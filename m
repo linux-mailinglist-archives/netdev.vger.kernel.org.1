@@ -1,297 +1,153 @@
-Return-Path: <netdev+bounces-143522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EA6F9C2D93
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 14:40:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E039C2DF8
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:01:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E71F280FBC
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 13:40:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 807FC282923
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C1B194125;
-	Sat,  9 Nov 2024 13:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944441448F2;
+	Sat,  9 Nov 2024 15:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="zeQkhBax"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QihDLrrq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0342192B95
-	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 13:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8772D1DFFC
+	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 15:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731159650; cv=none; b=N0P/FHgeTRkJw/DWSRJmi0IYvaymep8XImjKGTIUvunJqnJDG3LtOrjmqyaQDkesQL21zIYO1MmisAEqBY58D4GwQoPHKLwQRt8k5X8ErP6cxZsG5eUT1HylFFTk99ZMuV7P7YDaFbD/JMh1N3HZeYqWUyEXryLHrkAKvZFrzrk=
+	t=1731164471; cv=none; b=NXWJp5Z60S8pqO/zSqCeWeTnLcYiKPxU1pw2CQ4x7E4QtHiJgsim3EH8PavTmPJ8NCJjhNdwMUk28jnxHU3Omkx+jwaKXM25sRirdSvQ25Utb3fsXisrvk/ySTwr9U7fdurKIqMivVoNulFdt+ArmRQGMppBsYj38mTci/vYLBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731159650; c=relaxed/simple;
-	bh=DpuvVt7caLTKXKo/ZpTpfxwmYD5a5qfV0OjlFjgHRkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O6UuSXO2Y1psuTQYogkULbNVZTRbMNt1CxKymmcoEr6ExEgLjRjXkPermA6nsGw+4r7VB4CNGLends5ypEdsBm6pKhQaoohpyEYFhJdtzsUbZRuijCWGJ5GkDo2Xdx+NLzTknV0AJU5O/y2pvJk75ozoLL2k9aXHg+Xv/YZ3wx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=zeQkhBax; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53b34ed38easo3099221e87.0
-        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 05:40:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1731159647; x=1731764447; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nxB5gPoc3zzAhuEQiHf7da4pTtcAC3DNJzHv50OU/m4=;
-        b=zeQkhBaxgRaNjfPlN36AymfuUjNsxsPD6ibGlIMH2vK93+wglIykN/oWy7u9dUAddH
-         jUUJh88oo8Oha1DrOs4bi1AIVB48oagj2GgD0z8R4vul0BwG/ItXcMPNmjBQYMLvvbyT
-         6ojXCA+dAbf5ORKdP2rGkJPZ2MY95dGEOrHhktHJ+UxDx92z9r7RuMe+b+OL3JM8iP04
-         +JHO2tYS8kz2/4TOYLMecJJ5BD3sF7Clr747ROQtwLTP95ZD0+J8jYdg2S/8MCq3ADpP
-         92YdW7lIIn6Y0L2MzJdSwN+sVJySc7ddBdAJ4jEQD4jxTm6uX+OJEglIXuYduR35BTZV
-         Mb0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731159647; x=1731764447;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nxB5gPoc3zzAhuEQiHf7da4pTtcAC3DNJzHv50OU/m4=;
-        b=E6LHUijIn+ZT2GOpo9dwAmCNk5qytkFfwdaR3ahkbDSyeFwqIZ21/w0oA+k1xCI/fd
-         YL7B6LpH8S7rSZj5UpjniDNmsAgWOXMmTJVyD95sxmnXl2n8hX8EjFISXDM7U+MYhg+s
-         C+1sA+TqVv0o8SWmWJw11xRt6CTDG1GvAC0DviHp6dIjrXAy8btl4ux19a58/x7NuVKM
-         0PHlP1Yibjuf7U2Bu5YIIfMfiO3mtbVwEK7AE7dNszh5pW42Iu4XQyyIEIACpXeP/NFV
-         xLztL+SI01TlckW/xATkYgPuMR0r4hHjQcwj7ZfTs5C2cMC5Af9vep7gzylLndJeDQNR
-         3z2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVFtveNWAAH9fQkLOj2kqBRW8NnSTnIuwfUDopATOjvCNeBI3M5urgFCOWjF3s9WIGeOmFn0i0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNiVycJ3n7t0sv6fqMudk9oBx9+OThs6zrLZ+552L8rmVQckhJ
-	gYL7/0J65CYDGQO4Q+SZ3+QtO2AaOERAAxMva3vkDgntiv5eIpr0TCQLl+XysF8=
-X-Google-Smtp-Source: AGHT+IE0JAECEIE2ksLs8Y2aggg+blpxzPCgZBIS2K0qt/fU9tDMt9/9JtHZZK89+t7cjZNI3BmPvA==
-X-Received: by 2002:a05:6512:b83:b0:53c:7652:6c7a with SMTP id 2adb3069b0e04-53d862b45c8mr2870834e87.8.1731159646629;
-        Sat, 09 Nov 2024 05:40:46 -0800 (PST)
-Received: from localhost ([62.205.150.185])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d826a7248sm919292e87.127.2024.11.09.05.40.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Nov 2024 05:40:46 -0800 (PST)
-Date: Sat, 9 Nov 2024 15:40:45 +0200
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
-Cc: davem@davemloft.net, Roopa Prabhu <roopa@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [RFC net-next 2/4] net: bridge: send notification for roaming
- hosts
-Message-ID: <Zy9mXda9diHR_Eh5@penguin>
-References: <20241108032422.2011802-1-elliot.ayrey@alliedtelesis.co.nz>
- <20241108032422.2011802-3-elliot.ayrey@alliedtelesis.co.nz>
+	s=arc-20240116; t=1731164471; c=relaxed/simple;
+	bh=xjHYBzkNA2QJLik1N/FyRGPsd69C2yjVqwnGcZlqljY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=GbGdYcJ5gy2v1lcU7jDxOZB9eLS/n+bl7BGGEnvYDiz6Ff545FxaFpqh7+LscMHY8fJgx6/bOfKjn3yzUnsKdikToQ4IO9Jv8EvEMLGF/Yr73N3OG4THOHry5UUlnynNWFtOIrrkqboyIRcrl9f5UcInXnnfFQNus1mTQqycaiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QihDLrrq; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ea009a4a-c9f2-4843-b84d-e6b72982228e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731164463;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kBWdaYY7oZil/8F5g5wMNbyVFHwPk9nYWDS+2FprxqI=;
+	b=QihDLrrqNl0mmlpA31ADFLZbPSba3/Dsm/fcTEaoeyeceq4Q5G+/alt6FuneNFpoAsdf2V
+	k8Y6xaioukzDITmvYXb7oYyWQbauwJ5qrQIRNRW8/o6qjstmYLFyNLnAHn9VoTHNo5LBya
+	R0KvFtPaXey9K6rlEju9vRCbcYqSFRA=
+Date: Sat, 9 Nov 2024 15:00:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241108032422.2011802-3-elliot.ayrey@alliedtelesis.co.nz>
+Subject: Re: [PATCH net-next v2] Avoid traversing addrconf hash on ifdown
+To: Gilad Naaman <gnaaman@drivenets.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+References: <20241108052559.2926114-1-gnaaman@drivenets.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241108052559.2926114-1-gnaaman@drivenets.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Nov 08, 2024 at 04:24:19PM +1300, Elliot Ayrey wrote:
-> When an fdb entry is configured as static and sticky it should never
-> roam. However there are times where it would be useful to know when
-> this happens so a user application can act on it. For this reason,
-> extend the fdb notification mechanism to send a notification when the
-> bridge detects a host that is attempting to roam when it has been
-> configured not to.
+On 08/11/2024 05:25, Gilad Naaman wrote:
+> struct inet6_dev already has a list of addresses owned by the device,
+> enabling us to traverse this much shorter list, instead of scanning
+> the entire hash-table.
 > 
-> This is achieved by temporarily updating the fdb entry with the new
-> port, setting a new notify roaming bit, firing off a notification, and
-> restoring the original port immediately afterwards. The port remains
-> unchanged, respecting the sticky flag, but userspace is now notified
-> of the new port the host was seen on.
-> 
-> The roaming bit is cleared if the entry becomes inactive or if it is
-> replaced by a user entry.
-> 
-> Signed-off-by: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
 > ---
->  include/uapi/linux/neighbour.h |  4 ++-
->  net/bridge/br_fdb.c            | 64 +++++++++++++++++++++++-----------
->  net/bridge/br_input.c          | 10 ++++--
->  net/bridge/br_private.h        |  3 ++
->  4 files changed, 58 insertions(+), 23 deletions(-)
+> Changes in v2:
+>   - Remove double BH sections
+>   - Styling fixes (extra {}, extra newline)
+> ---
+>   net/ipv6/addrconf.c | 38 +++++++++++++++++---------------------
+>   1 file changed, 17 insertions(+), 21 deletions(-)
 > 
-
-No way, this is ridiculous. Changing the port like that for a notification is not
-ok at all. It is also not the bridge's job to notify user-space for sticky fdbs
-that are trying to roam, you already have some user-space app and you can catch
-such fdbs by other means (sniffing, ebpf hooks, netfilter matching etc). Such
-change can also lead to DDoS attacks with many notifications.
-
-Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
-
-> diff --git a/include/uapi/linux/neighbour.h b/include/uapi/linux/neighbour.h
-> index 5e67a7eaf4a7..e1c686268808 100644
-> --- a/include/uapi/linux/neighbour.h
-> +++ b/include/uapi/linux/neighbour.h
-> @@ -201,10 +201,12 @@ enum {
->   /* FDB activity notification bits used in NFEA_ACTIVITY_NOTIFY:
->    * - FDB_NOTIFY_BIT - notify on activity/expire for any entry
->    * - FDB_NOTIFY_INACTIVE_BIT - mark as inactive to avoid multiple notifications
-> +  * - FDB_NOTIFY_ROAMING_BIT - mark as attempting to roam
->    */
->  enum {
->  	FDB_NOTIFY_BIT		= (1 << 0),
-> -	FDB_NOTIFY_INACTIVE_BIT	= (1 << 1)
-> +	FDB_NOTIFY_INACTIVE_BIT	= (1 << 1),
-> +	FDB_NOTIFY_ROAMING_BIT	= (1 << 2)
->  };
->  
->  /* embedded into NDA_FDB_EXT_ATTRS:
-> diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-> index d0eeedc03390..a8b841e74e15 100644
-> --- a/net/bridge/br_fdb.c
-> +++ b/net/bridge/br_fdb.c
-> @@ -145,6 +145,8 @@ static int fdb_fill_info(struct sk_buff *skb, const struct net_bridge *br,
->  			goto nla_put_failure;
->  		if (test_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags))
->  			notify_bits |= FDB_NOTIFY_INACTIVE_BIT;
-> +		if (test_bit(BR_FDB_NOTIFY_ROAMING, &fdb->flags))
-> +			notify_bits |= FDB_NOTIFY_ROAMING_BIT;
->  
->  		if (nla_put_u8(skb, NFEA_ACTIVITY_NOTIFY, notify_bits)) {
->  			nla_nest_cancel(skb, nest);
-> @@ -554,8 +556,10 @@ void br_fdb_cleanup(struct work_struct *work)
->  					work_delay = min(work_delay,
->  							 this_timer - now);
->  				else if (!test_and_set_bit(BR_FDB_NOTIFY_INACTIVE,
-> -							   &f->flags))
-> +							   &f->flags)) {
-> +					clear_bit(BR_FDB_NOTIFY_ROAMING, &f->flags);
->  					fdb_notify(br, f, RTM_NEWNEIGH, false);
-> +				}
->  			}
->  			continue;
->  		}
-> @@ -880,6 +884,19 @@ static bool __fdb_mark_active(struct net_bridge_fdb_entry *fdb)
->  		  test_and_clear_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags));
->  }
->  
-> +void br_fdb_notify_roaming(struct net_bridge *br, struct net_bridge_port *p,
-> +			   struct net_bridge_fdb_entry *fdb)
-> +{
-> +	struct net_bridge_port *old_p = READ_ONCE(fdb->dst);
-> +
-> +	if (test_bit(BR_FDB_NOTIFY, &fdb->flags) &&
-> +	    !test_and_set_bit(BR_FDB_NOTIFY_ROAMING, &fdb->flags)) {
-> +		WRITE_ONCE(fdb->dst, p);
-> +		fdb_notify(br, fdb, RTM_NEWNEIGH, false);
-> +		WRITE_ONCE(fdb->dst, old_p);
-> +	}
-> +}
-> +
->  void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
->  		   const unsigned char *addr, u16 vid, unsigned long flags)
->  {
-> @@ -906,21 +923,24 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
->  			}
->  
->  			/* fastpath: update of existing entry */
-> -			if (unlikely(source != READ_ONCE(fdb->dst) &&
-> -				     !test_bit(BR_FDB_STICKY, &fdb->flags))) {
-> -				br_switchdev_fdb_notify(br, fdb, RTM_DELNEIGH);
-> -				WRITE_ONCE(fdb->dst, source);
-> -				fdb_modified = true;
-> -				/* Take over HW learned entry */
-> -				if (unlikely(test_bit(BR_FDB_ADDED_BY_EXT_LEARN,
-> -						      &fdb->flags)))
-> -					clear_bit(BR_FDB_ADDED_BY_EXT_LEARN,
-> -						  &fdb->flags);
-> -				/* Clear locked flag when roaming to an
-> -				 * unlocked port.
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index d0a99710d65d..c6fbd634912a 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -3846,12 +3846,12 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
+>   {
+>   	unsigned long event = unregister ? NETDEV_UNREGISTER : NETDEV_DOWN;
+>   	struct net *net = dev_net(dev);
+> -	struct inet6_dev *idev;
+>   	struct inet6_ifaddr *ifa;
+>   	LIST_HEAD(tmp_addr_list);
+> +	struct inet6_dev *idev;
+>   	bool keep_addr = false;
+>   	bool was_ready;
+> -	int state, i;
+> +	int state;
+>   
+>   	ASSERT_RTNL();
+>   
+> @@ -3890,28 +3890,24 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
+>   	}
+>   
+>   	/* Step 2: clear hash table */
+> -	for (i = 0; i < IN6_ADDR_HSIZE; i++) {
+> -		struct hlist_head *h = &net->ipv6.inet6_addr_lst[i];
+> +	read_lock_bh(&idev->lock);
+ > +	spin_lock(&net->ipv6.addrconf_hash_lock);>
+> -		spin_lock_bh(&net->ipv6.addrconf_hash_lock);
+> -restart:
+> -		hlist_for_each_entry_rcu(ifa, h, addr_lst) {
+> -			if (ifa->idev == idev) {
+> -				addrconf_del_dad_work(ifa);
+> -				/* combined flag + permanent flag decide if
+> -				 * address is retained on a down event
 > -				 */
-> -				if (unlikely(test_bit(BR_FDB_LOCKED, &fdb->flags)))
-> -					clear_bit(BR_FDB_LOCKED, &fdb->flags);
-> +			if (unlikely(source != READ_ONCE(fdb->dst))) {
-> +				if (unlikely(test_bit(BR_FDB_STICKY, &fdb->flags))) {
-> +					br_fdb_notify_roaming(br, source, fdb);
-> +				} else {
-> +					br_switchdev_fdb_notify(br, fdb, RTM_DELNEIGH);
-> +					WRITE_ONCE(fdb->dst, source);
-> +					fdb_modified = true;
-> +					/* Take over HW learned entry */
-> +					if (unlikely(test_bit(BR_FDB_ADDED_BY_EXT_LEARN,
-> +							      &fdb->flags)))
-> +						clear_bit(BR_FDB_ADDED_BY_EXT_LEARN,
-> +							  &fdb->flags);
-> +					/* Clear locked flag when roaming to an
-> +					 * unlocked port.
-> +					 */
-> +					if (unlikely(test_bit(BR_FDB_LOCKED, &fdb->flags)))
-> +						clear_bit(BR_FDB_LOCKED, &fdb->flags);
-> +				}
->  			}
->  
->  			if (unlikely(test_bit(BR_FDB_ADDED_BY_USER, &flags))) {
-> @@ -1045,6 +1065,7 @@ static bool fdb_handle_notify(struct net_bridge_fdb_entry *fdb, u8 notify)
->  		   test_and_clear_bit(BR_FDB_NOTIFY, &fdb->flags)) {
->  		/* disabled activity tracking, clear notify state */
->  		clear_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags);
-> +		clear_bit(BR_FDB_NOTIFY_ROAMING, &fdb->flags);
->  		modified = true;
->  	}
->  
-> @@ -1457,10 +1478,13 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
->  
->  		fdb->updated = jiffies;
->  
-> -		if (READ_ONCE(fdb->dst) != p &&
-> -		    !test_bit(BR_FDB_STICK, &fdb->flags)) {
-> -			WRITE_ONCE(fdb->dst, p);
-> -			modified = true;
-> +		if (READ_ONCE(fdb->dst) != p) {
-> +			if (test_bit(BR_FDB_STICKY, &fdb->flags)) {
-> +				br_fdb_notify_roaming(br, p, fdb);
-> +			} else {
-> +				WRITE_ONCE(fdb->dst, p);
-> +				modified = true;
-> +			}
->  		}
->  
->  		if (test_and_set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
-> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-> index ceaa5a89b947..512ffab16f5d 100644
-> --- a/net/bridge/br_input.c
-> +++ b/net/bridge/br_input.c
-> @@ -120,8 +120,14 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
->  				br_fdb_update(br, p, eth_hdr(skb)->h_source,
->  					      vid, BIT(BR_FDB_LOCKED));
->  			goto drop;
-> -		} else if (READ_ONCE(fdb_src->dst) != p ||
-> -			   test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
-> +		} else if (READ_ONCE(fdb_src->dst) != p) {
-> +			/* FDB is trying to roam. Notify userspace and drop
-> +			 * the packet
-> +			 */
-> +			if (test_bit(BR_FDB_STICKY, &fdb_src->flags))
-> +				br_fdb_notify_roaming(br, p, fdb_src);
-> +			goto drop;
-> +		} else if (test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
->  			/* FDB mismatch. Drop the packet without roaming. */
->  			goto drop;
->  		} else if (test_bit(BR_FDB_LOCKED, &fdb_src->flags)) {
-> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-> index 041f6e571a20..18d3cb5fec0e 100644
-> --- a/net/bridge/br_private.h
-> +++ b/net/bridge/br_private.h
-> @@ -277,6 +277,7 @@ enum {
->  	BR_FDB_NOTIFY_INACTIVE,
->  	BR_FDB_LOCKED,
->  	BR_FDB_DYNAMIC_LEARNED,
-> +	BR_FDB_NOTIFY_ROAMING,
->  };
->  
->  struct net_bridge_fdb_key {
-> @@ -874,6 +875,8 @@ int br_fdb_external_learn_del(struct net_bridge *br, struct net_bridge_port *p,
->  			      bool swdev_notify);
->  void br_fdb_offloaded_set(struct net_bridge *br, struct net_bridge_port *p,
->  			  const unsigned char *addr, u16 vid, bool offloaded);
-> +void br_fdb_notify_roaming(struct net_bridge *br, struct net_bridge_port *p,
-> +			   struct net_bridge_fdb_entry *fdb);
->  
->  /* br_forward.c */
->  enum br_pkt_type {
+> -				if (!keep_addr ||
+> -				    !(ifa->flags & IFA_F_PERMANENT) ||
+> -				    addr_is_local(&ifa->addr)) {
+> -					hlist_del_init_rcu(&ifa->addr_lst);
+> -					goto restart;
+> -				}
+> -			}
+> -		}
+> -		spin_unlock_bh(&net->ipv6.addrconf_hash_lock);
+> +	list_for_each_entry(ifa, &idev->addr_list, if_list) {
+> +		addrconf_del_dad_work(ifa);
+> +
+> +		/* combined flag + permanent flag decide if
+> +		 * address is retained on a down event
+> +		 */
+> +		if (!keep_addr ||
+> +		    !(ifa->flags & IFA_F_PERMANENT) ||
+> +		    addr_is_local(&ifa->addr))
+> +			hlist_del_init_rcu(&ifa->addr_lst);
+>   	}
+>   
+> +	spin_unlock(&net->ipv6.addrconf_hash_lock);
+> +	read_unlock_bh(&idev->lock);
+
+Why is this read lock needed here? spinlock addrconf_hash_lock will
+block any RCU grace period to happen, so we can safely traverse
+idev->addr_list with list_for_each_entry_rcu()...
+
+> +
+>   	write_lock_bh(&idev->lock);
+
+if we are trying to protect idev->addr_list against addition, then we
+have to extend write_lock scope. Otherwise it may happen that another
+thread will grab write lock between read_unlock and write_lock.
+
+Am I missing something?
 
