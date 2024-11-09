@@ -1,187 +1,242 @@
-Return-Path: <netdev+bounces-143517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624E19C2C11
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 12:01:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CC49C2D6A
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 13:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93DDB1C21124
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 11:00:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E89431C20D85
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 12:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517411741D2;
-	Sat,  9 Nov 2024 11:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBC61448F2;
+	Sat,  9 Nov 2024 12:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNbBIdwA"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="2pgOJCXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C461714A1;
-	Sat,  9 Nov 2024 11:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C7422083
+	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 12:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731150026; cv=none; b=tIaMJsumOGa/9ntxp0Q9TG2lY3YEU4LjQq+fOSj+KovbMsmAzItOux88sGfE+mZrUt92jy0b6V8Yk1LuFOZj4uH4dYqvoKx8Lrf83yxNypdU3Wln4UDXQmtOP3rhDvXsgTvRxFLYWnZvVN0iUdlqWWbvlpbOI1CTvvhU9Gh5FY4=
+	t=1731156667; cv=none; b=u5C/+QygudvSZsQ7hFkV1EbF6HbIxl3fIx1rLuZA+GT5nMtKsZa7PXdqvfmWBo9fzgAzrOcE4jivGDIKMmI8BkCpocQlKtZpJPGL8TotHwYHhdpYz7/dUM44kd4qw/xAGXgfefm8JclT9zvyA3zimlJTsg9MDSOOFATpTOUET2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731150026; c=relaxed/simple;
-	bh=C2Ggr7/lBmMYcsEocbkbo4QN88kd46oS6nv6gv/iEgA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Tdk/dATG25qZsglyCT58Eah/YnxsKARFmIPTJjIJ7bcjxWSt+heubNXQegR7RfBFXrym2p8Cgqt9rbePWhd/dMoFCDea+8diu5XmimP5/uizJpvVfQq1tIbRTQEkzQHqQkt8fPxwFAmTILMe7zoSgmLzD1bS63oRBbiOq4dcjdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNbBIdwA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA51C4CECE;
-	Sat,  9 Nov 2024 11:00:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731150025;
-	bh=C2Ggr7/lBmMYcsEocbkbo4QN88kd46oS6nv6gv/iEgA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=CNbBIdwAm3xS6s+wZ3pr+GNj3QD0NVrazS5bSRsfAn+kui58+vt57tSGgYlTJtj3p
-	 vxwpUW65Hu6ebxD/Gq5RA1ja2++m7Qz6dUgNWtByqvIHCrdlbkY3nm0Zj5u6az5JcS
-	 T4VAuRyZIaQ+WW8Ap2UDf3aiY7pDHOUV+aH6qb4ZxUbjeX5xoLeQFi2N91APv/y7Ot
-	 v2ZgVYMQ87KaBDAelMcPqHK30BqWFXJ6Vx6IjC0Tspm1wPfxKpzxQU1/EHLVTwgoTl
-	 9VzGA7WQ4b6W1tsdgRBDUGl6VDfK0YjNUP7pVr0l/CeiFcYpAllI+H50sPEU4JLGXH
-	 xI3XfRRrG+a4g==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Sat, 09 Nov 2024 13:00:08 +0200
-Subject: [PATCH net-next v3 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
- to priority map for RX
+	s=arc-20240116; t=1731156667; c=relaxed/simple;
+	bh=m64QaKUaZTxnkgelxWu20m5n+dkYOuC3Bv9wYe7Iggk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N9PzcihsP0ZY1+pW0qpGAAEISagpBfn3dQeKQun0rCr7W9/+sPueKUskNPQzCXGa5a1Ws5aZZcFRydUbIVfJRDTsu8aSTH+21/DCmMUtxvJy4QXSA5etfI2X29MJEXxivtu6PWSu7dSB/cefDxQ5o9xPen7BxdqKQfXRUwkPUXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=2pgOJCXW; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7eda47b7343so2142191a12.0
+        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 04:51:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1731156664; x=1731761464; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hjoy55EqLsAxv2ynvUHo4RLIRWtSzWG06eaGN7V8d1A=;
+        b=2pgOJCXW/SqBRQbb97aH+B6+3jleTFIeX0Yiw9Giqspe5FNoPc/hT3ULUFTLN4b+pA
+         5hWFG/LCNsUvFfYFdHRShjvPFeA9EcLhGICS1CRa03rFyyCMKnNIuBOZYCClFRNpT5sJ
+         8/y9id/edEDXP+aQeIRm9latwRlKquPMqX+EuPhFbjBx00q0tOF23gO88b9gYKfTuKJm
+         H1E1+RnxsF5mx53jaO2KwGDsu6vOAssdtB1dyGOCSbjDkP6q7qovzPnuS2OjpPCV57Lc
+         t5Xtp4nLOfrrjynxMyKluD+XL44f087f8QCcL4kZc+TTqtW8/1SG0bTvoTe2qyN8Tbj/
+         eCMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731156664; x=1731761464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hjoy55EqLsAxv2ynvUHo4RLIRWtSzWG06eaGN7V8d1A=;
+        b=rvC2n0nJoG4p+JVhitnpnbOq648DD8NYImNAKvtnfr47TtVcC+VXq5WHj/cd4G0t+M
+         XNUN9lYby+e+uOq4qk4yxbD6msRUir029j7sNHvf8NwSL4Ee2JssWm/4l1t4vqVt6pu2
+         FRgfOJYrKZrhZJtAyt8Fpd6e1ETBhXdByjJoMlugjGowzmERZRd/UMgdFv/kRDGOwxyO
+         +UM5Jpg8nWIdZtWKJtZtxnJ1nP5qIIAz1LmBaTt5RWqoMPxNX5POvZU9DDmR/MWrMIbM
+         8FJmAXL/IKRR4T3SObEHbiD4teaXbnXEb236kfiPGIi8lJgitWGj29GxRKX0Wkg1Z19q
+         GzfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFoD6G52LI7MZDFMDd4+0u+GLTerU0TrnEDLxVyiEPYvm0s71hJSNWzRQA/LQ/7UtKi076fTQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM/hNVOW0eLXLKTD2GDE/b4Tb8duGf8muUvVPJr1lTRECvuma/
+	HREzO5EH5ypUwMhzNYXnDW4ZFxa0CB9mbEZe9EiilB7ManX9OwaZ41GXFYb2DlOrR1vLY87VL7m
+	wLLchxj7kruz7x1JhjHbVhuGfVNFf70ix96/W
+X-Google-Smtp-Source: AGHT+IE20cuBS5IHS5bvoMYITbK/4r3hNwxvefgmOE3HTluxmbdsqN01uJtK5pb/+dxVJPgPiQ8EktkLb6TyoxAubwc=
+X-Received: by 2002:a17:90b:3c8f:b0:2e2:ac13:6f7 with SMTP id
+ 98e67ed59e1d1-2e9b16f0fffmr8888372a91.4.1731156664413; Sat, 09 Nov 2024
+ 04:51:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241109-am65-cpsw-multi-rx-dscp-v3-2-1cfb76928490@kernel.org>
-References: <20241109-am65-cpsw-multi-rx-dscp-v3-0-1cfb76928490@kernel.org>
-In-Reply-To: <20241109-am65-cpsw-multi-rx-dscp-v3-0-1cfb76928490@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, srk@ti.com, Pekka Varis <p-varis@ti.com>, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3478; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=C2Ggr7/lBmMYcsEocbkbo4QN88kd46oS6nv6gv/iEgA=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnL0C/p93EJarGcx0+FJBWemE0yLPM2z20HXQIa
- aYHJxbEwvSJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZy9AvwAKCRDSWmvTvnYw
- k29bEADKJNXfzn+YvxF+JuefXvuYT2LJBi7Qms8XonKOcs3hnOQsdAwJoFZV3fLHrIWN9PLvJel
- tMc58bXPRsgZ8nRGAKCV8zReWoVIx97bXBqpiPlMpW4KbiiqqjvL+2f4zkkXP8mer2NWN8m2Vvv
- UqSzHonhYSLvf17laJQLzbo8T6B22v9hS4GMZip63e42+AfkbWM0ORyuScnOhZh/Ec7JZQttq2I
- aQb97TRzCgeOIZ1g3sRllJfxTlbxhpeZ+pi/70BhoqVg0vf55sZEg58HBkfp10OG8jnETAFc+y8
- hH8ijX8Voeyu/Eifakh+sDdOWmX+Jr6VlE9kYugmr3VMWfASRzdI4+6A5NWhSz6RhKkC1sweZpn
- fq7kiEePmyavQBXJzy69mlurNdcLikgM29Z25OipCk31Izk46dl9OmB6Of9f2dHmOXD13LJZX5A
- 52fpub8Z8ri3oZGOX4uZ/GDH3bYrs+BchP4wAaWlKQfg0nrMdCH4FcgPObgfIMD+lj07mzrdBaZ
- +M5QuG5oKKeNBR1qI/GDUzOgSifXvRlzxQup0y9tMzrypVmmDC4eWMY9L7bZJFjc8U/QYqX5lvX
- vAEoQaAu0OJVlDYr2JkJVi+u4jmCQjwyF5R2uN5jgZ3Rrkr+o3ghDnH8aM7jls2lshKETSQ5+iE
- SKsV2xB6qP+9x0Q==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+References: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
+In-Reply-To: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sat, 9 Nov 2024 07:50:53 -0500
+Message-ID: <CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
+Subject: Re: [PATCH net v6] net: sched: cls_u32: Fix u32's systematic failure
+ to free IDR entries for hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, alexandre.ferrieux@orange.com, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
-appropriate priority queue via DSCP to Priority mapping registers
-(CPSW_PN_RX_PRI_MAP_REG).
+On Fri, Nov 8, 2024 at 9:12=E2=80=AFAM Alexandre Ferrieux
+<alexandre.ferrieux@gmail.com> wrote:
+>
+> To generate hnode handles (in gen_new_htid()), u32 uses IDR and
+> encodes the returned small integer into a structured 32-bit
+> word. Unfortunately, at disposal time, the needed decoding
+> is not done. As a result, idr_remove() fails, and the IDR
+> fills up. Since its size is 2048, the following script ends up
+> with "Filter already exists":
+>
+>   tc filter add dev myve $FILTER1
+>   tc filter add dev myve $FILTER2
+>   for i in {1..2048}
+>   do
+>     echo $i
+>     tc filter del dev myve $FILTER2
+>     tc filter add dev myve $FILTER2
+>   done
+>
+> This patch adds the missing decoding logic for handles that
+> deserve it, along with a corresponding tdc test.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
 
-We use the upper 3 bits of the DSCP field that indicate IP Precedence
-to map traffic to 8 priority queues.
 
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 54 ++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+Ok, looks good.
+Please split the test into a separate patch targeting net-next. Also
+your "Fixes" should be:
+commit e7614370d6f04711c4e4b48f7055e5008fa4ed42
+When you send the next version please include my Acked-by:
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 0520e9f4bea7..fab35e6aac7f 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -71,6 +71,8 @@
- #define AM65_CPSW_PORT_REG_RX_PRI_MAP		0x020
- #define AM65_CPSW_PORT_REG_RX_MAXLEN		0x024
- 
-+#define AM65_CPSW_PORTN_REG_CTL			0x004
-+#define AM65_CPSW_PORTN_REG_DSCP_MAP		0x120
- #define AM65_CPSW_PORTN_REG_SA_L		0x308
- #define AM65_CPSW_PORTN_REG_SA_H		0x30c
- #define AM65_CPSW_PORTN_REG_TS_CTL              0x310
-@@ -94,6 +96,10 @@
- /* AM65_CPSW_PORT_REG_PRI_CTL */
- #define AM65_CPSW_PORT_REG_PRI_CTL_RX_PTYPE_RROBIN	BIT(8)
- 
-+/* AM65_CPSW_PN_REG_CTL */
-+#define AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN	BIT(1)
-+#define AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN	BIT(2)
-+
- /* AM65_CPSW_PN_TS_CTL register fields */
- #define AM65_CPSW_PN_TS_CTL_TX_ANX_F_EN		BIT(4)
- #define AM65_CPSW_PN_TS_CTL_TX_VLAN_LT1_EN	BIT(5)
-@@ -176,6 +182,53 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port *slave,
- 	writel(mac_lo, slave->port_base + AM65_CPSW_PORTN_REG_SA_L);
- }
- 
-+#define AM65_CPSW_DSCP_MAX	GENMASK(5, 0)
-+#define AM65_CPSW_PRI_MAX	GENMASK(2, 0)
-+#define AM65_CPSW_DSCP_PRI_PER_REG	8
-+#define AM65_CPSW_DSCP_PRI_SIZE		4	/* in bits */
-+static int am65_cpsw_port_set_dscp_map(struct am65_cpsw_port *slave, u8 dscp, u8 pri)
-+{
-+	int reg_ofs;
-+	int bit_ofs;
-+	u32 val;
-+
-+	if (dscp > AM65_CPSW_DSCP_MAX)
-+		return -EINVAL;
-+
-+	if (pri > AM65_CPSW_PRI_MAX)
-+		return -EINVAL;
-+
-+	/* 32-bit register offset to this dscp */
-+	reg_ofs = (dscp / AM65_CPSW_DSCP_PRI_PER_REG) * 4;
-+	/* bit field offset to this dscp */
-+	bit_ofs = AM65_CPSW_DSCP_PRI_SIZE * (dscp % AM65_CPSW_DSCP_PRI_PER_REG);
-+
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+	val &= ~(AM65_CPSW_PRI_MAX << bit_ofs);	/* clear */
-+	val |= pri << bit_ofs;			/* set */
-+	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+
-+	return 0;
-+}
-+
-+static void am65_cpsw_port_enable_dscp_map(struct am65_cpsw_port *slave)
-+{
-+	int dscp, pri;
-+	u32 val;
-+
-+	/* Map IP Precedence field to Priority */
-+	for (dscp = 0; dscp <= AM65_CPSW_DSCP_MAX; dscp++) {
-+		pri = dscp >> 3; /* Extract IP Precedence */
-+		am65_cpsw_port_set_dscp_map(slave, dscp, pri);
-+	}
-+
-+	/* enable port IPV4 and IPV6 DSCP for this port */
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_CTL);
-+	val |= AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN |
-+		AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN;
-+	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_CTL);
-+}
-+
- static void am65_cpsw_sl_ctl_reset(struct am65_cpsw_port *port)
- {
- 	cpsw_sl_reset(port->slave.mac_sl, 100);
-@@ -921,6 +974,7 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
- 	common->usage_count++;
- 
- 	am65_cpsw_port_set_sl_mac(port, ndev->dev_addr);
-+	am65_cpsw_port_enable_dscp_map(port);
- 
- 	if (common->is_emac_mode)
- 		am65_cpsw_init_port_emac_ale(port);
+cheers,
+jamal
 
--- 
-2.34.1
-
+> ---
+> v6: big speedup of the tdc test with batch tc
+> v5: fix title - again
+> v4: add tdc test
+> v3: prepend title with subsystem ident
+> v2: use u32 type in handle encoder/decoder
+>
+>  net/sched/cls_u32.c                           | 18 ++++++++++----
+>  .../tc-testing/tc-tests/filters/u32.json      | 24 +++++++++++++++++++
+>  2 files changed, 38 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index 9412d88a99bc..6da94b809926 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -41,6 +41,16 @@
+>  #include <linux/idr.h>
+>  #include <net/tc_wrapper.h>
+>
+> +static inline u32 handle2id(u32 h)
+> +{
+> +       return ((h & 0x80000000) ? ((h >> 20) & 0x7FF) : h);
+> +}
+> +
+> +static inline u32 id2handle(u32 id)
+> +{
+> +       return (id | 0x800U) << 20;
+> +}
+> +
+>  struct tc_u_knode {
+>         struct tc_u_knode __rcu *next;
+>         u32                     handle;
+> @@ -310,7 +320,7 @@ static u32 gen_new_htid(struct tc_u_common *tp_c, str=
+uct tc_u_hnode *ptr)
+>         int id =3D idr_alloc_cyclic(&tp_c->handle_idr, ptr, 1, 0x7FF, GFP=
+_KERNEL);
+>         if (id < 0)
+>                 return 0;
+> -       return (id | 0x800U) << 20;
+> +       return id2handle(id);
+>  }
+>
+>  static struct hlist_head *tc_u_common_hash;
+> @@ -360,7 +370,7 @@ static int u32_init(struct tcf_proto *tp)
+>                 return -ENOBUFS;
+>
+>         refcount_set(&root_ht->refcnt, 1);
+> -       root_ht->handle =3D tp_c ? gen_new_htid(tp_c, root_ht) : 0x800000=
+00;
+> +       root_ht->handle =3D tp_c ? gen_new_htid(tp_c, root_ht) : id2handl=
+e(0);
+>         root_ht->prio =3D tp->prio;
+>         root_ht->is_root =3D true;
+>         idr_init(&root_ht->handle_idr);
+> @@ -612,7 +622,7 @@ static int u32_destroy_hnode(struct tcf_proto *tp, st=
+ruct tc_u_hnode *ht,
+>                 if (phn =3D=3D ht) {
+>                         u32_clear_hw_hnode(tp, ht, extack);
+>                         idr_destroy(&ht->handle_idr);
+> -                       idr_remove(&tp_c->handle_idr, ht->handle);
+> +                       idr_remove(&tp_c->handle_idr, handle2id(ht->handl=
+e));
+>                         RCU_INIT_POINTER(*hn, ht->next);
+>                         kfree_rcu(ht, rcu);
+>                         return 0;
+> @@ -989,7 +999,7 @@ static int u32_change(struct net *net, struct sk_buff=
+ *in_skb,
+>
+>                 err =3D u32_replace_hw_hnode(tp, ht, userflags, extack);
+>                 if (err) {
+> -                       idr_remove(&tp_c->handle_idr, handle);
+> +                       idr_remove(&tp_c->handle_idr, handle2id(handle));
+>                         kfree(ht);
+>                         return err;
+>                 }
+> diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json=
+ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+> index 24bd0c2a3014..b2ca9d4e991b 100644
+> --- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+> +++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+> @@ -329,5 +329,29 @@
+>          "teardown": [
+>              "$TC qdisc del dev $DEV1 parent root drr"
+>          ]
+> +    },
+> +    {
+> +        "id": "1234",
+> +        "name": "Exercise IDR leaks by creating/deleting a filter many (=
+2048) times",
+> +        "category": [
+> +            "filter",
+> +            "u32"
+> +        ],
+> +        "plugins": {
+> +            "requires": "nsPlugin"
+> +        },
+> +        "setup": [
+> +            "$TC qdisc add dev $DEV1 parent root handle 10: drr",
+> +            "$TC filter add dev $DEV1 parent 10:0 protocol ip prio 2 u32=
+ match ip src 0.0.0.2/32 action drop",
+> +            "$TC filter add dev $DEV1 parent 10:0 protocol ip prio 3 u32=
+ match ip src 0.0.0.3/32 action drop"
+> +        ],
+> +        "cmdUnderTest": "bash -c 'for i in {1..2048} ;do echo filter del=
+ete dev $DEV1 pref 3;echo filter add dev $DEV1 parent 10:0 protocol ip prio=
+ 3 u32 match ip src 0.0.0.3/32 action drop;done | $TC -b -'",
+> +        "expExitCode": "0",
+> +        "verifyCmd": "$TC filter show dev $DEV1",
+> +        "matchPattern": "protocol ip pref 3 u32",
+> +        "matchCount": "3",
+> +        "teardown": [
+> +            "$TC qdisc del dev $DEV1 parent root drr"
+> +        ]
+>      }
+>  ]
+> --
+> 2.30.2
+>
 
