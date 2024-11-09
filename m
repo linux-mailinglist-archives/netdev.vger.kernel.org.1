@@ -1,127 +1,142 @@
-Return-Path: <netdev+bounces-143503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 224159C2A48
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 06:15:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BA19C2A52
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 06:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEB3D2833E1
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 05:15:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A49F3B214A3
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 05:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340E413B2B6;
-	Sat,  9 Nov 2024 05:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B658F45945;
+	Sat,  9 Nov 2024 05:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtDf7yUp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JplINCLg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707198836;
-	Sat,  9 Nov 2024 05:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2C013AD0;
+	Sat,  9 Nov 2024 05:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731129340; cv=none; b=EhsZMLymRgcPkHp1jVQg34GOJ64B2TpkXTsc6tdcqUJ6M5iAY2hgR8nyIUe5foESLi1Ww+FCJzsm1vYOfnkiWd7plu3m2afDFQ/TXMr5yIzAQMHgILTl1l/lBwhBZVrQZa31Nm1L0mrdK03TY3TQjJxou4ELUdKJUBSDJHcDSDE=
+	t=1731130339; cv=none; b=WgCUqisDxE6/y/jJm2y/8aiZZavuc9a4DxQsAMKixYmu5wXBtrpLzAvVVJp1fu+DDaGzTh9ZFkQAMK0vNIbiCwQZXhYR9ul+IY/2SFylzqatXG+KHAwgi7hQ6du4vRsP0qyjdEMc3qsmO956Rl/zLB41rGf6aEMC2IWGyD1MNLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731129340; c=relaxed/simple;
-	bh=srDFTsNAwuMLwHBgKmjyNApD14mJpB3efD2+Gkm8Cis=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=RY0PN0eP3WMCGqUr4fZwHDkxnAYxjZyJASUblm/RWWVwdfMYJD5o9eAA2sT3i5BuAwJ81MJAaV5xnMlNeutKN+y6arjdDwr3xqfGCXMOOE2csV7jgoFDB7ZwHi7z9FjunqrFE1o6XPn2nVGY7haLMiNnKgl7bpVTaSlG6lT4lcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtDf7yUp; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20cb47387ceso31758305ad.1;
-        Fri, 08 Nov 2024 21:15:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731129337; x=1731734137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5jfnBisue6Ja6w9UlHzoj6XV7CgJYJ+QYjUAoUurtcw=;
-        b=HtDf7yUp8O1eWJCbdiMr2S0D/3PXmvdevQvyKTWW+c6bZwUV/iB5F9PNP9zHkrACYL
-         GMQYF5Q4ySQlNF5ct1kWnSOCDTnONPq7pw7U9h78LZ+xaR7AYw5tXFClD+5S7HLnizrQ
-         FYoA069XpoNM0Hh2m5KC2ab5zzUv/T3nqLvDLm8E5IpsgMCEYxNuJQCbCxKH12VEXQwx
-         Yr4MiJCNWE0gLuxVUsALLlinGQ9iuCo6o6TVZLxZS4+zZTeDEUmxoPQMVjPN6VXh/sSq
-         jYvkke5uVEeFCDlWVZAJCIc2QHXJlSTbzVhT764C3gvsHzNL7m+Hrp3MMPLg1sN7Ftxn
-         Vc6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731129337; x=1731734137;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5jfnBisue6Ja6w9UlHzoj6XV7CgJYJ+QYjUAoUurtcw=;
-        b=rbsB8lKlaHOU3nqI4UdfOIWo6eG1J9e+awwqL6CfMRR1VeJcmWAT4haYGdR0Ty+dzI
-         tH/T1ZGSLOrspvcxt/MBoesG5joisV2Zu0YQS7Gx872R4eMGfHYgPdwjyrE2sponDZ59
-         llAet6W/MB1qjyKNCsrbkptzeC/t4Rd2yB2GNebX9KmMDwyb7t5ChngpQ4P9KPeAOy5E
-         SO1lgi8tqUdQbcTp0pfUviYT0cZ8lUV6DFXjQuZ/vP5cU4RpI1tPvzUXUsQDlV+i0MUe
-         kupMlY8cGWvcK5+OheXErEFWyMtYDyLYAzUcvcTkjGmGh5jBWq0Kne6aAytIWJ9bcThZ
-         BHbg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjBkclh75HEmdf2JKvAcQrcSLAdAXIus8YYNXNUMMt0CyBBXIZQA1+0MgTtbou4iGIi92IjcyoLxxIrDhaAAI=@vger.kernel.org, AJvYcCWF5RcAtTNNTvxwv8dRGtO0hBnpM/jy5FHcQ4JwyTUMwXvM/6vNZ4hOJmK2egNCrzZ/W66kjj+v@vger.kernel.org, AJvYcCWwO34uiXo934uwyHqiHTuyHqSD9AveIqH7Mm9+exAjj96GnJqbkOFpsYSLGGcld1mrPRkLCP8fZdoobvQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzwb9R+jCBCamKkOlA9DCnN4FyXx1lvouItxAms9UbPL9ikd/DJ
-	WvCSrYIkxAqgVZFYjz5WcxwCR+npMGCs9KAD4hBdB8YgGJj2e+1N
-X-Google-Smtp-Source: AGHT+IG6vNIHXnZhYkkO0JMdGpVleHKOAwiCz9Uit7eCDcaw1dQ2hz6+QHxw3bblemdwa6m/gqOhkA==
-X-Received: by 2002:a17:902:d4cb:b0:20c:8f98:5dbe with SMTP id d9443c01a7336-2118354bfe9mr75976185ad.33.1731129336685;
-        Fri, 08 Nov 2024 21:15:36 -0800 (PST)
-Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177e41985sm39264925ad.168.2024.11.08.21.15.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 21:15:36 -0800 (PST)
-Date: Sat, 09 Nov 2024 14:15:20 +0900 (JST)
-Message-Id: <20241109.141520.1319530714927998446.fujita.tomonori@gmail.com>
-To: boqun.feng@gmail.com
-Cc: fujita.tomonori@gmail.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, jstultz@google.com,
- sboyd@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
-Subject: Re: [PATCH v5 6/7] rust: Add read_poll_timeout functions
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <Zyuy25viG51DDRk7@Boquns-Mac-mini.local>
-References: <20241101010121.69221-1-fujita.tomonori@gmail.com>
-	<20241101010121.69221-7-fujita.tomonori@gmail.com>
-	<Zyuy25viG51DDRk7@Boquns-Mac-mini.local>
+	s=arc-20240116; t=1731130339; c=relaxed/simple;
+	bh=go6EJHLnFe6ngJ4hdleV0KKVBCur+J/KhNeoZHpz/3E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UxfFONbI8b4Tg/y5I6GJIhgUIX5KgswnQMcy2Lmj396CE9eEdPiZfDiWwGZTNe5cV6gM3v7auWr1r5EyOjEkSTm34GsoX3ODJbFHtCH95RxVh89X6jQAElM+IrRCy/kdu5AjvGc7EJ7KXmzKV/1Ye363bHOg4sdeosj9FvqsUWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JplINCLg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE007C4CED6;
+	Sat,  9 Nov 2024 05:32:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731130338;
+	bh=go6EJHLnFe6ngJ4hdleV0KKVBCur+J/KhNeoZHpz/3E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=JplINCLgFXF2H6aXSBzvUZ/z5Zu/FtFsU8ZWKXKd3FVp/RbPjNmlJYVLEdGGW7sov
+	 ahiBIhZ28NXpp1pJ13xG5pzDGnm1t+AtzGTZB6PmCivzW2bb64QzfKNW8EyvjMS100
+	 OdKoemYTDAhx5/YCMIKRB2DdJOuxIdyZeXkWFbn071WTWndnsTT/8XYHGIauGePhbC
+	 XIkyMNclzxDhZjH1wIUC24XhxfB6/dRb0PcGEXmF4lfQQYYki1dKLtvNqmSg1+VBty
+	 Xewj21dMT6uEjYLMVHHkF8PXSis11ydZJEUAzc15VTo03gKHpOBXeZAPn3cHWsACaO
+	 zCFopkkSzq/DQ==
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-71807ad76a8so1740403a34.0;
+        Fri, 08 Nov 2024 21:32:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU6MjgEhL+V05DOj4SYkBOw0cu4pxh74cCUeHWQ57BWuyYSqYwSMr7YyqDgptmihv816rZ2Drhpdu134w==@vger.kernel.org, AJvYcCVvtJ5OeIAvZdrriHckG6LB6Jkw+Rf3z80rzQcQ5eIgPce0FnbB/qR2KX+K2wjiPLaPHFjpOwWVsQpD@vger.kernel.org, AJvYcCVyP2Wq1F9Xyk5LZLixLFTc5RBvTynCf9xdcJ6nsTOPpjySyA/A+XYJSsKZAczqQ5edgulnum/X@vger.kernel.org, AJvYcCWlPbodknCrV6gJWbwGzH7PC/EhmKU/UP1hIO1rY7p6V+Ru0NFCCSxd1iR+Mse/lI6PnXZZ7CAlU9S/cg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzKyJjStwdBwBKqdzCt0LWy2Edg6WM/URKbuPAVuG5EQ4G87EU
+	V8F73PwrewLLXYefU7EWoIxMn3Tmt2d9vYC/1iEPcbdbHI11LPrKwAi5/4XSv4T2Pfvn0UBN/oJ
+	BST00+P6YXxXMOUwQAHLBlGx3TEc=
+X-Google-Smtp-Source: AGHT+IGUk2Aoy8E+a8fBA7UoeDCTvBF9ts9tRUG7ZOLhiQIVcvd2RXZHo0CMHqhVCVLYEd13xSF8vSxYz2RjhcGsHrA=
+X-Received: by 2002:a05:6830:6105:b0:717:fe94:40af with SMTP id
+ 46e09a7af769-71a1c1c417amr5830991a34.3.1731130338076; Fri, 08 Nov 2024
+ 21:32:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241025072356.56093-1-wenjia@linux.ibm.com> <20241027201857.GA1615717@unreal>
+ <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com> <20241105112313.GE311159@unreal>
+ <20241106102439.4ca5effc.pasic@linux.ibm.com> <20241106135910.GF5006@unreal>
+ <20241107125643.04f97394.pasic@linux.ibm.com> <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
+ <20241108175906.GB189042@unreal>
+In-Reply-To: <20241108175906.GB189042@unreal>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 9 Nov 2024 14:32:07 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8csLBOYhUOOXWnVDZjiH03KHdwuL68aQKAtF9dFW=YfA@mail.gmail.com>
+Message-ID: <CAKYAXd8csLBOYhUOOXWnVDZjiH03KHdwuL68aQKAtF9dFW=YfA@mail.gmail.com>
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>, 
+	Alexandra Winter <wintera@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>, 
+	Niklas Schnell <schnelle@linux.ibm.com>, Thorsten Winkler <twinkler@linux.ibm.com>, 
+	Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>, 
+	Aswin K <aswin@linux.ibm.com>, linux-cifs@vger.kernel.org, 
+	Kangjing Huang <huangkangjing@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 6 Nov 2024 10:18:03 -0800
-Boqun Feng <boqun.feng@gmail.com> wrote:
+On Sat, Nov 9, 2024 at 2:59=E2=80=AFAM Leon Romanovsky <leon@kernel.org> wr=
+ote:
+>
+> On Fri, Nov 08, 2024 at 08:40:40AM +0900, Namjae Jeon wrote:
+> > On Thu, Nov 7, 2024 at 9:00=E2=80=AFPM Halil Pasic <pasic@linux.ibm.com=
+> wrote:
+> > >
+> > > On Wed, 6 Nov 2024 15:59:10 +0200
+> > > Leon Romanovsky <leon@kernel.org> wrote:
+> > >
+> > > > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA co=
+re code?
+> > > >
+> > > > RDMA core code is drivers/infiniband/core/*.
+> > >
+> > > Understood. So this is a violation of the no direct access to the
+> > > callbacks rule.
+> > >
+> > > >
+> > > > > I would guess it is not, and I would not actually mind sending a =
+patch
+> > > > > but I have trouble figuring out the logic behind  commit ecce70cf=
+17d9
+> > > > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
+> > > > > ksmbd_rdma_capable_netdev()").
+> > > >
+> > > > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avo=
+id
+> > > > GID, netdev and fabric complexity.
+> > >
+> > > I'm not familiar enough with either of the subsystems. Based on your
+> > > answer my guess is that it ain't outright bugous but still a layering
+> > > violation. Copying linux-cifs@vger.kernel.org so that
+> > > the smb are aware.
+> > Could you please elaborate what the violation is ?
+>
+> There are many, but the most screaming is that ksmbd has logic to
+> differentiate IPoIB devices. These devices are pure netdev devices
+> and should be treated like that. ULPs should treat them exactly
+> as they treat netdev devices.
+Okay, I'll discuss with Kangjing if there's another way to avoid this issue=
+.
+If not, I'll revert the patch.
 
-> On Fri, Nov 01, 2024 at 10:01:20AM +0900, FUJITA Tomonori wrote:
-> [...]
->> @@ -44,6 +45,7 @@
->>  pub mod page;
->>  pub mod prelude;
->>  pub mod print;
->> +pub mod processor;
->>  pub mod sizes;
->>  pub mod rbtree;
->>  mod static_assert;
->> diff --git a/rust/kernel/processor.rs b/rust/kernel/processor.rs
->> new file mode 100644
->> index 000000000000..eeeff4be84fa
->> --- /dev/null
->> +++ b/rust/kernel/processor.rs
-> 
-> What else would we put into this file? `smp_processor_id()` and IPI
-> functionality?
-
-Yeah, we would need smp_processor_id() but not sure about the other
-functions. There aren't many processor-related functions that Rust
-drivers directly need to call, I guess.
-
-> If so, I would probably want to rename this to cpu.rs.
-
-Fine by me, I'll go with cpu.rs in the next version.
-
-I chose processor.rs just because the C side uses processor.h for
-cpu_relax() but cpu.rs also looks good.
+Thanks.
+>
+> > I would also appreciate it if you could suggest to me how to fix this.
+> >
+> > Thanks.
+> > >
+> > > Thank you very much for all the explanations!
+> > >
+> > > Regards,
+> > > Halil
+> > >
 
