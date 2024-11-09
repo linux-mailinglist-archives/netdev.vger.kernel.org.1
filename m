@@ -1,229 +1,249 @@
-Return-Path: <netdev+bounces-143510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287C19C2B6E
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 10:38:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0DCE9C2B8B
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 11:09:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF98281D7D
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 09:38:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26490B20E15
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 10:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF133143725;
-	Sat,  9 Nov 2024 09:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10721482ED;
+	Sat,  9 Nov 2024 10:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBEujbZr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0eYpnFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47ED9288D1;
-	Sat,  9 Nov 2024 09:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C468E146590;
+	Sat,  9 Nov 2024 10:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731145104; cv=none; b=uZPVMrbbEXDD/GaM7mgBaLw2tyBmHq9HO7uzFVeFa8uVOCMDp0YT3FAPc/8a0GM9I0hRbJ95v+II/bbtVcYhUNHsVxaztuYeruHNRoLBZlxEWXPIsSXkuwxkCnHCZIUPYrF42ZACdHR4GEQxI86VpxHlpkKrL2DvG1RKXId94is=
+	t=1731146977; cv=none; b=tPPSOjb3785OaZ4CBsKqUmvH65Rpk3mxtBGuC31mN639r4Bv2Jchp4v5hKJTPN1cHebT/GSuQJ9x8I6rm961d4r6TpgvXeAmqzWTTqzjHT8INGYHa4AtDA1bvmS1uw7CkzscVXMl7wBFcFsbI3EgCSk0Q52+2FfX4E+5FqQr9iQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731145104; c=relaxed/simple;
-	bh=NzLYZgHOP2wvSoqFT7gXCPc7qie0SoqvKtxmE5X/Gh0=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=UowJ+OrRro3YqnD5ydmQylS2qIFt0t/Meg/ljkOcFngp3zj/NQVVP0wMFHWQe86YqgEVxzyAJPQKL6a4m2a6tIRj+Q/WqJdrz1lU3lIMCv5ysFF+Rd1lrougmyxeThJNoz2g26uO68eQc3tSIqnZFYMH2dj0D17c6aRWylvgnoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBEujbZr; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20c805a0753so30731615ad.0;
-        Sat, 09 Nov 2024 01:38:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731145103; x=1731749903; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fZB1H1cH3EcvDDGyOT3paa5uE/WHAGoFKm0TvWQ2nMs=;
-        b=LBEujbZrpRbS4sKLaEU4GkWhKmiFujf7DOMAOHLlfyedEGzrA4d1VWcLhk2y2fqcVI
-         pONtQQ7NPdYhabaSEKNgaqhkFzcokMQHuZf3m8DgGQnnLZiLV++isFPBvinTkvJXuQe3
-         w/saVefmYLgzfRvZuadbUtF5an8vBx1dLhO/pGbscgqWaX7W/EMllPEBees4YGhpv+aW
-         9fQU+ydbU0/hPTmE+6gvyQm0g+UeeN68v+WASSCC+EQQ1/ADZIxtmBOyKitdUeMEZ+T3
-         hF5WVVGx7CxJqX4HePUsnrsexvNigSxlcL/KfNniNTpMZyEs5T/Us7OGqV/3STMtEPbt
-         eU4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731145103; x=1731749903;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fZB1H1cH3EcvDDGyOT3paa5uE/WHAGoFKm0TvWQ2nMs=;
-        b=jWUNUR0V7KrVacVeKbfPx58WfBnaXNoxsI88NKVv6h9wXiJni9JG4G6H38lIMy6Id7
-         xG6KQ7kLMw5aKyDB6QPgR1c3mECG12mmj3+NetcoTZMxQJoqeAJ88fEceU0JbG42O4Kg
-         2TFv8oAfGBMWfMKCyYcMm/uXA4w4LNt7uRpX222bHHoAMoRtFQstg/8Z8E+iAJf5R6OS
-         q2LGz3QkzwyPBffKej2sedPOpwDJJkglpiVsjHAOWrQU0abYrGqy7+EREHitU/I7Fijp
-         WiZiECatLXHqknyYn0yJnmsSvEjgGAFUhoW7bzQrAHKSOZxthbcv9VjSW3fXvy34L6Sf
-         1Xjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWkRB8QELWJjecxbtwV2Crufh//bkQY0SnNGYdajx3dkkrgmuCNLCzB4qHNNzc9zBWNG7UsTg1X@vger.kernel.org, AJvYcCX3/kxWThQyOPWVlx+4qIhKnTgdzP7OCf0nedLHmtHbBbEuIVzhLfqbqeJuXvVg7W699fbjROuOm00Q5WQ=@vger.kernel.org, AJvYcCXTfVg+yOoRM9+x0Vnu9p4OXx+7Xw2HJ/mthlGWLet0ti1FalGd9el6nLa2E922oZhdzAYsklQXBPlpdHheH+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyoh3dTEgjP9SWQVFZsRifA6q4ks8F5HhsgsX/L8TyuCKkYCntE
-	DyDeryXIHFOGkEj1HnIo1qxa60OicfyyvljPisP9dodHy9nVF0WI
-X-Google-Smtp-Source: AGHT+IGyu0wK/UVWfHZUgP6+I416M2F1Dfaw3qijtJse7yfF4DWnr1CdFwG155TvFYjg79oO0OUVvQ==
-X-Received: by 2002:a17:902:c411:b0:20c:9d79:cf85 with SMTP id d9443c01a7336-21183e5ee46mr66346325ad.54.1731145102562;
-        Sat, 09 Nov 2024 01:38:22 -0800 (PST)
-Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f41f642bedsm4822452a12.67.2024.11.09.01.38.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Nov 2024 01:38:22 -0800 (PST)
-Date: Sat, 09 Nov 2024 18:38:04 +0900 (JST)
-Message-Id: <20241109.183804.1515599584405139212.fujita.tomonori@gmail.com>
-To: boqun.feng@gmail.com
-Cc: fujita.tomonori@gmail.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, jstultz@google.com,
- sboyd@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de,
- pmladek@suse.com, rostedt@goodmis.org, andriy.shevchenko@linux.intel.com,
- linux@rasmusvillemoes.dk, senozhatsky@chromium.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, bsegall@google.com, mgorman@suse.de,
- vschneid@redhat.com
-Subject: Re: [PATCH v5 6/7] rust: Add read_poll_timeout functions
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <ZyvhDbNAhPTqIoVi@boqun-archlinux>
-References: <20241101010121.69221-1-fujita.tomonori@gmail.com>
-	<20241101010121.69221-7-fujita.tomonori@gmail.com>
-	<ZyvhDbNAhPTqIoVi@boqun-archlinux>
+	s=arc-20240116; t=1731146977; c=relaxed/simple;
+	bh=Lq5A5kcSbQSM9mkKcxPIpv8cjiiz1I5NOw6kgjNp7XE=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=U/8q+U/ktPP4xwdYrUBgnz6EhGSPLaLpUbe+GaocUqld5zd7jNmwcXj4nwY8e3Nye8gzywpHBm5KKmRJIlPnlAFJSTivCwVqrarxiHxIT7hXM+ezELrRgroXbe1g4VIcfDDxOFuqhJyGmHUOaenTf2ITud+HnENafr8qR1YIpYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0eYpnFo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD94C4CECE;
+	Sat,  9 Nov 2024 10:09:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731146977;
+	bh=Lq5A5kcSbQSM9mkKcxPIpv8cjiiz1I5NOw6kgjNp7XE=;
+	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
+	b=W0eYpnFoHk47ScMecx7J8VkYaqi7D6Blcxp1VDPJrnztZrFujUYplhBCIW8iEzVbV
+	 HsD6hymEXrMJVT9Q1lZ5JlKmcOVyiCr3cqjfZc2BrPl8ADzycXgFbv+QFNMPn5EH1z
+	 84Etx3EkUksuzXAP9hrNieIC/h1E9JmP4FkPGZpLXqq5M1Z5F7+Vpf1OArMTb3h6TB
+	 VjIWgB3LHjGmpOSfUzA61MWqKqbIbNMfrMGzX2q7cIqssgIZdQMcFPnR+TGSbN5lZY
+	 7gMY4cYAyTdbjtrjlfRz/KX4XVFapWSzJCrdKgBs+EqEHl3aaAE6LRSS4Hw5UPg8wf
+	 +IiE8TrgEqYhA==
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
+Date: Sat, 9 Nov 2024 12:09:32 +0200 (EET)
+To: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net, 
+    edumazet@google.com, dsahern@kernel.org, pabeni@redhat.com, 
+    joel.granados@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch, 
+    horms@kernel.org, pablo@netfilter.org, kadlec@netfilter.org, 
+    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+    g.white@CableLabs.com, ingemar.s.johansson@ericsson.com, 
+    mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+    Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Subject: Re: [PATCH v5 net-next 08/13] gso: AccECN support
+In-Reply-To: <20241105100647.117346-9-chia-yu.chang@nokia-bell-labs.com>
+Message-ID: <661b9e25-0237-ef1f-e2fa-86ca52f676a2@kernel.org>
+References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com> <20241105100647.117346-9-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: multipart/mixed; BOUNDARY="8323328-396905128-1731146459=:1016"
+Content-ID: <3207a8a6-76b8-bedd-d35c-02d594f2f476@kernel.org>
 
-On Wed, 6 Nov 2024 13:35:09 -0800
-Boqun Feng <boqun.feng@gmail.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> On Fri, Nov 01, 2024 at 10:01:20AM +0900, FUJITA Tomonori wrote:
->> Add read_poll_timeout functions which poll periodically until a
->> condition is met or a timeout is reached.
->> 
->> C's read_poll_timeout (include/linux/iopoll.h) is a complicated macro
->> and a simple wrapper for Rust doesn't work. So this implements the
->> same functionality in Rust.
->> 
->> The C version uses usleep_range() while the Rust version uses
->> fsleep(), which uses the best sleep method so it works with spans that
->> usleep_range() doesn't work nicely with.
->> 
->> Unlike the C version, __might_sleep() is used instead of might_sleep()
->> to show proper debug info; the file name and line
->> number. might_resched() could be added to match what the C version
->> does but this function works without it.
->> 
->> The sleep_before_read argument isn't supported since there is no user
->> for now. It's rarely used in the C version.
->> 
->> For the proper debug info, readx_poll_timeout() and __might_sleep()
->> are implemented as a macro. We could implement them as a normal
->> function if there is a clean way to get a null-terminated string
->> without allocation from core::panic::Location::file().
->> 
-> 
-> So printk() actually support printing a string with a precison value,
-> that is: a format string "%.*s" would take two inputs, one for the length
-> and the other for the pointer to the string, for example you can do:
-> 
-> 	char *msg = "hello";
-> 
-> 	printk("%.*s\n", 5, msg);
-> 
-> This is similar to printf() in glibc [1].
-> 
-> If we add another __might_sleep_precision() which accepts a file name
-> length:
-> 
-> 	void __might_sleep_precision(const char *file, int len, int line)
-> 
-> then we don't need to use macro here, I've attached a diff based
-> on your whole patchset, and it seems working.
+--8323328-396905128-1731146459=:1016
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <ec7a403e-71b7-e063-ed88-40c0d643d808@kernel.org>
 
-Ah, I didn't know this.
+On Tue, 5 Nov 2024, chia-yu.chang@nokia-bell-labs.com wrote:
 
-> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-> index be2e8c0a187e..b405b0d19bac 100644
-> --- a/include/linux/kernel.h
-> +++ b/include/linux/kernel.h
-> @@ -87,6 +87,8 @@ extern int dynamic_might_resched(void);
->  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
->  extern void __might_resched(const char *file, int line, unsigned int offsets);
->  extern void __might_sleep(const char *file, int line);
-> +extern void __might_resched_precision(const char *file, int len, int line, unsigned int offsets);
-> +extern void __might_sleep_precision(const char *file, int len, int line);
->  extern void __cant_sleep(const char *file, int line, int preempt_offset);
->  extern void __cant_migrate(const char *file, int line);
->  
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index 43e453ab7e20..f872aa18eaf0 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -8543,7 +8543,7 @@ void __init sched_init(void)
->  
->  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
->  
-> -void __might_sleep(const char *file, int line)
-> +void __might_sleep_precision(const char *file, int len, int line)
->  {
->  	unsigned int state = get_current_state();
->  	/*
-> @@ -8557,7 +8557,14 @@ void __might_sleep(const char *file, int line)
->  			(void *)current->task_state_change,
->  			(void *)current->task_state_change);
->  
-> -	__might_resched(file, line, 0);
-> +	__might_resched_precision(file, len, line, 0);
-> +}
-> +
-> +void __might_sleep(const char *file, int line)
-> +{
-> +	long len = strlen(file);
-> +
-> +	__might_sleep_precision(file, len, line);
+> From: Ilpo J=E4rvinen <ij@kernel.org>
+>=20
+> Handling the CWR flag differs between RFC 3168 ECN and AccECN.
+> With RFC 3168 ECN aware TSO (NETIF_F_TSO_ECN) CWR flag is cleared
+> starting from 2nd segment which is incompatible how AccECN handles
+> the CWR flag. Such super-segments are indicated by SKB_GSO_TCP_ECN.
+> With AccECN, CWR flag (or more accurately, the ACE field that also
+> includes ECE & AE flags) changes only when new packet(s) with CE
+> mark arrives so the flag should not be changed within a super-skb.
+> The new skb/feature flags are necessary to prevent such TSO engines
+> corrupting AccECN ACE counters by clearing the CWR flag (if the
+> CWR handling feature cannot be turned off).
+>=20
+> If NIC is completely unaware of RFC3168 ECN (doesn't support
+> NETIF_F_TSO_ECN) or its TSO engine can be set to not touch CWR flag
+> despite supporting also NETIF_F_TSO_ECN, TSO could be safely used
+> with AccECN on such NIC. This should be evaluated per NIC basis
+> (not done in this patch series for any NICs).
+>=20
+> For the cases, where TSO cannot keep its hands off the CWR flag,
+> a GSO fallback is provided by this patch.
+>=20
+> Signed-off-by: Ilpo J=E4rvinen <ij@kernel.org>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  include/linux/netdev_features.h | 8 +++++---
+>  include/linux/netdevice.h       | 2 ++
+>  include/linux/skbuff.h          | 2 ++
+>  net/ethtool/common.c            | 1 +
+>  net/ipv4/tcp_offload.c          | 6 +++++-
+>  5 files changed, 15 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/linux/netdev_features.h b/include/linux/netdev_featu=
+res.h
+> index 66e7d26b70a4..c59db449bcf0 100644
+> --- a/include/linux/netdev_features.h
+> +++ b/include/linux/netdev_features.h
+> @@ -53,12 +53,12 @@ enum {
+>  =09NETIF_F_GSO_UDP_BIT,=09=09/* ... UFO, deprecated except tuntap */
+>  =09NETIF_F_GSO_UDP_L4_BIT,=09=09/* ... UDP payload GSO (not UFO) */
+>  =09NETIF_F_GSO_FRAGLIST_BIT,=09=09/* ... Fraglist GSO */
+> +=09NETIF_F_GSO_ACCECN_BIT,         /* TCP AccECN w/ TSO (no clear CWR) *=
+/
+>  =09/**/NETIF_F_GSO_LAST =3D=09=09/* last bit, see GSO_MASK */
+> -=09=09NETIF_F_GSO_FRAGLIST_BIT,
+> +=09=09NETIF_F_GSO_ACCECN_BIT,
+> =20
+>  =09NETIF_F_FCOE_CRC_BIT,=09=09/* FCoE CRC32 */
+>  =09NETIF_F_SCTP_CRC_BIT,=09=09/* SCTP checksum offload */
+> -=09__UNUSED_NETIF_F_37,
+>  =09NETIF_F_NTUPLE_BIT,=09=09/* N-tuple filters supported */
+>  =09NETIF_F_RXHASH_BIT,=09=09/* Receive hashing offload */
+>  =09NETIF_F_RXCSUM_BIT,=09=09/* Receive checksumming offload */
+> @@ -128,6 +128,7 @@ enum {
+>  #define NETIF_F_SG=09=09__NETIF_F(SG)
+>  #define NETIF_F_TSO6=09=09__NETIF_F(TSO6)
+>  #define NETIF_F_TSO_ECN=09=09__NETIF_F(TSO_ECN)
+> +#define NETIF_F_GSO_ACCECN=09__NETIF_F(GSO_ACCECN)
+>  #define NETIF_F_TSO=09=09__NETIF_F(TSO)
+>  #define NETIF_F_VLAN_CHALLENGED=09__NETIF_F(VLAN_CHALLENGED)
+>  #define NETIF_F_RXFCS=09=09__NETIF_F(RXFCS)
+> @@ -210,7 +211,8 @@ static inline int find_next_netdev_feature(u64 featur=
+e, unsigned long start)
+>  =09=09=09=09 NETIF_F_TSO_ECN | NETIF_F_TSO_MANGLEID)
+> =20
+>  /* List of features with software fallbacks. */
+> -#define NETIF_F_GSO_SOFTWARE=09(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |=09 =
+    \
+> +#define NETIF_F_GSO_SOFTWARE=09(NETIF_F_ALL_TSO | \
+> +=09=09=09=09 NETIF_F_GSO_ACCECN | NETIF_F_GSO_SCTP | \
+>  =09=09=09=09 NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST)
+> =20
+>  /*
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 6e0f8e4aeb14..480d915b3bdb 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -5076,6 +5076,8 @@ static inline bool net_gso_ok(netdev_features_t fea=
+tures, int gso_type)
+>  =09BUILD_BUG_ON(SKB_GSO_UDP !=3D (NETIF_F_GSO_UDP >> NETIF_F_GSO_SHIFT))=
+;
+>  =09BUILD_BUG_ON(SKB_GSO_UDP_L4 !=3D (NETIF_F_GSO_UDP_L4 >> NETIF_F_GSO_S=
+HIFT));
+>  =09BUILD_BUG_ON(SKB_GSO_FRAGLIST !=3D (NETIF_F_GSO_FRAGLIST >> NETIF_F_G=
+SO_SHIFT));
+> +=09BUILD_BUG_ON(SKB_GSO_TCP_ACCECN !=3D
+> +=09=09     (NETIF_F_GSO_ACCECN >> NETIF_F_GSO_SHIFT));
+> =20
+>  =09return (features & feature) =3D=3D feature;
 >  }
->  EXPORT_SYMBOL(__might_sleep);
->  
-> @@ -8582,7 +8589,7 @@ static inline bool resched_offsets_ok(unsigned int offsets)
->  	return nested == offsets;
->  }
->  
-> -void __might_resched(const char *file, int line, unsigned int offsets)
-> +void __might_resched_precision(const char *file, int len, int line, unsigned int offsets)
->  {
->  	/* Ratelimiting timestamp: */
->  	static unsigned long prev_jiffy;
-> @@ -8605,8 +8612,8 @@ void __might_resched(const char *file, int line, unsigned int offsets)
->  	/* Save this before calling printk(), since that will clobber it: */
->  	preempt_disable_ip = get_preempt_disable_ip(current);
->  
-> -	pr_err("BUG: sleeping function called from invalid context at %s:%d\n",
-> -	       file, line);
-> +	pr_err("BUG: sleeping function called from invalid context at %.*s:%d\n",
-> +	       len, file, line);
->  	pr_err("in_atomic(): %d, irqs_disabled(): %d, non_block: %d, pid: %d, name: %s\n",
->  	       in_atomic(), irqs_disabled(), current->non_block_count,
->  	       current->pid, current->comm);
-> @@ -8631,6 +8638,13 @@ void __might_resched(const char *file, int line, unsigned int offsets)
->  	dump_stack();
->  	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
->  }
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 48f1e0fa2a13..530cb325fb86 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -694,6 +694,8 @@ enum {
+>  =09SKB_GSO_UDP_L4 =3D 1 << 17,
+> =20
+>  =09SKB_GSO_FRAGLIST =3D 1 << 18,
 > +
-> +void __might_resched(const char *file, int line, unsigned int offsets)
-> +{
-> +	long len = strlen(file);
+> +=09SKB_GSO_TCP_ACCECN =3D 1 << 19,
+>  };
+> =20
+>  #if BITS_PER_LONG > 32
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 0d62363dbd9d..5c3ba2dfaa74 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -32,6 +32,7 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT=
+][ETH_GSTRING_LEN] =3D {
+>  =09[NETIF_F_TSO_BIT] =3D              "tx-tcp-segmentation",
+>  =09[NETIF_F_GSO_ROBUST_BIT] =3D       "tx-gso-robust",
+>  =09[NETIF_F_TSO_ECN_BIT] =3D          "tx-tcp-ecn-segmentation",
+> +=09[NETIF_F_GSO_ACCECN_BIT] =3D=09 "tx-tcp-accecn-segmentation",
+>  =09[NETIF_F_TSO_MANGLEID_BIT] =3D=09 "tx-tcp-mangleid-segmentation",
+>  =09[NETIF_F_TSO6_BIT] =3D             "tx-tcp6-segmentation",
+>  =09[NETIF_F_FSO_BIT] =3D              "tx-fcoe-segmentation",
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 2308665b51c5..0b05f30e9e5f 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -139,6 +139,7 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+>  =09struct sk_buff *gso_skb =3D skb;
+>  =09__sum16 newcheck;
+>  =09bool ooo_okay, copy_destructor;
+> +=09bool ecn_cwr_mask;
+>  =09__wsum delta;
+> =20
+>  =09th =3D tcp_hdr(skb);
+> @@ -198,6 +199,8 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+> =20
+>  =09newcheck =3D ~csum_fold(csum_add(csum_unfold(th->check), delta));
+> =20
+> +=09ecn_cwr_mask =3D !!(skb_shinfo(gso_skb)->gso_type & SKB_GSO_TCP_ACCEC=
+N);
 > +
-> +	__might_resched_precision(file, len, line, offsets);
-> +}
->  EXPORT_SYMBOL(__might_resched);
->  
->  void __cant_sleep(const char *file, int line, int preempt_offset)
+>  =09while (skb->next) {
+>  =09=09th->fin =3D th->psh =3D 0;
+>  =09=09th->check =3D newcheck;
+> @@ -217,7 +220,8 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+>  =09=09th =3D tcp_hdr(skb);
+> =20
+>  =09=09th->seq =3D htonl(seq);
+> -=09=09th->cwr =3D 0;
+> +
+> +=09=09th->cwr &=3D ecn_cwr_mask;
 
-Cc scheduler people to ask if they would accept the above change for
-Rust or prefer that Rust itself handles the null-terminated string
-issue.
+Hi all,
+
+I started to wonder if this approach would avoid CWR corruption without
+need to introduce the SKB_GSO_TCP_ACCECN flag at all:
+
+- Never set SKB_GSO_TCP_ECN for any skb
+- Split CWR segment on TCP level before sending. While this causes need to=
+=20
+split the super skb, it's once per RTT thing so does not sound very=20
+significant (compare e.g. with SACK that cause split on every ACK)
+- Remove th->cwr cleaning from GSO (the above line)
+- Likely needed: don't negotiate HOST/GUEST_ECN in virtio
+
+I think that would prevent offloading treating CWR flag as RFC3168 and CWR
+would be just copied as is like a normal flag which is required to not=20
+corrupt it. In practice, RFC3168 style traffic would just not combine=20
+anything with the CWR'ed packet as CWRs are singletons with RFC3168.
+
+Would that work? It sure sounds too simple to work but I cannot=20
+immediately see why it would not.
+
+--=20
+ i.
+--8323328-396905128-1731146459=:1016--
 
