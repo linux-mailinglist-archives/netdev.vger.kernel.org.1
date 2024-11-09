@@ -1,133 +1,138 @@
-Return-Path: <netdev+bounces-143533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C029C2E47
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:39:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB869C2E4F
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:43:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3471E2823E2
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:39:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A511C20E44
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8135719C576;
-	Sat,  9 Nov 2024 15:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41A019CCEA;
+	Sat,  9 Nov 2024 15:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JORMcLjk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HOz4E6lS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C644C233D6B
-	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 15:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F1D19CC21;
+	Sat,  9 Nov 2024 15:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731166751; cv=none; b=uuazZqwnup+THja9fCbGzsRt3oKJFUh4zKmY4SUatZocX//MYoaj7pH8z9/MA19ktFYCRf15aZ3r1s2e1yUrrRPtCpeKPdk+Iigu6ijOYPC7gXLhg9r3R24G0DCd4OKpzsj5n5e/Lq/Wv0eVNxXVEx7mCOtnitliwXa3zkSbURk=
+	t=1731167029; cv=none; b=ldlWoOUgI/txQ6TqibMoTLNWmTMR/7t+d/C98IO/Q7d4oqL1Vra6KieV+OCYrW87GYAlsYFVH5wthkXQf2Va43d8wFBytKKRCSjFw1kMFHbmk9UYq/c029OUssJLvsOobblIyWSd10+/pY4oThNOeuYB/gRKWHFcv+oQ/8N9RNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731166751; c=relaxed/simple;
-	bh=HRiphkFlCXWVsiLbPMteQlV+XGEmBAli8F+ZcUN0UVc=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=E1DVPkkACBsxkTKBuRNeUjbYMLxOIJwTRTCrel4jxcdjFPXgRHzxW/YPGikl1JHUPiyiUq0q3oi2qIprlCuS9Y9uF6tIPJA6vcb5cu/WGJi8IhFx8dq4VU2s1+tTJROzKD8wg0CooT18EpCdBkwqATn/mJ9EDgIRlPIQZAbIbkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JORMcLjk; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c9634c9160so3702800a12.2
-        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 07:39:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731166748; x=1731771548; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HRiphkFlCXWVsiLbPMteQlV+XGEmBAli8F+ZcUN0UVc=;
-        b=JORMcLjkTL2hNz//exXwkDExsTLC1+oF0CTk+1KsR1+nznP+ICjS2+m8r8nsEAxljS
-         0LC1T/mb2JvNNVzvcQqsgxfGRUsEP44Mw86zCVNIga9XWjHc6CkGCXeNpQnrSuPV111B
-         aEwvjVV/Qkf/A/Ij0zwugm46cg7ujfEJri0ZX3iUsrVw2hNdgvH+ujAUBi1mgBPbNpjx
-         H1SAFQh7V3NZPBD5d2GcSxo2DVybnfKfFHXpbvx9jh7Yy9M5nkufg3ZPiaAca4TZM23k
-         728fP661lmdzM/5QkoZmCT6KlYrMIFiGkA3CRTVLXxupTjtefeYMwoso1UZgLTxn4SPp
-         DWrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731166748; x=1731771548;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HRiphkFlCXWVsiLbPMteQlV+XGEmBAli8F+ZcUN0UVc=;
-        b=Nia6kObKVAg018QhkjD+NdSf78OI4/RpcRyiQ9wffwgOq4TUW11IALAfT4XkPQtf3l
-         shRvRHt8GyHHfCO4dS6vuV4cQFHDb/YiJOjn6BxiKdq6fu3VSMwuJVK12Z45Kyb9biM/
-         FaPB3OPSIbePWak3ndCliJFMYaLaSmMxtFs/lhs2fS2L0P7nIU4eo/SrmaXM3gQgY4Kr
-         fBKO+lUnvafMTjmoLYmP8yk/+VLmXUQPHYyiwXNWklJLMtSc/wzeuz2xHuvKMhUCBD8D
-         Qxgwyt7nDpLdGO5Srg2UiGbHZw7IuYfoimw1/O/BWWNX/1VKEFBWxFFYH8hg2Oyv7MUp
-         pF8A==
-X-Forwarded-Encrypted: i=1; AJvYcCW/Of2X7lo15zcNHulUdfd9+irgRQzYMeb6MLHijLyhmgkiW3t1zWKbU7+dstUGpw14UwNXwX4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEr3D5cU+a5/ZkT7TutLClgl/L9iWd+cUQ1mmnGOej3N66/MFg
-	WlodNbtEVufb8yCH9FerLnIwy5k2OMCmzpVSDHFw4T/NLWmt8K7e
-X-Google-Smtp-Source: AGHT+IEyZVkTysskjB4qTGxgN7+peppFF/g/ruUwb6d7/LwSEI9w590e/t3KRwC480dGn/FsKdNajQ==
-X-Received: by 2002:a05:6402:2803:b0:5cb:def2:be0a with SMTP id 4fb4d7f45d1cf-5cf0a4416e0mr4925074a12.21.1731166747772;
-        Sat, 09 Nov 2024 07:39:07 -0800 (PST)
-Received: from [127.0.0.1] ([193.252.113.11])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03c4edd8sm3072393a12.71.2024.11.09.07.39.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Nov 2024 07:39:06 -0800 (PST)
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-Message-ID: <c74d0c92-7e93-4f96-bf24-ab0ca95f1188@orange.com>
-Date: Sat, 9 Nov 2024 16:39:03 +0100
+	s=arc-20240116; t=1731167029; c=relaxed/simple;
+	bh=jDNZB1A/J/zq5gt2PGFW4eLWP2EuMycAA3yVEocaOhQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dKI0wcKg5dg+Ez079HUOV5vFXHfkndzI1epZne09TBC64ZKjx5bsFA9o/7cmk0wA/CfmAGyV3V323DKkHLgpClXDMw2iLl4/WVSdowdxyEtYZP9IWf0yK7WcoQSy3m4o2Hm3xEo+U8C7gumaWp2HMVnw0hPUz9KV+XZsTdzszvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HOz4E6lS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=J57s815SwhMV8jjaOfiNANO5vn4nCJpafqqppdC8Pmg=; b=HOz4E6lSW7KvhQYxEEDlHapBil
+	06iVa4Ql5eIpJK3KaG6xlCHM4FATGEtGbGz6MLI3M8DHdg/vbp2HunYyTqVrcAwGRjmNwVpARqneL
+	3eGN9WqggzBm0puxFjjBL/SnzDGfVSiSoXfTNFUO0JrAl2ycMlaqlDtyoISD4tihzCC4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t9nch-00CiYi-EH; Sat, 09 Nov 2024 16:43:39 +0100
+Date: Sat, 9 Nov 2024 16:43:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tristram.Ha@microchip.com
+Cc: Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <d912d397-38b4-4bdb-ac38-ac45206b4af8@lunn.ch>
+References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
+ <20241109015633.82638-3-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v6] net: sched: cls_u32: Fix u32's systematic failure
- to free IDR entries for hnodes.
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
- Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Linux Kernel Network Developers <netdev@vger.kernel.org>
-References: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
- <CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
-Content-Language: fr, en-US
-Organization: Orange
-In-Reply-To: <CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241109015633.82638-3-Tristram.Ha@microchip.com>
 
-On 09/11/2024 13:50, Jamal Hadi Salim wrote:
-> On Fri, Nov 8, 2024 at 9:12=E2=80=AFAM Alexandre Ferrieux
-> <alexandre.ferrieux@gmail.com> wrote:
->>
->> This patch adds the missing decoding logic for handles that
->> deserve it, along with a corresponding tdc test.
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> Reviewed-by: Eric Dumazet <edumazet@google.com>
->> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
->=20
->=20
-> Ok, looks good.
-> Please split the test into a separate patch targeting net-next.
+> +static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> +			 u16 *buf, u16 len)
+> +{
+> +	u32 data;
+> +
+> +	port_sgmii_s(dev, port, devid, reg, len);
+> +	while (len) {
+> +		ksz_pread32(dev, port, REG_PORT_SGMII_DATA__4, &data);
+> +		*buf++ = (u16)data;
+> +		len--;
+> +	}
+> +}
+> +
+> +static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> +			 u16 *buf, u16 len)
+> +{
+> +	u32 data;
+> +
+> +	port_sgmii_s(dev, port, devid, reg, len);
+> +	while (len) {
+> +		data = *buf++;
+> +		ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, data);
+> +		len--;
+> +	}
+> +}
 
-I'm unfamiliar with the net/net-next dance (beyond the dichotomy between =
-fixes
-and new features). Can you please explain why the test should not be in t=
-he same
-commit ?
+This kind of looks like a C45 only MDIO bus.
 
+#define MMD_DEVICE_ID_VENDOR_MII	0x1F
 
-> Also your "Fixes" should be:> commit e7614370d6f04711c4e4b48f7055e5008f=
-a4ed42
+#define SR_MII				MMD_DEVICE_ID_VENDOR_MII
 
-Ah OK, I see, that's the IDR conversion. I had mistakenly believed it was=
- an
-isofunctional change, and upon seeing the "(|0x800)<<20" without "(>>20)&=
-0x7FF"
-in the initial commit, I believed it was a 19-year old bug. Then it's onl=
-y a
-7-year-old, thanks a lot for the correction.
+This is identical to MDIO_MMD_VEND2.
 
-> When you send the next version please include my Acked-by:
+#define SR_MII_RESET			BIT(15)
+#define SR_MII_LOOPBACK			BIT(14)
+#define SR_MII_SPEED_100MBIT		BIT(13)
+#define SR_MII_AUTO_NEG_ENABLE		BIT(12)
+#define SR_MII_POWER_DOWN		BIT(11)
+#define SR_MII_AUTO_NEG_RESTART		BIT(9)
+#define SR_MII_FULL_DUPLEX		BIT(8)
+#define SR_MII_SPEED_1000MBIT		BIT(6)
 
-Will do. Thanks a lot !
+A standard BMCR.
 
+#define MMD_SR_MII_STATUS		0x0001
+#define MMD_SR_MII_ID_1			0x0002
+#define MMD_SR_MII_ID_2			0x0003
+#define MMD_SR_MII_AUTO_NEGOTIATION	0x0004
+
+Same as:
+
+#define MII_BMSR                0x01    /* Basic mode status register  */
+#define MII_PHYSID1             0x02    /* PHYS ID 1                   */
+#define MII_PHYSID2             0x03    /* PHYS ID 2                   */
+#define MII_ADVERTISE           0x04    /* Advertisement control reg   */
+
+So i think your first patch should be to replace all these with the
+standard macros.
+
+That will then help make it clearer how much is generic, could the
+existing helpers be used, probably with a wrapper to make your C22
+device mapped to C45 MDIO_MMD_VEND2 look like a C22 device?
+
+	Andrew
 
