@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-143559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37ABC9C2FA9
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 22:50:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E6D9C2FAA
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 22:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFD3C1F215F1
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 21:50:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 116381F21A56
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 21:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E900819DF48;
-	Sat,  9 Nov 2024 21:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 389721A00F8;
+	Sat,  9 Nov 2024 21:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iFKWPNB+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gaa5hpX0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AC22E628
-	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 21:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095FF19F471
+	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 21:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731189020; cv=none; b=kRkJtmfOxihtbGTIbwS6bEna+fnzyxdU561tODpERbaFH+nJf6y71CuySp5n8omowzt7oqHu+aTFNxQkLE4HN0/D6lXbuF+dJK1LzqrIJUt+e38tOplB9wBR0X+LPCf2uZARCjrMO7QoZ3vgawpR0IJjlDr56ruFSWzPy5UfK/8=
+	t=1731189021; cv=none; b=NNMlYU99U2cQQwRQWbQ3NWUKCHj4x3NGq2Cw6aiQQqMS7JAQty40oEbwEa/lg3K6uVBQB5+QZOD3mCtasvgr2Bl7JTJYl8QAUTyEIsiWzYJHXOH3SdnkTZbZGWuRDPgbIHKtr8NB39Lvz15G8NHetjpPfaFiKfHmwMqYT4BQZAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731189020; c=relaxed/simple;
-	bh=l/bkednoaFH+B4pIWBAofP8Z30XWavFQfE1jCzDbhQE=;
+	s=arc-20240116; t=1731189021; c=relaxed/simple;
+	bh=swXR1a+tlPfbvZ/wEeJtxsI1i8WsFnPqjGjeJ2smvPQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BxAIXkij+MxjXsNsCkMevhOf3OgVtX/7dM+q8SF/Ium3y65iPabiDm/MbLB2esCc7PjqNSBn3ldZJTrVwQMSYjhRE8Qa/DxE6mZW0qj5rZFtRkX/QzJ/IcOXyvcRRdGIUgjwNxMJY6vAvx6rx4SITwnqj5UpqPCFzZh8bz2qjXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iFKWPNB+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD4EC4CECE;
-	Sat,  9 Nov 2024 21:50:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pBi7LcGhos2d6OStqTqaYX6PHQMIDSebWEeJZPJdzamr1hz7+aQtFocPyED455AXVl6hHzHNr7uFG0D1xv/NnLTTIHAgwtEkkbTwgIbrVRMagubco0rMmWvASq8LHiKHB/hY/8202WICUiaChlTnxbvtWfuyMce5J10Ms2rsay0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gaa5hpX0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCE50C4CED2;
+	Sat,  9 Nov 2024 21:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731189019;
-	bh=l/bkednoaFH+B4pIWBAofP8Z30XWavFQfE1jCzDbhQE=;
+	s=k20201202; t=1731189020;
+	bh=swXR1a+tlPfbvZ/wEeJtxsI1i8WsFnPqjGjeJ2smvPQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iFKWPNB+XZcuoZZqcJE3tES4/WVUBt39VhwDiS1IqIw36e6mFNksAPV/eae1xY4Vb
-	 CVnhchFqFHWhrbE6n6wztglfi6t/zCn3zbe1VL8XJzZDNo1KWUXY5CuRY6Ldvey8JT
-	 2xz3aHybLCPykEUFSN1I0FTeqRlbdYXPh5ljC8FTw2gB4MluLhBbMPDt3VVY5NfKkt
-	 +y6E2lxJrLZmcVZ/VOgwQYdEuO1pcQvbENm8WsyFIF9m2IXcR47vyZetnzhvqFtFKs
-	 ESDpdQZvuP6hIYzTTROQfFTGqiS32XpjcK0GoKm/NtaiGDawR75/M/7gl8YSFij/HP
-	 NaD9UMKNMs+vw==
+	b=gaa5hpX0JN3z9jQ7B3fgJLJUHXlNsU77Qkeq8pTVo7U/HgFokM671MReZ6G4AtgHU
+	 LAFEGbJliHpFWVZggvur1/LA21xezUuE0NtyUGIy1Yn+pJnh/631G4EA7sa4vDqx35
+	 73G7aDFqqZLEMw23b+mRa3dzCmARc7z/hNW3SwExzrcdqS7HhRVbw13PbLhtUmDv4r
+	 aGedH2q9aFnz5lj0j8tM4wY5d8nPu2xyw4wcTU6mkO6xcuHxm1aBOGdZnss3uNxYwY
+	 blS+kPC2QNf9vs9u6ftTh1yWaoeMR4V/8lp1IEROWaUqRo+LDoNkifggrMUggPQzXh
+	 /6YYTbPvpNw5w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E7B3809A80;
-	Sat,  9 Nov 2024 21:50:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC763809A80;
+	Sat,  9 Nov 2024 21:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v9 0/6] Improve neigh_flush_dev performance
+Subject: Re: [PATCH net-next 0/3] r8169: improve wol/suspend-related code
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173118902902.3018960.15714262334867949431.git-patchwork-notify@kernel.org>
-Date: Sat, 09 Nov 2024 21:50:29 +0000
-References: <20241107160444.2913124-1-gnaaman@drivenets.com>
-In-Reply-To: <20241107160444.2913124-1-gnaaman@drivenets.com>
-To: Gilad Naaman <gnaaman@drivenets.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com
+ <173118903023.3018960.12845984242276994035.git-patchwork-notify@kernel.org>
+Date: Sat, 09 Nov 2024 21:50:30 +0000
+References: <be734d10-37f7-4830-b7c2-367c0a656c08@gmail.com>
+In-Reply-To: <be734d10-37f7-4830-b7c2-367c0a656c08@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  7 Nov 2024 16:04:37 +0000 you wrote:
-> This patchsets improves the performance of neigh_flush_dev.
+On Wed, 6 Nov 2024 17:54:27 +0100 you wrote:
+> This series improves wol/suspend-related code parts.
 > 
-> Currently, the only way to implement it requires traversing
-> all neighbours known to the kernel, across all network-namespaces.
-> 
-> This means that some flows are slowed down as a function of neigh-scale,
-> even if the specific link they're handling has little to no neighbours.
+> Heiner Kallweit (3):
+>   r8169: improve __rtl8169_set_wol
+>   r8169: improve rtl_set_d3_pll_down
+>   r8169: align WAKE_PHY handling with r8125/r8126 vendor drivers
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v9,1/6] neighbour: Add hlist_node to struct neighbour
-    https://git.kernel.org/netdev/net-next/c/41b3caa7c076
-  - [net-next,v9,2/6] neighbour: Define neigh_for_each_in_bucket
-    https://git.kernel.org/netdev/net-next/c/d7ddee1a522d
-  - [net-next,v9,3/6] neighbour: Convert seq_file functions to use hlist
-    https://git.kernel.org/netdev/net-next/c/00df5e1a3fdf
-  - [net-next,v9,4/6] neighbour: Convert iteration to use hlist+macro
-    https://git.kernel.org/netdev/net-next/c/0e3bcb0f78a0
-  - [net-next,v9,5/6] neighbour: Remove bare neighbour::next pointer
-    https://git.kernel.org/netdev/net-next/c/a01a67ab2fff
-  - [net-next,v9,6/6] neighbour: Create netdev->neighbour association
-    https://git.kernel.org/netdev/net-next/c/f7f52738637f
+  - [net-next,1/3] r8169: improve __rtl8169_set_wol
+    https://git.kernel.org/netdev/net-next/c/c507e96b5763
+  - [net-next,2/3] r8169: improve rtl_set_d3_pll_down
+    https://git.kernel.org/netdev/net-next/c/330dc2297c82
+  - [net-next,3/3] r8169: align WAKE_PHY handling with r8125/r8126 vendor drivers
+    https://git.kernel.org/netdev/net-next/c/e3e9e9039fa6
 
 You are awesome, thank you!
 -- 
