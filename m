@@ -1,222 +1,168 @@
-Return-Path: <netdev+bounces-143493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FD7C9C29D2
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 05:21:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F4A9C29D6
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 05:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C791D1F224D5
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 04:21:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 924D52845DA
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 04:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D111C6B8;
-	Sat,  9 Nov 2024 04:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71FC3D994;
+	Sat,  9 Nov 2024 04:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GW0HnUmQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hV6X6ACo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C2AECF
-	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 04:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD45A55;
+	Sat,  9 Nov 2024 04:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731126092; cv=none; b=HXtybVmqqd3X+owp6+RW9EyfAq+5HI0bISxfS28jASvPaY7ZOhlHu3ZdLTadw8B1FyW2jnUAZfY8NhV+GKZw6AEsBkVj3JpFSyPM4sDxgtHGo/Jh04RKIFESbTHIx3jYd5ULa+BNvhcufrvgKX6C9ojQeiZ5rp2LkxRmOeElkUY=
+	t=1731127127; cv=none; b=DK/dhGiKj95FLeS3q7xooHRF0SJEL+TiZESqEyKXqMxiORLbf3YpF3CFt1ttFnlVG/gFxo93nLJ573Tkzr67SHh8u6iPjzb7JxHq7S1UIRfeeAC0kkfhMFAdOwNa1i8QdFNi6CbOhMit41eQple6p7n+vmjcS35yV9hUJpAz1pA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731126092; c=relaxed/simple;
-	bh=Ibjgn5xzqf6PLtNyRfeHDnDCsjLN2fDtwoWusWb6tPI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WTV7J0xB7VXPaLSXIpG3+4wk+iapMxOS6ub52ZWxu6mbOIYdJu+rLKDDBh9pTvrdp1PDCGtW75AJJZEsTgMfT5ocJ2+YtN7ZsFaWxq9GyswKvJwkkQbHldulZqYCuPtP90Z7Hm4Lxc3FdSXpPuF67lSkW129arXlBm4ww3c17TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GW0HnUmQ; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c96b2a10e1so3949886a12.2
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 20:21:30 -0800 (PST)
+	s=arc-20240116; t=1731127127; c=relaxed/simple;
+	bh=KqclHp6ArxX0BZFmIZrwmiFdi8bA+sADZ4vgofgVCdk=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=LmLf1h9DdZ60yjPzMcS7eoFuJuw3QB7F9tX9cbjfAQqXp/2JK+DsK2FbSdmi6fAXEQcW463MW2AjkOx8rctyFoOrEFlY7TtKP14UaOpeRkWqWfBagVhq2rD0eRb89tALlQYOv21uvrEnpcpkaRKTrjxvkgnF4tmzGZ2u7+dxyOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hV6X6ACo; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e4e481692so2768212b3a.1;
+        Fri, 08 Nov 2024 20:38:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731126089; x=1731730889; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fPrNFqA10UGJSoJ2Ax0M+9QR1KdREENXsSFqGGq+9QU=;
-        b=GW0HnUmQLj8mGoQwrKe0StyLosVPDVcArPQzBDjPhEdJvsf+3ufXtvGsB8s5X11/If
-         DXv2R+Z0rkW0KTvrxMZcdTCLWAjQUl58DOwX2iq++yCyZO4WL45nB01vXxXHz0SDwaif
-         jUZSMc97o4bGp/VCang64RkNevaGimemz9uxE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731126089; x=1731730889;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1731127126; x=1731731926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fPrNFqA10UGJSoJ2Ax0M+9QR1KdREENXsSFqGGq+9QU=;
-        b=lUEdK/bCZahm4OfcWYh6OjYqrbq9Dtrp+SgtVhfeHwDK219FxhA3xO+0AdqL5n3DEy
-         IE4GM6wSACez9vyalmGrpv4Yf/Ycfw0APRZyvpfoJ3JnMH8EXalAnJU0+DeXt6hXBaiU
-         iBvnEftqOZoBKJNNMyZjrpqIKkcrG731fw89pe+zpu8HduiEBT5yQpSzyYeUoeUJ5n40
-         hPn6uDfeDZRGS5GvQ6zDeIkwTygCr2K8X3AQNODCTrOhX5mEt/CI7TBZuGIG+OwujtJ8
-         /uJWySKADXIasb/anxd++/fgV7jzii8JyziVah6NJd7WLHbwqB2FdUeepfiaEU6tGMIz
-         DTCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfvFQSjEkQFG1F6dX+Hx0uWi3RX3Vvrqr+aZtUPfTgn8HkMjg8a3q668RNiBAsYOWW8NfFBu4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZm/yGwjsRUlA5gCYLS6RB8iqzoxxwtyKgkoqCnpf/3ZsjNMPe
-	sWzdh1LAQ2Ow+u6al0rO/rq4Omx0Oy2gofzcZNz6DyQKvEoPdqZe0T5IpXUVkbXFfRdvWxpFmch
-	cOMMqnrDtIU3z7RTh2QYXKS4cFW//ySKxLPFE
-X-Google-Smtp-Source: AGHT+IEbI8Zy3jHJWZ8emyCEGhlMje1/z5MRT5gRrLJjxrgY5yg5uMbMy0BHhLZGL1yYeXxJfr5TzI2/SQZCAJDTYQ4=
-X-Received: by 2002:a05:6402:27c9:b0:5cf:f82:ea14 with SMTP id
- 4fb4d7f45d1cf-5cf0f82ebd0mr3652436a12.5.1731126089209; Fri, 08 Nov 2024
- 20:21:29 -0800 (PST)
+        bh=DA3hw8R6XL4AOWydyQZHwCswIEuadIAoTh+magCGfx0=;
+        b=hV6X6ACoqEnHVbygs6U4cEhsN2J3O7LQsNIWTa7rKrhSbr5whhFCcE5iTfr4rgfpCq
+         7A8JJA0jjnSiqgiC+1mGlgPPtDJUv4enLhTp9pKtIH+Pc+CMjRajDIEdKd+NAPmwFyqH
+         hoK24LWkyh+YuzkJGAKvcSMK96pQRb6JFzJbKfUTXZv/AZ3hMAKNpa7szgrjz/tBIHww
+         RzcE+K2aSS0jhtHpv1d9FBmfIq9vn9jhnEi1Cc8Hxcckt2gmHZuhKEfE8F5YDips7wUa
+         ERz8QfQHZlaW5htRl3wlKZ0kMjGvEsKKBdAHyeJXTXhXi3ml0dMH98Zj7QvSwtxf/Kmo
+         io9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731127126; x=1731731926;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DA3hw8R6XL4AOWydyQZHwCswIEuadIAoTh+magCGfx0=;
+        b=aLv48dHvFgZuPwdcknI/ob+JPQd7I4sh/7MAn/q3xtxKdBLIagL8LNkTbCd3sdsHzF
+         9+7ckES5x4ro0nagfoWxUKjQ4fuPSyYq3e6ZieGQ/6WH/VRDaDsV3Q1AqJMXbwCvaL36
+         53SDDiDpMvDHNYj5+NSCyDC4xs/CU7Vb6EI3fauBBeeUBbpOqnECAeAdUAkI+3OzdL9v
+         5/aDfvsBzkFC/PFab4y/vnletEMCXbLXX6Drff7ZLQLiCnsCzswJQGFlkNzRgi85oXWh
+         MPTmRC/G+iZJo22hKz4sUTpEBhadmT/3Za63cTv+9w+Cbh4Pj+PRIGY0zZ88rOy4/1eU
+         r1jw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUPjzgxx5fxBF0xMR6hMRTgqBZ0ZHCuHnmRL8IsBoJGCRPHQHDTkVeHMbXlQJBzTtbo5xG0BKo@vger.kernel.org, AJvYcCUfqV9pnoayv6vWFaKm3dN10wMIdBiMj9PeQSt7EQyB827m4F9xAvF5roLSise2l3ezKc6I0j/wLbZuOcb3w/0=@vger.kernel.org, AJvYcCVrrI+sKtiNRykkMCNAPxUhNdPH72ESimVZE5UVqtExAHFjtOEYY7lXpOdPA9tXYaYJBAtiyzndEyt/8cc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/oEfpVIlT8cJqLYBYiAOv1JuuCUFd5sbNvTQ5BilExGfvf6wW
+	xI0YLx2p+Wr0kAXXQSUmBBRibUcCjs6zyJPhuU7WGnpLG17FP+uFSbsayIZC
+X-Google-Smtp-Source: AGHT+IE0Kr9CUmz3El+k3JIITWmsTInqwUzEweCi1wf/HtTKz3DG3dyudW9DQYXt+GAqQh9CmRwTiw==
+X-Received: by 2002:a05:6a00:23c4:b0:71d:fb29:9f07 with SMTP id d2e1a72fcca58-724132cd842mr7181605b3a.15.1731127125542;
+        Fri, 08 Nov 2024 20:38:45 -0800 (PST)
+Received: from localhost (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f41f65aa9csm4340079a12.74.2024.11.08.20.38.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 20:38:45 -0800 (PST)
+Date: Sat, 09 Nov 2024 13:38:39 +0900 (JST)
+Message-Id: <20241109.133839.322803434056714560.fujita.tomonori@gmail.com>
+To: boqun.feng@gmail.com
+Cc: fujita.tomonori@gmail.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, jstultz@google.com,
+ sboyd@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
+Subject: Re: [PATCH v5 4/7] rust: time: Add wrapper for fsleep function
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <Zyux5d33Kt6qFdaH@Boquns-Mac-mini.local>
+References: <20241101010121.69221-1-fujita.tomonori@gmail.com>
+	<20241101010121.69221-5-fujita.tomonori@gmail.com>
+	<Zyux5d33Kt6qFdaH@Boquns-Mac-mini.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <384c034c23d63dec14e0cc333b8b0b2a778edcf1.1731092818.git.dxu@dxuuu.xyz>
- <CACKFLimKe8Kp5f=RzvoDFmmjPv1ZvUjOG-8woEJ9XXLNSGtSmw@mail.gmail.com> <CALs4sv0gt7stf+ADcsi7Yt-X8SZ=gYZuYfk9sQCLzPOjaabFvQ@mail.gmail.com>
-In-Reply-To: <CALs4sv0gt7stf+ADcsi7Yt-X8SZ=gYZuYfk9sQCLzPOjaabFvQ@mail.gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 8 Nov 2024 20:21:17 -0800
-Message-ID: <CACKFLi=CMdJNYH4R-Chpnt+LpvUv4_0nFmhzQp7E9f_YVbDeaQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] bnxt_en: ethtool: Supply ntuple rss context action
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, kuba@kernel.org, edumazet@google.com, 
-	davem@davemloft.net, andrew+netdev@lunn.ch, pabeni@redhat.com, 
-	martin.lau@linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-team@meta.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a1fe2d06267333cb"
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
---000000000000a1fe2d06267333cb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, 6 Nov 2024 10:13:57 -0800
+Boqun Feng <boqun.feng@gmail.com> wrote:
 
-On Fri, Nov 8, 2024 at 7:10=E2=80=AFPM Pavan Chebbi <pavan.chebbi@broadcom.=
-com> wrote:
+>> diff --git a/rust/kernel/time/delay.rs b/rust/kernel/time/delay.rs
+>> new file mode 100644
+>> index 000000000000..c3c908b72a56
+>> --- /dev/null
+>> +++ b/rust/kernel/time/delay.rs
+>> @@ -0,0 +1,43 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +//! Delay and sleep primitives.
+>> +//!
+>> +//! This module contains the kernel APIs related to delay and sleep that
+>> +//! have been ported or wrapped for usage by Rust code in the kernel.
+>> +//!
+>> +//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h).
+>> +
+>> +use crate::time::Delta;
+> 
+> Nit: I think it's better to use:
+> 
+> use super::Delta;
+> 
+> here to refer a definition in the super mod.
+
+Fixed.
+
+>> +use core::ffi::c_ulong;
+>> +
+>> +/// Sleeps for a given duration at least.
+>> +///
+>> +/// Equivalent to the kernel's [`fsleep`], flexible sleep function,
+>> +/// which automatically chooses the best sleep method based on a duration.
+>> +///
+>> +/// `delta` must be 0 or greater and no more than u32::MAX / 2 microseconds.
+> 
+> Adding backquotes on "u32::MAX / 2" would make it easier to read and
+> generates better documentation. For example.
+> 
+> /// `delta` must be 0 or greater and no more than `u32::MAX / 2` microseconds.
 >
-> On Sat, Nov 9, 2024 at 6:19=E2=80=AFAM Michael Chan <michael.chan@broadco=
-m.com> wrote:
-> >
-> > On Fri, Nov 8, 2024 at 11:07=E2=80=AFAM Daniel Xu <dxu@dxuuu.xyz> wrote=
-:
-> > >
-> > > Commit 2f4f9fe5bf5f ("bnxt_en: Support adding ntuple rules on RSS
-> > > contexts") added support for redirecting to an RSS context as an ntup=
-le
-> > > rule action. However, it forgot to update the ETHTOOL_GRXCLSRULE
-> > > codepath. This caused `ethtool -n` to always report the action as
-> > > "Action: Direct to queue 0" which is wrong.
-> > >
-> > > Fix by teaching bnxt driver to report the RSS context when applicable=
-.
-> > >
-> > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > > ---
-> > >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 8 ++++++--
-> > >  1 file changed, 6 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/driv=
-ers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> > > index cfd2c65b1c90..a218802befa8 100644
-> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> > > @@ -1187,10 +1187,14 @@ static int bnxt_grxclsrule(struct bnxt *bp, s=
-truct ethtool_rxnfc *cmd)
-> > >                 }
-> > >         }
-> > >
-> > > -       if (fltr->base.flags & BNXT_ACT_DROP)
-> > > +       if (fltr->base.flags & BNXT_ACT_DROP) {
-> > >                 fs->ring_cookie =3D RX_CLS_FLOW_DISC;
-> > > -       else
-> > > +       } else if (fltr->base.flags & BNXT_ACT_RSS_CTX) {
-> > > +               fs->flow_type |=3D FLOW_RSS;
-> > > +               cmd->rss_context =3D fltr->base.fw_vnic_id;
-> >
-> > I think the rss_context should be the index and not the VNIC ID.
 >
-> No, for RSS contexts, we save their index in the fw_vnic_id of the
-> filters. Hence what Daniel has done is correct.
->
+>> +/// If a value outside the range is given, the function will sleep
+>> +/// for u32::MAX / 2 microseconds at least.
+> 
+> Same here.
 
-I see now.   The index is stored in the fltr->base.fw_vnic_id.  Thanks.
+Updated both.
 
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+> I would also add the converted result in seconds of `u32::MAX / 2`
+> microseconds to give doc readers some intuitions, like:
+> 
+> the function will sleep for `u32::MAX / 2` (= ~2147 seconds or ~36
+> minutes) at least.
 
---000000000000a1fe2d06267333cb
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Yeah, looks good. Added.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILq+xZxWOVcaIVPPbdDp+qf4oPebVobp
-2o7gQpD5qlFJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEw
-OTA0MjEyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBARqe0oQQTa0enbEzNJZG18zB+pBysqqGetgFCyEOyj9iFuSyu
-1iDZKluqlr6ObQyx0M7x4OYJeEFxpTTfNnCIZUtya5SlA5pmGlFV5h1+SJw7+94LqDjTQjLwHXnf
-8ESmWXSs/3wOO9UxGNH4rI+XCXkxb0xudJ5JnyQjw5Om+qmmZLhrxmYmaSG8+X9VV/Z8EtU8d4Vr
-SZ0HQIW1MbxZoS8aGojb6bY4HE9grLOTQyFpmtRBWOa55dhCwN6YVN32hpjO5aE7S1P1wuSYItXB
-r2UiHeG0Vb+vMYv8kzGYlJwg7kG/nfklFUdTNFYKBljF5fTsbCbPNOGWtBzLL5E+
---000000000000a1fe2d06267333cb--
+>> +///
+>> +/// This function can only be used in a nonatomic context.
+>> +pub fn fsleep(delta: Delta) {
+>> +    // The argument of fsleep is an unsigned long, 32-bit on 32-bit architectures.
+>> +    // Considering that fsleep rounds up the duration to the nearest millisecond,
+>> +    // set the maximum value to u32::MAX / 2 microseconds.
+>> +    const MAX_DURATION: Delta = Delta::from_micros(u32::MAX as i64 >> 1);
+>> +
+>> +    let duration = if delta > MAX_DURATION || delta.as_nanos() < 0 {
+> 
+> I think it would be helpful if `Delta` has a `is_negative()` function.
+
+Added.
+
+Thanks a lot!
 
