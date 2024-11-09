@@ -1,138 +1,124 @@
-Return-Path: <netdev+bounces-143534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB869C2E4F
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:43:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 569589C2E79
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 17:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A511C20E44
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:43:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22A5A282732
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41A019CCEA;
-	Sat,  9 Nov 2024 15:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB6619D082;
+	Sat,  9 Nov 2024 16:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HOz4E6lS"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="BlZP/Cc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F1D19CC21;
-	Sat,  9 Nov 2024 15:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C045146A71
+	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 16:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731167029; cv=none; b=ldlWoOUgI/txQ6TqibMoTLNWmTMR/7t+d/C98IO/Q7d4oqL1Vra6KieV+OCYrW87GYAlsYFVH5wthkXQf2Va43d8wFBytKKRCSjFw1kMFHbmk9UYq/c029OUssJLvsOobblIyWSd10+/pY4oThNOeuYB/gRKWHFcv+oQ/8N9RNs=
+	t=1731169652; cv=none; b=Vvb1CZDeSbt751k/rc6sSpNCmVDTaOw9goyNviuvLP0wsZ/FeF24kfSRiP6jW6w3e1Ao1AUeJwZvvZgwWC2tsHjqnA+syAv4TP6P2TpVDn6SekURFq1f7Kft7kDipszE/0ANQZKTpdZ7G+2vQCLiQOZkiu8h9G/WwEynGHWsPGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731167029; c=relaxed/simple;
-	bh=jDNZB1A/J/zq5gt2PGFW4eLWP2EuMycAA3yVEocaOhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dKI0wcKg5dg+Ez079HUOV5vFXHfkndzI1epZne09TBC64ZKjx5bsFA9o/7cmk0wA/CfmAGyV3V323DKkHLgpClXDMw2iLl4/WVSdowdxyEtYZP9IWf0yK7WcoQSy3m4o2Hm3xEo+U8C7gumaWp2HMVnw0hPUz9KV+XZsTdzszvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HOz4E6lS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=J57s815SwhMV8jjaOfiNANO5vn4nCJpafqqppdC8Pmg=; b=HOz4E6lSW7KvhQYxEEDlHapBil
-	06iVa4Ql5eIpJK3KaG6xlCHM4FATGEtGbGz6MLI3M8DHdg/vbp2HunYyTqVrcAwGRjmNwVpARqneL
-	3eGN9WqggzBm0puxFjjBL/SnzDGfVSiSoXfTNFUO0JrAl2ycMlaqlDtyoISD4tihzCC4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t9nch-00CiYi-EH; Sat, 09 Nov 2024 16:43:39 +0100
-Date: Sat, 9 Nov 2024 16:43:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Message-ID: <d912d397-38b4-4bdb-ac38-ac45206b4af8@lunn.ch>
-References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
- <20241109015633.82638-3-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1731169652; c=relaxed/simple;
+	bh=WZzrxyimjWciWISaxFsmtsOekAeVLezIfgaSDyweimI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M7g6QLpVAI14X9TDFMt3c+JX2/tsEVG8gXtoCedhdjRAC5T5BPsMV48QclDDVJ9eqH4mxdwPz/LmseRmLS4h5rhghdpx66KJ/qlXnl2cPtlxwKWtAZoOjLSICwW8ZL4/qaIu6FqfoGsvQRnKhbxIRe+KYe5XH1qrFBqTQbZYH94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=BlZP/Cc3; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20cb47387ceso34585545ad.1
+        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 08:27:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731169649; x=1731774449; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=udRqs/iTfP7vusxv5DMs8DstYroHU1Mrt42xjhPxN2Y=;
+        b=BlZP/Cc3zbjHkJdlyK+HT94LhiNrUgcQHuiTRsumKliRQmCRRDZLBtai857qBP055p
+         wnVIuEde0Dd9s8Vn1ttuBeCXnmWZ7xTEdmaBRjtX+QJOuEGSPbabq2demh0jaF9RaFSv
+         JacHBc09Ht7IMpyPCbSsp55La8Kgar8FXbWaP10Kg8Td+O4pfOHxnKCVtOzDkQm3VlxA
+         d0UmYW6I50PAjcuHRJ3AAPw8kuxDpcmpK9KLn4TkHdg34FNcO0RZKJQREo6pPxddGKOd
+         z6i4CIiM/eFI1vANvFFKWB7ebOQ1bLWtYg4kWsccKtPS4h0fyRWuwV7DaIXdoAUZMEKv
+         L7zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731169649; x=1731774449;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=udRqs/iTfP7vusxv5DMs8DstYroHU1Mrt42xjhPxN2Y=;
+        b=gGsdEeHQQssz+DMcR36U2Yr59DCXcdDihZ950/uEWQRsgzlA8BUjWG+yjqUqBE07Zt
+         XiPu7MOEiEzLlUKGPlqarkWQ1TlUoNJ3KxULNzhL+LAY/8oA3He4lETfwnE8mAw0BS/Z
+         7ACNCZwTwr4UmvDDJ2nqQnYK3a3U5gfP0yXRl4C9Ovq0cRZz8N5Kh5fe8ejno/P4G8hW
+         /M7j++cjMDum75xt4G05qxpsNloKvdonOWoE6ve28yYrZwbNt/0gNNAXvk0tQpbyKb8U
+         tQ6csoJW4PHT7tBBYVrJqdGH8SDOaBszdWKCB3szBDxr5byg/01923rrkCrU7op8ICoR
+         HLUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXz9/M4SQsMV8G1Q13zCrChB3PdSNnSbBX6s4FkPVjFI5g0nzJUIWYUD3h6cNlpTF0KkNgQ6TE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzroVfKctI/9galDwW5Fv2UR1utzJzbn3incDDc9PRGjDBmDFDB
+	VsdRsrlt7CgOyZO7jHr/trQHk9spTir6RBm+4l+ZqetZSjkAPJy0X+WpZNeMsBSBiHhGNIPL1sB
+	C
+X-Google-Smtp-Source: AGHT+IHsYrwMexcU/Cq3dysUbeGuH/SNVtaVVp8Oclii6GFudzZ6IT+ZP6rTkw2ZpgpLcGo/Gp+mqA==
+X-Received: by 2002:a17:903:24e:b0:20c:e8df:2516 with SMTP id d9443c01a7336-2118359c161mr74281765ad.42.1731169649619;
+        Sat, 09 Nov 2024 08:27:29 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dc804esm48525625ad.31.2024.11.09.08.27.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Nov 2024 08:27:29 -0800 (PST)
+Date: Sat, 9 Nov 2024 08:27:27 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Alex Henrie <alexhenrie24@gmail.com>
+Cc: linux-man@vger.kernel.org, mtk.manpages@gmail.com,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
+Message-ID: <20241109082727.40ed6f74@hermes.local>
+In-Reply-To: <20241105041507.1292595-1-alexhenrie24@gmail.com>
+References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241109015633.82638-3-Tristram.Ha@microchip.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-> +			 u16 *buf, u16 len)
-> +{
-> +	u32 data;
-> +
-> +	port_sgmii_s(dev, port, devid, reg, len);
-> +	while (len) {
-> +		ksz_pread32(dev, port, REG_PORT_SGMII_DATA__4, &data);
-> +		*buf++ = (u16)data;
-> +		len--;
-> +	}
-> +}
-> +
-> +static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-> +			 u16 *buf, u16 len)
-> +{
-> +	u32 data;
-> +
-> +	port_sgmii_s(dev, port, devid, reg, len);
-> +	while (len) {
-> +		data = *buf++;
-> +		ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, data);
-> +		len--;
-> +	}
-> +}
+On Mon,  4 Nov 2024 21:14:20 -0700
+Alex Henrie <alexhenrie24@gmail.com> wrote:
 
-This kind of looks like a C45 only MDIO bus.
+> struct ifa_cacheinfo contains the address's creation time, update time,
+> preferred lifetime, and valid lifetime. See
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/if_addr.h?h=v6.11#n60
+> 
+> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+> ---
+>  man/man7/rtnetlink.7 | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
+> index 86ed459bb..b05654315 100644
+> --- a/man/man7/rtnetlink.7
+> +++ b/man/man7/rtnetlink.7
+> @@ -176,7 +176,15 @@ IFA_BROADCAST:raw protocol address:broadcast address
+>  IFA_ANYCAST:raw protocol address:anycast address
+>  IFA_CACHEINFO:struct ifa_cacheinfo:Address information
+>  .TE
+> -.\" FIXME Document struct ifa_cacheinfo
+> +.IP
+> +.EX
+> +struct ifa_cacheinfo {
+> +    __u32 ifa_prefered; /* Preferred lifetime in seconds, -1 = forever */
+> +    __u32 ifa_valid;    /* Valid lifetime in seconds, -1 = forever */
+> +    __u32 cstamp;       /* Creation timestamp in hundredths of seconds */
+> +    __u32 tstamp;       /* Update timestamp in hundredths of seconds */
+> +};
+> +.EE
+>  .TP
+>  .B RTM_NEWROUTE
+>  .TQ
 
-#define MMD_DEVICE_ID_VENDOR_MII	0x1F
-
-#define SR_MII				MMD_DEVICE_ID_VENDOR_MII
-
-This is identical to MDIO_MMD_VEND2.
-
-#define SR_MII_RESET			BIT(15)
-#define SR_MII_LOOPBACK			BIT(14)
-#define SR_MII_SPEED_100MBIT		BIT(13)
-#define SR_MII_AUTO_NEG_ENABLE		BIT(12)
-#define SR_MII_POWER_DOWN		BIT(11)
-#define SR_MII_AUTO_NEG_RESTART		BIT(9)
-#define SR_MII_FULL_DUPLEX		BIT(8)
-#define SR_MII_SPEED_1000MBIT		BIT(6)
-
-A standard BMCR.
-
-#define MMD_SR_MII_STATUS		0x0001
-#define MMD_SR_MII_ID_1			0x0002
-#define MMD_SR_MII_ID_2			0x0003
-#define MMD_SR_MII_AUTO_NEGOTIATION	0x0004
-
-Same as:
-
-#define MII_BMSR                0x01    /* Basic mode status register  */
-#define MII_PHYSID1             0x02    /* PHYS ID 1                   */
-#define MII_PHYSID2             0x03    /* PHYS ID 2                   */
-#define MII_ADVERTISE           0x04    /* Advertisement control reg   */
-
-So i think your first patch should be to replace all these with the
-standard macros.
-
-That will then help make it clearer how much is generic, could the
-existing helpers be used, probably with a wrapper to make your C22
-device mapped to C45 MDIO_MMD_VEND2 look like a C22 device?
-
-	Andrew
+This is for man pages, not iproute2. Resetting in patchwork
 
