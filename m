@@ -1,92 +1,121 @@
-Return-Path: <netdev+bounces-143529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B049C2E10
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:13:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E92B9C2E1F
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:18:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19F851F21C58
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:13:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4381C20D95
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394E019A281;
-	Sat,  9 Nov 2024 15:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDD61991A1;
+	Sat,  9 Nov 2024 15:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xRraR0Xg"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="WjGXSk+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2EA155C94;
-	Sat,  9 Nov 2024 15:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAB2233D6B;
+	Sat,  9 Nov 2024 15:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731165226; cv=none; b=oMtCDg1cj54budFptAuYnYCn3pa8u84Noix0f26pASy6NdMzf4hwsX2lIr4YtydAhLMiDE62f0tH497odErapxOYNlkUARjtvWK7ApRyZeZA4K2lcuLWsG+c8jukNU3asgjObUfxmRwLS2SNBAh26b0sb5sAKjlpVzhniEq+bek=
+	t=1731165485; cv=none; b=eEnwz7MP/RSc1Z4kXJLSGgn+IDeTjbOzY98N2Bbjo3Sy9yX6AeweOdgbrVycpOI/mH7A7/Zq02v3qjflKx5PbJC8XM6JMxqrFJ26IZfkf1tYhWkLtFd0uaIiaG0hzCVjwhLZZxHkdKVHOOMGhcT/SEl1zbNfuZcakwzhOeRQpK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731165226; c=relaxed/simple;
-	bh=JPuYZYFQoSS3IfqKdEvXWAGb671M99LKqnTQkNA0cDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JuHTS28Pn3tAYZVFOz81U77IKQRPR3vXoZLcQ1iBe/N/y3hQNkw4yByeeQOobY1x4I59C0jVaxmHi8hC7sXKS6lZR01NtJJcckcgIf4wGRFhMt65kSOwLhaSzDuPd/qFYaoqIt/Y4BYOxrXb0o3W7yFeQixD/HVVTFNjZAggMGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xRraR0Xg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xyZTJo9f8gsK10SkI8qjNVOpiFFkSOls53vDKWxDbVo=; b=xRraR0XgPrKBa604t1HRU1Yt64
-	yWeuU7ynYoJQ7iq2OrJI4nFN+M5RIHArwlj8j8F6tMVa+NfV1IBEUaBMzy/KKyuSNC8h+yW2/+5kw
-	H8XdZloyyH1V+DN0mWh2lqEFaqviH8IMWAf+3dDFH4aYsicGCgXZKXM4hSiqvJI0l+lk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t9n9Q-00CiQC-16; Sat, 09 Nov 2024 16:13:24 +0100
-Date: Sat, 9 Nov 2024 16:13:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek Vasut <marex@denx.de>, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Message-ID: <784a33e2-c877-4d0e-b3a5-7fe1a04c9217@lunn.ch>
-References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
- <20241109015633.82638-3-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1731165485; c=relaxed/simple;
+	bh=r8pOJtwP+l+aThisZLQEzXRJelwC83jKXvQDLp3YZ0Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gvfNsLXeEQAXyxooxOBdWe/cbQJoXZMc+vJnduh+leP1b8/4lhvO46/eLRRa8MVAL/2IwyvC0oQ9DyJ+UsYxka3OkQHULHqi4Hkk1AqXWYOmrCh+U2zrdmiKB0WHuyh1F0tvzFLX9B2h8o71snPJgbAlDwvddfceCkzLRQhL80g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=WjGXSk+p; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1731165476;
+	bh=r8pOJtwP+l+aThisZLQEzXRJelwC83jKXvQDLp3YZ0Q=;
+	h=From:Subject:Date:To:Cc:From;
+	b=WjGXSk+p0nwTI4xqakbd1duOtiGya37aCquPOiYed+6/OSQ8BqGEZAH8o6aD7iBl+
+	 Xdz1/YI9ZTLbGCJnocIykUcRbE7i2z6aKWIWv4PHML6J9c8oN1gxKuZHmfYNFAoDeP
+	 8d4rDYV9LbmkrrkiQ7LERwE1LZ85bZQFcg389FNZCTsGEZm5EpGAOomwISwgyydUpo
+	 Xhv4Wi1fHYa4Ww2fJRQw//ifCBcvVxnkIKDbirPmRM+9rrgVgYN34/AJb1aasZPFE4
+	 4NN2h6lSbfIYud9pWlxwvbYtWhB7mTsMjT1HauXx7fLk/Ws/05i6XiO6IXkvfjibkP
+	 6B2Vp7/vyZXzg==
+Received: from [192.168.1.63] (pool-100-2-116-133.nycmny.fios.verizon.net [100.2.116.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: nfraprado)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 4806517E35FA;
+	Sat,  9 Nov 2024 16:17:53 +0100 (CET)
+From: =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>
+Subject: [PATCH v2 0/2] net: stmmac: dwmac-mediatek: Fix inverted logic for
+ mediatek,mac-wol
+Date: Sat, 09 Nov 2024 10:16:31 -0500
+Message-Id: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241109015633.82638-3-Tristram.Ha@microchip.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAM98L2cC/43NTQ6CMBCG4auYrh3TQX6qK+9hWJQyykTomJZUD
+ eHuVk7g8vkW77eoSIEpqvNuUYESRxafUex3yg3W3wm4z1aFLkpEjTBRz3amB0zWwUtG8OLZJwo
+ z9YAn42pX6rI61ionnoFu/N7y1zZ74DhL+GxvCX/rn+GEoKGpOoNGmwYbe3EyjraTYA9OJtWu6
+ /oF5fARncwAAAA=
+X-Change-ID: 20241101-mediatek-mac-wol-noninverted-198c6c404536
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Biao Huang <biao.huang@mediatek.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+ Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: kernel@collabora.com, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>
+X-Mailer: b4 0.14.2
 
-On Fri, Nov 08, 2024 at 05:56:33PM -0800, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
-> 
-> The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
-> connect, 1 for 1000BaseT/1000BaseX SFP, and 2 for 10/100/1000BaseT SFP.
+This series fixes the inverted handling of the mediatek,mac-wol DT
+property. This was done with backwards compatibility in v1, but based on
+the feedback received, all boards should be using MAC WOL, so many of
+them were incorrectly described and didn't have working WOL tested
+anyway. So for v2, the approach is simpler: just fix the driver handling
+and update the DTs to enable MAC WOL everywhere.
 
-This naming is rather odd. First off, i would drop 'SFP'. It does not
-have to be an SFP on the other end, it could be another switch for
-example. 1 is PHY_INTERFACE_MODE_1000BASEX and 2 is
-PHY_INTERFACE_MODE_SGMII.
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+Changes in v2:
+- Dropped introduction of new property mediatek,mac-wol-noninverted for
+  backwards compatibility
+- Set MAC WOL for every DT
+- Link to v1: https://lore.kernel.org/r/20241101-mediatek-mac-wol-noninverted-v1-0-75b81808717a@collabora.com
 
-> SFP is typically used so the default is 1.  The driver can detect
-> 10/100/1000BaseT SFP and change the mode to 2.
+---
+Nícolas F. R. A. Prado (2):
+      net: stmmac: dwmac-mediatek: Fix inverted handling of mediatek,mac-wol
+      arm64: dts: mediatek: Set mediatek,mac-wol on DWMAC node for all boards
 
-phylink will tell you want mode to use. I would ignore what the
-hardware detects, so this driver is just the same as every other
-driver, making it easier to maintain.
+ arch/arm64/boot/dts/mediatek/mt2712-evb.dts                   | 1 +
+ arch/arm64/boot/dts/mediatek/mt8195-demo.dts                  | 1 +
+ arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts | 1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c          | 4 ++--
+ 4 files changed, 5 insertions(+), 2 deletions(-)
+---
+base-commit: c88416ba074a8913cf6d61b789dd834bbca6681c
+change-id: 20241101-mediatek-mac-wol-noninverted-198c6c404536
 
-	Andrew
+Best regards,
+-- 
+Nícolas F. R. A. Prado <nfraprado@collabora.com>
+
 
