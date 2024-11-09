@@ -1,61 +1,50 @@
-Return-Path: <netdev+bounces-143537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0FA89C2EAB
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 18:15:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 727EC9C2EB5
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 18:20:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44C241F21167
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 17:15:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1534C1F211FA
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 17:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CFA18EFC1;
-	Sat,  9 Nov 2024 17:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F1D19D890;
+	Sat,  9 Nov 2024 17:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="lcesHJDj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkeLzzLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C9119B5A9;
-	Sat,  9 Nov 2024 17:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E96FECF
+	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 17:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731172526; cv=none; b=RtW6undWOnxDLh9HOwAKA5rI5QsuFQX5v81N+gICunha4+z3zkg1HFIWHfIGfjWcI4dXgFkmu4Qt6uCEZytfoBRo7hm7RkcIOPIqYINtN+halDTmUM7N7ehahvhDtrXWT4Q+Ufi9lpPzFYep8GNTcMeITX5dvM32BJOB/AephlM=
+	t=1731172823; cv=none; b=awdCHdFhxrY40cuDGLALoK/9YKmQqChigS84g5NGGpO5awuuRcLU4YsbNMPEmzjRwwLrdYN5XXHs4QzmgS+H42Qixfa0fRmhU2Ta5dOGm+iF6tRsrKaQ+RyO1TquwXNLnn3q+tsTutig5Ss/1r30xKHf0ylRQtKaDX6lzQRAGSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731172526; c=relaxed/simple;
-	bh=6S0TuVkzqkc7ysyQHic+w6BGYlvdyTKD6XWIUkancIM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AJp4aDCps67TE39B5oVzLp5zMWDt6xXSO31jLedqq/EVDpDfmtw/OZ2j8lbjynPKdZsBLUbizi9I17wdVKSI/bRqryNfBh3lGrKNP0KIKfdbAw+tMYBHhzYUwZRAiL6GjmnERoxHERRUXmpvPfyTybbKJEJZIIORk96a5rcu5Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=lcesHJDj; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from fpc.intra.ispras.ru (unknown [10.10.165.14])
-	by mail.ispras.ru (Postfix) with ESMTPSA id DEB9B40B228D;
-	Sat,  9 Nov 2024 17:15:21 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru DEB9B40B228D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1731172522;
-	bh=VW35dz2P8QIlcF2UimhEjmmVGp+q1vXGSeRLP7WbgQU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=lcesHJDjCd/NBEIZHAewF98TPBmLV/HikclZ3rr73Mz/nzNEBuakraRG2mqN17njT
-	 avmBSoh5rE15+a0GC96cStURGiuAgmUUaFWuoKEWJqEYyiGDhoA14Y9YcO41MMaa+V
-	 tWXfzZ0wDAFx/laPYIYzRssnVLiNwkbEM5WNFG9g=
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Johannes Berg <johannes@sipsolutions.net>,
-	Sasha Levin <sashal@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	stable@vger.kernel.org
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
-	lvc-project@linuxtesting.org
-Subject: [PATCH 6.1] Revert "wifi: mac80211: fix RCU list iterations"
-Date: Sat,  9 Nov 2024 20:15:13 +0300
-Message-Id: <20241109171513.1641079-1-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1731172823; c=relaxed/simple;
+	bh=kE2cz7X63NASuIe5oGmjdNHQiIXPjoN1iHjcBqfxB68=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VZQbV+LXGKeclk+qKyGzmIqvWve47WU6v3G7Y3UhSzKCrnyqIHye+KV4BppwdiYNJMlXrCMxWN2HEjU46ooqp+5WosDZX0mQXWur9CE/nGrACELO0Q1FTglihu3qiSkRVk0m1iCggw3roZ0159KWW9M2cLit8ZHRKvuSKQwVpSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkeLzzLO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98CCBC4CECE;
+	Sat,  9 Nov 2024 17:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731172822;
+	bh=kE2cz7X63NASuIe5oGmjdNHQiIXPjoN1iHjcBqfxB68=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PkeLzzLO8j756TKyimCmQ4c7aTBuKZm3IB7nOaIjVxyon5ULQNcwgEpW0KOiZ4orE
+	 PvmapkZZ6HjBRxQwzwnxXawKxvaJedznmC7lXqmmNPy80p3R+4O03T4OCODuktuMRu
+	 iE8EsDYVzOlmwnQcVFmgM0uD5r3BtxW2Oe3PaavEuIuXonDxmePT928vT5fvN5fBUJ
+	 3XJdVNZf/bTFDtjNHMe2OGziopH7CUKL34g/+AFwcoM1z1TqUXHdZR8FRptjIwv6QJ
+	 5Va8+9G/fe4yJ0evyeRrWtF1c79WkOPdBVzkoGcgbbgnAwwy4r7BvUD8Q+diCgZVGf
+	 qluOptS5f+10w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE43809A80;
+	Sat,  9 Nov 2024 17:20:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,113 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] sctp: fix possible UAF in sctp_v6_available()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173117283227.2976734.4081832173323355514.git-patchwork-notify@kernel.org>
+Date: Sat, 09 Nov 2024 17:20:32 +0000
+References: <20241107192021.2579789-1-edumazet@google.com>
+In-Reply-To: <20241107192021.2579789-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, lucien.xin@gmail.com,
+ marcelo.leitner@gmail.com
 
-This reverts commit b0b2dc1eaa7ec509e07a78c9974097168ae565b7 which is
-commit ac35180032fbc5d80b29af00ba4881815ceefcb6 upstream.
+Hello:
 
-The reverted commit is based heavily on wiphy locking changes made by the
-"wifi: cfg80211/mac80211: locking cleanups" series [1] introduced since
-6.7 kernel and not supposed to be backported to old stable branches.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-It breaks locking rules in the context of old stables leading e.g. to the
-following lockdep splat there - ieee80211_get_max_required_bw() is
-actually called under RCU reader lock in 6.1/6.6, not the wiphy mutex.
+On Thu,  7 Nov 2024 19:20:21 +0000 you wrote:
+> A lockdep report [1] with CONFIG_PROVE_RCU_LIST=y hints
+> that sctp_v6_available() is calling dev_get_by_index_rcu()
+> and ipv6_chk_addr() without holding rcu.
+> 
+> [1]
+>  =============================
+>  WARNING: suspicious RCU usage
+>  6.12.0-rc5-virtme #1216 Tainted: G        W
+> 
+> [...]
 
-WARNING: CPU: 3 PID: 8711 at net/mac80211/chan.c:248 ieee80211_get_max_required_bw+0x423/0x4e0 net/mac80211/chan.c:248
-Modules linked in:
-CPU: 3 PID: 8711 Comm: kworker/u8:6 Not tainted 6.1.113-syzkaller-00105-g9859ec205cfa #0
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
-Workqueue: phy155 ieee80211_iface_work
-RIP: 0010:ieee80211_get_max_required_bw+0x423/0x4e0 net/mac80211/chan.c:248
-Call Trace:
- <TASK>
- ieee80211_get_chanctx_vif_max_required_bw net/mac80211/chan.c:294 [inline]
- ieee80211_get_chanctx_max_required_bw net/mac80211/chan.c:336 [inline]
- _ieee80211_recalc_chanctx_min_def+0x5e6/0xf30 net/mac80211/chan.c:381
- ieee80211_recalc_chanctx_min_def+0x21/0x80 net/mac80211/chan.c:462
- ieee80211_recalc_min_chandef+0x17a/0x590 net/mac80211/util.c:2908
- sta_info_move_state+0x748/0x8c0 net/mac80211/sta_info.c:2301
- ieee80211_assoc_success net/mac80211/mlme.c:5001 [inline]
- ieee80211_rx_mgmt_assoc_resp.cold+0x1335/0x69ec net/mac80211/mlme.c:5201
- ieee80211_sta_rx_queued_mgmt+0x40f/0x2270 net/mac80211/mlme.c:5831
- ieee80211_iface_process_skb net/mac80211/iface.c:1665 [inline]
- ieee80211_iface_work+0xa31/0xd30 net/mac80211/iface.c:1722
- process_one_work+0xa72/0x1590 kernel/workqueue.c:2292
- worker_thread+0x632/0x1240 kernel/workqueue.c:2439
- kthread+0x2e1/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x22/0x30 arch/x86/entry/entry_64.S:295
+Here is the summary with links:
+  - [net-next] sctp: fix possible UAF in sctp_v6_available()
+    https://git.kernel.org/netdev/net/c/eb72e7fcc839
 
-[1]: https://lore.kernel.org/linux-wireless/20230828115927.116700-41-johannes@sipsolutions.net/
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
----
- net/mac80211/chan.c | 4 +---
- net/mac80211/mlme.c | 2 +-
- net/mac80211/scan.c | 2 +-
- net/mac80211/util.c | 4 +---
- 4 files changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/net/mac80211/chan.c b/net/mac80211/chan.c
-index 807bea1a7d3c..f07e34bed8f3 100644
---- a/net/mac80211/chan.c
-+++ b/net/mac80211/chan.c
-@@ -245,9 +245,7 @@ ieee80211_get_max_required_bw(struct ieee80211_sub_if_data *sdata,
- 	enum nl80211_chan_width max_bw = NL80211_CHAN_WIDTH_20_NOHT;
- 	struct sta_info *sta;
- 
--	lockdep_assert_wiphy(sdata->local->hw.wiphy);
--
--	list_for_each_entry(sta, &sdata->local->sta_list, list) {
-+	list_for_each_entry_rcu(sta, &sdata->local->sta_list, list) {
- 		if (sdata != sta->sdata &&
- 		    !(sta->sdata->bss && sta->sdata->bss == sdata->bss))
- 			continue;
-diff --git a/net/mac80211/mlme.c b/net/mac80211/mlme.c
-index ee9ec74b9553..9a5530ca2f6b 100644
---- a/net/mac80211/mlme.c
-+++ b/net/mac80211/mlme.c
-@@ -660,7 +660,7 @@ static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
- 		bool disable_mu_mimo = false;
- 		struct ieee80211_sub_if_data *other;
- 
--		list_for_each_entry(other, &local->interfaces, list) {
-+		list_for_each_entry_rcu(other, &local->interfaces, list) {
- 			if (other->vif.bss_conf.mu_mimo_owner) {
- 				disable_mu_mimo = true;
- 				break;
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index edbf468e0bea..f1147d156c1f 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -501,7 +501,7 @@ static void __ieee80211_scan_completed(struct ieee80211_hw *hw, bool aborted)
- 	 * the scan was in progress; if there was none this will
- 	 * just be a no-op for the particular interface.
- 	 */
--	list_for_each_entry(sdata, &local->interfaces, list) {
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
- 		if (ieee80211_sdata_running(sdata))
- 			ieee80211_queue_work(&sdata->local->hw, &sdata->work);
- 	}
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index 3fe15089b24f..738f1f139a90 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -767,9 +767,7 @@ static void __iterate_interfaces(struct ieee80211_local *local,
- 	struct ieee80211_sub_if_data *sdata;
- 	bool active_only = iter_flags & IEEE80211_IFACE_ITER_ACTIVE;
- 
--	list_for_each_entry_rcu(sdata, &local->interfaces, list,
--				lockdep_is_held(&local->iflist_mtx) ||
--				lockdep_is_held(&local->hw.wiphy->mtx)) {
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
- 		switch (sdata->vif.type) {
- 		case NL80211_IFTYPE_MONITOR:
- 			if (!(sdata->u.mntr.flags & MONITOR_FLAG_ACTIVE))
+You are awesome, thank you!
 -- 
-2.39.5
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
