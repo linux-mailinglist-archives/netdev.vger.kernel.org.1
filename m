@@ -1,77 +1,106 @@
-Return-Path: <netdev+bounces-143549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0622A9C2EFE
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 19:00:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D569C2F01
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 19:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36EDD1C20AE7
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 18:00:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79509282333
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 18:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DCC13BACB;
-	Sat,  9 Nov 2024 18:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03C019D886;
+	Sat,  9 Nov 2024 18:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4NqLLIPz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+e7DHmJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7009233D7D;
-	Sat,  9 Nov 2024 18:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF93F198853;
+	Sat,  9 Nov 2024 18:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731175252; cv=none; b=kvzIceFVvWm2UeyEKGc9eHrSJvhqZI87rabS0b6VO1Bf36msnua1GDjHc53JtTic9FkgMC+6TtX7vGZLLSGp/qu+7l3N2v0CLKlRNUnWQxvnAVKVpyw7F5bmKE1gipWE4lyEzzNrIAxfYQAMm2p/NCu9tueUbCCE/1j4fbGzVXo=
+	t=1731175335; cv=none; b=aMkRGB9SvLHWjDDl2ELNAlg6jmHfYJjj+pcL+EDtqaEbYyJFSjAcjbFhU+VCBvmLs3xd7qB/JUAaixZmahg/AGTyfZ8n23tDMai7ocmf1kMfxpJHwFDL6QN3dw/X7CGepJq0P+YCzCaoPHBIpdqgJ6AVLzsPJnPblXvgEo89+ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731175252; c=relaxed/simple;
-	bh=jG+TcbF+YScf3QauecEwLkm1T1rd2Ak4bd+ycrp1DsE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c+oJDHUdWaqEDlgijOekTJXc2cVpRe7HRIVJEPdGi4lfpAVC6Ge1/3FKUrDuGENee2Q3gHNr5gEBE8u+douQhv+xLmRZnY1534Js32ot6nl9H/2u7jtV5mo4ZzHh3m1NG7cB7bgkfuHmF0/bMHptUZL45AWx8jArXjefHMCzYck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4NqLLIPz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Af08O8QQU9lovRofFEIAnROpNHG8FgeW3SE4K68deRo=; b=4NqLLIPzkMmK1O7OuDLm3WPg4v
-	C02k4xvKJF6hFhKmZhV66slK9Te3olkkVu9q5sKVROA/JNalQI2P00RbnZuCkh/N+j9qM5gbaaKJa
-	qm+/79eKOjFQvQa98IDMrnWQexS1eXUkNzaBEVPAW7zY6VhLCZHpOdUiVanxLipyuAbI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t9plG-00CiwN-4T; Sat, 09 Nov 2024 19:00:38 +0100
-Date: Sat, 9 Nov 2024 19:00:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sanman Pradhan <sanman.p211993@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	kernel-team@meta.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	mohsin.bashr@gmail.com, sanmanpradhan@meta.com,
-	andrew+netdev@lunn.ch, vadim.fedorenko@linux.dev,
-	jdamato@fastly.com, sdf@fomichev.me, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4] eth: fbnic: Add PCIe hardware statistics
-Message-ID: <e80299f8-5fc4-41ba-8e48-37029078825e@lunn.ch>
-References: <20241109025905.1531196-1-sanman.p211993@gmail.com>
+	s=arc-20240116; t=1731175335; c=relaxed/simple;
+	bh=FeLyUZvTBHbl1C0zFRijuNwt1QEAj5jW9xwfnTT3mrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ptzqT5KfqQPHr/MjHhgdcCW3Rn9B6Jodznmq6OXDpJ68R4PEDPkI9sWRQOJ1K77dF7dsinbgupL+4QFNLD92AELEdgmh4sfYqoRzQzfldkLKy7c2HyxWeRWEOsETMzGkv/jZ1a2J9RFzFQaBdvZtyJUL+IHRvYhyugAc4THa8lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+e7DHmJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93906C4CECE;
+	Sat,  9 Nov 2024 18:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731175335;
+	bh=FeLyUZvTBHbl1C0zFRijuNwt1QEAj5jW9xwfnTT3mrM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=L+e7DHmJVYAyyofeNoxC4kZ1nc1jlh98WKQNrZjUcek3tRXXxhUHg8u+fc25bFKgS
+	 CnYVXaDnQqx/3eryPpAXVgBbRurdQ1qYFHxsCoucB1ep0tEtW6IFDU3yWUpjaO4vDS
+	 XNadluKG342KLWiGr1MCNWSLHoo0BddV5TCN/W01tbWW4+X9eMs07jvHJbtakLaoRj
+	 38AqB3uEq5ht8gtQkX4lvg6PtJUY9cDUj8hRPzncLl5xDKQ0VZyDMzcqbmMSTMWVXA
+	 +uvdPuTnU4pEquXJyLvxab20pUhT0Ja0VL+A5ilmZvsKWMDmtLzRhN+I+VaEPxm9SA
+	 LQnF6vzDmq2RA==
+Date: Sat, 9 Nov 2024 10:02:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Michael Chan <michael.chan@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Potnuri
+ Bharat Teja <bharat@chelsio.com>, Christian Benvenuti <benve@cisco.com>,
+ Satish Kharat <satishkh@cisco.com>, Manish Chopra <manishc@marvell.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH v2 1/2][next] UAPI: ethtool: Use __struct_group() in
+ struct ethtool_link_settings
+Message-ID: <20241109100213.262a2fa0@kernel.org>
+In-Reply-To: <9e9fb0bd72e5ba1e916acbb4995b1e358b86a689.1730238285.git.gustavoars@kernel.org>
+References: <cover.1730238285.git.gustavoars@kernel.org>
+	<9e9fb0bd72e5ba1e916acbb4995b1e358b86a689.1730238285.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241109025905.1531196-1-sanman.p211993@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> +void fbnic_dbg_init(void)
-> +{
-> +	fbnic_dbg_root = debugfs_create_dir(fbnic_driver_name, NULL);
-> +	debugfs_create_file("pcie_stats", 0400, fbnic_dbg_root, NULL,
-> +			    &fbnic_dbg_pcie_stats_fops);
+On Tue, 29 Oct 2024 15:55:35 -0600 Gustavo A. R. Silva wrote:
+> Use the `__struct_group()` helper to create a new tagged
+> `struct ethtool_link_settings_hdr`. This structure groups together
+> all the members of the flexible `struct ethtool_link_settings`
+> except the flexible array. As a result, the array is effectively
+> separated from the rest of the members without modifying the memory
+> layout of the flexible structure.
+>=20
+> This new tagged struct will be used to fix problematic declarations
+> of middle-flex-arrays in composite structs[1].
 
-Have you tested this on a machine with two NICs?
+Possibly a very noob question, but I'm updating a C++ library with=20
+new headers and I think this makes it no longer compile.
 
-	Andrew
+$ cat > /tmp/t.cpp<<EOF
+extern "C" {
+#include "include/uapi/linux/ethtool.h"
+}
+int func() { return 0; }
+EOF
+
+$ g++ /tmp/t.cpp -I../linux -o /dev/null -c -W -Wall -O2
+In file included from /usr/include/linux/posix_types.h:5,
+                 from /usr/include/linux/types.h:9,
+                 from ../linux/include/uapi/linux/ethtool.h:18,
+                 from /tmp/t.cpp:2:
+../linux/include/uapi/linux/ethtool.h:2515:24: error: =E2=80=98struct ethto=
+ol_link_settings::<unnamed union>::ethtool_link_settings_hdr=E2=80=99 inval=
+id; an anonymous union may only have public non-static data members [-fperm=
+issive]
+ 2515 |         __struct_group(ethtool_link_settings_hdr, hdr, /* no attrs =
+*/,
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+I don't know much about C++, tho, so quite possibly missing something
+obvious.
 
