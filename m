@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-143563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401039C300B
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 00:27:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ABF59C300D
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 00:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645AC282301
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 23:26:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A975B218AF
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 23:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3A719E994;
-	Sat,  9 Nov 2024 23:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF481A0BDC;
+	Sat,  9 Nov 2024 23:27:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amundsen.org header.i=@amundsen.org header.b="SUFe1c1t"
+	dkim=pass (1024-bit key) header.d=amundsen.org header.i=@amundsen.org header.b="IMcak1cS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AFB15383E
-	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 23:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E5C1552FA
+	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 23:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731194815; cv=none; b=q7mhn3CNKA43rLWjGd+1E0pry42TyhJGS+qSK4pA1KeGjTlavv/pM/vuMbpi6jiU+MJ/5VK+PWmtm9umj5KJvQeE0dugBqKSeWKnVxf18tOSnDRhqdLHIcEmdY3LyPVawH/JpFZIhO5Gi+KRnp9hhWPTPYiqKfKmNJHgR0SVdes=
+	t=1731194822; cv=none; b=d40WnzfybsR9CWpVKonY6LEY8rBqoqKPqVeLwtsvrtYUX5v/rnHLd6nyG+artAWV3KONqxf2RfE73o+Xs1v5C1yXQcyHMm011MU+09F5j3CIR+mJutH+nmx87GIPSRiymiNibvRmq45GMbQZ9KCIkJSYsxuI1E5wsfDU5VPZT5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731194815; c=relaxed/simple;
-	bh=Cpk5ZBU9/k8RYhqX6ZYvMJrLN1gNQ/ahlhBBu9GJFjI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uso7/G+MjrPYjdCu2XxpbwSRZxFRiq92i8V08C6Z4R+cKMv3SkqyJDimhApgiBXm5zV7odWcXnF2wpXvY0C0MT3vIJXtpMWHNhMSLgDV1mNzthelKCSo0RhV8mxrURtZh7RXeo1NJFH4g3SZuHhhnFR4iCghX/t7E6k0VfosShc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amundsen.org; spf=pass smtp.mailfrom=amundsen.org; dkim=pass (1024-bit key) header.d=amundsen.org header.i=@amundsen.org header.b=SUFe1c1t; arc=none smtp.client-ip=209.85.208.173
+	s=arc-20240116; t=1731194822; c=relaxed/simple;
+	bh=bhfa8QVpzhJLNvVH2SZ6BH73Wyn+suzbcFJ9AvwI4qw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=an+sF/E95yBazXBHLBUHo/3o8OGKc3beEu6OBnNa/kHvzQ2N9amZkHIArFtAGtC9f4n9YQnyixiKkRwHInqjIaTY+bvmRKJ2mpgtTIwRX/X4ckh/DtEi+jUiW5dnJJMMrIT8hUs7klp+OiTBK9zX2rcJsUM4YpuJ5RLWVTat2CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amundsen.org; spf=pass smtp.mailfrom=amundsen.org; dkim=pass (1024-bit key) header.d=amundsen.org header.i=@amundsen.org header.b=IMcak1cS; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amundsen.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amundsen.org
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb3ce15172so39357511fa.0
-        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 15:26:53 -0800 (PST)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539f53973fdso3267888e87.1
+        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 15:27:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amundsen.org; s=google; t=1731194811; x=1731799611; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yKYtXxX3PpnBma4nIdw63BnV/Ds5TXBbvJ0ct3MPA5Y=;
-        b=SUFe1c1t9D6PUcua7oE3VK9CXxzUbZlJzS4dk9dLwqomo2N70Mfg8ZjX1PxqVKseBV
-         44s/MvK52DWW52YYSzho98VrGByHk4QxtReanl34h1EznVnI/9WMcfRlH0l5iVAKsbzB
-         0+KsciW38uFA95xEv+ClIh0Rgjra9Qamizwac=
+        d=amundsen.org; s=google; t=1731194819; x=1731799619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RUk+2MyJ3Nk7p96EL5x2+4zXYUEBWNJcqoIkZyN24sI=;
+        b=IMcak1cSnlYk+2kyeu9r8Y/2HczW7gQZICMH98pzQgy+Hz3gw5afSoFNGo9yV92H+7
+         kEn38frXJ1y3HC3T5MmdJYd9wmCpW34Bn4GkWCnd3LgA3tkfx7qW6fLYRVIm1pSh1aIM
+         Hxw88+ibYk2pHC15Zo3TO4iUzAn5/BXD43h+Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731194811; x=1731799611;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yKYtXxX3PpnBma4nIdw63BnV/Ds5TXBbvJ0ct3MPA5Y=;
-        b=fLs83d7W0l7qinI/86cwXZqkekOPyKA63A2NsZPuYe6zPYal3iZqkGLTt/9PsL2J8u
-         rVjvROZmBwHKMsg/RuMxszhdmWJepSWQYpBxhKt6cGbf43qdWVdgWS518LF43oAv8nEH
-         HFlskPktBubqHV8PARXXDyEl35OSqqs6PN6PjaILjzf9DsJhfV5gEL+x26g9/Fk0Yonr
-         PIrE0F6YZ9NPoMNdm9KjMIQxosY0HBvjjFrKSOvYeCqPhmcIfKVLxsrEv4q9TedKPMTO
-         7/hsF5xBgbLOeQvrUny0r826X5JgV55OAKOJuod3JuOtQCj9CfN+pCfVor6NpcJ7lX7i
-         NXLw==
-X-Gm-Message-State: AOJu0YzfSL3Xk3K3L8ldWjJn8Iey93uYrKCDOyt8Pb4DcfYLKJZQVpp+
-	nWVFyUEi/pd75U3DskEVHnvbUyLDWCOT5+TQCLqwf3b2juF+B7zy0nQcLg/FUB0LSLioiaMY5/p
-	o0SY=
-X-Google-Smtp-Source: AGHT+IE+4osdFH9b1wj1O8ionrC7MCM9mzuduMTfaES7SFRNmeiLoeGcSrqhKnSBDH+izun5KD+urA==
-X-Received: by 2002:a05:6512:485a:b0:539:fe02:c1fe with SMTP id 2adb3069b0e04-53d85ef6c4amr1982226e87.16.1731194811244;
-        Sat, 09 Nov 2024 15:26:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731194819; x=1731799619;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RUk+2MyJ3Nk7p96EL5x2+4zXYUEBWNJcqoIkZyN24sI=;
+        b=ToNtsZWtov4e/5CuD1BeDmV9JBW+KDPo4PCtkGNJ82bxEhs5FDa0SGPtNRC9WyR+Q5
+         R6ztvzgoGFfSaQQ5AEf6DZN8UBX2L3ZBb9MMGT2z1kyyVeqU1q7lDEqA9ZJaqUlouFAx
+         ImoMXjqaAxbEKzMTer4t1+Ut03bvnFR4EnTGP1HisOxVVUITpXNJjaHW7O8QH2/AO/oG
+         EGCMHjlM6zz/IAYkpUwHsm03jrsEyzBQL+csIl/W4Ohb3CSd6jFvPV5XWv7iDFLVvZrW
+         E0exNR3KNul9Zn3vehPcY3rwM/VAD+zFnUy6WmXWsdJ3ywdbDWDEsKDCoXI6TNPu53Py
+         Ez5g==
+X-Gm-Message-State: AOJu0YyOe5/nliRC4cXvvesnn0udCPrwCNxkjgbeC2TDHDe//n2tySop
+	Pa9lUNZLdVmogBTwVvNuDnNqEtdhuKCK+gtfv+wV2eSzKQP37wwYBVLwNBILC5svdGLCBfD2o5f
+	bz6I=
+X-Google-Smtp-Source: AGHT+IHu/CrOy1O8GUG/8a81IKfSyDxkXkDYyogMsyOSYajC01dxEovmO1L/UlKct/mw+O2nvMWy1g==
+X-Received: by 2002:a05:6512:3d14:b0:539:edc9:7400 with SMTP id 2adb3069b0e04-53d85f13a72mr2843906e87.20.1731194818581;
+        Sat, 09 Nov 2024 15:26:58 -0800 (PST)
 Received: from localhost.localdomain (77-95-74-246.bb.cust.hknett.no. [77.95.74.246])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d826aeb8fsm1057142e87.239.2024.11.09.15.26.50
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d826aeb8fsm1057142e87.239.2024.11.09.15.26.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Nov 2024 15:26:50 -0800 (PST)
+        Sat, 09 Nov 2024 15:26:58 -0800 (PST)
 From: Tore Amundsen <tore@amundsen.org>
 To: netdev@vger.kernel.org
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -74,10 +76,12 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	intel-wired-lan@lists.osuosl.org,
 	linux-kernel@vger.kernel.org,
 	Tore Amundsen <tore@amundsen.org>
-Subject: [PATCH 0/1] ixgbe: Correct BASE-BX10 compliance code
-Date: Sat,  9 Nov 2024 23:25:56 +0000
-Message-ID: <20241109232557.189035-1-tore@amundsen.org>
+Subject: [PATCH 1/1] ixgbe: Correct BASE-BX10 compliance code
+Date: Sat,  9 Nov 2024 23:25:57 +0000
+Message-ID: <20241109232557.189035-2-tore@amundsen.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241109232557.189035-1-tore@amundsen.org>
+References: <20241109232557.189035-1-tore@amundsen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,29 +90,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The current code in ixgbe_82599 checks the SFP Ethernet compliance code
-against IXGBE_SFF_BASEBX10_CAPABLE to determine if an SFP module supports
-1GB BASE-BX. According to SFF-8472 (section 5.4 Transceiver Compliance
-Codes), the BASE-BX10 bit is defined as bit 6, which corresponds to a
-value of 0x40 (binary 01000000).
+SFF-8472 (section 5.4 Transceiver Compliance Codes) defines bit 6 as
+BASE-BX10. Bit 6 means a value of 0x40 (decimal 64).
 
-However, the current value of IXGBE_SFF_BASEBX10_CAPABLE is 0x64 (binary
-01100100), which incorrectly sets bits for 1000BASE-CX (bit 2) and
-100BASE-FX (bit 5) in addition to BASE-BX10 (bit 6). This mix-up causes
-the driver to incorrectly configure for BASE-BX when encountering
-1000BASE-CX modules. Although 100BASE-FX does not pass the nominal
-signaling rate check, this error could lead to future bugs if other
-codes start to depend on the incorrect value of
-IXGBE_SFF_BASEBX10_CAPABLE.
+The current value in the source code is 0x64, which appears to be a
+mix-up of hex and decimal values. A value of 0x64 (binary 01100100)
+incorrectly sets bit 2 (1000BASE-CX) and bit 5 (100BASE-FX) as well.
 
-This patch corrects the value of IXGBE_SFF_BASEBX10_CAPABLE to 0x40.
-
-Tore Amundsen (1):
-  ixgbe: Correct BASE-BX10 compliance code
-
+Signed-off-by: Tore Amundsen <tore@amundsen.org>
+---
  drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+index 14aa2ca51f70..81179c60af4e 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+@@ -40,7 +40,7 @@
+ #define IXGBE_SFF_1GBASESX_CAPABLE		0x1
+ #define IXGBE_SFF_1GBASELX_CAPABLE		0x2
+ #define IXGBE_SFF_1GBASET_CAPABLE		0x8
+-#define IXGBE_SFF_BASEBX10_CAPABLE		0x64
++#define IXGBE_SFF_BASEBX10_CAPABLE		0x40
+ #define IXGBE_SFF_10GBASESR_CAPABLE		0x10
+ #define IXGBE_SFF_10GBASELR_CAPABLE		0x20
+ #define IXGBE_SFF_SOFT_RS_SELECT_MASK		0x8
 -- 
 2.43.0
 
