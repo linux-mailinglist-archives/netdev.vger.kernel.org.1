@@ -1,130 +1,146 @@
-Return-Path: <netdev+bounces-143526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 969BE9C2E00
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:05:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061B49C2E03
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 16:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DFCB281560
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:05:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 187841C20CB8
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 15:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99A3199FA0;
-	Sat,  9 Nov 2024 15:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67EDB1993B0;
+	Sat,  9 Nov 2024 15:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NN+u/TW8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/P/gv/8"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890691946A4;
-	Sat,  9 Nov 2024 15:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6951DFFC;
+	Sat,  9 Nov 2024 15:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731164721; cv=none; b=OsNAdbWGMxU/X5At4OslzPXlnHxNLWVweXVTx3tIOVGdnAM1fxRNTZ4IkGAim/bpH9dnyyqGVN5AkY+fR+VK+c+6AWXJBYB3NgmppRuT42ChS+klchuwWC9f6Gr3sNFVfS+12gBHpQ3Jsn1hb22mSDxw+56dS272VnI4+cILAJA=
+	t=1731164842; cv=none; b=G37X801NhC9O9v77bxeE0jrClU+YGpITWgr+95C9AkVu1tY9Wb8WCJx0/DcKNfsrybs0mgRcowJ716iLWsfwtoVOrKwxicur4PkYTKnrHzv8ECq35CVBqQk0pO6ZnyIgAfYCMsVMAULdIjBlidi27PzBncYAQ9EhsLWmfO0CivE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731164721; c=relaxed/simple;
-	bh=s/HE862Ebjc4x9QSbLryT2tjzrtXi+x51IAifw3w0tQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TF2ZYEcm5I35aTVyjVIVlXIf89vZjhiZXMfyjTTVFha54gDW6QjCWnPb2Wevu333FMWrXV16/3YXYezQbxE2SwxKRx6Sbkvp9SdB4CTl6fjS9FKFgjXT3I6RIAGe2TQYVEqLXs9UuTwjJlG61hJKJ3JPI/Ukf2thnipN+qZ0zW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NN+u/TW8; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=0mQMe
-	EqbIH1W/gwL+X7sQKXQSByBBidMVZJPmvHc5LI=; b=NN+u/TW8ioIIC5LkpoM8j
-	bh7KVHuYGtfHirZboAFQEdVfG20egBLydDKbfd4kFMm6FRBG9NG8vX4xHjw2h4J5
-	wP95q5qwPfhbKML8O7an/FvyeYbNxRgKxDfeGV4UTCeNQvJAZ613fOU19+C7WcXM
-	rF9hf983qkrro4dsQvqPE0=
-Received: from localhost.localdomain (unknown [47.252.33.72])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wBnT4exeS9n3Jk_GA--.36911S3;
-	Sat, 09 Nov 2024 23:03:29 +0800 (CST)
-From: Jiayuan Chen <mrpre@163.com>
-To: martin.lau@linux.dev,
-	edumazet@google.com,
-	jakub@cloudflare.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	daniel@iogearbox.net
-Cc: Jiayuan Chen <mrpre@163.com>,
-	Vincent Whitchurch <vincent.whitchurch@datadoghq.com>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: [PATCH bpf v2 1/2] bpf: fix recursive lock when verdict program return SK_PASS
-Date: Sat,  9 Nov 2024 23:03:04 +0800
-Message-ID: <20241109150305.141759-2-mrpre@163.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241109150305.141759-1-mrpre@163.com>
-References: <20241109150305.141759-1-mrpre@163.com>
+	s=arc-20240116; t=1731164842; c=relaxed/simple;
+	bh=Id2TaBMrzDI+7SgrR4QD7LYE/+MNn4P49sggGFT9324=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=s3T92ia+3OtjJ3K5jtusSCr2vpEvO1KjE9bXvT4kI5W6wMiS5o7fBzw3mvtmDrDl1NR8PXUW/8va3s9RWJU9GL3akDMH1r+WH+LhR2S1/lA6wLWSvxFqwXUGFFwavR4ke74l7Usy1IPPdWzc9NNCA86v2lmgVoPXpA74YUx/2tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/P/gv/8; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4609beb631aso23520971cf.2;
+        Sat, 09 Nov 2024 07:07:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731164840; x=1731769640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d7UTyqRrTKrSldjAfUOd5fR0L0k3y8bLbCdAZt/4Joo=;
+        b=g/P/gv/8WzrGNan5xCfsqFrZ54HkelnLiYGnMUktcQfsiXOsOmLnmvQvbNhTGpmWBT
+         p9bWnUFsNsuhw5mQ8VwVkw9TA2ueX16oDLIj/LW2V/ooxnJetnngTPvD4CATnlQ3ldxx
+         ak6i9hVN4rL77fing+nyvfb9DgxkWVU71q2woXKAD2wYstzx0ScatjjlpHB8CsSGHbD6
+         OnzViVKiUnnCdizbw4GRrCOuGiG+nvEotVNaIqLCEBpFOkAPJZ0JA/dnT8q4mu4jM5JQ
+         8t981oPSDkgBrwjUDR30dUUj5pTdjoCB+zc6Bnrjj6UyExZEtkROWnxUCDEiZaDZZ4kH
+         4kpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731164840; x=1731769640;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=d7UTyqRrTKrSldjAfUOd5fR0L0k3y8bLbCdAZt/4Joo=;
+        b=nb0KBF+sqVonJe2CKaNJnOIScctQKQm/Bw88milfF6AGM3F6TfmU4PzGBsUnL0E7AG
+         XjaxvQlLvaP4tRotPAPgtgyJLR8yMpuA93XyNi7/IFuHjhlboBd9WtNzqQv0GbqBEjnI
+         +f96ICWV7IWJEB8hcG4s3FCrixJfkLaMnezaUK+gpxX+FvNX1RmBmt3n38N8FKtuD6C4
+         obfXG4TPEUlANDqgCMVT/XwJeIJO2q4LPWOwspY4np7WhvTqDxLXLIcMOlX9/xbdkECO
+         UhJ0Cw/pzBKC9HF7ezxUvzsX3m7QMx5stfTRY8V1aZsjeryauvZw/HxMcBeYyJZB23b3
+         TzLw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1v00FkhJhN/heAxq5J/3Nv1jouMFKDbagHtlg/qREF0G/k43BaiXcSxGKagJM5gvmOvIwmHMwhL40xpQ=@vger.kernel.org, AJvYcCWisO4nWa2gemlKjJM0XqJjP/pUsyzMo+y0/YRDJ2+mPyNvqYqo22B0kJD1GoCdKg00A6qG4aJr@vger.kernel.org, AJvYcCWkICnyvEVk+7wfg8856wlsVAER10oZYRguh6Lov1ydtL7ajRYZMn8ANgoGI5EnLKyP7+yOFybNimQqxnKD+w2C@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfiNtwBjBaKf+L4ybR+0W5mRFHhHm4lJT1MlE8fC7B01N/rhY6
+	VSY90sNJ4FPnFpJGGj+arkWel2KC6C9+8JHcFONJx4CUGfwjlmfi
+X-Google-Smtp-Source: AGHT+IF68xP0ccbEj83xSaEav+tvpLf/chEjd+DqVyTlfe8QBOQ8yK0Zb5itugKECyaNWlxTNEtoQw==
+X-Received: by 2002:a05:622a:2b4c:b0:461:48f9:44f1 with SMTP id d75a77b69052e-463092148d7mr85566391cf.0.1731164839674;
+        Sat, 09 Nov 2024 07:07:19 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ff477014sm33723871cf.49.2024.11.09.07.07.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Nov 2024 07:07:19 -0800 (PST)
+Date: Sat, 09 Nov 2024 10:07:18 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, 
+ netdev@vger.kernel.org
+Cc: corbet@lwn.net, 
+ hdanton@sina.com, 
+ bagasdotme@gmail.com, 
+ pabeni@redhat.com, 
+ namangulati@google.com, 
+ edumazet@google.com, 
+ amritha.nambiar@intel.com, 
+ sridhar.samudrala@intel.com, 
+ sdf@fomichev.me, 
+ peter@typeblog.net, 
+ m2shafiei@uwaterloo.ca, 
+ bjorn@rivosinc.com, 
+ hch@infradead.org, 
+ willy@infradead.org, 
+ willemdebruijn.kernel@gmail.com, 
+ skhawaja@google.com, 
+ kuba@kernel.org, 
+ Joe Damato <jdamato@fastly.com>, 
+ Martin Karsten <mkarsten@uwaterloo.ca>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-kernel@vger.kernel.org (open list), 
+ linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
+Message-ID: <672f7aa6accf5_3564c0294e3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241109050245.191288-6-jdamato@fastly.com>
+References: <20241109050245.191288-1-jdamato@fastly.com>
+ <20241109050245.191288-6-jdamato@fastly.com>
+Subject: Re: [PATCH net-next v9 5/6] selftests: net: Add busy_poll_test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wBnT4exeS9n3Jk_GA--.36911S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7KrWkAr1DXF4Duw48JF4fKrg_yoW8Aw1Dpa
-	4ku3y5GF9rZr18Z3s3KF97Xr1jgw1vgay2gr1ruw1fZrn0gry5urZ5KFy2vF4YvrsrKF98
-	Zr4jqFsrtw17XaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piU3vUUUUUU=
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDweSp2cvca9g6AAAsj
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-When the stream_verdict program returns SK_PASS, it places the received skb
-into its own receive queue, but a recursive lock eventually occurs, leading
-to an operating system deadlock. This issue has been present since v6.9.
+Joe Damato wrote:
+> Add an epoll busy poll test using netdevsim.
+> 
+> This test is comprised of:
+>   - busy_poller (via busy_poller.c)
+>   - busy_poll_test.sh which loads netdevsim, sets up network namespaces,
+>     and runs busy_poller to receive data and socat to send data.
+> 
+> The selftest tests two different scenarios:
+>   - busy poll (the pre-existing version in the kernel)
+>   - busy poll with suspend enabled (what this series adds)
+> 
+> The data transmit is a 1MiB temporary file generated from /dev/urandom
+> and the test is considered passing if the md5sum of the input file to
+> socat matches the md5sum of the output file from busy_poller.
+> 
+> netdevsim was chosen instead of veth due to netdevsim's support for
+> netdev-genl.
+> 
+> For now, this test uses the functionality that netdevsim provides. In the
+> future, perhaps netdevsim can be extended to emulate device IRQs to more
+> thoroughly test all pre-existing kernel options (like defer_hard_irqs)
+> and suspend.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-'''
-sk_psock_strp_data_ready
-    write_lock_bh(&sk->sk_callback_lock)
-    strp_data_ready
-      strp_read_sock
-        read_sock -> tcp_read_sock
-          strp_recv
-            cb.rcv_msg -> sk_psock_strp_read
-              # now stream_verdict return SK_PASS without peer sock assign
-              __SK_PASS = sk_psock_map_verd(SK_PASS, NULL)
-              sk_psock_verdict_apply
-                sk_psock_skb_ingress_self
-                  sk_psock_skb_ingress_enqueue
-                    sk_psock_data_ready
-                      read_lock_bh(&sk->sk_callback_lock) <= dead lock
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-'''
-
-This topic has been discussed before, but it has not been fixed.
-Previous discussion:
-https://lore.kernel.org/all/6684a5864ec86_403d20898@john.notmuch
-
-Fixes: 6648e613226e ("bpf, skmsg: Fix NULL pointer dereference in sk_psock_skb_ingress_enqueue")
-Reported-by: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
-Signed-off-by: Jiayuan Chen <mrpre@163.com>
-Signed-off-by: John Fastabend <john.fastabend@gmail.com>
----
- net/core/skmsg.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index b1dcbd3be89e..e90fbab703b2 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -1117,9 +1117,9 @@ static void sk_psock_strp_data_ready(struct sock *sk)
- 		if (tls_sw_has_ctx_rx(sk)) {
- 			psock->saved_data_ready(sk);
- 		} else {
--			write_lock_bh(&sk->sk_callback_lock);
-+			read_lock_bh(&sk->sk_callback_lock);
- 			strp_data_ready(&psock->strp);
--			write_unlock_bh(&sk->sk_callback_lock);
-+			read_unlock_bh(&sk->sk_callback_lock);
- 		}
- 	}
- 	rcu_read_unlock();
--- 
-2.43.5
-
+minor nit that ULONG_MAX can not be true with uint32_t on 64-bit
+platforms. Definitely no need to respin just for that.
 
