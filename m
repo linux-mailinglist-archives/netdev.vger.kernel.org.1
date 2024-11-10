@@ -1,117 +1,83 @@
-Return-Path: <netdev+bounces-143598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1959C32CD
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:26:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B43F9C32D4
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:44:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE4F1F21241
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:26:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A39301C2090D
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B9D381BA;
-	Sun, 10 Nov 2024 14:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F522B9A9;
+	Sun, 10 Nov 2024 14:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BEn3SF5K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kuZxxufi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E2F1BC2A;
-	Sun, 10 Nov 2024 14:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686B7322B;
+	Sun, 10 Nov 2024 14:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731248758; cv=none; b=ePGJ9vcH4xaVSS6WjO5odLkjuVjx3pb68dSniEAYfUcXRzEvNg5/E9GqKMULQofMLXUsj4dOkkJwhvFAwelhkqz2uwL2C6+sTfsgL4zeh1hRC/cIxrScHDbo6XN3nTKERH2BHrLy/cqXucakEynqf3VKo894ph/Fk7YV7LurpDM=
+	t=1731249841; cv=none; b=jahD1sWK/ZJxTxzlikIMMqPowgMqqrZ8oLz+yqNvByWfzjFajM26Qj1FjU3MW5Ij+NidtjImXmpHcMivAMi64g7Rcy+Tnnb9qrtGUIpxcYKJqnEDJJM3BgnX97GrGZxu6X3SX/lEdov3lfNdg11v+R/XUaokUy65cJd4RwC2z28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731248758; c=relaxed/simple;
-	bh=H6kkLRcCXpgXgSCHKLz+/8/hd+KsxQu+a+akF/jsTAI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aPaX2oTgg4UjD+gFoLVCVD9qDWOrNn+h6pib1gXwPI+Q6jKEVFCKlwBfp4lD0bmtFyOYi9BpbGKzmTJSC1tlmfctoHCvZ6log/h1/kGQVLXfhxbQTRrDkXz/NGO7WYvfDnxDlCntsRUzkeo+SJI4p63PaD23BMMedV9cCGIaszg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BEn3SF5K; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-460963d6233so24542611cf.2;
-        Sun, 10 Nov 2024 06:25:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731248755; x=1731853555; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H6kkLRcCXpgXgSCHKLz+/8/hd+KsxQu+a+akF/jsTAI=;
-        b=BEn3SF5KfH4O7E/sA69T/mzOmt6l3loIRdGxTd4KkpM1N6uRYXlfiLkZ02Sm+t/vUa
-         Mmm66wNNxyHyy4ODsrFI9CfTpB7T3WDeDQALt5OxVe1T5bHwkAB09nOTSPlgH/iunQHP
-         CUOozO72+KsQAEMmdU95Gm53x0mAJW1/sSmLv17IdE5UZF0kBuLIvEiY8kbrVkz9pRO4
-         7C2bkM0sQfocuSNeFbZnQcrfzSjKavpmv7niVuEXxzlV8kDkgAUgUTsnQt3uCCDNI/3F
-         OGnJ6D3SXS/pomShI3VurE2KHGNZ/mZ+gFlOBJgGgVLeIu6KVq4Wx9WWzOn7wR2v+jA7
-         ZPiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731248755; x=1731853555;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H6kkLRcCXpgXgSCHKLz+/8/hd+KsxQu+a+akF/jsTAI=;
-        b=s40Y44O49WQEPGejdMlJJ9e8SzlGMyKYwW0N4rolUumQMs+WamUa9WcaSGXlB1VtB8
-         KR/lY9sLEG8U4azyJ0B/mm4ZBr+fep/mtlNPuI1QgDS7iFCmA5Ro1Pz4ttys8/FY+ScO
-         cYfApl7d4AputT53XdmT+mr9ml3bQ4ew9xCLKSksVFDnSQBQZVaBV7X6rVq646W9GyrB
-         DaY7ECnrcdySuoZoNwWHVoIyXHY0gQQI5BV99JDrv0fVftMznJhbK30ialHDnhjfa+ts
-         zyik59PXbxw5I+IYSU9KVOJu6hGzjqhF6vSPYlLWaCtztKmrq2HdtQIjAE2zhCDXxcZg
-         rmCg==
-X-Forwarded-Encrypted: i=1; AJvYcCVPK+Dw18WkgFFWNlhyb/5k2t42azXKEtWT4Znpm0k6eJzEb+lzmh5B8ygBprgMD8U94WoUAMmZSKtsQwQ=@vger.kernel.org, AJvYcCVoH4Nzj3kDs7Y4bwhA62e3bdyfXDwEHUzmbMCeqGCpiCVFTgQvv2k2pZwypLlcRmiqgWgenlVP@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhDfl6eFjlv+vc8X7FFSZECceBlKJOjFePmE0PeuhVq80MlH/A
-	lGRk+7mbGYqw4MuyujYPMLj7z2QqquFSnh4w/Kv0zm2p95S68iM72J5JnwMdH+Y08siAWAiouca
-	wn9wrt3Lnypndh9MeL7HkMJ3VN0A=
-X-Google-Smtp-Source: AGHT+IGkQLLgn2HEodulrOeD6p6V4fTHRrJtR65Lt9rJEe9gs+IOxxbj0YOJbG4tjZ8xYiHxCYzb0iR26ZuY9IqtE8k=
-X-Received: by 2002:a05:6214:5f04:b0:6cb:7e7a:ae87 with SMTP id
- 6a1803df08f44-6d39e1b4162mr124681656d6.33.1731248755569; Sun, 10 Nov 2024
- 06:25:55 -0800 (PST)
+	s=arc-20240116; t=1731249841; c=relaxed/simple;
+	bh=x0dLFVFwwgPAJrBiWJRBh6DZ9bipzieEb94nWiORQqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FdRuM0j63Q6ji5v2KC+mk4vQzTyhcS+1OLGrfq8qheiOk+PBBG9mt93fXQ/3H11LiHLxjQaiOWyyAq8Frv7Xql4+7Sb5kMdk5cMOqQjca1w5UmqSi//52rDMQUzt7jcr84AsVTx1Pnr4XDamyOsj0MaHT7b40NA/1TNDMIqNDG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kuZxxufi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3B5DC4CECD;
+	Sun, 10 Nov 2024 14:43:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731249840;
+	bh=x0dLFVFwwgPAJrBiWJRBh6DZ9bipzieEb94nWiORQqg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kuZxxufi+1/CaWf2jVlwgQIhaLfF8ZmXqakGCnFrQR1H3vvJklnB3SalUP81HSCB2
+	 4NReGYNhNEJc5xE8lpx2cZwytS66zOZjUw8EZpR0q3BH72TiptlnMZnVJYrHBgKOXj
+	 zOYQDhBFm/0mMLmnb6aAw71fVkovJehldoinKmv94KSw2X219sYZDOiyv6YpjawDfn
+	 CDkQliBIl46n+7rimmVGNfQmFz1bY/wHtWtYFo/OLx2QWG0IEj8e2hy+ANSpZsCFet
+	 dziRV1AvGZ24lM8MZxVA4LkKXP7nDusVW1cbxb+uvXs8NUcfSq54dZPHV4t8Lb7hrc
+	 ahyw2T7U6UdaA==
+Date: Sun, 10 Nov 2024 14:43:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jeroen de Borst <jeroendb@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, stable@vger.kernel.org, pabeni@redhat.com,
+	pkaligineedi@google.com, shailend@google.com, andrew+netdev@lunn.ch,
+	willemb@google.com, hramamurthy@google.com, ziweixiao@google.com
+Subject: Re: [PATCH net] gve: Flow steering trigger reset only for timeout
+ error
+Message-ID: <20241110144354.GT4507@kernel.org>
+References: <20241107183431.1270772-1-jeroendb@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107151929.37147-5-yyyynoom@gmail.com> <20241107200940.4dff026d@kernel.org>
-In-Reply-To: <20241107200940.4dff026d@kernel.org>
-From: Moon Yeounsu <yyyynoom@gmail.com>
-Date: Sun, 10 Nov 2024 23:25:44 +0900
-Message-ID: <CAAjsZQwhDeFEK2qEwy6b4-GbDUymiOz5xzrYwmMSTe-Jf_3oKQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: dlink: add support for reporting stats
- via `ethtool -S`
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, andrew@lunn.ch
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107183431.1270772-1-jeroendb@google.com>
 
-First of all, I would like to extend my apologies.
-In the previous patch, the `get_ethtool_rmon_stats()` function should
-have called the `get_stats()` function to update the stats
-information,
-but I missed this. I will include this part in the next patch.
+On Thu, Nov 07, 2024 at 10:34:31AM -0800, Jeroen de Borst wrote:
+> From: Ziwei Xiao <ziweixiao@google.com>
+> 
+> When configuring flow steering rules, the driver is currently going
+> through a reset for all errors from the device. Instead, the driver
+> should only reset when there's a timeout error from the device.
+> 
+> Fixes: 57718b60df9b ("gve: Add flow steering adminq commands")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-On Fri, Nov 8, 2024 at 1:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
-> Do these macro wrappers really buy you anything?
-> They make the code a lot harder to follow :(
-I fully understand that these macros can be difficult to comprehend at
-first glance.
-However, I wanted to avoid code duplication with this structure.
-For now, I will write the code in a way that minimizes the use of
-macros as much as possible.
+Hi Jeroen,
 
-> nit: multiple empty lines, checkpatch --strict should catch this
-In the next patch, I will use the `checkpatch --strict` option to fix
-as many warnings and checks as possible before submitting the patch.
-I also confirmed from patchwork[1] that there were additional warning messa=
-ges.
-I will pay attention to and correct these warnings in the next patch.
-Thank you for pointing that out.
+As you are posting this patch your Signed-off-by line needs to go here.
 
-> We've been getting conversion patches replacing such code with
-> ethtool_puts() lately, let's use it from the start.
-I will do so.
-
-[1]: https://patchwork.kernel.org/project/netdevbpf/patch/20241107151929.37=
-147-5-yyyynoom@gmail.com/
+--
+pw-bot: changes-requested
 
