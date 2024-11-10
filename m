@@ -1,94 +1,158 @@
-Return-Path: <netdev+bounces-143578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6013F9C3158
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 09:37:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED899C3164
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 09:44:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5660B20C37
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 08:37:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95DC81C20ACB
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 08:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B579150980;
-	Sun, 10 Nov 2024 08:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="But623dP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867F51527B4;
+	Sun, 10 Nov 2024 08:44:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315E014D70E;
-	Sun, 10 Nov 2024 08:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E107214E2CF
+	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 08:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731227840; cv=none; b=Jqw//LGQeFCQJt3RLv2rWDDq2zQu+gKeNWWAC6yfXeiOceHG7y/SbzK5d8yjCAj9RNiBkCDcexEZZ9609IboYsSshCCB3TZUBjYL7iLyuf/hqjx5hNNeb5YFEuR5J1lXQhQZLhqyeeK1ULKlyO6RWv9UbxJA7yK2foVjckl5YUc=
+	t=1731228259; cv=none; b=XRpjQLMBdFGRSEmgy7nwC7woCb4qS39IsQY/vNkrvcCoPggCoAg+oHQ7CImCcq/VSYPy6+wKc53eD1M0+xboO7qhccS2igZWbT6+9hcuz2OQiqEch0ZgG5KbUaejaqM50RSfSIOob0bVM4qsobxF8v/yPTK3t2d1n7XL0Za2eqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731227840; c=relaxed/simple;
-	bh=wXJjexJY/+pibG8nCaNFkp8io3YCMgfgRrl0fX5PLvc=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RTyuXREbp5MLz4XfgUjbB2/ixYzRKuDQWnnqLyxhvbyQkvT6CmbErxo4R8nRoSuiSJCgXr/jdZ4UritMVjxuMoNIhxF5pdkF4NR/HuWIVIFcDtBSHCtP+tjgtAqPEEbszoFPJwIGCmaHRnbDaRzmCD9++nNy6UHukMOPwmao7D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=But623dP; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=Q9MDlHLhRBCC/FowPzthZ3lSPHtwKksm/TWLW2AM+is=;
-	b=But623dPXF1lQYVcP3H/DPD9nGIwh6dHfu27H6gUfnoKOkGBzcU5RTEKG/fyl1
-	Ai2Kn2dSfDHzAKRfaU3e9SUTMzJDvSySMHtHPJ6jG6aMoKO0KXMp0Cw7WlEbwJ4U
-	a8iM5OOlqC9Ffy4jb34jLehVB6fl6+d0T9DTmzNEYgJiU=
-Received: from osx (unknown [139.227.12.77])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wC3H4mZcDBnBVbMGA--.16005S3;
-	Sun, 10 Nov 2024 16:36:43 +0800 (CST)
-Date: Sun, 10 Nov 2024 16:36:40 +0800
-From: Jiayuan Chen <mrpre@163.com>
-To: martin.lau@linux.dev, edumazet@google.com, jakub@cloudflare.com, 
-	davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf v2 0/2] bpf: fix recursive lock and add test -
- updated to [PATCH bpf v3]
-Message-ID: <wmexc72od3rsa5ayrmsuhhbozrr22yxkynspz46swyrcyp77bm@pjfwspeu2b7r>
-References: <20241109150305.141759-1-mrpre@163.com>
+	s=arc-20240116; t=1731228259; c=relaxed/simple;
+	bh=N6fjnQ3SVjcaUzADUhmQzaxQkP7EPDBqq6OJR0PXTh4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EelPCFap+ocNKFmX4CdcymtW4JtdymwrL8iyFslTU0fYj94VZHbRixBEm4trOhz/QH621rj8/SF4iJx1Ofb1atDobFB4L2yPlkCQuhMYealvxZg2EBUAnmX0mifn181EBGn88Xlokc7QaFWNPbZpsulSoNcIB6Yf1osJ2W01e0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83aed4f24a9so418839839f.0
+        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 00:44:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731228257; x=1731833057;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=znOIIlnNrOZ23GxgUlO5RXsc39UsdkSI5Y+xlIMB35Y=;
+        b=g5k7V0eLGZzeIjbfDAKNcHjcnhDkYAH2NsX2AuA8w7JxZ25HhMsULUMXqVLkQcZGBz
+         rZw6fqNIRPTnfjkCk2mYtYspRLaT7qaBwo0MmwPmovjwP33/7ffQkWDRsFpeNJZztLcO
+         6nHUURtmWCEdqYV97dsa7J4KHnFwvYkbL9oZ+kCheN3n8a3QjOuyxxTUYsJ5T+W1jG32
+         FUq0PjcotojDSkjvd0a3varHzn2FDXIkbPm9tmAFNqm6Ly3UOmrMEIlY3D4OuYv07RJF
+         nzSRiwODXGxfHBUIQ2w7tivj7QI7xMluiaO1Q1yOXNRs//HEwgZfp233Bk+EXNE0jR4L
+         O6xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/p18Vpa+XZkHFMIoUmMqtVnMFoqAS5fELrhWOOwmBOQlhElY3OQN3TvVIvVs9QFSnaYfi76k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXiA/+6C6SGT3GeQ/zHsfwwURgiVOeFue7kgteWqxHjvxPeNLL
+	iDvixoHzi20daFmMPP7VaX1AJvM7GJaU+URdY8YGrZuF56N3+Xp/b+VrpuAVr9/MX09IwPDKum2
+	u0strffpoK2vwPqYrbD2b0VUO8BJjFlkJSs5KA8+qLxcMOZcRUBeKFuU=
+X-Google-Smtp-Source: AGHT+IHy8lOTiYW1dJ+FhT3xtg2IJ7H1+Y2fyo4KO/dcG0+G7kCUR4jIMPTQjvCzUhggTMelaN5PLOTxeze85zG9HrIgdVI+QUmU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241109150305.141759-1-mrpre@163.com>
-X-CM-TRANSID:_____wC3H4mZcDBnBVbMGA--.16005S3
-X-Coremail-Antispam: 1Uf129KBjvdXoW7JF45urW3tr1UGFy7Ary3XFb_yoWDXFb_ur
-	4Uu3s7J3srAFs8KFykWa1rCFyq93yxt34UAFZrKr47ur47ZrZ5JFs2gr90ya4DZa1xA39x
-	tF1ruFWIyr4UXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjsNVPUUUUU==
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwCTp2cwbcolyAAAsm
+X-Received: by 2002:a05:6e02:20c6:b0:3a0:9f85:d74f with SMTP id
+ e9e14a558f8ab-3a6f1a3742bmr84154435ab.16.1731228257009; Sun, 10 Nov 2024
+ 00:44:17 -0800 (PST)
+Date: Sun, 10 Nov 2024 00:44:16 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67307260.050a0220.320e73.0321.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in mac80211_hwsim_config_mac_nl
+From: syzbot <syzbot+9ea265d998de25ac6a46@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Nov 09, 2024 at 11:03:03PM +0800, Jiayuan Chen wrote:
-> 1. fix recursive lock when ebpf prog return SK_PASS.
-> 2. add selftest to reproduce recursive lock.
-> 
-> Note that if just the selftest merged without first
-> patch, the test case will definitely fail, because the
-> issue of deadlock is inevitable.
-> 
-> ---
-> v1->v2: 1.inspired by martin.lau to add selftest to reproduce the issue.
->         2. follow the community rules for patch.
->         v1: https://lore.kernel.org/bpf/55fc6114-7e64-4b65-86d2-92cfd1e9e92f@linux.dev/T/#u
-> ---
-> 
-> Jiayuan Chen (2):
->   bpf: fix recursive lock when verdict program return SK_PASS
->   selftests/bpf: Add some tests with sockmap SK_PASS
-> 
->  net/core/skmsg.c                              |  4 +-
->  .../selftests/bpf/prog_tests/sockmap_basic.c  | 53 +++++++++++++++++++
->  .../bpf/progs/test_sockmap_pass_prog.c        |  2 +-
->  3 files changed, 56 insertions(+), 3 deletions(-)
-> 
-> -- 
-> 2.43.5
+Hello,
 
-patch v3: https://lore.kernel.org/bpf/20241110082452.40415-1-mrpre@163.com/T/#t
+syzbot found the following issue on:
 
+HEAD commit:    ccb35037c48a Merge branch 'net-lan969x-add-vcap-functional..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1492cf40580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a9d1c42858837b59
+dashboard link: https://syzkaller.appspot.com/bug?extid=9ea265d998de25ac6a46
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4c339ec95c42/disk-ccb35037.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/328f6f24277e/vmlinux-ccb35037.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0473d4109fcb/bzImage-ccb35037.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9ea265d998de25ac6a46@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 16303 at drivers/net/wireless/virtual/mac80211_hwsim.c:1445 mac80211_hwsim_config_mac_nl+0x2b2/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:1445
+Modules linked in:
+CPU: 0 UID: 0 PID: 16303 Comm: syz.6.3042 Not tainted 6.12.0-rc5-syzkaller-01164-gccb35037c48a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:mac80211_hwsim_config_mac_nl+0x2b2/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:1445
+Code: 48 8b 3c 24 4c 89 fe 44 89 ea 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 eb f8 ff ff e8 46 b3 8d fa eb 05 e8 3f b3 8d fa 90 <0f> 0b 90 e9 10 fe ff ff 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c 90 fd
+RSP: 0018:ffffc9000b0476b0 EFLAGS: 00010293
+RAX: ffffffff870726e1 RBX: 0000000000000000 RCX: ffff888072945a00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff870724ed R09: 1ffffffff203a5d5
+R10: dffffc0000000000 R11: ffffffff87069560 R12: ffff8880635dae32
+R13: 0000000000000000 R14: 0000000000000001 R15: ffff8880554630a0
+FS:  00007f08d2bff6c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020003a80 CR3: 000000007c7cc000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ mac80211_hwsim_add_interface+0x9a/0x320 drivers/net/wireless/virtual/mac80211_hwsim.c:2136
+ drv_add_interface+0x2f8/0x8e0 net/mac80211/driver-ops.c:73
+ ieee80211_do_open+0x73d/0x2430 net/mac80211/iface.c:1373
+ ieee80211_open+0x192/0x200 net/mac80211/iface.c:458
+ __dev_open+0x2d3/0x450 net/core/dev.c:1476
+ __dev_change_flags+0x1e2/0x6f0 net/core/dev.c:8904
+ dev_change_flags+0x8b/0x1a0 net/core/dev.c:8976
+ devinet_ioctl+0xcce/0x1ac0 net/ipv4/devinet.c:1209
+ inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1001
+ sock_do_ioctl+0x158/0x460 net/socket.c:1227
+ sock_ioctl+0x626/0x8e0 net/socket.c:1346
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f08d317e31b
+Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1c 48 8b 44 24 18 64 48 2b 04 25 28 00 00
+RSP: 002b:00007f08d2bfde60 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f08d2bfdf80 RCX: 00007f08d317e31b
+RDX: 00007f08d2bfdee0 RSI: 0000000000008914 RDI: 000000000000000b
+RBP: 000000000000000b R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000024
+R13: 0000000000000048 R14: 00007f08d2bfdfa0 R15: 00007f08d2bfdee0
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
