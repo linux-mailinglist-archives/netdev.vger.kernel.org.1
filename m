@@ -1,53 +1,64 @@
-Return-Path: <netdev+bounces-143587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B5B9C3228
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:31:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3809C322C
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:35:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62B3428134B
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 13:31:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA9D71C20841
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 13:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22634101EE;
-	Sun, 10 Nov 2024 13:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4594210A3E;
+	Sun, 10 Nov 2024 13:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hVY7iBPy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIO3FtlP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FF9C13C
-	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 13:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C69A15AF6;
+	Sun, 10 Nov 2024 13:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731245506; cv=none; b=nklJWQSD7WsysInKnLs+0clgQCGtzPiM/wm9qzvCEmYUEM8vOAVboTUQjqIdMj/cGtrjbojLZuQNxeWqfg4aSvuhgrzyxbe2JHsooceOBBs+sAo5CYjI7+/8TEQmZZ62juLE1e1m2c+HrSl328uk+Yzsmaxn9PFHHnbT+D7cXJA=
+	t=1731245732; cv=none; b=MtiM1lALb4PJbacYT89NJjcWxrrWOOQbDKGD+HylBkV17jmn0OYE0M8kwxFtYD1guIOAdm0qaJup3zWhZlbvZIKYuA/wU+grJ4LVeB9aWLcmZBIsK4AJQLiR+x5uyrH1djmw+lHgp2D/4vLOPlLmzrkn+1aO3X48Vh6qXRzVT5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731245506; c=relaxed/simple;
-	bh=VNBdV47EGFR+JVQgcO3mjSACcZCsxTHBYhlLqfmtixA=;
+	s=arc-20240116; t=1731245732; c=relaxed/simple;
+	bh=wAosZbIeN6i75DZ5IsgZbec7MRK0ROPy5XUoDy34nVI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VR7RImwdzAKAw3974vEO3d+VEMLWDpNRouEq1sUraeUr+CwGRWOSLzSU3GgWkYJbrSzgafoxFD3mazgx7rr9I2EWjc+a5NbJPoJYw1GhyNIZvfsw4UthVzElLLQIexF8ikcFxKrL6tzLQ2iKYQb/FqfVTKUwsdZbIueGAM1fTgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hVY7iBPy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A64C4CECD;
-	Sun, 10 Nov 2024 13:31:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=eZvlRaxV00dDOt3IVC5Pvf/XJ40bDE47c5Qx3sBhACPVJEBk90H6vZ0iWF0y56mF91bAXqwVTRtvsSd8q6c80G5WY9JO+fDgu2z4rASjjNisiRNCzJ0LEq0B9z+8eEgN9S+G8FZhZ/qUDOVU9Vi80D/WrtkA64NkwSJhXkJcmDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIO3FtlP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B76D3C4CECD;
+	Sun, 10 Nov 2024 13:35:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731245505;
-	bh=VNBdV47EGFR+JVQgcO3mjSACcZCsxTHBYhlLqfmtixA=;
+	s=k20201202; t=1731245731;
+	bh=wAosZbIeN6i75DZ5IsgZbec7MRK0ROPy5XUoDy34nVI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hVY7iBPy98gYKQ8ZMWDb/VBRjfBe+KRqpEK2VGBZvQbo7eTEsQxZKn5/lHUZPIMmK
-	 1welYCaSK5Fzea/IrWLYbuuQxB1qCLfaBzWTkahIVbVyUq+iusDCvskOxFaim4eHaw
-	 kIfj5LvJQdssrGHsu5Pwti0AwUruz/hGokjxXoH83u4U0gJxSegYdnwwrGZodCX+Sw
-	 IQ5WhFhtnqXCUIh2ShI0IRXQk7ItbqwTo2qutqqgTDEttrIoBXyFYtSSJ2GqQteSWz
-	 87C67cnVljR7QWYt0P/9jydYOtR7QXanLJ6baceH7PlQDS9rUNIfMXI3W5/ryfUHfg
-	 6hRey/f9HObdw==
-Date: Sun, 10 Nov 2024 13:31:41 +0000
+	b=eIO3FtlPwBtQzNX8Fv2NF3KEdJX2RtwjTu39d03m+uljJkRn7OH+k8RZPnmgcFxMq
+	 M1hfjVXujTHfJMX6lffuBSc8ENpI9wWnC8D1P+N2fAl6cIfO5oFJWQf2nFUwflwlmL
+	 /VvhI0PQt2tZFZSh8kZSsoBd5wg4ztRHl8IYNgyS6BeVTkAjQHaVPQaucIJzGtoSP/
+	 mWbEIo81hX6927L4OIw99CG6RUamy+stIDIhQLrIwM1tAM0bN2srXhHy9M6ReiR5m8
+	 wQl6pdNj/YHmNLRs5mWa3Upps1A/nSV1Ib5q4B22FH1jDr7DxiLz6gPRdDumu8JDoI
+	 AO8UytdIltBRA==
+Date: Sun, 10 Nov 2024 13:35:24 +0000
 From: Simon Horman <horms@kernel.org>
-To: Mohammad Heib <mheib@redhat.com>
-Cc: netdev@vger.kernel.org, irusskikh@marvell.com
-Subject: Re: [PATCH net] net: atlantic: use irq_update_affinity_hint()
-Message-ID: <20241110133141.GN4507@kernel.org>
-References: <20241107120739.415743-1-mheib@redhat.com>
+To: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	lftan.linux@gmail.com
+Subject: Re: [PATCH net-next v3 1/3] net: stmmac: dwmac4: Fix MTL_OP_MODE_RTC
+ mask and shift macros
+Message-ID: <20241110133524.GO4507@kernel.org>
+References: <20241107063637.2122726-1-leyfoon.tan@starfivetech.com>
+ <20241107063637.2122726-2-leyfoon.tan@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,27 +67,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107120739.415743-1-mheib@redhat.com>
+In-Reply-To: <20241107063637.2122726-2-leyfoon.tan@starfivetech.com>
 
-On Thu, Nov 07, 2024 at 02:07:39PM +0200, Mohammad Heib wrote:
-> irq_set_affinity_hint() is deprecated, Use irq_update_affinity_hint()
-> instead. This removes the side-effect of actually applying the affinity.
+On Thu, Nov 07, 2024 at 02:36:34PM +0800, Ley Foon Tan wrote:
+> RTC fields are located in bits [1:0]. Correct the _MASK and _SHIFT
+> macros to use the appropriate mask and shift.
 > 
-> The driver does not really need to worry about spreading its IRQs across
-> CPUs. The core code already takes care of that. when the driver applies the
-> affinities by itself, it breaks the users' expectations:
-> 
-> 1. The user configures irqbalance with IRQBALANCE_BANNED_CPULIST in
->    order to prevent IRQs from being moved to certain CPUs that run a
->    real-time workload.
-> 
-> 2. atlantic device reopening will resets the affinity
->    in aq_ndev_open().
-> 
-> 3. atlantic has no idea about irqbalance's config, so it may move an IRQ to
->    a banned CPU. The real-time workload suffers unacceptable latency.
-> 
-> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+> Signed-off-by: Ley Foon Tan <leyfoon.tan@starfivetech.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
