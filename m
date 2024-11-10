@@ -1,152 +1,117 @@
-Return-Path: <netdev+bounces-143597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1D19C32CB
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:23:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1959C32CD
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23C0E28142C
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:23:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE4F1F21241
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE1C2D047;
-	Sun, 10 Nov 2024 14:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B9D381BA;
+	Sun, 10 Nov 2024 14:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OuJR+Jb5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BEn3SF5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17F2DDD9;
-	Sun, 10 Nov 2024 14:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E2F1BC2A;
+	Sun, 10 Nov 2024 14:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731248590; cv=none; b=oQ8HSUBS/nHzffIGdB+IjLI2LrIvUS9j2zA1/iQJpvWoq3GcWbD3O0P2f9d7tu3svEB3ydWyMw+5lYTw81XiY8KfWbf0/yz9mrADvpBbBjLrWgQsuaWiGJvdRkw1NBe2y9HHuplAtgGmrTOa5jeA4Hlu3F0kW1yqpr2F292wj28=
+	t=1731248758; cv=none; b=ePGJ9vcH4xaVSS6WjO5odLkjuVjx3pb68dSniEAYfUcXRzEvNg5/E9GqKMULQofMLXUsj4dOkkJwhvFAwelhkqz2uwL2C6+sTfsgL4zeh1hRC/cIxrScHDbo6XN3nTKERH2BHrLy/cqXucakEynqf3VKo894ph/Fk7YV7LurpDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731248590; c=relaxed/simple;
-	bh=X+lwtwOzUFGIoQmz/u8HCHbE4khCcQS/82+VHurV2yY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bAQ3NcZ1laVlEIqcKgynOBGIaulXKGl90lA4+mj5b+NiSTI8shD4bvQ4VorHnxZ7zkfjSm0U3N6lesqqVhO7rIuqJn0lqh0qdETBdI4yuWm/GaF32c9r0l0Fmk5k3rx4PrDXxbLhx1MLCJNCYCXeh6dT0NrFMwUY1BtmXO+lqNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OuJR+Jb5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7B87C4CECD;
-	Sun, 10 Nov 2024 14:23:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731248590;
-	bh=X+lwtwOzUFGIoQmz/u8HCHbE4khCcQS/82+VHurV2yY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OuJR+Jb5gsV5jt2VeTE6lTPkYSHd+dJ5xDmbPwFrxBLFd3yol3QDO4U1yzxhCubpQ
-	 4l6B+lRTgsn/w765zdpwcwPHNo1+7hHX1JRML177AVrt98oyVEVqH4YcVvtYDL+PSU
-	 Mxll8jupLQKR2oLMBirdikdYOzs79+wd1h/xNsipqSPG/uIi9HNsSiA9OSGtR54Iha
-	 4jIisMdfZD5m9LhGKF0l+BmoBG0SgzbKiZdRR/RePkbr1OgZMcYBplmYy2G24xjEQM
-	 F29R1wboK/EPKrxDTNHo6K93MYYhxV7DicsfykA6koB6ycwDDHC5UWOTeOw6pp1fkz
-	 FBfPqRnTr2LMg==
-Date: Sun, 10 Nov 2024 16:23:03 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jerinj@marvell.com,
-	lcherian@marvell.com, ndabilpuram@marvell.com, sd@queasysnail.net
-Subject: Re: [net-next PATCH v9 1/8] octeontx2-pf: map skb data as device
- writeable
-Message-ID: <20241110142303.GA50588@unreal>
-References: <20241108045708.1205994-1-bbhushan2@marvell.com>
- <20241108045708.1205994-2-bbhushan2@marvell.com>
+	s=arc-20240116; t=1731248758; c=relaxed/simple;
+	bh=H6kkLRcCXpgXgSCHKLz+/8/hd+KsxQu+a+akF/jsTAI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aPaX2oTgg4UjD+gFoLVCVD9qDWOrNn+h6pib1gXwPI+Q6jKEVFCKlwBfp4lD0bmtFyOYi9BpbGKzmTJSC1tlmfctoHCvZ6log/h1/kGQVLXfhxbQTRrDkXz/NGO7WYvfDnxDlCntsRUzkeo+SJI4p63PaD23BMMedV9cCGIaszg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BEn3SF5K; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-460963d6233so24542611cf.2;
+        Sun, 10 Nov 2024 06:25:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731248755; x=1731853555; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H6kkLRcCXpgXgSCHKLz+/8/hd+KsxQu+a+akF/jsTAI=;
+        b=BEn3SF5KfH4O7E/sA69T/mzOmt6l3loIRdGxTd4KkpM1N6uRYXlfiLkZ02Sm+t/vUa
+         Mmm66wNNxyHyy4ODsrFI9CfTpB7T3WDeDQALt5OxVe1T5bHwkAB09nOTSPlgH/iunQHP
+         CUOozO72+KsQAEMmdU95Gm53x0mAJW1/sSmLv17IdE5UZF0kBuLIvEiY8kbrVkz9pRO4
+         7C2bkM0sQfocuSNeFbZnQcrfzSjKavpmv7niVuEXxzlV8kDkgAUgUTsnQt3uCCDNI/3F
+         OGnJ6D3SXS/pomShI3VurE2KHGNZ/mZ+gFlOBJgGgVLeIu6KVq4Wx9WWzOn7wR2v+jA7
+         ZPiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731248755; x=1731853555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H6kkLRcCXpgXgSCHKLz+/8/hd+KsxQu+a+akF/jsTAI=;
+        b=s40Y44O49WQEPGejdMlJJ9e8SzlGMyKYwW0N4rolUumQMs+WamUa9WcaSGXlB1VtB8
+         KR/lY9sLEG8U4azyJ0B/mm4ZBr+fep/mtlNPuI1QgDS7iFCmA5Ro1Pz4ttys8/FY+ScO
+         cYfApl7d4AputT53XdmT+mr9ml3bQ4ew9xCLKSksVFDnSQBQZVaBV7X6rVq646W9GyrB
+         DaY7ECnrcdySuoZoNwWHVoIyXHY0gQQI5BV99JDrv0fVftMznJhbK30ialHDnhjfa+ts
+         zyik59PXbxw5I+IYSU9KVOJu6hGzjqhF6vSPYlLWaCtztKmrq2HdtQIjAE2zhCDXxcZg
+         rmCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPK+Dw18WkgFFWNlhyb/5k2t42azXKEtWT4Znpm0k6eJzEb+lzmh5B8ygBprgMD8U94WoUAMmZSKtsQwQ=@vger.kernel.org, AJvYcCVoH4Nzj3kDs7Y4bwhA62e3bdyfXDwEHUzmbMCeqGCpiCVFTgQvv2k2pZwypLlcRmiqgWgenlVP@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhDfl6eFjlv+vc8X7FFSZECceBlKJOjFePmE0PeuhVq80MlH/A
+	lGRk+7mbGYqw4MuyujYPMLj7z2QqquFSnh4w/Kv0zm2p95S68iM72J5JnwMdH+Y08siAWAiouca
+	wn9wrt3Lnypndh9MeL7HkMJ3VN0A=
+X-Google-Smtp-Source: AGHT+IGkQLLgn2HEodulrOeD6p6V4fTHRrJtR65Lt9rJEe9gs+IOxxbj0YOJbG4tjZ8xYiHxCYzb0iR26ZuY9IqtE8k=
+X-Received: by 2002:a05:6214:5f04:b0:6cb:7e7a:ae87 with SMTP id
+ 6a1803df08f44-6d39e1b4162mr124681656d6.33.1731248755569; Sun, 10 Nov 2024
+ 06:25:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241108045708.1205994-2-bbhushan2@marvell.com>
+References: <20241107151929.37147-5-yyyynoom@gmail.com> <20241107200940.4dff026d@kernel.org>
+In-Reply-To: <20241107200940.4dff026d@kernel.org>
+From: Moon Yeounsu <yyyynoom@gmail.com>
+Date: Sun, 10 Nov 2024 23:25:44 +0900
+Message-ID: <CAAjsZQwhDeFEK2qEwy6b4-GbDUymiOz5xzrYwmMSTe-Jf_3oKQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: dlink: add support for reporting stats
+ via `ethtool -S`
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, andrew@lunn.ch
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 08, 2024 at 10:27:01AM +0530, Bharat Bhushan wrote:
-> Crypto hardware need write permission for in-place encrypt
-> or decrypt operation on skb-data to support IPsec crypto
-> offload. That patch uses skb_unshare to make skb data writeable
-> for ipsec crypto offload and map skb fragment memory as
-> device read-write.
-> 
-> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> ---
-> v7->v8:
->  - spell correction (s/sdk/skb) in description
-> 
-> v6->v7:
->  - skb data was mapped as device writeable but it was not ensured
->    that skb is writeable. This version calls skb_unshare() to make
->    skb data writeable.
-> 
->  .../ethernet/marvell/octeontx2/nic/otx2_txrx.c | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-> index 7aaf32e9aa95..49b6b091ba41 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-> @@ -11,6 +11,7 @@
->  #include <linux/bpf.h>
->  #include <linux/bpf_trace.h>
->  #include <net/ip6_checksum.h>
-> +#include <net/xfrm.h>
->  
->  #include "otx2_reg.h"
->  #include "otx2_common.h"
-> @@ -83,10 +84,17 @@ static unsigned int frag_num(unsigned int i)
->  static dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
->  					struct sk_buff *skb, int seg, int *len)
->  {
-> +	enum dma_data_direction dir = DMA_TO_DEVICE;
->  	const skb_frag_t *frag;
->  	struct page *page;
->  	int offset;
->  
-> +	/* Crypto hardware need write permission for ipsec crypto offload */
-> +	if (unlikely(xfrm_offload(skb))) {
-> +		dir = DMA_BIDIRECTIONAL;
-> +		skb = skb_unshare(skb, GFP_ATOMIC);
-> +	}
-> +
->  	/* First segment is always skb->data */
->  	if (!seg) {
->  		page = virt_to_page(skb->data);
-> @@ -98,16 +106,22 @@ static dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
->  		offset = skb_frag_off(frag);
->  		*len = skb_frag_size(frag);
->  	}
-> -	return otx2_dma_map_page(pfvf, page, offset, *len, DMA_TO_DEVICE);
-> +	return otx2_dma_map_page(pfvf, page, offset, *len, dir);
+First of all, I would like to extend my apologies.
+In the previous patch, the `get_ethtool_rmon_stats()` function should
+have called the `get_stats()` function to update the stats
+information,
+but I missed this. I will include this part in the next patch.
 
-Did I read correctly and you perform DMA mapping on every SKB in data path?
-How bad does it perform if you enable IOMMU?
+On Fri, Nov 8, 2024 at 1:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+> Do these macro wrappers really buy you anything?
+> They make the code a lot harder to follow :(
+I fully understand that these macros can be difficult to comprehend at
+first glance.
+However, I wanted to avoid code duplication with this structure.
+For now, I will write the code in a way that minimizes the use of
+macros as much as possible.
 
-Thanks
+> nit: multiple empty lines, checkpatch --strict should catch this
+In the next patch, I will use the `checkpatch --strict` option to fix
+as many warnings and checks as possible before submitting the patch.
+I also confirmed from patchwork[1] that there were additional warning messa=
+ges.
+I will pay attention to and correct these warnings in the next patch.
+Thank you for pointing that out.
 
->  }
->  
->  static void otx2_dma_unmap_skb_frags(struct otx2_nic *pfvf, struct sg_list *sg)
->  {
-> +	enum dma_data_direction dir = DMA_TO_DEVICE;
-> +	struct sk_buff *skb = NULL;
->  	int seg;
->  
-> +	skb = (struct sk_buff *)sg->skb;
-> +	if (unlikely(xfrm_offload(skb)))
-> +		dir = DMA_BIDIRECTIONAL;
-> +
->  	for (seg = 0; seg < sg->num_segs; seg++) {
->  		otx2_dma_unmap_page(pfvf, sg->dma_addr[seg],
-> -				    sg->size[seg], DMA_TO_DEVICE);
-> +				    sg->size[seg], dir);
->  	}
->  	sg->num_segs = 0;
->  }
-> -- 
-> 2.34.1
-> 
-> 
+> We've been getting conversion patches replacing such code with
+> ethtool_puts() lately, let's use it from the start.
+I will do so.
+
+[1]: https://patchwork.kernel.org/project/netdevbpf/patch/20241107151929.37=
+147-5-yyyynoom@gmail.com/
 
