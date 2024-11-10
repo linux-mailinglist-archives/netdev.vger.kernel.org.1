@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-143604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51F19C3415
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 18:42:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB02A9C3423
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 19:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 134EC1C20B97
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 17:42:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DB3A281297
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 18:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA4613D62B;
-	Sun, 10 Nov 2024 17:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFF91E495;
+	Sun, 10 Nov 2024 18:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrfyHrp5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ryWB8uHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDF513BC0D;
-	Sun, 10 Nov 2024 17:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15A93F9CC
+	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 18:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731260553; cv=none; b=s9grsA91cd8PwkObFG/Q160eFGReBrT1C/m5GNkxSbgZR6REYChmU+s4RgrQ+rwXyFv9HfO7aiuzA5rWvYNENjekIdyu6FOOFAWWKPJU5AVh/dFmTXOIqVzG03SsJybIorkdjsvtqnSafFpxz26A5M5+8cboImDQhknZ5fcHAMc=
+	t=1731261619; cv=none; b=jYKldjap/K8AhoznTHgzXkYKwtalaX8PrFqjsqZ12Dlzd70J+CH0tADU+hgGWVMI1Bq/hpjyahplxrQlvDFYA7vrYmrWINpb2JfAR5QMadg6molRVmymDNOjzHzimrrfPZqw0Wf4c8ub7pt4Mnb/exbH+ICJvTCx+3fS6XqxULU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731260553; c=relaxed/simple;
-	bh=JfEF809RF2m2raDEtEzGq1U+GsMqSQTut2ZS/M2QF+c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mPTIwwL1lr/waYW0nWQ5pRjD6rF3eR4G5gt5QdhTzzTkVn7d+DDoMVzqSnjQuvHRdWcynBN2r83GKJSCJ6l3zRGkEGXnsZfNzG1M08iotVtxtKMwvoPAwiebSCHC2+F9nX3/D3swBGAsctRFExbgxep84R5TSLzom5NR9EqXVTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrfyHrp5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AD52C4CED8;
-	Sun, 10 Nov 2024 17:42:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731260552;
-	bh=JfEF809RF2m2raDEtEzGq1U+GsMqSQTut2ZS/M2QF+c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JrfyHrp5LAuKk6/50/vZgkpYPKUHqAEfuRNDtwS1lRSud1QYcDRQxlMfGfgKHqxAx
-	 nS+7JbCeL4WuPFzLcunTECIKUo9RU+13cUPODXX1g39Tu0/rx6dfnN3TpAm25XcXih
-	 JSR+uK+AVn+PG/bVXLZK1HFz5ejOD867J0F2vAuF37KZL+JTMBQvmBYyu/0oPpqd4h
-	 DLXPafola/AqDdVot68+wO8xnAtgFjbP423YbQHPru6rgB30Lg8xXdjdxUbXzng3xu
-	 A1+9FOhX2K1FQ96xw9cofV81kvxqCx3u3J2LjB5tVww5mf88NwMPxtCh/iTFv9soCh
-	 E1f/qWK4h3lng==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Imran Shaik <quic_imrashai@quicinc.com>
-Cc: Ajit Pandey <quic_ajipan@quicinc.com>,
-	Taniya Das <quic_tdas@quicinc.com>,
-	Jagadeesh Kona <quic_jkona@quicinc.com>,
-	Satya Priya Kakitapalli <quic_skakitap@quicinc.com>,
-	linux-arm-msm@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: (subset) [PATCH v2 0/2] clk: qcom: Add support for GCC on QCS8300
-Date: Sun, 10 Nov 2024 11:42:28 -0600
-Message-ID: <173126054421.115040.15723309399326949691.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20240822-qcs8300-gcc-v2-0-b310dfa70ad8@quicinc.com>
-References: <20240822-qcs8300-gcc-v2-0-b310dfa70ad8@quicinc.com>
+	s=arc-20240116; t=1731261619; c=relaxed/simple;
+	bh=rJjtuFbjE9Fik8w8AnJc4zI1CCg0TPssFb3we/D9ZhE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QaFkalKt1LD++3QrouDIqQrsdbwFlSDa4LGLaQplIM3tW0FiSLJ3xAxg92mZ4CCf+TyLI2hkO+YijmHqiwhIjScJ6zfi9Rq7I4OHR5mYdd6zlWjAj4JE7U3v/Vu9kWXSKrfkd1RGNPUTmnV8HKRPXgjleZHtzVC8gpCp2wVkplQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ryWB8uHz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
+	Cc:To:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Content-Disposition:In-Reply-To:References;
+	bh=GWDxk1jkYVtL2gUBbt0kS/Okb9uAQtTviSjSmf+zv/A=; b=ryWB8uHzfCxpJfaZe9EsDnPKow
+	bDSMQR/qY68RUaNn0A/yV/ueoPwDdXlTlZHZdGjSgAsrsCbgL+85h0XGDtkRTDcMCAHbTwlkJbleC
+	RFyEiI7pJT+QzTAlogMYqQkiDdEt7RTdIjXBchFJjNCnRPyVD87k2dQt2B9SWR3V1vWk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tACEA-00CoOt-Fs; Sun, 10 Nov 2024 18:59:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: <edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<davem@davemloft.net>
+Cc: netdev <netdev@vger.kernel.org>,
+	ansuelsmth@gmail.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v1] dsa: qca8k: Use nested lock to avoid splat
+Date: Sun, 10 Nov 2024 18:59:55 +0100
+Message-Id: <20241110175955.3053664-1-andrew@lunn.ch>
+X-Mailer: git-send-email 2.37.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+qca8k_phy_eth_command() is used to probe the child MDIO bus while the
+parent MDIO is locked. This causes lockdep splat, reporting a possible
+deadlock. It is not an actually deadlock, because different locks are
+used. By making use of mutex_lock_nested() we can avoid this false
+positive.
 
-On Thu, 22 Aug 2024 16:57:17 +0530, Imran Shaik wrote:
-> This series adds the dt-bindings and driver support for GCC on QCS8300 platform.
-> 
-> 
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+---
+ drivers/net/dsa/qca/qca8k-8xxx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks!
-
-[2/2] clk: qcom: Add support for Global Clock Controller on QCS8300
-      commit: 95eeb2ffce73feb883156cbb056c75ee33c28648
-
-Best regards,
+diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+index f8d8c70642c4..59b4a7240b58 100644
+--- a/drivers/net/dsa/qca/qca8k-8xxx.c
++++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+@@ -673,7 +673,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
+ 	 * We therefore need to lock the MDIO bus onto which the switch is
+ 	 * connected.
+ 	 */
+-	mutex_lock(&priv->bus->mdio_lock);
++	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
+ 
+ 	/* Actually start the request:
+ 	 * 1. Send mdio master packet
 -- 
-Bjorn Andersson <andersson@kernel.org>
+2.45.2
+
 
