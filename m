@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-143592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C609C3239
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:42:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D139C32AC
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:00:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30C511F213A5
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 13:42:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6B8F1C20972
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208071CA84;
-	Sun, 10 Nov 2024 13:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192901BC2A;
+	Sun, 10 Nov 2024 14:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhmYxIYp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3KIk+Gu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E246515AF6;
-	Sun, 10 Nov 2024 13:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93E0C8FF
+	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 14:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731246156; cv=none; b=fiGYm91QkK0RQJyxPDUYikIh+sm0B8OQXqr5DRD9zVbKmn+YXCRr3OqVyGfclWdK09Tms55wzK+typave82+5wlyEX3FWAOJh28g3E3LXCwQD2oyOb/XiRbc1TVCZzkTIwdTo6raq9ASkXP6MXUgSIpQy2eDfEoynWUPvx7vUc4=
+	t=1731247223; cv=none; b=Lovt8cap5FP6xLpO4kFcQmAKZ39ouIYPv24Omwy2JbvpISETPV8md7I/Eyhzs9B7tWsCy30xlCZrK64ysZIrLxFH4x29GM7DcqBOUEfShlrR5Y/woNmSSdbQJ454tsamKpZ2EYLKFvD2XJ7aY3QAtv9HdBYiRnfmxEUMigxSRLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731246156; c=relaxed/simple;
-	bh=vWh3xc9cy52fVyeE5+7/UQXjUVEjNZjJfHc25gWXRCA=;
+	s=arc-20240116; t=1731247223; c=relaxed/simple;
+	bh=R89LLNcZc87UAVkdS+7soEbp9X/milyLofWyjfHefAo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bkSaFAEaR1hYcRoGgbqygHklbncyuGxs8xwDF4VmS3s6KYBijBxI2IRJsTyooiCEljCcOwBnpHQ7AYuY6wQHjo9NmFFw6+giACgnvSkk65f3NckbXypA0f1fUwfKSXqJbBZIP82uiKtXQCSCCIUFB13rS5PnxehMauYKtsWoF7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhmYxIYp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66806C4CECD;
-	Sun, 10 Nov 2024 13:42:33 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=m2kEWV9o0YG+3p8HEccDmS9CXo/QKYLEb/C7LzNNtbJ+KmnJIWvDBhfK79pUnM6vClfc3I4bHXPj7HQQt2w3eoazt3KToA6z9W20fQjFpJsMHLDIdW+3MW3g2/hdDDnIAWF0zZq/GI6HGRGx+jm019uv9Kiy8xwDpDul7EaUe3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M3KIk+Gu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67B36C4CECD;
+	Sun, 10 Nov 2024 14:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731246155;
-	bh=vWh3xc9cy52fVyeE5+7/UQXjUVEjNZjJfHc25gWXRCA=;
+	s=k20201202; t=1731247222;
+	bh=R89LLNcZc87UAVkdS+7soEbp9X/milyLofWyjfHefAo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YhmYxIYpYLNDkOACqRb1jQqwJA1FOPIIT5/JHaHliGHy8mXFrJPAh6LaK+bDsMRht
-	 P0lkauBuylNgpI9mVrVW9jkJr/E5djrOdSsrSLJusQIPXTJUveie0S5WClyxnq4Lcl
-	 3gkf8Z1OuzVPCxIGZw6krQp6aVegtlvi32VJq3JZWbzqrYYo5or4iVOIx2T9ZcF+gB
-	 4IE5zd1YxXBIqebEWWULJ3PrPNVcV4gyBvCH0w3UK4G9eS0Kwmck06WpBhpnBsJ+fw
-	 oUkj6ziEiDZk6AkfV9lg+BQ/r+pcA3oDLMUzHQkWTFoR15h0SQuEdp0/hSBiHcTlp5
-	 0ojdQp0zmsa8w==
-Date: Sun, 10 Nov 2024 13:42:30 +0000
+	b=M3KIk+GuYw+vVVd5fTvpEf/TW+tc2ac53sFjvl8ObcMAG4ibp1t3NgCNmuAyEwPyo
+	 eQNUnSdU8cz4w4Sa9kW50OAoy9WrcqVMN9YRGctp4+UK2OadtOXT8vQNWW8o0Dqsiz
+	 dkMHbNP5URXMtna5HNiE091QLBub0acMDg9B3/pCXrSqFGmSiwMeu3vQndy85Su4mf
+	 2aC1T/lgfqxnFaPL5NCxR1kXMhAufkqem6aJyTXqk0wuaio2PgQsGr6WfNftRaIAuI
+	 0OVr9+JDkZavcDgWWganvgP9xc6CR6GsmWnDQHGVkX11RckhhhG6aiETGjtoT/Dn8g
+	 hoaeObnI7O9uQ==
+Date: Sun, 10 Nov 2024 14:00:17 +0000
 From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] selftests: wireguard: load nf_conntrack if it's not
- present
-Message-ID: <20241110134230.GR4507@kernel.org>
-References: <20241107024418.3606-1-liuhangbin@gmail.com>
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Pedro Tammela <pctammela@mojatatu.com>, edumazet@google.com,
+	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
+ hnodes.
+Message-ID: <20241110140017.GS4507@kernel.org>
+References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
+ <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
+ <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
+ <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
+ <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,45 +64,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107024418.3606-1-liuhangbin@gmail.com>
+In-Reply-To: <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
 
-On Thu, Nov 07, 2024 at 02:44:18AM +0000, Hangbin Liu wrote:
-> Some distros may not load nf_conntrack by default, which will cause
-> subsequent nf_conntrack settings to fail. Let's load this module if it's
-> not loaded by default.
+On Mon, Nov 04, 2024 at 10:51:01PM +0100, Alexandre Ferrieux wrote:
+> On 04/11/2024 22:33, Vadim Fedorenko wrote:
+> > On 04/11/2024 20:26, Alexandre Ferrieux wrote:
+> >> On 04/11/2024 18:00, Pedro Tammela wrote:
+> >>>>
+> >>>> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+> >>>
+> >>> SoB does not match sender, probably missing 'From:' tag
+> >> 
+> >> Due to dumb administrativia at my organization, I am compelled to post from my
+> >> personal gmail accout in order for my posts to be acceptable on this mailing
+> >> list; while I'd like to keep my official address in commit logs. Is it possible ?
+> > 
+> > Yes, it's possible, the author of commit in your local git should use
+> > email account of company, then git format-patch will generate proper header.
 > 
-> Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  tools/testing/selftests/wireguard/netns.sh | 1 +
->  1 file changed, 1 insertion(+)
+> That's exactly what I did, and the file generated by format-patch does have the
+> proper From:, but it gets overridden by Gmail when sending. That's why, as a
+> last resort, I tried Signed-off-by... Any hope ?
 > 
-> diff --git a/tools/testing/selftests/wireguard/netns.sh b/tools/testing/selftests/wireguard/netns.sh
-> index 405ff262ca93..508b391e8d9a 100755
-> --- a/tools/testing/selftests/wireguard/netns.sh
-> +++ b/tools/testing/selftests/wireguard/netns.sh
-> @@ -66,6 +66,7 @@ cleanup() {
->  orig_message_cost="$(< /proc/sys/net/core/message_cost)"
->  trap cleanup EXIT
->  printf 0 > /proc/sys/net/core/message_cost
-> +lsmod | grep -q nf_conntrack || modprobe nf_conntrack
-
-Hi Hangbin,
-
-As modprobe should be idempotent both for the case were nf_conntrack is
-built-in (I'm unsure if that case can ever occur) and the module has
-already been inserted, I think you simply use:
-
-modprobe nf_conntrack
-
-Of course, if nf_conntrack isn't available at all, then this will fail.
-But that was the case with your patch too. And so I assume it is intended.
-
->  
->  ip netns del $netns0 2>/dev/null || true
->  ip netns del $netns1 2>/dev/null || true
-> -- 
-> 2.46.0
+> > you can add
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 > 
+> Ok.
 > 
+> >>> 'static inline' is discouraged in .c files
+> >> 
+> >> Why ?
+> >> 
+> >> It could have been a local macro, but an inline has (a bit) better type
+> >> checking. And I didn't want to add it to a .h that is included by many other
+> >> unrelated components, as it makes no sense to them. So, what is the recommendation ?
+> > 
+> > Either move it to some local header file, or use 'static u32 
+> > handle2id(u32 h)'
+> > and let compiler decide whether to include it or not.
+> 
+> I believe you mean "let the compiler decide whether to _inline_ it or not".
+> Sure, with a sufficiently modern Gcc this will do. However, what about more
+> exotic environments ? Wouldn't it risk a perf regression for style reasons ?
+> 
+> And speaking of style, what about the dozens of instances of "static inline" in
+> net/sched/*.c alone ? Why is it a concern suddenly ?
+
+Hi Alexandre,
+
+It's not suddenly a concern. It is a long standing style guideline for
+Networking code, even if not always followed. Possibly some of the code
+you have found in net/sched/*.c is even longer standing than the
+guideline.
+
+Please don't add new instances of inline to .c files unless there is a
+demonstrable - usually performance - reason to do so.
+
+Thanks!
 
