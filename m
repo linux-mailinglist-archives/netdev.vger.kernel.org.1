@@ -1,158 +1,371 @@
-Return-Path: <netdev+bounces-143579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED899C3164
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 09:44:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E413D9C31AF
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 11:54:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95DC81C20ACB
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 08:44:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 647081F21254
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 10:54:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867F51527B4;
-	Sun, 10 Nov 2024 08:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0071534FB;
+	Sun, 10 Nov 2024 10:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HAkoY2sc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E107214E2CF
-	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 08:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1CC14F121;
+	Sun, 10 Nov 2024 10:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731228259; cv=none; b=XRpjQLMBdFGRSEmgy7nwC7woCb4qS39IsQY/vNkrvcCoPggCoAg+oHQ7CImCcq/VSYPy6+wKc53eD1M0+xboO7qhccS2igZWbT6+9hcuz2OQiqEch0ZgG5KbUaejaqM50RSfSIOob0bVM4qsobxF8v/yPTK3t2d1n7XL0Za2eqs=
+	t=1731236040; cv=none; b=eJu9rUx5kpzhqagc+2FkKvLtowSx3dbxibw0IBr/XDWgx+sihXgCcv2qxt0QiQrVxblLg6kwbAtCfN6xu9gG5PDTqgQVHjVdnUxn2cpXHmLPq0JOUV82WJ/euanmTg2AHAXqOueiTtJ/IIDIighHvj4Pc4sBFpzAonE5fHPHPzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731228259; c=relaxed/simple;
-	bh=N6fjnQ3SVjcaUzADUhmQzaxQkP7EPDBqq6OJR0PXTh4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EelPCFap+ocNKFmX4CdcymtW4JtdymwrL8iyFslTU0fYj94VZHbRixBEm4trOhz/QH621rj8/SF4iJx1Ofb1atDobFB4L2yPlkCQuhMYealvxZg2EBUAnmX0mifn181EBGn88Xlokc7QaFWNPbZpsulSoNcIB6Yf1osJ2W01e0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83aed4f24a9so418839839f.0
-        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 00:44:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731228257; x=1731833057;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=znOIIlnNrOZ23GxgUlO5RXsc39UsdkSI5Y+xlIMB35Y=;
-        b=g5k7V0eLGZzeIjbfDAKNcHjcnhDkYAH2NsX2AuA8w7JxZ25HhMsULUMXqVLkQcZGBz
-         rZw6fqNIRPTnfjkCk2mYtYspRLaT7qaBwo0MmwPmovjwP33/7ffQkWDRsFpeNJZztLcO
-         6nHUURtmWCEdqYV97dsa7J4KHnFwvYkbL9oZ+kCheN3n8a3QjOuyxxTUYsJ5T+W1jG32
-         FUq0PjcotojDSkjvd0a3varHzn2FDXIkbPm9tmAFNqm6Ly3UOmrMEIlY3D4OuYv07RJF
-         nzSRiwODXGxfHBUIQ2w7tivj7QI7xMluiaO1Q1yOXNRs//HEwgZfp233Bk+EXNE0jR4L
-         O6xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/p18Vpa+XZkHFMIoUmMqtVnMFoqAS5fELrhWOOwmBOQlhElY3OQN3TvVIvVs9QFSnaYfi76k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXiA/+6C6SGT3GeQ/zHsfwwURgiVOeFue7kgteWqxHjvxPeNLL
-	iDvixoHzi20daFmMPP7VaX1AJvM7GJaU+URdY8YGrZuF56N3+Xp/b+VrpuAVr9/MX09IwPDKum2
-	u0strffpoK2vwPqYrbD2b0VUO8BJjFlkJSs5KA8+qLxcMOZcRUBeKFuU=
-X-Google-Smtp-Source: AGHT+IHy8lOTiYW1dJ+FhT3xtg2IJ7H1+Y2fyo4KO/dcG0+G7kCUR4jIMPTQjvCzUhggTMelaN5PLOTxeze85zG9HrIgdVI+QUmU
+	s=arc-20240116; t=1731236040; c=relaxed/simple;
+	bh=jepY9rdVvObl0SrjcpatpRHlR9HaeeZYJ/sYwE/vpoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fd6IWSBa4eVPaH947ebC1sxyZsWHwCY87rixPvmvGuVtQKm961Kxpy9o9aUJ900bLuuBW6nWpsGDFg7UFErZgf3Q7HwbPMPSUpdQkshEd8yvPNP6Bdq1NPmO2My2u2jnbEeMuG0/7Gw1NGs4XBANi4UUWKXJ6nsANFBKe4x1kzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HAkoY2sc; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731236037; x=1762772037;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jepY9rdVvObl0SrjcpatpRHlR9HaeeZYJ/sYwE/vpoY=;
+  b=HAkoY2sc/+lWZE14Rf9p52WT1wXYjV9pubNceVjx4eeuvl1D8szicE7b
+   dVDyqv23ydcPz4ACJjYl1NpD5qmbjT9+d7swEAZhexq7YlDi40zdqpb0i
+   djNPBmNwpppxlsAENURtzVKJFODsxgveNPvbSjXlkX8cuRG4JQer6AhMu
+   R2U+ijt19f2moAYIjCM0SK/n1irknLW1tylmNKvPeLkHexWfPvj31wBKU
+   dIVpJOnzLJvi7QzR3JA3R5tO5qHmPW9EDW0q8eB4OcOBivet/6BfTgSUF
+   ywD4yBHPUq0ovmp4OJZbeqflv4D0AJhFT9XeI39T4qyQGPKmKznP1BBgL
+   w==;
+X-CSE-ConnectionGUID: n3jZBN9zSZSdgbbnPoQWVg==
+X-CSE-MsgGUID: i5trc7fwRcq0NTrwsjtp7w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="42158841"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="42158841"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2024 02:53:56 -0800
+X-CSE-ConnectionGUID: Yf3RBR74Su+OBTikUs2MNg==
+X-CSE-MsgGUID: QPOnByq+TyuTok3dCYLBMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,142,1728975600"; 
+   d="scan'208";a="86115574"
+Received: from lkp-server01.sh.intel.com (HELO 7b17a4138caf) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 10 Nov 2024 02:53:51 -0800
+Received: from kbuild by 7b17a4138caf with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tA5Zk-00005x-2h;
+	Sun, 10 Nov 2024 10:53:48 +0000
+Date: Sun, 10 Nov 2024 18:53:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Byungho An <bh74.an@samsung.com>,
+	Kevin Brace <kevinbrace@bracecomputerlab.com>,
+	Francois Romieu <romieu@fr.zoreil.com>,
+	Michal Simek <monstr@monstr.eu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Zhao Qiang <qiang.zhao@nxp.com>, linux-can@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next] net: use pdev instead of OF funcs
+Message-ID: <202411101834.A8QNRx3c-lkp@intel.com>
+References: <20241109233821.8619-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20c6:b0:3a0:9f85:d74f with SMTP id
- e9e14a558f8ab-3a6f1a3742bmr84154435ab.16.1731228257009; Sun, 10 Nov 2024
- 00:44:17 -0800 (PST)
-Date: Sun, 10 Nov 2024 00:44:16 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67307260.050a0220.320e73.0321.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in mac80211_hwsim_config_mac_nl
-From: syzbot <syzbot+9ea265d998de25ac6a46@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241109233821.8619-1-rosenp@gmail.com>
 
-Hello,
+Hi Rosen,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    ccb35037c48a Merge branch 'net-lan969x-add-vcap-functional..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1492cf40580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9d1c42858837b59
-dashboard link: https://syzkaller.appspot.com/bug?extid=9ea265d998de25ac6a46
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+[auto build test ERROR on net-next/main]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-use-pdev-instead-of-OF-funcs/20241110-073939
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241109233821.8619-1-rosenp%40gmail.com
+patch subject: [PATCH net-next] net: use pdev instead of OF funcs
+config: powerpc-ge_imp3a_defconfig (https://download.01.org/0day-ci/archive/20241110/202411101834.A8QNRx3c-lkp@intel.com/config)
+compiler: powerpc-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241110/202411101834.A8QNRx3c-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4c339ec95c42/disk-ccb35037.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/328f6f24277e/vmlinux-ccb35037.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0473d4109fcb/bzImage-ccb35037.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411101834.A8QNRx3c-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9ea265d998de25ac6a46@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>):
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 16303 at drivers/net/wireless/virtual/mac80211_hwsim.c:1445 mac80211_hwsim_config_mac_nl+0x2b2/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:1445
-Modules linked in:
-CPU: 0 UID: 0 PID: 16303 Comm: syz.6.3042 Not tainted 6.12.0-rc5-syzkaller-01164-gccb35037c48a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:mac80211_hwsim_config_mac_nl+0x2b2/0x370 drivers/net/wireless/virtual/mac80211_hwsim.c:1445
-Code: 48 8b 3c 24 4c 89 fe 44 89 ea 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d e9 eb f8 ff ff e8 46 b3 8d fa eb 05 e8 3f b3 8d fa 90 <0f> 0b 90 e9 10 fe ff ff 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c 90 fd
-RSP: 0018:ffffc9000b0476b0 EFLAGS: 00010293
-RAX: ffffffff870726e1 RBX: 0000000000000000 RCX: ffff888072945a00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff870724ed R09: 1ffffffff203a5d5
-R10: dffffc0000000000 R11: ffffffff87069560 R12: ffff8880635dae32
-R13: 0000000000000000 R14: 0000000000000001 R15: ffff8880554630a0
-FS:  00007f08d2bff6c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020003a80 CR3: 000000007c7cc000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- mac80211_hwsim_add_interface+0x9a/0x320 drivers/net/wireless/virtual/mac80211_hwsim.c:2136
- drv_add_interface+0x2f8/0x8e0 net/mac80211/driver-ops.c:73
- ieee80211_do_open+0x73d/0x2430 net/mac80211/iface.c:1373
- ieee80211_open+0x192/0x200 net/mac80211/iface.c:458
- __dev_open+0x2d3/0x450 net/core/dev.c:1476
- __dev_change_flags+0x1e2/0x6f0 net/core/dev.c:8904
- dev_change_flags+0x8b/0x1a0 net/core/dev.c:8976
- devinet_ioctl+0xcce/0x1ac0 net/ipv4/devinet.c:1209
- inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1001
- sock_do_ioctl+0x158/0x460 net/socket.c:1227
- sock_ioctl+0x626/0x8e0 net/socket.c:1346
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f08d317e31b
-Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <89> c2 3d 00 f0 ff ff 77 1c 48 8b 44 24 18 64 48 2b 04 25 28 00 00
-RSP: 002b:00007f08d2bfde60 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f08d2bfdf80 RCX: 00007f08d317e31b
-RDX: 00007f08d2bfdee0 RSI: 0000000000008914 RDI: 000000000000000b
-RBP: 000000000000000b R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000024
-R13: 0000000000000048 R14: 00007f08d2bfdfa0 R15: 00007f08d2bfdee0
- </TASK>
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_free_rx':
+   drivers/net/ethernet/freescale/ucc_geth.c:1810:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+    1810 |         struct ucc_fast_info *uf_info;
+         |                               ^~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_free_tx':
+   drivers/net/ethernet/freescale/ucc_geth.c:1849:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+    1849 |         struct ucc_fast_info *uf_info;
+         |                               ^~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_alloc_tx':
+   drivers/net/ethernet/freescale/ucc_geth.c:2142:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+    2142 |         struct ucc_fast_info *uf_info;
+         |                               ^~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_alloc_rx':
+   drivers/net/ethernet/freescale/ucc_geth.c:2204:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+    2204 |         struct ucc_fast_info *uf_info;
+         |                               ^~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_startup':
+   drivers/net/ethernet/freescale/ucc_geth.c:2271:13: warning: variable 'ifstat' set but not used [-Wunused-but-set-variable]
+    2271 |         u32 ifstat, i, j, size, l2qt, l3qt;
+         |             ^~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c:2261:62: warning: variable 'p_82xx_addr_filt' set but not used [-Wunused-but-set-variable]
+    2261 |         struct ucc_geth_82xx_address_filtering_pram __iomem *p_82xx_addr_filt;
+         |                                                              ^~~~~~~~~~~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_rx':
+   drivers/net/ethernet/freescale/ucc_geth.c:2996:13: warning: variable 'bdBuffer' set but not used [-Wunused-but-set-variable]
+    2996 |         u8 *bdBuffer;
+         |             ^~~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_irq_handler':
+   drivers/net/ethernet/freescale/ucc_geth.c:3149:31: warning: variable 'ug_info' set but not used [-Wunused-but-set-variable]
+    3149 |         struct ucc_geth_info *ug_info;
+         |                               ^~~~~~~
+   drivers/net/ethernet/freescale/ucc_geth.c: In function 'ucc_geth_probe':
+>> drivers/net/ethernet/freescale/ucc_geth.c:3608:42: error: expected ')' before numeric constant
+    3608 |         res = platform_get_resource(ofdev 0, IORESOURCE_MEM);
+         |                                    ~     ^~
+         |                                          )
+>> drivers/net/ethernet/freescale/ucc_geth.c:3608:15: error: too few arguments to function 'platform_get_resource'
+    3608 |         res = platform_get_resource(ofdev 0, IORESOURCE_MEM);
+         |               ^~~~~~~~~~~~~~~~~~~~~
+   In file included from drivers/net/ethernet/freescale/ucc_geth.c:36:
+   include/linux/platform_device.h:58:25: note: declared here
+      58 | extern struct resource *platform_get_resource(struct platform_device *,
+         |                         ^~~~~~~~~~~~~~~~~~~~~
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +3608 drivers/net/ethernet/freescale/ucc_geth.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+  3555	
+  3556	static int ucc_geth_probe(struct platform_device* ofdev)
+  3557	{
+  3558		struct device *device = &ofdev->dev;
+  3559		struct device_node *np = ofdev->dev.of_node;
+  3560		struct net_device *dev = NULL;
+  3561		struct ucc_geth_private *ugeth = NULL;
+  3562		struct ucc_geth_info *ug_info;
+  3563		struct resource *res;
+  3564		int err, ucc_num, max_speed = 0;
+  3565		const unsigned int *prop;
+  3566		phy_interface_t phy_interface;
+  3567		static const int enet_to_speed[] = {
+  3568			SPEED_10, SPEED_10, SPEED_10,
+  3569			SPEED_100, SPEED_100, SPEED_100,
+  3570			SPEED_1000, SPEED_1000, SPEED_1000, SPEED_1000,
+  3571		};
+  3572		static const phy_interface_t enet_to_phy_interface[] = {
+  3573			PHY_INTERFACE_MODE_MII, PHY_INTERFACE_MODE_RMII,
+  3574			PHY_INTERFACE_MODE_RGMII, PHY_INTERFACE_MODE_MII,
+  3575			PHY_INTERFACE_MODE_RMII, PHY_INTERFACE_MODE_RGMII,
+  3576			PHY_INTERFACE_MODE_GMII, PHY_INTERFACE_MODE_RGMII,
+  3577			PHY_INTERFACE_MODE_TBI, PHY_INTERFACE_MODE_RTBI,
+  3578			PHY_INTERFACE_MODE_SGMII,
+  3579		};
+  3580	
+  3581		ugeth_vdbg("%s: IN", __func__);
+  3582	
+  3583		prop = of_get_property(np, "cell-index", NULL);
+  3584		if (!prop) {
+  3585			prop = of_get_property(np, "device-id", NULL);
+  3586			if (!prop)
+  3587				return -ENODEV;
+  3588		}
+  3589	
+  3590		ucc_num = *prop - 1;
+  3591		if ((ucc_num < 0) || (ucc_num > 7))
+  3592			return -ENODEV;
+  3593	
+  3594		ug_info = devm_kmemdup(&ofdev->dev, &ugeth_primary_info,
+  3595				       sizeof(*ug_info), GFP_KERNEL);
+  3596		if (!ug_info)
+  3597			return -ENOMEM;
+  3598	
+  3599		ug_info->uf_info.ucc_num = ucc_num;
+  3600	
+  3601		err = ucc_geth_parse_clock(np, "rx", &ug_info->uf_info.rx_clock);
+  3602		if (err)
+  3603			return err;
+  3604		err = ucc_geth_parse_clock(np, "tx", &ug_info->uf_info.tx_clock);
+  3605		if (err)
+  3606			return err;
+  3607	
+> 3608		res = platform_get_resource(ofdev 0, IORESOURCE_MEM);
+  3609		if (!res)
+  3610			return -ENODEV;
+  3611	
+  3612		ug_info->uf_info.regs = res->start;
+  3613		ug_info->uf_info.irq = platform_get_irq(ofdev, 0);
+  3614	
+  3615		ug_info->phy_node = of_parse_phandle(np, "phy-handle", 0);
+  3616		if (!ug_info->phy_node && of_phy_is_fixed_link(np)) {
+  3617			/*
+  3618			 * In the case of a fixed PHY, the DT node associated
+  3619			 * to the PHY is the Ethernet MAC DT node.
+  3620			 */
+  3621			err = of_phy_register_fixed_link(np);
+  3622			if (err)
+  3623				return err;
+  3624			ug_info->phy_node = of_node_get(np);
+  3625		}
+  3626	
+  3627		/* Find the TBI PHY node.  If it's not there, we don't support SGMII */
+  3628		ug_info->tbi_node = of_parse_phandle(np, "tbi-handle", 0);
+  3629	
+  3630		/* get the phy interface type, or default to MII */
+  3631		prop = of_get_property(np, "phy-connection-type", NULL);
+  3632		if (!prop) {
+  3633			/* handle interface property present in old trees */
+  3634			prop = of_get_property(ug_info->phy_node, "interface", NULL);
+  3635			if (prop != NULL) {
+  3636				phy_interface = enet_to_phy_interface[*prop];
+  3637				max_speed = enet_to_speed[*prop];
+  3638			} else
+  3639				phy_interface = PHY_INTERFACE_MODE_MII;
+  3640		} else {
+  3641			phy_interface = to_phy_interface((const char *)prop);
+  3642		}
+  3643	
+  3644		/* get speed, or derive from PHY interface */
+  3645		if (max_speed == 0)
+  3646			switch (phy_interface) {
+  3647			case PHY_INTERFACE_MODE_GMII:
+  3648			case PHY_INTERFACE_MODE_RGMII:
+  3649			case PHY_INTERFACE_MODE_RGMII_ID:
+  3650			case PHY_INTERFACE_MODE_RGMII_RXID:
+  3651			case PHY_INTERFACE_MODE_RGMII_TXID:
+  3652			case PHY_INTERFACE_MODE_TBI:
+  3653			case PHY_INTERFACE_MODE_RTBI:
+  3654			case PHY_INTERFACE_MODE_SGMII:
+  3655				max_speed = SPEED_1000;
+  3656				break;
+  3657			default:
+  3658				max_speed = SPEED_100;
+  3659				break;
+  3660			}
+  3661	
+  3662		if (max_speed == SPEED_1000) {
+  3663			unsigned int snums = qe_get_num_of_snums();
+  3664	
+  3665			/* configure muram FIFOs for gigabit operation */
+  3666			ug_info->uf_info.urfs = UCC_GETH_URFS_GIGA_INIT;
+  3667			ug_info->uf_info.urfet = UCC_GETH_URFET_GIGA_INIT;
+  3668			ug_info->uf_info.urfset = UCC_GETH_URFSET_GIGA_INIT;
+  3669			ug_info->uf_info.utfs = UCC_GETH_UTFS_GIGA_INIT;
+  3670			ug_info->uf_info.utfet = UCC_GETH_UTFET_GIGA_INIT;
+  3671			ug_info->uf_info.utftt = UCC_GETH_UTFTT_GIGA_INIT;
+  3672			ug_info->numThreadsTx = UCC_GETH_NUM_OF_THREADS_4;
+  3673	
+  3674			/* If QE's snum number is 46/76 which means we need to support
+  3675			 * 4 UECs at 1000Base-T simultaneously, we need to allocate
+  3676			 * more Threads to Rx.
+  3677			 */
+  3678			if ((snums == 76) || (snums == 46))
+  3679				ug_info->numThreadsRx = UCC_GETH_NUM_OF_THREADS_6;
+  3680			else
+  3681				ug_info->numThreadsRx = UCC_GETH_NUM_OF_THREADS_4;
+  3682		}
+  3683	
+  3684		if (netif_msg_probe(&debug))
+  3685			pr_info("UCC%1d at 0x%8llx (irq = %d)\n",
+  3686				ug_info->uf_info.ucc_num + 1,
+  3687				(u64)ug_info->uf_info.regs,
+  3688				ug_info->uf_info.irq);
+  3689	
+  3690		/* Create an ethernet device instance */
+  3691		dev = devm_alloc_etherdev(&ofdev->dev, sizeof(*ugeth));
+  3692		if (!dev) {
+  3693			err = -ENOMEM;
+  3694			goto err_deregister_fixed_link;
+  3695		}
+  3696	
+  3697		ugeth = netdev_priv(dev);
+  3698		spin_lock_init(&ugeth->lock);
+  3699	
+  3700		/* Create CQs for hash tables */
+  3701		INIT_LIST_HEAD(&ugeth->group_hash_q);
+  3702		INIT_LIST_HEAD(&ugeth->ind_hash_q);
+  3703	
+  3704		dev_set_drvdata(device, dev);
+  3705	
+  3706		/* Set the dev->base_addr to the gfar reg region */
+  3707		dev->base_addr = (unsigned long)(ug_info->uf_info.regs);
+  3708	
+  3709		SET_NETDEV_DEV(dev, device);
+  3710	
+  3711		/* Fill in the dev structure */
+  3712		uec_set_ethtool_ops(dev);
+  3713		dev->netdev_ops = &ucc_geth_netdev_ops;
+  3714		dev->watchdog_timeo = TX_TIMEOUT;
+  3715		INIT_WORK(&ugeth->timeout_work, ucc_geth_timeout_work);
+  3716		netif_napi_add(dev, &ugeth->napi, ucc_geth_poll);
+  3717		dev->mtu = 1500;
+  3718		dev->max_mtu = 1518;
+  3719	
+  3720		ugeth->msg_enable = netif_msg_init(debug.msg_enable, UGETH_MSG_DEFAULT);
+  3721		ugeth->phy_interface = phy_interface;
+  3722		ugeth->max_speed = max_speed;
+  3723	
+  3724		/* Carrier starts down, phylib will bring it up */
+  3725		netif_carrier_off(dev);
+  3726	
+  3727		err = devm_register_netdev(&ofdev->dev, dev);
+  3728		if (err) {
+  3729			if (netif_msg_probe(ugeth))
+  3730				pr_err("%s: Cannot register net device, aborting\n",
+  3731				       dev->name);
+  3732			goto err_deregister_fixed_link;
+  3733		}
+  3734	
+  3735		err = of_get_ethdev_address(np, dev);
+  3736		if (err == -EPROBE_DEFER)
+  3737			goto err_deregister_fixed_link;
+  3738	
+  3739		ugeth->ug_info = ug_info;
+  3740		ugeth->dev = device;
+  3741		ugeth->ndev = dev;
+  3742		ugeth->node = np;
+  3743	
+  3744		return 0;
+  3745	
+  3746	err_deregister_fixed_link:
+  3747		if (of_phy_is_fixed_link(np))
+  3748			of_phy_deregister_fixed_link(np);
+  3749		of_node_put(ug_info->tbi_node);
+  3750		of_node_put(ug_info->phy_node);
+  3751		return err;
+  3752	}
+  3753	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
