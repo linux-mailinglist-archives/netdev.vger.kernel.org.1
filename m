@@ -1,124 +1,113 @@
-Return-Path: <netdev+bounces-143593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D139C32AC
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:00:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D766A9C32C5
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 15:19:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6B8F1C20972
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 853072815B1
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 14:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192901BC2A;
-	Sun, 10 Nov 2024 14:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E1425757;
+	Sun, 10 Nov 2024 14:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3KIk+Gu"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qSp17F09"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93E0C8FF
-	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 14:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C620D2FA;
+	Sun, 10 Nov 2024 14:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731247223; cv=none; b=Lovt8cap5FP6xLpO4kFcQmAKZ39ouIYPv24Omwy2JbvpISETPV8md7I/Eyhzs9B7tWsCy30xlCZrK64ysZIrLxFH4x29GM7DcqBOUEfShlrR5Y/woNmSSdbQJ454tsamKpZ2EYLKFvD2XJ7aY3QAtv9HdBYiRnfmxEUMigxSRLA=
+	t=1731248355; cv=none; b=KgZcS02bIuxlY0AQ6wFuZhxCKMEXMl/LkswW5XpKRVJJIH4MKWFE87Pi8l21piTtRP0rYEkGpjBLXr3dlRapXWqp24uGxrawIdR8mQCdcDP5aq0rfX/6Cr0au+wSNq2R2uTXBqwuAmD6YCpv1jEK/7ikuYCfzy1PRy6sRrQTZEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731247223; c=relaxed/simple;
-	bh=R89LLNcZc87UAVkdS+7soEbp9X/milyLofWyjfHefAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m2kEWV9o0YG+3p8HEccDmS9CXo/QKYLEb/C7LzNNtbJ+KmnJIWvDBhfK79pUnM6vClfc3I4bHXPj7HQQt2w3eoazt3KToA6z9W20fQjFpJsMHLDIdW+3MW3g2/hdDDnIAWF0zZq/GI6HGRGx+jm019uv9Kiy8xwDpDul7EaUe3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M3KIk+Gu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67B36C4CECD;
-	Sun, 10 Nov 2024 14:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731247222;
-	bh=R89LLNcZc87UAVkdS+7soEbp9X/milyLofWyjfHefAo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M3KIk+GuYw+vVVd5fTvpEf/TW+tc2ac53sFjvl8ObcMAG4ibp1t3NgCNmuAyEwPyo
-	 eQNUnSdU8cz4w4Sa9kW50OAoy9WrcqVMN9YRGctp4+UK2OadtOXT8vQNWW8o0Dqsiz
-	 dkMHbNP5URXMtna5HNiE091QLBub0acMDg9B3/pCXrSqFGmSiwMeu3vQndy85Su4mf
-	 2aC1T/lgfqxnFaPL5NCxR1kXMhAufkqem6aJyTXqk0wuaio2PgQsGr6WfNftRaIAuI
-	 0OVr9+JDkZavcDgWWganvgP9xc6CR6GsmWnDQHGVkX11RckhhhG6aiETGjtoT/Dn8g
-	 hoaeObnI7O9uQ==
-Date: Sun, 10 Nov 2024 14:00:17 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Pedro Tammela <pctammela@mojatatu.com>, edumazet@google.com,
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
- hnodes.
-Message-ID: <20241110140017.GS4507@kernel.org>
-References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
- <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
- <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
- <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
- <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
+	s=arc-20240116; t=1731248355; c=relaxed/simple;
+	bh=A15GK6oBtzujOcY6O3nLHxGUewal/vs1xqbVRbPVoV8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=JBWqvZlpBcazIyaWctE/OOddO5WOYElOVZKJ4/9RxTNs/X3KJNnkYHsl/Hp/BNjCsrJhqxlRkqwtiW/xbEWHXVOL2tgVlKqUyNE4mp69FXNFC98Zhh6qFn9BJoYxOeD/DrRdKM9S5tteEu8cgvW4sFCdzZHs/HEUxUhODUtUsXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=qSp17F09; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1731248294; x=1731853094; i=markus.elfring@web.de;
+	bh=A15GK6oBtzujOcY6O3nLHxGUewal/vs1xqbVRbPVoV8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=qSp17F09WfwRfJvCnf/7qwvkIDgLqD+7ePKpIpQ8FjlgypZ3p7y9WPsbVqoIVzDk
+	 J4L1Euz1Y9gpArCV7X1izo2PVN4CeExJ9ihRuj+Xez1YpIYj60dLW+eR2pR+V5v1B
+	 nRGpMKxgEL/9Vsy/OTiYgtdIk/0yMlwwZZOF7Nu7tvR5rFpZ16ukNNR+9XuvzgWYf
+	 s2KkH6sb8EmXMtGcfl9UTwI652wA5wt9R99ghpyuM+PUJp3nAfHm/TeYBal/EzU+S
+	 aFzLrNViKkcxR+NBAotAs/ceoeJR8zuHe+yvHNzjIcFd4t0stXvO65Ot+XqNh2yV2
+	 k/+XEtIOKi9cDvSAcQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1M28SB-1tCcoB1COH-00EqVy; Sun, 10
+ Nov 2024 15:18:14 +0100
+Message-ID: <60300a57-aaaa-4e9d-8a44-ee2b3c197ea4@web.de>
+Date: Sun, 10 Nov 2024 15:18:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
+User-Agent: Mozilla Thunderbird
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org,
+ linux-can@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, bcm-kernel-feedback-list@broadcom.com,
+ Andrew Lunn <andrew@lunn.ch>, Chandrasekar Ramakrishnan
+ <rcsekar@samsung.com>, Chris Snook <chris.snook@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Doug Berger <opendmb@gmail.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kurt Kanzenbach <kurt@linutronix.de>,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
+References: <20241109233641.8313-1-rosenp@gmail.com>
+Subject: Re: [PATCH] net: modernize ioremap in probe
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20241109233641.8313-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:ONLWgX5Z+nK1YwOVREIImDYLzQ+s/3MBv2ELUVucMab+65YLRTz
+ v0xLXJ0ydx4plkVjtGwOcZsO0gHGHNzk+U6bq6XzSHVdBCD8/4ZJ200jAvt2g5vEMMSPN3A
+ JaWhzzml1DI1rQIH3pSSy1DqYyi0iZlgA8cKt/0S80zw6tns5TgjZXC00I9Szm37mWz0xZm
+ jHSz0DAaR7v2OwzutSdIw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:8F2WX9DLYa8=;Jrra2U+D7HiN9J1mk3lQt9mLfrO
+ mwfQhq6Vb5LyIIlVL9w6w9jU+cB8StAQHyJgXzrk97qUywcj2azWv4uz6HVX0onc6fkp7tVq9
+ SgV9D/SUJwu6Eyef0/8xSut7zmH6by3iEz966MTXlq/iAkQ+3vTcfxFalLuQW2JFyfav2X3B0
+ Oe9a/GfHQ1yaeXR47XF/dkv2ytHApSxS4VeDh182kAlJ+BA7h8xVTrMCzj2GAN4ioDsD5LMXa
+ 9gD+QtTVeD1KO2ElruAmI8ZwfpkRTT8eD1Kbmy00IXgu/Uc+clv4FL7V1YlSI2SrLdHS3LWSU
+ CAl09VlXiwxyILc3M55zHpdOFcbP/0zZTppuB2WFMJAKcUd6hMzrsYRSpcGGRRSJPpwjBg3pl
+ G0B5uiQxcVYu32R9whb1vBJuRoTGsrXtvVkOZLaBGj/nFRHWodBwTuYyUjBUPkvP3a3V4+ec8
+ Pd4JOx+SdFArIX/2DRB0vm3HTfk36X40dFXZQEGXuBqkoD0JDrshqRx6QCnNga1jqL/MrzBxo
+ tUrhiMUGukODhFjOGJLMh249TlO8fzntJQSniW8otzxh4xxR0D1SgoHYXTc+/mmIAbVD95Y3x
+ XhuN0ol4lKKi28YFlLida4iwudna1sg39Xk97GGuSYpCGZO9HYU7wBcMkcVONgjQUw8uJyRiX
+ pdMpyy7mRo6F3vfpQEPUeyrtowEph6XDbhSlebaV9Kigh45AjAYtPYFg/i0Xa4NkhLSu0aYom
+ doMoMe7DzMAKFhkyFpHKplfMPEvTwL6JWKVAudjy907rxqZIMo1Ed89lGImM6INN/Mh1IJRMV
+ /Esj3OddtzZHv/iVxbbYfE4w==
 
-On Mon, Nov 04, 2024 at 10:51:01PM +0100, Alexandre Ferrieux wrote:
-> On 04/11/2024 22:33, Vadim Fedorenko wrote:
-> > On 04/11/2024 20:26, Alexandre Ferrieux wrote:
-> >> On 04/11/2024 18:00, Pedro Tammela wrote:
-> >>>>
-> >>>> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-> >>>
-> >>> SoB does not match sender, probably missing 'From:' tag
-> >> 
-> >> Due to dumb administrativia at my organization, I am compelled to post from my
-> >> personal gmail accout in order for my posts to be acceptable on this mailing
-> >> list; while I'd like to keep my official address in commit logs. Is it possible ?
-> > 
-> > Yes, it's possible, the author of commit in your local git should use
-> > email account of company, then git format-patch will generate proper header.
-> 
-> That's exactly what I did, and the file generated by format-patch does have the
-> proper From:, but it gets overridden by Gmail when sending. That's why, as a
-> last resort, I tried Signed-off-by... Any hope ?
-> 
-> > you can add
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> Ok.
-> 
-> >>> 'static inline' is discouraged in .c files
-> >> 
-> >> Why ?
-> >> 
-> >> It could have been a local macro, but an inline has (a bit) better type
-> >> checking. And I didn't want to add it to a .h that is included by many other
-> >> unrelated components, as it makes no sense to them. So, what is the recommendation ?
-> > 
-> > Either move it to some local header file, or use 'static u32 
-> > handle2id(u32 h)'
-> > and let compiler decide whether to include it or not.
-> 
-> I believe you mean "let the compiler decide whether to _inline_ it or not".
-> Sure, with a sufficiently modern Gcc this will do. However, what about more
-> exotic environments ? Wouldn't it risk a perf regression for style reasons ?
-> 
-> And speaking of style, what about the dozens of instances of "static inline" in
-> net/sched/*.c alone ? Why is it a concern suddenly ?
+> resource aquisition and ioremap can be performed in one step.
 
-Hi Alexandre,
+Will another imperative wording become helpful for an improved change description?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.12-rc6#n94
 
-It's not suddenly a concern. It is a long standing style guideline for
-Networking code, even if not always followed. Possibly some of the code
-you have found in net/sched/*.c is even longer standing than the
-guideline.
-
-Please don't add new instances of inline to .c files unless there is a
-demonstrable - usually performance - reason to do so.
-
-Thanks!
+Regards,
+Markus
 
