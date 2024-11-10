@@ -1,92 +1,117 @@
-Return-Path: <netdev+bounces-143605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB02A9C3423
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 19:00:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D239D9C3429
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 19:14:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DB3A281297
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 18:00:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7CD4B209C8
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 18:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFF91E495;
-	Sun, 10 Nov 2024 18:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215998615A;
+	Sun, 10 Nov 2024 18:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ryWB8uHz"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="AKOTukR/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15A93F9CC
-	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 18:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1537D1E495
+	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 18:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731261619; cv=none; b=jYKldjap/K8AhoznTHgzXkYKwtalaX8PrFqjsqZ12Dlzd70J+CH0tADU+hgGWVMI1Bq/hpjyahplxrQlvDFYA7vrYmrWINpb2JfAR5QMadg6molRVmymDNOjzHzimrrfPZqw0Wf4c8ub7pt4Mnb/exbH+ICJvTCx+3fS6XqxULU=
+	t=1731262455; cv=none; b=c7u7e4NosWqBmSuWWgD0AVt6FlMVJP8rghkSrKDkFCrNzA6XQjxzjZ7dNd8uPaJGeLX91Qe/Opk8MqOgRB3hd4uxZ9UTbb2qI1poFO/I3f0eaPPXpG/OoyOorzLOTZdQJ/kuzE6Ga5ILTcQFmAWl5EUQODEPnyoEXZ8DJyi5Gs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731261619; c=relaxed/simple;
-	bh=rJjtuFbjE9Fik8w8AnJc4zI1CCg0TPssFb3we/D9ZhE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QaFkalKt1LD++3QrouDIqQrsdbwFlSDa4LGLaQplIM3tW0FiSLJ3xAxg92mZ4CCf+TyLI2hkO+YijmHqiwhIjScJ6zfi9Rq7I4OHR5mYdd6zlWjAj4JE7U3v/Vu9kWXSKrfkd1RGNPUTmnV8HKRPXgjleZHtzVC8gpCp2wVkplQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ryWB8uHz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-	Cc:To:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Content-Disposition:In-Reply-To:References;
-	bh=GWDxk1jkYVtL2gUBbt0kS/Okb9uAQtTviSjSmf+zv/A=; b=ryWB8uHzfCxpJfaZe9EsDnPKow
-	bDSMQR/qY68RUaNn0A/yV/ueoPwDdXlTlZHZdGjSgAsrsCbgL+85h0XGDtkRTDcMCAHbTwlkJbleC
-	RFyEiI7pJT+QzTAlogMYqQkiDdEt7RTdIjXBchFJjNCnRPyVD87k2dQt2B9SWR3V1vWk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tACEA-00CoOt-Fs; Sun, 10 Nov 2024 18:59:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: <edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<davem@davemloft.net>
-Cc: netdev <netdev@vger.kernel.org>,
-	ansuelsmth@gmail.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v1] dsa: qca8k: Use nested lock to avoid splat
-Date: Sun, 10 Nov 2024 18:59:55 +0100
-Message-Id: <20241110175955.3053664-1-andrew@lunn.ch>
-X-Mailer: git-send-email 2.37.2
+	s=arc-20240116; t=1731262455; c=relaxed/simple;
+	bh=sKnOMNt/BMKiknJkxM5fZccqGKVWNsCxg4YdCKR2K/o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M26wFAxUJaZl0GvpVxeUg8xq0CkbfEzRnaY0U4lARW18/kNXEQVJowb1CvXaewPmJ0Esps33EOjjHza5ePUEoy6UOm6z5+phOEJZbE2W1cbk679gjtzGywUlcOJm8a54q8sssJ+flwkJ1XXvCXp36dCD/S65YgnDUwoPJgYru1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=AKOTukR/; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-210e5369b7dso38924075ad.3
+        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 10:14:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1731262452; x=1731867252; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KpENEPB6lVdal6P5++3dyts7KO+skOmG5gxIaWngtKI=;
+        b=AKOTukR/4BXGsRDAwyFT56cPeuyCTlgplNvmsx3Thmib6KLk87abrNn72tj20aYZlN
+         6ivNgDOl0WyzEc8BKsMQI5eOaGW5AIwJOUt7k2V+cqZanU/faq11yna4DvG+/LhXre2V
+         Xx5W6SPvK7rRxgAwFhHhEQUnvtbsGOLyoN20/9PgiiPtl5uiMDLbhaeNIrP2g+elW20O
+         llm13yxgNiUWSqfP1zCZ9y/1mICWonRCfkfZA3WRK8sMH0QjQZthOVNtXpIAgMjqCiBL
+         Od7ueF33VJLmWPfSx2pzkbV8izzJ/c5R9p65es+sm1+AsH5Z1Mx5wVdiGuJ5xJzG7VDK
+         emYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731262452; x=1731867252;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KpENEPB6lVdal6P5++3dyts7KO+skOmG5gxIaWngtKI=;
+        b=KhUFvpb/TmUqiuV0hVCCsERJIGDOFrXPgi8t5FxN3GVIzw7eNUkurMToMV40ayJEv+
+         Ndrl6Y4EU9BcRaE+GxZQ0mU9zy+3BpP0B+RJGr/U7xxY+r5Zb6bPZtZlBapHcCdsLbIx
+         KNnymxNUC5Z+C+IE+1mz7keWUTj+0w3LTRrdVYyFZ/e0H33pkbVqR336v6sA0/9nVOSF
+         hGih6EHRQDDjFGnHHBDjoWxkqKYqLZUTKv5DACjy1xEfN80agmBAIc8BHZSyvFWojP5A
+         E0aZF25OKeD+L5frrI2BSGG9ZgtGv8xT5DVLuhCwCfmnBvzqg8SnoicWXa5BQH8pr9mW
+         Y0YA==
+X-Forwarded-Encrypted: i=1; AJvYcCWorZVyrEBOSQJvKMYeLw8kNFnRowkB5ZP94QNUFuZrf86IqJYUPLULqdyF4Lz0L/lQvD0EAe0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf6dwZf0uEJdGxsPPQpLvUBJ/FPtvPRfYnUvjbGwpmwQZvw8zc
+	+7PS2RWel5qoAeMSP4+MfsQNEpKlLP1+sPp/Z23XQFlqKjdXfiIi/3eMOEpLLA==
+X-Google-Smtp-Source: AGHT+IHRaJnCGtmK1acKEgBJvygPSy9CXaAKbpN1bqRc18Z+0ClVmXpH1lfXLZKE/O5aebxIFvx51Q==
+X-Received: by 2002:a17:902:ecc3:b0:20f:5443:9ec1 with SMTP id d9443c01a7336-21183d261bcmr122466225ad.33.1731262452309;
+        Sun, 10 Nov 2024 10:14:12 -0800 (PST)
+Received: from ?IPV6:2804:7f1:e2c0:14fa:2291:3c53:d9e7:ccaa? ([2804:7f1:e2c0:14fa:2291:3c53:d9e7:ccaa])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177ddf0f5sm62176345ad.79.2024.11.10.10.14.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Nov 2024 10:14:11 -0800 (PST)
+Message-ID: <b5df8fb4-e093-4798-8644-fd0604d0d7fe@mojatatu.com>
+Date: Sun, 10 Nov 2024 15:14:08 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v7] net: sched: cls_u32: Fix u32's systematic failure
+ to free IDR entries for hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, edumazet@google.com
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ horms@kernel.org, alexandre.ferrieux@orange.com, netdev@vger.kernel.org
+References: <20241110172836.331319-1-alexandre.ferrieux@orange.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20241110172836.331319-1-alexandre.ferrieux@orange.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-qca8k_phy_eth_command() is used to probe the child MDIO bus while the
-parent MDIO is locked. This causes lockdep splat, reporting a possible
-deadlock. It is not an actually deadlock, because different locks are
-used. By making use of mutex_lock_nested() we can avoid this false
-positive.
+On 10/11/2024 14:28, Alexandre Ferrieux wrote:
+> To generate hnode handles (in gen_new_htid()), u32 uses IDR and
+> encodes the returned small integer into a structured 32-bit
+> word. Unfortunately, at disposal time, the needed decoding
+> is not done. As a result, idr_remove() fails, and the IDR
+> fills up. Since its size is 2048, the following script ends up
+> with "Filter already exists":
+> 
+>    tc filter add dev myve $FILTER1
+>    tc filter add dev myve $FILTER2
+>    for i in {1..2048}
+>    do
+>      echo $i
+>      tc filter del dev myve $FILTER2
+>      tc filter add dev myve $FILTER2
+>    done
+> 
+> This patch adds the missing decoding logic for handles that
+> deserve it.
+> 
+> Fixes: e7614370d6f0 ("net_sched: use idr to allocate u32 filter handles")
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/dsa/qca/qca8k-8xxx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index f8d8c70642c4..59b4a7240b58 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -673,7 +673,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
- 	 * We therefore need to lock the MDIO bus onto which the switch is
- 	 * connected.
- 	 */
--	mutex_lock(&priv->bus->mdio_lock);
-+	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
- 
- 	/* Actually start the request:
- 	 * 1. Send mdio master packet
--- 
-2.45.2
-
+Tested-by: Victor Nogueira <victor@mojatatu.com>
 
