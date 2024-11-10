@@ -1,98 +1,128 @@
-Return-Path: <netdev+bounces-143569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F48C9C302F
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 01:59:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2D89C3033
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 01:59:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B7B21C20AED
-	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 00:59:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14C0E1C20BA1
+	for <lists+netdev@lfdr.de>; Sun, 10 Nov 2024 00:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB53A935;
-	Sun, 10 Nov 2024 00:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cyeXHKam"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F470BE4F;
+	Sun, 10 Nov 2024 00:59:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C01611E;
-	Sun, 10 Nov 2024 00:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881FB946F
+	for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 00:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731200349; cv=none; b=Sj+nU+UWogSsth4aG2UtGqE8gfU8GGJ0aoQYZuWfYnvBPzYnVIudSBG7rKDIO4o6L7IxPvCEMlmlZOeVjnDySWRGYP29CkTXzRPATj7tfXyM8g8F5go5mOOOIfEJrW1bdMMaOXzjsUghzoV1VkTAB6LV/P9Yo20EQxxsAdQ/7I4=
+	t=1731200383; cv=none; b=jFZ5yFCYMIxTDAQFoXubOW81XqeJneKI5SUnLhNsR0vv7U9QUxBZ36qXyGylFwqDVKpyQKzQu6hRQ1V6TTQb707vvk+x6hDzfgmmVNjLY05vjLW7UZTBhBkxXUk8jhDZ8lQNkhJa9AzxjBpRQmLdaEO+rMB7+qI7oqxUfrR7L7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731200349; c=relaxed/simple;
-	bh=eI4NrvYWCzY8jT56L2G03qeev6Tssv52JXBZuJzg/m8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rTSy35RP0SeDvWZ5HpC069jtJpn9Q3Q+MyHfMDiPLwDnoohYbROlw+Cs8+NoljILYMAV9JBpNq+rpDcxePLTMTmiuK+mOhr3/i1zM+rYcmgXvRzgi2LgbT7F943DAQbLZQyn+ezmaOf2grX/GXBICO+aIrH3Jz0woLGhfOOiblU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cyeXHKam; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E51C4CECE;
-	Sun, 10 Nov 2024 00:59:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731200349;
-	bh=eI4NrvYWCzY8jT56L2G03qeev6Tssv52JXBZuJzg/m8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cyeXHKamel7zxzso4MJjVcv5eVvRG2B/Z+PAXKIuoeqd8cQKPbFUatKQdtBBN8ePO
-	 Ch3nVHLWTJVy9rRxVS1Iibvg4COShjE4vGJr6V68GXs7gy5S0ifjmSJdCGizq2kuFb
-	 v/Xm5NWRNKPpQxSAI2uCFckuNdpJ2Ekf+erwEnoD+SvnY+8aoyVissres+tMpz+uC8
-	 5+lzgXKHxlfHWBeHEEsU01zCfKGt7pHd4Kt8LYnLOg1bcuLgvFFTtxO7JzFMiRZFl5
-	 tezmonZUao18zfVxkxBfie8praEh9a9vZ3wO/NAlxeGb1ssbenBSXhegPwTiQLUG77
-	 w64VUKdFeZCfw==
-Date: Sat, 9 Nov 2024 16:59:07 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Donald
- Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
- <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>
-Subject: Re: [PATCH net-next v2 5/8] net: ip_gre: Add netns_atomic module
- parameter
-Message-ID: <20241109165907.4e9611a9@kernel.org>
-In-Reply-To: <CABAhCOSyG6sTWfDfoYDCbiXesDbGiWYFrK4OGi+3zFgO-CZPxA@mail.gmail.com>
-References: <20241107133004.7469-1-shaw.leon@gmail.com>
-	<20241107133004.7469-6-shaw.leon@gmail.com>
-	<CANn89iLvC0H+eb1q1c9X6M1Cr296oLTWYyBhqTAyGW_BusHA_A@mail.gmail.com>
-	<CABAhCOS8WUqOsPCzQFcgeJbz-mkEV92OVXaH3E1tFe7=HRiuGg@mail.gmail.com>
-	<20241107075943.78bb160c@kernel.org>
-	<CABAhCOSvhUZE_FE4xFsOimzVBQpQYLNk51uYNLw+46fibzfM2Q@mail.gmail.com>
-	<20241107200410.4126cf52@kernel.org>
-	<CABAhCOSyG6sTWfDfoYDCbiXesDbGiWYFrK4OGi+3zFgO-CZPxA@mail.gmail.com>
+	s=arc-20240116; t=1731200383; c=relaxed/simple;
+	bh=qpD86/NheXWYIaioiY2D4CJ8Rxyk39jkfGhTyLLOIzE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LcNOLmQiosETv08gbuziIGENHU7zeMZ49S2zonRIFnlggOywxG1Jq3HMvqZQZ/PzXmrYn5Bnaf4HAtT0PcbUQPAs+JTottSuVOjAYQKeyEcfIAuQpzdIB9HRr/XiImEEqp1F2aFCtGId2pXg9b6MT8YJKEePkJ+bUsuGwY1yJ1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53b13ea6b78so5613201e87.2
+        for <netdev@vger.kernel.org>; Sat, 09 Nov 2024 16:59:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731200380; x=1731805180;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MguorYkV5Mjw/NVj/J/xnsKyFDdBwvG6wgkxCAvHz9U=;
+        b=iSNKwKgmH/gpA2kDW2hRLMc2/rDV2Hu80UQyFroWXQhbYhl0LBch0O1iBiZBs66Eh0
+         mYr28/FRps0pQKhWToPZhIZndPSBBU4dp20JYLwztNqzLC9EP8+uHXRTjd+fMWg+r8jF
+         luhKkkrmj8QgH2EbERO0Id0j5hyRDsbyG2n2asyxXeHIxWrkiKQKMrXuwEcE4cDJz/H+
+         sndOka02O/wuiZNdCfFe7wASrD+nJez/dfj2cqnN9qUnZ2CuI/PVGvTj9oRpacPhCH7O
+         mPhUKUK83RKRa5guDUCoRFhwNTfNtSO5w0rtF/v21boe1KXCpnLZVOsH23ZIwGXuqfjv
+         zTTw==
+X-Gm-Message-State: AOJu0YxVqIPh4ykQPm4vE+YJUQgLGuCd5gvk0w1rEe3JtWvh+fVPxYUd
+	hmH9chuEg8TpBtq+khybjMrVXbZekjZO4/kTri1/blPa1F7ERGILDo/Ul266
+X-Google-Smtp-Source: AGHT+IFPsYyhX7bsqG20wdLem4QQaJ5Gq2bcUMXM3In0Yy6gnkXY/bjyw38XgHWAWOijYaT0Yuqqzg==
+X-Received: by 2002:a05:6512:e8d:b0:53a:64:6818 with SMTP id 2adb3069b0e04-53d862f7d56mr4981606e87.47.1731200379304;
+        Sat, 09 Nov 2024 16:59:39 -0800 (PST)
+Received: from localhost.localdomain (c188-148-61-112.bredband.tele2.se. [188.148.61.112])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d826a7334sm1052059e87.120.2024.11.09.16.59.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Nov 2024 16:59:38 -0800 (PST)
+From: William@web.codeaurora.org, Mokhlef@web.codeaurora.org,
+	wmokhlef@gmail.com
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	trivial@kernel.org,
+	William Mokhlef <wmokhlef@gmail.com>
+Subject: [PATCH net-next] net/unix: Stylistic changes in diag.c
+Date: Sun, 10 Nov 2024 01:59:20 +0100
+Message-ID: <20241110005927.30688-1-wmokhlef@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 8 Nov 2024 14:44:37 +0800 Xiao Liang wrote:
-> > On Fri, 8 Nov 2024 00:53:55 +0800 Xiao Liang wrote:  
-> > > IMO, this is about driver capability, not about user requests.  
-> >
-> > The bit is a driver capability, that's fine. But the question was how
-> > to achieve backward compatibility. A flag in user request shifts the
-> > responsibility of ensuring all services are compatible to whoever
-> > spawns the interfaces. Which will probably be some network management
-> > daemon.  
-> 
-> OK. So I think we can change the driver capability indicator in rtnl_ops
-> to a tristate field, say, "linkns_support".
-> If it is
->   - not supported, then keep the old behavior
->   - supported (vlan, macvlan, etc.), then change to the new behavior
->   - compat-mode (ip_tunnel), default to old behavior and can be changed
->     via an IFLA flag.
-> Is this reasonable?
+From: William Mokhlef <wmokhlef@gmail.com>
 
-Let's start with annotating the drivers which need the old behavior.
-It seems like something that was done as a workaround for old drivers,
-maybe there isn't that many of them and we can convert them all in one
-series.
+Changes based on the script scripts/checkpatch.pl
+
+Remove space after cast, blank line after declaration,
+fixed brace style
+---
+ net/unix/diag.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/net/unix/diag.c b/net/unix/diag.c
+index 9138af8b465e..94d4d273f7f4 100644
+--- a/net/unix/diag.c
++++ b/net/unix/diag.c
+@@ -94,8 +94,8 @@ static int sk_diag_show_rqlen(struct sock *sk, struct sk_buff *nlskb)
+ 		rql.udiag_rqueue = skb_queue_len_lockless(&sk->sk_receive_queue);
+ 		rql.udiag_wqueue = sk->sk_max_ack_backlog;
+ 	} else {
+-		rql.udiag_rqueue = (u32) unix_inq_len(sk);
+-		rql.udiag_wqueue = (u32) unix_outq_len(sk);
++		rql.udiag_rqueue = (u32)unix_inq_len(sk);
++		rql.udiag_wqueue = (u32)unix_outq_len(sk);
+ 	}
+ 
+ 	return nla_put(nlskb, UNIX_DIAG_RQLEN, sizeof(rql), &rql);
+@@ -105,6 +105,7 @@ static int sk_diag_dump_uid(struct sock *sk, struct sk_buff *nlskb,
+ 			    struct user_namespace *user_ns)
+ {
+ 	uid_t uid = from_kuid_munged(user_ns, sock_i_uid(sk));
++
+ 	return nla_put(nlskb, UNIX_DIAG_UID, sizeof(uid_t), &uid);
+ }
+ 
+@@ -250,7 +251,7 @@ static int unix_diag_get_exact(struct sk_buff *in_skb,
+ 
+ 	sk = unix_lookup_by_ino(net, req->udiag_ino);
+ 	err = -ENOENT;
+-	if (sk == NULL)
++	if (!sk)
+ 		goto out_nosk;
+ 
+ 	err = sock_diag_check_cookie(sk, req->udiag_cookie);
+@@ -296,8 +297,9 @@ static int unix_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
+ 			.dump = unix_diag_dump,
+ 		};
+ 		return netlink_dump_start(sock_net(skb->sk)->diag_nlsk, skb, h, &c);
+-	} else
++	} else {
+ 		return unix_diag_get_exact(skb, h, nlmsg_data(h));
++	}
+ }
+ 
+ static const struct sock_diag_handler unix_diag_handler = {
+-- 
+2.42.0
+
 
