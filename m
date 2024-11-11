@@ -1,198 +1,175 @@
-Return-Path: <netdev+bounces-143664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31459C38A8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 07:52:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E476E9C38E9
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 08:16:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B5C1F213F1
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 06:52:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7771C282151
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 07:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B4B50276;
-	Mon, 11 Nov 2024 06:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69ADB154BFF;
+	Mon, 11 Nov 2024 07:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b="IC9DwOE0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKRAjz/e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00007101.pphosted.com (mx0a-00007101.pphosted.com [148.163.135.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4303513A258;
-	Mon, 11 Nov 2024 06:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5B34D8CB;
+	Mon, 11 Nov 2024 07:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731307945; cv=none; b=AOw74ahlIWGnMgQvwG/e/7eiiH0S7dlmAJdRsbKm9p3MJHOQSPSbi2ppiN9DBBcfb/XCWpnDE4jIayY2oPGhjx1EX4tOPFLqC0oXQSaY2sZSyS19psXnOhUN+HbvwbogdNMUKOi/WT6bsysq4pXaQO0Yeo0Vd9lqCBlErmkFQiU=
+	t=1731309364; cv=none; b=lHP8fBo2adD+YZspF+nuni/dGA9o91qkcgM86gPEH7BRALC3GhzQzC14mWwrtaDVkcx+GyfKBZn6AYMqudEHToBvfAGHilsYtlW+4qyNgIyWQxwR2BnC7YPay2BOlGt6VKsy4SgkBA/OR0a1mVUtWfinOauj49EWALbkuH/RpqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731307945; c=relaxed/simple;
-	bh=+U9r4++8vWNjOGgBUQp+LAiKwhXMBYkOY0XY8YYEC9E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qlu1NWowkQR9IdPaACODCsihZYiOmnV8OjnpnpwEj0LY43du1fr2UjjrAs3xu2c7b7wE0gCWFJNi/y9ukBlXhgN7MZ1zQp7NKIrejX/9HEfsX3uoQrroO5w95CQNTrBU0QMb9zarDESJUQFiNkgefVcxKLpq2eaWN21YSq1EFlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu; spf=pass smtp.mailfrom=illinois.edu; dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b=IC9DwOE0; arc=none smtp.client-ip=148.163.135.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=illinois.edu
-Received: from pps.filterd (m0166255.ppops.net [127.0.0.1])
-	by mx0a-00007101.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AB51htV012128;
-	Mon, 11 Nov 2024 06:51:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=illinois.edu; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=campusrelays; bh=G00Djb/CrG1My6IT3+uwf8Xvk9Zx1GAj
-	nDsHf77FZaI=; b=IC9DwOE0Ek905R3uX7ynL6WI4sy41z9nZz38I7mDia5SOX2p
-	jTyOms47q3dLorFVNEs8Qpt5M4GgM/6Qn7Ru+IH7vWEIF2xk3qaTNR3tPsChVCRi
-	f96iF39Lq9jOVEoPX6O9LRCWhK3COxuRYdDHB/vyCpKCsXQTlLEN6kYjmOHJ4d8t
-	5KH3I6VhRcFfyQVOzBxqMeDwG/0Kkzh6ja0LPVYzgw1HZVizTLQ8pCcSchc6lWC2
-	hJ0MQ/l5DbcnSKi3I3gRk8uPRz6bDeah8DSLZ7qr5q1WDmaR6L5+ZRc4XFvpdVp/
-	26sXh/7tuZdpg9lWBcoPqDndCtnplqIiu8Y+Cg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-00007101.pphosted.com (PPS) with ESMTPS id 42t0dy3632-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Nov 2024 06:51:39 +0000 (GMT)
-Received: from m0166255.ppops.net (m0166255.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AB6pd0M003663;
-	Mon, 11 Nov 2024 06:51:39 GMT
-Received: from localhost.localdomain (oasis.cs.illinois.edu [130.126.137.13])
-	by mx0a-00007101.pphosted.com (PPS) with ESMTP id 42t0dy362v-1;
-	Mon, 11 Nov 2024 06:51:38 +0000 (GMT)
-From: Jinghao Jia <jinghao7@illinois.edu>
-To: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>
-Cc: netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        Jinghao Jia <jinghao7@illinois.edu>, kernel test robot <lkp@intel.com>,
-        Ruowen Qin <ruqin@redhat.com>
-Subject: [PATCH] ipvs: fix UB due to uninitialized stack access in ip_vs_protocol_init()
-Date: Mon, 11 Nov 2024 00:51:05 -0600
-Message-ID: <20241111065105.82431-1-jinghao7@illinois.edu>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1731309364; c=relaxed/simple;
+	bh=MtbNoPkZSP3Y5Njy2K7u2mmx90uqChP6O2cN6ABOIcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fmrUSy7GaNunSR0bOawO72MgaevHwlH+OFdvE0+paeulfkMLlQOm56YnKYyuwfthIAsSxkAK5osMEpeJiujaK3OXHdfEaQvc2Uu/Y1iqJ8l+34rEWlpE8S8VuUyNVdFfQptWRyioVnaAnUItmys8Td7ZUKbXKpitUWepFvW/J3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKRAjz/e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39712C4CED0;
+	Mon, 11 Nov 2024 07:16:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731309363;
+	bh=MtbNoPkZSP3Y5Njy2K7u2mmx90uqChP6O2cN6ABOIcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XKRAjz/eahDUknMWLtvCROrA12ro063hkF5u7Z8mH9CIHSXM/0FASrJmh9SZdLOam
+	 jWOUohZiomsyOezExQ7XjW4020b2zig53RdHLNoZfxAy3r8cCCBUYcRPwIhxdfga+6
+	 QpRL/YrKcgHYh9Ud5UwL8YyCpPocVyZbPkhjPi75xg/3ME962jri9lcEttZDJRrksf
+	 +xuJXVXjXghtOP4hbSNAnfuq65Eo3xIxH/nWuiDPGGXHLZc3KUv8RtWpbGwFOrtVdR
+	 k+/SxqLtR1LdyKAMTRpeNBmnWXeXWDnXyQ55d0cxLc4JRJEDAvoZnVMbqH4ulVQpMd
+	 z7+upqXVQEqqQ==
+Date: Mon, 11 Nov 2024 09:15:56 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Bharat Bhushan <bharatb.linux@gmail.com>
+Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jerinj@marvell.com, lcherian@marvell.com,
+	ndabilpuram@marvell.com, sd@queasysnail.net
+Subject: Re: [net-next PATCH v9 1/8] octeontx2-pf: map skb data as device
+ writeable
+Message-ID: <20241111071556.GB71181@unreal>
+References: <20241108045708.1205994-1-bbhushan2@marvell.com>
+ <20241108045708.1205994-2-bbhushan2@marvell.com>
+ <20241110142303.GA50588@unreal>
+ <CAAeCc_nPP7FU7KUZoW+9AVPdaqTpVopEKQGVpzHgXkBUzfa1xQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: ePDWI69DVPRvmLg5drIxgZ6AhaoctuzM
-X-Proofpoint-ORIG-GUID: UtEpqJ5p1NH21y5diKtFX63ZyGgD1z6l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
-X-Spam-Details: rule=cautious_plus_nq_notspam policy=cautious_plus_nq score=0 adultscore=0
- mlxlogscore=999 priorityscore=1501 malwarescore=0 clxscore=1011
- lowpriorityscore=0 bulkscore=0 mlxscore=0 spamscore=0 phishscore=0
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2411110057
-X-Spam-Score: 0
-X-Spam-OrigSender: jinghao7@illinois.edu
-X-Spam-Bar: 
+In-Reply-To: <CAAeCc_nPP7FU7KUZoW+9AVPdaqTpVopEKQGVpzHgXkBUzfa1xQ@mail.gmail.com>
 
-Under certain kernel configurations when building with Clang/LLVM, the
-compiler does not generate a return or jump as the terminator
-instruction for ip_vs_protocol_init(), triggering the following objtool
-warning during build time:
+On Mon, Nov 11, 2024 at 10:31:02AM +0530, Bharat Bhushan wrote:
+> On Sun, Nov 10, 2024 at 7:53 PM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Fri, Nov 08, 2024 at 10:27:01AM +0530, Bharat Bhushan wrote:
+> > > Crypto hardware need write permission for in-place encrypt
+> > > or decrypt operation on skb-data to support IPsec crypto
+> > > offload. That patch uses skb_unshare to make skb data writeable
+> > > for ipsec crypto offload and map skb fragment memory as
+> > > device read-write.
+> > >
+> > > Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+> > > ---
+> > > v7->v8:
+> > >  - spell correction (s/sdk/skb) in description
+> > >
+> > > v6->v7:
+> > >  - skb data was mapped as device writeable but it was not ensured
+> > >    that skb is writeable. This version calls skb_unshare() to make
+> > >    skb data writeable.
+> > >
+> > >  .../ethernet/marvell/octeontx2/nic/otx2_txrx.c | 18 ++++++++++++++++--
+> > >  1 file changed, 16 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> > > index 7aaf32e9aa95..49b6b091ba41 100644
+> > > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> > > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> > > @@ -11,6 +11,7 @@
+> > >  #include <linux/bpf.h>
+> > >  #include <linux/bpf_trace.h>
+> > >  #include <net/ip6_checksum.h>
+> > > +#include <net/xfrm.h>
+> > >
+> > >  #include "otx2_reg.h"
+> > >  #include "otx2_common.h"
+> > > @@ -83,10 +84,17 @@ static unsigned int frag_num(unsigned int i)
+> > >  static dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
+> > >                                       struct sk_buff *skb, int seg, int *len)
+> > >  {
+> > > +     enum dma_data_direction dir = DMA_TO_DEVICE;
+> > >       const skb_frag_t *frag;
+> > >       struct page *page;
+> > >       int offset;
+> > >
+> > > +     /* Crypto hardware need write permission for ipsec crypto offload */
+> > > +     if (unlikely(xfrm_offload(skb))) {
+> > > +             dir = DMA_BIDIRECTIONAL;
+> > > +             skb = skb_unshare(skb, GFP_ATOMIC);
+> > > +     }
+> > > +
+> > >       /* First segment is always skb->data */
+> > >       if (!seg) {
+> > >               page = virt_to_page(skb->data);
+> > > @@ -98,16 +106,22 @@ static dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
+> > >               offset = skb_frag_off(frag);
+> > >               *len = skb_frag_size(frag);
+> > >       }
+> > > -     return otx2_dma_map_page(pfvf, page, offset, *len, DMA_TO_DEVICE);
+> > > +     return otx2_dma_map_page(pfvf, page, offset, *len, dir);
+> >
+> > Did I read correctly and you perform DMA mapping on every SKB in data path?
+> > How bad does it perform if you enable IOMMU?
+> 
+> Yes Leon, currently DMA mapping is done with each SKB, That's true
+> even with non-ipsec cases.
+> Performance is not good with IOMMU enabled. Given the context of this
+> series, it just extends the same for ipsec use cases.
 
-  vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
+I know and I don't ask to change anything, just really curious how
+costly this implementation is when IOMMU enabled.
 
-At runtime, this either causes an oops when trying to load the ipvs
-module or a boot-time panic if ipvs is built-in. This same issue has
-been reported by the Intel kernel test robot previously.
+Thanks
 
-Digging deeper into both LLVM and the kernel code reveals this to be a
-undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
-of 64 chars to store the registered protocol names and leaves it
-uninitialized after definition. The function calls strnlen() when
-concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
-strnlen() performs an extra step to check whether the last byte of the
-input char buffer is a null character (commit 3009f891bb9f ("fortify:
-Allow strlen() and strnlen() to pass compile-time known lengths")).
-This, together with possibly other configurations, cause the following
-IR to be generated:
-
-  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
-    %1 = alloca [64 x i8], align 16
-    ...
-
-  14:                                               ; preds = %11
-    %15 = getelementptr inbounds i8, ptr %1, i64 63
-    %16 = load i8, ptr %15, align 1
-    %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
-    %18 = icmp eq i8 %16, 0
-    %19 = select i1 %17, i1 %18, i1 false
-    br i1 %19, label %20, label %23
-
-  20:                                               ; preds = %14
-    %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
-    ...
-
-  23:                                               ; preds = %14, %11, %20
-    %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
-    ...
-  }
-
-The above code calculates the address of the last char in the buffer
-(value %15) and then loads from it (value %16). Because the buffer is
-never initialized, the LLVM GVN pass marks value %16 as undefined:
-
-  %13 = getelementptr inbounds i8, ptr %1, i64 63
-  br i1 undef, label %14, label %17
-
-This gives later passes (SCCP, in particular) to more DCE opportunities
-by propagating the undef value further, and eventually removes
-everything after the load on the uninitialized stack location:
-
-  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
-    %1 = alloca [64 x i8], align 16
-    ...
-
-  12:                                               ; preds = %11
-    %13 = getelementptr inbounds i8, ptr %1, i64 63
-    unreachable
-  }
-
-In this way, the generated native code will just fall through to the
-next function, as LLVM does not generate any code for the unreachable IR
-instruction and leaves the function without a terminator.
-
-Zero the on-stack buffer to avoid this possible UB.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
-Co-developed-by: Ruowen Qin <ruqin@redhat.com>
-Signed-off-by: Ruowen Qin <ruqin@redhat.com>
-Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
----
- net/netfilter/ipvs/ip_vs_proto.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
-index f100da4ba3bc..a9fd1d3fc2cb 100644
---- a/net/netfilter/ipvs/ip_vs_proto.c
-+++ b/net/netfilter/ipvs/ip_vs_proto.c
-@@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
- 
- int __init ip_vs_protocol_init(void)
- {
--	char protocols[64];
-+	char protocols[64] = { 0 };
- #define REGISTER_PROTOCOL(p)			\
- 	do {					\
- 		register_ip_vs_protocol(p);	\
-@@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
- 		strcat(protocols, (p)->name);	\
- 	} while (0)
- 
--	protocols[0] = '\0';
--	protocols[2] = '\0';
- #ifdef CONFIG_IP_VS_PROTO_TCP
- 	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
- #endif
--- 
-2.47.0
-
+> 
+> Thanks
+> -Bharat
+> 
+> >
+> > Thanks
+> >
+> > >  }
+> > >
+> > >  static void otx2_dma_unmap_skb_frags(struct otx2_nic *pfvf, struct sg_list *sg)
+> > >  {
+> > > +     enum dma_data_direction dir = DMA_TO_DEVICE;
+> > > +     struct sk_buff *skb = NULL;
+> > >       int seg;
+> > >
+> > > +     skb = (struct sk_buff *)sg->skb;
+> > > +     if (unlikely(xfrm_offload(skb)))
+> > > +             dir = DMA_BIDIRECTIONAL;
+> > > +
+> > >       for (seg = 0; seg < sg->num_segs; seg++) {
+> > >               otx2_dma_unmap_page(pfvf, sg->dma_addr[seg],
+> > > -                                 sg->size[seg], DMA_TO_DEVICE);
+> > > +                                 sg->size[seg], dir);
+> > >       }
+> > >       sg->num_segs = 0;
+> > >  }
+> > > --
+> > > 2.34.1
+> > >
+> > >
+> >
 
