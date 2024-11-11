@@ -1,95 +1,148 @@
-Return-Path: <netdev+bounces-143719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAF8F9C3D94
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:39:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2199B9C3DA4
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:44:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68D54B23C77
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:39:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537D51C21E13
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B70A188905;
-	Mon, 11 Nov 2024 11:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB42F18990D;
+	Mon, 11 Nov 2024 11:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBHMwjMY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2URJnrk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A89139578;
-	Mon, 11 Nov 2024 11:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7C915D5C5
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 11:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731325144; cv=none; b=rl99vYnWkRiSzfuLECV7Z03roFhTXDAKpxilEaI+lbnGHOjBEvOeNc9wWcmjQso0Z3nblOHGdwVw1C8JyWrIcjSBnfGR0LPBnvuAq4qOHmxDedX0aA8DwuYrvyufzy1R3bEAfNkkg5aX5WSg2+F9RSU1tI5wtMq3Cu+I+Z4yAfY=
+	t=1731325475; cv=none; b=K+qmLWhaatMdBs7O79mDbZ959fbR9H3mUArxYTQ/0DR93B3qJCh7odblR4HKKLY7a7uD5CJxvgcxbq0osPONfKZZAk+Lur1xKxle5WuKkLFNlnFSNZRR2YAnBD3loJvTbQcJ1uOPsYwRPAXcuNuth7u9Idn8yB68OiQvXcJZr78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731325144; c=relaxed/simple;
-	bh=awS5dN+X4Ie3viCfpwkaNH+GZOItv8oSj0ZeFRm8cNg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=ur/lumuLHcXDZ56FCGzywSA97TOufZuQmxn74v5+33I9Bnah0Jat9xUMwukGfO4UG/xU9/W1X4gu8dVCJTatG69cqp+t4QKzIIERio8vTOq3MDv7neAgSnHLTaLsambn95eaUSZSl+cAOdhm7AdpA+XqanvtiR1WLI22z0k9MEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBHMwjMY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12000C4CECF;
-	Mon, 11 Nov 2024 11:39:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731325143;
-	bh=awS5dN+X4Ie3viCfpwkaNH+GZOItv8oSj0ZeFRm8cNg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=MBHMwjMY8Bewc44C302prC+Tn3iwhfcwLBcZsKDXtleyvpIAL554HS67L76xDdVsb
-	 zSVlfSoj/E4Y1aNpM93fHnNteD3FkPwwIHiZDZCXQhMwhiCWvREYb0ynNxxMtu1vic
-	 M1EhWEZLfSOvKMBgFXabrtxGX4fkqmz0PJttsay9exxJWfQLtgO+HHwIFBDck92jMT
-	 rwUHvqvw0ta2zTGGwjttqk53D8BLhSGf+vQLEVlgHjj3btGhw5oyCTgXepFzBpcnF7
-	 pfQyI7NIMFxgI/N/7iBj0PpqL9bDGB8eLTTYMUoon3JKJmOPW5LoY5wV73CYlDVhXz
-	 STqU9WsFQzTUg==
-From: Kalle Valo <kvalo@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Michael Nemanov <michael.nemanov@ti.com>,  "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  Sabeeh Khan <sabeeh-khan@ti.com>
-Subject: Re: [PATCH v5 09/17] wifi: cc33xx: Add main.c
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
-	<20241107125209.1736277-10-michael.nemanov@ti.com>
-	<685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Date: Mon, 11 Nov 2024 13:38:59 +0200
-In-Reply-To: <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-	(Johannes Berg's message of "Fri, 08 Nov 2024 12:42:59 +0100")
-Message-ID: <87seryvw30.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1731325475; c=relaxed/simple;
+	bh=WiVbEbZwX7GE6FvNFFvXfXcrBQkn7qWeNINAmSp+lWY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ClX1rffAfuguMEPhUOYh5pOVh48gpYs+1FRX6X9IprRHxaqc9EBqi4sTnVAcU68QoJqbB4NfWAVGt4Zb/TkCT4L9oMtxkrIk9FGCOwgzP8iLsYThaUM5Xs7DAa2JwXMQSrn0In4tw7Lf/eXdlsrm9YG3cwnP65U/9eKoShVdMLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2URJnrk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731325470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RrNKWWNhtD81PNKsbKwhpsIaaGhGd8JKmE0eRL/JjT0=;
+	b=e2URJnrkJ6EJG/heUNJqoXjmZNWz+3j3YktMKwXfvPMYSqQNCLt9fVTTgDdGQ6PIwrOrth
+	HkS72sBapmiqxBxsV/mKmTRG5kgtjGFZrOBVI7JVCY+Pl51sTjLK0gGZF8RrpCA02plzZd
+	PwgZSuEgXBt4OrxhHkL11aF0ATMFJus=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-149-6Cud4j-bM0-c1UA-JjFrTg-1; Mon, 11 Nov 2024 06:44:25 -0500
+X-MC-Unique: 6Cud4j-bM0-c1UA-JjFrTg-1
+X-Mimecast-MFC-AGG-ID: 6Cud4j-bM0-c1UA-JjFrTg
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5eb75d21d3eso372830eaf.0
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 03:44:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731325464; x=1731930264;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RrNKWWNhtD81PNKsbKwhpsIaaGhGd8JKmE0eRL/JjT0=;
+        b=lI+Z3LX9OygInsql75/iqkBQojkIAW//qlro4a6zTzv5iVtJqJ1xOjmwcOAk/q+Fjz
+         Y2YhI6dWDfAb+jceAXfP8M1Rh0it8uAEs4uS9J93uLLribiXwH2IG0K7qz39YJg3TWer
+         hOBtYa5W1fLaIoNPu3mgQ9vZTUO/dC8WrA0oQrMCTUshyqv/i+OZFMFUzwJCRL/v8tV5
+         5fbU6a4tFu3LF625ce3eWcY/8MAdYNiTAXTJUxTZehQWEF1sIKj8oAlRxZQhBKYrM4ZZ
+         OEQ3JESp7BMxhCk9wwaWgc74NYE6tsjW5AJpm6vBE155z39r3IIGPPGm3GQDOne9I1zK
+         OI7A==
+X-Forwarded-Encrypted: i=1; AJvYcCU40MesGm82vRKbmpDtMiiSQisWba34qDNuGioD44lSgbMVjZ/dfbBIsyi4/nDimCPRY5590Nc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9nvQYr52ejKa0wr5BzqTub/skgvpwLs+0gZ+jEafHzHbB+lgr
+	WtwmjqhPE21JpqklVrbAbK2LGWo9bjdTzR1aKdmsxrAtjkqszrDSa5Tw8Q0EbN78m/I11i2YQ3G
+	u+67BiYHVvO4oRB/2XlFsHRFx1h4CKqt0dIjmzUm5vc1o40LX6+F4CBcIRqdHhbLH1VmmlpJx3C
+	rI0OYyIMF5IU98T6Fnb622q218B8EM
+X-Received: by 2002:a05:6870:9d18:b0:291:cb6:f3cd with SMTP id 586e51a60fabf-295600f04b3mr2366964fac.8.1731325464250;
+        Mon, 11 Nov 2024 03:44:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE37eDuGUNMpgsM81z+sCu4l+g2AmjHnAPzKRpJM7O2zuK4M8P9tUBlkaaYqdgsOj4PYl9dM6C8v6Uc5gSlT6E=
+X-Received: by 2002:a05:6870:9d18:b0:291:cb6:f3cd with SMTP id
+ 586e51a60fabf-295600f04b3mr2366958fac.8.1731325463916; Mon, 11 Nov 2024
+ 03:44:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20241104121337.129287-1-michal.swiatkowski@linux.intel.com> <20241104121337.129287-3-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20241104121337.129287-3-michal.swiatkowski@linux.intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 11 Nov 2024 12:44:11 +0100
+Message-ID: <CADEbmW2=9s8iGJibWpPnVUraMOr7ecE6Hbpb1n3d9es-aUvA7Q@mail.gmail.com>
+Subject: Re: [iwl-next v7 2/9] ice: devlink PF MSI-X max and min parameter
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com, 
+	jacob.e.keller@intel.com, pio.raczynski@gmail.com, konrad.knitter@intel.com, 
+	marcin.szycik@intel.com, wojciech.drewek@intel.com, 
+	nex.sw.ncis.nat.hpm.dev@intel.com, przemyslaw.kitszel@intel.com, 
+	jiri@resnulli.us, horms@kernel.org, David.Laight@aculab.com, 
+	pmenzel@molgen.mpg.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Johannes Berg <johannes@sipsolutions.net> writes:
-
->> +static void cc33xx_rc_update_work(struct work_struct *work)
->> +{
->> +	struct cc33xx_vif *wlvif = container_of(work, struct cc33xx_vif,
->> +						rc_update_work);
->> +	struct cc33xx *cc = wlvif->cc;
->> +	struct ieee80211_vif *vif = cc33xx_wlvif_to_vif(wlvif);
->> +
->> +	mutex_lock(&cc->mutex);
+On Mon, Nov 4, 2024 at 1:13=E2=80=AFPM Michal Swiatkowski
+<michal.swiatkowski@linux.intel.com> wrote:
 >
-> Given the way the wiphy mutex now works, I'd strongly recommend not
-> having your own mutex any more - it's a huge simplification in a lot of
-> places, and there's very little downside since everything coming from
-> higher layers holds the wiphy mutex already (and almost certainly needs
-> to acquire your own mutex.)
+> Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+> range.
+>
+> Add notes about this parameters into ice devlink documentation.
+>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>  Documentation/networking/devlink/ice.rst      | 11 +++
+>  .../net/ethernet/intel/ice/devlink/devlink.c  | 83 ++++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice.h          |  7 ++
+>  drivers/net/ethernet/intel/ice/ice_irq.c      |  7 ++
+>  4 files changed, 107 insertions(+), 1 deletion(-)
+>
+[...]
+> @@ -1648,6 +1710,7 @@ void ice_devlink_unregister(struct ice_pf *pf)
+>  int ice_devlink_register_params(struct ice_pf *pf)
+>  {
+>         struct devlink *devlink =3D priv_to_devlink(pf);
+> +       union devlink_param_value value;
+>         struct ice_hw *hw =3D &pf->hw;
+>         int status;
+>
+> @@ -1656,11 +1719,27 @@ int ice_devlink_register_params(struct ice_pf *pf=
+)
+>         if (status)
+>                 return status;
+>
+> +       status =3D devl_params_register(devlink, ice_dvl_msix_params,
+> +                                     ARRAY_SIZE(ice_dvl_msix_params));
+> +       if (status)
+> +               return status;
+> +
+>         if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+>                 status =3D devl_params_register(devlink, ice_dvl_sched_pa=
+rams,
+>                                               ARRAY_SIZE(ice_dvl_sched_pa=
+rams));
+> +       if (status)
+> +               return status;
 
-I can recommend using wiphy_lock(), at least in ath12k it made the
-locking so much simpler. The more wireless drivers start to use it the
-better.
+Error handling looks wrong in this function.
+You have to unwind the registration of the params from above or they will l=
+eak.
+Sorry I did not notice this earlier.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+Michal
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
