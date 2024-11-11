@@ -1,196 +1,204 @@
-Return-Path: <netdev+bounces-143696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D87E9C3AEF
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:34:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED7D9C3B0E
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713EE1C21B65
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:34:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 847552833DB
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8D178289;
-	Mon, 11 Nov 2024 09:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713AE166F3A;
+	Mon, 11 Nov 2024 09:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R95SSjES"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CboJN/wZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DEF224D6;
-	Mon, 11 Nov 2024 09:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15483143C72
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 09:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731317690; cv=none; b=BRnlme429m8a33ZoIiCCoUgxLVXIvOY8uSArEjmQI8X5sJ9L9tm1cCYsfQ5OtV9pmHg5gCjf4Z/cYDDt5mN0IWiHBJwNrAIH6xU7QcdAVKrOfYibORNcVP01vwEnkijja6Efvgix4ckGPxOJn1ep3Beop83dKy1zodQVw+lDk0c=
+	t=1731318010; cv=none; b=ZKdo1BaNu2diiZzcL8sWkMDVUhUE7xKyuIb5ier54nAF+TLGpBf1caYfb8RxFp9XSbOp7qh/vY/pUS6AhQ7b4bkalng1QhpqBgqWY91GZ/wyDFgJPST6Icme8YF5zwEzxNt1eHe80Hxftf57qbOsFLRsripS8fJBt3sTHE5k9OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731317690; c=relaxed/simple;
-	bh=oM2w0fRYXaMjbTO38PsVcs6JogWiEt4Q6dRAHtie0eo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkK0WGu21gW5DTXZqL5vk16b/yHVDIFiOhM5ndrnS80F9+8bFI9UO38Jquqc0WMCFgd9AT/orzffQzQiWSPHy+so4bO3kdOKdMywpisKuUtZG4r1xBGlGR1aumAzUf69pEM2BfOnQ4+BINrXkZy4svDnJQqj+lSXEtx5Kv4Zpb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R95SSjES; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D58C4CED0;
-	Mon, 11 Nov 2024 09:34:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731317689;
-	bh=oM2w0fRYXaMjbTO38PsVcs6JogWiEt4Q6dRAHtie0eo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R95SSjESFg3QmTa8vxxlbcrC6i6NsFUGgxfQXxSum8ijc1moLzsBimBtbk7eyEYby
-	 zoGDftPywOTnYx4poI7YLwvBTX+wFEu2NrxN5fO/6RXyQfyIqW96n/ylDiL1jaeEZy
-	 m3BlpzQ5DhupjVMwFCHa6kTRaCQGFw/H/HWi8rMMEdovgOm6RsrRKB2vw/LHAU5JhE
-	 hXAXoKiUJosjaDbiLuvouPyqN4NF5GPOtOQfPTrCKRf4FdcUCVnScRZgfiADX6vBOt
-	 ghqEgfYyFwIdes3DMkj8c8tYnnG/2A/MmPy9Kz/3wvRk7TLSm+0D4WuZzG6/8sGGN0
-	 VvInvaFT5FH0w==
-Date: Mon, 11 Nov 2024 10:34:46 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Alex Henrie <alexhenrie24@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, branden@debian.org, 
-	linux-man@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
-Message-ID: <76utdqobulhs7botd22qrtxooklpv6ai6xyh7wbjy737kiblhw@637outnydbi7>
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
- <20241105055338.61082-1-kuniyu@amazon.com>
- <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
- <CAMMLpeRMKEWkNC=irH5dWwJSMS2jp6OSeB6KJBh2=ZbLsigM7A@mail.gmail.com>
+	s=arc-20240116; t=1731318010; c=relaxed/simple;
+	bh=eVbFQ8eRmgwQjhyZDrpzmXZtLQtDVQOa42qdW6+BPsA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=AbbYaycjUqkrObLEt357W9j4vBMHvrqPB+XpCOs9Dlo74XWsZU49/rgeLeuKsL2RTBx1KYVbssupIG2rlEFO3qTACj+qEe3ET2xx1FMAphhr+Tes9c1SaSe6t2D9+FQ1zvDmId0jCXsPBQzd8YCYaXxnaT+VrmrGT6w38H812ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CboJN/wZ; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5ced377447bso6229716a12.1
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:40:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1731318006; x=1731922806; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RL5ouNz62J4rP7Vb2EwmgbN1hwLbAAvQeLoAfZ/ypHo=;
+        b=CboJN/wZx/s0KPqzs5G8KiJdfT0nBRV1sPV3gNT/W+zJdhJrw6Ekl046AJLjx+m36W
+         JCFXCqlXKsJhQvvp15uZ3D6sYVZtA+1OKF3CXm7stUxm4Mph/m9SxDFstILaKP39j21y
+         kFpxhWlNTS0YlWrN553BD8+1xJChy4fB/5A+N/GvxQXIv6Ylh8MLewPkJ59velzXeoKA
+         qV6XpSkBGjwbt38JYE/cjsCJ2gsCNzvBSb+klUeijdN928zdeS2TFDg9Gm03XaKpE/cw
+         ZSE9xQ1bBzouj/h6OspbtBm3VzxE12MJwo8hNQlvjoGKxoJgmkx6lilFVOdIjHa2Pc2m
+         IJOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731318006; x=1731922806;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RL5ouNz62J4rP7Vb2EwmgbN1hwLbAAvQeLoAfZ/ypHo=;
+        b=dL9dURt09Af7PeHQSkmjtXxQTzxzwVtyqHE5A2uRNYTH3A9Z8Je0o1HFggeUvqxvBK
+         HreXcKK7mlmaSKmgShWPrwFJegzWmPsiRVgKyJv+jDWa2uZ4zaN4UTLvwVk1nbvGR0aj
+         yjeRRax7PJW7HHPyaiVmiuyBiarICole+KkfHfiyoGb8UZ9byaNcqp+tZWwWn2q96IAB
+         zMRGhrmjtOYdQZZNIINETfGpVxp1cqCcYmq+SJYDKHfbvHhaehZ+NbhYsq/LyB3HI7nQ
+         teaWy1StNuxQZ/IkqgaFLNLAcHDoKMCWpiTrC3DKREHGKnziAsjPSFS3WSMX5fRf5cJ4
+         j40w==
+X-Forwarded-Encrypted: i=1; AJvYcCXsvth3g2JcFuETK7z2CBsLbWjc6mIAD0PGMjji/tRXGtO6vofurU+mkdF4j7bghrGslMZmQ1M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH8JwwO27QBKXKyxtoDFND000YuUqJmrowg51pLXm5du4+RZQd
+	krU7cqgFLed3S/wOUdHPoXIrEtEfZ5gLTUSL1ewQx472NCv5c6B0X4CrjwxjL4A=
+X-Google-Smtp-Source: AGHT+IF/p+575+YNR2OJr4WYmzHEumA5ro2KoQ7Lo/HcKAeV1re5jL3XLj3j1AdmsGeHCshinHqVXw==
+X-Received: by 2002:a05:6402:13ce:b0:5ce:ddd4:7c2f with SMTP id 4fb4d7f45d1cf-5cf0a30c5dcmr10678581a12.7.1731318006331;
+        Mon, 11 Nov 2024 01:40:06 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf0f369037sm3560713a12.12.2024.11.11.01.40.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 01:40:06 -0800 (PST)
+Date: Mon, 11 Nov 2024 12:38:50 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Rosen Penev <rosenp@gmail.com>,
+	netdev@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH] net: modernize ioremap in probe
+Message-ID: <0460e9ea-3d2b-425b-9e97-c69afe138670@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fg5ihjp3ifj7wsod"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMMLpeRMKEWkNC=irH5dWwJSMS2jp6OSeB6KJBh2=ZbLsigM7A@mail.gmail.com>
+In-Reply-To: <20241109233641.8313-1-rosenp@gmail.com>
 
+Hi Rosen,
 
---fg5ihjp3ifj7wsod
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Alex Henrie <alexhenrie24@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, branden@debian.org, 
-	linux-man@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
- <20241105055338.61082-1-kuniyu@amazon.com>
- <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
- <CAMMLpeRMKEWkNC=irH5dWwJSMS2jp6OSeB6KJBh2=ZbLsigM7A@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAMMLpeRMKEWkNC=irH5dWwJSMS2jp6OSeB6KJBh2=ZbLsigM7A@mail.gmail.com>
+kernel test robot noticed the following build warnings:
 
-Bon dia Alex,  :)
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-On Sun, Nov 10, 2024 at 11:17:40PM GMT, Alex Henrie wrote:
-> On Tue, Nov 5, 2024 at 4:33=E2=80=AFAM Alejandro Colomar <alx@kernel.org>=
- wrote:
->=20
-> > On Mon, Nov 04, 2024 at 09:53:38PM GMT, Kuniyuki Iwashima wrote:
-> > > From: Alex Henrie <alexhenrie24@gmail.com>
-> > > Date: Mon,  4 Nov 2024 21:14:20 -0700
-> > > > struct ifa_cacheinfo contains the address's creation time, update t=
-ime,
-> > > > preferred lifetime, and valid lifetime. See
-> >
-> > We use two spaces after period (the correct amount).  :)
-> > (I'm thinking we probably want to document something about it in
-> >  man-pages(7).  Branden, do you want to send a patch about it?  I want
-> >  to include the references you showed to me, and you probably remember
-> >  better those links.)
-> >
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
-tree/include/uapi/linux/if_addr.h?h=3Dv6.11#n60
-> >
-> > Please use this format for links:
-> >
-> > Link: <http://example.com>
->=20
-> Since the second sentence will be eliminated in favor of a Link line,
-> the first sentence will no longer have any spaces after its period.
->=20
-> > Which include provides the structure?
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-modernize-ioremap-in-probe/20241110-073751
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241109233641.8313-1-rosenp%40gmail.com
+patch subject: [PATCH] net: modernize ioremap in probe
+config: arm-randconfig-r071-20241110 (https://download.01.org/0day-ci/archive/20241111/202411110835.tTxOya6U-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 14.2.0
 
-The manual page should document it.  Readers should know which header
-they need to include to use a structure, no?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202411110835.tTxOya6U-lkp@intel.com/
 
->=20
-> linux/if_addr.h, which is the file I linked to in the commit message,
-> and the same file that contains struct ifaddrmsg which is documented a
-> few paragraphs earlier in the same section of the man page.
->=20
-> > > > +struct ifa_cacheinfo {
-> > > > +    __u32 ifa_prefered; /* Preferred lifetime in seconds, -1 =3D f=
-orever */
-> > > > +    __u32 ifa_valid;    /* Valid lifetime in seconds, -1 =3D forev=
-er */
-> > >
-> > > -1 should be rather 0xFFFFFFFF (INFINITY_LIFE_TIME) as it's unsigned.
-> >
-> > I prefer UINT32_MAX over 0xF...F, which might be unclear how many Fs it
-> > has.
->=20
-> INFINITY_LIFE_TIME is not defined in any public header, so let's not
-> mention it. I agree that it's hard to see at a glance how many F's are
-> in 0xFFFFFFFF. I would suggest ~0u, which is short and sweet, but
-> UINT32_MAX is a little better because ~0u isn't 32 bits on all C
-> compilers that have ever existed.
->=20
-> > > Also, it would be nice to mention that ifa_prefered must be less than
-> > > or equal to ifa_valid (ifa_prefered <=3D ifa_valid) and 0 is invalid =
-for
-> > > ifa_valid.
-> > >
-> > >   0 <=3D ifa_prefered <=3D ifa_valid
-> > >   0 < ifa_valid <=3D 0xFFFFFFFF
->=20
-> I'll add a paragraph to explain those relationships.
->=20
-> > It might also be interesting to add a separate manual page for the type,
-> > and reference it here.  Otherwise, the page starts getting fatty.
->=20
-> Perhaps. In my opinion, there's not enough material here to be worthy
-> of its own page.
+smatch warnings:
+drivers/net/ethernet/freescale/xgmac_mdio.c:395 xgmac_mdio_probe() error: uninitialized symbol 'res'.
 
-If you see the pages in section 2type or 3type, they're pretty small.
-Types don't have that much to tell.  But they're nevertheless useful.
-When you just want to see which header you need for a given type, just
-run `make type`, and you'll immediately see it.  It also has a few lines
-of description.
+vim +/res +395 drivers/net/ethernet/freescale/xgmac_mdio.c
 
-But up to you.
+33897cc869eef8 Bill Pemberton    2012-12-03  371  static int xgmac_mdio_probe(struct platform_device *pdev)
+9f35a7342cff0b Timur Tabi        2012-08-20  372  {
+ac53c26433b51f Marcin Wojtas     2021-06-25  373  	struct fwnode_handle *fwnode;
+73ee5442978b2d Shaohui Xie       2015-03-16  374  	struct mdio_fsl_priv *priv;
+15e7064e879335 Calvin Johnson    2021-06-11  375  	struct resource *res;
+15e7064e879335 Calvin Johnson    2021-06-11  376  	struct mii_bus *bus;
+9f35a7342cff0b Timur Tabi        2012-08-20  377  	int ret;
+9f35a7342cff0b Timur Tabi        2012-08-20  378  
+229f4bb47512ec Calvin Johnson    2020-06-22  379  	/* In DPAA-1, MDIO is one of the many FMan sub-devices. The FMan
+229f4bb47512ec Calvin Johnson    2020-06-22  380  	 * defines a register space that spans a large area, covering all the
+229f4bb47512ec Calvin Johnson    2020-06-22  381  	 * subdevice areas. Therefore, MDIO cannot claim exclusive access to
+229f4bb47512ec Calvin Johnson    2020-06-22  382  	 * this register area.
+229f4bb47512ec Calvin Johnson    2020-06-22  383  	 */
+9f35a7342cff0b Timur Tabi        2012-08-20  384  
+1d14eb15dc2c39 Tobias Waldekranz 2022-01-26  385  	bus = devm_mdiobus_alloc_size(&pdev->dev, sizeof(struct mdio_fsl_priv));
+9f35a7342cff0b Timur Tabi        2012-08-20  386  	if (!bus)
+9f35a7342cff0b Timur Tabi        2012-08-20  387  		return -ENOMEM;
+9f35a7342cff0b Timur Tabi        2012-08-20  388  
+9f35a7342cff0b Timur Tabi        2012-08-20  389  	bus->name = "Freescale XGMAC MDIO Bus";
+c0fc8e6dcee40c Andrew Lunn       2023-01-09  390  	bus->read = xgmac_mdio_read_c22;
+c0fc8e6dcee40c Andrew Lunn       2023-01-09  391  	bus->write = xgmac_mdio_write_c22;
+c0fc8e6dcee40c Andrew Lunn       2023-01-09  392  	bus->read_c45 = xgmac_mdio_read_c45;
+c0fc8e6dcee40c Andrew Lunn       2023-01-09  393  	bus->write_c45 = xgmac_mdio_write_c45;
+9f35a7342cff0b Timur Tabi        2012-08-20  394  	bus->parent = &pdev->dev;
+229f4bb47512ec Calvin Johnson    2020-06-22 @395  	snprintf(bus->id, MII_BUS_ID_SIZE, "%pa", &res->start);
+                                                                                                   ^^^
+res isn't initialized.
 
-> Thanks for the feedback,
+9f35a7342cff0b Timur Tabi        2012-08-20  396  
+73ee5442978b2d Shaohui Xie       2015-03-16  397  	priv = bus->priv;
+865bbb2945a161 Rosen Penev       2024-11-09  398  	priv->mdio_base = devm_platform_ioremap_resource(pdev, 0);
+865bbb2945a161 Rosen Penev       2024-11-09  399  	if (IS_ERR(priv->mdio_base))
+865bbb2945a161 Rosen Penev       2024-11-09  400  		return PTR_ERR(priv->mdio_base);
+9f35a7342cff0b Timur Tabi        2012-08-20  401  
+15e7064e879335 Calvin Johnson    2021-06-11  402  	/* For both ACPI and DT cases, endianness of MDIO controller
+15e7064e879335 Calvin Johnson    2021-06-11  403  	 * needs to be specified using "little-endian" property.
+15e7064e879335 Calvin Johnson    2021-06-11  404  	 */
+229f4bb47512ec Calvin Johnson    2020-06-22  405  	priv->is_little_endian = device_property_read_bool(&pdev->dev,
+07bf2e11ad0586 Julia Lawall      2016-08-05  406  							   "little-endian");
+73ee5442978b2d Shaohui Xie       2015-03-16  407  
+6198c722019774 Tobias Waldekranz 2022-01-18  408  	priv->has_a009885 = device_property_read_bool(&pdev->dev,
+6198c722019774 Tobias Waldekranz 2022-01-18  409  						      "fsl,erratum-a009885");
+229f4bb47512ec Calvin Johnson    2020-06-22  410  	priv->has_a011043 = device_property_read_bool(&pdev->dev,
+1d3ca681b9d957 Madalin Bucur     2020-01-22  411  						      "fsl,erratum-a011043");
+1d3ca681b9d957 Madalin Bucur     2020-01-22  412  
+909bea73485fab Tobias Waldekranz 2022-01-26  413  	xgmac_mdio_set_suppress_preamble(bus);
+909bea73485fab Tobias Waldekranz 2022-01-26  414  
+dd8f467eda72cd Tobias Waldekranz 2022-01-26  415  	ret = xgmac_mdio_set_mdc_freq(bus);
+dd8f467eda72cd Tobias Waldekranz 2022-01-26  416  	if (ret)
+dd8f467eda72cd Tobias Waldekranz 2022-01-26  417  		return ret;
+dd8f467eda72cd Tobias Waldekranz 2022-01-26  418  
+105b0468d7b2e6 zhaoxiao          2022-08-18  419  	fwnode = dev_fwnode(&pdev->dev);
+ac53c26433b51f Marcin Wojtas     2021-06-25  420  	if (is_of_node(fwnode))
+ac53c26433b51f Marcin Wojtas     2021-06-25  421  		ret = of_mdiobus_register(bus, to_of_node(fwnode));
+ac53c26433b51f Marcin Wojtas     2021-06-25  422  	else if (is_acpi_node(fwnode))
+ac53c26433b51f Marcin Wojtas     2021-06-25  423  		ret = acpi_mdiobus_register(bus, fwnode);
+ac53c26433b51f Marcin Wojtas     2021-06-25  424  	else
+ac53c26433b51f Marcin Wojtas     2021-06-25  425  		ret = -EINVAL;
+9f35a7342cff0b Timur Tabi        2012-08-20  426  	if (ret) {
+9f35a7342cff0b Timur Tabi        2012-08-20  427  		dev_err(&pdev->dev, "cannot register MDIO bus\n");
+9f35a7342cff0b Timur Tabi        2012-08-20  428  		return ret;
+9f35a7342cff0b Timur Tabi        2012-08-20  429  	}
+9f35a7342cff0b Timur Tabi        2012-08-20  430  
+1d14eb15dc2c39 Tobias Waldekranz 2022-01-26  431  	platform_set_drvdata(pdev, bus);
+9f35a7342cff0b Timur Tabi        2012-08-20  432  
+9f35a7342cff0b Timur Tabi        2012-08-20  433  	return 0;
+9f35a7342cff0b Timur Tabi        2012-08-20  434  }
 
-Have a lovely day!
-Alex
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
->=20
-> -Alex
->=20
-
---=20
-<https://www.alejandro-colomar.es/>
-
---fg5ihjp3ifj7wsod
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmcxz68ACgkQnowa+77/
-2zKzjQ/+JFCWdop6trDsOsYD3fs91JWi7vPkiNOlGazo8k4y78alVjf5iWw+1T96
-v2vhPK/vHhnJhHVFnI/8LGmiMkkPrzrJ27xm6wl/pfvfFbeZ3odct0VqTbxJbNx8
-9YrIVFG6UUyxVfmm4jb4LvqH/Z5Gt3EvXaikSCF0qHMAp1racQB025X/zoS4m1u4
-8rvxOHfD/xLbG5AhPu3tZmY0oEpAat8F7eB7uqsAhUGN0mDMv3z6KwdUyr+yT5RM
-OCvLuTsMhM0r4uTDbjPo68WglQoFdg353ijcWUYMF4A1DeBW1lRvbhayQ2yOhIsa
-5mUJm4EKeOs4hCz+oZJIGHR0IOj5VHwbVO+Oiigs5HgnifNVdPsFrHOBpnNnj0yg
-XbzHj0R/CIghcvv29jVqQDswQlpVG0bgZU7b1yMfeBqe0HM7X4StUCaCjJZJw1lF
-dZqAE4F2Nt26/wMMN38hFW3p9NxdL8ak4AUNz1jTNGxYeSVxU0Eqrv8B+om4/M2U
-imcjW7YuVrKuqo59Cz59axrgb5upxvyEFQEnHNSxSFBE51zd3oqPNxIEViy4RX2i
-SLFhpVtrXB2QI9bD9q8EvpSHz3Yerj6g3j2ix1UI8GovV7K4RdvbxlbPGKnjAwcf
-DvEzetmhZO51Pra+0eCnyU8Y3OqXhHf9RLdaMTNFVzTbJcrjyhI=
-=Uhqn
------END PGP SIGNATURE-----
-
---fg5ihjp3ifj7wsod--
 
