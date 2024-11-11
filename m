@@ -1,128 +1,131 @@
-Return-Path: <netdev+bounces-143755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 100D99C3FD1
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:50:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C93D9C400A
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:59:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5817285659
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:50:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E6E280C77
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB4519C552;
-	Mon, 11 Nov 2024 13:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="CHXPUy6E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D1D19E98C;
+	Mon, 11 Nov 2024 13:59:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD8F153BF6;
-	Mon, 11 Nov 2024 13:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6BD19E826;
+	Mon, 11 Nov 2024 13:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731333016; cv=none; b=aBP7k2QgsZmjAV9uWCoBHuzUa+s4OMaT/Gf1LXqSWSPxZWJ7JrcKz8Uopnjz25Y23SBMbrElHPTBmPZZnTPq5FscHPNffijV0FxymHBzbCdOm8vpgaPzGNJ3NZ1sAubPNRywP+J6KOZHYGxLU+dvS150r1PPCEBeyffKqTwfT0o=
+	t=1731333587; cv=none; b=UogAxzXCOc0ob1Drq42m8j6t6PWPILG3HikzexGUyeHiggx85ym7l0vm9SjV7TyuRIpbY/JlyrYLN5xJlp5gbSKB0QIOouzEb4Rh3Oi+Pe1alAqXama/lLrsKbFRILSMwRQOD8AHh7JrFq317HGXAEG/iL8tR/rdVi8JfGEiLiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731333016; c=relaxed/simple;
-	bh=sJVpMYEIzB9SFeNfXS1EZPH02Rwcl8iCgMdd51bIvlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=PTVjUD+t1zK6NofL489e+rEm8qEqFms39gBPTgQ/53hgY3v5G9GQtVSoOAKfwWI+xEhF9DTGCVHlwTT0bgC5fHDGUKbVpIUmd/g5HpxJeX9Y8kb2rbydbQZP6tBbHoRIM4GrDkrzEqYozjxjQShFmXAeuTlcdLK93243uuDC1bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=CHXPUy6E; arc=none smtp.client-ip=37.18.73.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 4C40E100007;
-	Mon, 11 Nov 2024 16:49:57 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4C40E100007
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1731332997;
-	bh=g0pytZrpgBh3guU1TbfOEDaDMwQNAGs2S0K7Jt+304I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=CHXPUy6Ekmyj0Zq/tZxfwosjmYBVkjpe5vjmTfbW1r/4bZQA0GVC/Yasss/h79rCG
-	 QWfexo/NDWPrrlU7aMdOoE5lziwSpFZgQMP7gunVJFqgoYF8O+rLdxFgubsR4xVU83
-	 LSB4N6fTRISFcx9FlEyDYMs6AMTaAg18xn77JI1FHAaImJf198T+Bql3jMeEaA7xcU
-	 x0hEM9tLo3KqDx7LokNx8MkaUEGcEBwpYkD7IqDWiJdTw+F0GGVVSNKuW9ctqP8NFK
-	 V4ZQYn8C6elL+rj+7/nJocOBV05gUgJk8bMaaZi72WQ8vBAUkg13U8Mh3aPHWzpV3a
-	 wU7eT+l5G/PXQ==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Mon, 11 Nov 2024 16:49:57 +0300 (MSK)
-Message-ID: <5d9cc8ba-ba60-cf37-5ffd-1e6bacf773c3@salutedevices.com>
-Date: Mon, 11 Nov 2024 16:49:51 +0300
+	s=arc-20240116; t=1731333587; c=relaxed/simple;
+	bh=ls6xR7OPifllcfidwmSCJFTPyb+sk+NFmXo7wqIxFt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJ4tNnSdgOSMJcknfa5XirHjWj4BAq90DS8mA3+GIABGD41I5oJ6Y9VUTSVa7W+icbO5V9brWAEJuMOx4LwbRQVSKKopyV1O8WxfgLAbQCWj/2khg+5kIowGKZK3Vq4UJlVOP5uAeKBNCn3BImQvN7qNTmBWOOnFeIz9GUgl0+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 58C102010CF;
+	Mon, 11 Nov 2024 14:50:35 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 52B662010C6;
+	Mon, 11 Nov 2024 14:50:35 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 10FFE20326;
+	Mon, 11 Nov 2024 14:50:35 +0100 (CET)
+Date: Mon, 11 Nov 2024 14:50:35 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>
+Subject: Re: [PATCH v4 05/16] net: dwmac-dwc-qos-eth: Use helper rgmii_clock
+Message-ID: <ZzILq99H/Zj4I/6Q@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-5-03618f10e3e2@oss.nxp.com>
+ <20241105134206.GE4507@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH net 3/4] virtio/vsock: Improve MSG_ZEROCOPY error handling
-Content-Language: en-US
-To: Michal Luczaj <mhal@rbox.co>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=c3=a9rez?=
-	<eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jia He
-	<justin.he@arm.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King
-	<acking@vmware.com>, George Zhang <georgezhang@vmware.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<netdev@vger.kernel.org>
-References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
- <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
- p-i-exch-a-m1.sberdevices.ru (172.24.196.116)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 189084 [Nov 11 2024]
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 41 0.3.41 623e98d5198769c015c72f45fabbb9f77bdb702b, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/11/11 06:58:00 #26843820
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105134206.GE4507@kernel.org>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-
-
-On 06.11.2024 20:51, Michal Luczaj wrote:
-> Add a missing kfree_skb() to prevent memory leaks.
+On Tue, Nov 05, 2024 at 01:42:06PM +0000, Simon Horman wrote:
+> On Mon, Oct 28, 2024 at 09:24:47PM +0100, Jan Petrous via B4 Relay wrote:
+> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> > 
+> > Utilize a new helper function rgmii_clock().
+> > 
+> > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c | 11 +++--------
+> >  1 file changed, 3 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> > index ec924c6c76c6..5080891c33e0 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> > @@ -181,24 +181,19 @@ static void dwc_qos_remove(struct platform_device *pdev)
+> >  static void tegra_eqos_fix_speed(void *priv, unsigned int speed, unsigned int mode)
+> >  {
+> >  	struct tegra_eqos *eqos = priv;
+> > -	unsigned long rate = 125000000;
+> > +	long rate = 125000000;
+> >  	bool needs_calibration = false;
+> >  	u32 value;
+> >  	int err;
 > 
-> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 1 +
->  1 file changed, 1 insertion(+)
-
-Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-
+> Hi Jan,
 > 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index cd075f608d4f6f48f894543e5e9c966d3e5f22df..e2e6a30b759bdc6371bb0d63ee2e77c0ba148fd2 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -400,6 +400,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  			if (virtio_transport_init_zcopy_skb(vsk, skb,
->  							    info->msg,
->  							    can_zcopy)) {
-> +				kfree_skb(skb);
->  				ret = -ENOMEM;
->  				break;
->  			}
+> As it seems that there will be another revision anyway,
+> please update the above so that the local variable declarations
+> are in reverse xmas tree order - longest line to shortest.
 > 
+> Likewise in s32_dwmac_probe() in the patch
+> "net: stmmac: dwmac-s32: add basic NXP S32G/S32R glue driver".
+> 
+
+Hi Simon,
+thanks for review, I will add those formating fixes in v5.
+
+BR.
+/Jan
 
