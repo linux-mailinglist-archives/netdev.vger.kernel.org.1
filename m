@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-143803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A1BE9C4430
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:53:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A01359C4427
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C8FFB26B23
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:51:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63E90280C63
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75DB71A76D5;
-	Mon, 11 Nov 2024 17:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0DE1AA787;
+	Mon, 11 Nov 2024 17:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kApQqBjb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoch/7no"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD621BC9EC;
-	Mon, 11 Nov 2024 17:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149BA1AA782;
+	Mon, 11 Nov 2024 17:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731347333; cv=none; b=DgrtunnCkxHOedOGiyYRp9p+j9pZsCGfCsTcdT5IlbttWp2cFZjqMhTI7nhSzzxZ+2q1CSAgZN7ftvItEoiR4pFUQYrONQXDEs7BWMIr5MJ98UhGcDmlbU0akRwTKIO3//N3AjvLbI0G86n9ElvWUoRv3LlqfesHmbgEfatgRrE=
+	t=1731347354; cv=none; b=dpa8kWSW1bqSQ4odstMz3yk2BuLjrOi/GINRqIjPtU/y+PKr+QUdsaPXK5jfVUTzp+9bZOus5jTEt8Au/k6/lgXAt/BXnWIr2rOdfp5zrztIKUBDkyFK78NUTI1AO441Fd4NSR5HOzF6C3UPLqHyCsx3oiEgu7DO/rHb8XWx/4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731347333; c=relaxed/simple;
-	bh=/8HoIU4UAnAKhMvR/WUlr+X2oei2/XjEowz8UAFduJY=;
+	s=arc-20240116; t=1731347354; c=relaxed/simple;
+	bh=egN3UM96Z01u7bHOU/6w4yX80ZNmDenDotIwXBCQMfU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DDNBw5hk5Fazdj5LhkJHy5IOVKAK2cNDGk8AtHD8++VakY8Tl9lJWpsO0y4tlCvgAGL866JrJV/GAV7EWCg4MVifwZARevmTPPezF8hQicbaEUMeLvxKp4+mSCC4y0TnUaNBGWeCZpQfGl4VdVtP/Iq+FOB7lP+dzR432GTgfH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kApQqBjb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8352C4CED4;
-	Mon, 11 Nov 2024 17:48:50 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=hqSNamwnmrlsYAVv9RRD/dHfSeFtPHuYAbOWbqAkqGctA3VvdwW6YQZVx5l+R0mRurqK3MNOtyDczL96G6qejXsH/JT3GlvxenGRMcfEkCQyNm2FlPAtqKZHx4glxdmKwavBTLQdaxyhTdTakIk5o+r8FgaQjSIjxDRiblhibqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoch/7no; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87CD7C4CECF;
+	Mon, 11 Nov 2024 17:49:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731347332;
-	bh=/8HoIU4UAnAKhMvR/WUlr+X2oei2/XjEowz8UAFduJY=;
+	s=k20201202; t=1731347353;
+	bh=egN3UM96Z01u7bHOU/6w4yX80ZNmDenDotIwXBCQMfU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kApQqBjbziZW1nioWWoTY8oBcIoybMyiUfREPWnGKUA/DrtwnUNOQbmrOIT1r39mW
-	 2B720sUpy49FUzBmeqMNtoV2/k1KLfL9p1SVCTPL5JGMNnlcPT74zqIhiBXJk9vr74
-	 NiL2Cme5WGokgSSXUbDOXZZ9fUR52YpzouPThrA05ufrVxfSCwiCKM5+0jjHwxupHY
-	 3wSY4F7TrHTu02+nTBpSX5I7k5IZAFRgzffTUoXiWCvaimrvLD4dCWeCPqr3RaUZjB
-	 qcWzT+uE85mDlK1IxuL3k4qskKZ+fQgTGj4oS1AAud2kaywDnGFmEnlnLmrRVXBo8E
-	 f8EwD8nC52u5w==
-Date: Mon, 11 Nov 2024 17:48:48 +0000
+	b=eoch/7noDxRxMVeVDWba7XIE0qnSfUJPgjcW74W1/prjEOkow7JiyqueDFSRnlz7u
+	 Jp7iakfep2IcEN7/EPHa1K5qdIv8IDvWHrU7q0Q0WsRIYC1aszaF8isPKMv16NkfJN
+	 4VaO9PHbPbRXPMwDN+wxxdTZTOFgDx1nT7tGGqZ7EIxoOiTu23da4f7OQ3RHVlU+LI
+	 +Oy0uO49PVlFQzacSjppSoUYPgQiKesdbjHRqfb8+FQpoqkF55DiH7YmxUisJh++++
+	 mP5s+HC3uPN+rpxoc8Llgf7h3peyr8Xa5DK+dJTjLV56E+1NX1qFjQv2xC4W5ZNNL2
+	 MdQC6zMx2Mp/g==
+Date: Mon, 11 Nov 2024 17:49:09 +0000
 From: Simon Horman <horms@kernel.org>
 To: Nelson Escobar <neescoba@cisco.com>
 Cc: John Daley <johndale@cisco.com>, Eric Dumazet <edumazet@google.com>,
@@ -51,11 +51,11 @@ Cc: John Daley <johndale@cisco.com>, Eric Dumazet <edumazet@google.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/7] enic: Adjust used MSI-X
- wq/rq/cq/interrupt resources in a more robust way
-Message-ID: <20241111174848.GI4507@kernel.org>
+Subject: Re: [PATCH net-next v3 6/7] enic: Move enic resource adjustments to
+ separate function
+Message-ID: <20241111174909.GJ4507@kernel.org>
 References: <20241108-remove_vic_resource_limits-v3-0-3ba8123bcffc@cisco.com>
- <20241108-remove_vic_resource_limits-v3-5-3ba8123bcffc@cisco.com>
+ <20241108-remove_vic_resource_limits-v3-6-3ba8123bcffc@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,13 +64,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108-remove_vic_resource_limits-v3-5-3ba8123bcffc@cisco.com>
+In-Reply-To: <20241108-remove_vic_resource_limits-v3-6-3ba8123bcffc@cisco.com>
 
-On Fri, Nov 08, 2024 at 09:47:51PM +0000, Nelson Escobar wrote:
-> Instead of failing to use MSI-X if resources aren't configured exactly
-> right, use the resources we do have.  Since we could start using large
-> numbers of rq resources, we do limit the rq count to what
-> netif_get_num_default_rss_queues() recommends.
+On Fri, Nov 08, 2024 at 09:47:52PM +0000, Nelson Escobar wrote:
+> Move the enic resource adjustments out of enic_set_intr_mode() and into
+> its own function, enic_adjust_resources().
 > 
 > Co-developed-by: John Daley <johndale@cisco.com>
 > Signed-off-by: John Daley <johndale@cisco.com>
