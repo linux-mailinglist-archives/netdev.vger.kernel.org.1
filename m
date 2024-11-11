@@ -1,109 +1,110 @@
-Return-Path: <netdev+bounces-143620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814529C35ED
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 02:30:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DCBB9C361D
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 02:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2A241C215FB
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 01:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 241EF1F231AD
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 01:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BABA1EA65;
-	Mon, 11 Nov 2024 01:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C6D5588F;
+	Mon, 11 Nov 2024 01:31:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UMirI1iU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wd3KrFZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8341BB67F
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093E01F94A
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731288644; cv=none; b=jhqc8wP2A/FGUYA/rKqpwccwWNjp9QG8FpQH61ff6xz0av4otoOuAbG4V/DCo0jJoZkGot0e2iToWlZz0NrExcrSqdsp7hH9g1kvPOxVphtUEOgYTZcnUEOU+Pppb85EziNCsx1SxaVxzx1KS772F77oRR8NfloQWpZgNKZRdSU=
+	t=1731288709; cv=none; b=I15CqzyeXIFGjqpllOJAdpBHqaReTSmPmyTvRSOuVxBRSBhTkCyfj7Fzp6dmBlUCYu2pip0nMRHYRnndrxm2Y/wfYDBefwho4m7K9NycCi/aFcznWE5kyqExhVKXnjNXqx7+88IhVEK3EFyuwPbV2tjoxHRw9iB1UjBUbese6w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731288644; c=relaxed/simple;
-	bh=pf9PTbGNPjVHsdQ4Eg1yKfu4ucndzhUiZGAnz9ecS9Y=;
+	s=arc-20240116; t=1731288709; c=relaxed/simple;
+	bh=8RjtmP7zVZrflkjuPVjKxGfngY1SABY3DdXeQA3BEpE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PZLV7jizd9dQZoQawcavJnzrLlsRLQvGEH5pna735xD+h+y8ijuHebqF4x+yoG7kjh7oS5GBSHYQGr6q0ejRHx85yFwY6SyzW+NlksK22SdpciQcwO7lGCQyoncVySG4knPmjI5euzxMQU2ylHidMW3zTFBiWL7MkwDdDdSIUVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UMirI1iU; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=b+putoK8iF081VHHcDsrFkbrG9JnrNl7QtVxiTbackRDRXpFwu44Uj0Ro/74PPCjel550RrM4QJOjcEUgk+mn1Krl3j/eKO0lk8DtWy7KKtVG1q/GCdNw5zvuA0eWfS86Jbp0wGQ0jQQC+7ta3QhFunk2jFG8L4hS/WUNNSoIUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wd3KrFZA; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731288642;
+	s=mimecast20190719; t=1731288706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pf9PTbGNPjVHsdQ4Eg1yKfu4ucndzhUiZGAnz9ecS9Y=;
-	b=UMirI1iUq0bEwjOXCS1iRYYaGkm/TlX73RjZHmFhZ/LXEL771N++0tzt0e3SDEwRlcqyNR
-	pJGeVkAPwDWxdzsOTABgFtAEfMkgRl2pqGX/e4ch9MFXYYG4UfD+VjndR643pdKKgmkViO
-	h0dT1IcVGf8jE9tKmzLGVC54GPZWm8E=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8RjtmP7zVZrflkjuPVjKxGfngY1SABY3DdXeQA3BEpE=;
+	b=Wd3KrFZA17kblj0bGv2Wrp1H7WPrw5nHjzOof1I8BnAyeIk4XOLORbE/yTALUh/o7ZscKP
+	D1ShCd4BoogWp1qsQzon9QrllsSaW/MCSJwjX2c01vqy+El6lNDTJ6kv/PRqMZUeDDfX6K
+	2lO0PM3zPJxgAkojSFviBzJTixDkicA=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-436-kOgGREgIPEOzr016Gg8ZrQ-1; Sun, 10 Nov 2024 20:30:41 -0500
-X-MC-Unique: kOgGREgIPEOzr016Gg8ZrQ-1
-X-Mimecast-MFC-AGG-ID: kOgGREgIPEOzr016Gg8ZrQ
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-20e56815e1cso45939005ad.3
-        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 17:30:41 -0800 (PST)
+ us-mta-615-sC4csUdLPA-5okSV0dTB3Q-1; Sun, 10 Nov 2024 20:31:45 -0500
+X-MC-Unique: sC4csUdLPA-5okSV0dTB3Q-1
+X-Mimecast-MFC-AGG-ID: sC4csUdLPA-5okSV0dTB3Q
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e9b5535940so1794080a91.1
+        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 17:31:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731288640; x=1731893440;
+        d=1e100.net; s=20230601; t=1731288704; x=1731893504;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pf9PTbGNPjVHsdQ4Eg1yKfu4ucndzhUiZGAnz9ecS9Y=;
-        b=OXgCOiNfKJYWEanujz27UuWTc3GsE5xbhr5mng+VzD+V1YJ2mc2FQrtBxR4TBBF3Qo
-         tqinrwQ/4TB9reY+9v0TVYFMVW49CIuAlcaqNJzGLNyiFnx9h/GZxDkH+UMOe9RMaf78
-         jcPFQdqiyCLP//XQn4CX6GZ7/5Sq8BBUTz8XYBshkq+NGHSE9pXQajSm9v1s4aOGj/55
-         dqzgFT5+aJLLEUCe7kTmDFlCfwGSkgg0oerlkaMSk/Z6NRTqKWe9ENIytKbfR3X0kOkv
-         OYzOOSacgSpCPdSW2OM7MxfJ1gA6uyQ079Sg9hZudJ8iuoji/FtUvOgF1hJJnrX7n+g9
-         9DXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVyFR/MFlQfFO/IVzZfK4+CkKpMfYgARggZXpH0Lm6U+RGJAgugxFY9CpBOKUwk97EXchuBCoA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWx+sFkabjnJc9n3+DSHqv9D6Jxp34uluWMKTcM7adwu9lRmmi
-	fX+v/MkFn8v1DNIP9rD5xXj27aOkr2Tzr8aUr2vpS9BL8fOLMl5LTpjHyGsx32ercSj6FV1hybc
-	HFfT0/mzp+2vLsmWNPJ6t/vATMNFRu+YXmLuukcaathZgk8A3aqSSKUp4mNY46u3s7GahG/S/Jo
-	1aiQi1Nl/sCLp1k+Vjim4p/A1aXWlv
-X-Received: by 2002:a17:902:cec7:b0:20b:b7b2:b6c5 with SMTP id d9443c01a7336-211835cd1a9mr142109745ad.54.1731288640281;
-        Sun, 10 Nov 2024 17:30:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFZRBnvWh5GWrgUU3+bWrELT9eUGDwENrtwgxF8fs2ll6MrUvLLBsrBK0BTbf9dHmzIUgOcdwoSUpYFkpBBW3M=
-X-Received: by 2002:a17:902:cec7:b0:20b:b7b2:b6c5 with SMTP id
- d9443c01a7336-211835cd1a9mr142109475ad.54.1731288639882; Sun, 10 Nov 2024
- 17:30:39 -0800 (PST)
+        bh=8RjtmP7zVZrflkjuPVjKxGfngY1SABY3DdXeQA3BEpE=;
+        b=KB2cnwRKUNxnrh8zpwmRxv34VFdjw5QokhiQ601sx34nHfNAGcUCltDdjntiY+3grc
+         +v6oUib5pEcPmD82PVliFbFthEywUj8t5z7NJPB52YZICEHomg4UaXeNUuIWO0lWp2uV
+         1JF/ig5tg8Z0CFGdNxdGhZREI9Ximwbb8eQKtdGFeaO3lKDtglxh81WCH2M1v1o/GyFU
+         W+ARfKs8EvvjLJnPQR8XIURWEHstZhKH09/2OTqkz4emVr9cn8/uN4RDLjMBJ2ld+m0l
+         u4qbfTaKMjhud9y0pPYEQh4ndNVgwOsOolsUUCNb9rVmUoe08XRvcG3GO26EgimNGpqa
+         TCQg==
+X-Gm-Message-State: AOJu0YznLVvQ8iK0Nj90KUkob9xG/YPJGJlZnqpduikaNiGBpE7mzG0q
+	esnVSp2e13xtkuSVqSF5dpzVs/Gk5K4pydWsJ9jnmOGwmJYVyKyc0L63n+IVTxweSH2+t1cS4tE
+	re8ZrX0TWbYpnYjkyiH0J96JdY1VafSoDr6GJSW+MQ12bKTEcrgf3sRq5ZHf77XsfPa7sOK+D5p
+	fewZHT36c0qLon1TMshuMYFTPPsheO
+X-Received: by 2002:a17:90b:4b88:b0:2e0:f035:8027 with SMTP id 98e67ed59e1d1-2e9b1ec3ad9mr15212837a91.2.1731288704296;
+        Sun, 10 Nov 2024 17:31:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHJ45A0a7VJ+rtoKCuZ3Xjxf3vbO+kpA+QpYKgLnefQ2pNNeyLQuJUHLmrx4bENZUF5kjBfviP3ZWmPxNU8h7c=
+X-Received: by 2002:a17:90b:4b88:b0:2e0:f035:8027 with SMTP id
+ 98e67ed59e1d1-2e9b1ec3ad9mr15212803a91.2.1731288703869; Sun, 10 Nov 2024
+ 17:31:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241104085706.13872-1-lulie@linux.alibaba.com> <1730883538.0293355-3-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1730883538.0293355-3-xuanzhuo@linux.alibaba.com>
+References: <20241107085504.63131-1-xuanzhuo@linux.alibaba.com> <20241107085504.63131-3-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20241107085504.63131-3-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 11 Nov 2024 09:30:28 +0800
-Message-ID: <CACGkMEundAnfw9mHY64xTGtrwB6TcZkfmVQc3K2L7vBy6SWSnA@mail.gmail.com>
-Subject: Re: [PATCH net 0/4] virtio_net: Make RSS interact properly with queue number
+Date: Mon, 11 Nov 2024 09:31:32 +0800
+Message-ID: <CACGkMEtj=D7OPL8hAxJumhVL8AwLS51tm42t0qCxzGhMa+psMg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/13] virtio_ring: split: record extras for
+ indirect buffers
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Philo Lu <lulie@linux.alibaba.com>, mst@redhat.com, eperezma@redhat.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andrew@daynix.com, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 6, 2024 at 5:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
+On Thu, Nov 7, 2024 at 4:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
 m> wrote:
 >
-> Hi Jason, could you review this firstly?
+> The subsequent commit needs to know whether every indirect buffer is
+> premapped or not. So we need to introduce an extra struct for every
+> indirect buffer to record this info.
 >
-> Thanks.
->
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-It looks like the series has been merged.
-
-Anyhow it looks good to me.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
 
