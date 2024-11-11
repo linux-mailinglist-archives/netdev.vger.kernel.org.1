@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-143804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01359C4427
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:51:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133169C4428
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:52:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63E90280C63
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:51:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6E6B1F26602
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0DE1AA787;
-	Mon, 11 Nov 2024 17:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFF71AAE19;
+	Mon, 11 Nov 2024 17:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoch/7no"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLtk0Ral"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149BA1AA782;
-	Mon, 11 Nov 2024 17:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1332D1AA7BF;
+	Mon, 11 Nov 2024 17:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731347354; cv=none; b=dpa8kWSW1bqSQ4odstMz3yk2BuLjrOi/GINRqIjPtU/y+PKr+QUdsaPXK5jfVUTzp+9bZOus5jTEt8Au/k6/lgXAt/BXnWIr2rOdfp5zrztIKUBDkyFK78NUTI1AO441Fd4NSR5HOzF6C3UPLqHyCsx3oiEgu7DO/rHb8XWx/4w=
+	t=1731347372; cv=none; b=oPD/OFtvmtjR2Jgq0FBS6dM86uMza/P9IJlCxbW7cnqzd82yuCLzwnerH1ihl4SXtJfN/4sFStprwgdN2oirzXyQpKB690dBuhfswnpFqqESPiD1+Swefc1UXqGYIajp6mQ1cxx4CL216b9V35Odow+WyqnRoR0r040sgoG2bWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731347354; c=relaxed/simple;
-	bh=egN3UM96Z01u7bHOU/6w4yX80ZNmDenDotIwXBCQMfU=;
+	s=arc-20240116; t=1731347372; c=relaxed/simple;
+	bh=L3GZntAmPUUqW5omPxjEYocwCLXEPfEJFR8CPMxG9Lo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hqSNamwnmrlsYAVv9RRD/dHfSeFtPHuYAbOWbqAkqGctA3VvdwW6YQZVx5l+R0mRurqK3MNOtyDczL96G6qejXsH/JT3GlvxenGRMcfEkCQyNm2FlPAtqKZHx4glxdmKwavBTLQdaxyhTdTakIk5o+r8FgaQjSIjxDRiblhibqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eoch/7no; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87CD7C4CECF;
-	Mon, 11 Nov 2024 17:49:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ImIA9jktobgLhHuump9TLCsHH7oF6jDOV7UqfIwVQnkU/0Cnyt4N1LSk3FOAz/2J9aa9IhHPnW1P7qBpuW6HtKV2euUl5npBvz3adzVqFfsPThhECvwptE/ym2a0ELUk+lN1jBbzIzUZWZ6tTSik11PxYiQxDHIJaHwCxoVdHZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLtk0Ral; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC369C4CED4;
+	Mon, 11 Nov 2024 17:49:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731347353;
-	bh=egN3UM96Z01u7bHOU/6w4yX80ZNmDenDotIwXBCQMfU=;
+	s=k20201202; t=1731347371;
+	bh=L3GZntAmPUUqW5omPxjEYocwCLXEPfEJFR8CPMxG9Lo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eoch/7noDxRxMVeVDWba7XIE0qnSfUJPgjcW74W1/prjEOkow7JiyqueDFSRnlz7u
-	 Jp7iakfep2IcEN7/EPHa1K5qdIv8IDvWHrU7q0Q0WsRIYC1aszaF8isPKMv16NkfJN
-	 4VaO9PHbPbRXPMwDN+wxxdTZTOFgDx1nT7tGGqZ7EIxoOiTu23da4f7OQ3RHVlU+LI
-	 +Oy0uO49PVlFQzacSjppSoUYPgQiKesdbjHRqfb8+FQpoqkF55DiH7YmxUisJh++++
-	 mP5s+HC3uPN+rpxoc8Llgf7h3peyr8Xa5DK+dJTjLV56E+1NX1qFjQv2xC4W5ZNNL2
-	 MdQC6zMx2Mp/g==
-Date: Mon, 11 Nov 2024 17:49:09 +0000
+	b=bLtk0Ral7YovejtQjT1ZaOLi3t2OdfteZHFsXcyw/f7JHDFZcHRmf5Ht78b83h72u
+	 kgi/asrgJz0qo97qJAnMRJysqLCUMzjrQE719esda9tgfyswfxhGNFICCU5wBprtNE
+	 374jYnmcdO1oM03We24f92wlgDcuPuO0ZVqCushAQ1NrXQMjSnx3mHELqjwujEBg37
+	 Qf1EwwzORVhXid04xCHY7X/Wcrdn9P17aV4xw1gAlHsMga2OiWWA8rlRzfZwpvUMkz
+	 16OtB3TlwAtd3QW7/NwVqEBAmMEIox+hzDxP+xtNmoh1F8fDx9Cp5ia6DOPYl+8Y/L
+	 oYQI/r7u37QpQ==
+Date: Mon, 11 Nov 2024 17:49:27 +0000
 From: Simon Horman <horms@kernel.org>
 To: Nelson Escobar <neescoba@cisco.com>
 Cc: John Daley <johndale@cisco.com>, Eric Dumazet <edumazet@google.com>,
@@ -51,11 +51,11 @@ Cc: John Daley <johndale@cisco.com>, Eric Dumazet <edumazet@google.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 6/7] enic: Move enic resource adjustments to
- separate function
-Message-ID: <20241111174909.GJ4507@kernel.org>
+Subject: Re: [PATCH net-next v3 7/7] enic: Move kdump check into
+ enic_adjust_resources()
+Message-ID: <20241111174927.GK4507@kernel.org>
 References: <20241108-remove_vic_resource_limits-v3-0-3ba8123bcffc@cisco.com>
- <20241108-remove_vic_resource_limits-v3-6-3ba8123bcffc@cisco.com>
+ <20241108-remove_vic_resource_limits-v3-7-3ba8123bcffc@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,11 +64,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108-remove_vic_resource_limits-v3-6-3ba8123bcffc@cisco.com>
+In-Reply-To: <20241108-remove_vic_resource_limits-v3-7-3ba8123bcffc@cisco.com>
 
-On Fri, Nov 08, 2024 at 09:47:52PM +0000, Nelson Escobar wrote:
-> Move the enic resource adjustments out of enic_set_intr_mode() and into
-> its own function, enic_adjust_resources().
+On Fri, Nov 08, 2024 at 09:47:53PM +0000, Nelson Escobar wrote:
+> Move the kdump check into enic_adjust_resources() so that everything
+> that modifies resources is in the same function.
 > 
 > Co-developed-by: John Daley <johndale@cisco.com>
 > Signed-off-by: John Daley <johndale@cisco.com>
