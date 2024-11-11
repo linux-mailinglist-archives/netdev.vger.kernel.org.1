@@ -1,162 +1,109 @@
-Return-Path: <netdev+bounces-143738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E16C9C3E8E
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:39:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E1F9C3EC1
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:53:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15C671F21D6B
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:39:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E822827DB
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5BF8199938;
-	Mon, 11 Nov 2024 12:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555EF15853B;
+	Mon, 11 Nov 2024 12:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dtv0b8+a";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t5hwhBcy"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A417158DC8
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 12:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF898F77;
+	Mon, 11 Nov 2024 12:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731328767; cv=none; b=dDAgOYxFGahCqIQsIV8Qiob0lQ2jxard4kZPCjX921roZTZIPN878JxuWHZitNrJOqHa7JloPZhBYPMnPPPMFhFATYnQE9ZAZibC0XtqKEd7SEMj9N0tWgMOaW7ySA//MeBvLaUbIkw3kfBIns1NG6NfHsv76/Fl6Vy8RQtrTkc=
+	t=1731329630; cv=none; b=kS9QTGJht4k9EtEtBI+VOxVxEAL/0Qe3MXJr1OnHe9GbuMmfAwa/vmO/QfpBCYlW3M/cYjU4MsDfDM2CkaPSdv+PLRX5MFs9ho1oc6aYlg2ZdDgl+gqF0xDZ90VsjtyopljkmaicgaGlgVAVfOPf/K6kcPT01/yxCfbHjvn5dLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731328767; c=relaxed/simple;
-	bh=1xGJiMx1/GNYO2oXy0LFFF5afr80INkTL/A7DZQL0II=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=egAFYsry5BjeACIVZhxUQ7BjWrN6TrtEf5IkuZCJnETlr1xkysLH1chjPZfKn22YK6nHX/LilcxQRV9dvU3OQYwlPwHnzjPlReEVFJzRbkXmV+HXjRLJ71y01tEuRd60zXgWIZJq/oa15/cZxJ30VdsPoQbK2IE6wkvZVoWOed8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Xn8Fh2dVTzlXGn;
-	Mon, 11 Nov 2024 20:37:28 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 73E6C140257;
-	Mon, 11 Nov 2024 20:39:21 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 11 Nov 2024 20:39:20 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <herbert@gondor.apana.org.au>
-CC: <netdev@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: [PATCH net] net: Fix icmp host relookup triggering ip_rt_bug
-Date: Mon, 11 Nov 2024 20:39:15 +0800
-Message-ID: <20241111123915.3879488-1-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1731329630; c=relaxed/simple;
+	bh=FmF3bZ1r/WsmIZmkn/Wp3I4nzVPM0WOoQQ+6z63YQIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T+6Gnn9CfC/NgUW5REQPmqkd+ATro53/a6/NplQ55KbnFtvkLCfNf2+jkNzmNFWxpnXfROsiEq6tFqPzFgtuMSsixABWhxGvns9S26w4RvJOcEZ8PR4YSP80Mj6pQUfti2rqwU98HLPdsk1isK85HR9XtwSMQujXu0Feg35G4+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dtv0b8+a; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t5hwhBcy; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 11 Nov 2024 13:53:45 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1731329626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w7z8yhXRBnlRYKfyfn4Xe3Y3OGC88TCWkSEzDPuPxNQ=;
+	b=dtv0b8+aCLwhVivvFUjFNqplSCPxGWFTtHuKMDvxFHL34tKWExWlHHNyW10RM/mrjJMI8f
+	089D2TK1AQ7sdF73yWg0qz0vACWNAENLY/QEQyRYuDTnwhNjzdyGccp1zYHtp0epqFcTky
+	U/Y0Q5SMvLKYQ4zAYI1SO3PKEYD2dZ4Vc3RWNarc7vJ8+OSFhOlQhTr8atuPRInTizsNdT
+	hUabpL8xT/N43Yya3ER6WSfvOoBQqJjQg5zaBA+LWBysOPwA1mdxCKsKtQpTgAN7lEIVsg
+	V2WPFmskshbU4nieE/3UMDrNexHbqdABCxsutrdzg3IdHiAImLC4UaFmC2vMTw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1731329626;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w7z8yhXRBnlRYKfyfn4Xe3Y3OGC88TCWkSEzDPuPxNQ=;
+	b=t5hwhBcysw6sr0uejWOPe0jN8ijZp6hxiaMi9xUsvaQ53fESoFBjWOSwjJQXUj2QkJp+lK
+	w4qAM5LVRIo4O/Dg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, tglx@linutronix.de,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Simon Horman <horms@kernel.org>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
+Subject: Re: [PATCH v2 1/4] Revert "igb: Disable threaded IRQ for
+ igb_msix_other"
+Message-ID: <20241111125345.T10WlDUG@linutronix.de>
+References: <20241106111427.7272-1-wander@redhat.com>
+ <1b0ecd28-8a59-4f06-b03e-45821143454d@intel.com>
+ <20241108122829.Dsax0PwL@linutronix.de>
+ <9f3fe7f3-9309-441c-a2c8-4ee8ad51550d@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9f3fe7f3-9309-441c-a2c8-4ee8ad51550d@intel.com>
 
-arp link failure may trigger ip_rt_bug while xfrm enabled, call trace is:
+On 2024-11-08 15:00:48 [-0800], Jacob Keller wrote:
+> 
+> 
+> On 11/8/2024 4:28 AM, Sebastian Andrzej Siewior wrote:
+> > On 2024-11-08 13:20:28 [+0100], Przemek Kitszel wrote:
+> >> I don't like to slow things down, but it would be great to have a Link:
+> >> to the report, and the (minified) splat attached.
+> > 
+> > I don't have a splat, I just reviewed the original patch. Please do
+> > delay this.
 
-WARNING: CPU: 0 PID: 0 at net/ipv4/route.c:1241 ip_rt_bug+0x14/0x20
-Modules linked in:
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc6-00077-g2e1b3cc9d7f7
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-RIP: 0010:ip_rt_bug+0x14/0x20
-Call Trace:
- <IRQ>
- ip_send_skb+0x14/0x40
- __icmp_send+0x42d/0x6a0
- ipv4_link_failure+0xe2/0x1d0
- arp_error_report+0x3c/0x50
- neigh_invalidate+0x8d/0x100
- neigh_timer_handler+0x2e1/0x330
- call_timer_fn+0x21/0x120
- __run_timer_base.part.0+0x1c9/0x270
- run_timer_softirq+0x4c/0x80
- handle_softirqs+0xac/0x280
- irq_exit_rcu+0x62/0x80
- sysvec_apic_timer_interrupt+0x77/0x90
+this clearly lacks a `not'
 
-The script below reproduces this scenario:
-ip xfrm policy add src 0.0.0.0/0 dst 0.0.0.0/0 \
-	dir out priority 0 ptype main flag localok icmp
-ip l a veth1 type veth
-ip a a 192.168.141.111/24 dev veth0
-ip l s veth0 up
-ping 192.168.141.155 -c 1
+> > Sebastian
+> 
+> It will definitely splat on RT kernels at some point, if there is a
+> spinlock.
 
-icmp_route_lookup() create input routes for locally generated packets
-while xfrm relookup ICMP traffic.Then it will set input route
-(dst->out = ip_rt_bug) to skb for DESTUNREACH.
+exactly my point.
 
-Similar to commit ed6e4ef836d4("netfilter: Fix ip_route_me_harder
-triggering ip_rt_bug"), avoid creating input routes with
-icmp_route_lookup() to fix it.
-
-Fixes: 8b7817f3a959 ("[IPSEC]: Add ICMP host relookup support")
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
----
- net/ipv4/icmp.c | 35 ++++++++++-------------------------
- 1 file changed, 10 insertions(+), 25 deletions(-)
-
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e1384e7331d8..11ef4eb5b659 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -490,6 +490,7 @@ static struct rtable *icmp_route_lookup(struct net *net,
- 	struct dst_entry *dst, *dst2;
- 	struct rtable *rt, *rt2;
- 	struct flowi4 fl4_dec;
-+	unsigned int addr_type;
- 	int err;
- 
- 	memset(fl4, 0, sizeof(*fl4));
-@@ -528,31 +529,15 @@ static struct rtable *icmp_route_lookup(struct net *net,
- 	if (err)
- 		goto relookup_failed;
- 
--	if (inet_addr_type_dev_table(net, route_lookup_dev,
--				     fl4_dec.saddr) == RTN_LOCAL) {
--		rt2 = __ip_route_output_key(net, &fl4_dec);
--		if (IS_ERR(rt2))
--			err = PTR_ERR(rt2);
--	} else {
--		struct flowi4 fl4_2 = {};
--		unsigned long orefdst;
--
--		fl4_2.daddr = fl4_dec.saddr;
--		rt2 = ip_route_output_key(net, &fl4_2);
--		if (IS_ERR(rt2)) {
--			err = PTR_ERR(rt2);
--			goto relookup_failed;
--		}
--		/* Ugh! */
--		orefdst = skb_in->_skb_refdst; /* save old refdst */
--		skb_dst_set(skb_in, NULL);
--		err = ip_route_input(skb_in, fl4_dec.daddr, fl4_dec.saddr,
--				     tos, rt2->dst.dev);
--
--		dst_release(&rt2->dst);
--		rt2 = skb_rtable(skb_in);
--		skb_in->_skb_refdst = orefdst; /* restore old refdst */
--	}
-+	addr_type = inet_addr_type_dev_table(net, route_lookup_dev, fl4_dec.saddr);
-+	if (addr_type == RTN_LOCAL || addr_type == RTN_UNICAST)
-+		fl4_dec.flowi4_flags |= FLOWI_FLAG_ANYSRC;
-+	else
-+		fl4_dec.saddr = 0;
-+
-+	rt2 = __ip_route_output_key(net, &fl4_dec);
-+	if (IS_ERR(rt2))
-+		err = PTR_ERR(rt2);
- 
- 	if (err)
- 		goto relookup_failed;
--- 
-2.25.1
-
+Sebastian
 
