@@ -1,115 +1,213 @@
-Return-Path: <netdev+bounces-143682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26CA59C3991
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:17:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA3B9C3954
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFBE9282459
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 08:17:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3442280CE9
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 08:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411D115A842;
-	Mon, 11 Nov 2024 08:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EB8l7NWr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFB413790B;
+	Mon, 11 Nov 2024 08:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4F115A85E;
-	Mon, 11 Nov 2024 08:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA0620B22;
+	Mon, 11 Nov 2024 08:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731313038; cv=none; b=QRuc1bd9+Wy5CkpmbudDrB+n87yRcOlbD90pB+IsgFMsnncnpzVMmSBfyPBd4m1WVZLPxP7s3dOZy+kgKJgfE3e/ZlfoIQlNv1us2oZFwTTnb+iJlLxsZAFkD7QdLXWT/RsdgGCGnfFM7rzCDhUk+/RIIqP4Vr/bbREZ6ABduVs=
+	t=1731312066; cv=none; b=SWpIdQI4yqKC038D2um7nPM/zlfYcbibxSXhK0YpMVKnDU8yKLv2wtlcraexJ1YVA8qarSzTDOFMG6VhaDIpHJlBqPyIIlsExQE55R0ZY7kLWoRKOZTXxj8mCHmopQ3MnxoNDIl4OyjQN9QNE7RkJjFNKYU9/eYN92dX9ITs1fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731313038; c=relaxed/simple;
-	bh=2BWxN+hwyN5KZizcGtWosAV8xQPNjgU9ZEDGgW7nESo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m5njcHRV0+5ULEvH3r7XAI3oxukTPnjM6j22YHVFu/PWkaH9gZU6MYRX39hFXe+6RkwdCVMn++UzqEUKQ4l6oPWVdbsPVgFs6AJfUVv7FkFM7IME7pVlZE2CgpzVkZzFUx3SJUcigNj3PGYlZ2DW07+mdIIvjq/zk+lAsFZRxGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EB8l7NWr; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-37d41894a32so2370146f8f.1;
-        Mon, 11 Nov 2024 00:17:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731313035; x=1731917835; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ZmC22zmrJiHAdVWtwda1/3MCkytTs/3xbfI6zOdY3g=;
-        b=EB8l7NWrxCf/hQwur56gk/ngFTP2XE+secT51qiUBjm17RA3+0ZhTSXH8jVerFTCEz
-         EsfqBzKgOBNsLHZmnx07ZOLpolnesxJl+Vqr9JytBlRluxiUtnANaFPDkaB/blgnEBsX
-         QdF9UK3vnN26oeCM6LAQNC3ikU6bovUsu30IB9RrtBfKn9NfUTBtlYrePTl+Q6npfWow
-         t6TvjMwlEKRre6VuZOBG08iD2Tlfk3lxVCqp/TbML9oHUQr59xzLMsj+sjbN30PtlvtE
-         AK8p9xMHI845M1HK4t88xipeag3p+AgCo8DTJv+On+BcEqmwJ4COv1h+YE+bNiRQ/4/3
-         OZBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731313035; x=1731917835;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4ZmC22zmrJiHAdVWtwda1/3MCkytTs/3xbfI6zOdY3g=;
-        b=SAzV4q/ldHLIToXjtztBZ27LjNxDqFgY71weCBKQnjA6R14ifb/mRVpPKdiJ60rKrM
-         FK7tcAnlQNY5nj6O54FF26S4kk8/n9IlOxAA9oBRNRdOwHXKJVNhNbeYFMgXyPxqThdp
-         B9P/XBjh8hbs+Z77lMSQBOsjzdthvTCtB6nv6URhTBQlKahxr/LwnxvgUcwb0e/swqvQ
-         Dkv2Mla4Gn/pGQRoRmHLB4zwXPNRJw9ZQ/1zb0H+geFwtY7axSbrC/rio0SMOorLBM3y
-         Eqdwi5u1ifMI344kSoyxnxewwbXUQ6x73uOtNApxQupO2Jz/+p85UIjr3A7CJqbWgQW8
-         5fPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKesPusJ96riJVWwwbOO1U6p2YAfTuvzMxDYo8CDHAfRgHM88KysQmmLB4BvH05BV2Cv5bPoGqWcjRQj+OZKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy95PS3zDQh2+AK7BKUtvkP6e+YlEAshQU4mbC5sUQotyqsqx+j
-	m/zXBJMfaDMOHPCMdH95rq93YgeTkEZ7wJTNWhRm5B4t+34ImvG0byeFadTF3FOF9r9a+bfw/uQ
-	WMSRsGAxsmybfXIWeknVS0IjJrMMYLXEv
-X-Google-Smtp-Source: AGHT+IFtV/OrXYsNz34By/KajVySu5vTvpGy4UZGV925ACn6DsCOL1B18zwfwwU0WsE85CdxnUPgRu7O/S4hPU6tZkY=
-X-Received: by 2002:a05:6000:1acc:b0:37c:cc7c:761c with SMTP id
- ffacd0b85a97d-381f1a6675fmr8154089f8f.3.1731313034538; Mon, 11 Nov 2024
- 00:17:14 -0800 (PST)
+	s=arc-20240116; t=1731312066; c=relaxed/simple;
+	bh=D4fxEffkdD+TzHlLOXdHYFcAXrCaBK85rwbWQ8pFt2Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NCIOMkJBPdKi1Txh+LlGMCes8PcFoqNF0xq6A1RhSMlBScDbz1qgWSLzSY3ALbjfRJfMhKUZIxiYrQNImYwzxSs/4qz/dHAZAMe8wcCBcMoIuUYXPQSvcKSFLLMRnSPKfhQRxJuW3SY3diK7f/LGFV0rrfYw/psv0UZePI+7pqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Xn24N5RtLz10V7P;
+	Mon, 11 Nov 2024 15:59:00 +0800 (CST)
+Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
+	by mail.maildlp.com (Postfix) with ESMTPS id B7515140257;
+	Mon, 11 Nov 2024 16:00:52 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg200003.china.huawei.com
+ (7.202.181.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 11 Nov
+ 2024 16:00:51 +0800
+From: Liu Jian <liujian56@huawei.com>
+To: <chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
+	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
+	<trondmy@kernel.org>, <anna@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <ebiederm@xmission.com>, <kuniyu@amazon.com>,
+	<liujian56@huawei.com>
+CC: <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH net v3] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
+Date: Mon, 11 Nov 2024 16:17:36 +0800
+Message-ID: <20241111081736.526093-1-liujian56@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-9-shaw.leon@gmail.com>
- <20241109170102.05a5c3f7@kernel.org>
-In-Reply-To: <20241109170102.05a5c3f7@kernel.org>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Mon, 11 Nov 2024 16:16:37 +0800
-Message-ID: <CABAhCOS1YocXsCp4CqYc0B3SAUzQnc_Kf=guAA+9c-cLWE_zfg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 8/8] selftests: net: Add two test cases for
- link netns
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemg200003.china.huawei.com (7.202.181.30)
 
-On Sun, Nov 10, 2024 at 9:01=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu,  7 Nov 2024 21:30:03 +0800 Xiao Liang wrote:
-> > +class NSEnter:
-> > +    def __init__(self, ns_name):
-> > +        self.ns_path =3D f"/run/netns/{ns_name}"
-> > +
-> > +    def __enter__(self):
-> > +        self.saved =3D open("/proc/thread-self/ns/net")
-> > +        with open(self.ns_path) as ns_file:
-> > +            libc.setns(ns_file.fileno(), 0)
-> > +
-> > +    def __exit__(self, exc_type, exc_value, traceback):
-> > +        libc.setns(self.saved.fileno(), 0)
-> > +        self.saved.close()
->
-> This is quite nice, why not move it to
-> tools/testing/selftests/net/lib/py/netns.py
-> so others can use it too
+BUG: KASAN: slab-use-after-free in tcp_write_timer_handler+0x156/0x3e0
+Read of size 1 at addr ffff888111f322cd by task swapper/0/0
 
-Sure, I will move it to lib.
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-dirty #7
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0x68/0xa0
+ print_address_description.constprop.0+0x2c/0x3d0
+ print_report+0xb4/0x270
+ kasan_report+0xbd/0xf0
+ tcp_write_timer_handler+0x156/0x3e0
+ tcp_write_timer+0x66/0x170
+ call_timer_fn+0xfb/0x1d0
+ __run_timers+0x3f8/0x480
+ run_timer_softirq+0x9b/0x100
+ handle_softirqs+0x153/0x390
+ __irq_exit_rcu+0x103/0x120
+ irq_exit_rcu+0xe/0x20
+ sysvec_apic_timer_interrupt+0x76/0x90
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20
+RIP: 0010:default_idle+0xf/0x20
+Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90
+ 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 f8 25 00 fb f4 <fa> c3 cc cc cc
+ cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
+RSP: 0018:ffffffffa2007e28 EFLAGS: 00000242
+RAX: 00000000000f3b31 RBX: 1ffffffff4400fc7 RCX: ffffffffa09c3196
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff9f00590f
+RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed102360835d
+R10: ffff88811b041aeb R11: 0000000000000001 R12: 0000000000000000
+R13: ffffffffa202d7c0 R14: 0000000000000000 R15: 00000000000147d0
+ default_idle_call+0x6b/0xa0
+ cpuidle_idle_call+0x1af/0x1f0
+ do_idle+0xbc/0x130
+ cpu_startup_entry+0x33/0x40
+ rest_init+0x11f/0x210
+ start_kernel+0x39a/0x420
+ x86_64_start_reservations+0x18/0x30
+ x86_64_start_kernel+0x97/0xa0
+ common_startup_64+0x13e/0x141
+ </TASK>
+
+Allocated by task 595:
+ kasan_save_stack+0x24/0x50
+ kasan_save_track+0x14/0x30
+ __kasan_slab_alloc+0x87/0x90
+ kmem_cache_alloc_noprof+0x12b/0x3f0
+ copy_net_ns+0x94/0x380
+ create_new_namespaces+0x24c/0x500
+ unshare_nsproxy_namespaces+0x75/0xf0
+ ksys_unshare+0x24e/0x4f0
+ __x64_sys_unshare+0x1f/0x30
+ do_syscall_64+0x70/0x180
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Freed by task 100:
+ kasan_save_stack+0x24/0x50
+ kasan_save_track+0x14/0x30
+ kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x54/0x70
+ kmem_cache_free+0x156/0x5d0
+ cleanup_net+0x5d3/0x670
+ process_one_work+0x776/0xa90
+ worker_thread+0x2e2/0x560
+ kthread+0x1a8/0x1f0
+ ret_from_fork+0x34/0x60
+ ret_from_fork_asm+0x1a/0x30
+
+Reproduction script:
+
+mkdir -p /mnt/nfsshare
+mkdir -p /mnt/nfs/netns_1
+mkfs.ext4 /dev/sdb
+mount /dev/sdb /mnt/nfsshare
+systemctl restart nfs-server
+chmod 777 /mnt/nfsshare
+exportfs -i -o rw,no_root_squash *:/mnt/nfsshare
+
+ip netns add netns_1
+ip link add name veth_1_peer type veth peer veth_1
+ifconfig veth_1_peer 11.11.0.254 up
+ip link set veth_1 netns netns_1
+ip netns exec netns_1 ifconfig veth_1 11.11.0.1
+
+ip netns exec netns_1 /root/iptables -A OUTPUT -d 11.11.0.254 -p tcp \
+	--tcp-flags FIN FIN  -j DROP
+
+(note: In my environment, a DESTROY_CLIENTID operation is always sent
+ immediately, breaking the nfs tcp connection.)
+ip netns exec netns_1 timeout -s 9 300 mount -t nfs -o proto=tcp,vers=4.1 \
+	11.11.0.254:/mnt/nfsshare /mnt/nfs/netns_1
+
+ip netns del netns_1
+
+The reason here is that the tcp socket in netns_1 (nfs side) has been
+shutdown and closed (done in xs_destroy), but the FIN message (with ack)
+is discarded, and the nfsd side keeps sending retransmission messages.
+As a result, when the tcp sock in netns_1 processes the received message,
+it sends the message (FIN message) in the sending queue, and the tcp timer
+is re-established. When the network namespace is deleted, the net structure
+accessed by tcp's timer handler function causes problems.
+
+To fix this problem, let's hold netns refcnt for the tcp kernel socket as
+ done in other modules.
+
+Fixes: 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets.")
+Signed-off-by: Liu Jian <liujian56@huawei.com>
+---
+ net/sunrpc/svcsock.c  | 4 ++++
+ net/sunrpc/xprtsock.c | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 6f272013fd9b..d4330aaadc23 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1551,6 +1551,10 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
+ 	newlen = error;
+ 
+ 	if (protocol == IPPROTO_TCP) {
++		__netns_tracker_free(net, &sock->sk->ns_tracker, false);
++		sock->sk->sk_net_refcnt = 1;
++		get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
++		sock_inuse_add(net, 1);
+ 		if ((error = kernel_listen(sock, 64)) < 0)
+ 			goto bummer;
+ 	}
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index d2f31b59457b..0f0b9f9283d9 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -1942,6 +1942,12 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
+ 		goto out;
+ 	}
+ 
++	if (protocol == IPPROTO_TCP) {
++		__netns_tracker_free(xprt->xprt_net, &sock->sk->ns_tracker, false);
++		sock->sk->sk_net_refcnt = 1;
++		get_net_track(xprt->xprt_net, &sock->sk->ns_tracker, GFP_KERNEL);
++		sock_inuse_add(xprt->xprt_net, 1);
++	}
+ 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
+ 	if (IS_ERR(filp))
+ 		return ERR_CAST(filp);
+-- 
+2.34.1
+
 
