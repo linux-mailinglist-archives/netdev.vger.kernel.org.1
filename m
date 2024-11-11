@@ -1,64 +1,74 @@
-Return-Path: <netdev+bounces-143721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54A79C3DC8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:54:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D909C3DD8
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:00:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D77481C2189D
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:54:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C57CAB241F2
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93BC18BBA8;
-	Mon, 11 Nov 2024 11:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22609199FAF;
+	Mon, 11 Nov 2024 11:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="waGp0b5+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5syxAM7"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9EE18A6C2;
-	Mon, 11 Nov 2024 11:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C23719995E;
+	Mon, 11 Nov 2024 11:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731326051; cv=none; b=FjjXztx+QW42gE5pMYaMuHdgDxPv2L8gr9iGI0KgGmGnhIq8uRW/DX68TbFdjGYR3QUItttSN3IBhVV2hauoStjXTO/9RLPRCdpYoDq5+NNXhf2Z0y3dH3H4iGYlMg7qgm3yB+m9W4zs6qlq11cck1EvSPv8TMKdq02bFsGcuL4=
+	t=1731326386; cv=none; b=rpZdqMasw6zxraVZFeQmkx2+iBXo0CyCu6qcyy4CNVyFlGAKy3VJyqog8UNZl/Na2oi0mIhP5WkRRLWuomtXlHGIZT/4DM2hc8uxYhPGnxzutGQTYP4CWQZaQtrRsx7dXg6plt5AugDw/PT5CAc50g2iRRBzBnkCHzIbWRCbfJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731326051; c=relaxed/simple;
-	bh=BMB7rrVMA5etCIU0o/7ur3ujEMLysqRk5+jjFjoyFfc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ga5wZVINxr89LwhvbwSeUD8Ft3tUrG3ZN1GF0CCaygfwSN5RI2uFeHuRV6/dB93zT8AIvTeCEZfUnbWe9KjYxh97dI4YDoCCL/GQgtfXyw69CT3PCI9TjOxiEY/lOXIg1xotMH8p+K/XhZrMXA3A9e5Brxa15w7UmU/dbgwVHHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=waGp0b5+; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4ABBrosx2498289
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Nov 2024 05:53:50 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1731326030;
-	bh=ZgYilRS3+fXEklYEgYiYwwxkuzYogqpLeaAN+pnNcuE=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=waGp0b5+pByg3V3Pb9thQH/Dyzi7sNqiXvjgYR2bILZGyNGrE25cDlFP6+Fb5oFaj
-	 goxxOtQJo18IAQFpTY48ER22ivhUWki2fzcjFZxK6BBdB/VdwwX3FNc05nlknxNvVD
-	 BY4CdJBgo21Im8SkP2q0GwItF1s4KL2CHMNTTVQI=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4ABBroTb010807
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 11 Nov 2024 05:53:50 -0600
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 11
- Nov 2024 05:53:50 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 11 Nov 2024 05:53:50 -0600
-Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4ABBrin4029503;
-	Mon, 11 Nov 2024 05:53:45 -0600
-Message-ID: <cb39d07b-ad4b-4e87-bba4-daf77b583659@ti.com>
-Date: Mon, 11 Nov 2024 17:23:43 +0530
+	s=arc-20240116; t=1731326386; c=relaxed/simple;
+	bh=KNU4wY5wjmSygjsz8VFqZf/kfLQiRGmzqRW7gpjXsQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Akf8pUvKjwycHaThZvesbwQRJqAqPVarXSCVfKwzibhPVplmT1W89b23t9wHCHSvTgWpPwm2M6vYJjsKEnqLxbj0QF4L015qQJIvD+nPNSRFUn6cwSDueeisGwRA7iMSqQQvuL0uYDJ62V3DscuqwUN7cbQDoVtJna8B5XrLw9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H5syxAM7; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a99eb8b607aso651503366b.2;
+        Mon, 11 Nov 2024 03:59:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731326383; x=1731931183; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4KXooGMOhmi1Th3JVflxn1LYQFUXTjJHyv8htJbwU4E=;
+        b=H5syxAM7OtSiBApwZpzfTbP+L21TtjzL6Xzszir6w4ztYsSeeDFn+fMSjOJ4cYTkD9
+         kA0UoC0EPkYvXmjlDoUZY2mIkcH4ep6fdLR9BEY5s/pcTPNxir2m+lrYEinf0EgN4X/f
+         KfygUMDrh2zXJFonyIkjJki8E7hEf1YzpAeoJU0LxAy8LGyuSQq+I6DhAKmC9ZKCkWLj
+         36H2xb13W/ySMyHA+3HhUz944KsX4bTI/r5tAundXcfOpzYGmcd8Fkd7de0yRXndbFR8
+         eGpfISX5xyquo5AobWESgysSGXs0mvtdOcV4WVWZt87tzIglHGOHxS5vWu6SfpD3nZIK
+         uF/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731326383; x=1731931183;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4KXooGMOhmi1Th3JVflxn1LYQFUXTjJHyv8htJbwU4E=;
+        b=IR7CiQAO7A7FJdmGOEuZUMG0qrc+OASrmhSXzazmblHpgCV86dcCrhjBI0XfrmXzi/
+         oDSWzqOyD7xwCokWpimEvst9nb17DNw04r51+DQt+DxZbiNCOzWltAQhNItaFZxCUjOE
+         o305obyye8XIiVo8QjfkKUuRicAzKf/aMlU6x8ntpVaxk2x3LLZ/eUl2iFptw5l0aUCF
+         A3Gwg3G1tpU1EfSPiri5u1DeP1RwuV+C5ZY0/vMQQ+wmgcwDUFXtFqWJ0UcXEedOUevY
+         7VlNpnTver+vrmCNAk+U923d8Tv2BId+TfkLz6d1esz14CuwgABli4/w/pf1q3sJoDHz
+         73mg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjvQiJ2YiluS6ugDpMCInrzDGB4eFnTDu3GkZdrB7BNyQ5FM2NZM4PnEo4OctJcU3H3W5rGzDzKJ/IlG8=@vger.kernel.org, AJvYcCWO0iSwgTvAAixsxmp9AIx2rlYV0+KdT/KXt0vBQ7m9IEan9RhqMm12Yt/Glwyf/L7XHn+TjlK8DaLvNA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFD+3QKgmH9KcoayTB/1lEGjgsh0k1iAvcyqatVNOsX94wI66d
+	Gjw3wX91+24JRlakK1mx6wPNSVbkulalkZMOZ8iN5RiXBoQpCdQ1
+X-Google-Smtp-Source: AGHT+IF00jAtfRc2EUX+k3JSZj7csi0+1+brLEMrWXf/8w0U7/FZXLloGHMckhc11kzEm58d/QUUAQ==
+X-Received: by 2002:a17:907:7b86:b0:a9d:e01e:ffa9 with SMTP id a640c23a62f3a-a9eeff449femr1173865766b.33.1731326382147;
+        Mon, 11 Nov 2024 03:59:42 -0800 (PST)
+Received: from [172.27.51.98] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0e2e41bsm586296566b.191.2024.11.11.03.59.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Nov 2024 03:59:41 -0800 (PST)
+Message-ID: <aabb11f4-74ea-4e57-a085-3448e64a2d07@gmail.com>
+Date: Mon, 11 Nov 2024 13:59:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,136 +76,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: ti: icssg-prueth: Fix firmware load
- sequence.
-To: Simon Horman <horms@kernel.org>
-CC: <vigneshr@ti.com>, <m-karicheri2@ti.com>, <jan.kiszka@siemens.com>,
-        <javier.carrasco.cruz@gmail.com>, <jacob.e.keller@intel.com>,
-        <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20241106074040.3361730-1-m-malladi@ti.com>
- <20241106074040.3361730-2-m-malladi@ti.com>
- <20241108133044.GB4507@kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] mlx5/core: deduplicate
+ {mlx5_,}eq_update_ci()
+To: Parav Pandit <parav@nvidia.com>,
+ Caleb Sander Mateos <csander@purestorage.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <ZyxMsx8o7NtTAWPp@x130>
+ <20241107183054.2443218-1-csander@purestorage.com>
+ <20241107183054.2443218-2-csander@purestorage.com>
+ <CY8PR12MB71954BBB822554D67F08A1CBDC5D2@CY8PR12MB7195.namprd12.prod.outlook.com>
 Content-Language: en-US
-From: Meghana Malladi <m-malladi@ti.com>
-In-Reply-To: <20241108133044.GB4507@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <CY8PR12MB71954BBB822554D67F08A1CBDC5D2@CY8PR12MB7195.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
 
 
-On 08/11/24 19:00, Simon Horman wrote:
-> On Wed, Nov 06, 2024 at 01:10:39PM +0530, Meghana Malladi wrote:
->> From: MD Danish Anwar <danishanwar@ti.com>
+On 08/11/2024 12:49, Parav Pandit wrote:
+> 
+>> From: Caleb Sander Mateos <csander@purestorage.com>
+>> Sent: Friday, November 8, 2024 12:01 AM
 >>
->> Timesync related operations are ran in PRU0 cores for both ICSSG SLICE0
->> and SLICE1. Currently whenever any ICSSG interface comes up we load the
->> respective firmwares to PRU cores and whenever interface goes down, we
->> stop the respective cores. Due to this, when SLICE0 goes down while
->> SLICE1 is still active, PRU0 firmwares are unloaded and PRU0 core is
->> stopped. This results in clock jump for SLICE1 interface as the timesync
->> related operations are no longer running.
+>> The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci(). The only
+>> additional work done by mlx5_eq_update_ci() is to increment
+>> eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to avoid
+>> the duplication.
 >>
->> Fix this by running both PRU0 and PRU1 firmwares as long as at least 1
->> ICSSG interface is up.
+>> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+>> ---
+>>   drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
+>>   1 file changed, 1 insertion(+), 8 deletions(-)
 >>
->> rx_flow_id is updated before firmware is loaded. Once firmware is loaded,
->> it reads the flow_id and uses it for rx. emac_fdb_flow_id_updated() is
->> used to let firmware know that the flow_id has been updated and to use the
->> latest rx_flow_id.
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>> b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>> index 859dcf09b770..078029c81935 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>> @@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct mlx5_eq
+>> *eq, u32 cc)  }  EXPORT_SYMBOL(mlx5_eq_get_eqe);
 >>
->> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>>   void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)  {
+>> -	__be32 __iomem *addr = eq->doorbell + (arm ? 0 : 2);
+>> -	u32 val;
+>> -
+>>   	eq->cons_index += cc;
+>> -	val = (eq->cons_index & 0xffffff) | (eq->eqn << 24);
+>> -
+>> -	__raw_writel((__force u32)cpu_to_be32(val), addr);
+>> -	/* We still want ordering, just not swabbing, so add a barrier */
+>> -	wmb();
+>> +	eq_update_ci(eq, arm);
+>>   }
+>>   EXPORT_SYMBOL(mlx5_eq_update_ci);
+>>
+>>   static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)  {
+>> --
+>> 2.45.2
 > 
-> ...
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
 > 
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> index 0556910938fa..9df67539285b 100644
->> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->> @@ -534,6 +534,7 @@ static int emac_ndo_open(struct net_device *ndev)
->>   {
->>   	struct prueth_emac *emac = netdev_priv(ndev);
->>   	int ret, i, num_data_chn = emac->tx_ch_num;
->> +	struct icssg_flow_cfg __iomem *flow_cfg;
->>   	struct prueth *prueth = emac->prueth;
->>   	int slice = prueth_emac_slice(emac);
->>   	struct device *dev = prueth->dev;
->> @@ -549,8 +550,12 @@ static int emac_ndo_open(struct net_device *ndev)
->>   	/* set h/w MAC as user might have re-configured */
->>   	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
->>   
->> +	if (!prueth->emacs_initialized) {
->> +		icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
->> +		icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
->> +	}
->> +
->>   	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
->> -	icssg_class_default(prueth->miig_rt, slice, 0, false);
->>   	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
->>   
->>   	/* Notify the stack of the actual queue counts. */
->> @@ -588,10 +593,31 @@ static int emac_ndo_open(struct net_device *ndev)
->>   		goto cleanup_napi;
->>   	}
->>   
->> -	/* reset and start PRU firmware */
->> -	ret = prueth_emac_start(prueth, emac);
->> -	if (ret)
->> -		goto free_rx_irq;
->> +	if (!prueth->emacs_initialized) {
->> +		if (prueth->emac[ICSS_SLICE0]) {
->> +			ret = prueth_emac_start(prueth, prueth->emac[ICSS_SLICE0]);
-> 
-> I wonder if it is worth simplifying this by having prueth_emac_start()
-> check if it's 2nd parameter is NULL. Likewise for prueth_emac_stop().
-> 
-Yes right, I will update this.
->> +			if (ret) {
->> +				netdev_err(ndev, "unable to start fw for slice %d", ICSS_SLICE0);
->> +				goto free_rx_irq;
->> +			}
->> +		}
->> +		if (prueth->emac[ICSS_SLICE1]) {
->> +			ret = prueth_emac_start(prueth, prueth->emac[ICSS_SLICE1]);
->> +			if (ret) {
->> +				netdev_err(ndev, "unable to start fw for slice %d", ICSS_SLICE1);
->> +				goto halt_slice0_prus;
->> +			}
->> +		}
->> +	}
->> +
->> +	flow_cfg = emac->dram.va + ICSSG_CONFIG_OFFSET + PSI_L_REGULAR_FLOW_ID_BASE_OFFSET;
->> +	writew(emac->rx_flow_id_base, &flow_cfg->rx_base_flow);
->> +	ret = emac_fdb_flow_id_updated(emac);
->> +
->> +	if (ret) {
->> +		netdev_err(ndev, "Failed to update Rx Flow ID %d", ret);
->> +		goto stop;
-> 
-> Branching to stop may result in calls to prueth_emac_stop() which does not
-> seem symmetrical with the condition on prueth->emacs_initialized for calls
-> to prueth_emac_start() above.
-> 
-> If so, is this intended?
-> 
-Yes this is intended. This change is made to run all the cores during 
-init and in case of any failure, stop all the cores. And even if one 
-interface is up, all the cores should run.
->> +	}
->>   
->>   	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
->>   
-> 
-> ...
+
+Acked-by: Tariq Toukan <tariqt@nvidia.com>
+
 
