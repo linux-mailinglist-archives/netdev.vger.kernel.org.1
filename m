@@ -1,148 +1,201 @@
-Return-Path: <netdev+bounces-143720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2199B9C3DA4
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:44:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A54A79C3DC8
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:54:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537D51C21E13
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:44:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D77481C2189D
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB42F18990D;
-	Mon, 11 Nov 2024 11:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93BC18BBA8;
+	Mon, 11 Nov 2024 11:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2URJnrk"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="waGp0b5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7C915D5C5
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 11:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9EE18A6C2;
+	Mon, 11 Nov 2024 11:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731325475; cv=none; b=K+qmLWhaatMdBs7O79mDbZ959fbR9H3mUArxYTQ/0DR93B3qJCh7odblR4HKKLY7a7uD5CJxvgcxbq0osPONfKZZAk+Lur1xKxle5WuKkLFNlnFSNZRR2YAnBD3loJvTbQcJ1uOPsYwRPAXcuNuth7u9Idn8yB68OiQvXcJZr78=
+	t=1731326051; cv=none; b=FjjXztx+QW42gE5pMYaMuHdgDxPv2L8gr9iGI0KgGmGnhIq8uRW/DX68TbFdjGYR3QUItttSN3IBhVV2hauoStjXTO/9RLPRCdpYoDq5+NNXhf2Z0y3dH3H4iGYlMg7qgm3yB+m9W4zs6qlq11cck1EvSPv8TMKdq02bFsGcuL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731325475; c=relaxed/simple;
-	bh=WiVbEbZwX7GE6FvNFFvXfXcrBQkn7qWeNINAmSp+lWY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ClX1rffAfuguMEPhUOYh5pOVh48gpYs+1FRX6X9IprRHxaqc9EBqi4sTnVAcU68QoJqbB4NfWAVGt4Zb/TkCT4L9oMtxkrIk9FGCOwgzP8iLsYThaUM5Xs7DAa2JwXMQSrn0In4tw7Lf/eXdlsrm9YG3cwnP65U/9eKoShVdMLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2URJnrk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731325470;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RrNKWWNhtD81PNKsbKwhpsIaaGhGd8JKmE0eRL/JjT0=;
-	b=e2URJnrkJ6EJG/heUNJqoXjmZNWz+3j3YktMKwXfvPMYSqQNCLt9fVTTgDdGQ6PIwrOrth
-	HkS72sBapmiqxBxsV/mKmTRG5kgtjGFZrOBVI7JVCY+Pl51sTjLK0gGZF8RrpCA02plzZd
-	PwgZSuEgXBt4OrxhHkL11aF0ATMFJus=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-149-6Cud4j-bM0-c1UA-JjFrTg-1; Mon, 11 Nov 2024 06:44:25 -0500
-X-MC-Unique: 6Cud4j-bM0-c1UA-JjFrTg-1
-X-Mimecast-MFC-AGG-ID: 6Cud4j-bM0-c1UA-JjFrTg
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5eb75d21d3eso372830eaf.0
-        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 03:44:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731325464; x=1731930264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RrNKWWNhtD81PNKsbKwhpsIaaGhGd8JKmE0eRL/JjT0=;
-        b=lI+Z3LX9OygInsql75/iqkBQojkIAW//qlro4a6zTzv5iVtJqJ1xOjmwcOAk/q+Fjz
-         Y2YhI6dWDfAb+jceAXfP8M1Rh0it8uAEs4uS9J93uLLribiXwH2IG0K7qz39YJg3TWer
-         hOBtYa5W1fLaIoNPu3mgQ9vZTUO/dC8WrA0oQrMCTUshyqv/i+OZFMFUzwJCRL/v8tV5
-         5fbU6a4tFu3LF625ce3eWcY/8MAdYNiTAXTJUxTZehQWEF1sIKj8oAlRxZQhBKYrM4ZZ
-         OEQ3JESp7BMxhCk9wwaWgc74NYE6tsjW5AJpm6vBE155z39r3IIGPPGm3GQDOne9I1zK
-         OI7A==
-X-Forwarded-Encrypted: i=1; AJvYcCU40MesGm82vRKbmpDtMiiSQisWba34qDNuGioD44lSgbMVjZ/dfbBIsyi4/nDimCPRY5590Nc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9nvQYr52ejKa0wr5BzqTub/skgvpwLs+0gZ+jEafHzHbB+lgr
-	WtwmjqhPE21JpqklVrbAbK2LGWo9bjdTzR1aKdmsxrAtjkqszrDSa5Tw8Q0EbN78m/I11i2YQ3G
-	u+67BiYHVvO4oRB/2XlFsHRFx1h4CKqt0dIjmzUm5vc1o40LX6+F4CBcIRqdHhbLH1VmmlpJx3C
-	rI0OYyIMF5IU98T6Fnb622q218B8EM
-X-Received: by 2002:a05:6870:9d18:b0:291:cb6:f3cd with SMTP id 586e51a60fabf-295600f04b3mr2366964fac.8.1731325464250;
-        Mon, 11 Nov 2024 03:44:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE37eDuGUNMpgsM81z+sCu4l+g2AmjHnAPzKRpJM7O2zuK4M8P9tUBlkaaYqdgsOj4PYl9dM6C8v6Uc5gSlT6E=
-X-Received: by 2002:a05:6870:9d18:b0:291:cb6:f3cd with SMTP id
- 586e51a60fabf-295600f04b3mr2366958fac.8.1731325463916; Mon, 11 Nov 2024
- 03:44:23 -0800 (PST)
+	s=arc-20240116; t=1731326051; c=relaxed/simple;
+	bh=BMB7rrVMA5etCIU0o/7ur3ujEMLysqRk5+jjFjoyFfc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ga5wZVINxr89LwhvbwSeUD8Ft3tUrG3ZN1GF0CCaygfwSN5RI2uFeHuRV6/dB93zT8AIvTeCEZfUnbWe9KjYxh97dI4YDoCCL/GQgtfXyw69CT3PCI9TjOxiEY/lOXIg1xotMH8p+K/XhZrMXA3A9e5Brxa15w7UmU/dbgwVHHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=waGp0b5+; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4ABBrosx2498289
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Nov 2024 05:53:50 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1731326030;
+	bh=ZgYilRS3+fXEklYEgYiYwwxkuzYogqpLeaAN+pnNcuE=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=waGp0b5+pByg3V3Pb9thQH/Dyzi7sNqiXvjgYR2bILZGyNGrE25cDlFP6+Fb5oFaj
+	 goxxOtQJo18IAQFpTY48ER22ivhUWki2fzcjFZxK6BBdB/VdwwX3FNc05nlknxNvVD
+	 BY4CdJBgo21Im8SkP2q0GwItF1s4KL2CHMNTTVQI=
+Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4ABBroTb010807
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 11 Nov 2024 05:53:50 -0600
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 11
+ Nov 2024 05:53:50 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 11 Nov 2024 05:53:50 -0600
+Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4ABBrin4029503;
+	Mon, 11 Nov 2024 05:53:45 -0600
+Message-ID: <cb39d07b-ad4b-4e87-bba4-daf77b583659@ti.com>
+Date: Mon, 11 Nov 2024 17:23:43 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241104121337.129287-1-michal.swiatkowski@linux.intel.com> <20241104121337.129287-3-michal.swiatkowski@linux.intel.com>
-In-Reply-To: <20241104121337.129287-3-michal.swiatkowski@linux.intel.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Mon, 11 Nov 2024 12:44:11 +0100
-Message-ID: <CADEbmW2=9s8iGJibWpPnVUraMOr7ecE6Hbpb1n3d9es-aUvA7Q@mail.gmail.com>
-Subject: Re: [iwl-next v7 2/9] ice: devlink PF MSI-X max and min parameter
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com, 
-	jacob.e.keller@intel.com, pio.raczynski@gmail.com, konrad.knitter@intel.com, 
-	marcin.szycik@intel.com, wojciech.drewek@intel.com, 
-	nex.sw.ncis.nat.hpm.dev@intel.com, przemyslaw.kitszel@intel.com, 
-	jiri@resnulli.us, horms@kernel.org, David.Laight@aculab.com, 
-	pmenzel@molgen.mpg.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ti: icssg-prueth: Fix firmware load
+ sequence.
+To: Simon Horman <horms@kernel.org>
+CC: <vigneshr@ti.com>, <m-karicheri2@ti.com>, <jan.kiszka@siemens.com>,
+        <javier.carrasco.cruz@gmail.com>, <jacob.e.keller@intel.com>,
+        <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20241106074040.3361730-1-m-malladi@ti.com>
+ <20241106074040.3361730-2-m-malladi@ti.com>
+ <20241108133044.GB4507@kernel.org>
+Content-Language: en-US
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <20241108133044.GB4507@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Mon, Nov 4, 2024 at 1:13=E2=80=AFPM Michal Swiatkowski
-<michal.swiatkowski@linux.intel.com> wrote:
->
-> Use generic devlink PF MSI-X parameter to allow user to change MSI-X
-> range.
->
-> Add notes about this parameters into ice devlink documentation.
->
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  Documentation/networking/devlink/ice.rst      | 11 +++
->  .../net/ethernet/intel/ice/devlink/devlink.c  | 83 ++++++++++++++++++-
->  drivers/net/ethernet/intel/ice/ice.h          |  7 ++
->  drivers/net/ethernet/intel/ice/ice_irq.c      |  7 ++
->  4 files changed, 107 insertions(+), 1 deletion(-)
->
-[...]
-> @@ -1648,6 +1710,7 @@ void ice_devlink_unregister(struct ice_pf *pf)
->  int ice_devlink_register_params(struct ice_pf *pf)
->  {
->         struct devlink *devlink =3D priv_to_devlink(pf);
-> +       union devlink_param_value value;
->         struct ice_hw *hw =3D &pf->hw;
->         int status;
->
-> @@ -1656,11 +1719,27 @@ int ice_devlink_register_params(struct ice_pf *pf=
-)
->         if (status)
->                 return status;
->
-> +       status =3D devl_params_register(devlink, ice_dvl_msix_params,
-> +                                     ARRAY_SIZE(ice_dvl_msix_params));
-> +       if (status)
-> +               return status;
-> +
->         if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
->                 status =3D devl_params_register(devlink, ice_dvl_sched_pa=
-rams,
->                                               ARRAY_SIZE(ice_dvl_sched_pa=
-rams));
-> +       if (status)
-> +               return status;
 
-Error handling looks wrong in this function.
-You have to unwind the registration of the params from above or they will l=
-eak.
-Sorry I did not notice this earlier.
 
-Michal
-
+On 08/11/24 19:00, Simon Horman wrote:
+> On Wed, Nov 06, 2024 at 01:10:39PM +0530, Meghana Malladi wrote:
+>> From: MD Danish Anwar <danishanwar@ti.com>
+>>
+>> Timesync related operations are ran in PRU0 cores for both ICSSG SLICE0
+>> and SLICE1. Currently whenever any ICSSG interface comes up we load the
+>> respective firmwares to PRU cores and whenever interface goes down, we
+>> stop the respective cores. Due to this, when SLICE0 goes down while
+>> SLICE1 is still active, PRU0 firmwares are unloaded and PRU0 core is
+>> stopped. This results in clock jump for SLICE1 interface as the timesync
+>> related operations are no longer running.
+>>
+>> Fix this by running both PRU0 and PRU1 firmwares as long as at least 1
+>> ICSSG interface is up.
+>>
+>> rx_flow_id is updated before firmware is loaded. Once firmware is loaded,
+>> it reads the flow_id and uses it for rx. emac_fdb_flow_id_updated() is
+>> used to let firmware know that the flow_id has been updated and to use the
+>> latest rx_flow_id.
+>>
+>> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> 
+> ...
+> 
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> 
+> ...
+> 
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> index 0556910938fa..9df67539285b 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -534,6 +534,7 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   {
+>>   	struct prueth_emac *emac = netdev_priv(ndev);
+>>   	int ret, i, num_data_chn = emac->tx_ch_num;
+>> +	struct icssg_flow_cfg __iomem *flow_cfg;
+>>   	struct prueth *prueth = emac->prueth;
+>>   	int slice = prueth_emac_slice(emac);
+>>   	struct device *dev = prueth->dev;
+>> @@ -549,8 +550,12 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   	/* set h/w MAC as user might have re-configured */
+>>   	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
+>>   
+>> +	if (!prueth->emacs_initialized) {
+>> +		icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
+>> +		icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
+>> +	}
+>> +
+>>   	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
+>> -	icssg_class_default(prueth->miig_rt, slice, 0, false);
+>>   	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
+>>   
+>>   	/* Notify the stack of the actual queue counts. */
+>> @@ -588,10 +593,31 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   		goto cleanup_napi;
+>>   	}
+>>   
+>> -	/* reset and start PRU firmware */
+>> -	ret = prueth_emac_start(prueth, emac);
+>> -	if (ret)
+>> -		goto free_rx_irq;
+>> +	if (!prueth->emacs_initialized) {
+>> +		if (prueth->emac[ICSS_SLICE0]) {
+>> +			ret = prueth_emac_start(prueth, prueth->emac[ICSS_SLICE0]);
+> 
+> I wonder if it is worth simplifying this by having prueth_emac_start()
+> check if it's 2nd parameter is NULL. Likewise for prueth_emac_stop().
+> 
+Yes right, I will update this.
+>> +			if (ret) {
+>> +				netdev_err(ndev, "unable to start fw for slice %d", ICSS_SLICE0);
+>> +				goto free_rx_irq;
+>> +			}
+>> +		}
+>> +		if (prueth->emac[ICSS_SLICE1]) {
+>> +			ret = prueth_emac_start(prueth, prueth->emac[ICSS_SLICE1]);
+>> +			if (ret) {
+>> +				netdev_err(ndev, "unable to start fw for slice %d", ICSS_SLICE1);
+>> +				goto halt_slice0_prus;
+>> +			}
+>> +		}
+>> +	}
+>> +
+>> +	flow_cfg = emac->dram.va + ICSSG_CONFIG_OFFSET + PSI_L_REGULAR_FLOW_ID_BASE_OFFSET;
+>> +	writew(emac->rx_flow_id_base, &flow_cfg->rx_base_flow);
+>> +	ret = emac_fdb_flow_id_updated(emac);
+>> +
+>> +	if (ret) {
+>> +		netdev_err(ndev, "Failed to update Rx Flow ID %d", ret);
+>> +		goto stop;
+> 
+> Branching to stop may result in calls to prueth_emac_stop() which does not
+> seem symmetrical with the condition on prueth->emacs_initialized for calls
+> to prueth_emac_start() above.
+> 
+> If so, is this intended?
+> 
+Yes this is intended. This change is made to run all the cores during 
+init and in case of any failure, stop all the cores. And even if one 
+interface is up, all the cores should run.
+>> +	}
+>>   
+>>   	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
+>>   
+> 
+> ...
 
