@@ -1,281 +1,125 @@
-Return-Path: <netdev+bounces-143860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99F19C4989
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:05:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9035D9C498B
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C90841F25DB2
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:04:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54568288989
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02D21AB528;
-	Mon, 11 Nov 2024 23:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDE01B4F07;
+	Mon, 11 Nov 2024 23:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SFnl289s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+Gg9nRi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3559F158D8B
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 23:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE5B16F0CA;
+	Mon, 11 Nov 2024 23:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731366294; cv=none; b=lxSuHbnKr6+/HDcCh/cptqMdBpe9ewKj9Lzt8ccglpc8MzdI2zZrUlVc9hdoBXL83EijACQ2Y7RfT0v3ox4ve1YqROcCYQy2EvWi7SBv3VHVMjId72cul1Ev6SPOkHr8eg3qK/0mLHUpzKHa8JI1xUP7k44QEeRAOih+XJWDRyM=
+	t=1731366372; cv=none; b=H3YjDkcO8ohtrIHXjLkAx49rmjfOSbDWbKNkp40uhSyIMS+N8Z072Q1pnTyb70Ut9atorEm7iG/k2Kz7RcMIihHfX/uIbgbGhA4cCv0VI5h0Rv5ptAxJ59S2Fr0R0gQbPE8nVYZ1EWYrdJZg6ZOoKnSgbSEKI+z69qy0TZ6ArFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731366294; c=relaxed/simple;
-	bh=QlFHaXoGdrdsdtsxaMNZEFvMRFaugC/uaB2aDp2fMvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WFQb4Ee157Odm0x2rZlIY3PWUUQvCrDrqCLZuoafDBv+yGMfHspvWrMi9WmvO1+TTqPmLbKHCuwM3vnkhyzc1lRHJZZ8Sgdptkv4pTMeTyPYgbPrXv6L+8qRjPnP6VmUacjfCLxTwWrd5ec7QppFDjL99Xpdl3m4iYa/Nh9cISM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SFnl289s; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f35f4d0e-77df-4e52-b62e-9e1254fb4b5c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731366289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nEuEfLgRpLMggNTLxWl+/ldUjnJz5XMj52pXTGqAcac=;
-	b=SFnl289s5f7ztp763yUfJc+/dJHQ9IYmL41SxAQxZ8sqeyPvmFwQB8VwAfAzRdokQAaqRK
-	ODDSpZwyJoWI05Us9Mwe3jPfD1pPzP+JQMMsQSJ3u8FU8HRTZ/CuhW37QhaXReDcfj49OD
-	6ypasCl86eZmrhQ/Ka3HE8GfMebic8M=
-Date: Mon, 11 Nov 2024 15:04:42 -0800
+	s=arc-20240116; t=1731366372; c=relaxed/simple;
+	bh=5cQ0zZajVpfP0QpuAM0B+3kFcgW+YfPO7ZhjFNsXkNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LsGM0DadK1B1wJfU/C93TOodQYKj/bX0FNiN+Gfd9Q7afhHcWq2CUHpBMOmGCkuei7WPKqxgCvP+d0vnKYkRNCrCAzhD4nIUmiE6Uqlp3VvjNAnW5uL8I0MnISahoyMG7sJ0NuWwcK8zbwg82re9dHJuIXTbyru25YBeo2tT9L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+Gg9nRi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B25CC4CECF;
+	Mon, 11 Nov 2024 23:06:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731366372;
+	bh=5cQ0zZajVpfP0QpuAM0B+3kFcgW+YfPO7ZhjFNsXkNA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=S+Gg9nRivyOHyZripGCNnKCa1o8L3XYcZA5Zrum3/rqRrjztDRo3fPkVSMfcuBDU8
+	 4lH1rH/Jlxk5mtst2T1xiWmFeLPTdpOodh6xJObbGFxFcgi7V2vPX0/0+HUK3mO2ep
+	 McajZR4QGpy+nMDTTp1r5S2dDGsJeODW6JlgVmWtDbPCEpzf8/lAHj0I3tpnha966Q
+	 zDw1Wzh78DRKJ7aWZs0wNi2sFGfFpV3Ri7c50H2cGfWZ58QDkhsObjAi9ow9yE1wsn
+	 A7oe5ai8ZCZHxq2Lcod0G2HqK/v5uV+0dCyYTI7oO9nvsGGypNGz6t+2+BWqoYvePi
+	 o82cYopzw5H8g==
+Date: Mon, 11 Nov 2024 15:06:09 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, donald.hunter@gmail.com,
+ danieller@nvidia.com, ecree.xilinx@gmail.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>, Jacob
+ Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v19 03/10] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
+Message-ID: <20241111150609.2b0425f6@kernel.org>
+In-Reply-To: <20241030-feature_ptp_netnext-v19-3-94f8aadc9d5c@bootlin.com>
+References: <20241030-feature_ptp_netnext-v19-0-94f8aadc9d5c@bootlin.com>
+	<20241030-feature_ptp_netnext-v19-3-94f8aadc9d5c@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 2/2] bpf: Add kernel symbol for struct_ops
- trampoline
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Yonghong Song <yonghong.song@linux.dev>, Kui-Feng Lee <thinker.li@gmail.com>
-References: <20241111121641.2679885-1-xukuohai@huaweicloud.com>
- <20241111121641.2679885-3-xukuohai@huaweicloud.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241111121641.2679885-3-xukuohai@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 11/11/24 4:16 AM, Xu Kuohai wrote:
-> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-> index e99fce81e916..d6dd56fc80d8 100644
-> --- a/kernel/bpf/bpf_struct_ops.c
-> +++ b/kernel/bpf/bpf_struct_ops.c
-> @@ -23,7 +23,6 @@ struct bpf_struct_ops_value {
->   
->   struct bpf_struct_ops_map {
->   	struct bpf_map map;
-> -	struct rcu_head rcu;
+On Wed, 30 Oct 2024 14:54:45 +0100 Kory Maincent wrote:
+> @@ -41,6 +43,11 @@ struct ptp_clock {
+>  	struct ptp_clock_info *info;
+>  	dev_t devid;
+>  	int index; /* index into clocks.map */
+> +	enum hwtstamp_source phc_source;
+> +	union { /* Pointer of the phc_source device */
+> +		struct net_device *netdev;
+> +		struct phy_device *phydev;
+> +	};
 
-Since it needs a respin (more on it later), it will be useful to separate this 
-cleanup as a separate patch in the same patch series.
+Storing the info about the "user" (netdev, phydev) in the "provider"
+(PHC) feels too much like a layering violation. Why do you need this?
 
->   	const struct bpf_struct_ops_desc *st_ops_desc;
->   	/* protect map_update */
->   	struct mutex lock;
-> @@ -32,6 +31,8 @@ struct bpf_struct_ops_map {
->   	 * (in kvalue.data).
->   	 */
->   	struct bpf_link **links;
-> +	/* ksyms for bpf trampolines */
-> +	struct bpf_ksym **ksyms;
->   	u32 funcs_cnt;
->   	u32 image_pages_cnt;
->   	/* image_pages is an array of pages that has all the trampolines
-> @@ -586,6 +587,49 @@ int bpf_struct_ops_prepare_trampoline(struct bpf_tramp_links *tlinks,
->   	return 0;
->   }
->   
-> +static void bpf_struct_ops_ksym_init(const char *tname, const char *mname,
-> +				     void *image, unsigned int size,
-> +				     struct bpf_ksym *ksym)
-> +{
-> +	snprintf(ksym->name, KSYM_NAME_LEN, "bpf__%s_%s", tname, mname);
-> +	INIT_LIST_HEAD_RCU(&ksym->lnode);
-> +	bpf_image_ksym_init(image, size, ksym);
-> +}
-> +
-> +static void bpf_struct_ops_map_ksyms_add(struct bpf_struct_ops_map *st_map)
-> +{
-> +	u32 i;
-> +
-> +	for (i = 0; i < st_map->funcs_cnt; i++) {
-> +		if (!st_map->ksyms[i])
-> +			break;
-> +		bpf_image_ksym_add(st_map->ksyms[i]);
-> +	}
-> +}
-> +
-> +static void bpf_struct_ops_map_del_ksyms(struct bpf_struct_ops_map *st_map)
-> +{
-> +	u32 i;
-> +
-> +	for (i = 0; i < st_map->funcs_cnt; i++) {
-> +		if (!st_map->ksyms[i])
-> +			break;
-> +		bpf_image_ksym_del(st_map->ksyms[i]);
-> +	}
-> +}
-> +
-> +static void bpf_struct_ops_map_free_ksyms(struct bpf_struct_ops_map *st_map)
-> +{
-> +	u32 i;
-> +
-> +	for (i = 0; i < st_map->funcs_cnt; i++) {
-> +		if (!st_map->ksyms[i])
-> +			break;
-> +		kfree(st_map->ksyms[i]);
-> +		st_map->links[i] = NULL;
+In general I can't shake the feeling that we're trying to configure 
+the "default" PHC for a narrow use case, while the goal should be 
+to let the user pick the PHC per socket.
 
-s/links/ksyms/
+> +/**
+> + * netdev_ptp_clock_register() - Register a PTP hardware clock driver for
+> + *				 a net device
+> + *
+> + * @info: Structure describing the new clock.
+> + * @dev:  Pointer of the net device.
 
-pw-bot: cr
+> +/**
+> + * ptp_clock_from_netdev() - Does the PTP clock comes from netdev
+> + *
+> + * @ptp:  The clock obtained from net/phy_ptp_clock_register().
+> + *
+> + * Return: True if the PTP clock comes from netdev, false otherwise.
 
-> +	}
-> +}
-> +
->   static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   					   void *value, u64 flags)
->   {
-> @@ -602,6 +646,8 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   	u32 i, trampoline_start, image_off = 0;
->   	void *cur_image = NULL, *image = NULL;
->   	struct bpf_link **plink;
-> +	struct bpf_ksym **pksym;
-> +	const char *tname, *mname;
->   
->   	if (flags)
->   		return -EINVAL;
-> @@ -641,14 +687,18 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   	kdata = &kvalue->data;
->   
->   	plink = st_map->links;
-> +	pksym = st_map->ksyms;
-> +	tname = btf_name_by_offset(st_map->btf, t->name_off);
->   	module_type = btf_type_by_id(btf_vmlinux, st_ops_ids[IDX_MODULE_ID]);
->   	for_each_member(i, t, member) {
->   		const struct btf_type *mtype, *ptype;
->   		struct bpf_prog *prog;
->   		struct bpf_tramp_link *link;
-> +		struct bpf_ksym *ksym;
->   		u32 moff;
->   
->   		moff = __btf_member_bit_offset(t, member) / 8;
-> +		mname = btf_name_by_offset(st_map->btf, member->name_off);
->   		ptype = btf_type_resolve_ptr(st_map->btf, member->type, NULL);
->   		if (ptype == module_type) {
->   			if (*(void **)(udata + moff))
-> @@ -718,6 +768,14 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   			      &bpf_struct_ops_link_lops, prog);
->   		*plink++ = &link->link;
->   
-> +		ksym = kzalloc(sizeof(*ksym), GFP_USER);
+> +/**
+> + * ptp_clock_netdev() - Obtain the net_device reference of PTP clock
 
-link is also using kzalloc but probably both link and ksym allocation should use 
-bpf_map_kzalloc instead. This switch can be done for both together later as a 
-follow up patch.
+nit: pick one way to spell netdev ?
 
-> +		if (!ksym) {
-> +			bpf_prog_put(prog);
+> +	ret = ptp_clock_get(dev, ptp);
+> +	if (ret)
+> +		return ERR_PTR(ret);
 
-afaik, this bpf_prog_put is not needed. The bpf_link_init above took the prog 
-ownership and the bpf_struct_ops_map_put_progs() at the error path will take 
-care of it.
-
-> +			err = -ENOMEM;
-> +			goto reset_unlock;
-> +		}
-> +		*pksym = ksym;
-
-nit. Follow the *plink++ style above and does the same *pksym++ here.
-
-> +
->   		trampoline_start = image_off;
->   		err = bpf_struct_ops_prepare_trampoline(tlinks, link,
->   						&st_ops->func_models[i],
-> @@ -737,6 +795,12 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   
->   		/* put prog_id to udata */
->   		*(unsigned long *)(udata + moff) = prog->aux->id;
-> +
-> +		/* init ksym for this trampoline */
-> +		bpf_struct_ops_ksym_init(tname, mname,
-> +					 image + trampoline_start,
-> +					 image_off - trampoline_start,
-> +					 *pksym++);
-
-then uses "ksym" here.
-
->   	}
->   
->   	if (st_ops->validate) {
-> @@ -785,6 +849,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   	 */
->   
->   reset_unlock:
-> +	bpf_struct_ops_map_free_ksyms(st_map);
->   	bpf_struct_ops_map_free_image(st_map);
->   	bpf_struct_ops_map_put_progs(st_map);
->   	memset(uvalue, 0, map->value_size);
-> @@ -792,6 +857,8 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   unlock:
->   	kfree(tlinks);
->   	mutex_unlock(&st_map->lock);
-> +	if (!err)
-> +		bpf_struct_ops_map_ksyms_add(st_map);
->   	return err;
->   }
->   
-> @@ -851,7 +918,10 @@ static void __bpf_struct_ops_map_free(struct bpf_map *map)
->   
->   	if (st_map->links)
->   		bpf_struct_ops_map_put_progs(st_map);
-> +	if (st_map->ksyms)
-> +		bpf_struct_ops_map_free_ksyms(st_map);
->   	bpf_map_area_free(st_map->links);
-> +	bpf_map_area_free(st_map->ksyms);
->   	bpf_struct_ops_map_free_image(st_map);
->   	bpf_map_area_free(st_map->uvalue);
->   	bpf_map_area_free(st_map);
-> @@ -868,6 +938,9 @@ static void bpf_struct_ops_map_free(struct bpf_map *map)
->   	if (btf_is_module(st_map->btf))
->   		module_put(st_map->st_ops_desc->st_ops->owner);
->   
-> +	if (st_map->ksyms)
-
-This null test should not be needed.
-
-> +		bpf_struct_ops_map_del_ksyms(st_map);
-> +
->   	/* The struct_ops's function may switch to another struct_ops.
->   	 *
->   	 * For example, bpf_tcp_cc_x->init() may switch to
-> @@ -980,7 +1053,11 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
->   	st_map->links =
->   		bpf_map_area_alloc(st_map->funcs_cnt * sizeof(struct bpf_links *),
->   				   NUMA_NO_NODE);
-> -	if (!st_map->uvalue || !st_map->links) {
-> +
-> +	st_map->ksyms =
-> +		bpf_map_area_alloc(st_map->funcs_cnt * sizeof(struct bpf_ksyms *),
-> +				   NUMA_NO_NODE);
-
-.map_mem_usage at least needs to include the st_map->ksyms[] pointer array. 
-func_cnts should be used instead of btf_type_vlen(vt) for link also in 
-.map_mem_usage.
-
-> +	if (!st_map->uvalue || !st_map->links || !st_map->ksyms) {
->   		ret = -ENOMEM;
->   		goto errout_free;
->   	}
+why do you take references on the ptp device?
 
