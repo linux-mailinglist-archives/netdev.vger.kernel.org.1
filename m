@@ -1,56 +1,82 @@
-Return-Path: <netdev+bounces-143760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CAD69C4005
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:58:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5F609C4082
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 15:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C7D1F21357
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:58:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F89E1F225A4
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0EC19E80F;
-	Mon, 11 Nov 2024 13:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tykzY2Hu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019E619E97E;
+	Mon, 11 Nov 2024 14:17:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584B519C552
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 13:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF2719CC1C;
+	Mon, 11 Nov 2024 14:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731333501; cv=none; b=U0caHhfywrmPZkcvnTLgu5K/jY20vNySSbchhKP52HPE0ercu3FNCx8H2cAkQjTSVhzsT9fgBRhnBmSn2Tje59UfnX/7tF9VuQOgYZUEW6QTtUbUjDqZiIGlfvJ//nGrlXcydZWQHNfTxBHITJm3fP6t/ItHwTrVlFTSDTS4dbA=
+	t=1731334631; cv=none; b=OKXJ+xFaxeJ2Jly2EU6KC3BareEcB5gTHw20Jzt7daYj8z7EB0fuI44t5s7xhYn2KYA0np8395LbXyyEEYmO4Zh1qjvQKhPbVW7E2Towv9/NkiC3NNxfRYcPcILKiGSslarYYNyjsz/Zk2bUg/09twA+O3ru1V/uKPPUyvnCY84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731333501; c=relaxed/simple;
-	bh=qCjXrvzUOOdu3h0mQcfyR6CSxHGWBH3xRNzG2Y2nKmI=;
+	s=arc-20240116; t=1731334631; c=relaxed/simple;
+	bh=atKj27umbsbkvfy41nhNQunjFCIirqrEGyCUijGtQbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUEuk7aO1J9N9Iw8rczfD66NG7XPRtXFyBypZ10YIx8HT/EfaClt+EUFPNoKgWp7r6utXfACsOxeI3co2RfgjdWURJ6hhtOlWve3N+M6fvxFWhCJ9B6DEtwwEeYXI6eo0oIdh9Huosaoks9v9fN0ypKCaQGHMOrZIuR68vVtRVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tykzY2Hu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89555C4CECF;
-	Mon, 11 Nov 2024 13:58:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731333500;
-	bh=qCjXrvzUOOdu3h0mQcfyR6CSxHGWBH3xRNzG2Y2nKmI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tykzY2Hun1j6bIUSOXgrPWL/aQX494OLYSNUFMrgp9+2oISPgej2lWlrhp6luzEsD
-	 Vy0TYKiTpSS5QskWNfNAXcTql91NktfI6RWPABa1L2NYG0sIEdpq1By+/3hpRwWJb8
-	 KeeH7DHn8R4IlbmKWQWB1E+dvhsKk0I/lZxWDf/mnDGr24gIeQxgudyWfP+Y83Z3h2
-	 hL3uD4SFtXWeOd4XoRtgA/1SMuD2UXDoehHWyiT40XMaYu22EQmBwOOzzFogHhFeiX
-	 MDnodvZN9qZQIAQlYGVyvI1jxre0HjsT61bwEK253DJxTflBEsc2LXLCaaQLaFPHmQ
-	 /KYKgDm9hQlPA==
-Date: Mon, 11 Nov 2024 13:58:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, kernel-team@meta.com,
-	sanmanpradhan@meta.com, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next] eth: fbnic: Add support to dump registers
-Message-ID: <20241111135816.GD4507@kernel.org>
-References: <20241108013253.3934778-1-mohsin.bashr@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gD4fZ9Dhty/gE33SmpQkebSYT/IEdWkscBo5lwGDw/I+yfeUWunkW8v6x5fB9QPFx+mW/ej1HNhw/EIAaRNRuMP64u9zssFTTNoJl93FifvDeADRQll3vpM2jjrsIJSNIGdDB/WIG2VjieTYNKYPsOG7PrTxp3dw7FtmhvkCqM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 7999E1A117E;
+	Mon, 11 Nov 2024 15:08:52 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 6CDCC1A1174;
+	Mon, 11 Nov 2024 15:08:52 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 2C4EF2037A;
+	Mon, 11 Nov 2024 15:08:52 +0100 (CET)
+Date: Mon, 11 Nov 2024 15:08:52 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>
+Subject: Re: [PATCH v4 14/16] net: stmmac: dwmac-s32: add basic NXP S32G/S32R
+ glue driver
+Message-ID: <ZzIP9OrIi+X/akgg@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-14-03618f10e3e2@oss.nxp.com>
+ <c902dc2a-9b2a-44a0-be1d-88fb150f4f17@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,18 +85,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108013253.3934778-1-mohsin.bashr@gmail.com>
+In-Reply-To: <c902dc2a-9b2a-44a0-be1d-88fb150f4f17@lunn.ch>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On Thu, Nov 07, 2024 at 05:32:53PM -0800, Mohsin Bashir wrote:
-> Add support for the 'ethtool -d <dev>' command to retrieve and print
-> a register dump for fbnic. The dump defaults to version 1 and consists
-> of two parts: all the register sections that can be dumped linearly, and
-> an RPC RAM section that is structured in an interleaved fashion and
-> requires special handling. For each register section, the dump also
-> contains the start and end boundary information which can simplify parsing.
+On Tue, Oct 29, 2024 at 01:15:52PM +0100, Andrew Lunn wrote:
+> > +#define GMAC_TX_RATE_125M	125000000	/* 125MHz */
+> > +#define GMAC_TX_RATE_25M	25000000	/* 25MHz */
+> > +#define GMAC_TX_RATE_2M5	2500000		/* 2.5MHz */
 > 
-> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> With the swap to the new helper, i think 25M and 2M5 are no longer
+> needed.
+> 
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Sure, I will fix it in v5.
 
+> > +static int s32_gmac_init(struct platform_device *pdev, void *priv)
+> > +{
+> > +	struct s32_priv_data *gmac = priv;
+> > +	int ret;
+> > +
+> > +	ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_125M);
+> > +	if (!ret)
+> > +		ret = clk_prepare_enable(gmac->tx_clk);
+> > +
+> > +	if (ret) {
+> > +		dev_err(&pdev->dev, "Can't set tx clock\n");
+> > +		return ret;
+> > +	}
+> > +
+> > +	ret = clk_prepare_enable(gmac->rx_clk);
+> > +	if (ret)
+> > +		dev_dbg(&pdev->dev, "Can't set rx, clock source is disabled.\n");
+> > +	else
+> > +		gmac->rx_clk_enabled = true;
+> 
+> Why would this fail? And if it does fail, why is it not fatal? Maybe a
+> comment here.
+> 
+> > +static void s32_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
+> > +{
+> > +	struct s32_priv_data *gmac = priv;
+> > +	long tx_clk_rate;
+> > +	int ret;
+> > +
+> > +	if (!gmac->rx_clk_enabled) {
+> > +		ret = clk_prepare_enable(gmac->rx_clk);
+> > +		if (ret) {
+> > +			dev_err(gmac->dev, "Can't set rx clock\n");
+> 
+> dev_err(), so is failing now fatal, but since this is a void function,
+> you cannot report the error up the call stack?
+> 
+
+I did a homework and checked the issue which was fixed by that 'lazy' rx
+clock enable procedure and got conslusion it is not needed anymore, as I
+was not able to reproduce the issue on the same board but with newer
+kernel version (6.6.32 versus 5.15.73).
+
+So I will simplify rx clock management in v5.
+
+BR.
+/Jan
 
