@@ -1,99 +1,159 @@
-Return-Path: <netdev+bounces-143857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F28F89C48FF
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:20:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE979C4907
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:23:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A544B1F22AD8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 22:20:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCDFB2842EA
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 22:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34311BC9FF;
-	Mon, 11 Nov 2024 22:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D5C1714D3;
+	Mon, 11 Nov 2024 22:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P6c9o9Kz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="bdJ5RNfd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE861BC085;
-	Mon, 11 Nov 2024 22:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62DC8150990
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 22:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731363627; cv=none; b=SwqZUHXwG5yfQUEvp/a0CJwBAB0d/9TyFCWmiJoVRpDVrQ0wx9nUW+YIW2wA8faqQsYrw3LFNmoVyVm4aEjc5UwsjhjgOLI1oJJMbB3X1u5MC1ghN7Lc52L0uqdoZNuM9Hs3JT3frEjcfDeVmS8pFuoyHVN8bSNftKm/aBzPE8o=
+	t=1731363787; cv=none; b=I+3Ha6h8UTs02AVVNANjyNcXdZwJDHDc/dS35fOgfOBGPg/CcSk9TaJ15JPyDiJeNN4OGptdVF6XqxtAxJhCQzkqdZCrUGUMe4wHM/sJWvT+2QLGRhi3VNlvV93SpqZaeJtRdjKpKtMR/Bxbx7G1OZ/eJ5+MQrcNSyTNElO2jv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731363627; c=relaxed/simple;
-	bh=yYcYFR5odzQQFMMS9ZBFI+glA7cNBWrgRkqOTfSQLVs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PbOUudU0lqGQHEYFqa6h+nxXsym6wpX0RUTkWdrw6oqOSJZhRnoj7pPzIwjZONjA4iRQL/WEG7+Q5IYDTLUowdvOOq7PkvKTGcJT0lvcDNpr2FskuIinlMphoYQd93thls5AMbY1GCSh5vlsHhvLn7AX5gx9++F57Qlzw3CaWeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P6c9o9Kz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31FC2C4CECF;
-	Mon, 11 Nov 2024 22:20:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731363627;
-	bh=yYcYFR5odzQQFMMS9ZBFI+glA7cNBWrgRkqOTfSQLVs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=P6c9o9KzvS2ieo5GYGN1T2QBG/jiNK260IVGshm7UyCwZfB2OFkxdRrrEtvdhKHYW
-	 kaE8bG+SCiV2Oh6zVW0MOxBPnoP8+09K6TWCJ+ul+DDAUuBgnkbfw3CdCz7P2jVURg
-	 m2zj/aeKpJifrs+jhiwRUkMCri3CuGG3HEbG2gleaaQT681VnEdSkwoUd9+GobElDx
-	 XuDsH+IWBwOBl9vB3sYzjpZrBdvU+pNPjC5VCR6+v9tUytgwH/Lp+mEqjuorJgI8dq
-	 iqg5rHWEJDv5A2mQm2gd2Dl4wBphd7a5yve7F4C+0+TeQ55wuR8g7l7UfYAwbZ0i1t
-	 3YrFPpYkLBYoA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7129F3809A80;
-	Mon, 11 Nov 2024 22:20:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1731363787; c=relaxed/simple;
+	bh=oEkq5JQuZ0g+PteOabUnceUzJjXO3FWbvb0iXjHZDpw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p3wGtffOrmwwMpwxj7ku0qoQLxz45MKMt7D5Zgm1h7E2/47bRvoxXymluJMpl4gYVOT8dSrOPP6UVzTe+a0INFZ2ISwezurQyeGMtTZ8R5eYaoWQi9Zh3nmGwJ9rGDCFC2xx73u+xLtosgSWniSS+7GvO4LGswWDJdhwgTn9aWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=bdJ5RNfd; arc=none smtp.client-ip=35.89.44.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5003a.ext.cloudfilter.net ([10.0.29.159])
+	by cmsmtp with ESMTPS
+	id AXIKt06PsVpzpAcoFtKtMh; Mon, 11 Nov 2024 22:22:59 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id AcoEtw7zy827nAcoFtxVXF; Mon, 11 Nov 2024 22:22:59 +0000
+X-Authority-Analysis: v=2.4 cv=GeTcnhXL c=1 sm=1 tr=0 ts=673283c3
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=GtNDhlRIH4u8wNL3EA3KcA==:17
+ a=IkcTkHD0fZMA:10 a=VlfZXiiP6vEA:10 a=7T7KSl7uo7wA:10
+ a=vVgwA9Hib2JlT8r2P8IA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=Xt_RvD8W3m28Mn_h3AK8:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QuuLV8RyuuVn5LsdO/A41b5qscG32jUw1xdRZuRx+yg=; b=bdJ5RNfduZCRpxWEX6hIqSthKH
+	FTrrIIZTFqrF5L1x6K8hpRT2ePufSi0hTV+ZvVn7Hu2iwPJsIny4fU3k9NnazJIltpgU+RnjCf8lh
+	4V8sqkmVATnc14qcYUH4wDC0yuL0VqRPoyinpwa0tBF6g7fas+g4K9seXUJt5GdTLZ+lyvH2L5vOr
+	uRpfWWIxhtPZmVFpaUND1UH9U5X03mf7jZW6ZfKeABx6TwirDJO2jqcvv5mI96xYT79AQzqjiW8f7
+	9QX2R35vsLfgem1jEXapJBYlYcvl37s9uVkZNi2Xov+k/q0nctJrNDP5ApNxSsR8k/wBSPCNj+NV7
+	4rz8BzeA==;
+Received: from [177.238.21.80] (port=27680 helo=[192.168.0.21])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1tAcoC-001lqJ-2Y;
+	Mon, 11 Nov 2024 16:22:56 -0600
+Message-ID: <d4f0830f-d384-487a-8442-ca0c603d502b@embeddedor.com>
+Date: Mon, 11 Nov 2024 16:22:53 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2][next] UAPI: ethtool: Use __struct_group() in
+ struct ethtool_link_settings
+To: Jakub Kicinski <kuba@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Michael Chan <michael.chan@broadcom.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
+ Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
+ Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Kees Cook <kees@kernel.org>
+References: <cover.1730238285.git.gustavoars@kernel.org>
+ <9e9fb0bd72e5ba1e916acbb4995b1e358b86a689.1730238285.git.gustavoars@kernel.org>
+ <20241109100213.262a2fa0@kernel.org>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20241109100213.262a2fa0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 net-next 0/3] Knobs for NPC default rule counters 
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173136363724.4189866.12190832539503399018.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Nov 2024 22:20:37 +0000
-References: <20241105125620.2114301-1-lcherian@marvell.com>
-In-Reply-To: <20241105125620.2114301-1-lcherian@marvell.com>
-To: Linu Cherian <lcherian@marvell.com>
-Cc: davem@davemloft.net, sgoutham@marvell.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, gakula@marvell.com, hkelam@marvell.com,
- sbhatta@marvell.com, jerinj@marvell.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.21.80
+X-Source-L: No
+X-Exim-ID: 1tAcoC-001lqJ-2Y
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.21]) [177.238.21.80]:27680
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfIEFLqd4sFWTtf6pxe04ttx6eH8QnWmPH5YBazwE8WHcmHXEluG2RkMwy1+5owR+fNjxkXGRcEIwfHvD/La5uChYupfRO1aXDoE1cO3uVUxSqmcRekR7
+ ewWYZOE0m4A/ei1vUUjm4/2GDgJlmlNYPt31CNmEPm5NOod1SRE5dhlAjyCvTZ1wUpsjuIz77ms9YVIloMjuv0c+Y/ifiqeLYGI=
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 5 Nov 2024 18:26:17 +0530 you wrote:
-> Changelog from v4:
-> - Minor code refactoring to make the code more readable
-> - Make documentation more clear about the counter usage, behaviour when
->   counter resources are not available, definition for default rules.
+On 09/11/24 12:02, Jakub Kicinski wrote:
+> On Tue, 29 Oct 2024 15:55:35 -0600 Gustavo A. R. Silva wrote:
+>> Use the `__struct_group()` helper to create a new tagged
+>> `struct ethtool_link_settings_hdr`. This structure groups together
+>> all the members of the flexible `struct ethtool_link_settings`
+>> except the flexible array. As a result, the array is effectively
+>> separated from the rest of the members without modifying the memory
+>> layout of the flexible structure.
+>>
+>> This new tagged struct will be used to fix problematic declarations
+>> of middle-flex-arrays in composite structs[1].
 > 
-> Changelog from v3:
-> Add documentation for the new devlink param as well as the existing
-> ones.
+> Possibly a very noob question, but I'm updating a C++ library with
+> new headers and I think this makes it no longer compile.
 > 
-> [...]
+> $ cat > /tmp/t.cpp<<EOF
+> extern "C" {
+> #include "include/uapi/linux/ethtool.h"
+> }
+> int func() { return 0; }
+> EOF
+> 
+> $ g++ /tmp/t.cpp -I../linux -o /dev/null -c -W -Wall -O2
+> In file included from /usr/include/linux/posix_types.h:5,
+>                   from /usr/include/linux/types.h:9,
+>                   from ../linux/include/uapi/linux/ethtool.h:18,
+>                   from /tmp/t.cpp:2:
+> ../linux/include/uapi/linux/ethtool.h:2515:24: error: ‘struct ethtool_link_settings::<unnamed union>::ethtool_link_settings_hdr’ invalid; an anonymous union may only have public non-static data members [-fpermissive]
+>   2515 |         __struct_group(ethtool_link_settings_hdr, hdr, /* no attrs */,
+>        |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> 
+> I don't know much about C++, tho, so quite possibly missing something
+> obvious.
 
-Here is the summary with links:
-  - [v5,net-next,1/3] octeontx2-af: Refactor few NPC mcam APIs
-    https://git.kernel.org/netdev/net-next/c/ca122473ebca
-  - [v5,net-next,2/3] octeontx2-af: Knobs for NPC default rule counters
-    https://git.kernel.org/netdev/net-next/c/70a7434bdb13
-  - [v5,net-next,3/3] devlink: Add documentation for OcteonTx2 AF
-    https://git.kernel.org/netdev/net-next/c/46799a41d292
+We are in the same situation here.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It seems C++ considers it ambiguous to define a struct with a tag such
+as `struct TAG { MEMBERS } ATTRS NAME;` within an anonymous union.
 
+Let me look into this further...
+--
+Gustavo
 
 
