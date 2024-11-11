@@ -1,156 +1,292 @@
-Return-Path: <netdev+bounces-143670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD469C3967
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:07:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B7A9C396A
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 603942823D2
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 08:07:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B3501F21044
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 08:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB18158D79;
-	Mon, 11 Nov 2024 08:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1049814B077;
+	Mon, 11 Nov 2024 08:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="G7hrW6fd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i5XzBiX3"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.65.219])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169A514B077;
-	Mon, 11 Nov 2024 08:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.65.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23B720B22;
+	Mon, 11 Nov 2024 08:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731312455; cv=none; b=mv9YMn/5Jyn0aYCm4V/XZfu9FK8zsF6feffYc1P5IVd4U3lS70IwEGPJTApw0Szn7g0C6bHJlh8jgw1Au6VgtoEyZW6SNHXRHsWmsdaZmDRKPrukH9Kepe6VvQ4lvzTJxRhRkWOCu7BvVgDyHO40V1Q9v5Laq2cc7hQ4YknJTfI=
+	t=1731312536; cv=none; b=lqbFETlyXpjmgPYiHl90uptiILMklKO9Y3M55Q4RSyyEFcimneefyoJuu3BYeoo0qPw37Fb5H3r6Jajr4RZoyRM+6hXqAPeeinmI15dN4Su72KrVVNZx2nBVmdg1H+2DGg+X5bW/ivPGGOJ2AmPjI85Pon86okKc/M32RSTVBBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731312455; c=relaxed/simple;
-	bh=PhwDtEg/LEpTPpLUYCpjCql2vZFz2gWbSSuDrAl9AKg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c58tu2wm2RoocEtjuZX4V1yjox+CMR9wQqOeJE3rDvGlkgRMrbTSKVLqgB1GnOg5weioZVIWVwgdYrZfi3JFt4zYO4ZOs5C8oriivhVuFhr2vYPVP5bMxOZaLUFuiO2Wv+rGO20A6ZyZ5KQHqdCiP4gqPV4ljAR0vPCYUs91YFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=G7hrW6fd; arc=none smtp.client-ip=114.132.65.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1731312435;
-	bh=Y1fuglRgUw47/f3KQYozli3/k4/a9X3TSldSFC8XL5o=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=G7hrW6fd6BKCGpmY3swi8/cH+8+Dt+0u+dkjl/nPaH1YBmro9pg5Ocwjd+NOKJQtp
-	 dcfTmQ0QCRZlf/jZr06JhM8RHY/qCD3HcnaSQLjIJh66UoRmoQQNjCRGunuG6OlHa3
-	 E5z/e6iZ44oZ8s53DgXaUAr5ruX7cSrRUkgqaAWc=
-X-QQ-mid: bizesmtpsz8t1731312404twhijyk
-X-QQ-Originating-IP: sjAl8FxYTJ6OMhx6nAYKrFe48tSnxFP11GG7iE8sYj8=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 11 Nov 2024 16:06:42 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6476989594551450920
-From: WangYuli <wangyuli@uniontech.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	guanwentao@uniontech.com,
-	zhanjun@uniontech.com,
-	f.fainelli@gmail.com,
-	sebastian.hesselbarth@gmail.com,
-	mugunthanvnm@ti.com,
-	geert+renesas@glider.be,
-	WangYuli <wangyuli@uniontech.com>
-Subject: [PATCH] net: phy: fix may not suspend when phy has WoL
-Date: Mon, 11 Nov 2024 16:06:27 +0800
-Message-ID: <ACDD37BE39A4EE18+20241111080627.1076283-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1731312536; c=relaxed/simple;
+	bh=85Iyog3gqyct6e3PZpARDGMRXtwa/eLkH9q7andW/cM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VkwHO6CO76UWRBGggC/h4g6haATs762HpleXQlyEtPRSgNlSo/xy82glsn6gw+kQkweyid3NfVvIAF3C1chAyTeQOLcW8nxPCCPRIMaT6CFKKKEYiyp5U/Fs4l+3LfzLZPOlmDtrBkxQDKag54bslp/PRFHH35zLn2+4aUiVx78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i5XzBiX3; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731312534; x=1762848534;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=85Iyog3gqyct6e3PZpARDGMRXtwa/eLkH9q7andW/cM=;
+  b=i5XzBiX3dWJCwPd/JVgo/TQ7qQI+IvH+qD7M0AZ7+HEByeiGl8Q3R+JV
+   /M6OYwwzYijtI3pp36xm0Y5lDd0RxK9NgEIC4SZ6UuxuhzNcj+/O9/nbm
+   8VfSf+pMWnRmo76t+/rcoCoaSz6G3AaYwNaDs9/HTwZFEqYpq5jf0ebX9
+   UsVLF2Kdvu+usyiEWpOKWFwxX8Z1ZNElKDq+Phfem4z3/Brr8NPDl52FD
+   NPEfVnctEJvhFiFaveASY8TYoCmUUGTdAsVULGvHkchdXxtV2vRcSRhB2
+   9JRgYliJSTRDi3SZAlogliYK5XqB2akP7K4i+uueKpLCfyjSIUoHLkubY
+   w==;
+X-CSE-ConnectionGUID: C3z2vFAQR9+7mG72rSWmCQ==
+X-CSE-MsgGUID: o8Eb3tcMRlua77ezV0YVuQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11252"; a="41723200"
+X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
+   d="scan'208";a="41723200"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 00:08:53 -0800
+X-CSE-ConnectionGUID: TafoUJFlSgKI4/44qPh1Vg==
+X-CSE-MsgGUID: Z7tRErwnQRKsXqh0vjG4tA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
+   d="scan'208";a="91323637"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 00:08:52 -0800
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net-next v5 0/9] lib: packing: introduce and use
+ (un)pack_fields
+Date: Mon, 11 Nov 2024 00:08:41 -0800
+Message-Id: <20241111-packing-pack-fields-and-ice-implementation-v5-0-80c07349e6b7@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NV9lVvsB36OpD6PKvxpVWu6D1z11YJfLSY4u2HvUy/KS3zr3hAkPgjS5
-	okRxcIKaAdmn90ieMiTsXMmXt0/nVVQ1XXMusgHlsiTnU+S6qQE+9CzIz6dX8nYYS2Akf5l
-	IKP3L6K8MtxtBttfe1WbVF7tADyLp17ZdzGIXd4vloeUQLhsOjYslfrG7JeVUvD/92y1xaA
-	c1PfIw2JlRBFcpui3PlRxNtghtUHu19CL8k7CsHD+iXguDwO7eFf4ns5sv7oADNt3XrGNeW
-	SLZkLs9UxcsCr+weGUHOdOUK8//pp/4tyjWQcfiMDuQFX+bMdsvS5GSjoYnFIhlVcYqwxGv
-	0BNhk9YbfbXA6mTIqGffhubRZXneZv7BXSqlYDOa9p/8cymNkHj4Fr2H/xAoZhaJU9qUND1
-	QmcXPYOLO+lAahJZO/izSlMqfxpzs/xMdFj+VMDAurBhjjx9/ANrvoDcsxLMNmEYxVx1plq
-	lkPZr3ISSdM/Vs1+oNaNS/L70nPr4A8HEWpqlxEOjgNdKkSChd3c95SVykWGgzIgFTD6Goy
-	TUsLsjB8PKkjDzPgeuFmcfh7Sbl+dza3Xb+//lmprh00wojN8gs217OP4zd0qZ15KS9A5nN
-	Hu+NUBelClE9/viLC7XZ3tyAlckdeV2phFWsPx0dBis8Ia9Z206iEHlGLPKFEQs/Io5T8PW
-	wbxbUAKw8I0yk+dggcabFHu3a4iqMGRaFJ79lp0m37u/iLq1cJs1QMcb94wJW8/XA/m2XAj
-	GLO3huJcsJ76tCigMOmLyfgF2LO2dkRJOcDE5MQ+R8L5s+ZZmeEgQ52MkubsoTNfVeVecri
-	ZWN10Zx6AewPnupR5i9w9jEo6v+geosZfhvVXZzNIVYgA74wZZcF4I7i5QHL1MwmARgt/Vq
-	WkOX+Oy7zIdbsCw4lE2R9ndo3RzGaEFC9bnplp7cVU4b/b5DTSF520QCIpSx7pf0P4qaFbc
-	LOLFFCzY6FL8kkTy4apwhfV8A0F27FLyMEykllEW7pFqwdsMlUQwE4ZQXXta3DMdugW4xVE
-	ybzlBghd5GA+i/KByC8dhmJ133BpIXXAhMQ8enPJ2MJShZHUleMUhjgPO/tJw=
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIm7MWcC/5XOTWrDMBAF4KsYraOiX4+dVe9RslDG40TUlo0tT
+ ELw3StUSk270moYZvjee7GVFk8rO1cvttDmVz+FtNhTxfDuwo2479LOlFBGCmH47PDTh1uevPc
+ 0dCt3oeMe0+s4DzRSiC4mhl8lICA1pEGzBM4L9f6Rwz5YoMgDPSK7pMvdr3FanrnFJvP9O1DKk
+ sBNcsG79ip7sEKAEe8+RBrecBpzzKYOtLJFtEo0aANQY9PQf1r/0lLURbRONFrjNLa9bFs40Kf
+ qh4RiUgHaunaojK7/tjXHtk0RbRLdSNf2RqEWZI/0vu9fgcE9W1ICAAA=
+To: Vladimir Oltean <olteanv@gmail.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Masahiro Yamada <masahiroy@kernel.org>, netdev <netdev@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+X-Mailer: b4 0.14.1
 
-From: Wentao Guan <guanwentao@uniontech.com>
+This series improves the packing library with a new API for packing or
+unpacking a large number of fields at once with minimal code footprint. The
+API is then used to replace bespoke packing logic in the ice driver,
+preparing it to handle unpacking in the future. Finally, the ice driver has
+a few other cleanups related to the packing logic.
 
-When system suspends and mdio_bus_phy goes to suspend, if the phy
-enabled wol, phy_suspend will returned -EBUSY, and break system
-suspend.
+The pack_fields and unpack_fields functions have the following improvements
+over the existing pack() and unpack() API:
 
-Commit 93f41e67dc8f ("net: phy: fix WoL handling when suspending
-the PHY") fixes the case when netdev->wol_enabled=1, but some case,
-netdev->wol_enabled=0 and phydev set wol_enabled enabled, so check
-phydev->wol_enabled.
+ 1. Packing or unpacking a large number of fields takes significantly less
+    code. This significantly reduces the .text size for an increase in the
+    .data size which is much smaller.
 
-This case happens when using some out of tree ethernet drivers or
-phy drivers.
+ 2. The unpacked data can be stored in sizes smaller than u64 variables.
+    This reduces the storage requirement both for runtime data structures,
+    and for the rodata defining the fields. This scales with the number of
+    fields used.
 
-Log:
-YT8531S Gigabit Ethernet phytmac_mii_bus-PHYT0046:00:07: PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x10c returns -16
-YT8531S Gigabit Ethernet phytmac_mii_bus-PHYT0046:00:07: PM: failed to suspend: error -16
-PM: Some devices failed to suspend, or early wake event detected
-YT8531S Gigabit Ethernet phytmac_mii_bus-PHYT0046:00:07: PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x10c returns -16
-YT8531S Gigabit Ethernet phytmac_mii_bus-PHYT0046:00:07: PM: failed to suspend: error -16
-PM: Some devices failed to suspend, or early wake event detected
-YT8531S Gigabit Ethernet phytmac_mii_bus-PHYT0046:00:07: PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x10c returns -16
-YT8531S Gigabit Ethernet phytmac_mii_bus-PHYT0046:00:07: PM: failed to freeze: error -16
+ 3. Most of the error checking is done at compile time, rather than
+    runtime, via additional checks added to modpost. This saves wasted
+    computation time *and* catches errors in the field definitions early,
+    rather than only after the offending code is executed.
 
-Link: https://lore.kernel.org/all/20240827092446.7948-1-guanwentao@uniontech.com/
-Fixes: 481b5d938b4a ("net: phy: provide phy_resume/phy_suspend helpers")
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+The actual packing and unpacking code still uses the u64 size
+variables. However, these are converted to the appropriate field sizes when
+storing or reading the data from the buffer.
+
+The majority of the "compile time" checks are placed into modpost. This is
+done to enable checking ordering and overlap of the fields. An attempt was
+made to implement these checks via macro in version 2 of this series.
+However, the C pre-processor cannot use loops to execute compile time
+checks. Without the loops, drivers were responsible for using the specific
+CHECK_PACKED_FIELDS_<N> macro. We generated these macros at compile time,
+but this resulted in thousands of lines of macro in the
+<generated/packing-checks.h> header. To limit the size, we tried config
+options to only generate the macros that are used. This resulted in even
+more complexity in the drivers and the build system.
+
+By using modpost, all of this complexity is kept in one place, minimizing
+the complexity on driver authors.
+
+Modpost can easily check the field overlap and ordering restrictions, but
+it cannot easily check that the fields fit within the buffers. To do that,
+modpost would need to obtain the size of the target buffer. This was
+attempted in v3, but the result was a mess, as modpost had to obtain a
+special symbol with the target size.
+
+Instead, modpost now only checks the things that are simple for it to
+check. The buffer size check is now handled directly by the pack_fields and
+unpack_fields macros. To obtain the size, we enforce that users wrap their
+buffer with an appropriate type (such as via a packed structure with a
+fixed size buffer). This reduces the number of arguments, and enables easy
+size checking. To allow both ascending and descending order, the first and
+last elements are checked to be within the size of the buffer. Modpost
+ensures that we do not allow other orderings, so we only need to check 2
+places.
+
+This version has much simpler modpost checks, as we no longer need to keep
+a hash of all the symbols: each symbol is independently checked. This
+reduces the amount of code even further, and avoids some other
+modifications that were originally required.
+
+This implementation is even simpler than before, and I do think modpost is
+better overall. The macro checks require additional work from drivers and
+might need to be extended if a user ever needs more than 50 fields.
+
+If the enforcement of a structured type is frowned upon, I believe we could
+keep the original API with a pbuflen argument and use
+__builtin_choose_expr() and __is_constexpr() to determine whether to have
+the checks run at compile time or run time.
+
+I'm in favor of this modpost implementation over the previous macro based
+solution. The fact that the mess of checking the fields is fairly self
+contained and avoids the mess of the CHECK_* and config options is a big
+win, and I think the modpost option is significantly better for this.
+
+Pros:
+
+ * Significantly less code to implement the checks, even if we ignore the
+   generated portions in <generated/packing-checks.h>
+
+ * The modpost checks are able to work in arbitrarily sized arrays, without
+   needing to add any modification in the future. The macro implementation
+   could require adding additional macros if a driver ever needed >50
+   fields.
+
+ * Keeping the size checks within pack_fields() and unpack_fields() greatly
+   simplifies the modpost implementation as we no longer need to determine
+   the sizes. This makes the checks extremely self contained.
+
+ * This solution avoids needing to edit the top level Kbuild.
+
+ * We don't need to leave 20K+ lines of code in a generated header.
+
+ * We don't need to add extra config options.
+
+ * Field order is enforced, which I think is useful even outside
+   simplifying the overlap checks to O(N).
+
+ * Drivers simply DECLARE_PACKED_FIELDS_(S|M) and get modpost warnings,
+   without requiring a manual call to CHECK_PACKED_FIELDS*. This should
+   make it easier to review, and less likely that checks are skipped.
+
+Cons:
+
+ * modpost doesn't have source code line information, so we can't report
+   that back to the user.
+
+ * modpost errors are reported slightly later in the compile process.
+
+ * We have to place the packed field arrays in special sections to enable
+   modpost. This is handled by DECLARE macros, so we have to ensure all
+   users use these macros. I did not attempt to add a check for that in
+   this series, but it could be done in principle with cocinelle or
+   checkpatch.
+
+ * These type of checks do feel somewhat ancillary to the original purpose
+   of modpost.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/phy/phy_device.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Changes in v5:
+- Fix printf format specifier for the sym->st_size
+- Link to v4: https://lore.kernel.org/r/20241108-packing-pack-fields-and-ice-implementation-v4-0-81a9f42c30e5@intel.com
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index bc24c9f2786b..12af590bfd99 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -315,6 +315,19 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- 	if (netdev->ethtool->wol_enabled)
- 		return false;
- 
-+	/* Ethernet and phy device wol state may not same, netdev->wol_enabled
-+	 * disabled, and phydev set wol_enabled enabled, so netdev->wol_enabled
-+	 * is not enough.
-+	 * Check phydev->wol_enabled.
-+	 */
-+	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
-+
-+	phy_ethtool_get_wol(phydev, &wol);
-+	if (wol.wolopts) {
-+		phydev_warn(phydev, "Phy and mac wol are not compatible\n");
-+		return false;
-+	}
-+
- 	/* As long as not all affected network drivers support the
- 	 * wol_enabled flag, let's check for hints that WoL is enabled.
- 	 * Don't suspend PHY if the attached netdev parent may wake up.
+Changes in v4:
+- Move the buffer size checks to (un)pack_fields() macros.
+- Enforce use of a sized type of the packed buffer, removing the now
+  unnecessary pbuflen argument of (un)pack_fields().
+- Drop exporting the buffer size to modpost.
+- Simplify modpost implementation to directly check each symbol in the
+  handle_packed_field_symbol() function. This removes the need for a hash,
+  and is ultimately much simpler now that modpost doesn't need the size of
+  the target buffer.
+- Fix the width check to correctly calculate the width and compare it
+  properly.
+- Refactor modpost messages to consistently report the module name first,
+  the symbol name second, and the field number 3rd.
+- Correctly implement overlap checks in the modpost, rather than only
+  checking field ordering.
+- Link to v3: https://lore.kernel.org/r/20241107-packing-pack-fields-and-ice-implementation-v3-0-27c566ac2436@intel.com
+
+Changes in v3:
+- Replace macro-based C pre-processor checks with checks implemented in
+  modpost.
+- Move structure definitions into  <linux/packing_types.h> to enable reuse
+  within modpost.
+- Add DECLARE_PACKED_FIELDS_S and DECLARE_PACKED_FIELDS_M to enable
+  automatically generating the buffer size constants and the section
+  attributes.
+- Add additional unit tests for the pack_fields and unpack_fields APIs.
+- Update documentation with an explanation of the new API as well as some
+  example code.
+- Link to v2: https://lore.kernel.org/r/20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com
+
+Changes in v2:
+- Add my missing sign-off to the first patch
+- Update the descriptions for a few patches
+- Only generate CHECK_PACKED_FIELDS_N when another module selects it
+- Add a new patch introducing wrapper structures for the packed Tx and Rx
+  queue context, suggested by Vladimir.
+- Drop the now unnecessary macros in ice, thanks to the new types
+- Link to v1: https://lore.kernel.org/r/20241011-packing-pack-fields-and-ice-implementation-v1-0-d9b1f7500740@intel.com
+
+---
+Jacob Keller (6):
+      ice: remove int_q_state from ice_tlan_ctx
+      ice: use structures to keep track of queue context size
+      ice: use <linux/packing.h> for Tx and Rx queue context data
+      ice: reduce size of queue context fields
+      ice: move prefetch enable to ice_setup_rx_ctx
+      ice: cleanup Rx queue context programming functions
+
+Vladimir Oltean (3):
+      lib: packing: create __pack() and __unpack() variants without error checking
+      lib: packing: demote truncation error in pack() to a warning in __pack()
+      lib: packing: add pack_fields() and unpack_fields()
+
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  11 +-
+ drivers/net/ethernet/intel/ice/ice_common.h     |   5 +-
+ drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h  |  49 +---
+ include/linux/packing.h                         |  43 ++++
+ include/linux/packing_types.h                   |  48 ++++
+ scripts/mod/modpost.h                           |   5 +
+ drivers/net/dsa/sja1105/sja1105_static_config.c |   8 +-
+ drivers/net/ethernet/intel/ice/ice_base.c       |   6 +-
+ drivers/net/ethernet/intel/ice/ice_common.c     | 293 +++++-------------------
+ lib/packing.c                                   | 285 +++++++++++++++++------
+ lib/packing_test.c                              |  61 +++++
+ scripts/mod/modpost.c                           |   3 +-
+ scripts/mod/packed_fields.c                     | 199 ++++++++++++++++
+ Documentation/core-api/packing.rst              |  59 +++++
+ MAINTAINERS                                     |   2 +
+ drivers/net/ethernet/intel/Kconfig              |   1 +
+ scripts/mod/Makefile                            |   4 +-
+ 17 files changed, 725 insertions(+), 357 deletions(-)
+---
+base-commit: 774ca6d3bf24287ff60b7d6dd4171ebb6e47760a
+change-id: 20241004-packing-pack-fields-and-ice-implementation-b17c7ce8e373
+
+Best regards,
 -- 
-2.45.2
+Jacob Keller <jacob.e.keller@intel.com>
 
 
