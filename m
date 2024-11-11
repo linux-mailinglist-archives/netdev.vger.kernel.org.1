@@ -1,133 +1,78 @@
-Return-Path: <netdev+bounces-143727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF419C3DF7
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:07:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EBD79C3E40
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F1511C217E0
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:07:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 543F428284D
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE91C19993B;
-	Mon, 11 Nov 2024 12:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB2318CC0B;
+	Mon, 11 Nov 2024 12:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CYohmhPb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYfOTNNd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB2319B3FF
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 12:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD57814B946;
+	Mon, 11 Nov 2024 12:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731326847; cv=none; b=XOUObfgXGMbyzMPO2z0OxbRFp0BhKTTixJtel23XU4p4ZPv1/HUKuVFfw2osx3dfG3N/hAszyDtrLLGQaYcTbi8Fjqe4Bvmh5AC7YYG0fkokGNIIcWTVBWiA+636SnAAK8zvZzgwRjRvUyXwlxwuSMo9uy3x8VG9ezFCMqM+9mQ=
+	t=1731327317; cv=none; b=Jc0JVUKJ/g5mgcREpyJ20stezYxFi4nsrC1JaSg8foIIIc1hyfuXIXqZzuYwIaiabNOalAIpqqjCulnD2qtZZ7J7C1dd16DPi9pnl4IgMwWK8vmKc2zFJJlhHXlozWY8Ix3l84Yyk7z65IjN2hdllBFsIizuhSHckG9abRUtKIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731326847; c=relaxed/simple;
-	bh=tnBLR1RojMlnFgZDcoxL5i+wgiMSz+tAGrcpkCeqofQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NtjpjJc+AOfFOpu+KTM10zR5JBb7QAnlOLwJOCqtBrT/MO7G12RM+hvWkcYvJDOZX5h6Vzfx7lWlr7PRuyqDgZTb7QEX7LcN75hiXEnLn5U2+3dy0PYvjzabwVT609SLuzBJQfmsWNpUrdoPbZGnYv5aT6RPyWFsLfFike/z07I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CYohmhPb; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9984afe3-2d5f-4ac0-9736-523ce4755e1c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731326843;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fm7YQOTuUAMJc6LehKMPlFnyAn78mxLYsW+ZQCazCnE=;
-	b=CYohmhPbFYfRehHHr6jfIDHReW/21Uk4icexc0BCp5HFf557jy+6Sx86HVrpQ5yUOGu4cR
-	K//ATc+dw1WAQTSuOqHgKRjFR/G3CPZb9aqTfQa6RKctqpIn7Rx8mlEDSdPtWz7nxRlx1v
-	lKtWKZjEYwiIe/iA9aI5X4vK+B3WzpY=
-Date: Mon, 11 Nov 2024 12:07:16 +0000
+	s=arc-20240116; t=1731327317; c=relaxed/simple;
+	bh=PDJaJMj3vIEuqEBwEC4j33YkGMEUjJ+7c3OjOHvEO4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DMTz5adR6AX8GVl9swZWse5+Pj41r+ahlX0iChm1byJOxkOYU7+GilBZuAn9JyXbMSnRdCFngkzGJPjgSgoD3O43uif1lk1/M8h8GpAoxaZNAtTQMnzptR543AbUEVq72LuE16FwhkEn9kv9LQjMnANYO+Vdb2ddCzz+0peTIt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYfOTNNd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45C59C4CEDA;
+	Mon, 11 Nov 2024 12:15:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731327316;
+	bh=PDJaJMj3vIEuqEBwEC4j33YkGMEUjJ+7c3OjOHvEO4o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oYfOTNNdRuLeihJPJoxrshFVR6+9GzOiBgncADPUsWLj3HvbnhajESYqyJsinLgK6
+	 nRVRD/abTeyjIUwLsx4RI7KATs95vjn999JRaSlRqb/WDkjMi8FLtQJvsjS72F9oXt
+	 eaxwRVv0tXxVwK5EFwgJKri+U2HdCXSJZwwAyn9tS2LvMH7rfxuXJAR0JRTdaK+68+
+	 KUFT1fU0yYKXJAbevnwWkhTyxBgaxAVZUejEjZI1U4NEqkj55rrbE0ZvC+bCMG3wMS
+	 FLQgYQXCpDz0qpRPdWS/Lfvhbx4jZry+HaSpGimz6go0jvuZM8WJ4s6wq1amtK91SN
+	 rjyia24AcHt7g==
+Date: Mon, 11 Nov 2024 12:15:12 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/8] netdevsim: add more hw_features
+Message-ID: <20241111121512.GU4507@kernel.org>
+References: <cover.1730929545.git.sd@queasysnail.net>
+ <b918dc4dd76410a57f7516a855f66b0a2bd58326.1730929545.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2] Avoid traversing addrconf hash on ifdown
-To: Gilad Naaman <gnaaman@drivenets.com>, Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
- kuba@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, pabeni@redhat.com
-References: <daef8c89-a27b-492f-935e-60fd55718841@linux.dev>
- <20241111052124.3030623-1-gnaaman@drivenets.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241111052124.3030623-1-gnaaman@drivenets.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b918dc4dd76410a57f7516a855f66b0a2bd58326.1730929545.git.sd@queasysnail.net>
 
-On 11/11/2024 05:21, Gilad Naaman wrote:
->> On 10/11/2024 06:53, Gilad Naaman wrote:
->>>>> -           spin_unlock_bh(&net->ipv6.addrconf_hash_lock);
->>>>> +   list_for_each_entry(ifa, &idev->addr_list, if_list) {
->>>>> +           addrconf_del_dad_work(ifa);
->>>>> +
->>>>> +           /* combined flag + permanent flag decide if
->>>>> +            * address is retained on a down event
->>>>> +            */
->>>>> +           if (!keep_addr ||
->>>>> +               !(ifa->flags & IFA_F_PERMANENT) ||
->>>>> +               addr_is_local(&ifa->addr))
->>>>> +                   hlist_del_init_rcu(&ifa->addr_lst);
->>>>>      }
->>>>>
->>>>> +   spin_unlock(&net->ipv6.addrconf_hash_lock);
->>>>> +   read_unlock_bh(&idev->lock);
->>>>
->>>> Why is this read lock needed here? spinlock addrconf_hash_lock will
->>>> block any RCU grace period to happen, so we can safely traverse
->>>> idev->addr_list with list_for_each_entry_rcu()...
->>>
->>> Oh, sorry, I didn't realize the hash lock encompasses this one;
->>> although it seems obvious in retrospect.
->>>
->>>>> +
->>>>>      write_lock_bh(&idev->lock);
->>>>
->>>> if we are trying to protect idev->addr_list against addition, then we
->>>> have to extend write_lock scope. Otherwise it may happen that another
->>>> thread will grab write lock between read_unlock and write_lock.
->>>>
->>>> Am I missing something?
->>>
->>> I wanted to ensure that access to `idev->addr_list` is performed under lock,
->>> the same way it is done immediately afterwards;
->>> No particular reason not to extend the existing lock, I just didn't think
->>> about it.
->>>
->>> For what it's worth, the original code didn't have this protection either,
->>> since the another thread could have grabbed the lock between
->>> `spin_unlock_bh(&net->ipv6.addrconf_hash_lock);` of the last loop iteration,
->>> and the `write_lock`.
->>>
->>> Should I extend the write_lock upwards, or just leave it off?
->>
->> Well, you are doing write manipulation with the list, which is protected
->> by read-write lock. I would expect this lock to be held in write mode.
->> And you have to protect hash map at the same time. So yes, write_lock
->> and spin_lock altogether, I believe.
->>
+On Thu, Nov 07, 2024 at 12:13:27AM +0100, Sabrina Dubroca wrote:
+> netdevsim currently only set HW_TC in its hw_features, but other
+> features should also be present to better reflect the behavior of real
+> HW.
 > 
-> Note that within the changed lines, the list itself is only iterated-on,
-> not manipulated.
-> The changes are to the `addr_lst` list, which is the hashtable, not the
-> list this lock protects.
+> In my macsec offload testing, this ends up as HW_CSUM being missing
+> from hw_features, so it doesn't stick in wanted_features when offload
+> is turned off. Then HW_CSUM (and thus TSO, thanks to
+> netdev_fix_features) is not automatically turned back on when offload
+> is re-enabled.
 > 
-> I'll send v3 with the write-lock extended.
-> Thank you!
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Reading it one more time, I'm not quite sure that locking hashmap
-spinlock under idev->lock in write mode is a good idea... We have to
-think more about it, maybe ask for another opinion. Looks like RTNL
-should protect idev->addr_list from modification while idev->lock is
-more about changes to idev, not only about addr_list.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-@Eric could you please shed some light on the locking schema here?
 
