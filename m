@@ -1,210 +1,178 @@
-Return-Path: <netdev+bounces-143745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885EF9C3F10
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:02:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13D799C3F1B
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 947A51C226AD
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:02:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4542F1C215D9
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3B51A2C29;
-	Mon, 11 Nov 2024 12:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C311719ADBF;
+	Mon, 11 Nov 2024 13:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ScbUPBmS"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="QTFaz9NF"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92811A0BD6;
-	Mon, 11 Nov 2024 12:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5D619CC29;
+	Mon, 11 Nov 2024 13:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731329959; cv=none; b=eTMgNk3PudIL3AnvZSa+kaaEtr6xgRfKwNOukG5vw1K4Iwqn6nJ4U2ths1jsSIrVNGp/+OMK5AbL3B6vIS39Mm0k7KakPXhX+jJvbEEBIJt3MqophoL0LjWn+A5IbudthjfiWUKX3HD9yzRSuhnMQyp6qgHTiCN0lUKKrZN8Mww=
+	t=1731330067; cv=none; b=iSuk5SihirfoHWQ67Mo08lH5nYShv8BaXoqmw8bxg1/fg1xUkmvjXadrltWUCJcLCZ0es5q+qkX5ZoUJvVjQ9jM9toDVh4W/WFNBs/8MhG+c6dGFiWVjwOHOQOso3+mWc7yXV1LrSLNHNhhZSjie2q1wbVzH4eJ3h1pfg/i8Osg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731329959; c=relaxed/simple;
-	bh=WpRHWf9iq/dZC8DDSNbIwKO/BMAKNdLDKKsvKcvLKGM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uJQgQWmJJ/pSw4hudNWc3sSSQ+eXJlmWTSnBAeErZm7FstVIFsjidJYwf50wjA5y33GJzoXdJa5s3zJuTmUKK6UsW8MNPp7hrh1S5W8soPZqyDFRjQRlwp5V0+ENNeT+3GmLQZ+N+1hZ4yxRgequFYb4S6xcWd5vg7GNRrCTEFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ScbUPBmS; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1731329957; x=1762865957;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version;
-  bh=WpRHWf9iq/dZC8DDSNbIwKO/BMAKNdLDKKsvKcvLKGM=;
-  b=ScbUPBmSIAQjej6ot9hRC8Skhca+hgh8E0CYMSuQ4dMH0UqWuBdoyq9L
-   Sp47tIV56x3ixN1ZCABpvcZVunnHxjJxd2ddfUsDdilB3LduA+Lcb4TMv
-   oILP4sboPzZW+1AqNBES17HrUOFvHh907vSbvyD7+jZXyG+pDdijCykPf
-   ptPRJ4ZyN6djdti/RbLJjkHaeiMj1dcedajPZek9as9fMcoVCD/7xOkUv
-   YIC1111c4/B5gO6o0zzKT+1EGYepmTlxbIRzlqRg6JE50SFM0pHIHIz9e
-   me30y9QeFy6ZMSpnjl+FpDKfrFAiqyuNb0DEKowzABvMsriX6D+bnWYcb
-   A==;
-X-CSE-ConnectionGUID: dZFC6vp0Q/6hLNqL+TdxVg==
-X-CSE-MsgGUID: E95FuZ3MRYODvkit0DG1RQ==
-X-IronPort-AV: E=Sophos;i="6.12,145,1728975600"; 
-   d="scan'208";a="37646828"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Nov 2024 05:59:15 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Nov 2024 05:59:07 -0700
-Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Nov 2024 05:59:03 -0700
-From: Divya Koppera <divya.koppera@microchip.com>
-To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>
-Subject: [PATCH net-next v2 5/5] net: phy: microchip_t1 : Add initialization of ptp for lan887x
-Date: Mon, 11 Nov 2024 18:28:33 +0530
-Message-ID: <20241111125833.13143-6-divya.koppera@microchip.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20241111125833.13143-1-divya.koppera@microchip.com>
-References: <20241111125833.13143-1-divya.koppera@microchip.com>
+	s=arc-20240116; t=1731330067; c=relaxed/simple;
+	bh=+9pyBbAd9XVZulKfecaIB64FBMPOg1uiqLEt55AJBjk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=DFedXlNZnFuov58r2S+QA9JUFAoG5rmFHt+UWrcsOGHLUC4NFbp1Y/02UyY84VXf0WiKMLdy5/SFjR65yf2aP5JKUiFWhuPwbO3+6xkvpE5tfgAuZjvwPuyzB+jjddkqryCyGNLDed2ZnVkdenetGX4hcKa2H5V2urxzgyNvZXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=QTFaz9NF; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from ldvnode.intra.ispras.ru (unknown [10.10.2.153])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 712E140B2287;
+	Mon, 11 Nov 2024 13:01:00 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 712E140B2287
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1731330060;
+	bh=LoDFg+BU0HIQ1tlmc6quFrKIJzeXNVPGLXuX0Js0k1k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QTFaz9NF4hXmf7LBTvZ2meQdmeUgnJSFQZnoC8H+TJWclm7XXWDHNULJOHOU2CDy8
+	 nS7sJP616ASKWNrnaJJxK+DbG9tgkeS92JDplwxw9ZFRqMxhbnzxclMaNoeidIZGs2
+	 O5tjBQ8h0Spg4ZADdEIGWX4gPM8Ck4QBGLovEfrw=
+From: Vitalii Mordan <mordan@ispras.ru>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Vitalii Mordan <mordan@ispras.ru>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Fedor Pchelkin <pchelkin@ispras.ru>,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	Vadim Mutilin <mutilin@ispras.ru>
+Subject: [PATCH net-next v2] stmmac: dwmac-intel-plat: remove redundant dwmac->data check in probe
+Date: Mon, 11 Nov 2024 16:00:47 +0300
+Message-Id: <20241111130047.3679099-1-mordan@ispras.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Add initialization of ptp for lan887x.
+The driver’s compatibility with devices is confirmed earlier in
+platform_match(). Since reaching probe means the device is valid,
+the extra check can be removed to simplify the code.
 
-Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+Signed-off-by: Vitalii Mordan <mordan@ispras.ru>
 ---
-v1 -> v2
-Fixed below review comment
-  Added ptp support only if interrupts are supported as interrupts are mandatory
-  for ptp.
----
- drivers/net/phy/microchip_t1.c | 40 +++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+v2: Add a comment explaining why dwmac->data cannot be NULL, as per
+Andrew Lunn's request.
+Link to another patch touching this code and targeted at net tree:
+https://lore.kernel.org/netdev/20241108173334.2973603-1-mordan@ispras.ru
+ .../stmicro/stmmac/dwmac-intel-plat.c         | 69 ++++++++++---------
+ 1 file changed, 36 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index 71d6050b2833..63206ae8075d 100644
---- a/drivers/net/phy/microchip_t1.c
-+++ b/drivers/net/phy/microchip_t1.c
-@@ -10,11 +10,15 @@
- #include <linux/ethtool.h>
- #include <linux/ethtool_netlink.h>
- #include <linux/bitfield.h>
-+#include "microchip_ptp.h"
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
+index 230e79658c54..377c98801319 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
+@@ -97,47 +97,50 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
+ 	dwmac->dev = &pdev->dev;
+ 	dwmac->tx_clk = NULL;
  
- #define PHY_ID_LAN87XX				0x0007c150
- #define PHY_ID_LAN937X				0x0007c180
- #define PHY_ID_LAN887X				0x0007c1f0
- 
-+#define MCHP_PTP_LTC_BASE_ADDR			0xe000
-+#define MCHP_PTP_PORT_BASE_ADDR			(MCHP_PTP_LTC_BASE_ADDR + 0x800)
++	/*
++	 * This cannot return NULL at this point because the driver’s
++	 * compatibility with the device has already been validated in
++	 * platform_match().
++	 */
+ 	dwmac->data = device_get_match_data(&pdev->dev);
+-	if (dwmac->data) {
+-		if (dwmac->data->fix_mac_speed)
+-			plat_dat->fix_mac_speed = dwmac->data->fix_mac_speed;
+-
+-		/* Enable TX clock */
+-		if (dwmac->data->tx_clk_en) {
+-			dwmac->tx_clk = devm_clk_get(&pdev->dev, "tx_clk");
+-			if (IS_ERR(dwmac->tx_clk))
+-				return PTR_ERR(dwmac->tx_clk);
+-
+-			clk_prepare_enable(dwmac->tx_clk);
+-
+-			/* Check and configure TX clock rate */
+-			rate = clk_get_rate(dwmac->tx_clk);
+-			if (dwmac->data->tx_clk_rate &&
+-			    rate != dwmac->data->tx_clk_rate) {
+-				rate = dwmac->data->tx_clk_rate;
+-				ret = clk_set_rate(dwmac->tx_clk, rate);
+-				if (ret) {
+-					dev_err(&pdev->dev,
+-						"Failed to set tx_clk\n");
+-					return ret;
+-				}
+-			}
+-		}
+-
+-		/* Check and configure PTP ref clock rate */
+-		rate = clk_get_rate(plat_dat->clk_ptp_ref);
+-		if (dwmac->data->ptp_ref_clk_rate &&
+-		    rate != dwmac->data->ptp_ref_clk_rate) {
+-			rate = dwmac->data->ptp_ref_clk_rate;
+-			ret = clk_set_rate(plat_dat->clk_ptp_ref, rate);
++	if (dwmac->data->fix_mac_speed)
++		plat_dat->fix_mac_speed = dwmac->data->fix_mac_speed;
 +
- /* External Register Control Register */
- #define LAN87XX_EXT_REG_CTL                     (0x14)
- #define LAN87XX_EXT_REG_CTL_RD_CTL              (0x1000)
-@@ -229,6 +233,7 @@
- 
- #define LAN887X_INT_STS				0xf000
- #define LAN887X_INT_MSK				0xf001
-+#define LAN887X_INT_MSK_P1588_MOD_INT_MSK	BIT(3)
- #define LAN887X_INT_MSK_T1_PHY_INT_MSK		BIT(2)
- #define LAN887X_INT_MSK_LINK_UP_MSK		BIT(1)
- #define LAN887X_INT_MSK_LINK_DOWN_MSK		BIT(0)
-@@ -319,6 +324,8 @@ struct lan887x_regwr_map {
- 
- struct lan887x_priv {
- 	u64 stats[ARRAY_SIZE(lan887x_hw_stats)];
-+	struct mchp_ptp_clock *clock;
-+	bool init_done;
- };
- 
- static int lan937x_dsp_workaround(struct phy_device *phydev, u16 ereg, u8 bank)
-@@ -1269,8 +1276,19 @@ static int lan887x_get_features(struct phy_device *phydev)
- 
- static int lan887x_phy_init(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
- 	int ret;
- 
-+	if (!priv->init_done && phy_interrupt_is_valid(phydev)) {
-+		priv->clock = mchp_ptp_probe(phydev, MDIO_MMD_VEND1,
-+					     MCHP_PTP_LTC_BASE_ADDR,
-+					     MCHP_PTP_PORT_BASE_ADDR);
-+		if (IS_ERR(priv->clock))
-+			return PTR_ERR(priv->clock);
++	/* Enable TX clock */
++	if (dwmac->data->tx_clk_en) {
++		dwmac->tx_clk = devm_clk_get(&pdev->dev, "tx_clk");
++		if (IS_ERR(dwmac->tx_clk))
++			return PTR_ERR(dwmac->tx_clk);
 +
-+		priv->init_done = true;
-+	}
++		clk_prepare_enable(dwmac->tx_clk);
 +
- 	/* Clear loopback */
- 	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
- 				 LAN887X_MIS_CFG_REG2,
-@@ -1470,6 +1488,7 @@ static int lan887x_probe(struct phy_device *phydev)
- 	if (!priv)
- 		return -ENOMEM;
- 
-+	priv->init_done = false;
- 	phydev->priv = priv;
- 
- 	return lan887x_phy_setup(phydev);
-@@ -1518,6 +1537,7 @@ static void lan887x_get_strings(struct phy_device *phydev, u8 *data)
- 
- static int lan887x_config_intr(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
- 	int rc;
- 
- 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
-@@ -1537,12 +1557,23 @@ static int lan887x_config_intr(struct phy_device *phydev)
- 
- 		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_INT_STS);
- 	}
-+	if (rc < 0)
-+		return rc;
- 
--	return rc < 0 ? rc : 0;
-+	if (phy_is_default_hwtstamp(phydev)) {
-+		return mchp_config_ptp_intr(priv->clock, LAN887X_INT_MSK,
-+					    LAN887X_INT_MSK_P1588_MOD_INT_MSK,
-+					    (phydev->interrupts ==
-+					     PHY_INTERRUPT_ENABLED));
-+	}
-+
-+	return 0;
- }
- 
- static irqreturn_t lan887x_handle_interrupt(struct phy_device *phydev)
- {
-+	struct lan887x_priv *priv = phydev->priv;
-+	int rc = IRQ_NONE;
- 	int irq_status;
- 
- 	irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_INT_STS);
-@@ -1553,10 +1584,13 @@ static irqreturn_t lan887x_handle_interrupt(struct phy_device *phydev)
- 
- 	if (irq_status & LAN887X_MX_CHIP_TOP_LINK_MSK) {
- 		phy_trigger_machine(phydev);
--		return IRQ_HANDLED;
-+		rc = IRQ_HANDLED;
++		/* Check and configure TX clock rate */
++		rate = clk_get_rate(dwmac->tx_clk);
++		if (dwmac->data->tx_clk_rate &&
++		    rate != dwmac->data->tx_clk_rate) {
++			rate = dwmac->data->tx_clk_rate;
++			ret = clk_set_rate(dwmac->tx_clk, rate);
+ 			if (ret) {
+ 				dev_err(&pdev->dev,
+-					"Failed to set clk_ptp_ref\n");
++					"Failed to set tx_clk\n");
+ 				return ret;
+ 			}
+ 		}
  	}
  
--	return IRQ_NONE;
-+	if (irq_status & LAN887X_INT_MSK_P1588_MOD_INT_MSK)
-+		rc = mchp_ptp_handle_interrupt(priv->clock);
++	/* Check and configure PTP ref clock rate */
++	rate = clk_get_rate(plat_dat->clk_ptp_ref);
++	if (dwmac->data->ptp_ref_clk_rate &&
++	    rate != dwmac->data->ptp_ref_clk_rate) {
++		rate = dwmac->data->ptp_ref_clk_rate;
++		ret = clk_set_rate(plat_dat->clk_ptp_ref, rate);
++		if (ret) {
++			dev_err(&pdev->dev,
++				"Failed to set clk_ptp_ref\n");
++			return ret;
++		}
++	}
 +
-+	return rc;
- }
+ 	plat_dat->bsp_priv = dwmac;
+ 	plat_dat->eee_usecs_rate = plat_dat->clk_ptp_rate;
  
- static int lan887x_cd_reset(struct phy_device *phydev,
 -- 
-2.17.1
+2.25.1
 
 
