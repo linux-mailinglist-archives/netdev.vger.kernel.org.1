@@ -1,89 +1,155 @@
-Return-Path: <netdev+bounces-143660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093349C3841
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 07:15:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F8D9C3845
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 07:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B2E21C216B8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 06:15:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A50DFB21265
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 06:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2AA414B956;
-	Mon, 11 Nov 2024 06:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4CB14037F;
+	Mon, 11 Nov 2024 06:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bY5L6Bzb"
 X-Original-To: netdev@vger.kernel.org
-Received: from cmccmta2.chinamobile.com (cmccmta2.chinamobile.com [111.22.67.135])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D16818E1F;
-	Mon, 11 Nov 2024 06:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.135
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88303B1A2;
+	Mon, 11 Nov 2024 06:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731305724; cv=none; b=eo/mPQ6LrVRBvttnREwpHI+1HiJGLj0rVkGfwNWarwy5gXvdYDn7thYgHZoneY9i8YOxTMnQ5Xilv89XcTjZ4tm3doPLT/etL0C3nC6Oo5oVEDwRzHdoD5BeYC+d9JSB8mhRto1mMEjAa52T/29XDtUNtydS73plLn5d+F2EVsY=
+	t=1731305812; cv=none; b=orcpzSI2uR86SDWBKnC9HHUPWlYymVTS/QX0BW8vFbviUJQbbbyjFd956a3bLctc/9aNeJUsSEXjCETeOvQL8zs0yu/lTZdc88l/H2r9mrT+jW1B1asn8TtCfuZcQeyYz8Fn6gPZMHUZvaQSp8ktsnf6KzirGt+xbRa8LtkrNto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731305724; c=relaxed/simple;
-	bh=djhqMcvNei+15HbeeSkpFbxE/FBQ5+n7EBel/b2ljMo=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Y3pDHKs4rhTiJ3O33jjEG1Y/h2FbZkRGj+CMUg4qhvvzaesXiTS/83DqNbJIa+ubLbye0VJ1IuJjATc6oQO0Xd2GYxlwjSWfWg7VQzU/Pb3h2A2wsN3aN5DgpusI4J82uW3nnBKJlMZqd6s977THwtq/Fwfwsfzyrhvs0gTTMo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app07-12007 (RichMail) with SMTP id 2ee76731a0f44ff-0251b;
-	Mon, 11 Nov 2024 14:15:17 +0800 (CST)
-X-RM-TRANSID:2ee76731a0f44ff-0251b
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from ubuntu.localdomain (unknown[10.55.1.70])
-	by rmsmtp-syy-appsvr02-12002 (RichMail) with SMTP id 2ee26731a0f423d-1b859;
-	Mon, 11 Nov 2024 14:15:17 +0800 (CST)
-X-RM-TRANSID:2ee26731a0f423d-1b859
-From: Zhu Jun <zhujun2@cmss.chinamobile.com>
-To: martin.lau@linux.dev
-Cc: eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhujun2@cmss.chinamobile.com
-Subject: [PATCH] samples: bpf: Remove unused variable
-Date: Sun, 10 Nov 2024 22:15:14 -0800
-Message-Id: <20241111061514.3257-1-zhujun2@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1731305812; c=relaxed/simple;
+	bh=WlYetTUngPh7fs3LohyjRvciW4psn4BgbO1zDS7xcvE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mF29qNsMuihwRjWzywxxNgbJ8s2/pukMsx7izzsIM7vFKUAFbOwk5B0DddX1reTBu4uqJAXKD4GtIL6Nmrjk3U26wtx5A2SfzsO8baKcvF7wBv6g4dZ9Q1ZuzEGFl5I35XT9dPngxE+uxkobNDppaB00M+Rtzkuljfn1Jg/877Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bY5L6Bzb; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e30d0d84d23so3598912276.3;
+        Sun, 10 Nov 2024 22:16:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731305810; x=1731910610; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hPlP6fFpjGEUalzsCVuoe0qrtYdjVJhlVuCgB/E1JY4=;
+        b=bY5L6BzbWMK2hhpEtnTLLJLmBdt56kKMLCnaUUAOMgMD44oXS+WcPU4OG4Vqf0ha8m
+         yKKWUEwNDUgUDhS2gd5H/Gyat/0eLQRdui3Qx0lULiCO+L4PewNfwbngbem+NZpshjw7
+         SZQq+Ak/J10V6nUbmwf0L4TJQLfA0QibJ9Ji97gLIKrIT8ktP9/pxGKex+JgPWTL02kZ
+         wWKlDNkoO0VteDPl1mkw+d9/MfJjjo7j5N0iG3Des7/r/xBUU/Hs+Ly8r1AA3RcX+MV2
+         vq9ljEK3+RYgMda1l8PJMmPA8H5sTP/d2aPZeuABxIgiWzg1iH8Gk2vT1K/M0SDdsTe2
+         q3mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731305810; x=1731910610;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hPlP6fFpjGEUalzsCVuoe0qrtYdjVJhlVuCgB/E1JY4=;
+        b=XlITkgC257fdH1wjmcO6vBKkFiOnei1en6cunLyurDJmEi/BCOcllECrXSDHgWxeUG
+         REPJ0qoQiWmkR+V8cLRnfzlAQCcBptqjVR7xTfGCz34q5bqztL+Y5Ds7QLLm+N1oKUdQ
+         jsEg4A8BTNdw5ggrYf1Kh7oBnksB1QawVboao57QXMab2A/LJ5v6iqx6hq5btOh5IKsc
+         yQqjh7xyJHV38MGSAUqkv4LNIMgLsDF1hVPxopYyh5G/0boF6vCNy8gxmTKdgdAV5qFX
+         JttVImWbOtjPnqHeQlB876bA0MJAKTp+lAvQ5cxmrzZUuuBdRUtGemrlGyFkxYlTqdW6
+         VlPg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+7VYN4XFxhWVOFT82YiWqRJIAuUZ/POwcouJibqNpI1xC78S09SBNMLUvkZPLlaa7XibYnnMgiX0=@vger.kernel.org, AJvYcCV/awEqQX2V3xI4nZwD5mhLxYAKRyqo7nH8Uah8fiXrmIBdGzuYhJBOEMBAtu3qcoRr2UJvdjMs@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz16C/CojNQgzeQvKJHwh9h+6RhI0BeId9/m+6UoOqYJ15aSkEh
+	rJBtXZCMa9aldISV1blJoGGjs1y0s74hsWW0bUr0Uli+BzbyAml4RPY1bpod8K1m9z99jIrWkbx
+	9ADtHIihZVIrt372v0fhiBu3xOm4=
+X-Google-Smtp-Source: AGHT+IHV84jKmVFyzKDZILxkB+cToSUhSPEvIqSiu8JVgo7Pg96vwixgic0N54zkLrLX8UmOYgYGsoA9io96qfGmTYA=
+X-Received: by 2002:a05:690c:3384:b0:6de:b23:f2a1 with SMTP id
+ 00721157ae682-6eaddda4b00mr120265127b3.15.1731305809870; Sun, 10 Nov 2024
+ 22:16:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
+ <20241105055338.61082-1-kuniyu@amazon.com> <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
+In-Reply-To: <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
+From: Alex Henrie <alexhenrie24@gmail.com>
+Date: Sun, 10 Nov 2024 23:17:40 -0700
+Message-ID: <CAMMLpeRMKEWkNC=irH5dWwJSMS2jp6OSeB6KJBh2=ZbLsigM7A@mail.gmail.com>
+Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
+To: Alejandro Colomar <alx@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, branden@debian.org, linux-man@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The variable is never referenced in the code, just remove it.
+On Tue, Nov 5, 2024 at 4:33=E2=80=AFAM Alejandro Colomar <alx@kernel.org> w=
+rote:
 
-Signed-off-by: Zhu Jun <zhujun2@cmss.chinamobile.com>
----
- samples/bpf/xdp2skb_meta_kern.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Mon, Nov 04, 2024 at 09:53:38PM GMT, Kuniyuki Iwashima wrote:
+> > From: Alex Henrie <alexhenrie24@gmail.com>
+> > Date: Mon,  4 Nov 2024 21:14:20 -0700
+> > > struct ifa_cacheinfo contains the address's creation time, update tim=
+e,
+> > > preferred lifetime, and valid lifetime. See
+>
+> We use two spaces after period (the correct amount).  :)
+> (I'm thinking we probably want to document something about it in
+>  man-pages(7).  Branden, do you want to send a patch about it?  I want
+>  to include the references you showed to me, and you probably remember
+>  better those links.)
+>
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/include/uapi/linux/if_addr.h?h=3Dv6.11#n60
+>
+> Please use this format for links:
+>
+> Link: <http://example.com>
 
-diff --git a/samples/bpf/xdp2skb_meta_kern.c b/samples/bpf/xdp2skb_meta_kern.c
-index d5631014a176..af29a1bde4e4 100644
---- a/samples/bpf/xdp2skb_meta_kern.c
-+++ b/samples/bpf/xdp2skb_meta_kern.c
-@@ -32,7 +32,7 @@ SEC("xdp_mark")
- int _xdp_mark(struct xdp_md *ctx)
- {
- 	struct meta_info *meta;
--	void *data, *data_end;
-+	void *data;
- 	int ret;
- 
- 	/* Reserve space in-front of data pointer for our meta info.
--- 
-2.17.1
+Since the second sentence will be eliminated in favor of a Link line,
+the first sentence will no longer have any spaces after its period.
 
+> Which include provides the structure?
 
+linux/if_addr.h, which is the file I linked to in the commit message,
+and the same file that contains struct ifaddrmsg which is documented a
+few paragraphs earlier in the same section of the man page.
 
+> > > +struct ifa_cacheinfo {
+> > > +    __u32 ifa_prefered; /* Preferred lifetime in seconds, -1 =3D for=
+ever */
+> > > +    __u32 ifa_valid;    /* Valid lifetime in seconds, -1 =3D forever=
+ */
+> >
+> > -1 should be rather 0xFFFFFFFF (INFINITY_LIFE_TIME) as it's unsigned.
+>
+> I prefer UINT32_MAX over 0xF...F, which might be unclear how many Fs it
+> has.
+
+INFINITY_LIFE_TIME is not defined in any public header, so let's not
+mention it. I agree that it's hard to see at a glance how many F's are
+in 0xFFFFFFFF. I would suggest ~0u, which is short and sweet, but
+UINT32_MAX is a little better because ~0u isn't 32 bits on all C
+compilers that have ever existed.
+
+> > Also, it would be nice to mention that ifa_prefered must be less than
+> > or equal to ifa_valid (ifa_prefered <=3D ifa_valid) and 0 is invalid fo=
+r
+> > ifa_valid.
+> >
+> >   0 <=3D ifa_prefered <=3D ifa_valid
+> >   0 < ifa_valid <=3D 0xFFFFFFFF
+
+I'll add a paragraph to explain those relationships.
+
+> It might also be interesting to add a separate manual page for the type,
+> and reference it here.  Otherwise, the page starts getting fatty.
+
+Perhaps. In my opinion, there's not enough material here to be worthy
+of its own page.
+
+Thanks for the feedback,
+
+-Alex
 
