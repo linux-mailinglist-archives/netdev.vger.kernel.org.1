@@ -1,283 +1,184 @@
-Return-Path: <netdev+bounces-143748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1D99C3F29
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:05:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643309C3F2E
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:05:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D6001C21A42
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:05:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28D95284F5A
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510881A01D8;
-	Mon, 11 Nov 2024 13:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9E215746E;
+	Mon, 11 Nov 2024 13:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIauOlev"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5Q2k2tq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AA719EEC2;
-	Mon, 11 Nov 2024 13:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96A615853B;
+	Mon, 11 Nov 2024 13:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731330228; cv=none; b=F31uZxp6yYdZIAQan47gJc2wUcDWHmMbQOOm0MWKRwacJ2Y/oaCsqByybZMsW6FvaJ5/7FArwcCrntWkMTmlcoztwmgw2iOMPoTw4E+URAW+P27Cx7Ly9UELs7i0vH+GzIaLSzsasAqsMvx92GPBM4I1vBGiEj3614TTcY+xxDc=
+	t=1731330289; cv=none; b=FLYAS0SZWQPJandaYPoAXDaF8W0WLkSpaKus4Dx5EVyW4V6VoP64AtpBoFq/KhOrqLHAMEIcyxX1CD0AoL0xWf7IbgXS+/vurh9pa2gi5+dJhF10DM8oN8l8n6fT90E8Hh1fnqaCsgP/3dfWuNwF3Ypr0awq7PG0sIEVBQEdfL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731330228; c=relaxed/simple;
-	bh=ltb3dN1SlfkH/Jekn9HDa9bnkF2hP9Bl86Mpcip/m/o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fOUOtlEhG/hRqjvQtrEXvXX9aqyyJ8wxt91eWwNlOXWGTbZ3Lmvjd7v1enTvrZvkrspfdz4Om/8Pz5W9jfZrAU6ZiNG5iae1dPjue8BkVsW8CnOVes8kpSZ4ZHHFtB76mEDJlckCqHt7zdGJoW2VSuWpOMo1Q0Pw1fu7rJ6giKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIauOlev; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BF54C4CECF;
-	Mon, 11 Nov 2024 13:03:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731330227;
-	bh=ltb3dN1SlfkH/Jekn9HDa9bnkF2hP9Bl86Mpcip/m/o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nIauOlevQm8kAbNtRzAOHPfZocSXefJAqJZrJ+ySZIt2ywJPFwb321tfXhtZ1iP5K
-	 4vx6ckU1YSGlaLaluHWZ9HsJXw6lQTEM+Lx3APHQkM+Yftm0dJPA8kXiAkqy4Kxxhn
-	 BZ84pRmRIb+e6EaLhUcrhxAmMem0FNhB21Y1GXqB2Ki5+f4GGfyrQxKde6kh+IyyRL
-	 hoIbbwUuPZDAFQZ1dRJOFH3njYPwWDyOa0Z/FCkdYHTFNhYKN9u18TJ7/2FoLymx0k
-	 IpVt/5fYDOZnWyEkTnJZIDsojp65mTu36Lo/wUDe+JKveURyLYim73E7/qe84XZ1tr
-	 Cp7naHLG4NgWQ==
-Message-ID: <ad2afaa3-7e76-47e8-943b-7bea0c02c9c0@kernel.org>
-Date: Mon, 11 Nov 2024 15:03:40 +0200
+	s=arc-20240116; t=1731330289; c=relaxed/simple;
+	bh=hatzcmcpYWhOgP/hmNNf7DP0hfQHOCGuemkUWFuPGpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=LU/fGYz7nJiv/GkCam/8xg5pKZbsJXtO/BHNFKuzAtG2UkxCnYShgdWSvRjGP8EzkVF/xz8T5UlQspg/wYz1Ccd/vb0eob6tGIkuyOpKNMxRlIR0WeoIdJymJIQqJklOtQHgx6xoYe49A05rjHLof8xaC30xOnp5mbvk2ubVPd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C5Q2k2tq; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7240fa50694so3167323b3a.1;
+        Mon, 11 Nov 2024 05:04:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731330287; x=1731935087; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=72gZPrPs6Lnv3vB1NA324RXBbJosSR4imJkzuREYYVo=;
+        b=C5Q2k2tqNjxOVnDbqXXA3Sep6oOxbJp07n2H9E16s9DVzTuBB2untstTkIikk9Y8jb
+         /4tFhNiZ9973BkG5cf3ISXkcsjjTs0YSjDmn/2l4DK6GwDp1088xJWPr7I4WYHTs3oG2
+         wY5+Bt3sYstrJWpu2GhyNKLfvqdFkLmiwYTpf1o9XCopMikG3leWGUKsc6HDM/ELtkg0
+         CwGgQMAHN3ECMRptxLMM9HdSeEOAVUMoXg5w/CCNqA4MSahHteIqPx1wwY0vEgjfgVwz
+         5kV/3EJDO3JA3swAR80Gmrh9R9LeUkLLTzP/eWugET2oBjzJGBN3igxt49udIgmL0h7M
+         RhiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731330287; x=1731935087;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=72gZPrPs6Lnv3vB1NA324RXBbJosSR4imJkzuREYYVo=;
+        b=bDjbiUqCo00ljgBhQnKy+cjj5rVevrtGbw2MkmALbu5LgWWkGzQM092G9vAbQoIZrd
+         Ew66dIygwHvexJAv4KP4IGgM/UYVKJIY9IqzI4iBWsXoZrqyHPHcUrdM8EyZN2VGOzMo
+         Q+sdnCwJ6biUGiBBFVMej+Sl811c/5lP3hsIMQczxo4g4xIHPOJPxwnBvxCGyAOKer3H
+         w5xYuXScwzttjehp8xV+OdkDC3EJ0Kel3wF5L7SWhwMN33NJMWjD7fNZk5Utk5GPbfne
+         NbYrWLENT+iWaWTManlC0IcsYEmpnAfZ6VtX5i1eXy/V7Q2QSjtmBnUleH4U1gm3R2T/
+         y8AA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOA+6AKcCX9kUvZ1Y07W1ht5GAxP5GYcPGtaAC3bdl8HvnbZG0axCvYxikdm1KOjvhUrnhXCdO@vger.kernel.org, AJvYcCVTYKUmsbeSBkaL4Ho1SQAXb3gzosI+EkzgSxLys4VUL1+3FIIGHEdcqlsiemsMtJ3bSE4QQAWymjwh2Rc=@vger.kernel.org, AJvYcCWlv/u/PUkfPbFglUk4fLkh0JnR0S0INCaQ3L+/VYbw1PsbevEb38p6M1BL5eBRJ874zAJfLZebH9SNWQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNDdW/WFXIjxKH5wbru14H6lX+9SmVlZ5nTzQXrKR6u7NfF2iY
+	AOZ38gTprh+Rco76U1LiKbNM6bbzc4/D869TmwKJULcJ2xrgCBTgbe6NsHUmGbk=
+X-Google-Smtp-Source: AGHT+IFBqDxOxf1PfVYJckn+qxMYKlRIW2aAqR5G/gwisPE+GQFN8erp7XgljKTDwF3QpbDf1rsfWw==
+X-Received: by 2002:a05:6a00:1909:b0:71e:818a:97d9 with SMTP id d2e1a72fcca58-72413278818mr16586268b3a.5.1731330286874;
+        Mon, 11 Nov 2024 05:04:46 -0800 (PST)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078a7c50sm9355801b3a.60.2024.11.11.05.04.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 05:04:46 -0800 (PST)
+From: Jeongjun Park <aha310510@gmail.com>
+To: devnull+manas18244.iiitd.ac.in@kernel.org
+Cc: alibuda@linux.alibaba.com,
+	anupnewsmail@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	guwen@linux.alibaba.com,
+	horms@kernel.org,
+	jaka@linux.ibm.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	manas18244@iiitd.ac.in,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	tonylu@linux.alibaba.com,
+	wenjia@linux.ibm.com
+Subject: Re: [PATCH] Remove unused function parameter in __smc_diag_dump
+Date: Mon, 11 Nov 2024 22:04:39 +0900
+Message-Id: <20241111130439.7536-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241109-fix-oops-__smc_diag_dump-v1-1-1c55a3e54ad4@iiitd.ac.in>
+References: <20241109-fix-oops-__smc_diag_dump-v1-1-1c55a3e54ad4@iiitd.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: ti: icssg-prueth: Fix firmware load
- sequence.
-To: Meghana Malladi <m-malladi@ti.com>, vigneshr@ti.com, m-karicheri2@ti.com,
- jan.kiszka@siemens.com, javier.carrasco.cruz@gmail.com,
- jacob.e.keller@intel.com, horms@kernel.org, diogo.ivo@siemens.com,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, danishanwar@ti.com
-References: <20241106074040.3361730-1-m-malladi@ti.com>
- <20241106074040.3361730-2-m-malladi@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20241106074040.3361730-2-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
-
-On 06/11/2024 09:40, Meghana Malladi wrote:
-> From: MD Danish Anwar <danishanwar@ti.com>
+Manas <devnull+manas18244.iiitd.ac.in@kernel.org> wrote:
+> The last parameter in __smc_diag_dump (struct nlattr *bc) is unused.
+> There is only one instance of this function being called and its passed
+> with a NULL value in place of bc.
 > 
-> Timesync related operations are ran in PRU0 cores for both ICSSG SLICE0
-> and SLICE1. Currently whenever any ICSSG interface comes up we load the
-> respective firmwares to PRU cores and whenever interface goes down, we
-> stop the respective cores. Due to this, when SLICE0 goes down while
-> SLICE1 is still active, PRU0 firmwares are unloaded and PRU0 core is
-> stopped. This results in clock jump for SLICE1 interface as the timesync
-> related operations are no longer running.
-> 
-> Fix this by running both PRU0 and PRU1 firmwares as long as at least 1
-> ICSSG interface is up.
-> 
-> rx_flow_id is updated before firmware is loaded. Once firmware is loaded,
-> it reads the flow_id and uses it for rx. emac_fdb_flow_id_updated() is
-> used to let firmware know that the flow_id has been updated and to use the
-> latest rx_flow_id.
-
-is rx_flow_id releated to timesync releated issue that this patch is fixing?
-If not please split it into separate patch and mention what functionality
-it is fixing.
-
-> 
-> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> Signed-off-by: Manas <manas18244@iiitd.ac.in>
 > ---
->  drivers/net/ethernet/ti/icssg/icssg_config.c | 28 ++++++++++
->  drivers/net/ethernet/ti/icssg/icssg_config.h |  1 +
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 58 ++++++++++++++++----
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  1 +
->  4 files changed, 77 insertions(+), 11 deletions(-)
+> The last parameter in __smc_diag_dump (struct nlattr *bc) is unused.
+> There is only one instance of this function being called and its passed
+> with a NULL value in place of bc.
 > 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> index 5d2491c2943a..f1f0c8659e2d 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> @@ -786,3 +786,31 @@ void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port)
->  		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT0_DEFAULT_VLAN_OFFSET);
->  }
->  EXPORT_SYMBOL_GPL(icssg_set_pvid);
-> +
-> +int emac_fdb_flow_id_updated(struct prueth_emac *emac)
-> +{
-> +	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
-> +	int slice = prueth_emac_slice(emac);
-> +	struct mgmt_cmd fdb_cmd = { 0 };
-> +	int ret = 0;
-> +
-> +	fdb_cmd.header = ICSSG_FW_MGMT_CMD_HEADER;
-> +	fdb_cmd.type   = ICSSG_FW_MGMT_FDB_CMD_TYPE_RX_FLOW;
-> +	fdb_cmd.seqnum = ++(emac->prueth->icssg_hwcmdseq);
-> +	fdb_cmd.param  = 0;
-> +
-> +	fdb_cmd.param |= (slice << 4);
-> +	fdb_cmd.cmd_args[0] = 0;
-> +
-> +	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
-> +	if (fdb_cmd_rsp.status == 1)
-> +		return 0;
-> +
-> +	return -EINVAL;
-> +}
-> +EXPORT_SYMBOL_GPL(emac_fdb_flow_id_updated);
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> index 92c2deaa3068..c884e9fa099e 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> @@ -55,6 +55,7 @@ struct icssg_rxq_ctx {
->  #define ICSSG_FW_MGMT_FDB_CMD_TYPE	0x03
->  #define ICSSG_FW_MGMT_CMD_TYPE		0x04
->  #define ICSSG_FW_MGMT_PKT		0x80000000
-> +#define ICSSG_FW_MGMT_FDB_CMD_TYPE_RX_FLOW	0x05
+> Though, the compiler (gcc) optimizes it. Looking at the object dump of
+> vmlinux (via `objdump -D vmlinux`), a new function clone
+> (__smc_diag_dump.constprop.0) is added which removes this parameter from
+> calling convention altogether.
+> 
+> ffffffff8a701770 <__smc_diag_dump.constprop.0>:
+> ffffffff8a701770:       41 57                   push   %r15
+> ffffffff8a701772:       41 56                   push   %r14
+> ffffffff8a701774:       41 55                   push   %r13
+> ffffffff8a701776:       41 54                   push   %r12
+> 
+> There are 5 parameters in original function, but in the cloned function
+> only 4.
+> 
+> I believe this patch also fixes this oops bug[1], which arises in the
+> same function __smc_diag_dump. But I couldn't verify it further. Can
+> someone please test this?
+> 
+> [1] https://syzkaller.appspot.com/bug?extid=271fed3ed6f24600c364
+
+Unfortunately, I tested it myself and this bug is still triggering. Basically,
+this bug is not triggered in normal situations, but triggered when a race
+condition occurs, so I think the root cause is somewhere else.
+
+Regards,
+
+Jeongjun Park
+
+> ---
+>  net/smc/smc_diag.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
+> index 6fdb2d96777ad704c394709ec845f9ddef5e599a..8f7bd40f475945171a0afa5a2cce12d9aa2b1eb4 100644
+> --- a/net/smc/smc_diag.c
+> +++ b/net/smc/smc_diag.c
+> @@ -71,8 +71,7 @@ static int smc_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
 >  
->  struct icssg_r30_cmd {
->  	u32 cmd[4];
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 0556910938fa..9df67539285b 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -534,6 +534,7 @@ static int emac_ndo_open(struct net_device *ndev)
+>  static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
+>  			   struct netlink_callback *cb,
+> -			   const struct smc_diag_req *req,
+> -			   struct nlattr *bc)
+> +			   const struct smc_diag_req *req)
 >  {
->  	struct prueth_emac *emac = netdev_priv(ndev);
->  	int ret, i, num_data_chn = emac->tx_ch_num;
-> +	struct icssg_flow_cfg __iomem *flow_cfg;
->  	struct prueth *prueth = emac->prueth;
->  	int slice = prueth_emac_slice(emac);
->  	struct device *dev = prueth->dev;
-> @@ -549,8 +550,12 @@ static int emac_ndo_open(struct net_device *ndev)
->  	/* set h/w MAC as user might have re-configured */
->  	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
->  
-> +	if (!prueth->emacs_initialized) {
-> +		icssg_class_default(prueth->miig_rt, ICSS_SLICE0, 0, false);
-> +		icssg_class_default(prueth->miig_rt, ICSS_SLICE1, 0, false);
-> +	}
-> +
->  	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
-> -	icssg_class_default(prueth->miig_rt, slice, 0, false);
->  	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
->  
->  	/* Notify the stack of the actual queue counts. */
-> @@ -588,10 +593,31 @@ static int emac_ndo_open(struct net_device *ndev)
->  		goto cleanup_napi;
->  	}
->  
-> -	/* reset and start PRU firmware */
-> -	ret = prueth_emac_start(prueth, emac);
-> -	if (ret)
-> -		goto free_rx_irq;
-> +	if (!prueth->emacs_initialized) {
-> +		if (prueth->emac[ICSS_SLICE0]) {
-> +			ret = prueth_emac_start(prueth, prueth->emac[ICSS_SLICE0]);
-> +			if (ret) {
-> +				netdev_err(ndev, "unable to start fw for slice %d", ICSS_SLICE0);
-> +				goto free_rx_irq;
-> +			}
-> +		}
-> +		if (prueth->emac[ICSS_SLICE1]) {
-> +			ret = prueth_emac_start(prueth, prueth->emac[ICSS_SLICE1]);
-> +			if (ret) {
-> +				netdev_err(ndev, "unable to start fw for slice %d", ICSS_SLICE1);
-> +				goto halt_slice0_prus;
-> +			}
-
-Did I understand right: SLICE0 needs to be always running if any of the
-interface is up but SLICE0 doesn't need to be running if only SLICE0
-interface is running.
-
-If yes then you need to update the patch so SLICE1 is not always running.
-
-> +		}
-> +	}
-> +
-> +	flow_cfg = emac->dram.va + ICSSG_CONFIG_OFFSET + PSI_L_REGULAR_FLOW_ID_BASE_OFFSET;
-> +	writew(emac->rx_flow_id_base, &flow_cfg->rx_base_flow);
-> +	ret = emac_fdb_flow_id_updated(emac);
-> +
-> +	if (ret) {
-> +		netdev_err(ndev, "Failed to update Rx Flow ID %d", ret);
-> +		goto stop;
-> +	}
->  
->  	icssg_mii_update_mtu(prueth->mii_rt, slice, ndev->max_mtu);
->  
-> @@ -644,7 +670,11 @@ static int emac_ndo_open(struct net_device *ndev)
->  free_tx_ts_irq:
->  	free_irq(emac->tx_ts_irq, emac);
->  stop:
-> -	prueth_emac_stop(emac);
-> +	if (prueth->emac[ICSS_SLICE1])
-> +		prueth_emac_stop(prueth->emac[ICSS_SLICE1]);
-> +halt_slice0_prus:
-> +	if (prueth->emac[ICSS_SLICE0])
-> +		prueth_emac_stop(prueth->emac[ICSS_SLICE0]);
->  free_rx_irq:
->  	free_irq(emac->rx_chns.irq[rx_flow], emac);
->  cleanup_napi:
-> @@ -680,7 +710,10 @@ static int emac_ndo_stop(struct net_device *ndev)
->  	if (ndev->phydev)
->  		phy_stop(ndev->phydev);
->  
-> -	icssg_class_disable(prueth->miig_rt, prueth_emac_slice(emac));
-> +	if (prueth->emacs_initialized == 1) {
-> +		icssg_class_disable(prueth->miig_rt, ICSS_SLICE0);
-> +		icssg_class_disable(prueth->miig_rt, ICSS_SLICE1);
-> +	}
->  
->  	if (emac->prueth->is_hsr_offload_mode)
->  		__dev_mc_unsync(ndev, icssg_prueth_hsr_del_mcast);
-> @@ -719,11 +752,14 @@ static int emac_ndo_stop(struct net_device *ndev)
->  	/* Destroying the queued work in ndo_stop() */
->  	cancel_delayed_work_sync(&emac->stats_work);
->  
-> -	if (prueth->emacs_initialized == 1)
-> +	if (prueth->emacs_initialized == 1) {
->  		icss_iep_exit(emac->iep);
-> -
-> -	/* stop PRUs */
-> -	prueth_emac_stop(emac);
-> +		/* stop PRUs */
-> +		if (prueth->emac[ICSS_SLICE0])
-> +			prueth_emac_stop(prueth->emac[ICSS_SLICE0]);
-> +		if (prueth->emac[ICSS_SLICE1])
-> +			prueth_emac_stop(prueth->emac[ICSS_SLICE1]);
-> +	}
->  
->  	free_irq(emac->tx_ts_irq, emac);
->  
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index 8722bb4a268a..c4f5f0349ae7 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -365,6 +365,7 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
->  		       u8 untag_mask, bool add);
->  u16 icssg_get_pvid(struct prueth_emac *emac);
->  void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
-> +int emac_fdb_flow_id_updated(struct prueth_emac *emac);
->  #define prueth_napi_to_tx_chn(pnapi) \
->  	container_of(pnapi, struct prueth_tx_chn, napi_tx)
->  
-
--- 
-cheers,
--roger
+>  	struct smc_sock *smc = smc_sk(sk);
+>  	struct smc_diag_fallback fallback;
+> @@ -199,7 +198,6 @@ static int smc_diag_dump_proto(struct proto *prot, struct sk_buff *skb,
+>  	struct smc_diag_dump_ctx *cb_ctx = smc_dump_context(cb);
+>  	struct net *net = sock_net(skb->sk);
+>  	int snum = cb_ctx->pos[p_type];
+> -	struct nlattr *bc = NULL;
+>  	struct hlist_head *head;
+>  	int rc = 0, num = 0;
+>  	struct sock *sk;
+> @@ -214,7 +212,7 @@ static int smc_diag_dump_proto(struct proto *prot, struct sk_buff *skb,
+>  			continue;
+>  		if (num < snum)
+>  			goto next;
+> -		rc = __smc_diag_dump(sk, skb, cb, nlmsg_data(cb->nlh), bc);
+> +		rc = __smc_diag_dump(sk, skb, cb, nlmsg_data(cb->nlh));
+>  		if (rc < 0)
+>  			goto out;
+>  next:
+> 
+> ---
+> base-commit: 59b723cd2adbac2a34fc8e12c74ae26ae45bf230
+> change-id: 20241109-fix-oops-__smc_diag_dump-06ab3e9d39f4
+> 
+> Best regards,
+> -- 
+> Manas <manas18244@iiitd.ac.in>
 
