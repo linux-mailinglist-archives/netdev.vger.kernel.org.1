@@ -1,100 +1,89 @@
-Return-Path: <netdev+bounces-143698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED7D9C3B0E
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:40:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896309C3B0B
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 847552833DB
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1D61C21D39
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 09:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713AE166F3A;
-	Mon, 11 Nov 2024 09:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005F115696E;
+	Mon, 11 Nov 2024 09:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CboJN/wZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SkYMK80u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15483143C72
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 09:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7BC156883
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 09:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731318010; cv=none; b=ZKdo1BaNu2diiZzcL8sWkMDVUhUE7xKyuIb5ier54nAF+TLGpBf1caYfb8RxFp9XSbOp7qh/vY/pUS6AhQ7b4bkalng1QhpqBgqWY91GZ/wyDFgJPST6Icme8YF5zwEzxNt1eHe80Hxftf57qbOsFLRsripS8fJBt3sTHE5k9OY=
+	t=1731318006; cv=none; b=jEbQ4LzhtoJa9zOPRZ1nIlunye5Dk9Xu6L6DJNjQ/pxCpBrt6P/s0Ai01wNPCuSHMyG5czHMeZgtNwOBTjUlI0ig0JoWvbkjDkTzeWaLxDvgTJqL4y3wjJsbRjJws37J5tZHHR+Ryi5E3KisvjczZ7gcehe91N4+loFQx81dxF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731318010; c=relaxed/simple;
-	bh=eVbFQ8eRmgwQjhyZDrpzmXZtLQtDVQOa42qdW6+BPsA=;
+	s=arc-20240116; t=1731318006; c=relaxed/simple;
+	bh=SrePIxSbFYjj2HfNvSNCaCC5bOfkmhdL4/yJT9sPHp8=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=AbbYaycjUqkrObLEt357W9j4vBMHvrqPB+XpCOs9Dlo74XWsZU49/rgeLeuKsL2RTBx1KYVbssupIG2rlEFO3qTACj+qEe3ET2xx1FMAphhr+Tes9c1SaSe6t2D9+FQ1zvDmId0jCXsPBQzd8YCYaXxnaT+VrmrGT6w38H812ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CboJN/wZ; arc=none smtp.client-ip=209.85.208.50
+	 Content-Disposition:In-Reply-To; b=KIujdiVau8xnlX5he6JF177yREdETOm/iA/Vb57tcsCNoKW4CxcbH+NsI9BCZX2Lv2n2CNWPrFsmozhaArfIDIfqSU9vI8JGIWkEbyckNFgayR2h48ZLyWLlfdvIx8QcdUWx2rSj9zIAy9LTEXx9jTNxVQBG6fWjXx/AatlnFQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SkYMK80u; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5ced377447bso6229716a12.1
-        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:40:07 -0800 (PST)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5cb15b84544so6330480a12.2
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:40:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731318006; x=1731922806; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1731318002; x=1731922802; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RL5ouNz62J4rP7Vb2EwmgbN1hwLbAAvQeLoAfZ/ypHo=;
-        b=CboJN/wZx/s0KPqzs5G8KiJdfT0nBRV1sPV3gNT/W+zJdhJrw6Ekl046AJLjx+m36W
-         JCFXCqlXKsJhQvvp15uZ3D6sYVZtA+1OKF3CXm7stUxm4Mph/m9SxDFstILaKP39j21y
-         kFpxhWlNTS0YlWrN553BD8+1xJChy4fB/5A+N/GvxQXIv6Ylh8MLewPkJ59velzXeoKA
-         qV6XpSkBGjwbt38JYE/cjsCJ2gsCNzvBSb+klUeijdN928zdeS2TFDg9Gm03XaKpE/cw
-         ZSE9xQ1bBzouj/h6OspbtBm3VzxE12MJwo8hNQlvjoGKxoJgmkx6lilFVOdIjHa2Pc2m
-         IJOg==
+        bh=8uq+o2vFZJUqX4/y2uQm9wgc0uDfnPCbnfiej+5FcGg=;
+        b=SkYMK80uK+Bnsm2xABboWe/iLl13dzi0kw0gPUKvS8i4MQYsQLRm6o5qL5hVX693CU
+         OFa5hDuSbSqjlJvPDtL2MjQ81aXUbMUhFjJ8Aafn0fuBViuuQgEO3JVqAJ5FL91zlkRn
+         KT8SlLL10vYqqZr6fDCgG9X+Y3ZfZlVSDIM91mjVpVQ8iy2WO7jMLgGBeAGcsrvVwIN/
+         QXmBVMnPooWivJVBenX5qgocK8wZqq0MpGOE6cEpAHoHlC1Xg5hXuhVRhdlLlsDs68WQ
+         i2zD552r570+WksEl0XpCmnVeXzac6wFERyQgAyzaGh7x6gNsN+H7CQmFNNBB1knRRti
+         371w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731318006; x=1731922806;
+        d=1e100.net; s=20230601; t=1731318002; x=1731922802;
         h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
          :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RL5ouNz62J4rP7Vb2EwmgbN1hwLbAAvQeLoAfZ/ypHo=;
-        b=dL9dURt09Af7PeHQSkmjtXxQTzxzwVtyqHE5A2uRNYTH3A9Z8Je0o1HFggeUvqxvBK
-         HreXcKK7mlmaSKmgShWPrwFJegzWmPsiRVgKyJv+jDWa2uZ4zaN4UTLvwVk1nbvGR0aj
-         yjeRRax7PJW7HHPyaiVmiuyBiarICole+KkfHfiyoGb8UZ9byaNcqp+tZWwWn2q96IAB
-         zMRGhrmjtOYdQZZNIINETfGpVxp1cqCcYmq+SJYDKHfbvHhaehZ+NbhYsq/LyB3HI7nQ
-         teaWy1StNuxQZ/IkqgaFLNLAcHDoKMCWpiTrC3DKREHGKnziAsjPSFS3WSMX5fRf5cJ4
-         j40w==
-X-Forwarded-Encrypted: i=1; AJvYcCXsvth3g2JcFuETK7z2CBsLbWjc6mIAD0PGMjji/tRXGtO6vofurU+mkdF4j7bghrGslMZmQ1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwH8JwwO27QBKXKyxtoDFND000YuUqJmrowg51pLXm5du4+RZQd
-	krU7cqgFLed3S/wOUdHPoXIrEtEfZ5gLTUSL1ewQx472NCv5c6B0X4CrjwxjL4A=
-X-Google-Smtp-Source: AGHT+IF/p+575+YNR2OJr4WYmzHEumA5ro2KoQ7Lo/HcKAeV1re5jL3XLj3j1AdmsGeHCshinHqVXw==
-X-Received: by 2002:a05:6402:13ce:b0:5ce:ddd4:7c2f with SMTP id 4fb4d7f45d1cf-5cf0a30c5dcmr10678581a12.7.1731318006331;
-        Mon, 11 Nov 2024 01:40:06 -0800 (PST)
+        bh=8uq+o2vFZJUqX4/y2uQm9wgc0uDfnPCbnfiej+5FcGg=;
+        b=MfcXIlE46p7Y7W7HfJ4yjCkhd/7R3az+tEtHazq2WFl6inISwl3NIHyuEXwgaQeINl
+         hZWUMo8vKh1vNdM3sbNrrashsxlvHVOOXM+xI+UHEZtHZVJq9N+tlSXrq79H838rfio3
+         I0S12oxwZOymXsjT3IOd74SjC5uW1qIT99eDvqpRY6DfevpVXsnfGB9x5+PSgtvrvuSf
+         SjrOTgQkjJZkBhnkFVB1EePj22DiDuvLFgl4y8pqUCqBvu9Lp3oTMiAa2WZJfHIZqFSF
+         TO+wNA644tS7L6mD9Mm5XG3HQ1T8Fnmkcu3hOqyfzA9SSCJpii9ofjXp6m7Dkxypvl2i
+         Irew==
+X-Forwarded-Encrypted: i=1; AJvYcCWUkotmn52WM32FWnfTuV8updtZZgymadWfEiNQdcTmvS/ZUJuHwTyJB8yCm8jMNROZbo0CEag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS2Jiiu6TScFax8gPcrDu+OgSJ6nNGtprz8/GDJtQYvrBxy0QM
+	Pf2K7DkgcH4gXEzfUoU208TP1YDso1KSGjYk2Cj9io9M4ppZeluJlZWxYYvwuOM=
+X-Google-Smtp-Source: AGHT+IEtwIpih366270iEmy7zBPiGHFqTs9kQiN6axsaFrcWpMU4sHgBmIXXbVCyVCYkUQP1Knn9+w==
+X-Received: by 2002:a05:6402:3198:b0:5ce:c9ae:347e with SMTP id 4fb4d7f45d1cf-5cf0a45d167mr7750194a12.30.1731318002466;
+        Mon, 11 Nov 2024 01:40:02 -0800 (PST)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf0f369037sm3560713a12.12.2024.11.11.01.40.05
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03bb85f5sm4646840a12.53.2024.11.11.01.40.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 01:40:06 -0800 (PST)
-Date: Mon, 11 Nov 2024 12:38:50 +0300
+        Mon, 11 Nov 2024 01:40:01 -0800 (PST)
+Date: Mon, 11 Nov 2024 12:39:58 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Rosen Penev <rosenp@gmail.com>,
-	netdev@vger.kernel.org
+To: oe-kbuild@lists.linux.dev, Vitalii Mordan <mordan@ispras.ru>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>
 Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Vitalii Mordan <mordan@ispras.ru>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] net: modernize ioremap in probe
-Message-ID: <0460e9ea-3d2b-425b-9e97-c69afe138670@stanley.mountain>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org, Fedor Pchelkin <pchelkin@ispras.ru>,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	Vadim Mutilin <mutilin@ispras.ru>
+Subject: Re: [PATCH net v2]: stmmac: dwmac-intel-plat: fix call balance of
+ tx_clk handling routines
+Message-ID: <e1b263d8-adc0-455b-adf1-9247fae1b320@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,99 +92,128 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241109233641.8313-1-rosenp@gmail.com>
+In-Reply-To: <20241108173334.2973603-1-mordan@ispras.ru>
 
-Hi Rosen,
+Hi Vitalii,
 
 kernel test robot noticed the following build warnings:
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-modernize-ioremap-in-probe/20241110-073751
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241109233641.8313-1-rosenp%40gmail.com
-patch subject: [PATCH] net: modernize ioremap in probe
-config: arm-randconfig-r071-20241110 (https://download.01.org/0day-ci/archive/20241111/202411110835.tTxOya6U-lkp@intel.com/config)
+url:    https://github.com/intel-lab-lkp/linux/commits/Vitalii-Mordan/stmmac-dwmac-intel-plat-fix-call-balance-of-tx_clk-handling-routines/20241109-013647
+base:   net/main
+patch link:    https://lore.kernel.org/r/20241108173334.2973603-1-mordan%40ispras.ru
+patch subject: [PATCH net v2]: stmmac: dwmac-intel-plat: fix call balance of tx_clk handling routines
+config: arm-randconfig-r071-20241110 (https://download.01.org/0day-ci/archive/20241111/202411110911.fxtHBKSw-lkp@intel.com/config)
 compiler: arm-linux-gnueabi-gcc (GCC) 14.2.0
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
 | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202411110835.tTxOya6U-lkp@intel.com/
+| Closes: https://lore.kernel.org/r/202411110911.fxtHBKSw-lkp@intel.com/
 
 smatch warnings:
-drivers/net/ethernet/freescale/xgmac_mdio.c:395 xgmac_mdio_probe() error: uninitialized symbol 'res'.
+drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c:163 intel_eth_plat_probe() error: we previously assumed 'dwmac->data' could be null (see line 101)
 
-vim +/res +395 drivers/net/ethernet/freescale/xgmac_mdio.c
+vim +163 drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
 
-33897cc869eef8 Bill Pemberton    2012-12-03  371  static int xgmac_mdio_probe(struct platform_device *pdev)
-9f35a7342cff0b Timur Tabi        2012-08-20  372  {
-ac53c26433b51f Marcin Wojtas     2021-06-25  373  	struct fwnode_handle *fwnode;
-73ee5442978b2d Shaohui Xie       2015-03-16  374  	struct mdio_fsl_priv *priv;
-15e7064e879335 Calvin Johnson    2021-06-11  375  	struct resource *res;
-15e7064e879335 Calvin Johnson    2021-06-11  376  	struct mii_bus *bus;
-9f35a7342cff0b Timur Tabi        2012-08-20  377  	int ret;
-9f35a7342cff0b Timur Tabi        2012-08-20  378  
-229f4bb47512ec Calvin Johnson    2020-06-22  379  	/* In DPAA-1, MDIO is one of the many FMan sub-devices. The FMan
-229f4bb47512ec Calvin Johnson    2020-06-22  380  	 * defines a register space that spans a large area, covering all the
-229f4bb47512ec Calvin Johnson    2020-06-22  381  	 * subdevice areas. Therefore, MDIO cannot claim exclusive access to
-229f4bb47512ec Calvin Johnson    2020-06-22  382  	 * this register area.
-229f4bb47512ec Calvin Johnson    2020-06-22  383  	 */
-9f35a7342cff0b Timur Tabi        2012-08-20  384  
-1d14eb15dc2c39 Tobias Waldekranz 2022-01-26  385  	bus = devm_mdiobus_alloc_size(&pdev->dev, sizeof(struct mdio_fsl_priv));
-9f35a7342cff0b Timur Tabi        2012-08-20  386  	if (!bus)
-9f35a7342cff0b Timur Tabi        2012-08-20  387  		return -ENOMEM;
-9f35a7342cff0b Timur Tabi        2012-08-20  388  
-9f35a7342cff0b Timur Tabi        2012-08-20  389  	bus->name = "Freescale XGMAC MDIO Bus";
-c0fc8e6dcee40c Andrew Lunn       2023-01-09  390  	bus->read = xgmac_mdio_read_c22;
-c0fc8e6dcee40c Andrew Lunn       2023-01-09  391  	bus->write = xgmac_mdio_write_c22;
-c0fc8e6dcee40c Andrew Lunn       2023-01-09  392  	bus->read_c45 = xgmac_mdio_read_c45;
-c0fc8e6dcee40c Andrew Lunn       2023-01-09  393  	bus->write_c45 = xgmac_mdio_write_c45;
-9f35a7342cff0b Timur Tabi        2012-08-20  394  	bus->parent = &pdev->dev;
-229f4bb47512ec Calvin Johnson    2020-06-22 @395  	snprintf(bus->id, MII_BUS_ID_SIZE, "%pa", &res->start);
-                                                                                                   ^^^
-res isn't initialized.
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   75  static int intel_eth_plat_probe(struct platform_device *pdev)
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   76  {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   77  	struct plat_stmmacenet_data *plat_dat;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   78  	struct stmmac_resources stmmac_res;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   79  	struct intel_dwmac *dwmac;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   80  	unsigned long rate;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   81  	int ret;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   82  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   83  	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   84  	if (ret)
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   85  		return ret;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   86  
+abea8fd5e801a6 Jisheng Zhang        2023-09-16   87  	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   88  	if (IS_ERR(plat_dat)) {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   89  		dev_err(&pdev->dev, "dt configuration failed\n");
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   90  		return PTR_ERR(plat_dat);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   91  	}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   92  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   93  	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
+abea8fd5e801a6 Jisheng Zhang        2023-09-16   94  	if (!dwmac)
+abea8fd5e801a6 Jisheng Zhang        2023-09-16   95  		return -ENOMEM;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   96  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   97  	dwmac->dev = &pdev->dev;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   98  	dwmac->tx_clk = NULL;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26   99  
+b0377116decdee Rob Herring          2023-10-09  100  	dwmac->data = device_get_match_data(&pdev->dev);
+b0377116decdee Rob Herring          2023-10-09 @101  	if (dwmac->data) {
+                                                            ^^^^^^^^^^^
+Check for NULL
 
-9f35a7342cff0b Timur Tabi        2012-08-20  396  
-73ee5442978b2d Shaohui Xie       2015-03-16  397  	priv = bus->priv;
-865bbb2945a161 Rosen Penev       2024-11-09  398  	priv->mdio_base = devm_platform_ioremap_resource(pdev, 0);
-865bbb2945a161 Rosen Penev       2024-11-09  399  	if (IS_ERR(priv->mdio_base))
-865bbb2945a161 Rosen Penev       2024-11-09  400  		return PTR_ERR(priv->mdio_base);
-9f35a7342cff0b Timur Tabi        2012-08-20  401  
-15e7064e879335 Calvin Johnson    2021-06-11  402  	/* For both ACPI and DT cases, endianness of MDIO controller
-15e7064e879335 Calvin Johnson    2021-06-11  403  	 * needs to be specified using "little-endian" property.
-15e7064e879335 Calvin Johnson    2021-06-11  404  	 */
-229f4bb47512ec Calvin Johnson    2020-06-22  405  	priv->is_little_endian = device_property_read_bool(&pdev->dev,
-07bf2e11ad0586 Julia Lawall      2016-08-05  406  							   "little-endian");
-73ee5442978b2d Shaohui Xie       2015-03-16  407  
-6198c722019774 Tobias Waldekranz 2022-01-18  408  	priv->has_a009885 = device_property_read_bool(&pdev->dev,
-6198c722019774 Tobias Waldekranz 2022-01-18  409  						      "fsl,erratum-a009885");
-229f4bb47512ec Calvin Johnson    2020-06-22  410  	priv->has_a011043 = device_property_read_bool(&pdev->dev,
-1d3ca681b9d957 Madalin Bucur     2020-01-22  411  						      "fsl,erratum-a011043");
-1d3ca681b9d957 Madalin Bucur     2020-01-22  412  
-909bea73485fab Tobias Waldekranz 2022-01-26  413  	xgmac_mdio_set_suppress_preamble(bus);
-909bea73485fab Tobias Waldekranz 2022-01-26  414  
-dd8f467eda72cd Tobias Waldekranz 2022-01-26  415  	ret = xgmac_mdio_set_mdc_freq(bus);
-dd8f467eda72cd Tobias Waldekranz 2022-01-26  416  	if (ret)
-dd8f467eda72cd Tobias Waldekranz 2022-01-26  417  		return ret;
-dd8f467eda72cd Tobias Waldekranz 2022-01-26  418  
-105b0468d7b2e6 zhaoxiao          2022-08-18  419  	fwnode = dev_fwnode(&pdev->dev);
-ac53c26433b51f Marcin Wojtas     2021-06-25  420  	if (is_of_node(fwnode))
-ac53c26433b51f Marcin Wojtas     2021-06-25  421  		ret = of_mdiobus_register(bus, to_of_node(fwnode));
-ac53c26433b51f Marcin Wojtas     2021-06-25  422  	else if (is_acpi_node(fwnode))
-ac53c26433b51f Marcin Wojtas     2021-06-25  423  		ret = acpi_mdiobus_register(bus, fwnode);
-ac53c26433b51f Marcin Wojtas     2021-06-25  424  	else
-ac53c26433b51f Marcin Wojtas     2021-06-25  425  		ret = -EINVAL;
-9f35a7342cff0b Timur Tabi        2012-08-20  426  	if (ret) {
-9f35a7342cff0b Timur Tabi        2012-08-20  427  		dev_err(&pdev->dev, "cannot register MDIO bus\n");
-9f35a7342cff0b Timur Tabi        2012-08-20  428  		return ret;
-9f35a7342cff0b Timur Tabi        2012-08-20  429  	}
-9f35a7342cff0b Timur Tabi        2012-08-20  430  
-1d14eb15dc2c39 Tobias Waldekranz 2022-01-26  431  	platform_set_drvdata(pdev, bus);
-9f35a7342cff0b Timur Tabi        2012-08-20  432  
-9f35a7342cff0b Timur Tabi        2012-08-20  433  	return 0;
-9f35a7342cff0b Timur Tabi        2012-08-20  434  }
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  102  		if (dwmac->data->fix_mac_speed)
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  103  			plat_dat->fix_mac_speed = dwmac->data->fix_mac_speed;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  104  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  105  		/* Enable TX clock */
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  106  		if (dwmac->data->tx_clk_en) {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  107  			dwmac->tx_clk = devm_clk_get(&pdev->dev, "tx_clk");
+abea8fd5e801a6 Jisheng Zhang        2023-09-16  108  			if (IS_ERR(dwmac->tx_clk))
+abea8fd5e801a6 Jisheng Zhang        2023-09-16  109  				return PTR_ERR(dwmac->tx_clk);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  110  
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  111  			ret = clk_prepare_enable(dwmac->tx_clk);
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  112  			if (ret) {
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  113  				dev_err(&pdev->dev,
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  114  					"Failed to enable tx_clk\n");
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  115  				return ret;
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  116  			}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  117  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  118  			/* Check and configure TX clock rate */
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  119  			rate = clk_get_rate(dwmac->tx_clk);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  120  			if (dwmac->data->tx_clk_rate &&
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  121  			    rate != dwmac->data->tx_clk_rate) {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  122  				rate = dwmac->data->tx_clk_rate;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  123  				ret = clk_set_rate(dwmac->tx_clk, rate);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  124  				if (ret) {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  125  					dev_err(&pdev->dev,
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  126  						"Failed to set tx_clk\n");
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  127  					goto err_tx_clk_disable;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  128  				}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  129  			}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  130  		}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  131  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  132  		/* Check and configure PTP ref clock rate */
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  133  		rate = clk_get_rate(plat_dat->clk_ptp_ref);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  134  		if (dwmac->data->ptp_ref_clk_rate &&
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  135  		    rate != dwmac->data->ptp_ref_clk_rate) {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  136  			rate = dwmac->data->ptp_ref_clk_rate;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  137  			ret = clk_set_rate(plat_dat->clk_ptp_ref, rate);
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  138  			if (ret) {
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  139  				dev_err(&pdev->dev,
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  140  					"Failed to set clk_ptp_ref\n");
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  141  				goto err_tx_clk_disable;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  142  			}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  143  		}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  144  	}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  145  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  146  	plat_dat->bsp_priv = dwmac;
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  147  	plat_dat->eee_usecs_rate = plat_dat->clk_ptp_rate;
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  148  
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  149  	if (plat_dat->eee_usecs_rate > 0) {
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  150  		u32 tx_lpi_usec;
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  151  
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  152  		tx_lpi_usec = (plat_dat->eee_usecs_rate / 1000000) - 1;
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  153  		writel(tx_lpi_usec, stmmac_res.addr + GMAC_1US_TIC_COUNTER);
+b4c5f83ae3f3e2 Rusaimi Amira Ruslan 2020-09-28  154  	}
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  155  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  156  	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  157  	if (ret)
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  158  		goto err_tx_clk_disable;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  159  
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  160  	return 0;
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  161  
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  162  err_tx_clk_disable:
+bd8cfad17c9530 Vitalii Mordan       2024-11-08 @163  	if (dwmac->data->tx_clk_en)
+                                                            ^^^^^^^^^^^^^
+Unchecked dereference
+
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  164  		clk_disable_unprepare(dwmac->tx_clk);
+bd8cfad17c9530 Vitalii Mordan       2024-11-08  165  	return ret;
+9efc9b2b04c74e Rusaimi Amira Ruslan 2020-08-26  166  }
 
 -- 
 0-DAY CI Kernel Test Service
