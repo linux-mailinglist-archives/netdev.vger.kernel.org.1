@@ -1,99 +1,158 @@
-Return-Path: <netdev+bounces-143806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542779C4439
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:54:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718CC9C4440
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A52728955E
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:54:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 030131F210A2
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:56:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049431A76BB;
-	Mon, 11 Nov 2024 17:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AFB1AA1C0;
+	Mon, 11 Nov 2024 17:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="MwtmfSxA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="nejyAANH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC97C53389;
-	Mon, 11 Nov 2024 17:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E023019F113;
+	Mon, 11 Nov 2024 17:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731347655; cv=none; b=r0kEWt79/LFU3zg2jCYFO509dJ0yBpwVkVHlU+q9jxuO4DHHpOaFU0NioknK9F2P3u9tg81srfuC8EHoxRp6st1WWSyTv1oif6CrH2Jc3Af4uiZdynfsR7H39upAyMR36UrW5K4p40iS0mlqXdO3D6po28SiUOTnCwUQ6RUwCFw=
+	t=1731347773; cv=none; b=CQQ1Aq+hXwnFtO3YrOzz1jOlOWveJdIHj+dcSjvEPfrns9KO1kvouV9ks6d+VGJz+MOHxH2QMddUvDgGqOfmcbW3CwE9DhuN0aMGirRMiu4jnw+vcA8iogB+pO+zpSrGWFYDMYorKV1woffDZC063Xi8BrDsK8FRTkmhkhGlQCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731347655; c=relaxed/simple;
-	bh=RQuehUcu7CPF8BzmE6YF+Hi6bonnL+vCx1x91FtB77Q=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
-	 References:In-Reply-To; b=AdA8nKdoxWOfzcakLhD6/cpt8cJvkvyKirWpl6qXEBkyIEwqgmm4Dgzj5FbAd1nZTWzo8d9/I+yxkY91ayJt0rMRRNqCXwtz8zRzBbg4Ne83ZdQbp4x7UGWsnGDsrErqw/BnRpJlwS02+6EfXJvHMdpeCWqLRYzyHammYvIHbnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=MwtmfSxA; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1731347639;
-	bh=RQuehUcu7CPF8BzmE6YF+Hi6bonnL+vCx1x91FtB77Q=;
-	h=From:To:Subject:Mime-Version:Date:Message-ID;
-	b=MwtmfSxAeBrpGREOuvQBAKowDITw+bRLkqsKwe/fj/Y1Sma4mUUNSyyDq9+LoEZ8z
-	 P7SX4pGevD5Aie90gc/CrmQ2vIBiHqsNPudYAxtiTjvWa2fSAeHEt+jVpbjguLHRYo
-	 1oztXU11iPhVE9wAd6IzZy/dg3VE9eKqz5u8kbSg=
-X-QQ-GoodBg: 1
-X-QQ-SSF: 00400000000000F0
-X-QQ-FEAT: D4aqtcRDiqT6iyfUez+DXx4B7ybItHVbSxkDlA8/kMI=
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: HxKBLVwctrUt98P+84o/bvHPxqJKkf1pbjYx6rm38RI=
-X-QQ-STYLE: 
-X-QQ-mid: t5gz7a-2t1731347617t5659572
-From: "=?utf-8?B?V2VudGFvIEd1YW4=?=" <guanwentao@uniontech.com>
-To: "=?utf-8?B?QW5kcmV3IEx1bm4=?=" <andrew@lunn.ch>
-Cc: "=?utf-8?B?546L5pix5Yqb?=" <wangyuli@uniontech.com>, "=?utf-8?B?aGthbGx3ZWl0MQ==?=" <hkallweit1@gmail.com>, "=?utf-8?B?bGludXg=?=" <linux@armlinux.org.uk>, "=?utf-8?B?ZGF2ZW0=?=" <davem@davemloft.net>, "=?utf-8?B?ZWR1bWF6ZXQ=?=" <edumazet@google.com>, "=?utf-8?B?a3ViYQ==?=" <kuba@kernel.org>, "=?utf-8?B?cGFiZW5p?=" <pabeni@redhat.com>, "=?utf-8?B?bmV0ZGV2?=" <netdev@vger.kernel.org>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>, "=?utf-8?B?5Y2g5L+K?=" <zhanjun@uniontech.com>, "=?utf-8?B?Zi5mYWluZWxsaQ==?=" <f.fainelli@gmail.com>, "=?utf-8?B?c2ViYXN0aWFuLmhlc3NlbGJhcnRo?=" <sebastian.hesselbarth@gmail.com>, "=?utf-8?B?bXVndW50aGFudm5t?=" <mugunthanvnm@ti.com>, "=?utf-8?B?Z2VlcnQrcmVuZXNhcw==?=" <geert+renesas@glider.be>
-Subject: Re: [PATCH] net: phy: fix may not suspend when phy has WoL
+	s=arc-20240116; t=1731347773; c=relaxed/simple;
+	bh=UhScj4HpDOH4p4UAdARMSOnIjb6CiQWNTlqjF5ncNO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eiA62wTjWsiZ9tA+U0555ZztAcC5wQ8kIo9nOfz0B3LLhYAdlR7F0bfc/MjlXQWlJ/JapgAqjmNpudikhUlNkMxFKT2adJ5Gmt7UjbgX7aSiNWsGdm+1tf/4mLo1+H7eJuLWcqa8hLgsrEcTDCefejmMvZMMfmlrThhAPkPo75Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=nejyAANH; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 54F1A2171FA8;
+	Mon, 11 Nov 2024 09:56:09 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 54F1A2171FA8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731347770;
+	bh=9vJd/Xt8CL3/r6fhnnHBJNHCUCe8NNZ/NF76sGIG8Ms=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=nejyAANH9MJ0obK6mmW65iWVfPeQ6DB9jkiusgAdjWTcADeLJ8qQkOD2WkR7mSn++
+	 G8hlwRLrMiApiVnWsLvQi/iqx+8zcBiNOnzc6qA2kGe15l1xQW3qk2fNVMj8W7HBkA
+	 P9ROuFGDwmH27ODflklr6wrod7Zn0iL59Y3cBZyo=
+Message-ID: <403306e2-bc7a-491c-ab4e-033456a9fbea@linux.microsoft.com>
+Date: Mon, 11 Nov 2024 09:55:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Tue, 12 Nov 2024 01:53:37 +0800
-X-Priority: 3
-Message-ID: <tencent_36F99FAA42FE3D9C1BC36653@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <ACDD37BE39A4EE18+20241111080627.1076283-1-wangyuli@uniontech.com>
-	<tencent_6056758936AF2CEE58AEBC36@qq.com>
-	<3e486556-e654-4b3a-82c2-602c853788f0@lunn.ch>
-In-Reply-To: <3e486556-e654-4b3a-82c2-602c853788f0@lunn.ch>
-X-QQ-ReplyHash: 3341295578
-X-BIZMAIL-ID: 18139226908605465664
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Tue, 12 Nov 2024 01:53:38 +0800 (CST)
-Feedback-ID: t:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: OBlwWD/GWDEohf/ygnOrzPn/4/fjZPsUuAHdKBwfFfLnEuWd3mSYk1ZY
-	Y/ABAu9sScJS8jyVd97C9oXM19D1OfYJUS72g0JP/Ns7YD6i37+Iyrt+OUyzfdM+L2N9aF4
-	0pTXNRgB198CmsSEYruwWHZduKR4uaxuXkwpPLaRcvY3+aBqRxCKfhSOcOvTh+ORSNaqZxf
-	Cmz6f7M58qizBrNcR4ubB/M0ZkiBlWDS1B58zb69g/9LmgzjfdEoB4OXO0Z/MdDHGNkkQOZ
-	ZOXm2O0C9fx41X1aSQfatF2INubR8mlQD75eYLCUuwUs3ZV1ZjcZXv5ezi1ZcludGu90qeR
-	cE8C749gmQgtJdPqE0E/jFwkb8toCd4LLf44rKSBn8PaXlQQ9URfs89cveeIzfxMfsd9kk8
-	1SOhYQT5V5lZef7b7BlMA0WO+eA00+kercj22E85gv40XkfdPza55xExudiUq+Ex4+/DPD7
-	PVLstiMXNy9ham7QI+6P9ngPCaXs9j74H+OnTjkFt0KkMSwK5ejwj+flEFZhVWSC04/rrmO
-	tAvusHZpkYdxcn6jpzf8bAv1lM+8bU1Bant3eLKomDJ+GQhh4eppSV2JtPI/1wCTuRgb267
-	7fhoEsZCUO9N3c0c2i0j9Y4BYOl+K7EuzT8khoxBgEmi7DrDyWirIPEuKoV6eQp0KkeiUJb
-	+bYnjm06vMT8s2p6LvxpPnkn/EWaAktt1OvOk7zPSWubZp3ddbS7lqdQULDiT4WRRWolhPU
-	C9znCEJkP5qgGrdAS3EUu0bP7Fjcevysj0dUP+b8R6s3UP95v25LiYM6UmyA7fnvRBGHy2q
-	njQLH0nd0Pq+HZgWNRtE/3wPolKMzx//PQpu6SsosO/aMfbZ4GHQdgqefNj1qbbXWoC9dt4
-	MgGvAEX2GoJ0nB89lPX/OJMN8btPRveAKDe3AJf7QByRwn0mKWLbmXz85zWQt//suHRkwCq
-	eRch+yGMAonWLlwvGDzFejbY0OXmDmZbb9qnkqtUORaOD0ZsgqnSQRunfIkPizZ+8hEM=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] hyperv: Add new Hyper-V headers in include/hyperv
+To: Naman Jain <namjain@linux.microsoft.com>, linux-hyperv@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, iommu@lists.linux.dev, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+ virtualization@lists.linux.dev
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ mhklinux@outlook.com, decui@microsoft.com, catalin.marinas@arm.com,
+ will@kernel.org, luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+ daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
+ bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
+ jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
+ skinsburskii@linux.microsoft.com, mukeshrathor@microsoft.com,
+ vkuznets@redhat.com, ssengar@linux.microsoft.com, apais@linux.microsoft.com
+References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1731018746-25914-4-git-send-email-nunodasneves@linux.microsoft.com>
+ <ef2686dc-ec9e-4efd-9c52-5ba9434b7ce8@linux.microsoft.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <ef2686dc-ec9e-4efd-9c52-5ba9434b7ce8@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-VGhhbmtzLCBJIHdpbGwgcGF5IGF0dGVudGlvbiB0byBpdCBpbiB0aGUgZnV0dXJlLg0KDQpC
-UnMNCldlbnRhbyBHdWFu
+On 11/7/2024 9:59 PM, Naman Jain wrote:
+> 
+> 
+> On 11/8/2024 4:02 AM, Nuno Das Neves wrote:
+>> These headers contain definitions for regular Hyper-V guests (as in
+>> hyperv-tlfs.h), as well as interfaces for more privileged guests like
+>> Dom0.
+>>
+>> These files are derived from headers exported from Hyper-V, rather than
+>> being derived from the TLFS document. (Although, to preserve
+>> compatibility with existing Linux code, some definitions are copied
+>> directly from hyperv-tlfs.h too).
+>>
+>> The new files follow a naming convention according to their original
+>> use:
+>> - hdk "host development kit"
+>> - gdk "guest development kit"
+>> With postfix "_mini" implying userspace-only headers, and "_ext" for
+>> extended hypercalls.
+> 
+> Naming convention for mini (which may have come from HyperV code) is a bit odd TBH. May be it has more to it than what is mentioned here or what I know. If more information helps, or this can be changed, please see.
+> 
+
+The naming is originally from the Hyper-V code. See below: "The original
+names are kept intact primarily to keep the provenance of exactly where
+they came from in Hyper-V code, which is helpful for manual maintenance
+and extension of these definitions."
+
+>>
+>> These names should be considered a rough guide only - since there are
+>> many places already where both host and guest code are in the same
+>> place, hvhdk.h (which includes everything) can be used most of the time.
+>>
+>> The original names are kept intact primarily to keep the provenance of
+>> exactly where they came from in Hyper-V code, which is helpful for
+>> manual maintenance and extension of these definitions. Microsoft
+>> maintainers importing new definitions should take care to put them in
+>> the right file.
+>>
+>> Note also that the files contain both arm64 and x86_64 code guarded by
+>> \#ifdefs, which is how the definitions originally appear in Hyper-V.
+>> Keeping this convention from Hyper-V code is another tactic for
+>> simplying the process of importing new definitions.
+>>
+>> These headers are a step toward importing headers directly from Hyper-V
+>> in the future, similar to Xen public files in include/xen/interface/.
+>>
+>> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+> 
+> While I understand the motivation behind this series that this is going to ease out the process of updating the header files with respect to HyperV, I think, we will need to pay attention to what we are bringing in with these headers, whether there are any users of it or not, and make sure that TLFS document is updated regularly, to avoid having bunch of code with no information of it.
+> The code comments in these files are one step forward towards that.
+> And from your cover letter it seems that some changes which actually make use of these additional interfaces are underway, so things will make more sense later. For now, this looks good to me.
+> 
+
+Yes, we do need to be careful about what interfaces we add here. Not just
+anything can be copied from Hyper-V code into these files. The exact
+process is a matter we can discuss internally. But, as you say, there are
+upcoming patches (previous versions can be found in the mailing list) which
+use the new root partition interfaces.
+
+Updating the TLFS and documenting the interfaces is a different matter.
+I can't speak to the best way forward for documenting these, but in many
+cases the use of the new interfaces will be self-evident from the code
+that uses them, and/or comments as you mentioned.
+
+Over the years many Hyper-V definitions have already been added and used
+in Linux which have not been documented in the TLFS or elsewhere. This
+patch series makes that fact more obvious and sets us on a path towards a
+more maintainable method (i.e., publishing headers directly from the Hyper-V
+code, hopefully).
+
+Thanks
+Nuno
+
+> > Regards,
+> Naman
+> 
+> <snip>
 
 
