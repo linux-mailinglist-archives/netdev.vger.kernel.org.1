@@ -1,171 +1,85 @@
-Return-Path: <netdev+bounces-143787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA0DD9C42D6
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:43:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7D269C4310
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89E1B2A9E8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 16:41:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BE642844AD
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 16:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E851A264A;
-	Mon, 11 Nov 2024 16:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6e+7tA8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001F81A3042;
+	Mon, 11 Nov 2024 16:56:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46011A257A
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 16:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B35C1A3028;
+	Mon, 11 Nov 2024 16:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731343198; cv=none; b=j34xxSbnUchR/ddMhZfSYxHZHKuMlwIfulfhaQwfXvkLSsCBhJ8oM9u9ZOlLiZDal+ZvhESsy3+eRLYLY+XSuK10I99EOc+dEKbo8AW8L9FuF26AgZFzOWizRjvWIxyq/euHvHKMB0bdvySX/hy7ZroommndsmZ3vZGSpKWraWE=
+	t=1731344180; cv=none; b=tuX/Qw7nI/OFs1oLJ2+De3k5BRsWj4AfpQc5i6V4+ieijNkQcglXBLVCOQZPMBZFkpRKOqzEsyrfzR8kQ1uMjjMxp4LGV6VPLq9SdpSsmCnhockkYILwP+YigjFBIcKIQt96Wgv18WToqbDJqX9Fd+UmmC6sF5hUKUWDXfb9f1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731343198; c=relaxed/simple;
-	bh=o486AYVqM7xqcbFT+XOIbCGL5DWZlP8FUBorEWAX/zg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QIqO7YJ/JPjAoatL7+gfh7gRHbMOGIeRVs43XTegVHH1f8tK8tdjrFTw3VkXTnpekRQQfo7qqFeKqJEO0ISOjousbLJdg3oOiEhHaVKDK5r8SOlh1dU/orHH5XzewIV1SXbzAc6A5crmK8pJXwvORjp5XSNyS86or8qOmoysN5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g6e+7tA8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731343195;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aKgW3LE84SWafFn65FDrfQSl/9TIfSGFANwG6EcBo18=;
-	b=g6e+7tA82qUbsn1vSi6WRiQu9U3y7/OlKeesJHINF7aYSHkj6aZdhOTTzWU7zNfKrQHWmX
-	wnxNqeHS5NKOLRPalz5qOa5y1JlclaBkSOFdGi3N3oHefk/F1nNXGfYweJMaHXubRIp98j
-	pF0tUFsHNh9QViTMB0sDIHRgKX9Vzvc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-45gy0RBdMZWr3PcZmp005A-1; Mon, 11 Nov 2024 11:39:54 -0500
-X-MC-Unique: 45gy0RBdMZWr3PcZmp005A-1
-X-Mimecast-MFC-AGG-ID: 45gy0RBdMZWr3PcZmp005A
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a9adb271de7so407265866b.0
-        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 08:39:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731343193; x=1731947993;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKgW3LE84SWafFn65FDrfQSl/9TIfSGFANwG6EcBo18=;
-        b=vnbLH0SjlLxesggGpkmDyo27feY6YSYU9zytoLlLln8QCO92aME7jEabzhwoBphD3w
-         6autnVomC/vivBsfZYru4D2Y5JLOezL6KR5Cpgo/YYdW2eXzWjvWzMvrM9d20529hLyk
-         iQwaGGEcBRBVQfZspklEZkshmU5OEpC+5VnK92GNqSghxH96uvMqXaWJ35VATY3yFPuL
-         BNgI5orN7aXyLZF0329XeYS/MTRweTG1bBi5QKpzghL/l3nCpZPHv1v/Qj/zpM9YvvWz
-         0sZ77QGKbqw3rntxl9D6VMCmqNmOCiYGrVF2ZgwlamqULSueDKW1vQOHerqtuVJhNSI+
-         rsSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGZ18mzB5+jowgkpxwR/t0Kd/kAJi9/oMYNajULXFvTY/1NLCU1gOyQQZAQ4Y5yDELUiq9Iew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfsGiitx2UguR4y+tVzK8oWldH34WgFCWgw5bDLjiDRf6EDgPZ
-	clHHdV0oKxmaGGApp7oihmv9DedTvy1hhtxS+GoGwC36IbhsDAk9i2Mql9qJv7u5qq7Vqd9Duoe
-	INJQymY8K7tUTI02EZHxooxqziv+5fRkzQO57RRzmsaVshX+7J7hnJQ==
-X-Received: by 2002:a17:906:ef08:b0:a99:e939:d69e with SMTP id a640c23a62f3a-a9ef0024349mr1298335666b.51.1731343193110;
-        Mon, 11 Nov 2024 08:39:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH3n8Roc+Mnu9kSawt8yE+qVV+ccGpVO4yEHKrFfI04/JcX8ndj08Z6F74oPMyb6gsKndsDZA==
-X-Received: by 2002:a17:906:ef08:b0:a99:e939:d69e with SMTP id a640c23a62f3a-a9ef0024349mr1298333066b.51.1731343192716;
-        Mon, 11 Nov 2024 08:39:52 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0ad2d9dsm610552266b.91.2024.11.11.08.39.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 08:39:52 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 2D95E164CC6E; Mon, 11 Nov 2024 17:39:51 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
- <sdf@fomichev.me>, Magnus Karlsson <magnus.karlsson@intel.com>,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 12/19] xdp: add generic
- xdp_build_skb_from_buff()
-In-Reply-To: <20241107161026.2903044-13-aleksander.lobakin@intel.com>
-References: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
- <20241107161026.2903044-13-aleksander.lobakin@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 11 Nov 2024 17:39:51 +0100
-Message-ID: <875xot67xk.fsf@toke.dk>
+	s=arc-20240116; t=1731344180; c=relaxed/simple;
+	bh=CPbt4ptTClt1ZwrN1NhFeJr/96tf+mEoicDZ5yuXqvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LjDhcZt2Rswb7bsjF30BG7i+Ys6nkYodQcs2MPkYk24eh7adXyQZdP51M5TSytXf6HxFaqE+QyEvqHolvz3OEsglw/Jr9nfx8Noc4gwpc+tIQ5xujfMDRzrbg1tt+72UV3v5tF/KRBmIrEz9XNaQJxA+OU1OrQnZPylbS0D294A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1tAXhu-0005Zz-PV; Mon, 11 Nov 2024 17:56:06 +0100
+Date: Mon, 11 Nov 2024 17:56:06 +0100
+From: Florian Westphal <fw@strlen.de>
+To: egyszeregy@freemail.hu
+Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
+	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] netfilter: uapi: Fix file names for case-insensitive
+ filesystem.
+Message-ID: <20241111165606.GA21253@breakpoint.cc>
+References: <20241111163634.1022-1-egyszeregy@freemail.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241111163634.1022-1-egyszeregy@freemail.hu>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+egyszeregy@freemail.hu <egyszeregy@freemail.hu> wrote:
+>  rename net/ipv4/netfilter/{ipt_ECN.c => ipt_ECN_TARGET.c} (98%)
+>  rename net/netfilter/{xt_DSCP.c => xt_DSCP_TARGET.c} (98%)
+>  rename net/netfilter/{xt_HL.c => xt_HL_TARGET.c} (100%)
+>  rename net/netfilter/{xt_RATEEST.c => xt_RATEEST_TARGET.c} (99%)
+>  rename net/netfilter/{xt_TCPMSS.c => xt_TCPMSS_TARGET.c} (99%)
 
-> The code which builds an skb from an &xdp_buff keeps multiplying itself
-> around the drivers with almost no changes. Let's try to stop that by
-> adding a generic function.
-> Unlike __xdp_build_skb_from_frame(), always allocate an skbuff head
-> using napi_build_skb() and make use of the available xdp_rxq pointer to
-> assign the Rx queue index. In case of PP-backed buffer, mark the skb to
-> be recycled, as every PP user's been switched to recycle skbs.
->
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/net/xdp.h |  1 +
->  net/core/xdp.c    | 55 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 56 insertions(+)
->
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index 4c19042adf80..b0a25b7060ff 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -330,6 +330,7 @@ xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
->  void xdp_warn(const char *msg, const char *func, const int line);
->  #define XDP_WARN(msg) xdp_warn(msg, __func__, __LINE__)
->  
-> +struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp);
->  struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp);
->  struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
->  					   struct sk_buff *skb,
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index b1b426a9b146..3a9a3c14b080 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -624,6 +624,61 @@ int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp)
->  }
->  EXPORT_SYMBOL_GPL(xdp_alloc_skb_bulk);
->  
-> +/**
-> + * xdp_build_skb_from_buff - create an skb from an &xdp_buff
-> + * @xdp: &xdp_buff to convert to an skb
-> + *
-> + * Perform common operations to create a new skb to pass up the stack from
-> + * an &xdp_buff: allocate an skb head from the NAPI percpu cache, initialize
-> + * skb data pointers and offsets, set the recycle bit if the buff is PP-backed,
-> + * Rx queue index, protocol and update frags info.
-> + *
-> + * Return: new &sk_buff on success, %NULL on error.
-> + */
-> +struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
-> +{
-> +	const struct xdp_rxq_info *rxq = xdp->rxq;
-> +	const struct skb_shared_info *sinfo;
-> +	struct sk_buff *skb;
-> +	u32 nr_frags = 0;
-> +	int metalen;
-> +
-> +	if (unlikely(xdp_buff_has_frags(xdp))) {
-> +		sinfo = xdp_get_shared_info_from_buff(xdp);
-> +		nr_frags = sinfo->nr_frags;
-> +	}
+No, please, if we have to do this, then lets merge the targets
+(uppercase name) into the match (lowercase), i.e. most of the contents
+of xt_DSCP.c go into xt_dscp.c.
 
-Why this separate branch at the start of the function? nr_frags is no
-used until the other branch below, so why not just make that branch on
-xdp_buff_has_frags() and keep everything frags-related together in one
-block?
+Same for tcpmss and others where applicable.
 
--Toke
+Renaming ip6t_ECN to ip6t_ECN_TARGET makes no sense to me,
+there is no ip6t_ecn.c, so no collision exists for case-insensitive
+file systems.
 
+> --- a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
+> +++ b/include/uapi/linux/netfilter_ipv4/ipt_ECN_TARGET.h
+> @@ -11,7 +11,7 @@
+>  #define _IPT_ECN_TARGET_H
+
+I don't think this can be done, for any of these files, as this
+is UAPI code.
+
+Best you can do is follow what
+include/uapi/linux/netfilter/xt_MARK.h does (did).
 
