@@ -1,119 +1,99 @@
-Return-Path: <netdev+bounces-143740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364539C3EF3
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:59:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1ACC9C3F0A
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A321B21AC8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:59:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EEB61C22676
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023BE19E826;
-	Mon, 11 Nov 2024 12:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C336C19E7F8;
+	Mon, 11 Nov 2024 12:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="JkHaimX5"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D494A19DF66;
-	Mon, 11 Nov 2024 12:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FA319CD0E;
+	Mon, 11 Nov 2024 12:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731329703; cv=none; b=bm9mwuMmNSltZEna0RbNmr1apC33M14JXFbyQYE4UKDHm02u4zPuTcwgh40Q5wwh+aNKCc5RskpWG1KQy44MCLa7B44IVYxStBzAQ8si/7mVU8n4RIi+uK81Vvsv20id5iO5Lz34IO8VMmv5lg/mMVAP3buQULS9qQ0R0h1e/xQ=
+	t=1731329956; cv=none; b=V6A6OM3cyy45taH/iDIrjKsR3kI19+Hti/j/aVt00afaaD8OUAIdpA4WJhUO3qelea8ZxCvnF4AGhOP8dUY/JOoaiwgFRngn+BFl7kA3WUg+bcNXxAGJIJExbE50VRIL1zZVqAfYxyfMwhqWhn3+5xrw/DDGse6mhNeUqEzQyyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731329703; c=relaxed/simple;
-	bh=FrwN6f/ivVvtDxoAVtk1Dom0WhPT+xE8kKmmrcZbIsI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=jR0Iys4qnKPweIBx63CRRED68fCQ4F0gv2x/0Xi61h9lbqKe5asWWLr5gBnyvkYN+e+p+BK3h3Y4rZvrKM/KECrc/ItANGTvpM7jBr6lkVMx0kSU7Moj0wSWpnagvt+YX5m72Ys7x0lDYhRharv4KQvjjqeLVLyA2XjKGaILosA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Xn8dW4462z4f3nTB;
-	Mon, 11 Nov 2024 20:54:39 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 9839B1A0359;
-	Mon, 11 Nov 2024 20:54:58 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP1 (Coremail) with SMTP id cCh0CgDHb7Gf_jFn1hfNBQ--.13673S2;
-	Mon, 11 Nov 2024 20:54:56 +0800 (CST)
-Message-ID: <1483d9ce-4929-4abb-8a5f-bd91abeeace6@huaweicloud.com>
-Date: Mon, 11 Nov 2024 20:54:55 +0800
+	s=arc-20240116; t=1731329956; c=relaxed/simple;
+	bh=0WBtHqJpcKYKgQyCWLjfinIAAVDEtD/lYNf3aIBMDvE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Dunkx1lXhS2GxGkViJd+jhmeaN+c78IYXbAXZ5DrZE0EKhzVv9054wnqYc+H52jTUuJMyHF/ELc+FTEofv7nPa4PxqVDO+k+CrI0m30PP5kaJllgz0mkzNH8B7nY8Oalmy1UuC27AJv0mKyEKLsFN07jIOyGRmtXz7P23cni9Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=JkHaimX5; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1731329955; x=1762865955;
+  h=from:to:subject:date:message-id:mime-version;
+  bh=0WBtHqJpcKYKgQyCWLjfinIAAVDEtD/lYNf3aIBMDvE=;
+  b=JkHaimX5X93hXqwBSybM/lZVRbvvm0t5UFofNPrLSp5dxvIaiwoZg6vD
+   k5P8MtWi9pfR8c54twSkBi0t+ArsYjRJ32ZQNj6HorvBSt0xKxH3y+ubr
+   5tyBEvTychw4eAxsR3+J17mu94+Vd/tJclnlr2fxyCCZRbwg+3HEQrV6X
+   MNuqi9b3CIggs70jfdW4J9We/jpRM3L9qs9ysLRmpabzKcy2B9OSiB89H
+   BRiUJ2AZGwn4XLXxgXoWuqNLMbCVjCeHIAlzBvqPiV+tLIQfIR8BLtVtZ
+   UAtg5fp31Vy3T/7w+GvGLYPdwdp9omGLzTbDy5kjaQpDDeUBd8WgM7b+8
+   w==;
+X-CSE-ConnectionGUID: dZFC6vp0Q/6hLNqL+TdxVg==
+X-CSE-MsgGUID: I67Ga0CDQ7Sq9vDrZLlvhA==
+X-IronPort-AV: E=Sophos;i="6.12,145,1728975600"; 
+   d="scan'208";a="37646824"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Nov 2024 05:59:14 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Nov 2024 05:58:43 -0700
+Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 11 Nov 2024 05:58:38 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>
+Subject: [PATCH net-next v2 0/5] Add ptp library for Microchip phys
+Date: Mon, 11 Nov 2024 18:28:28 +0530
+Message-ID: <20241111125833.13143-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 0/2] Add kernel symbol for struct_ops
- trampoline
-Content-Language: en-US
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-To: bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Yonghong Song <yonghong.song@linux.dev>,
- Kui-Feng Lee <thinker.li@gmail.com>
-References: <20241111121641.2679885-1-xukuohai@huaweicloud.com>
-In-Reply-To: <20241111121641.2679885-1-xukuohai@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:cCh0CgDHb7Gf_jFn1hfNBQ--.13673S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CrWrZw1kJF1rKFykuFyDKFg_yoW8GryUpa
-	yruwn8Zr40grZF93yfWayUCFWfKa1kXF15ur9rJ34fAFy2qr1DGr1jgr43urWagr9ak34r
-	JF909FyvkFyjvrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyGb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsUUUUUU==
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+Content-Type: text/plain
 
-On 11/11/2024 8:16 PM, Xu Kuohai wrote:
-> From: Xu Kuohai <xukuohai@huawei.com>
-> 
-> Add kernel symbol for struct_ops trampoline.
-> 
-> Without kernel symbol for struct_ops trampoline, the unwinder may
-> produce unexpected stacktraces. For example, the x86 ORC and FP
-> unwinder stops stacktrace on a struct_ops trampoline address since
-> there is no kernel symbol for the address.
-> 
-> v3:
-> - Add a separate cleanup patch to replace links_cnt with funcs_cnt
-> - Allocate ksyms on-demand in update_elem() to stay with the links
->    allocation way
-> - Set ksym name to prog__<struct_ops_name>_<member_name>
-> 
-> v2: https://lore.kernel.org/bpf/20241101111948.1570547-1-xukuohai@huaweicloud.com/
-> - Refine the commit message for clarity and fix a test bot warning
-> 
-> v1: https://lore.kernel.org/bpf/20241030111533.907289-1-xukuohai@huaweicloud.com/
-> 
-> Xu Kuohai (2):
->    bpf: Use function pointers count as struct_ops links count
->    bpf: Add kernel symbol for struct_ops trampoline
-> 
->   include/linux/bpf.h         |   3 +-
->   kernel/bpf/bpf_struct_ops.c | 114 ++++++++++++++++++++++++++++++++----
->   kernel/bpf/dispatcher.c     |   3 +-
->   kernel/bpf/trampoline.c     |   9 ++-
->   4 files changed, 114 insertions(+), 15 deletions(-)
-> 
+Adds support of ptp library in Microchip phys
 
-Oops, I messed up the code in v2, the argument for
-bpf_image_ksym_add in v3 is not correct.
+Divya Koppera (5):
+  net: phy: microchip_ptp : Add header file for Microchip ptp library
+  net: phy: microchip_ptp : Add ptp library for Microchip phys
+  net: phy: Kconfig: Add ptp library support and 1588 optional flag in
+    Microchip phys
+  net: phy: Makefile: Add makefile support for ptp in Microchip phys
+  net: phy: microchip_t1 : Add initialization of ptp for lan887x
 
-Sorry for the noise.
+ drivers/net/phy/Kconfig         |   9 +-
+ drivers/net/phy/Makefile        |   1 +
+ drivers/net/phy/microchip_ptp.c | 998 ++++++++++++++++++++++++++++++++
+ drivers/net/phy/microchip_ptp.h | 217 +++++++
+ drivers/net/phy/microchip_t1.c  |  40 +-
+ 5 files changed, 1261 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/phy/microchip_ptp.c
+ create mode 100644 drivers/net/phy/microchip_ptp.h
+
+-- 
+2.17.1
 
 
