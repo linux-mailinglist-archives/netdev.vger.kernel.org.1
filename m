@@ -1,117 +1,281 @@
-Return-Path: <netdev+bounces-143859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6639C496F
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:01:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D99F19C4989
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB1381F25DC7
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:01:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C90841F25DB2
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CBA17BEB8;
-	Mon, 11 Nov 2024 23:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02D21AB528;
+	Mon, 11 Nov 2024 23:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oCd5qown"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SFnl289s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B716224FD;
-	Mon, 11 Nov 2024 23:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3559F158D8B
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 23:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731366065; cv=none; b=lbqj2Gfr6SRj+JMxWXhfDHi+m7Sg6ajbd8HEjj4l8bsq/JiZO4JK+yzfzKyn8oC41DTdSPGtjsZd6vaQpOGogx0uSC8sJNuTmbGuHtmdIbD5ArEXhQhad6ylF1XzGNdbr9wNqO1r4q+LJKvfnlGF6ixTiX3J9cbEpzHNmsgzqgQ=
+	t=1731366294; cv=none; b=lxSuHbnKr6+/HDcCh/cptqMdBpe9ewKj9Lzt8ccglpc8MzdI2zZrUlVc9hdoBXL83EijACQ2Y7RfT0v3ox4ve1YqROcCYQy2EvWi7SBv3VHVMjId72cul1Ev6SPOkHr8eg3qK/0mLHUpzKHa8JI1xUP7k44QEeRAOih+XJWDRyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731366065; c=relaxed/simple;
-	bh=qDZkqTdAT5YURqPfR8TG4+JsVxiTK/oTrV1y2mYdmBw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o8sMJxeXuV+L8zh6lAsWPtpWb6OEVBsCluybrDyR0OmpGN8rkn2ug1AMIvjSko5ardacOfXhF8BHX6vr91lObW20yN+sVceY8GFAPAt25/NrDrBnGlcgkKxvOx4sfnVB/jqyXmhiaEXeU8G8ipwzXAMy9ZYHoeRVoxEKaqsPwCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=oCd5qown; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731366063; x=1762902063;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tptZj49XWdeiJ62/CwMkCF81VQcbIFs0dp/76ot3M/M=;
-  b=oCd5qownUTZg94JM3zkIaScVTP5qtoquuJq0a8uNzTIjivcLnIxnIkyZ
-   SgjHInmZef7iDblc89PkrYmMjl0XkKBTboJz8pEuo0RVO4NGwJ0S6kXlb
-   pJyT0sFnXYf/LwI14BqtLPeKggfNz2zExjQBH1xr/GSjL27jFqyv042P5
-   4=;
-X-IronPort-AV: E=Sophos;i="6.12,146,1728950400"; 
-   d="scan'208";a="673162477"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 23:00:59 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:28519]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.224:2525] with esmtp (Farcaster)
- id a35a08d3-1b23-45cb-a986-a3d7f5484b74; Mon, 11 Nov 2024 23:00:59 +0000 (UTC)
-X-Farcaster-Flow-ID: a35a08d3-1b23-45cb-a986-a3d7f5484b74
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 11 Nov 2024 23:00:58 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 11 Nov 2024 23:00:55 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <chuck.lever@oracle.com>
-CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <davem@davemloft.net>,
-	<ebiederm@xmission.com>, <edumazet@google.com>, <horms@kernel.org>,
-	<jlayton@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-nfs@vger.kernel.org>, <liujian56@huawei.com>, <neilb@suse.de>,
-	<netdev@vger.kernel.org>, <okorniev@redhat.com>, <pabeni@redhat.com>,
-	<tom@talpey.com>, <trondmy@kernel.org>
-Subject: Re: [PATCH net v3] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
-Date: Mon, 11 Nov 2024 15:00:52 -0800
-Message-ID: <20241111230052.50577-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <ZzIejAHeZYTqOqeH@tissot.1015granger.net>
-References: <ZzIejAHeZYTqOqeH@tissot.1015granger.net>
+	s=arc-20240116; t=1731366294; c=relaxed/simple;
+	bh=QlFHaXoGdrdsdtsxaMNZEFvMRFaugC/uaB2aDp2fMvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WFQb4Ee157Odm0x2rZlIY3PWUUQvCrDrqCLZuoafDBv+yGMfHspvWrMi9WmvO1+TTqPmLbKHCuwM3vnkhyzc1lRHJZZ8Sgdptkv4pTMeTyPYgbPrXv6L+8qRjPnP6VmUacjfCLxTwWrd5ec7QppFDjL99Xpdl3m4iYa/Nh9cISM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SFnl289s; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f35f4d0e-77df-4e52-b62e-9e1254fb4b5c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731366289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nEuEfLgRpLMggNTLxWl+/ldUjnJz5XMj52pXTGqAcac=;
+	b=SFnl289s5f7ztp763yUfJc+/dJHQ9IYmL41SxAQxZ8sqeyPvmFwQB8VwAfAzRdokQAaqRK
+	ODDSpZwyJoWI05Us9Mwe3jPfD1pPzP+JQMMsQSJ3u8FU8HRTZ/CuhW37QhaXReDcfj49OD
+	6ypasCl86eZmrhQ/Ka3HE8GfMebic8M=
+Date: Mon, 11 Nov 2024 15:04:42 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH bpf-next v3 2/2] bpf: Add kernel symbol for struct_ops
+ trampoline
+To: Xu Kuohai <xukuohai@huaweicloud.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Yonghong Song <yonghong.song@linux.dev>, Kui-Feng Lee <thinker.li@gmail.com>
+References: <20241111121641.2679885-1-xukuohai@huaweicloud.com>
+ <20241111121641.2679885-3-xukuohai@huaweicloud.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241111121641.2679885-3-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Chuck Lever <chuck.lever@oracle.com>
-Date: Mon, 11 Nov 2024 10:11:08 -0500
-> > diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-> > index 6f272013fd9b..d4330aaadc23 100644
-> > --- a/net/sunrpc/svcsock.c
-> > +++ b/net/sunrpc/svcsock.c
-> > @@ -1551,6 +1551,10 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
-> >  	newlen = error;
-> >  
-> >  	if (protocol == IPPROTO_TCP) {
-> > +		__netns_tracker_free(net, &sock->sk->ns_tracker, false);
-> > +		sock->sk->sk_net_refcnt = 1;
-> > +		get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-> > +		sock_inuse_add(net, 1);
-> 
-> I'm not as familiar with net tracking as perhaps I should be. Can
-> you tell me where this reference count is released, or does it not
-> need to be?
+On 11/11/24 4:16 AM, Xu Kuohai wrote:
+> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+> index e99fce81e916..d6dd56fc80d8 100644
+> --- a/kernel/bpf/bpf_struct_ops.c
+> +++ b/kernel/bpf/bpf_struct_ops.c
+> @@ -23,7 +23,6 @@ struct bpf_struct_ops_value {
+>   
+>   struct bpf_struct_ops_map {
+>   	struct bpf_map map;
+> -	struct rcu_head rcu;
 
-It's decremented when the socket is destroyed in __sk_free().
+Since it needs a respin (more on it later), it will be useful to separate this 
+cleanup as a separate patch in the same patch series.
 
+>   	const struct bpf_struct_ops_desc *st_ops_desc;
+>   	/* protect map_update */
+>   	struct mutex lock;
+> @@ -32,6 +31,8 @@ struct bpf_struct_ops_map {
+>   	 * (in kvalue.data).
+>   	 */
+>   	struct bpf_link **links;
+> +	/* ksyms for bpf trampolines */
+> +	struct bpf_ksym **ksyms;
+>   	u32 funcs_cnt;
+>   	u32 image_pages_cnt;
+>   	/* image_pages is an array of pages that has all the trampolines
+> @@ -586,6 +587,49 @@ int bpf_struct_ops_prepare_trampoline(struct bpf_tramp_links *tlinks,
+>   	return 0;
+>   }
+>   
+> +static void bpf_struct_ops_ksym_init(const char *tname, const char *mname,
+> +				     void *image, unsigned int size,
+> +				     struct bpf_ksym *ksym)
+> +{
+> +	snprintf(ksym->name, KSYM_NAME_LEN, "bpf__%s_%s", tname, mname);
+> +	INIT_LIST_HEAD_RCU(&ksym->lnode);
+> +	bpf_image_ksym_init(image, size, ksym);
+> +}
+> +
+> +static void bpf_struct_ops_map_ksyms_add(struct bpf_struct_ops_map *st_map)
+> +{
+> +	u32 i;
+> +
+> +	for (i = 0; i < st_map->funcs_cnt; i++) {
+> +		if (!st_map->ksyms[i])
+> +			break;
+> +		bpf_image_ksym_add(st_map->ksyms[i]);
+> +	}
+> +}
+> +
+> +static void bpf_struct_ops_map_del_ksyms(struct bpf_struct_ops_map *st_map)
+> +{
+> +	u32 i;
+> +
+> +	for (i = 0; i < st_map->funcs_cnt; i++) {
+> +		if (!st_map->ksyms[i])
+> +			break;
+> +		bpf_image_ksym_del(st_map->ksyms[i]);
+> +	}
+> +}
+> +
+> +static void bpf_struct_ops_map_free_ksyms(struct bpf_struct_ops_map *st_map)
+> +{
+> +	u32 i;
+> +
+> +	for (i = 0; i < st_map->funcs_cnt; i++) {
+> +		if (!st_map->ksyms[i])
+> +			break;
+> +		kfree(st_map->ksyms[i]);
+> +		st_map->links[i] = NULL;
 
-> 
-> Does the net reference count get carried over to sockets created
-> by accept() ?
+s/links/ksyms/
 
-Yes, sk_clone_lock() creates a child socket that inherits the
-listener's sk->sk_net_refcnt, then the child will call get_net_track().
+pw-bot: cr
 
-  tcp_create_openreq_child
-    inet_csk_clone_lock
-      sk_clone_lock
+> +	}
+> +}
+> +
+>   static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   					   void *value, u64 flags)
+>   {
+> @@ -602,6 +646,8 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   	u32 i, trampoline_start, image_off = 0;
+>   	void *cur_image = NULL, *image = NULL;
+>   	struct bpf_link **plink;
+> +	struct bpf_ksym **pksym;
+> +	const char *tname, *mname;
+>   
+>   	if (flags)
+>   		return -EINVAL;
+> @@ -641,14 +687,18 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   	kdata = &kvalue->data;
+>   
+>   	plink = st_map->links;
+> +	pksym = st_map->ksyms;
+> +	tname = btf_name_by_offset(st_map->btf, t->name_off);
+>   	module_type = btf_type_by_id(btf_vmlinux, st_ops_ids[IDX_MODULE_ID]);
+>   	for_each_member(i, t, member) {
+>   		const struct btf_type *mtype, *ptype;
+>   		struct bpf_prog *prog;
+>   		struct bpf_tramp_link *link;
+> +		struct bpf_ksym *ksym;
+>   		u32 moff;
+>   
+>   		moff = __btf_member_bit_offset(t, member) / 8;
+> +		mname = btf_name_by_offset(st_map->btf, member->name_off);
+>   		ptype = btf_type_resolve_ptr(st_map->btf, member->type, NULL);
+>   		if (ptype == module_type) {
+>   			if (*(void **)(udata + moff))
+> @@ -718,6 +768,14 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   			      &bpf_struct_ops_link_lops, prog);
+>   		*plink++ = &link->link;
+>   
+> +		ksym = kzalloc(sizeof(*ksym), GFP_USER);
+
+link is also using kzalloc but probably both link and ksym allocation should use 
+bpf_map_kzalloc instead. This switch can be done for both together later as a 
+follow up patch.
+
+> +		if (!ksym) {
+> +			bpf_prog_put(prog);
+
+afaik, this bpf_prog_put is not needed. The bpf_link_init above took the prog 
+ownership and the bpf_struct_ops_map_put_progs() at the error path will take 
+care of it.
+
+> +			err = -ENOMEM;
+> +			goto reset_unlock;
+> +		}
+> +		*pksym = ksym;
+
+nit. Follow the *plink++ style above and does the same *pksym++ here.
+
+> +
+>   		trampoline_start = image_off;
+>   		err = bpf_struct_ops_prepare_trampoline(tlinks, link,
+>   						&st_ops->func_models[i],
+> @@ -737,6 +795,12 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   
+>   		/* put prog_id to udata */
+>   		*(unsigned long *)(udata + moff) = prog->aux->id;
+> +
+> +		/* init ksym for this trampoline */
+> +		bpf_struct_ops_ksym_init(tname, mname,
+> +					 image + trampoline_start,
+> +					 image_off - trampoline_start,
+> +					 *pksym++);
+
+then uses "ksym" here.
+
+>   	}
+>   
+>   	if (st_ops->validate) {
+> @@ -785,6 +849,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   	 */
+>   
+>   reset_unlock:
+> +	bpf_struct_ops_map_free_ksyms(st_map);
+>   	bpf_struct_ops_map_free_image(st_map);
+>   	bpf_struct_ops_map_put_progs(st_map);
+>   	memset(uvalue, 0, map->value_size);
+> @@ -792,6 +857,8 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+>   unlock:
+>   	kfree(tlinks);
+>   	mutex_unlock(&st_map->lock);
+> +	if (!err)
+> +		bpf_struct_ops_map_ksyms_add(st_map);
+>   	return err;
+>   }
+>   
+> @@ -851,7 +918,10 @@ static void __bpf_struct_ops_map_free(struct bpf_map *map)
+>   
+>   	if (st_map->links)
+>   		bpf_struct_ops_map_put_progs(st_map);
+> +	if (st_map->ksyms)
+> +		bpf_struct_ops_map_free_ksyms(st_map);
+>   	bpf_map_area_free(st_map->links);
+> +	bpf_map_area_free(st_map->ksyms);
+>   	bpf_struct_ops_map_free_image(st_map);
+>   	bpf_map_area_free(st_map->uvalue);
+>   	bpf_map_area_free(st_map);
+> @@ -868,6 +938,9 @@ static void bpf_struct_ops_map_free(struct bpf_map *map)
+>   	if (btf_is_module(st_map->btf))
+>   		module_put(st_map->st_ops_desc->st_ops->owner);
+>   
+> +	if (st_map->ksyms)
+
+This null test should not be needed.
+
+> +		bpf_struct_ops_map_del_ksyms(st_map);
+> +
+>   	/* The struct_ops's function may switch to another struct_ops.
+>   	 *
+>   	 * For example, bpf_tcp_cc_x->init() may switch to
+> @@ -980,7 +1053,11 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
+>   	st_map->links =
+>   		bpf_map_area_alloc(st_map->funcs_cnt * sizeof(struct bpf_links *),
+>   				   NUMA_NO_NODE);
+> -	if (!st_map->uvalue || !st_map->links) {
+> +
+> +	st_map->ksyms =
+> +		bpf_map_area_alloc(st_map->funcs_cnt * sizeof(struct bpf_ksyms *),
+> +				   NUMA_NO_NODE);
+
+.map_mem_usage at least needs to include the st_map->ksyms[] pointer array. 
+func_cnts should be used instead of btf_type_vlen(vt) for link also in 
+.map_mem_usage.
+
+> +	if (!st_map->uvalue || !st_map->links || !st_map->ksyms) {
+>   		ret = -ENOMEM;
+>   		goto errout_free;
+>   	}
 
