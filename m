@@ -1,86 +1,91 @@
-Return-Path: <netdev+bounces-143709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8DC9C3C25
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:37:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60ECC9C3C32
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:41:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1791C21B15
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:37:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007D3281190
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2364D185E53;
-	Mon, 11 Nov 2024 10:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4095E17B51A;
+	Mon, 11 Nov 2024 10:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h+kUb3zD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jYjpMyx+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5870E1586C8;
-	Mon, 11 Nov 2024 10:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46AB215B971
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 10:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731321434; cv=none; b=rgHkt21R7ixQ1SvAyGWrIYr8Ho6nbktiHnzz7z0IZ9obWKyGv1+tfVtmQUpElbV608HbRK3pIt08iPzTHuXZjUcsj3AppIgazT1qRoPKs+d+TwOBPaDtoZWfC8sYtiZ36qO/ipCOwkel4jCHoiih/zKsYed85K1tfLiIPHnnvzo=
+	t=1731321601; cv=none; b=bmoIPteuMavrYhLwLZdSL7GKifIgjGMfoi/Mre9mVoz9DE8MaMXPSXBYpnOfMWCTH41hl/jyjC9/7rgLbSEgKm6LW6OV4Ah+dodbBigd7UaSjqLUL01KACIUNhsOfjED+fkFio12S7xQzh9+vsE3sutq9l6hneK6ymosc92Q5ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731321434; c=relaxed/simple;
-	bh=lbBtDcDQ9kheWZRjMZF8X46phct9ThmwwCKiRgasnlw=;
+	s=arc-20240116; t=1731321601; c=relaxed/simple;
+	bh=ZooVzeKA11bNCV2rZauHGdxFYbOKwoDzCawkcPIjnkg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e03vD5QQZ8Ud5QwxBFnu8Lnsr935QZM/M8ewRUIg7cM0jBptA4+syg7k5k+b/NNzmIGph4GpHITB7EoJ6sc1LvS6xHjsP5YgLqttwzaFcNz9FqKhQZ0xvvgTsRciTeGXxik6kxJkj2gA6ni22wTJHz5O+4r/pv4fhm35GPgMHXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h+kUb3zD; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731321433; x=1762857433;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lbBtDcDQ9kheWZRjMZF8X46phct9ThmwwCKiRgasnlw=;
-  b=h+kUb3zDsLhjEJQx+Ie6AjOMrhLL+YpNS1DkRaqs4eqtTVHkSZh60pzt
-   G779AeHwij61/bzFq0DZtYvvBgadfzzmP6YhSkK0CofMW/9PvQOW1i2ph
-   iYXZeVWv/UNexzfxq5tu+2nU0scIJ1igKTYtLx9FebTmFZEpC7d62lXpA
-   WUYaulY/QMLqCmBdRDSayzE57wuNSJXD72tD0Z5qu754nNnpsB5vj2hMp
-   /4aPcgQhVtNuTs4ZAH6GZFcVLmRk+e4rcSIG5SHTv1Kak9NVJmTvqiJtI
-   TcNaRnkDbVtho9eNjGIXOuSgFWW8svuRvbMz49og/GoCj+g4U5uOXkNZ/
-   A==;
-X-CSE-ConnectionGUID: DFFMxdGrQB6WNgW/Ohi5iA==
-X-CSE-MsgGUID: pv8/KionTG+CxRChOrCD9w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11252"; a="41736486"
-X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="41736486"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 02:37:12 -0800
-X-CSE-ConnectionGUID: 7xxRbpz/To+LaU8KVyt60w==
-X-CSE-MsgGUID: 3KYomZw+R7urgEfELjxcIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,144,1728975600"; 
-   d="scan'208";a="124420917"
-Received: from lkp-server01.sh.intel.com (HELO dc8184e5aea1) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 11 Nov 2024 02:37:08 -0800
-Received: from kbuild by dc8184e5aea1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tARn7-0000BT-0h;
-	Mon, 11 Nov 2024 10:37:05 +0000
-Date: Mon, 11 Nov 2024 18:36:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=pXvcyNLqDUKAPfS6JFe2LfEi6u+J7ugeavdrcLlQQ8P1hyv2KrOin1IAFoHxyrUb5vsCLII2fuP9Sv/cOHv8B25J3toyF1JoPHupN0XOw8LdIs0yVAzPFUtpqJ8uUqTLO5oj/Ayk+FcGn0PfMeh0cineoIQlRG98ci8FjRopn7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jYjpMyx+; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c94a7239cfso3388317a12.3
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 02:39:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1731321598; x=1731926398; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=83Ex4i0amGXOVK4wdTZcphg7YQMJCRSlYiBwa9dai4Q=;
+        b=jYjpMyx+byufTqv0+Xi2r4R2xovD3vTz2uGDnJdp+JeD0g0UMzyGDVVRvE4W7mtVC4
+         yC2HKP9kYcmReJblx+MfxOcP7Gcqqrzh9y1ZAfqf7U9iZFU9rYOb0w73GtLxZzPb1hbU
+         +GGSszBONe3Tim0lO2QQzPtCK5CNrVNOCOWyS+MeNsY09eAqXXvNWOHJC4iabkoRy6lI
+         Pg8rFuqSYbFdxWMEQztC3nB9LOHvTh/gcVisptu/hGqTKgVe3T6h+CvLEmt9afL5TMbj
+         QjBGYvR5yCfRcz40g7DBWFhgqgSH6D3r98Hy34cnOiLan01VES94sMoX26VAZWFyPrcc
+         dAFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731321598; x=1731926398;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=83Ex4i0amGXOVK4wdTZcphg7YQMJCRSlYiBwa9dai4Q=;
+        b=WTlha0sjy6lLMa2eYlCKYnWfAhgjZyJPsqO4ZD59Epl4w5sH+apAQpQaSO5Ede2g7m
+         iTThl7IxKDIfoTDC8Ce8K1KbCdLI0fiRv+ke4lGvawqoJuCc17MJo3HycPWk/CXQQFCm
+         75DRRZVx0/GGBlYFVsEu+Lx6qzmKU330SoZ42aIGIx6iVc/zrkO6JwU6cSPxJRwZWIS6
+         cjigSEjv66Kkg0dbhBpbbvC+hMznpgycclqKvnPwg1t5ppTmHyidOCYFrpSJJ9J3PNtv
+         IMP/Ty0zVC1A8TBJhQE71qmoH26oWtJgjBo5aE+ceHMph2A5RW4gC3rHPnka3KxObwHo
+         CNww==
+X-Forwarded-Encrypted: i=1; AJvYcCV14IAfKerJNji6uUxf2FTaye464221FfUT9AWPshVu4w5TdBRD5y1+6J1R9xq2LlPQrp/BsIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxz8kiRGHG91RlLuHAvZcBSkWLuI9Zx16nndr6Ci4F/+RnBK1Iz
+	MTLVbSrws8EgUYjtUR0wWttzpr4KV7Lb7+u6THoa3DMPCvmYDbE+jRr8wXQviGM=
+X-Google-Smtp-Source: AGHT+IG3n2/H+iwpqZ5QO1ewQ3Ger1ZK+UE8iF8Hgk62H7RKzgwtzGUzRUPggQWQjwX8bVTQ7/DvaQ==
+X-Received: by 2002:a05:6402:51cc:b0:5ca:efe:10de with SMTP id 4fb4d7f45d1cf-5cf0a4467eemr14296940a12.30.1731321597634;
+        Mon, 11 Nov 2024 02:39:57 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03c4ed9fsm4794848a12.62.2024.11.11.02.39.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 02:39:57 -0800 (PST)
+Date: Mon, 11 Nov 2024 13:39:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: oe-kbuild@lists.linux.dev, Vitalii Mordan <mordan@ispras.ru>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, lkp@intel.com,
+	oe-kbuild-all@lists.linux.dev, Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	netdev <netdev@vger.kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	linux-kbuild@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next v5 3/9] lib: packing: add pack_fields() and
- unpack_fields()
-Message-ID: <202411111817.tgnRn8v3-lkp@intel.com>
-References: <20241111-packing-pack-fields-and-ice-implementation-v5-3-80c07349e6b7@intel.com>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	Vadim Mutilin <mutilin@ispras.ru>
+Subject: Re: [PATCH net v2]: stmmac: dwmac-intel-plat: fix call balance of
+ tx_clk handling routines
+Message-ID: <9e7d4adf-f147-43a8-a654-8c2ee722121e@stanley.mountain>
+References: <20241108173334.2973603-1-mordan@ispras.ru>
+ <e1b263d8-adc0-455b-adf1-9247fae1b320@stanley.mountain>
+ <20241111-def1390bf54ce26f76be250c-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,117 +94,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241111-packing-pack-fields-and-ice-implementation-v5-3-80c07349e6b7@intel.com>
+In-Reply-To: <20241111-def1390bf54ce26f76be250c-pchelkin@ispras.ru>
 
-Hi Jacob,
+On Mon, Nov 11, 2024 at 01:25:42PM +0300, Fedor Pchelkin wrote:
+> Hi,
+> 
+> On Mon, 11. Nov 12:39, Dan Carpenter wrote:
+> > smatch warnings:
+> > drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c:163 intel_eth_plat_probe() error: we previously assumed 'dwmac->data' could be null (see line 101)
+> 
+> There is a patch [1] targeted at net-next tree which removes the check. I
+> think there should be v2 posted soon.
+> 
+> As it's not the first time Smatch is pointing at this issue [2], is there
+> something to improve? I mean, posting the patches in form of a series or
+> explaining in commit message that the check is redundant and is a subject
+> for removal? Adding new redundant checks for the fix-patch would not be
+> good..
+> 
+> What would be the most appropriate way?
+> 
+> [1]: https://lore.kernel.org/netdev/20240930183926.2112546-1-mordan@ispras.ru/
+> [2]: https://lore.kernel.org/netdev/20241003111811.GJ1310185@kernel.org/
+> 
 
-kernel test robot noticed the following build warnings:
+Once we remove the NULL check then the warning will go away.
 
-[auto build test WARNING on 774ca6d3bf24287ff60b7d6dd4171ebb6e47760a]
+I don't look at it like a big deal that both Simon and kbuild-bot reported the
+same issue.  Especially since he reported it against an earlier version of this
+patch.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jacob-Keller/lib-packing-create-__pack-and-__unpack-variants-without-error-checking/20241111-161131
-base:   774ca6d3bf24287ff60b7d6dd4171ebb6e47760a
-patch link:    https://lore.kernel.org/r/20241111-packing-pack-fields-and-ice-implementation-v5-3-80c07349e6b7%40intel.com
-patch subject: [PATCH net-next v5 3/9] lib: packing: add pack_fields() and unpack_fields()
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20241111/202411111817.tgnRn8v3-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241111/202411111817.tgnRn8v3-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411111817.tgnRn8v3-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> scripts/mod/packed_fields.c:135:29: warning: format specifies type 'unsigned int' but the argument has type 'Elf64_Xword' (aka 'unsigned long') [-Wformat]
-     134 |                 error("[%s.ko] \"%s\" has size %u which is not a multiple of the field size (%zu)\n",
-         |                                                ~~
-         |                                                %lu
-     135 |                       mod->name, symname, sym->st_size, field_size);
-         |                                           ^~~~~~~~~~~~
-   scripts/mod/modpost.h:207:54: note: expanded from macro 'error'
-     207 | #define error(fmt, args...)     modpost_log(true, fmt, ##args)
-         |                                                   ~~~    ^~~~
-   1 warning generated.
---
->> scripts/mod/packed_fields.c:135:29: warning: format specifies type 'unsigned int' but the argument has type 'Elf64_Xword' (aka 'unsigned long') [-Wformat]
-     134 |                 error("[%s.ko] \"%s\" has size %u which is not a multiple of the field size (%zu)\n",
-         |                                                ~~
-         |                                                %lu
-     135 |                       mod->name, symname, sym->st_size, field_size);
-         |                                           ^~~~~~~~~~~~
-   scripts/mod/modpost.h:207:54: note: expanded from macro 'error'
-     207 | #define error(fmt, args...)     modpost_log(true, fmt, ##args)
-         |                                                   ~~~    ^~~~
-   1 warning generated.
-   In file included from arch/x86/kernel/asm-offsets.c:14:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:21:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   4 warnings generated.
-
-
-vim +135 scripts/mod/packed_fields.c
-
-    99	
-   100	void handle_packed_field_symbol(struct module *mod, struct elf_info *info,
-   101					Elf_Sym *sym, const char *symname)
-   102	{
-   103		unsigned int secindex = get_secindex(info, sym);
-   104		struct packed_field_elem elem = {}, prev = {};
-   105		enum element_order order = FIRST_ELEMENT;
-   106		enum field_type type = UNKNOWN_SECTION;
-   107		size_t field_size, count;
-   108		const void *data, *ptr;
-   109		const char *section;
-   110	
-   111		/* Skip symbols without a name */
-   112		if (*symname == '\0')
-   113			return;
-   114	
-   115		/* Skip symbols with invalid sections */
-   116		if (secindex >= info->num_sections)
-   117			return;
-   118	
-   119		section = sec_name(info, secindex);
-   120	
-   121		if (strcmp(section, ".rodata.packed_fields_s") == 0)
-   122			type = PACKED_FIELD_S;
-   123		else if (strcmp(section, ".rodata.packed_fields_m") == 0)
-   124			type = PACKED_FIELD_M;
-   125	
-   126		/* Other sections don't relate to packed fields */
-   127		if (type == UNKNOWN_SECTION)
-   128			return;
-   129	
-   130		field_size = field_type_to_size(type);
-   131	
-   132		/* check that the data is a multiple of the size */
-   133		if (sym->st_size % field_size != 0) {
-   134			error("[%s.ko] \"%s\" has size %u which is not a multiple of the field size (%zu)\n",
- > 135			      mod->name, symname, sym->st_size, field_size);
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+regards,
+dan carpenter
 
