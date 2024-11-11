@@ -1,147 +1,130 @@
-Return-Path: <netdev+bounces-143757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2290F9C3FE4
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:53:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D3509C3FF9
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 14:54:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7D4F1F22B5A
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CA91F22CD0
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D50419D8BC;
-	Mon, 11 Nov 2024 13:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF2C19E804;
+	Mon, 11 Nov 2024 13:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YA5O1gyQ"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="fRakcPYQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1401B19C552;
-	Mon, 11 Nov 2024 13:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FF918BBA8;
+	Mon, 11 Nov 2024 13:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731333201; cv=none; b=ZqFn/cbRmGux40+oyYV5C1xYXhEIgTXZZhpLuFC4TN6OYY73TkrXmnYXrX0vgNAWWrByMJIqoPZvADG+OcIazJGbbnWHDyn3Y3zE3puVL+DYLw1YG90qfpGao25aLNCJZhWLMOpFLuejut2eB8nYuSX/6/j/YVEEZF0kze9bS6o=
+	t=1731333291; cv=none; b=RHQ2w+wGu0vBw7ok2GoO7Fy0NI+HdyfDmkMnAXwZkytL4LbgFWovWxybB48RsH8s5NIs/jlZ5FopiLq/fRR29dPMkz0oWp/0gfHukwGDzHqmzoDleQwKVsbKG/TXuFtKHf7x2KX17v5AF2en3Gw3fUkxnLD8YyukqS2qzrWRwNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731333201; c=relaxed/simple;
-	bh=ge5oa0wYzEMJ7QB+lZ6ggej9jKDVWgoVDWlv5rzge9E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PhAk1yr6pZ4kJGFpDHcUmJzsungf1hS5ULTBYJ7ps/CSVCm19f6ZbfTCRT4/ZMaSM5i3xesNecL2+DzIYoIHFQXxDf+5TSdgvvp3Q/+ruTZyXi57R1GKMY/O2qgQkr0GVhZiml0YSS48Wl3T9/rfaTzFtOyGR/x+sWLdH+5JGqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YA5O1gyQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7E2C4CECF;
-	Mon, 11 Nov 2024 13:53:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731333200;
-	bh=ge5oa0wYzEMJ7QB+lZ6ggej9jKDVWgoVDWlv5rzge9E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YA5O1gyQh3kljoc/vTndzAudVh7CVjwqrznl4tjWw+sqAaO/LLIHElV1SQhhU84fj
-	 YL1FSkeoCXx3frSZHkns7PtW0sjBiUYcL3zojU3q4Rsb/Li1YJTqXthbhaZmvaVJNe
-	 NJjMaNWrneeLWHvfh8kyPSZBtU33OiuO0FdHevrcylMKN3PZVBFYCdkSTKGP2dX4j+
-	 g2oGkXJkBtC/GiwJp3gjJ/pRNZvlaRWap0PkEI8rd83GYidhwuP+SGpJPqXW11nezi
-	 9zIDMVCkPKfVtpyokm2+mTPzeykcjQ1vjKq6HlgjO9SEBTqvbb0kuVXNf5LRBfcRzg
-	 0cdTK+ay0TnTw==
-Message-ID: <f28bf97c-783d-489c-9549-0dd0f576497e@kernel.org>
-Date: Mon, 11 Nov 2024 15:53:14 +0200
+	s=arc-20240116; t=1731333291; c=relaxed/simple;
+	bh=To4Ng8I3roAF+xOZUz5oVZlbkp04BFvmLmbeIlXb85U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YJLP4FjqUunqZa/G48rdEpUCEJfNl/L9tSMlx7cKFJEA0559UNRJg/LZjLjWZMn4EK8JwKnJvCVpNIktVD8iZsPd3uEDk7D8lMwioKD4qY5cu2myCsCBjEsZSQA/RHxTfZvppiyxDVHy9yl1yQB+H86e9n6KdrselavH7XvpxdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=fRakcPYQ; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id A5B2B120004;
+	Mon, 11 Nov 2024 16:54:36 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A5B2B120004
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1731333276;
+	bh=wG9GJftNEn9P2eUQzPGTJwlvGfDRgfnCYXn/04LGPHA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=fRakcPYQAS8KGUIkck3q/wKYodijRNeAz6OWjTyJ2gWS5gGqIDFTK+xkw0rrnqaT4
+	 9JKg6gT9HYPOI9ARZgzljWSDXcIbtinvbNdkhSQ54abTxPQMvq3myzIeYWeMnMfbLF
+	 NLegoYZz3cJeoZEYaTwsYBRgkPf9m7P5x/jvTkJxJzdkdyncQAYTbu57vWgpEI7O2+
+	 iF3htMBT+Y/LarsqQjn+7sqOS7TNG/V3shmJkvbeCwMYb3WP5jROz92Cg1RO/oiAX0
+	 /SmRTGXwZ8VxNDnzMgnOyjIBg7LPd5v07jq+ih5JHkl1Ei4A/vaVHJho2hQupGUbdu
+	 lUk1ay3tICF2Q==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 11 Nov 2024 16:54:36 +0300 (MSK)
+Message-ID: <39067785-6f2c-91fa-8d05-50ebe78f0151@salutedevices.com>
+Date: Mon, 11 Nov 2024 16:54:35 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] net: ti: icssg-prueth: Fix clearing of
- IEP_CMP_CFG registers during iep_init
-To: Meghana Malladi <m-malladi@ti.com>, vigneshr@ti.com, m-karicheri2@ti.com,
- jan.kiszka@siemens.com, javier.carrasco.cruz@gmail.com,
- jacob.e.keller@intel.com, horms@kernel.org, diogo.ivo@siemens.com,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, danishanwar@ti.com
-References: <20241106074040.3361730-1-m-malladi@ti.com>
- <20241106074040.3361730-3-m-malladi@ti.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH net v2 3/3] virtio/vsock: Improve MSG_ZEROCOPY error
+ handling
 Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20241106074040.3361730-3-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
+To: Michal Luczaj <mhal@rbox.co>, Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=c3=a9rez?=
+	<eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jia He
+	<justin.he@arm.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King
+	<acking@vmware.com>, George Zhang <georgezhang@vmware.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<netdev@vger.kernel.org>
+References: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
+ <20241107-vsock-mem-leaks-v2-3-4e21bfcfc818@rbox.co>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20241107-vsock-mem-leaks-v2-3-4e21bfcfc818@rbox.co>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
+ p-i-exch-a-m1.sberdevices.ru (172.24.196.116)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 189084 [Nov 11 2024]
+X-KSMG-AntiSpam-Version: 6.1.1.7
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 41 0.3.41 623e98d5198769c015c72f45fabbb9f77bdb702b, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/11/11 06:58:00 #26843820
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hi,
 
-On 06/11/2024 09:40, Meghana Malladi wrote:
-> When ICSSG interfaces are brought down and brought up again, the
-> pru cores are shut down and booted again, flushing out all the memories
-> and start again in a clean state. Hence it is expected that the
-> IEP_CMP_CFG register needs to be flushed during iep_init() to ensure
-> that the existing residual configuration doesn't cause any unusual
-> behavior. If the register is not cleared, existing IEP_CMP_CFG set for
-> CMP1 will result in SYNC0_OUT signal based on the SYNC_OUT register values.
+
+On 07.11.2024 23:46, Michal Luczaj wrote:
+> Add a missing kfree_skb() to prevent memory leaks.
 > 
-> After bringing the interface up, calling PPS enable doesn't work as
-> the driver believes PPS is already enabled, (iep->pps_enabled is not
-> cleared during interface bring down) and driver  will just return true
-> even though there is no signal. Fix this by setting the iep->pps_enable
-> and iep->perout_enable flags to false during the link down.
-> 
-> Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 > ---
->  drivers/net/ethernet/ti/icssg/icss_iep.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  net/vmw_vsock/virtio_transport_common.c | 1 +
+>  1 file changed, 1 insertion(+)
+
+Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+
 > 
-> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-> index 5d6d1cf78e93..03abc25ced12 100644
-> --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-> @@ -195,6 +195,12 @@ static void icss_iep_enable_shadow_mode(struct icss_iep *iep)
->  
->  	icss_iep_disable(iep);
->  
-> +	/* clear compare config */
-> +	for (cmp = IEP_MIN_CMP; cmp < IEP_MAX_CMP; cmp++) {
-> +		regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
-> +				   IEP_CMP_CFG_CMP_EN(cmp), 0);
-> +	}
-> +
-
-A bit later we are clearing compare status. Can clearing CMP be done in same for loop?
-
->  	/* disable shadow mode */
->  	regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
->  			   IEP_CMP_CFG_SHADOW_EN, 0);
-> @@ -778,6 +784,10 @@ int icss_iep_exit(struct icss_iep *iep)
->  		ptp_clock_unregister(iep->ptp_clock);
->  		iep->ptp_clock = NULL;
->  	}
-> +
-> +	iep->pps_enabled = false;
-> +	iep->perout_enabled = false;
-> +
-
-But how do you keep things in sync with user space?
-User might have enabled PPS or PEROUT and then put SLICE0 interface down.
-Then if SLICE0 is brought up should PPS/PEROUT keep working like before?
-We did call ptp_clock_unregister() so it should unregister the PPS as well.
-What I'm not sure is if it calls the ptp->enable() hook to disable the PPS/PEROUT.
-
-If yes then that should take care of the flags as well.
-
-If not then you need to call the relevant hooks explicitly but just after
-ptp_clock_unregister().
-e.g.
-	if (iep->pps_enabled)
-		icss_iep_pps_enable(iep, false);
-	else if (iep->perout_enabled)
-		icss_iep_perout_enable(iep, NULL, false);
-
-But this means that user has to again setup PPS/PEROUT.	
-
->  	icss_iep_disable(iep);
->  
->  	return 0;
-
--- 
-cheers,
--roger
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index cd075f608d4f6f48f894543e5e9c966d3e5f22df..e2e6a30b759bdc6371bb0d63ee2e77c0ba148fd2 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -400,6 +400,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>  			if (virtio_transport_init_zcopy_skb(vsk, skb,
+>  							    info->msg,
+>  							    can_zcopy)) {
+> +				kfree_skb(skb);
+>  				ret = -ENOMEM;
+>  				break;
+>  			}
+> 
 
