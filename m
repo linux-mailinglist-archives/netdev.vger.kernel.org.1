@@ -1,70 +1,86 @@
-Return-Path: <netdev+bounces-143701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F41A69C3BAA
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:05:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D91979C3BAC
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 11:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0ED1F22269
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:05:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 160DC1C21CA4
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 10:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA5A175D53;
-	Mon, 11 Nov 2024 10:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D849176240;
+	Mon, 11 Nov 2024 10:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mABxQ8lV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TK+aT1jc"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17886149C4D;
-	Mon, 11 Nov 2024 10:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905221487DC;
+	Mon, 11 Nov 2024 10:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731319543; cv=none; b=nknMVL2F1nW21+xJz+yBnNYgshL6cClsuLWcKcbXg8sUr7n9/+tF907g1E3fImp/ydv05DI0jCq0U0jiXKiEmMKTl2NbvVdYT90S9fLz3BQeWgV1eve2KrCeptQ8TncAnZQoDSoFXkl502kxQ+a3hFhYsOvwWY5GgP7ezYp++bE=
+	t=1731319551; cv=none; b=ddNakcaRMQ9PQCool/ruhmrGxU3q34BoSPSXt+aAPeu/vJRbbqQwp7woU49lLnUhvtb9bfR5q8HOI589ksTf0n4KyU6xPIcV/8k3eymWEJc6JMnEiql2YzuySWD6rAI/WDn4hvbgXAIXVRuS+KjdSeDlovMTXY48w+whu++tRqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731319543; c=relaxed/simple;
-	bh=5E4PiUM6H2VzK82LbZdFXQ38ZKEEGPaaBLZf/X2cVJk=;
+	s=arc-20240116; t=1731319551; c=relaxed/simple;
+	bh=Zfe5DqoVix5jhLP1E1nVQV2CPcwNRrCNvsL8r70Lcc4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J5RwhkRrzmpaGvdR0AyIZFzHOmq4inIpkfj9tTco6oU3vemWUTF+ywY+3IbnRnhGVDlwvWQHPEl273nTrhVrVAqcitYgDnbs9bkPk4JhX/CjJRwFP1Exhqu8o1lmL8RstZMIrRzQSyd6ZFOPll2Xo+qWb5g8GCUN1IKIhnZ1hM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mABxQ8lV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5gcABcMx6atSEt4fk9ejpJtZtz28kmeVOewSAuA6sX0=; b=mABxQ8lV8HByVFKbyOILVaFIhI
-	/bAFLgh8SQ0dE0kn0a19+wDoSr08vUqjlCsHGkzmIh4yznANZ0+u17qm37e4cNHpYl4/xB2bljqUy
-	/xk0xQIkQwn3HHbyiOGuT0R6GCfiy9bpn4lNhoPWEcLZJCaDToFhevvKbI8wrbmA6WLtAY4g+ua4b
-	tue8aTgCCV4KjXvdoLFv4tGMVk0tQGeT3J59mbr6qYxj44Xes/HZa+vPz1temYGm1s5bO1e+b7Dv1
-	Wdan37bEOIrKGCL7ubcZnPpKrhphBNX/OiQkZ+KOU+IqUG6yys6iO5QKBLDVAAul86MIFu6MDnthb
-	uQztfB7w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54736)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tARIX-0001vb-1Y;
-	Mon, 11 Nov 2024 10:05:30 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tARIR-0006Kb-1y;
-	Mon, 11 Nov 2024 10:05:23 +0000
-Date: Mon, 11 Nov 2024 10:05:23 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	guanwentao@uniontech.com, zhanjun@uniontech.com,
-	f.fainelli@gmail.com, sebastian.hesselbarth@gmail.com,
-	mugunthanvnm@ti.com, geert+renesas@glider.be
-Subject: Re: [PATCH] net: phy: fix may not suspend when phy has WoL
-Message-ID: <ZzHW4wOAH769WSJ0@shell.armlinux.org.uk>
-References: <ACDD37BE39A4EE18+20241111080627.1076283-1-wangyuli@uniontech.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNbkv9+/bz78KyeWLDs6jh5/zxneGZt5cJFnGyxlKbZg2XG7n8sD0JwY2p+B0Izs5YCtQFBXIKBvT+6XY/71FUNgcJ05xnjvfH0NNMyNe3xMGQkSX3kf15L9S0paGyrVvePW8AUOfHfYHUlBMK54JRQ1P82xyX9kNhzxPg3Kat4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TK+aT1jc; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c767a9c50so41199005ad.1;
+        Mon, 11 Nov 2024 02:05:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731319550; x=1731924350; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FvPH2N3OAhQHoEMAlrZgn2gjzjGSexp2plsOz/L89/o=;
+        b=TK+aT1jcLEOtUbkykUaxBh8WqmJ6jv+ZeUIVwzwEcKhIugJ+jCqd4UhTt5yYgReeRl
+         GuMOkRP38duMaJfVc/NR9+g2AtbxfYYEoSQJ4YAR3QoOLZQ+YdWRepNcxJ4nfUBObKy3
+         /mzhj3Ll1ZFZTW9GmhDrqZ2/vizvlny9xlN8Pjyqey6noG+TYrlD/gYYaYosBI3zgxWh
+         lrzBdjj26UxZpsIAdLmafcsvPT7TFroXJxlGTHvyrQG/zdR77etATo1XlLjI71TneOEm
+         dgPxsA6mSywOhBlgBficI1tDEXEAZc31oM/2eXPEevMz5Q5gqTkobKlXCuXoGQH6AUsD
+         f69Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731319550; x=1731924350;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FvPH2N3OAhQHoEMAlrZgn2gjzjGSexp2plsOz/L89/o=;
+        b=HEEIFoyF3wYLF+vT/saYWZgnOhjt5lA2MSfcRkOM9B51K8sKfEd8HL0GMc54uZmAkd
+         EYEa1qSF+Z91ohCEmDxnHudJUXzHyi/ghh4VPh1cidwfVl5Th7kEVm2lKwPlQldA8ToX
+         ClE2ySyYpO+s7ihIHDOx19/EVcpZRRlhhp0i7wB6TgYHhoIqZ3VmhW5BmevQ0IcQUm1w
+         nxfwpVVLsOZK0AXssCPNvsB7qq5KmmHIyTorhE0dTFfVgeQ4MsubRtZBBeEaaOM6+WrP
+         ePeEDLGUAhiWh2Kitl6odiuD1O8ubxYUY2HPPbwYGfliJM8WStUUAwkwWwnk7JDCic7z
+         aDSA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbHICEki5vnNIkwkfb7rLKcXjCPOJPaVAOhqJsKFMUWUR9dcHeQbYKoOJoGV94m+vUk09TYrAw/CGd4g0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7eMHkKHugEv3VAH7tmg3uKgIxFv7GpvqZta3fAfiZRkhm7qRL
+	+mgSoLOa2o7Dsj0obxGLxttO7P7xvi3fzPLsQTtARWuKgkSPLQ6p8dQlLOZOWhHMtA==
+X-Google-Smtp-Source: AGHT+IEiabOAJ7wISpdweL+1JDundoKuZoGfOQLtSIakO8qurYurwUN2EarAaFuij48zfW8FP5TsaQ==
+X-Received: by 2002:a17:903:230a:b0:208:d856:dbb7 with SMTP id d9443c01a7336-21183d5552fmr165550465ad.39.1731319549735;
+        Mon, 11 Nov 2024 02:05:49 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177ddf754sm73095645ad.98.2024.11.11.02.05.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 02:05:48 -0800 (PST)
+Date: Mon, 11 Nov 2024 10:05:42 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3 net 1/2] bonding: add ns target multicast address to
+ slave device
+Message-ID: <ZzHW9llUizisMk3u@fedora>
+References: <20241106051442.75177-1-liuhangbin@gmail.com>
+ <20241106051442.75177-2-liuhangbin@gmail.com>
+ <ZytEBmPmqHwfCIzo@penguin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,31 +89,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ACDD37BE39A4EE18+20241111080627.1076283-1-wangyuli@uniontech.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ZytEBmPmqHwfCIzo@penguin>
 
-On Mon, Nov 11, 2024 at 04:06:27PM +0800, WangYuli wrote:
-> From: Wentao Guan <guanwentao@uniontech.com>
+On Wed, Nov 06, 2024 at 12:25:10PM +0200, Nikolay Aleksandrov wrote:
+> > diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+> > index 95d59a18c022..60368cef2704 100644
+> > --- a/drivers/net/bonding/bond_options.c
+> > +++ b/drivers/net/bonding/bond_options.c
+> > @@ -15,6 +15,7 @@
+> >  #include <linux/sched/signal.h>
+> >  
+> >  #include <net/bonding.h>
+> > +#include <net/ndisc.h>
+> >  
+> >  static int bond_option_active_slave_set(struct bonding *bond,
+> >  					const struct bond_opt_value *newval);
+> > @@ -1234,6 +1235,64 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
+> >  }
+> >  
+> >  #if IS_ENABLED(CONFIG_IPV6)
+> > +static bool slave_can_set_ns_maddr(struct bonding *bond, struct slave *slave)
 > 
-> When system suspends and mdio_bus_phy goes to suspend, if the phy
-> enabled wol, phy_suspend will returned -EBUSY, and break system
-> suspend.
+> const bond/slave
 > 
-> Commit 93f41e67dc8f ("net: phy: fix WoL handling when suspending
-> the PHY") fixes the case when netdev->wol_enabled=1, but some case,
-> netdev->wol_enabled=0 and phydev set wol_enabled enabled, so check
-> phydev->wol_enabled.
+> > +{
+> > +	return BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
+> > +	       !bond_is_active_slave(slave) &&
+> > +	       slave->dev->flags & IFF_MULTICAST;
+> > +}
 
-I think a better question would be... why do we propagate the -EBUSY
-error code from phy_suspend() in mdio_bus_phy_suspend() ? It returns
--EBUSY "If the device has WOL enabled, we cannot suspend the PHY" so
-it seems ignoring this error code would avoid adding yet more
-complexity, trying to match the conditions in mdio_bus_phy_may_suspend()
-with those in phy_suspend().
+Hi, FYI, in new patch I only set bond to const as slave will be called
+by bond_is_active_slave().
 
-In any case, there's a helper for reading the WoL state.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks
+Hangbin
 
