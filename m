@@ -1,145 +1,80 @@
-Return-Path: <netdev+bounces-143853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0759C4905
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:22:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 239009C491E
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 23:33:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68679B2277D
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 22:02:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA88EB27E41
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 22:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEA01BC068;
-	Mon, 11 Nov 2024 22:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409511BC9F5;
+	Mon, 11 Nov 2024 22:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="qIqOn48Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TCQxBffB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D8C38F83
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 22:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3A21BC085;
+	Mon, 11 Nov 2024 22:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731362556; cv=none; b=iE3Op7YsWcmg/lwAAEWboJiwyWx9IYCrJIZQByDIddip2JLmRmSMrOBfZ2wBSaCHLypzEuQoHiVaTGtBhC/xlmy0DdaRBDk6TtOiZ1mspfz44uCucVLEIu0W/a0e1D04ErXHoiFZM0ZLw4C40Ddzcd5UJr1+5OR7fQGJVesrW5I=
+	t=1731363204; cv=none; b=UdstJqfoFJ3538L4dOzEWbWdnh+NG4f/1rWPrLXaFnixjM3TtM8zY46TGdDKv0d32Sm5U1+khR68C4EqvPAuF1QfUds/dUEDBbKR923pHR2wzhETqTuh55v3u8kBQ/K9S7rmrp+g0mxT77hLePhDFykKl2xXBwcgvH0tdMygP4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731362556; c=relaxed/simple;
-	bh=MkmXdLCur2g63HaeuU5lItYe9iF32HUWPE5MqmOr0DA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fgzvHljlIKMLqA7hi+B91eXo5/qaMrNDOKG58AgMTEsl4F83veeVJPg8MQQagoEpcdCaeNuyVgjbaei6uzrAVTjSHCZ0bL0O6PtW6aaZKSUDVJiy1IK7iUAd8vVsGXfks+8wqzFPsExNvFKg6PCCU8sB5DP7SorV3jdSav4yhxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=qIqOn48Z; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20cdbe608b3so49981715ad.1
-        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 14:02:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1731362554; x=1731967354; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G45ANN/KHbgTu/kZxFQWIYWlzKdk+/aJNBH16qEROuw=;
-        b=qIqOn48ZXbH7ymnU9SclWsPaMDHXMFgWWaRd69ptkOwz5q3Pd7D1uFYDZs56vvWEnh
-         kMZcGE8lTgrnnpyUw+gtOvNGU5eEkXJoJj8j7uGfXW03Gl6w97hV+kuqNabh4kFv1ehg
-         WrIRfB6v8ZBwsXZ1SrlgZFcsFOcbRpcf/iiwu0TEl+bkn4g8wV8XW6w8BQXx340kZAUk
-         Qfdg2IMmZCcyps00t9VxqxHGFIlYTqWe6V8mjj4JvE/dsAmnA5EKywUDNtRaKe2ibvDC
-         UJbJ+BPexIE5uTPHL6U2TeOK5d9XgGC+Q7fxQX8JIZsftxQ5v8YlPq2otNUBEUaIA/o2
-         iPxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731362554; x=1731967354;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G45ANN/KHbgTu/kZxFQWIYWlzKdk+/aJNBH16qEROuw=;
-        b=QJElS57j3Ym3HFfhdZ2XEnV5DDGq0nyXLlym2pHv2Q/gdI4tvU1xsiOtMine5RxdKP
-         Fki2CD6LSiVYw6kkXU04yharKjZGgB0Xh0zUdz1BmoDBQ6LTFd+uwPj4muDNvVKlLVLQ
-         Z+QEKU8WcpFzcx8SBmi8gTPGmJyR9rDtxsf+wd0eGdo9AigSHnsKJ943VtrdG/xxSZwc
-         rLHnY3tHioCjRMi+4ckK+Hv2qTfI60TvLT9n3cFItltmWBWTCgoznIDp69pex/97L52d
-         xv6sDdzIhxADBX7BrBF4T2L4ED3ihKoyIrjuar0bEyL4T+bvWaLFzVUmJ3yOEbcPBQQ2
-         kE6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVa/+NceUbrm4Mm+C3b37bW54tchOaLVvHtVIcY+2Ly5Ej2tC28xNujA4fJHITL/O7VTxWa0oE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2MGWrXbggsseFUbMtewG+N65xG1rr/VHi4wN8nFF2eahWLHWy
-	gTYir2Vwq3NRF4tlfUQ+BIPnD7OJik0Qh9aARMSZajhpsFRDsPrmFkQRu25x5jY=
-X-Google-Smtp-Source: AGHT+IFYcnZfGk4NN1GTJsmPYeOYd0OklHfCESVe08lY9folizL3FTMYdJVrKAw4DyZwNav+iQVm0A==
-X-Received: by 2002:a17:902:cecf:b0:20c:b606:d014 with SMTP id d9443c01a7336-211ab9e5b8amr3277985ad.44.1731362554278;
-        Mon, 11 Nov 2024 14:02:34 -0800 (PST)
-Received: from [192.168.1.10] (71-212-14-56.tukw.qwest.net. [71.212.14.56])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dc8264sm81288365ad.33.2024.11.11.14.02.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2024 14:02:33 -0800 (PST)
-Message-ID: <838c4bd4-1e35-4b43-add3-f84a773798da@davidwei.uk>
-Date: Mon, 11 Nov 2024 14:02:32 -0800
+	s=arc-20240116; t=1731363204; c=relaxed/simple;
+	bh=ojNX7ewQ5mBn+8GJnYQlZeE9p4+dRMgQGrBXvhs2+fI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m3dqsvGOtMFKSYZvPlxpSw/jPxQSL4UJJNXhDNmypDRyBCASM25lIg6eF0Yf948n0S0YbB3rNg77mGpuFnhfV6CYE5/b5tBJZFlqsPgdkTXZwFRtkGtJ+pu+HUZd01JaNRUyXpgRA81JbNX4uiWJMNZjlA1wjBEzGGkIDNWHHFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TCQxBffB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 103DDC4CECF;
+	Mon, 11 Nov 2024 22:13:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731363203;
+	bh=ojNX7ewQ5mBn+8GJnYQlZeE9p4+dRMgQGrBXvhs2+fI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TCQxBffBXyPKj2xKTDl6//xKba0ovCTA31loZDkm0SFTz3sw6YR/BHM/8Le7DZy7s
+	 aiCYcBwPe8OWe/MfHs4mGq7nc3s7/t+YjKfEyECHQK/iqvBQlsJs35JxN7X6ZfVN08
+	 slWovi9O55skKw5snL4fdwVQtWc9kESHJ0xulDXw5Qoh4ldQzDzpv8fSvzFFFch0pV
+	 3V2GeJPXt22BZJYmLPnfGNRntFuddZsepZXdE0M+puQi0SvYuWd2AzvoeXB1w12n1K
+	 Q6oZxiU8WsQlGyfbiZuw6JZuAxamncoYMg1bWVwxR1eT6ibE0HDBv2MJAe2CTM7yqf
+	 551OIgpkhLONw==
+Date: Mon, 11 Nov 2024 14:13:21 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Parav Pandit
+ <parav@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4] mlx5/core: Schedule EQ comp tasklet only if
+ necessary
+Message-ID: <20241111141321.0d723c9d@kernel.org>
+In-Reply-To: <20241105204000.1807095-1-csander@purestorage.com>
+References: <ZypqYHaRbBCGo3FD@x130>
+	<20241105204000.1807095-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 12/15] io_uring/zcrx: add io_recvzc request
-Content-Language: en-GB
-To: Mina Almasry <almasrymina@google.com>,
- Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241029230521.2385749-1-dw@davidwei.uk>
- <20241029230521.2385749-13-dw@davidwei.uk>
- <CAHS8izP=S8nEk77A+dfBzOyq7ddcGUNYNkVGDhpfJarzdx3vGw@mail.gmail.com>
- <f675b3ec-d2b3-4031-8c6e-f5e544faedc2@gmail.com>
- <CAHS8izNfBEHQea3EHU7BSYKmKL9py2esROySvgpCO48CxijRmw@mail.gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAHS8izNfBEHQea3EHU7BSYKmKL9py2esROySvgpCO48CxijRmw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2024-11-05 15:09, Mina Almasry wrote:
-> On Fri, Nov 1, 2024 at 2:16 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
->>
->> On 11/1/24 20:11, Mina Almasry wrote:
->>> On Tue, Oct 29, 2024 at 4:06 PM David Wei <dw@davidwei.uk> wrote:
->>>>
->>> ...
->>>> +static void io_zcrx_get_buf_uref(struct net_iov *niov)
->>>> +{
->>>> +       atomic_long_add(IO_ZC_RX_UREF, &niov->pp_ref_count);
->>>> +}
->>>> +
->>>
->>> This is not specific to io_rcrx I think. Please rename this and put it
->>> somewhere generic, like netmem.h.
->>>
->>> Then tcp_recvmsg_dmabuf can use the same helper instead of the very
->>> ugly call it currently does:
->>>
->>> - atomic_long_inc(&niov->pp_ref_count);
->>> + net_iov_pp_ref_get(niov, 1);
->>>
->>> Or something.
->>>
->>> In general I think io_uring code can do whatever it wants with the
->>> io_uring specific bits in net_iov (everything under net_area_owner I
->>> think), but please lets try to keep any code touching the generic
->>> net_iov fields (pp_pagic, pp_ref_count, and others) in generic
->>> helpers.
->>
->> I'm getting confused, io_uring shouldn't be touching these
->> fields, but on the other hand should export net/ private
->> netmem_priv.h and page_pool_priv.h and directly hard code a bunch
->> of low level setup io_uring that is currently in page_pool.c
->>
-> 
-> The only thing requested from this patch is to turn
-> io_zcrx_get_buf_uref into something more generic. I'm guessing your
-> confusion is following my other comments in "[PATCH v7 06/15] net:
-> page pool: add helper creating area from pages". Let me take a closer
-> look at my feedback there.
-> 
+On Tue,  5 Nov 2024 13:39:59 -0700 Caleb Sander Mateos wrote:
+> Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet
+> to call mlx5_cq_tasklet_cb() if it processes any completions. For CQs
+> whose completions don't need to be processed in tasklet context, this
+> adds unnecessary overhead. In a heavy TCP workload, we see 4% of CPU
+> time spent on the tasklet_trylock() in tasklet_action_common(), with a
+> smaller amount spent on the atomic operations in tasklet_schedule(),
+> tasklet_clear_sched(), and locking the spinlock in mlx5_cq_tasklet_cb().
+> TCP completions are handled by mlx5e_completion_event(), which schedules
+> NAPI to poll the queue, so they don't need tasklet processing.
 
-Sounds good, I'll rename io_zcrx_get_buf_uref() to something more
-generic. But I'll leave changing the existing calls for a future patch.
+Applied, thanks
 
