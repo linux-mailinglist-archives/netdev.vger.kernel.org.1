@@ -1,109 +1,119 @@
-Return-Path: <netdev+bounces-143739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3E1F9C3EC1
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:53:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 364539C3EF3
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 13:59:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E822827DB
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:53:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A321B21AC8
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 12:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555EF15853B;
-	Mon, 11 Nov 2024 12:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dtv0b8+a";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t5hwhBcy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023BE19E826;
+	Mon, 11 Nov 2024 12:55:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF898F77;
-	Mon, 11 Nov 2024 12:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D494A19DF66;
+	Mon, 11 Nov 2024 12:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731329630; cv=none; b=kS9QTGJht4k9EtEtBI+VOxVxEAL/0Qe3MXJr1OnHe9GbuMmfAwa/vmO/QfpBCYlW3M/cYjU4MsDfDM2CkaPSdv+PLRX5MFs9ho1oc6aYlg2ZdDgl+gqF0xDZ90VsjtyopljkmaicgaGlgVAVfOPf/K6kcPT01/yxCfbHjvn5dLo=
+	t=1731329703; cv=none; b=bm9mwuMmNSltZEna0RbNmr1apC33M14JXFbyQYE4UKDHm02u4zPuTcwgh40Q5wwh+aNKCc5RskpWG1KQy44MCLa7B44IVYxStBzAQ8si/7mVU8n4RIi+uK81Vvsv20id5iO5Lz34IO8VMmv5lg/mMVAP3buQULS9qQ0R0h1e/xQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731329630; c=relaxed/simple;
-	bh=FmF3bZ1r/WsmIZmkn/Wp3I4nzVPM0WOoQQ+6z63YQIY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T+6Gnn9CfC/NgUW5REQPmqkd+ATro53/a6/NplQ55KbnFtvkLCfNf2+jkNzmNFWxpnXfROsiEq6tFqPzFgtuMSsixABWhxGvns9S26w4RvJOcEZ8PR4YSP80Mj6pQUfti2rqwU98HLPdsk1isK85HR9XtwSMQujXu0Feg35G4+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dtv0b8+a; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t5hwhBcy; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 11 Nov 2024 13:53:45 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1731329626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w7z8yhXRBnlRYKfyfn4Xe3Y3OGC88TCWkSEzDPuPxNQ=;
-	b=dtv0b8+aCLwhVivvFUjFNqplSCPxGWFTtHuKMDvxFHL34tKWExWlHHNyW10RM/mrjJMI8f
-	089D2TK1AQ7sdF73yWg0qz0vACWNAENLY/QEQyRYuDTnwhNjzdyGccp1zYHtp0epqFcTky
-	U/Y0Q5SMvLKYQ4zAYI1SO3PKEYD2dZ4Vc3RWNarc7vJ8+OSFhOlQhTr8atuPRInTizsNdT
-	hUabpL8xT/N43Yya3ER6WSfvOoBQqJjQg5zaBA+LWBysOPwA1mdxCKsKtQpTgAN7lEIVsg
-	V2WPFmskshbU4nieE/3UMDrNexHbqdABCxsutrdzg3IdHiAImLC4UaFmC2vMTw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1731329626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w7z8yhXRBnlRYKfyfn4Xe3Y3OGC88TCWkSEzDPuPxNQ=;
-	b=t5hwhBcysw6sr0uejWOPe0jN8ijZp6hxiaMi9xUsvaQ53fESoFBjWOSwjJQXUj2QkJp+lK
-	w4qAM5LVRIo4O/Dg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, tglx@linutronix.de,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Simon Horman <horms@kernel.org>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
-Subject: Re: [PATCH v2 1/4] Revert "igb: Disable threaded IRQ for
- igb_msix_other"
-Message-ID: <20241111125345.T10WlDUG@linutronix.de>
-References: <20241106111427.7272-1-wander@redhat.com>
- <1b0ecd28-8a59-4f06-b03e-45821143454d@intel.com>
- <20241108122829.Dsax0PwL@linutronix.de>
- <9f3fe7f3-9309-441c-a2c8-4ee8ad51550d@intel.com>
+	s=arc-20240116; t=1731329703; c=relaxed/simple;
+	bh=FrwN6f/ivVvtDxoAVtk1Dom0WhPT+xE8kKmmrcZbIsI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=jR0Iys4qnKPweIBx63CRRED68fCQ4F0gv2x/0Xi61h9lbqKe5asWWLr5gBnyvkYN+e+p+BK3h3Y4rZvrKM/KECrc/ItANGTvpM7jBr6lkVMx0kSU7Moj0wSWpnagvt+YX5m72Ys7x0lDYhRharv4KQvjjqeLVLyA2XjKGaILosA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Xn8dW4462z4f3nTB;
+	Mon, 11 Nov 2024 20:54:39 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 9839B1A0359;
+	Mon, 11 Nov 2024 20:54:58 +0800 (CST)
+Received: from [10.67.111.192] (unknown [10.67.111.192])
+	by APP1 (Coremail) with SMTP id cCh0CgDHb7Gf_jFn1hfNBQ--.13673S2;
+	Mon, 11 Nov 2024 20:54:56 +0800 (CST)
+Message-ID: <1483d9ce-4929-4abb-8a5f-bd91abeeace6@huaweicloud.com>
+Date: Mon, 11 Nov 2024 20:54:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9f3fe7f3-9309-441c-a2c8-4ee8ad51550d@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v3 0/2] Add kernel symbol for struct_ops
+ trampoline
+Content-Language: en-US
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+To: bpf@vger.kernel.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Yonghong Song <yonghong.song@linux.dev>,
+ Kui-Feng Lee <thinker.li@gmail.com>
+References: <20241111121641.2679885-1-xukuohai@huaweicloud.com>
+In-Reply-To: <20241111121641.2679885-1-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:cCh0CgDHb7Gf_jFn1hfNBQ--.13673S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CrWrZw1kJF1rKFykuFyDKFg_yoW8GryUpa
+	yruwn8Zr40grZF93yfWayUCFWfKa1kXF15ur9rJ34fAFy2qr1DGr1jgr43urWagr9ak34r
+	JF909FyvkFyjvrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyGb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAK
+	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU17KsUUUUUU==
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-On 2024-11-08 15:00:48 [-0800], Jacob Keller wrote:
+On 11/11/2024 8:16 PM, Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
 > 
+> Add kernel symbol for struct_ops trampoline.
 > 
-> On 11/8/2024 4:28 AM, Sebastian Andrzej Siewior wrote:
-> > On 2024-11-08 13:20:28 [+0100], Przemek Kitszel wrote:
-> >> I don't like to slow things down, but it would be great to have a Link:
-> >> to the report, and the (minified) splat attached.
-> > 
-> > I don't have a splat, I just reviewed the original patch. Please do
-> > delay this.
-
-this clearly lacks a `not'
-
-> > Sebastian
+> Without kernel symbol for struct_ops trampoline, the unwinder may
+> produce unexpected stacktraces. For example, the x86 ORC and FP
+> unwinder stops stacktrace on a struct_ops trampoline address since
+> there is no kernel symbol for the address.
 > 
-> It will definitely splat on RT kernels at some point, if there is a
-> spinlock.
+> v3:
+> - Add a separate cleanup patch to replace links_cnt with funcs_cnt
+> - Allocate ksyms on-demand in update_elem() to stay with the links
+>    allocation way
+> - Set ksym name to prog__<struct_ops_name>_<member_name>
+> 
+> v2: https://lore.kernel.org/bpf/20241101111948.1570547-1-xukuohai@huaweicloud.com/
+> - Refine the commit message for clarity and fix a test bot warning
+> 
+> v1: https://lore.kernel.org/bpf/20241030111533.907289-1-xukuohai@huaweicloud.com/
+> 
+> Xu Kuohai (2):
+>    bpf: Use function pointers count as struct_ops links count
+>    bpf: Add kernel symbol for struct_ops trampoline
+> 
+>   include/linux/bpf.h         |   3 +-
+>   kernel/bpf/bpf_struct_ops.c | 114 ++++++++++++++++++++++++++++++++----
+>   kernel/bpf/dispatcher.c     |   3 +-
+>   kernel/bpf/trampoline.c     |   9 ++-
+>   4 files changed, 114 insertions(+), 15 deletions(-)
+> 
 
-exactly my point.
+Oops, I messed up the code in v2, the argument for
+bpf_image_ksym_add in v3 is not correct.
 
-Sebastian
+Sorry for the noise.
+
 
