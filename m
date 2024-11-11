@@ -1,322 +1,285 @@
-Return-Path: <netdev+bounces-143797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06B69C434B
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:12:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 409A89C4360
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 18:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51E111F21B7F
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:12:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C42AA1F21AE4
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3205C1A7046;
-	Mon, 11 Nov 2024 17:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490F91A3A8F;
+	Mon, 11 Nov 2024 17:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Kb49bsN1"
+	dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b="l5sF9qg9"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.183.29.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3910184556;
-	Mon, 11 Nov 2024 17:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F9A1A2860
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 17:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.29.33
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731345156; cv=fail; b=tQ6zjyhd3hpvRwthF8jRskn4FXCR85wATAo5JC4dXpwwiONojOMGaeBoOMirNik/h4CHT+0tJbuLsG2SwOC926C+kGFVyS22TbjEYCD3vPJo8kvNt21iMGXEcHSCDle3g+fmspglUab1k1b7oDVmIvN0i3iAsabSYkfiINVBpBU=
+	t=1731345403; cv=fail; b=Q18NNfFv4N71BSY/HCW5TdCqCXqHlVuJhpnjOaisRAQqarVR5Apnwu3gVqgLi84YtAk4I3FUtsiSThuFR8N064Mm8WLx2MB2Fhx/faoDJyp7TUbxfmig+NM+YAFlxG+ksNVxjR08vmA7PKzFNOVBxNduJJV5q2Nrj6tFdlWotz0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731345156; c=relaxed/simple;
-	bh=pENITIt7/CLg4RZ7fnoBqkbo7fRavKBlcU2Gh85U3f0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OnmyHe0Np8pWy60n6HcTHKob+pqVNIxAvx4kzrbR/+nUil7vh8FC1japneOFGucXdsVo+jbZwPKccxpQTAHFVuytIhzvWUAz5PPD8LfG0lscltl07BcoZFfOoC/s1eMGQ9R0dSpjhbDwMQZS/f+jAvA3B+nLzddAPXA+c5qppdo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Kb49bsN1; arc=fail smtp.client-ip=40.107.243.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1731345403; c=relaxed/simple;
+	bh=pL+u6JQ5bqiz8srNQC9bFpohibUcr1+/8H/m/Ud+5T0=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=OENcRwSJ0RXgaWc/cD6enl7118BfGp8oM+EtzRVOedwVSyzmxJhJlhHpTZkZhk/jsaTjwe4d4TaFxK9ulwCfONcIzaB8ma89YcQGVlGK1tEhLc7TlRWIlGut0TCDeerzrrr1UPaWhzjlNLQFn3g6EmxGobDPEvqz7rgYNwqF6bE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com; spf=pass smtp.mailfrom=drivenets.com; dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b=l5sF9qg9; arc=fail smtp.client-ip=185.183.29.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=drivenets.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05lp2110.outbound.protection.outlook.com [104.47.18.110])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 79D0B1C005B;
+	Mon, 11 Nov 2024 17:16:33 +0000 (UTC)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ge4USRQGkZONP1mmzzsnSRvhYXG6Zvf3eLENX/Nog9tJvZ74Zy+s/g6KGxOSxeDNk6qVVTzwKIaDXCO7WMBCcq31HCgMPW6smPDGYAXD9ojswM9QYZQQ1jM3DxgXReJ0fvgD9JuPnuhdpmo8AGEnyjengbUmb3OMHfANA1Ie+XZ7QmHRCtGfO+Of/L2vQqKk0AyaUp1hCo/HNaGg8yhIut2ffAOlGdX+n2t1qgrYZVBDLhnp6FTP4G9bGV9uDy2NQVY7u6j5zihMp2FHZlUa8VRZk69BNUbjN+10CUCHIC+CTP7HHLz1oAfVz4rWfybUH6hehuMfKRJPGCqm/r++/A==
+ b=h2OjyGYYiVfBdfdtJ9HHI6TpWkld3Kc+hrzBkLzPWf6U78kRMTSZnZmuQ4KycJT6PO65hY3pkXmQbSzC+v2FYXnZtVHl6teAFa3bZMgvuJhnWcjn6jLmFLqo9r/X8M+MMQgSvvaCMd3PIItbNVW225qhYQDDAcGFPOzTWv7Vdhl++wjeEQkg8fVuQ3S3fL+/RH9KV3fezYps2HX1F6YnSZMUHaIBChjoSdwLORdFGc8Whp6CiU9B2x86notIKCzIRT3z4Fp0PN1EwgiphdWD2axm9U4BQtUEW6JdK7xJRRZ+GS9tAve+G2Ew+GzcgqdAJmGRMyG4lOlDKID3Gm+wOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xVQihhtYWLrg1OTqdWtB8VuH7PoGIhINHuZ/rWXhYkY=;
- b=f6MrEalrhk6Cc73uVUygkv3fornX6djMg656PBNK38oGs2VINnT/RezYGms7H6ZOx+lIOttsCfjiUErc52yp6SzN7Qz8d7/D66R9h7L9R3Mmpmre0IoG4a4sA/oPcGbcJsb9Y5WrHayIY23KjWcGzQaoy/gDEq4ZOpfDNh5ywGEoQrWLSIw8zpp/D1fNN/d15+xaLaYlbUVcp1P8MAGLnTFof6CXVC/JUpkqM78l5VpWkgcSQ9LHCqJ7IYD+bWx5NxVLcBgZKAk/m+YSYymUG879fAzu1kLNTn7bv8+IF1hnn0kUKpZwHVYb9jdWFJ/MAcOkl2zAgkzYTfyS7nMlPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=fpCX2UKW3vtQgJK5QdDMVn+vqpAXX5bePRpUtp/ZGZA=;
+ b=CjAc6C7SS6YB9AWSs0kJ//+xYAvC/8mf8f98jLTooei9BW8GRgxZGc3ZUQ0w/nQ4w9OpjRB9YxdawOdrF0n3ebiJO88sCRpiuK3MeNFqzgAyLiMwl00K6m/KwlKNdiOB6of2AtkcmPBP2BaZsyC4rwY6zc47d7wSHOwhGcgJAqlXywAwgG1GFsM4Z6iFxjJPgR/VoDjBkiGIt8lmeLx7DU7S1QUnK957CmsNcuezBfgQio8xc9A+8r5F4VDIhRzjalKj/OoM2/TGMNGGKTV7/tEQE/CdQOI0+zlyAK51StmHmw2rpIjXoWl9/SejXGyu5rWSCVUprLqlIdHlZDOVjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=drivenets.com; dmarc=pass action=none
+ header.from=drivenets.com; dkim=pass header.d=drivenets.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=drivenets.onmicrosoft.com; s=selector2-drivenets-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xVQihhtYWLrg1OTqdWtB8VuH7PoGIhINHuZ/rWXhYkY=;
- b=Kb49bsN17iCwQkpZ8xypCnRItV60l6M91qCL9AC2e/ZVYZFKn5sebjBJspRuDRjmjxzOdI2OIWvTk8AtRbw/9CAae6slvXz07YtYkVA/iommkLxY3hi3GArrPW+d0v734gSZtUpLg0opbQwiLp5D/S5sT/gKi5vKy3PKB0Rtm5IJgX5QNlBzrE9NVI+NjJaXm04aFLnqON/e2lF64oTt8acBjtW2Y1TwxQF6dPcN+et+FWPF2bTZUANiL+slMuip+XMHXJ5iK8HkkG5bxQ4HZrCXhYv4hkILy24FUcXfHg5nzLXYLSSrRog0bbw9bUCRf/U20wv12OAV3RUY8BgqPg==
-Received: from MW4P221CA0010.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::15)
- by DM6PR12MB4314.namprd12.prod.outlook.com (2603:10b6:5:211::22) with
+ bh=fpCX2UKW3vtQgJK5QdDMVn+vqpAXX5bePRpUtp/ZGZA=;
+ b=l5sF9qg90sF1nYbwVRXVnYWa0oxkcutXaaVXru/FNZpD9k+8lqQ2VcWv58dK6b03fj7yxFY13BlxdiVC0KSDRNtoqLw7aT2Itn+nqP6qwLlXGi/2eswbO8M4NbPIdVKqaS2m+JahzHiP3NDyF5fpFhM5mumXl8TSmUw2AUx2HnQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=drivenets.com;
+Received: from DB8PR08MB5388.eurprd08.prod.outlook.com (2603:10a6:10:11c::7)
+ by AS2PR08MB8720.eurprd08.prod.outlook.com (2603:10a6:20b:544::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28; Mon, 11 Nov
- 2024 17:12:30 +0000
-Received: from CO1PEPF000075F3.namprd03.prod.outlook.com
- (2603:10b6:303:8b:cafe::56) by MW4P221CA0010.outlook.office365.com
- (2603:10b6:303:8b::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28 via Frontend
- Transport; Mon, 11 Nov 2024 17:12:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000075F3.mail.protection.outlook.com (10.167.249.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8158.14 via Frontend Transport; Mon, 11 Nov 2024 17:12:29 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 11 Nov
- 2024 09:12:12 -0800
-Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 11 Nov
- 2024 09:12:05 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
- Machata" <petrm@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Andy Roulin <aroulin@nvidia.com>,
-	<mlxsw@nvidia.com>, Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan
-	<shuah@kernel.org>, Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu
-	<liuhangbin@gmail.com>, <linux-kselftest@vger.kernel.org>, Jiri Pirko
-	<jiri@resnulli.us>
-Subject: [PATCH net-next v3 7/7] selftests: net: fdb_notify: Add a test for FDB notifications
-Date: Mon, 11 Nov 2024 18:09:01 +0100
-Message-ID: <baf2abd6af2e88f8874d14c97da1554b7e7a710e.1731342342.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <cover.1731342342.git.petrm@nvidia.com>
-References: <cover.1731342342.git.petrm@nvidia.com>
+ 2024 17:16:30 +0000
+Received: from DB8PR08MB5388.eurprd08.prod.outlook.com
+ ([fe80::29dd:6773:4977:dc4e]) by DB8PR08MB5388.eurprd08.prod.outlook.com
+ ([fe80::29dd:6773:4977:dc4e%6]) with mapi id 15.20.8137.027; Mon, 11 Nov 2024
+ 17:16:28 +0000
+From: Gilad Naaman <gnaaman@drivenets.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Cc: Gilad Naaman <gnaaman@drivenets.com>
+Subject: [PATCH net-next] ipv6: Avoid invoking addrconf_verify_rtnl unnecessarily
+Date: Mon, 11 Nov 2024 17:16:07 +0000
+Message-Id: <20241111171607.127691-1-gnaaman@drivenets.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO4P123CA0384.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18f::11) To DB8PR08MB5388.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075F3:EE_|DM6PR12MB4314:EE_
-X-MS-Office365-Filtering-Correlation-Id: f369eef1-7cf4-4ebe-1839-08dd027405f1
+X-MS-TrafficTypeDiagnostic: DB8PR08MB5388:EE_|AS2PR08MB8720:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b948a6d-6e6b-4a92-df5c-08dd02749407
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|36860700013|376014|82310400026;
+	BCL:0;ARA:13230040|52116014|1800799024|366016|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DTjT1XSJozJz//RH1vHaPfWmCbYTForVs8urxjwAbmTxFOpOg6A2W8jvxwgM?=
- =?us-ascii?Q?QgIM7YY8vDJYD6kNEfsdC2QFC4bLD0YKQMbcQout/OGqBzz4Ii2ONvOrFB7p?=
- =?us-ascii?Q?nDLeLMSeOjSexuSasgofejcRznb336Y+NxB+vzNWW/1uziFLhdMa9eR8gebR?=
- =?us-ascii?Q?Nk0ZH1bkOLEHSA4K4+FbrWWyWbMDj1IiLhNA54cGmAkFNXMwi7pVSZ2OEKsr?=
- =?us-ascii?Q?KGQ2ABja+dzjXVy5e00HpJ8Bqxux6IRDgCAIN1NuZ8WwUUrwHzEMObyaDJij?=
- =?us-ascii?Q?N4ajfTUCLp4IRvDlmv3FgxAjZsEO1MXjjbs2h47JkXcnFCnp8TsUKoDwqUUP?=
- =?us-ascii?Q?50Uf0H0CNoOWrERNZO8wsiN4IbgHVuOwLuwB8T1LiQ5WHb29aaTdD1NB9KtV?=
- =?us-ascii?Q?whKh4l+UmKOwh5fbRLxaQtSBy36lakIce5XXWzrCUyIZvTnZnG51HqAp9ycb?=
- =?us-ascii?Q?Jqet4HzjOTWeeiXF1n0iFpISQvAxyjuICeJm+nrhX5TxLepDaBqVZ0lCRpIF?=
- =?us-ascii?Q?raAOkRGD31rrjbgxlPmuyVUWjFqZsi3iFTgTuqWdYETcY6N2FxOVQWxvyfS/?=
- =?us-ascii?Q?XcSegaI2YbodscLWRnekVwfyL+25P3xZHMYBbxR0Sr1yUcpF2tyxqDZLnvCT?=
- =?us-ascii?Q?QOKTRoeKf5z+5QTnRaE1fEBIqqrwvPwhwhK/OC0fx8HDCoWAvskRycKkyXCp?=
- =?us-ascii?Q?Q4RmwiSkVNVBtRscjW+Qn3ef51TWn6khGrdrZ4L16E11ajzDzstwFkJ+XFXA?=
- =?us-ascii?Q?Ux9gq31tJR4OsGdQEmOjZn3Ea0AJlXMpTi9ePvVoCj8xifM/fOsAOYpo+K48?=
- =?us-ascii?Q?V2Jeo/u1s/KGJFdiP0ePB4MWKZu5P02unzMRifMLcTrano3iivBTJXA2b36s?=
- =?us-ascii?Q?DlcDYzEGirTUIR+6swaKsS4sDe6LQFUyXeuMDYFanxpnTWe5vYNqsiZKil4Z?=
- =?us-ascii?Q?V5agkONA3/XypH/+Q+DsIIGuXyTolMLbbco4y0F+XsrnE3Fz3AWAoHcQBBwt?=
- =?us-ascii?Q?0pJ3vZXvB7epqQjrqGnximKDYtaTCxaMxmtFzn8EFAw69j2IZmAnLiKB8v1h?=
- =?us-ascii?Q?4cZmA5bbHI+CGQFBuyhuD5NgnzDyHzKtG1V/tYENawaIIwJu/0Rxm7j529LN?=
- =?us-ascii?Q?ec1myeVV+dwtADrJjd7reIdDSSR8KinkLkPyxknSSlDWjO9QRzeM6zOj3Hve?=
- =?us-ascii?Q?cGFO17ZCdItLOHbtioUcD7sYI+hSpGu92NG0jG4m5y7Q2iLOvFO6Fo+mZILH?=
- =?us-ascii?Q?WtC9skor6kyb6xisjK4y+z23rOodqQVTSqOc+4sioUCH3c+o4KpK+CAvfedM?=
- =?us-ascii?Q?Z/KoRx15ocpoNXnR6Lsrpqmg6teLyF49CM3MdqFECrfSFZSox8na0XeuR/Nw?=
- =?us-ascii?Q?tKzX/y5qWmxd5YYLFPNrum8lNpGoBEUNo6g9hHYytI6hH5lCXA=3D=3D?=
+	=?us-ascii?Q?Nav/5qRTRKFymsaho80FXfkLaBwRIZctP/95rUxo5eofOhPqhGn9ZRr84mhP?=
+ =?us-ascii?Q?w11Q7ntTt7PW5E7311cPNBUh+fiG+X7e1dMMCmVxkHeyLYTWZHP9sc2zza1f?=
+ =?us-ascii?Q?SniNqqNME9fg+jiVTlWm+dhn9iYASlcFZosLBsKG8Ue1jCu5qsicLv1e80My?=
+ =?us-ascii?Q?xsZdzLXCWHGmFQQ6O9cJA16HcZ+gQyZDGoVsZp6B1AsCznJhVvFZzUPfFPMi?=
+ =?us-ascii?Q?dRmwuszz/WY5pmqAswSXf/5kG0A+k2/GoKwLTH5HhlU+udS3b0m9CDIQ4RYh?=
+ =?us-ascii?Q?CHyPiu5q7UhtR6FnZvGSBvtWInfj5S/lvw+OoHYYsStU/lcuBYh41ioF0NWA?=
+ =?us-ascii?Q?Ky6AxLbb8fgntSylee01RJT0xfHB/pJbXmliB1KW8n/bc+6uPiKkAGsAT0gA?=
+ =?us-ascii?Q?WxR15K7zr/oFJnApkafKsRz8kxgya+9fs1sn+OsHkwFssgdftyvgAsuoupDN?=
+ =?us-ascii?Q?k31jTArDJ0LqumJRjZ8gArnDjwiv0faz9TVU6OVurMgAMTYgu1rxwbWGFx9X?=
+ =?us-ascii?Q?78MiU/SUzNgl8ipBHZDlYr6diUwxGDFUialZ857J8PA21n1EVaXqh5s2pGXT?=
+ =?us-ascii?Q?hMFa+qOHDzVLcFYZBaPHmG8cAhXmdH4+WhT4dXw+0uJMTGeTljZb4Xmq3m7g?=
+ =?us-ascii?Q?tPJsMzrIrbTC9vca6wLkQ6nTsfBCUc/MZSwB3dPg4F5X7LbAMNMwtWYenIoi?=
+ =?us-ascii?Q?8r4dUWZ4/stJpHrRLomnWGAx+wvBoUXwm07Od+yzgzhpWXem9dR7JORUeo9I?=
+ =?us-ascii?Q?pwhbSn1OJY8fRew8zoXjEuI28+xNCowGsihhTAkJxVxkTs5VJ8kYvgAWf4sx?=
+ =?us-ascii?Q?Hb9xicCsv3URWaPlCfyfMehs20eEbp8i6+HRBo18TYWu03ZtfYZ2Pcn7/zBB?=
+ =?us-ascii?Q?Hlhju4SKDhyi0K+l8rI4wsz7pL5beEzn+5G28iIukwCmMUEtclwGnZdz3sS2?=
+ =?us-ascii?Q?lo6REXMpGewZkJ8/EAUcwvgX57Y/KEq0VRCKDGm0Q4mOwUzurJ1lk5jnJm1M?=
+ =?us-ascii?Q?Fx2E04sFnTBFLYNUz9DQDSnK/KuKXHdvnw7qWI+1kA+ntEhqgAukMOYmg4LE?=
+ =?us-ascii?Q?zAMT8xYsLBpEV+Eq2NyUjcMQ3LpXEjpyk+nSxCodQhlm8nenPHgju/rAQzIA?=
+ =?us-ascii?Q?vV6wDwk+hMfJezCkwQw/gq3W0k1TIhSMHnC2wLImI2kl6OH5AznjSIQjBGaj?=
+ =?us-ascii?Q?4TnnOyE357SfLJyiB+C2zcQvJFSBqEg5a7+2NkfYCE/ln4UiwK3MoyF9gU/B?=
+ =?us-ascii?Q?bDy+5ZLN1IVVCGGKXv8W4GfrDEsCf6zP1k2GasOKHalgktpWgnjKTXkzHmEy?=
+ =?us-ascii?Q?qdTonOpYuu6jy7/UDMRJUv1wiKGpU7zyXTKYpiWEJfvMOZXM8Wdsq7ITqVB1?=
+ =?us-ascii?Q?oXtzrtI=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2024 17:12:29.4064
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR08MB5388.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(366016)(376014)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Ojy3PC3NIaR1ICNanZdwkE5KrzSe6c/fWS5aymOMDLB49r/btbrJ+JndIHpu?=
+ =?us-ascii?Q?2jS4JH41+sbGqoqLS0JaJkvBr/1Gk0jMcOibVCbPbygimGaXzgQGcDMxIJTy?=
+ =?us-ascii?Q?Npf4G6iD9AaWcTxTZfGIWkBMTnKmpQpLrvqnnYrMf8xmeiImcYBNVX8e0vXT?=
+ =?us-ascii?Q?XfluUhyY+LS6Gc7dN8yV9JVXVD3ndMo8jf1pOxEzUEnRQsVHTBs7bMAXKSw6?=
+ =?us-ascii?Q?i/0IieIi+6zmWqRQ2JIttaBJCVtwCh2svXUeIcMEWCeGOHeYlnoEo/NrjEa7?=
+ =?us-ascii?Q?+hVrnJ2/trzKlgk5yMErF/9NXBgSC369FVzbYZTThEISMWLoOu9VW23GuDXs?=
+ =?us-ascii?Q?rmWkAORrDBAS7a4e8mqCByhYkG7v7NgPu5fpK0x82Y0OoNh2KPtV+tb7tH6k?=
+ =?us-ascii?Q?gGLKGIMMhOs4RFmLOq6YSvK11eCpGhnkEDpKT22r1R9dYpJr39IjHfAtCluk?=
+ =?us-ascii?Q?jtnFn/H3mUmwvnoUKqPND1gb50CbN9wCHbgiiYDwoOkl1QRmJdcC1ZrvcQ63?=
+ =?us-ascii?Q?XYxAcofD/z7Iur1Zkmgrs/t3+R36Drv3eSRU+JCmkvi06BQ5HVY8rei3zm2E?=
+ =?us-ascii?Q?9qWHd72IeT4AToinFwSti5zH5oGLRfYKsKk9rqurarLdopYWK40ExnBPD086?=
+ =?us-ascii?Q?q1o7x19mb/5ZodFo9I6eBVzlPaM1CnU17U1R/vf0zj7aznkTmfC5BQb10DGh?=
+ =?us-ascii?Q?HESl34d8z0zHKsu2TwSQgmHX1VzzEi8MUM5NuaxBaCzBj7xc2QadD2Si0095?=
+ =?us-ascii?Q?VhQP5g/yXBZ91rCmzDciuViZvXen0ia4DNq5jMZppUIzrymfuLNze5X44Cf4?=
+ =?us-ascii?Q?yuX8S+y92tYLmvZu+aj5XSdxG8wQqfmht/opmOgB/5Gv+K2Vf5ucE9JeI+K/?=
+ =?us-ascii?Q?3oO7pHVQ5r0GfZ349ms4F7rbo8/P8muGqZMAjb3iiOe2xQFy6aWTBRZ10kbc?=
+ =?us-ascii?Q?4QXcgKWdpGA1Cg4W6GZpQCMmK8byfSPf1BLG5F/tqwBWJkd+jPctNXbmkglN?=
+ =?us-ascii?Q?BeoRQxPYu9j2GCZTIIAF3e4om++16m+0s5zHhpjPh3AHJqP5Tz0SxxiZojuZ?=
+ =?us-ascii?Q?7ZgJTZpPKJ4Pha4G6/WdJiF8Fu+4Tol3br9rwEkKSoOdZknpXVy1KyXfB6LJ?=
+ =?us-ascii?Q?e6zfKG+6vPfCWI7pXFVyOBUH2/edwglOCKaCqd77Glq0z5CcPxeQz+e7I3LD?=
+ =?us-ascii?Q?Ma4JpC3x6VtQzanTf9yHzHAFJmFNuDIk3IzpZbNoJsoabCZYpfUfCq0BkVFh?=
+ =?us-ascii?Q?b/h6QU9RsyfBlbd3kyXwTUsZVab6IVG/cdBZNVYIknA5Pcj841JAIm6t6A5x?=
+ =?us-ascii?Q?Kk0za2ILqU5EPmAlx8LVfH8Tfap4br/l29QhivOApNVbZc7exEgA4bKbnJBm?=
+ =?us-ascii?Q?OYtBRldljuHOvCAKk8JNSEPNqHARNEMQ0XykhuuAvufZGz05NoXRVVP2UHC2?=
+ =?us-ascii?Q?GuuGlvpKYyX+xMoDwoa8wMSGJrcT5+sUXEZWtavzd3tzLGZiBHv7hqATw7an?=
+ =?us-ascii?Q?hB38I2IdunQMZj9jxqmYDOq31wS8NKWBseYkdJ28qFWGRch5WWX6nn5YLpE9?=
+ =?us-ascii?Q?L4Bp69UITuq7NdJjyHaICRt2yVXJXB94Tg+E/TgxCvHTJQXgQBcgd+O4j/07?=
+ =?us-ascii?Q?HA=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	N5CfCeBExMSun/ZWQoNHTXixWMpEcCT6FyqhhCmnJSagOcE50LFbQtWtAoTYjUwlUINZ7FOkwCqwFkBhlafYZQXH0cEzupS7PtGf9jx09l6FaNrST1ieYbNVnVCR+zP8bFV2G+d6bH82qtwaFy6inubZfSe8pRLob0iUIZ4npGa8V0wE8U+Jaw/oqHa8AVCGg5O/c1GQpDy4UGl5GWD89W3K4tQUqbnoaQBQNBBEYpfkNxB6/IdJ2XCc3CjWmgyYpdudqE9TvFgCMvX9MU7SHihwUPFgArH74Ot5efgp7zJtQLzZ8D77VIUtjUWXxafU9Tc4ILiPTq6C3K7RsyK4DxMwJhaGL+nfB6Yab4/PKHtKUpaoAnmpVkcG5DHuY9uC8VlaEtHrR8gtn9m/s9D2/Hm9aQ+zR/+XYpeHRBCmgqA+E8l/a7jXTeAFU1nTlqK3CPTnMFUK5OasLpRtn+fVowmzaAbhRH2zu2uwpuPfLSeRecplCGrFU90Ed8rkOPA2bGf28YC3Q1Idb7SrpVF1vgH6wqMUJ6YaWuOktKqNQZ7Ll5eLnDLNwlFQXLzmoRfrNWQb0T7EeoGOfgRPhsaDZK2uhYXh+aekoFQQg7ZzeJfvx0FnoV2wtLqIXI/4WqMY
+X-OriginatorOrg: drivenets.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b948a6d-6e6b-4a92-df5c-08dd02749407
+X-MS-Exchange-CrossTenant-AuthSource: DB8PR08MB5388.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2024 17:16:28.3028
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f369eef1-7cf4-4ebe-1839-08dd027405f1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075F3.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4314
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 662f82da-cf45-4bdf-b295-33b083f5d229
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IDCZH3kRiAg2V3svKCIRovoRm5TKAoEHKG991vwSIb6TtWXKtrBfdbkhXdmZusG2G5Pls0BNbmWcHdAV1JqHPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB8720
+X-MDID: 1731345394-RTYbwBxtfkJo
+X-MDID-O:
+ eu1;ams;1731345394;RTYbwBxtfkJo;<gnaaman@drivenets.com>;489d0494e21146abff88c0d96984588f
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
-Check that only one notification is produced for various FDB edit
-operations.
+Do not invoke costly `addrconf_verify_rtnl` if the added address
+wouldn't need it, or affect the delayed_work timer.
 
-Regarding the ip_link_add() and ip_link_master() helpers. This pattern of
-action plus corresponding defer is bound to come up often, and a dedicated
-vocabulary to capture it will be handy. tunnel_create() and vlan_create()
-from forwarding/lib.sh are somewhat opaque and perhaps too kitchen-sinky,
-so I tried to go in the opposite direction with these ones, and wrapped
-only the bare minimum to schedule a corresponding cleanup.
-
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Amit Cohen <amcohen@nvidia.com>
-Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
 ---
+addrconf_verify_rtnl() deals with either management/temporary (Security)
+addresses, or with addresses that have some kind of lifetime.
 
-Notes:
-CC: Shuah Khan <shuah@kernel.org>
-CC: Benjamin Poirier <bpoirier@nvidia.com>
-CC: Hangbin Liu <liuhangbin@gmail.com>
-CC: linux-kselftest@vger.kernel.org
-CC: Jiri Pirko <jiri@resnulli.us>
+This patches makes it so that ops on addresses that are permanent would
+not trigger this function.
 
- tools/testing/selftests/net/Makefile      |  2 +-
- tools/testing/selftests/net/fdb_notify.sh | 95 +++++++++++++++++++++++
- tools/testing/selftests/net/lib.sh        | 17 ++++
- 3 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/net/fdb_notify.sh
+This does wonders in our use-case of modifying a lot of (~24K) static
+addresses, since it turns the addition or deletion of addresses to an
+amortized O(1), instead of O(N).
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 26a4883a65c9..ab0e8f30bfe7 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -92,7 +92,7 @@ TEST_PROGS += test_vxlan_mdb.sh
- TEST_PROGS += test_bridge_neigh_suppress.sh
- TEST_PROGS += test_vxlan_nolocalbypass.sh
- TEST_PROGS += test_bridge_backup_port.sh
--TEST_PROGS += fdb_flush.sh
-+TEST_PROGS += fdb_flush.sh fdb_notify.sh
- TEST_PROGS += fq_band_pktlimit.sh
- TEST_PROGS += vlan_hw_filter.sh
- TEST_PROGS += bpf_offload.py
-diff --git a/tools/testing/selftests/net/fdb_notify.sh b/tools/testing/selftests/net/fdb_notify.sh
-new file mode 100755
-index 000000000000..a98047361988
---- /dev/null
-+++ b/tools/testing/selftests/net/fdb_notify.sh
-@@ -0,0 +1,95 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
+Modification of management addresses or "non-permanent" (not sure what
+is the correct jargon) addresses are still slow.
+
+We can improve those in the future, depending on the case:
+
+If the function is called only to handle cases where the scheduled work should
+be called earlier, I think this would be better served by saving the next
+expiration and equating to it, since it would save iteration of the
+table.
+
+If some upkeep *is* needed (e.g. creating a temporary address)
+I Think it is possible in theory make these modifications faster as
+well, if we only iterate `idev->if_addrs` as a response for a
+modification, since it doesn't seem to me like there are any
+cross-device effects.
+
+I opted to keep this patch simple and not solve this, on the assumption
+that there aren't many users that need this scale.
+---
+ net/ipv6/addrconf.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index d0a99710d65d..12fdabb1deba 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -3072,8 +3072,7 @@ static int inet6_addr_add(struct net *net, int ifindex,
+ 		 */
+ 		if (!(ifp->flags & (IFA_F_OPTIMISTIC | IFA_F_NODAD)))
+ 			ipv6_ifa_notify(0, ifp);
+-		/*
+-		 * Note that section 3.1 of RFC 4429 indicates
++		/* Note that section 3.1 of RFC 4429 indicates
+ 		 * that the Optimistic flag should not be set for
+ 		 * manually configured addresses
+ 		 */
+@@ -3082,7 +3081,15 @@ static int inet6_addr_add(struct net *net, int ifindex,
+ 			manage_tempaddrs(idev, ifp, cfg->valid_lft,
+ 					 cfg->preferred_lft, true, jiffies);
+ 		in6_ifa_put(ifp);
+-		addrconf_verify_rtnl(net);
 +
-+source lib.sh
++		/* Verify only if this address is perishable or has temporary
++		 * offshoots, as this function is too expansive.
++		 */
++		if ((cfg->ifa_flags & IFA_F_MANAGETEMPADDR) ||
++		    !(cfg->ifa_flags & IFA_F_PERMANENT) ||
++		    cfg->preferred_lft != INFINITY_LIFE_TIME)
++			addrconf_verify_rtnl(net);
 +
-+ALL_TESTS="
-+	test_dup_bridge
-+	test_dup_vxlan_self
-+	test_dup_vxlan_master
-+	test_dup_macvlan_self
-+	test_dup_macvlan_master
-+"
+ 		return 0;
+ 	} else if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+ 		ipv6_mc_config(net->ipv6.mc_autojoin_sk, false,
+@@ -3099,6 +3106,7 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+ 	struct inet6_ifaddr *ifp;
+ 	struct inet6_dev *idev;
+ 	struct net_device *dev;
++	int is_mgmt_tmp;
+ 
+ 	if (plen > 128) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Invalid prefix length");
+@@ -3124,12 +3132,17 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+ 			in6_ifa_hold(ifp);
+ 			read_unlock_bh(&idev->lock);
+ 
+-			if (!(ifp->flags & IFA_F_TEMPORARY) &&
+-			    (ifa_flags & IFA_F_MANAGETEMPADDR))
++			is_mgmt_tmp = (!(ifp->flags & IFA_F_TEMPORARY) &&
++				       (ifa_flags & IFA_F_MANAGETEMPADDR));
 +
-+do_test_dup()
-+{
-+	local op=$1; shift
-+	local what=$1; shift
-+	local tmpf
++			if (is_mgmt_tmp)
+ 				manage_tempaddrs(idev, ifp, 0, 0, false,
+ 						 jiffies);
+ 			ipv6_del_addr(ifp);
+-			addrconf_verify_rtnl(net);
 +
-+	RET=0
++			if (is_mgmt_tmp)
++				addrconf_verify_rtnl(net);
 +
-+	tmpf=$(mktemp)
-+	defer rm "$tmpf"
-+
-+	defer_scope_push
-+		bridge monitor fdb &> "$tmpf" &
-+		defer kill_process $!
-+
-+		bridge fdb "$op" 00:11:22:33:44:55 vlan 1 "$@"
-+		sleep 0.2
-+	defer_scope_pop
-+
-+	local count=$(grep -c -e 00:11:22:33:44:55 $tmpf)
-+	((count == 1))
-+	check_err $? "Got $count notifications, expected 1"
-+
-+	log_test "$what $op: Duplicate notifications"
-+}
-+
-+test_dup_bridge()
-+{
-+	ip_link_add br up type bridge vlan_filtering 1
-+	do_test_dup add "bridge" dev br self
-+	do_test_dup del "bridge" dev br self
-+}
-+
-+test_dup_vxlan_self()
-+{
-+	ip_link_add br up type bridge vlan_filtering 1
-+	ip_link_add vx up type vxlan id 2000 dstport 4789
-+	ip_link_master vx br
-+
-+	do_test_dup add "vxlan" dev vx self dst 192.0.2.1
-+	do_test_dup del "vxlan" dev vx self dst 192.0.2.1
-+}
-+
-+test_dup_vxlan_master()
-+{
-+	ip_link_add br up type bridge vlan_filtering 1
-+	ip_link_add vx up type vxlan id 2000 dstport 4789
-+	ip_link_master vx br
-+
-+	do_test_dup add "vxlan master" dev vx master
-+	do_test_dup del "vxlan master" dev vx master
-+}
-+
-+test_dup_macvlan_self()
-+{
-+	ip_link_add dd up type dummy
-+	ip_link_add mv up link dd type macvlan mode passthru
-+
-+	do_test_dup add "macvlan self" dev mv self
-+	do_test_dup del "macvlan self" dev mv self
-+}
-+
-+test_dup_macvlan_master()
-+{
-+	ip_link_add br up type bridge vlan_filtering 1
-+	ip_link_add dd up type dummy
-+	ip_link_add mv up link dd type macvlan mode passthru
-+	ip_link_master mv br
-+
-+	do_test_dup add "macvlan master" dev mv self
-+	do_test_dup del "macvlan master" dev mv self
-+}
-+
-+cleanup()
-+{
-+	defer_scopes_cleanup
-+}
-+
-+trap cleanup EXIT
-+tests_run
-+
-+exit $EXIT_STATUS
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index 24f63e45735d..8994fec1c38f 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -442,3 +442,20 @@ kill_process()
- 	# Suppress noise from killing the process.
- 	{ kill $pid && wait $pid; } 2>/dev/null
+ 			if (ipv6_addr_is_multicast(pfx)) {
+ 				ipv6_mc_config(net->ipv6.mc_autojoin_sk,
+ 					       false, pfx, dev->ifindex);
+@@ -4962,7 +4975,10 @@ static int inet6_addr_modify(struct net *net, struct inet6_ifaddr *ifp,
+ 				 jiffies);
+ 	}
+ 
+-	addrconf_verify_rtnl(net);
++	if (was_managetempaddr ||
++	    !(cfg->ifa_flags & IFA_F_PERMANENT) ||
++	    cfg->preferred_lft != INFINITY_LIFE_TIME)
++		addrconf_verify_rtnl(net);
+ 
+ 	return 0;
  }
-+
-+ip_link_add()
-+{
-+	local name=$1; shift
-+
-+	ip link add name "$name" "$@"
-+	defer ip link del dev "$name"
-+}
-+
-+ip_link_master()
-+{
-+	local member=$1; shift
-+	local master=$1; shift
-+
-+	ip link set dev "$member" master "$master"
-+	defer ip link set dev "$member" nomaster
-+}
 -- 
-2.45.0
+2.34.1
 
 
