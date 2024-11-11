@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-143625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D0969C3626
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 02:35:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 707769C3629
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 02:36:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8B811F21123
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 01:35:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 277EC1F22EC2
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 01:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600D44D8DA;
-	Mon, 11 Nov 2024 01:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04A625777;
+	Mon, 11 Nov 2024 01:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AY8ICHz/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOn1gRcp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92854224D4
-	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A38718E2A
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 01:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731288883; cv=none; b=UhyL1I2Ze0CaQPx6zo17q5hAF9p0Ih4AztQnWvFVMGvXpm534koCqQm6A9hWuAawKP/ZZIsGNPY6ETUX65PxLXtMu/60tFmOJRIweoGsuXkAO+FoiBaaHK9d05JfxONqyaiagLh8B3VGM7KoyG5N7kTwtSgywwDm4U39//ISS8g=
+	t=1731288968; cv=none; b=YE/TEEqIVARObsqisiiyLI4uXkdbBWfkvhS47cTc18ce/JiOAl0CvYQz2X4whrEdq/yEttZuJ6UX718aF3ZqfiMXB/Ca21Fn/ByoL5ytcgHvjbzc91DJklBuwKV8p8SfE7HkxFNnjwv6El+0Ph9Lza61HjZNvgtcD6HjHRIomm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731288883; c=relaxed/simple;
-	bh=SwnYr0wQUUCUjeABHi0X22mCkb+XL7pmujqjUXf5TNg=;
+	s=arc-20240116; t=1731288968; c=relaxed/simple;
+	bh=XdGLyjxBtq7skX/bK0TG/Xfwr3W5VTrng1jSu08x37Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L6993KmycYWeN38zvhRKIYTrVSN+UpSelGFWljVbxPDHU5aMLhFYwQPuFwdhFc8WumW39/uEx1u2mZz1VkXnux9RLDChufmO65jQLD6I+i/NkMCnAS94jR+28aNNW6LHiMuts0Ra4rKJWb6LRtVFkdpAd8pYJ0R4QgcnJzFi3l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AY8ICHz/; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=uHIFk45BiPVdKZbAixhJhcU004Amyw+2ZaDi9Bmgx3mVNRVageboka4UQ1J1CkUNwgow3paCu/n6PkJDSvI8s8puSWahGlIEbc48x+p5Uw+tdibQ5blT+cQyfTZ/zWeiMVvTWELmx2SAY2iFMIxuhINPQtN+66hpjRVhJh4lC+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SOn1gRcp; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731288880;
+	s=mimecast20190719; t=1731288966;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B5RPDPPvEC+nbrsIFTdBWydQ3ctDGSgyhAGrK+AzGtQ=;
-	b=AY8ICHz/pdIGEds1gLob7+a98PDpyvm76bsT7WlBOHSIdY7ogiiI/MCPdX1niKvFeoEvM0
-	MhQ0vMQklaRSbMXFK0j2klRzJTQ2qw2s8IWBXz7e2EaHDzSk9rIdh4SINtSGMq82oOaUBA
-	YPkQHnT/gCcQ8STow4DAqsSye5LmaFU=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=W/dbATLxL2+itDhzJeEzYBm61TCf+9wmLBdg3lhJg1U=;
+	b=SOn1gRcpMwA/BIIhJFwxbxbu/dGsXG/aJMzOnBl3UmLcH7tVxS8UCcpHMuO2YMrJbsjX4x
+	kHW+VFG4HfDlCPO5rgn3z02IBieO6sX7BTo/7aUm9yN9m6za4DoT/UbijBLXVwkFI/Xkkw
+	86p5JCtHrT5SWwe4NGCtI+OiEtvYHHU=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-378-nvVx1NREPTu3M-hBiThQYA-1; Sun, 10 Nov 2024 20:34:39 -0500
-X-MC-Unique: nvVx1NREPTu3M-hBiThQYA-1
-X-Mimecast-MFC-AGG-ID: nvVx1NREPTu3M-hBiThQYA
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e2ca4fb175so4001376a91.3
-        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 17:34:39 -0800 (PST)
+ us-mta-269-EAUoiU7cMd-87bdJmidogw-1; Sun, 10 Nov 2024 20:36:04 -0500
+X-MC-Unique: EAUoiU7cMd-87bdJmidogw-1
+X-Mimecast-MFC-AGG-ID: EAUoiU7cMd-87bdJmidogw
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-7edcfbf0a25so2701871a12.1
+        for <netdev@vger.kernel.org>; Sun, 10 Nov 2024 17:36:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731288878; x=1731893678;
+        d=1e100.net; s=20230601; t=1731288964; x=1731893764;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=B5RPDPPvEC+nbrsIFTdBWydQ3ctDGSgyhAGrK+AzGtQ=;
-        b=r6hNoMbT1WVC9DnHD2qYnSyeOM+SmygxHdtn/AdW/IyTEYQ8GKPxf3B62Ov8QXqsFk
-         9zdZ1f8CsjwsvbfNlFqWH421iCwv8St32XYdyjEmCAethX0yvVj9LQuu2UEkN1/TQdi/
-         V67bmIuoqgY1kOnoXCbV8shjC0DXsIejupfX6N03gcXzrPuDINeng+V5CTzsUeQtg3td
-         t6VxbrwvYh29CHKTaH/nL9TaNVb9UAMTcO9CS0YzISnugTkz1JcH7Ur3Yn+gqNSvEIyB
-         ppsPXocAMM5fClEJzg47LtnjuxlRN5M4pGtM7jIDesIeu2j9VtkLUZOONP0sjneLJbUH
-         mZ0w==
-X-Gm-Message-State: AOJu0YxXpIiaBQLf7rfb0cgelbh6jdPJ0NGjlsKf/DBxBZWRcfv6h2ra
-	5M+qjgdzSd6XZ9fo0fO1/TdReGJIsCddq4xLRBRQj1LV+wdAuadt5YqcPrkEbB89nW1gqjmU9Px
-	mBUEZ9r85bPJtZSYlS5ucIq17Na+b7/Yu9yAfAiOvv+yQ2qrS71nfAAkdMaV+JxqzkPmDYmn8eo
-	2ExtweSB4hM4WaZA6czsWgVMtjLAEk
-X-Received: by 2002:a17:90b:2e50:b0:2e0:74c9:ecf1 with SMTP id 98e67ed59e1d1-2e9b1680c50mr17180804a91.10.1731288878173;
-        Sun, 10 Nov 2024 17:34:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHKXVjG4ufYVtO/aRps9dNj08hlXOSoubtnDRnq04HNDaqa6AaAntNV6i56o/HhaPf03g09YFvoYfSVhfn/uuM=
-X-Received: by 2002:a17:90b:2e50:b0:2e0:74c9:ecf1 with SMTP id
- 98e67ed59e1d1-2e9b1680c50mr17180759a91.10.1731288877541; Sun, 10 Nov 2024
- 17:34:37 -0800 (PST)
+        bh=W/dbATLxL2+itDhzJeEzYBm61TCf+9wmLBdg3lhJg1U=;
+        b=CRoK6Q+i9nqbBi1Pyx+jvaNHfBbzSATrRdn0x0A27mxgE8NqRXD4jcV7/HjDjJzlaR
+         Lva3Sw5W+lmcgR0ewONJUZGXt6RPGhIAJiiXmo7Gy/sUNQ9RFyB1Y+vfrP83nb/I8BuV
+         +0zPrMW5Pqr7GQTLMhuT55VHQ+cENWfRkJkhjhYuGXC6Uma0fMRLCwgx7tXUWBSm2bVf
+         BArDBQtGWNgNiUG0Vy7LloTaOzAp7ep2EnxG4nzd1FXNsYBuTyowJ6Vinm6Sv6LZXN9s
+         meOIGoZf8WXv/AnHqtHUWimBfiAz4GtzhT8VlihHAIJCwkoz60prAoGj9jNCrCasznNI
+         4lAg==
+X-Gm-Message-State: AOJu0YxqNyOPrTGE8TjhrtrXEQFhzJ+WWj6nlC7ljZieMmg5HQWFxmHx
+	b7PlCExB3YmHEortGD4wpU1lGC455wx9VsbkYkha8oGwkloO4k8usuv703yUc16nFSVst5nujQx
+	R/FxVl7+UFmJgf9jDMred6HpkFDPrvsf3ySk+oePqS6VfbPF04/fjs/qeHHOwT0vNYvJiMIDQs1
+	NPlqqWwIc1t1aD+MEQP5x6MfwkPhU4
+X-Received: by 2002:a17:90b:2744:b0:2e2:af88:2b9f with SMTP id 98e67ed59e1d1-2e9b172005emr16972816a91.16.1731288963662;
+        Sun, 10 Nov 2024 17:36:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE0I8ydXA+f/porptghF/VJNNnyFOwaz2qko4ky8Boj/2OSboEeDKrdt8AhMzcp4lG0pNeDvvUUDBSXToarMbI=
+X-Received: by 2002:a17:90b:2744:b0:2e2:af88:2b9f with SMTP id
+ 98e67ed59e1d1-2e9b172005emr16972792a91.16.1731288963254; Sun, 10 Nov 2024
+ 17:36:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107085504.63131-1-xuanzhuo@linux.alibaba.com> <20241107085504.63131-6-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20241107085504.63131-6-xuanzhuo@linux.alibaba.com>
+References: <20241107085504.63131-1-xuanzhuo@linux.alibaba.com> <20241107085504.63131-7-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20241107085504.63131-7-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 11 Nov 2024 09:34:26 +0800
-Message-ID: <CACGkMEvwAte20vZjw-apRO_8+f+dy-Z070yoZjtzPD9SY=VPUg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 05/13] virtio_ring: introduce add api for premapped
+Date: Mon, 11 Nov 2024 09:35:51 +0800
+Message-ID: <CACGkMEvzJiTTxibwrbGgdfb9Vq1xtYvEcvR9Y2L9UdOCiy77ug@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 06/13] virtio-net: rq submits premapped per-buffer
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
 	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
@@ -97,22 +97,33 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Nov 7, 2024 at 4:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
 m> wrote:
 >
-> Two APIs are introduced to submit premapped per-buffers.
->
-> int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
->                                  struct scatterlist *sg, unsigned int num=
-,
->                                  void *data,
->                                  void *ctx,
->                                  gfp_t gfp);
->
-> int virtqueue_add_outbuf_premapped(struct virtqueue *vq,
->                                   struct scatterlist *sg, unsigned int nu=
-m,
->                                   void *data,
->                                   gfp_t gfp);
+> virtio-net rq submits premapped per-buffer by setting sg page to NULL;
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 4b27ded8fc16..862beacef5d7 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -539,6 +539,12 @@ static struct sk_buff *ptr_to_skb(void *ptr)
+>         return (struct sk_buff *)((unsigned long)ptr & ~VIRTIO_ORPHAN_FLA=
+G);
+>  }
+>
+> +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len=
+)
+> +{
+> +       sg_dma_address(sg) =3D addr;
+> +       sg_dma_len(sg) =3D len;
+> +}
+> +
+
+In the future, we need to consider hiding those in the core.
+
+Anyhow
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
