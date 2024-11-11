@@ -1,273 +1,171 @@
-Return-Path: <netdev+bounces-143788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B5B9C42E8
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:46:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA0DD9C42D6
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 17:43:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B1431F22B1B
-	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 16:46:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89E1B2A9E8
+	for <lists+netdev@lfdr.de>; Mon, 11 Nov 2024 16:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC8919F133;
-	Mon, 11 Nov 2024 16:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E851A264A;
+	Mon, 11 Nov 2024 16:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b="MxqIMByx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6e+7tA8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.freemail.hu (fmfe12.freemail.hu [46.107.16.205])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564B1219ED;
-	Mon, 11 Nov 2024 16:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.107.16.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46011A257A
+	for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 16:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731343587; cv=none; b=QVQhsvDkrlOkDbbTp2Y53hh6480ydhTmCMzTPj+vj0x90vePRtqYSZlNeiS0IjqqbEdSzCzcgCWYgP3ckyzajQVUQNkfRrb0ktdVNOaQXPrRuracy8yGUAuCSK2RpdRIZGsqeJT+as6qf1sxLkeoSir35LJj5Dxb6/RNWB9QcjM=
+	t=1731343198; cv=none; b=j34xxSbnUchR/ddMhZfSYxHZHKuMlwIfulfhaQwfXvkLSsCBhJ8oM9u9ZOlLiZDal+ZvhESsy3+eRLYLY+XSuK10I99EOc+dEKbo8AW8L9FuF26AgZFzOWizRjvWIxyq/euHvHKMB0bdvySX/hy7ZroommndsmZ3vZGSpKWraWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731343587; c=relaxed/simple;
-	bh=DiGMD2vaU42Lw4N34D2zVVQanU4ucJyLB3x5BeoRT+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XbU/P0zdtd5h/Vk3eXorvF00ZZMmjQxUlLfjlFgTqGrpk8l/o66w4/aw4POzLvHchGpoAmLMyFK9/1emxMR/8bHKDItbVuV7TUznHaxhSKuQBz4fAVLHsrkYAYqepQVetx8G1FwVzUgeG2Ud5LVUhSMgYb+1+O05mEMGRtXT6hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu; spf=pass smtp.mailfrom=freemail.hu; dkim=fail (2048-bit key) header.d=freemail.hu header.i=@freemail.hu header.b=MxqIMByx reason="signature verification failed"; arc=none smtp.client-ip=46.107.16.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=freemail.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=freemail.hu
-Received: from localhost.localdomain (catv-178-48-208-49.catv.fixed.vodafone.hu [178.48.208.49])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.freemail.hu (Postfix) with ESMTPSA id 4XnFc713lXztSh;
-	Mon, 11 Nov 2024 17:38:47 +0100 (CET)
-From: egyszeregy@freemail.hu
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Benjamin=20Sz=C5=91ke?= <egyszeregy@freemail.hu>
-Subject: [PATCH] netfilter: uapi: Fix file names for case-insensitive filesystem.
-Date: Mon, 11 Nov 2024 17:36:34 +0100
-Message-ID: <20241111163634.1022-1-egyszeregy@freemail.hu>
-X-Mailer: git-send-email 2.47.0.windows.2
+	s=arc-20240116; t=1731343198; c=relaxed/simple;
+	bh=o486AYVqM7xqcbFT+XOIbCGL5DWZlP8FUBorEWAX/zg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QIqO7YJ/JPjAoatL7+gfh7gRHbMOGIeRVs43XTegVHH1f8tK8tdjrFTw3VkXTnpekRQQfo7qqFeKqJEO0ISOjousbLJdg3oOiEhHaVKDK5r8SOlh1dU/orHH5XzewIV1SXbzAc6A5crmK8pJXwvORjp5XSNyS86or8qOmoysN5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g6e+7tA8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731343195;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aKgW3LE84SWafFn65FDrfQSl/9TIfSGFANwG6EcBo18=;
+	b=g6e+7tA82qUbsn1vSi6WRiQu9U3y7/OlKeesJHINF7aYSHkj6aZdhOTTzWU7zNfKrQHWmX
+	wnxNqeHS5NKOLRPalz5qOa5y1JlclaBkSOFdGi3N3oHefk/F1nNXGfYweJMaHXubRIp98j
+	pF0tUFsHNh9QViTMB0sDIHRgKX9Vzvc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-48-45gy0RBdMZWr3PcZmp005A-1; Mon, 11 Nov 2024 11:39:54 -0500
+X-MC-Unique: 45gy0RBdMZWr3PcZmp005A-1
+X-Mimecast-MFC-AGG-ID: 45gy0RBdMZWr3PcZmp005A
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a9adb271de7so407265866b.0
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 08:39:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731343193; x=1731947993;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKgW3LE84SWafFn65FDrfQSl/9TIfSGFANwG6EcBo18=;
+        b=vnbLH0SjlLxesggGpkmDyo27feY6YSYU9zytoLlLln8QCO92aME7jEabzhwoBphD3w
+         6autnVomC/vivBsfZYru4D2Y5JLOezL6KR5Cpgo/YYdW2eXzWjvWzMvrM9d20529hLyk
+         iQwaGGEcBRBVQfZspklEZkshmU5OEpC+5VnK92GNqSghxH96uvMqXaWJ35VATY3yFPuL
+         BNgI5orN7aXyLZF0329XeYS/MTRweTG1bBi5QKpzghL/l3nCpZPHv1v/Qj/zpM9YvvWz
+         0sZ77QGKbqw3rntxl9D6VMCmqNmOCiYGrVF2ZgwlamqULSueDKW1vQOHerqtuVJhNSI+
+         rsSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGZ18mzB5+jowgkpxwR/t0Kd/kAJi9/oMYNajULXFvTY/1NLCU1gOyQQZAQ4Y5yDELUiq9Iew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfsGiitx2UguR4y+tVzK8oWldH34WgFCWgw5bDLjiDRf6EDgPZ
+	clHHdV0oKxmaGGApp7oihmv9DedTvy1hhtxS+GoGwC36IbhsDAk9i2Mql9qJv7u5qq7Vqd9Duoe
+	INJQymY8K7tUTI02EZHxooxqziv+5fRkzQO57RRzmsaVshX+7J7hnJQ==
+X-Received: by 2002:a17:906:ef08:b0:a99:e939:d69e with SMTP id a640c23a62f3a-a9ef0024349mr1298335666b.51.1731343193110;
+        Mon, 11 Nov 2024 08:39:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH3n8Roc+Mnu9kSawt8yE+qVV+ccGpVO4yEHKrFfI04/JcX8ndj08Z6F74oPMyb6gsKndsDZA==
+X-Received: by 2002:a17:906:ef08:b0:a99:e939:d69e with SMTP id a640c23a62f3a-a9ef0024349mr1298333066b.51.1731343192716;
+        Mon, 11 Nov 2024 08:39:52 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0ad2d9dsm610552266b.91.2024.11.11.08.39.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 08:39:52 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 2D95E164CC6E; Mon, 11 Nov 2024 17:39:51 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 12/19] xdp: add generic
+ xdp_build_skb_from_buff()
+In-Reply-To: <20241107161026.2903044-13-aleksander.lobakin@intel.com>
+References: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
+ <20241107161026.2903044-13-aleksander.lobakin@intel.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 11 Nov 2024 17:39:51 +0100
+Message-ID: <875xot67xk.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/relaxed; t=1731343127;
-	s=20181004; d=freemail.hu;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	l=9249; bh=MFJ0d0K4njkBR/5La38uPan3/vOgwnNgHuSkxd63V6I=;
-	b=MxqIMByxB7IicqUVo0lEzpTN0JV2cUgSCMyWKkPZfnOSPb3HFD7wwVsaUVi3iGsg
-	zUfcM3To0PgA4i0DrHQFwYS+pJGBzNHdC0Z3VPrJgBXofgQGbLClQmQY0rnapfYF3mO
-	77a+S9ao5pCs8MaS3K/Us7fybaIZrtqlFuVAf9xJvQPBSDsWFqu/fZmmJ/kWbOoz2lY
-	sdzH+GDu51ETge0x2tW31cw6ahqeKZ6BMfNvt7UeUFODAHJumBXoA/tj2KGZusu9xPF
-	wDMxGmJyRFtt8D9FK0JfCUImiztwza2YaixZ1tOXgDY/iiJLjKgtX36ta942pIZDL5Y
-	IHzmYl11fw==
+Content-Type: text/plain
 
-From: Benjamin Szőke <egyszeregy@freemail.hu>
+Alexander Lobakin <aleksander.lobakin@intel.com> writes:
 
-The goal is to fix Linux repository for case-insensitive filesystem,
-to able to clone it and editable on any operating systems.
+> The code which builds an skb from an &xdp_buff keeps multiplying itself
+> around the drivers with almost no changes. Let's try to stop that by
+> adding a generic function.
+> Unlike __xdp_build_skb_from_frame(), always allocate an skbuff head
+> using napi_build_skb() and make use of the available xdp_rxq pointer to
+> assign the Rx queue index. In case of PP-backed buffer, mark the skb to
+> be recycled, as every PP user's been switched to recycle skbs.
+>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  include/net/xdp.h |  1 +
+>  net/core/xdp.c    | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 56 insertions(+)
+>
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index 4c19042adf80..b0a25b7060ff 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -330,6 +330,7 @@ xdp_update_skb_shared_info(struct sk_buff *skb, u8 nr_frags,
+>  void xdp_warn(const char *msg, const char *func, const int line);
+>  #define XDP_WARN(msg) xdp_warn(msg, __func__, __LINE__)
+>  
+> +struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp);
+>  struct xdp_frame *xdp_convert_zc_to_xdp_frame(struct xdp_buff *xdp);
+>  struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+>  					   struct sk_buff *skb,
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index b1b426a9b146..3a9a3c14b080 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -624,6 +624,61 @@ int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp)
+>  }
+>  EXPORT_SYMBOL_GPL(xdp_alloc_skb_bulk);
+>  
+> +/**
+> + * xdp_build_skb_from_buff - create an skb from an &xdp_buff
+> + * @xdp: &xdp_buff to convert to an skb
+> + *
+> + * Perform common operations to create a new skb to pass up the stack from
+> + * an &xdp_buff: allocate an skb head from the NAPI percpu cache, initialize
+> + * skb data pointers and offsets, set the recycle bit if the buff is PP-backed,
+> + * Rx queue index, protocol and update frags info.
+> + *
+> + * Return: new &sk_buff on success, %NULL on error.
+> + */
+> +struct sk_buff *xdp_build_skb_from_buff(const struct xdp_buff *xdp)
+> +{
+> +	const struct xdp_rxq_info *rxq = xdp->rxq;
+> +	const struct skb_shared_info *sinfo;
+> +	struct sk_buff *skb;
+> +	u32 nr_frags = 0;
+> +	int metalen;
+> +
+> +	if (unlikely(xdp_buff_has_frags(xdp))) {
+> +		sinfo = xdp_get_shared_info_from_buff(xdp);
+> +		nr_frags = sinfo->nr_frags;
+> +	}
 
-In netfilter, many of source files has duplaction with uppercase filename
-style. They was fixed by renaming.
+Why this separate branch at the start of the function? nr_frags is no
+used until the other branch below, so why not just make that branch on
+xdp_buff_has_frags() and keep everything frags-related together in one
+block?
 
-Signed-off-by: Benjamin Szőke <egyszeregy@freemail.hu>
----
- .../netfilter/{xt_CONNMARK.h => xt_CONNMARK_TARGET.h}     | 0
- .../uapi/linux/netfilter/{xt_DSCP.h => xt_DSCP_TARGET.h}  | 0
- .../uapi/linux/netfilter/{xt_MARK.h => xt_MARK_TARGET.h}  | 0
- .../linux/netfilter/{xt_RATEEST.h => xt_RATEEST_TARGET.h} | 0
- .../linux/netfilter/{xt_TCPMSS.h => xt_TCPMSS_TARGET.h}   | 0
- .../linux/netfilter_ipv4/{ipt_ECN.h => ipt_ECN_TARGET.h}  | 2 +-
- .../linux/netfilter_ipv4/{ipt_TTL.h => ipt_TTL_TARGET.h}  | 0
- .../linux/netfilter_ipv6/{ip6t_HL.h => ip6t_HL_TARGET.h}  | 0
- net/ipv4/netfilter/Makefile                               | 2 +-
- net/ipv4/netfilter/{ipt_ECN.c => ipt_ECN_TARGET.c}        | 2 +-
- net/netfilter/Makefile                                    | 8 ++++----
- net/netfilter/{xt_DSCP.c => xt_DSCP_TARGET.c}             | 2 +-
- net/netfilter/{xt_HL.c => xt_HL_TARGET.c}                 | 0
- net/netfilter/{xt_RATEEST.c => xt_RATEEST_TARGET.c}       | 2 +-
- net/netfilter/{xt_TCPMSS.c => xt_TCPMSS_TARGET.c}         | 2 +-
- 15 files changed, 10 insertions(+), 10 deletions(-)
- rename include/uapi/linux/netfilter/{xt_CONNMARK.h => xt_CONNMARK_TARGET.h} (100%)
- rename include/uapi/linux/netfilter/{xt_DSCP.h => xt_DSCP_TARGET.h} (100%)
- rename include/uapi/linux/netfilter/{xt_MARK.h => xt_MARK_TARGET.h} (100%)
- rename include/uapi/linux/netfilter/{xt_RATEEST.h => xt_RATEEST_TARGET.h} (100%)
- rename include/uapi/linux/netfilter/{xt_TCPMSS.h => xt_TCPMSS_TARGET.h} (100%)
- rename include/uapi/linux/netfilter_ipv4/{ipt_ECN.h => ipt_ECN_TARGET.h} (95%)
- rename include/uapi/linux/netfilter_ipv4/{ipt_TTL.h => ipt_TTL_TARGET.h} (100%)
- rename include/uapi/linux/netfilter_ipv6/{ip6t_HL.h => ip6t_HL_TARGET.h} (100%)
- rename net/ipv4/netfilter/{ipt_ECN.c => ipt_ECN_TARGET.c} (98%)
- rename net/netfilter/{xt_DSCP.c => xt_DSCP_TARGET.c} (98%)
- rename net/netfilter/{xt_HL.c => xt_HL_TARGET.c} (100%)
- rename net/netfilter/{xt_RATEEST.c => xt_RATEEST_TARGET.c} (99%)
- rename net/netfilter/{xt_TCPMSS.c => xt_TCPMSS_TARGET.c} (99%)
-
-diff --git a/include/uapi/linux/netfilter/xt_CONNMARK.h b/include/uapi/linux/netfilter/xt_CONNMARK_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter/xt_CONNMARK.h
-rename to include/uapi/linux/netfilter/xt_CONNMARK_TARGET.h
-diff --git a/include/uapi/linux/netfilter/xt_DSCP.h b/include/uapi/linux/netfilter/xt_DSCP_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter/xt_DSCP.h
-rename to include/uapi/linux/netfilter/xt_DSCP_TARGET.h
-diff --git a/include/uapi/linux/netfilter/xt_MARK.h b/include/uapi/linux/netfilter/xt_MARK_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter/xt_MARK.h
-rename to include/uapi/linux/netfilter/xt_MARK_TARGET.h
-diff --git a/include/uapi/linux/netfilter/xt_RATEEST.h b/include/uapi/linux/netfilter/xt_RATEEST_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter/xt_RATEEST.h
-rename to include/uapi/linux/netfilter/xt_RATEEST_TARGET.h
-diff --git a/include/uapi/linux/netfilter/xt_TCPMSS.h b/include/uapi/linux/netfilter/xt_TCPMSS_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter/xt_TCPMSS.h
-rename to include/uapi/linux/netfilter/xt_TCPMSS_TARGET.h
-diff --git a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h b/include/uapi/linux/netfilter_ipv4/ipt_ECN_TARGET.h
-similarity index 95%
-rename from include/uapi/linux/netfilter_ipv4/ipt_ECN.h
-rename to include/uapi/linux/netfilter_ipv4/ipt_ECN_TARGET.h
-index e3630fd045b8..195a124f9bfa 100644
---- a/include/uapi/linux/netfilter_ipv4/ipt_ECN.h
-+++ b/include/uapi/linux/netfilter_ipv4/ipt_ECN_TARGET.h
-@@ -11,7 +11,7 @@
- #define _IPT_ECN_TARGET_H
- 
- #include <linux/types.h>
--#include <linux/netfilter/xt_DSCP.h>
-+#include <linux/netfilter/xt_DSCP_TARGET.h>
- 
- #define IPT_ECN_IP_MASK	(~XT_DSCP_MASK)
- 
-diff --git a/include/uapi/linux/netfilter_ipv4/ipt_TTL.h b/include/uapi/linux/netfilter_ipv4/ipt_TTL_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter_ipv4/ipt_TTL.h
-rename to include/uapi/linux/netfilter_ipv4/ipt_TTL_TARGET.h
-diff --git a/include/uapi/linux/netfilter_ipv6/ip6t_HL.h b/include/uapi/linux/netfilter_ipv6/ip6t_HL_TARGET.h
-similarity index 100%
-rename from include/uapi/linux/netfilter_ipv6/ip6t_HL.h
-rename to include/uapi/linux/netfilter_ipv6/ip6t_HL_TARGET.h
-diff --git a/net/ipv4/netfilter/Makefile b/net/ipv4/netfilter/Makefile
-index 85502d4dfbb4..5bdb9dedcd63 100644
---- a/net/ipv4/netfilter/Makefile
-+++ b/net/ipv4/netfilter/Makefile
-@@ -39,7 +39,7 @@ obj-$(CONFIG_IP_NF_MATCH_AH) += ipt_ah.o
- obj-$(CONFIG_IP_NF_MATCH_RPFILTER) += ipt_rpfilter.o
- 
- # targets
--obj-$(CONFIG_IP_NF_TARGET_ECN) += ipt_ECN.o
-+obj-$(CONFIG_IP_NF_TARGET_ECN) += ipt_ECN_TARGET.o
- obj-$(CONFIG_IP_NF_TARGET_REJECT) += ipt_REJECT.o
- obj-$(CONFIG_IP_NF_TARGET_SYNPROXY) += ipt_SYNPROXY.o
- 
-diff --git a/net/ipv4/netfilter/ipt_ECN.c b/net/ipv4/netfilter/ipt_ECN_TARGET.c
-similarity index 98%
-rename from net/ipv4/netfilter/ipt_ECN.c
-rename to net/ipv4/netfilter/ipt_ECN_TARGET.c
-index 5930d3b02555..5a18103a29b2 100644
---- a/net/ipv4/netfilter/ipt_ECN.c
-+++ b/net/ipv4/netfilter/ipt_ECN_TARGET.c
-@@ -14,7 +14,7 @@
- 
- #include <linux/netfilter/x_tables.h>
- #include <linux/netfilter_ipv4/ip_tables.h>
--#include <linux/netfilter_ipv4/ipt_ECN.h>
-+#include <linux/netfilter_ipv4/ipt_ECN_TARGET.h>
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Harald Welte <laforge@netfilter.org>");
-diff --git a/net/netfilter/Makefile b/net/netfilter/Makefile
-index f0aa4d7ef499..277befb4d1e9 100644
---- a/net/netfilter/Makefile
-+++ b/net/netfilter/Makefile
-@@ -167,20 +167,20 @@ obj-$(CONFIG_NETFILTER_XT_TARGET_CHECKSUM) += xt_CHECKSUM.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_CLASSIFY) += xt_CLASSIFY.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_CONNSECMARK) += xt_CONNSECMARK.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_CT) += xt_CT.o
--obj-$(CONFIG_NETFILTER_XT_TARGET_DSCP) += xt_DSCP.o
--obj-$(CONFIG_NETFILTER_XT_TARGET_HL) += xt_HL.o
-+obj-$(CONFIG_NETFILTER_XT_TARGET_DSCP) += xt_DSCP_TARGET.o
-+obj-$(CONFIG_NETFILTER_XT_TARGET_HL) += xt_HL_TARGET.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_HMARK) += xt_HMARK.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_LED) += xt_LED.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_LOG) += xt_LOG.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_NETMAP) += xt_NETMAP.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_NFLOG) += xt_NFLOG.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_NFQUEUE) += xt_NFQUEUE.o
--obj-$(CONFIG_NETFILTER_XT_TARGET_RATEEST) += xt_RATEEST.o
-+obj-$(CONFIG_NETFILTER_XT_TARGET_RATEEST) += xt_RATEEST_TARGET.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_REDIRECT) += xt_REDIRECT.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_MASQUERADE) += xt_MASQUERADE.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_SECMARK) += xt_SECMARK.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_TPROXY) += xt_TPROXY.o
--obj-$(CONFIG_NETFILTER_XT_TARGET_TCPMSS) += xt_TCPMSS.o
-+obj-$(CONFIG_NETFILTER_XT_TARGET_TCPMSS) += xt_TCPMSS_TARGET.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_TCPOPTSTRIP) += xt_TCPOPTSTRIP.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_TEE) += xt_TEE.o
- obj-$(CONFIG_NETFILTER_XT_TARGET_TRACE) += xt_TRACE.o
-diff --git a/net/netfilter/xt_DSCP.c b/net/netfilter/xt_DSCP_TARGET.c
-similarity index 98%
-rename from net/netfilter/xt_DSCP.c
-rename to net/netfilter/xt_DSCP_TARGET.c
-index cfa44515ab72..347335b0d69a 100644
---- a/net/netfilter/xt_DSCP.c
-+++ b/net/netfilter/xt_DSCP_TARGET.c
-@@ -14,7 +14,7 @@
- #include <net/dsfield.h>
- 
- #include <linux/netfilter/x_tables.h>
--#include <linux/netfilter/xt_DSCP.h>
-+#include <linux/netfilter/xt_DSCP_TARGET.h>
- 
- MODULE_AUTHOR("Harald Welte <laforge@netfilter.org>");
- MODULE_DESCRIPTION("Xtables: DSCP/TOS field modification");
-diff --git a/net/netfilter/xt_HL.c b/net/netfilter/xt_HL_TARGET.c
-similarity index 100%
-rename from net/netfilter/xt_HL.c
-rename to net/netfilter/xt_HL_TARGET.c
-diff --git a/net/netfilter/xt_RATEEST.c b/net/netfilter/xt_RATEEST_TARGET.c
-similarity index 99%
-rename from net/netfilter/xt_RATEEST.c
-rename to net/netfilter/xt_RATEEST_TARGET.c
-index 4f49cfc27831..ca21d5da6833 100644
---- a/net/netfilter/xt_RATEEST.c
-+++ b/net/netfilter/xt_RATEEST_TARGET.c
-@@ -14,7 +14,7 @@
- #include <net/netns/generic.h>
- 
- #include <linux/netfilter/x_tables.h>
--#include <linux/netfilter/xt_RATEEST.h>
-+#include <linux/netfilter/xt_RATEEST_TARGET.h>
- #include <net/netfilter/xt_rateest.h>
- 
- #define RATEEST_HSIZE	16
-diff --git a/net/netfilter/xt_TCPMSS.c b/net/netfilter/xt_TCPMSS_TARGET.c
-similarity index 99%
-rename from net/netfilter/xt_TCPMSS.c
-rename to net/netfilter/xt_TCPMSS_TARGET.c
-index 116a885adb3c..fec2f0942fc6 100644
---- a/net/netfilter/xt_TCPMSS.c
-+++ b/net/netfilter/xt_TCPMSS_TARGET.c
-@@ -22,7 +22,7 @@
- #include <linux/netfilter_ipv6/ip6_tables.h>
- #include <linux/netfilter/x_tables.h>
- #include <linux/netfilter/xt_tcpudp.h>
--#include <linux/netfilter/xt_TCPMSS.h>
-+#include <linux/netfilter/xt_TCPMSS_TARGET.h>
- 
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Marc Boucher <marc@mbsi.ca>");
--- 
-2.47.0.windows.2
+-Toke
 
 
