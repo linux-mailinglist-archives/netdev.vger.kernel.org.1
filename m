@@ -1,74 +1,46 @@
-Return-Path: <netdev+bounces-144112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CF959C5C2F
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:44:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936679C5E6A
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:10:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B94DB288A4
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:57:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44551B66125
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 14:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C741FBCB4;
-	Tue, 12 Nov 2024 13:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="tofzuupw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6551FEFD5;
+	Tue, 12 Nov 2024 14:37:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC9B1FBF52
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 13:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D441FCC4F;
+	Tue, 12 Nov 2024 14:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731419813; cv=none; b=Ql+B79QD0HmPrjIm4N+VINyOKJwPjiJ/615mJZGgN1DNUcjRzoWAXg5Zt3pgqnicPqd2Is91KrFjnpA1ldFgNt6c7ivVS7yxQnDVV3l1iMY2GFlfoetE39qTjahKhmGl3yOYb1CHwrq8r+P8kk7avwOOYF5dUWWu9UbMRVA/msY=
+	t=1731422255; cv=none; b=Fh3v4AmRzThQzjU6z+U8l90agw7esFpSVdlnatg+4IfYgxdUYTUcaBPQvc+hvLe5SEtJizy+Jqu9tfRUo6zrXtTpC2T57vXpFzpB8t+k73bocMNcr7EaaMoC06BdyTD77QVTRfCPIml60W80PIrlzJZhxqHgUxc+pnMkPuDi/Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731419813; c=relaxed/simple;
-	bh=pkDv1qZhZ720WQ+N9YNVRNgTFRC3x08IFpZ57D13sY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VbRERMRVZRvcE4wuLwCMAkqcKqttA9j8mMnHWNTd4i0KMp3WkDOehBAyVMvpyaFChK2tfz//AvVH3rlQPcN0+cSDzhSz+Jq/2IbU3zfQ/PWBCVXDCB5eLJLrz4979M7llaNHVLKUi/xl+NOeP4MwEi0N7eV2goXYrO8qpdrKVo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=tofzuupw; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539e3f35268so6277350e87.3
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 05:56:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1731419810; x=1732024610; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z6GJIfsl8L+Awni2vauytFSpkySMXcNGaJ2BvaXXMQw=;
-        b=tofzuupw3xUi5YqJnlGSgEWLOOSF+AobnxqGAWJib6ZtCXZrplc8PLucjkDnV0z/pR
-         g/og2GQ28zCYXoz5yK6ooGVw4vQ4KocIbBx4/wxCnAzSwlA6dwlRfdowKr9SU24O1k9T
-         WThqHxM4vGfVmiIw92gGsZQJPamWZxwqtDemf+TLp/WOXuLxv1kY/ZPdvNXJEil1D1f6
-         wbjvYY7Dc77Z5kmrQ1EBG6CRCJ1hkBK8C/1MerlG+5vpF8LfkcVcLBmEYERQLS4N/ODu
-         ofAl1x/rJEaLh4/bdrf+dqsaZnKkJdLzplP3Izmo4uss8mjTQzQ6cSTwjn+4PV96g4Q/
-         vBxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731419810; x=1732024610;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z6GJIfsl8L+Awni2vauytFSpkySMXcNGaJ2BvaXXMQw=;
-        b=OeJG0Hn4aTQYH1LI/bBeZCWk8u0cPXQAz0DIR3Rhw8KQF52KjBbs5gpuoaJp4qE7qK
-         JgGwseYmTH7w9VJ1L8vO+S86Z6UL2Xsb9m+P4OXAm77uBHZNpxH7SBKsea801Thzz7oY
-         nSYHGsT+bDcCpw+MPfeMwZNogqSkvuS8lvccSWf4Hw/ZbA+FRFkbcsX7FRQkZ6AAEi2p
-         +MKufcG9jj0I8orrDnNgAUWCYobY8aH4bYJ36XQK5pZZdJi4OSa5XohQiARYibSiQk06
-         XzGmbkGY/UJ0vCMad24IkKSWjkFP1wiLxbs30mttmvItD01T9sMAv4uXoJGdJ7xZck8X
-         K5jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWeXVGzujoX2G7VWAPnsqOBVUzto0WTxoHBY5+7aRYfbcQwGoAWMylH3zrD640WxBeMedvYOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw44obSVROYbOu/k4Mzc8Y+/F+4FBMglk2YE4WOPbzyzSGdpuJe
-	PCIbshJ6x71blzwqJVqPwtqBRPyYrYyyNL5Iv+8zOoCvruMJPeayv7mNxIgj+Ag=
-X-Google-Smtp-Source: AGHT+IHOF4VYkC1Kg9QmW1uZS8lsVgKoN0pd0sATWDdzVSP/M3Xfx+BY8yEfFd2p1qhzXQFX+yWURg==
-X-Received: by 2002:a05:6512:3dac:b0:535:645b:fb33 with SMTP id 2adb3069b0e04-53d862b358cmr8000838e87.2.1731419809953;
-        Tue, 12 Nov 2024 05:56:49 -0800 (PST)
-Received: from [192.168.1.128] ([62.205.150.185])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d82678ec6sm1884152e87.50.2024.11.12.05.56.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 05:56:49 -0800 (PST)
-Message-ID: <c0bcb7fb-6e52-45af-a115-7d10375047bf@blackwall.org>
-Date: Tue, 12 Nov 2024 15:56:47 +0200
+	s=arc-20240116; t=1731422255; c=relaxed/simple;
+	bh=pcsB3HxBUO3zjYSRuVYOVBKwnqHHUka3qTp7aYKNFtc=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=axC2oXKjaqLAcINj4lHoiJTwHYmbtt5YNWD+bWP2Yr3MleWqVCiwDmPE0r+BKxQh/he9PiKcUatrRrKVXyOUjyZzbevwmt6LNzRH26C8A448gRIojHnMklRAF8vDNx2IxY/fp/V+n0m0xU4mOaVujHrqkQ1wdx6LzbRROWR6j1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Xnpps4X0lz10Qlw;
+	Tue, 12 Nov 2024 22:35:01 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E597B180104;
+	Tue, 12 Nov 2024 22:37:29 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 12 Nov 2024 22:37:28 +0800
+Message-ID: <98187fe7-23f1-4c52-a62f-c96e720cb491@huawei.com>
+Date: Tue, 12 Nov 2024 22:37:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,60 +48,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/7] ndo_fdb_del: Add a parameter to report
- whether notification was sent
-To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Andy Roulin <aroulin@nvidia.com>, mlxsw@nvidia.com,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- intel-wired-lan@lists.osuosl.org, UNGLinuxDriver@microchip.com,
- Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- bridge@lists.linux.dev
-References: <cover.1731342342.git.petrm@nvidia.com>
- <8153c15a3a5d341642e8c176cfb0d32e4be3efeb.1731342342.git.petrm@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <8153c15a3a5d341642e8c176cfb0d32e4be3efeb.1731342342.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V3 net-next 5/7] net: hibmcge: Add pauseparam supported in
+ this module
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20241111145558.1965325-1-shaojijie@huawei.com>
+ <20241111145558.1965325-6-shaojijie@huawei.com>
+ <efd481a8-d020-452b-b29b-dfa373017f1f@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <efd481a8-d020-452b-b29b-dfa373017f1f@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On 11/11/24 19:08, Petr Machata wrote:
-> In a similar fashion to ndo_fdb_add, which was covered in the previous
-> patch, add the bool *notified argument to ndo_fdb_del. Callees that send a
-> notification on their own set the flag to true.
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Amit Cohen <amcohen@nvidia.com>
-> ---
-> 
-> Notes:
-> CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> CC: intel-wired-lan@lists.osuosl.org
-> CC: UNGLinuxDriver@microchip.com
-> CC: Manish Chopra <manishc@marvell.com>
-> CC: GR-Linux-NIC-Dev@marvell.com
-> CC: Kuniyuki Iwashima <kuniyu@amazon.com>
-> CC: Andrew Lunn <andrew+netdev@lunn.ch>
-> CC: Nikolay Aleksandrov <razor@blackwall.org>
-> CC: bridge@lists.linux.dev
-> 
->  drivers/net/ethernet/intel/ice/ice_main.c        |  4 +++-
->  drivers/net/ethernet/mscc/ocelot_net.c           |  2 +-
->  drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c |  2 +-
->  drivers/net/macvlan.c                            |  2 +-
->  drivers/net/vxlan/vxlan_core.c                   |  5 ++++-
->  include/linux/netdevice.h                        |  9 +++++++--
->  net/bridge/br_fdb.c                              | 15 ++++++++-------
->  net/bridge/br_private.h                          |  2 +-
->  net/core/rtnetlink.c                             | 11 ++++++++---
->  9 files changed, 34 insertions(+), 18 deletions(-)
-> 
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+on 2024/11/12 1:58, Andrew Lunn wrote:
+> On Mon, Nov 11, 2024 at 10:55:56PM +0800, Jijie Shao wrote:
+>> The MAC can automatically send or respond to pause frames.
+>> This patch supports the function of enabling pause frames
+>> by using ethtool.
+>>
+>> Pause auto-negotiation is not supported currently.
+> What is actually missing to support auto-neg pause? You are using
+> phylib, so it will do most of the work. You just need your adjust_link
+> callback to configure the hardware to the result of the negotiation.
+> And call phy_support_asym_pause() to let phylib know what the MAC
+> supports.
+>
+> 	Andrew
+
+Thanks for your guidance,
+
+I haven't really figured out the difference between phy_support_sym_pause()
+and phy_support_asym_paus(). However, according to your guidance
+and referring to the phylib interface and other drivers code,
+I implemented the auto-neg pause function:
+
+
++static void hbg_ethtool_get_pauseparam(struct net_device *net_dev,
++				       struct ethtool_pauseparam *param)
++{
++	struct hbg_priv *priv = netdev_priv(net_dev);
++
++	param->autoneg = priv->mac.pause_autoneg;
++	hbg_hw_get_pause_enable(priv, &param->tx_pause, &param->rx_pause);
++}
++
++static int hbg_ethtool_set_pauseparam(struct net_device *net_dev,
++				      struct ethtool_pauseparam *param)
++{
++	struct hbg_priv *priv = netdev_priv(net_dev);
++	struct phy_device *phydev = priv->mac.phydev;
++
++	phy_set_asym_pause(phydev, param->rx_pause, param->tx_pause);
++
++	priv->mac.pause_autoneg = param->autoneg;
++	if (!param->autoneg)
++		hbg_hw_set_pause_enable(priv, param->tx_pause, param->rx_pause);
++
++	return 0;
++}
+
+......
+
++static void hbg_flowctrl_cfg(struct hbg_priv *priv)
++{
++	struct phy_device *phydev = priv->mac.phydev;
++	bool rx_pause;
++	bool tx_pause;
++
++	if (!priv->mac.pause_autoneg)
++		return;
++
++	phy_get_pause(phydev, &tx_pause, &rx_pause);
++	hbg_hw_set_pause_enable(priv, tx_pause, rx_pause);
++}
++
+  static void hbg_phy_adjust_link(struct net_device *netdev)
+  {
+  	struct hbg_priv *priv = netdev_priv(netdev);
+@@ -140,6 +153,7 @@ static void hbg_phy_adjust_link(struct net_device *netdev)
+  			priv->mac.duplex = phydev->duplex;
+  			priv->mac.autoneg = phydev->autoneg;
+  			hbg_hw_adjust_link(priv, speed, phydev->duplex);
++			hbg_flowctrl_cfg(priv);
+  		}
+  
+  		priv->mac.link_status = phydev->link;
+@@ -168,6 +182,7 @@ static int hbg_phy_connect(struct hbg_priv *priv)
+  		return ret;
+  
+  	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
++	phy_support_asym_pause(phydev);
+  	phy_attached_info(phydev);
+  
+  	return 0;
+
+......
+
+Can the auto-neg pause function be fully supported?
+If the code is ok, I'll add it in the next version.
+
+Thanks,
+Jijie Shao
 
 
 
