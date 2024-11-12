@@ -1,137 +1,93 @@
-Return-Path: <netdev+bounces-144217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4D7A9C613C
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:20:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22A69C6158
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:23:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B9BB286363
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:20:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 776A8280ECD
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A76D21A4B7;
-	Tue, 12 Nov 2024 19:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D21218D92;
+	Tue, 12 Nov 2024 19:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRWzEqlv"
+	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="UuGMq0mE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF852219E3E;
-	Tue, 12 Nov 2024 19:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D8021832A
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 19:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731439133; cv=none; b=LBSXLQW0Rqt0rsbDHmlWzGMLYRN0iUNtXdnFyOH0GW+CdWuopD6wBlnUKLL2sLB0Y0E6jYtrqmEjDBWpwrgWYk0jkPzCn4lwFzXfpXM8/cufZf4sH5TFzNvOMZMHVsdNmoVHVQ3IVjRJc4VbKqAEauaK2JV2Khs+giMopI4olMU=
+	t=1731439277; cv=none; b=jZsw9X/RVJBhbYC0tvS0DT3lzhseoEZEsNUE7vTvlmUBe0jvCzO3+NA1N0s8rSN2PIvdmKwtXG+m45YkVh3skFxpyODKS/ZtmDETco317bZA1Uq8JBCaGZMWqY/NjfIpT8CrN/s+BJ57ZetHLcLydSXcDXPjw3mGWlo322pBQyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731439133; c=relaxed/simple;
-	bh=FuoIfdQJv7ccjApa3N1JNOIaXeJa2+2IdI4Dq5YRvys=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JtInWTgON9YOCcld2dnwn3meZ0n4kC2hthriG1mPU3r/uNSWtuKtq8WQ2Z8q+4U6pXbLm8fKSC4TpAjmqfYOAUCmK8LLmmIpaTyMdMyGYw4ULW5PoFnHTFrgYl4EhKKxfAScWFfNB0tGsp92l2DfGA0HxNelHeocgD3T72Sl/LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRWzEqlv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C114C4CED6;
-	Tue, 12 Nov 2024 19:18:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731439133;
-	bh=FuoIfdQJv7ccjApa3N1JNOIaXeJa2+2IdI4Dq5YRvys=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=mRWzEqlvBUmydeu8Goq3XGOqaNoQTPm75uEC18Jetvvm65q7w+I4T1ds/YyzseUHi
-	 nj1qH5fiw8pmJ8nn+qhUip1MB8DMpsDJh1pY2ZJP2gMz1pCEjjhEjZ6im8rNizVqgi
-	 py5wikl2H3dogO+nKMapzkZ04uepO2CQh/mpvHLX3hbK8shQ5cMzMqv8Sn8nlul6JN
-	 fZn1+wYaXdf+leTbYRcv2eug4WQ7PfqvYGUSJZYo95InzVUItT6FXq4HranhItFJhf
-	 XlRfIYeP3SGhLe54RW71LV1dVYCVAfXSfapDaZ1Q51j5zkEAZhTzS3U7MNF2AscoAH
-	 KG/Oi9rHHsBKg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 12 Nov 2024 20:18:33 +0100
-Subject: [PATCH net 1/3] mptcp: update local address flags when setting it
+	s=arc-20240116; t=1731439277; c=relaxed/simple;
+	bh=HzTz+zkDjCfyc0Xw+jURVPdAEW/0cXyh7yElhXrCzl8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pLTrh+2ZY2qOROSlyb6uiURVhqvp7+yx8/727udvT8qZSNCEK3Derc2/a0mP9188cOL3RelunVBIm7oCBh+INFxnASQFAomKWmd04wLHhFjY4ctveixpRD5mj9Eno4MlynWQVndUYmQ/FZ02mL1PYTk0PROu+AF1nqQBi9+oQvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=UuGMq0mE; arc=none smtp.client-ip=136.144.140.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
+	t=1731439270; bh=HzTz+zkDjCfyc0Xw+jURVPdAEW/0cXyh7yElhXrCzl8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UuGMq0mEHzoELSMWvDoXVB5iqUxmh2n6eBqGYYlIZ/s2ZCbi2raAR29zEW3kPRe4X
+	 0+lsBNVgYi8ZiU0jJcMD8Y/FHzwoQiwGENpb5BxzY+CAO4H/TqeR/vhsZn+Om2m3vU
+	 Xgi90AEw4hGI+yU7rC8KxjdfUzg5stuU5wefwgvo+YPz/Hc9fp6I3GJ5UI/RvXWc5z
+	 jUeAcojvZzALF0JRxcf6eQ3pFR/Tf/IJN2HpyUZHM/d3IJzAOjKEQnNTg4o3yoPLJs
+	 SpMUe1JSJ2U9al3ii/1QFGk/xoeT2BAqkptkPRfKTzWB9wH2FI7LlQQiB7XEOtqeGJ
+	 vmvkMjn2zEe4SPbKifDA5yC6dVe3s4Pzfs+I4B40AC+Y05Jh6NodR9MiFmZ4FxXsK7
+	 PB3bMXLBabRmobTgcAo+3i4ev2InOF4SOcTkHBGiTB+D3WAljnRAs4K/mrIdxNnQaU
+	 GfANYXE5f2NIRYaGM5n8/tpnFoQTJtmSCsNvJdDAD+KBpfxGLbySDNrpx5Wukzi3zo
+	 aq5gT1RoeonAmv0EJnhbvW+5QCB8MH/An8wiU/ndlPcvd14Q+n2PZPC1ponpgJBatK
+	 lU5DgxihmfI0AXWFQx0+CEFffsQVzCKXuU55wn3/OSBBOKUd7f9LT7iqb8ecaiW9P7
+	 zmbhSDC6eZlcONmD4de66SSI=
+Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
+	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id 41A3C1683CF;
+	Tue, 12 Nov 2024 20:21:10 +0100 (CET)
+Message-ID: <d514ef1a-bf56-4949-91f1-c64e3f599922@ijzerbout.nl>
+Date: Tue, 12 Nov 2024 20:21:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241112-net-mptcp-misc-6-12-pm-v1-1-b835580cefa8@kernel.org>
-References: <20241112-net-mptcp-misc-6-12-pm-v1-0-b835580cefa8@kernel.org>
-In-Reply-To: <20241112-net-mptcp-misc-6-12-pm-v1-0-b835580cefa8@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Kishen Maloor <kishen.maloor@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
- Geliang Tang <geliang@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2016; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=7iaDiZC+u2/a+kvq6DT5vKQUNtAdNSAkppcjtytm4zs=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnM6oVOKxcsjilnaj6GBpYLjdp5CAxYxhOBZUdT
- ih/HgbjvniJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZzOqFQAKCRD2t4JPQmmg
- cx8XD/4o0fgUv37zQQhyT+E4OdgrXpapwrLHMg8YZA1EVeP9x/h00ZeXslZcv7ei+uJrHEbdEEa
- 7wQLTYmCn/67bmiqf7PNr0CRwZU7yG69DrS0mQQ34fyuwJ/Qta1Qh6LninftWx4r8MnAFQhHn2K
- F4AOPERMHXgTKiwOhMOM0WN4+PNDNTQZOvGNcVugQJ2QgvUU8ujHagB5RqnAxPEvoDnommJYZc9
- wz5HKzsYLavWqSeSuUEJ60NMcZNzLnPgBCzNHjw22ShZQ8kJn9WTUSLoifldJJ54lO7/97pFs5o
- J9NdlXY/QeKJUYpP0PTBq93fxKELIEmdXdRBVlFHJ+dgLhxdgieSNsOXEDrIh8Oi3/VZqJqLpGC
- ajCbthSK2mqnMjyZ9mFVgu2aI3JMn+mG+uH0XW4qo/IfuVyouDHPyx6zT77s9ZVytCgUGNDhigz
- KioeILf4Mhi9SKTQ8ZF/AbrFCiGQWy82DUS2MhvXMaugoMdZ4+BYs0GHFobACQTiAEIkS34PiRy
- QpIA2kf4NEZWSJu8jghVhmM8h/nNfGVtsgNWzQqBrLN6n60D+kiNKReUihmcw4y+zjyL4iKLNcR
- 0DI6xtyYamU9+StiMY2k1d4POLeLXPmTaW+jIY90W7LRCQFxiAC+8uKlTnXSd6Vk/21cJCWszxK
- H7Kga7PB0mYeiYQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] xfrm: Add support for per cpu xfrm state handling.
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: netdev@vger.kernel.org
+References: <f9eb1025-9a3d-42b3-a3e4-990a0fadbeaf@ijzerbout.nl>
+ <ZzM1/S72Qj0tBCC0@gauss3.secunet.de>
+Content-Language: en-US
+From: Kees Bakker <kees@ijzerbout.nl>
+In-Reply-To: <ZzM1/S72Qj0tBCC0@gauss3.secunet.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
-
-Just like in-kernel pm, when userspace pm does set_flags, it needs to send
-out MP_PRIO signal, and also modify the flags of the corresponding address
-entry in the local address list. This patch implements the missing logic.
-
-Traverse all address entries on userspace_pm_local_addr_list to find the
-local address entry, if bkup is true, set the flags of this entry with
-FLAG_BACKUP, otherwise, clear FLAG_BACKUP.
-
-Fixes: 892f396c8e68 ("mptcp: netlink: issue MP_PRIO signals from userspace PMs")
-Cc: stable@vger.kernel.org
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm_userspace.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
-index 56dfea9862b7b24dd0eaa8bbedcf22a7f6829ccf..3f888bfe1462ee3c75a3fb6eefe29cb712471410 100644
---- a/net/mptcp/pm_userspace.c
-+++ b/net/mptcp/pm_userspace.c
-@@ -560,6 +560,7 @@ int mptcp_userspace_pm_set_flags(struct sk_buff *skb, struct genl_info *info)
- 	struct nlattr *token = info->attrs[MPTCP_PM_ATTR_TOKEN];
- 	struct nlattr *attr = info->attrs[MPTCP_PM_ATTR_ADDR];
- 	struct net *net = sock_net(skb->sk);
-+	struct mptcp_pm_addr_entry *entry;
- 	struct mptcp_sock *msk;
- 	int ret = -EINVAL;
- 	struct sock *sk;
-@@ -601,6 +602,17 @@ int mptcp_userspace_pm_set_flags(struct sk_buff *skb, struct genl_info *info)
- 	if (loc.flags & MPTCP_PM_ADDR_FLAG_BACKUP)
- 		bkup = 1;
- 
-+	spin_lock_bh(&msk->pm.lock);
-+	list_for_each_entry(entry, &msk->pm.userspace_pm_local_addr_list, list) {
-+		if (mptcp_addresses_equal(&entry->addr, &loc.addr, false)) {
-+			if (bkup)
-+				entry->flags |= MPTCP_PM_ADDR_FLAG_BACKUP;
-+			else
-+				entry->flags &= ~MPTCP_PM_ADDR_FLAG_BACKUP;
-+		}
-+	}
-+	spin_unlock_bh(&msk->pm.lock);
-+
- 	lock_sock(sk);
- 	ret = mptcp_pm_nl_mp_prio_send_ack(msk, &loc.addr, &rem.addr, bkup);
- 	release_sock(sk);
-
--- 
-2.45.2
+Op 12-11-2024 om 12:03 schreef Steffen Klassert:
+> On Mon, Nov 11, 2024 at 09:42:02PM +0100, Kees Bakker wrote:
+>> Hi Steffen,
+>>
+>> Sorry for the direct email. Did you perhaps forgot a "goto out_cancel" here?
+> Yes, looks like that. Do you want to send a patch?
+I prefer that you create the patch.
+>
+>> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+>> [...]
+>> @@ -2576,6 +2603,8 @@ static int build_aevent(struct sk_buff *skb, struct
+>> xfrm_state *x, const struct
+>>       err = xfrm_if_id_put(skb, x->if_id);
+>>       if (err)
+>>           goto out_cancel;
+>> +    if (x->pcpu_num != UINT_MAX)
+>> +        err = nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
+>>
+>>       if (x->dir) {
+>>           err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+>>
+>> -- 
+>> Kees Bakker
 
 
