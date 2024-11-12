@@ -1,76 +1,95 @@
-Return-Path: <netdev+bounces-143938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91BA69C4CAD
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:38:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 890DD9C4CB1
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4609F1F21B21
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:38:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E8F5283248
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3268B204953;
-	Tue, 12 Nov 2024 02:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A50204F6C;
+	Tue, 12 Nov 2024 02:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cw2K/BCn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CAd2uApf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0761C4206E;
-	Tue, 12 Nov 2024 02:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6A3433BE;
+	Tue, 12 Nov 2024 02:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731379097; cv=none; b=Bu2SubE/+CIEKctUgNVBnTb3DKzj0Fpatv+F4lL2aMNsoWRS2pU3GcYjVrT5abG3kqy0JwuvH/HCN/K2n/g36lRpTpL3XRpLRIAJHyC5ji+2DT3I7NJq1iqiW1nkcpr2UtHznvjlAyOo0NYr0IXPVRnYJwqYPgiyuUlMP3T7RvU=
+	t=1731379219; cv=none; b=DONPTLAnAY5IVJdUZekn0/EeTkNAc23nOFiOINFs4oSZIXWyGv3sR7PzW90lyYNkjn5GexDdrR71RS1ZpZ8rssjVGIE2TTq9c1c2zANhrPzCYskAlwMxDcG87xYaLQSix52CXR5gzaGJqdFPyukIfHVLLkyE8updsh2ajDazjcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731379097; c=relaxed/simple;
-	bh=Z2tElrgtXWs2mL9ir69TYsaaIcF9mG5lgXAywvxFvco=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y9lE+mEauxtNHwkDI/riVE6+8okZtKyNfw/i01OccDweo7dyl0ZjW0XuOItnAgX4husBWkhrq4ey5B/jcPvFgJu6wyhmtvr4/EtSFfdQM9CtzLy/DgBl0IYy8vS11ZxAvqGNZeyTRY4fHy34JpH4hzRrxuKxfKSYe9n0uVwN6Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cw2K/BCn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E43A3C4CECF;
-	Tue, 12 Nov 2024 02:38:15 +0000 (UTC)
+	s=arc-20240116; t=1731379219; c=relaxed/simple;
+	bh=W4/sdurYMk6ijto4wRNLBNq/bTT/o7RXoziTz5dLhtY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SeMOJtZ692QZt24+Ab5b/KVvVq4NGHrLYgQERQsrXX43RbYJ8totqNi36ujNN26VYJ+7gCUmmrR961/oHknpdrCIlkj37IRe5jR7gQsHrEoY8pdvRMlnfl7PFkXqHnWpX3P/LN6pIvSs3B2DIjq1Ht/AVYcwhc45j8IJIqCUB7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CAd2uApf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD82CC4CECF;
+	Tue, 12 Nov 2024 02:40:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731379096;
-	bh=Z2tElrgtXWs2mL9ir69TYsaaIcF9mG5lgXAywvxFvco=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Cw2K/BCnWBy08LE6bIgofxDciz2gJLYKem/FI9U+ac0dfDhyyAfCbIiS7nHzr7OSk
-	 F14m7XsDwwUcq4a9FBPFAIPheQ+ELDjIBi0wT57mDmi9GJIillri+QRvKXrVTLAq7O
-	 NErWVNgEm2x4uuT+hNZurLiWayxuGq2ThtlnoOOLWzHYPdujbWueKMi9+GDab5C38J
-	 tOKWrleE9Zrp/Ql6z9dmeNnTVQJlbkO5bWF9VJnlYfPno0eixM618peTL7dJzmRnL3
-	 0xRSH7FMJcSTrs/NZ4tnkJ0gCOeeUlsTSryHOmUOc/DWqVXkEcMywo0vvQndt83ptb
-	 vvDFe96OH2ynQ==
-Date: Mon, 11 Nov 2024 18:38:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Parav Pandit
- <parav@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] mlx5/core: relax memory barrier in
- eq_update_ci()
-Message-ID: <20241111183814.264205a9@kernel.org>
-In-Reply-To: <20241107183054.2443218-1-csander@purestorage.com>
-References: <ZyxMsx8o7NtTAWPp@x130>
-	<20241107183054.2443218-1-csander@purestorage.com>
+	s=k20201202; t=1731379218;
+	bh=W4/sdurYMk6ijto4wRNLBNq/bTT/o7RXoziTz5dLhtY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CAd2uApfXdllcbZ62zl35FW0MuMP/nChBzxm+IsvEAWW2qRqsxcq3FmOpDp44ug6N
+	 BDNujW0anT2k6nQJckxBmjWmvgMNZYmXpE9MMYpFShL0BX0dGHUnGNYA1QnNojgPiD
+	 c4i8uvQTBmMGgFK/TT07Ns/X16S7ENXiHOg3/dvmsEfBqh4nkzwBbC5f5hL7KbzN6t
+	 mIkgJmCKhVclwigRyjXXNHaruMYZuV2kY43L0mOmwDA/eqwz6ncgaY1WsAOWN6ABA5
+	 kf/yY+c/beqGR72s/zGprrx07djPMypIjqboWko8a2Isofl0nUjnYT0CZcKuoDxgNQ
+	 heTrC53FCOfQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B7A3809A80;
+	Tue, 12 Nov 2024 02:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/2] net: fix SO_DEVMEM_DONTNEED looping too long
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173137922901.57225.8157709932343230683.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Nov 2024 02:40:29 +0000
+References: <20241107210331.3044434-1-almasrymina@google.com>
+In-Reply-To: <20241107210331.3044434-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+ willemb@google.com, davem@davemloft.net, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com, horms@kernel.org,
+ corbet@lwn.net, yi1.lai@linux.intel.com, sdf@fomichev.me
 
-On Thu,  7 Nov 2024 11:30:51 -0700 Caleb Sander Mateos wrote:
-> The memory barrier in eq_update_ci() after the doorbell write is a
-> significant hot spot in mlx5_eq_comp_int(). Under heavy TCP load, we see
-> 3% of CPU time spent on the mfence instruction.
+Hello:
 
-Applied, thanks. 
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-In the future please avoid sending patches in reply to older version.
+On Thu,  7 Nov 2024 21:03:30 +0000 you wrote:
+> Exit early if we're freeing more than 1024 frags, to prevent
+> looping too long.
+> 
+> Also minor code cleanups:
+> - Flip checks to reduce indentation.
+> - Use sizeof(*tokens) everywhere for consistentcy.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] net: fix SO_DEVMEM_DONTNEED looping too long
+    https://git.kernel.org/netdev/net/c/f2685c00c322
+  - [net,v2,2/2] net: clarify SO_DEVMEM_DONTNEED behavior in documentation
+    https://git.kernel.org/netdev/net/c/102d1404c385
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
