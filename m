@@ -1,169 +1,119 @@
-Return-Path: <netdev+bounces-144249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D6D59C6522
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:27:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514469C652D
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 347531F24F5D
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:27:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 126FE2841EA
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A6521C19A;
-	Tue, 12 Nov 2024 23:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF40218D6F;
+	Tue, 12 Nov 2024 23:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYx6E/mV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoIzRvBg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB9521A4BA;
-	Tue, 12 Nov 2024 23:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FAD1F6679
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 23:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731453979; cv=none; b=IOrzWB2Rt+qLiiEYhXCS0Dr1/SHKF+T964MSsnIqSGHE2Cv8QAYXhQxxHaaCGYCYgKkPFF8MASvXxP+tcJvjWLouVgSC7r2a1OiOHteS3QzhL/jiujIBJfbcz280+bc4RyoI1SOopZFKUaRWCp/oq+eHDwfq0cOMJG3lyPI9NRk=
+	t=1731454249; cv=none; b=I8NrTSqUsrFg1e1V3bzp6I8u/6lfd/uUKtGyKea+AyxYCU+ssYbuWEWIC1hQInf5TwGkff68zYB+cK2SCi3gbDZXPiCFuAf+2oTbd+aeB7bqbkMb2Putcp4ucbae6ziTUTd6PI6YA3jjaVeP8foxkELWwyEqF96zPr9jkhdEyj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731453979; c=relaxed/simple;
-	bh=+/BD4L/R1nBoJnct/mLcdKjNjhjT97jizBEz87gS56o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bgvkph4EV/2QBxxplsTi7tGxPcV14UzNNu3bui/j3SjomW+jQMKCcx5VWWBqFCn79X4TmsOpPduJ9zmtIBRS+taZbMAquAXznet1pngdudaKrCPGm1WHZjHe6StrJyrRr/vPzP/MnTiXV+ClHRB0NcFpnAELqlRnQAm9XyC8bBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYx6E/mV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71BFC4CECD;
-	Tue, 12 Nov 2024 23:26:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731453979;
-	bh=+/BD4L/R1nBoJnct/mLcdKjNjhjT97jizBEz87gS56o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sYx6E/mVEgu7QFsq/6plMW4JGvwyOhhxCqwb3hU6KtWvA5w5Sx65wiKMSTN6Cv80f
-	 HFFJr0NSP9kJHMqnQONP630GAKRQxt+zzfpN5BnaOzyGSNX9QSVmjWqX2BFjWEMRwy
-	 IQZzBtpjLeV+9Dee6YJc+VCcNWtVXGO0nH12gU6WYspjzTgHh5SuvJgMdTHHq9vBs+
-	 eU6c8gECgglu+8XYJcx3sysu7VvKfquAm9G7B+qPP2P5Q48TfasNMM4areInItPgFJ
-	 ZSBBKPkEj5JWndesDuCTyfxD09RYuLaNvGuYgeeWdMRb+QKKzrevjO/9elGFy245xh
-	 1E38CM3alOifQ==
-Date: Wed, 13 Nov 2024 00:26:15 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Alex Henrie <alexhenrie24@gmail.com>
-Cc: linux-man@vger.kernel.org, kuniyu@amazon.com, mtk.manpages@gmail.com, 
-	branden@debian.org, netdev@vger.kernel.org
-Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
-Message-ID: <udctaxcv6yqjvffgrtzgqo24ee3kr4h4ku66ubohc7l4hqwg3w@6ujhaoyg4kla>
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
- <20241111062205.207027-1-alexhenrie24@gmail.com>
+	s=arc-20240116; t=1731454249; c=relaxed/simple;
+	bh=QPZOFakwbsms/8IqUz2OaUZCjNqpmAIZnLYHPR78u4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PGaSAbFBGEQmfZ8K7DvTE6mqQxUths+9n/nbXgd5xeTceOOAlmSqfcENIOfRtOqp0a2AYTuW7BophoIOIaW3fguz8X2/GU/YbcDXDI/0S4rFXdLGgHWka45Tp5opTJyRlgPGlb5iuOtT1Elwni1oYyzWkFNR5zsq91U/VocWRV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HoIzRvBg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731454246;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=pahYg5ShvYI1JYFWF5WGQMVXj9AMRp+maWU01U95G10=;
+	b=HoIzRvBg+IFws7rUo/HZgj6MrkSA4WBfKdpd4/2nkkmbJSh/2xIrFt5u/22UrJmAKhXF5V
+	a//D86x4uCMRK43GUyYnShFNI4+VXSVtyBsRr/b5YRXcmLSbnol0/tsB1LsHsdHfbAXD7C
+	/IWxJa9s4jmInUbgy7CrGbrY0736MfA=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-311-eEADtwZrMnicHX2HYyE5VQ-1; Tue, 12 Nov 2024 18:30:43 -0500
+X-MC-Unique: eEADtwZrMnicHX2HYyE5VQ-1
+X-Mimecast-MFC-AGG-ID: eEADtwZrMnicHX2HYyE5VQ
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2fb5035169dso44496911fa.3
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 15:30:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731454242; x=1732059042;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pahYg5ShvYI1JYFWF5WGQMVXj9AMRp+maWU01U95G10=;
+        b=gTiZUQLQNx3n43vQWVKOKj1RM/3vJjhEh2PAvBM1p1Gq/zg+NpCtHVFJm9ObLRQp8D
+         fsTNB8zii/4aaNWAjYlxRzBuvGhcfIUscqciSFS6dNi8VUYDrhFbbBXUn523zj4eWynr
+         KbepVhQM3+BVjUgn+9YIeHYLWKXsGLcHWPPvfqOTy1aJeSMGjhvEKrSph8VM+g86BNN7
+         IJsqijKtZcQPoiUPFtgKIRN0+4z5SVy+qcfc7X7z9Yni1/mqJuy2SyHoK5JrnDcJ+nld
+         ABS1HeKEte/COfsKINnIxfp9EGMhvwoJ4Ezq93tGpHViWvMjbp1q8aBuHK3hDoczW74s
+         Aihg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCxheBpSDrSYql8UmJOBx06Kc7Wb5zWJVqkPt4h4AdgSlANLv9pZKzC4l5GrJ1w0lMUPviYjc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys0t4UDMKzz4dr+GZ3gnBu3hS26EnwbFDVzDdsjg3pXox20AQG
+	gFiirqus2oiakocSyX7GotMLFrZboyNUzLGfY3IZb4spWItB7Q3xqhuDHh17MuUJ1Uojq+/eYoy
+	ETo/VnzCfpm5H/WBP3JQWHDliHntfIxB+GfmIAaP7qDHX2/+SyI0DpA==
+X-Received: by 2002:a2e:b896:0:b0:2fa:fdd1:be23 with SMTP id 38308e7fff4ca-2ff2028aadamr130045331fa.28.1731454242088;
+        Tue, 12 Nov 2024 15:30:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHZ8235xoIzEDFqX8Iqts1f1b/TTKzRbzsKbik0jYFi7YnSriOxnAuUaNNRZk63pcxv8z4I2w==
+X-Received: by 2002:a2e:b896:0:b0:2fa:fdd1:be23 with SMTP id 38308e7fff4ca-2ff2028aadamr130045111fa.28.1731454241621;
+        Tue, 12 Nov 2024 15:30:41 -0800 (PST)
+Received: from redhat.com ([31.187.78.204])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a17662sm796178366b.28.2024.11.12.15.30.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2024 15:30:40 -0800 (PST)
+Date: Tue, 12 Nov 2024 18:30:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dtatulea@nvidia.com, jasowang@redhat.com, mst@redhat.com,
+	si-wei.liu@oracle.com
+Subject: [GIT PULL] virtio: bugfix
+Message-ID: <20241112183037-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="f7gmd3j6k5eoylin"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
+X-Mutt-Fcc: =sent
 
+The following changes since commit 83e445e64f48bdae3f25013e788fcf592f142576:
 
---f7gmd3j6k5eoylin
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Alex Henrie <alexhenrie24@gmail.com>
-Cc: linux-man@vger.kernel.org, kuniyu@amazon.com, mtk.manpages@gmail.com, 
-	branden@debian.org, netdev@vger.kernel.org
-Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
- <20241111062205.207027-1-alexhenrie24@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
+  vdpa/mlx5: Fix error path during device add (2024-11-07 16:51:16 -0500)
 
-Bona nit Alex,
+are available in the Git repository at:
 
-On Sun, Nov 10, 2024 at 11:20:06PM GMT, Alex Henrie wrote:
-> struct ifa_cacheinfo contains the address's creation time, update time,
-> preferred lifetime remaining, and valid lifetime remaining.
->=20
-> Link: <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
-/tree/include/uapi/linux/if_addr.h?h=3Dv6.11#n60>
-> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
-> ---
-> Changes from v1:
-> - Move link to Link line in commit message
-> - Add the word "remaining" to clarify that the reported values will
->   decrease over time
-> - Say UINT32_MAX instead of -1
-> - Add a short paragraph to explain the constraints on the minimum and
->   maximum lifetimes
->=20
-> Thanks to Kuniyuki and Alejandro for your feedback.
-> ---
->  man/man7/rtnetlink.7 | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
->=20
-> diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
-> index 86ed459bb..ed08834b0 100644
-> --- a/man/man7/rtnetlink.7
-> +++ b/man/man7/rtnetlink.7
-> @@ -176,7 +176,24 @@ IFA_BROADCAST:raw protocol address:broadcast address
->  IFA_ANYCAST:raw protocol address:anycast address
->  IFA_CACHEINFO:struct ifa_cacheinfo:Address information
->  .TE
-> -.\" FIXME Document struct ifa_cacheinfo
-> +.IP
-> +.EX
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-I expect users that need to use this struct to also need to include the
-header that defines it, right?  We should probably specify it by using
-an #include.  What do you think?
+for you to fetch changes up to 29ce8b8a4fa74e841342c8b8f8941848a3c6f29f:
 
-Have a lovely night!
-Alex
+  vdpa/mlx5: Fix PA offset with unaligned starting iotlb map (2024-11-12 18:05:04 -0500)
 
-> +struct ifa_cacheinfo {
-> +    __u32 ifa_prefered; /* Preferred lifetime remaining, in seconds */
-> +    __u32 ifa_valid;    /* Valid lifetime remaining, in seconds */
-> +    __u32 cstamp;       /* Creation timestamp, in hundredths of seconds =
-*/
-> +    __u32 tstamp;       /* Update timestamp, in hundredths of seconds */
-> +};
-> +.EE
-> +.IP
-> +.I ifa_valid
-> +cannot be zero, and
-> +.I ifa_prefered
-> +cannot be greater than
-> +.IR ifa_valid .
-> +A value of
-> +.B UINT32_MAX
-> +represents an infinite lifetime.
->  .TP
->  .B RTM_NEWROUTE
->  .TQ
-> --=20
-> 2.47.0
->=20
+----------------------------------------------------------------
+virtio: bugfix
 
---=20
-<https://www.alejandro-colomar.es/>
+A last minute mlx5 bugfix
 
---f7gmd3j6k5eoylin
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+Si-Wei Liu (1):
+      vdpa/mlx5: Fix PA offset with unaligned starting iotlb map
 
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmcz5BAACgkQnowa+77/
-2zJ4yg/+JpENPpflkfg+u6+X5zt6xvktmdBehI9nDnjhbmMgSyYKCcHoz25ZNE4B
-/2LrpeoC91ZPDncTyBw4ZAyQ8pxrWdwfsXW1/9Ok1vut2JmcN9hIe4WC40wQtTeo
-8/iQb7lVjb6LFI1ka4EZVvkAL32C0o+k+plrD7I0zWUMRGE4Ro2WHYGjX/NELY3t
-gLq2zTHu+zTm2fkWBcztMdwG3YjHqG30vOIXOo3SWff49c7EAqaMBCNqyqxIqekT
-B3FRorsJdgtNql/zhrfp2mOkoObnQM12maj12FfcLsUQbWDLcLDbC+wik79gdikN
-n+OKlOLeXw80fVLNt9c0h19ME/mRQJTXqnAxrDooXPl0hIjYiopy+/7jkGiX5jHI
-o672YrQyGXRDmPGoHYoqNTuUCtKCHJYHaKXXFO/Yn7/753k1cY+GnRCS5/7AUv5r
-AFhuuObVd2ap1OLpGYv3iIP85I0O6In0zrn5P93BVbIs9EZUIlt8hpZeVbv8AbRU
-oy0xvsxPhh0fg5gvqMc6RP51LrL+M5kkm5/LhSVV0+EQIkquUUBl8QkeqXEAtv2B
-USAUnTS/7AF+iLpbmf3Di38bJ1fggZgFRcMu37NJxZ0cqfFGx4eXLxqwNi+WdvLv
-gwz8DW4obmtblkSy0QcaD+goqEdRXmu+IX44VzySU3+OmnNWXCY=
-=NX2x
------END PGP SIGNATURE-----
+ drivers/vdpa/mlx5/core/mr.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
---f7gmd3j6k5eoylin--
 
