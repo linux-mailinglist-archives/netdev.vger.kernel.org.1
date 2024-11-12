@@ -1,127 +1,116 @@
-Return-Path: <netdev+bounces-143955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480F09C4D5C
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:35:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF639C4D6F
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFE1BB28103
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:32:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98AD6B21714
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9971B205AD9;
-	Tue, 12 Nov 2024 03:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713F91A072A;
+	Tue, 12 Nov 2024 03:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPHS1LaR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KX3RQ1hS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FAB1A072A;
-	Tue, 12 Nov 2024 03:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF4C4C91
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 03:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731382345; cv=none; b=Phd86Jub0pXVrN1lKb+FvyquGv4+Ik5NuhlIoQtpjXhY9sVK1L1OTU8UPMaJKH9tS72YYNmNEXjWDlm4Q0NG0IYxogFy5Xs9LkMzUn3NZs1q+makwIvkddrgv8GFPnaAJo7XYrx4dEEoQZJcvMSyJ60Evv2HlXAzkWUc/mQC3DU=
+	t=1731382823; cv=none; b=LOBqgOAPI6ZkyhsEZY9eSodskvMEl3SQaVo5XQBYLdXLPsYaDKBpzMxq2CAjXVnHpoIdB6vQ9ar+UHBkj6rULlx/AtPyT4ac0KmgkW16qTUWgnnBfXaPh0AKaB5/lEvXTvHGJYMqwAOdauuIuvgieJPT/FHKuNWc2SW3xFSuI9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731382345; c=relaxed/simple;
-	bh=CRaC5wjfbFfQA5LdfDrUsa3MI7ETN4OH4NFZVHy3LZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QOPYjepGjN6wYs2Xw4UEk9/cYJkq51WjLjWdNC1P8L8m8yVQYY6YdzTP10tilxiJqH7X/8CTSP4PpE+wj6ESsaXjAGjgGwmQAWyp7hisVBe4TGneQezsmevlF4EZmw3BKec/pdTP27CipJJ7wJ3YvMncA8crGHum4Phk5ossbtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPHS1LaR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CC2C4CECD;
-	Tue, 12 Nov 2024 03:32:23 +0000 (UTC)
+	s=arc-20240116; t=1731382823; c=relaxed/simple;
+	bh=wreQqtup/TwmXd62eyYqU+k8CcLEo5tJ39+JGKusVwo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fPO9vgPnC/m5qO0iSHZRkzyL5IbqtcKMVw17Bf6gt5OaF+RY+abrkA5CkrC6gi5ggaCxKRyKaekLHsKc6ssDzgFIZJWBpMQG/gVcl/G3HduuW+qoHOpEAgkmK9L+vjztPhA414gjiZlaqi6LkPjpoVziEYdekcZSmjTYSnnB/oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KX3RQ1hS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0E09C4CECD;
+	Tue, 12 Nov 2024 03:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731382345;
-	bh=CRaC5wjfbFfQA5LdfDrUsa3MI7ETN4OH4NFZVHy3LZ4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qPHS1LaRS738ZEdxN0SIOOejrDNeR3mIZxf8FoqvHVzE+3P3HSDY/j89/4CNJY/Yf
-	 8hhjNmzYPFoAGbat558J4jia9L6DHohhw0myhq/FXq5DCXErxtsPeIeOtlclyDs4tR
-	 LfkjrG0cQozV0elK6PBJl7JWLZP514f7/Y3EWaSRIJmk9w4wF+9bgZ52aUjfiJMbcB
-	 N/ITfrxNiOAELhQo9fW15NPfJJq2o9RZ25mV2R+apxtOA0SrGqeurIZ9SvEQLUNYNo
-	 TmkKiKJ3HtXv96XDD6L6cva4MvyIkSREmIoMo3a0fij2iRWm9tbbDpNfMAzK1xkj99
-	 4cbvrSuUZL8ng==
-Date: Mon, 11 Nov 2024 19:32:22 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
- Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, Pantelis Antoniou
- <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- Byungho An <bh74.an@samsung.com>, Kevin Brace
- <kevinbrace@bracecomputerlab.com>, Francois Romieu <romieu@fr.zoreil.com>,
- Michal Simek <michal.simek@amd.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Zhao Qiang
- <qiang.zhao@nxp.com>, linux-can@vger.kernel.org (open list:CAN NETWORK
- DRIVERS), linux-kernel@vger.kernel.org (open list),
- linux-arm-kernel@lists.infradead.org (moderated list:ARM/Allwinner sunXi
- SoC support), linux-sunxi@lists.linux.dev (open list:ARM/Allwinner sunXi
- SoC support), linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC
- FS_ENET DRIVER)
-Subject: Re: [PATCHv2 net-next] net: use pdev instead of OF funcs
-Message-ID: <20241111193222.00ae2f3e@kernel.org>
-In-Reply-To: <20241111210316.15357-1-rosenp@gmail.com>
-References: <20241111210316.15357-1-rosenp@gmail.com>
+	s=k20201202; t=1731382822;
+	bh=wreQqtup/TwmXd62eyYqU+k8CcLEo5tJ39+JGKusVwo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KX3RQ1hSdopEdPL3A/ZPZoPEg8BK6ClzHfFSkNg0DF7JKD9/ia553kYcxGg+CWCOb
+	 a+P2NIwo1Zm5eHhoiX1+xmVdZI7io0iZP4Oo327t6vmH/+C9GuNHikLfKBXiK73vW3
+	 BqjOV738OXkRO/vs4LAr0ah7SVeiVAamuyVhsnK6CjQepVgdQ7xdM23ImINbLUCYQR
+	 61PJ4AmFYSmTI3+s2FB2med1xKJ8cxyIs3fKhpb31p3bABNO+yt3hBdToJhy/CENpq
+	 DfA6cNxBBJpQmkefa1xm1uPYGxMK3wqFMdjYlF5tNaTdEnDnwTE4Y5dfIHHAwRfF59
+	 6KZdZiU1bfAKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB16C3809A80;
+	Tue, 12 Nov 2024 03:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/12] mlx5 esw qos refactor and SHAMPO cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173138283275.71105.7062967652158477670.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Nov 2024 03:40:32 +0000
+References: <20241107194357.683732-1-tariqt@nvidia.com>
+In-Reply-To: <20241107194357.683732-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com
 
-On Mon, 11 Nov 2024 13:03:16 -0800 Rosen Penev wrote:
-> --- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c
-> +++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c
-> @@ -111,7 +111,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
->  	}
->  
->  	/* Get the SXGBE common INT information */
-> -	priv->irq  = irq_of_parse_and_map(node, 0);
-> +	priv->irq = platform_get_irq(pdev, 0);
->  	if (priv->irq <= 0) {
->  		dev_err(dev, "sxgbe common irq parsing failed\n");
->  		goto err_drv_remove;
-> @@ -122,7 +122,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
->  
->  	/* Get the TX/RX IRQ numbers */
->  	for (i = 0, chan = 1; i < SXGBE_TX_QUEUES; i++) {
-> -		priv->txq[i]->irq_no = irq_of_parse_and_map(node, chan++);
-> +		priv->txq[i]->irq_no = platform_get_irq(pdev, chan++);
->  		if (priv->txq[i]->irq_no <= 0) {
->  			dev_err(dev, "sxgbe tx irq parsing failed\n");
->  			goto err_tx_irq_unmap;
-> @@ -130,14 +130,14 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
->  	}
->  
->  	for (i = 0; i < SXGBE_RX_QUEUES; i++) {
-> -		priv->rxq[i]->irq_no = irq_of_parse_and_map(node, chan++);
-> +		priv->rxq[i]->irq_no = platform_get_irq(pdev, chan++);
->  		if (priv->rxq[i]->irq_no <= 0) {
->  			dev_err(dev, "sxgbe rx irq parsing failed\n");
->  			goto err_rx_irq_unmap;
->  		}
->  	}
->  
-> -	priv->lpi_irq = irq_of_parse_and_map(node, chan);
-> +	priv->lpi_irq = platform_get_irq(pdev, chan);
->  	if (priv->lpi_irq <= 0) {
->  		dev_err(dev, "sxgbe lpi irq parsing failed\n");
->  		goto err_rx_irq_unmap;
+Hello:
 
-Coccicheck wants you to drop the errors:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:116:2-9: line 116 is redundant because platform_get_irq() already prints an error
-drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:127:3-10: line 127 is redundant because platform_get_irq() already prints an error
-drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:135:3-10: line 135 is redundant because platform_get_irq() already prints an error
-drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:142:2-9: line 142 is redundant because platform_get_irq() already prints an error
+On Thu, 7 Nov 2024 21:43:45 +0200 you wrote:
+> Hi,
+> 
+> This patchset for the mlx5 core and Eth drivers consists of 3 parts.
+> 
+> First patch by Patrisious improves the E-switch mode change operation.
+> 
+> The following 6 patches by Carolina introduce further refactoring for
+> the QoS handling, to set the foundation for future extensions.
+> 
+> [...]
 
-You can make it a separate patch in a series, for clarity.
+Here is the summary with links:
+  - [net-next,01/12] net/mlx5: E-switch, refactor eswitch mode change
+    https://git.kernel.org/netdev/net-next/c/ab85ebf43723
+  - [net-next,02/12] net/mlx5: Simplify QoS normalization by removing error handling
+    https://git.kernel.org/netdev/net-next/c/5a731857656e
+  - [net-next,03/12] net/mlx5: Generalize max_rate and min_rate setting for nodes
+    https://git.kernel.org/netdev/net-next/c/ac778fefed34
+  - [net-next,04/12] net/mlx5: Refactor scheduling element configuration bitmasks
+    https://git.kernel.org/netdev/net-next/c/cc4bb15ffa84
+  - [net-next,05/12] net/mlx5: Generalize scheduling element operations
+    https://git.kernel.org/netdev/net-next/c/663bc605d0db
+  - [net-next,06/12] net/mlx5: Integrate esw_qos_vport_enable logic into rate operations
+    https://git.kernel.org/netdev/net-next/c/d67bfd10e668
+  - [net-next,07/12] net/mlx5: Make vport QoS enablement more flexible for future extensions
+    https://git.kernel.org/netdev/net-next/c/be034baba83e
+  - [net-next,08/12] net/mlx5e: SHAMPO, Simplify UMR allocation for headers
+    https://git.kernel.org/netdev/net-next/c/8a0ee54027b1
+  - [net-next,09/12] net/mlx5e: SHAMPO, Fix page_index calculation inconsistency
+    https://git.kernel.org/netdev/net-next/c/1a4b58857704
+  - [net-next,10/12] net/mlx5e: SHAMPO, Change frag page setup order during allocation
+    https://git.kernel.org/netdev/net-next/c/4f56868b7132
+  - [net-next,11/12] net/mlx5e: SHAMPO, Drop info array
+    https://git.kernel.org/netdev/net-next/c/945ca432bfd0
+  - [net-next,12/12] net/mlx5e: SHAMPO, Rework header allocation loop
+    https://git.kernel.org/netdev/net-next/c/ab4219db89da
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
