@@ -1,137 +1,102 @@
-Return-Path: <netdev+bounces-143975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA84B9C4F4B
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:19:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A01C89C4F5D
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:25:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50807B22398
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:19:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58E2B1F2164E
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E335E20B217;
-	Tue, 12 Nov 2024 07:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5821E20ADC0;
+	Tue, 12 Nov 2024 07:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nJSJJ653"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFC819EED4
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 07:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05A920A5E1;
+	Tue, 12 Nov 2024 07:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731395951; cv=none; b=aBRMijBxdMwDMiq3iXNm8TTl0epLwqu+5KEMQB8gcsDji9c79vpJ3Ad+YDoirLiGEbdA7HJO6+Nnvqd8/sf785gYQGu86VpDBAkFFFp/vMX87ea7JZGvkaWPKnMs935Y8mpZ9pcH2qaY1ttDYKZnf4GHxIVUX3aCT3yG+UeQXo8=
+	t=1731396321; cv=none; b=oXXshUPvXfydNaEYYI2WK0KgRuS0UkwnNr8ebyWvDyiCsnetN9T4yVdMAlprdU23Ai4a3q60FJkJ8yur843/+sjJowsIB3e5F9V667g1JyHIjY+jKAQhcJ9wnUdP7QgtC+/w/c0WZWIHNYN5foyiamceTYEMrMiNgVZH1ac2ScE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731395951; c=relaxed/simple;
-	bh=76xbpcZxfKnQKxcIbxF4rUKygZAb+/RF0H6O+QjZFrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fc7qFZSWSYi0dZ1jAz1ME9lmB2OINYsWdamddhGy+1RncoGEiJeM+KRnGywVwgyJ/Lgdwh64Uz9DrUhw+IrMXj2y1rGc/tekZ9KCowaW0Pq7EQU5K9XOEwFOlYVKFX0vIn7I5d7UErxzDnRduZXEt47/EDvLdfRMA1ituWNxock=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tAlAl-00029k-RZ; Tue, 12 Nov 2024 08:18:47 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tAlAk-000N82-10;
-	Tue, 12 Nov 2024 08:18:46 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 2C92437111E;
-	Tue, 12 Nov 2024 07:16:04 +0000 (UTC)
-Date: Tue, 12 Nov 2024 08:16:02 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Sean Nyekjaer <sean@geanix.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
- voltage
-Message-ID: <20241112-hulking-smiling-pug-c6fd4d-mkl@pengutronix.de>
-References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
- <20241111101011.30e04701@kernel.org>
- <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
+	s=arc-20240116; t=1731396321; c=relaxed/simple;
+	bh=xyopsM7BqzZrYVf2ZRi9qIaLHUvjs5NWZpYOarQWMGs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J4jla+hEbh0ypbk227zJGn6zG93miNOHLT4sjIGPFrmuXvkHK2/v6uGPsIkT37b8e1uyo2+1MC4BhTcWcb6bOTqYRXDidCYmRuwgdpVHSfMYC/ZzIgZ8xrYQLKylwK/aDl6CaqeO82uJ5MkEf8pihGSQzk9BaFPA6RbLDIYmxuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nJSJJ653; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731396319; x=1762932319;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xyopsM7BqzZrYVf2ZRi9qIaLHUvjs5NWZpYOarQWMGs=;
+  b=nJSJJ65360d7ARdUtD1HAbt+VTDi5F6lrhBsJ7wwEn6Tu3PXfh+vA4If
+   b+6oiZix0OGtwGh6jZkmq4ZTT/jLfkb0b1G5ZY07FD0L30YGlExX/0l+2
+   deYB60HLn8Kxskw+KLhYMKVJ1ecxyd82K3D60BQoB9H3xhVDEqI00DAkI
+   xjEgItvLf2aD32HVFqqhtCp2nUbWkgbkt4/J+mnDH+1CiA/UJFlF7+Ze6
+   L7X/9dk3LW5CRW21Gev0KTAgptQqrZgPtktmicawhqm17BP8U/x8vPMum
+   I8X5u3Y+ecIYtoaxZfWiFlhq6GMxEargPb9ML7mT818YM7d/logdCpJ0q
+   w==;
+X-CSE-ConnectionGUID: 2d7KKa0xQQ2V1HXXFuBeDQ==
+X-CSE-MsgGUID: xpXn7O1wShq6ilrnPXxuAg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31387783"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="31387783"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 23:25:19 -0800
+X-CSE-ConnectionGUID: 5Sp2DgRqThWVvMbHZi+REA==
+X-CSE-MsgGUID: RnwHsSYBQVqVEP1H2VdsXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,147,1728975600"; 
+   d="scan'208";a="87074230"
+Received: from unknown (HELO YongLiang-Ubuntu20-iLBPG12.png.intel.com) ([10.88.229.33])
+  by fmviesa007.fm.intel.com with ESMTP; 11 Nov 2024 23:25:16 -0800
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net v1 0/2] Fix ethtool --show-eee for stmmac
+Date: Tue, 12 Nov 2024 15:24:45 +0800
+Message-Id: <20241112072447.3238892-1-yong.liang.choong@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2dmhaauk3amznaiq"
-Content-Disposition: inline
-In-Reply-To: <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
+This fix ensures that 'ethtool --show-eee' displays the correct
+status for stmmac.
 
---2dmhaauk3amznaiq
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
- voltage
-MIME-Version: 1.0
+Choong Yong Liang (2):
+  net: phy: Introduce phy_update_eee() to update eee_cfg values
+  net: stmmac: update eee_cfg after mac link up/down
 
-On 12.11.2024 07:39:12, Sean Nyekjaer wrote:
-> On Mon, Nov 11, 2024 at 10:10:11AM +0100, Jakub Kicinski wrote:
-> > On Mon, 11 Nov 2024 09:54:48 +0100 Sean Nyekjaer wrote:
-> > > This series adds support for setting the nWKRQ voltage.
-> >=20
-> > There is no need to CC netdev@ on pure drivers/net/can changes.
-> > Since these changes are not tagged in any way I have to manually
-> > go and drop all of them from our patchwork.
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  4 ++++
+ drivers/net/phy/phy_device.c                  | 24 +++++++++++++++++++
+ include/linux/phy.h                           |  2 ++
+ 3 files changed, 30 insertions(+)
 
-Does the prefix "can-next" help, i.e.:
+-- 
+2.34.1
 
-| [PATCH can-next v2 0/2]
-
-which can be configured via:
-
-| b4 prep --set-prefixes "can-next"
-
-> Oh sorry for that.
-> I'm using b4's --auto-to-cc feature, any way to fix that?
-
-You can manually trim the list of Cc: using:
-
-| b4 prep --edit-cover
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---2dmhaauk3amznaiq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmczAK8ACgkQKDiiPnot
-vG9RuQf+Nj+pyf7e2gKIkxeZr+ao11kZrMz4UOp00qlZNwshVskI6oUB8/t0cDxD
-qJO7Rfs1u4FqzvVsrB7yvtJZCxFNQrgIiUwEGJAP1Kp1/+/JKBoFkWVlvdCY1Olg
-3Tden0OB9T5P99cBQ4aJMQjma/TRuAnC0RNhURVGhDGqwlr7SPorfRXH0G4s7vni
-lFqRQ9CLH4pz5r2RbnVNFC0JQcyqZZAXr9j+r4U9RMg9BI80ATaAXK6aHJUP0nES
-QjM/aXXdI6OEQII9i+LobAqUlGiCoyAhTcLiClOwhl2bWst5TMe5Ntu1x5qpGNQS
-jYpaZnAnmBDkTVlYJw+kzDpVKcL0+w==
-=Y/tF
------END PGP SIGNATURE-----
-
---2dmhaauk3amznaiq--
 
