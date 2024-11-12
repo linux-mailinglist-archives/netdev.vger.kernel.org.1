@@ -1,168 +1,113 @@
-Return-Path: <netdev+bounces-143892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 284F09C4A7C
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:13:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B6399C4A9F
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE8B91F2180A
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:13:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC43B227E4
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:15:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DCF4C91;
-	Tue, 12 Nov 2024 00:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9470E1EB2F;
+	Tue, 12 Nov 2024 00:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UWKmA3N3"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Zy+aL1Mm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319E033D8;
-	Tue, 12 Nov 2024 00:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039954879B
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 00:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731370404; cv=none; b=tntP2lk7yM2kiNIReCqU+wzCQRDUy8J91LeY49oxcMk9zcF0kL22IG19HpcOVAFx08hAPuquTfjiCEfUMEMiadJYkV+S7mnFML05w/9UZrRiSyKNJMnzCC0JAa18kUgYi7sofR64qIa5mFu+6MTVnREvs88BCWcu/f0pMINX6g8=
+	t=1731370509; cv=none; b=FXKGRijFYRwxcTD5LZKFELssK/KiF83JoB/w85HlFdACvqsD85dey8a9xouZKG4+XXjwlMnKinsuU1HdQ48mMT3NtvW9VbCYu7Xbadc9xmYo3fOuXd8+czgX8DlXqTXlzxOEqOeKgJWZN+nq97TWD4aBm85+S5158fKUJD91x1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731370404; c=relaxed/simple;
-	bh=c8JMhxaw2aTzUlJqs9T0oHnklHlgTT7i1tkiYE+Chjw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cswdId/tMgtcwz5X9vv7jUKKpcCts/8iN6hlxihq64Xl7DvzCqSqSUK5JORtfVSbAs+BsqiFB6Z815F2ZrWpBEJqUMYSoENtBg0a6nng9dTYXVUPshAYSzqaXjA3iT+aG0cp3gzfiTmAKs8hbNJCThyjXvn2iJl/8N7ILfHwqY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UWKmA3N3; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1731370509; c=relaxed/simple;
+	bh=pAJytu3bbNTGxdvSfv26alPURMBlGfNV3WRynyLWi7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kQkAMUeU7PZuiS7w2XnUZr96zWtBkUZk8Q6dyJgT0g7BvGNzhpWxcNTD22u2lXheg8GLRY1b5Ppo2zvbWy9EZ+fWNJNQ0UJq0M4WYADpaat9uycJVdtNkmkHKvnOHkHH3+B/Z+9/JLTJhZa3HR6m4CvDCirZKfQ22lM5zEOgyck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Zy+aL1Mm; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20c8c50fdd9so41079575ad.0
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 16:15:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731370403; x=1762906403;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7PqkhJJe7HHVVYYciRML661Up3/RTfmAgq2lLOwz/+U=;
-  b=UWKmA3N3FKQfJ3MAWpmfD+dkCe75AehXn+JmeWoVRNxEbGNvmb7iO29j
-   Xymbp98XN3H3KyVECDk/xNy2cIKAkDiPuRM/ggsBY1GO7H5U5ha6y/iR9
-   2X3XewopXBZBkWOPOMIVkFgye0vxyn57pMPjZQ2hQwbj/Jmqsg435SWiD
-   k=;
-X-IronPort-AV: E=Sophos;i="6.12,146,1728950400"; 
-   d="scan'208";a="694616557"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 00:13:19 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:29838]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.168:2525] with esmtp (Farcaster)
- id 7fdd29ac-bb45-4d6d-9f13-6f1edba3eb25; Tue, 12 Nov 2024 00:13:18 +0000 (UTC)
-X-Farcaster-Flow-ID: 7fdd29ac-bb45-4d6d-9f13-6f1edba3eb25
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 12 Nov 2024 00:13:15 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 12 Nov 2024 00:13:11 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <neilb@suse.de>
-CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
-	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
-	<horms@kernel.org>, <jlayton@kernel.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-nfs@vger.kernel.org>, <liujian56@huawei.com>,
-	<netdev@vger.kernel.org>, <okorniev@redhat.com>, <pabeni@redhat.com>,
-	<tom@talpey.com>, <trondmy@kernel.org>
-Subject: Re: [PATCH net v3] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
-Date: Mon, 11 Nov 2024 16:13:08 -0800
-Message-ID: <20241112001308.58355-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <173136915454.1734440.13584866019725922631@noble.neil.brown.name>
-References: <173136915454.1734440.13584866019725922631@noble.neil.brown.name>
+        d=fastly.com; s=google; t=1731370507; x=1731975307; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pAJytu3bbNTGxdvSfv26alPURMBlGfNV3WRynyLWi7E=;
+        b=Zy+aL1Mm/hXBu36yeNjvC99KVVu3raDO1fP7e3npRyvBArMDFtWXh638xXCRqlFv85
+         5/j7nwLey6+XHzMPe7uhFN3GpG6bNk0tYMwULavK1Kybeo1MrOq3RUiI4jisytwpy4Jq
+         mLkU8XKGDc0zFg3vIEySONg7tqgD0FN+yk3WA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731370507; x=1731975307;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pAJytu3bbNTGxdvSfv26alPURMBlGfNV3WRynyLWi7E=;
+        b=G1bxrenj0ukz//1HYDL8IEpE3oeXfLzbVxRvHEzqoKk/X+XREBoqwJl3Hz7zPEyQKs
+         2A5XS0OjiknaKzg2CD0jCMnvJdLBYgE9WJS4wyL3nfXqwAX+df310Js+fR6AL39lHxf8
+         xQdLr/16zrnck6AAKx/SROMbX/ZiVdlY/lNPn60u+Q/MNfsGm46AiTYRGvYuWGDylOGy
+         N8UFmROXD/gBeZf4mzaVQQVslNBL/aTsjBWCphxkcSpBSImLEaiB5TgC25RV/tsDPZFG
+         jS7sAMR1nCw4gDXYsJ9yw/vv7Z/KAC8gwDKrc/mWB/CcRJtWAi1G2HbwHu5nEqrgyDHP
+         lzdw==
+X-Gm-Message-State: AOJu0Yy4AKd10rmD1+tjHKSHDYzInBx8X3IPQHVAO2LrWOCpMSuPvdti
+	dsZV2HSL4PO1Yfqd4/dWg+hUG7kLyJxEvS8x6U4lgTZ8+Car5LtBbVgYu3dk78c=
+X-Google-Smtp-Source: AGHT+IFKLRcira0M/l/zTbkyL1Rk4QR9G6rkQlsJ/FVWGSD9b7xJxC87jZ+AeMsKJ27ibV1kZ/+VQQ==
+X-Received: by 2002:a17:902:eccd:b0:20c:e169:eb7b with SMTP id d9443c01a7336-211821c16e2mr249663155ad.14.1731370507109;
+        Mon, 11 Nov 2024 16:15:07 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177e419a4sm81967435ad.149.2024.11.11.16.15.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 16:15:06 -0800 (PST)
+Date: Mon, 11 Nov 2024 16:15:04 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
+Subject: Re: [PATCH net-next v2 00/12] Begin upstreaming Homa transport
+ protocol
+Message-ID: <ZzKeCJZoEIFoiJyO@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org,
+	linux-api@vger.kernel.org
+References: <20241111234006.5942-1-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241111234006.5942-1-ouster@cs.stanford.edu>
 
-From: "NeilBrown" <neilb@suse.de>
-Date: Tue, 12 Nov 2024 10:52:34 +1100
-> > diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-> > index 6f272013fd9b..d4330aaadc23 100644
-> > --- a/net/sunrpc/svcsock.c
-> > +++ b/net/sunrpc/svcsock.c
-> > @@ -1551,6 +1551,10 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
-> >  	newlen = error;
-> >  
-> >  	if (protocol == IPPROTO_TCP) {
-> > +		__netns_tracker_free(net, &sock->sk->ns_tracker, false);
-> > +		sock->sk->sk_net_refcnt = 1;
-> > +		get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-> > +		sock_inuse_add(net, 1);
-> 
-> This is really ugly.  These internal details of the network layer have
-> no place in sunrpc code. There must be a better way.
+On Mon, Nov 11, 2024 at 03:39:53PM -0800, John Ousterhout wrote:
+> This patch series begins the process of upstreaming the Homa transport
+> protocol. Homa is an alternative to TCP for use in datacenter
+> environments. It provides 10-100x reductions in tail latency for short
+> messages relative to TCP. Its benefits are greatest for mixed workloads
+> containing both short and long messages running under high network loads.
+> Homa is not API-compatible with TCP: it is connectionless and message-
+> oriented (but still reliable and flow-controlled). Homa's new API not
+> only contributes to its performance gains, but it also eliminates the
+> massive amount of connection state required by TCP for highly connected
+> datacenter workloads.
 
-I asked to do this way.  I agree this way is really ugly.  Similar
-code exists in MPTCP, SMC, CIFS, etc, so I plan to add a new API for
-this case, but this requires huge change adding a new parameter for
-->create() prototype and the changes are not backportable.
+Quick note for future versions:
 
-https://github.com/q2ven/linux/commit/bb8b8814a73b3f50c3fef5eaf8d30d8c1df43e7b
-https://github.com/q2ven/linux/commits/427_2
+Consider adding a changelog to the cover letter and to the
+individual patches which change from revision to revision to make
+it easier for folks to follow along with what changed.
 
-After my series, we can use the following but cannot backport it to
-stable.
+You can find more information about this here:
+https://www.kernel.org/doc/html/v6.11/process/submitting-patches.html#respond-to-review-comments
 
-  sock_create_net(net, family, type, protocol);
+And it might be helpful to take a look at other series on the list
+which have multiple revisions [1] to get a sense of how others
+typically do this.
 
-  e.g. commit for MPTCP
-  https://github.com/q2ven/linux/commit/24a4647561272c1e67a685d8403e27eb863398cf
-
-That's why I suggested to go with the ugly way and I will clean them
-up in the next cycle.
-
-So, finally the sunrpc code will be much cleaner and the netns refcnt
-will be touched only in the core code.
-
-
-> 
-> Can we pass '0' for the kern arg to __sock_create()?  That should fix
-> the refcounting issues, but might mess up security labelling.
-
-This should be avoided as it's confusing for BPF programs, LSMs, and
-LOCKDEP.
-
-
-> 
-> Can we wait for something before we call put_net() to release the net.
-> 
-> Maybe we want to split the "kern" arg t __sock_create() and have
-> "kern" which affects labeling and "refnet" with affects refcounting the
-> net.
-
-This is exactly what my series does, but again, it's not backport
-friendly.
-https://github.com/q2ven/linux/commit/413e867b4aee9e9f60f3c33fb38d2004aeb29c40
-
-
-> 
-> I had a quick look and very nearly every caller of __sock_create()
-> outside of net/core really does want refcount.  Many callers of
-> sock_create_kern() possibly don't.
-
-Actually, since sock_create_kern() is added, we no longer need to
-export __sock_create(), so I have a patch to convert them to
-sock_create_kern().
-
-And most of TCP socket does need refcnt, but non-TCP won't.
-Also, handshake one is exception, which uses TCP but only in init_net,
-where we need not take care of netns refcnt.
-
-https://github.com/q2ven/linux/commit/b56888bbbf327d57ea25a6b97275d6b9b8ad043a
-
-
-
-> 
-> So I really think this needs to be cleaned up in net/core, not in all
-> the different network clients in the kernel.
-
-Yes, will be done in the next cycle.
+[1]: https://lore.kernel.org/netdev/20241030-feature_ptp_netnext-v19-0-94f8aadc9d5c@bootlin.com/
 
