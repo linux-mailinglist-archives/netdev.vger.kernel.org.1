@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-144208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301309C60E7
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:58:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C1F9C60E9
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:58:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E57392815E2
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:58:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C80FF28057A
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF43218953;
-	Tue, 12 Nov 2024 18:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F28218D85;
+	Tue, 12 Nov 2024 18:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hfk7Ntxi"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fYQPMVeO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53D72185B2;
-	Tue, 12 Nov 2024 18:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB28218D72;
+	Tue, 12 Nov 2024 18:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731437883; cv=none; b=cwCMbJKKgHPIXlbgBgQuovXdjRwZtW6B98WRhQ1Dl3DSjLzmYHTU1QLAsdNS1vTpm80lEW1GRPlqaDM209zQ7PqyJTj8LhE0DT8XM5A+SsERm9qinq/9w7vvpEwBkiNrPiu4kYH7JI7flw6m6TZZmmwyR50chgh4oWSNCpUBkpY=
+	t=1731437889; cv=none; b=cHo61H1dwSgiA7TySuXlJuvfBr2pfNLmaMGxLFw75ERESVBBT07kSivmWGPQMiDFg7LoORfHv8NGBPkcSoFYseLCAK6Z8kA/VIwXAWF7Af22kPp3H6yiKZ9ZY62Y7bqQg8H3qH53l+TIb8k5wz8HxJeo4/wkF7mSRZkKDTWCR0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731437883; c=relaxed/simple;
-	bh=+gLzr/wUkfudvxioSplH8sdG2Mwsta+tAXdxakw15fg=;
+	s=arc-20240116; t=1731437889; c=relaxed/simple;
+	bh=Olj/CczKrYOqJAkroOgmQD2BSpM3ZMqXK4LXahvRPRM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EK/xImnUVFMpd7gS9JjiHtJmMFYPNlNXeTYoEdNFuTFLmKcBINJhDhJjFBSDK41CP/yMjamcUMRYTB4fBE4DXoqRacl5hbP7XyJhWBZ89jvN/vz1bafrgGTGDc2zI8iHC4aDmRB7yjKwAgMwe8dYpc79eMK14tSgB80UdAIcrGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hfk7Ntxi; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=E8TNMgYU7kazeTQ+8d8WfxqHlwYCHuGILbmJ4zDdOMMVN7VJlLIBRy5gHAr6Pp6PCOHUfr2lV7b6uugG7h+FoD11nBmpnQ4Y/Z4xog03tj6fnhNKWjqUc22H9pzxJ2CVLU1TL9MgihYMx9rgqxMeDS3cAf57+NsLWJDjZAkq0ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fYQPMVeO; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACFpGlR025821;
-	Tue, 12 Nov 2024 10:57:52 -0800
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACFpOoY025896;
+	Tue, 12 Nov 2024 10:57:58 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=R
-	GPAfJbgP+k0BnU82UKhXSr/GRZBHdEt6KZTtlEpRTI=; b=hfk7NtxiSC8mtu4Hf
-	iPpVg0fAYxPryReZaskCYk64wl/fRbKycAVgZbD2XedqmErWzgEbA/K1CwiRRY37
-	HsEpaCoWaG1jL7Nm2MZlVmE+HXOjD59cgdSDjxh3OM8Ce4/8vB3fYX7nXSHrX95m
-	tTIF6DrBGQdEBDGlk89PgvnXNSPK36WXSnj8eTCMilNYWni3nlxVVHj/DSzs9JDc
-	AaL5SqBZTqmi6mHAmxRl9EjMxORmBxJ0JoWA+tvW4D6wZB6EjO/qZLvq+97hRLnH
-	UILaPwtR0vLONfDHLgwac1XYvrqSTt7fn3u6ooul3JNfKDVc+OfUNADfB47N85j2
-	PiBUA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42va160ew6-1
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=f
+	LXiZkMQ4VWw0bJl3kPJ1l5e9bVtvzq3tkgltpLtcAw=; b=fYQPMVeO9tTzhwUET
+	eLj7D8uvZiXaZiJ6q/R2YH5q9N04LCv9yjo65KRlhSWlZsRJ0d08bPqQGpWrwjrX
+	03gDZZtVnP8vZXIJgl4CK56L4hg4+ZEBS3SajZ95XV7CRj5mNg9hh2o8oG34ACPN
+	ueD2+UdzgI9hm2lfxz43I2OD3jKzJWHXs38lenX3aJ8mcvE66GLq0Zx6xZgIMtc/
+	Dujba/mjDGc9k9z2cRYiLc+rsaYaMcXr3TFjBZDsMOiy/OTJ5qNR2HlrffttFr4d
+	DI/Byelh/1jxw5hsuPV+9m6S+JzuqCoD+8eBI4PYwNc+8iqZIERnUfKHnR8RZIjs
+	MMCww==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42va160ewa-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Nov 2024 10:57:52 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	Tue, 12 Nov 2024 10:57:58 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 12 Nov 2024 10:57:51 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 12 Nov 2024 10:57:51 -0800
+ 15.2.1544.4; Tue, 12 Nov 2024 10:57:56 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 12 Nov 2024 10:57:56 -0800
 Received: from hyd1425.marvell.com (unknown [10.29.37.152])
-	by maili.marvell.com (Postfix) with ESMTP id F04C83F7045;
-	Tue, 12 Nov 2024 10:57:46 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id CD4033F7045;
+	Tue, 12 Nov 2024 10:57:51 -0800 (PST)
 From: Sai Krishna <saikrishnag@marvell.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
         <pabeni@redhat.com>, <netdev@vger.kernel.org>,
@@ -66,9 +66,9 @@ To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
         <hkelam@marvell.com>, <sbhatta@marvell.com>, <andrew+netdev@lunn.ch>,
         <kalesh-anakkur.purayil@broadcom.com>
 CC: Sai Krishna <saikrishnag@marvell.com>
-Subject: [net-next PATCH v3 2/6] octeontx2-af: CN20k basic mbox operations and structures
-Date: Wed, 13 Nov 2024 00:23:22 +0530
-Message-ID: <20241112185326.819546-3-saikrishnag@marvell.com>
+Subject: [net-next PATCH v3 3/6] octeontx2-af: CN20k mbox to support AF REQ/ACK functionality
+Date: Wed, 13 Nov 2024 00:23:23 +0530
+Message-ID: <20241112185326.819546-4-saikrishnag@marvell.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241112185326.819546-1-saikrishnag@marvell.com>
 References: <20241112185326.819546-1-saikrishnag@marvell.com>
@@ -80,430 +80,770 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: 8N5BWXTizCiZ93JWnBeubfrvRwibAR-9
-X-Proofpoint-ORIG-GUID: 8N5BWXTizCiZ93JWnBeubfrvRwibAR-9
+X-Proofpoint-GUID: FCGjIj7Kdt2ToyDw0o-0n4_6r9cdUb0-
+X-Proofpoint-ORIG-GUID: FCGjIj7Kdt2ToyDw0o-0n4_6r9cdUb0-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-This patch adds basic mbox operation APIs and structures to add support
-for mbox module on CN20k silicon. There are few CSR offsets, interrupts
-changed between CN20k and prior Octeon series of devices.
+This implementation uses separate trigger interrupts for request,
+response MBOX messages against using trigger message data in CN10K.
+This patch adds support for basic mbox implementation for CN20K
+from AF side.
 
 Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
 Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
 ---
- .../ethernet/marvell/octeontx2/af/Makefile    |  3 +-
- .../ethernet/marvell/octeontx2/af/cn20k/api.h | 22 +++++++
- .../marvell/octeontx2/af/cn20k/mbox_init.c    | 49 ++++++++++++++
- .../ethernet/marvell/octeontx2/af/cn20k/reg.h | 27 ++++++++
- .../net/ethernet/marvell/octeontx2/af/mbox.c  |  3 +
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  7 ++
- .../net/ethernet/marvell/octeontx2/af/rvu.c   | 65 +++++++++++++++----
- .../net/ethernet/marvell/octeontx2/af/rvu.h   | 19 ++++++
- .../marvell/octeontx2/af/rvu_struct.h         |  6 +-
- 9 files changed, 186 insertions(+), 15 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+ .../ethernet/marvell/octeontx2/af/cn20k/api.h |   8 +
+ .../marvell/octeontx2/af/cn20k/mbox_init.c    | 212 ++++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/cn20k/reg.h |  17 ++
+ .../marvell/octeontx2/af/cn20k/struct.h       |  25 +++
+ .../net/ethernet/marvell/octeontx2/af/mbox.c  |  83 ++++++-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |  70 ++++--
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  16 +-
+ .../marvell/octeontx2/nic/otx2_common.c       |  10 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   9 +-
+ 10 files changed, 417 insertions(+), 34 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/Makefile b/drivers/net/ethernet/marvell/octeontx2/af/Makefile
-index 3cf4c8285c90..38d8599dc6eb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/Makefile
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/Makefile
-@@ -11,4 +11,5 @@ rvu_mbox-y := mbox.o rvu_trace.o
- rvu_af-y := cgx.o rvu.o rvu_cgx.o rvu_npa.o rvu_nix.o \
- 		  rvu_reg.o rvu_npc.o rvu_debugfs.o ptp.o rvu_npc_fs.o \
- 		  rvu_cpt.o rvu_devlink.o rpm.o rvu_cn10k.o rvu_switch.o \
--		  rvu_sdp.o rvu_npc_hash.o mcs.o mcs_rvu_if.o mcs_cnf10kb.o
-+		  rvu_sdp.o rvu_npc_hash.o mcs.o mcs_rvu_if.o mcs_cnf10kb.o \
-+		  cn20k/mbox_init.o
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
-new file mode 100644
-index 000000000000..b57bd38181aa
---- /dev/null
+index b57bd38181aa..9436a4a4d815 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
-@@ -0,0 +1,22 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2024 Marvell.
-+ *
-+ */
-+
-+#ifndef CN20K_API_H
-+#define CN20K_API_H
-+
-+#include "../rvu.h"
-+
-+struct ng_rvu {
-+	struct mbox_ops         *rvu_mbox_ops;
-+	struct qmem             *pf_mbox_addr;
-+};
-+
-+/* Mbox related APIs */
-+int cn20k_rvu_mbox_init(struct rvu *rvu, int type, int num);
-+int cn20k_rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
-+			       int num, int type, unsigned long *pf_bmap);
-+#endif /* CN20K_API_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
-new file mode 100644
-index 000000000000..0e128013a03f
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
-@@ -0,0 +1,49 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2024 Marvell.
-+ *
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/irq.h>
-+
-+#include "rvu_trace.h"
-+#include "mbox.h"
-+#include "reg.h"
-+#include "api.h"
-+
-+int cn20k_rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
-+			       int num, int type, unsigned long *pf_bmap)
-+{
-+	int region;
-+	u64 bar;
-+
-+	for (region = 0; region < num; region++) {
-+		if (!test_bit(region, pf_bmap))
-+			continue;
-+
-+		bar = (u64)phys_to_virt((u64)rvu->ng_rvu->pf_mbox_addr->base);
-+		bar += region * MBOX_SIZE;
-+
-+		mbox_addr[region] = (void *)bar;
-+
-+		if (!mbox_addr[region])
-+			return -ENOMEM;
-+	}
-+	return 0;
-+}
-+
-+int cn20k_rvu_mbox_init(struct rvu *rvu, int type, int ndevs)
-+{
-+	int dev;
-+
-+	if (!is_cn20k(rvu->pdev))
-+		return 0;
-+
-+	for (dev = 0; dev < ndevs; dev++)
-+		rvu_write64(rvu, BLKADDR_RVUM,
-+			    RVU_MBOX_AF_PFX_CFG(dev), ilog2(MBOX_SIZE));
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
-new file mode 100644
-index 000000000000..58152a4024ec
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2024 Marvell.
-+ *
-+ */
-+
-+#ifndef RVU_MBOX_REG_H
-+#define RVU_MBOX_REG_H
-+#include "../rvu.h"
-+#include "../rvu_reg.h"
-+
-+/* RVUM block registers */
-+#define RVU_PF_DISC				(0x0)
-+#define RVU_PRIV_PFX_DISC(a)			(0x8000208 | (a) << 16)
-+#define RVU_PRIV_HWVFX_DISC(a)			(0xD000000 | (a) << 12)
-+
-+/* Mbox Registers */
-+/* RVU AF BAR0 Mbox registers for AF => PFx */
-+#define RVU_MBOX_AF_PFX_ADDR(a)			(0x5000 | (a) << 4)
-+#define RVU_MBOX_AF_PFX_CFG(a)			(0x6000 | (a) << 4)
-+#define RVU_AF_BAR2_SEL				(0x9000000)
-+#define RVU_AF_BAR2_PFID			(0x16400)
-+#define NIX_CINTX_INT_W1S(a)			(0xd30 | (a) << 12)
-+#define NIX_QINTX_CNT(a)			(0xc00 | (a) << 12)
-+
-+#endif /* RVU_MBOX_REG_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.c b/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
-index 791c468a10c5..1e3e72107a9d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
-@@ -10,8 +10,11 @@
- #include <linux/pci.h>
- 
- #include "rvu_reg.h"
-+#include "cn20k/reg.h"
-+#include "cn20k/api.h"
- #include "mbox.h"
- #include "rvu_trace.h"
-+#include "rvu.h"
- 
- /* Default values of PF and VF bit encodings in PCIFUNC for
-  * CN9XXX and CN10K series silicons.
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 38a0badcdb68..df64a18fe1d6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -55,6 +55,11 @@ extern u16 rvu_pcifunc_pf_mask;
- extern u16 rvu_pcifunc_func_shift;
- extern u16 rvu_pcifunc_func_mask;
- 
-+enum {
-+	TYPE_AFVF,
-+	TYPE_AFPF,
-+};
-+
- struct otx2_mbox_dev {
- 	void	    *mbase;   /* This dev's mbox region */
- 	void	    *hwbase;
-@@ -83,6 +88,8 @@ struct otx2_mbox {
- struct mbox_hdr {
- 	u64 msg_size;	/* Total msgs size embedded */
- 	u16  num_msgs;   /* No of msgs embedded */
-+	u16 opt_msg;
-+	u8 sig;
+@@ -15,8 +15,16 @@ struct ng_rvu {
+ 	struct qmem             *pf_mbox_addr;
  };
  
- /* Header which precedes every msg and is also part of it */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-index dcfc27a60b43..a5ebd7cd3a5c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-@@ -20,6 +20,8 @@
++struct rvu;
++
+ /* Mbox related APIs */
+ int cn20k_rvu_mbox_init(struct rvu *rvu, int type, int num);
++int cn20k_register_afpf_mbox_intr(struct rvu *rvu);
+ int cn20k_rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 			       int num, int type, unsigned long *pf_bmap);
++void cn20k_rvu_enable_mbox_intr(struct rvu *rvu);
++void cn20k_rvu_unregister_interrupts(struct rvu *rvu);
++void cn20k_free_mbox_memory(struct rvu *rvu);
++int cn20k_mbox_setup(struct otx2_mbox *mbox, struct pci_dev *pdev,
++		     void *reg_base, int direction, int ndevs);
+ #endif /* CN20K_API_H */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
+index 0e128013a03f..377e3f579184 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
+@@ -13,6 +13,137 @@
+ #include "reg.h"
+ #include "api.h"
  
- #include "rvu_trace.h"
- #include "rvu_npc_hash.h"
-+#include "cn20k/reg.h"
-+#include "cn20k/api.h"
- 
- #define DRV_NAME	"rvu_af"
- #define DRV_STRING      "Marvell OcteonTX2 RVU Admin Function Driver"
-@@ -34,10 +36,8 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
- 			 int type, int num,
- 			 void (mbox_handler)(struct work_struct *),
- 			 void (mbox_up_handler)(struct work_struct *));
--enum {
--	TYPE_AFVF,
--	TYPE_AFPF,
--};
-+static irqreturn_t rvu_mbox_pf_intr_handler(int irq, void *rvu_irq);
-+static irqreturn_t rvu_mbox_intr_handler(int irq, void *rvu_irq);
- 
- /* Supported devices */
- static const struct pci_device_id rvu_id_table[] = {
-@@ -2212,6 +2212,22 @@ static void __rvu_mbox_handler(struct rvu_work *mwork, int type, bool poll)
- 
- 	offset = mbox->rx_start + ALIGN(sizeof(*req_hdr), MBOX_MSG_ALIGN);
- 
-+	if (req_hdr->sig) {
-+		req_hdr->opt_msg = mw->mbox_wrk[devid].num_msgs;
-+		rvu_write64(rvu, BLKADDR_NIX0, RVU_AF_BAR2_SEL,
-+			    RVU_AF_BAR2_PFID);
-+		if (type == TYPE_AFPF)
-+			rvu_write64(rvu, BLKADDR_NIX0,
-+				    AF_BAR2_ALIASX(0, NIX_CINTX_INT_W1S(devid)),
-+				    0x1);
-+		else
-+			rvu_write64(rvu, BLKADDR_NIX0,
-+				    AF_BAR2_ALIASX(0, NIX_QINTX_CNT(devid)),
-+				    0x1);
-+		usleep_range(1000, 2000);
-+		goto done;
++/* CN20K mbox PFx => AF irq handler */
++static irqreturn_t cn20k_mbox_pf_common_intr_handler(int irq, void *rvu_irq)
++{
++	struct rvu_irq_data *rvu_irq_data = rvu_irq;
++	struct rvu *rvu = rvu_irq_data->rvu;
++	u64 intr;
++
++	/* Clear interrupts */
++	intr = rvu_read64(rvu, BLKADDR_RVUM, rvu_irq_data->intr_status);
++	rvu_write64(rvu, BLKADDR_RVUM, rvu_irq_data->intr_status, intr);
++
++	if (intr)
++		trace_otx2_msg_interrupt(rvu->pdev, "PF(s) to AF", intr);
++
++	/* Sync with mbox memory region */
++	rmb();
++
++	rvu_irq_data->rvu_queue_work_hdlr(&rvu->afpf_wq_info,
++					  rvu_irq_data->start,
++					  rvu_irq_data->mdevs, intr);
++
++	return IRQ_HANDLED;
++}
++
++void cn20k_rvu_enable_mbox_intr(struct rvu *rvu)
++{
++	struct rvu_hwinfo *hw = rvu->hw;
++
++	/* Clear spurious irqs, if any */
++	rvu_write64(rvu, BLKADDR_RVUM,
++		    RVU_MBOX_AF_PFAF_INT(0), INTR_MASK(hw->total_pfs));
++
++	rvu_write64(rvu, BLKADDR_RVUM,
++		    RVU_MBOX_AF_PFAF_INT(1), INTR_MASK(hw->total_pfs - 64));
++
++	rvu_write64(rvu, BLKADDR_RVUM,
++		    RVU_MBOX_AF_PFAF1_INT(0), INTR_MASK(hw->total_pfs));
++
++	rvu_write64(rvu, BLKADDR_RVUM,
++		    RVU_MBOX_AF_PFAF1_INT(1), INTR_MASK(hw->total_pfs - 64));
++
++	/* Enable mailbox interrupt for all PFs except PF0 i.e AF itself */
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF_INT_ENA_W1S(0),
++		    INTR_MASK(hw->total_pfs) & ~1ULL);
++
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF_INT_ENA_W1S(1),
++		    INTR_MASK(hw->total_pfs - 64));
++
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF1_INT_ENA_W1S(0),
++		    INTR_MASK(hw->total_pfs) & ~1ULL);
++
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF1_INT_ENA_W1S(1),
++		    INTR_MASK(hw->total_pfs - 64));
++}
++
++void cn20k_rvu_unregister_interrupts(struct rvu *rvu)
++{
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF_INT_ENA_W1C(0),
++		    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
++
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF_INT_ENA_W1C(1),
++		    INTR_MASK(rvu->hw->total_pfs - 64));
++
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF1_INT_ENA_W1C(0),
++		    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
++
++	rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFAF1_INT_ENA_W1C(1),
++		    INTR_MASK(rvu->hw->total_pfs - 64));
++}
++
++int cn20k_register_afpf_mbox_intr(struct rvu *rvu)
++{
++	struct rvu_irq_data *irq_data;
++	int intr_vec, ret, vec = 0;
++
++	/* irq data for 4 PF intr vectors */
++	irq_data = devm_kcalloc(rvu->dev, 4,
++				sizeof(struct rvu_irq_data), GFP_KERNEL);
++	if (!irq_data)
++		return -ENOMEM;
++
++	for (intr_vec = RVU_AF_CN20K_INT_VEC_PFAF_MBOX0; intr_vec <=
++				RVU_AF_CN20K_INT_VEC_PFAF1_MBOX1; intr_vec++,
++				vec++) {
++		switch (intr_vec) {
++		case RVU_AF_CN20K_INT_VEC_PFAF_MBOX0:
++			irq_data[vec].intr_status =
++						RVU_MBOX_AF_PFAF_INT(0);
++			irq_data[vec].start = 0;
++			irq_data[vec].mdevs = 64;
++			break;
++		case RVU_AF_CN20K_INT_VEC_PFAF_MBOX1:
++			irq_data[vec].intr_status =
++						RVU_MBOX_AF_PFAF_INT(1);
++			irq_data[vec].start = 64;
++			irq_data[vec].mdevs = 96;
++			break;
++		case RVU_AF_CN20K_INT_VEC_PFAF1_MBOX0:
++			irq_data[vec].intr_status =
++						RVU_MBOX_AF_PFAF1_INT(0);
++			irq_data[vec].start = 0;
++			irq_data[vec].mdevs = 64;
++			break;
++		case RVU_AF_CN20K_INT_VEC_PFAF1_MBOX1:
++			irq_data[vec].intr_status =
++						RVU_MBOX_AF_PFAF1_INT(1);
++			irq_data[vec].start = 64;
++			irq_data[vec].mdevs = 96;
++			break;
++		}
++		irq_data[vec].rvu_queue_work_hdlr = rvu_queue_work;
++		irq_data[vec].vec_num = intr_vec;
++		irq_data[vec].rvu = rvu;
++
++		/* Register mailbox interrupt handler */
++		sprintf(&rvu->irq_name[intr_vec * NAME_SIZE],
++			"RVUAF PFAF%d Mbox%d",
++			vec / 2, vec % 2);
++		ret = request_irq(pci_irq_vector(rvu->pdev, intr_vec),
++				  rvu->ng_rvu->rvu_mbox_ops->pf_intr_handler, 0,
++				  &rvu->irq_name[intr_vec * NAME_SIZE],
++				  &irq_data[vec]);
++		if (ret)
++			return ret;
++
++		rvu->irq_allocated[intr_vec] = true;
 +	}
 +
- 	for (id = 0; id < mw->mbox_wrk[devid].num_msgs; id++) {
- 		msg = mdev->mbase + offset;
- 
-@@ -2245,9 +2261,10 @@ static void __rvu_mbox_handler(struct rvu_work *mwork, int type, bool poll)
- 				 err, otx2_mbox_id2name(msg->id),
- 				 msg->id, devid);
- 	}
-+done:
- 	mw->mbox_wrk[devid].num_msgs = 0;
- 
--	if (poll)
-+	if (!is_cn20k(mbox->pdev) && poll)
- 		otx2_mbox_wait_for_zero(mbox, devid);
- 
- 	/* Send mbox responses to VF/PF */
-@@ -2360,6 +2377,10 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
- 	int region;
- 	u64 bar4;
- 
-+	if (is_cn20k(rvu->pdev))
-+		return cn20k_rvu_get_mbox_regions(rvu, mbox_addr,
-+						  num, type, pf_bmap);
++	return 0;
++}
 +
- 	/* For cn10k platform VF mailbox regions of a PF follows after the
- 	 * PF <-> AF mailbox region. Whereas for Octeontx2 it is read from
- 	 * RVU_PF_VF_BAR4_ADDR register.
-@@ -2413,12 +2434,17 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
- 	return -ENOMEM;
+ int cn20k_rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 			       int num, int type, unsigned long *pf_bmap)
+ {
+@@ -34,6 +165,48 @@ int cn20k_rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 	return 0;
  }
  
-+static struct mbox_ops rvu_mbox_ops = {
-+	.pf_intr_handler = rvu_mbox_pf_intr_handler,
++static struct mbox_ops cn20k_mbox_ops = {
++	.pf_intr_handler = cn20k_mbox_pf_common_intr_handler,
 +};
 +
- static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
- 			 int type, int num,
- 			 void (mbox_handler)(struct work_struct *),
- 			 void (mbox_up_handler)(struct work_struct *))
- {
- 	int err = -EINVAL, i, dir, dir_up;
-+	struct ng_rvu *ng_rvu_mbox;
- 	void __iomem *reg_base;
- 	struct rvu_work *mwork;
- 	unsigned long *pf_bmap;
-@@ -2443,6 +2469,18 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
- 		}
- 	}
- 
-+	ng_rvu_mbox = kzalloc(sizeof(*ng_rvu_mbox), GFP_KERNEL);
-+	if (!ng_rvu_mbox) {
-+		err = -ENOMEM;
-+		goto free_bitmap;
++static int rvu_alloc_mbox_memory(struct rvu *rvu, int type,
++				 int ndevs, int mbox_size)
++{
++	struct qmem *mbox_addr;
++	dma_addr_t iova;
++	int pf, err;
++
++	/* Allocate contiguous memory for mailbox communication.
++	 * eg: AF <=> PFx mbox memory
++	 * This allocated memory is split into chunks of MBOX_SIZE
++	 * and setup into each of the RVU PFs. In HW this memory will
++	 * get aliased to an offset within BAR2 of those PFs.
++	 *
++	 * AF will access mbox memory using direct physical addresses
++	 * and PFs will access the same shared memory from BAR2.
++	 */
++
++	err = qmem_alloc(rvu->dev, &mbox_addr, ndevs, mbox_size);
++	if (err)
++		return -ENOMEM;
++
++	switch (type) {
++	case TYPE_AFPF:
++		rvu->ng_rvu->pf_mbox_addr = mbox_addr;
++		iova = (u64)mbox_addr->iova;
++		for (pf = 0; pf < ndevs; pf++) {
++			rvu_write64(rvu, BLKADDR_RVUM, RVU_MBOX_AF_PFX_ADDR(pf),
++				    (u64)iova);
++			iova += mbox_size;
++		}
++		break;
++	default:
++		return 0;
 +	}
 +
-+	rvu->ng_rvu = ng_rvu_mbox;
++	return 0;
++}
 +
-+	rvu->ng_rvu->rvu_mbox_ops = &rvu_mbox_ops;
-+
-+	cn20k_rvu_mbox_init(rvu, type, num);
-+
- 	mutex_init(&rvu->mbox_lock);
+ int cn20k_rvu_mbox_init(struct rvu *rvu, int type, int ndevs)
+ {
+ 	int dev;
+@@ -41,9 +214,48 @@ int cn20k_rvu_mbox_init(struct rvu *rvu, int type, int ndevs)
+ 	if (!is_cn20k(rvu->pdev))
+ 		return 0;
  
- 	mbox_regions = kcalloc(num, sizeof(void *), GFP_KERNEL);
-@@ -2475,7 +2513,7 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
- 	}
++	rvu->ng_rvu->rvu_mbox_ops = &cn20k_mbox_ops;
++
+ 	for (dev = 0; dev < ndevs; dev++)
+ 		rvu_write64(rvu, BLKADDR_RVUM,
+ 			    RVU_MBOX_AF_PFX_CFG(dev), ilog2(MBOX_SIZE));
  
- 	mw->mbox_wq = alloc_workqueue("%s",
--				      WQ_UNBOUND | WQ_HIGHPRI | WQ_MEM_RECLAIM,
-+				      WQ_HIGHPRI | WQ_MEM_RECLAIM,
- 				      num, name);
- 	if (!mw->mbox_wq) {
- 		err = -ENOMEM;
-@@ -2553,8 +2591,8 @@ static void rvu_mbox_destroy(struct mbox_wq_info *mw)
- 	otx2_mbox_destroy(&mw->mbox_up);
++	return rvu_alloc_mbox_memory(rvu, type, ndevs, MBOX_SIZE);
++}
++
++void cn20k_free_mbox_memory(struct rvu *rvu)
++{
++	qmem_free(rvu->dev, rvu->ng_rvu->pf_mbox_addr);
++}
++
++int rvu_alloc_cint_qint_mem(struct rvu *rvu, struct rvu_pfvf *pfvf,
++			    int blkaddr, int nixlf)
++{
++	int qints, hwctx_size, err;
++	u64 cfg, ctx_cfg;
++
++	ctx_cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST3);
++	/* Alloc memory for CQINT's HW contexts */
++	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST2);
++	qints = (cfg >> 24) & 0xFFF;
++	hwctx_size = 1UL << ((ctx_cfg >> 24) & 0xF);
++	err = qmem_alloc(rvu->dev, &pfvf->cq_ints_ctx, qints, hwctx_size);
++	if (err)
++		return -ENOMEM;
++
++	rvu_write64(rvu, blkaddr, NIX_AF_LFX_CINTS_BASE(nixlf),
++		    (u64)pfvf->cq_ints_ctx->iova);
++
++	/* Alloc memory for QINT's HW contexts */
++	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST2);
++	qints = (cfg >> 12) & 0xFFF;
++	hwctx_size = 1UL << ((ctx_cfg >> 20) & 0xF);
++	err = qmem_alloc(rvu->dev, &pfvf->nix_qints_ctx, qints, hwctx_size);
++	if (err)
++		return -ENOMEM;
++
++	rvu_write64(rvu, blkaddr, NIX_AF_LFX_QINTS_BASE(nixlf),
++		    (u64)pfvf->nix_qints_ctx->iova);
++
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+index 58152a4024ec..df2d52567da7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
+@@ -19,6 +19,23 @@
+ /* RVU AF BAR0 Mbox registers for AF => PFx */
+ #define RVU_MBOX_AF_PFX_ADDR(a)			(0x5000 | (a) << 4)
+ #define RVU_MBOX_AF_PFX_CFG(a)			(0x6000 | (a) << 4)
++#define RVU_MBOX_AF_AFPFX_TRIGX(a)		(0x9000 | (a) << 3)
++#define RVU_MBOX_AF_PFAF_INT(a)			(0x2980 | (a) << 6)
++#define RVU_MBOX_AF_PFAF_INT_W1S(a)		(0x2988 | (a) << 6)
++#define RVU_MBOX_AF_PFAF_INT_ENA_W1S(a)		(0x2990 | (a) << 6)
++#define RVU_MBOX_AF_PFAF_INT_ENA_W1C(a)		(0x2998 | (a) << 6)
++#define RVU_MBOX_AF_PFAF1_INT(a)		(0x29A0 | (a) << 6)
++#define RVU_MBOX_AF_PFAF1_INT_W1S(a)		(0x29A8 | (a) << 6)
++#define RVU_MBOX_AF_PFAF1_INT_ENA_W1S(a)	(0x29B0 | (a) << 6)
++#define RVU_MBOX_AF_PFAF1_INT_ENA_W1C(a)	(0x29B8 | (a) << 6)
++
++/* RVU PF => AF mbox registers */
++#define RVU_MBOX_PF_PFAF_TRIGX(a)		(0xC00 | (a) << 3)
++#define RVU_MBOX_PF_INT				(0xC20)
++#define RVU_MBOX_PF_INT_W1S			(0xC28)
++#define RVU_MBOX_PF_INT_ENA_W1S			(0xC30)
++#define RVU_MBOX_PF_INT_ENA_W1C			(0xC38)
++
+ #define RVU_AF_BAR2_SEL				(0x9000000)
+ #define RVU_AF_BAR2_PFID			(0x16400)
+ #define NIX_CINTX_INT_W1S(a)			(0xd30 | (a) << 12)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
+new file mode 100644
+index 000000000000..fccad6e422e8
+--- /dev/null
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Marvell RVU Admin Function driver
++ *
++ * Copyright (C) 2024 Marvell.
++ *
++ */
++
++#ifndef STRUCT_H
++#define STRUCT_H
++
++/* RVU Admin function Interrupt Vector Enumeration */
++enum rvu_af_cn20k_int_vec_e {
++	RVU_AF_CN20K_INT_VEC_POISON		= 0x0,
++	RVU_AF_CN20K_INT_VEC_PFFLR0		= 0x1,
++	RVU_AF_CN20K_INT_VEC_PFFLR1		= 0x2,
++	RVU_AF_CN20K_INT_VEC_PFME0		= 0x3,
++	RVU_AF_CN20K_INT_VEC_PFME1		= 0x4,
++	RVU_AF_CN20K_INT_VEC_GEN		= 0x5,
++	RVU_AF_CN20K_INT_VEC_PFAF_MBOX0		= 0x6,
++	RVU_AF_CN20K_INT_VEC_PFAF_MBOX1		= 0x7,
++	RVU_AF_CN20K_INT_VEC_PFAF1_MBOX0	= 0x8,
++	RVU_AF_CN20K_INT_VEC_PFAF1_MBOX1	= 0x9,
++	RVU_AF_CN20K_INT_VEC_CNT		= 0xa,
++};
++#endif
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.c b/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
+index 1e3e72107a9d..4ff3aa58d3d4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.c
+@@ -46,8 +46,10 @@ void __otx2_mbox_reset(struct otx2_mbox *mbox, int devid)
+ 	mdev->rsp_size = 0;
+ 	tx_hdr->num_msgs = 0;
+ 	tx_hdr->msg_size = 0;
++	tx_hdr->sig = 0;
+ 	rx_hdr->num_msgs = 0;
+ 	rx_hdr->msg_size = 0;
++	rx_hdr->sig = 0;
+ }
+ EXPORT_SYMBOL(__otx2_mbox_reset);
+ 
+@@ -71,9 +73,78 @@ void otx2_mbox_destroy(struct otx2_mbox *mbox)
+ }
+ EXPORT_SYMBOL(otx2_mbox_destroy);
+ 
++int cn20k_mbox_setup(struct otx2_mbox *mbox, struct pci_dev *pdev,
++		     void *reg_base, int direction, int ndevs)
++{
++	switch (direction) {
++	case MBOX_DIR_AFPF:
++		mbox->tx_start = MBOX_DOWN_TX_START;
++		mbox->rx_start = MBOX_DOWN_RX_START;
++		mbox->tx_size  = MBOX_DOWN_TX_SIZE;
++		mbox->rx_size  = MBOX_DOWN_RX_SIZE;
++		break;
++	case MBOX_DIR_PFAF:
++		mbox->tx_start = MBOX_DOWN_RX_START;
++		mbox->rx_start = MBOX_DOWN_TX_START;
++		mbox->tx_size  = MBOX_DOWN_RX_SIZE;
++		mbox->rx_size  = MBOX_DOWN_TX_SIZE;
++		break;
++	case MBOX_DIR_AFPF_UP:
++		mbox->tx_start = MBOX_UP_TX_START;
++		mbox->rx_start = MBOX_UP_RX_START;
++		mbox->tx_size  = MBOX_UP_TX_SIZE;
++		mbox->rx_size  = MBOX_UP_RX_SIZE;
++		break;
++	case MBOX_DIR_PFAF_UP:
++		mbox->tx_start = MBOX_UP_RX_START;
++		mbox->rx_start = MBOX_UP_TX_START;
++		mbox->tx_size  = MBOX_UP_RX_SIZE;
++		mbox->rx_size  = MBOX_UP_TX_SIZE;
++		break;
++	default:
++		return -ENODEV;
++	}
++
++	switch (direction) {
++	case MBOX_DIR_AFPF:
++		mbox->trigger = RVU_MBOX_AF_AFPFX_TRIGX(1);
++		mbox->tr_shift = 4;
++		break;
++	case MBOX_DIR_AFPF_UP:
++		mbox->trigger = RVU_MBOX_AF_AFPFX_TRIGX(0);
++		mbox->tr_shift = 4;
++		break;
++	case MBOX_DIR_PFAF:
++		mbox->trigger = RVU_MBOX_PF_PFAF_TRIGX(0);
++		mbox->tr_shift = 0;
++		break;
++	case MBOX_DIR_PFAF_UP:
++		mbox->trigger = RVU_MBOX_PF_PFAF_TRIGX(1);
++		mbox->tr_shift = 0;
++		break;
++	default:
++		return -ENODEV;
++	}
++	mbox->reg_base = reg_base;
++	mbox->pdev = pdev;
++
++	mbox->dev = kcalloc(ndevs, sizeof(struct otx2_mbox_dev), GFP_KERNEL);
++	if (!mbox->dev) {
++		otx2_mbox_destroy(mbox);
++		return -ENOMEM;
++	}
++	mbox->ndevs = ndevs;
++
++	return 0;
++}
++
+ static int otx2_mbox_setup(struct otx2_mbox *mbox, struct pci_dev *pdev,
+ 			   void *reg_base, int direction, int ndevs)
+ {
++	if (is_cn20k(pdev))
++		return cn20k_mbox_setup(mbox, pdev, reg_base,
++							direction, ndevs);
++
+ 	switch (direction) {
+ 	case MBOX_DIR_AFPF:
+ 	case MBOX_DIR_PFVF:
+@@ -252,7 +323,10 @@ static void otx2_mbox_msg_send_data(struct otx2_mbox *mbox, int devid, u64 data)
+ 
+ 	spin_lock(&mdev->mbox_lock);
+ 
+-	tx_hdr->msg_size = mdev->msg_size;
++	if (!tx_hdr->sig) {
++		tx_hdr->msg_size = mdev->msg_size;
++		tx_hdr->num_msgs = mdev->num_msgs;
++	}
+ 
+ 	/* Reset header for next messages */
+ 	mdev->msg_size = 0;
+@@ -266,7 +340,6 @@ static void otx2_mbox_msg_send_data(struct otx2_mbox *mbox, int devid, u64 data)
+ 	 * messages.  So this should be written after writing all the messages
+ 	 * to the shared memory.
+ 	 */
+-	tx_hdr->num_msgs = mdev->num_msgs;
+ 	rx_hdr->num_msgs = 0;
+ 
+ 	trace_otx2_msg_send(mbox->pdev, tx_hdr->num_msgs, tx_hdr->msg_size);
+@@ -324,6 +397,7 @@ struct mbox_msghdr *otx2_mbox_alloc_msg_rsp(struct otx2_mbox *mbox, int devid,
+ {
+ 	struct otx2_mbox_dev *mdev = &mbox->dev[devid];
+ 	struct mbox_msghdr *msghdr = NULL;
++	struct mbox_hdr *mboxhdr = NULL;
+ 
+ 	spin_lock(&mdev->mbox_lock);
+ 	size = ALIGN(size, MBOX_MSG_ALIGN);
+@@ -347,6 +421,11 @@ struct mbox_msghdr *otx2_mbox_alloc_msg_rsp(struct otx2_mbox *mbox, int devid,
+ 	mdev->msg_size += size;
+ 	mdev->rsp_size += size_rsp;
+ 	msghdr->next_msgoff = mdev->msg_size + msgs_offset;
++
++	mboxhdr = mdev->mbase + mbox->tx_start;
++	/* Clear the msg header region */
++	memset(mboxhdr, 0, msgs_offset);
++
+ exit:
+ 	spin_unlock(&mdev->mbox_lock);
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index df64a18fe1d6..86d07fc4a7ff 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -13,6 +13,7 @@
+ 
+ #include "rvu_struct.h"
+ #include "common.h"
++#include "cn20k/struct.h"
+ 
+ #define MBOX_SIZE		SZ_64K
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index a5ebd7cd3a5c..f3d61294452a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -755,6 +755,11 @@ static void rvu_free_hw_resources(struct rvu *rvu)
+ 
+ 	rvu_reset_msix(rvu);
+ 	mutex_destroy(&rvu->rsrc_lock);
++
++	/* Free the QINT/CINt memory */
++	pfvf = &rvu->pf[RVU_AFPF];
++	qmem_free(rvu->dev, pfvf->nix_qints_ctx);
++	qmem_free(rvu->dev, pfvf->cq_ints_ctx);
  }
  
--static void rvu_queue_work(struct mbox_wq_info *mw, int first,
--			   int mdevs, u64 intr)
-+void rvu_queue_work(struct mbox_wq_info *mw, int first,
-+		    int mdevs, u64 intr)
- {
- 	struct otx2_mbox_dev *mdev;
- 	struct otx2_mbox *mbox;
-@@ -2965,12 +3003,14 @@ static int rvu_register_interrupts(struct rvu *rvu)
- 
- 	/* Register mailbox interrupt handler */
- 	sprintf(&rvu->irq_name[RVU_AF_INT_VEC_MBOX * NAME_SIZE], "RVUAF Mbox");
--	ret = request_irq(pci_irq_vector(rvu->pdev, RVU_AF_INT_VEC_MBOX),
--			  rvu_mbox_pf_intr_handler, 0,
--			  &rvu->irq_name[RVU_AF_INT_VEC_MBOX * NAME_SIZE], rvu);
-+	ret = request_irq(pci_irq_vector
-+			  (rvu->pdev, RVU_AF_INT_VEC_MBOX),
-+			  rvu->ng_rvu->rvu_mbox_ops->pf_intr_handler, 0,
-+			  &rvu->irq_name[RVU_AF_INT_VEC_MBOX *
-+			  NAME_SIZE], rvu);
- 	if (ret) {
- 		dev_err(rvu->dev,
--			"RVUAF: IRQ registration failed for mbox irq\n");
-+			"RVUAF: IRQ registration failed for mbox\n");
+ static void rvu_setup_pfvf_macaddress(struct rvu *rvu)
+@@ -814,13 +819,13 @@ static int rvu_fwdata_init(struct rvu *rvu)
  		goto fail;
+ 
+ 	BUILD_BUG_ON(offsetof(struct rvu_fwdata, cgx_fw_data) > FWDATA_CGX_LMAC_OFFSET);
+-	rvu->fwdata = ioremap_wc(fwdbase, sizeof(struct rvu_fwdata));
++	rvu->fwdata = (__force struct rvu_fwdata *)ioremap_wc(fwdbase, sizeof(struct rvu_fwdata));
+ 	if (!rvu->fwdata)
+ 		goto fail;
+ 	if (!is_rvu_fwdata_valid(rvu)) {
+ 		dev_err(rvu->dev,
+ 			"Mismatch in 'fwdata' struct btw kernel and firmware\n");
+-		iounmap(rvu->fwdata);
++		iounmap((void __iomem *)rvu->fwdata);
+ 		rvu->fwdata = NULL;
+ 		return -EINVAL;
+ 	}
+@@ -833,7 +838,7 @@ static int rvu_fwdata_init(struct rvu *rvu)
+ static void rvu_fwdata_exit(struct rvu *rvu)
+ {
+ 	if (rvu->fwdata)
+-		iounmap(rvu->fwdata);
++		iounmap((void __iomem *)rvu->fwdata);
+ }
+ 
+ static int rvu_setup_nix_hw_resource(struct rvu *rvu, int blkaddr)
+@@ -2399,7 +2404,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 				bar4 = rvupf_read64(rvu, RVU_PF_VF_BAR4_ADDR);
+ 				bar4 += region * MBOX_SIZE;
+ 			}
+-			mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++			mbox_addr[region] = (__force void *)ioremap_wc(bar4, MBOX_SIZE);
+ 			if (!mbox_addr[region])
+ 				goto error;
+ 		}
+@@ -2422,7 +2427,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 					  RVU_AF_PF_BAR4_ADDR);
+ 			bar4 += region * MBOX_SIZE;
+ 		}
+-		mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++		mbox_addr[region] = (__force void *)ioremap_wc(bar4, MBOX_SIZE);
+ 		if (!mbox_addr[region])
+ 			goto error;
+ 	}
+@@ -2683,6 +2688,11 @@ static void rvu_enable_mbox_intr(struct rvu *rvu)
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+ 
++	if (is_cn20k(rvu->pdev)) {
++		cn20k_rvu_enable_mbox_intr(rvu);
++		return;
++	}
++
+ 	/* Clear spurious irqs, if any */
+ 	rvu_write64(rvu, BLKADDR_RVUM,
+ 		    RVU_AF_PFAF_MBOX_INT, INTR_MASK(hw->total_pfs));
+@@ -2936,9 +2946,12 @@ static void rvu_unregister_interrupts(struct rvu *rvu)
+ 
+ 	rvu_cpt_unregister_interrupts(rvu);
+ 
+-	/* Disable the Mbox interrupt */
+-	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFAF_MBOX_INT_ENA_W1C,
+-		    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
++	if (!is_cn20k(rvu->pdev))
++		/* Disable the Mbox interrupt */
++		rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFAF_MBOX_INT_ENA_W1C,
++			    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
++	else
++		cn20k_rvu_unregister_interrupts(rvu);
+ 
+ 	/* Disable the PF FLR interrupt */
+ 	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFFLR_INT_ENA_W1C,
+@@ -3001,20 +3014,30 @@ static int rvu_register_interrupts(struct rvu *rvu)
+ 		return ret;
  	}
  
-@@ -3478,6 +3518,7 @@ static void rvu_remove(struct pci_dev *pdev)
+-	/* Register mailbox interrupt handler */
+-	sprintf(&rvu->irq_name[RVU_AF_INT_VEC_MBOX * NAME_SIZE], "RVUAF Mbox");
+-	ret = request_irq(pci_irq_vector
+-			  (rvu->pdev, RVU_AF_INT_VEC_MBOX),
+-			  rvu->ng_rvu->rvu_mbox_ops->pf_intr_handler, 0,
+-			  &rvu->irq_name[RVU_AF_INT_VEC_MBOX *
+-			  NAME_SIZE], rvu);
+-	if (ret) {
+-		dev_err(rvu->dev,
+-			"RVUAF: IRQ registration failed for mbox\n");
+-		goto fail;
+-	}
++	if (!is_cn20k(rvu->pdev)) {
++		/* Register mailbox interrupt handler */
++		sprintf(&rvu->irq_name[RVU_AF_INT_VEC_MBOX * NAME_SIZE],
++			"RVUAF Mbox");
++		ret = request_irq(pci_irq_vector
++				  (rvu->pdev, RVU_AF_INT_VEC_MBOX),
++				  rvu->ng_rvu->rvu_mbox_ops->pf_intr_handler, 0,
++				  &rvu->irq_name[RVU_AF_INT_VEC_MBOX *
++				  NAME_SIZE], rvu);
++		if (ret) {
++			dev_err(rvu->dev,
++				"RVUAF: IRQ registration failed for mbox\n");
++			goto fail;
++		}
+ 
+-	rvu->irq_allocated[RVU_AF_INT_VEC_MBOX] = true;
++		rvu->irq_allocated[RVU_AF_INT_VEC_MBOX] = true;
++	} else {
++		ret = cn20k_register_afpf_mbox_intr(rvu);
++		if (ret) {
++			dev_err(rvu->dev,
++				"RVUAF: IRQ registration failed for mbox\n");
++			goto fail;
++		}
++	}
+ 
+ 	/* Enable mailbox interrupts from all PFs */
+ 	rvu_enable_mbox_intr(rvu);
+@@ -3467,6 +3490,9 @@ static int rvu_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		ptp_start(rvu, rvu->fwdata->sclk, rvu->fwdata->ptp_ext_clk_rate,
+ 			  rvu->fwdata->ptp_ext_tstamp);
+ 
++	/* Alloc CINT and QINT memory */
++	rvu_alloc_cint_qint_mem(rvu, &rvu->pf[RVU_AFPF], BLKADDR_NIX0,
++				(rvu->hw->block[BLKADDR_NIX0].lf.max));
+ 	return 0;
+ err_dl:
+ 	rvu_unregister_dl(rvu);
+@@ -3518,6 +3544,8 @@ static void rvu_remove(struct pci_dev *pdev)
  	pci_set_drvdata(pdev, NULL);
  
  	devm_kfree(&pdev->dev, rvu->hw);
-+	kfree(rvu->ng_rvu);
++	if (is_cn20k(rvu->pdev))
++		cn20k_free_mbox_memory(rvu);
+ 	kfree(rvu->ng_rvu);
  	devm_kfree(&pdev->dev, rvu);
  }
- 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index 2f19b6b4a23a..dc7b2c1797a8 100644
+index dc7b2c1797a8..e030e5297b3f 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -444,6 +444,10 @@ struct mbox_wq_info {
+@@ -47,6 +47,9 @@
+ #define RVU_PFVF_FUNC_MASK	rvu_pcifunc_func_mask
+ 
+ #ifdef CONFIG_DEBUG_FS
++
++#define RVU_AFPF           25
++
+ struct dump_ctx {
+ 	int	lf;
+ 	int	id;
+@@ -444,6 +447,16 @@ struct mbox_wq_info {
  	struct workqueue_struct *mbox_wq;
  };
  
-+struct mbox_ops {
-+	irqreturn_t (*pf_intr_handler)(int irq, void *rvu_irq);
++struct rvu_irq_data {
++	u64 intr_status;
++	void (*rvu_queue_work_hdlr)(struct mbox_wq_info *mw, int first,
++				    int mdevs, u64 intr);
++	struct	rvu *rvu;
++	int vec_num;
++	int start;
++	int mdevs;
 +};
 +
- struct channel_fwdata {
- 	struct sdp_node_info info;
- 	u8 valid;
-@@ -595,6 +599,7 @@ struct rvu {
- 	spinlock_t		cpt_intr_lock;
- 
- 	struct mutex		mbox_lock; /* Serialize mbox up and down msgs */
-+	struct ng_rvu           *ng_rvu;
+ struct mbox_ops {
+ 	irqreturn_t (*pf_intr_handler)(int irq, void *rvu_irq);
  };
+@@ -954,7 +967,8 @@ int rvu_nix_mcast_get_mce_index(struct rvu *rvu, u16 pcifunc,
+ int rvu_nix_mcast_update_mcam_entry(struct rvu *rvu, u16 pcifunc,
+ 				    u32 mcast_grp_idx, u16 mcam_index);
+ void rvu_nix_flr_free_bpids(struct rvu *rvu, u16 pcifunc);
+-
++int rvu_alloc_cint_qint_mem(struct rvu *rvu, struct rvu_pfvf *pfvf,
++			    int blkaddr, int nixlf);
+ /* NPC APIs */
+ void rvu_npc_freemem(struct rvu *rvu);
+ int rvu_npc_get_pkind(struct rvu *rvu, u16 pf);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 6e0183f0d5a1..aa5ff0af6d72 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -22,10 +22,10 @@ static void otx2_nix_rq_op_stats(struct queue_stats *stats,
+ 	u64 incr = (u64)qidx << 32;
+ 	u64 *ptr;
  
- static inline void rvu_write64(struct rvu *rvu, u64 block, u64 offset, u64 val)
-@@ -876,11 +881,25 @@ static inline bool is_cgx_vf(struct rvu *rvu, u16 pcifunc)
- 		is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc)));
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_OCTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_OCTS);
+ 	stats->bytes = otx2_atomic64_add(incr, ptr);
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_PKTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_PKTS);
+ 	stats->pkts = otx2_atomic64_add(incr, ptr);
  }
  
-+#define CN20K_CHIPID	0x20
-+
-+/*
-+ * Silicon check for CN20K family
-+ */
-+static inline bool is_cn20k(struct pci_dev *pdev)
-+{
-+	return (pdev->subsystem_device & 0xFF) == CN20K_CHIPID;
-+}
-+
- #define M(_name, _id, fn_name, req, rsp)				\
- int rvu_mbox_handler_ ## fn_name(struct rvu *, struct req *, struct rsp *);
- MBOX_MESSAGES
- #undef M
+@@ -35,10 +35,10 @@ static void otx2_nix_sq_op_stats(struct queue_stats *stats,
+ 	u64 incr = (u64)qidx << 32;
+ 	u64 *ptr;
  
-+/* Mbox APIs */
-+void rvu_queue_work(struct mbox_wq_info *mw, int first,
-+		    int mdevs, u64 intr);
-+
- int rvu_cgx_init(struct rvu *rvu);
- int rvu_cgx_exit(struct rvu *rvu);
- void *rvu_cgx_pdata(u8 cgx_id, struct rvu *rvu);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
-index fc8da2090657..90cb063d00f0 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
-@@ -33,7 +33,8 @@ enum rvu_block_addr_e {
- 	BLKADDR_NDC_NIX1_RX	= 0x10ULL,
- 	BLKADDR_NDC_NIX1_TX	= 0x11ULL,
- 	BLKADDR_APR		= 0x16ULL,
--	BLK_COUNT		= 0x17ULL,
-+	BLKADDR_MBOX		= 0x1bULL,
-+	BLK_COUNT		= 0x1cULL,
- };
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_OCTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_OCTS);
+ 	stats->bytes = otx2_atomic64_add(incr, ptr);
  
- /* RVU Block Type Enumeration */
-@@ -49,7 +50,8 @@ enum rvu_block_type_e {
- 	BLKTYPE_TIM  = 0x8,
- 	BLKTYPE_CPT  = 0x9,
- 	BLKTYPE_NDC  = 0xa,
--	BLKTYPE_MAX  = 0xa,
-+	BLKTYPE_MBOX = 0x13,
-+	BLKTYPE_MAX  = 0x13,
- };
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_PKTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_PKTS);
+ 	stats->pkts = otx2_atomic64_add(incr, ptr);
+ }
  
- /* RVU Admin function Interrupt Vector Enumeration */
+@@ -819,7 +819,7 @@ void otx2_sqb_flush(struct otx2_nic *pfvf)
+ 	struct otx2_snd_queue *sq;
+ 	u64 incr, *ptr, val;
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_STATUS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_STATUS);
+ 	for (qidx = 0; qidx < otx2_get_total_tx_queues(pfvf); qidx++) {
+ 		sq = &pfvf->qset.sq[qidx];
+ 		if (!sq->sqb_ptrs)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index e6b03bad2dba..a2ef3943f2e8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -593,8 +593,7 @@ static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
+ 		base = pci_resource_start(pf->pdev, PCI_MBOX_BAR_NUM) +
+ 		       MBOX_SIZE;
+ 	else
+-		base = readq((void __iomem *)((u64)pf->reg_base +
+-					      RVU_PF_VF_BAR4_ADDR));
++		base = readq((pf->reg_base + RVU_PF_VF_BAR4_ADDR));
+ 
+ 	hwbase = ioremap_wc(base, MBOX_SIZE * pf->total_vfs);
+ 	if (!hwbase) {
+@@ -643,7 +642,7 @@ static void otx2_pfvf_mbox_destroy(struct otx2_nic *pf)
+ 	}
+ 
+ 	if (mbox->mbox.hwbase)
+-		iounmap(mbox->mbox.hwbase);
++		iounmap((void __iomem *)mbox->mbox.hwbase);
+ 
+ 	otx2_mbox_destroy(&mbox->mbox);
+ }
+@@ -1272,7 +1271,7 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 
+ 	/* CQ */
+ 	for (qidx = 0; qidx < pf->qset.cq_cnt; qidx++) {
+-		ptr = otx2_get_regaddr(pf, NIX_LF_CQ_OP_INT);
++		ptr = (__force u64 *)otx2_get_regaddr(pf, NIX_LF_CQ_OP_INT);
+ 		val = otx2_atomic64_add((qidx << 44), ptr);
+ 
+ 		otx2_write64(pf, NIX_LF_CQ_OP_INT, (qidx << 44) |
+@@ -1311,7 +1310,7 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 		 * these are fatal errors.
+ 		 */
+ 
+-		ptr = otx2_get_regaddr(pf, NIX_LF_SQ_OP_INT);
++		ptr = (__force u64 *)otx2_get_regaddr(pf, NIX_LF_SQ_OP_INT);
+ 		val = otx2_atomic64_add((qidx << 44), ptr);
+ 		otx2_write64(pf, NIX_LF_SQ_OP_INT, (qidx << 44) |
+ 			     (val & NIX_SQINT_BITS));
 -- 
 2.25.1
 
