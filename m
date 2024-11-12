@@ -1,61 +1,59 @@
-Return-Path: <netdev+bounces-144140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D8C9C5EB3
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:20:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB329C5D5E
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:33:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CE35B2AD30
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:18:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 068B1B425EE
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54E2200121;
-	Tue, 12 Nov 2024 15:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BEE6200BBA;
+	Tue, 12 Nov 2024 15:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GP2Ua2uY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BlUtcwUN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CDC1FF5F4
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 15:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458C2200121;
+	Tue, 12 Nov 2024 15:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731424703; cv=none; b=aA3ZaYKNlSgE5niV9niRUyfi3/wL61qDgIMnSrKGD7JmHcfIMs9FW0ylSTwarD17+l+fwJCwTZXQu5Vm7etvEKRNdQiiNaLXR7ofXz+xUsVE1pTVTiIlDM70EhQhvrrgojbNuQq65JTcKZFAMyVW7d/yW7ual1rbmGni1tKwT3s=
+	t=1731425282; cv=none; b=ZCYosQuBoAmZcI7li3g3cLobrfY6DVdv55nVYPLhKoyX4BGc02J1pUttYMlhvOU9A8kUCqQXd/Fh9N2o0NATKWdegcE5zmIVvWlx2UnGGlFbAaZu2pf+RyLDx2iESCJqgcwiT+zj4Va4tetJnaXfwpONzdRMLuqzIpsBw94N+Uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731424703; c=relaxed/simple;
-	bh=nth3J6FETCjuT0ZhgJ2WbzVPX+r5vZ9cXKeYs8Mwt5c=;
+	s=arc-20240116; t=1731425282; c=relaxed/simple;
+	bh=Z58vp2e2al0KWimVIPipVRG7YJpIir/MZaKzKbtQGVs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDzJgUDF+sOF6B5Y8yj8dzMVoLj+vchOu+lOACTIu6Bp4NRtCg8mKVfgJQRK3kE1aucBy0uYfmT+rjB9qJWLy1TFWfMe4t6vM89ILfpRard7uvS6DYP7dw7ToVQ7Uy+tfytIda95RIH+5XvvTc+O0uBgmf3ReI7v0SCrZdFWBRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GP2Ua2uY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF89C4CED0;
-	Tue, 12 Nov 2024 15:18:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NYwlTIDNsXEK/uelo4ANKl1KFmqEtKhUUho20oF7gPahSrzaNjESdL62h3BcLyoe64qCbXHWc+upXuJElsiPGwoq5HwpLWYvviVGDUpFxcRNKjZJxaremQMcthd/Zkstqs36zHQdjqLJcfedfD5yCsLzEC4D3Kyuq+xsHIOSC+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BlUtcwUN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FADAC4CED0;
+	Tue, 12 Nov 2024 15:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731424703;
-	bh=nth3J6FETCjuT0ZhgJ2WbzVPX+r5vZ9cXKeYs8Mwt5c=;
+	s=k20201202; t=1731425281;
+	bh=Z58vp2e2al0KWimVIPipVRG7YJpIir/MZaKzKbtQGVs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GP2Ua2uY0cnb3MK4O/2GZKsIBKct+UZyU3hCcHaX1CQG22At/E9vXMZdlcXPRLZ/w
-	 bJk3vd2emzym1+PsQeNzfSee0G0eFJ04I2jbSjkjyqppebh50A7TveSlWQOCcfkoeu
-	 K+nGli3BanOjIis7VJio547h92+1ohhB7k3KqIlw8VvCjnAgJCJ94O6dQYA00f92t0
-	 ikGEIuhD0Xa0Hz2NAIT6RapO5o+LEN+EFMHFPS3gLHnKSwGsIA0714doTdLBiDhGHN
-	 0IgHcmAZHgE8gbrDt5oVPimIbZ3CpjyLh0APp+KkjQHd+4oD8qCuatMDjEbn+77DBT
-	 qWH8fdTOvWXkQ==
-Date: Tue, 12 Nov 2024 07:18:22 -0800
+	b=BlUtcwUNpeuHsJZkJS8EgY/gkmNfn6KmGOr64KPfIEzpyq3a9TIqKZE0UzijvQMvC
+	 lVV6hvjSP6tv0WvgumXZwniU9PGyVbQ66/eabqlQSB5BOt2IgNc94SKoRtjDHHenKb
+	 Y3gf+x1tLS7I8Wjhj831VHASQe7u+XVlxSc/Pal2JDr542YXYvJPhjf+yXAUZqfQtv
+	 esqWIDMXP4cw4U+BdRqDJnY/ClrH/MZtX86XfM4DXyEJKvyChmtfa6EoTqfFjhm2dz
+	 yrzBAoM61/8DyYiTxpUugJe7Kk+3WNLxK8FI/w2JRHuZrVZoyvP3rt+VsitLcpdB7N
+	 +ykMYaI3wU+cw==
+Date: Tue, 12 Nov 2024 07:28:00 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, alexandre.ferrieux@orange.com, Linux Kernel Network
- Developers <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v6] net: sched: cls_u32: Fix u32's systematic
- failure to free IDR entries for hnodes.
-Message-ID: <20241112071822.1a6f3c9a@kernel.org>
-In-Reply-To: <CAM0EoMk=1dsi1C02si9MV_E-wX5hu01bi5yTfyMmL9i2FLys1g@mail.gmail.com>
-References: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
-	<CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
-	<20241111102632.74573faa@kernel.org>
-	<CAM0EoMk=1dsi1C02si9MV_E-wX5hu01bi5yTfyMmL9i2FLys1g@mail.gmail.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: donald.hunter@gmail.com, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] tools: ynl: two patches to ease building with
+ rpmbuild
+Message-ID: <20241112072800.3a25cdbc@kernel.org>
+In-Reply-To: <CAASaF6zsC59x-wCRKNmdPEB7NOwtqLf6=AgJ-UO1xFYxCG11gQ@mail.gmail.com>
+References: <cover.1730976866.git.jstancek@redhat.com>
+	<20241111155246.17aa0199@kernel.org>
+	<CAASaF6zsC59x-wCRKNmdPEB7NOwtqLf6=AgJ-UO1xFYxCG11gQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,19 +63,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Nov 2024 07:23:29 -0500 Jamal Hadi Salim wrote:
-> > Separate patch - okay, but why are you asking people to send the tests
-> > to net-next? These sort of requests lead people to try to run
-> > linux-next tests on stable trees.  
+On Tue, 12 Nov 2024 09:16:07 +0100 Jan Stancek wrote:
+> One thing I wasn't sure about (due to lacking install target) was whether
+> you intend to run ynl always from linux tree.
 > 
-> AFAIK, those are the rules.
+> If you're open to adding 'install' target, I think that should be something
+> to look at as well. It would make packaging less fragile, as I'm currently
+> handling all that on spec side.
 
-Do you have more info, or this is more of a "your understanding" thing?
-E.g. rules for which subsystem? are they specified somewhere?
-I'm used to merging the fix with the selftest, two minor reasons pro:
- - less burden on submitter
- - backporters can see and use the test to validate, immediately
-con:
- - higher risk of conflicts, but that's my problem (we really need to
-   alpha-sort the makefiles, sigh)
+Yes, definitely open to adding an install target.
+
+Assume that whatever is missing or done strangely from packaging
+perspective is due to incompetence rather than intentional design :)
 
