@@ -1,106 +1,67 @@
-Return-Path: <netdev+bounces-144052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D255D9C562E
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 12:20:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E86FD9C5708
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 12:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88D6928D926
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:20:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C208FB437B0
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97AE6227B83;
-	Tue, 12 Nov 2024 10:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26CC11FB72D;
+	Tue, 12 Nov 2024 11:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="jxjmmB5Z";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OrZrs7Ii"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CUyFtoHF"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a8-smtp.messagingengine.com (flow-a8-smtp.messagingengine.com [103.168.172.143])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767C4226B88;
-	Tue, 12 Nov 2024 10:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA9E1F77A7;
+	Tue, 12 Nov 2024 11:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731408986; cv=none; b=uviVlLrjjb8Mv4KXSZ590NNhlYfO8WIsTi8k+9+4pglpdEpu/EgZZK2lQOdda4/JiOrG8TUuoBf8JzXIRKo/pMNlYn61t+Y49iTvLLEqIGvNkEgG+RnHdzBBKe78bDNZX1MbE1Y62VUNKVo8gpCuaQi37IhyfcrozjSdm3PleBg=
+	t=1731409293; cv=none; b=hYqgRMS0iqQxydKRQ58aLloY6SQI9RVCyAryIeZ7aWEtpJ4i8+YTRGgMilxg7SsV4zX8gQX1yvhEZp/JnQwh4VH7PLxZh2lnHEntSn/cRHaZgW6AgTo1k/gbfGOzpqJgK+t5AT2HuECAf9c9in8Ilh2XYze5RURDqoIrGK71fx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731408986; c=relaxed/simple;
-	bh=cw+MfT95YAhX/0hs0XJcoCzuCnfI/HJJ/hHCJeYPspY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=biyGJRSgClPwyHfJDaa9+nrY3IOWUq1uiauTQ+pO03q4OwuadamRz6NWgYgUvA8BXr7C5yQMLszWp5NLA3ZQyg4WCsO3FeTDg3QwrNeSHOp35a05I9j0rIoyyOKpv3HssFw1E8m4XCni45qvqyIHNcEID/JYe4GznsTTuLqPlEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=jxjmmB5Z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OrZrs7Ii; arc=none smtp.client-ip=103.168.172.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailflow.phl.internal (Postfix) with ESMTP id 61318200A6E;
-	Tue, 12 Nov 2024 05:56:22 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Tue, 12 Nov 2024 05:56:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1731408982; x=
-	1731412582; bh=ZwYYSGG6zgmMQwyFMLiLhe2O5PD1kFprIqbGRmWdxuo=; b=j
-	xjmmB5ZUM7qDMfgY1FEN8CLjjH4rn0yxmf6F1ReTlHL/T8sqC/+GNphKTbV2miiS
-	HUYcgNpk1sX6GYvqRR0srsuxgLX97IbWJkfjgqLp/BIu0cL55ONWZduTObLwWZFr
-	GQ9VPf1q49sL+DxIkQC4pwqsKqoRTpM7LK49tZfXInyNpvlF5BZLbl7fWexG+ru1
-	cRm4rmSxuU6JbEdh5B+noI6JqZZv4RAdGIMTQZ9lHhZA+bahMYt7R4fOYMAWSyUO
-	eQCcLagtHZ2i+zsAxW4d997GWaIuik6m+StdmZxaf2tv3b6CTivofM0TLX69iSYW
-	wwa/mILkuXUx8wvfPBoHw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731408982; x=1731412582; bh=ZwYYSGG6zgmMQwyFMLiLhe2O5PD1kFprIqb
-	GRmWdxuo=; b=OrZrs7IiHfEF0GABQUZ3lNjqpd4ix9WQzbsoGPanfxaawaUNcL+
-	R091V9fvCdDJANt26C3CLipgqPUJLzm3bk69ESuUoDS7B3ozN3qej65/rFBiBdn4
-	N46N55+wGxegHjY3YQ5je1mfq+j8wKCQXVGZFFPzPfmJ55hORDt+rLfnKSya+JJ5
-	NAptGviUAWhnyYFKvgUQQUlCNNOKF8SAOXb9UHY8TSwrT3zcL70uwqP3vsIxKvCv
-	Fu1UVp2oUdEvq9eIZZjWr5yCMzgK/Peq9o/CyKbO6NED/r2g76oeOGUn0SVnuNdo
-	P3tWMwUXXWIvMLnao1LLQ2en68iAix8SpoA==
-X-ME-Sender: <xms:VTQzZ6LSOJzHcwsAXQ8YnEjnH4mlivfcxJPbnXBzwmph2nvcqvzH8w>
-    <xme:VTQzZyJXvYIhFkd0a4lfobcQ-8zYAMup23PaoZyKz2ePDuZM_Se_gu82PnGHoFfL9
-    DZHgN5pUfuQLmBoB6M>
-X-ME-Received: <xmr:VTQzZ6v9no1MkrL897MBqETcqvOXYChz-PfOITIJByQO06g-dJ9xCJpJ-k54>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeggddulecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
-    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:VTQzZ_YPIY0Ym-BJMFUogFpGBHhLBk20ACPap7NhQgyFzOVRkh2Pwg>
-    <xmx:VTQzZxaUdhKyt1q-unCxsqfwpnXBH-QTfQTsTHDpyCYbpHlSla_T9w>
-    <xmx:VTQzZ7Btt360WfzZcr3BTtS0x3AcQPx0aHQo3tH-HwFenSJKT5PMrg>
-    <xmx:VTQzZ3Zlg_FEeUgCQgzulKGdkQXzHg_ZTrI6b3X_IOLxlAM11XRFYw>
-    <xmx:VTQzZ_OmhHzrwY-lyBQdNyg2XZKMVTnhvlrCu8guNqFvlw62TkzDOJRx>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 Nov 2024 05:56:21 -0500 (EST)
-Date: Tue, 12 Nov 2024 11:56:19 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 17/23] ovpn: add support for peer floating
-Message-ID: <ZzM0U81dmvdEWqdF@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-17-de4698c73a25@openvpn.net>
+	s=arc-20240116; t=1731409293; c=relaxed/simple;
+	bh=A/1yp0LaJZZY/+agPEY0mYZ96StMCvDdlakH86oaiKE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JOuCvYc7L8tD2npllVgSSviJ2HC3BsOFZlTipq/bihF7yN3uc1KrCzQC31Z5sv74k7ONNm9FudBNUsomQB6WTpP6STJUwSvy0Y+v7sFfmcfTdK6nQToK6FoQqcCt8GQ1IcG0zm5MRff2wvJWMaDXm7y/E1GfOYglff6BfzyQ1/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CUyFtoHF; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 38001240011;
+	Tue, 12 Nov 2024 11:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731409283;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=osagrrumfDGl8S19V6hpWE8fnqHAIqSNeF5380MEu3w=;
+	b=CUyFtoHF/08sM1eEggzqP7IJe6O8R0TkpW63Bs9QPbEdltpEwqx575feeKDvJIgjExRxu3
+	S58bXqI/Fj8kpAt8YxV2ziwbVUsg4FlPj0VGcqr7rlpTal2QUPme2eDLdB9kA7cURMN91e
+	QE5SagNWrT2yPA7s6OpZS+2GegGVlbaiawgxOYKVCvHX3RkOa5drKDAwjcIsIjpej1LcXp
+	mZcddRk18xaXwz269r4UdXdckjewdoNEExtNIHl50eu0UCwTkrTkTHKj7E3TleHq+VTeYF
+	AWYg+8wZTVjqZz1phg+9KSXGxV8QsyY1eheqFBVjP4mC4by7oORFMmrW9gBXrg==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: <alex.aring@gmail.com>,  <davem@davemloft.net>,  <dmantipov@yandex.ru>,
+  <edumazet@google.com>,  <horms@kernel.org>,  <kuba@kernel.org>,
+  <linux-kernel@vger.kernel.org>,  <linux-usb@vger.kernel.org>,
+  <linux-wpan@vger.kernel.org>,  <netdev@vger.kernel.org>,
+  <pabeni@redhat.com>,  <stefan@datenfreihafen.org>,
+  <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>,
+  <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
+In-Reply-To: <20241112002134.2003089-1-lizhi.xu@windriver.com> (Lizhi Xu's
+	message of "Tue, 12 Nov 2024 08:21:33 +0800")
+References: <87msi5pn7y.fsf@bootlin.com>
+	<20241112002134.2003089-1-lizhi.xu@windriver.com>
+User-Agent: mu4e 1.12.1; emacs 29.4
+Date: Tue, 12 Nov 2024 12:01:21 +0100
+Message-ID: <87a5e4u35q.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,86 +69,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241029-b4-ovpn-v11-17-de4698c73a25@openvpn.net>
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-2024-10-29, 11:47:30 +0100, Antonio Quartulli wrote:
-> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-> index 63c140138bf98e5d1df79a2565b666d86513323d..0e8a6f2c76bc7b2ccc287ad1187cf50f033bf261 100644
-> --- a/drivers/net/ovpn/io.c
-> +++ b/drivers/net/ovpn/io.c
-> @@ -135,6 +135,15 @@ void ovpn_decrypt_post(void *data, int ret)
->  	/* keep track of last received authenticated packet for keepalive */
->  	peer->last_recv = ktime_get_real_seconds();
->  
-> +	if (peer->sock->sock->sk->sk_protocol == IPPROTO_UDP) {
+On 12/11/2024 at 08:21:33 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
 
-What prevents peer->sock from being replaced and released
-concurrently?
+> On Mon, 11 Nov 2024 20:46:57 +0100, Miquel Raynal wrote:
+>> On 08/11/2024 at 22:54:20 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
+>>=20
+>> > syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+>> >
+>> > Remove an IEEE 802.15.4 network interface after unregister an IEEE 802=
+.15.4
+>> > hardware device from the system.
+>> >
+>> > CPU0					CPU1
+>> > =3D=3D=3D=3D					=3D=3D=3D=3D
+>> > genl_family_rcv_msg_doit		ieee802154_unregister_hw
+>> > ieee802154_del_iface			ieee802154_remove_interfaces
+>> > rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
+>> > ieee802154_if_remove
+>> > list_del_rcu
+>>=20
+>> FYI this is a "duplicate" but with a different approach than:
+>> https://lore.kernel.org/linux-wpan/87v7wtpngj.fsf@bootlin.com/T/#m02cebe=
+86ec0171fc4d3350676bbdd4a7e3827077
+> No, my patch was the first to fix it, someone else copied my
+> patch. Here is my patch:
 
-Or possibly reading the error value that ovpn_socket_new can return
-before peer->sock is reset to NULL, just noticed this in
-ovpn_nl_peer_modify:
+Ok, so same question as to the other contributor, why not enclosing the
+remaining list_del_rcu() within mutex protection? Can we avoid the
+creation of the LISTDONE state bit?
 
-	if (attrs[OVPN_A_PEER_SOCKET]) {
-		// ...
-		peer->sock = ovpn_socket_new(sock, peer);
-		if (IS_ERR(peer->sock)) {
-			// ...
-			peer->sock = NULL;
-
-
-(ovpn_encrypt_post has a similar check on
-peer->sock->sock->sk->sk_protocol that I don't think is safe either)
-
-
-> +		/* check if this peer changed it's IP address and update
-> +		 * state
-> +		 */
-> +		ovpn_peer_float(peer, skb);
-> +		/* update source endpoint for this peer */
-> +		ovpn_peer_update_local_endpoint(peer, skb);
-
-Why not do both in the same function? They're not called anywhere else
-(at least in this version of the series). They both modify peer->bind
-depending on skb_protocol_to_family(skb), and operate under
-peer->lock.
-
-
-> +void ovpn_peer_float(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-> +	struct hlist_nulls_head *nhead;
-> +	struct sockaddr_storage ss;
-> +	const u8 *local_ip = NULL;
-> +	struct sockaddr_in6 *sa6;
-> +	struct sockaddr_in *sa;
-> +	struct ovpn_bind *bind;
-> +	sa_family_t family;
-> +	size_t salen;
-> +
-> +	rcu_read_lock();
-> +	bind = rcu_dereference(peer->bind);
-> +	if (unlikely(!bind)) {
-> +		rcu_read_unlock();
-> +		return;
-> +	}
-> +
-> +	spin_lock_bh(&peer->lock);
-
-You could take the lock from the start, instead of using rcu_read_lock
-to get peer->bind. It would guarantee that the bind we got isn't
-already being replaced just as we wait to update it. And same in
-ovpn_peer_update_local_endpoint, it would make sure we're updating the
-local IP for the active bind.
-
-(sorry I didn't think about that last time we discussed this)
-
-> +	if (likely(ovpn_bind_skb_src_match(bind, skb)))
-> +		goto unlock;
-> +
-> +	family = skb_protocol_to_family(skb);
-> +
-
--- 
-Sabrina
+Thanks,
+Miqu=C3=A8l
 
