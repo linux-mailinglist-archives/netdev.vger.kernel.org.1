@@ -1,177 +1,164 @@
-Return-Path: <netdev+bounces-143962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA0E29C4D8B
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 05:01:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE1A9C4D9E
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 05:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8D9284B76
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:01:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E723B22564
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153731553AB;
-	Tue, 12 Nov 2024 04:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0F3208222;
+	Tue, 12 Nov 2024 04:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CWCoMSpl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4BKgPpq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C561DFE4
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 04:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1B32076D7;
+	Tue, 12 Nov 2024 04:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731384061; cv=none; b=gx44ni8FiPENKv+nmsmivP1PuayboPzHmPGfMt+SULgOzRufhmfgitM8a95X3FaLlaxM2rf1/20u7qYPbRrIhCfB8Aw5BnZDFnshp+r6haXPYc4NOi9UjYpQ3LjD6TRrSOGiQ2pUjHONEVnKpd/F7NUPfnIkXzj3IcFLZf2GE4E=
+	t=1731384617; cv=none; b=f8teym1NUJpg4GZs1RyYPq58RRTZxqW8rfgpWQzj8D63eO4vyLW5fgkVmEs1iA36pSBZHO/OlAktYRAtoKmOcwXtj6JHrJtYnXx9OP2J3uDfJPucJe8wvqb463buN4hTq2w0+NED4wc86HpIrEu7CUKrmYRczBGyNRbEkSAxUXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731384061; c=relaxed/simple;
-	bh=MInRnrIbroaebirZdPdyrVsqkuxDkA6P3CW9MGylKKw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TE31AFq0pHJFSDHk8G+mGeV8YoXCcUhLNMjwJ5wKfZZIc+dpmh+03gxIdIXeqRtE++mzFLIqBB8foWNXHVHdQ1ehfX1hFyZ2nkLYwY6kMz2KE2WK5FZIxKyKn2/oyPw65WwS+ImKkuKWfKJuOX8CdkUmU4XHtWA2GMRgcUz4Im8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CWCoMSpl; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731384060; x=1762920060;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=MInRnrIbroaebirZdPdyrVsqkuxDkA6P3CW9MGylKKw=;
-  b=CWCoMSplgzm0uBLWwQtWsyOn7UYJlTp4M705fK7TOp8iuHYe3OzluIRh
-   fDDQsPK17csEvaZeOplTKZ98ezt4K20DwiWEKAu+VTFc3nQ3SPPgnes5/
-   xbs18kf7Ctao7ZCJiiFc9YqWUP/nVISNKJI75M2OLhaFXg97EOq2Jr7k0
-   tWON1cwMNT8HD4Waf3YfBM1wk0FT/rDcd/ylyFmSCM2j/M6kdpFciV2M/
-   yZj14SottZVTy5UoTssxRpd2PBovafOUtIWnRlSWJsgYJg7xf4D0ToNSE
-   gadAHnAjS1XZi3O0p0zoVN3b9zHYvip5sUtDHnRekZgJQR3dEt0rTwuXz
-   Q==;
-X-CSE-ConnectionGUID: 9zahqIAfTwCz89ZgxxUQ/Q==
-X-CSE-MsgGUID: PDHS/RcISu+3eWqXvhQJxw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31354598"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31354598"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 20:00:59 -0800
-X-CSE-ConnectionGUID: NuP7CmulReOewYOoI0Lp1g==
-X-CSE-MsgGUID: mTCYgI9ATySj7JT7n9vpug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,146,1728975600"; 
-   d="scan'208";a="110505004"
-Received: from unknown (HELO YongLiang-Ubuntu20-iLBPG12.png.intel.com) ([10.88.229.33])
-  by fmviesa002.fm.intel.com with ESMTP; 11 Nov 2024 20:00:57 -0800
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-To: netdev@vger.kernel.org
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Subject: [PATCH iproute2-next v1] tc: Add support for Hold/Release mechanism in TSN as per IEEE 802.1Q-2018
-Date: Tue, 12 Nov 2024 12:00:29 +0800
-Message-Id: <20241112040029.3196975-1-yong.liang.choong@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1731384617; c=relaxed/simple;
+	bh=Dh0Rge16au2bgrUgJitkpfwaIhhWpmio6WByFkkHRtI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TCSNLjI4kdbCzF42NHo+yA9JyJcjybDxcWcRRmjd56bBfqFTr9oVIy+7zMuZmcQ412gUV/MM2bj7TTE4wl7en4N+m0ZwggpjbLszKu5hUOEBhX7iFEEpJMdnXnp8KpMmNFXN3XGYEo1CDpO17J7K8xUAT29uT9Z0cY4pQWzBZOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H4BKgPpq; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6ea85f7f445so51346847b3.0;
+        Mon, 11 Nov 2024 20:10:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731384615; x=1731989415; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DsmubN01hyDUEhQ6tv783ePv53ofcUVY2RqcZdf3yEo=;
+        b=H4BKgPpqGjAJgJ3kI5rNJgvCMtWFSpE0QxOAiprbBS/3r/seXc2kid/TRioB7ZKyKS
+         Q3zJNGd4wl7iHb92Pe52M22CNc2bLID7Xlo+DCdts/vLI3eMHK9L7wFPJSs4zl4ZKtXP
+         lBG5zw+fpZhnnyJFhvsjcKGCL9S1op18xogwQ2gDMqKXA2lv8bHds7w+AAIEWRurfISL
+         WulZDpXR3zX1KKhkrz8FmPPDt5+eEyy75i2KZKd5WyFE7KdG4leeJ3E02gCaGQ4/WzOw
+         6QOMOzsEnF0NBRuvyMIf5bXox5RRw3ZA/Dvak7jz3uOkAhrPyYdux8zo5ZNt5oXo+g5x
+         0+0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731384615; x=1731989415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DsmubN01hyDUEhQ6tv783ePv53ofcUVY2RqcZdf3yEo=;
+        b=NpITAByoFtUwKDdzyT8RAq5zhqoo48MCvzm8sZh5PsXf31n47yV6qVoBLfBgml+Eq1
+         5iAaBcLLdEXjQG7pw/zl3byA7Eu7h5smWuue4qdWi9xQJRAX37IL+61ouuDQ5AVdU/Cz
+         v7reQcS+XDb9k6/inbsheOd1U54gnOIyqKjtArMFxtGuHrvFEqadeYTbp8Pqqt7d9n0e
+         pZGN1bAsQ1AXPsgtMd2BkgL2H+FShsjZn5Wi2RNKq66VPY+iRWpWITg/9DfkQS0qdPEG
+         FWEvmalqyzG6bgGlUdX1msK8aWtcO012PsU/EpFzBjkL1Xptpb2QH8zio3XUC2hqAtUM
+         B36w==
+X-Forwarded-Encrypted: i=1; AJvYcCU3FOpgCJNJHiVJRfrfzCM9oMx5cjjzAeUsMi1KOYV9htLxL9fjLjNLQ0bgvcN35itbl8MNV3VF4kUsXQOY@vger.kernel.org, AJvYcCV6+hSiZ8GF71TzIQWKIV6BK8to1iT/Dzt/REWsjXiHYjJ1FvAyK2yYS1Kfey2rAn75MAwhYwR9aDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtBB9utSD9dfsZmhFUAmd4P0sYP/zd6oW4dWjkpvX7UKxvGAXT
+	ymTNzGeLys9SgAksCshGlrTTjkehp+GCnYp8+mhV/EBSuqp6odHsPaQBjfwMZPo99BcifMQgQdF
+	ZhMHrzQYKUNcThRShdv4kY8cGbSmcoiWm
+X-Google-Smtp-Source: AGHT+IEEd9e7KYmg9hOChPdcooKIfQet+Ec2imFxx6bP82VRvCibSsbb8ecrhexu0TZ29275WhqN4tjEisNPdXIjqY0=
+X-Received: by 2002:a05:690c:6b11:b0:6e2:ab93:8c68 with SMTP id
+ 00721157ae682-6eadddaf35cmr135388027b3.25.1731384615059; Mon, 11 Nov 2024
+ 20:10:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241111210316.15357-1-rosenp@gmail.com> <20241111193222.00ae2f3e@kernel.org>
+In-Reply-To: <20241111193222.00ae2f3e@kernel.org>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Mon, 11 Nov 2024 20:10:04 -0800
+Message-ID: <CAKxU2N-VHmVerombZ77uOHApi0aGBFi46oC1eoGTm5sakCVc4w@mail.gmail.com>
+Subject: Re: [PATCHv2 net-next] net: use pdev instead of OF funcs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Pantelis Antoniou <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+	Byungho An <bh74.an@samsung.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, 
+	Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Zhao Qiang <qiang.zhao@nxp.com>, 
+	"open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	"moderated list:ARM/Allwinner sunXi SoC support" <linux-arm-kernel@lists.infradead.org>, 
+	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>, 
+	"open list:FREESCALE SOC FS_ENET DRIVER" <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This commit enhances the q_taprio module by adding support for the
-Hold/Release mechanism in Time-Sensitive Networking (TSN), as specified
-in the IEEE 802.1Q-2018 standard.
+On Mon, Nov 11, 2024 at 7:32=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 11 Nov 2024 13:03:16 -0800 Rosen Penev wrote:
+> > --- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c
+> > +++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c
+> > @@ -111,7 +111,7 @@ static int sxgbe_platform_probe(struct platform_dev=
+ice *pdev)
+> >       }
+> >
+> >       /* Get the SXGBE common INT information */
+> > -     priv->irq  =3D irq_of_parse_and_map(node, 0);
+> > +     priv->irq =3D platform_get_irq(pdev, 0);
+> >       if (priv->irq <=3D 0) {
+> >               dev_err(dev, "sxgbe common irq parsing failed\n");
+> >               goto err_drv_remove;
+> > @@ -122,7 +122,7 @@ static int sxgbe_platform_probe(struct platform_dev=
+ice *pdev)
+> >
+> >       /* Get the TX/RX IRQ numbers */
+> >       for (i =3D 0, chan =3D 1; i < SXGBE_TX_QUEUES; i++) {
+> > -             priv->txq[i]->irq_no =3D irq_of_parse_and_map(node, chan+=
++);
+> > +             priv->txq[i]->irq_no =3D platform_get_irq(pdev, chan++);
+> >               if (priv->txq[i]->irq_no <=3D 0) {
+> >                       dev_err(dev, "sxgbe tx irq parsing failed\n");
+> >                       goto err_tx_irq_unmap;
+> > @@ -130,14 +130,14 @@ static int sxgbe_platform_probe(struct platform_d=
+evice *pdev)
+> >       }
+> >
+> >       for (i =3D 0; i < SXGBE_RX_QUEUES; i++) {
+> > -             priv->rxq[i]->irq_no =3D irq_of_parse_and_map(node, chan+=
++);
+> > +             priv->rxq[i]->irq_no =3D platform_get_irq(pdev, chan++);
+> >               if (priv->rxq[i]->irq_no <=3D 0) {
+> >                       dev_err(dev, "sxgbe rx irq parsing failed\n");
+> >                       goto err_rx_irq_unmap;
+> >               }
+> >       }
+> >
+> > -     priv->lpi_irq =3D irq_of_parse_and_map(node, chan);
+> > +     priv->lpi_irq =3D platform_get_irq(pdev, chan);
+> >       if (priv->lpi_irq <=3D 0) {
+> >               dev_err(dev, "sxgbe lpi irq parsing failed\n");
+> >               goto err_rx_irq_unmap;
+>
+> Coccicheck wants you to drop the errors:
+>
+> drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:116:2-9: line 116 is =
+redundant because platform_get_irq() already prints an error
+> drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:127:3-10: line 127 is=
+ redundant because platform_get_irq() already prints an error
+> drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:135:3-10: line 135 is=
+ redundant because platform_get_irq() already prints an error
+> drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:142:2-9: line 142 is =
+redundant because platform_get_irq() already prints an error
 
-Changes include:
-- Addition of `TC_TAPRIO_CMD_SET_AND_HOLD` and `TC_TAPRIO_CMD_SET_AND_RELEASE`
-cases in the `entry_cmd_to_str` function to return "H" and "R" respectively.
-- Addition of corresponding string comparisons in the `str_to_entry_cmd`
-function to map "H" and "R" to `TC_TAPRIO_CMD_SET_AND_HOLD` and
-`TC_TAPRIO_CMD_SET_AND_RELEASE`.
+I looked at the output. The error checks need changing too.
 
-The Hold/Release feature works as follows:
-- Set-And-Hold-MAC (H): This command sets the gates and holds the current
-configuration, preventing any further changes until a release command is
-issued.
-- Set-And-Release-MAC (R): This command releases the hold, allowing
-subsequent gate configuration changes to take effect.
-
-These changes ensure that the q_taprio module can correctly interpret and
-handle the Hold/Release commands, aligning with the IEEE 802.1Q-2018 standard
-for enhanced TSN configuration.
-
-Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Signed-off-by: Jose Abreu <Jose.Abreu@synopsys.com>
----
- man/man8/tc-taprio.8 | 30 ++++++++++++++++++++++--------
- tc/q_taprio.c        |  8 ++++++++
- 2 files changed, 30 insertions(+), 8 deletions(-)
-
-diff --git a/man/man8/tc-taprio.8 b/man/man8/tc-taprio.8
-index bf489b03..b7a81faf 100644
---- a/man/man8/tc-taprio.8
-+++ b/man/man8/tc-taprio.8
-@@ -115,14 +115,28 @@ parameters in a single schedule. Each one has the
- 
- sched-entry <command> <gatemask> <interval>
- 
--format. The only supported <command> is "S", which
--means "SetGateStates", following the IEEE 802.1Q-2018 definition
--(Table 8-7). <gate mask> is a bitmask where each bit is a associated
--with a traffic class, so bit 0 (the least significant bit) being "on"
--means that traffic class 0 is "active" for that schedule entry.
--<interval> is a time duration, in nanoseconds, that specifies for how
--long that state defined by <command> and <gate mask> should be held
--before moving to the next entry.
-+format.
-+
-+<command> support the following values:
-+.br
-+.I "S"
-+for SetGateStates
-+.br
-+.I "H"
-+for Set-And-Hold-MAC
-+.br
-+.I "R"
-+for Set-And-Release-MAC
-+.br
-+These commands follow the IEEE 802.1Q-2018 definition (Table 8-7).
-+
-+<gate mask> is a bitmask where each bit is associated with a traffic class, so
-+bit 0 (the least significant bit) being "on" means that traffic class 0 is
-+"active" for that schedule entry.
-+
-+<interval> is a time duration, in nanoseconds, that specifies for how long that
-+state defined by <command> and <gate mask> should be held before moving to
-+the next entry.
- 
- .TP
- flags
-diff --git a/tc/q_taprio.c b/tc/q_taprio.c
-index 416a222a..689c7a8f 100644
---- a/tc/q_taprio.c
-+++ b/tc/q_taprio.c
-@@ -53,6 +53,10 @@ static const char *entry_cmd_to_str(__u8 cmd)
- 	switch (cmd) {
- 	case TC_TAPRIO_CMD_SET_GATES:
- 		return "S";
-+	case TC_TAPRIO_CMD_SET_AND_HOLD:
-+		return "H";
-+	case TC_TAPRIO_CMD_SET_AND_RELEASE:
-+		return "R";
- 	default:
- 		return "Invalid";
- 	}
-@@ -62,6 +66,10 @@ static int str_to_entry_cmd(const char *str)
- {
- 	if (strcmp(str, "S") == 0)
- 		return TC_TAPRIO_CMD_SET_GATES;
-+	else if (strcmp(str, "H") == 0)
-+		return TC_TAPRIO_CMD_SET_AND_HOLD;
-+	else if (strcmp(str, "R") == 0)
-+		return TC_TAPRIO_CMD_SET_AND_RELEASE;
- 
- 	return -1;
- }
--- 
-2.34.1
-
+>
+> You can make it a separate patch in a series, for clarity.
+I don't think it's enough to warrant its own commit.
+> --
+> pw-bot: cr
 
