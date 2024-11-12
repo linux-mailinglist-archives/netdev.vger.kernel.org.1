@@ -1,79 +1,95 @@
-Return-Path: <netdev+bounces-143949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C469C4D07
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:05:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C7309C4D20
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7EDCB2752A
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:04:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C8E28870B
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAEE8204F84;
-	Tue, 12 Nov 2024 03:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0EB20ADC0;
+	Tue, 12 Nov 2024 03:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJVC4FPh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CsbeBux+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D061DFE4;
-	Tue, 12 Nov 2024 03:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5569720A5F7;
+	Tue, 12 Nov 2024 03:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731380689; cv=none; b=WLrr8PSc3SYlr6QTXFse1jDPlzPBZBgL5zpdF+5CFe6dBWHlarYchIwgtvIgMdPxLk7wVEYb+Sp1PklxVKLOI4DIv6CcRz+BJQrMIpvJhnw7eRQwTAGJW+CHqUwZf80dwft4zhpe7UT/nqsBY/P3PStWO8y9LH/KijfhUVZ+vxU=
+	t=1731381021; cv=none; b=Ls7W/yFPvHRbmVz1/8p7auOUqsPUwGy1bNPE6AQH3UWjv62sWFa0mc32GDoohkDiRDlWk9PA87jy76UhBxTC+CB23eJ5wgdRBAOElzblqPyi8eIAxTfgbnvApIkXfhLPwsvBoa/Rl3mxhXFPSmgXgP4JPgm2LaqeGq5jtVFrjO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731380689; c=relaxed/simple;
-	bh=Hc9dgDWe1K9rdImKS8+TSxnAd59S+ucijqCsZs0nvhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QoIqADi6yr1EVOYGB/7cLbTuIkTV2vWaS4WOek/Y+bqzPMF4iJOr0O3XfiyHoji52dUw9cC4yKonTI3w6Et05DZhKtbEzy3V4gRGDFwIw0fDTMTH4J/UUr+sQBABz2XQQFl2S50ub0TC8ZYqT57CjXDbuNYKSpezxYEVMEiWlyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJVC4FPh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F5B8C4CECF;
-	Tue, 12 Nov 2024 03:04:48 +0000 (UTC)
+	s=arc-20240116; t=1731381021; c=relaxed/simple;
+	bh=mH57cbZjyVa6xNhl/CiiNE30nia+w8i2VuPME3G5B7s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ncjXk4QiOQmXMZTP9uu96vDbpnX3bDyAPxm03jnlxy3Cf6vcOceX0InWDE58OUWNTzjUo+zh53cdNxSN6mkro2AMoc3hy665ikVrwcGAbEsLDlOHItbHpDO+KG47ZZrjKxC/rF8DToicxmMPKsWru8Bp1aknG4AnaXF/S00HVHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CsbeBux+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCD4CC4CED0;
+	Tue, 12 Nov 2024 03:10:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731380689;
-	bh=Hc9dgDWe1K9rdImKS8+TSxnAd59S+ucijqCsZs0nvhg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tJVC4FPhXJZd0DxOccq49+oGu4Fl9RudggWjtK5bbZ8YvRzP3NODyb16mZE+YZv/o
-	 ymnyWhcPSRl3XExexTNRVu4no5ZdkGeDFKO4diyAqFLMvtR3UZJ8OBFIfHTPWAcptl
-	 n6Th5jKXbp4+eiQpd1qz9KdocRK5E+ZJUQlnOwO6xyGdh62aYUZcfY+vZSmpeBG6NR
-	 6l7FVxDaDYkjKlWojRmB/Wiv0kq8VutE435BMO19aBRvcLTmnx3qbO7f9uW4Z3ugfp
-	 J7zhwgsmmVoZ68yWqIZ2syDdiWdOrEDjChZuCuFMvqmbvsnnmLKk2NOlAWd0dJjbJ6
-	 OGHeyepU6X+5A==
-Date: Mon, 11 Nov 2024 19:04:47 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, John Fastabend <john.fastabend@gmail.com>, Alexei
- Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Ido Schimmel <idosch@nvidia.com>, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] ipv4: Prepare bpf helpers to .flowi4_tos
- conversion.
-Message-ID: <20241111190447.43d6c542@kernel.org>
-In-Reply-To: <cover.1731064982.git.gnault@redhat.com>
-References: <cover.1731064982.git.gnault@redhat.com>
+	s=k20201202; t=1731381018;
+	bh=mH57cbZjyVa6xNhl/CiiNE30nia+w8i2VuPME3G5B7s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CsbeBux+mHJnV6HMWnBLEOzUTiDIeeiT+C7nqSVS26l0GUAipb8+V4hpj3kOgO6/v
+	 /f88OyrtbgJnXzCDcoT4Yfyvx+NQSHVFfVwcCd21gKF5bbssJsxXmcVyxInvyDjXwS
+	 L0Nusfk/3FfLrJ74aXHdyR6DHA2SYm3qHL1aQLO8lVhMRsumFIT9YjkX3PZ8bHFEaZ
+	 KzVm7WdHxsr2K3kYShcChhUPMv4Xlbm9jljZr+GVBtmWA9rQKECkfD/UsuC3ZodxWi
+	 AYVZtBHxlQpooHgdRMSlA+E5iZFDXL2hWhdS5UJ/DYMRM1OzgyLcO9BTGPJoBGByDn
+	 4Acfn7A38JnUg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 344333809A80;
+	Tue, 12 Nov 2024 03:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] mptcp: fix a couple of races
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173138102902.64810.12435191606260669917.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Nov 2024 03:10:29 +0000
+References: <cover.1731060874.git.pabeni@redhat.com>
+In-Reply-To: <cover.1731060874.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, matttbe@kernel.org, martineau@kernel.org,
+ geliang@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, mptcp@lists.linux.dev
 
-On Fri, 8 Nov 2024 17:47:09 +0100 Guillaume Nault wrote:
-> Continue the process of making a dscp_t variable available when setting
-> .flowi4_tos. This series focuses on the BPF helpers that initialise a
-> struct flowi4 manually.
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  8 Nov 2024 11:58:15 +0100 you wrote:
+> The first patch addresses a division by zero issue reported by Eric,
+> the second one solves a similar issue found by code inspection while
+> investigating the former.
 > 
-> The objective is to eventually convert .flowi4_tos to dscp_t, (to get
-> type annotation and prevent ECN bits from interfering with DSCP).
+> Paolo Abeni (2):
+>   mptcp: error out earlier on disconnect
+>   mptcp: cope racing subflow creation in mptcp_rcv_space_adjust
+> 
+> [...]
 
-Daniel, feel free to take this or we can take with your ack..
+Here is the summary with links:
+  - [net,1/2] mptcp: error out earlier on disconnect
+    https://git.kernel.org/netdev/net/c/581302298524
+  - [net,2/2] mptcp: cope racing subflow creation in mptcp_rcv_space_adjust
+    https://git.kernel.org/netdev/net/c/ce7356ae3594
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
