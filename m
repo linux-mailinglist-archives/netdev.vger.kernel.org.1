@@ -1,50 +1,73 @@
-Return-Path: <netdev+bounces-143907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C0879C4B88
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:10:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410759C4B8E
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EFBD282EF8
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:10:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AEBEB21004
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C259F1F7574;
-	Tue, 12 Nov 2024 01:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885011F8196;
+	Tue, 12 Nov 2024 01:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldKFr+7m"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rq2jod52"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D2E5234;
-	Tue, 12 Nov 2024 01:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D981E884;
+	Tue, 12 Nov 2024 01:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731373822; cv=none; b=muco9LA+v0V7X8HwcTA3SGCMrQSty3tyuuS6lptglJKH4V1ZE1ADFGzqSHoilgj72haZohWAqW8SVQgTHkRjP9LOpGbboMpU71LiZBLS5JgFQdPRm0lk3GiCRHFMxIRhDKE3o2rnKKb4GZxCLlM/zerBGKDYrzz6Fywt/Vt4U9s=
+	t=1731373917; cv=none; b=if4cmLKwDSIwoXI4kvr2jhU0lLp7MjKiYS5E/MIK1ku9cW8JsVns/9XzOMHGUO2HLBq4smcdbrECZmwahcJTKd2W3Ldd0qjresDCaJmJUGIwE8NA86ndlAzdEqZcHEJtyGU2V7Hm7fldPEaJBxqrYnWc4aeCbbf7xi1VI2ag7yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731373822; c=relaxed/simple;
-	bh=6iXWIIYzs6Fz0/pkTPNNDbrXf39SPg/gliWgmM5jfNY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QBFqkHSME2UNFeWEzea6wtqPVNxpWV1dZ8m+oEYb+Ov3/z9HZ6SkdDMiqVtQX031qzkMLPP6r8lN7+D275Ir+7kwB15Lh6IlkjszD5ueUMzA33PE/uZ+GWTpFeEjSp3Pyj2F2sjGwRTF/uKVEbbhqe1UgKSMPgp0In+z04nNV3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldKFr+7m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EB62C4CECF;
-	Tue, 12 Nov 2024 01:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731373822;
-	bh=6iXWIIYzs6Fz0/pkTPNNDbrXf39SPg/gliWgmM5jfNY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ldKFr+7mn6+9pfbea/baC0+HmKUyUu6Fqjtgiwyd2XTSRMxQ19EtGcw8ucFsMdEd2
-	 il1S0SznFiFzKa0MHWzeRPW+EPDO+c7NA9DPiTaUxQPQfa0Cb84h29LFLh5/SJv1fS
-	 RXJdUVnyuMdK1Ta406YST4lvSBKqiGE0eBBfUKSX5DwQkLjmTOdHJuPr/P8RIrO3ne
-	 r7dvv4Y2a6aO8+PS94szVtEwQP1Mvk6lW0mY5ZP3mimRb/nNKgkI6By6DugtM0Nx5y
-	 DuLgxfMda/Q1lDtxtS+TelF2FbAiJ+/eIfxmKYEHxm/41uXwXQYG3uB2Glwmoo81V0
-	 B/GQ1hvXIWJ/A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714583809A80;
-	Tue, 12 Nov 2024 01:10:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1731373917; c=relaxed/simple;
+	bh=SPL3XQ1tu1vWeHaH3hszUW99/LjWt2MUH/1JFp5Dok8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NixYEnPPprLDznEP5ojGH6V0Q+/MaX5xDR04sqxtMHnEgCgiGU87mJcxCKi7B9OQQTWlqmBWYxiNIcxXAOGRruox1J23lrOEu8xePpZ2Ds4WhMeWTUI2eBr3ukuADCI9I5inH4eBEqViA8GCtPgoEpTbxG7q77A8JAJxAjKFtqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rq2jod52; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731373916; x=1762909916;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kbTAqDo4z0mETHSFiamEzBpNc9m1yAvP8V71QAcPZhI=;
+  b=rq2jod52F1vp2NfsTbCsNR21HLGJjyq/sTwcUoRr0ZvfIoX83H3kV0ps
+   Pds2EBZG43gvuPt9EEKcpTmMttdRDSqv0H6JRV/Fn5L0vjBn07TECGZJ5
+   9UjnnU+GTLDdVdsJVxJ9bWWaf0exhRGJqVnEzG6pTbF8hgKO9D42wr9xF
+   0=;
+X-IronPort-AV: E=Sophos;i="6.12,146,1728950400"; 
+   d="scan'208";a="438837700"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 01:11:52 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:29434]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.195:2525] with esmtp (Farcaster)
+ id 16a8b21c-41f4-49aa-91ef-9847d021dfb7; Tue, 12 Nov 2024 01:11:51 +0000 (UTC)
+X-Farcaster-Flow-ID: 16a8b21c-41f4-49aa-91ef-9847d021dfb7
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 12 Nov 2024 01:11:51 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 12 Nov 2024 01:11:49 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <alexhenrie24@gmail.com>
+CC: <alx@kernel.org>, <branden@debian.org>, <kuniyu@amazon.com>,
+	<linux-man@vger.kernel.org>, <mtk.manpages@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+Date: Mon, 11 Nov 2024 17:11:45 -0800
+Message-ID: <20241112011145.65139-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
+References: <20241111062205.207027-1-alexhenrie24@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,65 +75,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 00/12] selftests: ncdevmem: Add ncdevmem to ksft
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173137383227.35889.14781733163627286738.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Nov 2024 01:10:32 +0000
-References: <20241107181211.3934153-1-sdf@fomichev.me>
-In-Reply-To: <20241107181211.3934153-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org,
- horms@kernel.org, almasrymina@google.com, willemb@google.com,
- petrm@nvidia.com, jdamato@fastly.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  7 Nov 2024 10:11:59 -0800 you wrote:
-> The goal of the series is to simplify and make it possible to use
-> ncdevmem in an automated way from the ksft python wrapper.
+From: Alex Henrie <alexhenrie24@gmail.com>
+Date: Sun, 10 Nov 2024 23:20:06 -0700
+> struct ifa_cacheinfo contains the address's creation time, update time,
+> preferred lifetime remaining, and valid lifetime remaining.
 > 
-> ncdevmem is slowly mutated into a state where it uses stdout
-> to print the payload and the python wrapper is added to
-> make sure the arrived payload matches the expected one.
-> 
-> [...]
+> Link: <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/if_addr.h?h=v6.11#n60>
 
-Here is the summary with links:
-  - [net-next,v8,01/12] selftests: ncdevmem: Redirect all non-payload output to stderr
-    https://git.kernel.org/netdev/net-next/c/6891f0b523e1
-  - [net-next,v8,02/12] selftests: ncdevmem: Separate out dmabuf provider
-    https://git.kernel.org/netdev/net-next/c/8b9049af8066
-  - [net-next,v8,03/12] selftests: ncdevmem: Unify error handling
-    https://git.kernel.org/netdev/net-next/c/bfccbaac1b45
-  - [net-next,v8,04/12] selftests: ncdevmem: Make client_ip optional
-    https://git.kernel.org/netdev/net-next/c/0ebd75f5f239
-  - [net-next,v8,05/12] selftests: ncdevmem: Remove default arguments
-    https://git.kernel.org/netdev/net-next/c/d3ca35c64d48
-  - [net-next,v8,06/12] selftests: ncdevmem: Switch to AF_INET6
-    https://git.kernel.org/netdev/net-next/c/933056357a8c
-  - [net-next,v8,07/12] selftests: ncdevmem: Properly reset flow steering
-    https://git.kernel.org/netdev/net-next/c/e3c09623a53b
-  - [net-next,v8,08/12] selftests: ncdevmem: Use YNL to enable TCP header split
-    https://git.kernel.org/netdev/net-next/c/798d822e5d34
-  - [net-next,v8,09/12] selftests: ncdevmem: Remove hard-coded queue numbers
-    https://git.kernel.org/netdev/net-next/c/d4ef05d21131
-  - [net-next,v8,10/12] selftests: ncdevmem: Run selftest when none of the -s or -c has been provided
-    https://git.kernel.org/netdev/net-next/c/77f870a00016
-  - [net-next,v8,11/12] selftests: ncdevmem: Move ncdevmem under drivers/net/hw
-    (no matching commit)
-  - [net-next,v8,12/12] selftests: ncdevmem: Add automated test
-    https://git.kernel.org/netdev/net-next/c/80230864b7b0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Link does not need <> around URL.
 
 
+> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+
+otherwise looks good to me:
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
