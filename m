@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-144163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9359C5DBE
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:53:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 118D29C5E6F
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:11:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42CFF28199B
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:53:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D622824D5
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E91C213156;
-	Tue, 12 Nov 2024 16:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D08207A14;
+	Tue, 12 Nov 2024 17:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KF6aRyBn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60D2212D3E;
-	Tue, 12 Nov 2024 16:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE592076AB;
+	Tue, 12 Nov 2024 17:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731430305; cv=none; b=EO6Vt5lCVPdYcYgSUZfLZA2UNs1R2nLcPkwYQmempewB3ldNBCmyhYa6PAkf1s/fWzRXj4pNtKMg4ntEyWYkGMvoau4uj70pkqqdLHrNFvU6C4B4wtAGRw9ooPnB26U2yvXiuPLE3ymsPVkvvg3XIKLhKK+E+1A/0PP+xPQKQCM=
+	t=1731431226; cv=none; b=AxTcIyfEkCScgzIux1X0e5wWeihVtEOu2gGT88cgncjbToMFQEi44J3kTIEKZgOvwdelH0KuEQkXRf2B7IIaI90pKG5FMfHJeEfSFMkDvKUPpSvjREduz7rb30oOaLg9AAn2jlKnWhFa8qqRNvzg+mqrOHqxJoPXBFiWpXVTp80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731430305; c=relaxed/simple;
-	bh=ge6WToV2LD3RgxXc7bfGJlRMQKEfKVqLb33pph0b678=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=coVJGVPUcy+LTQGvqlsTq3qrc48d7OpCUHJQX7lutGkMAUMPeEkoIhHhrGl71T/dKZlRuJ9P75oYI51Rt1YAg+HlCd7xvtGIpWJ9hfnn2a4uCWxEmAmlhEAUEGkgv+MyKq7rSumfM/yO4w/94DhEPHmWkolZu7lNS839PmyJJts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71e467c3996so4788908b3a.2;
-        Tue, 12 Nov 2024 08:51:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731430303; x=1732035103;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RCNBJc3uUpKarH5QnEi/kXlb0a0dXh62yQ1NHQ7/+Wg=;
-        b=j5c2MLgm9LM2jY9qlyhbPytkHNLaAlgmOTyNgbm718DEK7L8YmodcfO0/frm35+0yo
-         jujdAMrVuyI9TgErdmAmxdEQBQwvvV0ebgzusRYPhUZkAsc4aimxXu0JKVvhiSnMrIWl
-         +25svdRPbLLPYwV13DfunCb0D76k/FW1492DDxf6X7DmwBT6ev7RtiQDnxZqbuJ8lcop
-         Ub/+8r47WalVImJiwzCHy6Gy7S0DHLuI/+0499U6A2ySvWt79rV8bf4lzTZbv7nzYJzb
-         lyuD4wMwlIDJKw4yWADthwUgy9cF3/wgRql8bEXcSbpj7ilXBI+5BCuS/GwfHZPP1o6f
-         KcdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzL/4LOKxUMSJeWD4fPuDP7ZoNojFYfBmx+wNi81mMCPjhN5fPmchTphjlXoV3XjVkN/pIqApeGjnb528=@vger.kernel.org, AJvYcCXdx4cv9pfKuGnyQQ5VO1jsAFXKaBp9YJvonpy2ZZhjIhl/FWwGwmjon/+HXQN69OQmzEbGh2AM@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEMCtyvrCI2q59yMjjy3DDpDXeNHiGXy4/OIinhmG13cHAkXeN
-	0HamtsPZHOxC5PEuSF0dAEgBm+7l6ILan3kVZerV7Vo22FysANHTI3LvNg==
-X-Google-Smtp-Source: AGHT+IGojFE8rKJQBBsF6z3vR9sMa07PdFrXTe3eJTCWnHtqaSAVMaYol+38slXcoet4/MbV7HRCuQ==
-X-Received: by 2002:a05:6a00:1909:b0:710:5848:8ae1 with SMTP id d2e1a72fcca58-7241327d7aamr22368753b3a.4.1731430302857;
-        Tue, 12 Nov 2024 08:51:42 -0800 (PST)
-Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407860aa5sm11271260b3a.32.2024.11.12.08.51.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 08:51:42 -0800 (PST)
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-To: linux-can@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Robert Nawrath <mbro1689@gmail.com>,
+	s=arc-20240116; t=1731431226; c=relaxed/simple;
+	bh=yfOv/eMBAl8i55aF51GafdzPzmAf+rbqJvtUJEDJb5M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JsnT+T0e1+YojpDgLIivfXG17SBFdqCv6x5AIML7ECoE2kwB+aGIrhyVwKj3X+vwQXWR79FtlOMPmj+XePcfKm1jLoLPWjONnDrwzt1ALkljKtFO5/pj8p3BXdOYcqI35/0JsLhSHcaP/rHtCP6sUyqPSQ1IuSzxDf9AGhieE20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KF6aRyBn; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 54B79E0002;
+	Tue, 12 Nov 2024 17:07:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731431222;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MNtCugG59nS9OABDLmKZagjpJ188CbPhZJNQ0/shOKY=;
+	b=KF6aRyBn5/7nNXSS5Mad6+l+b+BbubgLGJZfM7VgpqTBqmHpPWlNRVneQ/d90gcj71UWiN
+	vQcSemki6Sg14AxdjC6nY7uZpZWp4VcbfJSdHPfxJHViK4AcI22w/xTuXP3hzBPUIeD0ao
+	ROh47wIUy58MA/IYBsb0gpI1GW5WjRBMwuKHrSKQsvikmu2vDMAEMsj8+vkHOK2IMk+1WS
+	V/coLl2a4ohAaV3xmvzLYT0KbnbwQOUJ9d3Fx1nw2oai5BsAdrKmzc/OsDrLy2uU56QAVl
+	gyPT5qDS9aEjQfoG92F6DTJ2A4mNIJn4eOxk3euoa5MdvohILAkFdhPrDWk+Pg==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH v1 5/5] can: netlink: can_changelink(): rename tdc_mask into fd_tdc_flag_provided
-Date: Wed, 13 Nov 2024 01:50:20 +0900
-Message-ID: <20241112165118.586613-12-mailhol.vincent@wanadoo.fr>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
-References: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Daniel Machon <daniel.machon@microchip.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 0/9] Support external snapshots on dwmac1000
+Date: Tue, 12 Nov 2024 18:06:48 +0100
+Message-ID: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1934; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=ge6WToV2LD3RgxXc7bfGJlRMQKEfKVqLb33pph0b678=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnG7e1FzdcYi8/NWHPxRsqxAN4lhdMOb1eLVb7bs6yDo 2FWrm9LRykLgxgXg6yYIsuyck5uhY5C77BDfy1h5rAygQxh4OIUgIm8jWBkmJk00b14P7NpVPMC 7Y3brzS/SN/dpz5/g81xrwl+cZs7TzMyNO5z9PhzaZHbGZ55PcKz5rZVlNW4+GdrX90ZMOniGf4 0ZgA=
-X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The only purpose of the tdc_mask variable is to check whether or not
-any tdc flags (CAN_CTRLMODE_TDC_{AUTO,MANUAL}) were provided. At this
-point, the actual value of the flags do no matter any more because
-these can be deduced from some other information.
+Hi,
 
-Rename the tdc_mask variable into fd_tdc_flag_provided to make this
-more explicit. Note that the fd_ prefix is added in preparation of the
-introduction of CAN XL.
+This is v4 on the series to support external snapshots on dwmac1000.
 
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
----
- drivers/net/can/dev/netlink.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+The main change since v3 is the move of the fifo flush wait in the
+ptp_clock_info enable() function within the mutex that protects the ptp
+registers. Thanks Jakub and Paolo for spotting this.
 
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index 27168aa6db20..f346b4208f1c 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -189,7 +189,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 			  struct netlink_ext_ack *extack)
- {
- 	struct can_priv *priv = netdev_priv(dev);
--	u32 tdc_mask = 0;
-+	bool fd_tdc_flag_provided = false;
- 	int err;
- 
- 	/* We need synchronization with dev->stop() */
-@@ -234,11 +234,11 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 			memset(&priv->fd.tdc, 0, sizeof(priv->fd.tdc));
- 		}
- 
--		tdc_mask = cm->mask & CAN_CTRLMODE_FD_TDC_MASK;
-+		fd_tdc_flag_provided = cm->mask & CAN_CTRLMODE_FD_TDC_MASK;
- 		/* CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually
- 		 * exclusive: make sure to turn the other one off
- 		 */
--		if (tdc_mask)
-+		if (fd_tdc_flag_provided)
- 			priv->ctrlmode &= cm->flags | ~CAN_CTRLMODE_FD_TDC_MASK;
- 	}
- 
-@@ -342,7 +342,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 				priv->ctrlmode &= ~CAN_CTRLMODE_FD_TDC_MASK;
- 				return err;
- 			}
--		} else if (!tdc_mask) {
-+		} else if (!fd_tdc_flag_provided) {
- 			/* Neither of TDC parameters nor TDC flags are
- 			 * provided: do calculation
- 			 */
+This series also aggregates Daniel's reviews, except for the patch 4
+which was modified since then.
+
+This series is another take on the previous work [1] done by
+Alexis Lothoré, that fixes the support for external snapshots
+timestamping in GMAC3-based devices.
+
+Details on why this is needed are mentionned on the cover [2] from V1.
+
+[1]: https://lore.kernel.org/netdev/20230616100409.164583-1-alexis.lothore@bootlin.com/
+[2]: https://lore.kernel.org/netdev/20241029115419.1160201-1-maxime.chevallier@bootlin.com/
+
+Thanks Alexis for laying the groundwork for this,
+
+Best regards,
+
+Maxime
+
+Link to V1: https://lore.kernel.org/netdev/20241029115419.1160201-1-maxime.chevallier@bootlin.com/
+Link to V2: https://lore.kernel.org/netdev/20241104170251.2202270-1-maxime.chevallier@bootlin.com/
+Link to V3: https://lore.kernel.org/netdev/20241106090331.56519-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (9):
+  net: stmmac: Don't modify the global ptp ops directly
+  net: stmmac: Use per-hw ptp clock ops
+  net: stmmac: Only update the auto-discovered PTP clock features
+  net: stmmac: Introduce dwmac1000 ptp_clock_info and operations
+  net: stmmac: Introduce dwmac1000 timestamping operations
+  net: stmmac: Enable timestamping interrupt on dwmac1000
+  net: stmmac: Don't include dwmac4 definitions in stmmac_ptp
+  net: stmmac: Configure only the relevant bits for timestamping setup
+  net: stmmac: dwmac_socfpga: This platform has GMAC
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   4 +
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac1000.h   |  12 +++
+ .../ethernet/stmicro/stmmac/dwmac1000_core.c  | 101 ++++++++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  15 ++-
+ .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c |  26 ++++-
+ .../net/ethernet/stmicro/stmmac/stmmac_ptp.c  |  38 +++++--
+ .../net/ethernet/stmicro/stmmac/stmmac_ptp.h  |  10 ++
+ 8 files changed, 196 insertions(+), 11 deletions(-)
+
 -- 
-2.45.2
+2.47.0
 
 
