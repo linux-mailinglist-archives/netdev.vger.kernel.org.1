@@ -1,162 +1,132 @@
-Return-Path: <netdev+bounces-144105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D6499C5B06
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:56:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8E19C5BA4
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD7C8B320AC
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:50:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6BC1B282FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE871FBF6C;
-	Tue, 12 Nov 2024 13:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4FA1FCF63;
+	Tue, 12 Nov 2024 13:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WzN4faAC"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="rstItsb9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4A51FBF69;
-	Tue, 12 Nov 2024 13:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06951FCF41
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 13:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731419426; cv=none; b=Ztqhl7lHd+S1X6By3w/KyQp6Hdp8Ybx+Z/HXxNaCsLoczEk/Osu3vk5MAf0wynNspb3okNuYi2ZjpX69r0ln3JiAb+7xbs3ZtFW/Ui304Nf44y7K/HXuex91bfyr5ABHAAcYKxiIvASW/5cT8YJZrza/LUps7rhnlA0Pmu36HMM=
+	t=1731419429; cv=none; b=jccTBCdhYxPzBFdLPRTrf8csdadJVHzP3L6NN5aozV1goX/pwvW2sqgAAkhQDwERBELWND8mW9VCxIkvbdovRYzOWLt5zj6+Cfzjf4o8tZbbvVH4/fPOkv/hr0SeiJSsYKEh5KZUzWyhJ7UGLW/lxFFwQ+Z4rT2AOrxc6DFWfDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731419426; c=relaxed/simple;
-	bh=23YyCjbwBAijNPWYmfJkXL8K/4xOrP3oeVxaL7oa0uI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C8bcbq1T1bsa0PPXpjObyklcpB3Gg8xoNxN8GuZrZDqQjOPbq6VFHoYw7Q0R+26OSaPWkVHzpspdQ7e2C5/EdXphETCRbi/gy0d2mb0j3HxXWxL6SzvBjagY7paN/IfOO3M2nc8gJo8UnMTUxWV8oo14KGafTvlLNaUrKtOyyLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WzN4faAC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PAZREJW+aSaaTf3gacNdlLm+fyoS5JjUlA9TaeZpbJo=; b=WzN4faACh1+ZeQEAPhIDEd2kKO
-	+D7ac4hJXXnYXfIrXYdmt1q4gRdtAnqZB4nBBahEz77b7OAN0Louzr1tPPi+1X90pEbjBl5F0juTW
-	H0+0dqlxJpxmJefJBjcnJ+ZW71Ptfr3/pv/kfd9YyY4yImvpxrvob7eAy+/irThr0CKs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tArHc-00D2BH-BR; Tue, 12 Nov 2024 14:50:16 +0100
-Date: Tue, 12 Nov 2024 14:50:16 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tristram.Ha@microchip.com
-Cc: Woojung.Huh@microchip.com, olteanv@gmail.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	marex@denx.de, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Message-ID: <700c326c-d154-4d21-b9d4-d8abf8f2bf33@lunn.ch>
-References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
- <20241109015633.82638-3-Tristram.Ha@microchip.com>
- <784a33e2-c877-4d0e-b3a5-7fe1a04c9217@lunn.ch>
- <DM3PR11MB87360F9E39097E535416838EEC592@DM3PR11MB8736.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1731419429; c=relaxed/simple;
+	bh=mzq613P0rQJ2+4JHU/B89oV7zMp4IkunBZ8sL1R7feI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z9TB4AdVB6bSOzug8Qa0WMXThqcSRfyyRgAbNLBwhVckiaAqkQHNm049rpLbk7sGalae4IWaRhkTIE4rYuzn8Kg97bLku6OIKHlKThr7A8/911fSEweFoQUXyhUldMBn7y7co/rZLBkcC7/0MUTaAn3zSnirOKRIlSLRj3hfZ3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=rstItsb9; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539f58c68c5so9732091e87.3
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 05:50:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1731419426; x=1732024226; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=faWcBO3IObJ6Ff1ndGVWG5mNTwtfJB+/3MIGY1Y/Ibw=;
+        b=rstItsb9/vxg5pCALe+xEjzh/fa/g14ATXWB15ukZLLxfxzqrTSk2xos/MtDpPKP6f
+         ynmN+nu5asUSZ3ADEnNqFgbzKDDjkpPz9I1nstI297a1I9WAr1J5cnookOdsWgEZWZsz
+         koaqbkG3n/7zhpLi77ObH7Q1VmHnnVZrBN24He79R8SCvQmyfiYwka0EDA/Kdj46bW4A
+         RcV8Px/AHNmIG9lTtN5mNrDjKCvkZlLGtz+4q2eVK0FnpRvhwxogjp5x9YfeQtFHYtiz
+         /EsE/2ySYFMcAbTd5vCcBPi9j3woL0Ghxtpb9buIgRl3BWnGBofGlZqTmfNN6KyoEJsP
+         IMqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731419426; x=1732024226;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=faWcBO3IObJ6Ff1ndGVWG5mNTwtfJB+/3MIGY1Y/Ibw=;
+        b=Miqa5ItZOEi+BNjGJNL9f/x1UErlTovmzCtomhPbDQtXEjsa1OKlO7exd9OJ+KWGIx
+         Rd2sUHknE+lbc2vedUD+TCPs9w6wCBfi4qs4E/yRbLP/DSU2TAVSPno8yu0TdInS/4Mr
+         zqEE2rPdfQbU+xj2L982h3g3F4gj6+gxZ8mf4NFObDtC+9qEmY3P8MA0cAkxvnWu+Pn5
+         nxrGix7VflkjD2UnZXKkBXnDcaBBoQqal+BE5DafIe9Lh17tO644mP6ncqvdF+QTR9Sp
+         k3/qtXrqwer54u3RyEIXCcXCGy7NQfNsZ+AZxHktMGiG1S0caMuJx1OIsPUCCaXL7IYj
+         qpMw==
+X-Gm-Message-State: AOJu0YxBqBkbvhQc5CHROcPkpJbAljdbtg9qzREOQ9fkBkrTkxz1lsGN
+	QTIn2MqOHQcymsS+e2OFGcZfT/vO37ik3cA3p4rbzKcrd+BCH9j7pBsxwfQT5bm9wgAsYFLhfLw
+	x
+X-Google-Smtp-Source: AGHT+IH8giJ+0I4u5AIEdyM111/2T0kTvvnxMXkxC6ARvNEqpPlklpz/VToCv4/0i97trTh84+rTUA==
+X-Received: by 2002:a05:6512:3f09:b0:533:71f:3a3d with SMTP id 2adb3069b0e04-53d862c7321mr13439101e87.24.1731419425787;
+        Tue, 12 Nov 2024 05:50:25 -0800 (PST)
+Received: from [192.168.1.128] ([62.205.150.185])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d826a9d9dsm1844419e87.205.2024.11.12.05.50.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2024 05:50:24 -0800 (PST)
+Message-ID: <6821f3d4-3157-451d-86f2-bb1d1a990c17@blackwall.org>
+Date: Tue, 12 Nov 2024 15:50:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM3PR11MB87360F9E39097E535416838EEC592@DM3PR11MB8736.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 net 1/2] bonding: add ns target multicast address to
+ slave device
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+ Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+References: <20241106051442.75177-1-liuhangbin@gmail.com>
+ <20241106051442.75177-2-liuhangbin@gmail.com> <ZytEBmPmqHwfCIzo@penguin>
+ <ZzHW9llUizisMk3u@fedora>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ZzHW9llUizisMk3u@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 12, 2024 at 02:55:29AM +0000, Tristram.Ha@microchip.com wrote:
-> > On Fri, Nov 08, 2024 at 05:56:33PM -0800, Tristram.Ha@microchip.com wrote:
-> > > From: Tristram Ha <tristram.ha@microchip.com>
-> > >
-> > > The SGMII module of KSZ9477 switch can be setup in 3 ways: 0 for direct
-> > > connect, 1 for 1000BaseT/1000BaseX SFP, and 2 for 10/100/1000BaseT SFP.
-> > 
-> > This naming is rather odd. First off, i would drop 'SFP'. It does not
-> > have to be an SFP on the other end, it could be another switch for
-> > example. 1 is PHY_INTERFACE_MODE_1000BASEX and 2 is
-> > PHY_INTERFACE_MODE_SGMII.
-> > 
-> > > SFP is typically used so the default is 1.  The driver can detect
-> > > 10/100/1000BaseT SFP and change the mode to 2.
-> > 
-> > phylink will tell you want mode to use. I would ignore what the
-> > hardware detects, so this driver is just the same as every other
-> > driver, making it easier to maintain.
+On 11/11/24 12:05, Hangbin Liu wrote:
+> On Wed, Nov 06, 2024 at 12:25:10PM +0200, Nikolay Aleksandrov wrote:
+>>> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+>>> index 95d59a18c022..60368cef2704 100644
+>>> --- a/drivers/net/bonding/bond_options.c
+>>> +++ b/drivers/net/bonding/bond_options.c
+>>> @@ -15,6 +15,7 @@
+>>>  #include <linux/sched/signal.h>
+>>>  
+>>>  #include <net/bonding.h>
+>>> +#include <net/ndisc.h>
+>>>  
+>>>  static int bond_option_active_slave_set(struct bonding *bond,
+>>>  					const struct bond_opt_value *newval);
+>>> @@ -1234,6 +1235,64 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
+>>>  }
+>>>  
+>>>  #if IS_ENABLED(CONFIG_IPV6)
+>>> +static bool slave_can_set_ns_maddr(struct bonding *bond, struct slave *slave)
+>>
+>> const bond/slave
+>>
+>>> +{
+>>> +	return BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
+>>> +	       !bond_is_active_slave(slave) &&
+>>> +	       slave->dev->flags & IFF_MULTICAST;
+>>> +}
 > 
-> There are some issues I found that will need your advises.
+> Hi, FYI, in new patch I only set bond to const as slave will be called
+> by bond_is_active_slave().
 > 
-> The phylink SFP code categorizes SFP using fiber cable as
-> PHY_INTERFACE_MODE_1000BASEX and SFP using a regular RJ45 connector as 
-> PHY_INTERFACE_MODE_SGMII, which has a PHY that can be accessed through
-> I2C connection with a PHY driver.
+> Thanks
+> Hangbin
 
-Not quite correct, i think. If MDIO over I2C does not work, it will
-still decide on 1000BaseX vs SGMII from the SFP eeprom contents. There
-are some SFPs where the PHY is not accessible, and we have to live
-with however it is configured.
+Yeah, I figured. :) Thanks for letting me know!
 
-> Now when SGMII SFP is used the phylink
-> cannot be created because it fails the validation in
-> phylink_sfp_config_phy().
-
-Please stop using 'SGMII SFP'. It should just be SGMII. The MAC should
-not care what is on the other end, it could be a PHY, and SFP, or a
-switch, all using Cisco SGMII.
-
-> The reason is the phydev has empty supported
-> and advertising data fields as it is just created.
-
-Do you mean the phydev for the PHY in the SFP? Or do you have a second
-phydev here? I'm confused.
-
-> I mentioned the SGMII module operates differently for two types of SFP:
-> SGMII and 1000BASEX.  The 1000Base-T SFP operates the same as 1000Base-SX
-> fiber SFP, and the driver would like it to be assigned
-> PHY_INTERFACE_MODE_1000BASEX, but it is always assigned
-> PHY_INTERFACE_MODE_SGMII in sfp_select_interface because 1000baseT_Full
-> is compared before 1000baseX_Full.
-> 
-> Now I am not sure if those SFPs I tested have correct EEPROM.  Some
-> no-brand ones return 0xff value when the PHY driver reads the link status
-> from them and so that driver cannot tell when the link is down.  Other
-> than that those SFPs operate correctly in forwarding traffic.
-
-There is no standardisation of how you access the PHY in an SFP. So
-each manufacture can do their own thing. However, there are a small
-number of PHYs actually used inside SFPs, and we have support for
-those common ones.
-
-> It seems there is no way to assign an interupt to that PHY and so polling
-> is always used.
-
-Correct, the interface between the SFP and the SFP cage does not have
-an interrupt pin the PHY can use.
-
-> The SFP using fiber cable does not have the above issues but has its own
-> issue.  The SFP cage can detect the cable is being plugged in as the
-> light is detected.  The PCS driver is then consulted to confirm the link.
-> However as the cable is not completely plugged in the driver can report
-> the link is not up.  After two calls are done the port can be left into
-> unconnected state forever even after the cable is plugged in.  The driver
-> can detect there is something different about the link value and can try
-> to read it later to get a firm reading.  This just means the driver needs
-> to poll anyway.  But if interrupt is used and the driver uses it to
-> report link this issue is moot.
-
-Have you set pcs.poll? phylink will then poll the PCS every
-second. You can report PCS status any time.
-
-> I just feel the SFP code offered in the phylink model does not help to
-> operate SFP well in the KSZ9477 switch, and it does not need that code to
-> provide basic SGMII port connection.
-
-We need to understand what is different about the KSZ9477 switch that
-phylink does not work for it, yet phylink does work for mv88e6xxx,
-sja1105, rzn1, qca, ocelot, and other MAC drivers.
-
-	Andrew
 
