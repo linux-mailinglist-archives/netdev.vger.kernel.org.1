@@ -1,105 +1,127 @@
-Return-Path: <netdev+bounces-143954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441289C4D56
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:30:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 480F09C4D5C
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 042BA1F23C92
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:30:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFE1BB28103
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646CB205ADF;
-	Tue, 12 Nov 2024 03:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9971B205AD9;
+	Tue, 12 Nov 2024 03:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYbw/CSp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPHS1LaR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40152204F7A
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 03:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FAB1A072A;
+	Tue, 12 Nov 2024 03:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731382222; cv=none; b=pNYEAjXSdJHtv58mJ31bZDiQqO1G7Th58AWQPa5MweYCHRFqZDOqBHuzOpETrMOrH30evEl5/NtpKXnDX4Ql6qViurO7Az86n4EpRqMgxWvqEOHkxrKK/Y6euRThU+20rjM2O96G4mdQA7l4SHOQyoBLLI2O+MnBkx0OJeBA1YM=
+	t=1731382345; cv=none; b=Phd86Jub0pXVrN1lKb+FvyquGv4+Ik5NuhlIoQtpjXhY9sVK1L1OTU8UPMaJKH9tS72YYNmNEXjWDlm4Q0NG0IYxogFy5Xs9LkMzUn3NZs1q+makwIvkddrgv8GFPnaAJo7XYrx4dEEoQZJcvMSyJ60Evv2HlXAzkWUc/mQC3DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731382222; c=relaxed/simple;
-	bh=B0tW7I/Ia1mrWLM9XCAQ652yW6gfdGhf+MQJ03xlO9I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P45V7Y2ADD4iEXTGiBz8VR816Nao6WSnHoAS7G8rNfpH+4Pzh025ZhGpKP2G4aG2uGQXije8Kj8Ik7rOQ2qo3wRYV+x8lWZBc4bMZqdoMltP2oU+s/wqR875ia+FAvmb80NkCvLWQIU+fDZuOhxCzLGYZmcx6VcXBUvinI8SYgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYbw/CSp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA3BCC4CECD;
-	Tue, 12 Nov 2024 03:30:21 +0000 (UTC)
+	s=arc-20240116; t=1731382345; c=relaxed/simple;
+	bh=CRaC5wjfbFfQA5LdfDrUsa3MI7ETN4OH4NFZVHy3LZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QOPYjepGjN6wYs2Xw4UEk9/cYJkq51WjLjWdNC1P8L8m8yVQYY6YdzTP10tilxiJqH7X/8CTSP4PpE+wj6ESsaXjAGjgGwmQAWyp7hisVBe4TGneQezsmevlF4EZmw3BKec/pdTP27CipJJ7wJ3YvMncA8crGHum4Phk5ossbtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPHS1LaR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CC2C4CECD;
+	Tue, 12 Nov 2024 03:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731382221;
-	bh=B0tW7I/Ia1mrWLM9XCAQ652yW6gfdGhf+MQJ03xlO9I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sYbw/CSpwAHWdKsc0qc8Mg7qPNKDDWo8xtvIrFGwNvA/XEfulfHhsEbrgTImuJuKU
-	 WX4JBi70C0EID2MX28lNCKSgFWddT/XEc15AGlA76lDZcudDjwnsEqYagu5VFGE9E5
-	 IjnAsdZpy5SrOI+DIV7U8FMxnf5uEPl9OEqeh1VlJ+RJtlB1keQyJaHaOuUZDr/QON
-	 DI3/Gfs5jYV44cionnvRQWJPWtEUYPJu6oa+ZE2f9hSQXy4Rh/pvODwWxjjUA9VOjM
-	 JFQnpBFBeQ3ZKlEIwBNALYX8Miv4oVu4H+jGK+g1KM1pNPLb/iWXMOYo23XaYHRRNV
-	 mitqbdLfGIlmg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB7B23809A80;
-	Tue, 12 Nov 2024 03:30:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1731382345;
+	bh=CRaC5wjfbFfQA5LdfDrUsa3MI7ETN4OH4NFZVHy3LZ4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qPHS1LaRS738ZEdxN0SIOOejrDNeR3mIZxf8FoqvHVzE+3P3HSDY/j89/4CNJY/Yf
+	 8hhjNmzYPFoAGbat558J4jia9L6DHohhw0myhq/FXq5DCXErxtsPeIeOtlclyDs4tR
+	 LfkjrG0cQozV0elK6PBJl7JWLZP514f7/Y3EWaSRIJmk9w4wF+9bgZ52aUjfiJMbcB
+	 N/ITfrxNiOAELhQo9fW15NPfJJq2o9RZ25mV2R+apxtOA0SrGqeurIZ9SvEQLUNYNo
+	 TmkKiKJ3HtXv96XDD6L6cva4MvyIkSREmIoMo3a0fij2iRWm9tbbDpNfMAzK1xkj99
+	 4cbvrSuUZL8ng==
+Date: Mon, 11 Nov 2024 19:32:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
+ Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>, Pantelis Antoniou
+ <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ Byungho An <bh74.an@samsung.com>, Kevin Brace
+ <kevinbrace@bracecomputerlab.com>, Francois Romieu <romieu@fr.zoreil.com>,
+ Michal Simek <michal.simek@amd.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Zhao Qiang
+ <qiang.zhao@nxp.com>, linux-can@vger.kernel.org (open list:CAN NETWORK
+ DRIVERS), linux-kernel@vger.kernel.org (open list),
+ linux-arm-kernel@lists.infradead.org (moderated list:ARM/Allwinner sunXi
+ SoC support), linux-sunxi@lists.linux.dev (open list:ARM/Allwinner sunXi
+ SoC support), linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC
+ FS_ENET DRIVER)
+Subject: Re: [PATCHv2 net-next] net: use pdev instead of OF funcs
+Message-ID: <20241111193222.00ae2f3e@kernel.org>
+In-Reply-To: <20241111210316.15357-1-rosenp@gmail.com>
+References: <20241111210316.15357-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/7] mlx5 misc fixes 2024-11-07
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173138223176.69157.16396705104896814239.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Nov 2024 03:30:31 +0000
-References: <20241107183527.676877-1-tariqt@nvidia.com>
-In-Reply-To: <20241107183527.676877-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 11 Nov 2024 13:03:16 -0800 Rosen Penev wrote:
+> --- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c
+> +++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c
+> @@ -111,7 +111,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
+>  	}
+>  
+>  	/* Get the SXGBE common INT information */
+> -	priv->irq  = irq_of_parse_and_map(node, 0);
+> +	priv->irq = platform_get_irq(pdev, 0);
+>  	if (priv->irq <= 0) {
+>  		dev_err(dev, "sxgbe common irq parsing failed\n");
+>  		goto err_drv_remove;
+> @@ -122,7 +122,7 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
+>  
+>  	/* Get the TX/RX IRQ numbers */
+>  	for (i = 0, chan = 1; i < SXGBE_TX_QUEUES; i++) {
+> -		priv->txq[i]->irq_no = irq_of_parse_and_map(node, chan++);
+> +		priv->txq[i]->irq_no = platform_get_irq(pdev, chan++);
+>  		if (priv->txq[i]->irq_no <= 0) {
+>  			dev_err(dev, "sxgbe tx irq parsing failed\n");
+>  			goto err_tx_irq_unmap;
+> @@ -130,14 +130,14 @@ static int sxgbe_platform_probe(struct platform_device *pdev)
+>  	}
+>  
+>  	for (i = 0; i < SXGBE_RX_QUEUES; i++) {
+> -		priv->rxq[i]->irq_no = irq_of_parse_and_map(node, chan++);
+> +		priv->rxq[i]->irq_no = platform_get_irq(pdev, chan++);
+>  		if (priv->rxq[i]->irq_no <= 0) {
+>  			dev_err(dev, "sxgbe rx irq parsing failed\n");
+>  			goto err_rx_irq_unmap;
+>  		}
+>  	}
+>  
+> -	priv->lpi_irq = irq_of_parse_and_map(node, chan);
+> +	priv->lpi_irq = platform_get_irq(pdev, chan);
+>  	if (priv->lpi_irq <= 0) {
+>  		dev_err(dev, "sxgbe lpi irq parsing failed\n");
+>  		goto err_rx_irq_unmap;
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Coccicheck wants you to drop the errors:
 
-On Thu, 7 Nov 2024 20:35:20 +0200 you wrote:
-> Hi,
-> 
-> This patchset provides misc bug fixes from the team to the mlx5 core and
-> Eth drivers.
-> 
-> Series generated against:
-> commit 5f897f30f596 ("Merge branch 'fix-the-arc-emac-driver'")
-> 
-> [...]
+drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:116:2-9: line 116 is redundant because platform_get_irq() already prints an error
+drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:127:3-10: line 127 is redundant because platform_get_irq() already prints an error
+drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:135:3-10: line 135 is redundant because platform_get_irq() already prints an error
+drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:142:2-9: line 142 is redundant because platform_get_irq() already prints an error
 
-Here is the summary with links:
-  - [net,1/7] net/mlx5: E-switch, unload IB representors when unloading ETH representors
-    https://git.kernel.org/netdev/net/c/1220965d6191
-  - [net,2/7] net/mlx5: Fix msix vectors to respect platform limit
-    https://git.kernel.org/netdev/net/c/d0989c9d2b3a
-  - [net,3/7] net/mlx5: fs, lock FTE when checking if active
-    https://git.kernel.org/netdev/net/c/9ca314419930
-  - [net,4/7] net/mlx5e: kTLS, Fix incorrect page refcounting
-    https://git.kernel.org/netdev/net/c/dd6e972cc589
-  - [net,5/7] net/mlx5e: clear xdp features on non-uplink representors
-    https://git.kernel.org/netdev/net/c/c079389878de
-  - [net,6/7] net/mlx5e: CT: Fix null-ptr-deref in add rule err flow
-    https://git.kernel.org/netdev/net/c/e99c6873229f
-  - [net,7/7] net/mlx5e: Disable loopback self-test on multi-PF netdev
-    https://git.kernel.org/netdev/net/c/d1ac33934a66
-
-You are awesome, thank you!
+You can make it a separate patch in a series, for clarity.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
