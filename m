@@ -1,111 +1,139 @@
-Return-Path: <netdev+bounces-143904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB8E9C4B6C
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F819C4B71
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:02:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11D1D282F03
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:01:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B477280FFC
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F313520493F;
-	Tue, 12 Nov 2024 01:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01319205AD6;
+	Tue, 12 Nov 2024 01:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6/rJx87"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="M2b0XVXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F9E204933;
-	Tue, 12 Nov 2024 01:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87272205AB5;
+	Tue, 12 Nov 2024 01:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731373224; cv=none; b=DiCfknQW1qp6tX6+gY4SkSQ5jguWy2/Ick6iQsrb75Rk0hyuuGQLWpmvkU8nDdhFAA8VvjTZgFOaWne0rM4HL8PeSN3NCqcd7HjDKlxifH57OTLHhL8RKG8UlXiasTsyXhnXBzLV8XRgan0fPgzPjAozPpikIoEfESAZjbDtN+M=
+	t=1731373240; cv=none; b=oH+7YPjPvSHwe5WbUD0SDmAllu18bWaVyygpCbci6JV3ZQXpEDvbbEBvpjGEOZC3Nl+WVVsQgFl4JGxChUVi3XiyHf9X46gRS1qZGsBDy8Muw4SrA8+eW362Ak/WIjGLNKf0n3YX9ftXuHHVU7Nml5HBEy1dT9rVtgFZByWlv2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731373224; c=relaxed/simple;
-	bh=f6WJXrTRDikhQIj250Wnzzvx7X2r/wsegb+H7jPT+kI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OYD6mIivpk8dlC9VHOVrw2L9YibwrUi48LoK7oNEy/zPMfmwKBRG3k8oClg2qT64AIzKmoMiqAsf9lYkBDxDCQ3WDJ51q91SXIx6VMeiFu/MVpov3Ac05hGvTWKF99hO+VFy33TFOwrLuyxAsxHHFp0BOx/sYeKY3b8V11oMlBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6/rJx87; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2983BC4CECF;
-	Tue, 12 Nov 2024 01:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731373224;
-	bh=f6WJXrTRDikhQIj250Wnzzvx7X2r/wsegb+H7jPT+kI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h6/rJx871zpDPJ/Ca+zhF31lB5gWaSHsaGBByy/qf9lBzMVz/FA54LKkzkyQaJzAA
-	 /WVvk2D3IVfWM3SxynRcoJE76y/cmj05JlJOKdSb4g6aJVKJTyF6kx7jUFrSXmJ6Xj
-	 f2Sn7mBMusNAIx5bkndiAOcbe0ppwU2FA+NN/AHisv+0FcTeM3XdFSPcY7TCwb/QWD
-	 6SrlUl/zhqqW8lrliuzaaDNeW/9s95UQHj2CeB7oakRaDVUx5kh42Zpaql3QWJ0GO0
-	 C9LaOGiNlkgzDumvtaaNjrPy6rUTojDbeUGuCGzG2Xq8+n3bDL+VNpM6HAIsmLEAvK
-	 sLKRGur/fWJgw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713313809A80;
-	Tue, 12 Nov 2024 01:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1731373240; c=relaxed/simple;
+	bh=VBwjjvHl4gL/xi7YFTZbHwXN9EZ3tvcwZOXeuOiCZ7M=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=M4nxwKRo3nyuwqVE1hF9fykBkQv2KgzFyrgwvEB4FRNow6wEzf9pYbFXyC5AgZLXy+VTZm6Y3CXjFBfwSyOehr3o7ABEoe+RAV6HGIbQu3dqWMxkxtsxklHWUFbFllLmehJMNlZz5xkNEF+WGUUyVdWjZPN9Qj+KEDLZQ1C/NP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=M2b0XVXh; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1731373235;
+	bh=nF3vIcIsXP326Sv0CJmeBquaQ/4fj1huU+ts55mxoBA=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=M2b0XVXhUFsEdauRBajwKBRS6cqxRyvFIGHl4Fmrg55GiwTmCTIbt5AjVBlFPVQ5Q
+	 ul3t0BDlCrX8oWiDqWsT5C5rTOr6WzBXz1d84NnXh6rXbLFAwhwnMoCtozOWDLkMJQ
+	 FJxaJI9M9IQshjEIVY8bZYv5tfPiIL22SoZwvNeNCgAuER4haeQbmBVnpYmnVyCFca
+	 ESa3QnC8IXEwVslmi35q9Rsveyl2+8f4O/pGMM9A0gVx4/2C7X9qpHeLXOQ9iJGqsx
+	 F2WwdpPMsyk+cex3hzXIrKvw2oWU77EYd6sRYnOg6L46ecHPYsTJpDjTUJDlh3rO2Q
+	 IigTQJ6jHr4Zw==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id A8E1765FAE;
+	Tue, 12 Nov 2024 09:00:34 +0800 (AWST)
+Message-ID: <a4cf6516df6a7db734898a45907ff6f545acfd17.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>, 
+ admiyo@os.amperecomputing.com, Matt Johnston <matt@codeconstruct.com.au>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
+	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Huisong Li <lihuisong@huawei.com>
+Date: Tue, 12 Nov 2024 09:00:34 +0800
+In-Reply-To: <3224c94c-e4c0-43f0-9d1f-c68d98594932@amperemail.onmicrosoft.com>
+References: <20241029165414.58746-1-admiyo@os.amperecomputing.com>
+	 <20241029165414.58746-3-admiyo@os.amperecomputing.com>
+	 <b614c56f007b2669f1a23bfe8a8bc6c273f81bba.camel@codeconstruct.com.au>
+	 <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
+	 <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
+	 <c69f83fa-a4e2-48fc-8c1a-553724828d70@amperemail.onmicrosoft.com>
+	 <f4e3ff994fe28bb2645b5fddf1850f8fcc5d1f89.camel@codeconstruct.com.au>
+	 <3224c94c-e4c0-43f0-9d1f-c68d98594932@amperemail.onmicrosoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/4] Introduce VLAN support in HSR
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173137323399.33228.10298561607881644376.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Nov 2024 01:00:33 +0000
-References: <20241106091710.3308519-1-danishanwar@ti.com>
-In-Reply-To: <20241106091710.3308519-1-danishanwar@ti.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: geliang@kernel.org, liuhangbin@gmail.com, jiri@resnulli.us,
- w-kwok2@ti.com, aleksander.lobakin@intel.com, lukma@denx.de,
- jan.kiszka@siemens.com, diogo.ivo@siemens.com, shuah@kernel.org,
- horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, vigneshr@ti.com,
- rogerq@kernel.org
 
-Hello:
+Hi Adam,
+>=20
+> "The PCC signature. The signature of a subspace is computed by a=20
+> bitwise-or of the value 0x50434300 with the subspace ID. For example,
+> subspace 3 has the signature 0x50434303."
+>=20
+> This could be used, but the inclusion of the "PCC" is unnecessary, as
+> it is on every packet.=C2=A0 Thus only the subspace ID is relevant. This
+> is the  index of the=C2=A0 entry in the PCCT, and is what I have been
+> calling the  outbox ID. Thus it is half of the address that I am
+> proposing.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+But the signature value isn't implementing any MCTP-bus addressing
+functionality, right? It's a fixed value that has to be set the same
+way on all transactions using that PCC channel.
 
-On Wed, 6 Nov 2024 14:47:06 +0530 you wrote:
-> This series adds VLAN support to HSR framework.
-> This series also adds VLAN support to HSR mode of ICSSG Ethernet driver.
-> 
-> Changes from v2 to v3:
-> *) Modified hsr_ndo_vlan_rx_add_vid() to handle arbitrary HSR_PT_SLAVE_A,
-> HSR_PT_SLAVE_B order and skip INTERLINK port in patch 2/4 as suggested by
-> Paolo Abeni <pabeni@redhat.com>
-> *) Removed handling of HSR_PT_MASTER in hsr_ndo_vlan_rx_kill_vid() as MASTER
-> and INTERLINK port will be ignored anyway in the default switch case as
-> suggested by Paolo Abeni <pabeni@redhat.com>
-> *) Modified the selftest in patch 4/4 to use vlan by default. The test will
-> check the exposed feature `vlan-challenged` and if vlan is not supported, skip
-> the vlan test as suggested by Paolo Abeni <pabeni@redhat.com>. Test logs can be
-> found at [1]
-> 
-> [...]
+Just to walk it back a bit, we have two possible interpretations here:
 
-Here is the summary with links:
-  - [net-next,v3,1/4] net: hsr: Add VLAN support
-    https://git.kernel.org/netdev/net-next/c/d977d7eb09fe
-  - [net-next,v3,2/4] net: hsr: Add VLAN CTAG filter support
-    https://git.kernel.org/netdev/net-next/c/1a8a63a5305e
-  - [net-next,v3,3/4] net: ti: icssg-prueth: Add VLAN support for HSR mode
-    https://git.kernel.org/netdev/net-next/c/e6bf1f7aea4d
-  - [net-next,v3,4/4] selftests: hsr: Add test for VLAN
-    https://git.kernel.org/netdev/net-next/c/75e3f12fa51b
+ 1) that the channel indexes *do* form something like a physical=C2=A0
+    addressing mechanism; when packets are sent over a channel to a
+    remote endpoint, we need to add a specific channel identifier.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+ 2) that the channel indices are more of an internal detail of the
+    transport mechanism: they're identifying channels, not MCTP
+    endpoints (kinda like setting the PCIe target address when
+    transmitting a network packet, perhaps?)
+
+If we adopt the (1) approach, we'd want a hardware address to represent
+the mechanism for addressing an MCTP endpoint, not an interface
+instance. That would end up with something along the lines of:
+
+ - MCTP-over-PCC hardware addresses would be a single byte (to contain a
+   channel ID)
+
+ - the interface would have a hardware address of just the inbox ID:
+   incoming packets are received via the inbox to the local interface,
+   and so are "addressed" to that inbox ID
+
+ - remote endpoints would be represented by a hardware address of just
+   the outbox ID: outgoing packets are sent via the outbox to the remote
+   endpoint, so are "addressed" to that outbox ID
+
+... but that doesn't seem to be the approach you want to take here, as
+it doesn't match your requirements for an interface lladdr (also,
+implementing the neighbour-handling infrastructure for that would seem
+to be overkill for a strictly peer-to-peer link type).
+
+So a couple of queries to get us to a decision:
+
+Your goal with exposing the channel numbers is more to choose the
+correct *local* interface to use on a system, right? Can you elaborate
+on your objections for using something like sysfs attributes for that?
+
+Can you outline the intended usage of the spec updates that would add
+the address format you mentioned? Is there a use-case we need to
+consider for those?
+
+Cheers,
 
 
+Jeremy
 
