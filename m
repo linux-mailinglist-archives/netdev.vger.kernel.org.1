@@ -1,174 +1,79 @@
-Return-Path: <netdev+bounces-144195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 056939C5F8A
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2710F9C5FE1
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:07:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B98B92860ED
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:54:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B52E828306C
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC398215027;
-	Tue, 12 Nov 2024 17:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE6021502C;
+	Tue, 12 Nov 2024 18:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ob/wfwxl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8N1juX8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC532141DC
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 17:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43902215007;
+	Tue, 12 Nov 2024 18:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731434028; cv=none; b=J3F1fyPmN5YeseBvyopY9Vttt4CXV5S4PxIoW+hev9OwDI3mz2bYWYlyySESaNYSaxC1dwaTqe/DtKRkIR5S6184TspLJbO180mmPSw/bgsW1pxkGBYBowqvOsew0zpiwcQQMZ7MtyoElcKvL1+k+J7scJl3auIVe4nPt3mwa1c=
+	t=1731434843; cv=none; b=F7HSd6u5sNjF8A0zg0yHeXHVYl3lLTfWduhcVZeDspzLlnNfqPkiMYR4p8qWrm46aOfA2ocFvRgHVQxkZ6V7f7CsBHXhlaPxZovWpEdVhYl1XFiGlCTQqOW/jZKaTZ1B4semkOWZjOg+LFdKiax1sJTDpfGLkFCKy90DQs30g9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731434028; c=relaxed/simple;
-	bh=UYX2O1h2AvLoRdjFa5niV/SAHORHbQlFVhftdFs2wYs=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ExvrvnQsmrW+OipLOhJ4Ym3HWaBf+KfG5UCsUUulHkWIE8ICCwyXmr+1por8L9ptZK8ymuuIbhDEzMupIWf170+ql77wA6OXSZ9AfWlo9OF3MPvizeLf7z6QlDGid060rdzOW8znZRQbEjyUpZruAeS0Fyc+EkJcuqdBcp7aO4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ob/wfwxl; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731434028; x=1762970028;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=vgUV/OWM1rcXFGmTAMLYM2PDx47Hl1iykASf7BDAkg8=;
-  b=ob/wfwxlEz35qWzSBph7f9heQ3c9xXwUuQbIf3aRVoh6Nny5Rey3yDP+
-   ofTUuhgx0J4Ow+q7oeWbVnc0qRIISTjsN+0C05NoekHxZ1nSzMOe+Bj9j
-   Mjpgnxl52kQFa0RG8+UhIVC0e0ZKjpVqxPp0/UxE0QuXAVZH+mNqjhaK8
-   E=;
-X-IronPort-AV: E=Sophos;i="6.12,148,1728950400"; 
-   d="scan'208";a="351726582"
-Subject: RE: [PATCH v3 net-next 3/3] net: ena: Add PHC documentation
-Thread-Topic: [PATCH v3 net-next 3/3] net: ena: Add PHC documentation
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 17:53:45 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:29367]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.11.224:2525] with esmtp (Farcaster)
- id 50424793-4fea-4c12-ad0a-678039f5021f; Tue, 12 Nov 2024 17:53:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 50424793-4fea-4c12-ad0a-678039f5021f
-Received: from EX19D006EUA002.ant.amazon.com (10.252.50.65) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 12 Nov 2024 17:53:42 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D006EUA002.ant.amazon.com (10.252.50.65) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 12 Nov 2024 17:53:41 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 12 Nov 2024 17:53:41 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Jakub Kicinski <kuba@kernel.org>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "Woodhouse,
- David" <dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>, "Bshara, Saeed"
-	<saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori, Anthony"
-	<aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, "Schmeilin,
- Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin"
-	<benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
-	<ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Agroskin,
- Shay" <shayagr@amazon.com>, "Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir"
-	<ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>
-Thread-Index: AQHbLeQGl7kxu2fA00SYfY6yxcXfg7Kn9ekAgABNu5CAATcUAIAKf5Ww
-Date: Tue, 12 Nov 2024 17:53:41 +0000
-Message-ID: <baf0fe9c0a1741a6883768e816346123@amazon.com>
-References: <20241103113140.275-1-darinzon@amazon.com>
-	<20241103113140.275-4-darinzon@amazon.com>
-	<20241104181722.4ee86665@kernel.org>
-	<4ce957d04f6048f9bf607826e9e0be5b@amazon.com>
- <20241105172858.273df3fd@kernel.org>
-In-Reply-To: <20241105172858.273df3fd@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1731434843; c=relaxed/simple;
+	bh=YfH1GvXFKsdKUR7M0E2fxAHJRtaL1PPV2LsMW7nnb7E=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=dthvOS75e8k8KrKn2O4iuSbMHzga3hmMBr+qFwA7uj5YaBcRULxdCR0xLXldGSxh4KOAdLf967UAv/sjBxNWzGvY7xn+NqMWkxriUe1I0Ilyw0TwgyX9H0nim/U33r2s4s/VhPuNR1cbLllOi6wFvM0y0f2WyuHfDvnwHfsBkb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8N1juX8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE40C4CECD;
+	Tue, 12 Nov 2024 18:07:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731434843;
+	bh=YfH1GvXFKsdKUR7M0E2fxAHJRtaL1PPV2LsMW7nnb7E=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=A8N1juX8oS7mci0uA1LWmOIwJnYN/dTzG7Xl1GwrLgifbW4vnChXbb4imPHknhp6E
+	 IzK2dguEDPAKvHiVkJ86/WfF2u5Wv3yGcT71EBQdrsWp2au17o9wbOmvI32XKIA2yw
+	 7McP/jgLmFZUWMaK0vQKQkfXBjcx/8cSywdxJ8uD3sEP8Rhv5u69WeJCbvGzrSd8+0
+	 wNMlHHRGie2AIauCb+Q4pcIzzj4XdX2/8ctZqo3GUfTV7DtvdPgQLiS6/DaBRimYPs
+	 QU2ZPgizTgpRidU17FJ6wHWcwNWC1BvyBz8Q/pYAXneItnP/WCYbN+JDGOQ57wMSin
+	 AFPjQUCHK81Bw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71DFB3809A80;
+	Tue, 12 Nov 2024 18:07:34 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio: bugfixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20241111085050-mutt-send-email-mst@kernel.org>
+References: <20241111085050-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20241111085050-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 83e445e64f48bdae3f25013e788fcf592f142576
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0ccd733ac99edc473aaee90c8f6adc346d82befb
+Message-Id: <173143485302.621786.7229515238200918820.pr-tracker-bot@kernel.org>
+Date: Tue, 12 Nov 2024 18:07:33 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com, christophe.jaillet@wanadoo.fr, cvam0000@gmail.com, dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com, gregkh@linuxfoundation.org, jasowang@redhat.com, jiri@nvidia.com, lege.wang@jaguarmicro.com, lingshan.zhu@kernel.org, mst@redhat.com, pstanner@redhat.com, qwerty@theori.io, v4bel@theori.io, yuancan@huawei.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-Thank you Rahul for the detailed explanations
+The pull request you sent on Mon, 11 Nov 2024 08:50:50 -0500:
 
-Hi Jakub,
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-> > Just wanted to clarify that this feature and the associated
-> > documentation are specifically intended for reading a HW timestamp,
-> > not for TX/RX packet timestamping.
->=20
-> Oh, so you're saying you can only read the clock from the device?
-> The word timestamp means time associated with an event.
->=20
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0ccd733ac99edc473aaee90c8f6adc346d82befb
 
-Based on the documentation of gettimex64 API
-The ts parameter holds the PHC timestamp.
-We are using the same terminology
-https://elixir.bootlin.com/linux/v6.11.6/source/include/linux/ptp_clock_ker=
-nel.h#L97
+Thank you!
 
- * @gettimex64:  Reads the current time from the hardware clock and optiona=
-lly
- *               also the system clock.
- *               parameter ts: Holds the PHC timestamp.
- *               parameter sts: If not NULL, it holds a pair of timestamps =
-from
- *               the system clock. The first reading is made right before
- *               reading the lowest bits of the PHC timestamp and the secon=
-d
- *               reading immediately follows that.
-
-> In the doc you talk about:
->=20
-> > +PHC support and capabilities can be verified using ethtool:
-> > +
-> > +.. code-block:: shell
-> > +
-> > +  ethtool -T <interface>
->=20
-> which is for packet timestamping
->=20
-
-ethtool -T shows all timestamping capabilities, which indeed include
-packet timestamping but also the PTP Hardware Clock (PHC) index
-If the value is `none`, it means that there's no PHC support
-This is done by implementing the `get_ts_info` hook, which is
-part of this patchset.
-
-https://elixir.bootlin.com/linux/v6.11.6/source/include/linux/ethtool.h#L72=
-0
-
-> also:
->=20
-> > ENA Linux driver supports PTP hardware clock providing timestamp
-> > reference to achieve nanosecond accuracy.
->=20
-> You probably want to double check the definitions of accuracy and
-> resolution.
->=20
-
-Thank you, will be changed in the next patchset
-
-> We recently merged an Amazon PTP clock driver from David Woodhouse,
-> see commit 20503272422693. If you're not timestamping packets why not use
-> that driver?
-
-The AMZNC10C vmclock device driver is intended to be used in systems where =
-there's an hypervisor.
-The PHC driver in this patchset is intended for virtual and non-virtual (me=
-tal) instances in AWS.
-The AMZNC10C might not be available in the future on the same instances whe=
-re PHC is available.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
