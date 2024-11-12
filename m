@@ -1,107 +1,121 @@
-Return-Path: <netdev+bounces-144174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1E309C5E84
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:14:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DBA9C5E86
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:15:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96C911F221BE
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:14:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06E9E283FA3
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A1B21B45A;
-	Tue, 12 Nov 2024 17:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E7E2123EF;
+	Tue, 12 Nov 2024 17:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Hn4L25KJ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="lQz6tllB"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF55921A4CB;
-	Tue, 12 Nov 2024 17:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31B120A5CE
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 17:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731431234; cv=none; b=NtiPlmpdek+NDG9DymHwf4U1NPPk8P6eBAZVaTHXdGTsQwy2Qlk/2rn4R08whxgmC/Xf+uhUqODxxNUy96JUQ/YATprk1F859piD4xjjkJZhbKBcpN89eFLf56eL14LLh3wyGCJ1PnPx7qjxHgo9R+O7RHj5QoEN1URvYsuZU4w=
+	t=1731431244; cv=none; b=KrLMTYbqK1ZDypqAfpApmA9nASfgzhCyZW27F8AyNiMQhsBVfCkVw54UHVh5d/tjjj4Nx4v/caJFlUv2mtgn/mv0pqiKhSdfPsNyEzbYHo0qrXvHQ5rd0z04XVKc4RLwGKjlVD6tegjJHjcHTloy8XKYSg05HeOr12cNK7xdJZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731431234; c=relaxed/simple;
-	bh=xaj5KmROuHDs6V1pAE8F+BMNjL9ORFgFyK/RbeoRB2A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ChhJbKVMadounNoSfQbTxjedYenkpo7vUxFk0Q4iFHeRwFTatLS+pYu5reHgHindySw4fGL+hig5o87180UhRqnSd/bvDXLhfkFWuDHnPmgAjpRrFQuak6vRuif0jKNZEqAj7ld4g0595amGDPERB+zVUW5dNyl9rdok9LmnlWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Hn4L25KJ; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8597AE0002;
-	Tue, 12 Nov 2024 17:07:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731431230;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KmB45n0EFDDxVFATGrPwAYkLgt0gPIeYSjIsRXHFoik=;
-	b=Hn4L25KJ6Bk4NzyNodJ2N99gxYyx6ubpJJGX7MCAK3Z3L+1TpHWP+CqFqNoz/FXGe6ixKK
-	FFsatBb6wPQtSbA2DVpmOVpK94HUpgvj8XYYlwK0nSPXphisXAUEeGRsz84iXDKDRUz5Vz
-	wva2wuIa+NGeR7/r9FQsi9Qx6UT7sHPqGVIJxfZfRGym0AJujFs55fpLJdJuksF4UbGeH6
-	ByE9mD8mojXQiM1BlkR2n6PC0WqN1g9yl1tFf0uZqiJXH0OBz+DgK5kWgrGqSlL+nR/6k3
-	UyJIUYuc+VxnaW8QEPmPZ4hZuuKDvp1d+1JpAYblzQK2WNMuug4k1ZDK7VZePw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Daniel Machon <daniel.machon@microchip.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 9/9] net: stmmac: dwmac_socfpga: This platform has GMAC
-Date: Tue, 12 Nov 2024 18:06:57 +0100
-Message-ID: <20241112170658.2388529-10-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
-References: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1731431244; c=relaxed/simple;
+	bh=pjtQiqp/WPtaPB+Seq6kxtxAcQjRYpC6Q/5D6m8tl58=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pnJt6HMAgtojy5GZo9dKjE7uv/+Qz0w0i6ZT51I5a/gncsbhY/S///Q3wBbvZaEiJPTCMBpPF8mSC4wGrEr08ACdcZycK2hXFW13c0rAnqt5QlmzRRDYtA5r57vfjGrLQIsBgsslOLXAcezdwWLdhqCNQTdtLVkCARu8ZoqLLyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=lQz6tllB; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71e79f73aaeso4891754b3a.3
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 09:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1731431241; x=1732036041; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zCsEh3OshPxaXbpGdh/3Hu70pXjiPpoRbcmGEV33j/Q=;
+        b=lQz6tllBQhMCd+tiui2/GrpkvZ1OTkZTc0tz1NDyjxIbHBS3c/LTjgJyaD3G1YNgwu
+         FIYhypW/z1HhuQDnqZifYhuc8TDFNnhIEoMAnaQ+0CMXMq4s5Sqxtg0LuA5qJfaPLhez
+         7KCM0kfceb0COMLKimSuaGQgVGn/m/bKhqx/wUGNLYILJUyEvAWW2fUJEV9KokoH5Tz5
+         1TyhlhEPFA2MXRlpHZxH64dx5ukYZ/pDCEyV/+MzKUbiOULxE2c3nh7JfNz6PPzCYxn6
+         8Nbd/pDsQImehbZDcPHYVj2GlAGup2O3b/M5YYz8UtgbOQ+ugIQOTLvbn3wGCluLVKpx
+         OpEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731431241; x=1732036041;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zCsEh3OshPxaXbpGdh/3Hu70pXjiPpoRbcmGEV33j/Q=;
+        b=h2X5SaEduu7DUjpgXuZa5hXL9OOE5m11syEwFX/4X+Ijfb/+hZIWzPpIzliyAbxUBV
+         6qevV1pAMdmFrLAjy7qPHDLnxASx/7w0+ZGHB2/mXR/6/vM1xJpUi5dHiEMRc67AX1Vk
+         8TsRcMiSYeqSrNEyKcqr58OPCait8+WqsB/+bPeSpGMiqrLt57EPzsjidgNPpb09GNwl
+         lufjFXEv4KD1109hFHVt+ODesf0LQbuNM8v7h8dMPZLvHK5kBSEYXNJTxvmnfkAxfJvf
+         cz5qTBQ7xLtqoswhjBuRlZ0De2H2BCCZA2BCeIvsAIuw/gcYWzA+9cjF4J0r5Xzm3l7D
+         rAYA==
+X-Forwarded-Encrypted: i=1; AJvYcCUaMNArpabxjnHM0BkRHAAcLhq3zOXwtHaEpPu+h836csHR3TLoSYs8M7/Z5hsUlGoMIlCDodg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHez5h3h9bG+I3FiEHgLo4x8re1DBuC0VFUulo8kHnvv8BWPRn
+	8BUSobT/FU9bsy74gtR2zw0yqeeFi5/UDK9XX94YqD774InZwHFiut1pEI68EB+VLEGjdPIdLtw
+	poKv6sS+bhDmXDRNrYOLKfuKUMGXoEXN8O20M
+X-Google-Smtp-Source: AGHT+IEJ3VPShluXTM3fWKH9GntE3CxZDJujTT6jJDBOLP5o9D/6sq6oC2fY+FFPiQ4YpSNRfuDtl0Fy09Wz7P9R/DU=
+X-Received: by 2002:a05:6a00:887:b0:71e:6122:5919 with SMTP id
+ d2e1a72fcca58-7241335bd23mr22008354b3a.20.1731431241054; Tue, 12 Nov 2024
+ 09:07:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
+ <CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
+ <20241111102632.74573faa@kernel.org> <CAM0EoMk=1dsi1C02si9MV_E-wX5hu01bi5yTfyMmL9i2FLys1g@mail.gmail.com>
+ <20241112071822.1a6f3c9a@kernel.org>
+In-Reply-To: <20241112071822.1a6f3c9a@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 12 Nov 2024 12:07:10 -0500
+Message-ID: <CAM0EoMkQUqpkGJADfYUupp5zP7vZdd7=4MVo5TTJbWqEYDkq7g@mail.gmail.com>
+Subject: Re: [PATCH net v6] net: sched: cls_u32: Fix u32's systematic failure
+ to free IDR entries for hnodes.
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	alexandre.ferrieux@orange.com, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Indicate that dwmac_socfpga has a gmac. This will make sure that
-gmac-specific interrupt processing is done, including timestamp
-interrupt handling. Without this, the external snapshot interrupt is
-never ack'd and we have an interrupt storm on external snapshot event.
+On Tue, Nov 12, 2024 at 10:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Tue, 12 Nov 2024 07:23:29 -0500 Jamal Hadi Salim wrote:
+> > > Separate patch - okay, but why are you asking people to send the test=
+s
+> > > to net-next? These sort of requests lead people to try to run
+> > > linux-next tests on stable trees.
+> >
+> > AFAIK, those are the rules.
+>
+> Do you have more info, or this is more of a "your understanding" thing?
+> E.g. rules for which subsystem? are they specified somewhere?
 
-Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 1 +
- 1 file changed, 1 insertion(+)
+More "tribal knowledge" than written scripture onn networking subsystem.
+Over time i have seen pushback from people of that nature and have
+always followed that rule.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 0745117d5872..248b30d7b864 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -485,6 +485,7 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
- 	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
- 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
-+	plat_dat->has_gmac = true;
- 
- 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
- 	if (ret)
--- 
-2.47.0
+> I'm used to merging the fix with the selftest, two minor reasons pro:
+>  - less burden on submitter
+>  - backporters can see and use the test to validate, immediately
+> con:
+>  - higher risk of conflicts, but that's my problem (we really need to
+>    alpha-sort the makefiles, sigh)
 
+Sounds sensible to me - would help to burn it into scripture.
+
+cheers,
+jamal
 
