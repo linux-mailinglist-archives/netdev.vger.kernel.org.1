@@ -1,136 +1,137 @@
-Return-Path: <netdev+bounces-143974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 186779C4EE9
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:46:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA84B9C4F4B
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE264286269
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 06:46:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50807B22398
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F95E20A5DF;
-	Tue, 12 Nov 2024 06:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eclWhf2q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E335E20B217;
+	Tue, 12 Nov 2024 07:19:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EAB4C91;
-	Tue, 12 Nov 2024 06:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFC819EED4
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 07:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731393980; cv=none; b=t4akFgDT1WLqMVGgEdxv+ORXLp2Tb5VrZfdbUemgHdY4XetbWUY4EEz9dId9tS3iMkdXWgPOP+Nk2uRanNN6inC5ii3Acjf8DGaFHVvXljYAHquT5og4ijz2LE6kyHytue5pm5qWiSzKOpL+Q8IXQXOQfApdYzo+zxVym1BNvg0=
+	t=1731395951; cv=none; b=aBRMijBxdMwDMiq3iXNm8TTl0epLwqu+5KEMQB8gcsDji9c79vpJ3Ad+YDoirLiGEbdA7HJO6+Nnvqd8/sf785gYQGu86VpDBAkFFFp/vMX87ea7JZGvkaWPKnMs935Y8mpZ9pcH2qaY1ttDYKZnf4GHxIVUX3aCT3yG+UeQXo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731393980; c=relaxed/simple;
-	bh=VX9N36lARRqzMlNgWNjXqZec+VAuskDFhLy+Txu1Lwg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OeM3oZOGS5fmmzzjHbkSKdOwtmE84KpCx3CBtqij/38+5yXjXlj+DIKAmo9WMooIt15qS6nWZIDYR7JhubCiQkchlSkAm4jtZfWuixsM5BWe4rz8F6ONCIzngJH8qCroMq2MCD/oNKXUmi2tiKR3GLLsG7Pngi2/qsO09nW6isc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=eclWhf2q; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4AC6jtlY076588;
-	Tue, 12 Nov 2024 00:45:55 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1731393955;
-	bh=SHKLsrMhF1OLae930Bz/9un5AiYrRlutqYBk9lsUp60=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=eclWhf2qiB9WkGR5ub4qr3ubstyuvulIWLf8h3bpVvyyUy6bdaJK7sy1bcgV0WqJ/
-	 Wl8x8zW/sywdCB1h3GzGFbB8DraZonu+xSz1cbcVeLAeg9BSp62ZF8MNBFcfyMUPO6
-	 bHsNufvo5nZYSCyxGaWa7yKa2mRPXY8L78vmMg74=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4AC6jt5I067443
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 12 Nov 2024 00:45:55 -0600
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 12
- Nov 2024 00:45:54 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 12 Nov 2024 00:45:54 -0600
-Received: from [10.250.214.214] ([10.250.214.214])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4AC6joPB087798;
-	Tue, 12 Nov 2024 00:45:51 -0600
-Message-ID: <2b0e95be-8192-416f-8655-631d6cecc336@ti.com>
-Date: Tue, 12 Nov 2024 08:45:50 +0200
+	s=arc-20240116; t=1731395951; c=relaxed/simple;
+	bh=76xbpcZxfKnQKxcIbxF4rUKygZAb+/RF0H6O+QjZFrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fc7qFZSWSYi0dZ1jAz1ME9lmB2OINYsWdamddhGy+1RncoGEiJeM+KRnGywVwgyJ/Lgdwh64Uz9DrUhw+IrMXj2y1rGc/tekZ9KCowaW0Pq7EQU5K9XOEwFOlYVKFX0vIn7I5d7UErxzDnRduZXEt47/EDvLdfRMA1ituWNxock=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tAlAl-00029k-RZ; Tue, 12 Nov 2024 08:18:47 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tAlAk-000N82-10;
+	Tue, 12 Nov 2024 08:18:46 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 2C92437111E;
+	Tue, 12 Nov 2024 07:16:04 +0000 (UTC)
+Date: Tue, 12 Nov 2024 08:16:02 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+Message-ID: <20241112-hulking-smiling-pug-c6fd4d-mkl@pengutronix.de>
+References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
+ <20241111101011.30e04701@kernel.org>
+ <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 01/17] dt-bindings: net: wireless: cc33xx: Add
- ti,cc33xx.yaml
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Sabeeh Khan
-	<sabeeh-khan@ti.com>
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
- <20241107125209.1736277-2-michael.nemanov@ti.com>
- <y4ffzjekeccqg2tv7d54ilwbz3nhm4jkcq3fyg5tmpbupsqirn@dq3kjtwkllds>
-Content-Language: en-US
-From: "Nemanov, Michael" <michael.nemanov@ti.com>
-In-Reply-To: <y4ffzjekeccqg2tv7d54ilwbz3nhm4jkcq3fyg5tmpbupsqirn@dq3kjtwkllds>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2dmhaauk3amznaiq"
+Content-Disposition: inline
+In-Reply-To: <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 11/8/2024 2:02 PM, Krzysztof Kozlowski wrote:
-> On Thu, Nov 07, 2024 at 02:51:53PM +0200, Michael Nemanov wrote:
->> Add device-tree bindings for the CC33xx family.
->>
->> Signed-off-by: Michael Nemanov <michael.nemanov@ti.com>
->> ---
->>   .../bindings/net/wireless/ti,cc33xx.yaml      | 59 +++++++++++++++++++
->>   1 file changed, 59 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
->>
-> 
-> <form letter>
-> This is a friendly reminder during the review process.
-> 
-> It seems my or other reviewer's previous comments were not fully
-> addressed. Maybe the feedback got lost between the quotes, maybe you
-> just forgot to apply it. Please go back to the previous discussion and
-> either implement all requested changes or keep discussing them.
-> 
-> Thank you.
-> </form letter>
-> 
-> Best regards,
-> Krzysztof
-> 
 
-Are you referring to
+--2dmhaauk3amznaiq
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+MIME-Version: 1.0
 
-> diff --git a/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml b/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+On 12.11.2024 07:39:12, Sean Nyekjaer wrote:
+> On Mon, Nov 11, 2024 at 10:10:11AM +0100, Jakub Kicinski wrote:
+> > On Mon, 11 Nov 2024 09:54:48 +0100 Sean Nyekjaer wrote:
+> > > This series adds support for setting the nWKRQ voltage.
+> >=20
+> > There is no need to CC netdev@ on pure drivers/net/can changes.
+> > Since these changes are not tagged in any way I have to manually
+> > go and drop all of them from our patchwork.
 
-...
+Does the prefix "can-next" help, i.e.:
 
-> +
-> +properties:
-> +  $nodename:
-> +    pattern: "^wifi@2"
+| [PATCH can-next v2 0/2]
 
-?
+which can be configured via:
 
-If so, I replied here
-https://lore.kernel.org/linux-wireless/8024aa1c-5bd1-40d8-b0c3-14b5fcd992e2@ti.com/#t
-But if you don't think it's worthwhile I'll remove it.
+| b4 prep --set-prefixes "can-next"
 
-Regards,
-Michael.
+> Oh sorry for that.
+> I'm using b4's --auto-to-cc feature, any way to fix that?
+
+You can manually trim the list of Cc: using:
+
+| b4 prep --edit-cover
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--2dmhaauk3amznaiq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmczAK8ACgkQKDiiPnot
+vG9RuQf+Nj+pyf7e2gKIkxeZr+ao11kZrMz4UOp00qlZNwshVskI6oUB8/t0cDxD
+qJO7Rfs1u4FqzvVsrB7yvtJZCxFNQrgIiUwEGJAP1Kp1/+/JKBoFkWVlvdCY1Olg
+3Tden0OB9T5P99cBQ4aJMQjma/TRuAnC0RNhURVGhDGqwlr7SPorfRXH0G4s7vni
+lFqRQ9CLH4pz5r2RbnVNFC0JQcyqZZAXr9j+r4U9RMg9BI80ATaAXK6aHJUP0nES
+QjM/aXXdI6OEQII9i+LobAqUlGiCoyAhTcLiClOwhl2bWst5TMe5Ntu1x5qpGNQS
+jYpaZnAnmBDkTVlYJw+kzDpVKcL0+w==
+=Y/tF
+-----END PGP SIGNATURE-----
+
+--2dmhaauk3amznaiq--
 
