@@ -1,140 +1,169 @@
-Return-Path: <netdev+bounces-144248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B25809C650A
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:21:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D6D59C6522
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:27:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E6B28393F
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:21:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 347531F24F5D
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259F621CF87;
-	Tue, 12 Nov 2024 23:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A6521C19A;
+	Tue, 12 Nov 2024 23:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rQCTXzfo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYx6E/mV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C20B21CF82
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 23:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB9521A4BA;
+	Tue, 12 Nov 2024 23:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731453692; cv=none; b=V4Z1yxqKFWbSoJTSUWN2wwvvRApURi9ezhZNEu1kzrF9hBkFmcED/AZjDE7+XS0bigoUs1yZ0vPcI+R4czjPVpiWEvF3d803vAnpG65tyqr8RPGYFFRe7h+3lLFNw0YJ+cIX1NuSzjVjDK5Wq3pLdCMGmxYfYt9bTQ3yKH60LFk=
+	t=1731453979; cv=none; b=IOrzWB2Rt+qLiiEYhXCS0Dr1/SHKF+T964MSsnIqSGHE2Cv8QAYXhQxxHaaCGYCYgKkPFF8MASvXxP+tcJvjWLouVgSC7r2a1OiOHteS3QzhL/jiujIBJfbcz280+bc4RyoI1SOopZFKUaRWCp/oq+eHDwfq0cOMJG3lyPI9NRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731453692; c=relaxed/simple;
-	bh=T/ebl/U5ZAKRHJn2gpf/9r0tbBg+eYcJtqGgYb1sByM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kcR/1XYdIbEkYi1JrDeiSPk8MFFnAZ74jXSBsmsRkiJMUCcmda2MukqVj1dFwYx6uDUntzMQtXWLn5DS5hxaKGT5efBEPIDBZ4bTHVT0eCn7wMNlD798GQsvOC97IbxDVfg6o0GgrdhlCv40NBhff/Hfe5QWUBm7JWemh+K5ixI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rQCTXzfo; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a6d2a96b-feea-4cf2-b49a-c2c82391599e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731453688;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dCzpCsVkjLt6UNdvDR5L5KILqw8LXple0VYgWj3YQBw=;
-	b=rQCTXzfogUm6+I4Zd8EI7rIAurDCRvAHoy0f9Inf+EmU7P+ulgZn3zlpennFHg7Z7/MJax
-	dfqR0k5UWct1leRlrtSicXdAl4skcWYuK1BKxI6TrpSDDG+pm4+1J96fdKmAU2rQmPEDBZ
-	FOpA/m+x32j08NBhQxldJLrgXsnWhQg=
-Date: Tue, 12 Nov 2024 23:21:23 +0000
+	s=arc-20240116; t=1731453979; c=relaxed/simple;
+	bh=+/BD4L/R1nBoJnct/mLcdKjNjhjT97jizBEz87gS56o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bgvkph4EV/2QBxxplsTi7tGxPcV14UzNNu3bui/j3SjomW+jQMKCcx5VWWBqFCn79X4TmsOpPduJ9zmtIBRS+taZbMAquAXznet1pngdudaKrCPGm1WHZjHe6StrJyrRr/vPzP/MnTiXV+ClHRB0NcFpnAELqlRnQAm9XyC8bBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYx6E/mV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71BFC4CECD;
+	Tue, 12 Nov 2024 23:26:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731453979;
+	bh=+/BD4L/R1nBoJnct/mLcdKjNjhjT97jizBEz87gS56o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sYx6E/mVEgu7QFsq/6plMW4JGvwyOhhxCqwb3hU6KtWvA5w5Sx65wiKMSTN6Cv80f
+	 HFFJr0NSP9kJHMqnQONP630GAKRQxt+zzfpN5BnaOzyGSNX9QSVmjWqX2BFjWEMRwy
+	 IQZzBtpjLeV+9Dee6YJc+VCcNWtVXGO0nH12gU6WYspjzTgHh5SuvJgMdTHHq9vBs+
+	 eU6c8gECgglu+8XYJcx3sysu7VvKfquAm9G7B+qPP2P5Q48TfasNMM4areInItPgFJ
+	 ZSBBKPkEj5JWndesDuCTyfxD09RYuLaNvGuYgeeWdMRb+QKKzrevjO/9elGFy245xh
+	 1E38CM3alOifQ==
+Date: Wed, 13 Nov 2024 00:26:15 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Alex Henrie <alexhenrie24@gmail.com>
+Cc: linux-man@vger.kernel.org, kuniyu@amazon.com, mtk.manpages@gmail.com, 
+	branden@debian.org, netdev@vger.kernel.org
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+Message-ID: <udctaxcv6yqjvffgrtzgqo24ee3kr4h4ku66ubohc7l4hqwg3w@6ujhaoyg4kla>
+References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
+ <20241111062205.207027-1-alexhenrie24@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 1/5] net: phy: microchip_ptp : Add header file
- for Microchip ptp library
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Divya Koppera <divya.koppera@microchip.com>, arun.ramadoss@microchip.com,
- UNGLinuxDriver@microchip.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- richardcochran@gmail.com
-References: <20241112133724.16057-1-divya.koppera@microchip.com>
- <20241112133724.16057-2-divya.koppera@microchip.com>
- <37bba7bc-0d6f-4655-abd7-b6c86b12193a@linux.dev>
- <53c8b505-f992-4c2e-b2c0-616152b447c3@lunn.ch>
- <955cb079-b58d-4c32-8925-74f596312b21@linux.dev>
- <7e9e0964-6532-42e6-9005-18715aaac5a6@lunn.ch>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <7e9e0964-6532-42e6-9005-18715aaac5a6@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="f7gmd3j6k5eoylin"
+Content-Disposition: inline
+In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
 
-On 12/11/2024 23:11, Andrew Lunn wrote:
-> On Tue, Nov 12, 2024 at 10:56:19PM +0000, Vadim Fedorenko wrote:
->> On 12/11/2024 22:26, Andrew Lunn wrote:
->>>> I believe, the current design of mchp_ptp_clock has some issues:
->>>>
->>>> struct mchp_ptp_clock {
->>>>           struct mii_timestamper     mii_ts;             /*     0    48 */
->>>>           struct phy_device *        phydev;             /*    48     8 */
->>>>           struct sk_buff_head        tx_queue;           /*    56    24 */
->>>>           /* --- cacheline 1 boundary (64 bytes) was 16 bytes ago --- */
->>>>           struct sk_buff_head        rx_queue;           /*    80    24 */
->>>>           struct list_head           rx_ts_list;         /*   104    16 */
->>>>           spinlock_t                 rx_ts_lock          /*   120     4 */
->>>>           int                        hwts_tx_type;       /*   124     4 */
->>>>           /* --- cacheline 2 boundary (128 bytes) --- */
->>>>           enum hwtstamp_rx_filters   rx_filter;          /*   128     4 */
->>>>           int                        layer;              /*   132     4 */
->>>>           int                        version;            /*   136     4 */
->>>>
->>>>           /* XXX 4 bytes hole, try to pack */
->>>>
->>>>           struct ptp_clock *         ptp_clock;          /*   144     8 */
->>>>           struct ptp_clock_info      caps;               /*   152   184 */
->>>>           /* --- cacheline 5 boundary (320 bytes) was 16 bytes ago --- */
->>>>           struct mutex               ptp_lock;           /*   336    32 */
->>>>           u16                        port_base_addr;     /*   368     2 */
->>>>           u16                        clk_base_addr;      /*   370     2 */
->>>>           u8                         mmd;                /*   372     1 */
->>>>
->>>>           /* size: 376, cachelines: 6, members: 16 */
->>>>           /* sum members: 369, holes: 1, sum holes: 4 */
->>>>           /* padding: 3 */
->>>>           /* last cacheline: 56 bytes */
->>>> };
->>>>
->>>> tx_queue will be splitted across 2 cache lines and will have spinlock on the
->>>> cache line next to `struct sk_buff * next`. That means 2 cachelines
->>>> will have to fetched to have an access to it - may lead to performance
->>>> issues.
->>>>
->>>> Another issue is that locks in tx_queue and rx_queue, and rx_ts_lock
->>>> share the same cache line which, again, can have performance issues on
->>>> systems which can potentially have several rx/tx queues/irqs.
->>>>
->>>> It would be great to try to reorder the struct a bit.
->>>
->>> Dumb question: How much of this is in the hot patch? If this is only
->>> used for a couple of PTP packets per second, do we care about a couple
->>> of cache misses per second? Or will every single packet the PHY
->>> processes be affected by this?
->>
->> Even with PTP packets timestamped only - imagine someone trying to run
->> PTP server part with some proper amount of clients? And it's valid to
->> configure more than 1 sync packet per second. It may become quite hot.
-> 
-> I'm just thinking of Donald Knuth:
-> 
-> “The real problem is that programmers have spent far too much time
-> worrying about efficiency in the wrong places and at the wrong times;
-> premature optimization is the root of all evil (or at least most of
-> it) in programming.”
 
-It's hard to object to this argument :)
-I might be influenced to much by the latest findings in bnxt_en
-regarding bottlenecks in PTP processing..
+--f7gmd3j6k5eoylin
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+From: Alejandro Colomar <alx@kernel.org>
+To: Alex Henrie <alexhenrie24@gmail.com>
+Cc: linux-man@vger.kernel.org, kuniyu@amazon.com, mtk.manpages@gmail.com, 
+	branden@debian.org, netdev@vger.kernel.org
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
+ <20241111062205.207027-1-alexhenrie24@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
 
+Bona nit Alex,
+
+On Sun, Nov 10, 2024 at 11:20:06PM GMT, Alex Henrie wrote:
+> struct ifa_cacheinfo contains the address's creation time, update time,
+> preferred lifetime remaining, and valid lifetime remaining.
+>=20
+> Link: <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
+/tree/include/uapi/linux/if_addr.h?h=3Dv6.11#n60>
+> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+> ---
+> Changes from v1:
+> - Move link to Link line in commit message
+> - Add the word "remaining" to clarify that the reported values will
+>   decrease over time
+> - Say UINT32_MAX instead of -1
+> - Add a short paragraph to explain the constraints on the minimum and
+>   maximum lifetimes
+>=20
+> Thanks to Kuniyuki and Alejandro for your feedback.
+> ---
+>  man/man7/rtnetlink.7 | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
+> index 86ed459bb..ed08834b0 100644
+> --- a/man/man7/rtnetlink.7
+> +++ b/man/man7/rtnetlink.7
+> @@ -176,7 +176,24 @@ IFA_BROADCAST:raw protocol address:broadcast address
+>  IFA_ANYCAST:raw protocol address:anycast address
+>  IFA_CACHEINFO:struct ifa_cacheinfo:Address information
+>  .TE
+> -.\" FIXME Document struct ifa_cacheinfo
+> +.IP
+> +.EX
+
+I expect users that need to use this struct to also need to include the
+header that defines it, right?  We should probably specify it by using
+an #include.  What do you think?
+
+Have a lovely night!
+Alex
+
+> +struct ifa_cacheinfo {
+> +    __u32 ifa_prefered; /* Preferred lifetime remaining, in seconds */
+> +    __u32 ifa_valid;    /* Valid lifetime remaining, in seconds */
+> +    __u32 cstamp;       /* Creation timestamp, in hundredths of seconds =
+*/
+> +    __u32 tstamp;       /* Update timestamp, in hundredths of seconds */
+> +};
+> +.EE
+> +.IP
+> +.I ifa_valid
+> +cannot be zero, and
+> +.I ifa_prefered
+> +cannot be greater than
+> +.IR ifa_valid .
+> +A value of
+> +.B UINT32_MAX
+> +represents an infinite lifetime.
+>  .TP
+>  .B RTM_NEWROUTE
+>  .TQ
+> --=20
+> 2.47.0
+>=20
+
+--=20
+<https://www.alejandro-colomar.es/>
+
+--f7gmd3j6k5eoylin
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmcz5BAACgkQnowa+77/
+2zJ4yg/+JpENPpflkfg+u6+X5zt6xvktmdBehI9nDnjhbmMgSyYKCcHoz25ZNE4B
+/2LrpeoC91ZPDncTyBw4ZAyQ8pxrWdwfsXW1/9Ok1vut2JmcN9hIe4WC40wQtTeo
+8/iQb7lVjb6LFI1ka4EZVvkAL32C0o+k+plrD7I0zWUMRGE4Ro2WHYGjX/NELY3t
+gLq2zTHu+zTm2fkWBcztMdwG3YjHqG30vOIXOo3SWff49c7EAqaMBCNqyqxIqekT
+B3FRorsJdgtNql/zhrfp2mOkoObnQM12maj12FfcLsUQbWDLcLDbC+wik79gdikN
+n+OKlOLeXw80fVLNt9c0h19ME/mRQJTXqnAxrDooXPl0hIjYiopy+/7jkGiX5jHI
+o672YrQyGXRDmPGoHYoqNTuUCtKCHJYHaKXXFO/Yn7/753k1cY+GnRCS5/7AUv5r
+AFhuuObVd2ap1OLpGYv3iIP85I0O6In0zrn5P93BVbIs9EZUIlt8hpZeVbv8AbRU
+oy0xvsxPhh0fg5gvqMc6RP51LrL+M5kkm5/LhSVV0+EQIkquUUBl8QkeqXEAtv2B
+USAUnTS/7AF+iLpbmf3Di38bJ1fggZgFRcMu37NJxZ0cqfFGx4eXLxqwNi+WdvLv
+gwz8DW4obmtblkSy0QcaD+goqEdRXmu+IX44VzySU3+OmnNWXCY=
+=NX2x
+-----END PGP SIGNATURE-----
+
+--f7gmd3j6k5eoylin--
 
