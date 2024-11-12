@@ -1,180 +1,188 @@
-Return-Path: <netdev+bounces-144254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 610B79C656B
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:47:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB999C658E
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185E11F25706
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AA171F24C74
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D839B15443B;
-	Tue, 12 Nov 2024 23:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5BE21CF85;
+	Tue, 12 Nov 2024 23:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bfTexfFp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2w0J/Jq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B236E2FC23;
-	Tue, 12 Nov 2024 23:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD642FC23;
+	Tue, 12 Nov 2024 23:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731455221; cv=none; b=cy2onJiMYyLWtNx2l018K72Q+VoTKIYznYILED/ZpeXIwr133qh/PeeKMYoTln13F4JplHsnmhDjQ4GGKEzVYw8qX7jPmP/j2HIEg5kCj/Q+pZxP745cWY/fEkfdxszlVfeaj07lnsEGkUaWLQsFGV516mSXn7DOwG1eeRa+cps=
+	t=1731455765; cv=none; b=VPC44qZOjcR41arHXOcDntasJVLaIBz1bpEOZghPHgGkTKf/gbaJSGBbvR3FwhqvFhpe2Rs/BpKuSAUqf14PTmHLGrVUlU+HqLsSXR89mtxn3B0BV0AIdDrhYVS0ZnDh8FPP/iyB4kQLq3AbVOhr9Hb4pDS5ZWF0+q3RwItWuaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731455221; c=relaxed/simple;
-	bh=p+pkVgK+GHj/lm+LRx0FaUf5eXSGISrXbitR3i4a8cg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ew75uj/56JsMnj445dRR06aE/oYy7wiA4/cMesaZEtvIUdVnflx7CgQXJ4zUvMCKxaV5P2sSXJcf7YDBU8qxz/v5a89qdbryBB4jiQRIDFpkUhb7hiMcrI2MiFLJU++coYYONJPlmDjowptlYPek9MHPhAVFxV5cAyUzd8dfoI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bfTexfFp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CA2BC4CECD;
-	Tue, 12 Nov 2024 23:47:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731455221;
-	bh=p+pkVgK+GHj/lm+LRx0FaUf5eXSGISrXbitR3i4a8cg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bfTexfFpP1OUN0YkkD15tI/PbVUt5ZHC614phUNFvu6e2JPEZJos2kFxDfD3bsvH+
-	 EIY2bxcQ2ln9NQjmCZ/8bfd0tXCT9638LrfF1lNbBveDSB4gxbtMVirbgipMJgY4u4
-	 LhwXqIQk6v5tyNNKw6KjHBugQK96heqHn0Tq/Owl9Aqmzve5rU6jsKDGdlhx//hzcf
-	 +0sWxswIrw5MSfAcdfVT2n5xKYd/Rl9bi7PbbrY/7Ksr0EUoUmJZ39W8RTbkMnVTjM
-	 DWJ91VhJ1C7bb+pA6N3RFDzrg3PZcqYx5N6XVQbmsnYPkS73LtMThvdWmWIhJQyaSs
-	 r6rhsbToQNC4Q==
-Date: Wed, 13 Nov 2024 00:46:58 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Alex Henrie <alexhenrie24@gmail.com>
-Cc: linux-man@vger.kernel.org, kuniyu@amazon.com, mtk.manpages@gmail.com, 
-	branden@debian.org, netdev@vger.kernel.org
-Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
-Message-ID: <gmtdbcjvptsrkhos7hsw66vbcmroqlo3777qtlyki6vawgf5ot@tmavdu2oufde>
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
- <20241111062205.207027-1-alexhenrie24@gmail.com>
+	s=arc-20240116; t=1731455765; c=relaxed/simple;
+	bh=z+DRKjJHzcUGE/2W2detPEAAaU2VP4blQBH+jOMdy24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M5RaumWsKPysYI+3QlxZMy1qtmUDEfYuWkBjkDJX+a2ruSlEA/Et+gFQwYJjN1QqobJm74gTI5eozaGkNOYviNk1oZ28Blep5RXf+rx2/YHlJm/4/Yh5ZbIQ5tnr0jdk1OzqNk57QKxPBWx75CqM1w91xnYC6p0xMMRu0fJEBM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2w0J/Jq; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4316f3d3c21so51069405e9.3;
+        Tue, 12 Nov 2024 15:56:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731455762; x=1732060562; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YPX2HubMD2XkMQ4pQh5hLYBi/zSrflbsVt51KzFPBlo=;
+        b=k2w0J/Jq+UwpqGYhwKYt31TbKk5/ZHfAMEXCP7Yfw6e46cd9T4xMUsvN7T6yObVDn1
+         /batg3xiWUMGYj1eGwJ0gf9uLmQUs5Qo5yjyzNlwBkL7rf51k/VNTN9hfxQk9994mHQl
+         Y6m67c8Q1NcNBbGVAyA+gU7xETNSuNiYVJx3lDmmMQCSgzydbh0d5UkSyADhbAakvzJT
+         Fidn6UEkgdWL+xoP5aOceZZFoJbXo/d3BmPb89SqPnXLXHjwFzi7LjlbhI6eUTnAjFfP
+         jB8smLIfVV0YmTCKN1KTh/hsKpGxhgewEehh1rU1kt+pKb5+kEGv2Vl5v1UmtnMzIfCQ
+         b91w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731455762; x=1732060562;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YPX2HubMD2XkMQ4pQh5hLYBi/zSrflbsVt51KzFPBlo=;
+        b=eu8w41QVh9xd1Oron+TqhlqqRAJ2kkyo5yvPEmqX5IbNWeWK/oFs1xFkJ4LaAVPmu8
+         2meTVou/hB8DqCTjFV7Y7iCc4EQpDVBpzqMgLFg5VoSxuSKrX2O7Is6vBwrmh05QrlUj
+         nvn1+a2tCd4JCK6KPrTPvwQoIW1pVRvfGb5l3lsVQSdVHFjEvqkEaer+kc26XowaJ8k3
+         x+YzozF6azv0DIv3hp4wlwB7Gm92ERGFN00+NtIvcjI8oGRg9sk7tEf2SRQ0c44bmAb5
+         gpWg4qK9sTt9eTOBaSPXJzpyEzAdiPWqsUuubbcmVOywf8rPvZpMN2znxHu8aOx5aaIA
+         XzPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUz0S7h6L762l+G5Q+LGYXa9PaXJ1zaJdWcA28mBYU/9Viog/U/+OHf+ck4h4AkpVvxJKaal0RKYTZAU0xY0pnO@vger.kernel.org, AJvYcCVs1HeM9N3r4mf4JP8GkrJK3t3iGTMY5g7GbTs6T1FcO5S/JIZrQmaKj7mtGRWKd2rFBlfu9Vnz10IO6W4=@vger.kernel.org, AJvYcCWspvcbhEBVYKb+6O1qlVkYcDpNvPz/1VZBJJ+QjwTPiaEf+sfkEo9DcEN+JoBEhbaoZ5Jx+EhM@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrRUeWxLzfwOJlCUEe0XyHs5Mf4xFx/2uhhHA29jVyA70kfwpx
+	L5Sp0r1tWDGfE6AZeQmEB+Pom2ErOzjPJ6J9KzDXJGngNFAGFY5A
+X-Google-Smtp-Source: AGHT+IEiPiDkzgyTkv+vPfbi8V7ooV4hxHnzF/1ZiQ+HRyevtIERuTCQFRxzEeicrb8xWRyjyI+4Nw==
+X-Received: by 2002:a05:600c:4e50:b0:431:2b66:44f7 with SMTP id 5b1f17b1804b1-432cd47dacemr38913695e9.31.1731455761437;
+        Tue, 12 Nov 2024 15:56:01 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432d55038c5sm3502225e9.19.2024.11.12.15.55.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2024 15:56:00 -0800 (PST)
+Message-ID: <7e98323f-a1cd-4922-a3c0-b98dbb209e93@gmail.com>
+Date: Wed, 13 Nov 2024 01:56:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="a43pcku5xczo6dy3"
-Content-Disposition: inline
-In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 04/23] ovpn: add basic interface
+ creation/destruction/management routines
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-4-de4698c73a25@openvpn.net>
+ <2fd3dc9c-9d6a-494c-a4d8-a45221bf250d@gmail.com> <ZzOGqP9AAGSN2E7y@hog>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <ZzOGqP9AAGSN2E7y@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 12.11.2024 18:47, Sabrina Dubroca wrote:
+> 2024-11-09, 03:01:21 +0200, Sergey Ryazanov wrote:
+>> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>>> +/* When the OpenVPN protocol is ran in AEAD mode, use
+>>> + * the OpenVPN packet ID as the AEAD nonce:
+>>> + *
+>>> + *    00000005 521c3b01 4308c041
+>>> + *    [seq # ] [  nonce_tail   ]
+>>> + *    [     12-byte full IV    ] -> NONCE_SIZE
+>>> + *    [4-bytes                   -> NONCE_WIRE_SIZE
+>>> + *    on wire]
+>>> + */
+>>
+>> Nice diagram! Can we go futher and define the OpenVPN packet header as a
+>> stucture? Referencing the structure instead of using magic sizes and offsets
+>> can greatly improve the code readability. Especially when it comes to header
+>> construction/parsing in the encryption/decryption code.
+>>
+>> E.g. define a structures like this:
+>>
+>> struct ovpn_pkt_hdr {
+>>    __be32 op;
+>>    __be32 pktid;
+>>    u8 auth[];
+>> } __attribute__((packed));
+>>
+>> struct ovpn_aead_iv {
+>>    __be32 pktid;
+>>    u8 nonce[OVPN_NONCE_TAIL_SIZE];
+>> } __attribute__((packed));
+> 
+> __attribute__((packed)) should not be needed here as the fields in
+> both structs look properly aligned, and IIRC using packed can cause
+> the compiler to generate worse code.
 
---a43pcku5xczo6dy3
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Alex Henrie <alexhenrie24@gmail.com>
-Cc: linux-man@vger.kernel.org, kuniyu@amazon.com, mtk.manpages@gmail.com, 
-	branden@debian.org, netdev@vger.kernel.org
-Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
- <20241111062205.207027-1-alexhenrie24@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20241111062205.207027-1-alexhenrie24@gmail.com>
+True, the fields are pretty good aligned and from code generation 
+perspective packed indication is unneeded. I suggested to mark structs 
+as packed mostly as a documentation to clearly state that these 
+structures represent specific memory layout.
 
-Hi Alex,
+>>> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+>>> index 8516c1ccd57a7c7634a538fe3ac16c858f647420..84d294aab20b79b8e9cb9b736a074105c99338f3 100644
+>>> --- a/include/uapi/linux/if_link.h
+>>> +++ b/include/uapi/linux/if_link.h
+>>> @@ -1975,4 +1975,19 @@ enum {
+>>>    #define IFLA_DSA_MAX	(__IFLA_DSA_MAX - 1)
+>>> +/* OVPN section */
+>>> +
+>>> +enum ovpn_mode {
+>>> +	OVPN_MODE_P2P,
+>>> +	OVPN_MODE_MP,
+>>> +};
+>>
+>> Mode min/max values can be defined here and the netlink policy can reference
+>> these values:
+>>
+>> enum ovpn_mode {
+>>    OVPN_MODE_P2P,
+>>    OVPN_MODE_MP,
+>>    __OVPN_MODE_MAX
+>> };
+>>
+>> #define OVPN_MODE_MIN OVPN_MODE_P2P
+>> #define OVPN_MODE_MAX (__OVPN_MODE_MAX - 1)
+>>
+>> ... = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_MIN, OVPN_MODE_MAX)
+> 
+> I don't think there's much benefit to that, other than making the diff
+> smaller on a (very unlikely) patch that would add a new mode in the
+> future. It even looks more inconvenient to me when reading the code
+> ("ok what are _MIN and _MAX?  the code is using _P2P and _MP, do they
+> match?").
 
-On Sun, Nov 10, 2024 at 11:20:06PM GMT, Alex Henrie wrote:
-> struct ifa_cacheinfo contains the address's creation time, update time,
-> preferred lifetime remaining, and valid lifetime remaining.
->=20
-> Link: <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
-/tree/include/uapi/linux/if_addr.h?h=3Dv6.11#n60>
-> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+I would answer yes. Just prefer to trust these kind of statements until 
+it crashes badly. Honestly, I never thought that referring to a max 
+value might raise such a question. Can you give an example why it should 
+be meaningful to know exact min/max values of an unordered set?
 
-Patch applied.  Thanks!  And thank you for the review, Kuniyuki!
-<https://www.alejandro-colomar.es/src/alx/linux/man-pages/man-pages.git/com=
-mit/?h=3Dcontrib&id=3Deb801003747466333742aeb0e25abb8235ca4776>
+I suggested to define boundaries indeed for documentation purpose. Diff 
+reduction is also desirable, but as you already mentioned, here it is 
+not the case. Using specific values in a range declaration assigns them 
+with extra semantic. Like, MODE_P2P is also a minimal possible value 
+while MODE_MP has this extra meaning of minimal possible value. And we 
+can learn this only from the policy which is specified far way from the 
+modes declarations. I also see policies declaration as referring to 
+already defined information rather than creating new meanings. On 
+another hand the NL policy is the only user, so maybe we should left it 
+as-is for the sake of simplicity.
 
-I've applied some minor tweaks below, to avoid going over the 80-col
-right margin in the formatted output (which BTW triggers a warning in
-`make check`).  See below.
-
-Cheers,
-Alex
-
-> ---
-> Changes from v1:
-> - Move link to Link line in commit message
-> - Add the word "remaining" to clarify that the reported values will
->   decrease over time
-> - Say UINT32_MAX instead of -1
-> - Add a short paragraph to explain the constraints on the minimum and
->   maximum lifetimes
->=20
-> Thanks to Kuniyuki and Alejandro for your feedback.
-> ---
->  man/man7/rtnetlink.7 | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
->=20
-> diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
-> index 86ed459bb..ed08834b0 100644
-> --- a/man/man7/rtnetlink.7
-> +++ b/man/man7/rtnetlink.7
-> @@ -176,7 +176,24 @@ IFA_BROADCAST:raw protocol address:broadcast address
->  IFA_ANYCAST:raw protocol address:anycast address
->  IFA_CACHEINFO:struct ifa_cacheinfo:Address information
->  .TE
-> -.\" FIXME Document struct ifa_cacheinfo
-> +.IP
-> +.EX
-> +struct ifa_cacheinfo {
-> +    __u32 ifa_prefered; /* Preferred lifetime remaining, in seconds */
-> +    __u32 ifa_valid;    /* Valid lifetime remaining, in seconds */
-> +    __u32 cstamp;       /* Creation timestamp, in hundredths of seconds =
-*/
-> +    __u32 tstamp;       /* Update timestamp, in hundredths of seconds */
-
-+struct ifa_cacheinfo {
-+    __u32 ifa_prefered; // Preferred lifetime remaining, in seconds
-+    __u32 ifa_valid;    // Valid lifetime remaining, in seconds
-+    __u32 cstamp;       // Creation timestamp, in centiseconds
-+    __u32 tstamp;       // Update timestamp, in centiseconds
-
-> +};
-> +.EE
-> +.IP
-> +.I ifa_valid
-> +cannot be zero, and
-> +.I ifa_prefered
-> +cannot be greater than
-> +.IR ifa_valid .
-> +A value of
-> +.B UINT32_MAX
-> +represents an infinite lifetime.
->  .TP
->  .B RTM_NEWROUTE
->  .TQ
-> --=20
-> 2.47.0
->=20
-
---=20
-<https://www.alejandro-colomar.es/>
-
---a43pcku5xczo6dy3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmcz6PEACgkQnowa+77/
-2zLy9A/7BzU5nTIzdP12W2ZoiCiNxevyiR6aejlSfE9tixoOFo4wKuvTb2A+rlZ/
-NAPa1plSKwD/luCZz7jJIgeWBTVVMxdTky30KTHp0gMfh8ssvNfcUtw64AJ/JK9c
-WDJiaUmKDMDv72WhLJY5dLJy4txdSkEZ+fvluLy2jqmkpN1eQOfpOqFOPKsVzbr5
-PW9TyfRLwrVFGmQ80qxJnzvP3lA529hPr9dsQ2+HJoPj9JK6NIc505IpN5/fvO1z
-55oR+ZEwo40YA7kafM7O1Cwx5FE6FcOHshRsWn9j3852BpFciRZDENiJuJ/q5hdb
-uZdLGslM/EeWHHCC1VAI7RW2HZfrSq1TdB5kaSPRJV8iJhDQUSe2vkcHk/mKajwS
-e/NtJVswozOdZgFmWZlfqLyp3WFlZ0le2RTxJP1VsxLXsMetwQoXFJ7aAXWgjROV
-aEUvpEuutByF74dAcDYOp4QyL/vFLddhDxFx9v8dJ60dpRnSpfxfaH5ekVOH3PXQ
-tiEzY6zdMqXUoq2xNEV4Upe3bVuXnk3kNKSC7K9HG5aZnxgr/DyKYh5dbrSkEb6v
-398nn/ixIf5piR/b7LPTmM4/FPI731WAso+w8rVE9ovdhXTL7+QB4pfbjkT3eiXR
-fseKm/GtJskvHmYAHVOTU/ByJ8g2b7S9wJH7WU68CjNh9g5yl4Y=
-=mXZl
------END PGP SIGNATURE-----
-
---a43pcku5xczo6dy3--
+--
+Sergey
 
