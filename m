@@ -1,95 +1,245 @@
-Return-Path: <netdev+bounces-144131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD469C5D33
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4702D9C5E0A
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:01:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F635B34791
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 14:54:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85A20B466A0
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 14:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47012200C82;
-	Tue, 12 Nov 2024 14:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF2820125B;
+	Tue, 12 Nov 2024 14:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jf1lbr2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BF7200B8B;
-	Tue, 12 Nov 2024 14:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731423151; cv=none; b=UW7ATVZ12KpK8jP/fLjdV3k866VI1VOmUv8MRv4wazjFUt3/zr42yn9DynvFBBBVVAWyFaKw/2UfJeLii3sU8jbEI4XeQPfS/t3aoRi+H3g5K/pV5IW+uAnpQyc6QY3AHTSWX3arMpcNI5d6qJT/irj4V/ETHzZ0Kuym84gbr94=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731423151; c=relaxed/simple;
-	bh=3pCo5OAsNaEj9j0X5SyEEovuDYqC3xwvL4AT1U3A0qk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A7VpkGiVVJJaaCnjFCWOEmUNo+F/IxuZuiaAadUe3ShwWPc5V25KUOTIG82rkcywlSdEQx7SJSL7h0hX84HkIW1+mIG7tFJB6jmVnUr+OJyOsmruaTINa0uxi3GMEBUoz4oDq2hxX+Ic6rLmgeNcoMMpWLDLTduhV/yhgA+jksA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Xnq7K69pyz6J6pH;
-	Tue, 12 Nov 2024 22:49:17 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4E6F5140A08;
-	Tue, 12 Nov 2024 22:52:24 +0800 (CST)
-Received: from mscphis02103.huawei.com (10.123.65.215) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C772010F4;
+	Tue, 12 Nov 2024 14:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731423167; cv=fail; b=UG+R+kUF2IEKbJfT1MTVt+fIY7arr/f7L6DFW9D4AjVMtZieCjmy7PuUkp94U4bsZFr8BW4O2+X39VKeCQxNHT3rbsF0EY4mo0KGzgPVDKCOppoGBE4kU/Hs6weUdhB1X7Hpm9bv2XbQAO+3K+FjDEvMw8kB3kg0AYs8qZU8dnE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731423167; c=relaxed/simple;
+	bh=gkpQUECVHw9uQPoarRX6K/ms+nJQhEcKoiFNTDlnSTg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=raWTQ4y1gh6gTQS9mEQxHAhlHm2egzSomm1TuxNXp9S27jmnJXnVhqs2E/uVBrT6uaRAW/6wB8twQ92DL2uKnJ9yzNgWkLRItxYS21MvEmDYUzGyEyQ1A1vbwUcuE8knkyPQSWu7xQ8LtfO2GlEy1QOWZztmjIFTmoIkR8pfG4M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jf1lbr2n; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731423166; x=1762959166;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gkpQUECVHw9uQPoarRX6K/ms+nJQhEcKoiFNTDlnSTg=;
+  b=jf1lbr2nZYqcJAw2n0RgIsLpBKPwr4A81VEppQIZl23vwFb6TUluKyg0
+   D3m+UN5hN1xiX4zAjQYg/+rmMElgwZcUFWfrGDCAtOVDigm4IYL/RRIgy
+   Hc5ABxs4o2bc+/aX2XnQAisXz2/ZMSjy6MpFGSQIlT8+pW/QTrEkVx4Xn
+   wuqjgYoQH/OtGDf6bxEjNak07BnnQV83JEwQN1jxg8g5s66wDbRzRXJXh
+   ymfp952IKA+ruYIfIHq+gQ4ovjX+UpuLJ1jmsn7R5waB/pA6X2bMRWCJ7
+   bb1Ieqef5PLYL3aGnrj67KGHSLmqKLbYUbyLqiRhPPaYpkCNcYbawf2QC
+   g==;
+X-CSE-ConnectionGUID: CvIP6Mg6RW+LSDdESpi/YA==
+X-CSE-MsgGUID: jW7ck5W2TsOdXmeoTovx0w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="48715924"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="48715924"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 06:52:45 -0800
+X-CSE-ConnectionGUID: SAhl1nhISdG4qUpMG5cJpA==
+X-CSE-MsgGUID: oz92B18xSGyK4QPmMOTfeg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,148,1728975600"; 
+   d="scan'208";a="92464681"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Nov 2024 06:52:45 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 12 Nov 2024 06:52:44 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 12 Nov 2024 06:52:44 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 12 Nov 2024 17:52:23 +0300
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-To: <paul@paul-moore.com>
-CC: <mic@digikod.net>, <selinux@vger.kernel.org>,
-	<stephen.smalley.work@gmail.com>, <omosnace@redhat.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-Subject: [RFC PATCH] selinux: Fix SCTP error inconsistency in selinux_socket_bind()
-Date: Tue, 12 Nov 2024 22:52:03 +0800
-Message-ID: <20241112145203.2053193-1-ivanov.mikhail1@huawei-partners.com>
-X-Mailer: git-send-email 2.34.1
+ 15.1.2507.39; Tue, 12 Nov 2024 06:52:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ElW1j1JQA6zqX018gViLGK5F4c6o+Ygt+nXx4GQYN3ryrrEDaZKlQOtLvjXjPf+6CMbc3O4pShaemTr0f7m7b2Ypb3CSuISHe+gH9HAf/VKzhPhoZtMjZjg+ckGH0Hr+OGmbBiRHggxhkAeTO66smBw22DCToGGXeClrJypKGXcsiM4udGrQqS7ImXgK+CimxMJvBqa2LaGrX21brQUahggQEO75pQa9nT4DpEoukRjEEgZuM+NeGeM6it+GV/UfeD2E/3NSr32uN5S3+sRGbZ8+Vy1zZb4bO7sfIkvWngHNEU7HFvKha95NzKkrqh+cNB60R3h3ZHIxF5aV8XyqfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yDK134qPtu3DzI6dCPsV3lo37radNKUg50X3Bb211Xg=;
+ b=Al03VICbrAnsuP/iAxB2u1I0wzvCwZJuHnLkJChOGRpk1u9zHUZRYrkTzTKJweVLVohWbUA0sqwOijUjFBjvHlEZOj4ASxRQ97eX5UzyBVNDsV3TRJ/bqTvgNzzvT9TROG4879Y52wsA7ra3IvDcAXIESV7GNhTRdvMqoexYYx8taStQ6KLmCMqTwUvZDIuWp1s+lMI1IpOMVuafLe2yrGMEXpA4b4sgMwijidGbCVYfi0nSDnzA75LfcenYXxQD+dvI98PDECwPJ9mz5h9N4WlXXIgA2NI65Ht8Smdyzj4w1bysbnV+I88q1XA9W/TMe66JTcifliZtCCF2HN6N1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
+ by PH7PR11MB7028.namprd11.prod.outlook.com (2603:10b6:510:20b::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Tue, 12 Nov
+ 2024 14:52:41 +0000
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3%6]) with mapi id 15.20.8137.027; Tue, 12 Nov 2024
+ 14:52:41 +0000
+Message-ID: <2e6cea97-0ebf-4767-b014-680a0502e1f9@intel.com>
+Date: Tue, 12 Nov 2024 15:52:34 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] Revert "igb: Disable threaded IRQ for
+ igb_msix_other"
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Jacob Keller
+	<jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Wander
+ Lairson Costa" <wander@redhat.com>
+CC: <tglx@linutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Clark Williams
+	<clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Simon Horman
+	<horms@kernel.org>, "moderated list:INTEL ETHERNET DRIVERS"
+	<intel-wired-lan@lists.osuosl.org>, "open list:NETWORKING DRIVERS"
+	<netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, "open
+ list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT"
+	<linux-rt-devel@lists.linux.dev>
+References: <20241106111427.7272-1-wander@redhat.com>
+ <1b0ecd28-8a59-4f06-b03e-45821143454d@intel.com>
+ <20241108122829.Dsax0PwL@linutronix.de>
+ <9f3fe7f3-9309-441c-a2c8-4ee8ad51550d@intel.com>
+ <20241111125345.T10WlDUG@linutronix.de>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20241111125345.T10WlDUG@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE1P281CA0483.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:7e::25) To CH0PR11MB8086.namprd11.prod.outlook.com
+ (2603:10b6:610:190::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|PH7PR11MB7028:EE_
+X-MS-Office365-Filtering-Correlation-Id: 18f72b50-e26a-4719-f077-08dd0329a863
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SzVtYkROc1FWdVZYVTNDa0NVRXhub205ZjVUVUo4K0gyU01INlFsV2RkV3U0?=
+ =?utf-8?B?QjE3b2dqUjByVnBmWk5UQTBkTHJXWmR4a3Fqci9BSDB4TUY1c0tyS0tGV1U0?=
+ =?utf-8?B?OGcvNkRMMU50RW45VGR6MWFqemdSVWN4bmNUNlZWd25KVHVBd0sxVHV1RUZP?=
+ =?utf-8?B?LzNLVWk4aGQzUUFsdUJtTzVGR3JiR0Fkb1NlZm5ZVGNPU29Cdk44dmUyY1dt?=
+ =?utf-8?B?d0FmMnBBRGR1Yk1zVEc5MFVZeGNsWHRBR3VxSEhKalRSSXU0TklsNFFQUzNB?=
+ =?utf-8?B?U2J1TkNBaERPNmx2RUJvYStsMDVydnN6ajBVa0dhZVVvSFhUdk9jcWxFaGkx?=
+ =?utf-8?B?YnQ4TS9FRyt3TDkvajJLeldJUVAvclRWeEk2Vm1IbzdRM3BkdkpLbXBRTWx2?=
+ =?utf-8?B?M0JOUk1TdUNyQVkvNDlkaXRjbGlwejRocmoyTEVKWGxJcFI1akhuY2NqOGV6?=
+ =?utf-8?B?N3k2REJBVHlTcTZTUEJqeGJQdDh2cUhJMnd1UkZiSndIM2JUMzZ6ZS9lMndT?=
+ =?utf-8?B?Q3R4U3p0TGRJNFhRV0ZaMndRZEJpY0h6N2x0c01iVDEzQi83bXpxdW9MdkdW?=
+ =?utf-8?B?R3ZOVHh2aGI0RXZwMk1aSEpCbVJKaVBScmhPSFQxcHcwYkluWnV1bzAxdE4v?=
+ =?utf-8?B?cS9WTlRqbHBSN2VBMzhmb1FUUkFWcGVpc25HVzVFK1VENWZZRDZvdlNuZUcx?=
+ =?utf-8?B?UHhRRUxGVXJ2d2Z4NmZoY25VNlIwZXdkdENXZ2tTK200VUJuVVJHRTFxNWRP?=
+ =?utf-8?B?VXRZbTJZODM0UVJBUlczUStnUTJpdm9yWElONVEreEF0RXBFeExIMEphR1JE?=
+ =?utf-8?B?TkNRMmJHdXgzUzUreVFZRGZWbnpTN1FtTkhnTnUwV1pUNE1uMTF4Nk1paDh2?=
+ =?utf-8?B?QTYvVmpTd29xbk9tR1NHY252bkJqZytqZGZNLzNXRzVzc0hpYlJib0w1bTFX?=
+ =?utf-8?B?QzFXazVKMGVMc1JsTjB1TUl6WmdWRTlqUVpEVDIvRXgwNzhkVzQ1UGsweEpK?=
+ =?utf-8?B?NkV1QzljNERZcFVGZWpzZVZqZXpuaEhKejd2NlpaN05xcmlNWmhuYmVKL1Ni?=
+ =?utf-8?B?SE43NkZUQXo0WG9yZzFwMVJMMStkQmtlRzFXK3pmZVZqcE9XK1BFWHUzb2px?=
+ =?utf-8?B?amM4UjRhbXJsTDJrcllhL0x4d1V6L1RxTURNMUQyOWlmS3Iyb1lnS1VTMlVx?=
+ =?utf-8?B?THpDbno4OTd1NXJxWXMyclc1ZmVPOGppejRGMFZIWEpRYTdsa1ZLUW9Mdy9t?=
+ =?utf-8?B?dUZaZ1NPZVRZd1ozTE85d0pYSkU0K0ZyQmpJVkVjSkVXMTF0TmYxNTFldmxi?=
+ =?utf-8?B?UmpUYTlJOVowemxrQnBXU0lIVDZpTWtPaW1IUW1YczQyM3BMdkNlWEZlYlI2?=
+ =?utf-8?B?NTVsMlZQTWRUbGMvRThGaXk1MkZBMTc4MEpabm1URnpJZUhXOEVrOXZzQVNr?=
+ =?utf-8?B?R3JuS2hUWWM4Vk9zSWFFcWFnUXZGalFEM2h0Y1dDUm5IcHA4WEpFazBPejhk?=
+ =?utf-8?B?THczaWFKY0E5MGpIMDc4b1dpVVRCTVN2WkMxSTNZYVRlSFFDYzhHQkZ6blBC?=
+ =?utf-8?B?Y1Y0emU3YnBWZjAzV01XQ1pHTHFmRk9pQmJRclhlaHdIbldJSk9jUDVCOUFP?=
+ =?utf-8?B?Sy9yS1BGR3NiTWZRLy9Wc3FLUnAyYkcvKzJRODZRemJ1dnRjcWtwUVpmSEQ5?=
+ =?utf-8?B?eFlOMVhTMmRKZEFQWlB6VzJWbmJjMFFCUTdqU0hzQVVxQmRwenc3ZjVya05R?=
+ =?utf-8?Q?F+RsIjOJO2cv/DBx7CXhkEFPSoYK8Xj9MyHzYiq?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z0RaaTBKdFM0dlJtbXdtVFJrMlR1K0NyV1dLS0VLZjVDb0RJME9hT1IyMzMz?=
+ =?utf-8?B?d2JvUUhNWWhmN0N1WTVsSWJEb2dwTnZvZWd0T3FtZFRibzI4bUdKQmRsd3I5?=
+ =?utf-8?B?T05WWTgzVmtvZFp4SEZnTUFVbjdzMkQrL2RmOUVpNUxBQU81bFRKZytGSEFN?=
+ =?utf-8?B?TDIzb2Q1ZjJPR2lKNWVXb0hwNUhmVU1qWmZ6VjNPTzdydTNtMFNaKzlmL1Ew?=
+ =?utf-8?B?OGFlTmJRYUtuZm5jNlBiR21zRkwxeGI5bXJ5ZWlaTzVIQ2I2dG5LOXZSQ1BQ?=
+ =?utf-8?B?dmJaRXdTMDNteTFIVUNWUUFOL3I0ak5OTTErSWRvNXpQOXFBNk4weTVxTjJZ?=
+ =?utf-8?B?K1ZQVDE0WmJqY2NQZDZBK0wvbytmRW9tZytZa1ozMFNGU3V1R2ZTcThGU3Vs?=
+ =?utf-8?B?alJnNnlDSVJMNzAwNDBzbkg3SHNhWnFhNXlMQy9xWWdDRzVqOFBwVGRFNE9M?=
+ =?utf-8?B?ckEraDhxL2dEcXpNZGIwcDJWYWJkczNDb3VOMXlMVUNJbVNld3FiL0tRTG9G?=
+ =?utf-8?B?NVcxVEttSEl0c3JFYkIvVm9hc0p1SFdaRWNScncwblpNamxVUFQrNzBDUGN4?=
+ =?utf-8?B?KzVKMkZYZEMrR082dzY2LzIwWnRnNmRvY3BjNzBSMXhHa3VRc3UwZ0d0YTcr?=
+ =?utf-8?B?dlV2REdsRnRGKzQzR013aGgxL1dtTlhnM1V4VDBFRjlhMDFiakwwSDhPckp1?=
+ =?utf-8?B?Vk1JQ3FoZEVmcnBPWjZSVVVuaFZjYzU5T1RhU2lmaE9lOHNzeWJPUS9pMFV1?=
+ =?utf-8?B?dlRLZ2FRejFFWC94cTZrUlliYWFOaDNxZUVNYTJSUEwrYnVpM2pmWGRvWHV4?=
+ =?utf-8?B?UnZMWUdubGpLKzA2b2pEeU10cGQ5bjQwUUhocGY1cEtPK3J0UEZKUnF4dHZx?=
+ =?utf-8?B?N0VEeUk0eWRRSjM3cFZXV1UzUG9zbXkxT1prQStZZG5HWDdSTGt2ZWg0dG5l?=
+ =?utf-8?B?Tm5wRFZOMG0xZW1oSXdIQitDbHZUYVMwQnRkYk0rSWNEQjBFSDNvNzc0b1Js?=
+ =?utf-8?B?KzlEUDhVVy9hbGM5UTVCVVRvdDlTbkNIcVNvUEphaXRIZVJTM1VxQUZNTHhi?=
+ =?utf-8?B?UzRuUE5LbUoxZHBVVGRVOHVsdUxTM0kzVS83dXo5eU91VjhYREVhSzlBQmFi?=
+ =?utf-8?B?VXFWVFVwSzdESWNBKzQyM2RtUGd2TTdqRkcxMGpMWHZCaXFyQThXUmVjMDJw?=
+ =?utf-8?B?aDltRGo1UE9ldzFwOHBIcmd1NERaQTBJOEhWeDBiT2p4MnFxQ0tPeVdaWWJa?=
+ =?utf-8?B?Vk1vbmRMaXZ3b1BZZ1E1eUxsRWlXUmExZ2VjajcydzFtWkhvU0JLd2hIMlow?=
+ =?utf-8?B?OHJpWm5mUEEyU0V2Q3FyUDVrV1A1VzI2L1pEVE1uUy9GdDhVbmErcWZoQnA4?=
+ =?utf-8?B?UEFqVVZtaGs3TjVsWm9qK1ZvOFoyN1lhcTJsZ0ZVSjNGL0sySHJPUnZiQTls?=
+ =?utf-8?B?c0UxcUxmRHBVanRUc2Y5S0RlYW5kakM0amZDQXFMRURaQ2NaNGEwZ1Nib0NW?=
+ =?utf-8?B?YnB5WFpPajY3TmdqK2Y3akx0RTUwQmZiVEFuSm9FVHlqeWRoTUREYjZjcWVJ?=
+ =?utf-8?B?WEk0UGQ4WlA1R255Zk5vdUl0Ym5BbDZpdTRFR2dQa1R1QXNVdVcyWGVwZlk3?=
+ =?utf-8?B?czl3WGVpR3lCMUpQNE9BT1Z5V1d1VDlHSE1xbEtWK0RPMTZGVC90S2VGeGtE?=
+ =?utf-8?B?Sy9VNzJrNDVqZVVvLzRxT056RXA5ZlRCWVovaEVlc3hBRWhGalBza1dHL3Nh?=
+ =?utf-8?B?ckVyZngzN3kvTUUzT3ZQbkxmMndxMGNyMnVoNXRyUXIrR0taQnpWWEQ5dXRN?=
+ =?utf-8?B?QUZGOWpNOWMxS3pBTUtUeHJ4VHprWXM1M2V0Y0N2aWRvcjdjZU9MOVdYT0Zs?=
+ =?utf-8?B?OTdPQm03WngzLzZyVXF2anhmbVE1MHlGdkxpOEpIV21ha0RyTGRFNWRWTnBT?=
+ =?utf-8?B?bGRpS0pWdy9HREVqbmswS3h6K0RpVFNtUTEzVTRRZWFHVzRTa1Y1cHQ4Mmhn?=
+ =?utf-8?B?NzV0dFptejltUDNVL1FieFFMejQ3U2oxbWdaaUpXb05hWURZdFdTbGtFTlRP?=
+ =?utf-8?B?UEhJdGwrT3AwRXVqSFNMMnRnUWordWROa0g4VVdSVEthTGNrN24ydjZ3aVBk?=
+ =?utf-8?B?ejVzY3QxbEp1SjdlSGhwUjVCTlprSTExYnV0bWh2MnMyTGVHK0ZYZlMwSWsx?=
+ =?utf-8?B?Ymc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18f72b50-e26a-4719-f077-08dd0329a863
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2024 14:52:41.2669
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HgyU4yJAVT+IvZ2j10TEHchzf/tcMtTMwWwzYPU4XSQCIsNUURg7s3of40jAmojhbCujb9T0Nq9yxFBDXzMhCGBbmar8tHSdrs0njUh0zfg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7028
+X-OriginatorOrg: intel.com
 
-Check sk->sk_protocol instead of security class to recognize SCTP socket.
-SCTP socket is initialized with SECCLASS_SOCKET class if policy does not
-support EXTSOCKCLASS capability. In this case bind(2) hook wrongfully
-return EAFNOSUPPORT instead of EINVAL.
+On 11/11/24 13:53, Sebastian Andrzej Siewior wrote:
+> On 2024-11-08 15:00:48 [-0800], Jacob Keller wrote:
+>>
+>>
+>> On 11/8/2024 4:28 AM, Sebastian Andrzej Siewior wrote:
+>>> On 2024-11-08 13:20:28 [+0100], Przemek Kitszel wrote:
+>>>> I don't like to slow things down, but it would be great to have a Link:
+>>>> to the report, and the (minified) splat attached.
+>>>
+>>> I don't have a splat, I just reviewed the original patch. Please do
+>>> delay this.
+> 
+> this clearly lacks a `not'
 
-The inconsistency was detected with help of Landlock tests:
-https://lore.kernel.org/all/b58680ca-81b2-7222-7287-0ac7f4227c3c@huawei-partners.com/
+sorry for the slowdown then,
+Acked-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Fixes: 0f8db8cc73df ("selinux: add AF_UNSPEC and INADDR_ANY checks to selinux_socket_bind()")
-Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
----
- security/selinux/hooks.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+>>> Sebastian
+>>
+>> It will definitely splat on RT kernels at some point, if there is a
+>> spinlock.
+> 
+> exactly my point.
+still would be great to add some basic RT tests in our VAL,
+but it's unrelated to this patch
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index ad3abd48eed1..15e31299a833 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -4828,7 +4828,7 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
- 	return err;
- err_af:
- 	/* Note that SCTP services expect -EINVAL, others -EAFNOSUPPORT. */
--	if (sksec->sclass == SECCLASS_SCTP_SOCKET)
-+	if (sk->sk_protocol == IPPROTO_SCTP)
- 		return -EINVAL;
- 	return -EAFNOSUPPORT;
- }
-
-base-commit: d7b6918e22c74f2b354d8dc0ef31ab17ae334b93
--- 
-2.34.1
 
 
