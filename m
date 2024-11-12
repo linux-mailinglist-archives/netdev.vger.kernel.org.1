@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-144044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DB19C54C9
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:51:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A03A49C54FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEC382846AE
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 10:51:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58FCD1F25853
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 10:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A03224607;
-	Tue, 12 Nov 2024 10:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85D22309E8;
+	Tue, 12 Nov 2024 10:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J58g0gU6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4kGH+go"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595A52245FF;
-	Tue, 12 Nov 2024 10:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748F9215C42;
+	Tue, 12 Nov 2024 10:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731407850; cv=none; b=M/LVpXeH8mkqlxEQne7RqovYGKAFzQ1N/IaPjSYcB9QppMOQqRvjbV0f+A5/lk2FbKuZnl1wmoH6Pw9qXn936SzU/mbebYGDcJuuyZK4nNL0EcnTh9R2jGO/raDECJfsT35lse4H9/6Lsyvm80Hi57PKz8VCyP1gSgC8Kl6pxOo=
+	t=1731407875; cv=none; b=DZnlEDdcYUX/FLt0IUfskbic21CfwnhZzQEr3PVrMHhlUplEqpW/MDUi2Cpf//d1DwaPWgA+ZmRS7MutHuf/qxDQz+bEjeQqjOr9Wd2Y0StDVR/n4ko3heEsNjtmIEiFL5OF+kJrhtdarjGbmcac2DNnDBYXPTtXqRkWoXH1v5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731407850; c=relaxed/simple;
+	s=arc-20240116; t=1731407875; c=relaxed/simple;
 	bh=vSRvIIeuP0uL1xcfrQcdNYT7Bq8X8dLrpOUUMuR5bYk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QNp2NTIGYnycxbxAbFhMekbRxAiNPF8Gi5//EpP6siHeZ0rGhD/DOnmfFiJ8FiVd1JVTTSQjAQMisQ421rrZkHcNR2vwWxSCofTVuxp9lnvQzHOpJqsEeuwIdUx1xBsCMmt1vSJDqPNFnkxgewPLERz8iEuk0788f5+vtYsouf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J58g0gU6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4D5C4CED4;
-	Tue, 12 Nov 2024 10:37:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XL8tsOlIRFukbEe2TO+oHau1ywrwp8zfaqMKhrxmys67Qr8ME3UlNJ5bT+2Lf5d2QTkJbeNnkuYt7VW7qhjOM6LUoE9PLakHfQV3YGwzJkGdDuQqYyCK+PJg9n9FHrUsI6lDZWjih6LJMLRgYlzD/rn8jWV6F9H5MiJRPob84kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4kGH+go; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9346EC4CECD;
+	Tue, 12 Nov 2024 10:37:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731407849;
+	s=k20201202; t=1731407875;
 	bh=vSRvIIeuP0uL1xcfrQcdNYT7Bq8X8dLrpOUUMuR5bYk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J58g0gU6nKZ56rK3vO8vcVgMd2qN7R0K6tKkpI08aSx4VwWg4QZ9x8/A7f/70XpEM
-	 STfIMz5nu7+NqRYTckZUPUxMFVygs9G+Nh5tpzg9akdUHbszBQ4IO3SJXq7F0XwwPQ
-	 AMAavo9sHZLqblyCX2fjgBlvnPvMAK/ls+eJ9+0m/T9vVpwYiVKSzZh4eurrqxbCRU
-	 suWMabRosFXcN/hip8OkKJ2u4svblPRfg/5413uYsGGq1WzN54XY+5447MFjoxNS6N
-	 IUIhUhptRe/S9kUAZKWFRFFNK51QH5hF9LAJOoUNHpqOmGPdewpyO2EmR+DStRF5KQ
-	 23npRUauPgQgw==
+	b=c4kGH+govyaYzqvXT5NzrXluTGK1ohstRki+/S0gRgrBtnbWEVTZOj2SLxjyGqwI+
+	 3PMxj8HE8xMNUgRspeVM2mNtGMRBhdKhcb2U4IFFaw0Y5tnqC0i7ZfVmsvvmFYUh1O
+	 uHMdYL2KNqx9B7MO40JpDuO4UOTOqcpvWU5BEZcnik8elIslPysLYSJpEnOqPyS2Fn
+	 mj601OZcfNFm4zlhU88DAYn0iiJaDiTU+4TusCjJh22Hon4PJeNhytgPCL7dIMFBwR
+	 UGNaAd15h9UACWdfo4hD2ywsP1oZbxogbW7Ind1OQfnUMPXKa/PxkGBA2u+Au/HE2d
+	 WDHCw4oSr+/tg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -58,12 +58,12 @@ Cc: =?UTF-8?q?Alexander=20H=C3=B6lzl?= <alexander.hoelzl@gmx.net>,
 	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 06/12] can: j1939: fix error in J1939 documentation.
-Date: Tue, 12 Nov 2024 05:37:08 -0500
-Message-ID: <20241112103718.1653723-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 5/8] can: j1939: fix error in J1939 documentation.
+Date: Tue, 12 Nov 2024 05:37:39 -0500
+Message-ID: <20241112103745.1653994-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241112103718.1653723-1-sashal@kernel.org>
-References: <20241112103718.1653723-1-sashal@kernel.org>
+In-Reply-To: <20241112103745.1653994-1-sashal@kernel.org>
+References: <20241112103745.1653994-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +73,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.116
+X-stable-base: Linux 5.15.171
 Content-Transfer-Encoding: 8bit
 
 From: Alexander Hölzl <alexander.hoelzl@gmx.net>
