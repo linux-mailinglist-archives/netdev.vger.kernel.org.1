@@ -1,217 +1,335 @@
-Return-Path: <netdev+bounces-144099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3E369C5948
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 14:39:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505289C5A17
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D1A282DE7
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:39:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC201B35913
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A13F170A37;
-	Tue, 12 Nov 2024 13:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC0E13B2A9;
+	Tue, 12 Nov 2024 13:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="R1fGFGwp"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1BE170A16;
-	Tue, 12 Nov 2024 13:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BFD13A879
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 13:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731418679; cv=none; b=FFfRVIHY9eRSeJLYB6NUFF+M1dNzKrKCkLcfQDfiLE1t4X+yls7rFt7edXAk4H3LWwkyWwd6XfpZ4MtxBPlNUZczT2wpC01Ra3GxlIzKFo3gm8gyyAEfAi7Wk/D88dtav2+9BUImNr36IZtYJGWLh+x+5eRYuG8vvRkfvqUDGRE=
+	t=1731417627; cv=none; b=KAvC+ZQ66ZuRb5PAQ+zfRMThiwyiK2zsKD1mpAum+NXHV9vJ7LTts5CHIN3NOBxNqokOMN07MqSIFFCbpmjDU6Ker9xtfPHUnrh7FwhPX4hzt1pSDGtKFZ2SSs8/B7sF8QIsXLQnNrkZO2W5Zft6LCoLFhcSLiDOAYYhsQgrnH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731418679; c=relaxed/simple;
-	bh=TSyPJiUvgWDien+nBNbzWulNav57EULL9d5qPuadKYU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K+kERgDa0JkmM5LdKAVvplrzZdOGmnmXjskQIJjOjv8FKY9ykJTVdVJrk8iITUNKbmiJYSCXoW2SIPGPhaELo64q+yNkVD/aRbF67fY6HJHR5oV6YqlDMOt0Je0DiU60qVmgFotHJOxgfnMQK+yv6aK4ICEotE18MScjCWC1kZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XnnRW2TLYz28fR2;
-	Tue, 12 Nov 2024 21:33:11 +0800 (CST)
-Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1958C14011D;
-	Tue, 12 Nov 2024 21:37:54 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemg200003.china.huawei.com
- (7.202.181.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 12 Nov
- 2024 21:37:52 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<trondmy@kernel.org>, <anna@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <ebiederm@xmission.com>, <kuniyu@amazon.com>,
-	<liujian56@huawei.com>
-CC: <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: [PATCH net v4] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
-Date: Tue, 12 Nov 2024 21:54:34 +0800
-Message-ID: <20241112135434.803890-1-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1731417627; c=relaxed/simple;
+	bh=4uQQKVnJVNkYxj3Jf3V9uXYx3Kw1s6pIzZwwAp0Wiaw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hlOtRCq9pTtVYGZ0cuxTnRTJnQwOjABU05zha310O6B4jpwZajEfop2CONfnYcwmXIBclqJuJKoIQsol5Geh0rwXkc51E/6x/wKKGz4jWTh8qxyHVlCAypBipxCOQX46uSO+gknOeoOfPAzgdUmJ7OPEgidycgJBhbyOES/RzO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=R1fGFGwp; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9aa8895facso1046127266b.2
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 05:20:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1731417622; x=1732022422; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=A1t9Ib/aPHDdfQvoVKx/Fp+uYeREslGX9huBdxy8D5w=;
+        b=R1fGFGwpLwBuY22360zqHCFEnrtfk2hrVbS8OpLp+AYP9e1SySpJPTZcqrWxCqjgQ/
+         CtHDSrQDdNVPvhM5cgIaKBv7pEJ+ceYEGN73V32Wfbw2LSEYL8GXVKLgTd2f1dTVKjlb
+         7cJP/UpEaUm9iCVWwOeaRM/5blXj5ML6D/5rnW7T5ihfPCRHQkLa84+kpZzgs72NaKPl
+         qZreU/NfePX9GRTF1xtg/hOZG6UftZ/8/l5Vht+eGmpS7GH7ZcDslLA3jJQgN+GRvURF
+         pEaJfvO7RiXhmdLWXoAntXxo4lxPwlL9XW+SFeCoI2TUk/hVty3Sokumt1vFjrzV5x3t
+         GT1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731417622; x=1732022422;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A1t9Ib/aPHDdfQvoVKx/Fp+uYeREslGX9huBdxy8D5w=;
+        b=SxGpvvtDf0zXa/5drOuMigHg4PCWRdl9bZXg2xKiPkEQ7PHFo6uC+rgWcTSISR/2iB
+         J8qSClDhNKOXijNim7OQiz5c6cQubnt7wJSJIRH/HgAd7es/RmzFr2ATrurro0x1VK7F
+         tCFViombhJlq7sVJIvJEiHvpAlqFhSRbiNDsp9Yjwg+R78gbtxHt+BVeVFK9ZQQMC0JG
+         TCWwEaoYnO7Lz9JlMlUXWUFBRMfSoAcuWvsvP0GxMVBPNcKY7wOFxgTUWr8TwkYsLZ/R
+         2nxhDvvtOnyqNzpos5g2vVZTMl8E+RWqWWSkY+TIiL91UmqEUytGudP/GNcMq/tpwBVK
+         i+fw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCMdAbItcgos/RTtP9mRkQYD+MfSpb40ySD+O4Dh2Os/pjjDr8CD+btHussYGZ+8CqGj8hJjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFleqE1ELSvhKV3IwFZOPDlrt7AgdgV2rkx45F/j4phFCsr8Dt
+	znskFevFDyUDgu+hBUrQ75irCy88ZWrTy2ILjZcakLyQa2ybysgZlsZ8TmQC1PM=
+X-Google-Smtp-Source: AGHT+IHxDEAm5J4fyPiYBfUUcx8JGUKH/71W41+JakmzEd92mmK3cHWQHCGpTj47KLde3aEZt1tLWg==
+X-Received: by 2002:a17:907:72c8:b0:a9a:1739:91e9 with SMTP id a640c23a62f3a-a9eefeebe72mr1631965066b.24.1731417622152;
+        Tue, 12 Nov 2024 05:20:22 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:e829:c484:5241:93b2? ([2001:67c:2fbc:1:e829:c484:5241:93b2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0dc5112sm718813966b.112.2024.11.12.05.20.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2024 05:20:21 -0800 (PST)
+Message-ID: <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net>
+Date: Tue, 12 Nov 2024 14:20:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemg200003.china.huawei.com (7.202.181.30)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net> <ZypfnyfToF1b6YAZ@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZypfnyfToF1b6YAZ@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-BUG: KASAN: slab-use-after-free in tcp_write_timer_handler+0x156/0x3e0
-Read of size 1 at addr ffff888111f322cd by task swapper/0/0
+On 05/11/2024 19:10, Sabrina Dubroca wrote:
+> 2024-10-29, 11:47:28 +0100, Antonio Quartulli wrote:
+>> @@ -105,6 +132,9 @@ void ovpn_decrypt_post(void *data, int ret)
+>>   		goto drop;
+>>   	}
+>>   
+>> +	/* keep track of last received authenticated packet for keepalive */
+>> +	peer->last_recv = ktime_get_real_seconds();
+> 
+> It doesn't look like we're locking the peer here so that should be a
+> WRITE_ONCE() (and READ_ONCE(peer->last_recv) for all reads).
 
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-dirty #7
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x68/0xa0
- print_address_description.constprop.0+0x2c/0x3d0
- print_report+0xb4/0x270
- kasan_report+0xbd/0xf0
- tcp_write_timer_handler+0x156/0x3e0
- tcp_write_timer+0x66/0x170
- call_timer_fn+0xfb/0x1d0
- __run_timers+0x3f8/0x480
- run_timer_softirq+0x9b/0x100
- handle_softirqs+0x153/0x390
- __irq_exit_rcu+0x103/0x120
- irq_exit_rcu+0xe/0x20
- sysvec_apic_timer_interrupt+0x76/0x90
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20
-RIP: 0010:default_idle+0xf/0x20
-Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90
- 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 f8 25 00 fb f4 <fa> c3 cc cc cc
- cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-RSP: 0018:ffffffffa2007e28 EFLAGS: 00000242
-RAX: 00000000000f3b31 RBX: 1ffffffff4400fc7 RCX: ffffffffa09c3196
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff9f00590f
-RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed102360835d
-R10: ffff88811b041aeb R11: 0000000000000001 R12: 0000000000000000
-R13: ffffffffa202d7c0 R14: 0000000000000000 R15: 00000000000147d0
- default_idle_call+0x6b/0xa0
- cpuidle_idle_call+0x1af/0x1f0
- do_idle+0xbc/0x130
- cpu_startup_entry+0x33/0x40
- rest_init+0x11f/0x210
- start_kernel+0x39a/0x420
- x86_64_start_reservations+0x18/0x30
- x86_64_start_kernel+0x97/0xa0
- common_startup_64+0x13e/0x141
- </TASK>
+Is that because last_recv is 64 bit long (and might be more than one 
+word on certain architectures)?
 
-Allocated by task 595:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- __kasan_slab_alloc+0x87/0x90
- kmem_cache_alloc_noprof+0x12b/0x3f0
- copy_net_ns+0x94/0x380
- create_new_namespaces+0x24c/0x500
- unshare_nsproxy_namespaces+0x75/0xf0
- ksys_unshare+0x24e/0x4f0
- __x64_sys_unshare+0x1f/0x30
- do_syscall_64+0x70/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+I don't remember having to do so for reading/writing 32 bit long integers.
 
-Freed by task 100:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x54/0x70
- kmem_cache_free+0x156/0x5d0
- cleanup_net+0x5d3/0x670
- process_one_work+0x776/0xa90
- worker_thread+0x2e2/0x560
- kthread+0x1a8/0x1f0
- ret_from_fork+0x34/0x60
- ret_from_fork_asm+0x1a/0x30
+I presume we need a WRITE_ONCE also upon initialization in 
+ovpn_peer_keepalive_set() right?
+We still want to coordinate that with other reads/writes.
 
-Reproduction script:
+> 
+>> +
+>>   	/* point to encapsulated IP packet */
+>>   	__skb_pull(skb, payload_offset);
+>>   
+>> @@ -121,6 +151,12 @@ void ovpn_decrypt_post(void *data, int ret)
+>>   			goto drop;
+>>   		}
+>>   
+>> +		if (ovpn_is_keepalive(skb)) {
+>> +			net_dbg_ratelimited("%s: ping received from peer %u\n",
+>> +					    peer->ovpn->dev->name, peer->id);
+>> +			goto drop;
+> 
+> To help with debugging connectivity issues, maybe keepalives shouldn't
+> be counted as drops? (consume_skb instead of kfree_skb, and not
+> incrementing rx_dropped)
+> The packet was successfully received and did all it had to do.
 
-mkdir -p /mnt/nfsshare
-mkdir -p /mnt/nfs/netns_1
-mkfs.ext4 /dev/sdb
-mount /dev/sdb /mnt/nfsshare
-systemctl restart nfs-server
-chmod 777 /mnt/nfsshare
-exportfs -i -o rw,no_root_squash *:/mnt/nfsshare
+you're absolutely right. Will change that.
 
-ip netns add netns_1
-ip link add name veth_1_peer type veth peer veth_1
-ifconfig veth_1_peer 11.11.0.254 up
-ip link set veth_1 netns netns_1
-ip netns exec netns_1 ifconfig veth_1 11.11.0.1
+> 
+>> +		}
+>> +
+>>   		net_info_ratelimited("%s: unsupported protocol received from peer %u\n",
+>>   				     peer->ovpn->dev->name, peer->id);
+>>   		goto drop;
+>> @@ -221,6 +257,10 @@ void ovpn_encrypt_post(void *data, int ret)
+>>   		/* no transport configured yet */
+>>   		goto err;
+>>   	}
+>> +
+>> +	/* keep track of last sent packet for keepalive */
+>> +	peer->last_sent = ktime_get_real_seconds();
+> 
+> And another WRITE_ONCE() here (also paired with READ_ONCE() on the
+> read side).
 
-ip netns exec netns_1 /root/iptables -A OUTPUT -d 11.11.0.254 -p tcp \
-	--tcp-flags FIN FIN  -j DROP
+Yap
 
-(note: In my environment, a DESTROY_CLIENTID operation is always sent
- immediately, breaking the nfs tcp connection.)
-ip netns exec netns_1 timeout -s 9 300 mount -t nfs -o proto=tcp,vers=4.1 \
-	11.11.0.254:/mnt/nfsshare /mnt/nfs/netns_1
+> 
+> 
+>> +static int ovpn_peer_del_nolock(struct ovpn_peer *peer,
+>> +				enum ovpn_del_peer_reason reason)
+>> +{
+>> +	switch (peer->ovpn->mode) {
+>> +	case OVPN_MODE_MP:
+> 
+> I think it would be nice to add
+> 
+>      lockdep_assert_held(&peer->ovpn->peers->lock);
+> 
+>> +		return ovpn_peer_del_mp(peer, reason);
+>> +	case OVPN_MODE_P2P:
+> 
+> and here
+> 
+>      lockdep_assert_held(&peer->ovpn->lock);
 
-ip netns del netns_1
+Yeah, good idea.
+__must_hold() can't work here, so lockdep_assert_held is definitely the 
+way to go.
 
-The reason here is that the tcp socket in netns_1 (nfs side) has been
-shutdown and closed (done in xs_destroy), but the FIN message (with ack)
-is discarded, and the nfsd side keeps sending retransmission messages.
-As a result, when the tcp sock in netns_1 processes the received message,
-it sends the message (FIN message) in the sending queue, and the tcp timer
-is re-established. When the network namespace is deleted, the net structure
-accessed by tcp's timer handler function causes problems.
+> 
+> (I had to check that ovpn_peer_del_nolock is indeed called with those
+> locks held since they're taken by ovpn_peer_keepalive_work_{mp,p2p},
+> adding these assertions would make it clear that ovpn_peer_del_nolock
+> is not an unsafe version of ovpn_peer_del)
 
-To fix this problem, let's hold netns refcnt for the tcp kernel socket as
-done in other modules. This is an ugly hack which can easily be backported
-to earlier kernels. A proper fix which cleans up the interfaces will
-follow, but may not be so easy to backport.
+Right, it makes sense.
 
-Fixes: 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets.")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
-v3->v4: Add the commit message suggested by NeilBrown.
- net/sunrpc/svcsock.c  | 4 ++++
- net/sunrpc/xprtsock.c | 7 +++++++
- 2 files changed, 11 insertions(+)
+> 
+>> +		return ovpn_peer_del_p2p(peer, reason);
+>> +	default:
+>> +		return -EOPNOTSUPP;
+>> +	}
+>> +}
+>> +
+>>   /**
+>>    * ovpn_peers_free - free all peers in the instance
+>>    * @ovpn: the instance whose peers should be released
+>> @@ -830,3 +871,150 @@ void ovpn_peers_free(struct ovpn_struct *ovpn)
+>>   		ovpn_peer_unhash(peer, OVPN_DEL_PEER_REASON_TEARDOWN);
+>>   	spin_unlock_bh(&ovpn->peers->lock);
+>>   }
+>> +
+>> +static time64_t ovpn_peer_keepalive_work_single(struct ovpn_peer *peer,
+>> +						time64_t now)
+>> +{
+>> +	time64_t next_run1, next_run2, delta;
+>> +	unsigned long timeout, interval;
+>> +	bool expired;
+>> +
+>> +	spin_lock_bh(&peer->lock);
+>> +	/* we expect both timers to be configured at the same time,
+>> +	 * therefore bail out if either is not set
+>> +	 */
+>> +	if (!peer->keepalive_timeout || !peer->keepalive_interval) {
+>> +		spin_unlock_bh(&peer->lock);
+>> +		return 0;
+>> +	}
+>> +
+>> +	/* check for peer timeout */
+>> +	expired = false;
+>> +	timeout = peer->keepalive_timeout;
+>> +	delta = now - peer->last_recv;
+> 
+> I'm not sure that's always > 0 if we finish decrypting a packet just
+> as the workqueue starts:
+> 
+>    ovpn_peer_keepalive_work
+>      now = ...
+> 
+>                                         ovpn_decrypt_post
+>                                           peer->last_recv = ...
+> 
+>    ovpn_peer_keepalive_work_single
+>      delta: now < peer->last_recv
+> 
 
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 6f272013fd9b..d4330aaadc23 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1551,6 +1551,10 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
- 	newlen = error;
- 
- 	if (protocol == IPPROTO_TCP) {
-+		__netns_tracker_free(net, &sock->sk->ns_tracker, false);
-+		sock->sk->sk_net_refcnt = 1;
-+		get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-+		sock_inuse_add(net, 1);
- 		if ((error = kernel_listen(sock, 64)) < 0)
- 			goto bummer;
- 	}
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index d2f31b59457b..906a1b563aee 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1942,6 +1942,13 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
- 		goto out;
- 	}
- 
-+	if (protocol == IPPROTO_TCP) {
-+		__netns_tracker_free(xprt->xprt_net, &sock->sk->ns_tracker, false);
-+		sock->sk->sk_net_refcnt = 1;
-+		get_net_track(xprt->xprt_net, &sock->sk->ns_tracker, GFP_KERNEL);
-+		sock_inuse_add(xprt->xprt_net, 1);
-+	}
-+
- 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
- 	if (IS_ERR(filp))
- 		return ERR_CAST(filp);
+Yeah, there is nothing preventing this from happening...but is this 
+truly a problem? The math should still work, no?
+
+However:
+
+> 
+> 
+>> +	if (delta < timeout) {
+>> +		peer->keepalive_recv_exp = now + timeout - delta;
+> 
+> I'd shorten that to
+> 
+>      peer->keepalive_recv_exp = peer->last_recv + timeout;
+> 
+> it's a bit more readable to my eyes and avoids risks of wrapping
+> values.
+> 
+> So I'd probably get rid of delta and go with:
+> 
+>      last_recv = READ_ONCE(peer->last_recv)
+>      if (now < last_recv + timeout) {
+>      	peer->keepalive_recv_exp = last_recv + timeout;
+>      	next_run1 = peer->keepalive_recv_exp;
+>      } else if ...
+> 
+>> +		next_run1 = peer->keepalive_recv_exp;
+>> +	} else if (peer->keepalive_recv_exp > now) {
+>> +		next_run1 = peer->keepalive_recv_exp;
+>> +	} else {
+>> +		expired = true;
+>> +	}
+
+I agree this is simpler to read and gets rid of some extra operations.
+
+[note: I took inspiration from nat_keepalive_work_single() - it could be 
+simplified as well I guess]
+
+> 
+> [...]
+>> +	/* check for peer keepalive */
+>> +	expired = false;
+>> +	interval = peer->keepalive_interval;
+>> +	delta = now - peer->last_sent;
+>> +	if (delta < interval) {
+>> +		peer->keepalive_xmit_exp = now + interval - delta;
+>> +		next_run2 = peer->keepalive_xmit_exp;
+> 
+> and same here
+
+Yeah, will change both. Thanks!
+
+
+Regards,
+
+
 -- 
-2.34.1
+Antonio Quartulli
+OpenVPN Inc.
 
 
