@@ -1,146 +1,216 @@
-Return-Path: <netdev+bounces-144164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E6B39C6116
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3530A9C60B4
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 548B1B82146
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:56:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84B98BC36C3
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C15820F5B6;
-	Tue, 12 Nov 2024 16:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A6421790E;
+	Tue, 12 Nov 2024 17:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S/LrAtiP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fcSBz1Gr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A0820EA5B
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 16:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75D82076D2;
+	Tue, 12 Nov 2024 17:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731430425; cv=none; b=AVTPtTpjFoxD+QXUBHgNTlS74aWumARxTxf9nlcx2hOnItV08SCQZ77lJlY19o+F8XXHfNtsfCqZu7cUbgKhx9FSP4syM9s2c8iYse0JekCF/iQz1lNUtrIorhMcRJH7zEgW0mWPIgtpV1TSyuAYWO8tYXM08rSfYeXsRiqYAEo=
+	t=1731431229; cv=none; b=MzdvPVOfnj7v4ipijiUHfWe09UgiT3o6v+3Z1iF0rj4wGPZmnJmIhm4yCwosMfM0VhtLvSvthQavuNy4rspvMwBwqQExg4alKRwAOjhIvKjMZWP4+kW/5SyiZ8pzp4/QVpUI1L8ZzzCiFiTXoOzQj30gZgE3A7B31NqVaIQUiQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731430425; c=relaxed/simple;
-	bh=NetM12MdiqjEomNiBQ1R7rE3/8PUPvggUBu0004nbH4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=m4O8vEEWQN26TmcOyiJdjzoyZdGWp0l38adZFFisYkGDn8503opNEcB16WxWHczLwGtTUspjm3bHs6Njz3FnHN6tdlxdErqUEmKORnDH1aYGL1v8w+pgevSMKMBKesLM8K3snyMdbwXLazr5CRtzCoizHz/ybXboYWYGOkr4H4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S/LrAtiP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731430421;
+	s=arc-20240116; t=1731431229; c=relaxed/simple;
+	bh=RNS8OS44VA3qZ7FOchNv1YRfFwIzzNzs2xyH7AstGYY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OFnBIVBAfgE9y5WS3wJBMVV32Q5NfrEsfuJAyWTLvY/Sbhp7pH4HxPtPCAh5IP9mpbz7Xf/peI63OVQJT0eEfYnbBRTInVxNiReQMFrW/x4CxCnnB3Pi/wOIk9eaR7ebusYAMOURO7hk7sMxXizyrUCEzh1SEIiTULhoC+Hh0Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fcSBz1Gr; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 341ADE0005;
+	Tue, 12 Nov 2024 17:07:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731431224;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Fopx7SDjvtxGI9bqsHPVJpNSF9ZEcMOMcCEBQCKpPyw=;
-	b=S/LrAtiP3jYD0KyxQIpMW4OGH/tQhPXu+nxl/0p0wYLsBPqGiDaZMQk+TGTWMlXFVzRpHK
-	LzefD+1/nN2uyRUaD4TYyRPqhPenb4ImmdtT1cna4NVg32NuQ7ZGu+IVfWjKlXVRGUWTk7
-	wwJ/jn6bq8Q4jxBMMQnz1FP6sZVZzfI=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-49-rHAvgu1OP82fCfCrbhYunA-1; Tue, 12 Nov 2024 11:53:40 -0500
-X-MC-Unique: rHAvgu1OP82fCfCrbhYunA-1
-X-Mimecast-MFC-AGG-ID: rHAvgu1OP82fCfCrbhYunA
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-71807a67145so5130366a34.2
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 08:53:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731430419; x=1732035219;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fopx7SDjvtxGI9bqsHPVJpNSF9ZEcMOMcCEBQCKpPyw=;
-        b=TGy4XBOvWMBHn2CYSpjU1LV2Fw0BoCJKddw8G9Ebrvpls8zc3RE1DxySb36+jLG+qI
-         fQOVHx+tbVzmPModvlfQEQSyoVfFQDZF/SehU7HQB11KJzoPErcaVax5IL2SEnZTx5Wp
-         zdMwySs447l24tyYj0P186NdHj8GBBTR+7YbT6Fy624tg0gmUl1yaDvOm8mKSJmyZ8DC
-         wYa+tFiaj25XWE8IWII3OssVnhqJTi1xN+9jKZ/MmdghRVON+kpFnSYCLG4k81OphMh9
-         hJrBjV89XSxwPknWIE38Mg+EJ6HNefN06sKpK47U6PP+V5y2OVCkpTN3Bvbv3dMho5ZX
-         hN8g==
-X-Gm-Message-State: AOJu0YxIwyZ22+xAtkm51TnRkkAw1xPaiZ9nZHH9/ryJihXoRgCCrkec
-	zaXYXfiqIZiXa1/SuXpD6j7IkA6tb6LAMC+n9EuB53KOsPM+Sj1urxOhbcGCh7NU4Q1Mg5pGojY
-	YER8hRdZkH4jaGF0K7m/8dqNqNtKcfbFSo9nK8l9TZZvLtqxt8WhS1A==
-X-Received: by 2002:a05:6830:6788:b0:718:1987:24cb with SMTP id 46e09a7af769-71a5156ba4bmr3665886a34.10.1731430419512;
-        Tue, 12 Nov 2024 08:53:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFgZtjLql6MHKR3M7oCEP4Gi8JZUpYTaI4yxGOfRyQLbxRfrzvqrhtRE9/k7PQMyZ0lcGC4Dw==
-X-Received: by 2002:a05:6830:6788:b0:718:1987:24cb with SMTP id 46e09a7af769-71a5156ba4bmr3665870a34.10.1731430419244;
-        Tue, 12 Nov 2024 08:53:39 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac427cfsm604785585a.30.2024.11.12.08.53.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 08:53:38 -0800 (PST)
-Message-ID: <a6bd2ee8-c732-4922-9e7c-ae89a1ad8056@redhat.com>
-Date: Tue, 12 Nov 2024 17:53:36 +0100
+	bh=Q5euAD6mvMtoI8FBmagdROpF4KMX7Rxgrb+7EFp/no4=;
+	b=fcSBz1GrzADukN6xLwU6Gqk8+OPPUxrk7kfxs0YK3n4Ea7Co4G3bTtTz6Ua5Q2RjnIVdIJ
+	3IeYRuYwwlrGYSaJTzJe9+gwBaBtfF4vbpAHxgeR8zka4jduvrIGErnOSvxaPQuPN0mo/o
+	H3nlthG5bwg+MR8ZCj1oMwjfpGeCK9Kwhk9GfUrVCo7jCaSQj8FSxfu2bwRRQsXqziX1CZ
+	4kqEEy2hO2bU3+OoUH6C4BpCN18/s5nfq62Kdpz4tOItR7gOkGvhJPfDsU0Mx5E/O2vUDs
+	Hvm9PpHFB2l1vtlfFSyqRCdOIbPsXrGjA/2LTRVIrwSoEf9WnU/pkQAOsk0L9A==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Daniel Machon <daniel.machon@microchip.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 2/9] net: stmmac: Use per-hw ptp clock ops
+Date: Tue, 12 Nov 2024 18:06:50 +0100
+Message-ID: <20241112170658.2388529-3-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
+References: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] geneve: Use pcpu stats to update rx_dropped
- counter.
-From: Paolo Abeni <pabeni@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-References: <c9a7d3ddbe3fb890bee0c95d207f2ce431001075.1730979658.git.gnault@redhat.com>
- <231c2226-9b16-4a10-b2b8-484efe0aae6b@redhat.com>
-Content-Language: en-US
-In-Reply-To: <231c2226-9b16-4a10-b2b8-484efe0aae6b@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+The auxiliary snapshot configuration was found to differ depending on
+the dwmac version. To prepare supporting this, allow specifying the
+ptp_clock_info ops in the hwif array
 
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/common.h     |  2 ++
+ drivers/net/ethernet/stmicro/stmmac/hwif.c       | 11 +++++++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c |  4 +---
+ 3 files changed, 14 insertions(+), 3 deletions(-)
 
-On 11/12/24 11:53, Paolo Abeni wrote:
-> On 11/7/24 12:41, Guillaume Nault wrote:
->> Use the core_stats rx_dropped counter to avoid the cost of atomic
->> increments.
->>
->> Signed-off-by: Guillaume Nault <gnault@redhat.com>
-> 
-> It looks like other UDP tunnels devices could benefit from a similar
-> change (vxlan, bareudp). Would you mind to also touch them, to keep such
-> implementations aligned?
-> 
->> ---
->>  drivers/net/geneve.c | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
->> index 2f29b1386b1c..671ca5260e92 100644
->> --- a/drivers/net/geneve.c
->> +++ b/drivers/net/geneve.c
->> @@ -235,7 +235,7 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
->>  					 vni_to_tunnel_id(gnvh->vni),
->>  					 gnvh->opt_len * 4);
->>  		if (!tun_dst) {
->> -			DEV_STATS_INC(geneve->dev, rx_dropped);
->> +			dev_core_stats_rx_dropped_inc(geneve->dev);
-> 
-> How about switching to NETDEV_PCPU_STAT_DSTATS instead, so there is a
-> single percpu struct allocated x device (geneve already uses
-> NETDEV_PCPU_STAT_TSTATS): stats fetching will be faster, and possibly
-> memory usage lower.
-
-I was not aware of the previous discussion on this same topic:
-
-https://lore.kernel.org/netdev/20240903113402.41d19129@kernel.org/
-
-and I missed the previous change on bareudp.c
-
-I still think that avoiding the double per-cpu traversal when fetching
-the stats could be useful, especially on large multi-numa nodes systems.
-
-I guess it's better to be consistent and keep geneve and bareudp
-aligned. We can eventually consolidate the stats later.
-
-/P
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 684489156dce..4a0a1708c391 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -551,6 +551,8 @@ struct mac_device_info;
+ extern const struct stmmac_hwtimestamp stmmac_ptp;
+ extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
+ 
++extern const struct ptp_clock_info stmmac_ptp_clock_ops;
++
+ struct mac_link {
+ 	u32 caps;
+ 	u32 speed_mask;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index cfc50289aed6..47458cbcbc94 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -113,6 +113,7 @@ static const struct stmmac_hwif_entry {
+ 	const void *dma;
+ 	const void *mac;
+ 	const void *hwtimestamp;
++	const void *ptp;
+ 	const void *mode;
+ 	const void *tc;
+ 	const void *mmc;
+@@ -134,6 +135,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwmac100_dma_ops,
+ 		.mac = &dwmac100_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = NULL,
+ 		.tc = NULL,
+ 		.mmc = &dwmac_mmc_ops,
+@@ -152,6 +154,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwmac1000_dma_ops,
+ 		.mac = &dwmac1000_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = NULL,
+ 		.tc = NULL,
+ 		.mmc = &dwmac_mmc_ops,
+@@ -171,6 +174,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwmac4_dma_ops,
+ 		.mac = &dwmac4_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = NULL,
+ 		.tc = &dwmac4_tc_ops,
+ 		.mmc = &dwmac_mmc_ops,
+@@ -192,6 +196,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwmac4_dma_ops,
+ 		.mac = &dwmac410_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = &dwmac4_ring_mode_ops,
+ 		.tc = &dwmac510_tc_ops,
+ 		.mmc = &dwmac_mmc_ops,
+@@ -213,6 +218,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwmac410_dma_ops,
+ 		.mac = &dwmac410_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = &dwmac4_ring_mode_ops,
+ 		.tc = &dwmac510_tc_ops,
+ 		.mmc = &dwmac_mmc_ops,
+@@ -234,6 +240,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwmac410_dma_ops,
+ 		.mac = &dwmac510_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = &dwmac4_ring_mode_ops,
+ 		.tc = &dwmac510_tc_ops,
+ 		.mmc = &dwmac_mmc_ops,
+@@ -256,6 +263,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwxgmac210_dma_ops,
+ 		.mac = &dwxgmac210_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = NULL,
+ 		.tc = &dwxgmac_tc_ops,
+ 		.mmc = &dwxgmac_mmc_ops,
+@@ -278,6 +286,7 @@ static const struct stmmac_hwif_entry {
+ 		.dma = &dwxgmac210_dma_ops,
+ 		.mac = &dwxlgmac2_ops,
+ 		.hwtimestamp = &stmmac_ptp,
++		.ptp = &stmmac_ptp_clock_ops,
+ 		.mode = NULL,
+ 		.tc = &dwxgmac_tc_ops,
+ 		.mmc = &dwxgmac_mmc_ops,
+@@ -362,6 +371,8 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
+ 		priv->fpe_cfg.reg = entry->regs.fpe_reg;
+ 		priv->ptpaddr = priv->ioaddr + entry->regs.ptp_off;
+ 		priv->mmcaddr = priv->ioaddr + entry->regs.mmc_off;
++		memcpy(&priv->ptp_clock_ops, entry->ptp,
++		       sizeof(struct ptp_clock_info));
+ 		if (entry->est)
+ 			priv->estaddr = priv->ioaddr + entry->regs.est_off;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+index 11ab1d6b916a..41581f516ea9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+@@ -265,7 +265,7 @@ static int stmmac_getcrosststamp(struct ptp_clock_info *ptp,
+ }
+ 
+ /* structure describing a PTP hardware clock */
+-static struct ptp_clock_info stmmac_ptp_clock_ops = {
++const struct ptp_clock_info stmmac_ptp_clock_ops = {
+ 	.owner = THIS_MODULE,
+ 	.name = "stmmac ptp",
+ 	.max_adj = 62500000,
+@@ -303,8 +303,6 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
+ 	if (priv->plat->has_gmac4 && priv->plat->clk_ptp_rate)
+ 		priv->plat->cdc_error_adj = (2 * NSEC_PER_SEC) / priv->plat->clk_ptp_rate;
+ 
+-	priv->ptp_clock_ops = stmmac_ptp_clock_ops;
+-
+ 	priv->ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
+ 	priv->ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
+ 
+-- 
+2.47.0
 
 
