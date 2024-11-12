@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-143937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103239C4CA7
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:35:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91BA69C4CAD
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:38:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9B52283D74
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:35:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4609F1F21B21
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3488204924;
-	Tue, 12 Nov 2024 02:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3268B204953;
+	Tue, 12 Nov 2024 02:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQIOmalU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cw2K/BCn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACFB4500E;
-	Tue, 12 Nov 2024 02:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0761C4206E;
+	Tue, 12 Nov 2024 02:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731378951; cv=none; b=Z8xrdfmRTNk44cMxCehe6feNJw2+zZbVbKsp1ZkRw2i/KskfBLNdP7pfsAr+QJeEcKepJ7KgvVg4RxTDuR36HFxY8voYAVe3W3tQuCGeC9AzafdmFowVuyGOqWQJGb6c804WuYznqtIVJ2LOSjJUoY8w4iFCHjzTIe+FvWqs9p4=
+	t=1731379097; cv=none; b=Bu2SubE/+CIEKctUgNVBnTb3DKzj0Fpatv+F4lL2aMNsoWRS2pU3GcYjVrT5abG3kqy0JwuvH/HCN/K2n/g36lRpTpL3XRpLRIAJHyC5ji+2DT3I7NJq1iqiW1nkcpr2UtHznvjlAyOo0NYr0IXPVRnYJwqYPgiyuUlMP3T7RvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731378951; c=relaxed/simple;
-	bh=n6krzlp3piTmoir/fi8G3c4W6bWmm9yZyqRfZbhMICQ=;
+	s=arc-20240116; t=1731379097; c=relaxed/simple;
+	bh=Z2tElrgtXWs2mL9ir69TYsaaIcF9mG5lgXAywvxFvco=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r8eitGPmfool7qAnIktdwo8d9tUup27V7yDKTr3Ysx/DEPjSzngFZ7wuAJ6pVxKDsV4Awp5+ve3XdHORIwdjPLaQFDNnkILQpJrLtaXGpjpKrEzz59RTAzkuQmClHm8Rb5CJTBGrg2E48F/JeMX9yX920vdd0DgxXyle2jYtJj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQIOmalU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E724C4CECF;
-	Tue, 12 Nov 2024 02:35:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Y9lE+mEauxtNHwkDI/riVE6+8okZtKyNfw/i01OccDweo7dyl0ZjW0XuOItnAgX4husBWkhrq4ey5B/jcPvFgJu6wyhmtvr4/EtSFfdQM9CtzLy/DgBl0IYy8vS11ZxAvqGNZeyTRY4fHy34JpH4hzRrxuKxfKSYe9n0uVwN6Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cw2K/BCn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E43A3C4CECF;
+	Tue, 12 Nov 2024 02:38:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731378951;
-	bh=n6krzlp3piTmoir/fi8G3c4W6bWmm9yZyqRfZbhMICQ=;
+	s=k20201202; t=1731379096;
+	bh=Z2tElrgtXWs2mL9ir69TYsaaIcF9mG5lgXAywvxFvco=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uQIOmalU+PyFeus2wpfjOoYc1usY/5ZslowouYPPF3yRxfON/Ke0RUG+Nl02alnOQ
-	 eGd6hH5SuYdEJ//cS/IZQuimzAl8VE+iqexfMyRP96aiSPVd6TtF4HO5VAd+edGvdK
-	 waJVSvLyWjVMVosdx2KW0JKFqX30X8RmIYEOowXzuNfObQGlyYnun7z2b4O47yg/us
-	 RfOeUVmdftgMXk/urO2yQpizU3r+UA3+8lR2t8d6zNi0qnZ2jta4j/OIT0bjYnHbOO
-	 y9N9RMlSFPBsBd7hXIi1hN5I/1gOmjVc4sIJjVJnHQJl6XxIAqYvObsoj15py+lYES
-	 hBO7YqnKsYaQw==
-Date: Mon, 11 Nov 2024 18:35:49 -0800
+	b=Cw2K/BCnWBy08LE6bIgofxDciz2gJLYKem/FI9U+ac0dfDhyyAfCbIiS7nHzr7OSk
+	 F14m7XsDwwUcq4a9FBPFAIPheQ+ELDjIBi0wT57mDmi9GJIillri+QRvKXrVTLAq7O
+	 NErWVNgEm2x4uuT+hNZurLiWayxuGq2ThtlnoOOLWzHYPdujbWueKMi9+GDab5C38J
+	 tOKWrleE9Zrp/Ql6z9dmeNnTVQJlbkO5bWF9VJnlYfPno0eixM618peTL7dJzmRnL3
+	 0xRSH7FMJcSTrs/NZ4tnkJ0gCOeeUlsTSryHOmUOc/DWqVXkEcMywo0vvQndt83ptb
+	 vvDFe96OH2ynQ==
+Date: Mon, 11 Nov 2024 18:38:14 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, Willem
- de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>,
- Samiullah Khawaja <skhawaja@google.com>, linux-kernel@vger.kernel.org,
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v2 5/5] netmem: add netmem_prefetch
-Message-ID: <20241111183549.48497b86@kernel.org>
-In-Reply-To: <20241107212309.3097362-6-almasrymina@google.com>
-References: <20241107212309.3097362-1-almasrymina@google.com>
-	<20241107212309.3097362-6-almasrymina@google.com>
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Parav Pandit
+ <parav@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] mlx5/core: relax memory barrier in
+ eq_update_ci()
+Message-ID: <20241111183814.264205a9@kernel.org>
+In-Reply-To: <20241107183054.2443218-1-csander@purestorage.com>
+References: <ZyxMsx8o7NtTAWPp@x130>
+	<20241107183054.2443218-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,11 +65,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu,  7 Nov 2024 21:23:09 +0000 Mina Almasry wrote:
-> prefect(page) is a common thing to be called from drivers. Add
-> netmem_prefetch that can be called on generic netmem. Skips the prefetch
-> for net_iovs.
+On Thu,  7 Nov 2024 11:30:51 -0700 Caleb Sander Mateos wrote:
+> The memory barrier in eq_update_ci() after the doorbell write is a
+> significant hot spot in mlx5_eq_comp_int(). Under heavy TCP load, we see
+> 3% of CPU time spent on the mfence instruction.
 
-Why would you ever need to prefetch a payload buffer?
-Looks wrong..
+Applied, thanks. 
+
+In the future please avoid sending patches in reply to older version.
 
