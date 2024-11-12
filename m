@@ -1,113 +1,244 @@
-Return-Path: <netdev+bounces-143952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED3C9C4D40
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:23:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF089C4D45
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59A5EB2B461
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:20:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBA901F21300
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8501F208222;
-	Tue, 12 Nov 2024 03:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="svfoViJA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74DA207A25;
+	Tue, 12 Nov 2024 03:25:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1C120821D;
-	Tue, 12 Nov 2024 03:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA10207A03
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 03:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731381573; cv=none; b=HAiOPB+KEd7qSwDb7hxjtXggcEXuScqTar0W8ejA/uvYxPATKMtrG6y9Hulg+kW+YsCut3c5Qr8uz9hxhWHHj27xDks848Lys5Vknoi82Wjl9BArmTYqBkv/UwYGHr5rk4H/nR48XsyJ4m6x5OnIDxiRs5nr9q27MxeuBkAI7Oc=
+	t=1731381930; cv=none; b=mO24MdCIKAgEyFAo5c1ILWl84qn6O8MnWs7pRaf/IHaQw6qSPSrjfxY6PLNJNsFpt/Cok7Ako8cNSUeAd+BwcvTfseEjW8kSC0i8Qo9xoNLfQ9OBIVOUOe7np5FRfHQ3uA7QqjgxSSHez3u3dcEpo+2XruCIMSg/Fx/KOuaz6lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731381573; c=relaxed/simple;
-	bh=9yuWzaclr6QDV5gbBphLoP+z39ogdab4mruCBMVTZoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eJCg+5+cvAiGeach+sHhQMt54MkNYlu0/gRy+4wfckpKHJkozV/bSzq5fm0ruGydPWT/liHSR1dCUanO6+vN81O7Q6ol9dW0NzEOFR2Pu0kn0T4kIC4FmlkvNAv2BUQAK5hLrzbpJMc2DUfsiNj1BxtrTYiwhpWFOFaBEJdVyTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=svfoViJA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E5C4C4CED0;
-	Tue, 12 Nov 2024 03:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731381572;
-	bh=9yuWzaclr6QDV5gbBphLoP+z39ogdab4mruCBMVTZoY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=svfoViJAm7VCYxZSyXieIfhm5nwTGGwgDpuUxb/Dz7qENNCCk+JZXD3L21tvANUcg
-	 zENeVCLguuLoYKMSZAKtSpbE2jeZCKOxqIB0JxVZldP45Z3ktdRJZQ8r0BlxInE5C0
-	 KDgdUytLqpDJIzJcbYlKmox+ZH4rPaiRWEg1IxSsCYieiExffA0gbDzhx+uWKWul+O
-	 tBKC5UIzocEDC4JBgxSHIqqlbtf7gz/VsEI4Zz14Xa5ct59hQrc97pMECeFNKgkPNl
-	 z619O7nFH25aCVMWicLPyYnNq4AufIiDswFwwu5kh3ysMK3lmgMrp5pEd68LNHDQPQ
-	 J+wsWvz3tsZmw==
-Date: Mon, 11 Nov 2024 19:19:31 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lee Trager <lee@trager.us>
-Cc: Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Sanman Pradhan
- <sanmanpradhan@meta.com>, Al Viro <viro@zeniv.linux.org.uk>, Mohsin Bashir
- <mohsin.bashr@gmail.com>, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] eth: fbnic: Add devlink dev flash
- support
-Message-ID: <20241111191931.284b1be4@kernel.org>
-In-Reply-To: <20241111043058.1251632-3-lee@trager.us>
-References: <20241111043058.1251632-1-lee@trager.us>
-	<20241111043058.1251632-3-lee@trager.us>
+	s=arc-20240116; t=1731381930; c=relaxed/simple;
+	bh=v60/XNeGJ6P6Q9dHy2KAuX8dUztDvX4+YttrMJndQZc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=SRJPZ0IoWnveBX5RATLhuKcB6cGaXa68C3Ebuq7TDhh4jqnvZ8b/t5gbqdZndCxh28KmD+VQsP2WMxjgvYnIWHX44Pz85hppQOo7B+vPSerExoOto/CtEwjmfzrpKD6n/eEdTfYbG6Okv+6j+otWU/hOUbHO4zPZtuxc+m6tcm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a6c1907eeaso65189615ab.1
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 19:25:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731381928; x=1731986728;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BMWwpOnmmD03l1SYt6YYnqs/QyDCcSmQTZKHU1UsmQ0=;
+        b=ARAb9fM+VWQ+cmeIRym0wk1mtCcKSSzEToZh6qLouaWNXlC6EHUc0z4Lnuqv878jDl
+         x/00cQnk3zei7YofxBDUwUm79byab6ZSxJ1iNz99qtUmoaK0tIZrQqWtlWDaWnKguO9e
+         PzxsZr9INhbZTKZ+lA3wo2AP7De3Iw8zLvWrDzdoutgoujS/vdXm5L6Jnu22dYAaaPS3
+         NA39bp3N+Tt5p4+nDafcSGK3/6EQ+9kRijQMx/3s+FvfFcOTllm+QP7tmvR6tvBzhW9g
+         EzBIeaOoxDswp0GE1MxUUAI/zcgLewqPQLtrW6w69My9ZVd/gHJgEtSUKihnRUlHw2v9
+         py8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUi/2TTcI6sPaooC9WdrCEqS4q+hO8U2jOSB3LwqGUs4yW9j24K+Jk/znQpD52Y4Rao2yvo9f4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzywvKXgENFPVQO62lgqqRr9xeCtH3U0CCTwAM5sBgIvHmVmqx6
+	k3+rmY260rv1/yMipkXVTWbZ8HRkl5nHRiCcNNvlOSIyazZZSGhfagq0Wu9HlRDJqO60xnVoAm7
+	UeqwEHNYmVrQvak5ABmavDHVtJhoSmwAJNEC5+itxWK0vldTmdwVtXio=
+X-Google-Smtp-Source: AGHT+IHqC3Y4V8pOfSLs+aT8dqzIB5kUI2G+LdJX9AsiK2bl2Ahg/tKFCvqZ8oR2uNovEd2uFAZafqCxU2cpsoUChmgK2tuHl4u+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:180c:b0:3a6:ad61:7ffc with SMTP id
+ e9e14a558f8ab-3a6f1a6441amr177202635ab.17.1731381928186; Mon, 11 Nov 2024
+ 19:25:28 -0800 (PST)
+Date: Mon, 11 Nov 2024 19:25:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6732caa8.050a0220.138bd5.00cf.GAE@google.com>
+Subject: [syzbot] [netfilter?] KASAN: slab-out-of-bounds Read in bitmap_ip_add (2)
+From: syzbot <syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Please drop Al Viro from the CC (!?) and CC the maintainer of the pldm
-library (Jake).
+Hello,
 
-On Sun, 10 Nov 2024 20:28:42 -0800 Lee Trager wrote:
-> +/**
-> + * fbnic_send_package_data - Send record package data to firmware
-> + * @context: PLDM FW update structure
-> + * @data: pointer to the package data
-> + * @length: length of the package data
-> + *
-> + * Send a copy of the package data associated with the PLDM record matching
-> + * this device to the firmware.
-> + *
-> + * Return: zero on success
-> + *	    negative error code on failure
-> + */
+syzbot found the following issue on:
 
-can we drop these kdocs please? In the bast case they just repeat 
-the function name ("send package data") 3 times, in the worst case they
-are misleading. This function sends absolutely nothing to the firmware.
+HEAD commit:    906bd684e4b1 Merge tag 'spi-fix-v6.12-rc6' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1068035f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=64aa0d9945bd5c1
+dashboard link: https://syzkaller.appspot.com/bug?extid=58c872f7790a4d2ac951
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1468035f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=105b6e30580000
 
-> +static int fbnic_send_package_data(struct pldmfw *context, const u8 *data,
-> +				   u16 length)
-> +{
-> +	struct device *dev = context->dev;
-> +
-> +	/* Temp placeholder required by devlink */
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-906bd684.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/88c5c4ba7e33/vmlinux-906bd684.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/07094e69f47b/bzImage-906bd684.xz
 
-Do you mean that the pldm lib requires this callback to exist?
-If yes then make it not require it if it's not necessary?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
 
-> +	dev_info(dev,
-> +		 "Sending %u bytes of PLDM record package data to firmware\n",
-> +		 length);
+==================================================================
+BUG: KASAN: slab-out-of-bounds in instrument_atomic_read include/linux/instrumented.h:68 [inline]
+BUG: KASAN: slab-out-of-bounds in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+BUG: KASAN: slab-out-of-bounds in bitmap_ip_do_add net/netfilter/ipset/ip_set_bitmap_ip.c:83 [inline]
+BUG: KASAN: slab-out-of-bounds in bitmap_ip_add+0xdf/0x8d0 net/netfilter/ipset/ip_set_bitmap_gen.h:136
+Read of size 8 at addr ffff888032b3df08 by task syz-executor701/5308
 
-Please drop all the dev_*() prints. If something is important enough to
-be reported it should be reported via the devlink info channel, to the
-user. Not to system logs.
+CPU: 0 UID: 0 PID: 5308 Comm: syz-executor701 Not tainted 6.12.0-rc6-syzkaller-00169-g906bd684e4b1 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ kasan_check_range+0x282/0x290 mm/kasan/generic.c:189
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+ bitmap_ip_do_add net/netfilter/ipset/ip_set_bitmap_ip.c:83 [inline]
+ bitmap_ip_add+0xdf/0x8d0 net/netfilter/ipset/ip_set_bitmap_gen.h:136
+ bitmap_ip_uadt+0x78a/0xbb0 net/netfilter/ipset/ip_set_bitmap_ip.c:186
+ call_ad+0x279/0xa70 net/netfilter/ipset/ip_set_core.c:1746
+ ip_set_ad+0x7e0/0x990 net/netfilter/ipset/ip_set_core.c:1836
+ nfnetlink_rcv_msg+0xbec/0x1180 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+ nfnetlink_rcv+0x297/0x2ab0 net/netfilter/nfnetlink.c:667
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+ ___sys_sendmsg net/socket.c:2661 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fa0f44fcdf9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe08129638 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fa0f44fcdf9
+RDX: 0000000004000050 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 0000000000003a28 R08: 0000000000000006 R09: 0000000000000006
+R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000001
+R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-> +	return 0;
-> +}
--- 
-pw-bot: cr
+Allocated by task 5308:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:257 [inline]
+ __do_kmalloc_node mm/slub.c:4264 [inline]
+ __kmalloc_noprof+0x1fc/0x400 mm/slub.c:4276
+ init_map_ip net/netfilter/ipset/ip_set_bitmap_ip.c:223 [inline]
+ bitmap_ip_create+0x565/0xc00 net/netfilter/ipset/ip_set_bitmap_ip.c:327
+ ip_set_create+0xa5c/0x1900 net/netfilter/ipset/ip_set_core.c:1104
+ nfnetlink_rcv_msg+0xbec/0x1180 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+ nfnetlink_rcv+0x297/0x2ab0 net/netfilter/nfnetlink.c:667
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+ ___sys_sendmsg net/socket.c:2661 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888032b3df00
+ which belongs to the cache kmalloc-8 of size 8
+The buggy address is located 0 bytes to the right of
+ allocated 8-byte region [ffff888032b3df00, ffff888032b3df08)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x32b3d
+anon flags: 0x4fff00000000000(node=1|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 04fff00000000000 ffff88801ac41500 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000080800080 00000001f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 1, tgid 1 (swapper/0), ts 3971426165, free_ts 0
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1537
+ prep_new_page mm/page_alloc.c:1545 [inline]
+ get_page_from_freelist+0x303f/0x3190 mm/page_alloc.c:3457
+ __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4733
+ alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
+ alloc_slab_page+0x6a/0x140 mm/slub.c:2412
+ allocate_slab+0x5a/0x2f0 mm/slub.c:2578
+ new_slab mm/slub.c:2631 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3818
+ __slab_alloc+0x58/0xa0 mm/slub.c:3908
+ __slab_alloc_node mm/slub.c:3961 [inline]
+ slab_alloc_node mm/slub.c:4122 [inline]
+ __do_kmalloc_node mm/slub.c:4263 [inline]
+ __kmalloc_noprof+0x25a/0x400 mm/slub.c:4276
+ kmalloc_noprof include/linux/slab.h:882 [inline]
+ kzalloc_noprof include/linux/slab.h:1014 [inline]
+ acpi_ns_internalize_name+0x419/0x610 drivers/acpi/acpica/nsutils.c:331
+ acpi_ns_get_node_unlocked drivers/acpi/acpica/nsutils.c:666 [inline]
+ acpi_ns_get_node+0x1b7/0x3c0 drivers/acpi/acpica/nsutils.c:726
+ acpi_ns_evaluate+0x35f/0xa40 drivers/acpi/acpica/nseval.c:62
+ acpi_evaluate_object+0x59b/0xaf0 drivers/acpi/acpica/nsxfeval.c:354
+ acpi_evaluate_dsm drivers/acpi/utils.c:798 [inline]
+ acpi_check_dsm+0x296/0x850 drivers/acpi/utils.c:831
+ device_has_acpi_name drivers/pci/pci-label.c:44 [inline]
+ acpi_attr_is_visible+0x8b/0xf0 drivers/pci/pci-label.c:221
+ create_files fs/sysfs/group.c:65 [inline]
+ internal_create_group+0x714/0x11d0 fs/sysfs/group.c:180
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff888032b3de00: 00 fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
+ ffff888032b3de80: 07 fc fc fc 07 fc fc fc fa fc fc fc 00 fc fc fc
+>ffff888032b3df00: 00 fc fc fc fa fc fc fc 00 fc fc fc 00 fc fc fc
+                      ^
+ ffff888032b3df80: 00 fc fc fc 06 fc fc fc 06 fc fc fc 04 fc fc fc
+ ffff888032b3e000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
