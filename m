@@ -1,160 +1,175 @@
-Return-Path: <netdev+bounces-144187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC1D69C5EFC
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:31:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1475F9C5EEB
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BF84284710
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:31:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DED01F21B21
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCA4217F37;
-	Tue, 12 Nov 2024 17:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F581212D13;
+	Tue, 12 Nov 2024 17:28:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="VOt3XJDE";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cOGec7Zy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F557217910;
-	Tue, 12 Nov 2024 17:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9192101A9;
+	Tue, 12 Nov 2024 17:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731432517; cv=none; b=aHfXzbp+IKUzpGPUS5o3PnRwe4nG/n0qXWZsCjPia2QJQFAAS5ffwDlYltv8uDsfRG9hNrBJgT2ruex35KfHWzaaL4JqeLJ9XTH8PFEHqM3wgNEkoUDF1zdFxArGthYP9h+d0ikgHFNCS/6txK2HfKo6ArfENS/fuxHc876IYCc=
+	t=1731432495; cv=none; b=HLlUFi5r3ShisdVObU3q9ftvQ6rS/Ny8/ZffwPkWSbSqG6Hyea0FmosAw0j8iQrgWlnwQQTXuabH5p6d1vz4uOZRQ+3A2rPVT+VnTlKb8zpkhTrcXErnj1TXyFfxnP8UklZxqsmb3XNT5xPeE5fGwwZCoec7ZzoO1RUNmCftyGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731432517; c=relaxed/simple;
-	bh=h+bda6qIP39CBqtuxgK5KdbY/2wZmLIxOqGtJzn4hVs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L9YBY5alnQsBRo5K2XvEjISCgxadxXZgWXXRIV7Mdhd36C/azs+DIb1E5LbqHR68r2l9mBtN7oZc2dJJqbGQs4VHN2nQx1LLlrqA4W5ltRsLBEx6LBXa08BwEh3rBQHmVWKnSz4I0sgYF3ZRahIVVoHumQ2baCSns8blvewKkMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-720d01caa66so5673340b3a.2;
-        Tue, 12 Nov 2024 09:28:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731432515; x=1732037315;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qVVQAfQPrTYvBQm2LkvJxBcSdk/2T5k2ovRJfFBvGfY=;
-        b=tZlkJ++CcbiGBM2eMNXkMUtfIgDAs0FPU/oe2glZ8J94QursnsBmeZc0BvRoZUmWt6
-         OxaXmL5Jg21ByeiaPDsMdDLkc7sKV9/g7a9MpYw+apRuitnZfaGogMEge0Q3LY12REdc
-         e1iy2Zc/Ewbp3elM9XNvFUm58Nc8rzIat1mm/zlasihZMWXCdP9y62BQCiaiwP/whWEZ
-         HP0JH3xHpC7uBH+rXNZ0OOrO5wapkNPsWwoP5H6Nye99pSeaSbUkHM95SqBlxNBmDdr6
-         29Deir+GU44epnNO37MnsljOoGvjub41bu4wilzVGGzS7o8OCZF36roPAcK5W5YuMkxm
-         lAbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrCuocFCHJgcEzyDHHJPr/tly5LSE21rQlPG3ImlrJEOy8bNaAIMbeVC5EG7NBmh0ohcXUynJvo0+qLI8d@vger.kernel.org, AJvYcCVAKGwnvIX5XbGZU9HjojYOOrhUGg/tf7pXolMXLsy4akOHuvhQbUW5IxNPKvwEB7OgATFvPiPA2u0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5Anb6O6TMfGd+rhvMwUI6UROCXfH84DYWhxGSs7bmsYP6xkiH
-	wU0/tpEEZ4q6IA/j3pbDjkzKu3zFEZ1dZWSNIqjTo/xEUa+Zo7xeLdzppvfh
-X-Google-Smtp-Source: AGHT+IGsunV8IoVHOLTnCENkEOhjcs0K5xAnvHSjbazIFKYovYw7YrsA6wXC+V1+suzlDgMEFM7vUQ==
-X-Received: by 2002:a05:6a20:3952:b0:1db:d9fe:c442 with SMTP id adf61e73a8af0-1dc703a0740mr31898637.23.1731432514937;
-        Tue, 12 Nov 2024 09:28:34 -0800 (PST)
-Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407864f78sm11481439b3a.33.2024.11.12.09.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 09:28:34 -0800 (PST)
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-To: netdev@vger.kernel.org,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>,
-	linux-can@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Robert Nawrath <mbro1689@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH iproute2-next v1 6/6] iplink_can: rename dbt into fd_dbt in can_parse_opt()
-Date: Wed, 13 Nov 2024 02:27:56 +0900
-Message-ID: <20241112172812.590665-14-mailhol.vincent@wanadoo.fr>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241112172812.590665-8-mailhol.vincent@wanadoo.fr>
-References: <20241112172812.590665-8-mailhol.vincent@wanadoo.fr>
+	s=arc-20240116; t=1731432495; c=relaxed/simple;
+	bh=Yj+jvWwQRa4Ssk3kPK/9T3xPTVSRmlrCHJKydBYYUbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SoaQK7hHfDNlRvQz/Y3uU1YWhMynKpc0doTHYdXpVBGXnXNsutlHXxJsVxgYPuNzEwtcFH3tdfZThFv1OwLDs/2zQcdup4WRS3jokUFwcb4gCLQwMQG9e6c64BlEttOJC8TLtkA394faX692Z1Ocf6Y/+TVjM5RQg4q1U1ZqVLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=VOt3XJDE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cOGec7Zy; arc=none smtp.client-ip=202.12.124.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailflow.stl.internal (Postfix) with ESMTP id 10B8E1D4038E;
+	Tue, 12 Nov 2024 12:28:11 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Tue, 12 Nov 2024 12:28:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1731432490; x=
+	1731436090; bh=o1+HpOSf0pvwVmkS/ACXVJ+8V0VJ7ttlb7CCUALgPvE=; b=V
+	Ot3XJDEArKHlYIVmRr4Y4zcYCCqjwYgntmJ2nRx8d0f9CVC0pyCdJYTk4ae/+a5Z
+	I6erhXpfx8EMQb3wkjW/GS9Fkyv1bfbPoOmNOmiTeONYHdGz2aOBvQox/lh3XU5v
+	N0eUeUcN4uZwfsTDw11//U6ro3FTnBydZh1in6S3gX6Qufm2cYqnpiCMPLik6pRA
+	2LS7qmGMGFy8rTkOFlkSBD3UHNBTriYKQGMbkyeK/N6qiFpD78ULmScSfE004GHJ
+	Rd3alaEhSW+JTvisGQVA4iyZghuROMGINVXilKm2jhq+W4APQSMzON+eKHq46b8E
+	/qBuO52BD2zeb6q7yd1mg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1731432490; x=1731436090; bh=o1+HpOSf0pvwVmkS/ACXVJ+8V0VJ7ttlb7C
+	CUALgPvE=; b=cOGec7ZyjaUKZBkwrESsGlT6Yye4kzTWbwXTY2SvbarAm67zpQe
+	KckOpLNZ17QtfP0gyhMp6PaqhQ8fCWO8c2oyCmCX7bL7RoOBy4I4TRZpV24eNPJs
+	YbuBYLQwDpJ+qFff4suWMaXIDCK1mU1wci27iBpWNWzYojeBxpXSMCbn9Ay5Oq7e
+	9eJMuWMA085icjFM0TW/wKpbUOuRkC5xU79UcjP6ebcOCSD3pydUwQMBPel/TTmb
+	Bu/m5i2Zbg8UL/D18RnI4gsLqIUjcXODTXAa9qTFIG31q29NiuEMO2ukqoWgFuOg
+	V5Efxr87YNUwHp0Y2OLsoK48R/StkVUgbow==
+X-ME-Sender: <xms:KpAzZ2_yHsAIOlPurRebXRyLTjJW0Fovqkx9gsrMNrc449nSOIij1g>
+    <xme:KpAzZ2sPR6MW3d_X_FIeqnbw0WRp2ZwZKOG7U6PKymllBF3XbtwNRjuEWg-fQyI4M
+    oBdE9eDQ5ZXHByuT24>
+X-ME-Received: <xmr:KpAzZ8AKIFXDKX8KwuF30QjWgNwLwgfokv80_jW7IJAEGzlfncplsSGMrSOt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeggdeljecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
+    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
+    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
+    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
+    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrhigriigrnh
+    hovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhhtohhnihhosehophgv
+    nhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
+    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:KpAzZ-d_MLZltDajcFgRoRSUIjTuBYqyarwY4qmPSGCY4JBWLtiMfg>
+    <xmx:KpAzZ7PDx5yTfmMaYQC5Qm1swClcRtROBABbjPcECUeZZdU2oSNkVQ>
+    <xmx:KpAzZ4nBy159I_Vk0QMNbGfTPcc_jcyAvh6Sc8HkpOLWSXQjmHj93Q>
+    <xmx:KpAzZ9sOjBdfu3LD-Twr8GTr3laKwVnZqmGR_kWvfq1gkkSbN_oFOw>
+    <xmx:KpAzZ0gj5_Mq0NtzaVjbNwVZTnh_65gyDVdTUmwvmtfIoh6nK4j1v2Rj>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 12 Nov 2024 12:28:10 -0500 (EST)
+Date: Tue, 12 Nov 2024 18:28:08 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 08/23] ovpn: implement basic TX path (UDP)
+Message-ID: <ZzOQKPHjWsG9TNEU@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net>
+ <85858c63-4dc5-468e-8335-6ac77f314e33@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3136; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=h+bda6qIP39CBqtuxgK5KdbY/2wZmLIxOqGtJzn4hVs=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnGE3Qv1u6U54zfNfFpfl/dRIZfVW47V83fOu3KT9FFD LLh25TqOkpZGMS4GGTFFFmWlXNyK3QUeocd+msJM4eVCWQIAxenAEzk7hyG/37Bpe3r233En3CJ 3bqyIOPGkg9vY1aKfvrbubJkaumfl+8ZGY5avy75Jz6js2/27AnuEYl2gSvmfRJa9u3Sy5szApI edvEAAA==
-X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <85858c63-4dc5-468e-8335-6ac77f314e33@gmail.com>
 
-The CAN XL support will introduce another dbt variable. Rename the
-current dbt variable into fd_dbt to avoid future confusion. When
-introduced, the CAN XL variable will be named xl_dbt.
+2024-11-11, 00:32:51 +0200, Sergey Ryazanov wrote:
+> On 29.10.2024 12:47, Antonio Quartulli wrote:
+> > +static void ovpn_encrypt_post(struct sk_buff *skb, int ret)
+> > +{
+> > +	struct ovpn_peer *peer = ovpn_skb_cb(skb)->peer;
+> > +
+> > +	if (unlikely(ret < 0))
+> > +		goto err;
+> > +
+> > +	skb_mark_not_on_list(skb);
+> > +
+> > +	switch (peer->sock->sock->sk->sk_protocol) {
+> > +	case IPPROTO_UDP:
+> > +		ovpn_udp_send_skb(peer->ovpn, peer, skb);
+> > +		break;
+> > +	default:
+> > +		/* no transport configured yet */
+> > +		goto err;
+> > +	}
+> 
+> Did you consider calling protocol specific sending function indirectly?
+> E.g.:
+> 
+>         peer->sock->send(peer, skb);
 
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
----
- ip/iplink_can.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+In a case where
+ - only 2 implementations exist
+ - no other implementation is likely to be added in the future
+ - both implementations are part of the same module
 
-diff --git a/ip/iplink_can.c b/ip/iplink_can.c
-index 325a4007..fcffa852 100644
---- a/ip/iplink_can.c
-+++ b/ip/iplink_can.c
-@@ -132,7 +132,7 @@ static void print_ctrlmode(enum output_type t, __u32 flags, const char* key)
- static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 			 struct nlmsghdr *n)
- {
--	struct can_bittiming bt = {}, dbt = {};
-+	struct can_bittiming bt = {}, fd_dbt = {};
- 	struct can_ctrlmode cm = { 0 };
- 	struct can_tdc fd = { .tdcv = -1, .tdco = -1, .tdcf = -1 };
- 
-@@ -171,7 +171,7 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 				invarg("invalid \"sjw\" value", *argv);
- 		} else if (matches(*argv, "dbitrate") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&dbt.bitrate, *argv, 0))
-+			if (get_u32(&fd_dbt.bitrate, *argv, 0))
- 				invarg("invalid \"dbitrate\" value", *argv);
- 		} else if (matches(*argv, "dsample-point") == 0) {
- 			float sp;
-@@ -179,26 +179,26 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 			NEXT_ARG();
- 			if (get_float(&sp, *argv))
- 				invarg("invalid \"dsample-point\" value", *argv);
--			dbt.sample_point = (__u32)(sp * 1000);
-+			fd_dbt.sample_point = (__u32)(sp * 1000);
- 		} else if (matches(*argv, "dtq") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&dbt.tq, *argv, 0))
-+			if (get_u32(&fd_dbt.tq, *argv, 0))
- 				invarg("invalid \"dtq\" value", *argv);
- 		} else if (matches(*argv, "dprop-seg") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&dbt.prop_seg, *argv, 0))
-+			if (get_u32(&fd_dbt.prop_seg, *argv, 0))
- 				invarg("invalid \"dprop-seg\" value", *argv);
- 		} else if (matches(*argv, "dphase-seg1") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&dbt.phase_seg1, *argv, 0))
-+			if (get_u32(&fd_dbt.phase_seg1, *argv, 0))
- 				invarg("invalid \"dphase-seg1\" value", *argv);
- 		} else if (matches(*argv, "dphase-seg2") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&dbt.phase_seg2, *argv, 0))
-+			if (get_u32(&fd_dbt.phase_seg2, *argv, 0))
- 				invarg("invalid \"dphase-seg2\" value", *argv);
- 		} else if (matches(*argv, "dsjw") == 0) {
- 			NEXT_ARG();
--			if (get_u32(&dbt.sjw, *argv, 0))
-+			if (get_u32(&fd_dbt.sjw, *argv, 0))
- 				invarg("invalid \"dsjw\" value", *argv);
- 		} else if (matches(*argv, "tdcv") == 0) {
- 			NEXT_ARG();
-@@ -295,8 +295,8 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 
- 	if (bt.bitrate || bt.tq)
- 		addattr_l(n, 1024, IFLA_CAN_BITTIMING, &bt, sizeof(bt));
--	if (dbt.bitrate || dbt.tq)
--		addattr_l(n, 1024, IFLA_CAN_DATA_BITTIMING, &dbt, sizeof(dbt));
-+	if (fd_dbt.bitrate || fd_dbt.tq)
-+		addattr_l(n, 1024, IFLA_CAN_DATA_BITTIMING, &fd_dbt, sizeof(fd_dbt));
- 	if (cm.mask)
- 		addattr_l(n, 1024, IFLA_CAN_CTRLMODE, &cm, sizeof(cm));
- 
+I don't think indirect calls are beneficial (especially after the
+meltdown/etc mitigations, see for example 4f24ed77dec9 ("udp: use
+indirect call wrappers for GRO socket lookup"), 0e219ae48c3b ("net:
+use indirect calls helpers for L3 handler hooks"), and many others
+similar patches).
+
+
+[...]
+> > +	ovpn_send(ovpn, skb_list.next, NULL);
+> > +
+> > +	return NETDEV_TX_OK;
+> > +
+> > +drop:
+> >   	skb_tx_error(skb);
+> > -	kfree_skb(skb);
+> > +	kfree_skb_list(skb);
+> >   	return NET_XMIT_DROP;
+> >   }
+> > diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+> > index d9788a0cc99b5839c466c35d1b2266cc6b95fb72..aff3e9e99b7d2dd2fa68484d9a396d43f75a6d0b 100644
+> > --- a/drivers/net/ovpn/peer.c
+> > +++ b/drivers/net/ovpn/peer.c
+
+[very long chunk of Antonio's patch quoted without comments]
+
+Please trim your replies to only the necessary context.
+
 -- 
-2.45.2
-
+Sabrina
 
