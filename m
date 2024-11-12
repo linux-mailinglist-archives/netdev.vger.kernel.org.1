@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-143977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975619C4F62
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:25:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C57AD9C4F65
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F3A11F21269
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:25:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 793631F215A3
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B6420B20A;
-	Tue, 12 Nov 2024 07:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607FF20B7F5;
+	Tue, 12 Nov 2024 07:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ig7hFxX+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Iqsw9gt3"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A8020B1F0;
-	Tue, 12 Nov 2024 07:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEA820B800;
+	Tue, 12 Nov 2024 07:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731396325; cv=none; b=JihZs0K9TWP++odKMEN2MJuOXqoxC+9xf7fnJ6QweUdEIsg7BHC7kq+TuwmZqtmoU2g/ZszuD1z0/cLatpbHrbqdIJ+wXc2svbECRNZ8vUdJXTnERU9qAADhB5Ih95kzvTj4AS6grYUsFlLfno4MLzgzKJlh3c/IcOTlbge4EYY=
+	t=1731396329; cv=none; b=JIFpvlmd3qogtLhyPDvGs6Ua9utestqt9vmA43ntrjtS4OreQG6KK5hg7y/9wfm4LLXiQxYpgjJCrImpfU5jNtAWkh3Nv4yaPP78XtE/IIl4iN9apx63M6hIfUaZvj5i4B8ikcwBg1uVja9GU5Zphn/x9Z6tApbgcfJKR0G/FDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731396325; c=relaxed/simple;
-	bh=56zf3pdeCoar/wx2RuHyLAS0nUbRU/jxT75R9EzS8qE=;
+	s=arc-20240116; t=1731396329; c=relaxed/simple;
+	bh=HJUJ4+L4CnC/4Dsqig6kGVJWQvrMvkHAl3v7go1mWiQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LHaHGvi7Qc6vfE+jeEhZ/029sd2w24aKAC1HNn5HvLwCdmfxm7kxz7WU1n4k0j/Fs4tWGmq2av1Q5utpyeTQi8EY1vtKNhdErtwdvmwTg8K/sGzC0dm1LasdAMCQOWZ3bKSJiAStyGkvEfZIQ0P2fR90NHd2XLiVs2nL02a+vc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ig7hFxX+; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=DZOvHBVQ2YWLMqt6UpP2+Sb0UMMCux8GLq0B9U3BgK0goVlKjK7aJPLP8YQgjEjTdMPaRGIasx4FNGpCFaEqNd1A4fFROhuWTvqqvXv8lEwajCFS3DJgq/kfU6tAPbq8G3Atu/HMNWxLiEcXM/OQrvfPs2W1BxIhTEyMfJNmVGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Iqsw9gt3; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731396323; x=1762932323;
+  t=1731396328; x=1762932328;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=56zf3pdeCoar/wx2RuHyLAS0nUbRU/jxT75R9EzS8qE=;
-  b=Ig7hFxX+7+rfYI9ZWPp1ywTyjDL1G/sAK0L/8Ogi3xTlsyc1PRnwkrSd
-   hDOSfpTu8mXtkOgVxmDrGlL06Qs9tSFN44W1MPJmJnnKM1hmQ06dsv/3J
-   L4WWE9YN1gzEIq2YzRSgoySkZzuM+2r/5xb8mADVBguXUntDF9I+9Nxaa
-   52YKs8uM3LQN0S74MUJQ9Fv5I7aRP416jhW/2suxPFEQj6R3s/qrbEvAX
-   GFidPRRw0x1WfX1srk61KVpffWMw4gcliASZx/wHp1YR5gEllcRohUyW8
-   XLsESXM39ZNmzagzqoitunvu/LdhuVA9nrdo0nPnmD5kFZVeVG2hn+ilZ
+  bh=HJUJ4+L4CnC/4Dsqig6kGVJWQvrMvkHAl3v7go1mWiQ=;
+  b=Iqsw9gt363BmxZ0uDeHt+q790vK8Ry/JYXWAlkT6GvysFwP+mQP3nhjN
+   4ojrA4aApDTqrvmCl1MUMbRZGI8Y7vj1DeLr/7VytFJBFtPPrxPBbTF8H
+   C97qja7mDZzHlNa/X5Ek7fcAlT0rvRS5IicsMsSIn5TQ+nK7DVYmuCNcV
+   +sjUP62SxnQv8qYBAGWyYoCsJSrkyWmU1lxyVSs+kzXrEzSt5hKifJuQ+
+   kwvQWv251zZeprYS+LpnzqjXYt8R6sXPha+ZJ04Kw3Sz3l5TixnDf8RT9
+   uR6ETk4RX5z2v4BFBLjCiv5TugPDJCns+saREloUfjitXj3hvXql7h84g
    w==;
-X-CSE-ConnectionGUID: +rcFOWwzTkeB2q1K0mHj2g==
-X-CSE-MsgGUID: VPZgMajCSLC/G06KAXTuqQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31387803"
+X-CSE-ConnectionGUID: OBk9Wc/gR2+RN6DhhXOAUg==
+X-CSE-MsgGUID: o4Aep1TMR5y57YeXr6H2Cw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31387823"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31387803"
+   d="scan'208";a="31387823"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 23:25:23 -0800
-X-CSE-ConnectionGUID: 91fhFG1uRTKNRrYsEhwh5Q==
-X-CSE-MsgGUID: ig6CV1xeS4qYl8WbXmtpAA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2024 23:25:27 -0800
+X-CSE-ConnectionGUID: VJxMQNAyRCqk1YIV90zEkQ==
+X-CSE-MsgGUID: CEatCA5dQICZymbRza30iA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,147,1728975600"; 
-   d="scan'208";a="87074232"
+   d="scan'208";a="87074244"
 Received: from unknown (HELO YongLiang-Ubuntu20-iLBPG12.png.intel.com) ([10.88.229.33])
-  by fmviesa007.fm.intel.com with ESMTP; 11 Nov 2024 23:25:20 -0800
+  by fmviesa007.fm.intel.com with ESMTP; 11 Nov 2024 23:25:24 -0800
 From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -73,9 +73,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net v1 1/2] net: phy: Introduce phy_update_eee() to update eee_cfg values
-Date: Tue, 12 Nov 2024 15:24:46 +0800
-Message-Id: <20241112072447.3238892-2-yong.liang.choong@linux.intel.com>
+Subject: [PATCH net v1 2/2] net: stmmac: update eee_cfg after mac link up/down
+Date: Tue, 12 Nov 2024 15:24:47 +0800
+Message-Id: <20241112072447.3238892-3-yong.liang.choong@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241112072447.3238892-1-yong.liang.choong@linux.intel.com>
 References: <20241112072447.3238892-1-yong.liang.choong@linux.intel.com>
@@ -87,78 +87,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The commit fe0d4fd9285e ("net: phy: Keep track of EEE configuration")
-introduced eee_cfg, which is used to check the existing settings against
-the requested changes. When the 'ethtool --show-eee' command is issued,
-it reads the values from eee_cfg. However, the 'show-eee' command does
-not show the correct result after system boot-up, link up, and link down.
-
-For system boot-up, the commit 49168d1980e2
-("net: phy: Add phy_support_eee() indicating MAC support EEE") introduced
-phy_support_eee to set eee_cfg as the default value. However, the values
-set were not always correct, as after autonegotiation or speed changes,
-the selected speed might not be supported by EEE.
-
-phy_update_eee() was introduced to update the correct values for eee_cfg
-during link up and down, ensuring that 'ethtool --show-eee' shows
-the correct status.
+Update the eee_cfg values during link-up/down to ensure that
+'ethtool --show-eee <devname>' works correctly.
 
 Fixes: fe0d4fd9285e ("net: phy: Keep track of EEE configuration")
 Cc: <stable@vger.kernel.org>
 Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 ---
- drivers/net/phy/phy_device.c | 24 ++++++++++++++++++++++++
- include/linux/phy.h          |  2 ++
- 2 files changed, 26 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 499797646580..94dadf011ca6 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3016,6 +3016,30 @@ void phy_support_eee(struct phy_device *phydev)
- }
- EXPORT_SYMBOL(phy_support_eee);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 7bf275f127c9..1e16c2d8f951 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1005,6 +1005,8 @@ static void stmmac_mac_link_down(struct phylink_config *config,
+ 	priv->tx_lpi_enabled = false;
+ 	priv->eee_enabled = stmmac_eee_init(priv);
+ 	stmmac_set_eee_pls(priv, priv->hw, false);
++	phy_update_eee(priv->dev->phydev, priv->tx_lpi_enabled, priv->eee_enabled,
++		       priv->tx_lpi_timer);
  
-+/**
-+ * phy_update_eee - Update the Energy Efficient Ethernet (EEE) settings
-+ * @phydev: target phy_device struct
-+ * @tx_lpi_enabled: boolean indicating if Low Power Idle (LPI) for
-+ * transmission is enabled.
-+ * @eee_enabled: boolean indicating if Energy Efficient Ethernet (EEE) is
-+ * enabled.
-+ * @tx_lpi_timer: the Low Power Idle (LPI) timer value (in microseconds) for
-+ * transmission.
-+ *
-+ * Description:
-+ * This function updates the Energy Efficient Ethernet (EEE) settings for the
-+ * specified PHY device. It is typically called during link up and down events
-+ * to configure the EEE parameters according to the current link state.
-+ */
-+void phy_update_eee(struct phy_device *phydev, bool tx_lpi_enabled,
-+		    bool eee_enabled, u32 tx_lpi_timer)
-+{
-+	phydev->eee_cfg.tx_lpi_enabled = tx_lpi_enabled;
-+	phydev->eee_cfg.eee_enabled = eee_enabled;
-+	phydev->eee_cfg.tx_lpi_timer = tx_lpi_timer;
-+}
-+EXPORT_SYMBOL(phy_update_eee);
-+
- /**
-  * phy_support_sym_pause - Enable support of symmetrical pause
-  * @phydev: target phy_device struct
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index a98bc91a0cde..6c300ba47a2d 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2004,6 +2004,8 @@ void phy_advertise_eee_all(struct phy_device *phydev);
- void phy_support_sym_pause(struct phy_device *phydev);
- void phy_support_asym_pause(struct phy_device *phydev);
- void phy_support_eee(struct phy_device *phydev);
-+void phy_update_eee(struct phy_device *phydev, bool tx_lpi_enabled,
-+		    bool eee_enabled, u32 tx_lpi_timer);
- void phy_set_sym_pause(struct phy_device *phydev, bool rx, bool tx,
- 		       bool autoneg);
- void phy_set_asym_pause(struct phy_device *phydev, bool rx, bool tx);
+ 	if (priv->dma_cap.fpesel)
+ 		stmmac_fpe_link_state_handle(priv, false);
+@@ -1118,6 +1120,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 		priv->eee_enabled = stmmac_eee_init(priv);
+ 		priv->tx_lpi_enabled = priv->eee_enabled;
+ 		stmmac_set_eee_pls(priv, priv->hw, true);
++		phy_update_eee(phy, priv->tx_lpi_enabled, priv->eee_enabled,
++			       priv->tx_lpi_timer);
+ 	}
+ 
+ 	if (priv->dma_cap.fpesel)
 -- 
 2.34.1
 
