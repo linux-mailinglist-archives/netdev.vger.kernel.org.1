@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-144184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D3FF9C5EF4
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:30:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB87D9C5EF8
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:31:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C08A02818C9
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:30:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CDB91F238D1
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B370215F47;
-	Tue, 12 Nov 2024 17:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D08213EDF;
+	Tue, 12 Nov 2024 17:28:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E163215C5A;
-	Tue, 12 Nov 2024 17:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8557E21764E;
+	Tue, 12 Nov 2024 17:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731432510; cv=none; b=HMOpeKwSO7nCXOrUlfy/x8OcOsnGpj2sQs9JrGNGy6lb2E28dG8ZDxD//6v05aEeZrjs7OHhzJfEdytml5BTk31WwZawFlsOrXR2z+QLzqQ9Bgl7T6CTONsrwKoqGvNUyUomgMRpEnIP6VbIk9N2z5HhbaLuta5ULSpldW/oxpg=
+	t=1731432514; cv=none; b=aovoQN/8nF8f5apx2CKFXg3S8mPOhbPfncIAhm6D9qucB/smBZhqXAdKDcjyzYPyzANMLzwo1W9dyK3ACCzGMS1fFCGdp5jsuwbd4QzIK6GRwbzEJSKKy/BQsUau4DDZolIR6clK/byIuSX65hGrrngYbGD75msdnVCEgrgS1Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731432510; c=relaxed/simple;
-	bh=NxGx5LvNaB+W1MatwU+Reu1ZyoVRJisImSs03EU7MXI=;
+	s=arc-20240116; t=1731432514; c=relaxed/simple;
+	bh=l+6NUzOXYhXtEryxl5pt51gE9c/WX6SBeH0CzzxTXNU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=flJ7xnOoc58MD4Ty4c6xgjfAeNWq5WFztsKIbgQCeDPWXMcJ9HfBBYQKkaE/1HhuEepdsuaeImTBZFJunQ8r4Puze0p8e4YIOM5MqFWFfFS0DvYXI0QrETn6PlLhUBAHq/TCojYxri6T6/r/Gqk4Ju2buH0wMUuwUGHEG6lGXMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=LFQsofPZFsf5eciRMXG7qIZI48vbE8xjbnATHJ1SHGZgphKOhwULWpxcV61tlUebJ5Ay+roIs/XZGROs77i0JIA5qT60C4y+ImYvBJJCf7La4byUevS8mwk5ptYf332wM/1tRau0HlsgaHifshVNbMfqVJxp3p72bowvvuzVu50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-72041ff06a0so4836824b3a.2;
-        Tue, 12 Nov 2024 09:28:28 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71e625b00bcso4852266b3a.3;
+        Tue, 12 Nov 2024 09:28:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731432507; x=1732037307;
+        d=1e100.net; s=20230601; t=1731432512; x=1732037312;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s8KoOpwkyhRS3PqVqIRjg2hxzpyfF+mN3WNLkLLDJ/8=;
-        b=L8leaynAHWCSVrHCV1Oz86mAoWHoHRYDvzN7++6CGL8wdX15EpSYUUoBeo8qX2YfIA
-         JCjJw/naWqWeYBum5UeXMMU66gvmqB2BarybTVgV68S7lHonVXGi8o35rbYBD25X7omx
-         B4qtEftyp5ueDj/e8lOEmL4/uhW+OfTGYybTxefhryh2HtnrX8tZbLe3wiUYFNDEBfJw
-         TGMDHBF3FnKS2sx2NKd8HRc/oKvcJ0P6QyqOBjiM1eWWO8E5B5sNrYYSgGlaJ/jk/seq
-         k8EpjpfzRwyY4jBL7Jayz9vN8PrqmVK1OiTDXJTFiE6jLzhx5+53zwbV7uHYhowKUMK6
-         xCIA==
-X-Forwarded-Encrypted: i=1; AJvYcCX62QztVYMp2R1AjJuMcPRWEhTY3mF5BnDEHbTCpS8Uj4BEpOMHUjIw45qKCWVi4OGEmVsdatt2nbQ=@vger.kernel.org, AJvYcCXHnzqoUACY2enxM+K3w5E4lTghRs869jZ/HuwyYLeZu+3Bzs4uLtcOtQ14wKLyRDLsqG9BQSC7Dt6t4dtH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw97STGRKy5LkehQp2VSjNz1lVxLcCVigvxmLBMjVsglhT53JS+
-	K41TItZ3xYPr9zrAWRnYvf83BzMIGgwM2pVLOE0m5YO7U+OUx0vOScTXagcC
-X-Google-Smtp-Source: AGHT+IFmQVmWnEvel4LsYHGUNSnQ/WgSxfj3tIuYyobWcVyRdNqd+nzUtfDFoEvK5VEo6wP0CfJnlQ==
-X-Received: by 2002:a05:6a00:139f:b0:71e:b1dc:f255 with SMTP id d2e1a72fcca58-7241329a391mr23153863b3a.9.1731432507276;
-        Tue, 12 Nov 2024 09:28:27 -0800 (PST)
+        bh=i+lY6YW9eHHlxzUfS6J7/cug/odMVhqea2GaG9YKUyA=;
+        b=cdmLoXho1irdUwN0izN2xzJhfpaC2OnywVLqZ7A5c/yczxg09LIn9i4dgGT1HVX8vQ
+         6hdyU4IvzYGA0kdhrzmxe60/j3Th2EnsH8rrMmoCpS3Z/Nomc0PvDd11FHVDxYfRKmml
+         +g8I6e7L8z22mghfiFN0L9NluUJ/FNOn8/XPcH1p4E8QJsGx9frKLSsgd6CxQXJ9Gao6
+         3KAcF1vhcr8U5QdN7a9czApMUiD/BEJmjWiFdOTts2xleTvz/ZfBjuRg/pKzLWug5jYv
+         sCo/6Zup7NR1kG26A1iQQsMoX0dWbwoe2ZwAnzYE7Q10wQwJLf8iDHeeWf1P6QL8uzF3
+         UUgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUboy/cYaJXJZ+/K9wQTboY6QtIQ21+6D3CC04BBAexFhsy1EykGlVBSlahOnfbZAm8B3qx0pShhJE=@vger.kernel.org, AJvYcCW/vXA5z9udUKzq8W2/+Vmy+M3BtSyYPgpasnsx91PC6szXMSEh8iVJ3z3Un1ok3w5N15m+b2Fd8I7/cR80@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7JTvQPe4MyiCyrL1xlUnUKxKrMlgOUG5VP2ZipKAfQ5gDTvx1
+	l3iTzJlqy2VZQTveQDdfmpx/oSK/YhXtQKLS4o0zp6Kz0/rKqnkVx35HAfDo
+X-Google-Smtp-Source: AGHT+IEoaGNUn7E6rHbBCgKGntSxBnx2XYOaiuFqW3EEuI0mNxeIukhYSG9NjXjwgkAOeBvID84bIQ==
+X-Received: by 2002:a05:6a00:4fd0:b0:71e:4c01:b3da with SMTP id d2e1a72fcca58-724132618c6mr21601770b3a.5.1731432512419;
+        Tue, 12 Nov 2024 09:28:32 -0800 (PST)
 Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407864f78sm11481439b3a.33.2024.11.12.09.28.25
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407864f78sm11481439b3a.33.2024.11.12.09.28.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 09:28:26 -0800 (PST)
+        Tue, 12 Nov 2024 09:28:32 -0800 (PST)
 From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 To: netdev@vger.kernel.org,
 	Stephen Hemminger <stephen@networkplumber.org>,
@@ -63,9 +63,9 @@ To: netdev@vger.kernel.org,
 Cc: Robert Nawrath <mbro1689@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH iproute2-next v1 3/6] iplink_can: remove newline at the end of invarg()'s messages
-Date: Wed, 13 Nov 2024 02:27:53 +0900
-Message-ID: <20241112172812.590665-11-mailhol.vincent@wanadoo.fr>
+Subject: [PATCH iproute2-next v1 5/6] iplink_can: add struct can_tdc
+Date: Wed, 13 Nov 2024 02:27:55 +0900
+Message-ID: <20241112172812.590665-13-mailhol.vincent@wanadoo.fr>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20241112172812.590665-8-mailhol.vincent@wanadoo.fr>
 References: <20241112172812.590665-8-mailhol.vincent@wanadoo.fr>
@@ -75,136 +75,91 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5013; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=NxGx5LvNaB+W1MatwU+Reu1ZyoVRJisImSs03EU7MXI=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnGE3Ta8yYkLbwp7j/z3A/zLU+2u4dPytyhuXPZX/eoc /s+fmbK6ShhYRDjYpAVU2RZVs7JrdBR6B126K8lzBxWJpAhDFycAjCRDSYM/x2bkzgMxUPXPd0v M1vX+4/tuYd8GnqH7wX3chy5WCS8/CjDZ7acxDkX52nPUXR5l/5Rhb3iaWJUSKp7VuexmE98162 ZAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2743; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=l+6NUzOXYhXtEryxl5pt51gE9c/WX6SBeH0CzzxTXNU=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnGE3TLxRRuKd76466ZPaWmUVT0jK/mCdavGv4T7ObpZ HwMz/HqKGVhEONikBVTZFlWzsmt0FHoHXboryXMHFYmkCEMXJwCMJGjqYwM/T8/n196Y/a2J85v 0ybyp+828pxbcuWw95TyNc6NjkVSuxgZOqytJobsUNZZXM4i8Ouxy+6Nxne3/WirjblRcMLsqhc 3NwA=
 X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 Content-Transfer-Encoding: 8bit
 
-invarg() already prints a new line by default. Adding an explicit "\n"
-at the end of the message results in two lines being printed. Remove
-all newlines at the end of the invarg() messages.
+Add the struct can_tdc to group the tdcv, tdco and tdvf variables
+together. The structure is borrowed from linux/can/bittiming.h [1].
+
+This refactor is a preparation for the introduction of CAN XL.
+
+[1] https://elixir.bootlin.com/linux/v6.11/source/include/linux/can/bittiming.h#L78
 
 Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 ---
- ip/iplink_can.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ ip/iplink_can.c | 28 +++++++++++++++++-----------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
 
 diff --git a/ip/iplink_can.c b/ip/iplink_can.c
-index 3414d6c3..6c6fcf61 100644
+index 928d5d79..325a4007 100644
 --- a/ip/iplink_can.c
 +++ b/ip/iplink_can.c
-@@ -134,78 +134,78 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
+@@ -15,6 +15,12 @@
+ #include "utils.h"
+ #include "ip_common.h"
+ 
++struct can_tdc {
++	__u32 tdcv;
++	__u32 tdco;
++	__u32 tdcf;
++};
++
+ static void print_usage(FILE *f)
+ {
+ 	fprintf(f,
+@@ -128,7 +134,7 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
+ {
+ 	struct can_bittiming bt = {}, dbt = {};
+ 	struct can_ctrlmode cm = { 0 };
+-	__u32 tdcv = -1, tdco = -1, tdcf = -1;
++	struct can_tdc fd = { .tdcv = -1, .tdco = -1, .tdcf = -1 };
+ 
+ 	while (argc > 0) {
  		if (matches(*argv, "bitrate") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&bt.bitrate, *argv, 0))
--				invarg("invalid \"bitrate\" value\n", *argv);
-+				invarg("invalid \"bitrate\" value", *argv);
- 		} else if (matches(*argv, "sample-point") == 0) {
- 			float sp;
- 
- 			NEXT_ARG();
- 			if (get_float(&sp, *argv))
--				invarg("invalid \"sample-point\" value\n",
-+				invarg("invalid \"sample-point\" value",
- 				       *argv);
- 			bt.sample_point = (__u32)(sp * 1000);
- 		} else if (matches(*argv, "tq") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&bt.tq, *argv, 0))
--				invarg("invalid \"tq\" value\n", *argv);
-+				invarg("invalid \"tq\" value", *argv);
- 		} else if (matches(*argv, "prop-seg") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&bt.prop_seg, *argv, 0))
--				invarg("invalid \"prop-seg\" value\n", *argv);
-+				invarg("invalid \"prop-seg\" value", *argv);
- 		} else if (matches(*argv, "phase-seg1") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&bt.phase_seg1, *argv, 0))
--				invarg("invalid \"phase-seg1\" value\n", *argv);
-+				invarg("invalid \"phase-seg1\" value", *argv);
- 		} else if (matches(*argv, "phase-seg2") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&bt.phase_seg2, *argv, 0))
--				invarg("invalid \"phase-seg2\" value\n", *argv);
-+				invarg("invalid \"phase-seg2\" value", *argv);
- 		} else if (matches(*argv, "sjw") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&bt.sjw, *argv, 0))
--				invarg("invalid \"sjw\" value\n", *argv);
-+				invarg("invalid \"sjw\" value", *argv);
- 		} else if (matches(*argv, "dbitrate") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&dbt.bitrate, *argv, 0))
--				invarg("invalid \"dbitrate\" value\n", *argv);
-+				invarg("invalid \"dbitrate\" value", *argv);
- 		} else if (matches(*argv, "dsample-point") == 0) {
- 			float sp;
- 
- 			NEXT_ARG();
- 			if (get_float(&sp, *argv))
--				invarg("invalid \"dsample-point\" value\n", *argv);
-+				invarg("invalid \"dsample-point\" value", *argv);
- 			dbt.sample_point = (__u32)(sp * 1000);
- 		} else if (matches(*argv, "dtq") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&dbt.tq, *argv, 0))
--				invarg("invalid \"dtq\" value\n", *argv);
-+				invarg("invalid \"dtq\" value", *argv);
- 		} else if (matches(*argv, "dprop-seg") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&dbt.prop_seg, *argv, 0))
--				invarg("invalid \"dprop-seg\" value\n", *argv);
-+				invarg("invalid \"dprop-seg\" value", *argv);
- 		} else if (matches(*argv, "dphase-seg1") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&dbt.phase_seg1, *argv, 0))
--				invarg("invalid \"dphase-seg1\" value\n", *argv);
-+				invarg("invalid \"dphase-seg1\" value", *argv);
- 		} else if (matches(*argv, "dphase-seg2") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&dbt.phase_seg2, *argv, 0))
--				invarg("invalid \"dphase-seg2\" value\n", *argv);
-+				invarg("invalid \"dphase-seg2\" value", *argv);
- 		} else if (matches(*argv, "dsjw") == 0) {
- 			NEXT_ARG();
- 			if (get_u32(&dbt.sjw, *argv, 0))
--				invarg("invalid \"dsjw\" value\n", *argv);
-+				invarg("invalid \"dsjw\" value", *argv);
+@@ -196,15 +202,15 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
+ 				invarg("invalid \"dsjw\" value", *argv);
  		} else if (matches(*argv, "tdcv") == 0) {
  			NEXT_ARG();
- 			if (get_u32(&tdcv, *argv, 0))
--				invarg("invalid \"tdcv\" value\n", *argv);
-+				invarg("invalid \"tdcv\" value", *argv);
+-			if (get_u32(&tdcv, *argv, 0))
++			if (get_u32(&fd.tdcv, *argv, 0))
+ 				invarg("invalid \"tdcv\" value", *argv);
  		} else if (matches(*argv, "tdco") == 0) {
  			NEXT_ARG();
- 			if (get_u32(&tdco, *argv, 0))
--				invarg("invalid \"tdco\" value\n", *argv);
-+				invarg("invalid \"tdco\" value", *argv);
+-			if (get_u32(&tdco, *argv, 0))
++			if (get_u32(&fd.tdco, *argv, 0))
+ 				invarg("invalid \"tdco\" value", *argv);
  		} else if (matches(*argv, "tdcf") == 0) {
  			NEXT_ARG();
- 			if (get_u32(&tdcf, *argv, 0))
--				invarg("invalid \"tdcf\" value\n", *argv);
-+				invarg("invalid \"tdcf\" value", *argv);
+-			if (get_u32(&tdcf, *argv, 0))
++			if (get_u32(&fd.tdcf, *argv, 0))
+ 				invarg("invalid \"tdcf\" value", *argv);
  		} else if (matches(*argv, "loopback") == 0) {
  			NEXT_ARG();
- 			set_ctrlmode("loopback", *argv, &cm,
-@@ -268,14 +268,14 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
+@@ -294,16 +300,16 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
+ 	if (cm.mask)
+ 		addattr_l(n, 1024, IFLA_CAN_CTRLMODE, &cm, sizeof(cm));
  
- 			NEXT_ARG();
- 			if (get_u32(&val, *argv, 0))
--				invarg("invalid \"restart-ms\" value\n", *argv);
-+				invarg("invalid \"restart-ms\" value", *argv);
- 			addattr32(n, 1024, IFLA_CAN_RESTART_MS, val);
- 		} else if (matches(*argv, "termination") == 0) {
- 			__u16 val;
+-	if (tdcv != -1 || tdco != -1 || tdcf != -1) {
++	if (fd.tdcv != -1 || fd.tdco != -1 || fd.tdcf != -1) {
+ 		struct rtattr *tdc = addattr_nest(n, 1024,
+ 						  IFLA_CAN_TDC | NLA_F_NESTED);
  
- 			NEXT_ARG();
- 			if (get_u16(&val, *argv, 0))
--				invarg("invalid \"termination\" value\n",
-+				invarg("invalid \"termination\" value",
- 				       *argv);
- 			addattr16(n, 1024, IFLA_CAN_TERMINATION, val);
- 		} else if (matches(*argv, "help") == 0) {
+-		if (tdcv != -1)
+-			addattr32(n, 1024, IFLA_CAN_TDC_TDCV, tdcv);
+-		if (tdco != -1)
+-			addattr32(n, 1024, IFLA_CAN_TDC_TDCO, tdco);
+-		if (tdcf != -1)
+-			addattr32(n, 1024, IFLA_CAN_TDC_TDCF, tdcf);
++		if (fd.tdcv != -1)
++			addattr32(n, 1024, IFLA_CAN_TDC_TDCV, fd.tdcv);
++		if (fd.tdco != -1)
++			addattr32(n, 1024, IFLA_CAN_TDC_TDCO, fd.tdco);
++		if (fd.tdcf != -1)
++			addattr32(n, 1024, IFLA_CAN_TDC_TDCF, fd.tdcf);
+ 		addattr_nest_end(n, tdc);
+ 	}
+ 
 -- 
 2.45.2
 
