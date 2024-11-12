@@ -1,166 +1,146 @@
-Return-Path: <netdev+bounces-144162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F239C60F0
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:00:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6B39C6116
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F888B3FFAF
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:53:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 548B1B82146
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B7D2123F7;
-	Tue, 12 Nov 2024 16:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C15820F5B6;
+	Tue, 12 Nov 2024 16:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S/LrAtiP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E03B20F5B6;
-	Tue, 12 Nov 2024 16:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A0820EA5B
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 16:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731430303; cv=none; b=Wyr/tkRFnHmKuI3tBl426rB3u+Ij45yg7ktnO0ZS2Cmofif9beLeNU7LkqB6d+QLSm1c7LpIGO30yvBfsXH8a+OYWM0k5K3HnozCFh2ihl5UNQmQvHAMaifyfC2IxUA3eGH5U21rmTh0vlsXUERJU75Sx+cXN1DROs8jVGyHdcw=
+	t=1731430425; cv=none; b=AVTPtTpjFoxD+QXUBHgNTlS74aWumARxTxf9nlcx2hOnItV08SCQZ77lJlY19o+F8XXHfNtsfCqZu7cUbgKhx9FSP4syM9s2c8iYse0JekCF/iQz1lNUtrIorhMcRJH7zEgW0mWPIgtpV1TSyuAYWO8tYXM08rSfYeXsRiqYAEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731430303; c=relaxed/simple;
-	bh=62tUL9F6Iovdc0MpnIKxgF5dqpMMuTJqfFJva2MAtm4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HHiOs2TOiG0+RCTX52mgzyoMKJ9TbnMZ4jBGYBWTag7jF4UWL/gwN3fTdgHUHyevI0ea6v+Bgeuwjvi78SDS3vhTuVrVPDi6xOCLD34+QuSqSEf9J25L6vaECQx43yllFfpxx+C2wKP4tAslN8aJqEwGuLhxt5m5w+mntg+0DO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71e681bc315so4218527b3a.0;
-        Tue, 12 Nov 2024 08:51:41 -0800 (PST)
+	s=arc-20240116; t=1731430425; c=relaxed/simple;
+	bh=NetM12MdiqjEomNiBQ1R7rE3/8PUPvggUBu0004nbH4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=m4O8vEEWQN26TmcOyiJdjzoyZdGWp0l38adZFFisYkGDn8503opNEcB16WxWHczLwGtTUspjm3bHs6Njz3FnHN6tdlxdErqUEmKORnDH1aYGL1v8w+pgevSMKMBKesLM8K3snyMdbwXLazr5CRtzCoizHz/ybXboYWYGOkr4H4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S/LrAtiP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731430421;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Fopx7SDjvtxGI9bqsHPVJpNSF9ZEcMOMcCEBQCKpPyw=;
+	b=S/LrAtiP3jYD0KyxQIpMW4OGH/tQhPXu+nxl/0p0wYLsBPqGiDaZMQk+TGTWMlXFVzRpHK
+	LzefD+1/nN2uyRUaD4TYyRPqhPenb4ImmdtT1cna4NVg32NuQ7ZGu+IVfWjKlXVRGUWTk7
+	wwJ/jn6bq8Q4jxBMMQnz1FP6sZVZzfI=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-49-rHAvgu1OP82fCfCrbhYunA-1; Tue, 12 Nov 2024 11:53:40 -0500
+X-MC-Unique: rHAvgu1OP82fCfCrbhYunA-1
+X-Mimecast-MFC-AGG-ID: rHAvgu1OP82fCfCrbhYunA
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-71807a67145so5130366a34.2
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 08:53:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731430300; x=1732035100;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2u2R57gucY0eeJxp9CbTUBcRMCpAHmk0Uy7XQgHtLFs=;
-        b=nw2qPzGolg4ncT3fkLRZYJ849BHleAUvmRm7Vi/q+TSrLUh2lh0dAbR74aSQv6R8Gl
-         Oz8faQZYexyG8xDbLmv+J3BBetH1Z3/0nfFVHVt6WGl4dO5O7be9B85vyH3+e2iBnGkc
-         uh5bnHMsHHqtAMTUMZUR/2yu+xOxURIcRrQA2Uol3cH+0AWiAueeYxEn+J8LPVF+J80I
-         yO/Uy/8Np1gw3NF7oQMoNkeZcymTz6TPCJBh9vzfrFlEU2bQt8vqocX+I6NMWBcfe6sO
-         48ZzlB6pj8sSeVDzPI8gi3lm2h5RDtNRdTmIEE/+1Pmo8dFRTy+/ofU+FqXdnqPwIgIF
-         SSVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUdapDuZABQmGicfnwvle/oXi8PjU4OT4AzkGlkN1tX7l6Z3U2tFRsUP4KKxdNeKu9mPYTL9bIuceMz8Bc=@vger.kernel.org, AJvYcCVPehyQ/ieKIRIyZOM5Y0DVbXoEgx/t9bhTcDi47rTi//Nrm4NlDtDJX6Cy8NI+NIe4+rQTdv+Q@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+yTlA80R35RjlwXc2rK3GJfgDDJIehaM9m615dor33OLlpgL8
-	MH4VUaw/gKL9ywsp8PAnOE2S6QsxT08jQpRd1oOLeX//3H3AvNKeh2xlTw==
-X-Google-Smtp-Source: AGHT+IF0BoPoM/KmidRbvxpduKxV1w5dI8w45nmjZo7vnGy/9ppO3jMyRW9l6wInX/vHZEjoXdTHnQ==
-X-Received: by 2002:a05:6a00:2185:b0:71e:74f6:f83a with SMTP id d2e1a72fcca58-724121c7bd1mr31923109b3a.3.1731430300547;
-        Tue, 12 Nov 2024 08:51:40 -0800 (PST)
-Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407860aa5sm11271260b3a.32.2024.11.12.08.51.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 08:51:40 -0800 (PST)
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-To: linux-can@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Robert Nawrath <mbro1689@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH v1 4/5] can: bittiming: rename can_tdc_is_enabled() into can_fd_tdc_is_enabled()
-Date: Wed, 13 Nov 2024 01:50:19 +0900
-Message-ID: <20241112165118.586613-11-mailhol.vincent@wanadoo.fr>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
-References: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
+        d=1e100.net; s=20230601; t=1731430419; x=1732035219;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fopx7SDjvtxGI9bqsHPVJpNSF9ZEcMOMcCEBQCKpPyw=;
+        b=TGy4XBOvWMBHn2CYSpjU1LV2Fw0BoCJKddw8G9Ebrvpls8zc3RE1DxySb36+jLG+qI
+         fQOVHx+tbVzmPModvlfQEQSyoVfFQDZF/SehU7HQB11KJzoPErcaVax5IL2SEnZTx5Wp
+         zdMwySs447l24tyYj0P186NdHj8GBBTR+7YbT6Fy624tg0gmUl1yaDvOm8mKSJmyZ8DC
+         wYa+tFiaj25XWE8IWII3OssVnhqJTi1xN+9jKZ/MmdghRVON+kpFnSYCLG4k81OphMh9
+         hJrBjV89XSxwPknWIE38Mg+EJ6HNefN06sKpK47U6PP+V5y2OVCkpTN3Bvbv3dMho5ZX
+         hN8g==
+X-Gm-Message-State: AOJu0YxIwyZ22+xAtkm51TnRkkAw1xPaiZ9nZHH9/ryJihXoRgCCrkec
+	zaXYXfiqIZiXa1/SuXpD6j7IkA6tb6LAMC+n9EuB53KOsPM+Sj1urxOhbcGCh7NU4Q1Mg5pGojY
+	YER8hRdZkH4jaGF0K7m/8dqNqNtKcfbFSo9nK8l9TZZvLtqxt8WhS1A==
+X-Received: by 2002:a05:6830:6788:b0:718:1987:24cb with SMTP id 46e09a7af769-71a5156ba4bmr3665886a34.10.1731430419512;
+        Tue, 12 Nov 2024 08:53:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFgZtjLql6MHKR3M7oCEP4Gi8JZUpYTaI4yxGOfRyQLbxRfrzvqrhtRE9/k7PQMyZ0lcGC4Dw==
+X-Received: by 2002:a05:6830:6788:b0:718:1987:24cb with SMTP id 46e09a7af769-71a5156ba4bmr3665870a34.10.1731430419244;
+        Tue, 12 Nov 2024 08:53:39 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac427cfsm604785585a.30.2024.11.12.08.53.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2024 08:53:38 -0800 (PST)
+Message-ID: <a6bd2ee8-c732-4922-9e7c-ae89a1ad8056@redhat.com>
+Date: Tue, 12 Nov 2024 17:53:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3569; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=62tUL9F6Iovdc0MpnIKxgF5dqpMMuTJqfFJva2MAtm4=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnG7e3Oqp/nL8qfE1bzqPp5bVzy19USt1rOL1zAf/7j3 IOxlye/7yhlYRDjYpAVU2RZVs7JrdBR6B126K8lzBxWJpAhDFycAjCRP68ZGa5eYLv+8FJGxP0J tluiHh62a1seUjrhUo2otsVy5VPsCrWMDN/mTHjA98OlIzs48oVJi7jbZN4pp12PBa94kX6SZ6f 0Tk4A
-X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] geneve: Use pcpu stats to update rx_dropped
+ counter.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+References: <c9a7d3ddbe3fb890bee0c95d207f2ce431001075.1730979658.git.gnault@redhat.com>
+ <231c2226-9b16-4a10-b2b8-484efe0aae6b@redhat.com>
+Content-Language: en-US
+In-Reply-To: <231c2226-9b16-4a10-b2b8-484efe0aae6b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-With the introduction of CAN XL, a new can_xl_tdc_is_enabled() helper
-function will be introduced later on. Rename can_tdc_is_enabled() into
-can_fd_tdc_is_enabled() to make it more explicit that this helper is
-meant for CAN FD.
 
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
----
- drivers/net/can/dev/netlink.c             | 6 +++---
- drivers/net/can/usb/etas_es58x/es58x_fd.c | 2 +-
- drivers/net/can/xilinx_can.c              | 2 +-
- include/linux/can/dev.h                   | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index 72a60e8186aa..27168aa6db20 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -144,7 +144,7 @@ static int can_tdc_changelink(struct can_priv *priv, const struct nlattr *nla,
- 	const struct can_tdc_const *tdc_const = priv->fd.tdc_const;
- 	int err;
- 
--	if (!tdc_const || !can_tdc_is_enabled(priv))
-+	if (!tdc_const || !can_fd_tdc_is_enabled(priv))
- 		return -EOPNOTSUPP;
- 
- 	err = nla_parse_nested(tb_tdc, IFLA_CAN_TDC_MAX, nla,
-@@ -409,7 +409,7 @@ static size_t can_tdc_get_size(const struct net_device *dev)
- 		size += nla_total_size(sizeof(u32));	/* IFLA_CAN_TDCF_MAX */
- 	}
- 
--	if (can_tdc_is_enabled(priv)) {
-+	if (can_fd_tdc_is_enabled(priv)) {
- 		if (priv->ctrlmode & CAN_CTRLMODE_TDC_MANUAL ||
- 		    priv->fd.do_get_auto_tdcv)
- 			size += nla_total_size(sizeof(u32));	/* IFLA_CAN_TDCV */
-@@ -490,7 +490,7 @@ static int can_tdc_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 	     nla_put_u32(skb, IFLA_CAN_TDC_TDCF_MAX, tdc_const->tdcf_max)))
- 		goto err_cancel;
- 
--	if (can_tdc_is_enabled(priv)) {
-+	if (can_fd_tdc_is_enabled(priv)) {
- 		u32 tdcv;
- 		int err = -EINVAL;
- 
-diff --git a/drivers/net/can/usb/etas_es58x/es58x_fd.c b/drivers/net/can/usb/etas_es58x/es58x_fd.c
-index d924b053677b..6476add1c105 100644
---- a/drivers/net/can/usb/etas_es58x/es58x_fd.c
-+++ b/drivers/net/can/usb/etas_es58x/es58x_fd.c
-@@ -429,7 +429,7 @@ static int es58x_fd_enable_channel(struct es58x_priv *priv)
- 		es58x_fd_convert_bittiming(&tx_conf_msg.data_bittiming,
- 					   &priv->can.fd.data_bittiming);
- 
--		if (can_tdc_is_enabled(&priv->can)) {
-+		if (can_fd_tdc_is_enabled(&priv->can)) {
- 			tx_conf_msg.tdc_enabled = 1;
- 			tx_conf_msg.tdco = cpu_to_le16(priv->can.fd.tdc.tdco);
- 			tx_conf_msg.tdcf = cpu_to_le16(priv->can.fd.tdc.tdcf);
-diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-index 3f2e378199ab..81baec8eb1e5 100644
---- a/drivers/net/can/xilinx_can.c
-+++ b/drivers/net/can/xilinx_can.c
-@@ -515,7 +515,7 @@ static int xcan_set_bittiming(struct net_device *ndev)
- 	    priv->devtype.cantype == XAXI_CANFD_2_0) {
- 		/* Setting Baud Rate prescaler value in F_BRPR Register */
- 		btr0 = dbt->brp - 1;
--		if (can_tdc_is_enabled(&priv->can)) {
-+		if (can_fd_tdc_is_enabled(&priv->can)) {
- 			if (priv->devtype.cantype == XAXI_CANFD)
- 				btr0 |= FIELD_PREP(XCAN_BRPR_TDCO_MASK, priv->can.fd.tdc.tdco) |
- 					XCAN_BRPR_TDC_ENABLE;
-diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
-index e492dfa8a472..9a92cbe5b2cb 100644
---- a/include/linux/can/dev.h
-+++ b/include/linux/can/dev.h
-@@ -91,7 +91,7 @@ struct can_priv {
- 				   struct can_berr_counter *bec);
- };
- 
--static inline bool can_tdc_is_enabled(const struct can_priv *priv)
-+static inline bool can_fd_tdc_is_enabled(const struct can_priv *priv)
- {
- 	return !!(priv->ctrlmode & CAN_CTRLMODE_FD_TDC_MASK);
- }
--- 
-2.45.2
+On 11/12/24 11:53, Paolo Abeni wrote:
+> On 11/7/24 12:41, Guillaume Nault wrote:
+>> Use the core_stats rx_dropped counter to avoid the cost of atomic
+>> increments.
+>>
+>> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> 
+> It looks like other UDP tunnels devices could benefit from a similar
+> change (vxlan, bareudp). Would you mind to also touch them, to keep such
+> implementations aligned?
+> 
+>> ---
+>>  drivers/net/geneve.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+>> index 2f29b1386b1c..671ca5260e92 100644
+>> --- a/drivers/net/geneve.c
+>> +++ b/drivers/net/geneve.c
+>> @@ -235,7 +235,7 @@ static void geneve_rx(struct geneve_dev *geneve, struct geneve_sock *gs,
+>>  					 vni_to_tunnel_id(gnvh->vni),
+>>  					 gnvh->opt_len * 4);
+>>  		if (!tun_dst) {
+>> -			DEV_STATS_INC(geneve->dev, rx_dropped);
+>> +			dev_core_stats_rx_dropped_inc(geneve->dev);
+> 
+> How about switching to NETDEV_PCPU_STAT_DSTATS instead, so there is a
+> single percpu struct allocated x device (geneve already uses
+> NETDEV_PCPU_STAT_TSTATS): stats fetching will be faster, and possibly
+> memory usage lower.
+
+I was not aware of the previous discussion on this same topic:
+
+https://lore.kernel.org/netdev/20240903113402.41d19129@kernel.org/
+
+and I missed the previous change on bareudp.c
+
+I still think that avoiding the double per-cpu traversal when fetching
+the stats could be useful, especially on large multi-numa nodes systems.
+
+I guess it's better to be consistent and keep geneve and bareudp
+aligned. We can eventually consolidate the stats later.
+
+/P
 
 
