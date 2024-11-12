@@ -1,113 +1,119 @@
-Return-Path: <netdev+bounces-144048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 417CA9C560E
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 12:15:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BBA59C560C
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 12:15:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05A622817B3
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:15:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A2D284B7D
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:15:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7FF21FDAE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B2D321FD97;
 	Tue, 12 Nov 2024 10:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="isDiJkf0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRouAyQD"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2F6215010;
-	Tue, 12 Nov 2024 10:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4503821FD95;
+	Tue, 12 Nov 2024 10:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731408622; cv=none; b=GZZeF7YHmj+ktDqqYi+2agcEHH8Xc6EITlvxbOYdv3Za8tvyulirD4eIhDczStthOo5hiIHs9FcYaCstf650g0XtbYNUI+klvXt3vtmmb71cgf2m8xUKCPmRDU3EIFzl3OSPBb9ZkxF94l1Bu+mD+eZxFKa7rp7xQAIkmk66+xc=
+	t=1731408622; cv=none; b=HrfXnxf2DEIKMddbkKmaOo4HKwdTeLUdXpVo+5RrEsO8MGsFLOnnkH8eUkMma0eL50oWmkqU/KhpWEJRaZVKse04OyCjcX87btTday3V3W9iMQtZ4g6I3iYZbz7svwDWeQ63bV6BNC/mcVGRluAj8ZnI+RhjYNVq/TVqeNWVqE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731408622; c=relaxed/simple;
-	bh=K2Y9eESSp12JxRvCw+HrqqAyHVYfLWQIkdTY+grbKwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FnkLr686q9n1YaVveY7/p4H4u7lfmamnmoyo9dTfuHzC9YCLFYrlLIpqcImkJ6xwDDsP9AN7HVzZQfQWJKIbafYZwO3X8N7d1GJuVMhrmeHlVzLdSwC5qhcniZpk5s0lNazmjK62y3kZwrxk2e81utZLnz5Zkvt01e3qTGccLmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=isDiJkf0; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 37DEC1BF205;
-	Tue, 12 Nov 2024 10:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731408613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xkaaHxYMcgWp/Jayi5yY0YVWgrdbJQW2Bo/aXyuAcTM=;
-	b=isDiJkf0oDX77LXbJdSdCzRBNxcVXYU8Eai4pp6HN/z63vhnavWl1UtE70ItXhyv7QDcXF
-	Hgo8EJb7GPFkqIdTH9q/pUSAacJc7nfeAzL2kdSlKlv/Iy0k0uih6Dw0d+aJVBQ4QBW+16
-	UTjWOTeDMrFkVK1WXoIcFnZlfsDpSZDRaqIF0Ip1YFVNWBhmiS6udn0QDmXrDY/mqt9kAU
-	rReUKiWoFRLHv461lr7igdYCGG8/l1RDYhXE/IrLkZYhweOB2kEZvjgOVLsy8nhlPWOnGH
-	W4YleSe/ON9aFboToWLe5yXSTIPpSoglbRTZRjlXLyQSa5EBspMWShEGQeYvVA==
-Date: Tue, 12 Nov 2024 11:50:09 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Richard
- Cochran <richardcochran@gmail.com>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
- <alexis.lothore@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 4/9] net: stmmac: Introduce dwmac1000
- ptp_clock_info and operations
-Message-ID: <20241112115009.028b8724@fedora.home>
-In-Reply-To: <1b335330-900e-4620-8aaf-a27424f44321@redhat.com>
-References: <20241106090331.56519-1-maxime.chevallier@bootlin.com>
-	<20241106090331.56519-5-maxime.chevallier@bootlin.com>
-	<20241111161205.25c53c62@kernel.org>
-	<1b335330-900e-4620-8aaf-a27424f44321@redhat.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=KJ2F7sc2bf+xv1D/2D+hIJxzrNK6jbesAQAvmCnlx5o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=B9nRZdzVNo/D2NQPKOrepGYW72r2oLLk0a4tp1XUCdToke6L7v13kX0EcSEP8zGtVmdo3znXPMW8/bt8Fbn1lX4WbbYp4Ed1xJj2415MqaarC/wV3FTQ67QW4eMTICMLGKbjDy/EIEaDkElvM8+JA2R5vCbU8meQtFcYtVr9F4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oRouAyQD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFDE4C4CECD;
+	Tue, 12 Nov 2024 10:50:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731408621;
+	bh=KJ2F7sc2bf+xv1D/2D+hIJxzrNK6jbesAQAvmCnlx5o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oRouAyQDUPBGdu5xet77fXKCQrGNTYLitrbvb3S9EB8YGWSfVX2Y1zPewarNRQVcd
+	 40OkvXMnkRyfBGS+SLsq/HQuaJaFLmjRCoen/ST58PNlV+EEIMv6+y49b8Nqqvd2GT
+	 i2ecONHDXWVRwZBpCc66xPCt3/LJICE5+5AQpMAkLLCedezx9KWJnt4bf9Z+90gMHD
+	 axbfQfTRI2G3ushpeQq+aOj6m49tpmxEVXliMd7sEpkeqZ1U8EkhLlJ2eiTlKkMMyW
+	 SNimJ0v5/d2gevDQ6juWhEypqWvp4ZnGwjFRsiB8p9CdbELP8Ks0xwl/3HGBdNA78f
+	 AJXjpuEFTRLYw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DEC3809A80;
+	Tue, 12 Nov 2024 10:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/9] net: ip: add drop reasons to input route
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173140863199.479628.7032457382507846655.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Nov 2024 10:50:31 +0000
+References: <20241107125601.1076814-1-dongml2@chinatelecom.cn>
+In-Reply-To: <20241107125601.1076814-1-dongml2@chinatelecom.cn>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, dsahern@kernel.org, pablo@netfilter.org,
+ kadlec@netfilter.org, roopa@nvidia.com, razor@blackwall.org,
+ gnault@redhat.com, bigeasy@linutronix.de, hawk@kernel.org, idosch@nvidia.com,
+ dongml2@chinatelecom.cn, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev, bpf@vger.kernel.org
 
-Hello Jakub, Paolo,
+Hello:
 
-On Tue, 12 Nov 2024 10:28:21 +0100
-Paolo Abeni <pabeni@redhat.com> wrote:
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> On 11/12/24 01:12, Jakub Kicinski wrote:
-> > On Wed,  6 Nov 2024 10:03:25 +0100 Maxime Chevallier wrote:  
-> >> +		mutex_unlock(&priv->aux_ts_lock);
-> >> +
-> >> +		/* wait for auxts fifo clear to finish */
-> >> +		ret = readl_poll_timeout(ptpaddr + PTP_TCR, tcr_val,
-> >> +					 !(tcr_val & GMAC_PTP_TCR_ATSFC),
-> >> +					 10, 10000);  
-> > 
-> > Is there a good reason to wait for the flush to complete outside of 
-> > the mutex?   
+On Thu,  7 Nov 2024 20:55:52 +0800 you wrote:
+> In this series, we mainly add some skb drop reasons to the input path of
+> ip routing, and we make the following functions return drop reasons:
 > 
-> Indeed looking at other `ptpaddr` access use-case, it looks like the
-> mutex protects both read and write accesses.
+>   fib_validate_source()
+>   ip_route_input_mc()
+>   ip_mc_validate_source()
+>   ip_route_input_slow()
+>   ip_route_input_rcu()
+>   ip_route_input_noref()
+>   ip_route_input()
+>   ip_mkroute_input()
+>   __mkroute_input()
+>   ip_route_use_hint()
 > 
-> @Maxime: is the above intentional? looks race-prone
+> [...]
 
-You're right, this is racy... It wasn't intentionnal, it's actually the
-same logic as dwmac4 uses so looks like dwmac4 is also incorrect in
-that regard.
+Here is the summary with links:
+  - [net-next,v5,1/9] net: ip: make fib_validate_source() support drop reasons
+    https://git.kernel.org/netdev/net-next/c/37653a0b8a6f
+  - [net-next,v5,2/9] net: ip: make ip_route_input_mc() return drop reason
+    https://git.kernel.org/netdev/net-next/c/c6c670784b86
+  - [net-next,v5,3/9] net: ip: make ip_mc_validate_source() return drop reason
+    https://git.kernel.org/netdev/net-next/c/d46f827016d8
+  - [net-next,v5,4/9] net: ip: make ip_route_input_slow() return drop reasons
+    https://git.kernel.org/netdev/net-next/c/5b92112acd8e
+  - [net-next,v5,5/9] net: ip: make ip_route_input_rcu() return drop reasons
+    https://git.kernel.org/netdev/net-next/c/61b95c70f344
+  - [net-next,v5,6/9] net: ip: make ip_route_input_noref() return drop reasons
+    https://git.kernel.org/netdev/net-next/c/82d9983ebeb8
+  - [net-next,v5,7/9] net: ip: make ip_route_input() return drop reasons
+    https://git.kernel.org/netdev/net-next/c/50038bf38e65
+  - [net-next,v5,8/9] net: ip: make ip_mkroute_input/__mkroute_input return drop reasons
+    https://git.kernel.org/netdev/net-next/c/d9340d1e0277
+  - [net-next,v5,9/9] net: ip: make ip_route_use_hint() return drop reasons
+    https://git.kernel.org/netdev/net-next/c/479aed04e84a
 
-I'll send a v4 with that change, and a fix for dwmac4 along the way
-then.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks for spotting this,
-
-Maxime
 
 
