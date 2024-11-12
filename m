@@ -1,187 +1,166 @@
-Return-Path: <netdev+bounces-144157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 773699C6070
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:31:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F239C60F0
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F781B2427D
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:47:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F888B3FFAF
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215C2207212;
-	Tue, 12 Nov 2024 16:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="kNKy5euu";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="A0JPWRgg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B7D2123F7;
+	Tue, 12 Nov 2024 16:51:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF6C20720E;
-	Tue, 12 Nov 2024 16:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E03B20F5B6;
+	Tue, 12 Nov 2024 16:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731430065; cv=none; b=egj3vNTz1gEq8PN4HZ3hTAnk8StSvBuSNrjs7Jh4O09E5l86+zmgEaRWyrN4+/Gnsa3LNLGfDq9cEpxcscKajJLRy6flpbKGPX0r8ewLporOq3xjGidXOz88ZoOfjQP2XYSpXCCDBK16f6afsvXb0Z8ckAeu+gRl5VRRqFmxVuw=
+	t=1731430303; cv=none; b=Wyr/tkRFnHmKuI3tBl426rB3u+Ij45yg7ktnO0ZS2Cmofif9beLeNU7LkqB6d+QLSm1c7LpIGO30yvBfsXH8a+OYWM0k5K3HnozCFh2ihl5UNQmQvHAMaifyfC2IxUA3eGH5U21rmTh0vlsXUERJU75Sx+cXN1DROs8jVGyHdcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731430065; c=relaxed/simple;
-	bh=ZzNKDiqf8EYHXh9cVoPgd9CqqlRUC39S0XXWU70zxBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=teLINO6urYjRWg07aLt5bd8SNbwXz1aEhT0CS5vQV51qQriWq9jjCVTQst6pscUbD+zLIuZVPtxO2eGlkqVk/2W8eYej5qkWTvmejG/nWTwT1fjtMt96ddpGHSaHx7o8ovdfk0TVMqd1qVRLEt9g9Z3k+sPwRJS1sLPl+4t5U3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=kNKy5euu; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=A0JPWRgg; arc=none smtp.client-ip=202.12.124.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailflow.stl.internal (Postfix) with ESMTP id AB0891D40362;
-	Tue, 12 Nov 2024 11:47:39 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Tue, 12 Nov 2024 11:47:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1731430059; x=
-	1731433659; bh=mjBh6lGGOL7kWEbog/DbMVJwFE+VluwZ4NBVspvbpMw=; b=k
-	NKy5euuQ8i7BZ8C6Ou12k4jHPmW4m4flIL3kN9vP5OgHVzNVJKel2xAcJABV9rP2
-	u8O6ueDs9I7aUX9zlSJLCpTtd3hO7ofAv6+80cLWb//nh921/918u+rxkKiToxoh
-	mJaNlixa9mvMebn6HNvipMonezODj/4b7A1I/sf6v2LDAG9M+zVUeUntjb8paPw4
-	271/VWFUJgBaY6uvT4xCeaKHYdiaw6krsACB8qUxhihTFN7MF38aE0YmJ9GndG14
-	ROyFWqCO2WBcs1JOyK3vIvJvGKAYu75ttbtmakWeCOS93WMmdkkY3npXeAoCU3a/
-	Z5TtmB9OPqhtO+2NghGDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731430059; x=1731433659; bh=mjBh6lGGOL7kWEbog/DbMVJwFE+VluwZ4NB
-	VspvbpMw=; b=A0JPWRggkrMoDEVemxz5qTyCDdHISEpvb+9X+fqax2w1YRTCwD6
-	BilUHEm24CtlgFe6yQC4tW5XNMQ89GL06i1Kq880UXXA9g6tKIe0rvw+glYiLCVL
-	oVp5plN7Ax+UJG/Pmgtd8GGbklTses8qnQsYrkWAQoJvY2lLh6sn4EShK6Wu2FEy
-	qiOSGqJ8qx/pa/KE9RMXh3zOOaUyHRPz1qQWrLjyH2xEVtSrPe/isA9p8wZ0D7G8
-	cG7IP+v1j5z3EYKLKYxtW2EusaunE5JKHBAC9AENhxmzQIZvNE54kwB/UnU6ZtPC
-	ghgDKIdi+kWc4tx+waFqn6lt2vaVPsd4NWQ==
-X-ME-Sender: <xms:qoYzZxc-ivRYtK3nSBtzv-3sRHAoL5pMI7VqBcna_piHufK8clabOw>
-    <xme:qoYzZ_M1z8lKvlD5b6IhBEOE_hPqtAxwaSFObXkMkEQWOahSBdzl9Byx7HxL-5Gbo
-    05M7zubpcVR9o9i7AE>
-X-ME-Received: <xmr:qoYzZ6iiFoU1XeNoAkwqQdwWLabzSNbWBoni1OYRxBQMXd5UWRuMeBSdTZB1>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeggdeklecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrhigriigrnh
-    hovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhhtohhnihhosehophgv
-    nhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:qoYzZ6-dieiEvbKm0WW98CgSdGFNo0L3QUdDpD9wwGJM45kf4LA5PA>
-    <xmx:qoYzZ9sh2wEkundcfu3zccUkDVvBB8BaSxAgAINeXFZLIxn97s6RLQ>
-    <xmx:qoYzZ5HIgkupaP9q0HX6cTf0xzdCEC53yg2eYjaJHSBenvTIDVDruQ>
-    <xmx:qoYzZ0M9K72F9mbvbLa_xcutkknhVU6Wfx16gmn_Cwhs4W7rxKji6Q>
-    <xmx:q4YzZzCF0-MX0hHel1r4J3IZnbHGDzDsE8699IyjdqpYcJn6UuIMkfCv>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 Nov 2024 11:47:38 -0500 (EST)
-Date: Tue, 12 Nov 2024 17:47:36 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Antonio Quartulli <antonio@openvpn.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 04/23] ovpn: add basic interface
- creation/destruction/management routines
-Message-ID: <ZzOGqP9AAGSN2E7y@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-4-de4698c73a25@openvpn.net>
- <2fd3dc9c-9d6a-494c-a4d8-a45221bf250d@gmail.com>
+	s=arc-20240116; t=1731430303; c=relaxed/simple;
+	bh=62tUL9F6Iovdc0MpnIKxgF5dqpMMuTJqfFJva2MAtm4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HHiOs2TOiG0+RCTX52mgzyoMKJ9TbnMZ4jBGYBWTag7jF4UWL/gwN3fTdgHUHyevI0ea6v+Bgeuwjvi78SDS3vhTuVrVPDi6xOCLD34+QuSqSEf9J25L6vaECQx43yllFfpxx+C2wKP4tAslN8aJqEwGuLhxt5m5w+mntg+0DO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71e681bc315so4218527b3a.0;
+        Tue, 12 Nov 2024 08:51:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731430300; x=1732035100;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2u2R57gucY0eeJxp9CbTUBcRMCpAHmk0Uy7XQgHtLFs=;
+        b=nw2qPzGolg4ncT3fkLRZYJ849BHleAUvmRm7Vi/q+TSrLUh2lh0dAbR74aSQv6R8Gl
+         Oz8faQZYexyG8xDbLmv+J3BBetH1Z3/0nfFVHVt6WGl4dO5O7be9B85vyH3+e2iBnGkc
+         uh5bnHMsHHqtAMTUMZUR/2yu+xOxURIcRrQA2Uol3cH+0AWiAueeYxEn+J8LPVF+J80I
+         yO/Uy/8Np1gw3NF7oQMoNkeZcymTz6TPCJBh9vzfrFlEU2bQt8vqocX+I6NMWBcfe6sO
+         48ZzlB6pj8sSeVDzPI8gi3lm2h5RDtNRdTmIEE/+1Pmo8dFRTy+/ofU+FqXdnqPwIgIF
+         SSVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdapDuZABQmGicfnwvle/oXi8PjU4OT4AzkGlkN1tX7l6Z3U2tFRsUP4KKxdNeKu9mPYTL9bIuceMz8Bc=@vger.kernel.org, AJvYcCVPehyQ/ieKIRIyZOM5Y0DVbXoEgx/t9bhTcDi47rTi//Nrm4NlDtDJX6Cy8NI+NIe4+rQTdv+Q@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+yTlA80R35RjlwXc2rK3GJfgDDJIehaM9m615dor33OLlpgL8
+	MH4VUaw/gKL9ywsp8PAnOE2S6QsxT08jQpRd1oOLeX//3H3AvNKeh2xlTw==
+X-Google-Smtp-Source: AGHT+IF0BoPoM/KmidRbvxpduKxV1w5dI8w45nmjZo7vnGy/9ppO3jMyRW9l6wInX/vHZEjoXdTHnQ==
+X-Received: by 2002:a05:6a00:2185:b0:71e:74f6:f83a with SMTP id d2e1a72fcca58-724121c7bd1mr31923109b3a.3.1731430300547;
+        Tue, 12 Nov 2024 08:51:40 -0800 (PST)
+Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407860aa5sm11271260b3a.32.2024.11.12.08.51.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2024 08:51:40 -0800 (PST)
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+To: linux-can@vger.kernel.org,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Robert Nawrath <mbro1689@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Subject: [PATCH v1 4/5] can: bittiming: rename can_tdc_is_enabled() into can_fd_tdc_is_enabled()
+Date: Wed, 13 Nov 2024 01:50:19 +0900
+Message-ID: <20241112165118.586613-11-mailhol.vincent@wanadoo.fr>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
+References: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2fd3dc9c-9d6a-494c-a4d8-a45221bf250d@gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3569; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=62tUL9F6Iovdc0MpnIKxgF5dqpMMuTJqfFJva2MAtm4=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnG7e3Oqp/nL8qfE1bzqPp5bVzy19USt1rOL1zAf/7j3 IOxlye/7yhlYRDjYpAVU2RZVs7JrdBR6B126K8lzBxWJpAhDFycAjCRP68ZGa5eYLv+8FJGxP0J tluiHh62a1seUjrhUo2otsVy5VPsCrWMDN/mTHjA98OlIzs48oVJi7jbZN4pp12PBa94kX6SZ6f 0Tk4A
+X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
+Content-Transfer-Encoding: 8bit
 
-2024-11-09, 03:01:21 +0200, Sergey Ryazanov wrote:
-> On 29.10.2024 12:47, Antonio Quartulli wrote:
-> > +/* When the OpenVPN protocol is ran in AEAD mode, use
-> > + * the OpenVPN packet ID as the AEAD nonce:
-> > + *
-> > + *    00000005 521c3b01 4308c041
-> > + *    [seq # ] [  nonce_tail   ]
-> > + *    [     12-byte full IV    ] -> NONCE_SIZE
-> > + *    [4-bytes                   -> NONCE_WIRE_SIZE
-> > + *    on wire]
-> > + */
-> 
-> Nice diagram! Can we go futher and define the OpenVPN packet header as a
-> stucture? Referencing the structure instead of using magic sizes and offsets
-> can greatly improve the code readability. Especially when it comes to header
-> construction/parsing in the encryption/decryption code.
-> 
-> E.g. define a structures like this:
-> 
-> struct ovpn_pkt_hdr {
->   __be32 op;
->   __be32 pktid;
->   u8 auth[];
-> } __attribute__((packed));
-> 
-> struct ovpn_aead_iv {
->   __be32 pktid;
->   u8 nonce[OVPN_NONCE_TAIL_SIZE];
-> } __attribute__((packed));
+With the introduction of CAN XL, a new can_xl_tdc_is_enabled() helper
+function will be introduced later on. Rename can_tdc_is_enabled() into
+can_fd_tdc_is_enabled() to make it more explicit that this helper is
+meant for CAN FD.
 
-__attribute__((packed)) should not be needed here as the fields in
-both structs look properly aligned, and IIRC using packed can cause
-the compiler to generate worse code.
+Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+---
+ drivers/net/can/dev/netlink.c             | 6 +++---
+ drivers/net/can/usb/etas_es58x/es58x_fd.c | 2 +-
+ drivers/net/can/xilinx_can.c              | 2 +-
+ include/linux/can/dev.h                   | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-
-> > diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> > index 8516c1ccd57a7c7634a538fe3ac16c858f647420..84d294aab20b79b8e9cb9b736a074105c99338f3 100644
-> > --- a/include/uapi/linux/if_link.h
-> > +++ b/include/uapi/linux/if_link.h
-> > @@ -1975,4 +1975,19 @@ enum {
-> >   #define IFLA_DSA_MAX	(__IFLA_DSA_MAX - 1)
-> > +/* OVPN section */
-> > +
-> > +enum ovpn_mode {
-> > +	OVPN_MODE_P2P,
-> > +	OVPN_MODE_MP,
-> > +};
-> 
-> Mode min/max values can be defined here and the netlink policy can reference
-> these values:
-> 
-> enum ovpn_mode {
->   OVPN_MODE_P2P,
->   OVPN_MODE_MP,
->   __OVPN_MODE_MAX
-> };
-> 
-> #define OVPN_MODE_MIN OVPN_MODE_P2P
-> #define OVPN_MODE_MAX (__OVPN_MODE_MAX - 1)
-> 
-> ... = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_MIN, OVPN_MODE_MAX)
-
-I don't think there's much benefit to that, other than making the diff
-smaller on a (very unlikely) patch that would add a new mode in the
-future. It even looks more inconvenient to me when reading the code
-("ok what are _MIN and _MAX?  the code is using _P2P and _MP, do they
-match?").
-
+diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
+index 72a60e8186aa..27168aa6db20 100644
+--- a/drivers/net/can/dev/netlink.c
++++ b/drivers/net/can/dev/netlink.c
+@@ -144,7 +144,7 @@ static int can_tdc_changelink(struct can_priv *priv, const struct nlattr *nla,
+ 	const struct can_tdc_const *tdc_const = priv->fd.tdc_const;
+ 	int err;
+ 
+-	if (!tdc_const || !can_tdc_is_enabled(priv))
++	if (!tdc_const || !can_fd_tdc_is_enabled(priv))
+ 		return -EOPNOTSUPP;
+ 
+ 	err = nla_parse_nested(tb_tdc, IFLA_CAN_TDC_MAX, nla,
+@@ -409,7 +409,7 @@ static size_t can_tdc_get_size(const struct net_device *dev)
+ 		size += nla_total_size(sizeof(u32));	/* IFLA_CAN_TDCF_MAX */
+ 	}
+ 
+-	if (can_tdc_is_enabled(priv)) {
++	if (can_fd_tdc_is_enabled(priv)) {
+ 		if (priv->ctrlmode & CAN_CTRLMODE_TDC_MANUAL ||
+ 		    priv->fd.do_get_auto_tdcv)
+ 			size += nla_total_size(sizeof(u32));	/* IFLA_CAN_TDCV */
+@@ -490,7 +490,7 @@ static int can_tdc_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 	     nla_put_u32(skb, IFLA_CAN_TDC_TDCF_MAX, tdc_const->tdcf_max)))
+ 		goto err_cancel;
+ 
+-	if (can_tdc_is_enabled(priv)) {
++	if (can_fd_tdc_is_enabled(priv)) {
+ 		u32 tdcv;
+ 		int err = -EINVAL;
+ 
+diff --git a/drivers/net/can/usb/etas_es58x/es58x_fd.c b/drivers/net/can/usb/etas_es58x/es58x_fd.c
+index d924b053677b..6476add1c105 100644
+--- a/drivers/net/can/usb/etas_es58x/es58x_fd.c
++++ b/drivers/net/can/usb/etas_es58x/es58x_fd.c
+@@ -429,7 +429,7 @@ static int es58x_fd_enable_channel(struct es58x_priv *priv)
+ 		es58x_fd_convert_bittiming(&tx_conf_msg.data_bittiming,
+ 					   &priv->can.fd.data_bittiming);
+ 
+-		if (can_tdc_is_enabled(&priv->can)) {
++		if (can_fd_tdc_is_enabled(&priv->can)) {
+ 			tx_conf_msg.tdc_enabled = 1;
+ 			tx_conf_msg.tdco = cpu_to_le16(priv->can.fd.tdc.tdco);
+ 			tx_conf_msg.tdcf = cpu_to_le16(priv->can.fd.tdc.tdcf);
+diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
+index 3f2e378199ab..81baec8eb1e5 100644
+--- a/drivers/net/can/xilinx_can.c
++++ b/drivers/net/can/xilinx_can.c
+@@ -515,7 +515,7 @@ static int xcan_set_bittiming(struct net_device *ndev)
+ 	    priv->devtype.cantype == XAXI_CANFD_2_0) {
+ 		/* Setting Baud Rate prescaler value in F_BRPR Register */
+ 		btr0 = dbt->brp - 1;
+-		if (can_tdc_is_enabled(&priv->can)) {
++		if (can_fd_tdc_is_enabled(&priv->can)) {
+ 			if (priv->devtype.cantype == XAXI_CANFD)
+ 				btr0 |= FIELD_PREP(XCAN_BRPR_TDCO_MASK, priv->can.fd.tdc.tdco) |
+ 					XCAN_BRPR_TDC_ENABLE;
+diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
+index e492dfa8a472..9a92cbe5b2cb 100644
+--- a/include/linux/can/dev.h
++++ b/include/linux/can/dev.h
+@@ -91,7 +91,7 @@ struct can_priv {
+ 				   struct can_berr_counter *bec);
+ };
+ 
+-static inline bool can_tdc_is_enabled(const struct can_priv *priv)
++static inline bool can_fd_tdc_is_enabled(const struct can_priv *priv)
+ {
+ 	return !!(priv->ctrlmode & CAN_CTRLMODE_FD_TDC_MASK);
+ }
 -- 
-Sabrina
+2.45.2
+
 
