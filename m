@@ -1,127 +1,98 @@
-Return-Path: <netdev+bounces-144147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E2809C5D8D
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:41:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8B49C5C1E
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:41:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADF92B261E9
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:40:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16E61F22FD9
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C16201262;
-	Tue, 12 Nov 2024 15:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C652022D5;
+	Tue, 12 Nov 2024 15:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="n+25dFhC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="usFj0Rco"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B7F1FEFA8;
-	Tue, 12 Nov 2024 15:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D08201261
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 15:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731425994; cv=none; b=WWQkbWaWc1fjU3NvqUBhYJePTCWGppcqbRE/dnseAFnXslOX9KuhQTMFEwgNZwxEe+sc4CIC+zcIzHBHrunSN7ZPAmhEcxFXAaBck0AL8qPUYGdt35hAHkxeOWEv6VXdIIDc2DZWHa86qYAYqsrbDHnE5LUALHgTgNfTYZxnF4E=
+	t=1731426048; cv=none; b=fPKtBnkfFrvJrUyEirsh3pKCTD3WNmO8YAuwI2MPX4bO5ZHBknR9auzrBpoDXTXgFDpwfJ1gou5BcioQWmNrZxZEcS5ES+IOaqW5pbmG2CAOMNSwkouLOSByBOO7MKtdo+OyBN02yPELm7BUNsup1h81cMMQnLnkZFBBseQv00g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731425994; c=relaxed/simple;
-	bh=fvrNxzwDp2P3iPosrFRowJKvdfK7Cu3AryWdKt0N3Ls=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eiCp7cBwobU3vo5wU7Oz8Wk7qNMvBr63xuPwkwFsyC6GpfjFpFMBexEh696PyvIkbHydEzLqKyIhE+PpfByQPTPwmBcI2BIlM33k0fpxO/t3xH4pwGq9+SJ1+ZNOIvbvIlYF4NRowj3MtxIHnFrj4UjYcqEDG/3KRPODh+vyd6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=n+25dFhC; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=yC4PgO0iUg1E/9QX5QiVdbAl0FhMlHnWwAy+hx8zLyU=;
-	t=1731425993; x=1732635593; b=n+25dFhCEMsvZSJ+77KWS4+QeyK3HpzmWVj3lDZbVhXkBVK
-	iw9POVHy/1O36NwC8m1YrTkNw3NHwxlqSP4OnvNlw1HVcJrhFevAeT1Zzw0BH9QJCIARISV+Mpfc4
-	MXLu/wyejOcVmwSzslUW3HyOeo2xwD920oTB+yRrnbU3e8DALso3CO/h62kbtIoE19sMz88YsiMwu
-	GrMRaMlywOCenNPEtD8R76dNEr9QyRTPe4dsCq0HfLImkZgdwpwDnnl/5Z9GgdAwrhxuo9Z3EsHku
-	RzmrbxbfjTCFOtw5f059uYS4yw7gpTSYHLSMD6Epp+51Y+YKGO9IdivU7Wk7wpIQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tAszb-000000031hp-0UTN;
-	Tue, 12 Nov 2024 16:39:47 +0100
-Message-ID: <59b318b2d6719a009189e10949df35f855790d63.camel@sipsolutions.net>
-Subject: Re: [PATCH v5 09/17] wifi: cc33xx: Add main.c
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "Nemanov, Michael" <michael.nemanov@ti.com>, Kalle Valo
- <kvalo@kernel.org>,  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Sabeeh Khan <sabeeh-khan@ti.com>
-Date: Tue, 12 Nov 2024 16:39:45 +0100
-In-Reply-To: <2dbf1cba-0b16-413b-947e-dacf32c85687@ti.com>
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
-	 <20241107125209.1736277-10-michael.nemanov@ti.com>
-	 <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-	 <2dbf1cba-0b16-413b-947e-dacf32c85687@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1731426048; c=relaxed/simple;
+	bh=L0dpDiJMmjdlYAOKDC9wZA7FJpWTTw9cN5/dys5aQAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=efIn/rcZGuJ66vJwT8Gk0/Ss7W/Qy//ZHcr4V8rX5xUcPXPZrf5PsMRoq01Dn/ullDv3/Hli5ipae0UvTuf4WoTdrH1rUMJN730G1NJPiv6pZK/HfSq03LP4yAZdGF/NtlOd65jZggPt+fQnrmsRczcnQOTaeIR9yqkOR5U06po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=usFj0Rco; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29AFFC4CECD;
+	Tue, 12 Nov 2024 15:40:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731426048;
+	bh=L0dpDiJMmjdlYAOKDC9wZA7FJpWTTw9cN5/dys5aQAM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=usFj0RcoEtTJbxf1XytUTrwzSFNq7aHN41N+HYkipJFNEOATDmH6RVeStyv0AyOHi
+	 S399BYfxGK1C80zI0XoeQfvetYlNgPO9n9EkhnFqPaBY4ph1E0tv8Xqk8sIyZ2KccN
+	 NN+z6LJqqSMimuHAuNvLcPJZhcp8NGkjj1FxQSfupUcsKaUKGqlNO/IbA4nbXVs5sj
+	 pTWaKgLHetBCoS78XwbNq6KsDMgoQ6lHYDw+E4C59h0AXAWZzp7xaGOUCGT/qSG5fh
+	 eO19wkLWB4qFJWDlxfOn/U07H1bYmtX1EkND9pXXUvRKmJOjr/hV9N+0p1UXbigrr3
+	 C8HjVwAcaaLfw==
+Date: Tue, 12 Nov 2024 07:40:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: ecree.xilinx@gmail.com, jdamato@fastly.com, davem@davemloft.net,
+ mkubecek@suse.cz, martin.lau@linux.dev, netdev@vger.kernel.org,
+ kernel-team@meta.com
+Subject: Re: [PATCH ethtool-next v2] rxclass: Make output for RSS context
+ action explicit
+Message-ID: <20241112074047.44490c6e@kernel.org>
+In-Reply-To: <978e1192c07e970b8944c2a729ae42bf97667a53.1731107871.git.dxu@dxuuu.xyz>
+References: <978e1192c07e970b8944c2a729ae42bf97667a53.1731107871.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-11-12 at 17:34 +0200, Nemanov, Michael wrote:
->=20
-> > > +static int parse_control_message(struct cc33xx *cc,
-> > > +				 const u8 *buffer, size_t buffer_length)
-> > > +{
-> > > +	u8 *const end_of_payload =3D (u8 *const)buffer + buffer_length;
-> > > +	u8 *const start_of_payload =3D (u8 *const)buffer;
-> >=20
-> > I don't think the "u8 *const" is useful here, and the cast is awkward.
-> > If anything you'd want "const u8 *const" (which should make it not need
-> > the cast), but the const you have adds no value... do you even know wha=
-t
-> > it means? ;-)
-> >=20
->=20
-> My intent was to express that start and end pointers are fixed and will=
-=20
-> not change in the loop below. When reading this again I agree this hurts=
-=20
-> more than it helps, I'll drop it.
+On Mon, 11 Nov 2024 12:05:38 -0700 Daniel Xu wrote:
+> -	if (fsp->flow_type & FLOW_RSS)
+> -		fprintf(stdout, "\tRSS Context ID: %u\n", rss_context);
+> -
+>  	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
+>  		fprintf(stdout, "\tAction: Drop\n");
+>  	} else if (fsp->ring_cookie == RX_CLS_FLOW_WAKE) {
+>  		fprintf(stdout, "\tAction: Wake-on-LAN\n");
+> +	} else if (fsp->flow_type & FLOW_RSS) {
+> +		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
+> +
+> +		fprintf(stdout, "\tAction: Direct to RSS context id %u", rss_context);
 
-Well, I don't even mind the const so much rather than the cast, I'd
-probably not have commented on it if it were
+Do you have strong feelings about the change in formatting?
+Looking at Ed's comment on the new test made me wonder if the change 
+in capitalization is for the better.
 
-	const u8 *const end_of_payload =3D buffer + buffer_length;
-	const u8 *const start_of_payload =3D buffer;
+Action: Direct to RSS context id 1 (queue base offset: 2)
 
-I'd still think the second const (for the variable) isn't all that
-useful, but really the lack of first const (for the object pointed to)
-makes the casts necessary and (IMHO) that's what hurts.
+vs
 
-> const u8 *buffer in the prototype illustrates that parse_control_message=
-=20
-> will not change the data so I'll keep it if there a re no objections.
+Action: Direct to RSS Context ID: 1 (queue base offset: 2)
 
-Sure.
+Given "id" is a word (: I like the ID format, the extra colon is
+annoying but OTOH if we retain it your regexp in the other patch
+would match before and after..
 
-> > > +	struct NAB_header *nab_header;
-> >=20
-> > surely checkpatch complained about CamelCase or so with the struct name
-> > like that?
-> >=20
->=20
-> Double-checked, no warnings from checkpatch:
+Actually the best formatting IMHO would be to skip the ID altogether:
 
-Hah, ok :) I'm surprised because it complained about _Generic in my
-patch, and that's something you really can't even change since it's C11
-standard ...
+Action: Direct to RSS Context 1 (queue base offset: 2)
 
-johannes
+So please respin this, either set the ID to upper case or skip it.
+And depending on the decision here respin the test (feel free to
+repost before 24h passes, if you do).
 
