@@ -1,136 +1,83 @@
-Return-Path: <netdev+bounces-144138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898DE9C5DF3
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:58:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D8C9C5EB3
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 18:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49318B87F81
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:13:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CE35B2AD30
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E61F20010B;
-	Tue, 12 Nov 2024 15:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54E2200121;
+	Tue, 12 Nov 2024 15:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gN8R0y5r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GP2Ua2uY"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1BF1FF053;
-	Tue, 12 Nov 2024 15:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CDC1FF5F4
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 15:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731424344; cv=none; b=pCYWuglR8RAsS75avrHmcjChcC87nMiHFiR2eQgiXTDQ/Ww6g85nCifuxX4BHy6JvGt3+cKzWlVrscVDnbnCvi3ps380hIrR+cxI8XnxRLnU4DuDydAP+vmq9XfdmFHEtpcHe73gO2RFhLACNkPO81ZW3312uyVhEXS+t55kMYI=
+	t=1731424703; cv=none; b=aA3ZaYKNlSgE5niV9niRUyfi3/wL61qDgIMnSrKGD7JmHcfIMs9FW0ylSTwarD17+l+fwJCwTZXQu5Vm7etvEKRNdQiiNaLXR7ofXz+xUsVE1pTVTiIlDM70EhQhvrrgojbNuQq65JTcKZFAMyVW7d/yW7ual1rbmGni1tKwT3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731424344; c=relaxed/simple;
-	bh=FvYDxemAYWoX77GN8sFeA7OVWjIqbPCJa5r4+zu85Rg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U591I1JSHk12rAWW9ctAYHwxo6F0aP3/glU0tVudP243BZCXAF5tGw/cJfzv/VYhu9WBT8VKWtT0aWP02h4AEE9kDMgnsN1awVjXNvXUWu+xSNuXJ3pFKhkyMDm8VEt3fdR2pFWBydDbr7TC8HqOkvFKFDHMh4fU6I+pyduJ1FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gN8R0y5r; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5AAF7240006;
-	Tue, 12 Nov 2024 15:12:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731424339;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7/ZZ+GzA9JnknmCSiZ4KAoFAxIWZALm0qPy9dvBIJSk=;
-	b=gN8R0y5rBADWu+wo+lGHeMRwjS1282FydlI9vD3kgvpHQWTYsItwv0ODr3pyxeUUL9/IZL
-	szxsyvU9qROe3EZH29OPtqpzNY1CGgw47LbshgwpkgUVX6VO2bWsajgC4TmMcGHH7r9LlY
-	G33EvbRmjGx8br4vfR0EeyZkdPYjWhhRewSY/WUDxk+ZEvI08pmAojF8qfmADEABnJxIG+
-	qoyc+4hqVEjd2XnEyLTv/JnKdPv8cfU++ryF0rzS0cTh8FTuDEnlZfczRSAd+U2jb3EZf+
-	mfFl/EYf15RQtHk91p5j5TX+qAfHgPZIWoTiawRO5TblLOHnhgPxrTSLqjvRdg==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: cathycai0714@gmail.com, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Avi Fishman <avifishman70@gmail.com>
-Cc: cathy.cai@unisoc.com, cixi.geng1@unisoc.com,
- David Miller <davem@davemloft.net>, edumazet@google.com, kuba@kernel.org,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- Network Development <netdev@vger.kernel.org>, pabeni@redhat.com,
- wade.shu@unisoc.com, xuewen.yan94@gmail.com, zhiguo.niu@unisoc.com,
- Alexandre Torgue <alexandre.torgue@st.com>,
- Murali <murali.somarouthu@dell.com>, Tomer Maimon <tmaimon77@gmail.com>,
- "Silva, L Antonio" <Luis.A.Silva@dell.com>,
- Arias Pablo <Pablo_Arias@dell.com>,
- Somarouthu Murali <Murali_Somarouthu@dell.com>, uri.trichter@nuvoton.com
-Subject: Re: [RFC PATCH] net: stmmac: Fix the problem about interrupt storm
-Date: Tue, 12 Nov 2024 16:12:17 +0100
-Message-ID: <7732873.EvYhyI6sBW@fw-rgant>
-In-Reply-To:
- <CAKKbWA6zRee9Rzee-ebLnEAvwLqnmsPswGaUo_ineyzw-b=EgQ@mail.gmail.com>
-References:
- <CAKKbWA7e0TmU4z4O8tHfwE=dvqPFaZbSPjxR-==fQSsNq6ELCQ@mail.gmail.com>
- <CAKKbWA6zRee9Rzee-ebLnEAvwLqnmsPswGaUo_ineyzw-b=EgQ@mail.gmail.com>
+	s=arc-20240116; t=1731424703; c=relaxed/simple;
+	bh=nth3J6FETCjuT0ZhgJ2WbzVPX+r5vZ9cXKeYs8Mwt5c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FDzJgUDF+sOF6B5Y8yj8dzMVoLj+vchOu+lOACTIu6Bp4NRtCg8mKVfgJQRK3kE1aucBy0uYfmT+rjB9qJWLy1TFWfMe4t6vM89ILfpRard7uvS6DYP7dw7ToVQ7Uy+tfytIda95RIH+5XvvTc+O0uBgmf3ReI7v0SCrZdFWBRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GP2Ua2uY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF89C4CED0;
+	Tue, 12 Nov 2024 15:18:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731424703;
+	bh=nth3J6FETCjuT0ZhgJ2WbzVPX+r5vZ9cXKeYs8Mwt5c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GP2Ua2uY0cnb3MK4O/2GZKsIBKct+UZyU3hCcHaX1CQG22At/E9vXMZdlcXPRLZ/w
+	 bJk3vd2emzym1+PsQeNzfSee0G0eFJ04I2jbSjkjyqppebh50A7TveSlWQOCcfkoeu
+	 K+nGli3BanOjIis7VJio547h92+1ohhB7k3KqIlw8VvCjnAgJCJ94O6dQYA00f92t0
+	 ikGEIuhD0Xa0Hz2NAIT6RapO5o+LEN+EFMHFPS3gLHnKSwGsIA0714doTdLBiDhGHN
+	 0IgHcmAZHgE8gbrDt5oVPimIbZ3CpjyLh0APp+KkjQHd+4oD8qCuatMDjEbn+77DBT
+	 qWH8fdTOvWXkQ==
+Date: Tue, 12 Nov 2024 07:18:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, alexandre.ferrieux@orange.com, Linux Kernel Network
+ Developers <netdev@vger.kernel.org>
+Subject: Re: [PATCH net v6] net: sched: cls_u32: Fix u32's systematic
+ failure to free IDR entries for hnodes.
+Message-ID: <20241112071822.1a6f3c9a@kernel.org>
+In-Reply-To: <CAM0EoMk=1dsi1C02si9MV_E-wX5hu01bi5yTfyMmL9i2FLys1g@mail.gmail.com>
+References: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
+	<CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
+	<20241111102632.74573faa@kernel.org>
+	<CAM0EoMk=1dsi1C02si9MV_E-wX5hu01bi5yTfyMmL9i2FLys1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Tue, 12 Nov 2024 07:23:29 -0500 Jamal Hadi Salim wrote:
+> > Separate patch - okay, but why are you asking people to send the tests
+> > to net-next? These sort of requests lead people to try to run
+> > linux-next tests on stable trees.  
+> 
+> AFAIK, those are the rules.
 
-On dimanche 3 novembre 2024 20:00:54 heure normale d=E2=80=99Europe central=
-e Avi=20
-=46ishman wrote:
-> Hi all,
->=20
-=2E..
-> >  Yes. It could also happen between the dev_open() and
-> >=20
-> > clear_bit(STMMAC_DOWN) calls.
-> > Although we did not reproduce this scenario, it should have happened
-> > if we had increased
-> > the number of test samples. In addition, I found that other people had
-> > similar problems before.
-> > The link is:
-> > https://lore.kernel.org/all/20210208140820.10410-11-Sergey.Semin@baikal=
-ele
-> > ctronics.ru/>=20
-> > > Moreover, it seems strange to me that stmmac_interrupt()
-> > > unconditionnally
-> > > ignores interrupts when the driver is in STMMAC_DOWN state. This seems
-> > > like
-> > > dangerous behaviour, since it could cause IRQ storm issues whenever
-> > > something in the driver sets this state. I'm not too familiar with the
-> > > interrupt handling in this driver, but maybe stmmac_interrupt() could
-> > > clear interrupts unconditionnally in the STMMAC_DOWN state?
-> >=20
-> > Clear interrupts unconditionally in the STMMAC_DOWN state directly
-> > certainly won't cause this problem.
-> > This may be too rough, maybe this design has other considerations.
->=20
-> But then after the dev_open() you might miss interrupt, no?
-
-Indeed, but in any case, unconditionally returning from an IRQ handler with=
-out=20
-clearing any interrupt flags seems like very strange behavior to me.
-
-Disabling and reenabling interrupts as you suggested does seem like a
-good solution for this particular scenario, but it doesn't solve the more
-general issue of the dangerous way stmmac_interrupt handles this.
-
-Maybe the setting and clearing of this STMMAC_DOWN bit should
-be wrapped in some kind of handler which also disables all interrupts?
-
-Best Regards
-
-=2D-=20
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
-
+Do you have more info, or this is more of a "your understanding" thing?
+E.g. rules for which subsystem? are they specified somewhere?
+I'm used to merging the fix with the selftest, two minor reasons pro:
+ - less burden on submitter
+ - backporters can see and use the test to validate, immediately
+con:
+ - higher risk of conflicts, but that's my problem (we really need to
+   alpha-sort the makefiles, sigh)
 
