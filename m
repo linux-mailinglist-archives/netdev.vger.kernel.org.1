@@ -1,73 +1,55 @@
-Return-Path: <netdev+bounces-143988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9CF9C5007
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:56:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC729C5017
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 08:59:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2213F289F2D
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:56:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4031D289F65
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028E320C022;
-	Tue, 12 Nov 2024 07:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3B920BB59;
+	Tue, 12 Nov 2024 07:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kAQNghde"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA9F20C002
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 07:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FDB20A5F7;
+	Tue, 12 Nov 2024 07:58:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731398140; cv=none; b=D2Xv7nnNdSzCBXQp3quHyUQNb1Bmo7PXS/slIDV1EceoXed7h6FqPWhR+4mQxI15pFazy9RXVQ2YttUNP46s7MReyALPm1oQWl9EU0w0fMu3jvIH5vhosusLqkmAxb2jXNMyz5nohuPbVZ9Rfaz7MZE20TqrgEVBKAgywGnX3RU=
+	t=1731398336; cv=none; b=YBA+PYtC18aJpOmwGCvulapKDFoiIEsoVxxWyx28xIyUhnzUvEJkdfEEx0hHGZindPcFloAxc1UoKZZiTBt8CHu6RfLRXuJomRDa/PTl39kv/q1pbecm28hLuAecj/q5McOrCcOTBd5MeDvvwmmIW7oMi+S19tuksJ6bV23HP/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731398140; c=relaxed/simple;
-	bh=jqfH88goHxUWmGs0ZtcBrBheyTBZFV5qaRxeqIF0nDw=;
+	s=arc-20240116; t=1731398336; c=relaxed/simple;
+	bh=RoTRhrvmdCITBhc49mGXmvaw0oxEwJ/ffEXkezefAKY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H9cwPJJbqqUDncOMQsWWXzDvlHu2bxXTF/vwEPn2tfxvvDTGfzpUpSAz5ngKjgSbVSsSPvdg4GvWvJ8QOz08BxaimqcHIgvBCSBHPV6MtRUIJZY5MU2lhgscA5Q6eWXLPLAkc33Wd1hhx2bQ+0tiSGCf3faLZEh6dxEvHarIaok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tAljt-000840-0J; Tue, 12 Nov 2024 08:55:05 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tAljp-000NFm-0Y;
-	Tue, 12 Nov 2024 08:55:01 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id A90A23712AA;
-	Tue, 12 Nov 2024 07:55:00 +0000 (UTC)
-Date: Tue, 12 Nov 2024 08:55:00 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Pantelis Antoniou <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
-	Byungho An <bh74.an@samsung.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Zhao Qiang <qiang.zhao@nxp.com>, "open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"moderated list:ARM/Allwinner sunXi SoC support" <linux-arm-kernel@lists.infradead.org>, 
-	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>, 
-	"open list:FREESCALE SOC FS_ENET DRIVER" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCHv2 net-next] net: use pdev instead of OF funcs
-Message-ID: <20241112-lush-beneficial-chicken-9a31f5-mkl@pengutronix.de>
-References: <20241111210316.15357-1-rosenp@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GWjoWxzLYxDMw0Wfx2N2WYT/wpjX7h3meam1fowJ3IIQVXCJ6XneFdj09Z2EJOPkPMIrb3RqvWAbELZaQ8u1zBUzUJGdTL5KUKWBlHtvT4/7gNGWgcNtHd+eQ4OrdLzzASKsCFl1GAsWO8JfV+WFaS8DTqvntHhXuhCni1vwVVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kAQNghde; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70AFEC4CED6;
+	Tue, 12 Nov 2024 07:58:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731398335;
+	bh=RoTRhrvmdCITBhc49mGXmvaw0oxEwJ/ffEXkezefAKY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kAQNghdeegsGhor1Ktg3raYM+rE3qcBiVjVsAZKCVg0q/KQcLPAt0Fe5fOdyqnfeb
+	 x6CnhBFgjJTY2LWLUBgQ9FHS6dN872uMPdv34B9Y1NBUZwkYUvnsrWE3HIv3PisYZN
+	 uUcI/erGMXX16bg6XRMuKZQuGM3AGTqLZOHp58CeWiP1oKtQMGYK3SPCfUM9WemehO
+	 gfuIbcWKFfBCLv8THlmkv6UEJtWup4yiTqkgKgiJmCD7YSoSQxa+AyPuibOtsB144l
+	 iE3y7s71Wivzf3rvlFomuIzDnTNMms0+u2jSZV4NSfnIjA6GabBwbIs/XV+ukCdmB0
+	 ZM+qFjnrq3MCQ==
+Date: Tue, 12 Nov 2024 08:58:52 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexhenrie24@gmail.com, branden@debian.org, linux-man@vger.kernel.org, 
+	mtk.manpages@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+Message-ID: <z7nfnfeck4dh2bfdixuysgd3nkd2dyyur5z4yiuls23jupuzqq@zstux7xbo62u>
+References: <20241111062205.207027-1-alexhenrie24@gmail.com>
+ <20241112011145.65139-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,72 +57,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wiafd67i2wzywtxu"
+	protocol="application/pgp-signature"; boundary="ov7ptd5z6nbwgukb"
 Content-Disposition: inline
-In-Reply-To: <20241111210316.15357-1-rosenp@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241112011145.65139-1-kuniyu@amazon.com>
 
 
---wiafd67i2wzywtxu
+--ov7ptd5z6nbwgukb
 Content-Type: text/plain; protected-headers=v1; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCHv2 net-next] net: use pdev instead of OF funcs
+From: Alejandro Colomar <alx@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexhenrie24@gmail.com, branden@debian.org, linux-man@vger.kernel.org, 
+	mtk.manpages@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+References: <20241111062205.207027-1-alexhenrie24@gmail.com>
+ <20241112011145.65139-1-kuniyu@amazon.com>
 MIME-Version: 1.0
+In-Reply-To: <20241112011145.65139-1-kuniyu@amazon.com>
 
-On 11.11.2024 13:03:16, Rosen Penev wrote:
-> np here is the node coming from platform_device. No children are used.
+On Mon, Nov 11, 2024 at 05:11:45PM GMT, Kuniyuki Iwashima wrote:
+> From: Alex Henrie <alexhenrie24@gmail.com>
+> Date: Sun, 10 Nov 2024 23:20:06 -0700
+> > struct ifa_cacheinfo contains the address's creation time, update time,
+> > preferred lifetime remaining, and valid lifetime remaining.
+> >=20
+> > Link: <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.g=
+it/tree/include/uapi/linux/if_addr.h?h=3Dv6.11#n60>
 >=20
-> I changed irq_of_parse_and_map to platform_get_irq to pass it directly.
+> Link does not need <> around URL.
+
+I prefer to have <> always.  It doesn't hurt.  :)
+
+> > Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
 >=20
-> I changed of_address_to_resource to platform_get_resource for the same
-> reason.
+> otherwise looks good to me:
 >=20
-> It ends up being the same.
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-You should describe in an imperative way your changes. Something like:
-
-Modernize IRQ resource acquisition.
-
-Replace irq_of_parse_and_map() by platform_get_irq()
-
-=2E..and list the other changes, too.
-
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  v2: fixed compilation errors. Also removed non devm transformations.
->  Those will be handled separately. Also reworded description.
->  drivers/net/can/grcan.c                          |  2 +-
->  drivers/net/can/mscan/mpc5xxx_can.c              |  2 +-
-
-Reviewed by: Marc Kleine-Budde <mkl@pengutronix.de> # for CAN
-
-regards,
-Marc
+Thanks!
 
 --=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+<https://www.alejandro-colomar.es/>
 
---wiafd67i2wzywtxu
+--ov7ptd5z6nbwgukb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmczCdEACgkQKDiiPnot
-vG9P5Qf9GHBDogv141w23Ql4QYhPyQNOFBbAjfAmSaXZJQjwjI2/PT9uMOtwx1N3
-xkyyFSufM0a+sr9Mn7vC+liJrlzO9Xmqq+53eTAvq2e2RPKAdVT/aPa21s05sWUI
-u1r/6bgaTgg9stZMDtivo6HAYr69FexPGYKdk9bAcm4gANpW/Ih+NpLB4IwzqKv6
-EHXEtt4AfiBCLNkq4BUwBO4D1CHsDbICmSZbC2RRZ5Jc85R9u+YYqwj7RN3EbDfL
-fWarhFuRuoGubmHPg8gaauKa5/Cxjo9fsjn93QTzRbgEgLJEsii3Y85oI0LaN0U8
-e9/zBSWu8p/gXjqOGAwOOYQ1WVxswA==
-=3yO+
+iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmczCrUACgkQnowa+77/
+2zKfSRAAlQnok3MaCRgkbNm7PaOBws4yp1GFP/+1TiX2frX972UhwbrOD6oNMsGO
+l4cqD43w5SEE6rikkcpU50yGFAhrchHpgcf3XflU9lfLa+jN0v/lexNOEGQa0kAT
+FZFjXNuBhqaVFiNT5idIykHbN406RpI/6hzNO19pQXW0jSkc5Y+AQSr9iPqWAxqk
+ZNdQcxvyuVKwTX+aTjxkAbZGmshGgiV3DHah2A0CiPYKwDcK9beKW4NDLDrIAlxQ
+SZSR4YDr5YQ3ATUGSZNn3ethL5zb63mV8KW23VGVcdcB7SnZnZ5HkfJ4mkdPWVKT
+77exltE4feQw4qrgErPchVVlIZasVkA0RM5T/7N/itzMT/KEEubzVDT5SCUoPEKa
+F3hyl4iRfxxhgDUKmvG1Vfg9BjJsIG+n6WBngHtisG60/Q68vIkwSprrfJk+Z8Gr
+2Z9KStKJadV5QHDP9o4cgcxEk4AB++TnTSTohdTr7M5NZ7poXTu1zOl0g/tcuOCM
+CPM8SoYpQECrJWCpjWIf1BK9HTNg1IXlYTxijpdkgX6+0aklCz861GFrPKA9/3Na
+snwlu9hX573w7jgUR6gHfia30i6u6RRkUHXM1iSqI3WRM9ZwyZ+bJITkSGaCqoIj
+/+XzJfiiZPxFK5M16pY8dArLb+LMMmZHKqIcfM0c9l8clfmGywk=
+=5FtM
 -----END PGP SIGNATURE-----
 
---wiafd67i2wzywtxu--
+--ov7ptd5z6nbwgukb--
 
