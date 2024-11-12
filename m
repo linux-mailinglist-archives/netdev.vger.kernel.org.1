@@ -1,191 +1,140 @@
-Return-Path: <netdev+bounces-144146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1ABF9C5BF9
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:35:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A219C5C1A
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:40:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66274282C2C
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:35:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C21A2826B6
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DD6201279;
-	Tue, 12 Nov 2024 15:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A5C2022F6;
+	Tue, 12 Nov 2024 15:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="N1tOKKtK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MtNGWWyX"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16D5201253;
-	Tue, 12 Nov 2024 15:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441402022CB
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 15:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731425707; cv=none; b=TzsNh4YfjmQQTshy7OTQynJJhVsrEaXWdOfY75lc/RI77SDuM85/2jcStYh1uaZmuevvT37NWhsuX3dzMKbKQ4lLchLg/U/9mzJSpDg/VaRWkpj7zWkTFL4p/1Z9uf3h7mqnJgvALZI2OcuxP9chz8RiBknn4ZfIULUaHtTG4rw=
+	t=1731425997; cv=none; b=NLkX9iwrbtGv2NwEhPksGACpNGUJMEbhOMuugr8xmvKzKu62e/dzm60xEkeHp2FycxrmM+/7rV+eaLtWMkYxFKdAiw9mSAwsFMFt1pGI0tzhAH2+rZLG3mGAuhbhKH3IZNw3x9eT17pmOUDq4iTakupAKZAnqiT/U43PY+RWmfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731425707; c=relaxed/simple;
-	bh=G1EL/5dFTQLrRgb48Hj4XjZL8TYLTx/GXepImuust7c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DPe0tw/j0Ey9XnRNTTew+42Gs12Iw3iEp13SjLMODAaBhvbxgMFqbvNfqU+PxRWcQfDTpfvuDi2dAJG+IfSsmkgqIXnUCFApDDz+FEgAZf4+B8Nb/rF0amuKOvbegs+HW9Ru80ca0yyGlJBPcvCRk5kq3O3Xf9o5ekr6nGywzLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=N1tOKKtK; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4ACFYlGe002943;
-	Tue, 12 Nov 2024 09:34:47 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1731425687;
-	bh=8MzERit/I5MynQF+dQgf1nzw3r//+UtEH+8JutqbrkQ=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=N1tOKKtKOwVzqV9XImxZ12Dy5wPJmJ/EUjpVqulkFVBD3ytHqCpIxI2RItcPYRbO1
-	 dWq+6jBmQ3RaT8i8DbF4SqsdQppREaFyucXXlEr9pNTdWAa7rCrQH96NPbiAfvwVU7
-	 YDfYblrJxM4fkuwtF0abUyM2Hv3/fEz/DOdmWv+k=
-Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4ACFYlQF043556
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 12 Nov 2024 09:34:47 -0600
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 12
- Nov 2024 09:34:46 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 12 Nov 2024 09:34:47 -0600
-Received: from [137.167.6.238] (lt5cg1094w5k.dhcp.ti.com [137.167.6.238])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4ACFYhX0130880;
-	Tue, 12 Nov 2024 09:34:44 -0600
-Message-ID: <2dbf1cba-0b16-413b-947e-dacf32c85687@ti.com>
-Date: Tue, 12 Nov 2024 17:34:43 +0200
+	s=arc-20240116; t=1731425997; c=relaxed/simple;
+	bh=9Jy0+1aVwHE0Ay2fyDM5dF9xZ6v9CPRpC7jsyy/euz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PaIu3i54mXckS6zkGO0DwUm4qJsXe2+eIpqLyVHMQyhemKGSjFfT5gw+OqBHdVM3xhQlPBme2cpudNfwRb1SD0tHvh33TPF4TgT4F6JQsfj5L4BMBTyxFuUQ3Uqw127t0gtAY4BYvcqgH6GOVVmV9NMXTnyZSuI5tnzDOn41udc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MtNGWWyX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731425994;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=COWxCBk/xn+lK69v98IsMcjt5CTY0uE+IGQAJjbnHp0=;
+	b=MtNGWWyX3cQLUtPOPz3iCqq5OmkBKhiAkkQ3HixLEqHEXGErifSKf10PjTm7CLuw2HUSeh
+	Dth3XX9+DBbEC7Upy13g/oGSeczQiPzpzELgCJIS4Q65c9lTcEDwWtrqTWei8QT84m3tNe
+	UspH0rebqRb5ZdX8e0IxS5fdrAE76c8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-BLH5ZvVuMKyH4KDX32kVTg-1; Tue,
+ 12 Nov 2024 10:39:48 -0500
+X-MC-Unique: BLH5ZvVuMKyH4KDX32kVTg-1
+X-Mimecast-MFC-AGG-ID: BLH5ZvVuMKyH4KDX32kVTg
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 702141955F43;
+	Tue, 12 Nov 2024 15:39:47 +0000 (UTC)
+Received: from calimero.vinschen.de (unknown [10.39.193.40])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1EE271955F3C;
+	Tue, 12 Nov 2024 15:39:47 +0000 (UTC)
+Received: by calimero.vinschen.de (Postfix, from userid 500)
+	id A9E71A806B7; Tue, 12 Nov 2024 16:39:44 +0100 (CET)
+Date: Tue, 12 Nov 2024 16:39:44 +0100
+From: Corinna Vinschen <vinschen@redhat.com>
+To: Christopher S M Hall <christopher.s.hall@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
+	vinicius.gomes@intel.com, netdev@vger.kernel.org,
+	rodrigo.cadore@l-acoustics.com
+Subject: Re: [PATCH iwl-net v3 0/6] igc: Fix PTM timeout
+Message-ID: <ZzN2wIg6qE3_gAm4@calimero.vinschen.de>
+Mail-Followup-To: Christopher S M Hall <christopher.s.hall@intel.com>,
+	intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
+	vinicius.gomes@intel.com, netdev@vger.kernel.org,
+	rodrigo.cadore@l-acoustics.com
+References: <20241106184722.17230-1-christopher.s.hall@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/17] wifi: cc33xx: Add main.c
-To: Johannes Berg <johannes@sipsolutions.net>, Kalle Valo <kvalo@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob
- Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor
- Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Sabeeh Khan <sabeeh-khan@ti.com>
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
- <20241107125209.1736277-10-michael.nemanov@ti.com>
- <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Content-Language: en-US
-From: "Nemanov, Michael" <michael.nemanov@ti.com>
-In-Reply-To: <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241106184722.17230-1-christopher.s.hall@intel.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On 11/8/2024 1:42 PM, Johannes Berg wrote:
-> Hi,
+Hi Chris,
+
+On Nov  6 18:47, Christopher S M Hall wrote:
+> There have been sporadic reports of PTM timeouts using i225/i226 devices
 > 
-> reading through this anyway looking for mac80211 integration, so I'll
-> nitpick too ... ;-)
+> These timeouts have been root caused to:
 > 
-
-...
-
->> +	if (wlvif->sta.role_chan_type != NL80211_CHAN_HT40MINUS &&
->> +	    wlvif->sta.role_chan_type != NL80211_CHAN_HT40PLUS)
->> +		ieee80211_connection_loss(cc33xx_wlvif_to_vif(wlvif));
+> 1) Manipulating the PTM status register while PTM is enabled and triggered
+> 2) The hardware retrying too quickly when an inappropriate response is
+>    received from the upstream device
 > 
-> You seem to support HE (PPE thresholds above and all that), but then you
-> still use CHAN_HT40MINUS/PLUS?! That seems ... rather wrong? You should
-> probably track in terms of NL80211_CHAN_WIDTH_*, I'm not even sure how
-> you get NL80211_CHAN_* values in the first place, mac80211 should never
-> use them now?
+> The issue can be reproduced with the following:
 > 
-
-Right, a leftover from wlcore. Since CC33xx is 20 MHz only device I'll 
-remove it.
-
-...
-
->> +static inline void cc33xx_tx_watchdog_work(struct work_struct *work)
->> +{
->> +	container_of(to_delayed_work(work), struct cc33xx, tx_watchdog_work);
->> +}
+> $ sudo phc2sys -R 1000 -O 0 -i tsn0 -m
 > 
-> I don't think that does what you think it does. Well, I don't know what
-> you think it does, but ...
+> Note: 1000 Hz (-R 1000) is unrealistically large, but provides a way to
+> quickly reproduce the issue.
 > 
-> Also there should be (almost) no inline in C files, and even if it were
-> correct you'd probably just use it exactly once?
+> PHC2SYS exits with:
 > 
-
-Agree, will get rid of inline in all functions.
-
-...
-
->> +static int parse_control_message(struct cc33xx *cc,
->> +				 const u8 *buffer, size_t buffer_length)
->> +{
->> +	u8 *const end_of_payload = (u8 *const)buffer + buffer_length;
->> +	u8 *const start_of_payload = (u8 *const)buffer;
+> "ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
+>   fails
 > 
-> I don't think the "u8 *const" is useful here, and the cast is awkward.
-> If anything you'd want "const u8 *const" (which should make it not need
-> the cast), but the const you have adds no value... do you even know what
-> it means? ;-)
+> Additional problem description tested by:
+> Corinna Vinschen <vinschen@redhat.com>
 > 
-
-My intent was to express that start and end pointers are fixed and will 
-not change in the loop below. When reading this again I agree this hurts 
-more than it helps, I'll drop it.
-
-const u8 *buffer in the prototype illustrates that parse_control_message 
-will not change the data so I'll keep it if there a re no objections.
-
->> +	struct NAB_header *nab_header;
+>   This patch also fixes a hang in igc_probe() when loading the igc
+>   driver in the kdump kernel on systems supporting PTM.
 > 
-> surely checkpatch complained about CamelCase or so with the struct name
-> like that?
+>   The igc driver running in the base kernel enables PTM trigger in
+>   igc_probe().  Therefore the driver is always in PTM trigger mode,
+>   except in brief periods when manually triggering a PTM cycle.
 > 
+>   When a crash occurs, the NIC is reset while PTM trigger is enabled.
+>   Due to a hardware problem, the NIC is subsequently in a bad busmaster
+>   state and doesn't handle register reads/writes.  When running
+>   igc_probe() in the kdump kernel, the first register access to a NIC
+>   register hangs driver probing and ultimately breaks kdump.
+> 
+>   With this patch, igc has PTM trigger disabled most of the time,
+>   and the trigger is only enabled for very brief (10 - 100 us) periods
+>   when manually triggering a PTM cycle.  Chances that a crash occurs
+>   during a PTM trigger are not zero, but extremly reduced.
 
-Double-checked, no warnings from checkpatch:
-----------------------------------------------
-$ scripts/checkpatch.pl --codespell --strict 
-../../export/upstream/patch/v5-0009-wifi-cc33xx-Add-main.c.patch
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#44:
-new file mode 100644
+The patchset looks good to me, but I don't see that this description
+will make it into the commit message of patch 1.  Was that intended?
 
-WARNING: Prefer "GPL" over "GPL v2" - see commit bf7fbeeae6db ("module: 
-Cure the MODULE_LICENSE "GPL" vs. "GPL v2" bogosity")
-#5729: FILE: drivers/net/wireless/ti/cc33xx/main.c:5681:
-+MODULE_LICENSE("GPL v2");
+Other than that...
 
-total: 0 errors, 2 warnings, 0 checks, 5687 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-       mechanically convert to the typical style using --fix or 
---fix-inplace.
-
-../../export/upstream/patch/v5-0009-wifi-cc33xx-Add-main.c.patch has 
-style problems, please review.
-
-NOTE: If any of the errors are false positives, please report
-       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-$
-----------------------------------------------
-
-Obviously will fix the definition.
+Reviewed-by: Corinna Vinschen <vinschen@redhat.com>
 
 
-Still going over all other items you referred to, will take a minute :)
-
-Thanks and regards,
-Michael.
+Thanks,
+Corinna
 
 
