@@ -1,122 +1,211 @@
-Return-Path: <netdev+bounces-143897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E87A69C4B00
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:35:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1B4B9C4B40
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:52:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1F601F231F0
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:35:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73B8F1F231F1
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26781F7068;
-	Tue, 12 Nov 2024 00:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1709320100C;
+	Tue, 12 Nov 2024 00:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XtuK8EZ5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xu+VijKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7261EABBB
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 00:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39352022F6
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 00:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731371711; cv=none; b=r+VxIBG5pH3snJzSIHnCoWrxZn4If0yTTde1JeuPG2rXs+0xqfUYYR36Wzocbya2mOhCYNQPQYgndM9f1NFk7AXepmSowTK4MGnlbmMeJvxseq38tLT8KMUUxnPsDiRsvqQUEs9i8vaTVCuUOxELJa1HONLy8GrMgMUUIQWuPK0=
+	t=1731372669; cv=none; b=qlwrc4AFOSguM8zZok2tr+GZWJ4EJKd4q57HO6oeSrNJe1TDvQZmLb4yw92hIS2DKTrxrNZ+OcjHET5K5cBAyQkf0NaDGaIpU/NhQZCJMN3wDe9pOm344CTcBwTGiGIU5S4QB54gjsUo7hfYY3AZLlNYyFcujmEqE57yY/E5jME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731371711; c=relaxed/simple;
-	bh=PkbyTMgFqOzcboehWlrrNjFh8Q2ib415gbHXRRFnbKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lHG/VOVj408i+ydn/VFAwBHNTgh6MxF/E1yp/4dwwtRqv7ZBkKWkKwavnhS/AB9XBRu9tNvpfeRfgBJCPkHRyOmlHXDLIQLYIk8FvuW7lxPuhfoGlmIg9OOGcx2Ik8Avb55X9VV0sS84YkZMq40hfIjHj6RZmMZ9suCnqW7ENeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XtuK8EZ5; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20e6981ca77so57860285ad.2
-        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 16:35:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731371709; x=1731976509; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EKgRrgLp424rRp+9+I/8Qg6L1UWiV8NeCx/IXJG06O4=;
-        b=XtuK8EZ5k0B8EVS8lRpTMmyiSJxFc1EDkFbTXoxtx9vK6MIba3rfrQYXjWN4wCFgNl
-         KVmV1YCHOlYfFs91bgsD5uZfXAX2RtJjDeT5rAGeWRHZS5wdYsjwH7xLuEdpLPFcbS2i
-         0IFXutOvz/P3fbHTY9RqSw8+v7wu2cqAI6sSRjsB9m9KrgMI+7BhShgk+hVKxn7R12Gw
-         FvhakkkgAhhjzy9SjtneVLmShHgl8tPNP1GUspDLXlM4IUJswOKOb9n1DzDBRptwLjXd
-         oNS9iSJ52FDxMepWV3f7L+2kvu6QuoeEdICOfnTthmTbqKslZ2P9BqzkPrw2Wp2twy07
-         xTPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731371709; x=1731976509;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EKgRrgLp424rRp+9+I/8Qg6L1UWiV8NeCx/IXJG06O4=;
-        b=fUMQpwYkYlBbLUylgqT/jmfVgzwa+G4wDZ9GrPbyA5xr2AMH9Dv6tvoObTnBGnwp9y
-         3HTgtChpHaHsDbgs/i7M4yLXHw3YrykZrKfJlTxUJtdjAxTn+9D8SQ1CI/50QiZikzO7
-         6nl4qbWeeYGJLgJY+z45qs8iOvbOYhAdigKEAWSvUQ4VIz1QSWj3F0xMw5iyPyI/jkBr
-         YOgHZjiW/wkZHpxndgP23n7+3aKmbUeF5/KPgd0vJvF+Ww1edE48VHVCMx/MW4cc0rGh
-         EWeMRckgNr+XqHD4mgkhrG/ZqwgoKolZB3Py3z88H/cONqsdBw+iXaLkUwKsGGNosAMa
-         FMSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWeMo6kXd8rQNo+ujMTbLYzHNebTk5RIp9AFbpXqsWvmCms/Ez7lNpKkklM+bl8kIqej5DmNcE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrJJyJxMenTVPfRuciGnRf3GwGwJr/oJoIZX8HCWXOhE0U9rmv
-	fq9gayovwEsQ0UOQE1wHjxB63PO9+dH8nGa8f+7mvKBbCk02qA2s1ILOgwkA1Rg=
-X-Google-Smtp-Source: AGHT+IGQTUP7sJ930EzsgxemjH6kwFcSH2PpZgSrP5gAgxNP+jgwhKNTZv9LbZwLWAoEXjOkZzUgZw==
-X-Received: by 2002:a17:902:d4d0:b0:20b:ab4b:5432 with SMTP id d9443c01a7336-211834f2d6bmr134631535ad.12.1731371709530;
-        Mon, 11 Nov 2024 16:35:09 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dc8376sm82809975ad.44.2024.11.11.16.35.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 16:35:09 -0800 (PST)
-Date: Mon, 11 Nov 2024 16:34:30 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
- Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kw@linux.com>,
- linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>, Aditya Prabhune
- <aprabhune@nvidia.com>, Hannes Reinecke <hare@suse.de>, Heiner Kallweit
- <hkallweit1@gmail.com>, Arun Easi <aeasi@marvell.com>, Jonathan Chocron
- <jonnyc@amazon.com>, Bert Kenward <bkenward@solarflare.com>, Matt Carlson
- <mcarlson@broadcom.com>, Kai-Heng Feng <kai.heng.feng@canonical.com>, Jean
- Delvare <jdelvare@suse.de>, Alex Williamson <alex.williamson@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] PCI/sysfs: Change read permissions for VPD
- attributes
-Message-ID: <20241111163430.7fad2a2a@hermes.local>
-In-Reply-To: <20241111204104.GA1817395@bhelgaas>
-References: <f93e6b2393301df6ac960ef6891b1b2812da67f3.1731005223.git.leonro@nvidia.com>
- <20241111204104.GA1817395@bhelgaas>
+	s=arc-20240116; t=1731372669; c=relaxed/simple;
+	bh=uAKm1Q9rSMgb/s8lIoy6s2itwU6TBOZsyRFjUDSDSEE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RqrI55XOH4z3PAg/AMmXWwODsd+X8ZyBS0DaQosSM0UN7+TlCk0TW9vPpaCNP/5b/ADiRl1ArXbam1uyDhNI4kK6GpH4VaPeTXnc/gghZdgZmCFOQiJQIctKPeS2jGHNmN0yb7JNc1L1tHyPvUnsMArbkSvqegjv5wUzlUs7o9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xu+VijKs; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <668e6f75-bdf3-44f8-a9e8-306fd4a22eb1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731372658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tsSPQNZ5iLWASov38WAAf5vQXcJL0Tq9FLpBjWnTTcA=;
+	b=Xu+VijKsvEDV9ltfIimmgjDxgefoW9/OYsFf6aTxt5KikhbVHXEFyV467azrh1OV46JcgB
+	l4M2MUpmpg4czb3aJkxUizyFzh3vYTsSKwlw6bkJXL1X2cirZqyDw8JeL6BbMrzKancB3p
+	tTd0A4p6K3+pT6KDyW/jr5leCLj8mkc=
+Date: Mon, 11 Nov 2024 16:50:49 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next/net 2/5] bpf: Add mptcp_subflow bpf_iter
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+ Geliang Tang <geliang@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Martin KaFai Lau <martin.lau@kernel.org>
+References: <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-0-cf16953035c1@kernel.org>
+ <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-2-cf16953035c1@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-2-cf16953035c1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 11 Nov 2024 14:41:04 -0600
-Bjorn Helgaas <helgaas@kernel.org> wrote:
-
-> On Thu, Nov 07, 2024 at 08:56:56PM +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > The Vital Product Data (VPD) attribute is not readable by regular
-> > user without root permissions. Such restriction is not really needed
-> > for many devices in the world, as data presented in that VPD is not
-> > sensitive and access to the HW is safe and tested.
-> > 
-> > This change aligns the permissions of the VPD attribute to be accessible
-> > for read by all users, while write being restricted to root only.
-> > 
-> > For the driver, there is a need to opt-in in order to allow this
-> > functionality.  
+On 11/8/24 7:52 AM, Matthieu Baerts (NGI0) wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
 > 
-> I don't think the use case is very strong (and not included at all
-> here).
+> It's necessary to traverse all subflows on the conn_list of an MPTCP
+> socket and then call kfunc to modify the fields of each subflow. In
+> kernel space, mptcp_for_each_subflow() helper is used for this:
 > 
-> If we do need to do this, I think it's a property of the device, not
-> the driver.
+> 	mptcp_for_each_subflow(msk, subflow)
+> 		kfunc(subflow);
+> 
+> But in the MPTCP BPF program, this has not yet been implemented. As
+> Martin suggested recently, this conn_list walking + modify-by-kfunc
+> usage fits the bpf_iter use case.
+> 
+> So this patch adds a new bpf_iter type named "mptcp_subflow" to do
+> this and implements its helpers bpf_iter_mptcp_subflow_new()/_next()/
+> _destroy(). And register these bpf_iter mptcp_subflow into mptcp
+> common kfunc set. Then bpf_for_each() for mptcp_subflow can be used
+> in BPF program like this:
+> 
+> 	bpf_for_each(mptcp_subflow, subflow, msk)
+> 		kfunc(subflow);
+> 
+> Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+> Notes:
+> A few versions of this single patch have been previously posted to the
+> BPF mailing list by Geliang, before continuing to the MPTCP mailing list
+> only, with other patches of this series. The version of the whole series
+> has been reset to 1, but here is the ChangeLog for this patch here:
+>   - v2: remove msk->pm.lock in _new() and _destroy() (Martin)
+>         drop DEFINE_BPF_ITER_FUNC, change opaque[3] to opaque[2] (Andrii)
+>   - v3: drop bpf_iter__mptcp_subflow
+>   - v4: if msk is NULL, initialize kit->msk to NULL in _new() and check
+>         it in _next() (Andrii)
+>   - v5: use list_is_last() instead of list_entry_is_head() add
+>         KF_ITER_NEW/NEXT/DESTROY flags add msk_owned_by_me in _new()
+>   - v6: add KF_TRUSTED_ARGS flag (Andrii, Martin)
+> ---
+>   net/mptcp/bpf.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 45 insertions(+)
+> 
+> diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
+> index 6f96a5927fd371f8ea92cbf96c875edef9272b98..d107c2865e97e6ccffb9e0720dfbbd232b63a3b8 100644
+> --- a/net/mptcp/bpf.c
+> +++ b/net/mptcp/bpf.c
+> @@ -29,6 +29,15 @@ static const struct btf_kfunc_id_set bpf_mptcp_fmodret_set = {
+>   	.set   = &bpf_mptcp_fmodret_ids,
+>   };
+>   
+> +struct bpf_iter_mptcp_subflow {
+> +	__u64 __opaque[2];
+> +} __aligned(8);
+> +
+> +struct bpf_iter_mptcp_subflow_kern {
+> +	struct mptcp_sock *msk;
+> +	struct list_head *pos;
+> +} __aligned(8);
+> +
+>   __bpf_kfunc_start_defs();
+>   
+>   __bpf_kfunc static struct mptcp_sock *bpf_mptcp_sk(struct sock *sk)
+> @@ -48,12 +57,48 @@ bpf_mptcp_subflow_tcp_sock(const struct mptcp_subflow_context *subflow)
+>   	return mptcp_subflow_tcp_sock(subflow);
+>   }
+>   
+> +__bpf_kfunc static int
+> +bpf_iter_mptcp_subflow_new(struct bpf_iter_mptcp_subflow *it,
+> +			   struct mptcp_sock *msk)
+> +{
+> +	struct bpf_iter_mptcp_subflow_kern *kit = (void *)it;
+> +
+> +	kit->msk = msk;
+> +	if (!msk)
+> +		return -EINVAL;
+> +
+> +	msk_owned_by_me(msk);
 
-I remember some broken PCI devices, which will crash if VPD is read.
-Probably not worth opening this can of worms.
+I recalled in the earlier revision, a concern had already been brought up about 
+needing lock held and using the subflow iter in tracing. This patch still has 
+the subflow iter available to tracing [by 
+register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC)]. How is it supposed to work? 
+Adding msk_owned_by_me(msk) does not help. At best it will give a WARN which is 
+not good and then keep going even msk is not locked.
+
+Do you need to use subflow iter in tracing?
+
+The commit message mentioned it needs to modify the subflow. I don't see how 
+this modification could work in a tracing program also. It must be some non 
+tracing hooks? What is the plan on this hook? Is it a bpf_struct_ops or 
+something else?
+
+If it needs to modify the subflow, does it need to take the lock of the subflow?
+
+> +
+> +	kit->pos = &msk->conn_list;
+> +	return 0;
+> +}
+> +
+> +__bpf_kfunc static struct mptcp_subflow_context *
+> +bpf_iter_mptcp_subflow_next(struct bpf_iter_mptcp_subflow *it)
+> +{
+> +	struct bpf_iter_mptcp_subflow_kern *kit = (void *)it;
+> +
+> +	if (!kit->msk || list_is_last(kit->pos, &kit->msk->conn_list))
+> +		return NULL;
+> +
+> +	kit->pos = kit->pos->next;
+> +	return list_entry(kit->pos, struct mptcp_subflow_context, node);
+> +}
+> +
+> +__bpf_kfunc static void
+> +bpf_iter_mptcp_subflow_destroy(struct bpf_iter_mptcp_subflow *it)
+> +{
+> +}
+> +
+>   __bpf_kfunc_end_defs();
+>   
+>   BTF_KFUNCS_START(bpf_mptcp_common_kfunc_ids)
+>   BTF_ID_FLAGS(func, bpf_mptcp_sk)
+>   BTF_ID_FLAGS(func, bpf_mptcp_subflow_ctx)
+>   BTF_ID_FLAGS(func, bpf_mptcp_subflow_tcp_sock)
+> +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_new, KF_ITER_NEW | KF_TRUSTED_ARGS)
+> +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_next, KF_ITER_NEXT | KF_RET_NULL)
+> +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_destroy, KF_ITER_DESTROY)
+>   BTF_KFUNCS_END(bpf_mptcp_common_kfunc_ids)
+>   
+>   static const struct btf_kfunc_id_set bpf_mptcp_common_kfunc_set = {
+> 
+
 
