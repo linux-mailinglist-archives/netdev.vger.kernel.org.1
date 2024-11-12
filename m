@@ -1,129 +1,140 @@
-Return-Path: <netdev+bounces-144252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92479C6547
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:37:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A539C654B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829141F2376F
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:37:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379C5284800
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 23:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E6F21B449;
-	Tue, 12 Nov 2024 23:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02A821B44A;
+	Tue, 12 Nov 2024 23:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=everestkc-com-np.20230601.gappssmtp.com header.i=@everestkc-com-np.20230601.gappssmtp.com header.b="UkuUvAje"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="foEY8jE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F52420ADC6
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 23:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9483420ADC6;
+	Tue, 12 Nov 2024 23:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731454675; cv=none; b=mdIFw4VDhBU0fcLvhUVQDzfhIsylCa4jWnWKPACIjobOuY+NrJkOaRz7nliIQx6OpmSozQO1BdeqCL1zeTnY1mgL6PPWhkUXqHZELAI1W8uckvJI+fa7fk1q7nbe2SWtHas6Ah4M2rYvPeyCxN+owEKg0Do1IVAtuf/c+VHFMQk=
+	t=1731454726; cv=none; b=r5EPUow0IPRwVMlN6KMB43B+WP/HdJDpL+3iEsLgeR9tbfWGWd5U01JJ3mSWnLBU/hoQqsu5L9GOaOko4G5PO3+sMb/1TSFhoPsExKlrOIiERXreX6TGH6gsYekznyLoHlmvXnN1BE2BFH5FRly557/Mdw/G2qGmvLiOdxKceVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731454675; c=relaxed/simple;
-	bh=NS0oEJGLQMzwsxiRqjLbzLHQvzAKQUI4puz5ttzO3ks=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BTKT3rwcMhFQJdb1Gq1+MxcFX4AmSvVJvz14NHtj0vMaq7zzLTkJvu2TV+hrD+SPDlHqYDjdjQjQe0b4h8u8AyXgEyp4CepHHZT+V1FPzlMpUCZs7uQ7DpbRb9ymqR/qPMFJUtiN2YFVqS84VDOwjK5l5pm1DYKFtVBeC8PplaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=everestkc.com.np; spf=pass smtp.mailfrom=everestkc.com.np; dkim=pass (2048-bit key) header.d=everestkc-com-np.20230601.gappssmtp.com header.i=@everestkc-com-np.20230601.gappssmtp.com header.b=UkuUvAje; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=everestkc.com.np
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=everestkc.com.np
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20caea61132so54157735ad.2
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 15:37:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=everestkc-com-np.20230601.gappssmtp.com; s=20230601; t=1731454673; x=1732059473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YqXhkb9k4iQOMcnVT7rmgsvdL5//NXM53qxV9Inaccs=;
-        b=UkuUvAjedCivHk8wUefarjgCbvX6sxpQhad9uSYvae4Y7SCA6LsaaAbncBANSPycIP
-         25xFVgUpBGbzAoYX1LShImqwlWtjLW6BsyYi42Ip3HBqfPueFt0hPrBtz8HPi5Rv/tnL
-         PegsAl58dcohWZUF/GkVeBrsHknReeK+PdyFF860CA376W3jNEj7qfxWfY4guJSb9NWJ
-         sGS7ZDbnnm0FqzEaCaUim6ExSFfM80ZWQnUprQzBBFTcyj4sCRytd9l3670iWpn3U5qr
-         u5JW2f5Q4DDPLSwh8ajthDHEo7f0G8U7XlMbMN2TxiakNZhOwwc39FfMZGL5UfBuuh+T
-         Qz/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731454673; x=1732059473;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YqXhkb9k4iQOMcnVT7rmgsvdL5//NXM53qxV9Inaccs=;
-        b=KrMp8mMoPV2SEp3kXPOIVKgBmHUojoyuzmvWY2h/CrwEboTOdb/1ZEPQPBtXgqm+hj
-         ab3fVT06ll/35hj56HxMNm/GnJaXvW/IOQjw2DgCIDSIfEkGPasCR+Pt8JoN5NW5rmGX
-         mTOD50DvyuoMecVD2MrcqO9l9Jr24URd2141tFSNKXDWv+7kM2x8Id88fqSkoyWGje9F
-         djWx2qPQKw2n190oYM/nh0/mLmycuYvF7HqMMunTowruS1Mw+crR6d+vcnDHPbUAc8bs
-         1LFOxcJKrBrvLFRhbrzlumq7PRa3f8rGDfNty3uNCH0cdxrE81Tf7Jx1oVogBBRhB1pD
-         DWbw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWYgAETgibqxWcuDClzu9XfzM3SpIm/gSEEidZXC/UVVbcyWGsrNyE6kyM6zySWFIG6E0qBd8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+/00ELw3Pe3Skb9j+S0W+NWz7OaWoH5alavg08/E9pEDlOeoE
-	194MjTpymW+eVozZ4n3bRJxpwxK42GDBA3vSZnLdy6UN7tFjpvBl3bOiWq0jxs4=
-X-Google-Smtp-Source: AGHT+IGASecOiEAWmurWKnj+5DHPb4A0So/iYD/w6/x8Nel5WVXfgUdx9n98XhVQcCgEmMcc4HQFpA==
-X-Received: by 2002:a17:903:1246:b0:20b:ab6a:3a18 with SMTP id d9443c01a7336-2118350d16fmr263060925ad.17.1731454673455;
-        Tue, 12 Nov 2024 15:37:53 -0800 (PST)
-Received: from localhost.localdomain ([91.196.220.163])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-21177e419a4sm99549815ad.149.2024.11.12.15.37.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 15:37:52 -0800 (PST)
-From: "Everest K.C." <everestkc@everestkc.com.np>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: "Everest K.C." <everestkc@everestkc.com.np>,
-	netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] xfrm: Add error handling when nla_put_u32() returns an error
-Date: Tue, 12 Nov 2024 16:36:06 -0700
-Message-ID: <20241112233613.6444-1-everestkc@everestkc.com.np>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1731454726; c=relaxed/simple;
+	bh=4jhBImA9fphWU/iPklkgltmJav0ylKqo+Ae/jTfczDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fETnFxJS4EHAMExtibetJj0PA1zrQn8GR8eMCd35tXUavCZTSb8DqG0/7CjQ9eBZ9LPRfnkf0jx9yZsmWAqRRkVYqjQe02XOjmHQ0uHMJjcT70BnmQLOQeFqTUodkNDsNt64+Gs+c6xDGXbVLQkOPYBhAal8nBdsyccdtiCHoMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foEY8jE/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4C9DC4CECD;
+	Tue, 12 Nov 2024 23:38:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731454726;
+	bh=4jhBImA9fphWU/iPklkgltmJav0ylKqo+Ae/jTfczDo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=foEY8jE/MaZ1a2YPpL0RG4WjZrUhXg4E9Dxu436Kx/EWTXwFIIrx+zRx98Ww/C829
+	 FMrDNlN7olIKiG+1D2Xt9BXYvDDlSohLMixPSznHLo4dtXnuj3C2aDzi6VILw7bzc9
+	 78d5393lHqCzcPF45zHu3Px/3HCNTwZ6jT0TShSHe71Yy2OL3CtmtaeYaSs+OQY4D+
+	 nhO3SE4b5cDIarqTOy+3UtPci0bJ5kTt0tliF76LT7uiR6r6Pe+EozOQxu/ffFeJFJ
+	 KoyJDq0tjoEjV+IrehMbjmQVDj5B8XwZn6txxBDGZXJ++L84Ugm9mM/+tE30t+Qfk2
+	 dPotO3BFVzE3g==
+Date: Wed, 13 Nov 2024 00:38:42 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexhenrie24@gmail.com, branden@debian.org, linux-man@vger.kernel.org, 
+	mtk.manpages@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+Message-ID: <fvfuejrz36cejk344h646cm2chfnfangqjyq4pzpjeuhaxacq2@6kzmclbqsqg6>
+References: <udctaxcv6yqjvffgrtzgqo24ee3kr4h4ku66ubohc7l4hqwg3w@6ujhaoyg4kla>
+ <20241112233329.20660-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="uvruoyo774in7xnr"
+Content-Disposition: inline
+In-Reply-To: <20241112233329.20660-1-kuniyu@amazon.com>
 
-Error handling is missing when call to nla_put_u32() fails.
-Handle the error when the call to nla_put_u32() returns an error.
 
-The error was reported by Coverity Scan.
-Report:
-CID 1601525: (#1 of 1): Unused value (UNUSED_VALUE)
-returned_value: Assigning value from nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num)
-to err here, but that stored value is overwritten before it can be used
+--uvruoyo774in7xnr
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+From: Alejandro Colomar <alx@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexhenrie24@gmail.com, branden@debian.org, linux-man@vger.kernel.org, 
+	mtk.manpages@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH man-pages v2] rtnetlink.7: Document struct ifa_cacheinfo
+References: <udctaxcv6yqjvffgrtzgqo24ee3kr4h4ku66ubohc7l4hqwg3w@6ujhaoyg4kla>
+ <20241112233329.20660-1-kuniyu@amazon.com>
+MIME-Version: 1.0
+In-Reply-To: <20241112233329.20660-1-kuniyu@amazon.com>
 
-Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
-Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
----
- net/xfrm/xfrm_user.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Hi Kuniyuki,
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index f0ee0c7a59dd..a784598cc7cf 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2607,9 +2607,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
- 	err = xfrm_if_id_put(skb, x->if_id);
- 	if (err)
- 		goto out_cancel;
--	if (x->pcpu_num != UINT_MAX)
-+	if (x->pcpu_num != UINT_MAX) {
- 		err = nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
--
-+		if (err)
-+			goto out_cancel;
-+	}
-+
- 	if (x->dir) {
- 		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
- 		if (err)
--- 
-2.43.0
+On Tue, Nov 12, 2024 at 03:33:29PM GMT, Kuniyuki Iwashima wrote:
+> From: Alejandro Colomar <alx@kernel.org>
+> Date: Wed, 13 Nov 2024 00:26:15 +0100
+> > > diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
+> > > index 86ed459bb..ed08834b0 100644
+> > > --- a/man/man7/rtnetlink.7
+> > > +++ b/man/man7/rtnetlink.7
+> > > @@ -176,7 +176,24 @@ IFA_BROADCAST:raw protocol address:broadcast add=
+ress
+> > >  IFA_ANYCAST:raw protocol address:anycast address
+> > >  IFA_CACHEINFO:struct ifa_cacheinfo:Address information
+> > >  .TE
+> > > -.\" FIXME Document struct ifa_cacheinfo
+> > > +.IP
+> > > +.EX
+> >=20
+> > I expect users that need to use this struct to also need to include the
+> > header that defines it, right?
+>=20
+> rtnetlink.7 tells #include <linux/rtnetlink.h> is needed in SYNOPSIS
+> and the header internally includes <linux/if_addr.h>, so users need
+> not include it explicitly for struct ifa_cacheinfo.
+>=20
 
+Ahh, okay.  Then it's fine.
+
+Thanks!
+Alex
+
+>=20
+> > We should probably specify it by using
+> > an #include.  What do you think?
+>=20
+> So I think we need not mention linux/if_addr.h here.
+
+--=20
+<https://www.alejandro-colomar.es/>
+
+--uvruoyo774in7xnr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmcz5wIACgkQnowa+77/
+2zKz0g/9EGXL6rBiHLOffPE8b9l1Yny6ZHBw0qNjCMKDSeyi1qpTNWxNOhoHOJyu
+NXhbmjrKsBo1TDpM8FdncDhg7pDwZLcqyH9w6CkNjJRUYGkdiPlkDF3J3F3zXYHY
+T+JnQ0l4QtI/Mgzdeo8GwaCDoZ25VJigIgUPYg9z+nbsqpn2IsyVN3HFYD80uGoY
+xDIe3Qva4RKfJC8jisMCN49+U4THqgmyA6RQthuQ8mA8kyKM4xm1qEMEYPE0DFds
+/EJlewUqLyHm2gFlH7iPtZmbQwbruON/3EVxwQBmZ/UXD+q8hNG7tJUGKi1Q6fSQ
+cdTmnjhfTovhc157WYTR5uzqscrtL1qfjCZdAitDXw74l7tDyex4TEieUYDqT9Dc
++64nQlu0YVrhg5wX17kwkVTBnY3X0i2/SUDYGjVLn0UXZO9pqDeivj6TkCJRMNcK
+mN/8mjVvHgJT+lTmCVCAaY+tSVUYvDrBBIk+xdRhRe6jW/gQ5INS5xnj3nJh/16o
+I8Y3dHA+lgy0p7tjguzu2bzqLoSfgajpPn/GVTFe01zBLS3m+MlYr5Uw+skwh8+3
+OPYewBWA7WlPvb0LwgRPR8+iNWKPfckzIRJczdOQ56MWh+eEne78q+bmFZFYoVVj
+AtrhevXdP0NjFzSsLxUZO53n0VccnTiUrbaw2UKQ8ri2RSXFEP0=
+=9Q3+
+-----END PGP SIGNATURE-----
+
+--uvruoyo774in7xnr--
 
