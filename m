@@ -1,108 +1,129 @@
-Return-Path: <netdev+bounces-144159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC9B9C6173
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:30:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A06219C62E8
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 21:52:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67395B366A6
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:52:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B4D8B61938
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D555A208223;
-	Tue, 12 Nov 2024 16:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2725320822E;
+	Tue, 12 Nov 2024 17:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZdRuqB6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D872076D5;
-	Tue, 12 Nov 2024 16:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EAF2076D5;
+	Tue, 12 Nov 2024 17:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731430298; cv=none; b=pnxrPGWmwaawJQTEAwR62xCruKItZ7HyrdwVk/Or5sTYe7XIjcGKWw6tnk4RKlAJcuQW+cppZRLaGO8H3Om8Ruz5XAT/LZddBcLbvlwgMVXxzvdXSukb6K31LxiEtCFopKMtGw8QADjTQcZ4HHp/of2Gj6Y6oPDJ1xLtJtTcHJo=
+	t=1731431227; cv=none; b=dwcj0/9SPibFFuE1SGZsEd2Si92SyE9IVlpV2RMYwvLsP4geEWyxPJG08w1ryW2lczq4ZSgP0oSAYAs+QxyA/CrThMcouo0yOH9s0lFubcgTh8jGJitM6Iv76D2G434CG0m8eZ72s4oDOFXRY8BDDzYj8z801ZgoFd/gnI9UBi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731430298; c=relaxed/simple;
-	bh=HUuRF+VpnVCdV5kJ9WCQELFFEG9d8bVIIEs+eIl+0EM=;
+	s=arc-20240116; t=1731431227; c=relaxed/simple;
+	bh=vsBKz9P3aXcIkDkNHgjbl6t9R5yXoxKtjWQKWV2NGPI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nGed7kTo8K4z2jheA5MT32NH0+/rsDKGf16sBw4t4tqT4O30dGgT6Si3EppgBDYgQQMFa+PbDMfsoKhh8D5UfMcq1+yCMAR/0mikRjK17y0mzm8tnnFbFkGfTiOrCv0tySuRH//o0/8F1xxI4JvUVzroMHNtdz3MJOWf4TWROVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7240fa50694so4533194b3a.1;
-        Tue, 12 Nov 2024 08:51:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731430296; x=1732035096;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=llFs2o/AZRfDbTGGAt9cEjHshD2VstPRhzSHKTGEl4Y=;
-        b=X6041hvkCbzoud9NJ+YY92RiSr+Z2FEJJUc8xijOM7tq5Is2vSxCrc0fg5krZGrjrs
-         WXor6f2Kw8YbXKiy9zXR/fRMZxIjKXBQPk+PTndYih1jjAq5ewqF12pw43zQbacAKJoM
-         /65+VH3Rp0OTWGWZC/QfxBiA2ePx1XYDYjQOnRpRdOovxqQSyb0LZfPgBZQnnR4VJu96
-         +Hoe7bbcfvKWN9T3MDx4AkXdOC+ktNclL0qquVmTgw31+fw+IYEtX3cDJmvHIMDtcPEB
-         drY0W+f5YGiDsDWQYe5jGY+t6aU5E9Ks+gwHeYswAyKZ2XZeOFzpUAtKpL7WDK9hOVbp
-         HbNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVfkcMJb/ttUzGMy+F9UhUgn22/5d0dna11jfbIkhaF0wQ/RqlhIu0oGaV2U+LgcgIyW86junr6eLePq8k=@vger.kernel.org, AJvYcCWTDkDyEzdBLfdTUMskpGn7OyBILVZIrU+JnluYqrtvKsKCvuWFQy4W9I1b9JMgLqJsetOqtHBv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/E8O6NosWPh/NNEpAl2YfKKwltlQ5tKaogE8dX+DJPRbF5mTP
-	brZzqRqtyn9Nk0dAv2YMxOWkxQTID6V+0X1OfVRFKCQ6L7l6CLcxkA6zpw==
-X-Google-Smtp-Source: AGHT+IGfEvt+vr5Gelf7D4xOsG1UREz/mUJN+n6wyuY+ufWwPryyN6GsE6YKmfawgOTA2GUdFXWWKw==
-X-Received: by 2002:a05:6a00:a1d:b0:71e:693c:107c with SMTP id d2e1a72fcca58-724132c15a3mr21756587b3a.11.1731430296049;
-        Tue, 12 Nov 2024 08:51:36 -0800 (PST)
-Received: from localhost.localdomain (124x33x176x97.ap124.ftth.ucom.ne.jp. [124.33.176.97])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407860aa5sm11271260b3a.32.2024.11.12.08.51.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 08:51:35 -0800 (PST)
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-To: linux-can@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Robert Nawrath <mbro1689@gmail.com>,
+	 MIME-Version; b=Hf0P5mJPtgvCrTXOqVxTgjNXEhCqmkFu97ePkey/0+VetVOgeubQaSYKQUCPo+g/3olrg0lF2VOXGCOx8UH+Lq4xhbvjOTZSzPsAavcsHQFHZZhTdqjrRokqsUF16JysZyHdbwFyJ010gBaav+lBwfMGBwmSAQx89mcwfi/53N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZdRuqB6L; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4F093E0004;
+	Tue, 12 Nov 2024 17:07:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731431223;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZw9t9ICWMYTWiUjhgkRGFqANmNYJTvr2/KWvvFKqHo=;
+	b=ZdRuqB6L+RSgkn6gJdetR5a//9ZEmm5dAtN5Y6Hzy52DpESNjKNM55X63uMNNMpHOmryNP
+	b8IzA/heHgjBiJtwmoGiQshyNtHJIxc7/Dvrr8c2f3/9S2YYnabTrnPD3e4f6WxFumiM2s
+	0KyBM4wzec6A6nwUawnFC4JPukLkZlbza/iJaGaTvbrjXm5twEE+Wc/J78h15bNyfJgQND
+	gg4LbUGSSp4conVDdSjRQWHVg8sfAKaI5EAd/UrDHmiCzFV4iaROc2/nCd17iXAG1Fn/RU
+	EQ2AQBCtQQQzdmjPVAOvnsy8+KAEP8MTlNaaII8X4RjtblkApLYxCxP0sx32gg==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH v1 2/5] can: netlink: replace tabulation by space in assignment
-Date: Wed, 13 Nov 2024 01:50:17 +0900
-Message-ID: <20241112165118.586613-9-mailhol.vincent@wanadoo.fr>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
-References: <20241112165118.586613-7-mailhol.vincent@wanadoo.fr>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Daniel Machon <daniel.machon@microchip.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 1/9] net: stmmac: Don't modify the global ptp ops directly
+Date: Tue, 12 Nov 2024 18:06:49 +0100
+Message-ID: <20241112170658.2388529-2-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
+References: <20241112170658.2388529-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1188; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=HUuRF+VpnVCdV5kJ9WCQELFFEG9d8bVIIEs+eIl+0EM=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnG7W1hM5fP5rqw0lzPsNmzMvvm9+aWuvhyxkebfRwzf 4pu3dLaUcrCIMbFICumyLKsnJNboaPQO+zQX0uYOaxMIEMYuDgFYCL39jP8s9o499TinmvPt8kU JoV5VV/7wPM57/iXdYp8Sh5Lzq3Oc2P4xcTOEi0609Yhz+VX2KO50tvSp/q1pMh7frm2vjWJTae RCQA=
-X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-commit cfd98c838cbe ("can: netlink: move '=' operators back to
-previous line (checkpatch fix)") inadvertently introduced a tabulation
-between the IFLA_CAN_DATA_BITTIMING_CONST array index and the equal
-sign.
+The stmmac_ptp_clock_ops are copied into the stmmac_priv structure
+before being registered to the PTP core. Some adjustments are made prior
+to that, such as the number of snapshots or max adjustment parameters.
 
-Remove it.
+Instead of modifying the global definition, then copying into the local
+private data, let's first copy then modify the local parameters.
 
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/can/dev/netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index 7455a7c5a383..df8b7ba68b6e 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -18,7 +18,7 @@ static const struct nla_policy can_policy[IFLA_CAN_MAX + 1] = {
- 	[IFLA_CAN_CLOCK] = { .len = sizeof(struct can_clock) },
- 	[IFLA_CAN_BERR_COUNTER] = { .len = sizeof(struct can_berr_counter) },
- 	[IFLA_CAN_DATA_BITTIMING] = { .len = sizeof(struct can_bittiming) },
--	[IFLA_CAN_DATA_BITTIMING_CONST]	= { .len = sizeof(struct can_bittiming_const) },
-+	[IFLA_CAN_DATA_BITTIMING_CONST] = { .len = sizeof(struct can_bittiming_const) },
- 	[IFLA_CAN_TERMINATION] = { .type = NLA_U16 },
- 	[IFLA_CAN_TDC] = { .type = NLA_NESTED },
- 	[IFLA_CAN_CTRLMODE_EXT] = { .type = NLA_NESTED },
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+index a6b1de9a251d..11ab1d6b916a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+@@ -298,20 +298,21 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
+ 		priv->pps[i].available = true;
+ 	}
+ 
+-	if (priv->plat->ptp_max_adj)
+-		stmmac_ptp_clock_ops.max_adj = priv->plat->ptp_max_adj;
+-
+ 	/* Calculate the clock domain crossing (CDC) error if necessary */
+ 	priv->plat->cdc_error_adj = 0;
+ 	if (priv->plat->has_gmac4 && priv->plat->clk_ptp_rate)
+ 		priv->plat->cdc_error_adj = (2 * NSEC_PER_SEC) / priv->plat->clk_ptp_rate;
+ 
+-	stmmac_ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
+-	stmmac_ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
++	priv->ptp_clock_ops = stmmac_ptp_clock_ops;
++
++	priv->ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
++	priv->ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
++
++	if (priv->plat->ptp_max_adj)
++		priv->ptp_clock_ops.max_adj = priv->plat->ptp_max_adj;
+ 
+ 	rwlock_init(&priv->ptp_lock);
+ 	mutex_init(&priv->aux_ts_lock);
+-	priv->ptp_clock_ops = stmmac_ptp_clock_ops;
+ 
+ 	priv->ptp_clock = ptp_clock_register(&priv->ptp_clock_ops,
+ 					     priv->device);
 -- 
-2.45.2
+2.47.0
 
 
