@@ -1,84 +1,203 @@
-Return-Path: <netdev+bounces-143912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31F59C4BA5
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:25:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6019B9C4BB5
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13A181F23993
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:25:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24B282817C9
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C72204921;
-	Tue, 12 Nov 2024 01:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1B620494F;
+	Tue, 12 Nov 2024 01:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KfzA8fd0"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XEWpS2xG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564F24C91;
-	Tue, 12 Nov 2024 01:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2152AF06;
+	Tue, 12 Nov 2024 01:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731374714; cv=none; b=GBFxbyi5fCuCOfmhLL/vLWzI2pkzgW2d5l2IpBBkpxSFb7LZjGHzCqU3Q4XUoZxO7VL0SCCxp7MGT7tkldfDBAbC1IbPSb1s0qlO7jS1DjKFlv9O6u4Sb2ogE8EOYK8zrGVp0B8/HXNXQAa4D2B9av9NTDLxnlQVXPgv8VDeXLY=
+	t=1731374975; cv=none; b=INEI/Fclnymin3THpmzOw368nud0Z6d8zLo4REbto7p/bX408MqqYc5fS+4Zo0VMZ8KQZR86pgB5lu0jzukHsZ4KLknxjKxTDwD4RywsKzekJMbB/MWY8Tr9vNsxcuMi+Il5SveDnsWOURczqbbobxZ1L7T94WiOT0Xu5TYtjYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731374714; c=relaxed/simple;
-	bh=ajlOMkDBBhPwwih9QbgiLjrtuGoUTP90BUjo+Qgjh6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WJ+aFA37NzLQJ0ovEeuqEBKkeEvHMFgnci3pTMRLV8NKih0AADkG+KOdN3/wLO9JsSmsFdpcUpop5S7HYtGgD7VenZGergHf2QgwzoSN2GhYpkLWx0LrSlpbTQWawRcspAu8bJ9LHZP7pvq4zT1c+4zu6nCmPmvmhVk8AMx2eLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfzA8fd0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB58BC4CECF;
-	Tue, 12 Nov 2024 01:25:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731374713;
-	bh=ajlOMkDBBhPwwih9QbgiLjrtuGoUTP90BUjo+Qgjh6Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KfzA8fd0pETwyYLinnu1k0mQTTKvKELRW4i7faoBwBldWHr02vsTE4zrbkG0Uh8zw
-	 lnKJRShWAkZK0d5ZzMSVnjt6aXCIiu/qFsm/JbZGn+j+7AEi/e/6Hf5T7YUiWb81sP
-	 mpGSzdd5iELo+Gxd1foT6IivsoctI0MHBwZ3Py9l02SfrI1Ek9UAYlT5nBHwmBSYr5
-	 MjvrmedvjhWz1j/S+vIi+ha1jvgmQc2LXf1f48kOJVL3QynNGUoYa2JPQ4RtG5I798
-	 7IjYvo+i48mFDcM4xlo5pL+txl50dOSX0HS44cl5iMk57PsEblHSYIXXnCjvXAe6Y3
-	 Q4nzK0O7BxbsA==
-Date: Mon, 11 Nov 2024 17:25:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
- <salil.mehta@huawei.com>, <liuyonglong@huawei.com>,
- <wangpeiyang1@huawei.com>, <chenhao418@huawei.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND net 3/7] net: hns3: Resolved the issue that the
- debugfs query result is inconsistent.
-Message-ID: <20241111172511.773c71df@kernel.org>
-In-Reply-To: <20241107133023.3813095-4-shaojijie@huawei.com>
-References: <20241107133023.3813095-1-shaojijie@huawei.com>
-	<20241107133023.3813095-4-shaojijie@huawei.com>
+	s=arc-20240116; t=1731374975; c=relaxed/simple;
+	bh=51UECk28dV15zIq3POGflUXGPV5B5IFZ/GPDdueH+Wo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Cnlr5rQOF7YD85jWuBi7Abk87Gj/nSfku8KfHeO2kEOmWBAGT6rsJpTIBC/LaWA7RK9Flok6anenrHLmm4iBsim0gjPClcTQqOWvIBJek01TTihKeYjwZi1U+EiPxldg7TLZkNIWGW0r4lkOAMSxDC1xde9LA1iRecHxXOJPNVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XEWpS2xG; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1731374969; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=24nPIwKKsU+tzcVmELJ3VnjLe54hrnQQxWsvNlefg7k=;
+	b=XEWpS2xGzrLsg7BAfJhbsn45SUNAVYdQEc2WwfdLgmyfgecZN4l+KPEBGr4rQPru/xrs0aYZ1mHgiToBEd9Alspv5VlA0e6gE54AOZ0mirXwO8xCwQcC+pIICqhf0VSAJMvpeM1Eusgpll41yx3nw21jLgh/sLtMVUW1VVAtYiY=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WJF8T7F_1731374968 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 12 Nov 2024 09:29:29 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v4 00/13] virtio-net: support AF_XDP zero copy (tx)
+Date: Tue, 12 Nov 2024 09:29:15 +0800
+Message-Id: <20241112012928.102478-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Git-Hash: ee9bd377a389
+Content-Transfer-Encoding: 8bit
 
-On Thu, 7 Nov 2024 21:30:19 +0800 Jijie Shao wrote:
-> Subject: [PATCH RESEND net 3/7] net: hns3: Resolved the issue that the debugfs query result is inconsistent.
-> Date: Thu, 7 Nov 2024 21:30:19 +0800
-> X-Mailer: git-send-email 2.30.0
-> 
-> From: Hao Lan <lanhao@huawei.com>
-> 
-> This patch modifies the implementation of debugfs:
-> When the user process stops unexpectedly, not all data of the file system
-> is read. In this case, the save_buf pointer is not released. When the user
-> process is called next time, save_buf is used to copy the cached data
-> to the user space. As a result, the queried data is inconsistent. To solve
-> this problem, determine whether the function is invoked for the first time
-> based on the value of *ppos. If *ppos is 0, obtain the actual data.
+v4:
+    1. rebase net-next
+    2. update the kdoc for the new APIs
 
-What do you mean by "inconsistent" ?
-What if two processes read the file at once?
+v3:
+    1. use sg_dma_address/length api to set the premapped sg
+    2. remove 'premapped' parameter from the new APIs
+    3. tweak the comment of commit #2,#3
+
+v2:
+    1. use new api to submit premapped buffer instead of using sgs to pass this info
+    2. some small fixes for http://lore.kernel.org/all/20240924013204.13763-1-xuanzhuo@linux.alibaba.com
+
+
+v1:
+    1. some small fixes for http://lore.kernel.org/all/20240820073330.9161-1-xuanzhuo@linux.alibaba.com
+        1. fix the title of the commit #2, #3
+        2. fix the gcc error for commit #3
+        3. use virtqueue_dma_xxxx for tx hdr
+        4. rename virtnet_ptr_to_xsk to virtnet_ptr_to_xsk_buff_len
+        5. squash #11 in last patch set to #10
+
+================================================================================
+
+## AF_XDP
+
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good. mlx5 and intel ixgbe already support
+this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+feature.
+
+At present, we have completed some preparation:
+
+1. vq-reset (virtio spec and kernel code)
+2. virtio-core premapped dma
+3. virtio-net xdp refactor
+
+So it is time for Virtio-Net to complete the support for the XDP Socket
+Zerocopy.
+
+Virtio-net can not increase the queue num at will, so xsk shares the queue with
+kernel.
+
+This patch set includes some refactor to the virtio-net to let that to support
+AF_XDP.
+
+## About virtio premapped mode
+
+The current configuration sets the virtqueue (vq) to premapped mode,
+implying that all buffers submitted to this queue must be mapped ahead
+of time. This presents a challenge for the virtnet send queue (sq): the
+virtnet driver would be required to keep track of dma information for vq
+size * 17, which can be substantial. However, if the premapped mode were
+applied on a per-buffer basis, the complexity would be greatly reduced.
+With AF_XDP enabled, AF_XDP buffers would become premapped, while kernel
+skb buffers could remain unmapped.
+
+We can distinguish them by sg_page(sg), When sg_page(sg) is NULL, this
+indicates that the driver has performed DMA mapping in advance, allowing
+the Virtio core to directly utilize sg_dma_address(sg) without
+conducting any internal DMA mapping. Additionally, DMA unmap operations
+for this buffer will be bypassed.
+
+## performance
+
+ENV: Qemu with vhost-user(polling mode).
+Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+
+### virtio PMD in guest with testpmd
+
+testpmd> show port stats all
+
+ ######################## NIC statistics for port 0 ########################
+ RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+ RX-errors: 0
+ RX-nombuf: 0
+ TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
+
+
+ Throughput (since last show)
+ Rx-pps:   8861574     Rx-bps:  3969985208
+ Tx-pps:   8861493     Tx-bps:  3969962736
+ ############################################################################
+
+### AF_XDP PMD in guest with testpmd
+
+testpmd> show port stats all
+
+  ######################## NIC statistics for port 0  ########################
+  RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+
+  Throughput (since last show)
+  Rx-pps:      6333196          Rx-bps:   2837272088
+  Tx-pps:      6333227          Tx-bps:   2837285936
+  ############################################################################
+
+But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+
+Please review.
+
+Thanks.
+
+
+
+
+Xuan Zhuo (13):
+  virtio_ring: introduce vring_need_unmap_buffer
+  virtio_ring: split: record extras for indirect buffers
+  virtio_ring: packed: record extras for indirect buffers
+  virtio_ring: perform premapped operations based on per-buffer
+  virtio_ring: introduce add api for premapped
+  virtio-net: rq submits premapped per-buffer
+  virtio_ring: remove API virtqueue_set_dma_premapped
+  virtio_net: refactor the xmit type
+  virtio_net: xsk: bind/unbind xsk for tx
+  virtio_net: xsk: prevent disable tx napi
+  virtio_net: xsk: tx: support xmit xsk buffer
+  virtio_net: update tx timeout record
+  virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+
+ drivers/net/virtio_net.c     | 369 ++++++++++++++++++++++++++++-------
+ drivers/virtio/virtio_ring.c | 356 ++++++++++++++++-----------------
+ include/linux/virtio.h       |  13 +-
+ 3 files changed, 489 insertions(+), 249 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
