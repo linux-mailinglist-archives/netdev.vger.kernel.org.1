@@ -1,71 +1,88 @@
-Return-Path: <netdev+bounces-144056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A81769C5792
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:20:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BE989C584A
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:51:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AED62B474BC
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:24:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21D27B288F6
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55885230983;
-	Tue, 12 Nov 2024 11:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF9421948D;
+	Tue, 12 Nov 2024 11:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="innycBL3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T1olZ8tA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84ACB230981
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 11:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30224218D93
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 11:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731409590; cv=none; b=VHo29BZSneT8fm7Veye79YT0CE0S6nukEJN+JzamWeeTAnHBCiQ5CIH6F/+hfBiLwYQ9REPLJtRcjN9MMEtmV1rBiokROnU9T0rrCvTt3aWQQEY+DKwvOyFKPzZWkcK3PdQHgLheimzQRQqw9atXd0uat6a6BKygVYFiOZ45CQs=
+	t=1731410260; cv=none; b=RAWpGzR9Nxea5ffFeo4YikI71hCg+KnQrvMMm1RvlGYrVWp7CJS+uhORm/uZ4vBZBDPh6RJKFtg7nou5mEeUVCFrRDRb6sCYXLmkadyhhK3cql0AzlRWmdRafix7WeW7FQG9QDSc1eYUrv4DOh+ITTowYAWuTNxZJCmtMTnH6vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731409590; c=relaxed/simple;
-	bh=nmBc1paTAdIIY8F0RiybLycXRApPl8Ogge7DpSO4/Ew=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=a1GtfC1LiOJDMoa2IYjWKygRhlAPv61Va96Az7en0AzQ+aDXNReROuasp4TIjfU9xnav8s2CRVTth3C1TxSwCMjavpozjvSVveVuE4whGngt95152xwmbjM8YQURfBETgsn+kfUw1SJAMtvE8LxaKDJUXOHnBERnHq5hO/xFv5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=innycBL3; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 4AC8hOTq005316;
-	Tue, 12 Nov 2024 03:06:11 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=uHsDP+sbpuBI/ZID7Q
-	UKNvkeJ6eArH/mrecB/O27kg4=; b=innycBL3uqcJiqjyhHpG/Z6Ai70EI/FEWN
-	rXlKsVScr18AxbvuZ0Wa01E7m3NLPd7wg6E6PrwDnc42HUUZ6MlWRtFgFKpaF+e3
-	LsmRMlzQjAvWoZAhVKlGH7XFCMMT3k89UFL8a/C/FYTzzx9hIwIIwqjAdaGnXmOV
-	1rq+YoHG6S2u9rgmmr7m25lsLRPEMIPfANK3/irqrtkNwDEq1hUoyks2XQ+Z6cuI
-	i/Xc/fDzox3KShcNSmWS7G34BtdoENf9OBsTBdyTod6G7eF0owNM7Zle7qS4Q9rP
-	l7hrkgLdC18ZZl1IZ4qgQy3jjhpzrzO86AF9dAzqJrJBpRD8cvig==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 42v3rjrnxg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 12 Nov 2024 03:06:11 -0800 (PST)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
- 15.2.1544.11; Tue, 12 Nov 2024 11:05:42 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Pavan Chebbi
-	<pavan.chebbi@broadcom.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Michael Chan <michael.chan@broadcom.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Vadim Fedorenko <vadfed@meta.com>,
-        Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next] bnxt_en: optimize gettimex64
-Date: Tue, 12 Nov 2024 03:05:22 -0800
-Message-ID: <20241112110522.141924-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1731410260; c=relaxed/simple;
+	bh=Gxojs+r3yLJvy+VKhHr7QoFeI3xt1LpaF00PFbC6RVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HtVITeymN0d23o4WjWlqQHAPpV/D96wgxXhoNy5Ho/uIdKwmaqprKKO/YvJT/onO5yoY/RGKyvQIJ3yns2DYniuufHfeIYk/mgAm8UsqOt8JrSVZlUG/xK9EThHjIaHIab0PfVXWNMILMenNuKxRoAry+l4SI1KlQQsfcSDFvxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T1olZ8tA; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539f4d8ef84so6951214e87.0
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 03:17:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731410256; x=1732015056; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KQVfeZc6NJ075HA3ZdT+0D/cjgvXW3jWBY5YdxUCC+w=;
+        b=T1olZ8tA78lso4qY2bKROdCeK0YGYL1qg8eozLwJxnI0XmhSpdx8xw0V4IpYcoDGCA
+         LnTpdQo2MfTlcsRJyvH/IUYDLpC4GgqOEj2dt0F5CSpX1qzdPLMMsbACE3DThvNxyFAj
+         At2S47CzO8/2uy5VZvmK+Dd0NfB6CTUHOXl6iybQft/2bhpB7yC1dUJH8xaJa3Gtc6lu
+         4Z1PZaXpetGv/ipfDXrlCk7SFPbrVuVFjRJlL7/+yW7HodaBI9/ijr1u9NhQbQDO5ZLL
+         r4sOpjDTE4ScA4Zs48zj0sjsDXO6P8oIJX4cM0U0w2n2rfN1VVK5Z+E2h3fgzW+jrFMh
+         uuXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731410256; x=1732015056;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KQVfeZc6NJ075HA3ZdT+0D/cjgvXW3jWBY5YdxUCC+w=;
+        b=m+FLMZAHdBjz6WrCDbJARLoAKH+FMLfBux9oTptmM4HT+Xr8uUXIsiWDGKEETuzdTL
+         SeWeIta+Hs0tdnI0EXRpA9IPb/gcA/otgsGQAP3HjXITK8WyQXhL75Tt/1ar8DbSKm38
+         85WdSd60yTyDjVOi2ItfyrjLC8JTLMLWcNSFXnW9JlNFt4tBkc0JI6Hlv+VL7JXgi6YK
+         l5NIg/ozuGTaEQYOfyyxtg36UPZPIfUQpgff2+5CqXCqxz84ByWYy2cLWoA//NREv5XE
+         i52MZiUigw1IstN5cJCNmz+E4wAzkaVmIXiNJIPTyQf0m2mPOmKcA66BZXeVrUHLWXwe
+         6aFw==
+X-Gm-Message-State: AOJu0YzCXVm2JeSOUMbTYD+aFy8+SWatkC/UUZMhqZm4nO6+CQWL8PNU
+	8s/t3kCn6o51SpONTExBhaRzYh9vFp+q4kqZjBXyMSxYeX5OjL+Ndl9SluXU
+X-Google-Smtp-Source: AGHT+IEjGpKgmreHst5YJ5zx59jBB4wzD7My11iaMb6THS3IqFmmUrLyi04LhrGq05XowPBuD7lrHQ==
+X-Received: by 2002:a05:6512:104f:b0:539:f36c:dbac with SMTP id 2adb3069b0e04-53d86228009mr7501022e87.4.1731410255502;
+        Tue, 12 Nov 2024 03:17:35 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:a1ef:92f5:9114:b131])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b054b3fesm203543685e9.17.2024.11.12.03.17.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2024 03:17:34 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 2/2] tools/net/ynl: add async notification handling
+Date: Tue, 12 Nov 2024 11:17:27 +0000
+Message-ID: <20241112111727.91575-3-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20241112111727.91575-1-donald.hunter@gmail.com>
+References: <20241112111727.91575-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,118 +90,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 5fwdvibUc_P0_dDMl9qo---N6Fv1OjJB
-X-Proofpoint-ORIG-GUID: 5fwdvibUc_P0_dDMl9qo---N6Fv1OjJB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-Current implementation of gettimex64() makes at least 3 PCIe reads to
-get current PHC time. It takes at least 2.2us to get this value back to
-userspace. At the same time there is cached value of upper bits of PHC
-available for packet timestamps already. This patch reuses cached value
-to speed up reading of PHC time.
+The notification handling in ynl is currently very simple, using sleep()
+to wait a period of time and then handling all the buffered messages in
+a single batch.
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+This patch adds async notification handling so that messages can be
+processed as they are received. This makes it possible to use ynl as a
+library that supplies notifications in a timely manner.
+
+- Add poll_ntf() to be a generator that yields 1 notification at a
+  time and blocks until a notification is available.
+- Add a --duration parameter to the CLI, with --sleep as an alias.
+
+./tools/net/ynl/cli.py \
+    --spec <SPEC> --subscribe <TOPIC> [ --duration <SECS> ]
+
+The cli will report any notifications for duration seconds and then
+exit. If duration is not specified, then it will poll forever, until
+interrupted.
+
+Here is an example python snippet that shows how to use ynl as a library
+for receiving notifications:
+
+    ynl = YnlFamily(f"{dir}/rt_route.yaml")
+    ynl.ntf_subscribe('rtnlgrp-ipv4-route')
+
+    for event in ynl.poll_ntf():
+        handle(event)
+
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
-I did some benchmarks on host with Broadcom Thor NIC trying to build
-histogram of time spent to call clock_gettime() to query PTP device
-over million iterations.
-With current implementation the result is (long tail is cut):
+ tools/net/ynl/cli.py     | 16 +++++++++-------
+ tools/net/ynl/lib/ynl.py | 28 +++++++++++++++++++++++++---
+ 2 files changed, 34 insertions(+), 10 deletions(-)
 
-2200ns: 902624
-2300ns: 87404
-2400ns: 4025
-2500ns: 1307
-2600ns: 581
-2700ns: 261
-2800ns: 104
-2900ns: 36
-3000ns: 32
-3100ns: 24
-3200ns: 16
-3300ns: 29
-3400ns: 29
-3500ns: 23
-
-Optimized version on the very same machine and NIC gives next values:
-
-900ns: 865436
-1000ns: 128630
-1100ns: 2671
-1200ns: 727
-1300ns: 397
-1400ns: 178
-1500ns: 92
-1600ns: 16
-1700ns: 15
-1800ns: 11
-1900ns: 6
-2000ns: 20
-2100ns: 11
-
-That means pct(99) improved from 2300ns to 1000ns.
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 32 +++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 91e7e08fabb1..8764ce412f7b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -112,6 +112,28 @@ static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp *sts,
- 	return rc;
- }
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index b8481f401376..0601fcc53601 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -4,7 +4,6 @@
+ import argparse
+ import json
+ import pprint
+-import time
  
-+static int bnxt_refclk_read_low(struct bnxt *bp, struct ptp_system_timestamp *sts,
-+				u32 *low)
-+{
-+	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-+	unsigned long flags;
-+
-+	/* We have to serialize reg access and FW reset */
-+	read_seqlock_excl_irqsave(&ptp->ptp_lock, flags);
-+
-+	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
-+		read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
-+		return -EIO;
-+	}
-+
-+	ptp_read_system_prets(sts);
-+	*low = readl(bp->bar0 + ptp->refclk_mapped_regs[0]);
-+	ptp_read_system_postts(sts);
-+
-+	read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
-+	return 0;
-+}
-+
- static void bnxt_ptp_get_current_time(struct bnxt *bp)
- {
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-@@ -162,13 +184,19 @@ static int bnxt_ptp_gettimex(struct ptp_clock_info *ptp_info,
- {
- 	struct bnxt_ptp_cfg *ptp = container_of(ptp_info, struct bnxt_ptp_cfg,
- 						ptp_info);
--	u64 ns, cycles;
-+	u64 ns, cycles, time;
-+	u32 low;
- 	int rc;
+ from lib import YnlFamily, Netlink, NlError
  
--	rc = bnxt_refclk_read(ptp->bp, sts, &cycles);
-+	rc = bnxt_refclk_read_low(ptp->bp, sts, &low);
- 	if (rc)
- 		return rc;
+@@ -43,7 +42,10 @@ def main():
+     group.add_argument('--list-ops', action='store_true')
+     group.add_argument('--list-msgs', action='store_true')
  
-+	time = (u64)READ_ONCE(ptp->old_time) << BNXT_HI_TIMER_SHIFT;
-+	cycles = (time & BNXT_HI_TIMER_MASK) | low;
-+	if (low < (time & BNXT_LO_TIMER_MASK))
-+		cycles += BNXT_LO_TIMER_MASK + 1;
+-    parser.add_argument('--sleep', dest='sleep', type=int)
++    parser.add_argument('--duration', dest='duration', type=int,
++                        help='when subscribed, watch for DURATION seconds')
++    parser.add_argument('--sleep', dest='duration', type=int,
++                        help='alias for duration')
+     parser.add_argument('--subscribe', dest='ntf', type=str)
+     parser.add_argument('--replace', dest='flags', action='append_const',
+                         const=Netlink.NLM_F_REPLACE)
+@@ -80,9 +82,6 @@ def main():
+     if args.ntf:
+         ynl.ntf_subscribe(args.ntf)
+ 
+-    if args.sleep:
+-        time.sleep(args.sleep)
+-
+     if args.list_ops:
+         for op_name, op in ynl.ops.items():
+             print(op_name, " [", ", ".join(op.modes), "]")
+@@ -106,8 +105,11 @@ def main():
+         exit(1)
+ 
+     if args.ntf:
+-        ynl.check_ntf()
+-        output(ynl.async_msg_queue)
++        try:
++            for msg in ynl.poll_ntf(duration=args.duration):
++                output(msg)
++        except KeyboardInterrupt:
++            pass
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index c22c22bf2cb7..ffb1c4263d09 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -12,6 +12,9 @@ import sys
+ import yaml
+ import ipaddress
+ import uuid
++import queue
++import selectors
++import time
+ 
+ from .nlspec import SpecFamily
+ 
+@@ -489,7 +492,7 @@ class YnlFamily(SpecFamily):
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_GET_STRICT_CHK, 1)
+ 
+         self.async_msg_ids = set()
+-        self.async_msg_queue = []
++        self.async_msg_queue = queue.Queue()
+ 
+         for msg in self.msgs.values():
+             if msg.is_async:
+@@ -903,7 +906,7 @@ class YnlFamily(SpecFamily):
+ 
+         msg['name'] = op['name']
+         msg['msg'] = attrs
+-        self.async_msg_queue.append(msg)
++        self.async_msg_queue.put(msg)
+ 
+     def check_ntf(self):
+         while True:
+@@ -925,11 +928,30 @@ class YnlFamily(SpecFamily):
+ 
+                 decoded = self.nlproto.decode(self, nl_msg, None)
+                 if decoded.cmd() not in self.async_msg_ids:
+-                    print("Unexpected msg id done while checking for ntf", decoded)
++                    print("Unexpected msg id while checking for ntf", decoded)
+                     continue
+ 
+                 self.handle_ntf(decoded)
+ 
++    def poll_ntf(self, duration=None):
++        endtime = time.time() + duration if duration is not None else None
++        selector = selectors.DefaultSelector()
++        selector.register(self.sock, selectors.EVENT_READ)
 +
- 	ns = bnxt_timecounter_cyc2time(ptp, cycles);
- 	*ts = ns_to_timespec64(ns);
- 
++        while True:
++            try:
++                yield self.async_msg_queue.get_nowait()
++            except queue.Empty:
++                if endtime is not None:
++                    interval = endtime - time.time()
++                    if interval <= 0:
++                        return
++                else:
++                    interval = None
++                events = selector.select(interval)
++                if events:
++                    self.check_ntf()
++
+     def operation_do_attributes(self, name):
+       """
+       For a given operation name, find and return a supported
 -- 
-2.43.5
+2.47.0
 
 
