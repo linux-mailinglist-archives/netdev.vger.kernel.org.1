@@ -1,324 +1,229 @@
-Return-Path: <netdev+bounces-144051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFC39C572C
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:00:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C569C5881
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 14:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D81EB2FCF2
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:18:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA23EB3D813
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910502259D6;
-	Tue, 12 Nov 2024 10:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A77215C5A;
+	Tue, 12 Nov 2024 11:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="IRdPVpSC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ifEJK3xL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TBsrsGNC"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D71D2259C2;
-	Tue, 12 Nov 2024 10:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DF62141C4;
+	Tue, 12 Nov 2024 11:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731408959; cv=none; b=ou/SSe1ykNGzA3RkDYvD5pTu0NKRF5Nb2wWosLKVPWgbuRKIoSAYrSDK5mOfLnA6415+4YHwlfKCya4YRa9MF6u+NzLzPd8EsQ8oL0lFXhy1ocWeIo1hIL2OhzCKCyZodK+SC2LD4viCkVNCsWi1bnosXkC/3m7aRCI9BWD7+90=
+	t=1731409401; cv=none; b=RrkSb+r0DJ566wi47pI+1deKKNik5yVZSGG4Lojqq6FLYda9lQJc/r63zIdGcyJILlRWtGd2qpg5+9YeF6dsJZEjlrpf41blqwr5gkF+aK3/ccJVTOPYsIzf1zxpcAxiEKI7p9PshPq4+bstetmZGLbH/30kmZIA6CIZmFDgPXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731408959; c=relaxed/simple;
-	bh=dYUTeNmtAQ8X8gMz0q9BALSEM0DhK8omLem364dEbWo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jqOIVAObSLglswjyoILj4YRRpeCcRmPSNFL2t/rn+frt8BgUYrCw9WBBBoTaiEvt12a2hUz8Fiqlzr8/TEj8l5pco3jr6uF6OlXcSwTXmHKil6rp0Awhv9CrwFtueWSUASrYNH6bZvetEXImNBvCGA+Y/vQtb0KMdLHISgWSxLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me; spf=pass smtp.mailfrom=alistair23.me; dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b=IRdPVpSC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ifEJK3xL; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alistair23.me
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 9916D25401D0;
-	Tue, 12 Nov 2024 05:55:56 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Tue, 12 Nov 2024 05:55:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1731408956; x=
-	1731495356; bh=7RBDUfleD6Ixf368mtQOm0zVnbqIdDQIGho2QbrKN5A=; b=I
-	RdPVpSCWvOc2+LNyPsl1BKtw7avQj+Okw5pUIIuyhv448UVd2Yqxu4sUcQHhUatO
-	V9PynE2GQKkIpC28SlkKroTN21tazmjv+JlR4iOFz5UX59VJXclFNrb39pNgBijp
-	acYWHUXZqIIzzusQ+JPKE7CPEmDANWsP9zTMd5q8EIvCfriR81OJCnm/h7iBWbJB
-	dTbAsVknu7zN3zVHTDxU9qxmu6rehARccrXT12gHJW9aha1evNxx/X9YIKjbr+92
-	hH0IxBlGie4weOxKYhoCgCUBaKULjID5sqZD2tZZVDOiynNLPg+s42jp91R3f4MT
-	7c4LPjCj81RYujXqT0sbg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1731408956; x=1731495356; bh=7
-	RBDUfleD6Ixf368mtQOm0zVnbqIdDQIGho2QbrKN5A=; b=ifEJK3xLRkDAIbXqy
-	VsJixwXvY75DzN02ptdxaZml8Wfss7KO0SxBOzDpH36aPQs+z8p5A0YqGhADl+In
-	enViNYpMrBr40jgFOhrcKdAl9RjmwUmJSSiZGk11N+1ISzDMpEy0Zg7+OPPfP9jq
-	SXpRmkrUoihNrciZOu5NJr0EwkDZImB18DDAAOhQbBCerql++5vNvkPIHh8TMpxN
-	5HQ/MVXNloyIlXSG1+YwmBfoPpbVx1azQH7BsXTFmxwx3fbN8k/C6C1DWxyxn11+
-	qPqzLi8depLgpmyym4tZ9oGTQc6FkyryW1V1ZgVJhg5LoLBINBKQy+J2j54pEPvb
-	g3lOg==
-X-ME-Sender: <xms:PDQzZ5uz17B_fRDuJ4bG7QEbk1Mcp466nhzMdYec3KZkOYJ_KjPaAA>
-    <xme:PDQzZyfXDlzn3GdVAeWPpo9ugBNWEGTySoXVgQqIL4eACUa9vg90y-uGGvK2odPWV
-    xptXQ5lhUH2upJfavI>
-X-ME-Received: <xmr:PDQzZ8z98qiDzVkacve5BMEMWDiCf-yeAbcDC27oOV7-8dide6PC2UGxedFE2rWms2LIoe8-U3dT>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeggddukecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecunecujfgurhephffvvefuff
-    fkofgjfhgggfestdekredtredttdenucfhrhhomheptehlihhsthgrihhrucfhrhgrnhgt
-    ihhsuceorghlihhsthgrihhrsegrlhhishhtrghirhdvfedrmhgvqeenucggtffrrghtth
-    gvrhhnpeeitdefkeetledvleevveeuueejffeugfeuvdetkeevjeejueetudeftefhgfeh
-    heenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlh
-    hishhtrghirhesrghlihhsthgrihhrvdefrdhmvgdpnhgspghrtghpthhtohepjedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukh
-    dprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthho
-    pegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegrlhhishhtrghirhdvfeesgh
-    hmrghilhdrtghomhdprhgtphhtthhopegrlhhishhtrghirhdrfhhrrghntghishesfigu
-    tgdrtghomh
-X-ME-Proxy: <xmx:PDQzZwPEbmRfjjrkyIhHTQH5CJQ9LXhOy4_5-ynRo97SjSc4NdIwDQ>
-    <xmx:PDQzZ5_rS9DlvktTkm9hiog5MUc6Fx8LMewHN9KAhC8HMur8A_qeiQ>
-    <xmx:PDQzZwXJfn-AtTWlvNy8GPjbHVSnXN4nJ18LaMiZj1X7qhkC2g2E-A>
-    <xmx:PDQzZ6emz0r7saIODLwUy7gY5a81VmZvcz0V1_6o8qSctYGrXBeIfA>
-    <xmx:PDQzZyN5iI1YzfgW7re2jfUUqLqeWRLMsxSAaXaUDbE9oYYJgxPKxGQH>
-Feedback-ID: ifd214418:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 Nov 2024 05:55:53 -0500 (EST)
-From: Alistair Francis <alistair@alistair23.me>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linux@armlinux.org.uk,
-	hkallweit1@gmail.com,
-	andrew@lunn.ch,
-	alistair23@gmail.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: [PATCH 2/2] mdio: Remove mdio45_ethtool_gset_npage()
-Date: Tue, 12 Nov 2024 20:54:30 +1000
-Message-ID: <20241112105430.438491-2-alistair@alistair23.me>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241112105430.438491-1-alistair@alistair23.me>
-References: <20241112105430.438491-1-alistair@alistair23.me>
+	s=arc-20240116; t=1731409401; c=relaxed/simple;
+	bh=53Nqbs9za9XY0KG8sAX7ob6M8swycoF5/HqMt++y1Rw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l1+QnLdMiTUACMRNi4a/kNPnzLhM9gpbQIqh5CNrVFityPrmO9FRelSnWNkDoSj2gwsFx3G1MSXBBYEBmmUPviGoTfUVWLGNf6XuSAVGoyeoqEIwhGK6Z+Iq18t7ysHQ8dE9lVkNa1tM5l6i/d8NiLv8Fncyj5mDvBHbUMKi/k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TBsrsGNC; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c9388a00cfso7019286a12.3;
+        Tue, 12 Nov 2024 03:03:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731409397; x=1732014197; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iPcFHCJG8NGsuskBY+kZ5XWMDYsQmMFc2+wJS3PWRtM=;
+        b=TBsrsGNCGk9wGUczYwdxhKT0zJUEn7ROZV1GnPh4oSwovZ2FI+qwRJY3ata6Bp0EBr
+         UNKLXgbI7V4gFtcSwHXDn6Ce/4wlC41CZXiVLjWjVAbjOPdPGTMlOmIxvZULhf/CHl6h
+         g9fAhp+XOz7iqIRliTnd+hy+eO/oi4q4pMFd6McwXZN3WCCPtG2JaSVuo4Bn8wiAPj5D
+         hJu6xOF5ejn5wV9ER0XU4pUxyoPw+KTq8AhtQyYLqQ7gSaDNvTvfqLgQ6OgmWcLVXLI1
+         a7IgtaBLbITN3zEdncNxw8gm9Duabnl5Y7iC4rAh56ImkQRlHmCR9NQIInY9K1ShMhV8
+         Ee9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731409397; x=1732014197;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iPcFHCJG8NGsuskBY+kZ5XWMDYsQmMFc2+wJS3PWRtM=;
+        b=HKLQLzVjfxWI/2v1QySAPkdk2tAuUqCob1xlt2jH4Om+7vRiIE3upTTw2pyrOjzum9
+         1x4s9ZExyxo7MYMTF+y7f9PAEnp4t7W2XJ/geymUWQpL6MnQj6MAG//2NHpZSR515nio
+         5YxwDuZSvAgScGdgkH3zzltMaKhkQbQGXwDqyZW85QDlWvHNNNhugAdElTLpSuuKJg79
+         8/p93xE2swc1Cr9BJUPpyybASQX9F97bwqht6F4ybbAed1obEmwKbg4zMUsaYM4QGlcW
+         6JC3K0PxnDe0WyHoPCRmm0dcgPoAvo41lz4xyXeYlQ13FgG1q1TtnmxOBQtZC7tVzHyL
+         OmCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUI5HVDka+zEuctGwFlCPt4SDYOQj6vyDrl3KFZQDLnb7+X+vFz6wkCA/9FFrJFnxAyoq28gg7Ok/vxBYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt4KIVXKwD7dD4m2xJxbKBl1PWg9fgigoXofbsc6bXwoh02ncf
+	rrhIQum1Gm8jmAMyWttE7Ym3g/PgcK8+ja/HfrdFp+L8DYU/CaUS
+X-Google-Smtp-Source: AGHT+IHX4cUH9pyL7LKsapletYqx2kvV8JoES6EsVn/ceuKd30jkLRNMQcJatb/QouJT6jLYgTQnMA==
+X-Received: by 2002:a05:6402:254b:b0:5cf:45c2:981a with SMTP id 4fb4d7f45d1cf-5cf45c29904mr4046359a12.34.1731409397257;
+        Tue, 12 Nov 2024 03:03:17 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a46e:ea00:90f0:9049:6891:55f? (dynamic-2a02-3100-a46e-ea00-90f0-9049-6891-055f.310.pool.telefonica.de. [2a02:3100:a46e:ea00:90f0:9049:6891:55f])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03c4ecaesm5872673a12.70.2024.11.12.03.03.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2024 03:03:16 -0800 (PST)
+Message-ID: <f8ec2c77-33fa-45a8-9b6b-4be15e5f3658@gmail.com>
+Date: Tue, 12 Nov 2024 12:03:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1 1/2] net: phy: Introduce phy_update_eee() to update
+ eee_cfg values
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20241112072447.3238892-1-yong.liang.choong@linux.intel.com>
+ <20241112072447.3238892-2-yong.liang.choong@linux.intel.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20241112072447.3238892-2-yong.liang.choong@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Alistair Francis <alistair.francis@wdc.com>
+On 12.11.2024 08:24, Choong Yong Liang wrote:
+> The commit fe0d4fd9285e ("net: phy: Keep track of EEE configuration")
+> introduced eee_cfg, which is used to check the existing settings against
+> the requested changes. When the 'ethtool --show-eee' command is issued,
+> it reads the values from eee_cfg. However, the 'show-eee' command does
+> not show the correct result after system boot-up, link up, and link down.
+> 
 
-The mdio45_ethtool_gset_npage() function isn't called, so let's remove
-it.
+In stmmac_ethtool_op_get_eee() you have the following:
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- drivers/net/mdio.c   | 172 -------------------------------------------
- include/linux/mdio.h |   3 -
- 2 files changed, 175 deletions(-)
+edata->tx_lpi_timer = priv->tx_lpi_timer;
+edata->tx_lpi_enabled = priv->tx_lpi_enabled;
+return phylink_ethtool_get_eee(priv->phylink, edata);
 
-diff --git a/drivers/net/mdio.c b/drivers/net/mdio.c
-index e08c90ac0c6e..f67a4d4005e7 100644
---- a/drivers/net/mdio.c
-+++ b/drivers/net/mdio.c
-@@ -166,178 +166,6 @@ static u32 mdio45_get_an(const struct mdio_if_info *mdio, u16 addr)
- 	return result;
- }
- 
--/**
-- * mdio45_ethtool_gset_npage - get settings for ETHTOOL_GSET
-- * @mdio: MDIO interface
-- * @ecmd: Ethtool request structure
-- * @npage_adv: Modes currently advertised on next pages
-- * @npage_lpa: Modes advertised by link partner on next pages
-- *
-- * The @ecmd parameter is expected to have been cleared before calling
-- * mdio45_ethtool_gset_npage().
-- *
-- * Since the CSRs for auto-negotiation using next pages are not fully
-- * standardised, this function does not attempt to decode them.  The
-- * caller must pass them in.
-- */
--void mdio45_ethtool_gset_npage(const struct mdio_if_info *mdio,
--			       struct ethtool_cmd *ecmd,
--			       u32 npage_adv, u32 npage_lpa)
--{
--	int reg;
--	u32 speed;
--
--	BUILD_BUG_ON(MDIO_SUPPORTS_C22 != ETH_MDIO_SUPPORTS_C22);
--	BUILD_BUG_ON(MDIO_SUPPORTS_C45 != ETH_MDIO_SUPPORTS_C45);
--
--	ecmd->transceiver = XCVR_INTERNAL;
--	ecmd->phy_address = mdio->prtad;
--	ecmd->mdio_support =
--		mdio->mode_support & (MDIO_SUPPORTS_C45 | MDIO_SUPPORTS_C22);
--
--	reg = mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_PMAPMD,
--			      MDIO_CTRL2);
--	switch (reg & MDIO_PMA_CTRL2_TYPE) {
--	case MDIO_PMA_CTRL2_10GBT:
--	case MDIO_PMA_CTRL2_1000BT:
--	case MDIO_PMA_CTRL2_100BTX:
--	case MDIO_PMA_CTRL2_10BT:
--		ecmd->port = PORT_TP;
--		ecmd->supported = SUPPORTED_TP;
--		reg = mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_PMAPMD,
--				      MDIO_SPEED);
--		if (reg & MDIO_SPEED_10G)
--			ecmd->supported |= SUPPORTED_10000baseT_Full;
--		if (reg & MDIO_PMA_SPEED_1000)
--			ecmd->supported |= (SUPPORTED_1000baseT_Full |
--					    SUPPORTED_1000baseT_Half);
--		if (reg & MDIO_PMA_SPEED_100)
--			ecmd->supported |= (SUPPORTED_100baseT_Full |
--					    SUPPORTED_100baseT_Half);
--		if (reg & MDIO_PMA_SPEED_10)
--			ecmd->supported |= (SUPPORTED_10baseT_Full |
--					    SUPPORTED_10baseT_Half);
--		ecmd->advertising = ADVERTISED_TP;
--		break;
--
--	case MDIO_PMA_CTRL2_10GBCX4:
--		ecmd->port = PORT_OTHER;
--		ecmd->supported = 0;
--		ecmd->advertising = 0;
--		break;
--
--	case MDIO_PMA_CTRL2_10GBKX4:
--	case MDIO_PMA_CTRL2_10GBKR:
--	case MDIO_PMA_CTRL2_1000BKX:
--		ecmd->port = PORT_OTHER;
--		ecmd->supported = SUPPORTED_Backplane;
--		reg = mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_PMAPMD,
--				      MDIO_PMA_EXTABLE);
--		if (reg & MDIO_PMA_EXTABLE_10GBKX4)
--			ecmd->supported |= SUPPORTED_10000baseKX4_Full;
--		if (reg & MDIO_PMA_EXTABLE_10GBKR)
--			ecmd->supported |= SUPPORTED_10000baseKR_Full;
--		if (reg & MDIO_PMA_EXTABLE_1000BKX)
--			ecmd->supported |= SUPPORTED_1000baseKX_Full;
--		reg = mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_PMAPMD,
--				      MDIO_PMA_10GBR_FECABLE);
--		if (reg & MDIO_PMA_10GBR_FECABLE_ABLE)
--			ecmd->supported |= SUPPORTED_10000baseR_FEC;
--		ecmd->advertising = ADVERTISED_Backplane;
--		break;
--
--	/* All the other defined modes are flavours of optical */
--	default:
--		ecmd->port = PORT_FIBRE;
--		ecmd->supported = SUPPORTED_FIBRE;
--		ecmd->advertising = ADVERTISED_FIBRE;
--		break;
--	}
--
--	if (mdio->mmds & MDIO_DEVS_AN) {
--		ecmd->supported |= SUPPORTED_Autoneg;
--		reg = mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_AN,
--				      MDIO_CTRL1);
--		if (reg & MDIO_AN_CTRL1_ENABLE) {
--			ecmd->autoneg = AUTONEG_ENABLE;
--			ecmd->advertising |=
--				ADVERTISED_Autoneg |
--				mdio45_get_an(mdio, MDIO_AN_ADVERTISE) |
--				npage_adv;
--		} else {
--			ecmd->autoneg = AUTONEG_DISABLE;
--		}
--	} else {
--		ecmd->autoneg = AUTONEG_DISABLE;
--	}
--
--	if (ecmd->autoneg) {
--		u32 modes = 0;
--		int an_stat = mdio->mdio_read(mdio->dev, mdio->prtad,
--					      MDIO_MMD_AN, MDIO_STAT1);
--
--		/* If AN is complete and successful, report best common
--		 * mode, otherwise report best advertised mode. */
--		if (an_stat & MDIO_AN_STAT1_COMPLETE) {
--			ecmd->lp_advertising =
--				mdio45_get_an(mdio, MDIO_AN_LPA) | npage_lpa;
--			if (an_stat & MDIO_AN_STAT1_LPABLE)
--				ecmd->lp_advertising |= ADVERTISED_Autoneg;
--			modes = ecmd->advertising & ecmd->lp_advertising;
--		}
--		if ((modes & ~ADVERTISED_Autoneg) == 0)
--			modes = ecmd->advertising;
--
--		if (modes & (ADVERTISED_10000baseT_Full |
--			     ADVERTISED_10000baseKX4_Full |
--			     ADVERTISED_10000baseKR_Full)) {
--			speed = SPEED_10000;
--			ecmd->duplex = DUPLEX_FULL;
--		} else if (modes & (ADVERTISED_1000baseT_Full |
--				    ADVERTISED_1000baseT_Half |
--				    ADVERTISED_1000baseKX_Full)) {
--			speed = SPEED_1000;
--			ecmd->duplex = !(modes & ADVERTISED_1000baseT_Half);
--		} else if (modes & (ADVERTISED_100baseT_Full |
--				    ADVERTISED_100baseT_Half)) {
--			speed = SPEED_100;
--			ecmd->duplex = !!(modes & ADVERTISED_100baseT_Full);
--		} else {
--			speed = SPEED_10;
--			ecmd->duplex = !!(modes & ADVERTISED_10baseT_Full);
--		}
--	} else {
--		/* Report forced settings */
--		reg = mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_PMAPMD,
--				      MDIO_CTRL1);
--		speed = (((reg & MDIO_PMA_CTRL1_SPEED1000) ? 100 : 1)
--			 * ((reg & MDIO_PMA_CTRL1_SPEED100) ? 100 : 10));
--		ecmd->duplex = (reg & MDIO_CTRL1_FULLDPLX ||
--				speed == SPEED_10000);
--	}
--
--	ethtool_cmd_speed_set(ecmd, speed);
--
--	/* 10GBASE-T MDI/MDI-X */
--	if (ecmd->port == PORT_TP
--	    && (ethtool_cmd_speed(ecmd) == SPEED_10000)) {
--		switch (mdio->mdio_read(mdio->dev, mdio->prtad, MDIO_MMD_PMAPMD,
--					MDIO_PMA_10GBT_SWAPPOL)) {
--		case MDIO_PMA_10GBT_SWAPPOL_ABNX | MDIO_PMA_10GBT_SWAPPOL_CDNX:
--			ecmd->eth_tp_mdix = ETH_TP_MDI;
--			break;
--		case 0:
--			ecmd->eth_tp_mdix = ETH_TP_MDI_X;
--			break;
--		default:
--			/* It's complicated... */
--			ecmd->eth_tp_mdix = ETH_TP_MDI_INVALID;
--			break;
--		}
--	}
--}
--EXPORT_SYMBOL(mdio45_ethtool_gset_npage);
--
- /**
-  * mdio45_ethtool_ksettings_get_npage - get settings for ETHTOOL_GLINKSETTINGS
-  * @mdio: MDIO interface
-diff --git a/include/linux/mdio.h b/include/linux/mdio.h
-index c63f43645d50..3c3deac57894 100644
---- a/include/linux/mdio.h
-+++ b/include/linux/mdio.h
-@@ -165,9 +165,6 @@ extern int mdio_set_flag(const struct mdio_if_info *mdio,
- 			 bool sense);
- extern int mdio45_links_ok(const struct mdio_if_info *mdio, u32 mmds);
- extern int mdio45_nway_restart(const struct mdio_if_info *mdio);
--extern void mdio45_ethtool_gset_npage(const struct mdio_if_info *mdio,
--				      struct ethtool_cmd *ecmd,
--				      u32 npage_adv, u32 npage_lpa);
- extern void
- mdio45_ethtool_ksettings_get_npage(const struct mdio_if_info *mdio,
- 				   struct ethtool_link_ksettings *cmd,
--- 
-2.47.0
+You have to call phylink_ethtool_get_eee() first, otherwise the manually
+set values will be overridden. However setting tx_lpi_enabled shouldn't
+be needed if you respect phydev->enable_tx_lpi.
+
+> For system boot-up, the commit 49168d1980e2
+> ("net: phy: Add phy_support_eee() indicating MAC support EEE") introduced
+> phy_support_eee to set eee_cfg as the default value. However, the values
+> set were not always correct, as after autonegotiation or speed changes,
+> the selected speed might not be supported by EEE.
+> 
+> phy_update_eee() was introduced to update the correct values for eee_cfg
+> during link up and down, ensuring that 'ethtool --show-eee' shows
+> the correct status.
+> 
+> Fixes: fe0d4fd9285e ("net: phy: Keep track of EEE configuration")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> ---
+>  drivers/net/phy/phy_device.c | 24 ++++++++++++++++++++++++
+>  include/linux/phy.h          |  2 ++
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 499797646580..94dadf011ca6 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -3016,6 +3016,30 @@ void phy_support_eee(struct phy_device *phydev)
+>  }
+>  EXPORT_SYMBOL(phy_support_eee);
+>  
+> +/**
+> + * phy_update_eee - Update the Energy Efficient Ethernet (EEE) settings
+> + * @phydev: target phy_device struct
+> + * @tx_lpi_enabled: boolean indicating if Low Power Idle (LPI) for
+> + * transmission is enabled.
+> + * @eee_enabled: boolean indicating if Energy Efficient Ethernet (EEE) is
+> + * enabled.
+> + * @tx_lpi_timer: the Low Power Idle (LPI) timer value (in microseconds) for
+> + * transmission.
+> + *
+> + * Description:
+> + * This function updates the Energy Efficient Ethernet (EEE) settings for the
+> + * specified PHY device. It is typically called during link up and down events
+> + * to configure the EEE parameters according to the current link state.
+> + */
+> +void phy_update_eee(struct phy_device *phydev, bool tx_lpi_enabled,
+> +		    bool eee_enabled, u32 tx_lpi_timer)
+> +{
+> +	phydev->eee_cfg.tx_lpi_enabled = tx_lpi_enabled;
+> +	phydev->eee_cfg.eee_enabled = eee_enabled;
+> +	phydev->eee_cfg.tx_lpi_timer = tx_lpi_timer;
+> +}
+> +EXPORT_SYMBOL(phy_update_eee);
+> +
+>  /**
+>   * phy_support_sym_pause - Enable support of symmetrical pause
+>   * @phydev: target phy_device struct
+> diff --git a/include/linux/phy.h b/include/linux/phy.h
+> index a98bc91a0cde..6c300ba47a2d 100644
+> --- a/include/linux/phy.h
+> +++ b/include/linux/phy.h
+> @@ -2004,6 +2004,8 @@ void phy_advertise_eee_all(struct phy_device *phydev);
+>  void phy_support_sym_pause(struct phy_device *phydev);
+>  void phy_support_asym_pause(struct phy_device *phydev);
+>  void phy_support_eee(struct phy_device *phydev);
+> +void phy_update_eee(struct phy_device *phydev, bool tx_lpi_enabled,
+> +		    bool eee_enabled, u32 tx_lpi_timer);
+>  void phy_set_sym_pause(struct phy_device *phydev, bool rx, bool tx,
+>  		       bool autoneg);
+>  void phy_set_asym_pause(struct phy_device *phydev, bool rx, bool tx);
 
 
