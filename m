@@ -1,335 +1,100 @@
-Return-Path: <netdev+bounces-144091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505289C5A17
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:19:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CFB9C5A84
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 15:38:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC201B35913
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:20:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44456B29464
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 13:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC0E13B2A9;
-	Tue, 12 Nov 2024 13:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717601422D8;
+	Tue, 12 Nov 2024 13:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="R1fGFGwp"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="uY2tL0PP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BFD13A879
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 13:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC1142AA4;
+	Tue, 12 Nov 2024 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731417627; cv=none; b=KAvC+ZQ66ZuRb5PAQ+zfRMThiwyiK2zsKD1mpAum+NXHV9vJ7LTts5CHIN3NOBxNqokOMN07MqSIFFCbpmjDU6Ker9xtfPHUnrh7FwhPX4hzt1pSDGtKFZ2SSs8/B7sF8QIsXLQnNrkZO2W5Zft6LCoLFhcSLiDOAYYhsQgrnH4=
+	t=1731418644; cv=none; b=Jsdm5mKLGt2tatlVJSDvDGyYpXXadBIEtVWObCIozC1BvzJf6LxCX2Vr5oFRxThlH+ONyzRYkjrHmP33CKrbivRjTdyCA71L7F3JudLTEmsAiOBTmtY9qvv/rAzwLMk+Q2ZEOMgpNTHmsZAFsyAmobJWb4PiWbLIvrs5FUCklZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731417627; c=relaxed/simple;
-	bh=4uQQKVnJVNkYxj3Jf3V9uXYx3Kw1s6pIzZwwAp0Wiaw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hlOtRCq9pTtVYGZ0cuxTnRTJnQwOjABU05zha310O6B4jpwZajEfop2CONfnYcwmXIBclqJuJKoIQsol5Geh0rwXkc51E/6x/wKKGz4jWTh8qxyHVlCAypBipxCOQX46uSO+gknOeoOfPAzgdUmJ7OPEgidycgJBhbyOES/RzO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=R1fGFGwp; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9aa8895facso1046127266b.2
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 05:20:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1731417622; x=1732022422; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=A1t9Ib/aPHDdfQvoVKx/Fp+uYeREslGX9huBdxy8D5w=;
-        b=R1fGFGwpLwBuY22360zqHCFEnrtfk2hrVbS8OpLp+AYP9e1SySpJPTZcqrWxCqjgQ/
-         CtHDSrQDdNVPvhM5cgIaKBv7pEJ+ceYEGN73V32Wfbw2LSEYL8GXVKLgTd2f1dTVKjlb
-         7cJP/UpEaUm9iCVWwOeaRM/5blXj5ML6D/5rnW7T5ihfPCRHQkLa84+kpZzgs72NaKPl
-         qZreU/NfePX9GRTF1xtg/hOZG6UftZ/8/l5Vht+eGmpS7GH7ZcDslLA3jJQgN+GRvURF
-         pEaJfvO7RiXhmdLWXoAntXxo4lxPwlL9XW+SFeCoI2TUk/hVty3Sokumt1vFjrzV5x3t
-         GT1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731417622; x=1732022422;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A1t9Ib/aPHDdfQvoVKx/Fp+uYeREslGX9huBdxy8D5w=;
-        b=SxGpvvtDf0zXa/5drOuMigHg4PCWRdl9bZXg2xKiPkEQ7PHFo6uC+rgWcTSISR/2iB
-         J8qSClDhNKOXijNim7OQiz5c6cQubnt7wJSJIRH/HgAd7es/RmzFr2ATrurro0x1VK7F
-         tCFViombhJlq7sVJIvJEiHvpAlqFhSRbiNDsp9Yjwg+R78gbtxHt+BVeVFK9ZQQMC0JG
-         TCWwEaoYnO7Lz9JlMlUXWUFBRMfSoAcuWvsvP0GxMVBPNcKY7wOFxgTUWr8TwkYsLZ/R
-         2nxhDvvtOnyqNzpos5g2vVZTMl8E+RWqWWSkY+TIiL91UmqEUytGudP/GNcMq/tpwBVK
-         i+fw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCMdAbItcgos/RTtP9mRkQYD+MfSpb40ySD+O4Dh2Os/pjjDr8CD+btHussYGZ+8CqGj8hJjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFleqE1ELSvhKV3IwFZOPDlrt7AgdgV2rkx45F/j4phFCsr8Dt
-	znskFevFDyUDgu+hBUrQ75irCy88ZWrTy2ILjZcakLyQa2ybysgZlsZ8TmQC1PM=
-X-Google-Smtp-Source: AGHT+IHxDEAm5J4fyPiYBfUUcx8JGUKH/71W41+JakmzEd92mmK3cHWQHCGpTj47KLde3aEZt1tLWg==
-X-Received: by 2002:a17:907:72c8:b0:a9a:1739:91e9 with SMTP id a640c23a62f3a-a9eefeebe72mr1631965066b.24.1731417622152;
-        Tue, 12 Nov 2024 05:20:22 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:e829:c484:5241:93b2? ([2001:67c:2fbc:1:e829:c484:5241:93b2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0dc5112sm718813966b.112.2024.11.12.05.20.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 05:20:21 -0800 (PST)
-Message-ID: <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net>
-Date: Tue, 12 Nov 2024 14:20:45 +0100
+	s=arc-20240116; t=1731418644; c=relaxed/simple;
+	bh=EVYtzQGT3MSF63g4iCllL2nKr5PUl0YgthsgBXSWCjo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=P9WB9Wq5a388qZBtqqE3FMG09iLo2ZwRQdbaapuM/L0KqQULCzrXKT1v+tdg4becMu6N3zb24QeGrSd0JWm3nppKnxoCc3RJBETfVGTPio/DiOiBEQGT5h7YPdX2cCTBqgWMsWBmFPdjkXgrLKY4iX0saYhlGS4OEIXK8ieh0Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=uY2tL0PP; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1731418642; x=1762954642;
+  h=from:to:subject:date:message-id:mime-version;
+  bh=EVYtzQGT3MSF63g4iCllL2nKr5PUl0YgthsgBXSWCjo=;
+  b=uY2tL0PPtCMJhMNZ2jWuI0Y/ABpZN0GlP9IGS4yi/sCb9TXxtE76TbP/
+   /H0esl3SVGNLDvsCACts8jzUqvfT8Few7OE4FkH0sGO+Qq4aKuyoLxBXJ
+   ktXs+rNZW2QXTG8OSgC3r/sUk5SC9rfW1cuKQ+OA2RtnwVU3QRf1DzCHP
+   SXJSftW/uvWPDLOSUeA8SM9XUAMqqz9XT1aQZbjMqC1vDGSri4mBq7ETy
+   IO6qOr1h7gqKrUTVtwWyUUSLw+Q0KMlqLW2FPMrdEGfpLDNFzrEewfa5/
+   SFCyM38X+gfz0dSRXh8toP91rC574h830e6OxcBQyB+oiazuC1nHWoE2A
+   w==;
+X-CSE-ConnectionGUID: MrNChj17QCGoNOgRM4DkTw==
+X-CSE-MsgGUID: pxuDztyERIyMkw3B1dHC1w==
+X-IronPort-AV: E=Sophos;i="6.12,148,1728975600"; 
+   d="scan'208";a="201634987"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Nov 2024 06:37:21 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 12 Nov 2024 06:37:05 -0700
+Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 12 Nov 2024 06:37:01 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
+	<vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v3 0/5] Add ptp library for Microchip phys
+Date: Tue, 12 Nov 2024 19:07:19 +0530
+Message-ID: <20241112133724.16057-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net> <ZypfnyfToF1b6YAZ@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <ZypfnyfToF1b6YAZ@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 05/11/2024 19:10, Sabrina Dubroca wrote:
-> 2024-10-29, 11:47:28 +0100, Antonio Quartulli wrote:
->> @@ -105,6 +132,9 @@ void ovpn_decrypt_post(void *data, int ret)
->>   		goto drop;
->>   	}
->>   
->> +	/* keep track of last received authenticated packet for keepalive */
->> +	peer->last_recv = ktime_get_real_seconds();
-> 
-> It doesn't look like we're locking the peer here so that should be a
-> WRITE_ONCE() (and READ_ONCE(peer->last_recv) for all reads).
+Adds support of ptp library in Microchip phys
 
-Is that because last_recv is 64 bit long (and might be more than one 
-word on certain architectures)?
+Divya Koppera (5):
+  net: phy: microchip_ptp : Add header file for Microchip ptp library
+  net: phy: microchip_ptp : Add ptp library for Microchip phys
+  net: phy: Kconfig: Add ptp library support and 1588 optional flag in
+    Microchip phys
+  net: phy: Makefile: Add makefile support for ptp in Microchip phys
+  net: phy: microchip_t1 : Add initialization of ptp for lan887x
 
-I don't remember having to do so for reading/writing 32 bit long integers.
-
-I presume we need a WRITE_ONCE also upon initialization in 
-ovpn_peer_keepalive_set() right?
-We still want to coordinate that with other reads/writes.
-
-> 
->> +
->>   	/* point to encapsulated IP packet */
->>   	__skb_pull(skb, payload_offset);
->>   
->> @@ -121,6 +151,12 @@ void ovpn_decrypt_post(void *data, int ret)
->>   			goto drop;
->>   		}
->>   
->> +		if (ovpn_is_keepalive(skb)) {
->> +			net_dbg_ratelimited("%s: ping received from peer %u\n",
->> +					    peer->ovpn->dev->name, peer->id);
->> +			goto drop;
-> 
-> To help with debugging connectivity issues, maybe keepalives shouldn't
-> be counted as drops? (consume_skb instead of kfree_skb, and not
-> incrementing rx_dropped)
-> The packet was successfully received and did all it had to do.
-
-you're absolutely right. Will change that.
-
-> 
->> +		}
->> +
->>   		net_info_ratelimited("%s: unsupported protocol received from peer %u\n",
->>   				     peer->ovpn->dev->name, peer->id);
->>   		goto drop;
->> @@ -221,6 +257,10 @@ void ovpn_encrypt_post(void *data, int ret)
->>   		/* no transport configured yet */
->>   		goto err;
->>   	}
->> +
->> +	/* keep track of last sent packet for keepalive */
->> +	peer->last_sent = ktime_get_real_seconds();
-> 
-> And another WRITE_ONCE() here (also paired with READ_ONCE() on the
-> read side).
-
-Yap
-
-> 
-> 
->> +static int ovpn_peer_del_nolock(struct ovpn_peer *peer,
->> +				enum ovpn_del_peer_reason reason)
->> +{
->> +	switch (peer->ovpn->mode) {
->> +	case OVPN_MODE_MP:
-> 
-> I think it would be nice to add
-> 
->      lockdep_assert_held(&peer->ovpn->peers->lock);
-> 
->> +		return ovpn_peer_del_mp(peer, reason);
->> +	case OVPN_MODE_P2P:
-> 
-> and here
-> 
->      lockdep_assert_held(&peer->ovpn->lock);
-
-Yeah, good idea.
-__must_hold() can't work here, so lockdep_assert_held is definitely the 
-way to go.
-
-> 
-> (I had to check that ovpn_peer_del_nolock is indeed called with those
-> locks held since they're taken by ovpn_peer_keepalive_work_{mp,p2p},
-> adding these assertions would make it clear that ovpn_peer_del_nolock
-> is not an unsafe version of ovpn_peer_del)
-
-Right, it makes sense.
-
-> 
->> +		return ovpn_peer_del_p2p(peer, reason);
->> +	default:
->> +		return -EOPNOTSUPP;
->> +	}
->> +}
->> +
->>   /**
->>    * ovpn_peers_free - free all peers in the instance
->>    * @ovpn: the instance whose peers should be released
->> @@ -830,3 +871,150 @@ void ovpn_peers_free(struct ovpn_struct *ovpn)
->>   		ovpn_peer_unhash(peer, OVPN_DEL_PEER_REASON_TEARDOWN);
->>   	spin_unlock_bh(&ovpn->peers->lock);
->>   }
->> +
->> +static time64_t ovpn_peer_keepalive_work_single(struct ovpn_peer *peer,
->> +						time64_t now)
->> +{
->> +	time64_t next_run1, next_run2, delta;
->> +	unsigned long timeout, interval;
->> +	bool expired;
->> +
->> +	spin_lock_bh(&peer->lock);
->> +	/* we expect both timers to be configured at the same time,
->> +	 * therefore bail out if either is not set
->> +	 */
->> +	if (!peer->keepalive_timeout || !peer->keepalive_interval) {
->> +		spin_unlock_bh(&peer->lock);
->> +		return 0;
->> +	}
->> +
->> +	/* check for peer timeout */
->> +	expired = false;
->> +	timeout = peer->keepalive_timeout;
->> +	delta = now - peer->last_recv;
-> 
-> I'm not sure that's always > 0 if we finish decrypting a packet just
-> as the workqueue starts:
-> 
->    ovpn_peer_keepalive_work
->      now = ...
-> 
->                                         ovpn_decrypt_post
->                                           peer->last_recv = ...
-> 
->    ovpn_peer_keepalive_work_single
->      delta: now < peer->last_recv
-> 
-
-Yeah, there is nothing preventing this from happening...but is this 
-truly a problem? The math should still work, no?
-
-However:
-
-> 
-> 
->> +	if (delta < timeout) {
->> +		peer->keepalive_recv_exp = now + timeout - delta;
-> 
-> I'd shorten that to
-> 
->      peer->keepalive_recv_exp = peer->last_recv + timeout;
-> 
-> it's a bit more readable to my eyes and avoids risks of wrapping
-> values.
-> 
-> So I'd probably get rid of delta and go with:
-> 
->      last_recv = READ_ONCE(peer->last_recv)
->      if (now < last_recv + timeout) {
->      	peer->keepalive_recv_exp = last_recv + timeout;
->      	next_run1 = peer->keepalive_recv_exp;
->      } else if ...
-> 
->> +		next_run1 = peer->keepalive_recv_exp;
->> +	} else if (peer->keepalive_recv_exp > now) {
->> +		next_run1 = peer->keepalive_recv_exp;
->> +	} else {
->> +		expired = true;
->> +	}
-
-I agree this is simpler to read and gets rid of some extra operations.
-
-[note: I took inspiration from nat_keepalive_work_single() - it could be 
-simplified as well I guess]
-
-> 
-> [...]
->> +	/* check for peer keepalive */
->> +	expired = false;
->> +	interval = peer->keepalive_interval;
->> +	delta = now - peer->last_sent;
->> +	if (delta < interval) {
->> +		peer->keepalive_xmit_exp = now + interval - delta;
->> +		next_run2 = peer->keepalive_xmit_exp;
-> 
-> and same here
-
-Yeah, will change both. Thanks!
-
-
-Regards,
-
+ drivers/net/phy/Kconfig         |   9 +-
+ drivers/net/phy/Makefile        |   1 +
+ drivers/net/phy/microchip_ptp.c | 997 ++++++++++++++++++++++++++++++++
+ drivers/net/phy/microchip_ptp.h | 217 +++++++
+ drivers/net/phy/microchip_t1.c  |  40 +-
+ 5 files changed, 1260 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/phy/microchip_ptp.c
+ create mode 100644 drivers/net/phy/microchip_ptp.h
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.17.1
 
 
