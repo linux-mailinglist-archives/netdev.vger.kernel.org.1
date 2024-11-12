@@ -1,102 +1,209 @@
-Return-Path: <netdev+bounces-144022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4289F9C5229
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 10:35:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E76339C5230
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 10:37:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE2B51F23855
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 09:35:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7071285201
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 09:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FB320E332;
-	Tue, 12 Nov 2024 09:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550B220E021;
+	Tue, 12 Nov 2024 09:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZTbm41fY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZeNE8Amt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9074620E015;
-	Tue, 12 Nov 2024 09:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E2120DD64;
+	Tue, 12 Nov 2024 09:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731404122; cv=none; b=WPvQm+q8qwRI8eozvz7HgMS/C/aS0s9qqFloCdumSwgYQ5n5gOUuKNs6KLeO2aSa6W5vON2JrQ+0ZJwPgtVsEIfcKRVCBx5m1CmKLtBMxktRluy8SgnQReeT2YjuL89PRi1cUeOEdh7G1a59J75uHHNWn4B4t3ReyekDPtAddQA=
+	t=1731404234; cv=none; b=hSO78rmOiG2E6i70SPOFJBZndgImKJs7JPxk4PcLmqwtWT3Anu/h7xBW/+k9qfubSL7prrDG7xcJSVpqNIv8CaQ3Zrlgjib9238tRZ2Yb88OH+nu1iKFns4YM+TfjaiTQ/GfXXBuQgWCI8Lrlnc8GS9G7Kb26OQjalGGlPz2Z6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731404122; c=relaxed/simple;
-	bh=Ulfos9jKmMp9FRRzcWaNP9pRqcDXWjbtCIFpVe+BjzM=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=hyw1hNQnYceJ5ZkdA5ot1EKTUcTDUeb92P9ihiFv+5nyuNReb+FCN0AtoA2G68hjShiaZA9zeGgNzW5lifGA/04pdnBSarI4Dyw6Cyvaf6nwNcw/7XuNQ1o7Q3QIoMX4XhqXx+gbVkAwTsBSpRxtq5wWE0vxn1i4G+NMYOm5qrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZTbm41fY; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539f1292a9bso6639130e87.2;
-        Tue, 12 Nov 2024 01:35:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731404118; x=1732008918; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/2dA/CSJ1mXRX1iIfc9wkyf+fvE+0vTa/19Nc9jWmsE=;
-        b=ZTbm41fY3Pmam8B76DmvYzU3cM+OWaoDi3t8FpZEzqCjUkJwtQuU/iFB7Z0RKQMJSR
-         RzfWGBVXmHYvt/jqXtU1ZdASeFztqDIB5dBXUgDYznGiGX/BJ3ytyHTfKDvdFxyUdN6i
-         gq2aL9gOxUmzK9d5LAzUEa/mVrOiJveLjgaS2u/Ahs4fQb2l2LQ5a8Pxe1VgS4y2B4Xg
-         v6/nFfBud0UvsVjX7MNiHtqu4Z1rIHq/TC7fbTl/RLNctwEzQhlCB4zrwoBKC7EFM+dc
-         BkCnfxawOgR4fb5VL7mfYbrTc/GK2/Gj1X9X8n+yGiVPZmoAIYd2/fqA4RvDbVxcKegd
-         ogCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731404118; x=1732008918;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/2dA/CSJ1mXRX1iIfc9wkyf+fvE+0vTa/19Nc9jWmsE=;
-        b=dgsF0ofNAAyAV6u/W5dq3Z+KedpKo7EfyHAn0zT80PU+w8nlv9GWTww2/7NrMiibO9
-         qKq0DAKmNe1VWb5kpwKxXQymQ1tCxUOg3i7ZlevXlX2/NWoIeLE6hAnN3rF/JTNBE/eK
-         0ySUP3nevtcnQBU4ySP14zICWA7bUFlh7sB/jI+qdGtzVlDkO1bmdmDMvtTH+opKJ36O
-         KBH4CyCTXrVBUDaFyZOUR/PF7IbVUbM4QaAku0+fKCIMoLL0Si03yWuDAD9N5Ru95/Hv
-         LOTzIDO+BpwiPStsw1Y4eVvyJ22zhZScnJx01vqmlkpVzpzDqhfdYgnXVode/LoRuAWL
-         huDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9nmffQ0hnN3RiZrTYEbi7UgeLJwllrf7Mx732oCYMul3zfwWA8+1wfHc7C8d/KsDLol534FpoRAAOpUo=@vger.kernel.org, AJvYcCWy7w9OP5oXfbKu/7lWHKTudiLEKj7k/tfnwouhPF6mqW+9oK3R1Vwqqlxi/Gozq/LxMFBDQ9p/@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXCGBsh1jtVwIkp53DpBe3kp9JB1Lv/kRMhMjlKWtx2knsz4TM
-	gUSuAXpQ3YsL0FQ14eZhn9sO6uDFf74jUgyW+bOGf4l0FIoZgw41vLKbug==
-X-Google-Smtp-Source: AGHT+IFIhvdsWxGDaHpDPZFOhDaxNLymcA5oHrHaD/i0n7/b4Fl+3DYEGfak+N0uLU404q5aq+Dp0Q==
-X-Received: by 2002:a05:6512:2389:b0:539:ebb6:7b36 with SMTP id 2adb3069b0e04-53d862c587dmr7358493e87.25.1731404117991;
-        Tue, 12 Nov 2024 01:35:17 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:a1ef:92f5:9114:b131])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c18e0sm206352035e9.28.2024.11.12.01.35.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 01:35:17 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jan Stancek <jstancek@redhat.com>
-Cc: kuba@kernel.org,  pabeni@redhat.com,  davem@davemloft.net,
-  edumazet@google.com,  horms@kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] tools: ynl: add script dir to sys.path
-In-Reply-To: <b26537cdb6e1b24435b50b2ef81d71f31c630bc1.1731399562.git.jstancek@redhat.com>
-	(Jan Stancek's message of "Tue, 12 Nov 2024 09:21:32 +0100")
-Date: Tue, 12 Nov 2024 09:34:54 +0000
-Message-ID: <m2serwu75t.fsf@gmail.com>
-References: <cover.1731399562.git.jstancek@redhat.com>
-	<b26537cdb6e1b24435b50b2ef81d71f31c630bc1.1731399562.git.jstancek@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1731404234; c=relaxed/simple;
+	bh=BG88lmT+d3ZawoP/5WJSguMy0D/EvYsOfiqns+IETtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=duuZPOFZlbo1a195nxMfHdQuGxcGiIcUOIbj9CMkmcdHsZ9Qv+Q8Xe29njfHpwDCg2jUBt7WrTo0bc/3ZaMwFZTdwKjMze1RR4IvyIx7Mwi86kkow2udYn0IsT7OA6o6wXseo9djONzs2up0ZKMBy9xEOzM1YVaGXZLDhB6TWLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZeNE8Amt; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731404232; x=1762940232;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BG88lmT+d3ZawoP/5WJSguMy0D/EvYsOfiqns+IETtQ=;
+  b=ZeNE8AmtlxUTcbbIuntoyNlm6QCWvm775vjzy66B022FnqSYGOnCJI0y
+   cSMfpXOC2i+7tbGAAWIWoRtuLKSKviK0ezQs5egD797ph2ZaKkmdsc7PW
+   XOTQEWcFE3uSqvfnOzT95i6lJ775mQUfiK17cZkPcEEu/n+0KyYjQoPGy
+   fg4w4sJy1XIn1Ftbcbf14Zwazwg6ecVGhuHMvMKV61ekse7LyMS8H6p3b
+   BQ3QRzHn131U7/+yp/rFrb8wtQpi+BIyGgkX0/riNa7NhiQ+BNbuUxvHc
+   FzJVfcM5w9pkSGz3AxXVMyNdjtPeG9dZhPJG69pBbRLLQWh7e2/+h9VWK
+   g==;
+X-CSE-ConnectionGUID: cAHj36bMRACd6DFTxDTvnw==
+X-CSE-MsgGUID: h5go18ZWRxebnTmETQafGQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11253"; a="31324306"
+X-IronPort-AV: E=Sophos;i="6.12,147,1728975600"; 
+   d="scan'208";a="31324306"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2024 01:37:11 -0800
+X-CSE-ConnectionGUID: uznwFk1lQj6Hj/ss8jzqjw==
+X-CSE-MsgGUID: FrAaMaVFR46Dsllk7XcSsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,147,1728975600"; 
+   d="scan'208";a="87726523"
+Received: from lkp-server01.sh.intel.com (HELO bcfed0da017c) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 12 Nov 2024 01:37:10 -0800
+Received: from kbuild by bcfed0da017c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tAnKd-0000fj-23;
+	Tue, 12 Nov 2024 09:37:07 +0000
+Date: Tue, 12 Nov 2024 17:36:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org,
+	linux-api@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, John Ousterhout <ouster@cs.stanford.edu>
+Subject: Re: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
+Message-ID: <202411121707.Uash8uoM-lkp@intel.com>
+References: <20241111234006.5942-13-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241111234006.5942-13-ouster@cs.stanford.edu>
 
-Jan Stancek <jstancek@redhat.com> writes:
+Hi John,
 
-> Python options like PYTHONSAFEPATH or -P [1] do not add script
-> directory to PYTHONPATH. ynl depends on this path to build and run.
->
-> [1] This option is default for Fedora rpmbuild since introduction of
->     https://fedoraproject.org/wiki/Changes/PythonSafePath
->
-> Signed-off-by: Jan Stancek <jstancek@redhat.com>
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20241112-074535
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241111234006.5942-13-ouster%40cs.stanford.edu
+patch subject: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
+config: openrisc-allyesconfig (https://download.01.org/0day-ci/archive/20241112/202411121707.Uash8uoM-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241112/202411121707.Uash8uoM-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411121707.Uash8uoM-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from ./arch/openrisc/include/generated/asm/div64.h:1,
+                    from include/linux/math.h:6,
+                    from include/linux/kernel.h:27,
+                    from include/linux/cpumask.h:11,
+                    from include/linux/smp.h:13,
+                    from include/linux/lockdep.h:14,
+                    from include/linux/spinlock.h:63,
+                    from include/linux/sched.h:2145,
+                    from include/linux/audit.h:12,
+                    from net/homa/homa_impl.h:12,
+                    from net/homa/homa_outgoing.c:7:
+   net/homa/homa_outgoing.c: In function 'homa_new_data_packet':
+   include/asm-generic/div64.h:222:35: warning: comparison of distinct pointer types lacks a cast [-Wcompare-distinct-pointer-types]
+     222 |         (void)(((typeof((n)) *)0) == ((uint64_t *)0));  \
+         |                                   ^~
+   net/homa/homa_outgoing.c:108:9: note: in expansion of macro 'do_div'
+     108 |         do_div(segs, max_seg_data);
+         |         ^~~~~~
+   In file included from include/asm-generic/bug.h:5,
+                    from arch/openrisc/include/asm/bug.h:5,
+                    from include/linux/bug.h:5,
+                    from net/homa/homa_impl.h:10:
+   include/asm-generic/div64.h:234:32: warning: right shift count >= width of type [-Wshift-count-overflow]
+     234 |         } else if (likely(((n) >> 32) == 0)) {          \
+         |                                ^~
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   net/homa/homa_outgoing.c:108:9: note: in expansion of macro 'do_div'
+     108 |         do_div(segs, max_seg_data);
+         |         ^~~~~~
+>> include/asm-generic/div64.h:238:36: error: passing argument 1 of '__div64_32' from incompatible pointer type [-Wincompatible-pointer-types]
+     238 |                 __rem = __div64_32(&(n), __base);       \
+         |                                    ^~~~
+         |                                    |
+         |                                    int *
+   net/homa/homa_outgoing.c:108:9: note: in expansion of macro 'do_div'
+     108 |         do_div(segs, max_seg_data);
+         |         ^~~~~~
+   include/asm-generic/div64.h:213:38: note: expected 'uint64_t *' {aka 'long long unsigned int *'} but argument is of type 'int *'
+     213 | extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
+         |                            ~~~~~~~~~~^~~~~~~~
+   net/homa/homa_outgoing.c: In function 'homa_message_out_fill':
+   include/asm-generic/div64.h:222:35: warning: comparison of distinct pointer types lacks a cast [-Wcompare-distinct-pointer-types]
+     222 |         (void)(((typeof((n)) *)0) == ((uint64_t *)0));  \
+         |                                   ^~
+   net/homa/homa_outgoing.c:233:9: note: in expansion of macro 'do_div'
+     233 |         do_div(segs_per_gso, max_seg_data);
+         |         ^~~~~~
+   include/asm-generic/div64.h:234:32: warning: right shift count >= width of type [-Wshift-count-overflow]
+     234 |         } else if (likely(((n) >> 32) == 0)) {          \
+         |                                ^~
+   include/linux/compiler.h:76:45: note: in definition of macro 'likely'
+      76 | # define likely(x)      __builtin_expect(!!(x), 1)
+         |                                             ^
+   net/homa/homa_outgoing.c:233:9: note: in expansion of macro 'do_div'
+     233 |         do_div(segs_per_gso, max_seg_data);
+         |         ^~~~~~
+>> include/asm-generic/div64.h:238:36: error: passing argument 1 of '__div64_32' from incompatible pointer type [-Wincompatible-pointer-types]
+     238 |                 __rem = __div64_32(&(n), __base);       \
+         |                                    ^~~~
+         |                                    |
+         |                                    int *
+   net/homa/homa_outgoing.c:233:9: note: in expansion of macro 'do_div'
+     233 |         do_div(segs_per_gso, max_seg_data);
+         |         ^~~~~~
+   include/asm-generic/div64.h:213:38: note: expected 'uint64_t *' {aka 'long long unsigned int *'} but argument is of type 'int *'
+     213 | extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
+         |                            ~~~~~~~~~~^~~~~~~~
+
+
+vim +/__div64_32 +238 include/asm-generic/div64.h
+
+^1da177e4c3f41 Linus Torvalds     2005-04-16  215  
+^1da177e4c3f41 Linus Torvalds     2005-04-16  216  /* The unnecessary pointer compare is there
+^1da177e4c3f41 Linus Torvalds     2005-04-16  217   * to check for type safety (n must be 64bit)
+^1da177e4c3f41 Linus Torvalds     2005-04-16  218   */
+^1da177e4c3f41 Linus Torvalds     2005-04-16  219  # define do_div(n,base) ({				\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  220  	uint32_t __base = (base);			\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  221  	uint32_t __rem;					\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  222  	(void)(((typeof((n)) *)0) == ((uint64_t *)0));	\
+911918aa7ef6f8 Nicolas Pitre      2015-11-02  223  	if (__builtin_constant_p(__base) &&		\
+911918aa7ef6f8 Nicolas Pitre      2015-11-02  224  	    is_power_of_2(__base)) {			\
+911918aa7ef6f8 Nicolas Pitre      2015-11-02  225  		__rem = (n) & (__base - 1);		\
+911918aa7ef6f8 Nicolas Pitre      2015-11-02  226  		(n) >>= ilog2(__base);			\
+c747ce4706190e Geert Uytterhoeven 2021-08-11  227  	} else if (__builtin_constant_p(__base) &&	\
+461a5e51060c93 Nicolas Pitre      2015-10-30  228  		   __base != 0) {			\
+461a5e51060c93 Nicolas Pitre      2015-10-30  229  		uint32_t __res_lo, __n_lo = (n);	\
+461a5e51060c93 Nicolas Pitre      2015-10-30  230  		(n) = __div64_const32(n, __base);	\
+461a5e51060c93 Nicolas Pitre      2015-10-30  231  		/* the remainder can be computed with 32-bit regs */ \
+461a5e51060c93 Nicolas Pitre      2015-10-30  232  		__res_lo = (n);				\
+461a5e51060c93 Nicolas Pitre      2015-10-30  233  		__rem = __n_lo - __res_lo * __base;	\
+911918aa7ef6f8 Nicolas Pitre      2015-11-02  234  	} else if (likely(((n) >> 32) == 0)) {		\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  235  		__rem = (uint32_t)(n) % __base;		\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  236  		(n) = (uint32_t)(n) / __base;		\
+c747ce4706190e Geert Uytterhoeven 2021-08-11  237  	} else {					\
+^1da177e4c3f41 Linus Torvalds     2005-04-16 @238  		__rem = __div64_32(&(n), __base);	\
+c747ce4706190e Geert Uytterhoeven 2021-08-11  239  	}						\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  240  	__rem;						\
+^1da177e4c3f41 Linus Torvalds     2005-04-16  241   })
+^1da177e4c3f41 Linus Torvalds     2005-04-16  242  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
