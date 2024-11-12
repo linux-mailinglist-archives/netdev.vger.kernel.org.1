@@ -1,102 +1,92 @@
-Return-Path: <netdev+bounces-143964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DCEF9C4DAC
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 05:16:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7079C4DBC
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 05:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E4AF284317
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:16:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 048542878C9
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 04:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDBD1A08B2;
-	Tue, 12 Nov 2024 04:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZDyeuOUM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5A31A01C3;
+	Tue, 12 Nov 2024 04:31:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918B916CD29
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 04:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83072D53C
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 04:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731384968; cv=none; b=UHJqwdzGxyqfHs0feqarjLqWr/tdCc87vqmKL6TC2dekQFlGowdGgDxMgjHpyWxw5SIhP4LbgvF/0x03eghLwbd9v/aU+FtMgT8KE1Fdvrb4nAcqhYS7T2b8l9QtzIB3WT/0lhAQXwHVqgTs7L689xLFu0q1rP/GsylA7varbIo=
+	t=1731385868; cv=none; b=VBFhgKwUrAExY4E24cBWudEGeDENS2sF9EDDyfWe7lOxN8xHLn8TSbaps6I1GHBn6Nh7Db8JleMxaq5Jac2ZbTu6QY1VBvjBjQ72L3KeRzFZ+jwuc0A1gfNcpqAOHkrHTiQPPsLcEWGVbQzfXTTvDne+ouyCqUZndXwq5ixSk9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731384968; c=relaxed/simple;
-	bh=uy3uqLRHfXPI001TOjpvjYyNZD0yjjOQwcAffxmdvlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rvtf2+gcKX27BRXKX2hoLagluR2dARDFrzvxi0ZK8qIcfysfVf4TfZmrkqrRCahvBrfnc34IxZo8ZSY0QF+gpFSvgYmK2JoCY3NYri32q4ljvz77Awc+F7D3Ji0uCIAJeb82z73Z/SBWkfWtN9rA1bjTQDUDg+784V9LUJm4+Nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZDyeuOUM; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=4kYL+jth31n7Hz8rWiCyJvCyw0n/eS4R/2C2s6FINzw=; b=ZDyeuOUMx/Nx3hOaQGFa+MITkC
-	6vRv39KZKuH46sI9HHEpMjvm92kOCUUc1eX20EpfcqPFoLq4RfwK1iRwlZoNwuKLWpgqnIO46vbax
-	nVMtHDQLoA7rUgEAKJbSOrwF8Of/8mhHAHShOVNFwM5K/3W12kJ6TYcVsxs2JvCFfvQurmpgJSGZ6
-	w2muvjuq7yScvYENDstM5BSdzaUyHMnq8w/ByRl8aYK09j/YdmyGCsAP0SqLX53NHVHTruMVZN+/z
-	xnuZS0SNdCOzNZjyXUpvtd7DrRXlcfw1HnUX62yU1BzoBYgKsXW8dv9wX6YkLioxS/z0imJ5IUjsT
-	cNDgdv2Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tAiJf-00G9OU-0P;
-	Tue, 12 Nov 2024 12:15:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 12 Nov 2024 12:15:47 +0800
-Date: Tue, 12 Nov 2024 12:15:47 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "dongchenchen (A)" <dongchenchen2@huawei.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Subject: Re: [PATCH net] net: Fix icmp host relookup triggering ip_rt_bug
-Message-ID: <ZzLWcxskwi9e_bPf@gondor.apana.org.au>
-References: <20241111123915.3879488-1-dongchenchen2@huawei.com>
- <ZzK5A9DDxN-YJlsk@gondor.apana.org.au>
- <8acfac66-bd2f-44a0-a113-89951dcfd2d3@huawei.com>
+	s=arc-20240116; t=1731385868; c=relaxed/simple;
+	bh=UXtpxBefUNr3VcIYNI9rVjNQrYCyWHXXzZkWnLQ35Tc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=gp8829AaSloK4cnez4JMEQ0hZIZ4TdHGfealYVHc/M/EGPN3QxmywLi44V3TAxPCExqKTLVI8F5FX0HL1xskIxQlYHYfIC8XftU9LIrFXtS08K2L8xiS9Az3oFvBeNGZ5NHnjeA3a9KlaelED4Bob53ODOLSbKPAIQaCRtd2InQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3cb771556so64889655ab.3
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 20:31:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731385867; x=1731990667;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=57INWnZiq0HfAnj9yObF5CBGSGscztNUCHjuo+6K0KI=;
+        b=c2x/SQVXmaG/hwALjRG6ysa3K6EIMcwM0pADvrQs1qbWiTBa9WJic5iBxGM1iBlzRp
+         UE0CnNVZakfZoU4KiBL2O4quL4JzwD+YlJzveOcnfda+FqWPUbWnW6YZLjBKB34U88uf
+         LDWeqKqLpI5E5T9mYMFyiNj4kRjc0HWm2szZIwule2s0yUaQHSF6yBc5rZPgEp3Ior5g
+         3KFeJ82aIVETlPgjmAmJcNWhz68gipBPGc6wcVjsnhz8NdCVG3fuFxTCrFh+Fduzg8Wo
+         C7hl+gjrG73URul/NbkB+m/pwehUCHdMlksRV7FkMVtYegQ8JVGxcKOWl4Eg2BnFi6it
+         cFKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYg89E4eDFhvH/SySP4H67xzO1cvh4SgRDStzqywZATxVyYapElZCEpZUtTHjUVycN3SLuHyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRsUJCFTH1vMNB8ACTCr7qZgkOFTBLLgLa1yRiJy3IR9NTYJjn
+	sPlz18oBwq0YHSV+J0Kd9rZbpcIK2VeBPXYSjH2P63DK/6Nezub6piwy7D+5z5CYuVUD/NiVwau
+	9ATXuY3XbGCS70WNwwxfjW/a1+w5bFiVk1yZ6SIA7REG5biaJBTWpxMw=
+X-Google-Smtp-Source: AGHT+IFFUDjXKPivqzf1Tpm1sYMybaBdZY0FjaiXxICZysfVPEn6SL2GpDXPpaOREbFWte39HRrYxumuNBSVZgs5bBmZdVwHU/rz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8acfac66-bd2f-44a0-a113-89951dcfd2d3@huawei.com>
+X-Received: by 2002:a05:6e02:1908:b0:3a4:ebfa:2ac7 with SMTP id
+ e9e14a558f8ab-3a6f1a0a674mr158303905ab.12.1731385866731; Mon, 11 Nov 2024
+ 20:31:06 -0800 (PST)
+Date: Mon, 11 Nov 2024 20:31:06 -0800
+In-Reply-To: <20241112002134.2003089-1-lizhi.xu@windriver.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6732da0a.050a0220.5088e.0005.GAE@google.com>
+Subject: Re: [syzbot] [wpan?] [usb?] BUG: corrupted list in ieee802154_if_remove
+From: syzbot <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, dmantipov@yandex.ru, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, lizhi.xu@windriver.com, miquel.raynal@bootlin.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stefan@datenfreihafen.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 12, 2024 at 11:42:47AM +0800, dongchenchen (A) wrote:
->
-> If skb_in is outbound, fl4_dec.saddr is not nolocal. It may be no input
-> route from B to A for
-> 
-> first communication.
+Hello,
 
-You're right.  So the problem here is that for the case of A
-being local, we should not be taking the ip_route_input code
-path (this is intended for forwarded packets).
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-In fact if A is local, and we're sending an ICMP message to A,
-then perhaps we could skip the IPsec lookup completely and just
-do normal routing?
+Reported-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
 
-Steffen, what do you think?
+Tested on:
 
-So I think it boils down to two choices:
+commit:         2d5404ca Linux 6.12-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1608335f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1503500c6f615d24
+dashboard link: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=109ed35f980000
 
-1) We could simply drop IPsec processing if we notice that A
-(fl.fl4_dst) is local;
-2) Or we could take the __ip_route_output_key code path and
-continue to do the xfrm lookup when A is local.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Note: testing is done by a robot and is best-effort only.
 
