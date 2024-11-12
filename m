@@ -1,154 +1,128 @@
-Return-Path: <netdev+bounces-143931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE63E9C4C3E
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:10:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CAD99C4C99
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 03:30:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 727C228A489
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:10:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21A18B296CA
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 02:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F56204020;
-	Tue, 12 Nov 2024 02:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717ED1F7092;
+	Tue, 12 Nov 2024 02:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="aerelTLL"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="M1ZCf3M2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="n79C6nqM"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922CA433BE
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 02:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5A319CC3D;
+	Tue, 12 Nov 2024 02:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731377426; cv=none; b=F2GgsyrAX1CYLiYRe/c0cc81tIuXLlOykrWK73CJITk7i9zJk8yEILvLf1DTFoTxdUqx5HLzafKxcf6Z8oHe3aGuwjJ/LkgiI8gerJEkxYwg6WlzGDNYu9qAcZr+AHWKiD1dcPPWXDKOndfaq6gqYR4qt6YRDHytOEhNbj5OZnA=
+	t=1731378300; cv=none; b=LKwXf3dg93EbM6uCQTskvgRGK+bcJxh5rpEnx0J95R/4SWRVsLfygjHG6dlKot/vWIEYqmqP7PMPQTwBjeyvA+oaUzLVcnLPDNzuqS27JP1te2BmIVgzQJop92knQqChO+Vvu5wR/MwykBl4aDUL4ItoWk9rvdlnmucDtTITAz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731377426; c=relaxed/simple;
-	bh=Ivjmfehp21sJoOOTkDQKnovhf/CBif5FZeQ1rJTkvss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fa9y94iaM43Y1TfsWtWjFMriPg40xTv4jVbhhiUuX/LoNbMEYFzOm98YjNferO1ttPnEqpmXL0r13Rfzq6RiIvRwdFYYQinOekpH0nUJBVMAA26djUuHGrVYqjtSDLw3gFYbn1SUnYOqsGmYu5+ryUPnxW5q2hO2Z7INHHjD5tA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=aerelTLL; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=taHJuz6JJ0iMeh2D3a7DTBHgPLCQhVvmKimv/h/JEy4=; b=aerelTLL07K2jJHNVI+QHS6Xji
-	DYA8IajIOLFXVSufLSknqbCaGadu2RWRyk4XGxrVlbCH/OJCDkJnjnZ8hPd+M5GTjrg1S2sgfCb/e
-	6bqpEvWxfNX+vVqPiUgWl8HHOcst9cdX4jv8Wi9IOJxu+Dx8B6oV5oe3S67N1TnrxmpXhZ3zNlogP
-	weyW/xDfZxHEBBi0xuQhqb1himJWx8B+pcGBMUtqGqxi8aTE3kc1ZZh3snGXZp00b5hLXdAFR8d2i
-	xnqAlN5pjlbCa9F3/qmMB1Wqt65N/rXfRanC4l1GJRZ1Ulle5jrVBsna7u3cFt9Oz0I+3SeogHNwX
-	ORvGQQ+g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tAgM7-00G8Aq-2i;
-	Tue, 12 Nov 2024 10:10:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 12 Nov 2024 10:10:11 +0800
-Date: Tue, 12 Nov 2024 10:10:11 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dong Chenchen <dongchenchen2@huawei.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Subject: Re: [PATCH net] net: Fix icmp host relookup triggering ip_rt_bug
-Message-ID: <ZzK5A9DDxN-YJlsk@gondor.apana.org.au>
-References: <20241111123915.3879488-1-dongchenchen2@huawei.com>
+	s=arc-20240116; t=1731378300; c=relaxed/simple;
+	bh=3JXPofZrAihuRz2Dftz3FiL8QsEIZyfNEEldzOgT8Ko=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CnAfIs3aFqkHXSAqA/ExjL0oN4JGehYgRw8QZ0+ZrD7gY8vwvfP+D6vUkGbiVYeZYV87xrmgXlvqMc7/FWZVa4cxlx/JNv3kSg1YkmujQ6TuRJK5lfwm0a9GHMMjaL/9O4WTKmFzTlrHbHOVZT0Ex4ZKGDrd2hFbocvr8zfkOsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=M1ZCf3M2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=n79C6nqM; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id EAB521380274;
+	Mon, 11 Nov 2024 21:24:56 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Mon, 11 Nov 2024 21:24:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1731378296; x=1731464696; bh=3bTl2kc6DYFcUgHxTINVK
+	8rXRMZ1klif4KCyFjRR7Lw=; b=M1ZCf3M2JrkZjpuKVtx+t/wq1dSJPOwRFFzxJ
+	kYfRx1922HsFGVT39iQ89UtmMB0hbG1QoV9PMvppwv19CvlgnAyBsA7M7dlKFaCg
+	snZqyIcK/zigF19eAx9StTjuTVnBzSnSQp+Oq/6vBqlJXuwBxT5ZV3SbCpXTw/zN
+	p4cBxB115yeWQGsaKLx9ZFTkJ5uEScriqf1eC4XyicZ5bqCbCyAwZ33vIEt+tIUg
+	upsYdIVK0EW/KFjop+S8KPVA3107UE8PjHKO3m/GgjtC2kqqqNCwucmSU7jVPtpP
+	rdmHTByyG2UGNXDVZN5NhmucYUnFROWimqOrrOGN+8UA9wdqQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1731378296; x=1731464696; bh=3bTl2kc6DYFcUgHxTINVK8rXRMZ1klif4KC
+	yFjRR7Lw=; b=n79C6nqMkvn5B7G6lVKyZFO1z7LKsTTkY261S4DeDyv4QVIs3TU
+	koKnAmBCuXOFM+teKyjcPsu2AMl6Yloo8F1xdMUpifY1cC0UFjskvKKWuI4bFOrK
+	/7UQSPhnwiQyI0Ae/pckvIVjp/hKBY3C8U90HLPPQ604R5Q7/nlanqxouj1aWqHA
+	yL3BkMPytRus4PwXB9N93UuYiKNZ1DtLwGosctHeOAy3pSS8zjagbU9R3L/hQ2Kx
+	6g3vwCE2GnMhUNvkBDkrjrwv7+cL64JRku/VEu6/q/ni4NZIdExgWgTK9g1Nvm2/
+	sRNNiHW0okxHZ/lSaZIzFy9XKmglDwRfFTw==
+X-ME-Sender: <xms:eLwyZ_PZDpyYY5-kJkqP1Wt8FI6GxgIUolrallCNP9DPFdV-V_JrLw>
+    <xme:eLwyZ586Hbg1PjeSu0W3aU9X4njDmp2a8jDgno3WfG3BVzOAU1udfkKiIWpfknv5v
+    TZPEHxK8Nw6x6zUvA>
+X-ME-Received: <xmr:eLwyZ-QnEYtCf1Av6apA5gS8-F3cSlmsN7lCTIFVqaI5jfha0hbW5Al5G9QDwViR1K8_ISee6JUL6jifdyeHOqi32M5olSEDTAD8IpLwLd4kwZg6jN6s>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudefgdegiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdejtd
+    dmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhi
+    vghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpedvge
+    fgtefgleehhfeufeekuddvgfeuvdfhgeeljeduudfffffgteeuudeiieekjeenucevlhhu
+    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuh
+    hurdighiiipdhnsggprhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehkrghlvghshhdqrghnrghkkhhurhdrphhurhgrhihilhessghrohgruggtohhmrd
+    gtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohepmhhitghhrggvlhdrtghhrghnsegsrhhorggutghomhdrtghomhdprhgt
+    phhtthhopehprghvrghnrdgthhgvsggsihessghrohgruggtohhmrdgtohhmpdhrtghpth
+    htohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgv
+    lhhfthgvshhtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtih
+    hnrdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtohepkhgvrhhnvghlqdhtvggrmhes
+    mhgvthgrrdgtohhm
+X-ME-Proxy: <xmx:eLwyZztAOGOyx7TFiCA4M2nAGjuStbmdHfe7hl5sCyBJpUnfXTra3w>
+    <xmx:eLwyZ3cfUGX5nz7hH_2k2EBP9-x5GaDFhYS1KbfSLMyVx7hx1vQJ6A>
+    <xmx:eLwyZ_3r_NPuR_ncCivd3d3uenxbYvntDhNd3zqezRh39w1nm8FVPw>
+    <xmx:eLwyZz9aj-Qid04qPILfLJ7Ja7a3qgB8_p6chO_yxyM8MkfqgntW9g>
+    <xmx:eLwyZ77lmfn0VCprXtCfRwhJ4Iqg6J8x9w0aNgcSmzFM2Sx6C-SAOf3z>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 11 Nov 2024 21:24:55 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: kalesh-anakkur.purayil@broadcom.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	kuba@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	martin.lau@linux.dev
+Cc: kernel-team@meta.com
+Subject: [PATCH net v2 0/2] bnxt: Fix failure to report RSS context in ntuple rule
+Date: Mon, 11 Nov 2024 19:23:29 -0700
+Message-ID: <cover.1731377399.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241111123915.3879488-1-dongchenchen2@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 11, 2024 at 08:39:15PM +0800, Dong Chenchen wrote:
-> arp link failure may trigger ip_rt_bug while xfrm enabled, call trace is:
-> 
-> WARNING: CPU: 0 PID: 0 at net/ipv4/route.c:1241 ip_rt_bug+0x14/0x20
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc6-00077-g2e1b3cc9d7f7
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:ip_rt_bug+0x14/0x20
-> Call Trace:
->  <IRQ>
->  ip_send_skb+0x14/0x40
->  __icmp_send+0x42d/0x6a0
->  ipv4_link_failure+0xe2/0x1d0
->  arp_error_report+0x3c/0x50
->  neigh_invalidate+0x8d/0x100
->  neigh_timer_handler+0x2e1/0x330
->  call_timer_fn+0x21/0x120
->  __run_timer_base.part.0+0x1c9/0x270
->  run_timer_softirq+0x4c/0x80
->  handle_softirqs+0xac/0x280
->  irq_exit_rcu+0x62/0x80
->  sysvec_apic_timer_interrupt+0x77/0x90
-> 
-> The script below reproduces this scenario:
-> ip xfrm policy add src 0.0.0.0/0 dst 0.0.0.0/0 \
-> 	dir out priority 0 ptype main flag localok icmp
-> ip l a veth1 type veth
-> ip a a 192.168.141.111/24 dev veth0
-> ip l s veth0 up
-> ping 192.168.141.155 -c 1
-> 
-> icmp_route_lookup() create input routes for locally generated packets
-> while xfrm relookup ICMP traffic.Then it will set input route
-> (dst->out = ip_rt_bug) to skb for DESTUNREACH.
-> 
-> Similar to commit ed6e4ef836d4("netfilter: Fix ip_route_me_harder
-> triggering ip_rt_bug"), avoid creating input routes with
-> icmp_route_lookup() to fix it.
-> 
-> Fixes: 8b7817f3a959 ("[IPSEC]: Add ICMP host relookup support")
-> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
-> ---
->  net/ipv4/icmp.c | 35 ++++++++++-------------------------
->  1 file changed, 10 insertions(+), 25 deletions(-)
-> 
-> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> index e1384e7331d8..11ef4eb5b659 100644
-> --- a/net/ipv4/icmp.c
-> +++ b/net/ipv4/icmp.c
-> @@ -490,6 +490,7 @@ static struct rtable *icmp_route_lookup(struct net *net,
->  	struct dst_entry *dst, *dst2;
->  	struct rtable *rt, *rt2;
->  	struct flowi4 fl4_dec;
-> +	unsigned int addr_type;
->  	int err;
->  
->  	memset(fl4, 0, sizeof(*fl4));
-> @@ -528,31 +529,15 @@ static struct rtable *icmp_route_lookup(struct net *net,
->  	if (err)
->  		goto relookup_failed;
->  
-> -	if (inet_addr_type_dev_table(net, route_lookup_dev,
-> -				     fl4_dec.saddr) == RTN_LOCAL) {
-> -		rt2 = __ip_route_output_key(net, &fl4_dec);
-> -		if (IS_ERR(rt2))
-> -			err = PTR_ERR(rt2);
-> -	} else {
+This patchset fixes a bug where bnxt driver was failing to report that
+an ntuple rule is redirecting to an RSS context. First commit is the
+fix, then second commit extends selftests to detect if other/new drivers
+are compliant with ntuple/rss_ctx API.
 
-So you're saying that your packet triggered the else branch?
+Daniel Xu (2):
+  bnxt_en: ethtool: Supply ntuple rss context action
+  selftests: drv-net: rss_ctx: Add test for ntuple rule
 
-That I think is the bug here, not the input route lookup which
-is the whole purpose of the original patch (simulate an input route
-lookup in order to determine the correct policy).
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  8 ++++++--
+ tools/testing/selftests/drivers/net/hw/rss_ctx.py | 13 ++++++++++++-
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
-AFAIK the packet that triggered the crash has a source address
-of 192.168.141.111, which should definitely be local.  So why
-is the RTN_LOCAL check failing?
-
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.46.0
+
 
