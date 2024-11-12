@@ -1,113 +1,110 @@
-Return-Path: <netdev+bounces-144057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661529C5664
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 12:26:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E7A9C567D
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 12:29:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00840281F81
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:26:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA0711F24FF8
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B96C2141A4;
-	Tue, 12 Nov 2024 11:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176A6218D7C;
+	Tue, 12 Nov 2024 11:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J5j1qAz8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fzmIUJrF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730CF207A14;
-	Tue, 12 Nov 2024 11:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F49218D69
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 11:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731409827; cv=none; b=juTZCaWQKmQIqmbvSN9KiwZiFqNrQKLwEhBP273RhbRZr/dzzq2q5rMta1JQZ9gYXWteyE3m9LsjaOU2T+shMcfDt7byEKAYkH/c5mApl4DeEP9qwQawYWOSDTpk55sp4exQ68dFIFvadfL5r5PvuGLH+yX6JKF0P4FFVQov4JQ=
+	t=1731410257; cv=none; b=KkwvkNwihdIdrD63zgUsyLd5b83HaWaHVYd7nGD+nDARmI5aiMmUHkLy/pP08YmI9+asMm08Pspd1WMjWgg9pQb7fHLORmSjZiCC3FLmsKZ2hFA9zsZ54rre0ZHykvsonnaRKmp4RGrqe5W6w2Vph60QhMgj+82gJ4XNzT3kjmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731409827; c=relaxed/simple;
-	bh=o8LZzyAO/xN+J7whax3nwX9FC+5PPxdMxkeJ5j8tX94=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=tXRdooX25gOMhdLrmwudQoA7iZfG9x+wH43G+L7x0cuNhfoiy/3sHGqIQ1+zHo43kKxs1aZJDovQ3Qzb5ufyQv7ZKF7bq6fdYuYECk9GEDF7oRwaF7WqTb4ji0eMdd2TMzlwFY0NCbm3UnL/vgXP2WPMbKi/F6r1var9umCpwvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J5j1qAz8; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1731410257; c=relaxed/simple;
+	bh=VEjopYYM8Hj9eI3kGQIpu/ViVRSl9M0p8Ov2R/hADNo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=baZv2/SwMkd07ZM4FMopPgNOZCw/g7B87YLIX//Nk65Klf62b67bKk1rjwFzhgQqbCkvxKeMvIWoKugJgcrFUAlcj5eJc0eJ/+N4f/w8wmyEZ9C8kP2JOPnNrBsiCadEDWAobCF58w6rhcgp9RuRakU69IGd0EzjS+mODTVlOog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fzmIUJrF; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4315df7b43fso47979885e9.0;
-        Tue, 12 Nov 2024 03:10:26 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4315e9e9642so46100265e9.0
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 03:17:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731409825; x=1732014625; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=12Wq6vbO+PmZNrMZHIYjaXdLl5X7Jrekdu8wXlL99nM=;
-        b=J5j1qAz8dWsHagHbtRezLxOE8QJI5IO1F6onqTg3tcOs9WaVNLrBWl/W+SYGnTEbPc
-         xBstKpbG/OL3DxnGAGCbGWZatHOdHvRWH6OMFB+JCwGM4ES/be7esHBH9zYfRqtHbcoN
-         O0/6ZcNslZ/78UW+/80510SCvR86QzdOfUJGTB5saIq4cuGqR2YKRKmCUdxHSUKOmDIX
-         vKUY2D7MuYQrUNvPchaWmPnFbFAtoDtZG1GnbosSbUTT0x65jt6rjG9l/it0tD2/TUyZ
-         wFgQ9nfooVVNB9NJXyG0JWze4Ic/hLhvu7NSZiRj6WeeR81fIVAUqlFe5fZO2V8/qAae
-         OnyA==
+        d=gmail.com; s=20230601; t=1731410253; x=1732015053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aMMJ8iufWL7WXj+xSco2QGisyCXwnqa1bB0nKVngprs=;
+        b=fzmIUJrF/EAUMMQLbrv70l5xjHqleZ4TdkJbjDqzcITYu3EoAMRFp/Sxe0FQh8NwaQ
+         54iWDm4G9t+nVyTbsgEAK77aWFnNvoNFVVmHkxgiRRuBC/eArDtiaHgBBCOh7pu5a/Tw
+         BCUKWl4dPuL0llOn2+VP/rQwwXJ89SvtEAeE4K8q/sP54Z2SfgDuv+5p9H4WIAAKhdG3
+         YFih4xTPJD1wFRm0QzcbXSBoiESA8QTpL5vbsF9m19PFhypXExG3GUintJZRwAGZrFIl
+         dbLpm8sKA9KHBvK2iqdPuK8OAryO4bXAHn5ML0e3+uA2vESHyrASOMkOeYWoBBhIPFBU
+         k7IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731409825; x=1732014625;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=12Wq6vbO+PmZNrMZHIYjaXdLl5X7Jrekdu8wXlL99nM=;
-        b=PuYwcwm8YVfnOn5jRZYLDM4Ot/Y6q8+CrJHB9302DdoTF16R7fqRwhXU5k1tpCqTsx
-         KD86ZHdQAtanxGcauyhQXbGvbMQtrdI/7JgyYjpXhyB8mMJeunc5r/hES9j9yosOYnVo
-         ElBvhDGLCyeat6bKN+0Dpd9ES9ydALxVndjAukhUhT0NbaBJbfWzIpWnrKdlhXwhkuMr
-         DU7LCerJq3aCHB1ZAGgwEKJXqlzj8LR17QJnyE+Iq9SL4aVFigfcJ8/Ukf+ONYTGctZy
-         CLNZSVhkVsDU4xhaKtru+uaTVa4CR4d6rfjJtXf2Q7+PHIXUhQmuIjj+QTDoXUqew7cw
-         NihA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6eOLcI0TpIufl7KA07k8T3MJqZszEmrSpWQb+s1fiOoDmw61K2GDxunANeR1SCKgCphouGZIflk53hwivCPnt@vger.kernel.org, AJvYcCXPqHCZBh1paTah2kp3LaTjMgwKlqErzRcnDng1DG2YokaMDt7LtN/7H6LXBwtRSl+yg/sx2JytkUTeUUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL3eq0RFjLn+xj2Si1Ummpo0S6emXQMaAkEovX1Nfs3cQqOPxw
-	cEXHniHW+dXT7mtMkPptdo3GWdlaXmup6QnYioLx0mm4cTtGsuTA
-X-Google-Smtp-Source: AGHT+IHRIaT0FZC5Pj0wqmsuEq+/h6AALz3VNQ6OSJ6NTKX+W8stMuUJKvex0YIQKbXLuCAFtUHcow==
-X-Received: by 2002:a05:600c:46c5:b0:42c:bc22:e074 with SMTP id 5b1f17b1804b1-432b7519776mr135380495e9.29.1731409824467;
-        Tue, 12 Nov 2024 03:10:24 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6b35c0sm249228225e9.16.2024.11.12.03.10.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 03:10:24 -0800 (PST)
-Subject: Re: [PATCH net v2 2/2] selftests: drv-net: rss_ctx: Add test for
- ntuple rule
-To: Daniel Xu <dxu@dxuuu.xyz>, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, shuah@kernel.org, andrew+netdev@lunn.ch,
- kuba@kernel.org, michael.chan@broadcom.com, martin.lau@linux.dev,
- pavan.chebbi@broadcom.com
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@meta.com
-References: <cover.1731377399.git.dxu@dxuuu.xyz>
- <dc4398dfe9a8e959245d2a8ffe5c2fcefbdd67f7.1731377399.git.dxu@dxuuu.xyz>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <93831343-03c3-d540-369d-fe82eb480c58@gmail.com>
-Date: Tue, 12 Nov 2024 11:10:23 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1731410253; x=1732015053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aMMJ8iufWL7WXj+xSco2QGisyCXwnqa1bB0nKVngprs=;
+        b=wXe6acMIB4QXJ0bZZwxZnZvyp9cQjPZQfi63JQFyvKClYJWOXEt4e2RX5iyPqPX0Pt
+         lv4DEc+P5RUKLWk9dBHbud1lTRQwEsWlDnhUWE6deOgrVuv/Wq7UmYn7o5abRqLZ2Ekb
+         17lQdFBOsPedQbSdejARnzGwA8jPonXSJ+9PeSvtLG5863d+Mxkv5Vxy0ahgkgWQ3t04
+         7vtRFbeFv792PuZ1q9XB+vOUkf/5M0gp9/YLgvWu47V4AwhPN7Gu7edpqDvTn+bo6+ua
+         dLElA7mWNbrFYo54gT+jgLX63a1gxxFsaowthLcfqNwKT0CzUQyRCm7GIC3ml4Rcjn41
+         lDXw==
+X-Gm-Message-State: AOJu0YxyAXcnp7kp2rZ14RyG0M2qowjph6SNgR8yjAG+1+6dDxp9naSR
+	mgzQ3RaxmtBcY4inarodoKYeKgK7qsrLbW5ZXc6dpQfRlbkD84ZPYuqsUemk
+X-Google-Smtp-Source: AGHT+IEELUWmEucz0XD2PrMwFsWo06UVes4YeVwKRZQQNQ6Kr9Gs3HzSvBCP6UY8na6XhI4NJ9lj1Q==
+X-Received: by 2002:a05:600c:4f4e:b0:431:57d2:d7b4 with SMTP id 5b1f17b1804b1-432b751726emr143564335e9.26.1731410253107;
+        Tue, 12 Nov 2024 03:17:33 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:a1ef:92f5:9114:b131])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b054b3fesm203543685e9.17.2024.11.12.03.17.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2024 03:17:32 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 0/2] tools/net/ynl: rework async notification handling
+Date: Tue, 12 Nov 2024 11:17:25 +0000
+Message-ID: <20241112111727.91575-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <dc4398dfe9a8e959245d2a8ffe5c2fcefbdd67f7.1731377399.git.dxu@dxuuu.xyz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/11/2024 02:23, Daniel Xu wrote:
-> Extend the rss_ctx test suite to test that an ntuple action that
-> redirects to an RSS context contains that information in `ethtool -n`.
-> Otherwise the output from ethtool is highly deceiving. This test helps
-> ensure drivers are compliant with the API.
-> 
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-...
-> +def _ntuple_rule_check(cfg, rule_id, ctx_id):
-> +    """Check that ntuple rule references RSS context ID"""
-> +    text = ethtool(f"-n {cfg.ifname} rule {rule_id}").stdout
-> +    pattern = f"RSS Context ID: {ctx_id}"
-> +    ksft_true(re.search(pattern, text, re.IGNORECASE),
+Revert patch 1bf70e6c3a53 which modified check_ntf() and instead add a
+new poll_ntf() with async notification semantics. See patch 2 for a
+detailed description.
 
-This won't match the output from your ethtool patch, because that
- removes the colon.  Probably want to wait until the patch is
- finalised and then write a regex that matches both versions.
+v1 -> v2:
+ - Use python selector module (select / epoll)
+ - Remove interval parameter from poll_ntf()
+ - Handle KeyboardInterrupt in cli.py instead of lib code
+
+Donald Hunter (2):
+  Revert "tools/net/ynl: improve async notification handling"
+  tools/net/ynl: add async notification handling
+
+ tools/net/ynl/cli.py     | 20 ++++++--------
+ tools/net/ynl/lib/ynl.py | 59 +++++++++++++++++++++++++---------------
+ 2 files changed, 46 insertions(+), 33 deletions(-)
+
+-- 
+2.47.0
+
 
