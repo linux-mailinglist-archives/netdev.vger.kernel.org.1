@@ -1,163 +1,125 @@
-Return-Path: <netdev+bounces-144154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960289C5D06
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:20:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6BF9C5D74
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 17:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD76281631
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:20:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FD82282384
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 16:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00C920409D;
-	Tue, 12 Nov 2024 16:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15697206953;
+	Tue, 12 Nov 2024 16:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="h2wtBcJq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQaYjSTz"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133CB202649
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 16:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81BE206067;
+	Tue, 12 Nov 2024 16:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731428415; cv=none; b=tJqZfSYYKgshKr7ljbmgO65+QOI1sxJkuyZOim0As7Shjn7+VvORk39HEm+fp+3qOu3a1arW6wAzSr7OxD1OsriO6MDOg8xfhRP8ms8rlw4OGBsw0C7YVlP9Y/y7qk59VgulAwYtBO4wKw6EQW+xxL5JjuaajixLcx3tf1Iqjkg=
+	t=1731429446; cv=none; b=cddvYETCXQGU3IeFIC0l0vS4a/1VAe1Jl0fqnYnVsBnOZUwZGU8gz9/xWJ+gFSHzulXx2o0TcSj//ba504zo8X/k0tCm2DxOAohgQ7EXMadm5LWgLtHSTbrwjF8OVDxrbckXfG8ZENGdCNj1DNE+rF1QmNxbUIviOWp9Hp2YN9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731428415; c=relaxed/simple;
-	bh=+MiBfqBwvfi3xIVUfkNkGmIspQzYF5GGdknEVwEboyw=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=e+N9JlIGtoLdweBQ0gWbOkQbLFR9Ov17Nv0sOJJfk64XbIZGrx8Y0cnYIDRUAx8uc/Dq+7jh+GY7w4MZR+Cei6qs8WN43zbpCzZOPrcfE865RD2hkKDVeM+H7yqWMwVjmrqQofbD+6MgpQ9VWSfPcwYYhwnC9HMDEN5O55MKdHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=h2wtBcJq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PnsUv742ZhBELrN37gwbdxczzexyZwfVpy5fbI2ADkE=; b=h2wtBcJq8VGSwybR2tDWnKb83Q
-	2O1yGH6KffQnG9xwnjQv21vvhHWuJjXnv4RPNPXymq2awz40vNvn9OnrksTAWNGuVuS9EA0O2UbB+
-	i8C+nkWCJc4prCwrdq90K9bxiP2NgtWHnztATdAFIGCsibm59iSjmn3wr3qgtNKeW1oZslljB8ajL
-	79t7bJEU98WFq8v8xC7qjweDLJHW0SEEXh4Pg4E7jwDmlDSotO6vAiNEz+1NgWkMuGGYSwffMx5n4
-	EKu4Q6C+3rIegKfPxunrfw391uMO5kXHKQnpEQfqbqqbJCOPgFzmw6ef5Prf28sO/7dooxuml90W8
-	POO42rhg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38952 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tAtcW-0004YP-0B;
-	Tue, 12 Nov 2024 16:20:00 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tAtcW-002RBS-LB; Tue, 12 Nov 2024 16:20:00 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1731429446; c=relaxed/simple;
+	bh=0Gd9BBi3w/ks72jwpBlBm8kmgsSoikaY5omKdoods7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P1ksTuZTtJES8BLbSMyn+qJ5ejhMyeJHRGULiMjWwJLnJhkY5mkd+QTWl8UNB3BaDkdG50PnbqESqOmX/r2hkR3gMdnrtPBZKfVOHi2Wp69I1UOA9uVRq4/HX5MqQkx58bYKwKwc4ox6q6IxAwQTtUJUZFYV3hdvSTyH7k8JK5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQaYjSTz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C5A6C4CECD;
+	Tue, 12 Nov 2024 16:37:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731429445;
+	bh=0Gd9BBi3w/ks72jwpBlBm8kmgsSoikaY5omKdoods7E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UQaYjSTzIUtruQCkG7i8elZIjAfPq4ts1dJGlR7iG79h43GhySj+6iV6f1SXmPzvQ
+	 MbyYwKfjI7UJS0xmCwwO/0BSaeRSCXOU0NQTDdQCYNkGx6moa0+a8IMroSrbGn+Reu
+	 O8SHQxW9s7O0cCMikyNjOaat2rdp4bl//t4FttqP4M84tRQZoYhheeGCGZ1XDCCZoZ
+	 LvXsgbvkSB6Q9R6P56W6HB6vkOLuiB0r8alQxwjaAkRoSLdvTNmSrTHjYq7JjZ6uDq
+	 4ROllXcc/6b2M8LW/q2WumWONLV9Gvh6D9wVFQVJNde6woJmiTBxbDQCKP9NwdMjZU
+	 m36uFZe0dgUWw==
+Date: Tue, 12 Nov 2024 10:37:23 -0600
+From: Rob Herring <robh@kernel.org>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net: phylink: ensure PHY momentary link-fails are handled
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] dt-bindings: can: tcan4x5x: Document the
+ ti,nwkrq-voltage-sel option
+Message-ID: <20241112163723.GA1142553-robh@kernel.org>
+References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
+ <20241111-tcan-wkrqv-v2-2-9763519b5252@geanix.com>
+ <20241112-sincere-warm-quetzal-e854ac-mkl@pengutronix.de>
+ <jd5ausjx726rem4iscupwfxilc2fsfkshw3pim2ps3i5btstge@sz6qnqjfvwx2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 12 Nov 2024 16:20:00 +0000
+In-Reply-To: <jd5ausjx726rem4iscupwfxilc2fsfkshw3pim2ps3i5btstge@sz6qnqjfvwx2>
 
-Normally, phylib won't notify changes in quick succession. However, as
-a result of commit 3e43b903da04 ("net: phy: Immediately call
-adjust_link if only tx_lpi_enabled changes") this is no longer true -
-it is now possible that phy_link_down() and phy_link_up() will both
-complete before phylink's resolver has run, which means it'll miss that
-pl->phy_state.link momentarily became false.
+On Tue, Nov 12, 2024 at 08:40:56AM +0100, Sean Nyekjaer wrote:
+> Hi Marc,
+> 
+> On Tue, Nov 12, 2024 at 08:35:43AM +0100, Marc Kleine-Budde wrote:
+> > On 11.11.2024 09:54:50, Sean Nyekjaer wrote:
+> > > nWKRQ supports an output voltage of either the internal reference voltage
+> > > (3.6V) or the reference voltage of the digital interface 0 - 6V.
+> > > Add the devicetree option ti,nwkrq-voltage-sel to be able to select
+> > > between them.
+> > > 
+> > > Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+> > > ---
+> > >  Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml | 13 +++++++++++++
+> > >  1 file changed, 13 insertions(+)
+> > > 
+> > > diff --git a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+> > > index f1d18a5461e05296998ae9bf09bdfa1226580131..a77c560868d689e92ded08b9deb43e5a2b89bf2b 100644
+> > > --- a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+> > > @@ -106,6 +106,18 @@ properties:
+> > >        Must be half or less of "clocks" frequency.
+> > >      maximum: 18000000
+> > >  
+> > > +  ti,nwkrq-voltage-sel:
+> > > +    $ref: /schemas/types.yaml#/definitions/uint8
+> > > +    description:
+> > > +      nWKRQ Pin GPO buffer voltage rail configuration.
+> > > +      The option of this properties will tell which
+> > > +      voltage rail is used for the nWKRQ Pin.
+> > > +    oneOf:
+> > > +      - description: Internal voltage rail
+> > > +        const: 0
+> > > +      - description: VIO voltage rail
+> > > +        const: 1
+> > 
+> > We usually don't want to put register values into the DT. Is 0, i.e. the
+> > internal voltage rail the default? Is using a boolean better here?
+> > 
+> > regards,
+> > Marc
+> > 
+> 
+> Thanks for the review :)
+> 
+> Can you come up with a sane naming?
+> A boolean that equals true when it's set to VIO voltage? Or the other
+> way around?
 
-Rename "mac_link_dropped" to be more generic "link_failed" since it will
-cover more than the MAC/PCS end of the link failing, and arrange to set
-this in phylink_phy_change() if we notice that the PHY reports that the
-link is down.
+Make the property named/present for the less common case if there is 
+one. That might not be known here.
 
-This will ensure that we capture an EEE reconfiguration event.
-
-Fixes: 3e43b903da04 ("net: phy: Immediately call adjust_link if only tx_lpi_enabled changes")
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phylink.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 4309317de3d1..3e9957b6aa14 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -78,7 +78,7 @@ struct phylink {
- 	unsigned int pcs_neg_mode;
- 	unsigned int pcs_state;
- 
--	bool mac_link_dropped;
-+	bool link_failed;
- 	bool using_mac_select_pcs;
- 
- 	struct sfp_bus *sfp_bus;
-@@ -1475,9 +1475,9 @@ static void phylink_resolve(struct work_struct *w)
- 		cur_link_state = pl->old_link_state;
- 
- 	if (pl->phylink_disable_state) {
--		pl->mac_link_dropped = false;
-+		pl->link_failed = false;
- 		link_state.link = false;
--	} else if (pl->mac_link_dropped) {
-+	} else if (pl->link_failed) {
- 		link_state.link = false;
- 		retrigger = true;
- 	} else {
-@@ -1572,7 +1572,7 @@ static void phylink_resolve(struct work_struct *w)
- 			phylink_link_up(pl, link_state);
- 	}
- 	if (!link_state.link && retrigger) {
--		pl->mac_link_dropped = false;
-+		pl->link_failed = false;
- 		queue_work(system_power_efficient_wq, &pl->resolve);
- 	}
- 	mutex_unlock(&pl->state_mutex);
-@@ -1835,6 +1835,8 @@ static void phylink_phy_change(struct phy_device *phydev, bool up)
- 		pl->phy_state.pause |= MLO_PAUSE_RX;
- 	pl->phy_state.interface = phydev->interface;
- 	pl->phy_state.link = up;
-+	if (!up)
-+		pl->link_failed = true;
- 	mutex_unlock(&pl->state_mutex);
- 
- 	phylink_run_resolve(pl);
-@@ -2158,7 +2160,7 @@ EXPORT_SYMBOL_GPL(phylink_disconnect_phy);
- static void phylink_link_changed(struct phylink *pl, bool up, const char *what)
- {
- 	if (!up)
--		pl->mac_link_dropped = true;
-+		pl->link_failed = true;
- 	phylink_run_resolve(pl);
- 	phylink_dbg(pl, "%s link %s\n", what, up ? "up" : "down");
- }
-@@ -2792,7 +2794,7 @@ int phylink_ethtool_set_pauseparam(struct phylink *pl,
- 	 * link will cycle.
- 	 */
- 	if (manual_changed) {
--		pl->mac_link_dropped = true;
-+		pl->link_failed = true;
- 		phylink_run_resolve(pl);
- 	}
- 
--- 
-2.30.2
-
+Rob
 
