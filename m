@@ -1,107 +1,95 @@
-Return-Path: <netdev+bounces-143971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41C89C4E8E
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:13:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004EF9C4ED6
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 07:39:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6868EB21027
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 06:13:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC3141F24F86
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 06:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2E3209F2C;
-	Tue, 12 Nov 2024 06:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DDD209F2A;
+	Tue, 12 Nov 2024 06:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7pqRIFd"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="1kelb72c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009891C303A;
-	Tue, 12 Nov 2024 06:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A3F5234;
+	Tue, 12 Nov 2024 06:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731391980; cv=none; b=YEEfzOzvMkre8XrMfIdi8kn1pjPppRXRwwoeWh9I9zmQonIz5QcSnwbaSV/wpmkKrvoHu3iVDO9hJOKja3IsxUveMolX+HJng3tg49PIIWmh8qnfGILmt/BwV+gxhoz95CnPoQfPfq033ZpsaXJaIHLjtpU7zeiBiaEGtjQL3CE=
+	t=1731393562; cv=none; b=TDQlyNNn5kpVnTTFDasEQFwD918Cd7UrmTTpuSmzikEOfk1kpYyju61GRNFds9qB6gRAe2LkI2Pn3KJxNkoXsDpFzqu4it6xDI7wRcDmZjyyc0s67/K5iPQqCBjMi2AjcKS++GGOLLgvp/bWrygw0HJqp37d5r7HcH7U+58XwMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731391980; c=relaxed/simple;
-	bh=QgTT7r0KqdxQuGEyaNMWaIbXVXDTyKgK3Gsg2wAV8VY=;
+	s=arc-20240116; t=1731393562; c=relaxed/simple;
+	bh=qBZiGi1u8iJrl5166Fw1rBfClz9HCNwg6W87v0hoOjs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zf0YX+hd4wo39p6d6r/SUQnW62UDlmCnftWsDnXUkIEjCYUoo2PXG7pRx4xASTqBSeXj10IIVQfmhGuxXsREOczdgHVZSpRfCiMRGmloPmc4WWNavf86FCUW7KJyK2HUNVokqCxCvv96PhdVWbO5cDpTwqryvlKSXHIg/AyXUO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7pqRIFd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36E68C4CECD;
-	Tue, 12 Nov 2024 06:12:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731391979;
-	bh=QgTT7r0KqdxQuGEyaNMWaIbXVXDTyKgK3Gsg2wAV8VY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F7pqRIFdF2Q8kK200JhJZVR15jL8IAIjTRAsJ/3iqygUv52ELnGusC8MdwAGEWURj
-	 Ux3qDflbxmJCSGWO9wS+f2kd/6dWwesQ0MeWWcRwhFkXJhSvvY7VFR3MlNaUKUoJ8t
-	 36DlAxbl6HgQzVGGbcTRFRdjEfVrTBOE8P71PclNKZWtm7hZU0QZ4fBJDmKKuvsvET
-	 PElV5kIZI72F5yDUCmL+ABZBH4+ZXXccfzitW/p2EQnMPeoklGn3pI+a4yXisZPM3E
-	 S7CosqEeb/1etakULkJMiuoJ4Cd5+CowGR8D2t453kkvzmZd+IuIIbbPEgRTGpVtbn
-	 hV2fszerLJ0Cw==
-Date: Tue, 12 Nov 2024 08:12:51 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Bjorn Helgaas <helgaas@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
-	Aditya Prabhune <aprabhune@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
-	Bert Kenward <bkenward@solarflare.com>,
-	Matt Carlson <mcarlson@broadcom.com>,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Jean Delvare <jdelvare@suse.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] PCI/sysfs: Change read permissions for VPD
- attributes
-Message-ID: <20241112061251.GE71181@unreal>
-References: <f93e6b2393301df6ac960ef6891b1b2812da67f3.1731005223.git.leonro@nvidia.com>
- <20241111204104.GA1817395@bhelgaas>
- <20241111163430.7fad2a2a@hermes.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tYRjnFXcqHnFzvei560eSnB9sRqgzA+OSJoiVkDLfTqTb85RcwQZpsAID2SSouRpDUtx5RtIK/k8d+PSXMttxaO9KWO3bbEPk6gFXD0Mk6wa8i+te3KcHSyaO1bg0TXRTJ4eY0Cg0Yi177U+CT7oxvwfjl2CSHCn2/Aa0Bt6WAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=1kelb72c; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID; bh=DMBzvsCGMw6qfR4K0jMLHbUMUuG0vgDO025DsOZ7Tv4=; b=1kelb7
+	2cZXNysGmHSwC/aAZ3zikdKshn2km2x26JXQmwIFkM7DW+8QFicJmIRj+H27B7GWoqzBe6dGEB6oT
+	RLLhp5Zc700i1weTf+Ws7UZaHO6qKSRI7yb+0Yqzm8GhNq68efxk6e5wpGFhxuCODg6NEM5RRCP0q
+	pxT7yOwnioffiuInvyjvE9RE8KWolPRHdp8HAyzCxJtRvEcv4WYQuw4hGri6RZ594X+U4rFuUyw7A
+	TZlziQoYgVPuN1vEeNNz+bzs26SQuRht2lboFIG+H0x/yyM0NqEwdORtSEdO02NH+CftX8uIaBdQb
+	i4ciYB7NfaIzufyyDC/RdHK91i2w==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sean@geanix.com>)
+	id 1tAkYU-000Giw-5O; Tue, 12 Nov 2024 07:39:14 +0100
+Received: from [185.17.218.86] (helo=Seans-MacBook-Pro.local)
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <sean@geanix.com>)
+	id 1tAkYT-000NhT-1L;
+	Tue, 12 Nov 2024 07:39:13 +0100
+Date: Tue, 12 Nov 2024 07:39:12 +0100
+From: Sean Nyekjaer <sean@geanix.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+Message-ID: <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
+References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
+ <20241111101011.30e04701@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241111163430.7fad2a2a@hermes.local>
+In-Reply-To: <20241111101011.30e04701@kernel.org>
+X-Authenticated-Sender: sean@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27455/Mon Nov 11 10:58:33 2024)
 
-On Mon, Nov 11, 2024 at 04:34:30PM -0800, Stephen Hemminger wrote:
-> On Mon, 11 Nov 2024 14:41:04 -0600
-> Bjorn Helgaas <helgaas@kernel.org> wrote:
+Hi Jakub,
+
+On Mon, Nov 11, 2024 at 10:10:11AM +0100, Jakub Kicinski wrote:
+> On Mon, 11 Nov 2024 09:54:48 +0100 Sean Nyekjaer wrote:
+> > This series adds support for setting the nWKRQ voltage.
 > 
-> > On Thu, Nov 07, 2024 at 08:56:56PM +0200, Leon Romanovsky wrote:
-> > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > 
-> > > The Vital Product Data (VPD) attribute is not readable by regular
-> > > user without root permissions. Such restriction is not really needed
-> > > for many devices in the world, as data presented in that VPD is not
-> > > sensitive and access to the HW is safe and tested.
-> > > 
-> > > This change aligns the permissions of the VPD attribute to be accessible
-> > > for read by all users, while write being restricted to root only.
-> > > 
-> > > For the driver, there is a need to opt-in in order to allow this
-> > > functionality.  
-> > 
-> > I don't think the use case is very strong (and not included at all
-> > here).
-> > 
-> > If we do need to do this, I think it's a property of the device, not
-> > the driver.
-> 
-> I remember some broken PCI devices, which will crash if VPD is read.
+> There is no need to CC netdev@ on pure drivers/net/can changes.
+> Since these changes are not tagged in any way I have to manually
+> go and drop all of them from our patchwork.
 
-This is opt-in feature for devices which are known to be working.
-Broken devices will continue to be broken and will continue to require
-root permissions for read.
+Oh sorry for that.
+I'm using b4's --auto-to-cc feature, any way to fix that?
 
-Thanks
+Br,
+/Sean
 
