@@ -1,93 +1,120 @@
-Return-Path: <netdev+bounces-144222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB82B9C61AE
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:43:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 319049C6205
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 20:59:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 626A0283C23
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:43:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAEF42835E5
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 19:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF3021503E;
-	Tue, 12 Nov 2024 19:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="juduWgP0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EB6218D85;
+	Tue, 12 Nov 2024 19:59:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C23220B218;
-	Tue, 12 Nov 2024 19:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D5920B218;
+	Tue, 12 Nov 2024 19:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731440630; cv=none; b=PG1tf3NSI8ILU1iEny6Tm8EnFxVcySNIj5LZCd5IOyRxCGKtBSKOz4IrG5bssdmdlAd5CwxVBj0oeD4VGiYfNx7WlbJY90R4N3MW4YFdCbrdUkdfxElo8MUzPRgXHgSrFT9ErBjF0DkR6LXRnQNjDEOds4TSa0hUt9jX04ZA4C8=
+	t=1731441578; cv=none; b=vEbUWnCwc0lmHWFWGOGdNdx697YNUiYTq7RFaUAYsNAc9OVeESo1oQ1MS+lww+RuJlYqZ7In8fgdHQTXIrl13fiUacnuDk5YVtiHUi2AbGxYEcOzdshIIwO9+MPqI65P38RYF56tzihSb3SjBR/VfSCHvcxbLyT90SLHVQx6ZIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731440630; c=relaxed/simple;
-	bh=BeDSDoXPcPdLZNULBBBx2ulxSWrYGcd9EVpAudDaIx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uxWKuMvcvrHTC4ISQGsMfq+1QXGAzVmwwwAApqyl1yn7YzNSxwvy64EMkh8oEUbxY6Z64HGsh8EBjXCYZ64LgENEXSMVJPetwdLO5OYp4z8B1k9RXcSN27dmqRgQ5TupztLEmwCE3TbqvfaS6U1Kc4yp1/kpj5uh0PYtPWdAqD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=juduWgP0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YSQXibYKsgFeeFgY2M4dFECJ3n26gpZRHHkGSthk2yo=; b=juduWgP0JfB4DsEUOY0m/jPCvG
-	nm3PJVq288H7QLH15qaIlX6RlOqI39tcgVOxIzCP5XYLrEacj7DCx6+Y+ZH/sdkrQhk9pgifd3rpg
-	gcp9gItA9FdOPA+kvoBZng8Of/DxuHZQ/LZ7gc4mSjVDDCdKDO1UgF/uFOdiTh/GXFtg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tAwnf-00D4mw-PT; Tue, 12 Nov 2024 20:43:43 +0100
-Date: Tue, 12 Nov 2024 20:43:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Nyekjaer <sean@geanix.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	imx@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Initialize ethernet phy in low power mode before ndo_open
-Message-ID: <c16c6440-bf79-42a1-a330-68d9bb96f75c@lunn.ch>
-References: <4t7npxg4jxxoeemcat3besmrfn6sbgsgoolpxbw5asfxfj7xxl@inac2mylgpzl>
+	s=arc-20240116; t=1731441578; c=relaxed/simple;
+	bh=rC+0ugHNvw01z7Q9STlYyR40J3xB/OsK/Djp3RNVyos=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=gba/tHTmyP82ppiqIDekJA3hML+b7cXYTfJtZPzRf7kFBWTKUUBgeZ9SleC2EbnEZh0bWXrf5QNiCDq8B/PfISQDrq2V8VDxcwXL5ciqXliXv7rzqF9WwCWiIDvWywt7HYgaQPQqYwtLqoABT1powfmVhX7DMF45NYaJ9A0zcrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id B5C8432E01CF;
+	Tue, 12 Nov 2024 20:50:23 +0100 (CET)
+X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+ by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id ytOsMQz8XMno; Tue, 12 Nov 2024 20:50:21 +0100 (CET)
+Received: from mentat.rmki.kfki.hu (94-21-33-116.pool.digikabel.hu [94.21.33.116])
+	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
+	by smtp2.kfki.hu (Postfix) with ESMTPSA id 5FB7E32E01CD;
+	Tue, 12 Nov 2024 20:50:21 +0100 (CET)
+Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
+	id F05421428C3; Tue, 12 Nov 2024 20:50:20 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by mentat.rmki.kfki.hu (Postfix) with ESMTP id ECDFC1401AE;
+	Tue, 12 Nov 2024 20:50:20 +0100 (CET)
+Date: Tue, 12 Nov 2024 20:50:20 +0100 (CET)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: Jeongjun Park <aha310510@gmail.com>
+cc: pablo@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+    kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kaber@trash.net, 
+    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    stable@vger.kernel.org, 
+    syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] netfilter: ipset: add missing range check in
+ bitmap_ip_uadt
+In-Reply-To: <20241112113434.58975-1-aha310510@gmail.com>
+Message-ID: <85b3a08c-f148-ef3c-6489-e34aadc4e735@netfilter.org>
+References: <20241112113434.58975-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4t7npxg4jxxoeemcat3besmrfn6sbgsgoolpxbw5asfxfj7xxl@inac2mylgpzl>
+Content-Type: text/plain; charset=US-ASCII
+X-deepspam: ham 1%
 
-On Tue, Nov 12, 2024 at 01:36:37PM +0100, Sean Nyekjaer wrote:
-> Hi,
+Hello Jeongjun,
+
+On Tue, 12 Nov 2024, Jeongjun Park wrote:
+
+> In the bitmap_ip_uadt function, if ip is greater than ip_to, they are swapped.
+> However, there is no check to see if ip is smaller than map->first, which
+> causes an out-of-bounds vulnerability. Therefore, you need to add a missing
+> bounds check to prevent out-of-bounds.
+
+It's a good catch, thanks! However, with the patch below the 
+
+                        if (ip < map->first_ip)
+                                return -IPSET_ERR_BITMAP_RANGE;
+
+lines in the branch just after swapping the from/to addresses becomes 
+unnecessary. Could you send a second version of the patch with the lines
+above removed?
+
+Best regards,
+Jozsef
+
+> Cc: <stable@vger.kernel.org>
+> Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
+> Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> ---
+>  net/netfilter/ipset/ip_set_bitmap_ip.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I'm using a imx6ull, we have an unused ethernet on our board. We would
-> like it to use as little power as possible as it's battery operated.
-> During probe I would expect the ethernet driver to probe the phy
-> deivce and set it in low power mode (BMCR_PDOWN).
-> The bit is correcly set if I up/down the interface, is that prefered
-> behavior?
+> diff --git a/net/netfilter/ipset/ip_set_bitmap_ip.c b/net/netfilter/ipset/ip_set_bitmap_ip.c
+> index e4fa00abde6a..705c316b001a 100644
+> --- a/net/netfilter/ipset/ip_set_bitmap_ip.c
+> +++ b/net/netfilter/ipset/ip_set_bitmap_ip.c
+> @@ -178,7 +178,7 @@ bitmap_ip_uadt(struct ip_set *set, struct nlattr *tb[],
+>  		ip_to = ip;
+>  	}
+>  
+> -	if (ip_to > map->last_ip)
+> +	if (ip < map->first_ip || ip_to > map->last_ip)
+>  		return -IPSET_ERR_BITMAP_RANGE;
+>  
+>  	for (; !before(ip_to, ip); ip += map->hosts) {
+> --
 > 
-> I can see it's the same stmmac driver for stm32mp1 etc.
-> 
-> I can also set the phy in low power mode in the bootloader, but then the
-> fec driver would reset phy and we end up where we started.
 
-There are conflicting requirements here. Most users want the interface
-up as quickly as possible. Autoneg takes a little over 1 second, which
-if you force the interface down in probe means open will take up to 1
-second longer before the interface is usable.
-
-Few users want minimal power requirements, which is the conflicting
-requirement.
-
-Changing the default is going to cause regressions and developers will
-complain their board takes longer to boot. So your best bet is to
-up/down the unused interface. Or if you don't need it at all, mark it
-as disabled in DT.
-
-	Andrew
-
+-- 
+E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+Address: Wigner Research Centre for Physics
+         H-1525 Budapest 114, POB. 49, Hungary
 
