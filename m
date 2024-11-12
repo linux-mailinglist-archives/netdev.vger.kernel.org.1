@@ -1,168 +1,122 @@
-Return-Path: <netdev+bounces-143896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BC79C4AAC
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:26:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E87A69C4B00
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 01:35:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F14D1F2342A
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:26:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1F601F231F0
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 00:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DBF1F26DD;
-	Tue, 12 Nov 2024 00:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26781F7068;
+	Tue, 12 Nov 2024 00:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kO+Lnfri"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XtuK8EZ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3DE1BD9EC
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 00:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7261EABBB
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 00:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731371173; cv=none; b=JYlqgJIu4pSACiMpM6mSrYx4Z+s86K11+i4W9h5d00Oz5IzySjvpvEl3tFllxtHb+mNVC/MOpgvwOQMKyaoIP6kOdD6GSUrDjmRakDUrL3oY5zYdehPAgpfV+VLdoUfflQVBrujTaAYUPLg8sEIbWN+DvKerj/+TizqJfNq8LS8=
+	t=1731371711; cv=none; b=r+VxIBG5pH3snJzSIHnCoWrxZn4If0yTTde1JeuPG2rXs+0xqfUYYR36Wzocbya2mOhCYNQPQYgndM9f1NFk7AXepmSowTK4MGnlbmMeJvxseq38tLT8KMUUxnPsDiRsvqQUEs9i8vaTVCuUOxELJa1HONLy8GrMgMUUIQWuPK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731371173; c=relaxed/simple;
-	bh=Kcit5CA4vTs4RMwxjpt8VPjivGf4nauNqiLQ3xNz1dg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bOch0wouoRuGHDnIWo9Euhzc3GSJkCTi7yyA3RnPHykeDMTVBy1L5P2Bt4PIBwq00ncEosbdOySxqaiq9A/5KU/S/GpXUzE9/BdaZnq0LmtrZ1lVuuEbA8YTUMuERVn+T4FUIMD8OZlxK2q/gW+3eJyRs+n+2aGiovJMvx1jdKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kO+Lnfri; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fe7a61b3-627f-4e60-9bba-28a4d40d1ec8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731371167;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KPcxxtMej3Q9CrLa0p7MBeuTQqkwQgbrelNqYAfqzhE=;
-	b=kO+LnfriD7MOhewKFJpty3IQAqd0dlGZ+c7DOynj4za0S9K9ZS9SETPO/8NRvjGAerVzvJ
-	Q0jIfU5gyX6JGdptORBpAnVmzpRrvLyZVY5VNVdw0fYfpRl60xvFxEZoL/DFU8lHQVNHq8
-	fOFrEnQrB+XfHDY836G2Zx//9t3WznE=
-Date: Mon, 11 Nov 2024 16:25:52 -0800
+	s=arc-20240116; t=1731371711; c=relaxed/simple;
+	bh=PkbyTMgFqOzcboehWlrrNjFh8Q2ib415gbHXRRFnbKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lHG/VOVj408i+ydn/VFAwBHNTgh6MxF/E1yp/4dwwtRqv7ZBkKWkKwavnhS/AB9XBRu9tNvpfeRfgBJCPkHRyOmlHXDLIQLYIk8FvuW7lxPuhfoGlmIg9OOGcx2Ik8Avb55X9VV0sS84YkZMq40hfIjHj6RZmMZ9suCnqW7ENeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XtuK8EZ5; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20e6981ca77so57860285ad.2
+        for <netdev@vger.kernel.org>; Mon, 11 Nov 2024 16:35:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731371709; x=1731976509; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EKgRrgLp424rRp+9+I/8Qg6L1UWiV8NeCx/IXJG06O4=;
+        b=XtuK8EZ5k0B8EVS8lRpTMmyiSJxFc1EDkFbTXoxtx9vK6MIba3rfrQYXjWN4wCFgNl
+         KVmV1YCHOlYfFs91bgsD5uZfXAX2RtJjDeT5rAGeWRHZS5wdYsjwH7xLuEdpLPFcbS2i
+         0IFXutOvz/P3fbHTY9RqSw8+v7wu2cqAI6sSRjsB9m9KrgMI+7BhShgk+hVKxn7R12Gw
+         FvhakkkgAhhjzy9SjtneVLmShHgl8tPNP1GUspDLXlM4IUJswOKOb9n1DzDBRptwLjXd
+         oNS9iSJ52FDxMepWV3f7L+2kvu6QuoeEdICOfnTthmTbqKslZ2P9BqzkPrw2Wp2twy07
+         xTPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731371709; x=1731976509;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EKgRrgLp424rRp+9+I/8Qg6L1UWiV8NeCx/IXJG06O4=;
+        b=fUMQpwYkYlBbLUylgqT/jmfVgzwa+G4wDZ9GrPbyA5xr2AMH9Dv6tvoObTnBGnwp9y
+         3HTgtChpHaHsDbgs/i7M4yLXHw3YrykZrKfJlTxUJtdjAxTn+9D8SQ1CI/50QiZikzO7
+         6nl4qbWeeYGJLgJY+z45qs8iOvbOYhAdigKEAWSvUQ4VIz1QSWj3F0xMw5iyPyI/jkBr
+         YOgHZjiW/wkZHpxndgP23n7+3aKmbUeF5/KPgd0vJvF+Ww1edE48VHVCMx/MW4cc0rGh
+         EWeMRckgNr+XqHD4mgkhrG/ZqwgoKolZB3Py3z88H/cONqsdBw+iXaLkUwKsGGNosAMa
+         FMSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWeMo6kXd8rQNo+ujMTbLYzHNebTk5RIp9AFbpXqsWvmCms/Ez7lNpKkklM+bl8kIqej5DmNcE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrJJyJxMenTVPfRuciGnRf3GwGwJr/oJoIZX8HCWXOhE0U9rmv
+	fq9gayovwEsQ0UOQE1wHjxB63PO9+dH8nGa8f+7mvKBbCk02qA2s1ILOgwkA1Rg=
+X-Google-Smtp-Source: AGHT+IGQTUP7sJ930EzsgxemjH6kwFcSH2PpZgSrP5gAgxNP+jgwhKNTZv9LbZwLWAoEXjOkZzUgZw==
+X-Received: by 2002:a17:902:d4d0:b0:20b:ab4b:5432 with SMTP id d9443c01a7336-211834f2d6bmr134631535ad.12.1731371709530;
+        Mon, 11 Nov 2024 16:35:09 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dc8376sm82809975ad.44.2024.11.11.16.35.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 16:35:09 -0800 (PST)
+Date: Mon, 11 Nov 2024 16:34:30 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+ Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kw@linux.com>,
+ linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>, Aditya Prabhune
+ <aprabhune@nvidia.com>, Hannes Reinecke <hare@suse.de>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Arun Easi <aeasi@marvell.com>, Jonathan Chocron
+ <jonnyc@amazon.com>, Bert Kenward <bkenward@solarflare.com>, Matt Carlson
+ <mcarlson@broadcom.com>, Kai-Heng Feng <kai.heng.feng@canonical.com>, Jean
+ Delvare <jdelvare@suse.de>, Alex Williamson <alex.williamson@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] PCI/sysfs: Change read permissions for VPD
+ attributes
+Message-ID: <20241111163430.7fad2a2a@hermes.local>
+In-Reply-To: <20241111204104.GA1817395@bhelgaas>
+References: <f93e6b2393301df6ac960ef6891b1b2812da67f3.1731005223.git.leonro@nvidia.com>
+ <20241111204104.GA1817395@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net 1/5] bpf: Register mptcp common kfunc set
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- Geliang Tang <geliang@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-0-cf16953035c1@kernel.org>
- <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-1-cf16953035c1@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-1-cf16953035c1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 11/8/24 7:52 AM, Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
+On Mon, 11 Nov 2024 14:41:04 -0600
+Bjorn Helgaas <helgaas@kernel.org> wrote:
+
+> On Thu, Nov 07, 2024 at 08:56:56PM +0200, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > The Vital Product Data (VPD) attribute is not readable by regular
+> > user without root permissions. Such restriction is not really needed
+> > for many devices in the world, as data presented in that VPD is not
+> > sensitive and access to the HW is safe and tested.
+> > 
+> > This change aligns the permissions of the VPD attribute to be accessible
+> > for read by all users, while write being restricted to root only.
+> > 
+> > For the driver, there is a need to opt-in in order to allow this
+> > functionality.  
 > 
-> MPTCP helper mptcp_sk() is used to convert struct sock to mptcp_sock.
-> Helpers mptcp_subflow_ctx() and mptcp_subflow_tcp_sock() are used to
-> convert between struct mptcp_subflow_context and sock. They all will
-> be used in MPTCP BPF programs too.
+> I don't think the use case is very strong (and not included at all
+> here).
 > 
-> This patch defines corresponding wrappers of them, and put the
-> wrappers into mptcp common kfunc set and register the set with the
-> flag BPF_PROG_TYPE_UNSPEC to let them accessible to all types of BPF
-> programs.
-> 
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> Reviewed-by: Mat Martineau <martineau@kernel.org>
-> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->   net/mptcp/bpf.c | 40 +++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 39 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
-> index 8a16672b94e2384f5263e1432296cbca1236bb30..6f96a5927fd371f8ea92cbf96c875edef9272b98 100644
-> --- a/net/mptcp/bpf.c
-> +++ b/net/mptcp/bpf.c
-> @@ -29,8 +29,46 @@ static const struct btf_kfunc_id_set bpf_mptcp_fmodret_set = {
->   	.set   = &bpf_mptcp_fmodret_ids,
->   };
->   
-> +__bpf_kfunc_start_defs();
-> +
-> +__bpf_kfunc static struct mptcp_sock *bpf_mptcp_sk(struct sock *sk)
-> +{
-> +	return mptcp_sk(sk);
-> +}
-> +
-> +__bpf_kfunc static struct mptcp_subflow_context *
-> +bpf_mptcp_subflow_ctx(const struct sock *sk)
-> +{
-> +	return mptcp_subflow_ctx(sk);
+> If we do need to do this, I think it's a property of the device, not
+> the driver.
 
-This returns "struct mptcp_subflow_context *" without checking the sk is a mptcp 
-subflow or not...
-
-> +}
-> +
-> +__bpf_kfunc static struct sock *
-> +bpf_mptcp_subflow_tcp_sock(const struct mptcp_subflow_context *subflow)
-> +{
-> +	return mptcp_subflow_tcp_sock(subflow);
-
-...and then the "struct mptcp_subflow_context *" can be used by this kfunc here. 
-Is it really safe?
-
-> +}
-> +
-> +__bpf_kfunc_end_defs();
-> +
-> +BTF_KFUNCS_START(bpf_mptcp_common_kfunc_ids)
-> +BTF_ID_FLAGS(func, bpf_mptcp_sk)
-> +BTF_ID_FLAGS(func, bpf_mptcp_subflow_ctx)
-> +BTF_ID_FLAGS(func, bpf_mptcp_subflow_tcp_sock)
-
-All of them has no KF_TRUSTED_ARGS or KF_RCU, so the returned ptr is supposed to 
-be read-only? Why are they needed and why bpf_rdonly_cast (aka the bpf_core_cast 
-in libbpf) cannot be used?
-
-pw-bot: cr
-
-> +BTF_KFUNCS_END(bpf_mptcp_common_kfunc_ids)
-> +
-> +static const struct btf_kfunc_id_set bpf_mptcp_common_kfunc_set = {
-> +	.owner	= THIS_MODULE,
-> +	.set	= &bpf_mptcp_common_kfunc_ids,
-> +};
-> +
->   static int __init bpf_mptcp_kfunc_init(void)
->   {
-> -	return register_btf_fmodret_id_set(&bpf_mptcp_fmodret_set);
-> +	int ret;
-> +
-> +	ret = register_btf_fmodret_id_set(&bpf_mptcp_fmodret_set);
-> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
-> +					       &bpf_mptcp_common_kfunc_set);
-> +
-> +	return ret;
->   }
->   late_initcall(bpf_mptcp_kfunc_init);
-> 
-
+I remember some broken PCI devices, which will crash if VPD is read.
+Probably not worth opening this can of worms.
 
