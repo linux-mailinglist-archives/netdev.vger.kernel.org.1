@@ -1,174 +1,258 @@
-Return-Path: <netdev+bounces-144034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E59B9C529E
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:04:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C96D9C52D2
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 11:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CA4C1F21229
-	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 10:04:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E07C42831BF
+	for <lists+netdev@lfdr.de>; Tue, 12 Nov 2024 10:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5027220CCF6;
-	Tue, 12 Nov 2024 10:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617082038CF;
+	Tue, 12 Nov 2024 10:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUvZ3EHY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QVwFlm4L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D55918A6BF
-	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 10:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496D6189B9F
+	for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 10:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731405840; cv=none; b=JBEOrVHAye48+GmD7NZWVyd4HVlZJL5TKjUo9D91BidDfbBuC+HZ3yPAXdQ+S1KYG+DeWG7JBqMQbyxkFv2GD23iuUFxicWa5WwnVs6NsZjG55smSklv431PjOjHfd0vjfxR7VBuLd0dZfnjhJHP08C7CxqgaLNGmZ/C9vv3mxk=
+	t=1731406251; cv=none; b=RgfVGvMLlXRikmX1552kL35hAlpzKl3tqcs4gELHQ5qhrVg7Dshr7LfuTGvQzIpVXg1AXm4SZt9WLx3DukRWxf8lkBfivfBOnoKiS1qDNNvAl8tvcEiy6r3D0ooj2lJKKzyxTuJ3bSgzPy7PX9qp9CZniRNfM6DhSv0rUT/sShA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731405840; c=relaxed/simple;
-	bh=mij0PuBDBUQ5oNZm3ImD6hJSXEWYAYzy5KC1dpwd6DE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Hhg8XvCdCbdeCtX3KECKWW0Yf5a9XCer4spNAb7cIMGZSWNzDeP5xL+97AJFDK0Pxk9ODMYm+lxeSekiXtZzmVeQg5zTBALt9ibvTvGlz3sW7EP+ZhMoVW2/er+1mwOJLm5hgWTlclOQowqrJAd0oPl/XGADbRQjwIp+Os8Kekk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUvZ3EHY; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4315abed18aso46348485e9.2
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 02:03:58 -0800 (PST)
+	s=arc-20240116; t=1731406251; c=relaxed/simple;
+	bh=HP+balGFbVGwVaqj0CN2l8Br+XOBWTqlG0/ZQI6JrXY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V1CAWoAre7ADe044VGphWJLktZN0ymb7qJfD06H67kdZaEQ2HvK1KbNaMgfwH8J8waBD9Ltne/AHfmMnxNQ8f3ocWSRF2mLP0FjKyzI5Q0ta6CIgn9ugehMQmzILinm1n0VjrI+aIGGtnI2FxG/PqDV1rnbwJonRPzpBrqPjDto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QVwFlm4L; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-539e044d4f7so3e87.0
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 02:10:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731405837; x=1732010637; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JGWhHKwouAr6cxs2pOPTKtEYMNA8YfSUT0XaOqIT8aI=;
-        b=EUvZ3EHY/a0k3dF5phyUS8i3qYgaGEeUNqcwqqGPzFt7ZcDrfK/MYKfU+3Qhxz0dHh
-         LtIyenvpdcN7G8vAWZtdJlRmxenHKSLzHD3Li34A818HCsaOMYJ5AGAfS5Dzuyrby7rG
-         TxMb9TnNfPSv0ncl8XfleNmP5+Jd0O30ROCywewaueHtm6naqsc3Qbt/eck9nrWDQDgm
-         knAf02dNvEHwH7TL1ILkZSp/mLkqyyHFpsBMSn1GpuOkWhTY0k4Qy5Hb+xAUA+vWRLB1
-         Jd4xMvJJQ/eB9Au3scZVs3kCvTW69FqQz/99GZtCAXnnA8R08ERnipm3754ANoHtlKZU
-         gNQg==
+        d=google.com; s=20230601; t=1731406247; x=1732011047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fD/M+SkRBlx+35MXDrQjDBxeMgoBg80dQdVLbzaMVeY=;
+        b=QVwFlm4LKEaZeVQd+B90RRy4axu9OcL9gf5f6Qia6BQto7wCAnU8cQyEeR+LBPo1ua
+         bh7W8UMR849od50pT9ZI3uWwryDaiCdjkbUhMz9w4HaPvLPftoMiwZzKkpbjaPxPFr+D
+         aCt7zim/+UIQ874oyx9y+9h1X/D+B1pwMoJD0+Z5z8wwTZU6p9IIgNqr1D2BDWBWAF/m
+         25HWIShXmgpyYQwetPCkSesekuBaXU2GSp8AWT+jWwyL6ITprQdkq2ay5YWB+3PTdhFc
+         m651aKp0HjNKpf0axiWNoDCbkXH8wLi+wzXqEeKeBudqeeQofEwsaDgGIpuxp0GGXCVO
+         DfjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731405837; x=1732010637;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JGWhHKwouAr6cxs2pOPTKtEYMNA8YfSUT0XaOqIT8aI=;
-        b=BBouKeV6jovqL+AWFKgTZRnpiu+oJUMarFMbO2NsoDQJfXldSr434HUXRYYIcjBs+3
-         WOv4IdXS31om9DPMQKqhdLlMIInDatRv9L/58/eXmGjH8smik35zo3Y8Otm25x/Hx5Q4
-         GJRLmGTMUs4PGUCb6zHuLPO+3eg8xLZGM6gta31I57+KOOkOUPEekRU5OLaWh6Dt7brX
-         naY0BUsIWo9P204lYswMl8Oh1w0AvNcYEu+MbHRtj8xXcqY+u/y9x3YivxwyE+Ij/ofF
-         8ZdQtBhwawRWkY+dltX9c4e2/upu+90JGdnNFBDQJJBRpxvKol5HYiydD1MyzqL+n7zQ
-         NaZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUY/RKj8s3nZRxiZo1TD60/qaFgJeJ0zM0mHsUT3KXILJkZMxpWZQPIXSwa1mOw2ORWqKW4As=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybJRJJ57edf019DAyzvXiMh3prTd3vdSs/Csg3PRgNMLCZnSmx
-	hOdkbXDl5ackXzqun6AXIFcFl9pkozWQAqUn0yfVuTiMA5YuWoPq
-X-Google-Smtp-Source: AGHT+IGx30Rpk/mRIxjhka9hPreyvqDzPtvvoKpV0LUhWkANfWgA/yxp028eirqoazGONakaM0lwHQ==
-X-Received: by 2002:a05:600c:3c8f:b0:431:52f5:f48d with SMTP id 5b1f17b1804b1-432b751f42fmr133652995e9.31.1731405836628;
-        Tue, 12 Nov 2024 02:03:56 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05e5d29sm208727355e9.39.2024.11.12.02.03.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 02:03:56 -0800 (PST)
-Subject: Re: [PATCH ethtool-next v2] rxclass: Make output for RSS context
- action explicit
-To: Daniel Xu <dxu@dxuuu.xyz>, jdamato@fastly.com, davem@davemloft.net,
- mkubecek@suse.cz
-Cc: kuba@kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- kernel-team@meta.com
-References: <978e1192c07e970b8944c2a729ae42bf97667a53.1731107871.git.dxu@dxuuu.xyz>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <21bcb49a-4542-ddd4-db46-e0ba5f22aa35@gmail.com>
-Date: Tue, 12 Nov 2024 10:03:55 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1731406247; x=1732011047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fD/M+SkRBlx+35MXDrQjDBxeMgoBg80dQdVLbzaMVeY=;
+        b=TkOuIgABq+KYfB3VAVZuz/VbV/jz+Q/aubSDzw6AuCteRo/nB234FdqNnwP1WYRExw
+         En0j5zG7ZJtqdynqa8g8aev9gVk08cuXbInt9zh0eGlxVD3m21saGJGF772YwbLL5Ghd
+         BzYOiXOI1jNskGQ+eMTfBrmBksCcNNg+0IdNUe4ul5HhyszOg2pqDC+LQsS7rZkhOywy
+         PeFhXgfxEvwDz9YITh9rGSCJ755q/Uv2LyZUfGJX4JbkXE+ytTsvJkTMFNyLV0o/gV17
+         y2de1pcqOVW0YebltwEEzKOA3GyLS3hKXiWbJMzlCvp5rLJpipLdUfpzEmlVGjlvWcg6
+         51bw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCTJL0I6FS8pBOeqvy4hwPgB5nOumJYR2I7SvwY/bQdAqfz86S/Qf0rI18UwM3lVFeXfCcPtY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYHp6pchnly/f09DDtMUsF/OfmFBXr5gyFpQDKlTJyc281RpXc
+	on2el6UZbbi5WI+6WNxZcbYw7NnH2P7QW9LnBeiERKgs8QexnJFiOKSuS7E3ySS2eB5ZVOUWPw/
+	1sy9jKU/94QKe3lNMluv70/ydNkcDcPHKB+HP
+X-Gm-Gg: ASbGnctFiz3yhA0ZVrLtbr5biyOaRGS5aaeQ9/elQCiWsN2IydMY8SQ0Fj1YHFOtHjX
+	kVMx/lPcWitTEOpTIFuVjulMtCG6detc=
+X-Google-Smtp-Source: AGHT+IEz+pzcKPC5Uhh8ELzRmjUoQf/QSpsbPZtxRLnLjbViSlM/Kf5uj2NPUcO3jmt/h/sJed+HUn+scUU0RwhdyxY=
+X-Received: by 2002:ac2:5f97:0:b0:539:e756:ebc1 with SMTP id
+ 2adb3069b0e04-53d9e2fbe94mr354e87.1.1731406246218; Tue, 12 Nov 2024 02:10:46
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <978e1192c07e970b8944c2a729ae42bf97667a53.1731107871.git.dxu@dxuuu.xyz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <20241110081953.121682-1-yuyanghuang@google.com> <ZzMlvCA4e3YhYTPn@fedora>
+In-Reply-To: <ZzMlvCA4e3YhYTPn@fedora>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Tue, 12 Nov 2024 19:10:07 +0900
+Message-ID: <CADXeF1GKMJgBQEgxnrOFOF=aSD2NqTBm_bQCKat4bmAEm2aK9A@mail.gmail.com>
+Subject: Re: [PATCH net-next] netlink: add igmp join/leave notifications
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
+	stephen@networkplumber.org, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/11/2024 19:05, Daniel Xu wrote:
-> Currently `ethtool -n` prints out misleading output if the action for an
-> ntuple rule is to redirect to an RSS context. For example:
-> 
->     # ethtool -X eth0 hfunc toeplitz context new start 24 equal 8
->     New RSS context is 1
-> 
->     # ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
->     Added rule with ID 0
-> 
->     # ethtool -n eth0 rule 0
->     Filter: 0
->             Rule Type: Raw IPv6
->             Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
->             Dest IP addr: <redacted> mask: ::
->             Traffic Class: 0x0 mask: 0xff
->             Protocol: 0 mask: 0xff
->             L4 bytes: 0x0 mask: 0xffffffff
->             RSS Context ID: 1
->             Action: Direct to queue 0
-> 
-> The above output suggests that the HW will direct to queue 0 where in
-> reality queue 0 is just the base offset from which the redirection table
-> lookup in the RSS context is added to.
-> 
-> Fix by making output more clear. Also suppress base offset queue for the
-> common case of 0. Example of new output:
-> 
->     # ./ethtool -n eth0 rule 0
->     Filter: 0
->             Rule Type: Raw IPv6
->             Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
->             Dest IP addr: <redacted> mask: ::
->             Traffic Class: 0x0 mask: 0xff
->             Protocol: 0 mask: 0xff
->             L4 bytes: 0x0 mask: 0xffffffff
->             Action: Direct to RSS context id 1
-> 
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> Would you mind also update iproute2 for testing?
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+Sure, besides updating the ip monitor command, are there any other
+places that need to be updated?
 
-but someone who understands ethtool_get_flow_spec_ring_vf() should
- look at this as well to check whether that information's needed too.
+Thanks,
+Yuyang
 
-> ---
-> Changes from v1:
-> * Reword to support queue base offset API
-> * Fix compile error
-> * Improve wording (also a transcription error)
-> 
->  rxclass.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/rxclass.c b/rxclass.c
-> index f17e3a5..ac9b529 100644
-> --- a/rxclass.c
-> +++ b/rxclass.c
-> @@ -248,13 +248,17 @@ static void rxclass_print_nfc_rule(struct ethtool_rx_flow_spec *fsp,
->  
->  	rxclass_print_nfc_spec_ext(fsp);
->  
-> -	if (fsp->flow_type & FLOW_RSS)
-> -		fprintf(stdout, "\tRSS Context ID: %u\n", rss_context);
-> -
->  	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
->  		fprintf(stdout, "\tAction: Drop\n");
->  	} else if (fsp->ring_cookie == RX_CLS_FLOW_WAKE) {
->  		fprintf(stdout, "\tAction: Wake-on-LAN\n");
-> +	} else if (fsp->flow_type & FLOW_RSS) {
-> +		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
-> +
-> +		fprintf(stdout, "\tAction: Direct to RSS context id %u", rss_context);
-> +		if (queue)
-> +			fprintf(stdout, " (queue base offset: %llu)", queue);
-> +		fprintf(stdout, "\n");
->  	} else {
->  		u64 vf = ethtool_get_flow_spec_ring_vf(fsp->ring_cookie);
->  		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
-> 
-
+On Tue, Nov 12, 2024 at 6:54=E2=80=AFPM Hangbin Liu <liuhangbin@gmail.com> =
+wrote:
+>
+>
+> Hi Yuyang,
+>
+> Would you mind also update iproute2 for testing?
+> On Sun, Nov 10, 2024 at 05:19:53PM +0900, Yuyang Huang wrote:
+> > This change introduces netlink notifications for multicast address
+> > changes, enabling components like the Android Packet Filter to implemen=
+t
+> > IGMP offload solutions.
+> >
+> > The following features are included:
+> > * Addition and deletion of multicast addresses are reported using
+> >   RTM_NEWMULTICAST and RTM_DELMULTICAST messages with AF_INET.
+> > * A new notification group, RTNLGRP_IPV4_MCADDR, is introduced for
+> >   receiving these events.
+> >
+> > This enhancement allows user-space components to efficiently track
+> > multicast group memberships and program hardware offload filters
+> > accordingly.
+> >
+> > Cc: Maciej =C5=BBenczykowski <maze@google.com>
+> > Cc: Lorenzo Colitti <lorenzo@google.com>
+> > Co-developed-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
+> > Signed-off-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
+> > Link: https://lore.kernel.org/r/20180906091056.21109-1-pruddy@vyatta.at=
+t-mail.com
+> > Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+> > ---
+> >  include/uapi/linux/rtnetlink.h |  6 ++++
+> >  net/ipv4/igmp.c                | 58 ++++++++++++++++++++++++++++++++++
+> >  2 files changed, 64 insertions(+)
+> >
+> > diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetl=
+ink.h
+> > index 3b687d20c9ed..354a923f129d 100644
+> > --- a/include/uapi/linux/rtnetlink.h
+> > +++ b/include/uapi/linux/rtnetlink.h
+> > @@ -93,6 +93,10 @@ enum {
+> >       RTM_NEWPREFIX   =3D 52,
+> >  #define RTM_NEWPREFIX        RTM_NEWPREFIX
+> >
+> > +     RTM_NEWMULTICAST,
+> > +#define RTM_NEWMULTICAST RTM_NEWMULTICAST
+> > +     RTM_DELMULTICAST,
+> > +#define RTM_DELMULTICAST RTM_DELMULTICAST
+> >       RTM_GETMULTICAST =3D 58,
+> >  #define RTM_GETMULTICAST RTM_GETMULTICAST
+> >
+> > @@ -774,6 +778,8 @@ enum rtnetlink_groups {
+> >  #define RTNLGRP_TUNNEL               RTNLGRP_TUNNEL
+> >       RTNLGRP_STATS,
+> >  #define RTNLGRP_STATS                RTNLGRP_STATS
+> > +     RTNLGRP_IPV4_MCADDR,
+> > +#define RTNLGRP_IPV4_MCADDR  RTNLGRP_IPV4_MCADDR
+> >       __RTNLGRP_MAX
+> >  };
+> >  #define RTNLGRP_MAX  (__RTNLGRP_MAX - 1)
+> > diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> > index 9bf09de6a2e7..34575f5392a8 100644
+> > --- a/net/ipv4/igmp.c
+> > +++ b/net/ipv4/igmp.c
+> > @@ -88,6 +88,7 @@
+> >  #include <linux/byteorder/generic.h>
+> >
+> >  #include <net/net_namespace.h>
+> > +#include <net/netlink.h>
+> >  #include <net/arp.h>
+> >  #include <net/ip.h>
+> >  #include <net/protocol.h>
+> > @@ -1430,6 +1431,60 @@ static void ip_mc_hash_remove(struct in_device *=
+in_dev,
+> >       *mc_hash =3D im->next_hash;
+> >  }
+> >
+> > +static int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *=
+dev,
+> > +                           __be32 addr, int event)
+> > +{
+> > +     struct nlmsghdr *nlh;
+> > +     struct ifaddrmsg *ifm;
+> > +
+> > +     nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
+> > +     if (!nlh)
+> > +             return -EMSGSIZE;
+> > +
+> > +     ifm =3D nlmsg_data(nlh);
+> > +     ifm->ifa_family =3D AF_INET;
+> > +     ifm->ifa_prefixlen =3D 32;
+> > +     ifm->ifa_flags =3D IFA_F_PERMANENT;
+> > +     ifm->ifa_scope =3D RT_SCOPE_LINK;
+> > +     ifm->ifa_index =3D dev->ifindex;
+> > +
+> > +     if (nla_put_in_addr(skb, IFA_MULTICAST, addr) < 0) {
+> > +             nlmsg_cancel(skb, nlh);
+> > +             return -EMSGSIZE;
+> > +     }
+> > +
+> > +     nlmsg_end(skb, nlh);
+> > +     return 0;
+> > +}
+> > +
+> > +static inline int inet_ifmcaddr_msgsize(void)
+> > +{
+> > +     return NLMSG_ALIGN(sizeof(struct ifaddrmsg))
+> > +                     + nla_total_size(sizeof(__be32));
+> > +}
+> > +
+> > +static void inet_ifmcaddr_notify(struct net_device *dev, __be32 addr, =
+int event)
+> > +{
+> > +     struct net *net =3D dev_net(dev);
+> > +     struct sk_buff *skb;
+> > +     int err =3D -ENOBUFS;
+> > +
+> > +     skb =3D nlmsg_new(inet_ifmcaddr_msgsize(), GFP_ATOMIC);
+> > +     if (!skb)
+> > +             goto error;
+> > +
+> > +     err =3D inet_fill_ifmcaddr(skb, dev, addr, event);
+> > +     if (err < 0) {
+> > +             WARN_ON(err =3D=3D -EMSGSIZE);
+> > +             kfree_skb(skb);
+> > +             goto error;
+> > +     }
+> > +
+> > +     rtnl_notify(skb, net, 0, RTNLGRP_IPV4_MCADDR, NULL, GFP_ATOMIC);
+> > +     return;
+> > +error:
+> > +     rtnl_set_sk_err(net, RTNLGRP_IPV4_MCADDR, err);
+> > +}
+> >
+> >  /*
+> >   *   A socket has joined a multicast group on device dev.
+> > @@ -1476,6 +1531,7 @@ static void ____ip_mc_inc_group(struct in_device =
+*in_dev, __be32 addr,
+> >       igmpv3_del_delrec(in_dev, im);
+> >  #endif
+> >       igmp_group_added(im);
+> > +     inet_ifmcaddr_notify(in_dev->dev, addr, RTM_NEWMULTICAST);
+> >       if (!in_dev->dead)
+> >               ip_rt_multicast_event(in_dev);
+> >  out:
+> > @@ -1689,6 +1745,8 @@ void __ip_mc_dec_group(struct in_device *in_dev, =
+__be32 addr, gfp_t gfp)
+> >                               *ip =3D i->next_rcu;
+> >                               in_dev->mc_count--;
+> >                               __igmp_group_dropped(i, gfp);
+> > +                             inet_ifmcaddr_notify(in_dev->dev, addr,
+> > +                                                  RTM_DELMULTICAST);
+> >                               ip_mc_clear_src(i);
+> >
+> >                               if (!in_dev->dead)
+> > --
+> > 2.47.0.277.g8800431eea-goog
+> >
 
