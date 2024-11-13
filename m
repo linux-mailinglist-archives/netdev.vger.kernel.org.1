@@ -1,129 +1,92 @@
-Return-Path: <netdev+bounces-144265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC799C66A3
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:24:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223A19C66B4
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251E81F24EEF
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:24:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D7B9B2AB80
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B10D1F95E;
-	Wed, 13 Nov 2024 01:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5201175A5;
+	Wed, 13 Nov 2024 01:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="P4xbzwuH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AX/fanIF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C2A134A8;
-	Wed, 13 Nov 2024 01:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E68BA34;
+	Wed, 13 Nov 2024 01:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731461047; cv=none; b=MPb68x1BVVZv4RL3E1F5CS7oJCimwTuXPCldumHkZND5XpRuH9WIht816nh0dMEKQTHVHmggroX5uv0KRjiKb8ym9seK3vxTYkA3UuyR5mMlz8jtP/vNv1cxM46hFfFYWFZPHW6XIDqqADNrOC0Na8vCG01oyIuQXbuU3MBgrX0=
+	t=1731461322; cv=none; b=dlYftcZbRAA1sDhrKxMUA3Sf1pBvbaGXlERCOALJkSzfiUmzIBWu2ybrP6KH8TePyohfsjt8ZE256LkyM9SyRzATuTgssPBhO3HsIlBh+QU/snhA+pt5Wg9JEs1ROwJl0pxkY1W/qoFLt0mruQ8Ww2Ozbyp+YsznjWir5KKgegY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731461047; c=relaxed/simple;
-	bh=sUKz3jCT2hiAfo2BD57mh6EmTwdB5aP1+aVXCjzoIw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=dt32r6/Re5N6NEiqkv5wCftZ1kBp5jPj50/rZzJ22pGneQjjdmfD/3jGQgz0mkVE8Y9lXIdXy8thglSynhtN0Eg9sz6k6xNIXTDc9GSsLluJ2UOSeAY+v7g+NJ08Mqk0bPoOezB2S2zApPvndhIz2bQRUspcj6LAlLR34XRZx0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=P4xbzwuH; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1731461039;
-	bh=YTvwOVHqUNLK9XlVW0eiqWJCmdjKjorGQduxber6A+o=;
-	h=Date:From:To:Cc:Subject:From;
-	b=P4xbzwuHCV6A2QZcFbCBK8D+ucx6ZXFRFPDuCimpGIONfOvlVWZIWzbJlWIbZUMbf
-	 5tJpKcNfWb5wqzDMPchvMNPac9cM+JgFNkaHxxR5xA3v/IWJz4kSGYDa85RiIeTQi5
-	 MDjKHbok1Az1zA55CpSDhluscTlZFdvxv9yKK4ITgd5Qrfmf/wrOlpAoeCKWxirFZN
-	 pQIWET89dZxx3qfnu+/rlKFcuU/oo8IwQmoENFeIfPUaebFfYNrh2vAJX+NAmal85R
-	 XbMQlImXQprdupfpcUEXXvMtILrXY2ZF5d1boIU8roD84yE76rPiHxOjrz2J+QT0Ze
-	 V9fLSYYQlYk2g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xp5Cf3llYz4wb1;
-	Wed, 13 Nov 2024 12:23:57 +1100 (AEDT)
-Date: Wed, 13 Nov 2024 12:23:59 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Stanislav Fomichev <sdf@fomichev.me>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20241113122359.1b95180a@canb.auug.org.au>
+	s=arc-20240116; t=1731461322; c=relaxed/simple;
+	bh=+X+k54ktMEeVatN/itYEiydQwmUaz5SOmKOWD1vzsw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eCICz5Mw7pBfUYeSmA5mmODxQJFVpgaLQ5V3FH7peYoqgQbuoosQste11BpTaAVmNHwVk9qL3V3cWp0/X56gi6S6NQexAaj92PLGGX1B7m/9V9OyJ3WH8oBU3o4ka/cV2SH9FpEteKPz5ji18LKxEfNqbvXEiyMNkYPhNQ67Av0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AX/fanIF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2994C4CECD;
+	Wed, 13 Nov 2024 01:28:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731461322;
+	bh=+X+k54ktMEeVatN/itYEiydQwmUaz5SOmKOWD1vzsw0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AX/fanIFaupuu4/sINoxaLFKX6Hx0jUzlvQfDsRpK5Cp72DPKQ6+K50toZc8Uaucj
+	 qYMEBrXmkNE0WNRQOIcGL7/MmsMZSy/n2szVOZXSkYsGK2ceJcp07XPJ3Df09M7W7B
+	 pveT3GcXnsGnF9U3NKpzD+YjFSZsA7WLGTVULMwvw9vPFX5pngzuB72KobMnYNz87q
+	 3zoAq5B/LuCp6qWI3A1DVS+BBgO0ua9/Ka1Xuaj92ByWpzsD3iFyFHEhsXz84Qf/Lg
+	 3LcMekJ0BjE3bzKYeDyLEGzmAaEPgLzjvUG6WKfE8SIpSe6xbWEFtHasvJ+fHAmRSp
+	 lmH/9MmSHP7oA==
+Date: Tue, 12 Nov 2024 17:28:40 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+ mkarsten@uwaterloo.ca, stable@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Mina Almasry
+ <almasrymina@google.com>, linux-kernel@vger.kernel.org (open list)
+Subject: Re: [RFC net 1/2] netdev-genl: Hold rcu_read_lock in napi_get
+Message-ID: <20241112172840.0cf9731f@kernel.org>
+In-Reply-To: <20241112181401.9689-2-jdamato@fastly.com>
+References: <20241112181401.9689-1-jdamato@fastly.com>
+	<20241112181401.9689-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/LgKoOoNNB=8NtuqrS93ebRH";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/LgKoOoNNB=8NtuqrS93ebRH
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi all,
+On Tue, 12 Nov 2024 18:13:58 +0000 Joe Damato wrote:
+> +/* must be called under rcu_read_lock(), because napi_by_id requires it */
+> +static struct napi_struct *__do_napi_by_id(unsigned int napi_id,
+> +					   struct genl_info *info, int *err)
+> +{
+> +	struct napi_struct *napi;
+> +
+> +	napi = napi_by_id(napi_id);
+> +	if (napi) {
+> +		*err = 0;
+> +	} else {
+> +		NL_SET_BAD_ATTR(info->extack, info->attrs[NETDEV_A_NAPI_ID]);
+> +		*err = -ENOENT;
+> +	}
+> +
+> +	return napi;
+> +}
 
-Today's linux-next merge of the net-next tree got a conflict in:
+Thanks for the quick follow up! I vote we don't factor this out.
+I don't see what it buys us, TBH, normally we factor out code
+to avoid having to unlock before return, but this code doesn't
+have extra returns...
 
-  tools/testing/selftests/net/.gitignore
+Just slap an rcu_read_lock / unlock around and that's it?
 
-between commit:
-
-  252e01e68241 ("selftests: net: add netlink-dumps to .gitignore")
-
-from the net tree and commit:
-
-  be43a6b23829 ("selftests: ncdevmem: Move ncdevmem under drivers/net/hw")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/net/.gitignore
-index 59fe07ee2df9,48973e78d46b..000000000000
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@@ -18,8 -19,6 +19,7 @@@ ipv6_flowlabel_mg
-  log.txt
-  msg_oob
-  msg_zerocopy
-- ncdevmem
- +netlink-dumps
-  nettest
-  psock_fanout
-  psock_snd
-
---Sig_/LgKoOoNNB=8NtuqrS93ebRH
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcz/68ACgkQAVBC80lX
-0Gyblgf/XvYusQlNhiqcaGdiOAFSbPddN2qoVU2EcAz2vq8r+nogGPMmPW4nJiE1
-VHh4l508qhkRHaOc5GG/X8WmiWWHUCikqSVogsr6l77Xhz9X7zhkkLFlEIkFGz01
-5oUzXkNNXmkzjThLmNrNuuphuHLYQIHeI0u5t/khbmalhoGKMZSO7Kn9/mwL3L5N
-0vsFCgtSzIrPJysXAsS8VI0avkJx/SgktCEWYaGRP5Lct1EqxG6jTcRRvQSnKbwh
-Z7PkVt67TvAg5SzuN2Nss/45RYwGD7lORWVvNhlONSHkXlgun5IUKqCR3rqKk43h
-RPAP8PG6IvhoFeEQrgOH9ibmm1e59w==
-=eakZ
------END PGP SIGNATURE-----
-
---Sig_/LgKoOoNNB=8NtuqrS93ebRH--
+Feel free to repost soon.
 
