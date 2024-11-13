@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-144317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 371329C68CD
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:40:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DC519C68CE
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:40:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AC27B23E67
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:40:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 432C51F21F7B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A128B175D45;
-	Wed, 13 Nov 2024 05:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC0E176AAE;
+	Wed, 13 Nov 2024 05:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="huZN5r+U"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Un4X+DS7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86A717ADF8
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AC417C22E
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731476396; cv=none; b=PcdVjkOBKtsQVtB3Ty6wRIreU8+fmM+jvEu6iIjL+DQQ63EZe/20g/hKn3Oegl6Z7aUQhWxtCHFeizgrTMDP5RKsWkuVHXpBIAbrYlqpr7vdzFxTPTaRpYCvQ4k71tOVXRj/7Wwvank9Z1YQAD0QWo+6KdxduHwYkVGN2suNMvI=
+	t=1731476399; cv=none; b=Y552+QPHtbUXHrQdn2YpMQ5m/GhFj9SUCyL82UKrPQTSVGG1gJwZysRiRO19T1mAYNPE2T0zNWluTRJfmsIWjbRbCM+Bvk4B5saaAhn+XEwJZQY3TudcUo0C8gpHNe2B+smXj1AetOjpD9xeVB1+guARrb8igvdCTBSTktjab80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731476396; c=relaxed/simple;
-	bh=za0bpsogRxHm4NMYxv8TajsbSFkBAJ1cX8dK5TCTZuY=;
+	s=arc-20240116; t=1731476399; c=relaxed/simple;
+	bh=XfS7yQZzw2tyb+KDfwUMibufdhtqSILIsH5my5ENvi8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Cet5hhEQ6vpCDnc9AFeym72V5EihIgbm+HjDUrHTycZuXS5tiLGpduzlH0A6uyrikWVIttnkVEQP+ldSS95sgl7GIoVR/vgODqo7r4RJzjSwckwFYQXoTJYC+KpoyzByNjuscgWG/V5cL0OOuuYEmuhngEuK7X4sn/tstssQlac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=huZN5r+U; arc=none smtp.client-ip=209.85.160.178
+	 MIME-Version; b=Eso1aDTNTFlCLdq5Ldl95fevxPQmapnlsxr2bWw9+kKfxE45gAPItlPSco4SWqjuNv2KmWUmnhypjnNW8QHj664DLRnG83jVp0GbJskk16VqhdvBR5e7iMf2YksxTF+Cp69nWsDO0aatTWLrPAp6HXsm37NTLEcDj2ctjdJKHtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Un4X+DS7; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4609beb631aso50934541cf.2
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 21:39:54 -0800 (PST)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-460ad98b043so3188321cf.1
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 21:39:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731476394; x=1732081194; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1731476396; x=1732081196; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rMyXb5/y7I5147Me22ncRWOHA10ESARq7LBgy9CZhbc=;
-        b=huZN5r+UyUT8I50HnunfrbKCF6liIjUxmb1axKwOIfh8Bfila0M1maxty1+MU+6dnY
-         DxwsvaRf4CQvwU5/3CU4mRSvMXohzwXL5gGnhIw83VqGrl+NMFCkJjBTW1ssf68HSMSq
-         xpyYr1LlwVvmuodiVFjnVtJve4pBt8QzkwGJs=
+        bh=IN2FC8eaVBMz8jzqHpmhy39+1EIFsz9YNLVu7HrNRI0=;
+        b=Un4X+DS7e7MfHIn4Y23DFz8aYf+BVs0ZcvaGgEizUEGZzXjCe9xhgb+XKm4mh7+9dy
+         rmcDUfeWDXWnt5uGrhqBGQKZhWFSmWnsIU24PHBsAnxyXQj5amNGWi3Ezf8TfWy3Tghz
+         QNdBnHFoaxQFYGz0DYHovqH/ZsDBs87z9+NSQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731476394; x=1732081194;
+        d=1e100.net; s=20230601; t=1731476396; x=1732081196;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rMyXb5/y7I5147Me22ncRWOHA10ESARq7LBgy9CZhbc=;
-        b=T6K5rHymNrFcLfdEhOLDbBdUIPPIX1g82yjgtOv61J2d5oTO8Y6DBEAxQmsPvqS71S
-         6zG9kEqJA+NbJLUSPkSd65j4eCQuccrafIwtiNqc5/2Dv/cPtlqQqyw4BVjXmvJS2LFg
-         DGBpZLvctlB9lVwYBaHzFmXvfDaQfq25wG5clnax6Yon9kwXZmvblLuYnGLmPtxp6Afw
-         AblUSQdTimavs4sfs+t4KUBmUAoTyfGbU1rQKy1o/Q9Jrj4SA5LshxQaT83I3rqU+MPh
-         1SDu4HkQAM3DdmjUwfZpGmurdWU/dxL/YIHoCJuKiMbcODYa2b/ShRN7PEcX2XSNjIBs
-         Dffw==
-X-Gm-Message-State: AOJu0Yz1Wivd+r6BHJtOu7k+W3ts8vikjzdRENBtzch6KOidE4zahE9/
-	xEVzya2F+GHKPWZs95VQiitsq7SvkX4kyhTmUITMRWHLd6ujruT9Patp2Zu1Yg==
-X-Google-Smtp-Source: AGHT+IGc6ueDLypKAdZ2sBl7IRZz58ZTc4kuxQbTB2hTROous5s5XtH5KBESFPf36ek/ZXsbUt1WQg==
-X-Received: by 2002:a05:622a:2999:b0:461:313e:8865 with SMTP id d75a77b69052e-4630933bbe0mr263179851cf.21.1731476393883;
-        Tue, 12 Nov 2024 21:39:53 -0800 (PST)
+        bh=IN2FC8eaVBMz8jzqHpmhy39+1EIFsz9YNLVu7HrNRI0=;
+        b=SqgNPybk1EPoAb5TZ7Ec1YQQZGP68x4GCQPPVNBLjsIhiniu/+G8Xkh5ZsBNd4R3iU
+         sumaUmFw0JYh4eDU0Jf+KBStO1P/vEE5beCqQqFnY0t1yrHc7nfNKZAGhcbHga2jDZwH
+         ZkiLU1WW0VEhLrdU+w87PrHLh9+bLzOAUGC+mWCgWM/BMmrs+FpHCJs2hsgUUM/90bRl
+         pdOaVPD8tLOYuqez+ID5xZQkj6NDPJRCCqVIAk3B0908P519k+HNBZUkBX/TzOXF/RlE
+         9c211r0lhYZvn3DHA9eLyFVLuf3KbuCSjbQyAmk53qRSP8Y5ru3KPjB3HZ79QwvNZxtP
+         BZeA==
+X-Gm-Message-State: AOJu0YwZnN7Y/ybLrsXuU1bu/3E5BfH7hjiK12485UQosGcevBD55EWE
+	tz6saPQILrgwtRhKehHqvz0lDtysXXbnM48DpT6LVvBwt6VCqp6c+PJ2Av4Ocw==
+X-Google-Smtp-Source: AGHT+IFHHbXdr6bszTZ9RKqd5EJ/CahDgGKEnQRtYf41PUVGju6RZ8ey0DPZrXHx6Ng9IoditAutLg==
+X-Received: by 2002:ac8:5fd4:0:b0:45f:890c:5f49 with SMTP id d75a77b69052e-46309ba8d5bmr285182741cf.24.1731476396446;
+        Tue, 12 Nov 2024 21:39:56 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ff5e14f9sm83457491cf.86.2024.11.12.21.39.51
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ff5e14f9sm83457491cf.86.2024.11.12.21.39.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 21:39:52 -0800 (PST)
+        Tue, 12 Nov 2024 21:39:55 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: netdev@vger.kernel.org,
 	andrew.gospodarek@broadcom.com,
 	hongguang.gao@broadcom.com,
 	shruti.parab@broadcom.com
-Subject: [PATCH net-next 04/11] bnxt_en: Add a 'force' parameter to bnxt_free_ctx_mem()
-Date: Tue, 12 Nov 2024 21:36:42 -0800
-Message-ID: <20241113053649.405407-5-michael.chan@broadcom.com>
+Subject: [PATCH net-next 05/11] bnxt_en: Allocate backing store memory for FW trace logs
+Date: Tue, 12 Nov 2024 21:36:43 -0800
+Message-ID: <20241113053649.405407-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20241113053649.405407-1-michael.chan@broadcom.com>
 References: <20241113053649.405407-1-michael.chan@broadcom.com>
@@ -87,188 +87,155 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Hongguang Gao <hongguang.gao@broadcom.com>
+From: Shruti Parab <shruti.parab@broadcom.com>
 
-If 'force' is false, it will keep the memory pages and all data
-structures for the context memory type if the memory is valid.
+Allocate the new FW trace log backing store context memory types
+if they are supported by the FW.  FW debug logs are DMA'ed to the host
+backing store memory when the on-chip buffers are full.  If host
+memory cannot be allocated for these memory types, the driver
+will not abort.
 
-This patch always passes true for the 'force' parameter so there is
-no change in behavior.  Later patches will adjust the 'force' parameter
-for the FW log context memory types so that the logs will not be reset
-after FW reset.
-
-Signed-off-by: Hongguang Gao <hongguang.gao@broadcom.com>
+Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
+Signed-off-by: Shruti Parab <shruti.parab@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 44 ++++++++++++-------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  2 +-
- .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |  2 +-
- 3 files changed, 29 insertions(+), 19 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 43 ++++++++++++++++++-----
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 27 +++++++++++---
+ 2 files changed, 57 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 2e4fcab98cc9..7355db3e060c 100644
+index 7355db3e060c..fb315acf5a4b 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -8231,7 +8231,7 @@ static int bnxt_hwrm_func_backing_store_qcaps_v2(struct bnxt *bp)
- {
- 	struct hwrm_func_backing_store_qcaps_v2_output *resp;
- 	struct hwrm_func_backing_store_qcaps_v2_input *req;
--	struct bnxt_ctx_mem_info *ctx;
-+	struct bnxt_ctx_mem_info *ctx = bp->ctx;
- 	u16 type;
- 	int rc;
- 
-@@ -8239,10 +8239,12 @@ static int bnxt_hwrm_func_backing_store_qcaps_v2(struct bnxt *bp)
- 	if (rc)
- 		return rc;
- 
--	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
--	if (!ctx)
--		return -ENOMEM;
--	bp->ctx = ctx;
-+	if (!ctx) {
-+		ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+		if (!ctx)
-+			return -ENOMEM;
-+		bp->ctx = ctx;
-+	}
- 
- 	resp = hwrm_req_hold(bp, req);
- 
-@@ -8291,7 +8293,8 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
- 	struct hwrm_func_backing_store_qcaps_input *req;
- 	int rc;
- 
--	if (bp->hwrm_spec_code < 0x10902 || BNXT_VF(bp) || bp->ctx)
-+	if (bp->hwrm_spec_code < 0x10902 || BNXT_VF(bp) ||
-+	    (bp->ctx && bp->ctx->flags & BNXT_CTX_FLAG_INITED))
- 		return 0;
- 
- 	if (bp->fw_cap & BNXT_FW_CAP_BACKING_STORE_V2)
-@@ -8764,11 +8767,16 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp, u32 ena)
+@@ -2462,6 +2462,15 @@ static bool bnxt_auto_speed_updated(struct bnxt_link_info *link_info)
+ 	return false;
  }
  
- static void bnxt_free_one_ctx_mem(struct bnxt *bp,
--				  struct bnxt_ctx_mem_type *ctxm)
-+				  struct bnxt_ctx_mem_type *ctxm, bool force)
- {
- 	struct bnxt_ctx_pg_info *ctx_pg;
- 	int i, n = 1;
- 
-+	ctxm->last = 0;
++bool bnxt_bs_trace_avail(struct bnxt *bp, u16 type)
++{
++	u32 flags = bp->ctx->ctx_arr[type].flags;
 +
-+	if (ctxm->mem_valid && !force)
-+		return;
++	return (flags & BNXT_CTX_MEM_TYPE_VALID) &&
++		((flags & BNXT_CTX_MEM_FW_TRACE) ||
++		 (flags & BNXT_CTX_MEM_FW_BIN_TRACE));
++}
 +
- 	ctx_pg = ctxm->pg_info;
- 	if (ctx_pg) {
- 		if (ctxm->instance_bmap)
-@@ -8782,7 +8790,7 @@ static void bnxt_free_one_ctx_mem(struct bnxt *bp,
- 	}
- }
- 
--void bnxt_free_ctx_mem(struct bnxt *bp)
-+void bnxt_free_ctx_mem(struct bnxt *bp, bool force)
+ #define BNXT_EVENT_THERMAL_CURRENT_TEMP(data2)				\
+ 	((data2) &							\
+ 	  ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA2_CURRENT_TEMP_MASK)
+@@ -8742,16 +8751,34 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp, u32 ena)
  {
  	struct bnxt_ctx_mem_info *ctx = bp->ctx;
+ 	struct bnxt_ctx_mem_type *ctxm;
+-	u16 last_type;
++	u16 last_type = BNXT_CTX_INV;
+ 	int rc = 0;
  	u16 type;
-@@ -8791,11 +8799,13 @@ void bnxt_free_ctx_mem(struct bnxt *bp)
+ 
+-	if (!ena)
+-		return 0;
+-	else if (ena & FUNC_BACKING_STORE_CFG_REQ_ENABLES_TIM)
+-		last_type = BNXT_CTX_MAX - 1;
+-	else
+-		last_type = BNXT_CTX_L2_MAX - 1;
++	for (type = BNXT_CTX_SRT; type <= BNXT_CTX_RIGP1; type++) {
++		ctxm = &ctx->ctx_arr[type];
++		if (!bnxt_bs_trace_avail(bp, type))
++			continue;
++		if (!ctxm->mem_valid) {
++			rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm,
++						     ctxm->max_entries, 1);
++			if (rc) {
++				netdev_warn(bp->dev, "Unable to setup ctx page for type:0x%x.\n",
++					    type);
++				continue;
++			}
++			last_type = type;
++		}
++	}
++
++	if (last_type == BNXT_CTX_INV) {
++		if (!ena)
++			return 0;
++		else if (ena & FUNC_BACKING_STORE_CFG_REQ_ENABLES_TIM)
++			last_type = BNXT_CTX_MAX - 1;
++		else
++			last_type = BNXT_CTX_L2_MAX - 1;
++	}
+ 	ctx->ctx_arr[last_type].last = 1;
+ 
+ 	for (type = 0 ; type < BNXT_CTX_V2_MAX; type++) {
+@@ -8774,7 +8801,7 @@ static void bnxt_free_one_ctx_mem(struct bnxt *bp,
+ 
+ 	ctxm->last = 0;
+ 
+-	if (ctxm->mem_valid && !force)
++	if (ctxm->mem_valid && !force && (ctxm->flags & BNXT_CTX_MEM_PERSIST))
  		return;
  
- 	for (type = 0; type < BNXT_CTX_V2_MAX; type++)
--		bnxt_free_one_ctx_mem(bp, &ctx->ctx_arr[type]);
-+		bnxt_free_one_ctx_mem(bp, &ctx->ctx_arr[type], force);
- 
- 	ctx->flags &= ~BNXT_CTX_FLAG_INITED;
--	kfree(ctx);
--	bp->ctx = NULL;
-+	if (force) {
-+		kfree(ctx);
-+		bp->ctx = NULL;
-+	}
- }
- 
- static int bnxt_alloc_ctx_mem(struct bnxt *bp)
-@@ -11756,7 +11766,7 @@ static int bnxt_hwrm_if_change(struct bnxt *bp, bool up)
- 			set_bit(BNXT_STATE_FW_RESET_DET, &bp->state);
- 			if (!test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
- 				bnxt_ulp_irq_stop(bp);
--			bnxt_free_ctx_mem(bp);
-+			bnxt_free_ctx_mem(bp, true);
- 			bnxt_dcb_free(bp);
- 			rc = bnxt_fw_init_one(bp);
- 			if (rc) {
-@@ -13469,7 +13479,7 @@ static void bnxt_fw_reset_close(struct bnxt *bp)
- 	bnxt_hwrm_func_drv_unrgtr(bp);
- 	if (pci_is_enabled(bp->pdev))
- 		pci_disable_device(bp->pdev);
--	bnxt_free_ctx_mem(bp);
-+	bnxt_free_ctx_mem(bp, true);
- }
- 
- static bool is_bnxt_fw_ok(struct bnxt *bp)
-@@ -15326,7 +15336,7 @@ static void bnxt_remove_one(struct pci_dev *pdev)
- 	kfree(bp->fw_health);
- 	bp->fw_health = NULL;
- 	bnxt_cleanup_pci(bp);
--	bnxt_free_ctx_mem(bp);
-+	bnxt_free_ctx_mem(bp, true);
- 	bnxt_free_crash_dump_mem(bp);
- 	kfree(bp->rss_indir_tbl);
- 	bp->rss_indir_tbl = NULL;
-@@ -15968,7 +15978,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	kfree(bp->fw_health);
- 	bp->fw_health = NULL;
- 	bnxt_cleanup_pci(bp);
--	bnxt_free_ctx_mem(bp);
-+	bnxt_free_ctx_mem(bp, true);
- 	bnxt_free_crash_dump_mem(bp);
- 	kfree(bp->rss_indir_tbl);
- 	bp->rss_indir_tbl = NULL;
-@@ -16022,7 +16032,7 @@ static int bnxt_suspend(struct device *device)
- 	}
- 	bnxt_hwrm_func_drv_unrgtr(bp);
- 	pci_disable_device(bp->pdev);
--	bnxt_free_ctx_mem(bp);
-+	bnxt_free_ctx_mem(bp, true);
- 	rtnl_unlock();
- 	return rc;
- }
-@@ -16134,7 +16144,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 
- 	if (pci_is_enabled(pdev))
- 		pci_disable_device(pdev);
--	bnxt_free_ctx_mem(bp);
-+	bnxt_free_ctx_mem(bp, true);
- 	rtnl_unlock();
- 
- 	/* Request a slot slot reset. */
+ 	ctx_pg = ctxm->pg_info;
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 5b921c57a9f8..5fcb5a980bdf 100644
+index 5fcb5a980bdf..409882c4ac7f 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2823,7 +2823,7 @@ int bnxt_hwrm_vnic_alloc(struct bnxt *bp, struct bnxt_vnic_info *vnic,
- int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
- int bnxt_nq_rings_in_use(struct bnxt *bp);
- int bnxt_hwrm_set_coal(struct bnxt *);
--void bnxt_free_ctx_mem(struct bnxt *bp);
-+void bnxt_free_ctx_mem(struct bnxt *bp, bool force);
- int bnxt_num_tx_to_cp(struct bnxt *bp, int tx);
- unsigned int bnxt_get_max_func_stat_ctxs(struct bnxt *bp);
- unsigned int bnxt_get_avail_stat_ctxs_for_en(struct bnxt *bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-index 4cb0fabf977e..901fd36757ed 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-@@ -463,7 +463,7 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 			break;
- 		}
- 		bnxt_cancel_reservations(bp, false);
--		bnxt_free_ctx_mem(bp);
-+		bnxt_free_ctx_mem(bp, true);
- 		break;
- 	}
- 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE: {
+@@ -1880,6 +1880,13 @@ struct bnxt_ctx_mem_type {
+ 	u16	entry_size;
+ 	u32	flags;
+ #define BNXT_CTX_MEM_TYPE_VALID FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_TYPE_VALID
++#define BNXT_CTX_MEM_FW_TRACE		\
++	FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_FW_DBG_TRACE
++#define BNXT_CTX_MEM_FW_BIN_TRACE	\
++	FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_FW_BIN_DBG_TRACE
++#define BNXT_CTX_MEM_PERSIST		\
++	FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_NEXT_BS_OFFSET
++
+ 	u32	instance_bmap;
+ 	u8	init_value;
+ 	u8	entry_multiple;
+@@ -1920,21 +1927,30 @@ struct bnxt_ctx_mem_type {
+ #define BNXT_CTX_FTQM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_FP_TQM_RING
+ #define BNXT_CTX_MRAV	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_MRAV
+ #define BNXT_CTX_TIM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TIM
+-#define BNXT_CTX_TKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TKC
+-#define BNXT_CTX_RKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RKC
++#define BNXT_CTX_TCK	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TX_CK
++#define BNXT_CTX_RCK	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RX_CK
+ #define BNXT_CTX_MTQM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_MP_TQM_RING
+ #define BNXT_CTX_SQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SQ_DB_SHADOW
+ #define BNXT_CTX_RQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RQ_DB_SHADOW
+ #define BNXT_CTX_SRQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRQ_DB_SHADOW
+ #define BNXT_CTX_CQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CQ_DB_SHADOW
+-#define BNXT_CTX_QTKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_QUIC_TKC
+-#define BNXT_CTX_QRKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_QUIC_RKC
+ #define BNXT_CTX_TBLSC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TBL_SCOPE
+ #define BNXT_CTX_XPAR	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_XID_PARTITION
++#define BNXT_CTX_SRT	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRT_TRACE
++#define BNXT_CTX_SRT2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRT2_TRACE
++#define BNXT_CTX_CRT	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CRT_TRACE
++#define BNXT_CTX_CRT2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CRT2_TRACE
++#define BNXT_CTX_RIGP0	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RIGP0_TRACE
++#define BNXT_CTX_L2HWRM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_L2_HWRM_TRACE
++#define BNXT_CTX_REHWRM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_ROCE_HWRM_TRACE
++#define BNXT_CTX_CA0	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA0_TRACE
++#define BNXT_CTX_CA1	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA1_TRACE
++#define BNXT_CTX_CA2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA2_TRACE
++#define BNXT_CTX_RIGP1	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RIGP1_TRACE
+ 
+ #define BNXT_CTX_MAX	(BNXT_CTX_TIM + 1)
+ #define BNXT_CTX_L2_MAX	(BNXT_CTX_FTQM + 1)
+-#define BNXT_CTX_V2_MAX	(BNXT_CTX_XPAR + 1)
++#define BNXT_CTX_V2_MAX	(BNXT_CTX_RIGP1 + 1)
+ #define BNXT_CTX_INV	((u16)-1)
+ 
+ struct bnxt_ctx_mem_info {
+@@ -2792,6 +2808,7 @@ int bnxt_alloc_rx_data(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
+ 		       u16 prod, gfp_t gfp);
+ void bnxt_reuse_rx_data(struct bnxt_rx_ring_info *rxr, u16 cons, void *data);
+ u32 bnxt_fw_health_readl(struct bnxt *bp, int reg_idx);
++bool bnxt_bs_trace_avail(struct bnxt *bp, u16 type);
+ void bnxt_set_tpa_flags(struct bnxt *bp);
+ void bnxt_set_ring_params(struct bnxt *);
+ int bnxt_set_rx_skb_mode(struct bnxt *bp, bool page_mode);
 -- 
 2.30.1
 
