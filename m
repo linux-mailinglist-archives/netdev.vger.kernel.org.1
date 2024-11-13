@@ -1,190 +1,151 @@
-Return-Path: <netdev+bounces-144485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED97E9C7864
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:12:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F8DF9C7883
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C44E1F258D1
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:12:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E7E2284B02
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FB41DF26B;
-	Wed, 13 Nov 2024 16:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5124C201018;
+	Wed, 13 Nov 2024 16:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFU1h/Mw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MnoOLjdx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B4F17084F
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 16:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8203B1E00A0
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 16:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731514308; cv=none; b=kJcgPMAZDS40gFjqWMRi6WDSK+5jaZ7ZHHFixHaaKo0X7IKBaKDaulCLmV2I+leSnWQ7yzNmmk0vv7KZ/8eRchBgCyHxSxhPCZsX3lu6S8RyLqj2Zkde+QgkH89GKvcGK60erAd9k6K7GeupEU9ag2f1E35EAvQWLF2zGbe8b/c=
+	t=1731514489; cv=none; b=sBKX2HqD+AX478kSNfF4JaFY5IOgFXEo19x/z0Pkvr2TueLaGuCSQs+RtLlmHbof9eTH4bogXugxW8r5v80VrQVnZdEe1No4CyE0CLE7SjIFBP/lQtD8fDawvkQBYhMk65y2XuKeZYJKt6LmOA7wZzFU309sfCEPLSGdAioM088=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731514308; c=relaxed/simple;
-	bh=8JShsxBODe/ZYse/45GbByklsWCzNPukdA1ZXffLLLQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SJJoJenOtbZo3GoPg9XBQnRuv3blzpBAXoeJQgBbzids1wCWmktuvB1+rzRGj5bocZSR/Sg4zzCwuDWKtHG7VuKizy098W5GvZEs5PFWyfjA9UcMA/XqnMNnTacNpVS7cXMOTBMB9o63gGDaOBeJX6sHttlP6RkuJfQarXRtpCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SFU1h/Mw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731514305;
+	s=arc-20240116; t=1731514489; c=relaxed/simple;
+	bh=BmTsOCKyrPG2YfyL5acBzci1M0XdqFpbytOYo331NrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N2WADGb3oXqYWzDq628rBuMWjK/+//KJk2mNjHX6IXkKJhjVLi39ICGqLppVI4i1NCpo3Oe6C356WzxHjguNuh7hTWy7UcCnJhCcu6E0JKErRzOJxe6oLSUEbpLfY2BWysX6v7QE0Suw1Nx88aH58RWQxwg4ip2Fag221FQWe+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MnoOLjdx; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 56D9160002;
+	Wed, 13 Nov 2024 16:14:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731514484;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8JShsxBODe/ZYse/45GbByklsWCzNPukdA1ZXffLLLQ=;
-	b=SFU1h/Mwr7lIShqUGeYhB3lrs/uUp0HY161hgBtSN0ff/Z2hRKt25aHM2/4qwLMRRETThb
-	E7jlOoMTD/bCMQAfVVnK6bP3eYh+zjrGuYSvjzDDb/QAOCq4lzTDv/BkoeSLI7mGKP5CM5
-	U3uevNOjLemhJZRrm3u13v0aL0rdd0Q=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-149-e4hxc6ZxOxK2RfN7_n_WDQ-1; Wed, 13 Nov 2024 11:11:41 -0500
-X-MC-Unique: e4hxc6ZxOxK2RfN7_n_WDQ-1
-X-Mimecast-MFC-AGG-ID: e4hxc6ZxOxK2RfN7_n_WDQ
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6d38310949cso117695456d6.0
-        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 08:11:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731514301; x=1732119101;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8JShsxBODe/ZYse/45GbByklsWCzNPukdA1ZXffLLLQ=;
-        b=rIyLQJ6LQcRCM5hPEDhWn+4T1IK7mAbijmLec2Iobh6WCjOP+FS0HtpN84JtTfPQFy
-         Ro5tzit+ow+Kr+gbai40GvnW2dYf8o7cYA+9lsxsAvqpBHbLbK/VbNFb7nKb5ylTa/uq
-         Byi7QMDylMAj/PXs4oOerVZLV1EnyFwQl+KD9p7zrR6NhHNKgfZB1KQOPW0c6J/ijS10
-         7Yyj8xXiBkTQts6R5AVQ1Mxil/4k7Jrzb0MJgL+VM+hQeqgP0L5tCPptdUZmOechJoBv
-         FOEdPMWzRheU2yYfDnXOBbPC703wUv3+hfZL4H26A/mhVbBVn4zJaf5oaiZRI0hSqWLS
-         LKsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMLohYstebrpya49gdpqLWx/9VT2OXjgSlO3RbA7S9RIRwkvgF/xHj4C9rIfcReZAA7JoeWC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw2sBQAL6CeOzDUVxxuplUEDygDRnEwxZnO4ANH61PoAs1nrem
-	i2IJrdylJiUYO46o4mjijXXHD7l1BPlBak/5FfVh8AdQvBiS3/n21SSQBSuNwwbfyMg6hvooAHw
-	kCyE9vFUF026hDc7a70edxsAGaxoyYj5eQCREGQOkOX9xzqOM1AZQqQ==
-X-Received: by 2002:a05:6214:5987:b0:6d3:68df:f62d with SMTP id 6a1803df08f44-6d39e10946emr297207526d6.2.1731514300783;
-        Wed, 13 Nov 2024 08:11:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHnbeg7ogUgcEGRAzWAPJHQLp75DRK8IjefSxWG9p6JZ9o7VJOC4JF6vdJYqufewnJd395bRA==
-X-Received: by 2002:a05:6214:5987:b0:6d3:68df:f62d with SMTP id 6a1803df08f44-6d39e10946emr297207096d6.2.1731514300322;
-        Wed, 13 Nov 2024 08:11:40 -0800 (PST)
-Received: from [10.200.68.91] (nat-pool-muc-u.redhat.com. [149.14.88.27])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3966303e6sm86017386d6.99.2024.11.13.08.11.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 08:11:39 -0800 (PST)
-Message-ID: <2f94dd0f0bfef8d51f1ced78a9b5db8e2ce48429.camel@redhat.com>
-Subject: Re: [PATCH v2 01/11] PCI: Prepare removing devres from pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Damien Le Moal
- <dlemoal@kernel.org>,  Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>,  GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>,  Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
- S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Mario Limonciello
- <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>, Ricky Wu
- <ricky_wu@realtek.com>,  Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
- <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>, Mostafa Saleh
- <smostafa@google.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
- <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>, Christian Brauner
- <brauner@kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, Eric
- Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org
-Date: Wed, 13 Nov 2024 17:11:29 +0100
-In-Reply-To: <87plmzktn3.ffs@tglx>
-References: <20241113124158.22863-2-pstanner@redhat.com>
-	 <20241113124158.22863-3-pstanner@redhat.com> <87plmzktn3.ffs@tglx>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	bh=M3WZgkURvDfhuAy+4YumCl8Ei92ZKeFOurXNer0/T8U=;
+	b=MnoOLjdxWbULEiENmACt46MKmJVUNF2l4iQv9hCA2AnyYvo53+QTlPIyrCPjyPYgH87LpM
+	1vDofbOldcstJ8IeZw5rvUnfQlud0DAEkiZK19QerLMARHXnXnk0iXYojWv8/L5dDaJ9FT
+	WVGaiOVD1DlpbtyLrg30ElQOffxWoLltZ9VOZTWpFzYlwCNXEokp8fghsuPnXvfCCXG395
+	cM4cPHRUy3QiTVxRq8PAnQ4oeQZIv2XIQxBCGm8Md9WVoofxqyAP7yQnzAuU/s7QCiErDT
+	k3w339PF5AgA+2WqXBCM3zJcGDKAUF+wdm52QxZixYQw/euPdmtugilF/HrvTA==
+Date: Wed, 13 Nov 2024 17:14:43 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Re: Testing selectable timestamping - where are the tools for this
+ feature?
+Message-ID: <20241113171443.697ac278@kmaincent-XPS-13-7390>
+In-Reply-To: <ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk>
+References: <ZzS7wWx4lREiOgL3@shell.armlinux.org.uk>
+	<20241113161602.2d36080c@kmaincent-XPS-13-7390>
+	<ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 2024-11-13 at 17:04 +0100, Thomas Gleixner wrote:
-> On Wed, Nov 13 2024 at 13:41, Philipp Stanner wrote:
-> > +/**
-> > + * pci_intx_unmanaged - enables/disables PCI INTx for device dev,
-> > + * unmanaged version
-> > + * @pdev: the PCI device to operate on
-> > + * @enable: boolean: whether to enable or disable PCI INTx
+On Wed, 13 Nov 2024 15:57:56 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> On Wed, Nov 13, 2024 at 04:16:02PM +0100, Kory Maincent wrote:
+> > Hello Russell,
+> >=20
+> > On Wed, 13 Nov 2024 14:46:25 +0000
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> >  =20
+> > > Hi Kory,
+> > >=20
+> > > I've finally found some cycles (and time when I'm next to the platfor=
+m)
+> > > to test the selectable timestamping feature. However, I'm struggling =
+to
+> > > get it to work.
+> > >=20
+> > > In your email
+> > > https://lore.kernel.org/20240709-feature_ptp_netnext-v17-0-b5317f50df=
+2a@bootlin.com/
+> > > you state that "You can test it with the ethtool source on branch
+> > > feature_ptp of: https://github.com/kmaincent/ethtool". I cloned this
+> > > repository, checked out the feature_ptp branch, and while building
+> > > I get the following warnings:
+> > >=20
+> > > My conclusion is... your ethtool sources for testing this feature are
+> > > broken, or this is no longer the place to test this feature. =20
+> >=20
+> > Yeah, it was for v3 of the patch series. It didn't follow up to v19, I =
+am
+> > using ynl tool which is the easiest way to test it.
+> > As there were a lot of changes along the way, updating ethtool every ti=
+me
+> > was not a good idea.
+> >=20
+> > Use ynl tool. Commands are described in the last patch of the series:
+> > https://lore.kernel.org/all/20241030-feature_ptp_netnext-v19-10-94f8aad=
+c9d5c@bootlin.com/
+> >=20
+> > You simply need to install python python-yaml and maybe others python
+> > subpackages.
+> > Copy the tool "tools/net/ynl" and the specs "Documentation/netlink/" on=
+ the
+> > board.
+> >=20
+> > Then run the ynl commands. =20
 >=20
-> Except that the argument is of type int, which really should be type
-> bool.
-
-True, but this is a *temporary* copy of pci_intx(), a ~16 year old
-function. Older C programmers had the habit of for some reason using
-32-bit integers for a true/false boolean all the time.
-
-We _could_ think of changing pci_intx()'s parameter to a boolean, but I
-think it wouldn't really improve things very much
-
-see also below
-
+> Thanks... fairly unweildly but at least it's functional. However,
+> running the first, I immediately find a problem:
 >=20
-> > + * Enables/disables PCI INTx for device @pdev
-> > + *
-> > + * This function behavios identically to pci_intx(), but is never
-> > managed with
-> > + * devres.
+> # ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --dump
+> tsinfo-get --json '{"header":{"dev-name":"eth0"}}'
 >=20
-> behavios?
+> One would expect this to only return results for eth0 ?
 
--> behaves. Will fix.
+Indeed it should! That's weird, I will investigate.
 
+> Also, I don't see more than one timestamper on any interface - there
+> should be two on eth2, one for the MAC and one for the PHY. I see the
+> timestamper for the mvpp2 MAC, but nothing for the PHY. The PTP clock
+> on the PHY is definitely registered (/dev/ptp0), which means
+> phydev->mii_ts should be pointing to the MII timestamper for the PHY.
 >=20
-> > + */
-> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
->=20
-> I find this function name mildy confusing. This _unmanaged suffix is
-> not
-> really telling me anything. And the reference that this behaves
-> identically to pci_intx() makes it even worse.
->=20
-> This function is about controlling the PCI INTX_DISABLE bit in the
-> PCI_COMMAND config word, right?
->=20
-> So naming it pci_intx_control() would make it entirely clear what
-> this
-> is about, no?
+> I've also tried with --json '{"header":{"dev-name":"eth2"}}' but no
+> difference - it still reports all interfaces and only one timestamper
+> for eth2.
 
-We had this conversation last week. I answered on that already, maybe
-you have overlooked it:
+Sorry forgot to explain that you need to register PTP clock with the functi=
+on
+phydev_ptp_clock_register() in the PHY driver.
 
-https://lore.kernel.org/all/a8d9f32f60f55c58d79943c4409b8b94535ff853.camel@=
-redhat.com/
+It will be changed in v20 as request by Jakub. I will save the hwtstamp sou=
+rce
+and phydev pointer in the netdev core instead.
 
-
-Please also take a look at patch 11, then you'll see the full picture
-
-Danke,
-Philipp
-
->=20
-> Thanks,
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tglx
->=20
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
