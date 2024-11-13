@@ -1,113 +1,133 @@
-Return-Path: <netdev+bounces-144482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CDF19C78BB
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:23:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F41809C7826
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:04:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFC4BB3E8A8
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:53:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B919E2812C0
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7FB7083B;
-	Wed, 13 Nov 2024 15:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282E31632C7;
+	Wed, 13 Nov 2024 16:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UAoK1ORO"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Tkc3Assz";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gZ6656/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABF21632F2
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 15:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D33E7E0E8;
+	Wed, 13 Nov 2024 16:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731512974; cv=none; b=Icf2GAVPLvVOzJD7xWeXU0G9zqUotPT8oP6K/p1unapQ5ZJXGZI5J/NC6QN4P46DrrFg9OuxqpZaiRonbQm/KuxI1fPSUzrM84h8y4I7jjQ8MJAn5bNA0CUtrImJq8fQgUdstEqGogw3zC4LTJgOC/Mm8NNiX5hiCsFykigSupE=
+	t=1731513833; cv=none; b=n687o/qiGoMD1gj1WvnzUaCfes5YmeBUDzaacJ8EijiBoe03VcQ+ZctSOZVrh+CvZBG0MrnIIfMmxSXDf602RrBbsLJ9y8xy9ZX7Yn+UbaeCAXiJ9Q2XN73ey2qx/11yOwsWT4BheLuE68KKF6ZY/j/fsnSBJMUFqVeCL7DR+vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731512974; c=relaxed/simple;
-	bh=rL0Rj5BohAoFW1JXrmppR3BKs8WOPEHIQVuBaPVC7kU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=shGf+w6H+EChCQHE99/gvDCr6po1D7KNQeYzFqjDlttr3DvjU6U0NTpYkjDvpfksxxuU8VyhAS5K8ZJ5Q+5XsTjF5M/krxqzRT429pj9TUeO27qCAnMch+lndU6CQos6H/Pzjgi4vUeNHSpuf9WVRXD6z6GFAre+uNNjX6QH7RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UAoK1ORO; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731512972; x=1763048972;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rL0Rj5BohAoFW1JXrmppR3BKs8WOPEHIQVuBaPVC7kU=;
-  b=UAoK1OROGxK6xBtwmLvIrk7i2B3RyghFuvivINciRM4TsuQCmxQIZh7t
-   fc/owI1Y+tAC6iHj18cKjg2eD14XO6Po6TN9PjUtk0r11BZ4Y9ZfpOasd
-   fdeGIMl8S4Nbg+CDbP7Rw9cNUaE9GDacowjMhRx9QKA9y30+O65Dtreys
-   nwajlsGcqp4nWLcAXpOPkcgnT3ZXdsWktNfa6nV00pFs3Of2u+gFaFXJX
-   HdHkVXnj+EQ5RJKFvdYXQL6/MAdjukvsi9axsoJERXdezczToQzNHFrpg
-   cD+bg85Bxge6I7WHrdBPn3Ee6+3v9mv4szSnti0OCpTVQYfSS71Ejze9r
-   g==;
-X-CSE-ConnectionGUID: QUbcfwQRRjupa9D4cT8sCA==
-X-CSE-MsgGUID: GfwBPOoQSpWzUbotBghIGA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="48919108"
-X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="48919108"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 07:49:32 -0800
-X-CSE-ConnectionGUID: BnI3RWUpQxu+9MHlN9r2uQ==
-X-CSE-MsgGUID: niPavKQcQ6ODjmWInptQlw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="92869407"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.102.22.54])
-  by orviesa005.jf.intel.com with ESMTP; 13 Nov 2024 07:49:31 -0800
-From: Milena Olech <milena.olech@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Milena Olech <milena.olech@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH iwl-net 10/10] idpf: change the method for mailbox workqueue allocation
-Date: Wed, 13 Nov 2024 16:46:25 +0100
-Message-Id: <20241113154616.2493297-11-milena.olech@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20241113154616.2493297-1-milena.olech@intel.com>
-References: <20241113154616.2493297-1-milena.olech@intel.com>
+	s=arc-20240116; t=1731513833; c=relaxed/simple;
+	bh=0rvZTMtJ3F13U4qn3mQOzLEvAdJLknVek+g7ayMUb44=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=SsH291Kj1pxAElR/PtTDgXmIxOw72zPqLWhwLF2j7XKUayQz/HpC4jo3CgFlrJ57cRaQFZugQ4Mw8GQaMfE3Q+uvVY6ArKYjL2h1TYn/MOFcoq9c1P61XggOUAebBM6pkZ252Ly5gtjwHdJnr51PBI6V3Hfq+4a7LcrXTIE++Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Tkc3Assz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gZ6656/h; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1731513830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mtC6I/wVh3bb76vb3t0LUdhFECXQ4KT3wwkegPBL5lI=;
+	b=Tkc3AsszkaG1ttaL5KQ6kA/3Gp3pG1q2ZdVM0fszaMPZkw4gCHuFfWuv3VKwFF2QDmbKTE
+	uK1wYqzmgk2NsupCapiRb5Euvn6o4Pr9h618oJRekIrhsDEwHqAFadpccOd6e/H0UHWTaY
+	vhzGwHVpywCZIfFlws6CNzr2jkDD4pPlaHfRDcXHASMqT1LB3qyC7M6ucc1EmbP1EL+vmm
+	jPG06YIyZMIRJuVcoTNq6ocrzyZdn2+mw2yTUoqTeRo8BqrCqUdWaotc9P4H3hO2zIZSo+
+	j6voSULNE80DanUtRqy4O+Csz3C6daCKTUGksJm8rT8NaDBhE10MA8KSzD8kRg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1731513830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mtC6I/wVh3bb76vb3t0LUdhFECXQ4KT3wwkegPBL5lI=;
+	b=gZ6656/hxP+pjlIWvTiCX6gLBr0x7ypppl+tGbqLH4ZZgsitov7/35zTDVOF7kBDzF+8fF
+	dTDb7/M9Cv/UujBg==
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam
+ Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave
+ Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Juergen Gross <jgross@suse.com>, Stefano
+ Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Philipp Stanner <pstanner@redhat.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Chen Ni
+ <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Mostafa Saleh <smostafa@google.com>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
+ <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>, Christian Brauner
+ <brauner@kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, Eric
+ Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 01/11] PCI: Prepare removing devres from pci_intx()
+In-Reply-To: <20241113124158.22863-3-pstanner@redhat.com>
+References: <20241113124158.22863-2-pstanner@redhat.com>
+ <20241113124158.22863-3-pstanner@redhat.com>
+Date: Wed, 13 Nov 2024 17:04:00 +0100
+Message-ID: <87plmzktn3.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Since workqueues are created per CPU, the works scheduled to this
-workqueues are run on the CPU they were assigned. It may result in
-overloaded CPU that is not able to handle virtchnl messages in
-relatively short time. Allocating workqueue with WQ_UNBOUND and
-WQ_HIGHPRI flags allows scheduler to queue virtchl messages on less loaded
-CPUs, what eliminates delays.
+On Wed, Nov 13 2024 at 13:41, Philipp Stanner wrote:
+> +/**
+> + * pci_intx_unmanaged - enables/disables PCI INTx for device dev,
+> + * unmanaged version
+> + * @pdev: the PCI device to operate on
+> + * @enable: boolean: whether to enable or disable PCI INTx
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Except that the argument is of type int, which really should be type bool.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 22d9e2646444..31fe3e4b8162 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -196,8 +196,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_serv_wq_alloc;
- 	}
- 
--	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx", 0, 0,
--					  dev_driver_string(dev),
-+	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx", WQ_UNBOUND | WQ_HIGHPRI,
-+					  0, dev_driver_string(dev),
- 					  dev_name(dev));
- 	if (!adapter->mbx_wq) {
- 		dev_err(dev, "Failed to allocate mailbox workqueue\n");
--- 
-2.31.1
+> + * Enables/disables PCI INTx for device @pdev
+> + *
+> + * This function behavios identically to pci_intx(), but is never managed with
+> + * devres.
 
+behavios?
+
+> + */
+> +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
+
+I find this function name mildy confusing. This _unmanaged suffix is not
+really telling me anything. And the reference that this behaves
+identically to pci_intx() makes it even worse.
+
+This function is about controlling the PCI INTX_DISABLE bit in the
+PCI_COMMAND config word, right?
+
+So naming it pci_intx_control() would make it entirely clear what this
+is about, no?
+
+Thanks,
+
+        tglx
 
