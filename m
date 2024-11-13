@@ -1,170 +1,273 @@
-Return-Path: <netdev+bounces-144450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DE579C771F
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:29:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 725249C771E
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF666B2B579
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:25:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F38761F27870
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7EF81531D8;
-	Wed, 13 Nov 2024 15:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0BB2040B1;
+	Wed, 13 Nov 2024 15:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jEpL3axQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tlzoo7O6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2F913B29B;
-	Wed, 13 Nov 2024 15:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E488204001;
+	Wed, 13 Nov 2024 15:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731511475; cv=none; b=UxDgmxzn8mYByoUX0EX0IWb6/SBoKSpxbvA4do0GiWmw5e5gmlUYjlsS5fj6AdJlu2xQMcEXcuqW3Sf6XIXGbx9TkHewpLuKrcpXk+nVmbxqSVHlIhc3D/B6A30tDKFYZEbUV98Zm/UQkFV6d4IE0+vCVT1HcD7JLdCxy+7kRbA=
+	t=1731511534; cv=none; b=ErQcnrEhqRmTzR4ZAC0qqpXYsHZ4b0pz3qmg2kzPU8Opww+y0ZLCle7L+p+Zifqy9FdnskhGeEDrcw7bHwyU8MDWAsb2kXjf4qAHii1qxHO/fTH7Js6W1RkRswzd7C69Kp4htJlZJJCcJIvt+xpg/A+BIUt/spmostK8DvfBZMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731511475; c=relaxed/simple;
-	bh=/Qs+Z4ETO6HBDD0/r4vq50xWIIZZXaOFQHJesHfkTbA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VvKg0AVMOaRLlep0RkdBiY0X4Q6nH3jsF7yXOs960sZI2JzosBYHmLqsHZvHvR+UXxYLuUy+0stepgPrh/9RYxke833rjN9JqM/K8ODeSykfNmro5WvRndl46LgonJFTxdjSTlww0D7tbRnbYL909kzmLZMhV95NdRJX81lFIq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jEpL3axQ; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1731511534; c=relaxed/simple;
+	bh=0qxT/iWPgC0Ok9rBiKIjoDJnPFrQv3pHHINa8ccSEZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nyQ+erfbhcmO9J04F1xrHVZoNLnzJEDJ0RPFOz0BfJEQaJ5cLfZfKBM7wDuMXsFhtvtskI5NT2k7hCYECHe+s0IZyJyXRwhsHTM1aun7bU06AmHqczcVOUiZvWiO7EKtZbBrJZzhBKN39FMFWSuGy0kPn7rmk6bo7Jw+CkCSqW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tlzoo7O6; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731511474; x=1763047474;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/Qs+Z4ETO6HBDD0/r4vq50xWIIZZXaOFQHJesHfkTbA=;
-  b=jEpL3axQI5kZQvhWzQW1WgefqUXhGYEPMJsFyBsVRq8L/IJvsGg1iz6Y
-   wQ/G7eyoNLWHaUiZ5DjzPmVkGItHyIEMyFw0fbpmY0P70iZbtj2gEwVOE
-   56qnSDVS3DT8Dv5v44zSLn/aKTMUDFp439beeHamqBguNpZVolUEmPi3H
-   TCq2GsCIrsO/LxsXJzhzX/vRhmw6hW5weE3a1/QSc5cTVdVyDsSFunPCy
-   OHq+bbOUMDd6pdCoSPtZGD0QG1KqJntWOcyGIZ+GxQhN83Po/VPtDpz0R
-   PHOXz1N+GmYHe69Dt9+vgc/2IaiKX8luo5nkRLDt8GtnZ0Ly66Zp1f3sO
-   w==;
-X-CSE-ConnectionGUID: hufD5M6HQ5ahAp19Uixp0A==
-X-CSE-MsgGUID: N/JRjFZKROO6Qy00GI0UCQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="42038092"
+  t=1731511532; x=1763047532;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0qxT/iWPgC0Ok9rBiKIjoDJnPFrQv3pHHINa8ccSEZo=;
+  b=Tlzoo7O6taAb+V0kE982QQq2tO32XevSYvRw/zGwGowo3w0xckKgBxJt
+   wsOqV/KOrJyyMjfrMrM7ncLLiJXGudYwvzDNqvF9t7D0oGuTjQ9lPfjHH
+   hZD4DA4PTq/nllyeGKH6DZx8KwB+T4+FztKHPK/RCFsfV6QRPwavYrdKj
+   TxxXB55SraKHunqZCot7iCHEMwuSTczQZ7GHkagAGVR1moCKeTOQ8eHOK
+   vQhR8ygahW3hn1OaJz7m/r2otpCw80VLT384QPoXtl2JEMNCtzZSlAwIS
+   mlBribD7EoOTcKQ2SbFW4Uas4dlUEy6eHpFX6lZy9hmrW8UTs3M/jrPXT
+   A==;
+X-CSE-ConnectionGUID: 447LmedeTFOrxmnfMiib8A==
+X-CSE-MsgGUID: Pp/iOiCXQE2i/33SB0Srsw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="42799295"
 X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="42038092"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 07:24:33 -0800
-X-CSE-ConnectionGUID: Eu78RBWmRsK0vvilN+bwhQ==
-X-CSE-MsgGUID: u7LspSQgTTqwqS7xt+wrPQ==
+   d="scan'208";a="42799295"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 07:25:21 -0800
+X-CSE-ConnectionGUID: IsePiTBSS7aK0SApW2dfCg==
+X-CSE-MsgGUID: vkVuD9ZNRre1266gIoh4NQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="111214069"
-Received: from spandruv-desk1.amr.corp.intel.com (HELO [10.125.111.237]) ([10.125.111.237])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 07:24:28 -0800
-Message-ID: <decf5296-1c9b-49ab-8556-55a199e214ed@intel.com>
-Date: Wed, 13 Nov 2024 08:24:27 -0700
+   d="scan'208";a="118726900"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa002.jf.intel.com with ESMTP; 13 Nov 2024 07:25:17 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 05/19] xdp, xsk: constify read-only arguments of some static inline helpers
+Date: Wed, 13 Nov 2024 16:24:28 +0100
+Message-ID: <20241113152442.4000468-6-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
+References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/11] net/ntb: Use never-managed version of pci_intx()
-To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
- <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
- <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
- Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
- Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
- <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
- Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Mostafa Saleh <smostafa@google.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>,
- Kunwu Chan <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>,
- Christian Brauner <brauner@kernel.org>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org
-References: <20241113124158.22863-2-pstanner@redhat.com>
- <20241113124158.22863-6-pstanner@redhat.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20241113124158.22863-6-pstanner@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Lots of read-only helpers for &xdp_buff and &xdp_frame, such as getting
+the frame length, skb_shared_info etc., don't have their arguments
+marked with `const` for no reason. Add the missing annotations to leave
+less place for mistakes and more for optimization.
 
+Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+ include/net/xdp.h           | 29 +++++++++++++++++------------
+ include/net/xdp_sock_drv.h  | 11 ++++++-----
+ include/net/xsk_buff_pool.h |  2 +-
+ 3 files changed, 24 insertions(+), 18 deletions(-)
 
-On 11/13/24 5:41 AM, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> hw/amd and how/intel enable their PCI-Device with pci_enable_device().
-> Thus, they need the never-managed version.
-> 
-> Replace pci_intx() with pci_intx_unmanaged().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com> #for ntb_hw_amd.c
-
-Acked-by: Dave Jiang <dave.jiang@intel.com> # for ntb_hw_gen1.c
-> ---
->  drivers/ntb/hw/amd/ntb_hw_amd.c    | 4 ++--
->  drivers/ntb/hw/intel/ntb_hw_gen1.c | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/ntb/hw/amd/ntb_hw_amd.c b/drivers/ntb/hw/amd/ntb_hw_amd.c
-> index d687e8c2cc78..b146f170e839 100644
-> --- a/drivers/ntb/hw/amd/ntb_hw_amd.c
-> +++ b/drivers/ntb/hw/amd/ntb_hw_amd.c
-> @@ -791,7 +791,7 @@ static int ndev_init_isr(struct amd_ntb_dev *ndev,
->  err_msi_enable:
->  
->  	/* Try to set up intx irq */
-> -	pci_intx(pdev, 1);
-> +	pci_intx_unmanaged(pdev, 1);
->  
->  	rc = request_irq(pdev->irq, ndev_irq_isr, IRQF_SHARED,
->  			 "ndev_irq_isr", ndev);
-> @@ -831,7 +831,7 @@ static void ndev_deinit_isr(struct amd_ntb_dev *ndev)
->  		if (pci_dev_msi_enabled(pdev))
->  			pci_disable_msi(pdev);
->  		else
-> -			pci_intx(pdev, 0);
-> +			pci_intx_unmanaged(pdev, 0);
->  	}
->  }
->  
-> diff --git a/drivers/ntb/hw/intel/ntb_hw_gen1.c b/drivers/ntb/hw/intel/ntb_hw_gen1.c
-> index 079b8cd79785..9ad9d7fe227e 100644
-> --- a/drivers/ntb/hw/intel/ntb_hw_gen1.c
-> +++ b/drivers/ntb/hw/intel/ntb_hw_gen1.c
-> @@ -445,7 +445,7 @@ int ndev_init_isr(struct intel_ntb_dev *ndev,
->  
->  	/* Try to set up intx irq */
->  
-> -	pci_intx(pdev, 1);
-> +	pci_intx_unmanaged(pdev, 1);
->  
->  	rc = request_irq(pdev->irq, ndev_irq_isr, IRQF_SHARED,
->  			 "ndev_irq_isr", ndev);
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index e6770dd40c91..197808df1ee1 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -88,7 +88,7 @@ struct xdp_buff {
+ 	u32 flags; /* supported values defined in xdp_buff_flags */
+ };
+ 
+-static __always_inline bool xdp_buff_has_frags(struct xdp_buff *xdp)
++static __always_inline bool xdp_buff_has_frags(const struct xdp_buff *xdp)
+ {
+ 	return !!(xdp->flags & XDP_FLAGS_HAS_FRAGS);
+ }
+@@ -103,7 +103,8 @@ static __always_inline void xdp_buff_clear_frags_flag(struct xdp_buff *xdp)
+ 	xdp->flags &= ~XDP_FLAGS_HAS_FRAGS;
+ }
+ 
+-static __always_inline bool xdp_buff_is_frag_pfmemalloc(struct xdp_buff *xdp)
++static __always_inline bool
++xdp_buff_is_frag_pfmemalloc(const struct xdp_buff *xdp)
+ {
+ 	return !!(xdp->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
+ }
+@@ -144,15 +145,16 @@ xdp_prepare_buff(struct xdp_buff *xdp, unsigned char *hard_start,
+ 	 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
+ 
+ static inline struct skb_shared_info *
+-xdp_get_shared_info_from_buff(struct xdp_buff *xdp)
++xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
+ {
+ 	return (struct skb_shared_info *)xdp_data_hard_end(xdp);
+ }
+ 
+-static __always_inline unsigned int xdp_get_buff_len(struct xdp_buff *xdp)
++static __always_inline unsigned int
++xdp_get_buff_len(const struct xdp_buff *xdp)
+ {
+ 	unsigned int len = xdp->data_end - xdp->data;
+-	struct skb_shared_info *sinfo;
++	const struct skb_shared_info *sinfo;
+ 
+ 	if (likely(!xdp_buff_has_frags(xdp)))
+ 		goto out;
+@@ -177,12 +179,13 @@ struct xdp_frame {
+ 	u32 flags; /* supported values defined in xdp_buff_flags */
+ };
+ 
+-static __always_inline bool xdp_frame_has_frags(struct xdp_frame *frame)
++static __always_inline bool xdp_frame_has_frags(const struct xdp_frame *frame)
+ {
+ 	return !!(frame->flags & XDP_FLAGS_HAS_FRAGS);
+ }
+ 
+-static __always_inline bool xdp_frame_is_frag_pfmemalloc(struct xdp_frame *frame)
++static __always_inline bool
++xdp_frame_is_frag_pfmemalloc(const struct xdp_frame *frame)
+ {
+ 	return !!(frame->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
+ }
+@@ -201,7 +204,7 @@ static __always_inline void xdp_frame_bulk_init(struct xdp_frame_bulk *bq)
+ }
+ 
+ static inline struct skb_shared_info *
+-xdp_get_shared_info_from_frame(struct xdp_frame *frame)
++xdp_get_shared_info_from_frame(const struct xdp_frame *frame)
+ {
+ 	void *data_hard_start = frame->data - frame->headroom - sizeof(*frame);
+ 
+@@ -249,7 +252,8 @@ int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp);
+ struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
+ 
+ static inline
+-void xdp_convert_frame_to_buff(struct xdp_frame *frame, struct xdp_buff *xdp)
++void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
++			       struct xdp_buff *xdp)
+ {
+ 	xdp->data_hard_start = frame->data - frame->headroom - sizeof(*frame);
+ 	xdp->data = frame->data;
+@@ -260,7 +264,7 @@ void xdp_convert_frame_to_buff(struct xdp_frame *frame, struct xdp_buff *xdp)
+ }
+ 
+ static inline
+-int xdp_update_frame_from_buff(struct xdp_buff *xdp,
++int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
+ 			       struct xdp_frame *xdp_frame)
+ {
+ 	int metasize, headroom;
+@@ -317,9 +321,10 @@ void xdp_flush_frame_bulk(struct xdp_frame_bulk *bq);
+ void xdp_return_frame_bulk(struct xdp_frame *xdpf,
+ 			   struct xdp_frame_bulk *bq);
+ 
+-static __always_inline unsigned int xdp_get_frame_len(struct xdp_frame *xdpf)
++static __always_inline unsigned int
++xdp_get_frame_len(const struct xdp_frame *xdpf)
+ {
+-	struct skb_shared_info *sinfo;
++	const struct skb_shared_info *sinfo;
+ 	unsigned int len = xdpf->len;
+ 
+ 	if (likely(!xdp_frame_has_frags(xdpf)))
+diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+index 40085afd9160..f3175a5d28f7 100644
+--- a/include/net/xdp_sock_drv.h
++++ b/include/net/xdp_sock_drv.h
+@@ -101,7 +101,7 @@ static inline struct xdp_buff *xsk_buff_alloc(struct xsk_buff_pool *pool)
+ 	return xp_alloc(pool);
+ }
+ 
+-static inline bool xsk_is_eop_desc(struct xdp_desc *desc)
++static inline bool xsk_is_eop_desc(const struct xdp_desc *desc)
+ {
+ 	return !xp_mb_desc(desc);
+ }
+@@ -143,7 +143,7 @@ static inline void xsk_buff_add_frag(struct xdp_buff *xdp)
+ 	list_add_tail(&frag->list_node, &frag->pool->xskb_list);
+ }
+ 
+-static inline struct xdp_buff *xsk_buff_get_frag(struct xdp_buff *first)
++static inline struct xdp_buff *xsk_buff_get_frag(const struct xdp_buff *first)
+ {
+ 	struct xdp_buff_xsk *xskb = container_of(first, struct xdp_buff_xsk, xdp);
+ 	struct xdp_buff *ret = NULL;
+@@ -200,7 +200,8 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
+ 		XDP_TXMD_FLAGS_CHECKSUM | \
+ 	0)
+ 
+-static inline bool xsk_buff_valid_tx_metadata(struct xsk_tx_metadata *meta)
++static inline bool
++xsk_buff_valid_tx_metadata(const struct xsk_tx_metadata *meta)
+ {
+ 	return !(meta->flags & ~XDP_TXMD_FLAGS_VALID);
+ }
+@@ -337,7 +338,7 @@ static inline struct xdp_buff *xsk_buff_alloc(struct xsk_buff_pool *pool)
+ 	return NULL;
+ }
+ 
+-static inline bool xsk_is_eop_desc(struct xdp_desc *desc)
++static inline bool xsk_is_eop_desc(const struct xdp_desc *desc)
+ {
+ 	return false;
+ }
+@@ -360,7 +361,7 @@ static inline void xsk_buff_add_frag(struct xdp_buff *xdp)
+ {
+ }
+ 
+-static inline struct xdp_buff *xsk_buff_get_frag(struct xdp_buff *first)
++static inline struct xdp_buff *xsk_buff_get_frag(const struct xdp_buff *first)
+ {
+ 	return NULL;
+ }
+diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+index bb03cee716b3..3832997cc605 100644
+--- a/include/net/xsk_buff_pool.h
++++ b/include/net/xsk_buff_pool.h
+@@ -183,7 +183,7 @@ static inline bool xp_desc_crosses_non_contig_pg(struct xsk_buff_pool *pool,
+ 	       !(pool->dma_pages[addr >> PAGE_SHIFT] & XSK_NEXT_PG_CONTIG_MASK);
+ }
+ 
+-static inline bool xp_mb_desc(struct xdp_desc *desc)
++static inline bool xp_mb_desc(const struct xdp_desc *desc)
+ {
+ 	return desc->options & XDP_PKT_CONTD;
+ }
+-- 
+2.47.0
 
 
