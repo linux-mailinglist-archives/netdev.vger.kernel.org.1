@@ -1,62 +1,75 @@
-Return-Path: <netdev+bounces-144423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E7D9C70B6
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:33:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0039C7171
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:53:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65A121F279AB
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:33:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C686E2814F7
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5481E0DBB;
-	Wed, 13 Nov 2024 13:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B7E18FDA7;
+	Wed, 13 Nov 2024 13:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6AnEJ3H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lneoRFzP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D861E04B3;
-	Wed, 13 Nov 2024 13:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68A7111A8;
+	Wed, 13 Nov 2024 13:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731504789; cv=none; b=eALVNi5uWtQfbzWH4NslCmBndhTXLUDpO7MybqbHFH7X9a45ekPg2Qzc2ZjsI3Np40+U0W+HO2EaMoPC8EJ2MMitNy/ARhw8C2Hqol5pqi2cbuXwg34ByLrT+AfSeqcjkQT59xmvBvogVK4VPLqX8BME1+0Er+Q2fJSZbJ3aanI=
+	t=1731506010; cv=none; b=Fshbfwih0f+4et1xaIO4r26pjqhG0/6O1EtiHTWdAMFdtgqfn0Kzip5pmxv2CJfZmBeYmstNwSQYzTfTjPYm6abp5MT2ib5OUM2a/ZW7mFNIbZfwYHaZKAIl2/qVEieQdcqnnJW0GyBcf+jNJE7hTo/FF4zcFgYSiiM8qTP9Aes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731504789; c=relaxed/simple;
-	bh=Lw+7jUWZ437Jrqf60KJhCkbD9qpzU8DyvAxFOcixE60=;
+	s=arc-20240116; t=1731506010; c=relaxed/simple;
+	bh=e02wCo6/bCN5ygIPiqX/XjikMX8Gq9j4vtdOtzb6vsc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=irhaXkeg1BTjVDN/uq0NlN1KBRxfKrzZgvNj9oJ/XCw1qQbsMDgv87u3W0xo8dJhkc/nBLlHW4YQMjnwgbcQRb3JyLhz/zZzydM52n6KhNnMBP0gJnZdIsJbwsK/ltpHKBQtgFOhyRkhl9tGPRHhgfu8tX6DgfCRXIug2ZY137Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6AnEJ3H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFFF2C4CECD;
-	Wed, 13 Nov 2024 13:33:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731504787;
-	bh=Lw+7jUWZ437Jrqf60KJhCkbD9qpzU8DyvAxFOcixE60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H6AnEJ3H2xfABS2BOnlRR89lVBYcfgldJ5uIJ7LAIEKP3TCthwEjyUg+0IerE5xFR
-	 aVr7OC3IsRrp/uqeBqOarXoiQC8QDNrvkdxs0tUHRrjzB9NicVrk0fiknpmysaoeWj
-	 6kllLm4sRAolRLM8d+b4bAqI67lrI/9akLq4tSTM3IrkwnDT9P/JqOeyy7V+XEk0Uk
-	 +XBG0ZqeUVPXqT3x2BM9+WGUhdWJl947LnugQ0lGrh/08wSIQH6a25IWGyMRCK8fp1
-	 anTmL89a0vLdiBtiVYPauUtIXR7pL0WlcKwYfh/Abg/qskgi/7G+ZAqGvYnSmvtVHr
-	 9uJ+wH6kpQtbQ==
-Date: Wed, 13 Nov 2024 13:33:01 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
-	wangpeiyang1@huawei.com, liuyonglong@huawei.com,
-	chenhao418@huawei.com, sudongming1@huawei.com,
-	xujunsheng@huawei.com, shiyongbang@huawei.com, libaihan@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 net-next 3/7] net: hibmcge: Add unicast frame filter
- supported in this module
-Message-ID: <20241113133301.GZ4507@kernel.org>
-References: <20241111145558.1965325-1-shaojijie@huawei.com>
- <20241111145558.1965325-4-shaojijie@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yci/CMWo9W+tlc6hP/jkOcFwid5WmqHG9JiXcLpRKQ3TGXEcrdFK31hj2GAmwMvkeCJlpMx333gG9rWgR/1L/PWKMPfIc88vEUsf4Xz4TrPFPcGJo/aMG6bZzulTjhnED+B41wfrQZnJcxYgc5T7OomhQgEbOWzglw1mxRAN7A4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lneoRFzP; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731506009; x=1763042009;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=e02wCo6/bCN5ygIPiqX/XjikMX8Gq9j4vtdOtzb6vsc=;
+  b=lneoRFzPJO/3UTfgm3wNKUb7CMpQB/bpgVsvRF6vIs91C2gKqxHs/pEG
+   hhFgrEGPLsQJ8jzzBd3X/KL3Sf2u2VWkMlN31oGhg5cYatBCbnXY9e+Il
+   dWkPkCj9iHWhf3uXIhG8k1dvFm7D/2hm3QLhHL6eZL2SA6oXc5LIS+Poh
+   gzwzUdyuTI99LNRkjP9PsTjkCXvBJ0rUsrLRmoOafWbFSyatcqqmnm/36
+   CJinaGJl60tVEemSPQoi/SHYGDUf+49AyLI9GS27tRKxCFSb0yBhv0sC5
+   PkW/I6BPyonk+s1MIikT2a1Aoaw+x7nAKw6jQfpC2WqW5cBzzXYaWRLm4
+   A==;
+X-CSE-ConnectionGUID: UEBN9jmVSWK1E/JTZZuIkg==
+X-CSE-MsgGUID: 6Ir4oGWvRpyHRTaUi9ccjw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41961109"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="41961109"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 05:53:28 -0800
+X-CSE-ConnectionGUID: LHGpgglRQBiIK+ZXfwC8+Q==
+X-CSE-MsgGUID: f7Hfiq3BQZGpYPD5b8TPcg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
+   d="scan'208";a="87869712"
+Received: from lkp-server01.sh.intel.com (HELO 80bd855f15b3) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 13 Nov 2024 05:53:27 -0800
+Received: from kbuild by 80bd855f15b3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tBDoC-0000Qv-2j;
+	Wed, 13 Nov 2024 13:53:24 +0000
+Date: Wed, 13 Nov 2024 21:52:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org,
+	linux-api@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, John Ousterhout <ouster@cs.stanford.edu>
+Subject: Re: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
+Message-ID: <202411132114.VB5yFmtR-lkp@intel.com>
+References: <20241111234006.5942-13-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,60 +78,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241111145558.1965325-4-shaojijie@huawei.com>
+In-Reply-To: <20241111234006.5942-13-ouster@cs.stanford.edu>
 
-On Mon, Nov 11, 2024 at 10:55:54PM +0800, Jijie Shao wrote:
-> MAC supports filtering unmatched unicast packets according to
-> the MAC address table. This patch adds the support for
-> unicast frame filtering.
-> 
-> To support automatic restoration of MAC entries
-> after reset, the driver saves a copy of MAC entries in the driver.
-> 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Hi John,
 
-...
+kernel test robot noticed the following build warnings:
 
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+[auto build test WARNING on net-next/main]
 
-...
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20241112-074535
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241111234006.5942-13-ouster%40cs.stanford.edu
+patch subject: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
+config: riscv-randconfig-r112-20241113 (https://download.01.org/0day-ci/archive/20241113/202411132114.VB5yFmtR-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
+reproduce: (https://download.01.org/0day-ci/archive/20241113/202411132114.VB5yFmtR-lkp@intel.com/reproduce)
 
->  static int hbg_net_set_mac_address(struct net_device *netdev, void *addr)
->  {
->  	struct hbg_priv *priv = netdev_priv(netdev);
->  	u8 *mac_addr;
-> +	bool is_exists;
-> +	u32 index;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411132114.VB5yFmtR-lkp@intel.com/
 
-nit: If you have to respin for some other reason,
-     please arrange these local variables in reverse
-     xmas tree order - longest line to shortest.
+sparse warnings: (new ones prefixed by >>)
+>> net/homa/homa_sock.c:201:31: sparse: sparse: cast removes address space '__rcu' of expression
+   net/homa/homa_sock.c:248:17: sparse: sparse: context imbalance in 'homa_sock_shutdown' - different lock contexts for basic block
+   net/homa/homa_sock.c:303:21: sparse: sparse: context imbalance in 'homa_sock_bind' - different lock contexts for basic block
 
-     Also, from an English language PoV, is_exists is a bit tautological.
-     Not that it really matters, but maybe addr_exists would work?
+vim +/__rcu +201 net/homa/homa_sock.c
 
->  
->  	mac_addr = ((struct sockaddr *)addr)->sa_data;
->  
->  	if (!is_valid_ether_addr(mac_addr))
->  		return -EADDRNOTAVAIL;
->  
-> -	hbg_hw_set_uc_addr(priv, ether_addr_to_u64(mac_addr));
-> -	dev_addr_set(netdev, mac_addr);
-> +	/* The index of host mac is always 0.
-> +	 * If new mac address already exists,
-> +	 * delete the existing mac address and
-> +	 * add it to the position with index 0.
-> +	 */
-> +	is_exists = !hbg_get_index_from_mac_table(priv, mac_addr, &index);
-> +	hbg_set_mac_to_mac_table(priv, 0, mac_addr);
-> +	if (is_exists)
-> +		hbg_set_mac_to_mac_table(priv, index, NULL);
->  
-> +	dev_addr_set(netdev, mac_addr);
->  	return 0;
->  }
->  
+8ddf00265eb650 John Ousterhout 2024-11-11  183  
+8ddf00265eb650 John Ousterhout 2024-11-11  184  /*
+8ddf00265eb650 John Ousterhout 2024-11-11  185   * homa_sock_unlink() - Unlinks a socket from its socktab and does
+8ddf00265eb650 John Ousterhout 2024-11-11  186   * related cleanups. Once this method returns, the socket will not be
+8ddf00265eb650 John Ousterhout 2024-11-11  187   * discoverable through the socktab.
+8ddf00265eb650 John Ousterhout 2024-11-11  188   */
+8ddf00265eb650 John Ousterhout 2024-11-11  189  void homa_sock_unlink(struct homa_sock *hsk)
+8ddf00265eb650 John Ousterhout 2024-11-11  190  {
+8ddf00265eb650 John Ousterhout 2024-11-11  191  	struct homa_socktab *socktab = hsk->homa->port_map;
+8ddf00265eb650 John Ousterhout 2024-11-11  192  	struct homa_socktab_scan *scan;
+8ddf00265eb650 John Ousterhout 2024-11-11  193  
+8ddf00265eb650 John Ousterhout 2024-11-11  194  	/* If any scans refer to this socket, advance them to refer to
+8ddf00265eb650 John Ousterhout 2024-11-11  195  	 * the next socket instead.
+8ddf00265eb650 John Ousterhout 2024-11-11  196  	 */
+8ddf00265eb650 John Ousterhout 2024-11-11  197  	spin_lock_bh(&socktab->write_lock);
+8ddf00265eb650 John Ousterhout 2024-11-11  198  	list_for_each_entry(scan, &socktab->active_scans, scan_links) {
+8ddf00265eb650 John Ousterhout 2024-11-11  199  		if (!scan->next || scan->next->sock != hsk)
+8ddf00265eb650 John Ousterhout 2024-11-11  200  			continue;
+8ddf00265eb650 John Ousterhout 2024-11-11 @201  		scan->next = (struct homa_socktab_links *)hlist_next_rcu(&scan
+8ddf00265eb650 John Ousterhout 2024-11-11  202  				->next->hash_links);
+8ddf00265eb650 John Ousterhout 2024-11-11  203  	}
+8ddf00265eb650 John Ousterhout 2024-11-11  204  	hlist_del_rcu(&hsk->socktab_links.hash_links);
+8ddf00265eb650 John Ousterhout 2024-11-11  205  	spin_unlock_bh(&socktab->write_lock);
+8ddf00265eb650 John Ousterhout 2024-11-11  206  }
+8ddf00265eb650 John Ousterhout 2024-11-11  207  
 
-...
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
