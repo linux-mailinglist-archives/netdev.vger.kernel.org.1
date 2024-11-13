@@ -1,94 +1,129 @@
-Return-Path: <netdev+bounces-144264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C1B89C669D
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:23:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC799C66A3
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4C21283A75
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:23:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251E81F24EEF
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93433C147;
-	Wed, 13 Nov 2024 01:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B10D1F95E;
+	Wed, 13 Nov 2024 01:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEkPE6u2"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="P4xbzwuH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61ED1382;
-	Wed, 13 Nov 2024 01:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C2A134A8;
+	Wed, 13 Nov 2024 01:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731460985; cv=none; b=EkaugF3CJUXh97hldDxjKNvd0zhNH/2Iu+B6Hpq61pAsQWzQgx4pWz1qsBAwt+2ZBP2rZGztFy/UJ3oAh4kgB/dlmy7Ngdq9NmgQHzFAVBCJrg+EUKoUuLSG1TOzlrPiHuOOy8Pt/ExydQmtfpSkJ2ibA5DzNJZ1OYS6TSeh1Ro=
+	t=1731461047; cv=none; b=MPb68x1BVVZv4RL3E1F5CS7oJCimwTuXPCldumHkZND5XpRuH9WIht816nh0dMEKQTHVHmggroX5uv0KRjiKb8ym9seK3vxTYkA3UuyR5mMlz8jtP/vNv1cxM46hFfFYWFZPHW6XIDqqADNrOC0Na8vCG01oyIuQXbuU3MBgrX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731460985; c=relaxed/simple;
-	bh=KzYtezsHHZd5EyINMqqHGG51cXOLpemJwiEUUpvOkA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jR1+MKoKB/OF9oY+HOxc90/mccJI2DBFgn/j5vfZCvT4drTgw8YdUMofnv5+z2cA+DbQAl+m2H8xmw64RgGy6L7ePmE685VeFAEzE3XWeqQXhkx/pB4rX5HcI3VLrfoakjUheSGNil4b5hBncUvZvMrO21mBwbKznXGwvosZa04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEkPE6u2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7378C4CED4;
-	Wed, 13 Nov 2024 01:23:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731460985;
-	bh=KzYtezsHHZd5EyINMqqHGG51cXOLpemJwiEUUpvOkA4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OEkPE6u2U1WuKnADIOhylmi3CfE92O+1fH0PMk2OcC97uHIF+rD8uPt98OdIcOFX9
-	 mBHnkR5vQiCHCFBZWV4FS+jfrBZtscCc5p17M9osJzRLrVx8uMnlviKNu52llsksUI
-	 nfbdlsdAAR5V8jJOI4kK4pxjs+qrOaioOp+7aR58hBHoabKdA1qGfXOgO0zMLHqxFR
-	 aJSkCG41lRt2Of0Iavy3zRQiuErE3Q23RHcNwXXI7fWGrChlM1ZuKGJBFhtbxsuJQv
-	 zfQVeL5tRPZVRYJ03Vn34rjURJ6jgx/w9/GNCbhOYjCi2u9NZ3I6577l4olYOkP7L9
-	 mM9NSMb5hQveQ==
-Date: Tue, 12 Nov 2024 17:23:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
- Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, Pantelis Antoniou
- <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- Byungho An <bh74.an@samsung.com>, Kevin Brace
- <kevinbrace@bracecomputerlab.com>, Francois Romieu <romieu@fr.zoreil.com>,
- Michal Simek <michal.simek@amd.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Zhao Qiang
- <qiang.zhao@nxp.com>, linux-can@vger.kernel.org (open list:CAN NETWORK
- DRIVERS), linux-kernel@vger.kernel.org (open list),
- linux-arm-kernel@lists.infradead.org (moderated list:ARM/Allwinner sunXi
- SoC support), linux-sunxi@lists.linux.dev (open list:ARM/Allwinner sunXi
- SoC support), linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC
- FS_ENET DRIVER)
-Subject: Re: [PATCHv3 net-next] net: modernize IRQ resource acquisition
-Message-ID: <20241112172302.582285d3@kernel.org>
-In-Reply-To: <20241112211442.7205-1-rosenp@gmail.com>
-References: <20241112211442.7205-1-rosenp@gmail.com>
+	s=arc-20240116; t=1731461047; c=relaxed/simple;
+	bh=sUKz3jCT2hiAfo2BD57mh6EmTwdB5aP1+aVXCjzoIw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=dt32r6/Re5N6NEiqkv5wCftZ1kBp5jPj50/rZzJ22pGneQjjdmfD/3jGQgz0mkVE8Y9lXIdXy8thglSynhtN0Eg9sz6k6xNIXTDc9GSsLluJ2UOSeAY+v7g+NJ08Mqk0bPoOezB2S2zApPvndhIz2bQRUspcj6LAlLR34XRZx0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=P4xbzwuH; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1731461039;
+	bh=YTvwOVHqUNLK9XlVW0eiqWJCmdjKjorGQduxber6A+o=;
+	h=Date:From:To:Cc:Subject:From;
+	b=P4xbzwuHCV6A2QZcFbCBK8D+ucx6ZXFRFPDuCimpGIONfOvlVWZIWzbJlWIbZUMbf
+	 5tJpKcNfWb5wqzDMPchvMNPac9cM+JgFNkaHxxR5xA3v/IWJz4kSGYDa85RiIeTQi5
+	 MDjKHbok1Az1zA55CpSDhluscTlZFdvxv9yKK4ITgd5Qrfmf/wrOlpAoeCKWxirFZN
+	 pQIWET89dZxx3qfnu+/rlKFcuU/oo8IwQmoENFeIfPUaebFfYNrh2vAJX+NAmal85R
+	 XbMQlImXQprdupfpcUEXXvMtILrXY2ZF5d1boIU8roD84yE76rPiHxOjrz2J+QT0Ze
+	 V9fLSYYQlYk2g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xp5Cf3llYz4wb1;
+	Wed, 13 Nov 2024 12:23:57 +1100 (AEDT)
+Date: Wed, 13 Nov 2024 12:23:59 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20241113122359.1b95180a@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/LgKoOoNNB=8NtuqrS93ebRH";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/LgKoOoNNB=8NtuqrS93ebRH
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 12 Nov 2024 13:14:42 -0800 Rosen Penev wrote:
->  drivers/net/ethernet/moxa/moxart_ether.c      |  6 ++---
->  .../ethernet/samsung/sxgbe/sxgbe_platform.c   | 24 +++++++------------
+Hi all,
 
-coccicheck says:
+Today's linux-next merge of the net-next tree got a conflict in:
 
-drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:130:6-26: WARNING: Unsigned expression compared with zero: priv -> rxq [ i ] -> irq_no < 0
-drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:124:6-26: WARNING: Unsigned expression compared with zero: priv -> txq [ i ] -> irq_no < 0
-drivers/net/ethernet/moxa/moxart_ether.c:468:5-8: WARNING: Unsigned expression compared with zero: irq < 0
+  tools/testing/selftests/net/.gitignore
 
-Is this really worth the review effort? :|
+between commit:
 
-Please do not send any more conversions unless the old API is clearly
-deprecated. 
--- 
-pw-bot: cr
+  252e01e68241 ("selftests: net: add netlink-dumps to .gitignore")
+
+from the net tree and commit:
+
+  be43a6b23829 ("selftests: ncdevmem: Move ncdevmem under drivers/net/hw")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc tools/testing/selftests/net/.gitignore
+index 59fe07ee2df9,48973e78d46b..000000000000
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@@ -18,8 -19,6 +19,7 @@@ ipv6_flowlabel_mg
+  log.txt
+  msg_oob
+  msg_zerocopy
+- ncdevmem
+ +netlink-dumps
+  nettest
+  psock_fanout
+  psock_snd
+
+--Sig_/LgKoOoNNB=8NtuqrS93ebRH
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcz/68ACgkQAVBC80lX
+0Gyblgf/XvYusQlNhiqcaGdiOAFSbPddN2qoVU2EcAz2vq8r+nogGPMmPW4nJiE1
+VHh4l508qhkRHaOc5GG/X8WmiWWHUCikqSVogsr6l77Xhz9X7zhkkLFlEIkFGz01
+5oUzXkNNXmkzjThLmNrNuuphuHLYQIHeI0u5t/khbmalhoGKMZSO7Kn9/mwL3L5N
+0vsFCgtSzIrPJysXAsS8VI0avkJx/SgktCEWYaGRP5Lct1EqxG6jTcRRvQSnKbwh
+Z7PkVt67TvAg5SzuN2Nss/45RYwGD7lORWVvNhlONSHkXlgun5IUKqCR3rqKk43h
+RPAP8PG6IvhoFeEQrgOH9ibmm1e59w==
+=eakZ
+-----END PGP SIGNATURE-----
+
+--Sig_/LgKoOoNNB=8NtuqrS93ebRH--
 
