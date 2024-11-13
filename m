@@ -1,136 +1,124 @@
-Return-Path: <netdev+bounces-144333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 813BF9C69BE
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 08:16:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 467829C6A0A
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 08:31:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113E81F23550
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 07:16:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB871B25748
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 07:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF15187350;
-	Wed, 13 Nov 2024 07:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DE7189914;
+	Wed, 13 Nov 2024 07:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TfdJDVka"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A28175D38
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 07:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067D9188700
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 07:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731482159; cv=none; b=C5bwK3WzPflzxNEEEAewlDpqiWeSvULLie848rzl7/FtQJcX/ekWgErsUO8cmKnnBwrbcDx23btzfJLvV71uycQuzwCdujydwFl/HuMj8YC7Ax/W1qdU9ELWRqSyxVF2MVvBJUUw0xVea0YRgm9EKKXU7YuTDc0HXCbcimnZ4tc=
+	t=1731483094; cv=none; b=kYC4NDFHJsm83Z/mMNwvMIPjRR7ehkFeKN2pGh1dxCfqXTIMM7LWZs52QqKawv/Q0Myp1WQ5d4cmYHGE3k89tNCksyQusFAK67B9TV+3WQedBIKx/EpU6fwDzKmXids9sioscDVxiWL0CStmMhUMNKAgE8n/aOZiRezK6QfUmgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731482159; c=relaxed/simple;
-	bh=SBaq0tNsdJyjxFyTdktXxwIt5E9hSiPSZMXHIrQlJVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jusiEmMJeWcPkO9gyEEft3LrRJRHPHGXcvJ35bFM06oy0f68qjCE3eDEiAhLFbnXsQD0190GQctR+nNs4LaeB3myqhkDFcYTij2Zm+SH3NY89T6YtuKjOrK6CSQ5ubzpt4TiCh1B3xPRxH36odOkiKOMFJUCOgIh46glt/AqFI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tB7aT-0007QT-1e; Wed, 13 Nov 2024 08:14:49 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tB7aN-000XUv-0p;
-	Wed, 13 Nov 2024 08:14:43 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id C3AE03721A3;
-	Wed, 13 Nov 2024 07:14:42 +0000 (UTC)
-Date: Wed, 13 Nov 2024 08:14:41 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Pantelis Antoniou <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
-	Byungho An <bh74.an@samsung.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Zhao Qiang <qiang.zhao@nxp.com>, "open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"moderated list:ARM/Allwinner sunXi SoC support" <linux-arm-kernel@lists.infradead.org>, 
-	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>, 
-	"open list:FREESCALE SOC FS_ENET DRIVER" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCHv3 net-next] net: modernize IRQ resource acquisition
-Message-ID: <20241113-nonchalant-spaniel-of-contentment-83978a-mkl@pengutronix.de>
-References: <20241112211442.7205-1-rosenp@gmail.com>
+	s=arc-20240116; t=1731483094; c=relaxed/simple;
+	bh=tmuSu2iaBDMllSjqEsXXqjaCbaHp1pOOtGHzUZ12VGc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=W3DKVLqGMQntP9LYQiaWEYDu99RQogj67N0PISt4zuqra3h8OnJOoNs7dyp5whOInhhAuK4fAni0rYJBqWUCO+s/Vdn3HI9MINm0qhDa2PLpTdYd30kW5isDD8dFqmRrzKOEHiMK0DBFpZB7IIANPsJGZ/A2kXWp5QpomR9rRwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TfdJDVka; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43168d9c6c9so57067165e9.3
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 23:31:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1731483089; x=1732087889; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V4csWLl7Ej9wAFH627/RtOwQI0dYK7exWefQ0DxYMq0=;
+        b=TfdJDVkaOxLfhRptRKlUOMDVESNlELFaftJuuk5UCW5/H0i2au18apKckCipmXbvql
+         r3ZDtsKxL+s7Oz+8GkEFkCIBdAPBVPQHyGI14c/tr3LytgcGxVhTVObH8FspCR5ngFex
+         3dKF+ian+DEDqAjiicGlScqO3AL/nCBENkHAraxr/gmdZEWJqHOuSe3Taa2PKoJaGGah
+         cim3o89u+lxXlafzGjn71ECMcLxv7TCynXv+UXj9OkC7pbo6zqJ8QAu2qjXzYBxTyB3J
+         hDs/gZzWdqSRy0WEbi2zhm4WGplKpLNscjrnfVLynT1p1qzuphOkawLMGloWgHuDviZs
+         Zv6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731483089; x=1732087889;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V4csWLl7Ej9wAFH627/RtOwQI0dYK7exWefQ0DxYMq0=;
+        b=TmpItuGJSpO8DmIECZ/xWpGr+8Vrkk5sTm0/Qv2TxLOn89o+euQhwlU5Dw1mz5LazY
+         +87B8fYBJOXjoQwKYwdp2Z00h6hSFyu97Fu7h/vJuJyO/UtW5stFqDxFoT7PkjIzHw+I
+         KNG+Y1bpvTBrzt9fI9vIIR303RxIixCb0eEIaLZz+iPm7QjNUfZR1X0p8OtEh9nK8JlH
+         UubuCpVoXBU9JLFCm3CqMwfCEwzDJMJtkYS4EBoueAF+JxMjOSs0uPFvF5B3rS6WiWSN
+         7Rye7nz2tO6zUngWpjnG/3nWhCTRS1KPfhBR/+XfCQTMZppcxsD+pZHiPk4K+xjaWfj0
+         6bAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUykvYS1axrCS/iQu4FboWPMgKOeInW5mm1fLzzPIsImnMcCJfQFWYMYE45vRH9Eej1VgE5h0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoojMQgXwBKlKEab3oSVWVgNIMAyaFBJ0kxjq4YucBJ5llHIZl
+	Ru7bNH8HjQia5epDfSKHDxb2BoxvuNTVciAJ6SIzCSJXjut/PI+DQm0tzszAQoc=
+X-Google-Smtp-Source: AGHT+IFXhHLRS1YpnITs+WT4llH7CTWUIO/WdLiyAZE4altKKyOTrJjPAyh4aJtRTdM5ubYGkxnsCw==
+X-Received: by 2002:a05:600c:a4c:b0:431:5df7:b310 with SMTP id 5b1f17b1804b1-432b74ff9b1mr168355735e9.8.1731483089349;
+        Tue, 12 Nov 2024 23:31:29 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97fe6csm17353305f8f.31.2024.11.12.23.31.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2024 23:31:28 -0800 (PST)
+Date: Wed, 13 Nov 2024 10:31:25 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank Li <Frank.Li@nxp.com>, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] net: enetc: clean up before returning in probe()
+Message-ID: <93888efa-c838-4682-a7e5-e6bf318e844e@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yqpx5eyx2zhvpvlt"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241112211442.7205-1-rosenp@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Mailer: git-send-email haha only kidding
 
+We recently added this error  path.  We need to call enetc_pci_remove()
+before returning.  It cleans up the resources from enetc_pci_probe().
 
---yqpx5eyx2zhvpvlt
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCHv3 net-next] net: modernize IRQ resource acquisition
-MIME-Version: 1.0
+Fixes: 99100d0d9922 ("net: enetc: add preliminary support for i.MX95 ENETC PF")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/freescale/enetc/enetc_vf.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-On 12.11.2024 13:14:42, Rosen Penev wrote:
-> In probe, np =3D=3D pdev->dev.of_node. It's easier to pass pdev directly.
->=20
-> Replace irq_of_parse_and_map() by platform_get_irq() to do so. Requires
-> removing the error message as well as fixing the return type.
->=20
-> Replace of_address_to_resource() with platform_get_resource() for the
-> same reason.
->=20
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> (for CAN)
-> Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+index d18c11e406fc..a5f8ce576b6e 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+@@ -174,9 +174,11 @@ static int enetc_vf_probe(struct pci_dev *pdev,
+ 	si = pci_get_drvdata(pdev);
+ 	si->revision = ENETC_REV_1_0;
+ 	err = enetc_get_driver_data(si);
+-	if (err)
+-		return dev_err_probe(&pdev->dev, err,
+-				     "Could not get VF driver data\n");
++	if (err) {
++		dev_err_probe(&pdev->dev, err,
++			      "Could not get VF driver data\n");
++		goto err_alloc_netdev;
++	}
+ 
+ 	enetc_get_si_caps(si);
+ 
+-- 
+2.45.2
 
-Please write this as:
-
-Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de> # for CAN
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---yqpx5eyx2zhvpvlt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc0Ud0ACgkQKDiiPnot
-vG9ixwf+MRErFbP8EBNYW4KiknVHSCJqliQuxtMgRc5LE54Iz/W8AKqAbKIjgzTv
-XVCnuSSPn5hWw85VK1YrC2romqZQMmkjFDeaDAf27emw1tYQC5DkAg7DfdasiaFw
-ZUNWdDjmY3lm3YwXCupckUARjWB9VEXNsLca8eti0+gmBWR16gwNbd7lBeXHm+Qf
-mDzxiz9SQG5P/1V6GYCnHUgqw4yC6yxgNim60jfDfbD7t52x/C1EQylcG0Wzx3Uz
-H1irShtJQNqXv0j63qMX0K3NQOkUKy0/yfNUS5gqHefjAT5YnEqUHKReldiPq0JB
-IvRUsw91n6EDC2kPZwOR1gOkgMzKZA==
-=7118
------END PGP SIGNATURE-----
-
---yqpx5eyx2zhvpvlt--
 
