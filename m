@@ -1,122 +1,110 @@
-Return-Path: <netdev+bounces-144408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFBE29C6FB1
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:52:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1E79C7064
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B50DF287D8E
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:52:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2063B26572
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77EF1632E8;
-	Wed, 13 Nov 2024 12:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9814A1FF7B4;
+	Wed, 13 Nov 2024 12:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="qHIP4Nfy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7A2jNgW"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC26217B401;
-	Wed, 13 Nov 2024 12:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D5E1DF97D;
+	Wed, 13 Nov 2024 12:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731501946; cv=none; b=CmKcvuzaLtGXviFowVpCwKjQ7C4IHo0ksZnc9nqkjwctumxK8i4ZG0Bvr9m8Y81aq7VLcJQ80u6bsy6S2Kspw/hTVad0w+wQ6a+N8/BoUiqeOX6cC3Hic4Mma+UmGL9zvVdnBeWc83Kopa0aZIVds6W9XOmzUCVljcEUwmepgtg=
+	t=1731502323; cv=none; b=ryEiiCW1ygrL02Emdj1BG488rXANb2sDzKgKY3yau20XkBob8jlL/vOhkZsz3dmfJdriYxnPQ8F8NeM4ZdE5PuFjxg4GgA1pXPEPiNI1jZPaslNPyI+rbHEzwciHEVOtOuZCsVBXLwPOCDu3B2J0huizGCYpufnhrZ4v9sl9Zfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731501946; c=relaxed/simple;
-	bh=opOR9YZw0CrxnZL8RhalgHFJTGq5vO6cD7H/VXGcPu4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=hH+0TOFZMN3trLVDaDsfinKwpH1J/+8Eck6V65TjtgKq7xYI7uTzNXnKNfF8fO2VjI5U99jMtLq+lJT15lutfhw8DOYMBEpqiEHHNW7pYdkIXXM7WCaYDn0UhnUI0QKlhplPxXhNHtbK9BevpI2Xex/Ox69qjSsBW3qM94ARY4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=qHIP4Nfy; arc=none smtp.client-ip=178.154.239.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net [IPv6:2a02:6b8:c1c:2911:0:640:4396:0])
-	by forward501b.mail.yandex.net (Yandex) with ESMTPS id E4A5161F87;
-	Wed, 13 Nov 2024 15:45:40 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ajKC13TOcmI0-xlO3GQTV;
-	Wed, 13 Nov 2024 15:45:39 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1731501939; bh=xzUnup9lsF7Yn/7hev8VMKJhTvZiuEGUzU5++USG4P4=;
-	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
-	b=qHIP4Nfy0wnszrh4pBfyv421lwlhJNGBreWoiM0kpM28G/Z2qbrCOznZIX2GycGzN
-	 vfDqz1Lni1rrxFCFjbJA8Vt0WhefcYzAdtaQUdE+z4caRkyGLAYBwjpa3cyXiRtS/s
-	 ZmoCHu1XIv5vQj3SvcYRe4mnpNcmAMTooeOEScyc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <130193b3-6172-4fb0-b799-4e05d676f1dd@yandex.ru>
-Date: Wed, 13 Nov 2024 15:45:36 +0300
+	s=arc-20240116; t=1731502323; c=relaxed/simple;
+	bh=ZL4tb4tyjkA3ngZw5JSNkQKoqazR6ZjBwQyEWSIY3Mo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WCIIquwb8r4cyPUA6Y9Ee3dHKiKgaL50BqVLzPB0bE5spcLk+APwh+nlATtrhFEcVDOkV4rduz8Q6bva2UwqFFMc6hws5bYHPqG0pbJVvfc89kOkUuyxKoQJEx5PChMUPzRzptc8yw4zPHlx14ZxgHy9FmKTf9hGY9tVj2QbhNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q7A2jNgW; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20cf6eea3c0so65230905ad.0;
+        Wed, 13 Nov 2024 04:52:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731502321; x=1732107121; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwYc4d5Eu0RMIkZQjvwgqzFCRj5Rn8qF1GZCxG3QZAQ=;
+        b=Q7A2jNgWl+JRxa0m69FdCiMjuO38JTRaMhMQgQKt77oagQ9DrJQwtXSSFpUz5m4MTP
+         CIX+JSSX0Yv2OtsKu5qOh9u8srrON74e5b3xC6s+qiRamebLYzND4SrzdtcggXJIQbIu
+         iLfLydn1GzrHcp7rQd3o2bdD8m8H/Y1vRNjt6Zr1nyG+ZpAxNnVidzjBZo7o/QJn03bY
+         I6wgXdD/DJ1MbB5+nPMDmtzp81bQ0521hcRLeF7BYbyqaksd6Ibtq7d59GAWIg2/4Aka
+         GCtD+vozmu5VkB+epGirOxQ+4O+YSEUvKJn0kxM0TV0mIu7xDL70Ek4qOY7BFlpqRU14
+         BMyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731502321; x=1732107121;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CwYc4d5Eu0RMIkZQjvwgqzFCRj5Rn8qF1GZCxG3QZAQ=;
+        b=xLkEj9jTNh2ZD/Vk/nY3C5yi/eoLwbfLR9Gjrj7zQTITJQdesSkOWBFSIMRe5LYixH
+         RD2vzhsJYXZrdrtaLXJ+rdIvblRZuuyfraxGoZCJFSfjjX+wOWfPYqS6N6aR4X6tw9Ap
+         h/jQDNAx6/pMzDFLAfXoFNzOEOeod21TBeed/Py7ylABgGyJPS5CtReMT6Sb2rz8w++d
+         +5eM0J0pBIuwPG9gvfYX2dG/c7laB/WFcv/ZunT2yHci2HveZjJjZ9frLPr1b3gT4x+n
+         j6cGOzeLT+nNljhXYP9u5jIUkzIJemXd0yJFKiNcrnOInLS944dbdaqvgNFUWpAH/zry
+         QYAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWH9oFQFGeSKk+tuo5qpil1j7sXRzdwgzo/LbDcoljkSj2I9Kph76agoZkissfdAD1bpvcK25x1tkgzOpA=@vger.kernel.org, AJvYcCWnp3gxc3+IYkGy2M+haQPT31A+jts9W5tfRGuVsgx+aswpnQnQiM28hrCgUmCvwIKGi7JI2cur49yETW6q/RwB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi3+sMrT6tNNoI5U30Yq5sPO6+HFgEoxC+1g/RN6ENh6CZDVEI
+	pm4qQWCTq8xpPqB9Tp+XzInH4OS+RIlGldOX+rqx77mXHJIOsKzedGBJ5QnpAm3NnA==
+X-Google-Smtp-Source: AGHT+IFiPl3oBKoofvZbn+pOjY4pAF7UNAdAsAV6dCifV0l8Mayxr6JOwfe3xQjMmvx1/jktOGIo1g==
+X-Received: by 2002:a17:903:4306:b0:20c:f0dd:c408 with SMTP id d9443c01a7336-21183521d2bmr174148815ad.20.1731502321074;
+        Wed, 13 Nov 2024 04:52:01 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177cfb0ecsm109276345ad.0.2024.11.13.04.51.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 04:52:00 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Sam Edwards <cfsworks@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net 0/2] ipv6: fix temporary address not removed correctly
+Date: Wed, 13 Nov 2024 12:51:50 +0000
+Message-ID: <20241113125152.752778-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-MW
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Lizhi Xu <lizhi.xu@windriver.com>, alex.aring@gmail.com,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- stefan@datenfreihafen.org,
- syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-References: <87a5e4u35q.fsf@bootlin.com>
- <20241112134145.959501-1-lizhi.xu@windriver.com>
- <6ff1052f-76d5-42a4-bf0c-ec587ca4faa4@yandex.ru> <87y11npfhj.fsf@bootlin.com>
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
-In-Reply-To: <87y11npfhj.fsf@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 11/13/24 1:58 PM, Miquel Raynal wrote:
+Currently the temporary address is not removed when mngtmpaddr is deleted
+or becomes unmanaged. The patch set fixed this issue and add a related
+test.
 
->> Note https://syzkaller.appspot.com/text?tag=ReproC&x=12a9f740580000 makes an
->> attempt to connect the only device. How this is expected to work if there are
->> more than one device?
-> 
-> Isn't sdata already specific enough? What do you mean by "device"?
+Hangbin Liu (2):
+  net/ipv6: delete temporary address if mngtmpaddr is removed or
+    un-mngtmpaddr
+  selftests/rtnetlink.sh: add mngtempaddr test
 
-Well, syzbot's reproducer triggers this issue via USB Raw Gadget API. IIUC this
-is a debugging feature and it is possible to have the only raw gadget device.
-So when running syzbot's reproducer, 'list_count_nodes(&sdata->local->interfaces)'
-is always <= 1. But how this is expected to work for >1 case?
+ net/ipv6/addrconf.c                      |  5 ++
+ tools/testing/selftests/net/rtnetlink.sh | 89 ++++++++++++++++++++++++
+ 2 files changed, 94 insertions(+)
 
-Dmitry
+-- 
+2.46.0
+
 
