@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-144552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 405D89C7BB5
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:56:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CAEA9C7C03
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1C791F21FE5
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:56:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF7D5B3868F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126882076C5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7580B2076D4;
 	Wed, 13 Nov 2024 18:54:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GTsV8duY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nmLzUEDb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BD32071EE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF8320721E
 	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 18:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731524089; cv=none; b=GgEH6O9gDEmo+ThKtQ6JJFZdKXS3RSxb84KAyS7928mgMF2TfrQAoSXdeEOqOGWPy7aQkPpkS3plIRlTa4jnjTliNHstb6bucOMcnwtCkN++mI9WyA1+tC6Ok1B6KnmT0ROFYNqKj9Ye5ilqDBoInZ1gi1tPs8/IVmXapID9Vs4=
+	t=1731524089; cv=none; b=d83daccSgdBkUFXFb56kVx+xQGQ7zByhUIRHyc1uGhQfH8Uxm9ua4F9jk4I4dkNCIhFy3j4dCz55HEByQPIbUQawQzz3A69A07o5I7DDBOJrU6LUSaed9lMgtOU/chTO5oT1dT3PsNG+NC7imtX1KMvcwdvUhBPfeyWHfNiZH5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731524089; c=relaxed/simple;
-	bh=+qkYZqfvjzxp0CFLFUzJYCAAr85X49pQUa1hWU8bHvI=;
+	bh=3buNkZptrmm67XFSkWu1cSrwFgYDuF55Nz6t+nWwneA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z8HNTtEOlCj/AsSxPlhMOj3T6j/VVeWCkA36qevgsvvRrIUvhGOkvBwyrHFmi93s1DW5Mrntq+ZoQpSExZ+dXDiER3M2WdG89SpHm2dcSjFMmKwHyuqsBoMhn2etyNKzeeWsG/IYd6jq88JueUJUYl/RO8DNqSkhObQfZqPNe8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GTsV8duY; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=Ja8gFirwm5yjUMd+xHpmRUMMyo1euleGwFshiW6YvY2IziGczyglbY22JNYWneRAWarl+2/bw/aKiDPIlR2i/92P+VGGFxUjm6zs3E4Sg318ovOzPRDwlb4S11i4h0CtcLd72tA7RPakEbmyg9XQPfz2VudyUi1zYwoxAtwEE48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nmLzUEDb; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1731524088; x=1763060088;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+qkYZqfvjzxp0CFLFUzJYCAAr85X49pQUa1hWU8bHvI=;
-  b=GTsV8duY0P7cTWUqX/CLkDrGXlBGqy5QsGcKmIKXdxKPfEWgaS7wk8YM
-   ioot0uynSdUSNE5U9yeQsRvULVs0bCanbtsyRLXsdiwSq4sj0bcgbi/b6
-   ptsmerwWF3pRABAOPj84jzXb7e7VaGhaMhKcgtyhXmFm+xHnhsEiu9nIt
-   jla3K0oQIxdcZXloe9Ww9zWidSzNkk8mVQiYDhCQZy/frnHU2ih8RB8jV
-   m3uq44ajV8fIOq6xjXZ5s8SlmsZoClkYR8Z35Zny/lFX+ys1eTLk/Xrh9
-   pIevDQrV/8MTPl9911AjN2yvLqxwh+I6R1o27ftoxXlR7Y7golYtmXD0U
+  bh=3buNkZptrmm67XFSkWu1cSrwFgYDuF55Nz6t+nWwneA=;
+  b=nmLzUEDbKg5ZWCN/fUyGoQA+9a59FXRcDSs0CwrFIbjMzDI1PlA5IdUM
+   9BzPTpQ89PWNwujugapTb6dr+e0E+YRmvSO4csG7kVC3U27KUCEeYe14+
+   PrS6CI+WhP8GuaTxdDFr+TI6VFjqqObol/2ggM8nA1t+n1sOiIEOi0cIB
+   KWuupBin0rB3OFFA5OvGtdHxzpOORj4Q199iGOVcvOHUQnv0ymVjhnlgc
+   be7FOSKOz9wpq8y32uHbjJc2qR+bDMorHoOf+4pGqZ2uC37XGY0XAx3xh
+   6t6fdcWg8/bj05tof+MOkV6HUjCcmI2LqS2WoB/eDczKleb24A8r2GQKm
    A==;
-X-CSE-ConnectionGUID: w3zRXjYdRa+7gSLy3mOf8g==
-X-CSE-MsgGUID: 3Nt6FyPfRZeK2Yppq4w+uA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31589549"
+X-CSE-ConnectionGUID: H9HGRZTxT529AeDQIUr5dQ==
+X-CSE-MsgGUID: XjBjwJXIRRy1TYit4JlSAA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31589557"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31589549"
+   d="scan'208";a="31589557"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 10:54:43 -0800
-X-CSE-ConnectionGUID: TZ0XOjyKQwSqdX0RNYGd8w==
-X-CSE-MsgGUID: UoRcWsekTfiJJTEnxBrK6g==
+X-CSE-ConnectionGUID: r95FmK5CTnu4fN0aNWFwoA==
+X-CSE-MsgGUID: hObCrGulQRm9RBYg30T0Wg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="87520770"
+   d="scan'208";a="87520774"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa006.fm.intel.com with ESMTP; 13 Nov 2024 10:54:42 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,13 +65,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Wander Lairson Costa <wander@redhat.com>,
+Cc: Joe Damato <jdamato@fastly.com>,
 	anthony.l.nguyen@intel.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
 	przemyslaw.kitszel@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH net-next v2 13/14] igbvf: remove unused spinlock
-Date: Wed, 13 Nov 2024 10:54:28 -0800
-Message-ID: <20241113185431.1289708-14-anthony.l.nguyen@intel.com>
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH net-next v2 14/14] e1000: Hold RTNL when e1000_down can be called
+Date: Wed, 13 Nov 2024 10:54:29 -0800
+Message-ID: <20241113185431.1289708-15-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
 In-Reply-To: <20241113185431.1289708-1-anthony.l.nguyen@intel.com>
 References: <20241113185431.1289708-1-anthony.l.nguyen@intel.com>
@@ -83,57 +85,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Wander Lairson Costa <wander@redhat.com>
+From: Joe Damato <jdamato@fastly.com>
 
-tx_queue_lock and stats_lock are declared and initialized, but never
-used. Remove them.
+e1000_down calls netif_queue_set_napi, which assumes that RTNL is held.
 
-Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+There are a few paths for e1000_down to be called in e1000 where RTNL is
+not currently being held:
+  - e1000_shutdown (pci shutdown)
+  - e1000_suspend (power management)
+  - e1000_reinit_locked (via e1000_reset_task delayed work)
+  - e1000_io_error_detected (via pci error handler)
+
+Hold RTNL in three places to fix this issue:
+  - e1000_reset_task: igc, igb, and e100e all hold rtnl in this path.
+  - e1000_io_error_detected (pci error handler): e1000e and ixgbe hold
+    rtnl in this path. A patch has been posted for igc to do the same
+    [1].
+  - __e1000_shutdown (which is called from both e1000_shutdown and
+    e1000_suspend): igb, ixgbe, and e1000e all hold rtnl in the same
+    path.
+
+The other paths which call e1000_down seemingly hold RTNL and are OK:
+  - e1000_close (ndo_stop)
+  - e1000_change_mtu (ndo_change_mtu)
+
+Based on the above analysis and mailing list discussion [2], I believe
+adding rtnl in the three places mentioned above is correct.
+
+Fixes: 8f7ff18a5ec7 ("e1000: Link NAPI instances to queues and IRQs")
+Reported-by: Dmitry Antipov <dmantipov@yandex.ru>
+Closes: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
+Link: https://lore.kernel.org/netdev/20241022215246.307821-3-jdamato@fastly.com/ [1]
+Link: https://lore.kernel.org/netdev/ZxgVRX7Ne-lTjwiJ@LQ3V64L9R2/ [2]
+Signed-off-by: Joe Damato <jdamato@fastly.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igbvf/igbvf.h  | 3 ---
- drivers/net/ethernet/intel/igbvf/netdev.c | 3 ---
- 2 files changed, 6 deletions(-)
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/igbvf/igbvf.h b/drivers/net/ethernet/intel/igbvf/igbvf.h
-index 6ad35a00a287..ca6e44245a7b 100644
---- a/drivers/net/ethernet/intel/igbvf/igbvf.h
-+++ b/drivers/net/ethernet/intel/igbvf/igbvf.h
-@@ -169,8 +169,6 @@ struct igbvf_adapter {
- 	u16 link_speed;
- 	u16 link_duplex;
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 4de9b156b2be..3f089c3d47b2 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -3509,7 +3509,9 @@ static void e1000_reset_task(struct work_struct *work)
+ 		container_of(work, struct e1000_adapter, reset_task);
  
--	spinlock_t tx_queue_lock; /* prevent concurrent tail updates */
--
- 	/* track device up/down/testing state */
- 	unsigned long state;
+ 	e_err(drv, "Reset adapter\n");
++	rtnl_lock();
+ 	e1000_reinit_locked(adapter);
++	rtnl_unlock();
+ }
  
-@@ -220,7 +218,6 @@ struct igbvf_adapter {
- 	/* OS defined structs */
- 	struct net_device *netdev;
- 	struct pci_dev *pdev;
--	spinlock_t stats_lock; /* prevent concurrent stats updates */
+ /**
+@@ -5074,7 +5076,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
+ 			usleep_range(10000, 20000);
  
- 	/* structs defined in e1000_hw.h */
- 	struct e1000_hw hw;
-diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
-index 925d7286a8ee..02044aa2181b 100644
---- a/drivers/net/ethernet/intel/igbvf/netdev.c
-+++ b/drivers/net/ethernet/intel/igbvf/netdev.c
-@@ -1656,12 +1656,9 @@ static int igbvf_sw_init(struct igbvf_adapter *adapter)
- 	if (igbvf_alloc_queues(adapter))
- 		return -ENOMEM;
+ 		WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
++		rtnl_lock();
+ 		e1000_down(adapter);
++		rtnl_unlock();
+ 	}
  
--	spin_lock_init(&adapter->tx_queue_lock);
--
- 	/* Explicitly disable IRQ since the NIC can be in any state. */
- 	igbvf_irq_disable(adapter);
+ 	status = er32(STATUS);
+@@ -5235,16 +5239,20 @@ static pci_ers_result_t e1000_io_error_detected(struct pci_dev *pdev,
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+ 	struct e1000_adapter *adapter = netdev_priv(netdev);
  
--	spin_lock_init(&adapter->stats_lock);
- 	spin_lock_init(&adapter->hw.mbx_lock);
++	rtnl_lock();
+ 	netif_device_detach(netdev);
  
- 	set_bit(__IGBVF_DOWN, &adapter->state);
+-	if (state == pci_channel_io_perm_failure)
++	if (state == pci_channel_io_perm_failure) {
++		rtnl_unlock();
+ 		return PCI_ERS_RESULT_DISCONNECT;
++	}
+ 
+ 	if (netif_running(netdev))
+ 		e1000_down(adapter);
+ 
+ 	if (!test_and_set_bit(__E1000_DISABLED, &adapter->flags))
+ 		pci_disable_device(pdev);
++	rtnl_unlock();
+ 
+ 	/* Request a slot reset. */
+ 	return PCI_ERS_RESULT_NEED_RESET;
 -- 
 2.42.0
 
