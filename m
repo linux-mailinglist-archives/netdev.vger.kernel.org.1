@@ -1,125 +1,154 @@
-Return-Path: <netdev+bounces-144465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 173669C7957
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:55:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A0F9C7939
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:47:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F824B42E78
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:33:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ED59B2E733
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4242141B4;
-	Wed, 13 Nov 2024 15:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF8670833;
+	Wed, 13 Nov 2024 15:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OBBGM+bV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i+bekai5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2E42141AB;
-	Wed, 13 Nov 2024 15:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70EA070808
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 15:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731511558; cv=none; b=jghuYz1cSnzrxUCnXGety9H5GSuX5R6rPawkPVbREf/3dSO1asTn4KdQufXI0vlw1GKq/BQHTIO5mY0ZJY6OgfAZ/RnpPC8RiE+pHFPfH7PbMH2CDJpEK07iNmXR2V11kcnqiiPdJzTT0NCgvy0wfV5fBGsJiJ29S1/16ZAMW8M=
+	t=1731512896; cv=none; b=kh3MSjJCEyqtsy0lbGAOQbB880Q4ab4VM+XGpNGtGoy54o3Dn2KTmi2/Jvgd/AOajTuzk4oTJhvKPVqQQa9MvoK1yi8NIFWXCW1yL/B4KJDqCEEFE/hquejQuXWxqSZRVBiYcH2B7FtsLVX4McLO+8KJ8asvi1E791uWz4pH1+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731511558; c=relaxed/simple;
-	bh=O+ZcPvQeQyS8JRU5HG6GQbO8AhKShZuu+h1CEOZZVdA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AoEJPTS466/OcdwAWoKClH60QAKUrWdNM24qMpGHk3puWNoWySHMnLkz18o3+ZHrsUryn7kSF3Eo2zgNWB2IyyucW7ay8zJc0Tbj3+dlq7CRb20fVOiTlL1eu3xp9ubIKqKLDSoaahLYBAn8RZJht9uTKcVheVGpHu+TRTM0Ooc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OBBGM+bV; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1731512896; c=relaxed/simple;
+	bh=qHG84sX6f3ufA/50flHWraVatdJwVZN4tNgkvWeT4mo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IoJRiqKGHQLNpVCcnDB3KEMS6WIOyuvxzF1R94FU0UCsLI2u5zQkJQ6629/4QnF25+UiJZU5RDb88651LAtDJBodkHmz3SBXRGGXNVLDUFpO2KkzIGwRdvgNOJn1NT11EYi/Padhb8wq1iEdVaozhNCZ0AlZ+Md46R1PY/522jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i+bekai5; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731511557; x=1763047557;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=O+ZcPvQeQyS8JRU5HG6GQbO8AhKShZuu+h1CEOZZVdA=;
-  b=OBBGM+bVIRMqbOmx01oFo9TjcOqebmDsynOtQkMBqVjkItD97Mv7mKZG
-   ZOpc27FrBBa1LLM839nqhteJJbgHbNcxRZ8XmANl4KvyqmKrRa7oeeI5M
-   kvuZ98zJFjEwJs9kD46RMPO1iCpWpE4SxrXHcfcB9AyrHLfAQWnTLAtbN
-   YO8r1IVRRPogjqsoKDR4xbGni5f/4Iqzxtw1j5kG9VltqMi5zPsPh0/Io
-   D1SDdBplgGVIKy0r/GIIzObwNCuR4W0YwwJ+dqUrgG2CG5PCzC9X+pCsu
-   MjZXtIGUEEOrtSU5FzmE4+ArLQBEfcK2rOoQ6pZv3OGL6Yj7/mXT224YU
-   Q==;
-X-CSE-ConnectionGUID: zuq32msRTKWI/n0/S3o43Q==
-X-CSE-MsgGUID: Bg5BdTF5RPu/2sz99S0Fqg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="42799401"
+  t=1731512894; x=1763048894;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qHG84sX6f3ufA/50flHWraVatdJwVZN4tNgkvWeT4mo=;
+  b=i+bekai5i/Ii+3RIV//tlH+VX30h3J0dwByZ8iulFKaC1yWgVBYI6OaE
+   p7atGkimMqp4NIyZynW9F9C50N9LLJwMWasPem2AWvgmD/opDy+Ot9y4A
+   WlcVKmgxNJ0yqV3wG2GeHq12UWkwBWJiH+RUcrez+8IUtYVeqvCQQp99f
+   +/56vhXYPNmbf6Q2AMBys0Zj2jrlZGm3jcri6HNZCs1cAHNCm7E6hUHR4
+   vBTjlAsyMrjKwZv3GQRTqNXQVJRnEn2O2pKn+bYIdN8qWNCH0IhkKwzzX
+   Ytyhmbr5HQgO5OChZDj75R3E1W+zj6ZXzI07hcwHadnQleNyHg6tETFXZ
+   w==;
+X-CSE-ConnectionGUID: Z6Mq0CUOTDqhMtaIsdRCVg==
+X-CSE-MsgGUID: oYVyUf1VRlycGNw2t+3Xbw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="48918964"
 X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="42799401"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 07:25:57 -0800
-X-CSE-ConnectionGUID: HrWfWtebSxGxqAaF9sShxQ==
-X-CSE-MsgGUID: OP1VQ0G/SM6eP6DbQ1jVyQ==
+   d="scan'208";a="48918964"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 07:48:13 -0800
+X-CSE-ConnectionGUID: Xg9wFP+qSO27UZWkqjkqIA==
+X-CSE-MsgGUID: 0+ovJoaTRQuBKy5FeAZQGQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="118726991"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa002.jf.intel.com with ESMTP; 13 Nov 2024 07:25:53 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 14/19] xsk: allow attaching XSk pool via xdp_rxq_info_reg_mem_model()
-Date: Wed, 13 Nov 2024 16:24:37 +0100
-Message-ID: <20241113152442.4000468-15-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
-References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
+   d="scan'208";a="92869217"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.102.22.54])
+  by orviesa005.jf.intel.com with ESMTP; 13 Nov 2024 07:48:12 -0800
+From: Milena Olech <milena.olech@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Milena Olech <milena.olech@intel.com>
+Subject: [PATCH iwl-net 00/10] initial PTP support
+Date: Wed, 13 Nov 2024 16:46:07 +0100
+Message-Id: <20241113154616.2493297-1-milena.olech@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When you register an XSk pool as XDP Rxq info memory model, you then
-need to manually attach it after the registration.
-Let the user combine both actions into one by just passing a pointer
-to the pool directly to xdp_rxq_info_reg_mem_model(), which will take
-care of calling xsk_pool_set_rxq_info(). This looks similar to how a
-&page_pool gets registered and reduce repeating driver code.
+This patch series introduces support for Precision Time Protocol (PTP) to
+Intel(R) Infrastructure Data Path Function (IDPF) driver. PTP feature is
+supported when the PTP capability is negotiated with the Control
+Plane (CP). IDPF creates a PTP clock and sets a set of supported
+functions.
 
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- net/core/xdp.c | 3 +++
- 1 file changed, 3 insertions(+)
+During the PTP initialization, IDPF requests a set of PTP capabilities
+and receives a writeback from the CP with the set of supported options.
+These options are:
+- get time of the PTP clock
+- get cross timestamp
+- set the time of the PTP clock
+- adjust the PTP clock
+- Tx timestamping
 
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 3a9a3c14b080..f046b93faaa0 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -358,6 +358,9 @@ int xdp_rxq_info_reg_mem_model(struct xdp_rxq_info *xdp_rxq,
- 	if (IS_ERR(xdp_alloc))
- 		return PTR_ERR(xdp_alloc);
- 
-+	if (type == MEM_TYPE_XSK_BUFF_POOL && allocator)
-+		xsk_pool_set_rxq_info(allocator, xdp_rxq);
-+
- 	if (trace_mem_connect_enabled() && xdp_alloc)
- 		trace_mem_connect(xdp_alloc, xdp_rxq);
- 	return 0;
+Each feature is considered to have direct access, where the operations
+on PCIe BAR registers are allowed, or the mailbox access, where the
+virtchnl messages are used to perform any PTP action. Mailbox access
+means that PTP requests are sent to the CP through dedicated secondary
+mailbox and the CP reads/writes/modifies desired resource - PTP Clock
+or Tx timestamp registers.
+
+Tx timestamp capabilities are negotiated only for vports that have
+UPLINK_VPORT flag set by the CP. Capabilities provide information about
+the number of available Tx timestamp latches, their indexes and size of
+the Tx timestamp value. IDPF requests Tx timestamp by setting the
+TSYN bit and the requested timestamp index in the context descriptor for
+the PTP packets. When the completion tag for that packet is received,
+IDPF schedules a worker to read the Tx timestamp value.
+
+Current implementation of the IDPF driver does not allow to get stable
+Tx timestamping, when more than 1 request per 1 second is sent to the
+driver. Debug is in progress, however PTP feature seems to be affected by
+the IDPF transmit flow, as the Tx timestamping relies on the completion
+tag.
+
+Milena Olech (10):
+  idpf: initial PTP support
+  virtchnl: add PTP virtchnl definitions
+  idpf: move virtchnl structures to the header file
+  idpf: negotiate PTP capabilies and get PTP clock
+  idpf: add mailbox access to read PTP clock time
+  idpf: add PTP clock configuration
+  idpf: add Tx timestamp capabilities negotiation
+  idpf: add Tx timestamp flows
+  idpf: add support for Rx timestamping
+  idpf: change the method for mailbox workqueue allocation
+
+ drivers/net/ethernet/intel/idpf/Kconfig       |    1 +
+ drivers/net/ethernet/intel/idpf/Makefile      |    3 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |   18 +
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |    3 +
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |   14 +
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |   63 ++
+ .../ethernet/intel/idpf/idpf_lan_pf_regs.h    |    4 +
+ .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |   13 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   40 +
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |    8 +-
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 1006 +++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  352 ++++++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  166 ++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |   17 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  160 ++-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   84 ++
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  674 +++++++++++
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   |  312 ++++-
+ 18 files changed, 2839 insertions(+), 99 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+
+
+base-commit: 6d0dbb3dae5273e8efd6fd25deb00404ff5a8f38
 -- 
-2.47.0
+2.31.1
 
 
