@@ -1,120 +1,179 @@
-Return-Path: <netdev+bounces-144440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B3C9C773C
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:32:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4443F9C74F4
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 356C2B30539
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:46:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F14281F25FCE
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B61A171D2;
-	Wed, 13 Nov 2024 14:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4221C1531EA;
+	Wed, 13 Nov 2024 14:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Na09W/dH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TrfbnuXY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F164823A0
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 14:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B8413AA2D
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 14:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731509193; cv=none; b=mwCt7FIr7ZOdliR1cFE6/syV+/IHiREd97HihnHXDw4O0qGoWdBh1slaCHwKv9vT4Jmx0tnKbU0y/v+ctM3pKcupym+HVlE6dYShlk2pe+F8y9VRCZtaQCiUNLRrb9gBfWN4pBNnANLDywIgri7ZSDsthsTMdmoX8E/XkviE55w=
+	t=1731509951; cv=none; b=A176CSJ3EPSF2ZG0jkeXvNSx93OgiApmAzIQ+6TTDdkIUMHu8BMpS5MI/dxlNgFhjgVgrlZEzxb+Sa4Oie3ERlg5S4TiJ0puJT3QhDrebQ/fcnT2L5T62ebHpD+xKuEZifgwLI4xv2XZyuflPbvSmcKScpSmnGBktRbEEY5S/j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731509193; c=relaxed/simple;
-	bh=zIXoZhWC4DXAOrpWgsSnilXYYSorX84AMg9nuLvObNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=YxRRgFYs7ghxRhHKDKqxNrpX2xa6D2rN/NnhmV19qu6bJFzkHtP2+xX56cgfMION7+D1kE9RjTjLbr1V7WaGrvjbUpn5OynWPTfCUNgmiTcRtYz/pp8LvOvva/dHRCDmxkAZ6tq7NAJpSTjcA9s8q9W1aLHPcIHP5PJ31PKPg1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Na09W/dH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AYArTO1recV8g5TrTKd5zKTwX65IEI5Ux7w4h2yREEU=; b=Na09W/dHXSAS5mlvQ/kCpil37r
-	XUAdasMvajymADlGGNFInHm21rNJm6fsGo40C2x0bTZhLlbGl86gdN0f2vnh5bn4ql5zyFOdkKTXE
-	FK3tSISV31JVSXN/MPHUE6lD3aQ2lLJoGbiCWAEyNgX5wmPxVfyVmo+xTRjin8anLl2hlq9/VQFuf
-	LcnSDQ+jK17PjjE0hlmmCaJbCG3FnZWDbtp+ShtPPZdDbzbloPY7zO6VXRrc96RRLop97kgm5w9kd
-	0Ow1wkAEyX0zo3vbMAP0AaqA54AFIQIa6NkwRcL0qhB7Dm6Uk2JxiUimX0nnilPc0HJzkO8tpF0FQ
-	b7n7IRPw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48182)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBEdX-0006P3-0c;
-	Wed, 13 Nov 2024 14:46:27 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBEdV-00007K-1u;
-	Wed, 13 Nov 2024 14:46:25 +0000
-Date: Wed, 13 Nov 2024 14:46:25 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Testing selectable timestamping - where are the tools for this
- feature?
-Message-ID: <ZzS7wWx4lREiOgL3@shell.armlinux.org.uk>
+	s=arc-20240116; t=1731509951; c=relaxed/simple;
+	bh=esx3+gp6giuoSv55FGfF8nJwn5DJ2HORa2u7PFK+YjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rl9FF5/bRHAeGExEsMF7waMuNJi7expONZgifI7Nmxy3K9QlX9Fq+H2TSw/YLLzGYQs/0aKSvtPnVOgGdZbYnbaaj21tebEeN1UqBE4moFStUDvkDBdkK+oy0ZmE8GuAu1W21///ryOIC2wnuUipKCoxp5u4QbVMUo/vgVmvw7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TrfbnuXY; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8c3b20fe-650b-4910-bf23-236e2b377d04@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731509946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+OoiRYmdt25DiYMmRNWGGRLGwaM28ebbuFL+WS9HUsI=;
+	b=TrfbnuXYdOyykSoBMUoovS8eFoKHIvB8iV/6IYEqwumX++1qk89A9qrXdHIP2YXQC689lx
+	fscFuJnp55jhAsBcXtaR1dt2VJScCSrtG3hPvb5yP6Anx1f9GAji3/94q9N28+Hywwqqxq
+	In+FmT/1mlV2IGfpv/sDs5RCHZsHfOs=
+Date: Wed, 13 Nov 2024 14:59:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Subject: Re: [PATCH net v4 1/7] octeon_ep: Add checks to fix double free
+ crashes
+To: Shinas Rasheed <srasheed@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: hgani@marvell.com, sedara@marvell.com, vimleshk@marvell.com,
+ thaller@redhat.com, wizhao@redhat.com, kheib@redhat.com, egallen@redhat.com,
+ konguyen@redhat.com, horms@kernel.org,
+ Veerasenareddy Burru <vburru@marvell.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Abhijit Ayarekar <aayarekar@marvell.com>,
+ Satananda Burla <sburla@marvell.com>
+References: <20241113111319.1156507-1-srasheed@marvell.com>
+ <20241113111319.1156507-2-srasheed@marvell.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241113111319.1156507-2-srasheed@marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Kory,
+On 13/11/2024 11:13, Shinas Rasheed wrote:
+> From: Vimlesh Kumar <vimleshk@marvell.com>
+> 
+> Add required checks to avoid double free. Crashes were
+> observed due to the same on reset scenarios, when reset
+> was tried multiple times, and the first reset had torn
+> down resources already.
+> 
+> Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
+> Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> ---
+> V4:
+>    - Removed unnecessary protective code. Added fast return from
+>      octep_free_irqs()
+>    - Improved commit message
+> 
+> V3: https://lore.kernel.org/all/20241108074543.1123036-2-srasheed@marvell.com/
+>    - Added back "Fixes" to the changelist
+> 
+> V2: https://lore.kernel.org/all/20241107132846.1118835-2-srasheed@marvell.com/
+>    - No changes
+> 
+> V1: https://lore.kernel.org/all/20241101103416.1064930-2-srasheed@marvell.com/
+> 
+>   .../net/ethernet/marvell/octeon_ep/octep_main.c    | 14 ++++++++++----
+>   drivers/net/ethernet/marvell/octeon_ep/octep_tx.c  |  2 ++
+>   2 files changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> index 549436efc204..29796544feb6 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> @@ -496,6 +496,9 @@ static void octep_free_irqs(struct octep_device *oct)
+>   {
+>   	int i;
+>   
+> +	if (!oct->msix_entries)
+> +		return;
+> +
+>   	/* First few MSI-X interrupts are non queue interrupts; free them */
+>   	for (i = 0; i < CFG_GET_NON_IOQ_MSIX(oct->conf); i++)
+>   		free_irq(oct->msix_entries[i].vector, oct);
+> @@ -505,7 +508,7 @@ static void octep_free_irqs(struct octep_device *oct)
+>   	for (i = CFG_GET_NON_IOQ_MSIX(oct->conf); i < oct->num_irqs; i++) {
+>   		irq_set_affinity_hint(oct->msix_entries[i].vector, NULL);
+>   		free_irq(oct->msix_entries[i].vector,
+> -			 oct->ioq_vector[i - CFG_GET_NON_IOQ_MSIX(oct->conf)]);
+> +				oct->ioq_vector[i - CFG_GET_NON_IOQ_MSIX(oct->conf)]);
 
-I've finally found some cycles (and time when I'm next to the platform)
-to test the selectable timestamping feature. However, I'm struggling to
-get it to work.
+Looks like this chunk was unintended, it was perfectly aligned before...
 
-In your email
-https://lore.kernel.org/20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com/
-you state that "You can test it with the ethtool source on branch
-feature_ptp of: https://github.com/kmaincent/ethtool". I cloned this
-repository, checked out the feature_ptp branch, and while building
-I get the following warnings:
+>   	}
+>   	netdev_info(oct->netdev, "IRQs freed\n");
+>   }
+> @@ -635,8 +638,10 @@ static void octep_napi_delete(struct octep_device *oct)
+>   
+>   	for (i = 0; i < oct->num_oqs; i++) {
+>   		netdev_dbg(oct->netdev, "Deleting NAPI on Q-%d\n", i);
+> -		netif_napi_del(&oct->ioq_vector[i]->napi);
+> -		oct->oq[i]->napi = NULL;
+> +		if (oct->oq[i]->napi) {
+> +			netif_napi_del(&oct->ioq_vector[i]->napi);
+> +			oct->oq[i]->napi = NULL;
+> +		}
 
-netlink/desc-ethtool.c:241:37: warning: ‘__ts_desc’ defined but not used [-Wunus
-ed-const-variable=]
-  241 | static const struct pretty_nla_desc __ts_desc[] = {
-      |                                     ^~~~~~~~~
-netlink/ts.c: In function ‘ts_get_reply_cb’:
-netlink/ts.c:23:14: warning: unused variable ‘str’ [-Wunused-variable]
-   23 |         char str[10] = {'\0'};
-      |              ^~~
-ethtool.c:4865:12: warning: ‘do_set_ptp’ defined but not used [-Wunused-functio ]
- 4865 | static int do_set_ptp(struct cmd_context *ctx)
-      |            ^~~~~~~~~~
-ethtool.c:4839:12: warning: ‘do_get_ptp’ defined but not used [-Wunused-functio ]
- 4839 | static int do_get_ptp(struct cmd_context *ctx)
-      |            ^~~~~~~~~~
-ethtool.c:4817:12: warning: ‘do_list_ptp’ defined but not used [-Wunused-function]
- 4817 | static int do_list_ptp(struct cmd_context *ctx)
-      |            ^~~~~~~~~~~
+I would just add
 
-My conclusion is... your ethtool sources for testing this feature are
-broken, or this is no longer the place to test this feature.
+if (!oct->oq[i]->napi)
+	continue
 
-Presumably there _is_ something somewhere that allows one to exercise
-this new code that Jakub merged on July 15th (commit 30b356005048)?
-Please could you point me in the appropriate direction ASAP - time is
-very short if I'm going to give this a test on the setup where both
-the MAC and PHY support PTP. Essentially, this afternoon - or its
-going to be at least a month before the next opportunity.
+as the first line within the loop. Otherwise debug message could be
+misleading - deleting NAPI on queue which doesn't exist.
 
-Thanks.
+>   	}
+>   }
+>   
+> @@ -666,7 +671,8 @@ static void octep_napi_disable(struct octep_device *oct)
+>   
+>   	for (i = 0; i < oct->num_oqs; i++) {
+>   		netdev_dbg(oct->netdev, "Disabling NAPI on Q-%d\n", i);
+> -		napi_disable(&oct->ioq_vector[i]->napi);
+> +		if (oct->oq[i]->napi)
+> +			napi_disable(&oct->ioq_vector[i]->napi);
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+And here again, the same pattern.
+
+>   	}
+>   }
+>   
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
+> index 06851b78aa28..157bf489ae19 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
+> @@ -323,6 +323,8 @@ void octep_free_iqs(struct octep_device *oct)
+>   	int i;
+>   
+>   	for (i = 0; i < CFG_GET_PORTS_ACTIVE_IO_RINGS(oct->conf); i++) {
+> +		if (!oct->iq[i])
+> +			continue;
+>   		octep_free_iq(oct->iq[i]);
+>   		dev_dbg(&oct->pdev->dev,
+>   			"Successfully destroyed IQ(TxQ)-%d.\n", i);
+
 
