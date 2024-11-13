@@ -1,108 +1,89 @@
-Return-Path: <netdev+bounces-144597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA2829C7E20
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 23:10:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640A99C7E53
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 23:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F95B1F2322B
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 22:10:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3883B226F4
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 22:39:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0567918C926;
-	Wed, 13 Nov 2024 22:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F8C17A597;
+	Wed, 13 Nov 2024 22:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Kl5ovlMK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OlL8orMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E4B18BC0A;
-	Wed, 13 Nov 2024 22:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85FA33CFC
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 22:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731535832; cv=none; b=M72e5cMwYM9fG0QSCu5t+Z9uNBqKsOFuaJs6Z5dC4bjQWQ02lVZDTa0V0ZGq/SP2Ay/STYlTu6yfeq63Rf5cPfWzLgLhSdPGmqfxEcKx483SfnyPQsM9ifSsC8AsEhdcYHmtecVWzZIIgGbUmz36LIP5eiE8U3JVOu4P7BFCiPc=
+	t=1731537544; cv=none; b=LFkjMIikXjTqtoT9mlufm2/vpIgXr82ifoiXvaS7TDmAF626/Xg2ySs8J9Gcmc4G/6isiM68U2l3qpVQvKN6vZyCBfcbXyYkruhizbaYdBWWg/zNDm5TwZWd7t82aAvNhqxEN4fm09cBSXOnnb2mWEpC6jtwr7s3qsaWyzq2aQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731535832; c=relaxed/simple;
-	bh=4nlKL/GAI/wNHLhxaFni2Yc23qUd5r5JRyPks+7KfXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=hFzVgdn9oTpXe1OembDhuzjp97WpxKdP/88H+tMb1zCNassEcyoQquxLpbyRaBg8Am2dnwjovZkjxGUdAVsoHTpe3DisAXcss6UyiktrOT49AfLBtLYgjzuDyW4TsoV9SwhF3ABxIXd4xYD2zcoIZi9KrL05SPOjlJL+jvahc0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Kl5ovlMK; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1731535824;
-	bh=ViyKi74fZbZqqauFcX8QRPGItIFrBUPGLG5QeGrfiaA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Kl5ovlMKoBCcdQRrsrJtRT9TYzJ5z9rX472UURoP5vGFyURzT/imRdSdNoYLd3mvg
-	 6YgehizkWl6TIefCUQ/toCziWR2ITekQpUz+4YpUq6d/MDB/G25lZ5ci0S8jO8FxvT
-	 +bx7TkzZ2xMq/eiZWBvvqqxUp3zzhgNLhTN8y5tNJiMIwlTRW5lOMB7qEJ0DGCJMl8
-	 A05ftQ5yYWzXrCFdmTlH3205OZ16PAFk1YmTZsklDp2tTiBYoMkdhoxXjTcopl3bjn
-	 V5u7HZQeI07MufOP2Wr9D8zS3lJRquGzidryKG7KFP51WZgBUSLD+Ft+TWcSOMV1H6
-	 q7Q5CS9jr6HwQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xpcsp6GLlz4w2L;
-	Thu, 14 Nov 2024 09:10:22 +1100 (AEDT)
-Date: Thu, 14 Nov 2024 09:10:23 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Olof Johansson <olof@lixom.net>, Arnd
- Bergmann <arnd@arndb.de>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, ARM
- <linux-arm-kernel@lists.infradead.org>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patch in the net tree
-Message-ID: <20241114091023.50a38dfe@canb.auug.org.au>
+	s=arc-20240116; t=1731537544; c=relaxed/simple;
+	bh=1YnCSZkE94OioJl0N17ux60su9v06F7+HmGUymJhPG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kTZa+MK7wfxS6++U2bXLRIck3d55CrDUeJ1YD1OoxJeyceycsXF89eBO9/gtaULND8dKQ4VObDpEogHhK2cjRjw5KnK7E6Pdw/CstkUWzs4MXeQC4V1glBcwLQubSZ1wqGwAW28uH3KtDCnUpSt8FPw4vZoKwKrusOUDiGvbz2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OlL8orMj; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <03ccdc24-27af-4b4e-baf3-40d89ae72e99@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731537540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hHHjKUL/kzDAlNV+4InhVEstH+waskfQsZNfc86kp3k=;
+	b=OlL8orMjRTl36zRIhapsRW+bcZaso6rfs1Uf8cKK1zl6fnEiEjXGhFD3X2xNJyaCMmgB05
+	pTf3ZMHp16GJsGHXarvEz4b3gkhTysNpqYaatA4lTPAAyMBR2WR1t9rF1FZ6VcOG9pFDsH
+	TaJlz2QWeuLpVxr+3edUTAhO7pPY4H8=
+Date: Wed, 13 Nov 2024 22:38:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/CQy0aclGX8m_lk/oRNHiW9V";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Subject: Re: [PATCH net v4 1/7] octeon_ep: Add checks to fix double free
+ crashes
+To: Shinas Rasheed <srasheed@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: hgani@marvell.com, sedara@marvell.com, vimleshk@marvell.com,
+ thaller@redhat.com, wizhao@redhat.com, kheib@redhat.com, egallen@redhat.com,
+ konguyen@redhat.com, horms@kernel.org,
+ Veerasenareddy Burru <vburru@marvell.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Abhijit Ayarekar <aayarekar@marvell.com>,
+ Satananda Burla <sburla@marvell.com>
+References: <20241113111319.1156507-1-srasheed@marvell.com>
+ <20241113111319.1156507-2-srasheed@marvell.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241113111319.1156507-2-srasheed@marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
---Sig_/CQy0aclGX8m_lk/oRNHiW9V
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 13/11/2024 11:13, Shinas Rasheed wrote:
+> From: Vimlesh Kumar <vimleshk@marvell.com>
+> 
+> Add required checks to avoid double free. Crashes were
+> observed due to the same on reset scenarios, when reset
+> was tried multiple times, and the first reset had torn
+> down resources already.
 
-Hi all,
+I'm looking at the whole series and it feels like we have to deal
+with the root cause rather than add protective code left and right.
 
-The following commit is also in the arm-soc-fixes tree as a different
-commit (but the same patch):
-
-  2b99b2532593 ("MAINTAINERS: Re-add cancelled Renesas driver sections")
-
-This is commit
-
-  124f4f1a1869 ("MAINTAINERS: Re-add cancelled Renesas driver sections")
-
-in the arm-soc-fixes tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/CQy0aclGX8m_lk/oRNHiW9V
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc1I88ACgkQAVBC80lX
-0Gy5uQf+Pi/A9DUv8c2l2hDBnMVogOGKG6l7eP7S0wn2Q2JL4CY7oNHknSKv6YAI
-CY7tODPcGLyoisPCgbKT3OMy0HWWxVFLK63V3pXEpuqa7P+8v6xfuQfXzHd3btgS
-9q5SJOLqEQke4PXv415E36+f7/cgJuNR7mb4p3Ev3quHluGR2iRAYBCIHVXB6p7y
-5aafOzipahGZ9ZxDwT5kdUcEbVaAaAioC9dVGB8Ng1KVjN8raB06kr1AXwJ/w5j6
-172IGXjz+EjGpkLSwoYFADQ7xkOZX7fIn2rFzddoKhmpUJJlAD5J5iiKJ7iFjI5C
-LuvZLn6APNhjafrYkUqz3O+J8dJB0w==
-=dUdn
------END PGP SIGNATURE-----
-
---Sig_/CQy0aclGX8m_lk/oRNHiW9V--
+The driver may potentially have some locks missing which will cause
+missing resources, and to fix the root cause these locks have to be
+added. WDYT?
 
