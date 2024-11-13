@@ -1,130 +1,79 @@
-Return-Path: <netdev+bounces-144257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 944539C6667
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:01:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8E89C665B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:59:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7AFBB2F059
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A45A51F21C7E
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C89F5680;
-	Wed, 13 Nov 2024 00:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE007AD5A;
+	Wed, 13 Nov 2024 00:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uIoxmILW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LsdLzszk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6A21BC5C
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 00:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7809F6FB9
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 00:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731459420; cv=none; b=UN2oV06QDmX29x8HSD7WbwgEJ6bTSfcwWDt9Jp0fKtlqAcynqxT//nD6Cp82H7JZhhBZY9csOscznrjqufTDxnmhlt2Ri8RO4hxFrvVx9vRLmZ0FzYLKJpN8212izvF6/XjfmqO6ycNG856WPR7bw7t8z29HKpf3a9m3H2BkifY=
+	t=1731459555; cv=none; b=A7/jnRxr769Xg4y7XVhYARUx2tRexQBbReVcXhFFMXhPKbfvz6NdX665hSOq4DQhYI4wL/+og5qHzsf7lcDTCLUZHdRJQKJs6bFs+MuMoiUWmsHvuTpWLZs4gn61Hzb+z4Q2ccpyINisNh8g1/3y+Mk56aeKFsu8W31y6+VvuHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731459420; c=relaxed/simple;
-	bh=S/ZIIvHV4gDhxmZupsbdYnIIAA0H4KXqa3pcV4+Ru2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TKL6ITdss+PQRCxbUseGiL71iBHUHeSugPvV7sdub1pFDCmsLSqSE/biqZGL64gZjaKGBRVRipz8p19VAaRXY2rzSlxv2jedcyEBIrC82Tzcg8V70hr51JqJMoqd0vVTNk3h7IJpAs86es4/H8D8nnWXVoYmIwDJ5gKFG6npoiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uIoxmILW; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539e64ed090so2e87.1
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 16:56:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731459417; x=1732064217; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jx0hYhXWq4MHDr1staZ1xRj0crb2pojg8SADc+LPOAQ=;
-        b=uIoxmILW8Q3PMchD6AAO50udFsTXsRCSlz6xYK4YBJoUVWpSPN0QkcDrWpll9cC5Ry
-         4QmqOxUanljkXuTcf5cQjrPF/r6O3XTU8y2GveFqTDNY1EK64WSGjer97ykQm1yTIm1G
-         xM4dgnhaLGa5Id0Q/lL7bDnGeAXfO8IQcfipn0fgLhvMmPHsRt3m/ojFKbVW8OA0/MMw
-         aQKv89/cewdw3N8sGvD7SqfWZ25E95coZNzc0a1/s3esbQKIm4g3+JQ47qHk+1YePWhE
-         LQAX24ZhhYNEhdqgXOIWJpspdOGZICGBPnq73oiDq9ncrJC1bfxyECual66ixsC8c+vt
-         wa2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731459417; x=1732064217;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jx0hYhXWq4MHDr1staZ1xRj0crb2pojg8SADc+LPOAQ=;
-        b=NC72KxQ5ZP/NVwyBTuFp07XwuPyQJlcI/dS1THmrhDOcTmJU79dqk3zMbXa7JAA1ra
-         GF75cD3kl6CM4DM2iut9MhoB9NL3bgObcAWugd5Kryd/D65Ud27yUiTR2QQl6bl1lz0D
-         M8rFo1TIUx9tSRZMSMq3jcz235ZqGefjDshNCBpHYIE0BNLT28gFkaTWC4qXLmKrY8RJ
-         TQuK+awqRJFsFIog+RKk0v/3HMkucjsGCjedIPZJuyIc83MHApA5sknC+XWCW1dep0Jd
-         aCocnnNNgsi0TJtNKnP4F2sZx9bizO5nT70BZaFq8OhQsb2/3f8OOHfRc6U2/aI06/mu
-         gAZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUW+D4dLFqXtd6s/yTHkeJkY5o4vrKshQk3PuEC/Fxp4woRQWl9dE0RjXUcs3ghx1tUzDrMseY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh3+50jv7aDk/MyzYHSQXVNqo7DZtqJ0G286iq0+9WL4TN/Dqh
-	dqCvYSs80oYbBe1JdROwPfbmrWsPHDg+j01d73uUvN2XMAzJOssNvX4A3qRCxpwKIJUv6f7UMW5
-	fH3FSarx3uoVtzsU44ms/s8WlU3C9IxGLjCa4
-X-Gm-Gg: ASbGncsiD6yr6bnr6w6KP2hN3TCheDtAVW2fQDQq+UkT7Qeef9bCrket0W50UdY6UDr
-	GcUZunIcedOiQuh08dDuqGURKZw+mINi+BVoObAQLxCM+tJw2zz0rW6a7jwMpaW8L
-X-Google-Smtp-Source: AGHT+IFyo2CCWf1+kCiFRkYJgDWrUegjzUeNU4t/8JMPYaG9xjbFRAq2D0v8rFeFfjFkrHSgn2SrxQyw3Q/oyOrrmio=
-X-Received: by 2002:a05:6512:1599:b0:53d:a034:e563 with SMTP id
- 2adb3069b0e04-53da0726006mr2816e87.1.1731459416103; Tue, 12 Nov 2024 16:56:56
- -0800 (PST)
+	s=arc-20240116; t=1731459555; c=relaxed/simple;
+	bh=9XX5N+TdO/BUetwj4AmO4rLoKNvezuERJXKfJcR1eLQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QsnJJ1z+4SgN6sOQKsHewESooVt6fMNZdQoZrlmWAqDwrS7Mu5z8MQXxapV/f4dv8HirUNXpSkNAHSxwHWq8gbQy1IiDNNhGQ84V/Kcq9FSytFl86cXXKQAnpz7jqmFKTNLezouBs3FwLfm+m8Z6CKr9HyVOaO5CpcXXJLvhawE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LsdLzszk; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <677fac6c-e66d-4fba-a89a-982888209523@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731459551;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JvrHNLX9AABBSynCrSCTX1QYMPJbE/ts/ugS+jCT1/g=;
+	b=LsdLzszkcmZH8TwpENa+L0H+MTI/6+NeWZ2++OvFO6YvWJL95XFTbPzVluJls1c9VKZnJz
+	0nm/LjGTem+lhQxR64mbrcEkyGOZcAdTTOMoZQHIPi0zv61sfDasQlQMj0tVOnC1fm4aQS
+	vRezM0OeHdf2Dh2gPme0Hg+dq6AJv3o=
+Date: Tue, 12 Nov 2024 16:59:02 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241110081953.121682-1-yuyanghuang@google.com>
- <ZzMlvCA4e3YhYTPn@fedora> <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
-In-Reply-To: <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Wed, 13 Nov 2024 09:56:17 +0900
-Message-ID: <CADXeF1HMvDnKNSNCh1ULsspC+gR+S0eTE40MRhA+OH16zJKM6A@mail.gmail.com>
-Subject: Re: [PATCH net-next] netlink: add igmp join/leave notifications
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, 
-	jiri@resnulli.us, stephen@networkplumber.org, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next v4 0/3] Add kernel symbol for struct_ops
+ trampoline
+To: Xu Kuohai <xukuohai@huaweicloud.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Yonghong Song
+ <yonghong.song@linux.dev>, Kui-Feng Lee <thinker.li@gmail.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20241112145849.3436772-1-xukuohai@huaweicloud.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241112145849.3436772-1-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> Please could you say more about programming hardware offload filters?
-> How is this done?
+On 11/12/24 6:58 AM, Xu Kuohai wrote:
+> Add kernel symbol for struct_ops trampoline.
+> 
+> Without kernel symbol for struct_ops trampoline, the unwinder may
+> produce unexpected stacktraces. For example, the x86 ORC and FP
+> unwinder stops stacktrace on a struct_ops trampoline address since
+> there is no kernel symbol for the address.
 
-Sure,  please let me explain a little bit further on how Android
-Packet Filter (APF) works here.
+Reviewed-by: Martin KaFai Lau <martin.lau@kernel.org>
 
-The Android Packet Filter (APF) has two parts:
-* APF Interpreter: Runs on the Wi-Fi chipset and executes APF
-programs(bytecodes) to decide whether to accept, drop, or reply to
-incoming packets.
-* APF program generator: Resides in the Android Framework within the
-Network Stack process. It creates and updates APF programs based on
-network conditions and device state, allowing for dynamic adjustments
-to the filtering rules.
-APF program generator is part of the Network Stack module, which can
-be updated with monthly mainline releases.
-
-Feel free to let me know if the above explanation is still unclear.
-
-I will include a more detailed explanation in the commit message in patch v=
-2.
-
-Thanks,
-Yuyang
-
-On Wed, Nov 13, 2024 at 4:34=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > > This enhancement allows user-space components to efficiently track
-> > > multicast group memberships and program hardware offload filters
-> > > accordingly.
->
-> Sorry, i missed the original posting.
->
-> Please could you say more about programming hardware offload filters?
-> How is this done?
->
->         Andrew
 
