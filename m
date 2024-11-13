@@ -1,192 +1,120 @@
-Return-Path: <netdev+bounces-144439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28EAA9C749D
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:42:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B3C9C773C
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:32:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4CE22843D4
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:42:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 356C2B30539
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D7D4C6C;
-	Wed, 13 Nov 2024 14:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B61A171D2;
+	Wed, 13 Nov 2024 14:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DCR1StYq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Na09W/dH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B391C695;
-	Wed, 13 Nov 2024 14:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F164823A0
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 14:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731508957; cv=none; b=dAbGiJKD4Wtjg98ItiaHpVfVf/daGhQQIIOrINN+7oVTwprHeXH/2BBamvQ0oOB0pyzygMk3hltgTlWwRYYFbzRNEkqIMaxOVjh1TfsS2c7sQT53oTVJQSnThrZm1zVIdrhf+D/6wCjUDW08qXEzwF2a4AyTQsAbjMLYc7SRHPA=
+	t=1731509193; cv=none; b=mwCt7FIr7ZOdliR1cFE6/syV+/IHiREd97HihnHXDw4O0qGoWdBh1slaCHwKv9vT4Jmx0tnKbU0y/v+ctM3pKcupym+HVlE6dYShlk2pe+F8y9VRCZtaQCiUNLRrb9gBfWN4pBNnANLDywIgri7ZSDsthsTMdmoX8E/XkviE55w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731508957; c=relaxed/simple;
-	bh=4nJldl2tsb7DjNSPWlDcL1G4bRaAiP6fFFAhEZUMDz4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nxaal2ge+8yOy2dWM+3yGKrvAJhi1SfEr1hbPSq4kUA14eJ2EC9TzyGTIz/366YorywKzr1swsQxXMwcuS27CTYwBy+Hfcxc/C1rXELLt2j06gw4ps5mdLtu8w9YB4U1NjLnRVjuASy2Xmi8q0sYLMP33DypTyC6TVGVyR21jkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DCR1StYq; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37d4eac48d8so119034f8f.0;
-        Wed, 13 Nov 2024 06:42:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731508953; x=1732113753; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5EXRuvdJJsDZqVJbSr1eZa+g0bNBPJGLJZmT9i05/bg=;
-        b=DCR1StYqT9tSQaTg3av0Ywe6IJsS/E+7HOm4ys6A5uAspc6i90YqaT+lUppRAKE7i8
-         asDpaISNdpad/mGgh/QvNiOwd27jO4XndI/M1GBlMqn9aWy2B1sUwXrKJC4bBqkIF//9
-         3Ck6hZtRQsmVKzAj0sl3QgQodosnWb352s/05FRiZpDkytICvj4gDwyi3t5kBZY2ZD6Q
-         Oka0BKFSa7CcpQdwgteXE9ZluFZ0vRcGhMphhgQea/470239Co3gkJ4D90LgAqK93V8Z
-         0Ksnu2wjg52rBlKcI4o7xlombb7N6fCXalSlWErSd79ykQo204o36hUJ/n1WceMpocc6
-         WKaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731508953; x=1732113753;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5EXRuvdJJsDZqVJbSr1eZa+g0bNBPJGLJZmT9i05/bg=;
-        b=gM6/zSB+O8H/mRZ7jfEpss4nVN2163QiB/Lq0Shb0Nkw846efhTCV4F01ICyRrDpUg
-         k2WVcroBSBE/u8GUecAJk0xt+4P16D6yKVTUYOgIN53yLEs6jJGOOyGl+Dbc0HwcOinH
-         dZLS8LZO6bYJE/KF1JBLeG9M0jxG6hOcykATQVcbF90bYNYCsj06vZfp23WGzuAH0S2W
-         FXrFuaTyaxOpixzezIveX2yyIHMKxy9AG2ItSxlrsLbad2WY3XQ40mQysNoz3OlnIUNE
-         rbuLBX+WUU/hZozG8OEUzPYtk8djBt57WPZXm3XF4M5oSu83xNSUAq5qpSy4jLQlJcuS
-         ox8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUPtDTuvOKaA9Xi2/NRfaYcTLF6b6VIH8KgBpque2sdCXxmxetgTOjhCXUzLTyDTZgSGh9bh0TxVTBU@vger.kernel.org, AJvYcCUd/iBWRI48SAIrhdtYQHc7oyxliq+KXdCghliMaApUlgE2PoyFfloNx6ogyypQRd/Fvf1kOts4@vger.kernel.org, AJvYcCVGA3GFTV2t4einFsIMjXGt+KShrD+cgwWV+LZ1KCaxpFpI3xE56k0gaip8DfQNh6DwpifFz95vkuJxvgWl@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzqifhpb3q0jutrvWN8sIS449z2DngnmPZD1LWmOq77aNMCmC9S
-	MQ15ctRWx89Td+FYsVdBZXsBQ2Eyuur6sLuRxKOu/Of9kDB91iZT
-X-Google-Smtp-Source: AGHT+IF+IlngJBPGAB2mC/yn8u49IUvMkQZXPfKAehjzVLI/VB8YSaJsCxHx1adTzRqz9wjT6Wnx2A==
-X-Received: by 2002:a05:6000:1445:b0:37d:4864:397f with SMTP id ffacd0b85a97d-381f1714445mr7188030f8f.3.1731508953202;
-        Wed, 13 Nov 2024 06:42:33 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97fe9bsm18392883f8f.35.2024.11.13.06.42.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 06:42:31 -0800 (PST)
-Date: Wed, 13 Nov 2024 16:42:29 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tristram.Ha@microchip.com
-Cc: andrew@lunn.ch, Woojung.Huh@microchip.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	marex@denx.de, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Message-ID: <20241113144229.3ff4bgsalvj7spb7@skbuf>
-References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
- <20241109015633.82638-3-Tristram.Ha@microchip.com>
- <784a33e2-c877-4d0e-b3a5-7fe1a04c9217@lunn.ch>
- <DM3PR11MB87360F9E39097E535416838EEC592@DM3PR11MB8736.namprd11.prod.outlook.com>
- <700c326c-d154-4d21-b9d4-d8abf8f2bf33@lunn.ch>
- <DM3PR11MB873696176581059CF682F253EC5A2@DM3PR11MB8736.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1731509193; c=relaxed/simple;
+	bh=zIXoZhWC4DXAOrpWgsSnilXYYSorX84AMg9nuLvObNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YxRRgFYs7ghxRhHKDKqxNrpX2xa6D2rN/NnhmV19qu6bJFzkHtP2+xX56cgfMION7+D1kE9RjTjLbr1V7WaGrvjbUpn5OynWPTfCUNgmiTcRtYz/pp8LvOvva/dHRCDmxkAZ6tq7NAJpSTjcA9s8q9W1aLHPcIHP5PJ31PKPg1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Na09W/dH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AYArTO1recV8g5TrTKd5zKTwX65IEI5Ux7w4h2yREEU=; b=Na09W/dHXSAS5mlvQ/kCpil37r
+	XUAdasMvajymADlGGNFInHm21rNJm6fsGo40C2x0bTZhLlbGl86gdN0f2vnh5bn4ql5zyFOdkKTXE
+	FK3tSISV31JVSXN/MPHUE6lD3aQ2lLJoGbiCWAEyNgX5wmPxVfyVmo+xTRjin8anLl2hlq9/VQFuf
+	LcnSDQ+jK17PjjE0hlmmCaJbCG3FnZWDbtp+ShtPPZdDbzbloPY7zO6VXRrc96RRLop97kgm5w9kd
+	0Ow1wkAEyX0zo3vbMAP0AaqA54AFIQIa6NkwRcL0qhB7Dm6Uk2JxiUimX0nnilPc0HJzkO8tpF0FQ
+	b7n7IRPw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48182)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tBEdX-0006P3-0c;
+	Wed, 13 Nov 2024 14:46:27 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tBEdV-00007K-1u;
+	Wed, 13 Nov 2024 14:46:25 +0000
+Date: Wed, 13 Nov 2024 14:46:25 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Testing selectable timestamping - where are the tools for this
+ feature?
+Message-ID: <ZzS7wWx4lREiOgL3@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <DM3PR11MB873696176581059CF682F253EC5A2@DM3PR11MB8736.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Nov 13, 2024 at 02:12:36AM +0000, Tristram.Ha@microchip.com wrote:
-> When the SFP says it supports 1000Base-T sfp_add_phy() is called by the
-> SFP state machine and phylink_sfp_connect_phy() and
-> phylink_sfp_config_phy() are run.  It is in the last function that the
-> validation fails as the just created phy device does not initialize its
-> supported and advertising fields yet.  The phy device has the
-> opportunity later to fill them up if the phylink creation goes through,
-> but that never happens.
-> 
-> A fix is to fill those fields with sfp_support like this:
-> 
-> @@ -3228,6 +3228,11 @@ static int phylink_sfp_config_phy(struct
->     struct phylink_link_state config;
->     int ret;
-> 
-> +    /* The newly created PHY device has empty settings. */
-> +    if (linkmode_empty(phy->supported)) {
-> +        linkmode_copy(phy->supported, pl->sfp_support);
-> +        linkmode_copy(phy->advertising, pl->sfp_support);
-> +    }
->     linkmode_copy(support, phy->supported);
-> 
->     memset(&config, 0, sizeof(config));
-> 
-> The provided PCS driver from the DSA driver has an opportunity to change
-> support with its validation check, but that does not look right as
-> generally those checks remove certain bits from the link mode, but this
-> requires completely copying new ones.  And this still does not work as
-> the advertising field passed to the PCS driver has a const modifier.
+Hi Kory,
 
-I think I know what's happening, it's unfortunate it pushed you towards
-wrong conclusions.
+I've finally found some cycles (and time when I'm next to the platform)
+to test the selectable timestamping feature. However, I'm struggling to
+get it to work.
 
-The "fix" you posted is wrong, and no, the PCS driver should not expand
-the supported mask, just restrict it as you said. The phydev->supported
-mask normally comes from the phy_probe() logic:
+In your email
+https://lore.kernel.org/20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com/
+you state that "You can test it with the ethtool source on branch
+feature_ptp of: https://github.com/kmaincent/ethtool". I cloned this
+repository, checked out the feature_ptp branch, and while building
+I get the following warnings:
 
-	/* Start out supporting everything. Eventually,
-	 * a controller will attach, and may modify one
-	 * or both of these values
-	 */
-	if (phydrv->features) {
-		linkmode_copy(phydev->supported, phydrv->features);
-		genphy_c45_read_eee_abilities(phydev);
-	}
-	else if (phydrv->get_features)
-		err = phydrv->get_features(phydev);
-	else if (phydev->is_c45)
-		err = genphy_c45_pma_read_abilities(phydev);
-	else
-		err = genphy_read_abilities(phydev);
+netlink/desc-ethtool.c:241:37: warning: ‘__ts_desc’ defined but not used [-Wunus
+ed-const-variable=]
+  241 | static const struct pretty_nla_desc __ts_desc[] = {
+      |                                     ^~~~~~~~~
+netlink/ts.c: In function ‘ts_get_reply_cb’:
+netlink/ts.c:23:14: warning: unused variable ‘str’ [-Wunused-variable]
+   23 |         char str[10] = {'\0'};
+      |              ^~~
+ethtool.c:4865:12: warning: ‘do_set_ptp’ defined but not used [-Wunused-functio ]
+ 4865 | static int do_set_ptp(struct cmd_context *ctx)
+      |            ^~~~~~~~~~
+ethtool.c:4839:12: warning: ‘do_get_ptp’ defined but not used [-Wunused-functio ]
+ 4839 | static int do_get_ptp(struct cmd_context *ctx)
+      |            ^~~~~~~~~~
+ethtool.c:4817:12: warning: ‘do_list_ptp’ defined but not used [-Wunused-function]
+ 4817 | static int do_list_ptp(struct cmd_context *ctx)
+      |            ^~~~~~~~~~~
 
-The SFP bus code depends strictly on sfp_sm_probe_phy() -> phy_device_register()
-actually loading a precise device driver for the PHY synchronously via
-phy_bus_match(). There is another lazy loading mechanism later in
-phy_attach_direct(), for the Generic PHY driver:
+My conclusion is... your ethtool sources for testing this feature are
+broken, or this is no longer the place to test this feature.
 
-	/* Assume that if there is no driver, that it doesn't
-	 * exist, and we should use the genphy driver.
-	 */
+Presumably there _is_ something somewhere that allows one to exercise
+this new code that Jakub merged on July 15th (commit 30b356005048)?
+Please could you point me in the appropriate direction ASAP - time is
+very short if I'm going to give this a test on the setup where both
+the MAC and PHY support PTP. Essentially, this afternoon - or its
+going to be at least a month before the next opportunity.
 
-but that is too late for this code path, because as you say,
-phylink_sfp_config_phy() is coded up to only call phylink_attach_phy()
-if phylink_validate() succeeds. But phylink_validate() will only see a
-valid phydev->supported mask with the Generic PHY driver if we let that
-driver attach in phylink_attach_phy() in the first place.
+Thanks.
 
-Personally, I think SFP modules with embedded PHYs strictly require the
-matching driver to be available to the kernel, due to that odd way in
-which the Generic PHY driver is loaded, but I will let the PHY library
-experts share their opinion as well.
-
-You would be better off improving the error message, see what PHY ID you
-get, then find and load the driver for it:
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 7dbcbf0a4ee2..8be473a7d262 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -1817,9 +1817,12 @@ static int sfp_sm_probe_phy(struct sfp *sfp, int addr, bool is_c45)
- 
- 	err = sfp_add_phy(sfp->sfp_bus, phy);
- 	if (err) {
-+		dev_err(sfp->dev,
-+			"sfp_add_phy() for PHY %s (ID 0x%.8lx) failed: %pe, maybe PHY driver not loaded?\n",
-+			phydev_name(phy), (unsigned long)phy->phy_id,
-+			ERR_PTR(err));
- 		phy_device_remove(phy);
- 		phy_device_free(phy);
--		dev_err(sfp->dev, "sfp_add_phy failed: %pe\n", ERR_PTR(err));
- 		return err;
- 	}
- 
-
-Chances are it's one of CONFIG_MARVELL_PHY or CONFIG_AQUANTIA_PHY.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
