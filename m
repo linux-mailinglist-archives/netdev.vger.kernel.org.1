@@ -1,82 +1,223 @@
-Return-Path: <netdev+bounces-144395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 808799C6F34
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:40:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 706109C6FC2
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:53:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 458BB28709E
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:40:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BF5AB27FF7
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC2C1DF97D;
-	Wed, 13 Nov 2024 12:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FA9200B88;
+	Wed, 13 Nov 2024 12:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LAgrYLFa"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FFE17B401;
-	Wed, 13 Nov 2024 12:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B3E1C8FB5
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 12:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731501643; cv=none; b=gBtk0BW1sdyn/VZoWI+g0fm0qUD3vU2ZkfmTkld68O+I2FNZHfVtTpw3CgzB3r0vwf8NoxhPW4GJFgasalW3qtYz1RGr2ChluHa32C4nR0dVpS+8SDqmZJgAPhW/6/xlEtq7kWlzNLMRV7xzAR5HbeD+MxZ9U40/w25NHYsfsaI=
+	t=1731501756; cv=none; b=ZyiekHW4jffpjgT8Bv4G6Es4T19XSPd4YKoFn9UudfQl+l1gVKlpUvUC23uUOYxhMMhNFOoWE8pGlYOZqo/dWK78Kqz2I42/RCIoTZJUl9POAfsJTiIKPHDgEw7YjkBLZjvmyhDI3SIqC4B+fzYu+G9Dew8ihIzZW2mNNeOUTvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731501643; c=relaxed/simple;
-	bh=UhGcyZX4vutfzSFJhUGPvX8YAj3ctV0CaZSmGsKNu44=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=GUZmdA92sUMKIbdArTYodSkknbZTBh3+9bI7Jl7BGb0x1CO7QHIHi0Zyb+GosO7T+0DXyTQYKQyw69Z9ABNBObRUBJ5Gi4x22l21zcnXFGbufzshU+5rAjwdVUYacQ1l6H88BexPlvtXNxy79vBQxeiul4dg5J2eOkWU8LDb9RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XpN9T6Vf8z10R3g;
-	Wed, 13 Nov 2024 20:38:05 +0800 (CST)
-Received: from kwepemj200009.china.huawei.com (unknown [7.202.194.21])
-	by mail.maildlp.com (Postfix) with ESMTPS id 676BE140157;
-	Wed, 13 Nov 2024 20:40:35 +0800 (CST)
-Received: from dggpeml100007.china.huawei.com (7.185.36.28) by
- kwepemj200009.china.huawei.com (7.202.194.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 13 Nov 2024 20:40:34 +0800
-Received: from dggpeml100007.china.huawei.com ([7.185.36.28]) by
- dggpeml100007.china.huawei.com ([7.185.36.28]) with mapi id 15.01.2507.039;
- Wed, 13 Nov 2024 20:40:34 +0800
-From: mengkanglai <mengkanglai2@huawei.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "Fengtao (fengtao, Euler)" <fengtao40@huawei.com>, "Yanan (Euler)"
-	<yanan@huawei.com>
-Subject: kernel tcp sockets stuck in FIN_WAIT1 after call tcp_close
-Thread-Topic: kernel tcp sockets stuck in FIN_WAIT1 after call tcp_close
-Thread-Index: Ads1xkg7IqNH0XX0Qgm09Woz06bvyw==
-Date: Wed, 13 Nov 2024 12:40:34 +0000
-Message-ID: <c08bd5378da647a2a4c16698125d180a@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1731501756; c=relaxed/simple;
+	bh=5Ui9MCE1qEQAOh4WSjvlu7OY8Q34KrD5J6SmFsm5KGM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UyCmk4qPhU7efIjgZDuB91XewwVJUu0N1rCs3jdqF6iEo2LefVw+m/euGDQDtk1GwIHHUB3RKYhu8b+uoiJv32n+xJEY9u5jQwrB3VqYifk8FZb3hrfTeVjXQHtVPoBek0GG58VcgD4nD2qPMCMizifAM11LS59+mu2t1Wux1L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LAgrYLFa; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731501753;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gi/nDuPOQh+kW8YCVePTGgMsqduTQsEMI/h4REBTyU8=;
+	b=LAgrYLFa9w/He11GBOuRyIe9gRLR6HGgEYmiNCnGGck6hdMbjAjkCq3SWfWELAbubFTiB2
+	ZzvzDUL/3EfVfn2kf9k7YhofZNQ3zvW8sKn11cLpqHo3aunoExnrAdOmBI7d/Le6ksEycG
+	RADyIibJ6v4jolntIggwqXxHCWbhn6o=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-100-aizIM55vOte4l8rGqke8lg-1; Wed, 13 Nov 2024 07:42:32 -0500
+X-MC-Unique: aizIM55vOte4l8rGqke8lg-1
+X-Mimecast-MFC-AGG-ID: aizIM55vOte4l8rGqke8lg
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d432f9f5eso3589156f8f.0
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 04:42:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731501751; x=1732106551;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gi/nDuPOQh+kW8YCVePTGgMsqduTQsEMI/h4REBTyU8=;
+        b=GSUqHkDPPeTsHqBQ/8Hz7IVmb2fdhFQ/Gm9uaUvHUWd0TzPA48rEqjozWBcAPuzoFq
+         Er+SvfrCWme/cec9J6/wQEfynrrdpEeRqmUl7jGPyUkLB/kKfC143j5EIfz9TZ9Hy9aE
+         XZiBbrLI5EVFuXOucJhrnN3A3z3vW1K1GD9sGPkzuMp7PtURlDrH3jsp1kDT1snLbe0X
+         Ui6MQ0jLZWOiMhX/VGTVKZ18JiVzgHFF+wiE3Eoc8gkZaP0h/40txrO1ZIy1wn7wdd2F
+         uOqaYh+aWtcnNHjBHVUotux9sG5Mxnqib0KLB7017W0KxiZQ1gQugQhWH0MNYTtQgpy0
+         Nkmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUMWR2jpqoGEGWpeFfClSVy3Xlu0RG8qW/9fYIhcrCvLFHG/XdVW0krorkoUTaiX5d5E4P5fPk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWtGGPLftsHAbsSCwVXkTjPbv+Qi2V2aXEGIkNZwCWDH0Tj3+f
+	q4jiAqz7Sx5WIwxCw3V/0VUorx5WVOqAH4GKHBYAUlzBNeCeFU3twQq5IFbFNf1vme1r9EMSEEG
+	AcqBe893nwABgs0gY5EimwLxnmGi/5H9t6uNhgfiQWm9XPCHuWEB42Q==
+X-Received: by 2002:a5d:5f53:0:b0:381:f595:fd0a with SMTP id ffacd0b85a97d-3820810ffc0mr4675189f8f.16.1731501750666;
+        Wed, 13 Nov 2024 04:42:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEkW+KWr+FGBC4soAeZ9AbHODqoGfzXwj1GlUIlZwp3/7RfEbVzZfIvsQ3hNUEE9XJJckqbgQ==
+X-Received: by 2002:a5d:5f53:0:b0:381:f595:fd0a with SMTP id ffacd0b85a97d-3820810ffc0mr4675138f8f.16.1731501750223;
+        Wed, 13 Nov 2024 04:42:30 -0800 (PST)
+Received: from eisenberg.redhat.com (nat-pool-muc-u.redhat.com. [149.14.88.27])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed99aa18sm18023528f8f.61.2024.11.13.04.42.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 04:42:29 -0800 (PST)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Basavaraj Natikar <basavaraj.natikar@amd.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alex Dubov <oakad@yahoo.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rasesh Mody <rmody@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	Igor Mitsyanko <imitsyanko@quantenna.com>,
+	Sergey Matyukevich <geomatsi@gmail.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Sanjay R Mehta <sanju.mehta@amd.com>,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+	Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Chen Ni <nichen@iscas.ac.cn>,
+	Ricky Wu <ricky_wu@realtek.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Breno Leitao <leitao@debian.org>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Mostafa Saleh <smostafa@google.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yi Liu <yi.l.liu@intel.com>,
+	Kunwu Chan <chentao@kylinos.cn>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org
+Subject: [PATCH v2 00/11] Remove implicit devres from pci_intx()
+Date: Wed, 13 Nov 2024 13:41:48 +0100
+Message-ID: <20241113124158.22863-2-pstanner@redhat.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hello, Eric:
-Commit 151c9c724d05 (tcp: properly terminate timers for kernel sockets) int=
-roduce inet_csk_clear_xmit_timers_sync in tcp_close.
-For kernel sockets it does not hold sk->sk_net_refcnt, if this is kernel tc=
-p socket it will call tcp_send_fin in __tcp_close to send FIN packet to rem=
-otes server,=20
-if this fin packet lost due to network faults, tcp should retransmit this f=
-in packet, but tcp_timer stopped by inet_csk_clear_xmit_timers_sync.
-tcp sockets state will stuck in FIN_WAIT1 and never go away. I think it's n=
-ot right.
+@Driver-Maintainers: Your driver might be touched by patch "Remove
+devres from pci_intx()". You might want to take a look.
 
-Best wishes!
+Changes in v2:
+  - Drop pci_intx() deprecation patch.
+  - ata: Add RB from Sergey and Niklas.
+  - wifi: Add AB by Kalle.
+  - Drop INTx deprecation patch
+  - Drop ALSA / hda_intel patch because pci_intx() was removed from
+    there in the meantime.
+
+Changes since the RFC [1]:
+  - Add a patch deprecating pci{m}_intx(). (Heiner, Andy, Me)
+  - Add Acked-by's already given.
+  - Export pcim_intx() as a GPL function. (Alex)
+  - Drop patch for rts5280, since this driver will be removed quite
+    soon. (Philipp Hortmann, Greg)
+  - Use early-return in pci_intx_unmanaged() and pci_intx(). (Andy)
+
+Hi all,
+
+this series removes a problematic feature from pci_intx(). That function
+sometimes implicitly uses devres for automatic cleanup. We should get
+rid of this implicit behavior.
+
+To do so, a pci_intx() version that is always-managed, and one that is
+never-managed are provided. Then, all pci_intx() users are ported to the
+version they need. Afterwards, pci_intx() can be cleaned up and the
+users of the never-managed version be ported back to pci_intx().
+
+This way we'd get this PCI API consistent again.
+
+Patch "Remove devres from pci_intx()" obviously reverts the previous
+patches that made drivers use pci_intx_unmanaged(). But this way it's
+easier to review and approve. It also makes sure that each checked out
+commit should provide correct behavior, not just the entire series as a
+whole.
+
+Merge plan for this is to enter through the PCI tree.
+
+[1] https://lore.kernel.org/all/20241009083519.10088-1-pstanner@redhat.com/
+
+
+Regards,
+P.
+
+
+Philipp Stanner (11):
+  PCI: Prepare removing devres from pci_intx()
+  drivers/xen: Use never-managed version of pci_intx()
+  net/ethernet: Use never-managed version of pci_intx()
+  net/ntb: Use never-managed version of pci_intx()
+  misc: Use never-managed version of pci_intx()
+  vfio/pci: Use never-managed version of pci_intx()
+  PCI: MSI: Use never-managed version of pci_intx()
+  ata: Use always-managed version of pci_intx()
+  wifi: qtnfmac: use always-managed version of pcim_intx()
+  HID: amd_sfh: Use always-managed version of pcim_intx()
+  Remove devres from pci_intx()
+
+ drivers/ata/ahci.c                            |  2 +-
+ drivers/ata/ata_piix.c                        |  2 +-
+ drivers/ata/pata_rdc.c                        |  2 +-
+ drivers/ata/sata_sil24.c                      |  2 +-
+ drivers/ata/sata_sis.c                        |  2 +-
+ drivers/ata/sata_uli.c                        |  2 +-
+ drivers/ata/sata_vsc.c                        |  2 +-
+ drivers/hid/amd-sfh-hid/amd_sfh_pcie.c        |  4 ++--
+ drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c |  2 +-
+ .../wireless/quantenna/qtnfmac/pcie/pcie.c    |  2 +-
+ drivers/pci/devres.c                          | 24 +++----------------
+ drivers/pci/pci.c                             | 16 +++----------
+ include/linux/pci.h                           |  1 +
+ 13 files changed, 18 insertions(+), 45 deletions(-)
+
+-- 
+2.47.0
+
 
