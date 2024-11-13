@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-144280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F999C6702
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 03:01:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A06939C6706
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 03:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B7CF1F22972
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:01:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56E121F22238
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DBA3B1A1;
-	Wed, 13 Nov 2024 02:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72BE42A91;
+	Wed, 13 Nov 2024 02:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MbKbVY+w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="brBwWDNV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D7933EA;
-	Wed, 13 Nov 2024 02:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8269A22081
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 02:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731463264; cv=none; b=cMenWB0C4zioSDaLbuYK/syCz64maB14sE3nHvn9sGY+dqTpPqBUD54ZqyopaK12LWpwatYaPr1oiDVtc7eWnskjI7HKfHuH42MRI46kYhVmN6vK12PwUhA2mKB7AXRsFwSRNYYv7LVBkXFNmGfEHYilVxkqZLTUYmsPZWAkP50=
+	t=1731463325; cv=none; b=GzdYpUfb3c3RAgh1AbXd4ut3nufHQs5uJYxtqIi/zyy6+W0E62KpxOBCEii8qf+JIGq4jIumfVjKSG9soE/dqLAk1dhmDkNPaFq6nJ52zFrZzScwOy/fUon+sWUHUHs9yWZpR/tgWTwW3KkS8DOhBoZzEW7I3p5Abqqe/Jk7y8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731463264; c=relaxed/simple;
-	bh=fqJGAn6Td1QHXVNGq8+mVt/uTNMZmqpgdGlgIfh6pUk=;
+	s=arc-20240116; t=1731463325; c=relaxed/simple;
+	bh=Ccj/sftJI+jCz7TIn1xy2GhHA1TGP8Ab/BXDPPUhX84=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NLRbcjDSXtU3u1UBtXe4sPjk9RqNLubOk1HWWI8p7w1vbvn092SbMMAO/sgkX/I5FAcFqIIznsx7acOjLW4564IkSWbWWiUEiHtmEqOpOtskcbZ2N+cHBCAcW7aDVxf+byifXaW1Po9D2xO5/ENH8ZhcoPZuOmqc1rj5AL5t3UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MbKbVY+w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FE98C4CECD;
-	Wed, 13 Nov 2024 02:01:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hr3gxQJ9ARH0je8IS5bWsFUn3gr8LOZ7eDqpVKfBdm0WTO2zkcCr/oB50k8eTv1nYz24ZFT5L+yuiokztYE5QdUpt5lf5G457QaSc9TdZr3j0fKMnZ5CBxLXcU+xjMKMNuOZqTH/kfaxlcfsDWZ+u0M4olBbD6gwotP2T1pLznM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=brBwWDNV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAD7C4CECD;
+	Wed, 13 Nov 2024 02:02:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731463263;
-	bh=fqJGAn6Td1QHXVNGq8+mVt/uTNMZmqpgdGlgIfh6pUk=;
+	s=k20201202; t=1731463324;
+	bh=Ccj/sftJI+jCz7TIn1xy2GhHA1TGP8Ab/BXDPPUhX84=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MbKbVY+wY84ETXWojkkoFJhQKRSMXYYEf4v8z/gHiEHI697tJ7IquvcezvpUbNEo7
-	 pTp1wXXK5TM0cKxezF462NnyDe2ltxsit89GPXlugMOP0U9bT4sNpmbMEIHlRbchKz
-	 vBo8kScxztBxx2H+u3KH/qaDu9RKsOYOmWdWmtlzEkyUj5WQjhR7OBX9Eh7q3BxLrY
-	 zZSRo6YDGY2i6tewrwdmLzsuLbjR5LMjgQwuqbzItdQLfn+OLzLQMyUdqCihETLkDp
-	 6UEjy+WVfBRMBX9bv/FBT8DPRb2FaURKZec4ABLfCmwx6ny3wk+vqU0sQN6urDdAF3
-	 T7Bz91vBSG2sw==
-Date: Tue, 12 Nov 2024 18:01:02 -0800
+	b=brBwWDNVS67i0zBVgccKcK+zNMlNTg8YPZtQZJZN5IXytbKXfHv9Jc8hce9bOZ+ZR
+	 fWRh5hJSGJ4PrrxSQVfGZ1GnSGn7LBMmi2PcnW7nwgqCOnLE7xsr9YYaFVFytKYShd
+	 p00hH5w4aL0PDYfBHkBMbzs3eWMijj+ub3uIpJiGejc6Kj16xRq8PWrSsePR0YoPt+
+	 X94rxuyUvVzw9m6XZWjku4SiHo2FSTCkuJ5w0aAxZGxUkcUo/6Qwhm540c8sOnyTtk
+	 lw/F1rNp8tiR+DTaLRcPld4zzNa0xPHsIbZYJMiQ5B/ISA5+e5BYMnVWX8pCixQ5cf
+	 XUltLyeDMvCjw==
+Date: Tue, 12 Nov 2024 18:02:03 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
- mkarsten@uwaterloo.ca, stable@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Mina Almasry
- <almasrymina@google.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net 1/2] netdev-genl: Hold rcu_read_lock in napi_get
-Message-ID: <20241112180102.465dd909@kernel.org>
-In-Reply-To: <ZzQFeivicJPnxzzx@LQ3V64L9R2>
-References: <20241112181401.9689-1-jdamato@fastly.com>
-	<20241112181401.9689-2-jdamato@fastly.com>
-	<20241112172840.0cf9731f@kernel.org>
-	<ZzQFeivicJPnxzzx@LQ3V64L9R2>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: ecree.xilinx@gmail.com, jdamato@fastly.com, davem@davemloft.net,
+ mkubecek@suse.cz, martin.lau@linux.dev, netdev@vger.kernel.org,
+ kernel-team@meta.com
+Subject: Re: [PATCH ethtool-next v3] rxclass: Make output for RSS context
+ action explicit
+Message-ID: <20241112180203.42d34eb7@kernel.org>
+In-Reply-To: <e9de21b76807da310658dbfd46d6177c1c592fe7.1731462244.git.dxu@dxuuu.xyz>
+References: <e9de21b76807da310658dbfd46d6177c1c592fe7.1731462244.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,13 +61,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Nov 2024 17:48:42 -0800 Joe Damato wrote:
-> Sorry for the noob question: should I break it up into two patches
-> with one CCing stable and the other not like I did for this RFC?
-> 
-> Patch 1 definitely "feels" like a fixes + CC stable
-> Patch 2 could be either net-next or a net + "fixes" without stable?
+On Tue, 12 Nov 2024 18:45:43 -0700 Daniel Xu wrote:
+>     # ./ethtool -n eth0 rule 0
+>     Filter: 0
+>             Rule Type: Raw IPv6
+>             Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+>             Dest IP addr: <redacted> mask: ::
+>             Traffic Class: 0x0 mask: 0xff
+>             Protocol: 0 mask: 0xff
+>             L4 bytes: 0x0 mask: 0xffffffff
+>             Action: Direct to RSS context id 1
 
-Oh, sorry, I didn't comment on that because that part is correct.
-The split is great, will make backporting easier.
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
