@@ -1,174 +1,157 @@
-Return-Path: <netdev+bounces-144347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72B09C6C13
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:54:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F259C6C48
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A711B28929F
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 09:54:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E028F1F213EA
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970831F9413;
-	Wed, 13 Nov 2024 09:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BC81FB759;
+	Wed, 13 Nov 2024 10:03:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E301F8190;
-	Wed, 13 Nov 2024 09:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C370F1FB884
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 10:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731491521; cv=none; b=JhGL2Rm4G1bi1zOl7anSOa5zpyggZDWUVQ8HvfzKE6Gvds+p5eNgUSqjLsZj3tYcFbLwmR3fBEfe45pbIlCp5YJzAW1NyJgmEUJzGQkjbTqpPSk+LeKjb0FHvsBnb2pAx44eUX66E8N0tp6+ZoRvxjtUMRmAkZvbz/DZMYRgJVE=
+	t=1731492207; cv=none; b=dSCtjyEx71GrtAQq/SmuxxGm7gjWHu1Qk4NyNgQiEArEZip/WrLKJufj34R0OeRtz4dLAqSAAARzMeTuF29aDbsqDI0cplZ7oWFqSboRmXkqfvxygBH//l65xIpHIJOi0JmLuupjXSPEO/7Xc6V9vukx4G1MQsqOrMixFmG8kSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731491521; c=relaxed/simple;
-	bh=D8GFblYwuD1IbjittRzD0iz8VM57aln/zQ8SunXo8CQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EKS9/mN6BBb8NfxFzlp1dHK+kIO69bsgEIVcKkOX4FPAG5GFXwguyeP7MmW1/qpnoZ2Cjhr+XMeOB6q7jrXf19tTY69hPCHXf4IunzCtR7YsmDpCPwcQgIqTRtf/Nc0StE9/GzFt7ND3Qkv2ckTBwIVnnXtR4Jk7s1tRk/fDIyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AD9Jv2u019485;
-	Wed, 13 Nov 2024 09:51:36 GMT
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 42uwv49u4w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 13 Nov 2024 09:51:35 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Wed, 13 Nov 2024 01:51:34 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Wed, 13 Nov 2024 01:51:30 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <miquel.raynal@bootlin.com>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <dmantipov@yandex.ru>,
-        <edumazet@google.com>, <horms@kernel.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-wpan@vger.kernel.org>, <lizhi.xu@windriver.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <stefan@datenfreihafen.org>,
-        <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V2] mac802154: check local interfaces before deleting sdata list
-Date: Wed, 13 Nov 2024 17:51:29 +0800
-Message-ID: <20241113095129.1457225-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <87plmzsfog.fsf@bootlin.com>
-References: <87plmzsfog.fsf@bootlin.com>
+	s=arc-20240116; t=1731492207; c=relaxed/simple;
+	bh=wsdwC3CS6Hd8xHiLIAPYBss7Mnv9WRYVickFvP64SOU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eCB/P1X26WFoQk1XcW9RMiR/iSgNvqOEF8etE2EJQXW1wDG52PwH+7H+d/Pn6xz+ErJ0Ne5UuJE7fHK0OcvKD3JZaS7eGPBR63mt214XDPEaOcC1vL8x+9ChYGdppauffE5Zx4YsQ5c93b+EYaFRRNH8WS8OVZKdQmAT99duRFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a71bdd158aso423485ab.1
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 02:03:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731492205; x=1732097005;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YGwSr4FzZWJcuo3AWm+R4LEyOz9xOpfNp/jKix3RJZU=;
+        b=G1ugZkcdzH7YST+ax1kVZJ1JwQQltHghe9dCN7SESXSSVtygMLwLpX3YsX4abUF3KB
+         4m8XulwvPnBG9iDhSoEItfgno8xYft8I7M84HYJbscD9Ho9emuWcdS2kQORYRwHmVo7M
+         Zsk0LJZkey/f1mEwFnRuWqnTj3tBIssvik91ilDBy3akwxChs8MdcO3nvvTfOaCY7j6i
+         Fd5vl8yQ6vaw71D2Hic8NpWOv9y6B4qk0NqxzV1UF7X9mTYCGnpx4uZ5/+agY0rsI8uX
+         gsWW02UlPC49lrZj3wMMZqO34oiYf05jFyR5JAyd1CJAn1+qIcG4WEMLdnH11Otx9HSg
+         9IVw==
+X-Forwarded-Encrypted: i=1; AJvYcCV31Ia5bVDSg/X24ySQL3TsMuUYvxwnNt9aftYrAnADg2yM094TZ5dSRDJmFtjRmwEiqYC4yLs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM10dYcz1VgFk5NmLa6MinRfuDh5alp29IPhcLdcIkLEXfujL5
+	rHp51mdvTAsCsWSb/a7kql+e3jQWOIuwQyrRP3jCZVWFQsiVD8yQybk+aW/04d/+EmPNpi77/LL
+	x0GK917jpEC8zouhQBbrn2lCQM+Ig7QpmTfS9FfCge+hsbKurLg1ew9w=
+X-Google-Smtp-Source: AGHT+IHhDLkTrVT18M9FC5IesYfllKbhptcngWt2H3ROIa8ndTrDYfl9yr8GeXAqbjxFAWY69hQMzxSX75OLnXOZqhgTI56Q0LwK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: lFNnjX-toqGJjg-QE3CWoGjK2nXcCq2D
-X-Authority-Analysis: v=2.4 cv=Ke6AshYD c=1 sm=1 tr=0 ts=673476a7 cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=VlfZXiiP6vEA:10 a=hSkVLCK3AAAA:8 a=edf1wS77AAAA:8 a=t7CeM3EgAAAA:8 a=P-IC7800AAAA:8 a=wX8mhN7qUvqu7bC2lWAA:9
- a=cQPPKAXgyycSBL8etih5:22 a=DcSpbTIhAlouE1Uv7lRv:22 a=FdTzh2GWekK77mhwV6Dw:22 a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-ORIG-GUID: lFNnjX-toqGJjg-QE3CWoGjK2nXcCq2D
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-12_09,2024-11-12_02,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- spamscore=0 mlxlogscore=693 priorityscore=1501 lowpriorityscore=0
- suspectscore=0 mlxscore=0 impostorscore=0 clxscore=1015 adultscore=0
- phishscore=0 classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
- engine=8.21.0-2409260000 definitions=main-2411130086
+X-Received: by 2002:a05:6e02:1:b0:3a2:6cd7:3250 with SMTP id
+ e9e14a558f8ab-3a6f19c1b01mr218864055ab.10.1731492204891; Wed, 13 Nov 2024
+ 02:03:24 -0800 (PST)
+Date: Wed, 13 Nov 2024 02:03:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6734796c.050a0220.2a2fcc.0007.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in netlink_ack_tlv_fill
+From: syzbot <syzbot+d4373fa8042c06cefa84@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+Hello,
 
-Remove an IEEE 802.15.4 network interface after unregister an IEEE 802.15.4
-hardware device from the system.
+syzbot found the following issue on:
 
-CPU0					CPU1
-====					====
-genl_family_rcv_msg_doit		ieee802154_unregister_hw
-ieee802154_del_iface			ieee802154_remove_interfaces
-rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
-ieee802154_if_remove
-list_del_rcu
+HEAD commit:    4861333b4217 bonding: add ESP offload features when slaves..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=10f26ea7980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ea5200d154f868aa
+dashboard link: https://syzkaller.appspot.com/bug?extid=d4373fa8042c06cefa84
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17d19e30580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1733c35f980000
 
-The net device has been unregistered, since the rcu grace period,
-unregistration must be run before ieee802154_if_remove.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4263c9834cd5/disk-4861333b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/14c4f9ec4615/vmlinux-4861333b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6cc8fe1b802d/bzImage-4861333b.xz
 
-To avoid this issue, add a check for local->interfaces before deleting
-sdata list.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d4373fa8042c06cefa84@syzkaller.appspotmail.com
 
-[1]
-kernel BUG at lib/list_debug.c:58!
-Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
-Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
-RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
-RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
-RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
-R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
-R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
-FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5845 at net/netlink/af_netlink.c:2210 netlink_ack_tlv_fill+0x1a8/0x560 net/netlink/af_netlink.c:2209
+Modules linked in:
+CPU: 1 UID: 0 PID: 5845 Comm: syz-executor685 Not tainted 6.12.0-rc6-syzkaller-01230-g4861333b4217 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+RIP: 0010:netlink_ack_tlv_fill+0x1a8/0x560 net/netlink/af_netlink.c:2209
+Code: 00 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 0d 48 89 df e8 db b3 2a f8 48 8b 4c 24 10 4c 8b 3b 4d 39 fd 73 2c e8 c9 ed c0 f7 90 <0f> 0b 90 49 bf 00 00 00 00 00 fc ff df e9 9f 00 00 00 e8 b1 ed c0
+RSP: 0018:ffffc90003b47780 EFLAGS: 00010293
+RAX: ffffffff89d3ec97 RBX: ffff88807d437718 RCX: ffff888030185a00
+RDX: 0000000000000000 RSI: 00000000ffffffde RDI: 0000000000000000
+RBP: ffffc90003b47850 R08: ffffffff89d3ec3c R09: 0000000000000074
+R10: 6f702064656c6961 R11: 6620657475626972 R12: 1ffff92000768ef4
+R13: ffff88803169461c R14: ffffc90003b479c0 R15: ffff888031694620
+FS:  0000555569f6a380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+CR2: 000000000066abb0 CR3: 0000000079386000 CR4: 00000000003526f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- __list_del_entry_valid include/linux/list.h:124 [inline]
- __list_del_entry include/linux/list.h:215 [inline]
- list_del_rcu include/linux/rculist.h:157 [inline]
- ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
- rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
- ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:744
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
- ___sys_sendmsg net/socket.c:2661 [inline]
- __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ netlink_dump_done+0x513/0x970 net/netlink/af_netlink.c:2250
+ netlink_dump+0x91f/0xe10 net/netlink/af_netlink.c:2351
+ netlink_recvmsg+0x6bb/0x11d0 net/netlink/af_netlink.c:1983
+ sock_recvmsg_nosec net/socket.c:1051 [inline]
+ sock_recvmsg+0x22f/0x280 net/socket.c:1073
+ __sys_recvfrom+0x246/0x3d0 net/socket.c:2267
+ __do_sys_recvfrom net/socket.c:2285 [inline]
+ __se_sys_recvfrom net/socket.c:2281 [inline]
+ __x64_sys_recvfrom+0xde/0x100 net/socket.c:2281
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff37dd17a79
+Code: ff e8 cb 01 00 00 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d 11 66 07 00 00 41 89 ca 74 1c 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 67 c3 66 0f 1f 44 00 00 55 48 83 ec 20 48 89
+RSP: 002b:00007ffda0631f18 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
+RAX: ffffffffffffffda RBX: 00007ffda0631fa4 RCX: 00007ff37dd17a79
+RDX: 0000000000001000 RSI: 00007ffda0631f90 RDI: 0000000000000003
+RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffda0631f90
+R13: 00007ffda0633178 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-Reported-and-tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
 ---
-V1 -> V2: remove state bit and add a check for local interfaces before
-          deleting sdata list
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- net/mac802154/iface.c | 4 ++++
- 1 file changed, 4 insertions(+)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index c0e2da5072be..9e4631fade90 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -684,6 +684,10 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
- 	ASSERT_RTNL();
- 
- 	mutex_lock(&sdata->local->iflist_mtx);
-+	if (list_empty(&sdata->local->interfaces)) {
-+		mutex_unlock(&sdata->local->iflist_mtx);
-+		return;
-+	}
- 	list_del_rcu(&sdata->list);
- 	mutex_unlock(&sdata->local->iflist_mtx);
- 
--- 
-2.43.0
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
