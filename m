@@ -1,151 +1,270 @@
-Return-Path: <netdev+bounces-144486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F8DF9C7883
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:16:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21AD59C78A1
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 17:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E7E2284B02
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:16:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D476928398A
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5124C201018;
-	Wed, 13 Nov 2024 16:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DF013B298;
+	Wed, 13 Nov 2024 16:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MnoOLjdx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EyiJcNdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8203B1E00A0
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 16:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731514489; cv=none; b=sBKX2HqD+AX478kSNfF4JaFY5IOgFXEo19x/z0Pkvr2TueLaGuCSQs+RtLlmHbof9eTH4bogXugxW8r5v80VrQVnZdEe1No4CyE0CLE7SjIFBP/lQtD8fDawvkQBYhMk65y2XuKeZYJKt6LmOA7wZzFU309sfCEPLSGdAioM088=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731514489; c=relaxed/simple;
-	bh=BmTsOCKyrPG2YfyL5acBzci1M0XdqFpbytOYo331NrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N2WADGb3oXqYWzDq628rBuMWjK/+//KJk2mNjHX6IXkKJhjVLi39ICGqLppVI4i1NCpo3Oe6C356WzxHjguNuh7hTWy7UcCnJhCcu6E0JKErRzOJxe6oLSUEbpLfY2BWysX6v7QE0Suw1Nx88aH58RWQxwg4ip2Fag221FQWe+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MnoOLjdx; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56D9160002;
-	Wed, 13 Nov 2024 16:14:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731514484;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M3WZgkURvDfhuAy+4YumCl8Ei92ZKeFOurXNer0/T8U=;
-	b=MnoOLjdxWbULEiENmACt46MKmJVUNF2l4iQv9hCA2AnyYvo53+QTlPIyrCPjyPYgH87LpM
-	1vDofbOldcstJ8IeZw5rvUnfQlud0DAEkiZK19QerLMARHXnXnk0iXYojWv8/L5dDaJ9FT
-	WVGaiOVD1DlpbtyLrg30ElQOffxWoLltZ9VOZTWpFzYlwCNXEokp8fghsuPnXvfCCXG395
-	cM4cPHRUy3QiTVxRq8PAnQ4oeQZIv2XIQxBCGm8Md9WVoofxqyAP7yQnzAuU/s7QCiErDT
-	k3w339PF5AgA+2WqXBCM3zJcGDKAUF+wdm52QxZixYQw/euPdmtugilF/HrvTA==
-Date: Wed, 13 Nov 2024 17:14:43 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: Testing selectable timestamping - where are the tools for this
- feature?
-Message-ID: <20241113171443.697ac278@kmaincent-XPS-13-7390>
-In-Reply-To: <ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk>
-References: <ZzS7wWx4lREiOgL3@shell.armlinux.org.uk>
-	<20241113161602.2d36080c@kmaincent-XPS-13-7390>
-	<ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132D2137C35
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 16:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731514893; cv=fail; b=O6vgC2ZQsdkCIQs1VNJNNkAEGH8g6cAOyievz2gLkwRpd7fwkT6wD/CONmVXH9ujm8pdqWTQDLF5X1pzUFiZIMsIVG//2xxryoYHUI4d1LpAJjYsclVN233sW0D5JP0FhmHFMR6ZxKU5bbZwFocgOzI4Ti8AOXqDa+N0rrFDzjE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731514893; c=relaxed/simple;
+	bh=1SN++9hYewyYBep+Vk6v4/G2bj1LQ/Hzfx3kfg87IUg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dIswTlLMCJlx7m4LvcVrHj/LnXvCQVGCjj2vglF/l8gF200CMGZPPK8P+Ssd7yqW64OmFKn1fNIWijQW4o5Na9lB8buJF5cDsSftpvUrh4OPhBbWHUBpZpVyvK5Zz4Isx0d0eIClPL8ByTpnZui4GQCgbadJulMYbOcg83IcCKU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EyiJcNdg; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731514893; x=1763050893;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=1SN++9hYewyYBep+Vk6v4/G2bj1LQ/Hzfx3kfg87IUg=;
+  b=EyiJcNdgM3J1WjpbKvdq++jB/W3+M/5+2rnN2xmNYPekZjVXFr+yVjAi
+   NAEsdTkMIvXG7PLqC1X4hDxH5qro4cacFqOjoNTjNFgZTM2KSM4ough1E
+   jRr88pvCkXOQqg/Bk0cuRuvjqIWU3yRHmo7O64FB0X4BblqS2ZxzbaOAC
+   qRCmN17efekGF4s28AMtI4AKxEmFeSg6c7dPWUQWvWi5RoXNhW+p3rUVn
+   qh1SGRsze+l6FyO8gFtKyHLF+mZJ5VxHahDl4WXJSy73BPIg0zdNKX8D+
+   ZMdj3Ngav8fd8kz+AbS5CuH9sbr2z0BQIUzk1/2JqX5yr5C0z0++3z3RB
+   Q==;
+X-CSE-ConnectionGUID: vWHYsR/uSS6lotEZADaweg==
+X-CSE-MsgGUID: rqCuflwkQx+lerVJ9aUdTg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="48868038"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="48868038"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 08:21:32 -0800
+X-CSE-ConnectionGUID: Nl4+F75oS7+JBTOxBcrp+A==
+X-CSE-MsgGUID: DECk5lWMSa2GFlpr73UNyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
+   d="scan'208";a="88308712"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Nov 2024 08:21:31 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 13 Nov 2024 08:21:30 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 13 Nov 2024 08:21:30 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.170)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 13 Nov 2024 08:21:29 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g35tm7LENFcZi784XVMSDCqSVgoVg49x37tPehBKqM6EhHBbZcJFmhch2Qyc3miblfl0wnMWPHSWies+zHQ43hdAECV07zFibRVedqxhfaUy8HucRUb+E3DkPl6AbciH7ZpgCQenc0tSM+8UwdY4McRHYSP5qHrkcmV0iCx5eo4NWern2H1doBrw+hhruqVC42CrWYb2TebfXG9X2TSKZR8f5bCHSx9zkslrmTKMnRTFQI6PTGlJ6U0Pp/376q960v6P8nd2LELzcd8ZLOGlYxy9708o9bek6i5CppDfSp2o0XYEw8Pywrgw8ouu12XyhZcAC1t22Q6EeHSdJVpyJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ueB//XfdU88mLW/g42PE3gW01ukkSrlRzIEDbp92mAE=;
+ b=Zoeknts9vGK2qdYpzwghANi2G7zKUxO9I/fLmb23hkG0ZiZeF+qKOEB5FpzDOxUEk6fbu1tcocOMflv2Q3PUFB/faSXNH0kNZZbGxy6wEn+N9Q+6qHjpow1tyV/R9qxApwjazJeFz6/8ECavTKIdGMjuaJBgZpyz04zk9goSFKuV7fRs4frnW+dWrRvm0y0CG92UM9uC0mBjLjTq8gJpHM12PucksvqS0k247xw98SMzjr6Gn0SUYRGkkWuk0e1WV8ijyoV/Wekpa9AfWLmP2CNcXiBGj7f/ZNaPlVVetvSqFtokSdLm0JSdy/zO1BHF9xRoiNWJYBLzSOVbzVFIOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB6267.namprd11.prod.outlook.com (2603:10b6:208:3e5::8)
+ by CY5PR11MB6389.namprd11.prod.outlook.com (2603:10b6:930:3a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Wed, 13 Nov
+ 2024 16:21:27 +0000
+Received: from IA1PR11MB6267.namprd11.prod.outlook.com
+ ([fe80::30b6:4b51:6cde:faa9]) by IA1PR11MB6267.namprd11.prod.outlook.com
+ ([fe80::30b6:4b51:6cde:faa9%4]) with mapi id 15.20.8158.013; Wed, 13 Nov 2024
+ 16:21:27 +0000
+Message-ID: <5eca295e-1675-4779-b0d6-ec8a7550516f@intel.com>
+Date: Wed, 13 Nov 2024 17:21:20 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-next v7 5/9] ice, irdma: move interrupts
+ code to irdma
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <pmenzel@molgen.mpg.de>, <wojciech.drewek@intel.com>,
+	<marcin.szycik@intel.com>, <netdev@vger.kernel.org>,
+	<konrad.knitter@intel.com>, <pawel.chmielewski@intel.com>,
+	<horms@kernel.org>, <David.Laight@ACULAB.COM>,
+	<nex.sw.ncis.nat.hpm.dev@intel.com>, <pio.raczynski@gmail.com>,
+	<sridhar.samudrala@intel.com>, <jacob.e.keller@intel.com>,
+	<jiri@resnulli.us>, <przemyslaw.kitszel@intel.com>
+References: <20241104121337.129287-1-michal.swiatkowski@linux.intel.com>
+ <20241104121337.129287-6-michal.swiatkowski@linux.intel.com>
+Content-Language: en-US
+From: Lukasz Czapnik <lukasz.czapnik@intel.com>
+In-Reply-To: <20241104121337.129287-6-michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR2P278CA0004.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:50::8) To IA1PR11MB6267.namprd11.prod.outlook.com
+ (2603:10b6:208:3e5::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB6267:EE_|CY5PR11MB6389:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5642e287-23d5-4d3d-9cc2-08dd03ff3905
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SGJZSml5YkUzSm1aRjlJYXFMTTBWUEZySUg4L3pVT28yS1hFd0UwOGFXT01t?=
+ =?utf-8?B?bURqaFFMbUY1U0VGendMUzdoWVkwcmsvS2N2TElEck5WY3JjSGV1bXhBeURM?=
+ =?utf-8?B?bHUydnVxTG5PWVc4OG1UK1VFUGV6TUpoVzJJZXgrZG1OTTVVUXNTTXJMME5C?=
+ =?utf-8?B?WU9RUm00RVJMbXFDN3A5R3Q1YU45RC9Nb0czeXRob25vSlN2WENFM0pTOFo4?=
+ =?utf-8?B?eWNCcVVKMEprYkNseGhYVlFRRXdMUGN1U3FLUElUK3p5dFVQaDFBSHA5QjBC?=
+ =?utf-8?B?R1U1OEFyWnY5S3JWQjJNRU9jSG5lVG5aYkxjcVpUT0xzcHcxTGtkUW5odzll?=
+ =?utf-8?B?Tk04YlV6eENTaWhMUG02Mjk3SFJGL3BlV28vVEdFWEo3MzRSdFBPVlpTME1S?=
+ =?utf-8?B?RUU3anRhcHRWVngzdFFxRDB6dlkxT2V2RklUNUZ5RmU2eTN3TXdkZEdjMEtl?=
+ =?utf-8?B?MmZVUGR4emhDRDBxYmk0VWRnOXRFZUV4dzQvMXJEWFVNMmJoQjN0Z2pwTGxj?=
+ =?utf-8?B?M0VGVCtiZ2dHSlBlTThkZ21zMHdRVnJzenMveCtpWStEMnlvUHI0bG9DSDVp?=
+ =?utf-8?B?dmFtNVlWQllYWTY1TE9FTFIvOHZobUVTUDRGVkdvL1N1TXRBWWFNa2FOVFh1?=
+ =?utf-8?B?a3hHSC8vNDg4Z0VwTXNiYnhURDBQMDZsYzhRVmNMWERwYkZLUDIwRzEvQkp1?=
+ =?utf-8?B?cFpIUTVERktNZ2pPbjJNSjdtL3hnSVNvQjZBMUdMcjdJTXdqdThLY3duVFN4?=
+ =?utf-8?B?aXJQT3JtYnR3b2hvN1ZZMUlPWkw3c3QrYys1RVlROGpZZ1VwSDZROTVNb3BR?=
+ =?utf-8?B?aFRUL0NDR1dWc3lRdkRvb0VIRkpUMVY4OUNpbFBCLzh6WWUrNEhVNFk5Y3BY?=
+ =?utf-8?B?bFpXYmd1NHJrV2hiWjdFNHRvQXovMHc2bWdaQ3lrWWhadEsyRU9sSi8rY20r?=
+ =?utf-8?B?ZjE2aW9PREd1Z1FSOFVIZ0VNVnRsN3hjT1loMkVNR2hXK1FOdHRqcE5sc1E1?=
+ =?utf-8?B?OHdYMm92UVpNQURSbW9RQ3ZkV282d1FlcnZGeER0NW9mU2FTSTRKclhlSDdN?=
+ =?utf-8?B?VkJKNFVYMDN4NEhwOGU0OVdydExFK1dLNlo5RWF5TVVBNWpadkRCUEY4WFhS?=
+ =?utf-8?B?R3pxcjU5d1RCUm03VnJNNnlCUWNpa0wzS1E0a0tMNWgydFdSaFUwZ1pIMEti?=
+ =?utf-8?B?VzNGKzk2b0tJbFNUcmhSU1lLemJYZmdxY2VsYU1WcEcyU1czb3o5N2YwZXNN?=
+ =?utf-8?B?d1F6ak53RExNOXk0alpJTitOR2plZUdxbVVORmtiSWN3SytmdUhTQUZXdzFZ?=
+ =?utf-8?B?ZUVDMGdLQ3RxdFFoZUZlb1NPbDhoaGRCVjltM2wrRUxQZTJscWdIZy9oN3Bo?=
+ =?utf-8?B?M09HajJBc2M3a3p0UndlYWNUdnRNdjVDRTFyVGg5akl5N2M3aHZHVVVsTUJF?=
+ =?utf-8?B?V0lydkloWUpWYmxLNnVXTHZWbkxoUW9BWXNYamwvUTZxMU5QQmh1amE1OGVG?=
+ =?utf-8?B?VVZEajNMRnBWSjY3RWN3Ny9aZi9KR2JxQUNJcldoaFZONW5qdGtsbHRhSGVv?=
+ =?utf-8?B?MlVoam5RK2hHOGxaS1RCR1FOcmZHVnZET1F5UGVzT05reUt4aUVydnhHUW1q?=
+ =?utf-8?B?NkN0aXFqWmRJaEQ5TVl4T0lnckpTUHlaTVFncEdBSDVzalBFL3FPdld0Uk5K?=
+ =?utf-8?B?RWEvd2RRT1lhNG5WcDJ3N3VFRCsyRVFrZmxRcldtQW1YalpaaUhmdUVWWkJH?=
+ =?utf-8?Q?Mow1Au4UYmi8LEoDpQ=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6267.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MTFhU2N3alJxM3o5SkdTMGJjdjZJc29taGdxaVdlMHNGOUtqVTMzNWtPVjdK?=
+ =?utf-8?B?cjhtcFB1QXE1d25VNjdWT0Y1b1VpUFNVL29xbXpScDdSMXRza2c4cW5wRHFT?=
+ =?utf-8?B?TzBsYUdxSU4rMjRIbXBRUWdqVmJvS3BuK1NyWmVRTkN2U1BWbEk4bkI1N09E?=
+ =?utf-8?B?YTcxeWlUSG5BSk1oMWNzTXRiOXM5c3Z0Z2dWQU95Z05iV01vdUdIdDFjdDF0?=
+ =?utf-8?B?YnRjUzFFYjRDVE1nanRNb0hwWWFydjkvMGxRSXZUSm02QjN5aGlLUjJDRWs4?=
+ =?utf-8?B?OVFMNEdJZ3NJY20rTU1CYzFnc3FLTHlTL1NSRlN4T29pcjFYNVVtalMvQ0pB?=
+ =?utf-8?B?ekJWYWV5dml3WkZrY3V1a2l5ZEpObFR6NmFVdjZCVkt2LytidHFraER2b290?=
+ =?utf-8?B?eVdWeWhRVm9sbnk0YlIxSFNQU1NwRVVlbUVmb2FsVjNLK0NxWGtlZEh4L0hN?=
+ =?utf-8?B?RTljRlBQZmlwdzNyZ3hZaVlXRWhoaG5sYWJXd3dHQW9xTDJtLytNalBjUDVu?=
+ =?utf-8?B?VGR3eXpkMFpmc2Y4eGlMRVg1K1RESW5QSVZvOTlFNVdRL1JEZzd5MjhSbnBl?=
+ =?utf-8?B?NzN0UGNwTUFMZHpKNXYxMlAwUkdkSzk2ZWVKWmNqZ2tsNXpTVWJRaDR2YlUx?=
+ =?utf-8?B?YTZTc2JtQUF0VTd6c1ZRbzkzTUdXdFJYNTVtSGo4YVBpQ0t5cGQwYjJKNThX?=
+ =?utf-8?B?bmRyVkoyQXQxeVBqT1NJNUVhMG1OTXN6UUFWZ2VxSDBTU3BPanV1WXhpRERq?=
+ =?utf-8?B?d1dFK1VtNy81aklzLytuREZicEFWRmN4YlhLUHpsK0N0MXd0UUhhRGRvNUND?=
+ =?utf-8?B?ejRsVncvOWwyTlpwazJpUzRrRHRkZU91dHpHSnZxUXNDK216SGpVay9EZWZD?=
+ =?utf-8?B?c3BldU9FMTNNbVdDaWtEdlIxc01nRjkxenlOSlpXTzVUckxVc1VuTG9YOG1a?=
+ =?utf-8?B?TnVwYktMd1poVFZRL2I4eUlWUHdoSG5XYk9aTmszODVHVWtNVlh1RVdzRGt4?=
+ =?utf-8?B?YjhhbzBuczdBR21DREV2bTU1cnhEcENTUm9pcTNWdWJBY3ZxSEdXTzdTSVRs?=
+ =?utf-8?B?cmpwUnl3blpua0xhaks1a1BPdHl5WmllZXBSdGcxVFQxNktnMzkvZ1Q3SGpy?=
+ =?utf-8?B?SXBIaExaV0p2S0RQa0NZNkNiTUJQVFNTc09JUjVHaWwzNlpaSlY2QjI4WXpn?=
+ =?utf-8?B?dERrVm50L1R1VEZRZlhJejZMbVpUTjlOSEdEd0RqczFzeU1mU0NDdEo1VmQ3?=
+ =?utf-8?B?anIzL3RTNk4rcktsOEtZbFExZmwzNU5kcFdLeXVnSWRidHpYRlRyOU95UnZM?=
+ =?utf-8?B?WUVhVVYxVTZGTndHT0ViZVU4d0tMZWh6c3RxR0RCMitndmdGeUh4R2pEY1NJ?=
+ =?utf-8?B?ZEFGN29oMGNDLzI0bnFUMUVEUjh6OEhOaWYwd0puS2JUaUp4V0V0enZuYXRa?=
+ =?utf-8?B?MXdDSWNuMHZRek9sQ2FUTmxLckh6OFM4Mjg5YUVxaU5SMTlrUnRSbDRKSFFF?=
+ =?utf-8?B?N3FmblRWUjBaZkpsQU93U3R0Y1djRUp4MUNNTnZDaGMrTVNlaXIzWTduMFJt?=
+ =?utf-8?B?a3JscldiS0JMMWtHSytpNUtYZlNJZFNWd2ZoR2wvN29PYlVHSUYza3RJdExz?=
+ =?utf-8?B?TnNqcVpta3VOTWRSSDJRTVNFbE83QVE2WXlBemNzWWlUeUFUYnJPdXZpWHpv?=
+ =?utf-8?B?dWFqSlpQTFFaRExKUDJuUFg2eDVKcTQ3a1dSZlE0SldjZEp4WDAxWEt3TTJY?=
+ =?utf-8?B?blRyaG0vcmtDOXJOdHR3bm9FT3RXV1A4REhIeE41YzdPNDc1UVd0R0Y1NFJV?=
+ =?utf-8?B?cjNkRmVnMXBlSkltM1BPSnh2NkdmVUpSdEV1eGltS3dCSGVFTzdJVmVVU3Av?=
+ =?utf-8?B?cGNjMzYxcVBLWk51ZFZ4aGd4NlFkeVNLdnErTURVNU5SZHp0RUhjaDc4WjlB?=
+ =?utf-8?B?eUVkN2lTT1lSeGpjMlVrSjh0Qys0NE1DMkJ1WjVrbW9SaE54WW1TVGdzLytj?=
+ =?utf-8?B?MzhIRTI2dFFES2h6MVdtMTBPQmpUc1pRdWR4bGtraHlKa0cxUW1qTDYyMEJF?=
+ =?utf-8?B?K0UxOUcyQkoyQnpwcWtoOFlmTjMrVTUvSXRObXRFZzJqNTdYc0hPQjF3V2lq?=
+ =?utf-8?B?RlpCcHdnTXNPc2xLbGQyT3VsR2dZR2RoNWNlVElkMUhXdEtTRkNGUXJ2Nzkv?=
+ =?utf-8?B?Unc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5642e287-23d5-4d3d-9cc2-08dd03ff3905
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6267.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 16:21:26.8356
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: h7+ScIpPrze0rrcgsR1JWX4q6yCvnjNrQaNkdbs7+3Vy1wRl0jNEyEFBtzGmrHhyxjAVILv/qA8rebDeun2D98wYtLEUqk0fUqoibgQzF8g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6389
+X-OriginatorOrg: intel.com
 
-On Wed, 13 Nov 2024 15:57:56 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-> On Wed, Nov 13, 2024 at 04:16:02PM +0100, Kory Maincent wrote:
-> > Hello Russell,
-> >=20
-> > On Wed, 13 Nov 2024 14:46:25 +0000
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> >  =20
-> > > Hi Kory,
-> > >=20
-> > > I've finally found some cycles (and time when I'm next to the platfor=
-m)
-> > > to test the selectable timestamping feature. However, I'm struggling =
-to
-> > > get it to work.
-> > >=20
-> > > In your email
-> > > https://lore.kernel.org/20240709-feature_ptp_netnext-v17-0-b5317f50df=
-2a@bootlin.com/
-> > > you state that "You can test it with the ethtool source on branch
-> > > feature_ptp of: https://github.com/kmaincent/ethtool". I cloned this
-> > > repository, checked out the feature_ptp branch, and while building
-> > > I get the following warnings:
-> > >=20
-> > > My conclusion is... your ethtool sources for testing this feature are
-> > > broken, or this is no longer the place to test this feature. =20
-> >=20
-> > Yeah, it was for v3 of the patch series. It didn't follow up to v19, I =
-am
-> > using ynl tool which is the easiest way to test it.
-> > As there were a lot of changes along the way, updating ethtool every ti=
-me
-> > was not a good idea.
-> >=20
-> > Use ynl tool. Commands are described in the last patch of the series:
-> > https://lore.kernel.org/all/20241030-feature_ptp_netnext-v19-10-94f8aad=
-c9d5c@bootlin.com/
-> >=20
-> > You simply need to install python python-yaml and maybe others python
-> > subpackages.
-> > Copy the tool "tools/net/ynl" and the specs "Documentation/netlink/" on=
- the
-> > board.
-> >=20
-> > Then run the ynl commands. =20
->=20
-> Thanks... fairly unweildly but at least it's functional. However,
-> running the first, I immediately find a problem:
->=20
-> # ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --dump
-> tsinfo-get --json '{"header":{"dev-name":"eth0"}}'
->=20
-> One would expect this to only return results for eth0 ?
 
-Indeed it should! That's weird, I will investigate.
+On 11/4/2024 1:13 PM, Michal Swiatkowski wrote:
+> Move responsibility of MSI-X requesting for RDMA feature from ice driver
+> to irdma driver. It is done to allow simple fallback when there is not
+> enough MSI-X available.
+> 
+> Change amount of MSI-X used for control from 4 to 1, as it isn't needed
+> to have more than one MSI-X for this purpose.
+> 
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>   drivers/infiniband/hw/irdma/hw.c         |  2 -
+>   drivers/infiniband/hw/irdma/main.c       | 46 ++++++++++++++++-
+>   drivers/infiniband/hw/irdma/main.h       |  3 ++
+>   drivers/net/ethernet/intel/ice/ice.h     |  1 -
+>   drivers/net/ethernet/intel/ice/ice_idc.c | 64 ++++++------------------
+>   drivers/net/ethernet/intel/ice/ice_irq.c |  3 +-
+>   include/linux/net/intel/iidc.h           |  2 +
+>   7 files changed, 65 insertions(+), 56 deletions(-)
+> 
+> diff --git a/drivers/infiniband/hw/irdma/hw.c b/drivers/infiniband/hw/irdma/hw.c
+> index ad50b77282f8..69ce1862eabe 100644
+> --- a/drivers/infiniband/hw/irdma/hw.c
+> +++ b/drivers/infiniband/hw/irdma/hw.c
+> @@ -498,8 +498,6 @@ static int irdma_save_msix_info(struct irdma_pci_f *rf)
+>   	iw_qvlist->num_vectors = rf->msix_count;
+>   	if (rf->msix_count <= num_online_cpus())
+>   		rf->msix_shared = true;
+> -	else if (rf->msix_count > num_online_cpus() + 1)
+> -		rf->msix_count = num_online_cpus() + 1;
+>   
+>   	pmsix = rf->msix_entries;
+>   	for (i = 0, ceq_idx = 0; i < rf->msix_count; i++, iw_qvinfo++) {
+> diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
+> index 3f13200ff71b..1ee8969595d3 100644
+> --- a/drivers/infiniband/hw/irdma/main.c
+> +++ b/drivers/infiniband/hw/irdma/main.c
+> @@ -206,6 +206,43 @@ static void irdma_lan_unregister_qset(struct irdma_sc_vsi *vsi,
+>   		ibdev_dbg(&iwdev->ibdev, "WS: LAN free_res for rdma qset failed.\n");
+>   }
+>   
+> +static int irdma_init_interrupts(struct irdma_pci_f *rf, struct ice_pf *pf)
+> +{
+> +	int i;
+> +
+> +	rf->msix_count = num_online_cpus() + IRDMA_NUM_AEQ_MSIX;
 
-> Also, I don't see more than one timestamper on any interface - there
-> should be two on eth2, one for the MAC and one for the PHY. I see the
-> timestamper for the mvpp2 MAC, but nothing for the PHY. The PTP clock
-> on the PHY is definitely registered (/dev/ptp0), which means
-> phydev->mii_ts should be pointing to the MII timestamper for the PHY.
->=20
-> I've also tried with --json '{"header":{"dev-name":"eth2"}}' but no
-> difference - it still reports all interfaces and only one timestamper
-> for eth2.
+I think we can default RDMA MSI-X to 64 instead of num_online_cpus(). It
+would play better on platforms with high core count (200+ cores). There
+are very little benefits for having more than 64 queues.
 
-Sorry forgot to explain that you need to register PTP clock with the functi=
-on
-phydev_ptp_clock_register() in the PHY driver.
-
-It will be changed in v20 as request by Jakub. I will save the hwtstamp sou=
-rce
-and phydev pointer in the netdev core instead.
+In those special cases, when more queues are needed, user should be able
+to manually assign more resources to RDMA.
 
 Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Lukasz
+
 
