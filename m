@@ -1,82 +1,74 @@
-Return-Path: <netdev+bounces-144553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CAEA9C7C03
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:13:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E69C9C7BB9
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:56:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF7D5B3868F
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:56:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E725128319F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7580B2076D4;
-	Wed, 13 Nov 2024 18:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72AD1204012;
+	Wed, 13 Nov 2024 18:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nmLzUEDb"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="khB17xxz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF8320721E
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 18:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AB2200C90;
+	Wed, 13 Nov 2024 18:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731524089; cv=none; b=d83daccSgdBkUFXFb56kVx+xQGQ7zByhUIRHyc1uGhQfH8Uxm9ua4F9jk4I4dkNCIhFy3j4dCz55HEByQPIbUQawQzz3A69A07o5I7DDBOJrU6LUSaed9lMgtOU/chTO5oT1dT3PsNG+NC7imtX1KMvcwdvUhBPfeyWHfNiZH5k=
+	t=1731524193; cv=none; b=dzArGpVG0qRRviL+GyWxur9K7ww+N3fDMzig5UHar4a6AnOdpZcopPW+17K/SvXz3uGMzXDFyRUkaB04UejDPjJ+GypYYYf3qynh11s29eqRlpSDkJAFbKny4zjE1cyY6EnJBG1nj0Pv5XyFaCHxm5kRGnTQCeHizwkhbuE6Nco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731524089; c=relaxed/simple;
-	bh=3buNkZptrmm67XFSkWu1cSrwFgYDuF55Nz6t+nWwneA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ja8gFirwm5yjUMd+xHpmRUMMyo1euleGwFshiW6YvY2IziGczyglbY22JNYWneRAWarl+2/bw/aKiDPIlR2i/92P+VGGFxUjm6zs3E4Sg318ovOzPRDwlb4S11i4h0CtcLd72tA7RPakEbmyg9XQPfz2VudyUi1zYwoxAtwEE48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nmLzUEDb; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731524088; x=1763060088;
+	s=arc-20240116; t=1731524193; c=relaxed/simple;
+	bh=un+NX46uMYK+KsNv68izGxWUaJuUbYOpxd89O9S1nmY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V5mjqAjH1nux4lQ/PHwemrMdLool6zBpbp1OYndGnGGho4eui9LMVvNliBDukzMZ3rkRIIrvca8z9wkGmvau8cfDZcHp5KFu5oMliPrte6FR9PmpNwfOlbJzjMNqC5DwBVrWKJbYg2Y+NU7MUb/NFo4VKmU4/05N0cBTsXu5EPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=khB17xxz; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731524191; x=1763060191;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3buNkZptrmm67XFSkWu1cSrwFgYDuF55Nz6t+nWwneA=;
-  b=nmLzUEDbKg5ZWCN/fUyGoQA+9a59FXRcDSs0CwrFIbjMzDI1PlA5IdUM
-   9BzPTpQ89PWNwujugapTb6dr+e0E+YRmvSO4csG7kVC3U27KUCEeYe14+
-   PrS6CI+WhP8GuaTxdDFr+TI6VFjqqObol/2ggM8nA1t+n1sOiIEOi0cIB
-   KWuupBin0rB3OFFA5OvGtdHxzpOORj4Q199iGOVcvOHUQnv0ymVjhnlgc
-   be7FOSKOz9wpq8y32uHbjJc2qR+bDMorHoOf+4pGqZ2uC37XGY0XAx3xh
-   6t6fdcWg8/bj05tof+MOkV6HUjCcmI2LqS2WoB/eDczKleb24A8r2GQKm
-   A==;
-X-CSE-ConnectionGUID: H9HGRZTxT529AeDQIUr5dQ==
-X-CSE-MsgGUID: XjBjwJXIRRy1TYit4JlSAA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31589557"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31589557"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 10:54:43 -0800
-X-CSE-ConnectionGUID: r95FmK5CTnu4fN0aNWFwoA==
-X-CSE-MsgGUID: hObCrGulQRm9RBYg30T0Wg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="87520774"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 13 Nov 2024 10:54:42 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH net-next v2 14/14] e1000: Hold RTNL when e1000_down can be called
-Date: Wed, 13 Nov 2024 10:54:29 -0800
-Message-ID: <20241113185431.1289708-15-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
-In-Reply-To: <20241113185431.1289708-1-anthony.l.nguyen@intel.com>
-References: <20241113185431.1289708-1-anthony.l.nguyen@intel.com>
+  bh=un+NX46uMYK+KsNv68izGxWUaJuUbYOpxd89O9S1nmY=;
+  b=khB17xxzQ7fDDMlmR7i1xmQOSuTKF3vEOWWouIbefFA+jxfvt4b5T1bK
+   GzRTXOM6RIchKidgwRDLIKOsdMc7slDvVqvGVgEaMIA9a5VkmBaoXvqKw
+   gEEdta1YlJH/idV1+os01t+FM0pm1GwKsiYpv65QIAjmIVJdDNA8rxela
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.12,151,1728950400"; 
+   d="scan'208";a="439549764"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 18:56:28 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:30814]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.96:2525] with esmtp (Farcaster)
+ id 73d44386-eebc-4425-9e20-8bc91bca23f2; Wed, 13 Nov 2024 18:56:27 +0000 (UTC)
+X-Farcaster-Flow-ID: 73d44386-eebc-4425-9e20-8bc91bca23f2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 13 Nov 2024 18:56:26 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 13 Nov 2024 18:56:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mengkanglai2@huawei.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<fengtao40@huawei.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <yanan@huawei.com>,
+	<kuniyu@amazon.com>
+Subject: Re: kernel tcp sockets stuck in FIN_WAIT1 after call tcp_close
+Date: Wed, 13 Nov 2024 10:56:19 -0800
+Message-ID: <20241113185619.54064-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <c08bd5378da647a2a4c16698125d180a@huawei.com>
+References: <c08bd5378da647a2a4c16698125d180a@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,92 +76,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Joe Damato <jdamato@fastly.com>
+From: mengkanglai <mengkanglai2@huawei.com>
+Date: Wed, 13 Nov 2024 12:40:34 +0000
+> Hello, Eric:
+> Commit 151c9c724d05 (tcp: properly terminate timers for kernel sockets)
+> introduce inet_csk_clear_xmit_timers_sync in tcp_close.
+> For kernel sockets it does not hold sk->sk_net_refcnt, if this is kernel
+> tcp socket it will call tcp_send_fin in __tcp_close to send FIN packet
+> to remotes server,
 
-e1000_down calls netif_queue_set_napi, which assumes that RTNL is held.
+Just curious which subsystem the kernel socket is created by.
 
-There are a few paths for e1000_down to be called in e1000 where RTNL is
-not currently being held:
-  - e1000_shutdown (pci shutdown)
-  - e1000_suspend (power management)
-  - e1000_reinit_locked (via e1000_reset_task delayed work)
-  - e1000_io_error_detected (via pci error handler)
+Recently, CIFS and sunrpc are (being) converted to hold net refcnt.
 
-Hold RTNL in three places to fix this issue:
-  - e1000_reset_task: igc, igb, and e100e all hold rtnl in this path.
-  - e1000_io_error_detected (pci error handler): e1000e and ixgbe hold
-    rtnl in this path. A patch has been posted for igc to do the same
-    [1].
-  - __e1000_shutdown (which is called from both e1000_shutdown and
-    e1000_suspend): igb, ixgbe, and e1000e all hold rtnl in the same
-    path.
+CIFS: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ef7134c7fc48e1441b398e55a862232868a6f0a7
+sunrpc: https://lore.kernel.org/netdev/20241112135434.803890-1-liujian56@huawei.com/
 
-The other paths which call e1000_down seemingly hold RTNL and are OK:
-  - e1000_close (ndo_stop)
-  - e1000_change_mtu (ndo_change_mtu)
+I remember RDS's listener does not hold refcnt but other client sockets
+(SMC, RDS, MPTCP, CIFS, sunrpc) do.
 
-Based on the above analysis and mailing list discussion [2], I believe
-adding rtnl in the three places mentioned above is correct.
+I think all TCP kernel sockets should hold netns refcnt except for one
+created at pernet_operations.init() hook like RDS.
 
-Fixes: 8f7ff18a5ec7 ("e1000: Link NAPI instances to queues and IRQs")
-Reported-by: Dmitry Antipov <dmantipov@yandex.ru>
-Closes: https://lore.kernel.org/netdev/8cf62307-1965-46a0-a411-ff0080090ff9@yandex.ru/
-Link: https://lore.kernel.org/netdev/20241022215246.307821-3-jdamato@fastly.com/ [1]
-Link: https://lore.kernel.org/netdev/ZxgVRX7Ne-lTjwiJ@LQ3V64L9R2/ [2]
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 4de9b156b2be..3f089c3d47b2 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -3509,7 +3509,9 @@ static void e1000_reset_task(struct work_struct *work)
- 		container_of(work, struct e1000_adapter, reset_task);
- 
- 	e_err(drv, "Reset adapter\n");
-+	rtnl_lock();
- 	e1000_reinit_locked(adapter);
-+	rtnl_unlock();
- }
- 
- /**
-@@ -5074,7 +5076,9 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 			usleep_range(10000, 20000);
- 
- 		WARN_ON(test_bit(__E1000_RESETTING, &adapter->flags));
-+		rtnl_lock();
- 		e1000_down(adapter);
-+		rtnl_unlock();
- 	}
- 
- 	status = er32(STATUS);
-@@ -5235,16 +5239,20 @@ static pci_ers_result_t e1000_io_error_detected(struct pci_dev *pdev,
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct e1000_adapter *adapter = netdev_priv(netdev);
- 
-+	rtnl_lock();
- 	netif_device_detach(netdev);
- 
--	if (state == pci_channel_io_perm_failure)
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
- 		return PCI_ERS_RESULT_DISCONNECT;
-+	}
- 
- 	if (netif_running(netdev))
- 		e1000_down(adapter);
- 
- 	if (!test_and_set_bit(__E1000_DISABLED, &adapter->flags))
- 		pci_disable_device(pdev);
-+	rtnl_unlock();
- 
- 	/* Request a slot reset. */
- 	return PCI_ERS_RESULT_NEED_RESET;
--- 
-2.42.0
-
+> if this fin packet lost due to network faults, tcp should retransmit this
+> fin packet, but tcp_timer stopped by inet_csk_clear_xmit_timers_sync.
+> tcp sockets state will stuck in FIN_WAIT1 and never go away. I think
+> it's not right.
 
