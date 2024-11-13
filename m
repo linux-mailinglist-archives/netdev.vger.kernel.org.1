@@ -1,339 +1,232 @@
-Return-Path: <netdev+bounces-144311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0758C9C689E
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:21:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 313C59C68C1
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:31:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 545A4B258CA
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:21:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75FC1B26219
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6BD185936;
-	Wed, 13 Nov 2024 05:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC87617837A;
+	Wed, 13 Nov 2024 05:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctTgT830"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2TVd91Ph"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EB5172BCE;
-	Wed, 13 Nov 2024 05:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731475211; cv=none; b=LXLZmQ/JgPMIxc+rWBRoGxHWUl2Wsk46MYGWBYVtN/2sfyj53P3Ub3yW3s6JWC4G7gTahO33TYgNdxyBVB709x5Pr++DBlG6o3Y5zbTre1ZamW+rMtQ5Wvcu+gAn+a3u2wfiE9U7g/tUFsaEJeemV9Tyf0VmcjHaeSKBB3BwZr4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731475211; c=relaxed/simple;
-	bh=J2/iHAev3/BxqJfGMx/4cgXci3/pZfjhqPm1dMrTc+o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r2DGIBzyP9wdVSbrCd77eUjDptA9WVuVwi4dMElwh6bABWsEiMM2RlNymt9YX1zmkz9gwt/WfFqSgrEdJv4cl9/mwb1hbq526EakvhaJ2q6afSMb6xBpJ370bWO9ouAqtQLY+KqHb8B7mUfl12moQ+LFVvk0rEvjXYk1ug1F4Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctTgT830; arc=none smtp.client-ip=209.85.160.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-27d0e994ae3so3111266fac.3;
-        Tue, 12 Nov 2024 21:20:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731475209; x=1732080009; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5353xv9nfR949Aq3luMMcKblmb1cgT053z7RFtTwcFU=;
-        b=ctTgT830MgXJ4c9XM5cwKcxDUokiLF7mlz6DkprMK46RDUkRwPTlwcdDtL4RkhPYoE
-         yabZ4B/AIitvqwFjXnOi0ZNuVOGapvamYOu00cG/ZpawezDFi0sU+y7XDYb/CH9sK/jJ
-         CQD09JIWg3+I7uZMadO27i4KEXHES/TuW2Ig9bcFzITbr3Q9Zl1EbZ++AW8aRFSmKv4a
-         OtLB2E4cPR9GWGg+dE4qx7Zi6eDlqnOrrVBVI3UkkDWrlHvEkENCP8DT1sdRNRXlQhL7
-         HZ7/Sun/cpBb0LgkdHoqUWYHBjlAe8JXW11IW3i+0tjziJgbdqsPG8zWlXhNug4SRdDE
-         FvKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731475209; x=1732080009;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5353xv9nfR949Aq3luMMcKblmb1cgT053z7RFtTwcFU=;
-        b=TwPILN23p2+RIkJRJq7DmfG8A9f7danKrZc0Z7HiGW7QJ0GUmGBc5smO63gcsK2dLF
-         bbiRYMQNgaijQpB3OMxY2zsGVWEbeSSF8+ti/fv3S9TwbFkxfqDDhOIL55Yf7uLIhj5v
-         nCcDubgZkp2jQ5rY0C/SMXhhZvc4f3KEBJDgmfW3CQMmNSMagFV66d5OD4mO/1aEvBB5
-         SNIc12q4xwt5dba9wGAZVJZXI2iUmiMdxYLVqNL0HFtGg+kTuE8ajvGDSdnAzY0pM2mQ
-         GVej4NWeyl3dewCCxX7jaOU9IxNx+Ooj8YgFwK+OoL0EaLXGjxixuhzSA90o5ac5LFIr
-         tBcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDl8MtF1OmoCEa73p3OK3m1KKSHPXcU/xryJZpbj66r1RWfw43qU/1c+k69YS/u8JZ/G2636sb@vger.kernel.org, AJvYcCVeOYiOZpkXX0hs5Cu3LauetX2Po2Q4CzwpG9tjoY3oA0D5N5gFF4YNa7HCbayMKxk/Qajpbmty3RiL@vger.kernel.org, AJvYcCX9tC+z/VgQXIMkiopTsuizyJq1zyWeWPD0eHc0OpqlUDZH9S++jjxN8pHP644ewVL1N18CdWK851IhqdZN@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbYx2lVERDGP5sEbDthd7HhfXhteixCyfcBWp+sCf6YPnat4bA
-	Z3wql77O7fT4ayC2xJES7vXr/E1/Ji4+iNqg4gQlPeCuWLKx6+7+
-X-Google-Smtp-Source: AGHT+IFA7M9iVYxjJX9yzGaZF33PqN+3je2YxeBLIbH3+k+DhcZianzX1wGkCN8eQ4smDjyciHl1ng==
-X-Received: by 2002:a05:6870:230a:b0:254:bd24:de83 with SMTP id 586e51a60fabf-29560065134mr17026514fac.12.1731475209174;
-        Tue, 12 Nov 2024 21:20:09 -0800 (PST)
-Received: from yclu-ubuntu.. (60-250-192-107.hinet-ip.hinet.net. [60.250.192.107])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079aaa01sm12644376b3a.100.2024.11.12.21.20.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 21:20:08 -0800 (PST)
-From: Joey Lu <a0987203069@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com
-Cc: alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	ychuang3@nuvoton.com,
-	schung@nuvoton.com,
-	yclu4@nuvoton.com,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	openbmc@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Joey Lu <a0987203069@gmail.com>
-Subject: [PATCH v2 3/3] net: stmmac: dwmac-nuvoton: Add dwmac support for MA35 family
-Date: Wed, 13 Nov 2024 13:18:57 +0800
-Message-Id: <20241113051857.12732-4-a0987203069@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241113051857.12732-1-a0987203069@gmail.com>
-References: <20241113051857.12732-1-a0987203069@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD04176AAD;
+	Wed, 13 Nov 2024 05:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731475858; cv=fail; b=EftqgBehcyAphkCpHfkVS4IwPvYWJD4WdfbpivwsNlAFqAAcQTx+YsJaea7TpM2ZniH6DwuvLhnvOjF98i5hOwr8CePyTcDoPexFLLmXPLvlYX7bdx5U2nUstOD7c6dVFwUAJ5RWeFXj8a5zz6/BYomLZQ49Ibb4xU2yFInTB3g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731475858; c=relaxed/simple;
+	bh=K3U5+Gy6gKB2OTTOjmVy0FvmTHHfVuRSOQUvNiQCjdg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pq5Ah4fEs2LGFeWTNPBTdB8J2PzVw/jRqU6jcXAmvr86fvb/HwV+8OmX/jGDNqh98aA7qrnlAm6iPkDm7DaoQG+wwbRsj778tz+mr2dN1jbEcbY9R2EfN4OeFErqLAjFN9UwBQnN00cpLvZYUtJMwX9P1gD9GH9A0+iFHEw8Z4k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2TVd91Ph; arc=fail smtp.client-ip=40.107.244.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hpNHcjVoVHgGA13i6qriWqDBiWtqq/B8bz8GJfDWXfd8SXUkPA1lYckrgehVQYjcxMc2Lu9tYeMLwJyqbgHHZMokb0M5SmoQm49WrbAAxk03IsEk/osqsINdNZ7rYWaZVDsSCYshZD0EKVk4c0gsozgK2S8z1sUx3O7OQYZF3m3n60IoyWCw0uX9c/TfbH8kNjENYYDajjG0oGauOswTa6c1VoGBSnrSfgwdI/Turb1QcnEg54XG2yhUl0G328RnE+LlcHmbpTj0nTkjRyNsCdZ6+pge9wweTJ88xX+vykgDYsx7/4XSrSQfb1HcTydXQlwErsvvkQJhXaL5keIXVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K3U5+Gy6gKB2OTTOjmVy0FvmTHHfVuRSOQUvNiQCjdg=;
+ b=UtsEhRU42CtXqqxVtuFvV4VYoUCX082l/GbeJJbvYbZUBRdYdeiZHnz+uosV+lWt+60u4StbusjO7juHkGgS0ktbbPT4rAxsk6W7vMFjIEBX/UaXdnJxcdkU+vKQhVWS2qYH+7bDlE//AOPVSUecUrWP2xD0o8SP1m4UfB3YgiCLOP5lsH4BiSAqB4BGUttRNoBu/J/j+W/HyMZ58KmCiVLgPsBhNP29t06xtu0xCa5eHT954yQ1BxA3H4v0XW4mQL2ip1Mi8sIQuBpUFWXeldKBkej534Xqh7UN6wABBvZ6kWB43Be11Zft6vmOqWDji3pwTROIyAkr+1yJ2QVQdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K3U5+Gy6gKB2OTTOjmVy0FvmTHHfVuRSOQUvNiQCjdg=;
+ b=2TVd91PhitLMyFA1ofLqDLTdN60kjA77rYbOlKlavcgqB40z7ftyn2ems+eV0q0GplitVGZA2XB5g1LJz1436iPNac5k8vBHvbUzoVq2LlGojNxoAgxY3ZFMKTz+I2hIn1OKV0+Kup06D097ZQ/K7voqbv9y3KMk+z9pr5fmywvd/7WVmfhvfaUrxEmy2IzU9dIQCb2sTte6KHOsyfRvv49IrlFHpnGPJj0Hcegv7amvND1VF4h2+6DzagT+b68ESaa+R8hWdWFm4nR54p+yB9Q6bBGhOOvYWi43eYWEwYHoU6RYA1lykm8/76cTZJKTKcrf3O0eA21MkpxDzkfg5Q==
+Received: from DS0PR11MB7410.namprd11.prod.outlook.com (2603:10b6:8:151::11)
+ by PH7PR11MB7515.namprd11.prod.outlook.com (2603:10b6:510:278::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28; Wed, 13 Nov
+ 2024 05:30:54 +0000
+Received: from DS0PR11MB7410.namprd11.prod.outlook.com
+ ([fe80::bc90:804:a33d:d710]) by DS0PR11MB7410.namprd11.prod.outlook.com
+ ([fe80::bc90:804:a33d:d710%3]) with mapi id 15.20.8158.013; Wed, 13 Nov 2024
+ 05:30:53 +0000
+From: <Charan.Pedumuru@microchip.com>
+To: <krzk@kernel.org>
+CC: <mkl@pengutronix.de>, <mailhol.vincent@wanadoo.fr>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+	<Nicolas.Ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+	<claudiu.beznea@tuxon.dev>, <linux-can@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] dt-bindings: net: can: atmel: Convert to json schema
+Thread-Topic: [PATCH v2] dt-bindings: net: can: atmel: Convert to json schema
+Thread-Index: AQHbFVIi6ohrjpRmJ0q4L/FYI7DBTLJ0s46AgEA8N4A=
+Date: Wed, 13 Nov 2024 05:30:53 +0000
+Message-ID: <cd3a9342-3863-4a81-9b09-db7b8da1d561@microchip.com>
+References: <20241003-can-v2-1-85701d3296dd@microchip.com>
+ <xykmnsibdts7u73yu7b2vn3w55wx7puqo2nwhsji57th7lemym@f4l3ccxpevo4>
+In-Reply-To: <xykmnsibdts7u73yu7b2vn3w55wx7puqo2nwhsji57th7lemym@f4l3ccxpevo4>
+Accept-Language: en-IN, en-US
+Content-Language: en-IN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7410:EE_|PH7PR11MB7515:EE_
+x-ms-office365-filtering-correlation-id: 8c9d7544-be78-420b-a487-08dd03a457c9
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7410.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?ajJtWTlmb3k4TG55V2laMmJhWVdPTjIvM3dLNWpaM0JRRzNYN25vRjVRQ0hn?=
+ =?utf-8?B?aUhNR1NrcDI2VHMvMDZYOWdNclIyZFQzdnVjS2xVZVlZUWdwVGl1bDR4TlRX?=
+ =?utf-8?B?VUZkMWpyQ1Y5Y3JvZm96TU1LZ2IzVTZYaHlRRlV2OUM0Nkw2d21BQzBjUHgz?=
+ =?utf-8?B?dHRVTGVtam5GbCs4ZGF0Mm9uNjc0dFJqeDNXTU8vL2o1dm9sWFBCMVVVQWQ4?=
+ =?utf-8?B?OGg5WmlXbGZWSFdMQ1JKb1JNOWpDY1dHN3ZzZllXUjFpenU2MWZKd0c4L0FO?=
+ =?utf-8?B?OGZudDdxc3Nva3dub3BUT0wzWVN5R3pUQjl2RzNuTDY3Vm9valNtT29DOE1Q?=
+ =?utf-8?B?eGJ5bW05OHk1czlTZXN1dEhKalhrelFJSjZpcld2WDA4THh5REdKa0VGQmVY?=
+ =?utf-8?B?TlN2QVFjQVp4MzJVOGFmRCtsakpyaWF0NXdMdGw3Zlk4a294QnphbStxOUdx?=
+ =?utf-8?B?d2NzcFBidFVDN2lvUG5iaU9wQ2pJMGFPMFVBaFMzR09GQTVMVWh6aDQ2eVE4?=
+ =?utf-8?B?WGVEa2hodGJ1MDhjVXJVNVdMOGUydG55VmpCMUVxZkY1Wkg1cU5obTByelZQ?=
+ =?utf-8?B?ek50SDVkQm85dDlpNW4wdWhLL09vYWpJQllFNlUwT054b09DRkJML3hoUk9S?=
+ =?utf-8?B?MldxY251YjMxcmVZNXY5MDZEVE1CTmFSSTVpV2VSNnlhbnJvTFhKSTNLK21M?=
+ =?utf-8?B?anJSWVhNSTF0UlYya1FHWDZHVHN5bGloSkRUN3JpeWRpbGVpMDB6VkJ3eWNF?=
+ =?utf-8?B?Nm9aSVRQS0VPaWhsNUVXSVB0cFladjIxaHIwN1Q3WmNTS0hPY0h3bkI4eVdD?=
+ =?utf-8?B?KzAzckpTd1cvNm9vakYzeW03VXlMdy95U2NObC9PRXp4aUtHZFlaYXFydDNr?=
+ =?utf-8?B?UHlCbGFiS1B2cnlFeEVNNlFtQk54RDEvcVpUSlo4MW1lbnd1aWUzb01LOHAz?=
+ =?utf-8?B?VEFZTmpOTVFZTzA0c084NmxTdjhneGpENmEyZFNLRXpUZGJWSW9ueDBqc0w1?=
+ =?utf-8?B?SjFNR0hOYXF2NjJ4cURHdEdmeFJGK1lHL1FPYk1NNXQxUXFQNWxsQjVQd0p3?=
+ =?utf-8?B?bUNSMVhwRWVVbVI5eDVDeHlPTHc0RVAyR0NTR3djc2JBaWlvcnkvY1hBNXUr?=
+ =?utf-8?B?NlNQRjlicy9XeUtOQjk0MnNXcXloZ0VMalh3SFBZQXJnWGN5VjNwTDVGSFRh?=
+ =?utf-8?B?T3lpb2NZWGxtQUFMMU8yWmJvWVdVTEhwZ3djRndXNE1IdXhWcHM0YnFLeVJn?=
+ =?utf-8?B?dE8xTXMrYVJLWUpibVZBSmsvbUtSRU02emxxUDBDeDY1aTlJZUI2TVpFNFhK?=
+ =?utf-8?B?MjZ5c0I2azhhWEd6OU5NVmFHSTFQSzdlYlY2bzAyWUVHcWhWVWUyMlF0aHpx?=
+ =?utf-8?B?MDIzWElMUEd4Y3oxS1VJd29IRCsrdFF0UlpTZkxUR0Q1a1hiTjJzTmI0WFpl?=
+ =?utf-8?B?cnRTMHZybFB3Yk9hMWZOVHJkWHNFYWUyNGJ5aUcyVkM5elEvbEc1alNKK3dM?=
+ =?utf-8?B?NlJrcG1ncXRwM0ZDSUxneVA3aG0rVUZhMGlBNWpKaHdmd3lFYUs4SUZVM0lk?=
+ =?utf-8?B?ekpVVHZBZ1l0aG1ZTDJ5ZEhpUmQ4VUF5UGpnUldxdWtkV3B1MU5tZDJzVzdY?=
+ =?utf-8?B?dmI2bWFkV2NtSXNPZ3pjKzNPekRsWllzaUs4Kzg1NElueUx4WC84anJTTjg5?=
+ =?utf-8?B?cGt5NmtXRThkMExGbllPNWZWcmdFV1BxdzNFODBVL1hyZW9qV1pJWnBISDRu?=
+ =?utf-8?B?WUJweW55OUtPZlRCRWZhYUZWSVBXQVpqZGNDVjFpWUlwN3pTb0J1SjRZbmZ3?=
+ =?utf-8?B?YWdrdHhGN28vRTlQZitHdz09?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?OERqSFVjQnVabll0amhWcTJUT1hWZUpTQ3dXd1BVYjJPOFVVY3FzYkc5UlJk?=
+ =?utf-8?B?SnQ2d1pmN3pMVk9HNkYvbFV6MER2UlRNNisycnJMUWZYNm1SbTNZTDR3ckFp?=
+ =?utf-8?B?b0pKaXArM2UzWXAxeE1EcVI1RmF6OWZmcThaZy9KYkJlSXRFM1gvcSs2R1I2?=
+ =?utf-8?B?MURiUmNEVVcvYk5MY1VxcVBzM0dHd1BIZUZtMnE0UHJPbVpiMFhTVGlHRFAr?=
+ =?utf-8?B?cFFmRUVRTldzbytteHdRVUhsTDViVnFwRXNnQlZKUkdyMDZrTGQxbEhiOW84?=
+ =?utf-8?B?ekVPd3prNjJGU1QwcTlZb2dLakRQSmVmZWxISElBV29BZXZ5eXo3RXhUSHhv?=
+ =?utf-8?B?TVJTN05XVnlDc0p1SUFITVhOSTNScnhPREU2dEJkUmRoc3lSTHR2cndTWlNU?=
+ =?utf-8?B?Qkt4eHVBQzdnQVJwc2w2aytNT1EzWjliOU9PVkFXd09qd2UvMzgzZ3N6UkdG?=
+ =?utf-8?B?VmIyc2k5L29JdHBsQzhuRThMYjVvZHJUVG5FL29WRmo3dWcxK2FJeDZKZSsr?=
+ =?utf-8?B?ZzlOSFBBRmRFODJuN1RGaFNoUzVRSlRRVlRENm93MTlJVndIOEJYVmpvYjhO?=
+ =?utf-8?B?dWlUUWRmYTR2azJETGhWZGo3SUhjbWprcjRjOFdZaThTQVEzdGRhY005TG9I?=
+ =?utf-8?B?WWxoTjBBaWZ6MFNIaTg3a3I4ZHFLOUtvdWFsTm8zekRrVUJmZUVhQm1zUnN6?=
+ =?utf-8?B?V2RZL0QyYjZlOHhGSkdNdUJOSkY2S21UVlNhYW4wU3ZEK1kwZERiOTgwRGFI?=
+ =?utf-8?B?dU5WaXl2TWN0QUh0LzJYbnQ3RzdHaUR4RUFvam96NitFQ0toSmZTaU5mVXJw?=
+ =?utf-8?B?bDRkVk1JMzMxdkFZd3RqeE1ZaGUrdzBTSlZIN3JqeHNkcUxpemdiUk5mMi94?=
+ =?utf-8?B?SXlNWFhiV3ZUeHJxTkhqQkdqS0JBQmdQTjRRaFRxT1ZLb1Z3OEoyL2pra3Rq?=
+ =?utf-8?B?Y2w1UGRBUmxwdHV5ZDRMNzJXMElmK20xZ3MrMmNlQmhmbXR0RDR6aENIejRR?=
+ =?utf-8?B?ZW4yczA0VjN3UnJCRG8wdkYwMjV5U002eVExZWNmbmFWRkZ6SlRBUzg0Q2ov?=
+ =?utf-8?B?UjdRSDgzbSs0UUErdEhoWHF2aWEvN2VPT2xYT29WTmpVckpub3U0dWhvcVlI?=
+ =?utf-8?B?WGN5TTdrODFSeVlFTjAxdFduSUJhclpuNzhkUjJKMFVoUVdKTHhsK24ydlhs?=
+ =?utf-8?B?NmRtVEtwYThDYmYrYlZrMHkzbTU1enJQUjJXcGxPM2c4TTJPb3NXaUhxdVNw?=
+ =?utf-8?B?WFhkdmFBYWZCeGhuTGRRK0tLZXVaVFFJQ2lDc0dYWkQvTzEvQ29uWnZhUHpT?=
+ =?utf-8?B?VlJucFQzUytUZUR1N3BhMXp1NUpjOXpIUGdyMXBmWXpIdk0zeHlwVkZkcld3?=
+ =?utf-8?B?cGdEOUUyOEdNY0F2K0F2NE9wQ1Q5U3JBZzFXOUh3TnBXYjRqWnFhNW5jUzBY?=
+ =?utf-8?B?dzRQTzNtS3o3REVSRnhhL29kaG9LSFBOQ0UrUVNLall4QU9HQ0U2MHM5dFl4?=
+ =?utf-8?B?U2xTWGJFTTFZQ21DalY1bWFJckk1TlpFTUtIRUxkSUcxbVhYVWIrK2RCQkFG?=
+ =?utf-8?B?cjA5VWtETmVsaFZCdzR3cksxT2dmSXBSYUJCSG9GVys5RXgvSS9vOXpaWHVa?=
+ =?utf-8?B?Q2tPaHJRU2tydHhXMUFUamdiZEtIeG5jTVRNK2hBRVR4MlFoOUYwS3k5V29O?=
+ =?utf-8?B?MUNiNTdyZGw4aVNVTHlvWnAxbTBvd1lDM0ZiZldJVmhTSWRKcjNlQmJIQzdq?=
+ =?utf-8?B?S3prY0tPM3R4RWNOU2FWYmpLcG8wVEIvM0R2bGRKUWk0dndlNlBvaFlIeENO?=
+ =?utf-8?B?L3BaVDduakZ3SVlrRFQ1aGhUeUd3U3UwOXdwZzVqNXJPeEUySTNhWnpsVXJZ?=
+ =?utf-8?B?cVQ4YzRGMndISW9nK0x0WG1kaitrSkpUWlFJcDZmMkJkdGJvdEJsL2FwNllY?=
+ =?utf-8?B?RkpMQjBRZzRWb1d6S0xjQVhHUDhtbW52eEdBVlF2eUJOMm0wU0U5Vyt1aVZK?=
+ =?utf-8?B?VTFVTTR4L2kvY3JMSGRhTFBBZ2xSVVNRc2pZWEFsQmgrMk40dm9rNWtuVzF6?=
+ =?utf-8?B?OGdvTE1laEJqYUZkVlBPZzJvTFF0RDQxS2UyNnRzOVRwblpYTHpaUGc0KzdP?=
+ =?utf-8?B?RlJ3UjlQdWhNNzYyL292OWFERnRUaUFreVg5bnBFbUJ5TnFTRTR6aUI4Ymg4?=
+ =?utf-8?B?Mmc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <487D6D95B4604144AD6FD74694916AC6@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7410.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c9d7544-be78-420b-a487-08dd03a457c9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2024 05:30:53.8636
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0PKAjCcN6soPPo7qWm/nGcTxd720I7VZ4KWVBxmYyCOt35mnO+Fvv3+i0fNeHdncZ5W7om9lxk7+R9+cIsHCSOoYW4t5070dp+aEaBi4oXw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7515
 
-Add support for Gigabit Ethernet on Nuvoton MA35 series using dwmac driver.
-
-Signed-off-by: Joey Lu <a0987203069@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 179 ++++++++++++++++++
- 3 files changed, 191 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 05cc07b8f48c..55d94f669be3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -121,6 +121,17 @@ config DWMAC_MESON
- 	  the stmmac device driver. This driver is used for Meson6,
- 	  Meson8, Meson8b and GXBB SoCs.
- 
-+config DWMAC_NUVOTON
-+	tristate "Nuvoton MA35 dwmac support"
-+	default ARCH_MA35
-+	depends on OF && (ARCH_MA35 || COMPILE_TEST)
-+	select MFD_SYSCON
-+	help
-+	  Support for Ethernet controller on Nuvoton MA35 series SoC.
-+
-+	  This selects the Nuvoton MA35 series SoC glue layer support
-+	  for the stmmac device driver.
-+
- config DWMAC_QCOM_ETHQOS
- 	tristate "Qualcomm ETHQOS support"
- 	default ARCH_QCOM
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index c2f0e91f6bf8..c08fcfdd7b31 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_DWMAC_IPQ806X)	+= dwmac-ipq806x.o
- obj-$(CONFIG_DWMAC_LPC18XX)	+= dwmac-lpc18xx.o
- obj-$(CONFIG_DWMAC_MEDIATEK)	+= dwmac-mediatek.o
- obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
-+obj-$(CONFIG_DWMAC_NUVOTON)	+= dwmac-nuvoton.o
- obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
- obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
- obj-$(CONFIG_DWMAC_RZN1)	+= dwmac-rzn1.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-new file mode 100644
-index 000000000000..68c71d2b46f4
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-@@ -0,0 +1,179 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/**
-+ * dwmac-nuvoton.c - Nuvoton MA35 series DWMAC specific glue layer
-+ *
-+ * Copyright (C) 2024 Nuvoton Technology Corp.
-+ *
-+ * Author: Joey Lu <yclu4@nuvoton.com>
-+ */
-+
-+#include <linux/mfd/syscon.h>
-+#include <linux/of_device.h>
-+#include <linux/of_net.h>
-+#include <linux/platform_device.h>
-+#include <linux/regmap.h>
-+#include <linux/stmmac.h>
-+
-+#include "stmmac.h"
-+#include "stmmac_platform.h"
-+
-+#define PATHDLY_DEC         134
-+#define TXDLY_OFST          16
-+#define TXDLY_MSK           GENMASK(19, 16)
-+#define RXDLY_OFST          20
-+#define RXDLY_MSK           GENMASK(23, 20)
-+
-+#define REG_SYS_GMAC0MISCR  0x108
-+#define REG_SYS_GMAC1MISCR  0x10C
-+
-+#define MISCR_RMII          BIT(0)
-+
-+struct nvt_priv_data {
-+	struct platform_device *pdev;
-+	struct regmap *regmap;
-+};
-+
-+static struct nvt_priv_data *
-+nuvoton_gmac_setup(struct platform_device *pdev, struct plat_stmmacenet_data *plat)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct nvt_priv_data *bsp_priv;
-+	phy_interface_t phy_mode;
-+	u32 tx_delay, rx_delay;
-+	u32 macid, arg, reg;
-+
-+	bsp_priv = devm_kzalloc(dev, sizeof(*bsp_priv), GFP_KERNEL);
-+	if (!bsp_priv)
-+		return ERR_PTR(-ENOMEM);
-+
-+	bsp_priv->regmap =
-+		syscon_regmap_lookup_by_phandle_args(dev->of_node, "nuvoton,sys", 1, &macid);
-+	if (IS_ERR(bsp_priv->regmap)) {
-+		dev_err(dev, "Failed to get sys register\n");
-+		return ERR_PTR(-ENODEV);
-+	}
-+	if (macid > 1) {
-+		dev_err(dev, "Invalid sys arguments\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (of_property_read_u32(dev->of_node, "tx-internal-delay-ps", &arg)) {
-+		tx_delay = 0; /* Default value is 0 */
-+	} else {
-+		if (arg > 0 && arg <= 2000) {
-+			tx_delay = (arg == 2000) ? 0xF : (arg / PATHDLY_DEC);
-+			dev_dbg(dev, "Set Tx path delay to 0x%x\n", tx_delay);
-+		} else {
-+			tx_delay = 0;
-+			dev_err(dev, "Invalid Tx path delay argument. Setting to default.\n");
-+		}
-+	}
-+	if (of_property_read_u32(dev->of_node, "rx-internal-delay-ps", &arg)) {
-+		rx_delay = 0; /* Default value is 0 */
-+	} else {
-+		if (arg > 0 && arg <= 2000) {
-+			rx_delay = (arg == 2000) ? 0xF : (arg / PATHDLY_DEC);
-+			dev_dbg(dev, "Set Rx path delay to 0x%x\n", rx_delay);
-+		} else {
-+			rx_delay = 0;
-+			dev_err(dev, "Invalid Rx path delay argument. Setting to default.\n");
-+		}
-+	}
-+
-+	regmap_read(bsp_priv->regmap,
-+		    macid == 0 ? REG_SYS_GMAC0MISCR : REG_SYS_GMAC1MISCR, &reg);
-+	reg &= ~(TXDLY_MSK | RXDLY_MSK);
-+
-+	if (of_get_phy_mode(pdev->dev.of_node, &phy_mode)) {
-+		dev_err(dev, "missing phy mode property\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	switch (phy_mode) {
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		reg &= ~MISCR_RMII;
-+		break;
-+	case PHY_INTERFACE_MODE_RMII:
-+		reg |= MISCR_RMII;
-+		break;
-+	default:
-+		dev_err(dev, "Unsupported phy-mode (%d)\n", phy_mode);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	if (!(reg & MISCR_RMII)) {
-+		reg |= tx_delay << TXDLY_OFST;
-+		reg |= rx_delay << RXDLY_OFST;
-+	}
-+
-+	regmap_write(bsp_priv->regmap,
-+		     macid == 0 ? REG_SYS_GMAC0MISCR : REG_SYS_GMAC1MISCR, reg);
-+
-+	bsp_priv->pdev = pdev;
-+
-+	return bsp_priv;
-+}
-+
-+static int nuvoton_gmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return ret;
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return PTR_ERR(plat_dat);
-+
-+	/* Nuvoton DWMAC configs */
-+	plat_dat->has_gmac = 1;
-+	plat_dat->tx_fifo_size = 2048;
-+	plat_dat->rx_fifo_size = 4096;
-+	plat_dat->multicast_filter_bins = 0;
-+	plat_dat->unicast_filter_entries = 8;
-+	plat_dat->flags &= ~STMMAC_FLAG_USE_PHY_WOL;
-+
-+	plat_dat->bsp_priv = nuvoton_gmac_setup(pdev, plat_dat);
-+	if (IS_ERR(plat_dat->bsp_priv)) {
-+		ret = PTR_ERR(plat_dat->bsp_priv);
-+		return ret;
-+	}
-+
-+	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
-+	if (ret)
-+		return ret;
-+
-+	/* We support WoL by magic packet, override pmt to make it work! */
-+	plat_dat->pmt = 1;
-+	dev_info(&pdev->dev, "Wake-Up On Lan supported\n");
-+	device_set_wakeup_capable(&pdev->dev, 1);
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id nuvoton_dwmac_match[] = {
-+	{ .compatible = "nuvoton,ma35d1-dwmac"},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, nuvoton_dwmac_match);
-+
-+static struct platform_driver nuvoton_dwmac_driver = {
-+	.probe  = nuvoton_gmac_probe,
-+	.remove_new = stmmac_pltfr_remove,
-+	.driver = {
-+		.name           = "nuvoton-dwmac",
-+		.pm		= &stmmac_pltfr_pm_ops,
-+		.of_match_table = nuvoton_dwmac_match,
-+	},
-+};
-+module_platform_driver(nuvoton_dwmac_driver);
-+
-+MODULE_AUTHOR("Joey Lu <yclu4@nuvoton.com>");
-+MODULE_DESCRIPTION("Nuvoton DWMAC specific glue layer");
-+MODULE_LICENSE("GPL v2");
--- 
-2.34.1
-
+T24gMDMvMTAvMjQgMTQ6MDQsIEtyenlzenRvZiBLb3psb3dza2kgd3JvdGU6DQo+IEVYVEVSTkFM
+IEVNQUlMOiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91
+IGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZQ0KPg0KPiBPbiBUaHUsIE9jdCAwMywgMjAyNCBhdCAx
+MDozNzowM0FNICswNTMwLCBDaGFyYW4gUGVkdW11cnUgd3JvdGU6DQo+PiBDb252ZXJ0IGF0bWVs
+LWNhbiBkb2N1bWVudGF0aW9uIHRvIHlhbWwgZm9ybWF0DQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTog
+Q2hhcmFuIFBlZHVtdXJ1IDxjaGFyYW4ucGVkdW11cnVAbWljcm9jaGlwLmNvbT4NCj4+IC0tLQ0K
+Pj4gQ2hhbmdlcyBpbiB2MjoNCj4+IC0gUmVuYW1lZCB0aGUgdGl0bGUgdG8gIk1pY3JvY2hpcCBB
+VDkxIENBTiBjb250cm9sbGVyIg0KPj4gLSBSZW1vdmVkIHRoZSB1bm5lY2Vzc2FyeSBsYWJlbHMg
+YW5kIGFkZCBjbG9jayBwcm9wZXJ0aWVzIHRvIGV4YW1wbGVzDQo+PiAtIFJlbW92ZWQgaWYgY29u
+ZGl0aW9uIHN0YXRlbWVudHMgYW5kIG1hZGUgY2xvY2sgcHJvcGVydGllcyBhcyBkZWZhdWx0IHJl
+cXVpcmVkIHByb3BlcnRpZXMNCj4+IC0gTGluayB0byB2MTogaHR0cHM6Ly9sb3JlLmtlcm5lbC5v
+cmcvci8yMDI0MDkxMi1jYW4tdjEtMS1jNTY1MWIxODA5YmJAbWljcm9jaGlwLmNvbQ0KPj4gLS0t
+DQo+PiAgIC4uLi9iaW5kaW5ncy9uZXQvY2FuL2F0bWVsLGF0OTFzYW05MjYzLWNhbi55YW1sICAg
+IHwgNTggKysrKysrKysrKysrKysrKysrKysrKw0KPj4gICAuLi4vZGV2aWNldHJlZS9iaW5kaW5n
+cy9uZXQvY2FuL2F0bWVsLWNhbi50eHQgICAgICB8IDE1IC0tLS0tLQ0KPj4gICAyIGZpbGVzIGNo
+YW5nZWQsIDU4IGluc2VydGlvbnMoKyksIDE1IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1n
+aXQgYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L2Nhbi9hdG1lbCxhdDkx
+c2FtOTI2My1jYW4ueWFtbCBiL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9uZXQv
+Y2FuL2F0bWVsLGF0OTFzYW05MjYzLWNhbi55YW1sDQo+PiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0K
+Pj4gaW5kZXggMDAwMDAwMDAwMDAwLi5jODE4YzAxYTcxOGINCj4+IC0tLSAvZGV2L251bGwNCj4+
+ICsrKyBiL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9uZXQvY2FuL2F0bWVsLGF0
+OTFzYW05MjYzLWNhbi55YW1sDQo+PiBAQCAtMCwwICsxLDU4IEBADQo+PiArIyBTUERYLUxpY2Vu
+c2UtSWRlbnRpZmllcjogKEdQTC0yLjAtb25seSBPUiBCU0QtMi1DbGF1c2UpDQo+PiArJVlBTUwg
+MS4yDQo+PiArLS0tDQo+PiArJGlkOiBodHRwOi8vZGV2aWNldHJlZS5vcmcvc2NoZW1hcy9uZXQv
+Y2FuL2F0bWVsLGF0OTFzYW05MjYzLWNhbi55YW1sIw0KPj4gKyRzY2hlbWE6IGh0dHA6Ly9kZXZp
+Y2V0cmVlLm9yZy9tZXRhLXNjaGVtYXMvY29yZS55YW1sIw0KPj4gKw0KPj4gK3RpdGxlOiBNaWNy
+b2NoaXAgQVQ5MSBDQU4gQ29udHJvbGxlcg0KPj4gKw0KPj4gK21haW50YWluZXJzOg0KPj4gKyAg
+LSBOaWNvbGFzIEZlcnJlIDxuaWNvbGFzLmZlcnJlQG1pY3JvY2hpcC5jb20+DQo+PiArDQo+PiAr
+YWxsT2Y6DQo+PiArICAtICRyZWY6IGNhbi1jb250cm9sbGVyLnlhbWwjDQo+PiArDQo+PiArcHJv
+cGVydGllczoNCj4+ICsgIGNvbXBhdGlibGU6DQo+PiArICAgIG9uZU9mOg0KPj4gKyAgICAgIC0g
+ZW51bToNCj4+ICsgICAgICAgICAgLSBhdG1lbCxhdDkxc2FtOTI2My1jYW4NCj4+ICsgICAgICAg
+ICAgLSBhdG1lbCxhdDkxc2FtOXg1LWNhbg0KPj4gKyAgICAgIC0gaXRlbXM6DQo+PiArICAgICAg
+ICAgIC0gZW51bToNCj4+ICsgICAgICAgICAgICAgIC0gbWljcm9jaGlwLHNhbTl4NjAtY2FuDQo+
+PiArICAgICAgICAgIC0gY29uc3Q6IGF0bWVsLGF0OTFzYW05eDUtY2FuDQo+IFRoYXQgaXMgbm90
+IHdoYXQgb2xkIGJpbmRpbmcgc2FpZC4NCg0KQXBvbG9naWVzIGZvciB0aGUgbGF0ZSByZXBseSwg
+dGhlIGRyaXZlciBkb2Vzbid0IGhhdmUgY29tcGF0aWJsZSB3aXRoIA0KIm1pY3JvY2hpcCxzYW05
+eDYwLWNhbiIsDQpzbyBJIG1hZGUgImF0bWVsLGF0OTFzYW05eDUtY2FuIiBhcyBmYWxsYmFjayBk
+cml2ZXINCg0KPj4gKw0KPj4gKyAgcmVnOg0KPj4gKyAgICBtYXhJdGVtczogMQ0KPj4gKw0KPj4g
+KyAgaW50ZXJydXB0czoNCj4+ICsgICAgbWF4SXRlbXM6IDENCj4+ICsNCj4+ICsgIGNsb2NrczoN
+Cj4+ICsgICAgbWF4SXRlbXM6IDENCj4+ICsNCj4+ICsgIGNsb2NrLW5hbWVzOg0KPj4gKyAgICBp
+dGVtczoNCj4+ICsgICAgICAtIGNvbnN0OiBjYW5fY2xrDQo+IFRoZXNlIGFyZSBuZXcuLi4NCg0K
+VGhlc2Ugd2VyZSBhbHJlYWR5IGRlZmluZWQgaW4gdGhlIHByZXZpb3VzIHJldmlzaW9uLg0KDQo+
+DQo+PiArDQo+PiArcmVxdWlyZWQ6DQo+PiArICAtIGNvbXBhdGlibGUNCj4+ICsgIC0gcmVnDQo+
+PiArICAtIGludGVycnVwdHMNCj4+ICsgIC0gY2xvY2tzDQo+PiArICAtIGNsb2NrLW5hbWVzDQo+
+IEhlcmUgdGhlIHNhbWUuIEVhY2ggY2hhbmdlIHRvIHRoZSBiaW5kaW5nIHNob3VsZCBiZSBleHBs
+YWluZWQgKGFuc3dlcg0KPiB0byB0aGU6IHdoeSkgaW4gY29tbWl0IG1zZy4NCg0KU3VyZSwgSSB3
+aWxsIGluY2x1ZGUgdGhlIHJlYXNvbiBmb3IgY2hhbmdlcyBpbiBjb21taXQgbWVzc2FnZSBmb3Ig
+dGhlIA0KbmV4dCByZXZpc2lvbi4NCg0KPg0KPj4gKw0KPj4gK3VuZXZhbHVhdGVkUHJvcGVydGll
+czogZmFsc2UNCj4gQmVzdCByZWdhcmRzLA0KPiBLcnp5c3p0b2YNCj4NCg0KDQotLSANCkJlc3Qg
+UmVnYXJkcywNCkNoYXJhbi4NCg0K
 
