@@ -1,162 +1,202 @@
-Return-Path: <netdev+bounces-144585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C259C7D4D
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 22:07:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C479C9C7D5B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 22:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4944E1F23075
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84111285513
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60474206067;
-	Wed, 13 Nov 2024 21:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51E02071FA;
+	Wed, 13 Nov 2024 21:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JinBz2JC"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ps/yNT5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7983E18B481;
-	Wed, 13 Nov 2024 21:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0D61CAAC;
+	Wed, 13 Nov 2024 21:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731532033; cv=none; b=Rc2JdIh2ZfiW3CkZbvBvESHn2R/af39csLqxlhO0m0trlayo9bcxag1rzqUoKf3rXDjLIphAlbL+4Oi2F1ED4EhVklusrjDNY2EUd8evk/dEzGmPGiYbzR50jp7qzk7lIuJV1IRTy8sa6IQG50JGkuDOu3CBFHHrukwjLlNOF6c=
+	t=1731532327; cv=none; b=DvxYmjuUk/P0NZ++nQr7XMRO+h/kGmJgC6LKxCV6aGzYxCAb33jUGDdHRTI2nVrqNwmADG+uBVHrtA3xSDu8/nrZ2q4AEdeXdOP57XM0UL79s1YUHWXPJ/fhNMWVrQm0BRO/b97VpLA8bVi4aQhw3Xx9TNQy1edAN5OmBr7dk8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731532033; c=relaxed/simple;
-	bh=YO5AIO6rtnJ0wLQFmiH37xhlN8XJAq7x16ZhzZJKUE4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qsjOdSFHNpTEyJNS4z0rrsuszHUUYBzz5pxcYJWBC/o8WrrZXF5fV5mq3+0ZQoP1ONIBuX/4SG//Y3tAT4TUxpaTarKbFkWHLdlfVF6O95M6rLVXdnlw0UXGVTcHsJK8J/gi0t4jd2qabpzXkYFwsehcf5Rg/EEEDqTOgT0Dey0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JinBz2JC; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1731532327; c=relaxed/simple;
+	bh=MiOA+h2WEfYvSK6LWO85YbpCELWFRGGFH0WIAFxXeZc=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=LANgu8PShrpqGdhfpy8OIImboBzJFizGJiuHYRdBG1eb4zECVLydfhfNNH8maQ5IEJgIrEZdRkDwTtrcph/ZDqxjXUtl+/FLhC0dPZY87LPG2Vi0rps2V2GOXJKsBW+q5zQJuPB9kHt3ULklullN63Mt8tSh/HiNflgN+Z7yG44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ps/yNT5b; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731532032; x=1763068032;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YO5AIO6rtnJ0wLQFmiH37xhlN8XJAq7x16ZhzZJKUE4=;
-  b=JinBz2JCDv7c3ncdNdq41vATFDAjQKY1Q91jlGiVG84AYxUgeDqwiJ52
-   BQRb1MxfOuNW0KIm96ai0ShcbWZ0Oi1TnvebEY0Ubme58VNWzxQ+JFcCp
-   XFtIU3MiJv49GjwT7QuN8/6lC9z8QKvOFVjFVZkWrXSzAv1GTWH6FnUQ3
-   vlc6BxrZKLqkEWPWQZ1wlPluyg9SEcXjaOQIWHB3lXc/HHSqaHfpP27BV
-   i8kmUivhrNi5o82DJ1zuyeYCFFzDnfTNMQo1OrGZCfaOi+37oy58NSTlt
-   GzSke34HWT1ozD4M2lZ0/jwN7YhsGsgMVAJMiFryE/4rNTu6zjo9IJOL0
-   Q==;
-X-CSE-ConnectionGUID: gL3glywEQBahnbW+Dz613w==
-X-CSE-MsgGUID: frCNWcpoRCyE+MtJJ+lEtg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="31685321"
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1731532326; x=1763068326;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=MiOA+h2WEfYvSK6LWO85YbpCELWFRGGFH0WIAFxXeZc=;
+  b=ps/yNT5bfYo9qlc1lHrS0D68/0gIS3pM+Doo+HGKh/LEIctOhdY1AtYM
+   ZLLHx4FzF9LSUMzEiIpIlF/bY0tHNbKkAR/UdAJVioayq3utu9bHJBS65
+   5HBraTNyYFADXhW7Sx1lq2fGudi9p9alB5PxIHICwXcH1ghp4iYFImosk
+   hUabUiTpH8bccdKMiDe/rcQwQ9PDdwcE05SFaZTa7r8BTYiB0zxSoCtja
+   GtY0hGppNrl/+zH4jJUHQwn4Q7y8NS8eIG3NvkS7VawHYGhQkjerxWpTn
+   J1JZ9yEHVMfIGRUosJRxk7Gd9NNltGn8R2y4GOVihv+yshrE4Q4OeBBjX
+   g==;
+X-CSE-ConnectionGUID: KA3skogJTWSLY1V4ky2YAQ==
+X-CSE-MsgGUID: iVpW/84nSha1vD/zEH2PYA==
 X-IronPort-AV: E=Sophos;i="6.12,152,1728975600"; 
-   d="scan'208";a="31685321"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 13:07:10 -0800
-X-CSE-ConnectionGUID: KcHDyYDzQ4qPASVZP4sLXg==
-X-CSE-MsgGUID: p30YHL+OT1KsqpjJICX7Sg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,152,1728975600"; 
-   d="scan'208";a="125500147"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa001.jf.intel.com with ESMTP; 13 Nov 2024 13:07:09 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Peter=20Gro=C3=9Fe?= <pegro@friiks.de>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	ivecera@redhat.com,
-	stable@vger.kernel.org,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net] i40e: Fix handling changed priv flags
-Date: Wed, 13 Nov 2024 13:07:04 -0800
-Message-ID: <20241113210705.1296408-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
+   d="scan'208";a="265427892"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Nov 2024 14:12:04 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 13 Nov 2024 14:11:34 -0700
+Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 13 Nov 2024 14:11:31 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next v2 0/8] net: lan969x: add RGMII support
+Date: Wed, 13 Nov 2024 22:11:08 +0100
+Message-ID: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOwVNWcC/4WOzQqDMBCEX0X23C1G419PfY/iIca1WahRNmIt4
+ rtXpfceh+Gbb1YIJEwBbtEKQjMHHvwekksE1hn/JOR2z5DEiVYq1hhGI0uGL+OrvFowvHmyDlv
+ hmQQ1tlnVFGUS6zIzsI+MQh0vp+ABnib0tExQ701jAmEjxlt3CHrD/gAch2mQz3loVif2c+f/3
+ LPCGLuiK1KV6zRv2nvPVgbreLzaoYd627YvYI63bfEAAAA=
+To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
+ Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
+	<jacob.e.keller@intel.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>
+CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+X-Mailer: b4 0.14-dev
 
-From: Peter Große <pegro@friiks.de>
+== Description:
 
-After assembling the new private flags on a PF, the operation to determine
-the changed flags uses the wrong bitmaps. Instead of xor-ing orig_flags
-with new_flags, it uses the still unchanged pf->flags, thus changed_flags
-is always 0.
+This series is the fourth of a multi-part series, that prepares and adds
+support for the new lan969x switch driver.
 
-Fix it by using the correct bitmaps.
+The upstreaming efforts is split into multiple series (might change a
+bit as we go along):
 
-The issue was discovered while debugging why disabling source pruning
-stopped working with release 6.7. Although the new flags will be copied to
-pf->flags later on in that function, disabling source pruning requires
-a reset of the PF, which was skipped due to this bug.
+        1) Prepare the Sparx5 driver for lan969x (merged)
 
-Disabling source pruning:
-$ sudo ethtool --set-priv-flags eno1 disable-source-pruning on
-$ sudo ethtool --show-priv-flags eno1
-Private flags for eno1:
-MFP                   : off
-total-port-shutdown   : off
-LinkPolling           : off
-flow-director-atr     : on
-veb-stats             : off
-hw-atr-eviction       : off
-link-down-on-close    : off
-legacy-rx             : off
-disable-source-pruning: on
-disable-fw-lldp       : off
-rs-fec                : off
-base-r-fec            : off
-vf-vlan-pruning       : off
+        2) Add support for lan969x (same basic features as Sparx5
+           provides excl. FDMA and VCAP, merged).
 
-Regarding reproducing:
+        3) Add lan969x VCAP functionality (merged).
 
-I observed the issue with a rather complicated lab setup, where
- * two VLAN interfaces are created on eno1
- * each with a different MAC address assigned
- * each moved into a separate namespace
- * both VLANs are bridged externally, so they form a single layer 2 network
+    --> 4) Add RGMII support.
 
-The external bridge is done via a channel emulator adding packet loss and
-delay and the application in the namespaces tries to send/receive traffic
-and measure the performance. Sender and receiver are separated by
-namespaces, yet the network card "sees its own traffic" send back to it.
-To make that work, source pruning has to be disabled.
+        5) Add FDMA support.
 
-Cc: stable@vger.kernel.org
-Fixes: 70756d0a4727 ("i40e: Use DECLARE_BITMAP for flags and hw_features fields in i40e_pf")
-Signed-off-by: Peter Große <pegro@friiks.de>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+== RGMII support:
+
+The lan969x switch device includes two RGMII interfaces (port 28 and 29)
+supporting data speeds of 1 Gbps, 100 Mbps and 10 Mbps.
+
+Details are in the commit description of the patches.
+
+== Patch breakdown:
+
+Patch #1 does some preparation work.
+
+Patch #2 adds new function: is_port_rgmii() to the match data ops.
+
+Patch #3 uses the is_port_rgmii() in a number of places.
+
+Patch #4 uses the phy_interface_mode_is_rgmii() in a number of places.
+
+Patch #5 adds checks for RGMII PHY modes in sparx5_verify_speeds().
+
+Patch #6 adds registers required to configure RGMII.
+
+Patch #7 adds RGMII implementation.
+
+Patch #8 document RGMII delays.
+
+To: UNGLinuxDriver@microchip.com
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Lars Povlsen <lars.povlsen@microchip.com>
+To: Steen Hegelund <Steen.Hegelund@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Russell King <linux@armlinux.org.uk>
+To: jacob.e.keller@intel.com
+To: robh@kernel.org
+To: krzk+dt@kernel.org
+To: conor+dt@kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
-iwl: https://lore.kernel.org/intel-wired-lan/20241030160643.9950-1-pegro@friiks.de/
+Changes in v2:
 
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Most changes are in patch #7. RGMII implementation has been moved to
+  it's own file lan969x_rgmii.c.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index f2506511bbff..bce5b76f1e7a 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -5299,7 +5299,7 @@ static int i40e_set_priv_flags(struct net_device *dev, u32 flags)
- 	}
- 
- flags_complete:
--	bitmap_xor(changed_flags, pf->flags, orig_flags, I40E_PF_FLAGS_NBITS);
-+	bitmap_xor(changed_flags, new_flags, orig_flags, I40E_PF_FLAGS_NBITS);
- 
- 	if (test_bit(I40E_FLAG_FW_LLDP_DIS, changed_flags))
- 		reset_needed = I40E_PF_RESET_AND_REBUILD_FLAG;
+  Details:
+
+    - Use ETH_P_8021Q and ETH_P_8021AD instead of the Sparx5 provided
+      equivalents (patch #7).
+    - Configure MAC delays through "{rx,tx}-internal-delay-ps"
+      properties (patch #7).
+    - Add selectors for all the phase shifts that the hardware supports
+      (instead of only 2.0 ns, patch #7).
+    - Add selectors for all the port speeds (instead of only 1000 mbps.)
+    - Document RGMII delays in dt-bindings.
+
+  - Link to v1: https://lore.kernel.org/r/20241106-sparx5-lan969x-switch-driver-4-v1-0-f7f7316436bd@microchip.com
+
+---
+Daniel Machon (8):
+      net: sparx5: do some preparation work
+      net: sparx5: add function for RGMII port check
+      net: sparx5: use is_port_rgmii() throughout
+      net: sparx5: use phy_interface_mode_is_rgmii()
+      net: sparx5: verify RGMII speeds
+      net: lan969x: add RGMII registers
+      net: lan969x: add RGMII implementation
+      dt-bindings: net: sparx5: document RGMII MAC delays
+
+ .../bindings/net/microchip,sparx5-switch.yaml      |  20 ++
+ drivers/net/ethernet/microchip/lan969x/Makefile    |   2 +-
+ drivers/net/ethernet/microchip/lan969x/lan969x.c   |   5 +
+ drivers/net/ethernet/microchip/lan969x/lan969x.h   |  10 +
+ .../net/ethernet/microchip/lan969x/lan969x_rgmii.c | 237 +++++++++++++++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_main.c    |  29 ++-
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    |   3 +
+ .../ethernet/microchip/sparx5/sparx5_main_regs.h   | 145 +++++++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_phylink.c |   3 +
+ .../net/ethernet/microchip/sparx5/sparx5_port.c    |  57 +++--
+ .../net/ethernet/microchip/sparx5/sparx5_port.h    |   5 +
+ 11 files changed, 488 insertions(+), 28 deletions(-)
+---
+base-commit: 12079a59ce52e72a342c49cfacf0281213fd6f32
+change-id: 20241104-sparx5-lan969x-switch-driver-4-d59b7820485a
+
+Best regards,
 -- 
-2.42.0
+Daniel Machon <daniel.machon@microchip.com>
 
 
