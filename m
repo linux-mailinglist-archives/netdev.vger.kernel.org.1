@@ -1,150 +1,100 @@
-Return-Path: <netdev+bounces-144268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D2969C66C2
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:36:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789019C66D0
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:39:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17C161F21500
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:36:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2574CB2BE64
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3AE224F0;
-	Wed, 13 Nov 2024 01:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145792E40B;
+	Wed, 13 Nov 2024 01:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I29yc5bJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NRrJMxqz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65252BA34;
-	Wed, 13 Nov 2024 01:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4897C147
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 01:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731461808; cv=none; b=BXLfoBxhPy4wySaH+K2QNyDxM88qClSIyNTpqDRPZNx1G8xv7kU5hIKqqSbKb+c1xK3P7FI1+gup7K6jF5DvykQF1PLQKeJzK3dLWNeF2dJnBGrKwYu/B36ul7fAIF5LSFaHBFceajDC79pk7FMvGPJOkdPzvbjTLh8iXe63QSA=
+	t=1731461925; cv=none; b=QEpb1XfSIibpBVCzc7d8fFpIJc188eujFrgMbaI02vR75wJT4POhYSQifF/UQvHsynNmQw/p/zwaGTtj4+8HWMkEQAMRPvR3zWuIGUn8CYVbnbFvU9qJoVwSXSCV/6tGLkdknZPnPqAiF0IVbFXp7rIzaQmyXRNwRanSa/0kPyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731461808; c=relaxed/simple;
-	bh=jQ7vjQitYIwVRV5qo3X4jTdA0nSn7aCAbVKckDNIqhA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FRbk0pq0fIkop0VeRQuDoCmNgOesPSiE0GyJcEIOH6tJ/OVxo1PkR8vWvYJP9QQpAAkTw2Kj7JSyHaz1u8ctK6ZrTju/BjJRZb9t507z7miR6hlJRfWpIHwaphW8szGa1qx0JVO/vox7msL86JnwVljPZafd4a3FnQqc7DeXHQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I29yc5bJ; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4314fa33a35so51729195e9.1;
-        Tue, 12 Nov 2024 17:36:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731461805; x=1732066605; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r0He/ui9X3lLXTLqSVc28T6+iNWPPBcnJC+uzdT9cME=;
-        b=I29yc5bJJM9MQ+1VgrAuqnHJvnEa9UMZjSrXJjg8GhZubMXSiV+3NVjvOLGqtV9er+
-         LnJYfTFrJuUe9pgrJMJA+GvklvSu9OkRiIo4755NkXMnpSWY71TENhlmWhSdqTTGEO9R
-         gRNPHIdO6p1UavNGdhKGmFVIwJ+KA568/ZEOWYO9+PHE7zAKeh8jxrtCfrHuQnNRI81s
-         cZG2Div3VNKnsQFtO9ohe4eaErBgr2Dz21hQ6Xf643GOMyratDDTFRw2tAq9VVCsBnb4
-         aAXtbmxFY9wRs36M6JnU8J04EJUreOf5ewvKL6BX7zx5LRMcv9AjuGpawTEl/Oy66T75
-         R16g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731461805; x=1732066605;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0He/ui9X3lLXTLqSVc28T6+iNWPPBcnJC+uzdT9cME=;
-        b=mQ7wuU3EPxR781yc9ZV50L1y3WBtyKk19xYIICXp6KTaBt6mObVu9MTGNNDFdUBxd+
-         2LKhLGmrzdSpHPAsB/I1uTddZUgla5VqHPl2wUhssPILVhv2zf04ye28JQ4baTH50WEX
-         eowH+a13BM8MU6wOS/L66WRqb827UBsJ6Ikv5IRmgRVWOTZutEgG9w/ISnK+B1qAz8Gs
-         eQxecqNLuKpwp/A4Pj0kzakVJ8pN9k1cfV4M1HuwTFb+wtkq6R6XBzrmbxl6yZ3nHcYM
-         wOI26Xd4pSdw4Drw8BDsvanLpDiErc0W3pUW2UgldBqPu4DpJPksUIJ8DzSvcqIwSyGx
-         UrLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVAfExDBXd65c3YWzeN34a3oKhYJgMg/cLtZL0PSyI01fvNBgstFtSvgNjZOjadsFHj0f5aXFzFAesDxa4oOwZB@vger.kernel.org, AJvYcCWyDMTHWEQwYvzGHncQRk2gumQc3e6UMCWK3jzMUi7BCGwoR+LGXbrt2t2EfpnOPfhCwJgpQbIMCIX9Uko=@vger.kernel.org, AJvYcCX/BkABEXd4bcuxK6wvIQSTcP3whxfNkvw+ubbieHGKjr64xtBvxknb51lQ+w625oLZ9I3RYYeC@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoMcfxvWqTu99rT2VhCFvAVoLaQiQL+N6RvEX0dULy+MqWbp/h
-	szItvpYNZubIkmXZ6kglawraJgvVEnBnP3VdMIofaw59xBiB6Bf0
-X-Google-Smtp-Source: AGHT+IFJ3TyFzXqhDuVU7DJUr9rylVz4qYboLBexKwMmYF8kWN714xioYIohZpiK5XEDRhdObS7OuQ==
-X-Received: by 2002:a5d:47c7:0:b0:37c:d54b:a39a with SMTP id ffacd0b85a97d-3820812de92mr3323488f8f.33.1731461804463;
-        Tue, 12 Nov 2024 17:36:44 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed970729sm16681031f8f.15.2024.11.12.17.36.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2024 17:36:43 -0800 (PST)
-Message-ID: <e543a3de-44f1-4a2d-90ef-1786e222f0d8@gmail.com>
-Date: Wed, 13 Nov 2024 03:37:13 +0200
+	s=arc-20240116; t=1731461925; c=relaxed/simple;
+	bh=blf8kgpYDmhdgW/Flh9pWbEP6SrsFKFvVuIQBvpyYHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bR4ZBvkl1eFmyUWz2Jh6slMwHigLsfLnQEEIaQNLW3tA6bmqYxdSOnbJd6GivKbQTfOwAL6ifSpsndlqe28D+BdUQtp/AHsdfOA9rhhtn6wlI54rwS3cz7mKrafZyHiLXaULGO9fNACUfeIWSSButIXl9rLcD7ONlulNua2ipQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NRrJMxqz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FEBC4CECD;
+	Wed, 13 Nov 2024 01:38:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731461924;
+	bh=blf8kgpYDmhdgW/Flh9pWbEP6SrsFKFvVuIQBvpyYHs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NRrJMxqzzws7KocKEj7PRaohis6WiwlT/MJbpcuTOlrg9Um6+//YAOm1AsDIPI/ld
+	 K3OdF0EVc3miI0VI24khgiK/kZlCJI1B6k/2EtLpnH3QeBl9zdBCvQ/qEgw/okTdzG
+	 J7kIDwFC5MMZihktAlgWqszd4W9kYVDbeOJRvloH6epXFfMD4qhsSoobXUaKuDgtvr
+	 m9K2i0f21nh7Q8pCTQrNsnQFLaHeMmLjNoTaNsQc4fGZDUOUDLSWdYvQsKXcpa7NVs
+	 /H7aSlYyTgOzta2cD4y5P+74sIqQH+t6sp2V93gFd3KXBuk88us+PSdgbJV9Tcxc7j
+	 XTQ4zNQrD9Stg==
+Date: Tue, 12 Nov 2024 17:38:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Xiao Liang <shaw.leon@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 2/2] tools/net/ynl: add async notification
+ handling
+Message-ID: <20241112173843.2831e918@kernel.org>
+In-Reply-To: <20241112111727.91575-3-donald.hunter@gmail.com>
+References: <20241112111727.91575-1-donald.hunter@gmail.com>
+	<20241112111727.91575-3-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
-To: Sabrina Dubroca <sd@queasysnail.net>,
- Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
- <b7d3ec11-afe4-409c-970e-8bc647364a08@gmail.com> <ZzORATd5hG614dta@hog>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <ZzORATd5hG614dta@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 12.11.2024 19:31, Sabrina Dubroca wrote:
-> 2024-11-10, 15:38:27 +0200, Sergey Ryazanov wrote:
->> On 29.10.2024 12:47, Antonio Quartulli wrote:
->>> An ovpn_peer object holds the whole status of a remote peer
->>> (regardless whether it is a server or a client).
->>>
->>> This includes status for crypto, tx/rx buffers, napi, etc.
->>>
->>> Only support for one peer is introduced (P2P mode).
->>> Multi peer support is introduced with a later patch.
->>
->> Reviewing the peer creation/destroying code I came to a generic question.
->> Did you consider keeping a single P2P peer in the peers table as well?
->>
->> Looks like such approach can greatly simply the code by dropping all these
->> 'switch (ovpn->mode)' checks and implementing a unified peer management. The
->> 'peer' field in the main private data structure can be kept to accelerate
->> lookups, still using peers table for management tasks like removing all the
->> peers on the interface teardown.
-> 
-> It would save a few 'switch(mode)', but force every client to allocate
-> the hashtable for no reason at all. That tradeoff doesn't look very
-> beneficial to me, the P2P-specific code is really simple. And if you
-> keep ovpn->peer to make lookups faster, you're not removing that many
-> 'switch(mode)'.
+some comments for your consideration, if you prefer to keep as is:
 
-Looking at the done review, I can retrospectively conclude that I 
-personally do not like short 'switch' statements and special handlers :)
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
-Seriously, this module has a highest density of switches per KLOC from 
-what I have seen before and a major part of it dedicated to handle the 
-special case of P2P connection. What together look too unusual, so it 
-feels like a flaw in the design. I racked my brains to come up with a 
-better solution and failed. So I took a different approach, inviting 
-people to discuss item pieces of the code to find a solution 
-collectively or to realize that there is no better solution for now.
+On Tue, 12 Nov 2024 11:17:27 +0000 Donald Hunter wrote:
+> +    def poll_ntf(self, duration=None):
+> +        endtime = time.time() + duration if duration is not None else None
 
-The problem is that all these hash tables become inefficient with the 
-single entry (P2P case). I was thinking about allocating a table with a 
-single bin, but it still requires hash function run to access the 
-indexed entry.
+we can record starttime here, and avoid the complex logic..
 
+> +        selector = selectors.DefaultSelector()
+> +        selector.register(self.sock, selectors.EVENT_READ)
+> +
+> +        while True:
+> +            try:
+> +                yield self.async_msg_queue.get_nowait()
+> +            except queue.Empty:
+> +                if endtime is not None:
+> +                    interval = endtime - time.time()
 
-And back to the hashtable(s) size for the MP mode. 8k-bins table looks a 
-good choice for a normal server with 1-2Gb uplink serving up to 1k 
-connections. But it sill unclear, how this choice can affect 
-installations with a bigger number of connections? Or is this module 
-applicable for embedded solutions? E.g. running a couple of VPN servers 
-on a home router with a few actual connections looks like a waste of 
-RAM. I was about to suggest to use rhashtable due to its dynamic sizing 
-feature, but the module needs three tables. Any better idea?
+then here:
 
---
-Sergey
+		if duration is not None:
+			timeout = time.time() - starttime + duration
+
+and rest as is (modulo the s/interval/timeout/)
+
+> +                    if interval <= 0:
+> +                        return
+> +                else:
+> +                    interval = None
+> +                events = selector.select(interval)
+> +                if events:
+> +                    self.check_ntf()
 
