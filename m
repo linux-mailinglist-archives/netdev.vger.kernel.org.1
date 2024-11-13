@@ -1,134 +1,144 @@
-Return-Path: <netdev+bounces-144275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253EC9C66E5
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:50:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2984A9C66E9
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:52:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DF5E1F254C8
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:50:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD98E1F257DD
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C936743ABC;
-	Wed, 13 Nov 2024 01:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2736B481C4;
+	Wed, 13 Nov 2024 01:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CFeIdwQP"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="kGDRbR/5";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MWxDIHKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2D2433AB;
-	Wed, 13 Nov 2024 01:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E7722081;
+	Wed, 13 Nov 2024 01:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731462622; cv=none; b=H1PR2VdBNBqRjKEvTZAmCbPHTB9MKvOuC+DlG21AYmm5MuKI3W1gv+dBbS53usnhTqZDzt8oDgNEPx9InN+yMLw7xGOkSpBFT4sddPXb3wnBAbEnen9lVTwg3iCbkL9dBDFhfnZmSfZOrD27IDiVYOWxi8Rwv0KWnIUS5nihBB0=
+	t=1731462734; cv=none; b=JAvX0DlKfMPbq9d8Ae69jAKgmgyxTKW5iVoqqiytbN1/a80CtKgyYzc/5m3WueprOBHu3wLYF3BSHZaYdeDa/mXmZFJMepA4bPrjEU6OJcNyjupshubU8S45t2C1J3Z8EoVHw6wEaOVABww6ZAkeuxf3ZHFqmVqdwx2V/udK6Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731462622; c=relaxed/simple;
-	bh=uG6reBs91moH2PzKECRwJ3Gg7woMry9/s+xOesV5eEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HHv5ikxb5qfFCiBFpuevyqk/KGyKd/beUfCODLbFRybm+4psNiAAvY/wH8efiq44rKgINY1/+xPafBXPr8GnuzUuBtoi7WCj4DD6vBj8Qa0JmA4+KdIN3xlnAnM3cqFG52MxNYcXLZgIPvXrnOKNlhZwcYoqyE946/ZEggGq6ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CFeIdwQP; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1731462615; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=FOkMQdZjuP23Bbo0k0BJfY/bg4d+4bPwc5ocgxsFDYM=;
-	b=CFeIdwQPQNs+cwxVS1SPfc5HhLlqXEB8aPauGEQkM/yoz53eWWmLl/NUtFP/CMpHquWc3UJ0MdfYivHdsT1vjHp5K4Cj41c6V4PNz+ofW1xg2IYdCNhYEyP4KMP80slf2tiGW4Ti8E0QVT/EJxKfXD0DmklmUmpow87FG9u6gLg=
-Received: from 30.221.99.195(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WJJC5Xr_1731462613 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 13 Nov 2024 09:50:14 +0800
-Message-ID: <14a1a4a1-7281-4715-bf6e-73d3dd5417ef@linux.alibaba.com>
-Date: Wed, 13 Nov 2024 09:50:13 +0800
+	s=arc-20240116; t=1731462734; c=relaxed/simple;
+	bh=3o1IAk0Pu1DMM+4JmjvQ/Lh83+id96fpgNVzAmCd5iI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=bjPWlR7BbFPHoTrNRGEij5Y5k1mG9+5X/VHZ3ZEgyp9L/8Ri8+QjL5VfdopgWxI5+5ibyn0jzfHjgzMWjNYWdAkkekLNhPf+L7b/cFAv6KIuAn6ckbnhjofhfxYA4H+u8MwHvfkT5PufLc9yxU04ffeSI08P5ol5WfPbj/e3bj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=kGDRbR/5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MWxDIHKY; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 3D74F11400EE;
+	Tue, 12 Nov 2024 20:52:11 -0500 (EST)
+Received: from phl-imap-08 ([10.202.2.84])
+  by phl-compute-03.internal (MEProxy); Tue, 12 Nov 2024 20:52:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1731462731;
+	 x=1731549131; bh=8/kcwCsb6nVPjwURuXhrNrDPbY+2hNixujv0dk2XUuk=; b=
+	kGDRbR/5ubQKcSZKDz/HQMIjG5HkCHlrzuddY1pjTenNipq6A/8y1wcDpHbQTulj
+	R/evifz0zmqrztKExrJPabMiEe10oZCkXlObFV17iLC0vWxuMFlOMigbk0TZfT6m
+	1RSA1HoDHjR/P3XLpbWPBM/V78LFbdmBDQB2YuBVy1qCtRChsVtbhcBZD5be8U9w
+	CQbyYXoA5h4mqcNFx6kootse3whLx/pbRwsLCv2x7x4ucw+upLGsLrx9mQDO/sOZ
+	UwTwdjoFK3xgbT7u/6TAyt89SefysXcHrtNGmVBsrjwlkvIBNRW+yKywRzmmoSWI
+	AuGBtigrDN0owfiiQwkx2A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1731462731; x=
+	1731549131; bh=8/kcwCsb6nVPjwURuXhrNrDPbY+2hNixujv0dk2XUuk=; b=M
+	WxDIHKYOS1P2LW4aarOkEYToYOHdomKqY4npqtSaNZuLtzn2lZwHPcR1j4D1mo6B
+	beTcz3vdfWUCdselYDU79HmJBIs/zFSc1D83uiKn8qLj0/E1GFeULJ+RlaztkKsz
+	NYMGJ/JOLo9pkM5QvbgKjVFChlHGr4T7kHgMCn2EcIi3YJ3jiuRpW2rdGmOAmqxr
+	phn/SeHPNq7Q9EPTjJSKHkpodLFyMS68ZBKfbJDFMw1dKl22PsxwmQvOpAnwlipZ
+	0Gi+I1xxjhW6CHZLeMVYGcLThrB+BobsO/Op9GlKPw1soJn88n9cQMSbyJmGnxoe
+	ZDtw1P4jsBA9Oi9LMdEEg==
+X-ME-Sender: <xms:SgY0Zxll0Cse2x-mQtHnDdCaS91651rxYCcuLKg6XXfVOLJ8fUPfmA>
+    <xme:SgY0Z82dkQtOrGpnLGPcaWdY7aHB3bLEr7RNo5gvBq_ZHSNJcGePhBKhNudhB4IkD
+    gffy3PTT-j__vURcQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeigddtlecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenfghrlhcuvffnffculdefhedmnecujfgurhepofggfffhvfevkfgj
+    fhfutgfgsehtjeertdertddtnecuhfhrohhmpedfffgrnhhivghlucgiuhdfuceougiguh
+    esugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgeelieffhfduudeukefhieef
+    gfffgeduleevjeefffeukefgtdelvddvfeefiedunecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghr
+    tghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmihgthhgrvg
+    hlrdgthhgrnhessghrohgruggtohhmrdgtohhmpdhrtghpthhtohepphgrvhgrnhdrtghh
+    vggssghisegsrhhorggutghomhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvg
+    hmlhhofhhtrdhnvghtpdhrtghpthhtohepvggtrhgvvgdrgihilhhinhigsehgmhgrihhl
+    rdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtph
+    htthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvg
+    hvpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
+X-ME-Proxy: <xmx:SwY0Z3q2IvcM6mwyf2mM_tTQImDSUDZY9uhctecPeiaVXv5hMwkubQ>
+    <xmx:SwY0Zxm6FLNx7DhLs8KYlF3oqPU3ZKkSRV_ueZhiA9H4y1zlXuuE8w>
+    <xmx:SwY0Z_12VVhoWKVgJlHu6ti9h65rFcMEqB_7TKlreRx3WaWoNRLxnA>
+    <xmx:SwY0ZwuUbf3rrn3mSyu_KwrkW6ghpNoFEr_786bsJyeRKzzB1J-LWQ>
+    <xmx:SwY0Z23eZtYs0DgoZ1wOs0X_GFCq9fXd0--EvlharEoRXeMxQ1xnMYMC>
+Feedback-ID: i6a694271:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id DDFBE18A0068; Tue, 12 Nov 2024 20:52:10 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 net-next 3/4] ipv4/udp: Add 4-tuple hash for connected
- socket
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, dsahern@kernel.org, horms@kernel.org,
- antony.antony@secunet.com, steffen.klassert@secunet.com,
- linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
- jakub@cloudflare.com, fred.cc@alibaba-inc.com,
- yubing.qiuyubing@alibaba-inc.com
-References: <20241108054836.123484-1-lulie@linux.alibaba.com>
- <20241108054836.123484-4-lulie@linux.alibaba.com>
- <a1db0c11-38ee-4932-86bc-a397a0ecf963@redhat.com>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <a1db0c11-38ee-4932-86bc-a397a0ecf963@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Tue, 12 Nov 2024 17:51:50 -0800
+From: "Daniel Xu" <dxu@dxuuu.xyz>
+To: "Edward Cree" <ecree.xilinx@gmail.com>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Eric Dumazet" <edumazet@google.com>, "David Miller" <davem@davemloft.net>,
+ "Shuah Khan" <shuah@kernel.org>, andrew+netdev@lunn.ch,
+ "Jakub Kicinski" <kuba@kernel.org>,
+ "Michael Chan" <michael.chan@broadcom.com>,
+ "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "Pavan Chebbi" <pavan.chebbi@broadcom.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "Kernel Team" <kernel-team@meta.com>
+Message-Id: <d5b21f01-0f19-4580-bb7a-829d46ee7dcb@app.fastmail.com>
+In-Reply-To: <93831343-03c3-d540-369d-fe82eb480c58@gmail.com>
+References: <cover.1731377399.git.dxu@dxuuu.xyz>
+ <dc4398dfe9a8e959245d2a8ffe5c2fcefbdd67f7.1731377399.git.dxu@dxuuu.xyz>
+ <93831343-03c3-d540-369d-fe82eb480c58@gmail.com>
+Subject: Re: [PATCH net v2 2/2] selftests: drv-net: rss_ctx: Add test for ntuple rule
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
+Hi Ed,
 
+On Tue, Nov 12, 2024, at 3:10 AM, Edward Cree wrote:
+> On 12/11/2024 02:23, Daniel Xu wrote:
+>> Extend the rss_ctx test suite to test that an ntuple action that
+>> redirects to an RSS context contains that information in `ethtool -n`.
+>> Otherwise the output from ethtool is highly deceiving. This test helps
+>> ensure drivers are compliant with the API.
+>> 
+>> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> ...
+>> +def _ntuple_rule_check(cfg, rule_id, ctx_id):
+>> +    """Check that ntuple rule references RSS context ID"""
+>> +    text = ethtool(f"-n {cfg.ifname} rule {rule_id}").stdout
+>> +    pattern = f"RSS Context ID: {ctx_id}"
+>> +    ksft_true(re.search(pattern, text, re.IGNORECASE),
+>
+> This won't match the output from your ethtool patch, because that
+>  removes the colon.  Probably want to wait until the patch is
+>  finalised and then write a regex that matches both versions.
 
-On 2024/11/12 22:58, Paolo Abeni wrote:
-> On 11/8/24 06:48, Philo Lu wrote:
-> [...]
->> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
->> Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
->> Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
->> Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-> 
-> [...]
->> @@ -2937,7 +3128,7 @@ struct proto udp_prot = {
->>   	.owner			= THIS_MODULE,
->>   	.close			= udp_lib_close,
->>   	.pre_connect		= udp_pre_connect,
->> -	.connect		= ip4_datagram_connect,
->> +	.connect		= udp_connect,
->>   	.disconnect		= udp_disconnect,
->>   	.ioctl			= udp_ioctl,
->>   	.init			= udp_init_sock,
-> 
-> 2 minor notes, possibly not needing a repost:
-> 
-> - The SoB chain looks strange, do you mean co-developed-by actually?
+Argh, I meant to have wildcards here. But yeah, makes sense, will wait
+until the other patch is finalized.
 
-Yes, we're all involved in the development. I think it could be 
-indicated by SoBs (and all of us agree with this). Please let me know if 
-I'm wrong :)
-
-Or strictly as [1], it should be:
-
-Co-developed-by: Cambda Zhu <cambda@linux.alibaba.com>
-Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
-Co-developed-by: Fred Chen <fred.cc@alibaba-inc.com>
-Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
-Co-developed-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-
-[1]
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html#when-to-use-acked-by-cc-and-co-developed-by
-
-> - udplite is not touched. AFAICS should not be a problem - just the
-> feature will not be available for udplite. 
-
-Agreed. Theoretically, the feature relies on udp4_hash4/udp6_hash4 when 
-connecting, and all other functions including lookup/unhash/rehash 
-always check "hashed4" firstly, and do nothing if it's false (which is 
-the case for udplite).
-
-AFAICT, the effects to udplite include:
-- Additional memory consumption in udp_sock and udptable
-- Control path: udp_hashed4 checking when unhash/rehash
-- Data path: udp_has_hash4 checking when lookup
-              (like unconnected sks in udp)
-
-> I'm wondering if syzbot could
-> prove me wrong about "not being a problem" (usually it's able to do that;)
-> 
-> /P
-> 
-
-Thanks.
--- 
-Philo
-
+Thanks,
+Daniel 
 
