@@ -1,370 +1,249 @@
-Return-Path: <netdev+bounces-144606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214D29C7EBC
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 00:23:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5A149C7ECB
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 00:32:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3F5283E5D
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 23:22:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62BF7283EC8
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 23:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3459018C347;
-	Wed, 13 Nov 2024 23:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CC418C330;
+	Wed, 13 Nov 2024 23:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bGhQKZMk"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="k8PVw4nb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F7518BC2C
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 23:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4B717C;
+	Wed, 13 Nov 2024 23:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731540176; cv=none; b=frbAzqUsaqtED06M12AGLYoRLDTjYAHDbzVwCmCFj8ZEamCnOVZPfaWycdo1XNnEXTezFYcRU5jPlzqwwGrnDcBd0I3qLVpe10qmpiN3LJZTcOJC5b5WVeRquxplsbwHsJwYl5qw+ptifxCo1QN/7AKGy6KN+ko3sFzr+woaUBI=
+	t=1731540759; cv=none; b=LUZACpPnuG9syEI2s5itnt0XKyP5mzcEBdEFzowj1YdNuVw9Ej4Wj7fjk0929uNp9sX7Br9BjTrE5A6o8j37FAGuPxD7AgSFNDO2R7vnYkmWgH2LGl4GZTsrwzTIv7SqhFAhqcK1hyDdRDbodQ3g+HabXn7nO7lCMZFRcnFewuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731540176; c=relaxed/simple;
-	bh=gGEsecAmz54n91Vy/vNGu0ho97CKNc5Z2+CrQ6eEPpg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ehmSP3dowYLD8mkQeVzX05l+pYkiahTM5paLPBaava5cdo4CDIpHb3sPfyQ8iQGVx5XN2z1+ZK1iIdMZoqkcCbxJXPQ86WvNIXOC4H2wl64VVtdYdnlWpKfIhNeM1BDnrRc9t3h7y/0nYsjMQw5m58sDlf2bT+OynavujUDNmCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bGhQKZMk; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731540174; x=1763076174;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gGEsecAmz54n91Vy/vNGu0ho97CKNc5Z2+CrQ6eEPpg=;
-  b=bGhQKZMkmmhBRKSYWjwTMgkX5QzrkoCNojU0J2Wdq560/n/MyDYVOC9l
-   wHMFj/X5sr1W3nA/epoXSjvTOWQLkPWC0kMgRjjFCNDY93fUNgsv1QtEM
-   iaP9yGytD5qcu6JqISIerNEwUndZ/9c3SY7chCqE4iacQcovJXX/bQ/Kb
-   5Dn/GysyGbk0H4NfmvQkvDdvdQoQoyhIWeKpRQ4c89I49gn8sSxK4iUGo
-   Ql9ZF6CGoat3iS/OkzWtqnRE+9UD8HJuSLDXFByoXCaoJ81DMAkkZSG5D
-   8l3d8dZmu7gMATTWveeVAtC3JPLpWfLutrn5HGmiYsB1NCFQj2q6jkNMw
-   w==;
-X-CSE-ConnectionGUID: POVdzrkJTz+NzAL6oTJOrw==
-X-CSE-MsgGUID: 4HtJB3zHTNSIcsLqdkG//g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31614531"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31614531"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 15:22:53 -0800
-X-CSE-ConnectionGUID: whvV2z+fSmOFPR3C59GobA==
-X-CSE-MsgGUID: C5a8VtGESqGjdFHHpFZOfQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,152,1728975600"; 
-   d="scan'208";a="118955821"
-Received: from lkp-server01.sh.intel.com (HELO 80bd855f15b3) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 13 Nov 2024 15:22:48 -0800
-Received: from kbuild by 80bd855f15b3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tBMhC-0000qT-0X;
-	Wed, 13 Nov 2024 23:22:46 +0000
-Date: Thu, 14 Nov 2024 07:22:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	Jiri Pirko <jiri@resnulli.us>, Carolina Jubran <cjubran@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next 3/8] devlink: Extend devlink rate API with
- traffic classes bandwidth management
-Message-ID: <202411140730.KCvy3X1m-lkp@intel.com>
-References: <20241113180034.714102-4-tariqt@nvidia.com>
+	s=arc-20240116; t=1731540759; c=relaxed/simple;
+	bh=BZz8M8dA30sPg7gVl2T2380eKnaxbf2iUQX4W3szZMA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cfJfgzbsnGx+oQN1vJN1MnP1o2jIfnBqzqJ11nfBOX3GpM5IQe508yzZuUURpyNtxhJbZHMFYjB0IRQn9mVsIGo2hHHClEct/7gXUbve/aIF7Stkp9GCibuiyBr4PlP2WHyjX1Lro/9kyNZM5V1G9xbgIIxqTwsoAKl8f/x8x14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=k8PVw4nb; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 67C2C20BEBE8;
+	Wed, 13 Nov 2024 15:32:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 67C2C20BEBE8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731540757;
+	bh=18HJxeyRm3uSI4Swy2JMMEvrdkL3oWWV9AKPCAM4Vjo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k8PVw4nbkREJts0W0LLdSZ42CRybu1r1Xhyg6//i5lh5h22jmKQC5Lcd8aMOB/jYM
+	 HLQu6/qNMJUeGZmWA1itysWr/etRtR5KK0CiaR/7bY7XLVFMzfApOBiyev/vQ/vj4+
+	 bnJU3aZtjNHiFSBT13DVIlauDGkjJGEyGoyLGSkQ=
+Message-ID: <6d2a6bd4-a7cf-4672-9fb0-975acdc8ed31@linux.microsoft.com>
+Date: Wed, 13 Nov 2024 15:32:32 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241113180034.714102-4-tariqt@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] hyperv: Add new Hyper-V headers in include/hyperv
+To: Michael Kelley <mhklinux@outlook.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
+Cc: "kys@microsoft.com" <kys@microsoft.com>,
+ "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "decui@microsoft.com" <decui@microsoft.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "seanjc@google.com" <seanjc@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+ "joro@8bytes.org" <joro@8bytes.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+ "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
+ "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
+ <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
+ "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
+ "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
+ "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
+ "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+ "apais@linux.microsoft.com" <apais@linux.microsoft.com>
+References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1731018746-25914-4-git-send-email-nunodasneves@linux.microsoft.com>
+ <BN7PR02MB4148025D8757B917013297E0D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
+ <b8ef1f71-9f13-48c3-adab-aa52b68d2e33@linux.microsoft.com>
+ <SN6PR02MB4157AA30A9F27ECCAE202BC2D4582@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <SN6PR02MB4157AA30A9F27ECCAE202BC2D4582@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Tariq,
+On 11/11/2024 11:31 AM, Michael Kelley wrote:
+> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Monday, November 11, 2024 10:45 AM
+>>
+>> On 11/10/2024 8:13 PM, Michael Kelley wrote:
+>>> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday,
+>> November 7, 2024 2:32 PM
+>>>>
+>>>> These headers contain definitions for regular Hyper-V guests (as in
+>>>> hyperv-tlfs.h), as well as interfaces for more privileged guests like
+>>>> Dom0.
+>>>
+>>> See my comment on Patch 0/4 about use of "dom0" terminology.
+>>>
+>>
+>> Thanks, noted.
+>>
+>>>>
+>>>> These files are derived from headers exported from Hyper-V, rather than
+>>>> being derived from the TLFS document. (Although, to preserve
+>>>> compatibility with existing Linux code, some definitions are copied
+>>>> directly from hyperv-tlfs.h too).
+>>>>
+>>>> The new files follow a naming convention according to their original
+>>>> use:
+>>>> - hdk "host development kit"
+>>>> - gdk "guest development kit"
+>>>> With postfix "_mini" implying userspace-only headers, and "_ext" for
+>>>> extended hypercalls.
+>>>>
+>>>> These names should be considered a rough guide only - since there are
+>>>> many places already where both host and guest code are in the same
+>>>> place, hvhdk.h (which includes everything) can be used most of the time.
+>>>
+>>> Just curious -- are there really cases where hvhdk.h can't be used?
+>>> If so, could you summarize why?
+>>>
+>>
+>> No, there aren't cases where it "can't" be used. I suppose if someone
+>> doesn't want to include everything, perhaps they could just include
+>> hvgdk.h, for example. It doesn't really matter though.
+>>
+>>> I ask because it would be nice to expand slightly on your paragraph
+>>> below, as follows:  (if indeed what I've added is correct)
+>>>
+>>> The use of multiple files and their original names is primarily to
+>>> keep the provenance of exactly where they came from in Hyper-V
+>>> code, which is helpful for manual maintenance and extension
+>>> of these definitions. Microsoft maintainers importing new definitions
+>>> should take care to put them in the right file. However, Linux kernel code
+>>> that uses any of the definitions need not be aware of the multiple files
+>>> or assign any meaning to the new names. Linux kernel uses should
+>>> always just include hvhdk.h
+>>>
+>>
+>> Thanks, I think that additional sentence helps clarify things. I'll
+>> include it in the next version, and I think I can probably omit the prior
+>> paragraph: "These names should be considered a rough guide only...".
+>>
+> 
+> Omitting that prior paragraph is OK with me.  The key thoughts from my
+> standpoint are:
+> * The separation into multiple files and the file names come from
+>    the Windows Hyper-V world and are maintained to ease bringing
+>    the definitions over from that world
+>    
+> * Linux code can ignore the multiple files and their names. Just
+>    #include hvhdk.h.
+> 
 
-kernel test robot noticed the following build errors:
+Agreed, thanks for helping clarify the points.
 
-[auto build test ERROR on net-next/main]
+>>>>
+>>>> The original names are kept intact primarily to keep the provenance of
+>>>> exactly where they came from in Hyper-V code, which is helpful for
+>>>> manual maintenance and extension of these definitions. Microsoft
+>>>> maintainers importing new definitions should take care to put them in
+>>>> the right file.
+>>>>
+>>>> Note also that the files contain both arm64 and x86_64 code guarded by
+>>>> \#ifdefs, which is how the definitions originally appear in Hyper-V.
+>>>
+>>> Spurious backslash?
+>>>
+>>
+>> Indeed, thanks.
+>>
+>>> I would suggest some additional clarification:  The #ifdef guards are
+>>> employed minimally where necessary to prevent conflicts due to
+>>> different definitions for the same thing on x86_64 and arm64. Where
+>>> there are no conflicts, the union of x86_64 definitions and arm64
+>>> definitions is visible when building for either architecture. In other
+>>> words, not all definitions specific to x86_64 are protected by #ifdef
+>>> x86_64. Such unprotected definitions may be visible when building
+>>> for arm64. And vice versa.
+>>>
+>>
+>> Is there a reason you specifically want to point out that "Such
+>> unprotected definitions may be visible when building for arm64. And vice
+>> versa."? I think, in all the cases where #ifdefs are not used, an
+>> arch-specific prefix is used - hv_x64_ or hv_arm64_.
+>>
+>> The main thing I wanted to call out here was the reasoning for not
+>> splitting arch-specific definitions into separate files in arch/x86/
+>> and arch/arm64/ as is typical in Linux.
+>>
+>> Maybe this is a bit clearer:
+>> "
+>> Note the new headers contain both arm64 and x86_64 definitions. Some are
+>> guarded by #ifdefs, and some are instead prefixed with the architecture,
+>> e.g. hv_x64_*. These conventions are kept from Hyper-V code as another
+>> tactic to simplify the process of importing and maintaining the
+>> definitions, rather than splitting them up into their own files in
+>> arch/x86/ and arch/arm64/.
+>> "
+> 
+> Yes, your new paragraph works for me. Your original statement was
+> "the files contain both arm64 and x86_64 code guarded by #ifdefs",
+> which sounds like the more typical Linux approach of using #ifdefs
+> to segregate into x86-specific, arm64-specific, and common. I was
+> just trying to be explicit that full segregation isn't done, and isn't a
+> goal, because of wanting to maintain alignment with the original
+> Hyper-V definitions.
+> 
+> It's "Hey, we know we're not handling this in the typical Linux way,
+> and here's why". Your revised paragraph covers that in a less
+> heavyweight way than what I wrote. :-)
+> 
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tariq-Toukan/net-mlx5-DR-expand-SWS-STE-callbacks-and-consolidate-common-structs/20241114-022031
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241113180034.714102-4-tariqt%40nvidia.com
-patch subject: [PATCH net-next 3/8] devlink: Extend devlink rate API with traffic classes bandwidth management
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20241114/202411140730.KCvy3X1m-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241114/202411140730.KCvy3X1m-lkp@intel.com/reproduce)
+Ok, great. I'll use that for the next version then.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411140730.KCvy3X1m-lkp@intel.com/
+Thanks again!
+Nuno
 
-All errors (new ones prefixed by >>):
+> Michael
+> 
+>>
+>> I hope it's reasonably clear that it's a good tradeoff to go against
+>> Linux convention in this case, to make it easy to import and maintain
+>> Hyper-V definitions.
+>>
+>> Thanks
+>> Nuno
+>>
 
-   In file included from net/devlink/core.c:7:
-   In file included from include/net/genetlink.h:5:
-   In file included from include/linux/net.h:24:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from net/devlink/core.c:9:
-   In file included from include/trace/events/devlink.h:11:
->> include/net/devlink.h:121:12: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     121 |         u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-         |                   ^
-   In file included from net/devlink/core.c:11:
-   net/devlink/devl_internal.h:29:19: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      29 |         u32 reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:30:26: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      30 |         u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 warnings and 1 error generated.
---
-   In file included from net/devlink/dev.c:8:
-   In file included from include/net/genetlink.h:5:
-   In file included from include/linux/net.h:24:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from net/devlink/dev.c:10:
-   In file included from net/devlink/devl_internal.h:14:
->> include/net/devlink.h:121:12: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     121 |         u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-         |                   ^
-   In file included from net/devlink/dev.c:10:
-   net/devlink/devl_internal.h:29:19: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      29 |         u32 reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:30:26: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      30 |         u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/dev.c:335:20: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-     335 |                 stat_idx = limit * __DEVLINK_RELOAD_ACTION_MAX + action;
-         |                            ~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/dev.c:447:26: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-     447 |         u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   8 warnings and 1 error generated.
---
-   In file included from net/devlink/rate.c:7:
-   In file included from net/devlink/devl_internal.h:7:
-   In file included from include/linux/etherdevice.h:20:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from net/devlink/rate.c:7:
-   In file included from net/devlink/devl_internal.h:14:
->> include/net/devlink.h:121:12: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     121 |         u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-         |                   ^
-   In file included from net/devlink/rate.c:7:
-   net/devlink/devl_internal.h:29:19: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      29 |         u32 reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:30:26: warning: arithmetic between different enumeration types ('enum devlink_reload_limit' and 'enum devlink_reload_action') [-Wenum-enum-conversion]
-      30 |         u32 remote_reload_stats[DEVLINK_RELOAD_STATS_ARRAY_SIZE];
-         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/devlink/devl_internal.h:26:30: note: expanded from macro 'DEVLINK_RELOAD_STATS_ARRAY_SIZE'
-      26 |         (__DEVLINK_RELOAD_LIMIT_MAX * __DEVLINK_RELOAD_ACTION_MAX)
-         |          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> net/devlink/rate.c:133:18: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     133 |         for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-         |                         ^
-   net/devlink/rate.c:335:12: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     335 |         u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-         |                   ^
-   net/devlink/rate.c:405:19: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     405 |                 for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-         |                                 ^
-   6 warnings and 4 errors generated.
---
-   In file included from drivers/net/ethernet/intel/i40e/i40e_main.c:5:
-   In file included from include/linux/crash_dump.h:5:
-   In file included from include/linux/kexec.h:18:
-   In file included from include/linux/vmcore_info.h:6:
-   In file included from include/linux/elfcore.h:11:
-   In file included from include/linux/ptrace.h:10:
-   In file included from include/linux/pid_namespace.h:7:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from drivers/net/ethernet/intel/i40e/i40e_main.c:13:
-   In file included from drivers/net/ethernet/intel/i40e/i40e.h:13:
->> include/net/devlink.h:121:12: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     121 |         u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-         |                   ^
-   drivers/net/ethernet/intel/i40e/i40e_main.c:15639:46: warning: shift count >= width of type [-Wshift-count-overflow]
-    15639 |         err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-          |                                                     ^~~~~~~~~~~~~~~~
-   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
-      77 | #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
-         |                                                      ^ ~~~
-   5 warnings and 1 error generated.
---
-   In file included from drivers/net/ethernet/intel/i40e/i40e_ethtool.c:8:
-   In file included from drivers/net/ethernet/intel/i40e/i40e_txrx_common.h:7:
-   In file included from drivers/net/ethernet/intel/i40e/i40e.h:7:
-   In file included from include/linux/linkmode.h:5:
-   In file included from include/linux/ethtool.h:18:
-   In file included from include/linux/if_ether.h:19:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from drivers/net/ethernet/intel/i40e/i40e_ethtool.c:8:
-   In file included from drivers/net/ethernet/intel/i40e/i40e_txrx_common.h:7:
-   In file included from drivers/net/ethernet/intel/i40e/i40e.h:13:
->> include/net/devlink.h:121:12: error: use of undeclared identifier 'IEEE_8021QAZ_MAX_TCS'
-     121 |         u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-         |                   ^
-   4 warnings and 1 error generated.
-
-
-vim +/IEEE_8021QAZ_MAX_TCS +121 include/net/devlink.h
-
-   100	
-   101	struct devlink_rate {
-   102		struct list_head list;
-   103		enum devlink_rate_type type;
-   104		struct devlink *devlink;
-   105		void *priv;
-   106		u64 tx_share;
-   107		u64 tx_max;
-   108	
-   109		struct devlink_rate *parent;
-   110		union {
-   111			struct devlink_port *devlink_port;
-   112			struct {
-   113				char *name;
-   114				refcount_t refcnt;
-   115			};
-   116		};
-   117	
-   118		u32 tx_priority;
-   119		u32 tx_weight;
-   120	
- > 121		u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
-   122	};
-   123	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
