@@ -1,164 +1,194 @@
-Return-Path: <netdev+bounces-144448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BC79C75B8
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:13:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 285F99C77C1
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47B96284F54
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:13:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E2F6B4518A
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8930201261;
-	Wed, 13 Nov 2024 15:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6737DA87;
+	Wed, 13 Nov 2024 15:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aA0PzeKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2056.outbound.protection.outlook.com [40.107.212.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CFF201036;
-	Wed, 13 Nov 2024 15:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731510685; cv=none; b=YHy8NbPOkPGMn2ixNivEZHrVHqO+ucM368DesHX62OoqT1uQP/NyFXMwOiAqBmvPYoxyB3ibyY9250S4jUtymjpJu0a8ccD/30AH0TTdDuYK7SZufJyQ+aoeQGDUufxQ9tsDDboPK3leg4aOFL8nx3sF/9yJvIfHmtWAq9lzvW0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731510685; c=relaxed/simple;
-	bh=7wSSxIUiXUM5F3CnS/GS0ih6ZK6ssmZ3fx3f8y0jNi0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZzaqvfRx/jb+XDM15ZkPQDWC7maU9jqMnfDLNFuVnxw99MWJCBrnuJRZOa768nenrH7jLmda5fwXN0YuxYvyVhYP2Rkd0Y4o59cECHgKSsJtcPVLHLHY+v2tWQO9ph2pFdmHwuTf+lk3kJK4Mz7IoSqY00B2P3dampf2oMTikHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aa1f1f2d508so185377566b.2;
-        Wed, 13 Nov 2024 07:11:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731510682; x=1732115482;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zxJL6/w7ib7tor6B/awKjwacI8QkLWn7spqQywUygr4=;
-        b=T7hIDV4+icgtau/zZ/DMVhNWSUcjXpD6yNKrrTyCQh1JuIifz/GgBVwh4Ohmi/7Uaz
-         15E5Ni34rDzseG9DxuRLxlFUBJFuqpwO+j5DwpUVx+GiJdT80q2EAT33+5SnTTXwPW6q
-         EdKWsfF20FTZaQ11V2PoplhxL9a7W2+AkAN7jlRYLKG++e6lyVB2MPJH1PaTPr4jlUEC
-         45/ZRpZmZaQc2F3V+TEyhYU68/BbXC4CmjiFpNUnv29kHMjVDpcHdHozG/7MBjt71zjw
-         iJQGJnQ56zVT50NMfWxOit1T4TogWn/vFwQV81gjWtDnP/v6yLENpvdjtUBmF+Bv2G57
-         bPwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYEoqF8+0qwDEI4DL8KKPobYd2DOebmCbE2wxd/mHsVGr6KmR0uN+ir3hN7LbX0kOx8nOEM2yTwlAckGdRuMbs@vger.kernel.org, AJvYcCVkFUgNHgMu0zF0uEXKbQzR0C647JqglOBtl+5Cb/Hh7NoqXVZSmnf8twdM9gJUOwZIbNl4LrHnUmX3s+CH@vger.kernel.org, AJvYcCWdolYDYnLssxrwbHPFhCIhKCcC0Nx4e3NegcjJguwGLTQNsRLD3kImSIHI7SvkOCh+mXdeGhOi0f0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCxHhrpWiqxZaBoQCC7U8NWBM2JoWy4BUyu1jPT/z8ooPzhszL
-	fjZWGlB3E9f0rMnxf3eb8FrE6WIHYaQs54u+zCj2S30Xhrlm6Qvb
-X-Google-Smtp-Source: AGHT+IEoLyfigi2UbiHSBtCcn9AV7B2W8zEBzkfRzr2dXQX1hG/gGL44SEj+d1F3HrwKO/03w2g9Ag==
-X-Received: by 2002:a17:907:944c:b0:a9a:8a4:e079 with SMTP id a640c23a62f3a-a9eeff44660mr2145146866b.31.1731510681944;
-        Wed, 13 Nov 2024 07:11:21 -0800 (PST)
-Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03c7cabbsm7293671a12.79.2024.11.13.07.11.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 07:11:21 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 13 Nov 2024 07:10:55 -0800
-Subject: [PATCH net-next 4/4] netconsole: selftest: Validate CPU number
- auto-population in userdata
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D4C7080E
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 15:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731512242; cv=fail; b=jAljUGI8eawwLBtkhPcgpEYb+GP251WinZ41V0G95lNYwltDwvfqSUe47oIr5DqfsF7Y5zDp5zeSxYVRM12+dDEsdkDms3erYcVywJnBFL4oInrxaxYBtmAPZVsMykgfcgQTDUCAFVkmcJrt0PmAv0UvJKxUNz09X8l3Y2Ky5MI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731512242; c=relaxed/simple;
+	bh=u9nHvwOQ+YoFAA+P27D/8Te2SWG8lDnmyWEoxF+r7VI=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=BPtrdeYrlZ9fZltsSQiVSg8CiF5/jXt/k4WMII9dWufzeW80YsXfpqfqf006ld3kyI5O9iE81KQp4cajcqheS7YL4wZCcgmSMK3mPno+2Bpvf+HxL5WUHl50GNG+DeGWZQyZsLDNh5uKDNgyHyG6hBAU9YBQ9BantUv9hp1PO4g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aA0PzeKY; arc=fail smtp.client-ip=40.107.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pgdv48yRgQh0ZZ4W0HKtJCLRRiUuRnuLIjOue0LNk1FHUi3ooV+p7HazqXyDFhpybb38AwTihNoPxU4jEdHKqmy2oVv2cmyM0nX+CuPY92oVtngEH/QXmJmWTUPOZZ4jS28af8iJ0XY6Jplf2/gb8saNugtvJiW1+mDGmdjPY6cmdEmeDVoNXH+lK0v6SjkK2akKbXNmI2mh2LVanSrGN2IiIwymo2QoEGUwBGKd+jhnWLJVALECy7k/FtGieJRxaSm22Onl00GwL4sWlrpAUhpHsV0rhCYGb00FlLRA52La8xFGyr64xFLsYVqMs2aosc2uYFRqj96qOxftrSCpKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ogoxEfA+TUOZmjp+wJm0BUqZG8ID0EjQp+TNGaJsIOE=;
+ b=bemy1mqf6gXlooMTmlwSadD7cXix4P0iHjgvRdOHYha1zUtvRZQj7u9RWBQAQXmXGp1irvGyo8Lw44HMS/hTV1+sPQCsI+p+GE6mcqMzhK9MfndkSprdWzJrtghOdIjPdLNLabtHHtpvhGOhG2tU+3KyuytXeKzBJQLEGJcoFvVMu5O/obipfMRisv7KEI5fWkMa+bOmWuZCcp9tVN1WbtlYNSsIX6QD08AUMUhZhMVoU6Yqi6mWUcOoikUtoc3YVmdHaC7WMUzrmtMVUdqUmQSb/e8YFNO0BlfXM6vnRNhjGNeW5RIv2ugXZ5Xh7l5OMwmYH7toj1iu3bEFKwWcgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ogoxEfA+TUOZmjp+wJm0BUqZG8ID0EjQp+TNGaJsIOE=;
+ b=aA0PzeKYaHNcCP8cHTZ5Cz0ysJfuyHD14BQruW/IbXR25h5Ri4ukR/ffCnIt9/hkanlfCE3iftwrS+UhTg/WOTCbqNxaGLlg8ewc47080K170gaeOp2SEscW2yrW5/E4DKC2pwSKTkJeli84QnGeLK264526BX00mL7zKYxzBCvbSiCW7SWq1a06kM6kN2fNseTe8+zUp+B3dtiZYxzFedhGjl7Zu0G/ubnxWRsMkHoL9RrhwCW6YdI5iJykZ+wLqbbYwFAGmxRaJDtUZ0gN6fu8XRferAh4v3BTbrnYucwY6cbFjd3Nwg+eICCSW1WPzj/wj7vRAXRPo59x12a9gg==
+Received: from MN0P220CA0011.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:52e::23)
+ by PH8PR12MB6676.namprd12.prod.outlook.com (2603:10b6:510:1c3::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.29; Wed, 13 Nov
+ 2024 15:37:12 +0000
+Received: from BL02EPF0001A104.namprd05.prod.outlook.com
+ (2603:10b6:208:52e:cafe::34) by MN0P220CA0011.outlook.office365.com
+ (2603:10b6:208:52e::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.16 via Frontend
+ Transport; Wed, 13 Nov 2024 15:37:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF0001A104.mail.protection.outlook.com (10.167.241.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.14 via Frontend Transport; Wed, 13 Nov 2024 15:37:12 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 13 Nov
+ 2024 07:36:52 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 13 Nov
+ 2024 07:36:50 -0800
+References: <cover.1731342342.git.petrm@nvidia.com>
+ <baf2abd6af2e88f8874d14c97da1554b7e7a710e.1731342342.git.petrm@nvidia.com>
+ <20241112142234.7abf2232@kernel.org> <875xorjq37.fsf@nvidia.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 7/7] selftests: net: fdb_notify: Add a test
+ for FDB notifications
+Date: Wed, 13 Nov 2024 16:11:03 +0100
+In-Reply-To: <875xorjq37.fsf@nvidia.com>
+Message-ID: <871pzfjgc2.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241113-netcon_cpu-v1-4-d187bf7c0321@debian.org>
-References: <20241113-netcon_cpu-v1-0-d187bf7c0321@debian.org>
-In-Reply-To: <20241113-netcon_cpu-v1-0-d187bf7c0321@debian.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>, max@kutsevol.com, thepacketgeek@gmail.com, 
- vlad.wing@gmail.com, davej@codemonkey.org.uk
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2328; i=leitao@debian.org;
- h=from:subject:message-id; bh=7wSSxIUiXUM5F3CnS/GS0ih6ZK6ssmZ3fx3f8y0jNi0=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnNMGOZOdLZzudSzkfczgpbLOO/6uj8tFPcG7Of
- HLb1ouaDDGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzTBjgAKCRA1o5Of/Hh3
- belgD/9MXc6rZacHAL5a6Pw8kYf5u9hon846XtxERP1sNGQjSjmWiMP2V0KfSMLk5ZvHoFKKcQR
- bpP9ExABuvB3TKLEPd5Foldv7UOybHnj+255l5mHYh8zBBsDDlj2r0KSkegI0+dRyJnom7L87+e
- B7QJGapMQOZiXWoVeuFPb4dlp/ls0f/ZMyIynfJC4VV/G/mnAIPjdQYE9XiQK9b5ISbxGL1EYds
- zLZA9vmS9sw75WXjIGrXBX86UFxtK1pZ1vDqDYxA61YFjucv8fYw/gQrGZQ7DJMFLljNuur1Qcs
- KhEqfNOMCSLJ1/zQbFlCDrB3dvJJREFS02hY+q7bWnygKouaOsZVTY2l9qiZsiSg+FIKuJ3ilWI
- 3EXX3o163FxKuWTJOqRXv5/N9Pe5jEKYfhoQ6O12eYuDJoUKLj2pmx1GpxeG2zUdrJB+0GqFDWk
- U4m+hcSpOwcCXP3CLGfAC7DgmsIhYA5jmtXBQc8wpNt6UC/mZCQg/z1pqTF4sw/W71I4du91WO2
- cZCFn76yqO+5ZgSSqnWM/JelQE0IYWjCGFVPDL+vBZi+jceioXYMZLl4S1tBGo+/FIwFNA1Z+9I
- x+5FnBSn27Hb8LXecNdZiaMt+bXo+8LpZFsxZmfYte/n3jIbvbww6kFfhbEJdSRE3fRyOdWzgVR
- 0gtaa+bvWxbtz2w==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A104:EE_|PH8PR12MB6676:EE_
+X-MS-Office365-Filtering-Correlation-Id: e2ad5eb8-e373-4d09-be10-08dd03f90b25
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?hRJP/tj45W4sZdk+glE11r2fH4rufcJcBTwbfqWdExPRPZxYIMsz4LZILcXd?=
+ =?us-ascii?Q?Be871AXF3b6G79GTEpNlyETs3kmxlpnPyEF2DTbrns5lj3Rc6c7MW3MwqKSp?=
+ =?us-ascii?Q?WT2MmZfLc9Q5ile5C+lSuqTQiso+cYoZ8P7ehbhWb/qwWi8qjM58j/1gjTrB?=
+ =?us-ascii?Q?ihBaUHOy6Tl4jXj6iutyMXfbju8dU18QvG1OryUggcFq7lF3IA0pq6eJ7dBW?=
+ =?us-ascii?Q?hCDd5rEH8eLQAx9oF2LUI/4Ev5X6Xf5co7SrezYOGCJdLJlB3vh+CT7z0LJ1?=
+ =?us-ascii?Q?LEvjTJM0TQ35Vw8F5I0xOQUkC+qTG+ZNc56N0qdLIDnfxHEuGRZU/9Y67k7v?=
+ =?us-ascii?Q?YAUb2z0vIW7ICXYq5x8LoWQw8j+3lfo3rPKhGTIcOtlEKhXLZP7SN1FSedvL?=
+ =?us-ascii?Q?/BOflBT95XKWBb4Hsz8qBy9EX9EiPjV1qD+6EbAGHTuB8naWrjyukxoAxcea?=
+ =?us-ascii?Q?pa0AFJfEVuBaArbzDSA/J5XE5ZWKeGGI/uRGhK1dIWBG1uckLghBbSMaDzUk?=
+ =?us-ascii?Q?PZQtHjnHqz7szptGCJU7RHLMVDyY6Qw9p0eItdqPPZbtiwaLgKBz/P/m8lY9?=
+ =?us-ascii?Q?c+gDAkouVKORx0y6FidvcrzQom9E6WlMOlIP5xQj3xosv4qstSssB6NzVrHP?=
+ =?us-ascii?Q?0Lc3HB8fvkHb78+WQ4W8Pr2eJPWezDbICKUZI0SO/5Wv0tDoZ+cbKZ0KY2ty?=
+ =?us-ascii?Q?pQNM0iRg7/3mfA2zWLUDeTaxocJrSLe7HUxjjtRY8Onptmi4D0N1YJu2R88Z?=
+ =?us-ascii?Q?yGcHzM2YEmVBRPOXkii4KmjWxBxo3Jhfz3VrDNuTSzSFtNkxgnIuK9pC+LIQ?=
+ =?us-ascii?Q?R2nJAzDQ0YHCo85eQNcCU156CdPy/1r6uxTosm6rmUN2efq7wDS9IjVFgOFz?=
+ =?us-ascii?Q?EJnyDIt/5dPxIY/i9Xh4kRx8mCygFFW8CnEGZWGMTZqnd/E3zNhW48CtiLgm?=
+ =?us-ascii?Q?wd6tX6aEItKapPmDSsucl+QHpFDQc+KmTVKql2j7NmBN4SjapgaCuUvCLH30?=
+ =?us-ascii?Q?UprAHMI9gHyae+tq8vcRh+Ce6yVcY2CmmqEbEmdM4gGkewjUpxoqmHw9+N9h?=
+ =?us-ascii?Q?Gus5ctlvQGnClt9kqYoR08lfOXg+Ev24Y0e8w9JlDt59p22xSKeOpQ6QsXgT?=
+ =?us-ascii?Q?5LT2/K1kuDpUhWYM2Q7HyhLrYMesVz8NFBPFU8ausu6HyDjCLzTLGqZWGRaY?=
+ =?us-ascii?Q?qWE4mzijuOSn1azMNQWHZ5AkTa98KHcBJlC0XBy1qdnZcLKY1rDfkiOjIc4b?=
+ =?us-ascii?Q?QBDUeVNNlRfTe64dd6yyVHgekdHZ3otbDX23/6mN3er9DMEuuarsSILI3guD?=
+ =?us-ascii?Q?RHnzT2bq4Z19Iyoes8YUl6N3cQdnpOatqzTRmQxwnCQoLQsVIWx0ak6k9Sxu?=
+ =?us-ascii?Q?S2IV/K6Z3S+MWEtfqQjDm/jAvnfpMjFx26ZQkMJS2HPnq4McGg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 15:37:12.3210
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2ad5eb8-e373-4d09-be10-08dd03f90b25
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A104.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6676
 
-Expand the existing netconsole selftest to verify the functionality of
-the recently added CPU number auto-population feature in the netconsole
-userdata.
 
-The changes include enabling the "populate_cpu_nr" option on the
-netconsole target before sending the test data, and validating that the
-received data on the listener side contains a "cpu=" entry in the
-userdata, indicating that the CPU number was successfully
-auto-populated.
+Petr Machata <petrm@nvidia.com> writes:
 
-This addition to the netconsole selftest ensures that the new CPU number
-auto-population feature works as expected and helps catch any
-regressions in this functionality.
+> Jakub Kicinski <kuba@kernel.org> writes:
+>
+>> On Mon, 11 Nov 2024 18:09:01 +0100 Petr Machata wrote:
+>>> Check that only one notification is produced for various FDB edit
+>>> operations.
+>>> 
+>>> Regarding the ip_link_add() and ip_link_master() helpers. This pattern of
+>>> action plus corresponding defer is bound to come up often, and a dedicated
+>>> vocabulary to capture it will be handy. tunnel_create() and vlan_create()
+>>> from forwarding/lib.sh are somewhat opaque and perhaps too kitchen-sinky,
+>>> so I tried to go in the opposite direction with these ones, and wrapped
+>>> only the bare minimum to schedule a corresponding cleanup.
+>>
+>> Looks like it fails about half of the time :(
+>>
+>> https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=fdb-notify&br-cnt=200
+>
+> OK, I can't reproduce this. Trying in VM, on an actual HW, debug, no
+> debug, no luck. But I see basically two failures:
+>
+> - A "0 seen, 1 expected", which... I don't know, maybe it could just be
+>   a misplaced sleep. I don't see how, but it's a deterministing
+>   scenario, there shouldn't be anything racy here, either it emits or it
+>   doesn't, so some buffering issue is the only thing I can think of.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/netcons_basic.sh | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+I think this really could be just a "bridge monitor" taking a bit more
+time to start every now and then. Can I have you test with this extra
+chunk, or should I just resend with that change and hope for the best?
 
-diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
-index b175f4d966e5056ddb62e335f212c03e55f50fb0..92538a188f0696b3e54071d1d32c7b2e523db839 100755
---- a/tools/testing/selftests/drivers/net/netcons_basic.sh
-+++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
-@@ -153,6 +153,16 @@ function set_user_data() {
- 	echo "${USERDATA_VALUE}" > "${VALUE_PATH}"
- }
+diff --git a/tools/testing/selftests/net/fdb_notify.sh b/tools/testing/selftests/net/fdb_notify.sh
+index a98047361988..a8e04f08831c 100755
+--- a/tools/testing/selftests/net/fdb_notify.sh
++++ b/tools/testing/selftests/net/fdb_notify.sh
+@@ -26,6 +26,7 @@ do_test_dup()
+ 		bridge monitor fdb &> "$tmpf" &
+ 		defer kill_process $!
  
-+function set_cpu_nr() {
-+	if [[ ! -f "${NETCONS_PATH}""/userdata/populate_cpu_nr" ]]
-+	then
-+		echo "Populate CPU configfs path not available in ${NETCONS_PATH}/userdata/populate_cpu_nr" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
-+	echo 1 > "${NETCONS_PATH}""/userdata/populate_cpu_nr"
-+}
-+
- function listen_port_and_save_to() {
- 	local OUTPUT=${1}
- 	# Just wait for 2 seconds
-@@ -185,6 +195,12 @@ function validate_result() {
- 		exit "${ksft_fail}"
- 	fi
- 
-+	if ! grep -q "cpu=[0-9]\+" "${TMPFILENAME}"; then
-+		echo "FAIL: 'cpu=' not found in ${TMPFILENAME}" >&2
-+		cat "${TMPFILENAME}" >&2
-+		exit "${ksft_fail}"
-+	fi
-+
- 	# Delete the file once it is validated, otherwise keep it
- 	# for debugging purposes
- 	rm "${TMPFILENAME}"
-@@ -254,6 +270,8 @@ set_network
- create_dynamic_target
- # Set userdata "key" with the "value" value
- set_user_data
-+# Auto populate CPU number
-+set_cpu_nr
- # Listed for netconsole port inside the namespace and destination interface
- listen_port_and_save_to "${OUTPUT_FILE}" &
- # Wait for socat to start and listen to the port.
++		sleep 0.5
+ 		bridge fdb "$op" 00:11:22:33:44:55 vlan 1 "$@"
+ 		sleep 0.2
+ 	defer_scope_pop
 
--- 
-2.43.5
+> - Deadlocks. E.g. this, which looks like it deadlocked and timed out
 
+Eh, these are ancient. Never mind.
 
