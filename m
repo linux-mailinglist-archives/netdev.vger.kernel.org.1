@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-144445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8611D9C75AF
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:11:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76359C75B5
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 634A4284D11
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:11:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4DA1F2240B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0D4156C5F;
-	Wed, 13 Nov 2024 15:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274BA200B98;
+	Wed, 13 Nov 2024 15:11:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87EB208A7;
-	Wed, 13 Nov 2024 15:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4318A1F9A80;
+	Wed, 13 Nov 2024 15:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731510678; cv=none; b=VNpAIyqnLb2S175dzPFkjsQJCON2Q56CtZZFqLILchxIzd2zihnrGgKR1AmF4B4a7V0WWI2Eej7aiAs76JhdT+X9HU4cZgOKX6OdROiXwedMLFcvApz8imD03+Pb6rRy/DS+cnqkqzn5Qqmejts0urwK9QiSHZ4kujwLBRe/0zM=
+	t=1731510683; cv=none; b=E5tK36JQXm60qoUveCDGqNMhLC47jUcS1sQM+VmmaMt3ycXev5q531NI6Lu+hUSXai1N1vqpTZJ753nU4CtGFFvYYfDW1/ybflq7g1RPNeq+JkGGN/varSBYDu/YQnsKL6aqWiIFJf/POJbC392cfjgCGjsv79KPFcA8uSKZdds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731510678; c=relaxed/simple;
-	bh=dvK97ikucZCA3mi0xw8qgSct+K0NNsxtWtBJbaBwBso=;
+	s=arc-20240116; t=1731510683; c=relaxed/simple;
+	bh=IpyXc0ozD1GMB+Il96IkWK5dAeJgnotpsHJ8YdD/teM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hYo9gFQGKoSIRo+9qkVvo06upC0TMD3URQGMegF3k2F1kABSkgOaFygTL6ZOOdbi/McDh9fcYEJutyki/MpchX2xevA8xZpAi2bZ2go0faCSdGDZtrA11BzmtYGAEmCERvfrjf//lBwUHKbeSgz9Z1F8sGK4ePn6qDFLgSwEnEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+	 In-Reply-To:To:Cc; b=D9GDv2XC903iuF4Xx2ICyo3BFfktnGHeC+7xvQLZfl8dNOyJea+yacFxkpgHyhrnIhUYBh4TAEiNbQ8Q68z+iykgmDozu+45vGqorYQw+uiSNq6VM+/QVmFC7azWonmmpiMNHpOr0g3rwxFHm2aP1PLS47V8sKZhV8FzSdyW0UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa1e51ce601so327885066b.3;
-        Wed, 13 Nov 2024 07:11:16 -0800 (PST)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5cefa22e9d5so7809698a12.3;
+        Wed, 13 Nov 2024 07:11:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731510675; x=1732115475;
+        d=1e100.net; s=20230601; t=1731510679; x=1732115479;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=W0okCZd3Tx+gQrgEVOilpTV31ZqkJUqPhWl0/A78bQ0=;
-        b=re8fdyCM7fzxQxS1qsgfhIUfjw0Lfm4Z0IC0/Te9PJbe8wpiUbaU76ISAGj2NY1ve2
-         3EjWNW+IP5ZB80xrxomaxMLlQKvS2zFLNTJ7j2tLqyZSf30WbdtW0b8tdKXj2lIueUwY
-         crNx5/Tfn1hn3yH0+X3yzjV7BNhVlGNsKq46DUaTfezuXwkH42sMJ/gFiutxcr2FTrGs
-         AarJGugQJbmN7Byw525/ejImGwXlwfojptePfs/yKxyyRocpd/GHpg50syF2/46T74pQ
-         C4Zt7xz/ZhkGG5IepRAje7VCgI9kW0UYftJulxcy6v8uLR5iLYIyW/41CJSFPmpxCWev
-         +EUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUmT22IR3BAU8LzPf+EVb/1Xt9MKszASD32NfmJrFRgKcGQSM2N1MhbEhaUJjM6DZjhbGB99uoueWk=@vger.kernel.org, AJvYcCXFRhImIRU2Uf3uCw/J5WuJB/FAJgVC30qgdIejFdHb7Ux7P1INChK5r9z+hATm5GSS3zG8A9vaHnQt4oH1HoAd@vger.kernel.org, AJvYcCXnHA0PLFM0eh6BU8spsOXdIopOoof322bWf0W/f50F0FSq9Az1O2rYoLegdmD3A7tR7b11mQaWKizxcdBd@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2/2xM2byXqxNClboqdCkAu5SnQId72z6X13a0DEqr0EVQ/FM+
-	i/DXN3QFcC5G3fpq2hacsTWo2bHQ3j1+zVC3hEaVIJ04Hsk1kSnJ
-X-Google-Smtp-Source: AGHT+IEqga+x5+wVzdRkFEVj9yPEB6xOIvRkkWxf81x+yvhYejVYjpTd9wj5MB3gxeXmIfKIUFYygA==
-X-Received: by 2002:a17:907:2688:b0:a9a:a7fd:d840 with SMTP id a640c23a62f3a-a9eefeb2c37mr1909473966b.1.1731510674837;
-        Wed, 13 Nov 2024 07:11:14 -0800 (PST)
-Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a4a9b1sm874787166b.52.2024.11.13.07.11.14
+        bh=7S6/os6Qv1ZJNXWnYiunu3TXRi78fgOLap6v5ztnDQE=;
+        b=krW2KAjqImoaLtsMIJ0XyEVVTx+fvXqCDhXaDiOGV/H8x3YMEIvOBt5IAQVg09YMQi
+         qv7/5bz+kI693V3OnRKGfdDcCNl7n/UpKVabcYG7MxiXIWusvhLpThsEihNhI/gikeeY
+         s/7wkEp7v+rxhn871gmHhKPvTAO14pLBQDd2De1cWezBU54l+vbHBQtqfzlTcxN/0Ph0
+         EJSKxK8o5k9/lmb8Z/GpuYQZ7TeDXZ0wUXbHTWzJC8NhvB5BZ13AzE8Cp2huzCmSSfCF
+         PYVc6e0gGfMEVb8tYFxoB7ul1gEls8+p6tXXnqSomQkZbCos8haXOSmvhtEBl/5lLE46
+         LKTA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9AV+SzhaZCsITaD7NwYIOXJR05Jsiu2ulIy0PjqosBjqWcnF3n8RDWv0KTerL3iFEfb9h0Ghc4B7r9UlL@vger.kernel.org, AJvYcCVCG5Rz5rQNibt4RBUrzTiRKeOF7xGmHDFleYDuKvnL8DCKBrhDWKkp0qnTW8ohn3uziXYb2sOCdVo=@vger.kernel.org, AJvYcCVbgCQ+xpVSQaTZz0yu1anTTBsj3AS38ImMd3Vj1fGGZmjcya/sokMttYvdOyEzMo27NvMvhqqZMoVGjpsCAjjN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl6xJE53AIt123ozRJMFMOlZEIqcOU/OQS+etzgVjBnL5ieytZ
+	60DyPh9fgigKVQUZsj8oVa3zjagY+LhElRQ3sPOZY4CMYpLT+7NT
+X-Google-Smtp-Source: AGHT+IEooQZHxOiMQIn34HIP+DH8p3aE6At6BOsjxnDBiugb63EK8ejjNK/O5fpurmhQZP2JWmILNA==
+X-Received: by 2002:a05:6402:4311:b0:5cf:f82:eb65 with SMTP id 4fb4d7f45d1cf-5cf0f82eca8mr14928484a12.9.1731510679496;
+        Wed, 13 Nov 2024 07:11:19 -0800 (PST)
+Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03b7e9c1sm7150081a12.30.2024.11.13.07.11.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 07:11:14 -0800 (PST)
+        Wed, 13 Nov 2024 07:11:18 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Date: Wed, 13 Nov 2024 07:10:52 -0800
-Subject: [PATCH net-next 1/4] netconsole: Ensure dynamic_netconsole_mutex
- is held during userdata update
+Date: Wed, 13 Nov 2024 07:10:54 -0800
+Subject: [PATCH net-next 3/4] netconsole: docs: Add documentation for CPU
+ number auto-population
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241113-netcon_cpu-v1-1-d187bf7c0321@debian.org>
+Message-Id: <20241113-netcon_cpu-v1-3-d187bf7c0321@debian.org>
 References: <20241113-netcon_cpu-v1-0-d187bf7c0321@debian.org>
 In-Reply-To: <20241113-netcon_cpu-v1-0-d187bf7c0321@debian.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -78,51 +78,95 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Breno Leitao <leitao@debian.org>, max@kutsevol.com, thepacketgeek@gmail.com, 
  vlad.wing@gmail.com, davej@codemonkey.org.uk
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1125; i=leitao@debian.org;
- h=from:subject:message-id; bh=dvK97ikucZCA3mi0xw8qgSct+K0NNsxtWtBJbaBwBso=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnNMGNNLZFDm5UODb/yliTCrMzkzzRmOblnI0ne
- zFE3eQ7QcOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzTBjQAKCRA1o5Of/Hh3
- bSeoD/0YXmv/scg2QQ7OU0VAUCNpnLD08+t+xQ+IwTqsxUH5H7gj3wnukCQejaaFu2TAqNJtBPa
- lhRyMnRHZu9X2hjVHFhWZHWR4FibG2ADkEoyqxHyPJjeTn1MKVk1bB2fuvPRMsziosdB2TSpEbX
- S1dE1jemAtmpYBZpACpBgoEeET3C0iS7Qk3M8UxLF1pfSiGT2VXUJtqmW0a+WAWkfoDROFyj4qH
- ub0ZOaI/ILV2Ky7sl+W6DGwFTxxOERWin+Swjr9HI7vP8/lURJem0gGh5fVBIn5XlW3jop3jCaD
- IQLZ6wOjDBOjV39gX7reqazNlO9MXM2HyewTrchP4U/JCR/VT5tEi5x/CNhv759kirLFegZgB7Q
- us4gi94MbIkNY6oBzP+91Sza0IKxBDa9fUmWTd95ZM6uiBZBuSsYHFDrm+KF1iOpUR4uJO+TuKP
- XGYRm6/walO11gdJXudCyEw6edw4m/iCWoIReKA4WzfpF0AhGC4/oeSl6GueuW5evtrJi8GzomV
- LesQHUEWlnX71Of55gEjUz5HPZxcSVS6Bg8hbl6bNvb7siStQwdIOcV8psffyRV5hYPn57u7IIe
- GtnWvXi/kcyyahFAI0Xrb7yIESUldlNi9OuhD9FpE57NNanK8lNoT1aN8Jpf3uByY9zkBG2D1H0
- FGht4XCW5YRXwcg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2825; i=leitao@debian.org;
+ h=from:subject:message-id; bh=IpyXc0ozD1GMB+Il96IkWK5dAeJgnotpsHJ8YdD/teM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnNMGNzGRw6kxr2xG4dDZWgxH4YZ0MO8P17DbTm
+ zuXW0wPnA6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzTBjQAKCRA1o5Of/Hh3
+ bXu/D/9ZPm74waC8ijNe4fg4/CahtsYlyec/NF+SAZ9vDqSx4mlF5v9Z/qwc+Hp4lzlug3NTo1k
+ MzvOCTWK+fn28Ny2ImckvQ3rrYgCFoHdRnvqGep6rC76ZVSiy1X9cAqJ9VyycvbDdGJdRsgh429
+ ZYu4nrTn3H2w/kYqt1xjhsIBKyabNY3oROeAMeFlmg4dnSy7QIdtocsdwIhEZs0vM+o+WzBHZCK
+ VyiTURNjwKAgpt4kTVkli4yA+0ziwR97h4khTYoCUNqg8r8kXcArN6L7X88f8iQvg+h+dUBhSsp
+ JVuUMK5aMAdote/BInKBMAJab60LcmY4jWq06qCmrs5GEffzN7Cja/ISyeGGN43af5l6O00P5zg
+ eaPjcOt3Hes7byvM+6PZBuvqu2SZyaT3Bajj9bZCVbhVrxC1dGMfTYmg7lfJuxTWDq0Ai49pf0z
+ O+9+SwHO+VE5T30RQAMEoQBL6J0KX4Zc+Hbd5UKY4qVghkR3IF6FrVUkfhvcPdmx/zTndqbRfY5
+ 26Cr0ukcwtkUPK5wsuss1IDPo1XPJRMEHxXygq3MuLc4WjFRGS65K1j3v6tL2Y7GqbMRazfrXED
+ DfEoCeVwoioYVL94BwVLOEV3zrFekhJ+xVfR/NGBbL16FcjLhFLFFnOIG1ws4nodvPu9cG+lPz1
+ U5hWPn8TV/mxb2w==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Add a lock assertion to verify that dynamic_netconsole_mutex is held
-when updating the userdata fields in the netconsole driver.
+Update the netconsole documentation to explain the new feature that
+allows automatic population of the CPU number in the userdata field.
 
-This change prevents calling update_userdata() without holding the lock,
-ensuring data consistency and integrity.
+The key changes include introducing a new section titled "CPU number
+auto population in userdata", explaining how to enable the CPU number
+auto-population feature by writing to the "populate_cpu_nr" file in the
+netconsole configfs hierarchy.
 
-The update_userdata() function is invoked only when the user changes the
-configuration, so this addition does not impact performance as it is not
-in the hot path.
+This documentation update ensures users are aware of the new CPU number
+auto-population functionality and how to leverage it for better
+demultiplexing and visibility of parallel netconsole output.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/networking/netconsole.rst | 44 +++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 4ea44a2f48f7b1f9059d275f0f0edc40cc1997f0..965712d65a014c60f91bf35e48f1b112f66b8439 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -697,6 +697,8 @@ static void update_userdata(struct netconsole_target *nt)
- 	int complete_idx = 0, child_count = 0;
- 	struct list_head *entry;
+diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+index d55c2a22ec7af0e687b76176c9171eb1b19013bd..a1b269196be390b5f88a6eca77f6676c67c05720 100644
+--- a/Documentation/networking/netconsole.rst
++++ b/Documentation/networking/netconsole.rst
+@@ -237,6 +237,50 @@ Delete `userdata` entries with `rmdir`::
  
-+	lockdep_assert_held(&dynamic_netconsole_mutex);
+    It is recommended to not write user data values with newlines.
+ 
++CPU number auto population in userdata
++--------------------------------------
 +
- 	/* Clear the current string in case the last userdatum was deleted */
- 	nt->userdata_length = 0;
- 	nt->userdata_complete[0] = 0;
++Inside the netconsole configfs hierarchy, there is a file called
++`populate_cpu_nr` under the `userdata` directory. This file is used to enable or
++disable the automatic CPU number population feature. This feature
++automatically populate the CPU number that is sending the message in the
++userdata field.
++
++To enable the CPU number auto-population::
++
++  echo 1 > /sys/kernel/config/netconsole/target1/userdata/populate_cpu_nr
++
++When this option is enabled, the netconsole messages will include an additional
++line in the userdata field with the format `cpu=<cpu_number>`. This allows the
++receiver of the netconsole messages to easily differentiate and demultiplex
++messages originating from different CPUs, which is particularly useful when
++dealing with parallel log output.
++
++Example::
++
++  echo "This is a message" > /dev/kmsg
++  12,607,22085407756,-;This is a message
++   cpu=42
++
++In this example, the message was sent by CPU 42.
++
++.. note::
++
++   If the user has set a conflicting `cpu` key in the userdata dictionary,
++   both keys will be reported, with the kernel-populated entry appearing after
++   the user one. For example::
++
++     # User-defined CPU entry
++     mkdir -p /sys/kernel/config/netconsole/target1/userdata/cpu
++     echo "1" > /sys/kernel/config/netconsole/target1/userdata/cpu/value
++
++   Output might look like::
++
++     12,607,22085407756,-;This is a message
++      cpu=1
++      cpu=42    # kernel-populated value
++
++
+ Extended console:
+ =================
+ 
 
 -- 
 2.43.5
