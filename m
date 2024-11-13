@@ -1,140 +1,118 @@
-Return-Path: <netdev+bounces-144384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A3F9C6F03
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:26:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A5CF9C6E93
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:05:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FEA2B2D094
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:04:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD4181F21A94
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6255201002;
-	Wed, 13 Nov 2024 11:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDC82010E4;
+	Wed, 13 Nov 2024 12:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MKymMy5E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUhuN9hF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2792200C94;
-	Wed, 13 Nov 2024 11:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BCD206071;
+	Wed, 13 Nov 2024 12:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731499154; cv=none; b=NgV79PZ4mLg6nBHVtWpfU90SDjdYUvdQSPh0yqWGOJtAnU02zjBbE35SupfPt8B1VVxgA5mUNBZU1G++7UnI1yFOn9kF6TzxTTRD8SuQuV7ywtVDwXfIinSU+jZKEETTPaCNlsIu1KD5LlhYhp3cLDJVbSUKNHhIXuUry/i/SrM=
+	t=1731499225; cv=none; b=GCvh8ebV7u7GE0yUh66tmM2pbVdnSOGy+m3OPYuROQGeDclcixTX9mQXX7/KDuRvNBqLf0juZTvdxNMyhImLrhQs/xWq3Z8TZ4RKb7LdzWHpuDs/3I3eIssLwv3JqIokzkP0h8Sn1iUzSg+8vHxvql9c28vuaPJeq/TJ27qSmCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731499154; c=relaxed/simple;
-	bh=S2yXI+RpE/4Z6IIWIoXWreQT7e9SUd1QZeV3E85aBM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cdSkrx7w+4YUo9mGtb5hYiJRb0+zVIJcNrmq9ZQxwaPFysR8dPtKhqD4mopZ46jF2uwyoXNbM80rCn/Ll3vLz5WqQi84fwxcq2zgCAwr/ZtymOLAeH9+OsD1q/E4P7CWcSSi+f3m1fBTRJh1tfSR6fGP1CofejV/UHuMTKwYeow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MKymMy5E; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731499153; x=1763035153;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S2yXI+RpE/4Z6IIWIoXWreQT7e9SUd1QZeV3E85aBM8=;
-  b=MKymMy5EVEqpYpC+dCT4KWJ5GQM2SwaobrVXdbKUFjWBCz5BzSIjJOlu
-   szQUsPdf4w4aCPRxTLNudNainTIo+ZYuMdzNOU37mw6ACOccah4cXP2wI
-   TqvIeWwECCtBbcgEvLWzBGF7l93f8b4sOAKLZ+2WJrDAnxqT5heaAjhly
-   syERIulG6w52UYkCpezgtoqs63OUeYfrvyUEtSBWvkUAtwKPyLotntx3X
-   XiiXUbxnbWhTBMD4YnqDg+vel9Ra4RilRAFcBJRGWIFc1R848YbfDOXp6
-   hjc019SE1NOlHhLx4ovM5QfZO32E12c0VyM4G0HrXG5RlZ+pthoqT8Nuj
-   Q==;
-X-CSE-ConnectionGUID: RnN5Be6tSsCk/Vl5mrZdlg==
-X-CSE-MsgGUID: PaRj7UwmQ46Hkj+2hi5bxw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11254"; a="35314456"
-X-IronPort-AV: E=Sophos;i="6.12,150,1728975600"; 
-   d="scan'208";a="35314456"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 03:59:11 -0800
-X-CSE-ConnectionGUID: mbuIIPKWTsC2Zo2OOWA+8Q==
-X-CSE-MsgGUID: Drm0ljxqRt6tHanbqPmqGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,150,1728975600"; 
-   d="scan'208";a="87842391"
-Received: from lkp-server01.sh.intel.com (HELO 80bd855f15b3) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 13 Nov 2024 03:59:05 -0800
-Received: from kbuild by 80bd855f15b3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tBC1X-0000Kv-0X;
-	Wed, 13 Nov 2024 11:59:03 +0000
-Date: Wed, 13 Nov 2024 19:58:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: Joey Lu <a0987203069@gmail.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, ychuang3@nuvoton.com, schung@nuvoton.com,
-	yclu4@nuvoton.com, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Joey Lu <a0987203069@gmail.com>
-Subject: Re: [PATCH v2 3/3] net: stmmac: dwmac-nuvoton: Add dwmac support for
- MA35 family
-Message-ID: <202411131946.ozq1D0f2-lkp@intel.com>
-References: <20241113051857.12732-4-a0987203069@gmail.com>
+	s=arc-20240116; t=1731499225; c=relaxed/simple;
+	bh=THI3YLBzXVja+TcFlUWeFwf4xpf6z18cL1jh+zfVypY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Qnce3I5wBUyw2Mw4QA6m7QXSgVBF/8AnqQ/LfBRDNvau74BxNB4gFCIRoWZF1TfUHRWJz1/Lod1DzDxvHF7SFGbWqtwsNJPIUPyLXx/crrdh8c4c5xkMIZBezj53YuxprU24336RqLW+sty8z8eG8oJBGNBwIc6teyl8xdtMCWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kUhuN9hF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 645E3C4CECD;
+	Wed, 13 Nov 2024 12:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731499224;
+	bh=THI3YLBzXVja+TcFlUWeFwf4xpf6z18cL1jh+zfVypY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kUhuN9hFEeo7b725W8ffKt4JqVNuKS6YltTF3ubb9VnGMjiPs2rRqttQbvEh50la8
+	 AIpgdAFHs65SfXrxlGzGCamHOP7yZx6v8mCP0R+uB/v9YMrxxTn4N1tpYOQSQO+I3l
+	 hpfmkNdgd/0hM3LXVwy+PDJmjyHTOwc0FRnY8doNtW1uFKL8HLTtlTLBug0zDLl6sh
+	 Z1z1gJEDIJB4i5VPv6ZB86S/VeenrfHFj3SgwdB9nf6CRJurzgzqd7hlQNxbQyavDH
+	 E8auEoGJqtFaiqqJoh2GAFkt77rTLJP4BslagGldx6INHbHZ//QsQ1ulg6VJf/FORj
+	 rmVs6trt+M60g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF03809A80;
+	Wed, 13 Nov 2024 12:00:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241113051857.12732-4-a0987203069@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH v12 00/12] Introduce RVU representors  
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173149923475.1192742.13198903073889976671.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Nov 2024 12:00:34 +0000
+References: <20241107160839.23707-1-gakula@marvell.com>
+In-Reply-To: <20241107160839.23707-1-gakula@marvell.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, jiri@resnulli.us,
+ edumazet@google.com, sgoutham@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com
 
-Hi Joey,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-[auto build test WARNING on robh/for-next]
-[also build test WARNING on net-next/main net/main linus/master v6.12-rc7 next-20241113]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Thu, 7 Nov 2024 21:38:27 +0530 you wrote:
+> This series adds representor support for each rvu devices.
+> When switchdev mode is enabled, representor netdev is registered
+> for each rvu device. In implementation of representor model,
+> one NIX HW LF with multiple SQ and RQ is reserved, where each
+> RQ and SQ of the LF are mapped to a representor. A loopback channel
+> is reserved to support packet path between representors and VFs.
+> CN10K silicon supports 2 types of MACs, RPM and SDP. This
+> patch set adds representor support for both RPM and SDP MAC
+> interfaces.
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Joey-Lu/dt-bindings-net-nuvoton-Add-schema-for-MA35-family-GMAC/20241113-132300
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20241113051857.12732-4-a0987203069%40gmail.com
-patch subject: [PATCH v2 3/3] net: stmmac: dwmac-nuvoton: Add dwmac support for MA35 family
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241113/202411131946.ozq1D0f2-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241113/202411131946.ozq1D0f2-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next,v12,01/12] octeontx2-pf: RVU representor driver
+    https://git.kernel.org/netdev/net-next/c/222a4eea9c6b
+  - [net-next,v12,02/12] octeontx2-pf: Create representor netdev
+    https://git.kernel.org/netdev/net-next/c/3937b7308d4f
+  - [net-next,v12,03/12] octeontx2-pf: Add basic net_device_ops
+    https://git.kernel.org/netdev/net-next/c/22f858796758
+  - [net-next,v12,04/12] octeontx2-af: Add packet path between representor and VF
+    https://git.kernel.org/netdev/net-next/c/683645a2317e
+  - [net-next,v12,05/12] octeontx2-pf: Get VF stats via representor
+    https://git.kernel.org/netdev/net-next/c/940754a21dec
+  - [net-next,v12,06/12] octeontx2-pf: Add support to sync link state between representor and VFs
+    https://git.kernel.org/netdev/net-next/c/b8fea84a0468
+  - [net-next,v12,07/12] octeontx2-pf: Configure VF mtu via representor
+    https://git.kernel.org/netdev/net-next/c/3392f9190373
+  - [net-next,v12,08/12] octeontx2-pf: Add representors for sdp MAC
+    https://git.kernel.org/netdev/net-next/c/2f7f33a09516
+  - [net-next,v12,09/12] octeontx2-pf: Add devlink port support
+    https://git.kernel.org/netdev/net-next/c/9ed0343f561e
+  - [net-next,v12,10/12] octeontx2-pf: Implement offload stats ndo for representors
+    https://git.kernel.org/netdev/net-next/c/d8dec30b5165
+  - [net-next,v12,11/12] octeontx2-pf: Adds TC offload support
+    https://git.kernel.org/netdev/net-next/c/6c40ca957fe5
+  - [net-next,v12,12/12] Documentation: octeontx2: Add Documentation for RVU representors
+    https://git.kernel.org/netdev/net-next/c/6050b04dca8e
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411131946.ozq1D0f2-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c:20: warning: expecting prototype for dwmac(). Prototype was for PATHDLY_DEC() instead
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [m]:
-   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
-
-
-vim +20 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
-
-    19	
-  > 20	#define PATHDLY_DEC         134
-    21	#define TXDLY_OFST          16
-    22	#define TXDLY_MSK           GENMASK(19, 16)
-    23	#define RXDLY_OFST          20
-    24	#define RXDLY_MSK           GENMASK(23, 20)
-    25	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
