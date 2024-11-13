@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-144306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B48429C6851
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:00:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C199C6852
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30424B26A77
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:00:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 790231F23CB9
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03799175D45;
-	Wed, 13 Nov 2024 05:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D27417624D;
+	Wed, 13 Nov 2024 05:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+zBV3B0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uopi7cfJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4921175D39
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E09176227;
+	Wed, 13 Nov 2024 05:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731474026; cv=none; b=PKM6TI0mo94hn9ZiJkRRnyogTNjGMQCbf8Pks4p5E7wyWZU9vVZqBt/Wj60aIyn4hrJacyv6okPjgLVkmBeX1ZEnq06h28SNsa3upVoy2CfpE5TJ67ZcHDzXPNso5s8T23J3RcswEHCuhZ+B3kzbS1vxteU6SY4GRnlK1F5F504=
+	t=1731474028; cv=none; b=i9hKXnbLctdSxv4uS4wqsSG3Ni+dg3ZvvEx/zEo0CqKTAVrC5m6I4TUb/FPtNM5sloJtwjDxRhn59RquGEDUDYbS7EuL56jpEAqPtLJ4DmzNYXs/eVZUsngvJ3+sR8to+6GK/djCbsHhvsAkg0bzojJLqupIzIWxHHowpwOyLg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731474026; c=relaxed/simple;
-	bh=ASWObKzC1Nx3cn3QPT9eHJiyd6xFB3gr4sXPv3rLMmc=;
+	s=arc-20240116; t=1731474028; c=relaxed/simple;
+	bh=Z9eYVY2vdewrh0pTpQiuKoGCOKjkEvsy8120cNOY/ZA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B99KWMjMvUuZcBOf06oYy11sdytDgg0ljNi7A864mWr0e3AqW/U7TobWw8qd1qDr3d8dZTm7/oSRfL+TzrkiQHYltSyteR7fZ/fS4aqilxSbiV5kC1wIs6u/1e3N0m7uQZmxXUy5uvFd9+kHQGgkQ9UpJlqUQ7Xq59gBGZHCjp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+zBV3B0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 679C5C4CECD;
-	Wed, 13 Nov 2024 05:00:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=C0KZqRzwJCUBwwhBOTbJLHbUQqMod1KQQViaeDEg+9CckhhGqti9toEEBWYDZVSN91wp/noNhvk5VAx5jhMLpwHDS5Yx4CasGjeLCOrQsAr+ocXGLz8xXa8MP+rFhlKK+HAzSy4MASSTSPFj8W+f/8LSv2Sg/fiCdQvIDQ/6QPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uopi7cfJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0EC7C4CED2;
+	Wed, 13 Nov 2024 05:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731474026;
-	bh=ASWObKzC1Nx3cn3QPT9eHJiyd6xFB3gr4sXPv3rLMmc=;
+	s=k20201202; t=1731474027;
+	bh=Z9eYVY2vdewrh0pTpQiuKoGCOKjkEvsy8120cNOY/ZA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p+zBV3B0IKxO/P5MHzZGuN/TRz+wjxDwaXesaHeRSRGegWjaMg8r+yUu6H1/pzaV3
-	 6kbx0Xi7byoZ5x2e9TY2FHot2ZYenJ8V8OzMK54873CTOmcrU+mMYnLcB9DZPQqSUY
-	 HpdEaKGpp0S41odNx9CnqeCpqN3bLbW4xFk6rZWIH5cYo0HRReyWEjhABEUkM6OlXQ
-	 EZty6zKv24YNm6jRRTB84GhR3AgTJ1ZFEp7uwDtPzN0LryRyTilNwSCotJ5Dozgya+
-	 pu3y/p5XXFmfdc1M3noI6sBRnswtcjND9bhcT5Tc16dNU/ZR7Y3AVjVwfcrrli86YR
-	 LrXzCg1VPAo0A==
+	b=Uopi7cfJA15cmN9CZXz/xrBP34RWe6N7ftFmh4kVz/0ucrCRdZgEZfh+/hk2MPX0i
+	 LUGVNh44Wdh7B0NB9WKrXwTCaCPnT11ExWo42+U442he0ZrUwLIhATQw/o8AMoV5SH
+	 ne6sBdplH6hwQWmQyPQkkrEnQ/0/RGaUM3df29rOGmLtSB9U83KToLgfA52WbX6wWf
+	 urwHiWYdcHuRgwkE2cMJPgEMy2yrFIB/eHbVpbWcLO1Mv4hOPkmbwbBOEmD/tGfikL
+	 XZ6YWIcvsoM0IScY7z3/nK2loEBOMkR1v26uxvH1RdjkQiGqMR3aYFj6ToYcxz2caq
+	 tASggXlEZcdBg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC943809A80;
-	Wed, 13 Nov 2024 05:00:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EEA3809A80;
+	Wed, 13 Nov 2024 05:00:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] eth: bnxt: use page pool for head frags
+Subject: Re: [PATCH] mptcp: fix possible integer overflow in
+ mptcp_reset_tout_timer
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173147403650.787328.13748437765054715783.git-patchwork-notify@kernel.org>
-Date: Wed, 13 Nov 2024 05:00:36 +0000
-References: <20241109035119.3391864-1-kuba@kernel.org>
-In-Reply-To: <20241109035119.3391864-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, michael.chan@broadcom.com, ap420073@gmail.com
+ <173147403799.787328.7140723008412111256.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Nov 2024 05:00:37 +0000
+References: <20241107103657.1560536-1-d.kandybka@gmail.com>
+In-Reply-To: <20241107103657.1560536-1-d.kandybka@gmail.com>
+To: Dmitry Kandybka <d.kandybka@gmail.com>
+Cc: matttbe@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org, dmantipov@yandex.ru
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  8 Nov 2024 19:51:19 -0800 you wrote:
-> Testing small size RPCs (300B-400B) on a large AMD system suggests
-> that page pool recycling is very useful even for just the head frags.
-> With this patch (and copy break disabled) I see a 30% performance
-> improvement (82Gbps -> 106Gbps).
+On Thu,  7 Nov 2024 13:36:57 +0300 you wrote:
+> In 'mptcp_reset_tout_timer', promote 'probe_timestamp' to unsigned long
+> to avoid possible integer overflow. Compile tested only.
 > 
-> Convert bnxt from normal page frags to page pool frags for head buffers.
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] eth: bnxt: use page pool for head frags
-    https://git.kernel.org/netdev/net-next/c/7ed816be35ab
+  - mptcp: fix possible integer overflow in mptcp_reset_tout_timer
+    https://git.kernel.org/netdev/net-next/c/b169e76ebad2
 
 You are awesome, thank you!
 -- 
