@@ -1,95 +1,99 @@
-Return-Path: <netdev+bounces-144616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37A399C7F05
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 00:57:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E939C7F0E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 00:59:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C935B24DB7
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 23:57:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52BB62846BD
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 23:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AA5193408;
-	Wed, 13 Nov 2024 23:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9605818F2F2;
+	Wed, 13 Nov 2024 23:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="dUEh0PJh"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="lUCb2rG2"
 X-Original-To: netdev@vger.kernel.org
-Received: from alln-iport-3.cisco.com (alln-iport-3.cisco.com [173.37.142.90])
+Received: from alln-iport-2.cisco.com (alln-iport-2.cisco.com [173.37.142.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06721917C4;
-	Wed, 13 Nov 2024 23:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8792118DF91;
+	Wed, 13 Nov 2024 23:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731542223; cv=none; b=A7/zHBqoZQDMDP9LLDWCdLd9NWoc2SoLK4XyaKsRCDJkHL2WqCPCVF4mlIXV+R0oxZ73pBV+JeBL/fPXRoMTabGRyH3HdYjXPaUB4QMaMRdEuMLHCKFSD09HM7+qpjTj5q57fmETDo8MHMss7RhTI0BuecwxuvECCLAf3eDGVc8=
+	t=1731542285; cv=none; b=MV11Ask9pyJwnS/YtFxBZXVXT5FOoMcuheK895d+7dL8v81Ri1J2XVJqogWEdXN72Gn1IHxxKtdG0VSCLU/avQXQEdPAFOhiWjCKUpxzowx0nXVHDa+7/4sZZsfiKODH3aNeNcT8uFM5caImTPid5DjEmfVXVNxrNOzB4aS0lQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731542223; c=relaxed/simple;
-	bh=5owxqDXstMN6SHOLEqqiW5l7qDBaLbB+d3MirCHt/8w=;
+	s=arc-20240116; t=1731542285; c=relaxed/simple;
+	bh=BaAMDPDZS2YT6jrU8+AmVF8L/RZgKYuGDX5Aoh7FqDg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=M4TGRx6U241XTvdAEL0I5TPqzf4kHR+cFqRhJqcPoqGQDM+YcloYZ94EiagE6eZC/dmlWCjJo5hlrxiGxxvGZf+emATnmaDhVinv42cNmOuoKmYk8wT+fLOpbmJQ3G9s4dgHFcpIZOv8ju1FXsJlDRNV/qI6atC8VueSnHPnD3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=dUEh0PJh; arc=none smtp.client-ip=173.37.142.90
+	 In-Reply-To:To:Cc; b=glGK535gxQ3z5ODWkXG0kvoT/K2ytGy9+hJPWFfpR/9ct0lorntLeNqSoYh9Boo4TfQSMVtAkMfUTCntlLBxWsCEQF6bBuqO9NtLEujYR8/eQiWRuVCH8ls+kFpxR3kScC+D3oCDh1+aDmefKQ0LnAVgQ2IU5yNX7m1cpQoYiIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=lUCb2rG2; arc=none smtp.client-ip=173.37.142.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=6960; q=dns/txt; s=iport;
-  t=1731542220; x=1732751820;
+  d=cisco.com; i=@cisco.com; l=5894; q=dns/txt; s=iport;
+  t=1731542283; x=1732751883;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=xKLIfSrBTMEdou9XF+9pCY9FiWhEmlG0ZHo76FyHKjo=;
-  b=dUEh0PJhNU9g2cYgWldTMPOmZmeBORl/C9vOYcIGsQSpLolcx+7Kqjgr
-   3jIOQE2ZDJoVN1CrFn8elVXvG6SMQH/jMITliH0CsdECsFc42GOc99kmP
-   1PgLTrcq4J2A2JuMM0A/30vJWB7jXBZCQUWI4eYfe3kvlwxy9d0bz2N9B
-   k=;
-X-CSE-ConnectionGUID: OnRzWLl7QLGGOGC+q/XR5A==
-X-CSE-MsgGUID: Khr1ApE2Td2RbfZWkB4qMg==
-X-IPAS-Result: =?us-ascii?q?A0AFAABLPDVn/4oQJK1aGQEBAQEBAQEBAQEBAQEBAQEBA?=
- =?us-ascii?q?RIBAQEBAQEBAQEBAQFAgT8EAQEBAQELAYJKgVBCSIRViB2HMIIhi3WSIxSBE?=
- =?us-ascii?q?QNWDwEBAQ9EBAEBhQcCikUCJjQJDgECBAEBAQEDAgMBAQEBAQEBAQEBAQsBA?=
- =?us-ascii?q?QUBAQECAQcFgQ4ThgiGWwIBAyMEUhAlAiYCAisbEAYBEoMBgmUCAbBten8zg?=
- =?us-ascii?q?QGEe9k4gW2BGi4BiEsBgWyDfTuEPCcbgUlEgRWBO4E+b4Qqg3SCaQSCQYNVU?=
- =?us-ascii?q?nYlgRMCAgIHAoN8g3lbmE4JP4EFHANZIREBVRMNCgsHBWNXPAMib2pceiuBD?=
- =?us-ascii?q?oEXOkOBO4EiLxshC1yBN4EZARQGFQSBDkY/gkppSzoCDQI2giQkWYJPhRqEb?=
- =?us-ascii?q?YRmglQvHUADCxgNSBEsNQYOGwY9AW4HnmVGgysHgQ+BJgcDYyxjklwKg3KNP?=
- =?us-ascii?q?oIfn0yEJKFcM6pNmHcio05OhGaBZzyBWTMaCBsVgyJSGQ+OLRYWkwABtj9DN?=
- =?us-ascii?q?TsCBwsBAQMJkEkBAQ?=
-IronPort-Data: A9a23:t4p2qKNl01GsegPvrR12lsFynXyQoLVcMsEvi/4bfWQNrUorhjYDy
- zceWm3UPPreZTT2KNh1bt6+8kMEvsDVmIdkTXM5pCpnJ55oRWUpJjg4wmPYZX76whjrFRo/h
- ykmQoCeaphyFjmE+0/F3oHJ9RFUzbuPSqf3FNnKMyVwQR4MYCo6gHqPocZh6mJTqYb/WlnlV
- e/a+ZWFZAb8gmUsaQr41orawP9RlKWq0N8nlgRWicBj5Df2i3QTBZQDEqC9R1OQapVUBOOzW
- 9HYx7i/+G7Dlz91Yj9yuu+mGqGiaue60Tmm0hK6aYD76vRxjnBaPpIACRYpQRw/ZwNlMDxG4
- I4lWZSYEW/FN0BX8QgXe0Ew/ypWZcWq9FJbSJSymZT78qHIT5fj69JoNlMJGYlHw8JYLkZh3
- r8BbwA3MznW0opawJrjIgVtrs0nKM+uOMYUvWttiGmAS/0nWpvEBa7N4Le03h9p2ZsIRqiYP
- pRfMGE/BPjDS0Un1lM/Dp8zh+yvjHDXeDxDo1XTrq0yi4TW5FcgiuK3YICOJLRmQ+12nlzBj
- 3rrpVj1WCsQOu6gyhDZ61ej07qncSTTHdh6+KeD3vJjnlCW7mAaFhATUVy1vb+/h1LWc99TN
- kkd6Ccyhac180OvQ5/2WBjQiH6DpBsHc9ldCes37EeK0KW8ywWEDGEsTTNbbtEi8sgsSlQC3
- 1mFhd72RjpirLGYV1qZ67GS6ziyUQANJGUPYy4sVwYJ49D/5oo0i3rnStdlDb7wjdDvHzz06
- y6FoTJ4hLgJi8MPkaKh8jjvhT+wqpXXZhA66x+RXW+/6A59Iom/aOSVBUPz5PJEKsOdC1KGp
- nVBw5HY5+EVBpbLnyuIKAkQIIyUCz++GGW0qTZS81MJrlxBJ1bLkVhs3QxD
-IronPort-HdrOrdr: A9a23:SsX8f62IMJ/+Pn7+uzPTkAqjBH8kLtp133Aq2lEZdPWaSL3+qy
- nIppQmPH7P6Qr5N0tNpTntAsS9qDbnhPtICOoqU4tKIjOW21dARbsKheCJ/9SjIVydygc378
- hdmsZFebnNJGk/oMrk7Ay/Cto6hPuK4MmT9J/j5kYoYA10Z6Rn9gtjTjyaHEp/WRVcCfMCZe
- OhD7J81lydkbB9VLXAOpHDNNKz3OH2qA==
-X-Talos-CUID: =?us-ascii?q?9a23=3AMPQQxWusp6MSAlzYUhChlAbq6IsCdEfP81PUfHa?=
- =?us-ascii?q?cJklOZ5bWUBigwv5Nxp8=3D?=
-X-Talos-MUID: 9a23:YFB5VAnbQE5pVn9GgHPGdnpBNN0xyryDUnwBy68Mtfu7NgYsIhKS2WE=
+  bh=7faiQRGgmp7GL149R+szlt5/BOnQOPfLqxK1XaSDFqE=;
+  b=lUCb2rG2qtfwSQYnyOdQdsSJdANMCWp4fIP/yxyCjAvRv70b7BcCmM9i
+   zm4sQoio4SrcQ9iT5a3liMFYQM5UMMuuhL1t/IZg1oi5R1Utlp2lWeQrO
+   jf+eO7xNuCdrfmVgtawrEvy/cFxBjZhE6Q8taDml/mj43U9q3RIjMVNhp
+   g=;
+X-CSE-ConnectionGUID: FafY/dQyQBCNKHq8cJzebQ==
+X-CSE-MsgGUID: Opc5s8N3R0+vSp7+1roukQ==
+X-IPAS-Result: =?us-ascii?q?A0AGAADHOzVnj44QJK1aGwEBAQEBAQEBBQEBARIBAQEDA?=
+ =?us-ascii?q?wEBAUCBPwYBAQELAYQaQkiEVYgdhzCOFpIjgSUDVg8BAQEPRAQBAYUHAopFA?=
+ =?us-ascii?q?iY0CQ4BAgQBAQEBAwIDAQEBAQEBAQEBAQELAQEFAQEBAgEHBRQBAQEBAQE5B?=
+ =?us-ascii?q?Q47hgiGWwIBAyMEUhAlAiYCAisbEAYBEoMBgmUCAbBmen8zgQHeM4FtgRouA?=
+ =?us-ascii?q?YhLAYFsg307hDwnG4FJRIEUAYNohBuEA4JpBIQtA4I4diWFHoN5W49RiH0JP?=
+ =?us-ascii?q?4EFHANZIREBVRMNCgsHBWNXPAMib2pceiuBDoEXOkOBO4EiLxshC1yBN4EaF?=
+ =?us-ascii?q?AYVBIEORj+CSmlLOgINAjaCJCRZgk+FGoRthGaCVC8dQAMLGA1IESw1Bg4bB?=
+ =?us-ascii?q?j0BbgeeZUaDMoEOgScHgRJjkm2Da40+oWuEJKFcM6pNmHcipByEZoFnOoFbM?=
+ =?us-ascii?q?xoIGxWDIlIZD44tDQkWkwABtj9DNTsCBwsBAQMJjk2BfAEB?=
+IronPort-Data: A9a23:986sfazTWRfacTBMbdl6t+eixirEfRIJ4+MujC+fZmUNrF6WrkUHn
+ GNKW2yHO/uKM2ajeo92b4zl8xwP7cPVxtZkQVE+r1hgHilAwSbn6Xt1DatR0we6dJCroJdPt
+ p1GAjX4BJlqCCea/lH1b+CJQUBUjcmgXqD7BPPPJhd/TAplTDZJoR94kobVuKYw6TSCK13L4
+ ImaT/H3Ygf/h2ctazlMsMpvlTs21BjMkGJA1rABTagjUG/2zxE9EJ8ZLKetGHr0KqE8NvK6X
+ evK0Iai9Wrf+Ro3Yvv9+losWhRXKlJ6FVHmZkt+A8BOsDAbzsAB+vpT2M4nVKtio27hc+adZ
+ zl6ncfYpQ8BZsUgkQmGOvVSO3kW0aZuoNcrLZUj2CCe5xWuTpfi/xlhJG8/M7xf9t9mOEtl0
+ 984MWAGTAKOjdvjldpXSsE07igiBMDvOIVavjRryivUSK57B5vCWK7No9Rf2V/chOgXQq2YP
+ JRfMGQpNUiaC/FMEg9/5JYWmuqlnXL4eTRwo1OOrq1x6G/WpOB0+OOyYIOJIIPSHq25mG6/v
+ mmb5DTfWStCd8Kk0WXGq2irm+z2yHaTtIU6T+DgqaUw3zV/3Fc7BBQIWF6TrfCnh0u6XNxDb
+ UoZ5kIGoKQv8UW5Q8XVUBq/r3qJ+BUbXrJ4E+og7RqlyafO5QudQG8eQVZpa8Esvec1SCYs2
+ 1vPmMnmbRRmtrGPRG3e8LqIoT6sESwIK2lEbi9sZRMM6dTloakpgx7PR8olG6mw5vXxGDft0
+ 3WJoTI4irE7k8EGzeO48ErBjjbqoYLGJiYz6xnbU3yN8Ax0fsimapau5Fyd6uxPRLt1VXGIu
+ HwC3szb5+cUANTVyWqGQf4GG/ei4PPt3CDgbUBHMZAvxnOhwm+aV6t2wxFndExLIMsOQGq8C
+ KPMgj956JhWNXqsSKZ4ZYOtFsgnpZQM8/y7Cpg4ifIQP/BMmB+7wc14WaKHM4nQfKkQfUMXZ
+ cfznSWEVCpy5UFbINyeHLx1PVgDnXxW+I8rbcqnpylLKJLHDJJvdZ8LMUGVcscy576erQPe/
+ r53bpTRkkgFCrOuMnSOq+b/yGzmy1BmW/gaTOQKJ4a+zvZOQTBJ5wL5mOl4Itc0xcy5aM+Tr
+ ijmBCe0N2YTdVWcdF3VMSo8AF8edZ1+tnk8dTc9Jkql3mNrYICkqs8im2gfI9EaGBhY5acsF
+ ZEtIpzYatwWE2iv02pGN/HV8tc9HClHcCrSZEJJlhBjJMY4H2QkO7bMImPSycX5JnHn6ZVl+
+ +b/iVKzrFhqb10KMfs6ocmHlzuZ1UXxUsorN6cUCrG/oHnRzbU=
+IronPort-HdrOrdr: A9a23:/HD1GawDuJ0DiUOGHjbCKrPwT71zdoMgy1knxilNoH1uEvBw8v
+ rEoB1173LJYVoqMk3I+urgBED/exzhHPdOiOEs1NyZMDUO1lHHEL1f
+X-Talos-CUID: =?us-ascii?q?9a23=3AXjTGBmgXsAT73AVH4XBCATuE0TJuXHTT/TDcGl6?=
+ =?us-ascii?q?BI01Pa52MGVSy6q5uqp87?=
+X-Talos-MUID: =?us-ascii?q?9a23=3A9lcODQyaVVWWihoY0giD/r8XhbWaqIO2Ax0WwbN?=
+ =?us-ascii?q?dgZHHKxdoZHTEljOqQbZyfw=3D=3D?=
 X-IronPort-Anti-Spam-Filtered: true
 X-IronPort-AV: E=Sophos;i="6.12,152,1728950400"; 
-   d="scan'208";a="392228236"
-Received: from alln-l-core-01.cisco.com ([173.36.16.138])
-  by alln-iport-3.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 13 Nov 2024 23:56:54 +0000
+   d="scan'208";a="378142703"
+Received: from alln-l-core-05.cisco.com ([173.36.16.142])
+  by alln-iport-2.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 13 Nov 2024 23:56:54 +0000
 Received: from neescoba-vicdev.cisco.com (neescoba-vicdev.cisco.com [171.70.41.192])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by alln-l-core-01.cisco.com (Postfix) with ESMTPS id 5BA671800019A;
+	by alln-l-core-05.cisco.com (Postfix) with ESMTPS id E234718000154;
 	Wed, 13 Nov 2024 23:56:53 +0000 (GMT)
 Received: by neescoba-vicdev.cisco.com (Postfix, from userid 412739)
-	id D5BCACC12A5; Wed, 13 Nov 2024 23:56:52 +0000 (GMT)
+	id DB17CCC12AC; Wed, 13 Nov 2024 23:56:52 +0000 (GMT)
 From: Nelson Escobar <neescoba@cisco.com>
-Date: Wed, 13 Nov 2024 23:56:36 +0000
-Subject: [PATCH net-next v4 4/7] enic: Allocate arrays in enic struct based
- on VIC config
+Date: Wed, 13 Nov 2024 23:56:37 +0000
+Subject: [PATCH net-next v4 5/7] enic: Adjust used MSI-X wq/rq/cq/interrupt
+ resources in a more robust way
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,7 +102,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241113-remove_vic_resource_limits-v4-4-a34cf8570c67@cisco.com>
+Message-Id: <20241113-remove_vic_resource_limits-v4-5-a34cf8570c67@cisco.com>
 References: <20241113-remove_vic_resource_limits-v4-0-a34cf8570c67@cisco.com>
 In-Reply-To: <20241113-remove_vic_resource_limits-v4-0-a34cf8570c67@cisco.com>
 To: John Daley <johndale@cisco.com>, Eric Dumazet <edumazet@google.com>, 
@@ -109,243 +113,211 @@ To: John Daley <johndale@cisco.com>, Eric Dumazet <edumazet@google.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Nelson Escobar <neescoba@cisco.com>, Simon Horman <horms@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1731542212; l=7119;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1731542212; l=6224;
  i=neescoba@cisco.com; s=20241023; h=from:subject:message-id;
- bh=5owxqDXstMN6SHOLEqqiW5l7qDBaLbB+d3MirCHt/8w=;
- b=z5IZXmvKbmF9fvwHuFOjYqalykDRw8sn9jfD3FxtKqwNWWB4vl65qryJAj/Mew7SOeAig8QXy
- TA+kIiA/Tu7D1jGJnHRGwVQf6VbrlWOsOkfXIbkYOh7bwOxTHZ4PrJY
+ bh=BaAMDPDZS2YT6jrU8+AmVF8L/RZgKYuGDX5Aoh7FqDg=;
+ b=HgsBZACqfp16Yl9sxU5GphVHAlD2V68FhjLESi8FK1rVsCFClszHWGGi6FJdGABvoMNiSIe1n
+ FqrDRJFP4lCDJ8zcGYVYtlRzi3D2zXfgdNKxKyysF5Al6MGR5TvjJqR
 X-Developer-Key: i=neescoba@cisco.com; a=ed25519;
  pk=bLqWB7VU0KFoVybF4LVB4c2Redvnplt7+5zLHf4KwZM=
 X-Outbound-SMTP-Client: 171.70.41.192, neescoba-vicdev.cisco.com
-X-Outbound-Node: alln-l-core-01.cisco.com
+X-Outbound-Node: alln-l-core-05.cisco.com
 
-Allocate wq, rq, cq, intr, and napi arrays based on the number of
-resources configured in the VIC.
+Instead of failing to use MSI-X if resources aren't configured exactly
+right, use the resources we do have.  Since we could start using large
+numbers of rq resources, we do limit the rq count to what
+netif_get_num_default_rss_queues() recommends.
 
 Co-developed-by: John Daley <johndale@cisco.com>
 Signed-off-by: John Daley <johndale@cisco.com>
 Co-developed-by: Satish Kharat <satishkh@cisco.com>
 Signed-off-by: Satish Kharat <satishkh@cisco.com>
-Signed-off-by: Nelson Escobar <neescoba@cisco.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Nelson Escobar <neescoba@cisco.com>
 ---
- drivers/net/ethernet/cisco/enic/enic.h      | 24 ++++-----
- drivers/net/ethernet/cisco/enic/enic_main.c | 84 ++++++++++++++++++++++++++---
- 2 files changed, 87 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/cisco/enic/enic_main.c | 116 ++++++++++++++--------------
+ 1 file changed, 57 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index 98d6e0b825525a92f12776259c1c9c9730cb8a1e..10b7e02ba4d0ee37bf492eebf1b2556a745bee21 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -23,10 +23,8 @@
- 
- #define ENIC_BARS_MAX		6
- 
--#define ENIC_WQ_MAX		8
--#define ENIC_RQ_MAX		8
--#define ENIC_CQ_MAX		(ENIC_WQ_MAX + ENIC_RQ_MAX)
--#define ENIC_INTR_MAX		(ENIC_CQ_MAX + 2)
-+#define ENIC_WQ_MAX		256
-+#define ENIC_RQ_MAX		256
- 
- #define ENIC_WQ_NAPI_BUDGET	256
- 
-@@ -184,8 +182,8 @@ struct enic {
- 	struct work_struct reset;
- 	struct work_struct tx_hang_reset;
- 	struct work_struct change_mtu_work;
--	struct msix_entry msix_entry[ENIC_INTR_MAX];
--	struct enic_msix_entry msix[ENIC_INTR_MAX];
-+	struct msix_entry *msix_entry;
-+	struct enic_msix_entry *msix;
- 	u32 msg_enable;
- 	spinlock_t devcmd_lock;
- 	u8 mac_addr[ETH_ALEN];
-@@ -204,28 +202,24 @@ struct enic {
- 	bool enic_api_busy;
- 	struct enic_port_profile *pp;
- 
--	/* work queue cache line section */
--	____cacheline_aligned struct enic_wq wq[ENIC_WQ_MAX];
-+	struct enic_wq *wq;
- 	unsigned int wq_avail;
- 	unsigned int wq_count;
- 	u16 loop_enable;
- 	u16 loop_tag;
- 
--	/* receive queue cache line section */
--	____cacheline_aligned struct enic_rq rq[ENIC_RQ_MAX];
-+	struct enic_rq *rq;
- 	unsigned int rq_avail;
- 	unsigned int rq_count;
- 	struct vxlan_offload vxlan;
--	struct napi_struct napi[ENIC_RQ_MAX + ENIC_WQ_MAX];
-+	struct napi_struct *napi;
- 
--	/* interrupt resource cache line section */
--	____cacheline_aligned struct vnic_intr intr[ENIC_INTR_MAX];
-+	struct vnic_intr *intr;
- 	unsigned int intr_avail;
- 	unsigned int intr_count;
- 	u32 __iomem *legacy_pba;		/* memory-mapped */
- 
--	/* completion queue cache line section */
--	____cacheline_aligned struct vnic_cq cq[ENIC_CQ_MAX];
-+	struct vnic_cq *cq;
- 	unsigned int cq_avail;
- 	unsigned int cq_count;
- 	struct enic_rfs_flw_tbl rfs_h;
 diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index eb00058b6c68ec5c1ac433b54b5bc6f3fb613777..564202e81a711a6791bef7e848627f0a439cc6f3 100644
+index 564202e81a711a6791bef7e848627f0a439cc6f3..8b07899462d0671843579d16c8c935d9ebbe447b 100644
 --- a/drivers/net/ethernet/cisco/enic/enic_main.c
 +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -940,7 +940,7 @@ static void enic_get_stats(struct net_device *netdev,
- 	net_stats->rx_errors = stats->rx.rx_errors;
- 	net_stats->multicast = stats->rx.rx_multicast_frames_ok;
+@@ -2442,85 +2442,86 @@ static void enic_tx_hang_reset(struct work_struct *work)
  
--	for (i = 0; i < ENIC_RQ_MAX; i++) {
-+	for (i = 0; i < enic->rq_count; i++) {
- 		struct enic_rq_stats *rqs = &enic->rq[i].stats;
+ static int enic_set_intr_mode(struct enic *enic)
+ {
+-	unsigned int n = min_t(unsigned int, enic->rq_count, ENIC_RQ_MAX);
+-	unsigned int m = min_t(unsigned int, enic->wq_count, ENIC_WQ_MAX);
+ 	unsigned int i;
++	int num_intr;
  
- 		if (!enic->rq[i].vrq.ctrl)
-@@ -1792,7 +1792,7 @@ static void enic_free_intr(struct enic *enic)
- 		free_irq(enic->pdev->irq, enic);
- 		break;
- 	case VNIC_DEV_INTR_MODE_MSIX:
--		for (i = 0; i < ARRAY_SIZE(enic->msix); i++)
-+		for (i = 0; i < enic->intr_count; i++)
- 			if (enic->msix[i].requested)
- 				free_irq(enic->msix_entry[i].vector,
- 					enic->msix[i].devid);
-@@ -1859,7 +1859,7 @@ static int enic_request_intr(struct enic *enic)
- 		enic->msix[intr].isr = enic_isr_msix_notify;
- 		enic->msix[intr].devid = enic;
+ 	/* Set interrupt mode (INTx, MSI, MSI-X) depending
+ 	 * on system capabilities.
+ 	 *
+-	 * Try MSI-X first
++	 * We need a minimum of 1 RQ, 1 WQ, and 2 CQs
+ 	 *
+-	 * We need n RQs, m WQs, n+m CQs, and n+m+2 INTRs
+-	 * (the second to last INTR is used for WQ/RQ errors)
+-	 * (the last INTR is used for notifications)
+ 	 */
  
--		for (i = 0; i < ARRAY_SIZE(enic->msix); i++)
-+		for (i = 0; i < enic->intr_count; i++)
- 			enic->msix[i].requested = 0;
+-	for (i = 0; i < enic->intr_avail; i++)
+-		enic->msix_entry[i].entry = i;
+-
+-	/* Use multiple RQs if RSS is enabled
+-	 */
+-
+-	if (ENIC_SETTING(enic, RSS) &&
+-	    enic->config.intr_mode < 1 &&
+-	    enic->rq_count >= n &&
+-	    enic->wq_count >= m &&
+-	    enic->cq_count >= n + m &&
+-	    enic->intr_count >= n + m + 2) {
+-
+-		if (pci_enable_msix_range(enic->pdev, enic->msix_entry,
+-					  n + m + 2, n + m + 2) > 0) {
+-
+-			enic->rq_count = n;
+-			enic->wq_count = m;
+-			enic->cq_count = n + m;
+-			enic->intr_count = n + m + 2;
+-
+-			vnic_dev_set_intr_mode(enic->vdev,
+-				VNIC_DEV_INTR_MODE_MSIX);
+-
+-			return 0;
+-		}
++	if (enic->rq_avail < 1 || enic->wq_avail < 1 || enic->cq_avail < 2) {
++		dev_err(enic_get_dev(enic),
++			"Not enough resources available rq: %d wq: %d cq: %d\n",
++			enic->rq_avail, enic->wq_avail,
++			enic->cq_avail);
++		return -ENOSPC;
+ 	}
  
- 		for (i = 0; i < enic->intr_count; i++) {
-@@ -2456,8 +2456,7 @@ static int enic_set_intr_mode(struct enic *enic)
++	/* if RSS isn't set, then we can only use one RQ */
++	if (!ENIC_SETTING(enic, RSS))
++		enic->rq_avail = 1;
++
++	/* Try MSI-X first */
+ 	if (enic->config.intr_mode < 1 &&
+-	    enic->rq_count >= 1 &&
+-	    enic->wq_count >= m &&
+-	    enic->cq_count >= 1 + m &&
+-	    enic->intr_count >= 1 + m + 2) {
+-		if (pci_enable_msix_range(enic->pdev, enic->msix_entry,
+-					  1 + m + 2, 1 + m + 2) > 0) {
+-
+-			enic->rq_count = 1;
+-			enic->wq_count = m;
+-			enic->cq_count = 1 + m;
+-			enic->intr_count = 1 + m + 2;
++	    enic->intr_avail >= ENIC_MSIX_MIN_INTR) {
++		unsigned int max_queues;
++		unsigned int rq_default;
++		unsigned int rq_avail;
++		unsigned int wq_avail;
++
++		for (i = 0; i < enic->intr_avail; i++)
++			enic->msix_entry[i].entry = i;
++
++		num_intr = pci_enable_msix_range(enic->pdev, enic->msix_entry,
++						 ENIC_MSIX_MIN_INTR,
++						 enic->intr_avail);
++		if (num_intr > 0) {
++			wq_avail = min(enic->wq_avail, ENIC_WQ_MAX);
++			rq_default = netif_get_num_default_rss_queues();
++			rq_avail = min3(enic->rq_avail, ENIC_RQ_MAX, rq_default);
++			max_queues = min(enic->cq_avail,
++					 enic->intr_avail - ENIC_MSIX_RESERVED_INTR);
++
++			if (wq_avail + rq_avail <= max_queues) {
++				enic->rq_count = rq_avail;
++				enic->wq_count = wq_avail;
++			} else {
++				/* recalculate wq/rq count */
++				if (rq_avail < wq_avail) {
++					enic->rq_count = min(rq_avail, max_queues / 2);
++					enic->wq_count = max_queues - enic->rq_count;
++				} else {
++					enic->wq_count = min(wq_avail, max_queues / 2);
++					enic->rq_count = max_queues - enic->wq_count;
++				}
++			}
++			enic->cq_count = enic->rq_count + enic->wq_count;
++			enic->intr_count = enic->cq_count + ENIC_MSIX_RESERVED_INTR;
+ 
+ 			vnic_dev_set_intr_mode(enic->vdev,
+-				VNIC_DEV_INTR_MODE_MSIX);
+-
++					       VNIC_DEV_INTR_MODE_MSIX);
++			enic->intr_avail = num_intr;
+ 			return 0;
+ 		}
+ 	}
+ 
+ 	/* Next try MSI
+ 	 *
+-	 * We need 1 RQ, 1 WQ, 2 CQs, and 1 INTR
++	 * We need 1 INTR
+ 	 */
+ 
+ 	if (enic->config.intr_mode < 2 &&
+-	    enic->rq_count >= 1 &&
+-	    enic->wq_count >= 1 &&
+-	    enic->cq_count >= 2 &&
+-	    enic->intr_count >= 1 &&
++	    enic->intr_avail >= 1 &&
+ 	    !pci_enable_msi(enic->pdev)) {
+ 
+ 		enic->rq_count = 1;
+ 		enic->wq_count = 1;
+ 		enic->cq_count = 2;
+ 		enic->intr_count = 1;
+-
++		enic->intr_avail = 1;
+ 		vnic_dev_set_intr_mode(enic->vdev, VNIC_DEV_INTR_MODE_MSI);
+ 
+ 		return 0;
+@@ -2528,23 +2529,20 @@ static int enic_set_intr_mode(struct enic *enic)
+ 
+ 	/* Next try INTx
+ 	 *
+-	 * We need 1 RQ, 1 WQ, 2 CQs, and 3 INTRs
++	 * We need 3 INTRs
+ 	 * (the first INTR is used for WQ/RQ)
+ 	 * (the second INTR is used for WQ/RQ errors)
  	 * (the last INTR is used for notifications)
  	 */
  
--	BUG_ON(ARRAY_SIZE(enic->msix_entry) < n + m + 2);
--	for (i = 0; i < n + m + 2; i++)
-+	for (i = 0; i < enic->intr_avail; i++)
- 		enic->msix_entry[i].entry = i;
+ 	if (enic->config.intr_mode < 3 &&
+-	    enic->rq_count >= 1 &&
+-	    enic->wq_count >= 1 &&
+-	    enic->cq_count >= 2 &&
+-	    enic->intr_count >= 3) {
++	    enic->intr_avail >= 3) {
  
- 	/* Use multiple RQs if RSS is enabled
-@@ -2674,6 +2673,71 @@ static const struct netdev_stat_ops enic_netdev_stat_ops = {
- 	.get_base_stats		= enic_get_base_stats,
- };
+ 		enic->rq_count = 1;
+ 		enic->wq_count = 1;
+ 		enic->cq_count = 2;
+ 		enic->intr_count = 3;
+-
++		enic->intr_avail = 3;
+ 		vnic_dev_set_intr_mode(enic->vdev, VNIC_DEV_INTR_MODE_INTX);
  
-+static void enic_free_enic_resources(struct enic *enic)
-+{
-+	kfree(enic->wq);
-+	enic->wq = NULL;
-+
-+	kfree(enic->rq);
-+	enic->rq = NULL;
-+
-+	kfree(enic->cq);
-+	enic->cq = NULL;
-+
-+	kfree(enic->napi);
-+	enic->napi = NULL;
-+
-+	kfree(enic->msix_entry);
-+	enic->msix_entry = NULL;
-+
-+	kfree(enic->msix);
-+	enic->msix = NULL;
-+
-+	kfree(enic->intr);
-+	enic->intr = NULL;
-+}
-+
-+static int enic_alloc_enic_resources(struct enic *enic)
-+{
-+	enic->wq = kcalloc(enic->wq_avail, sizeof(struct enic_wq), GFP_KERNEL);
-+	if (!enic->wq)
-+		goto free_queues;
-+
-+	enic->rq = kcalloc(enic->rq_avail, sizeof(struct enic_rq), GFP_KERNEL);
-+	if (!enic->rq)
-+		goto free_queues;
-+
-+	enic->cq = kcalloc(enic->cq_avail, sizeof(struct vnic_cq), GFP_KERNEL);
-+	if (!enic->cq)
-+		goto free_queues;
-+
-+	enic->napi = kcalloc(enic->wq_avail + enic->rq_avail,
-+			     sizeof(struct napi_struct), GFP_KERNEL);
-+	if (!enic->napi)
-+		goto free_queues;
-+
-+	enic->msix_entry = kcalloc(enic->intr_avail, sizeof(struct msix_entry),
-+				   GFP_KERNEL);
-+	if (!enic->msix_entry)
-+		goto free_queues;
-+
-+	enic->msix = kcalloc(enic->intr_avail, sizeof(struct enic_msix_entry),
-+			     GFP_KERNEL);
-+	if (!enic->msix)
-+		goto free_queues;
-+
-+	enic->intr = kcalloc(enic->intr_avail, sizeof(struct vnic_intr),
-+			     GFP_KERNEL);
-+	if (!enic->intr)
-+		goto free_queues;
-+
-+	return 0;
-+
-+free_queues:
-+	enic_free_enic_resources(enic);
-+	return -ENOMEM;
-+}
-+
- static void enic_dev_deinit(struct enic *enic)
+ 		return 0;
+@@ -2762,8 +2760,8 @@ static void enic_kdump_kernel_config(struct enic *enic)
  {
- 	unsigned int i;
-@@ -2691,6 +2755,7 @@ static void enic_dev_deinit(struct enic *enic)
- 	enic_free_vnic_resources(enic);
- 	enic_clear_intr_mode(enic);
- 	enic_free_affinity_hint(enic);
-+	enic_free_enic_resources(enic);
- }
- 
- static void enic_kdump_kernel_config(struct enic *enic)
-@@ -2734,6 +2799,12 @@ static int enic_dev_init(struct enic *enic)
- 
- 	enic_get_res_counts(enic);
- 
-+	err = enic_alloc_enic_resources(enic);
-+	if (err) {
-+		dev_err(dev, "Failed to allocate enic resources\n");
-+		return err;
-+	}
-+
- 	/* modify resource count if we are in kdump_kernel
- 	 */
- 	enic_kdump_kernel_config(enic);
-@@ -2746,7 +2817,7 @@ static int enic_dev_init(struct enic *enic)
- 	if (err) {
- 		dev_err(dev, "Failed to set intr mode based on resource "
- 			"counts and system capabilities, aborting\n");
--		return err;
-+		goto err_out_free_vnic_resources;
- 	}
- 
- 	/* Allocate and configure vNIC resources
-@@ -2788,6 +2859,7 @@ static int enic_dev_init(struct enic *enic)
- 	enic_free_affinity_hint(enic);
- 	enic_clear_intr_mode(enic);
- 	enic_free_vnic_resources(enic);
-+	enic_free_enic_resources(enic);
- 
- 	return err;
- }
+ 	if (is_kdump_kernel()) {
+ 		dev_info(enic_get_dev(enic), "Running from within kdump kernel. Using minimal resources\n");
+-		enic->rq_count = 1;
+-		enic->wq_count = 1;
++		enic->rq_avail = 1;
++		enic->wq_avail = 1;
+ 		enic->config.rq_desc_count = ENIC_MIN_RQ_DESCS;
+ 		enic->config.wq_desc_count = ENIC_MIN_WQ_DESCS;
+ 		enic->config.mtu = min_t(u16, 1500, enic->config.mtu);
 
 -- 
 2.35.6
