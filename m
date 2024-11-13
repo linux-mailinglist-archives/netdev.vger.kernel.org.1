@@ -1,247 +1,164 @@
-Return-Path: <netdev+bounces-144357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238C39C6CF6
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:36:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FC49C6D0B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:40:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C06F1F21119
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:36:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 454F5B23F27
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3994B1FE0E3;
-	Wed, 13 Nov 2024 10:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB901FE0E9;
+	Wed, 13 Nov 2024 10:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="hJFxK9V4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="i1BFr7+W"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D4ZHu/6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698B318A6D1;
-	Wed, 13 Nov 2024 10:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44E91FE0E7;
+	Wed, 13 Nov 2024 10:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731494179; cv=none; b=g+5BlmmzOEwbsqtuB8uwOP8J3yhLdRP5y3Y+zxQ7CwjdekRwyNTRDzmEwAeqJi8ARbTRfxweYCd41XttwiJ2u20pK/mLnBDF8oiqrP2Phwq4DsY1GNUcHFkXSib68p6Oej3fuvSMxuNYJaHKBxfrKOgPUnn9uACqhZY/vQJW+oY=
+	t=1731494296; cv=none; b=QvWNfUo8G8G74qKowAQv42LlrzxBTzhqWZDQGvDpxrhmz8EnH9/wQDbBaXrKFL9N5O6jYYYE+uWQ6Xp+Mv08/hRtK2xRd1cvjfetOCdQ8Jh1JKMMQdpnfxN46LPqnorBUCB/3UL5LNZFnqxkyXpjQTxruBdMxs1kS/INXVwl7U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731494179; c=relaxed/simple;
-	bh=yLO/Ts8jUeJARWVb+zMtKwsDIocTm/3IsSv1rnWRZd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X2X42U7UBRlvMLWF+SpQeFNr3QPsQS74fvlxAhmBoT7FqRteaeeb4L1ckHq4VgNB8z5xlbVX7zMLZZTiI+IfWkqCsoWdGUTpTpwUOQ0IENS7pyE8JwOQJQl3/4iUjVQHloqv3WTfr0yZ5jtiClGv3jA5kxgTIWYRwsHs2ClxgD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=hJFxK9V4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=i1BFr7+W; arc=none smtp.client-ip=103.168.172.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailflow.phl.internal (Postfix) with ESMTP id 3BC55201D79;
-	Wed, 13 Nov 2024 05:36:14 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 13 Nov 2024 05:36:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1731494174; x=
-	1731497774; bh=JS8GGHOUfqV2VFOaX7E5RBnve3G+rENns81TnjIOP00=; b=h
-	JFxK9V4zWGmn/8QxrP0In2Op6vxHQnATVJiP0t/GcsJ1BcnhAb9imDFdnk6it4JW
-	YQ+m5ddXfbIG6WTBP46ZXLN8j1hgx/zVJ7BrVRum/Wu0csgDQ0OauS18lb+dyWUc
-	E1kT2px4wf/XmnJGJAo/GOnJRSAwki/KRDavzyL00DblHFvf4h0VQKqa9EfL/Xqy
-	Et/LWAHYfe+hboRvTYBEI2cr+eHDNhF/eRbqNP9kRcIvWLu754C6t8UAp1TJIIum
-	BesRekg3Op/5PAZ1FOjrrx0FT1KWOFaN+pJrtnCAelD/zou+ikUIMiKCHWVqrTbH
-	NT4W4PklsAjxzE2zYVVfg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731494174; x=1731497774; bh=JS8GGHOUfqV2VFOaX7E5RBnve3G+rENns81
-	TnjIOP00=; b=i1BFr7+WryUKFttGHpKBgIw7i2AICc83v+U2gJlWAw+cqH9b1Bu
-	zl4RgUQR/kMsbitqoe5yBzrZB0dlLQRanrsWh6rxhNhVyBI7jZuJ0wZw+hXqHgAi
-	OUrEYrtSzDnRxtFCvvk09LGK8dz7k185me52Zd8+kbu+keUA8/IZ4OmEjhvlnAVd
-	ioj+qy5PDDxG1CTZntQ45PZ+1hZOhcP95ZlSlhtVZsCDXHFRmkJOOhzpe50jJPMO
-	KxOY56pbrUxvHd7poFmo4sl/Kt9s+lEySbreyB5qXjBCx9AfnCAli4p/zbWroHKE
-	/0hDHrX1njMO3yU/lPjuYfVSzm1S+mqJH5g==
-X-ME-Sender: <xms:HYE0Z97TslQXmrb_NjleZ7ASKW5XhCtNJlMkyAl9NNLcL_fHTfKIpQ>
-    <xme:HYE0Z67FG9e7hb3cTxqoa9KeW3n4AnJ52Dl_Jzea5fgdr7_qXqqM58xVsxZobMKAm
-    1CH00t0jdWkViA6fDA>
-X-ME-Received: <xmr:HYE0Z0fXNaLay2Cg9wp2Meu_YSY5twgmpRQHjO25L8IFVcIKdAn1s_Z0eGOJ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvddtgddukecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
-    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:HYE0Z2LfrbxtAgH7CfM4Z6KnqtQ6wc3uNVe6h22rS2ItgmWuqDf_AQ>
-    <xmx:HYE0ZxLtVbPH_-UVYGpGU4z5iy3eCODN6NskYgOFh07Gb2kkn4ebgw>
-    <xmx:HYE0Z_y4Ejgf7IY_8473McZzCyS8fsNnDoUwDhKNYYcFll0SgCP30w>
-    <xmx:HYE0Z9K8GDVElI8X5cckgdBEn8RcdvocbFVpNYcZLuSmwqGvB9mc-Q>
-    <xmx:HoE0Z48fNf-ZAgtZfUjFSdMNbRlafSxCn1aEvYskMvNJwnWxKFOQKUHv>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 13 Nov 2024 05:36:13 -0500 (EST)
-Date: Wed, 13 Nov 2024 11:36:11 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
-Message-ID: <ZzSBG-RPUlpgVFhA@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net>
- <ZypfnyfToF1b6YAZ@hog>
- <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net>
+	s=arc-20240116; t=1731494296; c=relaxed/simple;
+	bh=GgRgVOMEvS/S1I8Js/v8S2ZAzUUwA0y/X9w1hFwpWzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mJKqOWj0GwlUlO2VJE6s3XL8YbPWSa8U3eq8fF21CecKYN5ciH5dc1WYNMoGoJFOI82deUkdyHbWS6O3VgHzffH9sNoJT0NTpmPX7YhLJykNvFoBh3EKvf7G15IbEplpKt0jRhxiSOgrhx2W0ggYOntjpw58TMaHOndB3kVVnE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D4ZHu/6S; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 55DBEE0009;
+	Wed, 13 Nov 2024 10:38:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731494292;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PnMiCNy2+Hy5BXlvmadwE+/GEldkxKYZcnFTEDBSHpA=;
+	b=D4ZHu/6S7DPFEzLUIg3ULjis4u2iaoRZcHNbwfGs0VTCInpPe/PP6cP9wWsRD18iflvAVu
+	6l3cZTrYIz++rNaV1bAiw+gMuaqmMnhSe28yGNadX9wka83/IbO+LoIJFtX1AIxfQkssKZ
+	AMtRHlUaAzD/av+a8TFSY/SxEle5WCFWBux7RP406jc0BO9HRVbPomK3IWNdUMxC+YoCAR
+	0gfmXkG16LZiIFgTqQqHHxdkLRV3ZeJeLx4Fx7KtXA5dJHakKTPhTZ+9q/xBG+GteEYjuG
+	tdAjLyr7O3r9Io/cxWrC3qjkA/muJrm9NoNa+6QEbcp/9gCFNGMMYKGrrgS9lQ==
+Date: Wed, 13 Nov 2024 11:38:08 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, donald.hunter@gmail.com,
+ danieller@nvidia.com, ecree.xilinx@gmail.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>, Jacob
+ Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v19 03/10] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
+Message-ID: <20241113113808.4f8c5a0b@kmaincent-XPS-13-7390>
+In-Reply-To: <20241112182226.2a6c8bab@kernel.org>
+References: <20241030-feature_ptp_netnext-v19-0-94f8aadc9d5c@bootlin.com>
+	<20241030-feature_ptp_netnext-v19-3-94f8aadc9d5c@bootlin.com>
+	<20241111150609.2b0425f6@kernel.org>
+	<20241112111232.1637f814@kmaincent-XPS-13-7390>
+	<20241112182226.2a6c8bab@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-2024-11-12, 14:20:45 +0100, Antonio Quartulli wrote:
-> On 05/11/2024 19:10, Sabrina Dubroca wrote:
-> > 2024-10-29, 11:47:28 +0100, Antonio Quartulli wrote:
-> > > @@ -105,6 +132,9 @@ void ovpn_decrypt_post(void *data, int ret)
-> > >   		goto drop;
-> > >   	}
-> > > +	/* keep track of last received authenticated packet for keepalive */
-> > > +	peer->last_recv = ktime_get_real_seconds();
-> > 
-> > It doesn't look like we're locking the peer here so that should be a
-> > WRITE_ONCE() (and READ_ONCE(peer->last_recv) for all reads).
-> 
-> Is that because last_recv is 64 bit long (and might be more than one word on
-> certain architectures)?
-> 
-> I don't remember having to do so for reading/writing 32 bit long integers.
+On Tue, 12 Nov 2024 18:22:26 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-AFAIK it's not just that. The compiler is free to do the read/write in
-any way it wants when you don't specify _ONCE. On the read side, it
-could read from memory a single time or multiple times (getting
-possibly different values each time), or maybe split the load
-(possibly reading chunks from different values being written in
-parallel).
+> On Tue, 12 Nov 2024 11:12:32 +0100 Kory Maincent wrote:
+> > > Storing the info about the "user" (netdev, phydev) in the "provider"
+> > > (PHC) feels too much like a layering violation. Why do you need this?=
+   =20
+> >=20
+> > The things is that, the way to manage the phc depends on the "user".
+> > ndo_hwtstamp_set for netdev and phy_hwtstamp_set for phydev.
+> > https://elixir.bootlin.com/linux/v6.11.6/source/net/core/dev_ioctl.c#L3=
+23
+> >=20
+> > Before PHC was managed by the driver "user" so there was no need for th=
+is
+> > information as the core only gives the task to the single "user". This
+> > didn't really works when there is more than one user possible on the net
+> > topology. =20
+>=20
+> I don't understand. I'm complaining storing netdev state in=20
+> struct ptp_clock. It's perfectly fine to add the extra info to netdev
+> and PHY topology maintained by the core.
 
-> I presume we need a WRITE_ONCE also upon initialization in
-> ovpn_peer_keepalive_set() right?
-> We still want to coordinate that with other reads/writes.
+Oh okay. Didn't get it the first time. I could move the PHC source with the
+phydev pointer in netdev core to avoid this.
 
-I think it makes sense, yes.
+> > > In general I can't shake the feeling that we're trying to configure=20
+> > > the "default" PHC for a narrow use case, while the goal should be=20
+> > > to let the user pick the PHC per socket.   =20
+> >=20
+> > Indeed PHC per socket would be neat but it would need a lot more work a=
+nd I
+> > am even not sure how it should be done. Maybe with a new cmsg structure
+> > containing the information of the PHC provider?
+> > In any case the new ETHTOOL UAPI is ready to support multiple PHC at the
+> > same time when it will be supported.
+> > This patch series is something in the middle, being able to enable all =
+the
+> > PHC on a net topology but only one at a time. =20
+>=20
+> I understand, I don't want to push you towards implementing all that.
+> But if we keep that in mind as the north star we should try to align
+> this default / temporary solution. If the socket API takes a PHC ID
+> as an input, the configuration we take in should also be maintained
+> as "int default_phc", not pointers to things.
 
-> > > +
-> > >   	/* point to encapsulated IP packet */
-> > >   	__skb_pull(skb, payload_offset);
-> > > @@ -121,6 +151,12 @@ void ovpn_decrypt_post(void *data, int ret)
-> > >   			goto drop;
-> > >   		}
-> > > +		if (ovpn_is_keepalive(skb)) {
-> > > +			net_dbg_ratelimited("%s: ping received from peer %u\n",
-> > > +					    peer->ovpn->dev->name, peer->id);
-> > > +			goto drop;
-> > 
-> > To help with debugging connectivity issues, maybe keepalives shouldn't
-> > be counted as drops? (consume_skb instead of kfree_skb, and not
-> > incrementing rx_dropped)
-> > The packet was successfully received and did all it had to do.
-> 
-> you're absolutely right. Will change that.
+In fact I could remove the hwtstamp pointer from netdevice and add only the
+hwtstamp source with the phydev rcu pointer.
+We will need the phydev pointer as we don't know to which phy device belong=
+ the
+PTP. Or we could also use the phyindex instead of the phydev pointer and use
+phy_link_topo_get_phy() in the hot path.
 
-Thanks.
+> IOW I'm struggling to connect the dots how the code you're adding now
+> will be built _upon_ rather than _on the side_ of when socket PHC
+> selection is in place.
 
-> > > +	/* check for peer timeout */
-> > > +	expired = false;
-> > > +	timeout = peer->keepalive_timeout;
-> > > +	delta = now - peer->last_recv;
-> > 
-> > I'm not sure that's always > 0 if we finish decrypting a packet just
-> > as the workqueue starts:
-> > 
-> >    ovpn_peer_keepalive_work
-> >      now = ...
-> > 
-> >                                         ovpn_decrypt_post
-> >                                           peer->last_recv = ...
-> > 
-> >    ovpn_peer_keepalive_work_single
-> >      delta: now < peer->last_recv
-> > 
-> 
-> Yeah, there is nothing preventing this from happening...but is this truly a
-> problem? The math should still work, no?
+I see what you mean! It is not something easy to think of as I don't really
+know how it would be implemented.
+Do you think adding simply the PHC source and the phydev pointer or index w=
+ould
+fit?=20
 
-We'll fail "delta < timeout" (which we shouldn't), so we'll end up
-either in the "expired = true" case, or not updating
-keepalive_recv_exp. Both of these seem not ideal.
+This could be removed from netdev core when we move to socket PHC as it
+won't be necessary to save the current PHC.
 
-> 
-> However:
-> 
-> > 
-> > 
-> > > +	if (delta < timeout) {
-> > > +		peer->keepalive_recv_exp = now + timeout - delta;
-> > 
-> > I'd shorten that to
-> > 
-> >      peer->keepalive_recv_exp = peer->last_recv + timeout;
-> > 
-> > it's a bit more readable to my eyes and avoids risks of wrapping
-> > values.
-> > 
-> > So I'd probably get rid of delta and go with:
-> > 
-> >      last_recv = READ_ONCE(peer->last_recv)
-> >      if (now < last_recv + timeout) {
-> >      	peer->keepalive_recv_exp = last_recv + timeout;
-> >      	next_run1 = peer->keepalive_recv_exp;
-> >      } else if ...
-> > 
-> > > +		next_run1 = peer->keepalive_recv_exp;
-> > > +	} else if (peer->keepalive_recv_exp > now) {
-> > > +		next_run1 = peer->keepalive_recv_exp;
-> > > +	} else {
-> > > +		expired = true;
-> > > +	}
-> 
-> I agree this is simpler to read and gets rid of some extra operations.
-> 
-> [note: I took inspiration from nat_keepalive_work_single() - it could be
-> simplified as well I guess]
-
-Ah, ok. I wanted to review this code when it was posted but didn't
-have time :(
-
-> > 
-> > [...]
-> > > +	/* check for peer keepalive */
-> > > +	expired = false;
-> > > +	interval = peer->keepalive_interval;
-> > > +	delta = now - peer->last_sent;
-> > > +	if (delta < interval) {
-> > > +		peer->keepalive_xmit_exp = now + interval - delta;
-> > > +		next_run2 = peer->keepalive_xmit_exp;
-> > 
-> > and same here
-> 
-> Yeah, will change both. Thanks!
-
-Thanks.
-
--- 
-Sabrina
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
