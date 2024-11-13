@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-144577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CA419C7CFE
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:35:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C78F9C7D01
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:35:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA3561F22A03
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:34:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A51DB23A99
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA300206506;
-	Wed, 13 Nov 2024 20:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE9A206E63;
+	Wed, 13 Nov 2024 20:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cwJPAxLy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ePv0SaNN"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2063.outbound.protection.outlook.com [40.107.223.63])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8ECB205AB3
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 20:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A36420899A
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 20:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731530062; cv=fail; b=P99jz+kXXM/3XrhPx0GRP60jQyaU271YWnZ9bdVV3fgpo7Mp/2VPm0APb/2HDk5O08Q9lni6CVSC+cjkenXc6jjwsYPK2Otb560u3+5IBXRUdMJ2489k8MIo/Ww+TgPDZQHtz4N57YBtwmMdGd0NcZMNuq601s7fU930vDKKgIE=
+	t=1731530066; cv=fail; b=oxkjj0Om/b683vYBe2JJwGzsU2RX3iN7ZZVlpHrzKz3mVPMyykzaUgC+EEYGaNGvC1F67rq5nZLQ27xh8PGZhT3srjpsNoYTFjWKZ+GeER1H4dsux91F+Ya8xNiaz4m4/fK0pTqDykbUkoshIuiDuIRZyDIWOJuL9UG6SIRcvTE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731530062; c=relaxed/simple;
-	bh=5kU0MsvS0HKgsObW9YwvATntg3QnhQ36R+bTGXnyct8=;
+	s=arc-20240116; t=1731530066; c=relaxed/simple;
+	bh=UdxvrmQyB77wGBDCVVzKTdUJ7FfmD4ynELJvJFSbAoY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=llJJiOJZFUetf6nBSemXAuu3vGkMXVpkm4SB9SE20nd7cOJKhwiwoVbR9guEFPTCWyyftDGCo+CpkQ/wlJZ9obg59TzJFLVP5881EtbGIF5qsyMqztuC0TPmPPeRoa0TVSMbKKDH6tyCPJu2JulvtlcOEodQdRQb8hKr7RIF23U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cwJPAxLy; arc=fail smtp.client-ip=40.107.223.63
+	 MIME-Version:Content-Type; b=IPPSCsSnnrXAJDukSx/OKOwV/d4X8i2GxSpkxsIKqw6c7pdpoYBMROI+MDOl6CkbvXGrRrvdpGU+weAJu4jDFjuBDYTvIsXRilpPS5AQFdWPYGfm5foKxFwqI2nLgFW/sB89OOog8hWG1BxsMcso1ycZrBq13XiWKVO1mJoxyng=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ePv0SaNN; arc=fail smtp.client-ip=40.107.223.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BDLCPdbcAP7OqM2MQi8v53RGEjxYLberoi5a1M1DfHNDPfe/UddkEiJRBAaSzSudU4e538PoMQi6xPIDhqj6risa+zEAwD2NqUgq5S43pJ/22iWiIImJPDoL1Y7Rjyp1GtUpB2c4PhrMwx0Nt8oxSjwHsJen3R7VQzqNqAmfdfPcvMtIyxBsbOASP/vopFbeN/fgVSwExQQnhkjqhhzi+L8Q/72KKxt53iSWpLX6GUit6Gwzdh/9iOMQCBFyWUW0XkQjA4MSMd2Uv/OeouRmbXPYkN8Uts71OBqi5QJGxI1GzgBhU5g4W+naTgeWaAYoe9RB3CtRxdoXVZ5V3B3gAw==
+ b=hU368ItmkYrRER7+f8GCtcnaV5m7vCMnAyDvpIMjG4351T6VJ1zcFzRSOXKtqMbRDZv1PG0mOOEVawb4LkX/2aMfTfnYn6fQPinQA8aM9HPXXsCmF2Gz0rvQJ9rRFGsn8l7DSzlk85auzRhO9NgpY2WOfx6+f+qYDpr91s3ywsBkai9/9o/asxWo9y5T+sDyjmaBpTEvFepn18srv5EJAaJ4u2QJEE8rpMUIqoH2IWNRvRyW2k1DxY9dQfFpY1VgWP01oX7+EIKjIn7JHsWuHEPaNtwwZaCujj19+Hjz3GtmyeKGyW6ITUj1nMASLZRj/ceHTzp8ape++CS6eWlcCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IE4UkLYPAkUfXQEXzr5TSah8LwK1Tl7/FlLf8E4ekrk=;
- b=IN1VRv5yzQkEgYaNSSPopLcHs/opTwheoM9nvbLoTsI/Ek+1MUl9v3wAwGvIpaA/Se5Qd2qnxeq2pnuQUs9kkwtZpK/b5qE8OyozNlbV+B619ccfkxqAVMhrXzmhUJmhfBDo/8JJx4F11AJny3Jx12puf0bonVPmdZZT1Vrm/uHX4Bbsp560Ya9umE+oXVRqaeSGNbc1PsEQGIT6Nxmo3Y4lAA67+ogj1j2M3jsEX36yTbvpTaemPIafUT5bD+g/JL18Z+wNNkTy5gAOntCK2OZQMGCPfFVEHhdhpLOQRW28Ur9x527OZLqk+viwxdl9NPGFHJsUAyPcMeoqQaqt4A==
+ bh=BbdsVZedmqE2Qw3LlVSocZ3zW+XN5gGQaVJYYTVAyMU=;
+ b=aBlCtQlurClXAFeW50JM6E6Be5CCdGWNagoqeuaG4CMEZsLluTe+P+4qg3AsG62wO9+8kWtXvtrfx7vSmVBq0VQ3ACpcrYYl4m3CHyp4Cy5Mlh/xbEs0GpTdWkD4agrjqLV7YfCQ8Wl+8cPBgmVbNNo/aERqKxaIKClmXjVVxQ1Lu82QjXc8dp2GonP9KjOyOzKIDRoWb0QJtJWP6OxhOu5Ewn2vQ+jIO22R+goDy8txxkWdJMnaG8EorhUDbdhaXdtua2NN2akV3BceSEfQmujyh5ZKz4hFjlF4lp3VN/eFKJ0dSaBJIjtxes+/TZKcJG/lE16+KLUjGDNiMoGIQA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IE4UkLYPAkUfXQEXzr5TSah8LwK1Tl7/FlLf8E4ekrk=;
- b=cwJPAxLyMlwQtV3rsIGM5U/ArfNGthCPs6ntBFxh+GDwMPiWO4X2GTbjI6oEOBy/B+YEa/vV+zumSf2e0qZeITVjQ9/k55I8ziQrSoGY5rmpPyMAR+nNpiJ5bFHynctJ4N/VNQkTT3GmdxokBUrU+nW71Bqva80o5GNCKlz+hzVYI4pX3acDpaIxm2Crgyszs7ZO0mgWAGg04+Cn9nx/aYuttLsCbaOy4vJE2BTFFVCV7iRBiB57TgVuhFEE/9ODc/RrtDO8ZQ+zXHwfIXoDiThPphTYLt9myLCoXJ9kH/SodkJnkWsBSAyCup39RkVTscuvQQrRdIU3PObZGeS2fA==
-Received: from DS7PR03CA0149.namprd03.prod.outlook.com (2603:10b6:5:3b4::34)
- by BY5PR12MB4068.namprd12.prod.outlook.com (2603:10b6:a03:203::12) with
+ bh=BbdsVZedmqE2Qw3LlVSocZ3zW+XN5gGQaVJYYTVAyMU=;
+ b=ePv0SaNN1HWY6/2l2UcOsPAQeBiTL2AVzjBjcB0/vQ0X68x0aalO5qfU5qEeRjmbPMCGyKYadjkZobU1Uzdjde7SkIAGIwPOo9uaO/B4L1xqZnZk7zf2eO9YojgFoYyaxudG7eJmhDv1E7KicAHSbKriWGD+zBhgvfWMKuDEdI7oaEvykoXw3jh36UwEz/Az8/DIZDSbttxCxhG/M5neD8KnsZEMADeAeXZ2PM2pa2ogJNdExuJCW6vUcIshCd+q28KHe4tCHF0fkM1L1SD1PQxGupYTVjNMfYYekcLwrd401JqDIc/7hd8PR0W+HMBIyRlzl2JsXuvRTgPzseh6mg==
+Received: from MW4PR02CA0002.namprd02.prod.outlook.com (2603:10b6:303:16d::10)
+ by SA1PR12MB5613.namprd12.prod.outlook.com (2603:10b6:806:22b::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Wed, 13 Nov
- 2024 20:34:14 +0000
-Received: from DS1PEPF0001708F.namprd03.prod.outlook.com
- (2603:10b6:5:3b4:cafe::fa) by DS7PR03CA0149.outlook.office365.com
- (2603:10b6:5:3b4::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28 via Frontend
- Transport; Wed, 13 Nov 2024 20:34:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.28; Wed, 13 Nov
+ 2024 20:34:19 +0000
+Received: from CO1PEPF000044FA.namprd21.prod.outlook.com
+ (2603:10b6:303:16d:cafe::ae) by MW4PR02CA0002.outlook.office365.com
+ (2603:10b6:303:16d::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17 via Frontend
+ Transport; Wed, 13 Nov 2024 20:34:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0001708F.mail.protection.outlook.com (10.167.17.139) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044FA.mail.protection.outlook.com (10.167.241.200) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8158.14 via Frontend Transport; Wed, 13 Nov 2024 20:34:13 +0000
+ 15.20.8182.1 via Frontend Transport; Wed, 13 Nov 2024 20:34:17 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 13 Nov
- 2024 12:33:57 -0800
+ 2024 12:34:00 -0800
 Received: from nexus.mtl.labs.mlnx (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 13 Nov
- 2024 12:33:55 -0800
+ 2024 12:33:57 -0800
 From: Cosmin Ratiu <cratiu@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <jiri@resnulli.us>, <tariqt@nvidia.com>, <kuba@kernel.org>,
 	<saeedm@nvidia.com>, <cratiu@nvidia.com>
-Subject: [PATCH 08/10] net/mlx5: qos: Introduce shared esw qos domains
-Date: Wed, 13 Nov 2024 22:30:45 +0200
-Message-ID: <20241113203317.2507537-9-cratiu@nvidia.com>
+Subject: [PATCH 09/10] net/mlx5: qos: Support cross-esw scheduling in qos.c
+Date: Wed, 13 Nov 2024 22:30:46 +0200
+Message-ID: <20241113203317.2507537-10-cratiu@nvidia.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20241113203317.2507537-1-cratiu@nvidia.com>
 References: <20241113203317.2507537-1-cratiu@nvidia.com>
@@ -97,190 +97,309 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001708F:EE_|BY5PR12MB4068:EE_
-X-MS-Office365-Filtering-Correlation-Id: a3c9d3d1-015a-4e93-93dd-08dd0422898e
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FA:EE_|SA1PR12MB5613:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29045557-564b-4b8d-1943-08dd04228bc2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TlTGmRFYfP1Lzlf05AJyoYwAPxsNWk/J0STgDEAxjw+NfEp1zEEkTZfVEGqk?=
- =?us-ascii?Q?z9NqrXOJZASBRBx60F7ybIuc7kEnQBUMXZReqeNwhGc3yg/O9ktjjCrG/uPb?=
- =?us-ascii?Q?kd+V4/VN/EWmnSnk8MfFhwraczJRDwqyUkK23a2xrVGEag1KJpWZJOYZEe6Q?=
- =?us-ascii?Q?okXAKZDJHIweWEK7l63LC2+++bFusLCj8e9n9RmOrWNWlFC7cT2i8Jidmju0?=
- =?us-ascii?Q?lXJkIgE9RFw4mTP3jTQN3pa1Kz7W59+EP725/QFPe5jesGkek7Yw1aKXW9hS?=
- =?us-ascii?Q?FFvx6yJcFBZIvg8bOvcggbGDBawt/03v/i4bTqTBHsV1Xuu0NAcDubfrBtaF?=
- =?us-ascii?Q?CAw4cSCzbwMcmwMIBYg7CA38Q5DmfqV5sg6WrI55U/IT+tnoX5lwCY9CPO9B?=
- =?us-ascii?Q?7mqrqre2iX+Sbch/GCFRJzsIxwpx6aQ8eMp9WgJKfzCidPFvcwTMIfWvxCJO?=
- =?us-ascii?Q?Q8cH32qgTW6/DsxfvH7+YyLAbmTb2RkFKYzdy9Ph5jZBTmv24qyuCM8KB73t?=
- =?us-ascii?Q?g5poNrBcuUJDXN6VozL3FbvibZdVsZGFg3HcZtcjJcI/wBk8WQDhhSKDaS5D?=
- =?us-ascii?Q?fHPseCM9VO+p2FwFliPEX0F0zGEY5YZzCjJZiBh7sOWVDD7afWGzf50nNG3+?=
- =?us-ascii?Q?FFkdSRYFIVJThiPKRqlMbi9RQEVO1aM7JptPwFSbii4qKPPsBdr1QJc4ExSz?=
- =?us-ascii?Q?c9JFq/vRL//2Cu2WhO+MkMTgRTiSgDLukNGep6HpYiA8DdRKdu32xXDjfdnw?=
- =?us-ascii?Q?ZUvvGUuNChk+SIFOwnsunn8HeSOB2w9gl+kCh3J3BA55dTkRUeXQeJMjGzHp?=
- =?us-ascii?Q?N/SEjha1bmOfSnSyYkh5dZIEe+8ekM0k+lN92P3fBa94FJ//LxtT5QI+tOt1?=
- =?us-ascii?Q?lS4IbCqBK07VmXU4e1j8YilI6po3orKQdQvC5WaskEGtmjc1VTsQkAaCcMsT?=
- =?us-ascii?Q?o266a96PIKAELLYPCql8BxFDHwkZidI74+JGmC+EtBpLRhO+SWqseOHbzL6E?=
- =?us-ascii?Q?P3JxqTtT+xM5v4ILiWimmczaJ1LUtAuqjAoseU4na3Ncl+YjBuJUnd8GUeDJ?=
- =?us-ascii?Q?D33rMGrgteL7oQcC5pgxEeAfa3y3HLAhIPAPaHIVkrQ+jNbpngDOJHgaQsS2?=
- =?us-ascii?Q?hc2/hC0T01g1AYgbOQGFUOiiHiGt6329eSZ5c/4d6KFI2A0QJ4Ae5WPa3X8H?=
- =?us-ascii?Q?aI4EcNAbbIOJM04LV2y7AVDGyC0sHUAfvoEsS6E45NNZWA4lsOLRIAjgmg68?=
- =?us-ascii?Q?wrhidkFYINzmusem88xNuCGFqVhPz0yq/v6Lm3Lq1WN5L48hsS4ifXYAKQuC?=
- =?us-ascii?Q?wJh8WdQQtG9xzxa2Vr41nb7wvd6pASdw+oSMAq/xnDqnJQYJfp0+JxednD68?=
- =?us-ascii?Q?ce0OO6ULipYgNY7F7Ek3BIqLifjJ/ovwDP9hpq/seBUaipdpFw=3D=3D?=
+	=?us-ascii?Q?pbY1QZmSKieY1+hzAN1rhTx2zZxIQQEODkxHjuF157O7GsPH+z5pn9dlLmMc?=
+ =?us-ascii?Q?30BNeppZUfldf7KomGyrNTmpp0mYxN7TgXmqS5CBybm1a/lbPhEx3J7sy1hT?=
+ =?us-ascii?Q?ekVderJBJ6hLG+xgfcTSTNvy7wbgiuIZq2mYj5KmFg1uTD+/Dl4AA8tj6j0L?=
+ =?us-ascii?Q?XPN6i/pOIEN7LLWqVwbuImihJVundXooKrMQOSZY24DH0E5y8W2xoz3fuGCy?=
+ =?us-ascii?Q?KBHSSSsk4Fx4xGfmMEtuAHOUP2qEOO8h//k6L9YuMhxeT+49DXgDKrKoEeqS?=
+ =?us-ascii?Q?V0NzA6Tzsdm8zzwcuq9uQT8Vlsgfu9aIeH08OjsDXdNO5X6aGO0piA4+Folt?=
+ =?us-ascii?Q?0ht7rnAU3XuNc5bjuRvdt9gBs2gxuWgrV+q7ACB7d1ISJn//bfqIglPSxpck?=
+ =?us-ascii?Q?9QruVqKsPmthfKqHG5nxVH8RfBZrkSa23b+aw5BaU7Ao6QOCQ6Pu7lp8vb0Y?=
+ =?us-ascii?Q?OTJOZDPqFtUujD1YcqiVcRCwsAN/73xUtBJFJjzpMgDtSHcEni4SUJ0IPpkt?=
+ =?us-ascii?Q?84T0Q62MX4rDdtFBDdf+UmSc5jdgMRZ/Pi/eGnUT8Wk+NEqjebDlPowydI4i?=
+ =?us-ascii?Q?zH0rNPQmAy8f8k8Vg8D7e1/P8J2LcLNhNaibskbUyWsNMcdQRJVZ5GOMnyaL?=
+ =?us-ascii?Q?or4jH6SSmwAU8z+6EbA7IrHkL193cZr+c/7cdUnVLIE2gsBOk+tfTM0WuUWd?=
+ =?us-ascii?Q?ahUD8e15YB4a6KSpl6LCVgzvlxtwHIOQVmFtTnh+bNYMnw/Lk6Z+y5bqltXr?=
+ =?us-ascii?Q?7OCzr/ORWioRy7nWvL7eaQODlR7kPPXIE0Dof7bHtj28BpaSiYDo3SCoV0VG?=
+ =?us-ascii?Q?ytzduNjpHKyWxNN4su/2kia5g7s+RTxWlhemo4rszJBDYV+iZ6LHVxkMMBGv?=
+ =?us-ascii?Q?c15ZGepFTbxInL0webnPdmvcd+Qj9w4SXzZsfEQpW1hntD6Cmpbca3zmiJlr?=
+ =?us-ascii?Q?iIJaY5rm+Mh12zV8gEMVOIv5HnPNqM3gMW7aZuSEa7l9l2KS1QXU2F0vf9u8?=
+ =?us-ascii?Q?MN+gMd9gT2cbXZUdhSG1AURT3acWUZ+LpPFvTLLXDgew04a9DfPW/BZ+lN4Q?=
+ =?us-ascii?Q?tDlhcMFpkpwS+2PCdgDQ3QIwIebRtvtex1sv5OEFPMfT+o3MwJzPh9Vg5i2h?=
+ =?us-ascii?Q?PoZq7YFQcWcULQyg/3QVZ9IM3jv1BQgfCpTSnF0fFgVle82C2/Z+H8DFbyIZ?=
+ =?us-ascii?Q?KWJuOHGl7SR3qrOzatGheLm7Z6il4u5pkL3rTAg7ftXbOhc/k+qUc3IQ50qW?=
+ =?us-ascii?Q?i2Bn9BjjsF2vV1q2IACa2Ue+hvc25AEz+TLqiUx9+TfaJ85OIBS92JmELZE7?=
+ =?us-ascii?Q?rAaPQChTIa/9u6jou+exbDzl/UbOHquif0PHzwVSW5/nQ5a5KnEu1TbqHdhj?=
+ =?us-ascii?Q?kvV5cn/BkU1BFx8cxpnbZgVhT8nqyKvJn/mn0NSqcCw8qydrYg=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 20:34:13.8137
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 20:34:17.5224
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3c9d3d1-015a-4e93-93dd-08dd0422898e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29045557-564b-4b8d-1943-08dd04228bc2
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001708F.namprd03.prod.outlook.com
+	CO1PEPF000044FA.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4068
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5613
 
-Introduce shared esw qos domains, capable of holding rate groups for
-multiple E-Switches of the same NIC. Shared qos domains are reference
-counted and can be discovered via devcom. The devcom comp lock is used
-in write-mode to prevent init/cleanup races.
+Up to now, rate groups could only contain vports from the same E-Switch.
+This patch relaxes that restriction if the device supports it
+(HCA_CAP.esw_cross_esw_sched == true) and the right conditions are met:
+- Link AGgregation (LAG) is enabled.
+- The E-Switches use the same qos domain.
 
-When initializing a shared qos domain fails due to devcom errors,
-the code falls back to using a private qos domain while logging a
-message that cross-esw scheduling cannot be supported.
-
-Shared esw qos domains will be used in a future patch to support
-cross-eswitch scheduling.
+This also enables the use of the previously added shared esw qos
+domains.
 
 Issue: 3645895
+Change-Id: I282f0ecad258fa2dbe6a49e88cc7bc9a06ccfcce
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Change-Id: I45afa120e2ac4c521c13389f789e02b5fd91c42e
 ---
- .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 73 +++++++++++++++++--
- 1 file changed, 67 insertions(+), 6 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 117 +++++++++++++-----
+ include/linux/mlx5/mlx5_ifc.h                 |  11 +-
+ 2 files changed, 92 insertions(+), 36 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-index 87c9789c2836..4fba59137011 100644
+index 4fba59137011..b75f9939ae4b 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-@@ -11,10 +11,17 @@
- /* Minimum supported BW share value by the HW is 1 Mbit/sec */
- #define MLX5_MIN_BW_SHARE 1
+@@ -155,7 +155,9 @@ struct mlx5_esw_sched_node {
+ 	enum sched_node_type type;
+ 	/* The eswitch this node belongs to. */
+ 	struct mlx5_eswitch *esw;
+-	/* The children nodes of this node, empty list for leaf nodes. */
++	/* The children nodes of this node, empty list for leaf nodes.
++	 * Can be from multiple E-Switches.
++	 */
+ 	struct list_head children;
+ 	/* Valid only if this node is associated with a vport. */
+ 	struct mlx5_vport *vport;
+@@ -471,6 +473,7 @@ static int esw_qos_vport_create_sched_element(struct mlx5_esw_sched_node *vport_
+ {
+ 	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+ 	struct mlx5_core_dev *dev = vport_node->esw->dev;
++	struct mlx5_vport *vport = vport_node->vport;
+ 	void *attr;
  
--/* Holds rate nodes associated with an E-Switch. */
-+/* Holds rate nodes associated with one or more E-Switches.
-+ * If cross-esw scheduling is supported, this is shared between all
-+ * E-Switches of a NIC.
-+ */
- struct mlx5_qos_domain {
- 	/* Serializes access to all qos changes in the qos domain. */
- 	struct mutex lock;
-+	/* Whether this domain is shared with other E-Switches. */
-+	bool shared;
-+	/* The reference count is only used for shared qos domains. */
-+	refcount_t refcnt;
- 	/* List of all mlx5_esw_sched_nodes. */
- 	struct list_head nodes;
- };
-@@ -34,7 +41,7 @@ static void esw_assert_qos_lock_held(struct mlx5_eswitch *esw)
- 	lockdep_assert_held(&esw->qos.domain->lock);
+ 	if (!mlx5_qos_element_type_supported(dev,
+@@ -481,7 +484,13 @@ static int esw_qos_vport_create_sched_element(struct mlx5_esw_sched_node *vport_
+ 	MLX5_SET(scheduling_context, sched_ctx, element_type,
+ 		 SCHEDULING_CONTEXT_ELEMENT_TYPE_VPORT);
+ 	attr = MLX5_ADDR_OF(scheduling_context, sched_ctx, element_attributes);
+-	MLX5_SET(vport_element, attr, vport_number, vport_node->vport->vport);
++	MLX5_SET(vport_element, attr, vport_number, vport->vport);
++	if (vport->dev != dev) {
++		/* The port is assigned to a node on another eswitch. */
++		MLX5_SET(vport_element, attr, eswitch_owner_vhca_id_valid, true);
++		MLX5_SET(vport_element, attr, eswitch_owner_vhca_id,
++			 MLX5_CAP_GEN(vport->dev, vhca_id));
++	}
+ 	MLX5_SET(scheduling_context, sched_ctx, parent_element_id, vport_node->parent->ix);
+ 	MLX5_SET(scheduling_context, sched_ctx, max_average_bw, vport_node->max_rate);
+ 
+@@ -494,6 +503,7 @@ static int esw_qos_vport_tc_create_sched_element(struct mlx5_esw_sched_node *vpo
+ {
+ 	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+ 	struct mlx5_core_dev *dev = vport_tc_node->esw->dev;
++	struct mlx5_vport *vport = vport_tc_node->vport;
+ 	void *attr;
+ 
+ 	if (!mlx5_qos_element_type_supported(dev,
+@@ -504,9 +514,15 @@ static int esw_qos_vport_tc_create_sched_element(struct mlx5_esw_sched_node *vpo
+ 	MLX5_SET(scheduling_context, sched_ctx, element_type,
+ 		 SCHEDULING_CONTEXT_ELEMENT_TYPE_VPORT_TC);
+ 	attr = MLX5_ADDR_OF(scheduling_context, sched_ctx, element_attributes);
+-	MLX5_SET(vport_tc_element, attr, vport_number, vport_tc_node->vport->vport);
++	MLX5_SET(vport_tc_element, attr, vport_number, vport->vport);
+ 	MLX5_SET(vport_tc_element, attr, traffic_class, vport_tc_node->tc);
+ 	MLX5_SET(scheduling_context, sched_ctx, max_bw_obj_id, rate_limit_elem_ix);
++	if (vport->dev != dev) {
++		/* The port is assigned to a node on another eswitch. */
++		MLX5_SET(vport_tc_element, attr, eswitch_owner_vhca_id_valid, true);
++		MLX5_SET(vport_tc_element, attr, eswitch_owner_vhca_id,
++			 MLX5_CAP_GEN(vport->dev, vhca_id));
++	}
+ 	MLX5_SET(scheduling_context, sched_ctx, parent_element_id, vport_tc_node->parent->ix);
+ 	MLX5_SET(scheduling_context, sched_ctx, bw_share, vport_tc_node->bw_share);
+ 
+@@ -947,7 +963,6 @@ static int esw_qos_vport_tc_enable(struct mlx5_vport *vport, enum sched_node_typ
+ 		NL_SET_ERR_MSG_MOD(extack, "Setting up TC Arbiter for a vport is not supported.");
+ 		return -EOPNOTSUPP;
+ 	}
+-
+ 	esw_assert_qos_lock_held(vport->dev->priv.eswitch);
+ 
+ 	if (type == SCHED_NODE_TYPE_RATE_LIMITER)
+@@ -1182,6 +1197,26 @@ static int esw_qos_vport_tc_check_type(enum sched_node_type curr_type,
+ 	return 0;
  }
  
--static struct mlx5_qos_domain *esw_qos_domain_alloc(void)
-+static struct mlx5_qos_domain *esw_qos_domain_alloc(bool shared)
- {
- 	struct mlx5_qos_domain *qos_domain;
- 
-@@ -44,21 +51,75 @@ static struct mlx5_qos_domain *esw_qos_domain_alloc(void)
- 
- 	mutex_init(&qos_domain->lock);
- 	INIT_LIST_HEAD(&qos_domain->nodes);
-+	qos_domain->shared = shared;
-+	if (shared)
-+		refcount_set(&qos_domain->refcnt, 1);
- 
- 	return qos_domain;
- }
- 
--static int esw_qos_domain_init(struct mlx5_eswitch *esw)
-+static void esw_qos_devcom_lock(struct mlx5_devcom_comp_dev *devcom, bool shared)
- {
--	esw->qos.domain = esw_qos_domain_alloc();
-+	if (shared)
-+		mlx5_devcom_comp_lock(devcom);
-+}
-+
-+static void esw_qos_devcom_unlock(struct mlx5_devcom_comp_dev *devcom, bool shared)
++static bool esw_qos_validate_unsupported_tc_bw(struct mlx5_eswitch *esw, u32 *tc_bw)
 +{
-+	if (shared)
-+		mlx5_devcom_comp_unlock(devcom);
-+}
++	int i, num_tcs = esw_qos_num_tcs(esw->dev);
 +
-+static int esw_qos_domain_init(struct mlx5_eswitch *esw, bool shared)
-+{
-+	struct mlx5_devcom_comp_dev *devcom = esw->dev->priv.hca_devcom_comp;
-+
-+	if (shared && IS_ERR_OR_NULL(devcom)) {
-+		esw_info(esw->dev, "Cross-esw QoS cannot be initialized because devcom is unavailable.");
-+		shared = false;
++	for (i = num_tcs; i < IEEE_8021QAZ_MAX_TCS; i++) {
++		if (tc_bw[i])
++			return false;
 +	}
 +
-+	esw_qos_devcom_lock(devcom, shared);
-+	if (shared) {
-+		struct mlx5_devcom_comp_dev *pos;
-+		struct mlx5_core_dev *peer_dev;
++	return true;
++}
 +
-+		mlx5_devcom_for_each_peer_entry(devcom, peer_dev, pos) {
-+			struct mlx5_eswitch *peer_esw = peer_dev->priv.eswitch;
++static bool esw_qos_vport_validate_unsupported_tc_bw(struct mlx5_vport *vport, u32 *tc_bw)
++{
++	struct mlx5_eswitch *esw = vport->qos.sched_node ?
++				   vport->qos.sched_node->parent->esw : vport->dev->priv.eswitch;
 +
-+			if (peer_esw->qos.domain && peer_esw->qos.domain->shared) {
-+				esw->qos.domain = peer_esw->qos.domain;
-+				refcount_inc(&esw->qos.domain->refcnt);
-+				goto unlock;
-+			}
++	return esw_qos_validate_unsupported_tc_bw(esw, tc_bw);
++}
++
+ static int esw_qos_vport_update(struct mlx5_vport *vport, enum sched_node_type type,
+ 				struct mlx5_esw_sched_node *parent,
+ 				struct netlink_ext_ack *extack)
+@@ -1200,8 +1235,14 @@ static int esw_qos_vport_update(struct mlx5_vport *vport, enum sched_node_type t
+ 	if (err)
+ 		return err;
+ 
+-	if (curr_type == SCHED_NODE_TYPE_TC_ARBITER_TSAR && curr_type == type)
++	if (curr_type == SCHED_NODE_TYPE_TC_ARBITER_TSAR && curr_type == type) {
+ 		esw_qos_tc_arbiter_get_bw_shares(vport->qos.sched_node, curr_tc_bw);
++		if (!esw_qos_validate_unsupported_tc_bw(parent->esw, curr_tc_bw)) {
++			NL_SET_ERR_MSG_MOD(extack,
++					   "Unsupported traffic classes on the new device");
++			return -EOPNOTSUPP;
 +		}
 +	}
-+
-+	/* If no shared domain found, this esw will create one.
-+	 * Doing it with the devcom comp lock held prevents races with other
-+	 * eswitches doing concurrent init.
-+	 */
-+	esw->qos.domain = esw_qos_domain_alloc(shared);
-+unlock:
-+	esw_qos_devcom_unlock(devcom, shared);
  
- 	return esw->qos.domain ? 0 : -ENOMEM;
+ 	esw_qos_vport_disable(vport, extack);
+ 
+@@ -1519,26 +1560,6 @@ static int esw_qos_devlink_rate_to_mbps(struct mlx5_core_dev *mdev, const char *
+ 	return 0;
  }
  
- static void esw_qos_domain_release(struct mlx5_eswitch *esw)
+-static bool esw_qos_validate_unsupported_tc_bw(struct mlx5_eswitch *esw, u32 *tc_bw)
+-{
+-	int i, num_tcs = esw_qos_num_tcs(esw->dev);
+-
+-	for (i = num_tcs; i < IEEE_8021QAZ_MAX_TCS; i++) {
+-		if (tc_bw[i])
+-			return false;
+-	}
+-
+-	return true;
+-}
+-
+-static bool esw_qos_vport_validate_unsupported_tc_bw(struct mlx5_vport *vport, u32 *tc_bw)
+-{
+-	struct mlx5_eswitch *esw = vport->qos.sched_node ?
+-				   vport->qos.sched_node->parent->esw : vport->dev->priv.eswitch;
+-
+-	return esw_qos_validate_unsupported_tc_bw(esw, tc_bw);
+-}
+-
+ static bool esw_qos_tc_bw_disabled(u32 *tc_bw)
  {
--	kfree(esw->qos.domain);
-+	struct mlx5_devcom_comp_dev *devcom = esw->dev->priv.hca_devcom_comp;
-+	struct mlx5_qos_domain *domain = esw->qos.domain;
-+	bool shared = domain->shared;
+ 	int i;
+@@ -1553,10 +1574,16 @@ static bool esw_qos_tc_bw_disabled(u32 *tc_bw)
+ 
+ int mlx5_esw_qos_init(struct mlx5_eswitch *esw)
+ {
+-	if (esw->qos.domain)
+-		return 0;  /* Nothing to change. */
++	bool use_shared_domain = esw->mode == MLX5_ESWITCH_OFFLOADS &&
++		MLX5_CAP_QOS(esw->dev, esw_cross_esw_sched);
+ 
+-	return esw_qos_domain_init(esw, false);
++	if (esw->qos.domain) {
++		if (esw->qos.domain->shared == use_shared_domain)
++			return 0;  /* Nothing to change. */
++		esw_qos_domain_release(esw);
++	}
 +
-+	/* Shared domains are released with the devcom comp lock held to
-+	 * prevent races with other eswitches doing concurrent init.
-+	 */
-+	esw_qos_devcom_lock(devcom, shared);
-+	if (!shared || refcount_dec_and_test(&domain->refcnt))
-+		kfree(domain);
- 	esw->qos.domain = NULL;
-+	esw_qos_devcom_unlock(devcom, shared);
- }
- 
- enum sched_node_type {
-@@ -1495,7 +1556,7 @@ int mlx5_esw_qos_init(struct mlx5_eswitch *esw)
- 	if (esw->qos.domain)
- 		return 0;  /* Nothing to change. */
- 
--	return esw_qos_domain_init(esw);
-+	return esw_qos_domain_init(esw, false);
++	return esw_qos_domain_init(esw, use_shared_domain);
  }
  
  void mlx5_esw_qos_cleanup(struct mlx5_eswitch *esw)
+@@ -1760,16 +1787,40 @@ int mlx5_esw_devlink_rate_node_del(struct devlink_rate *rate_node, void *priv,
+ 	return 0;
+ }
+ 
+-int mlx5_esw_qos_vport_update_parent(struct mlx5_vport *vport, struct mlx5_esw_sched_node *parent,
+-				     struct netlink_ext_ack *extack)
++static bool mlx5_esw_validate_cross_esw_scheduling(struct mlx5_eswitch *esw,
++						   struct mlx5_esw_sched_node *parent,
++						   struct netlink_ext_ack *extack)
+ {
+-	struct mlx5_eswitch *esw = vport->dev->priv.eswitch;
+-	int err = 0;
++	if (!parent || esw == parent->esw)
++		return 0;
+ 
+-	if (parent && parent->esw != esw) {
++	if (!MLX5_CAP_QOS(esw->dev, esw_cross_esw_sched)) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Cross E-Switch scheduling is not supported");
+ 		return -EOPNOTSUPP;
+ 	}
++	if (esw->qos.domain != parent->esw->qos.domain) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Cannot add vport to a parent belonging to a different qos domain");
++		return -EOPNOTSUPP;
++	}
++	if (!mlx5_lag_is_active(esw->dev)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Cross E-Switch scheduling requires LAG to be activated");
++		return -EOPNOTSUPP;
++	}
++
++	return 0;
++}
++
++int mlx5_esw_qos_vport_update_parent(struct mlx5_vport *vport, struct mlx5_esw_sched_node *parent,
++				     struct netlink_ext_ack *extack)
++{
++	struct mlx5_eswitch *esw = vport->dev->priv.eswitch;
++	int err;
++
++	err = mlx5_esw_validate_cross_esw_scheduling(esw, parent, extack);
++	if (err)
++		return err;
+ 
+ 	esw_qos_lock(esw);
+ 	if (!vport->qos.sched_node && parent) {
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index b9eef877c061..10cb9aa52f06 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -1095,7 +1095,9 @@ struct mlx5_ifc_qos_cap_bits {
+ 	u8         log_esw_max_sched_depth[0x4];
+ 	u8         reserved_at_10[0x10];
+ 
+-	u8         reserved_at_20[0xb];
++	u8         reserved_at_20[0x9];
++	u8         esw_cross_esw_sched[0x1];
++	u8         reserved_at_2a[0x1];
+ 	u8         log_max_qos_nic_queue_group[0x5];
+ 	u8         reserved_at_30[0x10];
+ 
+@@ -4130,13 +4132,16 @@ struct mlx5_ifc_tsar_element_bits {
+ };
+ 
+ struct mlx5_ifc_vport_element_bits {
+-	u8         reserved_at_0[0x10];
++	u8         reserved_at_0[0x4];
++	u8         eswitch_owner_vhca_id_valid[0x1];
++	u8         eswitch_owner_vhca_id[0xb];
+ 	u8         vport_number[0x10];
+ };
+ 
+ struct mlx5_ifc_vport_tc_element_bits {
+ 	u8         traffic_class[0x4];
+-	u8         reserved_at_4[0xc];
++	u8         eswitch_owner_vhca_id_valid[0x1];
++	u8         eswitch_owner_vhca_id[0xb];
+ 	u8         vport_number[0x10];
+ };
+ 
 -- 
 2.43.2
 
