@@ -1,185 +1,136 @@
-Return-Path: <netdev+bounces-144331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089F29C69B5
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 08:14:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 813BF9C69BE
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 08:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17D11F2585F
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 07:14:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113E81F23550
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 07:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E56183CAE;
-	Wed, 13 Nov 2024 07:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ofi2b00u"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF15187350;
+	Wed, 13 Nov 2024 07:15:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC8817D341;
-	Wed, 13 Nov 2024 07:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A28175D38
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 07:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731482062; cv=none; b=P8X3KZYiuhuW2jeGpA3YOAGcJys2ze5xBqjuD6HEwtPlJZRjraDs7HUzRvz7wl8ut/FYC8q3dPX49g21NlFkISOdmdIK7cc4tvqBIF0XS2po7B57tE7+V513xQZRUoO9Xg9X0dS386JXcdBuBKwIN9MWQ7CIwCBHCU87/aFxhQ4=
+	t=1731482159; cv=none; b=C5bwK3WzPflzxNEEEAewlDpqiWeSvULLie848rzl7/FtQJcX/ekWgErsUO8cmKnnBwrbcDx23btzfJLvV71uycQuzwCdujydwFl/HuMj8YC7Ax/W1qdU9ELWRqSyxVF2MVvBJUUw0xVea0YRgm9EKKXU7YuTDc0HXCbcimnZ4tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731482062; c=relaxed/simple;
-	bh=tmZYFTOl3WudTuEIAVaOUqs664VJPGr8Q7jZvsTOGXU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CCZx3wyVUkSjq7gcRw+rAb9QlmMn+GTNEzXxOhObN063DvYAI06gWLtBJX+aX9B/euYYQPu/1endXapelX5wcfracbWOjN0OLHJeeejXJuY9UAnxpR0dQK17bJwa8WQdnedhOab2BBh7kN20ruMCab/rU0QsHHzrYcJhZJcLJe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ofi2b00u; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1731482051; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=SNx7FPzEHfUmQ7BbVvthdJvm0Dd1tGLSqyuQY84NouY=;
-	b=ofi2b00uyOwKaU9Nq0JkU6/iiVypLniG2FhFAcYOOypy0UVYZB4QidtCcbeaXe65kynVtjPGdPfVMUUqktI5C32T0+9T4x8h6nFiWPEFefb0gehlUz+1OMDecx4gUe6rDFtsuLtMurP9ToHrD5Xtgqo3w0CHq94UeGWSdijXeUM=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WJK51Yk_1731482051 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 13 Nov 2024 15:14:11 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net-next 3/3] net/smc: Isolate the smc_xxx_lgr_pending with ib_device
-Date: Wed, 13 Nov 2024 15:14:05 +0800
-Message-ID: <20241113071405.67421-4-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20241113071405.67421-1-alibuda@linux.alibaba.com>
-References: <20241113071405.67421-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1731482159; c=relaxed/simple;
+	bh=SBaq0tNsdJyjxFyTdktXxwIt5E9hSiPSZMXHIrQlJVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jusiEmMJeWcPkO9gyEEft3LrRJRHPHGXcvJ35bFM06oy0f68qjCE3eDEiAhLFbnXsQD0190GQctR+nNs4LaeB3myqhkDFcYTij2Zm+SH3NY89T6YtuKjOrK6CSQ5ubzpt4TiCh1B3xPRxH36odOkiKOMFJUCOgIh46glt/AqFI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tB7aT-0007QT-1e; Wed, 13 Nov 2024 08:14:49 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tB7aN-000XUv-0p;
+	Wed, 13 Nov 2024 08:14:43 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C3AE03721A3;
+	Wed, 13 Nov 2024 07:14:42 +0000 (UTC)
+Date: Wed, 13 Nov 2024 08:14:41 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Pantelis Antoniou <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+	Byungho An <bh74.an@samsung.com>, Kevin Brace <kevinbrace@bracecomputerlab.com>, 
+	Francois Romieu <romieu@fr.zoreil.com>, Michal Simek <michal.simek@amd.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Zhao Qiang <qiang.zhao@nxp.com>, "open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"moderated list:ARM/Allwinner sunXi SoC support" <linux-arm-kernel@lists.infradead.org>, 
+	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>, 
+	"open list:FREESCALE SOC FS_ENET DRIVER" <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCHv3 net-next] net: modernize IRQ resource acquisition
+Message-ID: <20241113-nonchalant-spaniel-of-contentment-83978a-mkl@pengutronix.de>
+References: <20241112211442.7205-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yqpx5eyx2zhvpvlt"
+Content-Disposition: inline
+In-Reply-To: <20241112211442.7205-1-rosenp@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-It is widely known that SMC introduced a global lock to protect the
-creation of the first connection. This lock not only brings performance
-issues but also poses a serious security risk. In a multi-tenant
-container environment, malicious tenants can construct attacks that keep
-the lock occupied for an extended period, thereby affecting the
-connections of other tenants.
 
-Considering that this lock is essentially meant to protect the QP, which
-belongs to a device, we can limit the scope of the lock to within the
-device rather than having it be global. This way, when a container
-exclusively occupies the device, it can avoid being affected by other
-malicious tenants.
+--yqpx5eyx2zhvpvlt
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCHv3 net-next] net: modernize IRQ resource acquisition
+MIME-Version: 1.0
 
-Also make on impact on SMC-D since the path of SMC-D is shorter.
+On 12.11.2024 13:14:42, Rosen Penev wrote:
+> In probe, np =3D=3D pdev->dev.of_node. It's easier to pass pdev directly.
+>=20
+> Replace irq_of_parse_and_map() by platform_get_irq() to do so. Requires
+> removing the error message as well as fixing the return type.
+>=20
+> Replace of_address_to_resource() with platform_get_resource() for the
+> same reason.
+>=20
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> (for CAN)
+> Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
----
- net/smc/af_smc.c | 18 ++++++++++--------
- net/smc/smc_ib.c |  2 ++
- net/smc/smc_ib.h |  2 ++
- 3 files changed, 14 insertions(+), 8 deletions(-)
+Please write this as:
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 19480d8affb0..d5b9ea7661db 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -56,11 +56,8 @@
- #include "smc_loopback.h"
- #include "smc_inet.h"
- 
--static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
--						 * creation on server
--						 */
--static DEFINE_MUTEX(smc_client_lgr_pending);	/* serialize link group
--						 * creation on client
-+static DEFINE_MUTEX(smcd_server_lgr_pending);	/* serialize link group
-+						 * creation on server for SMC-D
- 						 */
- 
- static struct workqueue_struct	*smc_tcp_ls_wq;	/* wq for tcp listen work */
-@@ -1251,7 +1248,9 @@ static int smc_connect_rdma(struct smc_sock *smc,
- 	if (reason_code)
- 		return reason_code;
- 
--	smc_lgr_pending_lock(ini, &smc_client_lgr_pending);
-+	smc_lgr_pending_lock(ini, (ini->smcr_version & SMC_V2) ?
-+				&ini->smcrv2.ib_dev_v2->smc_server_lgr_pending :
-+				&ini->ib_dev->smc_server_lgr_pending);
- 	reason_code = smc_conn_create(smc, ini);
- 	if (reason_code) {
- 		smc_lgr_pending_unlock(ini);
-@@ -1412,7 +1411,7 @@ static int smc_connect_ism(struct smc_sock *smc,
- 	ini->ism_peer_gid[ini->ism_selected].gid = ntohll(aclc->d0.gid);
- 
- 	/* there is only one lgr role for SMC-D; use server lock */
--	smc_lgr_pending_lock(ini, &smc_server_lgr_pending);
-+	smc_lgr_pending_lock(ini, &smcd_server_lgr_pending);
- 	rc = smc_conn_create(smc, ini);
- 	if (rc) {
- 		smc_lgr_pending_unlock(ini);
-@@ -2044,6 +2043,9 @@ static int smc_listen_rdma_init(struct smc_sock *new_smc,
- {
- 	int rc;
- 
-+	smc_lgr_pending_lock(ini, (ini->smcr_version & SMC_V2) ?
-+			     &ini->smcrv2.ib_dev_v2->smc_server_lgr_pending :
-+			     &ini->ib_dev->smc_server_lgr_pending);
- 	/* allocate connection / link group */
- 	rc = smc_conn_create(new_smc, ini);
- 	if (rc)
-@@ -2064,6 +2066,7 @@ static int smc_listen_ism_init(struct smc_sock *new_smc,
- {
- 	int rc;
- 
-+	smc_lgr_pending_lock(ini, &smcd_server_lgr_pending);
- 	rc = smc_conn_create(new_smc, ini);
- 	if (rc)
- 		return rc;
-@@ -2478,7 +2481,6 @@ static void smc_listen_work(struct work_struct *work)
- 	if (rc)
- 		goto out_decl;
- 
--	smc_lgr_pending_lock(ini, &smc_server_lgr_pending);
- 	smc_close_init(new_smc);
- 	smc_rx_init(new_smc);
- 	smc_tx_init(new_smc);
-diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-index 9c563cdbea90..fb8b81b628b8 100644
---- a/net/smc/smc_ib.c
-+++ b/net/smc/smc_ib.c
-@@ -952,6 +952,8 @@ static int smc_ib_add_dev(struct ib_device *ibdev)
- 	init_waitqueue_head(&smcibdev->lnks_deleted);
- 	mutex_init(&smcibdev->mutex);
- 	mutex_lock(&smc_ib_devices.mutex);
-+	mutex_init(&smcibdev->smc_server_lgr_pending);
-+	mutex_init(&smcibdev->smc_client_lgr_pending);
- 	list_add_tail(&smcibdev->list, &smc_ib_devices.list);
- 	mutex_unlock(&smc_ib_devices.mutex);
- 	ib_set_client_data(ibdev, &smc_ib_client, smcibdev);
-diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
-index ef8ac2b7546d..322547a5a23d 100644
---- a/net/smc/smc_ib.h
-+++ b/net/smc/smc_ib.h
-@@ -57,6 +57,8 @@ struct smc_ib_device {				/* ib-device infos for smc */
- 	atomic_t		lnk_cnt_by_port[SMC_MAX_PORTS];
- 						/* number of links per port */
- 	int			ndev_ifidx[SMC_MAX_PORTS]; /* ndev if indexes */
-+	struct mutex    smc_server_lgr_pending; /* serialize link group creation on server */
-+	struct mutex    smc_client_lgr_pending; /* serialize link group creation on client */
- };
- 
- static inline __be32 smc_ib_gid_to_ipv4(u8 gid[SMC_GID_SIZE])
--- 
-2.45.0
+Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de> # for CAN
 
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--yqpx5eyx2zhvpvlt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc0Ud0ACgkQKDiiPnot
+vG9ixwf+MRErFbP8EBNYW4KiknVHSCJqliQuxtMgRc5LE54Iz/W8AKqAbKIjgzTv
+XVCnuSSPn5hWw85VK1YrC2romqZQMmkjFDeaDAf27emw1tYQC5DkAg7DfdasiaFw
+ZUNWdDjmY3lm3YwXCupckUARjWB9VEXNsLca8eti0+gmBWR16gwNbd7lBeXHm+Qf
+mDzxiz9SQG5P/1V6GYCnHUgqw4yC6yxgNim60jfDfbD7t52x/C1EQylcG0Wzx3Uz
+H1irShtJQNqXv0j63qMX0K3NQOkUKy0/yfNUS5gqHefjAT5YnEqUHKReldiPq0JB
+IvRUsw91n6EDC2kPZwOR1gOkgMzKZA==
+=7118
+-----END PGP SIGNATURE-----
+
+--yqpx5eyx2zhvpvlt--
 
