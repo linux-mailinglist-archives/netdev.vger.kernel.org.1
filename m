@@ -1,160 +1,125 @@
-Return-Path: <netdev+bounces-144431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 513A99C735F
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:19:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A58829C736A
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 057FB1F219F7
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:19:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65173283078
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12244C62E;
-	Wed, 13 Nov 2024 14:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD51B136352;
+	Wed, 13 Nov 2024 14:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7so6Gm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291EA43172
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 14:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD694C62E
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 14:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731507581; cv=none; b=eULslKoDoqmMmPZR+uXIU7QD8HEYgq67cxgj49XPEj2+jT2H8qG/CPq+qEBfrUN+p5v4EHS//2HRvcgW0P520Kqem1mUTeRdzNRl9HS9UBbfoD6+amVKv1Jq3cOxBi1xTTZVTGcHS0gKRGxsWicB7wua/GwW+uQiAR06SGJwL0c=
+	t=1731507749; cv=none; b=KiLPYisD5piZUkLL2aWw1u7yndfGyR/nmpnfe3sya2sQh2JqVSNMXgsfIjliSvMldpgPQsH6/QGi2MEqJinYlZKpvlgkD2EpMwBnQXQk7R+/wW1+LzyZSCegcjIFshQLuAmSEgDeRppC2geOW7hN+aUSEv3nbbHBNiMzxdnUOGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731507581; c=relaxed/simple;
-	bh=609fubuMMYfYHCOFsJn6d9MB3w7+X5uOw2vVw673paY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=eyaJBJAa5LOGXVFpEWlbyKL4IS9RctUpr/iEX6Y2q8mOXQFocy4YP9CdITnjD55UqExPbXIHGISor7XE4eHLmEdN1r6psA5XvJ89VEG+4K9HEqMlj3yZWl/DtdE1ergtxRiGt9E5sSyGJgF5MMtscIi+JXSk8coHPeInUX0UwZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XpQK11hGLz1JB6X;
-	Wed, 13 Nov 2024 22:14:45 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1D7E61400F4;
-	Wed, 13 Nov 2024 22:19:29 +0800 (CST)
-Received: from [10.174.177.223] (10.174.177.223) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 13 Nov 2024 22:19:28 +0800
-Message-ID: <97456f7d-83f3-404c-bc42-0a5f00af023e@huawei.com>
-Date: Wed, 13 Nov 2024 22:19:27 +0800
+	s=arc-20240116; t=1731507749; c=relaxed/simple;
+	bh=rSz5s+lFR/7j3AoPWRkF/xmDmXvldLwT7bIsTucDcSk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RCcqS4Qy3sqGHXUw32M7Rp+KiYes3Nhl3CS0vV7biMDCrwFjkRuFT43ZCOkTdecpdseszo4pnQe+/xqL5D+G3c+gl6opsQnUQ4+hDTtimE3fzsPHAdZjETf/tbgJnXH7HMVWveWEq9bETAa5UoKXMENK3OF2Vuxm5vx4cxY5Big=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W7so6Gm2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731507747;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mASqSpzIjCfOGjWWtMxMJjAa1f5QNiEn+kAbhz2hm6s=;
+	b=W7so6Gm2L8QK1sNl2FXfJq4GcogcpEifeynFxGvqQl3Aehnq59Ei30nm/ICBScBSvEp5g2
+	G9+qcr7qTGNpq+b5Zyy+nmR/wtlwR5sAM1RFPxTpbRoUtuh1zqiHj9g7MPyVg48dgl+O55
+	ppXAH6ecM3eObSmHaZEfYTVrvsAkDjk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-215-sRYLWHxQMea_wrdzY0MKig-1; Wed, 13 Nov 2024 09:22:25 -0500
+X-MC-Unique: sRYLWHxQMea_wrdzY0MKig-1
+X-Mimecast-MFC-AGG-ID: sRYLWHxQMea_wrdzY0MKig
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-431518e6d8fso49542345e9.0
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 06:22:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731507744; x=1732112544;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mASqSpzIjCfOGjWWtMxMJjAa1f5QNiEn+kAbhz2hm6s=;
+        b=wcopqFTYpYrE98dYvVcEPMtU4dU7IVHsRqtoOKPlmRNEgarNM5a/TYXpceJ4+eNyQs
+         qvclrqYbQVWvRVEOCLw27OVAUKpgHEjlwxdro4E5K98+efkQ94bC52gQ7XjAs+y4QsbE
+         CuKCsfkgENmh0sdGvPxrsVKAZQK5h7AJDVW4KWivVWGRegWAw0W4iCYwHn1fWZ0dl81j
+         5RTB9hESd6f2sSa2l8LGphiw6IruMNLvxeJfCxRMYIGevhOjx3XeqNn2oPHjSOfVOtHi
+         0iVNMsALB+dd2padNHLQF9FOtP9PDU6PImALgfBUU7raeYqwrOYUZ7eAUzrVEDMiP4fb
+         Z2tg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTeY8EV9QYtd3866EpHUR1HXFnHOW7LWzj0NeOreDIxDjd67S5cq3D4ipyQnyHLCnsPeGZFmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzofZHPBGFKRXnepuWLQ3Lm/RSBAodjCkZHIxQAcr54b2mnCmyx
+	ZgqCHrBqalpHfi0TCPv7cO7blp6eitOTKmbA6l8xRBVpEp4/B3/n7EFzbrQjsGPRlE4TrRhWXT4
+	FFTTj5uciXgZKGnInfZFC5SEETcXSc26Ep/FKZN+1o0VI4ZhgtSRU8g==
+X-Received: by 2002:a05:600c:4f43:b0:432:d82d:6a6c with SMTP id 5b1f17b1804b1-432d82d6b43mr10997335e9.30.1731507744437;
+        Wed, 13 Nov 2024 06:22:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEv0nIvk+mpeEA1hyRh0EsYUYVRpzKaeVOOE/+42qkI1tt/CHPMbYGzWsgSNQ+rY1caaZZZwA==
+X-Received: by 2002:a05:600c:4f43:b0:432:d82d:6a6c with SMTP id 5b1f17b1804b1-432d82d6b43mr10997095e9.30.1731507744082;
+        Wed, 13 Nov 2024 06:22:24 -0800 (PST)
+Received: from debian (2a01cb058d23d600736cb2b04c893998.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:736c:b2b0:4c89:3998])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed99a0efsm18547302f8f.58.2024.11.13.06.22.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 06:22:23 -0800 (PST)
+Date: Wed, 13 Nov 2024 15:22:21 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Subject: Re: [PATCH net-next] geneve: Use pcpu stats to update rx_dropped
+ counter.
+Message-ID: <ZzS2HcD1hPTc3E/g@debian>
+References: <c9a7d3ddbe3fb890bee0c95d207f2ce431001075.1730979658.git.gnault@redhat.com>
+ <231c2226-9b16-4a10-b2b8-484efe0aae6b@redhat.com>
+ <a6bd2ee8-c732-4922-9e7c-ae89a1ad8056@redhat.com>
+ <20241112181518.3f55a359@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: Fix icmp host relookup triggering ip_rt_bug
-From: "dongchenchen (A)" <dongchenchen2@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>
-References: <20241111123915.3879488-1-dongchenchen2@huawei.com>
- <ZzK5A9DDxN-YJlsk@gondor.apana.org.au>
- <8acfac66-bd2f-44a0-a113-89951dcfd2d3@huawei.com>
- <ZzLWcxskwi9e_bPf@gondor.apana.org.au>
- <9b9c7edf-fa68-465e-a960-0fe07773ba82@huawei.com>
-In-Reply-To: <9b9c7edf-fa68-465e-a960-0fe07773ba82@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241112181518.3f55a359@kernel.org>
 
+On Tue, Nov 12, 2024 at 06:15:18PM -0800, Jakub Kicinski wrote:
+> On Tue, 12 Nov 2024 17:53:36 +0100 Paolo Abeni wrote:
+> > > How about switching to NETDEV_PCPU_STAT_DSTATS instead, so there is a
+> > > single percpu struct allocated x device (geneve already uses
+> > > NETDEV_PCPU_STAT_TSTATS): stats fetching will be faster, and possibly
+> > > memory usage lower.  
+> > 
+> > I was not aware of the previous discussion on this same topic:
+> > 
+> > https://lore.kernel.org/netdev/20240903113402.41d19129@kernel.org/
+> > 
+> > and I missed the previous change on bareudp.c
+> > 
+> > I still think that avoiding the double per-cpu traversal when fetching
+> > the stats could be useful, especially on large multi-numa nodes systems.
+> > 
+> > I guess it's better to be consistent and keep geneve and bareudp
+> > aligned. We can eventually consolidate the stats later.
+> 
+> We merged the bareudp changes... begrudgingly. You're the third
+> maintainer in a row to make a similar suggestion, which is pretty
+> strong signal that it's a better direction.
 
-On 2024/11/13 22:13, dongchenchen (A) wrote:
->>> If skb_in is outbound, fl4_dec.saddr is not nolocal. It may be no input
->>> route from B to A for
->>>
->>> first communication.
->> You're right.  So the problem here is that for the case of A
->> being local, we should not be taking the ip_route_input code
->> path (this is intended for forwarded packets).
->>
->> In fact if A is local, and we're sending an ICMP message to A,
->> then perhaps we could skip the IPsec lookup completely and just
->> do normal routing?
->>
->> Steffen, what do you think?
->>
->> So I think it boils down to two choices:
->>
->> 1) We could simply drop IPsec processing if we notice that A
->> (fl.fl4_dst) is local;
->
-> Hi, Herbert! Thanks for your suggestions very much.
->
-> maybe we can fix it as below:
-> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> index e1384e7331d8..5f63c4dde4e9 100644
-> --- a/net/ipv4/icmp.c
-> +++ b/net/ipv4/icmp.c
-> @@ -517,7 +517,9 @@ static struct rtable *icmp_route_lookup(struct net 
-> *net,
->                           flowi4_to_flowi(fl4), NULL, 0);
->         rt = dst_rtable(dst);
->         if (!IS_ERR(dst)) {
-> -               if (rt != rt2)
-> +               unsigned int addr_type = inet_addr_type_dev_table(net, 
-> route_lookup_dev, fl4->daddr);
-> +               if (rt != rt2 || addr_type == RTN_LOCAL)
->                         return rt;
->         } else if (PTR_ERR(dst) == -EPERM) {
->                 rt = NULL;
->> 2) Or we could take the __ip_route_output_key code path and
->> continue to do the xfrm lookup when A is local.
+No problem, I can work on DSTAT conversion.
 
-sorry,  resend it due to format problems
-
-If only skip input route lookup as below, xfrm_lookup check may return 
-ENOENT
-for no xfrm pol or dst nofrm flag.
-
-@@ -543,6 +544,10 @@ static struct rtable *icmp_route_lookup(struct net 
-*net,
-                         err = PTR_ERR(rt2);
-                         goto relookup_failed;
-                 }
-+
-+               unsigned int addr_type = inet_addr_type_dev_table(net, 
-route_lookup_dev, fl4->daddr);
-+               if (addr_type == RTN_LOCAL)
-+                       goto relookup;
-                 /* Ugh! */
-                 orefdst = skb_in->_skb_refdst; /* save old refdst */
-
-xfrm_lookup
-     xfrm_lookup_with_ifid
-         if (!if_id && ((dst_orig->flags & DST_NOXFRM) ||
-             !net->xfrm.policy_count[XFRM_POLICY_OUT]))
-             goto nopol;
-
-Thanks a lot!
-Dong Chenchen
-
-> If only skip input route lookup as below, xfrm_lookup check may return 
-> ENOENT
-> for no xfrm pol or dst nofrm flag.
->
-> @@ -543,6 +544,10 @@ static struct rtable *icmp_route_lookup(struct 
-> net *net, err = PTR_ERR(rt2); goto relookup_failed; } + + unsigned int 
-> addr_type = inet_addr_type_dev_table(net, route_lookup_dev, 
-> fl4->daddr); + if (addr_type == RTN_LOCAL) + goto relookup; /* Ugh! */ 
-> orefdst = skb_in->_skb_refdst; /* save old refdst */
->
-> xfrm_lookup
-> xfrm_lookup_with_ifid
->       if (!if_id && ((dst_orig->flags & DST_NOXFRM) ||
-> !net->xfrm.policy_count[XFRM_POLICY_OUT]))
->         goto nopol;
->
-> Thanks a lot!
-> Dong Chenchen
->
->> Thanks,
 
