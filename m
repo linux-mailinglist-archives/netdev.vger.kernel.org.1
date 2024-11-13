@@ -1,157 +1,83 @@
-Return-Path: <netdev+bounces-144381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 459059C6DCA
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 579CD9C6E17
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 12:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9C98285251
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:25:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCD2281857
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349261FF03D;
-	Wed, 13 Nov 2024 11:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FC11F80AF;
+	Wed, 13 Nov 2024 11:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="nGTyBxRj";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KiaNvIii"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCDLeUee"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a7-smtp.messagingengine.com (flow-a7-smtp.messagingengine.com [103.168.172.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5114F1F80AF;
-	Wed, 13 Nov 2024 11:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA531FF7D0
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 11:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731497141; cv=none; b=CvMG43ynz/c9PzTnB1XGTB14fYD9IlQ9hWUgiQMk6dUC2EheKtckVpW4vSZ3++7uchaNJJtjY6J1A24sWD9rDjPZ02Jhthy5cE5/f66ZwFSvZAsLIF6vZWPu84npQdxns970VuNOKu1PqU3ZILMqAW1fr/jqx6DmJ3PvIR03FH4=
+	t=1731498245; cv=none; b=omvBy2inFOQC450ujMfM4eD+wNHq6fgS2mTR7/gzggN16TYdCfCOKWQSs7Yh+lMpItq5Ac98BtHQtvRun5QBTD3l6H5jaLlG+6N/vdeOYmVX53UDDJV8+a9vqQ6hjqOuwByPqhfk+WZpHc/Yoblul/0UvV8tJsNblb6/ks9YyZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731497141; c=relaxed/simple;
-	bh=YHQWcbEHKaHc/P7TUG5kLlyBMors0zniB0SXNRzu1P4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bx0oLG4lwDVfxly8YbbUhX/g1i1iGrTursBMqR+TcOnq12ej7NqbEaer4yro7HP+0vrxKfNwjPN+C0N0Gl9TYqJzXzrHuf+15ZMVbAoWg9UtXaimkEoG9E93VXXW704b19r3GGI9VK0CpQTy+teyOKDjSRPqZbV+xpyRtl1PbbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=nGTyBxRj; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KiaNvIii; arc=none smtp.client-ip=103.168.172.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailflow.phl.internal (Postfix) with ESMTP id 232D72012D5;
-	Wed, 13 Nov 2024 06:25:37 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Wed, 13 Nov 2024 06:25:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1731497137; x=
-	1731500737; bh=p+EBDf5BfjiBMMhc/gpjtuneMWwTLxbD154IjpxkN3U=; b=n
-	GTyBxRjGtaSJybNcRw2FycJiZ42dGQfOdcA4HLfpOYRduKaJS97rBnTOBSO6Jac8
-	mZ+RsA+ED0n43ttdVo1mgBgnVa07m2alBnIoFjGorfrZL0KkAdF3VShGF+g+2065
-	rGHKNhtJqmGSA5VSDonnDH3o2UZmiVDIbhFzPoNsWp+T7pfYUV8FHCx5Um+aDv3l
-	PjxYyVC72LIDhirHszFqFT7xylSepsh/Zf/m+DqtNoB/Uqnjtpa0tS6dLG7ad7C5
-	UHPVUnWVlSKXnNhetOYw7Ku7fMobA9bmRBcxQc2B+cnjrIj8TKqgSPd6ZGJzaRem
-	dVkwl1Bcw8LpG6S0cCLFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731497137; x=1731500737; bh=p+EBDf5BfjiBMMhc/gpjtuneMWwTLxbD154
-	IjpxkN3U=; b=KiaNvIii7g1gjPnKgr/YeoiCDN1+T6UHhKzsDhA4qBUytP//hOc
-	L+KcDPsId14Pv033NTJhUPN1Yn3DVUg7sI75+6+4snq8yz2NJlAypa5hefnfKTNG
-	wF/wsys8W4QTRazulNvpd9GAcAV3NbZVChXb51bEhqwOhtuRBHqV1muZp7sZjNHZ
-	YqHU0FIok+fpfo64El3q+2RJOatjbGPJ4mWCvsbIJIv2S8OlSfL/HQb+xhK9uUZz
-	AAWp6SDwnA/v1MXO9oFYwKeK246NCGGUFlLgNbdaluHgzc1CFVEjenNdarfkmz5r
-	6I6q4yU3vGyyVpqv4RR2DWly412i8bPaz2A==
-X-ME-Sender: <xms:sIw0Z-UkTq3CivOWH6djwBdxiDdxe2f5ix1oksvwLA7AdSXjlpa73Q>
-    <xme:sIw0Z6mPfeCpULLG5-tl6_BlU029Skck9F4mQFFdm5a6lXDNA0ZyEpu93lp1T0sZI
-    8pFQ7nRT6AO2UBgLfI>
-X-ME-Received: <xmr:sIw0ZyZZtFlx3G4hCR7YDk21vtmOmd2DOm5YeoQXBT7jiwHUDyDNZ6GpjiZK>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvddtgddvjecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
-    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:sIw0Z1WFzaFswqvsW3bc0Nn8A4x5I9SoQAeO8kDvqj2hnPKd_8MGzw>
-    <xmx:sIw0Z4nn62Z7xYyRgljV0J0iZ7mXLwXg_hl6ajSoNOhGwOPFrdQqjw>
-    <xmx:sIw0Z6dHqYWVHwVoDBj9SeXpYOFotxRZYRiLQzb3U6JdXdY8u8aWxQ>
-    <xmx:sIw0Z6EdBVIO1aIRUktFFD6AePShjAb-ekdTvvNAYH9hRhy_wRUTPQ>
-    <xmx:sIw0Zy7XYwx7MrUgeoaMYXZ5FmM3yJidc_l1jiiz6wpqrAENcG4d4iBl>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 13 Nov 2024 06:25:36 -0500 (EST)
-Date: Wed, 13 Nov 2024 12:25:34 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 17/23] ovpn: add support for peer floating
-Message-ID: <ZzSMrgFmbxX9NtIp@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-17-de4698c73a25@openvpn.net>
- <ZzM0U81dmvdEWqdF@hog>
- <955030bd-e230-448c-8a63-1b356590dd15@openvpn.net>
+	s=arc-20240116; t=1731498245; c=relaxed/simple;
+	bh=mqk98GP19dZ+Ay7HEP68kLZER2bT/NkIqYTu8jMJ4BE=;
+	h=From:Message-ID:To:Subject:Date:MIME-Version:Content-Type; b=kwY4/zF0CgkAY9t0P83oX3hVKC5+BxP9Fzwlz/L9KUZLxfPVOYRHxv8yNOSho8BxIgh3gzmPNSsHOXmGAlL8/3F65s5ABto0e1RMihryHmgwygOQp8tcRMXvy25kVk39frp1BuIm8IRngJvM22CInwWqMmVyNJ6mX8aGVqF760g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCDLeUee; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37d41894a32so362189f8f.1
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 03:44:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731498242; x=1732103042; darn=vger.kernel.org;
+        h=mime-version:date:subject:to:reply-to:message-id:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mqk98GP19dZ+Ay7HEP68kLZER2bT/NkIqYTu8jMJ4BE=;
+        b=LCDLeUeeIfn93k+5MQy4RzSIpnrkiCb1ufxaXP694zQfInuXIxo6QviZlshBlGR87B
+         RUEVxt8EkCgaa9EjgCufgGx6hhSlfdbNlM0r/RJKW1E6Lcxc7t/gUrIuNkeyn+V7n+/e
+         xTtZ+qE1oFBQ5eG2dJkwu0upJ24N2HPe2ePXkOGtsFWcFcTEWqbhaXP1HZlgFd3FTStW
+         KbsW1uMPXbWPqlnKhbHmjB9Y3Xhqey1Kgi/A+evup3MAr2zv21osa3s9FpkPSZpTONT2
+         bFcaC+uPi0fBG7zfRbSuVpiEP0aEnnwR6TsD2nngwYOQojNSzf3QbT8ShzeNISYj4Vuq
+         4Z8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731498242; x=1732103042;
+        h=mime-version:date:subject:to:reply-to:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mqk98GP19dZ+Ay7HEP68kLZER2bT/NkIqYTu8jMJ4BE=;
+        b=mfgk3/QqvYytkSk4xtG4gzIlgI7Q5QfBBpy+EhLS0T0GpYHNcc2ljC8ZJuMmYMZPns
+         AFHmvgNDhJExFBiGsV3wtAOWXvTfMJPhdElrc6JOJVcCuYKACHWUNm+v3fZPly6ObR45
+         gXOkSgUtygeQf78oXQrHUPVNpsqHJXQvC4wzM7LBWn67xnO8v/R/lO8nHy03a0Z3atQJ
+         w1ObsZGJ7zKF/Wpbc+Ukl+phvykWMUGcrcfuRX0x7+oABWX5dE5hwVjbR8bHXy8LNpvO
+         h8SOfQNczNKhtvv9qGVd46wXCbQr+0QzlZSDwoFjfwGiOsbJV8yWOwwgy5TUbKUHWwat
+         LF4g==
+X-Gm-Message-State: AOJu0Ywih2IdxIKCboOet2pr4Tk2/chRl9RasPyXOBkxGj/quGysoMzv
+	aaclFmY7RKWa51/nbnBC1T5gl9uwa5X01kptSib05vxoTQd/BcrKzDJovQ==
+X-Google-Smtp-Source: AGHT+IH7jbtsI83/aLmJhxnh5t4z6je6AjZkJ5FgPBOhbgW1GSTH/jsBaJnBZ4kLKKUQjREEAIxvWg==
+X-Received: by 2002:a05:6000:1f87:b0:37d:443b:7ca4 with SMTP id ffacd0b85a97d-381f0f5e2ddmr18126167f8f.14.1731498242195;
+        Wed, 13 Nov 2024 03:44:02 -0800 (PST)
+Received: from [87.120.84.56] ([87.120.84.56])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed9ea4f6sm18095283f8f.64.2024.11.13.03.44.01
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 13 Nov 2024 03:44:01 -0800 (PST)
+From: William Cheung <tammywoodhdhfsg84432@gmail.com>
+X-Google-Original-From: William Cheung <info@gmail.com>
+Message-ID: <425f1f46778e430fcc91915419dc794a12275ef864301c1d15ff1faef6b3fb3e@mx.google.com>
+Reply-To: willchg@hotmail.com
+To: netdev@vger.kernel.org
+Subject: Lucrative Proposal
+Date: Wed, 13 Nov 2024 03:43:29 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <955030bd-e230-448c-8a63-1b356590dd15@openvpn.net>
+Content-Type: text/plain; charset=us-ascii
 
-2024-11-12, 15:03:00 +0100, Antonio Quartulli wrote:
-> On 12/11/2024 11:56, Sabrina Dubroca wrote:
-> > 2024-10-29, 11:47:30 +0100, Antonio Quartulli wrote:
-> > > diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
-> > > index 63c140138bf98e5d1df79a2565b666d86513323d..0e8a6f2c76bc7b2ccc287ad1187cf50f033bf261 100644
-> > > --- a/drivers/net/ovpn/io.c
-> > > +++ b/drivers/net/ovpn/io.c
-> > > @@ -135,6 +135,15 @@ void ovpn_decrypt_post(void *data, int ret)
-> > >   	/* keep track of last received authenticated packet for keepalive */
-> > >   	peer->last_recv = ktime_get_real_seconds();
-> > > +	if (peer->sock->sock->sk->sk_protocol == IPPROTO_UDP) {
-> > 
-> > What prevents peer->sock from being replaced and released
-> > concurrently?
-> 
-> Technically nothing.
-> Userspace currently does not even support updating a peer socket at runtime,
-> but I wanted ovpn to be flexible enough from the beginning.
-
-Is there a reason to do that? With TCP the peer would have to
-reconnect, and I guess fully restart the whole process (become a new
-peer with a new ID etc). With UDP, do you need to replace the socket?
-
-> One approach might be to go back to peer->sock being unmutable and forget
-> about this.
-> 
-> OTOH, if we want to keep this flexibility (which I think is nice), I think I
-> should make peer->sock an RCU pointer and access it accordingly.
-
-You already use kfree_rcu for ovpn_socket, so the only difference
-would be the __rcu annotation and helpers? (+ rcu_read_lock/unlock in
-a few places)
-
-Adding rcu_read_lock for peer->sock in ovpn_tcp_tx_work looks
-painful... (another place that I missed where things could go bad if
-the socket was updated in the current implementation, btw)
-
-Maybe save that for later since you don't have a use case for it yet?
-
--- 
-Sabrina
+I have a lucratuve proposal for you, reply for more info.
 
