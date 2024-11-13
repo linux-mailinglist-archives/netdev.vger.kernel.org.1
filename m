@@ -1,175 +1,130 @@
-Return-Path: <netdev+bounces-144326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE569C691C
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 07:12:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256A29C6923
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 07:15:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FFB31F238F0
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:12:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DED7C28487F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A2417CA1F;
-	Wed, 13 Nov 2024 06:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0BD1632EE;
+	Wed, 13 Nov 2024 06:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmCQpJzd"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F123517B401
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 06:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218555680;
+	Wed, 13 Nov 2024 06:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731478308; cv=none; b=pf9KP37SWJb59H1vcGNW39u3OBbFh2KpJdMVYbDNCdTbpWpyw6HjaZwzvcVkUG8dS77giWs/tjLMi1KcpxslkkWcUeIYEFSznpjKCyxOVmk7x+PEWMgkMoOAJh0atupPOHbYFRM6VRkEd3fRGfyQmUdqqToFFcHIn39xvpRwG/g=
+	t=1731478544; cv=none; b=PwyLvtLJ8gH7fS6fXuTFG3xqDRK8NHLwC5eyDAZq1dO8oXM6LTdoQ9obiY7O4IqdRc7zTA5r7/19FAg7dJ2n3EaJ7r3eSFf7yP3WdLWkelQAvHYzGuwh5IJ82z+byM58EaQJmck+ddecMUs3gbbDML4xBMsuCM2IjcvXRoDM07Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731478308; c=relaxed/simple;
-	bh=jRNcvWxlvhe50IJi34gf4SABmjEAeBAr8313daeVr44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sQ/muUDXAcLZlOn+H8TXLKlEMoIkbeLJ4dEYggBEu+K9jD80iC30rBEZpRR1kqOUeh9gz/ca5aWHCtiAYKRF7NDAgFGpIYBWofEuMGWnmihKdpe9ObJJYMgT2NuejS49zTrcL/H8CwjC9O+yv2qcZHLvGKMqvMxbt5Iw7IfJ16A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tB6b9-0005VO-Dl; Wed, 13 Nov 2024 07:11:27 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tB6b7-000X5H-3B;
-	Wed, 13 Nov 2024 07:11:25 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tB6b7-009bdi-2p;
-	Wed, 13 Nov 2024 07:11:25 +0100
-Date: Wed, 13 Nov 2024 07:11:25 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: phylink: ensure PHY momentary link-fails are
- handled
-Message-ID: <ZzRDDbecGLMiRP0m@pengutronix.de>
-References: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1731478544; c=relaxed/simple;
+	bh=GjHWsGBW2+fujolM2tMANHwifuU0meTtmmBJ4b3ZT90=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=DwuAmxN7pKZPiDB7sQz+k5vGu2hhlf4zUxmtCEB8N69YY368mn/jeZVlrpMTVfeWcqqhM9LDrQQBqrwNwKtuLdJY7J9y86gigfGWxieHHjiDR6qhWuPugO9GqQJbIrPm2T2q/g1kz5sOGY75i9INV93yH3c6mkEmUDbJd9DIjn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmCQpJzd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79179C4CECD;
+	Wed, 13 Nov 2024 06:15:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731478543;
+	bh=GjHWsGBW2+fujolM2tMANHwifuU0meTtmmBJ4b3ZT90=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=qmCQpJzd2ahwxFIOLRTrnGuJ+kFeMPsYIBS0aPzc4h3BS7MXPwxBhDuBL8P5XaAVZ
+	 ABagjtywQEbi2AV19TGV+hMZuv1BAQm/m7PQ3X0xMx8RZoKhIjSZgsZR2Y2kxJlviP
+	 awiL8oQ4Ow5oejzqmbTw1b1ZSiSncj/UAPO9/8WPAYy/NS0oPsBGMY3Vlgud8GBW1z
+	 crzmwWXyqMqr4FtgIhDnkpiNeBkVZiK2OgEqFbei6V0tj6sgIZOAKw4NGehTYpWXZi
+	 JFe8U+7qEtRnPbGFGznPKuQ12JJwPgCrsG4BE+fCaNz518ZMDIZ7pnY2xSV9Ri/qxX
+	 QumlFfgbrpnSw==
+Date: Wed, 13 Nov 2024 00:15:41 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: krzk+dt@kernel.org, mcoquelin.stm32@gmail.com, davem@davemloft.net, 
+ conor+dt@kernel.org, pabeni@redhat.com, richardcochran@gmail.com, 
+ devicetree@vger.kernel.org, joabreu@synopsys.com, edumazet@google.com, 
+ linux-kernel@vger.kernel.org, kuba@kernel.org, schung@nuvoton.com, 
+ yclu4@nuvoton.com, ychuang3@nuvoton.com, 
+ linux-stm32@st-md-mailman.stormreply.com, openbmc@lists.ozlabs.org, 
+ linux-arm-kernel@lists.infradead.org, alexandre.torgue@foss.st.com, 
+ netdev@vger.kernel.org, andrew+netdev@lunn.ch
+To: Joey Lu <a0987203069@gmail.com>
+In-Reply-To: <20241113051857.12732-2-a0987203069@gmail.com>
+References: <20241113051857.12732-1-a0987203069@gmail.com>
+ <20241113051857.12732-2-a0987203069@gmail.com>
+Message-Id: <173147854152.3007386.10475661912425454611.robh@kernel.org>
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: nuvoton: Add schema for MA35
+ family GMAC
 
-On Tue, Nov 12, 2024 at 04:20:00PM +0000, Russell King (Oracle) wrote:
-> Normally, phylib won't notify changes in quick succession. However, as
-> a result of commit 3e43b903da04 ("net: phy: Immediately call
-> adjust_link if only tx_lpi_enabled changes") this is no longer true -
-> it is now possible that phy_link_down() and phy_link_up() will both
-> complete before phylink's resolver has run, which means it'll miss that
-> pl->phy_state.link momentarily became false.
+
+On Wed, 13 Nov 2024 13:18:55 +0800, Joey Lu wrote:
+> Create initial schema for Nuvoton MA35 family Gigabit MAC.
 > 
-> Rename "mac_link_dropped" to be more generic "link_failed" since it will
-> cover more than the MAC/PCS end of the link failing, and arrange to set
-> this in phylink_phy_change() if we notice that the PHY reports that the
-> link is down.
-> 
-> This will ensure that we capture an EEE reconfiguration event.
-> 
-> Fixes: 3e43b903da04 ("net: phy: Immediately call adjust_link if only tx_lpi_enabled changes")
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
-Thank you!
-
+> Signed-off-by: Joey Lu <a0987203069@gmail.com>
 > ---
->  drivers/net/phy/phylink.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 4309317de3d1..3e9957b6aa14 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -78,7 +78,7 @@ struct phylink {
->  	unsigned int pcs_neg_mode;
->  	unsigned int pcs_state;
->  
-> -	bool mac_link_dropped;
-> +	bool link_failed;
->  	bool using_mac_select_pcs;
->  
->  	struct sfp_bus *sfp_bus;
-> @@ -1475,9 +1475,9 @@ static void phylink_resolve(struct work_struct *w)
->  		cur_link_state = pl->old_link_state;
->  
->  	if (pl->phylink_disable_state) {
-> -		pl->mac_link_dropped = false;
-> +		pl->link_failed = false;
->  		link_state.link = false;
-> -	} else if (pl->mac_link_dropped) {
-> +	} else if (pl->link_failed) {
->  		link_state.link = false;
->  		retrigger = true;
->  	} else {
-> @@ -1572,7 +1572,7 @@ static void phylink_resolve(struct work_struct *w)
->  			phylink_link_up(pl, link_state);
->  	}
->  	if (!link_state.link && retrigger) {
-> -		pl->mac_link_dropped = false;
-> +		pl->link_failed = false;
->  		queue_work(system_power_efficient_wq, &pl->resolve);
->  	}
->  	mutex_unlock(&pl->state_mutex);
-> @@ -1835,6 +1835,8 @@ static void phylink_phy_change(struct phy_device *phydev, bool up)
->  		pl->phy_state.pause |= MLO_PAUSE_RX;
->  	pl->phy_state.interface = phydev->interface;
->  	pl->phy_state.link = up;
-> +	if (!up)
-> +		pl->link_failed = true;
->  	mutex_unlock(&pl->state_mutex);
->  
->  	phylink_run_resolve(pl);
-> @@ -2158,7 +2160,7 @@ EXPORT_SYMBOL_GPL(phylink_disconnect_phy);
->  static void phylink_link_changed(struct phylink *pl, bool up, const char *what)
->  {
->  	if (!up)
-> -		pl->mac_link_dropped = true;
-> +		pl->link_failed = true;
->  	phylink_run_resolve(pl);
->  	phylink_dbg(pl, "%s link %s\n", what, up ? "up" : "down");
->  }
-> @@ -2792,7 +2794,7 @@ int phylink_ethtool_set_pauseparam(struct phylink *pl,
->  	 * link will cycle.
->  	 */
->  	if (manual_changed) {
-> -		pl->mac_link_dropped = true;
-> +		pl->link_failed = true;
->  		phylink_run_resolve(pl);
->  	}
->  
-> -- 
-> 2.30.2
-> 
+>  .../bindings/net/nuvoton,ma35d1-dwmac.yaml    | 170 ++++++++++++++++++
+>  1 file changed, 170 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml
 > 
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: ignoring, error in schema: properties: compatible
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:compatible: [{'items': [{'enum': ['nuvoton,ma35d1-dwmac']}, {'const': 'snps,dwmac-3.70a'}]}] is not of type 'object', 'boolean'
+	from schema $id: http://json-schema.org/draft-07/schema#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:compatible: [{'items': [{'enum': ['nuvoton,ma35d1-dwmac']}, {'const': 'snps,dwmac-3.70a'}]}] is not of type 'object', 'boolean'
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:clock-names: 'oneOf' conditional failed, one must be fixed:
+	[{'const': 'stmmaceth'}, {'const': 'ptp_ref'}] is too long
+	[{'const': 'stmmaceth'}, {'const': 'ptp_ref'}] is too short
+	False schema does not allow 2
+	1 was expected
+	hint: "minItems" is only needed if less than the "items" list length
+	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:clocks: 'oneOf' conditional failed, one must be fixed:
+	[{'description': 'MAC clock'}, {'description': 'PTP clock'}] is too long
+	[{'description': 'MAC clock'}, {'description': 'PTP clock'}] is too short
+	False schema does not allow 2
+	1 was expected
+	hint: "minItems" is only needed if less than the "items" list length
+	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: 'oneOf' conditional failed, one must be fixed:
+	'unevaluatedProperties' is a required property
+	'additionalProperties' is a required property
+	hint: Either unevaluatedProperties or additionalProperties must be present
+	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.example.dtb: /example-0/ethernet@40120000: failed to match any schema with compatible: ['nuvoton,ma35d1-dwmac']
+Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.example.dtb: /example-1/ethernet@40130000: failed to match any schema with compatible: ['nuvoton,ma35d1-dwmac']
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241113051857.12732-2-a0987203069@gmail.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
