@@ -1,207 +1,260 @@
-Return-Path: <netdev+bounces-144532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D4299C7B3D
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:33:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 671019C7B6D
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E046287B99
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:33:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E86FE1F22115
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9639C202647;
-	Wed, 13 Nov 2024 18:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDB22038B1;
+	Wed, 13 Nov 2024 18:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ATqvQirm"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="sPIcrq90"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11022084.outbound.protection.outlook.com [40.93.200.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B606D20125C
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 18:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731522810; cv=none; b=aD1xXnZvOMI7lKp2xBVFyy+z4z/Hsyvm7q7N0E9K/Th/Anx13JqYMkqNqto8V/kNM/UyAnmIWcY506zYyjDcycQOJdKOPIRB1FyDzTKGGymuEsYeZJRWI1beoJ/a+b5v8BpswEmBsU/qBsmfal8cU3h1CajKohDeZqZvDLt80kE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731522810; c=relaxed/simple;
-	bh=EwSuFwBGsabC+tAlOx5Rv9AU2s0XjyQ/FTIZjCDU7Pg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mpq5aGeLqEV40c8OsYN3NQLN/XIoJhYIaOFu2StQNHvs+6GT8LjvzaQgcZ1lH0VlpXOqFbiUeofeO6bfdoBrG+5yBa7z/xy19nMlihQKMS9RwLZ1R4D711Cgy63UW99/gz0dcvIfhccjMFWozSCFrbE3o1XSuBBSCmk1kPOFDSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ATqvQirm; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a70f9078adso7007025ab.3
-        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 10:33:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A371E0B7C;
+	Wed, 13 Nov 2024 18:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.200.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731523318; cv=fail; b=VFZ0J0su92EK12Tmq7fpDKHmDdfox4m2YwEbXTEicWqoqT22sfATBX6hCbtbmcA5i4htGx0BUYuohRcdSOIo9KSk6eO6QXO6CKdTSMDG8dY3q1yyftHhJV8/p1suRcez5Fd2V04880HXRsG3JvlJU0dyTAnipg16Lg/LdLApELk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731523318; c=relaxed/simple;
+	bh=h+4LNdG9HZ/nYdg1OJon6LB7TG30TDAc6QB9IrOy/nw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=O1o8Ue5e/wtJUQUv6QNw3iuevY09iD96Ps93hFHnCEwSyqrSHkLVZZKtAeniDzvbm/I6kHoIf4B3gCOHIU1fxLYNYJTFi8KYQS5269fp32n7qyQILkhe3B4229pzfpMJsPvpLDG+yyek7iouil2WaKna7jGGxy095kVOdmNZMSk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=sPIcrq90 reason="key not found in DNS"; arc=fail smtp.client-ip=40.93.200.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Yent3uM/bnP56UU6I4SV17F39QJfv02vfLT/00OYsKY3mUSUYRhXcYaDEQeeNXDZD5YFfD+5ay8K18MW+R3wKX3XcyWcoAehgNNoO4KwS/lLzxFZPFihfE/OmOB3Lq8QBEANHXTqOaQz5qF89qoRttyp4fwMizJT7+Rl+opHc9QcDzqIq66oXDdo+PRZ6nqwJu4ld2/gJfacrvNxgowGtKmT0Xp9egembdJBI8pHjDnnOk2xbRtXL36CuuYoYtMm71QoeqbAAJG27tZzPGxKm8TqOog64uhEAFyzXszx2n6xxauLl8BWRT5VcOPFZ4XZ8WroudEtR2WD8FPMB6yLQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0WEQCMfbkKzaRffni97wluFPiKJmte2+XOBXFa4Mjpg=;
+ b=MFoNPRKwdTFbArHN7yYqRMjvp5ebm33FssdUOzxNd/Muo9/bui/j8DD/Ny8GgriJN2SLLlg4V4eBMLddpzpuyOEoc6z/g8rGNVJtgEed7J3C4ixeO3OWhW1XX4jPq5Bw2GYPhqNyYEohV/02TPO+8Sir2BjVm9uM0/t6AgDPYQdkSjMU7eGas6JqN7mOx3WOr/n0i+T5/ZGJBs5AWpvHlkHWdhvFkAddAP0BmruMiKTd5bKAufgQz5+Ae7i9dCGFROBW/Af91UFjeKk8VIU6rvvPHAcgNnBorFq41wX9jukNQ6+IItZwsFUej2xy65psumakvcTQKcCVdLxk+ZVkog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1731522808; x=1732127608; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S/GfcE9OCxBYPDcXgZTJGY+00HlR32HbeFGA4TmMb3U=;
-        b=ATqvQirmpKrMw09bjzWkYnq/1oWeIJn4Zf8mdt3n+lqGht6WXZMkXnkWwQScb5qoiX
-         Fnzr+bK3HOGM3CvpcnbtW/WY+6mxKSY+8D++X4Sz4keC/50U/s+vM2UoFVLlba3Y/T5Z
-         eXIfk6FzwPEv1GEVSKT6Cjw9ZhpDZtcx3JpAo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731522808; x=1732127608;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S/GfcE9OCxBYPDcXgZTJGY+00HlR32HbeFGA4TmMb3U=;
-        b=keTXcu4SVOAADtljS5mpInHs2YlDnO1I6tYpYbgBn4fCakqnV7R2casmwMQvdRV1w6
-         kfAIysrFLhGquunVyVylyig/nryiaRXBBCu1VIqzRAhZ+6ZYutOSNxpv5G2FZ25MnUvQ
-         nxOv3zq04nnKeKqqTHv2GqPSTdKBJpk1bmq4ouPABjrEYySndS+VpjMzFrFHTZ+U6wb8
-         SlUcEh58QXuYur+/mcKt6rzXQVIdNXkvsjsUoGfVITXc/frlzL60l4j5qerdeI/B0/13
-         75zg5aWxb4k+v3PfV8CfU/6N65Rm2jNqAx6kYYZE/RCVjcCh4veIkxSapuDMa+L8KcUr
-         pFXg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9HsnaLyJ15rVV0GjAoaFqRvGBZwtTcEVfEFot9DdQQVyCbMan+GF3JatesStlsdOZREkUugg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUnfGFzVZuFUHng7ErT/WY45A3dxs8Wn+BPIp7x+bOxKnIslXt
-	IRm9nLHBNhVMjH1Ce6BhR4YaDiUuHh5d9hMi26se+bQM3nfmnGP/b6hSxJm8m+E=
-X-Google-Smtp-Source: AGHT+IE6+B0pqn4ka7/F5/EGXwdqPuSVqy6MB8CNkXsjUaGm6LtPddAhvAayt3JB1jye48dzpCDhJA==
-X-Received: by 2002:a92:ca4b:0:b0:3a7:1891:c5f2 with SMTP id e9e14a558f8ab-3a71891c6d4mr34823225ab.1.1731522807654;
-        Wed, 13 Nov 2024 10:33:27 -0800 (PST)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a6f9838240sm31570215ab.23.2024.11.13.10.33.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2024 10:33:27 -0800 (PST)
-Message-ID: <eb4b9c05-66a2-4a14-b59b-37149beba3b2@linuxfoundation.org>
-Date: Wed, 13 Nov 2024 11:33:26 -0700
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0WEQCMfbkKzaRffni97wluFPiKJmte2+XOBXFa4Mjpg=;
+ b=sPIcrq9025rSfCjM4DCqEStcCYTlHgG/6vmetudtIgBKyb87IIvbzwinhW8pY4b+ZD3PfyvfQIogBoQdnPzVzM7hD1IP+sCPQE3W1zL6Sbp7fTMNCQRkVSAJ6RjiaXCgt4dTiQb2I4jIhxaO+k1OHt9hEU8PT78GtDsL/YDWS4U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ SA6PR01MB9022.prod.exchangelabs.com (2603:10b6:806:42b::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.16; Wed, 13 Nov 2024 18:41:54 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.8158.013; Wed, 13 Nov 2024
+ 18:41:53 +0000
+Message-ID: <7c1de9a0-9d82-4369-bdb1-63c110d81194@amperemail.onmicrosoft.com>
+Date: Wed, 13 Nov 2024 13:41:50 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
+To: Jeremy Kerr <jk@codeconstruct.com.au>, admiyo@os.amperecomputing.com,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Huisong Li <lihuisong@huawei.com>
+References: <20241029165414.58746-1-admiyo@os.amperecomputing.com>
+ <20241029165414.58746-3-admiyo@os.amperecomputing.com>
+ <b614c56f007b2669f1a23bfe8a8bc6c273f81bba.camel@codeconstruct.com.au>
+ <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
+ <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
+ <c69f83fa-a4e2-48fc-8c1a-553724828d70@amperemail.onmicrosoft.com>
+ <f4e3ff994fe28bb2645b5fddf1850f8fcc5d1f89.camel@codeconstruct.com.au>
+ <3224c94c-e4c0-43f0-9d1f-c68d98594932@amperemail.onmicrosoft.com>
+ <a4cf6516df6a7db734898a45907ff6f545acfd17.camel@codeconstruct.com.au>
+Content-Language: en-US
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <a4cf6516df6a7db734898a45907ff6f545acfd17.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BYAPR08CA0048.namprd08.prod.outlook.com
+ (2603:10b6:a03:117::25) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: LKFT CI: improving Networking selftests results when validating
- stable kernels
-To: Matthieu Baerts <matttbe@kernel.org>,
- Linux Kernel Functional Testing <lkft@linaro.org>,
- Greg KH <gregkh@linuxfoundation.org>
-Cc: Shuah Khan <shuah@kernel.org>,
- Kernel Selftests <linux-kselftest@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- Naresh Kamboju <naresh.kamboju@linaro.org>, Ido Schimmel
- <idosch@nvidia.com>, stable@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <ff870428-6375-4125-83bd-fc960b3c109b@kernel.org>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <ff870428-6375-4125-83bd-fc960b3c109b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|SA6PR01MB9022:EE_
+X-MS-Office365-Filtering-Correlation-Id: 83f8d8db-e77a-47a4-5c6b-08dd0412d7f0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WWtiZWoySnNtY00xSDF3TEtHcU9JNVdMdE1EVmFQTTlNTVFmS3kwRElQU3lF?=
+ =?utf-8?B?ckdNWHFWdVY3eTRHZTc4VWdYYTVHVkpTZTROamNrVFB2RFVPUkhWS1ZmZ2JJ?=
+ =?utf-8?B?VG5oWTVSenZIeTFoK3ZYTUpualg2YkJjc0QyK1BWeVViOWR5NHcvZGt4U1Jv?=
+ =?utf-8?B?T29GbDdwU3ZLUVArOUhhSnVXM1BYc2c4S2RQdE1UMHBaTHVtUmVnakxYdlpw?=
+ =?utf-8?B?di9ja2dtcTlYOWw2RUhuMmZOOENVbDYzcDFMM2ZuQm9YbG9yZGtBTnRjTGtE?=
+ =?utf-8?B?YTBQcXVJbFloTnJnNmNyUHFyN21NU0x2WTFqcmlwdUtkOUlYRysxWnBuNzRr?=
+ =?utf-8?B?cXZJaGl3L2Nzb0hVaWZhTEc3bmt1c1lqQS9kL29KNmFGYVJ2VlBOd1lQaWZ1?=
+ =?utf-8?B?SUlmUGl0VCtuTWthYldsdEtVbm5uWnRUREJWQld2WW9SK0RjWDVkQzJqejhE?=
+ =?utf-8?B?TDV1NnRkd1RobUp1aVRqNTd6bElCa2hJa1FmdjJ5R0srLzNNVXVMSFZiTGxn?=
+ =?utf-8?B?Y2JDZXhBU2xyai9US1dSU3hLcmdxMnhma0hkck8zSGxiU3JuYlJmMVpyQVJy?=
+ =?utf-8?B?Y2ZWMWNEY3dtR3NuNGY3QmdLdVBncmkrWkR2ZWdiUDExNWx5WWRieE12MFN4?=
+ =?utf-8?B?OXBhTjRzZ1Jpc1R5NnZveUppMXh6eUlueHBVZlB3emdXR2ZUbDNPZGY4U05o?=
+ =?utf-8?B?c2ZQNjNaTFBIaXZQcXM0S1B0STB2Q0tkaFhyUUZQaW04UUVVbVVKNnpSYmpW?=
+ =?utf-8?B?cUY2bndoKzJPZ0ZyTEhpWGlxU3liWTc2TWh2YURuQldWYlpNK1NkUHpKaVRG?=
+ =?utf-8?B?ZGhiUFpIVWhhNVJKa1lYVm0yeS83OVlrOXNZSm9zUjJGcWxPcW9CaHpsOW5D?=
+ =?utf-8?B?L2ZPVzJQd2REa0RXZ2lZQldIVDR6SHM1VVNJY1VjRG1nNmJMOTBMUDRxUkNx?=
+ =?utf-8?B?REZVZThmV0Jpa3E1T2RkMWVzRWlac3BOSWRtd2RHamFaZWZldHNVYTBEYTVu?=
+ =?utf-8?B?ODIxSm5BNis3K3krYjZpQ1RHZzh3c1VrYnhvOWd4R1FSb21FdmhjeGljTEdL?=
+ =?utf-8?B?TDNBL2RVd1oreWYwU284dzEvdzBnQkJYbUUvZFgrQ1oxQURrNVBnWWZSMVN2?=
+ =?utf-8?B?aUtzN3dtK0pEQVIwdWRPTDQrL0VXUGJLWXVDNEo3bzR0Mk9VbW1WVnhSMTRK?=
+ =?utf-8?B?bWlseEFsUnZtU1ZrMDl5VEE2WEV4bVBMS3FRUm5MSmZtelgycHlSSTdqbWZI?=
+ =?utf-8?B?V21sQXJWOVNha1dZa1VWRkN6ZnJITEFPMXJuRHk2akg2RjZnK0YvUzRlLzZU?=
+ =?utf-8?B?eVZSQVdXaDhaMUZsY2ZmTDFFaFJ0dU1xUEhkSGIvaFFWZ20zVlRaciswT2pV?=
+ =?utf-8?B?Y05ZbTl3Y2Nrb0pQeWp0N01wSG54QTNubS9WQ2ROdTJ4Um5YWlBzS0xiNG9a?=
+ =?utf-8?B?eXd2REJEY1U2cUVRSGZUWElWWHdXTVFPRkZ2dWVqRlRDNzk1emdQSE02NWFW?=
+ =?utf-8?B?TDJHb3pKQzNkVjl2VVN0eUpxQ1N2NEJLK2V5NVJOeHRkd05mWUUvWG11TkJh?=
+ =?utf-8?B?dGY5L3p5OGVyR0VWOXFpSURweUdsM0ZQbEt6aCtCM1Q4RS9uOGkwNStYcTBJ?=
+ =?utf-8?B?bUJJbWc2VE9aNXd1SHRMWE1GNFJCOEJ3cFowQnZlZVQ0VGVNcDZEUnBzU2Z1?=
+ =?utf-8?B?TUYvSzgrQi82L0ZXU0txdnEyZTQwWUNYaHdyTnFIZWFXZUFQMDRjbEY2MUxj?=
+ =?utf-8?Q?XE5tneaI6mQ/TN9ptoWF2cSnJrzKtvF8KKK+HlF?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(10070799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MTV4UHZBbXR1anpPdHdJRTZsaURCamFlSk1OWXNsTmswY0hQMTg1dDNzL2Ez?=
+ =?utf-8?B?SEUxT0xFY2t4VWZNTTVteUdTWUt3b2s2K1ZpT1JOZ29uV1ZkaGdGd05kMGcw?=
+ =?utf-8?B?WFMxakc5a2QvZ1FXb3lVV1dnNitjaGxhSXRGL2dpa2FVeHIwVHEvVXBlVHNk?=
+ =?utf-8?B?NlNrNnQyM3lpeEFlUElHZU14YXN5MU5XeW45WVdmdEhzaU1QMFV5Z01ENCt6?=
+ =?utf-8?B?OVNyUUxRMzRwUk15UFhadjBzYnZoSzBNTlZ4YkpuYjhZeDBObXpnRngzRUli?=
+ =?utf-8?B?QldjQkk3VStEU0prWWQxdWRZVlpPUVpVeitPSVJobklkNHE4enp5VVZuTUdq?=
+ =?utf-8?B?ak5vLzVBam5QVFhiWUd4WERWVXlhc2xhZVcxbXFXdTZSU3BvUkVQL2FiKzR1?=
+ =?utf-8?B?TWpEdGg2Qk1NOUthQVRYTEVuQ05CYzBXNnRvL2VmNzJUU1FWS1JnRTVMLzdj?=
+ =?utf-8?B?cmk1eFJaMHlDckdOMG1oeW9iWnpLc0NzTklZQkh1cHhLMFlzRDB1RXFUNUt0?=
+ =?utf-8?B?dGtEMmpaS1JHcWV1VnU0dVFZdTNwN3BHUDhoNnJmN2NNQW9DMlJSYVJkTU1j?=
+ =?utf-8?B?ay9LM2dnWWVCV1RSUTVJM0tsWnVXOVAzU2FWL0dhZjRPalhmUmNNdy9velV2?=
+ =?utf-8?B?dmlYcStDVmE2MVE0aDFBeG1wM2RRZ0k5VGVoMTB1WUVjaFhmVDdhZ0psUjhn?=
+ =?utf-8?B?TG1QOW8ycWFVZjk2c1BudmlkWnZkelMzQkxKVEVmeXlQY0RkdUI0WCtyUkVp?=
+ =?utf-8?B?Rlk1Z1RleXdUTm5JL1FsMm1LbmJpdGhhcEdqNU93ME5oZVBCdGJxK3Y3SVNF?=
+ =?utf-8?B?WGQydjJmc1pjVFk0QklNMlVmSjVoRXJVOWFGdTJCNUFmaHZtM3hlQW8xaklC?=
+ =?utf-8?B?VVRaTzllODh2bTRFUkY1UG5FWEgyT1g0Y09lS2FZN0M5aVVRREZYNlpZZktp?=
+ =?utf-8?B?U3M3MlhTMFcrb01DM3crem1rYXBBM283OGwxT3RHVmdTN2JUVW5tRXR5ZGNG?=
+ =?utf-8?B?MU43dmZOc1FqQUd2SE5YU09haXJxWVBsNWlDSzhNQkhZK1NPUjE1bkhzV2lM?=
+ =?utf-8?B?WFQ5YWFjMDJ2Y2t1WVd3S29yMEZEcHhlN0lBT3E3Tm5nNG9QcE1kakNNNFNT?=
+ =?utf-8?B?NnRlNTBBSU04Sk5iVHMrSXZOcFA3dXNlM21sTHZDdk8yWUhSdmJMVCt2UTBJ?=
+ =?utf-8?B?dmI4WURMS1ZueDluS3Nab2YvRXd4Z2orQXozNzdhcE1KeFVHcmxRQWpnUnRB?=
+ =?utf-8?B?SU41OGVuWVNjRDVJeXNvQ1dlMmdia3ZBeTEzQ0ZsZmZTb0pxZFNGQnpBMFhn?=
+ =?utf-8?B?RVlZU0dUSmlCVFhyMnovZ2loOEg5MkJqZEFoSVBSWmY2YjlKWkFmdFpQVmZI?=
+ =?utf-8?B?ZzZqeE8wcjA4Y0JRL2RaYUpIZU5CalJueERyVXhMUGp2WkU3aHJCQU1wNEJB?=
+ =?utf-8?B?UmlpakM3Yk11Y043ejd4QnlaYVlRVWJUZ0R3THVObDY2MlB1MUlOcjhtNDM4?=
+ =?utf-8?B?anhpbVBUZFhmQWlBTHZrMDFxY1hCZ0l0RFdzK0ZwMk4zV2YzM25nNE1GVzdz?=
+ =?utf-8?B?bFB4T1FMd3NUVEZwbWpQTGREbEJNd21KRE1qenJQTno4N1gzN1Mrd1hubUs1?=
+ =?utf-8?B?c1piYlUxcVVkZVNFd1dJMk1sdHJORHAwbzA1Q0psbDNLbWR4dS9HRkFoMnJw?=
+ =?utf-8?B?c2xyUjdTNWtOQk8xRTBqN1Fpbm5qU2xjMVhxNjNabG1DS0RYUmd3WDVsYkt3?=
+ =?utf-8?B?b1E5a016Mk5lVWNsWGVXN1psb2FXKzZQdUlaVG53QXc4SlVSbzRIREh6Vm1t?=
+ =?utf-8?B?WXhaWS9LT01pNlg2TEg2dCsvZFBsU3J1dld4amRJTGdXaUhCWXpQVUxNNVMv?=
+ =?utf-8?B?aTdTc1huRy84d1lYai9XVHVGUVFNMVlVNllyMXluYy9US1Z6amVzUVQycG05?=
+ =?utf-8?B?WUNXSjhtS0NJeWQrSmdySHRUZmV1UWRELzVSSmNkcEtMS0x5S3JuOUFKWUla?=
+ =?utf-8?B?bUtGbW5tVXNpeUdoQTNXb213bWlBbkFCTXFQQlFGQkprb2xYTG9BZEdzMmRU?=
+ =?utf-8?B?TFl6cDhpT3J3ckpvS1RqNTBuVTM2TjdhQ0pvdkxkVlhSTXltcUczaHZScjRa?=
+ =?utf-8?B?T2gzTmI3WDdqS2tIdDRxZ2VPV05SZXJFbEE4SXg5ekI3c1gzbGVScDdrUDhN?=
+ =?utf-8?B?T0RQdlk2VjFZek5XRUt0eFNTeExFc05GNzIraW1YZG14c2M5VGpudzcySWJk?=
+ =?utf-8?Q?eTAcNcnxQN1FKHr6ADAPwJzRn1NJnvMJDWg4RWm+JA=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83f8d8db-e77a-47a4-5c6b-08dd0412d7f0
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 18:41:53.7599
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZAYWzWIzAqvk7cZteMUKYdDT93pkw2p1Rq88G39vbvE/n9MynX8SRZgnLFsumTQr24UWetA3xVmwxf/ipFyg252Zi9wJWchARIc/APhDdC0LuPzwvRxXzxVLa+fzR9YQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR01MB9022
 
-On 11/8/24 11:21, Matthieu Baerts wrote:
-> Hello LKFT maintainers, CI operators,
-> 
-> First, I would like to say thank you to the people behind the LKFT
-> project for validating stable kernels (and more), and including some
-> Network selftests in their tests suites.
-> 
-> A lot of improvements around the networking kselftests have been done
-> this year. At the last Netconf [1], we discussed how these tests were
-> validated on stable kernels from CIs like the LKFT one, and we have some
-> suggestions to improve the situation.
-> 
-> 
-> KSelftests from the same version
-> --------------------------------
-> 
-> According to the doc [2], kselftests should support all previous kernel
-> versions. The LKFT CI is then using the kselftests from the last stable
-> release to validate all stable versions. Even if there are good reasons
-> to do that, we would like to ask for an opt-out for this policy for the
-> networking tests: this is hard to maintain with the increased
-> complexity, hard to validate on all stable kernels before applying
-> patches, and hard to put in place in some situations. As a result, many
-> tests are failing on older kernels, and it looks like it is a lot of
-> work to support older kernels, and to maintain this.
-> 
 
-This is from the Documentation/dev-tools/kselftest.rst:
-----
-Kselftest from mainline can be run on older stable kernels. Running tests
-from mainline offers the best coverage. Several test rings run mainline
-kselftest suite on stable releases. The reason is that when a new test
-gets added to test existing code to regression test a bug, we should be
-able to run that test on an older kernel. Hence, it is important to keep
-code that can still test an older kernel and make sure it skips the test
-gracefully on newer releases.
-----
+On 11/11/24 20:00, Jeremy Kerr wrote:
+> [EXTERNAL EMAIL NOTICE: This email originated from an external sender. Please be mindful of safe email handling and proprietary information protection practices.]
+>
+>
+> Hi Adam,
+>> "The PCC signature. The signature of a subspace is computed by a
+>> bitwise-or of the value 0x50434300 with the subspace ID. For example,
+>> subspace 3 has the signature 0x50434303."
+>>
+>> This could be used, but the inclusion of the "PCC" is unnecessary, as
+>> it is on every packet.  Thus only the subspace ID is relevant. This
+>> is the  index of the  entry in the PCCT, and is what I have been
+>> calling the  outbox ID. Thus it is half of the address that I am
+>> proposing.
+> But the signature value isn't implementing any MCTP-bus addressing
+> functionality, right? It's a fixed value that has to be set the same
+> way on all transactions using that PCC channel.
+>
+> Just to walk it back a bit, we have two possible interpretations here:
+>
+>   1) that the channel indexes *do* form something like a physical
+>      addressing mechanism; when packets are sent over a channel to a
+>      remote endpoint, we need to add a specific channel identifier.
+>
+>   2) that the channel indices are more of an internal detail of the
+>      transport mechanism: they're identifying channels, not MCTP
+>      endpoints (kinda like setting the PCIe target address when
+>      transmitting a network packet, perhaps?)
+>
+> If we adopt the (1) approach, we'd want a hardware address to represent
+> the mechanism for addressing an MCTP endpoint, not an interface
+> instance. That would end up with something along the lines of:
+>
+>   - MCTP-over-PCC hardware addresses would be a single byte (to contain a
+>     channel ID)
+>
+>   - the interface would have a hardware address of just the inbox ID:
+>     incoming packets are received via the inbox to the local interface,
+>     and so are "addressed" to that inbox ID
+>
+>   - remote endpoints would be represented by a hardware address of just
+>     the outbox ID: outgoing packets are sent via the outbox to the remote
+>     endpoint, so are "addressed" to that outbox ID
+>
+> ... but that doesn't seem to be the approach you want to take here, as
+> it doesn't match your requirements for an interface lladdr (also,
+> implementing the neighbour-handling infrastructure for that would seem
+> to be overkill for a strictly peer-to-peer link type).
+>
+> So a couple of queries to get us to a decision:
+>
+> Your goal with exposing the channel numbers is more to choose the
+> correct *local* interface to use on a system, right? Can you elaborate
+> on your objections for using something like sysfs attributes for that?
+>
+> Can you outline the intended usage of the spec updates that would add
+> the address format you mentioned? Is there a use-case we need to
+> consider for those?
 
-As it states, running tests from mainline increases the coverage when new
-tests are added to regression test an existing kernel feature in a stable
-release.
+On consideration that the spec is still closed, and may change between 
+now and when it is published, I am going to pull out the hardware 
+address from this patch.  Once we have a public spec, we can implement 
+it without fear of breaking userland.
 
-It also says that when mainline tests are running on an older kernel, the
-test should detect missing features and report skips.
 
-The above paragraph addresses test developers and users. I would say the
-policy regarding the test development will not change. We want to keep
-it the same, continuing to take measures to skip tests when a feature
-isn't supported in the kernel the tests are running on. This addresses
-not just a kernel and test revision mismatch, but also when a feature
-isn't enabled when kernel and test revisions match.
 
-This policy helps us find bugs in the tests failing when they should
-skip. If test rings move to a new policy, our ability to find bugs
-like this goes down.
 
-As per users and test ring maintainers, they need to be aware of the
-reduced coverage if they revision match kernel and tests.
-Revision matching example: 6.11.8 tests on 6.11.8 stable
-
-Greg KH and other stable maintainers can weigh in on whether they would
-like LKFT to go from running mainline tests on stable releases to
-revision matching.
-
-> Many networking tests are validating the internal behaviour that is not
-> exposed to the userspace. A typical example: some tests look at the raw
-> packets being exchanged during a test, and this behaviour can change
-> without modifying how the userspace is interacting with the kernel. The
-> kernel could expose capabilities, but that's not something that seems
-> natural to put in place for internal behaviours that are not exposed to
-> end users. Maybe workarounds could be used, e.g. looking at kernel
-> symbols, etc. Nut that doesn't always work, increase the complexity, and
-> often "false positive" issue will be noticed only after a patch hits
-> stable, and will cause a bunch of tests to be ignored.
-> 
-> Regarding fixes, ideally they will come with a new or modified test that
-> can also be backported. So the coverage can continue to grow in stable
-> versions too.
-> 
-
-The assumption that new tests can be backported is incorrect. It goes
-against the stable rules. We backport fixes and not new features and
-new tests.
-
-Running kselftests from the same release will reduce coverage when a new
-test is added to regression test a 6.11 feature. This happens more often
-than not.
-Revision matching example: 6.11.8 tests on 6.11.8 stable
-
-  
-> Do you think that from the kernel v6.12 (or before?), the LKFT CI could
-> run the networking kselftests from the version that is being validated,
-> and not from a newer one? So validating the selftests from v6.12.1 on a
-> v6.12.1, and not the ones from a future v6.16.y on a v6.12.42.
-> 
-
-It is expected that there will be more skipped tests as you run tests
-from mainline on stable releases. You will see more skips on older
-stables.
-
-An alternative would be to revision match for older stables. New tests
-could be written for 6.12 which should be run on 6.11 and maybe not on
-6.1 depending on missed coverage.
-
-Before changing the current approach, it is important to understand that
-running mainline tests on stable releases increases test coverage and that
-newer tests will not be backported and that the coverage gap will increase
-overtime.
-
-thanks,
--- Shuah
+>
+> Cheers,
+>
+>
+> Jeremy
 
