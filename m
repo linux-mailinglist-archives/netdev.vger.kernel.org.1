@@ -1,100 +1,326 @@
-Return-Path: <netdev+bounces-144269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789019C66D0
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:39:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15E519C66D8
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:43:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2574CB2BE64
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:38:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B5C281F3F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145792E40B;
-	Wed, 13 Nov 2024 01:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A282233086;
+	Wed, 13 Nov 2024 01:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NRrJMxqz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JWWTKUeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4897C147
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 01:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4922EB10
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 01:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731461925; cv=none; b=QEpb1XfSIibpBVCzc7d8fFpIJc188eujFrgMbaI02vR75wJT4POhYSQifF/UQvHsynNmQw/p/zwaGTtj4+8HWMkEQAMRPvR3zWuIGUn8CYVbnbFvU9qJoVwSXSCV/6tGLkdknZPnPqAiF0IVbFXp7rIzaQmyXRNwRanSa/0kPyM=
+	t=1731462190; cv=none; b=UV6Mv1Nhr35VjOtwP32D8ji2A4Le9xwvbQWHXN/oot+g5enua4Wel26qJVYUJxrFdwwENbsr7v2FnczCQplKTvGXsbQg4h3s2uevjVChKRkZCki3cFyNOgOR/zvLeJam6m2ayHWG6u1Xq/HiicTTxqtFAQTza5eJeoLXfX5N8yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731461925; c=relaxed/simple;
-	bh=blf8kgpYDmhdgW/Flh9pWbEP6SrsFKFvVuIQBvpyYHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bR4ZBvkl1eFmyUWz2Jh6slMwHigLsfLnQEEIaQNLW3tA6bmqYxdSOnbJd6GivKbQTfOwAL6ifSpsndlqe28D+BdUQtp/AHsdfOA9rhhtn6wlI54rwS3cz7mKrafZyHiLXaULGO9fNACUfeIWSSButIXl9rLcD7ONlulNua2ipQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NRrJMxqz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FEBC4CECD;
-	Wed, 13 Nov 2024 01:38:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731461924;
-	bh=blf8kgpYDmhdgW/Flh9pWbEP6SrsFKFvVuIQBvpyYHs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NRrJMxqzzws7KocKEj7PRaohis6WiwlT/MJbpcuTOlrg9Um6+//YAOm1AsDIPI/ld
-	 K3OdF0EVc3miI0VI24khgiK/kZlCJI1B6k/2EtLpnH3QeBl9zdBCvQ/qEgw/okTdzG
-	 J7kIDwFC5MMZihktAlgWqszd4W9kYVDbeOJRvloH6epXFfMD4qhsSoobXUaKuDgtvr
-	 m9K2i0f21nh7Q8pCTQrNsnQFLaHeMmLjNoTaNsQc4fGZDUOUDLSWdYvQsKXcpa7NVs
-	 /H7aSlYyTgOzta2cD4y5P+74sIqQH+t6sp2V93gFd3KXBuk88us+PSdgbJV9Tcxc7j
-	 XTQ4zNQrD9Stg==
-Date: Tue, 12 Nov 2024 17:38:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Xiao Liang <shaw.leon@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 2/2] tools/net/ynl: add async notification
- handling
-Message-ID: <20241112173843.2831e918@kernel.org>
-In-Reply-To: <20241112111727.91575-3-donald.hunter@gmail.com>
-References: <20241112111727.91575-1-donald.hunter@gmail.com>
-	<20241112111727.91575-3-donald.hunter@gmail.com>
+	s=arc-20240116; t=1731462190; c=relaxed/simple;
+	bh=m1SjG8ugznS7cfFTPWpCsU6Bn2rYcqj36xrYzkwRalQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oUu+Sfx8NVn2vcRqEkJGct2Gq/+LRJQ5eo5WwJ4B6QOGzlbGbGQ/po2CD+7FIkbvb/HGN1aSeyV6AQeZzpdvWC0re4ita4EvyNikUOuH0XZVxo0Q88zkiywewpDiHaWnzjdrug6x6dvlT43aU5nFr57vJzZfmGpTnoKQaz8YoCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JWWTKUeq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731462186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y2rB3RrwPY1rfdMiysUodqNFLXKaLd7bLkjxE+eeG4c=;
+	b=JWWTKUeqFAJH9qLjixZ06QL3EtlYkRuB6NKnrVIhAFxx47L4xzdtFIpFY1mnxE7GNeDyu7
+	kHXP1w4NrWhkebNrWQ8piAeJ7nqhnxH5vAF0medDPb0H/Cz0Os0RC1kyRCR71xyAI6hnaG
+	eCktlalRZyLCCAI4T8pnTZf1N6qWSYE=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-ieJ9mOOfOzuRNKguAuyHAw-1; Tue, 12 Nov 2024 20:43:05 -0500
+X-MC-Unique: ieJ9mOOfOzuRNKguAuyHAw-1
+X-Mimecast-MFC-AGG-ID: ieJ9mOOfOzuRNKguAuyHAw
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-7e6cc094c2fso228903a12.1
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 17:43:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731462184; x=1732066984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y2rB3RrwPY1rfdMiysUodqNFLXKaLd7bLkjxE+eeG4c=;
+        b=kHgv/Y3BI9z9qpCV/cqJ7B18xBbmswpscN61xjZGm1Ps/h6kLwWUDMxVp1g32cBqql
+         dAkZSiH3F/2MduLnk8/UjY7pGAhipY1k7KJ3FvzbQ9nRH/Bg/OkaWRbAOEWQXg6QxH2y
+         afdMdR/j7ar3Dmn2ArbRtt1P3cxZ2xy0KQUj4rSzLPO4bg3OUPDnuwMxN9Biu8kWCTFw
+         dIQOJ8BWunY4nabpUHyYIMsoN759FSuquRqsW4OWbOgnjOfElOeXJH/RnJ9XJ3lt1Gkm
+         EUMC++BLp8AJ2t9jzMAxghWgsS33wakjPcAC5v7n+lp58g9L51F8QgXHAT55AIvtxUFG
+         wQLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaJ8tY4calhxaWx7oSfQoL8D6ABBj0wgzw3vcKlzHtb9C8fegls6HfvIREYwVltVjh2PKtCC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDkC834cq40kkv6PhFsivIlmRpd5Vb0f5fTZYnrPm0hTfvL82D
+	dgMqPcQHRVDXbMj9jNxNU+IngJnYt+OEJzpJc+znEE5QY8PxYAzNluOIEJQaGLvjL2Qn0jMcqgC
+	kp0o1CFk9ADLVb33Yx93SRYQ33gOr04CohwdbhqbHb40PzS8r1LIwmAFCfJCJxbKHeBQsZlG0NJ
+	y4he14BNz0kWKGynYOgEF/w8CRl8Xf
+X-Received: by 2002:a17:90b:1a91:b0:2e2:c225:4729 with SMTP id 98e67ed59e1d1-2e9b0a3325emr29256955a91.8.1731462183965;
+        Tue, 12 Nov 2024 17:43:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE+vRCC4mrbHKut4t1fJto0Y0iBNbGPDhwP/9QXBKj/+OyIIO3GDNJxRo0creIYAsWkJaKGsGYm4Ut75lVbM+Q=
+X-Received: by 2002:a17:90b:1a91:b0:2e2:c225:4729 with SMTP id
+ 98e67ed59e1d1-2e9b0a3325emr29256906a91.8.1731462183395; Tue, 12 Nov 2024
+ 17:43:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com>
+ <20241105100647.117346-10-chia-yu.chang@nokia-bell-labs.com>
+ <CANn89i+9USaOthY3yaJPT-cbfAcP0re2bbGbWU7SqOSYEW2CMw@mail.gmail.com>
+ <37429ace-59c0-21d2-bcc8-54033794e789@kernel.org> <PAXPR07MB7984717B290B1BC250429D2BA3592@PAXPR07MB7984.eurprd07.prod.outlook.com>
+ <6c6aced9-7543-b195-93e9-17e824538c55@kernel.org>
+In-Reply-To: <6c6aced9-7543-b195-93e9-17e824538c55@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 13 Nov 2024 09:42:52 +0800
+Message-ID: <CACGkMEt-JpE0-WwEQYWLFijLoqRcWr9CV08otOR=Veg61aVcrA@mail.gmail.com>
+Subject: Re: [PATCH v5 net-next 09/13] gro: prevent ACE field corruption &
+ better AccECN handling
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ij@kernel.org>
+Cc: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, 
+	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"dsahern@gmail.com" <dsahern@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"dsahern@kernel.org" <dsahern@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"joel.granados@kernel.org" <joel.granados@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>, 
+	"pablo@netfilter.org" <pablo@netfilter.org>, "kadlec@netfilter.org" <kadlec@netfilter.org>, 
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>, 
+	"coreteam@netfilter.org" <coreteam@netfilter.org>, "ncardwell@google.com" <ncardwell@google.com>, 
+	"Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>, 
+	"g.white@cablelabs.com" <g.white@cablelabs.com>, 
+	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>, 
+	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>, 
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, 
+	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-some comments for your consideration, if you prefer to keep as is:
+On Wed, Nov 13, 2024 at 5:19=E2=80=AFAM Ilpo J=C3=A4rvinen <ij@kernel.org> =
+wrote:
+>
+> Adding a few virtio people. Please see the virtio spec/flag question
+> below.
+>
+> On Tue, 12 Nov 2024, Chia-Yu Chang (Nokia) wrote:
+>
+> > >From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > >Sent: Thursday, November 7, 2024 8:28 PM
+> > >To: Eric Dumazet <edumazet@google.com>
+> > >Cc: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>; netdev@=
+vger.kernel.org; dsahern@gmail.com; davem@davemloft.net; dsahern@kernel.org=
+; pabeni@redhat.com; joel.granados@kernel.org; kuba@kernel.org; andrew+netd=
+ev@lunn.ch; horms@kernel.org; pablo@netfilter.org; kadlec@netfilter.org; ne=
+tfilter-devel@vger.kernel.org; coreteam@netfilter.org; ncardwell@google.com=
+; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.white@=
+cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlewind@ericsson.=
+com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com; vidhi=
+_goel@apple.com
+> > >Subject: Re: [PATCH v5 net-next 09/13] gro: prevent ACE field corrupti=
+on & better AccECN handling
+> > >
+> > >
+> > >CAUTION: This is an external email. Please be very careful when clicki=
+ng links or opening attachments. See the URL nok.it/ext for additional info=
+rmation.
+> > >
+> > >
+> > >
+> > >On Thu, 7 Nov 2024, Eric Dumazet wrote:
+> > >
+> > >>On Tue, Nov 5, 2024 at 11:07=E2=80=AFAM <chia-yu.chang@nokia-bell-lab=
+s.com> wrote:
+> > >>>
+> > >>> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > >>>
+> > >>> There are important differences in how the CWR field behaves in
+> > >>> RFC3168 and AccECN. With AccECN, CWR flag is part of the ACE counte=
+r
+> > >>> and its changes are important so adjust the flags changed mask
+> > >>> accordingly.
+> > >>>
+> > >>> Also, if CWR is there, set the Accurate ECN GSO flag to avoid
+> > >>> corrupting CWR flag somewhere.
+> > >>>
+> > >>> Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > >>> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> > >>> ---
+> > >>>  net/ipv4/tcp_offload.c | 4 ++--
+> > >>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >>>
+> > >>> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c index
+> > >>> 0b05f30e9e5f..f59762d88c38 100644
+> > >>> --- a/net/ipv4/tcp_offload.c
+> > >>> +++ b/net/ipv4/tcp_offload.c
+> > >>> @@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_hea=
+d *head, struct sk_buff *skb,
+> > >>>         th2 =3D tcp_hdr(p);
+> > >>>         flush =3D (__force int)(flags & TCP_FLAG_CWR);
+> > >>>         flush |=3D (__force int)((flags ^ tcp_flag_word(th2)) &
+> > >>> -                 ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> > >>> +                 ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
+> > >>>         flush |=3D (__force int)(th->ack_seq ^ th2->ack_seq);
+> > >>>         for (i =3D sizeof(*th); i < thlen; i +=3D 4)
+> > >>>                 flush |=3D *(u32 *)((u8 *)th + i) ^ @@ -405,7 +405,=
+7
+> > >>> @@ void tcp_gro_complete(struct sk_buff *skb)
+> > >>>         shinfo->gso_segs =3D NAPI_GRO_CB(skb)->count;
+> > >>>
+> > >>>         if (th->cwr)
+> > >>> -               shinfo->gso_type |=3D SKB_GSO_TCP_ECN;
+> > >>> +               shinfo->gso_type |=3D SKB_GSO_TCP_ACCECN;
+> > >>>  }
+> > >>>  EXPORT_SYMBOL(tcp_gro_complete);
+> > >>>
+> > >>
+> > >> I do not really understand this patch. How a GRO engine can know whi=
+ch
+> > >> ECN variant the peers are using ?
+> > >
+> > >Hi Eric,
+> > >
+> > >Thanks for taking a look.
+> > >
+> > >GRO doesn't know. Setting SKB_GSO_TCP_ECN in case of not knowing can r=
+esult in header change that corrupts ACE field. Thus, GRO has to assume the=
+ RFC3168 CWR offloading trick cannot be used anymore (unless it tracks the =
+connection and knows the bits are used for RFC3168 which is something nobod=
+y is going to do).
+> > >
+> > >The main point of SKB_GSO_TCP_ACCECN is to prevent SKB_GSO_TCP_ECN or =
+NETIF_F_TSO_ECN offloading to be used for the skb as it would corrupt ACE f=
+ield value.
+> >
+> > Hi Eric and Ilpo,
+> >
+> > From my understanding of another email thread (patch 08/13), it seems t=
+he conclusions that SKB_GSO_TCP_ACCECN will still be needed.
+> >
+> > >
+> > >SKB_GSO_TCP_ACCECN doesn't allow CWR bits change within a super-skb bu=
+t the same CWR flag should be repeated for all segments. In a sense, it's s=
+impler than RFC3168 offloading.
+> > >
+> > >> SKB_GSO_TCP_ECN is also used from other points, what is your plan ?
+> > >>
+> > >> git grep -n SKB_GSO_TCP_ECN
+> > >> drivers/net/ethernet/hisilicon/hns3/hns3_enet.c:3888:
+> > >> skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+> > >> drivers/net/ethernet/mellanox/mlx5/core/en_rx.c:1291:
+> > >> skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+> > >> drivers/net/ethernet/mellanox/mlx5/core/en_rx.c:1312:
+> > >> skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+> > >
+> > >These looked like they should be just changed to set SKB_GSO_TCP_ACCEC=
+N instead.
+> >
+> > I agree with these changes and will apply them in the next version.
+> >
+> > >
+> > >I don't anymore recall why I didn't change those when I made this patc=
+h long time ago, perhaps it was just an oversight or things have changed so=
+mehow since then.
+> > >
+> > >> include/linux/netdevice.h:5061: BUILD_BUG_ON(SKB_GSO_TCP_ECN !=3D
+> > >> (NETIF_F_TSO_ECN >> NETIF_F_GSO_SHIFT));
+> > >> include/linux/skbuff.h:664:     SKB_GSO_TCP_ECN =3D 1 << 2,
+> > >
+> > >Not relevant.
+> > >
+> > >> include/linux/virtio_net.h:88:                  gso_type |=3D SKB_GS=
+O_TCP_ECN;
+> > >> include/linux/virtio_net.h:161:         switch (gso_type & ~SKB_GSO_=
+TCP_ECN) {
+> > >> include/linux/virtio_net.h:226:         if (sinfo->gso_type & SKB_GS=
+O_TCP_ECN)
+> > >
+> > >These need to be looked further what's going on as UAPI is also
+> > > involved here.
+> >
+> > I had a look at these parts, and only the 1st and 3rd ones are relevant=
+.
+> > Related to the 1st one, I propose to change
+> > from
+> >
+> >                 if (hdr->gso_type & VIRTIO_NET_HDR_GSO_ECN)
+> >                         gso_type |=3D SKB_GSO_TCP_ECN;
+> >
+> > to
+> >
+> >                 if (hdr->gso_type & VIRTIO_NET_HDR_GSO_ECN)
+> >                         gso_type |=3D SKB_GSO_TCP_ACCECN;
+> >
+> > The reason behind this proposed change is similar as the above changes
+> > in en_rx.c.
+>
+> But en_rx.c is based one CWR flag, there's no similar check here.
+>
+> > For the 3rd one, I suggest to change from
+> >
+> >                 if (sinfo->gso_type & SKB_GSO_TCP_ECN)
+> >                         hdr->gso_type |=3D VIRTIO_NET_HDR_GSO_ECN;
+> >
+> > to
+> >
+> >                 if (sinfo->gso_type & (SKB_GSO_TCP_ECN | SKB_GSO_TCP_AC=
+CECN))
+> >                         hdr->gso_type |=3D VIRTIO_NET_HDR_GSO_ECN;
+> >
+> > This proposed change is because VIRTIO_NET_HDR_GSO_ECN must be set to
+> > allow TCP packets requiring segmentation offload which have ECN bit set=
+.
+> > So, no matter whether skb gso_type have GSO_TCP_ECN flag or
+> > GSO_TCP_ACCECN flag, the corresponding hdr gso_type shall be set.
+> >
+> > But, I wonder what would the driver do when with VIRTIO_NET_HDR_GSO_ECN
+> > flag. Will it corrupts CWR or not?
+>
+> I'm starting to heavily question what is the meaning of that
+> VIRTIO_NET_HDR_GSO_ECN flag and if it's even consistent...
+>
+> https://github.com/qemu/qemu/blob/master/net/eth.c
+>
+> That sets VIRTIO_NET_HDR_GSO_ECN based on CE?? (Whereas kernel associates
+> the related SKB_GSO_TCP_ECN to CWR offloading.)
+>
+> The virtio spec is way too vague to be useful so it would not be
+> surprising if there are diverging interpretations from implementers:
+>
+> "If the driver negotiated the VIRTIO_NET_F_HOST_ECN feature, the
+> VIRTIO_NET_HDR_GSO_ECN bit in gso_type indicates that the TCP packet has
+> the ECN bit set."
+>
+> What is "the ECN bit" in terms used by TCP (or IP)? Could some virtio
+> folks please explain?
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+According to the current Linux implementation in virtio_net_hdr_to_skb():
 
-On Tue, 12 Nov 2024 11:17:27 +0000 Donald Hunter wrote:
-> +    def poll_ntf(self, duration=None):
-> +        endtime = time.time() + duration if duration is not None else None
+                if (hdr->gso_type & VIRTIO_NET_HDR_GSO_ECN)
+                        gso_type |=3D SKB_GSO_TCP_ECN;
 
-we can record starttime here, and avoid the complex logic..
+It mapps to SKB_GSO_TCP_ECN which is:
 
-> +        selector = selectors.DefaultSelector()
-> +        selector.register(self.sock, selectors.EVENT_READ)
-> +
-> +        while True:
-> +            try:
-> +                yield self.async_msg_queue.get_nowait()
-> +            except queue.Empty:
-> +                if endtime is not None:
-> +                    interval = endtime - time.time()
+        /* This indicates the tcp segment has CWR set. */
+        SKB_GSO_TCP_ECN =3D 1 << 2,
 
-then here:
+Thanks
 
-		if duration is not None:
-			timeout = time.time() - starttime + duration
+>
+>
+> --
+>  i.
 
-and rest as is (modulo the s/interval/timeout/)
-
-> +                    if interval <= 0:
-> +                        return
-> +                else:
-> +                    interval = None
-> +                events = selector.select(interval)
-> +                if events:
-> +                    self.check_ntf()
 
