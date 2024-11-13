@@ -1,139 +1,107 @@
-Return-Path: <netdev+bounces-144421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D342C9C704E
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:10:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6CB9C704F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70C591F21DFD
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:10:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F3A1F250E3
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426701DFD8C;
-	Wed, 13 Nov 2024 13:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26EB01FB8AC;
+	Wed, 13 Nov 2024 13:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WcsJ72je"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMubksJf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6CF1DF73B
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 13:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05FA433CE;
+	Wed, 13 Nov 2024 13:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731503423; cv=none; b=USJgz2EQ5gwk8A8HSklf3pf4Z7gSzS6n4X/KsNmsBWkDZ3ZWFfc9cXpJMFyzwnUj6WlxeK0xhkRy4h+6tOOX95pqM7+JK00aU6m2Y3oWPpengzcTmg/PmqUvZHJjs2T1CpcZi2Qqs3DOXVHswAbr640UxpSHqwKP01dShOneRiQ=
+	t=1731503425; cv=none; b=hSq/OPLGXiDZ2vXqrTDLZShF+Mwp1m8R63GX5WzECho37Z9gFYrFswT/KRsZZFZxPZ6RyiTVY3gfzuIEn3QE26HSERmoRggMvfRxb6UVy8YQeEa+gp88CM6zjGDOkIEUDSMdSst+hE4v81sveShmJrA7QWo1Gi9ZyxicJ2m9MaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731503423; c=relaxed/simple;
-	bh=Opcmz9YYIaVdPWsOxhUqLPlpXQUP+f6SvaFPoN8x2S4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YrrfH4c4d5AY+qAEUXTgizbxskTL0uSOFDrmwOTnEJMTIi5JbhFiuoWuOD8IW1qV8Q5ZeBJlG5xRiQmSis7d/pBgN9xBZfGUmifdifBKYl/jJvN1lHsJMHiC/4zHJEuPc1wcvr0QVV+3/PuNAHHTaa4ez9RiGtI2teDlFqnGqNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WcsJ72je; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4314c452180so4489765e9.0
-        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:10:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731503420; x=1732108220; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vrCyUIt2ww7l4E4yjLiYIeNzWk/0rCkfz0cRlXOTRlw=;
-        b=WcsJ72jeySrgNlU53qllluOgJb/aFlqt3rKFw4SeoMUCnWGrbfxrzGbtgxtDjsAw+M
-         XACker0FEQcyDNYqclFPOROgiRrxqAJCyQxPcDLUUwt8nab6qbMxsMv6m4PsJbohHHsV
-         tZVXU578PZIEk0ZA0I4rO4U1NXmH7tz/zIFSRwuNSlYgGLlex/REIbYD+NHclwHPWSlY
-         GJgGHPRNqNnmfsKnfU1TrjPNtT6maxijY5BAW1/0jhyLU621D0VscAZG1Q5B2Co3xCn1
-         W/xnWqEt4JBwS7yJy1g2V4CwjCzAR5mTfpx1RVntMINbNhg+6+HQhm8y76IWP8iooVTw
-         a1ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731503420; x=1732108220;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vrCyUIt2ww7l4E4yjLiYIeNzWk/0rCkfz0cRlXOTRlw=;
-        b=cUOzEws7orofBWxEwAixk8gX/FgrMTSRJC9K+fxaw/PeJ0axrPd9+esM0W85vUXHuJ
-         0Tq5YQuVVCc/udT5syKib8EwlKQKxfJSCczDvmmfGP2w+cCFkZ+qN+LAhVS5fGy8kk3L
-         nmiLw5Q4G3pKoteQ+VGANq98reePuQ6717tTs4dSkUt7OiEtwWLbMjJzlhCIee6rqI/n
-         zna5f6TELbmqE87Y+JSBL74Wn86dH+AkiruIjOwFnYRtXYqf23RC3ujJak01E0wLePq+
-         88Dzrl5Lctet2LHSaKLRiBNjCAWNYSFasRQGF/I0C2pkdySBep+F1yJwXkfegNyoMuoi
-         luNw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNfWHMKlLC1p6zeJMVz9lSUK0xbOuEyA6vJOHhc0YfZVhSCuOrAkWIfqTDizSAEABkfoTVOWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIogYPqj7cTWd6mL7trTG2qbfVzbc+i9Z/qBjpydtWClmfDebo
-	BjqAs1YvK77CUWMLpa3ZooM+qTembQ3pJxUh1ycorMzmc45W+PtoHh2NqkqVx3U=
-X-Google-Smtp-Source: AGHT+IE0LhHchWSjR1k9sQMVXr3w1p9/+8HBLDRMWC0wiutg6e3LOt2hgiDvsOk5dnHwLzxqCoRJPA==
-X-Received: by 2002:a05:600c:354f:b0:42f:84ec:3e0 with SMTP id 5b1f17b1804b1-432b685c0a8mr175006505e9.9.1731503419662;
-        Wed, 13 Nov 2024 05:10:19 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432d550c159sm24063835e9.32.2024.11.13.05.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 05:10:19 -0800 (PST)
-Date: Wed, 13 Nov 2024 16:10:15 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>
-Cc: "Everest K.C." <everestkc@everestkc.com.np>,
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] xfrm: Add error handling when nla_put_u32()
- returns an error
-Message-ID: <81088611-41d9-4472-94e6-3170418156c9@stanley.mountain>
-References: <20241112233613.6444-1-everestkc@everestkc.com.np>
- <20241113105939.GY4507@kernel.org>
+	s=arc-20240116; t=1731503425; c=relaxed/simple;
+	bh=9vr6tI1szK5Unm3lwJO3ytVbP8bZ0zDKkxo9WexlNH8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hGiWCzh1f1CQjuAUo+GSEh4NYWIBcRYGrNKY7yNWi64ni2eeQbmieWTfw1CN9ZCImtVI4EHU1pF1o8aqb1Fxcu9rCo9Zr4ekCG550fI37i6rCxlhAJW+pgWGZm3tSxYiEBZJshn4U5rGUIXd5w3K2PZGk1afuF/tlNU0RylKz2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMubksJf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DCE4C4CECD;
+	Wed, 13 Nov 2024 13:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731503424;
+	bh=9vr6tI1szK5Unm3lwJO3ytVbP8bZ0zDKkxo9WexlNH8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SMubksJfwYxg+9zGeltQjFzmBmYTJBju+k1u/Tu1qPf13N5Yp9X8Q45o2vYXcIix9
+	 nn4Lm5dL/c7u1pT1zgESdBXv5ZT+IetT6RbEURWGrYN5d5J2U4zmdZFBGOzWYuymFb
+	 LkwtL2/eWMr13rNoyiGDw1UuyL40R7YQs51cGOgvKBvbBBG0eu90/kGurELdWmb1Tl
+	 v7EZy6m6On8KaUQM2zZ9IN/XaD/EBpBlaep89bwOQgxQNir5rF1nAxdQLBzoTTLmFG
+	 hXdZ/dnMt8XHQ79pyI8c8izfjmfVJJxqpKPWVjWrUBA03fiJmDbAMO+H6ST9Nh1bL8
+	 nNysmcmSDOySA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFAD3809A80;
+	Wed, 13 Nov 2024 13:10:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241113105939.GY4507@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/5] Re-organize MediaTek ethernet phy drivers and
+ propose mtk-phy-lib
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173150343476.1214780.13147107754252375046.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Nov 2024 13:10:34 +0000
+References: <20241108163455.885-1-SkyLake.Huang@mediatek.com>
+In-Reply-To: <20241108163455.885-1-SkyLake.Huang@mediatek.com>
+To: Sky Huang <skylake.huang@mediatek.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ daniel@makrotopia.org, dqfext@gmail.com, SkyLake.Huang@mediatek.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ horms@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Steven.Liu@mediatek.com
 
-On Wed, Nov 13, 2024 at 10:59:39AM +0000, Simon Horman wrote:
-> On Tue, Nov 12, 2024 at 04:36:06PM -0700, Everest K.C. wrote:
-> > Error handling is missing when call to nla_put_u32() fails.
-> > Handle the error when the call to nla_put_u32() returns an error.
-> > 
-> > The error was reported by Coverity Scan.
-> > Report:
-> > CID 1601525: (#1 of 1): Unused value (UNUSED_VALUE)
-> > returned_value: Assigning value from nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num)
-> > to err here, but that stored value is overwritten before it can be used
-> > 
-> > Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
-> > Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Sat, 9 Nov 2024 00:34:50 +0800 you wrote:
+> From: Sky Huang <skylake.huang@mediatek.com>
 > 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+> This patchset comes from patch 1/9, 3/9, 4/9, 5/9 and 7/9 of:
+> https://lore.kernel.org/netdev/20241004102413.5838-1-SkyLake.Huang@mediatek.com/
 > 
-> For future reference, I think the appropriate target for this tree
-> is ipsec-next rather than next.
+> This patchset changes MediaTek's ethernet phy's folder structure and
+> integrates helper functions, including LED & token ring manipulation,
+> into mtk-phy-lib.
 > 
-> 	Subject: [PATCH ipsec-next] xfrm: ...
+> [...]
 
-All these trees are a pain in the butt to track.  It's fine for people who only
-work in one tree but for people doing static checker stuff, then we have to
-deal with all 388 trees in linux-next.
+Here is the summary with links:
+  - [net-next,v3,1/5] net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+    https://git.kernel.org/netdev/net-next/c/4c452f7ea862
+  - [net-next,v3,2/5] net: phy: mediatek: Move LED helper functions into mtk phy lib
+    https://git.kernel.org/netdev/net-next/c/7f9c320c98db
+  - [net-next,v3,3/5] net: phy: mediatek: Improve readability of mtk-phy-lib.c's mtk_phy_led_hw_ctrl_set()
+    https://git.kernel.org/netdev/net-next/c/477c200aa7d2
+  - [net-next,v3,4/5] net: phy: mediatek: Integrate read/write page helper functions
+    https://git.kernel.org/netdev/net-next/c/3cb1a3c9cbaa
+  - [net-next,v3,5/5] net: phy: mediatek: add MT7530 & MT7531's PHY ID macros
+    https://git.kernel.org/netdev/net-next/c/219cecbb3e86
 
-I've changed my scripts to add [next] to my patches if Linus hasn't merged the
-commit from the Fixes tag.  I still add net and net-next by hand but I'm going
-to just automate that as well because doing it by hand has been failure prone.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-But then if we try to add all the ipsec or whatever trees, it just becomes
-unworkable.  I started to write a script which would look do the --is-ancestor
-check based on the Fixes tag, but it take forever to update the git trees.  I
-wasn't able to figure out a way to make this work.
-
-Also once Linus merges the commit, there is no way to tell which tree the commit
-goes to so it only applies to linux-next.  For networking, I already have the
-script that greps the patch for -w net and grep -vw wireless.  But I don't want
-to maintain a list greps for everyone's tree.
-
-A lot of this scripting could be built into the CI system.  The CI system is
-already doing some scripting based on the subject but we could do it based on
-the Fixes tag instead.  If there isn't a Fixes tag, then it should go to
-net-next.
-
-regards,
-dan carpenter
 
 
