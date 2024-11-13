@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-144551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38FEB9C7BB4
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:55:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 067DF9C7BB6
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED21B28319F
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD10281663
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3394207213;
-	Wed, 13 Nov 2024 18:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EF62076BD;
+	Wed, 13 Nov 2024 18:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lIv0przx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TIISaALm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B820E20697E
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 18:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4CB206E9E
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 18:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731524087; cv=none; b=LqbaPmrh9Rc4xCTl08GMrAnMNBQRh3J2+c7ANsXZyJRMpful5/WWrvjMnFHRSgXpWeCkQ3sNMPulaNDzoBa/3S+3o9Pnsi4oEy78w1SnXp4bY8OaDR4IjorziMpGo5FIX8SIOCDYNu/djDx9kfybSmUx0DW9+9ZVE5wY1trfMPA=
+	t=1731524090; cv=none; b=ApMIJASOmNGivrv/7RoX+LR2flo1kcR2wiW6vnvg57RWuMArQTvql8mgjIo0J7TmgR5401wk7779qxYZw5zBT277z6sYg4WalLUZwi+WZzUt7dlP+U7y+Yer382Bt6grhOHFEmOFGxkw3xPIGKqZrUr0cWnwG3BKWM1GPCOUa0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731524087; c=relaxed/simple;
-	bh=POPtQA4z4W0eeC2oRwOmJW+kOiHy0ZDICENVatY2/Zs=;
+	s=arc-20240116; t=1731524090; c=relaxed/simple;
+	bh=2122BFx7wZd5PY+V5o0vzfvpOOTUFdW+arY4RIKKIrM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mUvOEZGdnfO1vy+9ElOhFjQw2mPrI5/DB8E8Z3ejra5i6SH9lp/gp8hewI3frQCJadmm4oHnykHi+JTTc1ZNV6eJ1W9eQRVShwnHefJKiaqD6Tbuez0V5oBPRMVcwUcVwgx+sOBhvVOCAYM+Caj9EOBw1ujP05pXcVuL75Dwjs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lIv0przx; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=EC42kXFeZf4Nvqb8jA3WtzfDYnfv6k+4Xz2yHgPjfDVbfYfqb9/lhSTBy8VG44MEXG2l50HvH0ZNY2jc4BkwU/CxOgICpfXGfyqP90ELPepC4RffJHjT/kfzwl9A4Pvv95WEmy7jAnzWFHiGW4+oqHLA7vctqXj6vpN9/roKOJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TIISaALm; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731524086; x=1763060086;
+  t=1731524087; x=1763060087;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=POPtQA4z4W0eeC2oRwOmJW+kOiHy0ZDICENVatY2/Zs=;
-  b=lIv0przxp3Zd4C7Qri0zcoQMjkHe8JSUUdfFlKmsN5Y/VKLTw1iByRXP
-   REpNOI2SFE3Xm8vlBhx9vfzcB/G/wvTe4AMVT7UK+LAymnhX8VfJp+JDF
-   o7/eXFEF1dY2AHdXtL9J5PxgyrMlwXNzOWhoCTgEdG2/D/TwyZMTvTRCB
-   3IA/hyo9+Ui9Xd/sNs5OmpM8a2tjK3iY203OCNgPZbT+wIJheeBVdMdjo
-   kumoUozovy9E49wa8ha+LcvKwRsltKUhCx2abmYOwfDFDmafHKcUQQ7ld
-   ej2HZz8KOT1VFeAN2XrpGUjBbDDDTfOfp0QDW2b2kzC18mNg6hbddtq4u
-   w==;
-X-CSE-ConnectionGUID: X0gmSyi2Sg6jpGmEXDej/Q==
-X-CSE-MsgGUID: 9hhNmq5EQ02WCa2ZopYVuA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31589535"
+  bh=2122BFx7wZd5PY+V5o0vzfvpOOTUFdW+arY4RIKKIrM=;
+  b=TIISaALmvdBQu8ofMoDK8lPyAs658yQ8XJXLL6ElNqkX1JefDrTO5bK5
+   P2E+xL1pPEIzjRosHVNYt4IUU5QixXKAacRv4zgVcNHkXEufu9CAsJFXl
+   5NEtkV7025LPTOg9M7x+3EfUZUm97A+qz2gOL1zVArQ3WaEHD30DzQ1j3
+   JByuxluouOQfhArmuequZM6jAUFAqKUPku9SytCZf2h7C/HAW4rfaHJDa
+   7YAgtg++22lDj3eAh6qzD+ZcfSKQEykOmr0+qStrS8le04TuSZPGjcAnT
+   Qyk2O8VwkC0xR0i+8ROgIWv3B9ZiCYRG4dW9MFgW31LM2YDNALJqu2FIK
+   g==;
+X-CSE-ConnectionGUID: UM5AAZZyS9WWoewcyfEppQ==
+X-CSE-MsgGUID: 8bznlsXHRCWWZVRQ3mKoUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="31589542"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="31589535"
+   d="scan'208";a="31589542"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 10:54:42 -0800
-X-CSE-ConnectionGUID: McNcLK3iQg+SA9Xay8lpoQ==
-X-CSE-MsgGUID: 0qB3a4j3TpCYUCZ8yENx3w==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 10:54:43 -0800
+X-CSE-ConnectionGUID: etPiKejyRZKRvnDlHtXaLg==
+X-CSE-MsgGUID: 2VXtXFlMQzuhhvWrWzDi2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,151,1728975600"; 
-   d="scan'208";a="87520763"
+   d="scan'208";a="87520766"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 13 Nov 2024 10:54:41 -0800
+  by fmviesa006.fm.intel.com with ESMTP; 13 Nov 2024 10:54:42 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,13 +65,13 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
+Cc: Johnny Park <pjohnny0508@gmail.com>,
 	anthony.l.nguyen@intel.com,
-	dima.ruinskiy@intel.com,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net-next v2 11/14] igc: remove autoneg parameter from igc_mac_info
-Date: Wed, 13 Nov 2024 10:54:26 -0800
-Message-ID: <20241113185431.1289708-12-anthony.l.nguyen@intel.com>
+	horms@kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v2 12/14] igb: Fix 2 typos in comments in igb_main.c
+Date: Wed, 13 Nov 2024 10:54:27 -0800
+Message-ID: <20241113185431.1289708-13-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
 In-Reply-To: <20241113185431.1289708-1-anthony.l.nguyen@intel.com>
 References: <20241113185431.1289708-1-anthony.l.nguyen@intel.com>
@@ -83,485 +83,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+From: Johnny Park <pjohnny0508@gmail.com>
 
-Since the igc driver doesn't support forced speed configuration and
-its current related hardware doesn't support it either, there is no
-use of the mac.autoneg parameter. Moreover, in one case this usage
-might result in a NULL pointer dereference due to an uninitialized
-function pointer, phy.ops.force_speed_duplex.
+Fix 2 spelling mistakes in comments in `igb_main.c`.
 
-Therefore, remove this parameter from the igc code.
-
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+Signed-off-by: Johnny Park <pjohnny0508@gmail.com>
+Acked-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_diag.c    |   3 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c |  13 +-
- drivers/net/ethernet/intel/igc/igc_hw.h      |   1 -
- drivers/net/ethernet/intel/igc/igc_mac.c     | 316 +++++++++----------
- drivers/net/ethernet/intel/igc/igc_main.c    |   1 -
- drivers/net/ethernet/intel/igc/igc_phy.c     |  24 +-
- 6 files changed, 163 insertions(+), 195 deletions(-)
+ drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_diag.c b/drivers/net/ethernet/intel/igc/igc_diag.c
-index cc621970c0cd..a43d7244ee70 100644
---- a/drivers/net/ethernet/intel/igc/igc_diag.c
-+++ b/drivers/net/ethernet/intel/igc/igc_diag.c
-@@ -173,8 +173,7 @@ bool igc_link_test(struct igc_adapter *adapter, u64 *data)
- 	*data = 0;
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index b83df5f94b1f..37b674f8cbcd 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -1204,7 +1204,7 @@ static int igb_alloc_q_vector(struct igb_adapter *adapter,
+ 	/* initialize pointer to rings */
+ 	ring = q_vector->ring;
  
- 	/* add delay to give enough time for autonegotioation to finish */
--	if (adapter->hw.mac.autoneg)
--		ssleep(5);
-+	ssleep(5);
- 
- 	link_up = igc_has_link(adapter);
- 	if (!link_up) {
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index 5b0c6f433767..817838677817 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1821,11 +1821,8 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 		ethtool_link_ksettings_add_link_mode(cmd, advertising, 2500baseT_Full);
- 
- 	/* set autoneg settings */
--	if (hw->mac.autoneg == 1) {
--		ethtool_link_ksettings_add_link_mode(cmd, supported, Autoneg);
--		ethtool_link_ksettings_add_link_mode(cmd, advertising,
--						     Autoneg);
--	}
-+	ethtool_link_ksettings_add_link_mode(cmd, supported, Autoneg);
-+	ethtool_link_ksettings_add_link_mode(cmd, advertising, Autoneg);
- 
- 	/* Set pause flow control settings */
- 	ethtool_link_ksettings_add_link_mode(cmd, supported, Pause);
-@@ -1878,10 +1875,7 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 		cmd->base.duplex = DUPLEX_UNKNOWN;
- 	}
- 	cmd->base.speed = speed;
--	if (hw->mac.autoneg)
--		cmd->base.autoneg = AUTONEG_ENABLE;
--	else
--		cmd->base.autoneg = AUTONEG_DISABLE;
-+	cmd->base.autoneg = AUTONEG_ENABLE;
- 
- 	/* MDI-X => 2; MDI =>1; Invalid =>0 */
- 	if (hw->phy.media_type == igc_media_type_copper)
-@@ -1955,7 +1949,6 @@ igc_ethtool_set_link_ksettings(struct net_device *netdev,
- 		advertised |= ADVERTISE_10_HALF;
- 
- 	if (cmd->base.autoneg == AUTONEG_ENABLE) {
--		hw->mac.autoneg = 1;
- 		hw->phy.autoneg_advertised = advertised;
- 		if (adapter->fc_autoneg)
- 			hw->fc.requested_mode = igc_fc_default;
-diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
-index e1c572e0d4ef..d9d1a1a11daf 100644
---- a/drivers/net/ethernet/intel/igc/igc_hw.h
-+++ b/drivers/net/ethernet/intel/igc/igc_hw.h
-@@ -92,7 +92,6 @@ struct igc_mac_info {
- 	bool asf_firmware_present;
- 	bool arc_subsystem_valid;
- 
--	bool autoneg;
- 	bool autoneg_failed;
- 	bool get_link_status;
- };
-diff --git a/drivers/net/ethernet/intel/igc/igc_mac.c b/drivers/net/ethernet/intel/igc/igc_mac.c
-index a5c4b19d71a2..d344e0a1cd5e 100644
---- a/drivers/net/ethernet/intel/igc/igc_mac.c
-+++ b/drivers/net/ethernet/intel/igc/igc_mac.c
-@@ -386,14 +386,6 @@ s32 igc_check_for_copper_link(struct igc_hw *hw)
- 	 */
- 	igc_check_downshift(hw);
- 
--	/* If we are forcing speed/duplex, then we simply return since
--	 * we have already determined whether we have link or not.
--	 */
--	if (!mac->autoneg) {
--		ret_val = -IGC_ERR_CONFIG;
--		goto out;
--	}
--
- 	/* Auto-Neg is enabled.  Auto Speed Detection takes care
- 	 * of MAC speed/duplex configuration.  So we only need to
- 	 * configure Collision Distance in the MAC.
-@@ -468,173 +460,171 @@ s32 igc_config_fc_after_link_up(struct igc_hw *hw)
- 		goto out;
- 	}
- 
--	/* Check for the case where we have copper media and auto-neg is
--	 * enabled.  In this case, we need to check and see if Auto-Neg
--	 * has completed, and if so, how the PHY and link partner has
--	 * flow control configured.
-+	/* In auto-neg, we need to check and see if Auto-Neg has completed,
-+	 * and if so, how the PHY and link partner has flow control
-+	 * configured.
- 	 */
--	if (mac->autoneg) {
--		/* Read the MII Status Register and check to see if AutoNeg
--		 * has completed.  We read this twice because this reg has
--		 * some "sticky" (latched) bits.
--		 */
--		ret_val = hw->phy.ops.read_reg(hw, PHY_STATUS,
--					       &mii_status_reg);
--		if (ret_val)
--			goto out;
--		ret_val = hw->phy.ops.read_reg(hw, PHY_STATUS,
--					       &mii_status_reg);
--		if (ret_val)
--			goto out;
- 
--		if (!(mii_status_reg & MII_SR_AUTONEG_COMPLETE)) {
--			hw_dbg("Copper PHY and Auto Neg has not completed.\n");
--			goto out;
--		}
-+	/* Read the MII Status Register and check to see if AutoNeg
-+	 * has completed.  We read this twice because this reg has
-+	 * some "sticky" (latched) bits.
-+	 */
-+	ret_val = hw->phy.ops.read_reg(hw, PHY_STATUS,
-+				       &mii_status_reg);
-+	if (ret_val)
-+		goto out;
-+	ret_val = hw->phy.ops.read_reg(hw, PHY_STATUS,
-+				       &mii_status_reg);
-+	if (ret_val)
-+		goto out;
- 
--		/* The AutoNeg process has completed, so we now need to
--		 * read both the Auto Negotiation Advertisement
--		 * Register (Address 4) and the Auto_Negotiation Base
--		 * Page Ability Register (Address 5) to determine how
--		 * flow control was negotiated.
--		 */
--		ret_val = hw->phy.ops.read_reg(hw, PHY_AUTONEG_ADV,
--					       &mii_nway_adv_reg);
--		if (ret_val)
--			goto out;
--		ret_val = hw->phy.ops.read_reg(hw, PHY_LP_ABILITY,
--					       &mii_nway_lp_ability_reg);
--		if (ret_val)
--			goto out;
--		/* Two bits in the Auto Negotiation Advertisement Register
--		 * (Address 4) and two bits in the Auto Negotiation Base
--		 * Page Ability Register (Address 5) determine flow control
--		 * for both the PHY and the link partner.  The following
--		 * table, taken out of the IEEE 802.3ab/D6.0 dated March 25,
--		 * 1999, describes these PAUSE resolution bits and how flow
--		 * control is determined based upon these settings.
--		 * NOTE:  DC = Don't Care
--		 *
--		 *   LOCAL DEVICE  |   LINK PARTNER
--		 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | NIC Resolution
--		 *-------|---------|-------|---------|--------------------
--		 *   0   |    0    |  DC   |   DC    | igc_fc_none
--		 *   0   |    1    |   0   |   DC    | igc_fc_none
--		 *   0   |    1    |   1   |    0    | igc_fc_none
--		 *   0   |    1    |   1   |    1    | igc_fc_tx_pause
--		 *   1   |    0    |   0   |   DC    | igc_fc_none
--		 *   1   |   DC    |   1   |   DC    | igc_fc_full
--		 *   1   |    1    |   0   |    0    | igc_fc_none
--		 *   1   |    1    |   0   |    1    | igc_fc_rx_pause
--		 *
--		 * Are both PAUSE bits set to 1?  If so, this implies
--		 * Symmetric Flow Control is enabled at both ends.  The
--		 * ASM_DIR bits are irrelevant per the spec.
--		 *
--		 * For Symmetric Flow Control:
--		 *
--		 *   LOCAL DEVICE  |   LINK PARTNER
--		 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | Result
--		 *-------|---------|-------|---------|--------------------
--		 *   1   |   DC    |   1   |   DC    | IGC_fc_full
--		 *
--		 */
--		if ((mii_nway_adv_reg & NWAY_AR_PAUSE) &&
--		    (mii_nway_lp_ability_reg & NWAY_LPAR_PAUSE)) {
--			/* Now we need to check if the user selected RX ONLY
--			 * of pause frames.  In this case, we had to advertise
--			 * FULL flow control because we could not advertise RX
--			 * ONLY. Hence, we must now check to see if we need to
--			 * turn OFF  the TRANSMISSION of PAUSE frames.
--			 */
--			if (hw->fc.requested_mode == igc_fc_full) {
--				hw->fc.current_mode = igc_fc_full;
--				hw_dbg("Flow Control = FULL.\n");
--			} else {
--				hw->fc.current_mode = igc_fc_rx_pause;
--				hw_dbg("Flow Control = RX PAUSE frames only.\n");
--			}
--		}
-+	if (!(mii_status_reg & MII_SR_AUTONEG_COMPLETE)) {
-+		hw_dbg("Copper PHY and Auto Neg has not completed.\n");
-+		goto out;
-+	}
- 
--		/* For receiving PAUSE frames ONLY.
--		 *
--		 *   LOCAL DEVICE  |   LINK PARTNER
--		 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | Result
--		 *-------|---------|-------|---------|--------------------
--		 *   0   |    1    |   1   |    1    | igc_fc_tx_pause
--		 */
--		else if (!(mii_nway_adv_reg & NWAY_AR_PAUSE) &&
--			 (mii_nway_adv_reg & NWAY_AR_ASM_DIR) &&
--			 (mii_nway_lp_ability_reg & NWAY_LPAR_PAUSE) &&
--			 (mii_nway_lp_ability_reg & NWAY_LPAR_ASM_DIR)) {
--			hw->fc.current_mode = igc_fc_tx_pause;
--			hw_dbg("Flow Control = TX PAUSE frames only.\n");
--		}
--		/* For transmitting PAUSE frames ONLY.
--		 *
--		 *   LOCAL DEVICE  |   LINK PARTNER
--		 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | Result
--		 *-------|---------|-------|---------|--------------------
--		 *   1   |    1    |   0   |    1    | igc_fc_rx_pause
--		 */
--		else if ((mii_nway_adv_reg & NWAY_AR_PAUSE) &&
--			 (mii_nway_adv_reg & NWAY_AR_ASM_DIR) &&
--			 !(mii_nway_lp_ability_reg & NWAY_LPAR_PAUSE) &&
--			 (mii_nway_lp_ability_reg & NWAY_LPAR_ASM_DIR)) {
--			hw->fc.current_mode = igc_fc_rx_pause;
--			hw_dbg("Flow Control = RX PAUSE frames only.\n");
--		}
--		/* Per the IEEE spec, at this point flow control should be
--		 * disabled.  However, we want to consider that we could
--		 * be connected to a legacy switch that doesn't advertise
--		 * desired flow control, but can be forced on the link
--		 * partner.  So if we advertised no flow control, that is
--		 * what we will resolve to.  If we advertised some kind of
--		 * receive capability (Rx Pause Only or Full Flow Control)
--		 * and the link partner advertised none, we will configure
--		 * ourselves to enable Rx Flow Control only.  We can do
--		 * this safely for two reasons:  If the link partner really
--		 * didn't want flow control enabled, and we enable Rx, no
--		 * harm done since we won't be receiving any PAUSE frames
--		 * anyway.  If the intent on the link partner was to have
--		 * flow control enabled, then by us enabling RX only, we
--		 * can at least receive pause frames and process them.
--		 * This is a good idea because in most cases, since we are
--		 * predominantly a server NIC, more times than not we will
--		 * be asked to delay transmission of packets than asking
--		 * our link partner to pause transmission of frames.
-+	/* The AutoNeg process has completed, so we now need to
-+	 * read both the Auto Negotiation Advertisement
-+	 * Register (Address 4) and the Auto_Negotiation Base
-+	 * Page Ability Register (Address 5) to determine how
-+	 * flow control was negotiated.
-+	 */
-+	ret_val = hw->phy.ops.read_reg(hw, PHY_AUTONEG_ADV,
-+				       &mii_nway_adv_reg);
-+	if (ret_val)
-+		goto out;
-+	ret_val = hw->phy.ops.read_reg(hw, PHY_LP_ABILITY,
-+				       &mii_nway_lp_ability_reg);
-+	if (ret_val)
-+		goto out;
-+	/* Two bits in the Auto Negotiation Advertisement Register
-+	 * (Address 4) and two bits in the Auto Negotiation Base
-+	 * Page Ability Register (Address 5) determine flow control
-+	 * for both the PHY and the link partner.  The following
-+	 * table, taken out of the IEEE 802.3ab/D6.0 dated March 25,
-+	 * 1999, describes these PAUSE resolution bits and how flow
-+	 * control is determined based upon these settings.
-+	 * NOTE:  DC = Don't Care
-+	 *
-+	 *   LOCAL DEVICE  |   LINK PARTNER
-+	 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | NIC Resolution
-+	 *-------|---------|-------|---------|--------------------
-+	 *   0   |    0    |  DC   |   DC    | igc_fc_none
-+	 *   0   |    1    |   0   |   DC    | igc_fc_none
-+	 *   0   |    1    |   1   |    0    | igc_fc_none
-+	 *   0   |    1    |   1   |    1    | igc_fc_tx_pause
-+	 *   1   |    0    |   0   |   DC    | igc_fc_none
-+	 *   1   |   DC    |   1   |   DC    | igc_fc_full
-+	 *   1   |    1    |   0   |    0    | igc_fc_none
-+	 *   1   |    1    |   0   |    1    | igc_fc_rx_pause
-+	 *
-+	 * Are both PAUSE bits set to 1?  If so, this implies
-+	 * Symmetric Flow Control is enabled at both ends.  The
-+	 * ASM_DIR bits are irrelevant per the spec.
-+	 *
-+	 * For Symmetric Flow Control:
-+	 *
-+	 *   LOCAL DEVICE  |   LINK PARTNER
-+	 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | Result
-+	 *-------|---------|-------|---------|--------------------
-+	 *   1   |   DC    |   1   |   DC    | IGC_fc_full
-+	 *
-+	 */
-+	if ((mii_nway_adv_reg & NWAY_AR_PAUSE) &&
-+	    (mii_nway_lp_ability_reg & NWAY_LPAR_PAUSE)) {
-+		/* Now we need to check if the user selected RX ONLY
-+		 * of pause frames.  In this case, we had to advertise
-+		 * FULL flow control because we could not advertise RX
-+		 * ONLY. Hence, we must now check to see if we need to
-+		 * turn OFF  the TRANSMISSION of PAUSE frames.
- 		 */
--		else if ((hw->fc.requested_mode == igc_fc_none) ||
--			 (hw->fc.requested_mode == igc_fc_tx_pause) ||
--			 (hw->fc.strict_ieee)) {
--			hw->fc.current_mode = igc_fc_none;
--			hw_dbg("Flow Control = NONE.\n");
-+		if (hw->fc.requested_mode == igc_fc_full) {
-+			hw->fc.current_mode = igc_fc_full;
-+			hw_dbg("Flow Control = FULL.\n");
- 		} else {
- 			hw->fc.current_mode = igc_fc_rx_pause;
- 			hw_dbg("Flow Control = RX PAUSE frames only.\n");
- 		}
-+	}
- 
--		/* Now we need to do one last check...  If we auto-
--		 * negotiated to HALF DUPLEX, flow control should not be
--		 * enabled per IEEE 802.3 spec.
--		 */
--		ret_val = hw->mac.ops.get_speed_and_duplex(hw, &speed, &duplex);
--		if (ret_val) {
--			hw_dbg("Error getting link speed and duplex\n");
--			goto out;
--		}
-+	/* For receiving PAUSE frames ONLY.
-+	 *
-+	 *   LOCAL DEVICE  |   LINK PARTNER
-+	 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | Result
-+	 *-------|---------|-------|---------|--------------------
-+	 *   0   |    1    |   1   |    1    | igc_fc_tx_pause
-+	 */
-+	else if (!(mii_nway_adv_reg & NWAY_AR_PAUSE) &&
-+		 (mii_nway_adv_reg & NWAY_AR_ASM_DIR) &&
-+		 (mii_nway_lp_ability_reg & NWAY_LPAR_PAUSE) &&
-+		 (mii_nway_lp_ability_reg & NWAY_LPAR_ASM_DIR)) {
-+		hw->fc.current_mode = igc_fc_tx_pause;
-+		hw_dbg("Flow Control = TX PAUSE frames only.\n");
-+	}
-+	/* For transmitting PAUSE frames ONLY.
-+	 *
-+	 *   LOCAL DEVICE  |   LINK PARTNER
-+	 * PAUSE | ASM_DIR | PAUSE | ASM_DIR | Result
-+	 *-------|---------|-------|---------|--------------------
-+	 *   1   |    1    |   0   |    1    | igc_fc_rx_pause
-+	 */
-+	else if ((mii_nway_adv_reg & NWAY_AR_PAUSE) &&
-+		 (mii_nway_adv_reg & NWAY_AR_ASM_DIR) &&
-+		 !(mii_nway_lp_ability_reg & NWAY_LPAR_PAUSE) &&
-+		 (mii_nway_lp_ability_reg & NWAY_LPAR_ASM_DIR)) {
-+		hw->fc.current_mode = igc_fc_rx_pause;
-+		hw_dbg("Flow Control = RX PAUSE frames only.\n");
-+	}
-+	/* Per the IEEE spec, at this point flow control should be
-+	 * disabled.  However, we want to consider that we could
-+	 * be connected to a legacy switch that doesn't advertise
-+	 * desired flow control, but can be forced on the link
-+	 * partner.  So if we advertised no flow control, that is
-+	 * what we will resolve to.  If we advertised some kind of
-+	 * receive capability (Rx Pause Only or Full Flow Control)
-+	 * and the link partner advertised none, we will configure
-+	 * ourselves to enable Rx Flow Control only.  We can do
-+	 * this safely for two reasons:  If the link partner really
-+	 * didn't want flow control enabled, and we enable Rx, no
-+	 * harm done since we won't be receiving any PAUSE frames
-+	 * anyway.  If the intent on the link partner was to have
-+	 * flow control enabled, then by us enabling RX only, we
-+	 * can at least receive pause frames and process them.
-+	 * This is a good idea because in most cases, since we are
-+	 * predominantly a server NIC, more times than not we will
-+	 * be asked to delay transmission of packets than asking
-+	 * our link partner to pause transmission of frames.
-+	 */
-+	else if ((hw->fc.requested_mode == igc_fc_none) ||
-+		 (hw->fc.requested_mode == igc_fc_tx_pause) ||
-+		 (hw->fc.strict_ieee)) {
-+		hw->fc.current_mode = igc_fc_none;
-+		hw_dbg("Flow Control = NONE.\n");
-+	} else {
-+		hw->fc.current_mode = igc_fc_rx_pause;
-+		hw_dbg("Flow Control = RX PAUSE frames only.\n");
-+	}
- 
--		if (duplex == HALF_DUPLEX)
--			hw->fc.current_mode = igc_fc_none;
-+	/* Now we need to do one last check...  If we auto-
-+	 * negotiated to HALF DUPLEX, flow control should not be
-+	 * enabled per IEEE 802.3 spec.
-+	 */
-+	ret_val = hw->mac.ops.get_speed_and_duplex(hw, &speed, &duplex);
-+	if (ret_val) {
-+		hw_dbg("Error getting link speed and duplex\n");
-+		goto out;
-+	}
- 
--		/* Now we call a subroutine to actually force the MAC
--		 * controller to use the correct flow control settings.
--		 */
--		ret_val = igc_force_mac_fc(hw);
--		if (ret_val) {
--			hw_dbg("Error forcing flow control settings\n");
--			goto out;
--		}
-+	if (duplex == HALF_DUPLEX)
-+		hw->fc.current_mode = igc_fc_none;
-+
-+	/* Now we call a subroutine to actually force the MAC
-+	 * controller to use the correct flow control settings.
-+	 */
-+	ret_val = igc_force_mac_fc(hw);
-+	if (ret_val) {
-+		hw_dbg("Error forcing flow control settings\n");
-+		goto out;
- 	}
- 
- out:
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 6e70bca15db1..27872bdea9bd 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7108,7 +7108,6 @@ static int igc_probe(struct pci_dev *pdev,
- 
- 	/* Initialize link properties that are user-changeable */
- 	adapter->fc_autoneg = true;
--	hw->mac.autoneg = true;
- 	hw->phy.autoneg_advertised = 0xaf;
- 
- 	hw->fc.requested_mode = igc_fc_default;
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.c b/drivers/net/ethernet/intel/igc/igc_phy.c
-index 2801e5f24df9..6c4d204aecfa 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.c
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.c
-@@ -494,24 +494,12 @@ s32 igc_setup_copper_link(struct igc_hw *hw)
- 	s32 ret_val = 0;
- 	bool link;
- 
--	if (hw->mac.autoneg) {
--		/* Setup autoneg and flow control advertisement and perform
--		 * autonegotiation.
--		 */
--		ret_val = igc_copper_link_autoneg(hw);
--		if (ret_val)
--			goto out;
--	} else {
--		/* PHY will be set to 10H, 10F, 100H or 100F
--		 * depending on user settings.
--		 */
--		hw_dbg("Forcing Speed and Duplex\n");
--		ret_val = hw->phy.ops.force_speed_duplex(hw);
--		if (ret_val) {
--			hw_dbg("Error Forcing Speed and Duplex\n");
--			goto out;
--		}
--	}
-+	/* Setup autoneg and flow control advertisement and perform
-+	 * autonegotiation.
-+	 */
-+	ret_val = igc_copper_link_autoneg(hw);
-+	if (ret_val)
-+		goto out;
- 
- 	/* Check link status. Wait up to 100 microseconds for link to become
- 	 * valid.
+-	/* intialize ITR */
++	/* initialize ITR */
+ 	if (rxr_count) {
+ 		/* rx or rx/tx vector */
+ 		if (!adapter->rx_itr_setting || adapter->rx_itr_setting > 3)
+@@ -3906,7 +3906,7 @@ static void igb_remove(struct pci_dev *pdev)
+  *
+  *  This function initializes the vf specific data storage and then attempts to
+  *  allocate the VFs.  The reason for ordering it this way is because it is much
+- *  mor expensive time wise to disable SR-IOV than it is to allocate and free
++ *  more expensive time wise to disable SR-IOV than it is to allocate and free
+  *  the memory for the VFs.
+  **/
+ static void igb_probe_vfs(struct igb_adapter *adapter)
 -- 
 2.42.0
 
