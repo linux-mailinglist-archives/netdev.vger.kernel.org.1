@@ -1,111 +1,91 @@
-Return-Path: <netdev+bounces-144569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105AB9C7CF5
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:33:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032349C7D0E
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:41:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90362819E4
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:33:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8001C1F22850
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50411E1A28;
-	Wed, 13 Nov 2024 20:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDCD2064E9;
+	Wed, 13 Nov 2024 20:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jeLbu6Uu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S5xmz/uf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B42318A6C5;
-	Wed, 13 Nov 2024 20:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADBF2036F2;
+	Wed, 13 Nov 2024 20:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731530004; cv=none; b=jpiELOBJKH6o4oIUYigdOzcvJZ7MJLeEzrpsTQCBYeHDHUN2xd59DoUg6JKGMLT57g/Xdwf7XqQy29CAbsli5GB0R2lZ99BmYqKsn1DkImhKacjQ75cniJ3Mds7uqkq2FO4Z8KUkohCODqrjfeJNrHFKidyWapEzKHdcCYYUV+M=
+	t=1731530482; cv=none; b=dlYqoBTUegO/4dei0oplkQcXghvqW+6XKS5SpZbxZ0ECAIl0OSwWaY/EHYnrFfc1fDejyE5F+f8P5zIVihjc46Bte3YEFVNiDY6uPXvbZFPW3YyhaEOwsKiapv1PU+Ws/a6shTcxx+uuvF7fJhYRnQbu52gfci4LJqZfvOm4wdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731530004; c=relaxed/simple;
-	bh=1qkybLLJBacioaCp847jzAEZavaYdaBya2lzXuTEQ5o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cC/Ey7vaSZRyGbOUaNs0X8tM9cPlqQKQCbtfPRT4iY6hR+mX4ldkSj9MN+hEwK+nTFQc/1ORa39CGeIwqCOIjLAIt/Gs48sX5V2DRDiedMegmagKfpKEJugGL1ZwKSOkFUZ+UJHXrPLTAU/um47ERVQ+IS7Z0QvEOl4sS1MuaBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jeLbu6Uu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58F8FC4CED2;
-	Wed, 13 Nov 2024 20:33:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731530004;
-	bh=1qkybLLJBacioaCp847jzAEZavaYdaBya2lzXuTEQ5o=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=jeLbu6UuqKt4Et49AKZYE2XlcvOh7sZZ77E5BIZAhe0+bKIwWpWcopmS37ZFvV47J
-	 Xn36XkqV32F8l0N7sm1iB3H7dcrq62+cG8pHz6WBjBhHPVNDY+r0c9jvQF1lPnr4pf
-	 lK7M8FrbIt/FZD/jwgujeBv1dLT06uVTQfb0xcEtkDeq8BpGUmWzwVVBl2PwoKcfz/
-	 5HcH75y/VG424c9pqtlh7YdbVyDrH1xHgK9ENLbmg4ZJM9kVJkwZPanm7FhEiWwLvb
-	 CMLi1NEyjUt0rlL2E/TYbh51B2oAyyhLUk0lcYr2Q1sM65XVP44oK6yLlIiddVYeL7
-	 VfKjErO2dXhRg==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539e8607c2aso8081931e87.3;
-        Wed, 13 Nov 2024 12:33:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUO8KEBM6KE2jAgD7kv7FDpYTRAVAN07PXUsH8mGg3dxdhT+Ob3YHTmlaqHbLue5X543/YPWzNU@vger.kernel.org, AJvYcCV8lGrRuzf5dQxkzV3xKpTshQwFam1yx/BXlToK5vUlsn9dX2QbSjc571EZ0LrrTldeGFN6bUX/5YUjPEk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznH2lhZ9JrA+ZeavG7OQyjWoupHoQjwEtXdRaBXYmkL0VigXq5
-	Em9UiZOwaH/u+J3FV5tM7lAyG8dMzVydHKArWtdOAMfKHCBzPXobtkxHERK1DTA0BQ9eFyT+cfD
-	GkBKwqhGjj4QqunFp0TKo13EO1Xs=
-X-Google-Smtp-Source: AGHT+IHn9oRm8ELrPUSJsk7WRdtvxyVbfPTpgRXaJzicZWCwkgORHUqXJ7+Io6pdVeIlKbzDNaDWddiN68gLbLOXOE0=
-X-Received: by 2002:ac2:4e13:0:b0:53b:1fc4:46c8 with SMTP id
- 2adb3069b0e04-53d862c58d4mr10744151e87.27.1731530003051; Wed, 13 Nov 2024
- 12:33:23 -0800 (PST)
+	s=arc-20240116; t=1731530482; c=relaxed/simple;
+	bh=UmCPqZHRJKUv6huErNv7ccyP9edlm5rjiZC0/3bMbHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HR5lh7AqeqRNsFTjTLhU56m6Sda1SZeNlmIRI4LuGLZkqoyV3aN3rfwhsj9EqiZSiU8pDLdVEFITOCA++vsmYE9r4gx0HrS+9L1a+Dfk+MjaMFHpO3ufkHv/eN+vRrgZhWHvHRJ5Fpussdmfpom/tHLgYrvdwL47z3BBIPu7fZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=S5xmz/uf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xyXDXrgpgdM6KcxgvcDZmedbCSrF14uf4voKguMkgic=; b=S5xmz/ufKaSIZhkuFsI0BiYEBt
+	R5AOLzH5R3qmpR/US6sZGlVA43e1KeASesF9lD7W3IQc2xpoZzWkQrcWmk01rS84ibn0+a0Zz1B0J
+	BRXLT4cN9b+pBJkRjFBlns1lkzO31WVnJo4bCGXy3eBsfzIAVvRaUj/mv+iGK4h9XL7M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tBKAk-00DCZw-Fb; Wed, 13 Nov 2024 21:41:06 +0100
+Date: Wed, 13 Nov 2024 21:41:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	sudongming1@huawei.com, xujunsheng@huawei.com,
+	shiyongbang@huawei.com, libaihan@huawei.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 net-next 5/7] net: hibmcge: Add pauseparam supported
+ in this module
+Message-ID: <08bbffc1-3c99-4b4a-a3b3-02707752398b@lunn.ch>
+References: <20241111145558.1965325-1-shaojijie@huawei.com>
+ <20241111145558.1965325-6-shaojijie@huawei.com>
+ <efd481a8-d020-452b-b29b-dfa373017f1f@lunn.ch>
+ <98187fe7-23f1-4c52-a62f-c96e720cb491@huawei.com>
+ <d22285c6-8286-4db0-86ca-90fff08e3a42@lunn.ch>
+ <2d8e467d-b8e0-4728-ac2c-fba70a53bd9f@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241111-packing-pack-fields-and-ice-implementation-v5-0-80c07349e6b7@intel.com>
- <20241111-packing-pack-fields-and-ice-implementation-v5-3-80c07349e6b7@intel.com>
-In-Reply-To: <20241111-packing-pack-fields-and-ice-implementation-v5-3-80c07349e6b7@intel.com>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Thu, 14 Nov 2024 05:32:46 +0900
-X-Gmail-Original-Message-ID: <CAK7LNARAsyOparQ1YxgPh9S4A-uzF04k+91t7Xy1jdTy6uT+Vg@mail.gmail.com>
-Message-ID: <CAK7LNARAsyOparQ1YxgPh9S4A-uzF04k+91t7Xy1jdTy6uT+Vg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/9] lib: packing: add pack_fields() and unpack_fields()
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	netdev <netdev@vger.kernel.org>, linux-kbuild@vger.kernel.org, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d8e467d-b8e0-4728-ac2c-fba70a53bd9f@huawei.com>
 
-On Mon, Nov 11, 2024 at 5:08=E2=80=AFPM Jacob Keller <jacob.e.keller@intel.=
-com> wrote:
->
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
->
-> This is new API which caters to the following requirements:
->
-> - Pack or unpack a large number of fields to/from a buffer with a small
->   code footprint. The current alternative is to open-code a large number
->   of calls to pack() and unpack(), or to use packing() to reduce that
->   number to half. But packing() is not const-correct.
->
-> - Use unpacked numbers stored in variables smaller than u64. This
->   reduces the rodata footprint of the stored field arrays.
->
-> - Perform error checking at compile time, rather than runtime, and return
->   void from the API functions. Because the C preprocessor can't generat
->   variable length code (loops), we can't easily use macros to implement t=
-he
->   overlap checks at compile time.
->
->   Instead, check for field ordering and overlap in modpost.
+> Maybe there is an error in this code.
+> If I want to disable auto-neg pause, do I need to set phy_set_asym_pause(phydev, 0, 0)?
 
-This is over-engineering.
+You could. It is not actually clear to me what you should tell the
+link peer when you decide to not use pause autoneg. By passing 0, 0,
+you are telling the peer you don't support pause, when in fact you do,
+and the configuration is hard coded. Not using pause autoneg really
+only makes sense when you do it to both peers. And then the
+negotiation configuration does not matter.
 
-modpost should not be bothered just for a small library like this.
+phylink makes this a lot easier, it hides this all away, leaving the
+MAC driver to just program the hardware.
 
-Please do sanity checks within lib/packing.c
+	Andrew
 
-
-
---=20
-Best Regards
-Masahiro Yamada
 
