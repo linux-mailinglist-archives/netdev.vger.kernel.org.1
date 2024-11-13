@@ -1,200 +1,244 @@
-Return-Path: <netdev+bounces-144301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932469C6806
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:20:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2909C680C
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 374DD280E01
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 04:20:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 831B9B2480F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 04:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2D7482EB;
-	Wed, 13 Nov 2024 04:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6721615CD58;
+	Wed, 13 Nov 2024 04:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AXSTBP6P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CoGLsQ6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C5F230984;
-	Wed, 13 Nov 2024 04:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5870D230984
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 04:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731471612; cv=none; b=XL59MSDfrak6lm24vgi3uv28DAYiTyMME7jnYxfsxcaTRpk4pyoT+vWhYkZ/DF+wqg5VVUyD0wWfqfeaDrfwfScNssZQOeSfx9jdht6JgyeZP4p8pvV/jCotOf7CaGOQEgFfp4bGseDO0RjajRTEu0MpsVzuVGKltXHGOGAXjrE=
+	t=1731472033; cv=none; b=ZJdeyTEEPkY1zgeGcjWdWRaC3JKY/ra73hCQ0vuPjYxVpJ7V0y82dTBxhWWNPW8cmEBu2a+/rh8lcojyXS+UfgUT15a3Z/f59mZfsijRDMA4Z7TYZMmgIj9NfXGlgKX0PzzOrLPYU+9Wd8SkgrPdQzFwEq/WMr2td07LB2mpkSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731471612; c=relaxed/simple;
-	bh=jhWwP/O8JhvbiiG5pI0v3W7Vre4PvvpIYErYutz+W1M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IRrol2pbmci0rQVnRduYj0awdvmy00CI1epCJvNjGCc2Nu1Hh20JNGNE00cIPcQgj3LIotcoMo/liPhqBc7yJEleLo74YyihpotC20g+NfdAuzRfkDD+WBIn1qJNeXiNalW1W17q7uIH8jJ5dO6fDqX2nF7gsSyvrghjGOqndBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AXSTBP6P; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1731472033; c=relaxed/simple;
+	bh=1ME7PDPqd3491CNKzMBYktquuZVHUC0mAsyPaon0wiY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PZSQCnAsZdOdIUVlbUYqeOyR3Grf9BG6JK4vfVS9e8LWjLUXVEGfEhPbJLkKdEOszPALHvSt4HCBOxU5mXBJY9smRxkf5QMR8P9rYmhHk2LM+TgCC6y4+gWidp+D5LVe/PcPVJ/hiIPCXa+2I+thMeogZDfTDiBsQ6dPVxIgIdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CoGLsQ6y; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539e64ed090so8e87.1
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 20:27:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731471610; x=1763007610;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pg9mM9J6Dxw/+7gv+bmmeu5fOzsl43yYd8X2FRBzK08=;
-  b=AXSTBP6POrNgJZfzqEPaEacI5lFHcrX/3JG40N186rlt7W7CmYjW0pNH
-   IOrz6Uq/Es3V1/jOSwcl8wTkkav99d0/BECBL8JdBt5sYbNoigm1ZXs0E
-   MvxSUpvdnFAT65pugU3unMVL/8QQfBPjG6MLeqbHfFrGZ4JNmZKEo3sMq
-   0=;
-X-IronPort-AV: E=Sophos;i="6.12,150,1728950400"; 
-   d="scan'208";a="351877170"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 04:20:08 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:27141]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.214:2525] with esmtp (Farcaster)
- id fdf33349-ad14-4138-a6ff-216e54c47000; Wed, 13 Nov 2024 04:20:08 +0000 (UTC)
-X-Farcaster-Flow-ID: fdf33349-ad14-4138-a6ff-216e54c47000
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 13 Nov 2024 04:20:06 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 13 Nov 2024 04:20:03 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <liujian56@huawei.com>
-CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
-	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
-	<horms@kernel.org>, <jlayton@kernel.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-nfs@vger.kernel.org>, <neilb@suse.de>,
-	<netdev@vger.kernel.org>, <okorniev@redhat.com>, <pabeni@redhat.com>,
-	<tom@talpey.com>, <trondmy@kernel.org>
-Subject: Re: [PATCH net v4] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
-Date: Tue, 12 Nov 2024 20:19:58 -0800
-Message-ID: <20241113041958.56568-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241112135434.803890-1-liujian56@huawei.com>
-References: <20241112135434.803890-1-liujian56@huawei.com>
+        d=google.com; s=20230601; t=1731472029; x=1732076829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QThO7EgtQuVWhNQW/XWzM7RwCcNoGRfMt97x7tFusKY=;
+        b=CoGLsQ6yKvJt/HwB/jyKHnfMT2Ls7HRKCkHkXNq8VgQ6PTX0GpQc8SUU2kann2vFJ/
+         2kfsCvgB/7x5qNT7SSHWk42pRyL2M3YUdL/A0NhBWmW3+S8tGrxn33flF79iWZ5hEWUd
+         YLjJpaGMjMbVU1V/3zzpEa25+0J7myRHq1Bvn0C9j1UlUyZHFhh8Nx22RuaRT+oXyy+o
+         yT9zD0lt/OuXh2nbTvJulaSjM/Dyy/yZRygo6cTFRo4JuPOXq6CW51neF2TtLm9prGBm
+         1KtBTCRV/3V2hxfrvueUTcW/Kck3MVeQwcrfijc08TUSSH2cNF7YlcgvBqDlTn/+uBmY
+         /Wxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731472029; x=1732076829;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QThO7EgtQuVWhNQW/XWzM7RwCcNoGRfMt97x7tFusKY=;
+        b=nepzd9dpj7SPcB09ixMDZICIujffQz0xPShxPoWbh960re0otX2iiK/i+ls+cdL6Fl
+         SStQXSynD+Kwu4+yuG7CUqtM8WcHfPiZf/dIQYderS/34RkJXiX9haV47vavj+e/0WzP
+         xQanqG7cGHeNH4WegWxaS0R85ZFwNU+QWVl59nrQKScvREKCgy7y6ADO1QAaeGYlpt6T
+         QW1w4qYvCUdl90630zNzASiE5vAj2+7d9UG8T2dPxihfwW1ncp0pRBp+VFblZx6nDrd3
+         g0Y5NGZzot+9Ca1splyW3y9m85g4eeI14dQab0E2VNiaFFuPhxgCWtHuZW92qV6bkZp9
+         TcAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgrtvkeRsVtENX9/ASkS17cTD1RK2moYy0/ZkEPzuoPlvdnoDHH3/5tRuMhl0MOP19opweyc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Wpp1klaI1sD48s+ERhjRzurEsA8XImMXraS6wMawxB1Nht4I
+	u9MFXkieI6SeIwiNPdjKV/Wlnj1utRP9YvJc4WYivLsEX5WsO5TPUA8fTFBv9k+FrfiACbGmgSH
+	n1tiK1xoOjrP+IO3aR+779HdGB/FABg++nwUq
+X-Gm-Gg: ASbGncvemc0nOI7jh/aRUSZdk+dxcs/jY/P4MRDoXmd8W7niI1hviyqiBsZfkFhPN3C
+	iZw8WsTtD7CIFb46Hmxs0Op0VydjRH/uqSmo31nSSR6u4IPB7grcFlr6RTnuCly5b
+X-Google-Smtp-Source: AGHT+IHAzsO794M5B2GmbH1Xmxi9JkvYY0pGB0Ri1pDCwCrUp9RX5DK3Gb2pxzi/RfQC28jvJE11YK5xTt5ZPqsU8U4=
+X-Received: by 2002:a05:6512:54d:b0:535:60b1:ffc2 with SMTP id
+ 2adb3069b0e04-53da06d8699mr2895e87.0.1731472028396; Tue, 12 Nov 2024 20:27:08
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20241110081953.121682-1-yuyanghuang@google.com>
+ <ZzMlvCA4e3YhYTPn@fedora> <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
+ <CADXeF1HMvDnKNSNCh1ULsspC+gR+S0eTE40MRhA+OH16zJKM6A@mail.gmail.com> <ce2359c3-a6eb-4ef3-b2cf-321c5c282fab@lunn.ch>
+In-Reply-To: <ce2359c3-a6eb-4ef3-b2cf-321c5c282fab@lunn.ch>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Wed, 13 Nov 2024 13:26:29 +0900
+Message-ID: <CADXeF1FYoXTixLFFhESDkCo2HXG3JAzzdMCfkFrr2dqmRVQcWg@mail.gmail.com>
+Subject: Re: [PATCH net-next] netlink: add igmp join/leave notifications
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, 
+	jiri@resnulli.us, stephen@networkplumber.org, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Liu Jian <liujian56@huawei.com>
-Date: Tue, 12 Nov 2024 21:54:34 +0800
-> BUG: KASAN: slab-use-after-free in tcp_write_timer_handler+0x156/0x3e0
-> Read of size 1 at addr ffff888111f322cd by task swapper/0/0
-> 
-> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-dirty #7
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
-> Call Trace:
->  <IRQ>
->  dump_stack_lvl+0x68/0xa0
->  print_address_description.constprop.0+0x2c/0x3d0
->  print_report+0xb4/0x270
->  kasan_report+0xbd/0xf0
->  tcp_write_timer_handler+0x156/0x3e0
->  tcp_write_timer+0x66/0x170
->  call_timer_fn+0xfb/0x1d0
->  __run_timers+0x3f8/0x480
->  run_timer_softirq+0x9b/0x100
->  handle_softirqs+0x153/0x390
->  __irq_exit_rcu+0x103/0x120
->  irq_exit_rcu+0xe/0x20
->  sysvec_apic_timer_interrupt+0x76/0x90
->  </IRQ>
->  <TASK>
->  asm_sysvec_apic_timer_interrupt+0x1a/0x20
-> RIP: 0010:default_idle+0xf/0x20
-> Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90
->  90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 f8 25 00 fb f4 <fa> c3 cc cc cc
->  cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-> RSP: 0018:ffffffffa2007e28 EFLAGS: 00000242
-> RAX: 00000000000f3b31 RBX: 1ffffffff4400fc7 RCX: ffffffffa09c3196
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff9f00590f
-> RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed102360835d
-> R10: ffff88811b041aeb R11: 0000000000000001 R12: 0000000000000000
-> R13: ffffffffa202d7c0 R14: 0000000000000000 R15: 00000000000147d0
->  default_idle_call+0x6b/0xa0
->  cpuidle_idle_call+0x1af/0x1f0
->  do_idle+0xbc/0x130
->  cpu_startup_entry+0x33/0x40
->  rest_init+0x11f/0x210
->  start_kernel+0x39a/0x420
->  x86_64_start_reservations+0x18/0x30
->  x86_64_start_kernel+0x97/0xa0
->  common_startup_64+0x13e/0x141
->  </TASK>
-> 
-> Allocated by task 595:
->  kasan_save_stack+0x24/0x50
->  kasan_save_track+0x14/0x30
->  __kasan_slab_alloc+0x87/0x90
->  kmem_cache_alloc_noprof+0x12b/0x3f0
->  copy_net_ns+0x94/0x380
->  create_new_namespaces+0x24c/0x500
->  unshare_nsproxy_namespaces+0x75/0xf0
->  ksys_unshare+0x24e/0x4f0
->  __x64_sys_unshare+0x1f/0x30
->  do_syscall_64+0x70/0x180
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Freed by task 100:
->  kasan_save_stack+0x24/0x50
->  kasan_save_track+0x14/0x30
->  kasan_save_free_info+0x3b/0x60
->  __kasan_slab_free+0x54/0x70
->  kmem_cache_free+0x156/0x5d0
->  cleanup_net+0x5d3/0x670
->  process_one_work+0x776/0xa90
->  worker_thread+0x2e2/0x560
->  kthread+0x1a8/0x1f0
->  ret_from_fork+0x34/0x60
->  ret_from_fork_asm+0x1a/0x30
-> 
-> Reproduction script:
-> 
-> mkdir -p /mnt/nfsshare
-> mkdir -p /mnt/nfs/netns_1
-> mkfs.ext4 /dev/sdb
-> mount /dev/sdb /mnt/nfsshare
-> systemctl restart nfs-server
-> chmod 777 /mnt/nfsshare
-> exportfs -i -o rw,no_root_squash *:/mnt/nfsshare
-> 
-> ip netns add netns_1
-> ip link add name veth_1_peer type veth peer veth_1
-> ifconfig veth_1_peer 11.11.0.254 up
-> ip link set veth_1 netns netns_1
-> ip netns exec netns_1 ifconfig veth_1 11.11.0.1
-> 
-> ip netns exec netns_1 /root/iptables -A OUTPUT -d 11.11.0.254 -p tcp \
-> 	--tcp-flags FIN FIN  -j DROP
-> 
-> (note: In my environment, a DESTROY_CLIENTID operation is always sent
->  immediately, breaking the nfs tcp connection.)
-> ip netns exec netns_1 timeout -s 9 300 mount -t nfs -o proto=tcp,vers=4.1 \
-> 	11.11.0.254:/mnt/nfsshare /mnt/nfs/netns_1
-> 
-> ip netns del netns_1
-> 
-> The reason here is that the tcp socket in netns_1 (nfs side) has been
-> shutdown and closed (done in xs_destroy), but the FIN message (with ack)
-> is discarded, and the nfsd side keeps sending retransmission messages.
-> As a result, when the tcp sock in netns_1 processes the received message,
-> it sends the message (FIN message) in the sending queue, and the tcp timer
-> is re-established. When the network namespace is deleted, the net structure
-> accessed by tcp's timer handler function causes problems.
-> 
-> To fix this problem, let's hold netns refcnt for the tcp kernel socket as
-> done in other modules. This is an ugly hack which can easily be backported
-> to earlier kernels. A proper fix which cleans up the interfaces will
-> follow, but may not be so easy to backport.
-> 
-> Fixes: 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets.")
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
+>O.K. WiFi is not my area. But i'm more interested in uAPIs, and
+> ensuring you are not adding APIs which promote kernel bypass.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+WiFi chipset vendors must implement the Android WiFi HAL to install
+and read the APF program from WiFi firmware. The Android System Server
+will talk to vendor HAL service using the WiFi HAL. The datapath is:
+Network Stack process -> Android System Server -> vendor HAL service
+-> WiFi driver -> WiFi firmware. The Android WiFi HAL is specific to
+Android. The vendor HAL service, WiFi driver and WiFi firmware are all
+vendor proprietary software.  In other words, those API are not in
+mainline yet.
+
+Feel free to referring to the following page for more details:
+* APF public doc:
+https://source.android.com/docs/core/connect/android-packet-filter
+* APF interpreter:
+https://cs.android.com/android/platform/superproject/main/+/main:hardware/g=
+oogle/apf/v6/
+* APF program generator:
+https://cs.android.com/android/platform/superproject/main/+/main:packages/m=
+odules/NetworkStack/src/android/net/apf/ApfFilter.java
+* APF WiFi HAL:
+https://cs.android.com/android/platform/superproject/main/+/main:hardware/i=
+nterfaces/wifi/aidl/aidl_api/android.hardware.wifi/2/android/hardware/wifi/=
+IWifiStaIface.aidl;l=3D50?q=3DinstallApfPacketFilter
+
+>Is the API to pass this bytestream to the wifi chipset in mainline?
+
+Currently, these APIs are only in Android HAL, which is not in
+mainline. We are working on adding proper APF APIs into ethtool.
+Please some previous discussion here:
+https://lore.kernel.org/netdev/20240813223325.3522113-1-maze@google.com/T/
+
+>And how does APF differ from BPF? Or P4? Why would we want APF when
+>mainline has BPF?
+
+Android has utilized APF on Pixel devices since approximately 2016
+(potentially as early as Pixel 3). All new devices launching with
+Android 14/U+ are required to implement APFv4 on their WiFi client/STA
+interface, enforced through Android VTS. APFv6 introduces support for
+reply sending (e.g., ARP offload). This version is planned to be a
+requirement for new devices launching with Android 16/W (or its
+eventual successor), extending to wired interfaces as well.
+
+APF is distinct from eBPF due to the latter's complexity and larger
+memory footprint.  Many low-end WiFi chipsets lack sufficient RAM in
+firmware to accommodate eBPF. In contrast, the latest APFv6
+interpreter requires only ~5kB of compiled code and ~2kB of bytecode
+(4kB recommended). Even this minimal size presents integration
+challenges for some WiFi chipset vendors.
+
+In sum, eBPF bytecode is very space inefficient compared to APF.
+
+We have collaborated with major WiFi chipset vendors (Broadcom,
+Synaptics, Qualcomm, Mediatek etc.) across various device categories
+(phones, watches, tablets, TV etc.). To my knowledge, none have
+integrated eBPF or P4 into their chipsets. Instead, they have either
+implemented vendor-specific offload solutions or adopted APF. One of
+APF's goals is to defrag the hardware offloading within the Android
+ecosystem.
+
+Moving the APF program generator into kernel space would eliminate the
+need for generating the program in userspace. Ideally, future Linux
+APIs would directly interact with drivers to manage offloads and APF
+loading. The kernel could even be responsible for building the APF
+bytecode, resolving race conditions caused by fetching kernel state
+for bytecode generation.  A BPF program could potentially build the
+APF bytecode during suspend.
+
+However, this is a long-term goal requiring significant design and
+discussion with the upstream Linux community. In the short term, APF
+program generation will remain in user space.
+
+>Do the new netlink message make sense without APF? Can i write a user
+>space IGMP snooping implementation and then call bridge mdb
+>add/del/replace?
+
+The RTM_NEWMULTICAST and RTM_DELMULTICAST events introduced in this
+patch enable user space implementation of IGMP/MLD offloading and
+IPv4/IPv6 multicast filtering. I have limited knowledge on how to
+implement IGMP snooping correctly so I don't know if they are
+sufficient.
+
+These two events have broader applications beyond APF. Any user space
+implementation of IGMP/MLD offloading requires kernel events to signal
+when a multicast address is added or removed. In fact, in the original
+attempt of this patch from "Patrick Ruddy", the commit message also
+mentioned about "having userspace applications to program multicast
+MAC filters in hardware". Which makes me believe APF won't be the only
+potential use case. Please check the following thread for more
+details:  https://lore.kernel.org/r/20180906091056.21109-1-pruddy@vyatta.at=
+t-mail.com
+
+>Assuming i can, why are the WiFi card not using that API, same a switches =
+do?
+
+I'm unsure if I understand your suggestion to use
+RTM_NEWMDB/RTM_DELMDB/RTNLGRP_MDB. Currently, the kernel doesn't send
+these events outside the bridge context.
+Previous patches attempted to reuse these events, but reviewers raised
+concerns about potential confusion for existing users.  IMHO, I agree
+with the reviewer that re-using the RTM_NEWMDB/RTM_DELMDB/RTNLGRP_MDB
+might be confusing and might affect the current applications that use
+those events. Those events seem to make more sense from a bridge
+perspective. Our use cases are targeting the end device which is not a
+bridge or router.
+
+It might also make sense to consider whether to accept the proposed
+APIs from an API completeness perspective. The current netlink API for
+multicast addresses seems incomplete. While RTM_GETMULTICAST exists,
+it only supports IPv6, not IPv4. This limitation forces tools like 'ip
+maddr' to rely on parsing procfs instead of using netlink.
+Additionally, 'ip monitor' cannot track multicast address additions or
+removals. I feel it would make sense to have full netlink based
+dumping and event notification support for both IPv4/IPv6 multicast
+addresses as well.
+
+Thanks,
+Yuyang
+
+
+
+On Wed, Nov 13, 2024 at 10:17=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> On Wed, Nov 13, 2024 at 09:56:17AM +0900, Yuyang Huang wrote:
+> > > Please could you say more about programming hardware offload filters?
+> > > How is this done?
+> >
+> > Sure,  please let me explain a little bit further on how Android
+> > Packet Filter (APF) works here.
+> >
+> > The Android Packet Filter (APF) has two parts:
+> > * APF Interpreter: Runs on the Wi-Fi chipset and executes APF
+> > programs(bytecodes) to decide whether to accept, drop, or reply to
+> > incoming packets.
+>
+> O.K. WiFi is not my area. But i'm more interested in uAPIs, and
+> ensuring you are not adding APIs which promote kernel bypass.
+>
+> Is the API to pass this bytestream to the wifi chipset in mainline?
+> And how does APF differ from BPF? Or P4? Why would we want APF when
+> mainline has BPF?
+>
+> Do the new netlink message make sense without APF? Can i write a user
+> space IGMP snooping implementation and then call bridge mdb
+> add/del/replace? Assuming i can, why are the WiFi card not using that
+> API, same a switches do?
+>
+>         Andrew
 
