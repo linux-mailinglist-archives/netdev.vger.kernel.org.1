@@ -1,121 +1,127 @@
-Return-Path: <netdev+bounces-144336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 951B39C6A86
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 09:26:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F639C6ADC
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 09:48:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50F211F23488
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 08:26:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF868B21CF3
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 08:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7ACF18A6B5;
-	Wed, 13 Nov 2024 08:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476CD17DFFC;
+	Wed, 13 Nov 2024 08:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ltgtRILT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWmgNVL5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6A5178CE4;
-	Wed, 13 Nov 2024 08:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF41175D38
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 08:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731486379; cv=none; b=Wha9CbKDXwUlbLDtoZzEfJl8KkFkS3B86rviAzYY8PA+z8IefVd+RzDs+531HZsSTTifWd7PrjkSN3LmBKhTU5Y3Ztnrkz9UfpZ6uROql3hQ+Yn7bTQo5Rm1PHycp8zmQseW2fZ2CKy9yl7/U1GWIR60SoClKghCja+KEoIsxuE=
+	t=1731487729; cv=none; b=p8Ldu/4P4Xb+DI127L/dfh12NM6w+sg78CtL/oVDAgM3Nmq2kih/IN1BUwh3nhQbS+Vho1QiNG7Jdh6z9ukglPh/agM9x7biBxnuwMBZtuTafWe6hyz+hGVTTHTPvlwLMi0dCdKoOMDUjyAdx2x2Is3L+pVnn7WFQYyPW4kIyyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731486379; c=relaxed/simple;
-	bh=NDnMXOg3a/YTXToq46OO3ahs23cF1TL4Ssqae3WYPzQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kqsXeizI4jqHoQdWjvRf2Dnta6EjMPl+giRa/WYvj9oz7/7Px1tAo7SOfHypwohfAp6hTbl/r73r2KTK2Kuq+Z5lo1q8QuWMjiUgkRge1OFh1HB64f57AfCFOmpTH9Mqc3JaSc5FNSgOqMK4FgQsqpDFZYhbjSEJMRRxkXAzuEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ltgtRILT; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3EFA0FF80B;
-	Wed, 13 Nov 2024 08:26:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731486369;
+	s=arc-20240116; t=1731487729; c=relaxed/simple;
+	bh=2rD+35iIOMUTZkdmCB1B5ZFhapy6EXwywGqUU9ML1GY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LAeLchJv6gSMjpKsI2ZSkaqN4Dl+XnSJHx28OyIsrp84ryDYjlrSOIIhQvn3H1JFPClRAGHB3Iv5FBnapU6nfVrGTwgP4Aul+IGHAyyE1W0IObs+VBTUgnCIo6ybRB6aUMCgtMJGgY2gv8lHg4Qc7NvgCC1uDHIVuRq8zX9q9ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jWmgNVL5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731487726;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QL6WB2LZnSXEXRY0BOwCQ3u9d/gRvFiU2Qv5SmZq72A=;
-	b=ltgtRILT2fq/g9aK/lshySY//LY+2Ylz1Vn/tDkPD4KgLVsA/6ikdHwCJbMz3Lfsm9co1u
-	i/SbSWnB2qzJqFrb1FltAo2ZPBbjUU9iN2fQPEkBH1KOdokNl7U+kY8XZwvnDRdCmUmzab
-	Ril1aRlNm5OUHA9fUT2YuokkfHbYrhbYIEVO0K9m46xl2+7Az1slh8GY7gFqiVehkXlvxs
-	Up01h8QBDAVpiJTza0xXEzrMQHQD3qfiJsX1sA4UOcRROxkeHL/l0vzs/yojRElSVaM12F
-	ZeggogdYBEI86ulquCJB8O3AZqileX6F5xvTP0yZItLmZy5nlpV+7DFk3zW+zQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: <alex.aring@gmail.com>,  <davem@davemloft.net>,  <dmantipov@yandex.ru>,
-  <edumazet@google.com>,  <horms@kernel.org>,  <kuba@kernel.org>,
-  <linux-kernel@vger.kernel.org>,  <linux-usb@vger.kernel.org>,
-  <linux-wpan@vger.kernel.org>,  <netdev@vger.kernel.org>,
-  <pabeni@redhat.com>,  <stefan@datenfreihafen.org>,
-  <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>,
-  <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
-In-Reply-To: <20241112134145.959501-1-lizhi.xu@windriver.com> (Lizhi Xu's
-	message of "Tue, 12 Nov 2024 21:41:45 +0800")
-References: <87a5e4u35q.fsf@bootlin.com>
-	<20241112134145.959501-1-lizhi.xu@windriver.com>
-User-Agent: mu4e 1.12.1; emacs 29.4
-Date: Wed, 13 Nov 2024 09:26:07 +0100
-Message-ID: <87plmzsfog.fsf@bootlin.com>
+	bh=EYg4VfynzwIiMrgokuYr8adCnrOyJM+ZuPcWT4xpSzI=;
+	b=jWmgNVL5bocyqA3BUzTlj1geFeWRvERHCicVPh7F+ulacWQgRSP6FwW4RTKKAxDB+0+TrY
+	1pB7VvzekxqkF1dREU37Bs+YZ3ON668vw+JPivcAPgt7WdWbL683CqdGP2yhjlMP0I5LRJ
+	ZEo8ukqGqoNWsyjoa8mEhLQHVD4fFZ4=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-501-GIFGXv9kO56t7fZWUwwcmQ-1; Wed, 13 Nov 2024 03:48:45 -0500
+X-MC-Unique: GIFGXv9kO56t7fZWUwwcmQ-1
+X-Mimecast-MFC-AGG-ID: GIFGXv9kO56t7fZWUwwcmQ
+Received: by mail-yb1-f199.google.com with SMTP id 3f1490d57ef6-e2904d0cad0so11048545276.1
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 00:48:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731487725; x=1732092525;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EYg4VfynzwIiMrgokuYr8adCnrOyJM+ZuPcWT4xpSzI=;
+        b=Zmo6oBkhNEohxIqLIi3TLTuF9IzKpjrS/r5xWPR1bs9LRHZXfYpb+4ONyL4wrZPzge
+         +51s7zMPq+aqv3xxbtRKyep7Ts69jRE6+t65iZuPyPOS1Fekaf06gIG7qv8+1xnCzV0G
+         r6PxrcsOTHV3LFbYWQ3q8ZZVf9l/fTmEmJf0kknktugA5mownfiMjAJKzpMUAJegX4VD
+         W6xM6f+yDk2o7/f/tdmgIbInFyETT+4onYEejtim4Xl6+WK9RAg+5aElayzgFMvwRe5Y
+         P+fSS0W5xsQfvuE3fRZ1/GTTDwCJXnDjQH//7p2iJUVBWsbEbe8X9zXvAlnAxmEpO4s6
+         5hNw==
+X-Forwarded-Encrypted: i=1; AJvYcCUM5og69hkWQVmBuWXVAt+zgo8UdkzA9/YWDptqvP2b6z64moe+Zubi5drhl8otp+BiAfkJMj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyT0Y2Rwb8hUwBuk8v1BfhUVzOtnqbRsZXr9fZfiVpf409d4hyE
+	j9Ln42sG/yP9aEiyDU9nDgyW+pdO/hSH5oBO+nrfJEmarOyTCdjU0dqd4s2lozAWMosSkGoQx3T
+	lUWW82gMbOSQ9UQZ9H9xz58PlAf+9FogHA7ZNZ/6wJNujw8uoIoDnGzy1Z3V37sk/sOeG54qQVk
+	uz2evOs3FuTT9PTu2LD0RPUTmecWRw
+X-Received: by 2002:a05:6902:704:b0:e30:d910:e5c8 with SMTP id 3f1490d57ef6-e337f81ec34mr17149351276.6.1731487724710;
+        Wed, 13 Nov 2024 00:48:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRwYx2NDKzd1FyvbGsn/DijngUPXjeEXugbCrGHCELRWnwDiqo5Zxxz30kUywtPEp7isgqCjCkNUAx2yLzdqQ=
+X-Received: by 2002:a05:6902:704:b0:e30:d910:e5c8 with SMTP id
+ 3f1490d57ef6-e337f81ec34mr17149345276.6.1731487724442; Wed, 13 Nov 2024
+ 00:48:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+References: <20241112111727.91575-1-donald.hunter@gmail.com>
+ <20241112111727.91575-3-donald.hunter@gmail.com> <20241112173843.2831e918@kernel.org>
+In-Reply-To: <20241112173843.2831e918@kernel.org>
+From: Donald Hunter <donald.hunter@redhat.com>
+Date: Wed, 13 Nov 2024 08:48:33 +0000
+Message-ID: <CAAf2ycmc-GANpwaJgTc4tt29_rK0K6PLCz3g8FuffSauQOYMmA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] tools/net/ynl: add async notification handling
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Xiao Liang <shaw.leon@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/11/2024 at 21:41:45 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
-
-> On Tue, 12 Nov 2024 12:01:21 +0100, Miquel Raynal wrote:
->>On 12/11/2024 at 08:21:33 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
->>
->>> On Mon, 11 Nov 2024 20:46:57 +0100, Miquel Raynal wrote:
->>>> On 08/11/2024 at 22:54:20 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
->>>>
->>>> > syzkaller reported a corrupted list in ieee802154_if_remove. [1]
->>>> >
->>>> > Remove an IEEE 802.15.4 network interface after unregister an IEEE 8=
-02.15.4
->>>> > hardware device from the system.
->>>> >
->>>> > CPU0					CPU1
->>>> > =3D=3D=3D=3D					=3D=3D=3D=3D
->>>> > genl_family_rcv_msg_doit		ieee802154_unregister_hw
->>>> > ieee802154_del_iface			ieee802154_remove_interfaces
->>>> > rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
->>>> > ieee802154_if_remove
->>>> > list_del_rcu
->>>>
->>>> FYI this is a "duplicate" but with a different approach than:
->>>> https://lore.kernel.org/linux-wpan/87v7wtpngj.fsf@bootlin.com/T/#m02ce=
-be86ec0171fc4d3350676bbdd4a7e3827077
->>> No, my patch was the first to fix it, someone else copied my
->>> patch. Here is my patch:
->>
->>Ok, so same question as to the other contributor, why not enclosing the
->>remaining list_del_rcu() within mutex protection? Can we avoid the
->>creation of the LISTDONE state bit?
-> From the analysis of the list itself, we can not rely on the newly added =
-state bit.=20
-> The net device has been unregistered, since the rcu grace period,
-> unregistration must be run before ieee802154_if_remove.
+On Wed, 13 Nov 2024 at 01:38, Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> Following is my V2 patch, it has been tested and works well.
+> some comments for your consideration, if you prefer to keep as is:
+>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+>
+> On Tue, 12 Nov 2024 11:17:27 +0000 Donald Hunter wrote:
+> > +    def poll_ntf(self, duration=None):
+> > +        endtime = time.time() + duration if duration is not None else None
+>
+> we can record starttime here, and avoid the complex logic..
 
-Please send a proper v2, not an inline v2.
+Yes, of course. That's a lot clearer.
 
-However the new approach looks better to me, so you can add my
+> > +        selector = selectors.DefaultSelector()
+> > +        selector.register(self.sock, selectors.EVENT_READ)
+> > +
+> > +        while True:
+> > +            try:
+> > +                yield self.async_msg_queue.get_nowait()
+> > +            except queue.Empty:
+> > +                if endtime is not None:
+> > +                    interval = endtime - time.time()
+>
+> then here:
+>
+>                 if duration is not None:
+>                         timeout = time.time() - starttime + duration
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+That'd be starttime + duration - time.time().
 
-Thanks,
-Miqu=C3=A8l
+I'll respin with these changes, thanks!
+
 
