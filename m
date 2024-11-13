@@ -1,179 +1,276 @@
-Return-Path: <netdev+bounces-144441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4443F9C74F4
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:59:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555B19C758F
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 16:05:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F14281F25FCE
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:59:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA3701F25CCD
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 15:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4221C1531EA;
-	Wed, 13 Nov 2024 14:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TrfbnuXY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BD313AD33;
+	Wed, 13 Nov 2024 15:05:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B8413AA2D
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 14:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C69438389
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 15:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731509951; cv=none; b=A176CSJ3EPSF2ZG0jkeXvNSx93OgiApmAzIQ+6TTDdkIUMHu8BMpS5MI/dxlNgFhjgVgrlZEzxb+Sa4Oie3ERlg5S4TiJ0puJT3QhDrebQ/fcnT2L5T62ebHpD+xKuEZifgwLI4xv2XZyuflPbvSmcKScpSmnGBktRbEEY5S/j8=
+	t=1731510325; cv=none; b=VLKIzo45GFUtBJOxQswzAbJ8AQkU+kH0FuwqE/1R6rIylIRVAJhCYWB+jwwI+OY6TCMIfXH3yQOEo4OufU38eP+1x+ctDIrESisCrAPz5gAH8oA6zs0EhGIhrYhCMwf09a6g1EL/hxi/CqlfMlwjNkIvpbpd9DfLzcIDeUUTux4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731509951; c=relaxed/simple;
-	bh=esx3+gp6giuoSv55FGfF8nJwn5DJ2HORa2u7PFK+YjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rl9FF5/bRHAeGExEsMF7waMuNJi7expONZgifI7Nmxy3K9QlX9Fq+H2TSw/YLLzGYQs/0aKSvtPnVOgGdZbYnbaaj21tebEeN1UqBE4moFStUDvkDBdkK+oy0ZmE8GuAu1W21///ryOIC2wnuUipKCoxp5u4QbVMUo/vgVmvw7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TrfbnuXY; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8c3b20fe-650b-4910-bf23-236e2b377d04@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731509946;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+OoiRYmdt25DiYMmRNWGGRLGwaM28ebbuFL+WS9HUsI=;
-	b=TrfbnuXYdOyykSoBMUoovS8eFoKHIvB8iV/6IYEqwumX++1qk89A9qrXdHIP2YXQC689lx
-	fscFuJnp55jhAsBcXtaR1dt2VJScCSrtG3hPvb5yP6Anx1f9GAji3/94q9N28+Hywwqqxq
-	In+FmT/1mlV2IGfpv/sDs5RCHZsHfOs=
-Date: Wed, 13 Nov 2024 14:59:01 +0000
+	s=arc-20240116; t=1731510325; c=relaxed/simple;
+	bh=Qzb3SWYKN5kATyrvzc/giVlT23Wo4lYTj5Z0PrALw+M=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LD7YT22ZxkNVyY6s5NNaTEWRseey3lHbvNeObXBPzmXAvNcrXwWyY7uwGtmw9WXuhM7Dlhd6wNyorVLgIP8dyFO3PsT8B0Nq+U8ljWwmfaUGx2AI3cm/y/hf+RH7wEdNbrFZT2ggWNDQzlorkMxtfCPvkq1zhHVf/96zxlf3O2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a71a9ed154so4227725ab.0
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 07:05:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731510323; x=1732115123;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Js2tCNoHj99UZbl15cY2mUZXw4l/roodQ0DjM9uGmiY=;
+        b=Pu9E+Y74NmZNIvOcAi1TmWHqRVcRhYgnWjkNbukL0uD4OYg+snEIV8uVbgoLEB4NVc
+         B9E1JxHDAxMKuxh2aGVKtHmwZE/UZ4ZH96cQNOWfcD/fUKk/Bgf63aHNw6XAlDsAthfL
+         a+AZ+x4RvZ66lZMfMpFUZQDrsZupSXtn0pjJ/hIjzBD3fBLh3YGMVjIzk5NaPLXQ+x/j
+         lyxT8/w4Ycy89p2cxsbME9OhYa6J+sjOCYoddDiHWxS3DNd5onmj4cwNmtxDD8Sl3QjW
+         V2QpNMJbFK46K+/leodt4whbgINTJWAGruz6v+XYBbpyWXkmYa/J43iCAKQ3Hg0J4Q8V
+         lcXg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnpzq+FYIKlmWYMNQ3tZKt1BgF1OnJ1iqVVruQvtrgt95OsfT7qkdOC1tDS9N9X/UhiLwCX1Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoJXG5sREBpgWy7GjtHy2eOWUH0jSiS1IDEH8TnNC8BpPXemZY
+	w0bNxbj79ikup2JOnARbuAbb5OJn5VSgU+HJDkGS5kUG5RMFUXx0CUIl4peinn4402mURA70/JR
+	udYI6mKGl5xFX2/kY78gzmRjkHeHEhrrpaJPjSEF9jWGDIygCL/jhSg4=
+X-Google-Smtp-Source: AGHT+IERF9C5WIE83rp9obP4lMyBNE0WYs9a1Ck9M5zPa5hSQMEY65QzFGJn21AgGj9jA/YgK+xVplkj68B4tCmdzOlqyt8IpWE4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v4 1/7] octeon_ep: Add checks to fix double free
- crashes
-To: Shinas Rasheed <srasheed@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: hgani@marvell.com, sedara@marvell.com, vimleshk@marvell.com,
- thaller@redhat.com, wizhao@redhat.com, kheib@redhat.com, egallen@redhat.com,
- konguyen@redhat.com, horms@kernel.org,
- Veerasenareddy Burru <vburru@marvell.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Abhijit Ayarekar <aayarekar@marvell.com>,
- Satananda Burla <sburla@marvell.com>
-References: <20241113111319.1156507-1-srasheed@marvell.com>
- <20241113111319.1156507-2-srasheed@marvell.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241113111319.1156507-2-srasheed@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:1384:b0:3a7:1a2a:85c3 with SMTP id
+ e9e14a558f8ab-3a71a2a863fmr15848105ab.22.1731510323076; Wed, 13 Nov 2024
+ 07:05:23 -0800 (PST)
+Date: Wed, 13 Nov 2024 07:05:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6734c033.050a0220.2a2fcc.0015.GAE@google.com>
+Subject: [syzbot] [bpf?] [net?] KASAN: slab-use-after-free Read in
+ sk_psock_verdict_data_ready (2)
+From: syzbot <syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jakub@cloudflare.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 13/11/2024 11:13, Shinas Rasheed wrote:
-> From: Vimlesh Kumar <vimleshk@marvell.com>
-> 
-> Add required checks to avoid double free. Crashes were
-> observed due to the same on reset scenarios, when reset
-> was tried multiple times, and the first reset had torn
-> down resources already.
-> 
-> Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
-> Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-> ---
-> V4:
->    - Removed unnecessary protective code. Added fast return from
->      octep_free_irqs()
->    - Improved commit message
-> 
-> V3: https://lore.kernel.org/all/20241108074543.1123036-2-srasheed@marvell.com/
->    - Added back "Fixes" to the changelist
-> 
-> V2: https://lore.kernel.org/all/20241107132846.1118835-2-srasheed@marvell.com/
->    - No changes
-> 
-> V1: https://lore.kernel.org/all/20241101103416.1064930-2-srasheed@marvell.com/
-> 
->   .../net/ethernet/marvell/octeon_ep/octep_main.c    | 14 ++++++++++----
->   drivers/net/ethernet/marvell/octeon_ep/octep_tx.c  |  2 ++
->   2 files changed, 12 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> index 549436efc204..29796544feb6 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> @@ -496,6 +496,9 @@ static void octep_free_irqs(struct octep_device *oct)
->   {
->   	int i;
->   
-> +	if (!oct->msix_entries)
-> +		return;
-> +
->   	/* First few MSI-X interrupts are non queue interrupts; free them */
->   	for (i = 0; i < CFG_GET_NON_IOQ_MSIX(oct->conf); i++)
->   		free_irq(oct->msix_entries[i].vector, oct);
-> @@ -505,7 +508,7 @@ static void octep_free_irqs(struct octep_device *oct)
->   	for (i = CFG_GET_NON_IOQ_MSIX(oct->conf); i < oct->num_irqs; i++) {
->   		irq_set_affinity_hint(oct->msix_entries[i].vector, NULL);
->   		free_irq(oct->msix_entries[i].vector,
-> -			 oct->ioq_vector[i - CFG_GET_NON_IOQ_MSIX(oct->conf)]);
-> +				oct->ioq_vector[i - CFG_GET_NON_IOQ_MSIX(oct->conf)]);
+Hello,
 
-Looks like this chunk was unintended, it was perfectly aligned before...
+syzbot found the following issue on:
 
->   	}
->   	netdev_info(oct->netdev, "IRQs freed\n");
->   }
-> @@ -635,8 +638,10 @@ static void octep_napi_delete(struct octep_device *oct)
->   
->   	for (i = 0; i < oct->num_oqs; i++) {
->   		netdev_dbg(oct->netdev, "Deleting NAPI on Q-%d\n", i);
-> -		netif_napi_del(&oct->ioq_vector[i]->napi);
-> -		oct->oq[i]->napi = NULL;
-> +		if (oct->oq[i]->napi) {
-> +			netif_napi_del(&oct->ioq_vector[i]->napi);
-> +			oct->oq[i]->napi = NULL;
-> +		}
+HEAD commit:    4861333b4217 bonding: add ESP offload features when slaves..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=122e6ea7980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ea5200d154f868aa
+dashboard link: https://syzkaller.appspot.com/bug?extid=dd90a702f518e0eac072
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-I would just add
+Unfortunately, I don't have any reproducer for this issue yet.
 
-if (!oct->oq[i]->napi)
-	continue
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4263c9834cd5/disk-4861333b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/14c4f9ec4615/vmlinux-4861333b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6cc8fe1b802d/bzImage-4861333b.xz
 
-as the first line within the loop. Otherwise debug message could be
-misleading - deleting NAPI on queue which doesn't exist.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
 
->   	}
->   }
->   
-> @@ -666,7 +671,8 @@ static void octep_napi_disable(struct octep_device *oct)
->   
->   	for (i = 0; i < oct->num_oqs; i++) {
->   		netdev_dbg(oct->netdev, "Disabling NAPI on Q-%d\n", i);
-> -		napi_disable(&oct->ioq_vector[i]->napi);
-> +		if (oct->oq[i]->napi)
-> +			napi_disable(&oct->ioq_vector[i]->napi);
+==================================================================
+BUG: KASAN: slab-use-after-free in sk_psock_verdict_data_ready+0x6d/0x390 net/core/skmsg.c:1221
+Read of size 8 at addr ffff88807595c220 by task syz.8.2987/16517
 
-And here again, the same pattern.
+CPU: 1 UID: 0 PID: 16517 Comm: syz.8.2987 Not tainted 6.12.0-rc6-syzkaller-01230-g4861333b4217 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ sk_psock_verdict_data_ready+0x6d/0x390 net/core/skmsg.c:1221
+ unix_stream_sendmsg+0x7d5/0xf80 net/unix/af_unix.c:2345
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2609
+ ___sys_sendmsg net/socket.c:2663 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2692
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fc8c817e719
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc8c9018038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fc8c8335f80 RCX: 00007fc8c817e719
+RDX: 0000000000000000 RSI: 0000000020000500 RDI: 0000000000000004
+RBP: 00007fc8c81f139e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fc8c8335f80 R15: 00007ffeb3aa3828
+ </TASK>
 
->   	}
->   }
->   
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-> index 06851b78aa28..157bf489ae19 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-> @@ -323,6 +323,8 @@ void octep_free_iqs(struct octep_device *oct)
->   	int i;
->   
->   	for (i = 0; i < CFG_GET_PORTS_ACTIVE_IO_RINGS(oct->conf); i++) {
-> +		if (!oct->iq[i])
-> +			continue;
->   		octep_free_iq(oct->iq[i]);
->   		dev_dbg(&oct->pdev->dev,
->   			"Successfully destroyed IQ(TxQ)-%d.\n", i);
+Allocated by task 16517:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ unpoison_slab_object mm/kasan/common.c:319 [inline]
+ __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:345
+ kasan_slab_alloc include/linux/kasan.h:247 [inline]
+ slab_post_alloc_hook mm/slub.c:4085 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ kmem_cache_alloc_lru_noprof+0x139/0x2b0 mm/slub.c:4153
+ sock_alloc_inode+0x28/0xc0 net/socket.c:307
+ alloc_inode+0x65/0x1a0 fs/inode.c:265
+ sock_alloc net/socket.c:633 [inline]
+ __sock_create+0x127/0xa30 net/socket.c:1540
+ sock_create net/socket.c:1634 [inline]
+ __sys_socketpair+0x2ca/0x720 net/socket.c:1781
+ __do_sys_socketpair net/socket.c:1834 [inline]
+ __se_sys_socketpair net/socket.c:1831 [inline]
+ __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1831
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+Freed by task 16:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:2342 [inline]
+ slab_free mm/slub.c:4579 [inline]
+ kmem_cache_free+0x1a2/0x420 mm/slub.c:4681
+ rcu_do_batch kernel/rcu/tree.c:2567 [inline]
+ rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
+ handle_softirqs+0x2c5/0x980 kernel/softirq.c:554
+ run_ksoftirqd+0xca/0x130 kernel/softirq.c:927
+ smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Last potentially related work creation:
+ kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
+ __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
+ __call_rcu_common kernel/rcu/tree.c:3086 [inline]
+ call_rcu+0x167/0xa70 kernel/rcu/tree.c:3190
+ destroy_inode fs/inode.c:320 [inline]
+ evict+0x83c/0x9b0 fs/inode.c:756
+ __dentry_kill+0x20d/0x630 fs/dcache.c:615
+ dput+0x19f/0x2b0 fs/dcache.c:857
+ __fput+0x5d2/0x880 fs/file_table.c:439
+ __do_sys_close fs/open.c:1567 [inline]
+ __se_sys_close fs/open.c:1552 [inline]
+ __x64_sys_close+0x7f/0x110 fs/open.c:1552
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88807595c200
+ which belongs to the cache sock_inode_cache of size 1408
+The buggy address is located 32 bytes inside of
+ freed 1408-byte region [ffff88807595c200, ffff88807595c780)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x75958
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+memcg:ffff88802edbb601
+anon flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000040 ffff88801eac6c80 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000080150015 00000001f5000000 ffff88802edbb601
+head: 00fff00000000040 ffff88801eac6c80 0000000000000000 dead000000000001
+head: 0000000000000000 0000000080150015 00000001f5000000 ffff88802edbb601
+head: 00fff00000000003 ffffea0001d65601 ffffffffffffffff 0000000000000000
+head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Reclaimable, gfp_mask 0xd20d0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_RECLAIMABLE), pid 5853, tgid 5853 (syz-executor), ts 63362518844, free_ts 14776689664
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1537
+ prep_new_page mm/page_alloc.c:1545 [inline]
+ get_page_from_freelist+0x303f/0x3190 mm/page_alloc.c:3457
+ __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4733
+ alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
+ alloc_slab_page+0x6a/0x140 mm/slub.c:2412
+ allocate_slab+0x5a/0x2f0 mm/slub.c:2578
+ new_slab mm/slub.c:2631 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3818
+ __slab_alloc+0x58/0xa0 mm/slub.c:3908
+ __slab_alloc_node mm/slub.c:3961 [inline]
+ slab_alloc_node mm/slub.c:4122 [inline]
+ kmem_cache_alloc_lru_noprof+0x1c5/0x2b0 mm/slub.c:4153
+ sock_alloc_inode+0x28/0xc0 net/socket.c:307
+ alloc_inode+0x65/0x1a0 fs/inode.c:265
+ sock_alloc net/socket.c:633 [inline]
+ __sock_create+0x127/0xa30 net/socket.c:1540
+ sock_create net/socket.c:1634 [inline]
+ __sys_socket_create net/socket.c:1671 [inline]
+ __sys_socket+0x150/0x3c0 net/socket.c:1718
+ __do_sys_socket net/socket.c:1732 [inline]
+ __se_sys_socket net/socket.c:1730 [inline]
+ __x64_sys_socket+0x7a/0x90 net/socket.c:1730
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+page last free pid 1 tgid 1 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1108 [inline]
+ free_unref_page+0xcfb/0xf20 mm/page_alloc.c:2638
+ free_contig_range+0x152/0x550 mm/page_alloc.c:6748
+ destroy_args+0x92/0x910 mm/debug_vm_pgtable.c:1017
+ debug_vm_pgtable+0x4be/0x550 mm/debug_vm_pgtable.c:1397
+ do_one_initcall+0x248/0x880 init/main.c:1269
+ do_initcall_level+0x157/0x210 init/main.c:1331
+ do_initcalls+0x3f/0x80 init/main.c:1347
+ kernel_init_freeable+0x435/0x5d0 init/main.c:1580
+ kernel_init+0x1d/0x2b0 init/main.c:1469
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Memory state around the buggy address:
+ ffff88807595c100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff88807595c180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88807595c200: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                               ^
+ ffff88807595c280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807595c300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
