@@ -1,102 +1,130 @@
-Return-Path: <netdev+bounces-144256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8AA59C65A0
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:01:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944539C6667
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EF911F2408C
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:01:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7AFBB2F059
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 00:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C77433FE;
-	Wed, 13 Nov 2024 00:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C89F5680;
+	Wed, 13 Nov 2024 00:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="NOYshMNV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uIoxmILW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A133317C
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 00:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6A21BC5C
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 00:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731456066; cv=none; b=PgWzJxpzlwcMJ2XjqRkai6ja7sOH02xByNb9wIR/YgyvYKy2r5rkoG/6us1t9iQV37jA/JGMz2rQfe/6ZEhErIW1AgbYg70NBg76AVy89d9ICyo4NRpQx1jHcfiWEj8sy7LlLFtb1O9gi43kOkBKMzR1SY7rKNfX9VQaAMvimTI=
+	t=1731459420; cv=none; b=UN2oV06QDmX29x8HSD7WbwgEJ6bTSfcwWDt9Jp0fKtlqAcynqxT//nD6Cp82H7JZhhBZY9csOscznrjqufTDxnmhlt2Ri8RO4hxFrvVx9vRLmZ0FzYLKJpN8212izvF6/XjfmqO6ycNG856WPR7bw7t8z29HKpf3a9m3H2BkifY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731456066; c=relaxed/simple;
-	bh=FoGmaHNM63GqBq0BQy8qKOtath3he6N2gYMwzHPG5lI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=l/ZXiXuZ7mEV0zFxJufW7pg94+xnLilpTN6U4Katbj0C2olsaaUtuOQiR4Klv0/YDyBstNVfx+bDQKzqgv0WlZ1Y5qz4s0soN1+8hL2p6UYVevaG9qGe5RN4o5MGAQvD6Jbm2JVaF1pOsHdeyyAIoY24LQ0zQslUf0ShfIxfoBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=NOYshMNV; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7240fa50694so4893626b3a.1
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 16:01:04 -0800 (PST)
+	s=arc-20240116; t=1731459420; c=relaxed/simple;
+	bh=S/ZIIvHV4gDhxmZupsbdYnIIAA0H4KXqa3pcV4+Ru2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TKL6ITdss+PQRCxbUseGiL71iBHUHeSugPvV7sdub1pFDCmsLSqSE/biqZGL64gZjaKGBRVRipz8p19VAaRXY2rzSlxv2jedcyEBIrC82Tzcg8V70hr51JqJMoqd0vVTNk3h7IJpAs86es4/H8D8nnWXVoYmIwDJ5gKFG6npoiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uIoxmILW; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539e64ed090so2e87.1
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 16:56:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1731456064; x=1732060864; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FoGmaHNM63GqBq0BQy8qKOtath3he6N2gYMwzHPG5lI=;
-        b=NOYshMNVjSOTVgdvo3zfE6mXikzn4pYqNHipj0T21Z3Hebul9xRMKp7a+PtzsHjzKZ
-         XalpWnvHO7XPWIqwHoQXHBVX9K7RF+rSzyQF9iW+lRslUFGXvpspzxj36JfvPnMILaJJ
-         ClgMLJgafCGgmuBE5k1X0cmnHNG0enMQz9c9mlZD8wjOhxi8wcMf5DtcwcdAjpQBiyQq
-         q/iPcgNsM4k/VdpGffIFODf3oOV6u5iYjUkC70Z4DzhYfGu8bZQnhBFOFMG1HNLGjoQn
-         kNLzSSZadhtSSVvoVUVQx7Etq2EIHBbt20cykdaPXgR1UGzMpqFx46YUgsDb3qc9R72R
-         0tWA==
+        d=google.com; s=20230601; t=1731459417; x=1732064217; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jx0hYhXWq4MHDr1staZ1xRj0crb2pojg8SADc+LPOAQ=;
+        b=uIoxmILW8Q3PMchD6AAO50udFsTXsRCSlz6xYK4YBJoUVWpSPN0QkcDrWpll9cC5Ry
+         4QmqOxUanljkXuTcf5cQjrPF/r6O3XTU8y2GveFqTDNY1EK64WSGjer97ykQm1yTIm1G
+         xM4dgnhaLGa5Id0Q/lL7bDnGeAXfO8IQcfipn0fgLhvMmPHsRt3m/ojFKbVW8OA0/MMw
+         aQKv89/cewdw3N8sGvD7SqfWZ25E95coZNzc0a1/s3esbQKIm4g3+JQ47qHk+1YePWhE
+         LQAX24ZhhYNEhdqgXOIWJpspdOGZICGBPnq73oiDq9ncrJC1bfxyECual66ixsC8c+vt
+         wa2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731456064; x=1732060864;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FoGmaHNM63GqBq0BQy8qKOtath3he6N2gYMwzHPG5lI=;
-        b=c1egYSlQ+FiQgLI4PJxFGuSktlT3J8LB8eouDyBA9x3LCOPVhuAkLLjU+ynlMH/B/B
-         0IBpgY8x9+3WSkROGEwwfJL/Deuox9Qh5E9+C1cea+vcQPgZ+QoThorwLLIG8eJb0sbP
-         jWch/QS4ETDFG1W8+KyCFNrV2VGECTM43tB/WAAc0/XyCknIScnTAb+gZCXYQuXvZdEe
-         7an0X6/9/6mFcFKEyJdRoaEGLFnf8lOqcj9OrCc/JBtHmEkC2/9wNLIxxlEAlRrxonPF
-         dAvyspKqJYp2v5/v5Jd2PL1mzkPYB0I4orpzzXXEW4Hucqgoj6fx7axwaUp+RZjRMccn
-         zKwg==
-X-Gm-Message-State: AOJu0Yyt8ycarNMi34miwPd/HcaQ7MIhXOBqjEzVRjl1u9LmKnLNJIxE
-	AiKJ1mkR4PZedSJhd/I5uDzHuVxCeXuC1mTMFyoqYWtRJ2TIrvGFSMtlkoApFMGJz22fjZAyrmv
-	+KLnokDBQCa0QIO9kqOjuuQwY9BLLGM0+Xsoa
-X-Google-Smtp-Source: AGHT+IEYm3xrjN3OhpDff0TCYzAQLcLBy7Ie7ujNcFbKW96oksbJ7FAxRHHehy6fUA3rjkmHB85DZUo8zI+0z4ZkvRQ=
-X-Received: by 2002:a05:6a20:734b:b0:1db:eb2c:a74 with SMTP id
- adf61e73a8af0-1dc7037a94dmr1440958637.12.1731456063780; Tue, 12 Nov 2024
- 16:01:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731459417; x=1732064217;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jx0hYhXWq4MHDr1staZ1xRj0crb2pojg8SADc+LPOAQ=;
+        b=NC72KxQ5ZP/NVwyBTuFp07XwuPyQJlcI/dS1THmrhDOcTmJU79dqk3zMbXa7JAA1ra
+         GF75cD3kl6CM4DM2iut9MhoB9NL3bgObcAWugd5Kryd/D65Ud27yUiTR2QQl6bl1lz0D
+         M8rFo1TIUx9tSRZMSMq3jcz235ZqGefjDshNCBpHYIE0BNLT28gFkaTWC4qXLmKrY8RJ
+         TQuK+awqRJFsFIog+RKk0v/3HMkucjsGCjedIPZJuyIc83MHApA5sknC+XWCW1dep0Jd
+         aCocnnNNgsi0TJtNKnP4F2sZx9bizO5nT70BZaFq8OhQsb2/3f8OOHfRc6U2/aI06/mu
+         gAZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW+D4dLFqXtd6s/yTHkeJkY5o4vrKshQk3PuEC/Fxp4woRQWl9dE0RjXUcs3ghx1tUzDrMseY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh3+50jv7aDk/MyzYHSQXVNqo7DZtqJ0G286iq0+9WL4TN/Dqh
+	dqCvYSs80oYbBe1JdROwPfbmrWsPHDg+j01d73uUvN2XMAzJOssNvX4A3qRCxpwKIJUv6f7UMW5
+	fH3FSarx3uoVtzsU44ms/s8WlU3C9IxGLjCa4
+X-Gm-Gg: ASbGncsiD6yr6bnr6w6KP2hN3TCheDtAVW2fQDQq+UkT7Qeef9bCrket0W50UdY6UDr
+	GcUZunIcedOiQuh08dDuqGURKZw+mINi+BVoObAQLxCM+tJw2zz0rW6a7jwMpaW8L
+X-Google-Smtp-Source: AGHT+IFyo2CCWf1+kCiFRkYJgDWrUegjzUeNU4t/8JMPYaG9xjbFRAq2D0v8rFeFfjFkrHSgn2SrxQyw3Q/oyOrrmio=
+X-Received: by 2002:a05:6512:1599:b0:53d:a034:e563 with SMTP id
+ 2adb3069b0e04-53da0726006mr2816e87.1.1731459416103; Tue, 12 Nov 2024 16:56:56
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 12 Nov 2024 19:00:52 -0500
-Message-ID: <CAM0EoMmoLXpz70sF6z301OccU-ghgNSOad9cQVhizipy-is-Lw@mail.gmail.com>
-Subject: 0x19: Call For Submissions open!
-To: people <people@netdevconf.info>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, Christie Geldart <christie@ambedia.com>, 
-	Kimberley Jeffries <kimberleyjeffries@gmail.com>, lwn@lwn.net, 
-	Lael Santos <lael.santos@expertisesolutions.com.br>, 
-	"board@netdevconf.org" <board@netdevconf.info>, linux-wireless <linux-wireless@vger.kernel.org>, 
-	netfilter-devel@vger.kernel.org, lartc@vger.kernel.org, 
-	Bruno Banelli <bruno.banelli@sartura.hr>
+References: <20241110081953.121682-1-yuyanghuang@google.com>
+ <ZzMlvCA4e3YhYTPn@fedora> <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
+In-Reply-To: <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Wed, 13 Nov 2024 09:56:17 +0900
+Message-ID: <CADXeF1HMvDnKNSNCh1ULsspC+gR+S0eTE40MRhA+OH16zJKM6A@mail.gmail.com>
+Subject: Re: [PATCH net-next] netlink: add igmp join/leave notifications
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, 
+	jiri@resnulli.us, stephen@networkplumber.org, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We are pleased to announce the opening of Call For Submissions(CFS)
-for Netdev conf 0x19.
-Netdev conf 0x19 is going to be a hybrid conference with the physical
-component being in Zagreb, Croatia.
+> Please could you say more about programming hardware offload filters?
+> How is this done?
 
-For overview of topics, submissions and requirements please visit:
-https://netdevconf.info/0x19/pages/submit-proposal.html
-For all submitted sessions, we employ a blind review process carried
-out by the Program Committee.
+Sure,  please let me explain a little bit further on how Android
+Packet Filter (APF) works here.
 
-Important dates:
-Closing of CFS: Jan 17th, 2025
-Notification by: Jan 26th, 2025
-Conference dates: March 10th-14th 2025
+The Android Packet Filter (APF) has two parts:
+* APF Interpreter: Runs on the Wi-Fi chipset and executes APF
+programs(bytecodes) to decide whether to accept, drop, or reply to
+incoming packets.
+* APF program generator: Resides in the Android Framework within the
+Network Stack process. It creates and updates APF programs based on
+network conditions and device state, allowing for dynamic adjustments
+to the filtering rules.
+APF program generator is part of the Network Stack module, which can
+be updated with monthly mainline releases.
 
-Please take this opportunity to share your work and ideas with the community
+Feel free to let me know if the above explanation is still unclear.
 
-cheers,
-jamal (on behalf of the Netdev Society)
+I will include a more detailed explanation in the commit message in patch v=
+2.
+
+Thanks,
+Yuyang
+
+On Wed, Nov 13, 2024 at 4:34=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > > This enhancement allows user-space components to efficiently track
+> > > multicast group memberships and program hardware offload filters
+> > > accordingly.
+>
+> Sorry, i missed the original posting.
+>
+> Please could you say more about programming hardware offload filters?
+> How is this done?
+>
+>         Andrew
 
