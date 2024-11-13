@@ -1,207 +1,137 @@
-Return-Path: <netdev+bounces-144349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F3E39C6C4C
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:04:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43A679C6C51
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:04:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E6C2887DF
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:04:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E60B31F2148B
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70781FB88D;
-	Wed, 13 Nov 2024 10:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753FE1FAC48;
+	Wed, 13 Nov 2024 10:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="AL91kOU5";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cU0ZSi8j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VYvVN+2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84CA1FAC48;
-	Wed, 13 Nov 2024 10:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FA11FB88B
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 10:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731492243; cv=none; b=jAaCV5wKlq4+m1GotU6q0CeqRM6LcDlNilk4uJcXz0ksQ0hfs1KsEzdDgWoO1URxho7lyjAH2lSVCnfkS6Ndy8FNPU+y8/idjEC04cxwDlZObrlxq/V87DkeG8MBVVY0loq4LMtpmvxNf4+9TBAiPq3OJPiBh+OJl43VLAVJrNA=
+	t=1731492275; cv=none; b=IIdNpi7b6PJcuM/pl/eaOi0Vg8vobJcyfPGoiBrebQIbEKfHU0R/IvmV8z92E7NEv3zzrY8uMgTe3undNhG7D60Z2YW76m+8GJY6ozSiEG+hwrlzUofzi3VXENJYRwoa1iK+MJbAupGeJ7ugqzVbQ7Ut5aHKE/yfbF8nt9ujV+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731492243; c=relaxed/simple;
-	bh=9WgOqZ7pkkEtVVakWuhfW72XbEP2znkm7oYKso1f9Y8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H6+I0NCiSxbAo2YFJ1jzP/6IDrRjw70ipkKgFz+Bm/rDt+ddkuc6DBZeYgffeXhwItIdpfpDWvJEdnuXVW03c8lEoMW97CtHkwA3Vw/mDRfCcQAxZz+ZmanZzvR6BZ3KOYT5bDd5slpyxUE038D9t/H+A5itFeCTk3zxQosxFfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=AL91kOU5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cU0ZSi8j; arc=none smtp.client-ip=103.168.172.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailflow.phl.internal (Postfix) with ESMTP id B20842018EE;
-	Wed, 13 Nov 2024 05:03:58 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 13 Nov 2024 05:03:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1731492238; x=
-	1731495838; bh=Ez/gX/Lx9KP5A6YSj3GZt6+aAN/V+id/rFQYWBdeg+4=; b=A
-	L91kOU58sCjmTlQJdgMjC5zUvg8oJLltEG1/JXMtFP8DKXriavohggJBOq+nh4dt
-	6NFDXq/jC3+z7K16HSXnK5YL1iRHnmOrBaAFhpS2N+zl4RReG4HvQdIQ1nxcqjBc
-	ATYUctYhl6w/BlPLfcmNKYhTkR0OT78loFBn4KUS6SRMUG50ZK19Yp4qrI+iisyf
-	Ael/GXblmdV6M3tCsGA0xpn66tVpuEDJjMiH0jyYs3bMz62Tv+pzR4z5Z+DlK7jr
-	Z2jWZKVyTpypvt+xMTSJ5Mx5zTi7TJ010kw+D6y6piuUbTX+Cqip2DSiuhn/zfHI
-	/fFMUn0IYAyNzbIa0oCDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731492238; x=1731495838; bh=Ez/gX/Lx9KP5A6YSj3GZt6+aAN/V+id/rFQ
-	YWBdeg+4=; b=cU0ZSi8jFa20seQjI3WTu4Fjrg/W3li2sTAH2U4YqtegfVVvrxI
-	RQu9RzmZTj8GWYG8km5CNxbBCt6E8uEXA7T/QSv7m7I+Yo5HJhu7iBMvlO1mZAJJ
-	tGTWecC3+ryJbr0CgDFc7rjl3xQ4RRD94mZplJ/IM0uv0lWKuKdd8eaiIU4SiHv7
-	cj6iqQXXqvyoxyiOLsxo0FoHvYMaTZoAgxmL0X4xs4ZOL7nZxubZCUVWUt+JU8pF
-	RgpkwRvVuVc2EtDGk3Vz3gVNpY+8a8ZUDDcSMtKPkxcHNyUa9MFqewvq5Myg/5Hs
-	Wk/9DdeXTSBplufBz/ooRpwHegwLAfRth6Q==
-X-ME-Sender: <xms:jnk0Z_vsGs6JcAKwsl1cYiLFuNY3kUjZaYHydsW2N2mGh2RD7e09YA>
-    <xme:jnk0ZweFultluEIzEi1IFLb3b4xwsj6NVIF-r5b6qzhdG-9MQr1OA__yPcIHcTzUY
-    vkqMQ-5diiY_Oo6ki0>
-X-ME-Received: <xmr:jnk0ZyxGw02KP2KYJGxmRDj4io7HFztf0hRKDKjqdItVFwPeIyuxSjN0kNs5>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvddtgdduudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrhigriigrnh
-    hovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhhtohhnihhosehophgv
-    nhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
-    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:jnk0Z-PUo6qciVVGOANqRs-bY-b0lMgcJLxwjOc6GCPghlRhs4vuPw>
-    <xmx:jnk0Z_9ajTA4p42cbzvUlQNMFz1EpzDBW1BgyhI0ASW9nZk1Sb2gdg>
-    <xmx:jnk0Z-V06zGIFJfG3gGz-ng1yHb6-baSgoZ4TihcDy2nYvOAJw51Sw>
-    <xmx:jnk0ZwcVAJiiOCDZHlqPDZGyXm-gDTXovwzEAEWM0TSG3uQdo3FkVw>
-    <xmx:jnk0Z7QRwMjJcd-5pKRmAt0K8PDhQkS-emb5OJadk1R8Qx_Ryt4fRzbm>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 13 Nov 2024 05:03:57 -0500 (EST)
-Date: Wed, 13 Nov 2024 11:03:55 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Antonio Quartulli <antonio@openvpn.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
-Message-ID: <ZzR5i9sO-xwoJcDB@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
- <b7d3ec11-afe4-409c-970e-8bc647364a08@gmail.com>
- <ZzORATd5hG614dta@hog>
- <e543a3de-44f1-4a2d-90ef-1786e222f0d8@gmail.com>
+	s=arc-20240116; t=1731492275; c=relaxed/simple;
+	bh=jj5qzFWgjRkTAFAG7zo2M1elbxj4e/tSqHZzY7envdU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CFi84Hj7aMevzV3w0iy7Ru+2y28t4qq/alXP5aEWANEhFJxEPzjjU07mU8JhGOZ8XlfCWcluM98yI4txdqfH69ygk5zHCE7zqGL7y6iYW75iBCbt89KQ/SLJ/pvYW80KeUrJbji99vqgyPQx9X6HuYIMlCR/6nsjreKQF90PLV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VYvVN+2r; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a99e3b3a411so102469866b.0
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 02:04:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731492272; x=1732097072; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9bhfdSqWHg0gTVu9nXnXjpZqPaGK+R11n4sItQEEJN4=;
+        b=VYvVN+2ry+joS4JVIo8c3dkGUycte7PgCeYPNbStX4OjbpCLQYyBHMBFdpQTwMSz1k
+         ZXUPJCjuC6tZxK1xlmwwjUg8PM9hEJvUipxw090g/FYHGvI37jiSL4ije5jOYzHpygtf
+         5q+VxhXB6arP62Z1hmMb262zli6T1Gwzrt9kcHRKMHFkcUZ8uHevX2ucvxDonuVS/DT3
+         0AZOE0zTUJSNtSlzPPD4/T2h6X0SjOBDUZI1NUJakf9tpIuugyjMbZmQZGvYTqhgjYLV
+         lrwWgP4QrOV9zH+86hewj0Cbr4nDerb0vYpindFAlHKHw59h7/V8r/qsF99UYpRDJBVx
+         RvWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731492272; x=1732097072;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9bhfdSqWHg0gTVu9nXnXjpZqPaGK+R11n4sItQEEJN4=;
+        b=Qka0PoTU2ltYyfl8fH4oRI4WR7iEQDGKusfNQFeD6bhfOpUio2c6gWBNW1RAmPSBDg
+         Ax342DaYPLXREUZMBO2e6pLaYBqhTojVdPb+1Ok6koVCw4BRAZXruXEV+MBUYY0stRi3
+         yVAlQ2f5i7cTtZrzRXBvs/bPAKbP8LZeZ0L4ceF76OdKP3QiaiVus6pc6lfrErBNYfOA
+         crxyymVBEGt36275QeoJc58pdA1uijaZHo2r9UmB92LWRAdMuICo95y2ha1eRXesdx+e
+         Adfe9m+DGsrjJy8aqSnYFop5jOy5ulEN64sGQWb4qYu/MRsVI1jSUU10MfKRP5oDgduL
+         ICSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdb/09BCJsWxK/GILYfPaahVzhIuhsuDfuRUvw/01Phq5pFKcGDTNoW5w0RrzC6GwUL6FN32s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz73kbFH9/eefLIUmKxlkUoVbLmNCjuZNNZSA7wJVYKbzK2lqSH
+	7ZnM2dDIAC726HfM+K9Eas/ZvJWYpiqfl58k0GRDBS9+aAsW3krn
+X-Google-Smtp-Source: AGHT+IFNuWVa0n3GJQ0QS7twii4O6tVw4xKc8ZluxZaNYxyJi2sJ2dns5+DXxWttrBSp1fz8cLyWuw==
+X-Received: by 2002:a17:907:5cd:b0:a9a:6c41:50c0 with SMTP id a640c23a62f3a-a9eeff982a2mr2003105966b.26.1731492271565;
+        Wed, 13 Nov 2024 02:04:31 -0800 (PST)
+Received: from getafix.rd.francetelecom.fr ([193.252.113.11])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee06b9d62sm836291466b.0.2024.11.13.02.04.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 02:04:31 -0800 (PST)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+To: edumazet@google.com
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	alexandre.ferrieux@orange.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net] net: sched: u32: Add test case for systematic hnode IDR leaks
+Date: Wed, 13 Nov 2024 11:04:28 +0100
+Message-Id: <20241113100428.360460-1-alexandre.ferrieux@orange.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e543a3de-44f1-4a2d-90ef-1786e222f0d8@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-2024-11-13, 03:37:13 +0200, Sergey Ryazanov wrote:
-> On 12.11.2024 19:31, Sabrina Dubroca wrote:
-> > 2024-11-10, 15:38:27 +0200, Sergey Ryazanov wrote:
-> > > On 29.10.2024 12:47, Antonio Quartulli wrote:
-> > > > An ovpn_peer object holds the whole status of a remote peer
-> > > > (regardless whether it is a server or a client).
-> > > > 
-> > > > This includes status for crypto, tx/rx buffers, napi, etc.
-> > > > 
-> > > > Only support for one peer is introduced (P2P mode).
-> > > > Multi peer support is introduced with a later patch.
-> > > 
-> > > Reviewing the peer creation/destroying code I came to a generic question.
-> > > Did you consider keeping a single P2P peer in the peers table as well?
-> > > 
-> > > Looks like such approach can greatly simply the code by dropping all these
-> > > 'switch (ovpn->mode)' checks and implementing a unified peer management. The
-> > > 'peer' field in the main private data structure can be kept to accelerate
-> > > lookups, still using peers table for management tasks like removing all the
-> > > peers on the interface teardown.
-> > 
-> > It would save a few 'switch(mode)', but force every client to allocate
-> > the hashtable for no reason at all. That tradeoff doesn't look very
-> > beneficial to me, the P2P-specific code is really simple. And if you
-> > keep ovpn->peer to make lookups faster, you're not removing that many
-> > 'switch(mode)'.
-> 
-> Looking at the done review, I can retrospectively conclude that I personally
-> do not like short 'switch' statements and special handlers :)
-> 
-> Seriously, this module has a highest density of switches per KLOC from what
-> I have seen before and a major part of it dedicated to handle the special
-> case of P2P connection.
+Add a tdc test case to exercise the just-fixed systematic leak of
+IDR entries in u32 hnode disposal. Given the IDR in question is
+confined to the range [1..0x7FF], it is sufficient to create/delete
+the same filter 2048 times to fill it up and get a nonzero exit
+status from "tc filter add".
 
-I think it's fine. Either way there will be two implementations of
-whatever mode-dependent operation needs to be done. switch doesn't
-make it more complex than an ops structure.
+Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+---
+ .../tc-testing/tc-tests/filters/u32.json      | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-If you're reading the current version and find ovpn_peer_add, you see
-directly that it'll do either ovpn_peer_add_mp or
-ovpn_peer_add_p2p. With an ops structure, you'd have a call to
-ovpn->ops->peer_add, and you'd have to look up all possible ops
-structures to know that it can be either ovpn_peer_add_mp or
-ovpn_peer_add_p2p. If there's an undefined number of implementations
-living in different modules (like net_device_ops, or L4 protocols),
-you don't have a choice.
-
-xfrm went the opposite way to what you're proposing a few years ago
-(see commit 0c620e97b349 ("xfrm: remove output indirection from
-xfrm_mode") and others), and it made the code simpler.
-
-
-> What together look too unusual, so it feels like a
-> flaw in the design.
-
-I don't think it's a flaw in the design, maybe just different needs
-from other code you've seen (but similar in some ways to xfrm).
-
-> I racked my brains to come up with a better solution and
-> failed. So I took a different approach, inviting people to discuss item
-> pieces of the code to find a solution collectively or to realize that there
-> is no better solution for now.
-
-Sure. And I think there is no better solution, so I'm answering this
-thread to say that.
-
-> The problem is that all these hash tables become inefficient with the single
-> entry (P2P case). I was thinking about allocating a table with a single bin,
-> but it still requires hash function run to access the indexed entry.
-
-And the current implementation relies on fixed-size hashtables
-(hash_for_each_safe -> HASH_SIZE -> ARRAY_SIZE -> sizeof).
-
-> And back to the hashtable(s) size for the MP mode. 8k-bins table looks a
-> good choice for a normal server with 1-2Gb uplink serving up to 1k
-> connections. But it sill unclear, how this choice can affect installations
-> with a bigger number of connections? Or is this module applicable for
-> embedded solutions? E.g. running a couple of VPN servers on a home router
-> with a few actual connections looks like a waste of RAM. I was about to
-> suggest to use rhashtable due to its dynamic sizing feature, but the module
-> needs three tables. Any better idea?
-
-For this initial implementation I think it's fine. Sure, converting to
-rhashtable (or some other type of dynamically-sized hashtable, if
-rhashtable doesn't fit) in the future would make sense. But I don't
-think it's necessary to get the patches into net-next.
-
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+index 24bd0c2a3014..b2ca9d4e991b 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+@@ -329,5 +329,29 @@
+         "teardown": [
+             "$TC qdisc del dev $DEV1 parent root drr"
+         ]
++    },
++    {
++        "id": "1234",
++        "name": "Exercise IDR leaks by creating/deleting a filter many (2048) times",
++        "category": [
++            "filter",
++            "u32"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$TC qdisc add dev $DEV1 parent root handle 10: drr",
++            "$TC filter add dev $DEV1 parent 10:0 protocol ip prio 2 u32 match ip src 0.0.0.2/32 action drop",
++            "$TC filter add dev $DEV1 parent 10:0 protocol ip prio 3 u32 match ip src 0.0.0.3/32 action drop"
++        ],
++        "cmdUnderTest": "bash -c 'for i in {1..2048} ;do echo filter delete dev $DEV1 pref 3;echo filter add dev $DEV1 parent 10:0 protocol ip prio 3 u32 match ip src 0.0.0.3/32 action drop;done | $TC -b -'",
++        "expExitCode": "0",
++        "verifyCmd": "$TC filter show dev $DEV1",
++        "matchPattern": "protocol ip pref 3 u32",
++        "matchCount": "3",
++        "teardown": [
++            "$TC qdisc del dev $DEV1 parent root drr"
++        ]
+     }
+ ]
 -- 
-Sabrina
+2.30.2
+
 
