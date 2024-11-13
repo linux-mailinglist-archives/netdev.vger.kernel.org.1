@@ -1,74 +1,91 @@
-Return-Path: <netdev+bounces-144567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE999C7CB1
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:14:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02B59C7CEB
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 21:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B081F21942
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:14:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A08A62819E4
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 20:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50002064E9;
-	Wed, 13 Nov 2024 20:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A969189F48;
+	Wed, 13 Nov 2024 20:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gMDWorSW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DBgCc8CE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E26D204F66;
-	Wed, 13 Nov 2024 20:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19B12AF00;
+	Wed, 13 Nov 2024 20:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731528887; cv=none; b=iGFwmlgF4Q57kpLgpn7dgSt1AfvjMo35jqI6Y0S40SCLUJJoouVKile/ZK8i2NjftpmJizpwSG7yeenIrxcuUUr7ZcrS/C+gtz7set4IPX+U5Abo8VTS6CA+0PkHyv2HeIb4ZVR8qOqJdoRluQo4EO4QFhL2q8NyzAp4IZ7wKzI=
+	t=1731529819; cv=none; b=hfcGkEhUXGOP8+qIGZfEb8S3tWcZ0YJZO6KTOYj4qodPbpmnYEihsI0R2RdIwniWFvSOXbsQsEDXTToxZ7r8nUx8Ll5DPNllqjZKPjuFiiPhNsf0HnmY0dto02SAYsKRLLAQkY3lk6GgYlVoJiqcHswPkXrTER+nMu4AYMXNJyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731528887; c=relaxed/simple;
-	bh=4KOzCR/6/uot43apjvnkzhZKyIj22nkrtQR5roVfvW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pHqAWEJ1xhBDIrhmG4LBDp0V/eBy9IWPBhPBQ4mGrEyroeLe4LDMIr8THUsWvaW4pK70CeAv1Q0iq36tX0YXvkU3Qy/O7ZsnyII8SHr8MDM9SG+jWZ4jo88p6RESe0u8ls5qYYucQx59BBx0g0tyzsVl8NDEv/OPG/48yJuUTng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gMDWorSW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8CC3C4CEC3;
-	Wed, 13 Nov 2024 20:14:46 +0000 (UTC)
+	s=arc-20240116; t=1731529819; c=relaxed/simple;
+	bh=bckki8DWBbOx4RUrL6DSa/YrYppd01msQl2dTBgFuoM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KYfua9AbSXKLi+LimF1kScoxlXOHQb53WjDZlqzyBvj0AnjocMXKPOBhJJ0TLIFWiiGbEs67XEq7+MH9bKxfIaA4F5F1kE9rBxKIzAf2r9sg5bP1D3xNchuTDx3WMcFh82C1ufktuMHsu1Yh4kgsQRb6exdHvcVnDWIrzC6aMgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DBgCc8CE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54031C4CEC3;
+	Wed, 13 Nov 2024 20:30:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731528887;
-	bh=4KOzCR/6/uot43apjvnkzhZKyIj22nkrtQR5roVfvW8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gMDWorSWbQlNE7du1pMgjamCWXHp81rQft/hvP5SwBg0yQUvZ1pTjlbMylirp25ie
-	 Kb6AiEQ2sZetofLqr1dZGKrNkhkBuDftWvTRTXE5kMR1dLjhz+YRAxTBrOFFbUDBLB
-	 l64TDGg0N5vpZY+HPJWD4p2g465d5mXvA6ecY2bkoTtfj+R4HLnxdpXngTi/DLII4E
-	 9mAkTxQqhgLfSDR80FArQJDgtSIzZckdQCi/63b33P7I3su0skLr/3Lz0JIIudESJZ
-	 U5+fJKoI5JRSheYbUhV6ZUVZfqHzRsi8cx0EEg51ffbNebpnEPjHiEXD+g7D9pO/ou
-	 bNMFjlitEScpA==
-Date: Wed, 13 Nov 2024 12:14:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, horms@kernel.org,
- donald.hunter@gmail.com, andrew+netdev@lunn.ch, kory.maincent@bootlin.com,
- nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 4/7] ynl: add missing pieces to ethtool spec to
- better match uapi header
-Message-ID: <20241113121445.08cdb25f@kernel.org>
-In-Reply-To: <20241113181023.2030098-5-sdf@fomichev.me>
-References: <20241113181023.2030098-1-sdf@fomichev.me>
-	<20241113181023.2030098-5-sdf@fomichev.me>
+	s=k20201202; t=1731529819;
+	bh=bckki8DWBbOx4RUrL6DSa/YrYppd01msQl2dTBgFuoM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DBgCc8CETWl0qosZf4o07cQ6TYJsOVJ3+oX2zkxA2+7KI4hCmn86c81Hpo7nSsC5N
+	 +rg+Me5kAAYOjC0B8lT/qrl29DraBLTgZejigmzbG+ePN1IwvMAFZU9L1A8QMqDOyy
+	 /grXIm/0a5yA01KLD8W9Wf3W611mrhxAvT4+HpXrh3+A/DH6ml17dQdHiKYljlJCzW
+	 MDNjvukKVZvQWrXrzqWY5y8NcEoDEAsEWLK59YPtAv/X7t2bEYbUVF1ft2PzDAgWqV
+	 jKbey3CvpLXUEpknzHd/t41jYT+8XDG9rxl8+848cSnjFKANzXj5QOWcBU06uSNHjh
+	 14D0Hy795WZwA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4AC3809A80;
+	Wed, 13 Nov 2024 20:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] samples: bpf: Remove unused variable
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173152982977.1375566.5132572860371360601.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Nov 2024 20:30:29 +0000
+References: <20241111061514.3257-1-zhujun2@cmss.chinamobile.com>
+In-Reply-To: <20241111061514.3257-1-zhujun2@cmss.chinamobile.com>
+To: Zhu Jun <zhujun2@cmss.chinamobile.com>
+Cc: martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, 13 Nov 2024 10:10:20 -0800 Stanislav Fomichev wrote:
-> +    attr-cnt-name: __ETHTOOL_UDP_TUNNEL_TYPE_CNT
+Hello:
 
---ethtool-udp-tunnel-type-cnt ?
-or possibly
-__ethtool-udp-tunnel-type-cnt
+This patch was applied to bpf/bpf-next.git (master)
+by Andrii Nakryiko <andrii@kernel.org>:
 
-but let the codegen do the char conversion via c_upper()
+On Sun, 10 Nov 2024 22:15:14 -0800 you wrote:
+> The variable is never referenced in the code, just remove it.
+> 
+> Signed-off-by: Zhu Jun <zhujun2@cmss.chinamobile.com>
+> ---
+>  samples/bpf/xdp2skb_meta_kern.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Here is the summary with links:
+  - samples: bpf: Remove unused variable
+    https://git.kernel.org/bpf/bpf-next/c/b41ec3e6053a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
