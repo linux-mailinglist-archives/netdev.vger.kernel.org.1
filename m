@@ -1,96 +1,94 @@
-Return-Path: <netdev+bounces-144263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93D649C669C
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:22:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1B89C669D
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F35BAB2945C
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:21:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4C21283A75
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961977C0BE;
-	Wed, 13 Nov 2024 01:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93433C147;
+	Wed, 13 Nov 2024 01:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hvb3bV44"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEkPE6u2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC90762EF;
-	Wed, 13 Nov 2024 01:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61ED1382;
+	Wed, 13 Nov 2024 01:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731460821; cv=none; b=rh6nsYcWffaU8PDiXMJHXyo39RoBendHNQw1XNkcuUjxS8ucfKwllVCsSzNRusQfbdwFVdmZfVmbjt/eeSHL/CrYr4VRxBKo0d474oTwq9m3X1ldjkqxyK979RnkoJf0JE7r+ZdBUx+1le8znkaGUB5dKMv4X9/N3TIwWseHP+k=
+	t=1731460985; cv=none; b=EkaugF3CJUXh97hldDxjKNvd0zhNH/2Iu+B6Hpq61pAsQWzQgx4pWz1qsBAwt+2ZBP2rZGztFy/UJ3oAh4kgB/dlmy7Ngdq9NmgQHzFAVBCJrg+EUKoUuLSG1TOzlrPiHuOOy8Pt/ExydQmtfpSkJ2ibA5DzNJZ1OYS6TSeh1Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731460821; c=relaxed/simple;
-	bh=ckzoOOGoP1ftBLkv5EcJHIvh7Ox55OIL+k6bfhcGSSE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sPzaTx9DhLCp8QPFu24hgXXYAuuK09wNGTUPfxI6ejkYYCOEDc1x6vdM6j/VGaUbZfTR6TtyGeshKaNdb6TfhdYyu2bJQoKK9wd9q+7w7Hocw9DdrNx/4MYFn3r8F6P52ZRrq4N/Q/2rnnjyGRvXmvUU2/MBOqOPNPNVGXl+tlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hvb3bV44; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02B95C4CECD;
-	Wed, 13 Nov 2024 01:20:21 +0000 (UTC)
+	s=arc-20240116; t=1731460985; c=relaxed/simple;
+	bh=KzYtezsHHZd5EyINMqqHGG51cXOLpemJwiEUUpvOkA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jR1+MKoKB/OF9oY+HOxc90/mccJI2DBFgn/j5vfZCvT4drTgw8YdUMofnv5+z2cA+DbQAl+m2H8xmw64RgGy6L7ePmE685VeFAEzE3XWeqQXhkx/pB4rX5HcI3VLrfoakjUheSGNil4b5hBncUvZvMrO21mBwbKznXGwvosZa04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEkPE6u2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7378C4CED4;
+	Wed, 13 Nov 2024 01:23:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731460821;
-	bh=ckzoOOGoP1ftBLkv5EcJHIvh7Ox55OIL+k6bfhcGSSE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hvb3bV44keb1ZQHtxGkqRPwIFOucQ3yHujeXJBcHHIxfAh3XFjLQmYeiskDUnAcvr
-	 oDU5bED7Gj4a8zn1c3q1XSrfEtcrG4qxTfzKhPwRNPToLmcvvaAEuq68TD/zv4lty2
-	 Evc7HK/bZJHXS+Q3xmyNfZO7pavlZ+11KVaoJs//iZGyFsB/7An5J3toqSQmHcSeg6
-	 QRuhxc+hVItfgePEc2Xivu2LkOhjPV0SKRBJC6hFtqZIAnWQ2nmFt+wMbU5442t55K
-	 Oi0zZ9Zb/4Y8EL8MxXMUSSt1YyRxVy+/PY6d7DvLf2ooU2/DqeP6tZN2xHV05d+Sii
-	 vXyP6DRPPpFOA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710C83809A80;
-	Wed, 13 Nov 2024 01:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1731460985;
+	bh=KzYtezsHHZd5EyINMqqHGG51cXOLpemJwiEUUpvOkA4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OEkPE6u2U1WuKnADIOhylmi3CfE92O+1fH0PMk2OcC97uHIF+rD8uPt98OdIcOFX9
+	 mBHnkR5vQiCHCFBZWV4FS+jfrBZtscCc5p17M9osJzRLrVx8uMnlviKNu52llsksUI
+	 nfbdlsdAAR5V8jJOI4kK4pxjs+qrOaioOp+7aR58hBHoabKdA1qGfXOgO0zMLHqxFR
+	 aJSkCG41lRt2Of0Iavy3zRQiuErE3Q23RHcNwXXI7fWGrChlM1ZuKGJBFhtbxsuJQv
+	 zfQVeL5tRPZVRYJ03Vn34rjURJ6jgx/w9/GNCbhOYjCi2u9NZ3I6577l4olYOkP7L9
+	 mM9NSMb5hQveQ==
+Date: Tue, 12 Nov 2024 17:23:02 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent
+ Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>, Pantelis Antoniou
+ <pantelis.antoniou@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ Byungho An <bh74.an@samsung.com>, Kevin Brace
+ <kevinbrace@bracecomputerlab.com>, Francois Romieu <romieu@fr.zoreil.com>,
+ Michal Simek <michal.simek@amd.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Zhao Qiang
+ <qiang.zhao@nxp.com>, linux-can@vger.kernel.org (open list:CAN NETWORK
+ DRIVERS), linux-kernel@vger.kernel.org (open list),
+ linux-arm-kernel@lists.infradead.org (moderated list:ARM/Allwinner sunXi
+ SoC support), linux-sunxi@lists.linux.dev (open list:ARM/Allwinner sunXi
+ SoC support), linuxppc-dev@lists.ozlabs.org (open list:FREESCALE SOC
+ FS_ENET DRIVER)
+Subject: Re: [PATCHv3 net-next] net: modernize IRQ resource acquisition
+Message-ID: <20241112172302.582285d3@kernel.org>
+In-Reply-To: <20241112211442.7205-1-rosenp@gmail.com>
+References: <20241112211442.7205-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v4 0/3] Add kernel symbol for struct_ops trampoline
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173146083125.741480.1473724826831955288.git-patchwork-notify@kernel.org>
-Date: Wed, 13 Nov 2024 01:20:31 +0000
-References: <20241112145849.3436772-1-xukuohai@huaweicloud.com>
-In-Reply-To: <20241112145849.3436772-1-xukuohai@huaweicloud.com>
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, yonghong.song@linux.dev, thinker.li@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 12 Nov 2024 13:14:42 -0800 Rosen Penev wrote:
+>  drivers/net/ethernet/moxa/moxart_ether.c      |  6 ++---
+>  .../ethernet/samsung/sxgbe/sxgbe_platform.c   | 24 +++++++------------
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+coccicheck says:
 
-On Tue, 12 Nov 2024 22:58:46 +0800 you wrote:
-> Add kernel symbol for struct_ops trampoline.
-> 
-> Without kernel symbol for struct_ops trampoline, the unwinder may
-> produce unexpected stacktraces. For example, the x86 ORC and FP
-> unwinder stops stacktrace on a struct_ops trampoline address since
-> there is no kernel symbol for the address.
-> 
-> [...]
+drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:130:6-26: WARNING: Unsigned expression compared with zero: priv -> rxq [ i ] -> irq_no < 0
+drivers/net/ethernet/samsung/sxgbe/sxgbe_platform.c:124:6-26: WARNING: Unsigned expression compared with zero: priv -> txq [ i ] -> irq_no < 0
+drivers/net/ethernet/moxa/moxart_ether.c:468:5-8: WARNING: Unsigned expression compared with zero: irq < 0
 
-Here is the summary with links:
-  - [bpf-next,v4,1/3] bpf: Remove unused member rcu from bpf_struct_ops_map
-    https://git.kernel.org/bpf/bpf-next/c/bd9d9b48eb18
-  - [bpf-next,v4,2/3] bpf: Use function pointers count as struct_ops links count
-    https://git.kernel.org/bpf/bpf-next/c/821a3fa32bbe
-  - [bpf-next,v4,3/3] bpf: Add kernel symbol for struct_ops trampoline
-    https://git.kernel.org/bpf/bpf-next/c/7c8ce4ffb684
+Is this really worth the review effort? :|
 
-You are awesome, thank you!
+Please do not send any more conversions unless the old API is clearly
+deprecated. 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
