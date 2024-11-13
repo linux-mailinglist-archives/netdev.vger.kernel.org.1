@@ -1,157 +1,207 @@
-Return-Path: <netdev+bounces-144348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F259C6C48
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:03:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3E39C6C4C
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 11:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E028F1F213EA
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E6C2887DF
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 10:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BC81FB759;
-	Wed, 13 Nov 2024 10:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70781FB88D;
+	Wed, 13 Nov 2024 10:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="AL91kOU5";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cU0ZSi8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C370F1FB884
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 10:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84CA1FAC48;
+	Wed, 13 Nov 2024 10:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731492207; cv=none; b=dSCtjyEx71GrtAQq/SmuxxGm7gjWHu1Qk4NyNgQiEArEZip/WrLKJufj34R0OeRtz4dLAqSAAARzMeTuF29aDbsqDI0cplZ7oWFqSboRmXkqfvxygBH//l65xIpHIJOi0JmLuupjXSPEO/7Xc6V9vukx4G1MQsqOrMixFmG8kSA=
+	t=1731492243; cv=none; b=jAaCV5wKlq4+m1GotU6q0CeqRM6LcDlNilk4uJcXz0ksQ0hfs1KsEzdDgWoO1URxho7lyjAH2lSVCnfkS6Ndy8FNPU+y8/idjEC04cxwDlZObrlxq/V87DkeG8MBVVY0loq4LMtpmvxNf4+9TBAiPq3OJPiBh+OJl43VLAVJrNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731492207; c=relaxed/simple;
-	bh=wsdwC3CS6Hd8xHiLIAPYBss7Mnv9WRYVickFvP64SOU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=eCB/P1X26WFoQk1XcW9RMiR/iSgNvqOEF8etE2EJQXW1wDG52PwH+7H+d/Pn6xz+ErJ0Ne5UuJE7fHK0OcvKD3JZaS7eGPBR63mt214XDPEaOcC1vL8x+9ChYGdppauffE5Zx4YsQ5c93b+EYaFRRNH8WS8OVZKdQmAT99duRFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a71bdd158aso423485ab.1
-        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 02:03:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731492205; x=1732097005;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YGwSr4FzZWJcuo3AWm+R4LEyOz9xOpfNp/jKix3RJZU=;
-        b=G1ugZkcdzH7YST+ax1kVZJ1JwQQltHghe9dCN7SESXSSVtygMLwLpX3YsX4abUF3KB
-         4m8XulwvPnBG9iDhSoEItfgno8xYft8I7M84HYJbscD9Ho9emuWcdS2kQORYRwHmVo7M
-         Zsk0LJZkey/f1mEwFnRuWqnTj3tBIssvik91ilDBy3akwxChs8MdcO3nvvTfOaCY7j6i
-         Fd5vl8yQ6vaw71D2Hic8NpWOv9y6B4qk0NqxzV1UF7X9mTYCGnpx4uZ5/+agY0rsI8uX
-         gsWW02UlPC49lrZj3wMMZqO34oiYf05jFyR5JAyd1CJAn1+qIcG4WEMLdnH11Otx9HSg
-         9IVw==
-X-Forwarded-Encrypted: i=1; AJvYcCV31Ia5bVDSg/X24ySQL3TsMuUYvxwnNt9aftYrAnADg2yM094TZ5dSRDJmFtjRmwEiqYC4yLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyM10dYcz1VgFk5NmLa6MinRfuDh5alp29IPhcLdcIkLEXfujL5
-	rHp51mdvTAsCsWSb/a7kql+e3jQWOIuwQyrRP3jCZVWFQsiVD8yQybk+aW/04d/+EmPNpi77/LL
-	x0GK917jpEC8zouhQBbrn2lCQM+Ig7QpmTfS9FfCge+hsbKurLg1ew9w=
-X-Google-Smtp-Source: AGHT+IHhDLkTrVT18M9FC5IesYfllKbhptcngWt2H3ROIa8ndTrDYfl9yr8GeXAqbjxFAWY69hQMzxSX75OLnXOZqhgTI56Q0LwK
+	s=arc-20240116; t=1731492243; c=relaxed/simple;
+	bh=9WgOqZ7pkkEtVVakWuhfW72XbEP2znkm7oYKso1f9Y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H6+I0NCiSxbAo2YFJ1jzP/6IDrRjw70ipkKgFz+Bm/rDt+ddkuc6DBZeYgffeXhwItIdpfpDWvJEdnuXVW03c8lEoMW97CtHkwA3Vw/mDRfCcQAxZz+ZmanZzvR6BZ3KOYT5bDd5slpyxUE038D9t/H+A5itFeCTk3zxQosxFfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=AL91kOU5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cU0ZSi8j; arc=none smtp.client-ip=103.168.172.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailflow.phl.internal (Postfix) with ESMTP id B20842018EE;
+	Wed, 13 Nov 2024 05:03:58 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Wed, 13 Nov 2024 05:03:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1731492238; x=
+	1731495838; bh=Ez/gX/Lx9KP5A6YSj3GZt6+aAN/V+id/rFQYWBdeg+4=; b=A
+	L91kOU58sCjmTlQJdgMjC5zUvg8oJLltEG1/JXMtFP8DKXriavohggJBOq+nh4dt
+	6NFDXq/jC3+z7K16HSXnK5YL1iRHnmOrBaAFhpS2N+zl4RReG4HvQdIQ1nxcqjBc
+	ATYUctYhl6w/BlPLfcmNKYhTkR0OT78loFBn4KUS6SRMUG50ZK19Yp4qrI+iisyf
+	Ael/GXblmdV6M3tCsGA0xpn66tVpuEDJjMiH0jyYs3bMz62Tv+pzR4z5Z+DlK7jr
+	Z2jWZKVyTpypvt+xMTSJ5Mx5zTi7TJ010kw+D6y6piuUbTX+Cqip2DSiuhn/zfHI
+	/fFMUn0IYAyNzbIa0oCDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1731492238; x=1731495838; bh=Ez/gX/Lx9KP5A6YSj3GZt6+aAN/V+id/rFQ
+	YWBdeg+4=; b=cU0ZSi8jFa20seQjI3WTu4Fjrg/W3li2sTAH2U4YqtegfVVvrxI
+	RQu9RzmZTj8GWYG8km5CNxbBCt6E8uEXA7T/QSv7m7I+Yo5HJhu7iBMvlO1mZAJJ
+	tGTWecC3+ryJbr0CgDFc7rjl3xQ4RRD94mZplJ/IM0uv0lWKuKdd8eaiIU4SiHv7
+	cj6iqQXXqvyoxyiOLsxo0FoHvYMaTZoAgxmL0X4xs4ZOL7nZxubZCUVWUt+JU8pF
+	RgpkwRvVuVc2EtDGk3Vz3gVNpY+8a8ZUDDcSMtKPkxcHNyUa9MFqewvq5Myg/5Hs
+	Wk/9DdeXTSBplufBz/ooRpwHegwLAfRth6Q==
+X-ME-Sender: <xms:jnk0Z_vsGs6JcAKwsl1cYiLFuNY3kUjZaYHydsW2N2mGh2RD7e09YA>
+    <xme:jnk0ZweFultluEIzEi1IFLb3b4xwsj6NVIF-r5b6qzhdG-9MQr1OA__yPcIHcTzUY
+    vkqMQ-5diiY_Oo6ki0>
+X-ME-Received: <xmr:jnk0ZyxGw02KP2KYJGxmRDj4io7HFztf0hRKDKjqdItVFwPeIyuxSjN0kNs5>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvddtgdduudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
+    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
+    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
+    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
+    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrhigriigrnh
+    hovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhhtohhnihhosehophgv
+    nhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+    dprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggv
+    nhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:jnk0Z-PUo6qciVVGOANqRs-bY-b0lMgcJLxwjOc6GCPghlRhs4vuPw>
+    <xmx:jnk0Z_9ajTA4p42cbzvUlQNMFz1EpzDBW1BgyhI0ASW9nZk1Sb2gdg>
+    <xmx:jnk0Z-V06zGIFJfG3gGz-ng1yHb6-baSgoZ4TihcDy2nYvOAJw51Sw>
+    <xmx:jnk0ZwcVAJiiOCDZHlqPDZGyXm-gDTXovwzEAEWM0TSG3uQdo3FkVw>
+    <xmx:jnk0Z7QRwMjJcd-5pKRmAt0K8PDhQkS-emb5OJadk1R8Qx_Ryt4fRzbm>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 13 Nov 2024 05:03:57 -0500 (EST)
+Date: Wed, 13 Nov 2024 11:03:55 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Antonio Quartulli <antonio@openvpn.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
+Message-ID: <ZzR5i9sO-xwoJcDB@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
+ <b7d3ec11-afe4-409c-970e-8bc647364a08@gmail.com>
+ <ZzORATd5hG614dta@hog>
+ <e543a3de-44f1-4a2d-90ef-1786e222f0d8@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1:b0:3a2:6cd7:3250 with SMTP id
- e9e14a558f8ab-3a6f19c1b01mr218864055ab.10.1731492204891; Wed, 13 Nov 2024
- 02:03:24 -0800 (PST)
-Date: Wed, 13 Nov 2024 02:03:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6734796c.050a0220.2a2fcc.0007.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in netlink_ack_tlv_fill
-From: syzbot <syzbot+d4373fa8042c06cefa84@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e543a3de-44f1-4a2d-90ef-1786e222f0d8@gmail.com>
 
-Hello,
+2024-11-13, 03:37:13 +0200, Sergey Ryazanov wrote:
+> On 12.11.2024 19:31, Sabrina Dubroca wrote:
+> > 2024-11-10, 15:38:27 +0200, Sergey Ryazanov wrote:
+> > > On 29.10.2024 12:47, Antonio Quartulli wrote:
+> > > > An ovpn_peer object holds the whole status of a remote peer
+> > > > (regardless whether it is a server or a client).
+> > > > 
+> > > > This includes status for crypto, tx/rx buffers, napi, etc.
+> > > > 
+> > > > Only support for one peer is introduced (P2P mode).
+> > > > Multi peer support is introduced with a later patch.
+> > > 
+> > > Reviewing the peer creation/destroying code I came to a generic question.
+> > > Did you consider keeping a single P2P peer in the peers table as well?
+> > > 
+> > > Looks like such approach can greatly simply the code by dropping all these
+> > > 'switch (ovpn->mode)' checks and implementing a unified peer management. The
+> > > 'peer' field in the main private data structure can be kept to accelerate
+> > > lookups, still using peers table for management tasks like removing all the
+> > > peers on the interface teardown.
+> > 
+> > It would save a few 'switch(mode)', but force every client to allocate
+> > the hashtable for no reason at all. That tradeoff doesn't look very
+> > beneficial to me, the P2P-specific code is really simple. And if you
+> > keep ovpn->peer to make lookups faster, you're not removing that many
+> > 'switch(mode)'.
+> 
+> Looking at the done review, I can retrospectively conclude that I personally
+> do not like short 'switch' statements and special handlers :)
+> 
+> Seriously, this module has a highest density of switches per KLOC from what
+> I have seen before and a major part of it dedicated to handle the special
+> case of P2P connection.
 
-syzbot found the following issue on:
+I think it's fine. Either way there will be two implementations of
+whatever mode-dependent operation needs to be done. switch doesn't
+make it more complex than an ops structure.
 
-HEAD commit:    4861333b4217 bonding: add ESP offload features when slaves..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=10f26ea7980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ea5200d154f868aa
-dashboard link: https://syzkaller.appspot.com/bug?extid=d4373fa8042c06cefa84
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17d19e30580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1733c35f980000
+If you're reading the current version and find ovpn_peer_add, you see
+directly that it'll do either ovpn_peer_add_mp or
+ovpn_peer_add_p2p. With an ops structure, you'd have a call to
+ovpn->ops->peer_add, and you'd have to look up all possible ops
+structures to know that it can be either ovpn_peer_add_mp or
+ovpn_peer_add_p2p. If there's an undefined number of implementations
+living in different modules (like net_device_ops, or L4 protocols),
+you don't have a choice.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4263c9834cd5/disk-4861333b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/14c4f9ec4615/vmlinux-4861333b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6cc8fe1b802d/bzImage-4861333b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d4373fa8042c06cefa84@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5845 at net/netlink/af_netlink.c:2210 netlink_ack_tlv_fill+0x1a8/0x560 net/netlink/af_netlink.c:2209
-Modules linked in:
-CPU: 1 UID: 0 PID: 5845 Comm: syz-executor685 Not tainted 6.12.0-rc6-syzkaller-01230-g4861333b4217 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-RIP: 0010:netlink_ack_tlv_fill+0x1a8/0x560 net/netlink/af_netlink.c:2209
-Code: 00 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 0d 48 89 df e8 db b3 2a f8 48 8b 4c 24 10 4c 8b 3b 4d 39 fd 73 2c e8 c9 ed c0 f7 90 <0f> 0b 90 49 bf 00 00 00 00 00 fc ff df e9 9f 00 00 00 e8 b1 ed c0
-RSP: 0018:ffffc90003b47780 EFLAGS: 00010293
-RAX: ffffffff89d3ec97 RBX: ffff88807d437718 RCX: ffff888030185a00
-RDX: 0000000000000000 RSI: 00000000ffffffde RDI: 0000000000000000
-RBP: ffffc90003b47850 R08: ffffffff89d3ec3c R09: 0000000000000074
-R10: 6f702064656c6961 R11: 6620657475626972 R12: 1ffff92000768ef4
-R13: ffff88803169461c R14: ffffc90003b479c0 R15: ffff888031694620
-FS:  0000555569f6a380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000066abb0 CR3: 0000000079386000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- netlink_dump_done+0x513/0x970 net/netlink/af_netlink.c:2250
- netlink_dump+0x91f/0xe10 net/netlink/af_netlink.c:2351
- netlink_recvmsg+0x6bb/0x11d0 net/netlink/af_netlink.c:1983
- sock_recvmsg_nosec net/socket.c:1051 [inline]
- sock_recvmsg+0x22f/0x280 net/socket.c:1073
- __sys_recvfrom+0x246/0x3d0 net/socket.c:2267
- __do_sys_recvfrom net/socket.c:2285 [inline]
- __se_sys_recvfrom net/socket.c:2281 [inline]
- __x64_sys_recvfrom+0xde/0x100 net/socket.c:2281
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff37dd17a79
-Code: ff e8 cb 01 00 00 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d 11 66 07 00 00 41 89 ca 74 1c 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 67 c3 66 0f 1f 44 00 00 55 48 83 ec 20 48 89
-RSP: 002b:00007ffda0631f18 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-RAX: ffffffffffffffda RBX: 00007ffda0631fa4 RCX: 00007ff37dd17a79
-RDX: 0000000000001000 RSI: 00007ffda0631f90 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffda0631f90
-R13: 00007ffda0633178 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+xfrm went the opposite way to what you're proposing a few years ago
+(see commit 0c620e97b349 ("xfrm: remove output indirection from
+xfrm_mode") and others), and it made the code simpler.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> What together look too unusual, so it feels like a
+> flaw in the design.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+I don't think it's a flaw in the design, maybe just different needs
+from other code you've seen (but similar in some ways to xfrm).
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+> I racked my brains to come up with a better solution and
+> failed. So I took a different approach, inviting people to discuss item
+> pieces of the code to find a solution collectively or to realize that there
+> is no better solution for now.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Sure. And I think there is no better solution, so I'm answering this
+thread to say that.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+> The problem is that all these hash tables become inefficient with the single
+> entry (P2P case). I was thinking about allocating a table with a single bin,
+> but it still requires hash function run to access the indexed entry.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+And the current implementation relies on fixed-size hashtables
+(hash_for_each_safe -> HASH_SIZE -> ARRAY_SIZE -> sizeof).
 
-If you want to undo deduplication, reply with:
-#syz undup
+> And back to the hashtable(s) size for the MP mode. 8k-bins table looks a
+> good choice for a normal server with 1-2Gb uplink serving up to 1k
+> connections. But it sill unclear, how this choice can affect installations
+> with a bigger number of connections? Or is this module applicable for
+> embedded solutions? E.g. running a couple of VPN servers on a home router
+> with a few actual connections looks like a waste of RAM. I was about to
+> suggest to use rhashtable due to its dynamic sizing feature, but the module
+> needs three tables. Any better idea?
+
+For this initial implementation I think it's fine. Sure, converting to
+rhashtable (or some other type of dynamically-sized hashtable, if
+rhashtable doesn't fit) in the future would make sense. But I don't
+think it's necessary to get the patches into net-next.
+
+-- 
+Sabrina
 
