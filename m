@@ -1,138 +1,139 @@
-Return-Path: <netdev+bounces-144420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229629C7073
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:22:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D342C9C704E
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 14:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83490B2B9AD
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:05:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70C591F21DFD
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 13:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A182022CD;
-	Wed, 13 Nov 2024 13:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426701DFD8C;
+	Wed, 13 Nov 2024 13:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGkyaGIv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WcsJ72je"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DD1200B82;
-	Wed, 13 Nov 2024 13:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6CF1DF73B
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 13:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731502944; cv=none; b=Oip9FlSNH5nViRZPF8bg5JsmFXB55GrBVodApeCYywV2YntJjtlPFuRBL7UgKr58S03uudIpqWoOoXNZ6dfQ64RwqdvQ9J9qmliYyER/Thtg5/J7sXf+8BSbUUgGFhrwgZckIlmgAEPvgY90QMBTj7pwywHGwkZGuCaIS4TcEzA=
+	t=1731503423; cv=none; b=USJgz2EQ5gwk8A8HSklf3pf4Z7gSzS6n4X/KsNmsBWkDZ3ZWFfc9cXpJMFyzwnUj6WlxeK0xhkRy4h+6tOOX95pqM7+JK00aU6m2Y3oWPpengzcTmg/PmqUvZHJjs2T1CpcZi2Qqs3DOXVHswAbr640UxpSHqwKP01dShOneRiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731502944; c=relaxed/simple;
-	bh=HE2f+Wis+LO+3GqCujUAT+1t51bvMsaOleQBQosi4fw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I/W06TrkCS4OHQwq57DzbkVU8d5n3l4RURrKmkMR/dPEfJkS1kHi3swDxMuqbwdhxYwau9VRKuUErMF+NWRhVidWGsXhKzPbv8ALr8dPmXhMblWvPxT60JSvhhob8fSQg58MAwTBl30DwLYsOP79XYRKyYyBJ+SNwGKVg3qPdok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGkyaGIv; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20cb7139d9dso64963105ad.1;
-        Wed, 13 Nov 2024 05:02:22 -0800 (PST)
+	s=arc-20240116; t=1731503423; c=relaxed/simple;
+	bh=Opcmz9YYIaVdPWsOxhUqLPlpXQUP+f6SvaFPoN8x2S4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YrrfH4c4d5AY+qAEUXTgizbxskTL0uSOFDrmwOTnEJMTIi5JbhFiuoWuOD8IW1qV8Q5ZeBJlG5xRiQmSis7d/pBgN9xBZfGUmifdifBKYl/jJvN1lHsJMHiC/4zHJEuPc1wcvr0QVV+3/PuNAHHTaa4ez9RiGtI2teDlFqnGqNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WcsJ72je; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4314c452180so4489765e9.0
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:10:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731502942; x=1732107742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AbzJ+kU15cqJAnxZBlXR2yEKRSm3bncn2jZQ5PrWfNM=;
-        b=gGkyaGIv+vG7t2uHZXInGMSs4cs19hDkhC85BNk1+RCsuZSbuwfqGYyE1jiiqa49Vd
-         //U0J/nGEY0yzfW/sj4Tnm+Gd1xZRKgaXCYKYmZU6U62I01jD9PVcrj7Nmxoy5MCtfZf
-         ijH8ZhdZuiVIeKpghovCbFMTjpoMZ+mBDv48Sob63UloVniUe28XJmb4vFVVdnwkleSP
-         4KkT9Y+PSvXahJbOb+yvSs30IOgoZnQh26AUDXnRIQINcbz/XFOK4OXH5FLpz/ePuXK/
-         nIWd2BTE3DbTzGq+hr8QNhEtYl7W851uYxYF+X43um5PWZCWqmgHcs2Jhx+eVVWI4g9p
-         9fmg==
+        d=linaro.org; s=google; t=1731503420; x=1732108220; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vrCyUIt2ww7l4E4yjLiYIeNzWk/0rCkfz0cRlXOTRlw=;
+        b=WcsJ72jeySrgNlU53qllluOgJb/aFlqt3rKFw4SeoMUCnWGrbfxrzGbtgxtDjsAw+M
+         XACker0FEQcyDNYqclFPOROgiRrxqAJCyQxPcDLUUwt8nab6qbMxsMv6m4PsJbohHHsV
+         tZVXU578PZIEk0ZA0I4rO4U1NXmH7tz/zIFSRwuNSlYgGLlex/REIbYD+NHclwHPWSlY
+         GJgGHPRNqNnmfsKnfU1TrjPNtT6maxijY5BAW1/0jhyLU621D0VscAZG1Q5B2Co3xCn1
+         W/xnWqEt4JBwS7yJy1g2V4CwjCzAR5mTfpx1RVntMINbNhg+6+HQhm8y76IWP8iooVTw
+         a1ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731502942; x=1732107742;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AbzJ+kU15cqJAnxZBlXR2yEKRSm3bncn2jZQ5PrWfNM=;
-        b=KxbHwoTrQPl9gZIG039tUl6X3zQZsv5mJXeQia8iUwjqdvTwBJQlsXrexkypFvuz7B
-         IUTiGktGywk2xH0/l8FsxpCyeNXz48VD6LOw18vVfheEZ65TxM1kGxhPFLI0ZcMcSIhx
-         w8mSfRTUczik9Lzhev8IfuAWVxrgSKhDnQ7PmfrJttKHjhtCu39b/JfepVHRFTSVY07E
-         gxW2K634K3axLRjGE1zoE2ioRui+/vzrBGQ/INwpwXFrCerQpweQGeAqSnLQwGWU/AAy
-         r3k3syH6ejGMcvrTEV+JL2u83l7bDSfn4lhYNxjmV1PUsm0dK2g7Fa2xWLnvuTKnS3XK
-         uNmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQVjhF5JAjNNGR5IwTNEyM1TSZk+XZyIeHTgNjIeDv79OizOSpERzjtUfQ8fjJa5uQ8rRTpIiV@vger.kernel.org, AJvYcCVitUYeZM54Lp9vl0Iul2D4nOqtCXsBvmMLOufttlAy8rWnqYhtMcUJymT+XV82hkud+wsATnY+@vger.kernel.org, AJvYcCVn1gNyAQzU82GA/lvhlVS0FJWkdBhSiGujEfFq3EpC2sqg0gEynw5zqZ+D22xKF5G2KwuphudufTkBlrtwEOW5@vger.kernel.org, AJvYcCXLeDQ8lbiBqt0Mh9ytYdzy4K+IiaQ4SIeCaohdYqR0mFgNMFW75BwWAnoEt4mMqcrecYU60glArxcITRw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe5sXwdgEbkSGUdsY+bFlp0YeekeCYBuzIUw1VMlFq2IB2wTtI
-	dF4GR2keSy0WJMYRo66i90GrutWxqW8cHD/NBRc17c5H+PZJG0eQ
-X-Google-Smtp-Source: AGHT+IGdFzP/aFDRjwd4saC/SLz9J8R5Gbj+ehtBZMSOW2SF3ig7tLXDoRjI5T94fEhIBVNHUlScgg==
-X-Received: by 2002:a17:902:e747:b0:20c:769b:f042 with SMTP id d9443c01a7336-21183d6717dmr282119785ad.31.1731502942041;
-        Wed, 13 Nov 2024 05:02:22 -0800 (PST)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dc8c29sm109692955ad.25.2024.11.13.05.02.18
+        d=1e100.net; s=20230601; t=1731503420; x=1732108220;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vrCyUIt2ww7l4E4yjLiYIeNzWk/0rCkfz0cRlXOTRlw=;
+        b=cUOzEws7orofBWxEwAixk8gX/FgrMTSRJC9K+fxaw/PeJ0axrPd9+esM0W85vUXHuJ
+         0Tq5YQuVVCc/udT5syKib8EwlKQKxfJSCczDvmmfGP2w+cCFkZ+qN+LAhVS5fGy8kk3L
+         nmiLw5Q4G3pKoteQ+VGANq98reePuQ6717tTs4dSkUt7OiEtwWLbMjJzlhCIee6rqI/n
+         zna5f6TELbmqE87Y+JSBL74Wn86dH+AkiruIjOwFnYRtXYqf23RC3ujJak01E0wLePq+
+         88Dzrl5Lctet2LHSaKLRiBNjCAWNYSFasRQGF/I0C2pkdySBep+F1yJwXkfegNyoMuoi
+         luNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNfWHMKlLC1p6zeJMVz9lSUK0xbOuEyA6vJOHhc0YfZVhSCuOrAkWIfqTDizSAEABkfoTVOWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIogYPqj7cTWd6mL7trTG2qbfVzbc+i9Z/qBjpydtWClmfDebo
+	BjqAs1YvK77CUWMLpa3ZooM+qTembQ3pJxUh1ycorMzmc45W+PtoHh2NqkqVx3U=
+X-Google-Smtp-Source: AGHT+IE0LhHchWSjR1k9sQMVXr3w1p9/+8HBLDRMWC0wiutg6e3LOt2hgiDvsOk5dnHwLzxqCoRJPA==
+X-Received: by 2002:a05:600c:354f:b0:42f:84ec:3e0 with SMTP id 5b1f17b1804b1-432b685c0a8mr175006505e9.9.1731503419662;
+        Wed, 13 Nov 2024 05:10:19 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432d550c159sm24063835e9.32.2024.11.13.05.10.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 05:02:21 -0800 (PST)
-From: Jeongjun Park <aha310510@gmail.com>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kaber@trash.net,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net v2] netfilter: ipset: add missing range check in bitmap_ip_uadt
-Date: Wed, 13 Nov 2024 22:02:09 +0900
-Message-Id: <20241113130209.22376-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 13 Nov 2024 05:10:19 -0800 (PST)
+Date: Wed, 13 Nov 2024 16:10:15 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: "Everest K.C." <everestkc@everestkc.com.np>,
+	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] xfrm: Add error handling when nla_put_u32()
+ returns an error
+Message-ID: <81088611-41d9-4472-94e6-3170418156c9@stanley.mountain>
+References: <20241112233613.6444-1-everestkc@everestkc.com.np>
+ <20241113105939.GY4507@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241113105939.GY4507@kernel.org>
 
-When tb[IPSET_ATTR_IP_TO] is not present but tb[IPSET_ATTR_CIDR] exists,
-the values of ip and ip_to are slightly swapped. Therefore, the range check
-for ip should be done later, but this part is missing and it seems that the
-vulnerability occurs.
+On Wed, Nov 13, 2024 at 10:59:39AM +0000, Simon Horman wrote:
+> On Tue, Nov 12, 2024 at 04:36:06PM -0700, Everest K.C. wrote:
+> > Error handling is missing when call to nla_put_u32() fails.
+> > Handle the error when the call to nla_put_u32() returns an error.
+> > 
+> > The error was reported by Coverity Scan.
+> > Report:
+> > CID 1601525: (#1 of 1): Unused value (UNUSED_VALUE)
+> > returned_value: Assigning value from nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num)
+> > to err here, but that stored value is overwritten before it can be used
+> > 
+> > Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
+> > Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> For future reference, I think the appropriate target for this tree
+> is ipsec-next rather than next.
+> 
+> 	Subject: [PATCH ipsec-next] xfrm: ...
 
-So we should add missing range checks and remove unnecessary range checks.
+All these trees are a pain in the butt to track.  It's fine for people who only
+work in one tree but for people doing static checker stuff, then we have to
+deal with all 388 trees in linux-next.
 
-Cc: <stable@vger.kernel.org>
-Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
- net/netfilter/ipset/ip_set_bitmap_ip.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+I've changed my scripts to add [next] to my patches if Linus hasn't merged the
+commit from the Fixes tag.  I still add net and net-next by hand but I'm going
+to just automate that as well because doing it by hand has been failure prone.
 
-diff --git a/net/netfilter/ipset/ip_set_bitmap_ip.c b/net/netfilter/ipset/ip_set_bitmap_ip.c
-index e4fa00abde6a..5988b9bb9029 100644
---- a/net/netfilter/ipset/ip_set_bitmap_ip.c
-+++ b/net/netfilter/ipset/ip_set_bitmap_ip.c
-@@ -163,11 +163,8 @@ bitmap_ip_uadt(struct ip_set *set, struct nlattr *tb[],
- 		ret = ip_set_get_hostipaddr4(tb[IPSET_ATTR_IP_TO], &ip_to);
- 		if (ret)
- 			return ret;
--		if (ip > ip_to) {
-+		if (ip > ip_to)
- 			swap(ip, ip_to);
--			if (ip < map->first_ip)
--				return -IPSET_ERR_BITMAP_RANGE;
--		}
- 	} else if (tb[IPSET_ATTR_CIDR]) {
- 		u8 cidr = nla_get_u8(tb[IPSET_ATTR_CIDR]);
- 
-@@ -178,7 +175,7 @@ bitmap_ip_uadt(struct ip_set *set, struct nlattr *tb[],
- 		ip_to = ip;
- 	}
- 
--	if (ip_to > map->last_ip)
-+	if (ip < map->first_ip || ip_to > map->last_ip)
- 		return -IPSET_ERR_BITMAP_RANGE;
- 
- 	for (; !before(ip_to, ip); ip += map->hosts) {
---
+But then if we try to add all the ipsec or whatever trees, it just becomes
+unworkable.  I started to write a script which would look do the --is-ancestor
+check based on the Fixes tag, but it take forever to update the git trees.  I
+wasn't able to figure out a way to make this work.
+
+Also once Linus merges the commit, there is no way to tell which tree the commit
+goes to so it only applies to linux-next.  For networking, I already have the
+script that greps the patch for -w net and grep -vw wireless.  But I don't want
+to maintain a list greps for everyone's tree.
+
+A lot of this scripting could be built into the CI system.  The CI system is
+already doing some scripting based on the subject but we could do it based on
+the Fixes tag instead.  If there isn't a Fixes tag, then it should go to
+net-next.
+
+regards,
+dan carpenter
+
 
