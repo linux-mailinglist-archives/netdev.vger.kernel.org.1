@@ -1,188 +1,200 @@
-Return-Path: <netdev+bounces-144300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 680729C67E7
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 04:50:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 932469C6806
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18141B23383
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 03:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 374DD280E01
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 04:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D16B142659;
-	Wed, 13 Nov 2024 03:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2D7482EB;
+	Wed, 13 Nov 2024 04:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ILoPHHG1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AXSTBP6P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C5F3D97A
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 03:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C5F230984;
+	Wed, 13 Nov 2024 04:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731469830; cv=none; b=l5KGlfwzYBRbYONC6rNDsolbVOq7o2tsIlrGChfQBtN6OvERmuBbbk4L+cDwtuHqC7vFAP/bBRsLaof7twTi1qa2PL9P4L/aSNyNT3nbilpod0RD3vuc9oip+GQG13AYnMTEqNACIm8vCSL9oynNCuZtN+r4cbMaxGHpxMivqBk=
+	t=1731471612; cv=none; b=XL59MSDfrak6lm24vgi3uv28DAYiTyMME7jnYxfsxcaTRpk4pyoT+vWhYkZ/DF+wqg5VVUyD0wWfqfeaDrfwfScNssZQOeSfx9jdht6JgyeZP4p8pvV/jCotOf7CaGOQEgFfp4bGseDO0RjajRTEu0MpsVzuVGKltXHGOGAXjrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731469830; c=relaxed/simple;
-	bh=w0UcEmDcIDlIrG3buY1TsjmunSIXSFEj5rfEXaxSm/c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H3OlcfzXqlo4L5vFR2fUxq3lrbqiEPEhtM9T3uHMDyopdXlOonYn9hNmIrHCGmkRNUy6XhVyfRDFfSILA84J4WNgMemXVuRO1iBfct3+Eru6BgCi5myR7UerT0jKlSfup/55Xl65w8M3jbfRlDVdWUKeCORjrXXlDqjtSxZmHFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ILoPHHG1; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539e8607c2aso7150804e87.3
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 19:50:27 -0800 (PST)
+	s=arc-20240116; t=1731471612; c=relaxed/simple;
+	bh=jhWwP/O8JhvbiiG5pI0v3W7Vre4PvvpIYErYutz+W1M=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IRrol2pbmci0rQVnRduYj0awdvmy00CI1epCJvNjGCc2Nu1Hh20JNGNE00cIPcQgj3LIotcoMo/liPhqBc7yJEleLo74YyihpotC20g+NfdAuzRfkDD+WBIn1qJNeXiNalW1W17q7uIH8jJ5dO6fDqX2nF7gsSyvrghjGOqndBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AXSTBP6P; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731469826; x=1732074626; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w0UcEmDcIDlIrG3buY1TsjmunSIXSFEj5rfEXaxSm/c=;
-        b=ILoPHHG1WAhNwWao0gZrZPNZFBqU+SfusRmCHZiT+3pGj8s7rW/HrRqgDM9ogLrMiX
-         oOCFztYChP6/iHLr3PGiUopTrTaMUDah6oIWZSPpI2e2BKDhbzZAjxzugYV4J1tc0Gy1
-         o6wC2xM8FkkM93R2hBlzvY5WFyZi8XVte3750=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731469826; x=1732074626;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w0UcEmDcIDlIrG3buY1TsjmunSIXSFEj5rfEXaxSm/c=;
-        b=ASe7j55SNqJNqcUvHe12KmfAqKIVrIImzI65gNjRRiK0ajJPRg3aJY+ROWoKYTB+Tz
-         50xk5867sKXuIBCH6UT/xkiX9h8PHITMveOpXJ3PCkSiTQHs10YReA+C3lA894wa4po4
-         VhQw1hEjek5vQBlLQ7R/L0YHx/tnX8C1NxsAa8JzwYby36VTkJDxFeGI7oBGzgLqEAp1
-         ih+3ERNvWZZwXMwVdWNn8jUfgxnE5I1VPaJNDBVWLHeikqmY0uHAKqNmJGBJnXN4nGM0
-         VlCHphlFWeimC0oL16OCnknECYBvFipxerp/WfzbgKSz+QIrtyWyV1PK/h8PwGjanklK
-         erRg==
-X-Gm-Message-State: AOJu0YxxIOFU54dvs22ZRg8VOL81NoTAcKW2TBiH+sepHE5Mq7xtDwTW
-	YLW94f7TOFB3+uQQDvBFDZ97FKHv7flgpyiyDA22J2ic3F6caJBSIBol08FAyEu+0XTEgFuBl3z
-	D6WoNQao+VRNEUZwt/EXM6NZJB9u1dpnT0hfN
-X-Google-Smtp-Source: AGHT+IG4rCJyCsYM7WDxI+wih2NzHvE4+0MzTHVd0u5eRttGLacoCG00+gQjCtI5Ctmsjigik1lq787JYqYfEFXNFUA=
-X-Received: by 2002:a05:6512:238c:b0:52f:d0f0:e37e with SMTP id
- 2adb3069b0e04-53d862e4fc4mr9113818e87.42.1731469826101; Tue, 12 Nov 2024
- 19:50:26 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731471610; x=1763007610;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pg9mM9J6Dxw/+7gv+bmmeu5fOzsl43yYd8X2FRBzK08=;
+  b=AXSTBP6POrNgJZfzqEPaEacI5lFHcrX/3JG40N186rlt7W7CmYjW0pNH
+   IOrz6Uq/Es3V1/jOSwcl8wTkkav99d0/BECBL8JdBt5sYbNoigm1ZXs0E
+   MvxSUpvdnFAT65pugU3unMVL/8QQfBPjG6MLeqbHfFrGZ4JNmZKEo3sMq
+   0=;
+X-IronPort-AV: E=Sophos;i="6.12,150,1728950400"; 
+   d="scan'208";a="351877170"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 04:20:08 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:27141]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.214:2525] with esmtp (Farcaster)
+ id fdf33349-ad14-4138-a6ff-216e54c47000; Wed, 13 Nov 2024 04:20:08 +0000 (UTC)
+X-Farcaster-Flow-ID: fdf33349-ad14-4138-a6ff-216e54c47000
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 13 Nov 2024 04:20:06 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.24) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 13 Nov 2024 04:20:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <liujian56@huawei.com>
+CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
+	<horms@kernel.org>, <jlayton@kernel.org>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-nfs@vger.kernel.org>, <neilb@suse.de>,
+	<netdev@vger.kernel.org>, <okorniev@redhat.com>, <pabeni@redhat.com>,
+	<tom@talpey.com>, <trondmy@kernel.org>
+Subject: Re: [PATCH net v4] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
+Date: Tue, 12 Nov 2024 20:19:58 -0800
+Message-ID: <20241113041958.56568-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241112135434.803890-1-liujian56@huawei.com>
+References: <20241112135434.803890-1-liujian56@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241112185432.1152541-1-srasheed@marvell.com>
-In-Reply-To: <20241112185432.1152541-1-srasheed@marvell.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 13 Nov 2024 09:20:15 +0530
-Message-ID: <CAH-L+nNzn87baqEXBiC6q7G=66YKzSS3=bASQfscA0yephz8QQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] octeon_ep: add ndo ops for VFs in PF driver
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com, 
-	sedara@marvell.com, vimleshk@marvell.com, thaller@redhat.com, 
-	wizhao@redhat.com, kheib@redhat.com, egallen@redhat.com, konguyen@redhat.com, 
-	horms@kernel.org, einstein.xue@synaxg.com, 
-	Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f304c70626c33b44"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
---000000000000f304c70626c33b44
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Liu Jian <liujian56@huawei.com>
+Date: Tue, 12 Nov 2024 21:54:34 +0800
+> BUG: KASAN: slab-use-after-free in tcp_write_timer_handler+0x156/0x3e0
+> Read of size 1 at addr ffff888111f322cd by task swapper/0/0
+> 
+> CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-dirty #7
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
+> Call Trace:
+>  <IRQ>
+>  dump_stack_lvl+0x68/0xa0
+>  print_address_description.constprop.0+0x2c/0x3d0
+>  print_report+0xb4/0x270
+>  kasan_report+0xbd/0xf0
+>  tcp_write_timer_handler+0x156/0x3e0
+>  tcp_write_timer+0x66/0x170
+>  call_timer_fn+0xfb/0x1d0
+>  __run_timers+0x3f8/0x480
+>  run_timer_softirq+0x9b/0x100
+>  handle_softirqs+0x153/0x390
+>  __irq_exit_rcu+0x103/0x120
+>  irq_exit_rcu+0xe/0x20
+>  sysvec_apic_timer_interrupt+0x76/0x90
+>  </IRQ>
+>  <TASK>
+>  asm_sysvec_apic_timer_interrupt+0x1a/0x20
+> RIP: 0010:default_idle+0xf/0x20
+> Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90
+>  90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 f8 25 00 fb f4 <fa> c3 cc cc cc
+>  cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
+> RSP: 0018:ffffffffa2007e28 EFLAGS: 00000242
+> RAX: 00000000000f3b31 RBX: 1ffffffff4400fc7 RCX: ffffffffa09c3196
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff9f00590f
+> RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed102360835d
+> R10: ffff88811b041aeb R11: 0000000000000001 R12: 0000000000000000
+> R13: ffffffffa202d7c0 R14: 0000000000000000 R15: 00000000000147d0
+>  default_idle_call+0x6b/0xa0
+>  cpuidle_idle_call+0x1af/0x1f0
+>  do_idle+0xbc/0x130
+>  cpu_startup_entry+0x33/0x40
+>  rest_init+0x11f/0x210
+>  start_kernel+0x39a/0x420
+>  x86_64_start_reservations+0x18/0x30
+>  x86_64_start_kernel+0x97/0xa0
+>  common_startup_64+0x13e/0x141
+>  </TASK>
+> 
+> Allocated by task 595:
+>  kasan_save_stack+0x24/0x50
+>  kasan_save_track+0x14/0x30
+>  __kasan_slab_alloc+0x87/0x90
+>  kmem_cache_alloc_noprof+0x12b/0x3f0
+>  copy_net_ns+0x94/0x380
+>  create_new_namespaces+0x24c/0x500
+>  unshare_nsproxy_namespaces+0x75/0xf0
+>  ksys_unshare+0x24e/0x4f0
+>  __x64_sys_unshare+0x1f/0x30
+>  do_syscall_64+0x70/0x180
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Freed by task 100:
+>  kasan_save_stack+0x24/0x50
+>  kasan_save_track+0x14/0x30
+>  kasan_save_free_info+0x3b/0x60
+>  __kasan_slab_free+0x54/0x70
+>  kmem_cache_free+0x156/0x5d0
+>  cleanup_net+0x5d3/0x670
+>  process_one_work+0x776/0xa90
+>  worker_thread+0x2e2/0x560
+>  kthread+0x1a8/0x1f0
+>  ret_from_fork+0x34/0x60
+>  ret_from_fork_asm+0x1a/0x30
+> 
+> Reproduction script:
+> 
+> mkdir -p /mnt/nfsshare
+> mkdir -p /mnt/nfs/netns_1
+> mkfs.ext4 /dev/sdb
+> mount /dev/sdb /mnt/nfsshare
+> systemctl restart nfs-server
+> chmod 777 /mnt/nfsshare
+> exportfs -i -o rw,no_root_squash *:/mnt/nfsshare
+> 
+> ip netns add netns_1
+> ip link add name veth_1_peer type veth peer veth_1
+> ifconfig veth_1_peer 11.11.0.254 up
+> ip link set veth_1 netns netns_1
+> ip netns exec netns_1 ifconfig veth_1 11.11.0.1
+> 
+> ip netns exec netns_1 /root/iptables -A OUTPUT -d 11.11.0.254 -p tcp \
+> 	--tcp-flags FIN FIN  -j DROP
+> 
+> (note: In my environment, a DESTROY_CLIENTID operation is always sent
+>  immediately, breaking the nfs tcp connection.)
+> ip netns exec netns_1 timeout -s 9 300 mount -t nfs -o proto=tcp,vers=4.1 \
+> 	11.11.0.254:/mnt/nfsshare /mnt/nfs/netns_1
+> 
+> ip netns del netns_1
+> 
+> The reason here is that the tcp socket in netns_1 (nfs side) has been
+> shutdown and closed (done in xs_destroy), but the FIN message (with ack)
+> is discarded, and the nfsd side keeps sending retransmission messages.
+> As a result, when the tcp sock in netns_1 processes the received message,
+> it sends the message (FIN message) in the sending queue, and the tcp timer
+> is re-established. When the network namespace is deleted, the net structure
+> accessed by tcp's timer handler function causes problems.
+> 
+> To fix this problem, let's hold netns refcnt for the tcp kernel socket as
+> done in other modules. This is an ugly hack which can easily be backported
+> to earlier kernels. A proper fix which cleans up the interfaces will
+> follow, but may not be so easy to backport.
+> 
+> Fixes: 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets.")
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
 
-On Wed, Nov 13, 2024 at 3:44=E2=80=AFAM Shinas Rasheed <srasheed@marvell.co=
-m> wrote:
->
-> These APIs are needed to support applications that use netlink to get VF
-> information from a PF driver.
->
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-
-LGTM, thanks for making suggested changes.
-
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-
---=20
-Regards,
-Kalesh A P
-
---000000000000f304c70626c33b44
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIGL+gDIJ3fHZtlS/od+6zJs0WYl3B49RanbVoV0mjsL4MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTExMzAzNTAyNlowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAzIuMdMZhp
-/ECc8slLIqV9O7b5ShJZrF5ZZTjM4V9FzgXoH2TFBdKGB0w/UoU3MCZY6NEsfAwEEGtVPVdu1J8w
-0pVpcE8cF7K+bSXoai87bXBu0J20KaNcJl5xjNTLtuCZg6FroJDJR1WmnM+o3btIlJpjJlLG4vgD
-tSZWIlprnzvgnOS7Ju7zFZDjDZT8Bk0MZ5mAyOO69GPGFWpSi20ijsPH+ySqj/Xs4Xz+slhAhW5K
-ymCWjuRB81DP4uaJwJtbl/LAi9gF0HToPGXIf2FkBKbrz29JwvkbHFRWhfFhN/lQyDFAOy83ZKwf
-70JjCkagniw19D4c8Mu8W/VQlT1N
---000000000000f304c70626c33b44--
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
