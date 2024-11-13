@@ -1,68 +1,69 @@
-Return-Path: <netdev+bounces-144321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E579C68D1
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:40:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC0A99C68D2
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 06:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DE02B24146
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:40:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A2D0282764
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 05:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B12316DEB2;
-	Wed, 13 Nov 2024 05:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A916E179958;
+	Wed, 13 Nov 2024 05:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="W6n2D3Kn"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KRSqo7Ik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1740183CAE
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BC2184549
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 05:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731476406; cv=none; b=pqFs1Pf8TZFamFEijFHw63GtdXANoOx98iQ3dVdXOT4jt7rn0n9HZ01h9HXKCCJFddnGGEnkO8IuYW/uQVULRjyNPVq7N+t3Oi20O1d3N8XcErBPtdFLS8O6nQcWIOK0Pn2uaXahaa0I8LKVvATvB5ADlGDalspKWkbw9cwNVX0=
+	t=1731476409; cv=none; b=jfTTltLQZCFXn4NwfJbo+cGo72UgVI331S7m4FdrmplVAKujgwxEkL7hPtMPprZV9v3JqGHpda4sHp1MJOyCcrEnZywGXuWQhcEFtCCF5FJ2ZcgPFLureoP3l/cn7QfL5VHF3Ue9NmA1C+gGwGUEAHbPYxG1Al2GAltO/eQvmZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731476406; c=relaxed/simple;
-	bh=/aJcOUUQ+XCQruZWVmDw6azuiIwYAwSCd55aPLh1aRs=;
+	s=arc-20240116; t=1731476409; c=relaxed/simple;
+	bh=JrY786zWQp16Bu3Rpm+WgoD2NekurY530EIqN/dVnbM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=npoeuF4mxZl7cHxrgwSl3k9b2D63MVYJGv9eUTjyoQr4QKMkgzBdFcC3Vjxni/Q7qULkXpN1m5ndZBXD4GWYBX7rLbXFEIEmINZODpxVk6233fj9CGNLh+9OG+1gaSKCyb50JVQ6XaBp5+NuROqnNRBMfqNbmjgqwdXGnDjx2Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=W6n2D3Kn; arc=none smtp.client-ip=209.85.160.175
+	 MIME-Version; b=QyIYxUnVKqyqhaU5dcNIiJvkJjWvs5Ops1RimYTDqaOcwN/kx1KmK3MSuYr7Kw1NoqvE/5D9X2St1xYckwHxeRrSSU/faxR2lFvnIewl3La+zl5swvWC4Tj47gtso5x2/K/vwItgipS3sYvsuxTxUesYEFDJKgI0I/KnVaWlqnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KRSqo7Ik; arc=none smtp.client-ip=209.85.221.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-460ab1bc2aeso43121131cf.3
-        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 21:40:04 -0800 (PST)
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-512259c860eso2462541e0c.2
+        for <netdev@vger.kernel.org>; Tue, 12 Nov 2024 21:40:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731476404; x=1732081204; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1731476407; x=1732081207; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I4RI0XuQ5W/mbQ4P8HCEVzj+CNo943fvZCGjie8RFAM=;
-        b=W6n2D3Knqz9dC/sMYIIhtsEu79CLKah8xlVZSbFrpCqgxkoAoryqA/PTGIqaxaMz99
-         13KUQovsnMpWNei4T4U6GzN5PtzQkVGVWPlgUxRTgmROZQN4wjAgrSyuyhXpZ0dFweLX
-         2fuluSxjTs34l85J7jDNxkbI6dkJFS1W1am0A=
+        bh=H5I/Omefwav243Sm9OSf4ZaosNZkxs0R/8amkvBUuSA=;
+        b=KRSqo7IkHPUQPSFA+MzRt9BXF9aVvEEo9+rJnE2kwGFNhr08Trv/3Qx2O77rw5fVuX
+         yP0zTfA0XHdBd09G4IJKrmffQFhktnI9vVXsGs9XywFO+PYR+ZTa7GgxYri7BRlmgvap
+         hmsrX+sxOOB1gc/ze77iMoJKRmQJ38MZtOgaE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731476404; x=1732081204;
+        d=1e100.net; s=20230601; t=1731476407; x=1732081207;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I4RI0XuQ5W/mbQ4P8HCEVzj+CNo943fvZCGjie8RFAM=;
-        b=Bot8z53Gv14Z8h4z4twbQOMNt1GTo4FsPyl+ZEAh6gSOjRDLOgXn4u6ZYrlIXNYDx3
-         M4XaJ4Ve7zBMFG1JF4YqnBMjiPit9WAVOhaZ9OG9LibPLcmGjx1YTlJ7WdChGhgJEp6/
-         o6HQVwYVCrdljTH/CGZvwcvMoqe0HAaxt3lJUSa1iPBCkzCgWNLWGpAwl9+9cpg+nx4X
-         Fx3H9WZrdwZPI+ue9WnTJxIbUZFGP9UyRHERJMMPiJELhx69aQZjwxvqTkXHp8kPmu1L
-         vZvtg73pBvaJO/OEv91lv3WvLSN/c6UkWN7btrpcjRv+BWWxZth9EqHSdynC6HMEbJdv
-         wdRA==
-X-Gm-Message-State: AOJu0Yy1b8RL7McyZq+UpvThXPRjMYkTifQfqW+FhhIpOfV3gA4kN2Fp
-	cc8wyiq/ey6Nh6WPF9cVg1Nhr+4e0qE7EKchdndfOVxd4TgNtW7fWROOkAMsDQ==
-X-Google-Smtp-Source: AGHT+IG4YS0tF0gCr/wjK1yzVNjJmxQVgSAGXWjd1veqcuuuK7bKlfKUBN73IL+XC/8dcHXb+f0QaQ==
-X-Received: by 2002:a05:622a:15ca:b0:45e:f2df:2ed3 with SMTP id d75a77b69052e-46309354ba9mr255852711cf.32.1731476403772;
-        Tue, 12 Nov 2024 21:40:03 -0800 (PST)
+        bh=H5I/Omefwav243Sm9OSf4ZaosNZkxs0R/8amkvBUuSA=;
+        b=wx86CPrVhCtW44xtpUTePgr3IqI7qjs2m9DAiJ3xkjtYwbjqBmnq8dxnqZ1i6TwHLs
+         i5hJd+Fzh5DYm2rfXf7pIYi6IG7JLdJFKDQyiA6nfEI7tYRID/GG9EeBd5T1vj46U4Mv
+         tZW+dMptZ5VXbuv58zi+WcfH88qsxdEn/tj+CrMUm/tlXBA/oo+eUZw90SX8KhkqCiXZ
+         u09jEv/5Yh/nKrU8aenZ0D9EyH1l6/hUyD8yO+XMGxWJIUjR5dq9CmLlqEBLAofMfFb/
+         wuVREt7Z5gJlys2VJSaBFDZAunM4Nugt0F+c4XjIpHDrqT1J/WPpk7C5v77P8QylAGpT
+         fj0w==
+X-Gm-Message-State: AOJu0Yw30iNfZdSIvZxVMgE438dpcOOPEBDJZ9qcTQc7jS8qkGEgQnZk
+	fxkS2kXpE7fOcVv0Lch4qNBxzmwRdnYbpruVxUW4t6JVa4y9LT95anTFbN4J4BcAs/9OuTIZ/Ak
+	=
+X-Google-Smtp-Source: AGHT+IHSeHEE6vQnX1De0szd1IJXSrFM183/EZT2Lt9cw0nnP1Vpb4RwX3TSJUeLJLTdekR2stdB6w==
+X-Received: by 2002:a05:6102:3a09:b0:4a4:9363:b84c with SMTP id ada2fe7eead31-4ad46861ea9mr1988425137.6.1731476406659;
+        Tue, 12 Nov 2024 21:40:06 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ff5e14f9sm83457491cf.86.2024.11.12.21.40.00
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ff5e14f9sm83457491cf.86.2024.11.12.21.40.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 21:40:02 -0800 (PST)
+        Tue, 12 Nov 2024 21:40:05 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -72,12 +73,10 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	andrew.gospodarek@broadcom.com,
 	hongguang.gao@broadcom.com,
-	shruti.parab@broadcom.com,
-	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>
-Subject: [PATCH net-next 08/11] bnxt_en: Add functions to copy host context memory
-Date: Tue, 12 Nov 2024 21:36:46 -0800
-Message-ID: <20241113053649.405407-9-michael.chan@broadcom.com>
+	shruti.parab@broadcom.com
+Subject: [PATCH net-next 09/11] bnxt_en: Add 2 parameters to bnxt_fill_coredump_seg_hdr()
+Date: Tue, 12 Nov 2024 21:36:47 -0800
+Message-ID: <20241113053649.405407-10-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20241113053649.405407-1-michael.chan@broadcom.com>
 References: <20241113053649.405407-1-michael.chan@broadcom.com>
@@ -89,173 +88,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+From: Shruti Parab <shruti.parab@broadcom.com>
 
-Host context memory is used by the newer chips to store context
-information for various L2 and RoCE states and FW logs.  This
-information will be useful for debugging.  This patch adds the
-functions to copy all pages of a context memory type to a contiguous
-buffer.  The next patches will include the context memory dump
-during ethtool -w coredump.
+Pass the component ID and segment ID to this function to create
+the coredump segment header.  This will be needed in the next
+patches to create more segments for the coredump.
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
 Signed-off-by: Shruti Parab <shruti.parab@broadcom.com>
-Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 101 ++++++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |   4 +
- 2 files changed, 105 insertions(+)
+ .../ethernet/broadcom/bnxt/bnxt_coredump.c    | 20 +++++++++----------
+ .../ethernet/broadcom/bnxt/bnxt_coredump.h    |  7 +++++++
+ 2 files changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c5c40981b879..921315660a05 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3505,6 +3505,35 @@ static void bnxt_init_ctx_mem(struct bnxt_ctx_mem_type *ctxm, void *p, int len)
- 		*(p2 + i + offset) = init_val;
- }
- 
-+static size_t __bnxt_copy_ring(struct bnxt *bp, struct bnxt_ring_mem_info *rmem,
-+			       void *buf, size_t offset, size_t head,
-+			       size_t tail)
-+{
-+	int i, head_page, start_idx, source_offset;
-+	size_t len, rem_len, total_len, max_bytes;
-+
-+	head_page = head / rmem->page_size;
-+	source_offset = head % rmem->page_size;
-+	total_len = (tail - head) & MAX_CTX_BYTES_MASK;
-+	if (!total_len)
-+		total_len = MAX_CTX_BYTES;
-+	start_idx = head_page % MAX_CTX_PAGES;
-+	max_bytes = (rmem->nr_pages - start_idx) * rmem->page_size -
-+		    source_offset;
-+	total_len = min(total_len, max_bytes);
-+	rem_len = total_len;
-+
-+	for (i = start_idx; rem_len; i++, source_offset = 0) {
-+		len = min((size_t)(rmem->page_size - source_offset), rem_len);
-+		if (buf)
-+			memcpy(buf + offset, rmem->pg_arr[i] + source_offset,
-+			       len);
-+		offset += len;
-+		rem_len -= len;
-+	}
-+	return total_len;
-+}
-+
- static void bnxt_free_ring(struct bnxt *bp, struct bnxt_ring_mem_info *rmem)
- {
- 	struct pci_dev *pdev = bp->pdev;
-@@ -8725,6 +8754,36 @@ static int bnxt_alloc_ctx_pg_tbls(struct bnxt *bp,
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+index 4e2b938ed1f7..4dfc26cfc979 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+@@ -165,11 +165,12 @@ static int bnxt_hwrm_dbg_coredump_retrieve(struct bnxt *bp, u16 component_id,
  	return rc;
  }
  
-+static size_t bnxt_copy_ctx_pg_tbls(struct bnxt *bp,
-+				    struct bnxt_ctx_pg_info *ctx_pg,
-+				    void *buf, size_t offset, size_t head,
-+				    size_t tail)
-+{
-+	struct bnxt_ring_mem_info *rmem = &ctx_pg->ring_mem;
-+	size_t nr_pages = ctx_pg->nr_pages;
-+	int page_size = rmem->page_size;
-+	size_t len = 0, total_len = 0;
-+	u16 depth = rmem->depth;
-+
-+	tail %= nr_pages * page_size;
-+	do {
-+		if (depth > 1) {
-+			int i = head / (page_size * MAX_CTX_PAGES);
-+			struct bnxt_ctx_pg_info *pg_tbl;
-+
-+			pg_tbl = ctx_pg->ctx_pg_tbl[i];
-+			rmem = &pg_tbl->ring_mem;
-+		}
-+		len = __bnxt_copy_ring(bp, rmem, buf, offset, head, tail);
-+		head += len;
-+		offset += len;
-+		total_len += len;
-+		if (head >= nr_pages * page_size)
-+			head = 0;
-+	} while (head != tail);
-+	return total_len;
-+}
-+
- static void bnxt_free_ctx_pg_tbls(struct bnxt *bp,
- 				  struct bnxt_ctx_pg_info *ctx_pg)
+-static void
++void
+ bnxt_fill_coredump_seg_hdr(struct bnxt *bp,
+ 			   struct bnxt_coredump_segment_hdr *seg_hdr,
+ 			   struct coredump_segment_record *seg_rec, u32 seg_len,
+-			   int status, u32 duration, u32 instance)
++			   int status, u32 duration, u32 instance, u32 comp_id,
++			   u32 seg_id)
  {
-@@ -8885,6 +8944,48 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp, u32 ena)
- 	return 0;
- }
+ 	memset(seg_hdr, 0, sizeof(*seg_hdr));
+ 	memcpy(seg_hdr->signature, "sEgM", 4);
+@@ -180,11 +181,8 @@ bnxt_fill_coredump_seg_hdr(struct bnxt *bp,
+ 		seg_hdr->high_version = seg_rec->version_hi;
+ 		seg_hdr->flags = cpu_to_le32(seg_rec->compress_flags);
+ 	} else {
+-		/* For hwrm_ver_get response Component id = 2
+-		 * and Segment id = 0
+-		 */
+-		seg_hdr->component_id = cpu_to_le32(2);
+-		seg_hdr->segment_id = 0;
++		seg_hdr->component_id = cpu_to_le32(comp_id);
++		seg_hdr->segment_id = cpu_to_le32(seg_id);
+ 	}
+ 	seg_hdr->function_id = cpu_to_le16(bp->pdev->devfn);
+ 	seg_hdr->length = cpu_to_le32(seg_len);
+@@ -287,11 +285,13 @@ static int __bnxt_get_coredump(struct bnxt *bp, void *buf, u32 *dump_len)
+ 	start_utc = sys_tz.tz_minuteswest * 60;
+ 	seg_hdr_len = sizeof(seg_hdr);
  
-+/**
-+ * __bnxt_copy_ctx_mem - copy host context memory
-+ * @bp: The driver context
-+ * @ctxm: The pointer to the context memory type
-+ * @buf: The destination buffer
-+ * @offset: The buffer offset to copy the data to
-+ * @head: The head offset of context memory to copy from
-+ * @tail: The tail offset (last byte + 1) of context memory to end the copy
-+ *
-+ * This function is called for debugging purposes to dump the host context
-+ * used by the chip.
-+ */
-+static size_t __bnxt_copy_ctx_mem(struct bnxt *bp,
-+				  struct bnxt_ctx_mem_type *ctxm, void *buf,
-+				  size_t offset, size_t head, size_t tail)
-+{
-+	struct bnxt_ctx_pg_info *ctx_pg = ctxm->pg_info;
-+	size_t len = 0, total_len = 0;
-+	int i, n = 1;
-+
-+	if (!ctx_pg)
-+		return 0;
-+
-+	if (ctxm->instance_bmap)
-+		n = hweight32(ctxm->instance_bmap);
-+	for (i = 0; i < n; i++) {
-+		len = bnxt_copy_ctx_pg_tbls(bp, &ctx_pg[i], buf, offset, head,
-+					    tail);
-+		offset += len;
-+		total_len += len;
-+	}
-+	return total_len;
-+}
-+
-+size_t bnxt_copy_ctx_mem(struct bnxt *bp, struct bnxt_ctx_mem_type *ctxm,
-+			 void *buf, size_t offset)
-+{
-+	size_t tail = ctxm->max_entries * ctxm->entry_size;
-+
-+	return __bnxt_copy_ctx_mem(bp, ctxm, buf, offset, 0, tail);
-+}
-+
- static void bnxt_free_one_ctx_mem(struct bnxt *bp,
- 				  struct bnxt_ctx_mem_type *ctxm, bool force)
- {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index d3697e531d67..b4cc5d77a55a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1848,6 +1848,8 @@ struct bnxt_vf_rep {
+-	/* First segment should be hwrm_ver_get response */
++	/* First segment should be hwrm_ver_get response.
++	 * For hwrm_ver_get response Component id = 2 and Segment id = 0.
++	 */
+ 	*dump_len = seg_hdr_len + ver_get_resp_len;
+ 	if (buf) {
+ 		bnxt_fill_coredump_seg_hdr(bp, &seg_hdr, NULL, ver_get_resp_len,
+-					   0, 0, 0);
++					   0, 0, 0, BNXT_VER_GET_COMP_ID, 0);
+ 		memcpy(buf + offset, &seg_hdr, seg_hdr_len);
+ 		offset += seg_hdr_len;
+ 		memcpy(buf + offset, &bp->ver_resp, ver_get_resp_len);
+@@ -346,7 +346,7 @@ static int __bnxt_get_coredump(struct bnxt *bp, void *buf, u32 *dump_len)
+ 		end = jiffies;
+ 		duration = jiffies_to_msecs(end - start);
+ 		bnxt_fill_coredump_seg_hdr(bp, &seg_hdr, seg_record, seg_len,
+-					   rc, duration, 0);
++					   rc, duration, 0, 0, 0);
  
- #define MAX_CTX_PAGES	(BNXT_PAGE_SIZE / 8)
- #define MAX_CTX_TOTAL_PAGES	(MAX_CTX_PAGES * MAX_CTX_PAGES)
-+#define MAX_CTX_BYTES		((size_t)MAX_CTX_TOTAL_PAGES * BNXT_PAGE_SIZE)
-+#define MAX_CTX_BYTES_MASK	(MAX_CTX_BYTES - 1)
+ 		if (buf) {
+ 			/* Write segment header into the buffer */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
+index a76d5c281413..f573e55f7e62 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.h
+@@ -68,6 +68,8 @@ struct bnxt_coredump_record {
+ 	__le16 rsvd3[313];
+ };
  
- struct bnxt_ctx_pg_info {
- 	u32		entries;
-@@ -2862,6 +2864,8 @@ int bnxt_hwrm_vnic_alloc(struct bnxt *bp, struct bnxt_vnic_info *vnic,
- int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
- int bnxt_nq_rings_in_use(struct bnxt *bp);
- int bnxt_hwrm_set_coal(struct bnxt *);
-+size_t bnxt_copy_ctx_mem(struct bnxt *bp, struct bnxt_ctx_mem_type *ctxm,
-+			 void *buf, size_t offset);
- void bnxt_free_ctx_mem(struct bnxt *bp, bool force);
- int bnxt_num_tx_to_cp(struct bnxt *bp, int tx);
- unsigned int bnxt_get_max_func_stat_ctxs(struct bnxt *bp);
++#define BNXT_VER_GET_COMP_ID	2
++
+ #define BNXT_CRASH_DUMP_LEN	(8 << 20)
+ 
+ #define COREDUMP_LIST_BUF_LEN		2048
+@@ -118,6 +120,11 @@ struct hwrm_dbg_cmn_output {
+ #define BNXT_DBG_CR_DUMP_MDM_CFG_DDR	\
+ 	DBG_CRASHDUMP_MEDIUM_CFG_REQ_TYPE_DDR
+ 
++void bnxt_fill_coredump_seg_hdr(struct bnxt *bp,
++				struct bnxt_coredump_segment_hdr *seg_hdr,
++				struct coredump_segment_record *seg_rec,
++				u32 seg_len, int status, u32 duration,
++				u32 instance, u32 comp_id, u32 seg_id);
+ int bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf, u32 *dump_len);
+ int bnxt_hwrm_get_dump_len(struct bnxt *bp, u16 dump_type, u32 *dump_len);
+ u32 bnxt_get_coredump_length(struct bnxt *bp, u16 dump_type);
 -- 
 2.30.1
 
