@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-144524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C2899C7AB7
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:10:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA819C7AB6
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 19:10:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50FE7289072
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:10:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77D001F220D9
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 18:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FA3204024;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C048202641;
 	Wed, 13 Nov 2024 18:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4062B201249;
-	Wed, 13 Nov 2024 18:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F73470806;
+	Wed, 13 Nov 2024 18:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731521429; cv=none; b=bH9F3AH2V+GIZGC4VllkbNXWc9tr6oWPzqCW2oEoYm+BGtYTMKD9WF7WO8dlq4z94lROAPijLxP356oJ40IUUQB2Jp6TJm3llCkxbpccQmskjthg65AcyBagn40WzkF/rjVXakSOGBMjXg8Vby4vxBkmaWShdgZFPkmFp9PdpaU=
+	t=1731521429; cv=none; b=G3akHE3dcfH1hEx9/xJzNCZO7fW7Sc5U3uF9gO1OmCF8f1RaWxshCK3AXhmV3TX4elrmnbNf3JV3nX9tkZhXncKKxLv6nly6WF8duNF47utJwXwGVOynipdd/mnGFS2XBNtwmnkEF3BVNaLeRf08PHmOr+xVlIHEsLd8gXaPUBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731521429; c=relaxed/simple;
-	bh=8YE0gJnG5Jc5NkuY0eYkee5uJq1dLqtk2+WmfvMWT3A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CZ4dc1fzFKuxGABXTxfEYb0izwCJgBRQJFKs8z/I6mk3aJJF1zwQEp4TqiMhMDZFi9npXYRR4aVr54z5yxZ3JYl+0zG2/6Y6ffFP/ONBZ0BmiP5hgV58u5WtrMhU0ikymu2MXQz8KohjoGWALpJu0AjKkzbL1IaZmSTN1rDM5ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.173
+	bh=wepfqwBUvr+6mdQX/N7zEZx37AqQglovyChCYbR/fv4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=K8aVa2xOcXrMyXUJSHjkI9/g9EliJfwavVsDWtQn0GC57zA5b3Gt/29AEv0H0qp0lJMyjxrnDdwyuuzBGpgpmb20QaCYat2V/cC8mK1v1ITx4wrjGqzTpkrTbAlGIcMiZ4FSNxRBxNh+f6+ezcN6RBxwPCZv/r3guxjUufEpWMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2113da91b53so53527995ad.3;
-        Wed, 13 Nov 2024 10:10:25 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e681bc315so826269b3a.0;
+        Wed, 13 Nov 2024 10:10:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731521425; x=1732126225;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bNLj4GFkTe8uBlnR/w5pmWiy4M7z2ZtobUlmLPyGTzo=;
-        b=iNsBH1G/phGjhgdlXPBFjTDvMd0kWUGtBvSK8VhxvUlLs+mQ3CopPS1aBJ/tmj3v/M
-         +6yVm1Vom9t+mn6Goel6+SiJl1mYfsmoQoA4RWaUH96Tf0wCMcDxvt/3wTweVEInM55j
-         k5QkxKTfH+OsUEg7ynOo1qjX1MOn3rF/7u69WCsKuwhFMCZqYvk2jrR1MXiNw3M9KPBv
-         iWF/tY2TKbDkrpwS4WWDd4H8YaRb+57cIQRCV/OOPtL+N3id7iZ2hWOSmjAF+rB6yDOX
-         tLlaB0mZ1wkyWS3TC60Ds5/DQ7qmHtTEhdKyi7c3ZmPV0JZT+imUWXoc2VXSQp930uGT
-         Na+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUxJeJlmWyDM26P5nIyyUHldaK1aM93oosdUTUCzXXDKUMv5REs91wpXoUdZ9fFCHEAjtJM+LVqYinSn8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4wpMgtjYJQrMMv+/6vRPNb+vypa84ZtgSGfTgkHgMQK2IBwy1
-	3Xp3buqSbboPK11XAtL2+tLYsQAVn3KbCeiryDrAHzr8Zawef3ILfw7H0sg=
-X-Google-Smtp-Source: AGHT+IHrf3Tx528upXsJVsI0GEebvUPg6BWINl2Z9XnJQCERqfvQNjsXWu6YcE7Tmm9YTNsj0H9z8w==
-X-Received: by 2002:a17:902:e5c5:b0:20c:83e7:ca51 with SMTP id d9443c01a7336-21183d6320cmr287138725ad.26.1731521425198;
-        Wed, 13 Nov 2024 10:10:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731521426; x=1732126226;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RFP4BGNMSeQAYd4JkfpkSSVTp1E+u/bS0lm9lwazT8U=;
+        b=fnxU7odMI3StVeq4nOOgUDrWhfCm7MXdc0ENR+0SnSq0iRzCXmWW7QbWUxSjJRZbAG
+         /HM/h+uDWN3s6REmE1MqeULGLS1is7epUBdXvvEd5Vs6yVWTPF1qHZtgxcit0K3L7N79
+         mEvf7qa/jywcs6zjZJbvGc8fxVauXWRrvH1VWfMVxoIT4FYgx6FJBXdt+3ZdlCSSLzNK
+         o8sEkCqbCXjMsWh1fIJWJuqd+KuEhPLBVi7O3duPoa5dYkFViOJKZjgfDLJtKJu9JrTN
+         rhL/AGbo0K8joZIlwy7TI/3lauPMGZbf5txMya7tNKiSOZmfjkm1buxlvS75iLneExwb
+         oOWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHLFCxO8eBFukupor/EaMsJxdFqJ0jYLH39Cx9XplEmqw4dt5rMvTZJwRykJOjKSy/cqTKoUgmNsCAAyc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz+xDY9MqrV5mI1hDO6HIqURwnozzP7coGROhB9Nt8ppY9G7hZ
+	BhU1DIPDHlNe+26nqxg0jSbHEI9hKh8KpYG1ojq0/igYZJmswxA8wUfwKR8=
+X-Google-Smtp-Source: AGHT+IHnmj65PAFFBha/58YSiSN5vvTLsGhgl0PJ2p+oclxyflz9a8At0gTo/E1ggOTD0YNlj2J7Ag==
+X-Received: by 2002:a05:6a00:32c9:b0:71e:467e:a75d with SMTP id d2e1a72fcca58-72466800a5emr480654b3a.12.1731521426424;
+        Wed, 13 Nov 2024 10:10:26 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177e6a73csm112803045ad.246.2024.11.13.10.10.24
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7240785fbe9sm13596733b3a.37.2024.11.13.10.10.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 10:10:24 -0800 (PST)
+        Wed, 13 Nov 2024 10:10:26 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -65,10 +66,12 @@ Cc: davem@davemloft.net,
 	kory.maincent@bootlin.com,
 	sdf@fomichev.me,
 	nicolas.dichtel@6wind.com
-Subject: [PATCH net-next 0/7] ethtool: generate uapi header from the spec
-Date: Wed, 13 Nov 2024 10:10:16 -0800
-Message-ID: <20241113181023.2030098-1-sdf@fomichev.me>
+Subject: [PATCH net-next 1/7] ynl: support attr-cnt-name attribute in legacy definitions
+Date: Wed, 13 Nov 2024 10:10:17 -0800
+Message-ID: <20241113181023.2030098-2-sdf@fomichev.me>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241113181023.2030098-1-sdf@fomichev.me>
+References: <20241113181023.2030098-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,33 +80,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We keep expanding ethtool netlink api surface and this leads to
-constantly playing catchup on the ynl spec side. There are a couple
-of things that prevent us from fully converting to generating
-the header from the spec (stats and cable tests), but we can
-generate 95% of the header which is still better than maintaining
-c header and spec separately. The series adds a couple of missing
-features on the ynl-gen-c side and separates the parts
-that we can generate into new ethtool_netlink_generated.h.
+This is similar to existing attr-cnt-name in the attributes
+to allow changing the name of the 'count' enum entry.
 
-Stanislav Fomichev (7):
-  ynl: support attr-cnt-name attribute in legacy definitions
-  ynl: support render attribute in legacy definitions
-  ynl: support directional specs in ynl-gen-c.py
-  ynl: add missing pieces to ethtool spec to better match uapi header
-  ethtool: separate definitions that are gonna be generated
-  ethtool: remove the comments that are not gonna be generated
-  ethtool: regenerate uapi header from the spec
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ Documentation/netlink/genetlink-legacy.yaml | 3 +++
+ tools/net/ynl/ynl-gen-c.py                  | 8 ++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
- Documentation/netlink/genetlink-legacy.yaml   |   8 +
- Documentation/netlink/specs/ethtool.yaml      | 354 ++++++-
- MAINTAINERS                                   |   2 +-
- include/uapi/linux/ethtool_netlink.h          | 893 +-----------------
- .../uapi/linux/ethtool_netlink_generated.h    | 792 ++++++++++++++++
- tools/net/ynl/ynl-gen-c.py                    | 128 ++-
- 6 files changed, 1240 insertions(+), 937 deletions(-)
- create mode 100644 include/uapi/linux/ethtool_netlink_generated.h
-
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 8db0e22fa72c..83f874ae7198 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -119,6 +119,9 @@ additionalProperties: False
+           type: string
+         # End genetlink-c
+         # Start genetlink-legacy
++        attr-cnt-name:
++          description: Name of the render-max counter enum entry.
++          type: string
+         members:
+           description: List of struct members. Only scalars and strings members allowed.
+           type: array
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index c48b69071111..210972b4796a 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -798,6 +798,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+             self.user_type = 'int'
+ 
+         self.value_pfx = yaml.get('name-prefix', f"{family.ident_name}-{yaml['name']}-")
++        self.attr_cnt_name = yaml.get('attr-cnt-name', None)
+ 
+         super().__init__(family, yaml)
+ 
+@@ -2468,9 +2469,12 @@ _C_KW = {
+                     max_val = f' = {enum.get_mask()},'
+                     cw.p(max_name + max_val)
+                 else:
++                    cnt_name = enum.attr_cnt_name
+                     max_name = c_upper(name_pfx + 'max')
+-                    cw.p('__' + max_name + ',')
+-                    cw.p(max_name + ' = (__' + max_name + ' - 1)')
++                    if not cnt_name:
++                        cnt_name = '__' + c_upper(name_pfx + 'max')
++                    cw.p(cnt_name + ',')
++                    cw.p(max_name + ' = (' + cnt_name + ' - 1)')
+             cw.block_end(line=';')
+             cw.nl()
+         elif const['type'] == 'const':
 -- 
 2.47.0
 
