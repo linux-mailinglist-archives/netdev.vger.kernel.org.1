@@ -1,92 +1,150 @@
-Return-Path: <netdev+bounces-144266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 223A19C66B4
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:29:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A120F9C66B9
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:31:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D7B9B2AB80
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:28:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C771F25711
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5201175A5;
-	Wed, 13 Nov 2024 01:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2793182D2;
+	Wed, 13 Nov 2024 01:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AX/fanIF"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="WwX4yF1Z";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bupu9b5n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E68BA34;
-	Wed, 13 Nov 2024 01:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806BF29A5
+	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 01:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731461322; cv=none; b=dlYftcZbRAA1sDhrKxMUA3Sf1pBvbaGXlERCOALJkSzfiUmzIBWu2ybrP6KH8TePyohfsjt8ZE256LkyM9SyRzATuTgssPBhO3HsIlBh+QU/snhA+pt5Wg9JEs1ROwJl0pxkY1W/qoFLt0mruQ8Ww2Ozbyp+YsznjWir5KKgegY=
+	t=1731461505; cv=none; b=opo4W0pUnBZhkG5m8UjKd8BRW80Bj836OoTksFU+TwZucaEfUVGgv6UeT6WYaRTRW4r07VJP7LNfy2X52XiksimuEmbyDRcbYylXmRHAoA0/S9yCejYyCM1SyZ81DEDtcnMw8pO5WoMTGCIIo8eThfO9JHxDxswus2vB67IOQOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731461322; c=relaxed/simple;
-	bh=+X+k54ktMEeVatN/itYEiydQwmUaz5SOmKOWD1vzsw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eCICz5Mw7pBfUYeSmA5mmODxQJFVpgaLQ5V3FH7peYoqgQbuoosQste11BpTaAVmNHwVk9qL3V3cWp0/X56gi6S6NQexAaj92PLGGX1B7m/9V9OyJ3WH8oBU3o4ka/cV2SH9FpEteKPz5ji18LKxEfNqbvXEiyMNkYPhNQ67Av0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AX/fanIF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2994C4CECD;
-	Wed, 13 Nov 2024 01:28:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731461322;
-	bh=+X+k54ktMEeVatN/itYEiydQwmUaz5SOmKOWD1vzsw0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AX/fanIFaupuu4/sINoxaLFKX6Hx0jUzlvQfDsRpK5Cp72DPKQ6+K50toZc8Uaucj
-	 qYMEBrXmkNE0WNRQOIcGL7/MmsMZSy/n2szVOZXSkYsGK2ceJcp07XPJ3Df09M7W7B
-	 pveT3GcXnsGnF9U3NKpzD+YjFSZsA7WLGTVULMwvw9vPFX5pngzuB72KobMnYNz87q
-	 3zoAq5B/LuCp6qWI3A1DVS+BBgO0ua9/Ka1Xuaj92ByWpzsD3iFyFHEhsXz84Qf/Lg
-	 3LcMekJ0BjE3bzKYeDyLEGzmAaEPgLzjvUG6WKfE8SIpSe6xbWEFtHasvJ+fHAmRSp
-	 lmH/9MmSHP7oA==
-Date: Tue, 12 Nov 2024 17:28:40 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
- mkarsten@uwaterloo.ca, stable@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Mina Almasry
- <almasrymina@google.com>, linux-kernel@vger.kernel.org (open list)
-Subject: Re: [RFC net 1/2] netdev-genl: Hold rcu_read_lock in napi_get
-Message-ID: <20241112172840.0cf9731f@kernel.org>
-In-Reply-To: <20241112181401.9689-2-jdamato@fastly.com>
-References: <20241112181401.9689-1-jdamato@fastly.com>
-	<20241112181401.9689-2-jdamato@fastly.com>
+	s=arc-20240116; t=1731461505; c=relaxed/simple;
+	bh=W3Jy1sjo1rKWdNY8N4qE3UzTPrGOiqRUUIQ/T3/jKBE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=P28P0Z8Sn/8vE8Bcv3cJPbRTmZT9vUg/OgvrWdnQqrcbxashD0InXpQtZMSRXGOJtEPhJS7tv2S1use4d2UHqk1EEFyDag+Jh/N/9LmMqCaZqo+sXlTEUqeitKXwZGUm39Qk8O/wuno6cZXFMtftq2HuOJoqjNJHwJqWmrEBU5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=WwX4yF1Z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Bupu9b5n; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 7E7861140081;
+	Tue, 12 Nov 2024 20:31:42 -0500 (EST)
+Received: from phl-imap-08 ([10.202.2.84])
+  by phl-compute-03.internal (MEProxy); Tue, 12 Nov 2024 20:31:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1731461502;
+	 x=1731547902; bh=iyIH6tkCp7zs8x47CvfHFO5X5AgmWhQjSf9eUwKoy00=; b=
+	WwX4yF1ZfPytkvS3Cs90yomBYqO9N6BY9SRej8l4OeI9Xx1PWOld2zugcVJR/X0E
+	A2Mt4UK3xLb9IOGapUo6UlStOgML7RkuC30ptFht8P/xzTuLsHiJpWu9ucEf1mu4
+	UumzNmFcVsN5S7FZ+A4yo3gC3a3Ghpgrg4tATH3uEoGcZLzBH+EHRfBBSKBzSj/M
+	rOiI/C5R9keaZz6A/la7ikpdapsA+fce0N19MI+fvjFOOITGmesSZ9S1oyqsC4nR
+	DmhYWl/1DKyiT+d34UyPlSZg1AzT+bpm3FX5KE1m3pdZdzkBQ/S1++m3xRRv9nw+
+	5op9k0jApJnEoLtd1hda3w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1731461502; x=
+	1731547902; bh=iyIH6tkCp7zs8x47CvfHFO5X5AgmWhQjSf9eUwKoy00=; b=B
+	upu9b5n5pgI0UCae5Qn+J+bty3o3DgqmKASS/CIN9iQKz2yr+5VSaPcIWfpDsFAj
+	2N1EYH15jy+NAA19PW8XdOwyXYhYzDvWSUBbSi2OhztbFaAjaBIpiQ8HxS/mXalX
+	VWrygMG/oHfaSufxBaPy0S4u9r4MwqL2XE5AnYbqNqpn/bGNWcfLPXcQcFAdVA0J
+	fqcF8/PHwgRlSOFRUC+hgGcvxQ5QNrzDf6dXCtSAoNgRwdr3wJtAqiQzjI/z4U+D
+	kXup5LSTASFz2hA6PDBZq/CbyHNyWuu+3E01NNhbsucCM8YPhlHwmibN7Izt/jgD
+	nAyU0JRxrbup1tf/FAFzQ==
+X-ME-Sender: <xms:fQE0Z_XH4Iyq7j8rmMBlMLSE5wmIhqzDlB2zgDVQnMNsZGt8wf5oug>
+    <xme:fQE0Z3ldLQMYL0YwysbvQAgUMBnuAkMH4ekzMCa787-elT2ZXiUFXGnspa7_8JYQx
+    vXQIN63JO06m0IRaQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeigddthecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenfghrlhcuvffnffculdefhedmnecujfgurhepofggfffhvfevkfgj
+    fhfutgfgsehtjeertdertddtnecuhfhrohhmpedfffgrnhhivghlucgiuhdfuceougiguh
+    esugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgeelieffhfduudeukefhieef
+    gfffgeduleevjeefffeukefgtdelvddvfeefiedunecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghr
+    tghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesug
+    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehjuggrmhgrthhosehfrghsthhlhidr
+    tghomhdprhgtphhtthhopegvtghrvggvrdigihhlihhngiesghhmrghilhdrtghomhdprh
+    gtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtihhn
+    rdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtohepkhgvrhhnvghlqdhtvggrmhesmh
+    gvthgrrdgtohhmpdhrtghpthhtohepmhhkuhgsvggtvghksehsuhhsvgdrtgiipdhrtghp
+    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:fQE0Z7baNy0cAJqA6tviK_-Bw_o3xWKIGIVnwb8RmhVnvn35M-P1iw>
+    <xmx:fQE0Z6UP8ycEwKEsIBNEh8fakAHdVCKpZfA19GkNETj9SdWPeaPsyg>
+    <xmx:fQE0Z5mr6yA0piRRyDDCEKZumzRxDE0IlI5b-Pd8pEP_soEH84dXfw>
+    <xmx:fQE0Z3cidiB5w1ec3cpVi5rybCQEGKg19VWFTUPMgRbs0rc8eezgGA>
+    <xmx:fgE0Z_U3fdYpe31eA4qglVPX0Dq5S6XIGNKAsBCl9bChtnDHvvmkQBkS>
+Feedback-ID: i6a694271:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 8691518A006B; Tue, 12 Nov 2024 20:31:41 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Date: Tue, 12 Nov 2024 17:31:20 -0800
+From: "Daniel Xu" <dxu@dxuuu.xyz>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: "Edward Cree" <ecree.xilinx@gmail.com>, jdamato@fastly.com,
+ "David Miller" <davem@davemloft.net>, mkubecek@suse.cz,
+ "Martin KaFai Lau" <martin.lau@linux.dev>, netdev@vger.kernel.org,
+ "Kernel Team" <kernel-team@meta.com>
+Message-Id: <57047008-53c9-4744-b408-f78fef4c1871@app.fastmail.com>
+In-Reply-To: <20241112074047.44490c6e@kernel.org>
+References: 
+ <978e1192c07e970b8944c2a729ae42bf97667a53.1731107871.git.dxu@dxuuu.xyz>
+ <20241112074047.44490c6e@kernel.org>
+Subject: Re: [PATCH ethtool-next v2] rxclass: Make output for RSS context action
+ explicit
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Nov 2024 18:13:58 +0000 Joe Damato wrote:
-> +/* must be called under rcu_read_lock(), because napi_by_id requires it */
-> +static struct napi_struct *__do_napi_by_id(unsigned int napi_id,
-> +					   struct genl_info *info, int *err)
-> +{
-> +	struct napi_struct *napi;
-> +
-> +	napi = napi_by_id(napi_id);
-> +	if (napi) {
-> +		*err = 0;
-> +	} else {
-> +		NL_SET_BAD_ATTR(info->extack, info->attrs[NETDEV_A_NAPI_ID]);
-> +		*err = -ENOENT;
-> +	}
-> +
-> +	return napi;
-> +}
+Hi Jakub,
 
-Thanks for the quick follow up! I vote we don't factor this out.
-I don't see what it buys us, TBH, normally we factor out code
-to avoid having to unlock before return, but this code doesn't
-have extra returns...
+On Tue, Nov 12, 2024, at 7:40 AM, Jakub Kicinski wrote:
+> On Mon, 11 Nov 2024 12:05:38 -0700 Daniel Xu wrote:
+>> -	if (fsp->flow_type & FLOW_RSS)
+>> -		fprintf(stdout, "\tRSS Context ID: %u\n", rss_context);
+>> -
+>>  	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
+>>  		fprintf(stdout, "\tAction: Drop\n");
+>>  	} else if (fsp->ring_cookie == RX_CLS_FLOW_WAKE) {
+>>  		fprintf(stdout, "\tAction: Wake-on-LAN\n");
+>> +	} else if (fsp->flow_type & FLOW_RSS) {
+>> +		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
+>> +
+>> +		fprintf(stdout, "\tAction: Direct to RSS context id %u", rss_context);
+>
+> Do you have strong feelings about the change in formatting?
+> Looking at Ed's comment on the new test made me wonder if the change 
+> in capitalization is for the better.
+>
+> Action: Direct to RSS context id 1 (queue base offset: 2)
+>
+> vs
+>
+> Action: Direct to RSS Context ID: 1 (queue base offset: 2)
+>
+> Given "id" is a word (: I like the ID format, the extra colon is
+> annoying but OTOH if we retain it your regexp in the other patch
+> would match before and after..
+>
+> Actually the best formatting IMHO would be to skip the ID altogether:
+>
+> Action: Direct to RSS Context 1 (queue base offset: 2)
 
-Just slap an rcu_read_lock / unlock around and that's it?
-
-Feel free to repost soon.
+No strong opinions other than I agree second colon should be skipped.
+Let's go with this one.
 
