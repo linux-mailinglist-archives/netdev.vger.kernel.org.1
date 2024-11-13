@@ -1,150 +1,150 @@
-Return-Path: <netdev+bounces-144267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A120F9C66B9
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:31:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D2969C66C2
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 02:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C771F25711
-	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:31:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17C161F21500
+	for <lists+netdev@lfdr.de>; Wed, 13 Nov 2024 01:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2793182D2;
-	Wed, 13 Nov 2024 01:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3AE224F0;
+	Wed, 13 Nov 2024 01:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="WwX4yF1Z";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bupu9b5n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I29yc5bJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806BF29A5
-	for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 01:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65252BA34;
+	Wed, 13 Nov 2024 01:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731461505; cv=none; b=opo4W0pUnBZhkG5m8UjKd8BRW80Bj836OoTksFU+TwZucaEfUVGgv6UeT6WYaRTRW4r07VJP7LNfy2X52XiksimuEmbyDRcbYylXmRHAoA0/S9yCejYyCM1SyZ81DEDtcnMw8pO5WoMTGCIIo8eThfO9JHxDxswus2vB67IOQOY=
+	t=1731461808; cv=none; b=BXLfoBxhPy4wySaH+K2QNyDxM88qClSIyNTpqDRPZNx1G8xv7kU5hIKqqSbKb+c1xK3P7FI1+gup7K6jF5DvykQF1PLQKeJzK3dLWNeF2dJnBGrKwYu/B36ul7fAIF5LSFaHBFceajDC79pk7FMvGPJOkdPzvbjTLh8iXe63QSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731461505; c=relaxed/simple;
-	bh=W3Jy1sjo1rKWdNY8N4qE3UzTPrGOiqRUUIQ/T3/jKBE=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=P28P0Z8Sn/8vE8Bcv3cJPbRTmZT9vUg/OgvrWdnQqrcbxashD0InXpQtZMSRXGOJtEPhJS7tv2S1use4d2UHqk1EEFyDag+Jh/N/9LmMqCaZqo+sXlTEUqeitKXwZGUm39Qk8O/wuno6cZXFMtftq2HuOJoqjNJHwJqWmrEBU5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=WwX4yF1Z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Bupu9b5n; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 7E7861140081;
-	Tue, 12 Nov 2024 20:31:42 -0500 (EST)
-Received: from phl-imap-08 ([10.202.2.84])
-  by phl-compute-03.internal (MEProxy); Tue, 12 Nov 2024 20:31:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1731461502;
-	 x=1731547902; bh=iyIH6tkCp7zs8x47CvfHFO5X5AgmWhQjSf9eUwKoy00=; b=
-	WwX4yF1ZfPytkvS3Cs90yomBYqO9N6BY9SRej8l4OeI9Xx1PWOld2zugcVJR/X0E
-	A2Mt4UK3xLb9IOGapUo6UlStOgML7RkuC30ptFht8P/xzTuLsHiJpWu9ucEf1mu4
-	UumzNmFcVsN5S7FZ+A4yo3gC3a3Ghpgrg4tATH3uEoGcZLzBH+EHRfBBSKBzSj/M
-	rOiI/C5R9keaZz6A/la7ikpdapsA+fce0N19MI+fvjFOOITGmesSZ9S1oyqsC4nR
-	DmhYWl/1DKyiT+d34UyPlSZg1AzT+bpm3FX5KE1m3pdZdzkBQ/S1++m3xRRv9nw+
-	5op9k0jApJnEoLtd1hda3w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1731461502; x=
-	1731547902; bh=iyIH6tkCp7zs8x47CvfHFO5X5AgmWhQjSf9eUwKoy00=; b=B
-	upu9b5n5pgI0UCae5Qn+J+bty3o3DgqmKASS/CIN9iQKz2yr+5VSaPcIWfpDsFAj
-	2N1EYH15jy+NAA19PW8XdOwyXYhYzDvWSUBbSi2OhztbFaAjaBIpiQ8HxS/mXalX
-	VWrygMG/oHfaSufxBaPy0S4u9r4MwqL2XE5AnYbqNqpn/bGNWcfLPXcQcFAdVA0J
-	fqcF8/PHwgRlSOFRUC+hgGcvxQ5QNrzDf6dXCtSAoNgRwdr3wJtAqiQzjI/z4U+D
-	kXup5LSTASFz2hA6PDBZq/CbyHNyWuu+3E01NNhbsucCM8YPhlHwmibN7Izt/jgD
-	nAyU0JRxrbup1tf/FAFzQ==
-X-ME-Sender: <xms:fQE0Z_XH4Iyq7j8rmMBlMLSE5wmIhqzDlB2zgDVQnMNsZGt8wf5oug>
-    <xme:fQE0Z3ldLQMYL0YwysbvQAgUMBnuAkMH4ekzMCa787-elT2ZXiUFXGnspa7_8JYQx
-    vXQIN63JO06m0IRaQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeigddthecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenfghrlhcuvffnffculdefhedmnecujfgurhepofggfffhvfevkfgj
-    fhfutgfgsehtjeertdertddtnecuhfhrohhmpedfffgrnhhivghlucgiuhdfuceougiguh
-    esugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgeelieffhfduudeukefhieef
-    gfffgeduleevjeefffeukefgtdelvddvfeefiedunecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghr
-    tghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesug
-    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehjuggrmhgrthhosehfrghsthhlhidr
-    tghomhdprhgtphhtthhopegvtghrvggvrdigihhlihhngiesghhmrghilhdrtghomhdprh
-    gtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtihhn
-    rdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtohepkhgvrhhnvghlqdhtvggrmhesmh
-    gvthgrrdgtohhmpdhrtghpthhtohepmhhkuhgsvggtvghksehsuhhsvgdrtgiipdhrtghp
-    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:fQE0Z7baNy0cAJqA6tviK_-Bw_o3xWKIGIVnwb8RmhVnvn35M-P1iw>
-    <xmx:fQE0Z6UP8ycEwKEsIBNEh8fakAHdVCKpZfA19GkNETj9SdWPeaPsyg>
-    <xmx:fQE0Z5mr6yA0piRRyDDCEKZumzRxDE0IlI5b-Pd8pEP_soEH84dXfw>
-    <xmx:fQE0Z3cidiB5w1ec3cpVi5rybCQEGKg19VWFTUPMgRbs0rc8eezgGA>
-    <xmx:fgE0Z_U3fdYpe31eA4qglVPX0Dq5S6XIGNKAsBCl9bChtnDHvvmkQBkS>
-Feedback-ID: i6a694271:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 8691518A006B; Tue, 12 Nov 2024 20:31:41 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1731461808; c=relaxed/simple;
+	bh=jQ7vjQitYIwVRV5qo3X4jTdA0nSn7aCAbVKckDNIqhA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FRbk0pq0fIkop0VeRQuDoCmNgOesPSiE0GyJcEIOH6tJ/OVxo1PkR8vWvYJP9QQpAAkTw2Kj7JSyHaz1u8ctK6ZrTju/BjJRZb9t507z7miR6hlJRfWpIHwaphW8szGa1qx0JVO/vox7msL86JnwVljPZafd4a3FnQqc7DeXHQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I29yc5bJ; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4314fa33a35so51729195e9.1;
+        Tue, 12 Nov 2024 17:36:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731461805; x=1732066605; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r0He/ui9X3lLXTLqSVc28T6+iNWPPBcnJC+uzdT9cME=;
+        b=I29yc5bJJM9MQ+1VgrAuqnHJvnEa9UMZjSrXJjg8GhZubMXSiV+3NVjvOLGqtV9er+
+         LnJYfTFrJuUe9pgrJMJA+GvklvSu9OkRiIo4755NkXMnpSWY71TENhlmWhSdqTTGEO9R
+         gRNPHIdO6p1UavNGdhKGmFVIwJ+KA568/ZEOWYO9+PHE7zAKeh8jxrtCfrHuQnNRI81s
+         cZG2Div3VNKnsQFtO9ohe4eaErBgr2Dz21hQ6Xf643GOMyratDDTFRw2tAq9VVCsBnb4
+         aAXtbmxFY9wRs36M6JnU8J04EJUreOf5ewvKL6BX7zx5LRMcv9AjuGpawTEl/Oy66T75
+         R16g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731461805; x=1732066605;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r0He/ui9X3lLXTLqSVc28T6+iNWPPBcnJC+uzdT9cME=;
+        b=mQ7wuU3EPxR781yc9ZV50L1y3WBtyKk19xYIICXp6KTaBt6mObVu9MTGNNDFdUBxd+
+         2LKhLGmrzdSpHPAsB/I1uTddZUgla5VqHPl2wUhssPILVhv2zf04ye28JQ4baTH50WEX
+         eowH+a13BM8MU6wOS/L66WRqb827UBsJ6Ikv5IRmgRVWOTZutEgG9w/ISnK+B1qAz8Gs
+         eQxecqNLuKpwp/A4Pj0kzakVJ8pN9k1cfV4M1HuwTFb+wtkq6R6XBzrmbxl6yZ3nHcYM
+         wOI26Xd4pSdw4Drw8BDsvanLpDiErc0W3pUW2UgldBqPu4DpJPksUIJ8DzSvcqIwSyGx
+         UrLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAfExDBXd65c3YWzeN34a3oKhYJgMg/cLtZL0PSyI01fvNBgstFtSvgNjZOjadsFHj0f5aXFzFAesDxa4oOwZB@vger.kernel.org, AJvYcCWyDMTHWEQwYvzGHncQRk2gumQc3e6UMCWK3jzMUi7BCGwoR+LGXbrt2t2EfpnOPfhCwJgpQbIMCIX9Uko=@vger.kernel.org, AJvYcCX/BkABEXd4bcuxK6wvIQSTcP3whxfNkvw+ubbieHGKjr64xtBvxknb51lQ+w625oLZ9I3RYYeC@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoMcfxvWqTu99rT2VhCFvAVoLaQiQL+N6RvEX0dULy+MqWbp/h
+	szItvpYNZubIkmXZ6kglawraJgvVEnBnP3VdMIofaw59xBiB6Bf0
+X-Google-Smtp-Source: AGHT+IFJ3TyFzXqhDuVU7DJUr9rylVz4qYboLBexKwMmYF8kWN714xioYIohZpiK5XEDRhdObS7OuQ==
+X-Received: by 2002:a5d:47c7:0:b0:37c:d54b:a39a with SMTP id ffacd0b85a97d-3820812de92mr3323488f8f.33.1731461804463;
+        Tue, 12 Nov 2024 17:36:44 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed970729sm16681031f8f.15.2024.11.12.17.36.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2024 17:36:43 -0800 (PST)
+Message-ID: <e543a3de-44f1-4a2d-90ef-1786e222f0d8@gmail.com>
+Date: Wed, 13 Nov 2024 03:37:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 12 Nov 2024 17:31:20 -0800
-From: "Daniel Xu" <dxu@dxuuu.xyz>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: "Edward Cree" <ecree.xilinx@gmail.com>, jdamato@fastly.com,
- "David Miller" <davem@davemloft.net>, mkubecek@suse.cz,
- "Martin KaFai Lau" <martin.lau@linux.dev>, netdev@vger.kernel.org,
- "Kernel Team" <kernel-team@meta.com>
-Message-Id: <57047008-53c9-4744-b408-f78fef4c1871@app.fastmail.com>
-In-Reply-To: <20241112074047.44490c6e@kernel.org>
-References: 
- <978e1192c07e970b8944c2a729ae42bf97667a53.1731107871.git.dxu@dxuuu.xyz>
- <20241112074047.44490c6e@kernel.org>
-Subject: Re: [PATCH ethtool-next v2] rxclass: Make output for RSS context action
- explicit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
+To: Sabrina Dubroca <sd@queasysnail.net>,
+ Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
+ <b7d3ec11-afe4-409c-970e-8bc647364a08@gmail.com> <ZzORATd5hG614dta@hog>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <ZzORATd5hG614dta@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On 12.11.2024 19:31, Sabrina Dubroca wrote:
+> 2024-11-10, 15:38:27 +0200, Sergey Ryazanov wrote:
+>> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>>> An ovpn_peer object holds the whole status of a remote peer
+>>> (regardless whether it is a server or a client).
+>>>
+>>> This includes status for crypto, tx/rx buffers, napi, etc.
+>>>
+>>> Only support for one peer is introduced (P2P mode).
+>>> Multi peer support is introduced with a later patch.
+>>
+>> Reviewing the peer creation/destroying code I came to a generic question.
+>> Did you consider keeping a single P2P peer in the peers table as well?
+>>
+>> Looks like such approach can greatly simply the code by dropping all these
+>> 'switch (ovpn->mode)' checks and implementing a unified peer management. The
+>> 'peer' field in the main private data structure can be kept to accelerate
+>> lookups, still using peers table for management tasks like removing all the
+>> peers on the interface teardown.
+> 
+> It would save a few 'switch(mode)', but force every client to allocate
+> the hashtable for no reason at all. That tradeoff doesn't look very
+> beneficial to me, the P2P-specific code is really simple. And if you
+> keep ovpn->peer to make lookups faster, you're not removing that many
+> 'switch(mode)'.
 
-On Tue, Nov 12, 2024, at 7:40 AM, Jakub Kicinski wrote:
-> On Mon, 11 Nov 2024 12:05:38 -0700 Daniel Xu wrote:
->> -	if (fsp->flow_type & FLOW_RSS)
->> -		fprintf(stdout, "\tRSS Context ID: %u\n", rss_context);
->> -
->>  	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
->>  		fprintf(stdout, "\tAction: Drop\n");
->>  	} else if (fsp->ring_cookie == RX_CLS_FLOW_WAKE) {
->>  		fprintf(stdout, "\tAction: Wake-on-LAN\n");
->> +	} else if (fsp->flow_type & FLOW_RSS) {
->> +		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
->> +
->> +		fprintf(stdout, "\tAction: Direct to RSS context id %u", rss_context);
->
-> Do you have strong feelings about the change in formatting?
-> Looking at Ed's comment on the new test made me wonder if the change 
-> in capitalization is for the better.
->
-> Action: Direct to RSS context id 1 (queue base offset: 2)
->
-> vs
->
-> Action: Direct to RSS Context ID: 1 (queue base offset: 2)
->
-> Given "id" is a word (: I like the ID format, the extra colon is
-> annoying but OTOH if we retain it your regexp in the other patch
-> would match before and after..
->
-> Actually the best formatting IMHO would be to skip the ID altogether:
->
-> Action: Direct to RSS Context 1 (queue base offset: 2)
+Looking at the done review, I can retrospectively conclude that I 
+personally do not like short 'switch' statements and special handlers :)
 
-No strong opinions other than I agree second colon should be skipped.
-Let's go with this one.
+Seriously, this module has a highest density of switches per KLOC from 
+what I have seen before and a major part of it dedicated to handle the 
+special case of P2P connection. What together look too unusual, so it 
+feels like a flaw in the design. I racked my brains to come up with a 
+better solution and failed. So I took a different approach, inviting 
+people to discuss item pieces of the code to find a solution 
+collectively or to realize that there is no better solution for now.
+
+The problem is that all these hash tables become inefficient with the 
+single entry (P2P case). I was thinking about allocating a table with a 
+single bin, but it still requires hash function run to access the 
+indexed entry.
+
+
+And back to the hashtable(s) size for the MP mode. 8k-bins table looks a 
+good choice for a normal server with 1-2Gb uplink serving up to 1k 
+connections. But it sill unclear, how this choice can affect 
+installations with a bigger number of connections? Or is this module 
+applicable for embedded solutions? E.g. running a couple of VPN servers 
+on a home router with a few actual connections looks like a waste of 
+RAM. I was about to suggest to use rhashtable due to its dynamic sizing 
+feature, but the module needs three tables. Any better idea?
+
+--
+Sergey
 
