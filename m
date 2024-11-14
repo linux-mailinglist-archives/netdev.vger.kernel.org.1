@@ -1,235 +1,160 @@
-Return-Path: <netdev+bounces-144913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D179C8BED
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:38:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3B5B9C8C42
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:57:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 040E62872DA
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:38:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88EE92815A4
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4D73A8CB;
-	Thu, 14 Nov 2024 13:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A9F22331;
+	Thu, 14 Nov 2024 13:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMyXZRn+"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="EYOwq4+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E12C36AEC;
-	Thu, 14 Nov 2024 13:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C255A95C;
+	Thu, 14 Nov 2024 13:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731591434; cv=none; b=BubuXqjEyWZw5VJ5jmdRaYOB8uEhtgvRuatsgqnFWL7bZMPz8s7ZXY+/J5ittUQWxesGLBqS9wIp6yzyAjAgJ/NlRdem8wRjByRTgdxr9xjDFYTkWh49gG3QRtgWrfVPi7YhaFEzJ4doj+VLoFDYC3/uPbgYaS31QLPCtBEttkA=
+	t=1731592630; cv=none; b=UzlmjVsqaxeR3agCsELgBww7t6ADc2cmhrmWy6kJdIXDi+GYjLbV0uQLwaU05VwfhGeXgfvaQdEppwG59Z+N+AGo6lUWc/Kj+yiWD6dgEHk8rt07sL+6YfXZTbx5qnWt0oN6DzxcZGPMALLBK+3JZiktTLcrTMK+cVmdeoZhUv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731591434; c=relaxed/simple;
-	bh=z0ibvP2+uFf2NigqDZN1BTPasnFxzj7OMV2W7BeLjtk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=mJxQwScFpnlJU8nS2UaArzHOWxkGzoH+Vp4LtWurqjL4/9q0YhHuFQDiofopFv250GDqsDT2fBEZCwGtfONybCv26xwsQtgfcqSnPQFmk64XlwCZmj4FNx/sHH4jBC+jAlhGqOwOnYQbSfRWLvbAOHfVlz+632qswh2knFwpFzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMyXZRn+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ED19C4CECD;
-	Thu, 14 Nov 2024 13:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731591434;
-	bh=z0ibvP2+uFf2NigqDZN1BTPasnFxzj7OMV2W7BeLjtk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=YMyXZRn+HhLi/gerWB9ktVwYFdfAs25Wg7SqUOYukeGHYtiLF7xV6skBVTiTL3Rcp
-	 TV8KqtXkh0DdkthCNQjd2uLcAFyGJjd8cp2XDas5PiinvVNsY6BbexjLIkc3oFcnXU
-	 mf6DAPGsIN7dnsEZ5gyBJECZOwJkgAPiP7U7U6RhimjYJRVSkk/JnR2/a6KysApXLb
-	 BQub3r5rJxPRh7bv2jSaWmJ9IWKzj2fYGIEBBsNkKUqZbSaSf4MKG+1YWqlxRnV1kV
-	 RCGHXxR0A5y9B3/z4uFPhn+5x+2ECXeQ8/YaqO+Y3Tl1dyYwYXZ3Y9LyzPN2PoRD/Q
-	 goIEG+szOkhRQ==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Thu, 14 Nov 2024 15:36:53 +0200
-Subject: [PATCH net-next v4 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
- to priority map for RX
+	s=arc-20240116; t=1731592630; c=relaxed/simple;
+	bh=xXmKpFmqAMp48Y7ttayGjWqRYdxHGKlAorYsho+aMWU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p2u9lsjZg2D/b/BjtysDHWtdExoLGVuEEWKBGeH/zQuQA604LZpwa8pPIRt+tys9lvW+nQQXMdl7NHbBx3DqbhpcCjF0hEh31bKS0HEf4n3qSk1MmeON+MTCWy0pzCp2uPBnr+So5+Tz9cW7DEHI4NabVaJcI4uh/9oejE2auoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=EYOwq4+k; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1731592620;
+	bh=xXmKpFmqAMp48Y7ttayGjWqRYdxHGKlAorYsho+aMWU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EYOwq4+kKxuaOhDYbs8RKuUUPRF+f3aQPWayV9Nqu8LJ9IXJ4vuTG7EKa1QbkkuoY
+	 0nJawHXVrCFbuf/jFbKvEC66c1koNvSPnAdAESpFMc6+yGzf3s1EDop25TdW++FbGH
+	 2Z5PUz5FmwJN9Ym5Wjj+4EhItfFEYhDKqz6RosFxvlGq8JpTA56Fm7udasiY5OaHNR
+	 JpHjIJtMgU5ZsOZMh4XR/mXkVQkcnkrjjlCdyQ1YwkCOZk/ZZJsKsk7lPO9Ht5rKyG
+	 0U8dFrEkhNxY/L3zM2GlasIZTIZpKZhntVg05DjgW7PLet8XI6gJB5OBd0G64r6IbN
+	 Lng+IxWOdIIaw==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3025917E3663;
+	Thu, 14 Nov 2024 14:57:00 +0100 (CET)
+Message-ID: <1a36456b-4844-4827-ab53-598ec14d7437@collabora.com>
+Date: Thu, 14 Nov 2024 14:56:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241114-am65-cpsw-multi-rx-dscp-v4-2-93eaf6760759@kernel.org>
-References: <20241114-am65-cpsw-multi-rx-dscp-v4-0-93eaf6760759@kernel.org>
-In-Reply-To: <20241114-am65-cpsw-multi-rx-dscp-v4-0-93eaf6760759@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Guillaume Nault <gnault@redhat.com>
-Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, srk@ti.com, Pekka Varis <p-varis@ti.com>, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4439; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=z0ibvP2+uFf2NigqDZN1BTPasnFxzj7OMV2W7BeLjtk=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnNf0AHuDqyqgGS25QnmggNIMqhYH+U6v67V6s6
- 1naCcHveWGJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZzX9AAAKCRDSWmvTvnYw
- kzFpEACgdyykrz7NgAUhIgedUGbQu5jwz8sRk6f3Et8ZW9z0yhi7zKnVYj/HNRCMToKKCP2Rnkr
- +rNmMbivrHQ4rC5/A01VYN52JkjVfQUqd7fM4d5YtjQPPDMgZOIXDhPxuDJGNRZTnol51gMnk+1
- W8htG14vcBpmE3xVgWc0jAYuT5XGJGYcTgwfFgV5IQRywoPeZzGBd8NCL1Ls8m6XWiHq/vxy625
- 7QgEsHhLkTyPAG7sE9B2EzTbQN3c+68affbNU999s+e6FC9FsoBgApZSiYWpb+vKOJEhspdBezQ
- TBb8xyykhL2HAEOWgegJX3VYme+PkeVYFJF4eqfnvAslLlSqnRplrUHHqaoqaUbDMCclU2AYL1e
- gr+AxygsJ7LAKlYUlI6kHNhjnm5tOgf5F5DkCRJ0qosk4VkQdEcX7C3YHLwL97QhmQRmWT37L89
- IkmHJILESNaS5++1KfZ8GSPZW9YXBDpfO6ePYl/h78Xcd5POzbe+6gAUuZhIIR4PaZmh6yoG1bD
- KYpOFSRLkUNh6ElXy1biOr09JvJgUAn0EFidgbEZo3x/e/RFRtRLHEJolQ/WXCqyDx+r/pg3m7W
- 7dRAwU4cNmIe97Xvhz4jSq2r6990JQEgwz9klGhI0U+pExsFLA6InpBbC0AgGsYHjtvFXwxa7u3
- 3Amydvz64lwxlvw==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: Set mediatek,mac-wol on
+ DWMAC node for all boards
+To: Michael Walle <mwalle@kernel.org>,
+ =?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>
+Cc: kernel@collabora.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Biao Huang <biao.huang@mediatek.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
+ <20241109-mediatek-mac-wol-noninverted-v2-2-0e264e213878@collabora.com>
+ <bdbfb1db-1291-4f95-adc9-36969bb51eb4@collabora.com>
+ <D5LWHT7OU9DQ.NCMSTUWT5991@kernel.org>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <D5LWHT7OU9DQ.NCMSTUWT5991@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
-appropriate priority queue via DSCP to Priority mapping registers
-(CPSW_PN_RX_PRI_MAP_REG).
+Il 14/11/24 13:29, Michael Walle ha scritto:
+> Hi,
+> 
+> On Thu Nov 14, 2024 at 10:26 AM CET, AngeloGioacchino Del Regno wrote:
+>> Il 09/11/24 16:16, Nícolas F. R. A. Prado ha scritto:
+>>> Due to the mediatek,mac-wol property previously being handled backwards
+>>> by the dwmac-mediatek driver, its use in the DTs seems to have been
+>>> inconsistent.
+>>>
+>>> Now that the driver has been fixed, correct this description. All the
+>>> currently upstream boards support MAC WOL, so add the mediatek,mac-wol
+>>> property to the missing ones.
+>>>
+>>> Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+>>> ---
+>>>    arch/arm64/boot/dts/mediatek/mt2712-evb.dts                   | 1 +
+>>>    arch/arm64/boot/dts/mediatek/mt8195-demo.dts                  | 1 +
+>>>    arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts | 1 +
+>>>    3 files changed, 3 insertions(+)
+>>>
+>>
+>> ..snip..
+>>
+>>> diff --git a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
+>>> index 31d424b8fc7cedef65489392eb279b7fd2194a4a..c12684e8c449b2d7b3b3a79086925bfe5ae0d8f8 100644
+>>> --- a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
+>>> +++ b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
+>>> @@ -109,6 +109,7 @@ &eth {
+>>>    	pinctrl-names = "default", "sleep";
+>>>    	pinctrl-0 = <&eth_default_pins>;
+>>>    	pinctrl-1 = <&eth_sleep_pins>;
+>>> +	mediatek,mac-wol;
+>>
+>> The demo board has the same WoL capability as the EVK, so you can avoid adding the
+>> mac-wol property here.
+> 
+> Not sure I can follow you here.
+> 
 
-Use a default DSCP to User Priority (UP) mapping as per
-https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
-and
-https://datatracker.ietf.org/doc/html/rfc8622#section-11
+That's in the sense that they do WoL through the MAC and not through the PHY (as
+in, it's the MAC that has to be configured for WoL and not *only* the PHY).
 
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 100 +++++++++++++++++++++++++++++++
- 1 file changed, 100 insertions(+)
+>>
+>>>    	status = "okay";
+>>>    
+>>>    	mdio {
+>>> diff --git a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
+>>> index e2e75b8ff91880711c82f783c7ccbef4128b7ab4..4985b65925a9ed10ad44a6e58b9657a9dd48751f 100644
+>>> --- a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
+>>> +++ b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
+>>> @@ -271,6 +271,7 @@ &eth {
+>>>    	pinctrl-names = "default", "sleep";
+>>>    	pinctrl-0 = <&eth_default_pins>;
+>>>    	pinctrl-1 = <&eth_sleep_pins>;
+>>> +	mediatek,mac-wol;
+>>
+>> I'm mostly sure that Kontron's i1200 works the same as the EVK in regards to WoL.
+>>
+>> Michael, I recall you worked on this board - can you please confirm?
+> 
+> I'd say so. Honestly, I've never tried WoL on this board, but I'm
+> not aware of any difference to the *demo* board (not the EVK).
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 0520e9f4bea7..8a6429aaded2 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -71,6 +71,8 @@
- #define AM65_CPSW_PORT_REG_RX_PRI_MAP		0x020
- #define AM65_CPSW_PORT_REG_RX_MAXLEN		0x024
- 
-+#define AM65_CPSW_PORTN_REG_CTL			0x004
-+#define AM65_CPSW_PORTN_REG_DSCP_MAP		0x120
- #define AM65_CPSW_PORTN_REG_SA_L		0x308
- #define AM65_CPSW_PORTN_REG_SA_H		0x30c
- #define AM65_CPSW_PORTN_REG_TS_CTL              0x310
-@@ -94,6 +96,10 @@
- /* AM65_CPSW_PORT_REG_PRI_CTL */
- #define AM65_CPSW_PORT_REG_PRI_CTL_RX_PTYPE_RROBIN	BIT(8)
- 
-+/* AM65_CPSW_PN_REG_CTL */
-+#define AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN	BIT(1)
-+#define AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN	BIT(2)
-+
- /* AM65_CPSW_PN_TS_CTL register fields */
- #define AM65_CPSW_PN_TS_CTL_TX_ANX_F_EN		BIT(4)
- #define AM65_CPSW_PN_TS_CTL_TX_VLAN_LT1_EN	BIT(5)
-@@ -176,6 +182,99 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port *slave,
- 	writel(mac_lo, slave->port_base + AM65_CPSW_PORTN_REG_SA_L);
- }
- 
-+#define AM65_CPSW_DSCP_MAX	GENMASK(5, 0)
-+#define AM65_CPSW_PRI_MAX	GENMASK(2, 0)
-+#define AM65_CPSW_DSCP_PRI_PER_REG	8
-+#define AM65_CPSW_DSCP_PRI_SIZE		4	/* in bits */
-+static int am65_cpsw_port_set_dscp_map(struct am65_cpsw_port *slave, u8 dscp, u8 pri)
-+{
-+	int reg_ofs;
-+	int bit_ofs;
-+	u32 val;
-+
-+	if (dscp > AM65_CPSW_DSCP_MAX)
-+		return -EINVAL;
-+
-+	if (pri > AM65_CPSW_PRI_MAX)
-+		return -EINVAL;
-+
-+	/* 32-bit register offset to this dscp */
-+	reg_ofs = (dscp / AM65_CPSW_DSCP_PRI_PER_REG) * 4;
-+	/* bit field offset to this dscp */
-+	bit_ofs = AM65_CPSW_DSCP_PRI_SIZE * (dscp % AM65_CPSW_DSCP_PRI_PER_REG);
-+
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+	val &= ~(AM65_CPSW_PRI_MAX << bit_ofs);	/* clear */
-+	val |= pri << bit_ofs;			/* set */
-+	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+
-+	return 0;
-+}
-+
-+static void am65_cpsw_port_enable_dscp_map(struct am65_cpsw_port *slave)
-+{
-+	int dscp, pri;
-+	u32 val;
-+
-+	/* Default DSCP to User Priority mapping as per:
-+	 * https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
-+	 * and
-+	 * https://datatracker.ietf.org/doc/html/rfc8622#section-11
-+	 */
-+	for (dscp = 0; dscp <= AM65_CPSW_DSCP_MAX; dscp++) {
-+		switch (dscp) {
-+		case 56:	/* CS7 */
-+		case 48:	/* CS6 */
-+			pri = 7;
-+			break;
-+		case 46:	/* EF */
-+		case 44:	/* VA */
-+			pri = 6;
-+			break;
-+		case 40:	/* CS5 */
-+			pri = 5;
-+			break;
-+		case 34:	/* AF41 */
-+		case 36:	/* AF42 */
-+		case 38:	/* AF43 */
-+		case 32:	/* CS4 */
-+		case 26:	/* AF31 */
-+		case 28:	/* AF32 */
-+		case 30:	/* AF33 */
-+		case 24:	/* CS3 */
-+			pri = 4;
-+			break;
-+		case 18:	/* AF21 */
-+		case 20:	/* AF22 */
-+		case 22:	/* AF23 */
-+			pri = 3;
-+			break;
-+		case 16:	/* CS2 */
-+		case 10:	/* AF11 */
-+		case 12:	/* AF12 */
-+		case 14:	/* AF13 */
-+		case 0:		/* DF */
-+			pri = 0;
-+			break;
-+		case 8:		/* CS1 */
-+		case 1:		/* LE */
-+			pri = 1;
-+			break;
-+		default:
-+			pri = 0;
-+			break;
-+		}
-+
-+		am65_cpsw_port_set_dscp_map(slave, dscp, pri);
-+	}
-+
-+	/* enable port IPV4 and IPV6 DSCP for this port */
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_CTL);
-+	val |= AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN |
-+		AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN;
-+	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_CTL);
-+}
-+
- static void am65_cpsw_sl_ctl_reset(struct am65_cpsw_port *port)
- {
- 	cpsw_sl_reset(port->slave.mac_sl, 100);
-@@ -921,6 +1020,7 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
- 	common->usage_count++;
- 
- 	am65_cpsw_port_set_sl_mac(port, ndev->dev_addr);
-+	am65_cpsw_port_enable_dscp_map(port);
- 
- 	if (common->is_emac_mode)
- 		am65_cpsw_init_port_emac_ale(port);
+Thanks for confirming. I will ignore the devicetree commit entirely then, as this
+would ...un...fix the fix (meaning that patch [1/2] is good!).
 
--- 
-2.34.1
+Cheers,
+Angelo
+
+> 
+> -michael
+
 
 
