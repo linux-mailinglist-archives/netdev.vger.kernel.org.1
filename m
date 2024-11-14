@@ -1,158 +1,135 @@
-Return-Path: <netdev+bounces-144819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271E29C87B0
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:36:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 150629C87B4
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB3711F21FCE
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA68E284867
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8078F1F757C;
-	Thu, 14 Nov 2024 10:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C8F1F80A3;
+	Thu, 14 Nov 2024 10:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="heuJwUlB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7pj2r2s"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556CE18BC05
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871741DC05F
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731580415; cv=none; b=d9tfYUVnNJPEN4davql/jo6LqJx1RHOjP9Tua+7agI9MrVwf5G16rVsclOpwbDspS+LhsSge4VXkCEBFyak2EF2OR/GXViYAzR1i8vC8LrE9BF+uAURYeo0qnQtGbfVzZV2js1fiQyOwx5pYk21gWEeGfU2QFy64vWH/0cvEpyQ=
+	t=1731580473; cv=none; b=hz0n1KmeviHX668kbKxP+MVPpR7z6JLQZVFO2IwPIpPiFWeCBoOrdcnsgLOhH51OzUVB32Mkrr7VcMrmVJJcH6jw12FUdsSx5CN23Exs2wRlmI1WV8iQsEhqtr5h4tPMJQu5XPLrPOLaU9wwRbjQ4zlGjfr4NPI+7c/wkHdzvL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731580415; c=relaxed/simple;
-	bh=Rba7beCswNATD6GrjVDhrp8F280yBr1PGNRiygXuC6s=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=UBCXEICQ8ww1/E/zullG3+q+gl6WEHfMOPKWyYtExDl41J5/7wKvhanI7aCyGxk4H9x2H8K7C3pkCjwMPQziiWS9TSmUB6KibrtbRM9445+kJ3bYh4hUAXXSJCc4jy9jfHMsDleEseR9UZp9g68nZYdCt65g9uj3FXVA+KsF6SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=heuJwUlB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=X1wxBL/Q1nMBB0WHkDAvSftBdcekIJh06T78jB7Q/Q0=; b=heuJwUlB7F7gDn3oSws3lccoXk
-	rmk0lQrq6v2hag4Di5FmeHR2pDJbiEsKpmA8D4CGPvG2VyOTcGDr2gkHxurPXzgflsPBZGLiYfuKg
-	/b83kJJyfL7cyf+ETSUCL4nqFUjTMp/MLP2gu0LezuN8+06kULOyDLbOYLdHsgIMgpxGox2CT4IqP
-	6hQjlb8V+Dg75sc+EvEv3qc3PndLj5saJs/yOFdb5rSnM07t4o3pl8f+72/ICheY4g+PtPUYTdfQJ
-	PnwOEvfE8qWkcsnjX3WBu6kzk+taWVNYFXWa0qE71N7sJH1L5tnvOQAIlCb5yKK99HS/36TT2Cmny
-	AvDta0IA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55396 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tBXAE-0007qg-2Y;
-	Thu, 14 Nov 2024 10:33:27 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tBXAF-00341F-EQ; Thu, 14 Nov 2024 10:33:27 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net: phy: fix phylib's dual eee_enabled
+	s=arc-20240116; t=1731580473; c=relaxed/simple;
+	bh=9NSyV8J37zkgSfT8SSmvC9IvYLYLgSb5DtAfbz6Q0DE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=k4a+DB5j9ppH5SJAiDIhng9lG9jBUG2bZibV7LDtElRa+rfFSozcyn4V1q0aekebW3IOZoYIU9gsl9+f2AM1YHEWFL2dZwrbJcS0g7U8K1CdgDni9syG6hVPWTLy7ZXbnxbwI3a9PQFoHfABISH9+yKKUL21VuQMSpPOKG+AzQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W7pj2r2s; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731580470;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bL1TDm7rZCPU5Kay9rqCq9qcbgcAxYuCQTRJOnYP6n4=;
+	b=W7pj2r2sXi62IaErYTT+W/YJzgFwi3x677OkDlkMXQOd/Rkx8jvWaY6cIYKBWGsloCWOt0
+	mJ+PtxHYQyEIgxBCJ7yveKGyKl0seVXCuFUM5mC4EJ0dtVMemWNIWpjhjLKineXtkmDkfV
+	6CsVbhLph6752WLHrnwzQhUnlJUlyj4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-342-MmL907OlP-CutNFUJGCWMw-1; Thu, 14 Nov 2024 05:34:28 -0500
+X-MC-Unique: MmL907OlP-CutNFUJGCWMw-1
+X-Mimecast-MFC-AGG-ID: MmL907OlP-CutNFUJGCWMw
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315f48bd70so3724885e9.2
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 02:34:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731580467; x=1732185267;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bL1TDm7rZCPU5Kay9rqCq9qcbgcAxYuCQTRJOnYP6n4=;
+        b=K6PDoWmxz+YprMLUnhc8BRelssqN53axAkKT5frIfVkbBQBJgQz2JKPrXB0rIrZq/n
+         UhI75Um2BRW2ILTIp+vPp7ot7uKcI1Zs536GfAOWOb8PeK36BJlUtwdzd3DfrsycZRo9
+         j3z223FBdCp+7fdcoNY+sSZIPzANWDqMp+HL1C3co41ieFG92UVbkPvvd3dAK5C9QlAA
+         02z8r53yzQ92S74cCboD1zeC79Sle+YCDP9hvLs1N0rHR13XvpumSba8CUH5h1VLdnMw
+         6v2kJYtMjIKcO11a+R/lx8SIwYdxR06aTob9NbpjenXRw5K2Hw6MRTTU6M2lVzrJPeyK
+         DG1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWb5x21P+dQBaizKcOkUtHEEtDrmYC2w54tPUfaRTYWwNqTVYdH4CL2O/NbUDocxn5BhvqaMJM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn8Fa+NGzcgjGiDivgUE4h++G9EYg6bpMmdll2lzSMgLlAHlaD
+	tcL8LhDxTbl3635VQoonSv6/Ph0tfdGY/WeeWUbgaDSU5CtcQF7RGidxVSZUv89wPHEt2DFlUKJ
+	MRE7U3zgcaKRw9Essj7ElujgVZBOs6gqhNyQKJ50NdilY8cqEBLBaoA==
+X-Received: by 2002:a05:600c:3114:b0:42c:bd4d:e8ba with SMTP id 5b1f17b1804b1-432d4aae479mr58575455e9.8.1731580467698;
+        Thu, 14 Nov 2024 02:34:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7QUd4COsmqD7s0A3KVqaPte+ZWjxjNIuWILigzUy4UQb3+ONujlZta3QocdY4DXgTqnCCCg==
+X-Received: by 2002:a05:600c:3114:b0:42c:bd4d:e8ba with SMTP id 5b1f17b1804b1-432d4aae479mr58575275e9.8.1731580467295;
+        Thu, 14 Nov 2024 02:34:27 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac0ae25sm15396975e9.35.2024.11.14.02.34.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 02:34:26 -0800 (PST)
+Message-ID: <7914fb1b-8e9d-4c02-b970-b6eaaf468d05@redhat.com>
+Date: Thu, 14 Nov 2024 11:34:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 14 Nov 2024 10:33:27 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xfrm: replace deprecated strncpy with strscpy_pad
+To: Daniel Yang <danielyangkang@gmail.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ "open list:NETWORKING [IPSEC]" <netdev@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20241113092058.189142-1-danielyangkang@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241113092058.189142-1-danielyangkang@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-phylib has two eee_enabled members. Some parts of the code are using
-phydev->eee_enabled, other parts are using phydev->eee_cfg.eee_enabled.
-This leads to incorrect behaviour as their state goes out of sync.
-ethtool --show-eee shows incorrect information, and --set-eee sometimes
-doesn't take effect.
+On 11/13/24 10:20, Daniel Yang wrote:
+> The function strncpy is deprecated since it does not guarantee the
+> destination buffer is NULL terminated. Recommended replacement is
+> strscpy. The padded version was used to remain consistent with the other
+> strscpy_pad usage in the modified function.
+> 
+> Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
+> ---
+>  net/xfrm/xfrm_user.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index e3b8ce898..085f68e35 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -1089,7 +1089,7 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
+>  	if (!nla)
+>  		return -EMSGSIZE;
+>  	algo = nla_data(nla);
+> -	strncpy(algo->alg_name, auth->alg_name, sizeof(algo->alg_name));
+> +	strscpy_pad(algo->alg_name, auth->alg_name, sizeof(algo->alg_name));
+>  
+>  	if (redact_secret && auth->alg_key_len)
+>  		memset(algo->alg_key, 0, (auth->alg_key_len + 7) / 8);
 
-Fix this by only having one eee_enabled member - that in eee_cfg.
+@Steffen, @Herbert: I think this should go via your tree despite the
+prefix tag.
 
-Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phy-c45.c    | 4 +---
- drivers/net/phy/phy_device.c | 4 ++--
- include/linux/phy.h          | 2 --
- 3 files changed, 3 insertions(+), 7 deletions(-)
+Please LMK otherwise!
 
-diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 5695935fdce9..ac987e5e82dc 100644
---- a/drivers/net/phy/phy-c45.c
-+++ b/drivers/net/phy/phy-c45.c
-@@ -942,7 +942,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_read_eee_abilities);
-  */
- int genphy_c45_an_config_eee_aneg(struct phy_device *phydev)
- {
--	if (!phydev->eee_enabled) {
-+	if (!phydev->eee_cfg.eee_enabled) {
- 		__ETHTOOL_DECLARE_LINK_MODE_MASK(adv) = {};
- 
- 		return genphy_c45_write_eee_adv(phydev, adv);
-@@ -1575,8 +1575,6 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
- 		linkmode_copy(phydev->advertising_eee, adv);
- 	}
- 
--	phydev->eee_enabled = data->eee_enabled;
--
- 	ret = genphy_c45_an_config_eee_aneg(phydev);
- 	if (ret > 0) {
- 		ret = phy_restart_aneg(phydev);
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 499797646580..5dfa2aa53c90 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3595,12 +3595,12 @@ static int phy_probe(struct device *dev)
- 	/* There is no "enabled" flag. If PHY is advertising, assume it is
- 	 * kind of enabled.
- 	 */
--	phydev->eee_enabled = !linkmode_empty(phydev->advertising_eee);
-+	phydev->eee_cfg.eee_enabled = !linkmode_empty(phydev->advertising_eee);
- 
- 	/* Some PHYs may advertise, by default, not support EEE modes. So,
- 	 * we need to clean them.
- 	 */
--	if (phydev->eee_enabled)
-+	if (phydev->eee_cfg.eee_enabled)
- 		linkmode_and(phydev->advertising_eee, phydev->supported_eee,
- 			     phydev->advertising_eee);
- 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index a98bc91a0cde..44890cdf40a2 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -601,7 +601,6 @@ struct macsec_ops;
-  * @adv_old: Saved advertised while power saving for WoL
-  * @supported_eee: supported PHY EEE linkmodes
-  * @advertising_eee: Currently advertised EEE linkmodes
-- * @eee_enabled: Flag indicating whether the EEE feature is enabled
-  * @enable_tx_lpi: When True, MAC should transmit LPI to PHY
-  * @eee_cfg: User configuration of EEE
-  * @lp_advertising: Current link partner advertised linkmodes
-@@ -721,7 +720,6 @@ struct phy_device {
- 	/* used for eee validation and configuration*/
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported_eee);
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising_eee);
--	bool eee_enabled;
- 
- 	/* Host supported PHY interface types. Should be ignored if empty. */
- 	DECLARE_PHY_INTERFACE_MASK(host_interfaces);
--- 
-2.30.2
+Thanks,
+
+Paolo
 
 
