@@ -1,101 +1,90 @@
-Return-Path: <netdev+bounces-144868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18B0D9C8985
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:08:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2924C9C898D
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B93D51F221C5
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:08:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A087B234BA
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3800A1F9EDF;
-	Thu, 14 Nov 2024 12:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6B31F891E;
+	Thu, 14 Nov 2024 12:09:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BC81F9EAE;
-	Thu, 14 Nov 2024 12:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6DF18BC2C;
+	Thu, 14 Nov 2024 12:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731586054; cv=none; b=nb3/t5MAAJA/ol7UW1P5HKKXd9FJLQiFOCSpx4hmxZyiRFpxdOZIbKeQq/vU96SvCqg1CUCMu8HlHWdoHktxE8MMmIMcZSq8bLiFctKLSrOfH2OkMqDF80Pr/LUvr1Jdn29/r0gaA3Qha0kseUEsjkkyG2iGXjOxmW8h4mPeMtI=
+	t=1731586154; cv=none; b=DkNNTuNvrrfwHFUJZ0XdxzvgWLBWHv2qxHLCFsgEJ+9fFRgtfHHX6AhvAYVkQbS8W0Kqq0UD4ZxKUqtfqbViBbcrMZVoCsj8VI2Ko+aztuqAatnN1MnyrtSl2zpzZoCq+USFM1dygD5QbB17r9CMGCzSFQC7cvAaXF58MFNPRVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731586054; c=relaxed/simple;
-	bh=LOd6GxO4tMJcV2o7TjI7n8wU2/+etepq1GwxCfsRtyc=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=pv57YEcPToZzgspW3bDJSaqn4S/GGAbuqylQlc3VIyT75KeI6nxTjMqSOgYRQ7CgQ7UCckihLXuZIPx+4Ly/A0YkwGwthJP88wC9FeY/DkOqtpdaWdUQ4Z2TuO1+cM/V+0Bh0gR3EIMtEVIKBZsP1VM20lRLlrxGwkXdDIajcm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4XpzRb5Bvxz50FXN;
-	Thu, 14 Nov 2024 20:07:23 +0800 (CST)
-Received: from njy2app02.zte.com.cn ([10.40.13.116])
-	by mse-fl1.zte.com.cn with SMTP id 4AEC67Ud016915;
-	Thu, 14 Nov 2024 20:06:07 +0800 (+08)
-	(envelope-from jiang.kun2@zte.com.cn)
-Received: from mapi (njb2app06[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Thu, 14 Nov 2024 20:06:11 +0800 (CST)
-Date: Thu, 14 Nov 2024 20:06:11 +0800 (CST)
-X-Zmail-TransId: 2afe6735e7b3032-b8ad8
-X-Mailer: Zmail v1.0
-Message-ID: <20241114200611368_vpMExu265JwdZuArEo_D@zte.com.cn>
+	s=arc-20240116; t=1731586154; c=relaxed/simple;
+	bh=zFjM9nD1eEcwNAhJr7GI0uPQTnedXfW/j65cRd8uHaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SVjkd4JQKLCcMLNPNCv0WmJ405AMbciNQXQc/yUhqrIfZC1FxmRXZk0/QcEezWjdj2TBm6LDNYbQVk00u+7cqwfXosojecyEqxBta8yAvJ2F9AJ9ecGrwXzJnTxYz1TvuqguA0/gtJ6gMveKlJPyyupYSYrkCO6e6H1rlie013U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=39690 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1tBYep-002ARd-BK; Thu, 14 Nov 2024 13:09:09 +0100
+Date: Thu, 14 Nov 2024 13:09:05 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jeongjun Park <aha310510@gmail.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	horms@kernel.org, kaber@trash.net, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] netfilter: ipset: add missing range check in
+ bitmap_ip_uadt
+Message-ID: <ZzXoYcxjSpejl9pC@calendula>
+References: <20241113130209.22376-1-aha310510@gmail.com>
+ <ff1c1622-a57c-471e-b41f-8fb4cb2f233d@redhat.com>
+ <ZzXfDDNSeO0vh1US@calendula>
+ <759eccdd-f75b-f3a7-8686-d4c49c72df41@blackhole.kfki.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <jiang.kun2@zte.com.cn>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <corbet@lwn.net>,
-        <jmaloy@redhat.com>, <lucien.xin@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Cc: <tu.qiang35@zte.com.cn>, <jiang.kun2@zte.com.cn>, <xu.xin16@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIERvY3VtZW50YXRpb246IHRpY3A6IGZpeCBmb3JtYXR0aW5nIGlzc3VlIGluIHRpcGMucnN0?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 4AEC67Ud016915
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6735E7FB.000/4XpzRb5Bvxz50FXN
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <759eccdd-f75b-f3a7-8686-d4c49c72df41@blackhole.kfki.hu>
+X-Spam-Score: -1.9 (-)
 
-From: tuqiang <tu.qiang35@zte.com.cn>
+On Thu, Nov 14, 2024 at 12:46:29PM +0100, Jozsef Kadlecsik wrote:
+> On Thu, 14 Nov 2024, Pablo Neira Ayuso wrote:
+> 
+> > On Thu, Nov 14, 2024 at 12:10:05PM +0100, Paolo Abeni wrote:
+> > > On 11/13/24 14:02, Jeongjun Park wrote:
+> > > > When tb[IPSET_ATTR_IP_TO] is not present but tb[IPSET_ATTR_CIDR] exists,
+> > > > the values of ip and ip_to are slightly swapped. Therefore, the range check
+> > > > for ip should be done later, but this part is missing and it seems that the
+> > > > vulnerability occurs.
+> > > > 
+> > > > So we should add missing range checks and remove unnecessary range checks.
+> > > > 
+> > > > Cc: <stable@vger.kernel.org>
+> > > > Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
+> > > > Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
+> > > > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> > > 
+> > > @Pablo, @Jozsef: despite the subj prefix, I guess this should go via
+> > > your tree. Please LMK if you prefer otherwise.
+> > 
+> > Patch LGTM. I am waiting for Jozsef to acknowledge this fix.
+> 
+> Sorry for the delay at acking the patch. Please apply it to the stable 
+> branches too because those are affected as well.
 
-The hyphen is removed to have the same style as the others.
-
-Fixes: 09ef17863f37 ("Documentation: add more details in tipc.rst")
-Signed-off-by: tuqiang <tu.qiang35@zte.com.cn>
-Signed-off-by: Jiang Kun <jiang.kun2@zte.com.cn>
-Cc: xu xin <xu.xin16@zte.com.cn>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Jon Maloy <jmaloy@redhat.com>
-Cc: Xin Long <lucien.xin@gmail.com>
----
- Documentation/networking/tipc.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/networking/tipc.rst b/Documentation/networking/tipc.rst
-index ab63d298cca2..9b375b9b9981 100644
---- a/Documentation/networking/tipc.rst
-+++ b/Documentation/networking/tipc.rst
-@@ -112,7 +112,7 @@ More Information
-
- - How to contribute to TIPC:
-
--- http://tipc.io/contacts.html
-+  http://tipc.io/contacts.html
-
- - More details about TIPC specification:
-
--- 
-2.18.4
+No problem, preparing PR. Thanks Jozsef.
 
