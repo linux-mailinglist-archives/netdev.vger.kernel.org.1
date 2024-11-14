@@ -1,80 +1,66 @@
-Return-Path: <netdev+bounces-144627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFFB9C7F6D
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 01:39:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8279A9C7F6F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 01:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D685B22A86
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 00:39:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C4AA283D1D
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 00:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5A6DF5C;
-	Thu, 14 Nov 2024 00:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6B6BE4E;
+	Thu, 14 Nov 2024 00:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urMKE+0p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVwvEp8p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F40A95C;
-	Thu, 14 Nov 2024 00:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF844A954
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 00:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731544767; cv=none; b=MakPVUhPT3wGcLedZXotzVUua3mDkj+uVXbendzR+O6CW1rof794TwOix/EA4lEFsfJs8lcykfcPV6Sk78aovE9hRF8rDd6Zh0a7l5TOU5OLgf/toNO5xaRcUBLO8rpvjoDzdi6I/a0CjORTQsXj+dQzGZQZOIfhARKd6HslcVo=
+	t=1731544872; cv=none; b=Sg5wVFLZ5ZFwIozhAnQYFl0XZ1df0tLjVyMNNlfHZtMBc95ThBW41gpq2WPi/qEqtfr7YkpaKAPcKg7NBJMFUN1fD1Vhu6r0n4tdqaCZurABeIoX8FBDN0FMQM7vF2EobPuutDxsCZy+A84x8lPPCAiRkRDrwLCdN5gh2FLKZNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731544767; c=relaxed/simple;
-	bh=M6ItR/lDbn7nuwHceUHxG8faR8R5lWBgt5KuTnUDLpk=;
+	s=arc-20240116; t=1731544872; c=relaxed/simple;
+	bh=C7ODDwvffHJ2YtnHrtzEf1EjtgbOEdFYer7W+NxWjJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tvwYtehO+j+tdOzHLa1V7WGRQzSK6cliMtPRkFckVxlLC8Io1JPJ9mLd3MoJu2aXIu9gPeJR7Vp2F+WBzBfxznmvToyGeEmcZhMEnWOZSbQXf+Y6fwJrfdUCdG0/StiVIwlxbMEu60r5hcspKJcsQPWAAs+47m5D9TTCv7kmYsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urMKE+0p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DFE2C4CECD;
-	Thu, 14 Nov 2024 00:39:26 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tReDSEmHLxdzRDug5VMn92xzhVz+Pz6q/zqPFRKJBm/CkSLgFv8ldBrl6eVMUBXsMPYkCb8bHMvWc3q6dCErWf2xtiVZLlcE55aKm4RkhcL+rf2mPMlnJQ1IsDqsx2jN056HhcPbn/uUyl8GxBtLzKGBDvZKDXTv6zygbDE8k04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVwvEp8p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15DD4C4CEC3;
+	Thu, 14 Nov 2024 00:41:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731544767;
-	bh=M6ItR/lDbn7nuwHceUHxG8faR8R5lWBgt5KuTnUDLpk=;
+	s=k20201202; t=1731544871;
+	bh=C7ODDwvffHJ2YtnHrtzEf1EjtgbOEdFYer7W+NxWjJA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=urMKE+0pIJbAqqWBaMVXUQwRD09oPxnn+n8UWVEHTvixXrLHbjrsGZ7KggONqUP87
-	 i/P3mc2dlSbl2JaqgFHNUX2NQLx7oOC8uI2Ow5CXdLOg+IvHcYOQuDn/FIb+JhTn6Q
-	 QJOtPH1NVqffOVpDZKJmSPjdbW9QB0Dfu6WnPtWLHT+S+MH/QTCjrpJN4B5Imjb21w
-	 O0B7ojUKn1Ai+rnyApv/3ZMV8+qPd2h3LmMu9S1zFolKtwkG8T8A8crISe6nEXRmGR
-	 j8PNmjbT/IegykTrgpXv1Lu1++9t6fVkUCYuIOaAi0BgdnDHZJvGOOHJ/hGPWBTj/N
-	 uaMVPHRgOSypw==
-Date: Wed, 13 Nov 2024 16:39:25 -0800
+	b=EVwvEp8pzoXP0sACNzzhfMuakENwWe2Y5P6z9qhCEWdUR/mKVp8xr+SnzmYSIr4bP
+	 75Au6PuxDOde5Mvau5uftr7m1dczCA1NADm66IK2ux0Al9onQKXhHp6zqkGqwPJ1B3
+	 nQH5GWNprFfJOA1Ub6C4HTDFqcP8/XtBvYz3TX3nxr8gkOHcEymvc37EDQVTmVUN23
+	 NNN/mi2vh/I23vZmQrYq3FCYVGx5cDh+afcrjmXP5/nBBhxQC+mwPeu+dQTW8FKf0r
+	 DI+Y/Ys6+LR8eypwtAqiXppJ6qKW0vodPTOQTc16hElc3tF9REj3FBLXqj1Pdff3qB
+	 9rWR/Ytfzrpjg==
+Date: Wed, 13 Nov 2024 16:41:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, donald.hunter@gmail.com,
- danieller@nvidia.com, ecree.xilinx@gmail.com, Andrew Lunn
- <andrew+netdev@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Shannon Nelson
- <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>, Jacob
- Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next v19 03/10] ptp: Add phc source and helpers to
- register specific PTP clock or get information
-Message-ID: <20241113163925.7b3bd3d9@kernel.org>
-In-Reply-To: <20241113113808.4f8c5a0b@kmaincent-XPS-13-7390>
-References: <20241030-feature_ptp_netnext-v19-0-94f8aadc9d5c@bootlin.com>
-	<20241030-feature_ptp_netnext-v19-3-94f8aadc9d5c@bootlin.com>
-	<20241111150609.2b0425f6@kernel.org>
-	<20241112111232.1637f814@kmaincent-XPS-13-7390>
-	<20241112182226.2a6c8bab@kernel.org>
-	<20241113113808.4f8c5a0b@kmaincent-XPS-13-7390>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, alexandre.ferrieux@orange.com, Linux Kernel Network
+ Developers <netdev@vger.kernel.org>, Simon Horman <horms@verge.net.au>,
+ Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net v6] net: sched: cls_u32: Fix u32's systematic
+ failure to free IDR entries for hnodes.
+Message-ID: <20241113164110.196f491d@kernel.org>
+In-Reply-To: <CAM0EoM=V80Qj3NQEcS4cmLoByTnUDn9BER8SWkWKUEp+OVRXWA@mail.gmail.com>
+References: <20241108141159.305966-1-alexandre.ferrieux@orange.com>
+	<CAM0EoMn+7tntXK10eT5twh6Bc62Gx2tE+3beVY99h6EMnFs6AQ@mail.gmail.com>
+	<20241111102632.74573faa@kernel.org>
+	<CAM0EoMk=1dsi1C02si9MV_E-wX5hu01bi5yTfyMmL9i2FLys1g@mail.gmail.com>
+	<20241112071822.1a6f3c9a@kernel.org>
+	<CAM0EoMkQUqpkGJADfYUupp5zP7vZdd7=4MVo5TTJbWqEYDkq7g@mail.gmail.com>
+	<20241112175713.6542a5cf@kernel.org>
+	<CAM0EoM=V80Qj3NQEcS4cmLoByTnUDn9BER8SWkWKUEp+OVRXWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,18 +70,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Nov 2024 11:38:08 +0100 Kory Maincent wrote:
-> > IOW I'm struggling to connect the dots how the code you're adding now
-> > will be built _upon_ rather than _on the side_ of when socket PHC
-> > selection is in place.  
+On Wed, 13 Nov 2024 09:17:09 -0500 Jamal Hadi Salim wrote:
+> >   Co-posting selftests
+> >   --------------------
+> >
+> >   Selftests should be part of the same series as the code changes.
+> >   Specifically for fixes both code change and related test should go into
+> >   the same tree (the tests may lack a Fixes tag, which is expected).
+> >   Mixing code changes and test changes in a single commit is discouraged.  
 > 
-> I see what you mean! It is not something easy to think of as I don't really
-> know how it would be implemented.
-> Do you think adding simply the PHC source and the phydev pointer or index would
-> fit? 
+> Just the last sentence:
+> Mixing unrelated (to the fix) code changes and test changes in a
+> single commit is discouraged.
 
-In net_device? Yes, I think so.
-
-> This could be removed from netdev core when we move to socket PHC as it
-> won't be necessary to save the current PHC.
+Perfect example why things are not documented.
+I have no idea what you're trying to say..
+I think you're the only person who is getting this wrong,
+so I'll toss the documentation patch.
 
