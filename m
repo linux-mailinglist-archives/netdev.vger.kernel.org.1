@@ -1,571 +1,251 @@
-Return-Path: <netdev+bounces-145077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E4A9C94EE
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 23:02:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC1A9C950F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 23:11:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE731284D13
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 22:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A668B26709
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 22:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF5F1AF4EA;
-	Thu, 14 Nov 2024 22:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AAF1AF0A6;
+	Thu, 14 Nov 2024 22:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TuivwSWc"
 X-Original-To: netdev@vger.kernel.org
-Received: from passt.top (passt.top [88.198.0.164])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2054.outbound.protection.outlook.com [40.107.212.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA48916ABC6
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 22:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.0.164
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731621763; cv=none; b=VUIGT5KWyb1MVQ/lg0+qJXT5YC8mnL4I08pr8XEAcYqKKFDDcqHzp4ZvbLDbP4TiFK75oW4xYWDZsYHwQa9x7xfNPYw7uqJPhvVIcog8oD9Mhkto9JhOrAzZXaY/QTNGca5fS8IzZVYRg8Nz9na5epQQPY5lpAF0I2zbGAngKq8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731621763; c=relaxed/simple;
-	bh=oh99OjOrs0aH8aIOvd4HLGLMAGH9Z4vsbXz0yGVIOKo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DVVtRyBPdzHRy4toBpL3NXJKmOgv0Vc0X0exAiz+ii4MMAlKNpoFq81c+yw3Vljyg/ArPxhbbZYxsmkXHI40eMtKEZ0nZD/1ntb71pJh/8urI/6Oi4OSMGsc5M1ipTw87FowLOxDOFwdFT0X+qchuw/IHw0G34ulEpdbXPziIeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=passt.top; arc=none smtp.client-ip=88.198.0.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=passt.top
-Received: by passt.top (Postfix, from userid 1000)
-	id 438DA5A0627; Thu, 14 Nov 2024 22:54:14 +0100 (CET)
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org,
-	Mike Manning <mmanning@vyatta.att-mail.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Ed Santiago <santiago@redhat.com>,
-	Paul Holzinger <pholzing@redhat.com>
-Subject: [PATCH RFC net 2/2] datagram, udp: Set local address and rehash socket atomically against lookup
-Date: Thu, 14 Nov 2024 22:54:14 +0100
-Message-ID: <20241114215414.3357873-3-sbrivio@redhat.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241114215414.3357873-1-sbrivio@redhat.com>
-References: <20241114215414.3357873-1-sbrivio@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8DC1AF0D5
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 22:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731622259; cv=fail; b=TXZGwB2N0HHx+NuakhF+BI1xAu64zKA7Cn6HbICt0zWZgDkfTki5Dr3VGVYq2Dac8g5q7Nl+Pqv/rCEov6P/nsHnG4zrOumhZf7qNVXss5/egt57oPuWpls6zBeyK24Dfmu8+fxg73A8QPR5JcjdXYLISg7tPho+uY/9elJqUyQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731622259; c=relaxed/simple;
+	bh=ljVKVk/tqxkcH0ByA52qllkFc8bww79W15J2eMaTJrw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rbXNew68PHgoqXKh7UG/cLgcbPnAaChRfai0eUMtvO9UfctPZAFsXDtsB+dJW6TU0/UPyzhJh5PPE73S4iYLhS2f++4Xz1j3U664y93GoGnshK3yezqTKscATtWZxLv0ygMaU0ntHa/PG7otgRue7MglrYWiSy2k4NLJXkxisKs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TuivwSWc; arc=fail smtp.client-ip=40.107.212.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ExZGzS32jBG3TvTk6ddHca7k4H8fy6Wza6GXyCfzE0ahM63HAdP9v++vd6YzoIzSUmxR+hSa8f73MGkdUUjADDNVzt/XXRSMYVUV/V+C1dJIOzCPj3k0u725hNKYWXDhpfZ8yZPJ4JIHoTwFBTIxdBn/SROy3+JeDrDagKQK9dz0g0aYodYxZcmxqnXaemXWmOk7IYKbWYALcbOOzq3dkjKvBbnHcqseelQcDaxMeB5+6ttnrnq3fS5IbIGNv+k5YlGils+INTJNzOwCcvRAnruO7tCCfv6ApuKy3xN9iX8X375nEgT20jlPKedP/ZQrj0BMfVRvkvITkUFev8X+9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8/LqjTm0bb+U6iiLg2Nedf/OTD9/Wuq7EKK2+RbGmCo=;
+ b=WpGDsUB8nC7N5/XaTY19GJI7uHO6MS2f6PbG37hXg+QKuR+doJcJw5bcukJ1dH5V/11VK8olV+KPQaBq22k5g88bXATaSfKa1wIfI6zCvxJjYt33Cmjvzo9efwgmdSYCanq2aqY/20/rymMp///j/Pi62Hl/f+c8eTFcgYjknUxMSxrhI4WAqP4VMAUjdYmbRdGlgTzX4Z7Bq66goU0EaTcZncZRMPyzF4Fpb8siO+lDPqRF+9n9vnX5kHPRvS5vUWGciGeFeHGv2KRZe8+qkwAZzm32a9OYzVoUKcii+HMIhXI+Uhqp8VZfAWscqRWhyYJmk4+eh5ohn+LogcvKmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8/LqjTm0bb+U6iiLg2Nedf/OTD9/Wuq7EKK2+RbGmCo=;
+ b=TuivwSWcWa+yg3uEZDTSRgz6QSIbJUxP7QDP0afBiFkGFQQyDNDCvgNuB3gDSJrmm67VKU7tm+qgaIP8KMdqy3G3RY5arJ+0QRXOZowyRUAhJRhYBgkkunmgNxKdYwOVxymR8n2SeD2N+3vFMGHpgRLaE9JLcRLO/dMxl9lDYBF/1p+3LYGXQSD9thzsTFFAYXMXXN/ysd1CSt3wpdmdQGtWAzJjNFdDGXZxcClayaVPWbGkaEUy0jpSQvpkngNvyNLVrcTvqLbt51oOkcY3nB89ZtPLKA38xtXoqBJ4tgxcoKVgFM4knH6irtRMiI+NImqxLD+X6mkDic+1HqvF8w==
+Received: from PH0P220CA0007.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:d3::31)
+ by SN7PR12MB7371.namprd12.prod.outlook.com (2603:10b6:806:29a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Thu, 14 Nov
+ 2024 22:10:52 +0000
+Received: from CY4PEPF0000FCC0.namprd03.prod.outlook.com
+ (2603:10b6:510:d3:cafe::8e) by PH0P220CA0007.outlook.office365.com
+ (2603:10b6:510:d3::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17 via Frontend
+ Transport; Thu, 14 Nov 2024 22:10:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000FCC0.mail.protection.outlook.com (10.167.242.102) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.14 via Frontend Transport; Thu, 14 Nov 2024 22:10:51 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 14 Nov
+ 2024 14:10:33 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 14 Nov
+ 2024 14:10:32 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Thu, 14 Nov
+ 2024 14:10:29 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
+	<jiri@resnulli.us>, Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next V2 0/8] net/mlx5: ConnectX-8 SW Steering + Rate management on traffic classes
+Date: Fri, 15 Nov 2024 00:09:29 +0200
+Message-ID: <20241114220937.719507-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC0:EE_|SN7PR12MB7371:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4030a07d-e31c-4bde-d0c8-08dd04f93392
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?c0NhdXR0eDJsK2x1Zy9LTU5mYnRSSUtLcDJKdEFvVFFMYloyNVAyNGVPd0ho?=
+ =?utf-8?B?Mjc0RUY3b3JSV2NoOC9mMlVnelZrQThlUk9PUXpQemNZOFZSTURwMkhSZDMx?=
+ =?utf-8?B?djFQbjMwTUFXNENoTzB4L3BOdjExcXlpQjViSU5GYVJsdUxtSWlqUXVISXd4?=
+ =?utf-8?B?ZkhQViswVXl2S1h6OEl5MDJENVVMYnV2dm1XeFBZd2s0ZWxLRGtQenFuS2xO?=
+ =?utf-8?B?UVZtSmpIQVJHNTZIYnNYNFA5NEVWcE9WQldyVUZ3Rkdrc2ZuV29KSzMwR3ky?=
+ =?utf-8?B?U09QOG1DbVVNWWJQTDR5UVdHSlpmZmpCalZSYlFEM2EyTmRURlZ3eG02L1VB?=
+ =?utf-8?B?dHFLL1puYU4yejhUOEdhbnpFK2hKQXBZdDFDREZRbXQ4Y2RuaWF3MWZuamhC?=
+ =?utf-8?B?Wm9zT252SU9HRk85RzJpRjZwYi9TT28vakRDZ0RiZ2xLczZpeUhLQmRSbU5q?=
+ =?utf-8?B?VGdxSXZGVkxWNHRENkMxTVNCR1hseDJPV1hJVVBjbGgwV0dUSENtOGVyUURX?=
+ =?utf-8?B?Si85VmpUdGRta0pSM3ZzUUdVVmZFdXNaK1IxdmFsT2N6dVlZT2JZTmM2QXlD?=
+ =?utf-8?B?N0ljOTRJZnQ1aVQ2ZnhON3VRVHhhS3hCR2UzZGNBdVM4ckVFMnVXSWZkNkhx?=
+ =?utf-8?B?N1ZkRHVPTTBGdncrbzNmR2RzbVdXMmtmbHF5YmVTKzNqRDZUeDc5S3o4N3pU?=
+ =?utf-8?B?VlFmRWxQNXZqZkp2N1VXaWh2a1RMYjV6ZlQxN3d1U3ZqVHFveWRQckthaU9k?=
+ =?utf-8?B?T2svbFF4OFJVaGhuZllmUjdFUjNlWndIVHB6WFlyMVExR2lJa0lWeWJuM05Y?=
+ =?utf-8?B?d0wyczB6Ri95cmFORndCNlY1Qnl1K0ZSaHpHWDRPckJjbXl3aVhJRS9sQnlB?=
+ =?utf-8?B?dU5ERkVSank4M1puWXpQdFdyRS9jTjc0SWhoai9OZ3ZnRzNtc3lUMDcxZnQ5?=
+ =?utf-8?B?ZFRLbHlSSmdBYzlFRy9USTlid1RLTHNpZm5mZmtHVitWUGNEbHg1dWRNOVhQ?=
+ =?utf-8?B?d3VmUUwyZFBUN0hMVkw2RWlNM3NxeU94NCtDdG5Hc3lEbnRoZC9EMHVKQmRE?=
+ =?utf-8?B?SlM5UFZyUDBxWkM3K2M0bjFWYkx5NzcyUWZNWjJrL3JXQVhTMU4xK1k3cjBI?=
+ =?utf-8?B?TldDQ3R2YWM0cEFUYm5ZQlhQa2E4eW1rRGV4b2JTL2N0bDFGZ1U1clFjOWFQ?=
+ =?utf-8?B?a3dPazRHTWppRmNoaisrNFhQeEViMVNEMlhraGtrV284N3c5UkxoTWx1Nnls?=
+ =?utf-8?B?ZUFvQ3d3dHZmTnpKWkRsSkt6Yk1wajVMbTBudnl2L2VacTlMV1l5dlFVZFpS?=
+ =?utf-8?B?MDcxWUNkRXVFRGpZRUExNlRaL2VQZElvbnVNRnBQcG1MclNiZEJ5YTlDcmZy?=
+ =?utf-8?B?aS82bFByYmxNaTcvY3JGemdmeFd1OHVMVXFYME8zVEVySElMM0hDNFU0bC95?=
+ =?utf-8?B?TVJINlB2bjA0bGFXanlWaDhTS2pqeW5pRUpXZFBaYVNWRFF5S0pINTkwam1D?=
+ =?utf-8?B?b0FKcGRaWGlBT0t3RU9tYnpmYzlkVVFkcWdzYVZMSEtCd3ZPeGZkSVVjQ0dn?=
+ =?utf-8?B?MllIT2dOR0VBUjU1L0taQ1ZFTGU4akxYUWcyQ2ZOV00wd3VVQlNtdklvZDFo?=
+ =?utf-8?B?VDIwSUdoSDZGeHFLbFRZdGpCRVNrYXJnSW56VWYyVWhIa3lidWhyTE9KWVp1?=
+ =?utf-8?B?eUc0QXhGeDkrVkhSbWc5Zjk2cW85YTVoaTIwOWdHZFlvNlR0YkhzWFljY0h3?=
+ =?utf-8?B?a3h2WUhMOHRpOWFvYWdQbUtzSHRyUmt2aXJwMkgvcFdkaWMzQVl0VTBUbE5T?=
+ =?utf-8?B?UXBxeE9JREFTMmdhMUNXT1Y3Q3oreXA2MnVlYjNYYktCb0JtSmZOQ1pVS3RJ?=
+ =?utf-8?B?OEFSSHIxVHFWalNabU8xcm5DenlpZkpoMnlXa1F2Y1MrTGc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2024 22:10:51.3543
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4030a07d-e31c-4bde-d0c8-08dd04f93392
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC0.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7371
 
-If a UDP socket changes its local address while it's receiving
-datagrams, as a result of connect(), there is a period during which
-a lookup operation might fail to find it, after the address is changed
-but before the secondary hash (port and address) is updated.
+Hi,
 
-Secondary hash chains were introduced by commit 30fff9231fad ("udp:
-bind() optimisation") and, as a result, a rehash operation became
-needed to make a bound socket reachable again after a connect().
+This patchset consists of two features:
+1. In patches 1-2, Itamar adds SW Steering support for ConnectX-8.
+2. Followed by patches by Carolina that add rate management support on
+traffic classes in devlink and mlx5, more details below [1].
 
-This operation was introduced by commit 719f835853a9 ("udp: add
-rehash on connect()") which isn't however a complete fix: the
-socket will be found once the rehashing completes, but not while
-it's pending.
+Series generated against:
+commit ef04d290c013 ("net: page_pool: do not count normal frag allocation in stats")
 
-This is noticeable with a socat(1) server in UDP4-LISTEN mode, and a
-client sending datagrams to it. After the server receives the first
-datagram (cf. _xioopen_ipdgram_listen()), it issues a connect() to
-the address of the sender, in order to set up a directed flow.
+Regards,
+Tariq
 
-Now, if the client, running on a different CPU thread, happens to
-send a (subsequent) datagram while the server's socket changes its
-address, but is not rehashed yet, this will result in a failed
-lookup and a port unreachable error delivered to the client, as
-apparent from the following reproducer:
+V2:
+- Included <linux/dcbnl.h> in devlink.h to resolve missing
+  IEEE_8021QAZ_MAX_TCS definition.
+- Refactored the rate-tc-bw attribute structure to use a separate
+  rate-tc-index.
+- Updated patch 2/6 title.
 
-  LEN=$(($(cat /proc/sys/net/core/wmem_default) / 4))
-  dd if=/dev/urandom bs=1 count=${LEN} of=tmp.in
 
-  while :; do
-  	taskset -c 1 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
-  	sleep 0.1 || sleep 1
-  	taskset -c 2 socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-  	wait
-  done
+[1]
+This patch series extends the devlink-rate API to support traffic class
+(TC) bandwidth management, enabling more granular control over traffic
+shaping and rate limiting across multiple TCs. The API now allows users
+to specify bandwidth proportions for different traffic classes in a
+single command. This is particularly useful for managing Enhanced
+Transmission Selection (ETS) for groups of Virtual Functions (VFs),
+allowing precise bandwidth allocation across traffic classes.
 
-where the client will eventually get ECONNREFUSED on a write()
-(typically the second or third one of a given iteration):
+Additionally the series refines the QoS handling in net/mlx5 to support
+TC arbitration and bandwidth management on vports and rate nodes.
 
-  2024/11/13 21:28:23 socat[46901] E write(6, 0x556db2e3c000, 8192): Connection refused
+Extend devlink-rate API to support rate management on TCs:
+- devlink: Extend the devlink rate API to support traffic class
+  bandwidth management
 
-This issue was first observed as a seldom failure in Podman's tests
-checking UDP functionality while using pasta(1) to connect the
-container's network namespace, which leads us to a reproducer with
-the lookup error resulting in an ICMP packet on a tap device:
+Introduce a no-op implementation:
+- net/mlx5: Add no-op implementation for setting tc-bw on rate objects
 
-  LOCAL_ADDR="$(ip -j -4 addr show|jq -rM '.[] | .addr_info[0] | select(.scope == "global").local')"
+Introduce new fields to support new scheduling elements:
+- net/mlx5: Add support for new scheduling elements
 
-  while :; do
-  	./pasta --config-net -p pasta.pcap -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc &
-  	sleep 0.2 || sleep 1
-  	socat OPEN:tmp.in UDP4:${LOCAL_ADDR}:1337,shut-null
-  	wait
-  	cmp tmp.in tmp.out
-  done
+Add support for enabling and disabling TC QoS on vports and nodes:
+- net/mlx5: Add support for setting tc-bw on nodes
+- net/mlx5: Add traffic class scheduling support for vport QoS
 
-Once this fails:
+Support for setting tc-bw on rate objects:
+- net/mlx5: Manage TC arbiter nodes and implement full support for
+  tc-bw
 
-  tmp.in tmp.out differ: char 8193, line 29
 
-we can finally have a look at what's going on:
+Carolina Jubran (6):
+  devlink: Extend devlink rate API with traffic classes bandwidth
+    management
+  net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+  net/mlx5: Add support for new scheduling elements
+  net/mlx5: Add support for setting tc-bw on nodes
+  net/mlx5: Add traffic class scheduling support for vport QoS
+  net/mlx5: Manage TC arbiter nodes and implement full support for tc-bw
 
-  $ tshark -r pasta.pcap
-      1   0.000000           :: ? ff02::16     ICMPv6 110 Multicast Listener Report Message v2
-      2   0.168690 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      3   0.168767 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      4   0.168806 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      5   0.168827 c6:47:05:8d:dc:04 ? Broadcast    ARP 42 Who has 88.198.0.161? Tell 88.198.0.164
-      6   0.168851 9a:55:9a:55:9a:55 ? c6:47:05:8d:dc:04 ARP 42 88.198.0.161 is at 9a:55:9a:55:9a:55
-      7   0.168875 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-      8   0.168896 88.198.0.164 ? 88.198.0.161 ICMP 590 Destination unreachable (Port unreachable)
-      9   0.168926 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-     10   0.168959 88.198.0.161 ? 88.198.0.164 UDP 8234 60260 ? 1337 Len=8192
-     11   0.168989 88.198.0.161 ? 88.198.0.164 UDP 4138 60260 ? 1337 Len=4096
-     12   0.169010 88.198.0.161 ? 88.198.0.164 UDP 42 60260 ? 1337 Len=0
+Itamar Gozlan (2):
+  net/mlx5: DR, expand SWS STE callbacks and consolidate common structs
+  net/mlx5: DR, add support for ConnectX-8 steering
 
-On the third datagram received, the network namespace of the container
-initiates an ARP lookup to deliver the ICMP message.
+ Documentation/netlink/specs/devlink.yaml      |  22 +
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   1 +
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |   2 +
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 795 +++++++++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.h |   4 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  13 +-
+ drivers/net/ethernet/mellanox/mlx5/core/rl.c  |   4 +
+ .../mlx5/core/steering/sws/dr_domain.c        |   2 +-
+ .../mellanox/mlx5/core/steering/sws/dr_ste.c  |   6 +-
+ .../mellanox/mlx5/core/steering/sws/dr_ste.h  |  19 +-
+ .../mlx5/core/steering/sws/dr_ste_v0.c        |   6 +-
+ .../mlx5/core/steering/sws/dr_ste_v1.c        | 207 +----
+ .../mlx5/core/steering/sws/dr_ste_v1.h        | 147 +++-
+ .../mlx5/core/steering/sws/dr_ste_v2.c        | 169 +---
+ .../mlx5/core/steering/sws/dr_ste_v2.h        | 168 ++++
+ .../mlx5/core/steering/sws/dr_ste_v3.c        | 221 +++++
+ .../mlx5/core/steering/sws/mlx5_ifc_dr.h      |  40 +
+ .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |   2 +-
+ include/linux/mlx5/mlx5_ifc.h                 |  15 +-
+ include/net/devlink.h                         |   7 +
+ include/uapi/linux/devlink.h                  |   4 +
+ net/devlink/netlink_gen.c                     |  15 +-
+ net/devlink/netlink_gen.h                     |   1 +
+ net/devlink/rate.c                            |  71 +-
+ 24 files changed, 1559 insertions(+), 382 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v2.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v3.c
 
-In another variant of this reproducer, starting the client with:
-
-  strace -f pasta --config-net -u 1337 socat UDP4-LISTEN:1337,null-eof OPEN:tmp.out,create,trunc 2>strace.log &
-
-and connecting to the socat server using a loopback address:
-
-  socat OPEN:tmp.in UDP4:localhost:1337,shut-null
-
-we can more clearly observe a sendmmsg() call failing after the
-first datagram is delivered:
-
-  [pid 278012] connect(173, 0x7fff96c95fc0, 16) = 0
-  [...]
-  [pid 278012] recvmmsg(173, 0x7fff96c96020, 1024, MSG_DONTWAIT, NULL) = -1 EAGAIN (Resource temporarily unavailable)
-  [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = 1
-  [...]
-  [pid 278012] sendmmsg(173, 0x561c5ad0a720, 1, MSG_NOSIGNAL) = -1 ECONNREFUSED (Connection refused)
-
-and, somewhat confusingly, after a connect() on the same socket
-succeeded.
-
-To fix this, replace the rehash operation by a set_rcv_saddr()
-callback holding the spinlock on the primary hash chain, just like
-the rehash operation used to do, but also setting the address while
-holding the spinlock.
-
-To make this atomic against the lookup operation, also acquire the
-spinlock on the primary chain there.
-
-This results in some awkwardness at a caller site, specifically
-sock_bindtoindex_locked(), where we really just need to rehash the
-socket without changing its address. With the new operation, we now
-need to forcibly set the current address again.
-
-On the other hand, this appears more elegant than alternatives such
-as fetching the spinlock reference in ip4_datagram_connect() and
-ip6_datagram_conect(), and keeping the rehash operation around for
-a single user also seems a tad overkill.
-
-Reported-by: Ed Santiago <santiago@redhat.com>
-Link: https://github.com/containers/podman/issues/24147
-Analysed-by: David Gibson <david@gibson.dropbear.id.au>
-Fixes: 30fff9231fad ("udp: bind() optimisation")
-Signed-off-by: Stefano Brivio <sbrivio@redhat.com>
----
- include/net/sock.h  |  2 +-
- include/net/udp.h   |  3 +-
- net/core/sock.c     | 13 ++++++--
- net/ipv4/datagram.c |  7 +++--
- net/ipv4/udp.c      | 76 +++++++++++++++++++++++++++++++--------------
- net/ipv4/udp_impl.h |  2 +-
- net/ipv4/udplite.c  |  2 +-
- net/ipv6/datagram.c | 30 +++++++++++++-----
- net/ipv6/udp.c      | 17 ++++++----
- net/ipv6/udp_impl.h |  2 +-
- net/ipv6/udplite.c  |  2 +-
- 11 files changed, 108 insertions(+), 48 deletions(-)
-
-diff --git a/include/net/sock.h b/include/net/sock.h
-index f29c14448938..5b34bfec5e27 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1222,6 +1222,7 @@ struct proto {
- 	int			(*connect)(struct sock *sk,
- 					struct sockaddr *uaddr,
- 					int addr_len);
-+	void			(*set_rcv_saddr)(struct sock *sk, void *addr);
- 	int			(*disconnect)(struct sock *sk, int flags);
- 
- 	struct sock *		(*accept)(struct sock *sk,
-@@ -1263,7 +1264,6 @@ struct proto {
- 	/* Keeping track of sk's, looking them up, and port selection methods. */
- 	int			(*hash)(struct sock *sk);
- 	void			(*unhash)(struct sock *sk);
--	void			(*rehash)(struct sock *sk);
- 	int			(*get_port)(struct sock *sk, unsigned short snum);
- 	void			(*put_port)(struct sock *sk);
- #ifdef CONFIG_BPF_SYSCALL
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 61222545ab1c..1ce858c2251c 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -193,7 +193,6 @@ static inline int udp_lib_hash(struct sock *sk)
- }
- 
- void udp_lib_unhash(struct sock *sk);
--void udp_lib_rehash(struct sock *sk, u16 new_hash);
- 
- static inline void udp_lib_close(struct sock *sk, long timeout)
- {
-@@ -286,6 +285,8 @@ int udp_rcv(struct sk_buff *skb);
- int udp_ioctl(struct sock *sk, int cmd, int *karg);
- int udp_init_sock(struct sock *sk);
- int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
-+void udp_lib_set_rcv_saddr(struct sock *sk, void *addr, u16 hash);
-+int udp_set_rcv_saddr(struct sock *sk, void *addr);
- int __udp_disconnect(struct sock *sk, int flags);
- int udp_disconnect(struct sock *sk, int flags);
- __poll_t udp_poll(struct file *file, struct socket *sock, poll_table *wait);
-diff --git a/net/core/sock.c b/net/core/sock.c
-index da50df485090..fcd2e2b89876 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -643,8 +643,17 @@ static int sock_bindtoindex_locked(struct sock *sk, int ifindex)
- 	/* Paired with all READ_ONCE() done locklessly. */
- 	WRITE_ONCE(sk->sk_bound_dev_if, ifindex);
- 
--	if (sk->sk_prot->rehash)
--		sk->sk_prot->rehash(sk);
-+	/* Force rehash if protocol needs it */
-+	if (sk->sk_prot->set_rcv_saddr) {
-+		if (IS_ENABLED(CONFIG_IPV6) && sk->sk_family == AF_INET6) {
-+			sk->sk_prot->set_rcv_saddr(sk, &sk->sk_v6_rcv_saddr);
-+		} else if (sk->sk_family == AF_INET) {
-+			struct inet_sock *inet = inet_sk(sk);
-+
-+			sk->sk_prot->set_rcv_saddr(sk, &inet->inet_rcv_saddr);
-+		}
-+	}
-+
- 	sk_dst_reset(sk);
- 
- 	ret = 0;
-diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
-index d52333e921f3..3ea3fa94c127 100644
---- a/net/ipv4/datagram.c
-+++ b/net/ipv4/datagram.c
-@@ -64,9 +64,10 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len
- 	if (!inet->inet_saddr)
- 		inet->inet_saddr = fl4->saddr;	/* Update source address */
- 	if (!inet->inet_rcv_saddr) {
--		inet->inet_rcv_saddr = fl4->saddr;
--		if (sk->sk_prot->rehash && sk->sk_family == AF_INET)
--			sk->sk_prot->rehash(sk);
-+		if (sk->sk_prot->set_rcv_saddr && sk->sk_family == AF_INET)
-+			sk->sk_prot->set_rcv_saddr(sk, &fl4->saddr);
-+		else
-+			inet->inet_rcv_saddr = fl4->saddr;
- 	}
- 	inet->inet_daddr = fl4->daddr;
- 	inet->inet_dport = usin->sin_port;
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 2849b273b131..cdd856bd2e44 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -486,10 +486,13 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
- 		int sdif, struct udp_table *udptable, struct sk_buff *skb)
- {
- 	unsigned short hnum = ntohs(dport);
-+	struct udp_hslot *hslot, *hslot2;
- 	unsigned int hash2, slot2;
--	struct udp_hslot *hslot2;
- 	struct sock *result, *sk;
- 
-+	hslot = udp_hashslot(udptable, net, hnum);
-+	spin_lock_bh(&hslot->lock);
-+
- 	hash2 = ipv4_portaddr_hash(net, daddr, hnum);
- 	slot2 = hash2 & udptable->mask;
- 	hslot2 = &udptable->hash2[slot2];
-@@ -526,6 +529,8 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
- 				  htonl(INADDR_ANY), hnum, dif, sdif,
- 				  hslot2, skb);
- done:
-+	spin_unlock_bh(&hslot->lock);
-+
- 	if (IS_ERR(result))
- 		return NULL;
- 	return result;
-@@ -1948,10 +1953,12 @@ int __udp_disconnect(struct sock *sk, int flags)
- 	sock_rps_reset_rxhash(sk);
- 	sk->sk_bound_dev_if = 0;
- 	if (!(sk->sk_userlocks & SOCK_BINDADDR_LOCK)) {
-+		if (sk->sk_prot->set_rcv_saddr &&
-+		    (sk->sk_userlocks & SOCK_BINDPORT_LOCK)) {
-+			sk->sk_prot->set_rcv_saddr(sk, &(__be32){ 0 });
-+		}
-+
- 		inet_reset_saddr(sk);
--		if (sk->sk_prot->rehash &&
--		    (sk->sk_userlocks & SOCK_BINDPORT_LOCK))
--			sk->sk_prot->rehash(sk);
- 	}
- 
- 	if (!(sk->sk_userlocks & SOCK_BINDPORT_LOCK)) {
-@@ -2000,25 +2007,36 @@ void udp_lib_unhash(struct sock *sk)
- }
- EXPORT_SYMBOL(udp_lib_unhash);
- 
--/*
-- * inet_rcv_saddr was changed, we must rehash secondary hash
-+/**
-+ * udp_lib_set_rcv_saddr() - Set local address and rehash socket atomically
-+ * @sk:		Socket changing local address
-+ * @addr:	New address, __be32 * or struct in6_addr * depending on family
-+ * @hash:	New secondary hash (port + local address) for socket
-+ *
-+ * Set local address for socket and rehash it while holding a spinlock on the
-+ * primary hash chain (port only). This needs to be atomic to avoid that a
-+ * concurrent lookup misses a socket while it's being connected or disconnected.
-  */
--void udp_lib_rehash(struct sock *sk, u16 newhash)
-+void udp_lib_set_rcv_saddr(struct sock *sk, void *addr, u16 hash)
- {
-+	struct udp_hslot *hslot;
-+
- 	if (sk_hashed(sk)) {
- 		struct udp_table *udptable = udp_get_table_prot(sk);
--		struct udp_hslot *hslot, *hslot2, *nhslot2;
-+		struct udp_hslot *hslot2, *nhslot2;
- 
- 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
--		nhslot2 = udp_hashslot2(udptable, newhash);
--		udp_sk(sk)->udp_portaddr_hash = newhash;
-+		nhslot2 = udp_hashslot2(udptable, hash);
-+
-+		hslot = udp_hashslot(udptable, sock_net(sk),
-+				     udp_sk(sk)->udp_port_hash);
-+
-+		spin_lock_bh(&hslot->lock);
-+
-+		udp_sk(sk)->udp_portaddr_hash = hash;
- 
- 		if (hslot2 != nhslot2 ||
- 		    rcu_access_pointer(sk->sk_reuseport_cb)) {
--			hslot = udp_hashslot(udptable, sock_net(sk),
--					     udp_sk(sk)->udp_port_hash);
--			/* we must lock primary chain too */
--			spin_lock_bh(&hslot->lock);
- 			if (rcu_access_pointer(sk->sk_reuseport_cb))
- 				reuseport_detach_sock(sk);
- 
-@@ -2034,20 +2052,32 @@ void udp_lib_rehash(struct sock *sk, u16 newhash)
- 				nhslot2->count++;
- 				spin_unlock(&nhslot2->lock);
- 			}
--
--			spin_unlock_bh(&hslot->lock);
- 		}
- 	}
-+
-+	if (sk->sk_family == AF_INET)
-+		sk->sk_rcv_saddr = *(__be32 *)addr;
-+	else if (sk->sk_family == AF_INET6)
-+		sk->sk_v6_rcv_saddr = *(struct in6_addr *)addr;
-+
-+	if (sk_hashed(sk))
-+		spin_unlock_bh(&hslot->lock);
- }
--EXPORT_SYMBOL(udp_lib_rehash);
-+EXPORT_SYMBOL(udp_lib_set_rcv_saddr);
- 
--void udp_v4_rehash(struct sock *sk)
-+/**
-+ * udp_v4_set_rcv_saddr() - Set local address and new hash for IPv4 socket
-+ * @sk:		Socket changing local address
-+ * @addr:	New address, pointer to __be32 representation
-+ */
-+void udp_v4_set_rcv_saddr(struct sock *sk, void *addr)
- {
--	u16 new_hash = ipv4_portaddr_hash(sock_net(sk),
--					  inet_sk(sk)->inet_rcv_saddr,
--					  inet_sk(sk)->inet_num);
--	udp_lib_rehash(sk, new_hash);
-+	u16 hash = ipv4_portaddr_hash(sock_net(sk),
-+				      *(__be32 *)addr, inet_sk(sk)->inet_num);
-+
-+	udp_lib_set_rcv_saddr(sk, addr, hash);
- }
-+EXPORT_SYMBOL(udp_v4_set_rcv_saddr);
- 
- static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- {
-@@ -2941,6 +2971,7 @@ struct proto udp_prot = {
- 	.close			= udp_lib_close,
- 	.pre_connect		= udp_pre_connect,
- 	.connect		= ip4_datagram_connect,
-+	.set_rcv_saddr		= udp_v4_set_rcv_saddr,
- 	.disconnect		= udp_disconnect,
- 	.ioctl			= udp_ioctl,
- 	.init			= udp_init_sock,
-@@ -2953,7 +2984,6 @@ struct proto udp_prot = {
- 	.release_cb		= ip4_datagram_release_cb,
- 	.hash			= udp_lib_hash,
- 	.unhash			= udp_lib_unhash,
--	.rehash			= udp_v4_rehash,
- 	.get_port		= udp_v4_get_port,
- 	.put_port		= udp_lib_unhash,
- #ifdef CONFIG_BPF_SYSCALL
-diff --git a/net/ipv4/udp_impl.h b/net/ipv4/udp_impl.h
-index e1ff3a375996..1c5ad903c064 100644
---- a/net/ipv4/udp_impl.h
-+++ b/net/ipv4/udp_impl.h
-@@ -10,7 +10,7 @@ int __udp4_lib_rcv(struct sk_buff *, struct udp_table *, int);
- int __udp4_lib_err(struct sk_buff *, u32, struct udp_table *);
- 
- int udp_v4_get_port(struct sock *sk, unsigned short snum);
--void udp_v4_rehash(struct sock *sk);
-+void udp_v4_set_rcv_saddr(struct sock *sk, void *addr);
- 
- int udp_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
- 		   unsigned int optlen);
-diff --git a/net/ipv4/udplite.c b/net/ipv4/udplite.c
-index af37af3ab727..4a5c2e080120 100644
---- a/net/ipv4/udplite.c
-+++ b/net/ipv4/udplite.c
-@@ -57,7 +57,7 @@ struct proto 	udplite_prot = {
- 	.recvmsg	   = udp_recvmsg,
- 	.hash		   = udp_lib_hash,
- 	.unhash		   = udp_lib_unhash,
--	.rehash		   = udp_v4_rehash,
-+	.set_rcv_saddr	   = udp_v4_set_rcv_saddr,
- 	.get_port	   = udp_v4_get_port,
- 
- 	.memory_allocated  = &udp_memory_allocated,
-diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
-index 5c28a11128c7..ec659bc97c04 100644
---- a/net/ipv6/datagram.c
-+++ b/net/ipv6/datagram.c
-@@ -104,10 +104,19 @@ int ip6_datagram_dst_update(struct sock *sk, bool fix_sk_saddr)
- 			np->saddr = fl6.saddr;
- 
- 		if (ipv6_addr_any(&sk->sk_v6_rcv_saddr)) {
--			sk->sk_v6_rcv_saddr = fl6.saddr;
--			inet->inet_rcv_saddr = LOOPBACK4_IPV6;
--			if (sk->sk_prot->rehash)
--				sk->sk_prot->rehash(sk);
-+			__be32 v4addr = LOOPBACK4_IPV6;
-+
-+			if (sk->sk_prot->set_rcv_saddr &&
-+			    sk->sk_family == AF_INET)
-+				sk->sk_prot->set_rcv_saddr(sk, &v4addr);
-+			else
-+				inet->inet_rcv_saddr = v4addr;
-+
-+			if (sk->sk_prot->set_rcv_saddr &&
-+			    sk->sk_family == AF_INET6)
-+				sk->sk_prot->set_rcv_saddr(sk, &fl6.saddr);
-+			else
-+				sk->sk_v6_rcv_saddr = fl6.saddr;
- 		}
- 	}
- 
-@@ -209,10 +218,15 @@ int __ip6_datagram_connect(struct sock *sk, struct sockaddr *uaddr,
- 
- 		if (ipv6_addr_any(&sk->sk_v6_rcv_saddr) ||
- 		    ipv6_mapped_addr_any(&sk->sk_v6_rcv_saddr)) {
--			ipv6_addr_set_v4mapped(inet->inet_rcv_saddr,
--					       &sk->sk_v6_rcv_saddr);
--			if (sk->sk_prot->rehash && sk->sk_family == AF_INET6)
--				sk->sk_prot->rehash(sk);
-+			struct in6_addr v4mapped;
-+
-+			ipv6_addr_set_v4mapped(inet->inet_rcv_saddr, &v4mapped);
-+
-+			if (sk->sk_prot->set_rcv_saddr &&
-+			    sk->sk_family == AF_INET6)
-+				sk->sk_prot->set_rcv_saddr(sk, &v4mapped);
-+			else
-+				sk->sk_v6_rcv_saddr = v4mapped;
- 		}
- 
- 		goto out;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 0cef8ae5d1ea..6bf9e41242b3 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -105,14 +105,19 @@ int udp_v6_get_port(struct sock *sk, unsigned short snum)
- 	return udp_lib_get_port(sk, snum, hash2_nulladdr);
- }
- 
--void udp_v6_rehash(struct sock *sk)
-+/**
-+ * udp_v6_set_rcv_saddr() - Set local address and new hash for IPv6 socket
-+ * @sk:		Socket changing local address
-+ * @addr:	New address, pointer to struct in6_addr
-+ */
-+void udp_v6_set_rcv_saddr(struct sock *sk, void *addr)
- {
--	u16 new_hash = ipv6_portaddr_hash(sock_net(sk),
--					  &sk->sk_v6_rcv_saddr,
--					  inet_sk(sk)->inet_num);
-+	u16 hash = ipv6_portaddr_hash(sock_net(sk),
-+				      addr, inet_sk(sk)->inet_num);
- 
--	udp_lib_rehash(sk, new_hash);
-+	udp_lib_set_rcv_saddr(sk, addr, hash);
- }
-+EXPORT_SYMBOL(udp_v6_set_rcv_saddr);
- 
- static int compute_score(struct sock *sk, const struct net *net,
- 			 const struct in6_addr *saddr, __be16 sport,
-@@ -1765,6 +1770,7 @@ struct proto udpv6_prot = {
- 	.close			= udp_lib_close,
- 	.pre_connect		= udpv6_pre_connect,
- 	.connect		= ip6_datagram_connect,
-+	.set_rcv_saddr		= udp_v6_set_rcv_saddr,
- 	.disconnect		= udp_disconnect,
- 	.ioctl			= udp_ioctl,
- 	.init			= udpv6_init_sock,
-@@ -1777,7 +1783,6 @@ struct proto udpv6_prot = {
- 	.release_cb		= ip6_datagram_release_cb,
- 	.hash			= udp_lib_hash,
- 	.unhash			= udp_lib_unhash,
--	.rehash			= udp_v6_rehash,
- 	.get_port		= udp_v6_get_port,
- 	.put_port		= udp_lib_unhash,
- #ifdef CONFIG_BPF_SYSCALL
-diff --git a/net/ipv6/udp_impl.h b/net/ipv6/udp_impl.h
-index 0590f566379d..45166e56ef12 100644
---- a/net/ipv6/udp_impl.h
-+++ b/net/ipv6/udp_impl.h
-@@ -14,7 +14,7 @@ int __udp6_lib_err(struct sk_buff *, struct inet6_skb_parm *, u8, u8, int,
- 
- int udpv6_init_sock(struct sock *sk);
- int udp_v6_get_port(struct sock *sk, unsigned short snum);
--void udp_v6_rehash(struct sock *sk);
-+void udp_v6_set_rcv_saddr(struct sock *sk, void *addr);
- 
- int udpv6_getsockopt(struct sock *sk, int level, int optname,
- 		     char __user *optval, int __user *optlen);
-diff --git a/net/ipv6/udplite.c b/net/ipv6/udplite.c
-index a60bec9b14f1..597ca4558b3f 100644
---- a/net/ipv6/udplite.c
-+++ b/net/ipv6/udplite.c
-@@ -56,7 +56,7 @@ struct proto udplitev6_prot = {
- 	.recvmsg	   = udpv6_recvmsg,
- 	.hash		   = udp_lib_hash,
- 	.unhash		   = udp_lib_unhash,
--	.rehash		   = udp_v6_rehash,
-+	.set_rcv_saddr	   = udp_v6_set_rcv_saddr,
- 	.get_port	   = udp_v6_get_port,
- 
- 	.memory_allocated  = &udp_memory_allocated,
 -- 
-2.40.1
+2.44.0
 
 
