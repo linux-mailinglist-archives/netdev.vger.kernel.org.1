@@ -1,128 +1,160 @@
-Return-Path: <netdev+bounces-144769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 872A19C866F
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:49:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B800E9C867B
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:50:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BA35283375
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:49:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C87B2836F0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D071DEFFE;
-	Thu, 14 Nov 2024 09:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/HleNfG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40E11F76C2;
+	Thu, 14 Nov 2024 09:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19F11632F2;
-	Thu, 14 Nov 2024 09:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76691F76C9
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731577765; cv=none; b=uVYZL5nTrU6iu4zdJOP+Zub2xa48Rg/tqOz9fy9vAhTnuQDs2miYVaJ4O+O1jERiIX7E6JDbVUTgGP8Mu410YTlADFZEAURYMtcTGPLc666Ac35G19plI1pp4Gw+P0dwIZv1vI/FgmQy1GGLOnxvyfO/RzmP2iomhxuXF0d3xGE=
+	t=1731577833; cv=none; b=NUXWcxOSqJhqffmzBUv4pTS4192/rAzccYxcPauSemapyWUNS/iuufy5WHcFhznKvb1u/5s6EXs0DOk7r9DDBqzmQAPV2fBOo5jAmhK4Ut1oVVxegrQFEFjtYQHXz9z7CS3XDKZcKfhnbkKnHS8gBY7oAHXVS8YQYE410RwqQf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731577765; c=relaxed/simple;
-	bh=LBDgTy1qkvDaPSlehfadhtmiLxFZBW+A5WLrGZyTGyI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D0heyECeWl3md9COOys+wDps04fQTtd3plaC09DZjfMU1D+xy6QlcPzcEgXcY4A2kc6NYiUr0lu6JZWRb+xozFRJwzUmlJTdAaRkDA7FqPI1UMgh/QXJTN/01DaaycxTr7UfpUgkvBeZRk7URoM640XdgpwrynPQgNp/6fdpyPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E/HleNfG; arc=none smtp.client-ip=209.85.161.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5ebc05007daso158043eaf.1;
-        Thu, 14 Nov 2024 01:49:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731577763; x=1732182563; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BJ007AyfFSmUh1mOpRxq8pHzHMlQHIiPTiwXlN1yM+4=;
-        b=E/HleNfGtOGBTIMt2dYnwDwh1LsV2jSksnaICYm3xRoh03Nve7gsCThm3pRgQRwXde
-         51ucAcy+4YmFIasZKyn8VvNvjYlSW1AmLRJCNLlEa0T1J/EJjhuBt63qWR+9zhF0NQqf
-         c0CpNyFqANK19H78B5mCb8K5FBt+QbKVGTHGPiy3J6gdzWtNP1036l+WWrYBcYXpcxND
-         45u7hNhCu57qt5YOANBBI5JPBbVKiaYjTetE7+X6XPv+ZZMKxsP6NPafcG/7ljYBBGie
-         7yjQe6Rzcfzof+xEw5QUy9NjR5s/KBj/K3MX8FfHeOBsZ08fQ4PWGJtvVR+i707D4cl1
-         sgtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731577763; x=1732182563;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BJ007AyfFSmUh1mOpRxq8pHzHMlQHIiPTiwXlN1yM+4=;
-        b=KHy6BPj/gbY109uEaGgeGfo/7kBDXQ62IYjtzHsMHxY4OcQl5oUW0gpluM+QrRqC9a
-         VTBC0zUWms7cAc+GF1RBQreywGpe82daj1fvkLJx1WKEyRjeGVoVxKMKduL7W6d/kM/K
-         h5/YMsh1FBO4i9fvWjyjeptro/NaAbFPLn066ZF0E6BF0u6VpW1V1CInONP/ICnJzcG7
-         wsvGIA6s/MHX1NDSCdELyzvQsa751HoJyAPOq0TaH4HvZOnB5sp3WQrtkRLDk2Z6SXct
-         QfSx/zZLNkBLy4mjQlN58XOI6rsmgo6ztR3HAc0ngSf807R73RvnNz1xRTJ2sqtZmavD
-         Vn1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUP+ghGhnPIVC0ApWD//IaPsr02IWYtw/paqsE86rxXhi5HUMa/vfcN+DyT7vhiK9+Q0/8yOMmgu96LsnT7@vger.kernel.org, AJvYcCW6/7aUC3GW7Afg+hKi4FzcyXR+hQQmzUB8CRrt/omVG7EAueBuw5XeOq9Qfe0bepqhjreHOMVRNwz+@vger.kernel.org, AJvYcCXoUFpSfqoghxm6b9MIx+b5tPwpxqjBIhNpenR/6mNT0EnRTX2fCobYNpndR/yz6TDpzKjqopdT@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwKiqSDIrinqr5JptDkGF7//CkLuPUmFHwYXT0ZFtDUKNv/JMF
-	i4EGvT1a3O8b5yyW8nxjdvwN3APRYjo790h6A+7ebOrl4OOflr0i
-X-Google-Smtp-Source: AGHT+IElpYeRFs0SFCU7YxvfDnm+J9VKwBd+r6YY8KKPQksjpdgonuoZU+lvxZoNdrIbZVA3+RzO9w==
-X-Received: by 2002:a05:6830:631c:b0:718:c2e:a193 with SMTP id 46e09a7af769-71a6010a842mr6854545a34.10.1731577762840;
-        Thu, 14 Nov 2024 01:49:22 -0800 (PST)
-Received: from [192.168.0.101] (60-250-192-107.hinet-ip.hinet.net. [60.250.192.107])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f8b37e01easm713510a12.24.2024.11.14.01.49.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 01:49:22 -0800 (PST)
-Message-ID: <8e55e276-f2ee-4679-8e0f-ca5afb3653fc@gmail.com>
-Date: Thu, 14 Nov 2024 17:49:18 +0800
+	s=arc-20240116; t=1731577833; c=relaxed/simple;
+	bh=+k7u+P8eibwusFxT8ldXcAutkYTaVW+oHhYiJa7Ah2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FoUXAiZA7wgttyy4F9/IqVr5vmYkdXRmtEL+PXV2r+wNs3TsT2TC2DO3YX6Frh3UVYzA2T2H25fSTS4bpFTnrHo4SyV23fOUxb+adklDNb8TUzdHjO+nrS1dBd6BBMs7stA3STgrD6tp27ujrAYmW30ED5s8l9y0qyzyvOAZxYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBWUO-00069V-U2; Thu, 14 Nov 2024 10:50:12 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBWUM-000ijA-2R;
+	Thu, 14 Nov 2024 10:50:10 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 68D54372F90;
+	Thu, 14 Nov 2024 09:50:10 +0000 (UTC)
+Date: Thu, 14 Nov 2024 10:50:10 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Simon Horman <horms@kernel.org>, 
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] can: m_can: add deinit callback
+Message-ID: <20241114-optimal-literate-newt-a6ace7-mkl@pengutronix.de>
+References: <20241111-tcan-standby-v1-0-f9337ebaceea@geanix.com>
+ <20241111-tcan-standby-v1-1-f9337ebaceea@geanix.com>
+ <20241112144603.GR4507@kernel.org>
+ <20241114-energetic-denim-chipmunk-577438-mkl@pengutronix.de>
+ <cjg6hv4wspgiavym5g2mwrx4ranz4payml37fnhzupp2xvqc6f@ckmweysspqto>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] net: stmmac: dwmac-nuvoton: Add dwmac support for
- MA35 family
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
- schung@nuvoton.com, yclu4@nuvoton.com, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
- linux-stm32@st-md-mailman.stormreply.com
-References: <20241113051857.12732-1-a0987203069@gmail.com>
- <20241113051857.12732-4-a0987203069@gmail.com>
- <b7fb59a9-989e-42b9-ac72-71f353854812@lunn.ch>
-Content-Language: en-US
-From: Joey Lu <a0987203069@gmail.com>
-In-Reply-To: <b7fb59a9-989e-42b9-ac72-71f353854812@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7zfbix6hpbtdjffy"
+Content-Disposition: inline
+In-Reply-To: <cjg6hv4wspgiavym5g2mwrx4ranz4payml37fnhzupp2xvqc6f@ckmweysspqto>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Dear Andrew,
 
-Thank you for your reply.
+--7zfbix6hpbtdjffy
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 1/3] can: m_can: add deinit callback
+MIME-Version: 1.0
 
-On 11/14/24 10:56, Andrew Lunn wrote:
->> +	if (of_property_read_u32(dev->of_node, "tx-internal-delay-ps", &arg)) {
->> +		tx_delay = 0; /* Default value is 0 */
->> +	} else {
->> +		if (arg > 0 && arg <= 2000) {
->> +			tx_delay = (arg == 2000) ? 0xF : (arg / PATHDLY_DEC);
->> +			dev_dbg(dev, "Set Tx path delay to 0x%x\n", tx_delay);
->> +		} else {
->> +			tx_delay = 0;
->> +			dev_err(dev, "Invalid Tx path delay argument. Setting to default.\n");
->> +		}
->> +	}
-> The device tree binding says that only [0, 2000] are valid. You should
-> enforce this here, return -EINVAL of any other value.
->
-> 	Andrew
+On 14.11.2024 10:36:48, Sean Nyekjaer wrote:
+> On Thu, Nov 14, 2024 at 10:34:23AM +0100, Marc Kleine-Budde wrote:
+> > On 12.11.2024 14:46:03, Simon Horman wrote:
+> > > On Mon, Nov 11, 2024 at 11:51:23AM +0100, Sean Nyekjaer wrote:
+> > > > This is added in preparation for calling standby mode in the tcan4x=
+5x
+> > > > driver or other users of m_can.
+> > > > For the tcan4x5x; If Vsup is 12V, standby mode will save 7-8mA, when
+> > > > the interface is down.
+> > > >=20
+> > > > Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+> > > > ---
+> > > >  drivers/net/can/m_can/m_can.c | 3 +++
+> > > >  drivers/net/can/m_can/m_can.h | 1 +
+> > > >  2 files changed, 4 insertions(+)
+> > > >=20
+> > > > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/=
+m_can.c
+> > > > index a7b3bc439ae596527493a73d62b4b7a120ae4e49..a171ff860b7c6992846=
+ae8d615640a40b623e0cb 100644
+> > > > --- a/drivers/net/can/m_can/m_can.c
+> > > > +++ b/drivers/net/can/m_can/m_can.c
+> > > > @@ -1756,6 +1756,9 @@ static void m_can_stop(struct net_device *dev)
+> > > > =20
+> > > >  	/* set the state as STOPPED */
+> > > >  	cdev->can.state =3D CAN_STATE_STOPPED;
+> > > > +
+> > > > +	if (cdev->ops->deinit)
+> > > > +		cdev->ops->deinit(cdev);
+> > >=20
+> > > Hi Sean,
+> > >=20
+> > > Perhaps this implementation is in keeping with other m_can code, but
+> > > I am wondering if either the return value of the callback be returned=
+ to
+> > > the caller, or the return type of the callback be changed to void?
+> > >=20
+> > > Similarly for calls to callbacks in in patch 3/3.
+> >=20
+> > please take care of errors/return values.
+> >=20
+>=20
+> Will do.
+> It's also missing for the init callback. Would you like this series to
+> fix that?
 
-This will be fixed in the next version. And I will correct error messages.
+If the patches don't conflict, please make it a separate patch.
 
-Thanks!
+Marc
 
-BR,
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Joey
+--7zfbix6hpbtdjffy
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc1x88ACgkQKDiiPnot
+vG/Kxwf/fJlb/9WWhaKfa4QvyDHbJxW4P+FQekkElrHSRDiibms3OGOvKzmgPrcb
+SU/OJAZ/y3p+1doX1K2V+Y2kFOm49x+egfdrk3V9XVXcoECe8yic7yk6y4GWVIdI
+QSsiqk6NeU+GbxyoDK7xZX5CO0IBLeC0+gHJSBtVK8ImxT7IQoPsR0+QexCk6oJH
+lXh946SEF1HNi04juAG7KiDUkKc92wQu4/pEQo1asqG1fVIorerr/j6FUnFbrkBc
+tqSROOOP5nU9s69HfN9WBlRia6QUkG+qd7Y0axHyQwuee+Q/EgLhTiBJfaTaP6Y3
+IBSgZomQ+l4tdIx7FDdJtPsRiniLaA==
+=pNIA
+-----END PGP SIGNATURE-----
+
+--7zfbix6hpbtdjffy--
 
