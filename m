@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-144988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CCF89C900C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:46:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E7479C8F1E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74790B46C66
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:04:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E529B28BA1F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBA417BED0;
-	Thu, 14 Nov 2024 16:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1BF17A583;
+	Thu, 14 Nov 2024 16:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AkCqgOVj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VGcgJIqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EC93D96D
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 16:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E00165EFC
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 16:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731600226; cv=none; b=DN8q5Q3MRKy07XCeKxnizqtzqS5bMY0QMVR9QPYUoAUa7zZrE/S84zzOkFQLn6E3r9/RN6gWUymLdU9ORcb7LIhHZALODnEprRbLlcg6sA4DB383MOFRG03a/LaR5KHSyuvXb9fXiH1KXqHhy834sSwGI4g08oaGUlGf4rUS37k=
+	t=1731600233; cv=none; b=O2PAH8vddalwMe6iKyCMVgOFALcemmLh2HSaZfw3k9MMesj2KCIBlbGUortJynuM1UjlQRTVGpXBX/v5OnEJid95VKweOC50SZh4CJspMxUmJ31eHH5HW54WfiipXpozVgiq2KPOk1IbWR1JpEaxC775YNLL1DtQL3iyl28mq2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731600226; c=relaxed/simple;
-	bh=Hg/efvizYk8WzQ8t6Lg1MCcYIg9RXN1TCtGqMqSSU8o=;
+	s=arc-20240116; t=1731600233; c=relaxed/simple;
+	bh=v0kwmtFfnXfpy5cKJxovL0kPGe2aqm4prwx082mj9sE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GNNZ1sxJc3llhzfihhqPaaY1xTsjwhhBPE3kRadhcjWtx/ZUvqa7kBMi5qfDRzM8484U/hKT8psj0Dqz6g3s5QmCCtoc7nwvg0/TGWilN2wGvaOXRLgScXFgGto+ThniVplr0Fj64Mjf9K5eb/72wiWgzucjnOHKAUqraweGcSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AkCqgOVj; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=mghO1kt6gXEmovozUnEWa5e81TO4GxDGlEmRRJTc1/IdrjEMpq4QDBAS22NBeagj6vZL1fZPkt9ken2V/dkN5VF9PyUyAl/zC8Ia/wQKCBXFNBXkOAGt4E5OktKNToSEV9hy/qzqwYtT2/URYFdBZc9IawfyLgKDPfzClYqQBAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VGcgJIqg; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731600224;
+	s=mimecast20190719; t=1731600231;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1ZK9SQWS0kJT4zJcnUWs+bLoqvQwItt4OaoBKbfggh0=;
-	b=AkCqgOVjX49lKdX4l/tPxuCFemsTPIPsHQ1O+cWrk9XugrE2FOcsknTcPRmbPdHl1BqIAn
-	4KhrHUAIsC9sZSi8YUU7SjK9eLmLy8qDz1sFu3I3nYNWWaqtaI6T1pa80s1/pS2BeO6+xn
-	rYJWjBHO287QkNV3fbCNGk4amX05cTM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=EdliM8Z7gt2RM9bOVe4sgL9YGb6zubuIY0PyqbDtTg8=;
+	b=VGcgJIqgkdhiWVkLtCBGWlIVJB6CswatwMRH+Ih6iVnOcImUG53SAXuwVma8Hb+l8uH6d5
+	zvMnRfw+fgi8UcbTpVQ4f39m1YMnG2Y7prGaYJ8/mz1Irs8YOSgBXX70clE0InuD44uSn1
+	ZJCKvMNzSegEAGLjCGMJ5BxKFsybobM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-301-GV0FEpHqPNSv-XcqXOr-MA-1; Thu, 14 Nov 2024 11:03:42 -0500
-X-MC-Unique: GV0FEpHqPNSv-XcqXOr-MA-1
-X-Mimecast-MFC-AGG-ID: GV0FEpHqPNSv-XcqXOr-MA
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d45f1e935so463923f8f.0
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:03:42 -0800 (PST)
+ us-mta-76-G179PfG2N16UGJ2lQYlLEA-1; Thu, 14 Nov 2024 11:03:50 -0500
+X-MC-Unique: G179PfG2N16UGJ2lQYlLEA-1
+X-Mimecast-MFC-AGG-ID: G179PfG2N16UGJ2lQYlLEA
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5ca192b8so505162f8f.1
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:03:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731600221; x=1732205021;
+        d=1e100.net; s=20230601; t=1731600229; x=1732205029;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1ZK9SQWS0kJT4zJcnUWs+bLoqvQwItt4OaoBKbfggh0=;
-        b=DUtYl4EM9ikWnp57INKRIlLepKh/pftNSOTfeh6RIgUIuPnzvpYl1EYq28ZM2ITao6
-         wZh5TQsxJs0bJlGS4O/1002eoBrP8K1b94ntyqT+L+wP5/Egy92WEvbfXQcoKNLXLUSW
-         PRWqRKo8xUzCCBKegD54Ch97a6hegFVCrqqr3t4bGS+e7Fa7C4w16Uueg9vsD8Sk5y1I
-         TVZrMVi1e75wcXny1O97GHRaWx6SLn1Ad+QmrP11NpNOrXF9HNUPuwzxbo2380yXx7ew
-         dC6rWgrAr6zstjLTJHuSjKNNKc0Ho4kN3ZCQ3vbQ6Iuv3Paqk22ekz1P0iiFKqOK2Zxs
-         ZYAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2ZnY6CebUkwl/iUXaFHd4AYXNBHIUiJK4rXTnOkebKZjRjw7c00RWtxAl4aTKGpBE7dWxfUo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZPW+m56LgCiH9gM7CVQxl15LSZ3coN88RT3toaIVxufzIri3M
-	8yGpeYr6OW2yRfk8/F3NTm5ORpjMzEgT/aMaDOjeEqvcioACOlytTB9DAkb7s85SgzJurotLmWC
-	Ataec+KabexnfvqANLBocc9Krxd7iEpl5vSypqznUnyXTw2PlDICr3g==
-X-Received: by 2002:a5d:5985:0:b0:37c:babe:2c49 with SMTP id ffacd0b85a97d-38218503517mr1977158f8f.19.1731600221349;
-        Thu, 14 Nov 2024 08:03:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFfSQUSDvP1nWEf6H6Zqi3hDixWY32tbX9uiJ7MWMgWsWz+YUcQP0Fk0Y+bRF07oOjfdSFOBg==
-X-Received: by 2002:a5d:5985:0:b0:37c:babe:2c49 with SMTP id ffacd0b85a97d-38218503517mr1977125f8f.19.1731600220785;
-        Thu, 14 Nov 2024 08:03:40 -0800 (PST)
+        bh=EdliM8Z7gt2RM9bOVe4sgL9YGb6zubuIY0PyqbDtTg8=;
+        b=Y/83QW+2FE0s2nQp6vWZvCUDzSuAUSUGQeVr0Ci3PcgTl5bPiiz6aKv99Zq0vRb3UB
+         CSGSDXxoEwZnd2sAhxsCGkIist7EnrlXMzeKaOngI7CfZq/UI5RQSOX4WM94gwA8MEea
+         R1jtpJnEQs2sK/Y8x/19hFb+iBNu9UnXrDy+s9LGRYyyNGjBqnq8bbZDrQFFRr082jcn
+         LHQp/WMDm9S7QJcr5qza1WRHqnwo7TB8pnJ4YlP+McNjntMVV55/yURQjdsnHxowsYyd
+         ONrGLqFUydm+DUw4MZcpgtiyUqNji8GiibcY9rMg8qipZF2fye3ewvKLX5RaUwLCYv3Z
+         3nOA==
+X-Forwarded-Encrypted: i=1; AJvYcCV42H4tEMlXUFtSWTyMafYkCrE0ZSfM3evFoPkCNG00NiiBIWK3Bmep1mw+D5+Wg/T4ECxG++g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvkf4eiUCl8/+4kWbjS0wz//9QBflWcF3KlXFTEB4B3AAyQ1Kq
+	yvhV2it51aWU6AqqxoRyNAYsAQLyx6W3t+IAOnSFcg8kQE2/hFddDfowDrpOC81yeZ80Bg+aBd9
+	qymagFafqXmxF8C18KzvU28OBJnWntBxEugTlgsNTEdIc+n+is21wdA==
+X-Received: by 2002:a5d:5f43:0:b0:37d:5251:e5ad with SMTP id ffacd0b85a97d-38213fe93femr3410130f8f.2.1731600228602;
+        Thu, 14 Nov 2024 08:03:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEmzBFIAWUMu8T177cyJQovSzl+Bfg2xMH/w7cpjzmzMiQkbhzX/e3tpT04f7jPfRKFJIHXbA==
+X-Received: by 2002:a5d:5f43:0:b0:37d:5251:e5ad with SMTP id ffacd0b85a97d-38213fe93femr3410053f8f.2.1731600227803;
+        Thu, 14 Nov 2024 08:03:47 -0800 (PST)
 Received: from debian (2a01cb058d23d600b637ad91a758ba3f.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:b637:ad91:a758:ba3f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adad9cesm1813271f8f.37.2024.11.14.08.03.39
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adbe7dfsm1812740f8f.56.2024.11.14.08.03.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 08:03:40 -0800 (PST)
-Date: Thu, 14 Nov 2024 17:03:38 +0100
+        Thu, 14 Nov 2024 08:03:47 -0800 (PST)
+Date: Thu, 14 Nov 2024 17:03:45 +0100
 From: Guillaume Nault <gnault@redhat.com>
 To: Pablo Neira Ayuso <pablo@netfilter.org>,
 	Jozsef Kadlecsik <kadlec@netfilter.org>
@@ -84,9 +84,9 @@ Cc: netfilter-devel@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>, coreteam@netfilter.org,
 	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH nf-next 3/5] netfilter: rpfilter: Convert rpfilter_mt() to
+Subject: [PATCH nf-next 4/5] netfilter: nft_fib: Convert nft_fib4_eval() to
  dscp_t.
-Message-ID: <20c7fe0c2c84b3fec77cdbfd7df4b587a0225fcd.1731599482.git.gnault@redhat.com>
+Message-ID: <f1b248fc908489dc5dbf6c48408b29152de149e0.1731599482.git.gnault@redhat.com>
 References: <cover.1731599482.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -107,22 +107,30 @@ inet_dscp_to_dsfield() call.
 
 Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- net/ipv4/netfilter/ipt_rpfilter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/netfilter/nft_fib_ipv4.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/netfilter/ipt_rpfilter.c b/net/ipv4/netfilter/ipt_rpfilter.c
-index 1ce7a1655b97..a27782d7653e 100644
---- a/net/ipv4/netfilter/ipt_rpfilter.c
-+++ b/net/ipv4/netfilter/ipt_rpfilter.c
-@@ -76,7 +76,7 @@ static bool rpfilter_mt(const struct sk_buff *skb, struct xt_action_param *par)
- 	flow.daddr = iph->saddr;
- 	flow.saddr = rpfilter_get_saddr(iph->daddr);
- 	flow.flowi4_mark = info->flags & XT_RPFILTER_VALID_MARK ? skb->mark : 0;
--	flow.flowi4_tos = iph->tos & INET_DSCP_MASK;
-+	flow.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(iph));
- 	flow.flowi4_scope = RT_SCOPE_UNIVERSE;
- 	flow.flowi4_l3mdev = l3mdev_master_ifindex_rcu(xt_in(par));
- 	flow.flowi4_uid = sock_net_uid(xt_net(par), NULL);
+diff --git a/net/ipv4/netfilter/nft_fib_ipv4.c b/net/ipv4/netfilter/nft_fib_ipv4.c
+index 09fff5d424ef..625adbc42037 100644
+--- a/net/ipv4/netfilter/nft_fib_ipv4.c
++++ b/net/ipv4/netfilter/nft_fib_ipv4.c
+@@ -11,6 +11,7 @@
+ #include <net/netfilter/nft_fib.h>
+ 
+ #include <net/inet_dscp.h>
++#include <net/ip.h>
+ #include <net/ip_fib.h>
+ #include <net/route.h>
+ 
+@@ -107,7 +108,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct nft_regs *regs,
+ 	if (priv->flags & NFTA_FIB_F_MARK)
+ 		fl4.flowi4_mark = pkt->skb->mark;
+ 
+-	fl4.flowi4_tos = iph->tos & INET_DSCP_MASK;
++	fl4.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(iph));
+ 
+ 	if (priv->flags & NFTA_FIB_F_DADDR) {
+ 		fl4.daddr = iph->daddr;
 -- 
 2.39.2
 
