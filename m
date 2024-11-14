@@ -1,109 +1,255 @@
-Return-Path: <netdev+bounces-144723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95709C8492
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:07:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A12BC9C84A6
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:12:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53F0EB25832
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:07:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25EF21F22AAE
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011121F585B;
-	Thu, 14 Nov 2024 08:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B285D1F754F;
+	Thu, 14 Nov 2024 08:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b="PhCmhdkT"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Jkz0aoep"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E01C1F5846
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3F51F7088
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731571658; cv=none; b=HE0ecxjVnpa+ENDRvRcx3feC3Vv2X6TyWRinn3cdv4KWW5DmY8G1H85pKUOLCvsAzQADN5B9QHnicqpQRkRbmAEVpwDXZICtetmZDvnLRrpakTc98ybn6gOHHcMFLUyP2lRXv4hdjv3Wa5TBCmk4NzCfXzQPPPkInGnCVJ0sX48=
+	t=1731571899; cv=none; b=Ipyi+QgC6+Iom09IWaHgGkMex6NtqKlYpbUuHeIOfBKK5o73Nz33QJGgH4G9Z2D4fEfQxTMMh5AwE39P09gzhrpOCx4T5WXiGZ9HNSl046HghRN+puLhZt5NW5Qc0aV2hvXXXZeq2kAmZrN9lxvxAl4t07QtJQ1nYDx/mReWwn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731571658; c=relaxed/simple;
-	bh=hSVg4Sg07+XwE9Y3hP3Ywg4pJOYxOfiQglazNaiSC3Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qHB+DzMLLBGFmGWov1GEZgva9/DhxvJwWp8Wew9QMcSJtsQ4MYtnwqpFj3CFjUFPAjVk71kLG4j/e9DgNjtRMgFHjRCMbouPlpvVxw9qzFMqqgaCoDUczh6hDfRx59KQSbFDiceh/UBa8UDzkUVNaYQ7aIwiyESOxLePJdPYpNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in; spf=pass smtp.mailfrom=iiitd.ac.in; dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b=PhCmhdkT; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e625b00bcso219174b3a.3
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 00:07:36 -0800 (PST)
+	s=arc-20240116; t=1731571899; c=relaxed/simple;
+	bh=dbIbz3t0cEpW3r7Wy8SR6AhtdgpUROKxXtAsVLqqPLY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MGuxj6nHNDD5tC4G7exfZ2rJsP3tc3AWGiPHRUkRb/rJAOs+3sDQPLh60pJWXHuyyu2Y+29L0rGmeTzqNf10lUou1ET7Yi6ObdKaIISUgxMhg4/O3AYfaZybGIRQ4QJ0OZNb1knqnQUaFbsVVH3Bmp8n5eY6XBn6UG78uTSzkLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Jkz0aoep; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5cf6f367f97so435226a12.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 00:11:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=iiitd.ac.in; s=google; t=1731571656; x=1732176456; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WbZp2hSV5qfnRBrkNDRRtWA/m5PiZnh77UndzUHjNSY=;
-        b=PhCmhdkTiVToVAC3A1zalcTueOHGJIFnpQXC+FsV84/x1SZBkoG7ek4JXBPiH0M+Jp
-         9d+7LFGrHoaJKY23AmjfvsUIhXrB2ttOaiSSpRtkzVXftc4TdVe/Hs4EioHvvmF0q3To
-         7ngBI0KRTmuhwiuXU6BK1omLg12osizbGFjhM=
+        d=openvpn.net; s=google; t=1731571896; x=1732176696; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lhi2XcdyoNb77R//XCSb7tUnf+SSZyDwvqz+0gWmS2A=;
+        b=Jkz0aoepK2Sj+XF2zGM3m4zzdxjKczXv2SqcpKrUswJOjeurexlOFdeH5NR4KlHAcb
+         GEJ6Xwy+p4KTeD2in8Fo+ro2f/ICS8+knYwWmHXtoNkV9+8GMoe3kAVytnyaODvc15Gn
+         AVAC0183dhrLUGC7ndFvef3TXmTJ609i/ch4ddgne4Dmhtm82X+SLy+fQ6jpkcnXrIns
+         qGmCs9Vi2E6mTcBBDv9qdc1gEH4u+m//q+wNT1zeAH3WFG4MNEDxA1zNFOUooWNRn7xE
+         rKyZv1YMkhtIyeWL4AhGkqNYc9gAJl5uzTIAKuBZJ/7omyCv3WqHiFKxtQK3mbM/J3zL
+         sceA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731571656; x=1732176456;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1731571896; x=1732176696;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WbZp2hSV5qfnRBrkNDRRtWA/m5PiZnh77UndzUHjNSY=;
-        b=jOfj/qMETJFSuAdekifwmEWH3QEg895s56iXcJFwk1YBJwxbewQ4NJ7mbF0HB6rzFC
-         z+yBEQG1Exlfv/XCmBCRd8dAwPSHADuGphDxKghibilu8ntBgyjLhWOPOedJ5D6CUaBF
-         rHZGRjTbSByfHoMV+rF+dZKWs6epm0DSUNVgeD5Urq/22FpDhQAWzl6vNwyDJepb78xj
-         tCbeNwwW3CyVE9wtUg81sCJsbxvFv6xViv+hg4ssOd8R3fU1ypbV52XuyIVjwpjYUSZf
-         6y2jaoeVX1W/Ht6MbuDGgdXMfpTLkSXBnDZnZKADNun282Gmy9BK3F2rDVWG+KKxiG9k
-         Fkdg==
-X-Forwarded-Encrypted: i=1; AJvYcCW6ahx6oYiwDHn/brj/ZwyTbAmrHZAXsl1suMi/2C4kjYIRX7zKiro0rAq8aqh5960D/ZxE87k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUFSGtUvh9eTLk5tn46fErGJ6PHQnoYqUmmE6k7u/JvuNX0P70
-	vSrTb8Qt6vy66xr00wZzThZ9cxarmnUHPNeEMss4g58NT0n7pCYaTRrGeCyGFEg=
-X-Google-Smtp-Source: AGHT+IEZ8+EwkzMjF1u7bzNUmHyWZha6bi30jiyzRwe+n6EDZ5DEy57jxaY44Un7DDtYMv+YTQkeGA==
-X-Received: by 2002:a05:6a00:234b:b0:71d:f4ef:6b3a with SMTP id d2e1a72fcca58-72457a71009mr7439292b3a.21.1731571655717;
-        Thu, 14 Nov 2024 00:07:35 -0800 (PST)
-Received: from fedora ([103.3.204.127])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7246a5ce647sm673336b3a.5.2024.11.14.00.07.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 00:07:34 -0800 (PST)
-Date: Thu, 14 Nov 2024 13:37:25 +0530
-From: Manas <manas18244@iiitd.ac.in>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Shuah Khan <shuah@kernel.org>, 
-	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+d4373fa8042c06cefa84@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] netlink: Add string check in netlink_ack_tlv_fill
-Message-ID: <r4dex6aial4htndvoxv6wynccag2buubjimkkhenn2rjxmsacs@2sf3lieqe5ke>
-References: <20241114-fix-netlink_ack_tlv_fill-v2-1-affdfb5f4c6f@iiitd.ac.in>
- <20241113182511.41960cc0@kernel.org>
+        bh=Lhi2XcdyoNb77R//XCSb7tUnf+SSZyDwvqz+0gWmS2A=;
+        b=lDMRB2mA0mIeei3bVbPApm5pTptBsoA11EATR3TRmB8wKKwgcqlfAjAoAgWk3Nau7+
+         mrcYyrOWfduBOYeLKaB7iDFKeI7jpYHhRxdfzAoJFIRKlW9IjSkG2EKDmpZLjHOtvI6T
+         MRbsQNKDRYr7msyoCX4QVRf15n/Vl/pIoZop5RmKN/wn7xCjVmBLCekKBooqkwpgkrhN
+         mI8FeBNx0ErYQ/hCHmeulcwogUg0psDkcQUHepbxccUcqVIfRPdEVMXnxjajuyGFp48f
+         iKA1L9FJ2Q9Qbj+km1WdMGpk73jkznKlLjiBmYVVnevrkcTaC94Prp3rZSq0Z3n8NAPz
+         1JYw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5Pc8naTwYvTDyqy5hdi9DX96RNGMroetso4LyIZYgMO9nUBWKa830J0GCKsda/VjAp0w0VHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYvlwobj5Of25relpz1aCN44mYhuAKehDG2ZxAl9fhpZh344Io
+	65uS1UH1E90AFVs/+fUM66jPMOEaqXHMWnRtAvj62epXdE7gB7ORadhYmbtDVBU=
+X-Google-Smtp-Source: AGHT+IHn8GzlUpFSwlHPxZF4Bet/aeH5Llo7f+cI3x6kBTlWSqRynAOg9Usx4t4FBNGnpyRoDEnKxA==
+X-Received: by 2002:a17:907:5cb:b0:a9a:1792:f1a with SMTP id a640c23a62f3a-aa1f8043f6amr520374466b.7.1731571895602;
+        Thu, 14 Nov 2024 00:11:35 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:3779:22d5:a322:7c13? ([2001:67c:2fbc:1:3779:22d5:a322:7c13])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20dffd782sm33977466b.129.2024.11.14.00.11.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 00:11:35 -0800 (PST)
+Message-ID: <2a90f702-3061-46b6-aafa-cf8c1ba3d0de@openvpn.net>
+Date: Thu, 14 Nov 2024 09:12:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241113182511.41960cc0@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net> <ZypfnyfToF1b6YAZ@hog>
+ <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net> <ZzSBG-RPUlpgVFhA@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZzSBG-RPUlpgVFhA@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 13.11.2024 18:25, Jakub Kicinski wrote:
->On Thu, 14 Nov 2024 06:15:15 +0530 Manas via B4 Relay wrote:
->> -	if (extack->bad_attr &&
->> +	if (extack->bad_attr && strlen(in_skb->data) &&
->>  	    !WARN_ON((u8 *)extack->bad_attr < in_skb->data ||
->>  		     (u8 *)extack->bad_attr >= in_skb->data + in_skb->len))
->
->that's most definitely not the right fix.
->in_skb->data points to binary data.
->
->my best idea so far is to rework this check to use nlh, because in_skb
->will be pulled at this stage for dumps
->if that makes sense to you please give it a go, otherwise I'll work on
->the fix tomorrow
-Hi Jakub, thanks for reviewing this.
+On 13/11/2024 11:36, Sabrina Dubroca wrote:
+> 2024-11-12, 14:20:45 +0100, Antonio Quartulli wrote:
+>> On 05/11/2024 19:10, Sabrina Dubroca wrote:
+>>> 2024-10-29, 11:47:28 +0100, Antonio Quartulli wrote:
+>>>> @@ -105,6 +132,9 @@ void ovpn_decrypt_post(void *data, int ret)
+>>>>    		goto drop;
+>>>>    	}
+>>>> +	/* keep track of last received authenticated packet for keepalive */
+>>>> +	peer->last_recv = ktime_get_real_seconds();
+>>>
+>>> It doesn't look like we're locking the peer here so that should be a
+>>> WRITE_ONCE() (and READ_ONCE(peer->last_recv) for all reads).
+>>
+>> Is that because last_recv is 64 bit long (and might be more than one word on
+>> certain architectures)?
+>>
+>> I don't remember having to do so for reading/writing 32 bit long integers.
+> 
+> AFAIK it's not just that. The compiler is free to do the read/write in
+> any way it wants when you don't specify _ONCE. On the read side, it
+> could read from memory a single time or multiple times (getting
+> possibly different values each time), or maybe split the load
+> (possibly reading chunks from different values being written in
+> parallel).
 
-I'll work on this.
+Ok, thanks. Will switch to WRITE/READ_ONE then.
+
+> 
+>> I presume we need a WRITE_ONCE also upon initialization in
+>> ovpn_peer_keepalive_set() right?
+>> We still want to coordinate that with other reads/writes.
+> 
+> I think it makes sense, yes.
+
+ACK
+
+[...]
+> 
+>>>> +	/* check for peer timeout */
+>>>> +	expired = false;
+>>>> +	timeout = peer->keepalive_timeout;
+>>>> +	delta = now - peer->last_recv;
+>>>
+>>> I'm not sure that's always > 0 if we finish decrypting a packet just
+>>> as the workqueue starts:
+>>>
+>>>     ovpn_peer_keepalive_work
+>>>       now = ...
+>>>
+>>>                                          ovpn_decrypt_post
+>>>                                            peer->last_recv = ...
+>>>
+>>>     ovpn_peer_keepalive_work_single
+>>>       delta: now < peer->last_recv
+>>>
+>>
+>> Yeah, there is nothing preventing this from happening...but is this truly a
+>> problem? The math should still work, no?
+> 
+> We'll fail "delta < timeout" (which we shouldn't), so we'll end up
+> either in the "expired = true" case, or not updating
+> keepalive_recv_exp. Both of these seem not ideal.
+
+delta is signed, so it'll end up being a negative value and "delta < 
+timeout" should not fail then. Unless I am missing something.
+
+Anyway, this was just an exercise to understand what was going on.
+I already changed the code as per your suggestion (the fact that we are 
+still discussing this chunk proves that it needed to be simplified :))
+
+> 
+>>
+>> However:
+>>
+>>>
+>>>
+>>>> +	if (delta < timeout) {
+>>>> +		peer->keepalive_recv_exp = now + timeout - delta;
+>>>
+>>> I'd shorten that to
+>>>
+>>>       peer->keepalive_recv_exp = peer->last_recv + timeout;
+>>>
+>>> it's a bit more readable to my eyes and avoids risks of wrapping
+>>> values.
+>>>
+>>> So I'd probably get rid of delta and go with:
+>>>
+>>>       last_recv = READ_ONCE(peer->last_recv)
+>>>       if (now < last_recv + timeout) {
+>>>       	peer->keepalive_recv_exp = last_recv + timeout;
+>>>       	next_run1 = peer->keepalive_recv_exp;
+>>>       } else if ...
+>>>
+>>>> +		next_run1 = peer->keepalive_recv_exp;
+>>>> +	} else if (peer->keepalive_recv_exp > now) {
+>>>> +		next_run1 = peer->keepalive_recv_exp;
+>>>> +	} else {
+>>>> +		expired = true;
+>>>> +	}
+>>
+>> I agree this is simpler to read and gets rid of some extra operations.
+>>
+>> [note: I took inspiration from nat_keepalive_work_single() - it could be
+>> simplified as well I guess]
+> 
+> Ah, ok. I wanted to review this code when it was posted but didn't
+> have time :(
+
+It can still be fixed ;)
+
+
+Thanks.
+Regards,
 
 -- 
-Manas
+Antonio Quartulli
+OpenVPN Inc.
+
 
