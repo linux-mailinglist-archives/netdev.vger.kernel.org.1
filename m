@@ -1,194 +1,138 @@
-Return-Path: <netdev+bounces-144739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8AC19C857C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:03:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516B79C8586
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:03:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8812E2820DD
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:03:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBD2D1F25DF0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C493A1DC74A;
-	Thu, 14 Nov 2024 09:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zD5NOp4D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF4D1DF73C;
+	Thu, 14 Nov 2024 09:03:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B4DE573;
-	Thu, 14 Nov 2024 09:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFA71E8854
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731574992; cv=none; b=IziF5EGZaodkcpcZV0aFGIB1Qky9cSlUYn1XVNFtSZeTIbvXTZsUQCAQmA6LfLmFWBCzj7/Ketdioou+LKzH3xsOAMjl5eHNkLE4Fqw2PXdmTlAQs2rClxqAUaTWDOxnTpV8qMExaMyHy6DNMKGBl+m+Vp21RrllkEbAie2uo5g=
+	t=1731574999; cv=none; b=aA5tb1jQDRIVwt+2lKVWqySkWhl3Kk7iO6cdmHPM0tD6yVTT/nmgXMOehPj+RVSeFjB8NZfNDtDxKwIzOQfdC5+8dEq5vyRyhs0u7U3+uu06l7oG1D64nRCekfJkTgincysbZ5/Wi8eURvb8LAYIEXida2XPCsvraENo1aaMUM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731574992; c=relaxed/simple;
-	bh=J220O8UfL3Mq3B3v+52/12kVBuBMYemtHeBSz+8e0pM=;
+	s=arc-20240116; t=1731574999; c=relaxed/simple;
+	bh=yMofAg6GnSBQAObf74t5qTT94MgiyHC7E8wT+BEjOl8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4UL3yw5m08VGIgkiv7bA/KqLyhrMebDKmMsyHQzBmRzbzJuQlKTYrWmm8qEALn+Sz/8cDqupGLKkVQmZ9cwch17ivLLoJMTejHw2NCcyvUP5GQnOq1JVs/mXzkVMDUmgTXhjX0KtKBsuruDndFGdJCPf9j8R7jCZN3KOv7Tv30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zD5NOp4D; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Vq+0o5UZAFxdEgelWoO434l6bAqjjNI/4fem/VNfZD0=; b=zD5NOp4D51nL3FAW1pcBwyJVl2
-	FxhxfgJ3tpP/uZ27OAg5hY80Mu9kbLJ7MGktRo9pgJd+G3N8RUkVd1wzUb8YIzxXs6iEI2PMBaqsH
-	hoStN7BCuIY/scBdom8a4Mtt72KeszUUBSK1BALW+ob16VYfc2EzNzdztNStW7d9CULAVpHecCKfC
-	KAaitanOUdWUkOIUukRB+yRq0Y5y7xJon0P3oEinFzgd7YMQ+43ZBZ3tLN+huJGGe8KLNKNyeLU3k
-	UM4P2lYEXKASMHptYgHYQ8Ngglt07QHh8cNWQ3AFhVnb/mrMhxlbM4HqkFDRNXQJASNlQ+OP8J32I
-	VQocwMsw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48016)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmjqGoFroJsKkL0qvxn2YN2fxnwMWadWwE/oJIR9UHt4F6iMrK4W0AZ6GhZNxNr6Q+VdUNOgUwycE4Fu46qou/ktHt1roJaDRMurqo+RV+exqmbd0fxuCl4EQtZ041BNWE7Da5KMLcniTo1pPa8AysOlf+aULPJAYdyRx+7EX8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBVkk-0003PQ-CT; Thu, 14 Nov 2024 10:03:02 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBVkc-0007gg-0b;
-	Thu, 14 Nov 2024 09:02:54 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBVkV-0000yG-1x;
-	Thu, 14 Nov 2024 09:02:47 +0000
-Date: Thu, 14 Nov 2024 09:02:47 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net v1 1/2] net: phy: Introduce phy_update_eee() to
- update eee_cfg values
-Message-ID: <ZzW8t2bCTXJCP7-_@shell.armlinux.org.uk>
-References: <20241112072447.3238892-1-yong.liang.choong@linux.intel.com>
- <20241112072447.3238892-2-yong.liang.choong@linux.intel.com>
- <f8ec2c77-33fa-45a8-9b6b-4be15e5f3658@gmail.com>
- <71b6be0e-426f-4fb4-9d28-27c55d5afa51@lunn.ch>
- <eb937669-d4ce-4b72-bcae-0660e1345b76@linux.intel.com>
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBVkk-000iJR-0X;
+	Thu, 14 Nov 2024 10:03:02 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D9007372EC9;
+	Thu, 14 Nov 2024 09:03:01 +0000 (UTC)
+Date: Thu, 14 Nov 2024 10:03:01 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Jakub Kicinski <kuba@kernel.org>, Sean Nyekjaer <sean@geanix.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+Message-ID: <20241114-natural-ethereal-auk-46db7f-mkl@pengutronix.de>
+References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
+ <20241111101011.30e04701@kernel.org>
+ <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
+ <20241112-hulking-smiling-pug-c6fd4d-mkl@pengutronix.de>
+ <20241113193709.395c18b0@kernel.org>
+ <CAMZ6Rq+Z=UZaxbMeigWp7-=v5xgetguxOcLgsht2G56OR1jFPw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dfrlbwylwhzsoyyl"
 Content-Disposition: inline
-In-Reply-To: <eb937669-d4ce-4b72-bcae-0660e1345b76@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <CAMZ6Rq+Z=UZaxbMeigWp7-=v5xgetguxOcLgsht2G56OR1jFPw@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Nov 13, 2024 at 06:10:55PM +0800, Choong Yong Liang wrote:
-> On 12/11/2024 9:04 pm, Andrew Lunn wrote:
-> > On Tue, Nov 12, 2024 at 12:03:15PM +0100, Heiner Kallweit wrote:
-> > > In stmmac_ethtool_op_get_eee() you have the following:
-> > > 
-> > > edata->tx_lpi_timer = priv->tx_lpi_timer;
-> > > edata->tx_lpi_enabled = priv->tx_lpi_enabled;
-> > > return phylink_ethtool_get_eee(priv->phylink, edata);
-> > > 
-> > > You have to call phylink_ethtool_get_eee() first, otherwise the manually
-> > > set values will be overridden. However setting tx_lpi_enabled shouldn't
-> > > be needed if you respect phydev->enable_tx_lpi.
-> > 
-> > I agree with Heiner here, this sounds like a bug somewhere, not
-> > something which needs new code in phylib. Lets understand why it gives
-> > the wrong results.
-> > 
-> > 	Andrew
-> Hi Russell, Andrew, and Heiner, thanks a lot for your valuable feedback.
-> 
-> The current implementation of the 'ethtool --show-eee' command heavily
-> relies on the phy_ethtool_get_eee() in phy.c. The eeecfg values are set by
-> the 'ethtool --set-eee' command and the phy_support_eee() during the initial
-> state. The phy_ethtool_get_eee() calls eeecfg_to_eee(), which returns the
-> eeecfg containing tx_lpi_timer, tx_lpi_enabled, and eee_enable for the
-> 'ethtool --show-eee' command.
 
-These three members you mention are user configuration members.
+--dfrlbwylwhzsoyyl
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+MIME-Version: 1.0
 
-> The tx_lpi_timer and tx_lpi_enabled values stored in the MAC or PHY driver
-> are not retrieved by the 'ethtool --show-eee' command.
+On 14.11.2024 13:41:12, Vincent Mailhol wrote:
+> On Thu. 14 Nov. 2024 at 12:37, Jakub Kicinski <kuba@kernel.org> wrote:
+> > My bad actually, I didn't realize we don't have an X: entries
+> > on net/can/ under general networking in MAINTAINERS.
+                      ^^^^^^^^^^^^^^^^^^
+> >
+> > Would you mind if I added them?
+>=20
+> OK for me. I guess you want to add the exclusion for both the
+>=20
+>   CAN NETWORK DRIVERS
+>=20
+> and the
+>=20
+>   CAN NETWORK LAYER
+>=20
+> entries in MAINTAINERS.
 
-tx_lpi_timer is the only thing that the MAC driver should be concerned
-with - it needs to program the MAC according to the timer value
-specified. Whether LPI is enabled or not is determined by
-phydev->enable_tx_lpi. The MAC should be using nothing else.
+I thinks, it's the other way round.
 
-> Currently, we are facing 3 issues:
-> 1. When we boot up our system and do not issue the 'ethtool --set-eee'
-> command, and then directly issue the 'ethtool --show-eee' command, it always
-> shows that EEE is disabled due to the eeecfg values not being set. However,
-> in the Maxliner GPY PHY, the driver EEE is enabled.
+General networking gets an X: for driver/net/can and driver/can/ and the
+include files.
 
-So the software state is out of sync with the hardware state. This is a
-bug in the GPY PHY driver.
+Marc
 
-If we look at the generic code, we can see that genphy_config_aneg()
-calls __genphy_config_aneg() which then goes on to call
-genphy_c45_an_config_eee_aneg(). genphy_c45_an_config_eee_aneg()
-writes the current EEE configuration to the PHY.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Now if we look at gpy_config_aneg(), it doesn't do this. Therefore,
-the GPY PHY is retaining its hardware state which is different from
-the software state. This is wrong.
+--dfrlbwylwhzsoyyl
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 2. The 'ethtool --show-eee' command does not display the correct status,
-> even if the link is down or the speed changes to one that does not support
-> EEE.
+-----BEGIN PGP SIGNATURE-----
 
-"eee_enabled" means that the user has enabled EEE. It does not mean the
-hardware is using EEE. It is a user configuration knob to turn EEE
-on/off.
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc1vMIACgkQKDiiPnot
+vG8jmgf9FcKy1/rIq9vQpBZ1lOKeAtlWIbgY9hfsDz/Iml2T5CpJtjkAOV4S11RH
+kIE2WpZU5pm6AqCXEgDVehVLFjVUaz/uGQXXJhxITNEPxsp4QAeV/pz4Gml5Lh1F
+c9kzILRL9QD43YrONxMGNT2meIp+nDIS73PNG6Jf3/Kr/GSv0R8Gfkkjv6I5vlgB
+4lHC2KnLxzj7l7BBCaeXSNkZywEVj+co3IFkKRTWAHJJHtIOefiDI5YiDW8KnyBJ
+0SmXZOC/bhSja2TIjGh1dE71dZFFWcdv0xqxfUckVc+TLnWcYw+iQIhHzwRYYdy5
+BfJNZIEiE8O8Zlr7B9ui0QTCd14LPQ==
+=TMAg
+-----END PGP SIGNATURE-----
 
-"eee_active" reports whether EEE has been negotiated, and thus will be
-made use of.
-
-There has been a lot of misinterpretation of the EEE API, and this is
-one of them - some have thought that "eee_enabled" refers to whether EEE
-has been negotiated, and "eee_active" means that the interface is
-currently in low-power state. This is wrong.
-
-> 3. The tx_lpi_timer in 'ethtool --show-eee' always shows 0 if we have not
-> used 'ethtool --set-eee' to set the values, even though the driver sets
-> different values.
-
-The driver needs to set these when attaching the PHY.
-
-> I appreciate Russell's point that eee_enabled is a user configuration bit,
-> not a status bit. However, I am curious if tx_lpi_timer, tx_lpi_enabled, and
-> other fields are also considered configuration bits.
-
-tx_lpi_timer and tx_lpi_enabled are also user configuration.
-
-> It does not specify which fields are configuration bits and which are status
-> bits.
-
-The documentation is in include/uapi/linux/ethtool.h:
-
- * @eee_active: Result of the eee auto negotiation.
- * @eee_enabled: EEE configured mode (enabled/disabled).
- * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
- *      that eee was negotiated.
- * @tx_lpi_timer: Time in microseconds the interface delays prior to asserting
- *      its tx lpi (after reaching 'idle' state). Effective only when eee
- *      was negotiated and tx_lpi_enabled was set.
-
-and has been for a very long time, yet people in the past have
-implemented it against the documentation, leading to the stupid
-situation where using ethtool --set-eee on one network driver
-works differently to another network driver. This has to stop,
-and by implementing most of the logic for the interface in phylib,
-it means there's less scope for misinterpretation.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--dfrlbwylwhzsoyyl--
 
