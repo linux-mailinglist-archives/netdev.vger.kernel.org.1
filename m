@@ -1,104 +1,115 @@
-Return-Path: <netdev+bounces-145102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A549C9633
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:36:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DBA9C967E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89D99281047
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 23:36:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26A9D283A1C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 23:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDE41B21A0;
-	Thu, 14 Nov 2024 23:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C9B1B3942;
+	Thu, 14 Nov 2024 23:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="OlUtC1IW"
+	dkim=pass (2048-bit key) header.d=castellotti.net header.i=@castellotti.net header.b="ccDvCUP0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from qs51p00im-qukt01072301.me.com (qs51p00im-qukt01072301.me.com [17.57.155.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8395674E
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 23:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511A51B3937
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 23:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731627407; cv=none; b=kEeZv5t3MxdXg8I8+TIQg4r5hWE2OE1Y195TN2SvbTX65HlLiJKLuLEm5pWEWlGZxdUE2mQ1TcXe7fx7bFOKR/VeMTEEPKNjsqVnW9wCER/k10rUOLaOXA85ulRM87kA/tNuIPNWUpu5X9cTD2bPebtsiYE/paLPGOvQfUxkG3Y=
+	t=1731628640; cv=none; b=RnIB2uOmYhof89BMCRaC2vqn05JRtHjO1Pt47IP2eQYO6g3kKjEI0wQ17p37n6DnDxwIaZ2hG2sfRtb43DfT9OkWasOk9Q5fYMckkW6c1pvSv63FbeIooq/86Tf+9BpdCsCradVO40w/Aw935ZAOKrem9ItYhXcAfFwsMCGQOfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731627407; c=relaxed/simple;
-	bh=kbJLT/qMDdSWDsoUBhaua+4Cy3c5O1rs5oyoM6SanBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d21IqAm/yH0MiXJX/tbMnyTTfO16gjNSMrY0dcir6YbUHtUFmE9XdYLlXukBjgzzUlvAVhO3UYL6YFwqL6iFfDy/TRAoB+ck7zE/4c05jrzwXRXgZZzHWV7JSzJnuLPiLMvsDeUNYtBTZ+R9bpupOqAlrSC+P3YV0n1pxf3snzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=OlUtC1IW; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tBjOE-005zIs-Us; Fri, 15 Nov 2024 00:36:42 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=xpYonVJg0vhVI01Htvc+fv0/qPa7fqTcqhpYqG6MZ8g=; b=OlUtC1IWxs5O8wcfhR0IZ31KFD
-	S4o/4FeBmchL5NT0zUVwIfbTklMD4wYnBfreyBpPB62fscYb6knX57dLrp3WoY7G0Y2Og1whSIk2J
-	xxxjQGwveCvt2sky+rbrraAEYVp7N22uCEyybsVoPtYt0TkqxodJShUA5pZmRHvIByxuISI7X6Ijk
-	FxtxHBmihaIiqlXMHS0AWioqn0uMv4aOkXD4b07hSb27YhQ1Mi3RS5UzfO6WYTytbrXvsiqZjTRzr
-	mM+hb5FPNr35qKEgUn53sOZ3Mwe40Nd/5P9RdiSQxSS1K9atACNvOkJxmu4SSdFqmMSIByNVISHv5
-	JrV7h+ig==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tBjOE-00064z-Iz; Fri, 15 Nov 2024 00:36:42 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tBjO8-00B7Cw-V9; Fri, 15 Nov 2024 00:36:37 +0100
-Message-ID: <535b4ef7-3cfb-4816-bd7e-c0fa8725c7f8@rbox.co>
-Date: Fri, 15 Nov 2024 00:36:35 +0100
+	s=arc-20240116; t=1731628640; c=relaxed/simple;
+	bh=4lFOEw1Cuwl0/qLgmCJe5RhGno98lXHPUYNOJ0IfpX8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IH74EVkMyId1EWh4Vkj7ad7UW0eOnM5hO9TQXvDvmfiXoKS3AvHH3RX7D39pS5KKzF9ZMQqHprUvP71bu3JStpaTBRFXxs5kfHtHq5RrLPU+WbFejn6rH+XK+Y83jK4AtXAyj75s/6UOzO1H6rImdh/xcjcmn/+RGbBwSSM/XAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=castellotti.net; spf=pass smtp.mailfrom=castellotti.net; dkim=pass (2048-bit key) header.d=castellotti.net header.i=@castellotti.net header.b=ccDvCUP0; arc=none smtp.client-ip=17.57.155.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=castellotti.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=castellotti.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=castellotti.net;
+	s=sig1; t=1731628636;
+	bh=iSCE/Qi+tv7NDRxH+x0UHfkFAYCL1dJiR18XFW4tY80=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version:
+	 x-icloud-hme;
+	b=ccDvCUP0SWQJCXe6CnHMGpX9Lipo3GhPS/7nfjEkeW8sLC2vvSeQ5zoA/pdiFGrBd
+	 MzX626s6TvubZk5CHJjE1slrOlDMa0Cm5aQ3QuXZ2JdPzuhX4W06Rh1Tx8JYcBKJht
+	 zFzKlZX8mMytx8ZlZHfcj9EzyYXF3uAoEuEbj7JHGO6VjtY4HBDUhAprjJmpYef/Lr
+	 xeoljcOU3SXxUEwBupEsM6BVHasVzamEoqinhYEaGs02rznrsh69NdAA9EmubHlDGb
+	 xFefMwOG6UOmCE/zzMsq+813l1Vtn3wZorBtB3PoJV8uWQS63SV/K8SveLxEV2suwz
+	 z8TWWL4QFpSxA==
+Received: from MSI-Laptop.local (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01072301.me.com (Postfix) with ESMTPSA id 99FDD25401B4;
+	Thu, 14 Nov 2024 23:57:12 +0000 (UTC)
+Message-ID: <799753305484d74cb9d194347743ff986da071d5.camel@castellotti.net>
+Subject: Re: [Intel-wired-lan] [PATCH v2 1/1] ixgbe: Correct BASE-BX10
+ compliance code
+From: Erny <ernesto@castellotti.net>
+Reply-To: 20241114195047.533083-2-tore@amundsen.org
+To: Tore Amundsen <tore@amundsen.org>
+Cc: andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com, davem@davemloft.net, 
+	edumazet@google.com, ernesto@castellotti.net,
+ intel-wired-lan@lists.osuosl.org, 	kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 	pabeni@redhat.com,
+ pmenzel@molgen.mpg.de, przemyslaw.kitszel@intel.com
+Date: Fri, 15 Nov 2024 00:57:10 +0100
+In-Reply-To: <20241114195047.533083-2-tore@amundsen.org>
+References: <ec66b579-90b7-42cc-b4d4-f4c2e906aeb9@molgen.mpg.de>
+	 <20241114195047.533083-1-tore@amundsen.org>
+	 <20241114195047.533083-2-tore@amundsen.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: Make copy_safe_from_sockptr() match
- documentation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-References: <20241111-sockptr-copy-ret-fix-v1-1-a520083a93fb@rbox.co>
- <20241113192924.4f931147@kernel.org>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20241113192924.4f931147@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: Spi5FdVucACLcYERu8XdpffBqfSFfqS6
+X-Proofpoint-ORIG-GUID: Spi5FdVucACLcYERu8XdpffBqfSFfqS6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-14_05,2024-11-14_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=876 bulkscore=0 mlxscore=0
+ phishscore=0 adultscore=0 spamscore=0 suspectscore=0 clxscore=1030
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2411140190
 
-On 11/14/24 04:29, Jakub Kicinski wrote:
-> On Mon, 11 Nov 2024 00:17:34 +0100 Michal Luczaj wrote:
->> copy_safe_from_sockptr()
->>   return copy_from_sockptr()
->>     return copy_from_sockptr_offset()
->>       return copy_from_user()
->>
->> copy_from_user() does not return an error on fault. Instead, it returns a
->> number of bytes that were not copied. Have it handled.
->>
->> Fixes: 6309863b31dd ("net: add copy_safe_from_sockptr() helper")
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> Patch has a side effect: it un-breaks garbage input handling of
->> nfc_llcp_setsockopt() and mISDN's data_sock_setsockopt().
-> 
-> I'll move this to the commit message, it's important.
-> 
-> Are you planning to scan callers of copy_from_sockptr() ?
-> I looked at 3 callers who save the return value, 2 of them are buggy :S
+On Thu, 2024-11-14 at 19:50 +0000, Tore Amundsen wrote:
+> The current value in the source code is 0x64, which appears to be a
+> mix-up of hex and decimal values. A value of 0x64 (binary 01100100)
+> incorrectly sets bit 2 (1000BASE-CX) and bit 5 (100BASE-FX) as well.
+> ---
+> =C2=A0drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> index 14aa2ca51f70..81179c60af4e 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> @@ -40,7 +40,7 @@
+> =C2=A0#define IXGBE_SFF_1GBASESX_CAPABLE		0x1
+> =C2=A0#define IXGBE_SFF_1GBASELX_CAPABLE		0x2
+> =C2=A0#define IXGBE_SFF_1GBASET_CAPABLE		0x8
+> -#define IXGBE_SFF_BASEBX10_CAPABLE		0x64
+> +#define IXGBE_SFF_BASEBX10_CAPABLE		0x40
+> =C2=A0#define IXGBE_SFF_10GBASESR_CAPABLE		0x10
+> =C2=A0#define IXGBE_SFF_10GBASELR_CAPABLE		0x20
+> =C2=A0#define IXGBE_SFF_SOFT_RS_SELECT_MASK		0x8
 
-Sure, I took a look:
-https://lore.kernel.org/netdev/20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co/
-Have I missed anything?
+LGMT.
 
-Thanks,
-Michal
+Acked-by: Ernesto Castellotti <ernesto@castellotti.net>
+
+Kind regards,
+
+Ernesto
+
 
 
