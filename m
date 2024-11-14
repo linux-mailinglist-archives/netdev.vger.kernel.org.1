@@ -1,255 +1,116 @@
-Return-Path: <netdev+bounces-144724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A12BC9C84A6
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:12:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 672C49C84B6
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25EF21F22AAE
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:12:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA21EB27834
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B285D1F754F;
-	Thu, 14 Nov 2024 08:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6DD1F5839;
+	Thu, 14 Nov 2024 08:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Jkz0aoep"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SQqRICgh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3F51F7088
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3954E146588;
+	Thu, 14 Nov 2024 08:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731571899; cv=none; b=Ipyi+QgC6+Iom09IWaHgGkMex6NtqKlYpbUuHeIOfBKK5o73Nz33QJGgH4G9Z2D4fEfQxTMMh5AwE39P09gzhrpOCx4T5WXiGZ9HNSl046HghRN+puLhZt5NW5Qc0aV2hvXXXZeq2kAmZrN9lxvxAl4t07QtJQ1nYDx/mReWwn4=
+	t=1731572250; cv=none; b=YEpcW/2rND+tBEy0SrALJ3fDE3DuT6iusWL1sEPBy+zYF0+5oMHbtZfMzJeov9uEUjzz4lWgfnk25byLMdkqCXy0j7OzIzeZjVaBGzRB8S9M1+zwvJVPKQYfcN/WEoBtjU3RCHWATgXAYcCeX8gyYLsUxJQw4QZ4Cn8Nmcd5jfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731571899; c=relaxed/simple;
-	bh=dbIbz3t0cEpW3r7Wy8SR6AhtdgpUROKxXtAsVLqqPLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MGuxj6nHNDD5tC4G7exfZ2rJsP3tc3AWGiPHRUkRb/rJAOs+3sDQPLh60pJWXHuyyu2Y+29L0rGmeTzqNf10lUou1ET7Yi6ObdKaIISUgxMhg4/O3AYfaZybGIRQ4QJ0OZNb1knqnQUaFbsVVH3Bmp8n5eY6XBn6UG78uTSzkLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Jkz0aoep; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5cf6f367f97so435226a12.0
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 00:11:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1731571896; x=1732176696; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lhi2XcdyoNb77R//XCSb7tUnf+SSZyDwvqz+0gWmS2A=;
-        b=Jkz0aoepK2Sj+XF2zGM3m4zzdxjKczXv2SqcpKrUswJOjeurexlOFdeH5NR4KlHAcb
-         GEJ6Xwy+p4KTeD2in8Fo+ro2f/ICS8+knYwWmHXtoNkV9+8GMoe3kAVytnyaODvc15Gn
-         AVAC0183dhrLUGC7ndFvef3TXmTJ609i/ch4ddgne4Dmhtm82X+SLy+fQ6jpkcnXrIns
-         qGmCs9Vi2E6mTcBBDv9qdc1gEH4u+m//q+wNT1zeAH3WFG4MNEDxA1zNFOUooWNRn7xE
-         rKyZv1YMkhtIyeWL4AhGkqNYc9gAJl5uzTIAKuBZJ/7omyCv3WqHiFKxtQK3mbM/J3zL
-         sceA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731571896; x=1732176696;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lhi2XcdyoNb77R//XCSb7tUnf+SSZyDwvqz+0gWmS2A=;
-        b=lDMRB2mA0mIeei3bVbPApm5pTptBsoA11EATR3TRmB8wKKwgcqlfAjAoAgWk3Nau7+
-         mrcYyrOWfduBOYeLKaB7iDFKeI7jpYHhRxdfzAoJFIRKlW9IjSkG2EKDmpZLjHOtvI6T
-         MRbsQNKDRYr7msyoCX4QVRf15n/Vl/pIoZop5RmKN/wn7xCjVmBLCekKBooqkwpgkrhN
-         mI8FeBNx0ErYQ/hCHmeulcwogUg0psDkcQUHepbxccUcqVIfRPdEVMXnxjajuyGFp48f
-         iKA1L9FJ2Q9Qbj+km1WdMGpk73jkznKlLjiBmYVVnevrkcTaC94Prp3rZSq0Z3n8NAPz
-         1JYw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5Pc8naTwYvTDyqy5hdi9DX96RNGMroetso4LyIZYgMO9nUBWKa830J0GCKsda/VjAp0w0VHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYvlwobj5Of25relpz1aCN44mYhuAKehDG2ZxAl9fhpZh344Io
-	65uS1UH1E90AFVs/+fUM66jPMOEaqXHMWnRtAvj62epXdE7gB7ORadhYmbtDVBU=
-X-Google-Smtp-Source: AGHT+IHn8GzlUpFSwlHPxZF4Bet/aeH5Llo7f+cI3x6kBTlWSqRynAOg9Usx4t4FBNGnpyRoDEnKxA==
-X-Received: by 2002:a17:907:5cb:b0:a9a:1792:f1a with SMTP id a640c23a62f3a-aa1f8043f6amr520374466b.7.1731571895602;
-        Thu, 14 Nov 2024 00:11:35 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:3779:22d5:a322:7c13? ([2001:67c:2fbc:1:3779:22d5:a322:7c13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20dffd782sm33977466b.129.2024.11.14.00.11.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 00:11:35 -0800 (PST)
-Message-ID: <2a90f702-3061-46b6-aafa-cf8c1ba3d0de@openvpn.net>
-Date: Thu, 14 Nov 2024 09:12:01 +0100
+	s=arc-20240116; t=1731572250; c=relaxed/simple;
+	bh=LzcUFYSQKL3vPxB47TGpPrctgQCVXb4LxxKzcyPBE3c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZT5eEOwmvi97qL6Lfg26PIRLIUVkDNxFEGoIgsqbOO1nKx1iGIFSMw+sPlQ5OJ6R14cAif4J7bLBzwgd+e9QpKDyGafKHwdKnSe2VNaBHLkqHflYEfkNdfUwwxyRGwC8ZVwnDlXQIGLlXIVLk8lmPynGyMlKo09jo4tBYReHFJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SQqRICgh; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731572249; x=1763108249;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LzcUFYSQKL3vPxB47TGpPrctgQCVXb4LxxKzcyPBE3c=;
+  b=SQqRICghT1r0Cku+l2d7KcdK9LVt3FaZcL0emOD/1aeJ9Ajbbhnna6Rz
+   EFU7YuHWKt1/ItvrBmt907LEgeMtOKpHxOJBwLjU5Cm59NPKnizSNJW70
+   KZzoJATmSBD7F0wVDJmXXJKgFemflkIwtj4Y+Q4RgzjB6UtYU3Kud1vCQ
+   mQVVeZD5kU3L8uHAWGJXISsgX2SBiPoCilB1WFWw5jLpefzF9EIlqSlm4
+   sUwUpSv3SwoxN/DdQTcLTlzFCKHFf0VwA9wzbh45BveS5WSqFw2sltIPU
+   msjeYRrANf1jcmJ+Aix3+Duap3e0+m6wHMPTWZOIoGOYbnHduc7SJT8rw
+   A==;
+X-CSE-ConnectionGUID: kVhP0Y0kRFihhWH6TCYp9Q==
+X-CSE-MsgGUID: k40BXLbzSqamVcUEpS0ixw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11255"; a="42921246"
+X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
+   d="scan'208";a="42921246"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2024 00:17:28 -0800
+X-CSE-ConnectionGUID: Lvz13PUNTQi3AKSD7udmqQ==
+X-CSE-MsgGUID: d9mnhq+6T1mq86CnPiONVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
+   d="scan'208";a="88553858"
+Received: from unknown (HELO YongLiang-Ubuntu20-iLBPG12.png.intel.com) ([10.88.229.33])
+  by fmviesa010.fm.intel.com with ESMTP; 14 Nov 2024 00:17:24 -0800
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net v1 0/2] Fix 'ethtool --show-eee' during initial stage
+Date: Thu, 14 Nov 2024 16:16:51 +0800
+Message-Id: <20241114081653.3939346-1-yong.liang.choong@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net> <ZypfnyfToF1b6YAZ@hog>
- <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net> <ZzSBG-RPUlpgVFhA@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <ZzSBG-RPUlpgVFhA@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 13/11/2024 11:36, Sabrina Dubroca wrote:
-> 2024-11-12, 14:20:45 +0100, Antonio Quartulli wrote:
->> On 05/11/2024 19:10, Sabrina Dubroca wrote:
->>> 2024-10-29, 11:47:28 +0100, Antonio Quartulli wrote:
->>>> @@ -105,6 +132,9 @@ void ovpn_decrypt_post(void *data, int ret)
->>>>    		goto drop;
->>>>    	}
->>>> +	/* keep track of last received authenticated packet for keepalive */
->>>> +	peer->last_recv = ktime_get_real_seconds();
->>>
->>> It doesn't look like we're locking the peer here so that should be a
->>> WRITE_ONCE() (and READ_ONCE(peer->last_recv) for all reads).
->>
->> Is that because last_recv is 64 bit long (and might be more than one word on
->> certain architectures)?
->>
->> I don't remember having to do so for reading/writing 32 bit long integers.
-> 
-> AFAIK it's not just that. The compiler is free to do the read/write in
-> any way it wants when you don't specify _ONCE. On the read side, it
-> could read from memory a single time or multiple times (getting
-> possibly different values each time), or maybe split the load
-> (possibly reading chunks from different values being written in
-> parallel).
+The commit 49168d1980e2 
+("net: phy: Add phy_support_eee() indicating MAC support EEE") introduced
+phy_support_eee() to set eee_cfg.tx_lpi_enabled and eee_cfg.eee_enabled to
+true as the default value. However, not all PHYs have EEE enabled by default.
+For example, Marvell PHYs are designed to have EEE hardware disabled during
+the initial state, and it needs to be configured to turn it on again.
 
-Ok, thanks. Will switch to WRITE/READ_ONE then.
+When the MAC boots up with a Marvell PHY and phy_support_eee() is implemented,
+the 'ethtool --show-eee' command shows that EEE is enabled, but in actuality,
+the driver side is disabled. If we try to enable EEE through
+'ethtool --set-eee' for a Marvell PHY, nothing happens because the eee_cfg
+matches the setting required to enable EEE in ethnl_set_eee().
 
-> 
->> I presume we need a WRITE_ONCE also upon initialization in
->> ovpn_peer_keepalive_set() right?
->> We still want to coordinate that with other reads/writes.
-> 
-> I think it makes sense, yes.
+This patch series will read the PHY configuration and set it as the initial
+value for eee_cfg.tx_lpi_enabled and eee_cfg.eee_enabled, allowing
+'ethtool --show-eee' to display the correct value during the initial stage.
 
-ACK
+Choong Yong Liang (2):
+  net: phy: set eee_cfg based on PHY configuration
+  net: stmmac: set initial EEE policy configuration
 
-[...]
-> 
->>>> +	/* check for peer timeout */
->>>> +	expired = false;
->>>> +	timeout = peer->keepalive_timeout;
->>>> +	delta = now - peer->last_recv;
->>>
->>> I'm not sure that's always > 0 if we finish decrypting a packet just
->>> as the workqueue starts:
->>>
->>>     ovpn_peer_keepalive_work
->>>       now = ...
->>>
->>>                                          ovpn_decrypt_post
->>>                                            peer->last_recv = ...
->>>
->>>     ovpn_peer_keepalive_work_single
->>>       delta: now < peer->last_recv
->>>
->>
->> Yeah, there is nothing preventing this from happening...but is this truly a
->> problem? The math should still work, no?
-> 
-> We'll fail "delta < timeout" (which we shouldn't), so we'll end up
-> either in the "expired = true" case, or not updating
-> keepalive_recv_exp. Both of these seem not ideal.
-
-delta is signed, so it'll end up being a negative value and "delta < 
-timeout" should not fail then. Unless I am missing something.
-
-Anyway, this was just an exercise to understand what was going on.
-I already changed the code as per your suggestion (the fact that we are 
-still discussing this chunk proves that it needed to be simplified :))
-
-> 
->>
->> However:
->>
->>>
->>>
->>>> +	if (delta < timeout) {
->>>> +		peer->keepalive_recv_exp = now + timeout - delta;
->>>
->>> I'd shorten that to
->>>
->>>       peer->keepalive_recv_exp = peer->last_recv + timeout;
->>>
->>> it's a bit more readable to my eyes and avoids risks of wrapping
->>> values.
->>>
->>> So I'd probably get rid of delta and go with:
->>>
->>>       last_recv = READ_ONCE(peer->last_recv)
->>>       if (now < last_recv + timeout) {
->>>       	peer->keepalive_recv_exp = last_recv + timeout;
->>>       	next_run1 = peer->keepalive_recv_exp;
->>>       } else if ...
->>>
->>>> +		next_run1 = peer->keepalive_recv_exp;
->>>> +	} else if (peer->keepalive_recv_exp > now) {
->>>> +		next_run1 = peer->keepalive_recv_exp;
->>>> +	} else {
->>>> +		expired = true;
->>>> +	}
->>
->> I agree this is simpler to read and gets rid of some extra operations.
->>
->> [note: I took inspiration from nat_keepalive_work_single() - it could be
->> simplified as well I guess]
-> 
-> Ah, ok. I wanted to review this code when it was posted but didn't
-> have time :(
-
-It can still be fixed ;)
-
-
-Thanks.
-Regards,
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ drivers/net/phy/phy_device.c                      | 7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.34.1
 
 
