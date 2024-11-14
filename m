@@ -1,236 +1,148 @@
-Return-Path: <netdev+bounces-144640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B459C8017
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 02:40:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FBF19C801A
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 02:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5558928383D
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 01:40:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E771B2351C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 01:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09581E500F;
-	Thu, 14 Nov 2024 01:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="I0SqJsqx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C6F2EAE4;
+	Thu, 14 Nov 2024 01:41:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75F51E3DD8;
-	Thu, 14 Nov 2024 01:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA772309B8
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731548416; cv=none; b=fXPDssCkQoC5e1+1gms2JSKvzsADkUA2oCF1Hmn6mIlJxZEdzXa23lEN5Lk2BTh+VVpQYOBEzipQlFU6M+dIsyeN08KA2cSoSef7y1+xgBzb4nrtFhBStjUAHqigZCM9nR3BV+7cKRrpQkAMxqUqxEJyoirlIF4TbiRfzfnuA1w=
+	t=1731548485; cv=none; b=P6kKugyi72pr5HzBUlSDWISQUdA7CA8vJNMBHTj/QO8nI5c1ytZdWUw7Gxvuqgf6znZjuZpRUwhHeGI8BkuCYGzwgbCalncRf0o/15lMNVdc/zgmcvqy1HIpddzAdbiyp4qIjjxe7mRFgnBSfInkByxNBd9+1clvWYzDi8cIeac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731548416; c=relaxed/simple;
-	bh=cU45uoLxwMlXc6cOPxZY6RiC71jcMhO9rfhrmJp8YWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JhADH4vRFWlbMRbWrCzPj8O3YiB56ngw+1VxsQQq6RDh7niY/Z4WS6f/1kA5t5kM/AqZE/s7mI12OTT8gHZVyjNuY+ZvO7pUEz9cY9H8P94kAICQQyNrpPzXmPuEDL8bzjkKsP714N78qdPljWTYVrTKfEC7kLORYnlv61NzbQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=I0SqJsqx; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1731548405; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=Ltl5k40jpmW1C9WKnmciGeeLcfTplcqonRFnFzBJ50s=;
-	b=I0SqJsqxfvohs37YaOwHgPMoRG2po8YlO2G1B7EQ2YDwkwor3Ah0b1PZB9hVk38sLx+1An6uNrkuUDwjn2A+sRhsn9jRz1dIlHdPtZaTKyBRzAe8w8p274PMZunFWy8kMqrKaFnnoTJKJiCaPcAB3RKOXslK1BWhsLbTWdAwhfs=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WJMObH1_1731548404 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 14 Nov 2024 09:40:05 +0800
-Date: Thu, 14 Nov 2024 09:40:04 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [PATCH net-next 1/3] net/smc: refactoring lgr pending lock
-Message-ID: <20241114014004.GE89669@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20241113071405.67421-1-alibuda@linux.alibaba.com>
- <20241113071405.67421-2-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1731548485; c=relaxed/simple;
+	bh=/sGVijHRI1ahXnEl7R2BFYaEqtSGhStIZ15Iu0wSW2I=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=u28fXMgb4BMo9EW961IbUpu2mLsK13/TPaU1+vWrSCzt2jJfZ5aUxQ/5Aees/5Vfu1GJZ2Ogva6ANXb2Y1xkgBs4Zbys9+3lDDy7mBKSxW0DA8cQPxR/w6RO9SgySLjxxSerRte70gXmaO/UeiUAIKmIOf3mfmCS6hbgPoWQszo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XpjVJ3sBGz1V47X;
+	Thu, 14 Nov 2024 09:38:48 +0800 (CST)
+Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 713ED14037E;
+	Thu, 14 Nov 2024 09:41:18 +0800 (CST)
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 14 Nov 2024 09:41:17 +0800
+Message-ID: <06a0b358-d2f3-4248-82fb-7f599a2200a0@huawei.com>
+Date: Thu, 14 Nov 2024 09:41:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241113071405.67421-2-alibuda@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: Fix icmp host relookup triggering ip_rt_bug
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>
+References: <20241111123915.3879488-1-dongchenchen2@huawei.com>
+ <ZzK5A9DDxN-YJlsk@gondor.apana.org.au>
+ <8acfac66-bd2f-44a0-a113-89951dcfd2d3@huawei.com>
+ <ZzLWcxskwi9e_bPf@gondor.apana.org.au>
+ <9b9c7edf-fa68-465e-a960-0fe07773ba82@huawei.com>
+ <97456f7d-83f3-404c-bc42-0a5f00af023e@huawei.com>
+In-Reply-To: <97456f7d-83f3-404c-bc42-0a5f00af023e@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemd100023.china.huawei.com (7.221.188.33)
 
-On 2024-11-13 15:14:03, D. Wythe wrote:
->This patch replaces the locking and unlocking of lgr pending with
->a unified inline function, and since the granularity of lgr pending
->lock is within the lifecycle of init_info, which make it possible
->to record the lock state on init_info, which provides a potential
->functionality for multiple unlocks without triggering exceptions, which
 
-Since we already have lockdep, I am skeptical about the usefulness of
-this feature.
+On 2024/11/13 22:19, dongchenchen (A) wrote:
+>
+> On 2024/11/13 22:13, dongchenchen (A) wrote:
+>>>> If skb_in is outbound, fl4_dec.saddr is not nolocal. It may be no 
+>>>> input
+>>>> route from B to A for
+>>>>
+>>>> first communication.
+>>> You're right.  So the problem here is that for the case of A
+>>> being local, we should not be taking the ip_route_input code
+>>> path (this is intended for forwarded packets).
+>>>
+>>> In fact if A is local, and we're sending an ICMP message to A,
+>>> then perhaps we could skip the IPsec lookup completely and just
+>>> do normal routing?
+>>>
+>>> Steffen, what do you think?
+>>>
+>>> So I think it boils down to two choices:
+>>>
+>>> 1) We could simply drop IPsec processing if we notice that A
+>>> (fl.fl4_dst) is local;
+>>
+>> Hi, Herbert! Thanks for your suggestions very much.
+>>
+>> maybe we can fix it as below:
+>> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+>> index e1384e7331d8..5f63c4dde4e9 100644
+>> --- a/net/ipv4/icmp.c
+>> +++ b/net/ipv4/icmp.c
+>> @@ -517,7 +517,9 @@ static struct rtable *icmp_route_lookup(struct 
+>> net *net,
+>>                           flowi4_to_flowi(fl4), NULL, 0);
+>>         rt = dst_rtable(dst);
+>>         if (!IS_ERR(dst)) {
+>> -               if (rt != rt2)
+>> +               unsigned int addr_type = 
+>> inet_addr_type_dev_table(net, route_lookup_dev, fl4->daddr);
+>> +               if (rt != rt2 || addr_type == RTN_LOCAL)
+>>                         return rt;
+>>         } else if (PTR_ERR(dst) == -EPERM) {
+>>                 rt = NULL;
+>>> 2) Or we could take the __ip_route_output_key code path and
+>>> continue to do the xfrm lookup when A is local.
+>
+> sorry,  resend it due to format problems
+>
+> If only skip input route lookup as below, xfrm_lookup check may return 
+> ENOENT
+> for no xfrm pol or dst nofrm flag.
 
->creates conditions to reduce the scope of locks in the future.
+Sorry, I misunderstood earlier.
+it's correct to return ENOENT here.
+The difference from the above is:
+If A is local, rt1->dst->dev is lo (fl4->dst is A),
+rt2->dst->dev is actual dev selected by daddr B(fl4_2->dst is B)
 
 >
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->---
-> net/smc/af_smc.c   | 24 ++++++++++++------------
-> net/smc/smc_core.h | 29 +++++++++++++++++++++++++++++
-> 2 files changed, 41 insertions(+), 12 deletions(-)
+> @@ -543,6 +544,10 @@ static struct rtable *icmp_route_lookup(struct 
+> net *net,
+>                         err = PTR_ERR(rt2);
+>                         goto relookup_failed;
+>                 }
+> +
+> +               unsigned int addr_type = inet_addr_type_dev_table(net, 
+> route_lookup_dev, fl4->daddr);
+> +               if (addr_type == RTN_LOCAL)
+> +                       goto relookup;
+>                 /* Ugh! */
+>                 orefdst = skb_in->_skb_refdst; /* save old refdst */
 >
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index 9d76e902fd77..19480d8affb0 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -1251,10 +1251,10 @@ static int smc_connect_rdma(struct smc_sock *smc,
-> 	if (reason_code)
-> 		return reason_code;
-> 
->-	mutex_lock(&smc_client_lgr_pending);
->+	smc_lgr_pending_lock(ini, &smc_client_lgr_pending);
-> 	reason_code = smc_conn_create(smc, ini);
-> 	if (reason_code) {
->-		mutex_unlock(&smc_client_lgr_pending);
->+		smc_lgr_pending_unlock(ini);
-> 		return reason_code;
-> 	}
-> 
->@@ -1343,7 +1343,7 @@ static int smc_connect_rdma(struct smc_sock *smc,
-> 		if (reason_code)
-> 			goto connect_abort;
-> 	}
->-	mutex_unlock(&smc_client_lgr_pending);
->+	smc_lgr_pending_unlock(ini);
-> 
-> 	smc_copy_sock_settings_to_clc(smc);
-> 	smc->connect_nonblock = 0;
->@@ -1353,7 +1353,7 @@ static int smc_connect_rdma(struct smc_sock *smc,
-> 	return 0;
-> connect_abort:
-> 	smc_conn_abort(smc, ini->first_contact_local);
->-	mutex_unlock(&smc_client_lgr_pending);
->+	smc_lgr_pending_unlock(ini);
-> 	smc->connect_nonblock = 0;
-> 
-> 	return reason_code;
->@@ -1412,10 +1412,10 @@ static int smc_connect_ism(struct smc_sock *smc,
-> 	ini->ism_peer_gid[ini->ism_selected].gid = ntohll(aclc->d0.gid);
-> 
-> 	/* there is only one lgr role for SMC-D; use server lock */
->-	mutex_lock(&smc_server_lgr_pending);
->+	smc_lgr_pending_lock(ini, &smc_server_lgr_pending);
-> 	rc = smc_conn_create(smc, ini);
-> 	if (rc) {
->-		mutex_unlock(&smc_server_lgr_pending);
->+		smc_lgr_pending_unlock(ini);
-> 		return rc;
-> 	}
-> 
->@@ -1446,7 +1446,7 @@ static int smc_connect_ism(struct smc_sock *smc,
-> 				  aclc->hdr.version, eid, ini);
-> 	if (rc)
-> 		goto connect_abort;
->-	mutex_unlock(&smc_server_lgr_pending);
->+	smc_lgr_pending_unlock(ini);
-> 
-> 	smc_copy_sock_settings_to_clc(smc);
-> 	smc->connect_nonblock = 0;
->@@ -1456,7 +1456,7 @@ static int smc_connect_ism(struct smc_sock *smc,
-> 	return 0;
-> connect_abort:
-> 	smc_conn_abort(smc, ini->first_contact_local);
->-	mutex_unlock(&smc_server_lgr_pending);
->+	smc_lgr_pending_unlock(ini);
-> 	smc->connect_nonblock = 0;
-> 
-> 	return rc;
->@@ -2478,7 +2478,7 @@ static void smc_listen_work(struct work_struct *work)
-> 	if (rc)
-> 		goto out_decl;
-> 
->-	mutex_lock(&smc_server_lgr_pending);
->+	smc_lgr_pending_lock(ini, &smc_server_lgr_pending);
-> 	smc_close_init(new_smc);
-> 	smc_rx_init(new_smc);
-> 	smc_tx_init(new_smc);
->@@ -2497,7 +2497,7 @@ static void smc_listen_work(struct work_struct *work)
-> 
-> 	/* SMC-D does not need this lock any more */
-> 	if (ini->is_smcd)
->-		mutex_unlock(&smc_server_lgr_pending);
->+		smc_lgr_pending_unlock(ini);
-> 
-> 	/* receive SMC Confirm CLC message */
-> 	memset(buf, 0, sizeof(*buf));
->@@ -2528,7 +2528,7 @@ static void smc_listen_work(struct work_struct *work)
-> 					    ini->first_contact_local, ini);
-> 		if (rc)
-> 			goto out_unlock;
->-		mutex_unlock(&smc_server_lgr_pending);
->+		smc_lgr_pending_unlock(ini);
-> 	}
-> 	smc_conn_save_peer_info(new_smc, cclc);
-> 
->@@ -2544,7 +2544,7 @@ static void smc_listen_work(struct work_struct *work)
-> 	goto out_free;
-> 
-> out_unlock:
->-	mutex_unlock(&smc_server_lgr_pending);
->+	smc_lgr_pending_unlock(ini);
-> out_decl:
-> 	smc_listen_decline(new_smc, rc, ini ? ini->first_contact_local : 0,
-> 			   proposal_version);
->diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
->index 69b54ecd6503..5abe9438772c 100644
->--- a/net/smc/smc_core.h
->+++ b/net/smc/smc_core.h
->@@ -432,6 +432,8 @@ struct smc_init_info {
-> 	u8			ism_offered_cnt; /* # of ISM devices offered */
-> 	u8			ism_selected;    /* index of selected ISM dev*/
-> 	u8			smcd_version;
->+	/* mutex holding for conn create */
->+	struct mutex *mutex;
-> };
-> 
-> /* Find the connection associated with the given alert token in the link group.
->@@ -600,6 +602,33 @@ int smcr_nl_get_lgr(struct sk_buff *skb, struct netlink_callback *cb);
-> int smcr_nl_get_link(struct sk_buff *skb, struct netlink_callback *cb);
-> int smcd_nl_get_lgr(struct sk_buff *skb, struct netlink_callback *cb);
-> 
->+static inline void smc_lgr_pending_lock(struct smc_init_info *ini, struct mutex *lock)
->+{
->+	if (unlikely(ini->mutex))
->+		pr_warn_once("smc: lgr pending deadlock dected.");
->+
->+	mutex_lock(lock);
->+	ini->mutex = lock;
->+}
->+
->+/* It will save the locking status of the ini, which provides a potential functionality
->+ * for multiple unlocks without triggering exceptions. This creates conditions
->+ * to reduce the scope of locks in the future.
->+ */
->+static inline void smc_lgr_pending_unlock(struct smc_init_info *ini)
->+{
->+	/* tempory */
->+	struct mutex *lock;
->+
->+	/* already unlock it, just return */
->+	if (!ini->mutex)
->+		return;
->+
->+	lock = ini->mutex;
->+	ini->mutex = NULL;
->+	mutex_unlock(lock);
->+}
->+
-> static inline struct smc_link_group *smc_get_lgr(struct smc_link *link)
-> {
-> 	return link->lgr;
->-- 
->2.45.0
+> xfrm_lookup
+>     xfrm_lookup_with_ifid
+>         if (!if_id && ((dst_orig->flags & DST_NOXFRM) ||
+>             !net->xfrm.policy_count[XFRM_POLICY_OUT]))
+>             goto nopol;
 >
 
