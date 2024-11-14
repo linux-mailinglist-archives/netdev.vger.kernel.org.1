@@ -1,99 +1,69 @@
-Return-Path: <netdev+bounces-144654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFF519C80F1
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:44:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E00A79C80FF
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56267B22678
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 02:44:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1642281111
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 02:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6341E47D8;
-	Thu, 14 Nov 2024 02:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA40560B8A;
+	Thu, 14 Nov 2024 02:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TfE4F3bv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmj28HLf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F391F95E;
-	Thu, 14 Nov 2024 02:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07FB6AAD;
+	Thu, 14 Nov 2024 02:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731552250; cv=none; b=gvqK2Rl0Zm+O6SsYxsV8TadFO39C5JuLohCm4a0iKGT7pHvB8tRklQZ+qSxMAhsVagaXOKob8cBlIYwMWnFECbYYKK1gd9w+nbvozjnuTaqkm/hAOkdxlzEzDuAwy5WnBX3vNZQb3a4rQ8L2NZRevL95IdWk7rU9VSESyPXFoWs=
+	t=1731552457; cv=none; b=cThrSj/akN3N0QgUgfQoD6YfywZ35bRTOQukCOfMo12rqUQl8bY8915TI815UXsSqI5/5duAt4MZlieXztigakVlJE8BN88oYI7cZkI1Nvc2hNtTRiE4QdT3vO9Kwc6G1PZf3pjw+Zx6uVnhFFtvoBPH2D2vKkTJY/LAbP4u/u0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731552250; c=relaxed/simple;
-	bh=uz4BvHry2OIBxHXKpoYAvuwAW6z/sT0uTHKiAHUVu5w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lB40ng8yyXEcqgqE0vAc6Sp/B2CozT3XjGlhX92KFhHokzbyKVkq7lCRgRQLA4owNURAXM0HIsS3QoXpICEs0S1eHzs1YMiXcP0vwAKH8ZCfDxJyx35f5J9tfWLw9wbkzwmsWOadkOxtx0Ydkx3IOKF9sEkLNq15LvEnI+2ZArk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TfE4F3bv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L/1LctONlRs6ejZ2L1vwCuAoDhET8UPNZjALGIfAqzU=; b=TfE4F3bvXonw4tJC3R7tFonS5w
-	FEWiAxcvIqdiCz+oXMnSOkOf5BGa74Nk4aCXjcMl/O1ddNvFcVHnahhkXbwhZAKsU5VgVVRPwSpsC
-	9UamXzf2rs1ijyF9JV7AYt1fTo7SbMo6eTOSS4Iov2jQIQgKirn8d7SVu1oMO596nY44=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tBPpp-00DEfS-Ut; Thu, 14 Nov 2024 03:43:53 +0100
-Date: Thu, 14 Nov 2024 03:43:53 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
-	"ratbert@faraday-tech.com" <ratbert@faraday-tech.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: =?utf-8?B?5Zue6KaG?= =?utf-8?Q?=3A?= [net-next 3/3] net:
- ftgmac100: Support for AST2700
-Message-ID: <e06668bf-f878-4a81-9f52-8fd047c1921c@lunn.ch>
-References: <20241107111500.4066517-1-jacky_chou@aspeedtech.com>
- <20241107111500.4066517-4-jacky_chou@aspeedtech.com>
- <1f8b0258-0d09-4a65-8e1c-46d9569765bf@lunn.ch>
- <SEYPR06MB5134FCCB102F13EA968F81869D5B2@SEYPR06MB5134.apcprd06.prod.outlook.com>
+	s=arc-20240116; t=1731552457; c=relaxed/simple;
+	bh=ckLeLN0G88iRttmSUjcB3Pw3BO4IJmRq3+6rgv4qs5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sZkjsPd8hvIyo0IMk1/uD4kGnq2Ts/+PLM+jou2WanvcvHGL76SUQ5RCNWZ5zX83rsKfz+xmOku4CsrOuw9rlcFZf9uqgPUSxJRw6KCd115CVQt7AQVLoUdSWknhWsu4bIhE6d1s7nuTtItpKZjsZjh6e+6cxI1La8qSU/6lKRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmj28HLf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 868BCC4CEC3;
+	Thu, 14 Nov 2024 02:47:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731552457;
+	bh=ckLeLN0G88iRttmSUjcB3Pw3BO4IJmRq3+6rgv4qs5s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rmj28HLf2QpcYxrxbQA7zRQk5binGaFoBuytF5qnLreolqhpO4yyyAPnrrL3zGmWz
+	 xCfYXGE+wHNrYYmMFy6jnDGYd07TgqHOXf9ghcBpRiZmYizXb5JK7i+XquC/1IN6Ju
+	 o46HbzbRKtgfTjDH5vcOjLKwz2XTTqKJ5K9RTpy0SUoaLYXjgM+5SEAhAh3UfXDNoh
+	 HrzYEIdiLZDbe/5+w8+EQ/eiLt0guV8N8tXOcgZEtEIi1Ef7EK6AEypUt3c4EdJTrA
+	 86UJgAVcFo2nAsKTzGQS+0kUO9V/NJlSStPD3s+VebOvMmi3xMWQqEk88FceEVeUjv
+	 5Q6Tin2UnuHzg==
+Date: Wed, 13 Nov 2024 18:47:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+ mkarsten@uwaterloo.ca, "David S. Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org (open list), Mina Almasry
+ <almasrymina@google.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [net v2 0/2] Fix rcu_read_lock issues in netdev-genl
+Message-ID: <20241113184735.28416e41@kernel.org>
+In-Reply-To: <20241113021755.11125-1-jdamato@fastly.com>
+References: <20241113021755.11125-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SEYPR06MB5134FCCB102F13EA968F81869D5B2@SEYPR06MB5134.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > > -	map = le32_to_cpu(rxdes->rxdes3);
-> > > +	map = le32_to_cpu(rxdes->rxdes3) | ((rxdes->rxdes2 &
-> > > +FTGMAC100_RXDES2_RXBUF_BADR_HI) << 16);
-> > 
-> > Is this safe? You have to assume older generation of devices will return 42 in
-> > rxdes3, since it is not used by the hardware.
-> 
-> Why does it need to return 42 in rxdes3?
-> The packet buffer address of the RX descriptor is used in both software and hardware.
+On Wed, 13 Nov 2024 02:17:50 +0000 Joe Damato wrote:
+> base-commit: a58f00ed24b849d449f7134fd5d86f07090fe2f5
 
-42 is just a random value. The point is, what do older generation of
-devices return here? Some random value? Something well defined?
-
-You basically need to convince us that you are not breaking older
-systems by accessing registers which they do not have. Describe in the
-commit message how you know this is safe, what testing you have done
-etc.
-
-	Andrew
-
-
+which is a net-next commit.. please rebase on net
 
