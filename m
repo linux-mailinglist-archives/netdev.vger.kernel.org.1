@@ -1,148 +1,137 @@
-Return-Path: <netdev+bounces-144641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FBF19C801A
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 02:41:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE8E9C8022
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 02:44:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E771B2351C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 01:41:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20261F24680
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 01:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C6F2EAE4;
-	Thu, 14 Nov 2024 01:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0EA1E3799;
+	Thu, 14 Nov 2024 01:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fqCvG48T"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA772309B8
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CB31C1AA9;
+	Thu, 14 Nov 2024 01:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731548485; cv=none; b=P6kKugyi72pr5HzBUlSDWISQUdA7CA8vJNMBHTj/QO8nI5c1ytZdWUw7Gxvuqgf6znZjuZpRUwhHeGI8BkuCYGzwgbCalncRf0o/15lMNVdc/zgmcvqy1HIpddzAdbiyp4qIjjxe7mRFgnBSfInkByxNBd9+1clvWYzDi8cIeac=
+	t=1731548662; cv=none; b=gP6dpBciRkaJeaspm9WtS8cgQACAdMEsF/QID35y4v8MxFcQeXb8OsDMmdd9vAZcKWqEXSW5ZLf48HhSGEHm9LRErZCzMRwwiesarFlgW7vwgN0Kg6ouRggk0913wP/a0axgcPiFv72G2Pm7c+Rdc4VFR5sXmfd8bSkgyoHuqkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731548485; c=relaxed/simple;
-	bh=/sGVijHRI1ahXnEl7R2BFYaEqtSGhStIZ15Iu0wSW2I=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=u28fXMgb4BMo9EW961IbUpu2mLsK13/TPaU1+vWrSCzt2jJfZ5aUxQ/5Aees/5Vfu1GJZ2Ogva6ANXb2Y1xkgBs4Zbys9+3lDDy7mBKSxW0DA8cQPxR/w6RO9SgySLjxxSerRte70gXmaO/UeiUAIKmIOf3mfmCS6hbgPoWQszo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XpjVJ3sBGz1V47X;
-	Thu, 14 Nov 2024 09:38:48 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 713ED14037E;
-	Thu, 14 Nov 2024 09:41:18 +0800 (CST)
-Received: from [10.174.177.223] (10.174.177.223) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 14 Nov 2024 09:41:17 +0800
-Message-ID: <06a0b358-d2f3-4248-82fb-7f599a2200a0@huawei.com>
-Date: Thu, 14 Nov 2024 09:41:16 +0800
+	s=arc-20240116; t=1731548662; c=relaxed/simple;
+	bh=IrVRJg3WLhTz8lAzrA6Li6rKoq9acM6m6RQtWvY5vEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HEZMIP3dGgJCn/OFJtfA0wJ+UlyoDP+Zi436Mpbx29x+Rnga6IC5AE9eBZ5BszOvACoDlDa3AeODcdevOFIwHXaNSzvy4R182LeXQNnPq3hNqWJkbaNYuMCAWtFfyi51eXzgyq5bNX4tY6kgJLU1yzgMxuVW7A4C4zBwYYzj75o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fqCvG48T; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8iXMgS+nqM8nHclZ1ysTcXy7y7OSuJIYtAZoKROY0EE=; b=fqCvG48TOaP5r3usPPYs1U4FnX
+	4PRWbhBktP2oO4czKwOuv8DK6Pmcvp0O22DoOwQ4erlsmHJTNxhlPfmuuBJvzLQXWOke1JtkTHt0O
+	DaUjhOx7et262E6YNMO/I1KscznzjF5upm4uP/pJhhYEUNPYr4giOtdigRAgQYdUqUJI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tBOtq-00DEPq-Gk; Thu, 14 Nov 2024 02:43:58 +0100
+Date: Thu, 14 Nov 2024 02:43:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tristram.Ha@microchip.com
+Cc: Woojung.Huh@microchip.com, olteanv@gmail.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	marex@denx.de, UNGLinuxDriver@microchip.com,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <1fcb11da-e660-497b-a098-c00f94c737f5@lunn.ch>
+References: <20241109015633.82638-1-Tristram.Ha@microchip.com>
+ <20241109015633.82638-3-Tristram.Ha@microchip.com>
+ <784a33e2-c877-4d0e-b3a5-7fe1a04c9217@lunn.ch>
+ <DM3PR11MB87360F9E39097E535416838EEC592@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <700c326c-d154-4d21-b9d4-d8abf8f2bf33@lunn.ch>
+ <DM3PR11MB873696176581059CF682F253EC5A2@DM3PR11MB8736.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: Fix icmp host relookup triggering ip_rt_bug
-From: "dongchenchen (A)" <dongchenchen2@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>
-References: <20241111123915.3879488-1-dongchenchen2@huawei.com>
- <ZzK5A9DDxN-YJlsk@gondor.apana.org.au>
- <8acfac66-bd2f-44a0-a113-89951dcfd2d3@huawei.com>
- <ZzLWcxskwi9e_bPf@gondor.apana.org.au>
- <9b9c7edf-fa68-465e-a960-0fe07773ba82@huawei.com>
- <97456f7d-83f3-404c-bc42-0a5f00af023e@huawei.com>
-In-Reply-To: <97456f7d-83f3-404c-bc42-0a5f00af023e@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM3PR11MB873696176581059CF682F253EC5A2@DM3PR11MB8736.namprd11.prod.outlook.com>
+
+> When the SFP EEPROM says it does not support 1000Base-T then the SFP bus
+> code does not consider the SFP has a PHY and skips creating a MDIO bus
+> for it and phylink_sfp_config_optical() is called to create the phylink.
+
+There are many SFPs out there with broken EEPROM contents. Do the SFPs
+you have say they are not 1000Base-T but actually are? If so, they are
+broken, and need a quirk adding.
+
+Russell King keeps a database of SFP EEPROM contents. Send him the
+output of `ethtool -m eth42 raw on hex on` 
+
+> Now back to the discussion of the different modes used by the SGMII
+> module.  I think a better term like SerDes can be used to help
+> understanding the operation, although I still cannot narrow down the
+> precise definitions from looking at the internet.  SGMII mode is
+> said to support 10/100/1000Mbit.  This is the default setting, so
+> plugging such SFP allows the port to communicate without any register
+> programming.  The other mode is SerDes, which is fixed at 1000Mbit.  This
+> is typically used by SFP using fiber optics.  This requires changing a
+> register to make the port works.  It seems those 1000Base-T SFPs all run
+> in SerDes mode, at least from all SFPs I tried.
+
+There is a comment in the code:
+
+/* Probe a SFP for a PHY device if the module supports copper - the PHY
+ * normally sits at I2C bus address 0x56, and may either be a clause 22
+ * or clause 45 PHY.
+ *
+ * Clause 22 copper SFP modules normally operate in Cisco SGMII mode with
+ * negotiation enabled, but some may be in 1000base-X - which is for the
+ * PHY driver to determine.
+
+So the default is SGMII for copper SFPs, but there are a few oddballs
+using 1000BaseX. The Marvell PHY driver should figure this out, and
+the phylink will tell you want mode to use.
 
 
-On 2024/11/13 22:19, dongchenchen (A) wrote:
->
-> On 2024/11/13 22:13, dongchenchen (A) wrote:
->>>> If skb_in is outbound, fl4_dec.saddr is not nolocal. It may be no 
->>>> input
->>>> route from B to A for
->>>>
->>>> first communication.
->>> You're right.  So the problem here is that for the case of A
->>> being local, we should not be taking the ip_route_input code
->>> path (this is intended for forwarded packets).
->>>
->>> In fact if A is local, and we're sending an ICMP message to A,
->>> then perhaps we could skip the IPsec lookup completely and just
->>> do normal routing?
->>>
->>> Steffen, what do you think?
->>>
->>> So I think it boils down to two choices:
->>>
->>> 1) We could simply drop IPsec processing if we notice that A
->>> (fl.fl4_dst) is local;
->>
->> Hi, Herbert! Thanks for your suggestions very much.
->>
->> maybe we can fix it as below:
->> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
->> index e1384e7331d8..5f63c4dde4e9 100644
->> --- a/net/ipv4/icmp.c
->> +++ b/net/ipv4/icmp.c
->> @@ -517,7 +517,9 @@ static struct rtable *icmp_route_lookup(struct 
->> net *net,
->>                           flowi4_to_flowi(fl4), NULL, 0);
->>         rt = dst_rtable(dst);
->>         if (!IS_ERR(dst)) {
->> -               if (rt != rt2)
->> +               unsigned int addr_type = 
->> inet_addr_type_dev_table(net, route_lookup_dev, fl4->daddr);
->> +               if (rt != rt2 || addr_type == RTN_LOCAL)
->>                         return rt;
->>         } else if (PTR_ERR(dst) == -EPERM) {
->>                 rt = NULL;
->>> 2) Or we could take the __ip_route_output_key code path and
->>> continue to do the xfrm lookup when A is local.
->
-> sorry,  resend it due to format problems
->
-> If only skip input route lookup as below, xfrm_lookup check may return 
-> ENOENT
-> for no xfrm pol or dst nofrm flag.
+> The issue is then phylink assigns SGMII phy mode to such SFP as its
+> EEPROM just says 1000Base-T support and not 1000BASEX phy mode so that
+> the DSA driver can program the register correspondingly.  Because of that
+> the driver still needs to rely on its own detection to find out which
+> mode to use.
+>  
+> > Have you set pcs.poll? phylink will then poll the PCS every
+> > second. You can report PCS status any time.
+> 
+> I know about PCS polling.  The SFP cage driver can provide link_up and
+> link_down indications to the phylink driver.
 
-Sorry, I misunderstood earlier.
-it's correct to return ENOENT here.
-The difference from the above is:
-If A is local, rt1->dst->dev is lo (fl4->dst is A),
-rt2->dst->dev is actual dev selected by daddr B(fl4_2->dst is B)
+The SPF cage provides LOS, Loss of Signal. This basically means there
+is light coming into the SFP, but not much more. It is not a
+trustworthy signal on its own. Phylink combines this with the PCS
+status, does the PCS also have link. You need the combination.
 
->
-> @@ -543,6 +544,10 @@ static struct rtable *icmp_route_lookup(struct 
-> net *net,
->                         err = PTR_ERR(rt2);
->                         goto relookup_failed;
->                 }
-> +
-> +               unsigned int addr_type = inet_addr_type_dev_table(net, 
-> route_lookup_dev, fl4->daddr);
-> +               if (addr_type == RTN_LOCAL)
-> +                       goto relookup;
->                 /* Ugh! */
->                 orefdst = skb_in->_skb_refdst; /* save old refdst */
->
-> xfrm_lookup
->     xfrm_lookup_with_ifid
->         if (!if_id && ((dst_orig->flags & DST_NOXFRM) ||
->             !net->xfrm.policy_count[XFRM_POLICY_OUT]))
->             goto nopol;
->
+> One more issue is if a SFP is not plugged in eventually the SFP driver
+> says "please wait, module slow to respond."
+
+Something is wrong with your GPIOs. Phylink thinks there is a module
+inserted, when in fact there is not. Add #define DEBUG 1 to the very
+top of sfp.c, so you can see the state transitions. I guess there is
+something wrong with the MODDEF0 GPIO.
+
+	Andrew
+
 
