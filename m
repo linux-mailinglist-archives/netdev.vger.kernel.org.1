@@ -1,170 +1,110 @@
-Return-Path: <netdev+bounces-144810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4FB89C8773
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:25:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 775109C8787
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:29:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55D8287870
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:25:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FF801F21F0E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650A31FB8AE;
-	Thu, 14 Nov 2024 10:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831731FF600;
+	Thu, 14 Nov 2024 10:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EKdxYz4c"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="ZxtRjLdW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066011FB8A6;
-	Thu, 14 Nov 2024 10:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70241FF7A5;
+	Thu, 14 Nov 2024 10:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731579408; cv=none; b=LJZJFfPZnyYcZXxLVxIj01nsq7P8Zq7FKsfduso/7Z2xf6UEJTCBKE9gRGNJRHhWDjSVxCL4lXlXpGcRoAxlPJ6gBXj+MCaHeM1sD7yxZ/pFriPs+e0ne3sITvtlLDtdFMjXOhQhzEwmDOIWsFfdnkHmcbP6sGzUkyqId4HGwEg=
+	t=1731579604; cv=none; b=XxioMupGNrkmVHw8WnCyHj2U3DXl0hkjWQyzU23RgVjxCkAqmj0h9fsbkAHczLBQ7YhSNLtpblaAbl6mMD0tSBhBcAsYn5cjC1SE1FGp06F+nD1efWuiLZJhw3x+5kPriWpXC0vKUcJcORC/xMvj4aGWVEJLmKR6gGAiqEM2vec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731579408; c=relaxed/simple;
-	bh=PVyNOYgX7ZJ8zY9NS0Zou8sXcvo4yd8bNUCokBcpSY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QE+FXDtbpuMvl2KcN/UYWCOxwWsErsJCnQ7mSjkl2HjuakAz474Y4dos+aF2klRrRCyzuaStJFNVPpx/ibp3kIl13Bf2PW+Gl9MDSbkT4j2aJAijZZhIOuLJopRqKNxT4JNXImKkxPsrIOchFLeSPVlEFRYqmO6gvfc4sKizCME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EKdxYz4c; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UQeUKWqacSfgCW37cA4xUbE+Eq7a4taaKHHUWJFU+2k=; b=EKdxYz4cjDjcDbN/5Eim1cU0zF
-	m0Ab8tdmycKewlP4QFRolSJMOyGu2gyQascXJbVJQS2fjLRBP0JkVEGn4kCQWy0cvXF8BSwz6xZTL
-	aHzJ8NRFeh518NKW85GgyNAfsBH1/eW8nTyH+9Oo7BD95uFBDgeV6CipZtit3ODL2JK6G+JlzybcW
-	wBJRiIXQupbtFsYdCK9Mu1JwSkpOeFiSzHz+TxbqXLNDVMkzKO1J/mxvs9uC8Y3MtK7Cl61H21e0l
-	SAfW+CFUDJVcvZAoU8W3eOWbElGWeTAF/zNAU0jq+H0fB7qZlk83x1OrXIk+yuNu8EZ3tqqJ34O4a
-	k7zQ6aiQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46564)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBWtw-0007oh-2N;
-	Thu, 14 Nov 2024 10:16:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBWtv-00012F-0T;
-	Thu, 14 Nov 2024 10:16:35 +0000
-Date: Thu, 14 Nov 2024 10:16:34 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net v1 1/2] net: phy: set eee_cfg based on PHY
- configuration
-Message-ID: <ZzXOAvc__iQscSb4@shell.armlinux.org.uk>
-References: <20241114081653.3939346-1-yong.liang.choong@linux.intel.com>
- <20241114081653.3939346-2-yong.liang.choong@linux.intel.com>
- <ZzXBpEHs0y2_elqK@shell.armlinux.org.uk>
- <ZzXLgEjElnJD1445@shell.armlinux.org.uk>
+	s=arc-20240116; t=1731579604; c=relaxed/simple;
+	bh=T9MOKMhMLZp9/wLwCovRSnGb/6bqj0NzuswbvjubVD4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=FeJx9UFCZ2tujo5L+hDu95Zs8JLNokWUqxKvj4pCcrNEXEsh3/7WUnUvueU54UCYX8f5rZASyk4ZvKT3Ub3Pb3rKJSarA3Jrz8Fq31WtuxDeP8LXww1xlEDlh/z2juKdfHxOR4PyqM44F/8RynE1dUcI4+Zj2CwO5IDmLH3Btpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=ZxtRjLdW reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=imDIG354HXXyW9aAYPK92UMoL0TanLrHN8vw4Nrw9BU=; b=Z
+	xtRjLdWRNdB1viPvt0clEYZzsnxaU0i6HHwFAdeKeGzyuXCNrPFl4XtkRBJ72boJ
+	MByYLIKrKcEtXj6vwezOeOKMz079Ul+ESB9T3G9Aj6mdNdoZA3ec6LKJGxDAdiI+
+	2zp4yffEH9x8s5T4GiyUZaVhUYgbAIqm9SJ+m1gLYM=
+Received: from 00107082$163.com ( [111.35.191.191] ) by
+ ajax-webmail-wmsvr-40-106 (Coremail) ; Thu, 14 Nov 2024 18:19:27 +0800
+ (CST)
+Date: Thu, 14 Nov 2024 18:19:27 +0800 (CST)
+From: "David Wang" <00107082@163.com>
+To: "Paolo Abeni" <pabeni@redhat.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/ipv4/proc: Avoid usage for seq_printf() when
+ reading /proc/net/snmp
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
+ Copyright (c) 2002-2024 www.mailtech.cn 163com
+In-Reply-To: <406c545e-8c00-406a-98f0-0e545c427b25@redhat.com>
+References: <20241111045623.10229-1-00107082@163.com>
+ <406c545e-8c00-406a-98f0-0e545c427b25@redhat.com>
+X-NTES-SC: AL_Qu2YA/mctk0t4SObZukXn0oTju85XMCzuv8j3YJeN500uCTo1SQ7cm9xHF/0+s6kCymhoAiRfBJQzsBob6pgeYn2JpyS9o8Hk/XIHGDAdbTn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZzXLgEjElnJD1445@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Message-ID: <5db8d6bc.9fe1.1932a2f5ce9.Coremail.00107082@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:aigvCgD3X6SwzjVnj_ImAA--.43762W
+X-CM-SenderInfo: qqqrilqqysqiywtou0bp/1tbiqQmXqmc1u4ZyjgAKsE
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Thu, Nov 14, 2024 at 10:05:52AM +0000, Russell King (Oracle) wrote:
-> On Thu, Nov 14, 2024 at 09:23:48AM +0000, Russell King (Oracle) wrote:
-> > On Thu, Nov 14, 2024 at 04:16:52PM +0800, Choong Yong Liang wrote:
-> > > Not all PHYs have EEE enabled by default. For example, Marvell PHYs are
-> > > designed to have EEE hardware disabled during the initial state, and it
-> > > needs to be configured to turn it on again.
-> > > 
-> > > This patch reads the PHY configuration and sets it as the initial value for
-> > > eee_cfg.tx_lpi_enabled and eee_cfg.eee_enabled instead of having them set to
-> > > true by default.
-> > 
-> > eee_cfg.tx_lpi_enabled is something phylib tracks, and it merely means
-> > that LPI needs to be enabled at the MAC if EEE was negotiated:
-> > 
-> >  * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
-> >  *      that eee was negotiated.
-> > 
-> > eee_cfg.eee_enabled means that EEE mode was enabled - which is user
-> > configuration:
-> > 
-> >  * @eee_enabled: EEE configured mode (enabled/disabled).
-> > 
-> > phy_probe() reads the initial PHY state and sets things up
-> > appropriately.
-> > 
-> > However, there is a point where the EEE configuration (advertisement,
-> > and therefore eee_enabled state) is written to the PHY, and that should
-> > be config_aneg(). Looking at the Marvell driver, it's calling
-> > genphy_config_aneg() which eventually calls
-> > genphy_c45_an_config_eee_aneg() which does this (via
-> > __genphy_config_aneg()).
-> > 
-> > Please investigate why the hardware state is going out of sync with the
-> > software state.
-> 
-> I think I've found the issue.
-> 
-> We have phydev->eee_enabled and phydev->eee_cfg.eee_enabled, which looks
-> like a bug to me. We write to phydev->eee_cfg.eee_enabled in
-> phy_support_eee(), leaving phydev->eee_enabled untouched.
-> 
-> However, most other places are using phydev->eee_enabled.
-> 
-> This is (a) confusing and (b) wrong, and having the two members leads
-> to this confusion, and makes the code more difficult to follow (unless
-> one has already clocked that there are these two different things both
-> called eee_enabled).
-> 
-> This is my untested prototype patch to fix this - it may cause breakage
-> elsewhere:
-
-As mentioned in the other thread:
-
-Without a call to phy_support_eee():
-
-EEE settings for eth2:
-        EEE status: disabled
-        Tx LPI: disabled
-        Supported EEE link modes:  100baseT/Full
-                                   1000baseT/Full
-        Advertised EEE link modes:  Not reported
-        Link partner advertised EEE link modes:  100baseT/Full
-                                                 1000baseT/Full
-
-With a call to phy_support_eee():
-
-EEE settings for eth2:
-        EEE status: enabled - active
-        Tx LPI: 0 (us)
-        Supported EEE link modes:  100baseT/Full
-                                   1000baseT/Full
-        Advertised EEE link modes:  100baseT/Full
-                                    1000baseT/Full
-        Link partner advertised EEE link modes:  100baseT/Full
-                                                 1000baseT/Full
-
-So the EEE status is now behaving correctly, and the Marvell PHY is
-being programmed with the advertisement correctly.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+CkF0IDIwMjQtMTEtMTQgMTc6MzA6MzQsICJQYW9sbyBBYmVuaSIgPHBhYmVuaUByZWRoYXQuY29t
+PiB3cm90ZToKPk9uIDExLzExLzI0IDA1OjU2LCBEYXZpZCBXYW5nIHdyb3RlOgo+PiBzZXFfcHJp
+bnRmKCkgaXMgY29zdHksIHdoZW4gcmVhZGluZyAvcHJvYy9uZXQvc25tcCwgcHJvZmlsaW5nIGlu
+ZGljYXRlcwo+PiBzZXFfcHJpbnRmKCkgdGFrZXMgbW9yZSB0aGFuIDUwJSBzYW1wbGVzIG9mIHNu
+bXBfc2VxX3Nob3coKToKPj4gCXNubXBfc2VxX3Nob3coOTcuNzUxJSAxNTg3MjIvMTYyMzczKQo+
+PiAJICAgIHNubXBfc2VxX3Nob3dfdGNwX3VkcC5pc3JhLjAoNDAuMDE3JSA2MzUxNS8xNTg3MjIp
+Cj4+IAkJc2VxX3ByaW50Zig4My40NTElIDUzMDA0LzYzNTE1KQo+PiAJCXNlcV93cml0ZSgxLjE3
+MCUgNzQzLzYzNTE1KQo+PiAJCV9maW5kX25leHRfYml0KDAuNzI3JSA0NjIvNjM1MTUpCj4+IAkJ
+Li4uCj4+IAkgICAgc2VxX3ByaW50ZigyNC43NjIlIDM5MzAzLzE1ODcyMikKPj4gCSAgICBzbm1w
+X3NlcV9zaG93X2lwc3RhdHMuaXNyYS4wKDIxLjQ4NyUgMzQxMDQvMTU4NzIyKQo+PiAJCXNlcV9w
+cmludGYoODUuNzg4JSAyOTI1Ny8zNDEwNCkKPj4gCQlfZmluZF9uZXh0X2JpdCgwLjMzMSUgMTEz
+LzM0MTA0KQo+PiAJCXNlcV93cml0ZSgwLjIzNSUgODAvMzQxMDQpCj4+IAkJLi4uCj4+IAkgICAg
+aWNtcG1zZ19wdXQoNy4yMzUlIDExNDgzLzE1ODcyMikKPj4gCQlzZXFfcHJpbnRmKDQxLjcxNCUg
+NDc5MC8xMTQ4MykKPj4gCQlzZXFfd3JpdGUoMi42MzAlIDMwMi8xMTQ4MykKPj4gCQkuLi4KPj4g
+VGltZSBmb3IgYSBtaWxsaW9uIHJvdW5kcyBvZiBzdHJlc3MgcmVhZGluZyAvcHJvYy9uZXQvc25t
+cDoKPj4gCXJlYWwJMG0yNC4zMjNzCj4+IAl1c2VyCTBtMC4yOTNzCj4+IAlzeXMJMG0yMy42Nzlz
+Cj4+IE9uIGF2ZXJhZ2UsIHJlYWRpbmcgL3Byb2MvbmV0L3NubXAgdGFrZXMgMC4wMjNtcy4KPj4g
+V2l0aCB0aGlzIHBhdGNoLCBleHRyYSBjb3N0cyBvZiBzZXFfcHJpbnRmKCkgaXMgYXZvaWRlZCwg
+YW5kIGEgbWlsbGlvbgo+PiByb3VuZHMgb2YgcmVhZGluZyAvcHJvYy9uZXQvc25tcCBub3cgdGFr
+ZXMgb25seSB+MTUuODUzczoKPj4gCXJlYWwJMG0xNi4zODZzCj4+IAl1c2VyCTBtMC4yODBzCj4+
+IAlzeXMJMG0xNS44NTNzCj4+IE9uIGF2ZXJhZ2UsIG9uZSByZWFkIHRha2VzIDAuMDE1bXMsIGEg
+fjQwJSBpbXByb3ZlbWVudC4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IERhdmlkIFdhbmcgPDAwMTA3
+MDgyQDE2My5jb20+Cj4KPklmIHRoZSB1c2VyIHNwYWNlIGlzIHJlYWxseSBjb25jZXJuZWQgd2l0
+aCBzbm1wIGFjY2VzcyBwZXJmb3JtYW5jZXMsIEkKPnRoaW5rIHN1Y2ggaW5mb3JtYXRpb24gc2hv
+dWxkIGJlIGV4cG9zZWQgdmlhIG5ldGxpbmsuCj4KPlN0aWxsIHRoZSBnb2FsIG9mIHRoZSBvcHRp
+bWl6YXRpb24gbG9va3MgZG91YnRmdWwuIFRoZSB0b3RhbCBudW1iZXIgb2YKPm1pYnMgZG9tYWlu
+IGlzIGNvbnN0YW50IGFuZCBsaW1pdGVkIChkaWZmZXJlbnRseSBmcm9tIHRoZSBuZXR3b3JrCj5k
+ZXZpY2VzIG51bWJlciB0aGF0IGluIHNwZWNpZmljIHNldHVwIGNhbiBncm93IGEgbG90KS4gU3Rh
+dHMgcG9sbGluZwo+c2hvdWxkIGJlIGEgbG93IGZyZXF1ZW5jeSBvcGVyYXRpb24uIFdoeSB5b3Ug
+bmVlZCB0byBvcHRpbWl6ZSBpdD8KCldlbGwsIG9uZSB0aGluZyBJIHRoaW5rIHdvcnRoIG1lbnRp
+b24sIG9wdGltaXplIC9wcm9jIGVudHJpZXMgY2FuIGhlbHAKaW5jcmVhc2Ugc2FtcGxlIGZyZXF1
+ZW5jeSwgaGVuY2UgbW9yZSBhY2N1cmF0ZSByYXRlIGFuYWx5c2lzLAogZm9yIG1vbml0b3Jpbmcg
+dG9vbHMgd2l0aCBhIGZpeGVkL2xpbWl0ZWQgY3B1IHF1b3RhLgoKQW5kIGZvciAvcHJvYy9uZXQv
+KiwgdGhlIG9wdGltaXphdGlvbiB3b3VsZCBiZSBhbXBsaWZpZWQgd2hlbiBjb25zaWRlcmluZyBu
+ZXR3b3JrIG5hbWVzcGFjZXMuCgpJIHRoaW5rIGl0IHdvcnRoIHRvIG9wdGltaXplLiAgIAoKPgo+
+SSBkb24ndCB0aGluayB3ZSBzaG91bGQgYWNjZXB0IHRoaXMgY2hhbmdlLCB0b28uIEFuZCBhIHNv
+bGlkIGV4cGxhbmF0aW9uCj5zaG91bGQgYmUgbmVlZCB0byBpbnRyb2R1Y2UgYSBuZXRsaW5rIE1J
+QiBpbnRlcmZhY2UuCj4KPj4gLS0tCj4+ICBuZXQvaXB2NC9wcm9jLmMgfCAxMTYgKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tCj4KPkZUUiB5b3UgbWlzc2Vk
+IG1wdGNwLgo+Cj4vUAo=
 
