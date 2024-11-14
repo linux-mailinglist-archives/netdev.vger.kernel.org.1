@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-144707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C879C83C3
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:11:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730CF9C83C2
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4505CB24171
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 07:11:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A0D9B24265
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 07:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8AA1F8EF4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81411F8EE8;
 	Thu, 14 Nov 2024 07:07:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7EC91F583D
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57441F583B
 	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 07:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731568058; cv=none; b=hAb5ZZaDNLZbHTPfM33ly+b+TFN8hXPbTNzOcV8SJ4XTh41StHos3RVJdWJXy6ILb+I244lj11AVrKDwbGAy30SsaP0F1f1y7bXMxPXFrkhxrGc1vScfdhJc/knTSJqmuKHhRk/nUcARi6+iaPcqLHTXbSB9uny0/woHFZfVV+A=
+	t=1731568058; cv=none; b=j1ylQJsnVR3pcP/XRAwH6wzIKs4sZLS+qgOKv/gCJ6S7OpDbw0EottSscpNszwtbFLeIMwgcCNiMhrakvB8lp2Ziq2ro7ck+Y8pqE3ONRrNzprZwCO4uKRaluB2z2d9y3MGsaOEpYwEtect/5pKmbkqeSq4PHCXnecDR+8BCO2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731568058; c=relaxed/simple;
-	bh=78Hqc6UVqE7CjyRti6C51aDSzNLZOqkmcU8vtgQl5PU=;
+	bh=Ost8fdhplQlZJXrX8vb6fH/ak07QyaQ/w7rFUpx+oRk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WDMUkzdn0mEqpKse18/nvnYtQUe1B4vaPCQDy6dhfVv5/Uw8QoNfRCldVonI7Q9O6kPExIejVagRmdCEc/vXPaFZERi7GQQks8v/LpsS729VDFfBysZWiX33xtoeWLPke5rWv54h1vWIjDKwsmrdk8SlcSq8QxGYERg/nZ+I0k4=
+	 MIME-Version; b=sm+V07x3P6QUd0sucGkF7aY/DsuTbVjZV0xYHByPo/VSw3uYMo4WWspGg3YfLqqEYvJgwz+6zt+I9RVk836QzgjZnqWMnLHc7ly6yTm/E43rRNMKq8kh/U02s3Q7R6wcgpRzMaQVR3AQEPUJtPV9ZAfHeqztBToKM/u0jVxzcdo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -31,7 +31,7 @@ Received: from labnh.big (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 82BED7D12F;
+	by smtp.chopps.org (Postfix) with ESMTPSA id 0A0CB7D133;
 	Thu, 14 Nov 2024 07:07:33 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
@@ -43,9 +43,9 @@ Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	Antony Antony <antony@phenome.org>,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v14 09/15] xfrm: iptfs: add fragmenting of larger than MTU user packets
-Date: Thu, 14 Nov 2024 02:07:06 -0500
-Message-ID: <20241114070713.3718740-10-chopps@chopps.org>
+Subject: [PATCH ipsec-next v14 10/15] xfrm: iptfs: add basic receive packet (tunnel egress) handling
+Date: Thu, 14 Nov 2024 02:07:07 -0500
+Message-ID: <20241114070713.3718740-11-chopps@chopps.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241114070713.3718740-1-chopps@chopps.org>
 References: <20241114070713.3718740-1-chopps@chopps.org>
@@ -59,481 +59,315 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Add support for tunneling user (inner) packets that are larger than the
-tunnel's path MTU (outer) using IP-TFS fragmentation.
+Add handling of packets received from the tunnel. This implements
+tunnel egress functionality.
 
 Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
- net/xfrm/xfrm_iptfs.c | 343 ++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 315 insertions(+), 28 deletions(-)
+ net/xfrm/xfrm_iptfs.c | 276 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 276 insertions(+)
 
 diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 7bf18f472fed..b7d706a006eb 100644
+index b7d706a006eb..085964fe3251 100644
 --- a/net/xfrm/xfrm_iptfs.c
 +++ b/net/xfrm/xfrm_iptfs.c
-@@ -46,6 +46,22 @@
-  */
- #define IPTFS_DEFAULT_MAX_QUEUE_SIZE (1024 * 10240)
+@@ -20,6 +20,10 @@
  
-+/* Assumed: skb->head is cache aligned.
-+ *
-+ * L2 Header resv: Arrange for cacheline to start at skb->data - 16 to keep the
-+ * to-be-pushed L2 header in the same cacheline as resulting `skb->data` (i.e.,
-+ * the L3 header). If cacheline size is > 64 then skb->data + pushed L2 will all
-+ * be in a single cacheline if we simply reserve 64 bytes.
-+ *
-+ * L3 Header resv: For L3+L2 headers (i.e., skb->data points at the IPTFS payload)
-+ * we want `skb->data` to be cacheline aligned and all pushed L2L3 headers will
-+ * be in their own cacheline[s]. 128 works for cachelins up to 128 bytes, for
-+ * any larger cacheline sizes the pushed headers will simply share the cacheline
-+ * with the start of the IPTFS payload (skb->data).
-+ */
-+#define XFRM_IPTFS_MIN_L3HEADROOM 128
-+#define XFRM_IPTFS_MIN_L2HEADROOM (L1_CACHE_BYTES > 64 ? 64 : 64 + 16)
+ #include "xfrm_inout.h"
+ 
++/* IPTFS encap (header) values. */
++#define IPTFS_SUBTYPE_BASIC 0
++#define IPTFS_SUBTYPE_CC 1
 +
- #define NSECS_IN_USEC 1000
- 
- #define IPTFS_HRTIMER_MODE HRTIMER_MODE_REL_SOFT
-@@ -57,10 +73,12 @@
-  * @max_queue_size: The maximum number of octets allowed to be queued to be sent
-  *	over the IPTFS SA. The queue size is measured as the size of all the
-  *	packets enqueued.
-+ * @dont_frag: true to inhibit fragmenting across IPTFS outer packets.
-  */
- struct xfrm_iptfs_config {
- 	u32 pkt_size;	    /* outer_packet_size or 0 */
- 	u32 max_queue_size; /* octets */
-+	u8 dont_frag : 1;
- };
- 
- /**
-@@ -88,13 +106,72 @@ struct xfrm_iptfs_data {
- 	u32 payload_mtu;	    /* max payload size */
- };
- 
--static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu);
-+static u32 __iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu);
- static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me);
- 
- /* ======================= */
- /* IPTFS SK_BUFF Functions */
- /* ======================= */
- 
-+/**
-+ * iptfs_alloc_skb() - Allocate a new `skb`.
-+ * @tpl: the skb to copy required meta-data from.
-+ * @len: the linear length of the head data, zero is fine.
-+ * @l3resv: true if skb reserve needs to support pushing L3 headers
-+ *
-+ * A new `skb` is allocated and required meta-data is copied from `tpl`, the
-+ * head data is sized to `len` + reserved space set according to the @l3resv
-+ * boolean.
-+ *
-+ * When @l3resv is false, resv is XFRM_IPTFS_MIN_L2HEADROOM which arranges for
-+ * `skb->data - 16`  which is a good guess for good cache alignment (placing the
-+ * to be pushed L2 header at the start of a cacheline.
-+ *
-+ * Otherwise, @l3resv is true and resv is set to the correct reserved space for
-+ * dst->dev plus the calculated L3 overhead for the xfrm dst or
-+ * XFRM_IPTFS_MIN_L3HEADROOM whichever is larger. This is then cache aligned so
-+ * that all the headers will commonly fall in a cacheline when possible.
-+ *
-+ * l3resv=true is used on tunnel ingress (tx), because we need to reserve for
-+ * the new IPTFS packet (i.e., L2+L3 headers). On tunnel egress (rx) the data
-+ * being copied into the skb includes the user L3 headers already so we only
-+ * need to reserve for L2.
-+ *
-+ * Return: the new skb or NULL.
-+ */
-+static struct sk_buff *iptfs_alloc_skb(struct sk_buff *tpl, u32 len, bool l3resv)
-+{
-+	struct sk_buff *skb;
-+	u32 resv;
-+
-+	if (!l3resv) {
-+		resv = XFRM_IPTFS_MIN_L2HEADROOM;
-+	} else {
-+		struct dst_entry *dst = skb_dst(tpl);
-+
-+		resv = LL_RESERVED_SPACE(dst->dev) + dst->header_len;
-+		resv = max(resv, XFRM_IPTFS_MIN_L3HEADROOM);
-+		resv = L1_CACHE_ALIGN(resv);
-+	}
-+
-+	skb = alloc_skb(len + resv, GFP_ATOMIC | __GFP_NOWARN);
-+	if (!skb)
-+		return NULL;
-+
-+	skb_reserve(skb, resv);
-+
-+	if (!l3resv) {
-+		/* xfrm_input resume needs dev and xfrm ext from tunnel pkt */
-+		skb->dev = tpl->dev;
-+		__skb_ext_copy(skb, tpl);
-+	}
-+
-+	/* dropped by xfrm_input, used by xfrm_output */
-+	skb_dst_copy(skb, tpl);
-+
-+	return skb;
-+}
-+
- /**
-  * iptfs_skb_head_to_frag() - initialize a skb_frag_t based on skb head data
-  * @skb: skb with the head data
-@@ -152,7 +229,7 @@ static int iptfs_get_cur_pmtu(struct xfrm_state *x, struct xfrm_iptfs_data *xtfs
- {
- 	struct xfrm_dst *xdst = (struct xfrm_dst *)skb_dst(skb);
- 	u32 payload_mtu = xtfs->payload_mtu;
--	u32 pmtu = iptfs_get_inner_mtu(x, xdst->child_mtu_cached);
-+	u32 pmtu = __iptfs_get_inner_mtu(x, xdst->child_mtu_cached);
- 
- 	if (payload_mtu && payload_mtu < pmtu)
- 		pmtu = payload_mtu;
-@@ -210,7 +287,8 @@ static int iptfs_output_collect(struct net *net, struct sock *sk, struct sk_buff
- 	 * fragmentation.
- 	 */
- 
--	pmtu = iptfs_get_cur_pmtu(x, xtfs, skb);
-+	if (xtfs->cfg.dont_frag)
-+		pmtu = iptfs_get_cur_pmtu(x, xtfs, skb);
- 
- 	/* Break apart GSO skbs. If the queue is nearing full then we want the
- 	 * accounting and queuing to be based on the individual packets not on the
-@@ -250,8 +328,10 @@ static int iptfs_output_collect(struct net *net, struct sock *sk, struct sk_buff
- 			continue;
- 		}
- 
--		/* Fragmenting handled in following commits. */
--		if (iptfs_is_too_big(sk, skb, pmtu)) {
-+		/* If the user indicated no iptfs fragmenting check before
-+		 * enqueue.
-+		 */
-+		if (xtfs->cfg.dont_frag && iptfs_is_too_big(sk, skb, pmtu)) {
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -294,6 +374,181 @@ static void iptfs_output_prepare_skb(struct sk_buff *skb, u32 blkoff)
- 	IPCB(skb)->flags |= IPSKB_XFRM_TUNNEL_SIZE;
+ /* ------------------------------------------------ */
+ /* IPTFS default SA values (tunnel ingress/dir-out) */
+ /* ------------------------------------------------ */
+@@ -185,6 +189,277 @@ static void iptfs_skb_head_to_frag(const struct sk_buff *skb, skb_frag_t *frag)
+ 	skb_frag_fill_page_desc(frag, page, skb->data - addr, skb_headlen(skb));
  }
  
++/* ================================== */
++/* IPTFS Receiving (egress) Functions */
++/* ================================== */
++
 +/**
-+ * iptfs_copy_create_frag() - create an inner fragment skb.
-+ * @st: The source packet data.
-+ * @offset: offset in @st of the new fragment data.
-+ * @copy_len: the amount of data to copy from @st.
++ * iptfs_pskb_extract_seq() - Create and load data into a new sk_buff.
++ * @skblen: the total data size for `skb`.
++ * @st: The source for the rest of the data to copy into `skb`.
++ * @off: The offset into @st to copy data from.
++ * @len: The length of data to copy from @st into `skb`. This must be <=
++ *       @skblen.
 + *
-+ * Create a new skb holding a single IPTFS inner packet fragment. @copy_len must
-+ * not be greater than the max fragment size.
++ * Create a new sk_buff `skb` with @skblen of packet data space. If non-zero,
++ * copy @rlen bytes of @runt into `skb`. Then using seq functions copy @len
++ * bytes from @st into `skb` starting from @off.
 + *
-+ * Return: the new fragment skb or an ERR_PTR().
++ * It is an error for @len to be greater than the amount of data left in @st.
++ *
++ * Return: The newly allocated sk_buff `skb` or NULL if an error occurs.
 + */
-+static struct sk_buff *iptfs_copy_create_frag(struct skb_seq_state *st, u32 offset, u32 copy_len)
++static struct sk_buff *
++iptfs_pskb_extract_seq(u32 skblen, struct skb_seq_state *st, u32 off, int len)
 +{
-+	struct sk_buff *src = st->root_skb;
-+	struct sk_buff *skb;
-+	int err;
++	struct sk_buff *skb = iptfs_alloc_skb(st->root_skb, skblen, false);
 +
-+	skb = iptfs_alloc_skb(src, copy_len, true);
 +	if (!skb)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/* Now copy `copy_len` data from src */
-+	err = skb_copy_seq_read(st, offset, skb_put(skb, copy_len), copy_len);
-+	if (err) {
++		return NULL;
++	if (skb_copy_seq_read(st, off, skb_put(skb, len), len)) {
++		XFRM_INC_STATS(dev_net(st->root_skb->dev), LINUX_MIB_XFRMINERROR);
 +		kfree_skb(skb);
-+		return ERR_PTR(err);
++		return NULL;
 +	}
-+
 +	return skb;
 +}
 +
 +/**
-+ * iptfs_copy_create_frags() - create and send N-1 fragments of a larger skb.
-+ * @skbp: the source packet skb (IN), skb holding the last fragment in
-+ *        the fragment stream (OUT).
-+ * @xtfs: IPTFS SA state.
-+ * @mtu: the max IPTFS fragment size.
++ * iptfs_complete_inner_skb() - finish preparing the inner packet for gro recv.
++ * @x: xfrm state
++ * @skb: the inner packet
 + *
-+ * This function is responsible for fragmenting a larger inner packet into a
-+ * sequence of IPTFS payload packets. The last fragment is returned rather than
-+ * being sent so that the caller can append more inner packets (aggregation) if
-+ * there is room.
-+ *
-+ * Return: 0 on success or a negative error code on failure
++ * Finish the standard xfrm processing on the inner packet prior to sending back
++ * through gro_cells_receive. We do this separately b/c we are building a list
++ * of packets in the hopes that one day a list will be taken by
++ * xfrm_input.
 + */
-+static int iptfs_copy_create_frags(struct sk_buff **skbp, struct xfrm_iptfs_data *xtfs, u32 mtu)
++static void iptfs_complete_inner_skb(struct xfrm_state *x, struct sk_buff *skb)
 +{
-+	struct skb_seq_state skbseq;
-+	struct list_head sublist;
-+	struct sk_buff *skb = *skbp;
-+	struct sk_buff *nskb = *skbp;
-+	u32 copy_len, offset;
-+	u32 to_copy = skb->len - mtu;
-+	int err = 0;
++	skb_reset_network_header(skb);
 +
-+	INIT_LIST_HEAD(&sublist);
++	/* The packet is going back through gro_cells_receive no need to
++	 * set this.
++	 */
++	skb_reset_transport_header(skb);
++
++	/* Packet already has checksum value set. */
++	skb->ip_summed = CHECKSUM_NONE;
++
++	/* Our skb will contain the header data copied when this outer packet
++	 * which contained the start of this inner packet. This is true
++	 * when we allocate a new skb as well as when we reuse the existing skb.
++	 */
++	if (ip_hdr(skb)->version == 0x4) {
++		struct iphdr *iph = ip_hdr(skb);
++
++		if (x->props.flags & XFRM_STATE_DECAP_DSCP)
++			ipv4_copy_dscp(XFRM_MODE_SKB_CB(skb)->tos, iph);
++		if (!(x->props.flags & XFRM_STATE_NOECN))
++			if (INET_ECN_is_ce(XFRM_MODE_SKB_CB(skb)->tos))
++				IP_ECN_set_ce(iph);
++
++		skb->protocol = htons(ETH_P_IP);
++	} else {
++		struct ipv6hdr *iph = ipv6_hdr(skb);
++
++		if (x->props.flags & XFRM_STATE_DECAP_DSCP)
++			ipv6_copy_dscp(XFRM_MODE_SKB_CB(skb)->tos, iph);
++		if (!(x->props.flags & XFRM_STATE_NOECN))
++			if (INET_ECN_is_ce(XFRM_MODE_SKB_CB(skb)->tos))
++				IP6_ECN_set_ce(skb, iph);
++
++		skb->protocol = htons(ETH_P_IPV6);
++	}
++}
++
++static bool __input_process_payload(struct xfrm_state *x, u32 data,
++				    struct skb_seq_state *skbseq,
++				    struct list_head *sublist)
++{
++	u8 hbytes[sizeof(struct ipv6hdr)];
++	struct sk_buff *first_skb, *next, *skb;
++	const unsigned char *old_mac;
++	struct iphdr *iph;
++	struct net *net;
++	u32 remaining, iplen, iphlen, tail;
++
++	net = xs_net(x);
++	skb = skbseq->root_skb;
++	first_skb = NULL;
++
++	/* Save the old mac header if set */
++	old_mac = skb_mac_header_was_set(skb) ? skb_mac_header(skb) : NULL;
++
++	/* New packets */
++
++	tail = skb->len;
++	while (data < tail) {
++		__be16 protocol = 0;
++
++		/* Gather information on the next data block.
++		 * `data` points to the start of the data block.
++		 */
++		remaining = tail - data;
++
++		/* try and copy enough bytes to read length from ipv4/ipv6 */
++		iphlen = min_t(u32, remaining, 6);
++		if (skb_copy_seq_read(skbseq, data, hbytes, iphlen)) {
++			XFRM_INC_STATS(net, LINUX_MIB_XFRMINBUFFERERROR);
++			goto done;
++		}
++
++		iph = (struct iphdr *)hbytes;
++		if (iph->version == 0x4) {
++			/* must have at least tot_len field present */
++			if (remaining < 4)
++				break;
++
++			iplen = be16_to_cpu(iph->tot_len);
++			iphlen = iph->ihl << 2;
++			protocol = cpu_to_be16(ETH_P_IP);
++			XFRM_MODE_SKB_CB(skbseq->root_skb)->tos = iph->tos;
++		} else if (iph->version == 0x6) {
++			/* must have at least payload_len field present */
++			if (remaining < 6)
++				break;
++
++			iplen = be16_to_cpu(((struct ipv6hdr *)hbytes)->payload_len);
++			iplen += sizeof(struct ipv6hdr);
++			iphlen = sizeof(struct ipv6hdr);
++			protocol = cpu_to_be16(ETH_P_IPV6);
++			XFRM_MODE_SKB_CB(skbseq->root_skb)->tos =
++				ipv6_get_dsfield((struct ipv6hdr *)iph);
++		} else if (iph->version == 0x0) {
++			/* pad */
++			break;
++		} else {
++			XFRM_INC_STATS(net, LINUX_MIB_XFRMINBUFFERERROR);
++			goto done;
++		}
++
++		if (unlikely(skbseq->stepped_offset)) {
++			/* We need to reset our seq read, it can't backup at
++			 * this point.
++			 */
++			struct sk_buff *save = skbseq->root_skb;
++
++			skb_abort_seq_read(skbseq);
++			skb_prepare_seq_read(save, data, tail, skbseq);
++		}
++
++		if (!first_skb)
++			first_skb = skb;
++
++		/* Fragment handling in following commits */
++		if (iplen > remaining)
++			break;
++
++		skb = iptfs_pskb_extract_seq(iplen, skbseq, data, iplen);
++		if (!skb) {
++			/* skip to next packet or done */
++			data += iplen;
++			continue;
++		}
++
++		skb->protocol = protocol;
++		if (old_mac) {
++			/* rebuild the mac header */
++			skb_set_mac_header(skb, -first_skb->mac_len);
++			memcpy(skb_mac_header(skb), old_mac, first_skb->mac_len);
++			eth_hdr(skb)->h_proto = skb->protocol;
++		}
++
++		data += iplen;
++		iptfs_complete_inner_skb(x, skb);
++		list_add_tail(&skb->list, sublist);
++	}
++
++	/* Send the packets! */
++	list_for_each_entry_safe(skb, next, sublist, list) {
++		skb_list_del_init(skb);
++		if (xfrm_input(skb, 0, 0, -2))
++			kfree_skb(skb);
++	}
++
++done:
++	return false;
++}
++
++/**
++ * iptfs_input() - handle receipt of iptfs payload
++ * @x: xfrm state
++ * @skb: the packet
++ *
++ * Process the IPTFS payload in `skb` and consume it afterwards.
++ *
++ * Returns 0.
++ */
++static int iptfs_input(struct xfrm_state *x, struct sk_buff *skb)
++{
++	struct ip_iptfs_cc_hdr iptcch;
++	struct skb_seq_state skbseq;
++	struct list_head sublist; /* rename this it's just a list */
++	struct ip_iptfs_hdr *ipth;
++	struct net *net;
++	u32 remaining, data;
++	bool consumed = false;
++
++	net = xs_net(x);
++
++	/* Large enough to hold both types of header */
++	ipth = (struct ip_iptfs_hdr *)&iptcch;
 +
 +	skb_prepare_seq_read(skb, 0, skb->len, &skbseq);
 +
-+	/* A trimmed `skb` will be sent as the first fragment, later. */
-+	offset = mtu;
-+	to_copy = skb->len - offset;
-+	while (to_copy) {
-+		/* Send all but last fragment to allow agg. append */
-+		list_add_tail(&nskb->list, &sublist);
++	/* Get the IPTFS header and validate it */
 +
-+		/* FUTURE: if the packet has an odd/non-aligning length we could
-+		 * send less data in the penultimate fragment so that the last
-+		 * fragment then ends on an aligned boundary.
-+		 */
-+		copy_len = min(to_copy, mtu);
-+		nskb = iptfs_copy_create_frag(&skbseq, offset, copy_len);
-+		if (IS_ERR(nskb)) {
-+			XFRM_INC_STATS(xs_net(xtfs->x), LINUX_MIB_XFRMOUTERROR);
-+			skb_abort_seq_read(&skbseq);
-+			err = PTR_ERR(nskb);
-+			nskb = NULL;
-+			break;
-+		}
-+		iptfs_output_prepare_skb(nskb, to_copy);
-+		offset += copy_len;
-+		to_copy -= copy_len;
++	if (skb_copy_seq_read(&skbseq, 0, ipth, sizeof(*ipth))) {
++		XFRM_INC_STATS(net, LINUX_MIB_XFRMINBUFFERERROR);
++		goto done;
 +	}
++	data = sizeof(*ipth);
++
++	/* Set data past the basic header */
++	if (ipth->subtype == IPTFS_SUBTYPE_CC) {
++		/* Copy the rest of the CC header */
++		remaining = sizeof(iptcch) - sizeof(*ipth);
++		if (skb_copy_seq_read(&skbseq, data, ipth + 1, remaining)) {
++			XFRM_INC_STATS(net, LINUX_MIB_XFRMINBUFFERERROR);
++			goto done;
++		}
++		data += remaining;
++	} else if (ipth->subtype != IPTFS_SUBTYPE_BASIC) {
++		XFRM_INC_STATS(net, LINUX_MIB_XFRMINHDRERROR);
++		goto done;
++	}
++
++	if (ipth->flags != 0) {
++		XFRM_INC_STATS(net, LINUX_MIB_XFRMINHDRERROR);
++		goto done;
++	}
++
++	INIT_LIST_HEAD(&sublist);
++
++	/* Fragment handling in following commits */
++	data += ntohs(ipth->block_offset);
++
++	/* New packets */
++	consumed = __input_process_payload(x, data, &skbseq, &sublist);
++done:
++	skb = skbseq.root_skb;
 +	skb_abort_seq_read(&skbseq);
 +
-+	/* return last fragment that will be unsent (or NULL) */
-+	*skbp = nskb;
++	if (!consumed)
++		kfree_skb(skb);
 +
-+	/* trim the original skb to MTU */
-+	if (!err)
-+		err = pskb_trim(skb, mtu);
-+
-+	if (err) {
-+		/* Free all frags. Don't bother sending a partial packet we will
-+		 * never complete.
-+		 */
-+		kfree_skb(nskb);
-+		list_for_each_entry_safe(skb, nskb, &sublist, list) {
-+			skb_list_del_init(skb);
-+			kfree_skb(skb);
-+		}
-+		return err;
-+	}
-+
-+	/* prepare the initial fragment with an iptfs header */
-+	iptfs_output_prepare_skb(skb, 0);
-+
-+	/* Send all but last fragment, if we fail to send a fragment then free
-+	 * the rest -- no point in sending a packet that can't be reassembled.
++	/* We always have dealt with the input SKB, either we are re-using it,
++	 * or we have freed it. Return EINPROGRESS so that xfrm_input stops
++	 * processing it.
 +	 */
-+	list_for_each_entry_safe(skb, nskb, &sublist, list) {
-+		skb_list_del_init(skb);
-+		if (!err)
-+			err = xfrm_output(NULL, skb);
-+		else
-+			kfree_skb(skb);
-+	}
-+	if (err)
-+		kfree_skb(*skbp);
-+	return err;
++	return -EINPROGRESS;
 +}
 +
-+/**
-+ * iptfs_first_skb() - handle the first dequeued inner packet for output
-+ * @skbp: the source packet skb (IN), skb holding the last fragment in
-+ *        the fragment stream (OUT).
-+ * @xtfs: IPTFS SA state.
-+ * @mtu: the max IPTFS fragment size.
-+ *
-+ * This function is responsible for fragmenting a larger inner packet into a
-+ * sequence of IPTFS payload packets.
-+ *
-+ * The last fragment is returned rather than being sent so that the caller can
-+ * append more inner packets (aggregation) if there is room.
-+ *
-+ * Return: 0 on success or a negative error code on failure
-+ */
-+static int iptfs_first_skb(struct sk_buff **skbp, struct xfrm_iptfs_data *xtfs, u32 mtu)
-+{
-+	struct sk_buff *skb = *skbp;
-+	int err;
-+
-+	/* Classic ESP skips the don't fragment ICMP error if DF is clear on
-+	 * the inner packet or ignore_df is set. Otherwise it will send an ICMP
-+	 * or local error if the inner packet won't fit it's MTU.
-+	 *
-+	 * With IPTFS we do not care about the inner packet DF bit. If the
-+	 * tunnel is configured to "don't fragment" we error back if things
-+	 * don't fit in our max packet size. Otherwise we iptfs-fragment as
-+	 * normal.
-+	 */
-+
-+	/* The opportunity for HW offload has ended */
-+	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+		err = skb_checksum_help(skb);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* We've split gso up before queuing */
-+
-+	/* Consider the buffer Tx'd and no longer owned */
-+	skb_orphan(skb);
-+
-+	/* Simple case -- it fits. `mtu` accounted for all the overhead
-+	 * including the basic IPTFS header.
-+	 */
-+	if (skb->len <= mtu) {
-+		iptfs_output_prepare_skb(skb, 0);
-+		return 0;
-+	}
-+
-+	return iptfs_copy_create_frags(skbp, xtfs, mtu);
-+}
-+
- static struct sk_buff **iptfs_rehome_fraglist(struct sk_buff **nextp, struct sk_buff *child)
- {
- 	u32 fllen = 0;
-@@ -350,6 +605,15 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 	struct sk_buff *skb, *skb2, **nextp;
- 	struct skb_shared_info *shi, *shi2;
- 
-+	/* If we are fragmenting due to a large inner packet we will output all
-+	 * the outer IPTFS packets required to contain the fragments of the
-+	 * single large inner packet. These outer packets need to be sent
-+	 * consecutively (ESP seq-wise). Since this output function is always
-+	 * running from a timer we do not need a lock to provide this guarantee.
-+	 * We will output our packets consecutively before the timer is allowed
-+	 * to run again on some other CPU.
-+	 */
-+
- 	while ((skb = __skb_dequeue(list))) {
- 		u32 mtu = iptfs_get_cur_pmtu(x, xtfs, skb);
- 		bool share_ok = true;
-@@ -359,7 +623,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 		skb->protocol = x->outer_mode.family == AF_INET ? htons(ETH_P_IP) :
- 								  htons(ETH_P_IPV6);
- 
--		if (skb->len > mtu) {
-+		if (skb->len > mtu && xtfs->cfg.dont_frag) {
- 			/* We handle this case before enqueueing so we are only
- 			 * here b/c MTU changed after we enqueued before we
- 			 * dequeued, just drop these.
-@@ -370,28 +634,22 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 			continue;
- 		}
- 
--		/* If we don't have a cksum in the packet we need to add one
--		 * before encapsulation.
-+		/* Convert first inner packet into an outer IPTFS packet,
-+		 * dealing with any fragmentation into multiple outer packets
-+		 * if necessary.
- 		 */
--		if (skb->ip_summed == CHECKSUM_PARTIAL) {
--			if (skb_checksum_help(skb)) {
--				XFRM_INC_STATS(dev_net(skb_dst(skb)->dev), LINUX_MIB_XFRMOUTERROR);
--				kfree_skb(skb);
--				continue;
--			}
--		}
--
--		/* Consider the buffer Tx'd and no longer owned */
--		skb_orphan(skb);
--
--		/* Convert first inner packet into an outer IPTFS packet */
--		iptfs_output_prepare_skb(skb, 0);
-+		if (iptfs_first_skb(&skb, xtfs, mtu))
-+			continue;
- 
--		/* The space remaining to send more inner packet data is `mtu` -
--		 * (skb->len - sizeof iptfs header). This is b/c the `mtu` value
--		 * has the basic IPTFS header len accounted for, and we added
--		 * that header to the skb so it is a part of skb->len, thus we
--		 * subtract it from the skb length.
-+		/* If fragmentation was required the returned skb is the last
-+		 * IPTFS fragment in the chain, and it's IPTFS header blkoff has
-+		 * been set just past the end of the fragment data.
-+		 *
-+		 * In either case the space remaining to send more inner packet
-+		 * data is `mtu` - (skb->len - sizeof iptfs header). This is b/c
-+		 * the `mtu` value has the basic IPTFS header len accounted for,
-+		 * and we added that header to the skb so it is a part of
-+		 * skb->len, thus we subtract it from the skb length.
- 		 */
- 		remaining = mtu - (skb->len - sizeof(struct ip_iptfs_hdr));
- 
-@@ -628,11 +886,13 @@ static int iptfs_prepare_output(struct xfrm_state *x, struct sk_buff *skb)
- /* ========================== */
- 
- /**
-- * iptfs_get_inner_mtu() - return inner MTU with no fragmentation.
-+ * __iptfs_get_inner_mtu() - return inner MTU with no fragmentation.
-  * @x: xfrm state.
-  * @outer_mtu: the outer mtu
-+ *
-+ * Return: Correct MTU taking in to account the encap overhead.
-  */
--static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
-+static u32 __iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
- {
- 	struct crypto_aead *aead;
- 	u32 blksize;
-@@ -643,6 +903,23 @@ static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
- 		~(blksize - 1)) - 2;
- }
- 
-+/**
-+ * iptfs_get_inner_mtu() - return the inner MTU for an IPTFS xfrm.
-+ * @x: xfrm state.
-+ * @outer_mtu: Outer MTU for the encapsulated packet.
-+ *
-+ * Return: Correct MTU taking in to account the encap overhead.
-+ */
-+static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
-+{
-+	struct xfrm_iptfs_data *xtfs = x->mode_data;
-+
-+	/* If not dont-frag we have no MTU */
-+	if (!xtfs->cfg.dont_frag)
-+		return x->outer_mode.family == AF_INET ? IP_MAX_MTU : IP6_MAX_MTU;
-+	return __iptfs_get_inner_mtu(x, outer_mtu);
-+}
-+
- /**
-  * iptfs_user_init() - initialize the SA with IPTFS options from netlink.
-  * @net: the net data
-@@ -664,6 +941,8 @@ static int iptfs_user_init(struct net *net, struct xfrm_state *x,
- 	xc->max_queue_size = IPTFS_DEFAULT_MAX_QUEUE_SIZE;
- 	xtfs->init_delay_ns = IPTFS_DEFAULT_INIT_DELAY_USECS * NSECS_IN_USEC;
- 
-+	if (attrs[XFRMA_IPTFS_DONT_FRAG])
-+		xc->dont_frag = true;
- 	if (attrs[XFRMA_IPTFS_PKT_SIZE]) {
- 		xc->pkt_size = nla_get_u32(attrs[XFRMA_IPTFS_PKT_SIZE]);
- 		if (!xc->pkt_size) {
-@@ -696,6 +975,8 @@ static unsigned int iptfs_sa_len(const struct xfrm_state *x)
- 	unsigned int l = 0;
- 
- 	if (x->dir == XFRM_SA_DIR_OUT) {
-+		if (xc->dont_frag)
-+			l += nla_total_size(0);	  /* dont-frag flag */
- 		l += nla_total_size(sizeof(u32)); /* init delay usec */
- 		l += nla_total_size(sizeof(xc->max_queue_size));
- 		l += nla_total_size(sizeof(xc->pkt_size));
-@@ -712,6 +993,12 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
- 	u64 q;
- 
- 	if (x->dir == XFRM_SA_DIR_OUT) {
-+		if (xc->dont_frag) {
-+			ret = nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
-+			if (ret)
-+				return ret;
-+		}
-+
- 		q = xtfs->init_delay_ns;
- 		do_div(q, NSECS_IN_USEC);
- 		ret = nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, q);
+ /* ================================= */
+ /* IPTFS Sending (ingress) Functions */
+ /* ================================= */
+@@ -1101,6 +1376,7 @@ static const struct xfrm_mode_cbs iptfs_mode_cbs = {
+ 	.copy_to_user = iptfs_copy_to_user,
+ 	.sa_len = iptfs_sa_len,
+ 	.get_inner_mtu = iptfs_get_inner_mtu,
++	.input = iptfs_input,
+ 	.output = iptfs_output_collect,
+ 	.prepare_output = iptfs_prepare_output,
+ };
 -- 
 2.47.0
 
