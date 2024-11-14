@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-144672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A7A9C815C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:10:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A58EF9C815F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:11:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5D131F224A1
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:10:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33941B259BC
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C05E1E9090;
-	Thu, 14 Nov 2024 03:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630D31EB9F1;
+	Thu, 14 Nov 2024 03:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0SkiN+G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoruIqWf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0311E908A;
-	Thu, 14 Nov 2024 03:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B8D1EABDF;
+	Thu, 14 Nov 2024 03:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731553820; cv=none; b=LsqseQHT98BjxUzJJAnTIqftgNt5KwHzRkU9p6a5+VRtKmovEp5X6SdN7QXLYvzvXITSkLNF6uqrdh8KH0fZrLnO9hjtwYRrTOFjL/spdFlRxsEYngV28jNy5Vn8qCTFb/0EfeTdO32M1wP+j5UeSAqNRuHrSorWTpryV7fhpAo=
+	t=1731553822; cv=none; b=oJ1l8PUFgL5CihMl49GitjyqDvrqf+LadK/5oh8+wVO4xWYVYe48DK/Iv3yvgXHnWxJCoA1tyueWZ6rZqAcfNvUfghEWNL9KPqeqaSuW+CDSzfQgDFweoEiN2/xLOCFiKpaZk7wJHKWlwm3D2IKfUIb6zAFKXB7cV6TUgi79uGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731553820; c=relaxed/simple;
-	bh=xVE9ZKqGPZURWOle4+lgbkCut6C6Frr5hCEr+cRxjkc=;
+	s=arc-20240116; t=1731553822; c=relaxed/simple;
+	bh=GLbVmIqMQok7XEpZtjFkl/69O4TC2qyOOzy0QtQ84Ac=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lvWJOKOeXSU0W0KhEwSqzP3+WS2OnV6HKz/Mi/Vg16KP8DET3qFxF10GZsk4sQmAAScTZX2OikwPvgB+Uv9LzguBing3FdOqvlBS9qYxCTlwX/laJzMFerSPD/guhqqVab4XRBpH54QeLGcdLyeTwZdcwx0zg16n5NAuuNbVmk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0SkiN+G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48900C4AF0B;
-	Thu, 14 Nov 2024 03:10:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aHwxgM/D1NIYpzPBz8Vgl5yIM+D+V0SJodNpcFLGcycDLyArEX7WQovOsLh6y72i48wWJL7FUDFpCoC2rGhAexkVMMhP07WtsgEXcT4FantrqK/6JkEFKqS2s8fl1l/if1nfeMc2+0hi6VtVcNUoYiWcz3B16s+lSxJOP9qfU/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoruIqWf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE598C4CED7;
+	Thu, 14 Nov 2024 03:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731553820;
-	bh=xVE9ZKqGPZURWOle4+lgbkCut6C6Frr5hCEr+cRxjkc=;
+	s=k20201202; t=1731553821;
+	bh=GLbVmIqMQok7XEpZtjFkl/69O4TC2qyOOzy0QtQ84Ac=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T0SkiN+G0nQqyTJB+PXS3W3nbpno5R7G2Hi/InU4AkAEFOiR4sVZtV/1QL8oQpTfB
-	 SDb78dEpu1OO8+avJaXLIDNwbQgmnbdi52XE7Bx1rqgjcp0eYvmXu/LHgwWqV5AlNh
-	 ZJKZWGplbfo7dKs3t0HLnlKGySf8aOF14N0BJikYqcxvuCYmwAaLeJ57GMWEXMZKtL
-	 SXgCBzDAED3wvbMF95EtuGMiLFvjkobuglv84d1Pfq7Hbcb1aEWqCMoCUWhFXLf2nY
-	 WU8hLpXUEg/RBsPXnIz3y+RZLypjGfx+wnXhVBAgIX58W5Qtd7k9zEMMfrwjXlp1S2
-	 Aur4InXuxk95g==
+	b=OoruIqWfTUtkLIsdc8COjJ/FyesDfBdoleGRHh7IXlEtGoMMH/TsvkQjlx4pFzcmT
+	 Mz560iH0intHotbQbp8RkOKHITY3UMtOU8wpGBUEGDgH4LKdCOhxKX01cVfmZh/OnY
+	 5k4O/LZn7evZd2szzqO1sJMLEXIg5OD79xhkfuSvIF5Nljgugo/ybnPkdtliJBy1cx
+	 K3dQ2QDFXvsH+MOI7BIxrpRStLcBbUw0zz/EQ0wVSYErM9gntFVMq1t4gdrcFam2nJ
+	 3nNBLUxjpD9Bs5LWgmJZS0X/VWTEkovzFY7c/3k0iHLeXqo2K1GY9OxCvqhnk7o/br
+	 TwlWuQAtx5zAw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE43809A80;
-	Thu, 14 Nov 2024 03:10:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C4B3809A80;
+	Thu, 14 Nov 2024 03:10:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] mptcp: pm: a few more fixes
+Subject: Re: [PATCH net] samples: pktgen: correct dev to DEV
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173155383073.1467456.7994386444537970996.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Nov 2024 03:10:30 +0000
-References: <20241112-net-mptcp-misc-6-12-pm-v1-0-b835580cefa8@kernel.org>
-In-Reply-To: <20241112-net-mptcp-misc-6-12-pm-v1-0-b835580cefa8@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, kishen.maloor@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <173155383199.1467456.16232649908337123107.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 03:10:31 +0000
+References: <20241112030347.1849335-1-wei.fang@nxp.com>
+In-Reply-To: <20241112030347.1849335-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, hawk@kernel.org, lorenzo@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Nov 2024 20:18:32 +0100 you wrote:
-> Three small fixes related to the MPTCP path-manager:
+On Tue, 12 Nov 2024 11:03:47 +0800 you wrote:
+> In the pktgen_sample01_simple.sh script, the device variable is uppercase
+> 'DEV' instead of lowercase 'dev'. Because of this typo, the script cannot
+> enable UDP tx checksum.
 > 
-> - Patch 1: correctly reflect the backup flag to the corresponding local
->   address entry of the userspace path-manager. A fix for v5.19.
-> 
-> - Patch 2: hold the PM lock when deleting an entry from the local
->   addresses of the userspace path-manager to avoid messing up with this
->   list. A fix for v5.19.
+> Fixes: 460a9aa23de6 ("samples: pktgen: add UDP tx checksum support")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] mptcp: update local address flags when setting it
-    https://git.kernel.org/netdev/net/c/e0266319413d
-  - [net,2/3] mptcp: hold pm lock when deleting entry
-    https://git.kernel.org/netdev/net/c/f642c5c4d528
-  - [net,3/3] mptcp: pm: use _rcu variant under rcu_read_lock
-    https://git.kernel.org/netdev/net/c/db3eab8110bc
+  - [net] samples: pktgen: correct dev to DEV
+    https://git.kernel.org/netdev/net/c/3342dc8b4623
 
 You are awesome, thank you!
 -- 
