@@ -1,55 +1,48 @@
-Return-Path: <netdev+bounces-144896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA389C8A12
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:35:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10CF09C8A84
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:47:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32E1328527F
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:35:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9C491F24420
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E9241F9EDE;
-	Thu, 14 Nov 2024 12:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CAA1F9ED9;
+	Thu, 14 Nov 2024 12:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="l9Jn6FuM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPc2tnyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC0E1F9A8D;
-	Thu, 14 Nov 2024 12:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA731E883F;
+	Thu, 14 Nov 2024 12:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731587727; cv=none; b=sUNRZ3yYvKO1hXhtdz/yjjEeZuUxwaowLYgbWNvY3Q8JxA0Yo8I9jFE/EcwUVGEZrxw2la3A0/FJpzkpQxpMaiUfAcEyBI8/0BhyEhufgejsLDSvF/MDaffLwtVHh8Kh7N2kXG1GiiCPsDdf+neitFgCAMkzXRdcGn1EvqS9eSA=
+	t=1731588433; cv=none; b=UH9oob2tQIpKPJeAmzC3GWt1F7FLdbKJQ/R4945WCZeobqxVnbQ8kpO6ip/GQ3jnfH2dRxbqJq+iniEkIA+ovtfgMFovvbqIPxuI54Migkt4wxcUGHkpS2+nq1KFYRv/d1NNFg2lYdgjJ9GNFnENTdgbb7g3IKaHJEEMO/AG5ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731587727; c=relaxed/simple;
-	bh=0WkcxfAr+SjjzcYjh2T51top57BNY5aFPaykSjgrnC0=;
+	s=arc-20240116; t=1731588433; c=relaxed/simple;
+	bh=LM2UJ++XVFcdQxrEHjPndh+FibA3jWXJI7JXihkurqE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kg2jWAS9kgNLGAtjxAuFM3yu9Zn6HoEolmlEnD5/p8Fjv5d82ghJrr71Co/urh5RQ0e8/+vSHtekPYMRfXxuKnqJD/ZRKIaYan9SaxmsmSsW6Y6kfEtMxG0G60U0371bXTQW4s6DIFtp6yCoO1VdkloTIhmoaKpSSr3LSaNQ0vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=l9Jn6FuM; arc=none smtp.client-ip=80.12.242.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id BZ40thIaGgtkHBZ41tUC1a; Thu, 14 Nov 2024 13:35:16 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1731587716;
-	bh=BHNcnOVeaZJasUSVXJ8QJzu53w+/kj7LUAx1oq0vuHI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=l9Jn6FuMBGr93BnQyPWs2l4LR7uh6VRheNq5TKgkXecQKIJuHI1IZS/H/vDQn5SV4
-	 HaRCZr4jrNuflztCnnbIo5O497lgQwskwO7oE3Qir8RLLE5cvp7TMiE1ypnBSploF2
-	 WPPxl/O0AUARNFLr8m4yFaAWXxfDDUHPxasy4TX4eqsrdwkP/1Rk35qrSt4u6qvuOc
-	 6QMKfFvfDgQ2mVLJFa3Hu9/Rgz6qoyNg1DYQp23ZqgaBwlcxEYxc5n7K9uAACBSjiO
-	 eWxk8AzcqXmZibMAoBxEOOoDy/3ifGT6zHlQtKK3TTuoPhykJXVNxZVUX7drOADaN6
-	 Ji/mRWELRS8dg==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 14 Nov 2024 13:35:16 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <9d6837c1-6fd1-4cc6-8315-c1ede8f20add@wanadoo.fr>
-Date: Thu, 14 Nov 2024 21:35:07 +0900
+	 In-Reply-To:Content-Type; b=jh5MbxOGH7Y+c9mNxOu6OZo7iQZfjhg/cWu8tiV3ZhmHV8UPdiUwuwfJOA6P6m08G8HznIlReGvtMf232nARzzVAU2hvUBiJG/KYw7eVX1Qx8D5b8SKN9joY19UUapXVDblnnEjcfrmj6wlM5YFUyZj3XIU9YmzCTJGUhqcSPXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPc2tnyk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA07C4CECD;
+	Thu, 14 Nov 2024 12:47:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731588432;
+	bh=LM2UJ++XVFcdQxrEHjPndh+FibA3jWXJI7JXihkurqE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QPc2tnykPn/pZ7kmhZ4WbSfG617lzNmuAjNDOh0YHwi2oMeY3GfWDYDjAgs4lJLB3
+	 ObFpuQg1vVhCSVvxgOZQ6vOqMvrVIGun62oTpxFYvZaygvQEgEx77NjxQTifX+ClnZ
+	 wzx7b2sLGsApXR9hvMBDrUak4MoAs7vBrscooyCvb7oLdi4/8QeC5IiffNdcRRsdLS
+	 h1igR/PFOJYTn+Tc+2Fk+sXREjUilbHBpYMmMcaBQyXWgf567cqzOFq3CIAv3qdxuS
+	 LuIBX+sjI6WgO8JQez3xH1/lNww+Bl9bTEQpQIjvUOjiDBhnRd3vTcuestBjD3MJLL
+	 ow2H9jfQWt3ZQ==
+Message-ID: <e9d3a6c8-fb12-4926-8c2b-414017681f03@kernel.org>
+Date: Thu, 14 Nov 2024 14:47:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,65 +50,125 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] can: can327: fix snprintf() limit in
- can327_handle_prompt()
-To: Dan Carpenter <dan.carpenter@linaro.org>, Max Staudt <max@enpas.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+Subject: Re: [PATCH net-next v3 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
+ to priority map for RX
+To: Guillaume Nault <gnault@redhat.com>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
- <6db4d783-6db2-4b86-887c-3c95d6763774@wanadoo.fr>
- <4ff913b9-93b3-4636-b0f6-6e874f813d2f@stanley.mountain>
+ Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
+ Pekka Varis <p-varis@ti.com>
+References: <20241109-am65-cpsw-multi-rx-dscp-v3-0-1cfb76928490@kernel.org>
+ <20241109-am65-cpsw-multi-rx-dscp-v3-2-1cfb76928490@kernel.org>
+ <ZzVBS1zXIy31pnaf@debian> <76dd6141-5852-43ae-af98-f0edf0bc10f5@kernel.org>
+ <8bfe8acc-9514-4ba8-9498-2427ddb0bb78@kernel.org> <ZzXm6SHjRfbaOX14@debian>
 Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-In-Reply-To: <4ff913b9-93b3-4636-b0f6-6e874f813d2f@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <ZzXm6SHjRfbaOX14@debian>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 14/11/2024 at 18:57, Dan Carpenter wrote:
-> On Thu, Nov 14, 2024 at 06:34:49PM +0900, Vincent Mailhol wrote:
->> Hi Dan,
->>
->> On 14/11/2024 at 18:03, Dan Carpenter wrote:
->>> This code is printing hex values to the &local_txbuf buffer and it's
->>> using the snprintf() function to try prevent buffer overflows.  The
->>> problem is that it's not passing the correct limit to the snprintf()
->>> function so the limit doesn't do anything.  On each iteration we print
->>> two digits so the remaining size should also decrease by two, but
->>> instead it passes the sizeof() the entire buffer each time.
+
+
+On 14/11/2024 14:02, Guillaume Nault wrote:
+> On Thu, Nov 14, 2024 at 12:12:47PM +0200, Roger Quadros wrote:
+>> On 14/11/2024 11:41, Roger Quadros wrote:
+>>> On 14/11/2024 02:16, Guillaume Nault wrote:
+>>>> So what about following the IETF mapping found in section 4.3?
+>>>> https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
 >>>
->>> If the frame->len were too long it would result in a buffer overflow.
+>>> Thanks for this tip.
+>>> I will update this patch to have the default DSCP to UP mapping as per
+>>> above link and map all unused DSCP to UP 0.
 >>
->> But, can frame->len be too long? Classical CAN frame maximum length is 8
->> bytes. And I do not see a path for a malformed frame to reach this part of
->> the driver.
+>> How does the below code look in this regard?
+> 
+> Looks generally good to me. A few comments inline though.
+> 
+>> static void am65_cpsw_port_enable_dscp_map(struct am65_cpsw_port *slave)
+>> {
+>> 	int dscp, pri;
+>> 	u32 val;
 >>
->> If such a path exists, I think this should be explained. Else, I am just not
->> sure if this needs a Fixes: tag.
+>> 	/* Default DSCP to User Priority mapping as per:
+>> 	 * https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
+> 
+> Maybe also add a link to
+> https://datatracker.ietf.org/doc/html/rfc8622#section-11
+> which defines the LE PHB (Low Effort) and updates RFC 8325 accordingly.
+> 
+>> 	 */
+>> 	for (dscp = 0; dscp <= AM65_CPSW_DSCP_MAX; dscp++) {
+>> 		switch (dscp) {
+>> 		case 56:	/* CS7 */
+>> 		case 48:	/* CS6 */
+>> 			pri = 7;
+>> 			break;
+>> 		case 46:	/* EF */
+>> 		case 44:	/* VA */
+>> 			pri = 6;
+>> 			break;
+>> 		case 40:	/* CS5 */
+>> 			pri = 5;
+>> 			break;
+>> 		case 32:	/* CS4 */
+>> 		case 34:	/* AF41 */
+>> 		case 36:	/* AF42 */
+>> 		case 38:	/* AF43 */
+>> 		case 24:	/* CS3 */
+>> 		case 26:	/* AF31 */
+>> 		case 28:	/* AF32 */
+>> 		case 30:	/* AF33 */
+> 
+> Until case 32 (CS4) you've kept the order of RFC 8325, table 1.
+> It'd make life easier for reviewers if you could keep this order
+> here. That is, moving CS4 after AF43 and CS3 after AF33.
+> 
+>> 			pri = 4;
+>> 			break;
+>> 		case 17:	/* AF21 */
+> 
+> AF21 is 18, not 17.
+> 
+>> 		case 20:	/* AF22 */
+>> 		case 22:	/* AF23 */
+>> 			pri = 3;
+>> 			break;
+>> 		case 8:		/* CS1 */
+> 
+> Let's be complete and add the case for LE (RFC 8622), which also
+> maps to 1.
 
-I confirmed the CAN frame length is correctly checked.
+All comments are valid. I will fix and send v4 for this series.
 
-The only way to trigger that snprintf() with the wrong size is if 
-CAN327_TX_DO_CAN_DATA is set, which only occurs in can327_send_frame(). 
-And the only caller of can327_send_frame() is can327_netdev_start_xmit().
+> 
+>> 			pri = 1;
+>> 			break;
 
-can327_netdev_start_xmit() calls can_dev_dropped_skb() which in turn 
-calls can_dropped_invalid_skb() which goes to can_is_can_skb() which 
-finally checks that cf->len is not bigger than CAN_MAX_DLEN (i.e. 8 bytes).
+For sake of completeness I will mention CS2, AF11, AF12, AF13
+here that can fallback to default case.
 
-So indeed, no buffer overflow can occur here.
+>> 		default:
+>> 			pri = 0;
+>> 			break;
+>> 		}
+>>
+>> 		am65_cpsw_port_set_dscp_map(slave, dscp, pri);
+>> 	}
+>>
+>> 	/* enable port IPV4 and IPV6 DSCP for this port */
+>> 	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_CTL);
+>> 	val |= AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN |
+>> 		AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN;
+>> 	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_CTL);
+>> }
+>>
+>>>
 
-> Even when bugs don't affect runtime we still assign a Fixes tag, but we don't
-> CC stable.  There is no way that passing the wrong size was intentional.
-
-Got it. Thanks for the explanation, now it makes sense to keep the 
-Fixes: tag.
-
-
-Yours sincerely,
-Vincent Mailhol
+-- 
+cheers,
+-roger
 
 
