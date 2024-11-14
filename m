@@ -1,148 +1,140 @@
-Return-Path: <netdev+bounces-144761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B483E9C8632
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:32:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90EC29C8638
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 059D6B2326B
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:30:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D312BB26BFE
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9669B1F4710;
-	Thu, 14 Nov 2024 09:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OBcQA2bD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B68B1DB95D;
+	Thu, 14 Nov 2024 09:33:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC60D1632F2
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FCE1D95BE
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731576642; cv=none; b=p/6Qh6LgRp6IpZDY9Kdv5WI+9ijK80TVi22ZV0pOYgNguLy7actz50IyHZFFNebneKkudQxxtGeUXMLob/elrnKs75+X0kz6vBbnwdyoW/9p1E8a7lEEezLz+nnNYeyCn1uzUz45bqZKzCg3z0Z/CuGX05aUFrBG3CrC8rtpU8E=
+	t=1731576796; cv=none; b=TuwOgf+vl8mI+FAqxe7JGvQkJZk9rtwyxhBUxoI8x8yDMRumSuOw3tQK4ze5w2kiUnoGsSdfqR60PekaHAihoDGjuo1LFx2zZBNOsnRb0Ou7/GKyd/pYiV+JcrDivxCpyVp11LdJr3k1j0hFvLvP9zB/GkDl00NKeaXnudcSA4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731576642; c=relaxed/simple;
-	bh=7+vl68/jvb9rfrFLy3IGUNyaEvNIRJWriCxG3wtIK1g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ez3P5kQMuHJviAmbG4c6jCO41oSOYch4nO85TVG68RnzinTHwNvhAQOyhwTTpjOdwKLuFziZpgpcJtPHm+iHnJLLYRHDzk3TGwfNrVrhg1NfRhxFM4q8o8/HCBMOFzw1EHyLK508ebTzdNDyXnhYQ/UN5zVboyBT/gc2zVOGpDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OBcQA2bD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731576639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IrSFgeuHYNgrrJXNzgxPo0ocsurFifsc7fqMwk3A2C0=;
-	b=OBcQA2bDseIkLzzs/CoXj98/dLGv38tY4M0wPM1C1zEdjKOVg5A+ERSZT0487rFh5D8791
-	DH0V0yRUi/mTwyMVzz14IEPZ+mZO5oCTmDsCLinE7PU45gB3LJIIED4LKJQQmrgkijfyeu
-	R9BS5WRYAvkjy1UcF24c0IlRGeJvC/A=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-117-GIvBXRDLOyqDkzJxmpenhQ-1; Thu, 14 Nov 2024 04:30:38 -0500
-X-MC-Unique: GIvBXRDLOyqDkzJxmpenhQ-1
-X-Mimecast-MFC-AGG-ID: GIvBXRDLOyqDkzJxmpenhQ
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6cbe4a123fdso4211296d6.2
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:30:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731576638; x=1732181438;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrSFgeuHYNgrrJXNzgxPo0ocsurFifsc7fqMwk3A2C0=;
-        b=Mu9SsuDj0BQ4DUVMRQ+NLHh0LCKxK9eJ1kqeiezq3SbAX6FG2Tfzy8B9A+VdiW6I+/
-         A3c15JXu2glBia7Ij6oOpUMdKA8et3oe07qzOLv81FHLoAZtNiDgF6watm8lBrUVQ5Ls
-         mUntgtFDw0FAhFL+XvwM+9e1AtNGi8lunx555hH0zpNmiXnqRujEHtxwoQBZ0uEwWmFP
-         hHhit/zwZT8YA+E4+BEwYluAizTXtOZFOtd3AjQcIR0VIpm/G4CrTbA38xwMLuMmF1kW
-         gIypssld0s9TMFRl/POie0Y38XiYq2AklIbfs3DRxy+H17l9do524q8pAhTcwfNk/7x6
-         kmww==
-X-Gm-Message-State: AOJu0YxaJjxAk85Rui+Q0HYArgu9IWmu8LIsSq44udh2WRE1djYmzIB9
-	uLruhv+BNYrHwevEKZEg6gVCjU/2zxps0VSLxXYyQ6RAvA1PSQ+2dYGN3M5HfyAnQ3f3EPc0CAV
-	lFt0uLzxmiadtjhBCTTV7XbabXp367oyc+FbcCFJWT62iEBV9nPMjwA==
-X-Received: by 2002:a05:620a:4103:b0:79f:67b:4ffc with SMTP id af79cd13be357-7b3528ab62cmr730524785a.5.1731576638036;
-        Thu, 14 Nov 2024 01:30:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFzvl1pJ94zqWs2bFy6g7EW6hsQmcWFqdigUoUrXGkvTzN3HRoBCNsXW3fPATzXvcaenhKuOw==
-X-Received: by 2002:a05:620a:4103:b0:79f:67b:4ffc with SMTP id af79cd13be357-7b3528ab62cmr730522185a.5.1731576637666;
-        Thu, 14 Nov 2024 01:30:37 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b35ca643b6sm29091785a.118.2024.11.14.01.30.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 01:30:36 -0800 (PST)
-Message-ID: <406c545e-8c00-406a-98f0-0e545c427b25@redhat.com>
-Date: Thu, 14 Nov 2024 10:30:34 +0100
+	s=arc-20240116; t=1731576796; c=relaxed/simple;
+	bh=YRGF3p57aTWGrXe/eH6/Q8GFpy/jcuMGWsfoDCUpfDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=idYft4eJTPWP4ZCMHbqjtAfXIz5Fj1O2MDTPYRV1OeARduZUC2qDbeCETn4X1C5Z7PCxxsu8DXCZp36JqgEYHrqzvY6v2pmX7QPKw/z/3QIwIwk86LAqXJeyaSdokeRak+sDVzKeoS0AWW+9Q6JfJndawJS1gZfIWqs5FuKzAZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBWDn-00029E-Sy; Thu, 14 Nov 2024 10:33:03 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBWDl-000idI-2a;
+	Thu, 14 Nov 2024 10:33:01 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 6C805372F64;
+	Thu, 14 Nov 2024 09:33:01 +0000 (UTC)
+Date: Thu, 14 Nov 2024 10:33:01 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] can: tcan4x5x: add deinit callback to set standby
+ mode
+Message-ID: <20241114-unique-oyster-of-honor-963b97-mkl@pengutronix.de>
+References: <20241111-tcan-standby-v1-0-f9337ebaceea@geanix.com>
+ <20241111-tcan-standby-v1-2-f9337ebaceea@geanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/ipv4/proc: Avoid usage for seq_printf() when reading
- /proc/net/snmp
-To: David Wang <00107082@163.com>, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241111045623.10229-1-00107082@163.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241111045623.10229-1-00107082@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vhaxvdnxrml75eby"
+Content-Disposition: inline
+In-Reply-To: <20241111-tcan-standby-v1-2-f9337ebaceea@geanix.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 11/11/24 05:56, David Wang wrote:
-> seq_printf() is costy, when reading /proc/net/snmp, profiling indicates
-> seq_printf() takes more than 50% samples of snmp_seq_show():
-> 	snmp_seq_show(97.751% 158722/162373)
-> 	    snmp_seq_show_tcp_udp.isra.0(40.017% 63515/158722)
-> 		seq_printf(83.451% 53004/63515)
-> 		seq_write(1.170% 743/63515)
-> 		_find_next_bit(0.727% 462/63515)
-> 		...
-> 	    seq_printf(24.762% 39303/158722)
-> 	    snmp_seq_show_ipstats.isra.0(21.487% 34104/158722)
-> 		seq_printf(85.788% 29257/34104)
-> 		_find_next_bit(0.331% 113/34104)
-> 		seq_write(0.235% 80/34104)
-> 		...
-> 	    icmpmsg_put(7.235% 11483/158722)
-> 		seq_printf(41.714% 4790/11483)
-> 		seq_write(2.630% 302/11483)
-> 		...
-> Time for a million rounds of stress reading /proc/net/snmp:
-> 	real	0m24.323s
-> 	user	0m0.293s
-> 	sys	0m23.679s
-> On average, reading /proc/net/snmp takes 0.023ms.
-> With this patch, extra costs of seq_printf() is avoided, and a million
-> rounds of reading /proc/net/snmp now takes only ~15.853s:
-> 	real	0m16.386s
-> 	user	0m0.280s
-> 	sys	0m15.853s
-> On average, one read takes 0.015ms, a ~40% improvement.
-> 
-> Signed-off-by: David Wang <00107082@163.com>
 
-If the user space is really concerned with snmp access performances, I
-think such information should be exposed via netlink.
+--vhaxvdnxrml75eby
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 2/3] can: tcan4x5x: add deinit callback to set standby
+ mode
+MIME-Version: 1.0
 
-Still the goal of the optimization looks doubtful. The total number of
-mibs domain is constant and limited (differently from the network
-devices number that in specific setup can grow a lot). Stats polling
-should be a low frequency operation. Why you need to optimize it?
-
-I don't think we should accept this change, too. And a solid explanation
-should be need to introduce a netlink MIB interface.
-
+On 11.11.2024 11:51:24, Sean Nyekjaer wrote:
+> At Vsup 12V, standby mode will save 7-8mA, when the interface is
+> down.
+>=20
+> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
 > ---
->  net/ipv4/proc.c | 116 ++++++++++++++++++++++++++++--------------------
+>  drivers/net/can/m_can/tcan4x5x-core.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>=20
+> diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_ca=
+n/tcan4x5x-core.c
+> index 2f73bf3abad889c222f15c39a3d43de1a1cf5fbb..c8336750cdc276b539dde7555=
+b2510fba0d0da75 100644
+> --- a/drivers/net/can/m_can/tcan4x5x-core.c
+> +++ b/drivers/net/can/m_can/tcan4x5x-core.c
+> @@ -270,6 +270,17 @@ static int tcan4x5x_init(struct m_can_classdev *cdev)
+>  	return ret;
+>  }
+> =20
+> +static int tcan4x5x_deinit(struct m_can_classdev *cdev)
+> +{
+> +	struct tcan4x5x_priv *tcan4x5x =3D cdev_to_priv(cdev);
+> +	int ret =3D 0;
+> +
+> +	ret =3D regmap_update_bits(tcan4x5x->regmap, TCAN4X5X_CONFIG,
+> +				 TCAN4X5X_MODE_SEL_MASK, TCAN4X5X_MODE_STANDBY);
 
-FTR you missed mptcp.
+return regmap_update_bits();
 
-/P
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--vhaxvdnxrml75eby
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc1w8oACgkQKDiiPnot
+vG8tVAf/Zq2t5InShRcFklZNepqf/HT7bgyQtAinr3X3GrDykdZD2NEv2PBf/FKv
+S6zkpZkfQ/c5JbiB11bNgn8rzLm5Ia32TeQDbCaHWK8CXAgxt0ITuT4L3RFuFWLs
+xVPQuMQ83iCeLaiwLWuyutT1viIwnLryevyTEfXnoT2ya4G3scCfKv+1LFbXyvVT
++7i2ZdVv1ZbFRPTit0pcN7bn7zVXG77GVAR9Py5m7naCRkhhMtbuhlBq6iYwdWQz
+YufX+ju3mY8tOlMSGnCrs/7yFA+AIPV6dvdiMawg0zBNqlwi/6o4KNhnuybII4cI
+d69WmcNeiPvXhfYk5do71kk8tGoZSg==
+=aruM
+-----END PGP SIGNATURE-----
+
+--vhaxvdnxrml75eby--
 
