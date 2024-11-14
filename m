@@ -1,154 +1,319 @@
-Return-Path: <netdev+bounces-144838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B81AE9C8907
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:33:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E889C8843
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:02:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BFE0B2FC28
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:01:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97E691F24906
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE08D1F8F0A;
-	Thu, 14 Nov 2024 11:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C212A1F76D7;
+	Thu, 14 Nov 2024 11:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vbBSoDKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342141F8937;
-	Thu, 14 Nov 2024 11:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E072D1DA113
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731582037; cv=none; b=gUAh94OKo2b3pi0AbzkczosoGHJtyefYXpYWs+esqtled1x/FdPbyRu2DewzliS0pfk2DQu7vn7dBb33f/v1JRAs5eGUpgAVPgNBpvhGcMWzvrhMmvAwXtTqNajYq6fvJmZKDlNzmRcOWRhcIlDB9jaHBlkCl5Tk0e5XrPFC0NQ=
+	t=1731582077; cv=none; b=RxmPZn0sfpybawuSgrYS0a4VTjrydAGOgBPe8lwdggcDLkXPu88cMs0SSCiHkfQcDp4ygVbj9cs5Iiv8wpPu8Q9BbQz+GTBXMi5KsYU3H9yCBQ20QUbs7rn24zjjh1chbJOLXxcp0CAy8w1TqUw9aHnPyR+BAdwBHM7tVV2ZeBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731582037; c=relaxed/simple;
-	bh=CcG0jqnBBTmp6RbT3RFFybDyVcLS/vaHZeyk4jmq+Cs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZIJFT++R7f8rwWKCU69x0SQ1Hr/sRtADRS1JzEWjx6QuBCs67mGRa0mTs42nQKwzcvXjraAp229Wy1zJNa6R4NUrxZ3ALHNbDw8g1JN+kCGhhnDEVEJqBXLpMbDYkn+0C76ecI/e3tw/tg1QCC2Ad1tqsCeyUN3yIoSSi91whF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9a4031f69fso77695066b.0;
-        Thu, 14 Nov 2024 03:00:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731582034; x=1732186834;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=it2C4C5wvQAPt4uHICHkREUf2UGdJNXOZRzjqKmIdic=;
-        b=EmkOb2fyOMxI16gH9M2iWUDAkJndRdWrljZHmlZ85nmDOrxbRy8FZoJGYTM+P2Wj57
-         6qvkr9lkQM7IXOdvp5BpXg/iaqEXd5Q9VW5j+6ZGppuK96brWUEgW/CT06fuEbPd1fiJ
-         /rIFTF4vNbD3pfSeO5+a2sH/xx6mmFmOhrbwixKeDkiAhYOwPaeouMgsbMCC/NFPoWYE
-         iiqydktW9iHQN2YYTRkW1B9CG4syapmZ2eQUUFd6znoGR8xbp8gJxlizNmIFQOBuToGs
-         fnPDNXKlPdQFPOO3x8CkNAi0w01R2MowtzNpx+5ObowdOQhVw6rSYXUrBH9mFOrPSIvb
-         ZEXw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3/tvnfJIVxv+vPMM9wLVjha+fSUhpRF2JACeGfWBnS0Tr73eEVB7jU/flsjBXury3ya2ZboJw+JiJAuk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAusC650CdCEytaU89YY/bM7etPriLK3Nnjvk2tW69v14n67+g
-	dY2MjUuqR03unYOo3EM+DX9hGFLxSscnYZOG0ADtmz/qIUgRamQJ
-X-Google-Smtp-Source: AGHT+IECDgFGPDccwqyT8QH8ZQNFUck6UICD6mFmCZCTDQXvteFqZoqCcgoaajup3soceL0oQ8/ffA==
-X-Received: by 2002:a17:906:da85:b0:a99:f56e:ce40 with SMTP id a640c23a62f3a-a9ef0021723mr2398084766b.47.1731582033982;
-        Thu, 14 Nov 2024 03:00:33 -0800 (PST)
-Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20e08617esm50003766b.182.2024.11.14.03.00.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 03:00:33 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 14 Nov 2024 03:00:12 -0800
-Subject: [PATCH net-next v3 2/2] net: netpoll: flush skb pool during
- cleanup
+	s=arc-20240116; t=1731582077; c=relaxed/simple;
+	bh=pUHn5HGgF79yg1wImG4JyLG23D2B1qKzAldSUj3B9Q4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K+/Sb+L7FKajXTZmSpjvURSPwSRNlZ6jfryqYa+4I769u/43a+8QNjOkfK4Fk0r/ynQKaYpjyXRuMknn0SzgD2J/4XSaWBPODA82sAgXEGWsR/fmnnaMQkGZIl65Kl6Rr2L9hiUV4o2tR6mQGxc1GDzLaP7MKA5N1vZOQ3SX9ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vbBSoDKS; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1dc15200-ee39-4134-9d2a-56bdd8c53b40@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731582067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bpYyE45O2ll6qjkcPPufPAoPphPwoZoaaYiuP75xxY4=;
+	b=vbBSoDKSqqIW78bvpU8UG2xmwbXhTSsryF0GR8UXHoSMIzAS8lJUzLXjm3uyju0/crRbE1
+	i1YCwf1HKsMrSzHhcBaVN/01PB6XisjBI/bHVeCVfPH/JJXJkDRXE+RGe3ZdV7YQo7YrGN
+	GwqNITznNY0/wLowFTrdJIRfAvq+isQ=
+Date: Thu, 14 Nov 2024 11:01:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH iwl-net 01/10] idpf: initial PTP support
+To: Milena Olech <milena.olech@intel.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20241113154616.2493297-1-milena.olech@intel.com>
+ <20241113154616.2493297-2-milena.olech@intel.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241113154616.2493297-2-milena.olech@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241114-skb_buffers_v2-v3-2-9be9f52a8b69@debian.org>
-References: <20241114-skb_buffers_v2-v3-0-9be9f52a8b69@debian.org>
-In-Reply-To: <20241114-skb_buffers_v2-v3-0-9be9f52a8b69@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>, max@kutsevol.com, davej@codemonkey.org.uk, 
- vlad.wing@gmail.com
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1609; i=leitao@debian.org;
- h=from:subject:message-id; bh=CcG0jqnBBTmp6RbT3RFFybDyVcLS/vaHZeyk4jmq+Cs=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnNdhMAIeFZEObOr+/04M/hYeWOnXWFCd9Fw27M
- 9NryO8Y6WKJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzXYTAAKCRA1o5Of/Hh3
- bSH0D/9JIsJfmcJNz8WmCGRtzR0Yl77PDOE7wrcHA/4W70kEb5CdTAN6Hocr36XDykat85iUSvF
- a/3Mc0B2qnjHq403WfaUbLYXHEMYBOXtmj6wR78D1T2fiKxT1HNzp12Q0Qi5FR/KDhUSSb85j8y
- kQY7AaF27FgEGNdBodYKb2PPVH0grTIjAGxtE2M1oycFI+mLyi8i3AHZLYXnLMTPyHdnd2kR/TR
- BJgbyoOCy8EZh51D+cMp4ULGJrPWveP4lN32QCQRSRtsJ4U4v6fZG2bK1g7YnKVCbfHitoQXlHx
- wGZdZFPbDHs+Flcy+gFZjCqN+t7EvEaCREdMUU7AhzY+1pUBKSe3yLztfnmp2XSJu/e6nyS0Rtm
- vx0aZsUyhooW3W0GbwNAwLjuMoTuVccy5IHNWPluAVx+bl5BBnSJnZOvBpJYVS01JU2Ivt2q2kl
- pDUnynvi7LqxqP14tDi1gXyAVYd916k0SobKMUBjvmBg2qUYFfSdfJdsghTLSUDGO4jJnJGq9MG
- 7XgXE7tzPZsPz7ufX3NOM3McFDZzA2gAyb1Nk5gVPgVRlyXf++StwBuvjnru6AhZoRjetv4DRaD
- 61tp2Kzzvyt/xrmkl9t7wGoTORR/C5kNIYMJIPIFgK09QGzaUw2s5traGJeMrdfgNUAh2psbfO8
- 4ekpO1wSOAeiYSw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Migadu-Flow: FLOW_OUT
 
-The netpoll subsystem maintains a pool of 32 pre-allocated SKBs per
-instance, but these SKBs are not freed when the netpoll user is brought
-down. This leads to memory waste as these buffers remain allocated but
-unused.
+On 13/11/2024 15:46, Milena Olech wrote:
+> PTP feature is supported if the VIRTCHNL2_CAP_PTP is negotiated during the
+> capabilities recognition. Initial PTP support includes PTP initialization
+> and registration of the clock.
+> 
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> ---
+>   drivers/net/ethernet/intel/idpf/Kconfig       |  1 +
+>   drivers/net/ethernet/intel/idpf/Makefile      |  1 +
+>   drivers/net/ethernet/intel/idpf/idpf.h        |  3 +
+>   drivers/net/ethernet/intel/idpf/idpf_main.c   |  4 +
+>   drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 89 +++++++++++++++++++
+>   drivers/net/ethernet/intel/idpf/idpf_ptp.h    | 32 +++++++
+>   .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  9 +-
+>   7 files changed, 138 insertions(+), 1 deletion(-)
+>   create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.c
+>   create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.h
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/Kconfig b/drivers/net/ethernet/intel/idpf/Kconfig
+> index 1addd663acad..2c359a8551c7 100644
+> --- a/drivers/net/ethernet/intel/idpf/Kconfig
+> +++ b/drivers/net/ethernet/intel/idpf/Kconfig
+> @@ -4,6 +4,7 @@
+>   config IDPF
+>   	tristate "Intel(R) Infrastructure Data Path Function Support"
+>   	depends on PCI_MSI
+> +	depends on PTP_1588_CLOCK_OPTIONAL
+>   	select DIMLIB
+>   	select LIBETH
+>   	help
+> diff --git a/drivers/net/ethernet/intel/idpf/Makefile b/drivers/net/ethernet/intel/idpf/Makefile
+> index 2ce01a0b5898..1f38a9d7125c 100644
+> --- a/drivers/net/ethernet/intel/idpf/Makefile
+> +++ b/drivers/net/ethernet/intel/idpf/Makefile
+> @@ -17,3 +17,4 @@ idpf-y := \
+>   	idpf_vf_dev.o
+>   
+>   idpf-$(CONFIG_IDPF_SINGLEQ)	+= idpf_singleq_txrx.o
+> +idpf-$(CONFIG_PTP_1588_CLOCK)	+= idpf_ptp.o
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+> index 66544faab710..2e8b14dd9d96 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+> @@ -530,6 +530,7 @@ struct idpf_vc_xn_manager;
+>    * @vector_lock: Lock to protect vector distribution
+>    * @queue_lock: Lock to protect queue distribution
+>    * @vc_buf_lock: Lock to protect virtchnl buffer
+> + * @ptp: Storage for PTP-related data
+>    */
+>   struct idpf_adapter {
+>   	struct pci_dev *pdev;
+> @@ -587,6 +588,8 @@ struct idpf_adapter {
+>   	struct mutex vector_lock;
+>   	struct mutex queue_lock;
+>   	struct mutex vc_buf_lock;
+> +
+> +	struct idpf_ptp *ptp;
+>   };
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> index db476b3314c8..22d9e2646444 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> @@ -163,6 +163,10 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   		goto err_free;
+>   	}
+>   
+> +	err = pci_enable_ptm(pdev, NULL);
+> +	if (err)
+> +		pci_dbg(pdev, "PCIe PTM is not supported by PCIe bus/controller\n");
+> +
+>   	/* set up for high or low dma */
+>   	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+>   	if (err) {
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> new file mode 100644
+> index 000000000000..1ac6367f5989
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> @@ -0,0 +1,89 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright (C) 2024 Intel Corporation */
+> +
+> +#include "idpf.h"
+> +#include "idpf_ptp.h"
+> +
+> +/**
+> + * idpf_ptp_create_clock - Create PTP clock device for userspace
+> + * @adapter: Driver specific private structure
+> + *
+> + * This function creates a new PTP clock device.
+> + *
+> + * Return: 0 on success, -errno otherwise.
+> + */
+> +static int idpf_ptp_create_clock(const struct idpf_adapter *adapter)
+> +{
+> +	struct ptp_clock *clock;
+> +
+> +	/* Attempt to register the clock before enabling the hardware. */
+> +	clock = ptp_clock_register(&adapter->ptp->info,
+> +				   &adapter->pdev->dev);
+> +	if (IS_ERR(clock)) {
+> +		pci_err(adapter->pdev, "PTP clock creation failed: %pe\n", clock);
+> +		return PTR_ERR(clock);
+> +	}
+> +
+> +	adapter->ptp->clock = clock;
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * idpf_ptp_init - Initialize PTP hardware clock support
+> + * @adapter: Driver specific private structure
+> + *
+> + * Set up the device for interacting with the PTP hardware clock for all
+> + * functions. Function will allocate and register a ptp_clock with the
+> + * PTP_1588_CLOCK infrastructure.
+> + *
+> + * Return: 0 on success, -errno otherwise.
+> + */
+> +int idpf_ptp_init(struct idpf_adapter *adapter)
+> +{
+> +	int err;
+> +
+> +	if (!idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS, VIRTCHNL2_CAP_PTP)) {
+> +		pci_dbg(adapter->pdev, "PTP capability is not detected\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	adapter->ptp = kzalloc(sizeof(*adapter->ptp), GFP_KERNEL);
+> +	if (!adapter->ptp)
+> +		return -ENOMEM;
+> +
+> +	/* add a back pointer to adapter */
+> +	adapter->ptp->adapter = adapter;
+> +
+> +	err = idpf_ptp_create_clock(adapter);
+> +	if (err)
+> +		goto free_ptp;
+> +
+> +	pci_dbg(adapter->pdev, "PTP init successful\n");
+> +
+> +	return 0;
+> +
+> +free_ptp:
+> +	kfree(adapter->ptp);
+> +	adapter->ptp = NULL;
+> +
+> +	return err;
+> +}
+> +
+> +/**
+> + * idpf_ptp_release - Clear PTP hardware clock support
+> + * @adapter: Driver specific private structure
+> + */
+> +void idpf_ptp_release(struct idpf_adapter *adapter)
+> +{
+> +	struct idpf_ptp *ptp = adapter->ptp;
+> +
+> +	if (!ptp)
+> +		return;
+> +
+> +	if (ptp->clock)
+> +		ptp_clock_unregister(ptp->clock);
+> +
+> +	kfree(ptp);
+> +	adapter->ptp = NULL;
+> +}
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+> new file mode 100644
+> index 000000000000..cb19988ca60f
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+> @@ -0,0 +1,32 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Copyright (C) 2024 Intel Corporation */
+> +
+> +#ifndef _IDPF_PTP_H
+> +#define _IDPF_PTP_H
+> +
+> +#include <linux/ptp_clock_kernel.h>
+> +
+> +/**
+> + * struct idpf_ptp - PTP parameters
+> + * @info: structure defining PTP hardware capabilities
+> + * @clock: pointer to registered PTP clock device
+> + * @adapter: back pointer to the adapter
+> + */
+> +struct idpf_ptp {
+> +	struct ptp_clock_info info;
+> +	struct ptp_clock *clock;
+> +	struct idpf_adapter *adapter;
+> +};
+> +
+> +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
+> +int idpf_ptp_init(struct idpf_adapter *adapter);
+> +void idpf_ptp_release(struct idpf_adapter *adapter);
+> +#else /* CONFIG_PTP_1588_CLOCK */
+> +static inline int idpf_ptp_init(struct idpf_adapter *adpater)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void idpf_ptp_release(struct idpf_adapter *adpater) { }
+> +#endif /* CONFIG_PTP_1588_CLOCK */
+> +#endif /* _IDPF_PTP_H */
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index d46c95f91b0d..c73c38511ea3 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -5,6 +5,7 @@
+>   
+>   #include "idpf.h"
+>   #include "idpf_virtchnl.h"
+> +#include "idpf_ptp.h"
+>   
+>   #define IDPF_VC_XN_MIN_TIMEOUT_MSEC	2000
+>   #define IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC	(60 * 1000)
+> @@ -896,7 +897,8 @@ static int idpf_send_get_caps_msg(struct idpf_adapter *adapter)
+>   			    VIRTCHNL2_CAP_MACFILTER		|
+>   			    VIRTCHNL2_CAP_SPLITQ_QSCHED		|
+>   			    VIRTCHNL2_CAP_PROMISC		|
+> -			    VIRTCHNL2_CAP_LOOPBACK);
+> +			    VIRTCHNL2_CAP_LOOPBACK		|
+> +			    VIRTCHNL2_CAP_PTP);
+>   
+>   	xn_params.vc_op = VIRTCHNL2_OP_GET_CAPS;
+>   	xn_params.send_buf.iov_base = &caps;
+> @@ -3025,6 +3027,10 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
+>   		goto err_intr_req;
+>   	}
+>   
+> +	err = idpf_ptp_init(adapter);
+> +	if (err)
+> +		pci_err(adapter->pdev, "PTP init failed, err=%pe\n", ERR_PTR(err));
+> +
+>   	idpf_init_avail_queues(adapter);
+>   
+>   	/* Skew the delay for init tasks for each function based on fn number
+> @@ -3080,6 +3086,7 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+>   	if (!test_bit(IDPF_VC_CORE_INIT, adapter->flags))
+>   		return;
+>   
+> +	idpf_ptp_release(adapter);
+>   	idpf_deinit_task(adapter);
+>   	idpf_intr_rel(adapter);
+>   	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
 
-Add skb_pool_flush() to properly clean up these SKBs when netconsole is
-terminated, improving memory efficiency.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/core/netpoll.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 719c9aae845fbeb6f5b53a2bef675d3cb8cd44a7..00e1e4a329022ddcef32d72f1828acaf58cc94fa 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -531,6 +531,14 @@ static int netpoll_parse_ip_addr(const char *str, union inet_addr *addr)
- 	return -1;
- }
- 
-+static void skb_pool_flush(struct netpoll *np)
-+{
-+	struct sk_buff_head *skb_pool;
-+
-+	skb_pool = &np->skb_pool;
-+	skb_queue_purge_reason(skb_pool, SKB_CONSUMED);
-+}
-+
- int netpoll_parse_options(struct netpoll *np, char *opt)
- {
- 	char *cur=opt, *delim;
-@@ -779,10 +787,12 @@ int netpoll_setup(struct netpoll *np)
- 
- 	err = __netpoll_setup(np, ndev);
- 	if (err)
--		goto put;
-+		goto flush;
- 	rtnl_unlock();
- 	return 0;
- 
-+flush:
-+	skb_pool_flush(np);
- put:
- 	DEBUG_NET_WARN_ON_ONCE(np->dev);
- 	if (ip_overwritten)
-@@ -830,6 +840,8 @@ void __netpoll_cleanup(struct netpoll *np)
- 		call_rcu(&npinfo->rcu, rcu_cleanup_netpoll_info);
- 	} else
- 		RCU_INIT_POINTER(np->dev->npinfo, NULL);
-+
-+	skb_pool_flush(np);
- }
- EXPORT_SYMBOL_GPL(__netpoll_cleanup);
- 
-
--- 
-2.43.5
-
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
