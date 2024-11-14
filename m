@@ -1,94 +1,65 @@
-Return-Path: <netdev+bounces-144920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79DD9C8C73
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:08:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B2C49C8C76
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC011F24AF0
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:08:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 338701F24AF0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473844204B;
-	Thu, 14 Nov 2024 14:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271D829429;
+	Thu, 14 Nov 2024 14:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jT0GHCfW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ALfL0Gb1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE9F25776
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 14:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299191799B;
+	Thu, 14 Nov 2024 14:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731593257; cv=none; b=N3BkIwrBgXEbKZJkXU4cPW1iBtTgl0qdJy/cTR1tRHMpn3KVvrFM8eUC712ZReyDqd1Hjj5nEroD/JOy5km0x0JQ0uZZQy3zcg1mr4jXnDWXglXWpHKh1ND0DmjhMjOy5urSLX51mZ9m4WAkhytuRuPwPCiK++sqMyLwzlITGf8=
+	t=1731593289; cv=none; b=Gd34C6YVOlagMsAllXnzaoSwJ64LjYKY5YPUBRDALYuQ39Xj2VUXmgrp9lLn60WcvlW2Kqvx4ZNxx5lI+8qIikfmpGqOpHs+Tt568OhF+UtwqqEtq2tzTCFwSpcmy+o4S02l9crwHHbFPfcGwbJRHKZ/wvg3XoSanJ8ZqaphJ/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731593257; c=relaxed/simple;
-	bh=WUzDeLLAJtW+Z0kgOfdgeEqqhYnBqQ4TWuHZqdvOLmE=;
+	s=arc-20240116; t=1731593289; c=relaxed/simple;
+	bh=Q5U+PJg1rcx9XWNl+P+/n5J1Fu65OrQwexbEb6Wk/oQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S6s7wN6lGa9AKX8y498cGfetezDJIX+vH9XF6mbCMt88yj2uVV9IoklcCH9kuRDnpZX82cEP5sltTfmM8j1Buo2psZdEjjyDzMR2i6JThtMmQmxD4kVcGSexVTOip4ox0EubxRkSCF0awYZDaZEGQ0zKRs92bQtgziicDQ6A8GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jT0GHCfW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731593252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K0gBUaNEyoe8hJ+dYpFL/aTlXJr3V+IJ2ahMbY21d80=;
-	b=jT0GHCfWv1HUgAfDfPBs9up9oBzdFJvaPRSoIRF1DyDHTugqjexxeigSoirScn7i3eJTFd
-	bdir//QXaf2ieYnaOfMxT496co5BlOpfDPVkfZVxgmc3ExUXo8iCdjXADyj3RuqIQD1GnB
-	cI8oqpz7cK1Gc+uQITO8ZVJgLYTDA18=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-qYhZEuMIOFiWfBsQHEg_CQ-1; Thu, 14 Nov 2024 09:07:31 -0500
-X-MC-Unique: qYhZEuMIOFiWfBsQHEg_CQ-1
-X-Mimecast-MFC-AGG-ID: qYhZEuMIOFiWfBsQHEg_CQ
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4314f023f55so5079615e9.2
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 06:07:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731593250; x=1732198050;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K0gBUaNEyoe8hJ+dYpFL/aTlXJr3V+IJ2ahMbY21d80=;
-        b=TLpkhns22EixUniwgDtdDkbUktyWmgicGsx+cLMko+E+clF8RglU/U2FKmnrrRsafg
-         wnoG2OYjx5GQ4HbcvsHRaNHbkute9kUVFhvdaXzUZuGhqH37/6ypLZTqGYJ/dpvcTZhP
-         5oVL90s/8C6G7XzfjKJgCKr7UVCksNddmRnCiPZWWzMzbl15Ki32swznP6L76fR/CmtT
-         lxCjTnkz9Bxsexcwx7eZAohjHlrqRtJOOfo+fslBuq5RcEcjtxuK/S6IHxizXXhDDj3C
-         +DrWmKag4hjM6ZSc6juYEUVRSnJBXzelIx/1TST6zg+5tJK1mjwqASfNLKoCQfIKAHYm
-         ZO7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWLsGafve7RwUU9hPdTXfvb59+7QcRDNWc+kbSgyIW9TH0L+Nb/PklcfluLL2ptvqqULwC7g20=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT0bHvoUHNzzOJ5N+oPTxQew5nKWRu8mVSgVNc/Q2B5x1j7mFV
-	9Uq3mhLeCGtE6fwhwA24wyF7xS6j/Z1Dw2g+Tc3WqzJH8ZfEiXYEZu9futmsVcDjad+7mBso3bE
-	+1QPjiP/T2Oe59sUV3AFn2zzMXyNX8/5m/SeeFRYaK+Em40XU5Ku8NQ==
-X-Received: by 2002:a05:600c:4f09:b0:42e:93af:61c5 with SMTP id 5b1f17b1804b1-432b7501fdemr223068245e9.14.1731593249954;
-        Thu, 14 Nov 2024 06:07:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGlAsv5aiN/Qn1l2dvPuDWBAlvuNUEXu9wk/kXmBPHQK9kBVTOoQJEVnzmbxW6W/XkP1hbywQ==
-X-Received: by 2002:a05:600c:4f09:b0:42e:93af:61c5 with SMTP id 5b1f17b1804b1-432b7501fdemr223067825e9.14.1731593249568;
-        Thu, 14 Nov 2024 06:07:29 -0800 (PST)
-Received: from debian (2a01cb058d23d600b637ad91a758ba3f.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:b637:ad91:a758:ba3f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab80ad9sm21463955e9.25.2024.11.14.06.07.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 06:07:29 -0800 (PST)
-Date: Thu, 14 Nov 2024 15:07:27 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
-	Pekka Varis <p-varis@ti.com>
-Subject: Re: [PATCH net-next v4 2/2] net: ethernet: ti: am65-cpsw: enable
- DSCP to priority map for RX
-Message-ID: <ZzYEH+q4AG5FBCiG@debian>
-References: <20241114-am65-cpsw-multi-rx-dscp-v4-0-93eaf6760759@kernel.org>
- <20241114-am65-cpsw-multi-rx-dscp-v4-2-93eaf6760759@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ukqmy2nySNZrdAz3Ibo5wgsN3Pi/F8gWxVejo0XqP+y+CEZXKAX4lZwkfofLHWORLErSRZGfC4ZZGi0sYtHrrP7GRcZxcAyH03xMVyiyUNEDVbvIpWgF+fFpA1kf2lhXODHvulxSq2ivly0RKaoT7KAdpajWS7Ou/AdQjSXbTak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ALfL0Gb1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9oj7rXsLkt3YOArpegG66nk5POyVHtry4taLnVtBxpU=; b=ALfL0Gb1uwFBZqdcRmk5nIcrza
+	6I4Pgdf2ci5biGO0CUxnmoed/4K43wbC6Jjh9A1MlILNhUB4aT0eRvOTcyo/Q+o+0Pk40a063cseo
+	eV4uypcF6l5WNk4/T/i7YfYvPhmrCsv387yC/xGaGuw3/D/vdXSlNdrd31bk7+OWzzbg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tBaVt-00DItG-Em; Thu, 14 Nov 2024 15:08:01 +0100
+Date: Thu, 14 Nov 2024 15:08:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com
+Subject: Re: [PATCH v6 7/7] net: phy: qt2025: Wait until PHY becomes ready
+Message-ID: <2d70826b-6d6c-43f6-b6ba-542d25e6e0c0@lunn.ch>
+References: <20241114070234.116329-1-fujita.tomonori@gmail.com>
+ <20241114070234.116329-8-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,18 +68,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241114-am65-cpsw-multi-rx-dscp-v4-2-93eaf6760759@kernel.org>
+In-Reply-To: <20241114070234.116329-8-fujita.tomonori@gmail.com>
 
-On Thu, Nov 14, 2024 at 03:36:53PM +0200, Roger Quadros wrote:
-> AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
-> appropriate priority queue via DSCP to Priority mapping registers
-> (CPSW_PN_RX_PRI_MAP_REG).
+On Thu, Nov 14, 2024 at 04:02:34PM +0900, FUJITA Tomonori wrote:
+> Wait until a PHY becomes ready in the probe callback by
+> using read_poll_timeout function.
 > 
-> Use a default DSCP to User Priority (UP) mapping as per
-> https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
-> and
-> https://datatracker.ietf.org/doc/html/rfc8622#section-11
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  drivers/net/phy/qt2025.rs | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+> index 28d8981f410b..c042f2f82bb9 100644
+> --- a/drivers/net/phy/qt2025.rs
+> +++ b/drivers/net/phy/qt2025.rs
+> @@ -12,6 +12,7 @@
+>  use kernel::c_str;
+>  use kernel::error::code;
+>  use kernel::firmware::Firmware;
+> +use kernel::io::poll::read_poll_timeout;
+>  use kernel::net::phy::{
+>      self,
+>      reg::{Mmd, C45},
+> @@ -19,6 +20,7 @@
+>  };
+>  use kernel::prelude::*;
+>  use kernel::sizes::{SZ_16K, SZ_8K};
+> +use kernel::time::Delta;
+>  
+>  kernel::module_phy_driver! {
+>      drivers: [PhyQT2025],
+> @@ -93,7 +95,13 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+>          // The micro-controller will start running from SRAM.
+>          dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
+>  
+> -        // TODO: sleep here until the hw becomes ready.
+> +        read_poll_timeout(
+> +            || dev.read(C45::new(Mmd::PCS, 0xd7fd)),
+> +            |val| val != 0x00 && val != 0x10,
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+Do we have any idea what these magic numbers mean? Can we replace the
+numbers with names?
 
+Apart from that, this patch looks O.K.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
