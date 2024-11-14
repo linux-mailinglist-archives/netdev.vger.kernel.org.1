@@ -1,118 +1,101 @@
-Return-Path: <netdev+bounces-144813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB7AB9C878A
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:29:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510879C87C3
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:38:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96EC01F2140D
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:29:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05DF8B33E03
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8506D200120;
-	Thu, 14 Nov 2024 10:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E853120262D;
+	Thu, 14 Nov 2024 10:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLDgXFIN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="baZf5bKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF59E1F80D2;
-	Thu, 14 Nov 2024 10:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF16420127A;
+	Thu, 14 Nov 2024 10:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731579617; cv=none; b=WSaorosuwCvn1LMSJwnIxAtmd8yExX77qvErMfLsthenb2SQrdphsk69YIG2nyl4sM/ml2XBCOekxwjazKzS82/u5JZ3FLmzp6fjuDrMiFSBqLcaQpPkfdsIBDrbPJuji+FxYIWs8mfaSOQQz2/yqF3urRQqtkDGhljMdvQzBVk=
+	t=1731579619; cv=none; b=IG6td1dv5BqthIucB9oxJ2LcQpxkYPiaFXWQDziRA1dC2vgnc9hViCLx0exrIRXXHic3iYojq4mLEXHv3DoQJgGiVaQpmPqC2jTG+kzUflGICg4UQLjNK8sRG0ddBhUAxvc7GIgiIq7Q+FR8KNynRjPR2lZy0ce2FTEOQ62KkOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731579617; c=relaxed/simple;
-	bh=Zj/1hkrQNcNwCq+kQCz6JEFTpDafV/64BToL/HZE2OY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=FAb8j66pmMCs2ruiUjdtj+Awfxn9/YimUiwp9NVc9AwUiX6PZ+99Rc9N/YDYGuI4QOxX0H6eW+6Wu1HRLv/mQaNAoQe5ZSsVnRWWMmY7IrbgPzJ4mEW7whNPsYDtaNBiq7inQHwto8SNELB8QRoHSs/yjdMggAO77u3IKzqRyF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mLDgXFIN; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53da209492cso449866e87.3;
-        Thu, 14 Nov 2024 02:20:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731579614; x=1732184414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BXs2D21LwohnP+U2rvw/liEYSUVRSTi/JkMTk288k0I=;
-        b=mLDgXFINIDN/tbysgIEnblnyP4PTCe/us+wVcRvCwjvvpUAulcQGvDfkgZqx7ASe+2
-         EmHuA2tRXOPtpmqJPVP22pyDvUD/yHYcgabNoFYePUVsfWJUHdmb8lZfnImEt1bRb+ee
-         S4Qkk6dSenNGtXEGddkpJpPsEfwSODHRuc7dq69n9pOZQZLM804lotcrzV2HMs7P1GrS
-         QtegBb/4mmvBbRE9zq/dRbg5KVI9diWy9qwpiDvrfIJ58c6tl61AYnQ6NMaEmdRJuzrF
-         Fi7wq+oWNsiijtQm3EqhwS15aGewYGrYAsWNyG22WeEAlaNbYJv51Iv6Nslg2DeqwnKT
-         D9gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731579614; x=1732184414;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BXs2D21LwohnP+U2rvw/liEYSUVRSTi/JkMTk288k0I=;
-        b=dwwLIijzkTNjMtIW91zn6UtHKdlKWJlp3fzwGWH0XVcaFmhmaMhiPqHWlmhxB0wVw4
-         8VhVBepTiT8XnvkTnioigokEnKqueaLPuEbV9uuV5ea60sxplwUwQuEaNQa8ogDrqeql
-         1xsq1eRVFxzHvvmxclMdlsZB9CEFCX2gf3+78591Niw0OkdX3kMmK0mgUZsJhnIqVo9/
-         OhbjozAErobAqp/IVmjFap+Q60UVg64T9PPEvWOTAqvYHDhfvxYBy5sG+ALIJt2nKyZG
-         lpIkm0giY1+OreOwe561k7L7sBmlwC2hvh7abwxbPZWfNgzTn8AuG/bWmPHp1aatLNPB
-         yaGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUt2j0uD5m7Zv8MRfMdqtlTX80QpmFpwy4khNfNHJD5tzmo/f6IthRPZoHZihC8xyJSBREsl9XE@vger.kernel.org, AJvYcCVCoOcQ8VvA7E9U+ZwJezOt2PFVYnJxTOrw9SXmCmYbZLIo9eWGwehaOtD49GkiBjOcGDHEdt0txUPI5uw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFgMdbBn7g3bvXgSqymapesAQXgJPUaGNCwv3C2N88xNGREjf1
-	QKeJirK0q3YL2/lVc6SKBMiFOW0XxPW/j8ahD/p67PtvoPP3vNaN
-X-Google-Smtp-Source: AGHT+IEijiW0XUP3xPsUKgtPzcn5M+JO4pbrgaMa4MN3iDTGrZpnMwHsGrkyC6K3HgljtvtI7HrCPw==
-X-Received: by 2002:ac2:4f02:0:b0:53b:4bc0:72aa with SMTP id 2adb3069b0e04-53d9fe8b1c7mr3288842e87.34.1731579613557;
-        Thu, 14 Nov 2024 02:20:13 -0800 (PST)
-Received: from localhost ([194.120.133.65])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821ada4076sm1048920f8f.16.2024.11.14.02.20.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 02:20:13 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] octeontx2-pf: Fix spelling mistake "reprentator" -> "representor"
-Date: Thu, 14 Nov 2024 10:20:12 +0000
-Message-Id: <20241114102012.1868514-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1731579619; c=relaxed/simple;
+	bh=WqoZPSZPRO3SiDo4pzhANc0aDEgAi1wQ2Z/rJ2p3oEA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ql2Y84JdlO2xyLDUdsbc1iPa/hG5YwoInJPXELf56dIW1qn22Qcn6FkM5hgFOLJfQHSgYOcxmoaIcWLIczDbaTKQePTFTor/admqh1d6SUlS2V1l5hDin9PAqoFIFV7lZn5qKdrNGCXqvBpvyRzOXPuvgETIEUIiZrQQbN03SvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=baZf5bKc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CFBAC4CECD;
+	Thu, 14 Nov 2024 10:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731579619;
+	bh=WqoZPSZPRO3SiDo4pzhANc0aDEgAi1wQ2Z/rJ2p3oEA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=baZf5bKccUP3axDeJh3De7q4W7MlZStYyhsWAXRHVFKpr1y7yUNXBIeF0Plrcv+iL
+	 LhkckTtFptLbqtAU5k2SySoDXldPvU/eah38HUm5mKPhTIIHZ+k9SsZZqShNKb6fEz
+	 vzQpO6WHpag+IO8dyJxzq8yhNEc7CoOEtZ1Q1Lwls3F9I+ZhJX/UMlLXLSQoTnnjNd
+	 Xp3k0IVLoxNSC2M3oY0P1dW4ni+Fl065IXaUFGMPkri+kL9K12WbfiGBQ0NRZJvqZ5
+	 ML3vQTG0G0uiQLrf+A7Psdta9hE07cEg0nziWFJt6KrAN6of7QQOFVN08McBE9kcFN
+	 swXKdeZgWIBXg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC853809A80;
+	Thu, 14 Nov 2024 10:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCHv4 net 0/2] bonding: fix ns targets not work on hardware NIC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173157962974.1869204.16348527317957867096.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 10:20:29 +0000
+References: <20241111101650.27685-1-liuhangbin@gmail.com>
+In-Reply-To: <20241111101650.27685-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, jv@jvosburgh.net, andy@greyhouse.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ razor@blackwall.org, horms@kernel.org, linux-kernel@vger.kernel.org
 
-There is a spelling mistake in a NL_SET_ERR_MSG_MOD error message.
-Fix it.
+Hello:
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/rep.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index ae58d0601b45..232b10740c13 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -687,7 +687,7 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
- 		err = register_netdev(ndev);
- 		if (err) {
- 			NL_SET_ERR_MSG_MOD(extack,
--					   "PFVF reprentator registration failed");
-+					   "PFVF representor registration failed");
- 			free_netdev(ndev);
- 			goto exit;
- 		}
+On Mon, 11 Nov 2024 10:16:48 +0000 you wrote:
+> The first patch fixed ns targets not work on hardware NIC when bonding
+> set arp_validate.
+> 
+> The second patch add a related selftest for bonding.
+> 
+> v4: Thanks Nikolay for the comments:
+>     use bond_slave_ns_maddrs_{add/del} with clear name
+>     fix comments typos
+>     remove _slave_set_ns_maddrs underscore directly
+>     update bond_option_arp_validate_set() change logic
+> v3: use ndisc_mc_map to convert the mcast mac address (Jay Vosburgh)
+> v2: only add/del mcast group on backup slaves when arp_validate is set (Jay Vosburgh)
+>     arp_validate doesn't support 3ad, tlb, alb. So let's only do it on ab mode.
+> 
+> [...]
+
+Here is the summary with links:
+  - [PATCHv4,net,1/2] bonding: add ns target multicast address to slave device
+    https://git.kernel.org/netdev/net/c/8eb36164d1a6
+  - [PATCHv4,net,2/2] selftests: bonding: add ns multicast group testing
+    https://git.kernel.org/netdev/net/c/86fb6173d11e
+
+You are awesome, thank you!
 -- 
-2.39.5
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
