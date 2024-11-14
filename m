@@ -1,192 +1,103 @@
-Return-Path: <netdev+bounces-145056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372549C9492
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 22:35:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC3389C9497
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 22:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E002858DE
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 21:35:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A43FB22EF8
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 21:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA711AE01F;
-	Thu, 14 Nov 2024 21:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D92E1B0F01;
+	Thu, 14 Nov 2024 21:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Z+jMj4Fh"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NQqKMwIs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE101A9B3A
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 21:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C95487BF;
+	Thu, 14 Nov 2024 21:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731620147; cv=none; b=P5k58hc0aCnsNlC48PHLG7MwckCpd8D6BNjGCxOiMCK5AQdDuWUgs4/pSBLEjb4hyevcj1UFHK6dvQsFa2NtVn8mYSumoB520/zzxmLSMC5Z9UV3uFgn4R65ZRaav8+AwwCXEjNOUcNJ6501mSfleVptHQoU5ypQSWTAY99NBQ8=
+	t=1731620157; cv=none; b=RmWVdMeNE4TzbsaeHpf9ys35T+VGDg4M9JaCGMS822AVIMXFO4XuK1vX/b6JkGAwiq8r8CK5bNz4aSa+f8/xJzERIQCBwmS2EyvB8eBx0Cv45MaoO9Vuul8t+iHu3lC+e3yDt57Qqsbbgxb/6MIBBWsYR4GiuqoeJBG6YvDovl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731620147; c=relaxed/simple;
-	bh=v3HK4gjqtfEqSmvvY5seDYiy0YByPXQztPCyrO5QnZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qQDsrlHmR7f3Y7YAGVBnQkJeTl6j0U/OioFMZSTkUkqcT1Xv7M2Dt7Pl7Wy48uP091zQmZEyHZKqPibYZgca+HFjlskg4MwHW7EAMEh9t+H34gIbMnbKdfEAC/Qjq2qDQUzIJhfLvQpBPhDRGgZzVZT0M+Mt4O1WOD2unh0weIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Z+jMj4Fh; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7eadb7f77e8so179850a12.1
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 13:35:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1731620144; x=1732224944; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5BDQkPXCXl3Qz9Ff47gk6begMR45pafFh0XIUGkRXuU=;
-        b=Z+jMj4FhO5a9ELgrThp8fW3u+rNWX6IJ5omg5EYPbAzj3jQ0EKQNeUhq9MSt6e1ogb
-         PkYfyyuCZ/s16gxmDfyHl6Y/M297TApRB5ZY6nI6ZLW/QgkWfl1hXgSDxJfbyRz+l1uE
-         52QgZU9kw0uONYkGfYedS1sjWts3ydMFsCY4znz2NyOPdKekWLyfU03me1ZPvL8CNhMt
-         69nPV928DyvrviMEQrH7GbcyVhzy8W7nLBfuhUiSlasSeceuF/jlzdQMYcxHtxosyRRj
-         /BAWOXVGI0oBphI5mfYjRF97qrlw+TnK8/mwFw21G2ATYQ8ndE/oOXB/6aTlPmBmK6wC
-         nqfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731620144; x=1732224944;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5BDQkPXCXl3Qz9Ff47gk6begMR45pafFh0XIUGkRXuU=;
-        b=SzTq6X0OFPbE5OcbPryfNQJO0luaOdkNP2ij0W1ROnk6GMorK0AzNVPzrYGOnyeK/u
-         SSgtb30WQOUWVWPuSfYnvoosYyui44Bmucs44mzf1wKc/JFijD9xDmlHDa3fGbbK716V
-         AyTV19U9bUSns4Lu/Mgape83n/DFPfLa7ntUzdKoXjVUYlHscX+Gxcnrz/kzcvzZD+pP
-         rt28FDOTTy7spDDyznuEG3Yk7LJHbg/L+AdLARc03jxD9kovXDE/+jebSrJqn9t9FrFX
-         8TbfBIIa6JXCxvwJsTk2lNS23FAn45jBSvYXLrcjm4ORAEjZzPAAchRTx0RkrOj2uGcF
-         G3/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWwyP6vhkVTqilQ8PtPzgjsXwh+c3EGuXYvZOHNY6DYGB6T48J8z72UaGimb55t4a2SXWoc1QM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlJ2/raqXkEgl71EV+Zp7Cdkwr7MzHMBANKoRypFDOfv44uWM+
-	jpXZ8WsI0tfQiYZT/E8j0MFE/fDp7h9uLW+TrvE/ytnzjape2IUerzpyRtiBAcStt8/j0lcJhUV
-	nquyEAhulq1+4L/57TYILSWzokAMfumWjtwhtOg==
-X-Google-Smtp-Source: AGHT+IEbUPtTRqLmM/RwnibXnd8sPObJSt1RNL3w40r5RGaXQ+de1pqNjI0X/dLe5cCAaW6vg16z42Z/ecN0RBrAIJI=
-X-Received: by 2002:a05:6a00:2293:b0:71e:70fd:dac3 with SMTP id
- d2e1a72fcca58-72476d082a6mr212875b3a.3.1731620143914; Thu, 14 Nov 2024
- 13:35:43 -0800 (PST)
+	s=arc-20240116; t=1731620157; c=relaxed/simple;
+	bh=+e79qdIDhXLlZ9c+P2Dc6YG0KRyU6RDSSxMlbTgd9g8=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=RjE5n90Q7nyTRSUNa4U0F7khJpCD4QMVdv0DjTHUmfebcftd/2VKQTMv7krcvCThBtqYgQu02dmioc9D7QwCmseFjBO9BjasI2Za7lS6LL991L2oWRbLm/MzRwC4y6rP5SOUsrNrXCt5rMszVYYeFP/xFuz4tRe5S0KYPocAcFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NQqKMwIs; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
+	by linux.microsoft.com (Postfix) with ESMTPSA id B9C9C20C8BA9;
+	Thu, 14 Nov 2024 13:35:54 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B9C9C20C8BA9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731620155;
+	bh=XPm0EAc1K/nvytn2cDBsP3xI8cBGOIMbd0Cl3IWdsjU=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=NQqKMwIsblJDQplTM3wYIQkHUxgOW2n632p2zFLlvECKHoCZPlToMzD5erEwPYfpe
+	 0xAcZl2lQraCLw3r4lLsocd3IgabK8u3iSBdob3SxKEh55p874cPox288sd/GyuZhW
+	 Ar0G9QMjSax+jhKvh5SSd5YXIokLKru/kSANZoeY=
+Message-ID: <4743445a-09c4-4f14-b6a7-2e6509077680@linux.microsoft.com>
+Date: Thu, 14 Nov 2024 13:35:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029182703.2698171-1-csander@purestorage.com>
- <CANn89iLx-4dTB9fFgfrsXQ8oA0Z+TpBWNk4b91PPS1o=oypuBQ@mail.gmail.com>
- <CADUfDZrSUNu7nym9dC1_yFUqhC8tUPYjv-ZKHofU9Q8Uv4Jvhw@mail.gmail.com> <CANn89iKQ3g2+nSWaV3BWarpbneRCSoGSXdGP90PF7ScDu4ULEQ@mail.gmail.com>
-In-Reply-To: <CANn89iKQ3g2+nSWaV3BWarpbneRCSoGSXdGP90PF7ScDu4ULEQ@mail.gmail.com>
-From: Caleb Sander <csander@purestorage.com>
-Date: Thu, 14 Nov 2024 13:35:32 -0800
-Message-ID: <CADUfDZqEe--KodhfJLK065biSE__TQ-FZNRtyanfXTA+iPjn4Q@mail.gmail.com>
-Subject: Re: [PATCH] net: skip RPS if packet is already on target CPU
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
+ wei.liu@kernel.org, mhklinux@outlook.com, decui@microsoft.com,
+ catalin.marinas@arm.com, will@kernel.org, luto@kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+ daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
+ bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
+ jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
+ skinsburskii@linux.microsoft.com, mukeshrathor@microsoft.com,
+ vkuznets@redhat.com, ssengar@linux.microsoft.com, apais@linux.microsoft.com
+Subject: Re: [PATCH v2 4/4] hyperv: Switch from hyperv-tlfs.h to
+ hyperv/hvhdk.h
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
+ linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, virtualization@lists.linux.dev
+References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1731018746-25914-5-git-send-email-nunodasneves@linux.microsoft.com>
+Content-Language: en-US
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <1731018746-25914-5-git-send-email-nunodasneves@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 30, 2024 at 5:55=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Oct 29, 2024 at 9:38=E2=80=AFPM Caleb Sander <csander@purestorage=
-.com> wrote:
-> >
-> > On Tue, Oct 29, 2024 at 12:02=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > >
-> > > On Tue, Oct 29, 2024 at 7:27=E2=80=AFPM Caleb Sander Mateos
-> > > <csander@purestorage.com> wrote:
-> > > >
-> > > > If RPS is enabled, all packets with a CPU flow hint are enqueued to=
- the
-> > > > target CPU's input_pkt_queue and process_backlog() is scheduled on =
-that
-> > > > CPU to dequeue and process the packets. If ARFS has already steered=
- the
-> > > > packets to the correct CPU, this additional queuing is unnecessary =
-and
-> > > > the spinlocks involved incur significant CPU overhead.
-> > > >
-> > > > In netif_receive_skb_internal() and netif_receive_skb_list_internal=
-(),
-> > > > check if the CPU flow hint get_rps_cpu() returns is the current CPU=
-. If
-> > > > so, bypass input_pkt_queue and immediately process the packet(s) on=
- the
-> > > > current CPU.
-> > > >
-> > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > >
-> > > Current implementation was a conscious choice. This has been discusse=
-d
-> > > several times.
-> > >
-> > > By processing packets inline, you are actually increasing latencies o=
-f
-> > > packets queued to other cpus.
-> >
-> > Sorry, I wasn't aware of these prior discussions. I take it you are
-> > referring to threads like
-> > https://lore.kernel.org/netdev/20230322072142.32751-1-xu.xin16@zte.com.=
-cn/T/
-> > ? I see what you mean about the latency penalty for packets that do
-> > require cross-CPU steering.
-> >
-> > Do you have an alternate suggestion for how to avoid the overhead of
-> > acquiring a spinlock for every packet? The atomic instruction in
-> > rps_lock_irq_disable() called from process_backlog() is consuming 5%
-> > of our CPU time. For our use case, we don't really want software RPS;
-> > we are expecting ARFS to steer all high-bandwidth traffic to the
-> > desired CPUs. We would happily turn off software RPS entirely if we
-> > could, which seems like it would avoid the concerns about higher
-> > latency for packets that need to be steering to a different CPU. But
-> > my understanding is that using ARFS requires RPS to be enabled
-> > (rps_sock_flow_entries set globally and rps_flow_cnt set on each
-> > queue), which enables these rps_needed static branches. Is that
-> > correct? If so, would you be open to adding a sysctl that disables
-> > software RPS and relies upon ARFS to do the packet steering?
->
-> A sysctl will not avoid the fundamental issue.
-> Why not instead address the past feedback ?
-> Can you test the following ?
->
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index c682173a76424d7dadcc8374aa5b11dff44a4b46..7a5a7f1a4b7c3cbd105ecfc07=
-6377f25929729eb
-> 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -5842,6 +5842,21 @@ static int generic_xdp_install(struct
-> net_device *dev, struct netdev_bpf *xdp)
->         return ret;
->  }
->
-> +#ifdef CONFIG_RPS
-> +static bool net_must_use_backlog(int tcpu)
-> +{
-> +       if (tcpu < 0)
-> +               return false;
-> +       if (tcpu !=3D smp_processor_id())
-> +               return true;
-> +       /* target cpu is ourself. We must use our backlog
-> +        * if we have deferred IPI or packets.
-> +        */
-> +       return this_cpu_read(softnet_data.rps_ipi_list) !=3D NULL ||
-> +              this_cpu_read(softnet_data.input_pkt_queue.qlen) !=3D 0;
-> +}
-> +#endif
+On 11/7/2024 2:32 PM, Nuno Das Neves wrote:
+> Switch to using hvhdk.h everywhere in the kernel. This header includes
+> all the new Hyper-V headers in include/hyperv, which form a superset of
+> the definitions found in hyperv-tlfs.h.
+> 
+> This makes it easier to add new Hyper-V interfaces without being
+> restricted to those in the TLFS doc (reflected in hyperv-tlfs.h).
+> 
+> To be more consistent with the original Hyper-V code, the names of some
+> definitions are changed slightly. Update those where needed.
+> 
+> hyperv-tlfs.h is no longer included anywhere - hvhdk.h can serve
+> the same role, but with an easier path for adding new definitions.
 
-Hi Eric,
-Look at this patch again, I am wondering why the tcpu < 0 case is
-treated differently from the tcpu =3D=3D smp_processor_id() case. If I
-understand correctly, packets without a CPU flow hint are allowed to
-be processed immediately on the current CPU. They will leapfrog
-packets that other CPUs have queued onto this CPU via RPS and any RPS
-IPIs waiting to be issued to other CPUs. I see this is the behavior in
-the current code too, but why don't the same concerns about higher
-latency for packets steered cross-CPU apply?
+Michael already mentioned this, I'd also agree that it's better to
+remove hyperv-tlfs.h entirely since it's been superseded.
 
-Thanks,
-Caleb
+This looks good to me, I'll wait for v3 addressing the other comments to
+take a look again.
+
+- Easwar
+
+<...>
 
