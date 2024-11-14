@@ -1,216 +1,281 @@
-Return-Path: <netdev+bounces-144905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B42E9C8BB8
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:25:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 591679C8B76
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:09:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 728C7B22228
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:08:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCE9D1F2648F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663901FAC4A;
-	Thu, 14 Nov 2024 13:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9B71FAEFF;
+	Thu, 14 Nov 2024 13:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EMYSag0s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/ReJGlc"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E1718C32C;
-	Thu, 14 Nov 2024 13:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176361FAEE3
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 13:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731589693; cv=none; b=uCjf66Ei44B+6XJdBzemMba2239pZ5OfydoaELT0Zt/D7UJxQZnxa48JLPQ8qn2kFgHldXloQk72TOMBiOusj+Rk8TZKccgVkpsXST4dNdK+sF7FRDfSl7NYdJBj46U43phU9aXQ1TXQg8BWADDDkL33x1hSzjXGiPMNu6j8BtI=
+	t=1731589756; cv=none; b=eyg8w16hwtLkhcjWi/ZVPtOYJ/7NDXcuGH/hDhoOPEoiDRS6RA8pfn1WzQluC8FdTsiXt4Igy7t9DLw57v+VsBaq8QMAqhxgF+4og3tKvuHVprUrFe9Cono7pa2XbW3VRE69FvouEblWBQWuSH9ZJMPbVZlOEIfawO3mLl/zyAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731589693; c=relaxed/simple;
-	bh=/lPw8YuDV0AKrjoQl+M8qaGgzeSJaLFjQBu2/LAF8/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FkqO4HtyjUOWD9xUMS69bXPlO0CXpGpFS9ADgtfybqPdqj2yiFQmZOiRyAs7IVEC3i5OYKf2CWFtRvXB7qu9ie2jd+AvfstHKa6GMJPLw5vmAm1zblGbDY//Uqy7vEXV3u+5sV0VezupGSOHnMjeql/Xm9Oyk5WdlAwXhHp4lGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EMYSag0s; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 7B6BB11401EA;
-	Thu, 14 Nov 2024 08:08:10 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 14 Nov 2024 08:08:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731589690; x=1731676090; bh=VwZkikMX0WnYtizo581kPA9GVlUC0Tn9wyC
-	7eMHPrQY=; b=EMYSag0st/FVrGspBN4hux+xKJQNWcci+5wpjfUcwoLa+WyMPyh
-	w1XVWnjj4JLJXat7jxcJ3gRrbUW5xcNhWNxqXZ++1YrCOtswoRoFPHvfsz9eGEFh
-	77PyjLShCUhkKPtkNZtRlD2a9rVItt0HZ/mdCgZ61kyj0/zsNOTKIBSC5LmDkGgE
-	9bwcuf4cerneU18iQtMEN31nbm6S/PJavfavmwMqaUdX0Ux/fy6kRfzxJspmpwrA
-	SSB8bJ9lyspwrQpsGh/XLX34NTmjpWW/AQunSrDwCgwjJfhcuG8yo2dnQrzf4ZAD
-	Ke7RSGQqtofWmmuJN0R+3i4VbWre8FaIgQw==
-X-ME-Sender: <xms:OfY1Z2B5fwzUq1-QMcGipr4FMlexIv9pzXp23h5wpaznW6i5L4LLRA>
-    <xme:OfY1ZwgKyUUjQ7Q-qWyZbCDTayWK2XAmAAur-goiTC4Ic72es_2HjAyypyFEE5mHE
-    LdcHQXajg7qSY0>
-X-ME-Received: <xmr:OfY1Z5nNXHzMneHjyzf5Cytm48i871rCjSIYF52XqIEcQDdiPuuZR4G5vGTe51HGW_O_baYhiyW0lsj2E6Ax-36a6NWh4A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvddvgdegkecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecuogfuuhhsphgvtghtffhomh
-    grihhnucdlgeelmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
-    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
-    hgqeenucggtffrrghtthgvrhhnpedvhfevffeujefgieehgefhgeeihfekfffhfeetieek
-    jeejieeijedvueffffdvvdenucffohhmrghinhepshihiihkrghllhgvrhdrrghpphhsph
-    hothdrtghomhdpghhoohhglhgvrghpihhsrdgtohhmpdhgohhordhglhenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguoh
-    hstghhrdhorhhgpdhnsggprhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgt
-    phhtthhopehshiiisghothdofeehvgejvgdvkeduudgssggvheejjeejsgdvtdgvsehshi
-    iikhgrlhhlvghrrdgrphhpshhpohhtmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughr
-    vgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvg
-    hmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtgho
-    mhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
-    hugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgv
-    thguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhise
-    hrvgguhhgrthdrtghomhdprhgtphhtthhopehshiiikhgrlhhlvghrqdgsuhhgshesghho
-    ohhglhgvghhrohhuphhsrdgtohhm
-X-ME-Proxy: <xmx:OfY1Z0xsKtDoLw49L740jTuA82UryiGMTQH8X7yAv6K2kDZ13LnFPg>
-    <xmx:OfY1Z7QosLlKvKv8PYMYr-GrLMCXBIBoEs6zzn8UAmMCotd8WLdDWA>
-    <xmx:OfY1Z_aoaXM0_HOpEQCB_cNW0TaL5f8gPtXv_cWYA88bu3zxIJXJeg>
-    <xmx:OfY1Z0SGL5va8y3_xc8GzO1MwlIkaFMjVqJXKhE7zsdPQ06H-Q-bBw>
-    <xmx:OvY1Z2FOLg5gFsxRFOCnsQhS0HaN43DLXNQ3pFYpRuu58bYUIkjmV0ym>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 14 Nov 2024 08:08:09 -0500 (EST)
-Date: Thu, 14 Nov 2024 15:08:04 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: syzbot <syzbot+35e7e2811bbe5777b20e@syzkaller.appspotmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] KMSAN: uninit-value in __vxlan_find_mac
-Message-ID: <ZzX2NDWWYLYtvyAL@shredder>
-References: <6735d39a.050a0220.1324f8.0096.GAE@google.com>
+	s=arc-20240116; t=1731589756; c=relaxed/simple;
+	bh=aZYjXmoZfp2HAOnzz7bgqnX8Ynj7sG9uIkMetOKcoB4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I8WrL51q329Fy+BiVpu4jLglOMh+BndzYn36vlbzh9RtUbAhwnzoafrBTj7CLRRlABn6frVT0ngUEsLvHvZoichlCE1N8y+E/whGwaB4z7D2egw6Py3HFoH0dTvp0FyKWIhEjwp8wkNnFGlsDILn0lKL89/N9WlBZxXUHTD3TIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g/ReJGlc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731589753;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RnN6qfrNHf3p41oLspRaSVbFnU2zYVZg7YbyYzfMlzM=;
+	b=g/ReJGlcAUwfTh7BMvCyBKSCYaa0gGTbCvCpMsy7zNPLIhH50DHFk2LgPEdXDw4iRKBwQd
+	oTyniAX+sepxomvRrQDl4HRUT+g5lVcJHjhNT9rc+42m2HHEUuP24lCImyPUxAZigUJBP3
+	aSNEKx2nxd0je7FtnDS8T2WUl1gWgaM=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-644-HuKPNk6mOCKjuQwBOvFkJA-1; Thu,
+ 14 Nov 2024 08:09:10 -0500
+X-MC-Unique: HuKPNk6mOCKjuQwBOvFkJA-1
+X-Mimecast-MFC-AGG-ID: HuKPNk6mOCKjuQwBOvFkJA
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F15351945112;
+	Thu, 14 Nov 2024 13:09:08 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.39.194.140])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2061D1955F3C;
+	Thu, 14 Nov 2024 13:09:06 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.12-rc8
+Date: Thu, 14 Nov 2024 14:08:46 +0100
+Message-ID: <20241114130846.94852-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6735d39a.050a0220.1324f8.0096.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, Nov 14, 2024 at 02:40:26AM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    de2f378f2b77 Merge tag 'nfsd-6.12-4' of git://git.kernel.o..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15b170c0580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=e4580d62ee1893a5
-> dashboard link: https://syzkaller.appspot.com/bug?extid=35e7e2811bbe5777b20e
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/f0ff1d637186/disk-de2f378f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/1515128a919f/vmlinux-de2f378f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/6624bf235bc6/bzImage-de2f378f.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+35e7e2811bbe5777b20e@syzkaller.appspotmail.com
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in __vxlan_find_mac+0x497/0x4e0
->  __vxlan_find_mac+0x497/0x4e0
->  vxlan_find_mac drivers/net/vxlan/vxlan_core.c:436 [inline]
->  vxlan_xmit+0x1669/0x39f0 drivers/net/vxlan/vxlan_core.c:2753
+Hi Linus!
 
-Missing a check that we have enough bytes for the Ethernet header.
-Will look into it.
+The following changes since commit bfc64d9b7e8cac82be6b8629865e137d962578f8:
 
->  __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4937 [inline]
->  xmit_one net/core/dev.c:3588 [inline]
->  dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
->  __dev_queue_xmit+0x3562/0x56d0 net/core/dev.c:4432
->  dev_queue_xmit include/linux/netdevice.h:3094 [inline]
->  __bpf_tx_skb net/core/filter.c:2152 [inline]
->  __bpf_redirect_common net/core/filter.c:2196 [inline]
->  __bpf_redirect+0x148c/0x1610 net/core/filter.c:2203
->  ____bpf_clone_redirect net/core/filter.c:2477 [inline]
->  bpf_clone_redirect+0x37e/0x500 net/core/filter.c:2447
->  ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:2010
->  __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2253
->  bpf_dispatcher_nop_func include/linux/bpf.h:1265 [inline]
->  __bpf_prog_run include/linux/filter.h:701 [inline]
->  bpf_prog_run include/linux/filter.h:708 [inline]
->  bpf_test_run+0x546/0xd20 net/bpf/test_run.c:434
->  bpf_prog_test_run_skb+0x182f/0x24d0 net/bpf/test_run.c:1095
->  bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4266
->  __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5671
->  __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
->  __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
->  __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5758
->  x64_sys_call+0x2cce/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:322
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Uninit was created at:
->  slab_post_alloc_hook mm/slub.c:4091 [inline]
->  slab_alloc_node mm/slub.c:4134 [inline]
->  kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
->  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
->  pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
->  skb_ensure_writable+0x496/0x520 net/core/skbuff.c:6214
->  __bpf_try_make_writable net/core/filter.c:1677 [inline]
->  bpf_try_make_writable net/core/filter.c:1683 [inline]
->  bpf_try_make_head_writable net/core/filter.c:1691 [inline]
->  ____bpf_clone_redirect net/core/filter.c:2471 [inline]
->  bpf_clone_redirect+0x1c5/0x500 net/core/filter.c:2447
->  ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:2010
->  __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2253
->  bpf_dispatcher_nop_func include/linux/bpf.h:1265 [inline]
->  __bpf_prog_run include/linux/filter.h:701 [inline]
->  bpf_prog_run include/linux/filter.h:708 [inline]
->  bpf_test_run+0x546/0xd20 net/bpf/test_run.c:434
->  bpf_prog_test_run_skb+0x182f/0x24d0 net/bpf/test_run.c:1095
->  bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4266
->  __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5671
->  __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
->  __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
->  __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5758
->  x64_sys_call+0x2cce/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:322
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> CPU: 1 UID: 0 PID: 8041 Comm: syz.2.760 Not tainted 6.12.0-rc6-syzkaller-00279-gde2f378f2b77 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-> =====================================================
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-> 
+  Merge tag 'net-6.12-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-11-07 11:07:57 -1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.12-rc8
+
+for you to fetch changes up to ca34aceb322bfcd6ab498884f1805ee12f983259:
+
+  net: sched: u32: Add test case for systematic hnode IDR leaks (2024-11-14 11:39:17 +0100)
+
+----------------------------------------------------------------
+Including fixes from bluetooth.
+
+Quite calm week. No new regression under investigation.
+
+Current release - regressions:
+
+  - eth: revert "igb: Disable threaded IRQ for igb_msix_other"
+
+Current release - new code bugs:
+
+  - bluetooth: btintel: direct exception event to bluetooth stack
+
+Previous releases - regressions:
+
+  - core: fix data-races around sk->sk_forward_alloc
+
+  - netlink: terminate outstanding dump on socket close
+
+  - mptcp: error out earlier on disconnect
+
+  - vsock: fix accept_queue memory leak
+
+  - phylink: ensure PHY momentary link-fails are handled
+
+  - eth: mlx5:
+    - fix null-ptr-deref in add rule err flow
+    - lock FTE when checking if active
+
+  - eth: dwmac-mediatek: fix inverted handling of mediatek,mac-wol
+
+Previous releases - always broken:
+
+  - sched: fix u32's systematic failure to free IDR entries for hnodes.
+
+  - sctp: fix possible UAF in sctp_v6_available()
+
+  - eth: bonding: add ns target multicast address to slave device
+
+  - eth: mlx5: fix msix vectors to respect platform limit
+
+  - eth: icssg-prueth: fix 1 PPS sync
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alexandre Ferrieux (2):
+      net: sched: cls_u32: Fix u32's systematic failure to free IDR entries for hnodes.
+      net: sched: u32: Add test case for systematic hnode IDR leaks
+
+Breno Leitao (1):
+      ipmr: Fix access to mfc_cache_list without lock held
+
+Carolina Jubran (1):
+      net/mlx5e: Disable loopback self-test on multi-PF netdev
+
+Chiara Meiohas (1):
+      net/mlx5: E-switch, unload IB representors when unloading ETH representors
+
+Dragos Tatulea (1):
+      net/mlx5e: kTLS, Fix incorrect page refcounting
+
+Eric Dumazet (1):
+      sctp: fix possible UAF in sctp_v6_available()
+
+Geert Uytterhoeven (1):
+      MAINTAINERS: Re-add cancelled Renesas driver sections
+
+Geliang Tang (2):
+      mptcp: update local address flags when setting it
+      mptcp: hold pm lock when deleting entry
+
+Hangbin Liu (2):
+      bonding: add ns target multicast address to slave device
+      selftests: bonding: add ns multicast group testing
+
+Jakub Kicinski (7):
+      netlink: terminate outstanding dump on socket close
+      selftests: net: add a test for closing a netlink socket ith dump in progress
+      selftests: net: add netlink-dumps to .gitignore
+      Merge branch 'mptcp-fix-a-couple-of-races'
+      Merge branch 'mlx5-misc-fixes-2024-11-07'
+      Merge tag 'for-net-2024-11-12' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge branch 'mptcp-pm-a-few-more-fixes'
+
+Kiran K (1):
+      Bluetooth: btintel: Direct exception event to bluetooth stack
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: hci_core: Fix calling mgmt_device_connected
+
+Mark Bloch (1):
+      net/mlx5: fs, lock FTE when checking if active
+
+Matthieu Baerts (NGI0) (1):
+      mptcp: pm: use _rcu variant under rcu_read_lock
+
+Meghana Malladi (1):
+      net: ti: icssg-prueth: Fix 1 PPS sync
+
+Michal Luczaj (4):
+      virtio/vsock: Fix accept_queue memory leak
+      vsock: Fix sk_error_queue memory leak
+      virtio/vsock: Improve MSG_ZEROCOPY error handling
+      net: Make copy_safe_from_sockptr() match documentation
+
+Mina Almasry (2):
+      net: fix SO_DEVMEM_DONTNEED looping too long
+      net: clarify SO_DEVMEM_DONTNEED behavior in documentation
+
+Moshe Shemesh (1):
+      net/mlx5e: CT: Fix null-ptr-deref in add rule err flow
+
+Nícolas F. R. A. Prado (1):
+      net: stmmac: dwmac-mediatek: Fix inverted handling of mediatek,mac-wol
+
+Paolo Abeni (4):
+      mptcp: error out earlier on disconnect
+      mptcp: cope racing subflow creation in mptcp_rcv_space_adjust
+      Merge branch 'virtio-vsock-fix-memory-leaks'
+      Merge branch 'bonding-fix-ns-targets-not-work-on-hardware-nic'
+
+Parav Pandit (1):
+      net/mlx5: Fix msix vectors to respect platform limit
+
+Russell King (Oracle) (1):
+      net: phylink: ensure PHY momentary link-fails are handled
+
+Stefan Wahren (1):
+      net: vertexcom: mse102x: Fix tx_bytes calculation
+
+Vitalii Mordan (1):
+      stmmac: dwmac-intel-plat: fix call balance of tx_clk handling routines
+
+Wander Lairson Costa (1):
+      Revert "igb: Disable threaded IRQ for igb_msix_other"
+
+Wang Liang (1):
+      net: fix data-races around sk->sk_forward_alloc
+
+Wei Fang (1):
+      samples: pktgen: correct dev to DEV
+
+William Tu (1):
+      net/mlx5e: clear xdp features on non-uplink representors
+
+ Documentation/networking/devmem.rst                |   9 ++
+ MAINTAINERS                                        |  30 ++++++
+ drivers/bluetooth/btintel.c                        |   5 +-
+ drivers/net/bonding/bond_main.c                    |  16 ++-
+ drivers/net/bonding/bond_options.c                 |  82 ++++++++++++++-
+ drivers/net/ethernet/intel/igb/igb_main.c          |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c |   8 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_selftest.c  |   4 +
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   5 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |  15 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |  32 +++++-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel-plat.c |  25 +++--
+ .../net/ethernet/stmicro/stmmac/dwmac-mediatek.c   |   4 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  13 ++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h       |  12 +++
+ drivers/net/ethernet/vertexcom/mse102x.c           |   4 +-
+ drivers/net/phy/phylink.c                          |  14 +--
+ include/linux/sockptr.h                            |   4 +-
+ include/net/bond_options.h                         |   2 +
+ net/bluetooth/hci_core.c                           |   2 -
+ net/core/sock.c                                    |  42 ++++----
+ net/dccp/ipv6.c                                    |   2 +-
+ net/ipv4/ipmr_base.c                               |   3 +-
+ net/ipv6/tcp_ipv6.c                                |   4 +-
+ net/mptcp/pm_netlink.c                             |   3 +-
+ net/mptcp/pm_userspace.c                           |  15 +++
+ net/mptcp/protocol.c                               |  16 ++-
+ net/netlink/af_netlink.c                           |  31 ++----
+ net/netlink/af_netlink.h                           |   2 -
+ net/sched/cls_u32.c                                |  18 +++-
+ net/sctp/ipv6.c                                    |  19 ++--
+ net/vmw_vsock/af_vsock.c                           |   3 +
+ net/vmw_vsock/virtio_transport_common.c            |   9 ++
+ samples/pktgen/pktgen_sample01_simple.sh           |   2 +-
+ .../selftests/drivers/net/bonding/bond_options.sh  |  54 +++++++++-
+ tools/testing/selftests/net/.gitignore             |   1 +
+ tools/testing/selftests/net/Makefile               |   1 +
+ tools/testing/selftests/net/netlink-dumps.c        | 110 +++++++++++++++++++++
+ .../selftests/tc-testing/tc-tests/filters/u32.json |  24 +++++
+ 41 files changed, 543 insertions(+), 109 deletions(-)
+ create mode 100644 tools/testing/selftests/net/netlink-dumps.c
+
 
