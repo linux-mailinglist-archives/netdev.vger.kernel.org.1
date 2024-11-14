@@ -1,204 +1,126 @@
-Return-Path: <netdev+bounces-144983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF8B59C8EF7
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:00:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED6A69C8F18
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:03:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 502031F24FB5
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:00:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A54F61F26170
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CBC414E2D6;
-	Thu, 14 Nov 2024 15:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B60E169AE6;
+	Thu, 14 Nov 2024 16:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="PHLKqB9T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDl0yqS3"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BD51420A8;
-	Thu, 14 Nov 2024 15:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6220133987;
+	Thu, 14 Nov 2024 16:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731599897; cv=none; b=Xi8ApPmYnYwZsOYsBaYxPKjUZKJFqDCYvFs8iZ2F4/9Xl4PkpEQ7aadMKOyWtmSKe/tb0wlXPb4AP9j0GGtaryc+Muq6vFEYLoSHQkyAcfkQ6RSEaGHnQoyyBvRzs29k+ERPrEbOrQKGlW1QRZTmNE7qDawpD+JFBVa0MXepToQ=
+	t=1731600137; cv=none; b=V0Vc0ZrEEc/TsFaRVtdiuV2FqVWYubn4NXKlPku7XYYMeGmTqiTcA/meFEIk5O7kc8QAtpK4toOmu7zqYbehDArPQTwvQ3QXfaA8L188uq5XmzTmqs2YJZH0Bf5fyaYIAj3piU9uyGDLScpcp7Mk84giV4iWGAaASchZ05XaKu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731599897; c=relaxed/simple;
-	bh=P+cOsdripRFvYlyp7WYqEoj6JQsmQNtvqopRVLA9AR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jTKrN6uA2bWxoPHoAacC1t1R/m6Jce885eLhVNP22aWxW2ppRs0ZLvdJ7T33Q02UtEgrlU1ZxtSGwxSTFuPsUS6aCAJ6BnF9kUw4mEzfxu7kzunJfHNNbq0P7kS/SQgeMM2zCaSvYLwdHrVdPWccXTpf2z1SfeVY511q2qr0mZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=PHLKqB9T; arc=none smtp.client-ip=67.231.154.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id CC8CD440089;
-	Thu, 14 Nov 2024 15:58:10 +0000 (UTC)
-Received: from [192.168.1.23] (unknown [98.97.40.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 206D113C2B0;
-	Thu, 14 Nov 2024 07:58:09 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 206D113C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1731599889;
-	bh=P+cOsdripRFvYlyp7WYqEoj6JQsmQNtvqopRVLA9AR4=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=PHLKqB9TrFph29oT1fpIsJICxW6RwWAJP+jxssgmtjLM85+rHMP0vToAGuR6uJgls
-	 SEh/YtLgiiQdSQg4JF1fCKzgdWm3VgLuLPjFN9kYVBvFqnCwkXROJRWsKAQTJWlp/P
-	 ViJ6rJVvIFpFW8oAdj+pjf0JkCc5NU8Dp3eBAgtU=
-Message-ID: <8df6ab0a-02fa-46d0-a19c-96545dcca035@candelatech.com>
-Date: Thu, 14 Nov 2024 07:58:08 -0800
+	s=arc-20240116; t=1731600137; c=relaxed/simple;
+	bh=CLE+gdbwkUGWxgVL/DfhT8L9omEJZAlZq2aorhrIAow=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WCw92uAqMMxAeQjVl7ZwDSElJ4Y4L27dkhcxL2TT4msyHKnTUWDa5EXHLO7OZtQPRNeBGggQnl6Ju2msH0kl58DyWkH9LHzsXNVU0S6c9f+YjgQISgSd49GuQh+57f1ykdguk0OaIEDd37A4k/A9jjRteBpEAWSmGWZpE1Iop6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDl0yqS3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFA7C4CECD;
+	Thu, 14 Nov 2024 16:02:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731600137;
+	bh=CLE+gdbwkUGWxgVL/DfhT8L9omEJZAlZq2aorhrIAow=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VDl0yqS3yS2D3oGna4mh6TH6YC/T+22WILn0j6PiK4E7vghIzflz4uhXyAxYY5MdO
+	 LepEXXmlDxd/tK5YiwY7HdF4AyACk96C4NUIejRVytBSvbjAgT5S3CQfiW0F8Kn53X
+	 nhQyOFRN8pDPhsPLIGw+6GlBua7KrYfVpn2BvTc6NtLXBBzQWOxPrZXYik8pGYJ8PA
+	 Phv6GsuBnRJ/37Z4T+oec6kp6EZnrOg0XfN1b1sMvPkgz3QYNKpAk9ygqJDqw4ioyB
+	 DKOex+tJkIkeH0PENmcrUV6H20f3ukmgesA+H18Td0NpeTTV7LdkZ2qsksxiC6hi53
+	 4jgMoE1+vSIlg==
+Date: Thu, 14 Nov 2024 16:02:14 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Linux-MM <linux-mm@kvack.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH net-next v23 1/7] mm: page_frag: add a test module for
+ page_frag
+Message-ID: <ZzYfBp0IO1WW6Cao@finisterre.sirena.org.uk>
+References: <20241028115343.3405838-1-linyunsheng@huawei.com>
+ <20241028115343.3405838-2-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [wireless?] INFO: task hung in nl80211_pre_doit (3)
-To: syzbot <syzbot+da14e8c0ada830335981@syzkaller.appspotmail.com>,
- johannes@sipsolutions.net, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <6735b24e.050a0220.2a2fcc.0063.GAE@google.com>
-Content-Language: en-MW
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <6735b24e.050a0220.2a2fcc.0063.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MDID: 1731599892-1MVAkSQ1m9Rj
-X-MDID-O:
- us5;at1;1731599892;1MVAkSQ1m9Rj;<greearb@candelatech.com>;3a4554d0eced4777ba762c7a41f48a81
-X-PPE-TRUSTED: V=1;DIR=OUT;
-
-On 11/14/24 00:18, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    de2f378f2b77 Merge tag 'nfsd-6.12-4' of git://git.kernel.o..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=12a245f7980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=64aa0d9945bd5c1
-> dashboard link: https://syzkaller.appspot.com/bug?extid=da14e8c0ada830335981
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160e635f980000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-de2f378f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/9ee61f45ffb8/vmlinux-de2f378f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a3b0e20d8f05/bzImage-de2f378f.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+da14e8c0ada830335981@syzkaller.appspotmail.com
-> 
-> INFO: task syz-executor:5427 blocked for more than 144 seconds.
->        Not tainted 6.12.0-rc6-syzkaller-00279-gde2f378f2b77 #0
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> task:syz-executor    state:D stack:20096 pid:5427  tgid:5427  ppid:1      flags:0x00004006
-> Call Trace:
->   <TASK>
->   context_switch kernel/sched/core.c:5328 [inline]
->   __schedule+0x184f/0x4c30 kernel/sched/core.c:6690
->   __schedule_loop kernel/sched/core.c:6767 [inline]
->   schedule+0x14b/0x320 kernel/sched/core.c:6782
->   schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6839
->   __mutex_lock_common kernel/locking/mutex.c:684 [inline]
->   __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
->   nl80211_pre_doit+0x5f/0x8b0 net/wireless/nl80211.c:16580
->   genl_family_rcv_msg_doit net/netlink/genetlink.c:1110 [inline]
->   genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->   genl_rcv_msg+0xaaa/0xec0 net/netlink/genetlink.c:1210
->   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
->   genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
->   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
->   sock_sendmsg_nosec net/socket.c:729 [inline]
->   __sock_sendmsg+0x221/0x270 net/socket.c:744
->   __sys_sendto+0x39b/0x4f0 net/socket.c:2214
->   __do_sys_sendto net/socket.c:2226 [inline]
->   __se_sys_sendto net/socket.c:2222 [inline]
->   __x64_sys_sendto+0xde/0x100 net/socket.c:2222
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f024ad805ac
-> RSP: 002b:00007ffd15eb6070 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-> RAX: ffffffffffffffda RBX: 00007f024ba64620 RCX: 00007f024ad805ac
-> RDX: 0000000000000040 RSI: 00007f024ba64670 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 00007ffd15eb60c4 R09: 000000000000000c
-> R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-> R13: 0000000000000000 R14: 00007f024ba64670 R15: 0000000000000000
->   </TASK>
-> INFO: task syz-executor:5435 blocked for more than 148 seconds.
->        Not tainted 6.12.0-rc6-syzkaller-00279-gde2f378f2b77 #0
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> task:syz-executor    state:D stack:20656 pid:5435  tgid:5435  ppid:1      flags:0x00004004
-> Call Trace:
->   <TASK>
->   context_switch kernel/sched/core.c:5328 [inline]
->   __schedule+0x184f/0x4c30 kernel/sched/core.c:6690
->   __schedule_loop kernel/sched/core.c:6767 [inline]
->   schedule+0x14b/0x320 kernel/sched/core.c:6782
->   schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6839
->   __mutex_lock_common kernel/locking/mutex.c:684 [inline]
->   __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
->   rtnl_lock net/core/rtnetlink.c:79 [inline]
->   rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6672
->   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
->   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
->   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
->   sock_sendmsg_nosec net/socket.c:729 [inline]
->   __sock_sendmsg+0x221/0x270 net/socket.c:744
->   __sys_sendto+0x39b/0x4f0 net/socket.c:2214
->   __do_sys_sendto net/socket.c:2226 [inline]
->   __se_sys_sendto net/socket.c:2222 [inline]
->   __x64_sys_sendto+0xde/0x100 net/socket.c:2222
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7facdd1805ac
-> RSP: 002b:00007ffc7ba5d850 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-> RAX: ffffffffffffffda RBX: 00007facdde64620 RCX: 00007facdd1805ac
-> RDX: 0000000000000040 RSI: 00007facdde64670 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 00007ffc7ba5d8a4 R09: 000000000000000c
-> R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-> R13: 0000000000000000 R14: 00007facdde64670 R15: 0000000000000000
->   </TASK>
-> 
-> Showing all locks held in the system:
-> 2 locks held by kworker/0:0/8:
-> 3 locks held by kworker/u4:0/11:
-> 2 locks held by kworker/u4:1/12:
-> 1 lock held by khungtaskd/25:
->   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
->   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
->   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
-
-Since those kworkers don't show locks, it must be because they are 'running'.
-
-The syzbot needs to learn to dump all tasks, or kernel lockdep needs to get
-smarter about dumping more useful information for running tasks.  I don't see how anyone
-can make progress from this report as it is, though I would very much like
-to understand this problem.  We see hints of similar bugs, but no luck
-reproducing them.
-
-This might show at least some of the needed info with no extra lockdep
-patches or significant changes to syzbot:
-
-echo 1 > /proc/sys/kernel/hung_task_all_cpu_backtrace
-
-Thanks,
-Ben
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="0MyQI+clfZpBVvMG"
+Content-Disposition: inline
+In-Reply-To: <20241028115343.3405838-2-linyunsheng@huawei.com>
+X-Cookie: System checkpoint complete.
 
 
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+--0MyQI+clfZpBVvMG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Mon, Oct 28, 2024 at 07:53:36PM +0800, Yunsheng Lin wrote:
+> The testing is done by ensuring that the fragment allocated
+> from a frag_frag_cache instance is pushed into a ptr_ring
+> instance in a kthread binded to a specified cpu, and a kthread
+> binded to a specified cpu will pop the fragment from the
+> ptr_ring and free the fragment.
+
+This is breaking the build in -next on at least arm64 and x86_64 since
+it's trying to build an out of tree kernel module which is included in
+the selftests directory, the kselftest build system just isn't set up to
+do that in a sensible and robust fashion.  The module should probably be
+in the main kernel tree and enabled by the config file for the mm tests.
+
+KernelCI sees:
+
+***
+*** Configuration file ".config" not found!
+***
+*** Please run some configurator (e.g. "make oldconfig" or
+*** "make menuconfig" or "make xconfig").
+***
+Makefile:810: include/config/auto.conf.cmd: No such file or directory
+
+(see https://storage.kernelci.org/next/master/next-20241114/x86_64/x86_64_defconfig%2Bkselftest/gcc-12/logs/kselftest.log)
+
+and I've seen:
+
+  ERROR: Kernel configuration is invalid.
+         include/generated/autoconf.h or include/config/auto.conf are missing.
+         Run 'make oldconfig && make prepare' on kernel src to fix it.
+
+make[3]: *** [Makefile:788: include/config/auto.conf] Error 1
+
+--0MyQI+clfZpBVvMG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmc2HwUACgkQJNaLcl1U
+h9Db9gf8Cr2HGJXLOLGXW8Noo9DxYlVt3elXI60b8tNmifJUKessfHXguQp3P1N4
+zOEibYMbPJb1psJo7B0xpb50i4BML30rUBm2vH4ZILQX8IMafE/y2L0vfJ4+kbhz
+HMMaZtkYMlePGIK25hApP53VfsEPDwdqOkTBJTksOxf0xLG3ZIQcguwnlZldxrZu
+5YfGkL85wLRoiOrNdqUR5lhl7hrV1YpLsrSeKfFs3fhAMgTrcmHLEpTYHtjo/caz
++V2b6+5SlF46vd0d0h8hz92i26LSTt/14K4ZXGQHGCVd2NmO7rmu6Bd6YbwGPVLA
+e17YBlDrGC1jnnuLNiDpZtBtN6VdJA==
+=MZrU
+-----END PGP SIGNATURE-----
+
+--0MyQI+clfZpBVvMG--
 
