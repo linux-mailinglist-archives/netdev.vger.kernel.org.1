@@ -1,113 +1,149 @@
-Return-Path: <netdev+bounces-144737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DAD9C8564
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:58:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ECF29C8578
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC31C1F22434
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 08:58:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F741F25337
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93171F756F;
-	Thu, 14 Nov 2024 08:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022241DE2B5;
+	Thu, 14 Nov 2024 09:02:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407001F6663
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868A11E00BD
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731574704; cv=none; b=l2DRTHiKUWzjlbBnorl8cc56brmbmXTkAMuAKXOCPb0W220txLEsVJzCxqHLDd1yHYQ2RQ5e8nJVzeNOCmsMlHxb6Gpwn5KwOWjF/UPodxQUOXF0E0jctoKZ0Szzp0qEixJScIFt1oR33NAOaTI9mDAyIqx83iphkjRRW25Rmn4=
+	t=1731574923; cv=none; b=s9VldJ1AuF9HSmT07932LhLkdkfYbNb9M4fLOVcOiW0P7d1cf2dudVFhX8yeD0Jclx2B7+L3VZcreuvrgbStZRdPamrUZp5pWexReYBnVCxmit7yzYREIyQ8+fX6R0pVtcWXTBUOWMmLUWqKv/vHveqUZ2XzSpY2O9PoyqR7Abs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731574704; c=relaxed/simple;
-	bh=arb5ev8D1gkREW3LGy4zcItfQnrfzM8oO7P/fIyEGH0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tjgoA+qBjDsg86oXX/XNw4FL49r23YqXfPnofUO4MDQo96xMVbWVfIQDkAWq5DYOlhyjfsCm72I6gjHnZs1WrxruzY6DyQnJGtGAIoRmB+MwTa3Y4UAcDPCzlRF++lKQ00CR8WPlBaixHSg8Ea5dyW1cPeZngsgcHyIgNtcbv78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83a9bd80875so38309239f.2
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 00:58:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731574702; x=1732179502;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NkslEva3xH+202UFk1N4Z5nFB7hQ9vtTqIsb5mgRVjc=;
-        b=inDC8xuzzwNdvr8vJrp7VsaqhToYbUS+s0AybiWtXVg4/fe7F4X7msH2flgFiqZ4rw
-         gJNh99TojUueLoDj30DsCLyhZfPGru+sVNZRz583+1aCGPcJE3IQ9pmH6B1YkldbhGi8
-         0KYa8G/7a3MAgzW2IW3y5o8Xeom5Rb5LxAwu3Q7wIF0WE7JmuDgq6zfA65LGG+8vojSy
-         b2uorHUZMDwJ99OX6F+4FOIRu9eb/MsvJHzRTUPbybr05oH4qqrVvhGoek9bHG/EMRmj
-         PyreUercSDb1oCyWDbU47yfep7eqhgWRPCqGQ8VVfdxt9oDX9KFZSzeMKXv+gpg3n9p4
-         JYVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEgi5IL9mnM3NUuLgftWv/vP+R8exV/dRLwO2E+fpmAUsXSQpPURZZsFk5KklRiqBqVtHtEQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpM18f5G9iK9tsClD6WgZ1tGoE643m8NlbqNML/TMgK0A8DIcD
-	gi1IZzQ8YpCfk0w37m1tsUoe5c9NXuTKmokIXufHWkjvSdatyQkqmyu5sZEy9V65KIr/6OsZ8zM
-	+7MZCvtr6FDnouIOcqWXztfAP8E17lOaI2dNdyu9amjm7Q7YMycZ3Ntk=
-X-Google-Smtp-Source: AGHT+IEIkCC8N1t3g1bFzgXedY1Bkr0mma44mi/1bc5v4Jq5iS0Rq6K9BCAIGlp4mxA4h010nK3uHM+G6TudeUGpnR10/ajX8bi1
+	s=arc-20240116; t=1731574923; c=relaxed/simple;
+	bh=+Qj7doP4Jib+4CAWjqtuXlPX1qsX62A2FRO1yV5dVok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XvzeZiy+/NAOa/f7loXn9qo7M285lne5E0ik57z+jcsRm8wdHd1GKX825OFKGGSjo93nxFku58zyDsSjZNEaB0v8m1H2ekY8oY56nodOjNXd2XSGVYe+SmmXkSTa7BAKgg9PiG92H6Gaq7HgJ7Ht4oKy3/4mhgqFbHU9iMSKLWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBVjU-0002o7-KX; Thu, 14 Nov 2024 10:01:44 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tBVjT-000iJL-34;
+	Thu, 14 Nov 2024 10:01:43 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 86B8F372EC6;
+	Thu, 14 Nov 2024 09:01:43 +0000 (UTC)
+Date: Thu, 14 Nov 2024 10:01:42 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Sean Nyekjaer <sean@geanix.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+Message-ID: <20241114-quirky-aquamarine-junglefowl-408784-mkl@pengutronix.de>
+References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
+ <20241111101011.30e04701@kernel.org>
+ <fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
+ <20241112-hulking-smiling-pug-c6fd4d-mkl@pengutronix.de>
+ <20241113193709.395c18b0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:194a:b0:3a7:1a65:2fbc with SMTP id
- e9e14a558f8ab-3a71a653086mr51886145ab.23.1731574702355; Thu, 14 Nov 2024
- 00:58:22 -0800 (PST)
-Date: Thu, 14 Nov 2024 00:58:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6735bbae.050a0220.1324f8.0094.GAE@google.com>
-Subject: [syzbot] Monthly wireless report (Nov 2024)
-From: syzbot <syzbot+lista52bb331ee700442ac9c@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xfgzptvdr5uihgs4"
+Content-Disposition: inline
+In-Reply-To: <20241113193709.395c18b0@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello wireless maintainers/developers,
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+--xfgzptvdr5uihgs4
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
+ voltage
+MIME-Version: 1.0
 
-During the period, 10 new issues were detected and 1 were fixed.
-In total, 48 issues are still open and 145 have already been fixed.
+On 13.11.2024 19:37:09, Jakub Kicinski wrote:
+> On Tue, 12 Nov 2024 08:16:02 +0100 Marc Kleine-Budde wrote:
+> > > > There is no need to CC netdev@ on pure drivers/net/can changes.
+> > > > Since these changes are not tagged in any way I have to manually
+> > > > go and drop all of them from our patchwork. =20
+> >=20
+> > Does the prefix "can-next" help, i.e.:
+> >=20
+> > | [PATCH can-next v2 0/2]
+> >=20
+> > which can be configured via:
+> >=20
+> > | b4 prep --set-prefixes "can-next"
+>=20
+> Yup, prefix would make it easy for us to automatically discard !
+>=20
+> > > Oh sorry for that.
+> > > I'm using b4's --auto-to-cc feature, any way to fix that? =20
+> >=20
+> > You can manually trim the list of Cc: using:
+> >=20
+> > | b4 prep --edit-cover
+>=20
+> My bad actually, I didn't realize we don't have an X: entries
+> on net/can/ under general networking in MAINTAINERS.
+>=20
+> Would you mind if I added them?
 
-Some of the still happening issues:
+Makes sense! I didn'k know that X: exists and that it makes total sense
+here.
 
-Ref  Crashes Repro Title
-<1>  40995   Yes   WARNING in __ieee80211_beacon_get
-                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
-<2>  5954    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<3>  3744    Yes   WARNING in ath6kl_bmi_get_target_info (2)
-                   https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
-<4>  2962    Yes   WARNING in rate_control_rate_init (3)
-                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-<5>  1415    Yes   WARNING in plfxlc_mac_release
-                   https://syzkaller.appspot.com/bug?extid=51a42f7c2e399392ea82
-<6>  1167    Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<7>  812     Yes   WARNING in __rate_control_send_low (3)
-                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
-<8>  516     Yes   INFO: task hung in rfkill_global_led_trigger_worker (3)
-                   https://syzkaller.appspot.com/bug?extid=50499e163bfa302dfe7b
-<9>  364     Yes   INFO: task hung in crda_timeout_work (8)
-                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
-<10> 286     Yes   INFO: task hung in reg_check_chans_work (7)
-                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
+Feel free to add my:
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Marc
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-You may send multiple commands in a single email message.
+--xfgzptvdr5uihgs4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc1vHMACgkQKDiiPnot
+vG+Y5QgAnsKhZBcYg2x5xl/xRkUMV8Q/4si7mWxptk6zDHdYBauHiTUaI/v8bpaV
+LHUjJWZM+sbmBV0BCIO6YAXPSHaM0VvxULIQC3fOhhl0nCeE+Gx0eiEpJ6U5HhLf
+xvHXqxuTjdonBgYOTPd2pEcjaobL0v8WYFwLcZArtEJgr4AJlqmTzDtapx+3Kuuv
+xoCm7gBqysQZ7GhRZArw83AKyKiKRLtZmSPpgygkN3Nl//qDS3ee/WgRkyMEH0Z2
+Dx2szXEn4m0PztyOGCdZQljehOfoKhOFJOeYRTGf9IwuQfC+fLk376PPmHZxATcB
+nv/RcdITZKtX3nrUQLLZ1UjjPYzs2Q==
+=RfwS
+-----END PGP SIGNATURE-----
+
+--xfgzptvdr5uihgs4--
 
