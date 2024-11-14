@@ -1,52 +1,40 @@
-Return-Path: <netdev+bounces-145028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A834A9C9275
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:36:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7AE9C9285
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D641282F42
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:36:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4C472833CB
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D0219E7FA;
-	Thu, 14 Nov 2024 19:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UsXOewac"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EA71A00D2;
+	Thu, 14 Nov 2024 19:40:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4878A14389F;
-	Thu, 14 Nov 2024 19:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865A219340B;
+	Thu, 14 Nov 2024 19:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731613005; cv=none; b=D6OGfT3PeECgKcBLnX0xSO0H1NMowuilCzQt/XXkbk9+18nhD4JNlERhz+tmhWItxJFpmMGzmBbnFSk9ShSP7YgcprkgU+4qjToXMQlnwdjRusdoM2S02NAtbSEFZDJgym6AogataohbwUiWPHRLj+krdheQhG40T5PAf/ZaXho=
+	t=1731613211; cv=none; b=e3xKhjsj30rGMvkLN4Zt3wI0DP6uGInJeExjdgteiecwCsfRXMO/wywkvoIZlthzUjNvo4Gnrg59XAGXsZjG/5p0vWjEYfo6NFM6ty/AzOQmqBQDanCyCYiZuBcQoao075yBZo+EL/CypiMxPNWLlzOeG7BgqjwiZh8b8Sl6sUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731613005; c=relaxed/simple;
-	bh=/EBrmwQU5rS3M7JeuDJfsU9fSQIlNMM7bV+MV6K5+PM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VNGIKRQOUGWqDiv4YsS87JluRVEnjg8UHTxnKa640SfnriVaEkEg0G9fQOefYAW7MxaYiTzbTakJCKSzjusStqJN1O/Is03Q5b+wgRyYKR8nC/06F9nC1wF+7dqHv8+BhVJnjf2pxVQpZ/tY6drpOCKHMxbMJdWDL4cC7+QkMrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UsXOewac; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=qW1uk/hmhiHBWlUU3XI2BHwzOgZLmpe0aMw1i+bQAyI=; b=UsXOewacG4DEMnTnSlOyzcqnXY
-	lBgH+jslP/I/JjYWj8iF4T2R5q14s4D0mppHz1hvdMHt/ICl2gxBzxyyuyAnmibbm7G0mWsa2lJFI
-	hoe73jIbe2QBfvelAxBrTkBvFPxmuDbYMCao5Yg4qwKmfMjaiuiD38jiq8Pzu3jhJ7Jb/rAkYmkbB
-	6fRqgU+ZAcMPmfNdodkan9pW7xkdRBLrFXS0fonXoH7PLznbu0AeHa/QoGU19cV6k2osMoGbEVOvH
-	xB+/uRxQfP5plzRydsD97IuIiRm5aXQ7fjlTpv+wGUI5X6JiNKnyxYvZEILm4w2iAQM00CnpyDi2n
-	ffiob7Og==;
-Received: from [50.53.2.24] (helo=[192.168.254.17])
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tBfdx-00000000Cs2-0KLS;
-	Thu, 14 Nov 2024 19:36:40 +0000
-Message-ID: <e5053f9e-3dc7-4a71-9a3a-f8492987f21f@infradead.org>
-Date: Thu, 14 Nov 2024 11:36:35 -0800
+	s=arc-20240116; t=1731613211; c=relaxed/simple;
+	bh=oV+pz9hI2FkCnLnpvE8P5qAd9RPezp8GwGXX5w2HPGw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=M3DdqFcCtOdeteX7rR12WplYv7v0QIy9GUegUpZgkBcHa7gSnJPWvGH9hHBn8F7JOTJA6H1zM73d6jnuHS6U8LJalfpS0HbAIWyuHH5dvB4Tg8r0FobZob8rgVPWMuGbKfVEgKUt35nKsQ1EZpeqyTrKlnuzubtV1Erqo+tpkPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.144.183) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 14 Nov
+ 2024 22:39:52 +0300
+Message-ID: <bf4ee238-bc28-45f2-a719-8bbf97619996@omp.ru>
+Date: Thu, 14 Nov 2024 22:39:51 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,76 +42,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/12] Begin upstreaming Homa transport
- protocol
-To: John Ousterhout <ouster@cs.stanford.edu>,
- Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
-References: <20241111234006.5942-1-ouster@cs.stanford.edu>
- <ZzTcx8nmEKIJpaCR@pop-os.localdomain>
- <CAGXJAmyGTwjFo6fGoROY=hQFXbR5RdpmpkEc9Zm6DOoD2nbwNA@mail.gmail.com>
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas,ether: Drop
+ undocumented "micrel,led-mode"
+To: "Rob Herring (Arm)" <robh@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Sergei
+ Shtylyov <sergei.shtylyov@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20241113225742.1784723-2-robh@kernel.org>
 Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CAGXJAmyGTwjFo6fGoROY=hQFXbR5RdpmpkEc9Zm6DOoD2nbwNA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20241113225742.1784723-2-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/14/2024 19:19:24
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 189187 [Nov 14 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 41 0.3.41
+ 623e98d5198769c015c72f45fabbb9f77bdb702b
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.144.183
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/14/2024 19:23:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/14/2024 4:04:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 11/14/24 1:57 AM, Rob Herring (Arm) wrote:
 
+> "micrel,led-mode" is not yet documented by a schema. It's irrelevant to
 
-On 11/14/24 8:59 AM, John Ousterhout wrote:
-> On Wed, Nov 13, 2024 at 9:08 AM Cong Wang <xiyou.wangcong@gmail.com> wrote:
->>
->> On Mon, Nov 11, 2024 at 03:39:53PM -0800, John Ousterhout wrote:
->>>  MAINTAINERS               |    7 +
->>>  include/uapi/linux/homa.h |  165 ++++++
->>>  net/Kconfig               |    1 +
->>>  net/Makefile              |    1 +
->>>  net/homa/Kconfig          |   19 +
->>>  net/homa/Makefile         |   14 +
->>>  net/homa/homa_impl.h      |  767 ++++++++++++++++++++++++++
->>>  net/homa/homa_incoming.c  | 1076 +++++++++++++++++++++++++++++++++++++
->>>  net/homa/homa_outgoing.c  |  854 +++++++++++++++++++++++++++++
->>>  net/homa/homa_peer.c      |  319 +++++++++++
->>>  net/homa/homa_peer.h      |  234 ++++++++
->>>  net/homa/homa_plumbing.c  |  965 +++++++++++++++++++++++++++++++++
->>>  net/homa/homa_pool.c      |  420 +++++++++++++++
->>>  net/homa/homa_pool.h      |  152 ++++++
->>>  net/homa/homa_rpc.c       |  488 +++++++++++++++++
->>>  net/homa/homa_rpc.h       |  446 +++++++++++++++
->>>  net/homa/homa_sock.c      |  380 +++++++++++++
->>>  net/homa/homa_sock.h      |  426 +++++++++++++++
->>>  net/homa/homa_stub.h      |   80 +++
->>>  net/homa/homa_timer.c     |  156 ++++++
->>>  net/homa/homa_utils.c     |  150 ++++++
->>>  net/homa/homa_wire.h      |  378 +++++++++++++
->>
->> Hi John,
->>
->> Thanks for your efforts to push them upstream!
->>
->> Just some very high-level comments:
->>
->> 1. Please run scripts/checkpatch.pl to make sure the coding style is
->> aligned with upstream, since I noticed there are still some C++ style
->> comments in your patchset.
+   It's documented by Documentation/devicetree/bindings/net/micrel.txt...
+Do you mean this one should be converted to .yaml?
+
+> the example, so just drop it.
 > 
-> I have been running checkpatch.pl, but it didn't complain about C++
-> style comments. Those comments really shouldn't be there, though: they
-> are for pieces of code I've temporarily commented out, and those
-> chunks shouldn't be in the upstream version of Homa. I'll fix things
-> so they don't appear in the future.
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/renesas,ether.yaml | 1 -
+>  1 file changed, 1 deletion(-)
 > 
+> diff --git a/Documentation/devicetree/bindings/net/renesas,ether.yaml b/Documentation/devicetree/bindings/net/renesas,ether.yaml
+> index 29355ab98569..ced1471c6484 100644
+> --- a/Documentation/devicetree/bindings/net/renesas,ether.yaml
+> +++ b/Documentation/devicetree/bindings/net/renesas,ether.yaml
+> @@ -123,7 +123,6 @@ examples:
+>              reg = <1>;
+>              interrupt-parent = <&irqc0>;
+>              interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
+> -            micrel,led-mode = <1>;
+>              reset-gpios = <&gpio5 31 GPIO_ACTIVE_LOW>;
+>          };
+>      };
 
-John, you should be OK using // comments if that's what you want to use.
-
-https://lkml.iu.edu/hypermail/linux/kernel/1607.1/00627.html
-or
-https://lore.kernel.org/lkml/CA+55aFyQYJerovMsSoSKS7PessZBr4vNp-3QUUwhqk4A4_jcbg@mail.gmail.com/
-
-are still current AFAIK.
-
-
--- 
-~Randy
+MBR, Sergey
 
 
