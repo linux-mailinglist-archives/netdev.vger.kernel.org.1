@@ -1,214 +1,219 @@
-Return-Path: <netdev+bounces-144860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD6C9C8958
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:58:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D77C79C8976
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71E30B2265B
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:55:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44241B2833C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2541F9431;
-	Thu, 14 Nov 2024 11:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5E61F9A9A;
+	Thu, 14 Nov 2024 12:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="Rt4/nLE1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="afhQGr3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82CD1F943C
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69AB192D9D
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 12:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731585321; cv=none; b=aeRIA5rNfxhmj1hmCTD6Itmw8VHcmJMbyYBlRaVVI+ERxcYaue9+p7a0VZnUMwo5XlNAqILCCU5S7yJ8kBFCT/9NR93zRLrN28DV6djhaqVxFQYGtVv2TqJwYC1ywchYaUZOfPdwKoU0ISTTJD0r1XSC5PD59Hm6g4fJAr1CVpU=
+	t=1731585780; cv=none; b=tqMbCjzEN4ztVi20bpyCfWstkxzhDk0an7fbrlF0Bgyux2OzvC7i1mfCxMS03wIg5/GGv5v9cY/5NmzYQROai0sYd69CklkdZVbYHjCCYAYDyzzBiV4knxqLdatXiBQvkiNxTHR0EaRGjQlpcht/9lW7dZIW9lY5e5Oc9FlH0X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731585321; c=relaxed/simple;
-	bh=mFAbYoNztpIV+4IFZ9jTX8TLDXeEO7op1F9KNzb1l1c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bIxD7Oqi/QIDalhj1jIB1Ww0oEA8j5zboDanVqG2bImCoMPkOUX36yec3XKa5zYR251XOBHsZqDgY9XtQEqmMu1bjcFt27J5HEC2RYi9Kd2rbou66B8rfzxNZhpM653PGXnhnO4dBcyUixnkSUkXPemLV9c/Z2TP6ub4zwpLYoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=Rt4/nLE1; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5cf7aa91733so256279a12.2
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 03:55:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1731585318; x=1732190118; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TykqvJZu7oobTkYrqspWrFCa8xwHBaWMCZeSIBVlCZw=;
-        b=Rt4/nLE1rEMwBkYzxioe6bCmT4N4ICRDMUUl4fuyaBwzXrHA2bmEo8YU/gvEvs2dEf
-         VbtCZgOHmy9qi4dcBzg8B+qA84UBkFlh1jusFm3yImJiswqRF5nWvwDCwEg2qdDRdxcr
-         tjFzZ1XlnHKRLa/gZvD2OURBIg0KT7blDjYOAU1cWp+oYdNq7yrY7wQFzYjVFbNUFHFu
-         ClObCN1mjTyW0yxd4lKE4nY1K3l7toWOrzX9d9T2I44wJ4O7xcghSZOdz1cu5LUDFn2o
-         0NhaR75mxe3wpBueB/WTPYAtHdhdtfa6HhPZzG/xPiD/nBAZdg0RC8QvOc0qgNFFcSn1
-         UHxg==
+	s=arc-20240116; t=1731585780; c=relaxed/simple;
+	bh=k8vvHLSi3/Ba27sZNaoHwLkf9qlD47v6sneOKR2gKYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YNzJvo5FgxgkwZTRxh6RIejAOWXsnpYQ0zCrPY5WWpK0XXmUUXEeUP3YsB2bSCv60EQZU3pEMXSPo9i7qunnRqXrrhQ/dKn8cIUMqCjZu45oRMUQ4oR8zhZFEZWSFV2Udi+5nMSkkTRrxD2e6drB7eRVDNmXa+3RDyyotvdo9QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=afhQGr3v; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731585777;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/zpQdMqKFFqaHRJ8M6WcgEvfRNF6AeI76vWq5L2MI+s=;
+	b=afhQGr3v7xc+3FOLlU15/PJc135LPfn4n08/GF6DPIkRdngZkN1RLpvsgBXmefkFfDuC0f
+	wGh6VZKFsxa0LrpB42C0AftYbhEd7LYZQHBIZsx3CeA0RnY3Eq4+m22P//CmKkhAi884ZF
+	ZYi+VMgvfcLewB3MOZUMYppFzxsFbUY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-237-9F0_5PVEP_C_YjXyRuHRzg-1; Thu, 14 Nov 2024 07:02:54 -0500
+X-MC-Unique: 9F0_5PVEP_C_YjXyRuHRzg-1
+X-Mimecast-MFC-AGG-ID: 9F0_5PVEP_C_YjXyRuHRzg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43159603c92so4036275e9.2
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 04:02:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731585318; x=1732190118;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TykqvJZu7oobTkYrqspWrFCa8xwHBaWMCZeSIBVlCZw=;
-        b=iz9OAcF1fl+MUl1/OWuvKdCtj4aaF9cWrgTGKaZCgFbTBuRayeW6a0OiPo+plS9OAa
-         xxV4cCVhslm6poO1OGhuKd5DFEqOI3ILIqpZn7QWJ40iJ8DhT++8V0xBivraJ6vccX3u
-         39mlv7JWe1O0aoJ7p/fK1kob/r3kxdFoG2QTe9TzPRVCmsPbU6l0k6iLuGmrlvHCVsOV
-         f0bcsyuVzZyMDiozvJd+8mpZWWbp5hcNHZgIeZq6umBbR2va9W5bNP0ppdcOGonJ3AeA
-         PcC6smCnrtwYmVhYV2w0CNddcJEiyFy0EKwfWw4/iNYmkoXgKdj59TbAyNt0JIIvKIpV
-         4Usw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs2HVIZ/hHB7JLnzqH96JlQsXKX3wAwvAbPCEEP6Fd2Xb9dz1Zj1zSG44PKVPaWlEadoNql0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeuVScDa/qzsR7EmIM5Uq+TpcD27iQoKn01+VL5521vHLjPOix
-	xjTCSid4kdKFB3Dhzzh9PyoMGXNmG0gqGfiYYWcR+fEWDAJZZm1f2JSh6cX+6BE=
-X-Google-Smtp-Source: AGHT+IE/1TBRDr0zrGfCx62LhZdMXdC4i7gKZ6O1OikOKLIOjOf9iNHmbMOKdG/5UJAwkvlasJ5yig==
-X-Received: by 2002:a05:6402:1cc1:b0:5ce:fa33:6c9f with SMTP id 4fb4d7f45d1cf-5cf77ecc8d2mr1814721a12.27.1731585317798;
-        Thu, 14 Nov 2024 03:55:17 -0800 (PST)
-Received: from [192.168.3.32] (cpe-188-129-45-253.dynamic.amis.hr. [188.129.45.253])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf79b8a6f7sm495171a12.18.2024.11.14.03.55.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 03:55:17 -0800 (PST)
-Message-ID: <296336ea-9181-4c85-92d4-4cee1866822e@sartura.hr>
-Date: Thu, 14 Nov 2024 12:55:14 +0100
+        d=1e100.net; s=20230601; t=1731585773; x=1732190573;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/zpQdMqKFFqaHRJ8M6WcgEvfRNF6AeI76vWq5L2MI+s=;
+        b=jnM+nQQ5R/PiPvpK2HFAK1pka/9/Ekoc3t4nNHm0S/FksgkoAYinjHK1Dookgh5I8S
+         aKT5b06V6Bpl+d9F93N8XJOXVdfeoCwsuhlMV58Fp7hcnjxKJ07KjEn2LfFR2oOEdj8O
+         KtXP26FkJU323ox3mjaYKgAwI9uGNE+VL2wjVMCQvS5qIFSG9T2jf2JWJKRWoL29Obje
+         milUVS+iQXTwT8ffwvgQelORgZgblOdJH7aOS6iFectrptBGvmMAV/yE8VmTtUTl1mSw
+         PbPrpRFCLs3A091+ppv6Wmw++DFxVdFP+hQqZzeqcLS5+7JP1SacMkUeg7as6dmmrauO
+         0usg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/fyL9bopPQqPvwTu4xFKlJq3UnGByk8CdqbznYCKOHQCD0Yg5mv1pqx+VBvISt9hylVzBXhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE53S7Bp/titAq1DuBxkYN9XKm4NrdvUa1h6pataJWERo616hk
+	TVjDuI/HHfGP6/AMImjIofdkggOaTz9vYYPbBIQUAL5qlCDOc7PKzZVCPeQW6W57BsSb15k22Qy
+	6WAezxn0mFplMbXW3/2Jnp0NLuUjrPzarKSsVPgG93IjCvJhb9wNAzA==
+X-Received: by 2002:a05:600c:4689:b0:431:57e5:b251 with SMTP id 5b1f17b1804b1-432da7dc45fmr14238875e9.28.1731585773175;
+        Thu, 14 Nov 2024 04:02:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHbgc10bxAJ/VIRFkaOi6IwkSPLAJX2D33rxzmsycb7616hQU5vNcmjB3rsRSBucznfT6zuWQ==
+X-Received: by 2002:a05:600c:4689:b0:431:57e5:b251 with SMTP id 5b1f17b1804b1-432da7dc45fmr14238395e9.28.1731585772696;
+        Thu, 14 Nov 2024 04:02:52 -0800 (PST)
+Received: from debian (2a01cb058d23d600b637ad91a758ba3f.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:b637:ad91:a758:ba3f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da298a41sm21695655e9.38.2024.11.14.04.02.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 04:02:52 -0800 (PST)
+Date: Thu, 14 Nov 2024 13:02:49 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
+	Pekka Varis <p-varis@ti.com>
+Subject: Re: [PATCH net-next v3 2/2] net: ethernet: ti: am65-cpsw: enable
+ DSCP to priority map for RX
+Message-ID: <ZzXm6SHjRfbaOX14@debian>
+References: <20241109-am65-cpsw-multi-rx-dscp-v3-0-1cfb76928490@kernel.org>
+ <20241109-am65-cpsw-multi-rx-dscp-v3-2-1cfb76928490@kernel.org>
+ <ZzVBS1zXIy31pnaf@debian>
+ <76dd6141-5852-43ae-af98-f0edf0bc10f5@kernel.org>
+ <8bfe8acc-9514-4ba8-9498-2427ddb0bb78@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/8] net: lan969x: add RGMII support
-To: Daniel Machon <daniel.machon@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- Russell King <linux@armlinux.org.uk>, jacob.e.keller@intel.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org
-Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
-Content-Language: en-US
-From: Robert Marko <robert.marko@sartura.hr>
-In-Reply-To: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8bfe8acc-9514-4ba8-9498-2427ddb0bb78@kernel.org>
 
+On Thu, Nov 14, 2024 at 12:12:47PM +0200, Roger Quadros wrote:
+> On 14/11/2024 11:41, Roger Quadros wrote:
+> > On 14/11/2024 02:16, Guillaume Nault wrote:
+> >> So what about following the IETF mapping found in section 4.3?
+> >> https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
+> > 
+> > Thanks for this tip.
+> > I will update this patch to have the default DSCP to UP mapping as per
+> > above link and map all unused DSCP to UP 0.
+> 
+> How does the below code look in this regard?
 
-On 13. 11. 2024. 22:11, Daniel Machon wrote:
-> == Description:
->
-> This series is the fourth of a multi-part series, that prepares and adds
-> support for the new lan969x switch driver.
->
-> The upstreaming efforts is split into multiple series (might change a
-> bit as we go along):
->
->          1) Prepare the Sparx5 driver for lan969x (merged)
->
->          2) Add support for lan969x (same basic features as Sparx5
->             provides excl. FDMA and VCAP, merged).
->
->          3) Add lan969x VCAP functionality (merged).
->
->      --> 4) Add RGMII support.
->
->          5) Add FDMA support.
->
-> == RGMII support:
->
-> The lan969x switch device includes two RGMII interfaces (port 28 and 29)
-> supporting data speeds of 1 Gbps, 100 Mbps and 10 Mbps.
->
-> Details are in the commit description of the patches.
->
-> == Patch breakdown:
->
-> Patch #1 does some preparation work.
->
-> Patch #2 adds new function: is_port_rgmii() to the match data ops.
->
-> Patch #3 uses the is_port_rgmii() in a number of places.
->
-> Patch #4 uses the phy_interface_mode_is_rgmii() in a number of places.
->
-> Patch #5 adds checks for RGMII PHY modes in sparx5_verify_speeds().
->
-> Patch #6 adds registers required to configure RGMII.
->
-> Patch #7 adds RGMII implementation.
->
-> Patch #8 document RGMII delays.
->
-> To: UNGLinuxDriver@microchip.com
-> To: Andrew Lunn <andrew+netdev@lunn.ch>
-> To: David S. Miller <davem@davemloft.net>
-> To: Eric Dumazet <edumazet@google.com>
-> To: Jakub Kicinski <kuba@kernel.org>
-> To: Paolo Abeni <pabeni@redhat.com>
-> To: Lars Povlsen <lars.povlsen@microchip.com>
-> To: Steen Hegelund <Steen.Hegelund@microchip.com>
-> To: Horatiu Vultur <horatiu.vultur@microchip.com>
-> To: Russell King <linux@armlinux.org.uk>
-> To: jacob.e.keller@intel.com
-> To: robh@kernel.org
-> To: krzk+dt@kernel.org
-> To: conor+dt@kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
->
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+Looks generally good to me. A few comments inline though.
 
-Tested-by: Robert Marko <robert.marko@sartura.hr>
+> static void am65_cpsw_port_enable_dscp_map(struct am65_cpsw_port *slave)
+> {
+> 	int dscp, pri;
+> 	u32 val;
+> 
+> 	/* Default DSCP to User Priority mapping as per:
+> 	 * https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
 
-> ---
-> Changes in v2:
->
->    Most changes are in patch #7. RGMII implementation has been moved to
->    it's own file lan969x_rgmii.c.
->
->    Details:
->
->      - Use ETH_P_8021Q and ETH_P_8021AD instead of the Sparx5 provided
->        equivalents (patch #7).
->      - Configure MAC delays through "{rx,tx}-internal-delay-ps"
->        properties (patch #7).
->      - Add selectors for all the phase shifts that the hardware supports
->        (instead of only 2.0 ns, patch #7).
->      - Add selectors for all the port speeds (instead of only 1000 mbps.)
->      - Document RGMII delays in dt-bindings.
->
->    - Link to v1: https://lore.kernel.org/r/20241106-sparx5-lan969x-switch-driver-4-v1-0-f7f7316436bd@microchip.com
->
-> ---
-> Daniel Machon (8):
->        net: sparx5: do some preparation work
->        net: sparx5: add function for RGMII port check
->        net: sparx5: use is_port_rgmii() throughout
->        net: sparx5: use phy_interface_mode_is_rgmii()
->        net: sparx5: verify RGMII speeds
->        net: lan969x: add RGMII registers
->        net: lan969x: add RGMII implementation
->        dt-bindings: net: sparx5: document RGMII MAC delays
->
->   .../bindings/net/microchip,sparx5-switch.yaml      |  20 ++
->   drivers/net/ethernet/microchip/lan969x/Makefile    |   2 +-
->   drivers/net/ethernet/microchip/lan969x/lan969x.c   |   5 +
->   drivers/net/ethernet/microchip/lan969x/lan969x.h   |  10 +
->   .../net/ethernet/microchip/lan969x/lan969x_rgmii.c | 237 +++++++++++++++++++++
->   .../net/ethernet/microchip/sparx5/sparx5_main.c    |  29 ++-
->   .../net/ethernet/microchip/sparx5/sparx5_main.h    |   3 +
->   .../ethernet/microchip/sparx5/sparx5_main_regs.h   | 145 +++++++++++++
->   .../net/ethernet/microchip/sparx5/sparx5_phylink.c |   3 +
->   .../net/ethernet/microchip/sparx5/sparx5_port.c    |  57 +++--
->   .../net/ethernet/microchip/sparx5/sparx5_port.h    |   5 +
->   11 files changed, 488 insertions(+), 28 deletions(-)
-> ---
-> base-commit: 12079a59ce52e72a342c49cfacf0281213fd6f32
-> change-id: 20241104-sparx5-lan969x-switch-driver-4-d59b7820485a
->
-> Best regards,
+Maybe also add a link to
+https://datatracker.ietf.org/doc/html/rfc8622#section-11
+which defines the LE PHB (Low Effort) and updates RFC 8325 accordingly.
+
+> 	 */
+> 	for (dscp = 0; dscp <= AM65_CPSW_DSCP_MAX; dscp++) {
+> 		switch (dscp) {
+> 		case 56:	/* CS7 */
+> 		case 48:	/* CS6 */
+> 			pri = 7;
+> 			break;
+> 		case 46:	/* EF */
+> 		case 44:	/* VA */
+> 			pri = 6;
+> 			break;
+> 		case 40:	/* CS5 */
+> 			pri = 5;
+> 			break;
+> 		case 32:	/* CS4 */
+> 		case 34:	/* AF41 */
+> 		case 36:	/* AF42 */
+> 		case 38:	/* AF43 */
+> 		case 24:	/* CS3 */
+> 		case 26:	/* AF31 */
+> 		case 28:	/* AF32 */
+> 		case 30:	/* AF33 */
+
+Until case 32 (CS4) you've kept the order of RFC 8325, table 1.
+It'd make life easier for reviewers if you could keep this order
+here. That is, moving CS4 after AF43 and CS3 after AF33.
+
+> 			pri = 4;
+> 			break;
+> 		case 17:	/* AF21 */
+
+AF21 is 18, not 17.
+
+> 		case 20:	/* AF22 */
+> 		case 22:	/* AF23 */
+> 			pri = 3;
+> 			break;
+> 		case 8:		/* CS1 */
+
+Let's be complete and add the case for LE (RFC 8622), which also
+maps to 1.
+
+> 			pri = 1;
+> 			break;
+> 		default:
+> 			pri = 0;
+> 			break;
+> 		}
+> 
+> 		am65_cpsw_port_set_dscp_map(slave, dscp, pri);
+> 	}
+> 
+> 	/* enable port IPV4 and IPV6 DSCP for this port */
+> 	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_CTL);
+> 	val |= AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN |
+> 		AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN;
+> 	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_CTL);
+> }
+> 
+> > 
+> > Is there any mechanism/API for network administrator to change this
+> > default mapping in the network drivers?
+> > 
+> >>
+> >>>  static void am65_cpsw_sl_ctl_reset(struct am65_cpsw_port *port)
+> >>>  {
+> >>>  	cpsw_sl_reset(port->slave.mac_sl, 100);
+> >>> @@ -921,6 +974,7 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
+> >>>  	common->usage_count++;
+> >>>  
+> >>>  	am65_cpsw_port_set_sl_mac(port, ndev->dev_addr);
+> >>> +	am65_cpsw_port_enable_dscp_map(port);
+> >>>  
+> >>>  	if (common->is_emac_mode)
+> >>>  		am65_cpsw_init_port_emac_ale(port);
+> >>>
+> >>> -- 
+> >>> 2.34.1
+> >>>
+> >>>
+> >>
+> > 
+> 
+> -- 
+> cheers,
+> -roger
+> 
+
 
