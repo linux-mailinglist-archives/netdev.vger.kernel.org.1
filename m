@@ -1,97 +1,123 @@
-Return-Path: <netdev+bounces-144960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 880239C8E71
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:41:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6A09C8E80
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:43:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DD37288DAE
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:41:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F39061F2831B
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E085118D63C;
-	Thu, 14 Nov 2024 15:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C895D1A00D2;
+	Thu, 14 Nov 2024 15:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rUwt46Ze"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PHgxnqys"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C891632EF
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 15:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669D219E990;
+	Thu, 14 Nov 2024 15:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731598402; cv=none; b=EqTSC7kpk4wklBzIl9zYdyaYRRF9g4WxHgXNVen0vrvhdMOY8+fZyFGGr+qdsFRDRx5GO6p/jVTxb5rgl6M4DUndkeZrN+MiuAJH+SLmZzkBtWoCF4NJ+zCAo9MuMUNf0vUOKMA/sOmSHaJFXzot0nfOfi+ixmLImbAiucnUQF8=
+	t=1731598575; cv=none; b=SdaYa4fs1FokGHSeEHR8c/4U1UBac1Bx60UKzBqcWPg61OVIhNcx1kj6jvp4Wp7tRjMrwUlubjF4NyTQolqt+aWIhPdGOf2jzG9GChydQNT5abElp5twQtYBvHqkYUcc3Rzq1yGY1A/eTyoBV1xLQqlNwlKHaZlukPIXy0YAopE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731598402; c=relaxed/simple;
-	bh=4NJ5/kx8A96DpPqLZgnNF4G1MvnTwJpwAggWwcXLYSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c5xrc6gHHX1JSeEec6BNTZ420PPlTha+ilXXGIwZoO/gnu5VpTY7UyZKP8fmNshVE4AKV4B5/8RsZK4pwiP6tjMBmuRAyN4aFiaOBdefv/Aw5iOnKpPoI+eO9WXV+g8IDApceStFrbPjTekRwpERdVBagDpDub8wFkfamxiI6PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rUwt46Ze; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G4EZ3jl6nOJdqJAgt3wJNi7n9xQj+CzVY+eMw04jHG4=; b=rUwt46Zez10UJ8W0ckfKsbtoTq
-	x2S5LRlUHPXEcceM7uJZuiR9eRSfX8dvUz1C+V4g4K73c3YOI53zwAyzVsKK4A/XvXkdZcI4dV5Pv
-	6pu12wjuWJHLBtM4IX87wOayueKLhV6oAEhIqQyK0aldO5epFecK07i1o33aSeO/iXPM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tBbqO-00DJTv-Ey; Thu, 14 Nov 2024 16:33:16 +0100
-Date: Thu, 14 Nov 2024 16:33:16 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: wojackbb@gmail.com
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
-Subject: Re: [net-next,v2] [PATCH net-next v2] net: wwan: t7xx: Change
- PM_AUTOSUSPEND_MS to 5000
-Message-ID: <546f1456-87f2-4e54-a486-86cac1504a3d@lunn.ch>
-References: <20241114102002.481081-1-wojackbb@gmail.com>
+	s=arc-20240116; t=1731598575; c=relaxed/simple;
+	bh=kQ39Rsyn2g4EDGB5xm+OxhRlfal4DKLP5XFNlKLBRic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aANSPmx9EiNrlEvAcqnIL+S2Rd5Knf68mTELwXkg0iPYrCHdh9woqw4QUNBDhUIFbjB3moDMc/gDgSMwTrGuJQHTHjlNLwIa2xG0uza4/9H9ImEqFfO7AtQm6AMSffBkyyWNx/tDH/UoqyUW+1P7vNfb2YoTJaLvkoQpQzF/wUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PHgxnqys; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 24C0B1BF203;
+	Thu, 14 Nov 2024 15:36:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731598566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VlbPUfJTfjR4el0/XaLK036mk95ZItSTahQIOW8fAxM=;
+	b=PHgxnqysattdywIh3LkhH4IdLjGjtYzbCWoX6xdldJ0v8MyWWWJMgIM2ruBo7MdD9V+DaF
+	+uBJcnFSXJORpsWiUXXThqd0TVhJ/XWRNLxHq5kWlQfulJKy+eulflir2FhPVarvD+gjcl
+	Y/WutCDBGl4NGwbUGgi6J9vzHmjOqTXpq7lyHE9Ifd25idaLfriMDmjepJEoMVtH1zVeLq
+	fpWUjLfPG9ZCK3n0AfhDh7lFt0eXHuEsZkg0HSvFjCUU0RV6MeRqU1KFKvKx1lpfdyVlCL
+	q/wze7B415Q4j0h1NoOuOQi3RJ8xinVrQ+j8UxIE57nG5ae8VFujlN1gv1SO3g==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Herve Codina <herve.codina@bootlin.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH net-next v2 00/10] net: freescale: ucc_geth: Phylink conversion
+Date: Thu, 14 Nov 2024 16:35:51 +0100
+Message-ID: <20241114153603.307872-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241114102002.481081-1-wojackbb@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Thu, Nov 14, 2024 at 06:20:02PM +0800, wojackbb@gmail.com wrote:
-> From: Jack Wu <wojackbb@gmail.com>
-> 
-> Because optimizing the power consumption of t7XX,
-> change auto suspend time to 5000.
-> 
-> The Tests uses a script to loop through the power_state
-> of t7XX.
-> (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
-> 
-> * If Auto suspend is 20 seconds,
->   test script show power_state have 0~5% of the time was in D3 state
->   when host don't have data packet transmission.
-> 
-> * Changed auto suspend time to 5 seconds,
->   test script show power_state have 50%~80% of the time was in D3 state
->   when host don't have data packet transmission.
-> 
-> We tested Fibocom FM350 and our products using the t7xx and they all
-> benefited from this.
-> 
-> Signed-off-by: Jack Wu <wojackbb@gmail.com>
+Hello everyone,
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This is V2 of the ucc_geth phylink conversion.
 
-    Andrew
+There were two main reviews from the first iteration :
+
+ - The WoL configuration was not accounting for most of the WoL flags.
+   The Wol config was reworked (however, not tested unfortunately) to
+   better account for what the PHY and MAC can deal with. However this
+   is still a topic I'm not fully mastering... I think the modifications
+   done to patch 4 addresses the shortcomings, but it does look a bit
+   convoluted to me.
+
+ - The last patch of the series, that does the phylink conversion, was
+   hard to digest. To address that, I've split it up a bit more by
+   introducing the phy_interface_mode_is_reduced() in a dedicated patch
+   (patch 9), and by moving around some internal functions in a
+   dedicated patch as well (patch 8).
+
+Thanks Andrew and Russell for the reviews on V1.
+
+Best regards,
+
+Maxime
+
+Link to V1: https://lore.kernel.org/netdev/20241107170255.1058124-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (10):
+  net: freescale: ucc_geth: Drop support for the "interface" DT property
+  net: freescale: ucc_geth: split adjust_link for phylink conversion
+  net: freescale: ucc_geth: Use netdev->phydev to access the PHY
+  net: freescale: ucc_geth: Fix WOL configuration
+  net: freescale: ucc_geth: Use the correct type to store WoL opts
+  net: freescale: ucc_geth: Simplify frame length check
+  net: freescale: ucc_geth: Hardcode the preamble length to 7 bytes
+  net: freescale: ucc_geth: Move the serdes configuration around
+  net: freescale: ucc_geth: Introduce a helper to check Reduced modes
+  net: freescale: ucc_geth: phylink conversion
+
+ drivers/net/ethernet/freescale/Kconfig        |   3 +-
+ drivers/net/ethernet/freescale/ucc_geth.c     | 601 +++++++-----------
+ drivers/net/ethernet/freescale/ucc_geth.h     |  22 +-
+ .../net/ethernet/freescale/ucc_geth_ethtool.c |  74 +--
+ 4 files changed, 265 insertions(+), 435 deletions(-)
+
+-- 
+2.47.0
+
 
