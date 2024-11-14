@@ -1,143 +1,162 @@
-Return-Path: <netdev+bounces-144741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A709C8588
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:04:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7539C858B
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:04:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E5491F260C4
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:04:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1DBE281EE0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3731DED77;
-	Thu, 14 Nov 2024 09:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3F51E8854;
+	Thu, 14 Nov 2024 09:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lbvk/xIz"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xD8RPzrC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B47WamvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F9E1DC74A
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3F829CFB;
+	Thu, 14 Nov 2024 09:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731575040; cv=none; b=Fkeg6oj6+XQVFeHTibKc8rHNvpi6dW6QCdojB3mqNZN3L9ZYSShHJeJ58NfMlAoZlkKwdOESPfumduHNX9ZVIjK+dTsO6Jb4lYDldEajkhjkSi4jIEswW3Vr9Tnz59B5qD4saS8fYY5puDqblkn/p5ZyMg9DNbFba0ISwuozVTw=
+	t=1731575047; cv=none; b=llFhWmYHCb2QENNhWdFwad/nqA+8LcfsSULw9SpNA8qj6r/XhCX76StTwrj8KPv2oPifjG9V0l3m2IimRUN3xcWBBa3QCosaXMa4r8LG87RRk2n2iP3JCRNxso5ElFCD3ZjcpYMndOHjuznsF+102mcrjPjPmsf63Ec8dg4WFws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731575040; c=relaxed/simple;
-	bh=zWuRiFchZrNBLXRq0j24MhQKqSTdtNiY9xXXezztt0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Ph/rXLb3Hjm3AlOD3RHpqngMnEbgVxdWE4y8/pIh9m9CC5l6KFRA4u51JD4v7yTqhiVvQdBfCAqMDAHzDbB8Iire6PkqFXkNbYHeD3fW/8iHp1DbqmKg3H8iVJUvMrtMaTggss7NTR0AMT0Ve3sPyykQday7UYp2qGZW1twj3+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lbvk/xIz; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38207c86695so335292f8f.2
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:03:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731575036; x=1732179836; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8yR9tbhF0q7yv18wxqWfZSuY7tMkF/Aly2je5xrlXRw=;
-        b=lbvk/xIzFDHpYcENEsDUfX4v6vkLmdEQktMwFkPfPCkStNa5r8g9MwNcT6RmMg27k/
-         7H+L3rUf8b9Krh/OIeYSvQREm6Pkgaq4aezNsqGVTPqFRro8GI4u12gg+HvknsIUbBJk
-         lm02PXX8kZxd6cXzLMnmUBm7vV3edn90njBiiZ3o8TIShL33W3pFZOUi4kD9BI/z2KpH
-         uKPS8S4IKQ20LIS0Sr94GFIsutVA9EsAtwNaC9pA8kyp/F0IJrzJ0mgq/BAOTIpLNnjp
-         hHWwirY0Ozbp1IQBpdRqUSQhzwE8YVRkPEQD3GggCFIg+aFFJNvcaylN9xLg4AAUt4Dg
-         HRpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731575036; x=1732179836;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8yR9tbhF0q7yv18wxqWfZSuY7tMkF/Aly2je5xrlXRw=;
-        b=TeWIPzQQmmeM3pYYCowhZsL6FcgC9CyQvr4H7CPrmueRvXT6uNOpBE5ezk1DWqEl2t
-         VelSpPht7zQKNgdbo0yby89mtfL3iYGN7IosESjEQmFOLM9LXGRiV9qf6RaSG09TeLTA
-         o1JrwETaI+z+FpEH6aTrby0sPnbP68Ej4b5ZfWpcSAUHkaFNNA5Ly1M0chTvs/34393i
-         PuwPPM6hdAjEnECrhFAfgaopKWmWiVSDoKynNY7sMEVAsEcW7UrM2eBzhfuSKlq9lj6N
-         gdb5NyI5LrWgchon86Jn3GwtOqnytDNAM4ejHs8MHthwrTmCg0o6a4YrpiB7OK6FWYuy
-         bvgA==
-X-Forwarded-Encrypted: i=1; AJvYcCWSJrFQ+WhFa1yuZXRfDEAG0S28rYlGuw9BJo5zmdwSCDqf8QDHmFSYP9/9wTwp9UDjV2iexsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWsU8kASxo6WyH0jXDgvON4Xm+uSav9sA+sxKIzSWEc3g5NFmL
-	wm6jGFUI6sSQi4VLYBlOXTRE3JNfxJwfDus0NtnW2ZkTcB2g4VwQJR4Gq5tZAwY=
-X-Google-Smtp-Source: AGHT+IF7LePleA2RVAB0zLKwWrjCZlENR6/gtLxK87oI7QxvhdPKjaNrSnuc/bm9zTG3lEGgwAT6DQ==
-X-Received: by 2002:a5d:6487:0:b0:37e:f4ae:987d with SMTP id ffacd0b85a97d-381f1872f43mr18512390f8f.29.1731575036374;
-        Thu, 14 Nov 2024 01:03:56 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-382207fd632sm82453f8f.44.2024.11.14.01.03.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 01:03:55 -0800 (PST)
-Date: Thu, 14 Nov 2024 12:03:52 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Max Staudt <max@enpas.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] can: can327: fix snprintf() limit in
- can327_handle_prompt()
-Message-ID: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
+	s=arc-20240116; t=1731575047; c=relaxed/simple;
+	bh=7BSoh5CYIXrW3QX1oTbrz1UW2luLIHecRtvcsgMl0lY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RawcZypRfqUcobQyXUx+27T9zBXZZu5nWt4SZVT0bML8HUywIfBvG1amWI8duwP+dp+mpucBEHsIDBHuu7bHH54MXymawl4BShWHiM1vdqu92Q9EUkY+DC6i5YzV9WblMvqH1t8Qaiy8nbyZecdy1ya7JlZEoERJzEvbaCqbj80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xD8RPzrC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B47WamvU; arc=none smtp.client-ip=103.168.172.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailflow.phl.internal (Postfix) with ESMTP id EA698200C81;
+	Thu, 14 Nov 2024 04:04:02 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Thu, 14 Nov 2024 04:04:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1731575042; x=
+	1731578642; bh=k+8HC8Ob/86QBDrUTivKmSt66P20tDmJvCeyr0tVG9w=; b=x
+	D8RPzrCztteIqD4p3M7Ba8G+dJMd6+D2LvxM0J7dpSgMht1nR4UkZ6TwQxojqa9+
+	pPIyqTnobBaddhPHPDTNf/B61QLw7xLL//l4bAJ+OOH0dtI3DLmr4HTm9HEgYxFW
+	/7PfIsQTcBcCDXHRijiXWRawu8t8lRW5nI9tUXPyS0iwnCcdWYbtpmmzK7erSyv7
+	65GVqOBdOq//9OjGGYiVmDMpb87gwaBPmlKBt25p8n+8cdKEpKVQgnZ5zxj6I/ba
+	zDUJoDBkMdAnKN9lkdf7KdHi9LXKkXASOxYoLoPDgW4b9a6iLNSbyv1Hz93SDXhM
+	Ci94OSyh6YjHzUjGO7GKg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1731575042; x=1731578642; bh=k+8HC8Ob/86QBDrUTivKmSt66P20tDmJvCe
+	yr0tVG9w=; b=B47WamvU4RG2pWk6h03rqkfKW61ad3Anab38pbhF6Mb3oXqWh7X
+	Cmc1BrUQvTCzEs11M7CBDVeX1QF+B9FWc7UU5A+ql2C4gCtTIoff3e1apj1IuG3j
+	ugl/6cugWD6oD6yZlpUN8APDJr7QNNhfitfhJmFAPNtgUekyLzYtxI1UA4oP3wtI
+	IO5y2hIoOhWhlNUH4eaTFCLIg2GX7PI4bJd5Se+IzJ7z53W4XPOpjZG0dcFcZ5cN
+	oljWvOUrAFZOX1MJG0MEzKqLrCQBsENUu0p1b51SQxehw7lz2w/AQh21u3P3gezC
+	IgPjVzfAvytfe1yQXH8gC3iEtypKp1HvVkA==
+X-ME-Sender: <xms:Ar01Z3de4E1RpvXIKIr5lQ6m0nGpP2blWzet4BT4lcIrCUnjIkgzrA>
+    <xme:Ar01Z9M-EU2zFLHei38II9Mz6ZY5Hnz6LQx9i58VXa6YgLcrURvhmAhG6VdwSNLnD
+    WZ6Lld3VFTgjepYlm4>
+X-ME-Received: <xmr:Ar01ZwiqrSqpHvx4ifxQmhF5JZ_LMvoavPEw-xoQ7jUbAdRlGcDjUs4XRQh8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvddugdduvdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
+    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
+    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
+    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:Ar01Z48B-Ca23chCb9uhiGujUw1dlCoonUO0dnbzSA3FaiBY0bIJSA>
+    <xmx:Ar01ZzvoFhcdTTi1zd4FZfZCqd7w3OkKQexIGQutTAsqJ9MS9gpOmA>
+    <xmx:Ar01Z3F_sCr8Ba2h_-SOgJThx48tyUuZI9ga21KID-cceWBkT2qSRA>
+    <xmx:Ar01Z6Nab6yQ8alFBli5ezi6J8FcJ1_bShW6Z7_3OSuj-hcNsLw_FA>
+    <xmx:Ar01Z5Aku3Ttdt_QMeuy_51B4pZmBYL2fUPmpGKmhREpQJmKFEUJlyfy>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 14 Nov 2024 04:04:02 -0500 (EST)
+Date: Thu, 14 Nov 2024 10:03:59 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
+Message-ID: <ZzW8_3MzprfwPS4o@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net>
+ <ZypfnyfToF1b6YAZ@hog>
+ <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net>
+ <ZzSBG-RPUlpgVFhA@hog>
+ <2a90f702-3061-46b6-aafa-cf8c1ba3d0de@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <2a90f702-3061-46b6-aafa-cf8c1ba3d0de@openvpn.net>
 
-This code is printing hex values to the &local_txbuf buffer and it's
-using the snprintf() function to try prevent buffer overflows.  The
-problem is that it's not passing the correct limit to the snprintf()
-function so the limit doesn't do anything.  On each iteration we print
-two digits so the remaining size should also decrease by two, but
-instead it passes the sizeof() the entire buffer each time.
+2024-11-14, 09:12:01 +0100, Antonio Quartulli wrote:
+> On 13/11/2024 11:36, Sabrina Dubroca wrote:
+> > 2024-11-12, 14:20:45 +0100, Antonio Quartulli wrote:
+> > > On 05/11/2024 19:10, Sabrina Dubroca wrote:
+> > > > 2024-10-29, 11:47:28 +0100, Antonio Quartulli wrote:
+> > > > > +	/* check for peer timeout */
+> > > > > +	expired = false;
+> > > > > +	timeout = peer->keepalive_timeout;
+> > > > > +	delta = now - peer->last_recv;
+> > > > 
+> > > > I'm not sure that's always > 0 if we finish decrypting a packet just
+> > > > as the workqueue starts:
+> > > > 
+> > > >     ovpn_peer_keepalive_work
+> > > >       now = ...
+> > > > 
+> > > >                                          ovpn_decrypt_post
+> > > >                                            peer->last_recv = ...
+> > > > 
+> > > >     ovpn_peer_keepalive_work_single
+> > > >       delta: now < peer->last_recv
+> > > > 
+> > > 
+> > > Yeah, there is nothing preventing this from happening...but is this truly a
+> > > problem? The math should still work, no?
+> > 
+> > We'll fail "delta < timeout" (which we shouldn't), so we'll end up
+> > either in the "expired = true" case, or not updating
+> > keepalive_recv_exp. Both of these seem not ideal.
+> 
+> delta is signed, so it'll end up being a negative value and "delta <
+> timeout" should not fail then. Unless I am missing something.
 
-If the frame->len were too long it would result in a buffer overflow.
+But timeout is "unsigned long", so the comparison will be done as
+unsigned.
 
-I've also changed the function from snprintf() to scnprintf().  The
-difference between the two functions is that snprintf() returns the number
-of bytes which would have been printed if there were space while the
-scnprintf() function returns the number of bytes which are actually
-printed.
+> Anyway, this was just an exercise to understand what was going on.
+> I already changed the code as per your suggestion (the fact that we are
+> still discussing this chunk proves that it needed to be simplified :))
 
-Fixes: 43da2f07622f ("can: can327: CAN/ldisc driver for ELM327 based OBD-II adapters")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
----
- drivers/net/can/can327.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+:)
 
-diff --git a/drivers/net/can/can327.c b/drivers/net/can/can327.c
-index 24af63961030..5c05ebc72318 100644
---- a/drivers/net/can/can327.c
-+++ b/drivers/net/can/can327.c
-@@ -623,16 +623,16 @@ static void can327_handle_prompt(struct can327 *elm)
- 			snprintf(local_txbuf, sizeof(local_txbuf), "ATRTR\r");
- 		} else {
- 			/* Send a regular CAN data frame */
-+			int off = 0;
- 			int i;
- 
- 			for (i = 0; i < frame->len; i++) {
--				snprintf(&local_txbuf[2 * i],
--					 sizeof(local_txbuf), "%02X",
--					 frame->data[i]);
-+				off += scnprintf(&local_txbuf[off],
-+						 sizeof(local_txbuf) - off,
-+						 "%02X", frame->data[i]);
- 			}
- 
--			snprintf(&local_txbuf[2 * i], sizeof(local_txbuf),
--				 "\r");
-+			scnprintf(&local_txbuf[off], sizeof(local_txbuf) - off, "\r");
- 		}
- 
- 		elm->drop_next_line = 1;
 -- 
-2.45.2
-
+Sabrina
 
