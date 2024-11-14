@@ -1,231 +1,280 @@
-Return-Path: <netdev+bounces-144924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB589C8C88
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:11:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475009C8CE2
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D99F286ACA
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:11:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D571B36FF0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD212943F;
-	Thu, 14 Nov 2024 14:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390673BB48;
+	Thu, 14 Nov 2024 14:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XsDv52Aa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s4LTW3Bh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FA4BA53
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 14:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731593473; cv=fail; b=YNlG2tuH1Rya3yh8hhN3jm9jBD6AvZ0F0TiPqM37Sp5Az2b5gdQ3BzMvpwXMGylIBJb+J7MHGTXYAafC33Ei1VmCoZg6DVfWJlJ6MJOuHxn5DMAuIgMexCU3nUgGqY8Ub6fN/pFIXvNZKbLn7x1y0kJYkClPbosyo0Uf9cPhHrQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731593473; c=relaxed/simple;
-	bh=xZhrvF7IIwLSvnHChi7iVRUDTtegcJhZ0ZcxT3RX/SU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZW0mMdGyNs1H6VHFUmuci0aMdmLaV/dZvWtNcHTGt4ypdL+4KQaPGCHFYSgoc4ZwCSS7AJAFNQnCkXlmVyMCfmvMs4L4aXov6TP174+ky+0+VCs8ikR+KFvpyNP87Wn3GzoBvpRi3Zfw/KFmy3rCyVKvG/HtCeuTIAbJPVjxQ1c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XsDv52Aa; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731593472; x=1763129472;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xZhrvF7IIwLSvnHChi7iVRUDTtegcJhZ0ZcxT3RX/SU=;
-  b=XsDv52AatgXP+/1RFKPKa05jxA/jnHINJqi/kMpk6Bcjldn6ejPv+A+o
-   No5pVk4NG69K/PoZn3B5Qy1LfX/Fad7ivGop7X3Pw04Sh1Rp3eyvRvnbC
-   dB0EJWp6I5UBtmAFB34xMLO24NuYjwMsSqIzyr0PCvbUGXRP5jRGdWnT5
-   +laXOBCyzYKd9ciuJOROSaS+lzT2tcT1WJg87iOYzFpBqTyijXm85KULn
-   hgwLqYB3MC90/ucAYrhvFjykaFyJwp+eE9Q8yngj/QTk737PaVPkGdkYY
-   3iAz3u40vm2pl6XGbZpEh5/rrPr1utw+I/cFaahtz14xwXcoXL1QSAWeZ
-   w==;
-X-CSE-ConnectionGUID: cLjL6cQ8RDueWEaUAlgf7g==
-X-CSE-MsgGUID: gPqhrrxYQa6uTePRNjQpfw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11256"; a="31642028"
-X-IronPort-AV: E=Sophos;i="6.12,154,1728975600"; 
-   d="scan'208";a="31642028"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2024 06:11:08 -0800
-X-CSE-ConnectionGUID: wH6y8qvzQbmjo8rd6UKnaA==
-X-CSE-MsgGUID: ydKRPNHBSDiWeoT88EKRtg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,154,1728975600"; 
-   d="scan'208";a="119150930"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Nov 2024 06:11:05 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 14 Nov 2024 06:11:04 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 14 Nov 2024 06:11:04 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 14 Nov 2024 06:11:04 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ShX4xirkY8wfry06u4SRFSLILYwSD6Nch8EXrmUJ6H09fZUX/tOfksevmrzElvCUOTkkb01kCNviCbwSek7FvhRs2VYBQeMpBZJGKwto9S4p4o2jZs2abrjP2xcW2Rb6UlEK6u+XPG0IEHpr2caAdRoZxPGdZyeAv5ys2P3LYecgcOnU5beQIkopSduul6TfBOY14++DQFt/kXdZk/GqRfgvuqZI33THRxuRU7ibcMDdAelVwZhw4om/UCSpCfHNhoT3tJT9UXK5GiDbqnCB22IqA8elJzLR3RYGX+eMBWuuTLXf6X+49/5Inf3D7zyy2jA+yGT6pa6nIiCuetFDSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0LfxpFfcwqkfqnYYdnbxR1MfhgWXfor5zHi1TKlrvyI=;
- b=MRHBUePjv7H1Tenj+I02GPnJj6OITG1P/3vuTUUF/LzNf9aoOoYliDDfqkyVc7UdcUmzAhRun2GpdeAJgov3QpcFLwrDpDYrUwQI7+JpNQnCBJhwqc98vfVkOMGLSVitGkTpinaBengUWiyIfm1G44j5A+If4GjV9P9plGrolLV+7tRShvIn736u/MNF0n7Q/k4qc2+1adGA6U1M+WkbSyk2Cgfh7YSZguwxU8Zyju9nE2N/7dbHn5BAYlqF+mfkykKcq4ZepZOLnPKxD68voWmnJLbrUU/BHptDdi7CrEoYTUZkpGBQrxiIOnHBYTa2lgO032YWa8ZYiXXISM4eQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by DM4PR11MB6120.namprd11.prod.outlook.com (2603:10b6:8:af::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Thu, 14 Nov
- 2024 14:11:02 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f%6]) with mapi id 15.20.8137.027; Thu, 14 Nov 2024
- 14:11:02 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, "Drewek, Wojciech"
-	<wojciech.drewek@intel.com>, "Szycik, Marcin" <marcin.szycik@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Knitter, Konrad"
-	<konrad.knitter@intel.com>, "Chmielewski, Pawel"
-	<pawel.chmielewski@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"David.Laight@ACULAB.COM" <David.Laight@ACULAB.COM>, NEX SW NCIS NAT HPM DEV
-	<nex.sw.ncis.nat.hpm.dev@intel.com>, "pio.raczynski@gmail.com"
-	<pio.raczynski@gmail.com>, "Samudrala, Sridhar"
-	<sridhar.samudrala@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [iwl-next v7 9/9] ice: init flow director
- before RDMA
-Thread-Topic: [Intel-wired-lan] [iwl-next v7 9/9] ice: init flow director
- before RDMA
-Thread-Index: AQHbLrMfvhqWC65610GM/Obir2p8CrK24HEw
-Date: Thu, 14 Nov 2024 14:11:01 +0000
-Message-ID: <CYYPR11MB8429E8CA7BF7585DDEC6B60CBD5B2@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20241104121337.129287-1-michal.swiatkowski@linux.intel.com>
- <20241104121337.129287-10-michal.swiatkowski@linux.intel.com>
-In-Reply-To: <20241104121337.129287-10-michal.swiatkowski@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|DM4PR11MB6120:EE_
-x-ms-office365-filtering-correlation-id: 84432d38-d6de-468d-b3f8-08dd04b62bb6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?3bbMQDpHTscJTYpRSOKTVv6VJyFa7v2JmSle6fR8UHdAkv9iY881S7NJtR9w?=
- =?us-ascii?Q?8UPFBTrpt8y5nKOiU9ZY9V8XAbvzp3EwMRWGbwpxRHOQyZ7f62stdlOzrtQ9?=
- =?us-ascii?Q?aZVR3s5ty12LoZnwmY4TVaiiKDL1BuJ/Ujzot7T5FvVQkxLyAKZYZ5uI72AP?=
- =?us-ascii?Q?RUtoiwgagk2SbrO93MpofFpYZEGEOVCPFNh7qujyUlbjz1q0jeb5KUPTivPA?=
- =?us-ascii?Q?0D7RjFch2prdSUeTZsHODTRuuH85sA+5/5xjuG/2c/o8c7ywZADr1YIHgHYx?=
- =?us-ascii?Q?y077VRkFGzeYzQc83f4UwFUUx9kOUMKSwBECVcY/lWi8LEtDKoNPbuBiUwH9?=
- =?us-ascii?Q?Lxz+ECaLbLXHdBKeo7i+8evs1khXLAxH6parjjp/rvCZQdi/9xL7xCw/84Cx?=
- =?us-ascii?Q?ea5+l4Q8u9T8E/IAnbS2/gDU62BcJnbgkC/NKZZo3JUME81ni4tmX/9SUc+h?=
- =?us-ascii?Q?MMI+UJxX9TdYiQtYXILwFwNF/6dVQwExigiTdLsqN0Tru2VWCk97Xuv0nj0u?=
- =?us-ascii?Q?uVlgbllPow7xJJ9oyQscbq1rJZlBhGLkdEaWvuva7ZbH5aJY+wUIKAY2PUYA?=
- =?us-ascii?Q?sxbJHon4Tuer2R6kXQg3OOjl2wrNtyMOKkUiUEKRqTuTYWPjWZ+pDc6k6DwD?=
- =?us-ascii?Q?nZPYW802S8QXqU+WWSkTC91pRDOkYMvVSyuFeFvWL1OPaI9MJev59GzpH6U6?=
- =?us-ascii?Q?+M2uqaEggJWmr7jeDwDVTwkaa3MLrebV3olnjQNByKyAgEVMupi+ETcEf+Mb?=
- =?us-ascii?Q?gR8+7hBMPmG8+y4FrdC4LNgeCDJq8icnmKgNxdrx+FUy3Q0Mydou8fCAxqE6?=
- =?us-ascii?Q?e3CB+XbZ0rDRSq6sqMxM04anztXs6uhGsFCeX7//2KfDFkNcJQcqjjml4rJo?=
- =?us-ascii?Q?orn+vJ9+wsSX55GV4U2OQqvJi5pqEGO/uHxPoUq8myEPunb++TRWjrs/spr4?=
- =?us-ascii?Q?KHv6NGIzfeYH7UzgH9DZHXz5CBBfy8PgCHXHOSI0g4adwBaWDZZouD5PEj7z?=
- =?us-ascii?Q?fPTAFiPn6YLfRj9WHR4KnGYg+LipCZIx2bYWNfOFEZpzwBz2f4uPmZSNbfI3?=
- =?us-ascii?Q?axx2fhpsxX6Qyu3dJFa8epZHJB5IywEds4IY4/h8e/LCRa/Mfs/cRD05+KjV?=
- =?us-ascii?Q?MDxAYyzNxT3vK8bGeUImq4qRqSQCrxfFFbR54LeliOU5MlT+rXs0lSLHuxQz?=
- =?us-ascii?Q?PDlvlEtZQnJ7zh9aR+myVb5MHLwv0/E4K8XL6VwVdYKxCHipXPJMINsd7BVa?=
- =?us-ascii?Q?nMz153fhFB/YjKO7BpFRCsn+xJBf28lU5kBg2Hzea10dIj7veQ6No+BecQtB?=
- =?us-ascii?Q?0CRFVHYJ9kOPE/08tMdW4JmLoQQu3yMzki4tqhrq10mWr7VbQITuSG08Mi/7?=
- =?us-ascii?Q?WVz31TY=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?iWzaa+ItxG1KVmE23/+5Rb7ePT842b/03xg/XjJUGSGLw3snBeSrG0mkCLOE?=
- =?us-ascii?Q?+RbIjisXbtD3I0DnGxKUllUzMGGElJxJgnMYC9iX53YM/UIogLzY95X8IZ8a?=
- =?us-ascii?Q?c+iV36pXvxQX/37tQ/V3tFkkjzDx4D0DRY3I2VyhKCfFNy2DKyNHC2upEIEc?=
- =?us-ascii?Q?oyarbLm+1+pJx3IimzXRyvVcvw6iU7SHPYaQlqVV1JEjb0+FqtJHvlXiBoGs?=
- =?us-ascii?Q?8dOhCvyxVHUTSTEAG9eitulm+JG9bqwMbpTI+Dm5LAeKXA5mQGWcmxnTJHrT?=
- =?us-ascii?Q?VonYtiqNUeff5VVbXe5ndAUtKe3nTDloCZP7HoxoYuXxJsUz6JY+it6biiva?=
- =?us-ascii?Q?vOhT2JsaRmOm0lQT4i1vUGyooc/4UyggpJBZnhl9o/IWOI4JBwNYQdHAvgp2?=
- =?us-ascii?Q?WrcuT+XVfopTgFG8bzw68Ny8hJhyBKxUl34r0OvWxjwJywlrjDL6sCqp8rk+?=
- =?us-ascii?Q?kviSXv6R3k/BqOxY8qgz5IVnsrvwEmMaQv148B9tobQctwIS9gy1CfpSAHnj?=
- =?us-ascii?Q?LPidhgNIQji07WXWATDsWIk903S15ZSSu1bc8N1LQBJCeVznIpWKPnapyI+Z?=
- =?us-ascii?Q?LDyQjYO8bSFbIs8z4suw/IfcoJlHFxB8Pk8bZMmzJfu8FjokV7Wnq+Mi89XK?=
- =?us-ascii?Q?SJwY1SKAZzAcX7hxa5X7pCTVbe/pEewL5ZJ7rqGdYyXyt1wcWv80+LbWMRV6?=
- =?us-ascii?Q?QltkAUzZHwTwloRry2GIMr0ce7axBP1xiQuegaimPUQTTnlP3EVO0YvOjKJb?=
- =?us-ascii?Q?Wptyo4mJdKy95PMdy9pqbC8vRWISi2bIwVni3RVbqB5Yl6wXHBwXg8qlDdTE?=
- =?us-ascii?Q?rd4CHJxbcD5+Hr1roiQfdnPQVlFxma9fUs+jlZkRktQxgVDh6ijbi3QWU8cm?=
- =?us-ascii?Q?GcEXm3x4LaJ3M+C08avQGq/TgZonx28/zRfVzGaEEl18TTe8u8wU/S44z0MB?=
- =?us-ascii?Q?NRw3BbfrBPlJP7udlJdaHLXl1ySoah1lSBjOF5/8fwJZo9JagbvCUPaAp6Dn?=
- =?us-ascii?Q?zS4vVNnkHnyp4Grb04ARKkAHsPP6k/gqLH/T0ikoosJcp9/5vkkTlfJgtlae?=
- =?us-ascii?Q?EOZMq4WZ/fApkM+gEUQXtumlm0eOuzFCuHZSA8lrEMimU4+WA8wfhxedJFbs?=
- =?us-ascii?Q?9Ww3/AOQilkbmBtxjsKJcI+BT9sxeWCL6Mm+xHoaHrotNCNDbHwpHPHc6vlw?=
- =?us-ascii?Q?JjDNwedJpEsFKFaBqHgxvkVaBOkEStof5L5yGmS2NJoo4NVo/ysE61p5PwVD?=
- =?us-ascii?Q?k69/ricHcNqenGHB2/Rk21AURjCxHNHc8AyiedvIifViBP1EVFemQL/vpKJO?=
- =?us-ascii?Q?kIADaI+iodvyhQ3CMgpSny8xsF0ALMNcUjtNJzwNgtaOBpXluYfJsOjUgBMZ?=
- =?us-ascii?Q?9/ysLV0TBWlEmCb1GeFAtethyCcAVJmZ4lA2+h7I68CIDhUC4y+/+hrSYUMD?=
- =?us-ascii?Q?hZblp0aMjpKC/WeI027GQfXBzMCBl84b+iFBSMJAbvsJvPRPJ0gcrRGJN232?=
- =?us-ascii?Q?6ab0HM064aiHC9dwzXeJ/lfvkDFx/OFhiMbJ8qiDZRta6XF7knoRjN76wO7E?=
- =?us-ascii?Q?p82BoMRZkQYC68G7d8lwQB4Ju9Rhw7v0+z+8Pkdvrw/qUgilVYjCLUPXBe2D?=
- =?us-ascii?Q?yw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A142FE33
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 14:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731593715; cv=none; b=Q+Ds9F9L1UPW4Enid7rS8DkpafeR+aqeKtqPAySfzUmhT3ypPgH8YzKdIiSMDBMP88yk2Kvulsd364bPYiAEk+m2dgF3wFpTr6eV2ck7IIlwryG6kitIMWau+ecxDnfW//Gk1YFKxaYuy7osH190OIXcBvwKRuPo+CxG+LSdoik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731593715; c=relaxed/simple;
+	bh=ja5Pm9uYZP4HeGDnNqYZDc/HKtmhFCsP7FShmCcwMSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rOgR+0GwY4hqsUbhucUSKxNmTX6ylfTa7PPj9/P7MkEAKocLHx2xkMqvqARC2HY9gfoSJrfXkA3ZxDN7XY/l5h50uWyVv3PgurBAouj1RKH0JBTYtthhD0rWLGBr7EMVOaSZFArs12PgWjABIptoAfpoGlDXmifSCUelBdyY6wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s4LTW3Bh; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4af7b21e-1340-493b-a3c0-be752ef9d7cf@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731593710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P/88vAmCRZdNnlmj1UPgM2nFthtidD0sUVSQ3mSRpTg=;
+	b=s4LTW3BhyD+g2DbbDdiCaHi9kNDK/6Is8jugzKI4GeEwAULusU5AFoW8v/MqUgsK8Ut9iP
+	qyGHM4MJUUw4VdWBd+t9FERnPilkhri+X+IEg8klM4nYjy/dA8X91wKrQevoUvBWG4/Rk3
+	n5JDIvEZSxyEmVJqbHXGuGA3pDcD7YE=
+Date: Thu, 14 Nov 2024 14:15:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84432d38-d6de-468d-b3f8-08dd04b62bb6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2024 14:11:01.9946
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: t0lkvlsK7JQ5sU9U5KHOZW21/RFbt99IUJId34Bk8BX0Vi2SaofgCKsRcCU1toUPlkDECC2115JDOoNjFwr2fOmzL3Ffcjp6nHRWIEkzy6Xyb2iNokdBMKzVSrCVVVFn
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6120
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH net-next v4 1/5] net: phy: microchip_ptp : Add header file
+ for Microchip ptp library
+To: Divya Koppera <divya.koppera@microchip.com>, andrew@lunn.ch,
+ arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ richardcochran@gmail.com
+References: <20241114120455.5413-1-divya.koppera@microchip.com>
+ <20241114120455.5413-2-divya.koppera@microchip.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241114120455.5413-2-divya.koppera@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
-ichal Swiatkowski
-> Sent: 04 November 2024 17:44
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: pmenzel@molgen.mpg.de; Drewek, Wojciech <wojciech.drewek@intel.com>; =
-Szycik, Marcin <marcin.szycik@intel.com>; netdev@vger.kernel.org; Knitter, =
-Konrad <konrad.knitter@intel.com>; Chmielewski, Pawel <pawel.chmielewski@in=
-tel.com>; horms@kernel.org; David.Laight@ACULAB.COM; NEX SW NCIS NAT HPM DE=
-V <nex.sw.ncis.nat.hpm.dev@intel.com>; pio.raczynski@gmail.com; Samudrala, =
-Sridhar <sridhar.samudrala@intel.com>; Keller, Jacob E <jacob.e.keller@inte=
-l.com>; jiri@resnulli.us; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com=
->
-> Subject: [Intel-wired-lan] [iwl-next v7 9/9] ice: init flow director befo=
-re RDMA
->
-> Flow director needs only one MSI-X. Load it before RDMA to save MSI-X for=
- it.
->
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On 14/11/2024 12:04, Divya Koppera wrote:
+> This ptp header file library will cover ptp macros for future phys in
+> Microchip where addresses will be same but base offset and mmd address
+> may changes.
+> 
+> Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
 > ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
+> v3 -> v4
+> - Re-ordered mchp_ptp_clock structure.
+> 
+> v2 -> v3
+> - No changes
+> 
+> v1 -> v2
+> - Fixed sparse warnings and compilation errors/warnings reported by kernel
+>    test robot
+> ---
+>   drivers/net/phy/microchip_ptp.h | 216 ++++++++++++++++++++++++++++++++
+>   1 file changed, 216 insertions(+)
+>   create mode 100644 drivers/net/phy/microchip_ptp.h
+> 
+> diff --git a/drivers/net/phy/microchip_ptp.h b/drivers/net/phy/microchip_ptp.h
+> new file mode 100644
+> index 000000000000..1b6e0d9d7e76
+> --- /dev/null
+> +++ b/drivers/net/phy/microchip_ptp.h
+> @@ -0,0 +1,216 @@
+> +/* SPDX-License-Identifier: GPL-2.0
+> + * Copyright (C) 2024 Microchip Technology
+> + */
+> +
+> +#ifndef _MICROCHIP_PTP_H
+> +#define _MICROCHIP_PTP_H
+> +
+> +#if IS_ENABLED(CONFIG_MICROCHIP_PHYPTP)
+> +
+> +#include <linux/ptp_clock_kernel.h>
+> +#include <linux/ptp_clock.h>
+> +#include <linux/ptp_classify.h>
+> +#include <linux/net_tstamp.h>
+> +#include <linux/mii.h>
+> +#include <linux/phy.h>
+> +
+> +#define MCHP_PTP_CMD_CTL(b)			((b) + 0x0)
+> +#define MCHP_PTP_CMD_CTL_LTC_STEP_NSEC		BIT(6)
+> +#define MCHP_PTP_CMD_CTL_LTC_STEP_SEC		BIT(5)
+> +#define MCHP_PTP_CMD_CTL_CLOCK_LOAD		BIT(4)
+> +#define MCHP_PTP_CMD_CTL_CLOCK_READ		BIT(3)
+> +#define MCHP_PTP_CMD_CTL_EN			BIT(1)
+> +#define MCHP_PTP_CMD_CTL_DIS			BIT(0)
+> +
+> +#define MCHP_PTP_REF_CLK_CFG(b)			((b) + 0x2)
+> +#define MCHP_PTP_REF_CLK_SRC_250MHZ		0x0
+> +#define MCHP_PTP_REF_CLK_PERIOD_OVERRIDE	BIT(9)
+> +#define MCHP_PTP_REF_CLK_PERIOD			4
+> +#define MCHP_PTP_REF_CLK_CFG_SET	(MCHP_PTP_REF_CLK_SRC_250MHZ |\
+> +					 MCHP_PTP_REF_CLK_PERIOD_OVERRIDE |\
+> +					 MCHP_PTP_REF_CLK_PERIOD)
+> +
+> +#define MCHP_PTP_LTC_SEC_HI(b)			((b) + 0x5)
+> +#define MCHP_PTP_LTC_SEC_MID(b)			((b) + 0x6)
+> +#define MCHP_PTP_LTC_SEC_LO(b)			((b) + 0x7)
+> +#define MCHP_PTP_LTC_NS_HI(b)			((b) + 0x8)
+> +#define MCHP_PTP_LTC_NS_LO(b)			((b) + 0x9)
+> +#define MCHP_PTP_LTC_RATE_ADJ_HI(b)		((b) + 0xc)
+> +#define MCHP_PTP_LTC_RATE_ADJ_HI_DIR		BIT(15)
+> +#define MCHP_PTP_LTC_RATE_ADJ_LO(b)		((b) + 0xd)
+> +#define MCHP_PTP_LTC_STEP_ADJ_HI(b)		((b) + 0x12)
+> +#define MCHP_PTP_LTC_STEP_ADJ_HI_DIR		BIT(15)
+> +#define MCHP_PTP_LTC_STEP_ADJ_LO(b)		((b) + 0x13)
+> +#define MCHP_PTP_LTC_READ_SEC_HI(b)		((b) + 0x29)
+> +#define MCHP_PTP_LTC_READ_SEC_MID(b)		((b) + 0x2a)
+> +#define MCHP_PTP_LTC_READ_SEC_LO(b)		((b) + 0x2b)
+> +#define MCHP_PTP_LTC_READ_NS_HI(b)		((b) + 0x2c)
+> +#define MCHP_PTP_LTC_READ_NS_LO(b)		((b) + 0x2d)
+> +#define MCHP_PTP_OP_MODE(b)			((b) + 0x41)
+> +#define MCHP_PTP_OP_MODE_DIS			0
+> +#define MCHP_PTP_OP_MODE_STANDALONE		1
+> +#define MCHP_PTP_LATENCY_CORRECTION_CTL(b)	((b) + 0x44)
+> +#define MCHP_PTP_PREDICTOR_EN			BIT(6)
+> +#define MCHP_PTP_TX_PRED_DIS			BIT(1)
+> +#define MCHP_PTP_RX_PRED_DIS			BIT(0)
+> +#define MCHP_PTP_LATENCY_SETTING		(MCHP_PTP_PREDICTOR_EN | \
+> +						 MCHP_PTP_TX_PRED_DIS | \
+> +						 MCHP_PTP_RX_PRED_DIS)
+> +
+> +#define MCHP_PTP_INT_EN(b)			((b) + 0x0)
+> +#define MCHP_PTP_INT_STS(b)			((b) + 0x01)
+> +#define MCHP_PTP_INT_TX_TS_OVRFL_EN		BIT(3)
+> +#define MCHP_PTP_INT_TX_TS_EN			BIT(2)
+> +#define MCHP_PTP_INT_RX_TS_OVRFL_EN		BIT(1)
+> +#define MCHP_PTP_INT_RX_TS_EN			BIT(0)
+> +#define MCHP_PTP_INT_ALL_MSK		(MCHP_PTP_INT_TX_TS_OVRFL_EN | \
+> +					 MCHP_PTP_INT_TX_TS_EN | \
+> +					 MCHP_PTP_INT_RX_TS_OVRFL_EN |\
+> +					 MCHP_PTP_INT_RX_TS_EN)
+> +
+> +#define MCHP_PTP_CAP_INFO(b)			((b) + 0x2e)
+> +#define MCHP_PTP_TX_TS_CNT(v)			(((v) & GENMASK(11, 8)) >> 8)
+> +#define MCHP_PTP_RX_TS_CNT(v)			((v) & GENMASK(3, 0))
+> +
+> +#define MCHP_PTP_RX_PARSE_CONFIG(b)		((b) + 0x42)
+> +#define MCHP_PTP_RX_PARSE_L2_ADDR_EN(b)		((b) + 0x44)
+> +#define MCHP_PTP_RX_PARSE_IPV4_ADDR_EN(b)	((b) + 0x45)
+> +
+> +#define MCHP_PTP_RX_TIMESTAMP_CONFIG(b)		((b) + 0x4e)
+> +#define MCHP_PTP_RX_TIMESTAMP_CONFIG_PTP_FCS_DIS BIT(0)
+> +
+> +#define MCHP_PTP_RX_VERSION(b)			((b) + 0x48)
+> +#define MCHP_PTP_RX_TIMESTAMP_EN(b)		((b) + 0x4d)
+> +
+> +#define MCHP_PTP_RX_INGRESS_NS_HI(b)		((b) + 0x54)
+> +#define MCHP_PTP_RX_INGRESS_NS_HI_TS_VALID	BIT(15)
+> +
+> +#define MCHP_PTP_RX_INGRESS_NS_LO(b)		((b) + 0x55)
+> +#define MCHP_PTP_RX_INGRESS_SEC_HI(b)		((b) + 0x56)
+> +#define MCHP_PTP_RX_INGRESS_SEC_LO(b)		((b) + 0x57)
+> +#define MCHP_PTP_RX_MSG_HEADER2(b)		((b) + 0x59)
+> +
+> +#define MCHP_PTP_TX_PARSE_CONFIG(b)		((b) + 0x82)
+> +#define MCHP_PTP_PARSE_CONFIG_LAYER2_EN		BIT(0)
+> +#define MCHP_PTP_PARSE_CONFIG_IPV4_EN		BIT(1)
+> +#define MCHP_PTP_PARSE_CONFIG_IPV6_EN		BIT(2)
+> +
+> +#define MCHP_PTP_TX_PARSE_L2_ADDR_EN(b)		((b) + 0x84)
+> +#define MCHP_PTP_TX_PARSE_IPV4_ADDR_EN(b)	((b) + 0x85)
+> +
+> +#define MCHP_PTP_TX_VERSION(b)			((b) + 0x88)
+> +#define MCHP_PTP_MAX_VERSION(x)			(((x) & GENMASK(7, 0)) << 8)
+> +#define MCHP_PTP_MIN_VERSION(x)			((x) & GENMASK(7, 0))
+> +
+> +#define MCHP_PTP_TX_TIMESTAMP_EN(b)		((b) + 0x8d)
+> +#define MCHP_PTP_TIMESTAMP_EN_SYNC		BIT(0)
+> +#define MCHP_PTP_TIMESTAMP_EN_DREQ		BIT(1)
+> +#define MCHP_PTP_TIMESTAMP_EN_PDREQ		BIT(2)
+> +#define MCHP_PTP_TIMESTAMP_EN_PDRES		BIT(3)
+> +#define MCHP_PTP_TIMESTAMP_EN_ALL		(MCHP_PTP_TIMESTAMP_EN_SYNC |\
+> +						 MCHP_PTP_TIMESTAMP_EN_DREQ |\
+> +						 MCHP_PTP_TIMESTAMP_EN_PDREQ |\
+> +						 MCHP_PTP_TIMESTAMP_EN_PDRES)
+> +
+> +#define MCHP_PTP_TX_TIMESTAMP_CONFIG(b)		((b) + 0x8e)
+> +#define MCHP_PTP_TX_TIMESTAMP_CONFIG_PTP_FCS_DIS BIT(0)
+> +
+> +#define MCHP_PTP_TX_MOD(b)			((b) + 0x8f)
+> +#define MCHP_PTP_TX_MOD_PTP_SYNC_TS_INSERT	BIT(12)
+> +#define MCHP_PTP_TX_MOD_PTP_FU_TS_INSERT	BIT(11)
+> +
+> +#define MCHP_PTP_TX_EGRESS_NS_HI(b)		((b) + 0x94)
+> +#define MCHP_PTP_TX_EGRESS_NS_HI_TS_VALID	BIT(15)
+> +
+> +#define MCHP_PTP_TX_EGRESS_NS_LO(b)		((b) + 0x95)
+> +#define MCHP_PTP_TX_EGRESS_SEC_HI(b)		((b) + 0x96)
+> +#define MCHP_PTP_TX_EGRESS_SEC_LO(b)		((b) + 0x97)
+> +#define MCHP_PTP_TX_MSG_HEADER2(b)		((b) + 0x99)
+> +
+> +#define MCHP_PTP_TSU_GEN_CONFIG(b)		((b) + 0xc0)
+> +#define MCHP_PTP_TSU_GEN_CFG_TSU_EN		BIT(0)
+> +
+> +#define MCHP_PTP_TSU_HARD_RESET(b)		((b) + 0xc1)
+> +#define MCHP_PTP_TSU_HARDRESET			BIT(0)
+> +
+> +/* Represents 1ppm adjustment in 2^32 format with
+> + * each nsec contains 4 clock cycles in 250MHz.
+> + * The value is calculated as following: (1/1000000)/((2^-32)/4)
+> + */
+> +#define MCHP_PTP_1PPM_FORMAT			17179
+> +#define MCHP_PTP_FIFO_SIZE			8
+> +#define MCHP_PTP_MAX_ADJ				31249999
+> +
+> +#define BASE_CLK(p)		((p)->clk_base_addr)
+> +#define BASE_PORT(p)		((p)->port_base_addr)
+> +#define PTP_MMD(p)		((p)->mmd)
+> +
+> +enum ptp_fifo_dir {
+> +	PTP_INGRESS_FIFO,
+> +	PTP_EGRESS_FIFO
+> +};
+> +
+> +struct mchp_ptp_clock {
+> +	struct mii_timestamper mii_ts;
+> +	struct phy_device *phydev;
+> +	struct ptp_clock *ptp_clock;
+> +
+> +	struct sk_buff_head tx_queue;
+> +	struct sk_buff_head rx_queue;
+> +	struct list_head rx_ts_list;
+> +
+> +	struct ptp_clock_info caps;
+> +
+> +	/* Lock for Rx ts fifo */
+> +	spinlock_t rx_ts_lock;
+> +	int hwts_tx_type;
+> +
+> +	enum hwtstamp_rx_filters rx_filter;
+> +	int layer;
+> +	int version;
+> +	u16 port_base_addr;
+> +	u16 clk_base_addr;
+> +
+> +	/* Lock for phc */
+> +	struct mutex ptp_lock;
+> +	u8 mmd;
+> +};
+> 
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+I'm not quite sure that this layout is better, but as Andrew said if
+it's not going to do Mpps processing - we are fine.
 
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
