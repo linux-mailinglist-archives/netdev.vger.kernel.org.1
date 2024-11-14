@@ -1,130 +1,117 @@
-Return-Path: <netdev+bounces-144857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 729B99C8932
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:46:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B122F9C8939
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:48:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C76A1B24A4B
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:45:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62969B30E38
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 226C81F942E;
-	Thu, 14 Nov 2024 11:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF081F8F0B;
+	Thu, 14 Nov 2024 11:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="XQCBkYDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE7918C02F;
-	Thu, 14 Nov 2024 11:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFA31F8F03;
+	Thu, 14 Nov 2024 11:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731584717; cv=none; b=TKg9cmy33Xg+qVu2xz4Rs0p5fzg7n64U8MzR8E6TEIwoDx9NiwdWpyPtm2xpZKrU2X3vR23I0bhWq4BK0LdiEaWYxQE/VAktCIUvA0qdmk7WwcpvV96fr95PDFlv3JgBBHDe5/DwmPkN4grJmq1fanW3TodqcdiOB5gG+nylejo=
+	t=1731582941; cv=none; b=iHptqjJqk5VAO6gbyAobAG3X10H8OfAu38NBVUETOodtx2e2uVaPxOAIR+ePXcnD1FBZqijG83/RxWZNC8fNCSGfzkhcDt+fmrZu2NWEoOmgAj3/lA/+MdoeXBPPlOvPeF3X1juHFgWu2sh3sNeUUJo60wV2Gh7GA6qE0l97T/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731584717; c=relaxed/simple;
-	bh=bnUVSsfKIRxnPADJrEdSRzBo/u/NdOCZ9jbg111mOBA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=cf+Ym2L6uZyQhQAYGQdVTOd+XRj3eCRGgwYHCabpb7DCXv6q2SO4GV5elIyVUjFnYzg5+gtOzxDy2MwFNC0A97QqenUIR5ruLqwpMTZnch6iu+dchjBuLkj07LQmjlFo46KQDKMDQtjO9LmrsLqm0W+wZQHf5uNJ4ewYbyq2lJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 1FCAC32E01C3;
-	Thu, 14 Nov 2024 12:45:05 +0100 (CET)
-X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
- by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id hI9TfCIXrCvY; Thu, 14 Nov 2024 12:45:03 +0100 (CET)
-Received: from mentat.rmki.kfki.hu (254C26AF.nat.pool.telekom.hu [37.76.38.175])
-	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
-	by smtp2.kfki.hu (Postfix) with ESMTPSA id B51AC32E01B7;
-	Thu, 14 Nov 2024 12:45:02 +0100 (CET)
-Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
-	id CDDAD1428CC; Thu, 14 Nov 2024 12:45:01 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by mentat.rmki.kfki.hu (Postfix) with ESMTP id CB601142175;
-	Thu, 14 Nov 2024 12:45:01 +0100 (CET)
-Date: Thu, 14 Nov 2024 12:45:01 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@netfilter.org>
-To: Jeongjun Park <aha310510@gmail.com>
-cc: Pablo Neira Ayuso <pablo@netfilter.org>, 
-    David Miller <davem@davemloft.net>, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, horms@kernel.org, Patrick McHardy <kaber@trash.net>, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    stable@vger.kernel.org, 
-    syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] netfilter: ipset: add missing range check in
- bitmap_ip_uadt
-In-Reply-To: <20241113130209.22376-1-aha310510@gmail.com>
-Message-ID: <de96a3be-deeb-efc0-dd64-8468598f15b0@netfilter.org>
-References: <20241113130209.22376-1-aha310510@gmail.com>
+	s=arc-20240116; t=1731582941; c=relaxed/simple;
+	bh=fyku/vJ50FoqSKdBGedLID31SZxrS+6VAFPp/5YrgOo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SWN6jSLn8AgSfaPrLOeZnxFYmaW2RWFiKKT0zlI20LXMt6Tvud3EDDbccf8+/iitoMF/C5cMAmqfcGnVRpkpgCq0vzR5Ew62nvUFv3vx8uI0ep38KG6czFRohvY1adgYpgo9c1PAelZK7acxN0aXZ9frCFN9akt/QqfkmlDbYNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=XQCBkYDO; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AEBFOBQ02903561, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1731582924; bh=fyku/vJ50FoqSKdBGedLID31SZxrS+6VAFPp/5YrgOo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=XQCBkYDOhDUFmGaGHBZpmPyGtST0Ki5p4Gltk9xd2NAhpHUlprvZE7RB0fK+iYcfa
+	 qVslflrKcbFyESisf12N65zWxFv+FZ/kDtNUgfikpHf0Y5AgK9MSW16GGaw+VCUkgp
+	 FBCWo65tOFV3nmW8hItJvDNZfMjTuTpAib+Fe7y8BWfV3eLQ7du62cBN0XTGfk7ROV
+	 s7rN8DW8yoq7npmOOxYpo/Yx4+AcHLUfGjLTbLP4SVqJeJmzR0c2zSkt0xLZUCNz4a
+	 V+B8bY+oYFfm5jnIV7CcNFbro2QmCsXdcKS/B/NAkC3Dkfjaehu9HUzG0yAIO4tHpm
+	 SKuSS+rXQirqw==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AEBFOBQ02903561
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Nov 2024 19:15:24 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 14 Nov 2024 19:15:24 +0800
+Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 14 Nov
+ 2024 19:15:24 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
+Subject: [PATCH net 2/4] rtase: Correct the speed for RTL907XD-V1
+Date: Thu, 14 Nov 2024 19:14:41 +0800
+Message-ID: <20241114111443.375649-3-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241114111443.375649-1-justinlai0215@realtek.com>
+References: <20241114111443.375649-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-deepspam: ham 1%
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-On Wed, 13 Nov 2024, Jeongjun Park wrote:
+Correct the speed for RTL907XD-V1.
 
-> When tb[IPSET_ATTR_IP_TO] is not present but tb[IPSET_ATTR_CIDR] exists,
-> the values of ip and ip_to are slightly swapped. Therefore, the range check
-> for ip should be done later, but this part is missing and it seems that the
-> vulnerability occurs.
-> 
-> So we should add missing range checks and remove unnecessary range checks.
-> 
-> Cc: <stable@vger.kernel.org>
-> Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-> Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+---
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-Acked-by: Jozsef Kadlecsik <kadlec@netfilter.org>
-
-The patch should be applied to the stable branches too. Thanks!
-
-Best regards,
-Jozsef
-
-> ---
->  net/netfilter/ipset/ip_set_bitmap_ip.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/netfilter/ipset/ip_set_bitmap_ip.c b/net/netfilter/ipset/ip_set_bitmap_ip.c
-> index e4fa00abde6a..5988b9bb9029 100644
-> --- a/net/netfilter/ipset/ip_set_bitmap_ip.c
-> +++ b/net/netfilter/ipset/ip_set_bitmap_ip.c
-> @@ -163,11 +163,8 @@ bitmap_ip_uadt(struct ip_set *set, struct nlattr *tb[],
->  		ret = ip_set_get_hostipaddr4(tb[IPSET_ATTR_IP_TO], &ip_to);
->  		if (ret)
->  			return ret;
-> -		if (ip > ip_to) {
-> +		if (ip > ip_to)
->  			swap(ip, ip_to);
-> -			if (ip < map->first_ip)
-> -				return -IPSET_ERR_BITMAP_RANGE;
-> -		}
->  	} else if (tb[IPSET_ATTR_CIDR]) {
->  		u8 cidr = nla_get_u8(tb[IPSET_ATTR_CIDR]);
->  
-> @@ -178,7 +175,7 @@ bitmap_ip_uadt(struct ip_set *set, struct nlattr *tb[],
->  		ip_to = ip;
->  	}
->  
-> -	if (ip_to > map->last_ip)
-> +	if (ip < map->first_ip || ip_to > map->last_ip)
->  		return -IPSET_ERR_BITMAP_RANGE;
->  
->  	for (; !before(ip_to, ip); ip += map->hosts) {
-> --
-> 
-
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 33808afd588d..10697e4055b6 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -1714,10 +1714,21 @@ static int rtase_get_settings(struct net_device *dev,
+ 			      struct ethtool_link_ksettings *cmd)
+ {
+ 	u32 supported = SUPPORTED_MII | SUPPORTED_Pause | SUPPORTED_Asym_Pause;
++	const struct rtase_private *tp = netdev_priv(dev);
+ 
+ 	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
+ 						supported);
+-	cmd->base.speed = SPEED_5000;
++
++	switch (tp->hw_ver) {
++	case 0x00800000:
++	case 0x04000000:
++		cmd->base.speed = SPEED_5000;
++		break;
++	case 0x04800000:
++		cmd->base.speed = SPEED_10000;
++		break;
++	}
++
+ 	cmd->base.duplex = DUPLEX_FULL;
+ 	cmd->base.port = PORT_MII;
+ 	cmd->base.autoneg = AUTONEG_DISABLE;
 -- 
-E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-Address: Wigner Research Centre for Physics
-         H-1525 Budapest 114, POB. 49, Hungary
+2.34.1
+
 
