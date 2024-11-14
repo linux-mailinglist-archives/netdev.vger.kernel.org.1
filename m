@@ -1,161 +1,174 @@
-Return-Path: <netdev+bounces-144747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 709049C85B8
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:12:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 679119C85C1
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30921282914
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:12:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16BD3B244BD
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABDB1DE4EF;
-	Thu, 14 Nov 2024 09:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4B01DE883;
+	Thu, 14 Nov 2024 09:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RDkKWExw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3MUrAEl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC8D1DE3B7;
-	Thu, 14 Nov 2024 09:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87FD1DE3B7
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731575544; cv=none; b=lc2QRzl8+4JEgQQXhBEvpclXyulKCkAlY02IGKN2HE/PveHuShyoRN1uqsoRD8wNHA8JpiNUkMrpk3XG7wlhfC8aLj12Ur6ij0Vfs/N+BTIGRcBfvxPIO6Zom2/59qXYFziWcKT0FHQrmguMl8o8u2pgT+2Af41SC9Sd6qQuQiM=
+	t=1731575587; cv=none; b=WQWiV7e3QAbeBo1M+0ae9TKGGtKmCjGHMbyhwnI3wnvEN1Tt7+F89PMrwYERwwEF4JbM8V1BDhDex4WH1CwTyaaHl+O0ltp5vp1CTH1EUIHWmyV2lL8m5/iQNmIyFUjuRJoCv1XgDNUWAvQHxWi5QaAZQ2Zq8LlRZs1aAr8Kpx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731575544; c=relaxed/simple;
-	bh=/FNXeBtwBLZaRaEpTbvM/HoWlTPqr8De8F0vVcJ4AEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k6XhudZ9qm724i2rGA5UfzjePZhhjJgLNVbBVM9hEZZ4WcO1XgHoo6ypP2U4uWtDpx1+6oHlmG1aWzMEGKuIArDGY3SN3ybQ5ETbPTQhMrDkLEMPJEbnTNVeuRKsCyoK04SY1dU4ft8oB0PbjNkHuPOj3bOY5vDiMxGYHbZtHio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RDkKWExw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hUnkAXCEYyWhwqu2Ap7JAT2p1h1b8+9Y1xqlGsEdk38=; b=RDkKWExwPhrgX3aYe5B32yxGK8
-	IqIHixh0BHo4a8oa8eEAdCICIsPU+UkMN3XX9rrKT6jdgWPJFqyoZQWhWL9dpreSjHM8twJPG7q3A
-	V6UtO1JmkfqE4sDoOTdAD1vD4op74dN2g6Tir/DMWbesEEMznSgYsiDRpR8J9AqGuTRTAMRKvTHPc
-	nU2I8OP3TNbiX0FJBe6wM2skax5S9rUPC8ySxgCfpfEr5gxJOTtMjViUEQFg7sqKsU2yaput+XC0Q
-	dschMRkuOyhkvzrB21aZYqq0OrtCREcUYhcaLm89J1aJYAwi/avmiUYW2a6GbxxdGN3rbfSoWGcSs
-	zbfoZMuA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50080)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBVtZ-0007he-0J;
-	Thu, 14 Nov 2024 09:12:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBVtW-0000zI-2c;
-	Thu, 14 Nov 2024 09:12:06 +0000
-Date: Thu, 14 Nov 2024 09:12:06 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net v1 1/2] net: phy: Introduce phy_update_eee() to
- update eee_cfg values
-Message-ID: <ZzW-5gj0cdbwdwZv@shell.armlinux.org.uk>
-References: <20241112072447.3238892-1-yong.liang.choong@linux.intel.com>
- <20241112072447.3238892-2-yong.liang.choong@linux.intel.com>
- <f8ec2c77-33fa-45a8-9b6b-4be15e5f3658@gmail.com>
- <71b6be0e-426f-4fb4-9d28-27c55d5afa51@lunn.ch>
- <eb937669-d4ce-4b72-bcae-0660e1345b76@linux.intel.com>
- <ZzW8t2bCTXJCP7-_@shell.armlinux.org.uk>
+	s=arc-20240116; t=1731575587; c=relaxed/simple;
+	bh=ZlochL675vKEl4dprZTa/z7ai2B8pgWEOJ0VD/AVS28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B6RZuyfWKIHf8+Ps9Q8UQVMQ3kmOLg244HZAhV0w+S7eU2fM0esN+98C0qC39ms5y7lfHEAhwgGC60271jbWn49bIix3EczUs/KQEFQVOcaSv5HruqdaAFitqvRMJCxg2vALVAuqZxHT562mZb+lrnvu6cvexg5j3yJShHF+EUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S3MUrAEl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731575584;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VUeaOXQiwvSG7xEIr9TGhk8zuNyNZ/eaCIMRElm3z+E=;
+	b=S3MUrAElx1+gTpLVNWYUAOm4ZDZ7G9pqVRQy7p1dnj7LHywv1/m/ROkBPVi+BZa8uGTtCw
+	B6WJBCpBOQ8pIc4fOu86/GQAOT3r0hap3+0IxYFpM22EO8p2jU5VE4KgZGjCoBejSz3chO
+	lUlLx90ZtvQlDJBEhpmU+pdmdWnI5as=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-WB4YnzB7O9mlSA6xIDOcTg-1; Thu, 14 Nov 2024 04:13:03 -0500
+X-MC-Unique: WB4YnzB7O9mlSA6xIDOcTg-1
+X-Mimecast-MFC-AGG-ID: WB4YnzB7O9mlSA6xIDOcTg
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b16c9a84efso35419785a.1
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:13:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731575583; x=1732180383;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VUeaOXQiwvSG7xEIr9TGhk8zuNyNZ/eaCIMRElm3z+E=;
+        b=rqfw3RHIqJF4so7X/ATBX0Ov3W+9R6gq4AYHdnIYukBxdrSg4YK/xtTFe/rnsoHnhB
+         C/FUBNYWX5MALvtY/xWzQsFcTmYoIZz0OoRFtwPk2dfnNQgHyNsfXunY7hwW5eRIjZx5
+         Un5T3l2mhkSj4CHDtqpxsnR1M84uiazHZjrnhIno3RJa1wP32jzt+03ndaXa7sDuYI8i
+         TZH08Jfs7zrXzyUNGHiuC17gcVH4+2K4svanOrMQm3197qe23uL5a9dZq+XwN98piwS+
+         wRXwV3gF3zDbk9NoeFyptKNVFDZNfIhs5iqv2M1YeD9udsWQk636LbamWITr8htzDGoG
+         +xog==
+X-Forwarded-Encrypted: i=1; AJvYcCUK38oZwaXuYvVes8MN1oz0yIJoS6242FnLA60Tuu7yMJjuvn0Ju8DHdabuG6g2kj9Gcar3FVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHuZkH9pGveIkD43/EI931xFqmAWU0AyKewsNw0G9AKBgZqxgG
+	tcnTz5v4NnETIxoiReoOiwtpUeJlR5j+WiDfj8nbEypJbQi5fl8f3foDRVyUn+sY9tbWGBkuNe0
+	OLubB56Rm9VGYDGaeVrLF+pCpuOLJPXKoP6aBdggyeW5EMRpgANcPtA==
+X-Received: by 2002:a05:620a:448f:b0:7a9:c406:eeb3 with SMTP id af79cd13be357-7b35c09efc9mr200075985a.1.1731575583013;
+        Thu, 14 Nov 2024 01:13:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHiS3vUHfH1zuhrwZzd1lLo5Hyvopj7rMtfjzgPmX9vV/xp1+1gGzFFTWpSfzlmkHlXbLU+yQ==
+X-Received: by 2002:a05:620a:448f:b0:7a9:c406:eeb3 with SMTP id af79cd13be357-7b35c09efc9mr200074485a.1.1731575582686;
+        Thu, 14 Nov 2024 01:13:02 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b35c99ddbdsm28735085a.47.2024.11.14.01.12.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 01:13:02 -0800 (PST)
+Message-ID: <978cdfc7-f584-4ab5-a062-db19ed363691@redhat.com>
+Date: Thu, 14 Nov 2024 10:12:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZzW8t2bCTXJCP7-_@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 net-next 3/4] ipv4/udp: Add 4-tuple hash for connected
+ socket
+To: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, dsahern@kernel.org, horms@kernel.org,
+ antony.antony@secunet.com, steffen.klassert@secunet.com,
+ linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
+ jakub@cloudflare.com, fred.cc@alibaba-inc.com,
+ yubing.qiuyubing@alibaba-inc.com
+References: <20241108054836.123484-1-lulie@linux.alibaba.com>
+ <20241108054836.123484-4-lulie@linux.alibaba.com>
+ <a1db0c11-38ee-4932-86bc-a397a0ecf963@redhat.com>
+ <14a1a4a1-7281-4715-bf6e-73d3dd5417ef@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <14a1a4a1-7281-4715-bf6e-73d3dd5417ef@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 14, 2024 at 09:02:47AM +0000, Russell King (Oracle) wrote:
-> On Wed, Nov 13, 2024 at 06:10:55PM +0800, Choong Yong Liang wrote:
-> > On 12/11/2024 9:04 pm, Andrew Lunn wrote:
-> > > On Tue, Nov 12, 2024 at 12:03:15PM +0100, Heiner Kallweit wrote:
-> > > > In stmmac_ethtool_op_get_eee() you have the following:
-> > > > 
-> > > > edata->tx_lpi_timer = priv->tx_lpi_timer;
-> > > > edata->tx_lpi_enabled = priv->tx_lpi_enabled;
-> > > > return phylink_ethtool_get_eee(priv->phylink, edata);
-> > > > 
-> > > > You have to call phylink_ethtool_get_eee() first, otherwise the manually
-> > > > set values will be overridden. However setting tx_lpi_enabled shouldn't
-> > > > be needed if you respect phydev->enable_tx_lpi.
-> > > 
-> > > I agree with Heiner here, this sounds like a bug somewhere, not
-> > > something which needs new code in phylib. Lets understand why it gives
-> > > the wrong results.
-> > > 
-> > > 	Andrew
-> > Hi Russell, Andrew, and Heiner, thanks a lot for your valuable feedback.
-> > 
-> > The current implementation of the 'ethtool --show-eee' command heavily
-> > relies on the phy_ethtool_get_eee() in phy.c. The eeecfg values are set by
-> > the 'ethtool --set-eee' command and the phy_support_eee() during the initial
-> > state. The phy_ethtool_get_eee() calls eeecfg_to_eee(), which returns the
-> > eeecfg containing tx_lpi_timer, tx_lpi_enabled, and eee_enable for the
-> > 'ethtool --show-eee' command.
+On 11/13/24 02:50, Philo Lu wrote:
+> On 2024/11/12 22:58, Paolo Abeni wrote:
+>> On 11/8/24 06:48, Philo Lu wrote:
+>> [...]
+>>> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+>>> Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
+>>> Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
+>>> Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
+>>
+>> [...]
+>>> @@ -2937,7 +3128,7 @@ struct proto udp_prot = {
+>>>   	.owner			= THIS_MODULE,
+>>>   	.close			= udp_lib_close,
+>>>   	.pre_connect		= udp_pre_connect,
+>>> -	.connect		= ip4_datagram_connect,
+>>> +	.connect		= udp_connect,
+>>>   	.disconnect		= udp_disconnect,
+>>>   	.ioctl			= udp_ioctl,
+>>>   	.init			= udp_init_sock,
+>>
+>> 2 minor notes, possibly not needing a repost:
+>>
+>> - The SoB chain looks strange, do you mean co-developed-by actually?
 > 
-> These three members you mention are user configuration members.
+> Yes, we're all involved in the development. I think it could be 
+> indicated by SoBs (and all of us agree with this). Please let me know if 
+> I'm wrong :)
 > 
-> > The tx_lpi_timer and tx_lpi_enabled values stored in the MAC or PHY driver
-> > are not retrieved by the 'ethtool --show-eee' command.
+> Or strictly as [1], it should be:
 > 
-> tx_lpi_timer is the only thing that the MAC driver should be concerned
-> with - it needs to program the MAC according to the timer value
-> specified. Whether LPI is enabled or not is determined by
-> phydev->enable_tx_lpi. The MAC should be using nothing else.
+> Co-developed-by: Cambda Zhu <cambda@linux.alibaba.com>
+> Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
+> Co-developed-by: Fred Chen <fred.cc@alibaba-inc.com>
+> Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
+> Co-developed-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
+> Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
+> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
 > 
-> > Currently, we are facing 3 issues:
-> > 1. When we boot up our system and do not issue the 'ethtool --set-eee'
-> > command, and then directly issue the 'ethtool --show-eee' command, it always
-> > shows that EEE is disabled due to the eeecfg values not being set. However,
-> > in the Maxliner GPY PHY, the driver EEE is enabled.
-> 
-> So the software state is out of sync with the hardware state. This is a
-> bug in the GPY PHY driver.
-> 
-> If we look at the generic code, we can see that genphy_config_aneg()
-> calls __genphy_config_aneg() which then goes on to call
-> genphy_c45_an_config_eee_aneg(). genphy_c45_an_config_eee_aneg()
-> writes the current EEE configuration to the PHY.
-> 
-> Now if we look at gpy_config_aneg(), it doesn't do this. Therefore,
-> the GPY PHY is retaining its hardware state which is different from
-> the software state. This is wrong.
+> [1]
+> https://www.kernel.org/doc/html/latest/process/submitting-patches.html#when-to-use-acked-by-cc-and-co-developed-by
 
-Also note that phy_probe() reads the current configuration from the
-PHY. The supported mask is set via phydev->drv->get_features,
-which calls genphy_c45_pma_read_abilities() via the GPY driver and
-genphy_c45_read_eee_abilities().
+The latter (with co-dev-by tags) I think would be better, it will give
+full attribution to all of you. Since the scope of this work is relevant
+I think it would be better a complete recognition.
 
-phy_probe() then moved on to genphy_c45_read_eee_adv(), which reads
-the advertisement mask. If the advertising mask is non-zero, then
-EEE is set as enabled.
+>> - udplite is not touched. AFAICS should not be a problem - just the
+>> feature will not be available for udplite. 
+> 
+> Agreed. Theoretically, the feature relies on udp4_hash4/udp6_hash4 when 
+> connecting, and all other functions including lookup/unhash/rehash 
+> always check "hashed4" firstly, and do nothing if it's false (which is 
+> the case for udplite).
+> 
+> AFAICT, the effects to udplite include:
+> - Additional memory consumption in udp_sock and udptable
+> - Control path: udp_hashed4 checking when unhash/rehash
+> - Data path: udp_has_hash4 checking when lookup
+>               (like unconnected sks in udp)
 
-From your description, it sounds like this isn't working right, and
-needs to be debugged. For example, is the PHY changing its EEE
-advertisement between phy_probe() and when it is up and running?
+Looks good. Please note explicitly in the cover letter that udplite is
+intentionally excluded here, the reason why such choice is safe
+(basically a synopsis of the above) and repost with the update tags
+chain including my Acked-by tag
+(you should retain Willem acked-by tag, too.)
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks!
+
+Paolo
+
 
