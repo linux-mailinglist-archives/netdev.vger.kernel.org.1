@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-144925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDCB09C8C8B
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:12:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAEB09C8C9A
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:13:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D8061F21704
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:12:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79290288E2F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A672A1D1;
-	Thu, 14 Nov 2024 14:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936222B9B9;
+	Thu, 14 Nov 2024 14:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VCnnikJ7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gs7lDWdR"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2079.outbound.protection.outlook.com [40.107.243.79])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3949BA53
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 14:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7891A13D890
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 14:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731593530; cv=fail; b=mWosM2jXua/92Nrm+6KJdeZjCMzU7g9yj7p+jGrl/VkdnmwwlL+JCXigMdWw5JothlYU/y/d6ZaeOkVd8RoyildT92/c4ckaB9HITXZBf98i3dhwyKGZ2+EJXVQItlFk9RWvIKgwUTQZyKF09JvY8ThQc2Q9D2UnOC0c4jC3X+o=
+	t=1731593540; cv=fail; b=RI6BVvF46ML70nWeV/P1FdspDwEpHA/EShw1uBOwjxsq4tM/5K3xJixhs27x6NP8TteyM5BASNrbU+dTlTfQqSqN39fd9wwtiUUHgO79g5drNDkQASjCeon0m+7QsjyLzJTtaRA2TeVMoAFtGMFtVOLPclxj15erCvgt0b4iAy0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731593530; c=relaxed/simple;
-	bh=oxOMQv8hjiSPAXN3QCnAd0yVFqO0BT18X/lHyK6FLTU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jjUiGCA6IWf0kzHlUgtdFZd7ld2TWUw3aAZTTrWu+7DlRlpXgRMmiX7UGkD0D7KASAh0jQg6L6+ZB8ii3TFWjWdEUcGuH7kkQXJuL7RNo4Fw+SkzpLZMotRbff/ZRnbCHpCaj/VV+BEJrxfY3I3fIDFznW+N8RfQbg76iqs77Pw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VCnnikJ7; arc=fail smtp.client-ip=40.107.243.79
+	s=arc-20240116; t=1731593540; c=relaxed/simple;
+	bh=L6od5+73Z/xL18knvjYYmgOhwiGbShPxXu8YxQk2XvI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BB65mr/5ypoLVTGYqsUSR2z16Qx9vI01Us05GMcwDt3siBRH1FsbOJKJ/kPmBHoTFhBSL/1hV/l9JGrQLQBg26KfUSo/U7Y52dZYDpJWCnyXA4xMpFTJemBRY7WkKLvI/uF5cc3cVcqBiyazDPxoyM1fVQnN9tqFUTczRtUoRfA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gs7lDWdR; arc=fail smtp.client-ip=40.107.223.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u9E899JsAMKjXrpTxG/PHSxpdvwa30rOVd2Jn4Bfm++KHSwN0x/xhXjfm7bQmIVJl21RTG5UAACfyerMJqcLJ/uhSNr/MUFuOJG5ixNdOfbJakFFSuu9nqH1D/rz3+OJ+zo7C0UCmK+251MhqOU8jdyMwEORlSTrB664nt0wU+YAC7AQmx/whlPX95LEKLdzcyWeokK4QV7Nv0dvMwJOpH1Pk/ZjlNayp3DLUJ4nxMFvf9cMlEhhZmbLzKgnHsQDNwVt0/Br2qMum678iM5kW1ktEXTBvppd275Q0CJ3UzQDMc1XrhTCEeDqppgjpi8jOE6+9TiAmn3N8q6LPQi2sg==
+ b=wMpbAGqvtP2mT9xZFt3Guh+1FnwKbvuqdqazhKIkVJlZuVV5g51lVqODHk6oWGk47Ch5ogbka/gv4rAoirRET9Snui/kuvJ2NUD88D2xVR8KFC8fA7dwtUyHAewzzXTSCzjBRnO2iQHNNhiF9/A8/VPkI7Mki/8baPK7syW7DZiPSprfxtEtSoJgGukpZ20cDxHR42N6UsSAnHwOnHCjKpsWpc7TwcwR22ScfRytNJfzHQ9M7rQvd7Msx7yl76dLCeCcthFYPn1sNgxi/EIaCXPf2NiK5Y6bjSnkDzz6DlZbO6EjnWzVfFRjn26d3pr2ViIOPklmEUQ9s8N6D+fcqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=81YRp/FXhHAFXKNvu6+fjl6iZpwxvSjig2JTj+w8o2E=;
- b=oLSzn36jYmdCijrMjETDRjsQXDTX3GVtlIO1WPQcxaSqLHjw11PRYyuSIO98CV0CoffTFk56l8dlpacTdZVXumQXOIWjd+6wQGuiZsbr6xiw0YTBOR9mNDtkyH+hi50/Gosan8s7rjd5LbSXg9aroYrTVdanROQaMB3Jd0xVXapbpLVtf35Zt3lpeKwYRa+jpwg6fB32SIhYhQT+4f6iaDEZkijlguw+6yubwiL4heSqJSgWid6i66+Os4/08ifNTYGPzzQrzvg6UTcN7uLaRMdvowJv+ulEHsyf1INVHQ0I/FQ6kCRBu7FWFbagv8fMgXi36Vl9ZmRIRJOKMfkK3A==
+ bh=84C38E5DArJAiR5YgmfG6OOLvYbuQF9qkPOHBkP3/Kg=;
+ b=vheRrkpRb+z4oyC2b5hJQFks3tKTkXJRwe4kx0HHeipQC3N9Eze/CSqhRBzXP8lbJB82aNXekFJT0WBZ3Pp+KxH3iAxhPXNJBcGaUWOX9vD8zK9QApZy+VCi5sFeTjw8ZMFzaSZO9hgA+tgrxbfim7MeucGnwKiiwBf8+xlmt/Eh2Yl/PbLcQoabG1Q+fjdJBhhHNIKLFvJ0jyReY6fHLjNsqVhN4eneJzWRKOa4OnvP8zC1LPFVD8WGMg4N+JzJXWtloG/eJP14+I38hGqnaiMAEo23eUJRie/FP3QzQ3x4ZgjFKaZYbT5gniPBmU1vxX45Bn4GORt5aEE5kFbzWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=81YRp/FXhHAFXKNvu6+fjl6iZpwxvSjig2JTj+w8o2E=;
- b=VCnnikJ7GnQMBuCaWQ6ZMwf9oSgEwoxmxxa9uZCmtqHow1RljqLf37L0w6YG2dcNRKRElUj/ZWSKfUqLJirD3KZ48RNDMTR+oSPIxdIhKmMct8/dYP3YqPUUx4JWkzOcVeTTGCBnQlRpYzpILYzMNwJ7jeZFXz2vskVYon0Tpjg64t6qDJgBnMkTyWeNouZJp3Mzna94vS0qktVtcqcfBek7sC3/5yvNVeig7I1dhYVCj+ON5mn3mrGHFOTOnszNsHrjo6c6RJ/kVcA2IVT9R5szlLft4Y42iaWJAhDk0WOPhl8IGI2pRQDJLcjeoOzqqHgLcKVdMUPhlJaJti/r3A==
-Received: from DM6PR01CA0011.prod.exchangelabs.com (2603:10b6:5:296::16) by
- SN7PR12MB6839.namprd12.prod.outlook.com (2603:10b6:806:265::21) with
+ bh=84C38E5DArJAiR5YgmfG6OOLvYbuQF9qkPOHBkP3/Kg=;
+ b=gs7lDWdRj0ViF23F7XFhwVWX7D7VPBO4+G7GFQ7d0iF6DvTwTIMBRiUnKPnK7e9RfhR6FY9jMBLZsaIM2lbPJYC8n0fdgF7dS2lE5xQ2uKWHgmaDhgyZMcuEBnQnjSE1dRqgPMSCDW64XDMiX5cCFovtNrXgyUOUlRl5ibPOvSJY/9G+rninnYfGJ7giaD+rzld6PsVFq464xVlTg9kE1bcCBcOVDY6pZHdEGQ2W1J8LlsXWYGopGeC7q6RY25pMzE1BWeApMf4XRQb4SuRxI+NT09bDXWZSPpItmvVgaCnTRVTioJhK2uonEwexC6WUkK6KxmxPV5QWcURexiwU/w==
+Received: from MW2PR16CA0056.namprd16.prod.outlook.com (2603:10b6:907:1::33)
+ by PH7PR12MB9073.namprd12.prod.outlook.com (2603:10b6:510:2eb::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Thu, 14 Nov
- 2024 14:12:04 +0000
-Received: from DS3PEPF000099D7.namprd04.prod.outlook.com
- (2603:10b6:5:296:cafe::ea) by DM6PR01CA0011.outlook.office365.com
- (2603:10b6:5:296::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17 via Frontend
- Transport; Thu, 14 Nov 2024 14:12:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2024 14:12:12 +0000
+Received: from SJ1PEPF000023CE.namprd02.prod.outlook.com
+ (2603:10b6:907:1:cafe::fd) by MW2PR16CA0056.outlook.office365.com
+ (2603:10b6:907:1::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.27 via Frontend
+ Transport; Thu, 14 Nov 2024 14:12:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS3PEPF000099D7.mail.protection.outlook.com (10.167.17.8) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8158.14 via Frontend Transport; Thu, 14 Nov 2024 14:12:03 +0000
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF000023CE.mail.protection.outlook.com (10.167.244.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.14 via Frontend Transport; Thu, 14 Nov 2024 14:12:11 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 14 Nov
- 2024 06:11:49 -0800
+ 2024 06:11:58 -0800
 Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 14 Nov
- 2024 06:11:44 -0800
+ 2024 06:11:49 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -81,11 +82,17 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
  Machata" <petrm@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, Vladimir Oltean
 	<vladimir.oltean@nxp.com>, Andy Roulin <aroulin@nvidia.com>,
-	<mlxsw@nvidia.com>
-Subject: [PATCH net-next v4 0/7] net: ndo_fdb_add/del: Have drivers report whether they notified
-Date: Thu, 14 Nov 2024 15:09:52 +0100
-Message-ID: <cover.1731589511.git.petrm@nvidia.com>
+	<mlxsw@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<UNGLinuxDriver@microchip.com>, Manish Chopra <manishc@marvell.com>,
+	<GR-Linux-NIC-Dev@marvell.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"Andrew Lunn" <andrew+netdev@lunn.ch>, <bridge@lists.linux.dev>
+Subject: [PATCH net-next v4 1/7] ndo_fdb_add: Add a parameter to report whether notification was sent
+Date: Thu, 14 Nov 2024 15:09:53 +0100
+Message-ID: <cbf6ae8195e85cbf922f8058ce4eba770f3b71ed.1731589511.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <cover.1731589511.git.petrm@nvidia.com>
+References: <cover.1731589511.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,57 +105,57 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099D7:EE_|SN7PR12MB6839:EE_
-X-MS-Office365-Filtering-Correlation-Id: c44b4ae4-f0ef-45aa-1c43-08dd04b6509d
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023CE:EE_|PH7PR12MB9073:EE_
+X-MS-Office365-Filtering-Correlation-Id: ad96cf16-3ea4-4c41-797a-08dd04b6550c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+	BCL:0;ARA:13230040|1800799024|7416014|376014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?wJm9OPV9VCU30MInye6F9IBWukaJae5DX5pvyYTKJwd/i7pkwlkAe1lsTwA/?=
- =?us-ascii?Q?9tHIKcgwGgCvwH3GZZndmSD1ozQPRzovKkCk5Ph/aGXCRKxjOIHcrNdH0B+9?=
- =?us-ascii?Q?sVpANyAEipxSIc6pEmMnVxQgIGduaRd8UOjnTL2C+GuRAcbnL/cpObSTfA4p?=
- =?us-ascii?Q?2KpAPPbzkRvEQYmtboIAsHFWN4xaKan7ef8p2drOXnudLP7H1m/4XYRxIunM?=
- =?us-ascii?Q?V2+kCBKIslZtlCDwpaPaAqQBkmFZnmcGWVW5x39W+Fc4j83WofhdA4F5Drdf?=
- =?us-ascii?Q?PwQMK3TILddxYHYS+YQbbJoRWJBKpKlQ420xC7ZTsEa45SfeXZ/blPpPSpbO?=
- =?us-ascii?Q?HtVhziHWcKp1Ab9uEe/dr4GORXhcbMWzqtMm3Xn1LLCNRXdH1D+dCy1/RB/Q?=
- =?us-ascii?Q?6vz8oXgUfShWoeX89dYqS4xkoAfBFh2/Sya0LbHc89SCbePx35vKSW82p8jN?=
- =?us-ascii?Q?r0VJT6N2ccK28DnLvQ9Ut1I1iXcezGFTAJAsJZyxMTP++DdDWqwVHFvn5FV1?=
- =?us-ascii?Q?YCZCjW8Tity0S0mimXly12lTfbwxupAdw7uqr5KLyD/mJKJLAsYd6Ui7zLDV?=
- =?us-ascii?Q?cQfO/uZp3B+mvor6vcvlnT9r19l3yxwBUhLGdLNLh3zXSJMqRQgxtEM9RoV1?=
- =?us-ascii?Q?tHFse2EbV4Bdf6qMF4aI/odiHhzTyzlcltzlx+Qz2zfujQWEl+qNoOqL5Czw?=
- =?us-ascii?Q?AmlPJtw6JmZb/u6qXxTZRHBhvb5vWgV8gQP5QjZulRWPWm5L55Yq1w3oUtIv?=
- =?us-ascii?Q?RLhsZwHpKttpKYbFPBl+N1aIGbSIONHJ7XaQoptC5rvQIN5TFlPYm8mFqLWM?=
- =?us-ascii?Q?4eDLAWSBBT0pdehEkOZz3aqzrWFb7MTYHA59bzP+w380n5FhtCKZeyD+YCUF?=
- =?us-ascii?Q?pEI1u92A9eRmWc+GctvH2DBVIJnsWfiXH/pr3xADJvi15IN34fO+uF/d6Dbu?=
- =?us-ascii?Q?DJW0knm42w8ztR0ql+r5XGZpmI1xuYkkjaklQ6a/Kou0f0dfRIaZQ42v9s4h?=
- =?us-ascii?Q?l2+v2EMjnCRXzWPZLJeIY62WoCeiVcNYOwtX+QpOhfRwjd/THGMmg2+2Ab2+?=
- =?us-ascii?Q?wzPxYM9r0N19kqxwygTwV3Oe1stimexvTQWDImUj9EjzzcSGGXsmd5y21htv?=
- =?us-ascii?Q?W+n5Qomlmc7g2qUhIMme617n/YgVbPXwj6dqFgYNUEZSKXrB3jtC0LHqd8Me?=
- =?us-ascii?Q?/3dw3EG7UVr2g8PqQ7zphlkVxQhnHXJquUDkPzT0bNzBqQwc/M6rKs0mwJu7?=
- =?us-ascii?Q?KNx1hlKPGibinj5z0c6gWqEA0ZFg+ux4pazrdeh1fWZyIZCOdMwLCWfK3MQp?=
- =?us-ascii?Q?dFNPTuOMdAGATI51RN/mxlqv1XyhmgrXsze8fTJFpqZd45S+TuPLDyihIxWQ?=
- =?us-ascii?Q?iCJBQp+fClTbHhfPzSyGoDu7C5BGHXMkoMrnnN8Rlv9/6zY00w=3D=3D?=
+	=?us-ascii?Q?gw7trl/H8WslFlzY9zyWSnBJdVpjeMSu46dWezMblpU4K+3PkyY4VGcLFqAr?=
+ =?us-ascii?Q?z191zpYyFMNbS9NrtSMEhINNFdbvaenF3Lu5g1VtyH6g8Vc48O5StQvPCGnq?=
+ =?us-ascii?Q?UrNciwHvPZeN8uXO/C4BbQGmcXBRsakDW9mAeZO2l7BlksBmMyZbiCN1V+8H?=
+ =?us-ascii?Q?BHYKP+ZXycWdagJsIcZyBPvvmXmmTpSLG5riwyIh+wAUPhjEL4S2DX4Kq+LE?=
+ =?us-ascii?Q?r4kxbeN9K36sKZzFs6HkCl9Wzb3iy0MsNjn+NlhAbBzZVfBoSfp61vIGgGn6?=
+ =?us-ascii?Q?ykP7D9fDec9XrwVu7b55gZAV0P6zMiWTZk2ca55E/uLQHLTmVCc3IFg/Ufzi?=
+ =?us-ascii?Q?Wf/P4NaTdtBbWft0jywVLFUkZSqO/x+zuPyMIn0n8Rvqqjz1ZY66tKQE9rv0?=
+ =?us-ascii?Q?8831zhBE9UVCb6+N5LKrZnCOg5vcGQdw9vDQ0ALRWFMqWo1pmovNy2JZcV3K?=
+ =?us-ascii?Q?VVO1zG5sOY4W7/J+SOLZBJvnQrTKk79uKXRs9rP3DQvOmPhf+bqaFHbGSKFP?=
+ =?us-ascii?Q?zUGNcFRje6VmOAspAn+Sc0j4SeR/YK3jzXNJg6UkQ+o8czlqBgV1oGNZwSio?=
+ =?us-ascii?Q?BUkO178vCn6jrlymECRMNfNac0rbYHR8M/1zwWfY8xIa5cAyYzhzW0HLggdp?=
+ =?us-ascii?Q?jXoyW7pJlgIlVOGD9/RCdxbw+rVr6IoyjaweD/xEJefapfNlRlNRsMXu7cqd?=
+ =?us-ascii?Q?L7ghBYva9oUfKkPzf1fLmUonEow1dd4eL2GpgikQb/QfNMRWMkHwmVQQ7OkL?=
+ =?us-ascii?Q?X1r1Y9pmK8IclROc01vbY3WXT+UPzW1dXh6y3gN8O/JGdtkZBClX37DnURW4?=
+ =?us-ascii?Q?pBMNCTGZCVHE/JtMRXWfp0QECJle1VUvaNQ3HojwdTOWQ6gdggDENYSUIc6m?=
+ =?us-ascii?Q?QVKjasvqOpM32TpaJ4oYqIZSQXzDxrjjawfgPjkgZYckcUzEUU6ygLfFpgyH?=
+ =?us-ascii?Q?fDfgSy5AQwpQi9FFbXrO0M15Z6m11DwIquvxvP5Q7Lje5wRjsfIMw6Zt3fJ+?=
+ =?us-ascii?Q?sb2Xk6YFUcvl/6/gTWEQ1n3eB481LE3DUZlSpzrWsOA0STRqQ8vecJa2qkRC?=
+ =?us-ascii?Q?6o0lqFMjxpvnF1UssH/pDlK3z7urcGcom4+XUxJhPqlYNvZJkz5jtYMoghRM?=
+ =?us-ascii?Q?TMn+mCTZQvPWWqtouxJbGnQE2fZ478D8c5cOvm3TqBjbxs3Tj8/uOIz1ZNGu?=
+ =?us-ascii?Q?hf8hf+6qnMHiV9d4htKgu9YvbmAESDEGnGYoJVohT3Prn5m/IO5KaPsdhqxy?=
+ =?us-ascii?Q?MfdGJqpC1Suo05GoG3kQ4Dd1Aj7OI64Bp7tNh0nKD87ntMvuGUfjXCjf4Jxq?=
+ =?us-ascii?Q?mFWGukw9ZfHT4jCnTCOliCpmF1tAezB5lOZPtD0pa0jaMLIHfj8hubQAK2XA?=
+ =?us-ascii?Q?pBmBSzVHk5Jn343/pvNUafseGKscoOcYsOt2b4qqlYivIezD1Q=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2024 14:12:03.8104
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2024 14:12:11.3293
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c44b4ae4-f0ef-45aa-1c43-08dd04b6509d
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad96cf16-3ea4-4c41-797a-08dd04b6550c
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099D7.namprd04.prod.outlook.com
+	SJ1PEPF000023CE.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6839
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9073
 
 Currently when FDB entries are added to or deleted from a VXLAN netdevice,
 the VXLAN driver emits one notification, including the VXLAN-specific
 attributes. The core however always sends a notification as well, a generic
 one. Thus two notifications are unnecessarily sent for these operations. A
 similar situation comes up with bridge driver, which also emits
-notifications on its own.
+notifications on its own:
 
  # ip link add name vx type vxlan id 1000 dstport 4789
  # bridge monitor fdb &
@@ -157,73 +164,296 @@ notifications on its own.
  de:ad:be:ef:13:37 dev vx dst 192.0.2.1 self permanent
  de:ad:be:ef:13:37 dev vx self permanent
 
-In order to prevent this duplicity, add a parameter, bool *notified, to
-ndo_fdb_add and ndo_fdb_del. The flag is primed to false, and if the callee
-sends a notification on its own, it sets the flag to true, thus informing
-the core that it should not generate another notification.
+In order to prevent this duplicity, add a paremeter to ndo_fdb_add,
+bool *notified. The flag is primed to false, and if the callee sends a
+notification on its own, it sets it to true, thus informing the core that
+it should not generate another notification.
 
-Patches #1 to #2 are concerned with the above.
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Amit Cohen <amcohen@nvidia.com>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+---
 
-In the remaining patches, #3 to #7, add a selftest. This takes place across
-several patches. Many of the helpers we would like to use for the test are
-in forwarding/lib.sh, whereas net/ is a more suitable place for the test,
-so the libraries need to be massaged a bit first.
+Notes:
+CC: Simon Horman <horms@kernel.org>
+CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+CC: intel-wired-lan@lists.osuosl.org
+CC: UNGLinuxDriver@microchip.com
+CC: Manish Chopra <manishc@marvell.com>
+CC: GR-Linux-NIC-Dev@marvell.com
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Nikolay Aleksandrov <razor@blackwall.org>
+CC: bridge@lists.linux.dev
 
-v4:
-- Patch #7:
-    - Adjust the sleep around the FDB op
+ drivers/net/ethernet/intel/i40e/i40e_main.c      |  3 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c        |  4 +++-
+ drivers/net/ethernet/intel/igb/igb_main.c        |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c    |  2 +-
+ drivers/net/ethernet/mscc/ocelot_net.c           |  2 +-
+ drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c |  2 +-
+ drivers/net/macvlan.c                            |  2 +-
+ drivers/net/vxlan/vxlan_core.c                   |  5 ++++-
+ include/linux/netdevice.h                        |  5 ++++-
+ net/bridge/br_fdb.c                              | 12 +++++++-----
+ net/bridge/br_private.h                          |  2 +-
+ net/core/rtnetlink.c                             |  9 ++++++---
+ 12 files changed, 32 insertions(+), 18 deletions(-)
 
-v3:
-- v1 and v2 differed from this version mainly because they outright shifted
-  the responsibility for notifying to the callee.
-- Both substance patches were reworked, patch #1 was dropped.
-  Selftest patches stayed intact.
-
-v2:
-- Patches #2, #3:
-    - Fix qlcnic build
-
-Petr Machata (7):
-  ndo_fdb_add: Add a parameter to report whether notification was sent
-  ndo_fdb_del: Add a parameter to report whether notification was sent
-  selftests: net: lib: Move logging from forwarding/lib.sh here
-  selftests: net: lib: Move tests_run from forwarding/lib.sh here
-  selftests: net: lib: Move checks from forwarding/lib.sh here
-  selftests: net: lib: Add kill_process
-  selftests: net: fdb_notify: Add a test for FDB notifications
-
- drivers/net/ethernet/intel/i40e/i40e_main.c   |   3 +-
- drivers/net/ethernet/intel/ice/ice_main.c     |   8 +-
- drivers/net/ethernet/intel/igb/igb_main.c     |   2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   2 +-
- drivers/net/ethernet/mscc/ocelot_net.c        |   4 +-
- .../net/ethernet/qlogic/qlcnic/qlcnic_main.c  |   4 +-
- drivers/net/macvlan.c                         |   4 +-
- drivers/net/vxlan/vxlan_core.c                |  10 +-
- include/linux/netdevice.h                     |  14 +-
- net/bridge/br_fdb.c                           |  27 ++-
- net/bridge/br_private.h                       |   4 +-
- net/core/rtnetlink.c                          |  20 +-
- .../drivers/net/mlxsw/devlink_trap.sh         |   2 +-
- .../net/mlxsw/devlink_trap_l3_drops.sh        |   4 +-
- .../net/mlxsw/devlink_trap_l3_exceptions.sh   |  12 +-
- .../net/mlxsw/devlink_trap_tunnel_ipip.sh     |   4 +-
- .../net/mlxsw/devlink_trap_tunnel_ipip6.sh    |   4 +-
- .../net/mlxsw/devlink_trap_tunnel_vxlan.sh    |   4 +-
- .../mlxsw/devlink_trap_tunnel_vxlan_ipv6.sh   |   4 +-
- .../selftests/drivers/net/mlxsw/tc_sample.sh  |   4 +-
- .../net/netdevsim/fib_notifications.sh        |   6 +-
- tools/testing/selftests/net/Makefile          |   2 +-
- .../selftests/net/drop_monitor_tests.sh       |   2 +-
- tools/testing/selftests/net/fdb_notify.sh     |  96 ++++++++
- tools/testing/selftests/net/fib_tests.sh      |   8 +-
- .../selftests/net/forwarding/devlink_lib.sh   |   2 +-
- tools/testing/selftests/net/forwarding/lib.sh | 199 +---------------
- .../selftests/net/forwarding/tc_police.sh     |   8 +-
- tools/testing/selftests/net/lib.sh            | 223 ++++++++++++++++++
- 29 files changed, 419 insertions(+), 267 deletions(-)
- create mode 100755 tools/testing/selftests/net/fdb_notify.sh
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 55fb362eb508..ab5febf83ec3 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -13095,12 +13095,13 @@ static int i40e_get_phys_port_id(struct net_device *netdev,
+  * @addr: the MAC address entry being added
+  * @vid: VLAN ID
+  * @flags: instructions from stack about fdb operation
++ * @notified: whether notification was emitted
+  * @extack: netlink extended ack, unused currently
+  */
+ static int i40e_ndo_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			    struct net_device *dev,
+ 			    const unsigned char *addr, u16 vid,
+-			    u16 flags,
++			    u16 flags, bool *notified,
+ 			    struct netlink_ext_ack *extack)
+ {
+ 	struct i40e_netdev_priv *np = netdev_priv(dev);
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index a6f586f9bfd1..c875036f654b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -6125,12 +6125,14 @@ ice_set_tx_maxrate(struct net_device *netdev, int queue_index, u32 maxrate)
+  * @addr: the MAC address entry being added
+  * @vid: VLAN ID
+  * @flags: instructions from stack about fdb operation
++ * @notified: whether notification was emitted
+  * @extack: netlink extended ack
+  */
+ static int
+ ice_fdb_add(struct ndmsg *ndm, struct nlattr __always_unused *tb[],
+ 	    struct net_device *dev, const unsigned char *addr, u16 vid,
+-	    u16 flags, struct netlink_ext_ack __always_unused *extack)
++	    u16 flags, bool *notified,
++	    struct netlink_ext_ack __always_unused *extack)
+ {
+ 	int err;
+ 
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index b83df5f94b1f..bb35f931f469 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -2486,7 +2486,7 @@ static int igb_set_features(struct net_device *netdev,
+ static int igb_ndo_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			   struct net_device *dev,
+ 			   const unsigned char *addr, u16 vid,
+-			   u16 flags,
++			   u16 flags, bool *notified,
+ 			   struct netlink_ext_ack *extack)
+ {
+ 	/* guarantee we can provide a unique filter for the unicast address */
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 8b8404d8c946..adc9392463ce 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -9954,7 +9954,7 @@ static int ixgbe_set_features(struct net_device *netdev,
+ static int ixgbe_ndo_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			     struct net_device *dev,
+ 			     const unsigned char *addr, u16 vid,
+-			     u16 flags,
++			     u16 flags, bool *notified,
+ 			     struct netlink_ext_ack *extack)
+ {
+ 	/* guarantee we can provide a unique filter for the unicast address */
+diff --git a/drivers/net/ethernet/mscc/ocelot_net.c b/drivers/net/ethernet/mscc/ocelot_net.c
+index 7c9540a71725..4f15ba2c5525 100644
+--- a/drivers/net/ethernet/mscc/ocelot_net.c
++++ b/drivers/net/ethernet/mscc/ocelot_net.c
+@@ -730,7 +730,7 @@ static void ocelot_get_stats64(struct net_device *dev,
+ static int ocelot_port_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			       struct net_device *dev,
+ 			       const unsigned char *addr,
+-			       u16 vid, u16 flags,
++			       u16 vid, u16 flags, bool *notified,
+ 			       struct netlink_ext_ack *extack)
+ {
+ 	struct ocelot_port_private *priv = netdev_priv(dev);
+diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
+index b3588a1ebc25..2484cebd97d4 100644
+--- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
++++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_main.c
+@@ -394,7 +394,7 @@ static int qlcnic_fdb_del(struct ndmsg *ndm, struct nlattr *tb[],
+ static int qlcnic_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			struct net_device *netdev,
+ 			const unsigned char *addr, u16 vid, u16 flags,
+-			struct netlink_ext_ack *extack)
++			bool *notified, struct netlink_ext_ack *extack)
+ {
+ 	struct qlcnic_adapter *adapter = netdev_priv(netdev);
+ 	int err = 0;
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index edbd5afcec41..dfb462e63248 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -1024,7 +1024,7 @@ static int macvlan_vlan_rx_kill_vid(struct net_device *dev,
+ static int macvlan_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			   struct net_device *dev,
+ 			   const unsigned char *addr, u16 vid,
+-			   u16 flags,
++			   u16 flags, bool *notified,
+ 			   struct netlink_ext_ack *extack)
+ {
+ 	struct macvlan_dev *vlan = netdev_priv(dev);
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 2c2ba5097647..09c1d27e11d3 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1241,7 +1241,7 @@ static int vxlan_fdb_parse(struct nlattr *tb[], struct vxlan_dev *vxlan,
+ static int vxlan_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			 struct net_device *dev,
+ 			 const unsigned char *addr, u16 vid, u16 flags,
+-			 struct netlink_ext_ack *extack)
++			 bool *notified, struct netlink_ext_ack *extack)
+ {
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+ 	/* struct net *net = dev_net(vxlan->dev); */
+@@ -1277,6 +1277,9 @@ static int vxlan_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			       nhid, true, extack);
+ 	spin_unlock_bh(&vxlan->hash_lock[hash_index]);
+ 
++	if (!err)
++		*notified = true;
++
+ 	return err;
+ }
+ 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0aae346d919e..6a7fd191e1ee 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1248,8 +1248,10 @@ struct netdev_net_notifier {
+  * int (*ndo_fdb_add)(struct ndmsg *ndm, struct nlattr *tb[],
+  *		      struct net_device *dev,
+  *		      const unsigned char *addr, u16 vid, u16 flags,
+- *		      struct netlink_ext_ack *extack);
++ *		      bool *notified, struct netlink_ext_ack *extack);
+  *	Adds an FDB entry to dev for addr.
++ *	Callee shall set *notified to true if it sent any appropriate
++ *	notification(s). Otherwise core will send a generic one.
+  * int (*ndo_fdb_del)(struct ndmsg *ndm, struct nlattr *tb[],
+  *		      struct net_device *dev,
+  *		      const unsigned char *addr, u16 vid)
+@@ -1525,6 +1527,7 @@ struct net_device_ops {
+ 					       const unsigned char *addr,
+ 					       u16 vid,
+ 					       u16 flags,
++					       bool *notified,
+ 					       struct netlink_ext_ack *extack);
+ 	int			(*ndo_fdb_del)(struct ndmsg *ndm,
+ 					       struct nlattr *tb[],
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index 77f110035df1..5f29958f3ddd 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -1152,7 +1152,7 @@ static int fdb_add_entry(struct net_bridge *br, struct net_bridge_port *source,
+ static int __br_fdb_add(struct ndmsg *ndm, struct net_bridge *br,
+ 			struct net_bridge_port *p, const unsigned char *addr,
+ 			u16 nlh_flags, u16 vid, struct nlattr *nfea_tb[],
+-			struct netlink_ext_ack *extack)
++			bool *notified, struct netlink_ext_ack *extack)
+ {
+ 	int err = 0;
+ 
+@@ -1183,6 +1183,8 @@ static int __br_fdb_add(struct ndmsg *ndm, struct net_bridge *br,
+ 		spin_unlock_bh(&br->hash_lock);
+ 	}
+ 
++	if (!err)
++		*notified = true;
+ 	return err;
+ }
+ 
+@@ -1195,7 +1197,7 @@ static const struct nla_policy br_nda_fdb_pol[NFEA_MAX + 1] = {
+ int br_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 	       struct net_device *dev,
+ 	       const unsigned char *addr, u16 vid, u16 nlh_flags,
+-	       struct netlink_ext_ack *extack)
++	       bool *notified, struct netlink_ext_ack *extack)
+ {
+ 	struct nlattr *nfea_tb[NFEA_MAX + 1], *attr;
+ 	struct net_bridge_vlan_group *vg;
+@@ -1258,10 +1260,10 @@ int br_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 
+ 		/* VID was specified, so use it. */
+ 		err = __br_fdb_add(ndm, br, p, addr, nlh_flags, vid, nfea_tb,
+-				   extack);
++				   notified, extack);
+ 	} else {
+ 		err = __br_fdb_add(ndm, br, p, addr, nlh_flags, 0, nfea_tb,
+-				   extack);
++				   notified, extack);
+ 		if (err || !vg || !vg->num_vlans)
+ 			goto out;
+ 
+@@ -1273,7 +1275,7 @@ int br_fdb_add(struct ndmsg *ndm, struct nlattr *tb[],
+ 			if (!br_vlan_should_use(v))
+ 				continue;
+ 			err = __br_fdb_add(ndm, br, p, addr, nlh_flags, v->vid,
+-					   nfea_tb, extack);
++					   nfea_tb, notified, extack);
+ 			if (err)
+ 				goto out;
+ 		}
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index 041f6e571a20..ebfc59049ec1 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -858,7 +858,7 @@ int br_fdb_delete_bulk(struct nlmsghdr *nlh, struct net_device *dev,
+ 		       struct netlink_ext_ack *extack);
+ int br_fdb_add(struct ndmsg *nlh, struct nlattr *tb[], struct net_device *dev,
+ 	       const unsigned char *addr, u16 vid, u16 nlh_flags,
+-	       struct netlink_ext_ack *extack);
++	       bool *notified, struct netlink_ext_ack *extack);
+ int br_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb,
+ 		struct net_device *dev, struct net_device *fdev, int *idx);
+ int br_fdb_get(struct sk_buff *skb, struct nlattr *tb[], struct net_device *dev,
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 327fa4957929..f31b2436cde5 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -4578,9 +4578,10 @@ static int rtnl_fdb_add(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	    netif_is_bridge_port(dev)) {
+ 		struct net_device *br_dev = netdev_master_upper_dev_get(dev);
+ 		const struct net_device_ops *ops = br_dev->netdev_ops;
++		bool notified = false;
+ 
+ 		err = ops->ndo_fdb_add(ndm, tb, dev, addr, vid,
+-				       nlh->nlmsg_flags, extack);
++				       nlh->nlmsg_flags, &notified, extack);
+ 		if (err)
+ 			goto out;
+ 		else
+@@ -4589,16 +4590,18 @@ static int rtnl_fdb_add(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 
+ 	/* Embedded bridge, macvlan, and any other device support */
+ 	if ((ndm->ndm_flags & NTF_SELF)) {
++		bool notified = false;
++
+ 		if (dev->netdev_ops->ndo_fdb_add)
+ 			err = dev->netdev_ops->ndo_fdb_add(ndm, tb, dev, addr,
+ 							   vid,
+ 							   nlh->nlmsg_flags,
+-							   extack);
++							   &notified, extack);
+ 		else
+ 			err = ndo_dflt_fdb_add(ndm, tb, dev, addr, vid,
+ 					       nlh->nlmsg_flags);
+ 
+-		if (!err) {
++		if (!err && !notified) {
+ 			rtnl_fdb_notify(dev, addr, vid, RTM_NEWNEIGH,
+ 					ndm->ndm_state);
+ 			ndm->ndm_flags &= ~NTF_SELF;
 -- 
 2.45.0
 
