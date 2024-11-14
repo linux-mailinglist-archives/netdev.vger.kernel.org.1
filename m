@@ -1,183 +1,137 @@
-Return-Path: <netdev+bounces-145007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3829C9109
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 18:45:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5263E9C91A0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8157E28422A
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:45:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0786B2E8DF
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7684618BC21;
-	Thu, 14 Nov 2024 17:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D188918D64D;
+	Thu, 14 Nov 2024 17:52:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Y0FRrLGv"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Z0tJYeTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147B1184528;
-	Thu, 14 Nov 2024 17:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E9F18C343
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 17:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731606297; cv=none; b=tQVi2MGwI2Zc87cGlR0hrYrAfQn+l9eQVtH4eSJ5RkftC8E1QayohnnPJs3cNQ4/j9VWSB7uvBErWwrLYQA85eEnZ+e/a514f9kWHmD1KWQxPJpcZv72T5q6XUpHIw5qHDWn8gEqZIgayCF8DT07jfjb/tBkdxbPZY+dh1DyaxY=
+	t=1731606732; cv=none; b=IgteQL0WAAcUrH8ANGH2qE1fiB6E1sg6H2Zckt6WpdbIwHqu+0c7cVp2hgTkvjezigdYHZe72trWugbhYjF8C71+hADJRfVU4vwY48clNxSTxilKKj8ElWFLJKSq+2BXw02WlYxgsdPiRD/CVaRNfWECQyg7Rc4hnvQd6JEebPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731606297; c=relaxed/simple;
-	bh=W+ydQ90TONgAfEYiEluV3t5x57+LGauopTl2uvcI1Yw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cvFs4G79h/YnTQ24rB4mewa/arwPfXGa2NB/2PwPA8Gd9RNmfk9wl5ef7f3bLqAC3FmGQBoDfjmyAIkauEi6eltK7D/PnfEEn99W+h7aux+TKUVN+Uq8sGbMWQmlDyR2nZxy+t/nVlnp5BGWUX3rN0kPxS/pS1tIg1acMuT9Vmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Y0FRrLGv; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4AEHiV5o028815;
-	Thu, 14 Nov 2024 11:44:31 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1731606271;
-	bh=4PC0ElUC8LkJ1ahDBqmcn8ZSzWDTsMdFJphZeZuf5E8=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Y0FRrLGvrlCdACTxe6k6wgplw8zrruA1/pQrLBourkkwkxuvTGh5VvQraIXyAaKDY
-	 AAjf/NRLkiThYzo7tvU5mIp6YM39F9GJ+zBtSmAdj7mLLPspsC7Xm+ELC7qdTyUpYB
-	 w7FYJvQQ+IM01FMe6b79KxYwW2PdCxh6PmqojOAU=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4AEHiVYI030179
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 14 Nov 2024 11:44:31 -0600
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 14
- Nov 2024 11:44:31 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 14 Nov 2024 11:44:31 -0600
-Received: from [10.250.214.214] ([10.250.214.214])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4AEHiRr7110038;
-	Thu, 14 Nov 2024 11:44:28 -0600
-Message-ID: <6bf6412d-8f9e-461d-913c-9718b5f0b8d3@ti.com>
-Date: Thu, 14 Nov 2024 19:44:27 +0200
+	s=arc-20240116; t=1731606732; c=relaxed/simple;
+	bh=apJSFXQVNjB7nklns7r3B69WAfmXsi7qpL7x89a7NVc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bc2EKGiNHGFINtN4UzSMzM310xDyoMTKwXfk0cGKBhAI/motq5EcEyfuarvywQEmI/Wr1kRCw5BzUeqdeZn3yOuuEYkJI7YR6LVdlkWmNz6J6ojFxXKghu2qsjTGuWzk0A4IHSYzvCCAbxy8I2W382Pzci+QFbcE49D2XCui440=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Z0tJYeTx; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71e4e481692so733187b3a.1
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:52:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1731606730; x=1732211530; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bpy3QdHD1PzWkQ/hC0jW+9k3dxQdnK5utepjrrTfjd4=;
+        b=Z0tJYeTxLY2SOzcxCG/Imt1hqhcayGy+UVMSvjAAHWM25X/Z0J4BqmjeKTWcaCZnMz
+         VO1KgBQu+dpBKU6EJ+k2Q3CQRJThiWAjYt6RTfNha5u4BDo4Z3NotFqhO5ov8/gO1hoy
+         kJsR9WfqCkpMUzZun9eNlkVQbRsJ6Yjm6kOug=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731606730; x=1732211530;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Bpy3QdHD1PzWkQ/hC0jW+9k3dxQdnK5utepjrrTfjd4=;
+        b=hDNpGauFRus+e8Ql/irHsVrpiBxg7y2DTKltd9BanNlH2pjKSKwi1HuUmSf7FYd15W
+         wVCdVNaUbfVdc2MRT3BQnRpbb+8Qr6L6oM4MqLXMin98QlyZDnsXl+VcxcGO1IdkZYjw
+         Da0vbCqZhiyWNZKKt4m53JPoyampemEMzRVQFVe7LBj5M/+UdDShP+iQArjD2Qi3kWxd
+         ynj/NpYTqUfKTcP1dpy466R0wdEpcss5fp6/zj4QZLGMYJ2cZszZHPmpokAs4IXV6jVk
+         tAC3MA/Swgxd+kCcgMVAJABI9g5vCO09GIOQFudZwzxCW/YnSsmvi7s+dfmQJTX1bzJP
+         rnXA==
+X-Gm-Message-State: AOJu0YwMLwZpdcsvvs4ZcF9TsRUtKgFH4rTfOaTAJuCvfhqFmp3e+9sf
+	JUxC2TLUcx+fpuw9fYEXoeRaBt/ITM3Itz0tlER11RLgAYCYJaEkUwaHY4d7mef5oIPyZc15JgS
+	K0oFvUot56nRE/hYthgNf951kfnA0D045pkLkbKMF7Wx5wN7r7fqhxiJ8gtVK2FXFOFpiuI7xFO
+	fRJ3fnPRzzR03jSOoGcoe/gqtjVA95QyPbZ7k=
+X-Google-Smtp-Source: AGHT+IEzuOBbg7r/5j57WaldF3llHWkwbSqlB3tC2UE/jWFYwiTb0w9QGbjIr3D5ZFS7w2Dgt5FdwA==
+X-Received: by 2002:a05:6a00:1ca6:b0:724:6bac:1003 with SMTP id d2e1a72fcca58-7246bac1753mr3240414b3a.24.1731606729863;
+        Thu, 14 Nov 2024 09:52:09 -0800 (PST)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7246a9bac56sm1559883b3a.141.2024.11.14.09.52.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 09:52:09 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com,
+	kuba@kernel.org,
+	mkarsten@uwaterloo.ca,
+	Joe Damato <jdamato@fastly.com>,
+	stable@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net v3] netdev-genl: Hold rcu_read_lock in napi_get
+Date: Thu, 14 Nov 2024 17:51:56 +0000
+Message-Id: <20241114175157.16604-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/17] wifi: cc33xx: Add main.c
-To: Johannes Berg <johannes@sipsolutions.net>, Kalle Valo <kvalo@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob
- Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor
- Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Sabeeh Khan <sabeeh-khan@ti.com>
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
- <20241107125209.1736277-10-michael.nemanov@ti.com>
- <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Content-Language: en-US
-From: "Nemanov, Michael" <michael.nemanov@ti.com>
-In-Reply-To: <685d782d68bfc664c4fcc594dff96546ffc30e5f.camel@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
-On 11/8/2024 1:42 PM, Johannes Berg wrote:
+Hold rcu_read_lock in netdev_nl_napi_get_doit, which calls napi_by_id
+and is required to be called under rcu_read_lock.
 
->> +	if (sta_rate_set) {
->> +		wlvif->rate_set = cc33xx_tx_enabled_rates_get(cc, sta_rate_set,
->> +							      wlvif->band);
->> +	}
-> 
-> you have a thing for extra braces ;-)
-> (also in many other places)
-> 
+Cc: stable@vger.kernel.org
+Fixes: 27f91aaf49b3 ("netdev-genl: Add netlink framework functions for napi")
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ v3:
+   - Separate the patches that were a series in v2 (and earlier) as
+     they target different trees.
 
-Yeah most of those head debug traces that were dropped as part of the 
-feedback. Will fix the style too.
+ v2:
+   - Simplified by removing the helper and calling rcu_read_lock /
+     unlock directly instead.
 
->> +static int cc33xx_init_ieee80211(struct cc33xx *cc)
->> +{
->> +	unsigned int i;
->> +
->> +	if (cc->conf.core.mixed_mode_support) {
->> +		static const u32 cipher_suites[] = {
->> +			WLAN_CIPHER_SUITE_CCMP,
->> +			WLAN_CIPHER_SUITE_AES_CMAC,
->> +			WLAN_CIPHER_SUITE_TKIP,
->> +			WLAN_CIPHER_SUITE_GCMP,
->> +			WLAN_CIPHER_SUITE_GCMP_256,
->> +			WLAN_CIPHER_SUITE_BIP_GMAC_128,
->> +			WLAN_CIPHER_SUITE_BIP_GMAC_256,
->> +		};
->> +		cc->hw->wiphy->cipher_suites = cipher_suites;
->> +		cc->hw->wiphy->n_cipher_suites = ARRAY_SIZE(cipher_suites);
->> +
->> +	} else {
->> +		static const u32 cipher_suites[] = {
->> +			WLAN_CIPHER_SUITE_CCMP,
->> +			WLAN_CIPHER_SUITE_AES_CMAC,
->> +			WLAN_CIPHER_SUITE_GCMP,
->> +			WLAN_CIPHER_SUITE_GCMP_256,
->> +			WLAN_CIPHER_SUITE_BIP_GMAC_128,
->> +			WLAN_CIPHER_SUITE_BIP_GMAC_256,
->> +		};
-> 
-> I don't see you have GEM here, yet you handle it in other places above,
-> that seems odd. Also I'm not sure it can work at all now that we removed
-> the whole extended IV mess, unless you offloaded that?
-> 
+ net/core/netdev-genl.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-This cipher is unsupported. Will remove this and any related code.
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 1cb954f2d39e..d2baa1af9df0 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -215,6 +215,7 @@ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 		return -ENOMEM;
+ 
+ 	rtnl_lock();
++	rcu_read_lock();
+ 
+ 	napi = napi_by_id(napi_id);
+ 	if (napi) {
+@@ -224,6 +225,7 @@ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
+ 		err = -ENOENT;
+ 	}
+ 
++	rcu_read_unlock();
+ 	rtnl_unlock();
+ 
+ 	if (err)
 
->> +	/* clear channel flags from the previous usage
->> +	 * and restore max_power & max_antenna_gain values.
->> +	 */
->> +	for (i = 0; i < ARRAY_SIZE(cc33xx_channels); i++) {
->> +		cc33xx_band_2ghz.channels[i].flags = 0;
->> +		cc33xx_band_2ghz.channels[i].max_power = CC33XX_MAX_TXPWR;
->> +		cc33xx_band_2ghz.channels[i].max_antenna_gain = 0;
->> +	}
->> +
->> +	for (i = 0; i < ARRAY_SIZE(cc33xx_channels_5ghz); i++) {
->> +		cc33xx_band_5ghz.channels[i].flags = 0;
->> +		cc33xx_band_5ghz.channels[i].max_power = CC33XX_MAX_TXPWR;
->> +		cc33xx_band_5ghz.channels[i].max_antenna_gain = 0;
->> +	}
->> +
->> +	/* Enable/Disable He based on conf file params */
->> +	if (!cc->conf.mac.he_enable) {
->> +		cc33xx_band_2ghz.iftype_data = NULL;
->> +		cc33xx_band_2ghz.n_iftype_data = 0;
->> +
->> +		cc33xx_band_5ghz.iftype_data = NULL;
->> +		cc33xx_band_5ghz.n_iftype_data = 0;
->> +	}
-> 
-> it seems wrong to modify the global data here
-> 
->> +	/* We keep local copies of the band structs because we need to
->> +	 * modify them on a per-device basis.
->> +	 */
->> +	memcpy(&cc->bands[NL80211_BAND_2GHZ], &cc33xx_band_2ghz,
->> +	       sizeof(cc33xx_band_2ghz));
->> +	memcpy(&cc->bands[NL80211_BAND_2GHZ].ht_cap,
->> +	       &cc->ht_cap[NL80211_BAND_2GHZ],
->> +	       sizeof(*cc->ht_cap));
-> 
-> and in particular if you *then* do that??
-> 
-
-I see your point. I'll drop the init loops and use C initializers 
-instead as this data does not change. Any dynamic modification will done 
-to cc->bands.
-
-Thanks and regards,
-Michael.
+base-commit: 5b366eae71937ae7412365340b431064625f9617
+-- 
+2.25.1
 
 
