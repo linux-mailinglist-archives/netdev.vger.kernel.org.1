@@ -1,48 +1,74 @@
-Return-Path: <netdev+bounces-144766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E1579C865C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:43:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D8AF9C8661
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:44:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5151B229AB
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:41:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90C1DB2214E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC011E9089;
-	Thu, 14 Nov 2024 09:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA45B1F7074;
+	Thu, 14 Nov 2024 09:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPdEYXkZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHKPGUux"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7F77C0BE;
-	Thu, 14 Nov 2024 09:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BECC1E7C2D;
+	Thu, 14 Nov 2024 09:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731577272; cv=none; b=moc1qLgqHakAdrg3ZBsIpPdy/JNbliB7kFPO0jok7nEzvvDoI7/vVtuky5XkYOs5FNu6VdZqlnLjXxXdtzQIerlF94hbduax1gKh5/BalfixITHfg+YyVAZSqFYuL1A4IZP0uOf8EryzUtbtmxK5/eGVJeOL3Aj1VxmByRhiPOU=
+	t=1731577400; cv=none; b=f7Qg5j3Hwg2Omd2hEb5HLhFbXLAxg8Vxx6VSbrSMEXKE1aAajo6vZST5v3prs02oPWdDFIpSsJgsL9GRCpmGQ8Z36MsOJHLGxrnF5GW4e3dAfBb6gzdt9KDfZoptgSKO5l7fjEZXk+pq6qv1kXvxl44kWxek51b5NWVuGeQYt7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731577272; c=relaxed/simple;
-	bh=5q3RktbUZXvf6M0hRM6HB/aJlJafYbTdCmLCZcHHYRM=;
+	s=arc-20240116; t=1731577400; c=relaxed/simple;
+	bh=25AUdCDFztM/MxjBrIsJOd7NjN+c7svZzT3gV+41nSQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i0COk4VvmmblIHpXcQyUPCTozHQkt49dw3X5lw+GRGCPBVWdDxbCp6TNLiUVDXfw5keCAp78cpJsLCC7SvkpaaGkdoh0gfogW0ct38X5cJDAft++E5Vq5jBtbWH3UONDIH+Tn5qGS18etTK0AIqMSfjMMPn4d9g1+Jp2tJ4JouY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPdEYXkZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60C56C4CECD;
-	Thu, 14 Nov 2024 09:41:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731577272;
-	bh=5q3RktbUZXvf6M0hRM6HB/aJlJafYbTdCmLCZcHHYRM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IPdEYXkZsrnbsNA/amFr6z9+SaYXUFEEn5OGID34chnxsJmNyfI3ULyGkejnFEgxV
-	 +rIeZC7SCUBgT9L2KsA84kPhdSfWCnUP4A2Ldg6Dc+CMCLB9Nk8ljPXtr6Zamql35j
-	 8i6vRWmKuw4oazJ4jsbxUBRmc71AxrDwV/aIVlWfmhyrN7NHCBiHmHuENEvl8RYNw7
-	 OrW9qYHIwRlCIU3JXAnmCM/sFUj3VLY7ju0+cwBtKPYxzsmQKPluiwnvA7Yml4+zo3
-	 qcVGvv2zojvmC43lcEfVqx32JY69z60Z2WLAlGRUsGQD+h+yAXYI+Cb7imS6pNPJPl
-	 M6gF/uMoJX9qQ==
-Message-ID: <76dd6141-5852-43ae-af98-f0edf0bc10f5@kernel.org>
-Date: Thu, 14 Nov 2024 11:41:06 +0200
+	 In-Reply-To:Content-Type; b=Snlx5Ldbs4T4mDiKFpt/R5wIqGcGGkKdMlXPTUwEiHVwRJkKXEKloEQn0N8cFF6hDfyYrhJj1wW8bP0X8xsCiQskshyMrWU96qlbUHsO+b64JehPusvydC1PQMLL5QV0f/XB0lVWMKvuazmHSbOC5n78Z/kob6YD/tfAu1MwSVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHKPGUux; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71e79f73aaeso270269b3a.3;
+        Thu, 14 Nov 2024 01:43:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731577398; x=1732182198; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7E3oRv+rq/XKtcZoaXZsJTQg3amz2zyCTxOxkN0m2BA=;
+        b=dHKPGUux1yZSNL13UN2Oug0+aum7KO2Sbq3dUdUlrY0clb57pDomvyQNxpYXTnheXQ
+         bG6Ybq9YPEg63YmyvHkyTnZjpBIMR5OJkda4tYYu7Tt7iyQsIrZD4K/u9pLkWTde/roo
+         guWDQ6G3xXXsJHPoUa+JbILeVsO8WSrzHMFDLuDikwPFtsk/jbjlnyzc+roChHay/woE
+         vKTTmEXGB6ajZ85nWKlWiJEclJ0ySrQzbJVl0oumB8L4wQMyqeCW62RHdwTz8IXHcZGj
+         9ST61KlWEK9RI/tpHGaYQm6d/UF7ZAeXU8nMUwa8dyjeggn2Zh+9qw68spp1kZxqoWEx
+         2T7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731577398; x=1732182198;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7E3oRv+rq/XKtcZoaXZsJTQg3amz2zyCTxOxkN0m2BA=;
+        b=EJGjEWkOWIkKT5QytCZY8aVNLTa1a6/Yfp0uwCw7b1yj3xajNyGNPGUcMJ7EZkR/86
+         W99X7XtFUZ8wfNGkcAQ1FfdVFaiXpATyyRrC8TEpRIWrg8jaYp6NTqgwoUTGRUSD7BRb
+         zZR7TzVUda+Ff3DCFHrB0ylKKdzegKv1DUCuyRFDyrn0JIPIPsecU4HtOM5wVULL/to3
+         r4L8g2y6eNOCLx8pBhse49obDR/rTKFOpap3bKf0oVbnaZIOcMAG6fAkDpie/9Qo7yV3
+         YrHNHBNhAe3OKTQ4v67aEkYoMuFzeJjzM4IgFocfk3nnbioSkeiSGBkZ5cWo7GGPWmE3
+         /N7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUEpQ4qegtsp47+4dLNveavvyTl9XlAUl84I1M3kfttH8Ht1Jt0T0oR4QcN3CFOtDuEHmfZxw7X@vger.kernel.org, AJvYcCUV2x4PjXxI5L+S09fVw963Ot5VarP1JK+f7TA5V6/xYHvr1G3f6btHGcV8yJSkzzhlD0ywGxUST1U8@vger.kernel.org, AJvYcCXNr4vtGw90TCDYL9QQ8Y6ZjXSbJ0lsNpva1350HGIHx3X58nQbNb8563ABeDjMVX5XqrwRLHP0+k0yegtm@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdarHLxtQ0zxmJianSyxh+NZ5msS0ZTqCAO5K5YAGcr1f51Gdz
+	Q59T1JWLshu/4H6/RiX1AtHQV8RSdCwOukF2MKUJ8vM+iabNMZDE
+X-Google-Smtp-Source: AGHT+IE7N5I7GpMECo0it1xEKMgqYnL8RbOemjcjR8CajkVg4l/czbLMGpNGruEWzRMOSH4KompvSQ==
+X-Received: by 2002:a17:90b:3ec5:b0:2e9:5f95:54c1 with SMTP id 98e67ed59e1d1-2e9b173c441mr33338891a91.17.1731577398096;
+        Thu, 14 Nov 2024 01:43:18 -0800 (PST)
+Received: from [192.168.0.101] (60-250-192-107.hinet-ip.hinet.net. [60.250.192.107])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea06f9c51esm783484a91.39.2024.11.14.01.43.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 01:43:17 -0800 (PST)
+Message-ID: <bbc212a7-ae42-461a-b0a9-509838053ab2@gmail.com>
+Date: Thu, 14 Nov 2024 17:43:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,171 +76,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
- to priority map for RX
-To: Guillaume Nault <gnault@redhat.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
- Pekka Varis <p-varis@ti.com>
-References: <20241109-am65-cpsw-multi-rx-dscp-v3-0-1cfb76928490@kernel.org>
- <20241109-am65-cpsw-multi-rx-dscp-v3-2-1cfb76928490@kernel.org>
- <ZzVBS1zXIy31pnaf@debian>
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: nuvoton: Add schema for MA35
+ family GMAC
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: krzk+dt@kernel.org, mcoquelin.stm32@gmail.com, davem@davemloft.net,
+ conor+dt@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ devicetree@vger.kernel.org, joabreu@synopsys.com, edumazet@google.com,
+ linux-kernel@vger.kernel.org, kuba@kernel.org, schung@nuvoton.com,
+ yclu4@nuvoton.com, ychuang3@nuvoton.com,
+ linux-stm32@st-md-mailman.stormreply.com, openbmc@lists.ozlabs.org,
+ linux-arm-kernel@lists.infradead.org, alexandre.torgue@foss.st.com,
+ netdev@vger.kernel.org, andrew+netdev@lunn.ch
+References: <20241113051857.12732-1-a0987203069@gmail.com>
+ <20241113051857.12732-2-a0987203069@gmail.com>
+ <173147854152.3007386.10475661912425454611.robh@kernel.org>
 Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <ZzVBS1zXIy31pnaf@debian>
-Content-Type: text/plain; charset=UTF-8
+From: Joey Lu <a0987203069@gmail.com>
+In-Reply-To: <173147854152.3007386.10475661912425454611.robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+Dear Rob,
 
+Thank you for your reply.
 
-On 14/11/2024 02:16, Guillaume Nault wrote:
-> On Sat, Nov 09, 2024 at 01:00:08PM +0200, Roger Quadros wrote:
->> AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
->> appropriate priority queue via DSCP to Priority mapping registers
->> (CPSW_PN_RX_PRI_MAP_REG).
+On 11/13/24 14:15, Rob Herring (Arm) wrote:
+> On Wed, 13 Nov 2024 13:18:55 +0800, Joey Lu wrote:
+>> Create initial schema for Nuvoton MA35 family Gigabit MAC.
 >>
->> We use the upper 3 bits of the DSCP field that indicate IP Precedence
->> to map traffic to 8 priority queues.
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Signed-off-by: Joey Lu <a0987203069@gmail.com>
 >> ---
->>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 54 ++++++++++++++++++++++++++++++++
->>  1 file changed, 54 insertions(+)
+>>   .../bindings/net/nuvoton,ma35d1-dwmac.yaml    | 170 ++++++++++++++++++
+>>   1 file changed, 170 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml
 >>
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->> index 0520e9f4bea7..fab35e6aac7f 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->> @@ -71,6 +71,8 @@
->>  #define AM65_CPSW_PORT_REG_RX_PRI_MAP		0x020
->>  #define AM65_CPSW_PORT_REG_RX_MAXLEN		0x024
->>  
->> +#define AM65_CPSW_PORTN_REG_CTL			0x004
->> +#define AM65_CPSW_PORTN_REG_DSCP_MAP		0x120
->>  #define AM65_CPSW_PORTN_REG_SA_L		0x308
->>  #define AM65_CPSW_PORTN_REG_SA_H		0x30c
->>  #define AM65_CPSW_PORTN_REG_TS_CTL              0x310
->> @@ -94,6 +96,10 @@
->>  /* AM65_CPSW_PORT_REG_PRI_CTL */
->>  #define AM65_CPSW_PORT_REG_PRI_CTL_RX_PTYPE_RROBIN	BIT(8)
->>  
->> +/* AM65_CPSW_PN_REG_CTL */
->> +#define AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN	BIT(1)
->> +#define AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN	BIT(2)
->> +
->>  /* AM65_CPSW_PN_TS_CTL register fields */
->>  #define AM65_CPSW_PN_TS_CTL_TX_ANX_F_EN		BIT(4)
->>  #define AM65_CPSW_PN_TS_CTL_TX_VLAN_LT1_EN	BIT(5)
->> @@ -176,6 +182,53 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port *slave,
->>  	writel(mac_lo, slave->port_base + AM65_CPSW_PORTN_REG_SA_L);
->>  }
->>  
->> +#define AM65_CPSW_DSCP_MAX	GENMASK(5, 0)
->> +#define AM65_CPSW_PRI_MAX	GENMASK(2, 0)
->> +#define AM65_CPSW_DSCP_PRI_PER_REG	8
->> +#define AM65_CPSW_DSCP_PRI_SIZE		4	/* in bits */
->> +static int am65_cpsw_port_set_dscp_map(struct am65_cpsw_port *slave, u8 dscp, u8 pri)
->> +{
->> +	int reg_ofs;
->> +	int bit_ofs;
->> +	u32 val;
->> +
->> +	if (dscp > AM65_CPSW_DSCP_MAX)
->> +		return -EINVAL;
->> +
->> +	if (pri > AM65_CPSW_PRI_MAX)
->> +		return -EINVAL;
->> +
->> +	/* 32-bit register offset to this dscp */
->> +	reg_ofs = (dscp / AM65_CPSW_DSCP_PRI_PER_REG) * 4;
->> +	/* bit field offset to this dscp */
->> +	bit_ofs = AM65_CPSW_DSCP_PRI_SIZE * (dscp % AM65_CPSW_DSCP_PRI_PER_REG);
->> +
->> +	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
->> +	val &= ~(AM65_CPSW_PRI_MAX << bit_ofs);	/* clear */
->> +	val |= pri << bit_ofs;			/* set */
->> +	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
->> +
->> +	return 0;
->> +}
->> +
->> +static void am65_cpsw_port_enable_dscp_map(struct am65_cpsw_port *slave)
->> +{
->> +	int dscp, pri;
->> +	u32 val;
->> +
->> +	/* Map IP Precedence field to Priority */
->> +	for (dscp = 0; dscp <= AM65_CPSW_DSCP_MAX; dscp++) {
->> +		pri = dscp >> 3; /* Extract IP Precedence */
->> +		am65_cpsw_port_set_dscp_map(slave, dscp, pri);
->> +	}
->> +
->> +	/* enable port IPV4 and IPV6 DSCP for this port */
->> +	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_CTL);
->> +	val |= AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN |
->> +		AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN;
->> +	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_CTL);
->> +}
-> 
-> It seems that this hardware is capable of mapping all possible DSCP
-yes.
+> My bot found errors running 'make dt_binding_check' on your patch:
+>
+> yamllint warnings/errors:
+>
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: ignoring, error in schema: properties: compatible
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:compatible: [{'items': [{'enum': ['nuvoton,ma35d1-dwmac']}, {'const': 'snps,dwmac-3.70a'}]}] is not of type 'object', 'boolean'
+> 	from schema $id: http://json-schema.org/draft-07/schema#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:compatible: [{'items': [{'enum': ['nuvoton,ma35d1-dwmac']}, {'const': 'snps,dwmac-3.70a'}]}] is not of type 'object', 'boolean'
+> 	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:clock-names: 'oneOf' conditional failed, one must be fixed:
+> 	[{'const': 'stmmaceth'}, {'const': 'ptp_ref'}] is too long
+> 	[{'const': 'stmmaceth'}, {'const': 'ptp_ref'}] is too short
+> 	False schema does not allow 2
+> 	1 was expected
+> 	hint: "minItems" is only needed if less than the "items" list length
+> 	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: properties:clocks: 'oneOf' conditional failed, one must be fixed:
+> 	[{'description': 'MAC clock'}, {'description': 'PTP clock'}] is too long
+> 	[{'description': 'MAC clock'}, {'description': 'PTP clock'}] is too short
+> 	False schema does not allow 2
+> 	1 was expected
+> 	hint: "minItems" is only needed if less than the "items" list length
+> 	from schema $id: http://devicetree.org/meta-schemas/items.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml: 'oneOf' conditional failed, one must be fixed:
+> 	'unevaluatedProperties' is a required property
+> 	'additionalProperties' is a required property
+> 	hint: Either unevaluatedProperties or additionalProperties must be present
+> 	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+> Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.example.dtb: /example-0/ethernet@40120000: failed to match any schema with compatible: ['nuvoton,ma35d1-dwmac']
+> Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.example.dtb: /example-1/ethernet@40130000: failed to match any schema with compatible: ['nuvoton,ma35d1-dwmac']
+>
+> doc reference errors (make refcheckdocs):
+>
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241113051857.12732-2-a0987203069@gmail.com
+>
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+>
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+>
+> pip3 install dtschema --upgrade
+>
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
+>
+These warnings/errors will be fixed in next patch.
 
-> values. Then why restricting the mapping to the 3 high order bits only?
+Thanks!
 
-Currently, the 64 DSCP values are mapped to 8 User Priorities (UP) based
-on just the Class Selector Codepoint field (first 3 bits of DSCP).
+BR,
 
-But now looking at rfc8325#section-4.3.
-"Note: All unused codepoints are RECOMMENDED to be mapped to UP 0"
-
-So what this patch does doesn't look like a good idea.
-
-> According to RFC 8325 section 2.3, this seem to be a common practice,
-> which this RFC considers a problem:
-> https://datatracker.ietf.org/doc/html/rfc8325#section-2.3
-
-Good to know about this.
-
-> 
-> I know this RFC is about 802.11, not 802.1p, but as far as I know, the
-> user priority (UP) are the same for both, so that shouldn't make a
-> difference.
-> 
-> So what about following the IETF mapping found in section 4.3?
-> https://datatracker.ietf.org/doc/html/rfc8325#section-4.3
-
-Thanks for this tip.
-I will update this patch to have the default DSCP to UP mapping as per
-above link and map all unused DSCP to UP 0.
-
-Is there any mechanism/API for network administrator to change this
-default mapping in the network drivers?
-
-> 
->>  static void am65_cpsw_sl_ctl_reset(struct am65_cpsw_port *port)
->>  {
->>  	cpsw_sl_reset(port->slave.mac_sl, 100);
->> @@ -921,6 +974,7 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
->>  	common->usage_count++;
->>  
->>  	am65_cpsw_port_set_sl_mac(port, ndev->dev_addr);
->> +	am65_cpsw_port_enable_dscp_map(port);
->>  
->>  	if (common->is_emac_mode)
->>  		am65_cpsw_init_port_emac_ale(port);
->>
->> -- 
->> 2.34.1
->>
->>
-> 
-
--- 
-cheers,
--roger
+Joey
 
 
