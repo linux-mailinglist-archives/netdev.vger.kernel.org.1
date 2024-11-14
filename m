@@ -1,466 +1,170 @@
-Return-Path: <netdev+bounces-144757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B219C8622
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:29:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92AE59C861C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:28:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0BBF2881B8
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:29:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 171891F21AD5
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F201F77B8;
-	Thu, 14 Nov 2024 09:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="IVV641DI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC9A1E9092;
+	Thu, 14 Nov 2024 09:27:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from forward200b.mail.yandex.net (forward200b.mail.yandex.net [178.154.239.157])
+Received: from mail.enpas.org (zhong.enpas.org [46.38.239.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929121F76DD;
-	Thu, 14 Nov 2024 09:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C22E1F4FD0;
+	Thu, 14 Nov 2024 09:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.239.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731576476; cv=none; b=btAOcehmx8QIU5uGM3K16/tdBgOtS2dyxTtigBLQjIr0HGS12qF6gw2zfGH/+9CTUo4Ry8re+D4EkRW0EUE41ONhD/eIHDC9TM8QyeJWtG0ZH/XQaoc84MFIE0FzXLkycRGFOYkml68pa7r7y0Awr+VbQPiczNe9YvQ7IqdoHvo=
+	t=1731576452; cv=none; b=c3IlJ13HgJlW+5bgDN5nLAXYSZDclbGpGK3LVeJgQ9cYdxu0yyH35hthgkXJZsEYsI1QTfKiER+FGgaqvdjCb7FfhUKjW2e+E7ZxLRa1B6dLa/ZO3EU3LcVWn8ij96IHwx6vygMSRZXPcxW98cUPAnX/qdonZjtScz427NMimx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731576476; c=relaxed/simple;
-	bh=ZOXd1Ag2oLCE5FMCxMnATsVnbbZntplqIEthagwyayY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l+8z0c/nBxdxHBad9HwK15vwekhlkPqYKXtAJ9rs5O5rj9Z3XMEshEK+ne1VQtw37JvP2j8vQ4HZ/8vRSkaz0TPL7T7g7VtNmYaqL+iV81DLCJ5qa6oxvnm75zyVPNsm8T/w9poBW6OI1xU9PDUWJfGRvnlJ0rjfF0T6vntMQkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=IVV641DI; arc=none smtp.client-ip=178.154.239.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward100b.mail.yandex.net (forward100b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d100])
-	by forward200b.mail.yandex.net (Yandex) with ESMTPS id 498386CA9E;
-	Thu, 14 Nov 2024 12:19:45 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net [IPv6:2a02:6b8:c07:109:0:640:efe1:0])
-	by forward100b.mail.yandex.net (Yandex) with ESMTPS id A524E608DD;
-	Thu, 14 Nov 2024 12:19:36 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id WJIaiqbOkuQ0-d6x63VtN;
-	Thu, 14 Nov 2024 12:19:34 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1731575974; bh=8iyLn9ngCDtpXPTur4ieUhij29NlErsZKG9fkMxboMc=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=IVV641DILDYOZoGQqMof5A1cs0NvgLY/cPH74tm1HVQOGuH42CQfyNWVc0LOCtDs1
-	 ChBgzrq+GtVbyR4YGWlrKgxNBdGGT/kLYMt1rafMVSXLwlB4OHp/JNT7TIksdd9+M8
-	 YL4DFwXAt5tGGkJaBEX8/nwLMQZwyA8wpa2Xx1x4=
-Authentication-Results: mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Stas Sergeev <stsp2@yandex.ru>
-To: linux-kernel@vger.kernel.org
-Cc: Stas Sergeev <stsp2@yandex.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Willem de Bruijn <willemb@google.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Gabriel Krisman Bertazi <krisman@suse.de>,
-	Mina Almasry <almasrymina@google.com>,
-	Oleg Nesterov <oleg@redhat.com>,
-	Tycho Andersen <tandersen@netflix.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Gou Hao <gouhao@uniontech.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Michal Luczaj <mhal@rbox.co>,
-	Kees Cook <kees@kernel.org>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2] net/unix: pass pidfd flags via SCM_PIDFD cmsg
-Date: Thu, 14 Nov 2024 12:19:09 +0300
-Message-ID: <20241114091909.3552288-1-stsp2@yandex.ru>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1731576452; c=relaxed/simple;
+	bh=vcmNDMnHTCbsk7v+wIdqk7Q11DIafstDmw6Umqcbmks=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WNb2LLU8k3p8uBSIs6GiITDOG8LDagjfNRBua42Pj7tzf6ED0hJoq1A4hG+3fYdT2DX/tlkQTMxkctk478K2jEfUNH28qzph9p92PrOeXb7Z+S7c0M9DLLUDG5/W/8x11GWPqPJ5LU5Qd2bnc18TagmCZW3FkHf6N3Qpazkaq3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enpas.org; spf=pass smtp.mailfrom=enpas.org; arc=none smtp.client-ip=46.38.239.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enpas.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enpas.org
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by mail.enpas.org (Postfix) with ESMTPSA id 93ED0102EC3;
+	Thu, 14 Nov 2024 09:19:16 +0000 (UTC)
+Message-ID: <22e388b5-37a1-40a6-bb70-4784e29451ed@enpas.org>
+Date: Thu, 14 Nov 2024 18:19:12 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] can: can327: fix snprintf() limit in
+ can327_handle_prompt()
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
+From: Max Staudt <max@enpas.org>
+Autocrypt: addr=max@enpas.org; keydata=
+ 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
+ PsRBqTJGs7jw5gOWMMchFaemEnEJtg==
+In-Reply-To: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently SCM_PIDFD cmsg cannot be sent via unix socket
-(returns -EINVAL) and SO_PASSPIDFD doesn't support flags.
-The created pidfd always has flags set to 0.
+Hi Dan,
 
-This patch implements SCM_PIDFD cmsg in AF_UNIX socket, which
-can be used to send flags to SO_PASSPIDFD-enabled recipient.
+On 11/14/24 18:03, Dan Carpenter wrote:
+> This code is printing hex values to the &local_txbuf buffer and it's
+> using the snprintf() function to try prevent buffer overflows.  The
+> problem is that it's not passing the correct limit to the snprintf()
+> function so the limit doesn't do anything.  On each iteration we print
+> two digits so the remaining size should also decrease by two, but
+> instead it passes the sizeof() the entire buffer each time.
 
-Self-test is added for the propagation of PIDFD_NONBLOCK flag.
+D'oh, silly mistake. Thank you for finding it!
 
-This is mainly needed for the future extensions, like eg this one:
-https://lore.kernel.org/lkml/8288a08e-448b-43c2-82dc-59f87d0d9072@yandex.ru/T/#me1237e46deba8574b77834b7704e63559ffef9cb
-where it was suggested to try solving the supplementary groups
-problem with pidfd.
 
-Changes in v2: remove flags validation in scm_pidfd_recv(), as
-  suggested by Kuniyuki Iwashima <kuniyu@amazon.com>
+IMHO the correct fix isn't further counting and checking within the 
+snprintf loop. Instead, the buffer is correctly sized for a payload of 
+up to 8 bytes, and what we should do is to initially establish that 
+frame->len is indeed no larger than 8 bytes. So, something like
 
-Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+if (frame->len > 8) {
+	netdev_err(elm->dev, "The CAN stack handed us a frame with len > 8 
+bytes. Dropped packet.\n");
+}
 
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>
-CC: Simon Horman <horms@kernel.org>
-CC: Shuah Khan <shuah@kernel.org>
-CC: Christian Brauner <brauner@kernel.org>
-CC: Jens Axboe <axboe@kernel.dk>
-CC: Willem de Bruijn <willemb@google.com>
-CC: Pavel Begunkov <asml.silence@gmail.com>
-CC: Gabriel Krisman Bertazi <krisman@suse.de>
-CC: Mina Almasry <almasrymina@google.com>
-CC: Oleg Nesterov <oleg@redhat.com>
-CC: Tycho Andersen <tandersen@netflix.com>
-CC: Al Viro <viro@zeniv.linux.org.uk>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: Gou Hao <gouhao@uniontech.com>
-CC: Abhishek Chauhan <quic_abchauha@quicinc.com>
-CC: Michal Luczaj <mhal@rbox.co>
-CC: Kees Cook <kees@kernel.org>
-CC: Aleksa Sarai <cyphar@cyphar.com>
-CC: linux-kernel@vger.kernel.org
-CC: netdev@vger.kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- include/linux/pidfs.h                         |  9 +++
- include/linux/socket.h                        |  2 +-
- include/net/af_unix.h                         |  1 +
- include/net/scm.h                             |  3 +-
- kernel/pid.c                                  |  6 +-
- net/core/scm.c                                | 14 ++++
- net/core/sock.c                               |  1 +
- net/unix/af_unix.c                            |  3 +
- .../testing/selftests/net/af_unix/scm_pidfd.c | 70 +++++++++++++++++--
- 9 files changed, 99 insertions(+), 10 deletions(-)
+This check would go into can327_netdev_start_xmit(), and then a comment 
+at your current patch's location to remind of this. Also, snprintf() can 
+be simplified to sprintf(), since it is fully predictable in this case.
 
-diff --git a/include/linux/pidfs.h b/include/linux/pidfs.h
-index 75bdf9807802..c4c5c1a0c2ad 100644
---- a/include/linux/pidfs.h
-+++ b/include/linux/pidfs.h
-@@ -2,7 +2,16 @@
- #ifndef _LINUX_PID_FS_H
- #define _LINUX_PID_FS_H
- 
-+#include <uapi/linux/pidfd.h>
-+
- struct file *pidfs_alloc_file(struct pid *pid, unsigned int flags);
- void __init pidfs_init(void);
- 
-+static inline int pidfd_validate_flags(unsigned int flags)
-+{
-+	if (flags & ~(PIDFD_NONBLOCK | PIDFD_THREAD))
-+		return -EINVAL;
-+	return 0;
-+}
-+
- #endif /* _LINUX_PID_FS_H */
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index d18cc47e89bd..ee27d391e5aa 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -178,7 +178,7 @@ static inline size_t msg_data_left(struct msghdr *msg)
- #define	SCM_RIGHTS	0x01		/* rw: access rights (array of int) */
- #define SCM_CREDENTIALS 0x02		/* rw: struct ucred		*/
- #define SCM_SECURITY	0x03		/* rw: security label		*/
--#define SCM_PIDFD	0x04		/* ro: pidfd (int)		*/
-+#define SCM_PIDFD	0x04		/* r: pidfd, w: pidfd_flags (int) */
- 
- struct ucred {
- 	__u32	pid;
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 63129c79b8cb..4bc197548c2f 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -62,6 +62,7 @@ struct unix_skb_parms {
- #ifdef CONFIG_SECURITY_NETWORK
- 	u32			secid;		/* Security ID		*/
- #endif
-+	u32			pidfd_flags;
- 	u32			consumed;
- } __randomize_layout;
- 
-diff --git a/include/net/scm.h b/include/net/scm.h
-index 0d35c7c77a74..1326edcacacb 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -48,6 +48,7 @@ struct scm_cookie {
- #ifdef CONFIG_SECURITY_NETWORK
- 	u32			secid;		/* Passed security ID 	*/
- #endif
-+	u32			pidfd_flags;
- };
- 
- void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm);
-@@ -154,7 +155,7 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
- 	if (!scm->pid)
- 		return;
- 
--	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
-+	pidfd = pidfd_prepare(scm->pid, scm->pidfd_flags, &pidfd_file);
- 
- 	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
- 		if (pidfd_file) {
-diff --git a/kernel/pid.c b/kernel/pid.c
-index 2715afb77eab..b1100ae8ea63 100644
---- a/kernel/pid.c
-+++ b/kernel/pid.c
-@@ -629,10 +629,12 @@ static int pidfd_create(struct pid *pid, unsigned int flags)
- SYSCALL_DEFINE2(pidfd_open, pid_t, pid, unsigned int, flags)
- {
- 	int fd;
-+	int err;
- 	struct pid *p;
- 
--	if (flags & ~(PIDFD_NONBLOCK | PIDFD_THREAD))
--		return -EINVAL;
-+	err = pidfd_validate_flags(flags);
-+	if (err)
-+		return err;
- 
- 	if (pid <= 0)
- 		return -EINVAL;
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 4f6a14babe5a..3bcdecdacd7e 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -23,6 +23,7 @@
- #include <linux/security.h>
- #include <linux/pid_namespace.h>
- #include <linux/pid.h>
-+#include <linux/pidfs.h>
- #include <linux/nsproxy.h>
- #include <linux/slab.h>
- #include <linux/errqueue.h>
-@@ -210,6 +211,19 @@ int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
- 			p->creds.gid = gid;
- 			break;
- 		}
-+		case SCM_PIDFD:
-+		{
-+			unsigned int flags;
-+
-+			if (cmsg->cmsg_len != CMSG_LEN(sizeof(flags)))
-+				goto error;
-+			memcpy(&flags, CMSG_DATA(cmsg), sizeof(flags));
-+			err = pidfd_validate_flags(flags);
-+			if (err)
-+				goto error;
-+			p->pidfd_flags = flags;
-+			break;
-+		}
- 		default:
- 			goto error;
- 		}
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 039be95c40cf..d1fce437c035 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2930,6 +2930,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
- 	/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
- 	case SCM_RIGHTS:
- 	case SCM_CREDENTIALS:
-+	case SCM_PIDFD:
- 		break;
- 	default:
- 		return -EINVAL;
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 001ccc55ef0f..8b19dfec0221 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1892,6 +1892,7 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
- 	UNIXCB(skb).uid = scm->creds.uid;
- 	UNIXCB(skb).gid = scm->creds.gid;
- 	UNIXCB(skb).fp = NULL;
-+	UNIXCB(skb).pidfd_flags = scm->pidfd_flags;
- 	unix_get_secdata(scm, skb);
- 	if (scm->fp && send_fds)
- 		err = unix_attach_fds(scm, skb);
-@@ -2486,6 +2487,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
- 	memset(&scm, 0, sizeof(scm));
- 
- 	scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
-+	scm.pidfd_flags = UNIXCB(skb).pidfd_flags;
- 	unix_set_secdata(&scm, skb);
- 
- 	if (!(flags & MSG_PEEK)) {
-@@ -2873,6 +2875,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 			   test_bit(SOCK_PASSPIDFD, &sock->flags)) {
- 			/* Copy credentials */
- 			scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
-+			scm.pidfd_flags = UNIXCB(skb).pidfd_flags;
- 			unix_set_secdata(&scm, skb);
- 			check_creds = true;
- 		}
-diff --git a/tools/testing/selftests/net/af_unix/scm_pidfd.c b/tools/testing/selftests/net/af_unix/scm_pidfd.c
-index 7e534594167e..1e70ff253a1d 100644
---- a/tools/testing/selftests/net/af_unix/scm_pidfd.c
-+++ b/tools/testing/selftests/net/af_unix/scm_pidfd.c
-@@ -5,6 +5,7 @@
- #include <stddef.h>
- #include <stdio.h>
- #include <stdlib.h>
-+#include <fcntl.h>
- #include <sys/socket.h>
- #include <linux/socket.h>
- #include <unistd.h>
-@@ -15,6 +16,11 @@
- #include <sys/types.h>
- #include <sys/wait.h>
- 
-+/* There are problems including linux/pidfd.h, so define. */
-+#ifndef PIDFD_NONBLOCK
-+#define PIDFD_NONBLOCK  O_NONBLOCK
-+#endif
-+
- #include "../../kselftest_harness.h"
- 
- #define clean_errno() (errno == 0 ? "None" : strerror(errno))
-@@ -126,7 +132,7 @@ static pid_t get_pid_from_fdinfo_file(int pidfd, const char *key, size_t keylen)
- 	return result;
- }
- 
--static int cmsg_check(int fd)
-+static int cmsg_check(int fd, unsigned int pidfd_flags)
- {
- 	struct msghdr msg = { 0 };
- 	struct cmsghdr *cmsg;
-@@ -136,6 +142,7 @@ static int cmsg_check(int fd)
- 	char control[CMSG_SPACE(sizeof(struct ucred)) +
- 		     CMSG_SPACE(sizeof(int))] = { 0 };
- 	int *pidfd = NULL;
-+	unsigned int flags;
- 	pid_t parent_pid;
- 	int err;
- 
-@@ -197,6 +204,13 @@ static int cmsg_check(int fd)
- 		return 1;
- 	}
- 
-+	flags = fcntl(*pidfd, F_GETFL, 0);
-+	flags &= ~O_ACCMODE;
-+	if (flags != pidfd_flags) {
-+		log_err("SCM_PIDFD flags mismatch: %x != %x", flags, pidfd_flags);
-+		return 1;
-+	}
-+
- 	/* pidfd from SCM_PIDFD should point to the parent process PID */
- 	parent_pid =
- 		get_pid_from_fdinfo_file(*pidfd, "Pid:", sizeof("Pid:") - 1);
-@@ -227,30 +241,49 @@ FIXTURE_VARIANT(scm_pidfd)
- {
- 	int type;
- 	bool abstract;
-+	unsigned int flags;
- };
- 
- FIXTURE_VARIANT_ADD(scm_pidfd, stream_pathname)
- {
- 	.type = SOCK_STREAM,
- 	.abstract = 0,
-+	.flags = 0,
- };
- 
- FIXTURE_VARIANT_ADD(scm_pidfd, stream_abstract)
- {
- 	.type = SOCK_STREAM,
- 	.abstract = 1,
-+	.flags = 0,
- };
- 
- FIXTURE_VARIANT_ADD(scm_pidfd, dgram_pathname)
- {
- 	.type = SOCK_DGRAM,
- 	.abstract = 0,
-+	.flags = 0,
- };
- 
- FIXTURE_VARIANT_ADD(scm_pidfd, dgram_abstract)
- {
- 	.type = SOCK_DGRAM,
- 	.abstract = 1,
-+	.flags = 0,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_pidfd, stream_nonblock)
-+{
-+	.type = SOCK_STREAM,
-+	.abstract = 0,
-+	.flags = PIDFD_NONBLOCK,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_pidfd, dgram_nonblock)
-+{
-+	.type = SOCK_DGRAM,
-+	.abstract = 0,
-+	.flags = PIDFD_NONBLOCK,
- };
- 
- FIXTURE_SETUP(scm_pidfd)
-@@ -335,7 +368,7 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
- 
- 	close(self->startup_pipe[1]);
- 
--	if (cmsg_check(cfd)) {
-+	if (cmsg_check(cfd, variant->flags)) {
- 		log_err("cmsg_check failed");
- 		child_die();
- 	}
-@@ -375,6 +408,27 @@ TEST_F(scm_pidfd, test)
- 	int err;
- 	int pfd;
- 	int child_status = 0;
-+	char iobuf;
-+	unsigned int pidfd_flags;
-+	struct msghdr msg = { 0 };
-+	struct cmsghdr *cmsg;
-+	struct iovec io = {
-+		.iov_base = &iobuf,
-+		.iov_len = sizeof(iobuf)
-+	};
-+	union {
-+		char buf[CMSG_SPACE(sizeof(pidfd_flags))];
-+		struct cmsghdr align;
-+	} u;
-+
-+	msg.msg_iov = &io;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = u.buf;
-+	msg.msg_controllen = sizeof(u.buf);
-+	cmsg = CMSG_FIRSTHDR(&msg);
-+	cmsg->cmsg_level = SOL_SOCKET;
-+	cmsg->cmsg_type = SCM_PIDFD;
-+	cmsg->cmsg_len = CMSG_LEN(sizeof(pidfd_flags));
- 
- 	self->server = socket(AF_UNIX, variant->type, 0);
- 	ASSERT_NE(-1, self->server);
-@@ -414,12 +468,16 @@ TEST_F(scm_pidfd, test)
- 	close(self->startup_pipe[0]);
- 
- 	if (variant->type == SOCK_DGRAM) {
--		err = sendto(pfd, "x", sizeof(char), 0, (struct sockaddr *)&self->client_addr->listen_addr, self->client_addr->addrlen);
--		ASSERT_NE(-1, err);
--	} else {
--		err = send(pfd, "x", sizeof(char), 0);
-+		err = connect(pfd,
-+			      (struct sockaddr *)&self->client_addr->listen_addr,
-+			      self->client_addr->addrlen);
- 		ASSERT_NE(-1, err);
- 	}
-+	iobuf = 'x';
-+	pidfd_flags = variant->flags;
-+	memcpy(CMSG_DATA(cmsg), &pidfd_flags, sizeof(pidfd_flags));
-+	err = sendmsg(pfd, &msg, 0);
-+	ASSERT_NE(-1, err);
- 
- 	close(pfd);
- 	waitpid(self->client_pid, &child_status, 0);
--- 
-2.47.0
+
+It's also possible that the CAN stack already checks frame->len, in 
+which case I'd just add comments to can327. I haven't dug into the code 
+now - maybe the maintainers know?
+
+
+I can whip something up next week.
+
+
+Max
 
 
