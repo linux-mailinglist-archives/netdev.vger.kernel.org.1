@@ -1,205 +1,169 @@
-Return-Path: <netdev+bounces-144689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5FD9C82DA
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 06:59:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8561E9C82F2
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 07:08:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17D55B245DA
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 05:59:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08F421F22533
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 06:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4AC158DC4;
-	Thu, 14 Nov 2024 05:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7656615A848;
+	Thu, 14 Nov 2024 06:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hve1d7bO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RZ/AOa+M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DBF1E0E13
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 05:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53561E4B0
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 06:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731563941; cv=none; b=VBw7fC2AhMi2gdcAamKJxmu3alvKtWeO6P0eDa3syTEsY4fAT3WXZ9uZ/I2barCgbcVOGucREMaeUiK/72D2P/TN16qovg3wHucooAYXrm/OHBV3KvtlpuF6EK63yJVmdQPERc0NJaKCcF3VdMYUIAVrpqhTFFE/7v0XLH+1vdo=
+	t=1731564508; cv=none; b=TM+SRdc66uGdqGYqWzsblNSf42MnklNL0xP8Ddj7dfQSzfPqq+DB8N1w7gx/iF/Qdlh3YkQ+qmWRCWxh3jYAN6UEPiEoI/enRZZbu5Jz2nnnrcohQxx/0U+8kZnMycC2jqs/WO9AU44/RAzub+OoNhvzanLFpN6aJkC8UYUbUGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731563941; c=relaxed/simple;
-	bh=ZXr+TjIk+3TUAi31MB7jDf2GOibO2uww2OXknCfrPLk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nPh5hw36meSuP54P8P/2hBxA0ErCWjU4poYPfknD72f5HJyrErQgA5z8V5sQx5+8ulUkJnXGDaD+Jr3Khk5CkcnABV5hgCSj0DmY9fU5e0uBHI71tjM+nJTmwDBXVYbb+XuoWQJj8xq65gK9p7NYHOyHjiY++vePjBVtW5ENoRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hve1d7bO; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539e64ed090so1e87.1
-        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 21:58:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731563938; x=1732168738; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MVF4qoblAyYWJlGgMA5ludEFaL4HP1vW57d3cFH2t6A=;
-        b=hve1d7bOdeAv1hBEGxDzPDeWl1Lq6TtWfc84y2WI+8NEaCffvnFH3wEiBRZmd7Ztke
-         v6SK3nywkov6BXhYS9apEIc+74Van8QvtvNUSck4mBVUtPBSwNHRhp0WbPVIPD0/sLOX
-         phgqz/kWn+VKbrUY0gJaqn9nUX25YQE4m1j6oUYAbCGGKzWrHs7lHLBC5VXF4nfI0XCN
-         H2Rd89f2bWTqQds9eWdOBtkJjRxgtf8xQHcXltVPHj7g8C2bmEGQm1yaWWe+eQPLCjjM
-         HaZeUsZg7/h2jU2q5nc4n7jWu6bmW2yGQhWN4xtMVEV3ztmtEd/Kf9HjH34wGF8a3ro+
-         hH8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731563938; x=1732168738;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MVF4qoblAyYWJlGgMA5ludEFaL4HP1vW57d3cFH2t6A=;
-        b=vj1Jt7IMyojmdScVv9G0OHxgVA5YdX7kG+iAYVVJI/tr5OGhJb2m9dyXEnqODrYI95
-         7Xykih/Sp7x02iqYFQVeZwZsLQLs1dKLc2iez+IwnlXyOJPsTc0eMaxwJ2iiIYpd8r8F
-         6vESjTKVclRvsnJZejD3ktsFUZ+ELBez+JHDwP+P6reyJZg/6RLnHNhYOHQ5Cmb9Iftl
-         QspqvObZuVordAWTZmB68bICEOGwGj9DihLSNK0unaVAPRFdrtFBCFdGhkQ5J+sPafNT
-         +GDekcYaYR1gbK0clhJcB/bufTTbo4vasowTRawcIIzqO0h6qlofZUv0hRX5sQ4+4hfj
-         23qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJF6VeITp7420EprsvpFk9x3T6WHFdUOUdXn205QhXNwqXG2JgMAYs0OPQNb/xBL/zbYevsx4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcdDvYLq9WiIU4zvK8xFcFnOdIcd4d7dIbMzSGvMRh5pspIrnc
-	QbCv5t0d7EyLsLz++gUX9UX+O5dN/5lVTqTSMC0ALYc9kSXroHXHqHm9mbOoTUSwZQEXKaMpycV
-	lJgRXvoMP2AU7HSkN4a8ngRJPYotNQWWjgfPJ
-X-Gm-Gg: ASbGnctzJa8i/JzthwPlwhI1k6RAAqcHymMP5826gBXbdw7YjEezeWMESsbcHYCecUu
-	SDwrw9NWlk8CUEufLtOoyXwKu1OG03l67kmfvAjldwKZbJqikx36GKu/kpxVcrQ==
-X-Google-Smtp-Source: AGHT+IF5dXy6KjRfaBmYjnPPAJ34MqLgJMphKtAJin7WMYczm0KOqYHT3gTCgxPxs0rdu2CHFUdawDvhzlmCnVQZcZg=
-X-Received: by 2002:a05:6512:318a:b0:535:60b1:ffc2 with SMTP id
- 2adb3069b0e04-53da8675a80mr246e87.0.1731563936730; Wed, 13 Nov 2024 21:58:56
- -0800 (PST)
+	s=arc-20240116; t=1731564508; c=relaxed/simple;
+	bh=sE51thmAZ7MC5QN6bD4tLwEO0ESCXyPCFsyHxzm0V+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fQB2EgJiM1U6Y0kpCvVDqNOY0XF8aQxRx3Zv71pI4YHR3mML1ymHfcccXe2NEqqQLlN/s50XZ4F/fMJXzc4rIMBpP17RNDAFN/y/mZdBMEMHO0NVGtE4ZFkUGJCr1bDXg/2RpHXJ6nLq7L+zcIwT8B+LtC/zxtLvPQWWsyHOa+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RZ/AOa+M; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731564507; x=1763100507;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sE51thmAZ7MC5QN6bD4tLwEO0ESCXyPCFsyHxzm0V+I=;
+  b=RZ/AOa+MTA7NvAqrQ3p/xhG0yrqBtrq+sF+XK2Zu1fUfeZwnq7rhZzvm
+   3PiKG11tBOp4lk7VErS6D2xZ8SEXNo16WFC4g9XWdpB/TfLEhmCnoEjD2
+   aziKk5vmGohka7I3i5sEYd0C1JL33wxGcGfeDWYA7AKWF5uEWLzQk4aTP
+   ZLIJwNln7ufZvzmQx2H2kvY3AtWvuNnxeHnoz9OLkQti/4JtACo55JMGv
+   WMRbMY0uONNIVS5HesEZTAKWA45Ee5qzFCbePMybC6Xn+ChRdLrklIKUd
+   Qq7B5PYpXKdfhzcWWUI5P+sxMHrHO43jykSqUL1N+klMp5oYB8sOn9xCJ
+   g==;
+X-CSE-ConnectionGUID: ZyXKsfnOSPGqYAJZJXUPPQ==
+X-CSE-MsgGUID: jc5lzDRHTLajouZE8CEK8w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11255"; a="42103554"
+X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
+   d="scan'208";a="42103554"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 22:08:24 -0800
+X-CSE-ConnectionGUID: WPODl92zQeu3pSP3ApAtsg==
+X-CSE-MsgGUID: HHWep677Qc+DhUZLVUETEg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
+   d="scan'208";a="111408696"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2024 22:08:21 -0800
+Date: Thu, 14 Nov 2024 07:05:39 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Lukasz Czapnik <lukasz.czapnik@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, pmenzel@molgen.mpg.de,
+	wojciech.drewek@intel.com, marcin.szycik@intel.com,
+	netdev@vger.kernel.org, konrad.knitter@intel.com,
+	pawel.chmielewski@intel.com, horms@kernel.org,
+	David.Laight@aculab.com, nex.sw.ncis.nat.hpm.dev@intel.com,
+	pio.raczynski@gmail.com, sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com, jiri@resnulli.us,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [Intel-wired-lan] [iwl-next v7 5/9] ice, irdma: move interrupts
+ code to irdma
+Message-ID: <ZzWTMwo7hx8qRLnt@mev-dev.igk.intel.com>
+References: <20241104121337.129287-1-michal.swiatkowski@linux.intel.com>
+ <20241104121337.129287-6-michal.swiatkowski@linux.intel.com>
+ <5eca295e-1675-4779-b0d6-ec8a7550516f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241110081953.121682-1-yuyanghuang@google.com>
- <ZzMlvCA4e3YhYTPn@fedora> <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
- <CADXeF1HMvDnKNSNCh1ULsspC+gR+S0eTE40MRhA+OH16zJKM6A@mail.gmail.com>
- <ce2359c3-a6eb-4ef3-b2cf-321c5c282fab@lunn.ch> <CADXeF1FYoXTixLFFhESDkCo2HXG3JAzzdMCfkFrr2dqmRVQcWg@mail.gmail.com>
- <9fa93b71-cd81-44ce-b7cc-24b12be8cb24@lunn.ch>
-In-Reply-To: <9fa93b71-cd81-44ce-b7cc-24b12be8cb24@lunn.ch>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Thu, 14 Nov 2024 14:58:18 +0900
-Message-ID: <CADXeF1HQH=bhNWAtafUKD3-WoHhQEB-=TpwN9GdOOZ9PSaLktQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] netlink: add igmp join/leave notifications
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, 
-	jiri@resnulli.us, stephen@networkplumber.org, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5eca295e-1675-4779-b0d6-ec8a7550516f@intel.com>
 
-> So that probably leads to a NACK for these patches. If APF is your
-> target, and to me it seems unlikely APF will get accepted into
-> mainline, there is no need for these netlink changes. Hence a NACK.
+On Wed, Nov 13, 2024 at 05:21:20PM +0100, Lukasz Czapnik wrote:
+> 
+> 
+> On 11/4/2024 1:13 PM, Michal Swiatkowski wrote:
+> > Move responsibility of MSI-X requesting for RDMA feature from ice driver
+> > to irdma driver. It is done to allow simple fallback when there is not
+> > enough MSI-X available.
+> > 
+> > Change amount of MSI-X used for control from 4 to 1, as it isn't needed
+> > to have more than one MSI-X for this purpose.
+> > 
+> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> >   drivers/infiniband/hw/irdma/hw.c         |  2 -
+> >   drivers/infiniband/hw/irdma/main.c       | 46 ++++++++++++++++-
+> >   drivers/infiniband/hw/irdma/main.h       |  3 ++
+> >   drivers/net/ethernet/intel/ice/ice.h     |  1 -
+> >   drivers/net/ethernet/intel/ice/ice_idc.c | 64 ++++++------------------
+> >   drivers/net/ethernet/intel/ice/ice_irq.c |  3 +-
+> >   include/linux/net/intel/iidc.h           |  2 +
+> >   7 files changed, 65 insertions(+), 56 deletions(-)
+> > 
+> > diff --git a/drivers/infiniband/hw/irdma/hw.c b/drivers/infiniband/hw/irdma/hw.c
+> > index ad50b77282f8..69ce1862eabe 100644
+> > --- a/drivers/infiniband/hw/irdma/hw.c
+> > +++ b/drivers/infiniband/hw/irdma/hw.c
+> > @@ -498,8 +498,6 @@ static int irdma_save_msix_info(struct irdma_pci_f *rf)
+> >   	iw_qvlist->num_vectors = rf->msix_count;
+> >   	if (rf->msix_count <= num_online_cpus())
+> >   		rf->msix_shared = true;
+> > -	else if (rf->msix_count > num_online_cpus() + 1)
+> > -		rf->msix_count = num_online_cpus() + 1;
+> >   	pmsix = rf->msix_entries;
+> >   	for (i = 0, ceq_idx = 0; i < rf->msix_count; i++, iw_qvinfo++) {
+> > diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
+> > index 3f13200ff71b..1ee8969595d3 100644
+> > --- a/drivers/infiniband/hw/irdma/main.c
+> > +++ b/drivers/infiniband/hw/irdma/main.c
+> > @@ -206,6 +206,43 @@ static void irdma_lan_unregister_qset(struct irdma_sc_vsi *vsi,
+> >   		ibdev_dbg(&iwdev->ibdev, "WS: LAN free_res for rdma qset failed.\n");
+> >   }
+> > +static int irdma_init_interrupts(struct irdma_pci_f *rf, struct ice_pf *pf)
+> > +{
+> > +	int i;
+> > +
+> > +	rf->msix_count = num_online_cpus() + IRDMA_NUM_AEQ_MSIX;
+> 
+> I think we can default RDMA MSI-X to 64 instead of num_online_cpus(). It
+> would play better on platforms with high core count (200+ cores). There
+> are very little benefits for having more than 64 queues.
+> 
 
-> And this is probably your way in. Forget about APF when talking to
-> mainline.
+Sure,I can do that. Do we have some numbers to put it into commit
+message?
 
-Thanks for the advice. I'll remove the APF context from the commit
-message, as these patches should benefit mainline regardless of their
-APF use case.
+> In those special cases, when more queues are needed, user should be able
+> to manually assign more resources to RDMA.
 
-> Show these patches are useful in general. Explain the use
-> case of IGMP/MLD control in user space using existing APIs to control
-> the network stack and hardware.
+Do we have a way to do that? I mean, currently AFAIK this is the only place
+where RDMA is requesting MSI-X from ice. Driver can be reloaded to do it
+again (if didn't receive enough MSI-X and user change other config to
+free it for RDMA use case), but the max value is fixed here (to
+num_online_cpus() here, and to 64 after your suggestion).
 
-> Yes, this is going in correct direction to get these patches
-> merged. Focus on this. Solve these problems with ip monitor etc.  Once
-> merged you can then use it with the out of mainline APF.
+RDMA driver should be able to reinit MSI-X during working exactly the
+same way as eth is changing MSI-X amount when queues number is changing.
+This should be done in irdma driver. Hope someone will take care of that
+(if this is really needed, becase if 64 is always enough we are fine).
 
-I plan to include MLD modifications and rewrite the commit message as
-follows in patch v2.  I will also send the ip monitor patches in
-parallel.
-
-Please let me know if you have any further suggestions.
-
-```
-netlink: add IGMP/MLD join/leave notifications
-
-This change introduces netlink notifications for multicast address
-changes. The following features are included:
-* Addition and deletion of multicast addresses are reported using
-  RTM_NEWMULTICAST and RTM_DELMULTICAST messages with AF_INET and
-  AF_INET6.
-* Two new notification groups: RTNLGRP_IPV4_MCADDR and
-  RTNLGRP_IPV6_MCADDR are introduced for receiving these events.
-
-This change allows user space applications (e.g., ip monitor) to
-efficiently track multicast group memberships by listening for netlink
-events. Previously, applications relied on inefficient polling of
-procfs, introducing delays. With netlink notifications, applications
-receive realtime updates on multicast group membership changes,
-enabling more precise metrics collection and system monitoring.
-
-This change also empowers user space applications to manage multicast
-filters and IGMP/MLD offload rules using the same netlink notification
-mechanism. This allows applications to dynamically adjust rules and
-configurations via generic netlink communication with the Wi-Fi driver,
-offering greater flexibility and updatability compared to implementing
-all logic within the driver itself. This is a key consideration for some
-commercial devices.
-```
+In summary I will add:
+#define IRDMA_NUM_OPTIMAL_MSIX 64
+min(IRDMA_NUM_OPTIMAL_MSIX, num_online_cpus()) + IRDMA_NUM_AEQ_MSIX;
 
 Thanks,
-Yuyang
+Michal
 
-On Thu, Nov 14, 2024 at 6:06=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Wed, Nov 13, 2024 at 01:26:29PM +0900, Yuyang Huang wrote:
-> > >O.K. WiFi is not my area. But i'm more interested in uAPIs, and
-> > > ensuring you are not adding APIs which promote kernel bypass.
->
-> [Off list]
->
-> >
-> > WiFi chipset vendors must implement the Android WiFi HAL to install
-> > and read the APF program from WiFi firmware. The Android System Server
-> > will talk to vendor HAL service using the WiFi HAL. The datapath is:
-> > Network Stack process -> Android System Server -> vendor HAL service
-> > -> WiFi driver -> WiFi firmware. The Android WiFi HAL is specific to
-> > Android. The vendor HAL service, WiFi driver and WiFi firmware are all
-> > vendor proprietary software.  In other words, those API are not in
-> > mainline yet.
->
-> So that probably leads to a NACK for these patches. If APF is your
-> target, and to me it seems unlikely APF will get accepted into
-> mainline, there is no need for these netlink changes. Hence a NACK.
->
-> > >Do the new netlink message make sense without APF? Can i write a user
-> > >space IGMP snooping implementation and then call bridge mdb
-> > >add/del/replace?
-> >
-> > The RTM_NEWMULTICAST and RTM_DELMULTICAST events introduced in this
-> > patch enable user space implementation of IGMP/MLD offloading and
-> > IPv4/IPv6 multicast filtering. I have limited knowledge on how to
-> > implement IGMP snooping correctly so I don't know if they are
-> > sufficient.
-> >
-> > These two events have broader applications beyond APF.
->
-> And this is probably your way in. Forget about APF when talking to
-> mainline. Show these patches are useful in general. Explain the use
-> case of IGMP/MLD control in user space using existing APIs to control
-> the network stack and hardware.
->
-> > It might also make sense to consider whether to accept the proposed
-> > APIs from an API completeness perspective. The current netlink API for
-> > multicast addresses seems incomplete. While RTM_GETMULTICAST exists,
-> > it only supports IPv6, not IPv4. This limitation forces tools like 'ip
-> > maddr' to rely on parsing procfs instead of using netlink.
-> > Additionally, 'ip monitor' cannot track multicast address additions or
-> > removals. I feel it would make sense to have full netlink based
-> > dumping and event notification support for both IPv4/IPv6 multicast
-> > addresses as well.
->
-> Yes, this is going in correct direction to get these patches
-> merged. Focus on this. Solve these problems with ip monitor etc.  Once
-> merged you can then use it with the out of mainline APF.
->
->         Andrew
+> 
+> Regards,
+> Lukasz
+> 
 
