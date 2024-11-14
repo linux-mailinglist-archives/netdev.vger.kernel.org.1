@@ -1,137 +1,122 @@
-Return-Path: <netdev+bounces-144842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16D79C887E
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:10:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B25629C88DC
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:26:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 591B51F2523E
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:10:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7442FB2F481
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D731F81B1;
-	Thu, 14 Nov 2024 11:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871BB1F8F0C;
+	Thu, 14 Nov 2024 11:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ua63s7Ns"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aq+BYOoM"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441211F81A7;
-	Thu, 14 Nov 2024 11:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE421F8185
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731582612; cv=none; b=GP9CzTZQHkaNl3Gg90syb/ZBtPOnAez012CDqH4wYy1WekSfoPy46FXUcIZc5xMtDYzZB1erMLojqgxMv9nH8F135VSvgPpnBRh6hZzrDOKhS1qJCkX3WrcO7bW0q3wDT7ZJJdz4vrmvJtW62ncxEDCccnL5R9NHRJV9i+v4KNw=
+	t=1731582614; cv=none; b=bb0dgdftEs3SNg0i44a6sYhviL7mr1l+oeA6TRGytMnM5ge7gRD7cb0gjPhvsBhIalK44cfLsdZo6arECxgrKkm8CqrKnz05edMU6zNIViwgJYBLnrE0A87Pg2CZO0oYEW2dK8cTb0UhVns5jXQKNgoPDfm5jl0uBuV2Rm/dvWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731582612; c=relaxed/simple;
-	bh=tkzHrrJXOXS7vOUYq3tWDArhR/nWqxSRsKMsB3s0zw4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXoNVKXKvg9udUpcqiWK/RiEskFfcdjZ96f+J6gv3pB+MGBieyIuAEheIMvE9ckEGHaeQgkVOOCUXVSnaVN+nvoqsZpMkDycBxjNTwCEJUm5pIV1+yQhyhXr7qFSaeDK7+VKubd6swOt+Ms7nB/MxPWneItenItetc0qd0duWvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ua63s7Ns; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1731582610; x=1763118610;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tkzHrrJXOXS7vOUYq3tWDArhR/nWqxSRsKMsB3s0zw4=;
-  b=ua63s7NslMf4M2K98kN+TCvZjLAUb119+pcsp7o18ZPmEvowXy88W9uj
-   z0Hv7Izk5Hfr2RLQpE6/bvIXIPdhnXevawFMACSPJKyIU0QbFVlQo3tQa
-   YquAXZPSLoZ/9sg/wJFhta52z8W2JxF01ia/vZVinLOsKydtkQYKQNxUq
-   ZTj1cDIdMBXV6CBFyvPMXweXEzxWbyzAhjVOLQHCSTO20cncHYsuKJX3y
-   jDXktTZeaHSXpGsqemKzwJZnk5uVqdKY3SHD1BlBfp8EZ/7GT2gyczork
-   ex+R15BmnWrsMDYo9Kq7cBejuHqsBCwQzhbyzm5SvKMV3O20xhh7VKqvl
-   Q==;
-X-CSE-ConnectionGUID: p4ZQJMZoSBKRif35c8c9jg==
-X-CSE-MsgGUID: mfgf0lngSeqcO77umlAhyg==
-X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
-   d="scan'208";a="34308229"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Nov 2024 04:10:09 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Nov 2024 04:09:28 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 14 Nov 2024 04:09:28 -0700
-Date: Thu, 14 Nov 2024 12:07:45 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Rosen Penev <rosenp@gmail.com>
-CC: <netdev@vger.kernel.org>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
-	<mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach
-	<kurt@linutronix.de>, Vladimir Oltean <olteanv@gmail.com>, Chris Snook
-	<chris.snook@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, "Russell
- King" <linux@armlinux.org.uk>, "maintainer:MICROCHIP LAN966X ETHERNET DRIVER"
-	<UNGLinuxDriver@microchip.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, Niklas =?utf-8?Q?S=C3=B6derlund?=
-	<niklas.soderlund@ragnatech.se>, Doug Berger <opendmb@gmail.com>, "Florian
- Fainelli" <florian.fainelli@broadcom.com>, "Broadcom internal kernel review
- list" <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
-	<hkallweit1@gmail.com>, Richard Cochran <richardcochran@gmail.com>, "open
- list:MCAN MMIO DEVICE DRIVER" <linux-can@vger.kernel.org>, open list
-	<linux-kernel@vger.kernel.org>, "open list:RENESAS ETHERNET SWITCH DRIVER"
-	<linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCHv2 net-next] net: modernize ioremap in probe
-Message-ID: <20241114110745.h6luzb72zkahyr5j@DEN-DL-M31836.microchip.com>
-References: <20241111200212.5907-1-rosenp@gmail.com>
+	s=arc-20240116; t=1731582614; c=relaxed/simple;
+	bh=+PJN9W5TUF8ROvz+Dk38kDMAFGpGNYq535RDxbaJqkg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aoh7fPZagevLoFa2UkY2fopEy0S7eNGgPrjYWHNlLYdqS8oKuW+aQMX0QdDYrW7mjIAyBRmFcxNvDcIwPmkpVgDbRmIdzh7weLMKN0cC1aBmfZ3y0f6t3z2f7gFC4vVPF7tuex+SL4FtUeZD74HjTfvSNee8So+zTHO5CtY/WCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Aq+BYOoM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731582611;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sQSRWxbj4Jr6bem90b/I0QTuf7y4SyjrrPrHgroR4SM=;
+	b=Aq+BYOoMvBgvCe9CeWS33MxY9v0t/teSR0obVyRqq74rLaAF38V7pAYf/rmpuXPmyTldrp
+	JNA/Jajkpi+lTFsshkrkQ9krWzubNenXGzIruoPH+60tfI3zUKhAWHaNhelxbdPzzU5aYy
+	JxBH3eh1wXW+LcRCfTZurKShsulSxOk=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-169-9UUg2b39MYWzW2R9BXIywA-1; Thu, 14 Nov 2024 06:10:10 -0500
+X-MC-Unique: 9UUg2b39MYWzW2R9BXIywA-1
+X-Mimecast-MFC-AGG-ID: 9UUg2b39MYWzW2R9BXIywA
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-460b71eb996so6299461cf.3
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 03:10:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731582610; x=1732187410;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sQSRWxbj4Jr6bem90b/I0QTuf7y4SyjrrPrHgroR4SM=;
+        b=WC3fAmFi4NJCMV5s0C8d2PkCgNyi3ty3hqUcIGg92Z1zbSzpFb69X2MJHVKXBWCDVa
+         WMZtve377DRAmVUmna+iUUzG0zc3b/uB8pCmo1JxirN7Ng5jY8opwtbWFVG/sMUVX457
+         6bG6AJc6VfyyiN0XShDU44wazWripnVrzYPCEhcPu2qqdnvqpwJxgy3Yg9jzGdvj3qsc
+         Ivf+dlCY+UvepxleM0azAYs+3hTYYqSo1NBh0FB12m7gzbna86b8+FHtNSB/hCYss48d
+         1ePNkMyob/4D2NVw2ZEjJdAM+zpldU9fNjG1y2/aNXoXi0106LHLXGsQOZmUFiUFvXrE
+         GzbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1LTdGrwv3gha0XbFBi05QbWEV/HDNg/iWrX3Q8At++QlbjToKCkCbJZYaPEbQ2Cwer1tqEkA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3HDQUoyWt8MHd6mpU9VsLC15S6X+kALRLoJYgaAYp6nR3q9LO
+	SXBlruDD1my8+Viw+l4+GG+BE4acG3iyUki/hGtikcDTdnLV8kk7EsOU8drcKnUZyd6xT5d+HXQ
+	PhNgTpn1ALozMndvChocSDcKVPvN6CV4kUc2s1T/a3vBwzLBcDLSnUA==
+X-Received: by 2002:ac8:5dc6:0:b0:458:4129:1135 with SMTP id d75a77b69052e-4630930660fmr341014361cf.9.1731582609956;
+        Thu, 14 Nov 2024 03:10:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7F+M/vbAnAssFq0op9LX2J4MXfyIul3bpH8Mbu3LUHXaUTQtWRodj5XOTZ0rPlg9LI4bX1w==
+X-Received: by 2002:ac8:5dc6:0:b0:458:4129:1135 with SMTP id d75a77b69052e-4630930660fmr341014071cf.9.1731582609592;
+        Thu, 14 Nov 2024 03:10:09 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635a9e97f4sm4224781cf.22.2024.11.14.03.10.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 03:10:08 -0800 (PST)
+Message-ID: <ff1c1622-a57c-471e-b41f-8fb4cb2f233d@redhat.com>
+Date: Thu, 14 Nov 2024 12:10:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20241111200212.5907-1-rosenp@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] netfilter: ipset: add missing range check in
+ bitmap_ip_uadt
+To: Jeongjun Park <aha310510@gmail.com>, pablo@netfilter.org,
+ kadlec@netfilter.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, kaber@trash.net, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
+References: <20241113130209.22376-1-aha310510@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241113130209.22376-1-aha310510@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The 11/11/2024 12:02, Rosen Penev wrote:
-
-Hi Rosen,
-
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> index 3234a960fcc3..375e9a68b9a9 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-> @@ -77,20 +77,12 @@ static int lan966x_create_targets(struct platform_device *pdev,
->          * this.
->          */
->         for (idx = 0; idx < IO_RANGES; idx++) {
-> -               iores[idx] = platform_get_resource(pdev, IORESOURCE_MEM,
-> -                                                  idx);
-> -               if (!iores[idx]) {
-> -                       dev_err(&pdev->dev, "Invalid resource\n");
-> -                       return -EINVAL;
-> -               }
-> -
-> -               begin[idx] = devm_ioremap(&pdev->dev,
-> -                                         iores[idx]->start,
-> -                                         resource_size(iores[idx]));
-> -               if (!begin[idx]) {
-> +               begin[idx] = devm_platform_get_and_ioremap_resource(
-> +                       pdev, idx, &iores[idx]);
-> +               if (IS_ERR(begin[idx])) {
->                         dev_err(&pdev->dev, "Unable to get registers: %s\n",
->                                 iores[idx]->name);
-> -                       return -ENOMEM;
-> +                       return PTR_ERR(begin[idx]);
->                 }
->         }
+On 11/13/24 14:02, Jeongjun Park wrote:
+> When tb[IPSET_ATTR_IP_TO] is not present but tb[IPSET_ATTR_CIDR] exists,
+> the values of ip and ip_to are slightly swapped. Therefore, the range check
+> for ip should be done later, but this part is missing and it seems that the
+> vulnerability occurs.
 > 
+> So we should add missing range checks and remove unnecessary range checks.
+> 
+> Cc: <stable@vger.kernel.org>
+> Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
+> Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 
-Unfortunately, this breaks the lan966x probe. With this change I get the
-following errors:
-[    1.705315] lan966x-switch e0000000.switch: can't request region for resource [mem 0xe0000000-0xe00fffff]
-[    1.714911] lan966x-switch e0000000.switch: Unable to get registers: cpu
-[    1.721607] lan966x-switch e0000000.switch: error -EBUSY: Failed to create targets
-[    1.729173] lan966x-switch: probe of e0000000.switch failed with error -16
+@Pablo, @Jozsef: despite the subj prefix, I guess this should go via
+your tree. Please LMK if you prefer otherwise.
 
--- 
-/Horatiu
+Cheers,
+
+Paolo
+
 
