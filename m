@@ -1,96 +1,78 @@
-Return-Path: <netdev+bounces-144806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7B69C87EB
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:43:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E7A9C880C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:50:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B25FB31662
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:21:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0985B300A0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C301F943D;
-	Thu, 14 Nov 2024 10:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHRbrM4t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147DD1F9EB8;
+	Thu, 14 Nov 2024 10:11:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.enpas.org (zhong.enpas.org [46.38.239.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701731F9402;
-	Thu, 14 Nov 2024 10:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14ED1F7566;
+	Thu, 14 Nov 2024 10:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.239.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731579020; cv=none; b=hjbKE8UDXB6DFoEz+b05G4zj1e4QJJdOcwNrbiFIjKNNk8Knkh6M9s/S61k0+vTLbK2yFeOM4hfsuNJZ3xilxTe/mlemKIiMQSSOq/eaU/m2ZklINxRTubQqOuBKOjmojCe6AVr299uNLoFOuDdu6/Y3nIn+rzOej4zIajqxULc=
+	t=1731579096; cv=none; b=kDzo3mkMgsfv/aanLEEY8SpU5SwFZM7bcDd6SMvi5JhLU0thM8j0qNEMx/9SSZrf8KefUgA1d3+fV9OQ8AdvUGjvbLs1WvTFaZRjN/oRO7r7EQQn7ZGjSfRXtxTqdEr4IHqG5AGkhNN06nligIj5w2FqV68dBPWZY66FRSJMboY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731579020; c=relaxed/simple;
-	bh=zIXoVPuLxS46P+2i3Z4nmPDd0XPDfcNwgdZycvncv+w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P767SUP+nDyGxea9Xvfk4Zc2AXnzKh0ho5fddXwZqmFryf7FUrs6EU6djMhOvcIzmYjQYQEEyVe1YWmR74pVqjGKfRCsLz3EPWtaQv+YWgL4UEuWRHH639uIuSMgbnMLY2HoSUFVw4VXI0kh1qcvxml9lY6Yxa+ZoOZJdW9n6HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHRbrM4t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFFC3C4CECD;
-	Thu, 14 Nov 2024 10:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731579018;
-	bh=zIXoVPuLxS46P+2i3Z4nmPDd0XPDfcNwgdZycvncv+w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CHRbrM4tcguZd7l9uc7J+VttnK1I2vUOgOSwFNF7UCmjXoTOe/7CyDW0H7jFHGHDG
-	 saGQ7gTZU3zDTlbumMOmQ7Z6mMZdnFN6y763tekJ9zeSRt0dZOEFV79pKwAatLLO+F
-	 /4lipHoacF3cjwrTDqcoH/yhC8WfEZcWbY3hFb85v+8a5kroRlJeCJVbu8tqpZNSKh
-	 PUCPoaxztlV0h86DbTcvLneQuS44bF4hZMdyfVRHMqAUf/WvWZqi7wzvE3hE/xUDE2
-	 ZXgG95CC2JDgX5TBSB6f29t8C9UkYjnHnuaLeUYJuVq0Xk/Z+pGBFSKuEEzxRUU0/g
-	 VF/fsw00+lVCw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDEC3809A80;
-	Thu, 14 Nov 2024 10:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1731579096; c=relaxed/simple;
+	bh=FHPBzkgdhJV+bYh6cr4lkdhdgn6MMB3utmf3P0DVUKU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Em7JCu5ESVNKzHQ94iILlnZ0Kho273j/VTb5J5SUSErXlbRkuPXDG19I+8k9UOSZBTkhVm8IEIX/Ktpv3ePxLBHPeGQVdOxvC7F0C4QaM6JfDmSjIDyscRN0bnZ84fgtHd/G0g5+FIUUCiWe/06XaZmfd8GyWP3PJ9M0kyrWO+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enpas.org; spf=pass smtp.mailfrom=enpas.org; arc=none smtp.client-ip=46.38.239.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enpas.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enpas.org
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by mail.enpas.org (Postfix) with ESMTPSA id 3355B102EC3;
+	Thu, 14 Nov 2024 10:11:27 +0000 (UTC)
+Message-ID: <26302002-0b96-49c1-bee4-648aa18ae7fb@enpas.org>
+Date: Thu, 14 Nov 2024 19:11:25 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5] net: ti: icssg-prueth: Fix 1 PPS sync
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173157902851.1866232.9016016024902028479.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Nov 2024 10:10:28 +0000
-References: <20241111095842.478833-1-m-malladi@ti.com>
-In-Reply-To: <20241111095842.478833-1-m-malladi@ti.com>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: vigneshr@ti.com, horms@kernel.org, jan.kiszka@siemens.com,
- diogo.ivo@siemens.com, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, rogerq@kernel.org,
- danishanwar@ti.com, vadim.fedorenko@linux.dev
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] can: can327: fix snprintf() limit in
+ can327_handle_prompt()
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
+ <22e388b5-37a1-40a6-bb70-4784e29451ed@enpas.org>
+ <1f9f5994-8143-43a2-9abf-362eec6a70f7@stanley.mountain>
+ <033f74e6-2706-439a-9c02-158df11a3192@stanley.mountain>
+From: Max Staudt <max@enpas.org>
+In-Reply-To: <033f74e6-2706-439a-9c02-158df11a3192@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 11/14/24 18:29, Dan Carpenter wrote:
+> To be honest, I was afraid that someone was going to suggest using on of the
+> helper functions that dumps hex.  (I don't remember then names of them so that's
+> why I didn't do that).
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+If you can think of a neat, clearer replacement for sprintf() in this 
+case, that'd be nice. I guess I didn't find one at the time when I wrote 
+the driver (or I didn't look hard enough).
 
-On Mon, 11 Nov 2024 15:28:42 +0530 you wrote:
-> The first PPS latch time needs to be calculated by the driver
-> (in rounded off seconds) and configured as the start time
-> offset for the cycle. After synchronizing two PTP clocks
-> running as master/slave, missing this would cause master
-> and slave to start immediately with some milliseconds
-> drift which causes the PPS signal to never synchronize with
-> the PTP master.
-> 
-> [...]
+Suggestions welcome!
 
-Here is the summary with links:
-  - [net,v5] net: ti: icssg-prueth: Fix 1 PPS sync
-    https://git.kernel.org/netdev/net/c/dc065076ee77
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Max
 
 
