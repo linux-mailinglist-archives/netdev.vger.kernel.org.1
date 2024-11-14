@@ -1,201 +1,158 @@
-Return-Path: <netdev+bounces-144818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E1E9C87AD
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:35:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 271E29C87B0
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:36:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAED1281DFD
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:35:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB3711F21FCE
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8521F9A81;
-	Thu, 14 Nov 2024 10:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8078F1F757C;
+	Thu, 14 Nov 2024 10:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="MBQFC/GF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="heuJwUlB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143881F9430
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556CE18BC05
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731580335; cv=none; b=oKhMQcTtKeaw8Ue5pOczrSESmWfe0I2tbFSuz5+APBRnJ7pwSFsgdOy4IZBhNlLoCcg6DfuGD5ORCLRa2G5+KBjdG5ck3361tXX+v4Ql/JyJgWrM7yX6UXv7oYVubdBpk1eTiJJqwEZO0BzGuhiEwr3w3eCfbB2unV2PBXfXqSY=
+	t=1731580415; cv=none; b=d9tfYUVnNJPEN4davql/jo6LqJx1RHOjP9Tua+7agI9MrVwf5G16rVsclOpwbDspS+LhsSge4VXkCEBFyak2EF2OR/GXViYAzR1i8vC8LrE9BF+uAURYeo0qnQtGbfVzZV2js1fiQyOwx5pYk21gWEeGfU2QFy64vWH/0cvEpyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731580335; c=relaxed/simple;
-	bh=DTeHUQizHgGM0F2W5Jcw8OsYgIMucRypUAcng0CuKAc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r9x86OIde2IwyccMOmGqOt0gnBstAbyL931PNfhdJrEK8DdFA2nEojD3k/LJ2YUoJGfXDF7m+2dcbTeqIJC9Y3Tb5PfyFoYH6bEN02GYIAJUIdQiB5nIdlz7Sz0+JC1TfHv2UsA/WDTOJqdWqTDdJXi6mTbOGfrV6KpbzXywqNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=MBQFC/GF; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-53da353eb2eso759501e87.3
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 02:32:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1731580331; x=1732185131; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=a0d1qrLF27Vwr69NZjn0r/8jpEAVBzVx/HFYFyUQblQ=;
-        b=MBQFC/GFVIH0ZourwRmIFWGPAg5BgmrNQK74vIPy6WMfuSCvDgR/Zr5aZEGc9JJcjV
-         57BH4RJLiZzuZ6n0BzJxRAcyDwcN5kL+/9Tfwk0XzQ7luPBapfEfd+DoFOLU0EDNldKy
-         oowtcCfIzsjLAP3m7C0fhcCXzBMfe8jKfUNRrotxUj2rStPQZVHB2Vzjy3T28tphxL5x
-         47XoK3rUt0JQibNEMVko/CGigM3VDg+49xfKQK2UkuFpvb3wyrtWWzxD5MKe7NyMRS5s
-         W7TLVzizhSj1K9sxgRqHNtstdg5mI4YTSC0xiLwPdapL1MtGvNLmBrLsBgnARrWUgcCX
-         Tt6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731580331; x=1732185131;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a0d1qrLF27Vwr69NZjn0r/8jpEAVBzVx/HFYFyUQblQ=;
-        b=LTu9Yon9QwWR/z0NB1g+xNMvWlklCPjWB/KF+NVJcwVfy/URlyY3IZJeRM3U+DEK6X
-         /mvfhFW6XcLkK3r4I0rYJWHNO7sRNbQqrvDAmj9stkJcqhSo70BUWsh0w43WGkUMd68/
-         NbNO5m8JzDiPURFv8UKXXWSOfylt8tJLVDHx3YP2UeKO4g81p/0j4wnA7C/jBBncgvST
-         4AP5jGeQ9NQA3NE/3XE/lZa7zwhUEXsldbjS0AkaEq8cHjg6QON+lnmXL2ws6D0vVbWX
-         jP907LziHvKsuH1zGgEUOsXPxJGDFw/41jvxWRF2QHDYAzdUtI+nUX662Ze+z8buEKSt
-         WCQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVoZU9tRDBq33eZyWlZERpFule1uplSdHH2YGJOpePakWehQQtbp1qoQBKDIp/pknWCGIb9F9A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRUC/pwa9NuQ7qHiniUv4bIJKz7HmInnUeFQ8JUNwBkVKprzxJ
-	YnynfR1R4N8RTJZYAUiYrrn6WHYpKQ5FAEPG0FsJFEFOwmcEGDWXm6nkjYpkYaY=
-X-Google-Smtp-Source: AGHT+IHd3oX3ni8cKLi44zCwkXhxdVFX9wScw/eOu0QOo7ZH+CwIThCw+6H/EIMe9KjR6h1HuTbOxw==
-X-Received: by 2002:a05:6512:3b82:b0:539:936c:9845 with SMTP id 2adb3069b0e04-53da5c7b691mr1371068e87.37.1731580331106;
-        Thu, 14 Nov 2024 02:32:11 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:3779:22d5:a322:7c13? ([2001:67c:2fbc:1:3779:22d5:a322:7c13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df51632sm47447466b.49.2024.11.14.02.32.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 02:32:10 -0800 (PST)
-Message-ID: <5ae6f624-5196-42f7-a0b8-85e2847b3fdf@openvpn.net>
-Date: Thu, 14 Nov 2024 11:32:36 +0100
+	s=arc-20240116; t=1731580415; c=relaxed/simple;
+	bh=Rba7beCswNATD6GrjVDhrp8F280yBr1PGNRiygXuC6s=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=UBCXEICQ8ww1/E/zullG3+q+gl6WEHfMOPKWyYtExDl41J5/7wKvhanI7aCyGxk4H9x2H8K7C3pkCjwMPQziiWS9TSmUB6KibrtbRM9445+kJ3bYh4hUAXXSJCc4jy9jfHMsDleEseR9UZp9g68nZYdCt65g9uj3FXVA+KsF6SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=heuJwUlB; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=X1wxBL/Q1nMBB0WHkDAvSftBdcekIJh06T78jB7Q/Q0=; b=heuJwUlB7F7gDn3oSws3lccoXk
+	rmk0lQrq6v2hag4Di5FmeHR2pDJbiEsKpmA8D4CGPvG2VyOTcGDr2gkHxurPXzgflsPBZGLiYfuKg
+	/b83kJJyfL7cyf+ETSUCL4nqFUjTMp/MLP2gu0LezuN8+06kULOyDLbOYLdHsgIMgpxGox2CT4IqP
+	6hQjlb8V+Dg75sc+EvEv3qc3PndLj5saJs/yOFdb5rSnM07t4o3pl8f+72/ICheY4g+PtPUYTdfQJ
+	PnwOEvfE8qWkcsnjX3WBu6kzk+taWVNYFXWa0qE71N7sJH1L5tnvOQAIlCb5yKK99HS/36TT2Cmny
+	AvDta0IA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55396 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tBXAE-0007qg-2Y;
+	Thu, 14 Nov 2024 10:33:27 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tBXAF-00341F-EQ; Thu, 14 Nov 2024 10:33:27 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] net: phy: fix phylib's dual eee_enabled
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 18/23] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net> <ZzIlxRbic7qLVD4F@hog>
- <136282ad-77d9-4799-bd2d-f3c3c9df99c0@openvpn.net> <ZzSH-Ke4wuJcis0q@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <ZzSH-Ke4wuJcis0q@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 14 Nov 2024 10:33:27 +0000
 
-On 13/11/2024 12:05, Sabrina Dubroca wrote:
-> 2024-11-12, 15:26:59 +0100, Antonio Quartulli wrote:
->> On 11/11/2024 16:41, Sabrina Dubroca wrote:
->>> 2024-10-29, 11:47:31 +0100, Antonio Quartulli wrote:
->>>> +void ovpn_peer_hash_vpn_ip(struct ovpn_peer *peer)
->>>> +	__must_hold(&peer->ovpn->peers->lock)
->>>
->>> Changes to peer->vpn_addrs are not protected by peers->lock, so those
->>> could be getting updated while we're rehashing (and taking peer->lock
->>> in ovpn_nl_peer_modify as I'm suggesting above also wouldn't prevent
->>> that).
->>>
->>
->> /me screams :-D
-> 
-> Sorry :)
-> 
->> Indeed peers->lock is only about protecting the lists, not the content of
->> the listed objects.
->>
->> How about acquiring the peers->lock before calling ovpn_nl_peer_modify()?
-> 
-> It seems like it would work. Maybe a bit weird to have conditional
-> locking (MP mode only), but ok. You already have this lock ordering
-> (hold peers->lock before taking peer->lock) in
-> ovpn_peer_keepalive_work_mp, so there should be no deadlock from doing
-> the same thing in the netlink code.
+phylib has two eee_enabled members. Some parts of the code are using
+phydev->eee_enabled, other parts are using phydev->eee_cfg.eee_enabled.
+This leads to incorrect behaviour as their state goes out of sync.
+ethtool --show-eee shows incorrect information, and --set-eee sometimes
+doesn't take effect.
 
-Yeah.
+Fix this by only having one eee_enabled member - that in eee_cfg.
 
-> 
-> Then I would also do that in ovpn_peer_float to protect that rehash.
+Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy-c45.c    | 4 +---
+ drivers/net/phy/phy_device.c | 4 ++--
+ include/linux/phy.h          | 2 --
+ 3 files changed, 3 insertions(+), 7 deletions(-)
 
-I am not extremely comfortable with this, because it means acquiring 
-peers->lock on every packet (right now we do so only on peer->lock) and 
-it may defeat the advantage of the RCU locking on the hashtables.
-Wouldn't you agree?
-
-An alternative would be to hold peer->lock for the entire function, but 
-this will lead to dead locks...no go either.
-
-> 
-> It feels like peers->lock is turning into a duplicate of
-> ovpn->lock. ovpn->lock used for P2P mode, peers->lock used
-> equivalently for MP mode. You might consider merging them (but I
-> wouldn't see it as necessary for merging the series unless there's a
-> locking issue with the current proposal).
-
-I agree: ovpn->lock was introduced to protect ovpn's fields, but 
-actually the only one e protect is peer.
-
-They are truly the same and I could therefore get rid of 
-ovpn->peers->lock and always use ovpn->lock.
-
-Will see how invasive this is and decide whether to commit it to v12 or not.
-
-Thanks!
-
-Regards,
-
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 5695935fdce9..ac987e5e82dc 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -942,7 +942,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_read_eee_abilities);
+  */
+ int genphy_c45_an_config_eee_aneg(struct phy_device *phydev)
+ {
+-	if (!phydev->eee_enabled) {
++	if (!phydev->eee_cfg.eee_enabled) {
+ 		__ETHTOOL_DECLARE_LINK_MODE_MASK(adv) = {};
+ 
+ 		return genphy_c45_write_eee_adv(phydev, adv);
+@@ -1575,8 +1575,6 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
+ 		linkmode_copy(phydev->advertising_eee, adv);
+ 	}
+ 
+-	phydev->eee_enabled = data->eee_enabled;
+-
+ 	ret = genphy_c45_an_config_eee_aneg(phydev);
+ 	if (ret > 0) {
+ 		ret = phy_restart_aneg(phydev);
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 499797646580..5dfa2aa53c90 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3595,12 +3595,12 @@ static int phy_probe(struct device *dev)
+ 	/* There is no "enabled" flag. If PHY is advertising, assume it is
+ 	 * kind of enabled.
+ 	 */
+-	phydev->eee_enabled = !linkmode_empty(phydev->advertising_eee);
++	phydev->eee_cfg.eee_enabled = !linkmode_empty(phydev->advertising_eee);
+ 
+ 	/* Some PHYs may advertise, by default, not support EEE modes. So,
+ 	 * we need to clean them.
+ 	 */
+-	if (phydev->eee_enabled)
++	if (phydev->eee_cfg.eee_enabled)
+ 		linkmode_and(phydev->advertising_eee, phydev->supported_eee,
+ 			     phydev->advertising_eee);
+ 
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index a98bc91a0cde..44890cdf40a2 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -601,7 +601,6 @@ struct macsec_ops;
+  * @adv_old: Saved advertised while power saving for WoL
+  * @supported_eee: supported PHY EEE linkmodes
+  * @advertising_eee: Currently advertised EEE linkmodes
+- * @eee_enabled: Flag indicating whether the EEE feature is enabled
+  * @enable_tx_lpi: When True, MAC should transmit LPI to PHY
+  * @eee_cfg: User configuration of EEE
+  * @lp_advertising: Current link partner advertised linkmodes
+@@ -721,7 +720,6 @@ struct phy_device {
+ 	/* used for eee validation and configuration*/
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported_eee);
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising_eee);
+-	bool eee_enabled;
+ 
+ 	/* Host supported PHY interface types. Should be ignored if empty. */
+ 	DECLARE_PHY_INTERFACE_MASK(host_interfaces);
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.30.2
 
 
