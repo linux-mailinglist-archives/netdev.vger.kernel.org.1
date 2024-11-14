@@ -1,416 +1,340 @@
-Return-Path: <netdev+bounces-145383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6889CF527
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:43:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF149D0235
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 07:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D46FB1F23270
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 19:43:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E123F1F22B91
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 06:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC771E231D;
-	Fri, 15 Nov 2024 19:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EF417BA0;
+	Sun, 17 Nov 2024 06:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R4z6QA1c"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lT72qxyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2059.outbound.protection.outlook.com [40.107.237.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5F51D79B6
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 19:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731699741; cv=none; b=aOm81hDN3kp/Z4RdE/CD8sdYWyRqHHDX/C3gZyl7V/OpGsOyYtTSROik8uty8l4RxKmhP84xeVlumM+ict9e7TwWEkHsyoJj/DxXb4vE4+zQe6/+40P5EHmKypnuwz8vyaq97V1RVO/yxoqb1Pm7DuBLU+NZWetLMK73Ns/YXbs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731699741; c=relaxed/simple;
-	bh=Qe1UbVPSxT4zLIBeZHK8caqZXk9w6alxg4UqAxLQdbM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Hg4NNyUvNbGFVoWQysdtBZpShbFLaVxWYKguUaLFfRKzmSUj9G49Zi2p9DJWrQVT8Iz6+AwVO1ktzZi4pKYMl/sUtUbxwc6xXoFJlWGuxJ8ohFIQfLS56f8mFg9Rb98NTPx35l/nEHWML8qT/xjc4B34rI9w6xe/AV6Q8tHNVXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R4z6QA1c; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731699739; x=1763235739;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Qe1UbVPSxT4zLIBeZHK8caqZXk9w6alxg4UqAxLQdbM=;
-  b=R4z6QA1cguKQ1Nvv74G3dz7KbWE9ACsbc8qYFc6JGGO1vgYgE/jZ9aW4
-   Vpx9x4LFTfq9tPsuzsSdtW2i0QK1wRd9dr8d5/BG1qAHVZh+TjII9ruBv
-   bevPiWaS1eD4FwGmj2BFHVonn71w/LLP/m4iWuNKI6gHlzx/Q4U7hreP8
-   CGYvlmEnymeVq7vOoiQ8kyRdXie9pA4V/KZP0kTqHUsu3BAdRAY8C0tMj
-   RrOXM6qnl9VxCjnGQqMC75PqBNHTMyZkK0qH0E2+oukaUJ+qW3YMNDPDs
-   Wpl4S2aAy1B8BiHgbetOvNpQzx5LRPO3VV5444uvIMX5yxbO0XB9Ko3bu
-   A==;
-X-CSE-ConnectionGUID: ZORJ5NzcT7GaiooDIe96iA==
-X-CSE-MsgGUID: 8WKy5lViRhCYKiNsmC42sw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11257"; a="31824184"
-X-IronPort-AV: E=Sophos;i="6.12,157,1728975600"; 
-   d="scan'208";a="31824184"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 11:42:19 -0800
-X-CSE-ConnectionGUID: zbS9nTs+RN27/Rlp0yLcAQ==
-X-CSE-MsgGUID: PGKGVPRXSpSz7ImlFzl/yA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,157,1728975600"; 
-   d="scan'208";a="93098215"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by fmviesa005.fm.intel.com with ESMTP; 15 Nov 2024 11:42:17 -0800
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Jan Sokolowski <jan.sokolowski@intel.com>,
-	Padraig J Connolly <padraig.j.connolly@intel.com>
-Subject: [PATCH iwl-next v5] i40e: add ability to reset VF for Tx and Rx MDD events
-Date: Fri, 15 Nov 2024 20:42:16 +0100
-Message-Id: <20241115194216.2718660-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676FE33E1
+	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 06:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731824555; cv=fail; b=Iwj+9XRrCJDIXzp/ewC3hzhsmquqKn7JHfgvi/czYuZFnAccHvJ1kpe9UJvDPBv7swkgrsThiI6Hl03l3ap6h0DK1oZOrG22X92xMtVo8oBKbmrmJt4cHocayi01D6UIyNlQkC84PVzvel9yMa6bBz29f/IAR7VuH0Vr+lo2jGo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731824555; c=relaxed/simple;
+	bh=imFodXCZva6erhVuYZ3HCNxQeRJjzD2USnKSwrxcTQY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HdVXAmewD/6r+mRfe17gwP52vNPhwML8wntK7cx1nmHixsR7m7Zcs8TByVxw9LkY97ooF6UMmMTREXEkb8poPFuezF6hDxEZ43zd38N9R77ZvO0rAoD/bAbKFO4ryDPXSjGAHfHIU49FZi/MDwGy+oA1jaI0jaiFFCrgShRoc5E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lT72qxyQ; arc=fail smtp.client-ip=40.107.237.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eu+BNK11J2j/qszFy/zrzJCDiDXu6m2QEUGqpVWKhsFG0EN228AFLl2yC5S0ADA14aWpXo8cqw1TXqqxHrOOvGAHzANdjVQqj5NQUfPBr6zROeeJeXYQa5J8WxZrtLj/gCICV+Mb5AJP21Xa9ZcSG0EIee9eLxRGLeO7LuN9AXNeWse+ejHXOxxXt6+saVMrLF9eDzaWveV5O8pOas/mzxoYVYaJvCjyqNnIqlt59o1RISjKd0NyiEGl5zMzeKy/VsguBV4xkKB+RgUiYYC2IPU5u4wsilW3huSAr1WcvefATE5AoaVkXsO7MESt3I5caEBupQMN4Nzrs88brzGEPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ROqkEbtxVhhDfxreavWSQBqlneAdW+yoc1n1cXYInZY=;
+ b=weoflpuPHVF5qZRKa/V/RMBe3xLzgWWUp+APAJbxObO8n6i+cYWTU9WGXyi1/re5xMJ2Q/uF8dAq4ULt5TGa0GL//Arl7bjRsjFhzSpCPWcq3H0cmx21u18pXLaAH3todvG5rqEvR6s8GhuF6wud6YYn/91fczfLIUyKhnK4y/Re9pcehLsBYC5cRDuCEQKbUPQYEVsjakvVl+lO0GVXAtaX438UWboi9LEJXwFcHjTCzvE1eCffXZensWOxVnjl8s+MFq9NpWM2RsQhKw9/s3xQO3FL8HU2K4JXxo+vSc+68B3R1zwrRYZfcSJAJLzvYMdXUquO4ZU7spys//TUXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ROqkEbtxVhhDfxreavWSQBqlneAdW+yoc1n1cXYInZY=;
+ b=lT72qxyQEpJs962eZKsn5rohREzLBiAnJyd9ds25WMucraW/hyn+Q+wy9dr6Txve6xFW5LoLKw8DUQvyut51yOMrV3at8QC5KiTHlWPhwLQ0suEmfDRkVyh8FfQJabU+eRTC9pJIBjP5iVPKcEB9xrXPXSezk77tKTYFu8DuCwLiDJdRNcMGijJFUhDCGcVoxh762GP9zNSMH2CoKDCzyKC5Yj6rPgM0DtrIRBCKl+kdwnhUWFY6NDcChEgesjV5QHnmHDh94+w1xVbzQU2FJlRzXono7QxiEdUty/AmJnE/4i3XnFku9R1hySz3ksW65l9AryTo5KPgDbngqI2UKQ==
+Received: from CH2PR10CA0011.namprd10.prod.outlook.com (2603:10b6:610:4c::21)
+ by SA1PR12MB6972.namprd12.prod.outlook.com (2603:10b6:806:24f::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Sun, 17 Nov
+ 2024 06:22:28 +0000
+Received: from CH2PEPF00000146.namprd02.prod.outlook.com
+ (2603:10b6:610:4c:cafe::68) by CH2PR10CA0011.outlook.office365.com
+ (2603:10b6:610:4c::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22 via Frontend
+ Transport; Sun, 17 Nov 2024 06:22:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000146.mail.protection.outlook.com (10.167.244.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.14 via Frontend Transport; Sun, 17 Nov 2024 06:22:28 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sat, 16 Nov
+ 2024 22:22:20 -0800
+Received: from localhost (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sat, 16 Nov
+ 2024 22:22:19 -0800
+Date: Thu, 14 Nov 2024 12:27:06 +0200
+From: Leon Romanovsky <leonro@nvidia.com>
+To: Feng Wang <wangfe@google.com>
+CC: <netdev@vger.kernel.org>, <steffen.klassert@secunet.com>,
+	<antony.antony@secunet.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <20241114102706.GB499069@unreal>
+References: <20241112192249.341515-1-wangfe@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241112192249.341515-1-wangfe@google.com>
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000146:EE_|SA1PR12MB6972:EE_
+X-MS-Office365-Filtering-Correlation-Id: c2c1d3ad-50bc-430f-0626-08dd06d035ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?oZ7e5bDUZyb4byz/ITukZclv6c3Sul03jIRmr28ecgLLIvRCgPwBmiPNNjmw?=
+ =?us-ascii?Q?mttI7q1YR5fVKp48Lyg5ecX4zzmmdubikSCr1inR9Z6/9wnm2PtwgSdCIPbT?=
+ =?us-ascii?Q?tgxFhk9y8UIdEBmPJqMo7L+DKUiuxxwtslW92R0F5yKdieSFPvohiZ0DfQZj?=
+ =?us-ascii?Q?NbSlnD43mdSCXAxiqMo2ZldJF4K+2TYotmMxYkVeRkexmP8pc/LAroU3PAEt?=
+ =?us-ascii?Q?nZrqB0vcVFIOxgE1cPHrrJvGbHuZbFnnljqo1xPSwkoRnXMOW1lP0i4j2Zg5?=
+ =?us-ascii?Q?l+MExmBbIe9FYOU2rG+AZRj4uXL2bAhS3yA581fJNJa01zBTJ8P/TMPpjKas?=
+ =?us-ascii?Q?3X2smZpZNkhh2reQK5pHpRzvdge76mFIU9BUKrnp3hBGqYXeZCdglFYryOLj?=
+ =?us-ascii?Q?zuCjS3kpzuSd0uwn+UljtM0Wi7Cn66j3yZwCtje5cghZJI7QswXA9vsgmkhg?=
+ =?us-ascii?Q?vdPt/WE60OMtHVwPalv8NjG1l1aNmwIloenCTZ5msUS72bD5Tz5eqAHfdKZo?=
+ =?us-ascii?Q?47PSLQN351w23IWRa3TbIXS3p/OI2MzpgapVLM/uQty6jrs1MrNqVmPfp9uN?=
+ =?us-ascii?Q?QBzo7xkzOtfEKxH9GO0M2zbtksfi/062RSPKdnbWpzlNJKDoVhJ0FeclNQjw?=
+ =?us-ascii?Q?1SI6UqRUCPKyQ3XrhMqVAL0hQQOCztooGNqWuEqQDoYYq9Ueya/epWCzAwSE?=
+ =?us-ascii?Q?V4b8MomG/C6ScRM8mBxPbclvLBW+KFP8eCsCw7Pi6nCheWuQ4SVdQ4iJmGFG?=
+ =?us-ascii?Q?tLK20WwyfmqzFDUvnsFHXJNEAJI2jvYbdNkAFuNz8jbtT8yrm/XA9qYgAVIm?=
+ =?us-ascii?Q?yEQPB0sh6UmEVH6NJ1Jjh6S1T8i803IGKL4xi4tEMKzC0dxz9zMyP5/rIZ3s?=
+ =?us-ascii?Q?9vmEfwYufLBVF0gtwINUUzNEpKWkemLcpA0jK2wOqdB8a4P2hKSKh8axyLBD?=
+ =?us-ascii?Q?WAfvSu/UD/9zLKw6F5PXOlrJWe7n08GKcW1aHZ85nlvMSZr4/XHMktMu7d4V?=
+ =?us-ascii?Q?W9rO5lN2Dl2GSU2u3AViXGIhuuNmbgz7jb075w5ztWsnUYWDOBdo7H9tlWPA?=
+ =?us-ascii?Q?ZoV5tKtcpZPklWsGFzna3W5kBjtIAZoNOeBb1SMns2MfsQYmiqfUmrVx7Jzt?=
+ =?us-ascii?Q?dx0BFlct1NsvDg3x5Reuo5sGeWwVOD5ABRKXPHC72KvOJDRd+X7O6gGJ7dLK?=
+ =?us-ascii?Q?1hv8Bx1+0sJqgcI8LP49XECpBGLjhUHgR30mSvCcOWrVDQuIgQBSSl2qYe0X?=
+ =?us-ascii?Q?dX4XeM2mbAfh+dzO8PgBA5P6JhAy6kKu1VhzztgATQN9mikO949UeXHR3g83?=
+ =?us-ascii?Q?ml23ufiT6Iyiqls4nw6mbU5Ca0zIAKezJqZqwicKYRUGG2Muj1J+2wJWMbF5?=
+ =?us-ascii?Q?B86IQAkkHB7P7v2A4m4r+iyXokJ++Qg1gfXXExERngmTbvoA5w=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2024 06:22:28.0312
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2c1d3ad-50bc-430f-0626-08dd06d035ca
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000146.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6972
 
-Implement "mdd-auto-reset-vf" priv-flag to handle Tx and Rx MDD events for VFs.
-This flag is also used in other network adapters like ICE.
+On Tue, Nov 12, 2024 at 11:22:49AM -0800, Feng Wang wrote:
+> From: wangfe <wangfe@google.com>
+> 
+> In packet offload mode, append Security Association (SA) information
+> to each packet, replicating the crypto offload implementation.
+> The XFRM_XMIT flag is set to enable packet to be returned immediately
+> from the validate_xmit_xfrm function, thus aligning with the existing
+> code path for packet offload mode.
+> 
+> This SA info helps HW offload match packets to their correct security
+> policies. The XFRM interface ID is included, which is used in setups
+> with multiple XFRM interfaces where source/destination addresses alone
+> can't pinpoint the right policy.
+> 
+> Enable packet offload mode on netdevsim and add code to check the XFRM
+> interface ID.
+> 
+> Signed-off-by: wangfe <wangfe@google.com>
+> ---
+> v4: https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@google.com/
+>   - Add offload flag check and only doing check when XFRM interface
+>     ID is non-zero.
+> v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@google.com/
+>   - Add XFRM interface ID checking on netdevsim in the packet offload
+>     mode.
+> v2:
+>   - Add why HW offload requires the SA info to the commit message
+> v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@google.com/
+> ---
+> ---
+>  drivers/net/netdevsim/ipsec.c     | 32 ++++++++++++++++++++++++++++++-
+>  drivers/net/netdevsim/netdevsim.h |  1 +
+>  net/xfrm/xfrm_output.c            | 21 ++++++++++++++++++++
+>  3 files changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
+> index f0d58092e7e9..afd2005bf7a8 100644
+> --- a/drivers/net/netdevsim/ipsec.c
+> +++ b/drivers/net/netdevsim/ipsec.c
+> @@ -149,7 +149,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
+>  		return -EINVAL;
+>  	}
+>  
+> -	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO) {
+> +	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO &&
+> +	    xs->xso.type != XFRM_DEV_OFFLOAD_PACKET) {
+>  		NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload type");
+>  		return -EINVAL;
+>  	}
+> @@ -165,6 +166,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
+>  	memset(&sa, 0, sizeof(sa));
+>  	sa.used = true;
+>  	sa.xs = xs;
+> +	sa.if_id = xs->if_id;
+>  
+>  	if (sa.xs->id.proto & IPPROTO_ESP)
+>  		sa.crypt = xs->ealg || xs->aead;
+> @@ -224,10 +226,24 @@ static bool nsim_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
+>  	return true;
+>  }
+>  
+> +static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
+> +				 struct netlink_ext_ack *extack)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
+> +{
+> +}
+> +
+>  static const struct xfrmdev_ops nsim_xfrmdev_ops = {
+>  	.xdo_dev_state_add	= nsim_ipsec_add_sa,
+>  	.xdo_dev_state_delete	= nsim_ipsec_del_sa,
+>  	.xdo_dev_offload_ok	= nsim_ipsec_offload_ok,
+> +
+> +	.xdo_dev_policy_add     = nsim_ipsec_add_policy,
+> +	.xdo_dev_policy_delete  = nsim_ipsec_del_policy,
+> +
+>  };
+>  
+>  bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
+> @@ -237,6 +253,7 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
+>  	struct xfrm_state *xs;
+>  	struct nsim_sa *tsa;
+>  	u32 sa_idx;
+> +	struct xfrm_offload *xo;
+>  
+>  	/* do we even need to check this packet? */
+>  	if (!sp)
+> @@ -272,6 +289,19 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
+>  		return false;
+>  	}
+>  
+> +	if (xs->if_id) {
 
-Usage:
-- "on"  - The problematic VF will be automatically reset
-	  if a malformed descriptor is detected.
-- "off" - The problematic VF will be disabled.
+If you are checking this, you will need to make sure that XFRM_XMIT is
+set when if_id != 0. It is not how it is implemented now.
 
-In cases where a VF sends malformed packets classified as malicious, it can
-cause the Tx queue to freeze, rendering it unusable for several minutes. When
-an MDD event occurs, this new implementation allows for a graceful VF reset to
-quickly restore operational state.
+> +		if (xs->if_id != tsa->if_id) {
+> +			netdev_err(ns->netdev, "unmatched if_id %d %d\n",
+> +				   xs->if_id, tsa->if_id);
+> +			return false;
+> +		}
+> +		xo = xfrm_offload(skb);
+> +		if (!xo || !(xo->flags & XFRM_XMIT)) {
+> +			netdev_err(ns->netdev, "offload flag missing or wrong\n");
+> +			return false;
+> +		}
+> +	}
+> +
+>  	ipsec->tx++;
+>  
+>  	return true;
+> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+> index bf02efa10956..4941b6e46d0a 100644
+> --- a/drivers/net/netdevsim/netdevsim.h
+> +++ b/drivers/net/netdevsim/netdevsim.h
+> @@ -41,6 +41,7 @@ struct nsim_sa {
+>  	__be32 ipaddr[4];
+>  	u32 key[4];
+>  	u32 salt;
+> +	u32 if_id;
+>  	bool used;
+>  	bool crypt;
+>  	bool rx;
+> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+> index e5722c95b8bb..a12588e7b060 100644
+> --- a/net/xfrm/xfrm_output.c
+> +++ b/net/xfrm/xfrm_output.c
+> @@ -706,6 +706,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
+>  	struct xfrm_state *x = skb_dst(skb)->xfrm;
+>  	int family;
+>  	int err;
+> +	struct xfrm_offload *xo;
+> +	struct sec_path *sp;
+>  
+>  	family = (x->xso.type != XFRM_DEV_OFFLOAD_PACKET) ? x->outer_mode.family
+>  		: skb_dst(skb)->ops->family;
+> @@ -728,6 +730,25 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
+>  			kfree_skb(skb);
+>  			return -EHOSTUNREACH;
+>  		}
+> +		sp = secpath_set(skb);
+> +		if (!sp) {
+> +			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+> +			kfree_skb(skb);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		sp->olen++;
+> +		sp->xvec[sp->len++] = x;
+> +		xfrm_state_hold(x);
 
-Currently, VF queues are disabled if an MDD event occurs. This patch adds the
-ability to reset the VF if a Tx or Rx MDD event occurs. It also includes MDD
-event logging throttling to avoid dmesg pollution and unifies the format of
-Tx and Rx MDD messages.
+Not an expert and just looked how XFRM_XMIT is assigned in other places,
+and simple skb_ext_add(skb, SKB_EXT_SEC_PATH) is used, why is it
+different here?
 
-Note: Standard message rate limiting functions like dev_info_ratelimited()
-do not meet our requirements. Custom rate limiting is implemented,
-please see the code for details.
+The additional issue is that you are adding extension and flag to all
+offloaded packets, which makes me wonder what to do with this check in
+validate_xmit_xfrm():
 
-Co-developed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Co-developed-by: Padraig J Connolly <padraig.j.connolly@intel.com>
-Signed-off-by: Padraig J Connolly <padraig.j.connolly@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v4->v5 + documentation - 2nd clear_bit(__I40E_MDD_EVENT_PENDING) * rate limit
-v3->v4 refactor two helper functions into one
-v2->v3 fix compilation issue
-v1->v2 fix compilation issue
----
- .../device_drivers/ethernet/intel/i40e.rst    |  12 ++
- drivers/net/ethernet/intel/i40e/i40e.h        |   4 +-
- .../net/ethernet/intel/i40e/i40e_debugfs.c    |   2 +-
- .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 107 +++++++++++++++---
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   2 +-
- .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  11 +-
- 7 files changed, 123 insertions(+), 17 deletions(-)
+  136         /* The packet was sent to HW IPsec packet offload engine,
+  137          * but to wrong device. Drop the packet, so it won't skip
+  138          * XFRM stack.
+  139          */
+  140         if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET && x->xso.dev != dev) {
+  141                 kfree_skb(skb);
+  142                 dev_core_stats_tx_dropped_inc(dev);
+  143                 return NULL;
+  144         }
 
-diff --git a/Documentation/networking/device_drivers/ethernet/intel/i40e.rst b/Documentation/networking/device_drivers/ethernet/intel/i40e.rst
-index 4fbaa1a..53d9d58 100644
---- a/Documentation/networking/device_drivers/ethernet/intel/i40e.rst
-+++ b/Documentation/networking/device_drivers/ethernet/intel/i40e.rst
-@@ -299,6 +299,18 @@ Use ethtool to view and set link-down-on-close, as follows::
-   ethtool --show-priv-flags ethX
-   ethtool --set-priv-flags ethX link-down-on-close [on|off]
- 
-+Setting the mdd-auto-reset-vf Private Flag
-+------------------------------------------
-+
-+When the mdd-auto-reset-vf private flag is set to "on", the problematic VF will
-+be automatically reset if a malformed descriptor is detected. If the flag is
-+set to "off", the problematic VF will be disabled.
-+
-+Use ethtool to view and set mdd-auto-reset-vf, as follows::
-+
-+  ethtool --show-priv-flags ethX
-+  ethtool --set-priv-flags ethX mdd-auto-reset-vf [on|off]
-+
- Viewing Link Messages
- ---------------------
- Link messages will not be displayed to the console if the distribution is
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index d546567..ee5d8d6 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -87,6 +87,7 @@ enum i40e_state {
- 	__I40E_SERVICE_SCHED,
- 	__I40E_ADMINQ_EVENT_PENDING,
- 	__I40E_MDD_EVENT_PENDING,
-+	__I40E_MDD_VF_PRINT_PENDING,
- 	__I40E_VFLR_EVENT_PENDING,
- 	__I40E_RESET_RECOVERY_PENDING,
- 	__I40E_TIMEOUT_RECOVERY_PENDING,
-@@ -190,6 +191,7 @@ enum i40e_pf_flags {
- 	 */
- 	I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENA,
- 	I40E_FLAG_VF_VLAN_PRUNING_ENA,
-+	I40E_FLAG_MDD_AUTO_RESET_VF,
- 	I40E_PF_FLAGS_NBITS,		/* must be last */
- };
- 
-@@ -571,7 +573,7 @@ struct i40e_pf {
- 	int num_alloc_vfs;	/* actual number of VFs allocated */
- 	u32 vf_aq_requests;
- 	u32 arq_overflows;	/* Not fatal, possibly indicative of problems */
--
-+	struct ratelimit_state mdd_message_rate_limit;
- 	/* DCBx/DCBNL capability for PF that indicates
- 	 * whether DCBx is managed by firmware or host
- 	 * based agent (LLDPAD). Also, indicates what
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-index abf624d..6a697bf 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-@@ -721,7 +721,7 @@ static void i40e_dbg_dump_vf(struct i40e_pf *pf, int vf_id)
- 		dev_info(&pf->pdev->dev, "vf %2d: VSI id=%d, seid=%d, qps=%d\n",
- 			 vf_id, vf->lan_vsi_id, vsi->seid, vf->num_queue_pairs);
- 		dev_info(&pf->pdev->dev, "       num MDD=%lld\n",
--			 vf->num_mdd_events);
-+			 vf->mdd_tx_events.count + vf->mdd_rx_events.count);
- 	} else {
- 		dev_info(&pf->pdev->dev, "invalid VF id %d\n", vf_id);
- 	}
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 1d0d2e5..d146575 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -459,6 +459,8 @@ static const struct i40e_priv_flags i40e_gstrings_priv_flags[] = {
- 	I40E_PRIV_FLAG("base-r-fec", I40E_FLAG_BASE_R_FEC, 0),
- 	I40E_PRIV_FLAG("vf-vlan-pruning",
- 		       I40E_FLAG_VF_VLAN_PRUNING_ENA, 0),
-+	I40E_PRIV_FLAG("mdd-auto-reset-vf",
-+		       I40E_FLAG_MDD_AUTO_RESET_VF, 0),
- };
- 
- #define I40E_PRIV_FLAGS_STR_LEN ARRAY_SIZE(i40e_gstrings_priv_flags)
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index cbcfada..b1f7316 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11189,22 +11189,88 @@ static void i40e_handle_reset_warning(struct i40e_pf *pf, bool lock_acquired)
- 	i40e_reset_and_rebuild(pf, false, lock_acquired);
- }
- 
-+/**
-+ * i40e_print_vf_mdd_event - print VF Tx/Rx malicious driver detect event
-+ * @pf: board private structure
-+ * @vf: pointer to the VF structure
-+ * @is_tx: true - for Tx event, false - for  Rx
-+ */
-+static void i40e_print_vf_mdd_event(struct i40e_pf *pf, struct i40e_vf *vf,
-+				       bool is_tx)
-+{
-+	dev_err(&pf->pdev->dev, is_tx ?
-+		"%lld Tx Malicious Driver Detection events detected on PF %d VF %d MAC %pm. mdd-auto-reset-vfs=%s\n" :
-+		"%lld Rx Malicious Driver Detection events detected on PF %d VF %d MAC %pm. mdd-auto-reset-vfs=%s\n",
-+		is_tx ? vf->mdd_tx_events.count : vf->mdd_rx_events.count,
-+		pf->hw.pf_id,
-+		vf->vf_id,
-+		vf->default_lan_addr.addr,
-+		str_on_off(test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags)));
-+}
-+
-+/**
-+ * i40e_print_vfs_mdd_events - print VFs malicious driver detect event
-+ * @pf: pointer to the PF structure
-+ *
-+ * Called from i40e_handle_mdd_event to rate limit and print VFs MDD events.
-+ */
-+static void i40e_print_vfs_mdd_events(struct i40e_pf *pf)
-+{
-+	unsigned int i;
-+
-+	/* check that there are pending MDD events to print */
-+	if (!test_and_clear_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state))
-+		return;
-+
-+	if (!__ratelimit(&pf->mdd_message_rate_limit))
-+		return;
-+
-+	for (i = 0; i < pf->num_alloc_vfs; i++) {
-+		struct i40e_vf *vf = &pf->vf[i];
-+		bool is_printed = false;
-+
-+		/* only print Rx MDD event message if there are new events */
-+		if (vf->mdd_rx_events.count != vf->mdd_rx_events.last_printed) {
-+			vf->mdd_rx_events.last_printed = vf->mdd_rx_events.count;
-+			i40e_print_vf_mdd_event(pf, vf, false);
-+			is_printed = true;
-+		}
-+
-+		/* only print Tx MDD event message if there are new events */
-+		if (vf->mdd_tx_events.count != vf->mdd_tx_events.last_printed) {
-+			vf->mdd_tx_events.last_printed = vf->mdd_tx_events.count;
-+			i40e_print_vf_mdd_event(pf, vf, true);
-+			is_printed = true;
-+		}
-+
-+		if (is_printed && !test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags))
-+			dev_info(&pf->pdev->dev,
-+				 "Use PF Control I/F to re-enable the VF #%d\n",
-+				 i);
-+	}
-+}
-+
- /**
-  * i40e_handle_mdd_event
-  * @pf: pointer to the PF structure
-  *
-  * Called from the MDD irq handler to identify possibly malicious vfs
-  **/
- static void i40e_handle_mdd_event(struct i40e_pf *pf)
- {
- 	struct i40e_hw *hw = &pf->hw;
- 	bool mdd_detected = false;
- 	struct i40e_vf *vf;
- 	u32 reg;
- 	int i;
- 
--	if (!test_bit(__I40E_MDD_EVENT_PENDING, pf->state))
-+	if (!test_and_clear_bit(__I40E_MDD_EVENT_PENDING, pf->state)) {
-+		/* Since the VF MDD event logging is rate limited, check if
-+		 * there are pending MDD events.
-+		 */
-+		i40e_print_vfs_mdd_events(pf);
- 		return;
-+	}
- 
- 	/* find what triggered the MDD event */
- 	reg = rd32(hw, I40E_GL_MDET_TX);
-@@ -11248,36 +11314,48 @@ static void i40e_handle_mdd_event(struct i40e_pf *pf)
- 
- 	/* see if one of the VFs needs its hand slapped */
- 	for (i = 0; i < pf->num_alloc_vfs && mdd_detected; i++) {
-+		bool is_mdd_on_tx = false;
-+		bool is_mdd_on_rx = false;
-+
- 		vf = &(pf->vf[i]);
- 		reg = rd32(hw, I40E_VP_MDET_TX(i));
- 		if (reg & I40E_VP_MDET_TX_VALID_MASK) {
-+			set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
- 			wr32(hw, I40E_VP_MDET_TX(i), 0xFFFF);
--			vf->num_mdd_events++;
--			dev_info(&pf->pdev->dev, "TX driver issue detected on VF %d\n",
--				 i);
--			dev_info(&pf->pdev->dev,
--				 "Use PF Control I/F to re-enable the VF\n");
-+			vf->mdd_tx_events.count++;
- 			set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
-+			is_mdd_on_tx = true;
- 		}
- 
- 		reg = rd32(hw, I40E_VP_MDET_RX(i));
- 		if (reg & I40E_VP_MDET_RX_VALID_MASK) {
-+			set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
- 			wr32(hw, I40E_VP_MDET_RX(i), 0xFFFF);
--			vf->num_mdd_events++;
--			dev_info(&pf->pdev->dev, "RX driver issue detected on VF %d\n",
--				 i);
--			dev_info(&pf->pdev->dev,
--				 "Use PF Control I/F to re-enable the VF\n");
-+			vf->mdd_rx_events.count++;
- 			set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
-+			is_mdd_on_rx = true;
-+		}
-+
-+		if ((is_mdd_on_tx || is_mdd_on_rx) &&
-+		    test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags)) {
-+			/* VF MDD event counters will be cleared by
-+			 * reset, so print the event prior to reset.
-+			 */
-+			if (is_mdd_on_rx)
-+				i40e_print_vf_mdd_event(pf, vf, false);
-+			if (is_mdd_on_tx)
-+				i40e_print_vf_mdd_event(pf, vf, true);
-+
-+			i40e_vc_reset_vf(vf, true);
- 		}
- 	}
- 
--	/* re-enable mdd interrupt cause */
--	clear_bit(__I40E_MDD_EVENT_PENDING, pf->state);
- 	reg = rd32(hw, I40E_PFINT_ICR0_ENA);
- 	reg |=  I40E_PFINT_ICR0_ENA_MAL_DETECT_MASK;
- 	wr32(hw, I40E_PFINT_ICR0_ENA, reg);
- 	i40e_flush(hw);
-+
-+	i40e_print_vfs_mdd_events(pf);
- }
- 
- /**
-@@ -15970,6 +16048,9 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 			 ERR_PTR(err),
- 			 i40e_aq_str(&pf->hw, pf->hw.aq.asq_last_status));
- 
-+	/* VF MDD event logs are rate limited to one second intervals */
-+	ratelimit_state_init(&pf->mdd_message_rate_limit, 1 * HZ, 1);
-+
- 	/* Reconfigure hardware for allowing smaller MSS in the case
- 	 * of TSO, so that we avoid the MDD being fired and causing
- 	 * a reset in the case of small MSS+TSO.
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 662622f..5b4618e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -216,7 +216,7 @@ void i40e_vc_notify_vf_reset(struct i40e_vf *vf)
-  * @notify_vf: notify vf about reset or not
-  * Reset VF handler.
-  **/
--static void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
-+void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
- {
- 	struct i40e_pf *pf = vf->pf;
- 	int i;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-index 66f95e2..5cf74f1 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-@@ -64,6 +64,12 @@ struct i40evf_channel {
- 	u64 max_tx_rate; /* bandwidth rate allocation for VSIs */
- };
- 
-+struct i40e_mdd_vf_events {
-+	u64 count;      /* total count of Rx|Tx events */
-+	/* count number of the last printed event */
-+	u64 last_printed;
-+};
-+
- /* VF information structure */
- struct i40e_vf {
- 	struct i40e_pf *pf;
-@@ -92,7 +98,9 @@ struct i40e_vf {
- 
- 	u8 num_queue_pairs;	/* num of qps assigned to VF vsis */
- 	u8 num_req_queues;	/* num of requested qps */
--	u64 num_mdd_events;	/* num of mdd events detected */
-+	/* num of mdd tx and rx events detected */
-+	struct i40e_mdd_vf_events mdd_rx_events;
-+	struct i40e_mdd_vf_events mdd_tx_events;
- 
- 	unsigned long vf_caps;	/* vf's adv. capabilities */
- 	unsigned long vf_states;	/* vf's runtime states */
-@@ -120,6 +128,7 @@ int i40e_alloc_vfs(struct i40e_pf *pf, u16 num_alloc_vfs);
- int i40e_vc_process_vf_msg(struct i40e_pf *pf, s16 vf_id, u32 v_opcode,
- 			   u32 v_retval, u8 *msg, u16 msglen);
- int i40e_vc_process_vflr_event(struct i40e_pf *pf);
-+void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf);
- bool i40e_reset_vf(struct i40e_vf *vf, bool flr);
- bool i40e_reset_all_vfs(struct i40e_pf *pf, bool flr);
- void i40e_vc_notify_vf_reset(struct i40e_vf *vf);
--- 
-2.25.1
+Also because you are adding it to all packets, you are adding extra
+overhead for all users, even these who didn't ask this if_id thing.
 
+And again, you should block creation of SAs with if_id != 0 for already
+existing in-kernel IPsec implementations.
+
+Thanks
+
+> +
+> +		xo = xfrm_offload(skb);
+> +		if (!xo) {
+> +			secpath_reset(skb);
+> +			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+> +			kfree_skb(skb);
+> +			return -EINVAL;
+> +		}
+> +		xo->flags |= XFRM_XMIT;
+>  
+>  		return xfrm_output_resume(sk, skb, 0);
+>  	}
+> -- 
+> 2.47.0.277.g8800431eea-goog
+> 
+> 
 
