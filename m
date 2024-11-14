@@ -1,208 +1,205 @@
-Return-Path: <netdev+bounces-144688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23AFB9C8240
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 05:55:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5FD9C82DA
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 06:59:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6A2B284A29
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:55:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17D55B245DA
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 05:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B081E7C34;
-	Thu, 14 Nov 2024 04:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4AC158DC4;
+	Thu, 14 Nov 2024 05:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="EOFOgcL8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hve1d7bO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566BF1553AA;
-	Thu, 14 Nov 2024 04:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DBF1E0E13
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 05:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731560103; cv=none; b=WySvPPeX678nWIV7YF7xyjbYvtWAgq2MAUDGuTOm7dotQJs3AhCm4/w/+PYxmizQERNVbW0PDA6wTWdbkQsynNO31NJyUYxwSG27VYqjz3i/BsTWmVKVRcCOTHqi9/l5sgiVygdMVku05OlGV/ecs9KteQSuYZp5praDS+IoEbA=
+	t=1731563941; cv=none; b=VBw7fC2AhMi2gdcAamKJxmu3alvKtWeO6P0eDa3syTEsY4fAT3WXZ9uZ/I2barCgbcVOGucREMaeUiK/72D2P/TN16qovg3wHucooAYXrm/OHBV3KvtlpuF6EK63yJVmdQPERc0NJaKCcF3VdMYUIAVrpqhTFFE/7v0XLH+1vdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731560103; c=relaxed/simple;
-	bh=o/5emXLfx9w6iWylWGCKAI4AJ2vE+YqEyXCPtzvueeo=;
+	s=arc-20240116; t=1731563941; c=relaxed/simple;
+	bh=ZXr+TjIk+3TUAi31MB7jDf2GOibO2uww2OXknCfrPLk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u0nXcBeKrLYTy3Qsa9luXCfe+/7yamsHJnUuLKeerY4UDsHp1B4dMhQJm3jb8HwRtdi7Sri4a2Hz2c9wFFJvd+1MYUb6fv7O2INCqqaFsCyvBgUgtOS+abtxaaKhpb8Ln6IcNrLfSc4h947G/pyCbwXm+A7A5HSBRifFj95hUsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=EOFOgcL8; arc=none smtp.client-ip=80.12.242.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from mail-ej1-f44.google.com ([209.85.218.44])
-	by smtp.orange.fr with ESMTPSA
-	id BRrVt6lmrmvx4BRrVt9AwL; Thu, 14 Nov 2024 05:53:45 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1731560025;
-	bh=1EDa0vg4ZBXnx63Iz6EA6oPRRRo42Elpu8PdgGbLErU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=EOFOgcL80OMUStwlt1/cSXRToGXQWb7t2ydd73hhXtbKz1asFu5olRod6MPs4aVtm
-	 zTs9FLZYzoHox0xuodbWWFIIC3S08LgpEzoYYtkLgrctF6Ryo81cl2hG8R8kbKHbn3
-	 VCyksgenrLkKRAF3zZSRad49MKoJMwCJeTKJYJpVkscjTkBJ0t+owvKXPh5AqVYAnY
-	 CQdlNk2JNtx0dX8orq4s1fDqOdTwbsnoEOx6GIpy7iiQ3e+9wajU6sitlE83+5fZrf
-	 wHFWEmqsiF0tsvgjm+dmvyJmEQzrhgmqLcN18RmH+HQmQOuXUfQ+0+8mGoko2mcpx0
-	 F6alpS1vgw0ug==
-X-ME-Helo: mail-ej1-f44.google.com
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 14 Nov 2024 05:53:45 +0100
-X-ME-IP: 209.85.218.44
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a9a850270e2so31057066b.0;
-        Wed, 13 Nov 2024 20:53:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUHt7zHxQwAk3Az9wWMG+6/mDLIlSclNLegYtPkyGOiJqrvKQWZ9qKS0R9XkaQDl4v0EoHk1Brp@vger.kernel.org, AJvYcCVYVQQlv52vZeGSPF4IYJiPqkLtRu+xgdgRt4entCMzYVoU1vNc+xMTXEdlNv3NuZLRqWhMrPwyPvaS@vger.kernel.org, AJvYcCW0h7AfTQASSqOuLzVAH5MZSUAiWMaEvWLgjK2WBGFNJ78XX1fWrkqmX7ckKz3uaO+H632jYzw94WbW@vger.kernel.org, AJvYcCXBMHa8+S+LbneygsNLfeEAVYdGr56cNiB6N7naIx1EhyC9bSL5bLYH9VavngBdaq/tXfRjTbTigy2R0Bhu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx8pxJwxcHFZLV7HTB/YXUAEj2+evs5ru2x3zdZxbP6FhboMih
-	jWb2ypR1+Nkur0mQqjAe8JRLn2DpVb//o0cwCyVyHBGeH438TuSJrfrYH6xTDCH/X4iSvBHn4nw
-	Ps3SXQYfodx+AJEyCvfb1oU/PzPA=
-X-Google-Smtp-Source: AGHT+IESI/Fks52+BoNd/GzjvshhIgxdlgulbfGGZFgoEKu8CbVbivjecQTI3En+lKEI4jB/Yi3PiBNAvLfDB2XRils=
-X-Received: by 2002:a17:907:7fa9:b0:aa2:c79:c940 with SMTP id
- a640c23a62f3a-aa20ccdb8b4mr63959766b.1.1731560024972; Wed, 13 Nov 2024
- 20:53:44 -0800 (PST)
+	 To:Cc:Content-Type; b=nPh5hw36meSuP54P8P/2hBxA0ErCWjU4poYPfknD72f5HJyrErQgA5z8V5sQx5+8ulUkJnXGDaD+Jr3Khk5CkcnABV5hgCSj0DmY9fU5e0uBHI71tjM+nJTmwDBXVYbb+XuoWQJj8xq65gK9p7NYHOyHjiY++vePjBVtW5ENoRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hve1d7bO; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539e64ed090so1e87.1
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 21:58:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731563938; x=1732168738; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MVF4qoblAyYWJlGgMA5ludEFaL4HP1vW57d3cFH2t6A=;
+        b=hve1d7bOdeAv1hBEGxDzPDeWl1Lq6TtWfc84y2WI+8NEaCffvnFH3wEiBRZmd7Ztke
+         v6SK3nywkov6BXhYS9apEIc+74Van8QvtvNUSck4mBVUtPBSwNHRhp0WbPVIPD0/sLOX
+         phgqz/kWn+VKbrUY0gJaqn9nUX25YQE4m1j6oUYAbCGGKzWrHs7lHLBC5VXF4nfI0XCN
+         H2Rd89f2bWTqQds9eWdOBtkJjRxgtf8xQHcXltVPHj7g8C2bmEGQm1yaWWe+eQPLCjjM
+         HaZeUsZg7/h2jU2q5nc4n7jWu6bmW2yGQhWN4xtMVEV3ztmtEd/Kf9HjH34wGF8a3ro+
+         hH8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731563938; x=1732168738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MVF4qoblAyYWJlGgMA5ludEFaL4HP1vW57d3cFH2t6A=;
+        b=vj1Jt7IMyojmdScVv9G0OHxgVA5YdX7kG+iAYVVJI/tr5OGhJb2m9dyXEnqODrYI95
+         7Xykih/Sp7x02iqYFQVeZwZsLQLs1dKLc2iez+IwnlXyOJPsTc0eMaxwJ2iiIYpd8r8F
+         6vESjTKVclRvsnJZejD3ktsFUZ+ELBez+JHDwP+P6reyJZg/6RLnHNhYOHQ5Cmb9Iftl
+         QspqvObZuVordAWTZmB68bICEOGwGj9DihLSNK0unaVAPRFdrtFBCFdGhkQ5J+sPafNT
+         +GDekcYaYR1gbK0clhJcB/bufTTbo4vasowTRawcIIzqO0h6qlofZUv0hRX5sQ4+4hfj
+         23qw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJF6VeITp7420EprsvpFk9x3T6WHFdUOUdXn205QhXNwqXG2JgMAYs0OPQNb/xBL/zbYevsx4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcdDvYLq9WiIU4zvK8xFcFnOdIcd4d7dIbMzSGvMRh5pspIrnc
+	QbCv5t0d7EyLsLz++gUX9UX+O5dN/5lVTqTSMC0ALYc9kSXroHXHqHm9mbOoTUSwZQEXKaMpycV
+	lJgRXvoMP2AU7HSkN4a8ngRJPYotNQWWjgfPJ
+X-Gm-Gg: ASbGnctzJa8i/JzthwPlwhI1k6RAAqcHymMP5826gBXbdw7YjEezeWMESsbcHYCecUu
+	SDwrw9NWlk8CUEufLtOoyXwKu1OG03l67kmfvAjldwKZbJqikx36GKu/kpxVcrQ==
+X-Google-Smtp-Source: AGHT+IF5dXy6KjRfaBmYjnPPAJ34MqLgJMphKtAJin7WMYczm0KOqYHT3gTCgxPxs0rdu2CHFUdawDvhzlmCnVQZcZg=
+X-Received: by 2002:a05:6512:318a:b0:535:60b1:ffc2 with SMTP id
+ 2adb3069b0e04-53da8675a80mr246e87.0.1731563936730; Wed, 13 Nov 2024 21:58:56
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com> <20241111-tcan-wkrqv-v2-1-9763519b5252@geanix.com>
-In-Reply-To: <20241111-tcan-wkrqv-v2-1-9763519b5252@geanix.com>
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Date: Thu, 14 Nov 2024 13:53:34 +0900
-X-Gmail-Original-Message-ID: <CAMZ6Rq++_yecNY-nNL7NK48ZsNPqH0KDRuqvCCGhUur24+7KGA@mail.gmail.com>
-Message-ID: <CAMZ6Rq++_yecNY-nNL7NK48ZsNPqH0KDRuqvCCGhUur24+7KGA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] can: tcan4x5x: add option for selecting nWKRQ voltage
-To: Sean Nyekjaer <sean@geanix.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, 
+References: <20241110081953.121682-1-yuyanghuang@google.com>
+ <ZzMlvCA4e3YhYTPn@fedora> <b47b1895-76b9-42bc-af29-e54a20d71a52@lunn.ch>
+ <CADXeF1HMvDnKNSNCh1ULsspC+gR+S0eTE40MRhA+OH16zJKM6A@mail.gmail.com>
+ <ce2359c3-a6eb-4ef3-b2cf-321c5c282fab@lunn.ch> <CADXeF1FYoXTixLFFhESDkCo2HXG3JAzzdMCfkFrr2dqmRVQcWg@mail.gmail.com>
+ <9fa93b71-cd81-44ce-b7cc-24b12be8cb24@lunn.ch>
+In-Reply-To: <9fa93b71-cd81-44ce-b7cc-24b12be8cb24@lunn.ch>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Thu, 14 Nov 2024 14:58:18 +0900
+Message-ID: <CADXeF1HQH=bhNWAtafUKD3-WoHhQEB-=TpwN9GdOOZ9PSaLktQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] netlink: add igmp join/leave notifications
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, 
+	jiri@resnulli.us, stephen@networkplumber.org, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon. 11 Nov. 2024 at 17:55, Sean Nyekjaer <sean@geanix.com> wrote:
-> nWKRQ supports an output voltage of either the internal reference voltage
-> (3.6V) or the reference voltage of the digital interface 0 - 6V.
-> Add the devicetree option ti,nwkrq-voltage-sel to be able to select
-> between them.
-> Default is kept as the internal reference voltage.
->
-> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
-> ---
->  drivers/net/can/m_can/tcan4x5x-core.c | 35 +++++++++++++++++++++++++++++++++++
->  drivers/net/can/m_can/tcan4x5x.h      |  2 ++
->  2 files changed, 37 insertions(+)
->
-> diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_can/tcan4x5x-core.c
-> index 2f73bf3abad889c222f15c39a3d43de1a1cf5fbb..264bba830be50033347056da994102f8b614e51b 100644
-> --- a/drivers/net/can/m_can/tcan4x5x-core.c
-> +++ b/drivers/net/can/m_can/tcan4x5x-core.c
-> @@ -92,6 +92,8 @@
->  #define TCAN4X5X_MODE_STANDBY BIT(6)
->  #define TCAN4X5X_MODE_NORMAL BIT(7)
->
-> +#define TCAN4X5X_NWKRQ_VOLTAGE_MASK BIT(19)
-> +
->  #define TCAN4X5X_DISABLE_WAKE_MSK      (BIT(31) | BIT(30))
->  #define TCAN4X5X_DISABLE_INH_MSK       BIT(9)
->
-> @@ -267,6 +269,11 @@ static int tcan4x5x_init(struct m_can_classdev *cdev)
->         if (ret)
->                 return ret;
->
-> +       ret = regmap_update_bits(tcan4x5x->regmap, TCAN4X5X_CONFIG,
-> +                                TCAN4X5X_NWKRQ_VOLTAGE_MASK, tcan4x5x->nwkrq_voltage);
-> +       if (ret)
-> +               return ret;
-> +
->         return ret;
->  }
->
-> @@ -318,6 +325,28 @@ static const struct tcan4x5x_version_info
->         return &tcan4x5x_versions[TCAN4X5X];
->  }
->
-> +static int tcan4x5x_get_dt_data(struct m_can_classdev *cdev)
-> +{
-> +       struct tcan4x5x_priv *tcan4x5x = cdev_to_priv(cdev);
-> +       struct device_node *np = cdev->dev->of_node;
-> +       u8 prop;
-> +       int ret;
-> +
-> +       ret = of_property_read_u8(np, "ti,nwkrq-voltage-sel", &prop);
-> +       if (!ret) {
-> +               if (prop <= 1)
-> +                       tcan4x5x->nwkrq_voltage = prop;
-> +               else
-> +                       dev_warn(cdev->dev,
-> +                                "nwkrq-voltage-sel have invalid option: %u\n",
-> +                                prop);
-> +       } else {
-> +               tcan4x5x->nwkrq_voltage = 0;
-> +       }
+> So that probably leads to a NACK for these patches. If APF is your
+> target, and to me it seems unlikely APF will get accepted into
+> mainline, there is no need for these netlink changes. Hence a NACK.
 
-If the
+> And this is probably your way in. Forget about APF when talking to
+> mainline.
 
-  if (prop <= 1)
+Thanks for the advice. I'll remove the APF context from the commit
+message, as these patches should benefit mainline regardless of their
+APF use case.
 
-condition fails, you print a warning, but you are not assigning a
-value to tcan4x5x->nwkrq_voltage. Is this intentional?
+> Show these patches are useful in general. Explain the use
+> case of IGMP/MLD control in user space using existing APIs to control
+> the network stack and hardware.
 
-What about:
+> Yes, this is going in correct direction to get these patches
+> merged. Focus on this. Solve these problems with ip monitor etc.  Once
+> merged you can then use it with the out of mainline APF.
 
-        tcan4x5x->nwkrq_voltage = 0;
-        ret = of_property_read_u8(np, "ti,nwkrq-voltage-sel", &prop);
-        if (!ret) {
-                if (prop <= 1)
-                        tcan4x5x->nwkrq_voltage = prop;
-                else
-                        dev_warn(cdev->dev,
-                                 "nwkrq-voltage-sel have invalid option: %u\n",
-                                 prop);
-        }
+I plan to include MLD modifications and rewrite the commit message as
+follows in patch v2.  I will also send the ip monitor patches in
+parallel.
 
-so that you make sure that tcan4x5x->nwkrq_voltage always gets a
-default zero value? Else, if you can make sure that tcan4x5x is always
-zero initialized, you can just drop the
+Please let me know if you have any further suggestions.
 
-        tcan4x5x->nwkrq_voltage = 0;
+```
+netlink: add IGMP/MLD join/leave notifications
 
-thing.
+This change introduces netlink notifications for multicast address
+changes. The following features are included:
+* Addition and deletion of multicast addresses are reported using
+  RTM_NEWMULTICAST and RTM_DELMULTICAST messages with AF_INET and
+  AF_INET6.
+* Two new notification groups: RTNLGRP_IPV4_MCADDR and
+  RTNLGRP_IPV6_MCADDR are introduced for receiving these events.
 
-> +       return 0;
-> +}
-> +
->  static int tcan4x5x_get_gpios(struct m_can_classdev *cdev,
->                               const struct tcan4x5x_version_info *version_info)
->  {
-> @@ -453,6 +482,12 @@ static int tcan4x5x_can_probe(struct spi_device *spi)
->                 goto out_power;
->         }
+This change allows user space applications (e.g., ip monitor) to
+efficiently track multicast group memberships by listening for netlink
+events. Previously, applications relied on inefficient polling of
+procfs, introducing delays. With netlink notifications, applications
+receive realtime updates on multicast group membership changes,
+enabling more precise metrics collection and system monitoring.
+
+This change also empowers user space applications to manage multicast
+filters and IGMP/MLD offload rules using the same netlink notification
+mechanism. This allows applications to dynamically adjust rules and
+configurations via generic netlink communication with the Wi-Fi driver,
+offering greater flexibility and updatability compared to implementing
+all logic within the driver itself. This is a key consideration for some
+commercial devices.
+```
+
+Thanks,
+Yuyang
+
+On Thu, Nov 14, 2024 at 6:06=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> +       ret = tcan4x5x_get_dt_data(mcan_class);
-> +       if (ret) {
-> +               dev_err(&spi->dev, "Getting dt data failed %pe\n", ERR_PTR(ret));
-> +               goto out_power;
-> +       }
-> +
->         tcan4x5x_check_wake(priv);
+> On Wed, Nov 13, 2024 at 01:26:29PM +0900, Yuyang Huang wrote:
+> > >O.K. WiFi is not my area. But i'm more interested in uAPIs, and
+> > > ensuring you are not adding APIs which promote kernel bypass.
 >
->         ret = tcan4x5x_write_tcan_reg(mcan_class, TCAN4X5X_INT_EN, 0);
-> diff --git a/drivers/net/can/m_can/tcan4x5x.h b/drivers/net/can/m_can/tcan4x5x.h
-> index e62c030d3e1e5a713c997e7c8ecad4a44aff4e6a..04ebe5c64f4f7056a62e72e717cb85dd3817ab9c 100644
-> --- a/drivers/net/can/m_can/tcan4x5x.h
-> +++ b/drivers/net/can/m_can/tcan4x5x.h
-> @@ -42,6 +42,8 @@ struct tcan4x5x_priv {
+> [Off list]
 >
->         struct tcan4x5x_map_buf map_buf_rx;
->         struct tcan4x5x_map_buf map_buf_tx;
-> +
-> +       u8 nwkrq_voltage;
->  };
+> >
+> > WiFi chipset vendors must implement the Android WiFi HAL to install
+> > and read the APF program from WiFi firmware. The Android System Server
+> > will talk to vendor HAL service using the WiFi HAL. The datapath is:
+> > Network Stack process -> Android System Server -> vendor HAL service
+> > -> WiFi driver -> WiFi firmware. The Android WiFi HAL is specific to
+> > Android. The vendor HAL service, WiFi driver and WiFi firmware are all
+> > vendor proprietary software.  In other words, those API are not in
+> > mainline yet.
 >
->  static inline void
+> So that probably leads to a NACK for these patches. If APF is your
+> target, and to me it seems unlikely APF will get accepted into
+> mainline, there is no need for these netlink changes. Hence a NACK.
 >
-> --
-> 2.46.2
+> > >Do the new netlink message make sense without APF? Can i write a user
+> > >space IGMP snooping implementation and then call bridge mdb
+> > >add/del/replace?
+> >
+> > The RTM_NEWMULTICAST and RTM_DELMULTICAST events introduced in this
+> > patch enable user space implementation of IGMP/MLD offloading and
+> > IPv4/IPv6 multicast filtering. I have limited knowledge on how to
+> > implement IGMP snooping correctly so I don't know if they are
+> > sufficient.
+> >
+> > These two events have broader applications beyond APF.
 >
+> And this is probably your way in. Forget about APF when talking to
+> mainline. Show these patches are useful in general. Explain the use
+> case of IGMP/MLD control in user space using existing APIs to control
+> the network stack and hardware.
 >
+> > It might also make sense to consider whether to accept the proposed
+> > APIs from an API completeness perspective. The current netlink API for
+> > multicast addresses seems incomplete. While RTM_GETMULTICAST exists,
+> > it only supports IPv6, not IPv4. This limitation forces tools like 'ip
+> > maddr' to rely on parsing procfs instead of using netlink.
+> > Additionally, 'ip monitor' cannot track multicast address additions or
+> > removals. I feel it would make sense to have full netlink based
+> > dumping and event notification support for both IPv4/IPv6 multicast
+> > addresses as well.
+>
+> Yes, this is going in correct direction to get these patches
+> merged. Focus on this. Solve these problems with ip monitor etc.  Once
+> merged you can then use it with the out of mainline APF.
+>
+>         Andrew
 
