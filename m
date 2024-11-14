@@ -1,185 +1,117 @@
-Return-Path: <netdev+bounces-145025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFB59C925A
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:22:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D30F19C9269
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:27:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F217287327
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:22:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98F6B2841DF
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B6019B3E2;
-	Thu, 14 Nov 2024 19:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C2B19F115;
+	Thu, 14 Nov 2024 19:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Yqkehs3T"
+	dkim=pass (2048-bit key) header.d=everestkc-com-np.20230601.gappssmtp.com header.i=@everestkc-com-np.20230601.gappssmtp.com header.b="lkmqC5Ym"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A70119939D;
-	Thu, 14 Nov 2024 19:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C72319939D
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 19:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731612168; cv=none; b=KOMtTg9v9zuQ9TlFBPrvmlnD9rbSld5QHs+BfqqvviXzQOt2m1cETDST5odC+NFNLq1unl6fke+KQ7X6v/CpYq3d7aVb2wwbAjfhrX7s6YtahPqUlHcRTM2pseEqWtkCD0JHAgHkU1mYPFyf/Gt7AqFw2oqMFkjVdoR9seTdEs8=
+	t=1731612463; cv=none; b=LaoR7CBX8mwCp6Y6L9gKmM+lY1x4dbW+CXB8DGq2cdk/LRexlM405MRQuQgQbrHqtuFXIcE+46sAuNmoH1GmQuDvt6gdUSyUQFlxA+LsJUz7DmPHmDzCnV6TCyAJoeM4e6EW+bpHv2ecF9gAZFa0nAqwaZlueL5VXAbY9ybVeME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731612168; c=relaxed/simple;
-	bh=JRi8xKxGuuE+b0jHJ+Vql53V2Sw0uR0okGWsErcdffQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IdrOtqKtRE80koWJIAUu8ZposQJKt3CbAZmxV42+AXXeLl1yVJsI+gwHh0Yv9Zuw6zlZ7XmeDeSvzTTq/fjy8ReeRtgHkYygLfurc+Lmgi+C1rVah6W+E7a5wPPe/fYTORgnMCVbTesqCSL3swMEWtnMi1MCOfyuCa17rcDBMC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Yqkehs3T; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1731612164;
-	bh=JRi8xKxGuuE+b0jHJ+Vql53V2Sw0uR0okGWsErcdffQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Yqkehs3TrUIuXJhUJQV0HpIYhnyj2ep62TqiK6605+0AuNb+Ie3PObfpQ3qgk5Bdu
-	 PLhwrXLEWqQEHPdM3en8D8z79kKxPxDDh4M+C4yC6aNxeJio+hyvyZ0aN/ixk6rNJb
-	 UduvP3x+5asy+/QrE7Qu36caEXlA+Y5GJ5lFJnX5it8BERejomH5Blxmm5kCsL9Bjh
-	 RVp28VQ1E3WeOVM+o3m8a4OiFpHPx8EWEfx9BH//KOLwhpoBlIqsM+uwZcb+v4tdsj
-	 MNlj22eoru+8XGoTvwzC5bk00i+mITI1XejHZc8ZlBAb0Nl7FYt0t3FqRY7ws0+rxo
-	 WqQvyaW17HrXQ==
-Received: from notapiano (pool-100-2-116-133.nycmny.fios.verizon.net [100.2.116.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: nfraprado)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 6856D17E377C;
-	Thu, 14 Nov 2024 20:22:40 +0100 (CET)
-Date: Thu, 14 Nov 2024 14:22:38 -0500
-From: =?utf-8?B?TsOtY29sYXMgRi4gUi4gQS4=?= Prado <nfraprado@collabora.com>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Michael Walle <mwalle@kernel.org>, kernel@collabora.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Biao Huang <biao.huang@mediatek.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: Set mediatek,mac-wol on
- DWMAC node for all boards
-Message-ID: <d441b614-0b71-410f-af4e-30cb164d9cd5@notapiano>
-References: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
- <20241109-mediatek-mac-wol-noninverted-v2-2-0e264e213878@collabora.com>
- <bdbfb1db-1291-4f95-adc9-36969bb51eb4@collabora.com>
+	s=arc-20240116; t=1731612463; c=relaxed/simple;
+	bh=txcz9rml5UlukCVS1D+ITLftMxjZTir6dwyu0ic8vgU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r1YymavPX1L/C9dMeyo+p+bQ2Ud1PL5OovyVLyW+i1ciw2xBV4RToimztZmhA9kECc/hv00CeIHhNjzfqfRCvJBRppQOnIuUatzPZWIONgyOmUi4nZLVOVSu66dI0Kb0bvenqKGwb/RSpW7GnZJXznDUBKFBYU+YbxwjEpu+IYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=everestkc.com.np; spf=pass smtp.mailfrom=everestkc.com.np; dkim=pass (2048-bit key) header.d=everestkc-com-np.20230601.gappssmtp.com header.i=@everestkc-com-np.20230601.gappssmtp.com header.b=lkmqC5Ym; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=everestkc.com.np
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=everestkc.com.np
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5cefc36c5d4so1326037a12.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:27:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=everestkc-com-np.20230601.gappssmtp.com; s=20230601; t=1731612460; x=1732217260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jeniB389OKvN5zEj18bT2eYMneg20P17C1/p3gN89l8=;
+        b=lkmqC5Ymx6d3saVpOtEWzHv1FucT57O8Ag67el/sfpPgk5EOvJYm3BD3HmwfyRuBBS
+         vP9Zgk6NTf00bk/GvcYeS1rtxCWYpzzaTCni5rBKUukfeBPWJfSlSFPX5fDTOUdznqbR
+         sU1PMlrIYyVPOZWcXpwr0mnK+mOPKPRGybkhVQKM6q2hPxj4TMyqlhidAh2y7zWKpZ4s
+         EAIJP8BpoTzJNFTgUXWAk1m5wFda0g6c8SbRxzWFHuFMzahHlRtZ0+9Oats6c0GDFECl
+         uRWCq5ale12V4Iu+2V75nqhFWeBVJdm6qHvfju5s/r1dqlXPTJQsDVjvYN8ZsW4JpfIL
+         8BLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731612460; x=1732217260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jeniB389OKvN5zEj18bT2eYMneg20P17C1/p3gN89l8=;
+        b=f2C6FcG6gsYWwk87DNlyYAw37/A13o4iSCfawX1ZQKfF9ts21HaYBxZN6G5D0hmZBf
+         exQ+2cztNZDDFfayMd/LICyw//9aQqUFiVV2Muk2WH7q94ezs6N84lH6c0qWDN6yvWXS
+         EcG8T9Eeka/7nU0ogrUip9hXqulzj+35mQMk0+gV5qBsnWzOZYWd/wXdD5yW1WSWb5v1
+         RC8CiDVCwNfJBVkPc3tNYutYHttTXqNUj7SV71a9CZTauTqCJc2LR3L7dQs/NO4kmR0t
+         02q0tdjXZRJAjug6PPDB9ZCOBeHEpi8Aa+/HCNmXCwkZ1KgU//i6UblYY0j5g867G3PN
+         QEHg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/EXdbGIQGrzQDAsY6RancqXlSP1exTVJbzmLT3Fj+QvcOHvvAawK+9worw/hKP0CG7g/d6+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7aXAdgFZlDxpLM8C07GXL64+N6y4/+vYFaOTPUnkV0H3rUY9l
+	dBtVUk9Hu9pSa9HnIrUu7biw2L487PHmDGDRFKdUUNUilAfFTQyxvBPGedRBCwMRYZP25y09HM3
+	snsBXoqW5Dr5elV5OjT0ibLsLqQxjOhEFM7iPbA==
+X-Google-Smtp-Source: AGHT+IFSQszniN+RtUbvA9KWKxINe1wk8KIYUXCCO8l/ucVV+qEreHHvFvj2XdwHBbQri+4d2NNe/piuHj9oJNb3iSo=
+X-Received: by 2002:a05:6402:2792:b0:5cb:dd06:90d5 with SMTP id
+ 4fb4d7f45d1cf-5cf77eeb2acmr3116704a12.26.1731612459509; Thu, 14 Nov 2024
+ 11:27:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bdbfb1db-1291-4f95-adc9-36969bb51eb4@collabora.com>
+References: <20241112233613.6444-1-everestkc@everestkc.com.np> <20241113105939.GY4507@kernel.org>
+In-Reply-To: <20241113105939.GY4507@kernel.org>
+From: "Everest K.C." <everestkc@everestkc.com.np>
+Date: Thu, 14 Nov 2024 12:27:28 -0700
+Message-ID: <CAEO-vhFzEo12uU7EBOb6r6J7Ludhe4HNNGvfN71fSDQRmR16pQ@mail.gmail.com>
+Subject: Re: [PATCH][next] xfrm: Add error handling when nla_put_u32() returns
+ an error
+To: Simon Horman <horms@kernel.org>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 14, 2024 at 10:26:34AM +0100, AngeloGioacchino Del Regno wrote:
-> Il 09/11/24 16:16, Nícolas F. R. A. Prado ha scritto:
-> > Due to the mediatek,mac-wol property previously being handled backwards
-> > by the dwmac-mediatek driver, its use in the DTs seems to have been
-> > inconsistent.
-> > 
-> > Now that the driver has been fixed, correct this description. All the
-> > currently upstream boards support MAC WOL, so add the mediatek,mac-wol
-> > property to the missing ones.
-> > 
-> > Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
-> > ---
-> >   arch/arm64/boot/dts/mediatek/mt2712-evb.dts                   | 1 +
-> >   arch/arm64/boot/dts/mediatek/mt8195-demo.dts                  | 1 +
-> >   arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts | 1 +
-> >   3 files changed, 3 insertions(+)
-> > 
-> 
-> ..snip..
-> 
-> > diff --git a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
-> > index 31d424b8fc7cedef65489392eb279b7fd2194a4a..c12684e8c449b2d7b3b3a79086925bfe5ae0d8f8 100644
-> > --- a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
-> > +++ b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
-> > @@ -109,6 +109,7 @@ &eth {
-> >   	pinctrl-names = "default", "sleep";
-> >   	pinctrl-0 = <&eth_default_pins>;
-> >   	pinctrl-1 = <&eth_sleep_pins>;
-> > +	mediatek,mac-wol;
-> 
-> The demo board has the same WoL capability as the EVK, so you can avoid adding the
-> mac-wol property here.
-
-Not sure I follow... If we omit the property here it will use PHY WOL instead,
-while the genio 1200 EVK has the property, so it will be using MAC WOL, so
-they're already the same and omitting will make them behave differently...
-
-Let me recap to make sure we're all on the same page:
-
-This was the WOL configuration for each board before this series:
-MAC mt2712-evb.dts
-MAC mt8195-demo.dts
-PHY mt8395-genio-1200-evk.dts
-MAC mt8395-kontron-3-5-sbc-i1200.dts
-PHY mt8395-radxa-nio-12l.dts
-PHY mt8390-genio-700-evk.dts
-
-After patch 1, they all get inverted:
-PHY mt2712-evb.dts
-PHY mt8195-demo.dts
-MAC mt8395-genio-1200-evk.dts
-PHY mt8395-kontron-3-5-sbc-i1200.dts
-MAC mt8395-radxa-nio-12l.dts
-MAC mt8390-genio-700-evk.dts
-
-And after patch 2, the remaining PHY ones are set to MAC:
-MAC mt2712-evb.dts
-MAC mt8195-demo.dts
-MAC mt8395-genio-1200-evk.dts
-MAC mt8395-kontron-3-5-sbc-i1200.dts
-MAC mt8395-radxa-nio-12l.dts
-MAC mt8390-genio-700-evk.dts
-
-The only board I have in hands and am able to test is mt8390-genio-700-evk.dts,
-which requires MAC WOL to work. For the others, your feedback on v1 was that
-they should all be set to MAC WOL. Except for mt2712, which you were not sure
-about, but it was already set to MAC WOL so we're keeping the same behavior.
-
-That's how we got to adding mediatek,mac-wol to mt8195-demo.dts,
-mt8395-kontron-3-5-sbc-i1200.dts and mt2712-evb.dts. Let me know if there has
-been some misunderstanding.
-
-Thanks,
-Nícolas
-
-> 
-> >   	status = "okay";
-> >   	mdio {
-> > diff --git a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
-> > index e2e75b8ff91880711c82f783c7ccbef4128b7ab4..4985b65925a9ed10ad44a6e58b9657a9dd48751f 100644
-> > --- a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
-> > +++ b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
-> > @@ -271,6 +271,7 @@ &eth {
-> >   	pinctrl-names = "default", "sleep";
-> >   	pinctrl-0 = <&eth_default_pins>;
-> >   	pinctrl-1 = <&eth_sleep_pins>;
-> > +	mediatek,mac-wol;
-> 
-> I'm mostly sure that Kontron's i1200 works the same as the EVK in regards to WoL.
-> 
-> Michael, I recall you worked on this board - can you please confirm?
-> 
-> Thanks,
-> Angelo
-> 
+On Wed, Nov 13, 2024 at 3:59=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Tue, Nov 12, 2024 at 04:36:06PM -0700, Everest K.C. wrote:
+> > Error handling is missing when call to nla_put_u32() fails.
+> > Handle the error when the call to nla_put_u32() returns an error.
+> >
+> > The error was reported by Coverity Scan.
+> > Report:
+> > CID 1601525: (#1 of 1): Unused value (UNUSED_VALUE)
+> > returned_value: Assigning value from nla_put_u32(skb, XFRMA_SA_PCPU, x-=
+>pcpu_num)
+> > to err here, but that stored value is overwritten before it can be used
+> >
+> > Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling=
+.")
+> > Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
+>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+>
+> For future reference, I think the appropriate target for this tree
+> is ipsec-next rather than next.
+>
+>         Subject: [PATCH ipsec-next] xfrm: ...
+Should I send a patch to ipsec-next ?
+>
+> ...
+- Everest K.C.
 
