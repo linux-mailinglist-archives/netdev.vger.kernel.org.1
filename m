@@ -1,96 +1,103 @@
-Return-Path: <netdev+bounces-144679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B561C9C8182
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:37:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4B8B9C81A7
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 05:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0C41F22E04
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:37:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BA691F23AB6
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719C91DF992;
-	Thu, 14 Nov 2024 03:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02711E9076;
+	Thu, 14 Nov 2024 04:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r837WVoo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mzlhoKEX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396432309B8;
-	Thu, 14 Nov 2024 03:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50361386B4;
+	Thu, 14 Nov 2024 04:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731555431; cv=none; b=itpFnep/+DsIsBLF4aN+R1cG/GtB/D1V0gBZ0QzbkAn5fSSEJJ5rJjBgVSb9qjxPKxUj/8Rmo99MOTnvoQLWbtlDVIVzP4SloIaNTO1EgKzBIPFmOkr/xDsJ0xdsq25axRb5coUmy4Q4n+ah73VcuuNjP/MfiZPscUAf+aDnHkk=
+	t=1731556817; cv=none; b=LKPk8v8ueLBUz66YgjOVXREAm5ghW9vDSkTmOgfUWOav7X6ebs6NpnUMr2GYPCasnjTh4YLwDsTip3Z9z226JTPbCRPJYx2oC3qlN5cVDncdMpqPi2GVm/ZTx8JFxMBHPecNcBqf0P6f8s9YTlroiV4pjPRtMar8D1yKKxFTyoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731555431; c=relaxed/simple;
-	bh=jFpyI3nOdDf01MdExjgHPu4NLF2fuwE/+slLVZ48g9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dWSDeYVDZPKnCwqy+WrQSd/+c940mMzEOzOfhFgZngOTWCOkvrjxzltlcZyJi8UYgdLImFJ+9Bi1Iuuvtu+7Z49JSQrFSbEko+zQvqLZ96wuKu1Vf7jB6rDhxwwAkbriwOapx/ETk4pt+BYChKrXJwKjvKbfWpCts9o3oVVL2nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r837WVoo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79731C4CEC3;
-	Thu, 14 Nov 2024 03:37:10 +0000 (UTC)
+	s=arc-20240116; t=1731556817; c=relaxed/simple;
+	bh=oFyEqg+Wi3bg6Jd+vWNtNIrKr6QAtBEfuLjYAZvCcL4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=E9aEe4ABGFKSz5AR2DjcfMiAaBR404d5JHnowefEyrNOP0oe0usTmS3954umBKLLt0RVng+18YYEOI9yBvtV0MJXrwOewrd8EjGYKkXubW9pUp8E+abQV01DbvtORCAmvgcGTervN3tfBkLmnRFbz3TNOAGtU6YV2x+2oJu4DCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mzlhoKEX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45061C4CED0;
+	Thu, 14 Nov 2024 04:00:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731555431;
-	bh=jFpyI3nOdDf01MdExjgHPu4NLF2fuwE/+slLVZ48g9o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r837WVoozJRURRFSvLLQf60pnpa5hpAN4IyOp8f60FfokeF1CXzss79hnUBem6g+4
-	 7aNpeqAzRdXPxi6S+8geG87H7dl/YYGDjdfzzf9ulqNaHKPfayBxY6RF9RUJndpXXZ
-	 3WuumvQW8CjhI3Rj+YYQHzG96rC2miV2U7rAcV22V+8zUKFSP0/zwkfl1j7Kxm1JcT
-	 WQTb3jWe+KMqFkfYAT/v/gbco4kYaG59ZW3nOlxy57+fX86wk06klYPgATonLiZT1b
-	 lLIMRU95NjUIJrPllCF7bH+QtKobg1qh+ERF2bfOqFkv6/a0GmSoGeq5ZuTC8apfRq
-	 nPrXdvStCg9Ug==
-Date: Wed, 13 Nov 2024 19:37:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Sean Nyekjaer <sean@geanix.com>, Vincent Mailhol
- <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] can: tcan4x5x: add option for selecting nWKRQ
- voltage
-Message-ID: <20241113193709.395c18b0@kernel.org>
-In-Reply-To: <20241112-hulking-smiling-pug-c6fd4d-mkl@pengutronix.de>
-References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
-	<20241111101011.30e04701@kernel.org>
-	<fatpdmg5k2vlwzr3nhz47esxv7nokzdebd7ziieic55o5opzt6@axccyqm6rjts>
-	<20241112-hulking-smiling-pug-c6fd4d-mkl@pengutronix.de>
+	s=k20201202; t=1731556817;
+	bh=oFyEqg+Wi3bg6Jd+vWNtNIrKr6QAtBEfuLjYAZvCcL4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mzlhoKEX4I76OAJB7pvtu5Ze2fcts8G9x8h3GSAoyP+KzoIy6C5/xzXwvJ9Ep05u8
+	 HGGXkG+jktDO8LFOvUNZU/ddThiPLLQDlOVwAYralL/jhT9CqiImtgl2iTHIo+V70c
+	 fzxkZwtkr2kIMratdRlGfnI66ekfT7VwI7UE9vqUig6MPC0qG++QT32oISGBRJFjAd
+	 pDKVCff+API3hcYNfNkJLWMGrQFtWcOYRbtB+u2toKx8cF5z1QdUFBARoLRVWMtYsH
+	 6zm+HjIMidPwri3aAOWhkZSvfP98AJ3cUysWAaaKz1N5NgtQioSJ7tQs7ry+U6kp7u
+	 3y6Nj1UQ1PI7Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEBF3809A80;
+	Thu, 14 Nov 2024 04:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/2] net: stmmac: dwmac-mediatek: Fix inverted logic for
+ mediatek,mac-wol
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173155682775.1476954.16636894744432122406.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 04:00:27 +0000
+References: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
+In-Reply-To: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
+To: =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado_=3Cnfraprado=40collabora=2Ecom?=@codeaurora.org,
+	=?utf-8?q?=3E?=@codeaurora.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, biao.huang@mediatek.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, bartosz.golaszewski@linaro.org,
+ ahalaney@redhat.com, horms@kernel.org, kernel@collabora.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com
 
-On Tue, 12 Nov 2024 08:16:02 +0100 Marc Kleine-Budde wrote:
-> > > There is no need to CC netdev@ on pure drivers/net/can changes.
-> > > Since these changes are not tagged in any way I have to manually
-> > > go and drop all of them from our patchwork.  
-> 
-> Does the prefix "can-next" help, i.e.:
-> 
-> | [PATCH can-next v2 0/2]
-> 
-> which can be configured via:
-> 
-> | b4 prep --set-prefixes "can-next"
+Hello:
 
-Yup, prefix would make it easy for us to automatically discard !
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> > Oh sorry for that.
-> > I'm using b4's --auto-to-cc feature, any way to fix that?  
+On Sat, 09 Nov 2024 10:16:31 -0500 you wrote:
+> This series fixes the inverted handling of the mediatek,mac-wol DT
+> property. This was done with backwards compatibility in v1, but based on
+> the feedback received, all boards should be using MAC WOL, so many of
+> them were incorrectly described and didn't have working WOL tested
+> anyway. So for v2, the approach is simpler: just fix the driver handling
+> and update the DTs to enable MAC WOL everywhere.
 > 
-> You can manually trim the list of Cc: using:
-> 
-> | b4 prep --edit-cover
+> [...]
 
-My bad actually, I didn't realize we don't have an X: entries
-on net/can/ under general networking in MAINTAINERS.
+Here is the summary with links:
+  - [v2,1/2] net: stmmac: dwmac-mediatek: Fix inverted handling of mediatek,mac-wol
+    https://git.kernel.org/netdev/net/c/a03b18a71c12
+  - [v2,2/2] arm64: dts: mediatek: Set mediatek,mac-wol on DWMAC node for all boards
+    (no matching commit)
 
-Would you mind if I added them?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
