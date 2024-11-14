@@ -1,162 +1,122 @@
-Return-Path: <netdev+bounces-144692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BFF09C8323
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 07:28:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEE5D9C832B
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 07:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D94D62870DD
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 06:28:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18055B24119
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 06:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C83516FF4E;
-	Thu, 14 Nov 2024 06:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B4C1E9098;
+	Thu, 14 Nov 2024 06:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="l/m2ar5X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg156.qq.com (smtpbg156.qq.com [15.184.82.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE2B1632E7;
-	Thu, 14 Nov 2024 06:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.82.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF771E9066
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 06:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731565728; cv=none; b=BK/UsoGAIaYtSy1kh3l0gQUHj1Qy76LqWLWAoPrRRddRe9ICLhbrrlfxS2CagwLu+diKwL7YCOjKVG70yKWpyKoZPoeiqFkvltNchYD2ETuNCClFftWX3O/Kd0j9o+EqeG4nsuSxnzNHeCJUSs8xuioKBjeTZSNMgTqVAA+RcA8=
+	t=1731565796; cv=none; b=Fn8YZY8kWAukKadq6AwDb7MhUz+73hJ4D9dUeyfGcuxNXP+MuSoPrOAq5Fj/f5nB5B5iEnsvSTKBgAQ5eRGqs6vqWPKjM3ekZzPB5gjGVwdORdbYfJc1cIwfNOXUhA9PpByM5LyQSVmSEulw2XuvaxNukL3T1ecp8LuBq95pW7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731565728; c=relaxed/simple;
-	bh=vlBoSOwvXilp2dG7d2LFG604okbAkj9QIiGpkrwdLEY=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=ULzWoiWiIQXe5cwwNd0PXc92REN85jkbhRwoE46ZChp2MsQeCk+OelZ2RwAO3HYfpOtS5RA23+YlY32AAYaBDTyBZgLikdWNuJx5SxX/ViT59Fy7aZNUNzZbqAz2tvjxwlqZbpmANTYjIoEB77dYoDp0tbBD1bGRssi4cvNqhTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=15.184.82.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp81t1731565677td9i2fx4
-X-QQ-Originating-IP: MQFf11WvFEzut+oeB4G2ojO/800rQ6j2cC39VE37dvA=
-Received: from smtpclient.apple ( [115.200.246.212])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 14 Nov 2024 14:27:55 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3780668568037727963
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1731565796; c=relaxed/simple;
+	bh=3+namQukeZLx2CV7DlgaX+q4V2zRXwnmPu+JiK8qS+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ChrkrJm/6gYfwuzO2b4YQ8oyj1WWj0yyJgOWDuk7y3YNndjNrTXjWZFsMLqscb3LGqOM5jFc9sl6m1YTPbNhpdW1pnnKVyDHYHeUM4pRpflfcbWt6SBZCKh3Bw2BhhutvSQIsqZHDEkgyet5wWe5/bx4TUznjybYrIBcmOk1HJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=l/m2ar5X; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2e2d1858cdfso227163a91.1
+        for <netdev@vger.kernel.org>; Wed, 13 Nov 2024 22:29:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1731565794; x=1732170594; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e1U1d47krDEIIdDqbZ0ejinn2L3sss3M6fc+t7cgpMg=;
+        b=l/m2ar5XtOzpZfn8q/ouwrOY51Lv2ELudVY5Lm0xOC+tOEJ9DSaSd04vJdpwUWY0eD
+         TmzC6K4w/U/vFbsa8i5XzmSyzkXC9tT6k4ELz9GejE3NJvIwO67XxapY1B9+FsHmHiUY
+         CIljGFvDMActb9dJDHZDiD6jMDqoJNOLRvELw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731565794; x=1732170594;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e1U1d47krDEIIdDqbZ0ejinn2L3sss3M6fc+t7cgpMg=;
+        b=eGzSymuA+1T2OkCpYOexYOohhRMUj0jZTdh2+TGxzRW6ylgrm8MAGmUwg3IJXtnjIv
+         Lp4ccm19HTQj+Eeuj7qZy3vTfi4WOVZmiRCOYaR/mdeTvu1E4RGxcn1Ba8MVx9+WUvPa
+         +UOy5hWB4YwOv6KVfv1Er6NoVad/aLMYCC2TvNXnzBIAEKTboWlE2TrwJxfX0gWV/aNs
+         gtQzUksx6jzK/imGp1xZTOF/sIHE+25dMJqS7Go+qmlU+Wn+hXxWc6UrsvKSB/6QYUfp
+         bKAPW3D+k6jWOAIg3gCHBkCcGmyLxikPBbYoTRPWtcScDkkeCtuIerPK3Hs1rRis1WnN
+         aovA==
+X-Gm-Message-State: AOJu0YzoFSzr6SGnJqisrgL5xmf6DKQWspuRjw7YYXTfEnQr9EXhQ+N5
+	ll5SsHetWvtmdB2veMJam8zUk/2Te9cF4mEFD5n4DClmgrXFNjMptK6Zqm0y5uA=
+X-Google-Smtp-Source: AGHT+IEwKpd9ZK69/Lrrv6KF9AavgRm3fpHJJ9DYUNlx4ODRs/7h6HAJLacjxS3Wq18rSX5qKX82EQ==
+X-Received: by 2002:a17:90b:2747:b0:2e2:cf5c:8ee3 with SMTP id 98e67ed59e1d1-2e9b17138bcmr33101700a91.10.1731565793945;
+        Wed, 13 Nov 2024 22:29:53 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea024a4b49sm635461a91.26.2024.11.13.22.29.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 22:29:53 -0800 (PST)
+Date: Wed, 13 Nov 2024 22:29:50 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	mkarsten@uwaterloo.ca, "David S. Miller" <davem@davemloft.net>,
+	open list <linux-kernel@vger.kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [net v2 0/2] Fix rcu_read_lock issues in netdev-genl
+Message-ID: <ZzWY3iAbgWEDcQzV@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, mkarsten@uwaterloo.ca,
+	"David S. Miller" <davem@davemloft.net>,
+	open list <linux-kernel@vger.kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Simon Horman <horms@kernel.org>
+References: <20241113021755.11125-1-jdamato@fastly.com>
+ <20241113184735.28416e41@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
-Subject: Re: [PATCH PCI] PCI: Add ACS quirk for Wangxun FF5XXX NICS
-From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-In-Reply-To: <20241112174821.GA1849315@bhelgaas>
-Date: Thu, 14 Nov 2024 14:27:44 +0800
-Cc: linux-pci@vger.kernel.org,
- netdev@vger.kernel.org,
- jiawenwu@trustnetic.com,
- duanqiangwen@net-swift.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <3D914272-CFAE-4B37-A07B-36CA77210110@net-swift.com>
-References: <20241112174821.GA1849315@bhelgaas>
-To: Bjorn Helgaas <helgaas@kernel.org>
-X-Mailer: Apple Mail (2.3818.100.11.1.3)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NRLj+a+1JRyJKtew8dwzP3Cy7HfiEXivvg7X3Kv5wdBSRfxOtEAvh4gW
-	7Ov+EW5p59fE2VcAY0Raoxz/HfB3lNtgES53JRIHz9H17BSsRBmc6xpHtZo/AfhrenL8M27
-	mDP5w0X1zPo9UsnzqWq5kc3eDvopTK1nGzRXSQRbgrVR2FOCrkAUgUG1aOS4nM+Tp2wYCJR
-	trghrcqJkp/Hf/yxLfKwcAJLIrqTr5gza/jfmpBaByL/5Bzq7E85/HqFTltRBf5xaRsfhzX
-	2FXW+fUjAcIYtxQFpEBXLHS80oP2RRs1QlpPcHdiT5zoyBkSPBIbN4Xx77pNsLA6Ur57H0M
-	/oXnMWJz0uZaDoH4CZlwAjPyN0MuIvIuaFtdMNV0jDicBqVycX3ie99FC+4kEBOXZj1Amnp
-	OzrloRAdO5tyxGMWitN9W26R+xzmab6f7s+VGSR5P3u/7Upzs9rBF/kRuoUjssqaz6NEyAK
-	d7aaQwoePNAX/ADl42EYnQ+mmdmPNFTaN17OZ4fIbjCe0i7h/yy2Ccav9/KLxQBwHTITMfK
-	/NTuYZkMODq1uVmNwfIfrV/feI3TzG+Ve9UYpeKehpwapeFfrq8UYaX+61wF+X/XgDLszsf
-	ut5qtauSTxWUdrEFRgDykOqDsO+6E+buxCzoUnVMMfqUYPplwbAGAc2EIOCYuIFQ4pIlrxv
-	m2RaxxrzIsm4kEm2mQLMnkdSTioqDt/1g5kbZBJhSviTIxa273oAROOROyT8ETA50yRuAp+
-	DXtg8s2EjZn3c3LugkPIL+vhKsb+tWvR7mDomKnHd9/NEeUMADlC6mcdCnNiIxHO38OCnLs
-	Dbqn8IVzCnBSTQSBosg6uYFD/VMjWUDSqytoRQsMVGvvvpP1IMLYEVSTc/IHCgfoz+JnB6+
-	fSzMQWDXfFfBrEH4yeYgWahIaySwWK3CvwScAEVP1j1GiMpbGrIEXGN5WnqEVbH36Ope3AW
-	FnNATbN/tP+rzpTE5QN0poS7z1vbJ3jbLJqDEzdqzPRcAIXSbJ7/c6PNLjDaPB5o1aRw=
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241113184735.28416e41@kernel.org>
 
+On Wed, Nov 13, 2024 at 06:47:35PM -0800, Jakub Kicinski wrote:
+> On Wed, 13 Nov 2024 02:17:50 +0000 Joe Damato wrote:
+> > base-commit: a58f00ed24b849d449f7134fd5d86f07090fe2f5
+> 
+> which is a net-next commit.. please rebase on net
 
-Thanks for your review. It is indeed accurate.
+I thought I asked about this in the previous thread, but I probably
+wasn't clear with my question.
 
-> 2024=E5=B9=B411=E6=9C=8813=E6=97=A5 01:48=EF=BC=8CBjorn Helgaas =
-<helgaas@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Tue, Nov 12, 2024 at 07:18:16PM +0800, Mengyuan Lou wrote:
->> Wangxun FF5XXX NICs are same as selection of SFxxx, RP1000 and
->> RP2000 NICS. They may be multi-function devices, but the hardware
->> does not advertise ACS capability.
->>=20
->> Add this ACS quirk for FF5XXX NICs in pci_quirk_wangxun_nic_acs
->> so the functions can be in independent IOMMU groups.
->>=20
->> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
->=20
-> I propose the following commit log and comment updates to be clear
-> that the hardware actually enforces this isolation.  Please
-> confirm that they are accurate.
->=20
->  PCI: Add ACS quirk for Wangxun FF5xxx NICs
->=20
->  Wangxun FF5xxx NICs are similar to SFxxx, RP1000 and RP2000 NICs.
->  They may be multi-function devices, but they do not advertise an ACS
->  capability.
->=20
->  But the hardware does isolate FF5xxx functions as though it had an
->  ACS capability and PCI_ACS_RR and PCI_ACS_CR were set in the ACS
->  Control register, i.e., all peer-to-peer traffic is directed
->  upstream instead of being routed internally.
->=20
->  Add ACS quirk for FF5xxx NICs in pci_quirk_wangxun_nic_acs() so the
->  functions can be in independent IOMMU groups.
->=20
->> ---
->> drivers/pci/quirks.c | 10 ++++++----
->> 1 file changed, 6 insertions(+), 4 deletions(-)
->>=20
->> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
->> index dccb60c1d9cc..d1973a8fd70c 100644
->> --- a/drivers/pci/quirks.c
->> +++ b/drivers/pci/quirks.c
->> @@ -4996,18 +4996,20 @@ static int pci_quirk_brcm_acs(struct pci_dev =
-*dev, u16 acs_flags)
->> }
->>=20
->> /*
->> - * Wangxun 10G/1G NICs have no ACS capability, and on multi-function
->> + * Wangxun 40G/25G/10G/1G NICs have no ACS capability, and on =
-multi-function
->>  * devices, peer-to-peer transactions are not be used between the =
-functions.
->>  * So add an ACS quirk for below devices to isolate functions.
->=20
->  Wangxun 40G/25G/10G/1G NICs have no ACS capability, but on
->  multi-function devices, the hardware isolates the functions by
->  directing all peer-to-peer traffic upstream as though PCI_ACS_RR and
->  PCI_ACS_CR were set.
->=20
->>  * SFxxx 1G NICs(em).
->>  * RP1000/RP2000 10G NICs(sp).
->> + * FF5xxx 40G/25G/10G NICs(aml).
->>  */
->> static int  pci_quirk_wangxun_nic_acs(struct pci_dev *dev, u16 =
-acs_flags)
->> {
->> switch (dev->device) {
->> - case 0x0100 ... 0x010F:
->> - case 0x1001:
->> - case 0x2001:
->> + case 0x0100 ... 0x010F: /* EM */
->> + case 0x1001: case 0x2001: /* SP */
->> + case 0x5010: case 0x5025: case 0x5040: /* AML */
->> + case 0x5110: case 0x5125: case 0x5140: /* AML */
->> return pci_acs_ctrl_enabled(acs_flags,
->> PCI_ACS_SV | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
->> }
->> --=20
->> 2.43.2
+Let me try again:
 
+Patch 1 will apply to net and is a fixes and CC's stable, and fixes
+a similar issue to the one Paolo reported, not the exact same path,
+though.
 
+Patch 2 will not apply to net, because the code it fixes is not in
+net yet. This fixes the splat Paolo reported.
+
+So... back to the question in the cover letter from the RFC :) I
+suppose the right thing to do is split the series:
+
+- Rebase patch 1 on net (it applies as is) and send it on its own
+- Send patch 2 on its own against net-next
+
+Or... something else ?
 
