@@ -1,126 +1,126 @@
-Return-Path: <netdev+bounces-144984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED6A69C8F18
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:03:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 305919C8F1C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A54F61F26170
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:03:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E96DD28BBE3
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B60E169AE6;
-	Thu, 14 Nov 2024 16:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BDE15B0EF;
+	Thu, 14 Nov 2024 16:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDl0yqS3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="amTz5GC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6220133987;
-	Thu, 14 Nov 2024 16:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC4B14E2D6
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 16:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731600137; cv=none; b=V0Vc0ZrEEc/TsFaRVtdiuV2FqVWYubn4NXKlPku7XYYMeGmTqiTcA/meFEIk5O7kc8QAtpK4toOmu7zqYbehDArPQTwvQ3QXfaA8L188uq5XmzTmqs2YJZH0Bf5fyaYIAj3piU9uyGDLScpcp7Mk84giV4iWGAaASchZ05XaKu8=
+	t=1731600216; cv=none; b=J9TwDc2N2uFCimykNOAjASOtx1jGYu97HLKswiVENqf/kWy8par5PkH13vK7YPd46s9K4r/NeLl7AUZE/9KteYbklGedsLx9lJEbggU2PFE3nnplLj4bL5qOtfOZU3NSs6cJZHfzc8haBen1rWEjFaEnelD6L4/mHqkthWOhHoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731600137; c=relaxed/simple;
-	bh=CLE+gdbwkUGWxgVL/DfhT8L9omEJZAlZq2aorhrIAow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WCw92uAqMMxAeQjVl7ZwDSElJ4Y4L27dkhcxL2TT4msyHKnTUWDa5EXHLO7OZtQPRNeBGggQnl6Ju2msH0kl58DyWkH9LHzsXNVU0S6c9f+YjgQISgSd49GuQh+57f1ykdguk0OaIEDd37A4k/A9jjRteBpEAWSmGWZpE1Iop6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDl0yqS3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFA7C4CECD;
-	Thu, 14 Nov 2024 16:02:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731600137;
-	bh=CLE+gdbwkUGWxgVL/DfhT8L9omEJZAlZq2aorhrIAow=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VDl0yqS3yS2D3oGna4mh6TH6YC/T+22WILn0j6PiK4E7vghIzflz4uhXyAxYY5MdO
-	 LepEXXmlDxd/tK5YiwY7HdF4AyACk96C4NUIejRVytBSvbjAgT5S3CQfiW0F8Kn53X
-	 nhQyOFRN8pDPhsPLIGw+6GlBua7KrYfVpn2BvTc6NtLXBBzQWOxPrZXYik8pGYJ8PA
-	 Phv6GsuBnRJ/37Z4T+oec6kp6EZnrOg0XfN1b1sMvPkgz3QYNKpAk9ygqJDqw4ioyB
-	 DKOex+tJkIkeH0PENmcrUV6H20f3ukmgesA+H18Td0NpeTTV7LdkZ2qsksxiC6hi53
-	 4jgMoE1+vSIlg==
-Date: Thu, 14 Nov 2024 16:02:14 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	Linux-MM <linux-mm@kvack.org>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH net-next v23 1/7] mm: page_frag: add a test module for
- page_frag
-Message-ID: <ZzYfBp0IO1WW6Cao@finisterre.sirena.org.uk>
-References: <20241028115343.3405838-1-linyunsheng@huawei.com>
- <20241028115343.3405838-2-linyunsheng@huawei.com>
+	s=arc-20240116; t=1731600216; c=relaxed/simple;
+	bh=EiBG97YNblHkUXL6lTFf1fcI90D+FK3ZliHurtw57i4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AMFF0wa9NefBX+fXxAmydijDM8yKYCwiADu0UhTFIkhGcPKrGlUb4r4eoVWFDmUyCJ8bk7s9ShdtBGqSUGEbpm3rhSH4QtOzhtkR2hIdgWMnodP9kUbJ+ME6b7t2LPjvdeByozXhxUTDGEWc6FlItZvvEmk1MQ6AvfZtR0Sq1hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=amTz5GC+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731600213;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=mqDeygRmWi/kNU1a4hZLWkcZ1ztVZyaf0VsbpEiFlQI=;
+	b=amTz5GC+eTPglghcelbV7RHoxIMpcXwaGIrowJEsddklEM1nifXtiGz3Ph3dqnsErwfXYb
+	RfZnbKqbtS9nLkehODFe8fdWdBijOrejydLH9PwRoi/o2ES2/NCJLR5Z9/KzgM99QZzx+b
+	YwlshMwXYSGaHVgw6MhqZqQ2qLDMHlE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-53-t-l-tX_CMWmpz6RtC_MB-A-1; Thu, 14 Nov 2024 11:03:29 -0500
+X-MC-Unique: t-l-tX_CMWmpz6RtC_MB-A-1
+X-Mimecast-MFC-AGG-ID: t-l-tX_CMWmpz6RtC_MB-A
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315ad4938fso6066845e9.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 08:03:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731600208; x=1732205008;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mqDeygRmWi/kNU1a4hZLWkcZ1ztVZyaf0VsbpEiFlQI=;
+        b=HdEJbcDr4vp9fX+8aJIBGesHLn/I2QT7fPjFJ5XLWtgoEEbfLQKQEtOf3p8CAE9Rby
+         AFTx3Uni8xhCYYIBEqRHP7SNk5e3hR9eXn83Mw4Uge3rGVxxVYXxXb4z6sN6uiwgcr8S
+         mVwzKeuXdX+HF13TJznHQ+MjD9XZ5vv4rB3S9/1u/enk0NogDhHsxYJrpBMgatKfxPAy
+         zGxtEeRP+/027YwD9Jk/j60uFSReQBnF5WjntoPukP3CoqavRfYsCAw1PFafXAfKrQUF
+         YsG7//1CaXuqQgpayLwm0deA2/wYFkDoZFoy783lL9dLYjEGmim0ohBFnDOnNs3pYJqP
+         /iMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqZ8Q5vkK8D+hvVRMaeihnipGGsHou9dWFxCFMf3tumIPaz5BWAkWULrpZ7hIprW1lTmoXbeI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT3IdhxFkHPHDeIAexLh6d+f9GE0ca1WIDPEEDaAL2ydVoNUOc
+	+1S6mk8blIfOXzybQVAnZHU6XubnVpKyMjkHOLyjUHOMxKR7whr1wX3LhpsBjuW9G+WInIgZP/u
+	A4RIovoyIT3o83KzTPfY+nURctEzqdhqs1xchbO5WGZt8oXr+BupXtg==
+X-Received: by 2002:a05:600c:1c09:b0:431:5522:e009 with SMTP id 5b1f17b1804b1-432b750394cmr227379835e9.12.1731600207967;
+        Thu, 14 Nov 2024 08:03:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHPb1+OHLtmsNZvaVnkw878qmBSxtdRGcXdFiXLwoXAHw0rchZLFpvGTZGMFu9nMowpx0edyA==
+X-Received: by 2002:a05:600c:1c09:b0:431:5522:e009 with SMTP id 5b1f17b1804b1-432b750394cmr227368955e9.12.1731600198419;
+        Thu, 14 Nov 2024 08:03:18 -0800 (PST)
+Received: from debian (2a01cb058d23d600b637ad91a758ba3f.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:b637:ad91:a758:ba3f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da299dadsm27965975e9.43.2024.11.14.08.03.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 08:03:17 -0800 (PST)
+Date: Thu, 14 Nov 2024 17:03:16 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, coreteam@netfilter.org,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH nf-next 0/5] netfilter: Prepare netfilter to future
+ .flowi4_tos conversion.
+Message-ID: <cover.1731599482.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0MyQI+clfZpBVvMG"
-Content-Disposition: inline
-In-Reply-To: <20241028115343.3405838-2-linyunsheng@huawei.com>
-X-Cookie: System checkpoint complete.
-
-
---0MyQI+clfZpBVvMG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Oct 28, 2024 at 07:53:36PM +0800, Yunsheng Lin wrote:
-> The testing is done by ensuring that the fragment allocated
-> from a frag_frag_cache instance is pushed into a ptr_ring
-> instance in a kthread binded to a specified cpu, and a kthread
-> binded to a specified cpu will pop the fragment from the
-> ptr_ring and free the fragment.
+There are multiple occasions where Netfilter code needs to perform
+route lookups and initialise struct flowi4. As we're in the process of
+converting the .flowi4_tos field to dscp_t, we need to convert the
+users so that they have a dscp_t value at hand, rather than a __u8.
 
-This is breaking the build in -next on at least arm64 and x86_64 since
-it's trying to build an out of tree kernel module which is included in
-the selftests directory, the kselftest build system just isn't set up to
-do that in a sensible and robust fashion.  The module should probably be
-in the main kernel tree and enabled by the config file for the mm tests.
+All netfilter users get the DSCP (TOS) value from IPv4 packet headers.
+So we just need to use the new ip4h_dscp() helper to get a dscp_t
+variable.
 
-KernelCI sees:
+Converting .flowi4_tos to dscp_t will allow to detect regressions where
+ECN bits are mistakenly treated as DSCP when doing route lookups.
 
-***
-*** Configuration file ".config" not found!
-***
-*** Please run some configurator (e.g. "make oldconfig" or
-*** "make menuconfig" or "make xconfig").
-***
-Makefile:810: include/config/auto.conf.cmd: No such file or directory
+Guillaume Nault (5):
+  netfilter: ipv4: Convert ip_route_me_harder() to dscp_t.
+  netfilter: flow_offload: Convert nft_flow_route() to dscp_t.
+  netfilter: rpfilter: Convert rpfilter_mt() to dscp_t.
+  netfilter: nft_fib: Convert nft_fib4_eval() to dscp_t.
+  netfilter: nf_dup4: Convert nf_dup_ipv4_route() to dscp_t.
 
-(see https://storage.kernelci.org/next/master/next-20241114/x86_64/x86_64_defconfig%2Bkselftest/gcc-12/logs/kselftest.log)
+ net/ipv4/netfilter.c              | 2 +-
+ net/ipv4/netfilter/ipt_rpfilter.c | 2 +-
+ net/ipv4/netfilter/nf_dup_ipv4.c  | 2 +-
+ net/ipv4/netfilter/nft_fib_ipv4.c | 3 ++-
+ net/netfilter/nft_flow_offload.c  | 4 ++--
+ 5 files changed, 7 insertions(+), 6 deletions(-)
 
-and I've seen:
+-- 
+2.39.2
 
-  ERROR: Kernel configuration is invalid.
-         include/generated/autoconf.h or include/config/auto.conf are missing.
-         Run 'make oldconfig && make prepare' on kernel src to fix it.
-
-make[3]: *** [Makefile:788: include/config/auto.conf] Error 1
-
---0MyQI+clfZpBVvMG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmc2HwUACgkQJNaLcl1U
-h9Db9gf8Cr2HGJXLOLGXW8Noo9DxYlVt3elXI60b8tNmifJUKessfHXguQp3P1N4
-zOEibYMbPJb1psJo7B0xpb50i4BML30rUBm2vH4ZILQX8IMafE/y2L0vfJ4+kbhz
-HMMaZtkYMlePGIK25hApP53VfsEPDwdqOkTBJTksOxf0xLG3ZIQcguwnlZldxrZu
-5YfGkL85wLRoiOrNdqUR5lhl7hrV1YpLsrSeKfFs3fhAMgTrcmHLEpTYHtjo/caz
-+V2b6+5SlF46vd0d0h8hz92i26LSTt/14K4ZXGQHGCVd2NmO7rmu6Bd6YbwGPVLA
-e17YBlDrGC1jnnuLNiDpZtBtN6VdJA==
-=MZrU
------END PGP SIGNATURE-----
-
---0MyQI+clfZpBVvMG--
 
