@@ -1,74 +1,93 @@
-Return-Path: <netdev+bounces-144674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B0A9C8161
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:11:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1419E9C8157
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:10:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1D3B2830A9
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:11:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A2C4B24928
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636D11F26C0;
-	Thu, 14 Nov 2024 03:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3651CCEE0;
+	Thu, 14 Nov 2024 03:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qo2zZh1+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPAaVjJE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DCC1F12F3;
-	Thu, 14 Nov 2024 03:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682982E634
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 03:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731553825; cv=none; b=A6Mr/SxIV9LPZjt+WJ40Y+kTrWFywoHZGQP0kG4GCybydB4q6f9hJ6aI+f9XZTOf1pZCJJRCa3/OAXxMAbU6dkTjPJpDEWwqSL9298I4RQ646VsGLl956hE8YNKyE34T4a3Y3Dakbl1ZJ509eaFri+d8/3nKuhEuj00FwQU9enA=
+	t=1731553819; cv=none; b=aLasQb5mmiCJfuTZOWCw/iVM+qGp7PLafXotT1N//kk7SM7R+2iXb4OiPTXcdY1NW556K6w7wmRDmJYPo936vQnl763isQUAUju0BWtZ0x6UoDwuybvpZk8JljlMzzS5Pbr5uolnx7w02WKo6U5ubdTE7tes1Ee+/sV48YbE2qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731553825; c=relaxed/simple;
-	bh=8LBZhTyUmqbp4I0278vs9a/olUqdNWfuPwRflqnmJfk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GaH5+w9PsGIc7AlbzTOLAiFwZ8/J7t549MvlnAQEY6SWyqLQ2nZj6gOcxmpyKWSG4d5HrIIhsDv2/QhxhaU5n1EJbChlkI/K3u6qH+4kDzhxZuZulFsHg99skRxBJCjg/kvj+yKnzTjBZODDm6uMdwdluKgxNi7GuByfo/jOmBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qo2zZh1+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CEF3C4CED5;
-	Thu, 14 Nov 2024 03:10:24 +0000 (UTC)
+	s=arc-20240116; t=1731553819; c=relaxed/simple;
+	bh=Naw/2iMvIsKYhVEY8NtnnYLnLQKzbYI2YxAKc1ylb7U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=P2S3lj1o7jdU9fHn124GN6+N+rdghuzZ9bzxoaavY2XUzEbwJo2G9u+Qvwaa08B37qlmeIaly1eOdTa9pHwQHUpDUZMFJNRY4lOIbKvD+3k1ZpLHylyzCuoxLHdFnHXPcOJRfNQHVNKBVI3fFsEQ/7z3WQgh/OqJ1HSxYmn2hko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPAaVjJE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0691DC4CEC3;
+	Thu, 14 Nov 2024 03:10:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731553825;
-	bh=8LBZhTyUmqbp4I0278vs9a/olUqdNWfuPwRflqnmJfk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qo2zZh1+IdFKI2JY6dhamMPROx6Ib4CTTNAH80Cdh2kGL0rJWq0KoTXMJjqWUfqvj
-	 gtBjhE/aWc8nckVdzmHqzTSIv8Sggo/Yxrw7yTd3EhjaCgThc0z78wNqWFh47up5p+
-	 o0gmcsaIe+ehxFI7SFUpj30KN49L9H9QA6xrZmHTN2YyU05Ccfih7hMzxULR0y7rmS
-	 uFxikSCJzeB8PVfT1G53zyiAoiaJ/4N6ebugNOKQ4R0XI9Sg06iyvCG+tkbO285/Sz
-	 ownZx4iM+SOBYmL5QWXQiaCzwWCKSe8rAXpkjoFZ93Ejfrt3EZweLfAvNSD1OwPibS
-	 uW3LJthzyatXQ==
-Date: Wed, 13 Nov 2024 19:10:23 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
- <dsahern@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@meta.com
-Subject: Re: [PATCH net v2] ipmr: Fix access to mfc_cache_list without lock
- held
-Message-ID: <20241113191023.401fad6b@kernel.org>
-In-Reply-To: <20241108-ipmr_rcu-v2-1-c718998e209b@debian.org>
-References: <20241108-ipmr_rcu-v2-1-c718998e209b@debian.org>
+	s=k20201202; t=1731553819;
+	bh=Naw/2iMvIsKYhVEY8NtnnYLnLQKzbYI2YxAKc1ylb7U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jPAaVjJEr+wZAiK5Yo4EZ+VST4Th1E1VtJLxuprp6PGsqW3i4i9eX9H4IZgsQZRoJ
+	 /MLGYboBBZJNgo8WVMqwKpNee6C1pR7ptSRoMy6hEWW9nA9Rl+ID7879V4is6liADz
+	 89w8ge0K+FRX7wbSKu4+cl+P6208TF3wJO5Bs70F2rTP6hfrV7OzGVoPwBrU/7EC5U
+	 7MZnE7tUkohEwK0x+EqrFIBu6OdGRno85x+EfgLL4NVbcUnctfKwbafBYc7zk4l/LD
+	 IA6QPBsM6BOMG4jQz0fasS8fYWNqr9NKumyLKk89BUK/f7VNc5BP3LtsxFc29+gbrP
+	 U2kbb3IM+PePA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD503809A80;
+	Thu, 14 Nov 2024 03:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phylink: ensure PHY momentary link-fails are handled
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173155382952.1467456.818025393378907444.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 03:10:29 +0000
+References: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ o.rempel@pengutronix.de, florian.fainelli@broadcom.com,
+ netdev@vger.kernel.org
 
-On Fri, 08 Nov 2024 06:08:36 -0800 Breno Leitao wrote:
-> Accessing `mr_table->mfc_cache_list` is protected by an RCU lock. In the
-> following code flow, the RCU read lock is not held, causing the
-> following error when `RCU_PROVE` is not held. The same problem might
-> show up in the IPv6 code path.
+Hello:
 
-good start, I hope someone can fix the gazillion warnings the CI 
-is hitting on the table accesses :)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 12 Nov 2024 16:20:00 +0000 you wrote:
+> Normally, phylib won't notify changes in quick succession. However, as
+> a result of commit 3e43b903da04 ("net: phy: Immediately call
+> adjust_link if only tx_lpi_enabled changes") this is no longer true -
+> it is now possible that phy_link_down() and phy_link_up() will both
+> complete before phylink's resolver has run, which means it'll miss that
+> pl->phy_state.link momentarily became false.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: phylink: ensure PHY momentary link-fails are handled
+    https://git.kernel.org/netdev/net/c/671154f174e0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
