@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-144889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE249C8A0E
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:34:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00FB79C89E3
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:26:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27698B2574C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:25:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99ED0B3045E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61061FB3FE;
-	Thu, 14 Nov 2024 12:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8429F1FB881;
+	Thu, 14 Nov 2024 12:23:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B112E1FB3D7;
-	Thu, 14 Nov 2024 12:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794531FB73E;
+	Thu, 14 Nov 2024 12:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731586982; cv=none; b=eTymf+uSo7SI1bUcMTcNt6Av3vyY1yDa5+EVlAIIyfIA3KOCrtv3kEtk7aMmHeV6NNDYONEuFju4+TfaH0e0oJHcIvroHCZKJFPlJO94TqnO7xdtAvHlfuV5vbzZ+sBOdTFPSmVPOjvRs7kAbtX2SzaCn29ZpgMHYrZzEqah7aE=
+	t=1731586985; cv=none; b=HJrAXjrPVjXQHxee68Z79TQTjCfAfhP8ZNDVCXrNsRi95b8Sr+iLxwnIoXf0BdrxHaBD+o8BrTd9TDUr2le3U1H0EBlW9zOlTJeP+eCzihBL6GZw9VPU/QtwGvTOshcnyhn5MKnv1WMqDiKi6MV2TzymL88Z32+690eK+rqNur8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731586982; c=relaxed/simple;
-	bh=W3AVsAVLDdbyor+wQ6o1A8oHcmMgqyXwTinoCUUNnDA=;
+	s=arc-20240116; t=1731586985; c=relaxed/simple;
+	bh=OAAn6AtZPCe522akGFfkCKvJoBBc3aTAMgK76mCoTZM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oi2PHzA7d7fYm9PMX1F1hy62DTPSUBBwWPrmW9fyJ+RX4HzfxQQuItmgq6r/XtWgd8CJBE2SdSQKK8cidzZzftgwsAARMNiAJi1PVtKd5QLN/N0f8D6CRaYTbsJp61yaqk/nYXjJa4AHMd4vEPiINBgmGMawZ7cJEoCh2e6QxVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 MIME-Version:Content-Type; b=ftzxJkDAkNhRwoZIbLozJH3jhOBvbka2h3YLDItimMy4KUy4m5VJeTo5iDrfiANzB0FASr1b3P//LGzN9lL3nGtv1S/PnVff8knJedxKMsfCRda4gZk87wvgDLfGGUxQeEPnsssskmCGSEkdW1qFb3A1oLKj75ylNWSHGi23/Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XpzlP60DHz2Dh2P;
-	Thu, 14 Nov 2024 20:21:05 +0800 (CST)
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Xpznr5xKPz1yqBZ;
+	Thu, 14 Nov 2024 20:23:12 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3C66E1A016C;
-	Thu, 14 Nov 2024 20:22:57 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 191891A016C;
+	Thu, 14 Nov 2024 20:23:01 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 14 Nov 2024 20:22:56 +0800
+ 15.2.1544.11; Thu, 14 Nov 2024 20:23:00 +0800
 From: Yunsheng Lin <linyunsheng@huawei.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
 	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Andrew
- Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jonathan
- Corbet <corbet@lwn.net>, <linux-doc@vger.kernel.org>
-Subject: [PATCH net-next v1 07/10] mm: page_frag: introduce probe related API
-Date: Thu, 14 Nov 2024 20:16:02 +0800
-Message-ID: <20241114121606.3434517-8-linyunsheng@huawei.com>
+ Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Shuah Khan
+	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next v1 08/10] mm: page_frag: add testing for the newly added API
+Date: Thu, 14 Nov 2024 20:16:03 +0800
+Message-ID: <20241114121606.3434517-9-linyunsheng@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20241114121606.3434517-1-linyunsheng@huawei.com>
 References: <20241114121606.3434517-1-linyunsheng@huawei.com>
@@ -62,159 +62,215 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-Some usecase may need a bigger fragment if current fragment
-can't be coalesced to previous fragment because more space
-for some header may be needed if it is a new fragment. So
-introduce probe related API to tell if there are minimum
-remaining memory in the cache to be coalesced to the previous
-fragment, in order to save memory as much as possible.
+Add testing for the newly added prepare API, for both aligned
+and non-aligned API, also probe API is also tested along with
+prepare API.
 
 CC: Alexander Duyck <alexander.duyck@gmail.com>
 CC: Andrew Morton <akpm@linux-foundation.org>
 CC: Linux-MM <linux-mm@kvack.org>
 Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 ---
- Documentation/mm/page_frags.rst | 10 +++++++-
- include/linux/page_frag_cache.h | 41 +++++++++++++++++++++++++++++++++
- mm/page_frag_cache.c            | 35 ++++++++++++++++++++++++++++
- 3 files changed, 85 insertions(+), 1 deletion(-)
+ .../selftests/mm/page_frag/page_frag_test.c   | 76 +++++++++++++++++--
+ tools/testing/selftests/mm/run_vmtests.sh     |  4 +
+ tools/testing/selftests/mm/test_page_frag.sh  | 27 +++++++
+ 3 files changed, 102 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
-index 1c98f7090d92..3e34831a0029 100644
---- a/Documentation/mm/page_frags.rst
-+++ b/Documentation/mm/page_frags.rst
-@@ -119,7 +119,13 @@ more performant if more memory is available. By using the prepare and commit
- related API, the caller calls prepare API to requests the minimum memory it
- needs and prepare API will return the maximum size of the fragment returned. The
- caller needs to either call the commit API to report how much memory it actually
--uses, or not do so if deciding to not use any memory.
-+uses, or not do so if deciding to not use any memory. Some usecase may need a
-+bigger fragment if the current fragment can't be coalesced to previous fragment
-+because more space for some header may be needed if it is a new fragment, probe
-+related API can be used to tell if there are minimum remaining memory in the
-+cache to be coalesced to the previous fragment, in order to save memory as much
-+as possible.
+diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+index e806c1866e36..3b3c32389def 100644
+--- a/tools/testing/selftests/mm/page_frag/page_frag_test.c
++++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
+@@ -32,6 +32,10 @@ static bool test_align;
+ module_param(test_align, bool, 0);
+ MODULE_PARM_DESC(test_align, "use align API for testing");
+ 
++static bool test_prepare;
++module_param(test_prepare, bool, 0);
++MODULE_PARM_DESC(test_prepare, "use prepare API for testing");
 +
- 
- .. kernel-doc:: include/linux/page_frag_cache.h
-    :identifiers: page_frag_cache_init page_frag_cache_is_pfmemalloc
-@@ -129,9 +135,11 @@ uses, or not do so if deciding to not use any memory.
- 		 __page_frag_alloc_refill_prepare_align
- 		 page_frag_alloc_refill_prepare_align
- 		 page_frag_alloc_refill_prepare
-+                 page_frag_alloc_refill_probe page_frag_refill_probe
- 
- .. kernel-doc:: mm/page_frag_cache.c
-    :identifiers: page_frag_cache_drain page_frag_free page_frag_alloc_abort_ref
-+                 __page_frag_alloc_refill_probe_align
- 
- Coding examples
- ===============
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 329390afbe78..0f7e8da91a67 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -63,6 +63,10 @@ void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
- unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
- 					    struct page_frag *pfrag,
- 					    unsigned int used_sz);
-+void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
-+					   unsigned int fragsz,
-+					   struct page_frag *pfrag,
-+					   unsigned int align_mask);
- 
- static inline unsigned int __page_frag_cache_commit(struct page_frag_cache *nc,
- 						    struct page_frag *pfrag,
-@@ -282,6 +286,43 @@ static inline void *page_frag_alloc_refill_prepare(struct page_frag_cache *nc,
- 						      gfp_mask, ~0u);
+ static int test_alloc_len = 2048;
+ module_param(test_alloc_len, int, 0);
+ MODULE_PARM_DESC(test_alloc_len, "alloc len for testing");
+@@ -74,6 +78,21 @@ static int page_frag_pop_thread(void *arg)
+ 	return 0;
  }
  
-+/**
-+ * page_frag_alloc_refill_probe() - Probe allocating a fragment and refilling
-+ * a page_frag.
-+ * @nc: page_frag cache from which to allocate and refill
-+ * @fragsz: the requested fragment size
-+ * @pfrag: the page_frag to be refilled
-+ *
-+ * Probe allocating a fragment and refilling a page_frag from page_frag cache.
-+ *
-+ * Return:
-+ * virtual address of the page fragment, otherwise return NULL.
-+ */
-+static inline void *page_frag_alloc_refill_probe(struct page_frag_cache *nc,
-+						 unsigned int fragsz,
-+						 struct page_frag *pfrag)
++static void frag_frag_test_commit(struct page_frag_cache *nc,
++				  struct page_frag *prepare_pfrag,
++				  struct page_frag *probe_pfrag,
++				  unsigned int used_sz)
 +{
-+	return __page_frag_alloc_refill_probe_align(nc, fragsz, pfrag, ~0u);
++	if (prepare_pfrag->page != probe_pfrag->page ||
++	    prepare_pfrag->offset != probe_pfrag->offset ||
++	    prepare_pfrag->size != probe_pfrag->size) {
++		force_exit = true;
++		WARN_ONCE(true, TEST_FAILED_PREFIX "wrong probed info\n");
++	}
++
++	page_frag_refill_commit(nc, prepare_pfrag, used_sz);
 +}
 +
-+/**
-+ * page_frag_refill_probe() - Probe refilling a page_frag.
-+ * @nc: page_frag cache from which to refill
-+ * @fragsz: the requested fragment size
-+ * @pfrag: the page_frag to be refilled
-+ *
-+ * Probe refilling a page_frag from page_frag cache.
-+ *
-+ * Return:
-+ * True if refill succeeds, otherwise return false.
-+ */
-+static inline bool page_frag_refill_probe(struct page_frag_cache *nc,
-+					  unsigned int fragsz,
-+					  struct page_frag *pfrag)
-+{
-+	return !!page_frag_alloc_refill_probe(nc, fragsz, pfrag);
-+}
-+
- /**
-  * page_frag_refill_commit - Commit a prepare refilling.
-  * @nc: page_frag cache from which to commit
-diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-index 8c3cfdbe8c2b..ae40520d452a 100644
---- a/mm/page_frag_cache.c
-+++ b/mm/page_frag_cache.c
-@@ -116,6 +116,41 @@ unsigned int __page_frag_cache_commit_noref(struct page_frag_cache *nc,
- }
- EXPORT_SYMBOL(__page_frag_cache_commit_noref);
+ static int page_frag_push_thread(void *arg)
+ {
+ 	struct ptr_ring *ring = arg;
+@@ -86,15 +105,61 @@ static int page_frag_push_thread(void *arg)
+ 		int ret;
  
-+/**
-+ * __page_frag_alloc_refill_probe_align() - Probe allocating a fragment and
-+ * refilling a page_frag with aligning requirement.
-+ * @nc: page_frag cache from which to allocate and refill
-+ * @fragsz: the requested fragment size
-+ * @pfrag: the page_frag to be refilled.
-+ * @align_mask: the requested aligning requirement for the fragment.
-+ *
-+ * Probe allocating a fragment and refilling a page_frag from page_frag cache
-+ * with aligning requirement.
-+ *
-+ * Return:
-+ * virtual address of the page fragment, otherwise return NULL.
-+ */
-+void *__page_frag_alloc_refill_probe_align(struct page_frag_cache *nc,
-+					   unsigned int fragsz,
-+					   struct page_frag *pfrag,
-+					   unsigned int align_mask)
+ 		if (test_align) {
+-			va = page_frag_alloc_align(&test_nc, test_alloc_len,
+-						   GFP_KERNEL, SMP_CACHE_BYTES);
++			if (test_prepare) {
++				struct page_frag prepare_frag, probe_frag;
++				void *probe_va;
++
++				va = page_frag_alloc_refill_prepare_align(&test_nc,
++									  test_alloc_len,
++									  &prepare_frag,
++									  GFP_KERNEL,
++									  SMP_CACHE_BYTES);
++
++				probe_va = __page_frag_alloc_refill_probe_align(&test_nc,
++										test_alloc_len,
++										&probe_frag,
++										-SMP_CACHE_BYTES);
++				if (va != probe_va) {
++					force_exit = true;
++					WARN_ONCE(true, TEST_FAILED_PREFIX "wrong va\n");
++				}
++
++				if (likely(va))
++					frag_frag_test_commit(&test_nc, &prepare_frag,
++							      &probe_frag, test_alloc_len);
++			} else {
++				va = page_frag_alloc_align(&test_nc,
++							   test_alloc_len,
++							   GFP_KERNEL,
++							   SMP_CACHE_BYTES);
++			}
+ 
+ 			if ((unsigned long)va & (SMP_CACHE_BYTES - 1)) {
+ 				force_exit = true;
+ 				WARN_ONCE(true, TEST_FAILED_PREFIX "unaligned va returned\n");
+ 			}
+ 		} else {
+-			va = page_frag_alloc(&test_nc, test_alloc_len, GFP_KERNEL);
++			if (test_prepare) {
++				struct page_frag prepare_frag, probe_frag;
++				void *probe_va;
++
++				va = page_frag_alloc_refill_prepare(&test_nc, test_alloc_len,
++								    &prepare_frag, GFP_KERNEL);
++
++				probe_va = page_frag_alloc_refill_probe(&test_nc, test_alloc_len,
++									&probe_frag);
++
++				if (va != probe_va) {
++					force_exit = true;
++					WARN_ONCE(true, TEST_FAILED_PREFIX "wrong va\n");
++				}
++
++				if (likely(va))
++					frag_frag_test_commit(&test_nc, &prepare_frag,
++							      &probe_frag, test_alloc_len);
++			} else {
++				va = page_frag_alloc(&test_nc, test_alloc_len, GFP_KERNEL);
++			}
+ 		}
+ 
+ 		if (!va)
+@@ -176,8 +241,9 @@ static int __init page_frag_test_init(void)
+ 	}
+ 
+ 	duration = (u64)ktime_us_delta(ktime_get(), start);
+-	pr_info("%d of iterations for %s testing took: %lluus\n", nr_test,
+-		test_align ? "aligned" : "non-aligned", duration);
++	pr_info("%d of iterations for %s %s API testing took: %lluus\n", nr_test,
++		test_align ? "aligned" : "non-aligned",
++		test_prepare ? "prepare" : "alloc", duration);
+ 
+ out:
+ 	ptr_ring_cleanup(&ptr_ring, NULL);
+diff --git a/tools/testing/selftests/mm/run_vmtests.sh b/tools/testing/selftests/mm/run_vmtests.sh
+index 2c5394584af4..f6ff9080a6f2 100755
+--- a/tools/testing/selftests/mm/run_vmtests.sh
++++ b/tools/testing/selftests/mm/run_vmtests.sh
+@@ -464,6 +464,10 @@ CATEGORY="page_frag" run_test ./test_page_frag.sh aligned
+ 
+ CATEGORY="page_frag" run_test ./test_page_frag.sh nonaligned
+ 
++CATEGORY="page_frag" run_test ./test_page_frag.sh aligned_prepare
++
++CATEGORY="page_frag" run_test ./test_page_frag.sh nonaligned_prepare
++
+ echo "SUMMARY: PASS=${count_pass} SKIP=${count_skip} FAIL=${count_fail}" | tap_prefix
+ echo "1..${count_total}" | tap_output
+ 
+diff --git a/tools/testing/selftests/mm/test_page_frag.sh b/tools/testing/selftests/mm/test_page_frag.sh
+index f55b105084cf..1c757fd11844 100755
+--- a/tools/testing/selftests/mm/test_page_frag.sh
++++ b/tools/testing/selftests/mm/test_page_frag.sh
+@@ -43,6 +43,8 @@ check_test_failed_prefix() {
+ SMOKE_PARAM="test_push_cpu=$TEST_CPU_0 test_pop_cpu=$TEST_CPU_1"
+ NONALIGNED_PARAM="$SMOKE_PARAM test_alloc_len=75 nr_test=$NR_TEST"
+ ALIGNED_PARAM="$NONALIGNED_PARAM test_align=1"
++NONALIGNED_PREPARE_PARAM="$NONALIGNED_PARAM test_prepare=1"
++ALIGNED_PREPARE_PARAM="$ALIGNED_PARAM test_prepare=1"
+ 
+ check_test_requirements()
+ {
+@@ -77,6 +79,20 @@ run_aligned_check()
+ 	insmod $DRIVER $ALIGNED_PARAM > /dev/null 2>&1
+ }
+ 
++run_nonaligned_prepare_check()
 +{
-+	unsigned long encoded_page = nc->encoded_page;
-+	unsigned int size, offset;
++	echo "Run performance tests to evaluate how fast nonaligned prepare API is."
 +
-+	size = PAGE_SIZE << encoded_page_decode_order(encoded_page);
-+	offset = __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
-+	if (unlikely(!encoded_page || offset + fragsz > size))
-+		return NULL;
-+
-+	pfrag->page = encoded_page_decode_page(encoded_page);
-+	pfrag->size = size - offset;
-+	pfrag->offset = offset;
-+
-+	return encoded_page_decode_virt(encoded_page) + offset;
++	insmod $DRIVER $NONALIGNED_PREPARE_PARAM > /dev/null 2>&1
 +}
-+EXPORT_SYMBOL(__page_frag_alloc_refill_probe_align);
 +
- void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
- 				struct page_frag *pfrag, gfp_t gfp_mask,
- 				unsigned int align_mask)
++run_aligned_prepare_check()
++{
++	echo "Run performance tests to evaluate how fast aligned prepare API is."
++
++	insmod $DRIVER $ALIGNED_PREPARE_PARAM > /dev/null 2>&1
++}
++
+ run_smoke_check()
+ {
+ 	echo "Run smoke test."
+@@ -87,6 +103,7 @@ run_smoke_check()
+ usage()
+ {
+ 	echo -n "Usage: $0 [ aligned ] | [ nonaligned ] | | [ smoke ] | "
++	echo "[ aligned_prepare ] | [ nonaligned_prepare ] | "
+ 	echo "manual parameters"
+ 	echo
+ 	echo "Valid tests and parameters:"
+@@ -107,6 +124,12 @@ usage()
+ 	echo "# Performance testing for aligned alloc API"
+ 	echo "$0 aligned"
+ 	echo
++	echo "# Performance testing for nonaligned prepare API"
++	echo "$0 nonaligned_prepare"
++	echo
++	echo "# Performance testing for aligned prepare API"
++	echo "$0 aligned_prepare"
++	echo
+ 	exit 0
+ }
+ 
+@@ -158,6 +181,10 @@ function run_test()
+ 			run_nonaligned_check
+ 		elif [[ "$1" = "aligned" ]]; then
+ 			run_aligned_check
++		elif [[ "$1" = "nonaligned_prepare" ]]; then
++			run_nonaligned_prepare_check
++		elif [[ "$1" = "aligned_prepare" ]]; then
++			run_aligned_prepare_check
+ 		else
+ 			run_manual_check $@
+ 		fi
 -- 
 2.33.0
 
