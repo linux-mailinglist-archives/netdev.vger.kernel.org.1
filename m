@@ -1,153 +1,108 @@
-Return-Path: <netdev+bounces-145039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4959C92E3
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 21:06:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05B99C9305
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 21:13:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 139CA1F21EA8
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:06:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C0B0281A7F
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E132B1A7AF6;
-	Thu, 14 Nov 2024 20:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3764A1AB51F;
+	Thu, 14 Nov 2024 20:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PDxJHMbh"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="SNy2v0ay"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E2FEEDE;
-	Thu, 14 Nov 2024 20:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE971AAE39
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 20:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731614781; cv=none; b=IS/oPUIX7HtlMWJID0YSGZcIUY2v3oIecZXojk+IPiL2WV6Es/qmoQjWX45tIdpu/GhQAVHQ9IrEZQD66caXkiDzGUQtbky/h8/Svq0tYXF6yEe2OYRE2v85mFTtKV06hRe51HvePQdm9rmGyuiNbH0SpjXx0V9Q6EDDciTaoPY=
+	t=1731615225; cv=none; b=Fuv5p0goETgn5t9vTybx+hwAi19rqDxNjdUTP40tavD254A8c1B+JtPjIsXYQ/5vbzVBUUHyOF6daWd6nDMYSGvniBhhKnfbhA7p9+47tddkDZF4LnfhT7T3Qq8+LBValoV7aoT7sLMF3cXb2LX9iPbiF1d/Wwr8V3+J7UglEuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731614781; c=relaxed/simple;
-	bh=+qErtJSAtXbxwYe6icG0dLk6au77bP2XR4LohEja7Ec=;
+	s=arc-20240116; t=1731615225; c=relaxed/simple;
+	bh=pCKYJj71wA06N6bc10/er2DhbontUDxAdn6wLTdlpc4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qukZFJLLVqamR30b3saq7e799G4OIRea7clcQuQ7IrYjZCH9MCr5h+MiD57FGG3KX3pZHL7z6R2MPVQ+eirTGjWguf+LN1S/4Hv/DqTiLf4v/I9txWtMEFzuIUq3ihulmynBPKhZl6HlBEP6rbiH9zwQ6dut8oK6eH2RXQDpLe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PDxJHMbh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6ACBC4CECD;
-	Thu, 14 Nov 2024 20:06:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731614781;
-	bh=+qErtJSAtXbxwYe6icG0dLk6au77bP2XR4LohEja7Ec=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PDxJHMbhx68G8JfrXELVLvUwb2oPsOD5P423u74SIvbwZ4LnpJNiBD2f6Eio70YTc
-	 4gJ4+KHh5ZhwmMvCnPIr00MukmusQKmx3XIplqN3GaW6/Zgj0iADc59D/VJt6E2Fpa
-	 rwqwow/QLOjr627VYQSSmoo70MEYaTnaiLngpls5ZMA7ZtohH/YROhEmrpLbgBYIBX
-	 M2Bm7UHx+onpc4PwnON55gjKsIAL4JMC+fOAshMBVWttr881a+QVz/LkSflY7lrZwO
-	 wTiv3mL+rV4+/sctWfWA+EueB8SgWd4x+Q8rVlq+Qc+oBBkoP0sONT04qf0PpvmIBf
-	 v31dNt2XqA9WQ==
-Date: Thu, 14 Nov 2024 20:06:15 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DB6fCqGRfKnWbtN0MpuIABF1PsITqpJxvSHgoDBJNqoiJZHlkcYw16qgv2rK/f2bWt32DDKg25a0/kKYIl9RByv3teoiGXXXXXAVtf9OLm/PukMOGnWdB3FmYA65owRYC++X8PF1rBZ8wE2DKbGOT9uDpKHyqSA3iP9DeYD3+JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=SNy2v0ay; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7240d93fffdso18160b3a.2
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 12:13:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1731615223; x=1732220023; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=otowYy7OdNtGuwhI4NBl1VzW4OrjPRlTRwbtUvhfdIc=;
+        b=SNy2v0ay+qQNr+QEft0IoSuDfkbI9Ro6UGYl7V4xSaEgtWujQkMgpCTST9yN7HfpC3
+         uHfOTW8WPizQ+ORXTj+sG2eVsr4rgKsDpGlYzkxAdCq6B6fanMnFJXEGgQ3gHoC6jW0B
+         1ikXeGgWYjnI2p6VplHkGxJJYyW1StHGjuvtc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731615223; x=1732220023;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=otowYy7OdNtGuwhI4NBl1VzW4OrjPRlTRwbtUvhfdIc=;
+        b=rhEhrCKb+dON5m51i+aTUnpBaxF9WWu9em5vTcFx6qlcwmaGC0SiVk0Pv7aggsQ0Md
+         2uTUtyb16KNScWJl6TZ37fAWLvUe+FwghOxy2JCvjbVmZPpD+YSB3zk8expH67U3oVEM
+         za3H2M+AEVd2Fuo8hMLuTgjYs6bivnBqdnaTaAmM86WBGbsL27RKUdZbo7gHAAbxZU1B
+         FzUthBTrXJVi/cQ/Dw3DaOtnkFJYEEzqBQHhkZiIZeyH3pd82LI+KzQZHJw2wdo7uaeY
+         gVi4CxeO8VJ6Xs9OkqUfockxWHyEfmqgNuzwylIk4WhUqI8sZp0w0iCEpzJ8ZJyz++5H
+         zijA==
+X-Gm-Message-State: AOJu0Yw2nnbIzMHuWhOIZYlLpk/AiSg2RrsunMOKb1Y72qjw7/CgSVkD
+	cZVx626+lZ0E8ePaFMlRwD/t2zWHREGiGq9+YX2TWgtN7pzriLJfJYCp9MtWCp8=
+X-Google-Smtp-Source: AGHT+IGzgiCgx6YZ4l4cVmh/B6atw7K/LtNrtk/3mukGWleTD3P6jRL/9E898TPH9UCk8E1KLkgQHg==
+X-Received: by 2002:a05:6a00:23cb:b0:71e:4fe4:354d with SMTP id d2e1a72fcca58-72476cccb37mr184064b3a.18.1731615222806;
+        Thu, 14 Nov 2024 12:13:42 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724771c0baesm26423b3a.92.2024.11.14.12.13.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 12:13:42 -0800 (PST)
+Date: Thu, 14 Nov 2024 12:13:39 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	mkarsten@uwaterloo.ca, "David S. Miller" <davem@davemloft.net>,
+	open list <linux-kernel@vger.kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [net v2 0/2] Fix rcu_read_lock issues in netdev-genl
+Message-ID: <ZzZZ85ONoGd8fF7Y@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, mkarsten@uwaterloo.ca,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Russell King <linux@armlinux.org.uk>, jacob.e.keller@intel.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v2 8/8] dt-bindings: net: sparx5: document RGMII
- MAC delays
-Message-ID: <20241114-liquefy-chasing-a85e284f14b9@spud>
-References: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
- <20241113-sparx5-lan969x-switch-driver-4-v2-8-0db98ac096d1@microchip.com>
+	open list <linux-kernel@vger.kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Simon Horman <horms@kernel.org>
+References: <20241113021755.11125-1-jdamato@fastly.com>
+ <20241113184735.28416e41@kernel.org>
+ <ZzWY3iAbgWEDcQzV@LQ3V64L9R2>
+ <20241114113144.1d1cc139@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eNDowPgtkxFgCrJx"
-Content-Disposition: inline
-In-Reply-To: <20241113-sparx5-lan969x-switch-driver-4-v2-8-0db98ac096d1@microchip.com>
-
-
---eNDowPgtkxFgCrJx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20241114113144.1d1cc139@kernel.org>
 
-On Wed, Nov 13, 2024 at 10:11:16PM +0100, Daniel Machon wrote:
-> The lan969x switch device supports two RGMII port interfaces that can be
-> configured for MAC level rx and tx delays.
->=20
-> Document two new properties {rx,tx}-internal-delay-ps. Make them
-> required properties, if the phy-mode is one of: rgmii, rgmii_id,
-> rgmii-rxid or rgmii-txid. Also specify accepted values.
->=20
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> ---
->  .../bindings/net/microchip,sparx5-switch.yaml        | 20 ++++++++++++++=
-++++++
->  1 file changed, 20 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switc=
-h.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> index dedfad526666..a3f2b70c5c77 100644
-> --- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> +++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> @@ -129,6 +129,26 @@ properties:
->              minimum: 0
->              maximum: 383
-> =20
-> +        allOf:
-> +          - if:
-> +              properties:
-> +                phy-mode:
-> +                  contains:
-> +                    enum:
-> +                      - rgmii
-> +                      - rgmii-rxid
-> +                      - rgmii-txid
-> +                      - rgmii-id
-> +            then:
-> +              properties:
-> +                rx-internal-delay-ps:
-> +                  enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
-> +                tx-internal-delay-ps:
-> +                  enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
+On Thu, Nov 14, 2024 at 11:31:44AM -0800, Jakub Kicinski wrote:
+> On Wed, 13 Nov 2024 22:29:50 -0800 Joe Damato wrote:
+> > - Rebase patch 1 on net (it applies as is) and send it on its own
+> > - Send patch 2 on its own against net-next
+> 
+> My bad, I thought patch 2 is also needed in net, but not in stable.
 
-Properties should be define at the top level and constrained in the
-if/then parts. Please move the property definitions out, and just leave
-the required: bit here.
-
-> +              required:
-> +                - rx-internal-delay-ps
-> +                - tx-internal-delay-ps
-
-You've got no else, so these properties are valid even for !rgmii?
-
-> +
->          required:
->            - reg
->            - phys
-
-Additionally, please move the conditional bits below the required
-property list.
-
-Cheers,
-Conor.
-
---eNDowPgtkxFgCrJx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZzZYNwAKCRB4tDGHoIJi
-0tseAQDj+4EzZBz0Olii65irqWB4dSvXcjEhBM44bZwOPV01VQD/VdnzMjewFP1O
-G21peKsEaCjo/s/xbOGZESYTlDp/mw0=
-=RG0u
------END PGP SIGNATURE-----
-
---eNDowPgtkxFgCrJx--
+No problem; sorry for the noob confusing on my side. Hopefully, I
+got it right for the v3.
 
