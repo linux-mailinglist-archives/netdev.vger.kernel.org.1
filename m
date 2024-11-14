@@ -1,177 +1,275 @@
-Return-Path: <netdev+bounces-144824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A10A9C888F
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:14:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B499C87E7
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:43:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE350B23531
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:41:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 259F91F25FA1
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57E91F818B;
-	Thu, 14 Nov 2024 10:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5F41EBFEC;
+	Thu, 14 Nov 2024 10:43:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A541DC18F
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97FE18BC33
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731580829; cv=none; b=g8dv6Dz1ZyhywzubcfKHfTupp9UgD/wGKXKe+f7SUTrbMXqY3VBzMVLk05fctK+q5GvEz4NUTa0rDHIujkXNK9gMrVZJE/u0KLuM6Jcx0LAaVNyU66SnoNBbPFOmzAZHstMVEi2veg3sv0eplrWMvKcS1/h67qUKKCo/SkY88eg=
+	t=1731580986; cv=none; b=nHO0FW0m7KcXC09ja6j7x1GreH+4xhUDZ3H3xOaI51zdttRxZOhSdN3RpgCHfVUPLcaR7m8mrcgcN9CKO2whGFoLKstlWtjXUr0oNoAMrGKy+3b9oC/AN/KrmzlAD0ehBPb4WS1l64rAOfWn83X+IZ8DMwHO/v9EwttsfG2iVco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731580829; c=relaxed/simple;
-	bh=hebrmXkhCY09OG8h8nGV0uOtICvEfbpG8iGrrMU9xw8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RDQ3nHwhyUV1wraEHntDmVJi8zeVqcliIEDHwH53xm6ZQ2hGunYO9gRnZdOPkotVCunB7f/ZQuVGJB7fWeUK8xNEajjabu9wb0spaK9PZ8+IJM2J/bHWeXrEzjxP3+AZnnTEFDnQoxPF+mdHFQ9ujMyOMW1jwgkn0fmmxvkYIZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83ab1b39ab1so47242639f.1
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 02:40:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731580827; x=1732185627;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EpQKVoCHR7S/IBsmhXUKOE1cWASKXA9mRVe4LwtSsA8=;
-        b=JWeM0hCS8krTRocV5jfiysvI9nT2DVnFUUyelBBP0VH3nUF36BZmdAt3NPOIeyB+Ua
-         NpDSCm2E6t4/fdOAE/3hl+Ff6H7ko1PBBYB57Cdvt2uEPC6VvS1OygFLEtwX7v9CwjbP
-         8gtekOPRcTIVVQUsG0OzOdPf0/kfFP3Tyy7DxOD+SHsp1h7U1GulL9h1zQN+YPQHVVam
-         6vy0hHIwuk8QGhH1xx0IJ/WMKPRoJ9+NSV3mhnDY7mKF3MsytmaU9dSsnQGCtMk9Jzwe
-         TJzO5deASBtcCKyPiFaXc7KUlAt2JedPMNmuNNkL9f0cAV5Tz9gWJ9IStPg7t8YICoGJ
-         zl6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUJll5yoi4G1Ed1okXFPfBz/M2Kl9hP7AtVsHCBX6C7G8+0gQ2LsPtwnAHOhn0NO1+vmRUrHpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNK/HtVAtXhxUsmGEBcEKrMj52uWyHbufnOrIc8gccXYLWt4y+
-	vHtylZ1IfiuDQFywx1INiz8tvlzXPKprrKrYTfJ7RVn6NcL1pPZFoFPuZuCTwWBpFHuB+arDDUh
-	tHCsNO+0+M1GPLKyu8AyN5KxdWaUlmmjpk5+ZnQKDzmD2yZ4C2YbL01A=
-X-Google-Smtp-Source: AGHT+IH38snHZpugJh/yH983zqKsVOwZbdixl4mY7r5cQJ5XXnavU66eqXKouJUw8ctrq6tpF+9BCwWKFI2IbH6enGPxVAT2H6GQ
+	s=arc-20240116; t=1731580986; c=relaxed/simple;
+	bh=8bz3ega2gIhXyEY/kIDsMpTCavzWJbXwfinZQdlZyR4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dz4rrW29cjEN13C584Trq+vOm52+cSHsPCoOfS53GnaOtnMCUoeAiJB2Cdi0RtHrzP604PpkdDMpgGGnBDTk6dkcTyUlx8/7TTjbGBtfBIiLYoub0HxKOFL/fnQHra3XliXGOHGEFq1j5dT2GnVL36fuGRSG1uTsrfs6uj6cD7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:ab77:b6e5:88e8:df20])
+	by albert.telenet-ops.be with cmsmtp
+	id cais2D0080Ss59E06aisdf; Thu, 14 Nov 2024 11:42:56 +0100
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1tBXIz-006zWB-RE;
+	Thu, 14 Nov 2024 11:42:52 +0100
+Received: from geert by rox.of.borg with local (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1tBXJM-003WqH-0p;
+	Thu, 14 Nov 2024 11:42:52 +0100
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Ben Dooks <ben.dooks@codethink.co.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH] [RFC] dt-bindings: net: micrel: Convert to json-schema
+Date: Thu, 14 Nov 2024 11:42:50 +0100
+Message-Id: <943cb31d01d0da3a63911326e24fbf9b328f7206.1731580776.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:184d:b0:3a7:2b12:78dd with SMTP id
- e9e14a558f8ab-3a72b1279b5mr6172675ab.11.1731580826776; Thu, 14 Nov 2024
- 02:40:26 -0800 (PST)
-Date: Thu, 14 Nov 2024 02:40:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6735d39a.050a0220.1324f8.0096.GAE@google.com>
-Subject: [syzbot] [net?] KMSAN: uninit-value in __vxlan_find_mac
-From: syzbot <syzbot+35e7e2811bbe5777b20e@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Convert the Micrel PHY Device Tree binding documentation to json-schema.
 
-syzbot found the following issue on:
+Add a simple example.
 
-HEAD commit:    de2f378f2b77 Merge tag 'nfsd-6.12-4' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15b170c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e4580d62ee1893a5
-dashboard link: https://syzkaller.appspot.com/bug?extid=35e7e2811bbe5777b20e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f0ff1d637186/disk-de2f378f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1515128a919f/vmlinux-de2f378f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6624bf235bc6/bzImage-de2f378f.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+35e7e2811bbe5777b20e@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in __vxlan_find_mac+0x497/0x4e0
- __vxlan_find_mac+0x497/0x4e0
- vxlan_find_mac drivers/net/vxlan/vxlan_core.c:436 [inline]
- vxlan_xmit+0x1669/0x39f0 drivers/net/vxlan/vxlan_core.c:2753
- __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
- netdev_start_xmit include/linux/netdevice.h:4937 [inline]
- xmit_one net/core/dev.c:3588 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
- __dev_queue_xmit+0x3562/0x56d0 net/core/dev.c:4432
- dev_queue_xmit include/linux/netdevice.h:3094 [inline]
- __bpf_tx_skb net/core/filter.c:2152 [inline]
- __bpf_redirect_common net/core/filter.c:2196 [inline]
- __bpf_redirect+0x148c/0x1610 net/core/filter.c:2203
- ____bpf_clone_redirect net/core/filter.c:2477 [inline]
- bpf_clone_redirect+0x37e/0x500 net/core/filter.c:2447
- ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:2010
- __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2253
- bpf_dispatcher_nop_func include/linux/bpf.h:1265 [inline]
- __bpf_prog_run include/linux/filter.h:701 [inline]
- bpf_prog_run include/linux/filter.h:708 [inline]
- bpf_test_run+0x546/0xd20 net/bpf/test_run.c:434
- bpf_prog_test_run_skb+0x182f/0x24d0 net/bpf/test_run.c:1095
- bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4266
- __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5671
- __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
- __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5758
- x64_sys_call+0x2cce/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:322
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4091 [inline]
- slab_alloc_node mm/slub.c:4134 [inline]
- kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
- pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
- skb_ensure_writable+0x496/0x520 net/core/skbuff.c:6214
- __bpf_try_make_writable net/core/filter.c:1677 [inline]
- bpf_try_make_writable net/core/filter.c:1683 [inline]
- bpf_try_make_head_writable net/core/filter.c:1691 [inline]
- ____bpf_clone_redirect net/core/filter.c:2471 [inline]
- bpf_clone_redirect+0x1c5/0x500 net/core/filter.c:2447
- ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:2010
- __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2253
- bpf_dispatcher_nop_func include/linux/bpf.h:1265 [inline]
- __bpf_prog_run include/linux/filter.h:701 [inline]
- bpf_prog_run include/linux/filter.h:708 [inline]
- bpf_test_run+0x546/0xd20 net/bpf/test_run.c:434
- bpf_prog_test_run_skb+0x182f/0x24d0 net/bpf/test_run.c:1095
- bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4266
- __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5671
- __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
- __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5758
- x64_sys_call+0x2cce/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:322
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 8041 Comm: syz.2.760 Not tainted 6.12.0-rc6-syzkaller-00279-gde2f378f2b77 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-=====================================================
-
-
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Notes:
+  1. I specified Ben Dooks as the maintainer, as he wrote the original
+     bindings. Ben, are you OK with that?
+  2. This schema is never applied, as there is no compatible value or
+     select statement. Adding
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+	select:
+	  properties:
+	    $nodename:
+	      pattern: "^ethernet-phy(@[a-f0-9]+)?$"
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+	  required:
+	    - $nodename
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+     and changing
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+	-unevaluatedProperties: false
+	+additionalProperties: true
 
-If you want to undo deduplication, reply with:
-#syz undup
+     would fix that, and is mostly harmless, except for possible
+     conflicts with other Ethernet PHYs having more than one clock, or
+     using different clock-names.
+     Documentation/devicetree/bindings/net/qca,ar803x.yaml has the same
+     issue.
+     Is there a proper way to handle this?  Are there other options than
+     mandating specific compatible values for Ethernet PHYs?
+
+Thanks for your comments!
+---
+ .../devicetree/bindings/net/micrel,phy.yaml   | 93 +++++++++++++++++++
+ .../devicetree/bindings/net/micrel.txt        | 57 ------------
+ 2 files changed, 93 insertions(+), 57 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/micrel,phy.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+
+diff --git a/Documentation/devicetree/bindings/net/micrel,phy.yaml b/Documentation/devicetree/bindings/net/micrel,phy.yaml
+new file mode 100644
+index 0000000000000000..609bbd9729efe516
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/micrel,phy.yaml
+@@ -0,0 +1,93 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/micrel,phy.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Micrel PHY properties
++
++maintainers:
++  - Ben Dooks <ben.dooks@codethink.co.uk>
++
++properties:
++  micrel,led-mode:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    enum: [ 0, 1, 2, 3 ]
++    description: |
++      LED mode value to set for PHYs with configurable LEDs.
++
++      Configure the LED mode with single value. The list of PHYs and the
++      bits that are currently supported:
++
++      KSZ8001: register 0x1e, bits 15..14
++      KSZ8041: register 0x1e, bits 15..14
++      KSZ8021: register 0x1f, bits 5..4
++      KSZ8031: register 0x1f, bits 5..4
++      KSZ8051: register 0x1f, bits 5..4
++      KSZ8081: register 0x1f, bits 5..4
++      KSZ8091: register 0x1f, bits 5..4
++      LAN8814: register EP5.0, bit 6
++
++      See the respective PHY datasheet for the mode values.
++
++  micrel,rmii-reference-clock-select-25-mhz:
++    description: |
++      RMII Reference Clock Select bit selects 25 MHz mode
++
++      Setting the RMII Reference Clock Select bit enables 25 MHz rather
++      than 50 MHz clock mode.
++
++      Note that this option in only needed for certain PHY revisions with a
++      non-standard, inverted function of this configuration bit.
++      Specifically, a clock reference ("rmii-ref" below) is always needed to
++      actually select a mode.
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    const: rmii-ref
++    description: |
++      supported clocks:
++        - KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
++          input clock. Used to determine the XI input clock.
++
++  micrel,fiber-mode:
++    type: boolean
++    description: |
++      If present the PHY is configured to operate in fiber mode.
++
++      Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
++      by the FXEN boot strapping pin. It can't be determined from the PHY
++      registers whether the PHY is in fiber mode, so this boolean device tree
++      property can be used to describe it.
++
++      In fiber mode, auto-negotiation is disabled and the PHY can only work in
++      100base-fx (full and half duplex) modes.
++
++  coma-mode-gpios:
++    description: |
++      If present the given gpio will be deasserted when the PHY is probed.
++
++      Some PHYs have a COMA mode input pin which puts the PHY into
++      isolate and power-down mode. On some boards this input is connected
++      to a GPIO of the SoC.
++
++      Supported on the LAN8814.
++
++dependencies:
++  micrel,rmii-reference-clock-select-25-mhz: [ clock-names ]
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    ethernet {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethernet-phy@1 {
++            reg = <1>;
++            micrel,led-mode = <1>;
++        };
++    };
+diff --git a/Documentation/devicetree/bindings/net/micrel.txt b/Documentation/devicetree/bindings/net/micrel.txt
+deleted file mode 100644
+index a407dd1b461459a6..0000000000000000
+--- a/Documentation/devicetree/bindings/net/micrel.txt
++++ /dev/null
+@@ -1,57 +0,0 @@
+-Micrel PHY properties.
+-
+-These properties cover the base properties Micrel PHYs.
+-
+-Optional properties:
+-
+- - micrel,led-mode : LED mode value to set for PHYs with configurable LEDs.
+-
+-	Configure the LED mode with single value. The list of PHYs and the
+-	bits that are currently supported:
+-
+-	KSZ8001: register 0x1e, bits 15..14
+-	KSZ8041: register 0x1e, bits 15..14
+-	KSZ8021: register 0x1f, bits 5..4
+-	KSZ8031: register 0x1f, bits 5..4
+-	KSZ8051: register 0x1f, bits 5..4
+-	KSZ8081: register 0x1f, bits 5..4
+-	KSZ8091: register 0x1f, bits 5..4
+-	LAN8814: register EP5.0, bit 6
+-
+-	See the respective PHY datasheet for the mode values.
+-
+- - micrel,rmii-reference-clock-select-25-mhz: RMII Reference Clock Select
+-						bit selects 25 MHz mode
+-
+-	Setting the RMII Reference Clock Select bit enables 25 MHz rather
+-	than 50 MHz clock mode.
+-
+-	Note that this option in only needed for certain PHY revisions with a
+-	non-standard, inverted function of this configuration bit.
+-	Specifically, a clock reference ("rmii-ref" below) is always needed to
+-	actually select a mode.
+-
+- - clocks, clock-names: contains clocks according to the common clock bindings.
+-
+-	supported clocks:
+-	- KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
+-	  input clock. Used to determine the XI input clock.
+-
+- - micrel,fiber-mode: If present the PHY is configured to operate in fiber mode
+-
+-	Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
+-	by the FXEN boot strapping pin. It can't be determined from the PHY
+-	registers whether the PHY is in fiber mode, so this boolean device tree
+-	property can be used to describe it.
+-
+-	In fiber mode, auto-negotiation is disabled and the PHY can only work in
+-	100base-fx (full and half duplex) modes.
+-
+- - coma-mode-gpios: If present the given gpio will be deasserted when the
+-		    PHY is probed.
+-
+-	Some PHYs have a COMA mode input pin which puts the PHY into
+-	isolate and power-down mode. On some boards this input is connected
+-	to a GPIO of the SoC.
+-
+-	Supported on the LAN8814.
+-- 
+2.34.1
+
 
