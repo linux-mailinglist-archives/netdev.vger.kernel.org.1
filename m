@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-144947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5842E9C8D85
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:02:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130649C8D89
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 16:03:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D4D128394C
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:02:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDEFB1F246EC
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8F9139CFF;
-	Thu, 14 Nov 2024 15:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391CC7DA66;
+	Thu, 14 Nov 2024 15:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOVs1XoT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="osFdQlLd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11F23C466;
-	Thu, 14 Nov 2024 15:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103AF1E521;
+	Thu, 14 Nov 2024 15:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731596556; cv=none; b=Q73jbEdNguIkkTspYd13/+sPB9xlpOli5GBlaGtrIcsIt7lZQNCjRrgpNFh2DJCKFIyL+bZsP6r35QtXu+Xh0AO5ZX8GxmkQ6casn22K2jHfZa97/PSZK/0TrRuDMC5XNBrygD+c4oB7KFyD15k/fLzI+9pM3aP0OVXqUMEIvGE=
+	t=1731596590; cv=none; b=SiiPbzznEJwgsNGoEVgdQbXroP+fSAYJujckQIBiG/lrE5elUe5VpcIj7CaMxVRsUhgkszOT+X9p7LUYFIgZ9DdrLVgfhdngPazA/bOWTRvfTeaSnSsw2g/F1scdlQxeOj9s+JHNiwdApiNuqSg97sH8/d29hb4nrrh12EISk7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731596556; c=relaxed/simple;
-	bh=dN4tvL3q9pcjFqSpwP8uKkrWWNaEeL9R+qbXlxvJ5G8=;
+	s=arc-20240116; t=1731596590; c=relaxed/simple;
+	bh=BsYcovQdRC1h0DdNzlfc6JaWZH38UXOZmf3UeEbmyK0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ni4JPW9KBwbpQfZKSAHCt/+FJlgNTELhJ5cCfihUIrlVa4vwPQJramQ/zKEw6RffCnRhBGtm4LRbjkmR8brXssfrWB2jwNj4H26N+21iDdtzkVdhYHAeVKUbGAhpIkm60sNeUkuMD3NiROIlMNyF+Qyy//CBnWYTkCcOCOnyPc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOVs1XoT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2D3C4CECD;
-	Thu, 14 Nov 2024 15:02:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=otcbLpOzBcLde7qhGdMCOPDl9cya4SBr6t7yiojAZ8azIfisgBhcBf/K9ZCwe5VyPznUZCYhfOwfjOUN72C3yV9Ink4fxMUFVoZTi6+tgqd9NoiL52XnLwWn/wjuuthbgHpEVJcBxsId4jW/B3oH1Lc8kmDNsj/gBtIgll0xN8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=osFdQlLd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BD42C4CECD;
+	Thu, 14 Nov 2024 15:03:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731596556;
-	bh=dN4tvL3q9pcjFqSpwP8uKkrWWNaEeL9R+qbXlxvJ5G8=;
+	s=k20201202; t=1731596589;
+	bh=BsYcovQdRC1h0DdNzlfc6JaWZH38UXOZmf3UeEbmyK0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WOVs1XoTZNNbTwcON3ExJl0NUWwZHgdMAROCIprysZMcxVLF215tsGcnP13WdCHxx
-	 +2f+9wr+kfk5dYY/V1gIGg7Db6voSlLXymnJ0YkUtFoo6OIOzph/hO4HNjHswqksBK
-	 xYg88qZHfVFVxv758KXVCys0hIsRuq4Q18inblgZqFixbNx7hD4h+OOntrpvUvdnab
-	 WJRYGmkcKrBbF/iTfd5XpEgrZJqFtvxR6t+nDg3KxTSTXEBJ/nCGhTwkhoMcKy+azo
-	 Rpo/65vWkT2H3qpJD8krVr6LESHH3NTB+NkGYmlw5RojqOXtenhaPjQIVbjC2VACoX
-	 o71rNQakFzwTg==
-Date: Thu, 14 Nov 2024 07:02:35 -0800
+	b=osFdQlLdTLNZDDz8qcYxE0pksuKJf+MsPBZ9dfcAB47ehzDwF/NIHeOQtIPWfsKuf
+	 6qMJfW+hjFp0R86JNn4LD4D/Nj3AaVxoTiDZpGCvMlIZ7GCRxGQuFLYIRkNFC6yiDe
+	 HllX0q44mYgUnuC2FLy4aBEEnZSA41mnUM8Wmm4hfYPoi7POINFoFiGoc7wvaX9HCq
+	 MybdfGuqzdxCK0nOgSznlmWcNYnazTr2mbGsBBeCNnvTYc6JvMMSLg4LsOIjlxax/h
+	 mKW5phHgvP+Jxpv4DvShW9Kbs29YC9AF1H6Ne/mJ6jwzaU/YHqlYZY9RRZp8L9+VRG
+	 s4QL31zLqU6aA==
+Date: Thu, 14 Nov 2024 07:03:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>, Jian Zhang
- <zhangjian.3032@bytedance.com>, netdev@vger.kernel.org,
- openbmc@lists.ozlabs.org, Matt Johnston <matt@codeconstruct.com.au>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] mctp i2c: notify user space on TX failure
-Message-ID: <20241114070235.79f9a429@kernel.org>
-In-Reply-To: <42761fa6276dcfc64f961d25ff7a46b764d35851.camel@codeconstruct.com.au>
-References: <20241108094206.2808293-1-zhangjian.3032@bytedance.com>
-	<20241113190920.0ceaddf2@kernel.org>
-	<da9b94909dcda3f0f7e48865e63d118c3be09a8d.camel@codeconstruct.com.au>
-	<20241113191909.10cf495e@kernel.org>
-	<42761fa6276dcfc64f961d25ff7a46b764d35851.camel@codeconstruct.com.au>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@meta.com
+Subject: Re: [PATCH net v2] ipmr: Fix access to mfc_cache_list without lock
+ held
+Message-ID: <20241114070308.79021413@kernel.org>
+In-Reply-To: <20241114-ancient-piquant-ibex-28a70b@leitao>
+References: <20241108-ipmr_rcu-v2-1-c718998e209b@debian.org>
+	<20241113191023.401fad6b@kernel.org>
+	<20241114-ancient-piquant-ibex-28a70b@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +65,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Nov 2024 14:48:57 +0800 Jeremy Kerr wrote:
-> > routing isn't really my forte, TBH, what eats the error so that it
-> > doesn't come out of mctp_local_output() ? Do you use qdiscs on top
-> > of the MCTP devices?  
+On Thu, 14 Nov 2024 00:55:57 -0800 Breno Leitao wrote:
+> On Wed, Nov 13, 2024 at 07:10:23PM -0800, Jakub Kicinski wrote:
+> > On Fri, 08 Nov 2024 06:08:36 -0800 Breno Leitao wrote:  
+> > > Accessing `mr_table->mfc_cache_list` is protected by an RCU lock. In the
+> > > following code flow, the RCU read lock is not held, causing the
+> > > following error when `RCU_PROVE` is not held. The same problem might
+> > > show up in the IPv6 code path.  
+> > 
+> > good start, I hope someone can fix the gazillion warnings the CI 
+> > is hitting on the table accesses :)  
 > 
-> There are no qdiscs involved at this stage, as we need to preserve
-> packet ordering in most cases. The route output functions will end up
-> in a dev_queue_xmit, so any tx error would have been decoupled from the
-> route output at that stage.
+> If you have an updated list, I'd be happy to take a look.
+> 
+> Last time, all the problems I found were being discussed upstream
+> already. I am wondering if they didn't land upstream, or, if you have
+> warnings that are not being currently fixed.
 
-Ah, it's the driver eating the errors, it puts the packet on a local
-queue and returns OK no matter what. The I2C transfer happens from 
-a thread.
-
-I wonder if there is precedent, let's ask CAN experts.
-
-Mark, MCTP would like to report errors from the drivers all the way 
-to the socket. Do CAN drivers do something along these lines?
+https://netdev-3.bots.linux.dev/vmksft-forwarding-dbg/results/859762/82-router-multicast-sh/stderr
 
