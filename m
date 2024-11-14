@@ -1,144 +1,137 @@
-Return-Path: <netdev+bounces-144752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9749C9C861E
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:28:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FC69C8639
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:33:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EBA6B23608
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:24:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64308B24D18
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D591DED72;
-	Thu, 14 Nov 2024 09:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10751E7C2D;
+	Thu, 14 Nov 2024 09:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ApZEQeXJ"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hsoLDJmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30751DED57;
-	Thu, 14 Nov 2024 09:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3EC1D1724;
+	Thu, 14 Nov 2024 09:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731576248; cv=none; b=tzBqJKZvJgcbXAC2TjIFbEkoxsHS53RZVJfKPrU+QDUHxtnXIaNjoANPFiDqNguPSSoRH4WmpYTAyEh73pYDALcjET5CIbxzlJRWqU0WVNv7dlmwG46ZUSiX3d0W5KBurvwjytr3HG3Iuo07sJHC785V/RW2/OJa73VpUYPf13o=
+	t=1731576399; cv=none; b=O5AIHOQoRmVy5S7jgLPlEZTkkZ7JYEOLrmYs+9xuEPAE+LPDWUoae8eV3wXqP4SSB5wKVNOCdUwrsCmw/GomRvaEL5dtgg13Ipxhgw+vG7IiEldhLOhGoRevC5za1ogNs4x2zs/pjFKVYgnSq3Qt06UWvXbPbbfbha9tw0uARdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731576248; c=relaxed/simple;
-	bh=1tLdh2ZKgihd5YMppDIxWzE/zLXz2gTbAgqBqNp303g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SNm3TIkiG8HAjisz6cngd5W5LhBZyv+lOsz6tnXCBshQWEJd3qM9vN4uphqfTHADNp/lBrkupJIljZwqWoYYqlxUj/7xszV1a7197KinekJ6vsnHJnRSA5dRuRUPfG49we0Ncwj2oTm59Loy3Se1UpLaToS5L5Y2tMUgmTEKwtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ApZEQeXJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6hOqxkHTBppwid8pGiYPCcvBY5MygdugyTwbWDxFu4o=; b=ApZEQeXJb3QMsX0nr8VsCR1KMk
-	BHewEG01VyFqxdnj4VTIcFdMSQRLJeYAIKf2UUucjAoUiaWrhI95OpWCSwPgBXoxFSNdRBeZDn77j
-	JolT1XGbISVYiaYyN/nL5Udwgwfdu2D4U8uPRxdE6zz4qw/eLNT63vswlZr2XYwZ1SDt6VK7gO6oU
-	XUeL509EO7mPzL1+uEqtQ7jJ0uLRDuPBphKJEBcqyhGtJCHwsMNMhA6xhIM2WZJu0xL3Wf/3h32YJ
-	gRBw5LJ/LzuhZuTWw90vnZPbVySSLnGi1jPzYFko8hPxSUd29hrE6p/djf/VQEr8dLzOP0YVJprLI
-	TJyl4lUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41792)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBW4t-0007ii-1z;
-	Thu, 14 Nov 2024 09:23:52 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBW4q-0000zW-1n;
-	Thu, 14 Nov 2024 09:23:48 +0000
-Date: Thu, 14 Nov 2024 09:23:48 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net v1 1/2] net: phy: set eee_cfg based on PHY
- configuration
-Message-ID: <ZzXBpEHs0y2_elqK@shell.armlinux.org.uk>
-References: <20241114081653.3939346-1-yong.liang.choong@linux.intel.com>
- <20241114081653.3939346-2-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1731576399; c=relaxed/simple;
+	bh=bYzcUGF7hCrjkXL1fsayWn1/CBgbO0ZZ6aSmChTaQt8=;
+	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:To:
+	 In-Reply-To:Content-Type; b=N4nnW4lnTJ5HaM7TSOIBhFH/Y36pseU3fkjUHWer03Os8iNh9gZZ5iP1nUv4wXZKBpokYc3+ULZb7ZDe+5aPiHjvR7tP9DTlQPxbop8Vo253gPA+vUXxZLqy8nkJ09MIVJ9bb1Cu6KU92e/zMzqXBIDkw9oGdwd9Xy0tTtKKekk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hsoLDJmr; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1731576395;
+	bh=bYzcUGF7hCrjkXL1fsayWn1/CBgbO0ZZ6aSmChTaQt8=;
+	h=Date:Subject:Cc:References:From:To:In-Reply-To:From;
+	b=hsoLDJmrvZeIQPuX9zZPHFsDVyqts0ZNfONnp53S0u1wSY4gI6SNQatZNdXS/iRJD
+	 Zzn+MsQrvvhsXlrZHcySjYGxTqvBvHGZgOcPMlirFAhjcJ48nOAgcaD5EqyV35JXFT
+	 T30pWXchhQ5ftFf5GwhU/kQtFKMsOobGjucg+lHsaP03toFfGTVzagCQXx8ecx4fZb
+	 OCX9KjbSp7uJ1diSutOUC7BX4VkisUZN3bQdZQYABhfBFXyLI2pII5cbs415p4qG+5
+	 qF/hN6djXJyHw91lytp8g16N6MOFI5u81O35Jmcbn++WL3e6Y5BHxwHpX4EDfQuaI1
+	 fPTWvybugzk+Q==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 9893117E1522;
+	Thu, 14 Nov 2024 10:26:34 +0100 (CET)
+Message-ID: <bdbfb1db-1291-4f95-adc9-36969bb51eb4@collabora.com>
+Date: Thu, 14 Nov 2024 10:26:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241114081653.3939346-2-yong.liang.choong@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: Set mediatek,mac-wol on
+ DWMAC node for all boards
+Cc: kernel@collabora.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Biao Huang <biao.huang@mediatek.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
+ <20241109-mediatek-mac-wol-noninverted-v2-2-0e264e213878@collabora.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+To: =?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>,
+ Michael Walle <mwalle@kernel.org>
+In-Reply-To: <20241109-mediatek-mac-wol-noninverted-v2-2-0e264e213878@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 14, 2024 at 04:16:52PM +0800, Choong Yong Liang wrote:
-> Not all PHYs have EEE enabled by default. For example, Marvell PHYs are
-> designed to have EEE hardware disabled during the initial state, and it
-> needs to be configured to turn it on again.
+Il 09/11/24 16:16, Nícolas F. R. A. Prado ha scritto:
+> Due to the mediatek,mac-wol property previously being handled backwards
+> by the dwmac-mediatek driver, its use in the DTs seems to have been
+> inconsistent.
 > 
-> This patch reads the PHY configuration and sets it as the initial value for
-> eee_cfg.tx_lpi_enabled and eee_cfg.eee_enabled instead of having them set to
-> true by default.
+> Now that the driver has been fixed, correct this description. All the
+> currently upstream boards support MAC WOL, so add the mediatek,mac-wol
+> property to the missing ones.
+> 
+> Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+> ---
+>   arch/arm64/boot/dts/mediatek/mt2712-evb.dts                   | 1 +
+>   arch/arm64/boot/dts/mediatek/mt8195-demo.dts                  | 1 +
+>   arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts | 1 +
+>   3 files changed, 3 insertions(+)
+> 
 
-eee_cfg.tx_lpi_enabled is something phylib tracks, and it merely means
-that LPI needs to be enabled at the MAC if EEE was negotiated:
+..snip..
 
- * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
- *      that eee was negotiated.
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
+> index 31d424b8fc7cedef65489392eb279b7fd2194a4a..c12684e8c449b2d7b3b3a79086925bfe5ae0d8f8 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
+> @@ -109,6 +109,7 @@ &eth {
+>   	pinctrl-names = "default", "sleep";
+>   	pinctrl-0 = <&eth_default_pins>;
+>   	pinctrl-1 = <&eth_sleep_pins>;
+> +	mediatek,mac-wol;
 
-eee_cfg.eee_enabled means that EEE mode was enabled - which is user
-configuration:
+The demo board has the same WoL capability as the EVK, so you can avoid adding the
+mac-wol property here.
 
- * @eee_enabled: EEE configured mode (enabled/disabled).
+>   	status = "okay";
+>   
+>   	mdio {
+> diff --git a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
+> index e2e75b8ff91880711c82f783c7ccbef4128b7ab4..4985b65925a9ed10ad44a6e58b9657a9dd48751f 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
+> +++ b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
+> @@ -271,6 +271,7 @@ &eth {
+>   	pinctrl-names = "default", "sleep";
+>   	pinctrl-0 = <&eth_default_pins>;
+>   	pinctrl-1 = <&eth_sleep_pins>;
+> +	mediatek,mac-wol;
 
-phy_probe() reads the initial PHY state and sets things up
-appropriately.
+I'm mostly sure that Kontron's i1200 works the same as the EVK in regards to WoL.
 
-However, there is a point where the EEE configuration (advertisement,
-and therefore eee_enabled state) is written to the PHY, and that should
-be config_aneg(). Looking at the Marvell driver, it's calling
-genphy_config_aneg() which eventually calls
-genphy_c45_an_config_eee_aneg() which does this (via
-__genphy_config_aneg()).
+Michael, I recall you worked on this board - can you please confirm?
 
-Please investigate why the hardware state is going out of sync with the
-software state.
+Thanks,
+Angelo
 
-Thanks.
-
->  void phy_support_eee(struct phy_device *phydev)
->  {
-> +	bool is_enabled = true;
-> +
-> +	genphy_c45_eee_is_active(phydev, NULL, NULL, &is_enabled);
->  	linkmode_copy(phydev->advertising_eee, phydev->supported_eee);
-> -	phydev->eee_cfg.tx_lpi_enabled = true;
-> -	phydev->eee_cfg.eee_enabled = true;
-> +	phydev->eee_cfg.tx_lpi_enabled = is_enabled;
-> +	phydev->eee_cfg.eee_enabled = is_enabled;
-
-This is almost certainly incorrect, because eee_enabled should only
-be set when phydev->advertising_eee (which should track the hardware
-EEE advertisement programmed into the PHY) is non-zero.
-
-Note that phy_support_eee() must be called _before_ phy_start(). I
-haven't checked whether stmmac does this.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
