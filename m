@@ -1,73 +1,74 @@
-Return-Path: <netdev+bounces-145023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9528D9C91EB
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:54:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA20E9C9217
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:05:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58FB3282C44
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 18:54:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FCBB281423
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16B517A583;
-	Thu, 14 Nov 2024 18:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B7419B3E2;
+	Thu, 14 Nov 2024 19:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nG3ZCKWH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFzoGyk2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD473199E8D
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 18:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5379D18CBFB;
+	Thu, 14 Nov 2024 19:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731610432; cv=none; b=pg13HooRepBPQ9bI/7UmPp55RAYubLaZDS3asF9Jukw4su231MduTuyvUNb5m98ehiUmw/cSoNOzqTOjOgprDQMFmHSX41oZ2GTgH3xfQ80v8oL3AOMqoXYI9srYR2xKZ3vIy2BizS+i4TnEMHpaTFmsZv28qYoC6/E/1iZS5X4=
+	t=1731611110; cv=none; b=V7IXMGI25kTHN8qJiKPF7ew5WdkAs9XRyqFNmbG+3/duF7IfbqflGwrxLhvct+5OBPNQ8zuJml/eyWP9k/ScCbGblK+K5udCsytGcZ0BvkM+QSno0tJhcfYiHD0Gyk3JAZXKuIABpW/GWcO2J6CzUBF6VWBKnw6cDpLmCKYHEJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731610432; c=relaxed/simple;
-	bh=4sESwwmOqkCWvHw+pndneTQ0omPnAfbeq93SPPpDLm4=;
+	s=arc-20240116; t=1731611110; c=relaxed/simple;
+	bh=DbJDRuSLShA200wqj8JWS+Dlqe3CG+CwunFs+VOQlsw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u8KG2JsK2id1wcBZyNRxCQTuNPl8zcJu/QiVwMNZcDWg5JegR8meN4imDfxJi5PLjCkuUHZZhire3RXf0+NJwUaDaecOZfW0mFgLLB+hqjwfmwDmHwssRuNAguHNYKRqKpeTWPXABO9RkG/LF+3i4cu0zUjIOHmMTUQ2Qffysvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nG3ZCKWH; arc=none smtp.client-ip=209.85.128.47
+	 In-Reply-To:Content-Type; b=k46Wj7tsV3bQRsjJdlBtZ2HHqqINRDe8/odeL0ZOkhvqjzDtdCRIdYPvpNE6sd5v8gi5VF9QpEbEQRvMiVd9QLsGcofOLjcUYv5eemr4HVZAtBB7vl8SXorKuOvDl/V05LWOPNZeH6VNsKeEKtFw5XWRGlclWhZbp8uvoGt2Y9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFzoGyk2; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43158625112so9038325e9.3
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 10:53:50 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-37d6ff1cbe1so672501f8f.3;
+        Thu, 14 Nov 2024 11:05:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731610429; x=1732215229; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731611107; x=1732215907; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=F+act8H8vBI0kssh+d2SqywPLeFhuuqkPtiKdY3nWas=;
-        b=nG3ZCKWHSw2CIKDmGP9nPYG+NoIkZ6yFWgk3eOWrCd0SVk8HMZv8ZDyDM0puZzRunM
-         CEMiOn6CJukA+8Bo3z3dSn967mKH8YWWSLZQhpWjEKlBnxTRXq5TeTwGI0UO5474mNec
-         DQP5GGvrfC7m84XG/MZgXw1wNdzKz+SWpBXplU1nAz3vQghyOVyK+Y/vugmEQlDlag0/
-         BFjL1im+3hlfqd0PwRH+lFy/gAI64RK46zxw/sqXnh1YCyRLgBZEENK8MFJbcj0VA5bb
-         CKqh3Tw/Sm3vJeV5EIMGFr+yqZXwhVA9IXv1A7YWDCtAICTEA+HX2U9XjOiKJiqWA4AI
-         fdtw==
+        bh=4arVc/lIRR2+wkPS1zfykW4JwiV7UbbXDc1Ect71VoM=;
+        b=kFzoGyk2G47PvT9opaRnMYj/rJ7OnEn8vaM3Pv0cyMQctr7E2CQYrNRolorcIJhtXv
+         a7cb5e0s2T3spZH4a05KYsjz1gZlSuwcNzdMGkzDOAHVOPJsFh5YhTlC+hgV0n00tnnE
+         JDNfJE5QcL1uAKm9Wxh4MSnT4lQ/3zCUK1EGcuctOk1AxNCvnsOjyccK6KZesKQ1vzuh
+         DrdjMiD6dYBumUZ5iiXn5FhZqMShl5DHGVa/weQwz2Pins9cOzzyjclMPdsef/b3KFhA
+         J+XhE57qkWOE796RenB7SY15t4sXftW6mkjvD6uk/xWDEsaWwNmg8ZMPAoRHZsCZi8P7
+         3DlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731610429; x=1732215229;
+        d=1e100.net; s=20230601; t=1731611107; x=1732215907;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F+act8H8vBI0kssh+d2SqywPLeFhuuqkPtiKdY3nWas=;
-        b=dGymplr4R3OL6CfZNed3B2THzP7u6cRouDMkfEEybN8N8euENbVhFwHcx1Jil3SLql
-         3FgOtCvC+Pk2pDG9JDUtjx/JnkiysLmxDFRpzAYOEZ4t7OdI95Y1R37lb7FxlSZdi7nC
-         wFLlqww2xPehPNPogoxTmvWXgs7SdBBSWuoGdbAQ+GNiL2Fn15XbCaB4ycei8JZcHEIC
-         /J6hRsKQ2FIDH0NTCIq2fDTpf44cJrD9y+59TMaSDsbkSo+xUVrionESHgZkvD421tM6
-         82oyQs/wbvFDhMqgKS6Cysm2vzKIM4VC2sbkW9vKJ850QQJiTmabn/A2DRUBoc7HXRHy
-         MZmg==
-X-Gm-Message-State: AOJu0Ywbhmp5+/YblEZ8rcvdXdXu/LC88GXDdEMKF2GTs3ao1IsS0U0L
-	mYVge4093tK/JCjDU5VSUbqAaeEZXeB3S/ZY2SPhpZBcBe13yFOJ
-X-Google-Smtp-Source: AGHT+IELUfVKeMhRwtzYKmzZRv1LYcmCpcb3hbTxVOGXrsYtHnsfVttlc2lV8lA+TvnfMtpATpXodQ==
-X-Received: by 2002:a05:6000:1785:b0:37c:d244:bdb1 with SMTP id ffacd0b85a97d-3821851c6a4mr2752224f8f.26.1731610428830;
-        Thu, 14 Nov 2024 10:53:48 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adbbc44sm2208283f8f.45.2024.11.14.10.53.46
+        bh=4arVc/lIRR2+wkPS1zfykW4JwiV7UbbXDc1Ect71VoM=;
+        b=ZrFNUbmTlacHpk96fLy7tj8bIKPvSxwN0/aTgbI6kZECRKPsS0iyQ59Z9jjo59jylD
+         VxMK4SOTUnUgiEmE6cgh4cwLl8jKbpRMyINBsB8i5fLI0HdB3sbV+JpWianX7Mp2Xuvb
+         8u3btR2mJQmpAv7OUg2g0ZaWloHF8dWGV8ihqJM5JMbCv3BtKZGSp4DzNjVvx92lrSV/
+         wwsqjK6Xa15f+WRqUkL7jUo66eQ/yEkiK1anWxlS69OOmrU4ZAcJNNfpmSi0MU/MFh/y
+         PWzMmfwx2L5Z/jOf3lVtxmvEaKS594BiIfQyX7aJzufT2NjGWn3GG+uwvFb1KGTDpB5P
+         Jy9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV3n1XZB1DL0IVWxQfCUBDDxqiENIPHqOssqCPBUQ7/aZp26B7Vj6jFE6mB0cEtvvP+vsuyiMEb@vger.kernel.org, AJvYcCVIfBaskYFidjtKwPWpysJH55qfpXdki46fIic39+iXHDq43AM6+HyyUqJt3wa7ZXVkiPmfnLtEgm26Rzo=@vger.kernel.org, AJvYcCVu5jGC0S+iGSDFvcPAeYVGMFK4dtYklLHA6JI/j9yasW95noVar7Qh7luyZm7q3EmSwl+Q1IGNFUg2@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXWz0zDuymVXrGpRWlQh1+ZMbVD6e66F3Rv1VjTHWfT6smhxzb
+	T5LcMfnulMjiebkGl3Anc5efR6nrDJ+Ke+Ml11mMl7MOn43yLaMH
+X-Google-Smtp-Source: AGHT+IEPoxJL3vk12kpIWe7rVi0czNqkBp3WsfV+muenmfpR/vTpuftD0YtGrter6Yzr09NSLeb9uw==
+X-Received: by 2002:a05:6000:79b:b0:381:f443:21d8 with SMTP id ffacd0b85a97d-3820dee1531mr6813982f8f.0.1731611106196;
+        Thu, 14 Nov 2024 11:05:06 -0800 (PST)
+Received: from [172.27.51.98] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adad397sm2165526f8f.23.2024.11.14.11.05.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 10:53:48 -0800 (PST)
-Message-ID: <6835fde6-0863-49e8-90e8-be88e86ef346@gmail.com>
-Date: Thu, 14 Nov 2024 20:54:20 +0200
+        Thu, 14 Nov 2024 11:05:05 -0800 (PST)
+Message-ID: <bfeeaccd-dc8f-4f9b-bbae-4b13547bd04d@gmail.com>
+Date: Thu, 14 Nov 2024 21:05:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,89 +76,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,v2] [PATCH net-next v2] net: wwan: t7xx: Change
- PM_AUTOSUSPEND_MS to 5000
-To: wojackbb@gmail.com
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
- chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
- m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
- loic.poulain@linaro.org, johannes@sipsolutions.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-arm-kernel@lists.infradead.org,
- angelogioacchino.delregno@collabora.com, linux-mediatek@lists.infradead.org,
- matthias.bgg@gmail.com
-References: <20241114102002.481081-1-wojackbb@gmail.com>
+Subject: Re: [Bug report] NFS patch breaks TLS device-offloaded TX zerocopy
+To: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Anna Schumaker <Anna.Schumaker@Netapp.com>,
+ Trond Myklebust <trondmy@kernel.org>, linux-nfs@vger.kernel.org,
+ Boris Pismenny <borisp@nvidia.com>, John Fastabend
+ <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Networking <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>
+References: <aeea3ae5-5c0b-48fa-942b-4d17acfd8cba@gmail.com>
 Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20241114102002.481081-1-wojackbb@gmail.com>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <aeea3ae5-5c0b-48fa-942b-4d17acfd8cba@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hello Jack,
 
-On 14.11.2024 12:20, wojackbb@gmail.com wrote:
-> From: Jack Wu <wojackbb@gmail.com>
+
+On 05/08/2024 13:40, Tariq Toukan wrote:
+> Hi,
 > 
-> Because optimizing the power consumption of t7XX,
-> change auto suspend time to 5000.
+> A recent patch [1] to 'fs' broke the TX TLS device-offloaded flow 
+> starting from v6.11-rc1.
 > 
-> The Tests uses a script to loop through the power_state
-> of t7XX.
-> (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
+> The kernel crashes. Different runs result in different kernel traces.
+> See below [2].
+> All of them disappear once patch [1] is reverted.
 > 
-> * If Auto suspend is 20 seconds,
->    test script show power_state have 0~5% of the time was in D3 state
->    when host don't have data packet transmission.
+> The issues appears only with "sendfile on and zerocopy on".
+> We couldn't repro with "sendfile off", or with "sendfile on and zerocopy 
+> off".
 > 
-> * Changed auto suspend time to 5 seconds,
->    test script show power_state have 50%~80% of the time was in D3 state
->    when host don't have data packet transmission.
+> The repro test is as simple as a repeated client/server communication 
+> (wrk/nginx), with sendfile on and zc on, and with "tls-hw-tx-offload: on".
 > 
-> We tested Fibocom FM350 and our products using the t7xx and they all
-> benefited from this.
-
-Possible negative outcomes for data transmission still need 
-clarification. Let me repeat it here.
-
-On 06.11.2024 13:10, 吳逼逼 wrote:
-> Receiving or sending data will cause PCIE to change D3 Cold to D0 state.
-
-Am I understand it correctly that receiving IP packets on downlink will 
-cause PCIe link re-activation?
-
-
-I am concerned about a TCP connection that can be idle for a long period 
-of time. For example, an established SSH connection can stay idle for 
-minutes. If I connected to a server and execute something like this:
-
-user@host$ sleep 20 && echo "Done"
-
-Will I eventually see the "Done" message or will the autosuspended modem 
-effectively block any incoming traffic? And how long does it take for 
-the modem to wake up and deliver a downlink packet to the host? Have you 
-measured StDev change?
-
-> Signed-off-by: Jack Wu <wojackbb@gmail.com>
-> ---
-> V2:
->   * supplementary commit information
-> ---
-> ---
->   drivers/net/wwan/t7xx/t7xx_pci.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> $ for i in `seq 10`; do wrk -b::2:2:2:3 -t10 -c100 -d15 --timeout 5s 
+> https://[::2:2:2:2]:20448/16000b.img; done
 > 
-> diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
-> index e556e5bd49ab..dcadd615a025 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_pci.c
-> +++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-> @@ -48,7 +48,7 @@
->   #define T7XX_INIT_TIMEOUT		20
->   #define PM_SLEEP_DIS_TIMEOUT_MS		20
->   #define PM_ACK_TIMEOUT_MS		1500
-> -#define PM_AUTOSUSPEND_MS		20000
-> +#define PM_AUTOSUSPEND_MS		5000
->   #define PM_RESOURCE_POLL_TIMEOUT_US	10000
->   #define PM_RESOURCE_POLL_STEP_US	100
->   
+> We can provide more details if needed, to help with the analysis and debug.
+> 
+> Regards,
+> Tariq
+> 
+> [1]
+> commit 49b29a573da83b65d5f4ecf2db6619bab7aa910c
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Mon May 27 18:36:09 2024 +0200
+> 
+>      nfs: add support for large folios
+> 
+>      NFS already is void of folio size assumption, so just pass the 
+> chunk size
+>      to __filemap_get_folio and set the large folio address_space flag 
+> for all
+>      regular files.
+> 
+>      Signed-off-by: Christoph Hellwig <hch@lst.de>
+>      Tested-by: Sagi Grimberg <sagi@grimberg.me>
+>      Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
+> 
+>   fs/nfs/file.c  | 4 +++-
+>   fs/nfs/inode.c | 1 +
+>   2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> 
+
+Hi all,
+
+FYI, issue is fixed by:
+
+commit dd6e972cc589 ("net/mlx5e: kTLS, Fix incorrect page refcounting")
+
+https://lore.kernel.org/netdev/20241107183527.676877-5-tariqt@nvidia.com/
+
+Thanks,
+Tariq
 
 
