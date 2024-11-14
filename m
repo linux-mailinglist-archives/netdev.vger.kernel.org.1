@@ -1,55 +1,43 @@
-Return-Path: <netdev+bounces-144914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B5B9C8C42
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:57:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B419C8C63
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 15:04:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88EE92815A4
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 13:57:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2417286FCD
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 14:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A9F22331;
-	Thu, 14 Nov 2024 13:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="EYOwq4+k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F226208AD;
+	Thu, 14 Nov 2024 14:03:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C255A95C;
-	Thu, 14 Nov 2024 13:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C09614287;
+	Thu, 14 Nov 2024 14:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731592630; cv=none; b=UzlmjVsqaxeR3agCsELgBww7t6ADc2cmhrmWy6kJdIXDi+GYjLbV0uQLwaU05VwfhGeXgfvaQdEppwG59Z+N+AGo6lUWc/Kj+yiWD6dgEHk8rt07sL+6YfXZTbx5qnWt0oN6DzxcZGPMALLBK+3JZiktTLcrTMK+cVmdeoZhUv4=
+	t=1731593027; cv=none; b=t2k1pEUvYVc/XF+zZvqJEZfaOOQ2yyQ65ZBxOXaL0yiKNzDS/DMjOFmIa42GX3S32mCj8/RhmlXE307jC0a805cXzxaX4zyvgLTxDn2H7og4VJUmCq2/MqBMvJvOL7lmTEkT73QL/ucO9EcRoFvkaQKlYbOYjleV7B21qlqDYzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731592630; c=relaxed/simple;
-	bh=xXmKpFmqAMp48Y7ttayGjWqRYdxHGKlAorYsho+aMWU=;
+	s=arc-20240116; t=1731593027; c=relaxed/simple;
+	bh=QdA+IH/Qn1gAdF0du8p1YO33j9VfU07Z68IwDPdTkuQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p2u9lsjZg2D/b/BjtysDHWtdExoLGVuEEWKBGeH/zQuQA604LZpwa8pPIRt+tys9lvW+nQQXMdl7NHbBx3DqbhpcCjF0hEh31bKS0HEf4n3qSk1MmeON+MTCWy0pzCp2uPBnr+So5+Tz9cW7DEHI4NabVaJcI4uh/9oejE2auoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=EYOwq4+k; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1731592620;
-	bh=xXmKpFmqAMp48Y7ttayGjWqRYdxHGKlAorYsho+aMWU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EYOwq4+kKxuaOhDYbs8RKuUUPRF+f3aQPWayV9Nqu8LJ9IXJ4vuTG7EKa1QbkkuoY
-	 0nJawHXVrCFbuf/jFbKvEC66c1koNvSPnAdAESpFMc6+yGzf3s1EDop25TdW++FbGH
-	 2Z5PUz5FmwJN9Ym5Wjj+4EhItfFEYhDKqz6RosFxvlGq8JpTA56Fm7udasiY5OaHNR
-	 JpHjIJtMgU5ZsOZMh4XR/mXkVQkcnkrjjlCdyQ1YwkCOZk/ZZJsKsk7lPO9Ht5rKyG
-	 0U8dFrEkhNxY/L3zM2GlasIZTIZpKZhntVg05DjgW7PLet8XI6gJB5OBd0G64r6IbN
-	 Lng+IxWOdIIaw==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	 In-Reply-To:Content-Type; b=G6ISyzXXnbSw4+lj4kaVUTxPEqWSpJLX5j4ZFMVlkfxhXg8wLaARaj+eD8fPTLPdpZAXehevcg99k8vy95nE0phKKQMmDLdLV+Ht0oSeNhq4Dr7fiTfYd0lVSXNd5E703N95riaIqqV9boy3oW6P2a7h3L8Xh68AVv96m2gMscU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [172.29.1.246] (unknown [141.14.52.155])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3025917E3663;
-	Thu, 14 Nov 2024 14:57:00 +0100 (CET)
-Message-ID: <1a36456b-4844-4827-ab53-598ec14d7437@collabora.com>
-Date: Thu, 14 Nov 2024 14:56:59 +0100
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7162661E5FE05;
+	Thu, 14 Nov 2024 15:02:50 +0100 (CET)
+Message-ID: <ec66b579-90b7-42cc-b4d4-f4c2e906aeb9@molgen.mpg.de>
+Date: Thu, 14 Nov 2024 15:02:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,104 +45,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: Set mediatek,mac-wol on
- DWMAC node for all boards
-To: Michael Walle <mwalle@kernel.org>,
- =?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>
-Cc: kernel@collabora.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+Subject: Re: [Intel-wired-lan] [PATCH 1/1] ixgbe: Correct BASE-BX10 compliance
+ code
+To: Tore Amundsen <tore@amundsen.org>
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, Biao Huang <biao.huang@mediatek.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20241109-mediatek-mac-wol-noninverted-v2-0-0e264e213878@collabora.com>
- <20241109-mediatek-mac-wol-noninverted-v2-2-0e264e213878@collabora.com>
- <bdbfb1db-1291-4f95-adc9-36969bb51eb4@collabora.com>
- <D5LWHT7OU9DQ.NCMSTUWT5991@kernel.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ Ernesto Castellotti <ernesto@castellotti.net>
+References: <20241109232557.189035-1-tore@amundsen.org>
+ <20241109232557.189035-2-tore@amundsen.org>
 Content-Language: en-US
-In-Reply-To: <D5LWHT7OU9DQ.NCMSTUWT5991@kernel.org>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241109232557.189035-2-tore@amundsen.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Il 14/11/24 13:29, Michael Walle ha scritto:
-> Hi,
+[Cc: +Ernesto]
+
+Dear Tore,
+
+
+Thank you for your patch.
+
+Am 10.11.24 um 00:25 schrieb Tore Amundsen:
+> SFF-8472 (section 5.4 Transceiver Compliance Codes) defines bit 6 as
+> BASE-BX10. Bit 6 means a value of 0x40 (decimal 64).
 > 
-> On Thu Nov 14, 2024 at 10:26 AM CET, AngeloGioacchino Del Regno wrote:
->> Il 09/11/24 16:16, Nícolas F. R. A. Prado ha scritto:
->>> Due to the mediatek,mac-wol property previously being handled backwards
->>> by the dwmac-mediatek driver, its use in the DTs seems to have been
->>> inconsistent.
->>>
->>> Now that the driver has been fixed, correct this description. All the
->>> currently upstream boards support MAC WOL, so add the mediatek,mac-wol
->>> property to the missing ones.
->>>
->>> Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
->>> ---
->>>    arch/arm64/boot/dts/mediatek/mt2712-evb.dts                   | 1 +
->>>    arch/arm64/boot/dts/mediatek/mt8195-demo.dts                  | 1 +
->>>    arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts | 1 +
->>>    3 files changed, 3 insertions(+)
->>>
->>
->> ..snip..
->>
->>> diff --git a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
->>> index 31d424b8fc7cedef65489392eb279b7fd2194a4a..c12684e8c449b2d7b3b3a79086925bfe5ae0d8f8 100644
->>> --- a/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
->>> +++ b/arch/arm64/boot/dts/mediatek/mt8195-demo.dts
->>> @@ -109,6 +109,7 @@ &eth {
->>>    	pinctrl-names = "default", "sleep";
->>>    	pinctrl-0 = <&eth_default_pins>;
->>>    	pinctrl-1 = <&eth_sleep_pins>;
->>> +	mediatek,mac-wol;
->>
->> The demo board has the same WoL capability as the EVK, so you can avoid adding the
->> mac-wol property here.
+> The current value in the source code is 0x64, which appears to be a
+> mix-up of hex and decimal values. A value of 0x64 (binary 01100100)
+> incorrectly sets bit 2 (1000BASE-CX) and bit 5 (100BASE-FX) as well.
 > 
-> Not sure I can follow you here.
+> Signed-off-by: Tore Amundsen <tore@amundsen.org>
+
+Could you add a Fixes: tag?
+
+Fixes: 1b43e0d20f2d (ixgbe: Add 1000BASE-BX support)
+
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> index 14aa2ca51f70..81179c60af4e 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+> @@ -40,7 +40,7 @@
+>   #define IXGBE_SFF_1GBASESX_CAPABLE		0x1
+>   #define IXGBE_SFF_1GBASELX_CAPABLE		0x2
+>   #define IXGBE_SFF_1GBASET_CAPABLE		0x8
+> -#define IXGBE_SFF_BASEBX10_CAPABLE		0x64
+> +#define IXGBE_SFF_BASEBX10_CAPABLE		0x40
+>   #define IXGBE_SFF_10GBASESR_CAPABLE		0x10
+>   #define IXGBE_SFF_10GBASELR_CAPABLE		0x20
+>   #define IXGBE_SFF_SOFT_RS_SELECT_MASK		0x8
 
-That's in the sense that they do WoL through the MAC and not through the PHY (as
-in, it's the MAC that has to be configured for WoL and not *only* the PHY).
-
->>
->>>    	status = "okay";
->>>    
->>>    	mdio {
->>> diff --git a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
->>> index e2e75b8ff91880711c82f783c7ccbef4128b7ab4..4985b65925a9ed10ad44a6e58b9657a9dd48751f 100644
->>> --- a/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
->>> +++ b/arch/arm64/boot/dts/mediatek/mt8395-kontron-3-5-sbc-i1200.dts
->>> @@ -271,6 +271,7 @@ &eth {
->>>    	pinctrl-names = "default", "sleep";
->>>    	pinctrl-0 = <&eth_default_pins>;
->>>    	pinctrl-1 = <&eth_sleep_pins>;
->>> +	mediatek,mac-wol;
->>
->> I'm mostly sure that Kontron's i1200 works the same as the EVK in regards to WoL.
->>
->> Michael, I recall you worked on this board - can you please confirm?
-> 
-> I'd say so. Honestly, I've never tried WoL on this board, but I'm
-> not aware of any difference to the *demo* board (not the EVK).
-
-Thanks for confirming. I will ignore the devicetree commit entirely then, as this
-would ...un...fix the fix (meaning that patch [1/2] is good!).
-
-Cheers,
-Angelo
-
-> 
-> -michael
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
+Kind regards,
+
+Paul
 
