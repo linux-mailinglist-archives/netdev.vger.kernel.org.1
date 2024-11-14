@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-144843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B25629C88DC
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:26:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC8F59C88CB
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7442FB2F481
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:10:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ECB0B22A7D
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871BB1F8F0C;
-	Thu, 14 Nov 2024 11:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C2B1F8EE1;
+	Thu, 14 Nov 2024 11:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aq+BYOoM"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="i2KEE3+8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE421F8185
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E10318BBBD;
+	Thu, 14 Nov 2024 11:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731582614; cv=none; b=bb0dgdftEs3SNg0i44a6sYhviL7mr1l+oeA6TRGytMnM5ge7gRD7cb0gjPhvsBhIalK44cfLsdZo6arECxgrKkm8CqrKnz05edMU6zNIViwgJYBLnrE0A87Pg2CZO0oYEW2dK8cTb0UhVns5jXQKNgoPDfm5jl0uBuV2Rm/dvWI=
+	t=1731582921; cv=none; b=BuUot6gYVkyISFXOyWDlycwiYK7Le4NDVBl5W7Jc7qu9tv6tYdfSW/x4KiU7G2VpC24ZBUCfM1yfuzNbNzbGMCTzTMme9YM0Mg73ebfOrndqTq1mTxH4ijprkM9Hzp+YNQHCqDhFR+x5hzBbrzLzdg0yLWLHP/dWtk4FefgqTYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731582614; c=relaxed/simple;
-	bh=+PJN9W5TUF8ROvz+Dk38kDMAFGpGNYq535RDxbaJqkg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aoh7fPZagevLoFa2UkY2fopEy0S7eNGgPrjYWHNlLYdqS8oKuW+aQMX0QdDYrW7mjIAyBRmFcxNvDcIwPmkpVgDbRmIdzh7weLMKN0cC1aBmfZ3y0f6t3z2f7gFC4vVPF7tuex+SL4FtUeZD74HjTfvSNee8So+zTHO5CtY/WCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Aq+BYOoM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731582611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sQSRWxbj4Jr6bem90b/I0QTuf7y4SyjrrPrHgroR4SM=;
-	b=Aq+BYOoMvBgvCe9CeWS33MxY9v0t/teSR0obVyRqq74rLaAF38V7pAYf/rmpuXPmyTldrp
-	JNA/Jajkpi+lTFsshkrkQ9krWzubNenXGzIruoPH+60tfI3zUKhAWHaNhelxbdPzzU5aYy
-	JxBH3eh1wXW+LcRCfTZurKShsulSxOk=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-9UUg2b39MYWzW2R9BXIywA-1; Thu, 14 Nov 2024 06:10:10 -0500
-X-MC-Unique: 9UUg2b39MYWzW2R9BXIywA-1
-X-Mimecast-MFC-AGG-ID: 9UUg2b39MYWzW2R9BXIywA
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-460b71eb996so6299461cf.3
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 03:10:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731582610; x=1732187410;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sQSRWxbj4Jr6bem90b/I0QTuf7y4SyjrrPrHgroR4SM=;
-        b=WC3fAmFi4NJCMV5s0C8d2PkCgNyi3ty3hqUcIGg92Z1zbSzpFb69X2MJHVKXBWCDVa
-         WMZtve377DRAmVUmna+iUUzG0zc3b/uB8pCmo1JxirN7Ng5jY8opwtbWFVG/sMUVX457
-         6bG6AJc6VfyyiN0XShDU44wazWripnVrzYPCEhcPu2qqdnvqpwJxgy3Yg9jzGdvj3qsc
-         Ivf+dlCY+UvepxleM0azAYs+3hTYYqSo1NBh0FB12m7gzbna86b8+FHtNSB/hCYss48d
-         1ePNkMyob/4D2NVw2ZEjJdAM+zpldU9fNjG1y2/aNXoXi0106LHLXGsQOZmUFiUFvXrE
-         GzbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1LTdGrwv3gha0XbFBi05QbWEV/HDNg/iWrX3Q8At++QlbjToKCkCbJZYaPEbQ2Cwer1tqEkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3HDQUoyWt8MHd6mpU9VsLC15S6X+kALRLoJYgaAYp6nR3q9LO
-	SXBlruDD1my8+Viw+l4+GG+BE4acG3iyUki/hGtikcDTdnLV8kk7EsOU8drcKnUZyd6xT5d+HXQ
-	PhNgTpn1ALozMndvChocSDcKVPvN6CV4kUc2s1T/a3vBwzLBcDLSnUA==
-X-Received: by 2002:ac8:5dc6:0:b0:458:4129:1135 with SMTP id d75a77b69052e-4630930660fmr341014361cf.9.1731582609956;
-        Thu, 14 Nov 2024 03:10:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH7F+M/vbAnAssFq0op9LX2J4MXfyIul3bpH8Mbu3LUHXaUTQtWRodj5XOTZ0rPlg9LI4bX1w==
-X-Received: by 2002:ac8:5dc6:0:b0:458:4129:1135 with SMTP id d75a77b69052e-4630930660fmr341014071cf.9.1731582609592;
-        Thu, 14 Nov 2024 03:10:09 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635a9e97f4sm4224781cf.22.2024.11.14.03.10.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 03:10:08 -0800 (PST)
-Message-ID: <ff1c1622-a57c-471e-b41f-8fb4cb2f233d@redhat.com>
-Date: Thu, 14 Nov 2024 12:10:05 +0100
+	s=arc-20240116; t=1731582921; c=relaxed/simple;
+	bh=LJyia1GC6owIBA+nt+R/EcuDd2a3EyVgS+cuvHdY9dE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D3xOpFIEf/J3vaXQDKqTwuaAcwR1WLOLoLz7PSyR+idr4tUS2k40JtPwOIcCGxeOHmZUbjWr1L1x/usdHZrCrfsd3JUjHTUEs9jL0+pRWV1Dt3ajSxWByAPLQLirH4zmftGWW2EyOIQJzrKnyBeYoXmnlgh82IQTS7LmZfEIzdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=i2KEE3+8; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AEBEpRI22903521, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1731582891; bh=LJyia1GC6owIBA+nt+R/EcuDd2a3EyVgS+cuvHdY9dE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=i2KEE3+8PPcP8NX8d/xPeHHFbJhhlH1HJ43L1RmsCflRZAzuMhmCeaguTVaxqhZr+
+	 mqx/jto8cKRqTWm61ZMXFgwvlQGT4mQm/UMNo7h3qisSXj5jza+Bi6gUlr+od5XJbh
+	 arbGmrA84wMTtY8qP9voDfk45saCcquDiu8oqggxOL/GzN4eypUDQrzoepfa4VhnZw
+	 LSnbT4XCw2XyjCUL54+ZugaydSo6YaT/dM1F6+n+eusoj9Wa9jAVs1AzPdwMnDnIEY
+	 LkTk1WBb6Z2/FZ+ZNBmJqfcbe6fyjZSTyZ2ASLWwVAhfuJuizhNhq8vn2O7MA05/tV
+	 AMsvvFhI1jH9Q==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AEBEpRI22903521
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Nov 2024 19:14:51 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 14 Nov 2024 19:14:51 +0800
+Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 14 Nov
+ 2024 19:14:50 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
+Subject: [PATCH net 0/4] Updating and correcting switch hardware versions and reported speeds
+Date: Thu, 14 Nov 2024 19:14:39 +0800
+Message-ID: <20241114111443.375649-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] netfilter: ipset: add missing range check in
- bitmap_ip_uadt
-To: Jeongjun Park <aha310510@gmail.com>, pablo@netfilter.org,
- kadlec@netfilter.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- horms@kernel.org, kaber@trash.net, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-References: <20241113130209.22376-1-aha310510@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241113130209.22376-1-aha310510@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-On 11/13/24 14:02, Jeongjun Park wrote:
-> When tb[IPSET_ATTR_IP_TO] is not present but tb[IPSET_ATTR_CIDR] exists,
-> the values of ip and ip_to are slightly swapped. Therefore, the range check
-> for ip should be done later, but this part is missing and it seems that the
-> vulnerability occurs.
-> 
-> So we should add missing range checks and remove unnecessary range checks.
-> 
-> Cc: <stable@vger.kernel.org>
-> Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-> Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+This patch set mainly involves updating and correcting switch hardware
+versions and reported speeds.
+Details are as follows:
+1. Refactor the rtase_check_mac_version_valid() function.
+2. Correct the speed for RTL907XD-V1
+3. Add support for RTL907XD-VA PCIe port
+4. Corrects error handling of the rtase_check_mac_version_valid()
 
-@Pablo, @Jozsef: despite the subj prefix, I guess this should go via
-your tree. Please LMK if you prefer otherwise.
+Justin Lai (4):
+  rtase: Refactor the rtase_check_mac_version_valid() function
+  rtase: Correct the speed for RTL907XD-V1
+  rtase: Add support for RTL907XD-VA PCIe port
+  rtase: Corrects error handling of the rtase_check_mac_version_valid()
 
-Cheers,
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  2 +
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 38 ++++++++++++++-----
+ 2 files changed, 30 insertions(+), 10 deletions(-)
 
-Paolo
+-- 
+2.34.1
 
 
