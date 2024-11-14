@@ -1,60 +1,64 @@
-Return-Path: <netdev+bounces-145033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0689C92B2
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B149C92B8
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CDF6B2827F
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:57:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9894CB2828C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6054F1A7275;
-	Thu, 14 Nov 2024 19:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD86F1A9B4F;
+	Thu, 14 Nov 2024 19:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRnWQu2n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hc+h5jCQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE33148827;
-	Thu, 14 Nov 2024 19:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A981A76C7;
+	Thu, 14 Nov 2024 19:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731614264; cv=none; b=rDo0GcP7vrLsosfp82UNs/I2VXKdHlbWGlXZ3MvBoZRwGViZPszgkfo7OLdQmnNmYqUoGVejEQWKJizNN5iuXf7+D81GuE1Lt5q6R6vb4j/HXUnuxesHIhzd8G39bT3cBx2+1keUTx8j8ZPAX5NbxmOdyGKX5a13sDe/A1KwM9E=
+	t=1731614277; cv=none; b=lVr1RZofw/awu4vLbozI+xpcBnwvfoBBa78YrpOSb8vN4oh0UD+vUgbkVm3BKfzywRK89C1ulFeXwQtO76GwOBtUgE0DCysIuoEB7y5inNDKuWJ0TyeWT4f+k2edzmdsS1/RutlsiOLiluoPOiijtmZLWLZlplsmmbHhk2Q1RSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731614264; c=relaxed/simple;
-	bh=OAa0i6PQbFBX9nxXU16/72WHOOIFXow2PFAUR2Ydja8=;
+	s=arc-20240116; t=1731614277; c=relaxed/simple;
+	bh=vmB6hvxyWgBDQfNuZdsI2IQbUBYy8dvD9SF1XBieQSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pMUm2rfQwflxrzTLyxtM0m7Vqv70j8yCIAhLX4ooLTQldUn7VzqNf0YRB6uSKIqvLY21koWJpwCjfTSZCOQPjMmHTRrKiYluUlx/OlkencJPpPQR4R41tchaxT5RQ3xWN3Ow9hdIsMOgW11UqdI0bF4Pqmpgdsvh3A6E/QtceVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRnWQu2n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DA0C4CECF;
-	Thu, 14 Nov 2024 19:57:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HANNLpnUq5wpu6F/k5VBoLdWtrwA6CQ8RMatyKO7wPeBkB0PgTchoT309yhEJ3wsHZ9AQAVG3SQoQ8hooaJylw3F1e4prcmse1q06OvG8ukVYt2O34hx5AcRqrZlTPtizwRz07G7bYSrlLZp0G4Tw+nzI65QKFjzyhDjEp4zhJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hc+h5jCQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B5FC4CECD;
+	Thu, 14 Nov 2024 19:57:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731614263;
-	bh=OAa0i6PQbFBX9nxXU16/72WHOOIFXow2PFAUR2Ydja8=;
+	s=k20201202; t=1731614277;
+	bh=vmB6hvxyWgBDQfNuZdsI2IQbUBYy8dvD9SF1XBieQSU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QRnWQu2nSakrfClWLAGqmJTp2XpscJTT3KC2itHiGwdIi3b7+xP6Evfc8Q1awxpIH
-	 zIgAWloo/6XcjAGF9tRoWY+X+3+OzC45ym3W9Pp033fbvcYsWH83GfFfrPZyU972Uw
-	 8U4oB06EPPct2FdCr8EyrYXt/8UGUXRgO0UTiMdiBqea5FmTQTvVpgIZL8iTK9vdFS
-	 KOX+6ixUrr2FHJ88RFox1HZT5Wv8XsBQxwK6HxDB5jXnSDavWiSnIc1B0lolgbFAfN
-	 c/N2jRfSWVF/xrPmdoTm4TojR7IHYfB+RPzGixt4a7XgT+cT2ZWyuiBiWrdoZTRLpM
-	 JwKD3v6Wf277w==
-Date: Thu, 14 Nov 2024 19:57:39 +0000
+	b=Hc+h5jCQx4O7/mnaqkoIZOrK1hGYhJX5mx7LaA2RpMOxcAV+paooz6g6ykYGjR5dc
+	 BE/3wbQ30ywPGcM1BDObyRR5j5BVQpO98bWAkun/av5+v+3qFz5k7tZJeYlfq8/sT/
+	 LMBuj1NF/quicl/DAhutSakXo82UfGZ0PqgErcz4H6M6oo8IH5zuBoQDw3eAhZENKm
+	 nlaz24lOD9o//LhKcIkWyeIAcqtvImotC5dDvTm3VMv10RNoiDNsawlQyxcEsrUlq7
+	 gTUoF8bjDEdhY8CLiDU3dd3vTK9VJho4t8p4DhpW23jFMiO0tJoTvfCQmgOKk/CAyz
+	 THhx1zqD07QEQ==
+Date: Thu, 14 Nov 2024 19:57:52 +0000
 From: Conor Dooley <conor@kernel.org>
 To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>,
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: sff,sfp: Fix "interrupts"
- property typo
-Message-ID: <20241114-spelling-stimulate-27d132bab456@spud>
-References: <20241113225825.1785588-2-robh@kernel.org>
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas,ether: Drop
+ undocumented "micrel,led-mode"
+Message-ID: <20241114-same-hydrated-fa006e6d2991@spud>
+References: <20241113225742.1784723-2-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,35 +66,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="uXl+LIBonLLh1Pue"
+	protocol="application/pgp-signature"; boundary="iAK1enMsNU2XmYYa"
 Content-Disposition: inline
-In-Reply-To: <20241113225825.1785588-2-robh@kernel.org>
+In-Reply-To: <20241113225742.1784723-2-robh@kernel.org>
 
 
---uXl+LIBonLLh1Pue
+--iAK1enMsNU2XmYYa
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 13, 2024 at 04:58:25PM -0600, Rob Herring (Arm) wrote:
-> The example has "interrupt" property which is not a defined property. It
-> should be "interrupts" instead. "interrupts" also should not contain a
-> phandle.
->=20
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+On Wed, Nov 13, 2024 at 04:57:42PM -0600, Rob Herring (Arm) wrote:
+> "micrel,led-mode" is not yet documented by a schema. It's irrelevant to
+> the example, so just drop it.
 
 Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
---uXl+LIBonLLh1Pue
+--iAK1enMsNU2XmYYa
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZzZWMwAKCRB4tDGHoIJi
-0j8yAQDpms3Ys4sS8WOalvUjCBd6pbiPJKOwadvRufiu+Dw8jgD7BgtLGCEM4YB9
-t9VnA7kmSKDP5Jet/6DAFA8i8iqBYgI=
-=rAh9
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZzZWQAAKCRB4tDGHoIJi
+0iTnAQCzKORcNjYixRmpzMut3cWD8oS8TjyrULKpc6GlS9vLbgEAkzWT6aKWyW5P
+ArHiO7xD4VWE9Hmgf+A5p8G5rwTuawA=
+=AMjb
 -----END PGP SIGNATURE-----
 
---uXl+LIBonLLh1Pue--
+--iAK1enMsNU2XmYYa--
 
