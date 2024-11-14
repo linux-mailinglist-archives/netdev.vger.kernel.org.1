@@ -1,103 +1,121 @@
-Return-Path: <netdev+bounces-144772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E009C86AD
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:59:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F5D9C86AF
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2773428348E
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC663283624
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3172C1F76CD;
-	Thu, 14 Nov 2024 09:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DBB1F8F0F;
+	Thu, 14 Nov 2024 09:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="S4kke8GP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QngmeC78"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46FC1F76AA;
-	Thu, 14 Nov 2024 09:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958C11F757C
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731578255; cv=none; b=TPiyVa1jXFm4d09tgAuhiOyfDWXd0dtJ/dyk0gg5JgevfzjYqSW1agym3hqJA7SQBLo4sFbJsv+ajsrxOV6ezIharDoC7YoGbuG6c1BHsf86jvogSY3hNHCoXtreCRxnH1SoXtzk4Ehg5QdWzceJyZp5/2g65SjYr8pcYb4LZZg=
+	t=1731578256; cv=none; b=malt6JD+NXfLByuuU5BtES+bHbpG1nzj44xaclsPeG1TgSSwCokgUG1ZnOkYkTf194ujZlH9VTeHBB7usq2WnzOHxp9FLu6IR0mjHoEUPmRrQEgaAecdsbjUMVHmP9WtyOK9NMIGwn2mSLIg7DWY9nQ5TVU6MSZ3fr3jOQxG4/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731578255; c=relaxed/simple;
-	bh=dl3f5V0GYfQ9H8usR6Gzm7s8YCR4Yk1aiQKw0lRR8Hg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=LhlU+BBFC/29rHL1R0ec+teCL7UlfHzSh1WYKp2Gnl2whj0x6h/KePRySXLlW8UoboMadbXhSh2V7Y9YDvNWaD+nCjvKSna6ofT+9ciEWSYUGZIRmusoKu7cleZHMqOPt25jgZhCBu6/MkMvIbaiHjFGF2v3MbPks6x6HRov3bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=S4kke8GP reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=k1S/3BU8Zb5jgvsFwcgiEGk5aCzAh4QhHc+14jg67x8=; b=S
-	4kke8GPsTrrwTy6GOB3WU19VU7uRGFhTZNLdK9PDsWKaQE99G6ybxNY/PNFwDm+v
-	+YmF3frFqtTZjpZ9J2GrVjWKcBunC2HWGAb7BP0Iy3yuTATQ+Q3AJk3CmLiCw6uw
-	vp7JVGUC7PjJijpn9l0buFGgcq4hJ4kLFoQjF6wuRQ=
-Received: from 00107082$163.com ( [111.35.191.191] ) by
- ajax-webmail-wmsvr-40-106 (Coremail) ; Thu, 14 Nov 2024 17:56:57 +0800
- (CST)
-Date: Thu, 14 Nov 2024 17:56:57 +0800 (CST)
-From: "David Wang" <00107082@163.com>
-To: "Paolo Abeni" <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/core/net-procfs: use seq_put_decimal_ull_width()
- for decimal values in /proc/net/dev
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
- Copyright (c) 2002-2024 www.mailtech.cn 163com
-In-Reply-To: <9e64f1ca-844f-47ec-8555-4ac1e409ec16@redhat.com>
-References: <20241110045221.4959-1-00107082@163.com>
- <9e64f1ca-844f-47ec-8555-4ac1e409ec16@redhat.com>
-X-NTES-SC: AL_Qu2YA/mct0oq4SOfZekXn0oTju85XMCzuv8j3YJeN500uCTo1SQ7cm9xHF/0+s6kCymhoAiRfBJQzsBob6pgeYnyvp1u4mGArd3gN7727wAl
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1731578256; c=relaxed/simple;
+	bh=ZkZhMBuYEetRs8RLxyGo7ZfE2c9wP9owZXBO19EWV1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLcxJ2+IRKbXoyLJbZMtPuUZutSLg6MZMcQXuwTYs7wok3I15kKUWul0vXbTPL98pm6kBdK/Ae1wxiAtF8PZps6nPQIXTXvVQAcL6aqNdU3PKYe2tRcczn96ytzbFw2SS+O47gEXFXhCOyVxdCR6hWFnTIvirSvAPLyuub46j3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QngmeC78; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-431688d5127so3892655e9.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:57:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1731578253; x=1732183053; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/MzeUno5ssgaxfmpObuz1vMLdWwk1h1FEXNkZI55Ovw=;
+        b=QngmeC78/e3RSOyQ9AxrLGU/phNx350HU8LF8H2bIjzoFaiOnSmli6Z7WEZufcPNNE
+         KWRKk8fmrsZtnvv7HstLYAorfx5LCgd9CU/KVHHO1IxYp0ATyIXQ6bLjeInzZaR1LCKm
+         1/JLNiaKhnuyQN48FVKV4QHKOUlCKogiA2iQ10WnBFX3cWDYxAb8RD+YFgmH+k5/dxXY
+         Myrf2nbWp9V49YE0d59YOMtBShgdAxQ7+W/q/HSNND2n8YeDaKXGG/er9juTBMiZ90J9
+         ylKElteUHxu5lJrqU5EtgKDC3fv6Jo8Ne6nEVV1vFNzuexWw2Ztlb31TGj5f/qc/eOJ+
+         Qu8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731578253; x=1732183053;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/MzeUno5ssgaxfmpObuz1vMLdWwk1h1FEXNkZI55Ovw=;
+        b=lCKIYvTKdDIxwrYon8h++lhRIkDPKPuF/YWyTobbjPGz/HYbPF0BtU30NY338GWmfr
+         AcvpEEGJ3Cn6MjC/s572Lerg4C6Mp0c1fAFTzJw5E3MFW1/xavTUy9wEodjnpxdptm/u
+         +IGMFCshvseBaI7LrF2DhjRk2umQCmfPcpiDktXyerbo//LeMRp1yeikkXMezq4KmCbU
+         Ep3XtCTlrJqIwcp7OPN10N7f+wIP1RTwvwgamrSRkxRMj9swRZ05pIoHhOI68TgI6GF8
+         6RQ8MesV+f+Knm3G3F1o9oSHSliayI0iqfz5TbD531z/+vIkwHUZKJUffYiPO+YY/Olu
+         ipeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3jyTM5Oq0yKsUj76Txi8X1/fjFFe1cVSJ01ha0x4+SZQEdBthVuTMuosjuuzEvCaC5A+1AP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxzs6XflPvd2QVeBWu+ln2x1+05A5WXJnIRX/J4APqv/VQt5ryd
+	nEAZd0Vt6Tb17tX5W0G0GnpqMTMfXAdf+U/KSB4nZNVi+NSzjcTN7PJDynpF/14=
+X-Google-Smtp-Source: AGHT+IG7x6fyvPJ2miRZp7ZOwhGxaCAKWIfgA45HLnQT8w8JmbciTFyDzjsHotb1zRcVAPKjbtwtBg==
+X-Received: by 2002:a05:600c:4f04:b0:42f:310f:de9 with SMTP id 5b1f17b1804b1-432b75099c1mr188268385e9.15.1731578252912;
+        Thu, 14 Nov 2024 01:57:32 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adbd6d6sm1001814f8f.55.2024.11.14.01.57.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 01:57:32 -0800 (PST)
+Date: Thu, 14 Nov 2024 12:57:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Max Staudt <max@enpas.org>, Marc Kleine-Budde <mkl@pengutronix.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] can: can327: fix snprintf() limit in
+ can327_handle_prompt()
+Message-ID: <4ff913b9-93b3-4636-b0f6-6e874f813d2f@stanley.mountain>
+References: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
+ <6db4d783-6db2-4b86-887c-3c95d6763774@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <309370ca.9ca1.1932a1ac39d.Coremail.00107082@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:aigvCgAHYKFqyTVnFO4mAA--.55402W
-X-CM-SenderInfo: qqqrilqqysqiywtou0bp/1tbiqQmXqmc1u4ZyjgAFsL
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6db4d783-6db2-4b86-887c-3c95d6763774@wanadoo.fr>
 
-CgpBdCAyMDI0LTExLTE0IDE3OjE3OjMyLCAiUGFvbG8gQWJlbmkiIDxwYWJlbmlAcmVkaGF0LmNv
-bT4gd3JvdGU6Cj4KPgo+T24gMTEvMTAvMjQgMDU6NTIsIERhdmlkIFdhbmcgd3JvdGU6Cj4+IHNl
-cV9wcmludGYoKSBpcyBjb3N0eSwgd2hlbiByZWFkaW5nIC9wcm9jL25ldC9kZXYsIHByb2ZpbGlu
-ZyBpbmRpY2F0ZXMKPj4gYWJvdXQgMTMlIHNhbXBsZXMgb2Ygc2VxX3ByaW50ZigpOgo+PiAJZGV2
-X3NlcV9zaG93KDk4LjM1MCUgNDI4MDQ2LzQzNTIyOSkKPj4gCSAgICBkZXZfc2VxX3ByaW50Zl9z
-dGF0cyg5OS43NzclIDQyNzA5Mi80MjgwNDYpCj4+IAkJZGV2X2dldF9zdGF0cyg4Ni4xMjElIDM2
-NzgxNC80MjcwOTIpCj4+IAkJICAgIHJ0bDgxNjlfZ2V0X3N0YXRzNjQoOTguNTE5JSAzNjIzNjUv
-MzY3ODE0KQo+PiAJCSAgICBkZXZfZmV0Y2hfc3dfbmV0c3RhdHMoMC41NTQlIDIwMzgvMzY3ODE0
-KQo+PiAJCSAgICBsb29wYmFja19nZXRfc3RhdHM2NCgwLjI1MCUgOTE5LzM2NzgxNCkKPj4gCQkg
-ICAgZGV2X2dldF90c3RhdHM2NCgwLjA3NyUgMjg0LzM2NzgxNCkKPj4gCQkgICAgbmV0ZGV2X3N0
-YXRzX3RvX3N0YXRzNjQoMC4wNTElIDE4OS8zNjc4MTQpCj4+IAkJICAgIF9maW5kX25leHRfYml0
-KDAuMDI5JSAxMDYvMzY3ODE0KQo+PiAJCXNlcV9wcmludGYoMTMuNzE5JSA1ODU5NC80MjcwOTIp
-Cj4+IEFuZCBvbiBhIHN5c3RlbSB3aXRoIG9uZSB3aXJlbGVzcyBpbnRlcmZhY2UsIHRpbWluZyBm
-b3IgMSBtaWxsaW9uIHJvdW5kcyBvZgo+PiBzdHJlc3MgcmVhZGluZyAvcHJvYy9uZXQvZGV2Ogo+
-PiAJcmVhbAkwbTUxLjgyOHMKPj4gCXVzZXIJMG0wLjIyNXMKPj4gCXN5cwkwbTUxLjY3MXMKPj4g
-T24gYXZlcmFnZSwgcmVhZGluZyAvcHJvYy9uZXQvZGV2IHRha2VzIH4wLjA1MW1zCj4+IAo+PiBX
-aXRoIHRoaXMgcGF0Y2gsIGV4dHJhIGNvc3RzIHBhcnNpbmcgZm9ybWF0IHN0cmluZyBieSBzZXFf
-cHJpbnRmKCkgY2FuIGJlCj4+IG9wdGltaXplZCBvdXQsIGFuZCB0aGUgdGltaW5nIGZvciAxIG1p
-bGxpb24gcm91bmRzIG9mIHJlYWQgaXM6Cj4+IAlyZWFsCTBtNDkuMTI3cwo+PiAJdXNlcgkwbTAu
-Mjk1cwo+PiAJc3lzCTBtNDguNTUycwo+PiBPbiBhdmVyYWdlLCB+MC4wNDhtcyByZWFkaW5nIC9w
-cm9jL25ldC9kZXYsIGEgfjYlIGltcHJvdmVtZW50Lgo+PiAKPj4gRXZlbiB0aG91Z2ggZGV2X2dl
-dF9zdGF0cygpIHRha2VzIHVwIHRoZSBtYWpvcml0eSBvZiB0aGUgcmVhZGluZyBwcm9jZXNzLAo+
-PiB0aGUgaW1wcm92ZW1lbnQgaXMgc3RpbGwgc2lnbmlmaWNhbnQ7Cj4+IEFuZCB0aGUgaW1wcm92
-ZW1lbnQgbWF5IHZhcnkgd2l0aCB0aGUgcGh5c2ljYWwgaW50ZXJmYWNlIG9uIHRoZSBzeXN0ZW0u
-Cj4+IAo+PiBTaWduZWQtb2ZmLWJ5OiBEYXZpZCBXYW5nIDwwMDEwNzA4MkAxNjMuY29tPgo+Cj5J
-ZiB0aGUgdXNlci1zcGFjZSBpcyBjb25jZXJuZWQgd2l0aCBwZXJmb3JtYW5jZXMsIGl0IG11c3Qg
-dXNlIG5ldGxpbmsuCj5PcHRpbWl6aW5nIGEgbGVnYWN5IGludGVyZmFjZSBnaXZlcyBJTUhPIGEg
-dmVyeSB3cm9uZyBtZXNzYWdlLgo+Cj5JJ20gc29ycnksIEkgdGhpbmsgd2Ugc2hvdWxkIG5vdCBh
-Y2NlcHQgdGhpcyBjaGFuZ2UuCgpJdCdzIE9LLiAKSSBoYXZlIGJlZW4gdXNpbmcgL3Byb2MvbmV0
-L2RldiB0byBnYXVnZSB0aGUgdHJhbnNtaXQvcmVjZWl2ZSByYXRlIGZvciBlYWNoIGludGVyZmFj
-ZSwKIGFuZCAvcHJvYy9uZXQvbmV0c3RhdCBmb3IgYWJub3JtYWxpdGllcyBpbiBteSBtb25pdG9y
-aW5nIHRvb2xzLiAgSSBndWVzcyBteSBrbm93bGVkZ2UgYXJlIHF1aXRlIG91dCBvZiBkYXRlIG5v
-dywKSSB3aWxsIGxvb2sgaW50byBuZXRsaW5rOyBBbmQgdGhhbmtzIGZvciBpbmZvcm1hdGlvbi4K
-Cj4KPi9QCgpUaGFua3MKRGF2aWQK
+On Thu, Nov 14, 2024 at 06:34:49PM +0900, Vincent Mailhol wrote:
+> Hi Dan,
+> 
+> On 14/11/2024 at 18:03, Dan Carpenter wrote:
+> > This code is printing hex values to the &local_txbuf buffer and it's
+> > using the snprintf() function to try prevent buffer overflows.  The
+> > problem is that it's not passing the correct limit to the snprintf()
+> > function so the limit doesn't do anything.  On each iteration we print
+> > two digits so the remaining size should also decrease by two, but
+> > instead it passes the sizeof() the entire buffer each time.
+> > 
+> > If the frame->len were too long it would result in a buffer overflow.
+> 
+> But, can frame->len be too long? Classical CAN frame maximum length is 8
+> bytes. And I do not see a path for a malformed frame to reach this part of
+> the driver.
+> 
+> If such a path exists, I think this should be explained. Else, I am just not
+> sure if this needs a Fixes: tag.
+> 
+
+Even when bugs don't affect runtime we still assign a Fixes tag, but we don't
+CC stable.  There is no way that passing the wrong size was intentional.
+
+regards,
+dan carpenter
+
 
