@@ -1,111 +1,226 @@
-Return-Path: <netdev+bounces-144858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47859C895A
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:58:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D399C893C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67230B23948
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:46:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88ED52849CA
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B141F940A;
-	Thu, 14 Nov 2024 11:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AACB1F940C;
+	Thu, 14 Nov 2024 11:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="LqHtwD0N"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="QHRkZ6LE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.51])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C7B18B49F;
-	Thu, 14 Nov 2024 11:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FE618B49F
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731584797; cv=none; b=dTeSmExfCO5yB9BjHgTGRKDh+0mHCVRAIH/N6+JusmK8cC4FzL7VYxsxe2Ddvi/CoO7067TXW8/96jthyOvKAatsYgZ0VWX1qZmET6hR0MPzHWzImFuaUE1IxmhxGI8fh6gQLKFeBKJeiXAckY5eklpEqj9Pb0cKePjWDo1clh0=
+	t=1731584936; cv=none; b=SDnwTfMYV41r5ZE92T6Oh6OSlCpznudYjyI5bfnNT4qqThkVA1Wa6ltTAjSRCJY34aHt1JIh7mUmk1+ugAMFfXg7cMCdfQRl+5AUP19nibyrls03AKsFyYVl9KerMeZhbSEZ4cy+gpKBBkRiqJmsSU+bLbPaTWRCTlibiLchcg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731584797; c=relaxed/simple;
-	bh=kBpLdhEGc7zOKzxVLXAaaIEWbOCpClUn8A3oGq7aZ/Q=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ajDDP5LO5kTFkPZH/1iSB0II4g2YAtj3LZTysuBaFxuyS14ftCCYRSqBkhbIzTeHHd2cW5LFmklFmImA8FoHfSVA1HiwSNHADE7h3LxQkABjqwvPceVfP4KepnZ7FFh31KU8A2HGvVkfgfJoeUe3Ai/1zEILwS/qc8K49yjsLY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=LqHtwD0N; arc=none smtp.client-ip=148.6.0.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 413B232E01C3;
-	Thu, 14 Nov 2024 12:46:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1731584790; x=1733399191; bh=3iF6OqcXdH
-	l2rv+0knV1DhJxbA/YKrtu8gEBD1nHGzA=; b=LqHtwD0NEHf0eKewieiDI6yJlG
-	SqOjJTIkGlyTd7VX5TKu12/tCP0SuZr/7h6heOTaFaM1pRZgqgW/X2oBse2DN0B2
-	RYmPsiH/Gdjn1qjp7GayjPb1ISbi4fJEEDdo+g/a2Czy9dsOQq813cya6FdCrHcY
-	e7fSFHEuRZhSS3+xI=
-X-Virus-Scanned: Debian amavis at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
- by localhost (smtp2.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id FufRpJMCKJMn; Thu, 14 Nov 2024 12:46:30 +0100 (CET)
-Received: from mentat.rmki.kfki.hu (254C26AF.nat.pool.telekom.hu [37.76.38.175])
-	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
-	by smtp2.kfki.hu (Postfix) with ESMTPSA id 268C632E01B7;
-	Thu, 14 Nov 2024 12:46:30 +0100 (CET)
-Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
-	id 8B28A1428CC; Thu, 14 Nov 2024 12:46:29 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by mentat.rmki.kfki.hu (Postfix) with ESMTP id 87F9E142175;
-	Thu, 14 Nov 2024 12:46:29 +0100 (CET)
-Date: Thu, 14 Nov 2024 12:46:29 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-cc: Paolo Abeni <pabeni@redhat.com>, Jeongjun Park <aha310510@gmail.com>, 
-    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-    horms@kernel.org, kaber@trash.net, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-    syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] netfilter: ipset: add missing range check in
- bitmap_ip_uadt
-In-Reply-To: <ZzXfDDNSeO0vh1US@calendula>
-Message-ID: <759eccdd-f75b-f3a7-8686-d4c49c72df41@blackhole.kfki.hu>
-References: <20241113130209.22376-1-aha310510@gmail.com> <ff1c1622-a57c-471e-b41f-8fb4cb2f233d@redhat.com> <ZzXfDDNSeO0vh1US@calendula>
+	s=arc-20240116; t=1731584936; c=relaxed/simple;
+	bh=GuaZVsTPlYWXRZLYXPADU6inSCOlZEV8AQQ/hDH/XrI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=n2CUoM8UHRuXVLD3BY+Nmpt/UcR/UM+DO2yd+4RJbQ8Jx0nHVP/IX4W3CqhjT6+tyXSCpBuohUWy3fbNM3XxPghDmnAbrgV6rbi/Fk0MS4iVVeloRjTesu/Tx6URrhtabPGw5+jW256XYcGSgOPf2o4NKfvNVnpzKRnR0Y5eGus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=QHRkZ6LE; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AEAoP4M007490;
+	Thu, 14 Nov 2024 03:48:41 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=yFkNc43UupPprKIWhS
+	atg3NsfBJo/FH/R8OGZrPVU5s=; b=QHRkZ6LETYceQI0zyReQezFXpn4YtJM10D
+	YAc4033+5uE0skHFGJWu0lF2HjPpfQBuyYV0dgeC3MX6YKvWWAtLE0FyoJkvYQHf
+	gzQIgdrZ4C7sUoBkcnuX33yVjfqKKlzsQ//NdEQ2klxcjeH51PSZkSlGXUfHR+vk
+	U8puqMIOzAfy3ElCsM7p3MvxBeVxnGv611i8VrRmFOcwcgcK0poH5YRXkzvr9b73
+	7UOi3JqF2ewvY25WMauy22NtYj5v6VcYsufgadIFpPoqVYr8UCDdavrW00L6ZThq
+	Sdtp+uWAXJ2C5E2ocZCjByg/7iLkiwVXDrbtu+pLkWuL1RHjhQiw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42wbt5hq93-18
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 14 Nov 2024 03:48:40 -0800 (PST)
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
+ 15.2.1544.11; Thu, 14 Nov 2024 11:48:36 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Pavan Chebbi
+	<pavan.chebbi@broadcom.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Michael Chan <michael.chan@broadcom.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>
+CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Vadim Fedorenko <vadfed@meta.com>,
+        Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2] bnxt_en: optimize gettimex64
+Date: Thu, 14 Nov 2024 03:48:20 -0800
+Message-ID: <20241114114820.1411660-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-deepspam: maybeham 2%
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: cvnbVuIPMuHdssz5bOQEqoZ-iREmI9FN
+X-Proofpoint-ORIG-GUID: cvnbVuIPMuHdssz5bOQEqoZ-iREmI9FN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-On Thu, 14 Nov 2024, Pablo Neira Ayuso wrote:
+Current implementation of gettimex64() makes at least 3 PCIe reads to
+get current PHC time. It takes at least 2.2us to get this value back to
+userspace. At the same time there is cached value of upper bits of PHC
+available for packet timestamps already. This patch reuses cached value
+to speed up reading of PHC time.
 
-> On Thu, Nov 14, 2024 at 12:10:05PM +0100, Paolo Abeni wrote:
-> > On 11/13/24 14:02, Jeongjun Park wrote:
-> > > When tb[IPSET_ATTR_IP_TO] is not present but tb[IPSET_ATTR_CIDR] exists,
-> > > the values of ip and ip_to are slightly swapped. Therefore, the range check
-> > > for ip should be done later, but this part is missing and it seems that the
-> > > vulnerability occurs.
-> > > 
-> > > So we should add missing range checks and remove unnecessary range checks.
-> > > 
-> > > Cc: <stable@vger.kernel.org>
-> > > Reported-by: syzbot+58c872f7790a4d2ac951@syzkaller.appspotmail.com
-> > > Fixes: 72205fc68bd1 ("netfilter: ipset: bitmap:ip set type support")
-> > > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> > 
-> > @Pablo, @Jozsef: despite the subj prefix, I guess this should go via
-> > your tree. Please LMK if you prefer otherwise.
-> 
-> Patch LGTM. I am waiting for Jozsef to acknowledge this fix.
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+v1 -> v2:
+* move cycles extension to a helper function and reuse it for both
+  timestamp extension and gettimex64() function
 
-Sorry for the delay at acking the patch. Please apply it to the stable 
-branches too because those are affected as well.
+I did some benchmarks on host with Broadcom Thor NIC trying to build
+histogram of time spent to call clock_gettime() to query PTP device
+over million iterations.
+With current implementation the result is (long tail is cut):
 
-Best regards,
-Jozsef
+2200ns: 902624
+2300ns: 87404
+2400ns: 4025
+2500ns: 1307
+2600ns: 581
+2700ns: 261
+2800ns: 104
+2900ns: 36
+3000ns: 32
+3100ns: 24
+3200ns: 16
+3300ns: 29
+3400ns: 29
+3500ns: 23
+
+Optimized version on the very same machine and NIC gives next values:
+
+900ns: 865436
+1000ns: 128630
+1100ns: 2671
+1200ns: 727
+1300ns: 397
+1400ns: 178
+1500ns: 92
+1600ns: 16
+1700ns: 15
+1800ns: 11
+1900ns: 6
+2000ns: 20
+2100ns: 11
+
+That means pct(99) improved from 2300ns to 1000ns.
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 32 +++++++++++++++----
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h | 11 +++++++
+ 2 files changed, 37 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index 91e7e08fabb1..075ccd589845 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -112,6 +112,28 @@ static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp *sts,
+ 	return rc;
+ }
+ 
++static int bnxt_refclk_read_low(struct bnxt *bp, struct ptp_system_timestamp *sts,
++				u32 *low)
++{
++	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
++	unsigned long flags;
++
++	/* We have to serialize reg access and FW reset */
++	read_seqlock_excl_irqsave(&ptp->ptp_lock, flags);
++
++	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
++		read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
++		return -EIO;
++	}
++
++	ptp_read_system_prets(sts);
++	*low = readl(bp->bar0 + ptp->refclk_mapped_regs[0]);
++	ptp_read_system_postts(sts);
++
++	read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
++	return 0;
++}
++
+ static void bnxt_ptp_get_current_time(struct bnxt *bp)
+ {
+ 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+@@ -163,12 +185,14 @@ static int bnxt_ptp_gettimex(struct ptp_clock_info *ptp_info,
+ 	struct bnxt_ptp_cfg *ptp = container_of(ptp_info, struct bnxt_ptp_cfg,
+ 						ptp_info);
+ 	u64 ns, cycles;
++	u32 low;
+ 	int rc;
+ 
+-	rc = bnxt_refclk_read(ptp->bp, sts, &cycles);
++	rc = bnxt_refclk_read_low(ptp->bp, sts, &low);
+ 	if (rc)
+ 		return rc;
+ 
++	cycles = bnxt_extend_cycles_32b_to_48b(ptp, low);
+ 	ns = bnxt_timecounter_cyc2time(ptp, cycles);
+ 	*ts = ns_to_timespec64(ns);
+ 
+@@ -801,15 +825,11 @@ void bnxt_get_tx_ts_p5(struct bnxt *bp, struct sk_buff *skb, u16 prod)
+ int bnxt_get_rx_ts_p5(struct bnxt *bp, u64 *ts, u32 pkt_ts)
+ {
+ 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+-	u64 time;
+ 
+ 	if (!ptp)
+ 		return -ENODEV;
+ 
+-	time = (u64)READ_ONCE(ptp->old_time) << BNXT_HI_TIMER_SHIFT;
+-	*ts = (time & BNXT_HI_TIMER_MASK) | pkt_ts;
+-	if (pkt_ts < (time & BNXT_LO_TIMER_MASK))
+-		*ts += BNXT_LO_TIMER_MASK + 1;
++	*ts = bnxt_extend_cycles_32b_to_48b(ptp, pkt_ts);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+index 4df4c2f373e0..c7851f8c971c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+@@ -182,4 +182,15 @@ static inline u64 bnxt_timecounter_cyc2time(struct bnxt_ptp_cfg *ptp, u64 ts)
+ 
+ 	return ns;
+ }
++
++static inline u64 bnxt_extend_cycles_32b_to_48b(struct bnxt_ptp_cfg *ptp, u32 ts)
++{
++	u64 time, cycles;
++
++	time = (u64)READ_ONCE(ptp->old_time) << BNXT_HI_TIMER_SHIFT;
++	cycles = (time & BNXT_HI_TIMER_MASK) | ts;
++	if (ts < (time & BNXT_LO_TIMER_MASK))
++		cycles += BNXT_LO_TIMER_MASK + 1;
++	return cycles;
++}
+ #endif
 -- 
-E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-Address: Wigner Research Centre for Physics
-         H-1525 Budapest 114, POB. 49, Hungary
+2.43.5
+
 
