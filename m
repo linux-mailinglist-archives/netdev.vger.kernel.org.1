@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-144671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1419E9C8157
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:10:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A7A9C815C
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 04:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A2C4B24928
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:10:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5D131F224A1
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 03:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3651CCEE0;
-	Thu, 14 Nov 2024 03:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C05E1E9090;
+	Thu, 14 Nov 2024 03:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPAaVjJE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0SkiN+G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682982E634
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 03:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0311E908A;
+	Thu, 14 Nov 2024 03:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731553819; cv=none; b=aLasQb5mmiCJfuTZOWCw/iVM+qGp7PLafXotT1N//kk7SM7R+2iXb4OiPTXcdY1NW556K6w7wmRDmJYPo936vQnl763isQUAUju0BWtZ0x6UoDwuybvpZk8JljlMzzS5Pbr5uolnx7w02WKo6U5ubdTE7tes1Ee+/sV48YbE2qw=
+	t=1731553820; cv=none; b=LsqseQHT98BjxUzJJAnTIqftgNt5KwHzRkU9p6a5+VRtKmovEp5X6SdN7QXLYvzvXITSkLNF6uqrdh8KH0fZrLnO9hjtwYRrTOFjL/spdFlRxsEYngV28jNy5Vn8qCTFb/0EfeTdO32M1wP+j5UeSAqNRuHrSorWTpryV7fhpAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731553819; c=relaxed/simple;
-	bh=Naw/2iMvIsKYhVEY8NtnnYLnLQKzbYI2YxAKc1ylb7U=;
+	s=arc-20240116; t=1731553820; c=relaxed/simple;
+	bh=xVE9ZKqGPZURWOle4+lgbkCut6C6Frr5hCEr+cRxjkc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P2S3lj1o7jdU9fHn124GN6+N+rdghuzZ9bzxoaavY2XUzEbwJo2G9u+Qvwaa08B37qlmeIaly1eOdTa9pHwQHUpDUZMFJNRY4lOIbKvD+3k1ZpLHylyzCuoxLHdFnHXPcOJRfNQHVNKBVI3fFsEQ/7z3WQgh/OqJ1HSxYmn2hko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPAaVjJE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0691DC4CEC3;
-	Thu, 14 Nov 2024 03:10:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lvWJOKOeXSU0W0KhEwSqzP3+WS2OnV6HKz/Mi/Vg16KP8DET3qFxF10GZsk4sQmAAScTZX2OikwPvgB+Uv9LzguBing3FdOqvlBS9qYxCTlwX/laJzMFerSPD/guhqqVab4XRBpH54QeLGcdLyeTwZdcwx0zg16n5NAuuNbVmk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0SkiN+G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48900C4AF0B;
+	Thu, 14 Nov 2024 03:10:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731553819;
-	bh=Naw/2iMvIsKYhVEY8NtnnYLnLQKzbYI2YxAKc1ylb7U=;
+	s=k20201202; t=1731553820;
+	bh=xVE9ZKqGPZURWOle4+lgbkCut6C6Frr5hCEr+cRxjkc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jPAaVjJEr+wZAiK5Yo4EZ+VST4Th1E1VtJLxuprp6PGsqW3i4i9eX9H4IZgsQZRoJ
-	 /MLGYboBBZJNgo8WVMqwKpNee6C1pR7ptSRoMy6hEWW9nA9Rl+ID7879V4is6liADz
-	 89w8ge0K+FRX7wbSKu4+cl+P6208TF3wJO5Bs70F2rTP6hfrV7OzGVoPwBrU/7EC5U
-	 7MZnE7tUkohEwK0x+EqrFIBu6OdGRno85x+EfgLL4NVbcUnctfKwbafBYc7zk4l/LD
-	 IA6QPBsM6BOMG4jQz0fasS8fYWNqr9NKumyLKk89BUK/f7VNc5BP3LtsxFc29+gbrP
-	 U2kbb3IM+PePA==
+	b=T0SkiN+G0nQqyTJB+PXS3W3nbpno5R7G2Hi/InU4AkAEFOiR4sVZtV/1QL8oQpTfB
+	 SDb78dEpu1OO8+avJaXLIDNwbQgmnbdi52XE7Bx1rqgjcp0eYvmXu/LHgwWqV5AlNh
+	 ZJKZWGplbfo7dKs3t0HLnlKGySf8aOF14N0BJikYqcxvuCYmwAaLeJ57GMWEXMZKtL
+	 SXgCBzDAED3wvbMF95EtuGMiLFvjkobuglv84d1Pfq7Hbcb1aEWqCMoCUWhFXLf2nY
+	 WU8hLpXUEg/RBsPXnIz3y+RZLypjGfx+wnXhVBAgIX58W5Qtd7k9zEMMfrwjXlp1S2
+	 Aur4InXuxk95g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD503809A80;
-	Thu, 14 Nov 2024 03:10:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE43809A80;
+	Thu, 14 Nov 2024 03:10:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: phylink: ensure PHY momentary link-fails are handled
+Subject: Re: [PATCH net 0/3] mptcp: pm: a few more fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173155382952.1467456.818025393378907444.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Nov 2024 03:10:29 +0000
-References: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1tAtcW-002RBS-LB@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- o.rempel@pengutronix.de, florian.fainelli@broadcom.com,
- netdev@vger.kernel.org
+ <173155383073.1467456.7994386444537970996.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 03:10:30 +0000
+References: <20241112-net-mptcp-misc-6-12-pm-v1-0-b835580cefa8@kernel.org>
+In-Reply-To: <20241112-net-mptcp-misc-6-12-pm-v1-0-b835580cefa8@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, kishen.maloor@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Nov 2024 16:20:00 +0000 you wrote:
-> Normally, phylib won't notify changes in quick succession. However, as
-> a result of commit 3e43b903da04 ("net: phy: Immediately call
-> adjust_link if only tx_lpi_enabled changes") this is no longer true -
-> it is now possible that phy_link_down() and phy_link_up() will both
-> complete before phylink's resolver has run, which means it'll miss that
-> pl->phy_state.link momentarily became false.
+On Tue, 12 Nov 2024 20:18:32 +0100 you wrote:
+> Three small fixes related to the MPTCP path-manager:
+> 
+> - Patch 1: correctly reflect the backup flag to the corresponding local
+>   address entry of the userspace path-manager. A fix for v5.19.
+> 
+> - Patch 2: hold the PM lock when deleting an entry from the local
+>   addresses of the userspace path-manager to avoid messing up with this
+>   list. A fix for v5.19.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: phylink: ensure PHY momentary link-fails are handled
-    https://git.kernel.org/netdev/net/c/671154f174e0
+  - [net,1/3] mptcp: update local address flags when setting it
+    https://git.kernel.org/netdev/net/c/e0266319413d
+  - [net,2/3] mptcp: hold pm lock when deleting entry
+    https://git.kernel.org/netdev/net/c/f642c5c4d528
+  - [net,3/3] mptcp: pm: use _rcu variant under rcu_read_lock
+    https://git.kernel.org/netdev/net/c/db3eab8110bc
 
 You are awesome, thank you!
 -- 
