@@ -1,111 +1,137 @@
-Return-Path: <netdev+bounces-144841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4BC9C88D5
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:25:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16D79C887E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 12:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC633B23CDB
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:07:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 591B51F2523E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 11:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F981F6688;
-	Thu, 14 Nov 2024 11:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D731F81B1;
+	Thu, 14 Nov 2024 11:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="NMSTYb3d"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ua63s7Ns"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FCF189BA0
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 11:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441211F81A7;
+	Thu, 14 Nov 2024 11:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731582422; cv=none; b=aUsT9lwFe+xcppJ0+mEUTh1m1+kQgnuGx7Vwl3CbCne3qwBf/ZAIw8MSjc/n++WtcVRlm8r9fjZmznqzRNjAoEi48Wm48bD8rCh+DuztBCg8zHCyBo3f2pTrfn3ZppjraoNQNbECYYMQZw+E2Z48cyO85K0VfO2ggIiDHJxyqH8=
+	t=1731582612; cv=none; b=GP9CzTZQHkaNl3Gg90syb/ZBtPOnAez012CDqH4wYy1WekSfoPy46FXUcIZc5xMtDYzZB1erMLojqgxMv9nH8F135VSvgPpnBRh6hZzrDOKhS1qJCkX3WrcO7bW0q3wDT7ZJJdz4vrmvJtW62ncxEDCccnL5R9NHRJV9i+v4KNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731582422; c=relaxed/simple;
-	bh=MA4Hnaopf9sdAb+RaajgFFOEWSTiz2WBNDKuEKx0GvE=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZuxOD8jfWNGk0s6430Qsu+V1Nemen9d983yJEpS+eZQsaPG4fMCq6GVjaiU/Le8NzN8amcVoB1I5tbSFElfZ5EjWRQlcC1gh7YqNq2t48uqV9MwPjikNlcAC3GLp3JBepm6aRxPhSsKeIWsboumi2bfwnyX5qEjpcxF8FtrjMwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=NMSTYb3d; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E2C5F204D9;
-	Thu, 14 Nov 2024 12:06:57 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5h4wNbJU4fF5; Thu, 14 Nov 2024 12:06:57 +0100 (CET)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 633D7201AA;
-	Thu, 14 Nov 2024 12:06:57 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 633D7201AA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1731582417;
-	bh=jemhpuiPgcVVHEZ5+RWWWoAM1Jx15i+hWfsj9Y0Ga/0=;
-	h=Date:From:To:CC:Subject:From;
-	b=NMSTYb3dHdfgzw0I4vSnlavN5Bbdt/QWMheadg5+pX6A7r/DTgsJqbd8IRq1+wXPn
-	 +VsYPBtByO67fJnkJ7ibhVUwZJNFGm42BZeTisK4Vb2RBpbf5e35LA2c+uW7bJVEQ7
-	 sL8pne4vMer9c6KaZ+LKilJjpROfDli9Q6+BrPgtcPMr2lptVWccL5fo+nYe+r6kL+
-	 1wBMQy4GWAPKmSRqGhKU6VzuR/Zqcx1iuKe0UIn0EroVE8uUWDsAdZEP8TfWqoB8X4
-	 KPu7pivoAaGGaSsIDCixk1oCejLj671Uz4m+0x/R7CTVgF4YC9LOL+0mz3eOFbIeEx
-	 1W/5F5MC43elA==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+	s=arc-20240116; t=1731582612; c=relaxed/simple;
+	bh=tkzHrrJXOXS7vOUYq3tWDArhR/nWqxSRsKMsB3s0zw4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXoNVKXKvg9udUpcqiWK/RiEskFfcdjZ96f+J6gv3pB+MGBieyIuAEheIMvE9ckEGHaeQgkVOOCUXVSnaVN+nvoqsZpMkDycBxjNTwCEJUm5pIV1+yQhyhXr7qFSaeDK7+VKubd6swOt+Ms7nB/MxPWneItenItetc0qd0duWvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ua63s7Ns; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1731582610; x=1763118610;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tkzHrrJXOXS7vOUYq3tWDArhR/nWqxSRsKMsB3s0zw4=;
+  b=ua63s7NslMf4M2K98kN+TCvZjLAUb119+pcsp7o18ZPmEvowXy88W9uj
+   z0Hv7Izk5Hfr2RLQpE6/bvIXIPdhnXevawFMACSPJKyIU0QbFVlQo3tQa
+   YquAXZPSLoZ/9sg/wJFhta52z8W2JxF01ia/vZVinLOsKydtkQYKQNxUq
+   ZTj1cDIdMBXV6CBFyvPMXweXEzxWbyzAhjVOLQHCSTO20cncHYsuKJX3y
+   jDXktTZeaHSXpGsqemKzwJZnk5uVqdKY3SHD1BlBfp8EZ/7GT2gyczork
+   ex+R15BmnWrsMDYo9Kq7cBejuHqsBCwQzhbyzm5SvKMV3O20xhh7VKqvl
+   Q==;
+X-CSE-ConnectionGUID: p4ZQJMZoSBKRif35c8c9jg==
+X-CSE-MsgGUID: mfgf0lngSeqcO77umlAhyg==
+X-IronPort-AV: E=Sophos;i="6.12,153,1728975600"; 
+   d="scan'208";a="34308229"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Nov 2024 04:10:09 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 14 Nov 2024 12:06:57 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 14 Nov
- 2024 12:06:57 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id E050D3181C12; Thu, 14 Nov 2024 12:06:56 +0100 (CET)
-Date: Thu, 14 Nov 2024 12:06:56 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: <netdev@vger.kernel.org>
-CC: Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH ipsec-next] xfrm: Fix acquire state insertion.
-Message-ID: <ZzXZ0BaL9ypZ1ilY@gauss3.secunet.de>
+ 15.1.2507.35; Thu, 14 Nov 2024 04:09:28 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 14 Nov 2024 04:09:28 -0700
+Date: Thu, 14 Nov 2024 12:07:45 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Rosen Penev <rosenp@gmail.com>
+CC: <netdev@vger.kernel.org>, Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
+	<mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach
+	<kurt@linutronix.de>, Vladimir Oltean <olteanv@gmail.com>, Chris Snook
+	<chris.snook@gmail.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, "Russell
+ King" <linux@armlinux.org.uk>, "maintainer:MICROCHIP LAN966X ETHERNET DRIVER"
+	<UNGLinuxDriver@microchip.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Niklas =?utf-8?Q?S=C3=B6derlund?=
+	<niklas.soderlund@ragnatech.se>, Doug Berger <opendmb@gmail.com>, "Florian
+ Fainelli" <florian.fainelli@broadcom.com>, "Broadcom internal kernel review
+ list" <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Richard Cochran <richardcochran@gmail.com>, "open
+ list:MCAN MMIO DEVICE DRIVER" <linux-can@vger.kernel.org>, open list
+	<linux-kernel@vger.kernel.org>, "open list:RENESAS ETHERNET SWITCH DRIVER"
+	<linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCHv2 net-next] net: modernize ioremap in probe
+Message-ID: <20241114110745.h6luzb72zkahyr5j@DEN-DL-M31836.microchip.com>
+References: <20241111200212.5907-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20241111200212.5907-1-rosenp@gmail.com>
 
-A recent commit jumped over the dst hash computation and
-left the symbol uninitialized. Fix this by explicitly
-computing the dst hash before it is used.
+The 11/11/2024 12:02, Rosen Penev wrote:
 
-Fixes: 0045e3d80613 ("xfrm: Cache used outbound xfrm states at the policy.")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/xfrm/xfrm_state.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Rosen,
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index e3266a5d4f90..67ca7ac955a3 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1470,6 +1470,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
- 			x->km.state = XFRM_STATE_ACQ;
- 			x->dir = XFRM_SA_DIR_OUT;
- 			list_add(&x->km.all, &net->xfrm.state_all);
-+			h = xfrm_dst_hash(net, daddr, saddr, tmpl->reqid, encap_family);
- 			XFRM_STATE_INSERT(bydst, &x->bydst,
- 					  net->xfrm.state_bydst + h,
- 					  x->xso.type);
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> index 3234a960fcc3..375e9a68b9a9 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> @@ -77,20 +77,12 @@ static int lan966x_create_targets(struct platform_device *pdev,
+>          * this.
+>          */
+>         for (idx = 0; idx < IO_RANGES; idx++) {
+> -               iores[idx] = platform_get_resource(pdev, IORESOURCE_MEM,
+> -                                                  idx);
+> -               if (!iores[idx]) {
+> -                       dev_err(&pdev->dev, "Invalid resource\n");
+> -                       return -EINVAL;
+> -               }
+> -
+> -               begin[idx] = devm_ioremap(&pdev->dev,
+> -                                         iores[idx]->start,
+> -                                         resource_size(iores[idx]));
+> -               if (!begin[idx]) {
+> +               begin[idx] = devm_platform_get_and_ioremap_resource(
+> +                       pdev, idx, &iores[idx]);
+> +               if (IS_ERR(begin[idx])) {
+>                         dev_err(&pdev->dev, "Unable to get registers: %s\n",
+>                                 iores[idx]->name);
+> -                       return -ENOMEM;
+> +                       return PTR_ERR(begin[idx]);
+>                 }
+>         }
+> 
+
+Unfortunately, this breaks the lan966x probe. With this change I get the
+following errors:
+[    1.705315] lan966x-switch e0000000.switch: can't request region for resource [mem 0xe0000000-0xe00fffff]
+[    1.714911] lan966x-switch e0000000.switch: Unable to get registers: cpu
+[    1.721607] lan966x-switch e0000000.switch: error -EBUSY: Failed to create targets
+[    1.729173] lan966x-switch: probe of e0000000.switch failed with error -16
+
 -- 
-2.34.1
-
+/Horatiu
 
