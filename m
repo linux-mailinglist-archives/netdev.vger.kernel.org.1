@@ -1,59 +1,67 @@
-Return-Path: <netdev+bounces-145048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC9929C933F
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 21:29:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6DF9C935E
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 21:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4B681F239AF
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:29:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 373B2286BAE
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 20:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3101ABEB1;
-	Thu, 14 Nov 2024 20:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A34C1ABEBF;
+	Thu, 14 Nov 2024 20:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XURbVFyk"
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="do6gi6g0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0581ABEA5
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 20:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A62BE4E;
+	Thu, 14 Nov 2024 20:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731616131; cv=none; b=TNRfYeOLmGZgddGyP9l4qYvdtu2Nm468miUvAHD+INY6geSK+wCIJqt5pbh2ZfMky7dH6dBqYtUVLqUxc6GRl5bBZ6aqPnP8mm5Uf+7yii34Pi/iytTApD6bWGWicsPHwBk/4ARqsiM3gXLL4NTWZ0j/bKumGM3Uow6pAD9a6Ek=
+	t=1731617004; cv=none; b=qOBfnhNXc3UgsZ3h8X8WRE1qfItcnri3r1hLOwMeWpHbsq1U11QbnAywcJCoyWWZySmcEbD28GIYsDGbmCj0BpRHX9TNvn/a1kBAKHmSFlwpONHCmr7/ZOKR3aNg97gyXaDQ98Zm5klb+/FLVs9Ya1qbCUKMA1VtNws51bsTfSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731616131; c=relaxed/simple;
-	bh=Z5Ognq7lw2HAWunqOpKCdPtwBarj4MBAdsTm07h6Sos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BM8W88fmXn2oh5Fnkb9MJJOvFfYd8kkoywk4idCdU2x9fdM2BrwVlfygYQgH60oeSj3GUhvoX7wuI6O+tZLeK/S7ZVUyD5FrZ4ITiZ+1kRmR86CcGdmnmeOiT2A5x6+1ZumQVGh0SXo4/3ydwJoVyl5qDS7a0BYkIjjTvGSPYBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XURbVFyk; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731616127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MhTsEtmVCd4GgZxWQiL5bXWykf/c3mGt0T84SKQe0zA=;
-	b=XURbVFyk+V6UTjHBbCM5/jiUQmCKw1whf00ppWm5USjUROjshXMj7Wg+kYPXnC0+OcaFli
-	uPO2bd0a7lywnfNuk3SVkZjwEF4m6ahuVPr7nU5rLrAEdo2goKbD3csL4mNyvlqiyLvDJL
-	q2r0oeAuY0kQk5HuGv6A/1ViyQDsehM=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2024-11-14
-Date: Thu, 14 Nov 2024 12:28:32 -0800
-Message-ID: <20241114202832.3187927-1-martin.lau@linux.dev>
+	s=arc-20240116; t=1731617004; c=relaxed/simple;
+	bh=zGklckDW0yAzRpIHB36p0nroZKUlM400pZk1ZhfMExw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=qDWN0zjfZ4uDp/Pp13q9kP70iLO8XSmCurZ1yeomVnQ62gp942o0yTS56L6tiU1L9i5JIL0LN/u/OOEyCkQUhPzlsd/rMRGfIaCnJBm7ZVO5n4OabjG52zFujOQAmeqymKMqN5VmGgz+uMelzSX1htpE24usZ1sM+LdOlKNvE4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=do6gi6g0; arc=none smtp.client-ip=148.163.147.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+Received: from pps.filterd (m0134421.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AEHb3JV024625;
+	Thu, 14 Nov 2024 20:42:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pps0720; bh=fIau/TGBK/Y6E
+	JZSH4sYAY5qCp0ClLkPwdbVUgJbvDw=; b=do6gi6g04etKrEWj5zW3MHyEAj9yN
+	dYuxnISDuq8X1YljOBw65ibngxyKXn1FT8NPU8HgMU19v3KkS4m9kto/atT5miH/
+	7e/R/b33j2SsVa7eUzwF6LGaujkUZodyBXD/F8FnKro5ouNfvBc1/bEIiYfODYTw
+	EbXo5GBKzPuqMljvYarke3DBKdtC2wJ0NKR+VFc5qzdkgaa18xszBWMZMaiZIXYK
+	H5UkKlVMRyYu661RviYLjI5n8fxn6RveqK/0LljTDTBkvA70LRyQykNXVY4pRAa2
+	KGrPPqM/aPbC9pL7BU59gXkZT7H4TS/zydjTLyyRrfM7JnpsXkDffQJ9w==
+Received: from p1lg14878.it.hpe.com ([16.230.97.204])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 42wnrgsayn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Nov 2024 20:42:55 +0000 (GMT)
+Received: from localhost (unknown [192.58.206.38])
+	by p1lg14878.it.hpe.com (Postfix) with ESMTP id 753C9295E7;
+	Thu, 14 Nov 2024 20:42:53 +0000 (UTC)
+From: Matt Muggeridge <Matt.Muggeridge@hpe.com>
+To: idosch@idosch.org
+Cc: Matt.Muggeridge@hpe.com, davem@davemloft.net, dsahern@kernel.org,
+        edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH net 1/1] net/ipv6: Netlink flag for new IPv6 Default Routes
+Date: Thu, 14 Nov 2024 15:42:47 -0500
+Message-Id: <20241114204247.32735-1-Matt.Muggeridge@hpe.com>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <ZyyN2bSgrpbhbkpp@shredder>
+References: <ZyyN2bSgrpbhbkpp@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,70 +69,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Proofpoint-GUID: Yq_UnSI4u6gDm-JGLpw48Ec7SKMspRQP
+X-Proofpoint-ORIG-GUID: Yq_UnSI4u6gDm-JGLpw48Ec7SKMspRQP
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ mlxlogscore=894 mlxscore=0 lowpriorityscore=0 clxscore=1015
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411140162
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+Thank you for your review and feedback, Ido.
 
-The following pull-request contains BPF updates for your *net-next* tree.
+>> Without this flag, when there are mutliple default routers, the kernel
+>> coalesces multiple default routes into an ECMP route. The ECMP route
+>> ignores per-route REACHABILITY information. If one of the default
+>> routers is unresponsive, with a Neighbor Cache entry of INCOMPLETE, then
+>> it can still be selected as the nexthop for outgoing packets. This
+>> results in an inability to communicate with remote hosts, even though
+>> one of the default routers remains REACHABLE. This violates RFC4861
+>> section 6.3.6, bullet 1.
+>
+>Do you have forwarding disabled (it causes RT6_LOOKUP_F_REACHABLE to be
+>set)?
 
-We've added 9 non-merge commits during the last 4 day(s) which contain
-a total of 3 files changed, 226 insertions(+), 84 deletions(-).
+Yes, forwarding is disabled on our embedded system. Though, this needs to
+work on systems regardless of the state of forwarding.
 
-The main changes are:
+>  Is the problem that fib6_table_lookup() chooses a reachable
+>nexthop and then fib6_select_path() overrides it with an unreachable
+>one?
 
-1) Fixes to bpf_msg_push/pop_data and test_sockmap. The changes has
-   dependency on the other changes in the bpf-next/net branch,
-   from Zijian Zhang.
+I'm afraid I don't know.
 
-2) Drop netns codes from mptcp test. Reuse the common helpers in
-   test_progs, from Geliang Tang.
+The objective is to allow IPv6 Netlink clients to be able to create default
+routes from RAs in the same way the kernel creates default routes from RAs.
+Essentially, I'm trying to have Netlink and Kernel behaviors match.
 
-Please consider pulling these changes from:
+My analysis led me to the need for Netlink clients to set the kernel's
+fib6_config flags RTF_RA_ROUTER, where:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+    #define RTF_RA_ROUTER		(RTF_ADDRCONF | RTF_DEFAULT)
 
-Thanks a lot!
+>> +	if (rtm->rtm_flags & RTM_F_RA_ROUTER)
+>> +		cfg->fc_flags |= RTF_RA_ROUTER;
+>> +
+> 
+> It is possible there are user space programs out there that set this bit
+> (knowingly or not) when sending requests to the kernel and this change
+> will result in a behavior change for them. So, if we were to continue in
+> this path, this would need to be converted to a new netlink attribute to
+> avoid such potential problems.
+> 
 
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
+Is this a mandated approach to implementing unspecified bits in a flag?
 
-John Fastabend, Matthieu Baerts (NGI0)
+I'm a little surprised by this consideration. If we account for poorly
+written buggy user-programs, doesn't this open any API to an explosion
+of new attributes or other odd extensions? I'd imagine the same argument
+would be applicable to ioctl flags, socket flags, and so on. Why would we
+treat implementing unspecified Netlink bits differently to implementing
+unspecified ioctl bits, etc.
 
-----------------------------------------------------------------
+Naturally, if this is the mandated approach, then I'll reimplement it with
+a new Netlink attribute. I'm just trying to understand what is the
+Linux-lore, here?
 
-The following changes since commit 8d1807a95c7dbb9633817fba776fa2f5e7c5146b:
+> BTW, you can avoid the coalescing problem by using the nexthop API (man
+> ip-nexthop).
 
-  Merge branch 'mlx5-misc-patches-2024-10-31' (2024-11-03 15:37:17 -0800)
+I'm not sure how that would help in this case. We need the nexthop to be
+determined according to its REACHABILITY and other considerations described
+in RFC4861.
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git for-netdev
-
-for you to fetch changes up to 141b4d6a8049cecdc8124f87e044b83a9e80730d:
-
-  Merge branch 'Fixes to bpf_msg_push/pop_data and test_sockmap' (2024-11-06 16:02:08 -0800)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Geliang Tang (1):
-      selftests/bpf: Drop netns helpers in mptcp
-
-Martin KaFai Lau (1):
-      Merge branch 'Fixes to bpf_msg_push/pop_data and test_sockmap'
-
-Zijian Zhang (8):
-      selftests/bpf: Add txmsg_pass to pull/push/pop in test_sockmap
-      selftests/bpf: Fix SENDPAGE data logic in test_sockmap
-      selftests/bpf: Fix total_bytes in msg_loop_rx in test_sockmap
-      selftests/bpf: Add push/pop checking for msg_verify_data in test_sockmap
-      selftests/bpf: Add more tests for test_txmsg_push_pop in test_sockmap
-      bpf, sockmap: Several fixes to bpf_msg_push_data
-      bpf, sockmap: Several fixes to bpf_msg_pop_data
-      bpf, sockmap: Fix sk_msg_reset_curr
-
- net/core/filter.c                              |  88 +++++++-----
- tools/testing/selftests/bpf/prog_tests/mptcp.c |  42 ++----
- tools/testing/selftests/bpf/test_sockmap.c     | 180 ++++++++++++++++++++++---
- 3 files changed, 226 insertions(+), 84 deletions(-)
+Kind regards,
+Matt.
 
