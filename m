@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-145099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687C99C9626
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:33:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236249C9622
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:33:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0473EB25755
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 23:33:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFB5E1F22506
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 23:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C5D1B395E;
-	Thu, 14 Nov 2024 23:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1461E1B219D;
+	Thu, 14 Nov 2024 23:33:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="DG491V3g"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="FAXhaIW3"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE011B393F;
-	Thu, 14 Nov 2024 23:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10893139CFA
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 23:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731627212; cv=none; b=jW2cME94FFKcTnSSuY+FZK57xkruJ4GymEcNRgwc4tj1HaWDad9gMXajY6SNExB+/ux1YiaBx5WAjC5v+UqBTxUqDKL+iy7RAlRK2MSQtIbmE/boBA9DyA2C+YBStzqFOgzYWZX/h/R4IwM7QqX33stz3BriVWj4e9ujOrZdx7A=
+	t=1731627209; cv=none; b=tG/HU5S6nS+9D2ASYETMGOUwycuo8x+TvH6KJHZlEBU/t+wMtvjJ2ul3QO1lpmrCrGKuQxPPBv8bA/5sF6lCuuVcElE+YykBbrD4uCtOxt8etLVfKvWElS+VgBUwbVZWqfe845LW8x/6nDVkZbpTdiVMlfqPbChQ67PGKa1vJ20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731627212; c=relaxed/simple;
-	bh=0t2lqAe28O+eiT+ButThphxuJ9w0b6ln8trcE7E75Ss=;
+	s=arc-20240116; t=1731627209; c=relaxed/simple;
+	bh=gprTeoy7X/Wjqtvvoz0adWqYsbyBH37Bx0rOKOG0ctk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iHYDOBG+maBRnJBKJMxl6BnvCS/GLxG0d+LbnnKIzgv9hz9YbJW2L3j4a35nK2NAklFOJTZ5o7FOOwEf9bKJMpFJYMe6Lt8XsmudYJLyJhQYMn5zL7zWtnriAwOge2G6p+djc0t3//4OnQB964HdWOz5rjGCBVRYVIlmBjbCf/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=DG491V3g; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:To:Cc; b=ryofjocTZCp1VZX8X5Txip7i57GvBAR9WcQspRf2j+/2G2EUJnGvEsw3Ht3rdr4208PvU8VXvhaOh1EfxsGzwd/FbrS3znDejIrBg+5PFcSnr+rq42OduerzBW1w0YhrSDtqFMjIxBT8sg2tQnJ7clm+XtILu9cTSr/B3gXWJRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=FAXhaIW3; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1tBjKt-0066RS-9p; Fri, 15 Nov 2024 00:33:15 +0100
+	id 1tBjKs-0066RH-7M; Fri, 15 Nov 2024 00:33:14 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=yEAHZcj9x7QiEAELm24qDgK2tLaXM0KZDTbbkayZg0U=; b=DG491V3gKGqdS0OL7wlCbQxWu7
-	AcFBfpnO2phhrXvLHwqwnYrd5cW/99UzFQj9535wQ0cVSEnC2Zgvhe5M9I+uQmmTj6L236CVXwLUs
-	3lYsUF5meZeinlsCN6zSoGQ1prgwbqg4L6/tmn0k5dRBr/wr4pUP0F1I1CXEfgN54Lt8+0ray4x5N
-	XRH8zIDvJxZp0l/vWfoKRE5CNn+IS811Yu8NFZEkeCaodJgomEHadGTlbfYm6QB4n6R2utIP9Ted1
-	IsO3OTd1Bts7z/4tCw4vuB3+p0ADqEkZbC34xUy5aRDO8S109k2N5/5Utr2Ws/zoQgK7Q++u1OZA4
-	y3IuzsZA==;
+	bh=plGZttL9jrxvU+XUBlrhk9Z1MsQem1Esym1JxdfFUxc=; b=FAXhaIW3c0kMy3LBRtxUgOxc26
+	Q9WlvN8bnoW7bhdwiFh84UhK/tlJYTrcwEXBX/VWVoSrOloZ/Kn73hx1gJGpe2/Pka4QfUr3AP9AP
+	oSKF6pRkodXY2175GJO0DfjYzinsRe7j4Gnh8TONLjtgpTiFbMhs/C/EjTS6UoBEFwsTib3XEWJOv
+	cPaQMz6/lFO8UNSP8utL88izM8gfGHVNgp+T4269YSFKBJh59GhSVG2FQejjaEi2vgL2ZK3i4Zz8o
+	Y7UxjMchVZIk+sA3EhcNTklow+Wb3+HhOuU40CntbeL7jZgcQRM6Dj0OLiofJLw+Dio/XVYYtYP1M
+	4eBAwUzw==;
 Received: from [10.9.9.72] (helo=submission01.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1tBjKs-0005mx-Tx; Fri, 15 Nov 2024 00:33:15 +0100
+	id 1tBjKr-0005mr-RE; Fri, 15 Nov 2024 00:33:14 +0100
 Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1tBjKR-008nXm-01; Fri, 15 Nov 2024 00:32:47 +0100
+	id 1tBjKR-008nXm-Lo; Fri, 15 Nov 2024 00:32:47 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Date: Fri, 15 Nov 2024 00:27:26 +0100
-Subject: [PATCH net 3/4] rxrpc: Improve setsockopt() handling of malformed
- user input
+Date: Fri, 15 Nov 2024 00:27:27 +0100
+Subject: [PATCH net 4/4] net: Comment copy_from_sockptr() explaining its
+ behaviour
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241115-sockptr-copy-fixes-v1-3-d183c87fcbd5@rbox.co>
+Message-Id: <20241115-sockptr-copy-fixes-v1-4-d183c87fcbd5@rbox.co>
 References: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
 In-Reply-To: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -79,38 +79,28 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-copy_from_sockptr() doesn't return negative value on error. Instead it's
-the number of bytes that could not be copied. Turn that into EFAULT.
+copy_from_sockptr() has a history of misuse. Add a comment explaining that
+the function follows API of copy_from_user(), i.e. returns 0 for success,
+or number of bytes not copied on error.
 
-Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- net/rxrpc/af_rxrpc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/linux/sockptr.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-index f4844683e12039d636253cb06f622468593487eb..dcf64dc148cceb547ffdb1cea8ff53a0633f5c06 100644
---- a/net/rxrpc/af_rxrpc.c
-+++ b/net/rxrpc/af_rxrpc.c
-@@ -702,14 +702,14 @@ static int rxrpc_setsockopt(struct socket *sock, int level, int optname,
- 
- 		case RXRPC_MIN_SECURITY_LEVEL:
- 			ret = -EINVAL;
--			if (optlen != sizeof(unsigned int))
-+			if (optlen != sizeof(min_sec_level))
- 				goto error;
- 			ret = -EISCONN;
- 			if (rx->sk.sk_state != RXRPC_UNBOUND)
- 				goto error;
--			ret = copy_from_sockptr(&min_sec_level, optval,
--				       sizeof(unsigned int));
--			if (ret < 0)
-+			ret = -EFAULT;
-+			if (copy_from_sockptr(&min_sec_level, optval,
-+					      sizeof(min_sec_level)))
- 				goto error;
- 			ret = -EINVAL;
- 			if (min_sec_level > RXRPC_SECURITY_MAX)
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+index 195debe2b1dbc5abf768aa806eb6c73b99421e27..3e6c8e9d67aef66e8ac5a4e474c278ac08244163 100644
+--- a/include/linux/sockptr.h
++++ b/include/linux/sockptr.h
+@@ -53,6 +53,8 @@ static inline int copy_from_sockptr_offset(void *dst, sockptr_t src,
+ /* Deprecated.
+  * This is unsafe, unless caller checked user provided optlen.
+  * Prefer copy_safe_from_sockptr() instead.
++ *
++ * Returns 0 for success, or number of bytes not copied on error.
+  */
+ static inline int copy_from_sockptr(void *dst, sockptr_t src, size_t size)
+ {
 
 -- 
 2.46.2
