@@ -1,144 +1,85 @@
-Return-Path: <netdev+bounces-145005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4ED99C9151
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:03:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79AC9C9188
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 19:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 942A5B28FD2
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:29:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3AAFB381E6
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 17:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890EB185B78;
-	Thu, 14 Nov 2024 17:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F60918C028;
+	Thu, 14 Nov 2024 17:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g5GRYKqO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="peRnfjav"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0131C683
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 17:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8F5262A3;
+	Thu, 14 Nov 2024 17:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731605336; cv=none; b=DmbVJPCnctfmCAmRX0X1Kzk4HBrhx9w1YFnlah2PGs/yOfNsLD2bXfQ3oCeHIA1IgTQECdcyBrqEK1PcJDpDEN1OukssLwFC7fCALvRWVi42zSTmkAZDxqCyop6Gipm4DBHX5mXHp2KsfnFNq0FxBO7Q3k0Z2cl11j5dZrfEUx0=
+	t=1731605899; cv=none; b=ofkYYb1JLhnAC2jEYeVy9TGs5+UJ5RN+4aeRL2g2j91MVybXX4y9wWj0Pwjnes0sR+KvpYVQ/PIGTRkp9Hb457l8ErKaKW4IEp+ZEQsqwHLIy2dblQ9/D0y5Gzldm+RjayACluSECY2QIZziJjnjHfMkCZ/HSVi3/Wjo3MpJHKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731605336; c=relaxed/simple;
-	bh=hetvMReEb2DzX2icclrVitYiumtitx8D/W+eGD9a9LE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Wm2QpXYiaQajQqwNv4t+/gs5S+3YFbkyr6x0YlrtTle+9gy9vhOCmKHVi6gZYN8AfFoIiPZTBrsvk3Y/+S3e1u2dyjYFxfDig0Ys2BCB+1Kl1UTL3qLoxpRvJvroDr4hsDVe3ErlbcbovkE1YrCMYQresst51VpQrXaZb9nMfL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g5GRYKqO; arc=none smtp.client-ip=209.85.161.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5ee9e209bb6so450055eaf.0
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:28:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731605334; x=1732210134; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EEF9eU09+Qb6BvC7qtMI4fadvfmR1JOTug6j8w0vouk=;
-        b=g5GRYKqO1YKAchSkZ9NeWi4z+qsPogAG6lohJZsgo/KTENh9NvqFvsn577DiJ1nQu1
-         ms18vEyldBSLnKaolf8LWu82hzPS4tLNJ2iPeHJSZXhqg2sJHNrGjRe65vmv2plUcr+S
-         EqJYZArUEuyEVZDa1NiH9+M9q9hyTkSQnFkh6O3bnPpdEdZRdOBm1SELL/DjYmXymh+r
-         R3OB8fV8qLtRcrfhwiDTw6WrNdjOrb7TXTzAz/9wzZNzgDt3QV1fWUGmH4X8w+OwiWK2
-         19pcSv6c4E4Kf8U0PZWqq/StDrAMpn87LPbQf2fRIToCy4nAywiUQMtCyOeXld0Tw9MI
-         vSYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731605334; x=1732210134;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EEF9eU09+Qb6BvC7qtMI4fadvfmR1JOTug6j8w0vouk=;
-        b=KLlEeTuPH0l3MxkyJahkstsf0lNwGywojWhBPZCqFUYMqJr4RkV/tI+dG2r02HTm+O
-         b+HebcQgphPqvjuBkf8vbLdLiYRdo+Us24az51dIqM8zUkya4vbhGonV8wc0O/6fd8dK
-         X4NuwrEtU0vjd09HihNwH2NuOwZ2QywFO1MFlUSTN4+H5Jdj/StS4ulJROlGk4oRPkBn
-         rxHaEyzJ5+n0YDXYNu/QuJsnl5JDC45MHMLYwxxgxhuosMAb1q78AeFFovJfHx7449eq
-         fBQJo1Tn8IH5Aa7PSzaTTLed6ZgoFyk63ipnTM/Z9SBBTzYYcFmOwLOetdfx8S0QTtvk
-         gLcA==
-X-Gm-Message-State: AOJu0YzSKr4QyUwJR7I/4AP6JZw2Q5ud+FOqwkAhFCZJFOtWYCzuwzG9
-	3OwCAxcjIm3MZMPFnZHZWVWsO/a7woE3BtXjUfNbfxNxsRkJauRm
-X-Google-Smtp-Source: AGHT+IEO+viR92ZpwLR8rpkElqcZ3pZfjGvNKa05dgUWoumsIJYl0GTK81WtP6mzGleOLzmwUIWJMg==
-X-Received: by 2002:a05:6358:5bc9:b0:1c6:99d:b832 with SMTP id e5c5f4694b2df-1c641ea6f9emr1347568655d.8.1731605333726;
-        Thu, 14 Nov 2024 09:28:53 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3ee8c3d25sm7734416d6.74.2024.11.14.09.28.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 09:28:53 -0800 (PST)
-Date: Thu, 14 Nov 2024 12:28:52 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Milena Olech <milena.olech@intel.com>, 
- intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, 
- anthony.l.nguyen@intel.com, 
- przemyslaw.kitszel@intel.com, 
- Milena Olech <milena.olech@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>
-Message-ID: <67363354c7ade_3244ed2943f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241113154616.2493297-3-milena.olech@intel.com>
-References: <20241113154616.2493297-1-milena.olech@intel.com>
- <20241113154616.2493297-3-milena.olech@intel.com>
-Subject: Re: [PATCH iwl-net 02/10] virtchnl: add PTP virtchnl definitions
+	s=arc-20240116; t=1731605899; c=relaxed/simple;
+	bh=wA6LYqVMtGvZCJ0h1057yxja1cF9UPo/rVFctUswHaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XCB4fUw9xhNBLU3qZ4ArwJPH5NlPHDxdmI9+BrImL+2K1+K9t0G5UdoZ3eIMUst8cGaPU5e5Nsx2r3apr0ZhQhKl0Paa/7Gm6ENPVc2OiEzeG/PSREHXDlyUc2b4HrcvVf/EKQjLUsUeLdhz58wBZXwY8U51s6ioMugxUYRoQD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=peRnfjav; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=CasxijWNS3J9QS+VuXQjZR02baqSbw5G8OFqE7xIXEc=; b=peRnfjav3IOzH3EBahcEA3x01k
+	qBfwOZfp0OC/pgbW2WVwJdTC9TN7/ybHi5BmFw2ouH7AREoLKYLaQfCHPvuIqt+LLG81eFz1O5/sd
+	7jYUU5NwPU1TXhyPqB32bK4jwn2RL0LR3IoNle9NqhiygVdtq9+PJCwEAGDy9Zo5lcP4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tBdnJ-00DKNj-K0; Thu, 14 Nov 2024 18:38:13 +0100
+Date: Thu, 14 Nov 2024 18:38:13 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tristram Ha <tristram.ha@microchip.com>
+Subject: Re: [PATCH net-next] net: phylink: improve phylink_sfp_config_phy()
+ error message with empty supported
+Message-ID: <54332f43-7811-426a-a756-61d63b54c725@lunn.ch>
+References: <20241114165348.2445021-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241114165348.2445021-1-vladimir.oltean@nxp.com>
 
-Milena Olech wrote:
-> PTP capabilities are negotiated using virtchnl commands. There are two
-> available modes of the PTP support: direct and mailbox. When the direct
-> access to PTP resources is negotiated, virtchnl messages returns a set
-> of registers that allow read/write directly. When the mailbox access to
-> PTP resources is negotiated, virtchnl messages are used to access
-> PTP clock and to read the timestamp values.
+> [   64.738270] mv88e6085 d0032004.mdio-mii:12 sfp: PHY i2c:sfp:16 (id 0x01410cc2) supports no link modes. Maybe its specific PHY driver not loaded?
+> [   64.769731] sfp sfp: sfp_add_phy failed: -EINVAL
 > 
-> Virtchnl API covers both modes and exposes a set of PTP capabilities.
-> 
-> Using virtchnl API, the driver recognizes also HW abilities - maximum
-> adjustment of the clock and the basic increment value.
-> 
-> Additionally, API allows to configure the secondary mailbox, dedicated
-> exclusively for PTP purposes.
-> 
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> Of course, there may be other reasons due to which phydev->supported is
+> empty, thus the use of the word "maybe", but I think the lack of a
+> driver would be the most common.
 
-minor issue, with that addressed
+I think this is useful.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I only have a minor nitpick, maybe in the commit message mention which
+PHY drivers are typically used by SFPs, to point somebody who gets
+this message in the right direction. The Marvell driver is one. at803x
+i think is also used. Are then any others?
 
+	Andrew
 
-> +/**
-> + * struct virtchnl2_ptp_set_dev_clk_time: Associated with message
-> + *					  VIRTCHNL2_OP_PTP_SET_DEV_CLK_TIME.
-> + * @dev_time_ns: Device time value expressed in nanoseconds to set
-> + *
-> + * PF/VF sends this message to set the time of the main timer.
-> + */
-> +struct virtchnl2_ptp_set_dev_clk_time {
-> +	__le64 dev_time_ns;
-> +};
-> +VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_set_dev_clk_time);
-> +
-> +/**
-> + * struct virtchnl2_ptp_set_dev_clk_time: Associated with message
-> + *					  VIRTCHNL2_OP_PTP_ADJ_DEV_CLK_FINE.
-
-minor: virtchnl2_ptp_adj_dev_clk_fine
-
-> + * @incval: Source timer increment value per clock cycle
-> + *
-> + * PF/VF sends this message to adjust the frequency of the main timer by the
-> + * indicated scaled ppm.
-> + */
-> +struct virtchnl2_ptp_adj_dev_clk_fine {
-> +	__le64 incval;
-> +};
-> +VIRTCHNL2_CHECK_STRUCT_LEN(8, virtchnl2_ptp_adj_dev_clk_fine);
 
