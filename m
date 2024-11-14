@@ -1,215 +1,139 @@
-Return-Path: <netdev+bounces-144744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-144745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7DCF9C85B2
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:10:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6ACF9C85B5
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 10:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F31EB216E3
-	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:06:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 831A3B2BCC6
+	for <lists+netdev@lfdr.de>; Thu, 14 Nov 2024 09:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5BE1DE8AC;
-	Thu, 14 Nov 2024 09:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA7E1DE3B7;
+	Thu, 14 Nov 2024 09:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YHE2PumO"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1061DD88E
-	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA92E573
+	for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 09:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731575137; cv=none; b=NQ+T5gvbC8OsOgJHCSvMhotYkf+KV9IZhrZN98djzCidYGiPcYLFRCs0M5j74v/Pe0CNQh/SnBwiOcpPxB+7R/6ktZaOOt4Fnz5TA7MKJS8CUBL2GQpK5faAT6uTS6SKIFiPszSrzcGajqWNxuQjenoPxTfc2tg4svlEhqEKm6s=
+	t=1731575170; cv=none; b=AN1WFG/TM5L6g4wy4jCn67GiVJZh4vWWz15piizPyOTnAFq9RgWZjwa6LEemznvj8PKoZnDtMoEbq7fseo5JdJUbWGQSLYwiSyESIPDp08KAjFJsv9w92zAp9M3QJeYDBMWSOx0XNAK5W7aXRZqhZZdybtA7Oz1lQLfamP5gKWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731575137; c=relaxed/simple;
-	bh=RcaJCgb7/1s/L0gr18CUi14exJ38H4CbH2NkhEJa8ZU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cDkbZ1RolDq8tO/VDmF0bx4v+nZ2p2SLQxLVILujg33/ixYSt7L0ddLvC5RWhUD0seoUuQsnDEGJ0mGU9PYXJdOsAh+2SJy/5p4aUg/G7gc4jOcd035B0plNkc8pbbbkZ9lA3NtKw5W3lVplHa+3yhcqllSNCv/2N20gU/HPYV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tBVmw-00043D-38; Thu, 14 Nov 2024 10:05:18 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tBVmv-000iZL-2e;
-	Thu, 14 Nov 2024 10:05:17 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 5EABF372EE5;
-	Thu, 14 Nov 2024 09:05:17 +0000 (UTC)
-Date: Thu, 14 Nov 2024 10:05:17 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: Sean Nyekjaer <sean@geanix.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] can: tcan4x5x: add option for selecting nWKRQ
- voltage
-Message-ID: <20241114-rebel-peach-rhino-96357c-mkl@pengutronix.de>
-References: <20241111-tcan-wkrqv-v2-0-9763519b5252@geanix.com>
- <20241111-tcan-wkrqv-v2-1-9763519b5252@geanix.com>
- <CAMZ6Rq++_yecNY-nNL7NK48ZsNPqH0KDRuqvCCGhUur24+7KGA@mail.gmail.com>
+	s=arc-20240116; t=1731575170; c=relaxed/simple;
+	bh=aFILYSe1c8y2SA8XZwkqPjVURhldMo/+d5BMIpxd1Z4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=FHFFT1jO+LX5Ys2bHjsyTHa745oBZaCywmvCHaZLg0Y2d96rEeZ37+NowYJ/yFVFhjqNZRLs8ZWefG1hz6NHyew1OzFMDwCttlRnN0CUPj3zueAJBusewvpUgk9RZOq1QqeRY6/M+RXpiNBlW0lAPLwereyBm/Bxop5tcZ6swf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YHE2PumO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731575168;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gk4fvCl2AelIitnEUCkAjtoqB7Mo6yKzoNwrEKOPpYQ=;
+	b=YHE2PumOi56pFxDfNzju0Ds8UpsXcwqXwi3KGcUlJUz5I27OtnUaeD2DaJ+G1q73e94ksp
+	ml1xQ4h+tVIO3AUNLJsDrme32KP/7wDOdnp3M+W+xAuhiwxogN9eIDjVxsFzQh+co7WKsQ
+	5qnko81JSrJMV3neujMurZIuCGJ8ha8=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-561-vHrB1yxWMY2hwxdYQUZDdQ-1; Thu, 14 Nov 2024 04:06:07 -0500
+X-MC-Unique: vHrB1yxWMY2hwxdYQUZDdQ-1
+X-Mimecast-MFC-AGG-ID: vHrB1yxWMY2hwxdYQUZDdQ
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3e60970ed1dso399857b6e.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 01:06:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731575166; x=1732179966;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gk4fvCl2AelIitnEUCkAjtoqB7Mo6yKzoNwrEKOPpYQ=;
+        b=YfRVZ11vdoRS7Qbq8ik6Y4jvohuZnlR10OLKntnOKsw9+n7sceK5SFtpBg4XNODPFt
+         RGZFwhd037njX4GCBCiKCTA2A3zf+uzr5IpzsloqlTlYXNrbAX6Pi+wK2u/CogESBjhw
+         M5lXS3dBfuVl1C1CvP2YFnGCw2eUoSG+ihnojmIF8Y7jIk6bNU7yJWW90mPYrkuAwNq3
+         HvrIoWNkesUZJA98MzbPauoLfgjqvknO48K12P7+Xzx59NHquX/trbDL6pQzBcIP8rKk
+         Z1n+fAI6rbADBfwkUamuSMGDlwH1e+JS5/bRXET45aMnM7iRU7Oc3AlZzyy4VdwVIhMt
+         /YzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWW6ZaFxIkUhMBRQwnJ6CwO30OVbp/3eL1pTGgIrzhu4p+leknusXtoaqEI9PjCYUiluV1wAbU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYuz7ttPR+rVExSaNci5ezN3ilwUc/daJ8/J3mK7BSNV3YFebJ
+	Ld1mHXjLFD0s+gNONioWmETIw77EECbtjnkfFXiHbJpUlg6hxXnmpi/U9JsHOBYJ350J7QqlDwA
+	InPK+zZwFMCu73YW/w9lzX7xgMiQUXtGDKo9cCG89lXdPJOOcNnk2/A==
+X-Received: by 2002:a05:6808:1986:b0:3e5:f43a:5d77 with SMTP id 5614622812f47-3e7b0ae1e37mr5537412b6e.42.1731575166372;
+        Thu, 14 Nov 2024 01:06:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJjqamCyS7gbasbpR+3EbOmIKtyYOg8obpLq/VvCFTX5e8vsr5EFqGrfeUbWedvmAQvmsXTg==
+X-Received: by 2002:a05:6808:1986:b0:3e5:f43a:5d77 with SMTP id 5614622812f47-3e7b0ae1e37mr5537394b6e.42.1731575166037;
+        Thu, 14 Nov 2024 01:06:06 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3ee933d15sm3223896d6.119.2024.11.14.01.06.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 01:06:05 -0800 (PST)
+Message-ID: <bf14b6d4-5e95-4e53-805b-7cc3cd7e83e3@redhat.com>
+Date: Thu, 14 Nov 2024 10:06:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ywcttwatzcumisks"
-Content-Disposition: inline
-In-Reply-To: <CAMZ6Rq++_yecNY-nNL7NK48ZsNPqH0KDRuqvCCGhUur24+7KGA@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net v2 0/2] Fix rcu_read_lock issues in netdev-genl
+To: Joe Damato <jdamato@fastly.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, edumazet@google.com, amritha.nambiar@intel.com,
+ sridhar.samudrala@intel.com, mkarsten@uwaterloo.ca,
+ "David S. Miller" <davem@davemloft.net>,
+ open list <linux-kernel@vger.kernel.org>,
+ Mina Almasry <almasrymina@google.com>, Simon Horman <horms@kernel.org>
+References: <20241113021755.11125-1-jdamato@fastly.com>
+ <20241113184735.28416e41@kernel.org> <ZzWY3iAbgWEDcQzV@LQ3V64L9R2>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZzWY3iAbgWEDcQzV@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---ywcttwatzcumisks
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 1/2] can: tcan4x5x: add option for selecting nWKRQ
- voltage
-MIME-Version: 1.0
 
-On 14.11.2024 13:53:34, Vincent Mailhol wrote:
-> On Mon. 11 Nov. 2024 at 17:55, Sean Nyekjaer <sean@geanix.com> wrote:
-> > nWKRQ supports an output voltage of either the internal reference volta=
-ge
-> > (3.6V) or the reference voltage of the digital interface 0 - 6V.
-> > Add the devicetree option ti,nwkrq-voltage-sel to be able to select
-> > between them.
-> > Default is kept as the internal reference voltage.
-> >
-> > Signed-off-by: Sean Nyekjaer <sean@geanix.com>
-> > ---
-> >  drivers/net/can/m_can/tcan4x5x-core.c | 35 +++++++++++++++++++++++++++=
-++++++++
-> >  drivers/net/can/m_can/tcan4x5x.h      |  2 ++
-> >  2 files changed, 37 insertions(+)
-> >
-> > diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_=
-can/tcan4x5x-core.c
-> > index 2f73bf3abad889c222f15c39a3d43de1a1cf5fbb..264bba830be50033347056d=
-a994102f8b614e51b 100644
-> > --- a/drivers/net/can/m_can/tcan4x5x-core.c
-> > +++ b/drivers/net/can/m_can/tcan4x5x-core.c
-> > @@ -92,6 +92,8 @@
-> >  #define TCAN4X5X_MODE_STANDBY BIT(6)
-> >  #define TCAN4X5X_MODE_NORMAL BIT(7)
-> >
-> > +#define TCAN4X5X_NWKRQ_VOLTAGE_MASK BIT(19)
-> > +
-> >  #define TCAN4X5X_DISABLE_WAKE_MSK      (BIT(31) | BIT(30))
-> >  #define TCAN4X5X_DISABLE_INH_MSK       BIT(9)
-> >
-> > @@ -267,6 +269,11 @@ static int tcan4x5x_init(struct m_can_classdev *cd=
-ev)
-> >         if (ret)
-> >                 return ret;
-> >
-> > +       ret =3D regmap_update_bits(tcan4x5x->regmap, TCAN4X5X_CONFIG,
-> > +                                TCAN4X5X_NWKRQ_VOLTAGE_MASK, tcan4x5x-=
->nwkrq_voltage);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> >         return ret;
-> >  }
-> >
-> > @@ -318,6 +325,28 @@ static const struct tcan4x5x_version_info
-> >         return &tcan4x5x_versions[TCAN4X5X];
-> >  }
-> >
-> > +static int tcan4x5x_get_dt_data(struct m_can_classdev *cdev)
-> > +{
-> > +       struct tcan4x5x_priv *tcan4x5x =3D cdev_to_priv(cdev);
-> > +       struct device_node *np =3D cdev->dev->of_node;
-> > +       u8 prop;
-> > +       int ret;
-> > +
-> > +       ret =3D of_property_read_u8(np, "ti,nwkrq-voltage-sel", &prop);
-> > +       if (!ret) {
-> > +               if (prop <=3D 1)
-> > +                       tcan4x5x->nwkrq_voltage =3D prop;
-> > +               else
-> > +                       dev_warn(cdev->dev,
-> > +                                "nwkrq-voltage-sel have invalid option=
-: %u\n",
-> > +                                prop);
-> > +       } else {
-> > +               tcan4x5x->nwkrq_voltage =3D 0;
-> > +       }
->=20
-> If the
->=20
->   if (prop <=3D 1)
->=20
-> condition fails, you print a warning, but you are not assigning a
-> value to tcan4x5x->nwkrq_voltage. Is this intentional?
->=20
-> What about:
->=20
->         tcan4x5x->nwkrq_voltage =3D 0;
->         ret =3D of_property_read_u8(np, "ti,nwkrq-voltage-sel", &prop);
->         if (!ret) {
->                 if (prop <=3D 1)
->                         tcan4x5x->nwkrq_voltage =3D prop;
->                 else
->                         dev_warn(cdev->dev,
->                                  "nwkrq-voltage-sel have invalid option: =
-%u\n",
->                                  prop);
->         }
->=20
-> so that you make sure that tcan4x5x->nwkrq_voltage always gets a
-> default zero value? Else, if you can make sure that tcan4x5x is always
-> zero initialized, you can just drop the
+On 11/14/24 07:29, Joe Damato wrote:
+> On Wed, Nov 13, 2024 at 06:47:35PM -0800, Jakub Kicinski wrote:
+>> On Wed, 13 Nov 2024 02:17:50 +0000 Joe Damato wrote:
+>>> base-commit: a58f00ed24b849d449f7134fd5d86f07090fe2f5
+>>
+>> which is a net-next commit.. please rebase on net
+> 
+> I thought I asked about this in the previous thread, but I probably
+> wasn't clear with my question.
+> 
+> Let me try again:
+> 
+> Patch 1 will apply to net and is a fixes and CC's stable, and fixes
+> a similar issue to the one Paolo reported, not the exact same path,
+> though.
+> 
+> Patch 2 will not apply to net, because the code it fixes is not in
+> net yet. This fixes the splat Paolo reported.
+> 
+> So... back to the question in the cover letter from the RFC :) I
+> suppose the right thing to do is split the series:
+> 
+> - Rebase patch 1 on net (it applies as is) and send it on its own
+> - Send patch 2 on its own against net-next
+> 
+> Or... something else ?
 
-The tcan4x5x_priv is allocated in the netdev priv, which is initialized
-with 0x0.
+I'm sorry for the late reply.
 
->=20
->         tcan4x5x->nwkrq_voltage =3D 0;
->=20
-> thing.
+Please send the two patch separately, patch 1 targeting (and rebased on)
+net and patch 2 targeting (and based on) net-next.
 
-regards,
-Marc
+Thanks!
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Paolo
 
---ywcttwatzcumisks
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc1vUoACgkQKDiiPnot
-vG/S7Af8DraKUI5aQuGcxnKxoOgQ2HpLlTRHdTWjtGvqMlXp7nVUT7GXl0TP9RZz
-Ami2hOk7ZEQhdUJobeqGZMU9O8p2UdEsa7TFQc8eghtfMAEj09OO42KY7Fd6X04V
-ehRp9m8gUnHgLANeEKigahu6t8uytQvv33nTyDbIdS58uyjBkAU6wHiNW2rjFeeD
-gacdD2m/rlAW3ny2RiIaADV6yJZDKmgdi6wUsCZNCNF59ydFQMwnR3rCuN7b/hEe
-Q18AyzXTEGqTyicoMSS+5DyIDKIKH2gW6STdPefD2d0dyV5VMaz73I9a3aAhlb42
-t8bsSdE/136KDqu9zAKaIElXYTpQiQ==
-=JzXk
------END PGP SIGNATURE-----
-
---ywcttwatzcumisks--
 
