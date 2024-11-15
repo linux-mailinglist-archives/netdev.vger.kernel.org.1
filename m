@@ -1,132 +1,224 @@
-Return-Path: <netdev+bounces-145283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A179CE09E
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:50:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17DBA9CE09F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A8E01F23C19
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AC2B28DE99
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0777C1CEEB2;
-	Fri, 15 Nov 2024 13:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1241CF2A0;
+	Fri, 15 Nov 2024 13:45:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nwp3uq+/"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Qk0judhr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E931F16B
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 13:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F371CF295
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 13:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731678306; cv=none; b=plqaE90i4LXvFF3HJpjjG2pZkgEoU8Ybafr7QTe3k8EdVOuGd8chjhaeUwAESpyvdSdOlqDfqJNtC7dOaDLEYb8opI23MPUZY4B66exNumF31PxI78cLJTEP4aYyhWWVW503sVg3DbfLm0FzYF/RjwWcUrgcMNK1zx4FzZPyuOM=
+	t=1731678320; cv=none; b=KkGhq0eNVckUlHDQYpUdyN549wEGm5Pk+xIgbOfA4xJSeF7QkzE6p7s1exXyiXMKqaUGcBZNspdlNFBtCxWhbKDgtZeW1NZKQ2gsr51ebA8IOnlGFMqZeQQeQ0P/FDWVq7a1BQb8vZDCsjfX7VQJGA+aRJsjS1vP14fKV2eD6pM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731678306; c=relaxed/simple;
-	bh=3yGbxF65nKGpPf3kAm5l8y5Ojc278AMQ6ZAHbQvYFwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JQ3SEZMtpbhBH5izppblCayCdN5EH7DlaiNqT6dCSvA3g75ptON2ZolRDvZNEMxx8bmbSKb5Y32sYfPw1T1xCF2yeZP99or//qxBKfSb1zmT/OWsbtIqDKcHL0i9voMNUANFiLPHqs6l/oquRErCYIyWxQWYMZOVuBY6b8BsEOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nwp3uq+/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC29EC4CECF;
-	Fri, 15 Nov 2024 13:45:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731678306;
-	bh=3yGbxF65nKGpPf3kAm5l8y5Ojc278AMQ6ZAHbQvYFwc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nwp3uq+/gfYQ5JxtFA6w8SmZBxkjETqdF+MyH9FO+H1LrsYbnTODGdSLCrHkuT/zP
-	 ndTWcWBfxoePeWxHS5tDhmt1Qo92hWaVlQnhWULI5u0MNJOOD9UqShURitIWLA72rZ
-	 dCVbB9q2i3YZVfy1S1ZpFTeATiWclgKgJ04My1hrdlpW/7M8mxrVVGRZTV8CuyX/3e
-	 h/0TiyVx2VV19BZFSwn4UCvXcUEql7+VhAOMk7oSzdNccPq+jpumUoQjjWXhTRCMH0
-	 H5KGLwIyx1aX5+eGnXR03H+90Gi4+uuz9ni5qcIwH5IpHLJ6N6qt7L14+gThy5zP80
-	 vS3YN+4yY546Q==
-Date: Fri, 15 Nov 2024 13:45:02 +0000
-From: Simon Horman <horms@kernel.org>
-To: Milena Olech <milena.olech@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH iwl-net 07/10] idpf: add Tx timestamp capabilities
- negotiation
-Message-ID: <20241115134502.GQ1062410@kernel.org>
-References: <20241113154616.2493297-1-milena.olech@intel.com>
- <20241113154616.2493297-8-milena.olech@intel.com>
+	s=arc-20240116; t=1731678320; c=relaxed/simple;
+	bh=wEvihj3FaG6q6yux4Sp4g9xT2J7CX9ZO0jrhysEVxMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EEDa3+JIJczC2TubV6FSUuqrudhEVh4ulqCUUhqCDrPgr+vZoFkuWk+xAO7vCj7Lx9fNf9AIU2hWg7eKe7h3DMLUkzB3vs7/RyD6hpf9B5dOCu79LkGm4zoRA6p63L64pAG1GyzdJUxe2TlBCwp2RBcmtgwCi7ZrFp6EJH+PYl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Qk0judhr; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539d9fffea1so1793598e87.2
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 05:45:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1731678316; x=1732283116; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ov+3BoKnMSe11D0SkLhwSbXFmwsCCeFQwOwZmC0xFp8=;
+        b=Qk0judhrAu4hBwxj3IlkDvz/6ABn9lsTR2VNmgCTykDrHpPAVC6JYOUzJ4Tt05z9Ez
+         vn9rh9+H+m42hn9rdJNdy1PHlQIb3u4vOIomYs+oaSn2PASDS8a0x6YLO4Prree3x5FL
+         GQpDjm+0jSUdRRzEaOKOC0Hlv4OKNZSKzC7Pk58oJqyc0EaS/U3IVaCvkKD3rh8eZSdj
+         KEDtC9Dfh1beK93j6E8AUyJObbk1J8/IpxJB2Zpv4UdBKRd/vCZgoNla+vzwjpij9WB3
+         xxGXKSYdDbC+p1SQ3rqLyaafyPyOOzzlpEucWMOF0mJtHBCPYJaLmoboJ8Vn993+bWGC
+         4kHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731678316; x=1732283116;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ov+3BoKnMSe11D0SkLhwSbXFmwsCCeFQwOwZmC0xFp8=;
+        b=X5PciusuVDMYGG31PQqJ88aVqZAFui0/YogDn26rqdMAr8Ro8W2Th69hHtC3sPpRjn
+         xWY6qVpCV8igE2jikIJpUjoOzOr6e0Oam5tApK6uJIdDmisE0hhy7eJYJIA/sgxA+Dbr
+         55+lRFA9mph7vNQ+WUntFyeB2wgdXktKd3p+jw4QWJ3PIdgU+Yr6mBCBglo0FmZjabCD
+         4NalhReeuT5HBNhr8wkH67XYkCG2vWJcYw3tR415Lx+DFjgazdBN4BK3WR0ZlgprNJcL
+         hD+D7SwjWWGTGRLZSCLpvocvsNhoVtwoSnpTOoyYQxN9dnLca4+K9Dv32AZtMcSv0ISz
+         JHnw==
+X-Forwarded-Encrypted: i=1; AJvYcCXqB3VG9tRySi3HzpOaGE87dnK8RZIeX3Ux1valPiBz/qNIEIEvbK2zU1on1WfVFIXbTCFz6Hc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV3FvOFILtFHUwT3VetOd7jzN5VBuTNzC+rkoFS5S2vmkQfUX3
+	0vuxK53gBPKy4v/c2mWbEOVQyUIjeXwbeld0JgVxSASkkmB3Hc4l+p75lRHX3CZQKJWxhzVspKu
+	z
+X-Google-Smtp-Source: AGHT+IHfp6211N2zJyxWAZDS/FNeL1B2lIvzVzZiH4FMGRoWJY7Lr3+gfzb1/aQAr6d75eCnF/HSqA==
+X-Received: by 2002:a05:6512:2823:b0:535:3ca5:daa with SMTP id 2adb3069b0e04-53dab2919f6mr1543586e87.7.1731678316391;
+        Fri, 15 Nov 2024 05:45:16 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da244cb6sm58968975e9.0.2024.11.15.05.45.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 05:45:15 -0800 (PST)
+Message-ID: <353a7ffd-852a-4da6-b382-ea1714c69dc1@openvpn.net>
+Date: Fri, 15 Nov 2024 14:45:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241113154616.2493297-8-milena.olech@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 04/23] ovpn: add basic interface
+ creation/destruction/management routines
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Sabrina Dubroca <sd@queasysnail.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-4-de4698c73a25@openvpn.net>
+ <2fd3dc9c-9d6a-494c-a4d8-a45221bf250d@gmail.com> <ZzOGqP9AAGSN2E7y@hog>
+ <3da3a4a6-f88d-4b60-be99-42860e1b8b2d@openvpn.net>
+ <7ba4b3a0-06ca-4273-aaf0-19f92b4de3e9@gmail.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <7ba4b3a0-06ca-4273-aaf0-19f92b4de3e9@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 13, 2024 at 04:46:19PM +0100, Milena Olech wrote:
-> Tx timestamp capabilities are negotiated for the uplink Vport.
-> Driver receives information about the number of available Tx timestamp
-> latches, the size of Tx timestamp value and the set of indexes used
-> for Tx timestamping.
+On 14/11/2024 23:57, Sergey Ryazanov wrote:
+> On 14.11.2024 10:07, Antonio Quartulli wrote:
+>> On 12/11/2024 17:47, Sabrina Dubroca wrote:
+>>> 2024-11-09, 03:01:21 +0200, Sergey Ryazanov wrote:
+>>>> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>>>>> +/* When the OpenVPN protocol is ran in AEAD mode, use
+>>>>> + * the OpenVPN packet ID as the AEAD nonce:
+>>>>> + *
+>>>>> + *    00000005 521c3b01 4308c041
+>>>>> + *    [seq # ] [  nonce_tail   ]
+>>>>> + *    [     12-byte full IV    ] -> NONCE_SIZE
+>>>>> + *    [4-bytes                   -> NONCE_WIRE_SIZE
+>>>>> + *    on wire]
+>>>>> + */
+>>>>
+>>>> Nice diagram! Can we go futher and define the OpenVPN packet header 
+>>>> as a
+>>>> stucture? Referencing the structure instead of using magic sizes and 
+>>>> offsets
+>>>> can greatly improve the code readability. Especially when it comes 
+>>>> to header
+>>>> construction/parsing in the encryption/decryption code.
+>>>>
+>>>> E.g. define a structures like this:
+>>>>
+>>>> struct ovpn_pkt_hdr {
+>>>>    __be32 op;
+>>>>    __be32 pktid;
+>>>>    u8 auth[];
+>>>> } __attribute__((packed));
+>>>>
+>>>> struct ovpn_aead_iv {
+>>>>    __be32 pktid;
+>>>>    u8 nonce[OVPN_NONCE_TAIL_SIZE];
+>>>> } __attribute__((packed));
+>>>
+>>> __attribute__((packed)) should not be needed here as the fields in
+>>> both structs look properly aligned, and IIRC using packed can cause
+>>> the compiler to generate worse code.
+>>
+>> Agreed. Using packed will make certain architecture read every field 
+>> byte by byte (I remember David M. biting us on this in batman-adv :))
 > 
-> Add function to get the Tx timestamp capabilities and parse the uplink
-> vport flag.
+> Still curious to see an example of that strange architecture/compiler 
+> combination. Anyway, as Sabrina mentioned, the header is already pretty 
+> aligned. So it's up to you how to document the structure.
+
+IIRC MIPS was one of those, but don't take my word for granted.
+
 > 
-> Co-developed-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Co-developed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
+>> This said, I like the idea of using a struct, but I don't feel 
+>> confident enough to change the code now that we are hitting v12.
+>> This kind of change will be better implemented later and tested 
+>> carefully. (and patches are always welcome! :))
+> 
+> The main reason behind the structure introduction is to improve the code 
+> readability. To reduce a shadow, where bugs can reside. I wonder how 
+> many people have invested their time to dig through the encryption 
+> preparation function?
+> 
+> As for risk of breaking something I should say that it can be addressed 
+> by connecting the kernel implementation to pure usespace implementation, 
+> which can be assumed the reference. And, I believe, it worth the benefit 
+> of merging easy to understand code.
+> 
 
-...
+I understand your point, but this is something I need to spend time on 
+because the openvpn packet format is not "very stable", as in "it can 
+vary depending on negotiated features".
 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+When implementing ovpn I decided what was the supported set of features 
+so to create a stable packet header, but this may change moving forward 
+(there is already some work going on in userspace regarding new features 
+that ovpn will have to support).
+Therefore I want to take some time thinking about what's best.
 
-...
+Regards,
 
-> +/**
-> + * idpf_ptp_get_vport_tstamps_caps - Send virtchnl to get tstamps caps for vport
-> + * @vport: Virtual port structure
-> + *
-> + * Send virtchnl get vport tstamps caps message to receive the set of tstamp
-> + * capabilities per vport.
-> + *
-> + * Return: 0 on success, -errno otherwise.
-> + */
-> +int idpf_ptp_get_vport_tstamps_caps(struct idpf_vport *vport)
 
-...
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
-> +	for (u16 i = 0; i < tstamp_caps->num_entries; i++) {
-> +		u32 offset_l, offset_h;
-
-It looks like the type of offset_l and offset_h should be __le32
-to match the values that are stored in them.
-
-Flagged by Sparse.
-
-> +
-> +		ptp_tx_tstamp = ptp_tx_tstamps + i;
-> +		tx_tstamp_latch_caps = rcv_tx_tstamp_caps->tstamp_latches[i];
-> +
-> +		if (tstamp_access != IDPF_PTP_DIRECT)
-> +			goto skip_offsets;
-> +
-> +		offset_l = tx_tstamp_latch_caps.tx_latch_reg_offset_l;
-> +		offset_h = tx_tstamp_latch_caps.tx_latch_reg_offset_h;
-> +		ptp_tx_tstamp->tx_latch_reg_offset_l = le32_to_cpu(offset_l);
-> +		ptp_tx_tstamp->tx_latch_reg_offset_h = le32_to_cpu(offset_h);
-> +
-> +skip_offsets:
-> +		ptp_tx_tstamp->idx = tx_tstamp_latch_caps.index;
-> +
-> +		list_add(&ptp_tx_tstamp->list_member,
-> +			 &tstamp_caps->latches_free);
-> +
-> +		tstamp_caps->tx_tstamp_status[i].state = IDPF_PTP_FREE;
-> +	}
-
-...
 
