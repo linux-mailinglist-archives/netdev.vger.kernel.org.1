@@ -1,343 +1,125 @@
-Return-Path: <netdev+bounces-145279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B789CE01A
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:34:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FEE49CE062
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 710EB1F23B77
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:34:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0B871F27E9A
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AF51CF5EF;
-	Fri, 15 Nov 2024 13:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81F41CBA1D;
+	Fri, 15 Nov 2024 13:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Kl27prUP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742A21CEAB9;
-	Fri, 15 Nov 2024 13:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888FB1C5798;
+	Fri, 15 Nov 2024 13:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731677547; cv=none; b=AxJ3p16pplUFMlvsQ2Sg+kT3bERGkE5QnOXzhg/+vS5X8mCK1f1/jdXGOApVv1XMbHKkCXEBuCaiheBpFdFlToPRJ/Tuw7mxP6QJHzD/ODcBqdaCSNXJ7R/YZqFziuoknKkJVZUDmB/Ldy04JwMlr/sLGAO3pv4OEh+oEQPNovI=
+	t=1731677867; cv=none; b=BA5wcYv/cc3IfemfP4s6z4/MFACrn6dgEKMY/fodsmci7j0G5Phhuj/QibOpV00lbeQCnmeGzitk/cTzC2XXW1qtw4uWcV3eAtM3Rl1VunS9fM8bWYBv4sYlYUgOdP3sR2QhdANzfKeWK8d9CB6QAh07LYYRkij/2X6TIDQzuBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731677547; c=relaxed/simple;
-	bh=WbWm8lWchmza2OeHfP9X24+B+SNZZGzCc8YdKP+rb3I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KwkPHXtsLWAXMXR44aw35lMeRqZkTnMCSqzQ0SshLWXD6uzT/uahXkAwaeCxo8CHD0DF8fk72UpyKiVzIrvyiSqsde87khbeCY/b1VBR4lFsM6Bq5wpcQGVopuA9s3sKci/tR5+745X2oAPB3JQMWDFwvPO6jzLXv58y2XeTL0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net-next 14/14] netfilter: bitwise: add support for doing AND, OR and XOR directly
-Date: Fri, 15 Nov 2024 14:32:07 +0100
-Message-Id: <20241115133207.8907-15-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241115133207.8907-1-pablo@netfilter.org>
-References: <20241115133207.8907-1-pablo@netfilter.org>
+	s=arc-20240116; t=1731677867; c=relaxed/simple;
+	bh=NQpWmVhFjCz/wptYBuBsug630baqpkCBgf4u+LxRKT8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jWVdU8/EiI4glciZ+N754uhMe7lXi8bTGpZiBuFF77NWSHMWk+4lHkdA+BcBBP9YpyuT8F0Syx3487Lj/MOw9ep/XqDsiPxA9WMcbrh+Cu5lBLrk2TeDPh1No8iOohr5/1ngLW4Inaa/olN86OhkhDHH5jp7t2IYitybV8ThxzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Kl27prUP; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8+1mHkW5xeUn98DLU2MzEmZyX/j5XKeY/1cmO/2lLi0=; b=Kl27prUPtKYLoQ/s2vZBSQyK7n
+	io0y6C+YFo3TFcRYOPId/ovLvP0qnH4MTTmrLCxykNrMAgDlcjuEKYNVgmLD0AZp19EbK4AnN9AMQ
+	d2BNDZbM9fF77Uc96Q+nxoFC+wIz1pzysRw6sDoZzSa5/0QH/84rJz04uqaaf8eUUavgjq89VY10V
+	IDEScKjh1+tLlUHzQwe3Dcd/ZG9AUCz28wcHJEhUWDeaYKZjmqII/edIgVwkDKi5OuzyWvXADw4vR
+	KkpT5l5b86Q3467cLtrC48K/+RD+6P5FkGnwLWRNB6g+B3DsMoen12t09Pu66ZSTV8DuHSRput/f7
+	R8PShxVw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36000)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tBwVq-0001Pv-1F;
+	Fri, 15 Nov 2024 13:37:26 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tBwVk-00029i-1G;
+	Fri, 15 Nov 2024 13:37:20 +0000
+Date: Fri, 15 Nov 2024 13:37:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net v2 1/2] net: phy: replace phydev->eee_enabled with
+ eee_cfg.eee_enabled
+Message-ID: <ZzdOkE0lqpl6wx2d@shell.armlinux.org.uk>
+References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+ <20241115111151.183108-2-yong.liang.choong@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241115111151.183108-2-yong.liang.choong@linux.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Jeremy Sowden <jeremy@azazel.net>
+On Fri, Nov 15, 2024 at 07:11:50PM +0800, Choong Yong Liang wrote:
+> Not all PHYs have EEE enabled by default. For example, Marvell PHYs are
+> designed to have EEE hardware disabled during the initial state.
+> 
+> In the initial stage, phy_probe() sets phydev->eee_enabled to be disabled.
+> Then, the MAC calls phy_support_eee() to set eee_cfg.eee_enabled to be
+> enabled. However, when phy_start_aneg() is called,
+> genphy_c45_an_config_eee_aneg() still refers to phydev->eee_enabled.
+> This causes the 'ethtool --show-eee' command to show that EEE is enabled,
+> but in actuality, the driver side is disabled.
+> 
+> This patch will remove phydev->eee_enabled and replace it with
+> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(),
+> it will follow the master configuration to have software and hardware
+> in sync.
 
-Hitherto, these operations have been converted in user space to
-mask-and-xor operations on one register and two immediate values, and it
-is the latter which have been evaluated by the kernel.  We add support
-for evaluating these operations directly in kernel space on one register
-and either an immediate value or a second register.
+Hmm. I'm not happy with how you're handling my patch. I would've liked
+some feedback on it (thanks for spotting that the set_eee case needed
+to pass the state to genphy_c45_an_config_eee_aneg()).
 
-Pablo made a few changes to the original patch:
+However, what's worse is, that the bulk of this patch is my work, yet
+you've effectively claimed complete authorship of it in the way you
+are submitting this patch. Moreover, you are violating the kernel
+submission rules, as the Signed-off-by does not include one for me
+(which I need to explicitly give.) I was waiting for the results of
+your testing before finalising the patch.
 
-- EINVAL if NFTA_BITWISE_SREG2 is used with fast version.
-- Allow _AND,_OR,_XOR with _DATA != sizeof(u32)
-- Dump _SREG2 or _DATA with _AND,_OR,_XOR
+The patch needs to be authored by me, the first sign-off needs to be
+me, then optionally Co-developed-by for you, and then your sign-off.
 
-Signed-off-by: Jeremy Sowden <jeremy@azazel.net>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/uapi/linux/netfilter/nf_tables.h |   8 ++
- net/netfilter/nft_bitwise.c              | 134 +++++++++++++++++++++--
- 2 files changed, 131 insertions(+), 11 deletions(-)
+See Documentation/process/submitting-patches.rst
 
-diff --git a/include/uapi/linux/netfilter/nf_tables.h b/include/uapi/linux/netfilter/nf_tables.h
-index 487542234ccd..49c944e78463 100644
---- a/include/uapi/linux/netfilter/nf_tables.h
-+++ b/include/uapi/linux/netfilter/nf_tables.h
-@@ -568,11 +568,17 @@ enum nft_immediate_attributes {
-  *                        and XOR boolean operations
-  * @NFT_BITWISE_LSHIFT: left-shift operation
-  * @NFT_BITWISE_RSHIFT: right-shift operation
-+ * @NFT_BITWISE_AND: and operation
-+ * @NFT_BITWISE_OR: or operation
-+ * @NFT_BITWISE_XOR: xor operation
-  */
- enum nft_bitwise_ops {
- 	NFT_BITWISE_MASK_XOR,
- 	NFT_BITWISE_LSHIFT,
- 	NFT_BITWISE_RSHIFT,
-+	NFT_BITWISE_AND,
-+	NFT_BITWISE_OR,
-+	NFT_BITWISE_XOR,
- };
- /*
-  * Old name for NFT_BITWISE_MASK_XOR.  Retained for backwards-compatibility.
-@@ -590,6 +596,7 @@ enum nft_bitwise_ops {
-  * @NFTA_BITWISE_OP: type of operation (NLA_U32: nft_bitwise_ops)
-  * @NFTA_BITWISE_DATA: argument for non-boolean operations
-  *                     (NLA_NESTED: nft_data_attributes)
-+ * @NFTA_BITWISE_SREG2: second source register (NLA_U32: nft_registers)
-  *
-  * The bitwise expression supports boolean and shift operations.  It implements
-  * the boolean operations by performing the following operation:
-@@ -613,6 +620,7 @@ enum nft_bitwise_attributes {
- 	NFTA_BITWISE_XOR,
- 	NFTA_BITWISE_OP,
- 	NFTA_BITWISE_DATA,
-+	NFTA_BITWISE_SREG2,
- 	__NFTA_BITWISE_MAX
- };
- #define NFTA_BITWISE_MAX	(__NFTA_BITWISE_MAX - 1)
-diff --git a/net/netfilter/nft_bitwise.c b/net/netfilter/nft_bitwise.c
-index 7f6a4f800537..d550910aabec 100644
---- a/net/netfilter/nft_bitwise.c
-+++ b/net/netfilter/nft_bitwise.c
-@@ -17,6 +17,7 @@
- 
- struct nft_bitwise {
- 	u8			sreg;
-+	u8			sreg2;
- 	u8			dreg;
- 	enum nft_bitwise_ops	op:8;
- 	u8			len;
-@@ -60,28 +61,72 @@ static void nft_bitwise_eval_rshift(u32 *dst, const u32 *src,
- 	}
- }
- 
-+static void nft_bitwise_eval_and(u32 *dst, const u32 *src, const u32 *src2,
-+				 const struct nft_bitwise *priv)
-+{
-+	unsigned int i, n;
-+
-+	for (i = 0, n = DIV_ROUND_UP(priv->len, sizeof(u32)); i < n; i++)
-+		dst[i] = src[i] & src2[i];
-+}
-+
-+static void nft_bitwise_eval_or(u32 *dst, const u32 *src, const u32 *src2,
-+				const struct nft_bitwise *priv)
-+{
-+	unsigned int i, n;
-+
-+	for (i = 0, n = DIV_ROUND_UP(priv->len, sizeof(u32)); i < n; i++)
-+		dst[i] = src[i] | src2[i];
-+}
-+
-+static void nft_bitwise_eval_xor(u32 *dst, const u32 *src, const u32 *src2,
-+				 const struct nft_bitwise *priv)
-+{
-+	unsigned int i, n;
-+
-+	for (i = 0, n = DIV_ROUND_UP(priv->len, sizeof(u32)); i < n; i++)
-+		dst[i] = src[i] ^ src2[i];
-+}
-+
- void nft_bitwise_eval(const struct nft_expr *expr,
- 		      struct nft_regs *regs, const struct nft_pktinfo *pkt)
- {
- 	const struct nft_bitwise *priv = nft_expr_priv(expr);
--	const u32 *src = &regs->data[priv->sreg];
-+	const u32 *src = &regs->data[priv->sreg], *src2;
- 	u32 *dst = &regs->data[priv->dreg];
- 
--	switch (priv->op) {
--	case NFT_BITWISE_MASK_XOR:
-+	if (priv->op == NFT_BITWISE_MASK_XOR) {
- 		nft_bitwise_eval_mask_xor(dst, src, priv);
--		break;
--	case NFT_BITWISE_LSHIFT:
-+		return;
-+	}
-+	if (priv->op == NFT_BITWISE_LSHIFT) {
- 		nft_bitwise_eval_lshift(dst, src, priv);
--		break;
--	case NFT_BITWISE_RSHIFT:
-+		return;
-+	}
-+	if (priv->op == NFT_BITWISE_RSHIFT) {
- 		nft_bitwise_eval_rshift(dst, src, priv);
--		break;
-+		return;
-+	}
-+
-+	src2 = priv->sreg2 ? &regs->data[priv->sreg2] : priv->data.data;
-+
-+	if (priv->op == NFT_BITWISE_AND) {
-+		nft_bitwise_eval_and(dst, src, src2, priv);
-+		return;
-+	}
-+	if (priv->op == NFT_BITWISE_OR) {
-+		nft_bitwise_eval_or(dst, src, src2, priv);
-+		return;
-+	}
-+	if (priv->op == NFT_BITWISE_XOR) {
-+		nft_bitwise_eval_xor(dst, src, src2, priv);
-+		return;
- 	}
- }
- 
- static const struct nla_policy nft_bitwise_policy[NFTA_BITWISE_MAX + 1] = {
- 	[NFTA_BITWISE_SREG]	= { .type = NLA_U32 },
-+	[NFTA_BITWISE_SREG2]	= { .type = NLA_U32 },
- 	[NFTA_BITWISE_DREG]	= { .type = NLA_U32 },
- 	[NFTA_BITWISE_LEN]	= { .type = NLA_U32 },
- 	[NFTA_BITWISE_MASK]	= { .type = NLA_NESTED },
-@@ -105,7 +150,8 @@ static int nft_bitwise_init_mask_xor(struct nft_bitwise *priv,
- 	};
- 	int err;
- 
--	if (tb[NFTA_BITWISE_DATA])
-+	if (tb[NFTA_BITWISE_DATA] ||
-+	    tb[NFTA_BITWISE_SREG2])
- 		return -EINVAL;
- 
- 	if (!tb[NFTA_BITWISE_MASK] ||
-@@ -139,7 +185,8 @@ static int nft_bitwise_init_shift(struct nft_bitwise *priv,
- 	int err;
- 
- 	if (tb[NFTA_BITWISE_MASK] ||
--	    tb[NFTA_BITWISE_XOR])
-+	    tb[NFTA_BITWISE_XOR]  ||
-+	    tb[NFTA_BITWISE_SREG2])
- 		return -EINVAL;
- 
- 	if (!tb[NFTA_BITWISE_DATA])
-@@ -157,6 +204,41 @@ static int nft_bitwise_init_shift(struct nft_bitwise *priv,
- 	return 0;
- }
- 
-+static int nft_bitwise_init_bool(const struct nft_ctx *ctx,
-+				 struct nft_bitwise *priv,
-+				 const struct nlattr *const tb[])
-+{
-+	int err;
-+
-+	if (tb[NFTA_BITWISE_MASK] ||
-+	    tb[NFTA_BITWISE_XOR])
-+		return -EINVAL;
-+
-+	if ((!tb[NFTA_BITWISE_DATA] && !tb[NFTA_BITWISE_SREG2]) ||
-+	    (tb[NFTA_BITWISE_DATA] && tb[NFTA_BITWISE_SREG2]))
-+		return -EINVAL;
-+
-+	if (tb[NFTA_BITWISE_DATA]) {
-+		struct nft_data_desc desc = {
-+			.type	= NFT_DATA_VALUE,
-+			.size	= sizeof(priv->data),
-+			.len	= priv->len,
-+		};
-+
-+		err = nft_data_init(NULL, &priv->data, &desc,
-+				    tb[NFTA_BITWISE_DATA]);
-+		if (err < 0)
-+			return err;
-+	} else {
-+		err = nft_parse_register_load(ctx, tb[NFTA_BITWISE_SREG2],
-+					      &priv->sreg2, priv->len);
-+		if (err < 0)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int nft_bitwise_init(const struct nft_ctx *ctx,
- 			    const struct nft_expr *expr,
- 			    const struct nlattr * const tb[])
-@@ -188,6 +270,9 @@ static int nft_bitwise_init(const struct nft_ctx *ctx,
- 		case NFT_BITWISE_MASK_XOR:
- 		case NFT_BITWISE_LSHIFT:
- 		case NFT_BITWISE_RSHIFT:
-+		case NFT_BITWISE_AND:
-+		case NFT_BITWISE_OR:
-+		case NFT_BITWISE_XOR:
- 			break;
- 		default:
- 			return -EOPNOTSUPP;
-@@ -204,6 +289,11 @@ static int nft_bitwise_init(const struct nft_ctx *ctx,
- 	case NFT_BITWISE_RSHIFT:
- 		err = nft_bitwise_init_shift(priv, tb);
- 		break;
-+	case NFT_BITWISE_AND:
-+	case NFT_BITWISE_OR:
-+	case NFT_BITWISE_XOR:
-+		err = nft_bitwise_init_bool(ctx, priv, tb);
-+		break;
- 	}
- 
- 	return err;
-@@ -232,6 +322,21 @@ static int nft_bitwise_dump_shift(struct sk_buff *skb,
- 	return 0;
- }
- 
-+static int nft_bitwise_dump_bool(struct sk_buff *skb,
-+				 const struct nft_bitwise *priv)
-+{
-+	if (priv->sreg2) {
-+		if (nft_dump_register(skb, NFTA_BITWISE_SREG2, priv->sreg2))
-+			return -1;
-+	} else {
-+		if (nft_data_dump(skb, NFTA_BITWISE_DATA, &priv->data,
-+				  NFT_DATA_VALUE, sizeof(u32)) < 0)
-+			return -1;
-+	}
-+
-+	return 0;
-+}
-+
- static int nft_bitwise_dump(struct sk_buff *skb,
- 			    const struct nft_expr *expr, bool reset)
- {
-@@ -255,6 +360,11 @@ static int nft_bitwise_dump(struct sk_buff *skb,
- 	case NFT_BITWISE_RSHIFT:
- 		err = nft_bitwise_dump_shift(skb, priv);
- 		break;
-+	case NFT_BITWISE_AND:
-+	case NFT_BITWISE_OR:
-+	case NFT_BITWISE_XOR:
-+		err = nft_bitwise_dump_bool(skb, priv);
-+		break;
- 	}
- 
- 	return err;
-@@ -299,6 +409,7 @@ static bool nft_bitwise_reduce(struct nft_regs_track *track,
- 	    track->regs[priv->dreg].bitwise &&
- 	    track->regs[priv->dreg].bitwise->ops == expr->ops &&
- 	    priv->sreg == bitwise->sreg &&
-+	    priv->sreg2 == bitwise->sreg2 &&
- 	    priv->dreg == bitwise->dreg &&
- 	    priv->op == bitwise->op &&
- 	    priv->len == bitwise->len &&
-@@ -375,7 +486,8 @@ static int nft_bitwise_fast_init(const struct nft_ctx *ctx,
- 	if (err < 0)
- 		return err;
- 
--	if (tb[NFTA_BITWISE_DATA])
-+	if (tb[NFTA_BITWISE_DATA] ||
-+	    tb[NFTA_BITWISE_SREG2])
- 		return -EINVAL;
- 
- 	if (!tb[NFTA_BITWISE_MASK] ||
+Thanks.
+
+pw-bot: cr
+
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
