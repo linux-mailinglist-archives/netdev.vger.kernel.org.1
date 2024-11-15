@@ -1,136 +1,190 @@
-Return-Path: <netdev+bounces-145305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC7729CEB20
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:11:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C3959CEA3F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92F30284DDE
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:11:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0725284542
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B601D47C6;
-	Fri, 15 Nov 2024 15:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305331D5154;
+	Fri, 15 Nov 2024 15:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="f5zNzLcx"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Rmf2rj4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C8D1B6CEB
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0574F1D47B6
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731683473; cv=none; b=P1d00u7XDDCBGGXuMXupmEAvFIjrtfioBw/MHH8ZOo42NTBAIrv4xU6s050Hul9uxXAcWS+XnKZtjjHGLdT56EiDfaIdrU1jncC0SIQI9YgB+Awvuc5J7lM2kWYjx/5nx4CiqKAe07NhAGSIwUHxqbHyA6ZJvAIaRKL4Ef+/VW4=
+	t=1731683294; cv=none; b=qEYoJCXuk4ePLnjm7z5mfK/P+dxyxu4Zj2jNW5pjllUs2qE7S1Pb07o6r5y+4k1UDIt931CWwmRjlumsG4qVcGGeucvLWWPwWzoQCqmCH0aJGzw2lMp7XK98ckEm6YYk/bspPRm40EGlG1Ba1u0devhH72EYe4Jvr3yf8vnMh18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731683473; c=relaxed/simple;
-	bh=MvFejoejzjVXp0/ksQf4JK9iyOrw8/hsflq74VWZcag=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RRBI13mMrAI1E7kmaLxeVqUKJu/+AEoH8COJ2jhcXt+TLZ07wGcTP3bL0k43uGIAT3vGjhkQMPG4TZku0+0zVGKsrguKqeb+k3g9WzjVVyKn5tJiWCqYIoY4boO9BYSvYD/DGkdjz9+M5kDjFzioFNIxqMT2MBwxwC1BoWec7sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=f5zNzLcx; arc=none smtp.client-ip=80.12.242.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from localhost.localdomain ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id BxyDtpboUgtkHBxyNtvR1x; Fri, 15 Nov 2024 16:11:01 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1731683462;
-	bh=yNQMf0U/atGQpXN0gCR8iiaEcZO1ItCYtrClXMZqPIk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=f5zNzLcxpWdz+8Yqcr+LDAtgIXOc+Vfh+OHuRl1vJKWsbJECxHCYzf6NbWUS3xdUK
-	 SA/j/d3yqlRDfVdr4ZomSpI9TaD+r+WjORzQ3CiKzeLtWvHvXqSOf+vpPa6Sf5UeBq
-	 T9lZ/kpnk5vyrKt64Y26WoBbnPxCl72c6dO3rJPrAc82ywZgp1NG+VmduDd29nqkBk
-	 +hOzEV3dRwpWfrvuj71+bb4IrgxBRNO2R/yFSf+uV6+4oBCyEHOQDqpBP1ctCfhCjJ
-	 c6CQ6XzinDe/abopO1xJLihX27mOL+UhrTt85TrByJf/xJ335MIXV6tK/2a4mux+nP
-	 NXzqDTAgEGtDQ==
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 15 Nov 2024 16:11:02 +0100
-X-ME-IP: 124.33.176.97
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-To: netdev@vger.kernel.org,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH iproute2-next] add .editorconfig file for basic formatting
-Date: Sat, 16 Nov 2024 00:08:27 +0900
-Message-ID: <20241115151030.1198371-2-mailhol.vincent@wanadoo.fr>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1731683294; c=relaxed/simple;
+	bh=XQjM1GvvHQ1WSi2kENKiDh1XY79HfJbCf+GuZF6GAAk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hFFgXXK+l/gptVOkoBN1JopiXIAUIhBPDR29/8tWeOLS0/Hu47zXdRssGv9xhMznvop+2BRvlOylW6PJIXHVhtI0tIXq06H5ytxaIeCLOsswgIi5A/2Jto4OjhpY3pZVZbh89ySSeUaMyBbWW++tvhvtQHtGJEF1cJ5KO+/jZls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Rmf2rj4f; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43193678216so16658465e9.0
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 07:08:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1731683290; x=1732288090; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=l1eVJ+u5gvoiBy0Qi5z7Q2cwYJUTwhtsNR7M5+MGpjw=;
+        b=Rmf2rj4fe3bQ/ngifZqZO8qjcqsQjo1OTDwkbdibHPku+yMS+bADmTAW8lj5RSMAPx
+         qBT/2m/i3QytW5M28V3GVckj7VGEndceUwW3uyiSATl3k2c4XSXe+2abMNYlWakWTIoJ
+         5XaEx4xUL31oJDs7cQuWCNeXFR945Fl2GGloShPO24N82You7zOClNsx2+MwMhJIxAg7
+         XqiddMy+ic7J3lrrsA4Kptc/477m5Ck5oy3dsFjkiPe/75EgF4bFU1YIieRqX77JcEFA
+         T7GqZ10O1IyebkQt5qbIf9JU9lKylkBfkwF3Zh1yCZera3+gCFydK+X0TTQ6Mt02c+LW
+         SVXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731683290; x=1732288090;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l1eVJ+u5gvoiBy0Qi5z7Q2cwYJUTwhtsNR7M5+MGpjw=;
+        b=You+1YkQvpPBTHCJw9FkPtEeahLRof34F4gPzIw8yuOdu8sN2h4f6xCeEaY+MbCWeE
+         KizKxZUn41DReczRmBBK902H+7uhz9aGg0UOJmVXSPSLxHz7q3/EdczbwecuXXfeJ8iN
+         k9HPWWppaMDoCUGWMuaQCsoEezSb/+8KW/MVxF6xo23TJD3G+iL8YVydB72r0ik+HQd3
+         kxTLyXZ478wb2/5PTmIFkrq3OewSlmDmvyZhfKivBUmbworVDvqf5VkqeyTeHI18SJtg
+         sXhv1b1cWenPnc50tNnlWQlz/aDNYzoJLdLU4fMjn/Ct+4CZhSd21uJQI1AgvNYpvJnR
+         T0bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUnvM26IqSgNbbzwhGJNXIusm8TSF56fTQkGYIOm3E+FZ7EXIf6xSz/IA/gleQt+7eIHBN9NqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUD+3RwQHSBqSBZ1tCEqfQjno8l0iNQ90z+GVIyCOkaR+H1TGc
+	bybHotOCmkSI2htVVSHJ54VdDCNL/DHfAR2T4qN+/rb8yr0KKiDhonVD9/pkIwM=
+X-Google-Smtp-Source: AGHT+IHy0UggFmJRQLPotM9I2PDLoXOFlnbr1NHeixCcWpBtFZ0X+Q7HyQTellfVyQE46O8++56qZw==
+X-Received: by 2002:a05:600c:1907:b0:430:52ec:1e2b with SMTP id 5b1f17b1804b1-432df791b70mr23882875e9.29.1731683290161;
+        Fri, 15 Nov 2024 07:08:10 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac1f94asm56070725e9.39.2024.11.15.07.08.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 07:08:09 -0800 (PST)
+Message-ID: <5fe43b6a-4f16-4a98-b586-51d2964777c0@openvpn.net>
+Date: Fri, 15 Nov 2024 16:08:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2099; i=mailhol.vincent@wanadoo.fr; h=from:subject; bh=MvFejoejzjVXp0/ksQf4JK9iyOrw8/hsflq74VWZcag=; b=owGbwMvMwCV2McXO4Xp97WbG02pJDOnmKWl7E3Z9fek984yRx5leb1VDA6N7UZfnrWN4xma9a HWmw+WUjlIWBjEuBlkxRZZl5ZzcCh2F3mGH/lrCzGFlAhnCwMUpABOxOc3IMOvLc/dX8Ru/ODJa GTfs89mlvPH3fuuH8jVaO5dvbmLk5Wf4H72wJVxVeBuDWtw/rp+rOGt9vT95L3OJNzKsuhOvI/q JCQA=
-X-Developer-Key: i=mailhol.vincent@wanadoo.fr; a=openpgp; fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 00/23] Introducing OpenVPN Data Channel
+ Offload
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ steffen.klassert@secunet.com, antony.antony@secunet.com,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <2828411f-f2e5-4dfc-80ff-577eb5fd359a@gmail.com>
+ <a7009e7e-a1f9-4aa5-ad41-2befc64b5d3e@openvpn.net>
+ <4fa316ce-c6f7-41d8-bb47-00c15f76faba@gmail.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <4fa316ce-c6f7-41d8-bb47-00c15f76faba@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-EditorConfig is a specification to define the most basic code formatting
-stuff, and it is supported by many editors and IDEs, either directly or
-via plugins, including VSCode/VSCodium, Vim, emacs and more.
+On 14/11/2024 23:10, Sergey Ryazanov wrote:
+> On 14.11.2024 17:33, Antonio Quartulli wrote:
+>> On 06/11/2024 02:18, Sergey Ryazanov wrote:
+>>> Regarding "big" topics I have only two concerns: link creation using 
+>>> RTNL and a switch statement usage. In the corresponding thread, I 
+>>> asked Jiri to clarify that "should" regarding .newlink 
+>>> implementation. Hope he will have a chance to find a time to reply.
+>>
+>> True, but to be honest at this point I am fine with sticking to RTNL, 
+>> also because we will soon introduce the ability to create 'persistent' 
+>> ifaces, which a user should be able to create before starting openvpn.
+> 
+> Could you share the use case for this functionality?
 
-It allows to define formatting style related to indentation, charset,
-end of lines and trailing whitespaces. It also allows to apply different
-formats for different files based on wildcards, so for example it is
-possible to apply different configurations to *.{c,h}, *.json or *.yaml.
+This is better asked to the users mailing list, but, for example, we 
+recently had a discussion about this with the VyOS guys, where they want 
+to create the interface and have it fit the various 
+firewall/routing/chachacha logic, before any daemon is started.
 
-In linux related projects, defining a .editorconfig might help people
-that work on different projects with different indentation styles, so
-they cannot define a global style. Now they will directly see the
-correct indentation on every fresh clone of the project.
+In OpenVPN userspace we already support the --mktun directive to help 
+with this specific use case, so it's a long existing use case.
 
-Add the .editorconfig file at the root of the iproute2 project. Only
-configuration for the file types currently present are specified. The
-automatic whitespace trimming option caused some issues in the Linux
-kernel [1] and is thus not activated.
+> 
+>> Going through RTNL for this is the best choice IMHO, therefore we have 
+>> an extra use case in favour of this approach (next to what Jiri 
+>> already mentioned).
+> 
+> In absence of arguments it's hard to understand, what's the "best" 
+> meaning. 
 
-See https://editorconfig.org
+well, that's why I added "IMHO" :)
 
-[1] .editorconfig: remove trim_trailing_whitespace option
-Link: https://git.kernel.org/torvalds/c/7da9dfdd5a3d
+> So, I'm still not sure is it worth to split uAPI between two 
+> interfaces. Anyway, it's up to maintainers to decide is it mergeable in 
+> this form or not. I just shared some arguments for the full management 
+> interface in GENL.
 
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
----
-For reference, here is the .editorconfig of the kernel:
+well, doing it differently from all other virtual drivers also requires 
+some important reason IMHO.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/.editorconfig
----
- .editorconfig | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
- create mode 100644 .editorconfig
+Anyway, I like the idea that iproute2 can be used to create interfaces, 
+without the need to have another userspace tool for that.
 
-diff --git a/.editorconfig b/.editorconfig
-new file mode 100644
-index 00000000..4cff39f1
---- /dev/null
-+++ b/.editorconfig
-@@ -0,0 +1,24 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+root = true
-+
-+[{*.{c,h,sh},Makefile}]
-+charset = utf-8
-+end_of_line = lf
-+insert_final_newline = true
-+indent_style = tab
-+indent_size = 8
-+
-+[*.json]
-+charset = utf-8
-+end_of_line = lf
-+insert_final_newline = true
-+indent_style = space
-+indent_size = 4
-+
-+[*.yaml]
-+charset = utf-8
-+end_of_line = lf
-+insert_final_newline = true
-+indent_style = space
-+indent_size = 2
+Regards,
+
+
 -- 
-2.45.2
+Antonio Quartulli
+OpenVPN Inc.
 
 
