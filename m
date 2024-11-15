@@ -1,178 +1,236 @@
-Return-Path: <netdev+bounces-145300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D959CF040
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:38:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA34A9CE7BA
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4797B343D6
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:01:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 772111F227B9
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6081D435C;
-	Fri, 15 Nov 2024 15:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9BF1D5165;
+	Fri, 15 Nov 2024 15:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUC9xSKf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NODpiI57"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63AC1BBBE4
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02FE1D5161;
+	Fri, 15 Nov 2024 15:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731682890; cv=none; b=jUCjSgnfBEVwqyU63xCNjGa/FTsL1cDd6YzBG+Q9aoOuDvbwN8mm0uB792bNp1hNmZzDdh3tIP9TnS97Aprkc8FDVgsbzNoCNNocleP9I1cnfNdwXPggLVv1XGKlWwT7yFkZiyvfhmDUfEWCsnXYB4VNYb3Rlf7A5utMAipo1NY=
+	t=1731682932; cv=none; b=u9XjBdHbgBtvj279MZzr6Px7a+UGY2l8ZHM9r/nEGsBv+hjV2xcjf/zvUxkWeAsJtSMrz5pLVyuCyOmF2CXm57rT+p92C2tAu8YoWajkLre7D+llufaWdORNT9k5dG6jmbEOOLbw8MC9Et/N8b6+zxk73cdquJdyE7cZXabKMvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731682890; c=relaxed/simple;
-	bh=4+wPdWcf1Zk14i7rQciPleQc/xgg17XNWPwGwBr67HM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tP2C4b1cZkzhkFir8qPCotRyFr+lCHvieoCU1tWh2LsS72cXqDiGrlC/7QReQC2ne85bNpRV8RkBp0yg9Jzg/M2doh8fUToZ8We9Mq1JUHgDBrVkwTOiynYVGxTmdhya/xq0sv/V96No+2AQiBUkFpGhSZwJaaDIePCOFMf4E8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fUC9xSKf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731682887;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aHUBGiiFcOHg/PutvfT3htJMFkefnO57swkf+fvIRUE=;
-	b=fUC9xSKfA0vj8nCeSucylQOLZOp1gbLLaZbkiwFOhc1AIy1bnpquItXUvfnd9tCOEBbFou
-	qtbxqzMS0/DK7mXVdxZwFFgJl5kt36mEmKrjJOQ1r5gMMPU4yLVeha/BD7kKkzFTGh0vQ7
-	eQvmp5sQ/HBT9J2GSwWbWuc/gpFDCcE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-498-kW3Di71bPx2QzoT49rUdOg-1; Fri, 15 Nov 2024 10:01:25 -0500
-X-MC-Unique: kW3Di71bPx2QzoT49rUdOg-1
-X-Mimecast-MFC-AGG-ID: kW3Di71bPx2QzoT49rUdOg
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4315b7b0c16so14475375e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 07:01:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731682884; x=1732287684;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aHUBGiiFcOHg/PutvfT3htJMFkefnO57swkf+fvIRUE=;
-        b=JFlF6L+mjcB2JO68xGOmdfx/gVfHUljMMc32Mv8cyEOR07Dy5OksOigENcaxvQ9JOK
-         gqZEC+i9KztBlqPkW4/vMucCmVLeOFByW51d1yE12hO0ZGI8iDgGFQHDQ2vvkybUic/3
-         8YBnti5nXEgCEHOt7mntg9TJe4qptkuzmCSyngcFe7S8u0GBvvO8cRF2xnqQfXSwu1cl
-         SgIW1X6gat9Z4S5ZAfrGZJhEJntffCNxyg1Fxriq3rn9cDsZXokzvNTBSdp6zyYH9A2M
-         M7UUnri6ofYnYZ1CAQ5PB3mH9PgmZT/DgHFMVqBE/D0xKatWu5jjR00fJVXPA0It4aaS
-         qpcA==
-X-Gm-Message-State: AOJu0YzbaJWGoJnuYjQMj/Pr3ffuMyQiQMySTQXvXdhhn1x170JsQBcI
-	Y4P7fLt2Eqvnaf+SMAZq9gT6tG8Z03YPZmUzT/HLarJA0zg3QRFaey33BiIKSwoBitsSqUWfjTU
-	k9I3C2hLnaeFvWWw4jXsO102uAA1ag33PXh7voArcy50r3yB1x4mY4Q==
-X-Received: by 2002:a05:600c:1553:b0:431:4fa0:2e0b with SMTP id 5b1f17b1804b1-432df78fd66mr20191865e9.28.1731682884352;
-        Fri, 15 Nov 2024 07:01:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGCeVARQgK8ePyFnDk6zxe0RJeUF456/Aex6zRm1UWyWfokhEeX0+DtvT5b/SYZmCaC+f9qgg==
-X-Received: by 2002:a05:600c:1553:b0:431:4fa0:2e0b with SMTP id 5b1f17b1804b1-432df78fd66mr20189735e9.28.1731682881885;
-        Fri, 15 Nov 2024 07:01:21 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da2946a3sm59116345e9.35.2024.11.15.07.01.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 07:01:21 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 43BB6164D225; Fri, 15 Nov 2024 16:01:20 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
-Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
- maciej.fijalkowski@intel.com, jordyzomer@google.com, security@kernel.org
-Subject: Re: [PATCH bpf 2/2] bpf: fix OOB devmap writes when deleting elements
-In-Reply-To: <20241115125348.654145-3-maciej.fijalkowski@intel.com>
-References: <20241115125348.654145-1-maciej.fijalkowski@intel.com>
- <20241115125348.654145-3-maciej.fijalkowski@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 15 Nov 2024 16:01:20 +0100
-Message-ID: <87wmh4pmm7.fsf@toke.dk>
+	s=arc-20240116; t=1731682932; c=relaxed/simple;
+	bh=RC7dHsUpzDmhpG2Rds2L44gcmJcCyTz4v8LUuaz9vbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FsLxy34n+++myf/7ncAvui9+djgRvU0YtogKN69NgH8JbqhWSPTCCrJWdFuo3zYUtuUhwCZhlBjBUmE0Ho6JgkuiA170W5nYx5LDPrSqL//fWf9S4mKDJlgfYwtc+XHdHUd/T0FvwGP3Kk1za5T696j1YQgbjk0e4E1+551J7sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NODpiI57; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10589C4CECF;
+	Fri, 15 Nov 2024 15:02:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731682932;
+	bh=RC7dHsUpzDmhpG2Rds2L44gcmJcCyTz4v8LUuaz9vbM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NODpiI57VDFfacvTlhxVqkf8jwPxzY6fiOgg3gq2JZGvdMF9+kkP830N/IR5m2EZ2
+	 JjhF3wpmjNF3rKJ+eaDiW8zej6RYSDOI9nq2zOKYlteBJLRhXbv9ttPs73k9G4pE1K
+	 +NX4ZvGgfs2U7GRIGYTh7KJcKqch/WyTTklvrxTh3euqNY33pYrTp4ZFvYG2z0AR9o
+	 rlOcYKq3rFeMQKr2stq28536T9adoMjR4ecbo3Hmn3iuEvOWCA4Zk6jtTRhcCBCLrI
+	 SPRsxungJhdM9ixRljBnRLmKTkO0tDPzyUAYeyF+ZYU/OEu8/Uig0Itf1oHHazPaWq
+	 RsELFu6TkoJhw==
+Date: Fri, 15 Nov 2024 09:02:10 -0600
+From: Rob Herring <robh@kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Ben Dooks <ben.dooks@codethink.co.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH] [RFC] dt-bindings: net: micrel: Convert to json-schema
+Message-ID: <20241115150210.GA2680735-robh@kernel.org>
+References: <943cb31d01d0da3a63911326e24fbf9b328f7206.1731580776.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <943cb31d01d0da3a63911326e24fbf9b328f7206.1731580776.git.geert+renesas@glider.be>
 
-Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
+On Thu, Nov 14, 2024 at 11:42:50AM +0100, Geert Uytterhoeven wrote:
+> Convert the Micrel PHY Device Tree binding documentation to json-schema.
+> 
+> Add a simple example.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> Notes:
+>   1. I specified Ben Dooks as the maintainer, as he wrote the original
+>      bindings. Ben, are you OK with that?
+>   2. This schema is never applied, as there is no compatible value or
+>      select statement. Adding
+> 
+> 	select:
+> 	  properties:
+> 	    $nodename:
+> 	      pattern: "^ethernet-phy(@[a-f0-9]+)?$"
+> 
+> 	  required:
+> 	    - $nodename
+> 
+>      and changing
+> 
+> 	-unevaluatedProperties: false
+> 	+additionalProperties: true
+> 
+>      would fix that, and is mostly harmless, except for possible
+>      conflicts with other Ethernet PHYs having more than one clock, or
+>      using different clock-names.
+>      Documentation/devicetree/bindings/net/qca,ar803x.yaml has the same
+>      issue.
+>      Is there a proper way to handle this?  Are there other options than
+>      mandating specific compatible values for Ethernet PHYs?
 
-> Jordy reported issue against XSKMAP which also applies to DEVMAP - the
-> index used for accessing map entry, due to being a signed integer,
-> causes the OOB writes. Fix is simple as changing the type from int to
-> u32, however, when compared to XSKMAP case, one more thing needs to be
-> addressed.
->
-> When map is released from system via dev_map_free(), we iterate through
-> all of the entries and an iterator variable is also an int, which
-> implies OOB accesses. Again, change it to be u32.
->
-> Example splat below:
->
-> [  160.724676] BUG: unable to handle page fault for address: ffffc8fc2c00=
-1000
-> [  160.731662] #PF: supervisor read access in kernel mode
-> [  160.736876] #PF: error_code(0x0000) - not-present page
-> [  160.742095] PGD 0 P4D 0
-> [  160.744678] Oops: Oops: 0000 [#1] PREEMPT SMP
-> [  160.749106] CPU: 1 UID: 0 PID: 520 Comm: kworker/u145:12 Not tainted 6=
-.12.0-rc1+ #487
-> [  160.757050] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS S=
-E5C620.86B.02.01.0008.031920191559 03/19/2019
-> [  160.767642] Workqueue: events_unbound bpf_map_free_deferred
-> [  160.773308] RIP: 0010:dev_map_free+0x77/0x170
-> [  160.777735] Code: 00 e8 fd 91 ed ff e8 b8 73 ed ff 41 83 7d 18 19 74 6=
-e 41 8b 45 24 49 8b bd f8 00 00 00 31 db 85 c0 74 48 48 63 c3 48 8d 04 c7 <=
-48> 8b 28 48 85 ed 74 30 48 8b 7d 18 48 85 ff 74 05 e8 b3 52 fa ff
-> [  160.796777] RSP: 0018:ffffc9000ee1fe38 EFLAGS: 00010202
-> [  160.802086] RAX: ffffc8fc2c001000 RBX: 0000000080000000 RCX: 000000000=
-0000024
-> [  160.809331] RDX: 0000000000000000 RSI: 0000000000000024 RDI: ffffc9002=
-c001000
-> [  160.816576] RBP: 0000000000000000 R08: 0000000000000023 R09: 000000000=
-0000001
-> [  160.823823] R10: 0000000000000001 R11: 00000000000ee6b2 R12: dead00000=
-0000122
-> [  160.831066] R13: ffff88810c928e00 R14: ffff8881002df405 R15: 000000000=
-0000000
-> [  160.838310] FS:  0000000000000000(0000) GS:ffff8897e0c40000(0000) knlG=
-S:0000000000000000
-> [  160.846528] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  160.852357] CR2: ffffc8fc2c001000 CR3: 0000000005c32006 CR4: 000000000=
-07726f0
-> [  160.859604] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000
-> [  160.866847] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
-0000400
-> [  160.874092] PKRU: 55555554
-> [  160.876847] Call Trace:
-> [  160.879338]  <TASK>
-> [  160.881477]  ? __die+0x20/0x60
-> [  160.884586]  ? page_fault_oops+0x15a/0x450
-> [  160.888746]  ? search_extable+0x22/0x30
-> [  160.892647]  ? search_bpf_extables+0x5f/0x80
-> [  160.896988]  ? exc_page_fault+0xa9/0x140
-> [  160.900973]  ? asm_exc_page_fault+0x22/0x30
-> [  160.905232]  ? dev_map_free+0x77/0x170
-> [  160.909043]  ? dev_map_free+0x58/0x170
-> [  160.912857]  bpf_map_free_deferred+0x51/0x90
-> [  160.917196]  process_one_work+0x142/0x370
-> [  160.921272]  worker_thread+0x29e/0x3b0
-> [  160.925082]  ? rescuer_thread+0x4b0/0x4b0
-> [  160.929157]  kthread+0xd4/0x110
-> [  160.932355]  ? kthread_park+0x80/0x80
-> [  160.936079]  ret_from_fork+0x2d/0x50
-> [  160.943396]  ? kthread_park+0x80/0x80
-> [  160.950803]  ret_from_fork_asm+0x11/0x20
-> [  160.958482]  </TASK>
->
-> Fixes: 546ac1ffb70d ("bpf: add devmap, a map for storing net device refer=
-ences")
-> Reported-by: Jordy Zomer <jordyzomer@google.com>
-> Suggested-by: Jordy Zomer <jordyzomer@google.com>
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+The proper way is simply, if you need to describe your phy in DT, it 
+needs a compatible string. MDIO phys are not special.
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+We really need to split ethernet-phy.yaml into common properties and a 
+specific schema for the compatibles it contains so that we can change 
+'additionalProperties: true'. That's one reason why all these properties 
+and typos didn't get flagged.
 
+If you don't want to retro-actively add a compatible, you can also do 
+something like this:
+
+select:
+  anyOf:
+    - required: ['micrel,led-mode']
+    - required: ['micrel,rmii-reference-clock-select-25-mhz']
+    - required: ['micrel,fiber-mode']
+    - required: ['coma-mode-gpios']
+
+That doesn't catch every case nor if you have a typo in the property 
+names.
+
+> Thanks for your comments!
+> ---
+>  .../devicetree/bindings/net/micrel,phy.yaml   | 93 +++++++++++++++++++
+>  .../devicetree/bindings/net/micrel.txt        | 57 ------------
+>  2 files changed, 93 insertions(+), 57 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/micrel,phy.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/micrel,phy.yaml b/Documentation/devicetree/bindings/net/micrel,phy.yaml
+> new file mode 100644
+> index 0000000000000000..609bbd9729efe516
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/micrel,phy.yaml
+> @@ -0,0 +1,93 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/micrel,phy.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Micrel PHY properties
+> +
+> +maintainers:
+> +  - Ben Dooks <ben.dooks@codethink.co.uk>
+> +
+> +properties:
+> +  micrel,led-mode:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    enum: [ 0, 1, 2, 3 ]
+> +    description: |
+> +      LED mode value to set for PHYs with configurable LEDs.
+> +
+> +      Configure the LED mode with single value. The list of PHYs and the
+> +      bits that are currently supported:
+> +
+> +      KSZ8001: register 0x1e, bits 15..14
+> +      KSZ8041: register 0x1e, bits 15..14
+> +      KSZ8021: register 0x1f, bits 5..4
+> +      KSZ8031: register 0x1f, bits 5..4
+> +      KSZ8051: register 0x1f, bits 5..4
+> +      KSZ8081: register 0x1f, bits 5..4
+> +      KSZ8091: register 0x1f, bits 5..4
+> +      LAN8814: register EP5.0, bit 6
+> +
+> +      See the respective PHY datasheet for the mode values.
+> +
+> +  micrel,rmii-reference-clock-select-25-mhz:
+> +    description: |
+> +      RMII Reference Clock Select bit selects 25 MHz mode
+> +
+> +      Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> +      than 50 MHz clock mode.
+> +
+> +      Note that this option in only needed for certain PHY revisions with a
+> +      non-standard, inverted function of this configuration bit.
+> +      Specifically, a clock reference ("rmii-ref" below) is always needed to
+> +      actually select a mode.
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    const: rmii-ref
+> +    description: |
+> +      supported clocks:
+> +        - KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
+> +          input clock. Used to determine the XI input clock.
+
+Don't repeat the clock name in the description.
+
+> +
+> +  micrel,fiber-mode:
+> +    type: boolean
+> +    description: |
+> +      If present the PHY is configured to operate in fiber mode.
+> +
+> +      Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
+> +      by the FXEN boot strapping pin. It can't be determined from the PHY
+> +      registers whether the PHY is in fiber mode, so this boolean device tree
+> +      property can be used to describe it.
+> +
+> +      In fiber mode, auto-negotiation is disabled and the PHY can only work in
+> +      100base-fx (full and half duplex) modes.
+> +
+> +  coma-mode-gpios:
+> +    description: |
+> +      If present the given gpio will be deasserted when the PHY is probed.
+> +
+> +      Some PHYs have a COMA mode input pin which puts the PHY into
+> +      isolate and power-down mode. On some boards this input is connected
+> +      to a GPIO of the SoC.
+> +
+> +      Supported on the LAN8814.
+
+Another reason to add compatible. You have per device properties.
+
+> +
+> +dependencies:
+> +  micrel,rmii-reference-clock-select-25-mhz: [ clock-names ]
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    ethernet {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        ethernet-phy@1 {
+> +            reg = <1>;
+> +            micrel,led-mode = <1>;
+> +        };
+> +    };
 
