@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-145136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5F99CD553
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:22:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2CB9CD561
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:27:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04A0E1F222E8
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:22:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 299921F22527
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2105913C9D4;
-	Fri, 15 Nov 2024 02:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E212F1442F4;
+	Fri, 15 Nov 2024 02:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MifU1ft7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1e4b6SE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE55284D02;
-	Fri, 15 Nov 2024 02:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74165228;
+	Fri, 15 Nov 2024 02:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731637326; cv=none; b=ELSzweky0etVIOzpaqAK3GWY2wNh9TmBMsEOcXuVbTZ3bSocXMRxF5NBFJY2IRmnGK+TRw/tdtNNZQOOR6z/EB0oCiBd04CZPVIS/yQP3uDTuOW+F+/3pswz8orsk1smSUEaHBSQiuzpmj+a64gV8VH7gKOmbctwMfkXZHuMEMY=
+	t=1731637671; cv=none; b=Vjb+zYYuJiv3m8u1pLh/OgxxiR3Mpd8iHmS75YZxVd3PCqTXB8tB5QFzXFtnhJnyxT/16mheglfkB51f8CvbOQoLsGbnVN7coQfBe8IOIIKGsCOQ9PaJUfdiqdWV4ix8p2ofUCV6UX2UI8Azl9J0qj0Zt/cRYJk1M2xPXMJuVxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731637326; c=relaxed/simple;
-	bh=g0xEvCzZMMSK2UulgwKL9aXd0SK9uImX1WbO+gn7Y8M=;
+	s=arc-20240116; t=1731637671; c=relaxed/simple;
+	bh=ciicWdUUqTmxlP2H/Q6z1OjXe00ZOD7vnXdIMmppkls=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JgWbMVOAWCRNMBQnAJ/UopseSHWi1ncZ9zUx1Api5h1DOXxSsr1yIWnnlMF0G5uyuN02mg2Gd6mo96xFshjetTGK4yhaHAHemOzNms4XL/sc76WfwE6JHK+QQV9rAPRKX4d/z57n1KuqOQtHN37DscHmjKNzx0/Ey6B5refSEiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MifU1ft7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CDD9C4CECD;
-	Fri, 15 Nov 2024 02:22:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qHZvMBMioHE7Y0ZBP2fXVqi/rW/O4dp0rMPJgBgmTAOwmRoTrUCAWpkqTIf/p/tVpR3Svv85UpjiUNkjaLAS2z0xE27utK8RjKtyvfV1awBTvtSAmhyksNQ0vGOqqUTx7UdDmVRYPyYN2TvYfOxtBa2kqhwKj1hpIIsg7B1gCB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1e4b6SE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F8CC4CECD;
+	Fri, 15 Nov 2024 02:27:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731637325;
-	bh=g0xEvCzZMMSK2UulgwKL9aXd0SK9uImX1WbO+gn7Y8M=;
+	s=k20201202; t=1731637671;
+	bh=ciicWdUUqTmxlP2H/Q6z1OjXe00ZOD7vnXdIMmppkls=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MifU1ft7lEj//tgGs7+dEnAVKWnLiBxKJtTrefRMjcsFWNvVIEqHnaIqcPJgTKsbX
-	 b3Z3bS3n/hPN6WMmVcAaacj0uwHI9pmsj83HpWGmAc2aJmFVHAn9sv/ItPN4UAoDWZ
-	 fFs4Bf3YvkVi456ShakW8z6uISJ7OFb3CkdYNHNiK+/hVc8YPrrgjIEXXPw46R0WXS
-	 QTg5pvzLTUzj/ehPxnqUYhGHZRyaGqJBbT7Fta57nP8jOOZEIC3m9OByusXm6Z4zEU
-	 i33q35Xq6MaPGNvJ2NQ06NwU1mCmaUNrblt5Ok7W3AarBEfALQmPbcVnfl6jU+GlE9
-	 zmz1nDK57jVxQ==
-Date: Thu, 14 Nov 2024 18:22:03 -0800
+	b=G1e4b6SE4TrViFB8tk+bUlBAZWA+VVON01VT87nCGi4nLVIFA2n38XKx9TEv1b9SL
+	 JL6/QN6T902v1Cklm/tlvH5y9hyuL6v4nhjBpJtX1/ePepoGarjN8xEjmK8dwS3tCn
+	 S6KLyy2OUjLfC7Wa7bRr0B+OI4HdFos40C0GyNADoQQEiJmqhpBvniepS2gSLeWe32
+	 0jGSdQKqMtlmkHNNGZbywCiO1oG0Uoyn+1GpR8ill2ck/Nru4FDlFOWBkFkIh6b9MA
+	 HknCcUGKmNgnqA/gFTQvQ0qQoljszierDY8gLHZmZIl0hFVy5th4ZARrU1QuhTa/HM
+	 kIXvqUNgwAhdQ==
+Date: Thu, 14 Nov 2024 18:27:50 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Felix Maurer <fmaurer@redhat.com>, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, yoong.siang.song@intel.com,
- sdf@fomichev.me, netdev@vger.kernel.org, Michal Schmidt
- <mschmidt@redhat.com>, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf] xsk: Free skb when TX metadata options are invalid
-Message-ID: <20241114182203.2f6353d2@kernel.org>
-In-Reply-To: <e5edc796-7ae3-4b57-b8ee-223f2c26f936@linux.dev>
-References: <edb9b00fb19e680dff5a3350cd7581c5927975a8.1731581697.git.fmaurer@redhat.com>
-	<e5edc796-7ae3-4b57-b8ee-223f2c26f936@linux.dev>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: ttoukan.linux@gmail.com, gal@nvidia.com, saeedm@nvidia.com,
+ tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via
+ rx_fifo_errors
+Message-ID: <20241114182750.0678f9ed@kernel.org>
+In-Reply-To: <20241114021711.5691-1-laoar.shao@gmail.com>
+References: <20241114021711.5691-1-laoar.shao@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,8 +61,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Nov 2024 13:43:22 -0800 Martin KaFai Lau wrote:
-> Jakub, can you help to take it directly to the net tree? Thanks!
+On Thu, 14 Nov 2024 10:17:11 +0800 Yafang Shao wrote:
+> - *   Not recommended for use in drivers for high speed interfaces.
 
-Ack, will do!
+I thought I suggested we provide clear guidance on this counter being
+related to processing pipeline being to slow, vs host backpressure.
+Just deleting the line that says "don't use" is not going to cut it :|
+-- 
+pw-bot: cr
 
