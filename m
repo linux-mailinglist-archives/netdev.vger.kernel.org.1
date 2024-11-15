@@ -1,157 +1,109 @@
-Return-Path: <netdev+bounces-145116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8DC9CD4DE
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:08:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EAD39CD518
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:39:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39FEA2829E8
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:08:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB3B8281010
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC8B3A1DB;
-	Fri, 15 Nov 2024 01:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3567DA9E;
+	Fri, 15 Nov 2024 01:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AO8n7byD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I862EZ8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D9C8F6C;
-	Fri, 15 Nov 2024 01:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E5B1F16B;
+	Fri, 15 Nov 2024 01:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731632931; cv=none; b=soearbLj5aI2vtqZzxh3TfwiJO4PNdUJZdPbWoew36S/ytaTv19TsXzopWavFoXXG665mIG4GVjIjy1UBZNTEQP6WVASaHJ3TvVUfBSIWybsoNzjEuLWcDc/WR834LYwMwdKuJCFGRzZmpho5c+2+TP3tJK7DCTD92wOCEWE7ew=
+	t=1731634749; cv=none; b=sTgnu3a8REwpbbxy15orLNErpJdrP+RKuot1MvLQYtCHi7A4qe4Mqo3i/0jFmte9vfytmX/9yGqw9XCiDRQAjVVrLaBbswABrQJXo2ARtRUhU+49O97mZBCk7DMOFuGvN3emdngZWHfszUcPppHHcDzx6k19y46bXEXa3gFDVOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731632931; c=relaxed/simple;
-	bh=A9umRcK6G6WHuT5df3Mh8Tf+sTzZJvAbLSBAscMGQ0A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fEUbXRa17UdSuDgLdYLQch30DrEX410tNXDPGvh+npw24gmH/QisEQiGYi7vVyGChI6dG/RsGlFYfJ9Zj4yBTsXOCn1vrsHnB8IYe2os19EUi7jYw8DUgoP4lQulUHKerb3W+I3SGSuGqQg51lr0hrdS1mjvFC7X0m8WCzmIyaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AO8n7byD; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AEHIXlD028167;
-	Fri, 15 Nov 2024 01:08:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	zs+u/WBcKqFMpAZC4G1CWeKDGTHkGvE+KuzQ9IOGNa4=; b=AO8n7byDtsJ8Q4sT
-	GxqOuotihj59zU/q/x6YXQZvlV18829dnnUkMDFfNr3AnErl8KT9WEPhg1jo413Q
-	WJIwWaP6E70EUDSuBs5wAo13u+GsYsC2awJnya+rU4GpRh1UwR0ukt+3ZVEgXBVn
-	SS4vqwM9PDDJth/0KBVGt5xtG7BuaCpAi/EEYMafDJ5FSO7S6uLrnxCeL5cnqaQR
-	IitYhZoRG2okq2tSGKsv2GEDxzgHaLXURw8II1ctT/ehMFASq0hfrs0MsCBwtxQF
-	m3/gx4PHJ8TfQXvb8FqENtfjYwyp/7k0kFgbZqRx1QevGYnuQo7KG4nSPP8nlS33
-	TLC9SA==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42w66gvhp6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 01:08:26 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AF18P0p015188
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 01:08:25 GMT
-Received: from [10.111.171.131] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 14 Nov
- 2024 17:08:20 -0800
-Message-ID: <2ac308d7-35be-463e-9838-3bbedc2a4d68@quicinc.com>
-Date: Thu, 14 Nov 2024 17:08:13 -0800
+	s=arc-20240116; t=1731634749; c=relaxed/simple;
+	bh=P0J40b7glC7/Mp8K4L3ngJXbPo5jPgKO1ADYUFBreaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cesyVWIqiZg9fARL0CQtYQvbAAH0xxS5ve2lTwf4B6FB14DyZopw067p3sHDuRwcQUHGznhma/QZgPFvlDdWwxUv1hjSQ5aiiF1luN6bA1y8hoS7LzWvxU7N44UEBfC7ELfcbnN+ONInnc9Zu/sK/45rxrswyPD3aVe9uYxHRoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I862EZ8M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F256C4CECD;
+	Fri, 15 Nov 2024 01:39:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731634749;
+	bh=P0J40b7glC7/Mp8K4L3ngJXbPo5jPgKO1ADYUFBreaE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=I862EZ8MHJsGm98dQkMHrQTqO1OCOTzGm+CXlfIZsD0/eA52QBvHLPfKsTG/zn66K
+	 rF41xnP6L3XPBTbhx5/EaKRt6MNKvIdk5z0LgHen1UhiQoPi6snmAAsyuVVhlqioEk
+	 bwAqh6oZZrBGg07JU5YMrhVyv8rEHl2Acb41MXTD7NUIxHBdpRxb3vA5WhhgNL+TQg
+	 o9aD0Xnw7N5FPXCDRZF7HvrY/esqf8zVllCPTELummijB1fOyaBbLMn5WZmKTLT5sG
+	 JCnHLpjE+XthjsNtZHdhIak6f6004y/lFtQ1AmGe+CAuGZ4sHLZvmrSWoPxWxGPZv2
+	 KuIpfbpesCVOA==
+Date: Thu, 14 Nov 2024 17:39:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, donald.hunter@gmail.com,
+ danieller@nvidia.com, ecree.xilinx@gmail.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>, Jacob
+ Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v19 03/10] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
+Message-ID: <20241114173906.71e9e6fb@kernel.org>
+In-Reply-To: <20241114114610.1eb4a5da@kmaincent-XPS-13-7390>
+References: <20241030-feature_ptp_netnext-v19-0-94f8aadc9d5c@bootlin.com>
+	<20241030-feature_ptp_netnext-v19-3-94f8aadc9d5c@bootlin.com>
+	<20241111150609.2b0425f6@kernel.org>
+	<20241112111232.1637f814@kmaincent-XPS-13-7390>
+	<20241112182226.2a6c8bab@kernel.org>
+	<20241113113808.4f8c5a0b@kmaincent-XPS-13-7390>
+	<20241113163925.7b3bd3d9@kernel.org>
+	<20241114114610.1eb4a5da@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: dwmac-qcom-ethqos: Enable support for XGMAC
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "Andrew
- Lunn" <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>
-References: <20241112-fix_qcom_ethqos_to_support_xgmac-v1-1-f0c93b27f9b2@quicinc.com>
- <55914c2a-95d8-4c40-a3ea-dfa6b2aeb1dd@lunn.ch>
-Content-Language: en-US
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-In-Reply-To: <55914c2a-95d8-4c40-a3ea-dfa6b2aeb1dd@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: VpAiDIwJg0qQK9JKi3waIpj8WD7-13GN
-X-Proofpoint-ORIG-GUID: VpAiDIwJg0qQK9JKi3waIpj8WD7-13GN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- mlxscore=0 malwarescore=0 suspectscore=0 impostorscore=0
- priorityscore=1501 bulkscore=0 clxscore=1011 lowpriorityscore=0
- adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411150009
 
+On Thu, 14 Nov 2024 11:46:10 +0100 Kory Maincent wrote:
+> > > I see what you mean! It is not something easy to think of as I don't really
+> > > know how it would be implemented.
+> > > Do you think adding simply the PHC source and the phydev pointer or index
+> > > would fit?     
+> > 
+> > In net_device? Yes, I think so.  
+>  
+> Also as the "user" is not described in the ptp_clock structure the only way to
+> find it is to roll through all the PTP of the concerned net device topology.
+> This find ptp loop will not be in the hotpath but only when getting the tsinfo
+> of a PHC or changing the current PHC. Is it ok for you?
 
+I think so :) We need to be able to figure out if it's the MAC PHC
+quickly, because MAC timestamping can be high rate. But IIUC PHY
+timestamping will usually involve async work and slow buses, so
+walking all PHYs of a netdev should be fine. Especially that 99%
+of the time there will only be one. Hope I understood the question..
 
-On 11/13/2024 6:51 PM, Andrew Lunn wrote:
-> On Tue, Nov 12, 2024 at 06:08:10PM -0800, Sagar Cheluvegowda wrote:
->> All Qualcomm platforms have only supported EMAC version 4 until
->> now whereas in future we will also be supporting XGMAC version
->> which has higher capabilities than its peer. As both has_gmac4
->> and has_xgmac fields cannot co-exist, make sure to disable the
->> former flag when has_xgmac  is enabled.
-> 
-> If you say they are mutually exclusive, how can it happen that both
-> are enabled?
-> 
-> To me, this feels like you are papering over a bug somewhere else.
-> 
-> 	Andrew
-
-
-We can set either has_gmac4 or has_xgmac flags by using below
-dtsi properties as well. But since Qualcomm only supported
-GMAC4 version in all of its chipsets until now, we had enabled
-has_gmac4 flag by default within dwmac_qcom_ethqos.c instead
-of adding any of the below entries in the dtsi. But this will
-create problem for us as we start supporting Xgmac version
-in the future, so we are trying to add this change so that
-our driver can support Xgmac version when "snps,dwxgmac" is 
-defined in the dtsi and we are keeping the default supported
-configuration as gmac4.
-
-
-	if (of_device_is_compatible(np, "snps,dwmac-4.00") ||
-	    of_device_is_compatible(np, "snps,dwmac-4.10a") ||
-	    of_device_is_compatible(np, "snps,dwmac-4.20a") ||
-	    of_device_is_compatible(np, "snps,dwmac-5.10a") ||
-	    of_device_is_compatible(np, "snps,dwmac-5.20")) {
-		plat->has_gmac4 = 1;
-		plat->has_gmac = 0;
-		plat->pmt = 1;
-		if (of_property_read_bool(np, "snps,tso"))
-			plat->flags |= STMMAC_FLAG_TSO_EN;
-	}
-
-
-	if (of_device_is_compatible(np, "snps,dwxgmac")) {
-		plat->has_xgmac = 1;
-		plat->pmt = 1;
-		if (of_property_read_bool(np, "snps,tso"))
-			plat->flags |= STMMAC_FLAG_TSO_EN;
-	}
+> I am at v20 so I ask for confirmation before changing the full patch series! ;)
 
