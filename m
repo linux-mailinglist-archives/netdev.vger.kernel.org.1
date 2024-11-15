@@ -1,64 +1,68 @@
-Return-Path: <netdev+bounces-145511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD0A9CFB32
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:31:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D1429CFB3A
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:35:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94595B25AA8
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:28:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF1A62848B0
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7D919E982;
-	Fri, 15 Nov 2024 23:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CA119E98B;
+	Fri, 15 Nov 2024 23:35:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ngBBDJaS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWd4Fyxc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEA918DF8D;
-	Fri, 15 Nov 2024 23:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC5216631C;
+	Fri, 15 Nov 2024 23:35:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731713322; cv=none; b=RcNlYOGzPSIGZL8GZoNlf1k3ZYNYznjrLVGoiNUOjUNtiNqEvXkYGErCzveUnk5QviJaRtIdI+p/2eLP9tRNPoL5A+0Gbm4tDg/nQQ7wAoKZ5LdqAqNmqlekllLIHILaRMBjadJLHmr+RYVDGVz87a6dPGBIXHTIdn5SSM8mfFQ=
+	t=1731713728; cv=none; b=BOv/nfrJNV5J0AB0LdLgzQ9y8Sau2Kuey+i55pi+Xm9GIRRDEI8aBlpqearghPLCezsISwccNrcFhO5VFsAIKw7OQaR6G+FNbev+CP8gQOEDf626oJidpD+msQUMqf37lL4fNVq7d3IkyBbRljd9KP1o4V6viWjbKmPmC3o7HfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731713322; c=relaxed/simple;
-	bh=48cNqeNILbOU+3UGrjHRKNNyLK0z81k5tiDiZiVH1NU=;
+	s=arc-20240116; t=1731713728; c=relaxed/simple;
+	bh=+0nSqXJMNPJie6Agi0DCflpUksVQqJLNIcznPm67J68=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U/MhcNSe9rhcu3V8RV94jm5GI5K9i8RVNxg/UEZEWofSO0vqT/CKkaJ760eipL6xdOuUkl9Oiw6HZUlfJvh3X8YfGc2byNzd623EOq66I75O7ABp7zX+mHZTvCetNnwm6cqcW9S8Uedj+2+DGxsE/hseVy5lQy3IKbqfMee9RbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngBBDJaS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F454C4CECF;
-	Fri, 15 Nov 2024 23:28:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pzWJtHq4vv1JbdBbp338G1ATWPxqT0zYhS6MQQ4nBW+a/ydVEA9MP3/VTKSYZdcc8+inR/P3q6DWGf6KtTB4OerM4ajRPMUUzczEFZEQKCcT4h6WyuAAwwuUcJphUvZPdxme75H0BwZKTO4JvJCpePHYHIS2Xi4c4f0qQ1c9+r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWd4Fyxc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 018E7C4CECF;
+	Fri, 15 Nov 2024 23:35:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731713321;
-	bh=48cNqeNILbOU+3UGrjHRKNNyLK0z81k5tiDiZiVH1NU=;
+	s=k20201202; t=1731713727;
+	bh=+0nSqXJMNPJie6Agi0DCflpUksVQqJLNIcznPm67J68=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ngBBDJaSV1FBLxDKemVskCphAz49K2OA3i/14mTTYOlf1gnYDQpFb2ARv/UE5yQJ2
-	 PfKh0RPtwuFDYWwEPcB3CG70ylGgVICnHX2BLrCyDJMvchcFPCZHHP8U+aflRn0oQj
-	 HFlvgDTO70QSPL2l2jBk6AW8gWSW2BpgHnYYp22rqvmcud/LAiC83UqkhrWrcvNSXu
-	 Hf/9FgLooQb230VoT6YAyKAd9cteydIceNHvoybBzOCaAYG5Lpyc8KyOBEna1gdV1/
-	 ZM1zn/qieGOaISrcOng515u8kaXkS5S7Fd7YcNMLS3WKsIzlCKKalxXWPNzOPW0/E1
-	 6NFsDCtRHBGUA==
-Date: Fri, 15 Nov 2024 15:28:40 -0800
+	b=SWd4Fyxcy6vkPAs/DoAyKv+eu9nnqiy9VDr1E7w6DAOPjGk3sTNyu3CQVJ1ftQ1Vl
+	 KQx7V76ZwBrflcMdU07dZ08pvCiVuMniy4GhDYMkJ/3vahjg0pawSvaX+3JhHfGywU
+	 5B5tE+7wI6tq8XfAriVL28lj/YBhGHcMmGeFVzCIrjSd9YzsgSS8omaH0MLx3DWaMn
+	 /8V/Hup5AfF5QtyTL3sde4ia3ZIuFa+PC0Cl0GrtcqcB8u0C+PbGN/aNnGXfwN1oRZ
+	 wKyFrTPI/2pLhWCxOGsAbPXDBSZL+32gxSUIudNzbcxe8lV0SDX6LcluNtG1LiyPmb
+	 wMVTTXTFPHQrg==
+Date: Fri, 15 Nov 2024 15:35:26 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- donald.hunter@gmail.com, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, kory.maincent@bootlin.com
-Subject: Re: [PATCH net-next v2 7/8] ethtool: remove the comments that are
- not gonna be generated
-Message-ID: <20241115152840.2153afb7@kernel.org>
-In-Reply-To: <ZzfTVtxjgXR-L8my@mini-arch>
-References: <20241115193646.1340825-1-sdf@fomichev.me>
-	<20241115193646.1340825-8-sdf@fomichev.me>
-	<20241115134023.6b451c18@kernel.org>
-	<ZzfDIjiVxUbHsIUg@mini-arch>
-	<20241115143759.4915be82@kernel.org>
-	<ZzfTVtxjgXR-L8my@mini-arch>
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
+ Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
+ osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
+ linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+ linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 4/6] rtnetlink: Decouple net namespaces in
+ rtnl_newlink_create()
+Message-ID: <20241115153526.3582ebcd@kernel.org>
+In-Reply-To: <20241113125715.150201-5-shaw.leon@gmail.com>
+References: <20241113125715.150201-1-shaw.leon@gmail.com>
+	<20241113125715.150201-5-shaw.leon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,22 +72,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 15 Nov 2024 15:03:50 -0800 Stanislav Fomichev wrote:
-> > > Absolutely, I did port these (and the rest of the comments that I removed)
-> > > over as doc: (see patch 4).  
-> > 
-> > Ah, I was looking for them re-appearing in patch 8. All good then.  
-> 
-> AFAICT, only enum docs are rendered. We don't have support for the rest.
-> I can try to follow up separately..
+On Wed, 13 Nov 2024 20:57:13 +0800 Xiao Liang wrote:
+> +/**
+> + *	struct rtnl_link_nets - net namespace context of newlink.
+> + *
+> + *	@src_net: Source netns of rtnetlink socket
+> + *	@link_net: Link netns by IFLA_LINK_NETNSID, NULL if not specified.
+> + */
+> +struct rtnl_link_nets {
+> +	struct net *src_net;
+> +	struct net *link_net;
+> +};
 
-Right but they will get rendered as HTML in
-https://docs.kernel.org/next/networking/netlink_spec/ethtool.html
+Let's not limit ourselves to passing just netns via this struct.
+Let's call it rtnl_newlink_args or params.
 
-Up to you if you want to follow up, I think I mostly added 
-the inline enum docs for the benefit of DPLL, because those
-guys were adding a family at the same time the specs were
-first merged, and I wanted to match what they had.
-No strong opinion if uAPI headers need to duplicate doc info 
-or HTML + reading YAML directly is enough.
+The first patch of the series got merged independently so you'll
+need to respin.
+-- 
+pw-bot: cr
 
