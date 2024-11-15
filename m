@@ -1,125 +1,182 @@
-Return-Path: <netdev+bounces-145280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FEE49CE062
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:43:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EDC69CE06B
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:44:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0B871F27E9A
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:43:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB93D288A45
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81F41CBA1D;
-	Fri, 15 Nov 2024 13:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0350B1CEEB2;
+	Fri, 15 Nov 2024 13:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Kl27prUP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cFoEq/ui"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888FB1C5798;
-	Fri, 15 Nov 2024 13:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6FD1CEE98;
+	Fri, 15 Nov 2024 13:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731677867; cv=none; b=BA5wcYv/cc3IfemfP4s6z4/MFACrn6dgEKMY/fodsmci7j0G5Phhuj/QibOpV00lbeQCnmeGzitk/cTzC2XXW1qtw4uWcV3eAtM3Rl1VunS9fM8bWYBv4sYlYUgOdP3sR2QhdANzfKeWK8d9CB6QAh07LYYRkij/2X6TIDQzuBA=
+	t=1731678119; cv=none; b=rT6cqBEvMUU9Nh65e0uphDIhvl4R8/+qxQtQQ2RdOwxkJ6ZL2mlvClaO/MuS/9mqrrtznrrEeg1j5Btn/sUiHgmeWJq4Q8XbPxHo7k/Rhi2VCEEDZ8jN8TFvjRkSS1wTgAYzDwbQiYjlmwaRZ1dK47gx6HYd5QLnwJAY9St4jyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731677867; c=relaxed/simple;
-	bh=NQpWmVhFjCz/wptYBuBsug630baqpkCBgf4u+LxRKT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jWVdU8/EiI4glciZ+N754uhMe7lXi8bTGpZiBuFF77NWSHMWk+4lHkdA+BcBBP9YpyuT8F0Syx3487Lj/MOw9ep/XqDsiPxA9WMcbrh+Cu5lBLrk2TeDPh1No8iOohr5/1ngLW4Inaa/olN86OhkhDHH5jp7t2IYitybV8ThxzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Kl27prUP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8+1mHkW5xeUn98DLU2MzEmZyX/j5XKeY/1cmO/2lLi0=; b=Kl27prUPtKYLoQ/s2vZBSQyK7n
-	io0y6C+YFo3TFcRYOPId/ovLvP0qnH4MTTmrLCxykNrMAgDlcjuEKYNVgmLD0AZp19EbK4AnN9AMQ
-	d2BNDZbM9fF77Uc96Q+nxoFC+wIz1pzysRw6sDoZzSa5/0QH/84rJz04uqaaf8eUUavgjq89VY10V
-	IDEScKjh1+tLlUHzQwe3Dcd/ZG9AUCz28wcHJEhUWDeaYKZjmqII/edIgVwkDKi5OuzyWvXADw4vR
-	KkpT5l5b86Q3467cLtrC48K/+RD+6P5FkGnwLWRNB6g+B3DsMoen12t09Pu66ZSTV8DuHSRput/f7
-	R8PShxVw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36000)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBwVq-0001Pv-1F;
-	Fri, 15 Nov 2024 13:37:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBwVk-00029i-1G;
-	Fri, 15 Nov 2024 13:37:20 +0000
-Date: Fri, 15 Nov 2024 13:37:20 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net v2 1/2] net: phy: replace phydev->eee_enabled with
- eee_cfg.eee_enabled
-Message-ID: <ZzdOkE0lqpl6wx2d@shell.armlinux.org.uk>
-References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
- <20241115111151.183108-2-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1731678119; c=relaxed/simple;
+	bh=hRf+VnrslbS6Gra4rG8tKwLOvhJZYSoAdLoxpwx0n98=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XJ41KnStjmbo9aH4cwHTNJAa+es9jKn3AMUjtrNlYknIIUmWe9K8RtNUYCcUPlvJGEYHhsSJw0+getDYVSLle1ADeVdh8VuBCPOoeJlSUZDf6VDieNZJNiO+DfeXceSEZDJ9cnUw3iTqkBekS2i6NxGVKnUD5Gh2T2VsSeKbs/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cFoEq/ui; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9a850270e2so343701566b.0;
+        Fri, 15 Nov 2024 05:41:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731678116; x=1732282916; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DFKvh8X0eWRG0GFEe/XAbitN4YrNcuJmHBxKKcIml5E=;
+        b=cFoEq/uipf3+/Kqcw7+3YESu0qtF+lxzW7j6D1xraEw81fZZ4sp9vzw2QCoJF49Vx0
+         WijWOY3GH4A4zWH66rbVFYW0301vy3Yz1WCei8WvtVO2OZRKWEEcRcJeO2emNV+mqH20
+         blv79rSqWjG+3h5j5rYiOgsSFV1o0d6NN8UM38565ahGmjbqulvSA4wk74BYBF8k282+
+         xNRXPlT+xmj8YpxcOakuxr0UazeOM+WPpvu8Ood6umXef62NOg+KrRv0Q4GfIAs9CNNa
+         bFnCqZs8BiX1sJuM/iaj3QWMyB7n2+CrUlINPLlGEFmKvOiaR7g27B3OzbfDUBqaEF/m
+         PRXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731678116; x=1732282916;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DFKvh8X0eWRG0GFEe/XAbitN4YrNcuJmHBxKKcIml5E=;
+        b=utt5VrYEZmQhjbvz3FElXbDNXnrviuamBPuhLXgEcpFWhh5flzUpZrRZE/l8zH8U7F
+         tXA6CYLg0OC1300NsUX+V0+7WxhPYfi2fmal3zw/FQft4Fsl813DDoe89BHHTZPFW5gy
+         xxW76neszPXUGEIwk8QYfmJXQmeN/PXr/Ng1oQQTUdBfCQJr82mXzlbt18EoZZHlQXVx
+         2gCCUptGwNuliT0Yd//7tmq1nf48SKVfvaOPn24cXfkEuRSqmdXwGpxhEiYiddJy2t8C
+         JKE7dXU9V+HzAH6XR8hDJP1CFUAQyAGsuk+a+mvXQUIBRzaO7oPPUcjCZKEfy0ayDjhN
+         njnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWfhAiT0LCfpbpe56h02pTG4cDxKGZ9CPZdsbBWJOAeQqVc1DVk5mqExxHm/46J/SUcYq80fSbtFFt9N3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMFbB5Dvv4Me5/sciOea09wy/STYzT794g+HEtl+vX5Di9Io/O
+	NkRZU7RKcOLRoGK0ONthRVAUzi4Hys9ooL3C7F8QfczpMxcur20/
+X-Google-Smtp-Source: AGHT+IEoHu0EWFGsk5B5nmRU8tr0m7Q8f4H38YW4o1/LtZol1g9TFT30zrsCH3v5q410wB/tfXRjMg==
+X-Received: by 2002:a17:907:9802:b0:a9a:1778:7024 with SMTP id a640c23a62f3a-aa483421c64mr246131566b.20.1731678116100;
+        Fri, 15 Nov 2024 05:41:56 -0800 (PST)
+Received: from ?IPV6:2a02:3100:b259:e900:7566:ab7c:4e9b:5c72? (dynamic-2a02-3100-b259-e900-7566-ab7c-4e9b-5c72.310.pool.telefonica.de. [2a02:3100:b259:e900:7566:ab7c:4e9b:5c72])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa20dfffc00sm183182066b.101.2024.11.15.05.41.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 05:41:54 -0800 (PST)
+Message-ID: <403be2f6-bab1-4a63-bad4-c7eac1e572ee@gmail.com>
+Date: Fri, 15 Nov 2024 14:41:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115111151.183108-2-yong.liang.choong@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/2] Fix 'ethtool --show-eee' during initial stage
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 15, 2024 at 07:11:50PM +0800, Choong Yong Liang wrote:
-> Not all PHYs have EEE enabled by default. For example, Marvell PHYs are
-> designed to have EEE hardware disabled during the initial state.
+On 15.11.2024 12:11, Choong Yong Liang wrote:
+> From: Choong Yong Liang <yong.liang.choong@intel.com>
 > 
-> In the initial stage, phy_probe() sets phydev->eee_enabled to be disabled.
-> Then, the MAC calls phy_support_eee() to set eee_cfg.eee_enabled to be
-> enabled. However, when phy_start_aneg() is called,
-> genphy_c45_an_config_eee_aneg() still refers to phydev->eee_enabled.
-> This causes the 'ethtool --show-eee' command to show that EEE is enabled,
-> but in actuality, the driver side is disabled.
+> When the MAC boots up with a Marvell PHY and phy_support_eee() is implemented,
+> the 'ethtool --show-eee' command shows that EEE is enabled, but in actuality,
+> the driver side is disabled. If we try to enable EEE through
+> 'ethtool --set-eee' for a Marvell PHY, nothing happens because the eee_cfg
+> matches the setting required to enable EEE in ethnl_set_eee().
 > 
-> This patch will remove phydev->eee_enabled and replace it with
-> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(),
-> it will follow the master configuration to have software and hardware
-> in sync.
+> This patch series will remove phydev->eee_enabled and replace it with
+> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(), it
+> will follow the master configuration to have software and hardware in sync,
+> allowing 'ethtool --show-eee' to display the correct value during the
+> initial stage.
+> 
+> v2 changes:
+>  - Implement the prototype suggested by Russell
+>  - Check EEE before calling phy_support_eee()
+> 
+> Thanks to Russell for the proposed prototype in [1].
+> 
+> Reference:
+> [1] https://patchwork.kernel.org/comment/26121323/
+> 
+> Choong Yong Liang (2):
+>   net: phy: replace phydev->eee_enabled with eee_cfg.eee_enabled
+>   net: stmmac: set initial EEE policy configuration
+> 
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  3 +++
+>  drivers/net/phy/phy-c45.c                         | 11 +++++------
+>  drivers/net/phy/phy_device.c                      |  6 +++---
+>  include/linux/phy.h                               |  5 ++---
+>  4 files changed, 13 insertions(+), 12 deletions(-)
+> 
 
-Hmm. I'm not happy with how you're handling my patch. I would've liked
-some feedback on it (thanks for spotting that the set_eee case needed
-to pass the state to genphy_c45_an_config_eee_aneg()).
+Russell submitted the proposed patch already:
+https://patchwork.kernel.org/project/netdevbpf/patch/E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk/
+So there's no need for your patch 1.
 
-However, what's worse is, that the bulk of this patch is my work, yet
-you've effectively claimed complete authorship of it in the way you
-are submitting this patch. Moreover, you are violating the kernel
-submission rules, as the Signed-off-by does not include one for me
-(which I need to explicitly give.) I was waiting for the results of
-your testing before finalising the patch.
-
-The patch needs to be authored by me, the first sign-off needs to be
-me, then optionally Co-developed-by for you, and then your sign-off.
-
-See Documentation/process/submitting-patches.rst
-
-Thanks.
-
-pw-bot: cr
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
