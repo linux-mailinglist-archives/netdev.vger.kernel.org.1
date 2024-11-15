@@ -1,152 +1,138 @@
-Return-Path: <netdev+bounces-145347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5529B9CF27F
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:12:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C82F9CF29E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D96451F21F7F
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:12:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6BE72893FA
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270C71D5CEE;
-	Fri, 15 Nov 2024 17:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95421D5CF2;
+	Fri, 15 Nov 2024 17:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GqsH5gTV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZxrymZ8F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6081D54FA;
-	Fri, 15 Nov 2024 17:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A83171658
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 17:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731690753; cv=none; b=ILN4aLjCgGwBG0gCxcJZsb0XQ/JsCH06nDyTO7G8gf8oZwjGKX6wFjuwcs2hCgRWe9Ft+efD5cLKiExCCHvMUulyUMGYHNSb7qa+ARP2x8ZSEcEVV7C5NwyQwJ3Z2VMR47an+KwLG9dpKkL0a6Z9mgiRAfjfR3GM/v4faTE/z5g=
+	t=1731691035; cv=none; b=fDMFqsIRzPUcQy5kFMFBHH4FmgjMky6m/wWjkqJu3ZTnMfYmusSF9+gMkjE+r7h+57nn6CH9rb6VIZnrMv5BonOAdz8yMkOqdoZzqewpw34/tQ77yIrdjFBUD73IPeEa/QoXvxyecXAY8EDxH1xj3ZysNNrg1HjeamtsAF2od/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731690753; c=relaxed/simple;
-	bh=bhB0gzg7ULcR6uels+MV/k4I/DvKzdJ2mBUQeZLSbjw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S9Ok79LFIN0X6MMH2YWOu5yGIJ0aHFJDK/8zz7CG4+BKfgGM5WMrtO+/o9AQzReG5si+iG3YxhXr0ayOMVvuN8QPhOQj9ZBc1HSqHV/ANILI+grLVXB4HT7sGqEEjriKREVifCpO5NVtjipvxLwwQYNtm1KRHVZXe4kY5zBe07M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GqsH5gTV; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5cb6ca2a776so3377290a12.0;
-        Fri, 15 Nov 2024 09:12:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731690750; x=1732295550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bhB0gzg7ULcR6uels+MV/k4I/DvKzdJ2mBUQeZLSbjw=;
-        b=GqsH5gTVn6yJG5A5kmAXPChmPtowGIHck1UBUvyqYnyxCyJvh6G4abiM/lbpoDRPlR
-         lmYZO8hJqD5y3NrSp+WiwLLj7UJzJDVlvsBNlbUGsxQguEUi8dMw8pBYIgApcATbxv4A
-         8sDB2E+589J2rmZEnE+rSboQNAqlxoBQ7M7Hx899eLXe0aInrq2q6i2fNWS6Op5uweai
-         zPic6tjD4JsbUhChXgLaVm8JMhkCDcD0GwMCu7dRG1wzayMPLsAYxmJmuI6BXBrosdXR
-         AeehMZrUpt5FcpkuFvn0axgi7QFGOn+OP1bCCuhsYF3YH9EMCY6nitSYibECBP5pflPu
-         tRzA==
+	s=arc-20240116; t=1731691035; c=relaxed/simple;
+	bh=r3jBVnZGxSxtvhjYTBv4hEUufJwtB4WYBde+FGZT5Vw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F/6YYlcPn7o08+xZvh2cNjrtcg1fPaq1w0jzu9cNfhcRzTxuQoUE/P2B+jF/WCcLAfjeBnhex1SZi69QcqWonuvg0VFThp/rA5KGiOcZRjkoS6Rg7Oc5PN2LJ1dgUA3rJtfDJcfyYOQdO6z/CAGTo3/2FvExKtaCX0ldtLBIvyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZxrymZ8F; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731691032;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WNINNbdA0F6hP6eHCYu5y4eAOKcxmjVgS1A+60t/9YU=;
+	b=ZxrymZ8FHrcZbdfPiw7mDqS58bk2+NjctsEAcu53vllQbaeF7ANlGb7abWXlt//zO2vKZQ
+	d5XG3GK1UbJwUWOsfNIkqItdnh4Ix6LP9z4c9r6HEhxS4dBtXpfXfNIXl992nKBn6BLatp
+	4wJ/VVDI5/Uj9fiQkg5/vRlsBf70WXQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-344-4HOxJyLbOJieJ17bBsQmYA-1; Fri, 15 Nov 2024 12:17:10 -0500
+X-MC-Unique: 4HOxJyLbOJieJ17bBsQmYA-1
+X-Mimecast-MFC-AGG-ID: 4HOxJyLbOJieJ17bBsQmYA
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5016d21eso1080936f8f.3
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 09:17:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731690750; x=1732295550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bhB0gzg7ULcR6uels+MV/k4I/DvKzdJ2mBUQeZLSbjw=;
-        b=q5tvM+Q5M8DUKj6chx1ctW236G6/R2GcXP6axK4pf68O1VaiW59RdSuj1SojBlr3n/
-         ac9tqueD5bKdLfJcr8sg+97cOdnZ20dHVGMQY1FrtI09nkvRIATC6Lb2XBMMX2feRxLs
-         yvRvEPXhblBOpm4pTpeMPK2/hWqyUz0JpocBSB+mbxG2JHpeAfytk1e+92jHk+FgnF5P
-         d3egLw8sTfVkWjrFpVgODqQrYZZjdduZ79A0NdPGlPfBh07GZcsMGXAOipCF767mHSHn
-         O1j82jpa5nNniwdxGyuMo0m3/eJBntL+xPds0i/8nwGeE3BNmt+nD9EL+bQczAIFlo5U
-         rHFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXegcTgjVOj5tDJYR9Qqg04Qkz3GyCWbDepw3Y2jr/2BSYHcpaCkQ8kOSb/FCY9gMNXY9qVr+wlHWk=@vger.kernel.org, AJvYcCXtx4Lz6w/kWXOdpWfplMW8u1pI6Nt8ab/kk8MiDoPnI89jvIISB8tWVdm7ZyJiYGwoztph17ik@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgHm8RxVLBFiwKidG4CtzDn4qLXkcYYTHFiCPU8UOxBnh8mMwg
-	EWlLbcWXJ/T3ZU5q8//3UP7OnID8GLXxhwL3L53noH7ZFN2mFPeBNCEdJlp+8uAQ4FmkSFT+Zi9
-	I55QnKKsca8gsAXi2+datv0aVkI0=
-X-Google-Smtp-Source: AGHT+IGeQO9JrkrdGz9qSWb0eysHt0WKJLPy+8e2aMyIG/zcrHg2ZdPgrY8XJzyo6tnNEBbGGetATPKg9ON+TfTyF+U=
-X-Received: by 2002:a05:6402:2807:b0:5cf:8449:e757 with SMTP id
- 4fb4d7f45d1cf-5cf8fc8b6d8mr2585660a12.13.1731690749470; Fri, 15 Nov 2024
- 09:12:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731691029; x=1732295829;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WNINNbdA0F6hP6eHCYu5y4eAOKcxmjVgS1A+60t/9YU=;
+        b=p6VmP03B3cSZbasWsPia4dOl9EuL174pneLSSs+9W6zM3glnVNpx0dpZqdLp5i2Cvm
+         U137UypgPhwAZ0Ij/d+zZDdekDimwr5ciTBVkoNQT53Iphmk4JbqiRzU6LkMFTsZJtFc
+         pGO/vk481fhPYMOOHd2S6QBcPeZoEIr41gIp2jKucA3vIRKdeK4Iq/vY0vnAb3o2CNAn
+         N0qWK66okZsmsyoAnmikdUIteFxsCzlvfVEgAcaTEPPmKL8ogC6zx+7J4J7+KLqUsXrs
+         541tKnEQNE8mDh3CdD52SqK0ftQ9Jz/vVkd8FgPI+ceObBYmMcDhV8osW46DIa7jxtW1
+         DSzg==
+X-Forwarded-Encrypted: i=1; AJvYcCWt4iuUrBysOlw/Ic7e3VWUu1ykywhEAvSltOa+sm5mjh9uzuv43VOsB8IVrJTX7uJfSdRMJ2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJAP16JoYT/b8D8zDu+JIxU1H2Y00PAj0jsPcJ9a3tQFFIMUjf
+	6ZeHTrn5AJR5SPmEHSVe9k6O9SrNilqkxNIWh3mNC7k8YK4+peMBDg2GZ0Oxbe6l42EA7YuU9lw
+	J6aJQYlIIO33YAYtMKe3qI+tkpXlEDLZn7WeS3vQE4SDDThu3Ot75Gw==
+X-Received: by 2002:a05:6000:1541:b0:382:2976:c26c with SMTP id ffacd0b85a97d-3822976c427mr1615832f8f.31.1731691029630;
+        Fri, 15 Nov 2024 09:17:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHqsGWeYmupRnbdYRzMnGla3oGhpbGMYhra1dRBEvJ2Cnd/70uqsVI1qXDSJV35YPP52UmDlQ==
+X-Received: by 2002:a05:6000:1541:b0:382:2976:c26c with SMTP id ffacd0b85a97d-3822976c427mr1615812f8f.31.1731691029280;
+        Fri, 15 Nov 2024 09:17:09 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821ada2a8bsm4868047f8f.17.2024.11.15.09.17.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 09:17:08 -0800 (PST)
+Message-ID: <ed2ec1c2-65c7-4768-99f1-987e5fa39a54@redhat.com>
+Date: Fri, 15 Nov 2024 18:17:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113173222.372128-1-ap420073@gmail.com> <20241113173222.372128-4-ap420073@gmail.com>
- <20241114201529.32f9f1ab@kernel.org>
-In-Reply-To: <20241114201529.32f9f1ab@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sat, 16 Nov 2024 02:12:18 +0900
-Message-ID: <CAMArcTXP0PWw0DEXzW5u7to8S9rUbcyc5dLOR_ZSE1H2VzBXFA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/7] bnxt_en: add support for tcp-data-split
- ethtool command
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-tegra: Read iommu stream id
+ from device tree
+To: Parker Newman <parker@finest.io>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Thierry Reding <thierry.reding@gmail.com>,
+ Jonathan Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Parker Newman <pnewman@connecttech.com>
+References: <cover.1731685185.git.pnewman@connecttech.com>
+ <f2a14edb5761d372ec939ccbea4fb8dfd1fdab91.1731685185.git.pnewman@connecttech.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <f2a14edb5761d372ec939ccbea4fb8dfd1fdab91.1731685185.git.pnewman@connecttech.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 15, 2024 at 1:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
+On 11/15/24 17:31, Parker Newman wrote:
+> From: Parker Newman <pnewman@connecttech.com>
+> 
+> Read the iommu stream id from device tree rather than hard coding to mgbe0.
+> Fixes kernel panics when using mgbe controllers other than mgbe0.
 
-Hi Jakub,
-Thank you so much for the review!
+It's better to include the full Oops backtrace, possibly decoded.
 
-> On Wed, 13 Nov 2024 17:32:17 +0000 Taehee Yoo wrote:
-> > NICs that uses bnxt_en driver supports tcp-data-split feature by the
-> > name of HDS(header-data-split).
-> > But there is no implementation for the HDS to enable by ethtool.
-> > Only getting the current HDS status is implemented and The HDS is just
-> > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled=
-.
-> > The hds_threshold follows rx-copybreak value. and it was unchangeable.
-> >
-> > This implements `ethtool -G <interface name> tcp-data-split <value>`
-> > command option.
-> > The value can be <on> and <auto>.
-> > The value is <auto> and one of LRO/GRO/JUMBO is enabled, HDS is
-> > automatically enabled and all LRO/GRO/JUMBO are disabled, HDS is
-> > automatically disabled.
-> >
-> > HDS feature relies on the aggregation ring.
-> > So, if HDS is enabled, the bnxt_en driver initializes the aggregation r=
-ing.
-> > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
->
-> I may be missing some existing check but doesn't enabling XDP force
-> page_mode which in turn clears BNXT_FLAG_AGG_RINGS, including HDS ?
-> If user specifically requested HDS we should refuse to install XDP
-> in non-multibuf mode.
+> Tested with Orin AGX 64GB module on Connect Tech Forge carrier board.
 
-Sorry, I missed adding this check.
-I added a check to reject setting HDS when XDP is attached.
-But, I didn't add a check to reject attaching XDP when HDS is enabled.
+Since this looks like a fix, you should include a suitable 'Fixes' tag
+here, and specify the 'net' target tree in the subj prefix.
 
-bnxt driver doesn't allow setting HDS if XDP is attached even if it's
-multibuffer XDP. So, I will reject installing singlebuffer and
-multibuffer XDP if HDS is enabled.
+> @@ -241,6 +243,12 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
+>  	if (IS_ERR(mgbe->xpcs))
+>  		return PTR_ERR(mgbe->xpcs);
+> 
+> +	/* get controller's stream id from iommu property in device tree */
+> +	if (!tegra_dev_iommu_get_stream_id(mgbe->dev, &mgbe->iommu_sid)) {
+> +		dev_err(mgbe->dev, "failed to get iommu stream id\n");
+> +		return -EINVAL;
+> +	}
 
->
-> TBH a selftest under tools/testing/drivers/net would go a long way
-> to make it clear we caught all cases. You can add a dummy netdevsim
-> implementation for testing without bnxt present (some of the existing
-> python tests can work with real drivers and netdevsim):
-> https://github.com/linux-netdev/nipa/wiki/Running-driver-tests
+I *think* it would be better to fallback (possibly with a warning or
+notice) to the previous default value when the device tree property is
+not available, to avoid regressions.
 
-Thanks for that, I will try to use this selftest.
-I will add a dummy HDS feature for testing on the netdevsim.
+Thanks,
 
-Thanks a lot!
-Taehee Yoo
+Paolo
+
 
