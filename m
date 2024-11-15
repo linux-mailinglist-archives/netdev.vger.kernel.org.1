@@ -1,191 +1,174 @@
-Return-Path: <netdev+bounces-145131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABBA9CD546
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:12:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F34619CD547
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A74AB22BE8
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:12:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F228DB22C9A
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78B513774D;
-	Fri, 15 Nov 2024 02:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE9C2E414;
+	Fri, 15 Nov 2024 02:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="uWybSv8f";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YMu5XKYv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4IJZFVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532EC291E
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 02:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE7D10F2;
+	Fri, 15 Nov 2024 02:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731636746; cv=none; b=FpBdQghP40BGowpBpqpjxWg6mnD7eIpgHjO7XkB/hHzRLBEDFXJ3r0QcDMd7Effv0yXr1JqyRWaaYZ72o+pTp0ju6twyqPcki4BgM4fJCYu+1FsT2JEW6oW9BDS3Rgtbo0u4RxOm2SJcTBXBI8OIUXaHsJ0eQ7dTmFu+fpZPqF4=
+	t=1731636955; cv=none; b=RXnhaGal23Bu8FftG2nwJ5uxQokAQdNzbukpkuaVcga1KNRNe64MbcEjIeNDladZssF+bWhJJs5z0Co50MWSEOZzdAUqavIVdUjjxjcCbrYYvRvlSLo+qxO5TqmnQpyQpEhqzcdG3ZZp46Of/fc4tBNlQyLAtrYH7hjpykzUicg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731636746; c=relaxed/simple;
-	bh=5lbiM83GZNkB+v7CWSZI2xQfVUgvV8U01Akyh63m6vE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YPe7nYUdU6UaW7HUZ9Y2TvABJYjqrD6JKwOkQ9PNMUUSDzPFjuuqYC3pKwru6QLrsPg62lpOR1DE4Z8bHarMtv7lTdwVBnoux8M8eq/mCNv58B1IOsU/e8iqdAYoPyDV95sy0AyAioR6hVaJ70vCsLePF/56+bw2YBafZ3JBOI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=uWybSv8f; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YMu5XKYv; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id 1CED61140161;
-	Thu, 14 Nov 2024 21:12:23 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 14 Nov 2024 21:12:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm2; t=1731636742; x=1731723142; bh=3MXALFIPQ8U9cEaGFIFOj
-	M6+PoQZ7RDO/pK8wsmNRoE=; b=uWybSv8fphfHrZ1mUQq2P8oNZfN4PfHfkH5nI
-	vCIWih7z6/hjnRlbiparxwJgEe3IFu8Iyl6VnbhWyfvowWuRhMdKHCHVWeNQmKzG
-	KvFD9KJC9tRmB8ND7a2Pba+R01CfEOh18pHZff8V6S8G+Fhhcqsi3eebROu7xswP
-	Jc6nO96pYZ8lgQK9K41cFgwZAwYjUkOdvkV0xsHQwR16xKPX/oIyGPJdQyCLEyIF
-	DwwihnRTfkL+6sQSx0sgmgsS0+4EHlNeAUqED/IEFwUGpEpAyl96p4+0ShVpklDT
-	kXLA1UyDvM49UP+OQGbkW2ZOsIZKYJXOZU/OAJMx/oV+tQakw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731636742; x=1731723142; bh=3MXALFIPQ8U9cEaGFIFOjM6+PoQZ7RDO/pK
-	8wsmNRoE=; b=YMu5XKYvFG8zTi48xtjWq7mWdUipoLzqjLKnxFk2lO/BZ0WYL/Y
-	h7XoXHn2nywwPpbl1aGSolv2f19BYP1Dp9uX+qN/YCMhSp43xXY2mAlapyj3eITO
-	9gt+j4/ttuefZn9bmGQrLcyyxbiloonjduL32X0AOEqmv/3taAbkQA1TyPy7cBr0
-	XRSuig/K8JQj9urts677H5aro/CPtybgKfxmw+jjNiuiZGixdsK0zB2gN84ZHQGu
-	QeWLksiemhfsHRI3bRoKpAS3Dc+B0Zydj+O+FqJHhQ/uRNJrVg7J04KOqy1ldgKu
-	u7frhxMbu7fU3w7dUoGeRoZcVyVoLmnblBA==
-X-ME-Sender: <xms:Bq42Z157kbwvdBXumLE0t6qliaz3xEXa8ZULr5_VN6YUqvmzW54hdw>
-    <xme:Bq42Zy4XZoXvvKNixv3p8DOcTzwnm3pTVW2htGtTMkNWS5kTyVHaVTgaMy5pFtK7N
-    qudcU8bslieQWJIyg>
-X-ME-Received: <xmr:Bq42Z8eKE78ujClu63xvD6t9xVzkfRDpYFvx2dzoUfI-qZpddxQ86Pbb-m05GEaTITlTQNvej_V84mojid9NKoCo4gXMmvFGCnQzfurcQYK1-LYp1Fwr>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdefgdegvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdejtd
-    dmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhi
-    vghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpedvge
-    fgtefgleehhfeufeekuddvgfeuvdfhgeeljeduudfffffgteeuudeiieekjeenucevlhhu
-    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuh
-    hurdighiiipdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopegvtghrvggvrdigihhlihhngiesghhmrghilhdrtghomhdprhgtphhtthhopehjug
-    grmhgrthhosehfrghsthhlhidrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtohepmhhkuhgsvggtvghksehsuhhsvgdrtgiipdhrtg
-    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrthhinhdr
-    lhgruheslhhinhhugidruggvvhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehkvghrnhgvlhdqthgvrghmsehmvghtrgdrtgho
-    mh
-X-ME-Proxy: <xmx:Bq42Z-JMWLCKLTkcmtxcwmO0kvrPz0LykzFkeBT8PP8p6G9WWjAPYw>
-    <xmx:Bq42Z5KMR4O7fqN3NEDIBCJGmg1RWYbvja2639RGzkYEp2_9A6HAnQ>
-    <xmx:Bq42Z3yiQOHh5sdckiQKxONkODnTPyi2gO2eC9rgIE5IK4qT75QYdg>
-    <xmx:Bq42Z1Iobr_rNtwJDJFND0hVXSdiRQlojIoLa7Vjiw92t9AI1wKxcg>
-    <xmx:Bq42Zw-z5mTAVRGDQHOIUEg4bFMl-Dk92cO9ZNOCRNb0Pjj_H8edb_5z>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 14 Nov 2024 21:12:21 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: ecree.xilinx@gmail.com,
-	jdamato@fastly.com,
-	davem@davemloft.net,
-	mkubecek@suse.cz
-Cc: kuba@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH ethtool-next v4] rxclass: Make output for RSS context action explicit
-Date: Thu, 14 Nov 2024 19:12:08 -0700
-Message-ID: <6f294267b30c93707509d742c34461668a0efc68.1731636671.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1731636955; c=relaxed/simple;
+	bh=0e+N3+/Rsp2tV5GwCYO79NhtdRtJat6VYstk/st7UQY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iGC6XmiKfgft6ErxRAA7d4DWix8eJuHUuwSLhLM5zW+t+XRkINUK4z0byK4TZ/U7ruaQlVJt6ltw+vu/vFtmgndF5mPtNQrbm9rydAotm6URzYB1wZrnPx42gry/qBrprV1P0TkvZ/li0dIniJ8RiJ70RYvODDueEOkmpQjABtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4IJZFVo; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53da24e9673so1320876e87.2;
+        Thu, 14 Nov 2024 18:15:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731636951; x=1732241751; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ippxyC1ssto08XSgY7z8EqhqA5JTUkFz85no0waffM0=;
+        b=m4IJZFVoi9jGU9XXvh61c+yuIUMqy0H8iyK6yHzZsrI1rMFs7N38YcfSX0fGtoLN/j
+         imKscFfayjDxhKm/5z8j4Ex/KJH9DKwRo25kVDPPj7LhkF2oLEj8dIIQHmDI/6erNFMa
+         Hkgei35zlrRkfZzeO3+EkmdumsLgA/vtUwREOQZQMM4nL9fuEwVFJ/POHtgGmxHtiaLv
+         YLFKP6upIiAIW7tlecb2KIY5qzacHkPq0s4bzWj4ARTr36BnAUjBZpdp1n9jcaMOXP/4
+         mj+XpFy08v0tec9nn6I1G9PBBZ0EjDE0e6qs3qxq+rjWf0XM44h540EjuoV3Lj6UrO1C
+         Qbrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731636951; x=1732241751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ippxyC1ssto08XSgY7z8EqhqA5JTUkFz85no0waffM0=;
+        b=Tpb9MdzRqTnTs3iivvOscuKS5hsqlLsPp/0ek/bUdgNsM09A+kStPIvj6I+BUT1WeT
+         dStPQjydEqFp1RhyPFCY0KWrFG1IRv2nupfDOW+8qah0kn67W2Hrq9lx8hJg2PiE2+bi
+         hbk3VJOFSIIa77cpQPwdkCkdKxd3qcbXjAdG3FqN/tUgyW6HGpEfgzFqfXbFwq9lrMB2
+         kKuc7Jd/SavJ2q5dc4w/yOhvmtqB2mFY8nOrtPyjJqhIMUeR+fJol5CwF/g3CoEcXxg+
+         884/1mMrb2ibQrkvgxIs9gsc6SBYEBJBpWgrJajckCdOYU3QvdO+zTfSQCYTUt4YczwN
+         ZQPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhIr79B6fDfRChOdbHG2fONhmtg7zdiMNThoTtzdWFLyXi6BfdEydvlN1gt4dRNuqL6bP+rvv1fO0Gpi+K32w=@vger.kernel.org, AJvYcCWX0aIDN8S0o6f6pLhtkldAvCCz5zfI3oEszhfzuCFJ9LhTQwWGU5k3rHQ07QCrv5m2vqc+qsI0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmsuDbusjr5ofZHu+8hKNGBEcDdx+ZsHvKnTDu629MBb374pzp
+	Y/BoQZjyOi9hsEWMnsro5+SN3dqS5FoT7DXNvDuuPhlGVYxRO/LSOOembntE4Y+nMhdyDoSFXkC
+	Lr1R5oqdmfL7QDveKbmzeQ+rjr78=
+X-Google-Smtp-Source: AGHT+IGec/+eQEuADDAF4XHCOSRzs5rnpKkoYFiK33Kqo560i8muQqdhYW3bBEy6l7LYxLk96WibNEGaNf5KGCB5/1A=
+X-Received: by 2002:ac2:4e06:0:b0:53b:1f14:e11a with SMTP id
+ 2adb3069b0e04-53dab29c89cmr266722e87.15.1731636951193; Thu, 14 Nov 2024
+ 18:15:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
+ <20241115-sockptr-copy-fixes-v1-1-d183c87fcbd5@rbox.co> <156ce25b-4344-40cd-9c72-1a45e8f77b38@davidwei.uk>
+In-Reply-To: <156ce25b-4344-40cd-9c72-1a45e8f77b38@davidwei.uk>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 14 Nov 2024 21:15:38 -0500
+Message-ID: <CABBYNZLbR22cWaXA4YNwtE8=+VfdGYR5oN6TSJ-MwXCuP3=6hw@mail.gmail.com>
+Subject: Re: [PATCH net 1/4] bluetooth: Improve setsockopt() handling of
+ malformed user input
+To: David Wei <dw@davidwei.uk>
+Cc: Michal Luczaj <mhal@rbox.co>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Currently `ethtool -n` prints out misleading output if the action for an
-ntuple rule is to redirect to an RSS context. For example:
+Hi David,
 
-    # ethtool -X eth0 hfunc toeplitz context new start 24 equal 8
-    New RSS context is 1
+On Thu, Nov 14, 2024 at 7:42=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2024-11-14 15:27, Michal Luczaj wrote:
+> > The bt_copy_from_sockptr() return value is being misinterpreted by most
+> > users: a non-zero result is mistakenly assumed to represent an error co=
+de,
+> > but actually indicates the number of bytes that could not be copied.
+> >
+> > Remove bt_copy_from_sockptr() and adapt callers to use
+> > copy_safe_from_sockptr().
+> >
+> > For sco_sock_setsockopt() (case BT_CODEC) use copy_struct_from_sockptr(=
+) to
+> > scrub parts of uninitialized buffer.
+> >
+> > Opportunistically, rename `len` to `optlen` in hci_sock_setsockopt_old(=
+)
+> > and hci_sock_setsockopt().
+> >
+> > Fixes: 51eda36d33e4 ("Bluetooth: SCO: Fix not validating setsockopt use=
+r input")
+> > Fixes: a97de7bff13b ("Bluetooth: RFCOMM: Fix not validating setsockopt =
+user input")
+> > Fixes: 4f3951242ace ("Bluetooth: L2CAP: Fix not validating setsockopt u=
+ser input")
+> > Fixes: 9e8742cdfc4b ("Bluetooth: ISO: Fix not validating setsockopt use=
+r input")
+> > Fixes: b2186061d604 ("Bluetooth: hci_sock: Fix not validating setsockop=
+t user input")
+> > Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> > ---
+> >  include/net/bluetooth/bluetooth.h |  9 ---------
+> >  net/bluetooth/hci_sock.c          | 14 +++++++-------
+> >  net/bluetooth/iso.c               | 10 +++++-----
+> >  net/bluetooth/l2cap_sock.c        | 20 +++++++++++---------
+> >  net/bluetooth/rfcomm/sock.c       |  9 ++++-----
+> >  net/bluetooth/sco.c               | 11 ++++++-----
+> >  6 files changed, 33 insertions(+), 40 deletions(-)
+> >
+> ...
+> > diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> > index f48250e3f2e103c75d5937e1608e43c123aa3297..1001fb4cc21c0ecc7bcdd3e=
+a9041770ede4f27b8 100644
+> > --- a/net/bluetooth/rfcomm/sock.c
+> > +++ b/net/bluetooth/rfcomm/sock.c
+> > @@ -629,10 +629,9 @@ static int rfcomm_sock_setsockopt_old(struct socke=
+t *sock, int optname,
+> >
+> >       switch (optname) {
+> >       case RFCOMM_LM:
+> > -             if (bt_copy_from_sockptr(&opt, sizeof(opt), optval, optle=
+n)) {
+> > -                     err =3D -EFAULT;
+> > +             err =3D copy_safe_from_sockptr(&opt, sizeof(opt), optval,=
+ optlen);
+> > +             if (err)
+> >                       break;
+> > -             }
+>
+> This will return a positive integer if copy_safe_from_sockptr() fails.
 
-    # ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
-    Added rule with ID 0
+What are you talking about copy_safe_from_sockptr never returns a
+positive value:
 
-    # ethtool -n eth0 rule 0
-    Filter: 0
-            Rule Type: Raw IPv6
-            Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-            Dest IP addr: <redacted> mask: ::
-            Traffic Class: 0x0 mask: 0xff
-            Protocol: 0 mask: 0xff
-            L4 bytes: 0x0 mask: 0xffffffff
-            RSS Context ID: 1
-            Action: Direct to queue 0
+ * Returns:
+ *  * -EINVAL: @optlen < @ksize
+ *  * -EFAULT: access to userspace failed.
+ *  * 0 : @ksize bytes were copied
 
-The above output suggests that the HW will direct to queue 0 where in
-reality queue 0 is just the base offset from which the redirection table
-lookup in the RSS context is added to.
+> Shouldn't this be:
+>
+> err =3D -EFAULT;
+> if (copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen))
+>         break;
 
-Fix by making output more clear. Also suppress base offset queue for the
-common case of 0. Example of new output:
 
-    # ./ethtool -n eth0 rule 0
-    Filter: 0
-            Rule Type: Raw IPv6
-            Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-            Dest IP addr: <redacted> mask: ::
-            Traffic Class: 0x0 mask: 0xff
-            Protocol: 0 mask: 0xff
-            L4 bytes: 0x0 mask: 0xffffffff
-            Action: Direct to RSS Context 1
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Tested-by: Joe Damato <jdamato@fastly.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
-Changes from v3:
-* Fixup commit message to match changes in v2
-
-Changes from v2:
-* Change capitalization and formatting
-
-Changes from v1:
-* Fix compile error
-* Add queue base offset
- rxclass.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/rxclass.c b/rxclass.c
-index f17e3a5..1e202cc 100644
---- a/rxclass.c
-+++ b/rxclass.c
-@@ -248,13 +248,17 @@ static void rxclass_print_nfc_rule(struct ethtool_rx_flow_spec *fsp,
- 
- 	rxclass_print_nfc_spec_ext(fsp);
- 
--	if (fsp->flow_type & FLOW_RSS)
--		fprintf(stdout, "\tRSS Context ID: %u\n", rss_context);
--
- 	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
- 		fprintf(stdout, "\tAction: Drop\n");
- 	} else if (fsp->ring_cookie == RX_CLS_FLOW_WAKE) {
- 		fprintf(stdout, "\tAction: Wake-on-LAN\n");
-+	} else if (fsp->flow_type & FLOW_RSS) {
-+		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
-+
-+		fprintf(stdout, "\tAction: Direct to RSS Context %u", rss_context);
-+		if (queue)
-+			fprintf(stdout, " (queue base offset: %llu)", queue);
-+		fprintf(stdout, "\n");
- 	} else {
- 		u64 vf = ethtool_get_flow_spec_ring_vf(fsp->ring_cookie);
- 		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
--- 
-2.46.0
-
+--=20
+Luiz Augusto von Dentz
 
