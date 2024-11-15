@@ -1,239 +1,101 @@
-Return-Path: <netdev+bounces-145231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A069CDC8E
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:30:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44449CDCF5
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724B7B24DCF
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69A831F238A7
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F6618FDDB;
-	Fri, 15 Nov 2024 10:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lDPVSNrB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7941B4F24;
+	Fri, 15 Nov 2024 10:49:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A55818950A;
-	Fri, 15 Nov 2024 10:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F5619E990
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 10:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731666625; cv=none; b=h8/rewGa8A3qBPihJGuChtyF8SBlnURpQTzc7NR8LvncvPQ57t047dor1DBNJ9zlPotTvhtGGlHnGNoyoVMYpBRTDfPfcGpHh8/nyNxoaYfGOkp4Zoqns9hrZfRirJGxIcwIhPc1dRUIimpAbtLtqmXzwc3YP1s6deLnuXAdE+U=
+	t=1731667766; cv=none; b=u9IA7pzmBXwa+0xJfLba1WVdj1Z6vIt7x2Q6ki7YeUiFGE1Ry6n8SPjHT9G4C/1rOkZL4KyDLt4VhKpvpm67JAJOVY5u2k2G/zFRuFd44CQ3xJaEArbs2hjw9hderW87YIUTpTWpzxjOqo/DGYT5UyhoMuyMWQhOO9wWJtFF05w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731666625; c=relaxed/simple;
-	bh=4vNgn+SsJajunpKXuBkZ//5pvqR9w+o+EcfCWsemrGQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o+4H83ducNF5wmlIvDgT3Pgibbh8TtyO5Y4OHaDtmF5AwH+sxnjdrP3uSpWUZ5OkWyLWjavneV/Hh06d1lFIBcd+Za9dSEUGgzurCgNsjRRO79WZnxnF1sY+mhn21KFEvYWVPGw82OC5la0bd7WjXDLVyEPcyq2qCa3eWMydtIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lDPVSNrB; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731666622; x=1763202622;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Nj6S1uQvHPGOTiJGqSfDYPUjpMdCEBMRTMmFsqU5FDo=;
-  b=lDPVSNrBXdMuOD1p54HCK/AYRlgHaF7Oezqy2DNnhMTSxiZuMD0FnUaw
-   rVyfctIZ76Jykt06ElF9ED+z4FFwpfxQV3RrFAHxK5gd4Gt6gGGRjUNEp
-   odLAH+L7nvZ64WE2qd63Ch7iCtPoekF6/yOv5u+0EXpegGdQvPHv1XeFX
-   M=;
-X-IronPort-AV: E=Sophos;i="6.12,156,1728950400"; 
-   d="scan'208";a="147826196"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 10:30:20 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:15220]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
- id e0f35240-8bc2-40ae-9f40-746d1c98b040; Fri, 15 Nov 2024 10:30:20 +0000 (UTC)
-X-Farcaster-Flow-ID: e0f35240-8bc2-40ae-9f40-746d1c98b040
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 15 Nov 2024 10:30:20 +0000
-Received: from ip-10-253-83-51.amazon.com (10.253.83.51) by
- EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 15 Nov 2024 10:30:18 +0000
-From: Alexander Graf <graf@amazon.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<kvm@vger.kernel.org>, Asias He <asias@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
-	<davem@davemloft.net>, Stefano Garzarella <sgarzare@redhat.com>, "Stefan
- Hajnoczi" <stefanha@redhat.com>
-Subject: [PATCH] vsock/virtio: Remove queued_replies pushback logic
-Date: Fri, 15 Nov 2024 10:30:16 +0000
-Message-ID: <20241115103016.86461-1-graf@amazon.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1731667766; c=relaxed/simple;
+	bh=YBWq//aMFNh7AbrBVww1FmxzHMu3uKd+Ddt5w5rf6MQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u+c/3umIUwGPvx4tTfnKWYX2tt9DmbmhcXsSF2++VIzymH9wPyub+DILnWj3RNJ1xdvUKURkH6IOWDihqwjUpKP4VeplcMqaJe9Vu544vhuYNBaurYsGOVep/luS6op+nMoUydEwfFDBHImXMDt5dkn+k2Mw/HkvsRN2/vBplIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83ae0af926dso171054339f.2
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 02:49:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731667764; x=1732272564;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SgZi5loVeC2B/qYjithZ8jk/6eHuBMqIP1U9qENvnp4=;
+        b=H3zG21eEabXHEMYXj5Aa31UqYCJbYcs8ZuSY1kcVqSiYZs/dB8Yixpmklh/pHpLnyZ
+         P84QaH9MwA7NG9lPi7T/ShxtwNj+U8cdGOyV7ha2MHiMFmYbI2jqSv5N2gEDTh4m1qQX
+         7Bg4gCU8uoXZULKFn88EfTKderShKLRZ8dyDHoMWMzfpJ4vFWQrezYJ6TJBlXBU8WGUO
+         QhjC6YcPaujKjP1xR/QpOsSA1Ga+/La0bYmOPMR2aG9guekVJiyLy2vlrMms9eUQmih1
+         xUycdY42x0LiEJqNaWjG3K9vR7ySt3BxL8xTJ1GPesxxI9apaaIxHQs6biOBeaU7ZV+G
+         zYzw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWltGrtv3wX3n/LYtLqrOVHlJ6jv8a/7dU1geC75FPmSfqIxX00JGmx2SDGX46Wg61MuD2oIE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVXWsu2MsvMefri/Wz90ITkJHMpGPfRKHNXuHdiq3Io4o+Nn+/
+	nMwQYnrAV8vq6gI7QIYbW3OebOU/nIuq8xnLhbuXPB22R7WEAKPVS94JCOQdLllqLdAZCpM4sD8
+	9KwfMt/non7v031pWqlUFB16aQTuup0WG5o8IAXb0nNqZOKc8ycFYyCE=
+X-Google-Smtp-Source: AGHT+IGf8YOFsFfRlgu/78sYo9Xhztfmj2R8J7nD5wC4MTFFueOKVE0QcuSl/LSymva9Cyje0Zgo4i6QJbmE0JllsyQeC3UaPRmF
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:b43:b0:3a7:158d:63a2 with SMTP id
+ e9e14a558f8ab-3a748077d9cmr18832205ab.18.1731667763990; Fri, 15 Nov 2024
+ 02:49:23 -0800 (PST)
+Date: Fri, 15 Nov 2024 02:49:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67372733.050a0220.2a2fcc.0077.GAE@google.com>
+Subject: [syzbot] Monthly hams report (Nov 2024)
+From: syzbot <syzbot+listb3995cb5944bf0cec442@syzkaller.appspotmail.com>
+To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Ever since the introduction of the virtio vsock driver, it included
-pushback logic that blocks it from taking any new RX packets until the
-TX queue backlog becomes shallower than the virtqueue size.
+Hello hams maintainers/developers,
 
-This logic works fine when you connect a user space application on the
-hypervisor with a virtio-vsock target, because the guest will stop
-receiving data until the host pulled all outstanding data from the VM.
+This is a 31-day syzbot report for the hams subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/hams
 
-With Nitro Enclaves however, we connect 2 VMs directly via vsock:
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 35 have already been fixed.
 
-  Parent      Enclave
+Some of the still happening issues:
 
-    RX -------- TX
-    TX -------- RX
+Ref Crashes Repro Title
+<1> 1684    Yes   WARNING: refcount bug in ax25_release (3)
+                  https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
+<2> 360     Yes   KMSAN: uninit-value in ax25cmp (3)
+                  https://syzkaller.appspot.com/bug?extid=74161d266475935e9c5d
+<3> 20      Yes   KMSAN: uninit-value in nr_route_frame
+                  https://syzkaller.appspot.com/bug?extid=f770ce3566e60e5573ac
+<4> 2       No    possible deadlock in nr_rt_device_down (3)
+                  https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
 
-This means we now have 2 virtio-vsock backends that both have the pushback
-logic. If the parent's TX queue runs full at the same time as the
-Enclave's, both virtio-vsock drivers fall into the pushback path and
-no longer accept RX traffic. However, that RX traffic is TX traffic on
-the other side which blocks that driver from making any forward
-progress. We're not in a deadlock.
-
-To resolve this, let's remove that pushback logic altogether and rely on
-higher levels (like credits) to ensure we do not consume unbounded
-memory.
-
-Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
-Signed-off-by: Alexander Graf <graf@amazon.com>
 ---
- net/vmw_vsock/virtio_transport.c | 51 ++------------------------------
- 1 file changed, 2 insertions(+), 49 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 64a07acfef12..53e79779886c 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -44,8 +44,6 @@ struct virtio_vsock {
- 	struct work_struct send_pkt_work;
- 	struct sk_buff_head send_pkt_queue;
- 
--	atomic_t queued_replies;
--
- 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
- 	 * must be accessed with rx_lock held.
- 	 */
-@@ -171,17 +169,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
- 
- 		virtio_transport_deliver_tap_pkt(skb);
- 
--		if (reply) {
--			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
--			int val;
--
--			val = atomic_dec_return(&vsock->queued_replies);
--
--			/* Do we now have resources to resume rx processing? */
--			if (val + 1 == virtqueue_get_vring_size(rx_vq))
--				restart_rx = true;
--		}
--
- 		added = true;
- 	}
- 
-@@ -218,9 +205,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
- 		goto out_rcu;
- 	}
- 
--	if (virtio_vsock_skb_reply(skb))
--		atomic_inc(&vsock->queued_replies);
--
- 	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
- 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
- 
-@@ -233,7 +217,7 @@ static int
- virtio_transport_cancel_pkt(struct vsock_sock *vsk)
- {
- 	struct virtio_vsock *vsock;
--	int cnt = 0, ret;
-+	int ret;
- 
- 	rcu_read_lock();
- 	vsock = rcu_dereference(the_virtio_vsock);
-@@ -242,17 +226,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
- 		goto out_rcu;
- 	}
- 
--	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
--
--	if (cnt) {
--		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
--		int new_cnt;
--
--		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
--		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
--		    new_cnt < virtqueue_get_vring_size(rx_vq))
--			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
--	}
-+	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
- 
- 	ret = 0;
- 
-@@ -323,18 +297,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
- 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
- }
- 
--/* Is there space left for replies to rx packets? */
--static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
--{
--	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
--	int val;
--
--	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
--	val = atomic_read(&vsock->queued_replies);
--
--	return val < virtqueue_get_vring_size(vq);
--}
--
- /* event_lock must be held */
- static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
- 				       struct virtio_vsock_event *event)
-@@ -581,14 +543,6 @@ static void virtio_transport_rx_work(struct work_struct *work)
- 			struct sk_buff *skb;
- 			unsigned int len;
- 
--			if (!virtio_transport_more_replies(vsock)) {
--				/* Stop rx until the device processes already
--				 * pending replies.  Leave rx virtqueue
--				 * callbacks disabled.
--				 */
--				goto out;
--			}
--
- 			skb = virtqueue_get_buf(vq, &len);
- 			if (!skb)
- 				break;
-@@ -735,7 +689,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
- 
- 	vsock->rx_buf_nr = 0;
- 	vsock->rx_buf_max_nr = 0;
--	atomic_set(&vsock->queued_replies, 0);
- 
- 	mutex_init(&vsock->tx_lock);
- 	mutex_init(&vsock->rx_lock);
--- 
-2.40.1
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-
-
-Amazon Web Services Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
+You may send multiple commands in a single email message.
 
