@@ -1,160 +1,115 @@
-Return-Path: <netdev+bounces-145404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 558839CF648
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FE79CF64E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFE74282CEC
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:43:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCF41282E40
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249251E883B;
-	Fri, 15 Nov 2024 20:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684AA1E3762;
+	Fri, 15 Nov 2024 20:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1dmWGRN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KgnXoeXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980001E6DCF;
-	Fri, 15 Nov 2024 20:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BC61E284B;
+	Fri, 15 Nov 2024 20:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731703321; cv=none; b=d00eS+Rff77RHwW18VuClTda7qaojqp7ybypSIW/ZIHUmiTabzAJQcJAXIajCzOkMaiJVCv3h3g42sVDZVyni8Nh5tKp/xqAWtgmCQuRgqoMTjie9r4vrCoYtRc6zWaIuonymvcACGyFQMUmTrRqwn0oHbl5+n9EZm8soRB05Fc=
+	t=1731703392; cv=none; b=Z/EEsM8J2UXwsFwGlb93HEV5ov/WvgKjJEuKjwIyv1lBT5B3C9sr+28HI5PoVjYoUiTcnjn16O8qkJ7SGSV/4SD1kypBvldz3Ir5Zc7f/qpT1sN+zRoYNtP7Cz/ji1SK+IoLdQc7s6PevMAWPDIjd1jGxsqseFHlGVUUrIoKyg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731703321; c=relaxed/simple;
-	bh=atjNlLzigxLFocWOYZ3P9pm/bgS/RCNfQxHKO7I/vHw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eWWoDNV1Cp1sbAFfr9vD32/nW/lzpfp4E1hrtpgBc84Ys/MZO6RJSJ09dSD0Iw8GNS6JGDdy1bCWSgxf/4NJ3tlRxa4070CI//FWuLyGrbbFHZ62QSqZIiou0UrXV0lXRX+OwocZkdIT1vAuniMuZMdXCy6gu1N3oZoIIFyoSkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f1dmWGRN; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7f12ba78072so1766835a12.2;
-        Fri, 15 Nov 2024 12:41:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731703319; x=1732308119; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fNJMkhvDACNxbVOybBT2qMig0uprGHP3aEgGM+RIyTQ=;
-        b=f1dmWGRNq5GqWy6RhwX6EhXh6sdpHQIqAQLBoons3wJlYoMNi0LCs0T2AoseiIDg+h
-         PgbGoUBqGggk/wLpJe3tn5XEC14VNbXNLlig09dQSCXiaEFaiZpfXUrqIEd0VstbAQUx
-         RVkrYPjfpLLPocTGaE0LrLi7SesfBWwvR8n6sowjOG5A0bLjxNRrYjMujtvbap0bts08
-         pd/edyDG8pOXaYNeSF5lclwulL+cjVbmIAcjCvnpQBef9i5zdhck1Z7W6EKyV1LsmEVN
-         02RRY7YwGBB9eeTXabOeH/A8fIhf3LVDAUeurGth6Jy9AOztxLq4IGxVXMHRsVOw+Uun
-         ixpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731703319; x=1732308119;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fNJMkhvDACNxbVOybBT2qMig0uprGHP3aEgGM+RIyTQ=;
-        b=bZk6L6MX9Vy76v+M/Zii7qGq1xKExMeJT8bTZIsj9JAr1Fa0ceZHjIW3FM6h2XqwNg
-         k++TDxLXwvboD+PDQJ+BG73+pHZyM2a4A6hAahkAJlmOUfs+8mgFLXDXeA1AwfWmCrYg
-         egYo9k/AoW3HDn5FuDWj4p+gJKfKIJIoMyh0DqYvlhrFzAOTPmrmultRQIguO5pBhBOE
-         XF4IA3UaO5bPQBvfn/T2zxSvz4ZUpeBd3cO4C8AbkpzoR512trbUpvMhOoP1g3LURk4a
-         OS9+HhSgduVfBx48RZ194n5wGomx+JmBB3dOVyOr7tQ7EQz5JnW7bNn2730+DWoJMOzQ
-         gcHg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoyyTzS2LApCRsgc3uWfZBkwa4e+alxybOlpCYVPwBMSOPZA8mxkjRlrvkI3W5Gzv6ZuJ3dLWlmaJ3nEw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF6L7K29IyueIlatHYwFpnvLGmqXO4D1PyvF7oXUsXsaYIzCBq
-	VOwKGk5u8m+o4RONMMTmSyUbAy4iNryU8OflxBnPexgWLByWbhbIWtw+nVyI
-X-Google-Smtp-Source: AGHT+IG4dLahHtutDalVm2ymCu3Q/BejwwfktlNjcCOSUUEWRykLPVrhxmsHRMjGgB7cdIbmX19kEA==
-X-Received: by 2002:a05:6a20:2590:b0:1d8:a9c0:8853 with SMTP id adf61e73a8af0-1dc90b39de6mr5457055637.23.1731703318673;
-        Fri, 15 Nov 2024 12:41:58 -0800 (PST)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724771e1ffesm1782744b3a.155.2024.11.15.12.41.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 12:41:57 -0800 (PST)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1731703392; c=relaxed/simple;
+	bh=Ccs4+fxbEG0SXm2z2piX1zTfr7x8e6ZLDBkf7LQCW0A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ACVH3rqAV6HSBkZkHxyiu6h/LxPU6mvArFNAdpHcLvMjFs0s/1nEXJ4WNUUVEyyP+CZyM72ED3P9kPSlh+iOi3jmC9KC/zWUTiEVxaWLUJObKPuLqUxEDty5MKN9lGoKZHQJSW/+MzrQZeBVibWwTgU6nXG7jood59FQkF7nRHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KgnXoeXy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9D32C4CED4;
+	Fri, 15 Nov 2024 20:43:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731703391;
+	bh=Ccs4+fxbEG0SXm2z2piX1zTfr7x8e6ZLDBkf7LQCW0A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KgnXoeXyOJo2ZDRajin/E3J7ga/4Y72rL6+Oio1pyTuJArJsxFTfbzL+uRUbO0Rey
+	 /nUwu50ecx70AEdAn3UO0Cg8AtZlK4uYqKucFzUIk3pLMf4c/7SjDX4RanolvPYXok
+	 4XNh6cI3GmJwKqNIQ3yCioEXnBr9OeZOOUmjka6hIdFTEJHnOmhSJtLG3QC60ETbcN
+	 lAiVpXJmPS8oQth4ITqqj7pULcSk8JlqptS3N+W/+Dz1/oc/U4iQZWW4l8AA20MAif
+	 DtSDnaLvsRZmB8hFk71Msmf2t7cfVyE2DY1AQjEX32RTQzw8b7L4e9tTkFZKhUwVBg
+	 bREL38GLX1izg==
+From: Kees Cook <kees@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 5/5] net: fsl_pq_mdio: return directly in probe
-Date: Fri, 15 Nov 2024 12:41:49 -0800
-Message-ID: <20241115204149.6887-6-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241115204149.6887-1-rosenp@gmail.com>
-References: <20241115204149.6887-1-rosenp@gmail.com>
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Christian Benvenuti <benve@cisco.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Simon Horman <horms@kernel.org>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Takeru Hayasaka <hayatake396@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH 0/3] UAPI: ethtool: Avoid flex-array in struct ethtool_link_settings
+Date: Fri, 15 Nov 2024 12:43:02 -0800
+Message-Id: <20241115204115.work.686-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1101; i=kees@kernel.org; h=from:subject:message-id; bh=Ccs4+fxbEG0SXm2z2piX1zTfr7x8e6ZLDBkf7LQCW0A=; b=owGbwMvMwCVmps19z/KJym7G02pJDOnmmyKKYlbuD2BQyuOW2RWzxnWZtJ+M3Qz1lZt09tiJR ZvFbCztKGVhEONikBVTZAmyc49z8XjbHu4+VxFmDisTyBAGLk4BmMhqUYa/ssfXyZ/s3ae/ZFGU 8xn95deMgyQda/0T5gXkHpLxFVDqY/gfyF204Jj5EtXzfHGKtpuSF+6cz3In5wPv/V2Z00/WP+f mAAA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-Instead of generating two errors in probe, just return directly to
-generate one.
+Hi,
 
-mdiobus_register was switched away from the of_ variant as no children
-are being used.
+This reverts the tagged struct group in struct ethtool_link_settings and
+instead just removes the flexible array member from Linux's view as it
+is entirely unused.
 
-No more need for a _remove function.
+-Kees
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/freescale/fsl_pq_mdio.c | 20 +-------------------
- 1 file changed, 1 insertion(+), 19 deletions(-)
+Kees Cook (3):
+  Revert "net: ethtool: Avoid thousands of
+    -Wflex-array-member-not-at-end warnings"
+  Revert "UAPI: ethtool: Use __struct_group() in struct
+    ethtool_link_settings"
+  UAPI: ethtool: Avoid flex-array in struct ethtool_link_settings
 
-diff --git a/drivers/net/ethernet/freescale/fsl_pq_mdio.c b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-index 640929a4562d..12b6c11d9cf9 100644
---- a/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-+++ b/drivers/net/ethernet/freescale/fsl_pq_mdio.c
-@@ -415,7 +415,6 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	struct mii_bus *new_bus;
- 	struct device_node *np;
- 	struct resource *res;
--	int err;
- 
- 	data = device_get_match_data(dev);
- 	if (!data) {
-@@ -465,7 +464,6 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	priv->regs = priv->map + data->mii_offset;
- 
- 	new_bus->parent = dev;
--	platform_set_drvdata(pdev, new_bus);
- 
- 	if (data->get_tbipa) {
- 		for_each_child_of_node(np, tbi) {
-@@ -490,22 +488,7 @@ static int fsl_pq_mdio_probe(struct platform_device *pdev)
- 	if (data->ucc_configure)
- 		data->ucc_configure(res->start, res->end);
- 
--	err = of_mdiobus_register(new_bus, np);
--	if (err) {
--		dev_err(dev, "cannot register %s as MDIO bus\n", new_bus->name);
--		return err;
--	}
--
--	return 0;
--}
--
--
--static void fsl_pq_mdio_remove(struct platform_device *pdev)
--{
--	struct device *device = &pdev->dev;
--	struct mii_bus *bus = dev_get_drvdata(device);
--
--	mdiobus_unregister(bus);
-+	return devm_mdiobus_register(dev, new_bus);
- }
- 
- static struct platform_driver fsl_pq_mdio_driver = {
-@@ -514,7 +497,6 @@ static struct platform_driver fsl_pq_mdio_driver = {
- 		.of_match_table = fsl_pq_mdio_match,
- 	},
- 	.probe = fsl_pq_mdio_probe,
--	.remove = fsl_pq_mdio_remove,
- };
- 
- module_platform_driver(fsl_pq_mdio_driver);
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  6 +--
+ .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    |  4 +-
+ .../ethernet/chelsio/cxgb4vf/cxgb4vf_main.c   |  2 +-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |  2 +-
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  4 +-
+ include/linux/ethtool.h                       |  2 +-
+ include/uapi/linux/ethtool.h                  | 40 ++++++++++---------
+ net/ethtool/ioctl.c                           |  2 +-
+ net/ethtool/linkinfo.c                        |  8 ++--
+ net/ethtool/linkmodes.c                       | 18 ++++-----
+ 10 files changed, 44 insertions(+), 44 deletions(-)
+
 -- 
-2.47.0
+2.34.1
 
 
