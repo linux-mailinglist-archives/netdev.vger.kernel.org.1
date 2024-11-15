@@ -1,419 +1,211 @@
-Return-Path: <netdev+bounces-145185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F0F9CD8DD
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 07:54:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75BEA9CD9E8
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 08:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EE02B22DD6
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 06:54:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF12AB282F3
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 07:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5431885BF;
-	Fri, 15 Nov 2024 06:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6D11885A1;
+	Fri, 15 Nov 2024 07:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="NxvIAIp3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C78414EC77
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 06:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177E2183CC7;
+	Fri, 15 Nov 2024 07:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731653689; cv=none; b=tAkAnu23D+YDdpABcct936t/Ks1GpQyU5KTjzjjwceVO7B4kzZ69NaorjHnbZyd+smjjPCKXNsbWJRjBxNtvZk++0vYjGk2g5kUE4CFHyIPKWF6FxeRhSWst/XLJ7PBmgUexlGU2nZq3Y6uy2ySSHHzTcq57GpElMJcEqACqKqE=
+	t=1731655679; cv=none; b=CQ2001ifWVImnKAnfrHT/ECCLyofUZ/VUebOBnqIPwgRfJrDbHbO2TafBgd6M/j0uGZsinL53LQefSccQh46odJQ1j1w8UUDh46/v7XwlZFbtLCUsEYxI46v8U9WY56k/ItiMNVnoUq1WwoyjDT7oqLKIgHD4qs6NmusjddbzwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731653689; c=relaxed/simple;
-	bh=TuNNIYt6IYlTNgMJNdrT36JIxJ4HsUPvT3BiqojK8uc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=StMYt4uJlItfXm/MS7TeoT2jc8N2xDgtrxwSF94fiNS5n44RAxLD9SP5bIwHiVxK6gwU/u6NolSQv8oeaWjcybr247xLqCA/jVxgkQVL30bHGTnBsHr+RRsUwt6JVehou7KenpuRor6HzL9dOSVdlAWnrZ6pfdiK1m/V9CC7NkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp82t1731653562tq53j0dw
-X-QQ-Originating-IP: +X+72kly31mX0ybw22mjx8K+Q9gPQTGzqN6rlyntlsE=
-Received: from wxdbg.localdomain.com ( [115.206.160.29])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 15 Nov 2024 14:52:32 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15018095483652981737
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linus.walleij@linaro.org,
-	brgl@bgdev.pl,
-	horms@kernel.org,
-	rmk+kernel@armlinux.org.uk,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net v2] net: txgbe: remove GPIO interrupt controller
-Date: Fri, 15 Nov 2024 15:15:27 +0800
-Message-Id: <20241115071527.1129458-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1731655679; c=relaxed/simple;
+	bh=WwHB1f3gavVE9l2aZQ4WLcUSVZv8GqGUZZYPi6oRew8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hPIt1N/vXmjb7vCi+j+SWDHuejOlJj3LOHKf4LB3dlz2nQlhMmWmwhZahU1BEEVfWdh106L2oQGtUsa3twqUj7/3JOc76F3cATXP1wF5dZOibkRnWKsc2cu3hS8QD8iZp/XMfG1HJcVwwCerek73XxUfMjCyRQjL4mGD10KvVtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=NxvIAIp3; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1731655668;
+	bh=WwHB1f3gavVE9l2aZQ4WLcUSVZv8GqGUZZYPi6oRew8=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=NxvIAIp3CfTFgSECIk88TXnKOBfoHK4lkVwMqk+cBMbKKLmwvt3eZFGDCG3fwj1Gq
+	 M8ZkOHvQAJ8EjBx2GjihvRpMKTgvq/Qak9peinF1HTtksafRotVt3/puDaKZF3SJ27
+	 JRxuozlduDJjaF/N9hm5hW1pu4EPEBeezNKqliVJcEri2GoIE+yLwYAE7wNTp+MFvj
+	 y1dOX+XT9JO0hzZgTBix4uWtMq1NZ4A/xl1iilxNf2n30zQHF4uGad96782lhpqWqm
+	 0Xiv//jWDyGDmyF2COAUmG34MEbVue80QKQzoBgi1r9cEJXLH3HV7NHoAKGOnu2PPc
+	 0Vir4+0zm3XTA==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id B8F3766537;
+	Fri, 15 Nov 2024 15:27:46 +0800 (AWST)
+Message-ID: <01be9950ef5591bd70685019cc56b7ffe0e3bce7.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v7 2/2] mctp pcc: Implement MCTP over PCC Transport
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: admiyo@os.amperecomputing.com, Matt Johnston
+ <matt@codeconstruct.com.au>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
+	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Huisong Li <lihuisong@huawei.com>
+Date: Fri, 15 Nov 2024 15:27:46 +0800
+In-Reply-To: <20241114024928.60004-3-admiyo@os.amperecomputing.com>
+References: <20241114024928.60004-1-admiyo@os.amperecomputing.com>
+	 <20241114024928.60004-3-admiyo@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NzSDQCFWCzVTRja39ZME0o3ZqJvGvf8sqv68B+u305xSjh/QQo4zNzns
-	QPhQ82zS1XbPP2LhBwtwAl2wxkcqqkzH4lrYdzgEwnmV3/tIIaQUy8ArtanBnkOUClPKvIt
-	pCCUBlKtufmeWm9zxYne/Dth5JoQdV+0Yy6qziieAcN7VROBGVw1oaVQxlAlNADsa5SL7gX
-	CtAvN8u28yQlBHT8mwplGj6oqDTlTCGYx140z46GHRBw1XMMT9Rd8oWIvXl/WypgVkb0F3a
-	CzTmFQlWbDmvcYDvvkUD0Pdy7qOHCI5Be7VxqsSEvUREj0902BVdu0//5eIYMUNxXU7jLWh
-	fusvLlHoeg6DBMrKK7Y08HRkPxjV2t9xvc7RmQGP56EZHloKkYwNDEKHnLtimdSWr75yL86
-	FQ/pwVeiCDspdtzWN2W7UPz3H5WTYN/QNSldSo1DRfZAkEt4wpC8dfJRaziZ70pSmIY7mzm
-	UJSoCNAttK9/JMaZ9nDW++j+8/i2R8FI1Qo8qq3YtTPx/SEKY3e+dOano2mEkTalYhmph3a
-	EM3rjCPXJhfHUMR47szuov0MtDhb8IX1mUUTZl4UpNx5Vb3dlXX5FEp7gTzDKUTDg67RSvW
-	SHEEqh3DhVZ6UbLwFAstY+8GXHg/ehyHkVcQxN0LG0DfS2hTrh2BSJPT9blkzkD6aizq84I
-	OigRQYydPuVVleKRTSV8DyorFGbXiBjTT4Yyy4T1fM2V/l+T2Qg372ExYEpe/B2I5JSf0+k
-	KN0LQpi4pd/Po74uB03453pLuaGUE4z1dU/Qr/VxdeKklzjn5T692fhfuGiOIKNlZQbWKRz
-	sB3OmhmWr6YSw5iSnVKv+6tKU2EikLhPLIAOtl9qqF/OfQs/kNFS/u0MphQlrDCaTS1/eT9
-	j7ieGVLJkYkmXL6pIiLJPxZY7Vu+6ytzyqHX39nW0FseXldIvZolitPBoft2qu+sYm4LvXX
-	nmtwL2qzN+VfpP/44ckBjUjq4KNcrwY3TsDfi1beBvsGWI8YHkUEcAa5F
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
 
-Since the GPIO interrupt controller is always not working properly, we need
-to constantly add workaround to cope with hardware deficiencies. So just
-remove GPIO interrupt controller, and let the SFP driver poll the GPIO
-status.
+Hi Adam,
 
-Fixes: b4a2496c17ed ("net: txgbe: fix GPIO interrupt blocking")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
-Changes in v2:
-- Remove GPIO interrupt controller
-- Link to v1: https://lore.kernel.org/all/20241106101717.981850-1-jiawenwu@trustnetic.com
----
- .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  24 +--
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   1 -
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 166 ------------------
- .../net/ethernet/wangxun/txgbe/txgbe_phy.h    |   2 -
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |   7 +-
- 5 files changed, 4 insertions(+), 196 deletions(-)
+All good with the hw addressing changes, but there are still things from
+my previous review that have either been ignored or discarded. In case
+of the latter, that still may be fine, but at least a note that you have
+done so would be helpful.
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index a4cf682dca65..0ee73a265545 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -72,14 +72,6 @@ int txgbe_request_queue_irqs(struct wx *wx)
- 	return err;
- }
- 
--static int txgbe_request_gpio_irq(struct txgbe *txgbe)
--{
--	txgbe->gpio_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_GPIO);
--	return request_threaded_irq(txgbe->gpio_irq, NULL,
--				    txgbe_gpio_irq_handler,
--				    IRQF_ONESHOT, "txgbe-gpio-irq", txgbe);
--}
--
- static int txgbe_request_link_irq(struct txgbe *txgbe)
- {
- 	txgbe->link_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_LINK);
-@@ -149,11 +141,6 @@ static irqreturn_t txgbe_misc_irq_thread_fn(int irq, void *data)
- 	u32 eicr;
- 
- 	eicr = wx_misc_isb(wx, WX_ISB_MISC);
--	if (eicr & TXGBE_PX_MISC_GPIO) {
--		sub_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_GPIO);
--		handle_nested_irq(sub_irq);
--		nhandled++;
--	}
- 	if (eicr & (TXGBE_PX_MISC_ETH_LK | TXGBE_PX_MISC_ETH_LKDN |
- 		    TXGBE_PX_MISC_ETH_AN)) {
- 		sub_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_LINK);
-@@ -179,7 +166,6 @@ static void txgbe_del_irq_domain(struct txgbe *txgbe)
- 
- void txgbe_free_misc_irq(struct txgbe *txgbe)
- {
--	free_irq(txgbe->gpio_irq, txgbe);
- 	free_irq(txgbe->link_irq, txgbe);
- 	free_irq(txgbe->misc.irq, txgbe);
- 	txgbe_del_irq_domain(txgbe);
-@@ -191,7 +177,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	struct wx *wx = txgbe->wx;
- 	int hwirq, err;
- 
--	txgbe->misc.nirqs = 2;
-+	txgbe->misc.nirqs = 1;
- 	txgbe->misc.domain = irq_domain_add_simple(NULL, txgbe->misc.nirqs, 0,
- 						   &txgbe_misc_irq_domain_ops, txgbe);
- 	if (!txgbe->misc.domain)
-@@ -216,20 +202,14 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	if (err)
- 		goto del_misc_irq;
- 
--	err = txgbe_request_gpio_irq(txgbe);
--	if (err)
--		goto free_msic_irq;
--
- 	err = txgbe_request_link_irq(txgbe);
- 	if (err)
--		goto free_gpio_irq;
-+		goto free_msic_irq;
- 
- 	wx->misc_irq_domain = true;
- 
- 	return 0;
- 
--free_gpio_irq:
--	free_irq(txgbe->gpio_irq, txgbe);
- free_msic_irq:
- 	free_irq(txgbe->misc.irq, txgbe);
- del_misc_irq:
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 93180225a6f1..f77450268036 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -82,7 +82,6 @@ static void txgbe_up_complete(struct wx *wx)
- {
- 	struct net_device *netdev = wx->netdev;
- 
--	txgbe_reinit_gpio_intr(wx);
- 	wx_control_hw(wx, true);
- 	wx_configure_vectors(wx);
- 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 67b61afdde96..2bfe41339c1c 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -358,169 +358,8 @@ static int txgbe_gpio_direction_out(struct gpio_chip *chip, unsigned int offset,
- 	return 0;
- }
- 
--static void txgbe_gpio_irq_ack(struct irq_data *d)
--{
--	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
--	irq_hw_number_t hwirq = irqd_to_hwirq(d);
--	struct wx *wx = gpiochip_get_data(gc);
--	unsigned long flags;
--
--	raw_spin_lock_irqsave(&wx->gpio_lock, flags);
--	wr32(wx, WX_GPIO_EOI, BIT(hwirq));
--	raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
--}
--
--static void txgbe_gpio_irq_mask(struct irq_data *d)
--{
--	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
--	irq_hw_number_t hwirq = irqd_to_hwirq(d);
--	struct wx *wx = gpiochip_get_data(gc);
--	unsigned long flags;
--
--	gpiochip_disable_irq(gc, hwirq);
--
--	raw_spin_lock_irqsave(&wx->gpio_lock, flags);
--	wr32m(wx, WX_GPIO_INTMASK, BIT(hwirq), BIT(hwirq));
--	raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
--}
--
--static void txgbe_gpio_irq_unmask(struct irq_data *d)
--{
--	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
--	irq_hw_number_t hwirq = irqd_to_hwirq(d);
--	struct wx *wx = gpiochip_get_data(gc);
--	unsigned long flags;
--
--	gpiochip_enable_irq(gc, hwirq);
--
--	raw_spin_lock_irqsave(&wx->gpio_lock, flags);
--	wr32m(wx, WX_GPIO_INTMASK, BIT(hwirq), 0);
--	raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
--}
--
--static void txgbe_toggle_trigger(struct gpio_chip *gc, unsigned int offset)
--{
--	struct wx *wx = gpiochip_get_data(gc);
--	u32 pol, val;
--
--	pol = rd32(wx, WX_GPIO_POLARITY);
--	val = rd32(wx, WX_GPIO_EXT);
--
--	if (val & BIT(offset))
--		pol &= ~BIT(offset);
--	else
--		pol |= BIT(offset);
--
--	wr32(wx, WX_GPIO_POLARITY, pol);
--}
--
--static int txgbe_gpio_set_type(struct irq_data *d, unsigned int type)
--{
--	struct gpio_chip *gc = irq_data_get_irq_chip_data(d);
--	irq_hw_number_t hwirq = irqd_to_hwirq(d);
--	struct wx *wx = gpiochip_get_data(gc);
--	u32 level, polarity, mask;
--	unsigned long flags;
--
--	mask = BIT(hwirq);
--
--	if (type & IRQ_TYPE_LEVEL_MASK) {
--		level = 0;
--		irq_set_handler_locked(d, handle_level_irq);
--	} else {
--		level = mask;
--		irq_set_handler_locked(d, handle_edge_irq);
--	}
--
--	if (type == IRQ_TYPE_EDGE_RISING || type == IRQ_TYPE_LEVEL_HIGH)
--		polarity = mask;
--	else
--		polarity = 0;
--
--	raw_spin_lock_irqsave(&wx->gpio_lock, flags);
--
--	wr32m(wx, WX_GPIO_INTEN, mask, mask);
--	wr32m(wx, WX_GPIO_INTTYPE_LEVEL, mask, level);
--	if (type == IRQ_TYPE_EDGE_BOTH)
--		txgbe_toggle_trigger(gc, hwirq);
--	else
--		wr32m(wx, WX_GPIO_POLARITY, mask, polarity);
--
--	raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
--
--	return 0;
--}
--
--static const struct irq_chip txgbe_gpio_irq_chip = {
--	.name = "txgbe-gpio-irq",
--	.irq_ack = txgbe_gpio_irq_ack,
--	.irq_mask = txgbe_gpio_irq_mask,
--	.irq_unmask = txgbe_gpio_irq_unmask,
--	.irq_set_type = txgbe_gpio_set_type,
--	.flags = IRQCHIP_IMMUTABLE,
--	GPIOCHIP_IRQ_RESOURCE_HELPERS,
--};
--
--irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
--{
--	struct txgbe *txgbe = data;
--	struct wx *wx = txgbe->wx;
--	irq_hw_number_t hwirq;
--	unsigned long gpioirq;
--	struct gpio_chip *gc;
--	unsigned long flags;
--
--	gpioirq = rd32(wx, WX_GPIO_INTSTATUS);
--
--	gc = txgbe->gpio;
--	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
--		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
--		struct irq_data *d = irq_get_irq_data(gpio);
--		u32 irq_type = irq_get_trigger_type(gpio);
--
--		txgbe_gpio_irq_ack(d);
--		handle_nested_irq(gpio);
--
--		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
--			raw_spin_lock_irqsave(&wx->gpio_lock, flags);
--			txgbe_toggle_trigger(gc, hwirq);
--			raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
--		}
--	}
--
--	return IRQ_HANDLED;
--}
--
--void txgbe_reinit_gpio_intr(struct wx *wx)
--{
--	struct txgbe *txgbe = wx->priv;
--	irq_hw_number_t hwirq;
--	unsigned long gpioirq;
--	struct gpio_chip *gc;
--	unsigned long flags;
--
--	/* for gpio interrupt pending before irq enable */
--	gpioirq = rd32(wx, WX_GPIO_INTSTATUS);
--
--	gc = txgbe->gpio;
--	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
--		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
--		struct irq_data *d = irq_get_irq_data(gpio);
--		u32 irq_type = irq_get_trigger_type(gpio);
--
--		txgbe_gpio_irq_ack(d);
--
--		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
--			raw_spin_lock_irqsave(&wx->gpio_lock, flags);
--			txgbe_toggle_trigger(gc, hwirq);
--			raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
--		}
--	}
--}
--
- static int txgbe_gpio_init(struct txgbe *txgbe)
- {
--	struct gpio_irq_chip *girq;
- 	struct gpio_chip *gc;
- 	struct device *dev;
- 	struct wx *wx;
-@@ -550,11 +389,6 @@ static int txgbe_gpio_init(struct txgbe *txgbe)
- 	gc->direction_input = txgbe_gpio_direction_in;
- 	gc->direction_output = txgbe_gpio_direction_out;
- 
--	girq = &gc->irq;
--	gpio_irq_chip_set_chip(girq, &txgbe_gpio_irq_chip);
--	girq->default_type = IRQ_TYPE_NONE;
--	girq->handler = handle_bad_irq;
--
- 	ret = devm_gpiochip_add_data(dev, gc, wx);
- 	if (ret)
- 		return ret;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
-index 8a026d804fe2..3938985355ed 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
-@@ -4,8 +4,6 @@
- #ifndef _TXGBE_PHY_H_
- #define _TXGBE_PHY_H_
- 
--irqreturn_t txgbe_gpio_irq_handler(int irq, void *data);
--void txgbe_reinit_gpio_intr(struct wx *wx);
- irqreturn_t txgbe_link_irq_handler(int irq, void *data);
- int txgbe_init_phy(struct txgbe *txgbe);
- void txgbe_remove_phy(struct txgbe *txgbe);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 959102c4c379..8ea413a7abe9 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -75,8 +75,7 @@
- #define TXGBE_PX_MISC_IEN_MASK                            \
- 	(TXGBE_PX_MISC_ETH_LKDN | TXGBE_PX_MISC_DEV_RST | \
- 	 TXGBE_PX_MISC_ETH_EVENT | TXGBE_PX_MISC_ETH_LK | \
--	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR |   \
--	 TXGBE_PX_MISC_GPIO)
-+	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR)
- 
- /* Port cfg registers */
- #define TXGBE_CFG_PORT_ST                       0x14404
-@@ -313,8 +312,7 @@ struct txgbe_nodes {
- };
- 
- enum txgbe_misc_irqs {
--	TXGBE_IRQ_GPIO = 0,
--	TXGBE_IRQ_LINK,
-+	TXGBE_IRQ_LINK = 0,
- 	TXGBE_IRQ_MAX
- };
- 
-@@ -335,7 +333,6 @@ struct txgbe {
- 	struct clk_lookup *clock;
- 	struct clk *clk;
- 	struct gpio_chip *gpio;
--	unsigned int gpio_irq;
- 	unsigned int link_irq;
- 
- 	/* flow director */
--- 
-2.27.0
+Those inline again, and one new one ("Implementation [...]").
 
+> +config MCTP_TRANSPORT_PCC
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tristate "MCTP PCC transport"
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0select ACPI
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0help
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Provides a driver to ac=
+cess MCTP devices over PCC transport,
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 A MCTP protocol network=
+ device is created via ACPI for each
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 entry in the DST/SDST t=
+hat matches the identifier. The Platform
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 commuinucation channels=
+ are selected from the corresponding
+
+typo: communication
+
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 entries in the PCCT.
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Say y here if you need =
+to connect to MCTP endpoints over PCC. To
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compile as a module, us=
+e m; the module will be called mctp-pcc.
+> +
+> =C2=A0endmenu
+> =C2=A0
+> =C2=A0endif
+> diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
+> index e1cb99ced54a..492a9e47638f 100644
+> --- a/drivers/net/mctp/Makefile
+> +++ b/drivers/net/mctp/Makefile
+> @@ -1,3 +1,4 @@
+> +obj-$(CONFIG_MCTP_TRANSPORT_PCC) +=3D mctp-pcc.o
+> =C2=A0obj-$(CONFIG_MCTP_SERIAL) +=3D mctp-serial.o
+> =C2=A0obj-$(CONFIG_MCTP_TRANSPORT_I2C) +=3D mctp-i2c.o
+> =C2=A0obj-$(CONFIG_MCTP_TRANSPORT_I3C) +=3D mctp-i3c.o
+> diff --git a/drivers/net/mctp/mctp-pcc.c b/drivers/net/mctp/mctp-pcc.c
+> new file mode 100644
+> index 000000000000..489f42849a24
+> --- /dev/null
+> +++ b/drivers/net/mctp/mctp-pcc.c
+> @@ -0,0 +1,324 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * mctp-pcc.c - Driver for MCTP over PCC.
+> + * Copyright (c) 2024, Ampere Computing LLC
+> + */
+> +
+> +/* Implelmentation of MCTP over PCC DMTF Specification 256
+
+"Implementation"
+
+(also, might be better to use the full spec ID ("DSP0256"), as it's
+easier to search)
+
+> +struct mctp_pcc_hdr {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 signature;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 flags;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 length;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char mctp_signature[MCTP_SIGNA=
+TURE_LENGTH];
+> +};
+>
+
+These signature/flags/length still don't have the endian annotations
+(nor conversions on access). This was raised on v2, but looks like that
+got lost?
+
+> +static void
+> +mctp_pcc_net_stats(struct net_device *net_dev,
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rtnl_link_stats64 *stats)
+> +{
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0stats->rx_errors =3D 0;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0stats->rx_packets =3D net_dev-=
+>stats.rx_packets;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0stats->tx_packets =3D net_dev-=
+>stats.tx_packets;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0stats->rx_dropped =3D 0;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0stats->tx_bytes =3D net_dev->s=
+tats.tx_bytes;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0stats->rx_bytes =3D net_dev->s=
+tats.rx_bytes;
+> +}
+
+Is this missing the rx_dropped stat (which you're updating in
+_rx_callback)?
+
+If you like, there are some new tstats helpers available, meaning you
+wouldn't need the ndo_get_stats64 op at all. Let me know if you're
+interested in using those, and would like a hand doing so.
+
+> +static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
+> +{
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mctp_pcc_lookup_context=
+ context =3D {0, 0, 0};
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct mctp_pcc_ndev *mctp_pcc=
+_ndev;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct device *dev =3D &acpi_d=
+ev->dev;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct net_device *ndev;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0acpi_handle dev_handle;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0acpi_status status;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int mctp_pcc_mtu;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char name[32];
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int rc;
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_dbg(dev, "Adding mctp_pcc =
+device for HID=C2=A0 %s\n",
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0acpi_device_hid(acpi_dev));
+
+Super minor: double space before the %s here.
+
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_handle =3D acpi_device_han=
+dle(acpi_dev);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0status =3D acpi_walk_resources=
+(dev_handle, "_CRS", lookup_pcct_indices,
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &context);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!ACPI_SUCCESS(status)) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0dev_err(dev, "FAILURE to lookup PCC indexes from CRS");
+
++ trailing newline (on the error message).
+
+Other than that, all good!
+
+Cheers,
+
+
+Jeremy
 
