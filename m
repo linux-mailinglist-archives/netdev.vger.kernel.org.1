@@ -1,152 +1,122 @@
-Return-Path: <netdev+bounces-145210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652329CDB08
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:03:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F889CDB30
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 111DB1F21EBA
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 09:03:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3FC7B2233A
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 09:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A4818A959;
-	Fri, 15 Nov 2024 09:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126E318CBEC;
+	Fri, 15 Nov 2024 09:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BI3udTYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BE71898EA;
-	Fri, 15 Nov 2024 09:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFDF16D9DF
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 09:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731661421; cv=none; b=HhJ4GjYUk0tGH9CrKWiHnnRLWI6ksTqiWmKJJoWC/Uiq73QckPOqhUvM6ErIO+NfN1bzXkrYU5+BeMxLze611Ig/Cdg5adVdeBa2eS7LemqqoGxuF+nCGNxiR4TMK5Y2FmiZTs0jhbB5SjE5e79LKU9jd30xdZ2jHd3pM3YH9tI=
+	t=1731661918; cv=none; b=fjMhE3kAZjsFZi8Oq8v06e+MIcKK0kcOEkKQYU0PSZKL/CQQ8z54PmdhPxVvklUeRjPprKKCQd8jjNoz7ZOaClnu7LZYhpPbLFXfjE82M/0RX/Dxk+wuH+I5IL8FXl+mSfvNKwkC/oHM0nt//GlQ8LOmixcAfnFGvdZqi4c1azo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731661421; c=relaxed/simple;
-	bh=DJwdqLhq4SXFj3DyzqrpE1g6K7+phi0Pt0XV4fkEaDw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=m/F8C7ThguGBgEiwyjvDRJQuIkm14l2xJQ2c7aMIBMVq4/CQSGi7ZMjh1lGhUcyu4StKP8rvigNhSieQgFkKkd3HBpfqLeOZoyILu8xOLV70Ey0hU8XdmZJ/Dji9kxG6RYTqXsaVYhjHmwU2pe+hvU6IOdW8yRmsl39AvQXVWeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XqWHZ2Jj2zQtpf;
-	Fri, 15 Nov 2024 17:02:18 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2C710141045;
-	Fri, 15 Nov 2024 17:03:35 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 15 Nov 2024 17:03:34 +0800
-Message-ID: <a031f13e-a5ee-4db9-89a3-983b962c3c1b@huawei.com>
-Date: Fri, 15 Nov 2024 17:03:34 +0800
+	s=arc-20240116; t=1731661918; c=relaxed/simple;
+	bh=7Ms/oSsLBt4A/SAgl6a+ZEkdg5DN23LDyDRzJws+kV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JFoMdujqikr/ckAMvmbPehqewu5Qvsl1MWX2l3YS7Nvug6YbsF13qcx7UMidUkdQKw1rnVnuwCunxe3mkXJzrwR0wHYzdaG1ekNteJ+aYHhe5hXseYS5BPdAKYFrQWFdlY5uyfZmnxyc3JmUPLGYnslkAkF+1LEwlOoSiNZSfQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BI3udTYo; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 63A3D240004;
+	Fri, 15 Nov 2024 09:11:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731661908;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o4yS7PvAWO1lhOSRuh6v2F8FYNMDf6jYfnIVbQHGkQE=;
+	b=BI3udTYoCxC16OnIvQRBef3LOCA2pUrq+V8mtWrobeXkZblL6JLa3GOg1RMdkZ5pjXltR7
+	k/eyj0uG7h3pJZUDEGoVVwHz1MnOsgXZnCi+kAbeHMA4JSzB9WyCMGMS5RrUAWsW4Yoin5
+	kxIB1/JUbGxkiQXRmPDZK5SBXdByqWyJpKkDw/YfwUejVIKe66XP+GaWZ+aAIvLya900tb
+	uHTZOQjyNIqahvtveR+/3VlLY47da06dDSFt8hsM5CpqJ1DGE7WezFifSqTvqXqhQdNFL3
+	g/pR6GDW/uwmzLGzVLbI5QheSa0vORuTO2dm2TqXe8AO1iN4BXSvUVcZnyaOyA==
+Date: Fri, 15 Nov 2024 10:11:45 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Re: Testing selectable timestamping - where are the tools for this
+ feature?
+Message-ID: <20241115101145.063db234@kmaincent-XPS-13-7390>
+In-Reply-To: <ZzZbqll+zj8o+Umc@shell.armlinux.org.uk>
+References: <ZzS7wWx4lREiOgL3@shell.armlinux.org.uk>
+	<20241113161602.2d36080c@kmaincent-XPS-13-7390>
+	<ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk>
+	<ZzZbqll+zj8o+Umc@shell.armlinux.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v23 1/7] mm: page_frag: add a test module for
- page_frag
-To: Mark Brown <broonie@kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, Alexander Duyck <alexander.duyck@gmail.com>,
-	Linux-MM <linux-mm@kvack.org>, Alexander Duyck <alexanderduyck@fb.com>, Shuah
- Khan <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<Aishwarya.TCV@arm.com>
-References: <20241028115343.3405838-1-linyunsheng@huawei.com>
- <20241028115343.3405838-2-linyunsheng@huawei.com>
- <ZzYfBp0IO1WW6Cao@finisterre.sirena.org.uk>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <ZzYfBp0IO1WW6Cao@finisterre.sirena.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 2024/11/15 0:02, Mark Brown wrote:
-> On Mon, Oct 28, 2024 at 07:53:36PM +0800, Yunsheng Lin wrote:
->> The testing is done by ensuring that the fragment allocated
->> from a frag_frag_cache instance is pushed into a ptr_ring
->> instance in a kthread binded to a specified cpu, and a kthread
->> binded to a specified cpu will pop the fragment from the
->> ptr_ring and free the fragment.
+On Thu, 14 Nov 2024 20:20:58 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-Hi,
-Thanks for reporting.
+> On Wed, Nov 13, 2024 at 03:57:56PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Nov 13, 2024 at 04:16:02PM +0100, Kory Maincent wrote: =20
+> > > You simply need to install python python-yaml and maybe others python
+> > > subpackages.
+> > > Copy the tool "tools/net/ynl" and the specs "Documentation/netlink/" =
+on
+> > > the board.
+> > >=20
+> > > Then run the ynl commands. =20
+> >=20
+> > Thanks... fairly unweildly but at least it's functional. However,
+> > running the first, I immediately find a problem:
+> >=20
+> > # ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --dump
+> > tsinfo-get --json '{"header":{"dev-name":"eth0"}}'
+> >=20
+> > One would expect this to only return results for eth0 ? I get: =20
+>=20
+> Here's the nlmon packet capture for the ynl request:
+>=20
+>         0x0000:  0004 0338 0000 0000 0000 0000 0000 0010  ...8............
+>         0x0010:  2400 0000 1500 0503 f9d3 0000 0000 0000  $...............
+>         0x0020:  1901 0000 1000 0180 0900 0200 6574 6832  ............eth2
+>         0x0030:  0000 0000                                ....
+>=20
+> Length: 0x00000024
+> Family ID: 0x0015 (ethtool)
+> Flags: 0x0305 (Return all matching, Specify tree root, ack, request)
+> Sequence: 0x0000d3f9
+> Port ID: 0x00000000
+> Command: 0x19
+> Family Version: 0x01
+>=20
+> Then 16 bytes of data that does contain the interface name given to
+> YNL. I haven't parsed that, it seems to require manual effort to do
+> so as wireshark is unable to do so.
+>=20
+> I'd be guessing to draw any conclusions from this without deeper
+> analysis.
 
-> 
-> This is breaking the build in -next on at least arm64 and x86_64 since
-> it's trying to build an out of tree kernel module which is included in
-> the selftests directory, the kselftest build system just isn't set up to
-> do that in a sensible and robust fashion.  The module should probably be
-I tried the below kernel modules in the testing directory, they seemed to
-have the similar problem if the kernel is not compiled yet.
+Ok thanks, I will take a look at it
 
-make -C tools/testing/nvdimm
-make -C tools/testing/selftests/bpf/bpf_testmod/
-make -C tools/testing/selftests/livepatch/test_modules/
-
-> in the main kernel tree and enabled by the config file for the mm tests.
-
-As discussed in [1], this module is not really a vaild kernel module by
-returning '-EAGAIN', which is the main reason that it is setup in the
-selftests instead of the main kernel tree.
-
-1. https://lore.kernel.org/all/CAKgT0UdL77J4reY0JRaQfCJAxww3R=jOkHfDmkuJHSkd1uE55A@mail.gmail.com/
-
-> 
-> KernelCI sees:
-> 
-> ***
-> *** Configuration file ".config" not found!
-> ***
-> *** Please run some configurator (e.g. "make oldconfig" or
-> *** "make menuconfig" or "make xconfig").
-> ***
-> Makefile:810: include/config/auto.conf.cmd: No such file or directory
-> 
-> (see https://storage.kernelci.org/next/master/next-20241114/x86_64/x86_64_defconfig%2Bkselftest/gcc-12/logs/kselftest.log)
-> 
-> and I've seen:
-> 
->   ERROR: Kernel configuration is invalid.
->          include/generated/autoconf.h or include/config/auto.conf are missing.
->          Run 'make oldconfig && make prepare' on kernel src to fix it.
-> 
-> make[3]: *** [Makefile:788: include/config/auto.conf] Error 1
-
-As above, I am not sure if there is some elegant way to avoid the above error
-in the selftest core, one possible way to avoid the above error is to skip
-compiling like below as tools/testing/selftests/mm/test_page_frag.sh already
-skip the testing for page_frag if the test module is not compiled:
-
-diff --git a/tools/testing/selftests/mm/page_frag/Makefile b/tools/testing/selftests/mm/page_frag/Makefile
-index 58dda74d50a3..ab5f457bd39e 100644
---- a/tools/testing/selftests/mm/page_frag/Makefile
-+++ b/tools/testing/selftests/mm/page_frag/Makefile
-@@ -7,6 +7,8 @@ else
- Q = @
- endif
-
-+ifneq (,$(wildcard $(KDIR)/Module.symvers))
-+
- MODULES = page_frag_test.ko
-
- obj-m += page_frag_test.o
-@@ -16,3 +18,10 @@ all:
-
- clean:
- 	+$(Q)make -C $(KDIR) M=$(PAGE_FRAG_TEST_DIR) clean
-+
-+else
-+
-+all:
-+	$(warning Please build the kernel before building the test ko)
-+
-+endif
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
