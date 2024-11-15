@@ -1,135 +1,104 @@
-Return-Path: <netdev+bounces-145146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130649CD599
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:47:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC03F9CD59B
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:47:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A2E8B21448
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:47:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A339228322D
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F896F30F;
-	Fri, 15 Nov 2024 02:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF29B13B5B6;
+	Fri, 15 Nov 2024 02:47:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB0C28EF;
-	Fri, 15 Nov 2024 02:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E979028EF;
+	Fri, 15 Nov 2024 02:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731638816; cv=none; b=gnZK5LmmWybXDs/gxb/Pv2LneGJ6qyOrNddZ19mps/6gvGo3OsLIBd89Bg3pApYxvzriZYd2KPhwQZ06upumiZs8d65UtMwUdLhe3BL3w8HBkKo6ELOEBzlhXMFKka+Px1iLD+jPPKOK7ZtWHM7C/f44rCK6YsoLorb4qLZ1MEs=
+	t=1731638863; cv=none; b=ewwxzy51SrLjAYnUF3cq6vcT49tgr1CAlkiDR3V+x5+COj3jzcYI/lta8ZXL1qumjt7wBMor9N5h9CmwjnMkejUhDFkOnTTNg47EyczN7YMKKHt2awnqYJWQ3YiaMTMyuAzqB8fttT3rUybpDWUc7Y2ICPTt4TachJfSnm9sxNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731638816; c=relaxed/simple;
-	bh=IAiuFyp3E8W9vuvfCCVnB6Wz9h8JSHrPyDRUJkzoI38=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XM8md1ZyDYxbMIBSbNUe7PhI6dXE4U3Y51dwBkB9l2MW1MyT06BPlIy++a+pe9+0vfeUnAmQtI7Wzf6uFXtlQHUctO/NjSnl86U+LwsreTK/N5W+h+ctiaGss3cQi6M5V1iy53g3eEzPBw/AiTzHna0rwPxi1StqoXSLu1sDa+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz13t1731638776tf26ak
-X-QQ-Originating-IP: m+FaQT7FrJXF6yKa4W3dcPGuEsWgqna6Tk5+0LWIfnY=
-Received: from localhost.localdomain ( [115.206.160.29])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 15 Nov 2024 10:46:07 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 10350192324756698958
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: linux-pci@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	helgaas@kernel.org,
-	jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH PCI v2] PCI: Add ACS quirk for Wangxun FF5XXX NICS
-Date: Fri, 15 Nov 2024 10:46:04 +0800
-Message-ID: <E16053DB2B80E9A5+20241115024604.30493-1-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1731638863; c=relaxed/simple;
+	bh=NaxE2YI/enKQyoFr4DQ+jtowLmbyJXGm9XqdEN8ifu0=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=K52tnZ/N0mfex2sGlcqSy72XwAXQZohKZucoK1rmdrFwK++ctgXMafTDmIxJXloFcKm5Cs6T6ZbIcn/YDCDeLq9n12/mXEnXU9PSWv4vMenEi2nY624eqkRL6xqK3SmxnBTKXn3gzDOocpacSjG1QlHYRrVlinaJ5LlYEuwTPxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4XqLzD3dp4z52SFv;
+	Fri, 15 Nov 2024 10:47:36 +0800 (CST)
+Received: from njb2app07.zte.com.cn ([10.55.22.95])
+	by mse-fl2.zte.com.cn with SMTP id 4AF2lUiE097838;
+	Fri, 15 Nov 2024 10:47:30 +0800 (+08)
+	(envelope-from jiang.kun2@zte.com.cn)
+Received: from mapi (njb2app07[null])
+	by mapi (Zmail) with MAPI id mid204;
+	Fri, 15 Nov 2024 10:47:31 +0800 (CST)
+Date: Fri, 15 Nov 2024 10:47:31 +0800 (CST)
+X-Zmail-TransId: 2aff6736b64336f-6cfab
+X-Mailer: Zmail v1.0
+Message-ID: <20241115104731435HuFjZOmkaqumuFhB7mrwe@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: M9NnLm3GdbLblnwuwzDh1lvvan46j55EdPu/Tw3UrgSnUAYJ/p8hyr8g
-	DygslxdDA8OtNC0stBCDeLvxGrXPFYfzfMulV64nFA7pw3wMLjvyDr+deG8Afagy5hxzw8i
-	1UC34bWkeRMjWgM9a3cDL3bhQvJ5Y2pxO/+uaLEuIu/yIP9mslbMryP6ql+qszqFqEq5kZ1
-	x4VaF3AyUuRaoEEkgrz30nPVV5aVMGN5/l81TXZMmuseKkf708681kfEy0krfJvLKv+7vNt
-	2MkRKa0efpixwGXx+sCcc9RSnsDdgM/NLdfpcxjSQz49yQ4XMjcXulbAQ5Wffg69umFeplh
-	wSAnq1pBK+VqrcjBNo71Iwux0ikMCspRm4GapMzTEL2YmTMaLHx0Mxy15p6C17410+96oqG
-	hpLBUtIxmk1sn1kIIA6ul/U0QUy2e7gi9RZ8xZxuyMkzaC0LAPTnv2xcR9bWYV3cHxDGZPL
-	LFSjuE/5XaYTyQHRXJVNSSSsbCZYybVW0aCXr/DhS+oXhq5Pdt5bevT0AnUM2gvphLwCrCb
-	YHcklIq0dIKCihv3PRCREPGUMZbHG32X/0kIcYmPdThgSY6BCWa1fuFLl0k524zK5a4tLXg
-	bZg+iM11MZx6RAvaLLxyX0/rkN1BI04spyrQT4i92rCMDEej6Myguy0OWYG50WsJXHN2AUY
-	DYp00sdwtWzpa3gykcyShQgjSUMKCzIt30ufdLPFMt00Dmb0q5VEjbfi6/DXk5/GoqU+wgE
-	FUcVscM/HsYeYiRqlYLJ298T1Hcd/YIIaNuOvRD3DMQ6eLr5Sy928JXu9iyxKSVsaY1r99n
-	agKyVYzfdwd/F8LXrACJv5YrSvm7DDQk2YY8JvLMZvLLUOhKr+MeQG+CkATF207Ru/wx6nQ
-	054wQ9YNSxi29f0gs/x+ajc53/dtzMPXwJe50DE4PEnusFpsQhI4hIajUK7IM3YywPBKnPy
-	h2DkjAe4A3WlBS4oMi0iFWLUxHhcK47/t93wwjQ2KQRXRNDO78eoDJO/8
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Mime-Version: 1.0
+From: <jiang.kun2@zte.com.cn>
+To: <horms@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <corbet@lwn.net>,
+        <jmaloy@redhat.com>, <lucien.xin@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Cc: <tu.qiang35@zte.com.cn>, <jiang.kun2@zte.com.cn>, <xu.xin16@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHQgdjJdIERvY3VtZW50YXRpb246IHRpcGM6IGZpeCBmb3JtYXR0aW5nIGlzc3VlIGluIHRpcGMucnN0?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 4AF2lUiE097838
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6736B648.000/4XqLzD3dp4z52SFv
 
-Wangxun FF5xxx NICs are similar to SFxxx, RP1000 and RP2000 NICs.
-They may be multi-function devices, but they do not advertise an ACS
-capability.
+From: tuqiang <tu.qiang35@zte.com.cn>
+The hyphen is removed to have the same style as the others.
 
-But the hardware does isolate FF5xxx functions as though it had an
-ACS capability and PCI_ACS_RR and PCI_ACS_CR were set in the ACS
-Control register, i.e., all peer-to-peer traffic is directed
-upstream instead of being routed internally.
-
-Add ACS quirk for FF5xxx NICs in pci_quirk_wangxun_nic_acs() so the
-functions can be in independent IOMMU groups.
-
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+Fixes: 09ef17863f37 ("Documentation: add more details in tipc.rst")
+Signed-off-by: tuqiang <tu.qiang35@zte.com.cn>
+Signed-off-by: Jiang Kun <jiang.kun2@zte.com.cn>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Cc: xu xin <xu.xin16@zte.com.cn>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Jon Maloy <jmaloy@redhat.com>
+Cc: Xin Long <lucien.xin@gmail.com>
 ---
+v1->v2:
+typo in the subject ticp -> tipc
+https://lore.kernel.org/all/20241114182129.0b24d293@kernel.org/
 
-v2:
-- Update commit and comment logs.
-v1:
-https://lore.kernel.org/linux-pci/3D914272-CFAE-4B37-A07B-36CA77210110@net-swift.com/T/#t
+ Documentation/networking/tipc.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/pci/quirks.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+diff --git a/Documentation/networking/tipc.rst b/Documentation/networking/tipc.rst
+index ab63d298cca2..9b375b9b9981 100644
+--- a/Documentation/networking/tipc.rst
++++ b/Documentation/networking/tipc.rst
+@@ -112,7 +112,7 @@ More Information
 
-diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index dccb60c1d9cc..8103bc24a54e 100644
---- a/drivers/pci/quirks.c
-+++ b/drivers/pci/quirks.c
-@@ -4996,18 +4996,21 @@ static int pci_quirk_brcm_acs(struct pci_dev *dev, u16 acs_flags)
- }
- 
- /*
-- * Wangxun 10G/1G NICs have no ACS capability, and on multi-function
-- * devices, peer-to-peer transactions are not be used between the functions.
-- * So add an ACS quirk for below devices to isolate functions.
-+ * Wangxun 40G/25G/10G/1G NICs have no ACS capability, but on
-+ * multi-function devices, the hardware isolates the functions by
-+ * directing all peer-to-peer traffic upstream as though PCI_ACS_RR and
-+ * PCI_ACS_CR were set.
-  * SFxxx 1G NICs(em).
-  * RP1000/RP2000 10G NICs(sp).
-+ * FF5xxx 40G/25G/10G NICs(aml).
-  */
- static int  pci_quirk_wangxun_nic_acs(struct pci_dev *dev, u16 acs_flags)
- {
- 	switch (dev->device) {
--	case 0x0100 ... 0x010F:
--	case 0x1001:
--	case 0x2001:
-+	case 0x0100 ... 0x010F: /* EM */
-+	case 0x1001: case 0x2001: /* SP */
-+	case 0x5010: case 0x5025: case 0x5040: /* AML */
-+	case 0x5110: case 0x5125: case 0x5140: /* AML */
- 		return pci_acs_ctrl_enabled(acs_flags,
- 			PCI_ACS_SV | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
- 	}
+ - How to contribute to TIPC:
+
+-- http://tipc.io/contacts.html
++  http://tipc.io/contacts.html
+
+ - More details about TIPC specification:
+
 -- 
-2.43.2
-
+2.18.4
 
