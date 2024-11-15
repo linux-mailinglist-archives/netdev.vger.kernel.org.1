@@ -1,182 +1,97 @@
-Return-Path: <netdev+bounces-145119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FCD49CD522
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:46:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D48D49CD528
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02CC4283E3F
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:46:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 985EA284A09
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1115584D02;
-	Fri, 15 Nov 2024 01:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BFB43156;
+	Fri, 15 Nov 2024 01:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U1HXVmgW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="te67Nzol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414A33211;
-	Fri, 15 Nov 2024 01:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB6763B9
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 01:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731635176; cv=none; b=WxBzT2z82P2aMlY0Q0Rm7/dNBp9spzknLZFAL4D8hNTL5cQ7C330qahOSTE1sc4C5UzJ59/ZnyJ7SHAs9F3dOyvl5lGlEOCaCD0kQzB5oZVJAzuQ6JBzIJ5eQ+dd5pyki+fwUKJf1nxvPmrlFOC0Jk1dUBcqhe/P9+1A/f/UE5Q=
+	t=1731635291; cv=none; b=soMo3+a/HjOxp8hmBDPOGpmkg9BCLDsTs1neD8pZjqGJEKCGpg4ZLDj/UuTcGbozU7wCL8tkMo4JU2OOQLAqet3QH2TVFlROom4kSPVN+oTconsUdO/1TVIe+GHmEeCdw1LMhgJZ9Oa8pg8RtM/ZAVdgq4EDCU3EmSoIkcIEzxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731635176; c=relaxed/simple;
-	bh=m5vc2Wizx2rJbKoJg3DIZCEwDfTT1ErdANobu7oKqtg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rZiCsE4wGVtlDXnie2Zoo1a6JTKA8r46kHH0bexOt0h7ReP6aQa/Chx0WXRqJWJA6VDHtoeOvzWlG+e1CNurcL+P+9vOx/ZtUUvO3PXZISQKHo28Dc5uAS+KA+TuvxXdxIuKGct3QOplC4odNrltCEZB2PQYJGnLcAUvEgRj/Ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U1HXVmgW; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731635175; x=1763171175;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=m5vc2Wizx2rJbKoJg3DIZCEwDfTT1ErdANobu7oKqtg=;
-  b=U1HXVmgWvkxkK2UNWVgFDd1wQfG8Imsl1E/dML+bE3G0hOPOWLz0Za9J
-   CTrLDj4mgf72ijAx/cSjTkr/McmkmQuyFgb7FbbnSfYxj2kwAZ+tShItz
-   CxllunPogJLyZoxlV5ozkV3qeeo63z7Cuv16W/6wHGQS3SLxQmOgwFMew
-   Gny4YDKmKjisj84VBdQeWm7nRONv9GP8QuileNCQSGXtIWIdS7a/ninPj
-   CCy5pnnBAEq0bI6yW2GtrAk3W9YNPfUSMocBLMlYcAE3eSzel/EchbeD4
-   ORtHjEbZjuuNWTdAImgrPmDSMc06jK7U4Dq9Nlks8x7X6CQZXw6AxSvsT
-   Q==;
-X-CSE-ConnectionGUID: kApCyZCkT5+0zs+74UEDLw==
-X-CSE-MsgGUID: ovvIFsGuSZOXMZ/3BJQAnA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11256"; a="31028346"
-X-IronPort-AV: E=Sophos;i="6.12,155,1728975600"; 
-   d="scan'208";a="31028346"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2024 17:46:13 -0800
-X-CSE-ConnectionGUID: 5je70P8PRcmZc2W8TeLARg==
-X-CSE-MsgGUID: RJOEMptXRAm1HGWlvPOq5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,155,1728975600"; 
-   d="scan'208";a="89153309"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.75.68]) ([10.247.75.68])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2024 17:46:09 -0800
-Message-ID: <6c023200-5e81-432c-b21d-d7a9cf1bfc92@linux.intel.com>
-Date: Fri, 15 Nov 2024 09:46:07 +0800
+	s=arc-20240116; t=1731635291; c=relaxed/simple;
+	bh=HgvV5xE6qEOFstn5OpN0rAnQ1tp2xgtwtx2zzjBPPqM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Oz8+pSfJBuwWjslb8OVIOEaWXMABUsAdhfHnebGJXtorsHcj65ufFvC+H3pOgZQ5c1UULjWcvuVg6byrCv0Y9FFarF+c3OGiMsCJKAVGJxkzaGSBQe+aE3fd4gr0KKBi613oWX4oIaVcmqhNcmAnwIZqWbdVJMXI9R5+x/Ge31c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=te67Nzol; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3BFBC4CECD;
+	Fri, 15 Nov 2024 01:48:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731635291;
+	bh=HgvV5xE6qEOFstn5OpN0rAnQ1tp2xgtwtx2zzjBPPqM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=te67NzolkzscDGy3eBCLgEVN0uhqeTsoddXpKykzLd9q6HMZExfoDb2sQjeUHAzQr
+	 8QrBh//qcE/Yqox0vQrpErsFLddak9EYCmIrA0BZyjBGGCY1zIkySiO+WcVUvKiaOR
+	 ZE3GUx4A3tyjZtZxabZwFpi9axUTRwb3XcyP0fC8/fNyYH40EjT8uUG51eTVQkviLz
+	 O1VyX6oCisZ57vIwPQEAUtGWKanry7BEzmDRv+smriVZJ8tA1aqtLgl9cxNerJDp/E
+	 q58PVD38GaEMLo7PGLIl0K2l8IUiioCmFhBuG1EDy4wTfwc/pgr99/RyUNn9P05JH4
+	 u3ZWj/ex8Hmow==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	alexanderduyck@fb.com,
+	kernel-team@meta.com
+Subject: [PATCH net] eth: fbnic: don't disable the PCI device twice
+Date: Thu, 14 Nov 2024 17:48:09 -0800
+Message-ID: <20241115014809.754860-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1 1/2] net: phy: set eee_cfg based on PHY
- configuration
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20241114081653.3939346-1-yong.liang.choong@linux.intel.com>
- <20241114081653.3939346-2-yong.liang.choong@linux.intel.com>
- <ZzXBpEHs0y2_elqK@shell.armlinux.org.uk>
- <ZzXLgEjElnJD1445@shell.armlinux.org.uk>
- <ZzXOAvc__iQscSb4@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <ZzXOAvc__iQscSb4@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+We use pcim_enable_device(), there is no need to call pci_disable_device().
 
+Fixes: 546dd90be979 ("eth: fbnic: Add scaffolding for Meta's NIC driver")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: alexanderduyck@fb.com
+CC: kernel-team@meta.com
+---
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-On 14/11/2024 6:16 pm, Russell King (Oracle) wrote:
-> On Thu, Nov 14, 2024 at 10:05:52AM +0000, Russell King (Oracle) wrote:
->> On Thu, Nov 14, 2024 at 09:23:48AM +0000, Russell King (Oracle) wrote:
->>> On Thu, Nov 14, 2024 at 04:16:52PM +0800, Choong Yong Liang wrote:
->>>> Not all PHYs have EEE enabled by default. For example, Marvell PHYs are
->>>> designed to have EEE hardware disabled during the initial state, and it
->>>> needs to be configured to turn it on again.
->>>>
->>>> This patch reads the PHY configuration and sets it as the initial value for
->>>> eee_cfg.tx_lpi_enabled and eee_cfg.eee_enabled instead of having them set to
->>>> true by default.
->>>
->>> eee_cfg.tx_lpi_enabled is something phylib tracks, and it merely means
->>> that LPI needs to be enabled at the MAC if EEE was negotiated:
->>>
->>>   * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
->>>   *      that eee was negotiated.
->>>
->>> eee_cfg.eee_enabled means that EEE mode was enabled - which is user
->>> configuration:
->>>
->>>   * @eee_enabled: EEE configured mode (enabled/disabled).
->>>
->>> phy_probe() reads the initial PHY state and sets things up
->>> appropriately.
->>>
->>> However, there is a point where the EEE configuration (advertisement,
->>> and therefore eee_enabled state) is written to the PHY, and that should
->>> be config_aneg(). Looking at the Marvell driver, it's calling
->>> genphy_config_aneg() which eventually calls
->>> genphy_c45_an_config_eee_aneg() which does this (via
->>> __genphy_config_aneg()).
->>>
->>> Please investigate why the hardware state is going out of sync with the
->>> software state.
->>
->> I think I've found the issue.
->>
->> We have phydev->eee_enabled and phydev->eee_cfg.eee_enabled, which looks
->> like a bug to me. We write to phydev->eee_cfg.eee_enabled in
->> phy_support_eee(), leaving phydev->eee_enabled untouched.
->>
->> However, most other places are using phydev->eee_enabled.
->>
->> This is (a) confusing and (b) wrong, and having the two members leads
->> to this confusion, and makes the code more difficult to follow (unless
->> one has already clocked that there are these two different things both
->> called eee_enabled).
->>
->> This is my untested prototype patch to fix this - it may cause breakage
->> elsewhere:
-> 
-> As mentioned in the other thread:
-> 
-> Without a call to phy_support_eee():
-> 
-> EEE settings for eth2:
->          EEE status: disabled
->          Tx LPI: disabled
->          Supported EEE link modes:  100baseT/Full
->                                     1000baseT/Full
->          Advertised EEE link modes:  Not reported
->          Link partner advertised EEE link modes:  100baseT/Full
->                                                   1000baseT/Full
-> 
-> With a call to phy_support_eee():
-> 
-> EEE settings for eth2:
->          EEE status: enabled - active
->          Tx LPI: 0 (us)
->          Supported EEE link modes:  100baseT/Full
->                                     1000baseT/Full
->          Advertised EEE link modes:  100baseT/Full
->                                      1000baseT/Full
->          Link partner advertised EEE link modes:  100baseT/Full
->                                                   1000baseT/Full
-> 
-> So the EEE status is now behaving correctly, and the Marvell PHY is
-> being programmed with the advertisement correctly.
-> 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index e110c2ceafcf..32702dc4a066 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -334,7 +334,6 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ free_irqs:
+ 	fbnic_free_irqs(fbd);
+ free_fbd:
+-	pci_disable_device(pdev);
+ 	fbnic_devlink_free(fbd);
+ 
+ 	return err;
+@@ -367,7 +366,6 @@ static void fbnic_remove(struct pci_dev *pdev)
+ 	fbnic_fw_disable_mbx(fbd);
+ 	fbnic_free_irqs(fbd);
+ 
+-	pci_disable_device(pdev);
+ 	fbnic_devlink_free(fbd);
+ }
+ 
+-- 
+2.47.0
 
-Thank you for all the suggestions, the provided prototype, and the tested 
-results.
-
-I will study the suggestions in depth, test the provided prototype, and 
-provide more feedback.
 
