@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-145311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF549CF08D
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:47:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 249189CED28
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:16:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A984B3126D
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:16:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA3F0282A16
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95851D516F;
-	Fri, 15 Nov 2024 15:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5341D54C2;
+	Fri, 15 Nov 2024 15:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e2cz86/E"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VZJ8OLkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367DB1D5160
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A7B1D516A
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731683782; cv=none; b=EVoDkXcXlGeh7kINal+IBEhNHDtNUnHjMkfFNqJbgVi7QB9cnB/57YPvS6FWwatGTfSH0aSKSgS3pFNJMeGM0m8BDnVkSp1reDhzdgFun5SxNyiTOeQR25RwSWB6rRSmEFKzhZ/uSPrpKtY2uvk1ljsJjf7spEpLf1T8PSMDfNY=
+	t=1731683784; cv=none; b=OSGAnSlVSnyZNw4ibbalDjdGO5K0PPTxC6G9lUY0LiltlOFJHzY090sYnxMqTfNFRZ9RTI1y88iIOi1v5Q+rbn8mEGmT/EWUtmG3oBM4eX1r01XJuCfbwjw8FByvVXcTHIQ/khb/kglK/Nk/GqY58ExjgqFTJv45FCNE6jeK/Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731683782; c=relaxed/simple;
-	bh=5CxTAwREzf51+Iq1z2c4FkIRBEimFiRap24OasETLXQ=;
+	s=arc-20240116; t=1731683784; c=relaxed/simple;
+	bh=6JYXar9nJqGM+hQMFvySLeA0LLoApmYvzmyUBedamgI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c314ZAhr/lJlHKa+1wPOEKh7nGV2dbh2fLQUPd5UyASbEd/AuuSg3/GEDTPvNXWQbZi7BREPdr91Xj/kZ7UYxmhQaq5uxTny+rVUgNrjBlwpiLCrgWTOYuPt6j7FNg/HVhQ21RxUvkdtdThoJbis5lOt8MLXx+vK0eageHJk3jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e2cz86/E; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version; b=R9AgOYN+a21fgs82rEinT5ubamFeg698MxYjInEYmuuL7NfADRMQ+kCZj5QxofkYXtzFelvXQdGnRiZXA6OrCujFHmUVxiYIpWVrSt+rJ83tbkNTHYTfzRX3rQePR6epB+ppv9ndsYo32gQGnkV0TLSqhTrY634UEVLlVMMOqAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VZJ8OLkT; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21116b187c4so16616115ad.3
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 07:16:21 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20caccadbeeso9499005ad.2
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 07:16:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731683780; x=1732288580; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1731683782; x=1732288582; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=o8UQ9hdSvscAsYixVXiexQJrKM4zc8TVPKTwRW0ePBo=;
-        b=e2cz86/ECcJyVmp5I2T5toAU3dUgYQvg7ux9NGJxQaI1ukYmO8XztsF8B04Wnn7f1q
-         NWkBYgwKQoey/arGQsc77kegZoBe27AMiB5aClfAr5y9eouQ1aDee7MF7FUEFmmpi5wg
-         psoAwFZBamEnxNMeDIsiKKqMOM08j/egC2E+g=
+        bh=P4KOIMNUmwPXJSVvVOcIPpnj4gejXC1bx3BrDaUsLiU=;
+        b=VZJ8OLkTRs7zOGzwVsB8hCW6ubz7rs/y9jlbPssE8MqxL3gXBw4++UJoWG9cMw4agE
+         uhYrqERLnAYjGo9TFrLbn5vdtj1vnoPZH9JBE9aVYgNdqS4TxcwjaRr71v5076jBfC5N
+         ExTf3Ng6Sd/hphEo7Ss8ZwZ8gja6lP0YsiHFU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731683780; x=1732288580;
+        d=1e100.net; s=20230601; t=1731683782; x=1732288582;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=o8UQ9hdSvscAsYixVXiexQJrKM4zc8TVPKTwRW0ePBo=;
-        b=MCQk7/qad0CQseDpmyzAZqWhBc1n6dW0UcvDOZ4IWpdsEowCMwg0F6MPNVwV7xC0aq
-         Ua1o7xL7q1U5XFYRacoMykuhsm7/Qh6xHmoTDZmF9i5miHCvs9lz6gOkemvpUuCM6Ln9
-         /FzPEj179+iAOm6P/Tm6f3b+HnSw3sf1wYo30q+ltoS22L9cItaGOW+n8ELCcE9Rchej
-         ol9p3bnzRNeYZybppiSAToSECdJovu1OewbRzDQhb0RBTOAdlcolYgxnsbLFY86P+NyW
-         gBP0Nb0b0zayUpBlHAGlb8cQCSwMT003WR9VsEGLMr4iuQtE/7Rqf6cVjz7uTUiaBbaT
-         oRLw==
-X-Gm-Message-State: AOJu0Ywh817KYVM6A74qWtOOTXiazveubmlSmtlQMdWgjgFkaTqhwSdn
-	yeaJbQr06DVr0QIGWLrxjeRVbdak1DGoYN+9jS6Qu7pBachcl/Q1uZcpwoeJ+w==
-X-Google-Smtp-Source: AGHT+IHP52Rx9yD3jfQ3kYehnKAm26i1+VzfRQer9jAtpvdyvUIA7vaZBOatRIz5QKZ/lrTD68pM6w==
-X-Received: by 2002:a17:902:f683:b0:20c:ac9a:d751 with SMTP id d9443c01a7336-211d0d85bf6mr50610075ad.32.1731683780566;
-        Fri, 15 Nov 2024 07:16:20 -0800 (PST)
+        bh=P4KOIMNUmwPXJSVvVOcIPpnj4gejXC1bx3BrDaUsLiU=;
+        b=HtiO6QF37NUsZBn8arnLpzAzIFBca7KsxPtNT/3TdEfOJkpF0XlT3firneqo722gsH
+         8RPb0apKIan60rMqvWa5KPZHcBq8HmABN2YWYBpxI8nLFUswro0/56wiGVZx8ivFbUqp
+         QZ5PBKig+ShqOQxFv8I7uqvkFTsQ7s8Y8u/ohmlTXftowx3ObPkybH7Ee7EgBu8CT3J/
+         VPm0A5k2u8EG/0JKdnt4ufY9E53h+NiXfCRj8fFdUYgYbm2yG4dogNoS+FDXuxNARfyd
+         rNOmeEx3FmJlvXLV9YOVPmnIWBBVBzNV0EmyYN6YqhlOpkot0NcwBOu+xCcYYhR916Cq
+         bpFw==
+X-Gm-Message-State: AOJu0YxXjaFag9tOWFi4q9VYw+wp3dDgnCbN630kBj6l2vOe5tNflcUZ
+	ua1+nH6tIpAjl4tObqD2UoGrQZCeyzKB+xoxXL0y2i8i72jfeJx6MF6uF2C2+A==
+X-Google-Smtp-Source: AGHT+IGEBy441nyGD+pm3PDxUSfxKGHmx3QWkeFZ5Or+j3/z7kE0eJ9WAHvonjTYXCcE1WDN4Xc03w==
+X-Received: by 2002:a17:903:22c3:b0:20c:7ee8:fc3c with SMTP id d9443c01a7336-211d0d70eedmr37675215ad.22.1731683781807;
+        Fri, 15 Nov 2024 07:16:21 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0eca26fsm13357925ad.106.2024.11.15.07.16.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0eca26fsm13357925ad.106.2024.11.15.07.16.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 07:16:19 -0800 (PST)
+        Fri, 15 Nov 2024 07:16:21 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: netdev@vger.kernel.org,
 	andrew.gospodarek@broadcom.com,
 	shruti.parab@broadcom.com,
 	hongguang.gao@broadcom.com
-Subject: [PATCH net-next v2 05/11] bnxt_en: Allocate backing store memory for FW trace logs
-Date: Fri, 15 Nov 2024 07:14:31 -0800
-Message-ID: <20241115151438.550106-6-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 06/11] bnxt_en: Manage the FW trace context memory
+Date: Fri, 15 Nov 2024 07:14:32 -0800
+Message-ID: <20241115151438.550106-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20241115151438.550106-1-michael.chan@broadcom.com>
 References: <20241115151438.550106-1-michael.chan@broadcom.com>
@@ -89,153 +89,170 @@ Content-Transfer-Encoding: 8bit
 
 From: Shruti Parab <shruti.parab@broadcom.com>
 
-Allocate the new FW trace log backing store context memory types
-if they are supported by the FW.  FW debug logs are DMA'ed to the host
-backing store memory when the on-chip buffers are full.  If host
-memory cannot be allocated for these memory types, the driver
-will not abort.
+The FW trace memory pages will be added to the ethtool -w coredump
+in later patches.  In addition to the raw data, the driver has to
+add a header to provide the head and tail information on each FW
+trace log segment when creating the coredump.  The FW sends an async
+message to the driver after DMAing a chunk of logs to the context
+memory to indicate the last offset containing the tail of the logs.
+The driver needs to keep track of that.
 
 Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
 Signed-off-by: Shruti Parab <shruti.parab@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 43 ++++++++++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h | 27 +++++++++++---
- 2 files changed, 57 insertions(+), 13 deletions(-)
+v2: Use the shortened strings
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 67 +++++++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 22 ++++++++
+ 2 files changed, 89 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 02a8d568857b..c7e7cb98f03b 100644
+index c7e7cb98f03b..07510df4497b 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2461,6 +2461,15 @@ static bool bnxt_auto_speed_updated(struct bnxt_link_info *link_info)
- 	return false;
+@@ -245,6 +245,21 @@ static const u16 bnxt_async_events_arr[] = {
+ 	ASYNC_EVENT_CMPL_EVENT_ID_PPS_TIMESTAMP,
+ 	ASYNC_EVENT_CMPL_EVENT_ID_ERROR_REPORT,
+ 	ASYNC_EVENT_CMPL_EVENT_ID_PHC_UPDATE,
++	ASYNC_EVENT_CMPL_EVENT_ID_DBG_BUF_PRODUCER,
++};
++
++const u16 bnxt_bstore_to_trace[] = {
++	[BNXT_CTX_SRT]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_SRT_TRACE,
++	[BNXT_CTX_SRT2]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_SRT2_TRACE,
++	[BNXT_CTX_CRT]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_CRT_TRACE,
++	[BNXT_CTX_CRT2]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_CRT2_TRACE,
++	[BNXT_CTX_RIGP0]	= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_RIGP0_TRACE,
++	[BNXT_CTX_L2HWRM]	= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_L2_HWRM_TRACE,
++	[BNXT_CTX_REHWRM]	= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_ROCE_HWRM_TRACE,
++	[BNXT_CTX_CA0]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_CA0_TRACE,
++	[BNXT_CTX_CA1]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_CA1_TRACE,
++	[BNXT_CTX_CA2]		= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_CA2_TRACE,
++	[BNXT_CTX_RIGP1]	= DBG_LOG_BUFFER_FLUSH_REQ_TYPE_RIGP1_TRACE,
+ };
+ 
+ static struct workqueue_struct *bnxt_pf_wq;
+@@ -2470,6 +2485,50 @@ bool bnxt_bs_trace_avail(struct bnxt *bp, u16 type)
+ 		 (flags & BNXT_CTX_MEM_FW_BIN_TRACE));
  }
  
-+bool bnxt_bs_trace_avail(struct bnxt *bp, u16 type)
++static void bnxt_bs_trace_init(struct bnxt *bp, struct bnxt_ctx_mem_type *ctxm)
 +{
-+	u32 flags = bp->ctx->ctx_arr[type].flags;
++	u32 mem_size, pages, rem_bytes, magic_byte_offset;
++	u16 trace_type = bnxt_bstore_to_trace[ctxm->type];
++	struct bnxt_ctx_pg_info *ctx_pg = ctxm->pg_info;
++	struct bnxt_ring_mem_info *rmem, *rmem_pg_tbl;
++	struct bnxt_bs_trace_info *bs_trace;
++	int last_pg;
 +
-+	return (flags & BNXT_CTX_MEM_TYPE_VALID) &&
-+		((flags & BNXT_CTX_MEM_FW_TRACE) ||
-+		 (flags & BNXT_CTX_MEM_FW_BIN_TRACE));
++	if (ctxm->instance_bmap && ctxm->instance_bmap > 1)
++		return;
++
++	mem_size = ctxm->max_entries * ctxm->entry_size;
++	rem_bytes = mem_size % BNXT_PAGE_SIZE;
++	pages = DIV_ROUND_UP(mem_size, BNXT_PAGE_SIZE);
++
++	last_pg = (pages - 1) & (MAX_CTX_PAGES - 1);
++	magic_byte_offset = (rem_bytes ? rem_bytes : BNXT_PAGE_SIZE) - 1;
++
++	rmem = &ctx_pg[0].ring_mem;
++	bs_trace = &bp->bs_trace[trace_type];
++	bs_trace->ctx_type = ctxm->type;
++	bs_trace->trace_type = trace_type;
++	if (pages > MAX_CTX_PAGES) {
++		int last_pg_dir = rmem->nr_pages - 1;
++
++		rmem_pg_tbl = &ctx_pg[0].ctx_pg_tbl[last_pg_dir]->ring_mem;
++		bs_trace->magic_byte = rmem_pg_tbl->pg_arr[last_pg];
++	} else {
++		bs_trace->magic_byte = rmem->pg_arr[last_pg];
++	}
++	bs_trace->magic_byte += magic_byte_offset;
++	*bs_trace->magic_byte = BNXT_TRACE_BUF_MAGIC_BYTE;
 +}
++
++#define BNXT_EVENT_BUF_PRODUCER_TYPE(data1)				\
++	(((data1) & ASYNC_EVENT_CMPL_DBG_BUF_PRODUCER_EVENT_DATA1_TYPE_MASK) >>\
++	 ASYNC_EVENT_CMPL_DBG_BUF_PRODUCER_EVENT_DATA1_TYPE_SFT)
++
++#define BNXT_EVENT_BUF_PRODUCER_OFFSET(data2)				\
++	(((data2) &							\
++	  ASYNC_EVENT_CMPL_DBG_BUF_PRODUCER_EVENT_DATA2_CURR_OFF_MASK) >>\
++	 ASYNC_EVENT_CMPL_DBG_BUF_PRODUCER_EVENT_DATA2_CURR_OFF_SFT)
 +
  #define BNXT_EVENT_THERMAL_CURRENT_TEMP(data2)				\
  	((data2) &							\
  	  ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA2_CURRENT_TEMP_MASK)
-@@ -8744,16 +8753,34 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp, u32 ena)
- {
- 	struct bnxt_ctx_mem_info *ctx = bp->ctx;
- 	struct bnxt_ctx_mem_type *ctxm;
--	u16 last_type;
-+	u16 last_type = BNXT_CTX_INV;
- 	int rc = 0;
- 	u16 type;
- 
--	if (!ena)
--		return 0;
--	else if (ena & FUNC_BACKING_STORE_CFG_REQ_ENABLES_TIM)
--		last_type = BNXT_CTX_MAX - 1;
--	else
--		last_type = BNXT_CTX_L2_MAX - 1;
-+	for (type = BNXT_CTX_SRT; type <= BNXT_CTX_RIGP1; type++) {
-+		ctxm = &ctx->ctx_arr[type];
-+		if (!bnxt_bs_trace_avail(bp, type))
-+			continue;
-+		if (!ctxm->mem_valid) {
-+			rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm,
-+						     ctxm->max_entries, 1);
-+			if (rc) {
-+				netdev_warn(bp->dev, "Unable to setup ctx page for type:0x%x.\n",
-+					    type);
-+				continue;
-+			}
-+			last_type = type;
-+		}
-+	}
+@@ -2786,6 +2845,13 @@ static int bnxt_async_event_process(struct bnxt *bp,
+ 		hwrm_update_token(bp, seq_id, BNXT_HWRM_DEFERRED);
+ 		goto async_event_process_exit;
+ 	}
++	case ASYNC_EVENT_CMPL_EVENT_ID_DBG_BUF_PRODUCER: {
++		u16 type = (u16)BNXT_EVENT_BUF_PRODUCER_TYPE(data1);
++		u32 offset =  BNXT_EVENT_BUF_PRODUCER_OFFSET(data2);
 +
-+	if (last_type == BNXT_CTX_INV) {
-+		if (!ena)
-+			return 0;
-+		else if (ena & FUNC_BACKING_STORE_CFG_REQ_ENABLES_TIM)
-+			last_type = BNXT_CTX_MAX - 1;
-+		else
-+			last_type = BNXT_CTX_L2_MAX - 1;
++		bnxt_bs_trace_check_wrap(&bp->bs_trace[type], offset);
++		goto async_event_process_exit;
 +	}
- 	ctx->ctx_arr[last_type].last = 1;
- 
- 	for (type = 0 ; type < BNXT_CTX_V2_MAX; type++) {
-@@ -8776,7 +8803,7 @@ static void bnxt_free_one_ctx_mem(struct bnxt *bp,
- 
- 	ctxm->last = 0;
- 
--	if (ctxm->mem_valid && !force)
-+	if (ctxm->mem_valid && !force && (ctxm->flags & BNXT_CTX_MEM_PERSIST))
- 		return;
- 
- 	ctx_pg = ctxm->pg_info;
+ 	default:
+ 		goto async_event_process_exit;
+ 	}
+@@ -8769,6 +8835,7 @@ static int bnxt_backing_store_cfg_v2(struct bnxt *bp, u32 ena)
+ 					    type);
+ 				continue;
+ 			}
++			bnxt_bs_trace_init(bp, ctxm);
+ 			last_type = type;
+ 		}
+ 	}
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index a092ed3c2248..d02860e7ea1c 100644
+index d02860e7ea1c..4ebee79fbe52 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1881,6 +1881,13 @@ struct bnxt_ctx_mem_type {
- 	u16	entry_size;
- 	u32	flags;
- #define BNXT_CTX_MEM_TYPE_VALID FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_TYPE_VALID
-+#define BNXT_CTX_MEM_FW_TRACE		\
-+	FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_FW_DBG_TRACE
-+#define BNXT_CTX_MEM_FW_BIN_TRACE	\
-+	FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_FW_BIN_DBG_TRACE
-+#define BNXT_CTX_MEM_PERSIST		\
-+	FUNC_BACKING_STORE_QCAPS_V2_RESP_FLAGS_NEXT_BS_OFFSET
+@@ -2112,6 +2112,26 @@ enum board_idx {
+ 	NETXTREME_E_P7_VF,
+ };
+ 
++#define BNXT_TRACE_BUF_MAGIC_BYTE ((u8)0xbc)
++#define BNXT_TRACE_MAX 11
 +
- 	u32	instance_bmap;
- 	u8	init_value;
- 	u8	entry_multiple;
-@@ -1921,21 +1928,30 @@ struct bnxt_ctx_mem_type {
- #define BNXT_CTX_FTQM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_FP_TQM_RING
- #define BNXT_CTX_MRAV	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_MRAV
- #define BNXT_CTX_TIM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TIM
--#define BNXT_CTX_TKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TKC
--#define BNXT_CTX_RKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RKC
-+#define BNXT_CTX_TCK	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TX_CK
-+#define BNXT_CTX_RCK	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RX_CK
- #define BNXT_CTX_MTQM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_MP_TQM_RING
- #define BNXT_CTX_SQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SQ_DB_SHADOW
- #define BNXT_CTX_RQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RQ_DB_SHADOW
- #define BNXT_CTX_SRQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRQ_DB_SHADOW
- #define BNXT_CTX_CQDBS	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CQ_DB_SHADOW
--#define BNXT_CTX_QTKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_QUIC_TKC
--#define BNXT_CTX_QRKC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_QUIC_RKC
- #define BNXT_CTX_TBLSC	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_TBL_SCOPE
- #define BNXT_CTX_XPAR	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_XID_PARTITION
-+#define BNXT_CTX_SRT	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRT_TRACE
-+#define BNXT_CTX_SRT2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_SRT2_TRACE
-+#define BNXT_CTX_CRT	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CRT_TRACE
-+#define BNXT_CTX_CRT2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CRT2_TRACE
-+#define BNXT_CTX_RIGP0	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RIGP0_TRACE
-+#define BNXT_CTX_L2HWRM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_L2_HWRM_TRACE
-+#define BNXT_CTX_REHWRM	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_ROCE_HWRM_TRACE
-+#define BNXT_CTX_CA0	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA0_TRACE
-+#define BNXT_CTX_CA1	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA1_TRACE
-+#define BNXT_CTX_CA2	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_CA2_TRACE
-+#define BNXT_CTX_RIGP1	FUNC_BACKING_STORE_QCAPS_V2_REQ_TYPE_RIGP1_TRACE
++struct bnxt_bs_trace_info {
++	u8 *magic_byte;
++	u32 last_offset;
++	u8 wrapped:1;
++	u16 ctx_type;
++	u16 trace_type;
++};
++
++static inline void bnxt_bs_trace_check_wrap(struct bnxt_bs_trace_info *bs_trace,
++					    u32 offset)
++{
++	if (!bs_trace->wrapped &&
++	    *bs_trace->magic_byte != BNXT_TRACE_BUF_MAGIC_BYTE)
++		bs_trace->wrapped = 1;
++	bs_trace->last_offset = offset;
++}
++
+ struct bnxt {
+ 	void __iomem		*bar0;
+ 	void __iomem		*bar1;
+@@ -2668,6 +2688,7 @@ struct bnxt {
  
- #define BNXT_CTX_MAX	(BNXT_CTX_TIM + 1)
- #define BNXT_CTX_L2_MAX	(BNXT_CTX_FTQM + 1)
--#define BNXT_CTX_V2_MAX	(BNXT_CTX_XPAR + 1)
-+#define BNXT_CTX_V2_MAX	(BNXT_CTX_RIGP1 + 1)
- #define BNXT_CTX_INV	((u16)-1)
+ 	struct bnxt_ctx_pg_info	*fw_crash_mem;
+ 	u32			fw_crash_len;
++	struct bnxt_bs_trace_info bs_trace[BNXT_TRACE_MAX];
+ };
  
- struct bnxt_ctx_mem_info {
-@@ -2793,6 +2809,7 @@ int bnxt_alloc_rx_data(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
- 		       u16 prod, gfp_t gfp);
- void bnxt_reuse_rx_data(struct bnxt_rx_ring_info *rxr, u16 cons, void *data);
- u32 bnxt_fw_health_readl(struct bnxt *bp, int reg_idx);
-+bool bnxt_bs_trace_avail(struct bnxt *bp, u16 type);
- void bnxt_set_tpa_flags(struct bnxt *bp);
- void bnxt_set_ring_params(struct bnxt *);
- int bnxt_set_rx_skb_mode(struct bnxt *bp, bool page_mode);
+ #define BNXT_NUM_RX_RING_STATS			8
+@@ -2803,6 +2824,7 @@ static inline bool bnxt_sriov_cfg(struct bnxt *bp)
+ #endif
+ }
+ 
++extern const u16 bnxt_bstore_to_trace[];
+ extern const u16 bnxt_lhint_arr[];
+ 
+ int bnxt_alloc_rx_data(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
 -- 
 2.30.1
 
