@@ -1,140 +1,163 @@
-Return-Path: <netdev+bounces-145194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06209CDA7F
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 09:31:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB179CDA80
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 09:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F130B24816
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 08:31:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99DDC1F23708
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 08:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E9F18A6BC;
-	Fri, 15 Nov 2024 08:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65281189919;
+	Fri, 15 Nov 2024 08:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="GvOBUsev"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1367018BC2F
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 08:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772E24317C;
+	Fri, 15 Nov 2024 08:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731659499; cv=none; b=KMme3rg3vZOviGuZdsxaRN+t9Anab6qijNSlifiVyIXxTe9GpwdvmIlPFRWGfj6yID7giP0vhJkSQ+A9PBu9pOVydexbqxru6oDoHbMmjLvudBN1J80i6miywqqNgVnylL8393k3t5CA/C0F8txTmFZXUT2HN7WdFl7nfrSgYHw=
+	t=1731659529; cv=none; b=TJQH2CYMl+me2lsvpsZavCT9TShbTSse9mkF5iD4+78JWKjB9scu1NOvd0LZEo0HoUcLvVmYGD3DrlaYZIwgK7OW5lkkt8chBo+mkKM7Fovn/9JVVcwE1+itYGftvEh445gSUnXy8JiYXDsboVKOa1Ew8xbyrzMH0kc5v7DGnmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731659499; c=relaxed/simple;
-	bh=xcdtrxcwpTnLEPaXSmZR3NuiRhTzoRvMbIOYl8cGGsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NeCnhM1hWkpbiLJu2Dh+iDyomP9q5EnfxXbTDq9DQWBBCDCuc369oLDpyYHhbnqgNH8R6naO5IG5UccoLitg02fZzW5Hy1QQovbTa2DFPrjTbw+t/q4RPgOvEXRP0MpQGCwhW4UMsxd/eBBjQ0b001ND46eHX2wZV1Zpax7pDrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tBrjF-0000SB-St; Fri, 15 Nov 2024 09:30:57 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tBrjD-000sSC-07;
-	Fri, 15 Nov 2024 09:30:55 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id AA09D373AB0;
-	Fri, 15 Nov 2024 08:30:54 +0000 (UTC)
-Date: Fri, 15 Nov 2024 09:30:54 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>, 
-	Jian Zhang <zhangjian.3032@bytedance.com>, netdev@vger.kernel.org, openbmc@lists.ozlabs.org, 
-	Matt Johnston <matt@codeconstruct.com.au>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] mctp i2c: notify user space on TX failure
-Message-ID: <20241115-scrupulous-mantis-of-purring-1c41fe-mkl@pengutronix.de>
-References: <20241108094206.2808293-1-zhangjian.3032@bytedance.com>
- <20241113190920.0ceaddf2@kernel.org>
- <da9b94909dcda3f0f7e48865e63d118c3be09a8d.camel@codeconstruct.com.au>
- <20241113191909.10cf495e@kernel.org>
- <42761fa6276dcfc64f961d25ff7a46b764d35851.camel@codeconstruct.com.au>
- <20241114070235.79f9a429@kernel.org>
+	s=arc-20240116; t=1731659529; c=relaxed/simple;
+	bh=Ft9o+8IN3dR7zbe+yx515zUiuduyfuQwiMP4dzTo3io=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NPjOe9gqz0tlzEkp+CH1q7VijHdf5FdR6N0NNUwSoe6muTlaZDtc0sSFmmUj+8vdDk9if84Qs6SGNLYwE8pU9rC+Er6QnbHGvBh6qm3amldRtdq9MkZYSnzBzMmKkHo6EMmEKEiGxvqmtO4qGm5og0/gTdJRquo66O+TAq1iAXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=GvOBUsev; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tBrkD-0077UP-P2; Fri, 15 Nov 2024 09:31:57 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=yqG1zxisn2LWsL+t6aF9uz0Ph7aK0bj7aXBWlAlzRag=; b=GvOBUsevAtuNwWJLpWYNk68lL4
+	EnEbylUdWFK8pvtoofV+DW2e0g5qGMM4h0wdq0xa8vWyg+ZNTEyaUB1xJ7+K5mTnlx2ki9OOm1F4S
+	RH1gv+d+xw7CA2ImPjL2Djcqd7jqskE6gTjTwqySSv8oqV1B7AGYO/IxAnexJHqgbs2+GgDtxKgKS
+	EuCoBXrg+cK/pdIKCdrUwhPLKNoOCcWBjlchBIg291UqoP96BBvtyVOr1UmQvmc0mBT+YfL20lPtw
+	8nHPnykyWXXqNWHyPk/CRlpMIC8U9wEm2W2UEcgEo6aAHH2Q+V6I5m7HcxHTkFgVXHkfmk1r7V62V
+	jDF+kJ+w==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tBrkC-0004eG-8g; Fri, 15 Nov 2024 09:31:56 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tBrju-00AATW-SW; Fri, 15 Nov 2024 09:31:38 +0100
+Message-ID: <02c01b54-ad82-4ae0-b4fd-db1b7687efa0@rbox.co>
+Date: Fri, 15 Nov 2024 09:31:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vt3m2lwmvec4zdoq"
-Content-Disposition: inline
-In-Reply-To: <20241114070235.79f9a429@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/4] bluetooth: Improve setsockopt() handling of
+ malformed user input
+To: David Wei <dw@davidwei.uk>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
+References: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
+ <20241115-sockptr-copy-fixes-v1-1-d183c87fcbd5@rbox.co>
+ <156ce25b-4344-40cd-9c72-1a45e8f77b38@davidwei.uk>
+ <CABBYNZLbR22cWaXA4YNwtE8=+VfdGYR5oN6TSJ-MwXCuP3=6hw@mail.gmail.com>
+ <970c7945-3dc4-4f07-94d5-19080efb2f21@davidwei.uk>
+ <CABBYNZL_awaZOKpsAyOaAbtnJLobJ1bQpF_9JNxpiyQg5P5q1Q@mail.gmail.com>
+ <4292b59f-7956-4c37-8909-ecb2261687b1@davidwei.uk>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <4292b59f-7956-4c37-8909-ecb2261687b1@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 11/15/24 04:04, David Wei wrote:
+> On 2024-11-14 18:50, Luiz Augusto von Dentz wrote:
+>> Hi David,
+>> On Thu, Nov 14, 2024 at 9:30 PM David Wei <dw@davidwei.uk> wrote:
+>>> On 2024-11-14 18:15, Luiz Augusto von Dentz wrote:
+>>>> Hi David,
+>>>> On Thu, Nov 14, 2024 at 7:42 PM David Wei <dw@davidwei.uk> wrote:
+>>>>> On 2024-11-14 15:27, Michal Luczaj wrote:
+>>>>> ...
+>>>>>> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+>>>>>> index f48250e3f2e103c75d5937e1608e43c123aa3297..1001fb4cc21c0ecc7bcdd3ea9041770ede4f27b8 100644
+>>>>>> --- a/net/bluetooth/rfcomm/sock.c
+>>>>>> +++ b/net/bluetooth/rfcomm/sock.c
+>>>>>> @@ -629,10 +629,9 @@ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname,
+>>>>>>
+>>>>>>       switch (optname) {
+>>>>>>       case RFCOMM_LM:
+>>>>>> -             if (bt_copy_from_sockptr(&opt, sizeof(opt), optval, optlen)) {
+>>>>>> -                     err = -EFAULT;
+>>>>>> +             err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
+>>>>>> +             if (err)
+>>>>>>                       break;
+>>>>>> -             }
+>>>>>
+>>>>> This will return a positive integer if copy_safe_from_sockptr() fails.
+>>>>
+>>>> What are you talking about copy_safe_from_sockptr never returns a
+>>>> positive value:
+>>>>
+>>>>  * Returns:
+>>>>  *  * -EINVAL: @optlen < @ksize
+>>>>  *  * -EFAULT: access to userspace failed.
+>>>>  *  * 0 : @ksize bytes were copied
+>>>
+>>> Isn't this what this series is about? copy_from_sockptr() returns 0 on
+>>> success, or a positive integer for number of bytes NOT copied on error.
+>>> Patch 4 even updates the docs for copy_from_sockptr().
+>>>
+>>> copy_safe_from_sockptr()
+>>>         -> copy_from_sockptr()
+>>>         -> copy_from_sockptr_offset()
+>>>         -> memcpy() for kernel to kernel OR
+>>>         -> copy_from_user() otherwise
+>>
+>> Well except the safe version does check what would otherwise cause a
+>> positive return by the likes of copy_from_user and returns -EINVAL
+>> instead, otherwise the documentation of copy_safe_from_sockptr is just
+>> wrong and shall state that it could return positive as well but I
+>> guess that would just make it as inconvenient so we might as well
+>> detect when a positive value would be returned just return -EFAULT
+>> instead.
+> 
+> Yes it checks and returns EINVAL, but not EFAULT which is what my
+> comment on the original patch is about. Most of the calls to
+> bt_copy_from_sockptr() that Michal replaced with
+> copy_safe_from_sockptr() remain incorrect because it is assumed that
+> EFAULT is returned. Only rfcomm_sock_setsockopt_old() was vaguely doing
+> the right thing and the patch changed it back to the incorrect pattern:
+> 
+> err = copy_safe_from_sockptr(...);
+> if (err)
+> 	break;
+> 
+> But I do agree that making copy_safe_from_sockptr() do the right thing
+> and EFAULT will be easier and prevent future problems given that
+> copy_from_sockptr() is meant to be deprecated anyhow.
 
---vt3m2lwmvec4zdoq
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next] mctp i2c: notify user space on TX failure
-MIME-Version: 1.0
+Just to be clear: copy_safe_from_sockptr() was recently fixed to return
+EFAULT:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=eb94b7bb1010
+Sorry, I should have mentioned this series is a follow up to that patch.
 
-On 14.11.2024 07:02:35, Jakub Kicinski wrote:
-> On Thu, 14 Nov 2024 14:48:57 +0800 Jeremy Kerr wrote:
-> > > routing isn't really my forte, TBH, what eats the error so that it
-> > > doesn't come out of mctp_local_output() ? Do you use qdiscs on top
-> > > of the MCTP devices? =20
-> >=20
-> > There are no qdiscs involved at this stage, as we need to preserve
-> > packet ordering in most cases. The route output functions will end up
-> > in a dev_queue_xmit, so any tx error would have been decoupled from the
-> > route output at that stage.
->=20
-> Ah, it's the driver eating the errors, it puts the packet on a local
-> queue and returns OK no matter what. The I2C transfer happens from=20
-> a thread.
->=20
-> I wonder if there is precedent, let's ask CAN experts.
->=20
-> Mark, MCTP would like to report errors from the drivers all the way=20
-> to the socket. Do CAN drivers do something along these lines?
+Thanks,
+Michal
 
-On CAN_RAW we send fixed size messages (struct can_frame) and there is a
-bit left to mark a can_frame as an error frame. This basically means we
-send the error notification inline.
-
-What about using sock_queue_err_skb()? We do this in CAN_J1939.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---vt3m2lwmvec4zdoq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc3BrsACgkQKDiiPnot
-vG+fYgf/Va/T2YBUFonO4TuAsteq+Vjzg37H/7ok0NZCvgSfZ8QqVGaI54B/ByJH
-fdknhCQ6xHUH0ov7SkK7I8TS2LZHQ3N092ApMCtENsfCTg5ZybIiibPS2Teb+lPP
-lKbktQqtS/5UX/ZJdstAl43zm/MYrNMHnfV2D+BUXDMpr3JvMFX6B6/jeUwZ/lAS
-6r5QAne4+DWNfWf+1S+YWsYHqI1r5cuzN1ZcVPM2WhTM0LdksgkojKAvV5t7zDes
-zwlUtToIF6nfehDyeue5wjMy0WrPOZQs8cTVi0GK3Z2petxKnGFWAvn5mkVg6T0k
-Wc7MKFi1s015Oh1cjnxV6VwvambeUg==
-=XgKe
------END PGP SIGNATURE-----
-
---vt3m2lwmvec4zdoq--
 
