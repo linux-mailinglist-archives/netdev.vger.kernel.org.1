@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-145375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5B29CF4FA
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:37:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3131E9CF4FC
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:37:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42BA52893FF
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 19:37:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAE4A28A2D2
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 19:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8C31E1C2D;
-	Fri, 15 Nov 2024 19:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C2F1E25F4;
+	Fri, 15 Nov 2024 19:36:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570151D63F0;
-	Fri, 15 Nov 2024 19:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804881E1023;
+	Fri, 15 Nov 2024 19:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731699412; cv=none; b=lldIET4gbdyJEY9LK1fBExs8+bFpE7yFw9HILswnxbHIZeKT2TbbH25laW/iFx49OVIImuAF8JDDInrrOe3CNYvIvYuoO0gKyD3XugtNZM0EuTeKub+BFJU9n9j9YyZbt8WvaQUwMIUzdqzZ1MwQDbkkTc33zuGaYkdNzgUVpoE=
+	t=1731699413; cv=none; b=GC4PrhqJttM0CyaqYaWT7ja0LUjSZf1358uH2iqvdZk5fXaIszmViZ83gvi2VL2U72rLgjL1gBYPYB7p/dQrGlSsiwVTkG3CouqnjWZ2vgQ5yTFMevGijPDp/Jy6ZoDg+m1Hc/rsU5pgNY48eN7vKV47VuCHFAh2+v+r/87C/EI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731699412; c=relaxed/simple;
-	bh=LJCi16uBVzofCIGZW8Thf5aK7hpT+0W/+ExLkSulXJc=;
+	s=arc-20240116; t=1731699413; c=relaxed/simple;
+	bh=0HURAoP05ewL0yjkUita5x92KSPTXFdoL30xsQh+/kA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rFTnfWDEk9w2UyWmGpbsrhaKXLucBCOzBi/pKmVQr0vcXqjBvMWFEF6ATOPup3FdotJaPVruzOkKDoQPgPwfbMC3QFpk+NDzakr6KF5D1Wr2bEJ0LKiryDLyYwW3ETbyNpqHI9AfnXCPnFb4Ad+PM7LqjRpv+hu+MX/8eIn49Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=mIX5XWwgXoBMQJdNjbeyK8/+iQ9d4yw069ckXq7uflGF4joyA8VeydPIKKyAwQXuN1WNbPXfGHWkb2lPUQaODcHZ0p3cTDDMfVElLXy/erOsJAYNhintlU6GQSi9z4PS8E6dIq2JgZpc+Klkiid4qkvKi9FjVOZ1e7Tq4xOq/8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7f450f7f11dso2351a12.2;
-        Fri, 15 Nov 2024 11:36:50 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7206304f93aso14011b3a.0;
+        Fri, 15 Nov 2024 11:36:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731699409; x=1732304209;
+        d=1e100.net; s=20230601; t=1731699410; x=1732304210;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zlNpJSVmyFUS31WHgmShvqL/urAeCOgEQgXd4kMEOLg=;
-        b=olcBVblUzZoGDNQBiN6iMNsRc0//ZKfgb8nM1h3HtK0Yy/3UbNbqbrrXh5vH7NX+4c
-         GboOw2syeLNYEtoOBxtPP/qDCahNTNaVpGRlbw2bhml8M43I5zWSvX4sX4w9jgTXR0N3
-         lNRkFi7WLsDOOoNFvRc+eAiXavoFgLS70dEXnIW4kRXY3Ar7l6S2bEowZN6NHlJB4Ci3
-         MzAsUNsWBMLj47HptRu2jQBmPFd6AgMZlUfInJLuSK3OXDg4FPUivLp6QKuFovr4G9OF
-         QWHBPWmjsY4hWy8oYlyFJmGfi8kzLI7pTE7Ha8ckkj9HXI3sR3TTfjPqRWh6+obSWaNn
-         Kl9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUCiZAByUQvCibXCCNAOqPRnHfctGGkK+/eU0m34LB4/RJ5CXQWm7CXIhAd9AjtWebPfof1iXtTVcw=@vger.kernel.org, AJvYcCVoxJ0Pj5zwMEvDJn9UwFIcmLyuGbWCyTYHOWZSon+YMO1uqIXSkTqDmfPQogBkzAqfaX0DKRnwPgkGfEZL@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZu6OUeba4BSTCQ6jCNuS2CKMme+ojuilZfuiOnoxosNbChsGl
-	Snmr1t4IiwbQ851lm8AeYXuAnWzy7yNFDyLY1h8e4vZ/ha2frIYJfJNkhuM=
-X-Google-Smtp-Source: AGHT+IHTqUjdVKy3Qncpy7KPSxayRIDAyVWzaou5ixNvcn4fzw9hACfPxJOS5QXdV6TDgeiiSZKALw==
-X-Received: by 2002:a17:90b:1a85:b0:2e2:b6c2:2ae with SMTP id 98e67ed59e1d1-2ea1559adbamr4032268a91.36.1731699409208;
-        Fri, 15 Nov 2024 11:36:49 -0800 (PST)
+        bh=9ZZAw5tZucUhEBuhWIYesgkI51NPJ4Ne/XBaMDswgq0=;
+        b=v3PX1yiyjtxbc+ULTfuYDlbwo76OvDhazi7KQLf57sdOnB6EhfawVVvemM4kPvNEJV
+         KCp+1IFqbeG1nfdokKPrPaIUBZCNiDdJywD73jsx2jB3WuLBZf0UCkG+DgxZa65FtlTq
+         H+C41ngvg/B6IQnUmOaQroLkQoYpPWXgK4pNQR4wxY9XF/dlyZfDrAsdL2C7DGhwquH7
+         kTQNCbWuGK2hq4lnVvAtjhwx/5mEpIo7bRAw6Vajy8QemcRHGzNK9J1jicgmYqONt6SL
+         fdJzEHADimurJnSFpP/KDNpQSNuslALul1dNWwNLKYN9t8O5WLH3PaP7jzbS8BY/mugk
+         QvcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUN7ln9np86+6bkTk+qPo7Xb8J/fUoA4uw+5mv8vwUpB36K3Z8eFChKt17GaFl5Gb4uGGy/Lrks0veE6wlu@vger.kernel.org, AJvYcCVwFNjqeUNnE6Tc7alpxuAE7/p90SI0K/ghaHcnkcAJEshksIaRRyjs31hhIxNlz1KUI8Qg5Q80qaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPrHWWRVxHY9821zZX4wXeRhlQ3wywuB2spGTH9U5KhzsASnu2
+	XSQql9yU3xJwLK6KjrJhOWXmXrzEkzJJKywjT04Aedy0BmRRDMZpIpiYq9w=
+X-Google-Smtp-Source: AGHT+IFmazW+ytgmFZiK4HiXxrsSFX57fKAHUMd9AN9AzApxoetCj1zKD1uxmRQY91ZOun4ArvH70Q==
+X-Received: by 2002:a05:6a00:3c96:b0:710:9d5d:f532 with SMTP id d2e1a72fcca58-72476f7d406mr5393537b3a.19.1731699410367;
+        Fri, 15 Nov 2024 11:36:50 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea06f1a634sm3243894a91.14.2024.11.15.11.36.48
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72476c8fc47sm1774014b3a.0.2024.11.15.11.36.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 11:36:48 -0800 (PST)
+        Fri, 15 Nov 2024 11:36:50 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -67,9 +67,9 @@ Cc: davem@davemloft.net,
 	andrew+netdev@lunn.ch,
 	kory.maincent@bootlin.com,
 	sdf@fomichev.me
-Subject: [PATCH net-next v2 1/8] ynl: support enum-cnt-name attribute in legacy definitions
-Date: Fri, 15 Nov 2024 11:36:39 -0800
-Message-ID: <20241115193646.1340825-2-sdf@fomichev.me>
+Subject: [PATCH net-next v2 2/8] ynl: skip rendering attributes with header property in uapi mode
+Date: Fri, 15 Nov 2024 11:36:40 -0800
+Message-ID: <20241115193646.1340825-3-sdf@fomichev.me>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241115193646.1340825-1-sdf@fomichev.me>
 References: <20241115193646.1340825-1-sdf@fomichev.me>
@@ -81,87 +81,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is similar to existing attr-cnt-name in the attributes
-to allow changing the name of the 'count' enum entry.
+To allow omitting some of the attributes in the final generated file.
 
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- Documentation/netlink/genetlink-c.yaml             | 3 +++
- Documentation/netlink/genetlink-legacy.yaml        | 3 +++
- Documentation/userspace-api/netlink/c-code-gen.rst | 4 +++-
- tools/net/ynl/ynl-gen-c.py                         | 8 ++++++--
- 4 files changed, 15 insertions(+), 3 deletions(-)
+ tools/net/ynl/ynl-gen-c.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-index 4f803eaac6d8..9660ffb1ed6a 100644
---- a/Documentation/netlink/genetlink-c.yaml
-+++ b/Documentation/netlink/genetlink-c.yaml
-@@ -106,6 +106,9 @@ additionalProperties: False
-         name-prefix:
-           description: For enum the prefix of the values, optional.
-           type: string
-+        enum-cnt-name:
-+          description: Name of the render-max counter enum entry.
-+          type: string
-         # End genetlink-c
- 
-   attribute-sets:
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index 8db0e22fa72c..16380e12cabe 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -117,6 +117,9 @@ additionalProperties: False
-         name-prefix:
-           description: For enum the prefix of the values, optional.
-           type: string
-+        enum-cnt-name:
-+          description: Name of the render-max counter enum entry.
-+          type: string
-         # End genetlink-c
-         # Start genetlink-legacy
-         members:
-diff --git a/Documentation/userspace-api/netlink/c-code-gen.rst b/Documentation/userspace-api/netlink/c-code-gen.rst
-index 89de42c13350..46415e6d646d 100644
---- a/Documentation/userspace-api/netlink/c-code-gen.rst
-+++ b/Documentation/userspace-api/netlink/c-code-gen.rst
-@@ -56,7 +56,9 @@ If ``name-prefix`` is specified it replaces the ``$family-$enum``
- portion of the entry name.
- 
- Boolean ``render-max`` controls creation of the max values
--(which are enabled by default for attribute enums).
-+(which are enabled by default for attribute enums). These max
-+values are named ``__$pfx-MAX`` and ``$pfx-MAX``. The name
-+of the first value can be overridden via ``enum-cnt-name`` property.
- 
- Attributes
- ==========
 diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 394b0023b9a3..55e7f2415b0b 100755
+index 55e7f2415b0b..8ba252973c2d 100755
 --- a/tools/net/ynl/ynl-gen-c.py
 +++ b/tools/net/ynl/ynl-gen-c.py
 @@ -801,6 +801,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
              self.user_type = 'int'
  
          self.value_pfx = yaml.get('name-prefix', f"{family.ident_name}-{yaml['name']}-")
-+        self.enum_cnt_name = yaml.get('enum-cnt-name', None)
++        self.header = yaml.get('header', None)
+         self.enum_cnt_name = yaml.get('enum-cnt-name', None)
  
          super().__init__(family, yaml)
+@@ -2440,6 +2441,9 @@ _C_KW = {
+         if const['type'] == 'enum' or const['type'] == 'flags':
+             enum = family.consts[const['name']]
  
-@@ -2471,9 +2472,12 @@ _C_KW = {
-                     max_val = f' = {enum.get_mask()},'
-                     cw.p(max_name + max_val)
-                 else:
-+                    cnt_name = enum.enum_cnt_name
-                     max_name = c_upper(name_pfx + 'max')
--                    cw.p('__' + max_name + ',')
--                    cw.p(max_name + ' = (__' + max_name + ' - 1)')
-+                    if not cnt_name:
-+                        cnt_name = '__' + name_pfx + 'max'
-+                    cw.p(c_upper(cnt_name) + ',')
-+                    cw.p(max_name + ' = (' + c_upper(cnt_name) + ' - 1)')
-             cw.block_end(line=';')
-             cw.nl()
-         elif const['type'] == 'const':
++            if enum.header:
++                continue
++
+             if enum.has_doc():
+                 if enum.has_entry_doc():
+                     cw.p('/**')
 -- 
 2.47.0
 
