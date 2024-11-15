@@ -1,145 +1,308 @@
-Return-Path: <netdev+bounces-145406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74BCD9CF655
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:46:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B1C79CF656
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:46:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22B14B366CE
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:44:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D176287648
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D7F1E32DB;
-	Fri, 15 Nov 2024 20:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3087C1E1035;
+	Fri, 15 Nov 2024 20:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOsDsKku"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="afyWifYD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B181E2847;
-	Fri, 15 Nov 2024 20:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3232D13FD72;
+	Fri, 15 Nov 2024 20:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731703392; cv=none; b=ZhNPVr07S3L20vtHjIpr0ALkg5IWqHNfNAhq6oQjTw97t2XVC6/E/5SScBEQxS6Wcd2PlMu70vAREqMVRFUW0I9tWl/91drNtBRPdxL6lNm8WUOy6wBSMfDYuYSNKWkvPDLIIEQgXg8n9AGVDB0JUrx4zJU0lx1+mHIYgBiyRQw=
+	t=1731703602; cv=none; b=IS9U1eJL7GywoxvIXL1hH3dfn+M6BOJwkAkfbUf/OmZnWW3mL8FOy/XJxvWWMZwRu8LamMd8NNTbOrSQ9a84o/vY17e1QrArStCyfxVkgtrfsfR1WGP9P1l7UVZkrCUtZP+O+tvRoLiCGPsxpcbWeJDqMmnI/OL+UnBxvoLmBlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731703392; c=relaxed/simple;
-	bh=L/nAji/np5Nj6xf7xzKtv5APFH3Nk1mvKh//Dch+LcI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=doGlFqBsL2ztZGjUekXpaslZZ6A9gowccu63edOO0zW8b5ZidHSljpTm7J0sgoWytRgFg4qS+8fHYczS1bfr+mdmSWx7Kr0mgoa5WJMIoM/49vs3/ch4VKenKwbQqnqaglGoBAzhc9jfdaTYcpvhdu8Ron/BBzeQOaQxJOo7Ruc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOsDsKku; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE64EC4AF0C;
-	Fri, 15 Nov 2024 20:43:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731703391;
-	bh=L/nAji/np5Nj6xf7xzKtv5APFH3Nk1mvKh//Dch+LcI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IOsDsKkuZ+ZyjsSoSsCn+85NzTnmSMnmohrt00YCpzx4TRL4vuazPXQDpKah0KOXb
-	 /fqEAcU+0Ce7z82qnrykHwLvwlDmDtqRgBopZPK98Krx672Zwi8sZXr0UseASrIraB
-	 o32U+ipKCAmIsM9qe/so6Oo117VqbhuHmyhhNj50uCsOtN0Mtg+ZW7XCA8khzuCBS5
-	 pf7prAFf7gL5Df4Qt7N9g9ZVNDswpvDc4JZybPAPNauJGCCFj/1W0FnT6ITU9aO3II
-	 3SmWI8+ucoQ0yjVogdneZNdWNWwAUizlWLBd/eI2guOj4wAMt3keNF36FBwYhdWlhI
-	 MYLhiU9ktzOaQ==
-From: Kees Cook <kees@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Christian Benvenuti <benve@cisco.com>,
-	Satish Kharat <satishkh@cisco.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Simon Horman <horms@kernel.org>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Takeru Hayasaka <hayatake396@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH 3/3] UAPI: ethtool: Avoid flex-array in struct ethtool_link_settings
-Date: Fri, 15 Nov 2024 12:43:05 -0800
-Message-Id: <20241115204308.3821419-3-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241115204115.work.686-kees@kernel.org>
-References: <20241115204115.work.686-kees@kernel.org>
+	s=arc-20240116; t=1731703602; c=relaxed/simple;
+	bh=SB6sRlYQPJX2cnmx7fApoRfkpOkQyL+KPr2/h03YT7c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XFixUy4wBSBjc36zRPysCHwL0DY5doC+Y+GFQSIjowJMpkfWZsDsEpzA0GVeShs/2ygc74W33V+DAuPebHchUWdzXitH4UrouBa1bcrGhlL3DoOPFsCZKXT/XvYXWkwKjcPpK34qWy4Eit7t7PTCz6O0wjaub/VvGj/bjqn+yTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=afyWifYD; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9a850270e2so4494666b.0;
+        Fri, 15 Nov 2024 12:46:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731703598; x=1732308398; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9yq6wiZr07zyT2tdDH94tcWOKQWvPr647j2FSkk0F3Q=;
+        b=afyWifYDw3xNyXhNjggqMNqjRDMS8naUtXKEpV0aEz94nW4liOZqL3E/9Iu0w/biPX
+         jQ+/q0GPqZthFFPy8o4GwHElOzqedJf1RIct1x6gmpd67uDcrtSPUIL+GHIZFymSTreJ
+         S0Dd8iwG18xT5+6R85YCmqogtjCw1cd5YlPHUmbeXJlmWJJU/RQU9ZTXHM37yUklmebZ
+         aU9B5Yg4QcK5LzAtBgfOHA69uRlaiZlWozsHiS9in8QCSvdjzCcwzdojHtNT59ou1AmC
+         Vb6EAKuecHqjCUcrkfYxGmvSrC0fe0maWglgwNXGA9vMSOKIi1FxfVZPNI7C/tvnNRkv
+         WWEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731703598; x=1732308398;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9yq6wiZr07zyT2tdDH94tcWOKQWvPr647j2FSkk0F3Q=;
+        b=Nn6bl2vXy6K+ov8D5D6/kAl0jy4FS8m8kOZkSXkT7ruWvxJqBwDbC8d69PYwtcBp8G
+         9zrF19rC/nP6seCEifECRSZMDHeN7KXk87vOJrlGUrHdnzFPoJeM0h4EL32O3neKPjXU
+         WLptN7H9dsYKUFpi5CgO7eJtzCY53afch0aTBeTwOlKvtwrL6oLBIP6qOnwjTcFA/QeA
+         XKMq3gTQDRQugT4NMDAY/iQZc7oX0De+EBNsKC/tdFYuD+P5hTWzNRo3OeGTDelJT5T0
+         +V8L0PfkZRILGsKPEflbavo2oqokuK292lG3wiVxCIbno9mqixemT+Q/+fuCHRLWhCgn
+         UUhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVL0zMNc1Sg0+Zx4BEac3Kj7EqgZnalpk3HU/HQbZBT8kYKO4fCgPkT9sNNcIQM3DsArzOH497jsvvaj0b2yv4X@vger.kernel.org, AJvYcCWt6BHGNhNaAzHuhCpDRGgzSmSTTArTjwlW1VSsDV24ZXxSoYmvmz2YNLXNyWkfQa7Ei5MQfcTwVr4R8Fk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJbOr120HknBc5njNp+ertVe8LJfjSEKbkDa/YZkz0DRnzgldE
+	0HP3CJQ2yD3Kd/qyIGlM6HwxcJ9kf5x1sxWyAglw7fBVKxcrwnzxeQDT1jeZShERQyxJeLqVwhA
+	t1gJxgG04AIip0MunvqDys+ilSbA=
+X-Google-Smtp-Source: AGHT+IGAiWLeBjumpw7p+afqPXYyXtvqY+8Qj9zPwMiWZbrBct0RWUM5Td4x4JWHFESzzhseikcfzEyMow/meHeScdg=
+X-Received: by 2002:a17:907:608a:b0:a99:6791:5449 with SMTP id
+ a640c23a62f3a-aa483553e12mr348295266b.52.1731703598185; Fri, 15 Nov 2024
+ 12:46:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2442; i=kees@kernel.org; h=from:subject; bh=L/nAji/np5Nj6xf7xzKtv5APFH3Nk1mvKh//Dch+LcI=; b=owGbwMvMwCVmps19z/KJym7G02pJDOnmmyLLWeIEXxh2FPs/3pJ5xlSy/cH/+nD+vuwjP2acn vV9zwzTjlIWBjEuBlkxRZYgO/c4F4+37eHucxVh5rAygQxh4OIUgIl8OMzwv0LhZLfx5y1aZana Uw7Xrnn0qNHML3P/3bo1+RaHrqxbJsPIsLFC5cDyritFW38Hc1SeuVE77Xr1IY2NcaJ+W3kXT/5 7hQcA
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+References: <20241113125152.752778-1-liuhangbin@gmail.com> <20241113125152.752778-2-liuhangbin@gmail.com>
+ <CAH5Ym4jjVFofG5J7QW=EsD00siDXtNWKt4ZDNbbUmP+Y4Jb-DQ@mail.gmail.com> <ZzWo5fJcraaDDLm_@fedora>
+In-Reply-To: <ZzWo5fJcraaDDLm_@fedora>
+From: Sam Edwards <cfsworks@gmail.com>
+Date: Fri, 15 Nov 2024 12:46:27 -0800
+Message-ID: <CAH5Ym4hcguhXvJvVuANns7Q9VTOWR-SxHSdD55rR5BWhWeg2Ow@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] net/ipv6: delete temporary address if mngtmpaddr
+ is removed or un-mngtmpaddr
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Xiao Ma <xiaom@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-struct ethtool_link_settings tends to be used as a header for other
-structures that have trailing bytes[1], but has a trailing flexible array
-itself. Using this overlapped with other structures leads to ambiguous
-object sizing in the compiler, so we want to avoid such situations (which
-have caused real bugs in the past). Detecting this can be done with
--Wflex-array-member-not-at-end, which will need to be enabled globally.
+On Wed, Nov 13, 2024 at 11:38=E2=80=AFPM Hangbin Liu <liuhangbin@gmail.com>=
+ wrote:
+>
+> On Wed, Nov 13, 2024 at 01:03:13PM -0800, Sam Edwards wrote:
+> > On Wed, Nov 13, 2024 at 4:52=E2=80=AFAM Hangbin Liu <liuhangbin@gmail.c=
+om> wrote:
+> > >
+> > > RFC8981 section 3.4 says that existing temporary addresses must have =
+their
+> > > lifetimes adjusted so that no temporary addresses should ever remain =
+"valid"
+> > > or "preferred" longer than the incoming SLAAC Prefix Information. Thi=
+s would
+> > > strongly imply in Linux's case that if the "mngtmpaddr" address is de=
+leted or
+> > > un-flagged as such, its corresponding temporary addresses must be cle=
+ared out
+> > > right away.
+> > >
+> > > But now the temporary address is renewed even after =E2=80=98mngtmpad=
+dr=E2=80=99 is removed
+> > > or becomes unmanaged. Fix this by deleting the temporary address with=
+ this
+> > > situation.
+> >
+> > Hi Hangbin,
+> >
+> > Is it actually a new temporary, or is it just failing to purge the old
+> > temporaries? While trying to understand this bug on my own, I learned
+>
+> 1. If delete the mngtmpaddr with the mngtmpaddr flag. e.g.
+> `ip addr del 2001::1/64 mngtmpaddr dev dummy0`. The following code in
+> inet6_addr_del()
+>
+>     if (!(ifp->flags & IFA_F_TEMPORARY) &&
+>         (ifa_flags & IFA_F_MANAGETEMPADDR))
+>             manage_tempaddrs(idev, ifp, 0, 0, false,
+>                              jiffies);
+>
+> will be called and the valid_lft/prefered_lft of tempaddres will be set t=
+o 0.
+>
+> 2. If we using cmd `ip addr change 2001::1/64 dev dummy0`, the following =
+code in
+> inet6_addr_modify():
+>
+>     if (was_managetempaddr || ifp->flags & IFA_F_MANAGETEMPADDR) {
+>             if (was_managetempaddr &&
+>                 !(ifp->flags & IFA_F_MANAGETEMPADDR)) {
+>                     cfg->valid_lft =3D 0;
+>                     cfg->preferred_lft =3D 0;
+>             }
+>             manage_tempaddrs(ifp->idev, ifp, cfg->valid_lft,
+>                              cfg->preferred_lft, !was_managetempaddr,
+>                              jiffies);
+>     }
+> will be called and valid_lft/prefered_lft of tempaddres will be set to 0.
+>
+> But these 2 setting actually not work as in addrconf_verify_rtnl():
+>
+>     if ((ifp->flags&IFA_F_TEMPORARY) &&
+>         !(ifp->flags&IFA_F_TENTATIVE) &&
+>         ifp->prefered_lft !=3D INFINITY_LIFE_TIME &&
+>         !ifp->regen_count && ifp->ifpub) {
+>             /* This is a non-regenerated temporary addr. */
+>
+>             unsigned long regen_advance =3D ipv6_get_regen_advance(ifp->i=
+dev);
+>
+>             if (age + regen_advance >=3D ifp->prefered_lft) {
+>
+>                  ^^ this will always true since prefered_lft is 0
+>
+> So later we will call ipv6_create_tempaddr(ifpub, true) to create a new
+> tempaddr.
+>
+> 3. If we delete the mngtmpaddr without the mngtmpaddr flag. e.g.
+> `ip addr del 2001::1/64 dev dummy0` The following code in inet6_addr_del(=
+)
+>
+>     if (!(ifp->flags & IFA_F_TEMPORARY) &&
+>         (ifa_flags & IFA_F_MANAGETEMPADDR))
+>             manage_tempaddrs(idev, ifp, 0, 0, false,
+>                              jiffies);
+>
+> Will *not* be called as ifa_flags doesn't have IFA_F_MANAGETEMPADDR.
+> So in addrconf_verify_rtnl(), the (age + regen_advance >=3D ifp->prefered=
+_lft)
+> checking will be false, no new tempaddr will be created. But the later
+> (ifp->valid_lft !=3D INFINITY_LIFE_TIME && age >=3D ifp->valid_lft) check=
+ing is
+> also false unless the valid_lft is just timeout. So the tempaddr will be =
+keep
+> until it's life timeout.
+>
+> > about a commit [1] that tried to address the former problem, and it's
+> > possible that the approach in that commit needs to be tightened up
+> > instead.
+> >
+> > [1]: 69172f0bcb6a09 ("ipv6 addrconf: fix bug where deleting a
+> > mngtmpaddr can create a new temporary address")
+>
+> The situation in this patch is that the user removed the temporary addres=
+s
+> first. The temporary address is not in the addr list anymore and
+> addrconf_verify_rtnl() won't create a new one. But later when delete the
+> mngtmpaddr, the manage_tempaddrs() is called again (because the mngtmpadd=
+r
+> flag in delete cmd) and a new tempaddr is created.
+>
+> >
+> > >
+> > > Fixes: 778964f2fdf0 ("ipv6/addrconf: fix timing bug in tempaddr regen=
+")
+> > > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > > ---
+> > >  net/ipv6/addrconf.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > >
+> > > diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> > > index 94dceac52884..6852dbce5a7d 100644
+> > > --- a/net/ipv6/addrconf.c
+> > > +++ b/net/ipv6/addrconf.c
+> > > @@ -4644,6 +4644,10 @@ static void addrconf_verify_rtnl(struct net *n=
+et)
+> > >                             !ifp->regen_count && ifp->ifpub) {
+> > >                                 /* This is a non-regenerated temporar=
+y addr. */
+> > >
+> > > +                               if ((!ifp->valid_lft && !ifp->prefere=
+d_lft) ||
+> > > +                                   ifp->ifpub->state =3D=3D INET6_IF=
+ADDR_STATE_DEAD)
+> > > +                                       goto delete_ifp;
+> > > +
+> >
+> > My understanding is that the kernel already calls
+> > `manage_tempaddrs(dev, ifp, 0, 0, false, now);` when some `ifp` needs
+> > its temporaries flushed out. That zeroes out the lifetimes of every
+> > temporary, which allows the "destructive" if/elseif/elseif/... block
+> > below to delete it. I believe fixing this bug properly will involve
+> > first understanding why *that* mechanism isn't working as designed.
+>
+> Please see the up comment.
+>
+> >
+> > In any case, this 'if' block is for temporary addresses /which haven't
+> > yet begun their regeneration process/, so this won't work to purge out
+> > addresses that have already started trying to create their
+> > replacement. That'll be a rare and frustrating race for someone in the
+> > future to debug indeed. As well, I broke this 'if' out from the below
+> > if/elseif/elseif/... to establish a clear separation between the
+> > "constructive" parts of an address's lifecycle (currently, only
+> > temporary addresses needing to regenerate) and the "destructive" parts
+> > (the address gradually becoming less prominent as its lifetime runs
+> > out), so destructive/delete logic doesn't belong up here anyway.
+>
+> Currently my fix is checking the tempaddr valid_lft and ifp->ifpub->state=
+.
+> Maybe we can delete the tempaddr direcly in ipv6_del_addr() and
+> inet6_addr_modify()?
 
-Using a tagged struct_group() to create a new ethtool_link_settings_hdr
-structure isn't possible as it seems we cannot use the tagged variant of
-struct_group() due to syntax issues from C++'s perspective (even within
-"extern C")[2]. Instead, we can just leave the offending member defined
-in UAPI and remove it from the kernel's view of the structure, as Linux
-doesn't actually use this member at all. There is also no change in
-size since it was already a flexible array that didn't contribute to
-size returned by any use of sizeof().
+Hi Hangbin,
 
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/lkml/20241109100213.262a2fa0@kernel.org/ [2]
-Link: https://lore.kernel.org/lkml/0bc2809fe2a6c11dd4c8a9a10d9bd65cccdb559b.1730238285.git.gustavoars@kernel.org/ [1]
-Signed-off-by: Kees Cook <kees@kernel.org>
----
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
----
- include/uapi/linux/ethtool.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+It took me a while to grasp but the problem seems to be a confusion
+about what it means to set a temporary's lifetimes to 0/0:
+1) "The mngtmpaddrs has gone away; this temporary is slated for
+deletion by addrconf_verify_rtnl()"
+2) "This temporary address itself shall no longer be used, regenerate
+it immediately."
 
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index c405ed63acfa..7e1b3820f91f 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -2526,12 +2526,19 @@ struct ethtool_link_settings {
- 	__u8	master_slave_state;
- 	__u8	rate_matching;
- 	__u32	reserved[7];
-+#ifndef __KERNEL__
-+	/* Linux builds with -Wflex-array-member-not-at-end but does
-+	 * not use the "link_mode_masks" member. Leave it defined for
-+	 * userspace for now, and when userspace wants to start using
-+	 * -Wfamnae, we'll need a new solution.
-+	 */
- 	__u32	link_mode_masks[];
- 	/* layout of link_mode_masks fields:
- 	 * __u32 map_supported[link_mode_masks_nwords];
- 	 * __u32 map_advertising[link_mode_masks_nwords];
- 	 * __u32 map_lp_advertising[link_mode_masks_nwords];
- 	 */
-+#endif
- };
- 
- /**
--- 
-2.34.1
+The existing behavior makes sense for the #2 case, but not for the #1
+case. It seems sensible to me to keep the #2 behavior as-is, because
+userspace might be setting a 0/0 lifetime to forcibly rotate the
+temporary.
 
+So it sounds like (at least) one of three fixes is in order:
+a) Make ipv6_create_tempaddr() verify that the `ifp` is (still)
+alive+mngtmpaddrs, returning with an error code if not.
+b) Look at the 3 callsites for ipv6_create_tempaddr() and add the
+above verifications before calling.
+c) Add a function that calls ipv6_del_addr(temp) for every temporary
+with a specified ifpub, and use it instead of manage_tempaddrs(..., 0,
+0, false, ...) when deleting/unflagging a mngtmpaddrs.
+
+Personally I like option C the best. What are your thoughts?
+
+Cheers,
+Sam
+
+>
+> Thanks
+> Hangbin
+> >
+> > What are your thoughts?
+> >
+> > Happy Wednesday,
+> > Sam
+> >
+> > >                                 unsigned long regen_advance =3D ipv6_=
+get_regen_advance(ifp->idev);
+> > >
+> > >                                 if (age + regen_advance >=3D ifp->pre=
+fered_lft) {
+> > > @@ -4671,6 +4675,7 @@ static void addrconf_verify_rtnl(struct net *ne=
+t)
+> > >
+> > >                         if (ifp->valid_lft !=3D INFINITY_LIFE_TIME &&
+> > >                             age >=3D ifp->valid_lft) {
+> > > +delete_ifp:
+> > >                                 spin_unlock(&ifp->lock);
+> > >                                 in6_ifa_hold(ifp);
+> > >                                 rcu_read_unlock_bh();
+> > > --
+> > > 2.46.0
+> > >
 
