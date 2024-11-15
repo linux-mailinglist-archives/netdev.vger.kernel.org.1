@@ -1,81 +1,50 @@
-Return-Path: <netdev+bounces-145352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96CAF9CF331
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:45:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9171D9CF392
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 19:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C6E9283FA0
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:45:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFD8CB344A3
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91501D61A1;
-	Fri, 15 Nov 2024 17:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76CA1D63E8;
+	Fri, 15 Nov 2024 16:52:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P5pZgxis"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpFVHUOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5100E1D5ADB;
-	Fri, 15 Nov 2024 17:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6781D63E0;
+	Fri, 15 Nov 2024 16:52:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731692708; cv=none; b=RWIj+i9H11b4ZMkLfXJgkgaJFBXZVYZWGUKHteTUYzz6cfys7CRAXpwJI2ufI+Wp4fn7eXXDEOLg30KrVNDSJzCH5TzsL0zwikqjKNF8/pAO9ecxGWHq47UC18ljN4zJksesSjR6m+Wq7+If8eqJj9MGGV9bUNDO7vhNzHnDdyI=
+	t=1731689573; cv=none; b=sk86kvDsNIr4o8LQylgNE/u3IOvLfVlECRitq7OTGZL+1/1eEGhvfRxZqm0a7ykO6vrGFy81H+XzKJ6HpOhZwYfDAECFRf6DRqGuNIYNzxQIveYEcWeR5EwNfu7TCWT4cX2Amz5HU7dgE87lndagkGzBvbdET7IWVF2PyxoReVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731692708; c=relaxed/simple;
-	bh=QTWbwD3DKt0zr3HVsMrLQMkox5w7tN0rnElVWEnMM14=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OvimdVVK4oUWB/mfjAg9eFYRsY/fmj9xovm82dQPGMtreRRc9dpromr6ZCFuddZom4pMcAY5qdatcYvqrAocql/9ha7xvM27YTm2JIqSQxvjiUuqPJLX3pirNL8/ijagOVVr0UQqBZcIodEWyT7LTNllL/ExgabqfmUHPBa4LIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P5pZgxis; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AFAYcWY008123;
-	Fri, 15 Nov 2024 17:45:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=9bwZzCyAvLguoe37pSaNCSSBT7z9
-	wKmcx4So1GTdFbs=; b=P5pZgxisEBU6TpexMjXjUUJAS4jxH9jyXTNIdgwdJ+l5
-	MmiOXh2qqtn11eBm6Ym3R+u+SyZ0o5u/bRJgTcoIvmcOdR3xG14U2FzUgKO6TO5O
-	2oAJWk+z1HvRX6lH1i9AMYLcoPcgHymjKabaDAnAsXWGUQXUYekVQ5p+Nj8rkppG
-	d9c6psyCrmoVLUfFoBhNX5vttE9gfp8hnfjOWCaYgiMNdNjYmL515FF1cNtfm0jH
-	l+WywwQhLRACCO6Yk5cwjuzZDAvo2zfAsAjylClZcNnI8k3amBmhCmuCOK4Hgfj2
-	gZELWBG9DMdCmLCdk2KAe5FbOdWV+VwYQNGdN07npg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42wu2vvsn5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 17:45:04 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AFHfs7v009421;
-	Fri, 15 Nov 2024 17:45:04 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42wu2vvsn1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 17:45:04 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AF8H6dM017821;
-	Fri, 15 Nov 2024 17:45:02 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42tk2n2se9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Nov 2024 17:45:02 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AFHiwZb19726688
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 15 Nov 2024 17:44:58 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 438C32004D;
-	Fri, 15 Nov 2024 17:44:58 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1CD2820040;
-	Fri, 15 Nov 2024 17:44:58 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 15 Nov 2024 17:44:58 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-Date: Fri, 15 Nov 2024 18:44:57 +0100
-Subject: [PATCH net-next] net/smc: Run patches also by RDMA ML
+	s=arc-20240116; t=1731689573; c=relaxed/simple;
+	bh=KmFQIPqrunG4ak8MKbdja0liL+Kg5SrJXxe1wOz+7gY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=p7f5SG4rgfUr3p81PEPUyOh1xxSxQMU5RPRgy4+nwwO4wg2PPopAMhxcnKIXrAktIPnR2S4WXgzj1XR71tugp0DdScjfn/OHs5WD66Gy+4XBGGAc/fya9iQG629Yhc49Gb1YbPC7dyEPDHb+tZPZlyn+AwtorFP/sqI+2opzZQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GpFVHUOL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D723CC4CED0;
+	Fri, 15 Nov 2024 16:52:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731689573;
+	bh=KmFQIPqrunG4ak8MKbdja0liL+Kg5SrJXxe1wOz+7gY=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=GpFVHUOL6XkAyNBmxv2aKUOvgpMMp2Wesvur5mFB9hEDoSploEXuY4CKvBhN+LxZr
+	 YK1DIGadS+3g8i395ldRnq7fCoO5jzLvB+UxvRfs842e93WMGPkr//f4pYLtBtw61g
+	 zbLCix56VWLPnsu0Yx1TymKgd5lbb8fWbdmNmGq5PVlcthH/Y1rs1fjq9fjb322DTq
+	 nbQPR/1Ef5YnICOHDr1GbI4kCfMnjSTt/vUjGd6mfeyDVURH8PNBmD+yxmYubcq3hA
+	 pXrQiC7ANssgF34XOPOaVruFoyBIHF1ajx5T4g/ofHtZ8oUhRQd+yXrIUsAGwYEOjS
+	 IMS6w3mZBNj1Q==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Fri, 15 Nov 2024 17:52:35 +0100
+Subject: [PATCH net-next 2/2] mptcp: pm: avoid code duplication to lookup
+ endp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,62 +53,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241115-smc_lists-v1-1-a0a438125f13@linux.ibm.com>
-X-B4-Tracking: v=1; b=H4sIAJiIN2cC/22NywqDMBBFf0Vm3YiTFh9d9T+KFJOMdUATSVKxi
- P/ekHWXh3s494BAninAvTjA08aBnU2AlwL0NNg3CTaJQVbyhljVIiz6NXOIQaiupbqVnbqihuS
- vnkbec+sJlqKwtEfo0zIl3/lvPtkw7396GwoUXWO0GWmoGlSPme1nL1ktpXYL9Od5/gCTMqTIs
- AAAAA==
-X-Change-ID: 20241106-smc_lists-b98e6829b31c
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Leon Romanovsky <leon@kernel.org>
-Cc: Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, linux390-list@tuxmaker.boeblingen.de.ibm.com,
-        linux-kernel@vger.kernel.org, Gerd Bayer <gbayer@linux.ibm.com>
+Message-Id: <20241115-net-next-mptcp-pm-lockless-dump-v1-2-f4a1bcb4ca2c@kernel.org>
+References: <20241115-net-next-mptcp-pm-lockless-dump-v1-0-f4a1bcb4ca2c@kernel.org>
+In-Reply-To: <20241115-net-next-mptcp-pm-lockless-dump-v1-0-f4a1bcb4ca2c@kernel.org>
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>
 X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: m24rJp-3g8Idy14-TaxmhZLjBXES-qUQ
-X-Proofpoint-GUID: LpD6NkObD4_44A3ElA8ZqYQXW7Vrk1nW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
- malwarescore=0 mlxscore=0 clxscore=1011 adultscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411150148
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1975; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=O/z/Hsnsu0LR75JFQ4U+yjYL7PiLIn4Ce3jB0lRGo68=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnN3xdydDjCMxxodmAEg7nruMUclT9BHZ93cVyJ
+ TmDdIH8x1+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZzd8XQAKCRD2t4JPQmmg
+ c+CuEACSxEujOpkJttoIF3f9j5rKquyF0TJ0EYDQuXkpOMPUZLPq73ZtfD2EMjK/EPRAmP5fljp
+ 4aQhKqhwqYfoK8tboi/UiIarV5bdmRkanCRJpc1N6+lFR4YtP9JBrAkSH6mfANJcfLMcMJYpUh+
+ 66Bcfe1Q7zm25XbBBnRW+YGicF+7yK7Dhc73e962bOgEXocPTKvu1aWYchIgfOba2BA+TCuweS7
+ jo9J1t0kqvxGmZ2XgxRPCSnw7OHjU9gjhwQtnledSYtQqJ0fX6Of8i5k+Q18kVjojzgnGYMlaTQ
+ APZKbSL/OCTo7W5r93YxpAX9ylgCpw4M70gTPat5rDNRNgVIVzvtGFVvVwXH451kyQ507AAaqB+
+ ugJ8EYAa85BDWYJ5Bp2xLEZxj9NpM88KSDTQ6Oijw5mssKbN/elHVaDnEZUGFFZ135KsjjCh2js
+ cnfYCg6vmwwDb6ulhgKNQzOkaabCWCyUTtjwOIwVTst5Q3rBof40NWkGFEBi+vQZ4OE3SHuUnEe
+ KZ78aCxnkt55wXz2Npp8iWT3pkCyUdE/broaKYQP6llkZSXAP1l5ebBvETKAw70prSnUv4iqCvQ
+ f4jTXfBmiasz1HpDMY+91+GZG3j6cG+rUbPRDxDS4aygxYglYnNyuhBDOKt7a6i+7HJeLmMWTMi
+ uDL4e5qyCCB6sMQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Commits for the SMC protocol usually get carried through the netdev
-mailing list. Some portions use InfiniBand verbs that are discussed on
-the RDMA mailing list. So run patches by that list too to increase the
-likelihood that all interested parties can see them.
+From: Geliang Tang <tanggeliang@kylinos.cn>
 
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+The helper __lookup_addr() can be used in mptcp_pm_nl_get_local_id()
+and mptcp_pm_nl_is_backup() to simplify the code, and avoid code
+duplication.
+
+Co-developed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+ net/mptcp/pm_netlink.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 32d157621b44fb919307e865e2481ab564eb17df..16024268b5fc1feb6c0d01eab3048bd9255d0bf9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20943,6 +20943,7 @@ M:	Jan Karcher <jaka@linux.ibm.com>
- R:	D. Wythe <alibuda@linux.alibaba.com>
- R:	Tony Lu <tonylu@linux.alibaba.com>
- R:	Wen Gu <guwen@linux.alibaba.com>
-+L:	linux-rdma@vger.kernel.org
- L:	linux-s390@vger.kernel.org
- S:	Supported
- F:	net/smc/
+diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+index 2b005ddfd2d365b66abf42065289d74630e604f6..7a0f7998376a5bb73a37829f9a6b3cdb9a3236a2 100644
+--- a/net/mptcp/pm_netlink.c
++++ b/net/mptcp/pm_netlink.c
+@@ -1143,17 +1143,13 @@ int mptcp_pm_nl_get_local_id(struct mptcp_sock *msk, struct mptcp_addr_info *skc
+ {
+ 	struct mptcp_pm_addr_entry *entry;
+ 	struct pm_nl_pernet *pernet;
+-	int ret = -1;
++	int ret;
+ 
+ 	pernet = pm_nl_get_pernet_from_msk(msk);
+ 
+ 	rcu_read_lock();
+-	list_for_each_entry_rcu(entry, &pernet->local_addr_list, list) {
+-		if (mptcp_addresses_equal(&entry->addr, skc, entry->addr.port)) {
+-			ret = entry->addr.id;
+-			break;
+-		}
+-	}
++	entry = __lookup_addr(pernet, skc);
++	ret = entry ? entry->addr.id : -1;
+ 	rcu_read_unlock();
+ 	if (ret >= 0)
+ 		return ret;
+@@ -1180,15 +1176,11 @@ bool mptcp_pm_nl_is_backup(struct mptcp_sock *msk, struct mptcp_addr_info *skc)
+ {
+ 	struct pm_nl_pernet *pernet = pm_nl_get_pernet_from_msk(msk);
+ 	struct mptcp_pm_addr_entry *entry;
+-	bool backup = false;
++	bool backup;
+ 
+ 	rcu_read_lock();
+-	list_for_each_entry_rcu(entry, &pernet->local_addr_list, list) {
+-		if (mptcp_addresses_equal(&entry->addr, skc, entry->addr.port)) {
+-			backup = !!(entry->flags & MPTCP_PM_ADDR_FLAG_BACKUP);
+-			break;
+-		}
+-	}
++	entry = __lookup_addr(pernet, skc);
++	backup = entry && !!(entry->flags & MPTCP_PM_ADDR_FLAG_BACKUP);
+ 	rcu_read_unlock();
+ 
+ 	return backup;
 
----
-base-commit: 519b790af22e705ee3fae7d598f1afbb3d1cfdd5
-change-id: 20241106-smc_lists-b98e6829b31c
-
-Best regards,
 -- 
-Gerd Bayer <gbayer@linux.ibm.com>
+2.45.2
 
 
