@@ -1,118 +1,146 @@
-Return-Path: <netdev+bounces-145180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D88F9CD650
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 05:58:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BF679CD6BE
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 06:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43067282EC3
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:58:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFA1B2832F5
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 05:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117D616D9DF;
-	Fri, 15 Nov 2024 04:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CBE17F4F2;
+	Fri, 15 Nov 2024 05:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GuluIQug"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CE2n7euX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DE561FEB;
-	Fri, 15 Nov 2024 04:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD0217C7CB;
+	Fri, 15 Nov 2024 05:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731646694; cv=none; b=P58upzTUS3wbTzh5cpaPkhFRbgG3qY7bvPUVvs66XlmjAK9mxNgfqeqRHN4B4/Bf3Il8DHH77S54VsZ49hjeKqtHeHZemNgd+JCHeTP2y1vXZBgoklA9Qo2xOmJsIdwUajBp5XG4kvKS81ekaRLV6uBujjLnTmYtfIO8EtnTHJE=
+	t=1731649884; cv=none; b=p0G72DaTJ1E0oqDDuoMl7tHSNadbOA4JuAbNEHXW+FZk9kMxw3EQTMukjE6SzOPbBpGIY1zGXFWl/fq3QclHQqZl5fe/ydSPhIBX4PSGliIqt2etRMewVAjWMkpjJbvMnxgkOthjyb0R0sKYCvLpGxr8fjiCDWK+qkLLJTlT838=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731646694; c=relaxed/simple;
-	bh=tpPC+qMEm8Rqne+cwyfDi7DPVgfoaHrzuLLvF8D0V+A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i5V+MpefLnsBprAcvfLjIS6n6DHB2KyBOPFjySLAHwnNmtlyYr8m6/0PFgthDooEPIkdA9mgIRhFpD2Ezhh2uihzgTfIqALzrGFTeEXoEs1mM/BhNFcMV+G884LDF5RyUuN11XauJGTa5knrFKFNX7jDK2QkacuiatuBGttM9lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GuluIQug; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1731649884; c=relaxed/simple;
+	bh=1VWsBgWFv/U76HFHVe1R2CdATfvlynSPlywEauHpQ+w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N68u6MX/g5H6K2As3n5qMYoZY0mxCxv+HM3KIrRFw4EQEUI2JeyeKBMkXz8Qj8h6dOJxDcpPbBBN87+aTQDI6tRBlXQ7Qfv9/IFkRDXOr4u1uDP/bwjeeR3naB1OQJCpSuEROhbC6ops/21h1xre4Q5YfrP+UuGLQYUAQHBGUcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CE2n7euX; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20cb47387ceso16053425ad.1;
-        Thu, 14 Nov 2024 20:58:12 -0800 (PST)
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6cd7a2ed34bso7889706d6.2;
+        Thu, 14 Nov 2024 21:51:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731646692; x=1732251492; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZiF3FgqNJA4tZDa0J2g8epdxrSCCmBW2k+8rzqXZnfk=;
-        b=GuluIQugREHDgbaGYMz3vOd51P6OVf7pAqyd5xKV+wmeOmo9YZ7pN7oV7guUniq9sp
-         G/LLKzT+0Xu0r09JMPleUv/TrPB/6JivVCN7xsSHDWaHZfCR3hZeRNn94O+K9oM+/N6l
-         5wjX/+1Bjm7ih7WgtXL8QyP1QvxnZbx5wN6kuhYHztpDNuQrruWSBmmCPRDNIblOwkcG
-         /6fGnEQBBt/lCYun9UML2uv3WkEyubxwckryubFso8+qMhnVFkmtXg3CxzwVPHaDovuv
-         jW3D/epD+W2oTUyqwy9K05TIktEhbz3vli2XISjktuu6bj5KBBqDlYU1MdbDDzT2Hx2p
-         vk7g==
+        d=gmail.com; s=20230601; t=1731649881; x=1732254681; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X/JVk5SuroGnHuens+zYRaJYVAvVeyQaRlHh71ViQEY=;
+        b=CE2n7euXk2XTfXX9OTSWE+/drMGJQ9vlCMTvsqPooQpTll00t/Mp1l/Vdh+sZIuQwY
+         e7xMjgmCedrdAeaS/4OU1j5AGZqV+SXpWtrbkACPPsuDtomZBAAtiBzmZC3ht+a0qpuU
+         KXtl+ZPlELPESOdyDc/j64Fl8/oTjffBmC4XzhBMRNCDCwSpEB1dAbfei1EveqqjQuuh
+         IrZF82A3ZByGNGPh9IulsgOpeK8kSC2FPorCq2wsN4SrzKYwAeTcQhLa5SP3X2Z7+dpP
+         ZBNqfYoLZf/ZOCtXOoXykX9IYY/rtpFirWuUAA3z0cdIckIZH/rL2SsTmyZjWLDQr7Es
+         Qcdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731646692; x=1732251492;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZiF3FgqNJA4tZDa0J2g8epdxrSCCmBW2k+8rzqXZnfk=;
-        b=SutQmhR5PWg1Ob4EbN6FuVdZ4uLln6B3BKWpvm2T0KeQ5bfbz0OpDBPQSrQpEoUv9W
-         TJyIz/5PuqS+yA7noP0WKw9G6x3NiQ32MUNMRkdcIpaMzHh490gQnNmNedo0gXRJ7hWa
-         LqdEao32/fB2FNXyXCD/B/owsBCbOBTyrlnOt0RmZ86YaeZO/7//GVyNQSBarK6lvDm7
-         CELbrNmxQoqS5i/1AEY96U5LnSca372aCmnE6Z9OA4Hc1CkQ/y1+o2TFBdZbO9oN44eG
-         ev0vlf2/IPQNMRn+12W7CVaBG0sMVbWrGnsIhw223DDEEoN6MS6o6uWilKIK4EvV45X2
-         nVZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9mDs0qeoPJ/JTHYr/fOJdSwTGnQ3ZPwz1dPTqo6hrMVScWFhOVc3Wt6ErUSjAs6w0uzpPHZxkqBoJ4g8=@vger.kernel.org, AJvYcCXLNVV9IdYzJkEcvOj79fx/7TZACPktW/MmQmdiSm5WOdYmulibgWV1ojp+89gH/tvrVYxIum1B@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdG/1KjiqX8aaBnrpsspVnxgP+5QDnTtUOQ4s9bEelw/Uvpa+z
-	HpXUuUKP2NcREkYsnndXFrT/s/wYdbEFzwMabiG7tPQh2IPJFNiNXVYfjvi9
-X-Google-Smtp-Source: AGHT+IF5BHuijPtl48H//iBsTd5HSy6KmsItjpyh0p28m6AERbvt7GJ/T2MK2aMn16UtOQM0C/bEew==
-X-Received: by 2002:a17:903:285:b0:20c:c1bc:2253 with SMTP id d9443c01a7336-211d0d861c9mr22855985ad.32.1731646691860;
-        Thu, 14 Nov 2024 20:58:11 -0800 (PST)
-Received: from HOME-PC ([223.185.134.27])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f47cbfsm4542935ad.217.2024.11.14.20.58.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 20:58:11 -0800 (PST)
-From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-To: mareklindner@neomailbox.ch,
-	sw@simonwunderlich.de,
-	a@unstable.cc,
-	sven@narfation.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Subject: [PATCH-net] batman-adv: Fix "Arguments in wrong order" issue
-Date: Fri, 15 Nov 2024 10:26:37 +0530
-Message-Id: <20241115045637.15481-1-dheeraj.linuxdev@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1731649881; x=1732254681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X/JVk5SuroGnHuens+zYRaJYVAvVeyQaRlHh71ViQEY=;
+        b=ocjBX4lcSeHGSxB5D4u9MSPwbpIcM7Ehrvx102SSUZJZ475y7vRcHYAvKkMglrJcbk
+         Wg3xubWWoG2cnoarDsWPewC23yXtRNB1a9W8ZQCOkN41bNI8KE+OQsfaAdGPCx+x+m1Y
+         qEs/VNYQzqiCEOdn20IzjYzbMEQvkPOWxlNwB5XlJBi6tErVttDkLQLp4oPk5b7t/pKK
+         yxkqGA1fcZz2oDxzmpdiTpAM3hP4b7/f+P5E6mxqAnk3ta47EWCFzO1nEvPplV+CeRFN
+         Hk7r65qyLvfkaYZlPGLhuA9ANllYNWIFC18doWO7fH2oA1Stvg4Us9iRLe4j8s6aU846
+         TBng==
+X-Forwarded-Encrypted: i=1; AJvYcCWPahnJwQiVG1IQsMkWkTWjJhw3mWj5atkntKCFNUJPrKauqh0IHYtwmBl50mK3PeNILd5kYUEg@vger.kernel.org, AJvYcCWUfH8JmTarLZc7tIlHft4rh4JBoY9PQoUGl15hAMZxdqDn/2YAs7FZpex0OB9LDVw6zZMEsr4qMPEf@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDQIKkVyB3AzF0IsozBZUyBvVyPOS6UT+U0icCL/6v5+O+Wzc+
+	zo5wAyhEZL9SBdEjhC1Z5utXz7z8SgHR6Oz2jD0s8eL4vyp7/Gb037B/RTf28MDu47zMApBGRba
+	z0CpvtuhIzmXLNgk9T59o3bKEv2o=
+X-Google-Smtp-Source: AGHT+IEKzucYFoI0BE/BI8mi0WFPgltPkJAjMFA2FhjJP2DUWLlEoEdFeS4UqG2hy2+LPUuqf05VjSeX5Zlg+5ajSqE=
+X-Received: by 2002:a05:6214:5541:b0:6d3:80a9:fcad with SMTP id
+ 6a1803df08f44-6d3fb780b6dmr18167946d6.19.1731649881600; Thu, 14 Nov 2024
+ 21:51:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241114021711.5691-1-laoar.shao@gmail.com> <20241114182750.0678f9ed@kernel.org>
+ <CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com> <20241114203256.3f0f2de2@kernel.org>
+In-Reply-To: <20241114203256.3f0f2de2@kernel.org>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Fri, 15 Nov 2024 13:50:45 +0800
+Message-ID: <CALOAHbBJ2xWKZ5frzR5wKq1D7-mzS62QkWpxB5Q-A7dR-Djhnw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via rx_fifo_errors
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: ttoukan.linux@gmail.com, gal@nvidia.com, saeedm@nvidia.com, 
+	tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This commit fixes an "Arguments in wrong order" issue detected by
-Coverity (CID 1376875).
+On Fri, Nov 15, 2024 at 12:32=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Fri, 15 Nov 2024 11:56:38 +0800 Yafang Shao wrote:
+> > > On Thu, 14 Nov 2024 10:17:11 +0800 Yafang Shao wrote:
+> > > > - *   Not recommended for use in drivers for high speed interfaces.
+> > >
+> > > I thought I suggested we provide clear guidance on this counter being
+> > > related to processing pipeline being to slow, vs host backpressure.
+> > > Just deleting the line that says "don't use" is not going to cut it :=
+|
+> >
+> > Hello Jakub,
+> >
+> > After investigating other network drivers, I found that they all
+> > report this metric to rx_missed_errors:
+> >
+> > - i40e
+> >   The corresponding ethtool metric is port.rx_discards, which was
+> > mapped to rx_missed_errors in commit 5337d2949733 ("i40e: Add
+> > rx_missed_errors for buffer exhaustion").
+> >
+> > - broadcom
+> >   The equivalent metric is rx_total_discard_pkts, reported as
+> > rx_missed_errors in commit c0c050c58d84 ("bnxt_en: New Broadcom
+> > ethernet driver")
+> >
+> > Given this, it seems we should align with the standard practice and
+> > report this metric to rx_missed_errors.
+> >
+> > Tariq, what are your thoughts?
+>
+> mlx5 already reports rx_missed_errors and AFAIU rx_discards_phy are very
+> different kind of drops than the drops reported as 'missed'.
+> The distinction is useful in production in my experience working with
+> mlx5 devices.
 
-Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
----
- net/batman-adv/distributed-arp-table.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From the manual [0], it says :
 
-diff --git a/net/batman-adv/distributed-arp-table.c b/net/batman-adv/distributed-arp-table.c
-index 801eff8a40e5..781a5118d441 100644
---- a/net/batman-adv/distributed-arp-table.c
-+++ b/net/batman-adv/distributed-arp-table.c
-@@ -1195,7 +1195,7 @@ bool batadv_dat_snoop_outgoing_arp_request(struct batadv_priv *bat_priv,
- 			goto out;
- 		}
- 
--		skb_new = batadv_dat_arp_create_reply(bat_priv, ip_dst, ip_src,
-+		skb_new = batadv_dat_arp_create_reply(bat_priv, ip_src, ip_dst,
- 						      dat_entry->mac_addr,
- 						      hw_src, vid);
- 		if (!skb_new)
--- 
-2.34.1
+The number of received packets dropped due to lack of buffers on a
+physical port. If this counter is increasing, it implies that the
+adapter is congested and cannot absorb the traffic coming from the
+network.
 
+Would it be possible to add this description to if_link.h?
+
+Frankly, it doesn=E2=80=99t make much difference to end users like me wheth=
+er
+this is reported to rx_missed_errors or rx_fifo_errors; the main goal
+is simply to monitor this metric to flag any issues...
+
+[0]. https://enterprise-support.nvidia.com/s/article/understanding-mlx5-eth=
+tool-counters
+
+
+--
+Regards
+Yafang
 
