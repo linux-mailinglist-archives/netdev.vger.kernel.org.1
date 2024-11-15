@@ -1,76 +1,97 @@
-Return-Path: <netdev+bounces-145161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 351339CD5D9
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:25:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A364B9CD5DB
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4888AB22B0B
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:25:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E00F2832A9
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F29D14F9D9;
-	Fri, 15 Nov 2024 03:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAEC145A0B;
+	Fri, 15 Nov 2024 03:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uNZCOOFU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RB81Qvaj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B2E36AEC;
-	Fri, 15 Nov 2024 03:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0022B33997;
+	Fri, 15 Nov 2024 03:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731641101; cv=none; b=HdiYfM+xCinPiW0ozZooNu7TMP1/DhWn3qfQ0uHGNfHLdRBg48EAE+n7Aq7IFb4x94nSrccA+fuFTjq5gSaC3gbHv+Nl0bcirafKZmH8Df4OwrcNVMY/KYw11X9yfrTopu4JeYfPArtzcS85xRvCNxaBp5kXjhOuyFRoSIggXZg=
+	t=1731641419; cv=none; b=MQAOcwQ/FElYGZ12kZMDjUCSgSCgzvOpeB6X1QmLNbcWl1G12D/fCN8OEhHpUpuyuK2Ty9rP4V9FXBgOnb3JqyO3/W7AtxbPwVCZ2XzR6Yc0Y1I8/RBrcb6f4oty9KRA5qqjWNZVEsI37/DDutH05uoXJlzpIv5mNTQJ+jlHNns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731641101; c=relaxed/simple;
-	bh=GwPx9p2fAAJpEgdXKmjcfWWIk4iKKUXNzgNV2UvJ0+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C9HSTouC18D8plRTRhlk/4CHQjls3Nm2g2q25rdm94gcNBNl7a7xUHb1gpe4tErm6HHJnCMDJZHRkQiArAHRhFZ5UYptVkj1Z3332UzJsTYEx2xKfgFDXOXuMO/v9IsWoDOxsWZ6i8RMUVDe6oFleliu0rC1qDpytqs44Nm+Bpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uNZCOOFU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82916C4CECD;
-	Fri, 15 Nov 2024 03:25:00 +0000 (UTC)
+	s=arc-20240116; t=1731641419; c=relaxed/simple;
+	bh=Him8nl8FyzNVEHA1o0Xazwb9egJOQ5O9TgMHjAoDCoU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RnEM2hEyuyye5vUhwkk9T/GqPhxDSwQ24BN/sLIqyIv0xH+aSymC+bOfAbc2yrRemTwyWf0f0tuUeHJ8o5qNDrpldIu9oVABxZpMvMB7Hb2eLVx7W4zTMx7Dl2/LMUZDk2WxFVIcOwdxy4OY2UgtHdY3n8jbEGWEZibXRVPovvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RB81Qvaj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55ACCC4CECD;
+	Fri, 15 Nov 2024 03:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731641100;
-	bh=GwPx9p2fAAJpEgdXKmjcfWWIk4iKKUXNzgNV2UvJ0+U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uNZCOOFUgyAw4ETeScWMCxscQ4txiq8XPlrNEgvaU96OLn7BreZt/jiU9vtnV09Y1
-	 EwbBMo0AOeIBJ8OI+GJFm5c1NwtYOY0vZuVApsnGuwvf8VGbL0kXDAOYgpsDGk3xbP
-	 5jg6+q2/7ELWDQ3yVT4yZh0WcZy4jLq4zUKm+MJ65dg/Vwnu9/HrBY0uQJftOFSbpX
-	 qFuFfd3bH3ofNdMPDazrqqnxvnUY8QnSJlLTRRwwGFSG59vfi2/HhJFMLxpHCX6m77
-	 PWp3mc+9M+Hs2ReF3i5Yj1uIeD60LUHJDjZbXf6AlWkny5yp2Fw2PBCfAxPco1yTOq
-	 Gb3Gi1mH9NIbQ==
-Date: Thu, 14 Nov 2024 19:24:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Qingtao Cao <qingtao.cao.au@gmail.com>
-Cc: Qingtao Cao <qingtao.cao@digi.com>, Sebastian Hesselbarth
- <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v0 1/1] net: mv643xx_eth: disable IP tx
- checksum with jumbo frames for Armada 310
-Message-ID: <20241114192459.75e5b4d9@kernel.org>
-In-Reply-To: <20241113110040.24181-1-qingtao.cao@digi.com>
-References: <20241113110040.24181-1-qingtao.cao@digi.com>
+	s=k20201202; t=1731641418;
+	bh=Him8nl8FyzNVEHA1o0Xazwb9egJOQ5O9TgMHjAoDCoU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RB81Qvaj5V0+kVVcbRM37PGyVbmJG5F258/uituX3OPjEmQXTPkMc69NeFD9ynAwl
+	 7r2HwsSa9FjTrCtBOukCojjx4TEQJSaTVPLGe7ADIfjZDezXjNybL9KM801jh9FbyX
+	 uEo6ZcnlH5+WRzQw1HClGsD6JCsxnrzK6W4euGBzetdKlpMqiiwJLsu0j8fvYJ8DTt
+	 D9vDNVLmth5RdAU86P+pkt6ZN+7uzqg95cWFIvGNe9hsXxLMni/lXan2LPhW3Fz3V7
+	 iXcp422k+TYSxrY0evK195nOa+RF4BOF3t8asbx1N8rEeDoy8OPzFIkxC1iWziNZDs
+	 zve2dlxT/HSTg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B623809A80;
+	Fri, 15 Nov 2024 03:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: phy: dp83869: fix status reporting for
+ 1000base-x autonegotiation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173164142900.2139249.18179517007808850405.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Nov 2024 03:30:29 +0000
+References: <20241112-dp83869-1000base-x-v3-1-36005f4ab0d9@bootlin.com>
+In-Reply-To: <20241112-dp83869-1000base-x-v3-1-36005f4ab0d9@bootlin.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dmurphy@ti.com, f.fainelli@gmail.com, thomas.petazzoni@bootlin.com,
+ maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-On Wed, 13 Nov 2024 21:00:40 +1000 Qingtao Cao wrote:
-> The Ethernet controller found in Armada 310 doesn't support TCP/IP checksum
-> with frame sizes larger than its TX checksum offload limit
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 12 Nov 2024 15:06:08 +0100 you wrote:
+> The DP83869 PHY transceiver supports converting from RGMII to 1000base-x.
+> In this operation mode, autonegotiation can be performed, as described in
+> IEEE802.3.
 > 
-> Disable the features NETIF_F_IP_CSUM and NETIF_F_TSO when the MTU is set to
-> a value larger than this limit, to prevent the software TSO generating GSO
-> packets that are not suitable to offload to the Ethernet controller, which
-> would be calculated by the IP stack instead.
+> The DP83869 has a set of fiber-specific registers located at offset 0xc00.
+> When the transceiver is configured in RGMII-to-1000base-x mode, these
+> registers are mapped onto offset 0, which should make reading the
+> autonegotiation status transparent.
+> 
+> [...]
 
-Did you consider disabling it per packet using .ndo_features_check ?
+Here is the summary with links:
+  - [net,v3] net: phy: dp83869: fix status reporting for 1000base-x autonegotiation
+    https://git.kernel.org/netdev/net/c/378e8feea9a7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
