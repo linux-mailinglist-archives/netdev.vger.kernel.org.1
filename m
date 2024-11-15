@@ -1,75 +1,76 @@
-Return-Path: <netdev+bounces-145222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8189A9CDBF2
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:56:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055D19CDC1A
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:05:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D33B4B260FE
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 09:56:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89BA71F207C1
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3D7192D8E;
-	Fri, 15 Nov 2024 09:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A594F1B21B5;
+	Fri, 15 Nov 2024 10:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="R3Oo6Gwq"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="A7RtfOW9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314AD192D64
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 09:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6078C1B0F3C
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 10:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731664554; cv=none; b=c+Fi4p3iX9m5ymCAWAgUPY+/NQiAjYkpJw6Hk+MzvfOkndsA0E6Hh+VDBSHjl6vVLWDwSTvt0jDi7g14lsOILBbHimTfN0KhnDkTm0IhZJBFNKI7ooO+6t4SXiPNaTVYi/CFY6ZX3n2QFKczowdcPmw1nUTKgOwapxR9umsFoZE=
+	t=1731665104; cv=none; b=lk2NaAQ55jYo+iFEYS9BgIuzgE/WSQUR4ziAVekWS7tIhzT4fV8G15rgyOZ/i3/QCCwho23LRbBEETjdZb3LdOgJmOeQcVbDpovqLe3mwsh1yXvS9AuguaSuKExED36nA//PYgrg322MgeXYorPU8iYfxLV13VCNE0mlgEwmlGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731664554; c=relaxed/simple;
-	bh=yV9t0i2OAbdtyzVgIEVQZ5/RABRgy/1LtmNo/oxFyUY=;
+	s=arc-20240116; t=1731665104; c=relaxed/simple;
+	bh=9UFteILIQ/ik06XzpgKEWpar7ygm5tTdXzZSrIpyuGQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m9Lc5yMMiPmrUE2Jr0xY1neP5yu8kVWQuGPngZJejAdk5gEdyD8Fquy/V/+vLo+ulv7k3iO5pnmKhYwJOenc8o3OggKSgNqljEQpcDGC7vDAJpYvXwj1EFHzgcx7GkphR4/SWZS66lc58m6d5qL8oQ6pNbID/yI9WvyuEnvLiEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=R3Oo6Gwq; arc=none smtp.client-ip=209.85.218.50
+	 In-Reply-To:Content-Type; b=oFhg/tnF8a6yuqA1Ei1VxGDGt2zX2aRoxir9NTi4PSoosZz+N0Aen15YPEbvGUTHnUP1LCzG8E0O9BKy1aWyCiCedfmQ2jOWlEs0aFfnXmTjwQenoq1D20A5xsvvGGiwiwhdI0SEPan0FjU+7Q0Dx+0DpiNTNlqDWo/ibRkPHfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=A7RtfOW9; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a9e8522c10bso229066866b.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 01:55:51 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5cedf5fe237so1970370a12.3
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 02:05:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1731664550; x=1732269350; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1731665101; x=1732269901; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LDM6dMgcaC3v448VH63QMEiug+aWbjvsWjmvgNSRweA=;
-        b=R3Oo6Gwqtx4pMr+TmTFQtPPQYPooYWDWaXsvGo2X54ysmfdk/KZ/fgoKspBfQ4L39e
-         E2xd0sNwS9Q/wk0nfwFq6LD2yBu0sG3KIkwJvG2PpvIHOeobxpEw1nRENVP0DEZFqnVF
-         8G5fPAjf5PUMG/spzhifqF2+NsxuafOqmrv+DCY94ibVaB9VhY2iOffh7CyT/4sn3zkp
-         PfuibpU+htDq6xEMbcxlFlARlz7Kx2PeaiTwpqK5smis8nfS0lIjpl0Knie5Dc4mQVrm
-         Y3/kbaO1gU76YEBnV0gXwQv0NxBaLSZ6WgW+IUiY1dGVF45055ksOD3mFI1tZGoTEbrq
-         QcMA==
+        bh=s4OiUEPXpIXkFmw5cnFtFbT/tcT2f3NjsbEMHrFWlh0=;
+        b=A7RtfOW9qlapuVlN4N10E0Zm2SfFLDgaJ555GYxQAxl+dpNQIDqutAXvNtgO9QbnRE
+         gNUCz+oS8xgEy3LnZSgUqmGVkYUCz79z7VKNGR6vZ5Tvl2AUqaO+r/X4HrVjgSHarpSL
+         nDO0yQiR6jRziBDI2NKYybPNthX2SJWc7x9JV3vya8vmdYUlqLz9DDAZNGY/H4KXJyR5
+         8ummD7i0IQ/V+SD1ltcxNC8exbJ8JP7wItXxjI6OahL+0Hwh0ik5R9TQrTb2j6/ryxab
+         2InZOKZdBiSUHpTyB0WKC/Bk6jvySGcfzshPi0Y1RpD7O+xXMaPF0IiBCPMbtAi6WlVl
+         K0gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731664550; x=1732269350;
+        d=1e100.net; s=20230601; t=1731665101; x=1732269901;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LDM6dMgcaC3v448VH63QMEiug+aWbjvsWjmvgNSRweA=;
-        b=wgPOEsDl/flY9Eu3arjY0wykB541FuRfntlhUuiUqVbT49J4EGXMQfUjTTxG/e5UVz
-         0Nu4oVJWEjCfXdUXP7EJbObH94zpOhGEKA++p0ZIw+dGtZWRelmv2lDtjb3sNXK/idiK
-         hMfGtgeWLnHlovdPSeXy8cTQk0cWoJ+ULu2PCQCh1hE+QtZMSfyNWnXdBIXDiVMbFfbu
-         QrC1Do2W3ec98n/tLrXQwKUXvcsyjYjgIBbESHBI/Lf1bs6n7t5dl8qiKcDJyDRciI6E
-         4/m5IqkeExmW9xkVdGOkpcKKIQ8ggLIAgK33i+vYQNzM74GHewfXiFAwbeatXqBw92rA
-         rqoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW23rD9JH3GCR5uaRcj5DvF9HRphgcGNWqO9HI/G9raNe4biwgael389O6Q2MA9ntY3M1flse4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTRi3ANaCNSVzU217wxsfmpfqEUuKOnvsr+YQEvF2jfpwE7/aD
-	4AgTSacjgvj+Ik5QPoKizBUzfxBH4lrZXtsh9veICCYUz3k5kmORmE2HgbzrbSI=
-X-Google-Smtp-Source: AGHT+IHZzR8bnr9F+1dU3YpKAnm3Vdx9mXd1Kt96KJN2YXVxQxnkavsm2Eb1FazEBQ/yL7xWma74lQ==
-X-Received: by 2002:a17:906:6a0f:b0:a9a:597:8cc9 with SMTP id a640c23a62f3a-aa4818a9875mr209386966b.12.1731664550379;
-        Fri, 15 Nov 2024 01:55:50 -0800 (PST)
+        bh=s4OiUEPXpIXkFmw5cnFtFbT/tcT2f3NjsbEMHrFWlh0=;
+        b=Bneus7MjXi+iOjZkxsBFXRITaPXkL7/AGJc6dQAA8PPr5ITM0N1ge+mrxNRX3twcmr
+         UzPDgpxLDnqihAezqjxwDUVxRQl6c0HvUgXH4tZKU6Z4yeIcqS3nWYCAThhm/jRGflTZ
+         QNe+h8qpXWCxMVa8xyV142wGwJSA/Mp5BwoLO54fyaRy1uYGiWOqi/J4FoNf2y17BCUh
+         rWl7LkyDRX7OxEM8O6gOEFW3XPWF8pktwVk1JTtvfHsBmh0ryV0tlJULT3MFLLr6oheh
+         6swamWRiwk8NydnW0SpoMf/XZ/PSRVyikRmjvrJHwhawAZ0WL3ylhYZi82mWZMj9iA61
+         ai3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXKMMtUXX8XRmVRbiRgjbma52NtTgZ9SWylJjg+6j+48JwoMiGX53sMCk10ff8S2Y9WzDF2Avc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz56gYUXkcAnXUI0v69fukrwWwTACOH2ubRgcGeSYz0nGNyCl8i
+	VC/RYQtr9NQL5BZO/CDP5H6LjMz2uVqpA+7uJovKcdDRjOmEb8Sx0dbYU3ORZEBy9n+ObUo7b+w
+	x
+X-Google-Smtp-Source: AGHT+IEp/xxelHfn3FkGS4W98jXXPoUegJ3cpzn/2IJRmvvo3KBb1RfaEkuNJ/akU0KifsYqg7tpLw==
+X-Received: by 2002:a05:6402:34cc:b0:5cf:7473:3318 with SMTP id 4fb4d7f45d1cf-5cf8fc315f9mr1617693a12.13.1731665100646;
+        Fri, 15 Nov 2024 02:05:00 -0800 (PST)
 Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20e042ed1sm161437066b.134.2024.11.15.01.55.47
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf79b8a4d4sm1423472a12.4.2024.11.15.02.04.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 01:55:48 -0800 (PST)
-Message-ID: <466ec41a-24b7-43a9-b75f-94556785800a@openvpn.net>
-Date: Fri, 15 Nov 2024 10:56:13 +0100
+        Fri, 15 Nov 2024 02:04:59 -0800 (PST)
+Message-ID: <a8f3a9ca-698d-4b4e-ab4b-7d8aa651dddc@openvpn.net>
+Date: Fri, 15 Nov 2024 11:05:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,18 +78,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 02/23] net: introduce OpenVPN Data Channel
- Offload (ovpn)
+Subject: Re: [PATCH net-next v11 03/23] ovpn: add basic netlink support
 To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
  Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
  Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, steffen.klassert@secunet.com,
- antony.antony@secunet.com
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-2-de4698c73a25@openvpn.net>
- <f35c2ec2-ef00-442d-94cd-fa695268c4f2@gmail.com>
+ <20241029-b4-ovpn-v11-3-de4698c73a25@openvpn.net>
+ <52a2f654-29e5-4567-b5f8-8362fa55c1e1@gmail.com>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -131,131 +130,93 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
  +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
 Organization: OpenVPN Inc.
-In-Reply-To: <f35c2ec2-ef00-442d-94cd-fa695268c4f2@gmail.com>
+In-Reply-To: <52a2f654-29e5-4567-b5f8-8362fa55c1e1@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 06/11/2024 01:31, Sergey Ryazanov wrote:
-[...]
-
->> Both UDP and TCP sockets ae supported.
-> 
-> s/ae/are/
-
-ACK
-
-> 
->> As explained above, in case of P2MP mode, OpenVPN will use the main 
->> system
->> routing table to decide which packet goes to which peer. This implies
->> that no routing table was re-implemented in the `ovpn` kernel module.
+On 09/11/2024 00:15, Sergey Ryazanov wrote:
+> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>> This commit introduces basic netlink support with family
+>> registration/unregistration functionalities and stub pre/post-doit.
 >>
->> This kernel module can be enabled by selecting the CONFIG_OVPN entry
->> in the networking drivers section.
+>> More importantly it introduces the YAML uAPI description along
+>> with its auto-generated files:
+>> - include/uapi/linux/ovpn.h
+>> - drivers/net/ovpn/netlink-gen.c
+>> - drivers/net/ovpn/netlink-gen.h
+>>
+>> Cc: donald.hunter@gmail.com
+>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 > 
-> Most of the above text has no relation to the patch itself. Should it be 
-> moved to the cover letter?
+> [skipped]
 > 
-
-I think this needs to be in the git history.
-We are introducing a new kernel module and this is the presentation, so 
-I expect this to live in git.
-
-This was the original text when ovpn was a 1/1 patch.
-I can better clarify what this patch is doing and what comes in 
-following patches, if that can help.
-
-[...]
-
->> --- a/drivers/net/Kconfig
->> +++ b/drivers/net/Kconfig
->> @@ -115,6 +115,19 @@ config WIREGUARD_DEBUG
->>         Say N here unless you know what you're doing.
->> +config OVPN
->> +    tristate "OpenVPN data channel offload"
->> +    depends on NET && INET
->> +    select NET_UDP_TUNNEL
->> +    select DST_CACHE
->> +    select CRYPTO
->> +    select CRYPTO_AES
->> +    select CRYPTO_GCM
->> +    select CRYPTO_CHACHA20POLY1305
+>> diff --git a/Documentation/netlink/specs/ovpn.yaml b/Documentation/ 
+>> netlink/specs/ovpn.yaml
 > 
-> nit: Options from NET_UDP_TUNNEL to CRYPTO_CHACHA20POLY1305 are not 
-> required for changes introduced in this patch. Should they be moved to 
-> corresponding patches?
-
-Originally I wanted to introduce all deps with patch 1, but then I added 
-STREAM_PARSER to the TCP patch.
-
-I will do the same with the others and add deps only when needed.
-
-[...]
-
->> +/* Driver info */
->> +#define DRV_DESCRIPTION    "OpenVPN data channel offload (ovpn)"
->> +#define DRV_COPYRIGHT    "(C) 2020-2024 OpenVPN, Inc."
+> [skipped]
 > 
-> nit: these strings are used only once for MODULE_{DESCRIPTION,AUTHOR} 
-> below. Can we directly use strings to avoid levels of indirection?
+>> +attribute-sets:
+>> +  -
+>> +    name: peer
+>> +    attributes:
+>> +      -
+>> +        name: id
+>> +        type: u32
+>> +        doc: |
+>> +          The unique ID of the peer. To be used to identify peers during
+>> +          operations
+> 
+> nit: could you specify the scope of uniqueness? I believe it is not 
+> globally uniq, it is just interface uniq, right?
 
-I liked to have these defines at the top as if they were some form of 
-greeting :) But I can move them down and drop the constants.
+Yeah it's per interface/instance.
+Will make it more clear, also for other IDs.
 
 > 
->> +
->> +/**
->> + * ovpn_dev_is_valid - check if the netdevice is of type 'ovpn'
->> + * @dev: the interface to check
->> + *
->> + * Return: whether the netdevice is of type 'ovpn'
->> + */
->> +bool ovpn_dev_is_valid(const struct net_device *dev)
->> +{
->> +    return dev->netdev_ops->ndo_start_xmit == ovpn_net_xmit;
+>> +        checks:
+>> +          max: 0xFFFFFF
 > 
-> You can directly check for the ops matching saving one dereferencing 
-> operation:
+> [skipped]
 > 
-> return dev->netdev_ops == &ovpn_netdev_ops;
+>> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>> index 
+>> 369a5a2b2fc1a497c8444e59f9b058eb40e49524..d5bdb0055f4dd3a6e32dc6e792bed1e7fd59e101 100644
+>> --- a/drivers/net/ovpn/main.c
+>> +++ b/drivers/net/ovpn/main.c
+>> @@ -7,11 +7,15 @@
+>>    *        James Yonan <james@openvpn.net>
+>>    */
+>> +#include <linux/genetlink.h>
+>>   #include <linux/module.h>
+>>   #include <linux/netdevice.h>
+>>   #include <net/rtnetlink.h>
+>> +#include <uapi/linux/ovpn.h>
+>> +#include "ovpnstruct.h"
+>>   #include "main.h"
+>> +#include "netlink.h"
+>>   #include "io.h"
+>>   /* Driver info */
+>> @@ -37,7 +41,7 @@ static int ovpn_newlink(struct net *src_net, struct 
+>> net_device *dev,
+>>   }
+>>   static struct rtnl_link_ops ovpn_link_ops = {
+>> -    .kind = "ovpn",
+>> +    .kind = OVPN_FAMILY_NAME,
 > 
+> nit: are you sure that the link kind is the same as the GENL family? I 
+> mean, they are both deriviated from the protocol name that is common for 
+> both entities, but is it making RTNL kind a derivative of GENL family?
 
-I see all net drivers do what you are suggesting.
-Will do the same, thanks
+I just want to use the same name everywhere and I thought it doesn't 
+make sense to create a separate define (they can be decoupled later 
+should see any need for that).
+But I can add:
 
-> You can define an empty ovpn_netdev_ops struct for this purpose in this 
-> patch and fill ops later with next patches. This way you can even move 
-> the ovpn_net_xmit() definition to the interface creation/destruction patch.
+#define OVPN_RTNL_LINK_KIND OVPN_FAMILY_NAME
 
-It's a device driver, so having a placeholder xmit() in the first patch 
-doesn't sound that bad :-)
-And xmit is more about packet flow rather than creation/destruction.
-
-I prefer to keep the stub here.
-
-[...]
-
->> --- a/include/uapi/linux/udp.h
->> +++ b/include/uapi/linux/udp.h
->> @@ -43,5 +43,6 @@ struct udphdr {
->>   #define UDP_ENCAP_GTP1U        5 /* 3GPP TS 29.060 */
->>   #define UDP_ENCAP_RXRPC        6
->>   #define TCP_ENCAP_ESPINTCP    7 /* Yikes, this is really xfrm encap 
->> types. */
->> +#define UDP_ENCAP_OVPNINUDP    8 /* OpenVPN traffic */
-> 
-> nit: this specific change does not belong to this specific patch.
-
-Right. Like for the Kconfig, I wanted to keep "general" changes and 
-things that touch the rest of the kernel in this patch.
-
-But since we are moving other things to related patches, I will also 
-move this to the UDP patch.
-
-Thanks!
+to make this relationship explicit?
 
 Regards,
-
 
 -- 
 Antonio Quartulli
