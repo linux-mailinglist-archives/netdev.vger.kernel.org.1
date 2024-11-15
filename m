@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-145168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432BC9CD5EF
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:40:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0529CD5F2
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06617282C91
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:40:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 818C21F221F8
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6D9152E12;
-	Fri, 15 Nov 2024 03:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D520B15FD13;
+	Fri, 15 Nov 2024 03:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VLLh9SwC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fP1L7zSp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D6914A627;
-	Fri, 15 Nov 2024 03:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B6715CD49;
+	Fri, 15 Nov 2024 03:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731642020; cv=none; b=OQOsplfUT+kCmMwDvPL58Xr/tMJjzV3bX4B6WY50lRP9dSzI/LlSJTthA56c+kWiaPva5skrqUL0UIyW9GAXbh93H3qcjxAlsexikJIzYKItNt+LXa6Ky0kEBFhaRicEdOh8zOi6ypUvm/2a+3A9CawENAAJlOfGtxlwqAlLJzo=
+	t=1731642021; cv=none; b=Mvry0rqcE1v1anO7CDcegj6e6ofRufjHkb0K+6UVhResO/kaQ7dmgdbvRAXua9OUUr7xIKrB/uQjljrCAsxrku/aQ1EojECu9JuzfllUXLyzIKHHWvXe86WEHcDN/mCzUDubJNMnqatnAmn9gvPFig9pUjNSVeZmGrKmJ9R0yDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731642020; c=relaxed/simple;
-	bh=G2uInqF8/nQM1NBix6fscRtHpgYOItzsoI2/fH2Us7E=;
+	s=arc-20240116; t=1731642021; c=relaxed/simple;
+	bh=ElqMo7Uyg7vjfrP+p+Vu5wcMB897kki8e7dpMrhh2LE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CD2zmA33XoBucpQiXYnYTcYzgto2/92t0BswSggo3Ya8crtuBbKjXKZQfIL5jMwGZi4bwDPaEfQlhJZkyZFwQFBOaGZmWd2zb4bSGI4OZaPfI0Vh1Rz56hBgLQLl3Q7N/RqvpeLJVRAOIk5QvBAqhjBzqkpAJvom7MoHyND4xZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VLLh9SwC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8AEC4CECF;
-	Fri, 15 Nov 2024 03:40:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mgpuPbiXL63PGG5Oq3W+YSZlCyN3FnodgdRrcjZmADLQNw42j1JI5yOBvcQkR6Lyoineb1Ks+hPwxagRmyWO4Xs87GR7OXDn0/NHH6KqAJKs8iAUyWHjvp8VVL7yBIjfwNLP4oR2kum+PlkcNDjzRqgKiwlMqjnI7LugNnw1hTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fP1L7zSp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E0B8C4CECF;
+	Fri, 15 Nov 2024 03:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731642017;
-	bh=G2uInqF8/nQM1NBix6fscRtHpgYOItzsoI2/fH2Us7E=;
+	s=k20201202; t=1731642021;
+	bh=ElqMo7Uyg7vjfrP+p+Vu5wcMB897kki8e7dpMrhh2LE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VLLh9SwCUMPqEcsuP6K36BOtyZggNSmuPmN5boJvnZYtkH1yIp2PNqh+ZBWmy+AOS
-	 ZnFt45bncUiP0ZT7JE8YEVtKjUNsUxOxiN8hdDcLswYrNppUKNU3WT/AdMdR5q5Nad
-	 YxVVpUOjo8OSBsNheMt65oDAAfCZD2EO9o/vb/RJSGGbDkVJYSmgaMFASP/8Y88m1R
-	 kaO1uhGOZsZLtPHwix+JDH5yAWKMsT6n98oMT+iqcYoi7HEOEG65PBbsL4WSOmd85z
-	 S7nY1YzELwbuNvP48aEisyByrRemLfOh9F1JPzKCISdt+stYxotWjK7XnbvYIRw9hC
-	 WkreS+5yx7wyQ==
+	b=fP1L7zSpyogcByfaCHrlELW1alKUAL41b2RP1YShHRlNC0ZM5a8TD5p6zCIjk0hvA
+	 izS2aXoPWvzX/SbDoS1oNnfMXVaIbnH4M6SDa59yTQY4ibh1yPrmj/U5wx3BWR61TZ
+	 kbTdlcTMMiUIh3dcXAC+qkvcEf9P03/TELXI6M6Zq6LMOE3dHu2BurqtTUgJ9/QUEl
+	 YK/Bt+0qh5jSwJdp3/+vwau8Kb/qe8linHEH+7An7Ctv3xlQb9JC6mQS6Xy9r4kKCz
+	 7j2rDwSKLTN8/tJFxNGD+Pud/+JFW07TZhPbT1Jq6mbdThsyvXOz22kv1fl03GFm1X
+	 mYLca+rG+93oA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CCC3809A80;
-	Fri, 15 Nov 2024 03:40:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2BD3809A80;
+	Fri, 15 Nov 2024 03:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] i40e: Fix handling changed priv flags
+Subject: Re: [PATCH net-next] dt-bindings: net: sff,sfp: Fix "interrupts" property
+ typo
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173164202826.2141101.1147325263004116030.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Nov 2024 03:40:28 +0000
-References: <20241113210705.1296408-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20241113210705.1296408-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- pegro@friiks.de, przemyslaw.kitszel@intel.com, ivecera@redhat.com,
- stable@vger.kernel.org, pmenzel@molgen.mpg.de,
- himasekharx.reddy.pucha@intel.com
+ <173164203148.2141101.13732070093827071857.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Nov 2024 03:40:31 +0000
+References: <20241113225825.1785588-2-robh@kernel.org>
+In-Reply-To: <20241113225825.1785588-2-robh@kernel.org>
+To: Rob Herring (Arm) <robh@kernel.org>
+Cc: linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 13 Nov 2024 13:07:04 -0800 you wrote:
-> From: Peter Große <pegro@friiks.de>
+On Wed, 13 Nov 2024 16:58:25 -0600 you wrote:
+> The example has "interrupt" property which is not a defined property. It
+> should be "interrupts" instead. "interrupts" also should not contain a
+> phandle.
 > 
-> After assembling the new private flags on a PF, the operation to determine
-> the changed flags uses the wrong bitmaps. Instead of xor-ing orig_flags
-> with new_flags, it uses the still unchanged pf->flags, thus changed_flags
-> is always 0.
-> 
-> [...]
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/sff,sfp.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net] i40e: Fix handling changed priv flags
-    https://git.kernel.org/netdev/net/c/ea301aec8bb7
+  - [net-next] dt-bindings: net: sff,sfp: Fix "interrupts" property typo
+    https://git.kernel.org/netdev/net-next/c/b52a8deea530
 
 You are awesome, thank you!
 -- 
