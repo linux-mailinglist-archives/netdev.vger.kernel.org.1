@@ -1,105 +1,101 @@
-Return-Path: <netdev+bounces-145340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2039CF208
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:48:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8911B9CF211
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 350AF1F2A2E2
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:48:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35E7F1F2AD3A
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82501D619F;
-	Fri, 15 Nov 2024 16:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772A31474DA;
+	Fri, 15 Nov 2024 16:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="K0X45QKZ"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XQaQT/AD"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10D01E4A6;
-	Fri, 15 Nov 2024 16:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615DB13A409
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 16:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731689158; cv=none; b=RZcCLQRcDjOTzkj9fkdkRlMaPCJ7uhwBqQAvQHHpxzgEe0leXUO2wq/mw0Dg2aZAPU69qUWuQXpkpJ1T32nuJLbxX2dU+DdrVrDG0y7vFOMnjncI4zFA1SqV9US1e9XEA8XxLNCa0y97QF8LLgOD2++bFTVVqs02YJQMMH4rcc4=
+	t=1731689379; cv=none; b=o64HrSOjbC9xcYt4cA1Y3MjSUWUzPI1xXzDj2jhDT/cN8cYK12Js8VWN9jwALlUIQlx7NqPvznn9n0DuyjXzJliQJZo8U/jkhA1i9KRv6Jtn4EC0cCbGy/J7nsrMHpf/7FwGZPxihvHXy7PRiXDPvck3wI0tRL5krX5WzrrKbr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731689158; c=relaxed/simple;
-	bh=QlTFpx4lRlHiQlpCKvHFweBi6bjTVBt/ODsa8/fKl5c=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WkPc48Z3I3LLj8bskWvr2E5z4M2L349escYoM/4iasnNCR/95LzShw7EFQWg0eqLdmySVOLQAv4UDNZ9fe9ZXmyqxHi7HYYsUHyY6j/f/pL6YFbkc7TniRdgyPUN3dhfZjPXVG5Ru6dHJzTfupzDYYo/WYAHreu/6kLvZFFVpnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=K0X45QKZ; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=3KHZY67bwe+QllEESueRK1qzee8uwp0gZy3HnGfpwfY=;
-	t=1731689157; x=1732898757; b=K0X45QKZw+dxDS7o/vdIceLqaHneh/0r8FFDZljzssWof55
-	LonLWOcZqlr7bZt1B6ZvHP3uf8H5ceKCalMdwkEKOZ2uR8csB1oYDiZK1V3leaJoVGF8vZV1G7PZT
-	iwJ+1FmQP0nk8z+5Jo4jsIy5r4Fp11T1oYZI7Y9rrZrXboP99Yc3KvgX6ETn8JBwar8efzHtWHmk+
-	t9z/xKEiZPCKrdIAJXHmXIEDFu9jhJdRZdd3wXIBcYWlcCOBlSZMvAAD0mH/1c8PlM7whygSli9/T
-	09b6wjfxDJbaOApkm/sMeX9Klwai+YwF/efpuzArP9QeYIKXEjUm6NkhVjyPmakg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tBzS0-00000005eqO-14gI;
-	Fri, 15 Nov 2024 17:45:40 +0100
-Message-ID: <49aec9dffbd9cf4d1ea0efe9d3cb36afb3e31aea.camel@sipsolutions.net>
-Subject: Re: [PATCH net-next] net: reformat kdoc return statements
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	pablo@netfilter.org, linux@armlinux.org.uk, richardcochran@gmail.com, 
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com, dsahern@kernel.org, 
-	wintera@linux.ibm.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, netfilter-devel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org
-Date: Fri, 15 Nov 2024 17:45:39 +0100
-In-Reply-To: <20241115163612.904906-1-kuba@kernel.org>
-References: <20241115163612.904906-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1731689379; c=relaxed/simple;
+	bh=gRmgXmWw/qEeqRapPrcW/MeSD7MAK9dNUuMzgrZH9+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QEnrMY6sjCCeFfLCGLlrcZB1S+iPJzx+ChDE2Z/RIcjDOHgIKj2aB7wA1bP/yVOASp402b+2LHQlBOVgUBJA5SzpYwa3Q3keo2JM+dueiJH3ATXWuDlkUaXHzLuNc1mj9/dL6G3cdQ8oAcThuw/0YjR51xqPFm3KPK/VJSVmpQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XQaQT/AD; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20c9978a221so22946815ad.1
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 08:49:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731689376; x=1732294176; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oXMagtWimVN0ioRCY+CmIJ4ypspz/2fORU17wLs/TqE=;
+        b=XQaQT/ADJKAC0Uq/VRf4kF8x0gDmfVFTrBJqTLmtowx2gc3bTt77eYX3KZILX58dmg
+         nBahlSWlzm7aJkoTfYIrI8OOrUs1XodlYHA0co/0+QbOrB+4njGoGJ1uD0VDIeVgd/+l
+         1vQB1QwTqXsMZk492Db7+dwnb1hYiovCa3glMZjeS8wdD0J6hQ1s7ZlCllBJHVmEybPm
+         Hn69l6+fsgF9NDo2EoZb1IrJ6Sq1g+yJWWkd+DhPENgTmMV6BUchfUBA+hwB4KX214yU
+         dtSa8X3sGkNczYdeUqweCjoQZliXyqL0IYo/urlGlOR6G9RHN8Tn3AdceQXGQRaT62uP
+         QTKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731689376; x=1732294176;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oXMagtWimVN0ioRCY+CmIJ4ypspz/2fORU17wLs/TqE=;
+        b=uew+3MVX/YI8wkLIITIKo0pUzA065RfsRjF1PL93N6xe1TuPJIV4OMGulGwg6F6eqJ
+         wWqXtVVDMPVHf5PGAXKboh/T7N5ktsJglwFF/kG6maCc2NRfu5qCFeELHDyZxrnDoPGc
+         T3gB00oVfqaZpHc1StlBUDN0mtOnwFeoH+LUlyRVgRzq2lDidnK1k8eBa6J7aS+9U8u5
+         OMC7Zr5m1XpKhEGLt33ZF8SQ4mc/H6plZwG+fsw2P7ADAQUL4dGCD0JcLrSQEC8+ba6k
+         QCrphHn7IL8qZCgFDXROIP9nLvlWsW5qCoBXXoa6s8jSVQAsoP7vCaqulsAIxiM0uLBz
+         1yxA==
+X-Gm-Message-State: AOJu0YyjzN2Mzj1167sIuG3w0nfr7demhBQFAoN/hdwaM+87dJlzmCs4
+	7J7TuiYmLT+p5L8zWjOkbjO5rkWmxd6heETo9t5Ynw2mEllAcE7yNVE0C0vc+hHfw2Rz8rc7dZJ
+	t
+X-Google-Smtp-Source: AGHT+IHWtelaelHe8hHeD7d+/e/EMNU4Bhte5ee0rg+kbyT6RSBKvj5K//e17e3PrUlhQoYr4OkiFg==
+X-Received: by 2002:a17:903:22cc:b0:20c:d2e4:dc33 with SMTP id d9443c01a7336-211d0d64d72mr43776885ad.14.1731689376619;
+        Fri, 15 Nov 2024 08:49:36 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f54283sm14362515ad.243.2024.11.15.08.49.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 08:49:36 -0800 (PST)
+Date: Fri, 15 Nov 2024 08:49:34 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@gmail.com>
+Subject: Re: [PATCH iproute2-next] add .editorconfig file for basic
+ formatting
+Message-ID: <20241115084934.5a9ac7c6@hermes.local>
+In-Reply-To: <20241115151030.1198371-2-mailhol.vincent@wanadoo.fr>
+References: <20241115151030.1198371-2-mailhol.vincent@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2024-11-15 at 08:36 -0800, Jakub Kicinski wrote:
-> kernel-doc -Wall warns about missing Return: statement for non-void
-> functions. We have a number of kdocs in our headers which are missing
-> the colon, IOW they use
->  * Return some value
-> or
->  * Returns some value
->=20
-> Having the colon makes some sense, it should help kdoc parser avoid
-> false positives. So add them. This is mostly done with a sed script,
-> and removing the unnecessary cases (mostly the comments which aren't
-> kdoc).
+On Sat, 16 Nov 2024 00:08:27 +0900
+Vincent Mailhol <mailhol.vincent@wanadoo.fr> wrote:
 
-Sure, I thought we were running kernel-doc pretty strictly now, but I
-guess there's always something to add :)
+> +
+> +[*.yaml]
+> +charset = utf-8
+> +end_of_line = lf
+> +insert_final_newline = true
+> +indent_style = space
+> +indent_size = 2
+> -- 
 
-LGTM. I guess some like e.g. netif_attrmask_next_and() could also get
-just more docs in general, in that example have something like "returns
-the next set bit or >=3D nr_bits if ..." but that's really unrelated.
-
-As far as wireless is concerned:
-
->  include/linux/rfkill.h             |  2 +-
->=20
->  include/net/cfg80211.h             |  2 +-
->=20
->  include/net/mac80211.h             |  2 +-
-
-Acked-by: Johannes Berg <johannes@sipsolutions.net>
-
-johannes
+Ok, but there are no .yaml files in iproute2-next
 
