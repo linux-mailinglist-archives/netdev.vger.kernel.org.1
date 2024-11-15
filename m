@@ -1,213 +1,109 @@
-Return-Path: <netdev+bounces-145395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014029CF63B
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:40:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE8B9CF629
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E9B5B2DC2B
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:32:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24341287FA7
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 20:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EF51DDC0B;
-	Fri, 15 Nov 2024 20:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B5B1E285A;
+	Fri, 15 Nov 2024 20:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="QeHMhT4Z"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="i431yn2q"
 X-Original-To: netdev@vger.kernel.org
-Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313621B6D1A;
-	Fri, 15 Nov 2024 20:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B080F1E283E
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 20:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731702731; cv=none; b=WW8Bq5ox8XMAvkL8eyHZFm/DGwMVAu9V1PCeTeHzW1/vbAYMKKszeTOTAx8ei7Ok+ha+zWLBEOWFrUK5dt100l9SxBhTMBBcci6gNx0J8ZJGEvX/zqXGr9u8O0njcBNgfdLX/eisEApKcQdTufeAtx0pEmEOYKpP9+L4lgizN7A=
+	t=1731702735; cv=none; b=REnsK2GgBrFIvjw9wPUSIzVRipw6Xhww2LtQyUhsRZz+EkgBcdTtVAoo4ZsRDrJBcQFXouX9aNyy61h4G8TVnO3cyhCyzIfVWKjQMQN6+6+qbyq7Su//yVphczgqlcMgbjUxhr0S3uKs+aF8Cxik0HqOzYfLDoYLXgFbStLkHCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731702731; c=relaxed/simple;
-	bh=aW0kZXCjwMJkAvO9eGrMTuU564xR45DjHMlx+V4e670=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hyjlswXoYki45WxyZc8QkAs3T86Qh1/ud60S6pDMGHznzbbOxKnb6uuMHaR5JdYb4kLO6lMJjLUpyKUOGg6JUcwuCQ57I/KYZgM20M0aDI4+BOzS2Fpq6lpM2sMAJTs53CzzEt90yZMXQ4JC2fLrxwaNGF3ST0HIgQNv3CnBfh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=QeHMhT4Z; arc=none smtp.client-ip=136.144.140.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
-	t=1731702725; bh=aW0kZXCjwMJkAvO9eGrMTuU564xR45DjHMlx+V4e670=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QeHMhT4Zs6fgL1xTGbR5gC4hQqUmKKeyRJFxO6CGGf7WsIf7m4fxhFOcKeoK0KrMa
-	 HWuLBlIm2hXivW4vyOHHsZ2R8gfLbGyax+8HF4AMY+G+vp0ly7uX4qMLmxVMNdIfsw
-	 GN3/MV1yHiHGsVhiAly54eawmHiD1EC1TV5rvt3zKe3oSvjRgqbiMGzox+AgYKiICK
-	 p/pa8VsdyE7qHc4SiqawWHBxzK89GtQsK12xNh+Y3ZriJNsJ/LyH3dI9kHt7bau2uJ
-	 VlIJ5dQncKjSE9lG+ShI7oYB7LmpwL1zbScAmtVxtPMd1SQxtKSJ7zUavRnC1kWV+/
-	 j0lhNwUHsLyQKY0k8s/okKEBXRAoP2rr0D09L0WvH+hO+0ERvYy/SWvKzYsPFz8VX8
-	 s/mKq4LASMQ8xdNuxbwaMkuJ12rn8YpFb1iSSd8giG5FP/5jm5c918mouNSkD2/91Q
-	 OcLS182MwxzqpojOVoINTZ5JXbG/tl5qMcKIfPKlvMCAy0myE6EC3Q5FZKzvpXhZyX
-	 i8O8Q47umz52anLbdpycCdz7+f5pd4+Egishgq9vRBTJCK4CKl8BX1nIYlVJh1IYCT
-	 D6tQyiAKznHrv/y2Bjui8nj+WkPgHsSkEyGN7GNJEtc1Z09bFtiJg0VUioI3mV8Eq8
-	 UFg72HmB4pDw9/qKIJBxNRiE=
-Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
-	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id D88A216029D;
-	Fri, 15 Nov 2024 21:32:04 +0100 (CET)
-Message-ID: <17eb79fc-ccd9-4c85-bd23-e08380825c41@ijzerbout.nl>
-Date: Fri, 15 Nov 2024 21:32:02 +0100
+	s=arc-20240116; t=1731702735; c=relaxed/simple;
+	bh=VlRSm8MJ70D6RF/SfNz605wFiXzHe0Bb7iXbBH/aFbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rvEoTjipzyLDpUYyRbNViHvWyk3th/yOWvJ5QKZxSU88upc65ECcJ9G65NTM4lh34/dq2gFKWq1cYF9C1IlnJnU9TdLqAXknKn/kl35OgNR2AmQejiORnnnMAcp/MV7gBrxRYx9RM9Ez1k4i9cIGwhyp4llNYYYPq3WL1FODrfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=i431yn2q; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7eab7622b61so1624504a12.1
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 12:32:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731702733; x=1732307533; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ae6byj492xR7qkk81rknSePZwzM1QlJfDGqk0U947fo=;
+        b=i431yn2qHK3fQ1UB1Ft2hsIr2LF5gP2t++BEbghbNSB71xIQj1IpNMqPYf82S+5XAI
+         46PE+EAwYjpfI6zkqf8VdsUppGfSv27l++NSHqYMeuCkQzJ8RmL8dqK/o1oA98n9Kdpo
+         NXs5u3pbSeOZ2p+h+iaPWcMmGw9IugRAZsuazEaL87yD7+T8ZTMApLTf9CwcFDOmbr8T
+         r6TRlXHoQ6DSDvT31qYbVtYd2X0gshELRMIenHtj+cX1OLjHEi9F4PGpsip4ocfcpsA3
+         7dA2YsyRzUK+FMqx8h15Smuel6r51K9R9Ns8AMfJdkqM44sahItUbKJwezYp6PIA8Ypk
+         zHVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731702733; x=1732307533;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ae6byj492xR7qkk81rknSePZwzM1QlJfDGqk0U947fo=;
+        b=LyiyXtGS4zJyPhFl92E2ZNvy9ZpT9/Y91nolvCA/xHGcut8fbkpzPkU9Dp7MDi5Zzk
+         JxmnNTdTW5rU9WpJPxkQVoyWOVppMbJ2v29vTB5VhJK0IbrVA6UBY9DNCgKg1Hcn6G+u
+         Wsxpx19Mq5K7BrirC0IrwYOvVsGjb/31CHqPEbegBVQoJ/OrcL2Yh/TJ372lGLQXmjSI
+         vgCNuamecWdsyQTnrxTZK587uNNYH+oi1kxNVo+2eFDI0hKfyycnb1K+PM6ekM0ILaxw
+         fYcUCPnMnaKSoIUaKaIUJ0CjyVse6jwqB1roIeUwQf9qJ8/i12wOs0rh/ZyhuJiIy6mp
+         6rbg==
+X-Gm-Message-State: AOJu0Yy0QStzUdXflEvYq2UDYs/IL+W/IypBREyERQIpYOgVFKs/BHXN
+	nZkMJCIk8HZeZi/nh9z+UT4UrQmjR26vKmG7z7JUhIQ/xN/0ZkeFpa0xvQI0Xw8=
+X-Google-Smtp-Source: AGHT+IFVTaYYuwuXOHDdnWlRGJdplUvn4N+8sHD4u/1+0UgjyJWuWVoxs7CSIAboWCmfjCcIbALW5Q==
+X-Received: by 2002:a05:6a20:2449:b0:1d8:a29b:8f6f with SMTP id adf61e73a8af0-1dc90b1cc5emr4661442637.16.1731702732953;
+        Fri, 15 Nov 2024 12:32:12 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7247711ce07sm1790530b3a.41.2024.11.15.12.32.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 12:32:12 -0800 (PST)
+Date: Fri, 15 Nov 2024 12:32:10 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@gmail.com>
+Subject: Re: [PATCH iproute2-next] add .editorconfig file for basic
+ formatting
+Message-ID: <20241115123210.752b5580@hermes.local>
+In-Reply-To: <31ea1d1b-dbe9-4bc6-8218-64de1884baaf@wanadoo.fr>
+References: <20241115151030.1198371-2-mailhol.vincent@wanadoo.fr>
+	<20241115085150.62d239ae@hermes.local>
+	<31ea1d1b-dbe9-4bc6-8218-64de1884baaf@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 23/33] afs: Use netfslib for directories
-To: David Howells <dhowells@redhat.com>,
- Christian Brauner <christian@brauner.io>, Steve French <smfrench@gmail.com>,
- Matthew Wilcox <willy@infradead.org>
-Cc: Jeff Layton <jlayton@kernel.org>, Gao Xiang
- <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>,
- Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- netfs@lists.linux.dev, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241108173236.1382366-1-dhowells@redhat.com>
- <20241108173236.1382366-24-dhowells@redhat.com>
-Content-Language: en-US
-From: Kees Bakker <kees@ijzerbout.nl>
-In-Reply-To: <20241108173236.1382366-24-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Op 08-11-2024 om 18:32 schreef David Howells:
-> In the AFS ecosystem, directories are just a special type of file that is
-> downloaded and parsed locally.  Download is done by the same mechanism as
-> ordinary files and the data can be cached.  There is one important semantic
-> restriction on directories over files: the client must download the entire
-> directory in one go because, for example, the server could fabricate the
-> contents of the blob on the fly with each download and give a different
-> image each time.
->
-> So that we can cache the directory download, switch AFS directory support
-> over to using the netfslib single-object API, thereby allowing directory
-> content to be stored in the local cache.
->
-> To make this work, the following changes are made:
->
->   (1) A directory's contents are now stored in a folio_queue chain attached
->       to the afs_vnode (inode) struct rather than its associated pagecache,
->       though multipage folios are still used to hold the data.  The folio
->       queue is discarded when the directory inode is evicted.
->
->       This also helps with the phasing out of ITER_XARRAY.
->
->   (2) Various directory operations are made to use and unuse the cache
->       cookie.
->
->   (3) The content checking, content dumping and content iteration are now
->       performed with a standard iov_iter iterator over the contents of the
->       folio queue.
->
->   (4) Iteration and modification must be done with the vnode's validate_lock
->       held.  In conjunction with (1), this means that the iteration can be
->       done without the need to lock pages or take extra refs on them, unlike
->       when accessing ->i_pages.
->
->   (5) Convert to using netfs_read_single() to read data.
->
->   (6) Provide a ->writepages() to call netfs_writeback_single() to save the
->       data to the cache according to the VM's scheduling whilst holding the
->       validate_lock read-locked as (4).
->
->   (7) Change local directory image editing functions:
->
->       (a) Provide a function to get a specific block by number from the
->       	 folio_queue as we can no longer use the i_pages xarray to locate
->       	 folios by index.  This uses a cursor to remember the current
->       	 position as we need to iterate through the directory contents.
->       	 The block is kmapped before being returned.
->
->       (b) Make the function in (a) extend the directory by an extra folio if
->       	 we run out of space.
->
->       (c) Raise the check of the block free space counter, for those blocks
->       	 that have one, higher in the function to eliminate a call to get a
->       	 block.
->
->       (d) Remove the page unlocking and putting done during the editing
->       	 loops.  This is no longer necessary as the folio_queue holds the
->       	 references and the pages are no longer in the pagecache.
->
->       (e) Mark the inode dirty and pin the cache usage till writeback at the
->       	 end of a successful edit.
->
->   (8) Don't set the large_folios flag on the inode as we do the allocation
->       ourselves rather than the VM doing it automatically.
->
->   (9) Mark the inode as being a single object that isn't uploaded to the
->       server.
->
-> (10) Enable caching on directories.
->
-> (11) Only set the upload key for writeback for regular files.
->
-> Notes:
->
->   (*) We keep the ->release_folio(), ->invalidate_folio() and
->       ->migrate_folio() ops as we set the mapping pointer on the folio.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Marc Dionne <marc.dionne@auristor.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-afs@lists.infradead.org
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->   fs/afs/dir.c               | 742 +++++++++++++++++++------------------
->   fs/afs/dir_edit.c          | 183 ++++-----
->   fs/afs/file.c              |   8 +
->   fs/afs/inode.c             |  21 +-
->   fs/afs/internal.h          |  16 +
->   fs/afs/super.c             |   2 +
->   fs/afs/write.c             |   4 +-
->   include/trace/events/afs.h |   6 +-
->   8 files changed, 512 insertions(+), 470 deletions(-)
->
-> [...]
-> +/*
-> + * Iterate through the directory folios under RCU conditions.
-> + */
-> +static int afs_dir_iterate_contents(struct inode *dir, struct dir_context *ctx)
-> +{
-> +	struct afs_vnode *dvnode = AFS_FS_I(dir);
-> +	struct iov_iter iter;
-> +	unsigned long long i_size = i_size_read(dir);
-> +	int ret = 0;
->   
-> -		do {
-> -			dblock = kmap_local_folio(folio, offset);
-> -			ret = afs_dir_iterate_block(dvnode, ctx, dblock,
-> -						    folio_pos(folio) + offset);
-> -			kunmap_local(dblock);
-> -			if (ret != 1)
-> -				goto out;
-> +	/* Round the file position up to the next entry boundary */
-> +	ctx->pos = round_up(ctx->pos, sizeof(union afs_xdr_dirent));
->   
-> -		} while (offset += sizeof(*dblock), offset < size);
-> +	if (i_size <= 0 || ctx->pos >= i_size)
-> +		return 0;
->   
-> -		ret = 0;
-> -	}
-> +	iov_iter_folio_queue(&iter, ITER_SOURCE, dvnode->directory, 0, 0, i_size);
-> +	iov_iter_advance(&iter, round_down(ctx->pos, AFS_DIR_BLOCK_SIZE));
-> +
-> +	iterate_folioq(&iter, iov_iter_count(&iter), dvnode, ctx,
-> +		       afs_dir_iterate_step);
-> +
-> +	if (ret == -ESTALE)
-This is dead code because `ret` is set to 0 and never changed.
-> +		afs_invalidate_dir(dvnode, afs_dir_invalid_iter_stale);
-> +	return ret;
-> +}
-> [...]
+On Sat, 16 Nov 2024 02:59:01 +0900
+Vincent Mailhol <mailhol.vincent@wanadoo.fr> wrote:
+
+> > [*]
+> > end_of_line = lf
+> > insert_final_newline = true
+> > trim_trailing_whitespace = true  
+> 
+> Just let me confirm this one: do you really want the automatic
+> whitespace removal? On some editor, it will trim not only the modified
+> lines but also any whitespace in the full file.
+> 
+> This can create "noise" in the patch diff. If you acknowledge this risk,
+> then I am fine to keep this parameter.
+
+
+Yes, emacs and some other editors have bad habit of leaving trailing
+whitespace. And sometimes new files get added without new line at end.
+
+Line length should be 100 like kernel.
 
