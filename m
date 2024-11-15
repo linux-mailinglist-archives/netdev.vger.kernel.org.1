@@ -1,126 +1,201 @@
-Return-Path: <netdev+bounces-145355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87039CF397
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 19:06:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D1D89CF378
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C050B3772B
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:51:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5222528A13B
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7C01D5ABF;
-	Fri, 15 Nov 2024 17:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4A61D6DC5;
+	Fri, 15 Nov 2024 17:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ehg5mtzN"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="HdDRlPSc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A4017BB38;
-	Fri, 15 Nov 2024 17:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F0B156243
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 17:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731693072; cv=none; b=P+E1EBR4ntuQKcYfumLGgN35xuokm1oVC/05fL4T8nWf+k6/QASSNIFYVZ5DZfw57CWX4V8aNBnA2oEX0D/xRLsBUkdWTq9+KesjC6ytFACXpXwWFDJZL0x+mS7yJif5E0Cp7Ks308AXCnq9SXMQc2HeDBrqnYMeQWblelThuRA=
+	t=1731693551; cv=none; b=GftYGLkyRESvNx/gipd8Rm8OJj4uJjqZtLkLk3Np/vrZuT99NckVFmD0SvgvVvu3qychWMJYeXWsaqhJ/eOKjOMb6B6s+HTnAEualTgVbwfJKPA2oEp4uidA3sTZysqaZiln9mwWNTjZGBbaQDuQLn7l1AyjUvZcy6wPV3nbwE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731693072; c=relaxed/simple;
-	bh=uJgYjJE0jR1lchCHkVbwdJluL2aX0+r1z+kOxGVkbHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cU03d7znpczkfw6hmK4mDTLRa2/q9cnid2+dAnJGKKYvLQ8RfoeYsd8OfRYTSUvMb/WimuRbNheqWwxGtSpL4J/yHHLpUdYP2Wz3ChGNyzR+w39RjAdrCkB1mLUQqYJuayGkOMI0jbE6DaXv6cPX55TU+3uwZAsHej4MQX6UZiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ehg5mtzN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GYQEl1wUEVXzOH0/nz8Ab4ikFSAxUZbnN5Q7yZ/M1Rs=; b=ehg5mtzNUmZnnTL99vDMrVL9ql
-	0+X3kc11AJyC6U7ptYtxyJfmF8Tx3t/YdXLcg/9nT+xqyXrOxs2plmE5Ea6ykEGlKbM7VIYtWP9hG
-	IDc6qv5bve8eijwyxeoLW0fe5qJyhMRdcOfjhn2ncyoTa1BEtCAwVdsJetgQ6Lxr/stQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tC0TE-00DRrf-U8; Fri, 15 Nov 2024 18:51:00 +0100
-Date: Fri, 15 Nov 2024 18:51:00 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tristram Ha <tristram.ha@microchip.com>
-Subject: Re: [PATCH net-next] net: phylink: improve phylink_sfp_config_phy()
- error message with empty supported
-Message-ID: <26b6ff38-68b2-4c9a-be20-99769cba07c4@lunn.ch>
-References: <20241114165348.2445021-1-vladimir.oltean@nxp.com>
- <54332f43-7811-426a-a756-61d63b54c725@lunn.ch>
- <ZzZCXMFRP5ulI1AD@shell.armlinux.org.uk>
- <20241115161401.2pfnbnsl2zv3euap@skbuf>
+	s=arc-20240116; t=1731693551; c=relaxed/simple;
+	bh=PuvzerMjZa+lsYbOLXG8QJGIgNH4trCNxumCNWcaoSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jPXnGwmsGl3o5zE2uF1Jrg3iafBMu3uBj1KgPTrDkVH59hhBF+7nqTx8CjhIF8XJr0Of/zASfDUV9nNlXHKMm523z9BvWHzJYyVjy/+hBW268p5tqpSOpW21nd2E9Ke24APKHgCTizKhvj0qDHqoWO56qfPMyDaJZ4N+Ign9ap8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=HdDRlPSc; arc=none smtp.client-ip=80.12.242.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id C0b0tmySFNywhC0b1tEybW; Fri, 15 Nov 2024 18:59:05 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1731693545;
+	bh=Ps2FThOUixFwqol5sm//odqUh2QyZm0LDBW7+hTu42o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=HdDRlPScaKBR+wWFU3QdNplFC8+tz6N7y4N2oIKPu0Cts2ZfDmYLAPdAtycK3vWhR
+	 iYna7GNUJuJBtmjYMlgtdSs/hvHB8MG12BKynsnBsxvNmBoa4ZyfV7QEuLhDCs4r8J
+	 d1P8oiRsuzLApKHVpKcNjtMImEjAT/8jXKKnUaH4olP9RjktNGbUJOzm/nv3HQze++
+	 Sq2dcSnOkys5nT7byuM8pa8KXC/Fanph80hCJQgknHHIZlxhOoZ0DWzJIzyVw7cJgE
+	 eZCpa7DaDZpR9D+QnBdxRfBcp/n6jtvP6VH37Ude+oBM6ve/hHJIlJINDs7OSsTknW
+	 +hVWdYUuAM9hQ==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 15 Nov 2024 18:59:05 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <31ea1d1b-dbe9-4bc6-8218-64de1884baaf@wanadoo.fr>
+Date: Sat, 16 Nov 2024 02:59:01 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115161401.2pfnbnsl2zv3euap@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] add .editorconfig file for basic formatting
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@gmail.com>
+References: <20241115151030.1198371-2-mailhol.vincent@wanadoo.fr>
+ <20241115085150.62d239ae@hermes.local>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+In-Reply-To: <20241115085150.62d239ae@hermes.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 15, 2024 at 06:14:01PM +0200, Vladimir Oltean wrote:
-> On Thu, Nov 14, 2024 at 06:33:00PM +0000, Russell King (Oracle) wrote:
-> > On Thu, Nov 14, 2024 at 06:38:13PM +0100, Andrew Lunn wrote:
-> > > > [   64.738270] mv88e6085 d0032004.mdio-mii:12 sfp: PHY i2c:sfp:16 (id 0x01410cc2) supports no link modes. Maybe its specific PHY driver not loaded?
-> > > > [   64.769731] sfp sfp: sfp_add_phy failed: -EINVAL
-> > > > 
-> > > > Of course, there may be other reasons due to which phydev->supported is
-> > > > empty, thus the use of the word "maybe", but I think the lack of a
-> > > > driver would be the most common.
-> > > 
-> > > I think this is useful.
-> > > 
-> > > I only have a minor nitpick, maybe in the commit message mention which
-> > > PHY drivers are typically used by SFPs, to point somebody who gets
-> > > this message in the right direction. The Marvell driver is one. at803x
-> > > i think is also used. Are then any others?
-> > 
-> > bcm84881 too. Not sure about at803x - the only SFP I know that uses
-> > that PHY doesn't make the PHY available to the host.
+On 16/11/2024 at 01:51, Stephen Hemminger wrote:
+> On Sat, 16 Nov 2024 00:08:27 +0900
+> Vincent Mailhol <mailhol.vincent@wanadoo.fr> wrote:
 > 
-> So which Kconfig options should I put down for v2? CONFIG_BCM84881_PHY
-> and CONFIG_MARVELL_PHY?
+>> EditorConfig is a specification to define the most basic code formatting
+>> stuff, and it is supported by many editors and IDEs, either directly or
+>> via plugins, including VSCode/VSCodium, Vim, emacs and more.
+>>
+>> It allows to define formatting style related to indentation, charset,
+>> end of lines and trailing whitespaces. It also allows to apply different
+>> formats for different files based on wildcards, so for example it is
+>> possible to apply different configurations to *.{c,h}, *.json or *.yaml.
+>>
+>> In linux related projects, defining a .editorconfig might help people
+>> that work on different projects with different indentation styles, so
+>> they cannot define a global style. Now they will directly see the
+>> correct indentation on every fresh clone of the project.
+>>
+>> Add the .editorconfig file at the root of the iproute2 project. Only
+>> configuration for the file types currently present are specified. The
+>> automatic whitespace trimming option caused some issues in the Linux
+>> kernel [1] and is thus not activated.
+>>
+>> See https://editorconfig.org
+>>
+>> [1] .editorconfig: remove trim_trailing_whitespace option
+>> Link: https://git.kernel.org/torvalds/c/7da9dfdd5a3d
+>>
+>> Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+>> ---
+>> For reference, here is the .editorconfig of the kernel:
+>>
+>>   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/.editorconfig
+>> ---
+>>  .editorconfig | 24 ++++++++++++++++++++++++
+>>  1 file changed, 24 insertions(+)
+>>  create mode 100644 .editorconfig
+>>
+>> diff --git a/.editorconfig b/.editorconfig
+>> new file mode 100644
+>> index 00000000..4cff39f1
+>> --- /dev/null
+>> +++ b/.editorconfig
+>> @@ -0,0 +1,24 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +
+>> +root = true
 > 
-> To avoid this "Please insert the name of your sound card" situation
-> reminiscent of the 90s, another thing which might be interesting to
-> explore would be for each PHY driver to have a stub portion always built
-> into the kernel, keeping an association between the phy_id/phy_id_mask
-> and the Kconfig information associated with it (Kconfig option, and
-> whether it was enabled or not).
+> Maybe add something generic across all files. Then you only need to specify overrides
 
-This might be useful in other ways, if we can make it work for every
-driver. genphy somewhat breaks the usual device model, and that causes
-us pain at times. fw_devlink gets confused by genphy, and users as
-well. We have the issue of not knowing if genphy is to be used, or we
-should wait around longer for the correct driver to load.
+This is risky. Doing this will make the configuration apply to *all*
+files with a risk of a "lost bullet". Are sure are we that some editor
+will not misinterpret this on some kind of file?
 
-So i can see three use cases:
+This is why it was decided against it when doing the .editorconfig in
+the Linux kernel and that instead, only what we are sure of should be
+specified.
 
-1) There is a driver for this hardware, it is just not being built
+Maybe what I can propose as an alternative is to factorize the safe
+option and still specify the indentation explicitly depending on the
+file type:
 
-2) There is a driver for this hardware, it is being built, it has not
-loaded yet.
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
 
-3) There is no driver for this hardware, genphy is the fallback.
+[{*.{c,h,sh},Makefile}]
+indent_style = tab
+indent_size = 8
 
-I would actually say 1) is not something we should solve at the PHY
-driver layer, it is a generic problem for all drivers. We want some
-Makefile support for extracting the MODULE_DEVICE_TABLE() for modules
-which are not enabled, and some way to create a modules.disabled.alias
-which module loading can look at and issue a warning. 2) i also think
-is a generic problem. 3) is probably PHY specific, because i don't
-know of any other case where there is a fallback driver.
+[*.json]
+indent_style = space
+indent_size = 4
 
-	Andrew
+Thoughts?
+
+> [*]
+> end_of_line = lf
+> insert_final_newline = true
+> trim_trailing_whitespace = true
+
+Just let me confirm this one: do you really want the automatic
+whitespace removal? On some editor, it will trim not only the modified
+lines but also any whitespace in the full file.
+
+This can create "noise" in the patch diff. If you acknowledge this risk,
+then I am fine to keep this parameter.
+
+> charset = utf-8
+> indent_style = tab
+> tab_width = 8
+> max_line_length = 100
+
+This max_line_length can also have unexpected consequences. For example,
+emacs will apply this parameter to the "fill commands", meaning that,
+for example, when editing Markdown or README files, the paragraphs will
+be warped at the 100th column. And I do not think that this is the
+desired behavior.
+
+If we want to keep the max_line_length, it is better to set it to the
+desired default column wrap (e.g. 72 or 80, there is no strong consensus
+here as far as I am aware).
+
+>> +
+>> +[{*.{c,h,sh},Makefile}]
+>> +charset = utf-8
+>> +end_of_line = lf
+>> +insert_final_newline = true
+>> +indent_style = tab
+>> +indent_size = 8
+>> +
+>> +[*.json]
+>> +charset = utf-8
+>> +end_of_line = lf
+>> +insert_final_newline = true
+>> +indent_style = space
+>> +indent_size = 4
+>> +
+>> +[*.yaml]
+>> +charset = utf-8
+>> +end_of_line = lf
+>> +insert_final_newline = true
+>> +indent_style = space
+>> +indent_size = 2
+> 
+
+Yours sincerely,
+Vincent Mailhol
+
 
