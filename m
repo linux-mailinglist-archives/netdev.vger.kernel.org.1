@@ -1,138 +1,156 @@
-Return-Path: <netdev+bounces-145348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C82F9CF29E
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:17:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51EA99CF2AD
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6BE72893FA
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:17:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38CCF28B10F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95421D5CF2;
-	Fri, 15 Nov 2024 17:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4AE81D63F3;
+	Fri, 15 Nov 2024 17:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZxrymZ8F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IGZONgCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A83171658
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 17:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08ADF1D5AAD;
+	Fri, 15 Nov 2024 17:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731691035; cv=none; b=fDMFqsIRzPUcQy5kFMFBHH4FmgjMky6m/wWjkqJu3ZTnMfYmusSF9+gMkjE+r7h+57nn6CH9rb6VIZnrMv5BonOAdz8yMkOqdoZzqewpw34/tQ77yIrdjFBUD73IPeEa/QoXvxyecXAY8EDxH1xj3ZysNNrg1HjeamtsAF2od/I=
+	t=1731691090; cv=none; b=hN2D1/oBvL4gjn05JWi92EzUKZ5z0kTH3rqcYGtTg6cjRM6XjzAWw/asGRr7mkuQ8Sjs+ixbIZudNZvQXAO7fPCzay/4c/p4DI+NKjAy+OuCmMYs6EcAPPSXVPBE+wot6NDE33y9lmU/dfM4M6WDCLFhOYh1qIz1cdpmwoJyz/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731691035; c=relaxed/simple;
-	bh=r3jBVnZGxSxtvhjYTBv4hEUufJwtB4WYBde+FGZT5Vw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F/6YYlcPn7o08+xZvh2cNjrtcg1fPaq1w0jzu9cNfhcRzTxuQoUE/P2B+jF/WCcLAfjeBnhex1SZi69QcqWonuvg0VFThp/rA5KGiOcZRjkoS6Rg7Oc5PN2LJ1dgUA3rJtfDJcfyYOQdO6z/CAGTo3/2FvExKtaCX0ldtLBIvyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZxrymZ8F; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731691032;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WNINNbdA0F6hP6eHCYu5y4eAOKcxmjVgS1A+60t/9YU=;
-	b=ZxrymZ8FHrcZbdfPiw7mDqS58bk2+NjctsEAcu53vllQbaeF7ANlGb7abWXlt//zO2vKZQ
-	d5XG3GK1UbJwUWOsfNIkqItdnh4Ix6LP9z4c9r6HEhxS4dBtXpfXfNIXl992nKBn6BLatp
-	4wJ/VVDI5/Uj9fiQkg5/vRlsBf70WXQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-344-4HOxJyLbOJieJ17bBsQmYA-1; Fri, 15 Nov 2024 12:17:10 -0500
-X-MC-Unique: 4HOxJyLbOJieJ17bBsQmYA-1
-X-Mimecast-MFC-AGG-ID: 4HOxJyLbOJieJ17bBsQmYA
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37d5016d21eso1080936f8f.3
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 09:17:10 -0800 (PST)
+	s=arc-20240116; t=1731691090; c=relaxed/simple;
+	bh=01OzKZ3LnQHQWiVFVS4IIK5959v6MIymChZSpGosESU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FgU5hHlsb9d9mhpzhnVUROikXkwATaASiuR1CXKmW5DkWX53yMWxklUkoRRnUu0yyF1dloJIZ/rb72HpX5F5LjxIINXMD8vKeQGn8JQDgxrMub2Txkf0cpii6BScvO0RmGKMguXQuujKH0qM8ZzcN3l/Egyr7Mv3YR5S09tV8K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IGZONgCG; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5cb6ca2a776so3386129a12.0;
+        Fri, 15 Nov 2024 09:18:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731691087; x=1732295887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fkt3Ff7sDNJlH1kI+wf1tL1jV62LWopLZpgKDe6O4nI=;
+        b=IGZONgCGoA+xMT0Ij0iNDUDJikfA1WAHlU97+NsUKqSz8hZ0TVWFm2hNUCpriNmo98
+         KIaD3FKFTBxvGzGpFWYUWtmu9Qrs19N5yQndgbLg9dIpU7Y8gcGvyxUUjEJ6qtTrD1bd
+         v98ow5nOL0buklAoHcFUlosbOJgnmAveblhycEK+ZPCOEJJtjyLp/4bwX0U63xl7xjYi
+         H7Me2NzjpWg0/7jrby04edlLzmOJavPCYQhJNtN5hxKLoctw6+s43OPt8H+ZhfOrG2te
+         e0Rla3odlUldICHeolgtsYI8bHKHQdE34jBs9Sxnb3GfvZmvgCJy7GKUvKZoj9nUyHzV
+         Ac7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731691029; x=1732295829;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WNINNbdA0F6hP6eHCYu5y4eAOKcxmjVgS1A+60t/9YU=;
-        b=p6VmP03B3cSZbasWsPia4dOl9EuL174pneLSSs+9W6zM3glnVNpx0dpZqdLp5i2Cvm
-         U137UypgPhwAZ0Ij/d+zZDdekDimwr5ciTBVkoNQT53Iphmk4JbqiRzU6LkMFTsZJtFc
-         pGO/vk481fhPYMOOHd2S6QBcPeZoEIr41gIp2jKucA3vIRKdeK4Iq/vY0vnAb3o2CNAn
-         N0qWK66okZsmsyoAnmikdUIteFxsCzlvfVEgAcaTEPPmKL8ogC6zx+7J4J7+KLqUsXrs
-         541tKnEQNE8mDh3CdD52SqK0ftQ9Jz/vVkd8FgPI+ceObBYmMcDhV8osW46DIa7jxtW1
-         DSzg==
-X-Forwarded-Encrypted: i=1; AJvYcCWt4iuUrBysOlw/Ic7e3VWUu1ykywhEAvSltOa+sm5mjh9uzuv43VOsB8IVrJTX7uJfSdRMJ2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJAP16JoYT/b8D8zDu+JIxU1H2Y00PAj0jsPcJ9a3tQFFIMUjf
-	6ZeHTrn5AJR5SPmEHSVe9k6O9SrNilqkxNIWh3mNC7k8YK4+peMBDg2GZ0Oxbe6l42EA7YuU9lw
-	J6aJQYlIIO33YAYtMKe3qI+tkpXlEDLZn7WeS3vQE4SDDThu3Ot75Gw==
-X-Received: by 2002:a05:6000:1541:b0:382:2976:c26c with SMTP id ffacd0b85a97d-3822976c427mr1615832f8f.31.1731691029630;
-        Fri, 15 Nov 2024 09:17:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHqsGWeYmupRnbdYRzMnGla3oGhpbGMYhra1dRBEvJ2Cnd/70uqsVI1qXDSJV35YPP52UmDlQ==
-X-Received: by 2002:a05:6000:1541:b0:382:2976:c26c with SMTP id ffacd0b85a97d-3822976c427mr1615812f8f.31.1731691029280;
-        Fri, 15 Nov 2024 09:17:09 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821ada2a8bsm4868047f8f.17.2024.11.15.09.17.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 09:17:08 -0800 (PST)
-Message-ID: <ed2ec1c2-65c7-4768-99f1-987e5fa39a54@redhat.com>
-Date: Fri, 15 Nov 2024 18:17:07 +0100
+        d=1e100.net; s=20230601; t=1731691087; x=1732295887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fkt3Ff7sDNJlH1kI+wf1tL1jV62LWopLZpgKDe6O4nI=;
+        b=CAHxn3tQCqyGM/jVqb44NpDDvKP115MaGey9DeqTPPeT63eykQ6ZfIU+uCoi4RpHg7
+         LGisZMRZYETyRDvVVUqigSQVFtT9+ffrw3Oubw942kdFayJ7qljikfZ+LTRLWp2v02bj
+         8/a0aRbLp+GCnL148zt92h5ndf16LycYLgcTfhXi40DR/3GlfsOsrAndJjZ3rIC9eeKI
+         FekSEeHoH9k3+uf8b0r4GiTeLvbJh5HLDirkcjABvz344KxtocDP9uCALyOIC/F81X8P
+         KT+TYOlfDEC3RVUCm1yyeIm2Aq0r7JobWMvkYILE4QQtTP3hylAoAXQk7Pt7NiEToGw2
+         I5Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCnkz4kvkcraLbw6Wd8UH8hOadm9Tepss7docv72W4xNRfsgJxl7niK4UtzW7wqsQYhDcg+sKlypA=@vger.kernel.org, AJvYcCXHY0XaD+gRHxfo4/PyJmN/m0o+BYY4lXPVHzGBmijP4XHjTa2G29NnFLfi4VnJVRWCPScmw69f@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWE/Y8ZaUTtTfadu1agPyTJpJHZe2BzSloJggaC06La0xuAwjk
+	gVDO1G7It/V8KQs1HPzW7+tPnglzi95/Dl6DnA+si/JIX7l34mCbnrX8DxfU7JherUDbHb++grK
+	0/t5HzLp+8KlKCjQ6HyDnZdTaRnw=
+X-Google-Smtp-Source: AGHT+IG9oNJIdClgmumB2FTMFaScUZiI/6EZcPFulFPZfR0THxcuyrrWoCMzBLfKXl9vXJIfILUiejdUBSvZsyhAmLw=
+X-Received: by 2002:a05:6402:1e93:b0:5ce:dfbc:7fa5 with SMTP id
+ 4fb4d7f45d1cf-5cf8fd300d3mr2822962a12.25.1731691086837; Fri, 15 Nov 2024
+ 09:18:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-tegra: Read iommu stream id
- from device tree
-To: Parker Newman <parker@finest.io>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Thierry Reding <thierry.reding@gmail.com>,
- Jonathan Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Parker Newman <pnewman@connecttech.com>
-References: <cover.1731685185.git.pnewman@connecttech.com>
- <f2a14edb5761d372ec939ccbea4fb8dfd1fdab91.1731685185.git.pnewman@connecttech.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <f2a14edb5761d372ec939ccbea4fb8dfd1fdab91.1731685185.git.pnewman@connecttech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241113173222.372128-1-ap420073@gmail.com> <20241113173222.372128-3-ap420073@gmail.com>
+ <20241114202239.3c80ef6a@kernel.org>
+In-Reply-To: <20241114202239.3c80ef6a@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 16 Nov 2024 02:17:55 +0900
+Message-ID: <CAMArcTWfxiKWghy3cFEL4rj7=VKku_Sm4W9pVWk39TEae1fyAw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/7] net: ethtool: add tcp_data_split_mod
+ member in kernel_ethtool_ringparam
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/15/24 17:31, Parker Newman wrote:
-> From: Parker Newman <pnewman@connecttech.com>
-> 
-> Read the iommu stream id from device tree rather than hard coding to mgbe0.
-> Fixes kernel panics when using mgbe controllers other than mgbe0.
+On Fri, Nov 15, 2024 at 1:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 13 Nov 2024 17:32:16 +0000 Taehee Yoo wrote:
+> > When tcp-data-split is UNKNOWN mode, drivers arbitrarily handle it.
+> > For example, bnxt_en driver automatically enables if at least one of
+> > LRO/GRO/JUMBO is enabled.
+> > If tcp-data-split is UNKNOWN and LRO is enabled, a driver returns
+> > ENABLES of tcp-data-split, not UNKNOWN.
+> > So, `ethtool -g eth0` shows tcp-data-split is enabled.
+> >
+> > The problem is in the setting situation.
+> > In the ethnl_set_rings(), it first calls get_ringparam() to get the
+> > current driver's config.
+> > At that moment, if driver's tcp-data-split config is UNKNOWN, it return=
+s
+> > ENABLE if LRO/GRO/JUMBO is enabled.
+> > Then, it sets values from the user and driver's current config to
+> > kernel_ethtool_ringparam.
+> > Last it calls .set_ringparam().
+> > The driver, especially bnxt_en driver receives
+> > ETHTOOL_TCP_DATA_SPLIT_ENABLED.
+> > But it can't distinguish whether it is set by the user or just the
+> > current config.
+> >
+> > The new tcp_data_split_mod member indicates the tcp-data-split value is
+> > explicitly set by the user.
+> > So the driver can handle ETHTOOL_TCP_DATA_SPLIT_ENABLED properly.
+>
+> I think this can work, but it isn't exactly what I had in mind.
+>
+> I was thinking we'd simply add u8 hds_config to
+> struct ethtool_netdev_state (which is stored inside netdev).
+> And update it there if user request via ethnl_set_rings() succeeds.
+>
+> That gives the driver and the core quick and easy access to checking if
+> the user forced the setting to ENABLED or DISABLED, or didn't (UNKNOWN).
+>
+> As far as the parameter passed to ->set_ringparam() goes we could do
+> (assuming the new fields in ethtool_netdev state is called hds):
+>
+>         kernel_ringparam.tcp_data_split =3D
+>                 nla_get_u32_default(tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT],
+>                                     dev->ethtool->hds);
+>
+> If the driver see UNKNOWN it means user doesn't care.
+> If the driver sees ENABLED/DISABLE it must comply, doesn't matter if
+> the user requested it in current netlink call, or previous and hasn't
+> reset it, yet.
+>
+> Hope this makes sense...
 
-It's better to include the full Oops backtrace, possibly decoded.
+Thank you so much for the details!
+I will try to use ethtool_netdev_state instead of this approach.
 
-> Tested with Orin AGX 64GB module on Connect Tech Forge carrier board.
-
-Since this looks like a fix, you should include a suitable 'Fixes' tag
-here, and specify the 'net' target tree in the subj prefix.
-
-> @@ -241,6 +243,12 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
->  	if (IS_ERR(mgbe->xpcs))
->  		return PTR_ERR(mgbe->xpcs);
-> 
-> +	/* get controller's stream id from iommu property in device tree */
-> +	if (!tegra_dev_iommu_get_stream_id(mgbe->dev, &mgbe->iommu_sid)) {
-> +		dev_err(mgbe->dev, "failed to get iommu stream id\n");
-> +		return -EINVAL;
-> +	}
-
-I *think* it would be better to fallback (possibly with a warning or
-notice) to the previous default value when the device tree property is
-not available, to avoid regressions.
-
-Thanks,
-
-Paolo
-
+Thanks a lot!
+Taehee Yoo
 
