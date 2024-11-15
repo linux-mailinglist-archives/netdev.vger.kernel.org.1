@@ -1,130 +1,157 @@
-Return-Path: <netdev+bounces-145507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F999CFB01
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:19:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF5C9CFB0E
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD2E11F225BD
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BC4C281B76
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF8E1991DD;
-	Fri, 15 Nov 2024 23:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1651A0BD8;
+	Fri, 15 Nov 2024 23:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hOQrlN+c"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SaYzzMZW";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="o0jZxjqE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CCF18DF8D;
-	Fri, 15 Nov 2024 23:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14201193067;
+	Fri, 15 Nov 2024 23:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731712754; cv=none; b=NZ5VgMHwepjGDq1hMl+kDkDeu+urJOVQS6clXcMo/xky3bhQGR3S23EnsJL/V0lMPxED+EsS0wsCSCBKPU9Rmlns2SGZ23lSzKcO6kA/Bb/9J5gZ+OwOhNqA96QqSWismJ4nDCmeAiMm8kTbhBH1VAK85o/rY9+dDLstNEvcPBA=
+	t=1731712849; cv=none; b=Yqny0HZ3VwYzs1sKJOB5ctqlsHOB+mV8KUgeKS4Kw40j4uaiWv9JNlM/Pk0NOknX/7ftkn1sQamElJJYD2R23KUUVBz5KMEwc/73KCzs1UDwrpMkcPX5o1kJYjJO9cE5k9T2xTYKxhoKsugUM0MFTE3CI6vShg2izrn+ej+Ui7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731712754; c=relaxed/simple;
-	bh=0yPcBEN00O1vZYAhrNKkld6XHKq6EJuKc9z33Rq3qZY=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qbx5SECUWlpuAqc7GKrS/5zSgixPfdBRr3vzGWqKDMvlmA8DMwnPqQKeHL2keYKXrpkA+sibFST2TyueJ27+qRZbmL/RGunhSdz9m5HSXciO4ec/xV624aX4ZlyrhOfWZ8WDc1P1KOxeCgCg7/fvP38lMd+QzbMSHE+7L0VpDf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hOQrlN+c; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43161c0068bso1387455e9.1;
-        Fri, 15 Nov 2024 15:19:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731712751; x=1732317551; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CiJda9W8rYQ25aoVKNjG4upIlR/b8ZNesPsVfBmzmp4=;
-        b=hOQrlN+cR3GZL5SO13TBkOtsENBYh0ynKGqgCkv4pHb7BnsUOx2GR2mnXeIU15XB+e
-         SVdzgrYi5hjsyaOs5x9JHXV9g0CMOW9IC4cKj02W2eZkWWeKvueRHrpiRIkWyJZXPrWG
-         PzvsJFKn5w9tj6FlHxwc2jbilB6P4cfdYTBXEJEVdTLHZPLr5Y37iMArFmg6teWjKx+z
-         4qYdVNFmnDRIUQejIeXUPIbRFkvbxAGzMEf+ALSGAy7wlgLZ3gjkmnEaB+7l7MVSG3Fz
-         RVvTqHlYvPSSozcr1QwGXN3FpINTMFsSRC/Fbyj2FKBJ9acvkkzFrJlr533rbldq5zgQ
-         g3EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731712751; x=1732317551;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CiJda9W8rYQ25aoVKNjG4upIlR/b8ZNesPsVfBmzmp4=;
-        b=gWT/wTaOnZrj0ETLNp2ru6kAxKvSpqiaxD0YSkTV6Qp47NndeR5L+1YoFXma937B87
-         npD+WQz+pQAmJ3ex6Z8pATpngRfTbweqwMFKYomQ11jUV8mh9ydi211MTcrh2yjR2u1H
-         7B8uExcOpPwCszoNeyUotLpJig1kGaIA2jhikiZeN9h/HzI/j+JoSFIC5re82JzYUjPt
-         zNF7FkcRS+66JEihDe+YTfXTR4HIBdqVf7J+JCPpb7z8VUVUXG1iZSE4Of1aTn8N0XkS
-         sVcvPn5gKW26OFDQ37cxrCFZHKLF/zihNraWP2trP7QMa0anIBusWn22niatNIt0RvYf
-         F6tw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNu2vptPcQBnISsaIHHjVQsujC0oQmDtPA6Aaoy3IYt8ruo7xrDXaB1ZxZowNd1lFPMdxdX7hqCdLz@vger.kernel.org, AJvYcCVpMb7ja8DSgRYqwP1FZQoallLZksAwivEyPdfM0NuYwbKqIRUSNbuMuXgj3wFG3Fyb2Rx45w3x@vger.kernel.org, AJvYcCWqEqZR3iivA6FDLUxgI0i8eYFk6cNv1FNxU1ZR4gBSjCrZamnzWPWoTtN+BKuGDEsPRmBjFtivPoBYyEev@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO9dMkK3U6wZ8Zz7oZvdWJH6cI/wa68vBFtT5LVmZ39c39peJ7
-	Qiuy/Gah98EMoQ0UWpda8ehAqsVRmOcC4O3eHZUWUcnhWaijKVFo
-X-Google-Smtp-Source: AGHT+IEuO6BO2OZ0lz6Px1gCfwr1s+/P/FdZIjh0SxJhkn+AIGHj1BkY+4LWXmmNkKyjGdn4wRI4SQ==
-X-Received: by 2002:a05:600c:3111:b0:431:5c7b:e937 with SMTP id 5b1f17b1804b1-432df74c8bdmr41371685e9.17.1731712751200;
-        Fri, 15 Nov 2024 15:19:11 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da298c81sm73081885e9.39.2024.11.15.15.19.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 15:19:10 -0800 (PST)
-Message-ID: <6737d6ee.050a0220.34072b.91c7@mx.google.com>
-X-Google-Original-Message-ID: <ZzfW6oLHfmanuyV-@Ansuel-XPS.>
-Date: Sat, 16 Nov 2024 00:19:06 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v5 3/4] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-References: <20241112204743.6710-1-ansuelsmth@gmail.com>
- <20241112204743.6710-4-ansuelsmth@gmail.com>
- <20241114192202.215869ed@kernel.org>
- <6737c439.5d0a0220.d7fe0.2221@mx.google.com>
- <20241115145918.5ed4d5ec@kernel.org>
- <6737d35f.050a0220.3d6fb4.8d89@mx.google.com>
- <20241115151553.71668045@kernel.org>
+	s=arc-20240116; t=1731712849; c=relaxed/simple;
+	bh=aHBaGiFTzA9hi/c3ULYVgr+MH6ar7nzsPVpxqhlR3d0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qReqhrbXA4BTNdYF06GnI1OqwyA+VAcVP2a9b+CeH7jsEZ1KpILmr9Wi2pmU34ZR6F5odXwsXVFkAVzYmYO/lGPIAlh9okqpQ+fqTGk6iXdrNNmVMvi+UMATpaAzeizp0J/0ELOX6RPLGpseXn2CqrzAB8PqkQXp3VNs1888tBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SaYzzMZW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=o0jZxjqE; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1731712845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ocF2UaqffllWgiGWdH3dEXBRLSQ8zx6v3UTSvYUEWBM=;
+	b=SaYzzMZW0ZsY0TGo8HlsbXzuUvCi20iDEgp+8ohYBSE4TZQXRHLKLbged2BOetLpsx4OkO
+	tbZB0k+QLCEJmNzJNJ7TX06kODrXybKEr0MN0pB2oucYCsCZhXwiPTvkrVYx4d0RSom1W9
+	M5V6DhOs4++KN4sHh/UkGD4PfYSgL/msvq0en1H26aBKpf6quxCthUWooMmyaT4o/QkfC2
+	lCNSo4ipp434fYIwklbWGy8m/kIcsHAL1J9mGF0JwBaNElltRXstfx+KSUKFTEf5oJlO1l
+	imvGv9XAnBM1fMHYuOdaaDvDY2O6X0pakSlzfvsLT9wL98INhCHIDkaV3HsBDQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1731712845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ocF2UaqffllWgiGWdH3dEXBRLSQ8zx6v3UTSvYUEWBM=;
+	b=o0jZxjqE/bb/KZAxT0liDWVEJtakeTQr/m7JfpgliBKuwvw5FjJoNIULPPZ+hcCbxwHCjD
+	VmO8h0eWyvF8dzAA==
+To: Easwar Hariharan <eahariha@linux.microsoft.com>, Jeff Johnson
+ <quic_jjohnson@quicinc.com>
+Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Naveen N Rao <naveen@kernel.org>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Louis Peens <louis.peens@corigine.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Russell King <linux+etnaviv@armlinux.org.uk>, Lucas Stach
+ <l.stach@pengutronix.de>, Takashi Iwai <tiwai@suse.com>, Jaroslav Kysela
+ <perex@perex.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
+ <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>, Jiri Kosina
+ <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Ilya Dryomov
+ <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Scott Branden
+ <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, Jens
+ Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, Kalle Valo
+ <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Roger Pau =?utf-8?Q?Monn=C3=A9?=
+ <roger.pau@citrix.com>, Jack
+ Wang <jinpu.wang@cloud.ionos.com>, Andrew Morton
+ <akpm@linux-foundation.org>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, James
+ Smart <james.smart@broadcom.com>, Dick Kennedy
+ <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Maxime Ripard
+ <mripard@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
+ <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>, Shailend Chand
+ <shailend@google.com>, Thomas Zimmermann <tzimmermann@suse.de>, Maarten
+ Lankhorst <maarten.lankhorst@linux.intel.com>, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
+ <thomas.hellstrom@linux.intel.com>, Lucas De Marchi
+ <lucas.demarchi@intel.com>, Oded Gabbay <ogabbay@kernel.org>, Ofir Bitton
+ <obitton@habana.ai>, Sven Schnelle <svens@linux.ibm.com>, Christian
+ Borntraeger <borntraeger@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko
+ Carstens <hca@linux.ibm.com>, Russell King <linux@armlinux.org.uk>, Robert
+ Jarzmik <robert.jarzmik@free.fr>, Haojian Zhuang
+ <haojian.zhuang@gmail.com>, Daniel Mack <daniel@zonque.org>, Nicolas Palix
+ <nicolas.palix@imag.fr>, Julia Lawall <Julia.Lawall@inria.fr>, Simon
+ Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jozsef Kadlecsik <kadlec@netfilter.org>, Pablo
+ Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+In-Reply-To: <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+ <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
+ <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
+ <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
+Date: Sat, 16 Nov 2024 00:20:50 +0100
+Message-ID: <87plmwytgt.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115151553.71668045@kernel.org>
+Content-Type: text/plain
 
-On Fri, Nov 15, 2024 at 03:15:53PM -0800, Jakub Kicinski wrote:
-> On Sat, 16 Nov 2024 00:03:55 +0100 Christian Marangi wrote:
-> > > > Ok I will search for this but it does sounds like something new and not
-> > > > used by other DSA driver, any hint on where to look for examples?  
-> > > 
-> > > It's relatively recent but I think the ops are plumbed thru to DSA.
-> > > Take a look at all the *_stats members of struct dsa_switch_ops, most
-> > > of them take a fixed format struct to fill in and the struct has some
-> > > extra kdoc on which field is what.  
-> > 
-> > Thanks for the follow-up, they are the get_stats64 I assume, quite
-> > different to the ethtools one as we need a poll logic. Ok I will check
-> > what to drop and rework it.
-> 
-> https://elixir.bootlin.com/linux/v6.12-rc1/source/include/net/dsa.h#L915-L927
-> 
-> am I looking in the wrong place?
+On Fri, Nov 15 2024 at 14:15, Easwar Hariharan wrote:
+> On 11/15/2024 1:41 PM, Jeff Johnson wrote:
+>> 
+>> How do you expect this series to land since it overlaps a large number of
+>> maintainer trees? Do you have a maintainer who has volunteered to take the
+>> series and the maintainers should just ack? Or do you want the maintainers to
+>> take the individual patches that are applicable to them?
+>> 
+>> /jeff
+>
+> I am hoping for tglx to take it through his tree since the patch
+> introducing secs_to_jiffies() is in his tree, so sequencing of
+> dependencies would not be an issue.
 
-Yep should be those.
+Right, but it's two days before the merge window opens, so no.
 
--- 
-	Ansuel
+> But if tglx won't, we could push it out another cycle and individual
+> maintainers can take the patches that are applicable to their tree for
+> the series.
+
+That's the easiest way forward as it does not create conflicts and all
+maintainers will have the base patch in their trees after rc1.
+
+Thanks,
+
+        tglx
 
