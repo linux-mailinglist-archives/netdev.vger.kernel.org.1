@@ -1,130 +1,124 @@
-Return-Path: <netdev+bounces-145247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7684C9CDEA5
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:51:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA55C9CDEAF
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:52:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0507F1F241EC
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:51:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77FAD1F24276
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630611B85FD;
-	Fri, 15 Nov 2024 12:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA741BBBFE;
+	Fri, 15 Nov 2024 12:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLp2kVBu"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="PUZD5uU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [178.154.239.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDE214A088
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 12:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE090558BB;
+	Fri, 15 Nov 2024 12:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731675076; cv=none; b=ScZAbnh8rpka5sxeowtecdoWnKgc8NZgUD8o5fZ4+SYCDo292Inz7Es1nlD6GwUdVvLqYGEnD6Dc29OlU5tSwVj9xNOKhC70vLb8ph3N7oNxK83FPm4lvxGUS39phk0AW+Ho3UwOUfovTEYYyVK9zLkaVnpokvkRGvWkXMGBRnI=
+	t=1731675170; cv=none; b=PegACFTB0M4stgukUEm7VMe+ownyRTmW5NY6CC3ceLm6PgXdIitSeL+mVeYZIHxYDJPkeOgw7XR4PgC3V8WY2tN1pibe2TcHfuNx6ewIUHAPxIGXn5FX2Lz2+9FLBJlevUtCexkrMV+dNy3lN30999PU3FNR1Bo0wokpdSVEXVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731675076; c=relaxed/simple;
-	bh=lSEI3t4D6CYF1nVrPsQ4X7kyHzEljSoE58GvXffqcug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IPLHloeR+MTYST6s4nXpRL2LpPZEdPtjH08in9FjlfFSF/xOigIUrERaeU45kNuVcZPNE83mOEfJhIV1JJCAfRry/ibAllm54N4G90oMji1jKXJow8LRRD6w63uBokWQTGNkA/SHSTPoiNqDirVTDs22H6fN8Mhih2WbespbJ3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLp2kVBu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52428C4CECF;
-	Fri, 15 Nov 2024 12:51:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731675075;
-	bh=lSEI3t4D6CYF1nVrPsQ4X7kyHzEljSoE58GvXffqcug=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HLp2kVBuO2Z41k26kjMddkl/mEbunJV7ryEjzkB89zt3px+i3oSYIgsJ6GvqvO4S9
-	 /njaEOf0SggN4Bnt4xhgK3cuZ+VvFu3COoyJFtNPaGNil/YOi1zkWTjMpbHmSnfcWG
-	 HvnMCNaeA9L5tV6fUokJCyHHMpvfVuYrm/U3WC/EjLIuiUvLBElaSNJ1o3hsy8Ayc7
-	 qjnmrQ56IDDBtoVOMs+OuVRxy5nWISoktRkfnE3ZDfq2Re9Ga97BcLzZTIawdLh/Ih
-	 rM27vaoVEv1xsIp5jQDEtyEI1yQmK6Z2/DIrR8ztP2IlhuwZVb4yMS83GlR2/I71zF
-	 e3PrVT3lELPMQ==
-Date: Fri, 15 Nov 2024 12:51:12 +0000
-From: Simon Horman <horms@kernel.org>
-To: Milena Olech <milena.olech@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH iwl-net 04/10] idpf: negotiate PTP capabilies and get PTP
- clock
-Message-ID: <20241115125112.GP1062410@kernel.org>
-References: <20241113154616.2493297-1-milena.olech@intel.com>
- <20241113154616.2493297-5-milena.olech@intel.com>
+	s=arc-20240116; t=1731675170; c=relaxed/simple;
+	bh=2juy4Ylv4MaM8LY8xJ4un4V+EwF5mFscetSWP49J2vM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=u8B8MsZFYc/uE6hpzkU9VpHsYlxvSpJm4PgILmur0coNKKdFzMZIfPZ9WstxpNXyLr7cWYG/ytRKlv9fZFt/GB+jEkKoBKvn3KKGV8VnzP6MkTxF+zskDL4XiVZMhytGSHEAEiqmRLK4Qc0xaTkRbV/pNAyQ8tpvZ3tIyqEsleg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=PUZD5uU1; arc=none smtp.client-ip=178.154.239.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net [IPv6:2a02:6b8:c07:109:0:640:efe1:0])
+	by forward103b.mail.yandex.net (Yandex) with ESMTPS id 7B33B60912;
+	Fri, 15 Nov 2024 15:52:37 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id aqMiAU8Or0U0-2DXNa1et;
+	Fri, 15 Nov 2024 15:52:36 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1731675157; bh=Loh55YzRdUYifYSRVv6NI6kFX5r8vY1rNPibfZfJwAU=;
+	h=Subject:From:Cc:To:Date:Message-ID;
+	b=PUZD5uU1cHz8jBZUDFEaHPYeF9fuR3S84Dli4uWkLaEjJ3RvNohXFcfj8CS7blT80
+	 cKDxtkXLb/iJQZj6SqSqnYmIWWqUKwHQjuYhavFAAIWhuYeBJjVtgBYG7YI2F7bQl0
+	 nE4dKhVk0bDvP2nVI2FNzpf6NzoXUjAiP2LsXpkE=
+Authentication-Results: mail-nwsmtp-smtp-production-main-46.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <1f9e278a-6590-4ede-a74a-3923ebe4d154@yandex.ru>
+Date: Fri, 15 Nov 2024 15:52:36 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241113154616.2493297-5-milena.olech@intel.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev <netdev@vger.kernel.org>
+Cc: Linux kernel <linux-kernel@vger.kernel.org>,
+ "Eric W. Biederman" <ebiederm@xmission.com>,
+ "Andrew Bird (Sphere Systems)" <ajb@spheresystems.co.uk>
+From: stsp <stsp2@yandex.ru>
+Subject: tun: group check overrides user, is this intentional?
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 13, 2024 at 04:46:14PM +0100, Milena Olech wrote:
-> PTP capabilities are negotiated using virtchnl command. Add get
-> capabilities function, direct access to read the PTP clock time and
-> direct access to read the cross timestamp - system time and PTP clock
-> time. Set initial PTP capabilities exposed to the stack.
-> 
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
+Hello.
 
-...
+I've found that the user that is an owner
+of tun device, can't access it if it is not
+in the tun's group.
+I.e. the following command:
+$ sudo tunctl -u stas -g root
 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+is insufficient for the user "stas"
+to access tun, unless he has group
+"root" in his supplementary list.
+This is somewhat very strange, as
+the group check usually enlarges
+the scope, not restricts it.
 
-...
+I am going to send the patch below,
+but I'd like to ask if maybe this is
+intentional?
 
->  /**
->   * struct idpf_ptp - PTP parameters
->   * @info: structure defining PTP hardware capabilities
->   * @clock: pointer to registered PTP clock device
->   * @adapter: back pointer to the adapter
-> + * @cmd: HW specific command masks
-> + * @dev_clk_regs: the set of registers to access the device clock
-> + * @caps: PTP capabilities negotiated with the Control Plane
-> + * @get_dev_clk_time_access: access type for getting the device clock time
-> + * @get_cross_tstamp_access: access type for the cross timestamping
->   */
->  struct idpf_ptp {
->  	struct ptp_clock_info info;
->  	struct ptp_clock *clock;
->  	struct idpf_adapter *adapter;
-> +	struct idpf_ptp_cmd cmd;
-> +	struct idpf_ptp_dev_clk_regs dev_clk_regs;
-> +	u32 caps;
-> +	enum idpf_ptp_access get_dev_clk_time_access:16;
-> +	enum idpf_ptp_access get_cross_tstamp_access:16;
->  };
->  
-> +/**
-> + * idpf_ptp_info_to_adapter - get driver adapter struct from ptp_clock_info
-> + * @info: pointer to ptp_clock_info struct
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 9a0f6eb32016..d35b6a48d138 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -574,14 +574,18 @@ static u16 tun_select_queue(struct net_device 
+*dev, struct sk_buff *skb,
+         return ret;
+  }
 
-Please in include a "Return:" section, as you have done elsewhere,
-to document the return value of this function.
+-static inline bool tun_not_capable(struct tun_struct *tun)
++static inline bool tun_capable(struct tun_struct *tun)
+  {
+         const struct cred *cred = current_cred();
+         struct net *net = dev_net(tun->dev);
 
-Flagged by ./scripts/kernel-doc -none -Wall
+-       return ((uid_valid(tun->owner) && !uid_eq(cred->euid, 
+tun->owner)) ||
+-                 (gid_valid(tun->group) && !in_egroup_p(tun->group))) &&
+-               !ns_capable(net->user_ns, CAP_NET_ADMIN);
++       if (ns_capable(net->user_ns, CAP_NET_ADMIN))
++               return 1;
++       if (uid_valid(tun->owner) && uid_eq(cred->euid, tun->owner))
++               return 1;
++       if (gid_valid(tun->group) && in_egroup_p(tun->group))
++               return 1;
++       return 0;
+  }
 
-> + */
-> +static inline struct idpf_adapter *
-> +idpf_ptp_info_to_adapter(const struct ptp_clock_info *info)
-> +{
-> +	const struct idpf_ptp *ptp = container_of_const(info, struct idpf_ptp,
-> +							info);
-> +	return ptp->adapter;
-> +}
-> +
->  #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
->  int idpf_ptp_init(struct idpf_adapter *adapter);
->  void idpf_ptp_release(struct idpf_adapter *adapter);
-> +int idpf_ptp_get_caps(struct idpf_adapter *adapter);
-> +void idpf_ptp_get_features_access(const struct idpf_adapter *adapter);
->  #else /* CONFIG_PTP_1588_CLOCK */
->  static inline int idpf_ptp_init(struct idpf_adapter *adpater)
->  {
+  static void tun_set_real_num_queues(struct tun_struct *tun)
+@@ -2778,7 +2782,7 @@ static int tun_set_iff(struct net *net, struct 
+file *file, struct ifreq *ifr)
+                     !!(tun->flags & IFF_MULTI_QUEUE))
+                         return -EINVAL;
 
-...
+-               if (tun_not_capable(tun))
++               if (!tun_capable(tun))
+                         return -EPERM;
+                 err = security_tun_dev_open(tun->security);
+                 if (err < 0)
+
 
