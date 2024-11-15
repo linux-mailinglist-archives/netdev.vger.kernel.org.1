@@ -1,127 +1,135 @@
-Return-Path: <netdev+bounces-145144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176EC9CD594
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:43:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130649CD599
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D2A282CC5
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:43:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A2E8B21448
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D9813D8A0;
-	Fri, 15 Nov 2024 02:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="cxSOglwu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F896F30F;
+	Fri, 15 Nov 2024 02:46:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464D220B20
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 02:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB0C28EF;
+	Fri, 15 Nov 2024 02:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731638622; cv=none; b=gzM8xG56sKjMvT6fr+9e5ShVK0cBu8VmjB0cGujXrt1CKZhAv9jk+TDA8OetTKRnewuYbP4OCS6FPd9w2yBGEGyFbWlvQMhn5hOyl8mR1jfDo6NfVf5qpS1+VmhaPIMMBVBU/4Kqyxt/8D1zsfNmjdpku7lGDYoPycuwm/IT0tw=
+	t=1731638816; cv=none; b=gnZK5LmmWybXDs/gxb/Pv2LneGJ6qyOrNddZ19mps/6gvGo3OsLIBd89Bg3pApYxvzriZYd2KPhwQZ06upumiZs8d65UtMwUdLhe3BL3w8HBkKo6ELOEBzlhXMFKka+Px1iLD+jPPKOK7ZtWHM7C/f44rCK6YsoLorb4qLZ1MEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731638622; c=relaxed/simple;
-	bh=0Jz8XKYskX+2p0e/euVme6pdahK2zNMLc9N16Rpb7x8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T2AEljZ3axYanrtc+y/oZgo4JUMqpOkR0NfHgQIXPyGR/+HNhcqAoqOgeSxw9av+Bjut9KT1n/R9E+YBUQG/SlksgdTNvLiJ9T2x/dwO3oAZyeeJzLjwOkgSZRyxJsPy+WLb3wKJzR5irCrRQk27l/x7hh8fXWTx0UFVU1xt/HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=cxSOglwu; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71e79f73aaeso1004804b3a.3
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 18:43:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1731638619; x=1732243419; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b1Lhh0DpW4WR6Dx6ZPrJHJSg0IKOPZ7IXqU4uvUXc7s=;
-        b=cxSOglwui5QeWUzpncgiAYcszO0bdpIaNTFoupjwmoa2rwmlkuJIC+KED35sT0gJt6
-         bjzugXWyjkWsTqHUyPg45Smr7MLETxmQie5YumaAM4EdpNHb4zRTdNkqbhFs7mEuLk5H
-         LAFBpBTrYDSryOAv9oDBzGtFNNJHbjpTM3uZVss8tJt9X6mUUVCxXlPqYAG+nY8VFbhj
-         0KvHAEDSYJSZsXXagD45KFemug3Ro3jhKHjx+BiKDGP4zAtaSa621+mYavJC+TG7stXy
-         GahCqx0kRdwuKBQTzyvlHHjSnbXAO6x/gQvA5/ZtEIApW5Zier6SmXVJrucfDZlvA2GU
-         nc6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731638619; x=1732243419;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b1Lhh0DpW4WR6Dx6ZPrJHJSg0IKOPZ7IXqU4uvUXc7s=;
-        b=FPfLn37lthnddJWbpAYULNkjVa3WvOOt214wewUXL+l4yUFw6iMR5ok46udRz8BWAP
-         psUV945FFYCZs9Zjm6U5XdXo+lII8h55XaAXekVxtys/KuRbaKNJQEwRYVey44wgTLJR
-         yf6BFx34ARvVQtv3BEDbpyVrUR/n+P1Pnih0ix2X1U8JhYK6Nh/dWw0GBPWpOk4NRYuJ
-         LsHGaJ5/4E27SCxq1PKOtNtN+rZ82YfJqaDVFrxz4IxozsvYGO+7C0qoMmc6qdJKrpF0
-         niVg+ONTEN4+qvz15ty/JzVD7rnxtNFGGKd1CgwoF9iZcP+meGIAgJ5iWQt2Zw5rXYtg
-         tdjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3OPb6TdWLNkhlr6e/jIoIE3f0RIOJD9cA1bouQu1jBHqHsKAviQHpNQH3CpwN7RNHMYqKZ/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVg16E/gELVmvHiVRhCMTmCieJ8Ww58OAO25R6w+CBPzL1AVGq
-	LsXuo3poUUrU8Pn6SZSZP0lrqMsX0phREJr9lpJxUbk8aj4D8QQycxB8/+3C2hA=
-X-Google-Smtp-Source: AGHT+IGF90XZC7tXrmioO0CbsJ457UP9v3N7eyd59x6hjEcyJ4D+fOWs4xD42yc5ly4Xbhg3q8oVrw==
-X-Received: by 2002:a05:6a00:cc2:b0:70d:265a:eec6 with SMTP id d2e1a72fcca58-72476bb89bemr1691745b3a.13.1731638619412;
-        Thu, 14 Nov 2024 18:43:39 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1151:15:40a:5eb5:8916:33a4? ([2620:10d:c090:500::5:db2e])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724770ee82asm363559b3a.30.2024.11.14.18.43.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2024 18:43:38 -0800 (PST)
-Message-ID: <f8d09aa1-b83d-4eaa-8202-b8cb6979d85f@davidwei.uk>
-Date: Thu, 14 Nov 2024 18:43:37 -0800
+	s=arc-20240116; t=1731638816; c=relaxed/simple;
+	bh=IAiuFyp3E8W9vuvfCCVnB6Wz9h8JSHrPyDRUJkzoI38=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XM8md1ZyDYxbMIBSbNUe7PhI6dXE4U3Y51dwBkB9l2MW1MyT06BPlIy++a+pe9+0vfeUnAmQtI7Wzf6uFXtlQHUctO/NjSnl86U+LwsreTK/N5W+h+ctiaGss3cQi6M5V1iy53g3eEzPBw/AiTzHna0rwPxi1StqoXSLu1sDa+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpsz13t1731638776tf26ak
+X-QQ-Originating-IP: m+FaQT7FrJXF6yKa4W3dcPGuEsWgqna6Tk5+0LWIfnY=
+Received: from localhost.localdomain ( [115.206.160.29])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 15 Nov 2024 10:46:07 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 10350192324756698958
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: linux-pci@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	helgaas@kernel.org,
+	jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH PCI v2] PCI: Add ACS quirk for Wangxun FF5XXX NICS
+Date: Fri, 15 Nov 2024 10:46:04 +0800
+Message-ID: <E16053DB2B80E9A5+20241115024604.30493-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 4/4] net: Comment copy_from_sockptr() explaining its
- behaviour
-Content-Language: en-GB
-To: Michal Luczaj <mhal@rbox.co>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
- David Wei <dw@davidwei.uk>
-References: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
- <20241115-sockptr-copy-fixes-v1-4-d183c87fcbd5@rbox.co>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20241115-sockptr-copy-fixes-v1-4-d183c87fcbd5@rbox.co>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: M9NnLm3GdbLblnwuwzDh1lvvan46j55EdPu/Tw3UrgSnUAYJ/p8hyr8g
+	DygslxdDA8OtNC0stBCDeLvxGrXPFYfzfMulV64nFA7pw3wMLjvyDr+deG8Afagy5hxzw8i
+	1UC34bWkeRMjWgM9a3cDL3bhQvJ5Y2pxO/+uaLEuIu/yIP9mslbMryP6ql+qszqFqEq5kZ1
+	x4VaF3AyUuRaoEEkgrz30nPVV5aVMGN5/l81TXZMmuseKkf708681kfEy0krfJvLKv+7vNt
+	2MkRKa0efpixwGXx+sCcc9RSnsDdgM/NLdfpcxjSQz49yQ4XMjcXulbAQ5Wffg69umFeplh
+	wSAnq1pBK+VqrcjBNo71Iwux0ikMCspRm4GapMzTEL2YmTMaLHx0Mxy15p6C17410+96oqG
+	hpLBUtIxmk1sn1kIIA6ul/U0QUy2e7gi9RZ8xZxuyMkzaC0LAPTnv2xcR9bWYV3cHxDGZPL
+	LFSjuE/5XaYTyQHRXJVNSSSsbCZYybVW0aCXr/DhS+oXhq5Pdt5bevT0AnUM2gvphLwCrCb
+	YHcklIq0dIKCihv3PRCREPGUMZbHG32X/0kIcYmPdThgSY6BCWa1fuFLl0k524zK5a4tLXg
+	bZg+iM11MZx6RAvaLLxyX0/rkN1BI04spyrQT4i92rCMDEej6Myguy0OWYG50WsJXHN2AUY
+	DYp00sdwtWzpa3gykcyShQgjSUMKCzIt30ufdLPFMt00Dmb0q5VEjbfi6/DXk5/GoqU+wgE
+	FUcVscM/HsYeYiRqlYLJ298T1Hcd/YIIaNuOvRD3DMQ6eLr5Sy928JXu9iyxKSVsaY1r99n
+	agKyVYzfdwd/F8LXrACJv5YrSvm7DDQk2YY8JvLMZvLLUOhKr+MeQG+CkATF207Ru/wx6nQ
+	054wQ9YNSxi29f0gs/x+ajc53/dtzMPXwJe50DE4PEnusFpsQhI4hIajUK7IM3YywPBKnPy
+	h2DkjAe4A3WlBS4oMi0iFWLUxHhcK47/t93wwjQ2KQRXRNDO78eoDJO/8
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On 2024-11-14 15:27, Michal Luczaj wrote:
-> copy_from_sockptr() has a history of misuse. Add a comment explaining that
-> the function follows API of copy_from_user(), i.e. returns 0 for success,
-> or number of bytes not copied on error.
-> 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
->  include/linux/sockptr.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
-> index 195debe2b1dbc5abf768aa806eb6c73b99421e27..3e6c8e9d67aef66e8ac5a4e474c278ac08244163 100644
-> --- a/include/linux/sockptr.h
-> +++ b/include/linux/sockptr.h
-> @@ -53,6 +53,8 @@ static inline int copy_from_sockptr_offset(void *dst, sockptr_t src,
->  /* Deprecated.
->   * This is unsafe, unless caller checked user provided optlen.
->   * Prefer copy_safe_from_sockptr() instead.
-> + *
-> + * Returns 0 for success, or number of bytes not copied on error.
->   */
->  static inline int copy_from_sockptr(void *dst, sockptr_t src, size_t size)
->  {
-> 
+Wangxun FF5xxx NICs are similar to SFxxx, RP1000 and RP2000 NICs.
+They may be multi-function devices, but they do not advertise an ACS
+capability.
 
-In addition to this, please update the docs for copy_safe_from_sockptr()
-that calls into copy_from_sockptr() which also contains the
-misunderstanding of what copy_from_sockptr() returns.
+But the hardware does isolate FF5xxx functions as though it had an
+ACS capability and PCI_ACS_RR and PCI_ACS_CR were set in the ACS
+Control register, i.e., all peer-to-peer traffic is directed
+upstream instead of being routed internally.
+
+Add ACS quirk for FF5xxx NICs in pci_quirk_wangxun_nic_acs() so the
+functions can be in independent IOMMU groups.
+
+Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+---
+
+v2:
+- Update commit and comment logs.
+v1:
+https://lore.kernel.org/linux-pci/3D914272-CFAE-4B37-A07B-36CA77210110@net-swift.com/T/#t
+
+ drivers/pci/quirks.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index dccb60c1d9cc..8103bc24a54e 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -4996,18 +4996,21 @@ static int pci_quirk_brcm_acs(struct pci_dev *dev, u16 acs_flags)
+ }
+ 
+ /*
+- * Wangxun 10G/1G NICs have no ACS capability, and on multi-function
+- * devices, peer-to-peer transactions are not be used between the functions.
+- * So add an ACS quirk for below devices to isolate functions.
++ * Wangxun 40G/25G/10G/1G NICs have no ACS capability, but on
++ * multi-function devices, the hardware isolates the functions by
++ * directing all peer-to-peer traffic upstream as though PCI_ACS_RR and
++ * PCI_ACS_CR were set.
+  * SFxxx 1G NICs(em).
+  * RP1000/RP2000 10G NICs(sp).
++ * FF5xxx 40G/25G/10G NICs(aml).
+  */
+ static int  pci_quirk_wangxun_nic_acs(struct pci_dev *dev, u16 acs_flags)
+ {
+ 	switch (dev->device) {
+-	case 0x0100 ... 0x010F:
+-	case 0x1001:
+-	case 0x2001:
++	case 0x0100 ... 0x010F: /* EM */
++	case 0x1001: case 0x2001: /* SP */
++	case 0x5010: case 0x5025: case 0x5040: /* AML */
++	case 0x5110: case 0x5125: case 0x5140: /* AML */
+ 		return pci_acs_ctrl_enabled(acs_flags,
+ 			PCI_ACS_SV | PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_UF);
+ 	}
+-- 
+2.43.2
+
 
