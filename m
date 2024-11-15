@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-145162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A364B9CD5DB
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F369CD5DE
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E00F2832A9
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF93E283062
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAEC145A0B;
-	Fri, 15 Nov 2024 03:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD70168C3F;
+	Fri, 15 Nov 2024 03:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RB81Qvaj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nv4K74NE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0022B33997;
-	Fri, 15 Nov 2024 03:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76E14D9FB;
+	Fri, 15 Nov 2024 03:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731641419; cv=none; b=MQAOcwQ/FElYGZ12kZMDjUCSgSCgzvOpeB6X1QmLNbcWl1G12D/fCN8OEhHpUpuyuK2Ty9rP4V9FXBgOnb3JqyO3/W7AtxbPwVCZ2XzR6Yc0Y1I8/RBrcb6f4oty9KRA5qqjWNZVEsI37/DDutH05uoXJlzpIv5mNTQJ+jlHNns=
+	t=1731641424; cv=none; b=DiXQq5ue+k/KeBCWrMNXYVg88Wx0ysdra4znxmUCzIRCqGXEskmvPp7IXbc2U6EKso7jp73bpmTzBtA76kJ8+lhxiXJ/d/PykMcuOfUeYjPod3U3R8aIabBBx51r80LULsSTFXZt/qIemrnG0Q0tK1kggVzttIlkj230ySUFVY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731641419; c=relaxed/simple;
-	bh=Him8nl8FyzNVEHA1o0Xazwb9egJOQ5O9TgMHjAoDCoU=;
+	s=arc-20240116; t=1731641424; c=relaxed/simple;
+	bh=+ufclaApr/0BR4iWbKqH2pyYxQdUe4d8Ad3IQrgrroE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RnEM2hEyuyye5vUhwkk9T/GqPhxDSwQ24BN/sLIqyIv0xH+aSymC+bOfAbc2yrRemTwyWf0f0tuUeHJ8o5qNDrpldIu9oVABxZpMvMB7Hb2eLVx7W4zTMx7Dl2/LMUZDk2WxFVIcOwdxy4OY2UgtHdY3n8jbEGWEZibXRVPovvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RB81Qvaj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55ACCC4CECD;
-	Fri, 15 Nov 2024 03:30:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LZeBnqF74RnnZtzC4RBORh83O/euIrSeDr9uu7IFQZUuyKVukm1a4ELczIi3MsaItuBat9nvg3FxDZSoocDw3S+Smogdoi5xoUUMtBd5NHhHl0E7LhKVo0afCbyTptZy1M+1h6MHQK0sQEgETcbL6v+wzcMjHeep4Ip7/PVIVFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nv4K74NE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 211D0C4CECD;
+	Fri, 15 Nov 2024 03:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731641418;
-	bh=Him8nl8FyzNVEHA1o0Xazwb9egJOQ5O9TgMHjAoDCoU=;
+	s=k20201202; t=1731641424;
+	bh=+ufclaApr/0BR4iWbKqH2pyYxQdUe4d8Ad3IQrgrroE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RB81Qvaj5V0+kVVcbRM37PGyVbmJG5F258/uituX3OPjEmQXTPkMc69NeFD9ynAwl
-	 7r2HwsSa9FjTrCtBOukCojjx4TEQJSaTVPLGe7ADIfjZDezXjNybL9KM801jh9FbyX
-	 uEo6ZcnlH5+WRzQw1HClGsD6JCsxnrzK6W4euGBzetdKlpMqiiwJLsu0j8fvYJ8DTt
-	 D9vDNVLmth5RdAU86P+pkt6ZN+7uzqg95cWFIvGNe9hsXxLMni/lXan2LPhW3Fz3V7
-	 iXcp422k+TYSxrY0evK195nOa+RF4BOF3t8asbx1N8rEeDoy8OPzFIkxC1iWziNZDs
-	 zve2dlxT/HSTg==
+	b=Nv4K74NEoU0XEauLu8mLEjZ9XjIf/qtIAudVKkatj1GWEAHmiZqfe5HCUsm8n8pAA
+	 RMgk4I7OO2xRuUO53hN8TemJ3AuUSihUPC8oUlud+xf5Smh/xlTecPPGcX4rP8Wgzm
+	 5pdpBoBpJ5AgTobehBZqLqdlt0DTpgtEfDTXBs8rTMHKZA4LaucAIU1DG1+f7J+xx/
+	 sRyKWJurMLmal9qv/p3ljcvrLvReuJAvPu3Lmnju8CZTLKax6hEjG4V+ifxvC5w7z4
+	 d4hffNewVj9rqpns2R82J9aU2n1yOuZL3BaCDrIUC85k8C+4gcyJY2f18F4NhZziZq
+	 fWALOXAFvYIeA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B623809A80;
-	Fri, 15 Nov 2024 03:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE213809A80;
+	Fri, 15 Nov 2024 03:30:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: phy: dp83869: fix status reporting for
- 1000base-x autonegotiation
+Subject: Re: [PATCH net-next 0/2] ipv4: Prepare bpf helpers to .flowi4_tos
+ conversion.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173164142900.2139249.18179517007808850405.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Nov 2024 03:30:29 +0000
-References: <20241112-dp83869-1000base-x-v3-1-36005f4ab0d9@bootlin.com>
-In-Reply-To: <20241112-dp83869-1000base-x-v3-1-36005f4ab0d9@bootlin.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dmurphy@ti.com, f.fainelli@gmail.com, thomas.petazzoni@bootlin.com,
- maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <173164143473.2139249.2172625891763389024.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Nov 2024 03:30:34 +0000
+References: <cover.1731064982.git.gnault@redhat.com>
+In-Reply-To: <cover.1731064982.git.gnault@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, horms@kernel.org,
+ martin.lau@linux.dev, daniel@iogearbox.net, john.fastabend@gmail.com,
+ ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, idosch@nvidia.com, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Nov 2024 15:06:08 +0100 you wrote:
-> The DP83869 PHY transceiver supports converting from RGMII to 1000base-x.
-> In this operation mode, autonegotiation can be performed, as described in
-> IEEE802.3.
+On Fri, 8 Nov 2024 17:47:09 +0100 you wrote:
+> Continue the process of making a dscp_t variable available when setting
+> .flowi4_tos. This series focuses on the BPF helpers that initialise a
+> struct flowi4 manually.
 > 
-> The DP83869 has a set of fiber-specific registers located at offset 0xc00.
-> When the transceiver is configured in RGMII-to-1000base-x mode, these
-> registers are mapped onto offset 0, which should make reading the
-> autonegotiation status transparent.
+> The objective is to eventually convert .flowi4_tos to dscp_t, (to get
+> type annotation and prevent ECN bits from interfering with DSCP).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] net: phy: dp83869: fix status reporting for 1000base-x autonegotiation
-    https://git.kernel.org/netdev/net/c/378e8feea9a7
+  - [net-next,1/2] bpf: ipv4: Prepare __bpf_redirect_neigh_v4() to future .flowi4_tos conversion.
+    https://git.kernel.org/netdev/net-next/c/bfe086be5c4c
+  - [net-next,2/2] bpf: lwtunnel: Prepare bpf_lwt_xmit_reroute() to future .flowi4_tos conversion.
+    https://git.kernel.org/netdev/net-next/c/dab9c6307161
 
 You are awesome, thank you!
 -- 
