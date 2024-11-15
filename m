@@ -1,75 +1,57 @@
-Return-Path: <netdev+bounces-145295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771E59CE16C
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:39:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AAA39CE549
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3938D2811A3
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:39:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0F26B26C37
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48DE1D435E;
-	Fri, 15 Nov 2024 14:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBD71CDA3F;
+	Fri, 15 Nov 2024 14:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Eegd4ZWk"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="oxnyUFwf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4281D4351
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 14:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9538F1CEE88;
+	Fri, 15 Nov 2024 14:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731681554; cv=none; b=qe4FJWKPQ0yiSa/u0M3NoHNYc7m1NxFRmWSKsWFO+50CbAM2/f3Blb50eAbZ+3sgF8/xKey6LZHyVZm6xYp4BkFixQEjPXGEitmz489LQvJQEFkevNdHgXBD9Diajds67WD1f0FwZVdMMzgqfRIbzfMKSXVUJvIPWf7xpmBP8F4=
+	t=1731681632; cv=none; b=ZHllZlWv5ZsBeze7emEiSMIJItf05vLAEDpoF+bFsByCHmLzjk+77/GpcJByuTNcn5BDnfgc/8a4HJrTmQ8ktk0Dfnmj1wPE98/BiBsu9oizf96sWmxesP7qyvRsKY2hH2UDDedgatr6oQre2p28qFoyjuQAgBEvJJT/y93+YOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731681554; c=relaxed/simple;
-	bh=4tlLltxo+Hj+0MDVTEjHpvj7Ka2vLnni5nupXYpEmNk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RN79eZxKKjRwP4j5BfFvWXEZ5BdKSDwrlzHJ4yaqd1CoA7I78Emhb5w7yYQHgvu3R5o7rPi7Q3ALudOoJRDz8dqDb5C/ETePCSmAKqmiD6IrgkEs6mbo1EjStVsCEZmdHizBouQcQorVcWZNSINXo57a0K76JJ+0AMUgVnsQf6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Eegd4ZWk; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4314c4cb752so6281325e9.2
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 06:39:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1731681551; x=1732286351; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jFC7sT7ccqdUHp1cDL4XMUSFjZj93CegQi4p8wl3lxA=;
-        b=Eegd4ZWksJGs7+btMgWSHnjZqw8+8MnfNZZNcLisS+OzjYTgeKzNZglSeLxL3EkMJN
-         w2x929T7qK/lAt8h+zKhX2ZsUPdPkUOzOs0Xaf3tyounzZ3eA0t4CdDMWBFt3h2IMTx6
-         /2xa3rbjj2J1nN9BuS2tqJl+XX0SSMZvh0L7KPWwFpvpzTtjftK2nEQqjx9pyzSIyljP
-         a56fDEo/IwAQG5ntknQZ0vcn4d0nYC6SHw/XY7tlUGHfpaP/NcziVdRtQFqliBTFIyI+
-         zvow4xX7G+dP49KgnOYRwS8+UNJ/+Hc3RDgUq4cnz4Hl/V4hQJrwrS4Dg5L3+ixmCz7C
-         Dpjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731681551; x=1732286351;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jFC7sT7ccqdUHp1cDL4XMUSFjZj93CegQi4p8wl3lxA=;
-        b=EYZwpkwmMjt8Q3kebUwKS1ZHXOBvzkUgZglaldnVuht5gZr1PT70pw45ZOrhjyuG9z
-         N1NG+K4wIuYn/NKiNU6QpufF+CXYokSU69+bEkChTfnWJ4d/yVHdHv+yMXQ/W3OLW/26
-         IkvOUuNvXaveDIce2euxEUSg40u4oLQn4bSscuTIVwSiRXx2aTs9A5MQnyS47XT6MZC4
-         K7CkzC4z0RN5SLndAwugbvIn+RMVoqsr9s/+oY7MHX24B8f0zKXJiiv5Hmx3Eo8gb0h6
-         qj+Y4km8LboZzrrVzR/dt7Hc0taAhyBWmyOU/InbQCqSoE6ljDLVxz2MmXluS6Kd0I1z
-         O08Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVkhxSWRmxdDG8V4Us6RZ3Vmg0WfRyixqHDU2JrFwV2QZh6YNK5ACHEpMoQQKVILZWdBrGXPAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPhYbMes+qexPDdoZAXrta1owtlR3quI1ocDtgJhos4VQY7T47
-	wvZOF8xLLTCWDWija8FjRGaFClBwoS2rQbpHegB+kofrZC2/FI3CehaANWkOIuM=
-X-Google-Smtp-Source: AGHT+IHynH3QnvU6nVv7lZXeKUim6BKbTkTiRuQ7hpZ9Jr52HVBBSOHcVHcsmd9GfvobRtv2iCKJvw==
-X-Received: by 2002:a05:600c:3584:b0:430:5887:c238 with SMTP id 5b1f17b1804b1-432df725532mr23699705e9.11.1731681550884;
-        Fri, 15 Nov 2024 06:39:10 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da24459bsm60768935e9.6.2024.11.15.06.39.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 06:39:10 -0800 (PST)
-Message-ID: <387d3fc5-9ff6-4a8e-b766-5e30d0aef4a4@openvpn.net>
-Date: Fri, 15 Nov 2024 15:39:36 +0100
+	s=arc-20240116; t=1731681632; c=relaxed/simple;
+	bh=959MsTQz65hf3eOqxrdEOR8H94M1v6fwbz0kNjifmac=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=opEz2xhWcd4jg2oQ+AbnW1bcCTqs9JxCz6k397hj5LOFK9zSFqlMF72p48A1WlFp27naAPsMR2p7wKyXZS2hbgSuTdbUWhVT5xMoTfzcTzL8WOzPYFjecoh5/eF8ZKtbPJDMA8BhX7Sy2b8dgCpIaYqyQ65phqBlmD9cduuFvuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=oxnyUFwf; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 22A27A03F3;
+	Fri, 15 Nov 2024 15:40:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=6/2MUpA9iiZewuVkOsHA
+	/MenPovLnhmD8c1npxgNkyA=; b=oxnyUFwf1GBAuF54WohUVoYHLcYbWL5OC3JN
+	WfA6bBY0jbXYlYO0X0OUeeG/zNgj7vAbK/cBQyDUoSQC6cSXzrdK5/k1nPazM8yk
+	Hh+pSItTYkGibeGcJsACpTu9q5JTS/Ku8FXsFloK/tnUSu4KcYIdUJcPO3IxkO7J
+	1XO0SVUDUDwv7z1PsQ2FodflkSI8p0iB97ELYYyYL57mFs+lWucXRZr+maV2Jf1a
+	DJjYLKzIr2cJDthaaYaqnWZ3HERHddc0wf64awhMLUHCMih4K37EOrqcISI3OqBT
+	xIvqdEeAp9HSHss45nlH6rcYVAtqugLc9tN5k2YGjzT0z8jSHUYuNzV/Ez+8C0fW
+	93E131l5/5ZbVJaRlwmOHVNxfEnrVTyJ8MT3TPqtk8J+rw1mjh4NklLiUah+e89f
+	TFJRhGlFZn5wWHG3QYyK80zHtDQfUfZx9JFhQgrJKx28ntiSsmsCroTzH1dKV5B4
+	TuDi0L+RPwCaLe/DDsyWv2f9FktlCwO0tKNAok/npQjyQtRyy71OTBi2SiyZ2iFy
+	65jt7ggA10MYoTb3K+Koh2LeuoE+JLE+uvEPnXhik7Jx5GpWnX63IjlShTeXI1In
+	UiUUxT9K3jti9wuAMRYqnGdTzeoJrMn3BVph3qon+PLd6kw+JHw4i0AIOPIh0osh
+	RCqgwsI=
+Message-ID: <f50ee921-277e-4aad-a96e-378c08ec8288@prolan.hu>
+Date: Fri, 15 Nov 2024 15:40:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,113 +59,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 08/23] ovpn: implement basic TX path (UDP)
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net>
- <4fe9f0d5-a8ac-4f2e-aee7-00cbeaf2f0aa@gmail.com>
+Subject: Re: [PATCH net-next 01/13] net: fec: fix typos found by codespell
+To: Marc Kleine-Budde <mkl@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Richard
+ Cochran" <richardcochran@gmail.com>
+CC: <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@pengutronix.de>
+References: <20241016-fec-cleanups-v1-0-de783bd15e6a@pengutronix.de>
+ <20241016-fec-cleanups-v1-1-de783bd15e6a@pengutronix.de>
 Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <4fe9f0d5-a8ac-4f2e-aee7-00cbeaf2f0aa@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <20241016-fec-cleanups-v1-1-de783bd15e6a@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D94855617C6B
 
-On 11/11/2024 00:54, Sergey Ryazanov wrote:
-> Another one forgotten question, sorry about this. Please find the 
-> question inlined.
+Hi,
+
+On 2024. 10. 16. 23:51, Marc Kleine-Budde wrote:
+> codespell has found some typos in the comments, fix them.
 > 
-> On 29.10.2024 12:47, Antonio Quartulli wrote:
->>   /* Send user data to the network
->>    */
->>   netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
->>   {
->> +    struct ovpn_struct *ovpn = netdev_priv(dev);
->> +    struct sk_buff *segments, *curr, *next;
->> +    struct sk_buff_head skb_list;
->> +    __be16 proto;
->> +    int ret;
->> +
->> +    /* reset netfilter state */
->> +    nf_reset_ct(skb);
->> +
->> +    /* verify IP header size in network packet */
->> +    proto = ovpn_ip_check_protocol(skb);
->> +    if (unlikely(!proto || skb->protocol != proto)) {
->> +        net_err_ratelimited("%s: dropping malformed payload packet\n",
->> +                    dev->name);
->> +        dev_core_stats_tx_dropped_inc(ovpn->dev);
->> +        goto drop;
->> +    }
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> ---
+>   drivers/net/ethernet/freescale/fec.h     | 8 ++++----
+>   drivers/net/ethernet/freescale/fec_ptp.c | 4 ++--
+>   2 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> The above check implies that kernel can feed a network device with skb- 
->  >protocol value mismatches actual skb content. Can you share any 
-> example of such case?
+> diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
+> index 1cca0425d49397bbdb97f2c058bd759f9e602f17..77c2a08d23542accdb85b37a6f86847d9eb56a7a 100644
+> --- a/drivers/net/ethernet/freescale/fec.h
+> +++ b/drivers/net/ethernet/freescale/fec.h
+> @@ -115,7 +115,7 @@
+>   #define IEEE_T_MCOL		0x254 /* Frames tx'd with multiple collision */
+>   #define IEEE_T_DEF		0x258 /* Frames tx'd after deferral delay */
+>   #define IEEE_T_LCOL		0x25c /* Frames tx'd with late collision */
+> -#define IEEE_T_EXCOL		0x260 /* Frames tx'd with excesv collisions */
+> +#define IEEE_T_EXCOL		0x260 /* Frames tx'd with excessive collisions */
+>   #define IEEE_T_MACERR		0x264 /* Frames tx'd with TX FIFO underrun */
+>   #define IEEE_T_CSERR		0x268 /* Frames tx'd with carrier sense err */
+>   #define IEEE_T_SQE		0x26c /* Frames tx'd with SQE err */
+> @@ -342,7 +342,7 @@ struct bufdesc_ex {
+>   #define FEC_TX_BD_FTYPE(X)	(((X) & 0xf) << 20)
+>   
+>   /* The number of Tx and Rx buffers.  These are allocated from the page
+> - * pool.  The code may assume these are power of two, so it it best
+> + * pool.  The code may assume these are power of two, so it is best
+>    * to keep them that size.
+>    * We don't need to allocate pages for the transmitter.  We just use
+>    * the skbuffer directly.
+> @@ -460,7 +460,7 @@ struct bufdesc_ex {
+>   #define FEC_QUIRK_SINGLE_MDIO		(1 << 11)
+>   /* Controller supports RACC register */
+>   #define FEC_QUIRK_HAS_RACC		(1 << 12)
+> -/* Controller supports interrupt coalesc */
+> +/* Controller supports interrupt coalesce */
+>   #define FEC_QUIRK_HAS_COALESCE		(1 << 13)
+>   /* Interrupt doesn't wake CPU from deep idle */
+>   #define FEC_QUIRK_ERR006687		(1 << 14)
+> @@ -495,7 +495,7 @@ struct bufdesc_ex {
+>    */
+>   #define FEC_QUIRK_HAS_EEE		(1 << 20)
+>   
+> -/* i.MX8QM ENET IP version add new feture to generate delayed TXC/RXC
+> +/* i.MX8QM ENET IP version add new feature to generate delayed TXC/RXC
+>    * as an alternative option to make sure it works well with various PHYs.
+>    * For the implementation of delayed clock, ENET takes synchronized 250MHz
+>    * clocks to generate 2ns delay.
+> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+> index 7f6b57432071667e8553363f7c8c21198f38f530..8722f623d9e47e385439f1cee8c677e2b95b236d 100644
+> --- a/drivers/net/ethernet/freescale/fec_ptp.c
+> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
+> @@ -118,7 +118,7 @@ static u64 fec_ptp_read(const struct cyclecounter *cc)
+>    * @fep: the fec_enet_private structure handle
+>    * @enable: enable the channel pps output
+>    *
+> - * This function enble the PPS ouput on the timer channel.
+> + * This function enable the PPS output on the timer channel.
+
+enableS
+
+>    */
+>   static int fec_ptp_enable_pps(struct fec_enet_private *fep, uint enable)
+>   {
+> @@ -173,7 +173,7 @@ static int fec_ptp_enable_pps(struct fec_enet_private *fep, uint enable)
+>   		 * very close to the second point, which means NSEC_PER_SEC
+>   		 * - ts.tv_nsec is close to be zero(For example 20ns); Since the timer
+>   		 * is still running when we calculate the first compare event, it is
+> -		 * possible that the remaining nanoseonds run out before the compare
+> +		 * possible that the remaining nanoseconds run out before the compare
+>   		 * counter is calculated and written into TCCR register. To avoid
+>   		 * this possibility, we will set the compare event to be the next
+>   		 * of next second. The current setting is 31-bit timer and wrap
 > 
-> If you just want to be sure that the user packet is either IPv4 or IPv6 
-> then it can be done like this and without error messages:
-> 
-> /* Support only IPv4 or IPv6 traffic transporting */
-> if (unlikely(skb->protocol == ETH_P_IP || skb->protocol == ETH_P_IPV6))
->      goto drop;
 
-It look good, but I will still increase the drop counter, because 
-something entered the interface and we are trashing it.
+Otherwise, LGTM.
+Reviewed-by: Csókás, Bence <csokas.bence@prolan.hu>
 
-Why not printing a message? The interface is not Ethernet based, so I 
-think we should not expect anything else other than v4 or v6, no?
-
-Thanks.
-
-Regards,
-
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+Bence
 
 
