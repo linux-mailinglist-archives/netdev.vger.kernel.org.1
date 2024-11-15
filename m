@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-145513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 279E49CFB43
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:40:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929BC9CFB44
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0769B249A7
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:40:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FA6E1F2438A
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF914191F9E;
-	Fri, 15 Nov 2024 23:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92891ABEBA;
+	Fri, 15 Nov 2024 23:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVy3nEcM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMNdaGS6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A6818DF8D;
-	Fri, 15 Nov 2024 23:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DAC1AAE1E;
+	Fri, 15 Nov 2024 23:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731714020; cv=none; b=gA04JZDQIiqdw0s6cw/TRdcUf9SFjEDxOYLMs5F5GVFA9ckJXVhDawNsvjxC2IKqXL2Nl4I5TqFd0NvKqffwIVNjetO0mPEmNeb353EhHfrlcxOIFtS4h+hMdPkriqDot7SHi5Td9PYtqbyL3xxrh1MsuFntoUP2bu387eoRE18=
+	t=1731714021; cv=none; b=hUIX6UNDER4RTdcJq16Ab8pj38UuWEyGtiPlUaEMtqV4NnWs2m51QfROlaiQ96Upijm9qQrVxcjzXH9RMH1YLgGqBTjRWe0slR8i2RO6bKppHP/IEt14r3YuPEk7QFeqXl3Ovq9AfwsUKJYlIqMUAEFZiwQjLO9eSxnHk8eQI/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731714020; c=relaxed/simple;
-	bh=+1oE7bt04gcniALNaCS35HwWjesqhn26LK/iHoUcAPg=;
+	s=arc-20240116; t=1731714021; c=relaxed/simple;
+	bh=7aZ+QLZkMJD7SSoh7nu8VDLzts57ruPUVHaX0ERm+vc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Q2MzNjtuS6Rg0KUijL8fZGICUvrQZSL1WaaVnRL0yeSw5EDnBxGnDLZ9P7FIKiBGVHzALAOxieZI088/BXTrtDk8sKl0WV3NlT9POSpI4NFQhoFsexsncDOM+fAgdoiN2wmIOMLzT4VerAbvSbFE5hyqjD6BEanHZjAMyAKAYQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVy3nEcM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F714C4CECF;
-	Fri, 15 Nov 2024 23:40:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LJEfD3pYeWBCnVxDlJDkDRxoLjJjd3DlU7X4majGsfXwEIOGYk5DEITeXnmpbxUh79MBPSXMt1NTbcZkII9scrtV2dLU+zCl2jgLLAyjuT6n3PiOAlTrAon8impvKgbj+liHQQ1/A+a7SaR1BqKe79wH9c3OsCC8jqkrfP7/0kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMNdaGS6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B8DC4CECF;
+	Fri, 15 Nov 2024 23:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731714018;
-	bh=+1oE7bt04gcniALNaCS35HwWjesqhn26LK/iHoUcAPg=;
+	s=k20201202; t=1731714021;
+	bh=7aZ+QLZkMJD7SSoh7nu8VDLzts57ruPUVHaX0ERm+vc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TVy3nEcMJAR4Nreys9S5RTmHJX7hBc1GlXUSJ0kNt/lPu9OdIGFAABGr6I3XevUuw
-	 /gN8ALBTcr7e7ZZ4zlcGM4pCReicy6hK92C2/a6yDnvAmN4p7HCwlnzvWQ/aIpDUZN
-	 yIJw4Bqa0HVlZ2PxnHQUn5xaQb1IIvsBox2GAI+QPzOTFzRLTvF/AWmRbz9FRdIMY5
-	 PMMcjXWeruTt/JvlZjmjTiVUOi/DmZHHrz8oboy74Qh73ZmWVls3PWSpeXAx4qriNd
-	 kQbHjEMyEf2E5OE3mglQWi7tzrnv8U180IjqHpSE21wDX82Gv4xAjHG8PEDjegWFVZ
-	 BJKkoMPsp8ntQ==
+	b=LMNdaGS6AZUuqq6wqUrQ5/wWZslOwaQMhuzzJsnh8UhYPjPp0HaF8Wzi3IGNLGpsJ
+	 UhVn7vEHgjJ9VbXwv62WFXFRg7Ey79wZBWL3S/5Iufd0osb5J0isQ8H7v/+UiB/qMV
+	 fxXlNM8ngQkG6zYh1P6+Pmie2PDGSk88iXxdHtdG8WGiBOg89Iag6RRiDnH7CXEnI7
+	 5cFayrMSns5Clam43dbxVh7R88uoftJLutRkAwUWoviJZcfEXyOVgSBkcQWsrjQ3of
+	 FL/XcUySybRXeVd+RluGJAfSFcM4/+ymfU146Nbe5YJy/UJDYam2wIWDss1NuYutJG
+	 fwvypXvvz+5fA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B913809A80;
-	Fri, 15 Nov 2024 23:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E6F3809A80;
+	Fri, 15 Nov 2024 23:40:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] gve: Flow steering trigger reset only for timeout
- error
+Subject: Re: [PATCH net-next] net: phy: microchip_t1: Clause-45 PHY loopback
+ support for LAN887x
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173171402900.2770408.15282693426483623858.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Nov 2024 23:40:29 +0000
-References: <20241113175930.2585680-1-jeroendb@google.com>
-In-Reply-To: <20241113175930.2585680-1-jeroendb@google.com>
-To: Jeroen de Borst <jeroendb@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, stable@vger.kernel.org, pabeni@redhat.com,
- pkaligineedi@google.com, shailend@google.com, andrew+netdev@lunn.ch,
- willemb@google.com, hramamurthy@google.com, ziweixiao@google.com
+ <173171403198.2770408.408499941921229541.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Nov 2024 23:40:31 +0000
+References: <20241114101951.382996-1-Tarun.Alle@microchip.com>
+In-Reply-To: <20241114101951.382996-1-Tarun.Alle@microchip.com>
+To: Tarun Alle <tarun.alle@microchip.com>
+Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 13 Nov 2024 09:59:30 -0800 you wrote:
-> From: Ziwei Xiao <ziweixiao@google.com>
+On Thu, 14 Nov 2024 15:49:51 +0530 you wrote:
+> Adds support for clause-45 PHY loopback for the Microchip LAN887x driver.
 > 
-> When configuring flow steering rules, the driver is currently going
-> through a reset for all errors from the device. Instead, the driver
-> should only reset when there's a timeout error from the device.
-> 
-> Fixes: 57718b60df9b ("gve: Add flow steering adminq commands")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-> Signed-off-by: Jeroen de Borst <jeroendb@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> 
-> [...]
+> Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
+> ---
+>  drivers/net/phy/microchip_t1.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Here is the summary with links:
-  - [net,V2] gve: Flow steering trigger reset only for timeout error
-    https://git.kernel.org/netdev/net/c/8ffade77b633
+  - [net-next] net: phy: microchip_t1: Clause-45 PHY loopback support for LAN887x
+    https://git.kernel.org/netdev/net-next/c/025b2bbc5ab1
 
 You are awesome, thank you!
 -- 
