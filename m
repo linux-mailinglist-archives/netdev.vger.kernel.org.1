@@ -1,87 +1,162 @@
-Return-Path: <netdev+bounces-145464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080E09CF907
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:05:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9521E9CF914
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B205F1F213C5
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:05:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37971284670
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9341FCC4E;
-	Fri, 15 Nov 2024 21:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99E11FE0FA;
+	Fri, 15 Nov 2024 21:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WO7Lkb9L"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Xurk/K9N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3921E1C07;
-	Fri, 15 Nov 2024 21:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDFF1EB9F1;
+	Fri, 15 Nov 2024 21:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731706366; cv=none; b=G0E4mbPKP74Ucs9u5VyNm3U2BAq+1/In+pkJw2TYs5wAo6d308jCHka0KP81L68Nz/t7SshdRWcjyfc77OTOnQfjSsAU2cwMJjh9xsrg+B0YrJC1KFbJgoYcy7srZ9S9XI0xW1q2w5Dmktpb1M9mSkAITLDHYU8lrjdR9rQKvFQ=
+	t=1731706491; cv=none; b=DgO50fD/yh7mqHhI9IIq9MPI3ZDRI9pL3ELc3x8njZnQxPlIqHD+AshUOt8slH4e05H8mgd2lBIjZQlpQBThHrBVjdQlhFySgM0mAaUnItFM0QqaM9Vu0CNfvExoXOH5kr98A3gM6OblujE4VQbD39a4eWZl1PmJN2gD9OLRTlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731706366; c=relaxed/simple;
-	bh=sD2Vh6S7t1SuSC0zfoPnJDz1etOCITqvTKlSzS+QQe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rr93qlBjD4uXlKfPdLxIk5Ix0lcUXGft0H6OCaORJYVw9RlEy5PMkIXJQ7LuMCUaMZDt5BWyHJXRHL+AuqbwdmeyF8nbnDT+pQp2q1q6bmQtn63YPXFANEhQ8raw6i2unNdZOIvp5K9WiFRoDqbNqbODoV6QBJlgp5F6sgM112E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WO7Lkb9L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56A40C4CECF;
-	Fri, 15 Nov 2024 21:32:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731706365;
-	bh=sD2Vh6S7t1SuSC0zfoPnJDz1etOCITqvTKlSzS+QQe0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WO7Lkb9Lf7wQ4SBYfCz1zb3P/nb0se8O9npT3qT4k3D98brdsiexu/oI74vnP+Sbk
-	 uPXZ1q/ZSyO1vY2Akj2E//PtHJ6Jrced0eL9kkwbgDkOJS/FrQaySr0dq6hZgXH6Am
-	 t9pKyHnA3JcD3QVNC3R2pEICuWtkD1HPO9Monz6Uwtt9Tr7yt5ml2RZM0A8WjttZlH
-	 5nQAig3OzYD98SaOCLdMLDOmBMphvotYF0RPajuXnsxKwG1XBwTJSjDOncR5Ytj6nV
-	 EjZKfqBTx1EE2ckJn5qI4144g+kiDLSXTHDsHMaAps3bMz4XXyfY8N+slAqrUSG0gB
-	 3zAHj5UVKUKhg==
-Date: Fri, 15 Nov 2024 13:32:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- donald.hunter@gmail.com, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, kory.maincent@bootlin.com
-Subject: Re: [PATCH net-next v2 3/8] ynl: support directional specs in
- ynl-gen-c.py
-Message-ID: <20241115133244.6e144520@kernel.org>
-In-Reply-To: <20241115193646.1340825-4-sdf@fomichev.me>
-References: <20241115193646.1340825-1-sdf@fomichev.me>
-	<20241115193646.1340825-4-sdf@fomichev.me>
+	s=arc-20240116; t=1731706491; c=relaxed/simple;
+	bh=ynYosdbbpOY3VrI3Suc9RBL1xgUDIqoX2LZt7ciANKc=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uzMh4s9JePX3prbtdCiqFxVVXtMli75vS4biTGqF/8WanEozNo13GaWvUAXlNViZNSI3l/BNyoMmJoxlx+sEgplVV/2VfHHXOom1Qh0Y3z6FOYjPDkppoHgnmpLOgGZcqcoTfWQbnHBdNoGN1GxU5qftM1ae8KbXx1Eux36YX4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Xurk/K9N; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 684CD2064AE8;
+	Fri, 15 Nov 2024 13:34:46 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 684CD2064AE8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731706489;
+	bh=OEAxYqndmV97fB2t7JocLL7u1S4ql6E8JdtDlfM98mA=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=Xurk/K9NZ4Pt7R0qwaS9VSYSKCTMSaNp/aapEsQZCtIT74ft5tvctXWuFivs3Zswx
+	 hrelPOn+ppZ3FOsJiI+79MeaWo7lX97CMgyLO8+gyOebFfO+/iJc5GjxBT3U1ILKzl
+	 NFamFr9+2AnMiAp4lQnkRWbNDRlCI9FqXsyeg14c=
+Message-ID: <ae1f83c3-88fe-4b75-9446-e7e711b954ae@linux.microsoft.com>
+Date: Fri, 15 Nov 2024 13:34:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Michael Kelley <mhklinux@outlook.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: Re: [PATCH 22/22] jiffies: Define secs_to_jiffies()
+To: Jeff Johnson <quic_jjohnson@quicinc.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Lucas Stach <l.stach@pengutronix.de>,
+ Russell King <linux+etnaviv@armlinux.org.uk>,
+ Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
+ <20241115-converge-secs-to-jiffies-v1-22-19aadc34941b@linux.microsoft.com>
+ <e1ff4b71-7abf-4ac6-8b82-86aad5394de6@quicinc.com>
+Content-Language: en-US
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <e1ff4b71-7abf-4ac6-8b82-86aad5394de6@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri, 15 Nov 2024 11:36:41 -0800 Stanislav Fomichev wrote:
-> The intent is to generate ethtool uapi headers. For now, some of the
-> things are hard-coded:
-> - <FAMILY>_MSG_{USER,KERNEL}_MAX
-> - the split between USER and KERNEL messages
+On 11/15/2024 1:30 PM, Jeff Johnson wrote:
+> On 11/15/2024 1:22 PM, Easwar Hariharan wrote:
+>> secs_to_jiffies() is defined in hci_event.c and cannot be reused by
+>> other call sites. Hoist it into the core code to allow conversion of the
+>> ~1150 usages of msecs_to_jiffies() that either:
+>>
+>>  - use a multiplier value of 1000 or equivalently MSEC_PER_SEC, or
+>>  - have timeouts that are denominated in seconds (i.e. end in 000)
+>>
+>> It's implemented as a macro to allow usage in static initializers.
+>>
+>> This will also allow conversion of yet more sites that use (sec * HZ)
+>> directly, and improve their readability.
+>>
+>> Suggested-by: Michael Kelley <mhklinux@outlook.com>
+>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+>> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+>> Reviewed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> Link: https://lore.kernel.org/all/20241030-open-coded-timeouts-v3-1-9ba123facf88@linux.microsoft.com
+> 
+> your signed-off-by should be last.
+> 
+> and you have a patch ordering problem since this patch must come before all
+> the patches that use secs_to_jiffies(), otherwise this series cannot be bisected
 
-Maybe toss in a TODO: comment or some such on top of
-render_uapi_directional(), to make it clear that the code needs 
-more love before it can be reasonably reused.
+Thanks for the quick response, indeed this patch is already in tip[1], I
+pulled it in for testing the series but missed out on removing it before
+sending. Please review v2 that excludes this:
+https://lore.kernel.org/all/20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com/
 
-nit: possibly split into two commits for ease of review
+[1]: https://git.kernel.org/tip/b35108a51cf7bab58d7eace1267d7965978bcdb8
 
-> +    if family.msg_id_model == 'unified':
-> +        render_uapi_unified(family, cw, max_by_define, separate_ntf)
-> +    elif family.msg_id_model == 'directional':
-> +        render_uapi_directional(family, cw, max_by_define)
-> +    else:
-> +        raise Exception(f'Unsupported enum-model {family.msg_id_model}')
-
-You gotta say "Message enum-model", enum-mode alone sounds like we're
-doing something with how enums are processed, rather than message IDs.
+Thanks,
+Easwar
 
