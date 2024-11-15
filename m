@@ -1,236 +1,594 @@
-Return-Path: <netdev+bounces-145302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA34A9CE7BA
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:02:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5376A9CE789
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 772111F227B9
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:02:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 149122846D9
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9BF1D5165;
-	Fri, 15 Nov 2024 15:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C921D47C8;
+	Fri, 15 Nov 2024 15:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NODpiI57"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="NNZ9dmcT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02FE1D5161;
-	Fri, 15 Nov 2024 15:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66841D432D
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731682932; cv=none; b=u9XjBdHbgBtvj279MZzr6Px7a+UGY2l8ZHM9r/nEGsBv+hjV2xcjf/zvUxkWeAsJtSMrz5pLVyuCyOmF2CXm57rT+p92C2tAu8YoWajkLre7D+llufaWdORNT9k5dG6jmbEOOLbw8MC9Et/N8b6+zxk73cdquJdyE7cZXabKMvs=
+	t=1731682927; cv=none; b=lpTIE4i7dwy8KFPYigRYnQgFW948/I3HFGF+dmUe28iX8qOrlNGIILE/QaWaJsuTg5JmR50/evyqpb6e3TPGSITSpBMugFQShWsoNXpJQGaSG1nN3BnM7/8fjtcxLEVIp0I+VFhPFWj8gxdZB5WzwglyX5lTTjDfgPAOY9Skbs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731682932; c=relaxed/simple;
-	bh=RC7dHsUpzDmhpG2Rds2L44gcmJcCyTz4v8LUuaz9vbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FsLxy34n+++myf/7ncAvui9+djgRvU0YtogKN69NgH8JbqhWSPTCCrJWdFuo3zYUtuUhwCZhlBjBUmE0Ho6JgkuiA170W5nYx5LDPrSqL//fWf9S4mKDJlgfYwtc+XHdHUd/T0FvwGP3Kk1za5T696j1YQgbjk0e4E1+551J7sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NODpiI57; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10589C4CECF;
-	Fri, 15 Nov 2024 15:02:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731682932;
-	bh=RC7dHsUpzDmhpG2Rds2L44gcmJcCyTz4v8LUuaz9vbM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NODpiI57VDFfacvTlhxVqkf8jwPxzY6fiOgg3gq2JZGvdMF9+kkP830N/IR5m2EZ2
-	 JjhF3wpmjNF3rKJ+eaDiW8zej6RYSDOI9nq2zOKYlteBJLRhXbv9ttPs73k9G4pE1K
-	 +NX4ZvGgfs2U7GRIGYTh7KJcKqch/WyTTklvrxTh3euqNY33pYrTp4ZFvYG2z0AR9o
-	 rlOcYKq3rFeMQKr2stq28536T9adoMjR4ecbo3Hmn3iuEvOWCA4Zk6jtTRhcCBCLrI
-	 SPRsxungJhdM9ixRljBnRLmKTkO0tDPzyUAYeyF+ZYU/OEu8/Uig0Itf1oHHazPaWq
-	 RsELFu6TkoJhw==
-Date: Fri, 15 Nov 2024 09:02:10 -0600
-From: Rob Herring <robh@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Ben Dooks <ben.dooks@codethink.co.uk>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] [RFC] dt-bindings: net: micrel: Convert to json-schema
-Message-ID: <20241115150210.GA2680735-robh@kernel.org>
-References: <943cb31d01d0da3a63911326e24fbf9b328f7206.1731580776.git.geert+renesas@glider.be>
+	s=arc-20240116; t=1731682927; c=relaxed/simple;
+	bh=8avGz2uStbfiOeHgcSppXI3lyg//LNPX/QYBtkPHETs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jeM4Lb0YbqIe2iR0ro9RdHAGkGchc5CyoR27NKwvETkOjDS3zfSalxWeYLXJstpG6HuAhXN/O8oZ2f4S7k8AklT+3dGli9cUzx9db8dtYCJI2fEYWItmn5COootUswCUMQVI+x1ls59ktcwaDpXka7lBqhsnI9Pcgs20SKPFcGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=NNZ9dmcT; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43161e7bb25so15614435e9.2
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 07:02:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1731682923; x=1732287723; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+KRG+xR26JPgKnKl+zgTUX9WmO2aclLYJoeiMSQ7eZ8=;
+        b=NNZ9dmcTDumJy4ls0soaXIe8YwE3/QlFt646raw4amMcHwxVr/dX5MwEUmRt0UVYg1
+         6Xcm6iO6mNvQh+S1KgW/dIPqRYSSGqRL7UMT/pwRUwac+t3eJxJyXRvsoB2poc4DrRat
+         uRIx6SFlui+pQQXWbowAlUR3hLjnlzbeKsL/nwVlTDbBNUMfbFz+zJPMx4TdB4QIO0CH
+         q+PQIFXfYdfaAVSLfCf7dP715TXE2cvuGmw+k1dTETTpmsm/S+TJ8hjbXHbPU1G8361j
+         1qVkmKZtq90YNBivBUFH0Ahr9Fmd9YahiEl0LrWKqPVQUsDC12vlIVRjwXk7PESzrt5c
+         2iXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731682923; x=1732287723;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+KRG+xR26JPgKnKl+zgTUX9WmO2aclLYJoeiMSQ7eZ8=;
+        b=J+bWg1jrl+1rWkj2kPUgBTdANdHQ5kAQeVXuh85swQeYTXjdkmPPLoXLFVv6DWPCnJ
+         gPYWgyNqsB+uv2Snd+CXSE8Z6HThSUc0YvhB695LlThYE/uG7brMDadvjTqbFjrkf3sy
+         eMZqiq62Q+eMv9LODoZkS8r8T5b6s53pHdRHMCbdXmtXs7MW0Q8SSDpTYdn2fzIQkvlV
+         n2q2BV4k4EZzJZgnmPTkDMBnCgxRL3gTvR4gIfuh6x4M887G/vo8nr53q/Dwb6Vc3Fgt
+         8NC1lUIbiPumLjwyr6Wig54uT6O5dWPJaucnMJGqhCORxIuzsp6CJiIumXVe794KTWap
+         4isw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgFjxVumCIzf3yvYgno7aTKKXo6OI9G+qlYqEsn788qCNwm/AyXPpVitim02bdg3B5vCDwqVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzN5hVBY47HFXEgDKA9YMXet03792pwUwQhTWEEvXtWa0WgLR7a
+	VAsAH9T4acmHaPc8tqav/XZ3PbFH8uW7tr+T7SgvKizM0OeTujI9CKl8bvOdyKE=
+X-Google-Smtp-Source: AGHT+IGoaq6IxF5JKv0QXl4ovp1iUvSNYYrTn9zcpzec5/zG4S0O5fq1TFh5PoDP5AKow6h6x+T9lA==
+X-Received: by 2002:a05:6000:2c6:b0:382:1c58:5787 with SMTP id ffacd0b85a97d-38225a89fe4mr2814514f8f.46.1731682922399;
+        Fri, 15 Nov 2024 07:02:02 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adbbc4fsm4602869f8f.46.2024.11.15.07.02.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 07:02:01 -0800 (PST)
+Message-ID: <288f68cd-533a-4253-85c4-951cc4a9c862@openvpn.net>
+Date: Fri, 15 Nov 2024 16:02:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <943cb31d01d0da3a63911326e24fbf9b328f7206.1731580776.git.geert+renesas@glider.be>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 09/23] ovpn: implement basic RX path (UDP)
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ sd@queasysnail.net, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-9-de4698c73a25@openvpn.net>
+ <eabe28f9-d6a4-4bdc-a988-418e5137f3cb@gmail.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <eabe28f9-d6a4-4bdc-a988-418e5137f3cb@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 14, 2024 at 11:42:50AM +0100, Geert Uytterhoeven wrote:
-> Convert the Micrel PHY Device Tree binding documentation to json-schema.
+On 11/11/2024 02:54, Sergey Ryazanov wrote:
+[...]
+
+>> +/* Called after decrypt to write the IP packet to the device.
+>> + * This method is expected to manage/free the skb.
+>> + */
+>> +static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff 
+>> *skb)
+>> +{
+>> +    unsigned int pkt_len;
+>> +
+>> +    /* we can't guarantee the packet wasn't corrupted before entering 
+>> the
+>> +     * VPN, therefore we give other layers a chance to check that
+>> +     */
+>> +    skb->ip_summed = CHECKSUM_NONE;
+>> +
+>> +    /* skb hash for transport packet no longer valid after 
+>> decapsulation */
+>> +    skb_clear_hash(skb);
+>> +
+>> +    /* post-decrypt scrub -- prepare to inject encapsulated packet 
+>> onto the
+>> +     * interface, based on __skb_tunnel_rx() in dst.h
+>> +     */
+>> +    skb->dev = peer->ovpn->dev;
+>> +    skb_set_queue_mapping(skb, 0);
+>> +    skb_scrub_packet(skb, true);
+>> +
 > 
-> Add a simple example.
+> The skb->protocol field is going to be updated in the upcoming patch in 
+> the caller (ovpn_decrypt_post). Shall we put a comment here clarifying, 
+> why do not touch the protocol field here?
+
+Well, I would personally not document missing details in a partly 
+implemented code path.
+
 > 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> Notes:
->   1. I specified Ben Dooks as the maintainer, as he wrote the original
->      bindings. Ben, are you OK with that?
->   2. This schema is never applied, as there is no compatible value or
->      select statement. Adding
+>> +    skb_reset_network_header(skb);
 > 
-> 	select:
-> 	  properties:
-> 	    $nodename:
-> 	      pattern: "^ethernet-phy(@[a-f0-9]+)?$"
+> ovpn_decrypt_post() already reseted the network header. Why do we need 
+> it here again?
+
+yeah, I think this can be removed.
+
 > 
-> 	  required:
-> 	    - $nodename
+>> +    skb_reset_transport_header(skb);
+>> +    skb_probe_transport_header(skb);
+>> +    skb_reset_inner_headers(skb);
+>> +
+>> +    memset(skb->cb, 0, sizeof(skb->cb));
 > 
->      and changing
+> Why do we need to zero the control buffer here?
+
+To avoid the next layer to assume the cb is clean while it is not.
+Other drivers do the same as well.
+
+I think this was recommended by Sabrina as well.
+
 > 
-> 	-unevaluatedProperties: false
-> 	+additionalProperties: true
+>> +    /* cause packet to be "received" by the interface */
+>> +    pkt_len = skb->len;
+>> +    if (likely(gro_cells_receive(&peer->ovpn->gro_cells,
+>> +                     skb) == NET_RX_SUCCESS))
+>> +        /* update RX stats with the size of decrypted packet */
+>> +        dev_sw_netstats_rx_add(peer->ovpn->dev, pkt_len);
+>> +}
+>> +
+>> +static void ovpn_decrypt_post(struct sk_buff *skb, int ret)
+>> +{
+>> +    struct ovpn_peer *peer = ovpn_skb_cb(skb)->peer;
+>> +
+>> +    if (unlikely(ret < 0))
+>> +        goto drop;
+>> +
+>> +    ovpn_netdev_write(peer, skb);
+>> +    /* skb is passed to upper layer - don't free it */
+>> +    skb = NULL;
+>> +drop:
+>> +    if (unlikely(skb))
+>> +        dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
+>> +    ovpn_peer_put(peer);
+>> +    kfree_skb(skb);
+>> +}
+>> +
+>> +/* pick next packet from RX queue, decrypt and forward it to the 
+>> device */
 > 
->      would fix that, and is mostly harmless, except for possible
->      conflicts with other Ethernet PHYs having more than one clock, or
->      using different clock-names.
->      Documentation/devicetree/bindings/net/qca,ar803x.yaml has the same
->      issue.
->      Is there a proper way to handle this?  Are there other options than
->      mandating specific compatible values for Ethernet PHYs?
+> The function now receives packets from externel callers. Should we 
+> update the above comment?
 
-The proper way is simply, if you need to describe your phy in DT, it 
-needs a compatible string. MDIO phys are not special.
+yap will do.
 
-We really need to split ethernet-phy.yaml into common properties and a 
-specific schema for the compatibles it contains so that we can change 
-'additionalProperties: true'. That's one reason why all these properties 
-and typos didn't get flagged.
+[...]
 
-If you don't want to retro-actively add a compatible, you can also do 
-something like this:
-
-select:
-  anyOf:
-    - required: ['micrel,led-mode']
-    - required: ['micrel,rmii-reference-clock-select-25-mhz']
-    - required: ['micrel,fiber-mode']
-    - required: ['coma-mode-gpios']
-
-That doesn't catch every case nor if you have a typo in the property 
-names.
-
-> Thanks for your comments!
-> ---
->  .../devicetree/bindings/net/micrel,phy.yaml   | 93 +++++++++++++++++++
->  .../devicetree/bindings/net/micrel.txt        | 57 ------------
->  2 files changed, 93 insertions(+), 57 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/micrel,phy.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+>> --- /dev/null
+>> +++ b/drivers/net/ovpn/proto.h
+>> @@ -0,0 +1,75 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*  OpenVPN data channel offload
+>> + *
+>> + *  Copyright (C) 2020-2024 OpenVPN, Inc.
+>> + *
+>> + *  Author:    Antonio Quartulli <antonio@openvpn.net>
+>> + *        James Yonan <james@openvpn.net>
+>> + */
+>> +
+>> +#ifndef _NET_OVPN_OVPNPROTO_H_
+>> +#define _NET_OVPN_OVPNPROTO_H_
+>> +
+>> +#include "main.h"
+>> +
+>> +#include <linux/skbuff.h>
+>> +
+>> +/* Methods for operating on the initial command
+>> + * byte of the OpenVPN protocol.
+>> + */
+>> +
+>> +/* packet opcode (high 5 bits) and key-id (low 3 bits) are combined in
+>> + * one byte
+>> + */
+>> +#define OVPN_KEY_ID_MASK 0x07
+>> +#define OVPN_OPCODE_SHIFT 3
+>> +#define OVPN_OPCODE_MASK 0x1F
 > 
-> diff --git a/Documentation/devicetree/bindings/net/micrel,phy.yaml b/Documentation/devicetree/bindings/net/micrel,phy.yaml
-> new file mode 100644
-> index 0000000000000000..609bbd9729efe516
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/micrel,phy.yaml
-> @@ -0,0 +1,93 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/micrel,phy.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Micrel PHY properties
-> +
-> +maintainers:
-> +  - Ben Dooks <ben.dooks@codethink.co.uk>
-> +
-> +properties:
-> +  micrel,led-mode:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [ 0, 1, 2, 3 ]
-> +    description: |
-> +      LED mode value to set for PHYs with configurable LEDs.
-> +
-> +      Configure the LED mode with single value. The list of PHYs and the
-> +      bits that are currently supported:
-> +
-> +      KSZ8001: register 0x1e, bits 15..14
-> +      KSZ8041: register 0x1e, bits 15..14
-> +      KSZ8021: register 0x1f, bits 5..4
-> +      KSZ8031: register 0x1f, bits 5..4
-> +      KSZ8051: register 0x1f, bits 5..4
-> +      KSZ8081: register 0x1f, bits 5..4
-> +      KSZ8091: register 0x1f, bits 5..4
-> +      LAN8814: register EP5.0, bit 6
-> +
-> +      See the respective PHY datasheet for the mode values.
-> +
-> +  micrel,rmii-reference-clock-select-25-mhz:
-> +    description: |
-> +      RMII Reference Clock Select bit selects 25 MHz mode
-> +
-> +      Setting the RMII Reference Clock Select bit enables 25 MHz rather
-> +      than 50 MHz clock mode.
-> +
-> +      Note that this option in only needed for certain PHY revisions with a
-> +      non-standard, inverted function of this configuration bit.
-> +      Specifically, a clock reference ("rmii-ref" below) is always needed to
-> +      actually select a mode.
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  clock-names:
-> +    const: rmii-ref
-> +    description: |
-> +      supported clocks:
-> +        - KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
-> +          input clock. Used to determine the XI input clock.
+> Instead of defining mask(s) and shift(s), we can define only masks and 
+> use bitfield API (see below).
+> 
+>> +/* upper bounds on opcode and key ID */
+>> +#define OVPN_KEY_ID_MAX (OVPN_KEY_ID_MASK + 1)
+>> +#define OVPN_OPCODE_MAX (OVPN_OPCODE_MASK + 1)
+>> +/* packet opcodes of interest to us */
+>> +#define OVPN_DATA_V1 6 /* data channel V1 packet */
+>> +#define OVPN_DATA_V2 9 /* data channel V2 packet */
+>> +/* size of initial packet opcode */
+>> +#define OVPN_OP_SIZE_V1 1
+>> +#define OVPN_OP_SIZE_V2    4
+>> +#define OVPN_PEER_ID_MASK 0x00FFFFFF
+>> +#define OVPN_PEER_ID_UNDEF 0x00FFFFFF
+>> +/* first byte of keepalive message */
+>> +#define OVPN_KEEPALIVE_FIRST_BYTE 0x2a
+>> +/* first byte of exit message */
+>> +#define OVPN_EXPLICIT_EXIT_NOTIFY_FIRST_BYTE 0x28
+> 
+>  From the above list of macros, OVPN_KEY_ID_MAX, OVPN_OPCODE_MAX, 
+> OVPN_OP_SIZE_V1, OVPN_KEEPALIVE_FIRST_BYTE, and 
+> OVPN_EXPLICIT_EXIT_NOTIFY_FIRST_BYTE are unused and looks like should be 
+> removed.
 
-Don't repeat the clock name in the description.
+ACK
 
-> +
-> +  micrel,fiber-mode:
-> +    type: boolean
-> +    description: |
-> +      If present the PHY is configured to operate in fiber mode.
-> +
-> +      Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
-> +      by the FXEN boot strapping pin. It can't be determined from the PHY
-> +      registers whether the PHY is in fiber mode, so this boolean device tree
-> +      property can be used to describe it.
-> +
-> +      In fiber mode, auto-negotiation is disabled and the PHY can only work in
-> +      100base-fx (full and half duplex) modes.
-> +
-> +  coma-mode-gpios:
-> +    description: |
-> +      If present the given gpio will be deasserted when the PHY is probed.
-> +
-> +      Some PHYs have a COMA mode input pin which puts the PHY into
-> +      isolate and power-down mode. On some boards this input is connected
-> +      to a GPIO of the SoC.
-> +
-> +      Supported on the LAN8814.
+> 
+>> +/**
+>> + * ovpn_opcode_from_skb - extract OP code from skb at specified offset
+>> + * @skb: the packet to extract the OP code from
+>> + * @offset: the offset in the data buffer where the OP code is located
+>> + *
+>> + * Note: this function assumes that the skb head was pulled enough
+>> + * to access the first byte.
+>> + *
+>> + * Return: the OP code
+>> + */
+>> +static inline u8 ovpn_opcode_from_skb(const struct sk_buff *skb, u16 
+>> offset)
+>> +{
+>> +    u8 byte = *(skb->data + offset);
+>> +
+>> +    return byte >> OVPN_OPCODE_SHIFT;
+> 
+> For example here, the shift can be replaced with bitfield macro:
+> 
+> #define OVPN_OPCODE_PKTTYPE_MSK  0xf8000000
+> #define OVPN_OPCODE_KEYID_MSK    0x07000000
+> #define OVPN_OPCODE_PEERID_MSK   0x00ffffff
+> 
+> static inline u8 ovpn_opcode_from_skb(...)
+> {
+>      u32 opcode = be32_to_cpu(*(__be32 *)(skb->data + offset));
+> 
+>      return FIELD_GET(OVPN_OPCODE_PKTTYPE_MSK, opcode);
+> }
+> 
+> And the upcoming ovpn_opcode_compose() can be implemented like this:
+> 
+> static inline u32 ovpn_opcode_compose(u8 opcode, u8 key_id, u32 peer_id)
+> {
+>      return FIELD_PREP(OVPN_OPCODE_PKTTYPE_MSK, opcode) |
+>             FIELD_PREP(OVPN_OPCODE_KEYID_MSK, key_id) |
+>             FIELD_PREP(OVPN_OPCODE_PEERID_MSK, peer_id);
+> }
+> 
+> And with this size can be even embedded into ovpn_aead_encrypt() to make 
+> the header composing more clear.
 
-Another reason to add compatible. You have per device properties.
+I wasn't aware of the bitfield API.
 
-> +
-> +dependencies:
-> +  micrel,rmii-reference-clock-select-25-mhz: [ clock-names ]
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    ethernet {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        ethernet-phy@1 {
-> +            reg = <1>;
-> +            micrel,led-mode = <1>;
-> +        };
-> +    };
+Yeah, it looks cleaner and gives a better definition of the first 4 
+bytes of the header.
+
+There is also GENMASK() that helps with creating MASKs instead of 
+hardcofing the bits in hex.
+
+Will give it a try, thanks!
+
+> 
+>> +}
+>> +
+>> +/**
+>> + * ovpn_peer_id_from_skb - extract peer ID from skb at specified offset
+>> + * @skb: the packet to extract the OP code from
+>> + * @offset: the offset in the data buffer where the OP code is located
+>> + *
+>> + * Note: this function assumes that the skb head was pulled enough
+>> + * to access the first 4 bytes.
+>> + *
+>> + * Return: the peer ID.
+>> + */
+>> +static inline u32 ovpn_peer_id_from_skb(const struct sk_buff *skb, 
+>> u16 offset)
+>> +{
+>> +    return ntohl(*(__be32 *)(skb->data + offset)) & OVPN_PEER_ID_MASK;
+>> +}
+>> +
+>> +#endif /* _NET_OVPN_OVPNPROTO_H_ */
+>> diff --git a/drivers/net/ovpn/socket.c b/drivers/net/ovpn/socket.c
+>> index 
+>> 090a3232ab0ec19702110f1a90f45c7f10889f6f..964b566de69f4132806a969a455cec7f6059a0bd 100644
+>> --- a/drivers/net/ovpn/socket.c
+>> +++ b/drivers/net/ovpn/socket.c
+>> @@ -22,6 +22,9 @@ static void ovpn_socket_detach(struct socket *sock)
+>>       if (!sock)
+>>           return;
+>> +    if (sock->sk->sk_protocol == IPPROTO_UDP)
+>> +        ovpn_udp_socket_detach(sock);
+>> +
+>>       sockfd_put(sock);
+>>   }
+>> @@ -71,6 +74,27 @@ static int ovpn_socket_attach(struct socket *sock, 
+>> struct ovpn_peer *peer)
+>>       return ret;
+>>   }
+>> +/* Retrieve the corresponding ovpn object from a UDP socket
+>> + * rcu_read_lock must be held on entry
+>> + */
+>> +struct ovpn_struct *ovpn_from_udp_sock(struct sock *sk)
+>> +{
+>> +    struct ovpn_socket *ovpn_sock;
+>> +
+>> +    if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != 
+>> UDP_ENCAP_OVPNINUDP))
+>> +        return NULL;
+>> +
+>> +    ovpn_sock = rcu_dereference_sk_user_data(sk);
+>> +    if (unlikely(!ovpn_sock))
+>> +        return NULL;
+>> +
+>> +    /* make sure that sk matches our stored transport socket */
+>> +    if (unlikely(!ovpn_sock->sock || sk != ovpn_sock->sock->sk))
+>> +        return NULL;
+>> +
+>> +    return ovpn_sock->ovpn;
+> 
+> Now, returning of this pointer is safe. But the following TCP transport 
+> support calls the socket release via a scheduled work. What extends 
+> socket lifetime and makes it possible to receive a UDP packet way after 
+> the interface private data release. Is it correct assumption?
+
+Sorry you lost me when sayng "following *TCP* transp[ort support calls".
+This function is invoked only in UDP context.
+Was that a typ0?
+
+> 
+> If the above is right then shall we set ->ovpn = NULL before scheduling 
+> the socket releasing work or somehow else mark the socket as half- 
+> destroyed?
+> 
+>> +}
+>> +
+>>   /**
+>>    * ovpn_socket_new - create a new socket and initialize it
+>>    * @sock: the kernel socket to embed
+>> diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
+>> index 
+>> d26d7566e9c8dfe91fa77f49c34fb179a9fb2239..d1e88ae83843f02d591e67a7995f2d6868720695 100644
+>> --- a/drivers/net/ovpn/udp.c
+>> +++ b/drivers/net/ovpn/udp.c
+>> @@ -21,9 +21,95 @@
+>>   #include "bind.h"
+>>   #include "io.h"
+>>   #include "peer.h"
+>> +#include "proto.h"
+>>   #include "socket.h"
+>>   #include "udp.h"
+>> +/**
+>> + * ovpn_udp_encap_recv - Start processing a received UDP packet.
+>> + * @sk: socket over which the packet was received
+>> + * @skb: the received packet
+>> + *
+>> + * If the first byte of the payload is DATA_V2, the packet is further 
+>> processed,
+>> + * otherwise it is forwarded to the UDP stack for delivery to user 
+>> space.
+>> + *
+>> + * Return:
+>> + *  0 if skb was consumed or dropped
+>> + * >0 if skb should be passed up to userspace as UDP (packet not 
+>> consumed)
+>> + * <0 if skb should be resubmitted as proto -N (packet not consumed)
+>> + */
+>> +static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+>> +{
+>> +    struct ovpn_peer *peer = NULL;
+>> +    struct ovpn_struct *ovpn;
+>> +    u32 peer_id;
+>> +    u8 opcode;
+>> +
+>> +    ovpn = ovpn_from_udp_sock(sk);
+>> +    if (unlikely(!ovpn)) {
+>> +        net_err_ratelimited("%s: cannot obtain ovpn object from UDP 
+>> socket\n",
+>> +                    __func__);
+> 
+> Probably we should zero ovpn pointer in the ovpn_sock to survive 
+> scheduled socket release (see comment in ovpn_from_udp_sock). So, this 
+> print should be removed to avoid printing misguiding errors.
+
+I am also not following this. ovpn is already NULL if we are entering 
+this branch, no?
+
+And I think this condition is quite improbable as well.
+
+> 
+>> +        goto drop_noovpn;
+>> +    }
+>> +
+>> +    /* Make sure the first 4 bytes of the skb data buffer after the UDP
+>> +     * header are accessible.
+>> +     * They are required to fetch the OP code, the key ID and the 
+>> peer ID.
+>> +     */
+>> +    if (unlikely(!pskb_may_pull(skb, sizeof(struct udphdr) +
+>> +                    OVPN_OP_SIZE_V2))) {
+>> +        net_dbg_ratelimited("%s: packet too small\n", __func__);
+>> +        goto drop;
+>> +    }
+>> +
+>> +    opcode = ovpn_opcode_from_skb(skb, sizeof(struct udphdr));
+>> +    if (unlikely(opcode != OVPN_DATA_V2)) {
+>> +        /* DATA_V1 is not supported */
+>> +        if (opcode == OVPN_DATA_V1)
+>> +            goto drop;
+> 
+> This packet dropping makes protocol accelerator, intendent to speed up 
+> the data packets processing, a protocol enforcement entity, isn't it? 
+> Shall we follow the principle of beeing liberal in what we accept and 
+> just forward everything besides data packets upstream to a userspace 
+> application?
+
+'ovpn' only supports DATA_V2. When ovpn is in use userspace does nto 
+expect any DATA packet to bubble up as it would not know what to do with it.
+
+So any decision regarding data packets should stay in 'ovpn'.
+
+We just decided to support the modern DATA_V2 (DATA_V1 is seldomly used 
+nowadays).
+
+Moreover, it's quite impossible that a peer will send us DATA_V1 if it 
+passed userspace handshake and negotiation.
+
+> 
+>> +
+>> +        /* unknown or control packet: let it bubble up to userspace */
+>> +        return 1;
+>> +    }
+>> +
+>> +    peer_id = ovpn_peer_id_from_skb(skb, sizeof(struct udphdr));
+>> +    /* some OpenVPN server implementations send data packets with the
+>> +     * peer-id set to undef. In this case we skip the peer lookup by 
+>> peer-id
+>> +     * and we try with the transport address
+>> +     */
+>> +    if (peer_id != OVPN_PEER_ID_UNDEF) {
+>> +        peer = ovpn_peer_get_by_id(ovpn, peer_id);
+>> +        if (!peer) {
+>> +            net_err_ratelimited("%s: received data from unknown peer 
+>> (id: %d)\n",
+>> +                        __func__, peer_id);
+> 
+> Why do we consider a peer sending us garbage our problem? Meaning, this 
+> peer miss can be not our fault but a malformed packet from a 3rd party 
+> side. E.g. nowdays I can see a lot of traces of these "active probers" 
+> in my OpenVPN logs. Shall remove this message or at least make it debug 
+> to avoid bothering users with garbage traveling Internet? Anyway we can 
+> not do anything regarding incoming traffic.
+
+It could also be a peer that believes to be connected while 'ovpn' 
+dropped it earlier on. So this message would help the admin/user 
+understanding what's going on. no?
+
+Maybe make it an info/notice instead of error?
+
+> 
+>> +            goto drop;
+>> +        }
+>> +    }
+>> +
+>> +    if (!peer) {
+> 
+> AFAIU, this condition can true only in case of peer_id beeing equal to 
+> OVPN_PEER_ID_UNDEF, right? In this case the condition check can be 
+> replaced by simple 'else' statement.
+> 
+
+This part was actually rewritten already, so better wait for v12 before 
+further discussing.
+
+> And to make code more corresponding to the above comment regarding 
+> implementations that send undefined peer-id, can we swap sides of the 
+> lookup method selection? E.g.
+> 
+> /* Comment about fancy implementations sending undefined peer-id */
+> if (peer_id == OVPN_PEER_ID_UNDEF) {
+>    /* Do transport address based loockup */
+> } else {
+>    /* Do peer-id based loockup */
+> }
+> 
+>> +        /* data packet with undef peer-id */
+>> +        peer = ovpn_peer_get_by_transp_addr(ovpn, skb);
+>> +        if (unlikely(!peer)) {
+>> +            net_dbg_ratelimited("%s: received data with undef peer-id 
+>> from unknown source\n",
+>> +                        __func__);
+>> +            goto drop;
+>> +        }
+>> +    }
+>> +
+>> +    /* pop off outer UDP header */
+>> +    __skb_pull(skb, sizeof(struct udphdr));
+>> +    ovpn_recv(peer, skb);
+>> +    return 0;
+>> +
+>> +drop:
+>> +    if (peer)
+>> +        ovpn_peer_put(peer);
+> 
+> AFAIU, the peer is alway NULL here. Shall we remove the above check?
+
+yeah simplified as well already.
+
+Thanks!
+
+Regards,
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
