@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-145108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F0E9CCD30
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:32:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 353149CCD31
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:32:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33F01F22551
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:32:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF4A428147C
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:32:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02AE15E8B;
-	Fri, 15 Nov 2024 00:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B8B1E49F;
+	Fri, 15 Nov 2024 00:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BizuAkgT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lH7oFdhu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC38A1362
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 00:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BDD1362;
+	Fri, 15 Nov 2024 00:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731630746; cv=none; b=I5gNmSBxTFeM5rM1rNYrKNEFEs5LH0JJy/zgc+5PEwoN/j9ffuA0iHvVuXJBMQ+zzDleg/lavfwe1ihaCQv2PWbp7Wy8toItbW0a2YYCwZOspr3X53ZcS2hBh5N9UGCu7bPLkm8PdjQgBDe4oendHrSfNqqsFfSThoRvIsltcWA=
+	t=1731630770; cv=none; b=RAAl8fs6+FyS9UbtGUZVPM0NCL5nYBoFPzXtRpYSchWe61R6SU0rVklKYrIdvxwtZ1lJ5+YhePSTNglR4sX8cdfIZ5E/0LIeb3gWDXHWez1VqEp9B3AUcOXoOWsLJNZU8bSpmEt1MMJTsNWjCzF+mJciyvxViVhHmi7ryx+D9ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731630746; c=relaxed/simple;
-	bh=QuPQz7X7LzV3pUXR1NJ2Qm+3AYBIYfOU0aKBJJGG36w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZLrhOjHDYFw01MDhqPZJUpQNAowNuzIsqGsw609txZeS+hQuxSGJHHgSQqqJb4Fdy7LnrKYAC0sDjzymwr24SPCQtcLJssHr4xqEWM0fqnAR5WY0vmLNGHonE0DBBxzbN8dZmDQ14qj/yJimWSYRdNN92xLDHaK29iHOmVC3cSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BizuAkgT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D04C4CECD;
-	Fri, 15 Nov 2024 00:32:26 +0000 (UTC)
+	s=arc-20240116; t=1731630770; c=relaxed/simple;
+	bh=GYRM5gNSiHO7NkDBe9fQ+HFXk1V7NpIIOWlG2DkikDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yf9KZmIkDW4c6j8UjBpDEMgFX8ifsRUaVVBgdOE/wOCEoHxf7FJTAZjZztVrkCr+l2xkNAWvHibWip70vIECycm6H/Y0Glb//cWWOLFX1NrLwkOHA7n497uqzvvlFHKQmKo7Fxv2LezsfnCA9gZk1MdWhiI1KlAUTq9R3x7cVZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lH7oFdhu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D595C4CECD;
+	Fri, 15 Nov 2024 00:32:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731630746;
-	bh=QuPQz7X7LzV3pUXR1NJ2Qm+3AYBIYfOU0aKBJJGG36w=;
+	s=k20201202; t=1731630769;
+	bh=GYRM5gNSiHO7NkDBe9fQ+HFXk1V7NpIIOWlG2DkikDA=;
 	h=From:To:Cc:Subject:Date:From;
-	b=BizuAkgTuFl6jmBJfYfzEwYf1wR/PpeJmS5LvfzkrBcm2LUqklMRvsWdxZiE7Zf5e
-	 1d7Mqw9ur9PR6zCn7qjIdbcYssRFzoEhUi0d3UFEQ6Nj9d/NwinL/+OUHx12meHjZT
-	 jBCB+NDDjdIy+JyIKD1Tjvjxg9Grsj+355GhvcOmMBNnnJEEfBTPTu8YH+b1D5alal
-	 50IafNZr+QpA6WpnOfCWmxX5zaB+nPX3ns7PpxEYA0Wo6x1ITRZmpO40Sli1C1dBZ+
-	 WwvEPQuOgaOBu22Y1WeE0eOZl6SjNPSjkmeKgsVNN6XnYAqHKNbCQ2e9AjLJCgMy28
-	 9gqlyuCQ4Yl7A==
+	b=lH7oFdhucuUIq6YhlJ7+wHD44bZjazoBAnvSBic4OGpY2pn+DsMBCkDlnaJEm8Uiz
+	 IPMnFoba7pT8B3M1jnueQo38cviniLVebmqcQR8MxQQPRLRQVL+UXFx7iN2QhuLLvV
+	 SG1dhS4Bj/I5zx4sGchJoSQAsTLvngS1L0eJhb4nijWYPe4QjPzqJlcg3Qt/M+6Dnc
+	 Ot5jhcxr4mPjrqc7QXikU54SVGyVUuKiuVoFSjzLDENuUeeTLqiXCXPywmsXWzs/qd
+	 CTz9s9o946nqhbc1zU2ck/YcTtQume2RUULGQ1UbSu9kEBDbdoACAJekqAEw5DdJVE
+	 U9g2BSY+l9/vQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	joel.granados@kernel.org
-Subject: [PATCH net-next] net/neighbor: clear error in case strict check is not set
-Date: Thu, 14 Nov 2024 16:32:21 -0800
-Message-ID: <20241115003221.733593-1-kuba@kernel.org>
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: net: netlink-dumps: validation checks
+Date: Thu, 14 Nov 2024 16:32:48 -0800
+Message-ID: <20241115003248.733862-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,35 +59,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 51183d233b5a ("net/neighbor: Update neigh_dump_info for strict
-data checking") added strict checking. The err variable is not cleared,
-so if we find no table to dump we will return the validation error even
-if user did not want strict checking.
-
-I think the only way to hit this is to send an buggy request, and ask
-for a table which doesn't exist, so there's no point treating this
-as a real fix. I only noticed it because a syzbot repro depended on it
-to trigger another bug.
+The sanity checks are going to get silently cast to unsigned
+and always pass. Cast the sizeof to signed size.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: joel.granados@kernel.org
+CC: linux-kselftest@vger.kernel.org
 ---
- net/core/neighbour.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/testing/selftests/net/netlink-dumps.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 77b819cd995b..cc58315a40a7 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -2876,6 +2876,7 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
- 	err = neigh_valid_dump_req(nlh, cb->strict_check, &filter, cb->extack);
- 	if (err < 0 && cb->strict_check)
- 		return err;
-+	err = 0;
+diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
+index 195febbf6a61..07423f256f96 100644
+--- a/tools/testing/selftests/net/netlink-dumps.c
++++ b/tools/testing/selftests/net/netlink-dumps.c
+@@ -185,10 +185,10 @@ TEST(test_sanity)
+ 	ASSERT_EQ(n, sizeof(dump_policies));
  
- 	s_t = cb->args[0];
+ 	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
+-	ASSERT_GE(n, sizeof(struct nlmsghdr));
++	ASSERT_GE(n, (ssize_t)sizeof(struct nlmsghdr));
  
+ 	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
+-	ASSERT_GE(n, sizeof(struct nlmsghdr));
++	ASSERT_GE(n, (ssize_t)sizeof(struct nlmsghdr));
+ 
+ 	close(netlink_sock);
+ }
 -- 
 2.47.0
 
