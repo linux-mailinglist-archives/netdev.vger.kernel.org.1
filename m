@@ -1,167 +1,95 @@
-Return-Path: <netdev+bounces-145490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE91B9CFA31
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:39:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CCB99CFA3E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 422F61F291C6
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:39:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4500D1F293AD
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88D51ABED9;
-	Fri, 15 Nov 2024 22:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43FD1917DE;
+	Fri, 15 Nov 2024 22:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="dvqBU9n8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2x2Z5Nj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64561922F2;
-	Fri, 15 Nov 2024 22:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9F818C33C;
+	Fri, 15 Nov 2024 22:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731710303; cv=none; b=HhfHsmArJNanRAUmijSLAIvEcCP1HFP59q11rn84rq5oasfJItCfWUJjilMH8AaGzz1aYIAfHgTC5Y77UKbzZlVsGy1F6PD709TbzpyGHkQbdLCfzOhiF02SsHyipazFmf+IqGGVYmYor6Wi5tEuC6nYhLcbtNkBrXNVNL9Lm2g=
+	t=1731710537; cv=none; b=G1XGDOsHk6mcAbnr18AIJMlmAJo02+H2VHZR1Xvmvm0y9Z/gqvTkP9pQdGrTxRK+MIywFkChJIfMdGzMtRjS1aRrXLioveIN6zj3ITxSQOlWEl98ese2lF0LG7+sPJ9XY1uACraKp8F30ZqIAyWI3qNkriSS/nl7mvGnWE8OWWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731710303; c=relaxed/simple;
-	bh=RIiFqJrXkrJVjomDZYuASdyvOtyrcrIuEW8LyVF0TSA=;
+	s=arc-20240116; t=1731710537; c=relaxed/simple;
+	bh=sympt9edmCXPUVcUd/uAA+42AmjDQXBS4Rkc29BZ860=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kzuta5QUxcyt4z5kO5d3RniH9lqVO4O34pKdRr+VMtDDY9jFnus1j+L8Sbrkxf6NoPp8gXlV0EDBTJ1hspXBp46tyededWFk0tnmIN1MiFWvmLwPTefZYfUXMQEJgS33zzyb+z952z8RSPgygJkJlN2iyiy4gudz2L31v+8soQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=dvqBU9n8; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1731710297;
-	bh=2Oo8tuThL69UywoHNtNWphGeN1l/Ks7ZdfhLn6nu8Ts=;
+	 MIME-Version:Content-Type; b=FN/mcgJVIbbiUTvgcourGU9vJV0Qp9pkvf92p1xpb/VT0HuMQHlEtVrvy16nzhq5PbmQzElYGJcl/7Nyaiiw2oZTmaSA5yFTB/tsR0RTuWjiiME76PYwfmPL+MJsfL+ilhNXsyk0nOVwQR8NottVpKvWGZTdVVbOY4EYDDyC3yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2x2Z5Nj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D410CC4CECF;
+	Fri, 15 Nov 2024 22:42:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731710536;
+	bh=sympt9edmCXPUVcUd/uAA+42AmjDQXBS4Rkc29BZ860=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dvqBU9n8wyesGOM7wAJUVL4V50umalSR9AGyHvO50R9rHL4dRlvqV2fKiGIxclon7
-	 dHEpXPpW9NVhcbFtMBHzRNkcGVSkeVB/y2szbGMNYINCZkHzmLDf1115Jxe24OTeOk
-	 GNv8daj8Y6W/lBqt6k/toExNrcSvGF2/nzg0QTmOQX9jzDpl13KzERpvnsypqwk14l
-	 Jr2Y6hhhHGQcduaub5tIB8ldj0pYnhXmYJw4zK368Q9lExm0iQorTgylYyIdDuEGMp
-	 WagrfQz4Kwg8LTMJpR3GyN8L1t3g91kYKCDixQ+vf1WORv4sLKKi8JfCCFjRz+Eeni
-	 +eMZUx+2BK6mA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XqsP22nY1z4x8v;
-	Sat, 16 Nov 2024 09:38:14 +1100 (AEDT)
-Date: Sat, 16 Nov 2024 09:38:15 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
- <kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Julia Lawall
- <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack
- <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?UTF-8?B?TW9ubsOp?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Jack
- Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo
- Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf
- <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, Miroslav Benes
- <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
- <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>, Russell King
- <linux+etnaviv@armlinux.org.uk>, Christian Gmeiner
- <christian.gmeiner@gmail.com>, Louis Peens <louis.peens@corigine.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao
- <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>
-Subject: Re: [PATCH 03/22] arm: pxa: Convert timeouts to use
- secs_to_jiffies()
-Message-ID: <20241116093815.5d37eb43@canb.auug.org.au>
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-3-19aadc34941b@linux.microsoft.com>
-References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
-	<20241115-converge-secs-to-jiffies-v1-3-19aadc34941b@linux.microsoft.com>
+	b=M2x2Z5NjQo3eF4mgl0rBQGEIS1d2UQPMhWj8IzGkHQM/8qgb2Y432dlpMohBGeRSF
+	 ZgRRdlHTAYk6e51gMn4RmbMThKHH0sWm/sILRaHciGvG4x40jkFSIoEoNCBg/XjkNi
+	 ijvhMhDCJS8pv9WRDzWM0eINerBkRARZvuLCr8kpMypehv99UZVuUdA8MRcw9K5Ild
+	 NIqlxYD9Xggd6lHHOhGG6uOxZPkoI6fSDakq6noj6eXjR6gjN6gyIV2BiwfAN/cwY4
+	 qXYqXH0SvkMpRhuH7VUEC37dXrOVk5dSbWIa0q83SU5maJvcxkiRVj+CCK6XdRThMd
+	 d/jYFwh/M/e8A==
+Date: Fri, 15 Nov 2024 14:42:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Yafang Shao <laoar.shao@gmail.com>,
+ ttoukan.linux@gmail.com, gal@nvidia.com, tariqt@nvidia.com,
+ leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via
+ rx_fifo_errors
+Message-ID: <20241115144214.03f17c16@kernel.org>
+In-Reply-To: <ZzfGfji0V2Xy4LAQ@x130>
+References: <20241114021711.5691-1-laoar.shao@gmail.com>
+	<20241114182750.0678f9ed@kernel.org>
+	<CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com>
+	<20241114203256.3f0f2de2@kernel.org>
+	<CALOAHbBJ2xWKZ5frzR5wKq1D7-mzS62QkWpxB5Q-A7dR-Djhnw@mail.gmail.com>
+	<Zzb_7hXRPgYMACb9@x130>
+	<20241115112443.197c6c4e@kernel.org>
+	<Zzem_raXbyAuSyZO@x130>
+	<20241115132519.03f7396c@kernel.org>
+	<ZzfGfji0V2Xy4LAQ@x130>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/4rVE82Kt6y+3_PbwMmwogMj";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/4rVE82Kt6y+3_PbwMmwogMj
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi Easwar,
+On Fri, 15 Nov 2024 14:09:02 -0800 Saeed Mahameed wrote:
+> >> rx_dropped: Number of packets received but not processed,
+> >>   *   e.g. due to lack of resources or unsupported protocol.
+> >>   *   For hardware interfaces this counter may include packets discarded
+> >>   *   due to L2 address filtering but should not include packets dropped
+> >>                                   ^^^^^^^^^^^^^^
+> >>   *   by the device due to buffer exhaustion which are counted separately in
+> >>                            ^^^^^^^^^^^^^^^^^
+> >>   *   @rx_missed_errors (since procfs folds those two counters together).
+> >>       ^^^^^^^^^^^^^^^^^  
+> >
+> >I presume you quote this comment to indicate the rx_dropped should
+> >count packets dropped due to buffer exhaustion? If yes then you don't
+> >understand the comment. If no then I don't understand why you're
+> >quoting it.
+> 
+> I quoted this because you suggested to use rx_dropped. It's not a good fit.
+> In your previous reply you said: 
+> "but honestly I'd just make sure they are counted in rx_dropped"
 
-On Fri, 15 Nov 2024 21:22:33 +0000 Easwar Hariharan <eahariha@linux.microso=
-ft.com> wrote:
->
-> -#define SHARPSL_CHARGE_ON_TIME_INTERVAL        (msecs_to_jiffies(1*60*10=
-00))  /* 1 min */
-> -#define SHARPSL_CHARGE_FINISH_TIME             (msecs_to_jiffies(10*60*1=
-000)) /* 10 min */
-> -#define SHARPSL_BATCHK_TIME                    (msecs_to_jiffies(15*1000=
-))    /* 15 sec */
-> +#define SHARPSL_CHARGE_ON_TIME_INTERVAL        (secs_to_jiffies(60))  /*=
- 1 min */
-> +#define SHARPSL_CHARGE_FINISH_TIME             (secs_to_jiffies(10*60)) =
-/* 10 min */
-> +#define SHARPSL_BATCHK_TIME                    (secs_to_jiffies(15))    =
-/* 15 sec */
-
-It might be nice to keep the alignment of the comments here.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/4rVE82Kt6y+3_PbwMmwogMj
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc3zVcACgkQAVBC80lX
-0GyUXgf+Ii9yOHf1vRadjfzExIFyJR4I0mG1VXDEBH24ASdL/jVIFlfW31h/JIe9
-7JJFAL5Aa+C8Xw22mmq/8e0wbWCe+DqEq+SLtggkTN8kHtwf7Glda0a/aIix0pNM
-s9nQXwrTFFvaCt2ocRmPUcm7K/jwiG3YxWawYBvIoSF9l/TfQXwD4LBbP2glFEL2
-BkTvGG0/asLCHZK2LHwDsWsZ5XskgJmmQfbYEdygcm9C3bP40tFYUM22B6iEYNez
-WKquyY7lAmwUJQsIAWZig/PKPz8e6uux6ghIdGbwFC0ezQqIOAz8ZqllWy1Dpa87
-vCjZSu4lRCFBg5npBBL5wIOagKFSCw==
-=vmyn
------END PGP SIGNATURE-----
-
---Sig_/4rVE82Kt6y+3_PbwMmwogMj--
+The comment just says not to add what's already counted in missed,
+because profcs adds the two and we'd end up double counting.
 
