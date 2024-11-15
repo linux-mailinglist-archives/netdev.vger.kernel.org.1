@@ -1,188 +1,156 @@
-Return-Path: <netdev+bounces-145111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464CD9CD4C1
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:43:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8449C9CD4C9
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4D11B242B3
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:43:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 462392825F6
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1EC33BB21;
-	Fri, 15 Nov 2024 00:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81D0757F3;
+	Fri, 15 Nov 2024 00:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mqKWVytS"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="QOnTTM3u";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="B6FonATM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E76538DC0
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 00:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06C81EA84;
+	Fri, 15 Nov 2024 00:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731631419; cv=none; b=bbc6YIk7RC5qWxoEy2DZobyy7818syFRzW68Drs2k5xMtcaV+tQUVgQR+mlQZZiWSvoqBt4ip6MrqDr1FnHwtPBK58YDbr5/BU/2bi9i5tQwnT0Mz80tcMWfHv+UzeLujte43CxM2lO27Vwvqua2o5A5fzVCsQ23INNXW7zwXBs=
+	t=1731631561; cv=none; b=A83j3i7xN++23o4chNbTfvFs8CMc7YwnQBkJAq+Wf5QoD2bCxA19dQssx+pGzSvwhuod/jjjPLDBUmVTcwC35Ye/TcShPQTQFDN0ylwM3b1VwOfZir92VlhiK/S0aABfBsHKY0I7RqAb8+ns/0swK2QfIq+VZ8vObohswGuT4v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731631419; c=relaxed/simple;
-	bh=FJIOGWCLd0zOn2KJU/YW/Xn5hiEiN8d8QFD12OSHxzw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HSkPdlyOmvvuD7GqMaQ8CIy2UBYbB73uul5UVrzq3M2KkQuYV0kHOjdTK4PA5egkIcpAFcJQIn33/fS5lHdvDMW4Wdlc0Gaai4oGLb/lK//kUoc5KDKqNZnvM3WNSVVhPqkS/u2BMvNGHGr8fN9gn8qR907do35Lt6T+DFspRg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mqKWVytS; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-460a8d1a9b7so51831cf.1
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 16:43:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731631417; x=1732236217; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6L3F4z6VvLws6sCdgJuhbmYdQVM2hzBWnjk8WbNzj8s=;
-        b=mqKWVytSnmZH+ox7GAloiueBvnhTPcdv9j0VY4DHNara9xYCXsdCBQz6dfckYNAIVQ
-         pHaxdjneAvC9SkJu2bMDa64WvtQ1Kd4/bjDM73bAnehHOdFFZF3vsbuXquFrvMJOXqI9
-         vkWGhzOVq83GUHQbZ28XNHPmJM5yxPoKJAPV0r1E9YZWwOSbTSxSup3nOObvz6ppbH2x
-         xmjdsgZhu+VtZUNHBCFPNDnRY2ilyO8UXhdavDpZjmN08K6d3ad2FQaAI16i2U0jdhxN
-         Z//Bep5BmGUS0ZspIZXRCHZV7vJJeXCzkRMS7ckG3EAHxQtm4/sAEshBz+8m5mSYuoip
-         0H8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731631417; x=1732236217;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6L3F4z6VvLws6sCdgJuhbmYdQVM2hzBWnjk8WbNzj8s=;
-        b=ZLi75zh62isBCg9V/hrrLIY/lgB0Xwl9iI2imBuSDmvqSMkfx/YoJaLIlTp+90HUdg
-         cGEOnqoyYKwN07FtKd1gNIonXxvwM7jGJ42C5JCYlpYVb78lX8AhGk406wjzyq2Kgc+D
-         WGHFOpc7hmys3W6e85B+QcbiMOD8htndkh08aCt9roPW4EGsYg/BkaqIuGy6V2iTlOcj
-         cPp/uIrhhoW9am9BQedygQrfeFQB+0jHLiU6b5o5ycTamiUxcCn00KPJy1s9xXQ+TqXT
-         lm1OeCDWZEBF79b0xDhdY6sgQL8Lqkl5WrTtXyYv6EWG/qgpUM4lMXjnq+pr0k8SSr8E
-         /D7w==
-X-Forwarded-Encrypted: i=1; AJvYcCW7S3GzxRlj61VHxeiQMYyC3WP3YII/IB/XndP/N+9bDwMjJE3+hjH+D/7bISE/943rYV8zAX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNaQvhrO+QPuekDsSP/GevHqNvKzmW4F4Wv0OqI8obqUQOB+Vc
-	ELLSSTV4fXgZY3t1P8gB4BQqTrTUlk8oRWWGn7JjTXEEVbr5sHWdMP7aDlwDBwUHeBcthByIhYE
-	0lQ+G8qEKAipMnzomjBy/6QyHXIGkuHqOEn7w
-X-Gm-Gg: ASbGncsQzOJ7r4i2lyMqDkH6LcOy+cRkQOezXr1GcSAXzp8ubnoQAZt/vVpBmb3UZoH
-	L57upnXaM9688/hTCEDOHn6rXlkDL3HE=
-X-Google-Smtp-Source: AGHT+IEyGdliSHvtMyXSP/W6yT+yNwxpe//bWguU5hFzmSUkQYmcbAnAlQj03BMC20ZVFq0x1pqImhz3wa71bPHBzfw=
-X-Received: by 2002:ac8:58c3:0:b0:461:70cc:3799 with SMTP id
- d75a77b69052e-46364d97befmr575061cf.21.1731631416763; Thu, 14 Nov 2024
- 16:43:36 -0800 (PST)
+	s=arc-20240116; t=1731631561; c=relaxed/simple;
+	bh=wmlctHEns5HH4kuTaBjX2JNcI1LzVOydASF++UAbmDY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=J6ZP0fgAXh4pOIEA1FkAq4AS0llScqZOcz1AFijov8qEZzxv8WsbPDx/Ysryx6HFPAJ+feXIKVa1r0rw14OT4qY+TBKQ61q5SKlpO5AknhQyKbssvUh5QEEgm4KlB4mbi//55EIJH97WKEv6GbGkSjG6oaOUMmKQSUhleMVQREc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=QOnTTM3u; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=B6FonATM; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1731631556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wmlctHEns5HH4kuTaBjX2JNcI1LzVOydASF++UAbmDY=;
+	b=QOnTTM3upVgvLOqHHkULAR/Sd+IXv2/jwWShAxdu/d9Ou3VRQKwRFQcKkxYFlQbNCHuDKC
+	qmtZIl1QGU9LvuaVEHVi6mN8leBtPwfqyHUmV8sQ4okR7sVQBV4nqtQqHtK44NZWa+achm
+	KJtmcrXFernLrXFh8br79W+BBZcbUPnfW6G5ETbNxP5n4/wMMrok/VJbm/1lHIAX31JScD
+	X4TbcxeFRb0UaQ4ZOxoYrise9V26pZtUHGM6uIGxT7DAWZfdtWm58X+EkXZorarJx6j3sJ
+	jv7CYR1gtAzR1m3FucHfJnoCrMS9Ay9Ifg0KTixSjK7w1MQSxCZuE9xVfV0ltA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1731631556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wmlctHEns5HH4kuTaBjX2JNcI1LzVOydASF++UAbmDY=;
+	b=B6FonATMAX4OxdtMR8JNBP8qWfBOIV1vFazP675PCOfWlXztCY+avvBu11Vcb9coe6V9WE
+	q7IVbFH9tV+539Aw==
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
+ S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Mario Limonciello
+ <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>, Ricky Wu
+ <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
+ <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>, Mostafa Saleh
+ <smostafa@google.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi
+ Liu <yi.l.liu@intel.com>, Kunwu Chan <chentao@kylinos.cn>, Ankit Agrawal
+ <ankita@nvidia.com>, Christian Brauner <brauner@kernel.org>, Reinette
+ Chatre <reinette.chatre@intel.com>, Eric
+ Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 11/11] Remove devres from pci_intx()
+In-Reply-To: <49bb6fc9ebff3cae844da0465ceadeef8d3217c7.camel@redhat.com>
+References: <20241113124158.22863-2-pstanner@redhat.com>
+ <20241113124158.22863-13-pstanner@redhat.com> <87msi3ksru.ffs@tglx>
+ <49bb6fc9ebff3cae844da0465ceadeef8d3217c7.camel@redhat.com>
+Date: Fri, 15 Nov 2024 01:46:13 +0100
+Message-ID: <8734jtl3xm.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-5-dw@davidwei.uk>
- <CAHS8izPZ3bzmPx=geE0Nb0q8kG8fvzsGT2YgohoFJbSz2r21Zw@mail.gmail.com>
- <5b928f0e-f3f8-4eaa-b750-e3f445d2fa46@gmail.com> <CAHS8izMTuEMS2hyHs0cit0Wvo3DcuHxReE1WS-crJ8zDTs=_Wg@mail.gmail.com>
- <c5213478-a6ec-431e-b11b-cc8271a84d59@davidwei.uk>
-In-Reply-To: <c5213478-a6ec-431e-b11b-cc8271a84d59@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 14 Nov 2024 16:43:24 -0800
-Message-ID: <CAHS8izMat6eN9b-anHOqkrkmfTpBQ6hn3rj2FqeKj=FLVhcTmw@mail.gmail.com>
-Subject: Re: [PATCH v7 04/15] net: prepare for non devmem TCP memory providers
-To: David Wei <dw@davidwei.uk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org, 
-	netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-On Mon, Nov 11, 2024 at 11:01=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
->
-> On 2024-11-04 05:20, Mina Almasry wrote:
-> > On Fri, Nov 1, 2024 at 10:41=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
-ail.com> wrote:
-> >> ...
-> >>>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> >>>> index e928efc22f80..31e01da61c12 100644
-> >>>> --- a/net/ipv4/tcp.c
-> >>>> +++ b/net/ipv4/tcp.c
-> >>>> @@ -277,6 +277,7 @@
-> >>>>   #include <net/ip.h>
-> >>>>   #include <net/sock.h>
-> >>>>   #include <net/rstreason.h>
-> >>>> +#include <net/page_pool/types.h>
-> >>>>
-> >>>>   #include <linux/uaccess.h>
-> >>>>   #include <asm/ioctls.h>
-> >>>> @@ -2476,6 +2477,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk=
-, const struct sk_buff *skb,
-> >>>>                          }
-> >>>>
-> >>>>                          niov =3D skb_frag_net_iov(frag);
-> >>>> +                       if (net_is_devmem_page_pool_ops(niov->pp->mp=
-_ops)) {
-> >>>> +                               err =3D -ENODEV;
-> >>>> +                               goto out;
-> >>>> +                       }
-> >>>> +
-> >>>
-> >>> I think this check needs to go in the caller. Currently the caller
-> >>> assumes that if !skb_frags_readable(), then the frag is dma-buf, and
-> >>
-> >> io_uring originated netmem that are marked unreadable as well
-> >> and so will end up in tcp_recvmsg_dmabuf(), then we reject and
-> >> fail since they should not be fed to devmem TCP. It should be
-> >> fine from correctness perspective.
-> >>
-> >> We need to check frags, and that's the place where we iterate
-> >> frags. Another option is to add a loop in tcp_recvmsg_locked
-> >> walking over all frags of an skb and doing the checks, but
-> >> that's an unnecessary performance burden to devmem.
-> >>
-> >
-> > Checking each frag in tcp_recvmsg_dmabuf (and the equivalent io_uring
-> > function) is not ideal really. Especially when you're dereferencing
-> > nio->pp to do the check which IIUC will pull a cache line not normally
-> > needed in this code path and may have a performance impact.
->
-> This check is needed currently because the curent assumption in core
-> netdev code is that !skb_frags_readable() means devmem TCP. Longer term,
-> we need to figure out how to distinguish skb frag providers in both code
-> and Netlink introspection.
->
-
-Right. In my mind the skb_frags_readable() check can be extended to
-tell us whether the entire skb is io_uring or devmem or readable. So
-that we don't have to:
-
-1. Do a per-frag check, and
-2. pull and keep an entire new cacheline hot to do the check.
-
-> Since your concerns here are primarily around performance rather than
-> correctness, I suggest we defer this as a follow up series.
->
-
-OK.
-
-> >
-> > We currently have a check in __skb_fill_netmem_desc() that makes sure
-> > all frags added to an skb are pages or dmabuf. I think we need to
-> > improve it to make sure all frags added to an skb are of the same type
-> > (pages, dmabuf, iouring). sending it to skb_copy_datagram_msg or
-> > tcp_recvmsg_dmabuf or error.
->
-> It should not be possible for drivers to fill in an skb with frags from
-> different providers. A provider can only change upon a queue reset.
->
-
-Right, drivers shouldn't fill in an skb with different providers. We
-should probably protect the core net from weird driver behavior. We
-could assert/force at skb_add_rx_frag_netmem() time that the entire
-skb has frags of the same type. Then we only need to check
-skb->frags[0] once to determine the type of the entire skb.
-
-But as you mention this is a performance optimization. Probably OK to
-punt this to a later iteration. But to me the changes are
-straightforward enough that it may have been good to carry them in the
-first iteration anyway. But OK to leave this out.
-
---
-Thanks,
-Mina
+T24gVGh1LCBOb3YgMTQgMjAyNCBhdCAxMDowNSwgUGhpbGlwcCBTdGFubmVyIHdyb3RlOg0KPiBP
+biBXZWQsIDIwMjQtMTEtMTMgYXQgMTc6MjIgKzAxMDAsIFRob21hcyBHbGVpeG5lciB3cm90ZToN
+Cj4+IE9uIFdlZCwgTm92IDEzIDIwMjQgYXQgMTM6NDEsIFBoaWxpcHAgU3Rhbm5lciB3cm90ZToN
+Cj4+ID4gcGNpX2ludHgoKSBpcyBhIGh5YnJpZCBmdW5jdGlvbiB3aGljaCBjYW4gc29tZXRpbWVz
+IGJlIG1hbmFnZWQNCj4+ID4gdGhyb3VnaA0KPj4gPiBkZXZyZXMuIFRoaXMgaHlicmlkIG5hdHVy
+ZSBpcyB1bmRlc2lyYWJsZS4NCj4+ID4gDQo+PiA+IFNpbmNlIGFsbCB1c2VycyBvZiBwY2lfaW50
+eCgpIGhhdmUgYnkgbm93IGJlZW4gcG9ydGVkIGVpdGhlciB0bw0KPj4gPiBhbHdheXMtbWFuYWdl
+ZCBwY2ltX2ludHgoKSBvciBuZXZlci1tYW5hZ2VkIHBjaV9pbnR4X3VubWFuYWdlZCgpLA0KPj4g
+PiB0aGUNCj4+ID4gZGV2cmVzIGZ1bmN0aW9uYWxpdHkgY2FuIGJlIHJlbW92ZWQgZnJvbSBwY2lf
+aW50eCgpLg0KPj4gPiANCj4+ID4gQ29uc2VxdWVudGx5LCBwY2lfaW50eF91bm1hbmFnZWQoKSBp
+cyBub3cgcmVkdW5kYW50LCBiZWNhdXNlDQo+PiA+IHBjaV9pbnR4KCkNCj4+ID4gaXRzZWxmIGlz
+IG5vdyB1bm1hbmFnZWQuDQo+PiA+IA0KPj4gPiBSZW1vdmUgdGhlIGRldnJlcyBmdW5jdGlvbmFs
+aXR5IGZyb20gcGNpX2ludHgoKS4gSGF2ZSBhbGwgdXNlcnMgb2YNCj4+ID4gcGNpX2ludHhfdW5t
+YW5hZ2VkKCkgY2FsbCBwY2lfaW50eCgpLiBSZW1vdmUgcGNpX2ludHhfdW5tYW5hZ2VkKCkuDQo+
+PiA+IA0KPj4gPiBTaWduZWQtb2ZmLWJ5OiBQaGlsaXBwIFN0YW5uZXIgPHBzdGFubmVyQHJlZGhh
+dC5jb20+DQo+PiA+IC0tLQ0KPj4gPiDCoGRyaXZlcnMvbWlzYy9jYXJkcmVhZGVyL3J0c3hfcGNy
+LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAyICstDQo+PiA+IMKgZHJpdmVycy9taXNjL3Rp
+Zm1fN3h4MS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA2
+ICstLQ0KPj4gPiDCoC4uLi9uZXQvZXRoZXJuZXQvYnJvYWRjb20vYm54MngvYm54MnhfbWFpbi5j
+wqAgfMKgIDIgKy0NCj4+ID4gwqBkcml2ZXJzL25ldC9ldGhlcm5ldC9icm9jYWRlL2JuYS9ibmFk
+LmPCoMKgwqDCoMKgwqAgfMKgIDIgKy0NCj4+ID4gwqBkcml2ZXJzL250Yi9ody9hbWQvbnRiX2h3
+X2FtZC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNCArLQ0KPj4gPiDCoGRyaXZl
+cnMvbnRiL2h3L2ludGVsL250Yl9od19nZW4xLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAy
+ICstDQo+PiA+IMKgZHJpdmVycy9wY2kvZGV2cmVzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNCArLQ0KPj4gPiDCoGRyaXZlcnMvcGNpL21z
+aS9hcGkuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8
+wqAgMiArLQ0KPj4gPiDCoGRyaXZlcnMvcGNpL21zaS9tc2kuY8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiArLQ0KPj4gPiDCoGRyaXZlcnMvcGNp
+L3BjaS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgfCA0MyArLS0tLS0tLS0tLS0tLS0NCj4+ID4gLS0tLQ0KPj4gPiDCoGRyaXZlcnMvdmZp
+by9wY2kvdmZpb19wY2lfY29yZS5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDIgKy0N
+Cj4+ID4gwqBkcml2ZXJzL3ZmaW8vcGNpL3ZmaW9fcGNpX2ludHJzLmPCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgfCAxMCArKy0tLQ0KPj4gPiDCoGRyaXZlcnMveGVuL3hlbi1wY2liYWNrL2NvbmZf
+c3BhY2VfaGVhZGVyLmPCoMKgIHzCoCAyICstDQo+PiA+IMKgaW5jbHVkZS9saW51eC9wY2kuaMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDEg
+LQ0KPj4gPiDCoDE0IGZpbGVzIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKyksIDYyIGRlbGV0aW9u
+cygtKQ0KPj4gDQo+PiBOb3cgSSdtIHV0dGVybHkgY29uZnVzZWQuIFRoaXMgdW5kb2VzIHRoZSBw
+Y2lfaW50eF91bm1hbmFnZWQoKSBjaHVybg0KPj4gd2hpY2ggeW91IGNhcmVmdWxseSBzcGxpdCBp
+bnRvIHNldmVyYWwgcGF0Y2hlcyBmaXJzdC4NCj4NCj4gSGF2ZSB5b3UgcmVhZCB0aGUgZW1haWwg
+SSBoYXZlIGxpbmtlZD8NCj4NCj4gVGhlcmUgaXMgYWxzbyB0aGUgY292ZXItbGV0dGVyIChkb2Vz
+IGFueW9uZSBpbiB0aGUgY29tbXVuaXR5IGV2ZXIgcmVhZA0KPiB0aG9zZT8pIHdoaWNoIGV4cGxp
+Y2l0bHkgc3RhdGVzOg0KPg0KPiAiUGF0Y2ggIlJlbW92ZSBkZXZyZXMgZnJvbSBwY2lfaW50eCgp
+IiBvYnZpb3VzbHkgcmV2ZXJ0cyB0aGUgcHJldmlvdXMNCj4gcGF0Y2hlcyB0aGF0IG1hZGUgZHJp
+dmVycyB1c2UgcGNpX2ludHhfdW5tYW5hZ2VkKCkuIEJ1dCB0aGlzIHdheSBpdCdzDQo+IGVhc2ll
+ciB0byByZXZpZXcgYW5kIGFwcHJvdmUuIEl0IGFsc28gbWFrZXMgc3VyZSB0aGF0IGVhY2ggY2hl
+Y2tlZCBvdXQNCj4gY29tbWl0IHNob3VsZCBwcm92aWRlIGNvcnJlY3QgYmVoYXZpb3IsIG5vdCBq
+dXN0IHRoZSBlbnRpcmUgc2VyaWVzIGFzIGENCj4gd2hvbGUuIg0KDQpJIHJlYWQgaXQgYW5kIEkg
+YXNzdW1lIHlvdXIgaW50ZW50aW9uIHdhcyB0byBmb3JjZSBhbiBleWUgb24gZXZlcnkgdXNlDQpj
+YXNlIG9mIHBjaV9pbnR4KCkgYW5kIG5vdCBqdXN0IG9uIHRob3NlIHdoaWNoIG5lZWQgdG8gYmUg
+Y29udmVydGVkIHRvDQpwY2ltX2ludHgoKS4NCg0KSSdtIG5vdCBjb252aW5jZWQgdGhhdCB0aGlz
+IGlzIG5lZWRlZCwgYnV0IGZhaXIgZW5vdWdoLg0KDQoNCg0KDQo=
 
