@@ -1,82 +1,93 @@
-Return-Path: <netdev+bounces-145495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E499CFAB5
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:01:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 673779CFAC5
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C2CA1F22D91
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C7BA280D5D
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95CA1922F9;
-	Fri, 15 Nov 2024 23:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGLAR1nR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A284E1917ED;
+	Fri, 15 Nov 2024 23:03:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD68214F9D9;
-	Fri, 15 Nov 2024 23:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D487346D
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 23:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731711688; cv=none; b=J5uUx/5l9Idl2zRqXpuM5obi+Y1YYSKB9vFL80eyD2J4MI4XiJSucYBu2GMm9tY/cc3JUvBkBaRX0flDNiKhw0Zp83CkFKl0cfwzMtZLBPqhHYklVaDcJfrADvrOhxiVDpTIlj8j7nH747aSeNrHGNQe+hDGlcuIEdaMg0iZdFo=
+	t=1731711785; cv=none; b=hBLEL1K96YsL87EtzzU+vaoEwRs5IB/Z00RLueCBDR50C6e3MmRUaC4cw1S862pz1sTccQrxjHLSlb0gwezAkaCNtQV9fU7BkmwPyVczqcugscZep5Q4h23Sx0hi2mP1VqAuycvP1S8aptDsj7K/wy4pDbaX4Jw8nIE6ttpzW5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731711688; c=relaxed/simple;
-	bh=p/RkG74/pG6hdlrjw0YmxwjjhszMqIpeAw8p7yBufzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OYJcYKRTtXu8WuDUAyMMZbynAll7MRhLpTNsAr5k9G1wQjiw0BKan6j8uZtg+QWHNeh1CvSUkk4l6F42bB3ESqy1toUUPTZEWk5wCDtDb1xoAOsteKBGtvFFn9f19wJXLlOrkP69+++b4ZXVmiytSsTjBukajkmUGuH6LDBDbm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGLAR1nR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96457C4CECF;
-	Fri, 15 Nov 2024 23:01:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731711687;
-	bh=p/RkG74/pG6hdlrjw0YmxwjjhszMqIpeAw8p7yBufzc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CGLAR1nRfhKDOpTAULm4nPHxY3m95yie9SR/2Dx2ykecTCwofOnxzPdqyHrVbZ2Zp
-	 YtZyp2az5jBqGtdf2pvvq4uPxMlvJzvJljbsSboll2Lj5gPE/9z5ZBrndbNYgKL8VI
-	 qxZigd8TsBI5WNhNvNdBAdTtyciOzaDJGDOU0I/REuIA3BZaZHrFDe2n8iyyBnZ48H
-	 vSdGsS+w/+6CUKKGX7eHDlqxaLWwGFDeaVLmdS4fWH3lPLJM+M8AME8LsrwAcb1uAg
-	 NFcVDV3+33FGCX3RCtxzeXOIQX8rd06qwnYB3+jc2rM/yiNvAuwe/3K/RaA8eHOyDl
-	 avyOdjOhPCEHw==
-Date: Fri, 15 Nov 2024 15:01:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- donald.hunter@gmail.com, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, kory.maincent@bootlin.com
-Subject: Re: [PATCH net-next v2 8/8] ethtool: regenerate uapi header from
- the spec
-Message-ID: <20241115150125.77c1edf8@kernel.org>
-In-Reply-To: <ZzfDnLG_U85X_pOd@mini-arch>
-References: <20241115193646.1340825-1-sdf@fomichev.me>
-	<20241115193646.1340825-9-sdf@fomichev.me>
-	<20241115132838.1d13557c@kernel.org>
-	<ZzfDnLG_U85X_pOd@mini-arch>
+	s=arc-20240116; t=1731711785; c=relaxed/simple;
+	bh=t2XiTNbL3PGInfYAp4yZu+eB8efE/gjHGgnsP2+qp74=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=LocuCNoDwnvtmdNMeif4mPjxSEqnumOfR4mFnoEYxkgAnks51xbpiQgq5+TkyuNycZPv19AX7f6zpkwzdlHedkt+G7SHCeqQzCTET7vLZvSF84o5WiO3056BY7oUbc7jkMaZZrUVROWDlwj4gYpEUMwyB7j47J0okMpXpKLKIlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-83abb901672so241583939f.3
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 15:03:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731711783; x=1732316583;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5hiwjEO+AOrBwenkKAdfZyDGvRKtEogqhlLWQFYfXE8=;
+        b=RYclv1cleuHLXVS3wtDgVBmT6R1K03hv6TCEj+m5F5RDV35xCA/54DTaRXfqURPOam
+         3pAQtcz61I5CP8dA75KWuf4v4gBqbI62wC423+Focx5WiEkW/jxTRp2MZ0spfoShkcxo
+         tih4hJ42/vABQjNHW14xspQQtZJVFiao90G5RMfFvjzegyNUyhLE1Hc2gB/VxsE2tIfS
+         Db92euJ8M02x8D+joaP0R9grIa3lGFMT4tDNFMOfIRKPBDbMiZmTlS3G9X8QAS15KHiT
+         5EAkUKY3h8JRR6mzmTB1vte1QGJeEnIKIuQRzGUFUb9wQMSaUTeU8ecBCxopVZKRR0Fx
+         7+kg==
+X-Forwarded-Encrypted: i=1; AJvYcCVevl0a2rcqpFuxbqU4UMvw3BThM5zARyJu874uyRWanr24UJlFowkyKZxxkT+tcUTEmD1Y+zw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvEUwM92PBiSbGcGZSdMJT9zEHncpgZrlUukIa4Fqq7T4y5/bH
+	6H3PFPzI87gh7eU63K+uRENEfia7ib7YcU46FPPlF7nxEF4cUyTjlEkauZmYVLh92Cp+B+sIoqi
+	c6OJ1i3LgMK8A7KN9uULv+dSfDKLRSzFuMuEHl96odd/MUdAC7lqmbfQ=
+X-Google-Smtp-Source: AGHT+IGCWQb2OFq+eRkFN5Be/l2kdINtmGhVA25ziCy7onrqtTIY+y47XSwL8lIK4nziRpWINhyZ+hSokuOwnLRypykFMAjGs49x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:a:b0:3a6:ac17:13e4 with SMTP id
+ e9e14a558f8ab-3a748079fc1mr51440345ab.18.1731711783356; Fri, 15 Nov 2024
+ 15:03:03 -0800 (PST)
+Date: Fri, 15 Nov 2024 15:03:03 -0800
+In-Reply-To: <0000000000005423e30621f745ff@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6737d327.050a0220.57553.0040.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in l2tp_exit_net
+From: syzbot <syzbot+332fe1e67018625f63c9@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, guohui.study@gmail.com, 
+	horms@kernel.org, jchapman@katalix.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tparkin@katalix.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 15 Nov 2024 13:56:44 -0800 Stanislav Fomichev wrote:
-> > Looks like we need a doc on the enum itself here:
-> > 
-> > include/uapi/linux/ethtool_netlink_generated.h:23: warning: missing initial short description on line:
-> >  * enum ethtool_header_flags  
-> 
-> "Assorted ethtool flags" as placeholder? Any better ideas? These don't seem
-> to have a good common purpose :-(
+syzbot has bisected this issue to:
 
-"common ethtool header flags" ?
+commit 73d33bd063c4cfef3db17f9bec3d202928ed8631
+Author: James Chapman <jchapman@katalix.com>
+Date:   Fri Aug 23 14:22:57 2024 +0000
 
-These are "ethtool level" as in they are request independent / 
-do the same thing for all requests (as applicable).
+    l2tp: avoid using drain_workqueue in l2tp_pre_exit_net
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1306eb5f980000
+start commit:   ccb35037c48a Merge branch 'net-lan969x-add-vcap-functional..
+git tree:       net-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1086eb5f980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1706eb5f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a9d1c42858837b59
+dashboard link: https://syzkaller.appspot.com/bug?extid=332fe1e67018625f63c9
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136a36a7980000
+
+Reported-by: syzbot+332fe1e67018625f63c9@syzkaller.appspotmail.com
+Fixes: 73d33bd063c4 ("l2tp: avoid using drain_workqueue in l2tp_pre_exit_net")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
