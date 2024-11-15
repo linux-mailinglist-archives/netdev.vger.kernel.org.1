@@ -1,196 +1,239 @@
-Return-Path: <netdev+bounces-145230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D98F9CDC57
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:19:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A069CDC8E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1AA3B226DA
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:19:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724B7B24DCF
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 10:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F733192D61;
-	Fri, 15 Nov 2024 10:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F6618FDDB;
+	Fri, 15 Nov 2024 10:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="dQQXSmFb"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lDPVSNrB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039C81B2196
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 10:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A55818950A;
+	Fri, 15 Nov 2024 10:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731665941; cv=none; b=LJC30KsMFp23FrumsLpXGC1ogSZpqIaQNioIRpIBHCqYTe8PNlVFsjgKfi1FhRFz7Xyj1CLA7ScF7MPXv7R9+2a7iE+uA3tlFCRTg5fOczIQsVvsqp9TIEjDIeptxmNq6pxZo9o/J9YpICh6yvoJVYunBoMABLl2n9q3gcf23rk=
+	t=1731666625; cv=none; b=h8/rewGa8A3qBPihJGuChtyF8SBlnURpQTzc7NR8LvncvPQ57t047dor1DBNJ9zlPotTvhtGGlHnGNoyoVMYpBRTDfPfcGpHh8/nyNxoaYfGOkp4Zoqns9hrZfRirJGxIcwIhPc1dRUIimpAbtLtqmXzwc3YP1s6deLnuXAdE+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731665941; c=relaxed/simple;
-	bh=X5D0h9UNJl13Pe4z8gullnSJc8fhH65Kg8B35uclJ0c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJ6qe2jHoEZZpNiH2brzpOwY3L4duOi0WHb5KjADgHjNCfkG/OjXJnYaAQNQrBfJgFGdyEHMkyBiO5935n82tiKzz3yHOIBBr56DmwsoiABCrLWXn/3fbKMw4rENqtFd+NdURJvN2SrVBHTg+gxL8fwOxUurlvY/pADIPv7dQVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=dQQXSmFb; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4314fa33a35so13335265e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 02:18:58 -0800 (PST)
+	s=arc-20240116; t=1731666625; c=relaxed/simple;
+	bh=4vNgn+SsJajunpKXuBkZ//5pvqR9w+o+EcfCWsemrGQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o+4H83ducNF5wmlIvDgT3Pgibbh8TtyO5Y4OHaDtmF5AwH+sxnjdrP3uSpWUZ5OkWyLWjavneV/Hh06d1lFIBcd+Za9dSEUGgzurCgNsjRRO79WZnxnF1sY+mhn21KFEvYWVPGw82OC5la0bd7WjXDLVyEPcyq2qCa3eWMydtIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lDPVSNrB; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1731665937; x=1732270737; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=moBXfLDVX5c6Ljj6/t/WvvrljNE0SqwxGCewjZjiArM=;
-        b=dQQXSmFb01ocaTBhm7x0t/GB9tAv2BAD49D7Zfa9OIuN1Lbmjg/1hps1qR3e6uzCVr
-         UpcbVCCYN7xcg+3WN1Hlu9SnEwInSJaD6dSI8tl75RRDOrA6mG/MS7efDcOduz+pyGi1
-         BZ4gUOtUSnmXALrh7ljqACp4oRbEVoTxu1PDKEgCAbLvPc0JWZfXTTp6NOHf1uCrMPb2
-         RolgXh8pgOu/BlhTGdbOh0T7rB+/ul5zVDO3O3tOJJEVRP89rdBpo1zfBBXalggcBfgZ
-         SYllH5RmpquIl7+E8b67P6ZLBR/TcYodzh5TA5KKIeS4Cbfh9qQQYtjr3Lyecb4sMj0N
-         Eubw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731665937; x=1732270737;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=moBXfLDVX5c6Ljj6/t/WvvrljNE0SqwxGCewjZjiArM=;
-        b=ieRuuMIPe6RyEvTX/Rm9Ue38AeDxhOuO8gdw2Rmsld4cIrRYLxM5D3i+YXT2m/8YMi
-         MVRcNG3wexKDfpd7NoPkzWQa69gPPnlCm1H3K3qCKqoSi01E4Ij5XCbUq7H3XKrrvV1/
-         1kQchU5gHCSdIBZlOVvNAeWQEkrv72NnwYD3Mj6Ba28/RuGX+cAAAostprUIFks2F5vv
-         rcSGsX5CbQpj+fl65ybesaRFQD0iNwAS50hw6+6SPuGazaJHSJWWKCD37zsbnVmffwlx
-         VJh6U321oMZXQAUgYtTIg7xEvElSnXF8UywOntTkN7UbYtu4t5m2KdgT1Q5fDQVEANq8
-         c8yg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmrr6B7YlkbJ9J7jBuB1AzpN+jtM/eadOyWeAFvEJL56k+7ukg3YfsVnFOJDrsczmEX2AJAQ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzaqb6Y+xHKJKKCqP6TEkIc+ptYxgq1bqHDwHgP60aLSDY92eoU
-	kIPFL4cqZrH8vanm2I5HwcMpK5RERFpOZoAQp0abharIEU/F7EuQQY+CA/6To+s=
-X-Google-Smtp-Source: AGHT+IGn9S7JhSYSeHgbVmQ2BSBxvX0GWYaTGrCbot1ed9O8BPB4IeK8ajzzLD6HoKiGPR6iN1/CKA==
-X-Received: by 2002:a05:600c:3513:b0:42c:b16e:7a22 with SMTP id 5b1f17b1804b1-432df72c555mr18504095e9.12.1731665937243;
-        Fri, 15 Nov 2024 02:18:57 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab78783sm49172485e9.12.2024.11.15.02.18.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 02:18:56 -0800 (PST)
-Message-ID: <dc63a3cb-7ace-4aca-9b67-f3c50297b2d2@openvpn.net>
-Date: Fri, 15 Nov 2024 11:19:20 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731666622; x=1763202622;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Nj6S1uQvHPGOTiJGqSfDYPUjpMdCEBMRTMmFsqU5FDo=;
+  b=lDPVSNrBXdMuOD1p54HCK/AYRlgHaF7Oezqy2DNnhMTSxiZuMD0FnUaw
+   rVyfctIZ76Jykt06ElF9ED+z4FFwpfxQV3RrFAHxK5gd4Gt6gGGRjUNEp
+   odLAH+L7nvZ64WE2qd63Ch7iCtPoekF6/yOv5u+0EXpegGdQvPHv1XeFX
+   M=;
+X-IronPort-AV: E=Sophos;i="6.12,156,1728950400"; 
+   d="scan'208";a="147826196"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 10:30:20 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:15220]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
+ id e0f35240-8bc2-40ae-9f40-746d1c98b040; Fri, 15 Nov 2024 10:30:20 +0000 (UTC)
+X-Farcaster-Flow-ID: e0f35240-8bc2-40ae-9f40-746d1c98b040
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 15 Nov 2024 10:30:20 +0000
+Received: from ip-10-253-83-51.amazon.com (10.253.83.51) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 15 Nov 2024 10:30:18 +0000
+From: Alexander Graf <graf@amazon.com>
+To: <netdev@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<kvm@vger.kernel.org>, Asias He <asias@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
+	<davem@davemloft.net>, Stefano Garzarella <sgarzare@redhat.com>, "Stefan
+ Hajnoczi" <stefanha@redhat.com>
+Subject: [PATCH] vsock/virtio: Remove queued_replies pushback logic
+Date: Fri, 15 Nov 2024 10:30:16 +0000
+Message-ID: <20241115103016.86461-1-graf@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 03/23] ovpn: add basic netlink support
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-3-de4698c73a25@openvpn.net>
- <21c0887b-1c7d-424d-a723-2a8d212cbde1@gmail.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <21c0887b-1c7d-424d-a723-2a8d212cbde1@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-On 09/11/2024 00:31, Sergey Ryazanov wrote:
-> On 29.10.2024 12:47, Antonio Quartulli wrote:
->> This commit introduces basic netlink support with family
->> registration/unregistration functionalities and stub pre/post-doit.
->>
->> More importantly it introduces the YAML uAPI description along
->> with its auto-generated files:
->> - include/uapi/linux/ovpn.h
->> - drivers/net/ovpn/netlink-gen.c
->> - drivers/net/ovpn/netlink-gen.h
->>
->> Cc: donald.hunter@gmail.com
->> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-> 
-> [skipped]
-> 
->> diff --git a/drivers/net/ovpn/ovpnstruct.h b/drivers/net/ovpn/ 
->> ovpnstruct.h
->> --- /dev/null
->> +++ b/drivers/net/ovpn/ovpnstruct.h
->> @@ -0,0 +1,25 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*  OpenVPN data channel offload
->> + *
->> + *  Copyright (C) 2019-2024 OpenVPN, Inc.
->> + *
->> + *  Author:    James Yonan <james@openvpn.net>
->> + *        Antonio Quartulli <antonio@openvpn.net>
->> + */
->> +
->> +#ifndef _NET_OVPN_OVPNSTRUCT_H_
->> +#define _NET_OVPN_OVPNSTRUCT_H_
->> +
->> +#include <net/net_trackers.h>
->> +
->> +/**
->> + * struct ovpn_struct - per ovpn interface state
->> + * @dev: the actual netdev representing the tunnel
->> + * @dev_tracker: reference tracker for associated dev
->> + */
->> +struct ovpn_struct {
-> 
-> There is no standard convention how to entitle such structures, so the 
-> question is basically of out-of-curiosity class. For me, having a 
-> sturcuture with name 'struct' is like having no name. Did you consider 
-> to use such names as ovpn_dev or ovpn_iface? Meaning, using a name that 
-> gives a clue regarding the scope of the content.
+Ever since the introduction of the virtio vsock driver, it included
+pushback logic that blocks it from taking any new RX packets until the
+TX queue backlog becomes shallower than the virtqueue size.
 
-Yes, I wanted to switch to ovpn_priv, but  did not care much for the 
-time being :)
+This logic works fine when you connect a user space application on the
+hypervisor with a virtio-vsock target, because the guest will stop
+receiving data until the host pulled all outstanding data from the VM.
 
-I can still do it now in v12.
+With Nitro Enclaves however, we connect 2 VMs directly via vsock:
 
-Thanks!
-Regards,
+  Parent      Enclave
 
+    RX -------- TX
+    TX -------- RX
+
+This means we now have 2 virtio-vsock backends that both have the pushback
+logic. If the parent's TX queue runs full at the same time as the
+Enclave's, both virtio-vsock drivers fall into the pushback path and
+no longer accept RX traffic. However, that RX traffic is TX traffic on
+the other side which blocks that driver from making any forward
+progress. We're not in a deadlock.
+
+To resolve this, let's remove that pushback logic altogether and rely on
+higher levels (like credits) to ensure we do not consume unbounded
+memory.
+
+Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+Signed-off-by: Alexander Graf <graf@amazon.com>
+---
+ net/vmw_vsock/virtio_transport.c | 51 ++------------------------------
+ 1 file changed, 2 insertions(+), 49 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 64a07acfef12..53e79779886c 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -44,8 +44,6 @@ struct virtio_vsock {
+ 	struct work_struct send_pkt_work;
+ 	struct sk_buff_head send_pkt_queue;
+ 
+-	atomic_t queued_replies;
+-
+ 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
+ 	 * must be accessed with rx_lock held.
+ 	 */
+@@ -171,17 +169,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+ 
+ 		virtio_transport_deliver_tap_pkt(skb);
+ 
+-		if (reply) {
+-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+-			int val;
+-
+-			val = atomic_dec_return(&vsock->queued_replies);
+-
+-			/* Do we now have resources to resume rx processing? */
+-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
+-				restart_rx = true;
+-		}
+-
+ 		added = true;
+ 	}
+ 
+@@ -218,9 +205,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
+ 		goto out_rcu;
+ 	}
+ 
+-	if (virtio_vsock_skb_reply(skb))
+-		atomic_inc(&vsock->queued_replies);
+-
+ 	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+ 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+ 
+@@ -233,7 +217,7 @@ static int
+ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+ {
+ 	struct virtio_vsock *vsock;
+-	int cnt = 0, ret;
++	int ret;
+ 
+ 	rcu_read_lock();
+ 	vsock = rcu_dereference(the_virtio_vsock);
+@@ -242,17 +226,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+ 		goto out_rcu;
+ 	}
+ 
+-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+-
+-	if (cnt) {
+-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+-		int new_cnt;
+-
+-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
+-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
+-		    new_cnt < virtqueue_get_vring_size(rx_vq))
+-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+-	}
++	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+ 
+ 	ret = 0;
+ 
+@@ -323,18 +297,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
+ 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+ }
+ 
+-/* Is there space left for replies to rx packets? */
+-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
+-{
+-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
+-	int val;
+-
+-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
+-	val = atomic_read(&vsock->queued_replies);
+-
+-	return val < virtqueue_get_vring_size(vq);
+-}
+-
+ /* event_lock must be held */
+ static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
+ 				       struct virtio_vsock_event *event)
+@@ -581,14 +543,6 @@ static void virtio_transport_rx_work(struct work_struct *work)
+ 			struct sk_buff *skb;
+ 			unsigned int len;
+ 
+-			if (!virtio_transport_more_replies(vsock)) {
+-				/* Stop rx until the device processes already
+-				 * pending replies.  Leave rx virtqueue
+-				 * callbacks disabled.
+-				 */
+-				goto out;
+-			}
+-
+ 			skb = virtqueue_get_buf(vq, &len);
+ 			if (!skb)
+ 				break;
+@@ -735,7 +689,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 
+ 	vsock->rx_buf_nr = 0;
+ 	vsock->rx_buf_max_nr = 0;
+-	atomic_set(&vsock->queued_replies, 0);
+ 
+ 	mutex_init(&vsock->tx_lock);
+ 	mutex_init(&vsock->rx_lock);
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.40.1
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
 
