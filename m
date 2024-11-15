@@ -1,519 +1,211 @@
-Return-Path: <netdev+bounces-145414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E9E9CF6DC
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:15:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179B09CF713
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E555E1F22755
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:15:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90D941F2208F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 21:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D901E282B;
-	Fri, 15 Nov 2024 21:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4881E32CF;
+	Fri, 15 Nov 2024 21:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Vx946PRA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qSckkTef"
 X-Original-To: netdev@vger.kernel.org
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309381D5ADD;
-	Fri, 15 Nov 2024 21:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B418A18A924;
+	Fri, 15 Nov 2024 21:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731705303; cv=none; b=ibBEVthDbxi8BjSaYaQY6CqaXs3FcF82R7+uPVLfwA/cpjC/nLhmIj3voAClT6LZ/u4QGhuFn5RrMT9qWBBPSzSflsj/skF6ud0k0b5RbD1EPNvFO6HmeIkxRcfFxmjW4ROfueHfeYOTxheF+vbFM6qIoIb8jPpoM62Ma+lH1oQ=
+	t=1731705764; cv=none; b=P1M/OVgSL7NF4cJwjhwD487EmqMlHMWkfwO2JaQ2CUIKXf1m9Hyb4vMaQvG6+ugW5YoBlp8fObnG6EubyWTQpj0bjcwNN3BaXSz3OVXRnhbxu6IL8mvzzPU15Tfd4nbzPvESGtMAB2FPAJAdJi1awztKSg2mB9YQM4JsTW2uErs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731705303; c=relaxed/simple;
-	bh=hmZyID0xTDejqUdHbnNnIfCcRfkvqbnrZ7rK8Oz9WJk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=br/Ais40koezOOPn+jEb7ln5YqKYcjbqGzAlwvtq/K2Cw129IUYX5G6YqfLeMcnGlvX2v+Vq78NbODNRgibP6uHBKcB+1sbdgUopq+/CbldGbfGZ/7ntRiUnvWjSTBwdz9pPVfxcWBIPs2vhLSlTFpWNWG+UTIMnP7Ik/YlqLFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Vx946PRA; arc=none smtp.client-ip=13.77.154.182
+	s=arc-20240116; t=1731705764; c=relaxed/simple;
+	bh=96KN3Ljbz+K6CjnkL8vShuYnQFInh7Up21ZKHXD0rrk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FD95DvFQjteKo7SU1YdZ0f5CNoLJmtskjdsCJocCWDiO9sj5UJ+DHxgWhcMKqqiWgjJFEzVdUR9CqETks5SSJeAI3rQLfNUAXwJ7bdCGl/wcF4Y7gvzFqwX+XWeAKeM0/BkM/U3WAUK65ktZ+9GdROo1m1TPssvCIqIxRDIsaRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qSckkTef; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6AE7820BEBD0;
-	Fri, 15 Nov 2024 13:14:53 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6AE7820BEBD0
+Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
+	by linux.microsoft.com (Postfix) with ESMTPSA id C8F55206BCE1;
+	Fri, 15 Nov 2024 13:22:41 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C8F55206BCE1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1731705294;
-	bh=IOtJqBKEB6hW5aqrE09EdKHehH+hQljR82pxvDiFOrU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Vx946PRAHZaunNzhrBN6r6Eunx0XJSwCvezU7p34uq8bmwkx0jTPCzMuPBGb2qBPT
-	 A8LE/xwEbQJ+NzGbNgrWZCTjrkQQVzzzg2vG5xZdBjRK88CM1qYOR49k0z4NdpInur
-	 6MRDszJnBx80i9qdoXbBprb9zFmFTUmTZOmbumlQ=
-Message-ID: <e832dd94-04f3-413a-a1a9-870849b4bc53@linux.microsoft.com>
-Date: Fri, 15 Nov 2024 13:14:52 -0800
+	s=default; t=1731705762;
+	bh=NaKJY5KeJ2E1lFlJGT3YRi054w9/PadhToJsjl04lc4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=qSckkTefY4nSDpMG6iW1ikvAvcu+Bro+zmtddjC9Ua2IIcocuRc7w5JVg1mXiL1Zv
+	 gjq7MVSAX23TgeVecpPfH5/IBxuFBQ/uZHv6yLuKDmXda9ST9w35n4VJDzv6x+pplU
+	 738dCnI1RTxo/K26kLo/E4BvWWcYM0/mvOAHIgpM=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Subject: [PATCH 00/22] Converge on using secs_to_jiffies()
+Date: Fri, 15 Nov 2024 21:22:30 +0000
+Message-Id: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/4] hyperv: Switch from hyperv-tlfs.h to
- hyperv/hvhdk.h
-To: Michael Kelley <mhklinux@outlook.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-Cc: "kys@microsoft.com" <kys@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
- <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
- "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
- "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
- "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
- "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>,
- "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
- "apais@linux.microsoft.com" <apais@linux.microsoft.com>
-References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1731018746-25914-5-git-send-email-nunodasneves@linux.microsoft.com>
- <BN7PR02MB4148513F8ABA50392E11C616D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <BN7PR02MB4148513F8ABA50392E11C616D4582@BN7PR02MB4148.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJa7N2cC/y2NQQqDQAxFryJZN2AGKehVpIt2JtOmi5k2sSKId
+ zdol+/Bf38FYxU2GJoVlGcxqcWBLg3E1708GSU5Q2hDR0QBYy0zq3vjaDhVfEvOXsDU94lauj4
+ SEfj8o5xlOdLj7WTl788fpr/cth3E5bKGfwAAAA==
+X-Change-ID: 20241112-converge-secs-to-jiffies-d99d1016bd11
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>, 
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, 
+ Haojian Zhuang <haojian.zhuang@gmail.com>, 
+ Robert Jarzmik <robert.jarzmik@free.fr>, 
+ Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>, 
+ Vasily Gorbik <gor@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
+ Oded Gabbay <ogabbay@kernel.org>, 
+ Lucas De Marchi <lucas.demarchi@intel.com>, 
+ =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Jeroen de Borst <jeroendb@google.com>, 
+ Praveen Kaligineedi <pkaligineedi@google.com>, 
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ James Smart <james.smart@broadcom.com>, 
+ Dick Kennedy <dick.kennedy@broadcom.com>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ =?utf-8?q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, 
+ Jeff Johnson <jjohnson@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Jack Wang <jinpu.wang@cloud.ionos.com>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
+ Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+ Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, 
+ Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, 
+ Takashi Iwai <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>, 
+ Russell King <linux+etnaviv@armlinux.org.uk>, 
+ Christian Gmeiner <christian.gmeiner@gmail.com>, 
+ Louis Peens <louis.peens@corigine.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr, 
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ ath11k@lists.infradead.org, linux-mm@kvack.org, 
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev, 
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org, 
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org, 
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com, 
+ linuxppc-dev@lists.ozlabs.org, 
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+ Easwar Hariharan <eahariha@linux.microsoft.com>, 
+ Michael Kelley <mhklinux@outlook.com>, Thomas Gleixner <tglx@linutronix.de>, 
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+X-Mailer: b4 0.14.2
 
-On 11/10/2024 8:13 PM, Michael Kelley wrote:
-> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday, November 7, 2024 2:32 PM
->>
->> Switch to using hvhdk.h everywhere in the kernel. This header includes
->> all the new Hyper-V headers in include/hyperv, which form a superset of
->> the definitions found in hyperv-tlfs.h.
->>
->> This makes it easier to add new Hyper-V interfaces without being
->> restricted to those in the TLFS doc (reflected in hyperv-tlfs.h).
->>
->> To be more consistent with the original Hyper-V code, the names of some
->> definitions are changed slightly. Update those where needed.
->>
->> hyperv-tlfs.h is no longer included anywhere - hvhdk.h can serve
->> the same role, but with an easier path for adding new definitions.
-> 
-> Is hyperv-tlfs.h and friends being deleted? If not, the risk is that
-> someone adds a new #include of it without realizing that it has been
-> superseded by hvhdk.h.
-> 
+This is a series that follows up on my previous series to introduce
+secs_to_jiffies() and convert a few initial users.[1] In the review for
+that series, Anna-Maria requested converting other users with
+Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
+that use the multiply pattern of either of:
+- msecs_to_jiffies(N*1000), or
+- msecs_to_jiffies(N*MSEC_PER_SEC)
 
-I was hesitant to delete it because I thought someone may still have
-a use for a header file that (mostly) reflects the TLFS document and
-nothing more.
+The entire conversion is made with Coccinelle in the script added in
+patch 2. Some changes suggested by Coccinelle have been deferred to
+later parts that will address other possible variant patterns.
 
-But in practical terms, this patchset makes it much more difficult to
-use because all the helper code (i.e. mshyperv.h) now uses hvhdk.h.
-So, maybe there is no point keeping it.
+CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 
-> Note also that this patch does not apply cleanly to 6.12 rc's, or to
-> current linux-next trees. There's an unrelated #include added to
-> arch/x86/include/asm/kvm_host.h that causes a merge failure
-> in that file.
-> 
+[1] https://lore.kernel.org/all/20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com/
+[2] https://lore.kernel.org/all/8734kngfni.fsf@somnus/
 
-I've been developing this series based on hyperv-next. Should I be
-basing it on linux-next?
+---
+Easwar Hariharan (22):
+      netfilter: conntrack: Cleanup timeout definitions
+      coccinelle: misc: Add secs_to_jiffies script
+      arm: pxa: Convert timeouts to use secs_to_jiffies()
+      s390: kernel: Convert timeouts to use secs_to_jiffies()
+      powerpc/papr_scm: Convert timeouts to secs_to_jiffies()
+      mm: kmemleak: Convert timeouts to secs_to_jiffies()
+      accel/habanalabs: Convert timeouts to secs_to_jiffies()
+      drm/xe: Convert timeout to secs_to_jiffies()
+      drm/etnaviv: Convert timeouts to secs_to_jiffies()
+      scsi: lpfc: Convert timeouts to secs_to_jiffies()
+      scsi: arcmsr: Convert timeouts to secs_to_jiffies()
+      scsi: pm8001: Convert timeouts to secs_to_jiffies()
+      xen/blkback: Convert timeouts to secs_to_jiffies()
+      gve: Convert timeouts to secs_to_jiffies()
+      wifi: ath11k: Convert timeouts to secs_to_jiffies()
+      Bluetooth: MGMT: Convert timeouts to secs_to_jiffies()
+      staging: vc04_services: Convert timeouts to secs_to_jiffies()
+      ceph: Convert timeouts to secs_to_jiffies()
+      livepatch: Convert timeouts to secs_to_jiffies()
+      ALSA: line6: Convert timeouts to secs_to_jiffies()
+      nfp: Convert timeouts to secs_to_jiffies()
+      jiffies: Define secs_to_jiffies()
 
-> Michael
-> 
->>
->> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
->> ---
->>  arch/arm64/hyperv/hv_core.c        |  2 +-
->>  arch/arm64/hyperv/mshyperv.c       |  4 ++--
->>  arch/arm64/include/asm/mshyperv.h  |  2 +-
->>  arch/x86/hyperv/hv_init.c          | 20 ++++++++++----------
->>  arch/x86/hyperv/hv_proc.c          |  2 +-
->>  arch/x86/hyperv/nested.c           |  2 +-
->>  arch/x86/include/asm/kvm_host.h    |  2 +-
->>  arch/x86/include/asm/mshyperv.h    |  2 +-
->>  arch/x86/include/asm/svm.h         |  2 +-
->>  arch/x86/kernel/cpu/mshyperv.c     |  2 +-
->>  arch/x86/kvm/vmx/hyperv_evmcs.h    |  2 +-
->>  arch/x86/kvm/vmx/vmx_onhyperv.h    |  2 +-
->>  drivers/clocksource/hyperv_timer.c |  2 +-
->>  drivers/hv/hv_balloon.c            |  4 ++--
->>  drivers/hv/hv_common.c             |  2 +-
->>  drivers/hv/hv_kvp.c                |  2 +-
->>  drivers/hv/hv_snapshot.c           |  2 +-
->>  drivers/hv/hyperv_vmbus.h          |  2 +-
->>  include/asm-generic/mshyperv.h     |  2 +-
->>  include/clocksource/hyperv_timer.h |  2 +-
->>  include/linux/hyperv.h             |  2 +-
->>  net/vmw_vsock/hyperv_transport.c   |  2 +-
->>  22 files changed, 33 insertions(+), 33 deletions(-)
->>
->> diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
->> index 7a746a5a6b42..69004f619c57 100644
->> --- a/arch/arm64/hyperv/hv_core.c
->> +++ b/arch/arm64/hyperv/hv_core.c
->> @@ -14,7 +14,7 @@
->>  #include <linux/arm-smccc.h>
->>  #include <linux/module.h>
->>  #include <asm-generic/bug.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>
->>  /*
->> diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
->> index b1a4de4eee29..fc49949b7df6 100644
->> --- a/arch/arm64/hyperv/mshyperv.c
->> +++ b/arch/arm64/hyperv/mshyperv.c
->> @@ -49,12 +49,12 @@ static int __init hyperv_init(void)
->>  	hv_set_vpreg(HV_REGISTER_GUEST_OS_ID, guest_id);
->>
->>  	/* Get the features and hints from Hyper-V */
->> -	hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
->> +	hv_get_vpreg_128(HV_REGISTER_PRIVILEGES_AND_FEATURES_INFO, &result);
->>  	ms_hyperv.features = result.as32.a;
->>  	ms_hyperv.priv_high = result.as32.b;
->>  	ms_hyperv.misc_features = result.as32.c;
->>
->> -	hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
->> +	hv_get_vpreg_128(HV_REGISTER_FEATURES_INFO, &result);
->>  	ms_hyperv.hints = result.as32.a;
->>
->>  	pr_info("Hyper-V: privilege flags low 0x%x, high 0x%x, hints 0x%x, misc
->> 0x%x\n",
->> diff --git a/arch/arm64/include/asm/mshyperv.h
->> b/arch/arm64/include/asm/mshyperv.h
->> index a975e1a689dd..7595fb35fae6 100644
->> --- a/arch/arm64/include/asm/mshyperv.h
->> +++ b/arch/arm64/include/asm/mshyperv.h
->> @@ -20,7 +20,7 @@
->>
->>  #include <linux/types.h>
->>  #include <linux/arm-smccc.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  /*
->>   * Declare calls to get and set Hyper-V VP register values on ARM64, which
->> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
->> index 1a6354b3e582..3f9aef157c88 100644
->> --- a/arch/x86/hyperv/hv_init.c
->> +++ b/arch/x86/hyperv/hv_init.c
->> @@ -19,7 +19,7 @@
->>  #include <asm/sev.h>
->>  #include <asm/ibt.h>
->>  #include <asm/hypervisor.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>  #include <asm/idtentry.h>
->>  #include <asm/set_memory.h>
->> @@ -416,24 +416,24 @@ static void __init hv_get_partition_id(void)
->>  static u8 __init get_vtl(void)
->>  {
->>  	u64 control = HV_HYPERCALL_REP_COMP_1 | HVCALL_GET_VP_REGISTERS;
->> -	struct hv_get_vp_registers_input *input;
->> -	struct hv_get_vp_registers_output *output;
->> +	struct hv_input_get_vp_registers *input;
->> +	struct hv_register_assoc *output;
->>  	unsigned long flags;
->>  	u64 ret;
->>
->>  	local_irq_save(flags);
->>  	input = *this_cpu_ptr(hyperv_pcpu_input_arg);
->> -	output = (struct hv_get_vp_registers_output *)input;
->> +	output = (struct hv_register_assoc *)input;
->>
->> -	memset(input, 0, struct_size(input, element, 1));
->> -	input->header.partitionid = HV_PARTITION_ID_SELF;
->> -	input->header.vpindex = HV_VP_INDEX_SELF;
->> -	input->header.inputvtl = 0;
->> -	input->element[0].name0 = HV_X64_REGISTER_VSM_VP_STATUS;
->> +	memset(input, 0, struct_size(input, names, 1));
->> +	input->partition_id = HV_PARTITION_ID_SELF;
->> +	input->vp_index = HV_VP_INDEX_SELF;
->> +	input->input_vtl.as_uint8 = 0;
->> +	input->names[0] = HV_X64_REGISTER_VSM_VP_STATUS;
->>
->>  	ret = hv_do_hypercall(control, input, output);
->>  	if (hv_result_success(ret)) {
->> -		ret = output->as64.low & HV_X64_VTL_MASK;
->> +		ret = output->value.reg8 & HV_X64_VTL_MASK;
->>  	} else {
->>  		pr_err("Failed to get VTL(error: %lld) exiting...\n", ret);
->>  		BUG();
->> diff --git a/arch/x86/hyperv/hv_proc.c b/arch/x86/hyperv/hv_proc.c
->> index b74c06c04ff1..ac4c834d4435 100644
->> --- a/arch/x86/hyperv/hv_proc.c
->> +++ b/arch/x86/hyperv/hv_proc.c
->> @@ -176,7 +176,7 @@ int hv_call_create_vp(int node, u64 partition_id, u32 vp_index,
->> u32 flags)
->>  		input->partition_id = partition_id;
->>  		input->vp_index = vp_index;
->>  		input->flags = flags;
->> -		input->subnode_type = HvSubnodeAny;
->> +		input->subnode_type = HV_SUBNODE_ANY;
->>  		input->proximity_domain_info = hv_numa_node_to_pxm_info(node);
->>  		status = hv_do_hypercall(HVCALL_CREATE_VP, input, NULL);
->>  		local_irq_restore(irq_flags);
->> diff --git a/arch/x86/hyperv/nested.c b/arch/x86/hyperv/nested.c
->> index 9dc259fa322e..1083dc8646f9 100644
->> --- a/arch/x86/hyperv/nested.c
->> +++ b/arch/x86/hyperv/nested.c
->> @@ -11,7 +11,7 @@
->>
->>
->>  #include <linux/types.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>  #include <asm/tlbflush.h>
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 3627eab994a3..38cd609f37c7 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -34,7 +34,7 @@
->>  #include <asm/asm.h>
->>  #include <asm/kvm_page_track.h>
->>  #include <asm/kvm_vcpu_regs.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->>
->> diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
->> index 47ca48062547..f0564e599b7f 100644
->> --- a/arch/x86/include/asm/mshyperv.h
->> +++ b/arch/x86/include/asm/mshyperv.h
->> @@ -6,9 +6,9 @@
->>  #include <linux/nmi.h>
->>  #include <linux/msi.h>
->>  #include <linux/io.h>
->> -#include <asm/hyperv-tlfs.h>
->>  #include <asm/nospec-branch.h>
->>  #include <asm/paravirt.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  /*
->>   * Hyper-V always provides a single IO-APIC at this MMIO address.
->> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
->> index f0dea3750ca9..913af68ad660 100644
->> --- a/arch/x86/include/asm/svm.h
->> +++ b/arch/x86/include/asm/svm.h
->> @@ -5,7 +5,7 @@
->>  #include <uapi/asm/svm.h>
->>  #include <uapi/asm/kvm.h>
->>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  /*
->>   * 32-bit intercept words in the VMCB Control Area, starting
->> diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
->> index e0fd57a8ba84..be0d1f4491d9 100644
->> --- a/arch/x86/kernel/cpu/mshyperv.c
->> +++ b/arch/x86/kernel/cpu/mshyperv.c
->> @@ -20,7 +20,7 @@
->>  #include <linux/random.h>
->>  #include <asm/processor.h>
->>  #include <asm/hypervisor.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>  #include <asm/desc.h>
->>  #include <asm/idtentry.h>
->> diff --git a/arch/x86/kvm/vmx/hyperv_evmcs.h b/arch/x86/kvm/vmx/hyperv_evmcs.h
->> index a543fccfc574..6536290f4274 100644
->> --- a/arch/x86/kvm/vmx/hyperv_evmcs.h
->> +++ b/arch/x86/kvm/vmx/hyperv_evmcs.h
->> @@ -6,7 +6,7 @@
->>  #ifndef __KVM_X86_VMX_HYPERV_EVMCS_H
->>  #define __KVM_X86_VMX_HYPERV_EVMCS_H
->>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #include "capabilities.h"
->>  #include "vmcs12.h"
->> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h
->> b/arch/x86/kvm/vmx/vmx_onhyperv.h
->> index eb48153bfd73..2b94ff301712 100644
->> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
->> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
->> @@ -3,7 +3,7 @@
->>  #ifndef __ARCH_X86_KVM_VMX_ONHYPERV_H__
->>  #define __ARCH_X86_KVM_VMX_ONHYPERV_H__
->>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>
->>  #include <linux/jump_label.h>
->> diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyperv_timer.c
->> index b2a080647e41..c1cc96a168c7 100644
->> --- a/drivers/clocksource/hyperv_timer.c
->> +++ b/drivers/clocksource/hyperv_timer.c
->> @@ -23,7 +23,7 @@
->>  #include <linux/acpi.h>
->>  #include <linux/hyperv.h>
->>  #include <clocksource/hyperv_timer.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>
->>  static struct clock_event_device __percpu *hv_clock_event;
->> diff --git a/drivers/hv/hv_balloon.c b/drivers/hv/hv_balloon.c
->> index c38dcdfcb914..d792df113962 100644
->> --- a/drivers/hv/hv_balloon.c
->> +++ b/drivers/hv/hv_balloon.c
->> @@ -28,7 +28,7 @@
->>  #include <linux/sizes.h>
->>
->>  #include <linux/hyperv.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #include <asm/mshyperv.h>
->>
->> @@ -1585,7 +1585,7 @@ static int hv_free_page_report(struct
->> page_reporting_dev_info *pr_dev_info,
->>  		return -ENOSPC;
->>  	}
->>
->> -	hint->type = HV_EXT_MEMORY_HEAT_HINT_TYPE_COLD_DISCARD;
->> +	hint->heat_type = HV_EXTMEM_HEAT_HINT_COLD_DISCARD;
->>  	hint->reserved = 0;
->>  	for_each_sg(sgl, sg, nents, i) {
->>  		union hv_gpa_page_range *range;
->> diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
->> index 9c452bfbd571..9ea05cbbf50d 100644
->> --- a/drivers/hv/hv_common.c
->> +++ b/drivers/hv/hv_common.c
->> @@ -28,7 +28,7 @@
->>  #include <linux/slab.h>
->>  #include <linux/dma-map-ops.h>
->>  #include <linux/set_memory.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>  #include <asm/mshyperv.h>
->>
->>  /*
->> diff --git a/drivers/hv/hv_kvp.c b/drivers/hv/hv_kvp.c
->> index d35b60c06114..bfb7a518b4ed 100644
->> --- a/drivers/hv/hv_kvp.c
->> +++ b/drivers/hv/hv_kvp.c
->> @@ -27,7 +27,7 @@
->>  #include <linux/connector.h>
->>  #include <linux/workqueue.h>
->>  #include <linux/hyperv.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #include "hyperv_vmbus.h"
->>  #include "hv_utils_transport.h"
->> diff --git a/drivers/hv/hv_snapshot.c b/drivers/hv/hv_snapshot.c
->> index 0d2184be1691..097ebd58f14e 100644
->> --- a/drivers/hv/hv_snapshot.c
->> +++ b/drivers/hv/hv_snapshot.c
->> @@ -12,7 +12,7 @@
->>  #include <linux/connector.h>
->>  #include <linux/workqueue.h>
->>  #include <linux/hyperv.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #include "hyperv_vmbus.h"
->>  #include "hv_utils_transport.h"
->> diff --git a/drivers/hv/hyperv_vmbus.h b/drivers/hv/hyperv_vmbus.h
->> index 76ac5185a01a..2bea654858e3 100644
->> --- a/drivers/hv/hyperv_vmbus.h
->> +++ b/drivers/hv/hyperv_vmbus.h
->> @@ -15,10 +15,10 @@
->>  #include <linux/list.h>
->>  #include <linux/bitops.h>
->>  #include <asm/sync_bitops.h>
->> -#include <asm/hyperv-tlfs.h>
->>  #include <linux/atomic.h>
->>  #include <linux/hyperv.h>
->>  #include <linux/interrupt.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #include "hv_trace.h"
->>
->> diff --git a/include/asm-generic/mshyperv.h b/include/asm-generic/mshyperv.h
->> index 8fe7aaab2599..138e416a0f9c 100644
->> --- a/include/asm-generic/mshyperv.h
->> +++ b/include/asm-generic/mshyperv.h
->> @@ -25,7 +25,7 @@
->>  #include <linux/cpumask.h>
->>  #include <linux/nmi.h>
->>  #include <asm/ptrace.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #define VTPM_BASE_ADDRESS 0xfed40000
->>
->> diff --git a/include/clocksource/hyperv_timer.h b/include/clocksource/hyperv_timer.h
->> index 6cdc873ac907..a4c81a60f53d 100644
->> --- a/include/clocksource/hyperv_timer.h
->> +++ b/include/clocksource/hyperv_timer.h
->> @@ -15,7 +15,7 @@
->>
->>  #include <linux/clocksource.h>
->>  #include <linux/math64.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #define HV_MAX_MAX_DELTA_TICKS 0xffffffff
->>  #define HV_MIN_DELTA_TICKS 1
->> diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
->> index d0893ec488ae..ed65b20defea 100644
->> --- a/include/linux/hyperv.h
->> +++ b/include/linux/hyperv.h
->> @@ -24,7 +24,7 @@
->>  #include <linux/mod_devicetable.h>
->>  #include <linux/interrupt.h>
->>  #include <linux/reciprocal_div.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  #define MAX_PAGE_BUFFER_COUNT				32
->>  #define MAX_MULTIPAGE_BUFFER_COUNT			32 /* 128K */
->> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
->> index e2157e387217..152b6ed8877d 100644
->> --- a/net/vmw_vsock/hyperv_transport.c
->> +++ b/net/vmw_vsock/hyperv_transport.c
->> @@ -13,7 +13,7 @@
->>  #include <linux/hyperv.h>
->>  #include <net/sock.h>
->>  #include <net/af_vsock.h>
->> -#include <asm/hyperv-tlfs.h>
->> +#include <hyperv/hvhdk.h>
->>
->>  /* Older (VMBUS version 'VERSION_WIN10' or before) Windows hosts have some
->>   * stricter requirements on the hv_sock ring buffer size of six 4K pages.
->> --
->> 2.34.1
+ arch/arm/mach-pxa/sharpsl_pm.c                      |  6 +++---
+ arch/powerpc/platforms/pseries/papr_scm.c           |  2 +-
+ arch/s390/kernel/lgr.c                              |  3 ++-
+ arch/s390/kernel/time.c                             |  4 ++--
+ arch/s390/kernel/topology.c                         |  2 +-
+ drivers/accel/habanalabs/common/device.c            |  2 +-
+ drivers/accel/habanalabs/common/habanalabs_drv.c    |  3 +--
+ drivers/block/xen-blkback/blkback.c                 |  2 +-
+ drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c            |  2 +-
+ drivers/gpu/drm/xe/xe_device.c                      |  2 +-
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c        |  6 ++----
+ drivers/net/ethernet/netronome/nfp/nfp_net_common.c |  2 +-
+ drivers/net/wireless/ath/ath11k/debugfs.c           |  2 +-
+ drivers/scsi/arcmsr/arcmsr_hba.c                    |  2 +-
+ drivers/scsi/lpfc/lpfc_init.c                       | 18 +++++++++---------
+ drivers/scsi/lpfc/lpfc_nportdisc.c                  |  8 ++++----
+ drivers/scsi/lpfc/lpfc_nvme.c                       |  2 +-
+ drivers/scsi/lpfc/lpfc_sli.c                        |  4 ++--
+ drivers/scsi/lpfc/lpfc_vmid.c                       |  2 +-
+ drivers/scsi/pm8001/pm8001_init.c                   |  2 +-
+ .../vc04_services/bcm2835-audio/bcm2835-vchiq.c     |  2 +-
+ fs/ceph/quota.c                                     |  2 +-
+ include/linux/jiffies.h                             | 13 +++++++++++++
+ mm/kmemleak.c                                       |  4 ++--
+ net/bluetooth/hci_event.c                           |  2 --
+ net/bluetooth/mgmt.c                                |  2 +-
+ net/netfilter/nf_conntrack_proto_sctp.c             | 21 ++++++++-------------
+ samples/livepatch/livepatch-callbacks-busymod.c     |  2 +-
+ samples/livepatch/livepatch-shadow-fix1.c           |  2 +-
+ samples/livepatch/livepatch-shadow-mod.c            | 10 +++++-----
+ scripts/coccinelle/misc/secs_to_jiffies.cocci       | 21 +++++++++++++++++++++
+ sound/usb/line6/toneport.c                          |  2 +-
+ 32 files changed, 92 insertions(+), 67 deletions(-)
+---
+base-commit: 2d5404caa8c7bb5c4e0435f94b28834ae5456623
+change-id: 20241112-converge-secs-to-jiffies-d99d1016bd11
+
+Best regards,
+-- 
+Easwar Hariharan <eahariha@linux.microsoft.com>
 
 
