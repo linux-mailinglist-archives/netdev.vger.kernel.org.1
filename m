@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-145107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5966E9CCD1F
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:32:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F0E9CCD30
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:32:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0947B2243A
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:32:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33F01F22551
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC3F1EA91;
-	Fri, 15 Nov 2024 00:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02AE15E8B;
+	Fri, 15 Nov 2024 00:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXwOrYMg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BizuAkgT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2661E49F;
-	Fri, 15 Nov 2024 00:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC38A1362
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 00:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731630715; cv=none; b=O1fNZuEwJojsGSTU1o3m7ksRTKb9aCCZikF5M5Vg8chrl0eM5CbjAbx8qCHeVuyEUzj/dhMSKKTCnAx4Bz/ZC5bGol3jVCI6LQkhiqLCOoIGsBnyO3l7MxRf6UDf7g1Kw3lP/VFifADKbiFYnRyhmJaiJVn1g4It+T18I2ocEPk=
+	t=1731630746; cv=none; b=I5gNmSBxTFeM5rM1rNYrKNEFEs5LH0JJy/zgc+5PEwoN/j9ffuA0iHvVuXJBMQ+zzDleg/lavfwe1ihaCQv2PWbp7Wy8toItbW0a2YYCwZOspr3X53ZcS2hBh5N9UGCu7bPLkm8PdjQgBDe4oendHrSfNqqsFfSThoRvIsltcWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731630715; c=relaxed/simple;
-	bh=LdyZfhGLcAffeQWdZ9vyCIw4OGV0nYZirm1HjPWiJ4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bU+hVQn5i6kv+FDG47pTzVwWuPDyAwjXoJSTfg3FBJmp0au70ag4tCdc5/hlBYZc+AbASRDs5onBkL0BW1ZbWz8XMbqY9KkrE0BJ5h2lu/+2JKY61cr4XVmT/uKSJNc2JiwIX9k+hBKSEc2nbHshxrRNQFV9uHtzXgcIp29PIrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nXwOrYMg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CED8C4CED4;
-	Fri, 15 Nov 2024 00:31:54 +0000 (UTC)
+	s=arc-20240116; t=1731630746; c=relaxed/simple;
+	bh=QuPQz7X7LzV3pUXR1NJ2Qm+3AYBIYfOU0aKBJJGG36w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZLrhOjHDYFw01MDhqPZJUpQNAowNuzIsqGsw609txZeS+hQuxSGJHHgSQqqJb4Fdy7LnrKYAC0sDjzymwr24SPCQtcLJssHr4xqEWM0fqnAR5WY0vmLNGHonE0DBBxzbN8dZmDQ14qj/yJimWSYRdNN92xLDHaK29iHOmVC3cSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BizuAkgT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D04C4CECD;
+	Fri, 15 Nov 2024 00:32:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731630714;
-	bh=LdyZfhGLcAffeQWdZ9vyCIw4OGV0nYZirm1HjPWiJ4c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nXwOrYMgGmyxfYqfFsUZXEUGR0kZH5McM15cOenYsvWgCzwWIyqst8hJYGSbEEfXI
-	 IcxiFRB9gAvOgZzAOFIh2IsQ0Kdj/FQBtQzDX5c78qwJU1op3siUY+H83HH4v105yU
-	 4CttpV+2lgbYc1CJAv2+WPP+PMicar1U+Md6pZBN+DCWMEyqLHlskMFgXMeEJxMYFo
-	 XQrxFx0dWo2Ftq3+XYg1tcAuIe4526kUAkYmabUSVe4qMOfFf8C9f+QYdJtGa5B9AX
-	 oJOvYr0Zn1uDbVz5zeH1yEaqtQMZMMsXnGQL808PXmTBBFRr1PLh2g3rQHYepmfYqL
-	 XPoeKbekSewSA==
+	s=k20201202; t=1731630746;
+	bh=QuPQz7X7LzV3pUXR1NJ2Qm+3AYBIYfOU0aKBJJGG36w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BizuAkgTuFl6jmBJfYfzEwYf1wR/PpeJmS5LvfzkrBcm2LUqklMRvsWdxZiE7Zf5e
+	 1d7Mqw9ur9PR6zCn7qjIdbcYssRFzoEhUi0d3UFEQ6Nj9d/NwinL/+OUHx12meHjZT
+	 jBCB+NDDjdIy+JyIKD1Tjvjxg9Grsj+355GhvcOmMBNnnJEEfBTPTu8YH+b1D5alal
+	 50IafNZr+QpA6WpnOfCWmxX5zaB+nPX3ns7PpxEYA0Wo6x1ITRZmpO40Sli1C1dBZ+
+	 WwvEPQuOgaOBu22Y1WeE0eOZl6SjNPSjkmeKgsVNN6XnYAqHKNbCQ2e9AjLJCgMy28
+	 9gqlyuCQ4Yl7A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 2/2] selftests: net: test extacks in netlink dumps
-Date: Thu, 14 Nov 2024 16:31:50 -0800
-Message-ID: <20241115003150.733141-2-kuba@kernel.org>
+	joel.granados@kernel.org
+Subject: [PATCH net-next] net/neighbor: clear error in case strict check is not set
+Date: Thu, 14 Nov 2024 16:32:21 -0800
+Message-ID: <20241115003221.733593-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241115003150.733141-1-kuba@kernel.org>
-References: <20241115003150.733141-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,187 +59,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Test that extacks in dumps work. The test fills up the receive buffer
-to test both the inline dump (as part of sendmsg()) and delayed one
-(run during recvmsg()).
+Commit 51183d233b5a ("net/neighbor: Update neigh_dump_info for strict
+data checking") added strict checking. The err variable is not cleared,
+so if we find no table to dump we will return the validation error even
+if user did not want strict checking.
 
-Use YNL helpers to parse the messages. We need to add the test to YNL
-file to make sure the right include path are used.
+I think the only way to hit this is to send an buggy request, and ask
+for a table which doesn't exist, so there's no point treating this
+as a real fix. I only noticed it because a syzbot repro depended on it
+to trigger another bug.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: linux-kselftest@vger.kernel.org
+CC: joel.granados@kernel.org
 ---
- tools/testing/selftests/net/Makefile        |   3 +-
- tools/testing/selftests/net/netlink-dumps.c | 129 ++++++++++++++++++++
- 2 files changed, 130 insertions(+), 2 deletions(-)
+ net/core/neighbour.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 5e86f7a51b43..c427ee32b193 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -78,7 +78,6 @@ TEST_PROGS += test_vxlan_vnifiltering.sh
- TEST_GEN_FILES += io_uring_zerocopy_tx
- TEST_PROGS += io_uring_zerocopy_tx.sh
- TEST_GEN_FILES += bind_bhash
--TEST_GEN_PROGS += netlink-dumps
- TEST_GEN_PROGS += sk_bind_sendto_listen
- TEST_GEN_PROGS += sk_connect_zero_addr
- TEST_GEN_PROGS += sk_so_peek_off
-@@ -100,7 +99,7 @@ TEST_PROGS += bpf_offload.py
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 77b819cd995b..cc58315a40a7 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -2876,6 +2876,7 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 	err = neigh_valid_dump_req(nlh, cb->strict_check, &filter, cb->extack);
+ 	if (err < 0 && cb->strict_check)
+ 		return err;
++	err = 0;
  
- # YNL files, must be before "include ..lib.mk"
- EXTRA_CLEAN += $(OUTPUT)/libynl.a
--YNL_GEN_FILES := ncdevmem
-+YNL_GEN_FILES := ncdevmem netlink-dumps
- TEST_GEN_FILES += $(YNL_GEN_FILES)
+ 	s_t = cb->args[0];
  
- TEST_FILES := settings
-diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
-index 7ee6dcd334df..195febbf6a61 100644
---- a/tools/testing/selftests/net/netlink-dumps.c
-+++ b/tools/testing/selftests/net/netlink-dumps.c
-@@ -12,11 +12,140 @@
- #include <unistd.h>
- 
- #include <linux/genetlink.h>
-+#include <linux/neighbour.h>
-+#include <linux/netdevice.h>
- #include <linux/netlink.h>
- #include <linux/mqueue.h>
-+#include <linux/rtnetlink.h>
- 
- #include "../kselftest_harness.h"
- 
-+#include <ynl.h>
-+
-+struct ext_ack {
-+	int err;
-+
-+	__u32 attr_offs;
-+	__u32 miss_type;
-+	__u32 miss_nest;
-+	const char *str;
-+};
-+
-+/* 0: no done, 1: done found, 2: extack found, -1: error */
-+static int nl_get_extack(char *buf, size_t n, struct ext_ack *ea)
-+{
-+	const struct nlmsghdr *nlh;
-+	const struct nlattr *attr;
-+	ssize_t rem;
-+
-+	for (rem = n; rem > 0; NLMSG_NEXT(nlh, rem)) {
-+		nlh = (struct nlmsghdr *)&buf[n - rem];
-+		if (!NLMSG_OK(nlh, rem))
-+			return -1;
-+
-+		if (nlh->nlmsg_type != NLMSG_DONE)
-+			continue;
-+
-+		ea->err = -*(int *)NLMSG_DATA(nlh);
-+
-+		if (!(nlh->nlmsg_flags & NLM_F_ACK_TLVS))
-+			return 1;
-+
-+		ynl_attr_for_each(attr, nlh, sizeof(int)) {
-+			switch (ynl_attr_type(attr)) {
-+			case NLMSGERR_ATTR_OFFS:
-+				ea->attr_offs = ynl_attr_get_u32(attr);
-+				break;
-+			case NLMSGERR_ATTR_MISS_TYPE:
-+				ea->miss_type = ynl_attr_get_u32(attr);
-+				break;
-+			case NLMSGERR_ATTR_MISS_NEST:
-+				ea->miss_nest = ynl_attr_get_u32(attr);
-+				break;
-+			case NLMSGERR_ATTR_MSG:
-+				ea->str = ynl_attr_get_str(attr);
-+				break;
-+			}
-+		}
-+
-+		return 2;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct {
-+	struct nlmsghdr nlhdr;
-+	struct ndmsg ndm;
-+	struct nlattr ahdr;
-+	__u32 val;
-+} dump_neigh_bad = {
-+	.nlhdr = {
-+		.nlmsg_len	= sizeof(dump_neigh_bad),
-+		.nlmsg_type	= RTM_GETNEIGH,
-+		.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP,
-+		.nlmsg_seq	= 1,
-+	},
-+	.ndm = {
-+		.ndm_family	= 123,
-+	},
-+	.ahdr = {
-+		.nla_len	= 4 + 4,
-+		.nla_type	= NDA_FLAGS_EXT,
-+	},
-+	.val = -1, // should fail MASK validation
-+};
-+
-+TEST(dump_extack)
-+{
-+	int netlink_sock;
-+	char buf[8192];
-+	int one = 1;
-+	int i, cnt;
-+	ssize_t n;
-+
-+	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-+	ASSERT_GE(netlink_sock, 0);
-+
-+	n = setsockopt(netlink_sock, SOL_NETLINK, NETLINK_CAP_ACK,
-+		       &one, sizeof(one));
-+	ASSERT_EQ(n, 0);
-+	n = setsockopt(netlink_sock, SOL_NETLINK, NETLINK_EXT_ACK,
-+		       &one, sizeof(one));
-+	ASSERT_EQ(n, 0);
-+	n = setsockopt(netlink_sock, SOL_NETLINK, NETLINK_GET_STRICT_CHK,
-+		       &one, sizeof(one));
-+	ASSERT_EQ(n, 0);
-+
-+	/* Dump so many times we fill up the buffer */
-+	cnt = 64;
-+	for (i = 0; i < cnt; i++) {
-+		n = send(netlink_sock, &dump_neigh_bad,
-+			 sizeof(dump_neigh_bad), 0);
-+		ASSERT_EQ(n, sizeof(dump_neigh_bad));
-+	}
-+
-+	/* Read out the ENOBUFS */
-+	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
-+	EXPECT_EQ(n, -1);
-+	EXPECT_EQ(errno, ENOBUFS);
-+
-+	for (i = 0; i < cnt; i++) {
-+		struct ext_ack ea = {};
-+
-+		n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
-+		if (n < 0) {
-+			ASSERT_GE(i, 10);
-+			break;
-+		}
-+		ASSERT_GE(n, (ssize_t)sizeof(struct nlmsghdr));
-+
-+		EXPECT_EQ(nl_get_extack(buf, n, &ea), 2);
-+		EXPECT_EQ(ea.attr_offs,
-+			  sizeof(struct nlmsghdr) + sizeof(struct ndmsg));
-+	}
-+}
-+
- static const struct {
- 	struct nlmsghdr nlhdr;
- 	struct genlmsghdr genlhdr;
 -- 
 2.47.0
 
