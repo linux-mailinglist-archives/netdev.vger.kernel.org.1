@@ -1,118 +1,278 @@
-Return-Path: <netdev+bounces-145238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD529CDD50
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:13:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446B39CDDEF
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76376B2605B
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:13:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 985CCB25724
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED68B1B6D17;
-	Fri, 15 Nov 2024 11:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9791BA89C;
+	Fri, 15 Nov 2024 11:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KkLoNxkN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6PfnwHS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703FF1BA89C;
-	Fri, 15 Nov 2024 11:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DCF1B85C0
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 11:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731669159; cv=none; b=hBXgFvFllgIshcrsUHYqZWcMOoEbRYd54uu8Wm1kauPzOBS2qCnL1cS1eZp0fAqZiZMTSCkO5ftfSgOt4Ed+uL9p6w2Yyne8cqWR/Aqp78ljfFh3Tf1gdgGUpo8PToTxY02bSuzxF62OAGgA73c1L1egAZglVZ5jBH9DF2F46VU=
+	t=1731671963; cv=none; b=GQRwgxvaLJ6Tl0VU/3EouaAPKCcTIZhmlHNhlWvhClwS00QdsFdJSdgI3abN4XAc4oHqvZD4NthXvuBneprYwg1te1IO5lx2bwf2S8s8lGzeda5NwAiHdkgGanzbNeftKwP6SJA6jCz6lhkoVSxz4ccRgjNvb8Yug8VBx+OICOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731669159; c=relaxed/simple;
-	bh=YqpnsuBVVUj80WoJfL9985bvH3cQ9fyiXqy0b0EDE5E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N8ZWoqEpGEO+U8v78+r4wb4bonqAu/tPzN2KWZ/xFzu8hK5qY2ggIwKoz0CEBQMcWE1I3CkyC1YVFunh6xRyYi6xlUqeDyjBWiWdX7M9WGAsqTe1NODnGjKIDMyhye/Bd+jCotpnDZ406Cj9uMGetIQCXZ0qwadze0hg5Qbd8IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KkLoNxkN; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731669159; x=1763205159;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YqpnsuBVVUj80WoJfL9985bvH3cQ9fyiXqy0b0EDE5E=;
-  b=KkLoNxkNZfTnmvBvrawyUqTnQdI20aRMN66idkniHst+XhJINIOqhnUt
-   gkFa1GSqxadDLKAdkcnrOEW/lQuGOoBqm4xWmnrga6D7sD1T4HMmZXbRl
-   BNAA3knSBLAcgZfIsl4FzSbUPMwKRArsUnyukQV5VS+/rD5rLfjoQy0+M
-   Q2pToAG830AAJnx2zEgnp8Y1P6pW98sUMJTvZVci72jeG1mj8/gaaw0+Z
-   zHKobXHlY9bUQZR22bBmVR/RSJiQT03WgPH4ms/WyUSz6/cVT0uqlYuhW
-   6C70Oj8H+KSLGbc9sMOQCzpRaDwbORRTva/mM0Jmm6GDNwb062/MrxLm2
-   w==;
-X-CSE-ConnectionGUID: wHp1zBjnTE2M1o9OkT4jAA==
-X-CSE-MsgGUID: UQ1mjR0ST+i3Y1RqcC1cMg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11256"; a="34543484"
-X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
-   d="scan'208";a="34543484"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2024 03:12:38 -0800
-X-CSE-ConnectionGUID: tgyKVCdzSoGlFTnzA7d8+g==
-X-CSE-MsgGUID: IsgtgJfuRK+d4o9hIYvaqQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,156,1728975600"; 
-   d="scan'208";a="88112384"
-Received: from unknown (HELO YongLiang-Ubuntu20-iLBPG12.png.intel.com) ([10.88.229.33])
-  by fmviesa006.fm.intel.com with ESMTP; 15 Nov 2024 03:12:35 -0800
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net v2 2/2] net: stmmac: set initial EEE policy configuration
-Date: Fri, 15 Nov 2024 19:11:51 +0800
-Message-Id: <20241115111151.183108-3-yong.liang.choong@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
-References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1731671963; c=relaxed/simple;
+	bh=2pulDDreteiHjL9r4qUGqKDhpqeb1HMkFOW42Xg7+Go=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kL+Gn7+blUGz8boPC2n6N/PvisTJyOs1exE7LCkiNeI47HRmHVnP9dk4aEEnUTZH/bFMfwwY7dZdXjghgXt5qVowGaDolZt+pXpsiHwqHG17nmc72wsfFjVtHjzby5hsCOUCEuD1BaJn9hUzULlONwp1m8Kl0u2OX6W92zRx874=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6PfnwHS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731671960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KWFhnUI/8u1MsI357oWFQrDLalvod+ZiB7DQP1zPYnA=;
+	b=N6PfnwHSnw8ElqvfDpbFO5/woGEVGcgDRt+1S449QeFmvCXlJhW4SMVh0FuV0LV0hHbivf
+	RB+pPjAqbBEjFjfnW0uGaOp06rAg3zSlm2nzVV7PbhTwFeo2V6oELqtLVYOTgOlcpH61Q3
+	lB3xEKGWbpkDm9c35pOcwa0R9weGW7Y=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-WN9_3Mh4MjCCvXK9IoZREQ-1; Fri, 15 Nov 2024 06:59:19 -0500
+X-MC-Unique: WN9_3Mh4MjCCvXK9IoZREQ-1
+X-Mimecast-MFC-AGG-ID: WN9_3Mh4MjCCvXK9IoZREQ
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b147855414so203871785a.0
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 03:59:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731671959; x=1732276759;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KWFhnUI/8u1MsI357oWFQrDLalvod+ZiB7DQP1zPYnA=;
+        b=ve2eHz4qoO66hg9HbBYeBpsD+wST6JVXVK6UydsZMUUmrtiSJihhPxwPriV6zxMS7w
+         l6rxgMYDL8Baxff5pU3wQuZ0XrtFGIZgkw66wGvdLYsu4ljsjhOeEIiq+GLndKpH4uZa
+         K5F564jwfMN5SyQkq+Fl921Wc342d9qR8w6vtkQQh5jnQ1notLBDKVsGI1Mu+KhszJ0o
+         rHTTJvCm73vmDa3WsCVpOlfqYMvxDZBT5H8uYEEZRwA5YlPknpEIbjFuoM5abEw1NrOP
+         al4QQXwsgvhpsSpnZ94FfWmFsvodTpsYXvaafZuAEvPNvW07BEUVVXuIBzWj385jnGRg
+         D5Jg==
+X-Gm-Message-State: AOJu0YwgAUxjX5rhbXQFZNn0o+DwWRtvC5wHpDD46y/IAtN5rIs8asvm
+	f4KB3t4l+6KgpxzmTxCRxsRy3jYbn7ZZN4uteEHwKLkAYR7z4NpNAxanCG182JMUJv7tZARBA0v
+	Dh7fP9lqpLbbJrqbhfVh+kbRz37Dv6r67KuqAHSfQksuB+uBrBtaY9w==
+X-Received: by 2002:a05:620a:179e:b0:7b3:56f4:6e09 with SMTP id af79cd13be357-7b3622bcab6mr264000385a.27.1731671958887;
+        Fri, 15 Nov 2024 03:59:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEfVKO66Y6rgNt/itCv3b+8Dv2NvBLsA25nUYuxO9qTqEw2uRmmntwxkoCY3pA5nCghXARiwg==
+X-Received: by 2002:a05:620a:179e:b0:7b3:56f4:6e09 with SMTP id af79cd13be357-7b3622bcab6mr263998485a.27.1731671958500;
+        Fri, 15 Nov 2024 03:59:18 -0800 (PST)
+Received: from sgarzare-redhat ([79.46.200.129])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b35c984691sm151968885a.2.2024.11.15.03.59.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 03:59:17 -0800 (PST)
+Date: Fri, 15 Nov 2024 12:59:07 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, Asias He <asias@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] vsock/virtio: Remove queued_replies pushback logic
+Message-ID: <yjhfe5bsnfpqbnibxl2urrnuowzitxnrbodlihz4y5csig7e7p@drgxxxxgokfo>
+References: <20241115103016.86461-1-graf@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241115103016.86461-1-graf@amazon.com>
 
-Set the initial eee_cfg values to have 'ethtool --show-eee ' display
-the initial EEE configuration.
+On Fri, Nov 15, 2024 at 10:30:16AM +0000, Alexander Graf wrote:
+>Ever since the introduction of the virtio vsock driver, it included
+>pushback logic that blocks it from taking any new RX packets until the
+>TX queue backlog becomes shallower than the virtqueue size.
+>
+>This logic works fine when you connect a user space application on the
+>hypervisor with a virtio-vsock target, because the guest will stop
+>receiving data until the host pulled all outstanding data from the VM.
 
-Fixes: 3eeca4e199ce ("net: phy: do not force EEE support")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+So, why not skipping this only when talking with a sibling VM?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 7bf275f127c9..766213ee82c1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1205,6 +1205,9 @@ static int stmmac_init_phy(struct net_device *dev)
- 			return -ENODEV;
- 		}
- 
-+		if (priv->dma_cap.eee)
-+			phy_support_eee(phydev);
-+
- 		ret = phylink_connect_phy(priv->phylink, phydev);
- 	} else {
- 		fwnode_handle_put(phy_fwnode);
--- 
-2.34.1
+>
+>With Nitro Enclaves however, we connect 2 VMs directly via vsock:
+>
+>  Parent      Enclave
+>
+>    RX -------- TX
+>    TX -------- RX
+>
+>This means we now have 2 virtio-vsock backends that both have the pushback
+>logic. If the parent's TX queue runs full at the same time as the
+>Enclave's, both virtio-vsock drivers fall into the pushback path and
+>no longer accept RX traffic. However, that RX traffic is TX traffic on
+>the other side which blocks that driver from making any forward
+>progress. We're not in a deadlock.
+>
+>To resolve this, let's remove that pushback logic altogether and rely on
+>higher levels (like credits) to ensure we do not consume unbounded
+>memory.
+
+I spoke quickly with Stefan who has been following the development from
+the beginning and actually pointed out that there might be problems
+with the control packets, since credits only covers data packets, so
+it doesn't seem like a good idea remove this mechanism completely.
+
+>
+>Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+
+I'm not sure we should add this Fixes tag, this seems very risky
+backporting on stable branches IMHO.
+
+If we cannot find a better mechanism to replace this with something
+that works both guest <-> host and guest <-> guest, I would prefer
+to do this just for guest <-> guest communication.
+Because removing this completely seems too risky for me, at least
+without a proof that control packets are fine.
+
+Thanks,
+Stefano
+
+>Signed-off-by: Alexander Graf <graf@amazon.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 51 ++------------------------------
+> 1 file changed, 2 insertions(+), 49 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 64a07acfef12..53e79779886c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -44,8 +44,6 @@ struct virtio_vsock {
+> 	struct work_struct send_pkt_work;
+> 	struct sk_buff_head send_pkt_queue;
+>
+>-	atomic_t queued_replies;
+>-
+> 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
+> 	 * must be accessed with rx_lock held.
+> 	 */
+>@@ -171,17 +169,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>
+> 		virtio_transport_deliver_tap_pkt(skb);
+>
+>-		if (reply) {
+>-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+>-			int val;
+>-
+>-			val = atomic_dec_return(&vsock->queued_replies);
+>-
+>-			/* Do we now have resources to resume rx processing? */
+>-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
+>-				restart_rx = true;
+>-		}
+>-
+> 		added = true;
+> 	}
+>
+>@@ -218,9 +205,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
+> 		goto out_rcu;
+> 	}
+>
+>-	if (virtio_vsock_skb_reply(skb))
+>-		atomic_inc(&vsock->queued_replies);
+>-
+> 	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+> 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+>
+>@@ -233,7 +217,7 @@ static int
+> virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> {
+> 	struct virtio_vsock *vsock;
+>-	int cnt = 0, ret;
+>+	int ret;
+>
+> 	rcu_read_lock();
+> 	vsock = rcu_dereference(the_virtio_vsock);
+>@@ -242,17 +226,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> 		goto out_rcu;
+> 	}
+>
+>-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+>-
+>-	if (cnt) {
+>-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+>-		int new_cnt;
+>-
+>-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
+>-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
+>-		    new_cnt < virtqueue_get_vring_size(rx_vq))
+>-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>-	}
+>+	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+>
+> 	ret = 0;
+>
+>@@ -323,18 +297,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
+> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> }
+>
+>-/* Is there space left for replies to rx packets? */
+>-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
+>-{
+>-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
+>-	int val;
+>-
+>-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
+>-	val = atomic_read(&vsock->queued_replies);
+>-
+>-	return val < virtqueue_get_vring_size(vq);
+>-}
+>-
+> /* event_lock must be held */
+> static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
+> 				       struct virtio_vsock_event *event)
+>@@ -581,14 +543,6 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 			struct sk_buff *skb;
+> 			unsigned int len;
+>
+>-			if (!virtio_transport_more_replies(vsock)) {
+>-				/* Stop rx until the device processes already
+>-				 * pending replies.  Leave rx virtqueue
+>-				 * callbacks disabled.
+>-				 */
+>-				goto out;
+>-			}
+>-
+> 			skb = virtqueue_get_buf(vq, &len);
+> 			if (!skb)
+> 				break;
+>@@ -735,7 +689,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>
+> 	vsock->rx_buf_nr = 0;
+> 	vsock->rx_buf_max_nr = 0;
+>-	atomic_set(&vsock->queued_replies, 0);
+>
+> 	mutex_init(&vsock->tx_lock);
+> 	mutex_init(&vsock->rx_lock);
+>-- 
+>2.40.1
+>
+>
+>
+>
+>Amazon Web Services Development Center Germany GmbH
+>Krausenstr. 38
+>10117 Berlin
+>Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+>Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+>Sitz: Berlin
+>Ust-ID: DE 365 538 597
+>
+>
 
 
