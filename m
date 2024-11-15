@@ -1,75 +1,43 @@
-Return-Path: <netdev+bounces-145281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDC69CE06B
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:44:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD46B9CE083
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:48:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB93D288A45
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:44:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBB3828C562
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0350B1CEEB2;
-	Fri, 15 Nov 2024 13:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cFoEq/ui"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B85D1D4333;
+	Fri, 15 Nov 2024 13:44:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6FD1CEE98;
-	Fri, 15 Nov 2024 13:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED601D433C
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 13:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731678119; cv=none; b=rT6cqBEvMUU9Nh65e0uphDIhvl4R8/+qxQtQQ2RdOwxkJ6ZL2mlvClaO/MuS/9mqrrtznrrEeg1j5Btn/sUiHgmeWJq4Q8XbPxHo7k/Rhi2VCEEDZ8jN8TFvjRkSS1wTgAYzDwbQiYjlmwaRZ1dK47gx6HYd5QLnwJAY9St4jyo=
+	t=1731678260; cv=none; b=UertwVy6kYYfnvPSEpMcLMLmcxTBYMCdO+zw9k9BNgb0LWNyr6zbAPQWXXR3jRvcTWP3jiDUCeuhIWiQgnfMLNGi3+MBJqL9nghbMe+dIjpZa9JkQJJ+F4boQ6eorrAeeR/qDkEOlizmeBZBsrlHkjhjmmZv0NN2cv1ccN17pW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731678119; c=relaxed/simple;
-	bh=hRf+VnrslbS6Gra4rG8tKwLOvhJZYSoAdLoxpwx0n98=;
+	s=arc-20240116; t=1731678260; c=relaxed/simple;
+	bh=UhBEdOSui9VyyiYzOcamZHyoZCLsv43+dZ9dHKwhbNo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XJ41KnStjmbo9aH4cwHTNJAa+es9jKn3AMUjtrNlYknIIUmWe9K8RtNUYCcUPlvJGEYHhsSJw0+getDYVSLle1ADeVdh8VuBCPOoeJlSUZDf6VDieNZJNiO+DfeXceSEZDJ9cnUw3iTqkBekS2i6NxGVKnUD5Gh2T2VsSeKbs/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cFoEq/ui; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9a850270e2so343701566b.0;
-        Fri, 15 Nov 2024 05:41:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731678116; x=1732282916; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DFKvh8X0eWRG0GFEe/XAbitN4YrNcuJmHBxKKcIml5E=;
-        b=cFoEq/uipf3+/Kqcw7+3YESu0qtF+lxzW7j6D1xraEw81fZZ4sp9vzw2QCoJF49Vx0
-         WijWOY3GH4A4zWH66rbVFYW0301vy3Yz1WCei8WvtVO2OZRKWEEcRcJeO2emNV+mqH20
-         blv79rSqWjG+3h5j5rYiOgsSFV1o0d6NN8UM38565ahGmjbqulvSA4wk74BYBF8k282+
-         xNRXPlT+xmj8YpxcOakuxr0UazeOM+WPpvu8Ood6umXef62NOg+KrRv0Q4GfIAs9CNNa
-         bFnCqZs8BiX1sJuM/iaj3QWMyB7n2+CrUlINPLlGEFmKvOiaR7g27B3OzbfDUBqaEF/m
-         PRXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731678116; x=1732282916;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DFKvh8X0eWRG0GFEe/XAbitN4YrNcuJmHBxKKcIml5E=;
-        b=utt5VrYEZmQhjbvz3FElXbDNXnrviuamBPuhLXgEcpFWhh5flzUpZrRZE/l8zH8U7F
-         tXA6CYLg0OC1300NsUX+V0+7WxhPYfi2fmal3zw/FQft4Fsl813DDoe89BHHTZPFW5gy
-         xxW76neszPXUGEIwk8QYfmJXQmeN/PXr/Ng1oQQTUdBfCQJr82mXzlbt18EoZZHlQXVx
-         2gCCUptGwNuliT0Yd//7tmq1nf48SKVfvaOPn24cXfkEuRSqmdXwGpxhEiYiddJy2t8C
-         JKE7dXU9V+HzAH6XR8hDJP1CFUAQyAGsuk+a+mvXQUIBRzaO7oPPUcjCZKEfy0ayDjhN
-         njnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfhAiT0LCfpbpe56h02pTG4cDxKGZ9CPZdsbBWJOAeQqVc1DVk5mqExxHm/46J/SUcYq80fSbtFFt9N3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMFbB5Dvv4Me5/sciOea09wy/STYzT794g+HEtl+vX5Di9Io/O
-	NkRZU7RKcOLRoGK0ONthRVAUzi4Hys9ooL3C7F8QfczpMxcur20/
-X-Google-Smtp-Source: AGHT+IEoHu0EWFGsk5B5nmRU8tr0m7Q8f4H38YW4o1/LtZol1g9TFT30zrsCH3v5q410wB/tfXRjMg==
-X-Received: by 2002:a17:907:9802:b0:a9a:1778:7024 with SMTP id a640c23a62f3a-aa483421c64mr246131566b.20.1731678116100;
-        Fri, 15 Nov 2024 05:41:56 -0800 (PST)
-Received: from ?IPV6:2a02:3100:b259:e900:7566:ab7c:4e9b:5c72? (dynamic-2a02-3100-b259-e900-7566-ab7c-4e9b-5c72.310.pool.telefonica.de. [2a02:3100:b259:e900:7566:ab7c:4e9b:5c72])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa20dfffc00sm183182066b.101.2024.11.15.05.41.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 05:41:54 -0800 (PST)
-Message-ID: <403be2f6-bab1-4a63-bad4-c7eac1e572ee@gmail.com>
-Date: Fri, 15 Nov 2024 14:41:54 +0100
+	 In-Reply-To:Content-Type; b=gQcJy7TC8nmBbB3HiVDWV8ka/cw4+zBhga0B7VhAKNd+cj/BYeL7B5ou3jDejlFofqpz+taFWy2qSOpTVAtynR10akpRlt7viY0KkZ066DHFBZ/DexSgzFXWAzkWZ4zvMmyZzSzG1ymuTNX/cQWj3BK1yV/ud7I/3IDxdIb5P4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8244661E5FE05;
+	Fri, 15 Nov 2024 14:43:45 +0100 (CET)
+Message-ID: <4aa6f9f2-e3d9-4255-a964-c03d611d848e@molgen.mpg.de>
+Date: Fri, 15 Nov 2024 14:43:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,106 +45,284 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/2] Fix 'ethtool --show-eee' during initial stage
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net 01/10] idpf: initial PTP support
+To: Milena Olech <milena.olech@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20241113154616.2493297-1-milena.olech@intel.com>
+ <20241113154616.2493297-2-milena.olech@intel.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241113154616.2493297-2-milena.olech@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 15.11.2024 12:11, Choong Yong Liang wrote:
-> From: Choong Yong Liang <yong.liang.choong@intel.com>
-> 
-> When the MAC boots up with a Marvell PHY and phy_support_eee() is implemented,
-> the 'ethtool --show-eee' command shows that EEE is enabled, but in actuality,
-> the driver side is disabled. If we try to enable EEE through
-> 'ethtool --set-eee' for a Marvell PHY, nothing happens because the eee_cfg
-> matches the setting required to enable EEE in ethnl_set_eee().
-> 
-> This patch series will remove phydev->eee_enabled and replace it with
-> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(), it
-> will follow the master configuration to have software and hardware in sync,
-> allowing 'ethtool --show-eee' to display the correct value during the
-> initial stage.
-> 
-> v2 changes:
->  - Implement the prototype suggested by Russell
->  - Check EEE before calling phy_support_eee()
-> 
-> Thanks to Russell for the proposed prototype in [1].
-> 
-> Reference:
-> [1] https://patchwork.kernel.org/comment/26121323/
-> 
-> Choong Yong Liang (2):
->   net: phy: replace phydev->eee_enabled with eee_cfg.eee_enabled
->   net: stmmac: set initial EEE policy configuration
-> 
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  3 +++
->  drivers/net/phy/phy-c45.c                         | 11 +++++------
->  drivers/net/phy/phy_device.c                      |  6 +++---
->  include/linux/phy.h                               |  5 ++---
->  4 files changed, 13 insertions(+), 12 deletions(-)
-> 
+Dear Milena,
 
-Russell submitted the proposed patch already:
-https://patchwork.kernel.org/project/netdevbpf/patch/E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk/
-So there's no need for your patch 1.
 
+Thank you for your patch. It’d be great if you used a statement for the 
+summary/title by adding a verb (in imperative mood):
+
+idpf: Add initial PTP support
+
+Am 13.11.24 um 16:46 schrieb Milena Olech:
+> PTP feature is supported if the VIRTCHNL2_CAP_PTP is negotiated during the
+> capabilities recognition. Initial PTP support includes PTP initialization
+> and registration of the clock.
+
+Maybe mention/paste the new debug messages, and document on what device 
+you tested it?
+
+
+Kind regards,
+
+Paul
+
+
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> ---
+>   drivers/net/ethernet/intel/idpf/Kconfig       |  1 +
+>   drivers/net/ethernet/intel/idpf/Makefile      |  1 +
+>   drivers/net/ethernet/intel/idpf/idpf.h        |  3 +
+>   drivers/net/ethernet/intel/idpf/idpf_main.c   |  4 +
+>   drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 89 +++++++++++++++++++
+>   drivers/net/ethernet/intel/idpf/idpf_ptp.h    | 32 +++++++
+>   .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  9 +-
+>   7 files changed, 138 insertions(+), 1 deletion(-)
+>   create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.c
+>   create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.h
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/Kconfig b/drivers/net/ethernet/intel/idpf/Kconfig
+> index 1addd663acad..2c359a8551c7 100644
+> --- a/drivers/net/ethernet/intel/idpf/Kconfig
+> +++ b/drivers/net/ethernet/intel/idpf/Kconfig
+> @@ -4,6 +4,7 @@
+>   config IDPF
+>   	tristate "Intel(R) Infrastructure Data Path Function Support"
+>   	depends on PCI_MSI
+> +	depends on PTP_1588_CLOCK_OPTIONAL
+>   	select DIMLIB
+>   	select LIBETH
+>   	help
+> diff --git a/drivers/net/ethernet/intel/idpf/Makefile b/drivers/net/ethernet/intel/idpf/Makefile
+> index 2ce01a0b5898..1f38a9d7125c 100644
+> --- a/drivers/net/ethernet/intel/idpf/Makefile
+> +++ b/drivers/net/ethernet/intel/idpf/Makefile
+> @@ -17,3 +17,4 @@ idpf-y := \
+>   	idpf_vf_dev.o
+>   
+>   idpf-$(CONFIG_IDPF_SINGLEQ)	+= idpf_singleq_txrx.o
+> +idpf-$(CONFIG_PTP_1588_CLOCK)	+= idpf_ptp.o
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+> index 66544faab710..2e8b14dd9d96 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+> @@ -530,6 +530,7 @@ struct idpf_vc_xn_manager;
+>    * @vector_lock: Lock to protect vector distribution
+>    * @queue_lock: Lock to protect queue distribution
+>    * @vc_buf_lock: Lock to protect virtchnl buffer
+> + * @ptp: Storage for PTP-related data
+>    */
+>   struct idpf_adapter {
+>   	struct pci_dev *pdev;
+> @@ -587,6 +588,8 @@ struct idpf_adapter {
+>   	struct mutex vector_lock;
+>   	struct mutex queue_lock;
+>   	struct mutex vc_buf_lock;
+> +
+> +	struct idpf_ptp *ptp;
+>   };
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> index db476b3314c8..22d9e2646444 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> @@ -163,6 +163,10 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   		goto err_free;
+>   	}
+>   
+> +	err = pci_enable_ptm(pdev, NULL);
+> +	if (err)
+> +		pci_dbg(pdev, "PCIe PTM is not supported by PCIe bus/controller\n");
+> +
+>   	/* set up for high or low dma */
+>   	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+>   	if (err) {
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> new file mode 100644
+> index 000000000000..1ac6367f5989
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> @@ -0,0 +1,89 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright (C) 2024 Intel Corporation */
+> +
+> +#include "idpf.h"
+> +#include "idpf_ptp.h"
+> +
+> +/**
+> + * idpf_ptp_create_clock - Create PTP clock device for userspace
+> + * @adapter: Driver specific private structure
+> + *
+> + * This function creates a new PTP clock device.
+> + *
+> + * Return: 0 on success, -errno otherwise.
+> + */
+> +static int idpf_ptp_create_clock(const struct idpf_adapter *adapter)
+> +{
+> +	struct ptp_clock *clock;
+> +
+> +	/* Attempt to register the clock before enabling the hardware. */
+> +	clock = ptp_clock_register(&adapter->ptp->info,
+> +				   &adapter->pdev->dev);
+> +	if (IS_ERR(clock)) {
+> +		pci_err(adapter->pdev, "PTP clock creation failed: %pe\n", clock);
+> +		return PTR_ERR(clock);
+> +	}
+> +
+> +	adapter->ptp->clock = clock;
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * idpf_ptp_init - Initialize PTP hardware clock support
+> + * @adapter: Driver specific private structure
+> + *
+> + * Set up the device for interacting with the PTP hardware clock for all
+> + * functions. Function will allocate and register a ptp_clock with the
+> + * PTP_1588_CLOCK infrastructure.
+> + *
+> + * Return: 0 on success, -errno otherwise.
+> + */
+> +int idpf_ptp_init(struct idpf_adapter *adapter)
+> +{
+> +	int err;
+> +
+> +	if (!idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS, VIRTCHNL2_CAP_PTP)) {
+> +		pci_dbg(adapter->pdev, "PTP capability is not detected\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	adapter->ptp = kzalloc(sizeof(*adapter->ptp), GFP_KERNEL);
+> +	if (!adapter->ptp)
+> +		return -ENOMEM;
+> +
+> +	/* add a back pointer to adapter */
+> +	adapter->ptp->adapter = adapter;
+> +
+> +	err = idpf_ptp_create_clock(adapter);
+> +	if (err)
+> +		goto free_ptp;
+> +
+> +	pci_dbg(adapter->pdev, "PTP init successful\n");
+> +
+> +	return 0;
+> +
+> +free_ptp:
+> +	kfree(adapter->ptp);
+> +	adapter->ptp = NULL;
+> +
+> +	return err;
+> +}
+> +
+> +/**
+> + * idpf_ptp_release - Clear PTP hardware clock support
+> + * @adapter: Driver specific private structure
+> + */
+> +void idpf_ptp_release(struct idpf_adapter *adapter)
+> +{
+> +	struct idpf_ptp *ptp = adapter->ptp;
+> +
+> +	if (!ptp)
+> +		return;
+> +
+> +	if (ptp->clock)
+> +		ptp_clock_unregister(ptp->clock);
+> +
+> +	kfree(ptp);
+> +	adapter->ptp = NULL;
+> +}
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+> new file mode 100644
+> index 000000000000..cb19988ca60f
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+> @@ -0,0 +1,32 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Copyright (C) 2024 Intel Corporation */
+> +
+> +#ifndef _IDPF_PTP_H
+> +#define _IDPF_PTP_H
+> +
+> +#include <linux/ptp_clock_kernel.h>
+> +
+> +/**
+> + * struct idpf_ptp - PTP parameters
+> + * @info: structure defining PTP hardware capabilities
+> + * @clock: pointer to registered PTP clock device
+> + * @adapter: back pointer to the adapter
+> + */
+> +struct idpf_ptp {
+> +	struct ptp_clock_info info;
+> +	struct ptp_clock *clock;
+> +	struct idpf_adapter *adapter;
+> +};
+> +
+> +#if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
+> +int idpf_ptp_init(struct idpf_adapter *adapter);
+> +void idpf_ptp_release(struct idpf_adapter *adapter);
+> +#else /* CONFIG_PTP_1588_CLOCK */
+> +static inline int idpf_ptp_init(struct idpf_adapter *adpater)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void idpf_ptp_release(struct idpf_adapter *adpater) { }
+> +#endif /* CONFIG_PTP_1588_CLOCK */
+> +#endif /* _IDPF_PTP_H */
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index d46c95f91b0d..c73c38511ea3 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -5,6 +5,7 @@
+>   
+>   #include "idpf.h"
+>   #include "idpf_virtchnl.h"
+> +#include "idpf_ptp.h"
+>   
+>   #define IDPF_VC_XN_MIN_TIMEOUT_MSEC	2000
+>   #define IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC	(60 * 1000)
+> @@ -896,7 +897,8 @@ static int idpf_send_get_caps_msg(struct idpf_adapter *adapter)
+>   			    VIRTCHNL2_CAP_MACFILTER		|
+>   			    VIRTCHNL2_CAP_SPLITQ_QSCHED		|
+>   			    VIRTCHNL2_CAP_PROMISC		|
+> -			    VIRTCHNL2_CAP_LOOPBACK);
+> +			    VIRTCHNL2_CAP_LOOPBACK		|
+> +			    VIRTCHNL2_CAP_PTP);
+>   
+>   	xn_params.vc_op = VIRTCHNL2_OP_GET_CAPS;
+>   	xn_params.send_buf.iov_base = &caps;
+> @@ -3025,6 +3027,10 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
+>   		goto err_intr_req;
+>   	}
+>   
+> +	err = idpf_ptp_init(adapter);
+> +	if (err)
+> +		pci_err(adapter->pdev, "PTP init failed, err=%pe\n", ERR_PTR(err));
+> +
+>   	idpf_init_avail_queues(adapter);
+>   
+>   	/* Skew the delay for init tasks for each function based on fn number
+> @@ -3080,6 +3086,7 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+>   	if (!test_bit(IDPF_VC_CORE_INIT, adapter->flags))
+>   		return;
+>   
+> +	idpf_ptp_release(adapter);
+>   	idpf_deinit_task(adapter);
+>   	idpf_intr_rel(adapter);
+>   	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
 
