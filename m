@@ -1,151 +1,152 @@
-Return-Path: <netdev+bounces-145346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821C69CF234
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:55:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5529B9CF27F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:12:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39BA71F235BC
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:55:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D96451F21F7F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BDF1D515A;
-	Fri, 15 Nov 2024 16:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270C71D5CEE;
+	Fri, 15 Nov 2024 17:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bhu/QvTZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GqsH5gTV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8988762E0
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 16:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6081D54FA;
+	Fri, 15 Nov 2024 17:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731689718; cv=none; b=joLF2HD/nAAdWfmqz8lqopkSkOzik8vlBoCb+yzpLlmvUSwcd9/1Sgr2uQahrRTRLgvDbHRt3FJswZ39ALcwgHXg9Q3rUZESDHwp04mBOaQOMm4/oEA+fcfJ0Viv4IlWVo/AOFgv3/g3pG2DVEoJDVIRyq6deo1tF/0yklrvPRA=
+	t=1731690753; cv=none; b=ILN4aLjCgGwBG0gCxcJZsb0XQ/JsCH06nDyTO7G8gf8oZwjGKX6wFjuwcs2hCgRWe9Ft+efD5cLKiExCCHvMUulyUMGYHNSb7qa+ARP2x8ZSEcEVV7C5NwyQwJ3Z2VMR47an+KwLG9dpKkL0a6Z9mgiRAfjfR3GM/v4faTE/z5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731689718; c=relaxed/simple;
-	bh=IgLzXavQdjK/5aH95pPM9ugA1OqsX9bgCpUzJSrNlW8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IiIEE9FQHgeNEFDLRXAcpWu+BjjaGITDtt5PgsBUZYnqFsTpggCaDUmowv8Wy1c2WLMLcJSycgRVMedkK2oZ7OEkYjzpNYMSw/440M7dedGWkYacszY/9RGEJYyJsl4SRuMKZZ18avkr18IOk9L2HgFY1FNDCriZvzciEZo0rjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bhu/QvTZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731689715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4UndQQvaz2BWPfe663alob5z6FFAUciGi+iLOvRtoSU=;
-	b=Bhu/QvTZvd7HE012OjbsSIf1Oin/rPl4Ow1ih37ALYkCza0WMf3L/NFbVI6HCx+AMYGOXX
-	lgZWbt5pouiuBZMyYySMD3lWu5Szf1P7yH4q+FI2NXI7+AkbgreLhQ37xLTpKQYZ57r0Ej
-	iE9EdwOy2L6YRZWVV/pTNPhHdIDmZ50=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-7nHFPmUlM-m4lbIcVsJf7g-1; Fri, 15 Nov 2024 11:55:14 -0500
-X-MC-Unique: 7nHFPmUlM-m4lbIcVsJf7g-1
-X-Mimecast-MFC-AGG-ID: 7nHFPmUlM-m4lbIcVsJf7g
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d5ca192b8so1244746f8f.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 08:55:14 -0800 (PST)
+	s=arc-20240116; t=1731690753; c=relaxed/simple;
+	bh=bhB0gzg7ULcR6uels+MV/k4I/DvKzdJ2mBUQeZLSbjw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S9Ok79LFIN0X6MMH2YWOu5yGIJ0aHFJDK/8zz7CG4+BKfgGM5WMrtO+/o9AQzReG5si+iG3YxhXr0ayOMVvuN8QPhOQj9ZBc1HSqHV/ANILI+grLVXB4HT7sGqEEjriKREVifCpO5NVtjipvxLwwQYNtm1KRHVZXe4kY5zBe07M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GqsH5gTV; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5cb6ca2a776so3377290a12.0;
+        Fri, 15 Nov 2024 09:12:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731690750; x=1732295550; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bhB0gzg7ULcR6uels+MV/k4I/DvKzdJ2mBUQeZLSbjw=;
+        b=GqsH5gTVn6yJG5A5kmAXPChmPtowGIHck1UBUvyqYnyxCyJvh6G4abiM/lbpoDRPlR
+         lmYZO8hJqD5y3NrSp+WiwLLj7UJzJDVlvsBNlbUGsxQguEUi8dMw8pBYIgApcATbxv4A
+         8sDB2E+589J2rmZEnE+rSboQNAqlxoBQ7M7Hx899eLXe0aInrq2q6i2fNWS6Op5uweai
+         zPic6tjD4JsbUhChXgLaVm8JMhkCDcD0GwMCu7dRG1wzayMPLsAYxmJmuI6BXBrosdXR
+         AeehMZrUpt5FcpkuFvn0axgi7QFGOn+OP1bCCuhsYF3YH9EMCY6nitSYibECBP5pflPu
+         tRzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731689713; x=1732294513;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4UndQQvaz2BWPfe663alob5z6FFAUciGi+iLOvRtoSU=;
-        b=n7w9pQF8higxQOMv1w5JgCL9jfAIOGQlgCQgvu0PYeKyrOkYGCYGiskiy4ok0u1WMZ
-         5gUuw+Vlo/NwnLn+PUURHt5OdhArqKkBgmV0fWd5oZ7m/6EMXMxCnieDHSgl4In1a/q3
-         zreOVnwriTtbSCWBunUSfnLweO9VSPwllpyGwkSInhv7zCm3Yb3fzdEOWd3d0D2XIJ1h
-         Q0b4AZl2sI5qklQzLkDkAqwqDr620nxJ9W9XYc9BJqbw/q7eUkus6XRp5pmeteSXAF8X
-         7TFqxhYEVMtW75AMsI8ZRedqodnB7SWUKKjt6xIHtx3hEzmH8SrFdChcRF6vF18k8WL9
-         KiEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzVRLPcncEmHzrvf4VDxuzHqEYzOKfuqZNVwkMElSBYmkRKbGjkhH3JvWuHA5o6trpZBNJ538=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWKMbRCyOcm4Tuwvbp0j/aq095URedl8gGS5bG6eJ583efMvvD
-	0uwBUxGC2Be8LlciS9NO6S/6/tBvcYnGXuFOiIXHMLwVjk/e+5QNZNVvoc9R8rBRQgSO6dK7a2H
-	WTY2vq+pVopY4gxEwOuLWO5sWKYMmO/DRgUx0u/ogfUF7U0DbboyNTA==
-X-Received: by 2002:a05:6000:1f89:b0:37d:3b31:7a9d with SMTP id ffacd0b85a97d-38214064614mr7116022f8f.23.1731689713227;
-        Fri, 15 Nov 2024 08:55:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4cNRgKrO5Uuppx4robye6yBpFW+Vh1bqljZ/n4EB4OIo5T5gjB4C5v1Z4j8I2UQXdHPmLqQ==
-X-Received: by 2002:a05:6000:1f89:b0:37d:3b31:7a9d with SMTP id ffacd0b85a97d-38214064614mr7115996f8f.23.1731689712837;
-        Fri, 15 Nov 2024 08:55:12 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac0aea8sm58446295e9.31.2024.11.15.08.55.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 08:55:12 -0800 (PST)
-Message-ID: <9837c682-72a0-428e-81ab-b42f201b3c71@redhat.com>
-Date: Fri, 15 Nov 2024 17:55:11 +0100
+        d=1e100.net; s=20230601; t=1731690750; x=1732295550;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bhB0gzg7ULcR6uels+MV/k4I/DvKzdJ2mBUQeZLSbjw=;
+        b=q5tvM+Q5M8DUKj6chx1ctW236G6/R2GcXP6axK4pf68O1VaiW59RdSuj1SojBlr3n/
+         ac9tqueD5bKdLfJcr8sg+97cOdnZ20dHVGMQY1FrtI09nkvRIATC6Lb2XBMMX2feRxLs
+         yvRvEPXhblBOpm4pTpeMPK2/hWqyUz0JpocBSB+mbxG2JHpeAfytk1e+92jHk+FgnF5P
+         d3egLw8sTfVkWjrFpVgODqQrYZZjdduZ79A0NdPGlPfBh07GZcsMGXAOipCF767mHSHn
+         O1j82jpa5nNniwdxGyuMo0m3/eJBntL+xPds0i/8nwGeE3BNmt+nD9EL+bQczAIFlo5U
+         rHFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXegcTgjVOj5tDJYR9Qqg04Qkz3GyCWbDepw3Y2jr/2BSYHcpaCkQ8kOSb/FCY9gMNXY9qVr+wlHWk=@vger.kernel.org, AJvYcCXtx4Lz6w/kWXOdpWfplMW8u1pI6Nt8ab/kk8MiDoPnI89jvIISB8tWVdm7ZyJiYGwoztph17ik@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgHm8RxVLBFiwKidG4CtzDn4qLXkcYYTHFiCPU8UOxBnh8mMwg
+	EWlLbcWXJ/T3ZU5q8//3UP7OnID8GLXxhwL3L53noH7ZFN2mFPeBNCEdJlp+8uAQ4FmkSFT+Zi9
+	I55QnKKsca8gsAXi2+datv0aVkI0=
+X-Google-Smtp-Source: AGHT+IGeQO9JrkrdGz9qSWb0eysHt0WKJLPy+8e2aMyIG/zcrHg2ZdPgrY8XJzyo6tnNEBbGGetATPKg9ON+TfTyF+U=
+X-Received: by 2002:a05:6402:2807:b0:5cf:8449:e757 with SMTP id
+ 4fb4d7f45d1cf-5cf8fc8b6d8mr2585660a12.13.1731690749470; Fri, 15 Nov 2024
+ 09:12:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipmr: Fix access to mfc_cache_list without lock
- held
-To: Stefan Wiehler <stefan.wiehler@nokia.com>,
- Jakub Kicinski <kuba@kernel.org>, Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
-References: <20241108-ipmr_rcu-v2-1-c718998e209b@debian.org>
- <20241113191023.401fad6b@kernel.org>
- <20241114-ancient-piquant-ibex-28a70b@leitao>
- <20241114070308.79021413@kernel.org>
- <20241115-frisky-mahogany-mouflon-19fc5b@leitao>
- <20241115080031.6e6e15ff@kernel.org>
- <9cdf4969-8422-4cda-b1d0-35a57a1fe233@nokia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <9cdf4969-8422-4cda-b1d0-35a57a1fe233@nokia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241113173222.372128-1-ap420073@gmail.com> <20241113173222.372128-4-ap420073@gmail.com>
+ <20241114201529.32f9f1ab@kernel.org>
+In-Reply-To: <20241114201529.32f9f1ab@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 16 Nov 2024 02:12:18 +0900
+Message-ID: <CAMArcTXP0PWw0DEXzW5u7to8S9rUbcyc5dLOR_ZSE1H2VzBXFA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/7] bnxt_en: add support for tcp-data-split
+ ethtool command
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
+	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/15/24 17:07, Stefan Wiehler wrote:
->> On Fri, 15 Nov 2024 01:16:27 -0800 Breno Leitao wrote:
->>> This one seems to be discussed in the following thread already.
->>>
->>> https://lore.kernel.org/all/20241017174109.85717-1-stefan.wiehler@nokia.com/
->>
->> That's why it rung a bell..
->> Stefan, are you planning to continue with the series?
-> 
-> Yes, sorry for the delay, went on vacation and was busy with other tasks, but
-> next week I plan to continue (i.e. refactor using refcount_t).
+On Fri, Nov 15, 2024 at 1:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
 
-I forgot about that series and spent a little time investigating the
-scenario.
+Hi Jakub,
+Thank you so much for the review!
 
-I think we don't need a refcount: the tables are freed only at netns
-cleanup time, so the netns refcount is enough to guarantee that the
-tables are not deleted when escaping the RCU section.
+> On Wed, 13 Nov 2024 17:32:17 +0000 Taehee Yoo wrote:
+> > NICs that uses bnxt_en driver supports tcp-data-split feature by the
+> > name of HDS(header-data-split).
+> > But there is no implementation for the HDS to enable by ethtool.
+> > Only getting the current HDS status is implemented and The HDS is just
+> > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled=
+.
+> > The hds_threshold follows rx-copybreak value. and it was unchangeable.
+> >
+> > This implements `ethtool -G <interface name> tcp-data-split <value>`
+> > command option.
+> > The value can be <on> and <auto>.
+> > The value is <auto> and one of LRO/GRO/JUMBO is enabled, HDS is
+> > automatically enabled and all LRO/GRO/JUMBO are disabled, HDS is
+> > automatically disabled.
+> >
+> > HDS feature relies on the aggregation ring.
+> > So, if HDS is enabled, the bnxt_en driver initializes the aggregation r=
+ing.
+> > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
+>
+> I may be missing some existing check but doesn't enabling XDP force
+> page_mode which in turn clears BNXT_FLAG_AGG_RINGS, including HDS ?
+> If user specifically requested HDS we should refuse to install XDP
+> in non-multibuf mode.
 
-Some debug assertions could help clarify, document and make the schema
-more robust to later change.
+Sorry, I missed adding this check.
+I added a check to reject setting HDS when XDP is attached.
+But, I didn't add a check to reject attaching XDP when HDS is enabled.
 
-Side note, I think we need to drop the RCU lock moved by:
+bnxt driver doesn't allow setting HDS if XDP is attached even if it's
+multibuffer XDP. So, I will reject installing singlebuffer and
+multibuffer XDP if HDS is enabled.
 
-https://lore.kernel.org/all/20241017174109.85717-2-stefan.wiehler@nokia.com/
+>
+> TBH a selftest under tools/testing/drivers/net would go a long way
+> to make it clear we caught all cases. You can add a dummy netdevsim
+> implementation for testing without bnxt present (some of the existing
+> python tests can work with real drivers and netdevsim):
+> https://github.com/linux-netdev/nipa/wiki/Running-driver-tests
 
-as the seqfile core can call blocking functions - alloc(GFP_KERNEL) -
-between ->start() and ->stop().
+Thanks for that, I will try to use this selftest.
+I will add a dummy HDS feature for testing on the netdevsim.
 
-The issue is pre-existent to that patch, and even to the patch
-introducing the original RCU() - the old read_lock() created an illegal
-atomic scope - but I think we should address it while touching this code.
-
-I have some patches implementing the above but I have hard times testing
-vs net/forwarding, as the forwarding ST setup is eluding me - with
-mausezahn internal errors.
-
-@Jakub: do you have by chance any cheap tip handy about the forwarding
-self-tests setup?
-
-Thanks,
-
-Paolo
-
+Thanks a lot!
+Taehee Yoo
 
