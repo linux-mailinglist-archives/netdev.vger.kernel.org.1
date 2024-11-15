@@ -1,107 +1,117 @@
-Return-Path: <netdev+bounces-145183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9089CD6C7
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 06:59:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF829CD71E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 07:33:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF850B21AC1
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 05:59:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 092981F21239
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 06:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F9B17BB1A;
-	Fri, 15 Nov 2024 05:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AF317DFFD;
+	Fri, 15 Nov 2024 06:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xr9vx0s2"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="sdViNGgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E50315FD13
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 05:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33A1645;
+	Fri, 15 Nov 2024 06:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731650362; cv=none; b=I+/3y0CAK8v64N7B3bV0wChQPfz0TLButoOXn4MsEO17qY/LhF2yGoWPIo1+Bb86+lF5q1oDZPDXqrtPFy06EGrbOiqIljqHZHS9gOuCVg8KKKhaPji4qKw6/YCAZyvQMMD2RDzXlPfzKB/TFdTbjUwGOHroocCwGydx+wSbfsg=
+	t=1731652398; cv=none; b=TkwNIJmWkF8WN2UQU/XsXkfRtQRjYg+gNcsNDOobsOU//RXjmCAVb7y/wu9Ea8i6cR/KVXL67hLiydudymXie7DeratkNvJMqq+hgh2smdaPE2EkLEc8zrhMIga3+gQbYvlLvLa8E5tMglSqJQuil/crhdD35Lwc4nLGw6OpkWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731650362; c=relaxed/simple;
-	bh=0C5PTpLyscvzquQ7WTzD8KgRr74ihmZXwVDibh1tji8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPypE2Kh2e62RMdEWa2ddHAynj4BSlpaSwoQebcFH2oOIuyccyoz1OUr54767ZDeVDe1R1oLRCl9KcbnihIoKqBWw1aSn2pi//7Yntf1fr/3enYDAlY6yZuA15GBu6RsL1jdoX80sHfg3k8hovH3idRkEmM0/9c8wVbqOYpcXm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xr9vx0s2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9E71C4CECF;
-	Fri, 15 Nov 2024 05:59:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731650362;
-	bh=0C5PTpLyscvzquQ7WTzD8KgRr74ihmZXwVDibh1tji8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Xr9vx0s2ppl6uM78/fBa+35FR6AYrLg2WNzGJM6+j56R8aAKBSFmgxKRpLwEz3eoG
-	 XBdSit9UL7MkWhWI2GE8fS+1AQdcbm7u01BCyDGSjjMm+W+PBrMoaEkG5qsKcB4BH9
-	 SY/TMt3saT0LrCX5GsoCTM9+lwVb4PWyEyiJAe+Z5l5JFmQtIR9HThlDXwSBTdEPB8
-	 bEdcJ2Yqi6W04d9wvq81VU7+aUZsh578dq73F/W98boa6qC1Q5N8iP2NAIqcBhllzL
-	 TSSQLVVtXD/PSmpkqohkbUE58ferZKwgxWPzIFpZw6OMozwko/7aiw/KqSpFpXSqHH
-	 U9xCeYJB3yHvA==
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: David Ahern <dsahern@gmail.com>,
-	netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: [PATCH iproute2-next] bash-completion: devlink: fix port param name show completion
-Date: Thu, 14 Nov 2024 21:58:48 -0800
-Message-ID: <20241115055848.2979328-1-saeed@kernel.org>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1731652398; c=relaxed/simple;
+	bh=KGbCXoBZOcHJK+gVr+MJPUUaqUCYGQjLZ6iycOTgm+8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=AzInNOHzWCGoa/H53NKnI4P/QmnrOLa/3jHuW7lO2WpQ/U8orUKUfKaxpmhWbhVk58oVJ7pJVXDDaCh95EtLHuHia/bgJ5T835LlhdPEnOmnDT9rZ3zK9X+Pai4M3KWTobZgOl2LNDoySJh1Yyn2OL1kOlgcy/N1Y3/IpGX4WpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=sdViNGgR; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AF6WsKiA056657, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1731652374; bh=KGbCXoBZOcHJK+gVr+MJPUUaqUCYGQjLZ6iycOTgm+8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=sdViNGgRgVCAeyLGPw8h3JSNO+Sqlbvt8nEOVbY9us41zI0uq6YVuI3K2mzGfKvon
+	 SX8etaSSaneVdHWODGDmNLYpr/pfZH5z7c8ZiE4fxupNus3e7My/VE2YZAngeVbjoI
+	 rC7neCn5c69fHFdu0x1lO8tpvM49DKDs6ArIirFH6YzhvCyPKIui9P7TcAVRgsqnil
+	 D6yAUea+DZZ8KxsraGqCeNpuoiBKug11xdD7FpG8uPcYn+d/DsKAX5zwrgg4ksaFWQ
+	 Y8YUfjO4CTSkZBUCNcCPS/z7DMhGT7S1fNx7nVuUVl8Y/MQ9XSz8vVrqaJr/GbyzX1
+	 /zHiJNYuZOalg==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AF6WsKiA056657
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 15 Nov 2024 14:32:54 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 15 Nov 2024 14:32:55 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 15 Nov 2024 14:32:54 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Fri, 15 Nov 2024 14:32:54 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net 1/4] rtase: Refactor the rtase_check_mac_version_valid() function
+Thread-Topic: [PATCH net 1/4] rtase: Refactor the
+ rtase_check_mac_version_valid() function
+Thread-Index: AQHbNoZ3TgKh3vcPZkulu1daZxQDq7K2Y9aAgAF+VRA=
+Date: Fri, 15 Nov 2024 06:32:54 +0000
+Message-ID: <78ffc49101b343338671650e5b5dcfcf@realtek.com>
+References: <20241114111443.375649-1-justinlai0215@realtek.com>
+ <20241114111443.375649-2-justinlai0215@realtek.com>
+ <83569c8e-d4d0-4790-9df6-87b06872229d@lunn.ch>
+In-Reply-To: <83569c8e-d4d0-4790-9df6-87b06872229d@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-From: Saeed Mahameed <saeedm@nvidia.com>
-
-Port param names are found with "devlink port param show", and not
-"devlink param show", fix that.
-
-Port dev name can be a netdev, so find the actual port dev before
-querying "devlink port params show | jq '... [$dev] ...'",
-since "devlink port params show" doesn't return the netdev name,
-but the actual port dev name.
-
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- bash-completion/devlink | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/bash-completion/devlink b/bash-completion/devlink
-index 52dc82b3..ac5ea62c 100644
---- a/bash-completion/devlink
-+++ b/bash-completion/devlink
-@@ -43,6 +43,15 @@ _devlink_direct_complete()
-             value=$(devlink -j dev param show 2>/dev/null \
-                     | jq ".param[\"$dev\"][].name")
-             ;;
-+        port_param_name)
-+            dev=${words[4]}
-+            # dev could be a port or a netdev so find the port
-+            portdev=$(devlink -j port show dev $dev 2>/dev/null \
-+                    | jq '.port as $ports | $ports | keys[] as $keys | keys[0] ')
-+
-+            value=$(devlink -j port param show 2>/dev/null \
-+                    | jq ".param[$portdev][].name")
-+            ;;
-         port)
-             value=$(devlink -j port show 2>/dev/null \
-                     | jq '.port as $ports | $ports | keys[] as $key
-@@ -401,7 +410,7 @@ _devlink_port_param()
-             return
-             ;;
-         6)
--            _devlink_direct_complete "param_name"
-+            _devlink_direct_complete "port_param_name"
-             return
-             ;;
-     esac
--- 
-2.47.0
-
+>
+>=20
+> On Thu, Nov 14, 2024 at 07:14:40PM +0800, Justin Lai wrote:
+> > 1. Sets tp->hw_ver.
+> > 2. Changes the return type from bool to int.
+> >
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+>=20
+> If you want these in net, you should add a Fixes: tag.
+>=20
+>     Andrew
+>=20
+Ok, I will do that.
+> ---
+> pw-bot: cr
 
