@@ -1,95 +1,119 @@
-Return-Path: <netdev+bounces-145491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CCB99CFA3E
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:42:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1433D9CFA5D
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4500D1F293AD
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0B8284C17
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43FD1917DE;
-	Fri, 15 Nov 2024 22:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32CF31917F0;
+	Fri, 15 Nov 2024 22:51:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2x2Z5Nj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCFkBbW4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9F818C33C;
-	Fri, 15 Nov 2024 22:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0283014F9D9;
+	Fri, 15 Nov 2024 22:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731710537; cv=none; b=G1XGDOsHk6mcAbnr18AIJMlmAJo02+H2VHZR1Xvmvm0y9Z/gqvTkP9pQdGrTxRK+MIywFkChJIfMdGzMtRjS1aRrXLioveIN6zj3ITxSQOlWEl98ese2lF0LG7+sPJ9XY1uACraKp8F30ZqIAyWI3qNkriSS/nl7mvGnWE8OWWc=
+	t=1731711076; cv=none; b=dJQTwY8wj9sBvF2PoC0Yze5eMY/wlMFElkyeLYKL0+549Oj/BKLgMvbf979LSxZ6w2Ajken3m/3CM5pACuL9DhQHHkTjureBSBFSHu0p0zubyeG5fmAf96Cqz2sqF+IT9Biqu8IO4XnPeJ10KXLAfYGFkSUWsQ5Yi6SuK8oS5zQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731710537; c=relaxed/simple;
-	bh=sympt9edmCXPUVcUd/uAA+42AmjDQXBS4Rkc29BZ860=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FN/mcgJVIbbiUTvgcourGU9vJV0Qp9pkvf92p1xpb/VT0HuMQHlEtVrvy16nzhq5PbmQzElYGJcl/7Nyaiiw2oZTmaSA5yFTB/tsR0RTuWjiiME76PYwfmPL+MJsfL+ilhNXsyk0nOVwQR8NottVpKvWGZTdVVbOY4EYDDyC3yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2x2Z5Nj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D410CC4CECF;
-	Fri, 15 Nov 2024 22:42:15 +0000 (UTC)
+	s=arc-20240116; t=1731711076; c=relaxed/simple;
+	bh=Jht/2wZpROGtsN14r3YcP1e9epsnJMyCctqGZl0f40s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZLtQRV7eRGaDc6Q4ZchczF7aFL3vnDIwxQrg7XW9FKVF5s3AM9Kn5+MwF/VXZ/R+/PapectXGRLCbRUkv5gb6krUEDZLyY1CLEv8J9oAWpVUvODOXSKNLCz46ptB+5eJm7p1xYSt8mHFLVAjGTRmFyrnTnhY4H3zYHT/Lh2PE48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCFkBbW4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14001C4CECF;
+	Fri, 15 Nov 2024 22:51:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731710536;
-	bh=sympt9edmCXPUVcUd/uAA+42AmjDQXBS4Rkc29BZ860=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M2x2Z5NjQo3eF4mgl0rBQGEIS1d2UQPMhWj8IzGkHQM/8qgb2Y432dlpMohBGeRSF
-	 ZgRRdlHTAYk6e51gMn4RmbMThKHH0sWm/sILRaHciGvG4x40jkFSIoEoNCBg/XjkNi
-	 ijvhMhDCJS8pv9WRDzWM0eINerBkRARZvuLCr8kpMypehv99UZVuUdA8MRcw9K5Ild
-	 NIqlxYD9Xggd6lHHOhGG6uOxZPkoI6fSDakq6noj6eXjR6gjN6gyIV2BiwfAN/cwY4
-	 qXYqXH0SvkMpRhuH7VUEC37dXrOVk5dSbWIa0q83SU5maJvcxkiRVj+CCK6XdRThMd
-	 d/jYFwh/M/e8A==
-Date: Fri, 15 Nov 2024 14:42:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Yafang Shao <laoar.shao@gmail.com>,
- ttoukan.linux@gmail.com, gal@nvidia.com, tariqt@nvidia.com,
- leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via
- rx_fifo_errors
-Message-ID: <20241115144214.03f17c16@kernel.org>
-In-Reply-To: <ZzfGfji0V2Xy4LAQ@x130>
-References: <20241114021711.5691-1-laoar.shao@gmail.com>
-	<20241114182750.0678f9ed@kernel.org>
-	<CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com>
-	<20241114203256.3f0f2de2@kernel.org>
-	<CALOAHbBJ2xWKZ5frzR5wKq1D7-mzS62QkWpxB5Q-A7dR-Djhnw@mail.gmail.com>
-	<Zzb_7hXRPgYMACb9@x130>
-	<20241115112443.197c6c4e@kernel.org>
-	<Zzem_raXbyAuSyZO@x130>
-	<20241115132519.03f7396c@kernel.org>
-	<ZzfGfji0V2Xy4LAQ@x130>
+	s=k20201202; t=1731711075;
+	bh=Jht/2wZpROGtsN14r3YcP1e9epsnJMyCctqGZl0f40s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PCFkBbW4KMxzIiNilnx1D+38dZUl9xMatxEwTnxieesvyQaDMebt0p8A1S5AD0XwX
+	 6xS7Dsp8BRDyGdbMKli/DgLMzyCJ5yOP8HIShiKmA/wQX+CRKDIPrUvlXP8GjrKemD
+	 nXAL97JH746uehmvPZsiFshb860GinB8Ny7ro1xGR1ym232+5LwAvZIVbxRl7lEx5X
+	 F0ca/qbe42fil5LCSfhCYj/pMtLSFuJDb994762noA21eA+CF8rSv/k0dZ98CwSIAx
+	 f3cT5ZJnrmxQNrNoCLiykc1+bUGUwRWSfmKJu9KZHtFhQlDvMFmvUWF5361B93lzTN
+	 TKguxkPtB2TSQ==
+Message-ID: <80785a22-26de-4466-af44-5aee85a056fe@kernel.org>
+Date: Fri, 15 Nov 2024 14:51:14 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net/ipv6: delete temporary address if mngtmpaddr
+ is removed or un-mngtmpaddr
+Content-Language: en-US
+To: Sam Edwards <cfsworks@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?=
+ <maze@google.com>, Xiao Ma <xiaom@google.com>
+References: <20241113125152.752778-1-liuhangbin@gmail.com>
+ <20241113125152.752778-2-liuhangbin@gmail.com>
+ <CAH5Ym4jjVFofG5J7QW=EsD00siDXtNWKt4ZDNbbUmP+Y4Jb-DQ@mail.gmail.com>
+ <ZzWo5fJcraaDDLm_@fedora>
+ <CAH5Ym4hcguhXvJvVuANns7Q9VTOWR-SxHSdD55rR5BWhWeg2Ow@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAH5Ym4hcguhXvJvVuANns7Q9VTOWR-SxHSdD55rR5BWhWeg2Ow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 15 Nov 2024 14:09:02 -0800 Saeed Mahameed wrote:
-> >> rx_dropped: Number of packets received but not processed,
-> >>   *   e.g. due to lack of resources or unsupported protocol.
-> >>   *   For hardware interfaces this counter may include packets discarded
-> >>   *   due to L2 address filtering but should not include packets dropped
-> >>                                   ^^^^^^^^^^^^^^
-> >>   *   by the device due to buffer exhaustion which are counted separately in
-> >>                            ^^^^^^^^^^^^^^^^^
-> >>   *   @rx_missed_errors (since procfs folds those two counters together).
-> >>       ^^^^^^^^^^^^^^^^^  
-> >
-> >I presume you quote this comment to indicate the rx_dropped should
-> >count packets dropped due to buffer exhaustion? If yes then you don't
-> >understand the comment. If no then I don't understand why you're
-> >quoting it.
+On 11/15/24 1:46 PM, Sam Edwards wrote:
+> Hi Hangbin,
 > 
-> I quoted this because you suggested to use rx_dropped. It's not a good fit.
-> In your previous reply you said: 
-> "but honestly I'd just make sure they are counted in rx_dropped"
+> It took me a while to grasp but the problem seems to be a confusion
+> about what it means to set a temporary's lifetimes to 0/0:
+> 1) "The mngtmpaddrs has gone away; this temporary is slated for
+> deletion by addrconf_verify_rtnl()"
+> 2) "This temporary address itself shall no longer be used, regenerate
+> it immediately."
+> 
+> The existing behavior makes sense for the #2 case, but not for the #1
+> case. It seems sensible to me to keep the #2 behavior as-is, because
+> userspace might be setting a 0/0 lifetime to forcibly rotate the
+> temporary.
+> 
+> So it sounds like (at least) one of three fixes is in order:
+> a) Make ipv6_create_tempaddr() verify that the `ifp` is (still)
+> alive+mngtmpaddrs, returning with an error code if not.
+> b) Look at the 3 callsites for ipv6_create_tempaddr() and add the
+> above verifications before calling.
+> c) Add a function that calls ipv6_del_addr(temp) for every temporary
+> with a specified ifpub, and use it instead of manage_tempaddrs(..., 0,
+> 0, false, ...) when deleting/unflagging a mngtmpaddrs.
+> 
+> Personally I like option C the best. What are your thoughts?
+> 
+> Cheers,
 
-The comment just says not to add what's already counted in missed,
-because profcs adds the two and we'd end up double counting.
+Off the top of my head regarding recent changes, please include Maciej:
+
+commit 69172f0bcb6a09110c5d2a6d792627f5095a9018
+Author: Maciej Żenczykowski <maze@google.com>
+Date:   Thu Jul 20 09:00:22 2023 -0700
+
+    ipv6 addrconf: fix bug where deleting a mngtmpaddr can create a new
+temporary address
+
+
+
+and Alex in discussions around changes to temp addresses
+
+commit f4bcbf360ac8dc424dc4d2b384b528e69b6f34d9
+Author: Alex Henrie <alexhenrie24@gmail.com>
+Date:   Tue Feb 13 23:26:32 2024 -0700
+
+    net: ipv6/addrconf: clamp preferred_lft to the minimum required
 
