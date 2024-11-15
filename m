@@ -1,75 +1,120 @@
-Return-Path: <netdev+bounces-145128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4B2A9CD537
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:57:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 726E39CD538
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 02:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FFF7B22532
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:57:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29544B22092
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7039E58222;
-	Fri, 15 Nov 2024 01:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BEA139D0A;
+	Fri, 15 Nov 2024 01:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/E1KjKA"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NlkUy8vl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0BF3307B
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 01:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6752D7BF
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 01:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731635833; cv=none; b=mCWIImJpRc7pr59SyRtM5ACyeUbhnxIcLwCiaX9TLz31SanbFYyRT36AQs30JgnEqB05cEAFXm2QNwecUkbYqYgkYW6xu37D/7yTtKtjdmAwN2YUzX8LPYTvyTpocZ1LZhZQjllxiS7lNLfHRFDQLin8gFUKrXIn10qMDs5ZhG4=
+	t=1731635957; cv=none; b=u7f1ZlA7UWEs/sfDaR3I87Be9lGtHrP7uLXqzJnV9bo78+L+dV6reRJywAFAwX43QbFR2FgtVzqhGETySgIhPRlQmSH6Gj5M5ENKNN7ggLjoGxUIJvpP6kqJcLGaBWslcJrsnW57cAyCc88wsue+LzxUbB3cTGGt+NMDMw9tWzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731635833; c=relaxed/simple;
-	bh=tcOuP5p62jl5BLLfSzICiOVoitRJ77m8em2pnmBMEyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+EdGt5ad5ihAxHoi1GkmGWGLWshuWdfinhfdQLTPBKx/Xjem8ka3qI7Kpj9Lx8CMGoJhe/qU7OjylMxOuEUidAR63xeiGRi8VJoox03TD4o+beMGWstQRV63FI0tLT0Bp2lfbmZT69J0M1R9/UwFYdF1xMqePljcspSfAfVhxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z/E1KjKA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9557C4CECD;
-	Fri, 15 Nov 2024 01:57:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731635832;
-	bh=tcOuP5p62jl5BLLfSzICiOVoitRJ77m8em2pnmBMEyc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z/E1KjKA+8aXfz987yfQSI8TJJ2gM4EdRTxzIpvwppvacNvQGowNepVsCjctfzjXa
-	 VZcDr8ugbCznSfGpCb5SDr6gOEmAxWl074urADRhWXCoIRXu4SsI8krs8zkZeqK/en
-	 RZ0I5VxEwwLVJT0QHV6afoCiQp1yVDZF07lyGVYBrKVewqaCpaOczLJYAYJU7x7UJp
-	 uhCQ+2D4G2vXUXhHLAUu6sshwwt43p7tkzr5KSy6+BFuZivXG6YMOPW4Ch9IJugx8b
-	 taRLHsFVstBs+qMr8Bq3zG6FYAqGPgvQud4RnpCd126uOa9dMAkmzp1bIaHRD8UJ3M
-	 iywIc6VxYaOOQ==
-Date: Thu, 14 Nov 2024 17:57:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: Make copy_safe_from_sockptr() match
- documentation
-Message-ID: <20241114175711.1a51c414@kernel.org>
-In-Reply-To: <535b4ef7-3cfb-4816-bd7e-c0fa8725c7f8@rbox.co>
-References: <20241111-sockptr-copy-ret-fix-v1-1-a520083a93fb@rbox.co>
-	<20241113192924.4f931147@kernel.org>
-	<535b4ef7-3cfb-4816-bd7e-c0fa8725c7f8@rbox.co>
+	s=arc-20240116; t=1731635957; c=relaxed/simple;
+	bh=9dskGBysdln+lYQVGRohOKlI/bgLYL0kJNpAhLRteA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nY8vQV4J/rUxydCMeDQNZwG6Kkz+keM65sjkMq66PxVG6ssy67cn8wo/Tpb9ft7VH92ip8cgyuNuBUApHjiSA1ABy7imBE0bVeRvBLPfp93D6Km9ry1oSgf7AG7+UzmrOM2YkaSG+5RdIh9rOtvJ1Z3m9p8hMi6m4SVLGn3RymM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NlkUy8vl; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-460af1a1154so1628781cf.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 17:59:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1731635954; x=1732240754; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hm3KvGlpNbi42Zh2FXESOlpQoGT8BcmT00IYzj/PJNs=;
+        b=NlkUy8vlVVYq711xx66haWi+y24Dj5tQGU7+iMqzcvkib3MZqoUuD6n7JDjzVPW/8a
+         KfBl+LREFQ+/WVrLscJeN8hOKykW2T8rn7WqhNuafz6WmN4yLO3oGFFaZrDPiv+x39Ax
+         uaXlqYHTNHaPEiE3C3XJMpkZJKx5vUKyuvhucedMX1lmOH2gZNcRI96BJ57a5UaksPQy
+         q1JOpmIUL5+Y7ijKuRFbjXSQnElONvXO7S90kFjjf39qHNFc43Rkq/phITEEWa+MR2He
+         u/HqxrAbkWlzICssz2oPA4rXF5yUsqIv/8VtE7+eynS30AfjLNvRtJHW1pKqbO3v1Pzl
+         WQlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731635954; x=1732240754;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hm3KvGlpNbi42Zh2FXESOlpQoGT8BcmT00IYzj/PJNs=;
+        b=TAf3qgKCifGB5Hi3r5+edWPh1+FyOW0P9DQLhETZuQketH3+5ysrKYtAi26hFMpJeC
+         uBuD1rprGp7Wb7KEEJPnYcZdnuKH2l1lc7+rE+ENypEb1OTUOagzqjSDO2FJ1D6Off6E
+         jpMEZUfJ2ZA3+9Te2YXcFcXUjS8jDYhFx6xorj1GLSFXSB3XpkrPwoPmPMdhmyAcsEI6
+         cxnhbpN9PSi+Gg5LzURoIihr+doMZIbKoIOxDIFPlq5aUL9Ceavsfz8C1BNO/HM9n59L
+         TtHGxZ8pK0w/t2qSwxASgbg/jPr8Mrw2iuS+oQRZNUr9L+mjXHWV0ZqJvt7dlLCDQDTH
+         mkYw==
+X-Gm-Message-State: AOJu0YzzB27XQM78J5XiB1vnpBuloBFaLvwhCIvTWLAefUjWXTw/8kvj
+	LNVky49EYqZxcKXtWKAVsr5anEY6vE52lB6YtOspakAtAI5rgnezKe5HEDJ9ND8=
+X-Google-Smtp-Source: AGHT+IF+aeMqV2rKAuv61HduvUq1HkREkex7cEjAy7nPtVPfuS68jcRhASn6Dsq8GkYqaHel7bXwwA==
+X-Received: by 2002:a05:622a:58cc:b0:463:1577:2416 with SMTP id d75a77b69052e-46363e2e5b7mr16159931cf.32.1731635954588;
+        Thu, 14 Nov 2024 17:59:14 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635a9e97f4sm13129521cf.22.2024.11.14.17.59.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 17:59:13 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tBlc8-00000002LdN-1jZw;
+	Thu, 14 Nov 2024 21:59:12 -0400
+Date: Thu, 14 Nov 2024 21:59:12 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
+ dmabuf memory provider
+Message-ID: <20241115015912.GA559636@ziepe.ca>
+References: <20241107212309.3097362-1-almasrymina@google.com>
+ <20241107212309.3097362-5-almasrymina@google.com>
+ <20241108141812.GL35848@ziepe.ca>
+ <CAHS8izOVs+Tz2nFHMfiQ7=+hk6jKg46epO2f6Whfn07fNFOSRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHS8izOVs+Tz2nFHMfiQ7=+hk6jKg46epO2f6Whfn07fNFOSRw@mail.gmail.com>
 
-On Fri, 15 Nov 2024 00:36:35 +0100 Michal Luczaj wrote:
-> > I'll move this to the commit message, it's important.
-> > 
-> > Are you planning to scan callers of copy_from_sockptr() ?
-> > I looked at 3 callers who save the return value, 2 of them are buggy :S  
+On Fri, Nov 08, 2024 at 11:01:21AM -0800, Mina Almasry wrote:
+
+> > If you do this you may want to block accepting dmabufs that have CPU
+> > pages inside them.
+> >
 > 
-> Sure, I took a look:
-> https://lore.kernel.org/netdev/20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co/
-> Have I missed anything?
+> How do I check if the dmabuf has CPU pages inside of it? The only way
+> I can think to do that is to sg_page a scatterlist entry, then
+> !is_zone_device_page() the page. Or something like that, but I thought
+> calling sg_page() on the dmabuf scatterlist was banned now.
 
-Looks like you covered the two I spotted - rxrpc and llc, thanks!
+I don't know. Many dmabuf scenarios abuse scatter list and the CPU
+list is invalid, so you can't reference sg_page().
+
+I think you'd need to discuss with the dmabuf maintainers.
+
+Jason
 
