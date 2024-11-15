@@ -1,155 +1,116 @@
-Return-Path: <netdev+bounces-145234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F4D9CDD3C
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:07:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD509CDD3F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:07:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5406B23C81
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:07:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D652832F6
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B481B6CFF;
-	Fri, 15 Nov 2024 11:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB0B1B3938;
+	Fri, 15 Nov 2024 11:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqrSKY3g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1IVOKUc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670BB1B652B
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 11:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4EF18FC92;
+	Fri, 15 Nov 2024 11:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731668833; cv=none; b=JBoyT4niiZdWzckCfjf+4x04sb4V5vM8TnGgNfKzNDyVS+l1UIj6a/0GZQ4s0avYIJtNwJdvBna6Id40kJDDvBAAncGzU9g8r/2SzxQmxeUhjyGtX1KnwWunZ65MRUlGjz+JWFZs6SnEeR15SGJuA4HO0gMQroYEq0/Vk83qPcA=
+	t=1731668862; cv=none; b=PtRBxBdBbQQj0yBKglwOEnkkwfSjAiYHZr0C8dfVXYNuhiPVYaGCT3Y8eRazHTMiQBPICzWOcNo5XPwpcqaeJ1dgtMPYv30Dd1gaeEq/h18XwNGHNbMbo/z3KNIFmTDFDadBzpyNxJYfy5ZbAWlG9x9ThmAL2bxuipA20mUYaIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731668833; c=relaxed/simple;
-	bh=/Be/Q3Pv/gZYXqIqwnuQYODJ0P9sar7TAP2czlgo7NI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gf850M+e93c4XPs0UKWRdz6qzA2OyXEyxhU6cO+7F8UO2k6NA2dnn9KAAkey4X4FWSH6p+hy5dWibBVMeQ1o1vndl2tOVGiaoV5uMiOopYnv/MAU2pgtlAsPefJfIfPg38vqOzGZ5rfClEqiOZ3tmAqjXxS2nun13dXlEayLG5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TqrSKY3g; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731668830;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/Be/Q3Pv/gZYXqIqwnuQYODJ0P9sar7TAP2czlgo7NI=;
-	b=TqrSKY3gY4PCJVW6cu50J6FvMYKJf8ZGVtoCXh8ikody4Gz7KDbqQyCKsNk20FvfVT6DtI
-	e1+ROKYObgUEKc2BYWdFSKHxyMoXphxUCHZ5dWtsJmM96jd3F7WLTY4IT8vsAellflL5/E
-	AFJykrxM9O9VCTzIoh7B8e6mRqkROus=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-2VDkJo6iO22t0U76GK23cA-1; Fri, 15 Nov 2024 06:07:08 -0500
-X-MC-Unique: 2VDkJo6iO22t0U76GK23cA-1
-X-Mimecast-MFC-AGG-ID: 2VDkJo6iO22t0U76GK23cA
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5cf88ebda56so720750a12.0
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 03:07:08 -0800 (PST)
+	s=arc-20240116; t=1731668862; c=relaxed/simple;
+	bh=F9IcBAH98/nD2miuExOgtqzna16ZxOdtVAV/XT4hAns=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oF/Xp3cvthFmMcs2vJzr0L6hUbAv/V6JkXHXbQJdXqdToHNqHqSQSPh8dntzzeNxX46P7KRQYqHwkgja7yhAH37gToEIEkOrpjoCRUUxbgtSKzdsp7DzU2xlV87cQ3C2ZRfSkdvI6yu/cJrXOXWUFjRuS05kHsifnYq0t8nE/6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1IVOKUc; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7f12ba78072so1245275a12.2;
+        Fri, 15 Nov 2024 03:07:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731668860; x=1732273660; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+s7uyzZf8In4uLin49oKAReXMClKRobUSg+yMBzWuAs=;
+        b=X1IVOKUc8AtUqsF8efkQgjU942UU7rt5DZ3KF0HZ5DirnaANqREfYCXWkYOhcAB6Uc
+         4Z2EbjrI94U5zVS7nXP0O5YOtaz95auqTqvPKS9dXfRnyL7I0/4f2/NMbzOFDvUHKRaB
+         8ESaRb9hHHDJLHjsDWvN1pUSRFlZy6iQhF3f5hGZLy/aFTdyzPLYfob4TLo7hQy6djgI
+         xxDY6HlnMDJtgvG0XCRBsT05QZcC+r0jDFnNYqJ6SNirylf+m2Fpn/y0l42V3FKRH1CC
+         pbmGf/zTnFJkj+d6qVWc3HO2PDX7vaIJAkD0O8NOYnUlxsQ6G+wSqg3bWwDKa4/hd0pl
+         72bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731668827; x=1732273627;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Be/Q3Pv/gZYXqIqwnuQYODJ0P9sar7TAP2czlgo7NI=;
-        b=YjucaZAxVquY2cH59tU+cG4czw/BlBNDwIwqL0ZLmRCnGXIjd0TPNa7Uf/ILdi9rsO
-         nElbxRiLvPF26WcXXz5VhvgZOz9dUMQLQAO1XtZjy8Sow8TvlKvqHhjfE/AHl6C1sl91
-         saolFz4tualn0XzGZkSZz2OCSlipW+VeZanfrcFqNz+trr2cl8v+3w5figRbelH4tczo
-         j5voCWKKhecIRnX5bBArfhDfGEo+QEh8n7zHxarycaEYZUA7j9Y1dhRdNnw2GHN2x1a9
-         Jws2Ml/klSaezDPGeEQo9BLo+kN8X4OMOeU4lQUAnPH/BsaQUguNKZ/NSM1/XoyZ0ukA
-         Gs+A==
-X-Gm-Message-State: AOJu0YyFRl7hQ3TddxqstKt4p86jKpg8wcfYlWapxAk9EQHlYWFYPnkV
-	nZ6h3RjxecSSWbJFku7E/cp1M/r64blm2nqPd8bB0JwYYRSWjWvSatqtLFml5u52XXsEJS8b4Ra
-	CfF+jLiO9RgsBXQKcJbFpRHnDnAGQvyqZQE0rjwZDJpzUoUeiI5fTKPtfiKzs1Q==
-X-Received: by 2002:a17:907:3ea6:b0:a9e:e1a9:792f with SMTP id a640c23a62f3a-aa48347e6acmr192610266b.25.1731668826832;
-        Fri, 15 Nov 2024 03:07:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFFErEXMy1ftFsgtlFkean6KMt2WjV+feVxB3C/tYQRW2vJwMK02kXKvbvss1qizejGe1PQew==
-X-Received: by 2002:a17:907:3ea6:b0:a9e:e1a9:792f with SMTP id a640c23a62f3a-aa48347e6acmr192607366b.25.1731668826413;
-        Fri, 15 Nov 2024 03:07:06 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df501f9sm167303366b.46.2024.11.15.03.07.05
+        d=1e100.net; s=20230601; t=1731668860; x=1732273660;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+s7uyzZf8In4uLin49oKAReXMClKRobUSg+yMBzWuAs=;
+        b=fG22sgrq2+W6Q14pKChkuthgLqwuwVvJE4f7lL2VABdmVxV/YW5XxXn++QKph+Udnm
+         Qg5zqG1fcFn7hIMtpOjHf63undDTSPdCgssTo30DG+pcCNYwl2j7KPIKvLeDqP2MyQlW
+         G5DSOQ1YIxtnh0hu5NbAYqbFfgPjh3Hgnke9Shgy+3Twcx9Ss3h+7ddb3/yyeqfTPwT4
+         /RrIrRJswYlBxls70E85pAHFTKU7H+cXAbE+82qC4dPpepGlyMf3ujmhiujX9+nCbsCU
+         xYQnRmGd85KU6lcW7vOARCtEFpMQP2jFUVRQTfrHgM5IppQeooal0xtjlPEY2c8XK9Do
+         0CRA==
+X-Forwarded-Encrypted: i=1; AJvYcCV3m71SVnfUX8+tLzXW2im6hpC+p6xIazmHdCGKwYKrv3lIiA64DTRWS1txC1np/dax4bYuUtfRO/qoR6g=@vger.kernel.org, AJvYcCVFOBPVyBn4Xq+85fTAoOnP3rm235NFsYcd+uDYDvXlkOOtNWT158wLsFx4tOUXNka2kca67k9s@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAJmbsPo5ZcWXGHJAoMaAQVobuDGRqAyptCZi3/zNU9KUy4T/M
+	9rVKR0d52jp/+bnijUcyCdyVcIfcRCROapPMIKKSaqEk64ty2yo4
+X-Google-Smtp-Source: AGHT+IE0jUvjlIv9ahz4VOxkviACSEPPm9XERK0CMbvsThmxdZ/es+hFfDJJtHURfB0yuoqlI2BAuQ==
+X-Received: by 2002:a05:6a20:7f9a:b0:1d9:8275:cd70 with SMTP id adf61e73a8af0-1dc90bee4e9mr3125851637.40.1731668859858;
+        Fri, 15 Nov 2024 03:07:39 -0800 (PST)
+Received: from HOME-PC ([223.185.134.27])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72477120bbdsm1100341b3a.78.2024.11.15.03.07.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 03:07:05 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 964DE164D1A8; Fri, 15 Nov 2024 12:07:04 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Ryan Wilson <ryantimwilson@gmail.com>, Alexei Starovoitov
- <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, Jakub Kicinski
- <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- ryantimwilson@meta.com, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH bpf-next] bpf: Add multi-prog support for XDP BPF programs
-In-Reply-To: <CA+Fy8Ub7b1SXByugjDo-D13H_12w0iWzQhO-rf=MMhSjby+maA@mail.gmail.com>
-References: <20241114170721.3939099-1-ryantimwilson@gmail.com>
- <CAADnVQJ2V6JnDhvNuqRHEmBcK-6Aty9GRkdRCGEyxnWnRrAKcA@mail.gmail.com>
- <CA+Fy8Ub7b1SXByugjDo-D13H_12w0iWzQhO-rf=MMhSjby+maA@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 15 Nov 2024 12:07:04 +0100
-Message-ID: <874j48rc13.fsf@toke.dk>
+        Fri, 15 Nov 2024 03:07:39 -0800 (PST)
+From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+To: Jason@zx2c4.com,
+	wireguard@lists.zx2c4.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dheeraj.linuxdev@gmail.com
+Subject: [PATCH net-next] wireguard: allowedips: Fix useless call issue
+Date: Fri, 15 Nov 2024 16:37:21 +0530
+Message-Id: <20241115110721.22932-1-dheeraj.linuxdev@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Ryan
+This commit fixes a useless call issue detected
+by Coverity (CID 1508092). The call to
+horrible_allowedips_lookup_v4 is unnecessary as
+its return value is never checked.
 
-I'll take a more detailed look at your patch later, but wanted to add
-a few smallish comment now, see below:
+Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+---
+ drivers/net/wireguard/selftest/allowedips.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-
-Ryan Wilson <ryantimwilson@gmail.com> writes:
-> On Thu, Nov 14, 2024 at 4:52=E2=80=AFPM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
->>
->> On Thu, Nov 14, 2024 at 9:07=E2=80=AFAM Ryan Wilson <ryantimwilson@gmail=
-.com> wrote:
->> >
->> > Currently, network devices only support a single XDP program. However,
->> > there are use cases for multiple XDP programs per device. For example,
->> > at Meta, we have XDP programs for firewalls, DDOS and logging that must
->> > all run in a specific order. To work around the lack of multi-program
->> > support, a single daemon loads all programs and uses bpf_tail_call()
->> > in a loop to jump to each program contained in a BPF map.
->>
->> The support for multiple XDP progs per netdev is long overdue.
->> Thank you for working on this!
-
-+1 on this!
-
-
-[...]
-
-> Note for real drivers, we do not hit this code. This is how it works
-> for real drivers:
-> - When installing a BPF program on a driver, we call the driver's
-> ndo_bpf() callback function with command =3D XDP_QUERY_MPROG_SUPPORT. If
-> this returns 0, then mprog is supported. Otherwise, mprog is not
-> supported.
-
-We already have feature flags for XDP, so why not just make mprog
-support a feature flag instead of the query thing? It probably should be
-anyway, so it can also be reported to userspace.
-
->> I think it will remove this branch and XDP performance will remain
->> the same ?
->> Benchmarking on real NIC matters, of course.
->
-> Good point. I will migrate a real driver and add XDP benchmarking
-> numbers to v2.
-
-Yes, please, looking forward to seeing benchmark numbers!
-
--Toke
+diff --git a/drivers/net/wireguard/selftest/allowedips.c b/drivers/net/wireguard/selftest/allowedips.c
+index 3d1f64ff2e12..25de7058701a 100644
+--- a/drivers/net/wireguard/selftest/allowedips.c
++++ b/drivers/net/wireguard/selftest/allowedips.c
+@@ -383,7 +383,6 @@ static __init bool randomized_test(void)
+ 		for (i = 0; i < NUM_QUERIES; ++i) {
+ 			get_random_bytes(ip, 4);
+ 			if (lookup(t.root4, 32, ip) != horrible_allowedips_lookup_v4(&h, (struct in_addr *)ip)) {
+-				horrible_allowedips_lookup_v4(&h, (struct in_addr *)ip);
+ 				pr_err("allowedips random v4 self-test: FAIL\n");
+ 				goto free;
+ 			}
+-- 
+2.34.1
 
 
