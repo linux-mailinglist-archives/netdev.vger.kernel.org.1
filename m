@@ -1,118 +1,119 @@
-Return-Path: <netdev+bounces-145319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CAFA9CF04C
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:40:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C90C9CF062
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1298528B95D
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:40:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13615288FB5
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138231E008E;
-	Fri, 15 Nov 2024 15:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6505E1D6DBC;
+	Fri, 15 Nov 2024 15:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y02bJzNX"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="C40dr8q9";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DexVQlk5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33601D5145;
-	Fri, 15 Nov 2024 15:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCE41D517E;
+	Fri, 15 Nov 2024 15:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731684808; cv=none; b=TwixIcWxptGhjbpUWIKe/tW5qb93F+F5j/1O7/7kibZuo65Ha429Qm8NNqTnzr9AXxkvtJ7/tekq7+daMTedq6NzHSc49bbOYm4HcEDR+SEnPV4hMMq4VtiQZGv8RXRXNzUUV4sQJWvbks4a4rBGnvWIjlHrpspL0RoFFziGD/A=
+	t=1731684918; cv=none; b=hdlQRX9+3fjQCictF7tkGQDpqJuDnuKD6UVeiGvmQpjXz0La0Gta51yd1DSKM7jPAaearQzaMurY82XeMoKGoNes0TlOeIsWQLDw+HbOZmWiUfBG477RUOcPGm2bQbB+9bibigRoueAVlSMj4HaK8S3w4s/4yI/13tZnx1wWDS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731684808; c=relaxed/simple;
-	bh=EQmW+6qtlic7muFJOBQKcRPW3U1LPcHefIwIJM6ZqeU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AgTizwobzUHu/DWjRn6I3xixO6qGs9a2ujaJUOj+MgPFhIx52r8s61EMAxy1eYQpLQdOLC3c4BQs+n4xSFKusgXXrbkRBmE7UGBNk0qov9K5vf9Lmw2RYyXMuZY0evsbubu6Yl+TZIyey8szt8Y0qrPXVcdo/Mf76TKzi4Anj/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y02bJzNX; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20c70abba48so20347655ad.0;
-        Fri, 15 Nov 2024 07:33:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731684806; x=1732289606; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=R4xDCj5B2QeGrTNDvnzO6HQLCL3c6E+XtripCJ8X3Mw=;
-        b=Y02bJzNXKCYh7aTwdGop4Np8SoeNlbbSBfIAGeRBg62Y/VQ7Xj17jFWAjLECcttANz
-         XIfTPxkxrUU6BdO3jd5/cFLyJ6kg8aDUwGHFPPz17b/YZCeKlmndqqk0Y5L7ARXiiFKe
-         D1MvEOfTu5+wZXpkOddjVig2p8ag4Fs8HZ2UDaUflkxT1vXfgQsvyBzmKfaDDKKgIfSg
-         Y/zIqNTA9enR69dqPvuR60Lzdmv2WMIogV1g4qzKAAP1xs+VNkqbBWmH//Q5RgXsxVh2
-         zc+QkM4CwtHf/+/BHEDG4qoiwhp5BqnQR6iQgGasTiZZl0cmSnW3WQvvBPCGcUta8jpr
-         NEtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731684806; x=1732289606;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R4xDCj5B2QeGrTNDvnzO6HQLCL3c6E+XtripCJ8X3Mw=;
-        b=X+M59Vcq5ULBuSeusb03L12z9dM+oSYqDtz69pSjjPwXxRlHLApSKKJ+3LRbfAKn8F
-         DCwdLzIXYzf86QcEkem0fXb/7TlaVMSamIxI7/uaiNkoMfJExUiwS3Wx0hTAj6OLANW9
-         +cLwfInJDlUqv2jPST6AMXW+sRvSkc4mH4wT/ewGdJ4Ph8Jmv6fxkwjCZY8MkcKlNGQe
-         asth7fCGnz48vvK+j+g/6t4Xn4L/gPi/zEPaN5mvRjYgeu8wy3S5EUAkojVq+gphbZB3
-         1mvgBNbjrfrSluW7c1lxd61XgYC6SUZaBoyS3z0kFhTFelMwqqwyb21WXmlDtGwFwSWM
-         IoJw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLda1vgIQcWOm0tgueBq9XyKPJk9lnXjyGN1F4TU54996ltz2DHmcHWG4rqpgC42aEomA=@vger.kernel.org, AJvYcCVbBwlm0tU5+WJ2EKTiUru40uWO9ys9bU8+owAng/kOpHwxadh1CvQVIDak0HAOQtSOFrh7KM2qmlWmKsqY@vger.kernel.org, AJvYcCVepxvsA6PYaYDX1QahNcyGB8iuWrqnRq/h6QvOd+0BSap5HDGvbXBiHI0YuJXciJ8H51o0mBHV@vger.kernel.org, AJvYcCX82Drk2Ez1rPRtEXmSoYxiWN8yO5sB3xC3eEFNPkCysogu75umjJaX6JAUZDzSvPu/zdQoaxXTy4T5c45VcyQg@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGW64DxKDiPYQuKBvcThJKQjYWJcc+o8TxjsFe+8ilmyAVPAEv
-	KR1lqSmJkEQN+5IRKEnlWFKUHC23jl3j0xI+hiy1eLWMwX6AOYQ=
-X-Google-Smtp-Source: AGHT+IFdNLJpKmGKgs+Fdc+XyEbqC4Q7ibZECpAVJgFfNUW2ri9gW30CImhEHhaKAvks7ItIU3ci8A==
-X-Received: by 2002:a17:902:e746:b0:20b:80e6:bcdf with SMTP id d9443c01a7336-211d0d726b3mr39033025ad.23.1731684805713;
-        Fri, 15 Nov 2024 07:33:25 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0ec7db9sm13545245ad.63.2024.11.15.07.33.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 07:33:25 -0800 (PST)
-Date: Fri, 15 Nov 2024 07:33:24 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Alexis =?utf-8?Q?Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Bastien Curutchet <bastien.curutchet@bootlin.com>,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 10/13] selftests/bpf: rename pseudo headers
- checksum computation
-Message-ID: <ZzdpxDYzwDDu5W6x@mini-arch>
-References: <20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com>
- <20241114-flow_dissector-v2-10-ee4a3be3de65@bootlin.com>
+	s=arc-20240116; t=1731684918; c=relaxed/simple;
+	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=m/pI1vZAQ9gxkkrLO4Ck9+wP9LbxWHNLTrhIlgyWxvHYEzuYsWqKH43sexoA3BbGj7kQl9pEwxtFlUBhKoXMYEr3MPsrKTXACWNVH2K83g8VfSZbA+QAphVFxiaJU71bVjVC2mmG1w6Z5DxdTlmomxVVMcXRL/fQCj5cluVl7lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=C40dr8q9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DexVQlk5; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1731684914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
+	b=C40dr8q9ADx3mdyM9aZWGfyNweZhURE5tGHsnoEPOBZ904QoHc4A1GcjWf/GhDl0Adlgrf
+	69L3PJoNzAzHniCsGBlfwosD15LDHvc8ITSwBMRd+5Sbe41oaOOiaEZlNe1GflVWe7uMmn
+	Kzt8nWpH6yNOxLgVHZos2j37vQf3hzemX8dtqEeaHa/T8/Znh9DDC8Ece7mjtCtQQT3Ujv
+	KD9bNcHp4TJd//4bZGwhCHqCSvgB4uI1kMAvZ+ldC3dONiNJGi2r2u0iSkzbPxxKe4NX3O
+	SQh1dzqAsqbj2vzeJBJM/qwLDpY3Q9H6tWI4KQY8TUCGPS3qaekoi9YVTk7kCQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1731684914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
+	b=DexVQlk5YViUHETMQnzqsi81sHcgKGKaG/NWsxoB8OfZI81poTF211mDX/o0kNLPLWaOEC
+	Apumdsb73YjhwXBQ==
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
+ <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
+ Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam
+ Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave
+ Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Juergen Gross <jgross@suse.com>, Stefano
+ Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Philipp Stanner <pstanner@redhat.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Chen Ni
+ <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
+ <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
+ <kevin.tian@intel.com>, Mostafa Saleh <smostafa@google.com>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
+ <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>, Christian Brauner
+ <brauner@kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, Eric
+ Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 07/11] PCI: MSI: Use never-managed version of pci_intx()
+In-Reply-To: <20241113124158.22863-9-pstanner@redhat.com>
+References: <20241113124158.22863-2-pstanner@redhat.com>
+ <20241113124158.22863-9-pstanner@redhat.com>
+Date: Fri, 15 Nov 2024 16:35:22 +0100
+Message-ID: <87y11kzf0l.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241114-flow_dissector-v2-10-ee4a3be3de65@bootlin.com>
+Content-Type: text/plain
 
-On 11/14, Alexis Lothoré (eBPF Foundation) wrote:
-> network_helpers.h provides helpers to compute checksum for pseudo
-> headers but no helpers to compute the global checksums.
-> 
-> Before adding those, rename the pseudo header checksum helper to clarify
-> their role.
+On Wed, Nov 13 2024 at 13:41, Philipp Stanner wrote:
+> pci_intx() is a hybrid function which can sometimes be managed through
+> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+> port users to either an always-managed or a never-managed version.
+>
+> MSI sets up its own separate devres callback implicitly in
+> pcim_setup_msi_release(). This callback ultimately uses pci_intx(),
+> which is problematic since the callback of course runs on driver-detach.
+>
+> That problem has last been described here:
+> https://lore.kernel.org/all/ee44ea7ac760e73edad3f20b30b4d2fff66c1a85.camel@redhat.com/
+>
+> Replace the call to pci_intx() with one to the never-managed version
+> pci_intx_unmanaged().
+>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-Same here: let's keep the old names? They are matching the ones we
-have on the kernel side so it's easy to find them. I do agree that
-the naming is unfortunate :-( If you prefer, maybe clarify with
-a doc?
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
 
