@@ -1,278 +1,159 @@
-Return-Path: <netdev+bounces-145239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 446B39CDDEF
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:59:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B359CDE27
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 985CCB25724
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 11:59:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00B01B2104D
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 12:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9791BA89C;
-	Fri, 15 Nov 2024 11:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F81B1B5EDC;
+	Fri, 15 Nov 2024 12:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6PfnwHS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hgp2erme"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DCF1B85C0
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 11:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D647D3F4;
+	Fri, 15 Nov 2024 12:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731671963; cv=none; b=GQRwgxvaLJ6Tl0VU/3EouaAPKCcTIZhmlHNhlWvhClwS00QdsFdJSdgI3abN4XAc4oHqvZD4NthXvuBneprYwg1te1IO5lx2bwf2S8s8lGzeda5NwAiHdkgGanzbNeftKwP6SJA6jCz6lhkoVSxz4ccRgjNvb8Yug8VBx+OICOc=
+	t=1731673160; cv=none; b=cvowa4Lo9/Z2KaqyDHwqQrq8VpGNXx7dQ1y3e5TFC9TCyeDlUM+1dh7y4F0/g3YisQLXxS7aLr3T7HTf9yovyIh1LlUjb344I9VsbIQ8KYnqKwGguT5tUD3M3QOGDf9ExG878FRytD1FYr30F1LXRKp/dnU2kDrlxnMVn6p8Ohg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731671963; c=relaxed/simple;
-	bh=2pulDDreteiHjL9r4qUGqKDhpqeb1HMkFOW42Xg7+Go=;
+	s=arc-20240116; t=1731673160; c=relaxed/simple;
+	bh=xYQ9TNp9p5kYBx3sWMGmhMUu5MqStfTQnH3N5bBDZJc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kL+Gn7+blUGz8boPC2n6N/PvisTJyOs1exE7LCkiNeI47HRmHVnP9dk4aEEnUTZH/bFMfwwY7dZdXjghgXt5qVowGaDolZt+pXpsiHwqHG17nmc72wsfFjVtHjzby5hsCOUCEuD1BaJn9hUzULlONwp1m8Kl0u2OX6W92zRx874=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6PfnwHS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731671960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KWFhnUI/8u1MsI357oWFQrDLalvod+ZiB7DQP1zPYnA=;
-	b=N6PfnwHSnw8ElqvfDpbFO5/woGEVGcgDRt+1S449QeFmvCXlJhW4SMVh0FuV0LV0hHbivf
-	RB+pPjAqbBEjFjfnW0uGaOp06rAg3zSlm2nzVV7PbhTwFeo2V6oELqtLVYOTgOlcpH61Q3
-	lB3xEKGWbpkDm9c35pOcwa0R9weGW7Y=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-WN9_3Mh4MjCCvXK9IoZREQ-1; Fri, 15 Nov 2024 06:59:19 -0500
-X-MC-Unique: WN9_3Mh4MjCCvXK9IoZREQ-1
-X-Mimecast-MFC-AGG-ID: WN9_3Mh4MjCCvXK9IoZREQ
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b147855414so203871785a.0
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 03:59:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731671959; x=1732276759;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KWFhnUI/8u1MsI357oWFQrDLalvod+ZiB7DQP1zPYnA=;
-        b=ve2eHz4qoO66hg9HbBYeBpsD+wST6JVXVK6UydsZMUUmrtiSJihhPxwPriV6zxMS7w
-         l6rxgMYDL8Baxff5pU3wQuZ0XrtFGIZgkw66wGvdLYsu4ljsjhOeEIiq+GLndKpH4uZa
-         K5F564jwfMN5SyQkq+Fl921Wc342d9qR8w6vtkQQh5jnQ1notLBDKVsGI1Mu+KhszJ0o
-         rHTTJvCm73vmDa3WsCVpOlfqYMvxDZBT5H8uYEEZRwA5YlPknpEIbjFuoM5abEw1NrOP
-         al4QQXwsgvhpsSpnZ94FfWmFsvodTpsYXvaafZuAEvPNvW07BEUVVXuIBzWj385jnGRg
-         D5Jg==
-X-Gm-Message-State: AOJu0YwgAUxjX5rhbXQFZNn0o+DwWRtvC5wHpDD46y/IAtN5rIs8asvm
-	f4KB3t4l+6KgpxzmTxCRxsRy3jYbn7ZZN4uteEHwKLkAYR7z4NpNAxanCG182JMUJv7tZARBA0v
-	Dh7fP9lqpLbbJrqbhfVh+kbRz37Dv6r67KuqAHSfQksuB+uBrBtaY9w==
-X-Received: by 2002:a05:620a:179e:b0:7b3:56f4:6e09 with SMTP id af79cd13be357-7b3622bcab6mr264000385a.27.1731671958887;
-        Fri, 15 Nov 2024 03:59:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEfVKO66Y6rgNt/itCv3b+8Dv2NvBLsA25nUYuxO9qTqEw2uRmmntwxkoCY3pA5nCghXARiwg==
-X-Received: by 2002:a05:620a:179e:b0:7b3:56f4:6e09 with SMTP id af79cd13be357-7b3622bcab6mr263998485a.27.1731671958500;
-        Fri, 15 Nov 2024 03:59:18 -0800 (PST)
-Received: from sgarzare-redhat ([79.46.200.129])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b35c984691sm151968885a.2.2024.11.15.03.59.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 03:59:17 -0800 (PST)
-Date: Fri, 15 Nov 2024 12:59:07 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, Asias He <asias@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <yjhfe5bsnfpqbnibxl2urrnuowzitxnrbodlihz4y5csig7e7p@drgxxxxgokfo>
-References: <20241115103016.86461-1-graf@amazon.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hZ177MoeI3ROUYB0NATMj2oWtR/M+XRHFfyfFeM/v1LbcG8am0LNQOe27MuvoRQjIiS0JJUpgiQ/gDwAptLi4QIYuIMLzRH+8oomJqdRoCcjwJHTit/KPeodSk0lvNVFNUorbDtJANxIYERn9/vWfCAiGu4DxxhHSuSN/wLCBmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hgp2erme; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D463EC4CECF;
+	Fri, 15 Nov 2024 12:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731673159;
+	bh=xYQ9TNp9p5kYBx3sWMGmhMUu5MqStfTQnH3N5bBDZJc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Hgp2ermerQoEtA7rDHw8fmjZvMztpbM6wzYhbqM2dYdaYgpB3s7A2zNC5RUoQUExz
+	 EWON/IPsj0QzBO0ybOKrRxgw7bgnE5FrwLJ969oQFLtmAiCWTyxblXbsnBgnXBEwDD
+	 KV2XdzQ0Mjfo0DisVOxFYLAVidMOxlVPpJX9P/ruVUaefgrxnm9bWc9WVUSZEPWOzW
+	 tFZQbG9M083rPlm8lnCUzkoa7tXVuqzvA3MyGheGxFQMxbtpGKjBniaL659U2akiQC
+	 kxwl+CVy45uP7aIZUqT+wynK25ye9nFWmWqai+3yguXZzNZf9g9PGuYzBMzCkWnYwK
+	 OAyU/ogCBDf7w==
+Date: Fri, 15 Nov 2024 12:19:14 +0000
+From: Simon Horman <horms@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Herve Codina <herve.codina@bootlin.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next v2 01/10] net: freescale: ucc_geth: Drop support
+ for the "interface" DT property
+Message-ID: <20241115121914.GL1062410@kernel.org>
+References: <20241114153603.307872-1-maxime.chevallier@bootlin.com>
+ <20241114153603.307872-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241115103016.86461-1-graf@amazon.com>
+In-Reply-To: <20241114153603.307872-2-maxime.chevallier@bootlin.com>
 
-On Fri, Nov 15, 2024 at 10:30:16AM +0000, Alexander Graf wrote:
->Ever since the introduction of the virtio vsock driver, it included
->pushback logic that blocks it from taking any new RX packets until the
->TX queue backlog becomes shallower than the virtqueue size.
->
->This logic works fine when you connect a user space application on the
->hypervisor with a virtio-vsock target, because the guest will stop
->receiving data until the host pulled all outstanding data from the VM.
+On Thu, Nov 14, 2024 at 04:35:52PM +0100, Maxime Chevallier wrote:
+> In april 2007, ucc_geth was converted to phylib with :
+> 
+> commit 728de4c927a3 ("ucc_geth: migrate ucc_geth to phylib").
+> 
+> In that commit, the device-tree property "interface", that could be used to
+> retrieve the PHY interface mode was deprecated.
+> 
+> DTS files that still used that property were converted along the way, in
+> the following commit, also dating from april 2007 :
+> 
+> commit 0fd8c47cccb1 ("[POWERPC] Replace undocumented interface properties in dts files")
+> 
+> 17 years later, there's no users of that property left and I hope it's
+> safe to say we can remove support from that in the ucc_geth driver,
+> making the probe() function a bit simpler.
+> 
+> Should there be any users that have a DT that was generated when 2.6.21 was
+> cutting-edge, print an error message with hints on how to convert the
+> devicetree if the 'interface' property is found.
+> 
+> With that property gone, we can greatly simplify the parsing of the
+> phy-interface-mode from the devicetree by using of_get_phy_mode(),
+> allowing the removal of the open-coded parsing in the driver.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+> V2: No changes
+> 
+>  drivers/net/ethernet/freescale/ucc_geth.c | 63 +++++------------------
+>  1 file changed, 12 insertions(+), 51 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
 
-So, why not skipping this only when talking with a sibling VM?
+...
 
->
->With Nitro Enclaves however, we connect 2 VMs directly via vsock:
->
->  Parent      Enclave
->
->    RX -------- TX
->    TX -------- RX
->
->This means we now have 2 virtio-vsock backends that both have the pushback
->logic. If the parent's TX queue runs full at the same time as the
->Enclave's, both virtio-vsock drivers fall into the pushback path and
->no longer accept RX traffic. However, that RX traffic is TX traffic on
->the other side which blocks that driver from making any forward
->progress. We're not in a deadlock.
->
->To resolve this, let's remove that pushback logic altogether and rely on
->higher levels (like credits) to ensure we do not consume unbounded
->memory.
+> @@ -3627,18 +3588,17 @@ static int ucc_geth_probe(struct platform_device* ofdev)
+>  	/* Find the TBI PHY node.  If it's not there, we don't support SGMII */
+>  	ug_info->tbi_node = of_parse_phandle(np, "tbi-handle", 0);
+>  
+> -	/* get the phy interface type, or default to MII */
+> -	prop = of_get_property(np, "phy-connection-type", NULL);
+> -	if (!prop) {
+> -		/* handle interface property present in old trees */
+> -		prop = of_get_property(ug_info->phy_node, "interface", NULL);
+> -		if (prop != NULL) {
+> -			phy_interface = enet_to_phy_interface[*prop];
+> -			max_speed = enet_to_speed[*prop];
+> -		} else
+> -			phy_interface = PHY_INTERFACE_MODE_MII;
+> -	} else {
+> -		phy_interface = to_phy_interface((const char *)prop);
+> +	prop = of_get_property(ug_info->phy_node, "interface", NULL);
+> +	if (prop) {
+> +		dev_err(&ofdev->dev,
+> +			"Device-tree property 'interface' is no longer supported. Please use 'phy-connection-type' instead.");
+> +		goto err_put_tbi;
 
-I spoke quickly with Stefan who has been following the development from
-the beginning and actually pointed out that there might be problems
-with the control packets, since credits only covers data packets, so
-it doesn't seem like a good idea remove this mechanism completely.
+Hi Maxime,
 
->
->Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+This goto will result in err being returned by this function.
+But here err is 0. Should it be set to an error value instead?
 
-I'm not sure we should add this Fixes tag, this seems very risky
-backporting on stable branches IMHO.
+Flagged by Smatch.
 
-If we cannot find a better mechanism to replace this with something
-that works both guest <-> host and guest <-> guest, I would prefer
-to do this just for guest <-> guest communication.
-Because removing this completely seems too risky for me, at least
-without a proof that control packets are fine.
-
-Thanks,
-Stefano
-
->Signed-off-by: Alexander Graf <graf@amazon.com>
->---
-> net/vmw_vsock/virtio_transport.c | 51 ++------------------------------
-> 1 file changed, 2 insertions(+), 49 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 64a07acfef12..53e79779886c 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -44,8 +44,6 @@ struct virtio_vsock {
-> 	struct work_struct send_pkt_work;
-> 	struct sk_buff_head send_pkt_queue;
->
->-	atomic_t queued_replies;
->-
-> 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
-> 	 * must be accessed with rx_lock held.
-> 	 */
->@@ -171,17 +169,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->
-> 		virtio_transport_deliver_tap_pkt(skb);
->
->-		if (reply) {
->-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->-			int val;
->-
->-			val = atomic_dec_return(&vsock->queued_replies);
->-
->-			/* Do we now have resources to resume rx processing? */
->-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
->-				restart_rx = true;
->-		}
->-
-> 		added = true;
-> 	}
->
->@@ -218,9 +205,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
-> 		goto out_rcu;
-> 	}
->
->-	if (virtio_vsock_skb_reply(skb))
->-		atomic_inc(&vsock->queued_replies);
->-
-> 	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
-> 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
->
->@@ -233,7 +217,7 @@ static int
-> virtio_transport_cancel_pkt(struct vsock_sock *vsk)
-> {
-> 	struct virtio_vsock *vsock;
->-	int cnt = 0, ret;
->+	int ret;
->
-> 	rcu_read_lock();
-> 	vsock = rcu_dereference(the_virtio_vsock);
->@@ -242,17 +226,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
-> 		goto out_rcu;
-> 	}
->
->-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
->-
->-	if (cnt) {
->-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
->-		int new_cnt;
->-
->-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
->-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
->-		    new_cnt < virtqueue_get_vring_size(rx_vq))
->-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->-	}
->+	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
->
-> 	ret = 0;
->
->@@ -323,18 +297,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
-> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-> }
->
->-/* Is there space left for replies to rx packets? */
->-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
->-{
->-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
->-	int val;
->-
->-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
->-	val = atomic_read(&vsock->queued_replies);
->-
->-	return val < virtqueue_get_vring_size(vq);
->-}
->-
-> /* event_lock must be held */
-> static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
-> 				       struct virtio_vsock_event *event)
->@@ -581,14 +543,6 @@ static void virtio_transport_rx_work(struct work_struct *work)
-> 			struct sk_buff *skb;
-> 			unsigned int len;
->
->-			if (!virtio_transport_more_replies(vsock)) {
->-				/* Stop rx until the device processes already
->-				 * pending replies.  Leave rx virtqueue
->-				 * callbacks disabled.
->-				 */
->-				goto out;
->-			}
->-
-> 			skb = virtqueue_get_buf(vq, &len);
-> 			if (!skb)
-> 				break;
->@@ -735,7 +689,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->
-> 	vsock->rx_buf_nr = 0;
-> 	vsock->rx_buf_max_nr = 0;
->-	atomic_set(&vsock->queued_replies, 0);
->
-> 	mutex_init(&vsock->tx_lock);
-> 	mutex_init(&vsock->rx_lock);
->-- 
->2.40.1
->
->
->
->
->Amazon Web Services Development Center Germany GmbH
->Krausenstr. 38
->10117 Berlin
->Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
->Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
->Sitz: Berlin
->Ust-ID: DE 365 538 597
->
->
-
+> +	}
+> +
+> +	err = of_get_phy_mode(np, &phy_interface);
+> +	if (err) {
+> +		dev_err(&ofdev->dev, "Invalid phy-connection-type");
+> +		goto err_put_tbi;
+>  	}
+>  
+>  	/* get speed, or derive from PHY interface */
+> @@ -3746,6 +3706,7 @@ static int ucc_geth_probe(struct platform_device* ofdev)
+>  err_deregister_fixed_link:
+>  	if (of_phy_is_fixed_link(np))
+>  		of_phy_deregister_fixed_link(np);
+> +err_put_tbi:
+>  	of_node_put(ug_info->tbi_node);
+>  	of_node_put(ug_info->phy_node);
+>  	return err;
+> -- 
+> 2.47.0
+> 
+> 
 
