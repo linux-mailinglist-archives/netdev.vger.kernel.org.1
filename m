@@ -1,95 +1,145 @@
-Return-Path: <netdev+bounces-145351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE4819CF300
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:34:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96CAF9CF331
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 18:45:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78A3A280E28
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:34:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C6E9283FA0
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 17:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661421D6193;
-	Fri, 15 Nov 2024 17:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91501D61A1;
+	Fri, 15 Nov 2024 17:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="IGRPnAOt"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P5pZgxis"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D481215573A
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 17:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5100E1D5ADB;
+	Fri, 15 Nov 2024 17:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731692072; cv=none; b=FspKb6kMYAtoWZpF9aampQG9GoCvoHQBONb4IGovD8laqeEuIdgUreba1ezpQ7hWw5rWyCR9LzxvF0mPF3cTL2gqM9v1UsVqqgjIZZWdCHIkLNwgk5ioLNRIAa9CMevRBbpGik8/GR0Ngk627l8QdiQ36ckAPwrG3kxzI7i8is4=
+	t=1731692708; cv=none; b=RWIj+i9H11b4ZMkLfXJgkgaJFBXZVYZWGUKHteTUYzz6cfys7CRAXpwJI2ufI+Wp4fn7eXXDEOLg30KrVNDSJzCH5TzsL0zwikqjKNF8/pAO9ecxGWHq47UC18ljN4zJksesSjR6m+Wq7+If8eqJj9MGGV9bUNDO7vhNzHnDdyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731692072; c=relaxed/simple;
-	bh=B5foYQMH1aGdnaqJkB9lNTV83r6o8dGsvVkXPS7ossY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=msTvFm8s1EU0nl3g3NY/QgOsx7znRYw2M7/ELot+GLSlNFnV7bUlv3NkSBfR8VeyHGXZD98VjItcLwPf52nvebdB/ZPCQsG+fL9x5YA+F3pysaXas0xVLrHFZXjIwstyN0hpQpnRdutz5o5+zILuiBLphm8B1U0fcwQMaW9I+Mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=IGRPnAOt; arc=none smtp.client-ip=80.12.242.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id C0DAtmzuzJKJTC0DCt0RFy; Fri, 15 Nov 2024 18:34:28 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1731692068;
-	bh=uoqQAzrDh+tCtRBnaJ5TIwLIBIdjUa2Cj3TVQQfnVMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=IGRPnAOtyQbLGiz4CaEVjBvQFWgXjlCqNXPwS7kX8V+6FoH5AwMjaRdaOsqJTAhWi
-	 BypjRDEnDoSa69AgDareLrdV8rycNbsVqfxFO1jFzS9Sige7XwjCm1uH3FhKHzIhX7
-	 zOjJ8YNNpb0cTu8FcWTWDdLdhHybsQBcSq0BXOy2Ioh+Si/VtYtVM0SDp/FbJtNhSB
-	 iu+GJ/H13lKpFpWnS2Ykx+DypCbD97zjBai3wwN1lvqO0yUNfEbFfZQlsALXDULkSq
-	 E9HmiZA3/R6fB2Js9CF0V4pSps/Ba3C2re9oU/jvNZcEZJQX7rhz44GqcZdOczIQfh
-	 aFqQS8Lx24JqQ==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 15 Nov 2024 18:34:28 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <64787857-cbea-4fd3-b169-e7a8230234bf@wanadoo.fr>
-Date: Sat, 16 Nov 2024 02:34:23 +0900
+	s=arc-20240116; t=1731692708; c=relaxed/simple;
+	bh=QTWbwD3DKt0zr3HVsMrLQMkox5w7tN0rnElVWEnMM14=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OvimdVVK4oUWB/mfjAg9eFYRsY/fmj9xovm82dQPGMtreRRc9dpromr6ZCFuddZom4pMcAY5qdatcYvqrAocql/9ha7xvM27YTm2JIqSQxvjiUuqPJLX3pirNL8/ijagOVVr0UQqBZcIodEWyT7LTNllL/ExgabqfmUHPBa4LIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P5pZgxis; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AFAYcWY008123;
+	Fri, 15 Nov 2024 17:45:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=9bwZzCyAvLguoe37pSaNCSSBT7z9
+	wKmcx4So1GTdFbs=; b=P5pZgxisEBU6TpexMjXjUUJAS4jxH9jyXTNIdgwdJ+l5
+	MmiOXh2qqtn11eBm6Ym3R+u+SyZ0o5u/bRJgTcoIvmcOdR3xG14U2FzUgKO6TO5O
+	2oAJWk+z1HvRX6lH1i9AMYLcoPcgHymjKabaDAnAsXWGUQXUYekVQ5p+Nj8rkppG
+	d9c6psyCrmoVLUfFoBhNX5vttE9gfp8hnfjOWCaYgiMNdNjYmL515FF1cNtfm0jH
+	l+WywwQhLRACCO6Yk5cwjuzZDAvo2zfAsAjylClZcNnI8k3amBmhCmuCOK4Hgfj2
+	gZELWBG9DMdCmLCdk2KAe5FbOdWV+VwYQNGdN07npg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42wu2vvsn5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Nov 2024 17:45:04 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AFHfs7v009421;
+	Fri, 15 Nov 2024 17:45:04 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42wu2vvsn1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Nov 2024 17:45:04 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AF8H6dM017821;
+	Fri, 15 Nov 2024 17:45:02 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42tk2n2se9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Nov 2024 17:45:02 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AFHiwZb19726688
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 15 Nov 2024 17:44:58 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 438C32004D;
+	Fri, 15 Nov 2024 17:44:58 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1CD2820040;
+	Fri, 15 Nov 2024 17:44:58 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 15 Nov 2024 17:44:58 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+Date: Fri, 15 Nov 2024 18:44:57 +0100
+Subject: [PATCH net-next] net/smc: Run patches also by RDMA ML
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next] add .editorconfig file for basic formatting
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@gmail.com>
-References: <20241115151030.1198371-2-mailhol.vincent@wanadoo.fr>
- <20241115084934.5a9ac7c6@hermes.local>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-In-Reply-To: <20241115084934.5a9ac7c6@hermes.local>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20241115-smc_lists-v1-1-a0a438125f13@linux.ibm.com>
+X-B4-Tracking: v=1; b=H4sIAJiIN2cC/22NywqDMBBFf0Vm3YiTFh9d9T+KFJOMdUATSVKxi
+ P/ekHWXh3s494BAninAvTjA08aBnU2AlwL0NNg3CTaJQVbyhljVIiz6NXOIQaiupbqVnbqihuS
+ vnkbec+sJlqKwtEfo0zIl3/lvPtkw7396GwoUXWO0GWmoGlSPme1nL1ktpXYL9Od5/gCTMqTIs
+ AAAAA==
+X-Change-ID: 20241106-smc_lists-b98e6829b31c
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Leon Romanovsky <leon@kernel.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>, linux-rdma@vger.kernel.org,
+        netdev@vger.kernel.org, linux390-list@tuxmaker.boeblingen.de.ibm.com,
+        linux-kernel@vger.kernel.org, Gerd Bayer <gbayer@linux.ibm.com>
+X-Mailer: b4 0.14.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: m24rJp-3g8Idy14-TaxmhZLjBXES-qUQ
+X-Proofpoint-GUID: LpD6NkObD4_44A3ElA8ZqYQXW7Vrk1nW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ malwarescore=0 mlxscore=0 clxscore=1011 adultscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411150148
 
-On 16/11/2024 at 01:49, Stephen Hemminger wrote:
-> On Sat, 16 Nov 2024 00:08:27 +0900
-> Vincent Mailhol <mailhol.vincent@wanadoo.fr> wrote:
-> 
->> +
->> +[*.yaml]
->> +charset = utf-8
->> +end_of_line = lf
->> +insert_final_newline = true
->> +indent_style = space
->> +indent_size = 2
->> -- 
-> 
-> Ok, but there are no .yaml files in iproute2-next
+Commits for the SMC protocol usually get carried through the netdev
+mailing list. Some portions use InfiniBand verbs that are discussed on
+the RDMA mailing list. So run patches by that list too to increase the
+likelihood that all interested parties can see them.
 
-My bad, I had a .yaml file in my local directory generated by some
-static analysis tool.
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+---
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-Will be removed in v2.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 32d157621b44fb919307e865e2481ab564eb17df..16024268b5fc1feb6c0d01eab3048bd9255d0bf9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -20943,6 +20943,7 @@ M:	Jan Karcher <jaka@linux.ibm.com>
+ R:	D. Wythe <alibuda@linux.alibaba.com>
+ R:	Tony Lu <tonylu@linux.alibaba.com>
+ R:	Wen Gu <guwen@linux.alibaba.com>
++L:	linux-rdma@vger.kernel.org
+ L:	linux-s390@vger.kernel.org
+ S:	Supported
+ F:	net/smc/
 
+---
+base-commit: 519b790af22e705ee3fae7d598f1afbb3d1cfdd5
+change-id: 20241106-smc_lists-b98e6829b31c
 
-Yours sincerely,
-Vincent Mailhol
+Best regards,
+-- 
+Gerd Bayer <gbayer@linux.ibm.com>
 
 
