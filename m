@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-145153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416EB9CD5B5
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:04:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14CDC9CD5B7
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:05:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C681A1F220FE
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:04:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6387AB2405F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B20F17837F;
-	Fri, 15 Nov 2024 03:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D90517C225;
+	Fri, 15 Nov 2024 03:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QT1NpE39"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="i5ok+M9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2040.outbound.protection.outlook.com [40.107.105.40])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2085.outbound.protection.outlook.com [40.107.105.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683B1176AB7;
-	Fri, 15 Nov 2024 03:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A6114F9D9;
+	Fri, 15 Nov 2024 03:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731639825; cv=fail; b=ZIZbYMb8na/NAmzOqO/r0Uf5VT/+ueTet9rqiKMvvrWVs9btdVUAntoVq9/V9a2T6DOZ2pRw7wtsGJF9aT9CLuQc14DhHiiihmrRDh/Tbj04hnncB+Lkdh3V6TZDoiGuqkUqaMS10mijw4e1pJVptaKpjkcrkCu8BVYtdR0N/fg=
+	t=1731639831; cv=fail; b=j+lxo0RL7sHGzn3ve0UsANd2T4/sZHKtwwaOaesSJBA8UpjtoCykaW24Cwi7oV5+nqymk3mJirHHS+YOfN+2MOLCBMvPj81UtIQ3xpuUBLIKGnV0gGXZBvzHSIAaHu20tuNQcybaPWKQgipAY/fgMIGCAyxdY+FYTPgsgXqPUxw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731639825; c=relaxed/simple;
-	bh=SWBuTvYmdj+l000rued5AkC6nvwZZo8BOPcQf13pMv0=;
+	s=arc-20240116; t=1731639831; c=relaxed/simple;
+	bh=jDzdflMFBGLq7JisXPAx45zswPL1Xdmze9bB6OwstL4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uG0+Oc1gNWNk2gQbtKrE0sXeLAsegBLG6WqKciMtzXU5eiSJUKccF+8bUsisY5Zkti/OSUIvywFbYsGbvci+H4TAEb8vsRp/0tbwoHChVESMFDpOQl4I1VrkCuRZesEz3kulhNptsGd2tYKogwvFJxVC+p8l3N+j+zwy6e9Hds4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QT1NpE39; arc=fail smtp.client-ip=40.107.105.40
+	 Content-Type:MIME-Version; b=rP+EcZ8pyPksyhmXlGnNhktT075ahxGCwPKGNgieiuEWtBJj/GpQXC3E60W7XqYndileP0ZgqBTfg3ayP5QBQPtUOxgPMHjMFTvRR/PeskMPZJyAHv6E8VWQIIqfof6cazpCpUpaUJelZ5t/yFd9QzZhfCyqYeBigUgbH/XmpbY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=i5ok+M9B; arc=fail smtp.client-ip=40.107.105.85
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dC2IhX8bY0muekWqTm8kWxs/Aly4c4FW6SMCxAakpqCSmVfQNtXVDRJrVtNZkJ2ubPWVhZyJJjnvHtHiIzIlETiggEYTIcf84rXgnDED3LUjJ1bU1phsUkthnxCU1sR1Yi0xqoPn9vStTee5wmy04wrRcxdWEENBigJFC2bYp+0Vucswf/CqH28/FwmiBwVCyqI2CRxT6z2ZoWjEgLe1qNrodmI57Hi6c02YfqOqOwaeQbD7UDZJNky1Yy0II2kTsKj7BWEpo9rGG7o1Cup2000PQqClfnEalvqZGkzzgXMc6sxHF8uKZ0KEdJsyyLKuYjbSSgxmw4HOEG+9haGJQw==
+ b=q9QkM/ek08CSyHpFyQZRXxdFvrf4bA78rMAPWNMT7F8FLcZo7I5tPUWfPUO4hbeuyU/Yp7uOIv3EWJaX9u8eFmD4jqYjESQRt7yjPWfV7RJA8IgW/gAjl4hNKRkm7BUtwKxuhPj1wjkoMZeCFNWk/1gutwCCal4dAt3nBFzwSW8aOGpolDyou1L0Qx5VJ5AAD347i5H/kV9mSDxcMrT58orRQCbyxBHBZqL2Ab7lMoys2CuuL4X03N1C73cIO1q2XkIDfm9ynzHL4iRIn44fuI9FPCJDblXVTB2owQLrEtdZrn/TITkrgmCDt2erqAloWOOTki3BNDHqktaiMHlIuA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iGCDOkk2izEzTdvJ19yTFpJKyHMLmjxkpBFDGypQHCg=;
- b=SoR/PUwY+CiuO1pBOTQg5xAp3RZm4pcS2Xo0Jbg7RzWBoiwPP6ndwP5/P36YR4dyPhpQINgKqaJyHn/EA86GPDm01kL/IrEZLcqlhiwaJJSqYzTX8SduhVliD7kBjFLjL0fc6zNmc3IxGk6n/B3MtJCK7c8fmD+pHXP1q+HDSMqTdOVQ3zyrF3zlQRblnij+smSHdMZsEwE0aQ53FEPWpGmaJqiozg/POEjPLdD4pYTz1zwHpARJJCcxmmsivpD3NGX41ijMrbHgk+301nXMBCHz5idxbv6S47bNNjX8S30MxBZOLLvt6nv73nMHvIAmYHfyWSto3hhVSV+14LrtYg==
+ bh=BVIfY2blyRDn27O2nVcGRh/gl54CkwsBRLjQmOShMIs=;
+ b=HGtsL6YGz+bgQ3JHGQLzsMHLvUn0G1wIakD0AaIzmTV8/z9tW0WcAbD8f8UBRnYEZoYy72fof83pj7XIVscFG8ShAmyERBvb+t+0d65tn7MRFPe6UR8q2gqWESB448vEdAxjEFv7ytLsKQZ4eM50G6qrs2cYz+mU0ewYXWGPmBFF/el+qcyoO0qj0bn54t2Eg7I2rOCsc+4JOjbs9Dj9q62VXsFv8tm1OwK7XpdjafvIpjXORP99OnfePzw/f8z+O0hbdH2hlzcHHLKI6/M4lqrl1tBMIUZIoVwJmY4CN8AX44U1MZO9rKHkSLeCaK148+qgB7hWleQw+TJvrPCWWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iGCDOkk2izEzTdvJ19yTFpJKyHMLmjxkpBFDGypQHCg=;
- b=QT1NpE39cfWvFSmWZNxVZ+Fu/trXZtsk6Lb/fbQVsEuMZvSUYJiQXpZcEbthqsILHhn+6HThrvjWVbqslo1u6JdlFRq29358kaF+NFurcdUBL3YosOo0C30hcnY6f+YJnfKWdzsbhrIKAhlyWjxx2Vhiz0+XdpVxlRMQB79mAXVA2HFO4lInACmVLXbMUkREOg6ytMByazOFO11iyCFvDlgQQVJJCGe8VJopQjJ/HHKcAla58KloQmxYwt2erdvCas6WT3F6XzhGl3Z0+pBuGVylACOts2Ip1sEChqgNV882VuKEwUc/LziUZ4BuVd1nLthJOkzcpft9XnzhCqO4zg==
+ bh=BVIfY2blyRDn27O2nVcGRh/gl54CkwsBRLjQmOShMIs=;
+ b=i5ok+M9Ba1HKdmjD/bKXn/yxkooVp35Nx6KAfllZkc42aBgyBOm3iwv57vIyOdXTksJfrsTEJfMpIuzp/hpsAPT7KAdTYZYD/zuA9SbmN6aC2k8007peJjq4BCLgKtPlNEFYMIZ1KqsMbb3f4Ll5t+g6rtBRTlPSs/kneMBT3i7teqBV/7zhNGRnjFdT6A+TxynE5UJ9UrrgskHYOcVGxQ7yFYt7yaAX/wk3dv80e7Fy+yoXY68vuyKp9wtsQGZ7JP1pxwAMKNAK6cVg/RRaoVlmZzZUsqmHZ8zpD7UkuM2nASCMBngkGSM3qgRre1t+Djr3gDh+tEJpHreCLSjDEQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
  by VI1PR04MB10028.eurprd04.prod.outlook.com (2603:10a6:800:1db::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Fri, 15 Nov
- 2024 03:03:40 +0000
+ 2024 03:03:45 +0000
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8158.017; Fri, 15 Nov 2024
- 03:03:40 +0000
+ 03:03:45 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -69,9 +69,9 @@ To: claudiu.manoil@nxp.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	imx@lists.linux.dev
-Subject: [PATCH v4 net-next 3/5] net: enetc: update max chained Tx BD number for i.MX95 ENETC
-Date: Fri, 15 Nov 2024 10:47:42 +0800
-Message-Id: <20241115024744.1903377-4-wei.fang@nxp.com>
+Subject: [PATCH v4 net-next 4/5] net: enetc: add LSO support for i.MX95 ENETC PF
+Date: Fri, 15 Nov 2024 10:47:43 +0800
+Message-Id: <20241115024744.1903377-5-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241115024744.1903377-1-wei.fang@nxp.com>
 References: <20241115024744.1903377-1-wei.fang@nxp.com>
@@ -88,238 +88,555 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|VI1PR04MB10028:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3b0e1b9e-b86d-4614-167a-08dd05221b51
+X-MS-Office365-Filtering-Correlation-Id: 64069a76-83b1-4241-b178-08dd05221e69
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|52116014|1800799024|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iiYN7OWe1mvRdvXk1oq5MIpakJlSvyY9v6mQYgRLMksrCpoOvYLFgFY1yn+y?=
- =?us-ascii?Q?T5uCbLIiPl+ULBmy12Dm89657lLZHWmA5YS5u5+uEJolKlr12jdPTU66UukE?=
- =?us-ascii?Q?SiNNqSNsXNq2ykJI6AXctABbM7uHrBc2Fkoqgn+vtStLmnpiSCX2fSgSmKg2?=
- =?us-ascii?Q?jrk95+H1keepii0ply41jpiOfve7gV/NKD3I6hgE4SVW7giTkmooBvYU7Iny?=
- =?us-ascii?Q?P7+Lf+RgHVj+PeLcVXkVA5ABZJudt8zsU9leOFUkGZQU4cLJVQACKvR7ymZK?=
- =?us-ascii?Q?7326L0Kjkio2Ubos8E67FlG+KXmNadGfwdlFcCV+hN+UtnNNcNNQSQUylvOT?=
- =?us-ascii?Q?Mkbds++uKFGwWWl4cfflr5TF+1Jqq5d1jerekEj+1UsgsU0x3waoaR6hQVmH?=
- =?us-ascii?Q?X7faS2nS120wslkaciRhovILlBPQ0FQqy5wNwUO6kUrIco+DSUz34hi7kZs/?=
- =?us-ascii?Q?xyz/Rs9h6/oZ5hHpt6OAWdnyyWbqdP7gn0mLbgtPHC4zx/Co+ufqHmUygXCc?=
- =?us-ascii?Q?i02t7zWKmKQe4zdiBm+uNApLm1+uFptrvpDUo5bOqsrksYzJPefxjbZHtrKv?=
- =?us-ascii?Q?QhRgoMMBXDKXU8B+CGmjmZxqvi1lAfhdLu80WmHc5dKSxMB1XRGshJ33JX2q?=
- =?us-ascii?Q?1FUKKmVEfpegpk+FX1PZN2mtfx/HgSe+/fqkuJ0IU2gtctIrtefrNAJcfpyW?=
- =?us-ascii?Q?AvE0NmFSoGQWeBiB5q/eVitxxz/69VykuFCC3jIkZBDHXDyARl2mKs3Rt/Pc?=
- =?us-ascii?Q?2SlKkXOyEPtBaPl6LR8mK+mDJjKectfaFOfdj7W+cEncDd3xK9iO8W9+TyQT?=
- =?us-ascii?Q?u+AVu98PgyesECEk9mcrJnjQ4yVB8zYfLOoXYARdtDgxW0HvX1UQr9iHzfxr?=
- =?us-ascii?Q?2bchy9vjYkbiZNZxQWWyRcJs+6J5Hb2lzWN71Aq6iq7Vkf2eH06B/CR67/Go?=
- =?us-ascii?Q?lHdzA4q8XaApZKj9WJiX8ENCtFovzwz/G6u8k1huj1+4hy9UcnG1eaGqLkWV?=
- =?us-ascii?Q?w/LtqA94vcguIXmp9mX46GcvzYepwo9lzg5nNXZkjqVIqJZnRkHfMLh1XZLe?=
- =?us-ascii?Q?+45fjbfoLyR+rSZ9OSmLRTxTmC3kE9DTX0gIY2DxhBtI7f/mxvZgpDvO9LZ2?=
- =?us-ascii?Q?xw+BemNcEAVaOSilvJpiQLBJNEWE2ei6XPKkRqbdv8i8rRnGtia7qz6rccpg?=
- =?us-ascii?Q?j7Mg2NFgQa5eULtTNRRvO+tNylaTYzq0IU/Lf/iAKqrXZ+/RLZQqusdxn19e?=
- =?us-ascii?Q?pQXKW42OFLeXFJiUvroTURSC6bzP682FqITqauBDQHKJlfg6eDvylYdQ/60+?=
- =?us-ascii?Q?OP+I6svyE6FT52+9pg005Xen/8Rk+TSZrTNO8ySct+kX2LTOCgnlbL+NGK9w?=
- =?us-ascii?Q?pUBqupo=3D?=
+	=?us-ascii?Q?LkzXnqPJ3A3vnLKh2q74ZHIP2BXxSvtapyiHG8T5hWFwa9u8WiBIF9uxRMbO?=
+ =?us-ascii?Q?tEVsrp3l74nmMOfMN2mDjThftQBQSwl1yioNcbgA0AohYjU/r33/M3SnqdDE?=
+ =?us-ascii?Q?AbH0NFo64aGcYCrxCUeKilSijDYOeEnwEQqdLr0HziEcUW7AGJV5EuEZ6+mx?=
+ =?us-ascii?Q?NUeocJaKSToUc0cZtcOhfz1oks/OR/zVAzBMuK2kwKFpFJI9OX9/lR9nsxwQ?=
+ =?us-ascii?Q?OJ1yWe5DbmJDe9yOS6GkZJW/38Al1bce9/727Z/aMIeu22lV3eHKX0JpgEWp?=
+ =?us-ascii?Q?NBv7OF3NFIhtiDwpOE/4ajHCifrsExVwxoNeXMsF6U/b7Cf7OR/EZgCfawZm?=
+ =?us-ascii?Q?s7ACpxc3WGshjakilJgkDB2+eSf3cA83aleHoZ0GDSuVQjjzGnIAkifnouAr?=
+ =?us-ascii?Q?dV4onH3m14VeyliRQhl4OcpKooBeY5LK09Ls2R/e8bo3NOt0E3fdQTt6RCB1?=
+ =?us-ascii?Q?ZUcVxJ0wRO3GZUV08X8K6a4NbzYGZR0ucGBbIXPxK4Z9eZaSmhaAJqD/+NsZ?=
+ =?us-ascii?Q?+2Iv8v4k3b/oQOjc8WvEy27hzrR1+RHQGfPTtQBVY66cMpKdtIxCyD2spSMz?=
+ =?us-ascii?Q?DzOsCqwsgTTl2pEZ6i+mcINIJKikoC8ozvSazAIUIjRpE6M6y5JhT0uxhgYX?=
+ =?us-ascii?Q?NIqGRoJSHKkZ3/Iw6gSuPLtb0PzIceuqfb8zdc6XQ5U+oP/+OcsiZrCPQbgb?=
+ =?us-ascii?Q?7jXQ7ZkLcXZpvObpV1CMxSuHVeYxJ3CCZM9XhS2P1JkwTyEHh5ArDjLSdiKI?=
+ =?us-ascii?Q?s3BND5axt/XRs9yN5v3X5hAYY3JTZdVKNibxGnbl01r8c/1WJPb8ArTnMzM+?=
+ =?us-ascii?Q?6lZAQTLPH3bnV7rEPF7vaFlzCg99pFxOTJaCFPJdk7uzB4ru0ti9sbgmnBGn?=
+ =?us-ascii?Q?ItAAKahPfoCczQWMqnDv8w/z3YkdmjtpvNpPD9Z4FZ+/nNl7PZZd/UupkCv2?=
+ =?us-ascii?Q?nRyc6Aj2uih5jnxwzSFn5Ev/uNoszVJ7ByTxEmeWMlRBynERVo4EvC2jutE6?=
+ =?us-ascii?Q?nDW1LF7N8G5LA218Blf4ulnPYORvqk1NtODh1KP5qEtZx0SORZybOb7r6UWb?=
+ =?us-ascii?Q?YlTqZneBAiFqJWR/+AaC7nfC+FisgkaqjfJCkPEQI368MrHK09Q6kd2vNtcc?=
+ =?us-ascii?Q?aBSnuZbkrHjmfS0D0qhLpjcDvqmaIHW7UqeufvyjADv6IUtkN1YcjOOh/ojt?=
+ =?us-ascii?Q?IGjT82DWllRi5xOOGd8kfx4q3WyXnXu/PH5hJmEz5zyqcq3CZ2F9l8ue6YQG?=
+ =?us-ascii?Q?tN2G9+Tusx9JTbxfkBJEDN8juXrZsHSdbfo9e+Zg6oF78Xye54tMGWR4WIWN?=
+ =?us-ascii?Q?1ILN05A7L7ugG0t00/zPxOlxPu8Fej03NTNhAwX0/W1zKLt4WO0/w4mmP6tq?=
+ =?us-ascii?Q?6GtCQy0=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YNOoov39xrybEUiEf9GWVBn55cMBzlTTyXsS7qkH3bXVX/xBPorXckEXlH3u?=
- =?us-ascii?Q?HD53zNRdGasNLh9t/js8tdrGmFKa+g09NGl6gNEflMegNsJ2psBFHJ0SkWhx?=
- =?us-ascii?Q?fDGVt0O5OItQkQc6kYBVxgt9tT4zIA9w+3FRrlkGUrAOd7rr+4uHsot9Ezhe?=
- =?us-ascii?Q?DsDl7c/JwZGGC4SjN0pf0klbgPUcyypuhdfL8paUAsNe2qe6eDPB1I3k8+10?=
- =?us-ascii?Q?WOPA+EB6jLq6xHC4BWmIaPlYzt9Pl4SQONJ5GzhHPmKmkHAaCA1GdbmhywTC?=
- =?us-ascii?Q?fUhR+plU6eS0DGQWxWSiUIXahqphMf40Zw6jK77uMgsYt0RVlzK9b602FMZ7?=
- =?us-ascii?Q?eZfwPlcz4H9iwTOusnvZSGitFOuDgStnFNSQhICB5rKRrGSQ/YVpTr73Wmny?=
- =?us-ascii?Q?8IBezIs8t4wc2znrR55F7OJ2s9nR6fobJZ/gPZL/H6jxbOE0EkyMQYjHJQl1?=
- =?us-ascii?Q?N3MC5DLiCKhKTDjbkF9SOsXnt2+Z0UGEBYlVXmDjKYgbE5vYuABND7vvN0dT?=
- =?us-ascii?Q?Kba9Z0n6IBr59pOHK4SFhiITTileOjotbSO9FYyFI76Ry26UnvOkxTUSlD+v?=
- =?us-ascii?Q?F5bHU32ivgbqhiNgd5QaioT5VVW2z32NjnY1hjl6clhfn68BkeL7VrkgrYZL?=
- =?us-ascii?Q?lU2SFJLEfvqOrCwzwft6DlvaF9/My3Z1YIlvYufdkEr9RAVuLw2oO+clnQeb?=
- =?us-ascii?Q?16HFr27vRUU8cmRoKxp7FDciCquzFHmwPJq/myPy4duM1XXK4fvt6g1MgMdq?=
- =?us-ascii?Q?qSGRiP8gSFA5FhC5FhjbCRGUdx/AMhz4kyX7QLld+s/DhVmGMEkONhCBAuhQ?=
- =?us-ascii?Q?zhAmVVEORG7FsVYT1083+CUISJ8SycrdgrXs2NbybieJ/Dj3p8CDNXT8clZ4?=
- =?us-ascii?Q?anspMATY7OyZ6LGvdKPDe709BbE92Z22NAp8YAszERgpM3KuziWvQr3Xrzee?=
- =?us-ascii?Q?6tguVX1FyiaVkaHul473tLIax30pclH0KMbxPZ5VXe5HefP1K2zk62MYhS9R?=
- =?us-ascii?Q?beurGRrLRFtXP+krkeTbhPnToypR50UuSvQHm2OQZjLBgbM7d0KvB0HoQ/HO?=
- =?us-ascii?Q?wXfPF2Nr6zdFiKGMlyu3Ji9l+O4otWrwxIdc3mm6TCVdJqqMlezC/l5nBr+u?=
- =?us-ascii?Q?mT0oBgNeGJC2Bj1NsI5kahBlJ1MmA89d2KzKuoqKRB8Q6BkzXnv8HMM13Y6W?=
- =?us-ascii?Q?TizDBg6NzdZ/6EKV5v0gif0wk6v5aJLW+VaPgFiELFKd/f47Eo74Obc1sPn+?=
- =?us-ascii?Q?FwTcxkX+orJwkks8gL0ZTcR8X6SQebLplYIzXPYiQNunTxMiWUTV7TAjlqD8?=
- =?us-ascii?Q?HS7zYCQM4vEWTG9RidXVaJe/AWvDa4Uomjo3Gb682DbxaAnRPJzoBflH7mP4?=
- =?us-ascii?Q?CbIXGC/01pgFNJmgO1hxiVUO+W5Oq0laP0+Wkls0u8h426dk2h0awyyMovKv?=
- =?us-ascii?Q?2L5yRbg2BUZeqoMiiXs4exudTGkFJgtRb0cdZXCbc/zuXB4Wdt0GYp56m3zx?=
- =?us-ascii?Q?xipgZv527e7sMkC27SWjzWLohZihKJ4V5P8Xt26QtMduv0PrXs2WSbF6TqrN?=
- =?us-ascii?Q?e6P7yBTWhj9X5+f9D/i/NY57eYYr31r+Q6CHD4AI?=
+	=?us-ascii?Q?vx5bRDgcoFlART4O7sPX0VXUhkjhPkIsLRqmv8gKBQg9lJEi0SuY9mW+wnsV?=
+ =?us-ascii?Q?7hjm4E4Kt4Qha0JY0qI9u79YU8YIHncAwch6R7dqTXRVv37nYuv8IRgpZiHs?=
+ =?us-ascii?Q?mtuYrUUAVml5PMNvOjmuYloHghpWe6cTbxxgimOflHY/7wHlQvzzBz1XcZba?=
+ =?us-ascii?Q?YV2W9xv8eYz/OM9SoO+8UM+JFdles34FyOTQRihxoWHJKE4r4JqWwNl6+2O2?=
+ =?us-ascii?Q?zvMSWjSWj0L0tFoHcc5/MMa8ehblveO00CDa8/XPr27F0zNScg1pv2aUd+5z?=
+ =?us-ascii?Q?rKAbbc590uwG2XE7gjZb904PkJ7nXk2rwQGiaidY8ryyfIW+sVMUmRA6f+Yw?=
+ =?us-ascii?Q?IjHGsLx0CP1ICWnxaGM9E7AXLGqlkeGdf7XhcLSoDqFubwDQ2hZd61+sjbqg?=
+ =?us-ascii?Q?LahTOSb2XmZGGopwtCz5PxEFaw4pIku7g64Q3KeBpOVquXIkPZ3cOQeeRA+F?=
+ =?us-ascii?Q?UsiSNQA6sL57znqthhrMRfMiPYjdcfZxksvbKEchAGkLkQC4L4/XDzxWgEJS?=
+ =?us-ascii?Q?VBWAB6/kIbpLTxO7bsZt4cbYk+vAhiFy4jO5T8bzzfhmK3OTtxP59nLmA5zO?=
+ =?us-ascii?Q?OmZYKdPNPWXOASWM7R8ZYjX6Bn7jQq8ZgR6nIXkHCLFfAL7cm2mrMX//enpG?=
+ =?us-ascii?Q?kVXpq7WTLnxj6L4K2LrtHm7jvVBcxwHCGBeBYVRbVsse6tiePfCNwtbZCQul?=
+ =?us-ascii?Q?lSjkioExwk4HN+VNytnVRq0/Yo+0TjRjTp94tVzvJ3f3u/mGYTAvSiSEnUVk?=
+ =?us-ascii?Q?/5DFsQ/9Tnot/QdeEJZuMjLusGk+sXfZxJQnhE0YaqXL6G4dZdRthKtC3Zsi?=
+ =?us-ascii?Q?FV9njQg3/jXtyCWcacEO18zOut6VeGbnB1gUWZXf9kWicpmaKFD5lBXU52Kl?=
+ =?us-ascii?Q?VoG3ZGctf4p0DVHho7gCKG3E6+FPo0iUy8yfq3HAt4UE86xjDixJMmlfM2Ei?=
+ =?us-ascii?Q?1Hc1Y6ecPnTYVyGlTrUjppqIEmgjCAv9bPNcOpE/T1RCecFR8k+dOryiIkUv?=
+ =?us-ascii?Q?k1LmQq5pfc3uUeV4ZV8I7P2pMmbvtbbaPTDy7sRvXe2rCHOgaCiSL11yIFDS?=
+ =?us-ascii?Q?9ToDz5DbQpASQO8p19cjm4+h3NCChtPzbiTABkcLgf4sACK5HopzoiLjM8sH?=
+ =?us-ascii?Q?NUMshSP29TukwopoUUOdVYM3CNmSCWw1cQpJipMetRpnQmY+ZZafGcatAyNm?=
+ =?us-ascii?Q?Wn3bw4YVHi4W0VfsvAyj6bCCtJBn/gUMbKIHwyskT5eBW5cr+x6zLGHC/JZV?=
+ =?us-ascii?Q?b0Tgc4KpIoZKdu4t1vDjvYuXfcOCtD2zLdDxdDcAyCLW1JevGd5L/DQDcJVF?=
+ =?us-ascii?Q?O9pJEauRE1m79/kw9h1aMirLpVcglmTrRc1ulPEFwgVWNFj9sNzaY6ipqbGb?=
+ =?us-ascii?Q?y4GMcXwRtH5Q6vwD7okpGH0TGI+EoEGIScil9s/DE+3fdYTJ+KV8fZ4P4oF0?=
+ =?us-ascii?Q?lqYS6i8qAWd/5Zhiq9WVXLGrxpwuLxHWETn7oPAeRab9VFHKxjJBv4v5THhB?=
+ =?us-ascii?Q?oVc9jCaaFmFuhmbwQt2TzI1y7VVJH+wtFEd3v84EXJZ1mma0gH55WJq39BVM?=
+ =?us-ascii?Q?t7Qxea4C21UMk6z6cpdlSmhWNJk+Z8ZJM6WorJE1?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b0e1b9e-b86d-4614-167a-08dd05221b51
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64069a76-83b1-4241-b178-08dd05221e69
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2024 03:03:40.4893
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2024 03:03:45.7634
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PQI0dn23NEBSIYf7m0yZhSt6yC0lb7y3Z/XlVjTuQcw3tbViwVZaPNgNEzqs85+iL3T5V1j+mdanuQdYVRlssQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: BraBmCBOXLj4R/RXAku5836VPIvo7zcjvJa0yYrUgRhpoSw6oe4ZDO91CJf74wesNTQz/4skKMKaW0IDC3n87A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB10028
 
-The max chained Tx BDs of latest ENETC (i.MX95 ENETC, rev 4.1) has been
-increased to 63, but since the range of MAX_SKB_FRAGS is 17~45, so for
-i.MX95 ENETC and later revision, it is better to set ENETC4_MAX_SKB_FRAGS
-to MAX_SKB_FRAGS.
+ENETC rev 4.1 supports large send offload (LSO), segmenting large TCP
+and UDP transmit units into multiple Ethernet frames. To support LSO,
+software needs to fill some auxiliary information in Tx BD, such as LSO
+header length, frame length, LSO maximum segment size, etc.
 
-In addition, add max_frags in struct enetc_drvdata to indicate the max
-chained BDs supported by device. Because the max number of chained BDs
-supported by LS1028A and i.MX95 ENETC is different.
+At 1Gbps link rate, TCP segmentation was tested using iperf3, and the
+CPU performance before and after applying the patch was compared through
+the top command. It can be seen that LSO saves a significant amount of
+CPU cycles compared to software TSO.
+
+Before applying the patch:
+%Cpu(s):  0.1 us,  4.1 sy,  0.0 ni, 85.7 id,  0.0 wa,  0.5 hi,  9.7 si
+
+After applying the patch:
+%Cpu(s):  0.1 us,  2.3 sy,  0.0 ni, 94.5 id,  0.0 wa,  0.4 hi,  2.6 si
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 Reviewed-by: Frank Li <Frank.Li@nxp.com>
 Reviewed-by: Claudiu Manoil <claudiu.manoil@nxp.com>
 ---
-v2:
-1. Refine the commit message
-2. Add Reviewed-by tag
-v3: no changes
-v4: no changes
+v2: no changes
+v3: use enetc_skb_is_ipv6() helper fucntion which is added in patch 2
+v4: fix a typo
 ---
- drivers/net/ethernet/freescale/enetc/enetc.c        | 13 +++++++++----
- drivers/net/ethernet/freescale/enetc/enetc.h        | 13 +++++++++++--
- .../net/ethernet/freescale/enetc/enetc_pf_common.c  |  1 +
- drivers/net/ethernet/freescale/enetc/enetc_vf.c     |  1 +
- 4 files changed, 22 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/freescale/enetc/enetc.c  | 266 +++++++++++++++++-
+ drivers/net/ethernet/freescale/enetc/enetc.h  |  15 +
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |  22 ++
+ .../net/ethernet/freescale/enetc/enetc_hw.h   |  15 +-
+ .../freescale/enetc/enetc_pf_common.c         |   3 +
+ 5 files changed, 311 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index eeefd536d051..7c6b844c2e96 100644
+index 7c6b844c2e96..d05eaaf8a812 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -529,6 +529,7 @@ static void enetc_tso_complete_csum(struct enetc_bdr *tx_ring, struct tso_t *tso
+@@ -527,6 +527,233 @@ static void enetc_tso_complete_csum(struct enetc_bdr *tx_ring, struct tso_t *tso
+ 	}
+ }
  
++static inline int enetc_lso_count_descs(const struct sk_buff *skb)
++{
++	/* 4 BDs: 1 BD for LSO header + 1 BD for extended BD + 1 BD
++	 * for linear area data but not include LSO header, namely
++	 * skb_headlen(skb) - lso_hdr_len. And 1 BD for gap.
++	 */
++	return skb_shinfo(skb)->nr_frags + 4;
++}
++
++static int enetc_lso_get_hdr_len(const struct sk_buff *skb)
++{
++	int hdr_len, tlen;
++
++	tlen = skb_is_gso_tcp(skb) ? tcp_hdrlen(skb) : sizeof(struct udphdr);
++	hdr_len = skb_transport_offset(skb) + tlen;
++
++	return hdr_len;
++}
++
++static void enetc_lso_start(struct sk_buff *skb, struct enetc_lso_t *lso)
++{
++	lso->lso_seg_size = skb_shinfo(skb)->gso_size;
++	lso->ipv6 = enetc_skb_is_ipv6(skb);
++	lso->tcp = skb_is_gso_tcp(skb);
++	lso->l3_hdr_len = skb_network_header_len(skb);
++	lso->l3_start = skb_network_offset(skb);
++	lso->hdr_len = enetc_lso_get_hdr_len(skb);
++	lso->total_len = skb->len - lso->hdr_len;
++}
++
++static void enetc_lso_map_hdr(struct enetc_bdr *tx_ring, struct sk_buff *skb,
++			      int *i, struct enetc_lso_t *lso)
++{
++	union enetc_tx_bd txbd_tmp, *txbd;
++	struct enetc_tx_swbd *tx_swbd;
++	u16 frm_len, frm_len_ext;
++	u8 flags, e_flags = 0;
++	dma_addr_t addr;
++	char *hdr;
++
++	/* Get the first BD of the LSO BDs chain */
++	txbd = ENETC_TXBD(*tx_ring, *i);
++	tx_swbd = &tx_ring->tx_swbd[*i];
++	prefetchw(txbd);
++
++	/* Prepare LSO header: MAC + IP + TCP/UDP */
++	hdr = tx_ring->tso_headers + *i * TSO_HEADER_SIZE;
++	memcpy(hdr, skb->data, lso->hdr_len);
++	addr = tx_ring->tso_headers_dma + *i * TSO_HEADER_SIZE;
++
++	frm_len = lso->total_len & 0xffff;
++	frm_len_ext = (lso->total_len >> 16) & 0xf;
++
++	/* Set the flags of the first BD */
++	flags = ENETC_TXBD_FLAGS_EX | ENETC_TXBD_FLAGS_CSUM_LSO |
++		ENETC_TXBD_FLAGS_LSO | ENETC_TXBD_FLAGS_L4CS;
++
++	enetc_clear_tx_bd(&txbd_tmp);
++	txbd_tmp.addr = cpu_to_le64(addr);
++	txbd_tmp.hdr_len = cpu_to_le16(lso->hdr_len);
++
++	/* first BD needs frm_len and offload flags set */
++	txbd_tmp.frm_len = cpu_to_le16(frm_len);
++	txbd_tmp.flags = flags;
++
++	if (lso->tcp)
++		txbd_tmp.l4t = ENETC_TXBD_L4T_TCP;
++	else
++		txbd_tmp.l4t = ENETC_TXBD_L4T_UDP;
++
++	if (lso->ipv6)
++		txbd_tmp.l3t = 1;
++	else
++		txbd_tmp.ipcs = 1;
++
++	/* l3_hdr_size in 32-bits (4 bytes) */
++	txbd_tmp.l3_hdr_size = lso->l3_hdr_len / 4;
++	txbd_tmp.l3_start = lso->l3_start;
++
++	/* For the LSO header we do not set the dma address since
++	 * we do not want it unmapped when we do cleanup. We still
++	 * set len so that we count the bytes sent.
++	 */
++	tx_swbd->len = lso->hdr_len;
++	tx_swbd->do_twostep_tstamp = false;
++	tx_swbd->check_wb = false;
++
++	/* Actually write the header in the BD */
++	*txbd = txbd_tmp;
++
++	/* Get the next BD, and the next BD is extended BD */
++	enetc_bdr_idx_inc(tx_ring, i);
++	txbd = ENETC_TXBD(*tx_ring, *i);
++	tx_swbd = &tx_ring->tx_swbd[*i];
++	prefetchw(txbd);
++
++	enetc_clear_tx_bd(&txbd_tmp);
++	if (skb_vlan_tag_present(skb)) {
++		/* Setup the VLAN fields */
++		txbd_tmp.ext.vid = cpu_to_le16(skb_vlan_tag_get(skb));
++		txbd_tmp.ext.tpid = 0; /* < C-TAG */
++		e_flags = ENETC_TXBD_E_FLAGS_VLAN_INS;
++	}
++
++	/* Write the BD */
++	txbd_tmp.ext.e_flags = e_flags;
++	txbd_tmp.ext.lso_sg_size = cpu_to_le16(lso->lso_seg_size);
++	txbd_tmp.ext.frm_len_ext = cpu_to_le16(frm_len_ext);
++	*txbd = txbd_tmp;
++}
++
++static int enetc_lso_map_data(struct enetc_bdr *tx_ring, struct sk_buff *skb,
++			      int *i, struct enetc_lso_t *lso, int *count)
++{
++	union enetc_tx_bd txbd_tmp, *txbd = NULL;
++	struct enetc_tx_swbd *tx_swbd;
++	skb_frag_t *frag;
++	dma_addr_t dma;
++	u8 flags = 0;
++	int len, f;
++
++	len = skb_headlen(skb) - lso->hdr_len;
++	if (len > 0) {
++		dma = dma_map_single(tx_ring->dev, skb->data + lso->hdr_len,
++				     len, DMA_TO_DEVICE);
++		if (unlikely(dma_mapping_error(tx_ring->dev, dma))) {
++			netdev_err(tx_ring->ndev, "DMA map error\n");
++			goto dma_err;
++		}
++
++		enetc_bdr_idx_inc(tx_ring, i);
++		txbd = ENETC_TXBD(*tx_ring, *i);
++		tx_swbd = &tx_ring->tx_swbd[*i];
++		prefetchw(txbd);
++		*count += 1;
++
++		enetc_clear_tx_bd(&txbd_tmp);
++		txbd_tmp.addr = cpu_to_le64(dma);
++		txbd_tmp.buf_len = cpu_to_le16(len);
++
++		tx_swbd->dma = dma;
++		tx_swbd->len = len;
++		tx_swbd->is_dma_page = 0;
++		tx_swbd->dir = DMA_TO_DEVICE;
++	}
++
++	frag = &skb_shinfo(skb)->frags[0];
++	for (f = 0; f < skb_shinfo(skb)->nr_frags; f++, frag++) {
++		if (txbd)
++			*txbd = txbd_tmp;
++
++		len = skb_frag_size(frag);
++		dma = skb_frag_dma_map(tx_ring->dev, frag, 0, len,
++				       DMA_TO_DEVICE);
++		if (unlikely(dma_mapping_error(tx_ring->dev, dma))) {
++			netdev_err(tx_ring->ndev, "DMA map error\n");
++			goto dma_err;
++		}
++
++		/* Get the next BD */
++		enetc_bdr_idx_inc(tx_ring, i);
++		txbd = ENETC_TXBD(*tx_ring, *i);
++		tx_swbd = &tx_ring->tx_swbd[*i];
++		prefetchw(txbd);
++		*count += 1;
++
++		enetc_clear_tx_bd(&txbd_tmp);
++		txbd_tmp.addr = cpu_to_le64(dma);
++		txbd_tmp.buf_len = cpu_to_le16(len);
++
++		tx_swbd->dma = dma;
++		tx_swbd->len = len;
++		tx_swbd->is_dma_page = 1;
++		tx_swbd->dir = DMA_TO_DEVICE;
++	}
++
++	/* Last BD needs 'F' bit set */
++	flags |= ENETC_TXBD_FLAGS_F;
++	txbd_tmp.flags = flags;
++	*txbd = txbd_tmp;
++
++	tx_swbd->is_eof = 1;
++	tx_swbd->skb = skb;
++
++	return 0;
++
++dma_err:
++	return -ENOMEM;
++}
++
++static int enetc_lso_hw_offload(struct enetc_bdr *tx_ring, struct sk_buff *skb)
++{
++	struct enetc_tx_swbd *tx_swbd;
++	struct enetc_lso_t lso = {0};
++	int err, i, count = 0;
++
++	/* Initialize the LSO handler */
++	enetc_lso_start(skb, &lso);
++	i = tx_ring->next_to_use;
++
++	enetc_lso_map_hdr(tx_ring, skb, &i, &lso);
++	/* First BD and an extend BD */
++	count += 2;
++
++	err = enetc_lso_map_data(tx_ring, skb, &i, &lso, &count);
++	if (err)
++		goto dma_err;
++
++	/* Go to the next BD */
++	enetc_bdr_idx_inc(tx_ring, &i);
++	tx_ring->next_to_use = i;
++	enetc_update_tx_ring_tail(tx_ring);
++
++	return count;
++
++dma_err:
++	do {
++		tx_swbd = &tx_ring->tx_swbd[i];
++		enetc_free_tx_frame(tx_ring, tx_swbd);
++		if (i == 0)
++			i = tx_ring->bd_count;
++		i--;
++	} while (count--);
++
++	return 0;
++}
++
  static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb)
  {
-+	struct enetc_ndev_priv *priv = netdev_priv(tx_ring->ndev);
- 	int hdr_len, total_len, data_len;
- 	struct enetc_tx_swbd *tx_swbd;
- 	union enetc_tx_bd *txbd;
-@@ -594,7 +595,7 @@ static int enetc_map_tx_tso_buffs(struct enetc_bdr *tx_ring, struct sk_buff *skb
- 			bd_data_num++;
- 			tso_build_data(skb, &tso, size);
+ 	struct enetc_ndev_priv *priv = netdev_priv(tx_ring->ndev);
+@@ -647,14 +874,26 @@ static netdev_tx_t enetc_start_xmit(struct sk_buff *skb,
+ 	tx_ring = priv->tx_ring[skb->queue_mapping];
  
--			if (unlikely(bd_data_num >= ENETC_MAX_SKB_FRAGS && data_len))
-+			if (unlikely(bd_data_num >= priv->max_frags && data_len))
- 				goto err_chained_bd;
- 		}
+ 	if (skb_is_gso(skb)) {
+-		if (enetc_bd_unused(tx_ring) < tso_count_descs(skb)) {
+-			netif_stop_subqueue(ndev, tx_ring->index);
+-			return NETDEV_TX_BUSY;
+-		}
++		/* LSO data unit lengths of up to 256KB are supported */
++		if (priv->active_offloads & ENETC_F_LSO &&
++		    (skb->len - enetc_lso_get_hdr_len(skb)) <=
++		    ENETC_LSO_MAX_DATA_LEN) {
++			if (enetc_bd_unused(tx_ring) < enetc_lso_count_descs(skb)) {
++				netif_stop_subqueue(ndev, tx_ring->index);
++				return NETDEV_TX_BUSY;
++			}
  
-@@ -655,7 +656,7 @@ static netdev_tx_t enetc_start_xmit(struct sk_buff *skb,
- 		count = enetc_map_tx_tso_buffs(tx_ring, skb);
- 		enetc_unlock_mdio();
+-		enetc_lock_mdio();
+-		count = enetc_map_tx_tso_buffs(tx_ring, skb);
+-		enetc_unlock_mdio();
++			count = enetc_lso_hw_offload(tx_ring, skb);
++		} else {
++			if (enetc_bd_unused(tx_ring) < tso_count_descs(skb)) {
++				netif_stop_subqueue(ndev, tx_ring->index);
++				return NETDEV_TX_BUSY;
++			}
++
++			enetc_lock_mdio();
++			count = enetc_map_tx_tso_buffs(tx_ring, skb);
++			enetc_unlock_mdio();
++		}
  	} else {
--		if (unlikely(skb_shinfo(skb)->nr_frags > ENETC_MAX_SKB_FRAGS))
-+		if (unlikely(skb_shinfo(skb)->nr_frags > priv->max_frags))
+ 		if (unlikely(skb_shinfo(skb)->nr_frags > priv->max_frags))
  			if (unlikely(skb_linearize(skb)))
- 				goto drop_packet_err;
- 
-@@ -673,7 +674,7 @@ static netdev_tx_t enetc_start_xmit(struct sk_buff *skb,
- 	if (unlikely(!count))
- 		goto drop_packet_err;
- 
--	if (enetc_bd_unused(tx_ring) < ENETC_TXBDS_MAX_NEEDED)
-+	if (enetc_bd_unused(tx_ring) < ENETC_TXBDS_MAX_NEEDED(priv->max_frags))
- 		netif_stop_subqueue(ndev, tx_ring->index);
- 
- 	return NETDEV_TX_OK;
-@@ -941,7 +942,8 @@ static bool enetc_clean_tx_ring(struct enetc_bdr *tx_ring, int napi_budget)
- 	if (unlikely(tx_frm_cnt && netif_carrier_ok(ndev) &&
- 		     __netif_subqueue_stopped(ndev, tx_ring->index) &&
- 		     !test_bit(ENETC_TX_DOWN, &priv->flags) &&
--		     (enetc_bd_unused(tx_ring) >= ENETC_TXBDS_MAX_NEEDED))) {
-+		     (enetc_bd_unused(tx_ring) >=
-+		      ENETC_TXBDS_MAX_NEEDED(priv->max_frags)))) {
- 		netif_wake_subqueue(ndev, tx_ring->index);
+@@ -1800,6 +2039,9 @@ void enetc_get_si_caps(struct enetc_si *si)
+ 		si->num_rss = ENETC_SIRSSCAPR_GET_NUM_RSS(rss);
  	}
  
-@@ -3316,6 +3318,7 @@ EXPORT_SYMBOL_GPL(enetc_pci_remove);
- static const struct enetc_drvdata enetc_pf_data = {
- 	.sysclk_freq = ENETC_CLK_400M,
- 	.pmac_offset = ENETC_PMAC_OFFSET,
-+	.max_frags = ENETC_MAX_SKB_FRAGS,
- 	.eth_ops = &enetc_pf_ethtool_ops,
- };
++	if (val & ENETC_SIPCAPR0_LSO)
++		si->hw_features |= ENETC_SI_F_LSO;
++
+ 	if (val & ENETC_SIPCAPR0_QBV)
+ 		si->hw_features |= ENETC_SI_F_QBV;
  
-@@ -3324,11 +3327,13 @@ static const struct enetc_drvdata enetc4_pf_data = {
- 	.pmac_offset = ENETC4_PMAC_OFFSET,
- 	.rx_csum = 1,
- 	.tx_csum = 1,
-+	.max_frags = ENETC4_MAX_SKB_FRAGS,
- 	.eth_ops = &enetc4_pf_ethtool_ops,
- };
+@@ -2104,6 +2346,13 @@ static int enetc_setup_default_rss_table(struct enetc_si *si, int num_groups)
+ 	return 0;
+ }
  
- static const struct enetc_drvdata enetc_vf_data = {
- 	.sysclk_freq = ENETC_CLK_400M,
-+	.max_frags = ENETC_MAX_SKB_FRAGS,
- 	.eth_ops = &enetc_vf_ethtool_ops,
- };
++static void enetc_set_lso_flags_mask(struct enetc_hw *hw)
++{
++	enetc_wr(hw, ENETC4_SILSOSFMR0,
++		 SILSOSFMR0_VAL_SET(TCP_NL_SEG_FLAGS_DMASK, TCP_NL_SEG_FLAGS_DMASK));
++	enetc_wr(hw, ENETC4_SILSOSFMR1, 0);
++}
++
+ int enetc_configure_si(struct enetc_ndev_priv *priv)
+ {
+ 	struct enetc_si *si = priv->si;
+@@ -2117,6 +2366,9 @@ int enetc_configure_si(struct enetc_ndev_priv *priv)
+ 	/* enable SI */
+ 	enetc_wr(hw, ENETC_SIMR, ENETC_SIMR_EN);
  
++	if (si->hw_features & ENETC_SI_F_LSO)
++		enetc_set_lso_flags_mask(hw);
++
+ 	/* TODO: RSS support for i.MX95 will be supported later, and the
+ 	 * is_enetc_rev1() condition will be removed
+ 	 */
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
-index ee11ff97e9ed..a78af4f624e0 100644
+index a78af4f624e0..0a69f72fe8ec 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc.h
 +++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-@@ -59,9 +59,16 @@ struct enetc_rx_swbd {
- 
- /* ENETC overhead: optional extension BD + 1 BD gap */
- #define ENETC_TXBDS_NEEDED(val)	((val) + 2)
--/* max # of chained Tx BDs is 15, including head and extension BD */
-+/* For LS1028A, max # of chained Tx BDs is 15, including head and
-+ * extension BD.
-+ */
- #define ENETC_MAX_SKB_FRAGS	13
--#define ENETC_TXBDS_MAX_NEEDED	ENETC_TXBDS_NEEDED(ENETC_MAX_SKB_FRAGS + 1)
-+/* For ENETC v4 and later versions, max # of chained Tx BDs is 63,
-+ * including head and extension BD, but the range of MAX_SKB_FRAGS
-+ * is 17 ~ 45, so set ENETC4_MAX_SKB_FRAGS to MAX_SKB_FRAGS.
-+ */
-+#define ENETC4_MAX_SKB_FRAGS		MAX_SKB_FRAGS
-+#define ENETC_TXBDS_MAX_NEEDED(x)	ENETC_TXBDS_NEEDED((x) + 1)
- 
- struct enetc_ring_stats {
- 	unsigned int packets;
-@@ -236,6 +243,7 @@ struct enetc_drvdata {
- 	u32 pmac_offset; /* Only valid for PSI which supports 802.1Qbu */
- 	u8 rx_csum:1;
- 	u8 tx_csum:1;
-+	u8 max_frags;
- 	u64 sysclk_freq;
- 	const struct ethtool_ops *eth_ops;
+@@ -41,6 +41,19 @@ struct enetc_tx_swbd {
+ 	u8 qbv_en:1;
  };
-@@ -379,6 +387,7 @@ struct enetc_ndev_priv {
- 	u16 msg_enable;
  
- 	u8 preemptible_tcs;
-+	u8 max_frags; /* The maximum number of BDs for fragments */
++struct enetc_lso_t {
++	bool	ipv6;
++	bool	tcp;
++	u8	l3_hdr_len;
++	u8	hdr_len; /* LSO header length */
++	u8	l3_start;
++	u16	lso_seg_size;
++	int	total_len; /* total data length, not include LSO header */
++};
++
++#define ENETC_1KB_SIZE			1024
++#define ENETC_LSO_MAX_DATA_LEN		(256 * ENETC_1KB_SIZE)
++
+ #define ENETC_RX_MAXFRM_SIZE	ENETC_MAC_MAXFRM_SIZE
+ #define ENETC_RXB_TRUESIZE	2048 /* PAGE_SIZE >> 1 */
+ #define ENETC_RXB_PAD		NET_SKB_PAD /* add extra space if needed */
+@@ -238,6 +251,7 @@ enum enetc_errata {
+ #define ENETC_SI_F_PSFP BIT(0)
+ #define ENETC_SI_F_QBV  BIT(1)
+ #define ENETC_SI_F_QBU  BIT(2)
++#define ENETC_SI_F_LSO	BIT(3)
  
- 	enum enetc_active_offloads active_offloads;
+ struct enetc_drvdata {
+ 	u32 pmac_offset; /* Only valid for PSI which supports 802.1Qbu */
+@@ -353,6 +367,7 @@ enum enetc_active_offloads {
+ 	ENETC_F_QBU			= BIT(11),
+ 	ENETC_F_RXCSUM			= BIT(12),
+ 	ENETC_F_TXCSUM			= BIT(13),
++	ENETC_F_LSO			= BIT(14),
+ };
  
+ enum enetc_flags_bit {
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
+index 26b220677448..cdde8e93a73c 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
+@@ -12,6 +12,28 @@
+ #define NXP_ENETC_VENDOR_ID		0x1131
+ #define NXP_ENETC_PF_DEV_ID		0xe101
+ 
++/**********************Station interface registers************************/
++/* Station interface LSO segmentation flag mask register 0/1 */
++#define ENETC4_SILSOSFMR0		0x1300
++#define  SILSOSFMR0_TCP_MID_SEG		GENMASK(27, 16)
++#define  SILSOSFMR0_TCP_1ST_SEG		GENMASK(11, 0)
++#define  SILSOSFMR0_VAL_SET(first, mid)	((((mid) << 16) & SILSOSFMR0_TCP_MID_SEG) | \
++					 ((first) & SILSOSFMR0_TCP_1ST_SEG))
++
++#define ENETC4_SILSOSFMR1		0x1304
++#define  SILSOSFMR1_TCP_LAST_SEG	GENMASK(11, 0)
++#define   TCP_FLAGS_FIN			BIT(0)
++#define   TCP_FLAGS_SYN			BIT(1)
++#define   TCP_FLAGS_RST			BIT(2)
++#define   TCP_FLAGS_PSH			BIT(3)
++#define   TCP_FLAGS_ACK			BIT(4)
++#define   TCP_FLAGS_URG			BIT(5)
++#define   TCP_FLAGS_ECE			BIT(6)
++#define   TCP_FLAGS_CWR			BIT(7)
++#define   TCP_FLAGS_NS			BIT(8)
++/* According to tso_build_hdr(), clear all special flags for not last packet. */
++#define TCP_NL_SEG_FLAGS_DMASK		(TCP_FLAGS_FIN | TCP_FLAGS_RST | TCP_FLAGS_PSH)
++
+ /***************************ENETC port registers**************************/
+ #define ENETC4_ECAPR0			0x0
+ #define  ECAPR0_RFS			BIT(2)
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+index 590b1412fadf..34a3e8f1496e 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+@@ -28,6 +28,8 @@
+ #define ENETC_SIPCAPR0_QBV	BIT(4)
+ #define ENETC_SIPCAPR0_QBU	BIT(3)
+ #define ENETC_SIPCAPR0_RFS	BIT(2)
++#define ENETC_SIPCAPR0_LSO	BIT(1)
++#define ENETC_SIPCAPR0_RSC	BIT(0)
+ #define ENETC_SIPCAPR1	0x24
+ #define ENETC_SITGTGR	0x30
+ #define ENETC_SIRBGCR	0x38
+@@ -554,7 +556,10 @@ static inline u64 _enetc_rd_reg64_wa(void __iomem *reg)
+ union enetc_tx_bd {
+ 	struct {
+ 		__le64 addr;
+-		__le16 buf_len;
++		union {
++			__le16 buf_len;
++			__le16 hdr_len;	/* For LSO, ENETC 4.1 and later */
++		};
+ 		__le16 frm_len;
+ 		union {
+ 			struct {
+@@ -574,13 +579,16 @@ union enetc_tx_bd {
+ 		__le32 tstamp;
+ 		__le16 tpid;
+ 		__le16 vid;
+-		u8 reserved[6];
++		__le16 lso_sg_size; /* For ENETC 4.1 and later */
++		__le16 frm_len_ext; /* For ENETC 4.1 and later */
++		u8 reserved[2];
+ 		u8 e_flags;
+ 		u8 flags;
+ 	} ext; /* Tx BD extension */
+ 	struct {
+ 		__le32 tstamp;
+-		u8 reserved[10];
++		u8 reserved[8];
++		__le16 lso_err_count; /* For ENETC 4.1 and later */
+ 		u8 status;
+ 		u8 flags;
+ 	} wb; /* writeback descriptor */
+@@ -589,6 +597,7 @@ union enetc_tx_bd {
+ enum enetc_txbd_flags {
+ 	ENETC_TXBD_FLAGS_L4CS = BIT(0), /* For ENETC 4.1 and later */
+ 	ENETC_TXBD_FLAGS_TSE = BIT(1),
++	ENETC_TXBD_FLAGS_LSO = BIT(1), /* For ENETC 4.1 and later */
+ 	ENETC_TXBD_FLAGS_W = BIT(2),
+ 	ENETC_TXBD_FLAGS_CSUM_LSO = BIT(3), /* For ENETC 4.1 and later */
+ 	ENETC_TXBD_FLAGS_TXSTART = BIT(4),
 diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 3a8a5b6d8c26..2c4c6af672e7 100644
+index 2c4c6af672e7..82a67356abe4 100644
 --- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
 +++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -101,6 +101,7 @@ void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
+@@ -126,6 +126,9 @@ void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
+ 	if (si->drvdata->tx_csum)
+ 		priv->active_offloads |= ENETC_F_TXCSUM;
  
- 	priv->msg_enable = (NETIF_MSG_WOL << 1) - 1;
- 	priv->sysclk_freq = si->drvdata->sysclk_freq;
-+	priv->max_frags = si->drvdata->max_frags;
- 	ndev->netdev_ops = ndev_ops;
- 	enetc_set_ethtool_ops(ndev);
- 	ndev->watchdog_timeo = 5 * HZ;
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-index 31e630638090..052833acd220 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-@@ -129,6 +129,7 @@ static void enetc_vf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
- 
- 	priv->msg_enable = (NETIF_MSG_IFUP << 1) - 1;
- 	priv->sysclk_freq = si->drvdata->sysclk_freq;
-+	priv->max_frags = si->drvdata->max_frags;
- 	ndev->netdev_ops = ndev_ops;
- 	enetc_set_ethtool_ops(ndev);
- 	ndev->watchdog_timeo = 5 * HZ;
++	if (si->hw_features & ENETC_SI_F_LSO)
++		priv->active_offloads |= ENETC_F_LSO;
++
+ 	/* TODO: currently, i.MX95 ENETC driver does not support advanced features */
+ 	if (!is_enetc_rev1(si)) {
+ 		ndev->hw_features &= ~(NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_LOOPBACK);
 -- 
 2.34.1
 
