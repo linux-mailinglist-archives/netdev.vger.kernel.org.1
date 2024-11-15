@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-145165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91F989CD5E2
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:31:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8D69CD5E4
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 116E6B23599
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:31:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7E94B23A01
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 03:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C631741CB;
-	Fri, 15 Nov 2024 03:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4FF17B50E;
+	Fri, 15 Nov 2024 03:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9NOXVfI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZo2+AeP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3C8173357;
-	Fri, 15 Nov 2024 03:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1ECD14F9D9;
+	Fri, 15 Nov 2024 03:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731641427; cv=none; b=gDY0W15DyMrHzy66YGBBKxPBAYujx5dOgobEEGRJ5H3RV25fS7FxGn1V0ms68VlOhbHfcKNtmEKcfFCA58nD/m8/CYBwWlXJJUsehCx2BkoMAdNk/Zr1o5yhobRlxGhQB3CIgOcMBP09CkIG/vIhL2J8KnHjRoDEUYe3v8GjFQI=
+	t=1731641428; cv=none; b=PwbzoxXkfiqVnMOE9K5lQ024m6WUunfj8CLLe0usuN1KkXIDTB1Ft+30eWKELuKgQlgL5Iv6CRpspOAQ1xfOkxxgnEYK5diQgwvg0jyxr+oVXVFG4u5p14TGxNt05Hl9ENXHXZ/HfOo6RtvQKfml76IhmRrmGgU9Cd8dWCbUzRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731641427; c=relaxed/simple;
-	bh=JV/05U3NhZxJjiMzxnBuMp3VCFi+787aOaBvpWeQEh0=;
+	s=arc-20240116; t=1731641428; c=relaxed/simple;
+	bh=tRte2cJ6WYjP7LNjMXvfr/fw720GHoAReQrPoN10vwE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PGJG2leYQYZs7rOnOYFiGJoCXvkAVaI8KsGVC+f2MRI8JDXVHhgmKoREhUb8epSPZ1E7//SIH90U4CBs9XroAFLz00iPJ636gI2NfOb2EFR+xt01LbTmx5g2W+nFTmGjOnHTH0YPOppv4yJVdJWdYG3kwnxBL6Wdvs3jh165ouk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E9NOXVfI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE150C4CECF;
-	Fri, 15 Nov 2024 03:30:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tIPToSdzsrkPsWKvT4yA44yq+rmaqzYlxtGiSnrua/LDLJWPupR/naeN/ozNDpOGZyrWe32Ytlpu27ju2ObNBPWwEUgwblmymgiXwJdPuxFitIggt//6S4doxAhkQKYehX6WP84zpv1afi7tKNg8PfyDfjiedOVj0gyMRlFid2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZo2+AeP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 645E2C4CECD;
+	Fri, 15 Nov 2024 03:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731641426;
-	bh=JV/05U3NhZxJjiMzxnBuMp3VCFi+787aOaBvpWeQEh0=;
+	s=k20201202; t=1731641428;
+	bh=tRte2cJ6WYjP7LNjMXvfr/fw720GHoAReQrPoN10vwE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E9NOXVfIzPAlP+Nr8dhoMVk03F3w3huF0Pb55FCFkVS96J6pTAPCmbMNO+GQgkJkW
-	 KDB0KuAkTVEqGOzsS3zvOsK59H7WGMfz4YXS+U0scvpL9wykefAFxPnqda1c19zq2G
-	 FzKfFbNQ6z1gAUdzM/rkTSCY+bvqR5CLQ+njiFNGyvUIaN01Y7p4rMPT7lWRzfY9tJ
-	 E2Go0Qt/4M2lcWJ5/vagHShT9FUh6wEZJ80s6IoPvno1IY6+nJxyQ8PhXm/2cdCEHc
-	 QkM9gmSsSiOdfdrw++dmP1L9Dfgp4iHXzkrvuhB5/X4J/C9yUdvcdm3lxvillyV7fe
-	 i+mwoTboM/HTQ==
+	b=gZo2+AeP5Q6VYbH7jUgw8KeRi7wuSwz/rnUCrv/ru5DWRrohIcm7OjR8BzcSJE8id
+	 4vsEnrP4C71bm6ovypf4Y5qgBNNeWoaIXGGpDTtqLCq6szxaXMqBtZUktjSSYsFqwa
+	 rTMdXuWuUaAKLFHcoO41aPRX1mt3lxhSaZ2XNidOqnqGV9v+++DCNI6MfRSmlW7iFB
+	 EOZYtDBp/zg2w6QqH4hFLmXWmTLjk0aVOAny9vlYJnLpwQ+emiLxKvC/RHtU+64B1D
+	 DyFgCS7dH0q3tUVwDVk6rm9R7USrwuoqSekcrR66rH52/OtQlJWMMu22jS4J342dQw
+	 QcEWvq0sBSc5A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD283809A80;
-	Fri, 15 Nov 2024 03:30:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E393809A80;
+	Fri, 15 Nov 2024 03:30:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] include: mdio: Remove mdio45_ethtool_gset()
+Subject: Re: [PATCH net-next] net: enetc: clean up before returning in probe()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173164143724.2139249.14310287581673930566.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Nov 2024 03:30:37 +0000
-References: <20241112105430.438491-1-alistair@alistair23.me>
-In-Reply-To: <20241112105430.438491-1-alistair@alistair23.me>
-To: Alistair Francis <alistair@alistair23.me>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux@armlinux.org.uk, hkallweit1@gmail.com, andrew@lunn.ch,
- alistair23@gmail.com, alistair.francis@wdc.com
+ <173164143874.2139249.5208538994413325103.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Nov 2024 03:30:38 +0000
+References: <93888efa-c838-4682-a7e5-e6bf318e844e@stanley.mountain>
+In-Reply-To: <93888efa-c838-4682-a7e5-e6bf318e844e@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: wei.fang@nxp.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
+ xiaoning.wang@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, Frank.Li@nxp.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 12 Nov 2024 20:54:29 +1000 you wrote:
-> From: Alistair Francis <alistair.francis@wdc.com>
+On Wed, 13 Nov 2024 10:31:25 +0300 you wrote:
+> We recently added this error  path.  We need to call enetc_pci_remove()
+> before returning.  It cleans up the resources from enetc_pci_probe().
 > 
-> mdio45_ethtool_gset() is never called, so let's remove it.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Fixes: 99100d0d9922 ("net: enetc: add preliminary support for i.MX95 ENETC PF")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > ---
->  include/linux/mdio.h | 16 ----------------
->  1 file changed, 16 deletions(-)
+>  drivers/net/ethernet/freescale/enetc/enetc_vf.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 
 Here is the summary with links:
-  - [1/2] include: mdio: Remove mdio45_ethtool_gset()
-    https://git.kernel.org/netdev/net-next/c/e7cb7cf43afb
-  - [2/2] mdio: Remove mdio45_ethtool_gset_npage()
-    https://git.kernel.org/netdev/net-next/c/575092a7f0ce
+  - [net-next] net: enetc: clean up before returning in probe()
+    https://git.kernel.org/netdev/net-next/c/f66af9616148
 
 You are awesome, thank you!
 -- 
