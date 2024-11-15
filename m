@@ -1,89 +1,54 @@
-Return-Path: <netdev+bounces-145254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8208A9CDF95
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:07:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD4F89CDFA6
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:13:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EBFD1F23949
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CAAD2834A6
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 13:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B391BD50C;
-	Fri, 15 Nov 2024 13:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ED81BD9CD;
+	Fri, 15 Nov 2024 13:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OeR7N49F"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YKcvbYW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65CC01BBBEE
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 13:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F222F1B85F0;
+	Fri, 15 Nov 2024 13:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731676061; cv=none; b=FR8xM1M5pgxmbgZwL2se9E+VIX94XxEXorlBaRd/6ZWC961mlFN+8P3EDOjDsNM589Tc0+mcyQ5OxV2i8PALwu65xZYszarupFcVj35G4a2SQCvgrbhSNgWhTI73syKKURjNcULHjQGBErmIaaJBvPg/Do9LcwbSpyNyIKAxUYo=
+	t=1731676382; cv=none; b=VByMV58dozskjVaNmsw7r0hJheNUbzOow5gy4ZkwHefxG5+uMcGk1H8f0RcNSkruKVeSmcPSpSYHOxDE+9ZW3bmr2U+eKYKiGj2B+AC2Bk4qkvuiuKsctKzlOCfgi5nxoheJYGzaBNtpPc4GOYuG4afXAyJGEZNtBPMEl/JMHpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731676061; c=relaxed/simple;
-	bh=dEY4bMcfjN2jDnrT5hwQmo7mPSnSCSRep4/jww4nqDk=;
+	s=arc-20240116; t=1731676382; c=relaxed/simple;
+	bh=G5QZQ1AhxAgj20DWSm76n/XJ45IMxUtQpj1ePyESAIg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cTBHLhreQHMQ3E5vlgGSKE9hP6bNk/87QDV83BNMiKZoFip1cgGiL+0DjAWS1//lL69vLdgqeEYZxaLO7D1L5yJwnGYzgigh6o3BMFSGjT97ev6TZI9ocq00/crGZVmb56kDJ3s0C6O8dJSaRPiVwTRQUR/zmLF1L9tqls5hBnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OeR7N49F; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4315eac969aso10378915e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 05:07:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731676058; x=1732280858; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZiAfY0lvd8epGAfG9vNvMumF0065glHRGxW52XCXbkY=;
-        b=OeR7N49FEZcEypjrT2B5wTO9I0SN3XO19ljXjY1GToDAbiwQtlcD3w86yI+MpGbKex
-         G5D7T8Y9KKY9bXAEDXwYdQCCN9Oq9mchRtSPp5bdUkaNKpADhVkRIX7+nSXQJYicmUCq
-         YZSUK0CB+cQRz0V1k/mdDKqHgrkpEU5Ospsp70McnQruzWO12wovDQ5hH5ofJ8lVGlwY
-         HGNH9IiDTspUNqHrYVjogxryBXOGHgLVCsUEpsQuHeidNTd9kgapVSj4dH+YSfwjwsJr
-         bcl/pfyC7Ox3HJUHiJm9fpmDWc+DfrCQkluNlmUMSC6FqRLEZkYHPV4A7oEnSkVI5tNH
-         M/8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731676058; x=1732280858;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZiAfY0lvd8epGAfG9vNvMumF0065glHRGxW52XCXbkY=;
-        b=U/zpQt2xGKZPTT/jQ9vpvjzzCgk25bDYwQoFlIGOL5zvo/Aj0ZzXpxOERp2gWG84mV
-         HSoRDqkxM+R4AwnqnWhh9A0hgAQC9fbrU998GBDkhylTemzyRjOlysHyvAyb33+m7Axp
-         oIamCsP2LKaF/qXJ1+Vr37nKLam+4Cj4VgQCUEM+O32+2ayqtytz1MgA29h0wvCs5Ge6
-         GusLpUVLI2dnUc3s9fWCBYXd5vupNswyE0FH5YNtXnmCXGKUZ4LkWdM9NkNg0KGFnu+O
-         QqbkIQplxErSUUB3kzX2QFY/VB7wGtC5oh9zSx/Wp03FmusfBnax1StgIq/gm9K+aOSd
-         /u5A==
-X-Forwarded-Encrypted: i=1; AJvYcCV7g7lp/eYbgUgarq+eCwsoxSBwasWewNvTcDtlwHGW9FnkhHT1U8ZEDm5S0rTzx75NqK36rAU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgGTUrTy6TKbOi+lLIAZw9fh05IJDansAxkemi3RxP9Bzd+zFg
-	gDX27fPL0RBrGAchqc2r6DLeY939mr3QfDzEQb/auE6aZuCPsbopCqRIxiizloQ=
-X-Google-Smtp-Source: AGHT+IFLypSUXKMXZQokl7jiW1yVHZc6DmXrur69Qui95mFW1vmj5vxRjJRCT3fWilyBKdsvE8W84w==
-X-Received: by 2002:a05:600c:1c95:b0:431:416e:2603 with SMTP id 5b1f17b1804b1-432d9726874mr70098235e9.3.1731676057729;
-        Fri, 15 Nov 2024 05:07:37 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab7878esm54044435e9.14.2024.11.15.05.07.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 05:07:37 -0800 (PST)
-Date: Fri, 15 Nov 2024 16:07:33 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
-	Linux Kernel Functional Testing <lkft@linaro.org>,
-	Kernel Selftests <linux-kselftest@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Ido Schimmel <idosch@nvidia.com>, stable@vger.kernel.org
-Subject: Re: LKFT CI: improving Networking selftests results when validating
- stable kernels
-Message-ID: <226bc28f-d720-4bf9-90c9-ebdd4e711079@stanley.mountain>
-References: <ff870428-6375-4125-83bd-fc960b3c109b@kernel.org>
- <1bda012e-817a-45be-82e2-03ac78c58034@stanley.mountain>
- <c4ed1f88-e43b-4b12-bffc-faf27879042c@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pLBGRfrV2LHGeHYYp1y1xrtn1QG++75llaHFhSQ795yFs4SLnM/KA/Nzqz4/hR7ZxFzaStC9NBMKncra6aik+2hzzF6FzpeqJApklMhlENFjvmNhM3S9sctW6n20o3rhjf0gT9dIMi9xFLrux5/ZEwo3k9xyz8tEOCqdRKHncck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YKcvbYW/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB85BC4CECF;
+	Fri, 15 Nov 2024 13:13:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1731676381;
+	bh=G5QZQ1AhxAgj20DWSm76n/XJ45IMxUtQpj1ePyESAIg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YKcvbYW/o3DdAouGiODL5yskG6Q3oJw0fQN2rV8YaFhhVwNAW3D7ShkaKo7JFNVsp
+	 KART63cqZZaSd/fmGgK8jRadTLLXlz+ZTQOPBAPM1Xe15st3sJYvoqhpEVbkl47i0F
+	 rA9LRoVTsJxRWH9xPJqRfufI/mMnX8trH+zbB8Eg=
+Date: Fri, 15 Nov 2024 14:12:57 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, bjorn@kernel.org, jordyzomer@google.com,
+	security@kernel.org
+Subject: Re: [PATCH bpf 1/2] xsk: fix OOB map writes when deleting elements
+Message-ID: <2024111544-grinning-daydream-e118@gregkh>
+References: <20241115125348.654145-1-maciej.fijalkowski@intel.com>
+ <20241115125348.654145-2-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,19 +57,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c4ed1f88-e43b-4b12-bffc-faf27879042c@kernel.org>
+In-Reply-To: <20241115125348.654145-2-maciej.fijalkowski@intel.com>
 
-On Fri, Nov 15, 2024 at 01:43:14PM +0100, Matthieu Baerts wrote:
-> Regarding the other questions from my previous email -- skipped tests
-> (e.g. I think Netfilter tests are no longer validated), KVM,
-> notifications -- do you know who at Linaro could eventually look at them?
+On Fri, Nov 15, 2024 at 01:53:47PM +0100, Maciej Fijalkowski wrote:
+> Jordy says:
 > 
+> "
+> In the xsk_map_delete_elem function an unsigned integer
+> (map->max_entries) is compared with a user-controlled signed integer
+> (k). Due to implicit type conversion, a large unsigned value for
+> map->max_entries can bypass the intended bounds check:
+> 
+> 	if (k >= map->max_entries)
+> 		return -EINVAL;
+> 
+> This allows k to hold a negative value (between -2147483648 and -2),
+> which is then used as an array index in m->xsk_map[k], which results
+> in an out-of-bounds access.
+> 
+> 	spin_lock_bh(&m->lock);
+> 	map_entry = &m->xsk_map[k]; // Out-of-bounds map_entry
+> 	old_xs = unrcu_pointer(xchg(map_entry, NULL));  // Oob write
+> 	if (old_xs)
+> 		xsk_map_sock_delete(old_xs, map_entry);
+> 	spin_unlock_bh(&m->lock);
+> 
+> The xchg operation can then be used to cause an out-of-bounds write.
+> Moreover, the invalid map_entry passed to xsk_map_sock_delete can lead
+> to further memory corruption.
+> "
+> 
+> It indeed results in following splat:
+> 
+> [76612.897343] BUG: unable to handle page fault for address: ffffc8fc2e461108
+> [76612.904330] #PF: supervisor write access in kernel mode
+> [76612.909639] #PF: error_code(0x0002) - not-present page
+> [76612.914855] PGD 0 P4D 0
+> [76612.917431] Oops: Oops: 0002 [#1] PREEMPT SMP
+> [76612.921859] CPU: 11 UID: 0 PID: 10318 Comm: a.out Not tainted 6.12.0-rc1+ #470
+> [76612.929189] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.02.01.0008.031920191559 03/19/2019
+> [76612.939781] RIP: 0010:xsk_map_delete_elem+0x2d/0x60
+> [76612.944738] Code: 00 00 41 54 55 53 48 63 2e 3b 6f 24 73 38 4c 8d a7 f8 00 00 00 48 89 fb 4c 89 e7 e8 2d bf 05 00 48 8d b4 eb 00 01 00 00 31 ff <48> 87 3e 48 85 ff 74 05 e8 16 ff ff ff 4c 89 e7 e8 3e bc 05 00 31
+> [76612.963774] RSP: 0018:ffffc9002e407df8 EFLAGS: 00010246
+> [76612.969079] RAX: 0000000000000000 RBX: ffffc9002e461000 RCX: 0000000000000000
+> [76612.976323] RDX: 0000000000000001 RSI: ffffc8fc2e461108 RDI: 0000000000000000
+> [76612.983569] RBP: ffffffff80000001 R08: 0000000000000000 R09: 0000000000000007
+> [76612.990812] R10: ffffc9002e407e18 R11: ffff888108a38858 R12: ffffc9002e4610f8
+> [76612.998060] R13: ffff888108a38858 R14: 00007ffd1ae0ac78 R15: ffffc9002e4610c0
+> [76613.005303] FS:  00007f80b6f59740(0000) GS:ffff8897e0ec0000(0000) knlGS:0000000000000000
+> [76613.013517] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [76613.019349] CR2: ffffc8fc2e461108 CR3: 000000011e3ef001 CR4: 00000000007726f0
+> [76613.026595] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [76613.033841] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [76613.041086] PKRU: 55555554
+> [76613.043842] Call Trace:
+> [76613.046331]  <TASK>
+> [76613.048468]  ? __die+0x20/0x60
+> [76613.051581]  ? page_fault_oops+0x15a/0x450
+> [76613.055747]  ? search_extable+0x22/0x30
+> [76613.059649]  ? search_bpf_extables+0x5f/0x80
+> [76613.063988]  ? exc_page_fault+0xa9/0x140
+> [76613.067975]  ? asm_exc_page_fault+0x22/0x30
+> [76613.072229]  ? xsk_map_delete_elem+0x2d/0x60
+> [76613.076573]  ? xsk_map_delete_elem+0x23/0x60
+> [76613.080914]  __sys_bpf+0x19b7/0x23c0
+> [76613.084555]  __x64_sys_bpf+0x1a/0x20
+> [76613.088194]  do_syscall_64+0x37/0xb0
+> [76613.091832]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> [76613.096962] RIP: 0033:0x7f80b6d1e88d
+> [76613.100592] Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 b5 0f 00 f7 d8 64 89 01 48
+> [76613.119631] RSP: 002b:00007ffd1ae0ac68 EFLAGS: 00000206 ORIG_RAX: 0000000000000141
+> [76613.131330] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f80b6d1e88d
+> [76613.142632] RDX: 0000000000000098 RSI: 00007ffd1ae0ad20 RDI: 0000000000000003
+> [76613.153967] RBP: 00007ffd1ae0adc0 R08: 0000000000000000 R09: 0000000000000000
+> [76613.166030] R10: 00007f80b6f77040 R11: 0000000000000206 R12: 00007ffd1ae0aed8
+> [76613.177130] R13: 000055ddf42ce1e9 R14: 000055ddf42d0d98 R15: 00007f80b6fab040
+> [76613.188129]  </TASK>
+> 
+> Fix this by simply changing key type from int to u32.
+> 
+> Fixes: fbfc504a24f5 ("bpf: introduce new bpf AF_XDP map type BPF_MAP_TYPE_XSKMAP")
+> Reported-by: Jordy Zomer <jordyzomer@google.com>
+> Suggested-by: Jordy Zomer <jordyzomer@google.com>
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  net/xdp/xskmap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The skip tests were because they lead to hangs.  We're going to look at those
-again to see if they're still an issue.  And we're also going to try enable the
-other tests you mentioned.
+Hi,
 
-regards,
-dan carpenter
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
 
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
 
