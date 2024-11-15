@@ -1,119 +1,133 @@
-Return-Path: <netdev+bounces-145320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C90C9CF062
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:41:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B395E9CF07D
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 16:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13615288FB5
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:41:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78C8028D2E7
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6505E1D6DBC;
-	Fri, 15 Nov 2024 15:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5992C1EE02D;
+	Fri, 15 Nov 2024 15:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="C40dr8q9";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DexVQlk5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NisQIBvA"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCE41D517E;
-	Fri, 15 Nov 2024 15:35:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFED1EBA1F;
+	Fri, 15 Nov 2024 15:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731684918; cv=none; b=hdlQRX9+3fjQCictF7tkGQDpqJuDnuKD6UVeiGvmQpjXz0La0Gta51yd1DSKM7jPAaearQzaMurY82XeMoKGoNes0TlOeIsWQLDw+HbOZmWiUfBG477RUOcPGm2bQbB+9bibigRoueAVlSMj4HaK8S3w4s/4yI/13tZnx1wWDS4=
+	t=1731685062; cv=none; b=SRdZ3LKdDsabu7ilXgRPR5a//OhTezHfRkVJcEBKyDOfRBSG1/5wbIl22HlNqeFVLRqn3cuc3s3lP+MxSylmpN4+KKA604R1lSx5rTC+eopVV4ttxaQk8SIydqN1yoeIgBsthcT03+kzl4pXmswRuC7Mbvpxt9Kq/yN5kYwaPII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731684918; c=relaxed/simple;
-	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=m/pI1vZAQ9gxkkrLO4Ck9+wP9LbxWHNLTrhIlgyWxvHYEzuYsWqKH43sexoA3BbGj7kQl9pEwxtFlUBhKoXMYEr3MPsrKTXACWNVH2K83g8VfSZbA+QAphVFxiaJU71bVjVC2mmG1w6Z5DxdTlmomxVVMcXRL/fQCj5cluVl7lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=C40dr8q9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DexVQlk5; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1731684914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
-	b=C40dr8q9ADx3mdyM9aZWGfyNweZhURE5tGHsnoEPOBZ904QoHc4A1GcjWf/GhDl0Adlgrf
-	69L3PJoNzAzHniCsGBlfwosD15LDHvc8ITSwBMRd+5Sbe41oaOOiaEZlNe1GflVWe7uMmn
-	Kzt8nWpH6yNOxLgVHZos2j37vQf3hzemX8dtqEeaHa/T8/Znh9DDC8Ece7mjtCtQQT3Ujv
-	KD9bNcHp4TJd//4bZGwhCHqCSvgB4uI1kMAvZ+ldC3dONiNJGi2r2u0iSkzbPxxKe4NX3O
-	SQh1dzqAsqbj2vzeJBJM/qwLDpY3Q9H6tWI4KQY8TUCGPS3qaekoi9YVTk7kCQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1731684914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yU1G2hIrLcZlXd3LaebeyKYONXTnd34hSfRSQEHJ1yU=;
-	b=DexVQlk5YViUHETMQnzqsi81sHcgKGKaG/NWsxoB8OfZI81poTF211mDX/o0kNLPLWaOEC
-	Apumdsb73YjhwXBQ==
-To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>, Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam
- Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave
- Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn
- Helgaas <bhelgaas@google.com>, Alex Williamson
- <alex.williamson@redhat.com>, Juergen Gross <jgross@suse.com>, Stefano
- Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Philipp Stanner <pstanner@redhat.com>,
- Mario Limonciello <mario.limonciello@amd.com>, Chen Ni
- <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Mostafa Saleh <smostafa@google.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Jason Gunthorpe
- <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kunwu Chan
- <chentao@kylinos.cn>, Ankit Agrawal <ankita@nvidia.com>, Christian Brauner
- <brauner@kernel.org>, Reinette Chatre <reinette.chatre@intel.com>, Eric
- Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v2 07/11] PCI: MSI: Use never-managed version of pci_intx()
-In-Reply-To: <20241113124158.22863-9-pstanner@redhat.com>
-References: <20241113124158.22863-2-pstanner@redhat.com>
- <20241113124158.22863-9-pstanner@redhat.com>
-Date: Fri, 15 Nov 2024 16:35:22 +0100
-Message-ID: <87y11kzf0l.ffs@tglx>
+	s=arc-20240116; t=1731685062; c=relaxed/simple;
+	bh=0PVblsDRA77Rnd2SrDeXPvCj+AkYyXnR7eiruXvE/HE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uGd6osXd7lL8i3GZ0rZz4grVWErChkDtzgVLdS5TF2JSz50tcimC1njc7LRdFmytsGXxu2IhatN0ftycljYuclNJ9m6v/jnlSys5tyiUGWm7mZjTvZFH3ApFKF3YA7tPN4KsvgJlFPvvm9gMm/Cok+YaTm+W8BBcSbL55Taq3sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NisQIBvA; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-720b2d8bb8dso1467302b3a.1;
+        Fri, 15 Nov 2024 07:37:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731685060; x=1732289860; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yoyUygnEDqv1sl49POhWOJmAGKIKRSGhPgMfHLTPEPE=;
+        b=NisQIBvAxiJdztkC+owfSqEq/Q7jFIdF/rZVDxwMkH1IuBYc8S1faNuSUkEb5IaT8k
+         hnFXZnk+34+8P+6TSON6hJJ33FJU5BHMntuvlAK1WAc4RsQvcT+w227RXF8FbSUZifix
+         tGlVKZhjwuWQ96HxqEPfE3mKnvKkRoi/0rte1Kf7VzHQKFIHBE3dWv+0kZnjByxLEWB8
+         L7C+G5CjpJvS3Xx+gkUV5cTXh+FF24kju2ySzqjeBT9AAkmjhj+wPWR7amB1WEY7JV9Z
+         2JWxU7+c5+oaDgCXxbGaHuGLgZgAkFqY6WAxwnw5rakGNoPqkZHj0wYTetaZ1W/raC1C
+         Nr4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731685060; x=1732289860;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yoyUygnEDqv1sl49POhWOJmAGKIKRSGhPgMfHLTPEPE=;
+        b=YB4lyFcD/mtVFssmp9fSRsYY1GYyf9zZwfSFQ8Xc17xNRVqMyjsO1wVwxA4DKjN/Xj
+         Se9OxlTMnVITHlIgRjwgCIeatEkKmvF+SCuxc1Hq1qh6RsdAQe71mBIKRDOmhAi7Ld0v
+         dyJLG+PjO2mfyG2gvAbJy8ve5KbVg/8Mw7DFFkkHgXGzb6DqdZb9oSpLaYH4XHyF+ixa
+         kXVV193dtLjsOwHLvQDfFpMUFeCqln4WFUdE9KIbbSV8I1/yAy4tpIELaFAPp5gp/nSy
+         ITaTGK1elR/YG64R0O8On2ITKhU2RQnP5QE8jXfg6m/O74iDSrMYNd6wj0FmIeQqisQK
+         D8DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXmxPBA18uUAilA9AKcxrLT39Dl6t2MtIAn095FN47C2zHGMcLQLGQkQedUmMCV4Vzuy4uMXR5yVcsowRP@vger.kernel.org, AJvYcCUcnTEapeEq5c+mhfg0xX57kBaAmYrUz4qfjc0sJkYC7HKzXO6fESEuy/Ul3KpLVGe9gLE9vYen@vger.kernel.org, AJvYcCV7xNFhnjtJzdu0MRkXWCEuof9mtNhklCnH5Pyx2CKSWnkS6yPHURDJQyQx4T9ham5Ttmo=@vger.kernel.org, AJvYcCVqFdETeZlL/cjLpoiMhhhherW32iec/SULCSRf1fdJUuHxhr6YsFxsvTn+QXWy6x7oWwXVkQQJltfDC2dv+MLg@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWhTH4pH7uiZZC3su9d/8texlQ/NBuvtvUdDQYPCWmnciu7LcL
+	HJgMrvX6bZish+hK+1j7MbZ6jCZdFiM77WBEEBAEDBwFtLds+7Q=
+X-Google-Smtp-Source: AGHT+IHjSlXN7KUkjoVV1B3vVD0bH+j46ZLfV51KqXZZw3ZV0fV29iOjgmG5+sYvHxdQbvdFhcaMSQ==
+X-Received: by 2002:a17:90b:17c2:b0:2e2:de27:db09 with SMTP id 98e67ed59e1d1-2ea1551cb1emr3594710a91.19.1731685060008;
+        Fri, 15 Nov 2024 07:37:40 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea024ee436sm3017381a91.47.2024.11.15.07.37.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 07:37:39 -0800 (PST)
+Date: Fri, 15 Nov 2024 07:37:38 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Alexis =?utf-8?Q?Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Bastien Curutchet <bastien.curutchet@bootlin.com>,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2 01/13] selftests/bpf: add a macro to compare
+ raw memory
+Message-ID: <Zzdqwn-vhYxWIXGo@mini-arch>
+References: <20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com>
+ <20241114-flow_dissector-v2-1-ee4a3be3de65@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241114-flow_dissector-v2-1-ee4a3be3de65@bootlin.com>
 
-On Wed, Nov 13 2024 at 13:41, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
->
-> MSI sets up its own separate devres callback implicitly in
-> pcim_setup_msi_release(). This callback ultimately uses pci_intx(),
-> which is problematic since the callback of course runs on driver-detach.
->
-> That problem has last been described here:
-> https://lore.kernel.org/all/ee44ea7ac760e73edad3f20b30b4d2fff66c1a85.camel@redhat.com/
->
-> Replace the call to pci_intx() with one to the never-managed version
-> pci_intx_unmanaged().
->
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+On 11/14, Alexis Lothoré (eBPF Foundation) wrote:
+> We sometimes need to compare whole structures in an assert. It is
+> possible to use the existing macros on each field, but when the whole
+> structure has to be checked, it is more convenient to simply compare the
+> whole structure memory
+> 
+> Add a dedicated assert macro, ASSERT_MEMEQ, to allow bare memory
+> comparision
+> The output generated by this new macro looks like the following:
+> [...]
+> run_tests_skb_less:FAIL:returned flow keys unexpected memory mismatch
+> actual:
+> 	00 00 00 00 00 00 00 00 	00 00 00 00 00 00 00 00
+> 	00 00 00 00 00 00 00 00 	00 00 00 00 00 00 00 00
+> 	00 00 00 00 00 00 00 00 	00 00 00 00 00 00 00 00
+> 	00 00 00 00 00 00 00 00
+> expected:
+> 	0E 00 3E 00 DD 86 01 01 	00 06 86 DD 50 00 90 1F
+> 	00 00 00 00 00 00 00 00 	00 00 00 00 00 00 00 00
+> 	00 00 00 00 00 00 00 00 	00 00 00 00 00 00 00 00
+> 	01 00 00 00 00 00 00 00
+> [...]
+> 
+> Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
 
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
