@@ -1,133 +1,195 @@
-Return-Path: <netdev+bounces-145290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6E09CE103
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:13:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA3949CE150
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 15:33:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 550AD1F21600
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:13:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D81ADB36537
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 14:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E941CEEB2;
-	Fri, 15 Nov 2024 14:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F601CEAD5;
+	Fri, 15 Nov 2024 14:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FgChEBy7"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="UJGlbvRC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB151CDA3F;
-	Fri, 15 Nov 2024 14:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805DB1CD1F1
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 14:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731679987; cv=none; b=RB/vuwx90n3b1ARr1L1vwiOdhQLX4EvUD2UzhhNXh1oCsjWYQ6VkuLRDihlml4+BC3ZwwyYzGRx06npimPOpUHpZB0eYZA7W3RLs6DFydg7NVJp8E1AGxP6iSLd1KQBmbV1l3dtf91Xnb2rGVlF6KV56LYMXDUISCMvOGKhjPE4=
+	t=1731679985; cv=none; b=V/1yh1AXWf7izZvylIUAt7SbKCZDSdYM3xaMmjkg9iSPYQn6gpMf/4QC6GA6YIpWpj6wdDgTkYssyanHrTxfhgpSwz3ohT6I3MUMxIh6PhwSHKAVIH+sAvEllgX91SAxtV19HMbTXbR7+sYIjbAgF3km/LktPbUjmTtqrcqt15Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731679987; c=relaxed/simple;
-	bh=tEwx7ySV/rj0eZVT+xpG8c/YM2OZU0LddxtLl/tCygw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NbS94cAMyqMZOMYxLK2Q94zPZ21f9NO6XBEinFFxcB0Z4M7Eh3Ik3TJOkP39KOpcmWezMxq+lSqM0AVd/c6ztnzqgYcgfkAZebsJ/rAnrnbxfbjCofIptvW1K10EZCY63mUqRhK+Ux7LRhIvnK193XQc2LJdeRc1eWV7Td9Bzlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FgChEBy7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kCJamRcv160IaLBk591jHJ5/fIg4GfMqcqO3NZ/cgPo=; b=FgChEBy7f0xHqUezBIeOC59p8L
-	ZIl1QDD3C+5HuUow1dNSNJBICuq78SuDCZidjKnpgYbz8kTvrQ7BDv2gYrDf0ktiu7yXzVHyHSc55
-	58DVQAbV7yLJ1fpaTsghTN3jaGpHaX5Nvycf8LC8uIQNtLGSzTP4Br5xO63HQnQg9EodOdiswdHae
-	f0Not3t/g8D22gAMIno8lPfFIAsDMjdfZTdeGJ3mQgBlfnnkfQtG5Sk/ahvHrUh5KaX0yuenCVC1e
-	BhKEX/Gb/ggnrH/pzQJ53h0MT4qu4Kx46tv/SWxVHuxlLgax/+P6gra19Hbu/fA2wsn6QAvUKByJm
-	NM4ZvpPw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54080)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tBx45-0001So-23;
-	Fri, 15 Nov 2024 14:12:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tBx3z-0002Bd-09;
-	Fri, 15 Nov 2024 14:12:43 +0000
-Date: Fri, 15 Nov 2024 14:12:42 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net v2 0/2] Fix 'ethtool --show-eee' during initial stage
-Message-ID: <ZzdW2iB2OkbZxTgS@shell.armlinux.org.uk>
-References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
- <403be2f6-bab1-4a63-bad4-c7eac1e572ee@gmail.com>
+	s=arc-20240116; t=1731679985; c=relaxed/simple;
+	bh=5ckO5t0nqEIlsChL4+gNfUjtzSwipsLH1PFedh4bPrU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hRy7IMzdzBGRAWmtiVEdgaAJ0L53liTzPvrhMJySgWyF9kRJHwLw9Nq/HkAPb4hsAInZD2MDrtdKXdaxD5QpeEtpfMd6VWTW1oTZlJWIKtpC8Dr51fPmPIKGuwCLckA+o5zbE6aOHbwVDC5uOSMRRBiglcWZU6OMxe7Br4naZzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=UJGlbvRC; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-431481433bdso6034375e9.3
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 06:13:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1731679982; x=1732284782; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jdL3RGy8G79xHcAW/ZfXupKv9nSP9o1SLsKr9EeHBQ=;
+        b=UJGlbvRCfGwx2w73RAzRViW8gWlfTF+4q8qJ53/CeIjUs5YjIDS233Ee0RAE+rr9TZ
+         qeoqGu2QJ8TUwNV2VtPCPgfK1eWNCeI3FEwtFCNYKUAgiHS1yJ1ny8rv7XciobDjz8+E
+         5WTXwIapnFX1B1dBZzd8t7l42fYESYbQC6u07CTsRWOMuqAzr1T5oJQ+/iP+6ACe72X2
+         TpbHeVdR6KsrSxkD7dCNeSGaxC+wKULR8IUmGamAxGNB+4oC3q5Xnyj7mqqLkuTQP0wG
+         9TS8wr5dO3EME9Wupg2394A5HXLr7oqcb8zMoHxhm56i+wtSU7/jUA07t0XxtckyH7zv
+         pHmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731679982; x=1732284782;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0jdL3RGy8G79xHcAW/ZfXupKv9nSP9o1SLsKr9EeHBQ=;
+        b=EPfAmJDGC4BpJBluc0Lilb7taT06w4wcqi1RcZnsU2qXesiDZM20ibn2GpYtkYHMKW
+         1sZymd9G5b5yTBJk+TGxZ8Tfnm/EhBD8nARMUqFQcfRQ2T7vtRMjulaySpMbq7uP41dn
+         hMmTKmJ+46KRz6G5SGYQvGvTdDJfjM2LTzsqf/UITFlgDZK/pXxgMJ+PhFtWY2KbAmiW
+         SDhEGz1219yXoV/JiHqEbt5/XEC70ec7yY0EoTrYHw1bhFG0cPivBisjdE/hhuUM9370
+         GLrNOXNch5x/5+f70wWawbC2yi5ALEPOa0k+rjW0IBIPL6NV3pKZD84CbQ7xY8DkkvyU
+         c6xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHhp0sXdgdhzOACF/iDQ04L1gQ8paOYxTBrhtSJzLM6ghIwXl7jcBrC7wr1+9DCEhfU0GFInI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Wx2tsAcufkCZIv1OCw63GwR9OuCP1DrWBtLXQ6+lATiSO+9h
+	1YIFyLkF4Cll93amMC7YRlbNPphWAjlEQG51zuOPrekuqMoeY2YlZarJUXIpOME=
+X-Google-Smtp-Source: AGHT+IFBwmr3zPJ5r+6Cfq+1jGAEKzVdTLjr1YH9uboAyjLgn8jqjPoMDxe9tAoUi41ds2S7g2RiHA==
+X-Received: by 2002:a05:600c:1e27:b0:431:5043:87c3 with SMTP id 5b1f17b1804b1-432df78bb53mr19272825e9.22.1731679981863;
+        Fri, 15 Nov 2024 06:13:01 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:59f4:10be:886a:27eb? ([2001:67c:2fbc:1:59f4:10be:886a:27eb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821ae3100csm4439298f8f.91.2024.11.15.06.13.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2024 06:13:01 -0800 (PST)
+Message-ID: <89ae26a2-0a09-4758-989e-8f45a707a41b@openvpn.net>
+Date: Fri, 15 Nov 2024 15:13:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <403be2f6-bab1-4a63-bad4-c7eac1e572ee@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 05/23] ovpn: keep carrier always on
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net>
+ <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 15, 2024 at 02:41:54PM +0100, Heiner Kallweit wrote:
-> On 15.11.2024 12:11, Choong Yong Liang wrote:
-> > From: Choong Yong Liang <yong.liang.choong@intel.com>
-> > 
-> > When the MAC boots up with a Marvell PHY and phy_support_eee() is implemented,
-> > the 'ethtool --show-eee' command shows that EEE is enabled, but in actuality,
-> > the driver side is disabled. If we try to enable EEE through
-> > 'ethtool --set-eee' for a Marvell PHY, nothing happens because the eee_cfg
-> > matches the setting required to enable EEE in ethnl_set_eee().
-> > 
-> > This patch series will remove phydev->eee_enabled and replace it with
-> > eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(), it
-> > will follow the master configuration to have software and hardware in sync,
-> > allowing 'ethtool --show-eee' to display the correct value during the
-> > initial stage.
-> > 
-> > v2 changes:
-> >  - Implement the prototype suggested by Russell
-> >  - Check EEE before calling phy_support_eee()
-> > 
-> > Thanks to Russell for the proposed prototype in [1].
-> > 
-> > Reference:
-> > [1] https://patchwork.kernel.org/comment/26121323/
-> > 
-> > Choong Yong Liang (2):
-> >   net: phy: replace phydev->eee_enabled with eee_cfg.eee_enabled
-> >   net: stmmac: set initial EEE policy configuration
-> > 
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  3 +++
-> >  drivers/net/phy/phy-c45.c                         | 11 +++++------
-> >  drivers/net/phy/phy_device.c                      |  6 +++---
-> >  include/linux/phy.h                               |  5 ++---
-> >  4 files changed, 13 insertions(+), 12 deletions(-)
-> > 
+On 09/11/2024 02:11, Sergey Ryazanov wrote:
+> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>> An ovpn interface will keep carrier always on and let the user
+>> decide when an interface should be considered disconnected.
+>>
+>> This way, even if an ovpn interface is not connected to any peer,
+>> it can still retain all IPs and routes and thus prevent any data
+>> leak.
+>>
+>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>> ---
+>>   drivers/net/ovpn/main.c | 7 +++++++
+>>   1 file changed, 7 insertions(+)
+>>
+>> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>> index 
+>> eead7677b8239eb3c48bb26ca95492d88512b8d4..eaa83a8662e4ac2c758201008268f9633643c0b6 100644
+>> --- a/drivers/net/ovpn/main.c
+>> +++ b/drivers/net/ovpn/main.c
+>> @@ -31,6 +31,13 @@ static void ovpn_struct_free(struct net_device *net)
+>>   static int ovpn_net_open(struct net_device *dev)
+>>   {
+>> +    /* ovpn keeps the carrier always on to avoid losing IP or route
+>> +     * configuration upon disconnection. This way it can prevent leaks
+>> +     * of traffic outside of the VPN tunnel.
+>> +     * The user may override this behaviour by tearing down the 
+>> interface
+>> +     * manually.
+>> +     */
+>> +    netif_carrier_on(dev);
 > 
-> Russell submitted the proposed patch already:
-> https://patchwork.kernel.org/project/netdevbpf/patch/E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk/
-> So there's no need for your patch 1.
+> If a user cares about the traffic leaking, then he can create a 
+> blackhole route with huge metric:
+> 
+> # ip route add blackhole default metric 10000
+> 
+> Why the network interface should implicitly provide this functionality? 
+> And on another hand, how a routing daemon can learn a topology change 
+> without indication from the interface?
 
-Patch 1 is an updated version of that patch, minus my authorship and of
-course no sign-off. I've already marked this series as requiring changes
-in patchwork (hopefully, if I did it correctly.)
+This was discussed loooong ago with Andrew. Here my last response:
+
+https://lore.kernel.org/all/d896bbd8-2709-4834-a637-f982fc51fc57@openvpn.net/
+
+
+Regards,
+
+> 
+>>       netif_tx_start_all_queues(dev);
+>>       return 0;
+>>   }
+>>
+> 
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Antonio Quartulli
+OpenVPN Inc.
+
 
