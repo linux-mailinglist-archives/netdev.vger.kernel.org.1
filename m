@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-145470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 561FC9CFA28
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:38:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2CE9CF96F
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:14:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4EBEB3041C
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:13:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E74D428B047
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF0A20400F;
-	Fri, 15 Nov 2024 21:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F70E204F68;
+	Fri, 15 Nov 2024 21:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vcjs3LLs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cmL95fDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8C31FAC44;
-	Fri, 15 Nov 2024 21:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8111FF05F;
+	Fri, 15 Nov 2024 21:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731707685; cv=none; b=pEMPk6I9teoDKwEEz44BnrRhTCNWHiWWbGYnaPdxjKeHRTj/9lD8aB14KBJfuQdxTnIWR/cNA81KoW9BU2x6SdaijOguG4IWm8rWoPfl7ARfpzwvzW+NJUL34bsSBoUbdqM/bc5+0aDEVvbYVUwMpr1jtVbQUSy3Cdzg3d2Hqas=
+	t=1731707739; cv=none; b=bS0Qzm2fTi1Mlvh48ewGpk0p9J3D/HVBcBmCTns7dF7iYNOEqtEfCehqkY6F8BJd6ljR/gXhqwIxBWGNJfLAO7tgkf8BUVRpsQgB2LEws98s6eyHyc8XXNwMCOdOWv+D/0LoXjHNqzGuHJ0z/nOgkjJAEDS30hYubLOeCyj+3KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731707685; c=relaxed/simple;
-	bh=PZUFopZFW011mgMW9hqK5D/QiGvWyJ859zbDEt+6aK0=;
+	s=arc-20240116; t=1731707739; c=relaxed/simple;
+	bh=8lMmfOqZiODGIcx4SlXUkqurOh0F3j8AKrId7NUWn7g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KmbY2ZPIDA5kpgVM0W2dL/LP1hRHRQhrF3Qd3Jn0rs9xzSyXQINOTlxatad+lgHpLfqTQKVMRq1i2TA11FQceg6GzY/5QDSvGIz2Wfk1vY49rJLKLMzpaBYZFDfJDI47U9qyNdcLhB6PnOFlvk9S4c6jvGIGXmt+WaLHCUBDCLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vcjs3LLs; arc=none smtp.client-ip=209.85.215.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=rteLvsi8GJntePpe+VF5WpUth0kdhGYVHQQ5LiL6V0DKjSWSg1sdMkNNd+2BpHP5UHVlVgUTSLjab+SUsgGXpbk/IJRxzyp5a2X0CH4oVR+NjB+DpC6A34giyJjfEjaSSpk6XKjSFPGubA+9U1YQcjJ7QwVLk6QymfqA1wEC9lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cmL95fDO; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7eb0bc007edso680942a12.3;
-        Fri, 15 Nov 2024 13:54:44 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-72410cc7be9so2024746b3a.0;
+        Fri, 15 Nov 2024 13:55:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731707683; x=1732312483; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731707737; x=1732312537; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Ih3rsYrxbacXhs22/ceJtwa19H77jl+ddUaN6SDc00=;
-        b=Vcjs3LLsTZUq27S99r+6sSUGeObutbVbOaDSu0bAMDxg3+60cq4Z5S/IzctJQbJZ6e
-         h4km42sUNanBi1XNSOneWoOSasVIwgLv/XqXBxEXRiAM28MDOuq84oiBowaFWNKNmpa2
-         doekIpKYL4M+lnuhNyUjtRibixiE4lEkds9old/hcVFzkWbSa6MOV+mQ07G9XuxESdMv
-         OxRr4gmSg+tO2uv8tmlRsYlCiaIsg9grFxarzMdCgcXrQVkbYeuOaUeMbM6HPr4uZVj2
-         0htc5QSm5O94wsDvHQutyI/55XaY5s6sLfFcQg2mv+7sqpMAUCyl9YX3HIzIzxxHKZHH
-         +nZA==
+        bh=JmMYbxJ4coyv+Z6T49LrludaC9pLdJpHpgB5sLMwpLA=;
+        b=cmL95fDOKVCUzjHv9GA77Wk7oK4cmdwISnx2PBX619FHEpaReONTILy7JLV7RbT8Bu
+         nYuT8IXYrtxWjtWgOatyn6ls4y/KP3BFT3WRc7Pv/x97mWpJS6GibYQ+Tmx1atjVot2g
+         4LStXU4yCv74GHeXGSJN+kJIXzK50+Gyqht+5N+YcBSlng5kWkO626u/YCsV7n7L1r1e
+         3hyCILHKNOXL9+xuJm/xHVugPYhH7hll79mnnjvwxcYiPKWmyJks3euzSLyhxcXRyKhm
+         o0SOzRGOkgHBuMYgCD/1eWh+YZLzepa/nPA4m/3inq1l+PCcTkQFdhKHHw5GAj7Yevav
+         /0qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731707683; x=1732312483;
+        d=1e100.net; s=20230601; t=1731707737; x=1732312537;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7Ih3rsYrxbacXhs22/ceJtwa19H77jl+ddUaN6SDc00=;
-        b=Ex1GYsbBtFAGWTy/9VpMVh5lxwiTwXlWxfDleH5wOlYfzaaZB6B8iIZVFo4KBsuSZP
-         nbEtafHwZh9Z7Gt5rMwgtbTth33Umk2dqEqfSTu5dJhn2tv/Yf48SdMbkbko6i2b5a+I
-         3NU7YmVoFKIAcbCkOAYC9tknzMPnf2G5ClhMzvnkhrXRkzLiWQZMyotjaSmNZRgkPHjz
-         5x1KQOF9kqyWBqdLBmT7xF1KbndDgpZaRY8zKfffZ8V+/qu1C50T4zLw/JWtY4CE2nV7
-         eTfKR8kSZgINPpm9lMWpgdK4vEbNKI2z61FCKe3H/YB/4WmWIIRPpsZE8lSWjs/yxGXR
-         p+GQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUX8yTXducF5z8CoqQ7LqBzvmQJciOthSevacBxOVJoMJKF1nH+MaNzgHSR+/H5l+EwgYDhDAfG+y6heb3O@vger.kernel.org, AJvYcCVb+ReUG+68HW4ci9ewPpSd5jXM+d/X5hH9blqCEySY79CwY7qqGG5BFchCF3Riw+2GiMX9m40R@vger.kernel.org, AJvYcCXPbI5D87AcyYr78eQ18YYQh+vnqsMQVGpN3JGvoyR1spwIAgPb7Ky22aLlzcKxbFkOsYRr642PyNk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyONFUlmDKRmoVfPTyV4L/IbKTA+19ziMwrKFU8f7pC8DQ0EXpW
-	T+WH8thcArIjn31O1YthHx0eSnVwNh+TgeUowpFugsV3G5+glMA=
-X-Google-Smtp-Source: AGHT+IEPQV9zwJoJlonYiQ4GuwJ0b3EHPHZ8jqkjsJ+ToR78Cl1m4Q7iPUEqcqWSzT4lX3EDev04eg==
-X-Received: by 2002:a17:90b:350e:b0:2ea:14c4:7b8c with SMTP id 98e67ed59e1d1-2ea154cd16amr5207631a91.5.1731707683460;
-        Fri, 15 Nov 2024 13:54:43 -0800 (PST)
+        bh=JmMYbxJ4coyv+Z6T49LrludaC9pLdJpHpgB5sLMwpLA=;
+        b=OLQpSqJLZ9W7H1JY1g3gaCbM6zSkGc4anl19Rbag7gFZL/3Xz9pu03c2knesRDcd6O
+         9XOD0umYvOmUrDEq485cSzmO8F5i7rryUQ1wJ4UdVpqtLzgVseexuJuwj6DJd8qknK6V
+         FG8Q5SHyl6EZXGt6IUAegFy4nTy+lvKzhC2i0fPy2qKhuUw3Y9EiEb0UJ4wO+QHkjs/V
+         QeEVHCpR07KwW+d373U3LhsFHUPnDBDThlRRfLJX8N892GIVoLxfMrq8+EHEDH3qItdR
+         0wymHYrRtstWGey15J4NuAOHcflDfnNvVfJedjnU36x4XFZlQdfoG9BP2wPRRhtHVc5u
+         A+Hw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuQZcXN/Jt1f2k5pUSt7BCJUOI+BHf20RQrPbPh1+zaO8MRE41CgfgnVlFGbGe90Qi5K3fTRWhmqtYN4Kn@vger.kernel.org, AJvYcCX7zSIF90OtL/IOoFJ3uhduu2wTpeOAy9QFDCJA6VRgljJVWYhYbL39JnlLTY627h61Eq8FElJihh8=@vger.kernel.org, AJvYcCXU66MLTVyVbueR7BMfUOIt7Bz3Xr1b6gJ10KhDh8TUTs26F96IRzjmII0omsMz9W18YcrpRPHc@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM4f/c5pPdv2Xy/G5/zHpUWnB290dpEAE3AQhnypybOa86C661
+	5Cq+crC5jxcPuPdneqpJcLWkJUqa8vAoVTLGHDXfSyp2FL5R4e0=
+X-Google-Smtp-Source: AGHT+IGGffkc2/SUimzY/QWeSMjwTUkWseb8vdJ5Su82+S0KbYX0+K29jVfXqiMuwQ5y8CO6eVp6sA==
+X-Received: by 2002:a17:90b:4a85:b0:2e0:d957:1b9d with SMTP id 98e67ed59e1d1-2ea154f6fc4mr4900048a91.13.1731707737323;
+        Fri, 15 Nov 2024 13:55:37 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea06fbc909sm3320819a91.53.2024.11.15.13.54.42
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea06f9c64esm3347129a91.42.2024.11.15.13.55.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 13:54:43 -0800 (PST)
-Date: Fri, 15 Nov 2024 13:54:42 -0800
+        Fri, 15 Nov 2024 13:55:36 -0800 (PST)
+Date: Fri, 15 Nov 2024 13:55:36 -0800
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
@@ -74,12 +74,12 @@ Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
 	donald.hunter@gmail.com, horms@kernel.org, corbet@lwn.net,
 	andrew+netdev@lunn.ch, kory.maincent@bootlin.com
-Subject: Re: [PATCH net-next v2 7/8] ethtool: remove the comments that are
- not gonna be generated
-Message-ID: <ZzfDIjiVxUbHsIUg@mini-arch>
+Subject: Re: [PATCH net-next v2 3/8] ynl: support directional specs in
+ ynl-gen-c.py
+Message-ID: <ZzfDWB1O_mgF0o7j@mini-arch>
 References: <20241115193646.1340825-1-sdf@fomichev.me>
- <20241115193646.1340825-8-sdf@fomichev.me>
- <20241115134023.6b451c18@kernel.org>
+ <20241115193646.1340825-4-sdf@fomichev.me>
+ <20241115133244.6e144520@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,38 +88,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241115134023.6b451c18@kernel.org>
+In-Reply-To: <20241115133244.6e144520@kernel.org>
 
 On 11/15, Jakub Kicinski wrote:
-> On Fri, 15 Nov 2024 11:36:45 -0800 Stanislav Fomichev wrote:
-> > -/* MAC Merge (802.3) */
-> > -
-> >  enum {
-> >  	ETHTOOL_A_MM_STAT_UNSPEC,
-> >  	ETHTOOL_A_MM_STAT_PAD,
-> > +	ETHTOOL_A_MM_STAT_REASSEMBLY_ERRORS,
-> > +	ETHTOOL_A_MM_STAT_SMD_ERRORS,
-> > +	ETHTOOL_A_MM_STAT_REASSEMBLY_OK,
-> > +	ETHTOOL_A_MM_STAT_RX_FRAG_COUNT,
-> > +	ETHTOOL_A_MM_STAT_TX_FRAG_COUNT,
-> > +	ETHTOOL_A_MM_STAT_HOLD_COUNT,
-> >  
-> > -	/* aMACMergeFrameAssErrorCount */
-> > -	ETHTOOL_A_MM_STAT_REASSEMBLY_ERRORS,	/* u64 */
-> > -	/* aMACMergeFrameSmdErrorCount */
-> > -	ETHTOOL_A_MM_STAT_SMD_ERRORS,		/* u64 */
-> > -	/* aMACMergeFrameAssOkCount */
-> > -	ETHTOOL_A_MM_STAT_REASSEMBLY_OK,	/* u64 */
-> > -	/* aMACMergeFragCountRx */
-> > -	ETHTOOL_A_MM_STAT_RX_FRAG_COUNT,	/* u64 */
-> > -	/* aMACMergeFragCountTx */
-> > -	ETHTOOL_A_MM_STAT_TX_FRAG_COUNT,	/* u64 */
-> > -	/* aMACMergeHoldCount */
-> > -	ETHTOOL_A_MM_STAT_HOLD_COUNT,		/* u64 */
+> On Fri, 15 Nov 2024 11:36:41 -0800 Stanislav Fomichev wrote:
+> > The intent is to generate ethtool uapi headers. For now, some of the
+> > things are hard-coded:
+> > - <FAMILY>_MSG_{USER,KERNEL}_MAX
+> > - the split between USER and KERNEL messages
 > 
-> These comments could be useful to cross reference with the IEEE spec.
-> Can we add them as doc: ?
+> Maybe toss in a TODO: comment or some such on top of
+> render_uapi_directional(), to make it clear that the code needs 
+> more love before it can be reasonably reused.
+> 
+> nit: possibly split into two commits for ease of review
+> 
+> > +    if family.msg_id_model == 'unified':
+> > +        render_uapi_unified(family, cw, max_by_define, separate_ntf)
+> > +    elif family.msg_id_model == 'directional':
+> > +        render_uapi_directional(family, cw, max_by_define)
+> > +    else:
+> > +        raise Exception(f'Unsupported enum-model {family.msg_id_model}')
+> 
+> You gotta say "Message enum-model", enum-mode alone sounds like we're
+> doing something with how enums are processed, rather than message IDs.
 
-Absolutely, I did port these (and the rest of the comments that I removed)
-over as doc: (see patch 4).
+"Unsupported message enum-model {...}" ? Will do.
 
