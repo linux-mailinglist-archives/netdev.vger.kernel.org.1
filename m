@@ -1,98 +1,103 @@
-Return-Path: <netdev+bounces-145178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FF99CD637
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 05:33:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422F99CD63C
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 05:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E844B22CF4
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:33:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FFA22829AA
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 04:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59261153BD9;
-	Fri, 15 Nov 2024 04:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37AA216CD35;
+	Fri, 15 Nov 2024 04:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7TW1z54"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVxE6XOD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DE528366;
-	Fri, 15 Nov 2024 04:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E08614F9D9;
+	Fri, 15 Nov 2024 04:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731645178; cv=none; b=Hk02jZ058qYmPfXY+87K/Au8WNq/MXBjgLiADNkJs+Hrk/mgsNjb4iFacPir6D5juqzDqfYJGp5MJcWguFaekOrTxEpRzxxn3mHb/UPO+Nk24K5IXrD2cnuiKP1RYr+YNgQ8Hp3K0CJiCb1s9zJpxMmdaP9tdyFYJhI6XOrTCIE=
+	t=1731645623; cv=none; b=K8OCjXlcdefaB6t+OI/NltPV5GcNM4OGwkh8WTPsH6dyt3JKrh3PdvgSoLQdtMsf+pw0/sMslzR27HWrPjbdjn57xRizxatvw4l0dGloo35foZOQl4bLwEVr9t5kxZBnrEmXhf3x4tnGEgRlkd45TbeBsaNetD6wrdFlObKYn+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731645178; c=relaxed/simple;
-	bh=Kt8JJ2EzNGwvHpwBGZfylQDeIunpNHowQDYBOsuGkAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o+Njb3FEr9ypnOul4hig8SEWfAUji8KSjpGULFwFeUFBKmnSkVsEahKj4b/z2u+f5ZRvzGebjT2pN90vzWy4UgN4tl1J+cTc248j3YwN34Jr4c6dMlJ0KEEN2gdXkqLG+0JF1es+tITW0jLFXRNL04BJ2Lcytrg/TSU+NF6cGRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7TW1z54; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4593BC4CECF;
-	Fri, 15 Nov 2024 04:32:57 +0000 (UTC)
+	s=arc-20240116; t=1731645623; c=relaxed/simple;
+	bh=koauvZYWrVLIz/tiqY+SnR8+k5MqcqF4T9Dx5OILdX0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LAwp5ht4vTNfY/2WXb2ZylGUFPG+QqRphtvLpXSYzFEfhAA4iwCNSZBY/v9QM1ucu+G6dcaFkrOoQ3yzC3qiD08+TaUYQjHZm102UIV48m4D5AzUF19ANhDGn/hbzI6WdKpX+elZxkW10NjOiODCNHCzjOIUv0rEfYBimWEpi1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MVxE6XOD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9323DC4CECF;
+	Fri, 15 Nov 2024 04:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731645177;
-	bh=Kt8JJ2EzNGwvHpwBGZfylQDeIunpNHowQDYBOsuGkAk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W7TW1z544xaOOk6ZX1LOiRlfeVKJq01lLTZIfQS2tBic7vT2IcxhPMw4RGDEzmfTB
-	 LVq+cVPu1siCsaJrjKT30Wk9+fowe5M/wEPHKqXRYgW7Q8kC9cQNuFhu1H0FumdoeU
-	 RpPgesRNdhAwApZe1pdrKLDZuGRzsYvmEDNV9SduNC/RMQZPQWdTAMuxMablXxmyka
-	 uE/jTmDkgFwoazD1pbqmBEMy3xUM5CVf7cTA+CRmoyuDK5JabxFWJ6/8nTJ29N4lmO
-	 x+H/YNEO540obAz0bQByi6NhWZRUulNeZ1CZOlHqkRDLMjxpLCsyUDCKnJUfsZO3P4
-	 pkf66mXLUlUNg==
-Date: Thu, 14 Nov 2024 20:32:56 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: ttoukan.linux@gmail.com, gal@nvidia.com, saeedm@nvidia.com,
- tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via
- rx_fifo_errors
-Message-ID: <20241114203256.3f0f2de2@kernel.org>
-In-Reply-To: <CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com>
-References: <20241114021711.5691-1-laoar.shao@gmail.com>
-	<20241114182750.0678f9ed@kernel.org>
-	<CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com>
+	s=k20201202; t=1731645622;
+	bh=koauvZYWrVLIz/tiqY+SnR8+k5MqcqF4T9Dx5OILdX0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MVxE6XODLMc8q/NUmtPbb4LwafASgkSFJJvqnQ6eorHUiTQ+PEpmnYTjoDshHmI/x
+	 KAd3fwN1dIbs3sYNoFrocXP2x/+wfQQJoBn9Y5X0qVLKi8vuxaaemne2HrSKiy1/7J
+	 IK3uwOtkmxkknbc7WCuCOKg+ZVxxbbop4n+uv1tn7nED7IkhWEB85/94i2J9Zy3CZ+
+	 u2F0818dH3vJS3n0CBgAG0VDtSWDb89q99svpx11xVWNSku0JQR/wguAamck1tLikJ
+	 rOZPwj8rnnj/1RNf4tqi2jMwQ9wsExpUL70Li60v5t6JxwjmahLnrcXZCpREtcXenY
+	 U0Ax90Wy6AZcw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B543809A80;
+	Fri, 15 Nov 2024 04:40:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/5] net: make RSS+RXNFC semantics more explicit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173164563325.2151510.15712104184262372756.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Nov 2024 04:40:33 +0000
+References: <cover.1731499021.git.ecree.xilinx@gmail.com>
+In-Reply-To: <cover.1731499021.git.ecree.xilinx@gmail.com>
+To:  <edward.cree@amd.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, ecree.xilinx@gmail.com, netdev@vger.kernel.org,
+ horms@kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
 
-On Fri, 15 Nov 2024 11:56:38 +0800 Yafang Shao wrote:
-> > On Thu, 14 Nov 2024 10:17:11 +0800 Yafang Shao wrote:  
-> > > - *   Not recommended for use in drivers for high speed interfaces.  
-> >
-> > I thought I suggested we provide clear guidance on this counter being
-> > related to processing pipeline being to slow, vs host backpressure.
-> > Just deleting the line that says "don't use" is not going to cut it :|  
-> 
-> Hello Jakub,
-> 
-> After investigating other network drivers, I found that they all
-> report this metric to rx_missed_errors:
-> 
-> - i40e
->   The corresponding ethtool metric is port.rx_discards, which was
-> mapped to rx_missed_errors in commit 5337d2949733 ("i40e: Add
-> rx_missed_errors for buffer exhaustion").
-> 
-> - broadcom
->   The equivalent metric is rx_total_discard_pkts, reported as
-> rx_missed_errors in commit c0c050c58d84 ("bnxt_en: New Broadcom
-> ethernet driver")
-> 
-> Given this, it seems we should align with the standard practice and
-> report this metric to rx_missed_errors.
-> 
-> Tariq, what are your thoughts?
+Hello:
 
-mlx5 already reports rx_missed_errors and AFAIU rx_discards_phy are very
-different kind of drops than the drops reported as 'missed'.
-The distinction is useful in production in my experience working with
-mlx5 devices.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 13 Nov 2024 12:13:08 +0000 you wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
+> 
+> The original semantics of ntuple filters with FLOW_RSS were not
+>  fully understood by all drivers, some ignoring the ring_cookie from
+>  the flow rule.  Require this support to be explicitly declared by
+>  the driver for filters relying on it to be inserted, and add self-
+>  test coverage for this functionality.
+> Also teach ethtool_check_max_channel() about this.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/5] net: ethtool: only allow set_rxnfc with rss + ring_cookie if driver opts in
+    https://git.kernel.org/netdev/net-next/c/9e43ad7a1ede
+  - [net-next,2/5] net: ethtool: account for RSS+RXNFC add semantics when checking channel count
+    https://git.kernel.org/netdev/net-next/c/a64499f618b2
+  - [net-next,3/5] selftest: include dst-ip in ethtool ntuple rules
+    https://git.kernel.org/netdev/net-next/c/b2d5b4c46856
+  - [net-next,4/5] selftest: validate RSS+ntuple filters with nonzero ring_cookie
+    https://git.kernel.org/netdev/net-next/c/e9e8abfec214
+  - [net-next,5/5] selftest: extend test_rss_context_queue_reconfigure for action addition
+    https://git.kernel.org/netdev/net-next/c/29a4bc1fe961
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
