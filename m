@@ -1,121 +1,82 @@
-Return-Path: <netdev+bounces-145479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7CFE9CF9A8
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:20:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 524AC9CF9A9
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 23:20:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 644B51F23D91
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:20:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F25E51F248A5
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 22:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F59118DF65;
-	Fri, 15 Nov 2024 22:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A7F18F2E2;
+	Fri, 15 Nov 2024 22:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GvQC2ciw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rAS5yure"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76508824BD;
-	Fri, 15 Nov 2024 22:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5234218DF6E;
+	Fri, 15 Nov 2024 22:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731709222; cv=none; b=QNLNe0M1f5ryMnlr7D2Cd3u+4ODJYUdHIaUQPVnoH0v1e/dOXDLgLFgG9q39Q20bPM5JirCr9/VPgpsbzwsE1QpbTeaaVP7bfZu871y8nyOBrYW02nsf4c3p6OB1EWoZnCQ4Wq4U1tIeXeIMo+VLGqGEWmQRgcHZUr4djx3k3+k=
+	t=1731709240; cv=none; b=RkuFgcDaNVFJXnarPTWImWvwitxYMf635r44IrVXPwtsjZfDa25wazAufUBlp1BEuivmxhTocxNWA3TOvHyR8zGyxmMJHgfDvbgHuCCzdBKfa9/I2xYeayXiZvJvWaK1/kLDIlJEyJkvKZ6UFz/3JS7SU7iRthe5Du1TSnR4r88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731709222; c=relaxed/simple;
-	bh=B+2xRedtL/liNFw5J11WdSIGow4Ng61KZCkJd6ZdxsI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tMKaCRV8ZEitmTcH73c5htX9SMxIQiFoDNEAHefvQaAZAXtEIiJ4yu5zO6BlGmddADSBbS3eNKRCzwfhy4eIgozAQ86yyuPp8kFuaNKqrLX11qZBjvwvSEpq2//2Va52VAy4/yYe1ay/UZibT5J1bqF30/TRXgfkX7XGO19ecn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GvQC2ciw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7ACFC4CECF;
-	Fri, 15 Nov 2024 22:20:21 +0000 (UTC)
+	s=arc-20240116; t=1731709240; c=relaxed/simple;
+	bh=YEbIVo1wJQ4C/7AYDnCrmqFUNPjdBkHWoZanVZOmc4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=nFTaT59eCQEnvSkG5UIOlFj4ipGVPolPcLkfcyB+4gU29Vo5cjAcEcSPGHhhFJiw3YA49jmRrxaj+ZfYxBBipNzfQw83eJL4mJBinMPZ3JqoPpYfXJvTcbdnWMhWfMiw/94SoJowJW4RU55xufEq0Ij9By5yvrJcl3hKDgzIclk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rAS5yure; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00B00C4CECF;
+	Fri, 15 Nov 2024 22:20:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731709222;
-	bh=B+2xRedtL/liNFw5J11WdSIGow4Ng61KZCkJd6ZdxsI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GvQC2ciwB6frXDhJqaeRX5j055GFdvN/04YMXfQQMYOx7tsmpPQ4pZotHkhxsZnYv
-	 8PiwZve1vgD4GLnVdi7yD1bMPr6NEUfvAy7Q0kzyXu6HI67M2vfTF8sSbi+rh9ClnL
-	 2WZELIhQuNrc5aHqvlbargTPBxbEKbe0IRDIPMFAlGbOotFqncWAjBDeVTFQ9FxLgF
-	 NPQ2pUdY+60uaTIQtVx7a4XSDKLiz7nu9SKHb4Yko8c2+AWYyQMdOINywHbrHnyBmO
-	 GhXmdEAkhBA3KPkV9ok8ETNLJB4XAIM/smLZwxUKfAZgvCzDyFgDjMiIj7JOqbpflY
-	 IEGKtMTWPgwng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFD63809A80;
-	Fri, 15 Nov 2024 22:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1731709240;
+	bh=YEbIVo1wJQ4C/7AYDnCrmqFUNPjdBkHWoZanVZOmc4E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=rAS5yureYW4EChvqhEnR8hiiiPxSFVks7f31D0nZSHKh2zZto53j/IxYwczEZIWfq
+	 w2v1fZJWSKc34TQ9XODi0t9of+rp24bH3GmwV0rSPgPQXHcIlek5Jx08V+xGvzAByb
+	 efMGANqdLUFsru74uhL0yprtruElrdzhNEw2k/2bxTgIoGVdU+zrtt6fdq8jCcnzS8
+	 9LBul4Fcw/Hte1+sXAabn4zSQ/AlM5df6bhtkaEUDhh6ARkXhmdl8OHb+0DhhwkI6g
+	 armbR+bukhe2nQwi4CXk+st/0kkY+zqcRlzJy5xMB4LL1JxjTtY+Sqy0o0RWRa8V+Q
+	 s/ZyybgkE7nqg==
+Date: Fri, 15 Nov 2024 16:20:38 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: bhelgaas@google.com, Wei Huang <wei.huang2@amd.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, asml.silence@gmail.com, almasrymina@google.com,
+	gospo@broadcom.com, michael.chan@broadcom.com,
+	ajit.khaparde@broadcom.com, somnath.kotur@broadcom.com,
+	andrew.gospodarek@broadcom.com, manoj.panicker2@amd.com,
+	Eric.VanTassell@amd.com
+Subject: Re: [PATCH V1 1/2] bnxt_en: Add TPH support in BNXT driver
+Message-ID: <20241115222038.GA2063216@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/14] netfilter: nfnetlink: Report extack policy
- errors for batched ops
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173170923276.2750070.17765103576205976526.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Nov 2024 22:20:32 +0000
-References: <20241115133207.8907-2-pablo@netfilter.org>
-In-Reply-To: <20241115133207.8907-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241115140434.50457691@kernel.org>
 
-Hello:
+On Fri, Nov 15, 2024 at 02:04:34PM -0800, Jakub Kicinski wrote:
+> ...
+> Bjorn, do you have a strong preference to have a user of the TPH code
+> merged as part of 6.13?  We're very close to the merge window, I'm not
+> sure build bots etc. will have enough time to hammer this code.
+> My weak preference would be to punt these driver changes to 6.14
+> avoid all the conflicts and risks (unless Linus gives us another week.)
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+I do not have a preference.  The PCI core changes are queued for
+v6.13, so driver changes will be able to go the normal netdev route
+for v6.14.
 
-On Fri, 15 Nov 2024 14:31:54 +0100 you wrote:
-> From: Donald Hunter <donald.hunter@gmail.com>
-> 
-> The nftables batch processing does not currently populate extack with
-> policy errors. Fix this by passing extack when parsing batch messages.
-> 
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> 
-> [...]
+I agree it seems late to add significant things for v6.13.
 
-Here is the summary with links:
-  - [net-next,01/14] netfilter: nfnetlink: Report extack policy errors for batched ops
-    https://git.kernel.org/netdev/net-next/c/3f5495962824
-  - [net-next,02/14] netfilter: bpf: Pass string literal as format argument of request_module()
-    https://git.kernel.org/netdev/net-next/c/8340b0056ac7
-  - [net-next,03/14] netfilter: nf_tables: add nft_trans_commit_list_add_elem helper
-    https://git.kernel.org/netdev/net-next/c/4ee29181216d
-  - [net-next,04/14] netfilter: nf_tables: prepare for multiple elements in nft_trans_elem structure
-    https://git.kernel.org/netdev/net-next/c/a8ee6b900c14
-  - [net-next,05/14] netfilter: nf_tables: prepare nft audit for set element compaction
-    https://git.kernel.org/netdev/net-next/c/466c9b3b2a92
-  - [net-next,06/14] netfilter: nf_tables: switch trans_elem to real flex array
-    https://git.kernel.org/netdev/net-next/c/b0c49466043a
-  - [net-next,07/14] netfilter: nf_tables: allocate element update information dynamically
-    https://git.kernel.org/netdev/net-next/c/508180850b73
-  - [net-next,08/14] netfilter: ipv4: Convert ip_route_me_harder() to dscp_t.
-    https://git.kernel.org/netdev/net-next/c/0608746f95b2
-  - [net-next,09/14] netfilter: flow_offload: Convert nft_flow_route() to dscp_t.
-    https://git.kernel.org/netdev/net-next/c/6f9615a6e686
-  - [net-next,10/14] netfilter: rpfilter: Convert rpfilter_mt() to dscp_t.
-    https://git.kernel.org/netdev/net-next/c/f694ce6de589
-  - [net-next,11/14] netfilter: nft_fib: Convert nft_fib4_eval() to dscp_t.
-    https://git.kernel.org/netdev/net-next/c/f12b67cc7d1b
-  - [net-next,12/14] netfilter: nf_dup4: Convert nf_dup_ipv4_route() to dscp_t.
-    https://git.kernel.org/netdev/net-next/c/f0d839c13ed5
-  - [net-next,13/14] netfilter: bitwise: rename some boolean operation functions
-    https://git.kernel.org/netdev/net-next/c/a12143e6084c
-  - [net-next,14/14] netfilter: bitwise: add support for doing AND, OR and XOR directly
-    https://git.kernel.org/netdev/net-next/c/b0ccf4f53d96
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Bjorn
 
