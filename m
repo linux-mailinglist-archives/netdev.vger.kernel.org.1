@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-145104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B97B9CA0B9
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:22:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 393C89CC7EF
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 01:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26333B21EA2
-	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:22:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC6BD28411E
+	for <lists+netdev@lfdr.de>; Fri, 15 Nov 2024 00:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B388837;
-	Fri, 15 Nov 2024 00:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06AE1E522;
+	Fri, 15 Nov 2024 00:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QvKFBqpz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BOO/U8mg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F104A11
-	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 00:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D56F1E519
+	for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 00:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731630164; cv=none; b=bg7pri3eT3tQcw6WsslyuUz6jy5GzZz63s8kpIydcm9xP5aaA+TBTA98KauhfRyx+4TUm8OXr/UX4EnOeirW9p32L+8NPihrIadbRkVTPHYrc2FTN7AGhjEP7vAsRM0yWDOVZRFUzQmJJNoXXtDUrv40kA/nBduDUv/ZdbaF47U=
+	t=1731630462; cv=none; b=gx3y7cChGqiaxDaPuGgl3bHfE9sD7iRKdR7jbOyyuHBZFc361owTg+qbxv4ThG+uktORnjucBKXI1nqH8gcE2/DSbKcMJUPrhdsAkMbf5w/cHfIOjrshUU9GzmhORBk799Fh1t9/RP3CjX754QJ+0hkeRi+euxeEQcmd+mC9Xa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731630164; c=relaxed/simple;
-	bh=moI8WxGiB9tv0ZyrmC+zOv4MuT1TuR7i0bMoi5MdArg=;
+	s=arc-20240116; t=1731630462; c=relaxed/simple;
+	bh=n7syOyeaxbpj8Fyi2QdMef9706Yyhd6iKZ4uaqkZU2g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R/XmnNxPN0NU+a7NWGMaAYJetFGTQQHoVD3hWNfrZNabLoG59eFr9kezMlN/3ut5JTWdCtta83BKrL9MvOXaDkFroI2gWDU2qz48+O2tizNoQLWXeEXZJZNvCF3KPE6AdbtOuS06//YIYmHD/8ItacVY0061bLIbZfrPw8KgnQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QvKFBqpz; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=i1b3/Lk3HFFBvwpqJ5Dct2+byKMZ8X76lXmzD3mFLvjYDwvvtjNh4Sp0ydliyBvc+6YhaJpZE1YDZjTvAuxBwDg3WmOQ/QQKr0Xb8OC6rK4i1gTrgzacpdBOqqTT+CN9Hzc4A9zyGpmfNh/eG0tZDCYK1ERERyyxrCHJlUCngNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BOO/U8mg; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5cf764e50a3so2501676a12.1
-        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 16:22:39 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37d495d217bso974078f8f.0
+        for <netdev@vger.kernel.org>; Thu, 14 Nov 2024 16:27:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731630158; x=1732234958; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1731630458; x=1732235258; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hfS1H2yOchvS/qqNKVWblV/sdXddi+zLRSwGNQFOfzI=;
-        b=QvKFBqpz720C9nCXfuDPFDHXw1RJy4OSRHtspAm0TnBKlFsHFKLcCa/AzIHgyBUddE
-         FYIUr6tINqsxFXCPtFrEg1xoh1WMxDDrc6mH4zVy8iwtiS4njq5Z5+q4gAg7b4sMQ86B
-         ycpd0F8BbxHXHV7DZbLGG7yxsBts+vI+tJSIs=
+        bh=+1FCXBWQV1ppiwqTuo79byKj0gV+Rw25EEjurLskVnM=;
+        b=BOO/U8mg/IQUgxM4Czql3LWrZecZLWt35CmbgivNt1NklCdYAv/Fpg1raDXYKTKXON
+         1xfCmiqu+Dx456UbTiXWB+BzcnP/MM/NThueYL/iaInz1Ig5wl8nGyowHU+O9GmveZmx
+         g+M1b0xlZ5tY+RtuJI0FFJxpk3tT6l3gLjQNg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731630158; x=1732234958;
+        d=1e100.net; s=20230601; t=1731630458; x=1732235258;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hfS1H2yOchvS/qqNKVWblV/sdXddi+zLRSwGNQFOfzI=;
-        b=OhB9OfBLMDBzepGhCwMHC/3wwkS48J985sekcMYFlx8a6PG94OhvzfeOC7cM5+YnEL
-         m1mWViapZ+N4fJYZIWAtZ1cjyN+gEqJj85yo7xPrFVhaOt6qXPvgwLZvZ6NqjCaG33EH
-         WADXd4nYCr30Nq7qY7sB7rTc6B8F1bMmfc19ONFqppcBm1AZgJiEwM1jbKfYIEEZWT6x
-         grIL4PUxX2JXqu+OY9TbdD48fy6GvWEw24piA1MYDD9Zs6nrCwVqRpbg8DBBIBzxxqme
-         4/8L12djXSBHbWSHlFYVFsq0zrnLYMfCabqZ6YX/QQazYeXVqrBcgUtmdFpyIiGygwCV
-         Z0Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCXj7+iEwpGweD6y2qhxaQUvg2l7Dg8D8c4nUfi1LqDmRvFqxaPqrjQynH46KJD4BTWw3JZZAQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8h1c2durwNVxe1YR9/HjpSMCOEnnlCldh+HihphiagvzeMIh0
-	SrKmIkUDfrF6w6DXzLAz3cX1F8RZjxbnRdGQnmJC/bkhXKPWho1GALLvwH9JseghCnetiQySV5t
-	oHmhxJLeJhI/XDkHTVHV8X2GifUxq7bT+kyPi
-X-Google-Smtp-Source: AGHT+IFAajEiR/JuU4hBVske0C10Goc34RQVrgIDuPPp1N6VsXYF4OjopM5yM6/7PIRNEuoATX9GxT1sZBW+91oBxJk=
-X-Received: by 2002:a17:907:2d93:b0:a9e:82f3:d4ab with SMTP id
- a640c23a62f3a-aa207687241mr481420666b.9.1731630157868; Thu, 14 Nov 2024
- 16:22:37 -0800 (PST)
+        bh=+1FCXBWQV1ppiwqTuo79byKj0gV+Rw25EEjurLskVnM=;
+        b=Dz8R0upqPQ0dJLkpHuxgFXtCRYOlyue5aeNWtroph+QBuMkQKAxlFdVz2YgGvkQLdm
+         3TzWI2Udp4+TDHAwdnYq5mrjoJPO0MEs1I42Qe8twOKCsqBfqlrce/4gRLrn2Aqx3pWQ
+         rr7UlH1sMzGCgBchzIunCqqXaLj+TAPubMGV9suLSOL667yM82KsgwfnAqyuVU+hOS+A
+         kEYOaR9gu56yDe04dJLY9fZsl5lgi39OjMkdQBLbcgD09Hd9UitWPVjSN8ebZWtZyUFD
+         o2FEHxtzfsg7fxzATZhjUCU5zrbznCkB0zeLLY3fjtOHgey0ifagQXhpj7iHYWKlEVKy
+         6y3g==
+X-Forwarded-Encrypted: i=1; AJvYcCWAALpbNAfvzuXUXEXin7FkbJ9AlvlU6b74PCz+Y5iplNmsSEVGfUgjyuw8r3FWZXpm+iY8ezM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW3aH3H/oS3xnO6ZJExu6f+XIEsD/R8n0C9m4SdGr6K/ExA73c
+	fDcXXbUez65FHYEQQ1+HUvCd6U90CztzCmXxZjQYY4taUZKBlAEDgvo1cj3IbzuDAu+S9cw8Lw+
+	J36gTRJQKI1NOijDuhrbjJbpwuSzhyj5J4ref
+X-Google-Smtp-Source: AGHT+IGGuUUlxH8FpXfge9PfFVHHBR5lJDtheC1uEZdPwtcHTmSYbER4V+NCBF4ego+O7B3f8TbIiKJ+wZehu9cNVGQ=
+X-Received: by 2002:a5d:5c12:0:b0:37d:53d1:84f2 with SMTP id
+ ffacd0b85a97d-38225a21adfmr737502f8f.11.1731630458460; Thu, 14 Nov 2024
+ 16:27:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113173222.372128-1-ap420073@gmail.com> <20241113173222.372128-2-ap420073@gmail.com>
-In-Reply-To: <20241113173222.372128-2-ap420073@gmail.com>
+References: <20241113173222.372128-1-ap420073@gmail.com> <20241113173222.372128-6-ap420073@gmail.com>
+ <ZzZ_ub26phtVNmnK@JRM7P7Q02P>
+In-Reply-To: <ZzZ_ub26phtVNmnK@JRM7P7Q02P>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 14 Nov 2024 16:22:26 -0800
-Message-ID: <CACKFLikWhVicBRENq9Je=61+zJUqpcrpKONKP7sczi89sgbw0g@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 1/7] bnxt_en: add support for rx-copybreak
- ethtool command
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, almasrymina@google.com, donald.hunter@gmail.com, 
-	corbet@lwn.net, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+Date: Thu, 14 Nov 2024 16:27:27 -0800
+Message-ID: <CACKFLimmY1CBdu9VhG6nUd=o4DjdQwxHVHxbnky7qUWhZK9KDw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 5/7] bnxt_en: add support for
+ header-data-split-thresh ethtool command
+To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com, 
+	donald.hunter@gmail.com, corbet@lwn.net, andrew+netdev@lunn.ch, 
+	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
+	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
+	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org, kory.maincent@bootlin.com, 
 	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
 	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
 	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
@@ -89,60 +90,56 @@ Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
 	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
 	willemb@google.com, daniel.zahka@gmail.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000077a63c0626e89077"
+	boundary="00000000000060d2a00626e8a232"
 
---00000000000077a63c0626e89077
+--00000000000060d2a00626e8a232
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 13, 2024 at 9:32=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
+On Thu, Nov 14, 2024 at 2:54=E2=80=AFPM Andy Gospodarek
+<andrew.gospodarek@broadcom.com> wrote:
 >
-> The bnxt_en driver supports rx-copybreak, but it couldn't be set by
-> userspace. Only the default value(256) has worked.
-> This patch makes the bnxt_en driver support following command.
-> `ethtool --set-tunable <devname> rx-copybreak <value> ` and
-> `ethtool --get-tunable <devname> rx-copybreak`.
+> On Wed, Nov 13, 2024 at 05:32:19PM +0000, Taehee Yoo wrote:
+> > The bnxt_en driver has configured the hds_threshold value automatically
+> > when TPA is enabled based on the rx-copybreak default value.
+> > Now the header-data-split-thresh ethtool command is added, so it adds a=
+n
+> > implementation of header-data-split-thresh option.
+> >
+> > Configuration of the header-data-split-thresh is allowed only when
+> > the header-data-split is enabled. The default value of
+> > header-data-split-thresh is 256, which is the default value of
+> > rx-copybreak, which used to be the hds_thresh value.
+> >
+> >    # Example:
+> >    # ethtool -G enp14s0f0np0 tcp-data-split on header-data-split-thresh=
+ 256
+> >    # ethtool -g enp14s0f0np0
+> >    Ring parameters for enp14s0f0np0:
+> >    Pre-set maximums:
+> >    ...
+> >    Header data split thresh:  256
+> >    Current hardware settings:
+> >    ...
+> >    TCP data split:         on
+> >    Header data split thresh:  256
+> >
+> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 >
-> By this patch, hds_threshol is set to the rx-copybreak value.
-> But it will be set by `ethtool -G eth0 header-data-split-thresh N`
-> in the next patch.
+> Tested-by: Andy Gospodarek <gospo@broadcom.com>
 >
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-> Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 
-> @@ -6417,16 +6422,14 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp=
-, struct bnxt_vnic_info *vnic)
->
->         req->flags =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLAC=
-EMENT);
->         req->enables =3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_=
-THRESH_VALID);
-> +       req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
->
-> -       if (BNXT_RX_PAGE_MODE(bp)) {
-> -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_buf_use_size);
-> -       } else {
-> +       if (!BNXT_RX_PAGE_MODE(bp) && (bp->flags & BNXT_FLAG_AGG_RINGS)) =
-{
->                 req->flags |=3D cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_H=
-DS_IPV4 |
->                                           VNIC_PLCMODES_CFG_REQ_FLAGS_HDS=
-_IPV6);
->                 req->enables |=3D
->                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THR=
-ESHOLD_VALID);
-> -               req->jumbo_thresh =3D cpu_to_le16(bp->rx_copy_thresh);
-> -               req->hds_threshold =3D cpu_to_le16(bp->rx_copy_thresh);
-> +               req->hds_threshold =3D cpu_to_le16(bp->rx_copybreak);
+> > @@ -2362,6 +2362,8 @@ struct bnxt {
+> >       u8                      q_ids[BNXT_MAX_QUEUE];
+> >       u8                      max_q;
+> >       u8                      num_tc;
+> > +#define BNXT_HDS_THRESHOLD_MAX       256
 
-I double checked our hardware spec and the HDS threshold is 10 bits,
-so the maximum value is 1023.  When we get to patch #5, the HDS
-threshold is separated from RX copybreak and the HDS maximum becomes
-256.  So it is within the hardware limit.
+As mentioned in my comments for patch #1, our NIC can support HDS
+threshold of up to 1023, so we can set this to 1023.  Thanks.
 
---00000000000077a63c0626e89077
+--00000000000060d2a00626e8a232
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -213,14 +210,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICMpYCS6omWQotCOf8bRp7xnEsn596tm
-u5kUdVwn5xPJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEx
-NTAwMjIzOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIO5jCWXCCn92mVTI/Zm7nycf8Zm5yG6D
+ym41K2hkAWacMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEx
+NTAwMjczOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCUrqs0eWJuKiXhj/zgv89WL4nxWI4dYFnAh35ZcaLXT/j28FQf
-FRzBteR1jPs/VR2ROmOiNESkG+86uYSPqAN8U0h8d64hXEDgSvm7Tk1obsjYMxuz3lAiBeDGZl3B
-OAd13jngAXzkd7YKgUcah6nqsvRGNdZkd40HM1zzdMOAJPDOQEmc7Ih2GWuTxQ/eCO1leP8GXxk9
-Tc3H4ZW2is46bj4aRnAu3R0lxhTLAIRLAeEnEQyRTUBPt3GN5gvciLC5DPdOP3meBpDR7zXavtYX
-lW0M/qG+cd7ciZNyLNFgmcK2q3c/vyThdDdyCmQMi4flaetGH8zTb3jUkV7CEkoQ
---00000000000077a63c0626e89077--
+ATANBgkqhkiG9w0BAQEFAASCAQAoy81JKQrFSEfZqAXTE1d9pLgZs5oVpME3OuegxfILMeyLPpqN
+dHv4PbW8j5XhtFrV7+HHKdoThzV3t5VcCyd6vZ8ud1z6ehQL/r92wLEWhNSAyFg+3xgL+HwU5tyj
+u3n5VNMWKGINzznqTlsvfV9YnH3P/hO5CpDCBc3vTwlDz3vbabAsSAjXcsKRxdY8UwL0lNXxkG/A
+eGaraWcDVBClGcDRN9oskF6pOsY5P5tEWUl8RrsF9itP51oOlxmYi73L3LU1bmTlrY+3/lLv9ipS
+y9Ioox9j3DPBOkQroZUtjVWU3MyuSNsHDiLlpsGo5SQhltTmuGPgBQ4BVzHHYzkI
+--00000000000060d2a00626e8a232--
 
