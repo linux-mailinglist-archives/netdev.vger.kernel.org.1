@@ -1,229 +1,303 @@
-Return-Path: <netdev+bounces-145587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1C99D0010
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 18:26:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B66C9D0019
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 18:41:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E15931F2307F
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 17:26:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8394028224E
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 17:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08BD18CC10;
-	Sat, 16 Nov 2024 17:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D3218D65A;
+	Sat, 16 Nov 2024 17:41:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="ThY3aZXr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KwEkliYF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8CF8172A;
-	Sat, 16 Nov 2024 17:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731777963; cv=fail; b=QT02NyQcATVfHdbxP+xLA1xPGuxWzUZ4jZp9K0jsHk25cFHKik2EaZaNzVubBHHpAFJuGnYfSQ4NDAlRUeNq8UTFUAQU0cvXUrYDBJCiRZ3iSeCToPP724Gjg658sqr+UldWtyd6IFZ+JvEEf1H/FWJuUdXc8x2MM5v86KgvU84=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731777963; c=relaxed/simple;
-	bh=ozPNsGsxtI1LDiwk1e2rt4Z4Xyd03mGX4VIrWrhWScg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=C0rIzuJ7I250dQCk9NYYKn+FbGso1mEdkd8gm6DZs/P6T2XXZSDubNO808uLYbeGeyy/v68anw/vYgSrBt4RNK3WJJxxYw1HuUXNcfLDDGnCk/fmJO3+CA6tgF0mcLWJ5iif9iS6qoY3vdX8jKHjR367ogmwxmDF/VxxlL5hXgo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=ThY3aZXr; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AGHDO9Y030822;
-	Sat, 16 Nov 2024 09:25:33 -0800
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2176.outbound.protection.outlook.com [104.47.57.176])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42xw10054p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 16 Nov 2024 09:25:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qVVji5MHILylktnhTEwPiXt7e2vVQsxcvJpeZ+RhpdMCQOsMyI2hDI1k3lthiour/RkJ6OJihKs8DDfRBJ9VOvwbfjRVp71rZX7cAKcNcAlyWMPBBMHIYadbOOc8ZBVcTFDmVknxjKZ4GkDDh4F9+7mZTEJ6MFnOzGGYdz3GqfRA9Zz5ZylbC/jRQHwos6EOlYGKNF93rVfsA4VYY0dhuYm032ZdIPlLiSXwZL80hSrTMKT1NW6x9BVgSlBaxuPMekQpDdyVaN49lFEF8kPfeg5bpLnEaJZ2bIpzOphGGUArFo0g7LCHlL7g8AsdbOkOy01KpBrPBGgwV28vyewA0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ozPNsGsxtI1LDiwk1e2rt4Z4Xyd03mGX4VIrWrhWScg=;
- b=SC1RnWCu1/CBOgmlyUP308g7bL/9s2x5z1Oz5ZkIaP1qb9dRNwMC6CBJbmaWIhIHEV44NRinEz+GKVWE+wynahbTpBHztUXmRvPgZwWiq3Dgzp54YdFmg/zx7HAeDhhDxeDIQOxwdxfZH2x6OITla1aChGlgsY9QBsW4ySA3lhKPtQIl/rmBZ/RlsaDVERhENQVzlBs/4YqfXhOOtdObPzoQmdG1IuLQvpRYjky/VUsTWdFwe5k4gsKwlfflcQiqdLuvHt2ZnE0lRyYy6Q+ccR7XD30s46Qt/LjJ/APZ5PqMQcPkE/OVYO7b4g745HdSCEFaqvfUOnOYJ4e+AQMQqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ozPNsGsxtI1LDiwk1e2rt4Z4Xyd03mGX4VIrWrhWScg=;
- b=ThY3aZXrgpiMBrOWaaZK06V8ehqWrEw3jyYncdwiSYr6VusxPOEfYNvYlPq4XXphRwLAmJMMr5xm7b1wb0RpjERgZsIGmsUZgainm9P98YuGsG+8S9XcBTe9FLst0RO2nHOZyhe7wCSD0YPXjbKTH2kIkPrNvGhACpgtQXDgavc=
-Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
- by IA3PR18MB6311.namprd18.prod.outlook.com (2603:10b6:208:529::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.20; Sat, 16 Nov
- 2024 17:25:29 +0000
-Received: from PH0PR18MB4734.namprd18.prod.outlook.com
- ([fe80::8adb:1ecd:bca9:6dcd]) by PH0PR18MB4734.namprd18.prod.outlook.com
- ([fe80::8adb:1ecd:bca9:6dcd%3]) with mapi id 15.20.8158.019; Sat, 16 Nov 2024
- 17:25:29 +0000
-From: Shinas Rasheed <srasheed@marvell.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: Haseeb Gani <hgani@marvell.com>, Sathesh B Edara <sedara@marvell.com>,
-        Vimlesh Kumar <vimleshk@marvell.com>,
-        "thaller@redhat.com"
-	<thaller@redhat.com>,
-        "wizhao@redhat.com" <wizhao@redhat.com>,
-        "kheib@redhat.com" <kheib@redhat.com>,
-        "egallen@redhat.com"
-	<egallen@redhat.com>,
-        "konguyen@redhat.com" <konguyen@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Abhijit Ayarekar
-	<aayarekar@marvell.com>,
-        Satananda Burla <sburla@marvell.com>
-Subject: RE: [EXTERNAL] Re: [PATCH net v4 1/7] octeon_ep: Add checks to fix
- double free crashes
-Thread-Topic: [EXTERNAL] Re: [PATCH net v4 1/7] octeon_ep: Add checks to fix
- double free crashes
-Thread-Index: AQHbNb0RQc020HgX5E6gYTB4lCpykLK1zieAgARereA=
-Date: Sat, 16 Nov 2024 17:25:29 +0000
-Message-ID:
- <PH0PR18MB473449C495237697452E777DC7252@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <20241113111319.1156507-1-srasheed@marvell.com>
- <20241113111319.1156507-2-srasheed@marvell.com>
- <03ccdc24-27af-4b4e-baf3-40d89ae72e99@linux.dev>
-In-Reply-To: <03ccdc24-27af-4b4e-baf3-40d89ae72e99@linux.dev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|IA3PR18MB6311:EE_
-x-ms-office365-filtering-correlation-id: 3e81fa87-9442-4cc1-b89f-08dd0663aaae
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?cWRjQW9Wb1ZrVVhqV0xabFhQSTQ3cDlNRUkwdVFJTW5hSHhxaGRHMDdvOVJy?=
- =?utf-8?B?S0dCQlNaZ2k5NFNGZG1yTW0xeEZzN0xRMEZhcEhhdXB2VkJNU3pTSmgxSlhr?=
- =?utf-8?B?bTJ4OTRmWmEwSDVyT0dDWjYxOHRZcVJKb0pCV2svNFg3ZmRDUU02Q01DOWMx?=
- =?utf-8?B?UVFGQmxtSGlnTlNVcDBha2NuQytJZEdHdWFEMGVMT00wdmNUUHU3UmlWZkpa?=
- =?utf-8?B?OVc1SENBWFdxOGRBNit4RVg3VTlXRWZ5enhGSyszS0RSVy9XeWpqU0xFbVJJ?=
- =?utf-8?B?S0ZhRlIvNUs2b2x2cFNGOHk3Y3k5WTBQRndHN2ZWRW5ZblhnS2lGUWJhZWdI?=
- =?utf-8?B?MkJjSmo4OVZwTk5EUktkTEdJaUpNeU0zS3UzZGtDL2owNmNVRkxEcXZ3TDZK?=
- =?utf-8?B?ajB3eDlXaDJYOFNpR0xOdUFKSGRadnU1bTllNmQ5cmd4OGVoYVhOaWdFZDhq?=
- =?utf-8?B?Qm1DaUNJbzlxMHIwSzdHQjR5L09WcGU2VDUzdUZIZmsxSXdmYXZnaGF6L05Z?=
- =?utf-8?B?TkR2YkhYWHAzREk1c0lvVkhHdmZ5aDRLcTVUVUpPZTZhN0Nqc3JaYUN0SHBo?=
- =?utf-8?B?YW9SaysyNHlSdkhOSjA5ZStUUisvQ1lrZzl1RmFSOEUzTU04UThxdnlQVkJ3?=
- =?utf-8?B?NGxQLzFCYXB3d0VqYUI0dFZaSEE2NGN1UW95NWxucW1UZjF6MHl0ZDJ5UnMw?=
- =?utf-8?B?YmJlcVBWWDBJdWZvaEdzRTZBaXdtNlVIbGllK1RMdHcweHE2MEV0U3NCSXBG?=
- =?utf-8?B?cFhMOVl0TExDaGI0dFA1VGFBM3hUdnNhVlBMbXhRbHFUT1R4NmQ5OC94NTZ3?=
- =?utf-8?B?RlpaMlNqOFBrajA1MHo4MzdlWEVvTm5mTEFWRzFKclo2S0x4eHNFUVNxMnk5?=
- =?utf-8?B?Ri9Cc1hWVldYWTQyNGJrRlZ4Q3pXVmVtR2RaUTU5Vlc4d1d4WC9TMUt1ZjFq?=
- =?utf-8?B?WW8zb0JDK29qS1kwbU90RjA2OEYvRjBYR3pLMkVkaFJDcmZEc1pjZHFEZElW?=
- =?utf-8?B?MEhiei95a1ltL1hKcmdzaE9ORFNIOHdyWUdVMUU4UkVjTVZZZlZUZFpQN2J0?=
- =?utf-8?B?NW80NFJQcnMvcXJFbUxweWcxNHdFTWZHTmtWcDVDM1pucDEyYzI1am9kNllv?=
- =?utf-8?B?aWRLTXhWWHExa3YyVEtUdENpaEZobXBLMGV4NjRodVcrQTd0ZkVFOVVmMVEr?=
- =?utf-8?B?THBRV05jZTc0bXJ2dHhXeE5MRjdTU0UrVWI1T1JEeS9ESzhLZ201bVJyMCsy?=
- =?utf-8?B?dGFwM3UzaXBiVkNwQndTL0NXZVpoUDcwNGhVbWNxUU9LQzNGSXNRUG9wWDZX?=
- =?utf-8?B?RkhXSVZETi9YSkZzSkR2ZE9xRUYyeDZ2TjhZcUVYWHJ2NWlTc1RQeHgwL0xV?=
- =?utf-8?B?U2V0dEhlWHFiNzF3Lzl0Qllsd3E5SCtlelVrZTJuZUJRTHhzc2ZDZjdMQ1Bj?=
- =?utf-8?B?TGRGeVBDTHV6UEpMRVBYSTFNQjBaZGJ6QWVLc1o0Qnl4RFB2eloxZnJUOVhl?=
- =?utf-8?B?NnZqdFN6MGxKcVF6akI1TUtPN2tERmtEZk9lVnJhQm5KVnY3anM0ZDc5b2VN?=
- =?utf-8?B?NS9rK3picVJSb0NkY2pMeFQ3SXd4NTN6eWhZY2w0dXpIa2czeGhHRitEdisz?=
- =?utf-8?B?OHZTMGMrY3ZmYlF5eExwSitvd2VZNm05N1Arb3FDbFYxbVpLM3ZmQjdDUXJa?=
- =?utf-8?B?d1IxWEorbDJPRTNYZ1dZQTFVaUZPZUEyampJZlNqMWxvNlNOczNjNTRYSUg5?=
- =?utf-8?B?RWF6dHhpemRIVGNqZnZmeVlnOGM2SFNCbTVQVCtnd1NqS09QVFJkd205QXEr?=
- =?utf-8?Q?DbIFSjxy2zTUzplROti2P8jUhaOCYc9gut33A=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?aHF0N0N3NFMxakVhdzBwRDA1SVNhUlVzUGl5aEhCeGJKZE5nQldCcW5pNnZ4?=
- =?utf-8?B?TGhFWUM2a0s5UUpCNlQxM3pobThIZnJId3VxaUFNdkpwdEFKSVZiOG94Ymh2?=
- =?utf-8?B?UmJNZWZpQXpWT3orSnNLVVFrRXFqMG5EbERaeEtOZ2hTR09Kc0ZBTFZlMlp2?=
- =?utf-8?B?N0tBK1dmNWZLL01MVmJSeVhCQytVWTAyWXBKM3YvOWg2eURCTE1VWlhsL1FO?=
- =?utf-8?B?SGh3RnNRWExtczh2Z2hrOEJ3ZDBsQWhSWnowUjFVeFJFS2crenRTZEtEZ1pX?=
- =?utf-8?B?Syt2NWtSU25pOEV3VEl3bHUvZWdPcDlUV1o5MmE5UVk4elpoSEIwZUZjMCtK?=
- =?utf-8?B?LzFLV0hQUVBnVTM5K0xaRXpNZk00d2NpMnkwQVpGSkxTK1ZrL3ZBZXNWZVdL?=
- =?utf-8?B?dlVSKzNPL1RTNzJYNUs2ZEsvNmhMemVFd25OVldub0V5a1N4MEE1SFVON1VE?=
- =?utf-8?B?NFRmV3dUL0FMTGgxSE4rVDkxZkkyQjhWOG0xTnVTdVBoRHJxT0Qyd2h0eXVJ?=
- =?utf-8?B?WVRuSm1jb3NQbG12ZWdITHZITEY5QncxamgyMmJ5eWg4TkdDZUVxYitYWDBX?=
- =?utf-8?B?bG5QSTcrSjZ2Y1hqRU1GUGZ5Ti9JZ3o2aDlGSVByT1VnUjJ0UzduKzcvUmgr?=
- =?utf-8?B?VUxXSmtZV3Z3UzNrTDRJalVKYy9hZG4xTisyZWRZcGJGR3RTNTdabnI3OEdV?=
- =?utf-8?B?YWYwKzhmUnJ1T2JLcjVoUFhqS3ZKZjk4QnJyMERlWXEwREJCWEpHZytSM2xL?=
- =?utf-8?B?VnhkVTM2WVUybWd1czJLdktGckpDakk0WXlpYVNhZ2NvSzMwZC91Z2JUMnF5?=
- =?utf-8?B?eHBwa0J2dFU2eU1CSkZTZUFJbGRudlo4NUdFWkc3cGo4dzFIMk1PWU9pcDNV?=
- =?utf-8?B?TmdQU1d5b3dlNGVaYTVQNllQb1ZYdUtRZnNzSjdzT0d2dzRlNXBleFV6LzFF?=
- =?utf-8?B?RWZhOGlqZFJBMU1INVA2VlZVQk9sM1VMVC8ybU1aUFRDRE9FdnI1OHp5TWRu?=
- =?utf-8?B?blBWM09ZeHFYU09IVTBrMUVoMll5RlorVERPNytXUVpuMmJMemVHUXhzQmVP?=
- =?utf-8?B?TmZnamFqQWZFOEQ3UUF6Q0w2cmxLc2ZacUllUW1HakoyMm9aZkxkQm82WWNZ?=
- =?utf-8?B?aFZ1S1N2eXBHdjZ3ZUhtazFHNDBxRmYxb0d0OGFVZnVUSGwwdFZYbmFqZGQy?=
- =?utf-8?B?UEZlTGl1WHdSY3RrVnZuMy85dTRtdFNzTVZrY1M0eVdOdXREZnhQb0M1SUJI?=
- =?utf-8?B?czJyaHRWUFlUU241bnlhM29PQkpxWXFDRnpRVkM1c0FYSDljbzhOcWdsYWRi?=
- =?utf-8?B?ZWo5dmV1NkNvNURQd01UWHNHRGI5RDdBNElYWU55V29Lci92ZGh0Rk1Xd3dy?=
- =?utf-8?B?M1ZJZVI5Zk9mWDY2WU9lRVlQM24wQU5yS3BkL3MwaWViWHdPait2UnlUeXFo?=
- =?utf-8?B?Vk1yemw2SXZDRGhuSXFvbm9OQjFKcnA1WDlEbkhnQUZhb1cyUGd4Y283S3Q2?=
- =?utf-8?B?UVZyK3ptUjIxZGxiUzF5R3NYVVhwVndXaXFaZTVSV3l2cVZLMUZaMlBwUWZZ?=
- =?utf-8?B?RTQ0MnNNbzVkT2htWmVwanBOYUhRaXlPZC9yOWx1M2VCWHZ5M0IvY00xRWxE?=
- =?utf-8?B?cy94eTU0dVdWZHBUdlFVeGNHYzNvWUZsQ0ZGUDlOS3lmZm1BZnVWZ2lDRER2?=
- =?utf-8?B?SDNRWEpCQUVlZXZnc3NBaWpkRFcxRjN5MjVob0NBYTI4dVBHT3RLSmllQllt?=
- =?utf-8?B?eVduWUdaaTh4NDUxellNL0Zldk9DTzE1dnh5a2NwamhYNXZBZVB6SjBrMElj?=
- =?utf-8?B?WmJoOWhqQUlzK2xlN1lkQXcwSVcrbWwrL3BCZHlsQWMwZGhDdTdqbXhZa0tL?=
- =?utf-8?B?dmIzOEkrTm9SSmQvMjh0QVdkRHphcGw0ZEFHZVViZVdmQS80VkpYbitLZm1R?=
- =?utf-8?B?amxYRENWTDFqNEpBQWZwWDl4bytUbzh2ZjFnUUxybmhFb3RBMGliVitBVkhr?=
- =?utf-8?B?SHVwQmc0MUZHWDZ6K2RmQkNOUGprd1ZTWTFRNXAxWmFjRng2Y1djVkVFbUJL?=
- =?utf-8?B?ODBEdnM5VWxWWlZKcG9DV3VkWnZmQVlTSEdEaG1sU2w1ZVUxakZpNzZDa1ZE?=
- =?utf-8?Q?u84LHTRDYjvh2LMKkG4O8NdBL?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5251126C01;
+	Sat, 16 Nov 2024 17:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731778879; cv=none; b=RG51bpngi9VVfK1WAcm1JoDjoVyqdEQ8oPwZFxzFASjI/raC+cGv9z/+pRirH93cfsqPXwdXl0WqrJx8cBv62olKfu6CcSB9nJ+Uv6Q4FQ6RwcwnZZqVFybZbnwsEMNoTAqgZ/8HvljCbHZf1+nA5BvQnbXuy+SBzYaJrZNHYJA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731778879; c=relaxed/simple;
+	bh=/rVuaP85siJqm21jqbzPs2EZbqZhi87XdRlgCqlvKEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jhu/HXaYMg4KoBRt3Imxa4dQDQCnnkBFEpBcFwdGgWrWpNwUeoD0uyCSH5TvJ03a12C/qCdThaV880+QkRwfhMj0Okr/sq4xNFH2zRE16HwpD5OYqZKFW7ilsSFkpRN1cPhXa2IjDusXuE9LPCCgY3ew+tye3ZFR3E8yfkwEE/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KwEkliYF; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5cfabc686c8so637431a12.0;
+        Sat, 16 Nov 2024 09:41:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731778876; x=1732383676; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ugg/iLQbVd1pD0SvcWGfHZ1QyN8v0iCQir2+yUEZXS4=;
+        b=KwEkliYFoP16tiobZzBScFt1W7+StJEFt4IDNiGDkDugXFchBV0iYTpDEm8pxuXX6x
+         q3/zE9ZEF9vg/0LXQUyff9T3hJFNT/JHfhcUPKtu6wX+nuq0uIS/VHxz01TMPU1WFLhV
+         p0iTp8sD2paO7I7BewChm6a1lGj+8FG9V9t6DdYfIHV06qO98uwJvVrFjV2jXT4BTFZB
+         LGsGhsTZL04uNPPBq+AJDTLQtoh7OclIFJw0ntD/vKxDMPpUjio2YPImE/dGQqLHvwFf
+         ltXOus/sz7GpMNwN6CHHophnM1vG3Dspu9WfZXiL0NvuGzOFoUlKVh0P4DmbDSyITzCF
+         wDTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731778876; x=1732383676;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ugg/iLQbVd1pD0SvcWGfHZ1QyN8v0iCQir2+yUEZXS4=;
+        b=DJPwxe8JfFf+B6HRbz9UeN+pN2cOSY6L6LlCSDCXJB39NKKyO/R1e6qoBr1OnxQQH8
+         cry4Kjic8I7k1cTrIjLAMtc0NSv1tIQiRSsudeQuDHkmfE1EYkwoR41dKhJ4S8m0Bx8b
+         9O7HjdB0DbxnayikwkKBXEh1IGdik0Wq0wHTafbSreB4FqqIG6gfjbr5OFwm6ysnTEoc
+         Ol8OP9f2eBNDiIZ2UXTjbP510x6twqCdYT3ca2uYcZ30Im7eIh7ThN3CleMQ1mB8un2F
+         4nlbVm/l9AXOL3TDvBPg2prj6sqi6MiPSupKAX9T/RNOuvVskFW9ynMwH3sHXZcic6to
+         UkkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTeF7eyHCGB6aE8OOa6igAGdHjuwbCSuqOeDPu2E/pfRUjOBe3H6hbuDA9OrcZKpCq0LIDdFRjO6GSGXU=@vger.kernel.org, AJvYcCVdmAfIRE8IPHZ+0dr1qXVtTYhv8G0HlY7QXBpvsAfvAWD+YR9YbON/z2f5TrKs98cHcMI2/I4J@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTvCWmR1nKlkB2xYsFOaPWL//A9sZzlhcSjqjWZ9bOfYcqA1f0
+	x6pWGcIobEVLbY9OFyJZ38MJtzsZO9UU34J/cmM/rsRWRDU+MRz8
+X-Google-Smtp-Source: AGHT+IHpZmT4T8lybeJN/U2hl5jwfmp7spe4revMmxTiFh48M0jSiffKNt+oHZApVYuhlA+WSRjpUw==
+X-Received: by 2002:a05:6402:440b:b0:5cf:3d11:c798 with SMTP id 4fb4d7f45d1cf-5cf8fd10554mr5278428a12.28.1731778875892;
+        Sat, 16 Nov 2024 09:41:15 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a557:e100:45f4:697f:1405:21be? (dynamic-2a02-3100-a557-e100-45f4-697f-1405-21be.310.pool.telefonica.de. [2a02:3100:a557:e100:45f4:697f:1405:21be])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5cf79b9e761sm2895554a12.22.2024.11.16.09.41.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Nov 2024 09:41:14 -0800 (PST)
+Message-ID: <3915908d-d70b-4fbe-b80b-990d02211965@gmail.com>
+Date: Sat, 16 Nov 2024 18:41:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e81fa87-9442-4cc1-b89f-08dd0663aaae
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2024 17:25:29.1266
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: A0BS63biTLfvFrBntNwF0O9swv1wwKtZ89EXCzpQDq3WfpmLPGs1Oz45PqiX2N03wFNu1Lf5g70F7gh4JLXW2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR18MB6311
-X-Proofpoint-GUID: XQN_pEaSBtXPitYMRfDFjZUx9xhzIg9V
-X-Proofpoint-ORIG-GUID: XQN_pEaSBtXPitYMRfDFjZUx9xhzIg9V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
- definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/2] Fix 'ethtool --show-eee' during initial stage
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Andrew Lunn <andrew@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+ <403be2f6-bab1-4a63-bad4-c7eac1e572ee@gmail.com>
+ <ZzdW2iB2OkbZxTgS@shell.armlinux.org.uk>
+ <170a8d59-e954-4316-9b83-9b799cb60481@gmail.com>
+ <Zzi7dqqZLCCVvlHq@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <Zzi7dqqZLCCVvlHq@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGkgVmFkaW0sDQoNCj4gT24gMTMvMTEvMjAyNCAxMToxMywgU2hpbmFzIFJhc2hlZWQgd3JvdGU6
-DQo+ID4gRnJvbTogVmltbGVzaCBLdW1hciA8dmltbGVzaGtAbWFydmVsbC5jb20+DQo+ID4NCj4g
-PiBBZGQgcmVxdWlyZWQgY2hlY2tzIHRvIGF2b2lkIGRvdWJsZSBmcmVlLiBDcmFzaGVzIHdlcmUN
-Cj4gPiBvYnNlcnZlZCBkdWUgdG8gdGhlIHNhbWUgb24gcmVzZXQgc2NlbmFyaW9zLCB3aGVuIHJl
-c2V0DQo+ID4gd2FzIHRyaWVkIG11bHRpcGxlIHRpbWVzLCBhbmQgdGhlIGZpcnN0IHJlc2V0IGhh
-ZCB0b3JuDQo+ID4gZG93biByZXNvdXJjZXMgYWxyZWFkeS4NCj4gDQo+IEknbSBsb29raW5nIGF0
-IHRoZSB3aG9sZSBzZXJpZXMgYW5kIGl0IGZlZWxzIGxpa2Ugd2UgaGF2ZSB0byBkZWFsDQo+IHdp
-dGggdGhlIHJvb3QgY2F1c2UgcmF0aGVyIHRoYW4gYWRkIHByb3RlY3RpdmUgY29kZSBsZWZ0IGFu
-ZCByaWdodC4NCj4gDQo+IFRoZSBkcml2ZXIgbWF5IHBvdGVudGlhbGx5IGhhdmUgc29tZSBsb2Nr
-cyBtaXNzaW5nIHdoaWNoIHdpbGwgY2F1c2UNCj4gbWlzc2luZyByZXNvdXJjZXMsIGFuZCB0byBm
-aXggdGhlIHJvb3QgY2F1c2UgdGhlc2UgbG9ja3MgaGF2ZSB0byBiZQ0KPiBhZGRlZC4gV0RZVD8N
-Cg0KSSB3aWxsIHJld29yayB0aGlzIHBhdGNoIHNlcmllcy4gSSB0aGluayBzb21lIG9mIHRoZSBw
-YXRjaHNldHMgbmVlZCBub3QgYmUgcHJlc2VudCB1cHN0cmVhbQ0KYXMgdGhleSBoYXZlIGNvbWUg
-ZnJvbSBzb21lIGN1c3RvbWVyIGNyYXNoZXMgd2hpY2ggb25seSBvY2N1ciBpbiBjb25qdW5jdGlv
-biB3aXRoIG90aGVyDQpwcm9wcmlldGFyeSBtb2R1bGVzIGFuZCBmZWF0dXJlcyBwcmVzZW50LiBJ
-IHdpbGwgcmV3b3JrIHRoaXMgb25lIHRvIG9ubHkgaW5jbHVkZSBjaGFuZ2VzIHBlcnRpbmVudA0K
-dG8gY29kZSB1cHN0cmVhbS4NCg0KVGhhbmtzIGEgbG90IGZvciB5b3VyIGNvbW1lbnRzDQo=
+On 16.11.2024 16:34, Russell King (Oracle) wrote:
+> On Fri, Nov 15, 2024 at 09:35:25PM +0100, Heiner Kallweit wrote:
+>> On 15.11.2024 15:12, Russell King (Oracle) wrote:
+>>> On Fri, Nov 15, 2024 at 02:41:54PM +0100, Heiner Kallweit wrote:
+>>>> On 15.11.2024 12:11, Choong Yong Liang wrote:
+>>>>> From: Choong Yong Liang <yong.liang.choong@intel.com>
+>>>>>
+>>>>> When the MAC boots up with a Marvell PHY and phy_support_eee() is implemented,
+>>>>> the 'ethtool --show-eee' command shows that EEE is enabled, but in actuality,
+>>>>> the driver side is disabled. If we try to enable EEE through
+>>>>> 'ethtool --set-eee' for a Marvell PHY, nothing happens because the eee_cfg
+>>>>> matches the setting required to enable EEE in ethnl_set_eee().
+>>>>>
+>>>>> This patch series will remove phydev->eee_enabled and replace it with
+>>>>> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(), it
+>>>>> will follow the master configuration to have software and hardware in sync,
+>>>>> allowing 'ethtool --show-eee' to display the correct value during the
+>>>>> initial stage.
+>>>>>
+>>>>> v2 changes:
+>>>>>  - Implement the prototype suggested by Russell
+>>>>>  - Check EEE before calling phy_support_eee()
+>>>>>
+>>>>> Thanks to Russell for the proposed prototype in [1].
+>>>>>
+>>>>> Reference:
+>>>>> [1] https://patchwork.kernel.org/comment/26121323/
+>>>>>
+>>>>> Choong Yong Liang (2):
+>>>>>   net: phy: replace phydev->eee_enabled with eee_cfg.eee_enabled
+>>>>>   net: stmmac: set initial EEE policy configuration
+>>>>>
+>>>>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  3 +++
+>>>>>  drivers/net/phy/phy-c45.c                         | 11 +++++------
+>>>>>  drivers/net/phy/phy_device.c                      |  6 +++---
+>>>>>  include/linux/phy.h                               |  5 ++---
+>>>>>  4 files changed, 13 insertions(+), 12 deletions(-)
+>>>>>
+>>>>
+>>>> Russell submitted the proposed patch already:
+>>>> https://patchwork.kernel.org/project/netdevbpf/patch/E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk/
+>>>> So there's no need for your patch 1.
+>>>
+>>> Patch 1 is an updated version of that patch, minus my authorship and of
+>>> course no sign-off. I've already marked this series as requiring changes
+>>> in patchwork (hopefully, if I did it correctly.)
+>>>
+>>
+>> The updated version adds an argument to genphy_c45_an_config_eee_aneg(),
+>> and I wonder whether we can do better, as this results in several calls
+>> with the same argument. The following is an alternative, to be applied
+>> on top of your original patch. I don't have a clear preference, though.
+>>
+>> ---
+>>  drivers/net/phy/phy.c | 25 +++++++++++++++----------
+>>  1 file changed, 15 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+>> index 8876f3673..22c9bbebb 100644
+>> --- a/drivers/net/phy/phy.c
+>> +++ b/drivers/net/phy/phy.c
+>> @@ -1682,11 +1682,10 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
+>>   * configuration.
+>>   */
+>>  static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+>> -				      struct ethtool_keee *data)
+>> +				      struct ethtool_keee *old_cfg)
+>>  {
+>> -	if (phydev->eee_cfg.tx_lpi_enabled != data->tx_lpi_enabled ||
+>> -	    phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) {
+>> -		eee_to_eeecfg(&phydev->eee_cfg, data);
+>> +	if (phydev->eee_cfg.tx_lpi_enabled != old_cfg->tx_lpi_enabled ||
+>> +	    phydev->eee_cfg.tx_lpi_timer != old_cfg->tx_lpi_timer) {
+>>  		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+>>  		if (phydev->link) {
+>>  			phydev->link = false;
+>> @@ -1706,21 +1705,27 @@ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+>>   */
+>>  int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data)
+>>  {
+>> +	struct eee_config old_cfg;
+>>  	int ret;
+>>  
+>>  	if (!phydev->drv)
+>>  		return -EIO;
+>>  
+>> +	old_cfg = phydev->eee_cfg;
+>> +	eee_to_eeecfg(&phydev->eee_cfg, data);
+>> +
+> 
+> Hmm, don't we want to do this under phydev->lock, because network
+> drivers and phylib may be reading from phydev->eee_cfg? If we
+> update it outside the lock, and then revert, there's a chance that
+> the phylib state machine / network driver may see the changes
+> which then get reverted on failure, potentially leading to
+> inconsistent state.
+> 
+
+Good point, then the patch would look like this.
+BTW: Saw that Jakub applied your patch already.
+
+---
+ drivers/net/phy/phy.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 8876f3673..7f6594a66 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1682,11 +1682,10 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
+  * configuration.
+  */
+ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+-				      struct ethtool_keee *data)
++				      struct ethtool_keee *old_cfg)
+ {
+-	if (phydev->eee_cfg.tx_lpi_enabled != data->tx_lpi_enabled ||
+-	    phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) {
+-		eee_to_eeecfg(&phydev->eee_cfg, data);
++	if (phydev->eee_cfg.tx_lpi_enabled != old_cfg->tx_lpi_enabled ||
++	    phydev->eee_cfg.tx_lpi_timer != old_cfg->tx_lpi_timer) {
+ 		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+ 		if (phydev->link) {
+ 			phydev->link = false;
+@@ -1706,18 +1705,23 @@ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+  */
+ int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data)
+ {
++	struct eee_config old_cfg;
+ 	int ret;
+ 
+ 	if (!phydev->drv)
+ 		return -EIO;
+ 
+ 	mutex_lock(&phydev->lock);
++
++	old_cfg = phydev->eee_cfg;
++	eee_to_eeecfg(&phydev->eee_cfg, data);
++
+ 	ret = genphy_c45_ethtool_set_eee(phydev, data);
+-	if (ret >= 0) {
+-		if (ret == 0)
+-			phy_ethtool_set_eee_noneg(phydev, data);
+-		eee_to_eeecfg(&phydev->eee_cfg, data);
+-	}
++	if (ret == 0)
++		phy_ethtool_set_eee_noneg(phydev, data);
++	else if (ret < 0)
++		phydev->eee_cfg = old_cfg;
++
+ 	mutex_unlock(&phydev->lock);
+ 
+ 	return ret < 0 ? ret : 0;
+-- 
+2.47.0
+
+
 
