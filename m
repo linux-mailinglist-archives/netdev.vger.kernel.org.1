@@ -1,194 +1,122 @@
-Return-Path: <netdev+bounces-145557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41A09CFD95
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:40:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E469CFD9C
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:42:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F422B251F2
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 09:40:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57E8B1F281A7
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 09:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FA7194ACF;
-	Sat, 16 Nov 2024 09:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C70194A70;
+	Sat, 16 Nov 2024 09:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SS6LYye1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8144F2F29;
-	Sat, 16 Nov 2024 09:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DB919007E
+	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 09:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731750045; cv=none; b=nKci6P9ChIYbUUbESp0XSYHfKPTpt2rkoFthPx307Sq8WAEpuBYt/C8pbUYXaQo6XYICJkRhYCgMTHQ5PcdvB7C3VBcVLq9bUSQbt6mqaDynATAmYicljBhsNlyT7GprxMqmUhJFw+S8DePkjyWbf8GP8YzxZ55AXZP9yUbNs8M=
+	t=1731750165; cv=none; b=Lvy0uhV6gfZy20mVgmNo0UwzQDDeONuAbARLUeG1tuATq2cigtOmBhXXBKp1bC9wnzu3lGEU/09b/YgkLoqO8Phkf5k5CrKqUiJUsQUhjG6RUhqvgntCiOSe/64/hI7tqpb3ky/H2+lVZInJB2MGkctm+5G32FnS61DmF4H+xcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731750045; c=relaxed/simple;
-	bh=AYdjEchhZ5mrm6nYKh972kd0ZosjG1lq2iB4ht9KhII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G9p87YQrzyvr9ZgC4UnYmX4PV8h1ms//bFN4cqu6cx2VOL2xUm+JY8ZKFHIQhCb0t/iCMQRjjRaujTMld3nwNvQqfK1s+5RzPYoN6V2Nh60Vkz+iHn/8tGJEKhdTtehwXlB1X8qZR/fPD56bbhCQWpi+KTekh9n8uER5DHCkUx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Xr85N5Gv6z9sSR;
-	Sat, 16 Nov 2024 10:40:40 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RSlaypuNxNm4; Sat, 16 Nov 2024 10:40:40 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Xr85N41fnz9sSL;
-	Sat, 16 Nov 2024 10:40:40 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6B8F18B7A0;
-	Sat, 16 Nov 2024 10:40:40 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id 9RKIVUrbVgoj; Sat, 16 Nov 2024 10:40:40 +0100 (CET)
-Received: from [192.168.232.159] (POS169858.IDSI0.si.c-s.fr [192.168.232.159])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id EDBE28B763;
-	Sat, 16 Nov 2024 10:40:36 +0100 (CET)
-Message-ID: <b370e8d0-2f87-4819-8f30-1181946295d9@csgroup.eu>
-Date: Sat, 16 Nov 2024 10:40:36 +0100
+	s=arc-20240116; t=1731750165; c=relaxed/simple;
+	bh=YD478yUNlcMk0PR0alh8RiTROYjT7uOprJ4cGSsc1Bo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MCvFQKtnyXYx9zTHLwPAoSTes4/W5dcyc3BFyq6pJmHPyo7cFfhLwaYir+VBv2N3siG5lVlHD61qhUiLmM5BVX/gN3NTd0l2QiyYl+S9p/1KITp7f6yCLYPbLanniHAk/Nt2AdAS223/GXjTwrNZnQ763GYxiSPOwIohjkCxfLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SS6LYye1; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-382378f359dso215769f8f.1
+        for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 01:42:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731750162; x=1732354962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wtmbgObVPqEcaQduRgeglVc17hEyE/OZ+SDbXbc3sGI=;
+        b=SS6LYye1ifQLs6epKLHu+cgZrxLkr6LgBgaNHJBEg9GXADDIRqaufzzB/Z0E+AsNdc
+         n1qT+WQGYioW2bAnuM9nEIfdDnpbYEeR92wBJCoKmM9mCrH8Gq78NcHe7UIfRhjGSVIt
+         ch6HZsjsi32JMkxqQbjxJOIwEkWRrHNS/wDNOIqX65kXLIpHI2m0Ro8ThsrnYUuuJO0a
+         /7pApqoZPKHgK4BcMvMoAndbDhurMC5/CS4EovWSB8djq1P8qTz8LxiiCIrMaAHjfULQ
+         kNWjjdGKQxVEjvZNX50ENjYSiut4lPvwWxY4Ru4XFiDo96xkcg9QAmvvsAc/l8GiqpKg
+         HlEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731750162; x=1732354962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wtmbgObVPqEcaQduRgeglVc17hEyE/OZ+SDbXbc3sGI=;
+        b=iDE5e3fHpDr03Ntu4AxEQHGJDQ0HPlXVeSQCVQUogfGn8sZa6eDSxVykNfaMbyvnEX
+         bNkcsUL+BtS70aZItRk2SEg4Foy3tPdwKtXkyyPCefJs75SDuT7vLkUYbwjcGwDBd7uD
+         Z1fL1GnvmqIwLnpmXe/y2PL4t8OpQ2CUsFJd2x5grP0GThwvnFHXatDkmeCBDqU3Ee9i
+         PtXZFI2DOlJbXSppyBeXbXIVEsRDjApeB7mleEURJexJB7LUmRU0GRBV/ROMQ8fmUwDc
+         WxqKBKwO6SjfSK/ND38MiYhNTvDqkCg1bQpv5XgNnUTgxwLdWr05ClUyAHLt/dDpapkE
+         BCoQ==
+X-Gm-Message-State: AOJu0YyTj7d/K4I3du4WKCfZ/iH/3GJfopWgi0wamonjsng20dELKuV9
+	S6fsXZzaN8B9s1M0MA5NwKIGxuNMaQibWsehbwHfCmUXqXwHrNGsD4u7wQ==
+X-Google-Smtp-Source: AGHT+IG9bnWpsDFB6xY+zYwsG/sS2DIA3y4MZeQx5DSTZXDWsEti2EHlIWRTo5N3qMa5xysLd1Wivw==
+X-Received: by 2002:a5d:5f43:0:b0:36c:ff0c:36d7 with SMTP id ffacd0b85a97d-38225a41fc3mr4717786f8f.2.1731750162019;
+        Sat, 16 Nov 2024 01:42:42 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:592a:f022:ac3b:3ce8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adbe7dfsm6700632f8f.56.2024.11.16.01.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Nov 2024 01:42:41 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1] net: af_unix: clean up spurious drop reasons
+Date: Sat, 16 Nov 2024 09:42:36 +0000
+Message-ID: <20241116094236.28786-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/21] netfilter: conntrack: Cleanup timeout
- definitions
-To: Easwar Hariharan <eahariha@linux.microsoft.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
- Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
- <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
- <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
- Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Lucas Stach <l.stach@pengutronix.de>,
- Russell King <linux+etnaviv@armlinux.org.uk>,
- Christian Gmeiner <christian.gmeiner@gmail.com>,
- Louis Peens <louis.peens@corigine.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-1-911fb7595e79@linux.microsoft.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20241115-converge-secs-to-jiffies-v2-1-911fb7595e79@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Use consume_skb() instead of kfree_skb() in the happy paths to clean up
+spurious NOT_SPECIFIED drop reasons.
 
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ net/unix/af_unix.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
-> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> None of the higher order definitions are used anymore, so remove
-> definitions for minutes, hours, and days timeouts. Convert the seconds
-> denominated timeouts to secs_to_jiffies()
-
-There is very similar things with tcp_timeouts[] in 
-nf_conntrack_proto_tcp.c, why not convert it as well ?
-
-> 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->   net/netfilter/nf_conntrack_proto_sctp.c | 21 ++++++++-------------
->   1 file changed, 8 insertions(+), 13 deletions(-)
-> 
-> diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
-> index 4cc97f971264ed779434ab4597dd0162586b3736..6c95ac96fa42a39acafb5b88a7cf8898010e911c 100644
-> --- a/net/netfilter/nf_conntrack_proto_sctp.c
-> +++ b/net/netfilter/nf_conntrack_proto_sctp.c
-> @@ -39,20 +39,15 @@ static const char *const sctp_conntrack_names[] = {
->          [SCTP_CONNTRACK_HEARTBEAT_SENT]         = "HEARTBEAT_SENT",
->   };
-> 
-> -#define SECS  * HZ
-> -#define MINS  * 60 SECS
-> -#define HOURS * 60 MINS
-> -#define DAYS  * 24 HOURS
-> -
->   static const unsigned int sctp_timeouts[SCTP_CONNTRACK_MAX] = {
-> -       [SCTP_CONNTRACK_CLOSED]                 = 10 SECS,
-> -       [SCTP_CONNTRACK_COOKIE_WAIT]            = 3 SECS,
-> -       [SCTP_CONNTRACK_COOKIE_ECHOED]          = 3 SECS,
-> -       [SCTP_CONNTRACK_ESTABLISHED]            = 210 SECS,
-> -       [SCTP_CONNTRACK_SHUTDOWN_SENT]          = 3 SECS,
-> -       [SCTP_CONNTRACK_SHUTDOWN_RECD]          = 3 SECS,
-> -       [SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]      = 3 SECS,
-> -       [SCTP_CONNTRACK_HEARTBEAT_SENT]         = 30 SECS,
-> +       [SCTP_CONNTRACK_CLOSED]                 = secs_to_jiffies(10),
-> +       [SCTP_CONNTRACK_COOKIE_WAIT]            = secs_to_jiffies(3),
-> +       [SCTP_CONNTRACK_COOKIE_ECHOED]          = secs_to_jiffies(3),
-> +       [SCTP_CONNTRACK_ESTABLISHED]            = secs_to_jiffies(210),
-> +       [SCTP_CONNTRACK_SHUTDOWN_SENT]          = secs_to_jiffies(3),
-> +       [SCTP_CONNTRACK_SHUTDOWN_RECD]          = secs_to_jiffies(3),
-> +       [SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]      = secs_to_jiffies(3),
-> +       [SCTP_CONNTRACK_HEARTBEAT_SENT]         = secs_to_jiffies(3),
-
-Was 30 before, if you think it must be changed to 3 you must explain it 
-in the commit message, or maybe do another patch for that change.
-
->   };
-> 
->   #define        SCTP_FLAG_HEARTBEAT_VTAG_FAILED 1
-> 
-> --
-> 2.34.1
-> 
-
-Christophe
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 001ccc55ef0f..90bb8556ea04 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1705,7 +1705,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 		unix_state_unlock(other);
+ 
+ out:
+-	kfree_skb(skb);
++	consume_skb(skb);
+ 	if (newsk)
+ 		unix_release_sock(newsk, 0);
+ 	if (other)
+@@ -2174,7 +2174,7 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		unix_state_unlock(sk);
+ 	unix_state_unlock(other);
+ out_free:
+-	kfree_skb(skb);
++	consume_skb(skb);
+ out:
+ 	if (other)
+ 		sock_put(other);
+-- 
+2.47.0
 
 
