@@ -1,213 +1,173 @@
-Return-Path: <netdev+bounces-145551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092BF9CFCE6
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 07:37:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 034EB9CFD0E
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 08:46:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 825AB1F21A45
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 06:37:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80ED287571
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 07:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF3F190685;
-	Sat, 16 Nov 2024 06:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDA4192D75;
+	Sat, 16 Nov 2024 07:46:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365B918C004
-	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 06:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284B0282FB;
+	Sat, 16 Nov 2024 07:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731739059; cv=none; b=QXDuo3KW8xyW6ezheMFjPh0i1mNtLHu+Tr9mrxVYL/77ddIByV7uDqxCJZETOBoPeZ0/h4DnmXsnekXP0iChgEPZKhUv8dfrnrBjsYXVBS94AEbZxuvwV8+GsN8Y+x73jnqFsclbNS3A8GjJstjk9RD/1maLut/Y+/W4ixxaLN8=
+	t=1731743187; cv=none; b=DlB58Y2XGKckvPw04Rq5dXtQgxh9g+wCfGGw5KRvhnsFmJcUxz6U3CX+JbFubm4l4+L3sFwva9nJqwiMaB41dSuF04uM+ACgWWFXSyFA93hgMTVkQ1JHaXVfCpBaXW72f6av+VeGVvh02rmNaOtk5vG0IxroMEtd63mMbDLxVVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731739059; c=relaxed/simple;
-	bh=Ck68tQPdvnIuA5/4Z9IWdU3phhAhwllxAbrgvISPpy8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Wf9Itw4ysAUm/CfmXhyPrD6+95/5lE9ThA9+asHRrbe+ZoXFRuHvpdVM+LyaHDoCMVf8svR/13z+YJgAGcVL+qUsG3KD2dH1ely74d+Qczoqu0hd6Hep0oPwC2xTqlvvp6lWDXXp0amp4yuKR/k+v541N92nDx3qL9Kr67wm9D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a753606bbcso1950875ab.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 22:37:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731739057; x=1732343857;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OYO6fy/yAOPEBTr5iXKStG5hCr8eX/ccSp7+gS/GZds=;
-        b=Aq5yqI0uqGVwriQ4+aB4JWDPU8B2ESnDDUFITw38iSbRAv9E5xojelulZO6ZJ1iXtj
-         f16ilFKs67TgIceioGOaPhvdXaVNgcjxOEOxAzzLb8clCqPQnI5m1lSmsoI7hnARoU1N
-         4f0gSa0EGN1qTF3XZoM4ftKg17EVF1m6Stcs4ssG8MY6m2+IUvbbWGnXoxih2PPbZwGx
-         nTQPktfc/UDj0nlmfbdaVkqZcUHqkpInREcetuUkjU0ixuUfu8WbbJsjOyTicyqQkcCD
-         EZsUA94N2p9aEwgn2F8sox+9zHnYvSkEs836MxVmsbiGJOKSDTWYGcpyy8peEZvRwd7L
-         fNEg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+OM9/qx7PZV3Vr7yDnw2dfeEgrXhqcEdkwUivSKplANZRu1ypdURnx+zbvCboELFFXpP0mcw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1/hSki88QyMfH1eP2mMXfGBbmuz54Y09OXV/0PiJnxGjo8VNk
-	cur9IV9L+Fop/eHwnO9qkSwKinXjtpOoUonlSBQeOyY8ouuFmerb2/LJWRMEuKqYsKp0cZaPzp4
-	Tf5BJP76QZWE8sWyMbpfYsj0Em7hXzIy3wSK+R06NU3pe+GM+r+cyIBw=
-X-Google-Smtp-Source: AGHT+IGINyvMBQPURN/YiDCs4J65gbCKDZBVTWDAsdnkgxIxhGVbEfRrWm8ETKflwDFS9hCnsgKwL15hvFEQwBdRkHnUJ1TyKj5A
+	s=arc-20240116; t=1731743187; c=relaxed/simple;
+	bh=LrHKonL6AMDeiODs+r5O/Ry42Pdsy0sJz4fYgpA7IXU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dmTAOeyPGt97b60BS5Ig4oC5woUz2Gmw3J60BZfJKaCxD1szy0khTnEOiB4Rrq5QlCpU7W5v8Xae2wwAq/ZzNPV0zx2bgQkbHkODlGjSF2WSdwJaI8GMLE1mWdOcFuVOJotssyJ4AAevNoJzbhRO8bYL9fr9qHMV0k4BXeNXyXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4Xr5YN504Vz9sSR;
+	Sat, 16 Nov 2024 08:46:16 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id lhQM5FPtGe1r; Sat, 16 Nov 2024 08:46:16 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4Xr5YN3dzNz9sSL;
+	Sat, 16 Nov 2024 08:46:16 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 60E718B7A0;
+	Sat, 16 Nov 2024 08:46:16 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id DVfL0PgYOHHm; Sat, 16 Nov 2024 08:46:16 +0100 (CET)
+Received: from [192.168.232.159] (POS169858.IDSI0.si.c-s.fr [192.168.232.159])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 93F818B763;
+	Sat, 16 Nov 2024 08:46:12 +0100 (CET)
+Message-ID: <856ae9de-0712-4a44-ab3d-9e5077725877@csgroup.eu>
+Date: Sat, 16 Nov 2024 08:46:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d1c:b0:3a7:2b12:78dd with SMTP id
- e9e14a558f8ab-3a7480234f3mr48582975ab.11.1731739057156; Fri, 15 Nov 2024
- 22:37:37 -0800 (PST)
-Date: Fri, 15 Nov 2024 22:37:37 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67383db1.050a0220.85a0.000e.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in dev_prep_valid_name
-From: syzbot <syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, csander@purestorage.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, parav@nvidia.com, 
-	saeedm@nvidia.com, syzkaller-bugs@googlegroups.com, tariqt@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    80b6f094756f Merge branch 'suspend-irqs-during-application..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=16b80ce8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ea5200d154f868aa
-dashboard link: https://syzkaller.appspot.com/bug?extid=21ba4d5adff0b6a7cfc6
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=107dfe30580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=147dfe30580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1460e7e4f91a/disk-80b6f094.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9375c3c40003/vmlinux-80b6f094.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/33f29f155ac1/bzImage-80b6f094.xz
-
-The issue was bisected to:
-
-commit 0ac20437412bfc48d67d33eb4be139eafa4a0800
-Author: Caleb Sander Mateos <csander@purestorage.com>
-Date:   Tue Nov 5 20:39:59 2024 +0000
-
-    mlx5/core: Schedule EQ comp tasklet only if necessary
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12a981a7980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16a981a7980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+21ba4d5adff0b6a7cfc6@syzkaller.appspotmail.com
-Fixes: 0ac20437412b ("mlx5/core: Schedule EQ comp tasklet only if necessary")
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000004c: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000260-0x0000000000000267]
-CPU: 0 UID: 0 PID: 5944 Comm: syz-executor276 Not tainted 6.12.0-rc6-syzkaller-01329-g80b6f094756f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-RIP: 0010:dev_prep_valid_name+0x3e3/0xa40 net/core/dev.c:1165
-Code: 20 08 00 00 e8 6e 50 27 fb 48 85 c0 0f 84 8f 04 00 00 48 89 44 24 38 48 8b 5c 24 30 48 81 c3 68 02 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 20 00 74 08 48 89 df e8 ce d4 6b f8 48 8b 03 48 89 5c 24
-RSP: 0018:ffffc90004266940 EFLAGS: 00010203
-RAX: 000000000000004c RBX: 0000000000000265 RCX: 0000000000002000
-RDX: 0000000000001000 RSI: ffffffff8c610a80 RDI: ffffffff8c610a40
-RBP: ffffc90004266a50 R08: 0000000000000920 R09: 00000000ffffffff
-R10: dffffc0000000000 R11: fffffbfff203ac56 R12: dffffc0000000000
-R13: 1ffff9200084cd38 R14: ffff88802172e126 R15: 1ffff9200084cd34
-FS:  00007ff6558636c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff655821d58 CR3: 0000000012380000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- dev_get_valid_name net/core/dev.c:1199 [inline]
- register_netdevice+0x542/0x1b00 net/core/dev.c:10509
- veth_newlink+0x455/0xc10 drivers/net/veth.c:1819
- rtnl_newlink_create+0x2df/0xa30 net/core/rtnetlink.c:3774
- __rtnl_newlink net/core/rtnetlink.c:3891 [inline]
- rtnl_newlink+0x17dd/0x24f0 net/core/rtnetlink.c:4001
- rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6903
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:744
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2609
- ___sys_sendmsg net/socket.c:2663 [inline]
- __sys_sendmsg+0x292/0x380 net/socket.c:2692
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff6558ea759
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ff655863218 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ff655974368 RCX: 00007ff6558ea759
-RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000006
-RBP: 00007ff655974360 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000009 R11: 0000000000000246 R12: 00007ff65597436c
-R13: 00007ff655941074 R14: 006e75742f74656e R15: 74656e2f7665642f
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:dev_prep_valid_name+0x3e3/0xa40 net/core/dev.c:1165
-Code: 20 08 00 00 e8 6e 50 27 fb 48 85 c0 0f 84 8f 04 00 00 48 89 44 24 38 48 8b 5c 24 30 48 81 c3 68 02 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 20 00 74 08 48 89 df e8 ce d4 6b f8 48 8b 03 48 89 5c 24
-RSP: 0018:ffffc90004266940 EFLAGS: 00010203
-RAX: 000000000000004c RBX: 0000000000000265 RCX: 0000000000002000
-RDX: 0000000000001000 RSI: ffffffff8c610a80 RDI: ffffffff8c610a40
-RBP: ffffc90004266a50 R08: 0000000000000920 R09: 00000000ffffffff
-R10: dffffc0000000000 R11: fffffbfff203ac56 R12: dffffc0000000000
-R13: 1ffff9200084cd38 R14: ffff88802172e126 R15: 1ffff9200084cd34
-FS:  00007ff6558636c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff655821d58 CR3: 0000000012380000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	20 08                	and    %cl,(%rax)
-   2:	00 00                	add    %al,(%rax)
-   4:	e8 6e 50 27 fb       	call   0xfb275077
-   9:	48 85 c0             	test   %rax,%rax
-   c:	0f 84 8f 04 00 00    	je     0x4a1
-  12:	48 89 44 24 38       	mov    %rax,0x38(%rsp)
-  17:	48 8b 5c 24 30       	mov    0x30(%rsp),%rbx
-  1c:	48 81 c3 68 02 00 00 	add    $0x268,%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 ce d4 6b f8       	call   0xf86bd507
-  39:	48 8b 03             	mov    (%rbx),%rax
-  3c:	48                   	rex.W
-  3d:	89                   	.byte 0x89
-  3e:	5c                   	pop    %rsp
-  3f:	24                   	.byte 0x24
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Lucas Stach <l.stach@pengutronix.de>,
+ Russell King <linux+etnaviv@armlinux.org.uk>,
+ Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+ <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Le 15/11/2024 à 22:29, Easwar Hariharan a écrit :
+> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+> 
+> On 11/15/2024 1:26 PM, Easwar Hariharan wrote:
+>> This is a series that follows up on my previous series to introduce
+>> secs_to_jiffies() and convert a few initial users.[1] In the review for
+>> that series, Anna-Maria requested converting other users with
+>> Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
+>> that use the multiply pattern of either of:
+>> - msecs_to_jiffies(N*1000), or
+>> - msecs_to_jiffies(N*MSEC_PER_SEC)
+>>
+>> The entire conversion is made with Coccinelle in the script added in
+>> patch 2. Some changes suggested by Coccinelle have been deferred to
+>> later parts that will address other possible variant patterns.
+>>
+>> CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
+>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+>>
+>> [1] https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20241030-open-coded-timeouts-v3-0-9ba123facf88%40linux.microsoft.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cff4857ad28a74e7051f708dd05bc8d45%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638673029556700628%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=q%2FHm%2Fal%2FBtK5J4nd%2BqJHNeSJ3f%2B0lVCKzigUUoL2vjw%3D&reserved=0
+>> [2] https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F8734kngfni.fsf%40somnus%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cff4857ad28a74e7051f708dd05bc8d45%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638673029556721028%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=PZiR%2B9GSo3Zk7cD85MyM4ZpqvIQtD0lSxd4G1gZ4UFE%3D&reserved=0
+>>
+>> ---
+>> Changes in v2:
+>> - EDITME: describe what is new in this series revision.
+>> - EDITME: use bulletpoints and terse descriptions.
+>> - Link to v1: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fr%2F20241115-converge-secs-to-jiffies-v1-0-19aadc34941b%40linux.microsoft.com&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7Cff4857ad28a74e7051f708dd05bc8d45%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638673029556732854%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=NXdY%2FTuSufEPcy4ijIj%2F0%2BW3K%2FhkLs2JGu5C1WFMPOM%3D&reserved=0
+>>
+> 
+> Apologies, I missed out on editing the changelog here. v1 included a
+> patch that's already been accepted, there are no other changes in v2.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+You should refrain from sending such a patch bomb twice in 4 minutes. If 
+there is no other change you could have just replied to that already 
+included patch to say so.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+In any case wait a few days so that people have time to review and 
+provide comments.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Christophe
 
