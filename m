@@ -1,104 +1,140 @@
-Return-Path: <netdev+bounces-145518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133A99CFB73
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 01:08:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E309CFB7C
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 01:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDCFF1F246B3
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:08:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4BE31F24096
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 00:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F37383;
-	Sat, 16 Nov 2024 00:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFAD84400;
+	Sat, 16 Nov 2024 00:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dm0XF7ME"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Pq2k2Nni"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F7036D;
-	Sat, 16 Nov 2024 00:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1295F372;
+	Sat, 16 Nov 2024 00:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731715699; cv=none; b=mxXaz9OPPclgiuxjMshKtU1OoqfuuBdyd9LJsVIGWK0A6XzcDpYYkA8Wzopg9Ybf8u8BKjBzPQv+g6IpRkLSljCkEhhD/v1aKSsRjHN81sAY2biMHU1jNyDeO9TPhpNEfKYUJ0/oBxqYmK6QI127OLmGQxvFnbARzdoH2MxmFtU=
+	t=1731715956; cv=none; b=tWLzqxWR6mNoKwoGUPDbgpEuoOxW8XsjfuH3IIN7nubUVA7toiRnHJM9LLQRi3Tt8foUlysivp9/ZtHL40lqGXMKLRt9z/EbkTCxfT6NYLmfDaZgOSZuUXSwW6FkUwaaYu1Q4pYYPpNM/aIkO6s2JrZB5IWqPzwDuA+/+cVj2N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731715699; c=relaxed/simple;
-	bh=c8v8xPbDc/4iwirqSmQJaogTdm/AhEGIo+tQMRM8OQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d4bDgv69GMRi+awApH/cyy8S4JRsLaQL3D8oeTHN2QunhLmwEJeSQW2vf8xiznJJIyT81SfHAojWfmie1gSJ+ioFrh/EC+VMbzoB/nUFNyQEkuhaY2xp8d+D8vHAbj5uM85Q/RM4nu2ThskMNH1b/sadr+f4A0hHnXlB5VdsKHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dm0XF7ME; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2158DC4CECF;
-	Sat, 16 Nov 2024 00:08:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731715698;
-	bh=c8v8xPbDc/4iwirqSmQJaogTdm/AhEGIo+tQMRM8OQY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dm0XF7ME7O2ruIlmQRmGirE5rDBOoCgmDlamxXJlYjHlweWrdgutxXeGTZzIt+fku
-	 6ili11KJ2KgDRG7/vuXp+Kca8el/PnkeI1KkbUvQT7Rs1d/JR++mc+lYoIFQCvX4BF
-	 WIsLlz8NxPcPbLaZeULIIAfQPip8lO5PFW+IiLwVfmAd2fAbO053YIeiCnBizDENb4
-	 xqpWmvkTJ/30vlNqJxLZCm/vb/uYNOjwhHlQ/318Uqdy5gpd9sCRgYclzWqwSi7qFr
-	 sAoFbOGmGqbR44mVTEhSic5nPtuBXW76W+1udJsxy9HdaapwvGZgQmNu0wPaAaVFth
-	 +elYkTvRzJzpw==
-Date: Fri, 15 Nov 2024 16:08:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Cc: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Ivan Delalande
- <colona@arista.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
- <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, Kuniyuki
- Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, mptcp@lists.linux.dev, Johannes Berg
- <johannes@sipsolutions.net>
-Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
-Message-ID: <20241115160816.09df40eb@kernel.org>
-In-Reply-To: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
-References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
+	s=arc-20240116; t=1731715956; c=relaxed/simple;
+	bh=EwtcEvyQT+x2DNLqUHeHqoI5ammFui7AZL1V/iVQFH4=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ChOSkvoUv/SK0oVDZXPBtBQaotrUyfFQI2Xp6roCpdAXAII2Rzdt3eA7mvTl55xcxGjKao7Qs8Ocxq6AFaTk8oz7jmxyZSK4QTha794D16o7xqc/+ZrOlrNZoxmelqD4zEPigIPtyZEit930oiYtfQ/kiccGMm7pw1Cf77LL+uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Pq2k2Nni; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 1600B2064AEE;
+	Fri, 15 Nov 2024 16:12:32 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1600B2064AEE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731715954;
+	bh=xpBEojaRNmZLcf0UaP4ux3dQkOORS/leVLfy1gAywiE=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=Pq2k2Nni3cFBRk9EH3pyxgnDw6ECvdbg1vXWXgUrnZTvujbQOLePABt8LVR+E9JSZ
+	 k4WoN+iIfUxQpiMRt/FU+pwGNrKJBo/0Q2+4KvxqDSAbq0u3pnKwVj+6aACG5ZF/KB
+	 j3wJy4AhuvO/DGvU623x7nThkWYs37o8kaDAxg9k=
+Message-ID: <68331eb9-545f-48a4-9c49-1a3637b3d918@linux.microsoft.com>
+Date: Fri, 15 Nov 2024 16:12:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Lucas Stach <l.stach@pengutronix.de>,
+ Russell King <linux+etnaviv@armlinux.org.uk>,
+ Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+Subject: Re: [PATCH 03/22] arm: pxa: Convert timeouts to use secs_to_jiffies()
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
+ <20241115-converge-secs-to-jiffies-v1-3-19aadc34941b@linux.microsoft.com>
+ <20241116093815.5d37eb43@canb.auug.org.au>
+Content-Language: en-US
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <20241116093815.5d37eb43@canb.auug.org.au>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Nov 2024 18:46:39 +0000 Dmitry Safonov via B4 Relay wrote:
-> 2. Inet-diag allocates netlink message for sockets in
->    inet_diag_dump_one_icsk(), which uses a TCP-diag callback
->    .idiag_get_aux_size(), that pre-calculates the needed space for
->    TCP-diag related information. But as neither socket lock nor
->    rcu_readlock() are held between allocation and the actual TCP
->    info filling, the TCP-related space requirement may change before
->    reaching tcp_diag_put_md5sig(). I.e., the number of TCP-MD5 keys on
->    a socket. Thankfully, TCP-MD5-diag won't overwrite the skb, but will
->    return EMSGSIZE, triggering WARN_ON() in inet_diag_dump_one_icsk().
+On 11/15/2024 2:38 PM, Stephen Rothwell wrote:
+> Hi Easwar,
+> 
+> On Fri, 15 Nov 2024 21:22:33 +0000 Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
+>>
+>> -#define SHARPSL_CHARGE_ON_TIME_INTERVAL        (msecs_to_jiffies(1*60*1000))  /* 1 min */
+>> -#define SHARPSL_CHARGE_FINISH_TIME             (msecs_to_jiffies(10*60*1000)) /* 10 min */
+>> -#define SHARPSL_BATCHK_TIME                    (msecs_to_jiffies(15*1000))    /* 15 sec */
+>> +#define SHARPSL_CHARGE_ON_TIME_INTERVAL        (secs_to_jiffies(60))  /* 1 min */
+>> +#define SHARPSL_CHARGE_FINISH_TIME             (secs_to_jiffies(10*60)) /* 10 min */
+>> +#define SHARPSL_BATCHK_TIME                    (secs_to_jiffies(15))    /* 15 sec */
+> 
+> It might be nice to keep the alignment of the comments here.
+> 
 
-Would it be too ugly if we simply retried with a 32kB skb if the initial
-dump failed with EMSGSIZE?
-
-Another option would be to automatically grow the skb. The size
-accounting is an endless source of bugs. We'd just need to scan
-the codebase to make sure there are no cases where someone does
-
-	ptr = __nla_reserve();
-	nla_put();
-	*ptr = 0;
-
-Which may be too much of a project and source of bugs in itself.
-
-Or do both, retry as a fix, and auto-grow in net-next.
-
-> In order to remove the new limit from (4) solution, my plan is to
-> convert the dump of TCP-MD5 keys from an array to
-> NL_ATTR_TYPE_NESTED_ARRAY (or alike), which should also address (1).
-> And for (3), it's needed to teach tcp-diag how-to remember not only
-> socket on which previous recvmsg() stopped, but potentially TCP-MD5
-> key as well.
-
-Just putting the same attribute type multiple times is preferable
-to array types.
+Will fix in v3.
 
