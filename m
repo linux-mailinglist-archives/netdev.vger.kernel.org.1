@@ -1,135 +1,187 @@
-Return-Path: <netdev+bounces-145581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E0819CFF80
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 16:31:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42DA49CFFAA
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 16:41:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D61928380D
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 15:31:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03A7628244E
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 15:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157631B815;
-	Sat, 16 Nov 2024 15:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5CD188010;
+	Sat, 16 Nov 2024 15:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i20LXlj8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ljE4+OXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755E815E97;
-	Sat, 16 Nov 2024 15:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2F115B0F2;
+	Sat, 16 Nov 2024 15:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731771072; cv=none; b=SPkje/y6uu+MPpVi3jX2TeJrqo9BYpoC+kvz+m5K2QR4TDjgOE2hukNK5A06JZ7F0QHPwPvy4kFmqfDUUbm08rl9x74SCc+8lrFP3lHk/HpnJC606cZnwKBIUh/PeWi6t72F2ABDI+YirYJ874eK7uLc5+Gw0i7mVAUhJTuIs08=
+	t=1731771662; cv=none; b=h5DGxH3Gm69JTrOPCYzcpFv9dpZxzAfWz6ff96RcGc7RnJpEmNax+CDiF4bbZWV8SsQ5GajtKCZDOpgAfH+pP7MJdjACRALlLbNOlds3IsPfZjKKMte4Dw1VjETFhS0lq1xFnIMHYDA7Y0POi4WzuyH6AaEmtRq3H5Gf0l8KXDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731771072; c=relaxed/simple;
-	bh=yQYdgCpNEMtF0HNTBzAA+71DuzYd+VQ2Rqp+ru9TBB0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=QAzzLwGPAooRE2vbNlqzquPjNJ8mZOE7oaZBZsqfj7x/taxkRO51YhE1cmfAJD90Va+cKlBWTtuH3/MAGQfJFYjbgCIl/Qc9jbARoVqzTnopfV8h8S7nmVwepBS5aP3NY/2nWaR4/rhQMYfBn/VfY7oht5ORpmJ2XYSho2lQ21g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i20LXlj8; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7b14554468fso169989185a.1;
-        Sat, 16 Nov 2024 07:31:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731771069; x=1732375869; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ffp/2XHswsX4GIfB6X17WYFirgSky6aZSjqbMLRIuB0=;
-        b=i20LXlj88z4Sy2qfYjPRU0G7Qg4I29PT0ytoqlj4TZAHQIZItvJ7NgYmpG0Y+czlZt
-         7ItoJ3lUDFWns8RHWxqWTkx4C2gJH0kG4quNnbYIMUckFWr5wQMlzKTcOWaXLhnEcw68
-         a+3hBgDBU1XzbU4hsDCwYWXCzKc3MBuEj9roKlNl8WzZA9Y1yTDlTy55sdZjD+vAQJsf
-         6D+V5O+NrN1EEhZizNZl+BdF+IiuEcWXU7kk+kn27adexWj3YhGXAiTk2QxnE6fy4u3m
-         WrXPkbi082reEsVQPpmZOYmD/Qb8WlEXq0LYfyf3Tf8suPsAzrsTckuMG9ezT7smM3r4
-         f/fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731771069; x=1732375869;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ffp/2XHswsX4GIfB6X17WYFirgSky6aZSjqbMLRIuB0=;
-        b=CA6HBdMjFzIMD35lmFBAh/c3fxhykr8qgdJRfu7hOhjTTTZtk9Wd4srrlXY54mAAFS
-         XRUrl+JHTsewbodr/fO1Eo9qaen1wQ0yVDNjZCOey2Sdw3QXSCuc6wpXuTw90HI1V9YK
-         fBr0DB3Zg/smupqaCZsVXQSWh6rlJhY1svyU+U2fiNje5CliZ0vdLfBewgUGapMl27V+
-         5ofXa7IHpqDONo+4nqNBOeRJrC+5povnbxvkoF9PXzCe6o2pz3FCWXQJZ/+F2X3gJIEL
-         whDhaEk3MmIEplVgC7gyKuY8z5nKwrN5cf8XqRPHtMH6GSaHAZeLZ7+AyYFZglkKlR6/
-         qA8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWZpuesIBfxIkW0dUrzbMyKR4kPclDlQLap72JmHSNBrUQPbfK7JFo/AFPIA7FmfTB/jOXaFXOo@vger.kernel.org, AJvYcCWfzE4s7dqhJ9ud/B6kX2SOKCyyztxztEFux+mi/g17wsA8w7+qKPaotgImuZqk/XAEnL8=@vger.kernel.org, AJvYcCWgYk7645W1tFVau5nP2YiavAAobfWHEe8t+I6XxUn7aUjsW/29u+tby+ZXh0Vn4Vvy8HgFZWZMv41jKahQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxhkb7JsDlyB4hWZXWg2DhHKKqBEDccGHJS6jZWAFYqbXSrR4So
-	iPysMWI0qG893nregAkbrojyIzbWbDrKi5VVczaJ/CfRVAGE9nV/
-X-Google-Smtp-Source: AGHT+IGzJiXel5I/BzErwJFKRsN4haga5+vVh6h48bwOnnM6wNuhTqevKYwU6qC0aF/ISDj4a7QqsA==
-X-Received: by 2002:a05:620a:1996:b0:7b1:3f19:b81a with SMTP id af79cd13be357-7b3623678aemr876423485a.53.1731771069231;
-        Sat, 16 Nov 2024 07:31:09 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635aa3ab71sm32480391cf.49.2024.11.16.07.31.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Nov 2024 07:31:08 -0800 (PST)
-Date: Sat, 16 Nov 2024 10:31:08 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <6738babc4165e_747ce29446@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241115184301.16396cfe@kernel.org>
-References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
- <20241115184301.16396cfe@kernel.org>
-Subject: Re: [PATCH net-next v5 00/19] xdp: a fistful of generic changes
- (+libeth_xdp)
+	s=arc-20240116; t=1731771662; c=relaxed/simple;
+	bh=kd24YppsFSJgA4yExReNKgTc43EmxRfDhYKaKkSzSAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IRwvvJSIjZ5RR8Otlkh5S2PETzCFj6ux2Veo/KBGWnSNX7WZes5TTG+f8cwNIw8qdQJateeOpYrhnmaGBO2I44xJ2+j6Nuj15ukxsrt1bMThNGwyI76xmCnv9ZwRqpL1d2PSPf6ZGDS1bum3AJLGdPviyx1C1Fsh5gRF+kFvp9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ljE4+OXp; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kl9+L+s20bjo6FdXRDv6f97HZvSe4Rkk10pmpIZ6IVo=; b=ljE4+OXpXvnb40kYTYlAbN3ON7
+	wQHgYoJJylhoqXNdAIOzjJklYVz+AcgHUdDpoJZPMJsNdWzku2ynM7h2JF0FkdqtViHqiJXXG9Bwh
+	csLzfJsobCuAXtdoOZwxpiX5BMHtQy+XDX4cKjSqAWq5Oo5TrPrTvGGd53TdDrnbhDxC/4K0ys9ow
+	yax1oYN6vFOferrYBM86G2ShYEKu+9yLfxM+tdJMkZa69v0ANAqVMpfkHUefziGOo/Ktw8lxvxyCV
+	wCmBLFg961DC9L8vUsInGuWl0ntIbj9yc7BUum2rD3uoCPKRpB/PJ/ed1zQ4Y3Ger9OBPLHVkTWOb
+	x3B3FVNQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42354)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tCKoX-0007L6-0O;
+	Sat, 16 Nov 2024 15:34:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tCKoQ-0003DP-11;
+	Sat, 16 Nov 2024 15:34:14 +0000
+Date: Sat, 16 Nov 2024 15:34:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net v2 0/2] Fix 'ethtool --show-eee' during initial stage
+Message-ID: <Zzi7dqqZLCCVvlHq@shell.armlinux.org.uk>
+References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+ <403be2f6-bab1-4a63-bad4-c7eac1e572ee@gmail.com>
+ <ZzdW2iB2OkbZxTgS@shell.armlinux.org.uk>
+ <170a8d59-e954-4316-9b83-9b799cb60481@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <170a8d59-e954-4316-9b83-9b799cb60481@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Jakub Kicinski wrote:
-> On Wed, 13 Nov 2024 16:24:23 +0100 Alexander Lobakin wrote:
-> > Part III does the following:
-> > * does some cleanups with marking read-only bpf_prog and xdp_buff
-> >   arguments const for some generic functions;
-> > * allows attaching already registered XDP memory model to Rxq info;
-> > * allows mixing pages from several Page Pools within one XDP frame;
-> > * optimizes &xdp_frame structure and removes no-more-used field;
-> > * adds generic functions to build skbs from xdp_buffs (regular and
-> >   XSk) and attach frags to xdp_buffs (regular and XSk);
-> > * adds helper to optimize XSk xmit in drivers;
-> > * extends libeth Rx to support XDP requirements (headroom etc.) on Rx;
-> > * adds libeth_xdp -- libeth module with common XDP and XSk routines.
+On Fri, Nov 15, 2024 at 09:35:25PM +0100, Heiner Kallweit wrote:
+> On 15.11.2024 15:12, Russell King (Oracle) wrote:
+> > On Fri, Nov 15, 2024 at 02:41:54PM +0100, Heiner Kallweit wrote:
+> >> On 15.11.2024 12:11, Choong Yong Liang wrote:
+> >>> From: Choong Yong Liang <yong.liang.choong@intel.com>
+> >>>
+> >>> When the MAC boots up with a Marvell PHY and phy_support_eee() is implemented,
+> >>> the 'ethtool --show-eee' command shows that EEE is enabled, but in actuality,
+> >>> the driver side is disabled. If we try to enable EEE through
+> >>> 'ethtool --set-eee' for a Marvell PHY, nothing happens because the eee_cfg
+> >>> matches the setting required to enable EEE in ethnl_set_eee().
+> >>>
+> >>> This patch series will remove phydev->eee_enabled and replace it with
+> >>> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(), it
+> >>> will follow the master configuration to have software and hardware in sync,
+> >>> allowing 'ethtool --show-eee' to display the correct value during the
+> >>> initial stage.
+> >>>
+> >>> v2 changes:
+> >>>  - Implement the prototype suggested by Russell
+> >>>  - Check EEE before calling phy_support_eee()
+> >>>
+> >>> Thanks to Russell for the proposed prototype in [1].
+> >>>
+> >>> Reference:
+> >>> [1] https://patchwork.kernel.org/comment/26121323/
+> >>>
+> >>> Choong Yong Liang (2):
+> >>>   net: phy: replace phydev->eee_enabled with eee_cfg.eee_enabled
+> >>>   net: stmmac: set initial EEE policy configuration
+> >>>
+> >>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  3 +++
+> >>>  drivers/net/phy/phy-c45.c                         | 11 +++++------
+> >>>  drivers/net/phy/phy_device.c                      |  6 +++---
+> >>>  include/linux/phy.h                               |  5 ++---
+> >>>  4 files changed, 13 insertions(+), 12 deletions(-)
+> >>>
+> >>
+> >> Russell submitted the proposed patch already:
+> >> https://patchwork.kernel.org/project/netdevbpf/patch/E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk/
+> >> So there's no need for your patch 1.
+> > 
+> > Patch 1 is an updated version of that patch, minus my authorship and of
+> > course no sign-off. I've already marked this series as requiring changes
+> > in patchwork (hopefully, if I did it correctly.)
+> > 
 > 
-> This clearly could be multiple series, please don't go over the limit.
+> The updated version adds an argument to genphy_c45_an_config_eee_aneg(),
+> and I wonder whether we can do better, as this results in several calls
+> with the same argument. The following is an alternative, to be applied
+> on top of your original patch. I don't have a clear preference, though.
+> 
+> ---
+>  drivers/net/phy/phy.c | 25 +++++++++++++++----------
+>  1 file changed, 15 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+> index 8876f3673..22c9bbebb 100644
+> --- a/drivers/net/phy/phy.c
+> +++ b/drivers/net/phy/phy.c
+> @@ -1682,11 +1682,10 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
+>   * configuration.
+>   */
+>  static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+> -				      struct ethtool_keee *data)
+> +				      struct ethtool_keee *old_cfg)
+>  {
+> -	if (phydev->eee_cfg.tx_lpi_enabled != data->tx_lpi_enabled ||
+> -	    phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) {
+> -		eee_to_eeecfg(&phydev->eee_cfg, data);
+> +	if (phydev->eee_cfg.tx_lpi_enabled != old_cfg->tx_lpi_enabled ||
+> +	    phydev->eee_cfg.tx_lpi_timer != old_cfg->tx_lpi_timer) {
+>  		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+>  		if (phydev->link) {
+>  			phydev->link = false;
+> @@ -1706,21 +1705,27 @@ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+>   */
+>  int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data)
+>  {
+> +	struct eee_config old_cfg;
+>  	int ret;
+>  
+>  	if (!phydev->drv)
+>  		return -EIO;
+>  
+> +	old_cfg = phydev->eee_cfg;
+> +	eee_to_eeecfg(&phydev->eee_cfg, data);
+> +
 
-Targeting different subsystems and thus reviewers. The XDP, page_pool
-and AF_XDP changes might move faster on their own.
+Hmm, don't we want to do this under phydev->lock, because network
+drivers and phylib may be reading from phydev->eee_cfg? If we
+update it outside the lock, and then revert, there's a chance that
+the phylib state machine / network driver may see the changes
+which then get reverted on failure, potentially leading to
+inconsistent state.
 
-If pulling those out into separate series, that also allows splitting
-up the last patch. That weighs in at 3481 LoC, out of 4400 for the
-series.
-
-The first 3 patches are not essential to IDFP XDP + AF_XDP either.
-The IDPF feature does not have to not depend on them.
-
-Does not matter for upstream, but for the purpose of backporting this
-to distro kernels, it helps if the driver feature minimizes dependency
-on core kernel API changes. If patch 19 can be made to work without
-some of the changes in 1..18, that makes it more robust from that PoV.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
