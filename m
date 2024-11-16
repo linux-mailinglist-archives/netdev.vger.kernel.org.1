@@ -1,132 +1,145 @@
-Return-Path: <netdev+bounces-145604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E1259D00A3
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 20:23:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6649D00C1
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 21:07:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7F32287691
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 19:23:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11AF9B220CE
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 20:07:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2C0195B1A;
-	Sat, 16 Nov 2024 19:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23950197548;
+	Sat, 16 Nov 2024 20:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gdRfOcvT"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="JQOZxKP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B999919149F;
-	Sat, 16 Nov 2024 19:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C5D1946AA;
+	Sat, 16 Nov 2024 20:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731784998; cv=none; b=qm0rgR8XxyUhgtPbQ4aHga0FoKzZoBjNB+v3XaPyIGstZcGjv3BQimDyAcmNVZXpHl3zOVDoP3Z1h7G9lD+Ja4btD7LxB+7whU3B6Nd7Wopl/DUL942Lhn7Zmw7220sy1ldBdiAKOVLbvHj/+K6F+QuNbHgGc8qPPgFMtGzlGDw=
+	t=1731787665; cv=none; b=No6rwdoVeUkOjRgCg2sExtSKyfSAA9jGpdk+wwpE59ZJXGEpJRNh9pF0Q+6npJD+zKotJrLMNxKDNWTdVVAz697PxV3VAWVyOl/8Kt/hkKK6Sx1VavpjVp5HhciO4wY0HAL+42JFPIz+/3KY2S0k8BQuvCSiBkOAt5CWCh4QFQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731784998; c=relaxed/simple;
-	bh=yfX/6TZQ1gd9+8AMgBgNPFETIp1Fe4WBrJJhmJztd/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P1qN3RWW7epoR+V2Q6vRa2nmYbLa4Pm/nwn/m/4RwJbBeowuxkKm+cjzguqrpl3v6X+URPjXM2bqFzCqSQfLFW0RVHVw+I6bD53UQ5XtyEylRM7VO648RGfoiVQ0X9bOJG80DKuEtAHoniNJMsKqe+VuY8OQUKkWsISE2TEQWs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gdRfOcvT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dn+2cDfRC1yH4NOcw8ysKYN7T3VzTAsD6jJX6tRQuE0=; b=gdRfOcvTKwxKkLKP+bQtMsvxeP
-	Zcxq1PDSbPRXkd6PvRH478+Xa11lrRN3cdrqac8/EN9m0pGru+9CaGqImJwB9y2vem4kTJ9INuRjQ
-	3BNTlCTAlH6WrvWOK3XO5BHaKsjGnmQlg/tFjALWn9OFuc6IOvE4cK8R+h+z/XuTo7NM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tCONh-00DXYh-Cb; Sat, 16 Nov 2024 20:22:53 +0100
-Date: Sat, 16 Nov 2024 20:22:53 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parker Newman <parker@finest.io>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Parker Newman <pnewman@connecttech.com>
-Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-tegra: Read iommu stream id
- from device tree
-Message-ID: <bb52bdc1-df2e-493d-a58f-df3143715150@lunn.ch>
-References: <cover.1731685185.git.pnewman@connecttech.com>
- <f2a14edb5761d372ec939ccbea4fb8dfd1fdab91.1731685185.git.pnewman@connecttech.com>
- <ed2ec1c2-65c7-4768-99f1-987e5fa39a54@redhat.com>
- <20241115135940.5f898781.parker@finest.io>
+	s=arc-20240116; t=1731787665; c=relaxed/simple;
+	bh=5rtxGu68PLWrXyTEJNBr68hhrntpwpZdOSN9YWdsbfY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qxiVqSsmdln+TjVfPRmDgwPyjT3nA7y3o5lzewuNKz/WLYdmENM+91eclN2OSQ85pNrv+VNgnLfiWULn69XiWdN01myxb8V8dnYLolXF2K93rwmABeR6RSQlJJLuk67IDnkt2mzYgJsuQtoozXZokA9tbqaByVGwNJIlLjCb01I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=JQOZxKP3; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 40BBA89698;
+	Sat, 16 Nov 2024 21:07:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1731787655;
+	bh=msWG5qnuSAmchrjZIHWSe5yibi3jg0xEpfJtIVvoQA0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JQOZxKP3VnpaHDzeb2po7GNni8qWiMQve1IWLtAaq1+5mSjtN24PUPimlzF/6AHC1
+	 U8a+ONq23zJkAah8DAfn22UvOArHyWcUDdkBSWpKHFlb6IY8OYZmywqxK4Q3295oFF
+	 fPv6GRs5arWYat28D4lnKYRN1DAbvUdj5ndlmYt9fsGrMWp+Ld34ORgN+sVhT0r5Qv
+	 qyr5Bb6JCRB98vN4avDSYVag8IDSLlol/nUZRmeok5Yrn1pzUg3Da6UxSnhJUFCLM3
+	 mLOGXtKy2197fkhOCAXvKQuWikwhkiqxMNKQxZsDmMs+clqx+AH4W0ISuqxOI+XUj1
+	 Udg2euHimVxRw==
+Message-ID: <b287f8f9-600e-4e69-b7ec-25990275575e@denx.de>
+Date: Sat, 16 Nov 2024 20:57:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115135940.5f898781.parker@finest.io>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
+To: Ajay.Kathat@microchip.com, alexis.lothore@bootlin.com,
+ linux-wireless@vger.kernel.org
+Cc: davem@davemloft.net, adham.abozaeid@microchip.com,
+ claudiu.beznea@tuxon.dev, conor+dt@kernel.org, edumazet@google.com,
+ kuba@kernel.org, kvalo@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
+ robh@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
+References: <20241022013855.284783-1-marex@denx.de>
+ <c9e98811-15f5-427a-82f7-2e7fff4a9873@bootlin.com>
+ <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
+ <a4c8c489-c6b9-4a38-84ab-f08409baccff@microchip.com>
+ <5e2a5056-78ac-4be0-83ca-4aa55f524535@denx.de>
+ <880baad9-be3d-41b2-bea3-620f915ca397@microchip.com>
+ <9d20b408-72a4-49f0-aca6-108dfdd65f99@denx.de>
+ <16e5c8d7-64ac-424e-9430-b683ae16a34e@denx.de>
+ <9888f605-ee68-4bd3-8d1d-aeef247d23d0@microchip.com>
+ <fcdfa93a-2db4-49ad-8947-ca43be329250@denx.de>
+ <260a505e-53ec-4f1d-94fe-2b71af48f1b7@denx.de>
+ <b61b5b11-b078-4cf5-bb40-7c3ff8ffa972@microchip.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <b61b5b11-b078-4cf5-bb40-7c3ff8ffa972@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Fri, Nov 15, 2024 at 01:59:40PM -0500, Parker Newman wrote:
-> On Fri, 15 Nov 2024 18:17:07 +0100
-> Paolo Abeni <pabeni@redhat.com> wrote:
-> 
-> > On 11/15/24 17:31, Parker Newman wrote:
-> > > From: Parker Newman <pnewman@connecttech.com>
-> > >
-> > > Read the iommu stream id from device tree rather than hard coding to mgbe0.
-> > > Fixes kernel panics when using mgbe controllers other than mgbe0.
-> >
-> > It's better to include the full Oops backtrace, possibly decoded.
-> >
-> 
-> Will do, there are many different ones but I can add the most common.
-> 
-> > > Tested with Orin AGX 64GB module on Connect Tech Forge carrier board.
-> >
-> > Since this looks like a fix, you should include a suitable 'Fixes' tag
-> > here, and specify the 'net' target tree in the subj prefix.
-> >
-> 
-> Sorry I missed the "net" tag.
-> 
-> The bug has existed since dwmac-tegra.c was added. I can add a Fixes tag but
-> in the past I was told they aren't needed in that situation?
-> 
-> > > @@ -241,6 +243,12 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
-> > >  	if (IS_ERR(mgbe->xpcs))
-> > >  		return PTR_ERR(mgbe->xpcs);
-> > >
-> > > +	/* get controller's stream id from iommu property in device tree */
-> > > +	if (!tegra_dev_iommu_get_stream_id(mgbe->dev, &mgbe->iommu_sid)) {
-> > > +		dev_err(mgbe->dev, "failed to get iommu stream id\n");
-> > > +		return -EINVAL;
-> > > +	}
-> >
-> > I *think* it would be better to fallback (possibly with a warning or
-> > notice) to the previous default value when the device tree property is
-> > not available, to avoid regressions.
-> >
-> 
-> I debated this as well... In theory the iommu must be setup for the
-> mgbe controller to work anyways. Doing it this way means the worst case is
-> probe() fails and you lose an ethernet port.
+On 11/15/24 9:04 PM, Ajay.Kathat@microchip.com wrote:
 
-New DT properties are always optional. Take the example of a board
-only using a single controller. It should happily work. It probably
-does not have this property because it is not needed. Your change is
-likely to cause a regression on such a board.
+Hello Ajay,
 
-Also, is a binding patch needed?
+>>>>> Can you explain how to prevent that or shall we disable uAPSD
+>>>>> altogether ?
+>>>>
+>>>> Could you please share the test procedure and logs. I am occupied at the
+>>>> moment but I shall make some time to look into it and get a better
+>>>> understanding.
+>>>
+>>> The simplest test procedure is this:
+>>>
+>>> $ while true ; do ifconfig wlan0 up ; ifconfig wlan0 down ; done
+>>>
+>>> As for the logs, MMCI controller sporadically reports either Command or
+>>> Data CRC error, so likely the SDIO response (from WILC to Host) is
+>>> corrupted.
+>>
+>> Are there any news ?
+> 
+> I did test the same procedure in my setup, but I couldn't reproduce this issue
+> even after running it for a long duration. In my test setup, I used the
+> sama5d27-som1-ek1 host and wilc3000 firmware version 16.3.
+> 
+> I think this issue could be related to the host MMCI controller driver.
+> Normally, the wilc SDIO bus failures are captured by driver logs with an error
+> code (e.g., timeout), but if the MMCI controller is outputting the warning
+> message, then the error could be related to it. Does the MMCI controller error
+> point to any specific function?
 
-	Andrew
+Either CMD52 or CMD53 errors out with CRC error, this is recognized by 
+the controller. That points to sporadic CRC error during SDIO transfer.
+
+> Which host was used to test this scenario, and
+> is it possible to test with different host or different configuration on the
+> same host
+
+I am observing sporadic command and data CRC errors on STM32MP157F 
+system with SDIO WILC3000.
+
+, like disabling power save on the host?
+I already tested disabling power save.
+
+Can you explain why does uAPSD (iw ...set power_save off) adversely 
+affect SDIO bus stability ?
+
+Can you explain how to prevent that or shall we disable uAPSD altogether ?
+
+Is there any way to make the WILC firmware produce debug output , so we 
+can figure out what is going on "on the other side" ?
+
+Are you able to provide me (maybe off-list) some debug firmware build ?
+(or can I get firmware sources and build and debug my own WILC firmware 
+on the Cortus CPU?)
+
+I can trigger the SDIO errors even without being connected to any AP , 
+so this is something between the WILC and the SDIO host, the radio is 
+likely not involved , right ?
 
