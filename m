@@ -1,179 +1,214 @@
-Return-Path: <netdev+bounces-145554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F159CFD1F
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 08:59:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5376F9CFD38
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 09:16:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BC2F1F254CE
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 07:59:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD6D62836F5
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 08:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B89193071;
-	Sat, 16 Nov 2024 07:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r5iZGNuE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FF91925BA;
+	Sat, 16 Nov 2024 08:16:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FDE192D83
-	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 07:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1620618C004
+	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 08:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731743977; cv=none; b=gKc9APQX38vRn+M5pSuiYPmGclqjHN8Sj1Y7JH6mieZmkHvBQL2SUh52O7qFkkz1M4Q/Yhcl2vPIxF3t/jI0Gsc/aijzBehG6Umj6mvlTDm+5cfUdA47nppuwlINXpB6ysopDkXWB3nk9zvAmvwqwpD/ZEUKUqPXwLhlS/kE66E=
+	t=1731744989; cv=none; b=Yb8jwpl21zwxReerzKWbsdB8H/NKCESs9B3asAn2h3cJBHQQsJxQ4PJQjo5YYzOL+K9D5irnL3KSmV+RAlcvZcN+a1ciiOV8A/cY5lH4q8XBr367VFjlgLO+P5CZPSsRO8geVO7dwwS8IiHlJTnYceaQyPNDQzs7PbB9zNNW19E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731743977; c=relaxed/simple;
-	bh=syAVCylnhi0AytBImEtkvzButQ9wsAguk45yhcS0NNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KrmPg3bCCjmCIvJ6v48VEoSgcmZtgVBpCwcWqb0jYVVtbVQwXOcKbPwKXc+X+Oti9PPdQwojaERKeuF3e9FQLAZcrYuA7vvkxhbCFknh4ZFTVo+WMyUo+DjMoQ8/1uCmvTONcBqvhLRtYDWwfAn4PdsY251ekglwqx94s3/z/b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r5iZGNuE; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-431616c23b5so14427645e9.0
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 23:59:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731743973; x=1732348773; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xrsdExZKqTlwoTRHJD0ZdQo7yx2uU25FrNS0bU2S5+Y=;
-        b=r5iZGNuEOfNWbi26gs/0hDufWiKU9glpkrz83hfYdk20o+8yDMVRsyZ6+cPIv/oaQN
-         1kDE9R6Vr8IhLeyXsibSIWi+i5grPibUr8CgcnTKyayifBg26F0iK5NCf/Zk+pdy13Hu
-         08u3dXU0sR2s59y+fza8gG5ZMw0Hfg8Sa3w3izBxsCrCB2Hfi3yWK+5VciZPLCvYZRaJ
-         Cm3dD99wasOBV+Vb4KvuHLxcD9cr9PRrdBxQ3n8LlNaCQDaVlvqQLTJ3YxibOJsA3aud
-         mNDVaqD9+G+4jwsF6k6bmfL3lgB8UhWpAIV/7hICAk042PQXjY0vP86Sl31MhmWRTiq6
-         Ag5Q==
+	s=arc-20240116; t=1731744989; c=relaxed/simple;
+	bh=NdCNRt5hseY7XgSrFhM3rvJkKWMJFpMnTxgzT+R6vHA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uIziGbhT7SavRcZ68dTe+dx06AwLh2a7JIf1eL+QX8o0T9lpATDr/nkFc5Yuv5IpNlmE86JNr7cqpaUuKcFztNq0c4qOJ7fQUfqvCz+WySSOEB//VRJO8T+CCOHuR/qiw+zLeHrMqrpQSTcUW4CFNDZBfYULy3yCexhnbDYUF2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a71d04c76dso17108365ab.3
+        for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 00:16:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731743973; x=1732348773;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xrsdExZKqTlwoTRHJD0ZdQo7yx2uU25FrNS0bU2S5+Y=;
-        b=TbtLJC/PjhKPDT1WJ3BeeoHE87thBW4Issy8FnwjFOSFCHNhaDB1h538X2htLMXo9Q
-         xFwhVPY09gHLslv9DNlT9hRXL3vUXwvVJUwZjFUwuHX2ByNWrDJBPMnF2gfZwKsgAZlZ
-         4fpMveS51rp47iI+w7ip8JGSwv05RDvE0QsX/jS3VdtbDRJuafDGKJQpkeGG37rQfSe1
-         POqV9f3D9B5KDuY4Ar6eAQDdm+YBVthXXv/EBLld85zMJn1q8txPC7CFSEAOuBBxJ3oX
-         MklUjlgB7esrEqk+I6vl6bMQflAHq4wk/eNMW1yR5MglX4/cZZnMdui9USChSKzRCoIe
-         DRxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvqvMRER6+Uf2/wdMPsS3HzZ+1+G+pt8LgWslRvkK8QAJYTvchXK0vFtxarT2L2mrvHxeDdhE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBfSCimAIYQztmiDFrYWuCclfDHFPWDUDyC6aJ4zhJkJipo8BM
-	zGHi9EtfGODmAjDcgYylI3vQbXNrxmf8nJBGZPYx3a+dxwKY3lCS6ZRV9mGHCM4=
-X-Google-Smtp-Source: AGHT+IHwPca/r8TengkDOJBkzNMy5+IC+M/DjfY5vaIp0XwfqGKX+JdkORZRtZVKPaDZkydKQ4+r2A==
-X-Received: by 2002:a05:600c:19cb:b0:431:559d:4103 with SMTP id 5b1f17b1804b1-432defe3203mr49400585e9.7.1731743973417;
-        Fri, 15 Nov 2024 23:59:33 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab806e1sm81445685e9.20.2024.11.15.23.59.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 23:59:32 -0800 (PST)
-Date: Sat, 16 Nov 2024 10:59:29 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jack Wang <jinpu.wang@cloud.ionos.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
-	Petr Mladek <pmladek@suse.com>,
-	Joe Lawrence <joe.lawrence@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Lucas Stach <l.stach@pengutronix.de>,
-	Russell King <linux+etnaviv@armlinux.org.uk>,
-	Christian Gmeiner <christian.gmeiner@gmail.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
-	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org,
-	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org,
-	linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org,
-	oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH 19/22] livepatch: Convert timeouts to secs_to_jiffies()
-Message-ID: <896c656f-6d8c-4337-8464-7557c43a80ab@stanley.mountain>
-References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v1-19-19aadc34941b@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1731744987; x=1732349787;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2jbckV7ux3lzXJSR7JR4BmQDcEyddTRVjQlXOwEJaVI=;
+        b=soq0G31xqNKw6rU+tNHHGiDgSgG580uhHFG5+QxrO1ps+Y5sOxmT1I4lFXcy7ORvd/
+         jW/y4R9hzOSWKAS6hNLLGVQ+DOYNaCgISgWLdR+YjVi4V+sFUxN0H6JXDiBW5VoaRC4u
+         Kcsy8ybqOheEo5fSj2Lf969ey7Xj4uf4h4hDUUv2BgUiLaXNVESRnHGeZ+6QaUKTHuWB
+         5JBBb/c056wMgc9zDbnLmvprBwK7y4HQIBfrlON14ywmzuLKXOSpciNmNtnHtDKO0kL+
+         GHdTqxGv27LjIGMJnhfIpasfUfKQmQjpXjzuD1EKitfPim9ayg+HzSdwXrV9V9ihyR8I
+         2zAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYsvTuC/GpEDi1S/l8MRK4yqIKQ7KOBJder/YspXHZ24oORuV8FWWdCVgf4aENr1DkKo5mcDs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtFmoAwBRVXIa45Pgv5JZp+ZF9YvB2onJ/wtXdlb4Q1SSHjEZV
+	jC1UUb23+xqof7L1QhI66jx7Bn5gdLC8bKOV8TDhkAybcc1+62jdhYpX2IowDLd751PKMXJypaf
+	DwwCsIkXZuq9/wOxztkKXTkob8el7vv6zFuNoIrehG07GPpOtXpTsYbo=
+X-Google-Smtp-Source: AGHT+IH9L6VPPkxwi3Qe5NdR2HEfdsN8Fets2wPPjEmFamGj7SXwc73uB8k38B1TeZwK9V74LE9ui4l4Am0DBHkuzPYYHMdszb70
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-19-19aadc34941b@linux.microsoft.com>
+X-Received: by 2002:a05:6e02:b47:b0:3a0:4d1f:519c with SMTP id
+ e9e14a558f8ab-3a747ff8c92mr58797555ab.3.1731744987352; Sat, 16 Nov 2024
+ 00:16:27 -0800 (PST)
+Date: Sat, 16 Nov 2024 00:16:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <673854db.050a0220.85a0.0011.GAE@google.com>
+Subject: [syzbot] [net?] WARNING: suspicious RCU usage in dev_deactivate
+From: syzbot <syzbot+8a65ac5be396817eefb3@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 15, 2024 at 09:22:49PM +0000, Easwar Hariharan wrote:
-> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
-> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
-> --- a/samples/livepatch/livepatch-callbacks-busymod.c
-> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
-> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
->  {
->  	pr_info("%s\n", __func__);
->  	schedule_delayed_work(&work,
-> -		msecs_to_jiffies(1000 * 0));
-> +		secs_to_jiffies(0));
+Hello,
 
-Better to just call schedule_delayed_work(&work, 0);
+syzbot found the following issue on:
 
->  	return 0;
->  }
+HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1219335f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=327b6119dd928cbc
+dashboard link: https://syzkaller.appspot.com/bug?extid=8a65ac5be396817eefb3
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-regards,
-dan carpenter
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-2d5404ca.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1bbbfa50cb5f/vmlinux-2d5404ca.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a5bcdede1c8a/bzImage-2d5404ca.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8a65ac5be396817eefb3@syzkaller.appspotmail.com
+
+=============================
+WARNING: suspicious RCU usage
+6.12.0-rc7-syzkaller #0 Not tainted
+-----------------------------
+net/sched/sch_generic.c:1290 suspicious rcu_dereference_protected() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+3 locks held by kworker/u32:18/10870:
+ #0: ffff888046b42148 ((wq_completion)bond0#22){+.+.}-{0:0}, at: process_one_work+0x129b/0x1ba0 kernel/workqueue.c:3204
+ #1: ffffc90004557d80 ((work_completion)(&(&bond->mii_work)->work)){+.+.}-{0:0}, at: process_one_work+0x921/0x1ba0 kernel/workqueue.c:3205
+ #2: ffffffff8e1b8340 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #2: ffffffff8e1b8340 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #2: ffffffff8e1b8340 (rcu_read_lock){....}-{1:2}, at: bond_mii_monitor+0x140/0x2d90 drivers/net/bonding/bond_main.c:2937
+stack backtrace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x210/0x3c0 kernel/locking/lockdep.c:6821
+ dev_deactivate_queue+0x167/0x190 net/sched/sch_generic.c:1290
+ netdev_for_each_tx_queue include/linux/netdevice.h:2504 [inline]
+ dev_deactivate_many+0xe7/0xb20 net/sched/sch_generic.c:1363
+ dev_deactivate+0xf9/0x1c0 net/sched/sch_generic.c:1403
+ bond_miimon_inspect drivers/net/bonding/bond_main.c:2717 [inline]
+ bond_mii_monitor+0x3c1/0x2d90 drivers/net/bonding/bond_main.c:2939
+-----------------------------
+include/linux/rtnetlink.h:100 suspicious rcu_dereference_protected() usage!
+other info that might help us debug this:
+
+rcu_scheduler_active = 2, debug_locks = 1
+
+stack backtrace:
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ dev_deactivate+0xf9/0x1c0 net/sched/sch_generic.c:1403
+ bond_check_dev_link+0x197/0x490 drivers/net/bonding/bond_main.c:873
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ </TASK>
+RCU nest depth: 1, expected: 0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ dev_deactivate_many+0x2a1/0xb20 net/sched/sch_generic.c:1377
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+3 locks held by kworker/u32:18/10870:
+ #0: ffff888046b42148 ((wq_completion)bond0#22){+.+.}-{0:0}, at: process_one_work+0x129b/0x1ba0 kernel/workqueue.c:3204
+
+stack backtrace:
+Tainted: [W]=WARN
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x210/0x3c0 kernel/locking/lockdep.c:6821
+ dev_deactivate+0xf9/0x1c0 net/sched/sch_generic.c:1403
+ ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:62
+ process_scheduled_works kernel/workqueue.c:3310 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+6.12.0-rc7-syzkaller #0 Tainted: G        W         
+-----------------------------
+other info that might help us debug this:
+context-{4:4}
+stack backtrace:
+Workqueue: bond0 bond_mii_monitor
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5825
+ synchronize_rcu_expedited+0x290/0x450 kernel/rcu/tree_exp.h:976
+ synchronize_net+0x3e/0x60 net/core/dev.c:11286
+ ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:62
+ bond_check_dev_link+0x197/0x490 drivers/net/bonding/bond_main.c:873
+ bond_miimon_inspect drivers/net/bonding/bond_main.c:2717 [inline]
+ bond_mii_monitor+0x3c1/0x2d90 drivers/net/bonding/bond_main.c:2939
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+------------[ cut here ]------------
+WARNING: CPU: 2 PID: 10870 at kernel/rcu/tree_plugin.h:331 rcu_note_context_switch+0xc5c/0x1ae0 kernel/rcu/tree_plugin.h:331
+Tainted: [W]=WARN
+RSP: 0018:ffffc900045573b0 EFLAGS: 00010086
+RDX: ffff888026c3c880 RSI: ffffffff814e6e86 RDI: 0000000000000001
+R10: 0000000000000000 R11: 000000002d2d2d2d R12: ffff888026c3c880
+CR2: 00007fd5d2467d60 CR3: 0000000030df0000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ mutex_optimistic_spin kernel/locking/mutex.c:510 [inline]
+ __mutex_lock_common kernel/locking/mutex.c:612 [inline]
+ __mutex_lock+0x81e/0x9c0 kernel/locking/mutex.c:752
+ synchronize_rcu_expedited+0x290/0x450 kernel/rcu/tree_exp.h:976
+ dev_deactivate_many+0x2a1/0xb20 net/sched/sch_generic.c:1377
+ linkwatch_sync_dev+0x181/0x210 net/core/link_watch.c:263
+ ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:62
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
