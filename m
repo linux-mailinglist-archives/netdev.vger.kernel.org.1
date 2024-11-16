@@ -1,145 +1,120 @@
-Return-Path: <netdev+bounces-145605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6649D00C1
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 21:07:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB8E49D00C6
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 21:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11AF9B220CE
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 20:07:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77F701F22C0E
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 20:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23950197548;
-	Sat, 16 Nov 2024 20:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EA219004A;
+	Sat, 16 Nov 2024 20:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="JQOZxKP3"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="lmoYsacE"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [178.154.239.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C5D1946AA;
-	Sat, 16 Nov 2024 20:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405D228FF;
+	Sat, 16 Nov 2024 20:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731787665; cv=none; b=No6rwdoVeUkOjRgCg2sExtSKyfSAA9jGpdk+wwpE59ZJXGEpJRNh9pF0Q+6npJD+zKotJrLMNxKDNWTdVVAz697PxV3VAWVyOl/8Kt/hkKK6Sx1VavpjVp5HhciO4wY0HAL+42JFPIz+/3KY2S0k8BQuvCSiBkOAt5CWCh4QFQw=
+	t=1731788618; cv=none; b=t+27V6cO2BL+Ztx/4uqHD8y41rFBQSnNi2cako2wL8aAn+4zZezja6TxBYbw9uPGVeczt2T0urSyPAtvRWPh2YcgdWpJCx+Q3jUqbQVWkv6jZUiBMxB1YUIcQiuZ6/8c3T0/PIIjP6hDU10B9ydnsDMtoAfzHPj6HFpSWZMAsMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731787665; c=relaxed/simple;
-	bh=5rtxGu68PLWrXyTEJNBr68hhrntpwpZdOSN9YWdsbfY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qxiVqSsmdln+TjVfPRmDgwPyjT3nA7y3o5lzewuNKz/WLYdmENM+91eclN2OSQ85pNrv+VNgnLfiWULn69XiWdN01myxb8V8dnYLolXF2K93rwmABeR6RSQlJJLuk67IDnkt2mzYgJsuQtoozXZokA9tbqaByVGwNJIlLjCb01I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=JQOZxKP3; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 40BBA89698;
-	Sat, 16 Nov 2024 21:07:34 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1731787655;
-	bh=msWG5qnuSAmchrjZIHWSe5yibi3jg0xEpfJtIVvoQA0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JQOZxKP3VnpaHDzeb2po7GNni8qWiMQve1IWLtAaq1+5mSjtN24PUPimlzF/6AHC1
-	 U8a+ONq23zJkAah8DAfn22UvOArHyWcUDdkBSWpKHFlb6IY8OYZmywqxK4Q3295oFF
-	 fPv6GRs5arWYat28D4lnKYRN1DAbvUdj5ndlmYt9fsGrMWp+Ld34ORgN+sVhT0r5Qv
-	 qyr5Bb6JCRB98vN4avDSYVag8IDSLlol/nUZRmeok5Yrn1pzUg3Da6UxSnhJUFCLM3
-	 mLOGXtKy2197fkhOCAXvKQuWikwhkiqxMNKQxZsDmMs+clqx+AH4W0ISuqxOI+XUj1
-	 Udg2euHimVxRw==
-Message-ID: <b287f8f9-600e-4e69-b7ec-25990275575e@denx.de>
-Date: Sat, 16 Nov 2024 20:57:36 +0100
+	s=arc-20240116; t=1731788618; c=relaxed/simple;
+	bh=Xwt1wgD3GpJFJvVO6W3Kf69DFMrYWLJzBt+Q+zwdm+0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GcloqygU2PFy9vQHKKPlVtEIx40TQr974h5neSMAniztWwMjDrrxdy6/T5FBhqTydF9HNJDKjGkt3L3766Igur+l8Rzym8mXLwObfIA7wi4OteZ/gW0Uw7Zi3yGyQ3WSqt1atlrPIiWeyH5TF7lAUtZKgTWAds2zHtecV5rJqPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=lmoYsacE; arc=none smtp.client-ip=178.154.239.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1d:3e83:0:640:307a:0])
+	by forward101a.mail.yandex.net (Yandex) with ESMTPS id E5A9860039;
+	Sat, 16 Nov 2024 23:23:24 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id LNVPeYOOouQ0-0ivAiGht;
+	Sat, 16 Nov 2024 23:23:23 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1731788603; bh=O31CYpoIo+My2OpOnR9CiaJUHu/xs78IoYQDtcJ0LqQ=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=lmoYsacE+Sy+VMXQJRteDwFsxIILrj5k8mhabMMexsWuSGk5t3RvuTQaG+FGVmCf5
+	 t6iDNm4u2wRuUHbTCJ/7i2o0Tbe+evaMcaIztP7pnLFFjzH37D93PRfW+nn11MacSG
+	 FTZSdAUWuIqj35xxvfQwNcfkI6oRSABIH/ljeY7A=
+Authentication-Results: mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Stas Sergeev <stsp2@yandex.ru>
+To: linux-kernel@vger.kernel.org
+Cc: Stas Sergeev <stsp2@yandex.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] scm: fix negative fds with SO_PASSPIDFD
+Date: Sat, 16 Nov 2024 23:23:05 +0300
+Message-ID: <20241116202306.937322-1-stsp2@yandex.ru>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
-To: Ajay.Kathat@microchip.com, alexis.lothore@bootlin.com,
- linux-wireless@vger.kernel.org
-Cc: davem@davemloft.net, adham.abozaeid@microchip.com,
- claudiu.beznea@tuxon.dev, conor+dt@kernel.org, edumazet@google.com,
- kuba@kernel.org, kvalo@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
- robh@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
-References: <20241022013855.284783-1-marex@denx.de>
- <c9e98811-15f5-427a-82f7-2e7fff4a9873@bootlin.com>
- <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
- <a4c8c489-c6b9-4a38-84ab-f08409baccff@microchip.com>
- <5e2a5056-78ac-4be0-83ca-4aa55f524535@denx.de>
- <880baad9-be3d-41b2-bea3-620f915ca397@microchip.com>
- <9d20b408-72a4-49f0-aca6-108dfdd65f99@denx.de>
- <16e5c8d7-64ac-424e-9430-b683ae16a34e@denx.de>
- <9888f605-ee68-4bd3-8d1d-aeef247d23d0@microchip.com>
- <fcdfa93a-2db4-49ad-8947-ca43be329250@denx.de>
- <260a505e-53ec-4f1d-94fe-2b71af48f1b7@denx.de>
- <b61b5b11-b078-4cf5-bb40-7c3ff8ffa972@microchip.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <b61b5b11-b078-4cf5-bb40-7c3ff8ffa972@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
 
-On 11/15/24 9:04 PM, Ajay.Kathat@microchip.com wrote:
+pidfd_prepare() can return negative values as an error codes.
+But scm_pidfd_recv() didn't check for that condition.
+As the result, it is possible to create the race that leads to
+the negative fds. The race happens if the peer process sends
+something to SO_PASSPIDFD-enabled recipient, and quickly exits.
+pidfd_prepare() has this code:
 
-Hello Ajay,
+    if (!pid || !pid_has_task(pid, thread ? PIDTYPE_PID : PIDTYPE_TGID))
+            return -EINVAL;
 
->>>>> Can you explain how to prevent that or shall we disable uAPSD
->>>>> altogether ?
->>>>
->>>> Could you please share the test procedure and logs. I am occupied at the
->>>> moment but I shall make some time to look into it and get a better
->>>> understanding.
->>>
->>> The simplest test procedure is this:
->>>
->>> $ while true ; do ifconfig wlan0 up ; ifconfig wlan0 down ; done
->>>
->>> As for the logs, MMCI controller sporadically reports either Command or
->>> Data CRC error, so likely the SDIO response (from WILC to Host) is
->>> corrupted.
->>
->> Are there any news ?
-> 
-> I did test the same procedure in my setup, but I couldn't reproduce this issue
-> even after running it for a long duration. In my test setup, I used the
-> sama5d27-som1-ek1 host and wilc3000 firmware version 16.3.
-> 
-> I think this issue could be related to the host MMCI controller driver.
-> Normally, the wilc SDIO bus failures are captured by driver logs with an error
-> code (e.g., timeout), but if the MMCI controller is outputting the warning
-> message, then the error could be related to it. Does the MMCI controller error
-> point to any specific function?
+So if you exit quickly enough, you can hit that EINVAL.
+Getting the fd=-22 is very weird, if not exploitable.
 
-Either CMD52 or CMD53 errors out with CRC error, this is recognized by 
-the controller. That points to sporadic CRC error during SDIO transfer.
+This patch adds the missing check and sets MSG_CTRUNC on error.
+Recipient can now detect an error by checking this flag.
 
-> Which host was used to test this scenario, and
-> is it possible to test with different host or different configuration on the
-> same host
+Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
 
-I am observing sporadic command and data CRC errors on STM32MP157F 
-system with SDIO WILC3000.
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>
+CC: Christian Brauner <brauner@kernel.org>
+CC: Kees Cook <kees@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: netdev@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
+---
+ include/net/scm.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-, like disabling power save on the host?
-I already tested disabling power save.
+diff --git a/include/net/scm.h b/include/net/scm.h
+index 0d35c7c77a74..3ccf8546c506 100644
+--- a/include/net/scm.h
++++ b/include/net/scm.h
+@@ -155,6 +155,10 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
+ 		return;
+ 
+ 	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
++	if (pidfd < 0) {
++		msg->msg_flags |= MSG_CTRUNC;
++		return;
++	}
+ 
+ 	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
+ 		if (pidfd_file) {
+-- 
+2.47.0
 
-Can you explain why does uAPSD (iw ...set power_save off) adversely 
-affect SDIO bus stability ?
-
-Can you explain how to prevent that or shall we disable uAPSD altogether ?
-
-Is there any way to make the WILC firmware produce debug output , so we 
-can figure out what is going on "on the other side" ?
-
-Are you able to provide me (maybe off-list) some debug firmware build ?
-(or can I get firmware sources and build and debug my own WILC firmware 
-on the Cortus CPU?)
-
-I can trigger the SDIO errors even without being connected to any AP , 
-so this is something between the WILC and the SDIO host, the radio is 
-likely not involved , right ?
 
