@@ -1,51 +1,56 @@
-Return-Path: <netdev+bounces-145564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27A2B9CFDEC
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 11:14:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061A29CFDF3
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 11:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DCA7B21F33
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:14:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EF0E1F25200
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA805196D8F;
-	Sat, 16 Nov 2024 10:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="E2FeZq3A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8EC194C6A;
+	Sat, 16 Nov 2024 10:16:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from forward500a.mail.yandex.net (forward500a.mail.yandex.net [178.154.239.80])
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157761922E7;
-	Sat, 16 Nov 2024 10:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD3918A931;
+	Sat, 16 Nov 2024 10:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731752046; cv=none; b=PN+aKVBDvvfCECoIYBgjdFqcB/TirC4fT1xFIv2p/Zv1OnrDiGkOqY06mkQP1P1x3Cxdgbk8R2gZmAyHaVVPT97rO73F4aOiDrW1NceN9l5wiIdidI+fM3UjNBBzRiwjps8gFgmW7AtjneOrTstYfJh2gdVdak+SQme5GyErfR4=
+	t=1731752177; cv=none; b=Zo7UWgml7pLX7BQeNs8oNw29zEOriSU/7JypmK2vEKCXJBxBGeVncJGSNBDkSjr6i3ZUO/s9Faia3sVmUS3DAgv6eQnNTO/F4OyDyMMCCYCUJMXu9T7XUPbivG/vVMU/2XPw4lp1nSym5k0xpAPr65kXX+VQrKt3lzi+nJbs+XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731752046; c=relaxed/simple;
-	bh=rP4Id0o0pjix2RzsAbumbbP3O59EsvcAAPXhyma6SY4=;
+	s=arc-20240116; t=1731752177; c=relaxed/simple;
+	bh=xvKhI7eui1Yw8gXdp7bI1owqDpZN6TrHmiGbb45pqJ0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mevHAqhEyERp14beDP7PO0Ra76ftZ2ZUe+VdO4XAk5buadVg3xTzlrvAJzDBEJyi1ktZpSrFgnyDi/RLVcwKHUIvqAnzwykgtGNru5atN0FaQyHTZ/Rm8S+NJE+Fl+LJoM6Wgb4LcqHl3wuK0Vyi5WA0wzrYja+yDTpj6+lMd7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=E2FeZq3A; arc=none smtp.client-ip=178.154.239.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net [IPv6:2a02:6b8:c15:2e15:0:640:bcf8:0])
-	by forward500a.mail.yandex.net (Yandex) with ESMTPS id 987A260EAA;
-	Sat, 16 Nov 2024 13:13:54 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id pDLvORJOqGk0-tARlOAXu;
-	Sat, 16 Nov 2024 13:13:54 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1731752034; bh=B9MSS2AhSbOOyHxFwscTN2r1cPygHowIvt4HpFX2vWg=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=E2FeZq3A8fApLcsUg8zl5lqLQzQyJ7cjP2vN4b2+iHaVLaCXyMyjGTJdmLhUFa5eJ
-	 PX7YjQ0V912wqcGHoy6m/0XJB8yh1GnniwU6wwziHvZksUMtoYV6+Kb2hCX7p/cEWy
-	 xX6tWoFq9lANHnHCmh095QzppqTKpe0zDZY9SKBM=
-Authentication-Results: mail-nwsmtp-smtp-production-main-84.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <0abb6630-f431-4f71-beb2-b8ac24757c81@yandex.ru>
-Date: Sat, 16 Nov 2024 13:13:51 +0300
+	 In-Reply-To:Content-Type; b=cit7E4C3NnQR+weyIHHYedNvbccJwn9Dnszuk46j9yoI4ztnstbRURqF6FrHeLiTot3W6QwmyMzHc+sXG4EA9IJv+dL0qXAmYmyTBpluNJ4J4apH+wML00SB2zyykIp3v4GtMYE9TBF9j7Ih3FvRIuMzq47Tu/Xq4hwgVEK68nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4Xr8tQ0Lwzz9sSp;
+	Sat, 16 Nov 2024 11:16:14 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ChPZcymudP6k; Sat, 16 Nov 2024 11:16:13 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4Xr8tP62LJz9sSm;
+	Sat, 16 Nov 2024 11:16:13 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id AD7A98B7A0;
+	Sat, 16 Nov 2024 11:16:13 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id 2lYwjZXCjNX7; Sat, 16 Nov 2024 11:16:13 +0100 (CET)
+Received: from [192.168.232.159] (POS169858.IDSI0.si.c-s.fr [192.168.232.159])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 159E18B763;
+	Sat, 16 Nov 2024 11:16:10 +0100 (CET)
+Message-ID: <cbca5f57-bc29-4d3e-a009-8ac3f5d38600@csgroup.eu>
+Date: Sat, 16 Nov 2024 11:16:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,30 +58,171 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/unix: pass pidfd flags via SCM_PIDFD cmsg
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: almasrymina@google.com, asml.silence@gmail.com, axboe@kernel.dk,
- brauner@kernel.org, cyphar@cyphar.com, davem@davemloft.net,
- edumazet@google.com, gouhao@uniontech.com, horms@kernel.org,
- kees@kernel.org, krisman@suse.de, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, mhal@rbox.co,
- netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com,
- quic_abchauha@quicinc.com, shuah@kernel.org, tandersen@netflix.com,
- viro@zeniv.linux.org.uk, willemb@google.com
-References: <20241114091909.3552288-1-stsp2@yandex.ru>
- <20241116011038.94912-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: stsp <stsp2@yandex.ru>
-In-Reply-To: <20241116011038.94912-1-kuniyu@amazon.com>
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Lucas Stach <l.stach@pengutronix.de>,
+ Russell King <linux+etnaviv@armlinux.org.uk>,
+ Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-16.11.2024 04:10, Kuniyuki Iwashima пишет:
->> [PATCH v2] net/unix: pass pidfd flags via SCM_PIDFD cmsg
-> Please specify the target tree; net for fixes, net-next for others.
-> https://www.kernel.org/doc/html/v6.11/process/maintainer-netdev.html
->
->    [PATCH net-next v3] af_unix: pass ...
-Thanks for the link and the hints!
-All done.
+
+
+Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
+> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+> 
+> This is a series that follows up on my previous series to introduce
+> secs_to_jiffies() and convert a few initial users.[1] In the review for
+> that series, Anna-Maria requested converting other users with
+> Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
+> that use the multiply pattern of either of:
+> - msecs_to_jiffies(N*1000), or
+> - msecs_to_jiffies(N*MSEC_PER_SEC)
+
+You should provide a reference to the accepted commit that adds 
+secs_to_jiffies:
+
+Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()")
+
+> 
+> The entire conversion is made with Coccinelle in the script added in
+> patch 2. Some changes suggested by Coccinelle have been deferred to
+> later parts that will address other possible variant patterns.
+> 
+> CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> 
+> [1] https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20241030-open-coded-timeouts-v3-0-9ba123facf88%40linux.microsoft.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C121622b159564a010cac08dd05bc32da%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638673028056187739%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=oW04hGIpfjRo8qcX0GaGdHE1xiApgoOtgAuWQXFgWR4%3D&reserved=0
+> [2] https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F8734kngfni.fsf%40somnus%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C121622b159564a010cac08dd05bc32da%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638673028056211741%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=UDn89U6oUNFiRj3K5fvNEIuiwmwEGfJ2XhPn43z8%2BhA%3D&reserved=0
+> 
+> ---
+> Changes in v2:
+> - EDITME: describe what is new in this series revision.
+> - EDITME: use bulletpoints and terse descriptions.
+> - Link to v1: https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fr%2F20241115-converge-secs-to-jiffies-v1-0-19aadc34941b%40linux.microsoft.com&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C121622b159564a010cac08dd05bc32da%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638673028056225723%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=reWzZOiSyn%2FA5qxcXAoUqNGedJ1K%2FM%2BuCgEKwXusuU8%3D&reserved=0
+> 
+> ---
+> Easwar Hariharan (21):
+>        netfilter: conntrack: Cleanup timeout definitions
+>        coccinelle: misc: Add secs_to_jiffies script
+>        arm: pxa: Convert timeouts to use secs_to_jiffies()
+>        s390: kernel: Convert timeouts to use secs_to_jiffies()
+>        powerpc/papr_scm: Convert timeouts to secs_to_jiffies()
+>        mm: kmemleak: Convert timeouts to secs_to_jiffies()
+>        accel/habanalabs: Convert timeouts to secs_to_jiffies()
+>        drm/xe: Convert timeout to secs_to_jiffies()
+>        drm/etnaviv: Convert timeouts to secs_to_jiffies()
+>        scsi: lpfc: Convert timeouts to secs_to_jiffies()
+>        scsi: arcmsr: Convert timeouts to secs_to_jiffies()
+>        scsi: pm8001: Convert timeouts to secs_to_jiffies()
+>        xen/blkback: Convert timeouts to secs_to_jiffies()
+>        gve: Convert timeouts to secs_to_jiffies()
+>        wifi: ath11k: Convert timeouts to secs_to_jiffies()
+>        Bluetooth: MGMT: Convert timeouts to secs_to_jiffies()
+>        staging: vc04_services: Convert timeouts to secs_to_jiffies()
+>        ceph: Convert timeouts to secs_to_jiffies()
+>        livepatch: Convert timeouts to secs_to_jiffies()
+>        ALSA: line6: Convert timeouts to secs_to_jiffies()
+>        nfp: Convert timeouts to secs_to_jiffies()
+> 
+>   arch/arm/mach-pxa/sharpsl_pm.c                      |  6 +++---
+>   arch/powerpc/platforms/pseries/papr_scm.c           |  2 +-
+>   arch/s390/kernel/lgr.c                              |  3 ++-
+>   arch/s390/kernel/time.c                             |  4 ++--
+>   arch/s390/kernel/topology.c                         |  2 +-
+>   drivers/accel/habanalabs/common/device.c            |  2 +-
+>   drivers/accel/habanalabs/common/habanalabs_drv.c    |  3 +--
+>   drivers/block/xen-blkback/blkback.c                 |  2 +-
+>   drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c            |  2 +-
+>   drivers/gpu/drm/xe/xe_device.c                      |  2 +-
+>   drivers/net/ethernet/google/gve/gve_tx_dqo.c        |  6 ++----
+>   drivers/net/ethernet/netronome/nfp/nfp_net_common.c |  2 +-
+>   drivers/net/wireless/ath/ath11k/debugfs.c           |  2 +-
+>   drivers/scsi/arcmsr/arcmsr_hba.c                    |  2 +-
+>   drivers/scsi/lpfc/lpfc_init.c                       | 18 +++++++++---------
+>   drivers/scsi/lpfc/lpfc_nportdisc.c                  |  8 ++++----
+>   drivers/scsi/lpfc/lpfc_nvme.c                       |  2 +-
+>   drivers/scsi/lpfc/lpfc_sli.c                        |  4 ++--
+>   drivers/scsi/lpfc/lpfc_vmid.c                       |  2 +-
+>   drivers/scsi/pm8001/pm8001_init.c                   |  2 +-
+>   .../vc04_services/bcm2835-audio/bcm2835-vchiq.c     |  2 +-
+>   fs/ceph/quota.c                                     |  2 +-
+>   mm/kmemleak.c                                       |  4 ++--
+>   net/bluetooth/mgmt.c                                |  2 +-
+>   net/netfilter/nf_conntrack_proto_sctp.c             | 21 ++++++++-------------
+>   samples/livepatch/livepatch-callbacks-busymod.c     |  2 +-
+>   samples/livepatch/livepatch-shadow-fix1.c           |  2 +-
+>   samples/livepatch/livepatch-shadow-mod.c            | 10 +++++-----
+>   scripts/coccinelle/misc/secs_to_jiffies.cocci       | 21 +++++++++++++++++++++
+>   sound/usb/line6/toneport.c                          |  2 +-
+>   30 files changed, 79 insertions(+), 65 deletions(-)
+> ---
+> base-commit: 2d5404caa8c7bb5c4e0435f94b28834ae5456623
+> change-id: 20241112-converge-secs-to-jiffies-d99d1016bd11
+> 
+> Best regards,
+> --
+> Easwar Hariharan <eahariha@linux.microsoft.com>
+> 
 
