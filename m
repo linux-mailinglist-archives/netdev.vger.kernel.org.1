@@ -1,214 +1,125 @@
-Return-Path: <netdev+bounces-145555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5376F9CFD38
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 09:16:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CE29CFD73
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:25:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD6D62836F5
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 08:16:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C53E9B21B6B
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 09:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FF91925BA;
-	Sat, 16 Nov 2024 08:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3B5191F7C;
+	Sat, 16 Nov 2024 09:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="UntmjAAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1620618C004
-	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 08:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059194C8F;
+	Sat, 16 Nov 2024 09:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731744989; cv=none; b=Yb8jwpl21zwxReerzKWbsdB8H/NKCESs9B3asAn2h3cJBHQQsJxQ4PJQjo5YYzOL+K9D5irnL3KSmV+RAlcvZcN+a1ciiOV8A/cY5lH4q8XBr367VFjlgLO+P5CZPSsRO8geVO7dwwS8IiHlJTnYceaQyPNDQzs7PbB9zNNW19E=
+	t=1731749126; cv=none; b=S3lJM87W3nCGuG376Lo/Z+8XB0wxWRd+0vY4Fc0sYijfVAvQIqGWoBHpHFWmzp8R0eXEq6n8K70NjXSw7hkzYZysR2buK+SkVEdnWDbUrfH3IgJAnjlmg9OSWn3UHz6HyfWIovlNm6vzhW4Z+YyyM6oa+fZAo2gmQppmGwwScis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731744989; c=relaxed/simple;
-	bh=NdCNRt5hseY7XgSrFhM3rvJkKWMJFpMnTxgzT+R6vHA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uIziGbhT7SavRcZ68dTe+dx06AwLh2a7JIf1eL+QX8o0T9lpATDr/nkFc5Yuv5IpNlmE86JNr7cqpaUuKcFztNq0c4qOJ7fQUfqvCz+WySSOEB//VRJO8T+CCOHuR/qiw+zLeHrMqrpQSTcUW4CFNDZBfYULy3yCexhnbDYUF2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a71d04c76dso17108365ab.3
-        for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 00:16:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731744987; x=1732349787;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2jbckV7ux3lzXJSR7JR4BmQDcEyddTRVjQlXOwEJaVI=;
-        b=soq0G31xqNKw6rU+tNHHGiDgSgG580uhHFG5+QxrO1ps+Y5sOxmT1I4lFXcy7ORvd/
-         jW/y4R9hzOSWKAS6hNLLGVQ+DOYNaCgISgWLdR+YjVi4V+sFUxN0H6JXDiBW5VoaRC4u
-         Kcsy8ybqOheEo5fSj2Lf969ey7Xj4uf4h4hDUUv2BgUiLaXNVESRnHGeZ+6QaUKTHuWB
-         5JBBb/c056wMgc9zDbnLmvprBwK7y4HQIBfrlON14ywmzuLKXOSpciNmNtnHtDKO0kL+
-         GHdTqxGv27LjIGMJnhfIpasfUfKQmQjpXjzuD1EKitfPim9ayg+HzSdwXrV9V9ihyR8I
-         2zAg==
-X-Forwarded-Encrypted: i=1; AJvYcCWYsvTuC/GpEDi1S/l8MRK4yqIKQ7KOBJder/YspXHZ24oORuV8FWWdCVgf4aENr1DkKo5mcDs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtFmoAwBRVXIa45Pgv5JZp+ZF9YvB2onJ/wtXdlb4Q1SSHjEZV
-	jC1UUb23+xqof7L1QhI66jx7Bn5gdLC8bKOV8TDhkAybcc1+62jdhYpX2IowDLd751PKMXJypaf
-	DwwCsIkXZuq9/wOxztkKXTkob8el7vv6zFuNoIrehG07GPpOtXpTsYbo=
-X-Google-Smtp-Source: AGHT+IH9L6VPPkxwi3Qe5NdR2HEfdsN8Fets2wPPjEmFamGj7SXwc73uB8k38B1TeZwK9V74LE9ui4l4Am0DBHkuzPYYHMdszb70
+	s=arc-20240116; t=1731749126; c=relaxed/simple;
+	bh=Zk1O9SUr1w34Gb7epIOzlc9m2eqC/jwsnWdOWs97jTQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZHoinpFHwQAkMfMZJV8mAESvcafSI+r2b6bXzhGn7O3U2U+wTF7kATZFTLBZ2EIHorQVvm+2gOCd2K1RnTANfgP9mj0d67I60+IrrKUHc4ezKYSMptsRdo9ubS+5UNQ1D6nXRgIl4TLao6v2SJuwPNDPjG3MvNbWtyZ+l2Lh7kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=UntmjAAj; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tCF38-00AKCl-Qn; Sat, 16 Nov 2024 10:25:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=xVQ7NElMWJv2muZgQTJ/fGMoxQ9I1cEMsg3js05cbQM=; b=UntmjAAj/s8OVVjhQdjCHmGnTa
+	KsduCeN6XnUcn/2Jv1hYKJ2Kud6YUl33f3jtzz0tQ3i/g/Q24hycj1HV28eUqhik9L118uRhuhHiq
+	jBH0YZLRR6HqBD1q4+utGTaCy4PDzckHsGV/Z5BvKUbHAMCIpzpIPv3zSlR0+PtmNP+I1hqihjy4i
+	UU+iXTFzh9iOuhOa/WODf0e5DMqxXuoGFvUKA9JKCfWE8Rbx0PymmiXlSWr8EUh6JHD++UusmD04G
+	SuSSK4ZTYu8cjbG+ZlT7BwyePtMcDd078Z6/4ULRF9iVvcyWt5tDLdZCJ/uctJX/xGlPWpCPqZH5l
+	W4pYdgog==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tCF36-0000rQ-G9; Sat, 16 Nov 2024 10:25:00 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tCF33-00GPSH-Ma; Sat, 16 Nov 2024 10:24:57 +0100
+Message-ID: <368a3808-f774-4aaa-9658-bf19db891f8f@rbox.co>
+Date: Sat, 16 Nov 2024 10:24:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b47:b0:3a0:4d1f:519c with SMTP id
- e9e14a558f8ab-3a747ff8c92mr58797555ab.3.1731744987352; Sat, 16 Nov 2024
- 00:16:27 -0800 (PST)
-Date: Sat, 16 Nov 2024 00:16:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <673854db.050a0220.85a0.0011.GAE@google.com>
-Subject: [syzbot] [net?] WARNING: suspicious RCU usage in dev_deactivate
-From: syzbot <syzbot+8a65ac5be396817eefb3@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/4] llc: Improve setsockopt() handling of
+ malformed user input
+To: David Wei <dw@davidwei.uk>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
+References: <20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co>
+ <20241115-sockptr-copy-fixes-v2-2-9b1254c18b7a@rbox.co>
+ <84e5987e-ff03-4fab-a042-679f76f341e9@davidwei.uk>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <84e5987e-ff03-4fab-a042-679f76f341e9@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 11/16/24 01:59, David Wei wrote:
+> On 2024-11-15 05:21, Michal Luczaj wrote:
+>> copy_from_sockptr()'s non-zero result represents the number of bytes that
+>> could not be copied. Turn that into EFAULT.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+>>  net/llc/af_llc.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+>> index 4eb52add7103b0f83d6fe7318abf1d1af533d254..711c8a7a423f1cf1b03e684a6e23c8eefbab830f 100644
+>> --- a/net/llc/af_llc.c
+>> +++ b/net/llc/af_llc.c
+>> @@ -1096,12 +1096,12 @@ static int llc_ui_setsockopt(struct socket *sock, int level, int optname,
+>>  	int rc = -EINVAL;
+>>  
+>>  	lock_sock(sk);
+>> -	if (unlikely(level != SOL_LLC || optlen != sizeof(int)))
+>> +	if (unlikely(level != SOL_LLC || optlen != sizeof(opt)))
+>>  		goto out;
+>> -	rc = copy_from_sockptr(&opt, optval, sizeof(opt));
+>> -	if (rc)
+>> +	if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
+>> +		rc = -EFAULT;
+>>  		goto out;
+>> -	rc = -EINVAL;
+>> +	}
+>>  	switch (optname) {
+>>  	case LLC_OPT_RETRY:
+>>  		if (opt > LLC_OPT_MAX_RETRY)
+>>
+> 
+> Can copy_from_sockptr() be deprecated here in favour of
+> copy_safe_from_sockptr()?
 
-syzbot found the following issue on:
+Yeah, good point. I'll wait a bit and send v3.
 
-HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1219335f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=327b6119dd928cbc
-dashboard link: https://syzkaller.appspot.com/bug?extid=8a65ac5be396817eefb3
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Thanks!
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-2d5404ca.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1bbbfa50cb5f/vmlinux-2d5404ca.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a5bcdede1c8a/bzImage-2d5404ca.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8a65ac5be396817eefb3@syzkaller.appspotmail.com
-
-=============================
-WARNING: suspicious RCU usage
-6.12.0-rc7-syzkaller #0 Not tainted
------------------------------
-net/sched/sch_generic.c:1290 suspicious rcu_dereference_protected() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-3 locks held by kworker/u32:18/10870:
- #0: ffff888046b42148 ((wq_completion)bond0#22){+.+.}-{0:0}, at: process_one_work+0x129b/0x1ba0 kernel/workqueue.c:3204
- #1: ffffc90004557d80 ((work_completion)(&(&bond->mii_work)->work)){+.+.}-{0:0}, at: process_one_work+0x921/0x1ba0 kernel/workqueue.c:3205
- #2: ffffffff8e1b8340 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #2: ffffffff8e1b8340 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #2: ffffffff8e1b8340 (rcu_read_lock){....}-{1:2}, at: bond_mii_monitor+0x140/0x2d90 drivers/net/bonding/bond_main.c:2937
-stack backtrace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x210/0x3c0 kernel/locking/lockdep.c:6821
- dev_deactivate_queue+0x167/0x190 net/sched/sch_generic.c:1290
- netdev_for_each_tx_queue include/linux/netdevice.h:2504 [inline]
- dev_deactivate_many+0xe7/0xb20 net/sched/sch_generic.c:1363
- dev_deactivate+0xf9/0x1c0 net/sched/sch_generic.c:1403
- bond_miimon_inspect drivers/net/bonding/bond_main.c:2717 [inline]
- bond_mii_monitor+0x3c1/0x2d90 drivers/net/bonding/bond_main.c:2939
------------------------------
-include/linux/rtnetlink.h:100 suspicious rcu_dereference_protected() usage!
-other info that might help us debug this:
-
-rcu_scheduler_active = 2, debug_locks = 1
-
-stack backtrace:
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- dev_deactivate+0xf9/0x1c0 net/sched/sch_generic.c:1403
- bond_check_dev_link+0x197/0x490 drivers/net/bonding/bond_main.c:873
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- </TASK>
-RCU nest depth: 1, expected: 0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- dev_deactivate_many+0x2a1/0xb20 net/sched/sch_generic.c:1377
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-3 locks held by kworker/u32:18/10870:
- #0: ffff888046b42148 ((wq_completion)bond0#22){+.+.}-{0:0}, at: process_one_work+0x129b/0x1ba0 kernel/workqueue.c:3204
-
-stack backtrace:
-Tainted: [W]=WARN
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x210/0x3c0 kernel/locking/lockdep.c:6821
- dev_deactivate+0xf9/0x1c0 net/sched/sch_generic.c:1403
- ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:62
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-6.12.0-rc7-syzkaller #0 Tainted: G        W         
------------------------------
-other info that might help us debug this:
-context-{4:4}
-stack backtrace:
-Workqueue: bond0 bond_mii_monitor
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5825
- synchronize_rcu_expedited+0x290/0x450 kernel/rcu/tree_exp.h:976
- synchronize_net+0x3e/0x60 net/core/dev.c:11286
- ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:62
- bond_check_dev_link+0x197/0x490 drivers/net/bonding/bond_main.c:873
- bond_miimon_inspect drivers/net/bonding/bond_main.c:2717 [inline]
- bond_mii_monitor+0x3c1/0x2d90 drivers/net/bonding/bond_main.c:2939
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 10870 at kernel/rcu/tree_plugin.h:331 rcu_note_context_switch+0xc5c/0x1ae0 kernel/rcu/tree_plugin.h:331
-Tainted: [W]=WARN
-RSP: 0018:ffffc900045573b0 EFLAGS: 00010086
-RDX: ffff888026c3c880 RSI: ffffffff814e6e86 RDI: 0000000000000001
-R10: 0000000000000000 R11: 000000002d2d2d2d R12: ffff888026c3c880
-CR2: 00007fd5d2467d60 CR3: 0000000030df0000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- mutex_optimistic_spin kernel/locking/mutex.c:510 [inline]
- __mutex_lock_common kernel/locking/mutex.c:612 [inline]
- __mutex_lock+0x81e/0x9c0 kernel/locking/mutex.c:752
- synchronize_rcu_expedited+0x290/0x450 kernel/rcu/tree_exp.h:976
- dev_deactivate_many+0x2a1/0xb20 net/sched/sch_generic.c:1377
- linkwatch_sync_dev+0x181/0x210 net/core/link_watch.c:263
- ethtool_op_get_link+0x1d/0x70 net/ethtool/ioctl.c:62
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
