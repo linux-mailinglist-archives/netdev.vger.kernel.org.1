@@ -1,249 +1,464 @@
-Return-Path: <netdev+bounces-145561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FEC79CFDD0
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 11:11:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F67A9CFDD9
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 11:12:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 810E22817CC
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:11:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6616B29186
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 10:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCB61957E9;
-	Sat, 16 Nov 2024 10:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F31195985;
+	Sat, 16 Nov 2024 10:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="jfnnNyII"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [178.154.239.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0FF192B77;
-	Sat, 16 Nov 2024 10:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A6E18FC7E;
+	Sat, 16 Nov 2024 10:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731751862; cv=none; b=byE3vDuZxG/AvnPfZLsBAxnDm3kx2SlaMcJwMfyNAMCsvXxHjkOL5cCJVLG2hROiNmJNMgSk1SUrOsP1RkMIQmxAVpp+UoFItGE2NkeAOXTpjuLKYQ/EPR5wvPQEU3OSa1v8lkKzLmLhjV44hN0fQKHA0pKPI8qzC6UHP4D60CE=
+	t=1731751946; cv=none; b=rS7kgaxp1DqTwzou37KGqK9jdwIs4yoKGPYjUZnCY6khD514n632urKePQqphxA9k/WxBK2cDBnUA+pDEzIN6smGR4lms9Q0++4uwm5iZho2n6RsaifmL+UaEezQL3bkH5+PE4vxVyE8Va1Y5M7Z21RWsCB4hWUFyd/VrA3cWR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731751862; c=relaxed/simple;
-	bh=xksNnw+gkMp5XjS+cpaBCLtGghYgnvoCGMV+G6vSmdk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VWc/gT0u7Bs5Qm46shG5suhjdrgILtCz/Cq3O0jsUZdz21wIx3koDtbdXkWDLEXMUJwVcVa7J1vv1134UNYAAnQaek/hv13k4BvgRubzVHZnt+e2tuzs65G/VY74ub3xz+exSuAYjDwtpUnVixKBYlenipZfVbW8AqHuhDeod14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Xr8mL1R16z9sSd;
-	Sat, 16 Nov 2024 11:10:58 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sS8O0LnxtKc7; Sat, 16 Nov 2024 11:10:58 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Xr8mJ5rw4z9sSb;
-	Sat, 16 Nov 2024 11:10:56 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id ABE338B7A0;
-	Sat, 16 Nov 2024 11:10:56 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id F1qWTVabQRIL; Sat, 16 Nov 2024 11:10:56 +0100 (CET)
-Received: from [192.168.232.159] (POS169858.IDSI0.si.c-s.fr [192.168.232.159])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 35D3D8B763;
-	Sat, 16 Nov 2024 11:10:53 +0100 (CET)
-Message-ID: <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu>
-Date: Sat, 16 Nov 2024 11:10:52 +0100
+	s=arc-20240116; t=1731751946; c=relaxed/simple;
+	bh=Nmdbsf9McNySzFEM2yTHtvHs02PfcIuItR0evRPhzns=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q+VI9vOWYlO6Y9kicS0WHNRu7IDi/f1mJSBDWVdDquDbjVPQdXroSQHUHxr7UGcbFr/J0aVDrTrsv0RJ/xheIL72tTy//pqQmYVNnt/o8bguC3n6IUdux1XXxnEDTgraANH8H/tSmPvTnCjGnJN2dwxjC85qN2mQIXiCNWBJH1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=jfnnNyII; arc=none smtp.client-ip=178.154.239.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:c61f:0:640:7720:0])
+	by forward102b.mail.yandex.net (Yandex) with ESMTPS id EE0F460D47;
+	Sat, 16 Nov 2024 13:12:12 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 8CLpeTIOdW20-XBxIsA31;
+	Sat, 16 Nov 2024 13:12:11 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1731751931; bh=RP9sLEO4kGBKuXKHGcZGGOS8ISqdhxAXTp7MErr7XvU=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=jfnnNyIIKr13HlV7eSqD/o2hwOgzwGbY7eL8jnwrpTe1Jf2WKL70lAHGl4vKLw0Xd
+	 bz4M+JiHxh4wfCCCdgWpmWr6AJPx9Ag32e1Hh510Nv5bIqUjGQbDnn7DYk05vv4kH9
+	 lbxRY2mTq+gFjCwmHiA9vmHh5SSDfyKopYDMNaIU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Stas Sergeev <stsp2@yandex.ru>
+To: linux-kernel@vger.kernel.org
+Cc: Stas Sergeev <stsp2@yandex.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Willem de Bruijn <willemb@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Gabriel Krisman Bertazi <krisman@suse.de>,
+	Mina Almasry <almasrymina@google.com>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Tycho Andersen <tandersen@netflix.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Gou Hao <gouhao@uniontech.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Michal Luczaj <mhal@rbox.co>,
+	Kees Cook <kees@kernel.org>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3] af_unix: pass pidfd flags via SCM_PIDFD cmsg
+Date: Sat, 16 Nov 2024 13:11:20 +0300
+Message-ID: <20241116101120.323174-1-stsp2@yandex.ru>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
- Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
- <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
- <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
- Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Lucas Stach <l.stach@pengutronix.de>,
- Russell King <linux+etnaviv@armlinux.org.uk>,
- Christian Gmeiner <christian.gmeiner@gmail.com>,
- Louis Peens <louis.peens@corigine.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Currently SCM_PIDFD cmsg cannot be sent via unix socket
+(returns -EINVAL) and SO_PASSPIDFD doesn't support flags.
+The created pidfd always has flags set to 0.
 
+This patch implements SCM_PIDFD cmsg in AF_UNIX socket, which
+can be used to send flags to SO_PASSPIDFD-enabled recipient.
 
-Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
-> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> Changes made with the following Coccinelle rules:
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
-> 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->   samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
->   samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
->   samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
->   3 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
-> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
-> --- a/samples/livepatch/livepatch-callbacks-busymod.c
-> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
-> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
->   {
->          pr_info("%s\n", __func__);
->          schedule_delayed_work(&work,
-> -               msecs_to_jiffies(1000 * 0));
-> +               secs_to_jiffies(0));
+Self-test is added for the propagation of PIDFD_NONBLOCK flag.
 
-Using secs_to_jiffies() is pointless, 0 is universal, should become 
-schedule_delayed_work(&work, 0);
+This is mainly needed for the future extensions, like eg this one:
+https://lore.kernel.org/lkml/8288a08e-448b-43c2-82dc-59f87d0d9072@yandex.ru/T/#me1237e46deba8574b77834b7704e63559ffef9cb
+where it was suggested to try solving the supplementary groups
+problem with pidfd.
 
->          return 0;
->   }
-> 
-> diff --git a/samples/livepatch/livepatch-shadow-fix1.c b/samples/livepatch/livepatch-shadow-fix1.c
-> index 6701641bf12d454a770e49abeeb0dea92560e55e..948ea1f5760fed2fa27baf478c97cf98ad5c99a8 100644
-> --- a/samples/livepatch/livepatch-shadow-fix1.c
-> +++ b/samples/livepatch/livepatch-shadow-fix1.c
-> @@ -73,7 +73,7 @@ static struct dummy *livepatch_fix1_dummy_alloc(void)
->                  return NULL;
-> 
->          d->jiffies_expire = jiffies +
-> -               msecs_to_jiffies(1000 * EXPIRE_PERIOD);
-> +               secs_to_jiffies(EXPIRE_PERIOD);
-> 
->          /*
->           * Patch: save the extra memory location into a SV_LEAK shadow
-> diff --git a/samples/livepatch/livepatch-shadow-mod.c b/samples/livepatch/livepatch-shadow-mod.c
-> index 7e753b0d2fa611524c9e2adbe02c8fa3e9b6015e..79296e6ccb119f521e86a121623855d841c9fc5e 100644
-> --- a/samples/livepatch/livepatch-shadow-mod.c
-> +++ b/samples/livepatch/livepatch-shadow-mod.c
-> @@ -102,7 +102,7 @@ static __used noinline struct dummy *dummy_alloc(void)
->                  return NULL;
-> 
->          d->jiffies_expire = jiffies +
-> -               msecs_to_jiffies(1000 * EXPIRE_PERIOD);
-> +               secs_to_jiffies(EXPIRE_PERIOD);
+Changes in v3: specify target tree in patch subject
+Changes in v2: remove flags validation in scm_pidfd_recv(), as
+  suggested by Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Should fit on a single line, avoid multiple lines when possible.
+Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
 
-> 
->          /* Oops, forgot to save leak! */
->          leak = kzalloc(sizeof(*leak), GFP_KERNEL);
-> @@ -153,7 +153,7 @@ static void alloc_work_func(struct work_struct *work)
->          mutex_unlock(&dummy_list_mutex);
-> 
->          schedule_delayed_work(&alloc_dwork,
-> -               msecs_to_jiffies(1000 * ALLOC_PERIOD));
-> +               secs_to_jiffies(ALLOC_PERIOD));
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>
+CC: Shuah Khan <shuah@kernel.org>
+CC: Christian Brauner <brauner@kernel.org>
+CC: Jens Axboe <axboe@kernel.dk>
+CC: Willem de Bruijn <willemb@google.com>
+CC: Pavel Begunkov <asml.silence@gmail.com>
+CC: Gabriel Krisman Bertazi <krisman@suse.de>
+CC: Mina Almasry <almasrymina@google.com>
+CC: Oleg Nesterov <oleg@redhat.com>
+CC: Tycho Andersen <tandersen@netflix.com>
+CC: Al Viro <viro@zeniv.linux.org.uk>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: Gou Hao <gouhao@uniontech.com>
+CC: Abhishek Chauhan <quic_abchauha@quicinc.com>
+CC: Michal Luczaj <mhal@rbox.co>
+CC: Kees Cook <kees@kernel.org>
+CC: Aleksa Sarai <cyphar@cyphar.com>
+CC: linux-kernel@vger.kernel.org
+CC: netdev@vger.kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ include/linux/pidfs.h                         |  9 +++
+ include/linux/socket.h                        |  2 +-
+ include/net/af_unix.h                         |  1 +
+ include/net/scm.h                             |  3 +-
+ kernel/pid.c                                  |  6 +-
+ net/core/scm.c                                | 14 ++++
+ net/core/sock.c                               |  1 +
+ net/unix/af_unix.c                            |  3 +
+ .../testing/selftests/net/af_unix/scm_pidfd.c | 70 +++++++++++++++++--
+ 9 files changed, 99 insertions(+), 10 deletions(-)
 
-Should fit on a single line, avoid multiple lines when possible.
+diff --git a/include/linux/pidfs.h b/include/linux/pidfs.h
+index 75bdf9807802..c4c5c1a0c2ad 100644
+--- a/include/linux/pidfs.h
++++ b/include/linux/pidfs.h
+@@ -2,7 +2,16 @@
+ #ifndef _LINUX_PID_FS_H
+ #define _LINUX_PID_FS_H
+ 
++#include <uapi/linux/pidfd.h>
++
+ struct file *pidfs_alloc_file(struct pid *pid, unsigned int flags);
+ void __init pidfs_init(void);
+ 
++static inline int pidfd_validate_flags(unsigned int flags)
++{
++	if (flags & ~(PIDFD_NONBLOCK | PIDFD_THREAD))
++		return -EINVAL;
++	return 0;
++}
++
+ #endif /* _LINUX_PID_FS_H */
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index d18cc47e89bd..ee27d391e5aa 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -178,7 +178,7 @@ static inline size_t msg_data_left(struct msghdr *msg)
+ #define	SCM_RIGHTS	0x01		/* rw: access rights (array of int) */
+ #define SCM_CREDENTIALS 0x02		/* rw: struct ucred		*/
+ #define SCM_SECURITY	0x03		/* rw: security label		*/
+-#define SCM_PIDFD	0x04		/* ro: pidfd (int)		*/
++#define SCM_PIDFD	0x04		/* r: pidfd, w: pidfd_flags (int) */
+ 
+ struct ucred {
+ 	__u32	pid;
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 63129c79b8cb..4bc197548c2f 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -62,6 +62,7 @@ struct unix_skb_parms {
+ #ifdef CONFIG_SECURITY_NETWORK
+ 	u32			secid;		/* Security ID		*/
+ #endif
++	u32			pidfd_flags;
+ 	u32			consumed;
+ } __randomize_layout;
+ 
+diff --git a/include/net/scm.h b/include/net/scm.h
+index 0d35c7c77a74..1326edcacacb 100644
+--- a/include/net/scm.h
++++ b/include/net/scm.h
+@@ -48,6 +48,7 @@ struct scm_cookie {
+ #ifdef CONFIG_SECURITY_NETWORK
+ 	u32			secid;		/* Passed security ID 	*/
+ #endif
++	u32			pidfd_flags;
+ };
+ 
+ void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm);
+@@ -154,7 +155,7 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
+ 	if (!scm->pid)
+ 		return;
+ 
+-	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
++	pidfd = pidfd_prepare(scm->pid, scm->pidfd_flags, &pidfd_file);
+ 
+ 	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
+ 		if (pidfd_file) {
+diff --git a/kernel/pid.c b/kernel/pid.c
+index 2715afb77eab..b1100ae8ea63 100644
+--- a/kernel/pid.c
++++ b/kernel/pid.c
+@@ -629,10 +629,12 @@ static int pidfd_create(struct pid *pid, unsigned int flags)
+ SYSCALL_DEFINE2(pidfd_open, pid_t, pid, unsigned int, flags)
+ {
+ 	int fd;
++	int err;
+ 	struct pid *p;
+ 
+-	if (flags & ~(PIDFD_NONBLOCK | PIDFD_THREAD))
+-		return -EINVAL;
++	err = pidfd_validate_flags(flags);
++	if (err)
++		return err;
+ 
+ 	if (pid <= 0)
+ 		return -EINVAL;
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 4f6a14babe5a..3bcdecdacd7e 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -23,6 +23,7 @@
+ #include <linux/security.h>
+ #include <linux/pid_namespace.h>
+ #include <linux/pid.h>
++#include <linux/pidfs.h>
+ #include <linux/nsproxy.h>
+ #include <linux/slab.h>
+ #include <linux/errqueue.h>
+@@ -210,6 +211,19 @@ int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
+ 			p->creds.gid = gid;
+ 			break;
+ 		}
++		case SCM_PIDFD:
++		{
++			unsigned int flags;
++
++			if (cmsg->cmsg_len != CMSG_LEN(sizeof(flags)))
++				goto error;
++			memcpy(&flags, CMSG_DATA(cmsg), sizeof(flags));
++			err = pidfd_validate_flags(flags);
++			if (err)
++				goto error;
++			p->pidfd_flags = flags;
++			break;
++		}
+ 		default:
+ 			goto error;
+ 		}
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 039be95c40cf..d1fce437c035 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2930,6 +2930,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+ 	/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
+ 	case SCM_RIGHTS:
+ 	case SCM_CREDENTIALS:
++	case SCM_PIDFD:
+ 		break;
+ 	default:
+ 		return -EINVAL;
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 001ccc55ef0f..8b19dfec0221 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1892,6 +1892,7 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
+ 	UNIXCB(skb).uid = scm->creds.uid;
+ 	UNIXCB(skb).gid = scm->creds.gid;
+ 	UNIXCB(skb).fp = NULL;
++	UNIXCB(skb).pidfd_flags = scm->pidfd_flags;
+ 	unix_get_secdata(scm, skb);
+ 	if (scm->fp && send_fds)
+ 		err = unix_attach_fds(scm, skb);
+@@ -2486,6 +2487,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
+ 	memset(&scm, 0, sizeof(scm));
+ 
+ 	scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
++	scm.pidfd_flags = UNIXCB(skb).pidfd_flags;
+ 	unix_set_secdata(&scm, skb);
+ 
+ 	if (!(flags & MSG_PEEK)) {
+@@ -2873,6 +2875,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 			   test_bit(SOCK_PASSPIDFD, &sock->flags)) {
+ 			/* Copy credentials */
+ 			scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
++			scm.pidfd_flags = UNIXCB(skb).pidfd_flags;
+ 			unix_set_secdata(&scm, skb);
+ 			check_creds = true;
+ 		}
+diff --git a/tools/testing/selftests/net/af_unix/scm_pidfd.c b/tools/testing/selftests/net/af_unix/scm_pidfd.c
+index 7e534594167e..1e70ff253a1d 100644
+--- a/tools/testing/selftests/net/af_unix/scm_pidfd.c
++++ b/tools/testing/selftests/net/af_unix/scm_pidfd.c
+@@ -5,6 +5,7 @@
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <fcntl.h>
+ #include <sys/socket.h>
+ #include <linux/socket.h>
+ #include <unistd.h>
+@@ -15,6 +16,11 @@
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ 
++/* There are problems including linux/pidfd.h, so define. */
++#ifndef PIDFD_NONBLOCK
++#define PIDFD_NONBLOCK  O_NONBLOCK
++#endif
++
+ #include "../../kselftest_harness.h"
+ 
+ #define clean_errno() (errno == 0 ? "None" : strerror(errno))
+@@ -126,7 +132,7 @@ static pid_t get_pid_from_fdinfo_file(int pidfd, const char *key, size_t keylen)
+ 	return result;
+ }
+ 
+-static int cmsg_check(int fd)
++static int cmsg_check(int fd, unsigned int pidfd_flags)
+ {
+ 	struct msghdr msg = { 0 };
+ 	struct cmsghdr *cmsg;
+@@ -136,6 +142,7 @@ static int cmsg_check(int fd)
+ 	char control[CMSG_SPACE(sizeof(struct ucred)) +
+ 		     CMSG_SPACE(sizeof(int))] = { 0 };
+ 	int *pidfd = NULL;
++	unsigned int flags;
+ 	pid_t parent_pid;
+ 	int err;
+ 
+@@ -197,6 +204,13 @@ static int cmsg_check(int fd)
+ 		return 1;
+ 	}
+ 
++	flags = fcntl(*pidfd, F_GETFL, 0);
++	flags &= ~O_ACCMODE;
++	if (flags != pidfd_flags) {
++		log_err("SCM_PIDFD flags mismatch: %x != %x", flags, pidfd_flags);
++		return 1;
++	}
++
+ 	/* pidfd from SCM_PIDFD should point to the parent process PID */
+ 	parent_pid =
+ 		get_pid_from_fdinfo_file(*pidfd, "Pid:", sizeof("Pid:") - 1);
+@@ -227,30 +241,49 @@ FIXTURE_VARIANT(scm_pidfd)
+ {
+ 	int type;
+ 	bool abstract;
++	unsigned int flags;
+ };
+ 
+ FIXTURE_VARIANT_ADD(scm_pidfd, stream_pathname)
+ {
+ 	.type = SOCK_STREAM,
+ 	.abstract = 0,
++	.flags = 0,
+ };
+ 
+ FIXTURE_VARIANT_ADD(scm_pidfd, stream_abstract)
+ {
+ 	.type = SOCK_STREAM,
+ 	.abstract = 1,
++	.flags = 0,
+ };
+ 
+ FIXTURE_VARIANT_ADD(scm_pidfd, dgram_pathname)
+ {
+ 	.type = SOCK_DGRAM,
+ 	.abstract = 0,
++	.flags = 0,
+ };
+ 
+ FIXTURE_VARIANT_ADD(scm_pidfd, dgram_abstract)
+ {
+ 	.type = SOCK_DGRAM,
+ 	.abstract = 1,
++	.flags = 0,
++};
++
++FIXTURE_VARIANT_ADD(scm_pidfd, stream_nonblock)
++{
++	.type = SOCK_STREAM,
++	.abstract = 0,
++	.flags = PIDFD_NONBLOCK,
++};
++
++FIXTURE_VARIANT_ADD(scm_pidfd, dgram_nonblock)
++{
++	.type = SOCK_DGRAM,
++	.abstract = 0,
++	.flags = PIDFD_NONBLOCK,
+ };
+ 
+ FIXTURE_SETUP(scm_pidfd)
+@@ -335,7 +368,7 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
+ 
+ 	close(self->startup_pipe[1]);
+ 
+-	if (cmsg_check(cfd)) {
++	if (cmsg_check(cfd, variant->flags)) {
+ 		log_err("cmsg_check failed");
+ 		child_die();
+ 	}
+@@ -375,6 +408,27 @@ TEST_F(scm_pidfd, test)
+ 	int err;
+ 	int pfd;
+ 	int child_status = 0;
++	char iobuf;
++	unsigned int pidfd_flags;
++	struct msghdr msg = { 0 };
++	struct cmsghdr *cmsg;
++	struct iovec io = {
++		.iov_base = &iobuf,
++		.iov_len = sizeof(iobuf)
++	};
++	union {
++		char buf[CMSG_SPACE(sizeof(pidfd_flags))];
++		struct cmsghdr align;
++	} u;
++
++	msg.msg_iov = &io;
++	msg.msg_iovlen = 1;
++	msg.msg_control = u.buf;
++	msg.msg_controllen = sizeof(u.buf);
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_PIDFD;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(pidfd_flags));
+ 
+ 	self->server = socket(AF_UNIX, variant->type, 0);
+ 	ASSERT_NE(-1, self->server);
+@@ -414,12 +468,16 @@ TEST_F(scm_pidfd, test)
+ 	close(self->startup_pipe[0]);
+ 
+ 	if (variant->type == SOCK_DGRAM) {
+-		err = sendto(pfd, "x", sizeof(char), 0, (struct sockaddr *)&self->client_addr->listen_addr, self->client_addr->addrlen);
+-		ASSERT_NE(-1, err);
+-	} else {
+-		err = send(pfd, "x", sizeof(char), 0);
++		err = connect(pfd,
++			      (struct sockaddr *)&self->client_addr->listen_addr,
++			      self->client_addr->addrlen);
+ 		ASSERT_NE(-1, err);
+ 	}
++	iobuf = 'x';
++	pidfd_flags = variant->flags;
++	memcpy(CMSG_DATA(cmsg), &pidfd_flags, sizeof(pidfd_flags));
++	err = sendmsg(pfd, &msg, 0);
++	ASSERT_NE(-1, err);
+ 
+ 	close(pfd);
+ 	waitpid(self->client_pid, &child_status, 0);
+-- 
+2.47.0
 
-
->   }
-> 
->   /*
-> @@ -185,15 +185,15 @@ static void cleanup_work_func(struct work_struct *work)
->          mutex_unlock(&dummy_list_mutex);
-> 
->          schedule_delayed_work(&cleanup_dwork,
-> -               msecs_to_jiffies(1000 * CLEANUP_PERIOD));
-> +               secs_to_jiffies(CLEANUP_PERIOD));
-
-Should fit on a single line, avoid multiple lines when possible.
-
-
->   }
-> 
->   static int livepatch_shadow_mod_init(void)
->   {
->          schedule_delayed_work(&alloc_dwork,
-> -               msecs_to_jiffies(1000 * ALLOC_PERIOD));
-> +               secs_to_jiffies(ALLOC_PERIOD));
-
-Should fit on a single line, avoid multiple lines when possible.
-
-
->          schedule_delayed_work(&cleanup_dwork,
-> -               msecs_to_jiffies(1000 * CLEANUP_PERIOD));
-> +               secs_to_jiffies(CLEANUP_PERIOD));
-
-Should fit on a single line, avoid multiple lines when possible.
-
-
-> 
->          return 0;
->   }
-> 
-> --
-> 2.34.1
-> 
 
