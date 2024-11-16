@@ -1,82 +1,152 @@
-Return-Path: <netdev+bounces-145553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51399CFD1A
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 08:58:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86F159CFD1F
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 08:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72D35287B28
-	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 07:58:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BC2F1F254CE
+	for <lists+netdev@lfdr.de>; Sat, 16 Nov 2024 07:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88E654765;
-	Sat, 16 Nov 2024 07:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B89193071;
+	Sat, 16 Nov 2024 07:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IJc9CKqx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r5iZGNuE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA09F18FC86
-	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 07:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FDE192D83
+	for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 07:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731743894; cv=none; b=N7E9lENY1s2lcq644J5wrk9gChcn8zSf1hf2yNsJbLqScnrS8+pnjNvXfkpEqwf6icy0PsFcn7a0Bb+h6X8PFweQq6yNaqeAxtHqzQi/SumaIaePhgcAgTp9N3uAQP6YNLCaYY3eNNPf5oukBwFk6AK17up/ucGOLuKK/nckiAM=
+	t=1731743977; cv=none; b=gKc9APQX38vRn+M5pSuiYPmGclqjHN8Sj1Y7JH6mieZmkHvBQL2SUh52O7qFkkz1M4Q/Yhcl2vPIxF3t/jI0Gsc/aijzBehG6Umj6mvlTDm+5cfUdA47nppuwlINXpB6ysopDkXWB3nk9zvAmvwqwpD/ZEUKUqPXwLhlS/kE66E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731743894; c=relaxed/simple;
-	bh=WBDVAdoHwfYrQuVAbgJ+ex4uYWPQ1hMBlrH8QxHygNk=;
+	s=arc-20240116; t=1731743977; c=relaxed/simple;
+	bh=syAVCylnhi0AytBImEtkvzButQ9wsAguk45yhcS0NNc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UJ4Jkvegc+1g+owCpEXjou/rCUsJw5SS9i0rpyTwqo2XL3qW+tHXUOzMN2HuA4gkW4hbB0PtSEYCxQID/eW1SIWF09mVZZindElhyx2yznYzOJ2PIqKtHBKaLFCAY/Mc+3T3YQJHmYekR4OyyJKdIpXVNcBDvuENl7R6f3k6W0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=IJc9CKqx; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4314f38d274so5097175e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 23:58:11 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=KrmPg3bCCjmCIvJ6v48VEoSgcmZtgVBpCwcWqb0jYVVtbVQwXOcKbPwKXc+X+Oti9PPdQwojaERKeuF3e9FQLAZcrYuA7vvkxhbCFknh4ZFTVo+WMyUo+DjMoQ8/1uCmvTONcBqvhLRtYDWwfAn4PdsY251ekglwqx94s3/z/b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r5iZGNuE; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-431616c23b5so14427645e9.0
+        for <netdev@vger.kernel.org>; Fri, 15 Nov 2024 23:59:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1731743890; x=1732348690; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1731743973; x=1732348773; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7xaz3JG2gQQdrg04GxLvjUYpEC9sHE7VvBHr/vi0mAA=;
-        b=IJc9CKqxoXVVbs/0K4dl1zDZ1rxhYcZirxCrs9zlayVUXaobeWYBgxhhBkktc/0T5F
-         QU2z9nhJcYWpPh8MQCbcsd4q45HJgbQTURWqZmYpL8fWx91ccrf3D7lP1JA5mWzDnJza
-         9O422oYrdRWqRa4eSoo9a8HWW5h9WPQbqSZKylWWohYw43XbK5BMkUmWvbtzi8ofDdeD
-         7CZpIVOLb8ObZLd65twsX/QZd6QiCkj349flbmQa9EX95sAHiwYUjGHG05pt6+xWVK2s
-         1mIH+89JW0mqn2Xo4kiAIRzM4Wa5YoquY6PNWvZrZVluxOeHmiG9S2b89nCaDyuFUZ/s
-         mlbg==
+        bh=xrsdExZKqTlwoTRHJD0ZdQo7yx2uU25FrNS0bU2S5+Y=;
+        b=r5iZGNuEOfNWbi26gs/0hDufWiKU9glpkrz83hfYdk20o+8yDMVRsyZ6+cPIv/oaQN
+         1kDE9R6Vr8IhLeyXsibSIWi+i5grPibUr8CgcnTKyayifBg26F0iK5NCf/Zk+pdy13Hu
+         08u3dXU0sR2s59y+fza8gG5ZMw0Hfg8Sa3w3izBxsCrCB2Hfi3yWK+5VciZPLCvYZRaJ
+         Cm3dD99wasOBV+Vb4KvuHLxcD9cr9PRrdBxQ3n8LlNaCQDaVlvqQLTJ3YxibOJsA3aud
+         mNDVaqD9+G+4jwsF6k6bmfL3lgB8UhWpAIV/7hICAk042PQXjY0vP86Sl31MhmWRTiq6
+         Ag5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731743890; x=1732348690;
+        d=1e100.net; s=20230601; t=1731743973; x=1732348773;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7xaz3JG2gQQdrg04GxLvjUYpEC9sHE7VvBHr/vi0mAA=;
-        b=rSd9XaQc7sYV3YysDuqmWz2VHJzbHEA6Bh2k4q0YPCosTHQH8v7vO/Yi7VYVNTAf4r
-         AKk/SXT/OvomTQDLhnFIG7a77KVikc6YcXlS4xnpPtC2SFq3B4WeNA8G8qUJnuRAdcCi
-         5i3smLUIXX1/bCrwR7Gb22KSm28jrHRTeRwJNN7nxiOxu0D35mGBe4BO7kkw0CPHhK0X
-         RMKFDBmoFMFWw4qP6yGMVf26J6lIOPawyD+rqMmBprpKCWj1PbXSY0ZIj7wKNVvU0Ub1
-         HZbq7Y1nJ5tWg14Mwvtgw5eUM7euo6L7GCIcVBX1FWfORyC44f8KKghVL85b3c7OT0PP
-         bdyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVG41KQ7yfSntBr3V3LRjeaQDOYJOsPhLoy3NHmgGpWm8PF8sdJMLSkUJmPzhnn0gIHAnuhbgw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRtoMgPMaVRNyGUfgVU2LoSoPCBQD4QFODneYTVy9klZo0wtyi
-	SdXGLoUaepgnQbYGgN+QpL3vLPY/OP5gaAid+KKPOziN4ayuswf1F2wjhzuv9LE=
-X-Google-Smtp-Source: AGHT+IHm97EKJ2KlifGaH5wV5M2bb/7vmN+ydN0LH33CUCn4C4y0ZLCEBpPdB4ntuSvD670VJtbcxA==
-X-Received: by 2002:a05:600c:1387:b0:42c:b508:750e with SMTP id 5b1f17b1804b1-432df742662mr52682805e9.11.1731743889853;
-        Fri, 15 Nov 2024 23:58:09 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432d4788c2asm83257185e9.0.2024.11.15.23.58.08
+        bh=xrsdExZKqTlwoTRHJD0ZdQo7yx2uU25FrNS0bU2S5+Y=;
+        b=TbtLJC/PjhKPDT1WJ3BeeoHE87thBW4Issy8FnwjFOSFCHNhaDB1h538X2htLMXo9Q
+         xFwhVPY09gHLslv9DNlT9hRXL3vUXwvVJUwZjFUwuHX2ByNWrDJBPMnF2gfZwKsgAZlZ
+         4fpMveS51rp47iI+w7ip8JGSwv05RDvE0QsX/jS3VdtbDRJuafDGKJQpkeGG37rQfSe1
+         POqV9f3D9B5KDuY4Ar6eAQDdm+YBVthXXv/EBLld85zMJn1q8txPC7CFSEAOuBBxJ3oX
+         MklUjlgB7esrEqk+I6vl6bMQflAHq4wk/eNMW1yR5MglX4/cZZnMdui9USChSKzRCoIe
+         DRxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvqvMRER6+Uf2/wdMPsS3HzZ+1+G+pt8LgWslRvkK8QAJYTvchXK0vFtxarT2L2mrvHxeDdhE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBfSCimAIYQztmiDFrYWuCclfDHFPWDUDyC6aJ4zhJkJipo8BM
+	zGHi9EtfGODmAjDcgYylI3vQbXNrxmf8nJBGZPYx3a+dxwKY3lCS6ZRV9mGHCM4=
+X-Google-Smtp-Source: AGHT+IHwPca/r8TengkDOJBkzNMy5+IC+M/DjfY5vaIp0XwfqGKX+JdkORZRtZVKPaDZkydKQ4+r2A==
+X-Received: by 2002:a05:600c:19cb:b0:431:559d:4103 with SMTP id 5b1f17b1804b1-432defe3203mr49400585e9.7.1731743973417;
+        Fri, 15 Nov 2024 23:59:33 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab806e1sm81445685e9.20.2024.11.15.23.59.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 23:58:09 -0800 (PST)
-Date: Sat, 16 Nov 2024 08:58:05 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Saeed Mahameed <saeed@kernel.org>, David Ahern <dsahern@gmail.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] bash-completion: devlink: fix port param
- name show completion
-Message-ID: <ZzhQjYrQmR5XHcLA@nanopsycho.orion>
-References: <20241115055848.2979328-1-saeed@kernel.org>
- <ZzdFZ1C1te_eEQ5P@nanopsycho.orion>
- <ZzeWcUnoUGpIgNbk@x130>
+        Fri, 15 Nov 2024 23:59:32 -0800 (PST)
+Date: Sat, 16 Nov 2024 10:59:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Easwar Hariharan <eahariha@linux.microsoft.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>,
+	Nicolas Palix <nicolas.palix@imag.fr>,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	James Smart <james.smart@broadcom.com>,
+	Dick Kennedy <dick.kennedy@broadcom.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+	Petr Mladek <pmladek@suse.com>,
+	Joe Lawrence <joe.lawrence@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Lucas Stach <l.stach@pengutronix.de>,
+	Russell King <linux+etnaviv@armlinux.org.uk>,
+	Christian Gmeiner <christian.gmeiner@gmail.com>,
+	Louis Peens <louis.peens@corigine.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
+	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org,
+	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org,
+	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org,
+	linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org,
+	oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>
+Subject: Re: [PATCH 19/22] livepatch: Convert timeouts to secs_to_jiffies()
+Message-ID: <896c656f-6d8c-4337-8464-7557c43a80ab@stanley.mountain>
+References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
+ <20241115-converge-secs-to-jiffies-v1-19-19aadc34941b@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,76 +155,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZzeWcUnoUGpIgNbk@x130>
+In-Reply-To: <20241115-converge-secs-to-jiffies-v1-19-19aadc34941b@linux.microsoft.com>
 
-Fri, Nov 15, 2024 at 07:44:01PM CET, saeedm@nvidia.com wrote:
->On 15 Nov 13:58, Jiri Pirko wrote:
->> Fri, Nov 15, 2024 at 06:58:48AM CET, saeed@kernel.org wrote:
->> > From: Saeed Mahameed <saeedm@nvidia.com>
->> > 
->> > Port param names are found with "devlink port param show", and not
->> > "devlink param show", fix that.
->> > 
->> > Port dev name can be a netdev, so find the actual port dev before
->> > querying "devlink port params show | jq '... [$dev] ...'",
->> > since "devlink port params show" doesn't return the netdev name,
->> > but the actual port dev name.
->> > 
->> > Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
->> > ---
->> > bash-completion/devlink | 11 ++++++++++-
->> > 1 file changed, 10 insertions(+), 1 deletion(-)
->> > 
->> > diff --git a/bash-completion/devlink b/bash-completion/devlink
->> > index 52dc82b3..ac5ea62c 100644
->> > --- a/bash-completion/devlink
->> > +++ b/bash-completion/devlink
->> > @@ -43,6 +43,15 @@ _devlink_direct_complete()
->> >             value=$(devlink -j dev param show 2>/dev/null \
->> >                     | jq ".param[\"$dev\"][].name")
->> >             ;;
->> > +        port_param_name)
->> > +            dev=${words[4]}
->> > +            # dev could be a port or a netdev so find the port
->> > +            portdev=$(devlink -j port show dev $dev 2>/dev/null \
->> > +                    | jq '.port as $ports | $ports | keys[] as $keys | keys[0] ')
->> > +
->> > +            value=$(devlink -j port param show 2>/dev/null \
->> 
->> As you only care about params for specific port, you should pass it as
->> cmdline option here. And you can pass netdev directly, devlink knows how
->> to handle that. If I'm not missing anything in the code, should work
->> right now.
->> 
->
->Nope doesn't work:
->
->$ devlink -j port param show mlx5_1
->Parameter name expected.
->
->$ devlink -j port param show auxiliary/mlx5_core.eth.0/65535
->Parameter name expected.
+On Fri, Nov 15, 2024 at 09:22:49PM +0000, Easwar Hariharan wrote:
+> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
+> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
+> --- a/samples/livepatch/livepatch-callbacks-busymod.c
+> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
+> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
+>  {
+>  	pr_info("%s\n", __func__);
+>  	schedule_delayed_work(&work,
+> -		msecs_to_jiffies(1000 * 0));
+> +		secs_to_jiffies(0));
 
-Okay, so fix it :)
+Better to just call schedule_delayed_work(&work, 0);
 
+>  	return 0;
+>  }
 
->
->> 
->> > +                    | jq ".param[$portdev][].name")
->> > +            ;;
->> >         port)
->> >             value=$(devlink -j port show 2>/dev/null \
->> >                     | jq '.port as $ports | $ports | keys[] as $key
->> > @@ -401,7 +410,7 @@ _devlink_port_param()
->> >             return
->> >             ;;
->> >         6)
->> > -            _devlink_direct_complete "param_name"
->> > +            _devlink_direct_complete "port_param_name"
->> >             return
->> >             ;;
->> >     esac
->> > --
->> > 2.47.0
->> > 
+regards,
+dan carpenter
 
