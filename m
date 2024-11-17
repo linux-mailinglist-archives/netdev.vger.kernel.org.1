@@ -1,289 +1,263 @@
-Return-Path: <netdev+bounces-145673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43F79D05EA
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:50:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F1C9D05EB
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:51:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95FA928231E
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 20:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24C891F2183A
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 20:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D7E1DBB35;
-	Sun, 17 Nov 2024 20:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FFD1DC184;
+	Sun, 17 Nov 2024 20:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YUigP6rx"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="in800z8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC83917BB6;
-	Sun, 17 Nov 2024 20:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731876633; cv=none; b=okO138YWmyUwn+LQsYN7uvPGjKU8Fn7n1CvrGpQB/AN6+I33jz6hmDLhk2ydVYQ0vVNQaq4pU/ASanUfovr6BKM6Pk93JV8YgZ165kKscHtSQRoTmhfXnVW2PiALaXng6LOxxNuH7cXIk9rj8xCJtUbyMv42G7eQiruo+TwAOok=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731876633; c=relaxed/simple;
-	bh=kyPpFDnqb7LNLHad0cPKGNxRKPn1cSwcwxAQ9dtIRsQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nd4j2JRMn7eUsnFeDHxdu7pCV3NfFF3Hzkn+TxN0Kq2B1yvHelFrufkM7nTei5MhSUJmmlRAbMf2d+om5ZwZ2Wb8cdgMu5vbhAI+HjvfVrQOjPQaXA5aXX+rRnz7iSTb1vvb9gn6Vko32ejwFu4tKlYi73mX4aDZyzsXDd0/fOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=YUigP6rx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 875F3C4CECD;
-	Sun, 17 Nov 2024 20:50:31 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YUigP6rx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1731876630;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gSCBJB8RborMmFQHp8hbCfO+7ERT5vDowmtQ5/z6cJs=;
-	b=YUigP6rxN++G05bDuSZJJLqTyKWw57RsxRvQfsIHK+TBOAOCfODmQJAqEP06ptQS2XQhZK
-	LPD+ldNeclzJw2jAJ+8kJ2PJJpEi1cTn7bvi5ubzV+Dol7SAHMzQcrE2YPAi+nfFyO7lUa
-	zqX4f+pe6aJ9ovR8LHIdIvgLZtJlr5c=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 48d6b135 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Sun, 17 Nov 2024 20:50:29 +0000 (UTC)
-Date: Sun, 17 Nov 2024 21:50:27 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Jordan Rife <jrife@google.com>
-Cc: wireguard@lists.zx2c4.com, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] wireguard: allowedips: Add
- WGALLOWEDIP_F_REMOVE_ME flag
-Message-ID: <ZzpXE8GlhjDYTa5l@zx2c4.com>
-References: <20240905200551.4099064-1-jrife@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA72D17BB6
+	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 20:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731876712; cv=fail; b=FHAur2rQl/T/rTBg9A2xHm5USe3zC71YffRQKjPx1UXiF5LaYp+TV4+hLy7lzRveN3Ngg8eNk0Ov0cZ5wsGiNp1eHRTjIwodAnGUP2uQYYl6YGh8oBJTKPyxi8V22YtOSkX+TkSUkEWAIhJCvdsyaAessO6MS/0QBZFBdp8dDLE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731876712; c=relaxed/simple;
+	bh=ysi4MP5sMeol11Rd37b6jclpm1pPV8vNGhjw+TvLwJg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UCluBi1ZnbZ66g3/XJXFem1OUBAOgpi42XolgdH59I0LX/BmisCMSgTxS41rrWkVfj3Lb0o7o7ONBkcGEawYRCuw/Lj5YwKHtrd5RzQYWiOTD7tQGlDkxxhFBLYq3jCTewPh4q2rQrakc1cVQWUaxw7kwfZtsI1KC97Bvx5Dc3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=in800z8e; arc=fail smtp.client-ip=40.107.244.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RYjAYlkmgLpjyDnhagNopyglzDRIjmiIyNE6ZukjTDam2U3RyQ9NwRupXZ9RdRIyHLAbfDJbyjfz0ZrSNJqqHx3oDxVJJ1IXHa/9YBnT3zUqPn70kcL1HFuq4tCeDPz3BXb7gqiilqKhCqjie5lswfThzfSETP15c5Gbhdb702fy4ZCNOSNz1coKqSTOjKjjhF3Fv7DIhFZevXKDSQbLgWzEpBuqiyHdEAKzqB5Ga0dXUoAjceIEp5ae0JFkaGDfIn8I8ky8JyQ/UpqpGJhs1xrzOGU4fdhzeFKWBGqmE2CIZw2QK1xIkMUNjOZ9bTr1b13SEfEQNJEzIpxoVNoxkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rSug5B4nilrnJ3x3YObpTh9VSGBNn3JaEbFLbVcgeEY=;
+ b=bdDT0YOwSmaAGLdSMt4fix2W9AJv3mHB0+K/jIStNUMDKPPy0ou5vsij3Dt4959AgU0wHbD8FTrD8GfK6Uy9jcLWIZ7VLw5qj1oQCzePtlBHLczxY8crhS1Iu61Uo73+eglvXDv15TooObxOGTdDk4rNjyCVjgPvVxODSWX8Kgjo32nZqhPF5Z7GVBexwLbMranUxji0JzYdr+iOZUlTLFxyXRWLdf0LDe6HQCwZUiSLWkydyLd7gLQctxC7YrwIvwzKl3raTRqutKmVNt6GsVHutYdipLVay7P1zx0AcXzZ9BzuwVd+e/u+pv7Dt3Ps1F2wdwjcsliEUt0AqXV+mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rSug5B4nilrnJ3x3YObpTh9VSGBNn3JaEbFLbVcgeEY=;
+ b=in800z8ey6HNAvPEoTaneT+GCZFEURyn1qmGyuTdcFnttllPyDXGGyd8vE5SwIbk3Ydo17BXf06JVcYNKSfTT2FlsJwEvl8V05hq7i7nt5/OpNflagCgvLB95DHagV3ficFmWsIlhAd6jJ2+QKq1f21k8sdKv2/HIwSUWedcXrGH+RXw2UPg0prM7+GPF6tzANVdJBw/p4oaldP7HYCeRdw6DC1gbq09Iws21YbOSLRjv9X3M4SkFvNk/SY85whlKAteLTrV7ToBe3KM7apA3Dh+//KeqfHArDhoyd4O9htjR8/LdPSxoq6sst2zDn4f1A/xo1B+HtrYqRMno4r/kA==
+Received: from DS7PR03CA0093.namprd03.prod.outlook.com (2603:10b6:5:3b7::8) by
+ PH8PR12MB7424.namprd12.prod.outlook.com (2603:10b6:510:228::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.20; Sun, 17 Nov
+ 2024 20:51:47 +0000
+Received: from DS2PEPF0000343F.namprd02.prod.outlook.com
+ (2603:10b6:5:3b7:cafe::e9) by DS7PR03CA0093.outlook.office365.com
+ (2603:10b6:5:3b7::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23 via Frontend
+ Transport; Sun, 17 Nov 2024 20:51:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS2PEPF0000343F.mail.protection.outlook.com (10.167.18.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.14 via Frontend Transport; Sun, 17 Nov 2024 20:51:46 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 17 Nov
+ 2024 12:51:45 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 17 Nov 2024 12:51:45 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 17 Nov 2024 12:51:42 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
+	<jiri@resnulli.us>, Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next V3 0/8] net/mlx5: ConnectX-8 SW Steering + Rate management on traffic classes
+Date: Sun, 17 Nov 2024 22:50:37 +0200
+Message-ID: <20241117205046.736499-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240905200551.4099064-1-jrife@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF0000343F:EE_|PH8PR12MB7424:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a7084fa-aae7-4d8a-57e7-08dd0749a692
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?elV2c3VzV3ZobnZYV3NYLzc5QXNnSmpkU01tZVhhT0tRdUkwUkExNkdMRHpM?=
+ =?utf-8?B?L0Jhakd3MXAzMmZSaVRxK1J1S0o2QUswb090Z0t1aVk4VWxGeC9kU2p5SDNB?=
+ =?utf-8?B?dk5GNFlzcWxiNGk4Q3NOVS9Mc3V0VUlPcW0xOWFaTE5Va0lCLzBSYi9XdTd5?=
+ =?utf-8?B?WWhIM3RMZXpZcHpFZEFjUnVvUmJKRHRQTVcvd2p5Z2U3a0sxbFVteXRpMkJk?=
+ =?utf-8?B?YlBtc0FuU3lTcjBZYmNMcnFVdFZGdEkwZzd5SGNVWm5CVlN2Qm5ubDB3R01J?=
+ =?utf-8?B?TXpycEc5SEYrazlBVFRIVkFudjlxaDViOU8zTVR6cEdCZUhRQkFTcmlVZ3Ix?=
+ =?utf-8?B?cTZEYmVyZkt0amc4cVZneGM2QndrekF0bmVOSU1PRzNuMCtWRW5TN1ZIZDUx?=
+ =?utf-8?B?MEFlVzA5MmkxWFhQTHRkL2tDWFZvNDlJOHlFaU1ZTmRBa3RHcGJ4c1Q2MU0r?=
+ =?utf-8?B?S1hRR2lpOUt2TUhsZk5sRlJHOHpBZzBlM0d4VFAvY2pjeU1rK0dBU0dDNVRu?=
+ =?utf-8?B?MHN3bUVVT1MydU9oSlI1ai9xQkhvRlhuOFgwdVcxRVdadnZhY0IvVHZHTkhJ?=
+ =?utf-8?B?UFdlMmlKVyt5MkhyaVVNQ2lCWHlQRmEzMFF6bnFncHVrbS9DL0RTd3ozRHFv?=
+ =?utf-8?B?QVN2c0VmME1aMmg5ZXkzanJGcDcxRWxjYmc0eVlIRHkvR0JSTW90NHhpUGww?=
+ =?utf-8?B?WlhQQkE4ZlY3Wm52cW5XaGRLZHJiVHp0SXVsU3F6Z1R4TUlJNCtUNGt2RUp3?=
+ =?utf-8?B?bW1kTjBoV29kSDFKaWhzV2VqYU9iK3VRK0U0Z3o5UXdqWCsvdlZTTlZKZk8y?=
+ =?utf-8?B?dUhUbGY3UDJxVGdqTUFUVHJDNHBYaGJOSkcrNERWRVY3NFc3bEllZ3FSTHlx?=
+ =?utf-8?B?S0MyLzhPb1VQcjMwZmpOMTRxTWp0OVloejZ5QUg4UDNUZjZhV0U2N0VtQkJs?=
+ =?utf-8?B?alFXZThvaHFNQmdva2ZENi8yc0c0Lzk0NFI3dENOdWZUYnhUV0o4QTlFdEkw?=
+ =?utf-8?B?U1JzUlVXQVZVd1hzTXRRb1k0MHpxS09pVkliR2MvTi9yOEluVzVUMlIvUzZY?=
+ =?utf-8?B?SWFZckMzam9QNDNsZlREUmJrZENTWFVBcFF0akowdmhhd2hJVXZZL05iYXBZ?=
+ =?utf-8?B?d2dIOWxlQlgxWTZWeHlzdytmckxPdlBuUG9xNUJFK3UxQTF5a1NWSWYzcWd4?=
+ =?utf-8?B?aEpkbm0rZEZ4UTc3REtJcXRyUExMK3JjaXRjOFBNVE85LzA2U0Q3UlY0N1NW?=
+ =?utf-8?B?ZUVHSkZTS1N6d2M5SnIrdXlRZ3owd2hSdk9BNjdWQy9kU3AxNEx2bndtUk40?=
+ =?utf-8?B?ZjNmY2pmeWd0VmFqS1E4L2RKeFRIWFZ3cmlzL1Riemx6aUNtb0FwOWtTeEIy?=
+ =?utf-8?B?ZzdkNlVyN0FHRXZrQTB3c3N0aVlxSVRLcXlEZEs0RG9VcXRTZzJHYURJK2Nv?=
+ =?utf-8?B?akg4Ry9ZSTZCb0c4QzZBVGNVUWdPZ0NoMTdIRlc1YkpxZE9GOXpObDA0dUF0?=
+ =?utf-8?B?Q0RaWTFkZDF3M1JMSVE3aVl0eE8wL0xYZ1BDdlhnN1crMUtIWnpodzkwNGZN?=
+ =?utf-8?B?YlhYR0VobFovMHQ1Z3poNXVlTTZvYUVCVDRJc2VjTm5QVUpvbWNETTloRG5V?=
+ =?utf-8?B?Sk1IRWJsMGNMdzluaXpEdU9Zcndtb0lxdlowTGtCSzlmMWc1K2tkdy9aZmZ5?=
+ =?utf-8?B?QlhCU3RBSTBuT1BSTko5UGNuZ1ZLN0RST2hYU3pHVk54bHJQMmhuRlJHbngx?=
+ =?utf-8?B?cEFRM2lNd2IxUm9haEsraUxvaEloODhDbGs1SmpxRlhCQUxwSVdEMFoxT0Yw?=
+ =?utf-8?B?K0VTYmhpMXNOUis5bW96SE51UGtoZDRwYXlZNFpoRnZqT2p6NzdrRjZwNzRN?=
+ =?utf-8?B?QTNjQ3lKZHBibVlDenR6YW9HQmZFVGFUeEw1Uy84S3NTdXc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2024 20:51:46.3531
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a7084fa-aae7-4d8a-57e7-08dd0749a692
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF0000343F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7424
 
-Hi Jordan,
+Hi,
 
-Sorry it's taken me a bit to look at this patch. A few notes:
+This patchset consists of two features:
+1. In patches 1-2, Itamar adds SW Steering support for ConnectX-8.
+2. Followed by patches by Carolina that add rate management support on
+traffic classes in devlink and mlx5, more details below [1].
 
-On Thu, Sep 05, 2024 at 03:05:41PM -0500, Jordan Rife wrote:
-> With the current API the only way to remove an allowed IP is to
-> completely rebuild the allowed IPs set for a peer using
-> WGPEER_F_REPLACE_ALLOWEDIPS. In other words, if my current configuration
-> is such that a peer has allowed IP IPs 192.168.0.2 and 192.168.0.3 and I
-> want to remove 192.168.0.2 the actual transition looks like this.
-> 
-> [192.168.0.2, 192.168.0.3] <-- Initial state
-> []                         <-- Step 1: Allowed IPs removed for peer
-> [192.168.0.3]              <-- Step 2: Allowed IPs added back for peer
-> 
-> This is true even if the allowed IP list is small and the update does
-> not need to be batched into multiple WG_CMD_SET_DEVICE requests, as
-> the removal and subsequent addition of IPs is non-atomic within a single
-> request. Consequently, wg_allowedips_lookup_dst and
-> wg_allowedips_lookup_src may return NULL while reconfiguring a peer even
-> for packets bound for IPs a user did not intend to remove leading to
-> unintended interruptions in connectivity. This presents in userspace as
-> failed calls to sendto and sendmsg for UDP sockets. In my case, I ran
-> netperf while repeatedly reconfiguring the allowed IPs for a peer with
-> wg.
-> 
-> /usr/local/bin/netperf -H 10.102.73.72 -l 10m -t UDP_STREAM -- -R 1 -m 1024
-> send_data: data send error: No route to host (errno 113)
-> netperf: send_omni: send_data failed: No route to host
+Series generated against:
+commit ef04d290c013 ("net: page_pool: do not count normal frag allocation in stats")
 
-That's a worthwhile point. This indeed fixes a *bug*, beyond being just
-a helpful new feature.
+Regards,
+Tariq
 
-> incrementally updated. This patch also bumps WG_GENL_VERSION which can
-> be used by clients to detect whether or not their system supports the
-> WGALLOWEDIP_F_REMOVE_ME flag.
+V3:
+- Dropped rate-tc-index, using tc-bw array index instead.
+- Renamed rate-bw to rate-tc-bw.
+- Documneted what the rate-tc-bw represents and added a range check for
+  validation.
+- Intorduced devlink_nl_rate_tc_bw_set() to parse and set the TC
+  bandwidth values.
+- Updated the user API in the commit message of patch 1/6 to ensure
+  bandwidths sum equals 100.
+- Fixed missing filling of rate-parent in devlink_nl_rate_fill().
 
-I'm actually less enthusiastic about this part, but mainly because I
-haven't looked closely at what the convention for this is. I was
-wondering though - this adds WGALLOWEDIP_A_FLAGS, which didn't exist
-before. Shouldn't some upper layer return a relevant value in that case?
-And even within the existing flags, for WGPEER_A_FLAGS, for example, old
-kernels check to see if there are new flags, for this purpose, e.g.:
-
-        if (attrs[WGPEER_A_FLAGS])
-                flags = nla_get_u32(attrs[WGPEER_A_FLAGS]);
-        ret = -EOPNOTSUPP;
-        if (flags & ~__WGPEER_F_ALL)
-                goto out;
-
-So I think we might be able to avoid having to bump the version number.
-GENL is supposed to be extensible like this.
-
-> +static void _remove(struct allowedips_node *node, struct mutex *lock)
-
-This file doesn't really do the _ prefix thing anywhere. Can you call
-this something more descriptive, like "remove_node"?
-
-> -		if (free_parent)
-> -			child = rcu_dereference_protected(
-> -					parent->bit[!(node->parent_bit_packed & 1)],
-> -					lockdep_is_held(lock));
-[...]
-> +	if (free_parent)
-> +		child = rcu_dereference_protected(parent->bit[!(node->parent_bit_packed & 1)],
-> +						  lockdep_is_held(lock));
-
-Thanks for fixing up the ugly extra \n in the original code you copy and
-pasted from. I remember the horror of that when I added line breaks in
-the original code.
-
-> +	call_rcu(&node->rcu, node_free_rcu);
-> +	if (!free_parent)
-> +		return;
-> +	if (child)
-> +		child->parent_bit_packed = parent->parent_bit_packed;
-> +	*(struct allowedips_node **)(parent->parent_bit_packed & ~3UL) = child;
-> +	call_rcu(&parent->rcu, node_free_rcu);
-> +}
-> +
-> +static int remove(struct allowedips_node __rcu **trie, u8 bits, const u8 *key,
-> +		  u8 cidr, struct wg_peer *peer, struct mutex *lock)
-> +{
-> +	struct allowedips_node *node;
-> +
-> +	if (unlikely(cidr > bits || !peer))
-> +		return -EINVAL;
-
-Reasoning for this is that it copies the logic in add()?
-
-> +	if (!rcu_access_pointer(*trie) ||
-> +	    !node_placement(*trie, key, cidr, bits, &node, lock) ||
-> +	    peer != rcu_access_pointer(node->peer))
-> +		return 0;
-
-What's the reasoning behind returning success when it can't find the
-node? Because in that case it's already removed so the function is
-idempotent? And you checked that nothing really cares about the return
-value there anyway? Or is this a mistake and you meant to return
-something else? I can imagine good reasoning in either direction; I'd
-just like to learn that your choice is deliberate.
-
-> +
-> +	_remove(node, lock);
-> +
-> +	return 0;
-> +}
-> +
->  	family = nla_get_u16(attrs[WGALLOWEDIP_A_FAMILY]);
->  	cidr = nla_get_u8(attrs[WGALLOWEDIP_A_CIDR_MASK]);
-> +	if (attrs[WGALLOWEDIP_A_FLAGS])
-> +		flags = nla_get_u32(attrs[WGALLOWEDIP_A_FLAGS]);
-
-As I mentioned above, you need to do the dance of:
-
-        ret = -EOPNOTSUPP;
-        if (flags & ~__WGALLOWEDIP_F_ALL)
-                goto out;
-
-So that we can safely extend this later.
+V2:
+- Included <linux/dcbnl.h> in devlink.h to resolve missing
+  IEEE_8021QAZ_MAX_TCS definition.
+- Refactored the rate-tc-bw attribute structure to use a separate
+  rate-tc-index.
+- Updated patch 2/6 title.
 
 
->  
->  	if (family == AF_INET && cidr <= 32 &&
-> -	    nla_len(attrs[WGALLOWEDIP_A_IPADDR]) == sizeof(struct in_addr))
-> -		ret = wg_allowedips_insert_v4(
-> -			&peer->device->peer_allowedips,
-> -			nla_data(attrs[WGALLOWEDIP_A_IPADDR]), cidr, peer,
-> -			&peer->device->device_update_lock);
-> -	else if (family == AF_INET6 && cidr <= 128 &&
-> -		 nla_len(attrs[WGALLOWEDIP_A_IPADDR]) == sizeof(struct in6_addr))
-> -		ret = wg_allowedips_insert_v6(
-> -			&peer->device->peer_allowedips,
-> -			nla_data(attrs[WGALLOWEDIP_A_IPADDR]), cidr, peer,
-> -			&peer->device->device_update_lock);
-> +	    nla_len(attrs[WGALLOWEDIP_A_IPADDR]) == sizeof(struct in_addr)) {
-> +		if (flags & WGALLOWEDIP_F_REMOVE_ME)
-> +			ret = wg_allowedips_remove_v4(&peer->device->peer_allowedips,
-> +						      nla_data(attrs[WGALLOWEDIP_A_IPADDR]),
-> +						      cidr,
-> +						      peer,
-> +						      &peer->device->device_update_lock);
+[1]
+This patch series extends the devlink-rate API to support traffic class
+(TC) bandwidth management, enabling more granular control over traffic
+shaping and rate limiting across multiple TCs. The API now allows users
+to specify bandwidth proportions for different traffic classes in a
+single command. This is particularly useful for managing Enhanced
+Transmission Selection (ETS) for groups of Virtual Functions (VFs),
+allowing precise bandwidth allocation across traffic classes.
 
-We get 100 chars now, so you can rewrite this as:
+Additionally the series refines the QoS handling in net/mlx5 to support
+TC arbitration and bandwidth management on vports and rate nodes.
 
-                        ret = wg_allowedips_remove_v4(&peer->device->peer_allowedips,
-                                                      nla_data(attrs[WGALLOWEDIP_A_IPADDR]), cidr,
-                                                      peer, &peer->device->device_update_lock);
+Extend devlink-rate API to support rate management on TCs:
+- devlink: Extend the devlink rate API to support traffic class
+  bandwidth management
 
-> + *                    WGALLOWEDIP_A_FLAGS: NLA_U32, WGALLOWEDIP_F_REMOVE_ME if
-> + *                                         the specified IP should be removed,
+Introduce a no-op implementation:
+- net/mlx5: Add no-op implementation for setting tc-bw on rate objects
 
-That comma should be a semicolon because what comes after is a complete
-sentence, and there's no conjunction.
+Introduce new fields to support new scheduling elements:
+- net/mlx5: Add support for new scheduling elements
 
-> + *                                         otherwise this IP will be added if
-> + *                                         it is not already present.
+Add support for enabling and disabling TC QoS on vports and nodes:
+- net/mlx5: Add support for setting tc-bw on nodes
+- net/mlx5: Add traffic class scheduling support for vport QoS
+
+Support for setting tc-bw on rate objects:
+- net/mlx5: Manage TC arbiter nodes and implement full support for
+  tc-bw
 
 
-> +remove-ip:
-> +	gcc -I/usr/include/libnl3 \
-> +	    -I../../../../usr/include \
-> +	    remove-ip.c \
-> +	    -o remove-ip \
-> +	    -lnl-genl-3 \
-> +	    -lnl-3
->
-> +	sock = nl_socket_alloc();
-> +	genl_connect(sock);
-> +	family = genl_ctrl_resolve(sock, WG_GENL_NAME);
-> +	msg = nlmsg_alloc();
-> +	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_ECHO,
-> +		    WG_CMD_SET_DEVICE, WG_GENL_VERSION);
-> +	nla_put_string(msg, WGDEVICE_A_IFNAME, argv[1]);
-> +
-> +	struct nlattr *peers = nla_nest_start(msg, WGDEVICE_A_PEERS);
-> +	struct nlattr *peer0 = nla_nest_start(msg, 0);
-> +
-> +	nla_put(msg, WGPEER_A_PUBLIC_KEY, CURVE25519_KEY_SIZE, pub_key);
-> +
-> +	struct nlattr *allowed_ips = nla_nest_start(msg, WGPEER_A_ALLOWEDIPS);
-> +	struct nlattr *allowed_ip0 = nla_nest_start(msg, 0);
-> +
-> +	nla_put_u16(msg, WGALLOWEDIP_A_FAMILY, af);
-> +	nla_put(msg, WGALLOWEDIP_A_IPADDR, addr_len, &addr);
-> +	nla_put_u8(msg, WGALLOWEDIP_A_CIDR_MASK, cidr);
-> +	nla_put_u32(msg, WGALLOWEDIP_A_FLAGS, WGALLOWEDIP_F_REMOVE_ME);
-> +	nla_nest_end(msg, allowed_ip0);
-> +	nla_nest_end(msg, allowed_ips);
-> +	nla_nest_end(msg, peer0);
-> +	nla_nest_end(msg, peers);
-> +
-> +	int err = nl_send_sync(sock, msg);
-> +
-> +	if (err < 0) {
-> +		char message[256];
-> +
-> +		nl_perror(err, message);
-> +		printf("An error occurred: %d - %s\n", err, message);
-> +	}
-> +
- 
-I'm not so keen on this, simply because we've been able to do everything
-else in that script and keeping with the "make sure the userspace
-tooling" paradigm. There are two options:
 
-1. Rewrite netns.sh all in C, only depending on libnl or whatever (which
-   I would actually really *love* to see happen). This would change the
-   testing paradigm, but I'd be okay with that if it's done well and all
-   at once.
+Carolina Jubran (6):
+  devlink: Extend devlink rate API with traffic classes bandwidth
+    management
+  net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+  net/mlx5: Add support for new scheduling elements
+  net/mlx5: Add support for setting tc-bw on nodes
+  net/mlx5: Add traffic class scheduling support for vport QoS
+  net/mlx5: Manage TC arbiter nodes and implement full support for tc-bw
 
-2. Add support for this new flag to wg(8) (which I think is necessary
-   anyway for this to land; kernel features and userspace support oughta
-   be posted at once).
+Itamar Gozlan (2):
+  net/mlx5: DR, expand SWS STE callbacks and consolidate common structs
+  net/mlx5: DR, add support for ConnectX-8 steering
 
+ Documentation/netlink/specs/devlink.yaml      |  22 +
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   1 +
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |   2 +
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 795 +++++++++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.h |   4 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  13 +-
+ drivers/net/ethernet/mellanox/mlx5/core/rl.c  |   4 +
+ .../mlx5/core/steering/sws/dr_domain.c        |   2 +-
+ .../mellanox/mlx5/core/steering/sws/dr_ste.c  |   6 +-
+ .../mellanox/mlx5/core/steering/sws/dr_ste.h  |  19 +-
+ .../mlx5/core/steering/sws/dr_ste_v0.c        |   6 +-
+ .../mlx5/core/steering/sws/dr_ste_v1.c        | 207 +----
+ .../mlx5/core/steering/sws/dr_ste_v1.h        | 147 +++-
+ .../mlx5/core/steering/sws/dr_ste_v2.c        | 169 +---
+ .../mlx5/core/steering/sws/dr_ste_v2.h        | 168 ++++
+ .../mlx5/core/steering/sws/dr_ste_v3.c        | 221 +++++
+ .../mlx5/core/steering/sws/mlx5_ifc_dr.h      |  40 +
+ .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |   2 +-
+ include/linux/mlx5/mlx5_ifc.h                 |  15 +-
+ include/net/devlink.h                         |   7 +
+ include/uapi/linux/devlink.h                  |   3 +
+ net/devlink/netlink_gen.c                     |  14 +-
+ net/devlink/netlink_gen.h                     |   1 +
+ net/devlink/rate.c                            |  71 +-
+ 24 files changed, 1559 insertions(+), 380 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v2.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_ste_v3.c
 
-Thanks for the patch. I like the feature and I'm happy you posted this.
+-- 
+2.44.0
 
-Jason
 
