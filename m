@@ -1,87 +1,115 @@
-Return-Path: <netdev+bounces-145661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B599D0535
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 19:40:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 594409D0551
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 19:57:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD0DC28186E
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 18:40:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0590B219F7
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 18:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C33D1DAC93;
-	Sun, 17 Nov 2024 18:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBBC1DAC9A;
+	Sun, 17 Nov 2024 18:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="MYGzs1OK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g5ezFbgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD83823DD
-	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 18:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE25CA64;
+	Sun, 17 Nov 2024 18:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731868829; cv=none; b=ZyBDo/4g1/bwElFK5ExV5mWr+/nKkMt9vVOgfwI0naA9cXZu10ZFz4dx0Nf0Ww5NnTWCsStm8pCNWm7CJG+Jsly+8ttkOntpIGwxuUJxu4Uwz+IbVvu5RdAFM/KBzi1mHuj9xdEsYG/hgwUKtF2atH7Xkydvp9C/6cFrqPjz6Lw=
+	t=1731869829; cv=none; b=jupLGnXbyd9mgZJ5Qr+iaDpFP2HFzWV6Vmcn0mi33IEDvkKSvhdFfpxVCeu8Bn5KQlEa64GlCCvrBtueeO/faULoGj4sDSpbzFU8/2AH7S30zD/j1Xsc9PHsON0UJ6e/ri9e/uPYzjtdd9ZIGr7pLubViYA8dTDcz+g8yk0elz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731868829; c=relaxed/simple;
-	bh=Ao9mynJkxgk8QrL1RlXXfX4GqrqDqJak8WR9vLGZk80=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=rrAS2TC41zY61dp4kNnF4FZ32oqflgfEycyu9Go41tmr+eQBZyaFSx2lZI7gUa16zuA+qLVDF5QPzc5tgpRLMO4CBNKSMju506UdaV0HoW0gbEr0MhWwYDi1h0e2rF2fHSlczg+mp/WhuZBsVFNggDSrs9YGygrnJEJXTFWQu+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=MYGzs1OK; arc=none smtp.client-ip=148.163.129.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 0779C10006B
-	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 18:40:18 +0000 (UTC)
-Received: from [10.252.34.165] (unknown [198.134.98.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 66EE013C2B0
-	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 10:40:18 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 66EE013C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1731868818;
-	bh=Ao9mynJkxgk8QrL1RlXXfX4GqrqDqJak8WR9vLGZk80=;
-	h=Date:To:From:Subject:From;
-	b=MYGzs1OKANaoW24s3lqJnF+tfheR+JNkGigUD38WZz1dZuKwI0m+BHX6lZPbaiGGo
-	 xQqRFXE2FOkv0GxhjvbP8h5GqdAcukvWRrA45A0uMEKUIqqNef7GDySmc/RQlrGng4
-	 aXf/efku3NJbpY1tV3CXvsEQL+af7+V/PKq9PluY=
-Message-ID: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
-Date: Sun, 17 Nov 2024 10:40:18 -0800
+	s=arc-20240116; t=1731869829; c=relaxed/simple;
+	bh=SEOIgTCUy4+HOH8UQKeT6frqBa7iPvkcDq9wa8F7ROo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e+59pKzq1W9Xaf2LlmWEVWebdFSQw10wE6Jl41f+CkLXTRAiUR65vL4KSC4LgHPi0SbLH9yUoytJ9Ozs/aqfFOVX+rWu51Qc/Ho4GF6K28wAEHYMAM2dkP/N0XoKO0uzlEApUdUw2RuLvkeycWxrULyiT832hnU99T38n/+ehJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g5ezFbgq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NHVg2E/H5YCAy5+1o4Vz0LNrbxQqYDDkxHcc+tN/8GI=; b=g5ezFbgqIcrjJdkml8RtQoMld6
+	FLfqJx0j7ZqhcgH8EMczXQs2L0/GSXkrQm3nHFOHX8qnaXDpCq4NGQn8NnQPuADHtRKTSCUMr1irQ
+	wNmu3Hl0Tum/GzT1b48gxov6tGZNxCXx0KjTk3MGESB0wpbT5q2YDNqPB2yvZac62sEONtCry7Yl9
+	tNG08/RdPqnHzE21kLUOtd7mnzn8iVngN14Mwf17vZyvTSOYb9elnl/KCjbcyU8HVJuse++7y+A2b
+	b8GLk77GeAe01HPcRwt5HlHnqWsShhNrHNiH8rnKU1eUgsbOEidp5Rn9PUfRtDpdvAjMFTziOAJz1
+	gD/SNi/w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50362)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tCkRo-0000Yb-1Q;
+	Sun, 17 Nov 2024 18:56:36 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tCkRj-0004K9-2Q;
+	Sun, 17 Nov 2024 18:56:31 +0000
+Date: Sun, 17 Nov 2024 18:56:31 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Amanas18244@iiitd.ac.in, ndrew Lunn <andrew@lunn.ch>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH] rust: simplify Result<()> uses
+Message-ID: <Zzo8Xx9tJdvEO1Q1@shell.armlinux.org.uk>
+References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
+ <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-MW
-To: netdev <netdev@vger.kernel.org>
-From: Ben Greear <greearb@candelatech.com>
-Subject: GRE tunnels bound to VRF
-Organization: Candela Technologies
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MDID: 1731868819-irlW85hjI81F
-X-MDID-O:
- us5;ut7;1731868819;irlW85hjI81F;<greearb@candelatech.com>;0590461a9946a11a9d6965a08c2b2857
-X-PPE-TRUSTED: V=1;DIR=OUT;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello,
+On Sun, Nov 17, 2024 at 07:25:48PM +0100, Andrew Lunn wrote:
+> On Sun, Nov 17, 2024 at 08:41:47PM +0530, Manas via B4 Relay wrote:
+> > From: Manas <manas18244@iiitd.ac.in>
+> > 
+> > This patch replaces `Result<()>` with `Result`.
+> > 
+> > Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+> > Link: https://github.com/Rust-for-Linux/linux/issues/1128
+> > Signed-off-by: Manas <manas18244@iiitd.ac.in>
+> > ---
+> >  drivers/net/phy/qt2025.rs        | 2 +-
+> >  rust/kernel/block/mq/gen_disk.rs | 2 +-
+> >  rust/kernel/uaccess.rs           | 2 +-
+> >  rust/macros/lib.rs               | 6 +++---
+> 
+> Please split these patches up per subsystem, and submit them
+> individually to the appropriate subsystems.
 
-Is there any (sane) way to tell a GRE tunnel to use a VRF for its
-underlying traffic?
-
-For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
-to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
-gre interfaces and have that go out whatever the ethernet VRFs route to...
-
-Thanks,
-Ben
+In addition, it would be good if the commit stated the rationale for
+the change, rather than what the change is (which we can see from the
+patch itself.)
 
 -- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
