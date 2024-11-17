@@ -1,361 +1,185 @@
-Return-Path: <netdev+bounces-145655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55E669D04C5
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 18:14:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9169D04C9
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 18:23:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D0C2824E9
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 17:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2F9C282194
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 17:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBF31DA63D;
-	Sun, 17 Nov 2024 17:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25F71D9A6F;
+	Sun, 17 Nov 2024 17:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RpQYjO81"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B113A1CD;
-	Sun, 17 Nov 2024 17:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9F923AD
+	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 17:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731863667; cv=none; b=In9AHkg8E1wxhUTpOzPOlWDPPWBskET5IvuD5LuqDx8KIfpa02WtrAA1QpkUJzhr1gnsnUquWGyh8FXbGCcVnXpbB08PreMJY/3MKyGgWnEtBKj+7kvA79W92hesbt05BHRU5wGdkvPSGppjS7+JJu93jBRTReLNhzZwuYGEmKY=
+	t=1731864190; cv=none; b=fuef8fo73K20ZXc7Tu/lWZYB5v2qpSPTGNKox2SxjSGQEtiOL0VVVuL42rvdzgdBPkgXOGfuEBubX2WW+lMrvG9gYayU09QCnvsFgQN5Z+TLwWjD+dDguNxUGAp1hGL/8hGUXa4+ofkSVsjdgkb9K4Lt2fWKW3nXA0YnoE2HjnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731863667; c=relaxed/simple;
-	bh=a8GyKpn0jcOgx76uziTiiFRmYGPv9um3ohgxcewyRkg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=YqiDNXagsl7FfXVvLD7sJ5TJkN9P3jB9ex8H8yEhFZ5swg8GZWTHovAz0dVgQL5QeqMXdaVY4UyPr680Fdcm8DmXJrMpMFsAov0hx64bksy1pDVBmJPB6r9L3E4gstEoCcKgJw0X88Ek5orZRyHVEzNcL4rBc1oVoMfoJvj3UGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.102] (213.87.152.88) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 17 Nov
- 2024 20:14:12 +0300
-Message-ID: <c847e042-cc66-462e-a857-d1d9e500a081@omp.ru>
-Date: Sun, 17 Nov 2024 20:14:11 +0300
+	s=arc-20240116; t=1731864190; c=relaxed/simple;
+	bh=wHEepThs8zD/JYJYBhuibrPXrk564fkO7cnDTP8+w4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HH31p8TSkoPf9biBJwCCXBfgC7Pswtpr69EDoCT+zY2TEELnP7NYtCAArzkq1UtAH4MjbKlF1VZWdyl0ubkIOGFI1ks9FF6p48FP48zuK4TRoS/SyxGGOu9W9KFTwsfVKxjYw7vCQivGCgKBZ+UkiRWE7JQi1dtG5lAia4eFEdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RpQYjO81; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731864189; x=1763400189;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wHEepThs8zD/JYJYBhuibrPXrk564fkO7cnDTP8+w4Q=;
+  b=RpQYjO81Szu0je/+5pL8FtEkRI5htq5kfnWdoaQyVU3oICOA6GeMr8yQ
+   EokNjNEM+/UoJUNgKYWvH+CeqlDo/i2o37JNJvgoqiuDlyvKdd0z1kwHN
+   99FzjSBO/nmbQcnumVsqiYPNtPzJwKI+6TfQ6kTq/2BW3oPFARoKbpqiJ
+   TdspuMHwKd7HUJxHpZkUb34SCckjNActMjyYh9Ki1c+w93zJ6cgBfalI3
+   2sUUI7hJM6P8QC+BhDIf76lodCIkbl2HJ/WsEV+kI8+nu1qL6MPDcEg6h
+   sUSA35PUznu4l5cozllcro1dgA4kJeu36wcn9sXoQcVPPbYTHBhmMasEv
+   Q==;
+X-CSE-ConnectionGUID: udLpkJJ9Rt+i2OdQVwZnVQ==
+X-CSE-MsgGUID: rdcPsWv8Qlep7MhdktM3zA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="31198551"
+X-IronPort-AV: E=Sophos;i="6.12,162,1728975600"; 
+   d="scan'208";a="31198551"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2024 09:23:08 -0800
+X-CSE-ConnectionGUID: XFFm+i4RT9+I+kloY4CwAQ==
+X-CSE-MsgGUID: DOdYGX7VTDSI9RWpRiGo0Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,162,1728975600"; 
+   d="scan'208";a="89180128"
+Received: from lkp-server01.sh.intel.com (HELO 1e3cc1889ffb) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 17 Nov 2024 09:23:02 -0800
+Received: from kbuild by 1e3cc1889ffb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tCizC-0001yD-1W;
+	Sun, 17 Nov 2024 17:22:58 +0000
+Date: Mon, 18 Nov 2024 01:22:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Easwar Hariharan <eahariha@linux.microsoft.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Julia Lawall <julia.lawall@inria.fr>,
+	Nicolas Palix <nicolas.palix@imag.fr>,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?unknown-8bit?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Jeroen de Borst <jeroendb@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 01/21] netfilter: conntrack: Cleanup timeout
+ definitions
+Message-ID: <202411180131.xdHcVFlh-lkp@intel.com>
+References: <20241115-converge-secs-to-jiffies-v2-1-911fb7595e79@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCHv2 net-next] net: modernize ioremap in probe
-To: Rosen Penev <rosenp@gmail.com>, <netdev@vger.kernel.org>
-CC: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Marc Kleine-Budde
-	<mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Kurt Kanzenbach <kurt@linutronix.de>, Vladimir Oltean
-	<olteanv@gmail.com>, Chris Snook <chris.snook@gmail.com>, Marcin Wojtas
-	<marcin.s.wojtas@gmail.com>, Russell King <linux@armlinux.org.uk>, Horatiu
- Vultur <horatiu.vultur@microchip.com>, "maintainer:MICROCHIP LAN966X ETHERNET
- DRIVER" <UNGLinuxDriver@microchip.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
-	<niklas.soderlund@ragnatech.se>, Doug Berger <opendmb@gmail.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
-	<hkallweit1@gmail.com>, Richard Cochran <richardcochran@gmail.com>, "open
- list:MCAN MMIO DEVICE DRIVER" <linux-can@vger.kernel.org>, open list
-	<linux-kernel@vger.kernel.org>, "open list:RENESAS ETHERNET SWITCH DRIVER"
-	<linux-renesas-soc@vger.kernel.org>
-References: <20241111200212.5907-1-rosenp@gmail.com>
-Content-Language: en-US
-Organization: Open Mobile Platform
-In-Reply-To: <20241111200212.5907-1-rosenp@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 11/17/2024 17:00:21
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 189220 [Nov 17 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.1.7
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 41 0.3.41
- 623e98d5198769c015c72f45fabbb9f77bdb702b
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.152.88
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/17/2024 17:04:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/17/2024 3:00:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241115-converge-secs-to-jiffies-v2-1-911fb7595e79@linux.microsoft.com>
 
-On 11/11/24 11:02 PM, Rosen Penev wrote:
+Hi Easwar,
 
-> I changed resource acquisition to be performed in a single step. Possible
-> because devm is used here.
+kernel test robot noticed the following build errors:
 
-   Have you tested it? Asking because switching to devm_platform_ioremap_resource_byname()
-and devm_platform_get_and_ioremap_resource() seems to add devm_request_mem_region() call
-into the picture...
-   I'm also not sure the single patch per drivers/net/ would be enough, but that's for the
-maintainers to decide...
+[auto build test ERROR on 2d5404caa8c7bb5c4e0435f94b28834ae5456623]
 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-[...]
+url:    https://github.com/intel-lab-lkp/linux/commits/Easwar-Hariharan/netfilter-conntrack-Cleanup-timeout-definitions/20241117-003530
+base:   2d5404caa8c7bb5c4e0435f94b28834ae5456623
+patch link:    https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v2-1-911fb7595e79%40linux.microsoft.com
+patch subject: [PATCH v2 01/21] netfilter: conntrack: Cleanup timeout definitions
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20241118/202411180131.xdHcVFlh-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241118/202411180131.xdHcVFlh-lkp@intel.com/reproduce)
 
-> diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-> index 283ec5a6e23c..940c4fa6a924 100644
-> --- a/drivers/net/dsa/hirschmann/hellcreek.c
-> +++ b/drivers/net/dsa/hirschmann/hellcreek.c
-[...]
-> @@ -1982,23 +1981,12 @@ static int hellcreek_probe(struct platform_device *pdev)
->  
->  	hellcreek->dev = dev;
->  
-> -	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsn");
-> -	if (!res) {
-> -		dev_err(dev, "No memory region provided!\n");
-> -		return -ENODEV;
-> -	}
-> -
-> -	hellcreek->base = devm_ioremap_resource(dev, res);
-> +	hellcreek->base = devm_platform_ioremap_resource_byname(pdev, "tsn");
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411180131.xdHcVFlh-lkp@intel.com/
 
-   The new code here should behave equivalently to the old, so seems OK.
+All errors (new ones prefixed by >>):
 
->  	if (IS_ERR(hellcreek->base))
->  		return PTR_ERR(hellcreek->base);
->  
-> -	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ptp");
-> -	if (!res) {
-> -		dev_err(dev, "No PTP memory region provided!\n");
-> -		return -ENODEV;
-> -	}
-> -
-> -	hellcreek->ptp_base = devm_ioremap_resource(dev, res);
-> +	hellcreek->ptp_base =
-> +		devm_platform_ioremap_resource_byname(pdev, "ptp");
+>> net/netfilter/nf_conntrack_proto_sctp.c:43:51: error: implicit declaration of function 'secs_to_jiffies'; did you mean 'nsecs_to_jiffies'? [-Werror=implicit-function-declaration]
+      43 |         [SCTP_CONNTRACK_CLOSED]                 = secs_to_jiffies(10),
+         |                                                   ^~~~~~~~~~~~~~~
+         |                                                   nsecs_to_jiffies
+>> net/netfilter/nf_conntrack_proto_sctp.c:43:51: error: initializer element is not constant
+   net/netfilter/nf_conntrack_proto_sctp.c:43:51: note: (near initialization for 'sctp_timeouts[1]')
+   net/netfilter/nf_conntrack_proto_sctp.c:44:51: error: initializer element is not constant
+      44 |         [SCTP_CONNTRACK_COOKIE_WAIT]            = secs_to_jiffies(3),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:44:51: note: (near initialization for 'sctp_timeouts[2]')
+   net/netfilter/nf_conntrack_proto_sctp.c:45:51: error: initializer element is not constant
+      45 |         [SCTP_CONNTRACK_COOKIE_ECHOED]          = secs_to_jiffies(3),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:45:51: note: (near initialization for 'sctp_timeouts[3]')
+   net/netfilter/nf_conntrack_proto_sctp.c:46:51: error: initializer element is not constant
+      46 |         [SCTP_CONNTRACK_ESTABLISHED]            = secs_to_jiffies(210),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:46:51: note: (near initialization for 'sctp_timeouts[4]')
+   net/netfilter/nf_conntrack_proto_sctp.c:47:51: error: initializer element is not constant
+      47 |         [SCTP_CONNTRACK_SHUTDOWN_SENT]          = secs_to_jiffies(3),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:47:51: note: (near initialization for 'sctp_timeouts[5]')
+   net/netfilter/nf_conntrack_proto_sctp.c:48:51: error: initializer element is not constant
+      48 |         [SCTP_CONNTRACK_SHUTDOWN_RECD]          = secs_to_jiffies(3),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:48:51: note: (near initialization for 'sctp_timeouts[6]')
+   net/netfilter/nf_conntrack_proto_sctp.c:49:51: error: initializer element is not constant
+      49 |         [SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]      = secs_to_jiffies(3),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:49:51: note: (near initialization for 'sctp_timeouts[7]')
+   net/netfilter/nf_conntrack_proto_sctp.c:50:51: error: initializer element is not constant
+      50 |         [SCTP_CONNTRACK_HEARTBEAT_SENT]         = secs_to_jiffies(3),
+         |                                                   ^~~~~~~~~~~~~~~
+   net/netfilter/nf_conntrack_proto_sctp.c:50:51: note: (near initialization for 'sctp_timeouts[8]')
+   cc1: some warnings being treated as errors
 
-   Here as well...
 
-[...]
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> index 571631a30320..faf853edc0db 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> @@ -7425,21 +7425,17 @@ static int mvpp2_init(struct platform_device *pdev, struct mvpp2 *priv)
->  static int mvpp2_get_sram(struct platform_device *pdev,
->  			  struct mvpp2 *priv)
->  {
-> -	struct resource *res;
->  	void __iomem *base;
->  
-> -	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
-> -	if (!res) {
-> +	base = devm_platform_ioremap_resource(pdev, 2);
-> +	if (IS_ERR(base)) {
->  		if (has_acpi_companion(&pdev->dev))
->  			dev_warn(&pdev->dev, "ACPI is too old, Flow control not supported\n");
->  		else
-> -			dev_warn(&pdev->dev, "DT is too old, Flow control not supported\n");
-> -		return 0;
-> -	}
-> -
-> -	base = devm_ioremap_resource(&pdev->dev, res);
-> -	if (IS_ERR(base))
-> +			dev_warn(&pdev->dev,
-> +				 "DT is too old, Flow control not supported\n");
->  		return PTR_ERR(base);
-> +	}
->  
->  	priv->cm3_base = base;
->  	return 0;
+vim +43 net/netfilter/nf_conntrack_proto_sctp.c
 
-   This change also seems to look sane...
+    41	
+    42	static const unsigned int sctp_timeouts[SCTP_CONNTRACK_MAX] = {
+  > 43		[SCTP_CONNTRACK_CLOSED]			= secs_to_jiffies(10),
+    44		[SCTP_CONNTRACK_COOKIE_WAIT]		= secs_to_jiffies(3),
+    45		[SCTP_CONNTRACK_COOKIE_ECHOED]		= secs_to_jiffies(3),
+    46		[SCTP_CONNTRACK_ESTABLISHED]		= secs_to_jiffies(210),
+    47		[SCTP_CONNTRACK_SHUTDOWN_SENT]		= secs_to_jiffies(3),
+    48		[SCTP_CONNTRACK_SHUTDOWN_RECD]		= secs_to_jiffies(3),
+    49		[SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]	= secs_to_jiffies(3),
+    50		[SCTP_CONNTRACK_HEARTBEAT_SENT]		= secs_to_jiffies(3),
+    51	};
+    52	
 
-[...]
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-> index 8d18dae4d8fb..8ef52fc46a01 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-[...]
-> @@ -2074,7 +2067,7 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
->  
->  	platform_set_drvdata(pdev, priv);
->  	priv->pdev = pdev;
-> -	priv->addr = devm_ioremap_resource(&pdev->dev, res);
-> +	priv->addr = devm_platform_ioremap_resource_byname(pdev, "secure_base");
->  	if (IS_ERR(priv->addr))
->  		return PTR_ERR(priv->addr);
->  
-
-   This one looks OKish too...
-
-> diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
-> index 6b3f7fca8d15..bfe08facc707 100644
-> --- a/drivers/net/ethernet/renesas/rtsn.c
-> +++ b/drivers/net/ethernet/renesas/rtsn.c
-> @@ -1297,14 +1297,8 @@ static int rtsn_probe(struct platform_device *pdev)
->  	ndev->netdev_ops = &rtsn_netdev_ops;
->  	ndev->ethtool_ops = &rtsn_ethtool_ops;
->  
-> -	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
-> -	if (!res) {
-> -		dev_err(&pdev->dev, "Can't find gptp resource\n");
-> -		ret = -EINVAL;
-> -		goto error_free;
-> -	}
-> -
-> -	priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
-> +	priv->ptp_priv->addr =
-> +		devm_platform_ioremap_resource_byname(pdev, "gptp");
->  	if (IS_ERR(priv->ptp_priv->addr)) {
->  		ret = PTR_ERR(priv->ptp_priv->addr);
->  		goto error_free;
-
-   Looks OKish too...
-
-> diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
-> index d072f394eecb..07d1f1504a97 100644
-> --- a/drivers/net/ethernet/renesas/sh_eth.c
-> +++ b/drivers/net/ethernet/renesas/sh_eth.c
-> @@ -3351,31 +3351,12 @@ static int sh_eth_drv_probe(struct platform_device *pdev)
->  
->  	if (mdp->cd->tsu) {
->  		int port = pdev->id < 0 ? 0 : pdev->id % 2;
-> -		struct resource *rtsu;
->  
-> -		rtsu = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-> -		if (!rtsu) {
-> -			dev_err(&pdev->dev, "no TSU resource\n");
-> -			ret = -ENODEV;
-> -			goto out_release;
-> -		}
-> -		/* We can only request the  TSU region  for the first port
-> -		 * of the two  sharing this TSU for the probe to succeed...
-> -		 */
-> -		if (port == 0 &&
-> -		    !devm_request_mem_region(&pdev->dev, rtsu->start,
-> -					     resource_size(rtsu),
-> -					     dev_name(&pdev->dev))) {
-> -			dev_err(&pdev->dev, "can't request TSU resource.\n");
-> -			ret = -EBUSY;
-> -			goto out_release;
-> -		}
->  		/* ioremap the TSU registers */
-> -		mdp->tsu_addr = devm_ioremap(&pdev->dev, rtsu->start,
-> -					     resource_size(rtsu));
-> -		if (!mdp->tsu_addr) {
-> +		mdp->tsu_addr = devm_platform_ioremap_resource(pdev, 1);
-> +		if (IS_ERR(mdp->tsu_addr)) {
->  			dev_err(&pdev->dev, "TSU region ioremap() failed.\n");
-> -			ret = -ENOMEM;
-> +			ret = PTR_ERR(mdp->tsu_addr);
->  			goto out_release;
->  		}
->  		mdp->port = port;
-
-   No, this one won't fly since you're removing the port == 0 check... :-/
-This code looks so strange on purpose... :-)
-
-[...]
-> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
-> index dd3ed2d6430b..725e5c13d212 100644
-> --- a/drivers/net/mdio/mdio-ipq4019.c
-> +++ b/drivers/net/mdio/mdio-ipq4019.c
-> @@ -256,7 +256,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
->  	/* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
->  	 * is specified in the device tree.
->  	 */
-> -	if (priv->eth_ldo_rdy) {
-> +	if (!IS_ERR(priv->eth_ldo_rdy)) {
-
-   What's that? :-/
-   Ah, devm_ioremap_resource() returns error ptr too, so this looks like a fix for
-the existing code?
-
->  		val = readl(priv->eth_ldo_rdy);
->  		val |= BIT(0);
->  		writel(val, priv->eth_ldo_rdy);
-[...]
-> @@ -351,9 +350,7 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->  
->  	/* The platform resource is provided on the chipset IPQ5018 */
->  	/* This resource is optional */
-> -	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-> -	if (res)
-> -		priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
-> +	priv->eth_ldo_rdy = devm_platform_ioremap_resource(pdev, 1);
->  
->  	bus->name = "ipq4019_mdio";
->  	bus->read = ipq4019_mdio_read_c22;
-
-   Other than that looks OKish...
-
-[...]
-> diff --git a/drivers/net/mdio/mdio-octeon.c b/drivers/net/mdio/mdio-octeon.c
-> index 2beb83154d39..cb53dccbde1a 100644
-> --- a/drivers/net/mdio/mdio-octeon.c
-> +++ b/drivers/net/mdio/mdio-octeon.c
-> @@ -17,37 +17,20 @@ static int octeon_mdiobus_probe(struct platform_device *pdev)
->  {
->  	struct cavium_mdiobus *bus;
->  	struct mii_bus *mii_bus;
-> -	struct resource *res_mem;
-> -	resource_size_t mdio_phys;
-> -	resource_size_t regsize;
->  	union cvmx_smix_en smi_en;
-> -	int err = -ENOENT;
-> +	int err;
->  
->  	mii_bus = devm_mdiobus_alloc_size(&pdev->dev, sizeof(*bus));
->  	if (!mii_bus)
->  		return -ENOMEM;
->  
-> -	res_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> -	if (res_mem == NULL) {
-> -		dev_err(&pdev->dev, "found no memory resource\n");
-> -		return -ENXIO;
-> -	}
-> -
->  	bus = mii_bus->priv;
->  	bus->mii_bus = mii_bus;
-> -	mdio_phys = res_mem->start;
-> -	regsize = resource_size(res_mem);
->  
-> -	if (!devm_request_mem_region(&pdev->dev, mdio_phys, regsize,
-> -				     res_mem->name)) {
-> -		dev_err(&pdev->dev, "request_mem_region failed\n");
-> -		return -ENXIO;
-> -	}
-> -
-> -	bus->register_base = devm_ioremap(&pdev->dev, mdio_phys, regsize);
-> -	if (!bus->register_base) {
-> +	bus->register_base = devm_platform_ioremap_resource(pdev, 0);
-> +	if (IS_ERR(bus->register_base)) {
->  		dev_err(&pdev->dev, "dev_ioremap failed\n");
-> -		return -ENOMEM;
-> +		return PTR_ERR(bus->register_base);
->  	}
->  
->  	smi_en.u64 = 0;
-
-   Seems OKish too...
-
-MBR, Sergey
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
