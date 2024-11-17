@@ -1,180 +1,135 @@
-Return-Path: <netdev+bounces-145651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21DE09D0471
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 16:11:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07B6A9D0487
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 16:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 984681F21B01
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 15:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB2F52825AE
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 15:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3568C1D8E18;
-	Sun, 17 Nov 2024 15:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3N+T/Vs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5016F1D90AD;
+	Sun, 17 Nov 2024 15:39:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E7C8831;
-	Sun, 17 Nov 2024 15:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AD7CA64;
+	Sun, 17 Nov 2024 15:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731856310; cv=none; b=iwgwxOh69tWBA4Sc/ZMcAD/q24b7PT5bH8h0M1aoy0PnvVCqk/nkn11k/GjkmXZdsYXIsyme9Te7nL/VcpjNAYhIymiuvyrLiOflto2PUJMX2v+K8HH/uyEGTpWjL7m0pHKmueX+yS4OPbWNTGV0jx/3xDlAsvjzWYiLqUweV3Q=
+	t=1731857955; cv=none; b=OU2fpQloBxerJjvh7W2SlZQln96/3r1XJEBGZl0b9NbvynbkqJoIR2PiCXkXaEqrSCA2J2R35DG2YXUbuzWtlRN/ySDkPDbqSqQrEeeWmbjcBCcBh/WNHTBLqZ+nyryM/NsrqoH3wB/8SYqRKZpURNm705tE11hRPI+EoQdkm38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731856310; c=relaxed/simple;
-	bh=YoWEgbjfpT0pRKmM5sLM3OnhUgtNHURpAF5a1fG7oDs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J/nGchVtusGuiLxHruCY2CcWGqWFNhN/EvvZSHjgmsbsDYc3RtP8nyN4ULmtaoRAR89OICicrayUvU4cwRCXI9Ftp/gJXpM/8IAMcFzCt4g7a5DDPEsRXuq7hPoJ/oYyhkpB3j2miT4bQCjH/oYBfkPtMQuP6fwFvTZe/JWjEbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3N+T/Vs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69DB0C4CECD;
-	Sun, 17 Nov 2024 15:11:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731856309;
-	bh=YoWEgbjfpT0pRKmM5sLM3OnhUgtNHURpAF5a1fG7oDs=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=E3N+T/Vs1LKBInl2ZXVI2j7Y1XIEiy3wAHvkLbMOkWst2Jsv0VjBfHu7BnIH2XFuH
-	 s09dnZ5QzmNf7OH+zXAGztFzgpUAXASstIgtIlEPHl58miSuq2iu4IJPGoOgKouPoY
-	 R37/pCb4ugofjQTdfZFwBtCNA6m0ne9QoZMsnbbkI41vR+L7FTIjq5as1rj5ek0nIC
-	 aTY88Hwwx7ZmdDt9+Pj2FIyT8CiXlqTykOZaPnT2nulvqSksN0aiFaxvaEVXfp6TAr
-	 C45hcOUXdd/bH9yYgNlO0d3tGHxob5S5ldyMOYobN7a1ez9uh6R6OMxqWv9KdqeOFC
-	 ge1TSPp2eY93g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B14BD68BEF;
-	Sun, 17 Nov 2024 15:11:49 +0000 (UTC)
-From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
-Date: Sun, 17 Nov 2024 20:41:47 +0530
-Subject: [PATCH] rust: simplify Result<()> uses
+	s=arc-20240116; t=1731857955; c=relaxed/simple;
+	bh=vfJw0C9mvbKaRPxQRr3ddRzBrn5U8By/saKIXyh4gys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W0JjdrCOyY5NMfxW2uBorss6KLzpbKFxzMTU3bi2+yv0K8ftgg1urvOtWK6rHxFev84brz+f6DfgO6P60Qj+1B54EHh/ixwkeLxPao0pcXxyRnOjBxO05/RbcAbLERNHbhLVmYypkEDLHsD5k7S6DRhMwgBiSRy4jXHDD5mx0Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 604521A033D;
+	Sun, 17 Nov 2024 16:39:05 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 5302A1A0018;
+	Sun, 17 Nov 2024 16:39:05 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 0CBCC203CE;
+	Sun, 17 Nov 2024 16:39:05 +0100 (CET)
+Date: Sun, 17 Nov 2024 16:39:05 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>,
+	Andrei Botila <andrei.botila@nxp.org>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH v4 16/16] net: stmmac: dwmac-s32: Read PTP clock rate
+ when ready
+Message-ID: <ZzoOGdlbQXQVxPkv@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-16-03618f10e3e2@oss.nxp.com>
+ <9154cc5f-a330-4f6d-b161-827e64231e35@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
-X-B4-Tracking: v=1; b=H4sIALIHOmcC/x3MQQqAIBBA0avIrBM0grKrRAuxsQbKwqkoxLsnL
- d/i/wSMkZChFwki3sS0hwJdCXCLDTNKmoqhVnWjtW4l03as5F8Zka/1lM5OprNeGeUMlOqI6On
- 5j8OY8weuNWvsYQAAAA==
-X-Change-ID: 20241117-simplify-result-cad98af090c9
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
- Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>
-Cc: Shuah Khan <skhan@linuxfoundation.org>, 
- Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-block@vger.kernel.org, Manas <manas18244@iiitd.ac.in>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1731856307; l=3582;
- i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
- bh=9wh8APnbE+xtYBBHViec799odh7ToNYbNtboBILuiv4=;
- b=KwKDJLX1CAhKLCiNJsRH41q4RnVX6JT2IaF2iIN5gA1wqesEONanU83urTsIDlPG8AdssXWZ4
- jXKYUpk51h+ByiaQUvylhQUgWs6/9BfIElhdayxeAi1xSAwLjz9xKIc
-X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
- pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
-X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
- auth_id=196
-X-Original-From: Manas <manas18244@iiitd.ac.in>
-Reply-To: manas18244@iiitd.ac.in
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9154cc5f-a330-4f6d-b161-827e64231e35@lunn.ch>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-From: Manas <manas18244@iiitd.ac.in>
+On Tue, Oct 29, 2024 at 01:18:43PM +0100, Andrew Lunn wrote:
+> On Mon, Oct 28, 2024 at 09:24:58PM +0100, Jan Petrous via B4 Relay wrote:
+> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> > 
+> > The PTP clock is read by stmmac_platform during DT parse.
+> > On S32G/R the clock is not ready and returns 0. Postpone
+> > reading of the clock on PTP init.
+> 
+> This needs more explanation as to why this is a feature, not a bug,
+> for the PTP clock.
+> 
 
-This patch replaces `Result<()>` with `Result`.
+Thanks for comment. I did a homework and found out the root cause is
+using PTP clocks before they are properly enabled. As I understand,
+the clocks, especially the composite variant, require preparation and/or
+enabling them, what is not managed correctly for PTP clocks when
+stmmac_platform is used. In this case, the PTP clock value is read this way:
 
-Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-Link: https://github.com/Rust-for-Linux/linux/issues/1128
-Signed-off-by: Manas <manas18244@iiitd.ac.in>
----
- drivers/net/phy/qt2025.rs        | 2 +-
- rust/kernel/block/mq/gen_disk.rs | 2 +-
- rust/kernel/uaccess.rs           | 2 +-
- rust/macros/lib.rs               | 6 +++---
- 4 files changed, 6 insertions(+), 6 deletions(-)
+   stmmac_probe_config_dt:
+   // https://github.com/torvalds/linux/blob/4a5df37964673effcd9f84041f7423206a5ae5f2/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c#L634
 
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..25c12a02baa255d3d5952e729a890b3ccfe78606 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -39,7 +39,7 @@ impl Driver for PhyQT2025 {
-     const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
-     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
- 
--    fn probe(dev: &mut phy::Device) -> Result<()> {
-+    fn probe(dev: &mut phy::Device) -> Result {
-         // Check the hardware revision code.
-         // Only 0x3b works with this driver and firmware.
-         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index 708125dce96a934f32caab44d5e6cff14c4321a9..798c4ae0bdedd58221b5851a630c0e1052e0face 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -45,7 +45,7 @@ pub fn rotational(mut self, rotational: bool) -> Self {
- 
-     /// Validate block size by verifying that it is between 512 and `PAGE_SIZE`,
-     /// and that it is a power of two.
--    fn validate_block_size(size: u32) -> Result<()> {
-+    fn validate_block_size(size: u32) -> Result {
-         if !(512..=bindings::PAGE_SIZE as u32).contains(&size) || !size.is_power_of_two() {
-             Err(error::code::EINVAL)
-         } else {
-diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
-index 05b0b8d13b10da731af62be03e1c2c13ced3f706..7c21304344ccd943816e38119a5be2ccf8d8e154 100644
---- a/rust/kernel/uaccess.rs
-+++ b/rust/kernel/uaccess.rs
-@@ -49,7 +49,7 @@
- /// use kernel::error::Result;
- /// use kernel::uaccess::{UserPtr, UserSlice};
- ///
--/// fn bytes_add_one(uptr: UserPtr, len: usize) -> Result<()> {
-+/// fn bytes_add_one(uptr: UserPtr, len: usize) -> Result {
- ///     let (read, mut write) = UserSlice::new(uptr, len).reader_writer();
- ///
- ///     let mut buf = KVec::new();
-diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-index 4ab94e44adfe3206faad159e81417ea41a35815b..463920353ca9c408f5d69e2626c13a173bae98d7 100644
---- a/rust/macros/lib.rs
-+++ b/rust/macros/lib.rs
-@@ -144,11 +144,11 @@ pub fn module(ts: TokenStream) -> TokenStream {
- /// // Declares a `#[vtable]` trait
- /// #[vtable]
- /// pub trait Operations: Send + Sync + Sized {
--///     fn foo(&self) -> Result<()> {
-+///     fn foo(&self) -> Result {
- ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
- ///     }
- ///
--///     fn bar(&self) -> Result<()> {
-+///     fn bar(&self) -> Result {
- ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
- ///     }
- /// }
-@@ -158,7 +158,7 @@ pub fn module(ts: TokenStream) -> TokenStream {
- /// // Implements the `#[vtable]` trait
- /// #[vtable]
- /// impl Operations for Foo {
--///     fn foo(&self) -> Result<()> {
-+///     fn foo(&self) -> Result {
- /// #        Err(EINVAL)
- ///         // ...
- ///     }
+	/* Fall-back to main clock in case of no PTP ref is passed */
+	plat->clk_ptp_ref = devm_clk_get(&pdev->dev, "ptp_ref");
+	if (IS_ERR(plat->clk_ptp_ref)) {
+		plat->clk_ptp_rate = clk_get_rate(plat->stmmac_clk);
+		plat->clk_ptp_ref = NULL;
+		dev_info(&pdev->dev, "PTP uses main clock\n");
+	} else {
+		plat->clk_ptp_rate = clk_get_rate(plat->clk_ptp_ref);
+		dev_dbg(&pdev->dev, "PTP rate %d\n", plat->clk_ptp_rate);
+	}
 
----
-base-commit: b2603f8ac8217bc59f5c7f248ac248423b9b99cb
-change-id: 20241117-simplify-result-cad98af090c9
+If I change getter to enabled getter:
+	plat->clk_ptp_ref = devm_clk_get_enabled(&pdev->dev, "ptp_ref");
 
-Best regards,
--- 
-Manas <manas18244@iiitd.ac.in>
+The driver got valid rate and the patch is not needed anymore.
 
+So, if I didn't miss something, it seems like I have to replace the current
+patch with one fixing clk getter.
 
+BR.
+/Jan
 
