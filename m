@@ -1,185 +1,117 @@
-Return-Path: <netdev+bounces-145656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9169D04C9
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 18:23:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256729D04F4
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 19:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2F9C282194
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 17:23:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C8C9B21818
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 18:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25F71D9A6F;
-	Sun, 17 Nov 2024 17:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67AA819342E;
+	Sun, 17 Nov 2024 18:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RpQYjO81"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="t7rYLQ4F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9F923AD
-	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 17:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F4715C0
+	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 18:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731864190; cv=none; b=fuef8fo73K20ZXc7Tu/lWZYB5v2qpSPTGNKox2SxjSGQEtiOL0VVVuL42rvdzgdBPkgXOGfuEBubX2WW+lMrvG9gYayU09QCnvsFgQN5Z+TLwWjD+dDguNxUGAp1hGL/8hGUXa4+ofkSVsjdgkb9K4Lt2fWKW3nXA0YnoE2HjnQ=
+	t=1731867032; cv=none; b=mMF/JfqaGd7ck5WIzWthA0BJKaniCKwg2w5JFelwy3db9fMjMJul3RD5bIbXcH1s0xD6GM3dfQKb4kby65tury0Tg5iJq6Ong4rR5PPG4S2d74/o6TSFFuuTUyxchmu4+4oaLH4/QPW+whHwA9Ckqz2xgMf5wl8ennOhsR790wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731864190; c=relaxed/simple;
-	bh=wHEepThs8zD/JYJYBhuibrPXrk564fkO7cnDTP8+w4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HH31p8TSkoPf9biBJwCCXBfgC7Pswtpr69EDoCT+zY2TEELnP7NYtCAArzkq1UtAH4MjbKlF1VZWdyl0ubkIOGFI1ks9FF6p48FP48zuK4TRoS/SyxGGOu9W9KFTwsfVKxjYw7vCQivGCgKBZ+UkiRWE7JQi1dtG5lAia4eFEdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RpQYjO81; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731864189; x=1763400189;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wHEepThs8zD/JYJYBhuibrPXrk564fkO7cnDTP8+w4Q=;
-  b=RpQYjO81Szu0je/+5pL8FtEkRI5htq5kfnWdoaQyVU3oICOA6GeMr8yQ
-   EokNjNEM+/UoJUNgKYWvH+CeqlDo/i2o37JNJvgoqiuDlyvKdd0z1kwHN
-   99FzjSBO/nmbQcnumVsqiYPNtPzJwKI+6TfQ6kTq/2BW3oPFARoKbpqiJ
-   TdspuMHwKd7HUJxHpZkUb34SCckjNActMjyYh9Ki1c+w93zJ6cgBfalI3
-   2sUUI7hJM6P8QC+BhDIf76lodCIkbl2HJ/WsEV+kI8+nu1qL6MPDcEg6h
-   sUSA35PUznu4l5cozllcro1dgA4kJeu36wcn9sXoQcVPPbYTHBhmMasEv
-   Q==;
-X-CSE-ConnectionGUID: udLpkJJ9Rt+i2OdQVwZnVQ==
-X-CSE-MsgGUID: rdcPsWv8Qlep7MhdktM3zA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="31198551"
-X-IronPort-AV: E=Sophos;i="6.12,162,1728975600"; 
-   d="scan'208";a="31198551"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2024 09:23:08 -0800
-X-CSE-ConnectionGUID: XFFm+i4RT9+I+kloY4CwAQ==
-X-CSE-MsgGUID: DOdYGX7VTDSI9RWpRiGo0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,162,1728975600"; 
-   d="scan'208";a="89180128"
-Received: from lkp-server01.sh.intel.com (HELO 1e3cc1889ffb) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 17 Nov 2024 09:23:02 -0800
-Received: from kbuild by 1e3cc1889ffb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tCizC-0001yD-1W;
-	Sun, 17 Nov 2024 17:22:58 +0000
-Date: Mon, 18 Nov 2024 01:22:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Julia Lawall <julia.lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?unknown-8bit?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Jeroen de Borst <jeroendb@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 01/21] netfilter: conntrack: Cleanup timeout
- definitions
-Message-ID: <202411180131.xdHcVFlh-lkp@intel.com>
-References: <20241115-converge-secs-to-jiffies-v2-1-911fb7595e79@linux.microsoft.com>
+	s=arc-20240116; t=1731867032; c=relaxed/simple;
+	bh=omy1vPv9yyrmVb9mnzh9SVB+8KoCKoTbLsmy3o/t3EI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b+ydtdw+zLEtlnNVQjxYTmR7qy7/oJ9U/V2jIPWhV92GFUdPuLBz5KBbVP460aSeY8ZiILZV1qq0jD34Paq9zYQdjBWmB++4jC+GU7jrwJiRYsUPmQV12+2WhXLutNbKIp/bfwFVDX+ASxg2tJv6bJwCFdZJOA/Zw4saI1dRMoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=t7rYLQ4F; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7248c1849bdso792525b3a.3
+        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 10:10:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731867029; x=1732471829; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N33BhjHRfRSuMcPymVOtYysXnsdqJkviGekmc6/OOwQ=;
+        b=t7rYLQ4F+P/GUQrngU4BEuM5uSfHmvC9JNBHKFgxcYicj4OdSGMrWEOeHdUfcP+ib5
+         KFqnbQn31hWb/3oL5ttWou03vX12UAzRRaja2d6HIMTQHDDYLz3JMjrDwNcJhjtVlsnc
+         8xEwnjXef0nOt92cP+RQaKXo8hseBJ00st4oaZlfu0ZhdWz4zt5IIC50NhJLwvE3PQlk
+         g5FodXvKpgHqpdWFnkd8GxhX5YWeLS+QBF+bArThYwROdOafqCsjI2fEgjBwBmbZFNcd
+         swfdrWGXorAXliq4eWTIzxMpzndxa1V75Ws9yxpDmQ4GIa1gDuo9WepUwfmmi3DTBerz
+         DDeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731867029; x=1732471829;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N33BhjHRfRSuMcPymVOtYysXnsdqJkviGekmc6/OOwQ=;
+        b=tO7B50MQ4QMeI/UJGoCypyBbNyfY5H85+mAHuiPrn/76PASzbkefjgbWrOI81L6A83
+         bftBHH84toSjHmoNsBeM4RcKXBfWgXF1SVp1PmKXO/ZdayXO7qezcCjCwUeKhIeZQ1vp
+         rrdNe+4Igg5P23Xlm7hPqs9jjBxNSGxjbW1q1GiY5/asFAUIdfGRcpNXTBdo1+w4L0a3
+         6GV+vcvSjSbvNVvtYB54oke5l7D83f+cyh/7AQ8XYXimenV+pvzxUl5W1pxDSjLMKBTw
+         fZkdWNKIA9ZlV4XlwQEzDcizjpafOznnfLJ5ijjPGfOn9iNM0OV+74fdLkShTtgwvg7x
+         jp2A==
+X-Gm-Message-State: AOJu0YxKJkKFsYXifG0eqBaGsgRGJIQfX/A0hAAow4FIj0gh+zEXtaDY
+	O29Ptw1xK4UVNaWz9AMrx0kFhsUnYxkJrQ18fWIityDJk4sR2CXD8IlkSO1iaDU=
+X-Google-Smtp-Source: AGHT+IFN5JMmSUYEFBMUhO+gnyDlBCjiiwV21rfblJhUaWwINDHUAjDVgK5DwvKtPQHKA35fG4l5Vw==
+X-Received: by 2002:a17:90b:380d:b0:2e2:cf5c:8ee8 with SMTP id 98e67ed59e1d1-2ea154f5f8fmr14816214a91.12.1731867029331;
+        Sun, 17 Nov 2024 10:10:29 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea67700e19sm961417a91.19.2024.11.17.10.10.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Nov 2024 10:10:28 -0800 (PST)
+Date: Sun, 17 Nov 2024 10:10:25 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Bjarni Ingi Gislason <bjarniig@simnet.is>
+Cc: netdev@vger.kernel.org
+Subject: Re: dcb-apptrust.8: some remarks and editorial changes for this
+ manual
+Message-ID: <20241117101025.7d924bcd@hermes.local>
+In-Reply-To: <ZylcVAmsr55YK38b@kassi.invalid.is>
+References: <ZylcVAmsr55YK38b@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115-converge-secs-to-jiffies-v2-1-911fb7595e79@linux.microsoft.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Easwar,
+On Mon, 4 Nov 2024 23:44:20 +0000
+Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
 
-kernel test robot noticed the following build errors:
+>   The man page is from Debian:
+> 
+> Package: iproute2
+> Version: 6.11.0-1
+> Severity: minor
+> Tags: patch
+> 
+>   Improve the layout of the man page according to the "man-page(7)"
+> guidelines, the output of "mandoc -lint T", the output of
+> "groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+> conventions.
+> 
+> -.-
+> 
+>   Output from a script "chk_manual" is in the attachment.
+> 
+> -.-
+> 
+> Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
 
-[auto build test ERROR on 2d5404caa8c7bb5c4e0435f94b28834ae5456623]
+These dcb patches are not formatted correctly. You need to
+use git (and format-patch/send-email) or compatible diff arguments.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Easwar-Hariharan/netfilter-conntrack-Cleanup-timeout-definitions/20241117-003530
-base:   2d5404caa8c7bb5c4e0435f94b28834ae5456623
-patch link:    https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v2-1-911fb7595e79%40linux.microsoft.com
-patch subject: [PATCH v2 01/21] netfilter: conntrack: Cleanup timeout definitions
-config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20241118/202411180131.xdHcVFlh-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241118/202411180131.xdHcVFlh-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411180131.xdHcVFlh-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/netfilter/nf_conntrack_proto_sctp.c:43:51: error: implicit declaration of function 'secs_to_jiffies'; did you mean 'nsecs_to_jiffies'? [-Werror=implicit-function-declaration]
-      43 |         [SCTP_CONNTRACK_CLOSED]                 = secs_to_jiffies(10),
-         |                                                   ^~~~~~~~~~~~~~~
-         |                                                   nsecs_to_jiffies
->> net/netfilter/nf_conntrack_proto_sctp.c:43:51: error: initializer element is not constant
-   net/netfilter/nf_conntrack_proto_sctp.c:43:51: note: (near initialization for 'sctp_timeouts[1]')
-   net/netfilter/nf_conntrack_proto_sctp.c:44:51: error: initializer element is not constant
-      44 |         [SCTP_CONNTRACK_COOKIE_WAIT]            = secs_to_jiffies(3),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:44:51: note: (near initialization for 'sctp_timeouts[2]')
-   net/netfilter/nf_conntrack_proto_sctp.c:45:51: error: initializer element is not constant
-      45 |         [SCTP_CONNTRACK_COOKIE_ECHOED]          = secs_to_jiffies(3),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:45:51: note: (near initialization for 'sctp_timeouts[3]')
-   net/netfilter/nf_conntrack_proto_sctp.c:46:51: error: initializer element is not constant
-      46 |         [SCTP_CONNTRACK_ESTABLISHED]            = secs_to_jiffies(210),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:46:51: note: (near initialization for 'sctp_timeouts[4]')
-   net/netfilter/nf_conntrack_proto_sctp.c:47:51: error: initializer element is not constant
-      47 |         [SCTP_CONNTRACK_SHUTDOWN_SENT]          = secs_to_jiffies(3),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:47:51: note: (near initialization for 'sctp_timeouts[5]')
-   net/netfilter/nf_conntrack_proto_sctp.c:48:51: error: initializer element is not constant
-      48 |         [SCTP_CONNTRACK_SHUTDOWN_RECD]          = secs_to_jiffies(3),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:48:51: note: (near initialization for 'sctp_timeouts[6]')
-   net/netfilter/nf_conntrack_proto_sctp.c:49:51: error: initializer element is not constant
-      49 |         [SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]      = secs_to_jiffies(3),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:49:51: note: (near initialization for 'sctp_timeouts[7]')
-   net/netfilter/nf_conntrack_proto_sctp.c:50:51: error: initializer element is not constant
-      50 |         [SCTP_CONNTRACK_HEARTBEAT_SENT]         = secs_to_jiffies(3),
-         |                                                   ^~~~~~~~~~~~~~~
-   net/netfilter/nf_conntrack_proto_sctp.c:50:51: note: (near initialization for 'sctp_timeouts[8]')
-   cc1: some warnings being treated as errors
-
-
-vim +43 net/netfilter/nf_conntrack_proto_sctp.c
-
-    41	
-    42	static const unsigned int sctp_timeouts[SCTP_CONNTRACK_MAX] = {
-  > 43		[SCTP_CONNTRACK_CLOSED]			= secs_to_jiffies(10),
-    44		[SCTP_CONNTRACK_COOKIE_WAIT]		= secs_to_jiffies(3),
-    45		[SCTP_CONNTRACK_COOKIE_ECHOED]		= secs_to_jiffies(3),
-    46		[SCTP_CONNTRACK_ESTABLISHED]		= secs_to_jiffies(210),
-    47		[SCTP_CONNTRACK_SHUTDOWN_SENT]		= secs_to_jiffies(3),
-    48		[SCTP_CONNTRACK_SHUTDOWN_RECD]		= secs_to_jiffies(3),
-    49		[SCTP_CONNTRACK_SHUTDOWN_ACK_SENT]	= secs_to_jiffies(3),
-    50		[SCTP_CONNTRACK_HEARTBEAT_SENT]		= secs_to_jiffies(3),
-    51	};
-    52	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yes, I could edit the patch to make it work, but since you
+are working with a distro and sending so many patches you
+need to learn how to send a patch that is correctly formatted
+for merging.
 
