@@ -1,102 +1,166 @@
-Return-Path: <netdev+bounces-145695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56BD29D06B5
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 23:41:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42B319D06CF
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 00:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FB44281DDF
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 22:41:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE74CB222FF
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 23:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381131DB375;
-	Sun, 17 Nov 2024 22:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B601DDC39;
+	Sun, 17 Nov 2024 22:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWLXKng3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyOquGKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8817A15445D
-	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 22:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171831DDC2F;
+	Sun, 17 Nov 2024 22:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731883304; cv=none; b=je25sb+t8aqNDKvOFHCtPw3osX7uTXuAPu8Upx01luW01H0gbq3JTOrBAN3r0qdzwPbhRlnZ+LNld9nwUTI1OMJdnDM5DD5a70j+UQx3um7MmoZypqR8n8ty3VVZ4TMlReJiHpa2gOyWTvuB8AerjrCi2PGZ7IQr/elRZxum05E=
+	t=1731884396; cv=none; b=gX4k2HT3FJDSNgsBbuZLZF2ozV68MTJmd67nd1a5+TlzlmavWIMxE+C0Tfe5PDQ0NzEU4kfhdedruomsJeBwQl4m3Wgh2L4fC3+nhY3iZXDDVegjB6zTQ/6x5LQQBKowtgNxAoVuDD+XVn/QoydMlVf63Gz5GvyAWvqgOpDXeI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731883304; c=relaxed/simple;
-	bh=oD/hNRdR/qJ6gLA5pBNm/miI+eSxnQIBdqvIkH8gHfs=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
-	 In-Reply-To:Content-Type; b=An0hJ4sDWyww/pyj//FPxSNwL3nhZwHjuatWNBcUpzWVcgdi8KFUCgMXNsNZGBTS5rIdeEd13RtEs0GHFPyCTuABWd4e5Kg3NB1oXUmVtXl0PdJmpZaeWnUaCawtDHapE444Zwb+iByjVvASg2vRfassoLaFil/GXEJlIkmlfHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWLXKng3; arc=none smtp.client-ip=209.85.208.41
+	s=arc-20240116; t=1731884396; c=relaxed/simple;
+	bh=uv8Ihhtdg0n2NJQ3p5u110hUeSo0Kpr8GmEcZJ2bcBA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n8a6uzzxyKZw6TzueVjr7KmZ1LuoGPtSFIEzv5BVvIZZpnzeHxmW5UrtEklWktBDrzAzIrAVT4SWlwSolJthKy60MQjpQalH7N6CtFNGRV7CWqFiLByL0NDvcPhVw+hAKI6t48m7JVVFXG4/ybWgGEj9yU5CyicsUNU2IiZNlJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XyOquGKX; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1ecbso5050569a12.0
-        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 14:41:42 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20c693b68f5so23321735ad.1;
+        Sun, 17 Nov 2024 14:59:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731883301; x=1732488101; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y2ktFFf0cKGqaf9MBrA+rOF7o6IMiIaN18AcSe2ncGo=;
-        b=LWLXKng39S5IJoGci1QJDUt5ckD+PmOd6NKihYPJGDqnXAkx57zn2tEG0BXeJwhz+t
-         61KbNvkNrXjKqPUgtJMHEXNCNxBhq5/xIyRoUmNMKADgZ8qspEJAKn4TePmMU2/3uWn+
-         WAJjJrlPn/T44UQ3ffrAhbC41V7lq3lkNn7NU4iq9hZgR230tY/6+suVUftxciDnTXpY
-         lZyTmfdTyRT6IQaZlwfsvaB3T6zt55XSjIBXFV2uwNjOGObAx3Ym+z4Wp87+kZRVrmKe
-         a2uMxCeALXrFi3i4Ht5qR3X4UBEs9iSazy3fZxVZPBwTzgzPG3/ww/f+fa0z+Ac4+WYM
-         3Bew==
+        d=gmail.com; s=20230601; t=1731884394; x=1732489194; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YDkdpFP063xLDM3wocri/nG7NRGeGfpBxyGmNCvpHu8=;
+        b=XyOquGKXF9K3cfZfp1g09hvAzxGjFdCUOQ4zFxXwbEpWWnNTg5q7S66vAzINj0aQFo
+         Y1vNUt1ieFuQt2KI7ceqEuTCh89US3nfqvmmbDq4T4gzO3gVyM3P8XL6cqrqN3dp/w34
+         ffOJ4AkITTwE504yzhj+RiFArhZQv3CVY5dMVE2ZDGpF8xjZMNk5BYbnmKQJ+AekLkBC
+         0O2BdJW5GK+1hFTQ3aWmZvgKi7Lh32NBjO45E3wAR2RHXVNOicD8BlIQMZOER/G5MzTj
+         M1WB3kHE4YEwDLqUVVXktVaEOZ4KQet4os3AHTddEyOw8sJM/WbqYoKXrTCkHcbo5xY/
+         n6lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731883301; x=1732488101;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y2ktFFf0cKGqaf9MBrA+rOF7o6IMiIaN18AcSe2ncGo=;
-        b=JWZh3z5n2UTOPReO68lfesRuTGoWdcaXlYz3Iu62v0DGX0PPQ65hGIG25q6VDDyNox
-         Km8r4VMLp6MP91uBukhSChVW+0HIZt0RXKt19hLuVxNKEZsSYrQb1jO27Uf26eumisXP
-         O3nlf2x/AzxtlYYFPEGH6VQaZ4gMUjO61dL/sgefIn/qO96Xti9eUI42/HiKkh4COjyf
-         dkZ3WTwbD4DG7fjofulrOtk/yaWck8TWmRfs/S3l3ss2SY3DXcKRIKTHSwHMJd+K5fSM
-         m3cIPKWHL19j/MiM7fmgwrNV0l2By8N5gKyV8x7JTcrhBarOk9FLEU4+2HFZdlKuVDMr
-         AbEA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIJLVHG1tr0/WkGrq5X1D2wPRuuC3Mjc0k07HIy8uP01IynRiSEAOhCqzeVoZ8TSozUZU6y3E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnqgAdhvfGmKRHsx/bAY6VPVYDvdRKXZpFGk3EislaGekFpi+e
-	2FqdHZhZT6JvZscNcsqaqYffVOGUv8hQbiIVsAw4AnmxtxEQAsz6NcpZ7Q==
-X-Google-Smtp-Source: AGHT+IGwUB06d5NYNW8Z5+XDNY1lppmufUtSM2fXvAqhHF19GkxjowSr56zkq772iNdFITEklqeGzw==
-X-Received: by 2002:a05:6402:d06:b0:5ca:e5d:f187 with SMTP id 4fb4d7f45d1cf-5cf8fc676b7mr8201329a12.17.1731883300743;
-        Sun, 17 Nov 2024 14:41:40 -0800 (PST)
-Received: from [127.0.0.1] ([193.252.113.11])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cfb99af32esm1214955a12.75.2024.11.17.14.41.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Nov 2024 14:41:39 -0800 (PST)
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-Message-ID: <88c439e9-0771-4bfc-a4af-70b4be76ea1f@orange.com>
-Date: Sun, 17 Nov 2024 23:41:35 +0100
+        d=1e100.net; s=20230601; t=1731884394; x=1732489194;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YDkdpFP063xLDM3wocri/nG7NRGeGfpBxyGmNCvpHu8=;
+        b=UYhKtKAB30W+NADuanDMej/bHqk4j3dMb4vs4kjd1FrojSRQ8p7F1QnknU1GGH1L9o
+         OecbMS04a/E3XJjBjL/YVlzJGXRzQpU0IxHlB7G/3GvlpimSpzwZQXrM2Zyyoh4FBFtx
+         6Hh57YQO0FY0l2Ab/6LyMOFUmimmaIWm1QYaWXQsIoTlRrB4raPq3Bq8iXIVqmNvcl4K
+         5AeSyY9UZqf4aFtT5woPo+zIsQ1JLQVXHJV4flYrAY5dplSWiYm/HkQDwGeN/unYgPid
+         17fXuGo1jlhtkgWrImMzAgkWwsK7K/rPF8MN5WDHb5pLxlVFbE/WQiTC8mjNwoMkLxkQ
+         i62w==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ6s5MCrpSHH7Bl4HswD99tl7NRnp+LouSQCgE4at+wAzSq4OEd8MOG7VEWjZMx12FDjak1OB3TjoRmwk=@vger.kernel.org, AJvYcCX6Dyt242rm45qQNV4raeWXgxBWx+WuS/ehMtDq8/h2FC5AmliIFcJhF2/k3pmQdvbYb0fLW/WD08hoprUptCM8@vger.kernel.org, AJvYcCXYddxGSJACeZQWPojqHohMKfcS/ihDBNX1FvN9ljsE6z2ktGi0JGJ/jHfIXmbOlftzd13xZKfx@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2bqDYIzDId9n+64ZUbZ0WgV92GojMCytBTWnGKbWJ3VZJtQ40
+	A3zTeJlDxKJxSVJ2MdX+5j3tlxM4z61ZMp2q7bjdPc8KQX3MhlzW
+X-Google-Smtp-Source: AGHT+IG4IhDYQGGogz/AsvycfNbCsZDdahXP/VJU1uZ9sUw3Y9/74uV9EjqxgWYSikEEivGON3kDHg==
+X-Received: by 2002:a17:902:da91:b0:206:9a3f:15e5 with SMTP id d9443c01a7336-211d0d92220mr162127935ad.32.1731884394177;
+        Sun, 17 Nov 2024 14:59:54 -0800 (PST)
+Received: from tp.hsd1.or.comcast.net ([2601:1c2:c104:170:138:7477:f049:643b])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f3461fsm44932285ad.154.2024.11.17.14.59.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Nov 2024 14:59:53 -0800 (PST)
+From: Leo Stone <leocstone@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: Leo Stone <leocstone@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH net-next] selftests: net/psock_lib: Handle EINTR and EAGAIN
+Date: Sun, 17 Nov 2024 14:59:50 -0800
+Message-Id: <20241117225950.138968-1-leocstone@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: GRE tunnels bound to VRF
-To: Ben Greear <greearb@candelatech.com>, netdev <netdev@vger.kernel.org>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
-Content-Language: fr, en-US
-Organization: Orange
-In-Reply-To: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 17/11/2024 19:40, Ben Greear wrote:
-> Hello,
-> 
-> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
-> underlying traffic?
-> 
-> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
-> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
-> gre interfaces and have that go out whatever the ethernet VRFs route to...
+Make pair_udp_send_char handle EAGAIN, EINTR, and partial reads or
+writes.
 
-A netns is vastly more flexible than a VRF, with much cleaner operation. In your
-case I'd just move each eth to a separate netns, and create its GRE there.
+Signed-off-by: Leo Stone <leocstone@gmail.com>
+---
+ tools/testing/selftests/net/psock_lib.h | 39 +++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
+
+diff --git a/tools/testing/selftests/net/psock_lib.h b/tools/testing/selftests/net/psock_lib.h
+index 6e4fef560873..e28bff95c8e2 100644
+--- a/tools/testing/selftests/net/psock_lib.h
++++ b/tools/testing/selftests/net/psock_lib.h
+@@ -13,6 +13,7 @@
+ #include <string.h>
+ #include <arpa/inet.h>
+ #include <unistd.h>
++#include <stdbool.h>
+ 
+ #include "kselftest.h"
+ 
+@@ -110,21 +111,41 @@ static __maybe_unused void pair_udp_open(int fds[], uint16_t port)
+ 	}
+ }
+ 
++static void read_write_checked(int fd, char *buf, size_t sz, bool is_write)
++{
++	int bytes_processed = 0;
++	int ret;
++
++	do {
++		if (is_write)
++			ret = write(fd, buf + bytes_processed,
++				    sz - bytes_processed);
++		else
++			ret = read(fd, buf + bytes_processed,
++				   sz - bytes_processed);
++		if (ret == -1) {
++			if (errno == EAGAIN || errno == EINTR) {
++				continue;
++			} else {
++				fprintf(stderr, "ERROR: %s failed, bytes left=%lu\n",
++					is_write ? "send" : "recv",
++					sz - bytes_processed);
++				exit(1);
++			}
++		}
++		bytes_processed += ret;
++	} while (bytes_processed < sz);
++}
++
+ static __maybe_unused void pair_udp_send_char(int fds[], int num, char payload)
+ {
+ 	char buf[DATA_LEN], rbuf[DATA_LEN];
+ 
+ 	memset(buf, payload, sizeof(buf));
+ 	while (num--) {
+-		/* Should really handle EINTR and EAGAIN */
+-		if (write(fds[0], buf, sizeof(buf)) != sizeof(buf)) {
+-			fprintf(stderr, "ERROR: send failed left=%d\n", num);
+-			exit(1);
+-		}
+-		if (read(fds[1], rbuf, sizeof(rbuf)) != sizeof(rbuf)) {
+-			fprintf(stderr, "ERROR: recv failed left=%d\n", num);
+-			exit(1);
+-		}
++		read_write_checked(fds[0], buf, sizeof(buf), true);
++		read_write_checked(fds[1], rbuf, sizeof(rbuf), false);
++
+ 		if (memcmp(buf, rbuf, sizeof(buf))) {
+ 			fprintf(stderr, "ERROR: data failed left=%d\n", num);
+ 			exit(1);
+-- 
+2.39.5
+
 
