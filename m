@@ -1,105 +1,97 @@
-Return-Path: <netdev+bounces-145629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A7E39D02AE
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 11:02:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF9C9D02DC
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 11:11:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4D32B22FF3
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 10:02:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D16F1F22A25
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 10:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8D47DA82;
-	Sun, 17 Nov 2024 10:02:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387D9139D07;
+	Sun, 17 Nov 2024 10:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LebczgXL"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="fhNhH9Jx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward502d.mail.yandex.net (forward502d.mail.yandex.net [178.154.239.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0D738C;
-	Sun, 17 Nov 2024 10:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D50E335B5;
+	Sun, 17 Nov 2024 10:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731837722; cv=none; b=RYa+J8n9A9r6EXnYHdLhj5w2lTOe4rxSXQCWwMyCNleg3AA90rKIz24nR+cZS5rCF1Wh8N6hcXT9M7yXXi4GzmHyoWJDRGTDQTCzaG2dE3OfjmbnKb4O5VfDAyabtPfZNIoQgZfRnED/nzQ1PunZL4uvP/4KGO6bkfKALn44p2k=
+	t=1731838292; cv=none; b=pcHXjbwCFIJat4Pz1Xm49WwLPOWeek13Zv1A+HvcYNHCJPAUGy+gwnvA2zWjAadbah9w1dN81p6lANby4iyN5wViPUMX7KSTsVUfb8BX3Ldn4eVWiUA7azO3AHpnokwbs2cau+3Z6RtF7l8OMy0NCbkBDZoIXrlAsPB+6JzqF4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731837722; c=relaxed/simple;
-	bh=GDy6m6BY4EGyXxc2N9r+tnApMzC68LOdmdCnQ6PdhHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YPthTiMGAadOG7MrR4tivHekhfP1J5LsBSZLb54ANRqISgMDfi0btUOWf69/4Ev6sgiElGY3+X78c9mKBq4SXIa9FOEu+qvlkFMgsWwzphpeIwWKykpa7C1W0LitEMGeEth6/0SfFQm56DbtbgqVlbcxnFaM/DHbsGyfOADgbvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LebczgXL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CD5BC4CECD;
-	Sun, 17 Nov 2024 10:02:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731837721;
-	bh=GDy6m6BY4EGyXxc2N9r+tnApMzC68LOdmdCnQ6PdhHs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LebczgXLzB7bS4cwxNexnHpB3sIg+Qps8p+Da/insm+RxuMlE5Xj1O/G8cwiODmnj
-	 Vn8pyhm31oezXFTWaG/3KvoNseUbHJE6r9qzqZxs3JBAxppDl2UZPtotPGP1xRIKcT
-	 gf5CnoK1zOUJUoCBiojv4J0POtQxW5du3OX0etKs6iJpkD83cg7/9a+sUdZ+xYx5lc
-	 r5YF/jZoes6tAu7d4TrxNPUn2IRL47ziqlSZ8Uaw2f5YUVlxBvBYgENJMXkaWIK4Dy
-	 D/Pz7EsiI63/4NiYpvkwgMnav2CU6CJSsBw2kPkdH/eMbxp44MgUMl+c8rgEtRoao3
-	 jJKVji4avjE9Q==
-Date: Sun, 17 Nov 2024 12:01:56 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux390-list@tuxmaker.boeblingen.de.ibm.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net/smc: Run patches also by RDMA ML
-Message-ID: <20241117100156.GA28954@unreal>
-References: <20241115-smc_lists-v1-1-a0a438125f13@linux.ibm.com>
+	s=arc-20240116; t=1731838292; c=relaxed/simple;
+	bh=Dxby0uqMdN7as2UyyHjcSaRbFkuNxqYBZvH3idpkSss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Li9cmiFrZaQlx6zw2+Pia8w4OnnQTzk9S+4Uth9y2GsV36HF9X3j4b+zY6uRn+LTGKMT+TnUUceTmiKj/Z0E+fgmj/J7gpXQ/V35kQP46Qkw2HPDm4eDo15zW8JXeANfvaV0PY0e8cmYhPxaanJyBxTcX09LOMYK+Y6TnSQc/WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=fhNhH9Jx; arc=none smtp.client-ip=178.154.239.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-72.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-72.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:2cca:0:640:9416:0])
+	by forward502d.mail.yandex.net (Yandex) with ESMTPS id E9F1760F04;
+	Sun, 17 Nov 2024 13:04:55 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-72.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id r4M6SEROg8c0-pFZwU6ST;
+	Sun, 17 Nov 2024 13:04:55 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1731837895; bh=Dxby0uqMdN7as2UyyHjcSaRbFkuNxqYBZvH3idpkSss=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=fhNhH9Jxvc9NeeLktZiL0q18ircVXaacbK+3docRjMX5MUYvX/OzMvMwmpMM2VliM
+	 8TUv/YD2Q5IC12SWDU1bvzH0kP/QznbX8OvltEnMKsl1vWH6cFqax78WdGSsGuF30R
+	 h5hXq+c8uAhQQCZPD/4HhglwpBZwV8SIWxgk3jbU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-72.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <d1e90994-ca11-4a3e-b627-e3425dc5bf26@yandex.ru>
+Date: Sun, 17 Nov 2024 13:04:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115-smc_lists-v1-1-a0a438125f13@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] scm: fix negative fds with SO_PASSPIDFD
+To: Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Christian Brauner <brauner@kernel.org>, Kees Cook <kees@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org
+References: <20241117091313.10251-1-stsp2@yandex.ru>
+ <CAJqdLrp4J57k67R3OWM-_6QZSv8EV9UANzdAtBCiLGQZPTXDcQ@mail.gmail.com>
+Content-Language: en-US
+From: stsp <stsp2@yandex.ru>
+In-Reply-To: <CAJqdLrp4J57k67R3OWM-_6QZSv8EV9UANzdAtBCiLGQZPTXDcQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 15, 2024 at 06:44:57PM +0100, Gerd Bayer wrote:
-> Commits for the SMC protocol usually get carried through the netdev
-> mailing list. Some portions use InfiniBand verbs that are discussed on
-> the RDMA mailing list. So run patches by that list too to increase the
-> likelihood that all interested parties can see them.
-> 
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> ---
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 32d157621b44fb919307e865e2481ab564eb17df..16024268b5fc1feb6c0d01eab3048bd9255d0bf9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20943,6 +20943,7 @@ M:	Jan Karcher <jaka@linux.ibm.com>
->  R:	D. Wythe <alibuda@linux.alibaba.com>
->  R:	Tony Lu <tonylu@linux.alibaba.com>
->  R:	Wen Gu <guwen@linux.alibaba.com>
-> +L:	linux-rdma@vger.kernel.org
->  L:	linux-s390@vger.kernel.org
+17.11.2024 12:40, Alexander Mikhalitsyn пишет:
+> Hi Stas,
+>
+> Actually, it's not a forgotten check. It's intended behavior to pass
+> through errors from pidfd_prepare() to
+> the userspace. In my first version [1] of the patch I tried to return
+> ESRCH instead of EINVAL in your case, but
+> then during discussions we decided to remove that.
+>
+> [1] https://lore.kernel.org/all/20230316131526.283569-2-aleksandr.mikhalitsyn@canonical.com/
+Yes, the patch you referenced above,
+only calls put_cmsg() with an error code.
 
-Why don't we have netdev ML here too?
+But the code I can see now in git, does
+much more. Namely,
+if (pidfd_file)
+     fd_install(pidfd, pidfd_file);
 
-Thanks
+Or:
 
->  S:	Supported
->  F:	net/smc/
-> 
-> ---
-> base-commit: 519b790af22e705ee3fae7d598f1afbb3d1cfdd5
-> change-id: 20241106-smc_lists-b98e6829b31c
-> 
-> Best regards,
-> -- 
-> Gerd Bayer <gbayer@linux.ibm.com>
-> 
+put_unused_fd(pidfd);
+
+And I really can't find any ">=0" check
+in those funcs. What am I missing?
+Is it safe to call fd_install(-22, pidfd_file)?
+
 
