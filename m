@@ -1,158 +1,102 @@
-Return-Path: <netdev+bounces-145694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8C49D06B3
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 23:39:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56BD29D06B5
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 23:41:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D13C72822D5
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 22:39:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FB44281DDF
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 22:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBD71DD880;
-	Sun, 17 Nov 2024 22:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381131DB375;
+	Sun, 17 Nov 2024 22:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="d7kp6BQH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mnbU/buw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWLXKng3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A5E144D1A;
-	Sun, 17 Nov 2024 22:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8817A15445D
+	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 22:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731883137; cv=none; b=tMrZ7T3S9GHdEWoPnSVzGTVPC4t04qBMO0StIG/AKN4pMLuze28hLlzkNZblyKO9lfJFOgTG6KIGJ0dhf+nvFoYdZ1o0xqvgjKurcumXVpg+rKjJUTlq7W3T5dU1QujFw/8WDNZ2zpXbvbcsB2WcsINmMqgDAmMgQ8SJZ7EIKis=
+	t=1731883304; cv=none; b=je25sb+t8aqNDKvOFHCtPw3osX7uTXuAPu8Upx01luW01H0gbq3JTOrBAN3r0qdzwPbhRlnZ+LNld9nwUTI1OMJdnDM5DD5a70j+UQx3um7MmoZypqR8n8ty3VVZ4TMlReJiHpa2gOyWTvuB8AerjrCi2PGZ7IQr/elRZxum05E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731883137; c=relaxed/simple;
-	bh=kcUhqc1H/sSqKzCIml06tsv1hCK1orZ6aFoj1a6W/Cc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZgjozZkZti6u+7gZhiskUEsIFYDokoBz3sfedc8GATWkPma+700nZB5s263pewID3yAkKKBwFQmB8JnMCEfwB1Qi1xkJoP7gfX4yiZS4xxArt94jhPKu+MSvWEuxIoR0YX8wYRF8VHZQQftyT387Jb+mquYY/Egc6vt5BNAKoUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=d7kp6BQH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mnbU/buw; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id F3A46114019E;
-	Sun, 17 Nov 2024 17:38:53 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Sun, 17 Nov 2024 17:38:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1731883133;
-	 x=1731969533; bh=TyZQ3oux8sXs5BpOMWkWK8bYbC++bbMBVEmXrfZoS3Q=; b=
-	d7kp6BQHytP1h9Wp35KVSneMQe8evLLLOkjCYcZ9p/UZvRs3wS0jsmnvACxhnS9P
-	kuTBVemnvrG+p1SRIybTuokCLK7ZiCA7y4Z/5rDwPPjlpctmxOJibbGCBQSFjViZ
-	i6pezuzo8gHtc2eoJ0Rg0qrJ2WmFv4/hlnUB0x9cy8EqcC2NQxc3wE57nhK0RrCi
-	n1WHqU08GvU7z4t5CIG4oz2CyHnNRf26ZeX57do3xsMitXHjevaBMDgwsAdm4QQQ
-	mUOMewDydZS7cfx7thYr0FqRSznihaRjPK1acB1Qr+zZOf8JWOmMDoB4r/QhZAbD
-	4IDH9mA60Y1OmNbNTx2lPQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1731883133; x=
-	1731969533; bh=TyZQ3oux8sXs5BpOMWkWK8bYbC++bbMBVEmXrfZoS3Q=; b=m
-	nbU/buwwYUrQAyx5S9Y7uuXXfhNb908OyP4OSZ0ui9lAbUpIzSgloO984WKrOZpS
-	i8MTMQUztUCu0nesuRcyIqmp2VPxAWg4XfidJvrUZ3DgU2JdHGv8dSqIWNDdv4qR
-	VZ0lW1flKA0RkoQvr6t+juwMEAUa41qNUu7rln76uDpXMIp0wiDImQK7eTJGzNzL
-	UV/bSlKG80qwrdWxoVGIQDz6wyhzlxG44k9lICevx6yoZxv7agU97OnXdksUaTdc
-	Vfs+yUo0XN4RSgZQQ1V3QD5PGooKiEcbeBA/6Vh1m3vb1kMH8t1v6wYXaeMP2ox6
-	DRbYFkFh67Tu2qKdc6DYA==
-X-ME-Sender: <xms:fXA6Z96BCF5uYknDq7mRGDIKHd991mX2eKgLCQQJCrb7zLx2kYUUzg>
-    <xme:fXA6Z67b6jLmzDPUhLwwE8ep_ShVAW5psEdB4I14W_j2rUL0YbRGatjAOVPTG_xJX
-    KGQv426Dkw6r039kds>
-X-ME-Received: <xmr:fXA6Z0c1Jg8mZidDRcUEwDk5lAxp2RenM78Vkpoh0q5MAtWiYxVNRW2UsR18LpUI7xtnz0YEGqBA-yZ-PbvjVpntmbnrl4_q-w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgddtudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeen
-    ucfhrhhomheppfhikhhlrghsucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvg
-    hrlhhunhgusehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepveetgedt
-    vddvhfdtkeeghfeffeehteehkeekgeefjeduieduueelgedtheekkeetnecuvehluhhsth
-    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohgu
-    vghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepudejpdhmoh
-    guvgepshhmthhpohhuthdprhgtphhtthhopehrohhsvghnphesghhmrghilhdrtghomhdp
-    rhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehkuhhrtheslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfies
-    lhhunhhnrdgthhdprhgtphhtthhopeholhhtvggrnhhvsehgmhgrihhlrdgtohhmpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughu
-    mhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:fXA6Z2Llebuj6Mu__Xn91mLXJlHF_1Ia91oHwnN3c5vx8QSXQpSO7Q>
-    <xmx:fXA6ZxJ7mAUShv7861GzoKjOyMv88BDtZR2EkO4JCWWlvt4KGKkaXw>
-    <xmx:fXA6Z_wu_fGarudwg0_BqSGgyVmFBb5JpzFJroGUnFnzu9T0_ASD3g>
-    <xmx:fXA6Z9L68MvcmYZk6Cv8RXh_V5z1eU9cMr1IxjnNadVK7exp8tQldg>
-    <xmx:fXA6Z-dNDxbuUacU3sy5A9HaBR5hB-c8fAgdPyXnSZZ5Dr1N_6w3_BhF>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 17 Nov 2024 17:38:52 -0500 (EST)
-Date: Sun, 17 Nov 2024 23:38:50 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:RENESAS ETHERNET SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCHv3 net-next] net: modernize ioremap in probe
-Message-ID: <20241117223850.GK5315@ragnatech.se>
-References: <20241117212711.13612-1-rosenp@gmail.com>
+	s=arc-20240116; t=1731883304; c=relaxed/simple;
+	bh=oD/hNRdR/qJ6gLA5pBNm/miI+eSxnQIBdqvIkH8gHfs=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
+	 In-Reply-To:Content-Type; b=An0hJ4sDWyww/pyj//FPxSNwL3nhZwHjuatWNBcUpzWVcgdi8KFUCgMXNsNZGBTS5rIdeEd13RtEs0GHFPyCTuABWd4e5Kg3NB1oXUmVtXl0PdJmpZaeWnUaCawtDHapE444Zwb+iByjVvASg2vRfassoLaFil/GXEJlIkmlfHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWLXKng3; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1ecbso5050569a12.0
+        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 14:41:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731883301; x=1732488101; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y2ktFFf0cKGqaf9MBrA+rOF7o6IMiIaN18AcSe2ncGo=;
+        b=LWLXKng39S5IJoGci1QJDUt5ckD+PmOd6NKihYPJGDqnXAkx57zn2tEG0BXeJwhz+t
+         61KbNvkNrXjKqPUgtJMHEXNCNxBhq5/xIyRoUmNMKADgZ8qspEJAKn4TePmMU2/3uWn+
+         WAJjJrlPn/T44UQ3ffrAhbC41V7lq3lkNn7NU4iq9hZgR230tY/6+suVUftxciDnTXpY
+         lZyTmfdTyRT6IQaZlwfsvaB3T6zt55XSjIBXFV2uwNjOGObAx3Ym+z4Wp87+kZRVrmKe
+         a2uMxCeALXrFi3i4Ht5qR3X4UBEs9iSazy3fZxVZPBwTzgzPG3/ww/f+fa0z+Ac4+WYM
+         3Bew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731883301; x=1732488101;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y2ktFFf0cKGqaf9MBrA+rOF7o6IMiIaN18AcSe2ncGo=;
+        b=JWZh3z5n2UTOPReO68lfesRuTGoWdcaXlYz3Iu62v0DGX0PPQ65hGIG25q6VDDyNox
+         Km8r4VMLp6MP91uBukhSChVW+0HIZt0RXKt19hLuVxNKEZsSYrQb1jO27Uf26eumisXP
+         O3nlf2x/AzxtlYYFPEGH6VQaZ4gMUjO61dL/sgefIn/qO96Xti9eUI42/HiKkh4COjyf
+         dkZ3WTwbD4DG7fjofulrOtk/yaWck8TWmRfs/S3l3ss2SY3DXcKRIKTHSwHMJd+K5fSM
+         m3cIPKWHL19j/MiM7fmgwrNV0l2By8N5gKyV8x7JTcrhBarOk9FLEU4+2HFZdlKuVDMr
+         AbEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXIJLVHG1tr0/WkGrq5X1D2wPRuuC3Mjc0k07HIy8uP01IynRiSEAOhCqzeVoZ8TSozUZU6y3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnqgAdhvfGmKRHsx/bAY6VPVYDvdRKXZpFGk3EislaGekFpi+e
+	2FqdHZhZT6JvZscNcsqaqYffVOGUv8hQbiIVsAw4AnmxtxEQAsz6NcpZ7Q==
+X-Google-Smtp-Source: AGHT+IGwUB06d5NYNW8Z5+XDNY1lppmufUtSM2fXvAqhHF19GkxjowSr56zkq772iNdFITEklqeGzw==
+X-Received: by 2002:a05:6402:d06:b0:5ca:e5d:f187 with SMTP id 4fb4d7f45d1cf-5cf8fc676b7mr8201329a12.17.1731883300743;
+        Sun, 17 Nov 2024 14:41:40 -0800 (PST)
+Received: from [127.0.0.1] ([193.252.113.11])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cfb99af32esm1214955a12.75.2024.11.17.14.41.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Nov 2024 14:41:39 -0800 (PST)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+Message-ID: <88c439e9-0771-4bfc-a4af-70b4be76ea1f@orange.com>
+Date: Sun, 17 Nov 2024 23:41:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241117212711.13612-1-rosenp@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: GRE tunnels bound to VRF
+To: Ben Greear <greearb@candelatech.com>, netdev <netdev@vger.kernel.org>
+References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+Content-Language: fr, en-US
+Organization: Orange
+In-Reply-To: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Rosen,
+On 17/11/2024 19:40, Ben Greear wrote:
+> Hello,
+> 
+> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
+> underlying traffic?
+> 
+> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
+> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
+> gre interfaces and have that go out whatever the ethernet VRFs route to...
 
-Thanks for your work.
-
-On 2024-11-17 13:27:11 -0800, Rosen Penev wrote:
-
-> diff --git a/drivers/net/ethernet/renesas/rtsn.c 
-> b/drivers/net/ethernet/renesas/rtsn.c
-> index 6b3f7fca8d15..bfe08facc707 100644
-> --- a/drivers/net/ethernet/renesas/rtsn.c
-> +++ b/drivers/net/ethernet/renesas/rtsn.c
-> @@ -1297,14 +1297,8 @@ static int rtsn_probe(struct platform_device *pdev)
->  	ndev->netdev_ops = &rtsn_netdev_ops;
->  	ndev->ethtool_ops = &rtsn_ethtool_ops;
->  
-> -	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
-> -	if (!res) {
-> -		dev_err(&pdev->dev, "Can't find gptp resource\n");
-> -		ret = -EINVAL;
-> -		goto error_free;
-> -	}
-> -
-> -	priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
-> +	priv->ptp_priv->addr =
-> +		devm_platform_ioremap_resource_byname(pdev, "gptp");
->  	if (IS_ERR(priv->ptp_priv->addr)) {
->  		ret = PTR_ERR(priv->ptp_priv->addr);
->  		goto error_free;
-
-You have a similar construct using platform_get_resource_byname() a few 
-lines above this one. Please convert both uses, or none, mixing them is 
-just confusing IMHO.
-
--- 
-Kind Regards,
-Niklas Söderlund
+A netns is vastly more flexible than a VRF, with much cleaner operation. In your
+case I'd just move each eth to a separate netns, and create its GRE there.
 
