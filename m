@@ -1,102 +1,84 @@
-Return-Path: <netdev+bounces-145613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C46B89D01DC
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 03:00:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BD29D01EA
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 04:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D5951F226BE
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 02:00:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53BCAB21F9B
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 03:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FA9EBE;
-	Sun, 17 Nov 2024 02:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266BED515;
+	Sun, 17 Nov 2024 03:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MRf3fef1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KdiJGosl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FCA9322E
-	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 02:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BCBBA3F;
+	Sun, 17 Nov 2024 03:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731808838; cv=none; b=dxZwyeFzMLbe9lLQpyU44w/6hvWqFmlVlieZFJHoSKGZyWdlhjMqUbAy2rzUe+oJPFQZd6rPRIDPsfrfEqBcVcX0wlKQ1HaM6oyiVDnejdPUACCH+qnc/NA+GjNyTO0OXcn8yvABdinpSDSm9ibUr1Piq/oEiwBwIUaARnpS0gU=
+	t=1731812745; cv=none; b=oY6JywFeoS/UTJkpr5plCmvtA4HhPs8xF8YWqN+BeJ2Rtos8cAGAYM1T5GruAVcE6XzBFab2CZxwhQSLV5vi6L9rsM5e9qjKdcr6fZ4SDwDsOcVCtJ/7PDZShrQPU18MRciYdRAhSXlLG1qyZilP9xeSiWEJHoTEvNfcR5rO3uY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731808838; c=relaxed/simple;
-	bh=pggGwYYiO7/EKpaGZyBXtbcE3Gc+xSn+dqRYs9jjf7w=;
+	s=arc-20240116; t=1731812745; c=relaxed/simple;
+	bh=CHrsYTfEg3BHIhf2gtxsVvuv1Sg6ZU+fanYiVmQxMLU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I4aXj9ShvpmvNtGjrX1FAnv80dyoXGx1BvrpBpFjQ6ys/N5LIi5FlFSut4ZMzOxbvYqZOg7EUZQ0YtBZrLnWvfdelgtDBq52cDHu3wDc1xeK8IR1iUVHi0Xx9M0BG3ENgEJU/PqK8AofmmfCxP4t1XU4avTUlN+D7kWjoAopy5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MRf3fef1; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7f3e30a43f1so588739a12.1
-        for <netdev@vger.kernel.org>; Sat, 16 Nov 2024 18:00:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731808837; x=1732413637; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iSj+/u6+GW4MKPbW6oQfGVJ+m84++DtvLy+bIAMU78k=;
-        b=MRf3fef1Mw6kIynYD+7CHa7CjM1HV0MMAslXAv5WafFMAwqFpeHGEICUM5/LhqYgKD
-         0Nf76Sw+Lg2vPef54sSf5bXYwg7VsjysGHw4glUE+gDaLyWD2bkkJWpGgobzHGNjpqE1
-         E4UEBSID0WSmxHP6mn1E7CiQ5RXvad66EuzlDAaaOx+bo7b29BBjB4/Rxio1kpvq85aV
-         bBqeKRTMvZ7Zke3m5iUX+SfE35LYowJCL/yEhcEUyD5S65U6dqvd1/lirMDafjDzmTv1
-         ljF73PScW1SnSgBhywv43DlvbCq9gGezKVj7Cn6wE2/Izd3BgPofCCm8pMXYnGd3sxUw
-         3UqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731808837; x=1732413637;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iSj+/u6+GW4MKPbW6oQfGVJ+m84++DtvLy+bIAMU78k=;
-        b=v3uGb7OWynbF0v3/2ut275M9+WribNaJ9k9ZSVTUSIcuT41YFgRqJ4CqGOXYGHRa9Y
-         HOMvy7iOAcAVU0Qw+0B2RxkCQz66bwWkE1cymBflXLZ1CMFm6ZRAAhj4Q8J1o656B1pw
-         bOYN8twtBSDOLBVALCGfYVTcS8mjlf2V/h4FkwiCf6qLJdjCNUSJTJhONuSOmK6Nrsgi
-         nmmkxO1mEmRAe5/iwlhbdDCPMYkTv+BFM/FmMJ8pnAKLy0p565NgMDKQTZzNFsL64Bvc
-         jWLIUZvqKsuMoghUGi9w/tlz85Cgq2x5o0A1i3Pf7Kedc9IIHL2AvQWUDI/TYYBhKbCr
-         fpuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpIECkwCdX/nUx5Dq67GMn3K/e5bA79fL7AHS0p9uL7zYnzqxLcEC61FevtF8rufvasUJNHrs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0fg0KwZz+3Unp4ozi5XM8INsMquPFZgAd/NQfL4IuZbyWNRKM
-	IMAFJpf0jkBgv8ITnLq1PMIgl5ykqrmkVqSBGov3Ik+lJ8j0b775
-X-Google-Smtp-Source: AGHT+IFsZMZwSwbAKPkv6r9IvFGROXfwOQP66QD5l2cdrvFymWhAYjttisJwAoW9VjB444FjZdteiw==
-X-Received: by 2002:a17:902:e80b:b0:211:aa9e:b825 with SMTP id d9443c01a7336-211d0d724e1mr99791465ad.14.1731808836602;
-        Sat, 16 Nov 2024 18:00:36 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f56defsm33307405ad.270.2024.11.16.18.00.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Nov 2024 18:00:32 -0800 (PST)
-Date: Sat, 16 Nov 2024 18:00:28 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: David Arinzon <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: Re: [PATCH v4 net-next 3/3] net: ena: Add PHC documentation
-Message-ID: <ZzlOPEyFxOjvPJd2@hoboy.vegasvil.org>
-References: <20241114095930.200-1-darinzon@amazon.com>
- <20241114095930.200-4-darinzon@amazon.com>
- <ZzlMlnDvhBntNkDS@hoboy.vegasvil.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UR/fvYbEa8hJURMs3reEoKRXSI2QmczHV+9bto5AVsS6G87XWCcEssMaXygivs4WjCFmTV+21lKjelLvHVv0FGwX2LbM7KcDETJxfIGYwmHOOjz29m314rCo+9nzkU94a13wWb/TcrcLSIvOrM5nZZqvan/qLG/GJMHpVjBCtPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KdiJGosl; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731812742; x=1763348742;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CHrsYTfEg3BHIhf2gtxsVvuv1Sg6ZU+fanYiVmQxMLU=;
+  b=KdiJGoslHYgLV3ORZf6a7WUswimPm5qy2zKY/eZ3+YXCb7rqPBhjG49f
+   QqKbj0TzBkk/BpzXHTGlyv79zmJYY5JW2n6GcUbFOAmj0nPMwIT2sbl6j
+   r/IUx+CBFamdE/FmnCea6PZeMKzM1oP63LrF7yV/APmL4mo0AIsIbBDrD
+   tMY354GDVU5YyS66OJRGd5kSZCDfpkXk80BX/JhASGMkq9S5k65CEDEBW
+   gMP58TkYxIkqBIJpNgi+IWykONrEGp2j7Z/sE+YSK7QZhe9wKcqgLbx1s
+   0pA8WFIGO3hWUDRv485iGk9O+uJUos9gVfbq4anoeUy3RdNrWMysdS/dA
+   Q==;
+X-CSE-ConnectionGUID: oqPnFRcgT1OLEKVv27jiMQ==
+X-CSE-MsgGUID: GaLYDS3bRFSgcDHnH7ozOQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11258"; a="31199853"
+X-IronPort-AV: E=Sophos;i="6.12,161,1728975600"; 
+   d="scan'208";a="31199853"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2024 19:05:41 -0800
+X-CSE-ConnectionGUID: 9AR+ZDSRRySkglu2Zx+FcA==
+X-CSE-MsgGUID: AODqRlbGSV6WufBreVf/pg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,161,1728975600"; 
+   d="scan'208";a="88478076"
+Received: from lkp-server01.sh.intel.com (HELO 1e3cc1889ffb) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 16 Nov 2024 19:05:37 -0800
+Received: from kbuild by 1e3cc1889ffb with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tCVbT-0001HR-0T;
+	Sun, 17 Nov 2024 03:05:35 +0000
+Date: Sun, 17 Nov 2024 11:04:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: admiyo@os.amperecomputing.com, Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH v7 2/2] mctp pcc: Implement MCTP over PCC Transport
+Message-ID: <202411171010.YDEy5wvg-lkp@intel.com>
+References: <20241114024928.60004-3-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,29 +87,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZzlMlnDvhBntNkDS@hoboy.vegasvil.org>
+In-Reply-To: <20241114024928.60004-3-admiyo@os.amperecomputing.com>
 
-On Sat, Nov 16, 2024 at 05:53:26PM -0800, Richard Cochran wrote:
-> On Thu, Nov 14, 2024 at 11:59:30AM +0200, David Arinzon wrote:
-> 
-> > +**phc_skp**         Number of skipped get time attempts (during block period).
-> > +**phc_err**         Number of failed get time attempts (entering into block state).
-> 
-> Just curious...  I understand that the HW can't support a very high
-> rate of gettime calls and that the driver will throttle them.
-> 
-> But why did you feel the need to document the throttling behavior in
-> such a overt way?  Are there user space programs out there calling
-> gettime excessively?
+Hi,
 
-Answering my own question (maybe)
+kernel test robot noticed the following build warnings:
 
-I see that your PHC only supports gettime(), and so I guess you must
-have some atypical system setup in mind.
+[auto build test WARNING on rafael-pm/linux-next]
+[also build test WARNING on rafael-pm/bleeding-edge linus/master v6.12-rc7 next-20241115]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I didn't see any comments in the cover letter or in the patch about
-why the PHC isn't adjustable or how offering gettime() only is useful?
+url:    https://github.com/intel-lab-lkp/linux/commits/admiyo-os-amperecomputing-com/mctp-pcc-Check-before-sending-MCTP-PCC-response-ACK/20241114-105151
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git linux-next
+patch link:    https://lore.kernel.org/r/20241114024928.60004-3-admiyo%40os.amperecomputing.com
+patch subject: [PATCH v7 2/2] mctp pcc: Implement MCTP over PCC Transport
+config: riscv-kismet-CONFIG_ACPI-CONFIG_MCTP_TRANSPORT_PCC-0-0 (https://download.01.org/0day-ci/archive/20241117/202411171010.YDEy5wvg-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20241117/202411171010.YDEy5wvg-lkp@intel.com/reproduce)
 
-Thanks,
-Richard
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411171010.YDEy5wvg-lkp@intel.com/
+
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for ACPI when selected by MCTP_TRANSPORT_PCC
+   WARNING: unmet direct dependencies detected for ACPI
+     Depends on [n]: ARCH_SUPPORTS_ACPI [=n]
+     Selected by [y]:
+     - MCTP_TRANSPORT_PCC [=y] && NETDEVICES [=y] && MCTP [=y]
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
