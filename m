@@ -1,104 +1,135 @@
-Return-Path: <netdev+bounces-145616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39A089D0209
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 06:00:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE1469D0242
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 07:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2A0BB22F61
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 05:00:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B909B20DB4
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 06:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70786179BC;
-	Sun, 17 Nov 2024 05:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866BE29406;
+	Sun, 17 Nov 2024 06:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZ/gAa/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from 189.cn (ptr.189.cn [183.61.185.104])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57D315C0;
-	Sun, 17 Nov 2024 05:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.61.185.104
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0887A28F5;
+	Sun, 17 Nov 2024 06:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731819617; cv=none; b=cB32ADrqRU1lIHcrvkyYubzSPLWKh9rSJRAMXnvJBzIjxy9wOX5Emn7JRnndUlddJaP7dRTR13Noj1yyBYyw0ZzbXqMa1o5DkM+5PsBuN58rzhw6YZsF0d3xgq1pOApxz35rToD3+i7JEc9Gls7qMYHqYB6LRnESNuW3FUWW920=
+	t=1731825249; cv=none; b=W8qW581gJnfya0nUzsAKSw6XYRItrOtANP6MVE+JVZMOVu+1vfq41uTg/mT62bA5QwYgo9SzlvIjK4lkuzk8msv3CyltgcdPVn98srTOTxQNe1OzjgcYTOWfZd8wBaJFr3mHepkAZcxDUyl4aeHejbrXHVYF6VB/7xPEMeshZNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731819617; c=relaxed/simple;
-	bh=XgFJjt5/DFGuMscEjrtcxG3CWGxgAUMArINndNWJhU8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JkTfWhgsuCQ4Oqpoo/+/OSLNyjGeKv23anzi9Sm0SuN8pkNGaVTe86lh09R4/PcVbBWW1nTYquN5VdaUNeZAwkOq6h2Spf98INUFON2MBME6UFUaL2oA/iIvmhDbiaialy2OISZfobPskCOnxUVVnx5It+W5Vad2bA+/XpmX7W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn; spf=pass smtp.mailfrom=189.cn; arc=none smtp.client-ip=183.61.185.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=189.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=189.cn
-HMM_SOURCE_IP:10.158.242.145:64623.961438416
-HMM_ATTACHE_NUM:0000
-HMM_SOURCE_TYPE:SMTP
-Received: from clientip-60.24.208.28 (unknown [10.158.242.145])
-	by 189.cn (HERMES) with SMTP id F3C7B10294C;
-	Sun, 17 Nov 2024 12:55:15 +0800 (CST)
-Received: from  ([60.24.208.28])
-	by gateway-153622-dep-5c5f88b874-qw5z2 with ESMTP id 42bc408d85d145a9944272cc616e9566 for davem@davemloft.net;
-	Sun, 17 Nov 2024 12:55:18 CST
-X-Transaction-ID: 42bc408d85d145a9944272cc616e9566
-X-Real-From: chensong_2000@189.cn
-X-Receive-IP: 60.24.208.28
-X-MEDUSA-Status: 0
-Sender: chensong_2000@189.cn
-From: Song Chen <chensong_2000@189.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kory.maincent@bootlin.com,
-	aleksander.lobakin@intel.com,
-	willemb@google.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Song Chen <chensong_2000@189.cn>
-Subject: [PATCH] net/core/dev_ioctl: avoid invoking modprobe with empty ifr_name
-Date: Sun, 17 Nov 2024 12:55:12 +0800
-Message-Id: <20241117045512.111515-1-chensong_2000@189.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1731825249; c=relaxed/simple;
+	bh=gsX8/Mr6ZipynmvwjhuvN3wQ0AEi5mBidtZOhIGQLjM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aZqttbMnZK4anSQzEDhpB2EPMN7ITjiJcgVpjLbElKkwsNz44jx/x0i4+Xp9g9ISMQnNvG8eXha/b75TfTtZkgySml8kFE96yiS6xWcvWc8O6M3sS30lVPMrLJwptNk0YglJRSRkXl/C8fsJdhNxyVzKB2TLusAJVrdlLtnALOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZ/gAa/V; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6d41f721047so199356d6.1;
+        Sat, 16 Nov 2024 22:34:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731825247; x=1732430047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Llp461Ox5dWCJI8j4xlqQdNbwBiK+AxIcle+FmhTh/M=;
+        b=fZ/gAa/VzuQEORV6OZAVgUt9VTMfPzhir6ieT5kP/wLlAqmqppGOexfS3HJscwWzYc
+         cZQ/BtBrtSf7gvZiYILeJgdybmLZzUr3+bCfcZOGGrc4wSKk7QK/g+MKYE3n3/Nz2Txn
+         clKjCczrHnSag2rrBcbQYCWWrGDrvNARUcI+UgTZ5yP8wsmN+m9fSqwUpV7SGuQQuEeL
+         P7ryXDJfmxMMUzERnK7+CoShpIuTwaZem09vo39jhCP6WeJX86ctFOWPfDRwFTfZSfj5
+         uV1CgISzKedHrx5fx1vYHgmx1cn2/532FZ4deTBG4CL4XpWeb6dEUFS/pHMGwpcaaVd6
+         B45Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731825247; x=1732430047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Llp461Ox5dWCJI8j4xlqQdNbwBiK+AxIcle+FmhTh/M=;
+        b=laJseaAqmdhQjZuWJ4N9OoyLTK1xwkZFrF7+8Ol9ntyciEM2TDPMQ612d4WLoB5yJV
+         sH3lNhMbQlEbcCmeyFE4JyCeUabs5i2CTZtAJELCZ0Oju1rQQuQ1DcAyj+z/0ZqzwF/z
+         t2rO/Doe2gmGeTIJ9a/i0ULBf5CaXTrOdvuq6HU+KMl1hjOdjzqc2uPLKZMxzgO+Kw9C
+         O334TQGuyl6z/4RQ0INi5qJftdExJg3xx8DGitYBqQkoVt+nxvAMGA4ntWtJjrSsDYZj
+         dCdi0rDn23vc7IIVzkPQQjnd1h2RyH/hA7ZNAWjiHF+BKRw3u1UA9/7Mx/aQf94nJhJW
+         vq7A==
+X-Forwarded-Encrypted: i=1; AJvYcCW95rsbVw7S8V6ckw1wWCfVZ+4SR7Hzxnskx5BWeZ4LgqGQUZ9loEP9FrYJaZiDFCOzmwwhCSAXng5I@vger.kernel.org, AJvYcCXL3EWPWxByzOu5QF4PAZSc4uixV2UrHL4bYvhBfBY5cC5De6YxoUvUXpfBSEa5homY6lXTlwfp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy34c/2BAGmRGlWH4jJvp+UxXIQ9LQbLeYGGyx4oTNQowHlfzeV
+	w5TfsVcz0GOTBrxHpE2GkGCjbsUAbD7Fiw5+bPkW1TNEf0NEz7CHsrH11t7X79VCi7GOBo+OCLK
+	OYVhuLVCrPlfEC1p7QJusAWpt24g=
+X-Google-Smtp-Source: AGHT+IHfgygckDfPXX0L1LnLV1/q7U0/z5MeorMgYMcjfj7om6vSM+2og4ShWwnigTq+SJ/Sd/9W6ld5RoL4TU9DZVk=
+X-Received: by 2002:a05:6214:242a:b0:6d4:b1b:8b9c with SMTP id
+ 6a1803df08f44-6d40b1b8cc3mr84667596d6.3.1731825246961; Sat, 16 Nov 2024
+ 22:34:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241114021711.5691-1-laoar.shao@gmail.com> <20241114182750.0678f9ed@kernel.org>
+ <CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com>
+ <20241114203256.3f0f2de2@kernel.org> <CALOAHbBJ2xWKZ5frzR5wKq1D7-mzS62QkWpxB5Q-A7dR-Djhnw@mail.gmail.com>
+ <Zzb_7hXRPgYMACb9@x130> <20241115112443.197c6c4e@kernel.org> <Zzem_raXbyAuSyZO@x130>
+In-Reply-To: <Zzem_raXbyAuSyZO@x130>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Sun, 17 Nov 2024 14:33:31 +0800
+Message-ID: <CALOAHbC2E4-7EhE=ZXBT_bF5Cuvcrt0Grf51EAcebzFa7tLB=w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via rx_fifo_errors
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, ttoukan.linux@gmail.com, 
+	gal@nvidia.com, tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-dev_ioctl handles requests from user space if a process calls
-ioctl(sockfd, SIOCGIFINDEX, &ifr). However, if this user space
-process doesn't have interface name well specified, dev_ioctl
-doesn't give it an essential check, as a result, dev_load will
-invoke modprobe with a nonsense module name if the user happens
-to be sys admin or root, see following code in dev_load:
+On Sat, Nov 16, 2024 at 3:54=E2=80=AFAM Saeed Mahameed <saeed@kernel.org> w=
+rote:
+>
+> On 15 Nov 11:24, Jakub Kicinski wrote:
+> >On Fri, 15 Nov 2024 00:01:50 -0800 Saeed Mahameed wrote:
+> >> not rx_missed_errors please, it is exclusive for software lack of buff=
+ers.
+> >>
+> >> Please have a look at thtool_eth_XXX_stats IEEE ethnl_stats, if you ne=
+ed to
+> >> extend, this is the place.
+> >>
+> >> RFC2863[1] defines this type of discards as ifInDiscards. So let's add
+> >> it to ehttool std stats. mlx5 reports most of them already to driver c=
+ustom
+> >> ethtool -S
+> >
+> >We can, but honestly I'd just make sure they are counted in rx_dropped
+>
+> rx_dropped: Number of packets received but not processed,
+>   *   e.g. due to lack of resources or unsupported protocol.
+>   *   For hardware interfaces this counter may include packets discarded
+>   *   due to L2 address filtering but should not include packets dropped
+>                                   ^^^^^^^^^^^^^^
+>   *   by the device due to buffer exhaustion which are counted separately=
+ in
+>                            ^^^^^^^^^^^^^^^^^
+>   *   @rx_missed_errors (since procfs folds those two counters together).
+>       ^^^^^^^^^^^^^^^^^
+>
+> I think we should use rx_fifo_errors for this and update documentation:
 
-    no_module = !dev;
-    if (no_module && capable(CAP_NET_ADMIN))
-        no_module = request_module("netdev-%s", name);
-    if (no_module && capable(CAP_SYS_MODULE))
-        request_module("%s", name);
+Hello Saeed,
 
-This patch checks if ifr_name is empty at the beginning, reduces
-the overhead of calling modprobe.
+Could we apply the change to
+`drivers/net/ethernet/mellanox/mlx5/core/en_main.c` first and update
+the documentation in a future patch? Updating the documentation
+perfectly seems like a challenging task, and I=E2=80=99m not the best perso=
+n
+for that job ;)
 
-Signed-off-by: Song Chen <chensong_2000@189.cn>
----
- net/core/dev_ioctl.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 473c437b6b53..1371269f17d5 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -676,6 +676,9 @@ int dev_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr,
- 	if (cmd == SIOCGIFNAME)
- 		return dev_ifname(net, ifr);
- 
-+	if (ifr->ifr_name[0] == '\0')
-+		return -EINVAL;
-+
- 	ifr->ifr_name[IFNAMSIZ-1] = 0;
- 
- 	colon = strchr(ifr->ifr_name, ':');
--- 
-2.25.1
-
+--
+Regards
+Yafang
 
