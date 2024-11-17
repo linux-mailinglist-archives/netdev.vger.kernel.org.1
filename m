@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-145681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4D079D05F2
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:52:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CAC49D05F3
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84B55282136
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 20:52:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5CEDB219EA
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 20:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A361DD880;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395A31DDA09;
 	Sun, 17 Nov 2024 20:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eLCKcifl"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RW4Kg2NT"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2048.outbound.protection.outlook.com [40.107.237.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18C81D9598
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373AF1DC184
 	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 20:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.50
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731876744; cv=fail; b=DItcbJuMDiBTV1T6KlpL5FE4VIVBBniPc7YCzC4mCJSxNsJ143/le6dSpDckznArJtakZ+xojvA9afEVmrAjtZYdXzsAlVG3jDZaH00e/RPPyyMpXedSZ5gPvRLVShTsbPysSFnNfchA4VjK2cEfO+nbMwihDtPRm33JtPWGOZY=
+	t=1731876744; cv=fail; b=XwHQC4NwMOB2qgD3ivjzASU8j3HgEjqvEIaWvs6jWTrcHGz8rys9LmTzvMH/tkqDi1ExZ2vdgdHMZzF9LM6o72sFfF1UXxYJ0skQahHWqrhYYwlcrpFgK5ZgirWX51Apdc1HDS2ItkACup1F08Ds8tZxufjreeQm1AslRuQvoUg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731876744; c=relaxed/simple;
-	bh=pHPiHxkHVeAXSkJmkHECWEtJLRvdm2FGHKnjy3XcH74=;
+	bh=4cNIZDzLQfKsJJ0kQrHNCv75ROx+XfXm7fbjY1Jm25k=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jgCWxceKyPIlpwnHk8T/2cmU080yrvFQhmLJRgsSpuKO63QLYyLib8WF8vDD9bOTaD5JfZopKJtqHGMOn14eeu6QjAh/ZSXPyoPHjlwRvR9Y5YyPDxW59/qq3lGeVgKj8JsAax8o2GLEu9s6YWYrJ4mQTqV7J9sFa9PA1dKhdk8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eLCKcifl; arc=fail smtp.client-ip=40.107.220.50
+	 MIME-Version:Content-Type; b=R9nJmddDi5iNiez0qm8eWvCtvssUGWhBDHHKM0/gYMX5H7lQL9EXl8Le5BghMcqIy+Sjn4zzXxS90pVDHUxOLfXtjUqi8FJ1nQzq7dcGIhOIDitsn/lfGhBWl6qgYS32jC2DiNWkqoN5++s2sR0d15UoyrxI0mjr1wkHApo0PlU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RW4Kg2NT; arc=fail smtp.client-ip=40.107.237.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ItRXmgHB/has35tEvF5MLaf/t6no4763+kd623n8hY2BV61BeYiEI1qpYxchisiPaPdlQeTtWb/ZH8UOlWEU2DeHJAYKsrFixqwGWZaJqFMlqexzyrQBHc8n+UDANoGHuIPFU1UezhqwNdL8CHOI4Ko3jHkGZ8DLym5JJUvCa1YbcIckuFOGtfFKv1aR7NvorVc4ck/CXNUZ0R0Qb94ysNWY+Wfy99nEGJcHZ829olIktxkGAmigge034/WJq2rnKo85SbPQwDaKM8k3XhjmIDVrivZOuDj4Be5+QSyEXuu0na7i+Gyu9iG5O8BY9qaP1DJ+eA8Jd/NsdpkFwUIz/Q==
+ b=LBEw0/zEHpByO7peoaPwh+eFTKQiNyemIOEjXhVei2I7hb5QP6c/OI6Fq9YUUMZYWnvqrUG8/U9wd1areKS/X6R0E2uggFPU2wjuOtRdJTCIBPQom2OyYcqxim3N7guv/PeoMCGz+/XXFoCJFyi+w6wL+E+xMJv4nJl42lkeZo7YlIewq4R5Ti+w1FhMZikA1ksyYIUzOjeR2uQWivMeuXkuT/86I0hIaUJu7Pm3Wzf3zEgW3wVdnUTS8DcbPB1RJACO2LQepGdya6l3mUai4aw51kQsTb2oXrYUdoLIh7RQ2eW396rv/elXFvoL/u1+P6UB08KBVg2AMeBedjES9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QFQzAYTi2EezQBOcjrjkNtbQA0YlRS5M3RDhfwGiltw=;
- b=k29v2ox17qekEJqPMC1dQdkaHV89Y4HAcNmjclfBb3rC4gmTEDuurjX2yCVpl6y8QZ7JH5Qqiw6sG3pBgYqAGIWk4UhVYEqAhh5iw1vaFeIuHyT5Lwg2Y2fhnSMr9mYb5umY/G+Dlw939LmwjEJA6Fzpxc8MSRighdKjENj6fBPrc5myGxdA9SeK86vDLB5Q99omLbXtgphbVDvpIkv87PAaHUPZ6A5cgsens7AStf5Wydoysyls0UBrRKWHxb3o5nt7I4JErUyEXte+m0etBQClE29ZTbvrd0pmvTEFvUjPcC7YpTJ5Jhx0+NyQDqN78amOv3I46snwFq1L7DujJg==
+ bh=BPvv3IafnPs+viKn9AmZlYH2Xt66noDxqyj57pvtwVk=;
+ b=u6fEBSDsTv24wXXTaUoqckPQR3lTZIsgrwgAdLdbNTpcucD4SVXmCiTD3qMkgfqngzKNk8S5tHuRfJpCDnI4gn5fzSSD/matJxa4o8ejpktPhjV8fWMy/bdYPj2Vw34KnX0LfVsuLkETOapHegIy2W+k4WV8aaeW8uzHJJzUX/5Kz5UEeyxMDl1Px8wbNDpPecaWp/oC3JgjfLUkIzdBDCYLuxtcEXMlMWw0PSpEm1xPXuJw61bmTwX85kEskuCUBAju0eSqqGNlvv1rPvZCg8M444/BUICIexuuZLAvW0gH0rSqbzIjfS4+DNnNRCFU5eq0Rg9m/WwaL8eKaQchTA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QFQzAYTi2EezQBOcjrjkNtbQA0YlRS5M3RDhfwGiltw=;
- b=eLCKcifleNdCQhYmolMXtTN4s1efX5BjT54zexaPtX2orZPGzM6cnB/MZECctmINsehKB+gEaPl+oDyR08CnTgU+ShJQK83f2VPCek2ZlmDwLZlVteLoq0Bf8u1vipqHrqMSidVeo3tTsOv+H0otBpekpH3hq7PR4VuYLYp9bgT3S+bEyLaP+G0Zy93CWkH/k6oFK91lkhdIs4Gbo+B1qb4k6OBe/Tse3EhlF0giKsAuSLo0h9qjpDkPhMwbpRpIWamf5L50k48d1OpXeEqaOAxsq6hAPUzYQs0XZnwPcHH4Wmjr28cN2MlMXVuYro3h7Pf2Fe9FyChMtiJ7s5Kp6w==
-Received: from BL1PR13CA0443.namprd13.prod.outlook.com (2603:10b6:208:2c3::28)
- by IA1PR12MB7616.namprd12.prod.outlook.com (2603:10b6:208:427::11) with
+ bh=BPvv3IafnPs+viKn9AmZlYH2Xt66noDxqyj57pvtwVk=;
+ b=RW4Kg2NTyteU3ketaUFS9cSwjvq4RZvT9ionTHbFRiI1Xn/AmK81pMDbOTtFzeUXSN30pEkK5bMLRJXYkEj1r2RZUz/GBCDNsGu8E1JQpUHxX4LwZxNRAs71nnssWUfis7k2041rJN5mdVNP3uiV9hv43lsf/Ozj7aBOlEgLE6UiFKbcAVGyKoRoqL0kPk0eawVcWXeYpyd0d/HzOjM1cqc2k5bQZJjJGIKynqM+ZNaQdKtRVAw1bCHmYpjDW/5lmqWmLlOYNaXcSZevPkUJYzfT6pgu01mgFGzoZYxXjaLRAW2QhXQaomAhZwnqOJ/iaJ7zOxFddHpsWG4iDRDdTw==
+Received: from BN9P220CA0016.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:13e::21)
+ by DM4PR12MB8557.namprd12.prod.outlook.com (2603:10b6:8:18b::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18; Sun, 17 Nov
- 2024 20:52:12 +0000
-Received: from BL6PEPF00022570.namprd02.prod.outlook.com
- (2603:10b6:208:2c3:cafe::98) by BL1PR13CA0443.outlook.office365.com
- (2603:10b6:208:2c3::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.12 via Frontend
- Transport; Sun, 17 Nov 2024 20:52:12 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.20; Sun, 17 Nov
+ 2024 20:52:15 +0000
+Received: from BL6PEPF00022573.namprd02.prod.outlook.com
+ (2603:10b6:408:13e:cafe::71) by BN9P220CA0016.outlook.office365.com
+ (2603:10b6:408:13e::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22 via Frontend
+ Transport; Sun, 17 Nov 2024 20:52:15 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,20 +64,20 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.118.233 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.118.233) by
- BL6PEPF00022570.mail.protection.outlook.com (10.167.249.38) with Microsoft
+ BL6PEPF00022573.mail.protection.outlook.com (10.167.249.41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8158.14 via Frontend Transport; Sun, 17 Nov 2024 20:52:12 +0000
+ 15.20.8158.14 via Frontend Transport; Sun, 17 Nov 2024 20:52:14 +0000
 Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
  (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 17 Nov
- 2024 12:52:10 -0800
+ 2024 12:52:13 -0800
 Received: from drhqmail203.nvidia.com (10.126.190.182) by
  drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 17 Nov 2024 12:52:09 -0800
+ 15.2.1544.4; Sun, 17 Nov 2024 12:52:13 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
  (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Sun, 17 Nov 2024 12:52:06 -0800
+ Transport; Sun, 17 Nov 2024 12:52:10 -0800
 From: Tariq Toukan <tariqt@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
@@ -86,9 +86,9 @@ CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
 	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko
 	<jiri@resnulli.us>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
 	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next V3 7/8] net/mlx5: Add traffic class scheduling support for vport QoS
-Date: Sun, 17 Nov 2024 22:50:44 +0200
-Message-ID: <20241117205046.736499-8-tariqt@nvidia.com>
+Subject: [PATCH net-next V3 8/8] net/mlx5: Manage TC arbiter nodes and implement full support for tc-bw
+Date: Sun, 17 Nov 2024 22:50:45 +0200
+Message-ID: <20241117205046.736499-9-tariqt@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20241117205046.736499-1-tariqt@nvidia.com>
 References: <20241117205046.736499-1-tariqt@nvidia.com>
@@ -103,628 +103,367 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00022570:EE_|IA1PR12MB7616:EE_
-X-MS-Office365-Filtering-Correlation-Id: beb87ac6-cd13-4e3b-02ec-08dd0749b600
+X-MS-TrafficTypeDiagnostic: BL6PEPF00022573:EE_|DM4PR12MB8557:EE_
+X-MS-Office365-Filtering-Correlation-Id: 26fa5882-57b5-4111-9f99-08dd0749b79f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?V7X4BQjmkHSY3k1mQGw/rxzkSAREJKUR8D+4nrJK5ioi7zp6ixif7d31DxyR?=
- =?us-ascii?Q?W+3D2QHz1Z2vfdyrOn6BWXVu7+deertnJcmXrqUC5V4VP7yHeIEuwd2bBV/n?=
- =?us-ascii?Q?TU2WpaYyiSEPhxo8IG55mrKchxC2ahVxeSZ+SIyps8hnm4ZeiMK0WVszHur6?=
- =?us-ascii?Q?kVSQ+Qvxo4A7ZeoxSf68ZotHta4QC5VRXgAH+GDnjc3wSGPFOVlRKwiu2HfD?=
- =?us-ascii?Q?xM5ZNadBzTTq5y0BfYJtakB1a30GnQvN9vfNQNUzYrr9ZIKKu6k44GK2+PHW?=
- =?us-ascii?Q?AnKRIevbbFBxjmAHrpI6GDVIAJ7DPtuSiCcdBMxuZOSEkN3oN+De34+Xq0tJ?=
- =?us-ascii?Q?aTDGPFmobfjB+FbVNvZdqsH7r6gjpOYE4Ub57EAs/0yrIH7VaDiIYq6htKAG?=
- =?us-ascii?Q?MEPtRS+T0Zv0LaYYFpV3j2zf+/sx95/lmdoQa/JIX0Lhy2wMaSvYmpNiFqDL?=
- =?us-ascii?Q?aw5qs3UVKIefk15sF5fHelqiHhRoulOWWrtv/AJ62BnPIYRDPp/I/DzmrxRc?=
- =?us-ascii?Q?XovcEFdlaSNdIHgJZJkRKSzpsVTJIvccZWjS4+/bHfQBQZAVdFgSlSI4+KS3?=
- =?us-ascii?Q?fl87OBp36QSplScJd2v8bzY8aWhopQKcVHSlc3onUdE9XWUidq0L8IdDi3rW?=
- =?us-ascii?Q?oG61p5d3i/0HZjfl4wV0oKgjvLzZdalirJC0EHlDmOuUGJPQbUKguZYxds1X?=
- =?us-ascii?Q?HNHryDrr66a5nWiDV61wqCfepnKbm7wc293768XH7f1tnuPLyp/dwlxl1fWe?=
- =?us-ascii?Q?5pLe4bpOQqF3eFVq0WpkPlBCtrFA4cI4soDHon8/boiJuxSdemYowT1lLawH?=
- =?us-ascii?Q?otjI7BEVYTrlSLkNWoB3bi9YKhJbxN9P7Jbuctxn/mPZPsxwqoTlk4F72mT2?=
- =?us-ascii?Q?FoELEWJOy8wg1LPxFK2wGUP5WlEOWm2ujvw6Dwa6BVsw3GFPpBIiIU2XVi+m?=
- =?us-ascii?Q?eg8FCp/BtdBEE+vEm1z56Oq3qSs2fQvUCOXw/7XNuHQq0lvyOulcKN5Y/cPy?=
- =?us-ascii?Q?zZhvhHgjM8WhhjlZTvjZUXIqqNcv0/MMbKuLZZvydXgl9Zb+Zj0IvsgWmzbQ?=
- =?us-ascii?Q?3LxoqH8bxSkwpiYrLFPnfHWvx07gOvIQXS3ByTI98M+r4unXnMrCG+0z6el+?=
- =?us-ascii?Q?4Xez3Akc1E9bsDgsGOttpwziTROexOVeYDJTMjKvYPlUCEoCnwcYmE4275o1?=
- =?us-ascii?Q?HC06Brn5CAzwdq6kfmuRCg4CmcaH3ClmqbiR7Fh2zHJa8DHtkbYh/q7eiVnu?=
- =?us-ascii?Q?yJxPe5mI5g4yariWJ5OlQcyah3oG0nxNeO2zWUSseVjAt19jlqV8Yh4GjzcZ?=
- =?us-ascii?Q?oa5xGtN2xxdSqklZinYSqtSuvvjq5RVCAf0H4ucZxo+Y9dAD+QWwCVszbT9H?=
- =?us-ascii?Q?ZUCCKfkkZ8gQZCkJpDgPMFJITtXwXKIBam8/iC0RZ+o24y+P0g=3D=3D?=
+	=?us-ascii?Q?KOh6kq2WwShVoI+Hnub5/LenUvWQSbC1VvmSwdIF68zdO/AUSkEn/uztK9BK?=
+ =?us-ascii?Q?+VDd1bfmzJMsSXOSZUkaKyBtKeHyPA0DM1Wcy5ohHFNkP+G4n+kogRoKTo9c?=
+ =?us-ascii?Q?2pyTaRHCDuKJUEgrWat/tChwHSy/YmZf0daiD8nxnhDC3DWc/UAUCnt6zRcI?=
+ =?us-ascii?Q?UK/tCt1VyBP1RcNPLVlSGkG6dISsLfcsQ2fjGyEG3KvdZF47KgxT+UoqL0oc?=
+ =?us-ascii?Q?2hDcmuljrN6n00la0RPrOdklZ+se03/HTGl7DPFe0i8xo8Rk0aKdEqi26+sO?=
+ =?us-ascii?Q?3JgZ2izSJO7ENhe4/MSM+lNb7kid3/5EMmIt9bj4C3TKz/T+ySgNC/MSK2I8?=
+ =?us-ascii?Q?M6dWO7qSEuYNX1k+aaxzmVpapNlelVSL5akCZWDrbngPKCnsEq9kiJVPMm7P?=
+ =?us-ascii?Q?5Oo0khNh55okPAFJUhhnFpzBZ+qQxQFjrU6EsMokVglUir38Pqv+NZbXeai6?=
+ =?us-ascii?Q?1PC38yfTRhaYVjo2S9pZYJy72YPiRQacoi1L82swxNweJxBzekEavejXW4l5?=
+ =?us-ascii?Q?Kx3Q5sSr833bqz2BA4MTAUgnZaQXzGCLFeol2L+1fH4i6cnXgXPnhLa0T511?=
+ =?us-ascii?Q?gdU1igkBb1ukuESTdHNsS8cOKqE7KfjC29mEr3+cMtUyy0QBg4HFF4Ho8CtR?=
+ =?us-ascii?Q?kHuGDLx01vlI6ccXEVjsWE9CyntrthQI97ROrt0OH1KPyB2wQh/apEHWTn6N?=
+ =?us-ascii?Q?j+2i41UWmkSAziZyw/GSN8eAwPWgrx0aY7AL+Gyh4tHyyonpCHojsI/Fd6fp?=
+ =?us-ascii?Q?l75cjnX5ekAmzP5jut81iQV6G/ExVj35fl3mhovNg44HonqPZQn6Bx8OovIC?=
+ =?us-ascii?Q?/dypuy7oEMcVMJTLfJSRswdq8UGojGaG+Me9KAQzpgdaEF/hIYyHZMTBIsOJ?=
+ =?us-ascii?Q?DfR/AURsUeldH62eL5Du8qDuSwpB1dbv8cMPklRFToQuGbC76lPVQSxrZrhF?=
+ =?us-ascii?Q?xd/7XAU554YlELLC8DNJcgMjFbEARqVYDxT3Fjp+eBjnMrwiLX+bxFmoRwjd?=
+ =?us-ascii?Q?MQzfb3jCFXSaXXXC1gqXgsgEkpMx9riYl8Y8LF2oxhhnOQ/jDY+9zEh4/EOr?=
+ =?us-ascii?Q?iuSHcgKxiBgSYsSFdovLT81NRfiCklcnRDPWESElpF1J0htcF3hsEyKPXPZs?=
+ =?us-ascii?Q?0UL+TQLhSoS7MHmTmtne0ATAtFN0qRmCPTRRhR7Lalsf/FM+g+KefRGU0Dww?=
+ =?us-ascii?Q?kgwTG3fmY10cEl1p5704XaQXPzDfh7To/ba6p2PsONM4RgJpHKJkmiNXQa/v?=
+ =?us-ascii?Q?hK9ZV3QEPhQraMWdYcP7tHeiqQrkelIbKzEzf4VvQxg7cYOSGBS/LmAaDHZ5?=
+ =?us-ascii?Q?JckncmC9G1ZWYsAWT1F2H+Iir1wQjepByE8EuzBqCPHrLVhx/kSLQX2Dabga?=
+ =?us-ascii?Q?qbItbPl4p9IaUjIYEngHy4klk+4rJ6xtT2eZXxze6gekhv4xSQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2024 20:52:12.2064
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2024 20:52:14.8989
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: beb87ac6-cd13-4e3b-02ec-08dd0749b600
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26fa5882-57b5-4111-9f99-08dd0749b79f
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00022570.namprd02.prod.outlook.com
+	BL6PEPF00022573.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7616
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8557
 
 From: Carolina Jubran <cjubran@nvidia.com>
 
-Introduce support for traffic class (TC) scheduling on vports by
-allowing the vport to own multiple TC scheduling nodes. This patch
-enables more granular control of QoS by defining three distinct QoS
-states for vports, each providing unique scheduling behavior:
-
-1. Regular QoS: The `sched_node` represents the vport directly,
-   handling QoS as a single scheduling entity.
-2. TC QoS on the vport: The `sched_node` acts as a TC arbiter, enabling
-   TC scheduling directly on the vport.
-3. TC QoS on the parent node: The `sched_node` functions as a rate
-   limiter, with TC arbitration enabled at the parent level, associating
-   multiple scheduling nodes with each vport.
+Introduce support for managing Traffic Class (TC) arbiter nodes and
+associated vports TC nodes within the E-Switch QoS hierarchy. This
+patch adds support for the new scheduling node type,
+`SCHED_NODE_TYPE_VPORTS_TC_TSAR`, and implements full support for
+setting tc-bw on both vports and nodes.
 
 Key changes include:
 
-- Added support for new scheduling elements, vport traffic class and
-  rate limiter.
+- Introduced the new scheduling node type,
+  `SCHED_NODE_TYPE_VPORTS_TC_TSAR`, for managing vports within the TC
+  arbiter node.
 
-- New helper functions for creating, destroying, and restoring vport TC
-  scheduling nodes, handling transitions between regular QoS and TC
-  arbitration states.
+- New helper functions for creating and destroying vports TC nodes
+  under the TC arbiter.
 
-- Updated `esw_qos_vport_enable()` and `esw_qos_vport_disable()` to
-  support both regular QoS and TC arbitration states, ensuring consistent
-  transitions between scheduling modes.
+- Updated the minimum rate normalization function to skip nodes of type
+  `SCHED_NODE_TYPE_VPORTS_TC_TSAR`. Vports TC TSARs have bandwidth
+  shares configured on them but not minimum rates, so their `min_rate`
+  cannot be normalized.
 
-- Introduced a `sched_nodes` array under `vport->qos` to store multiple
-  TC scheduling nodes per vport, enabling finer control over per-TC QoS.
+- Implementation of `esw_qos_tc_arbiter_scheduling_setup()` and
+  `esw_qos_tc_arbiter_scheduling_teardown()` for initializing and
+  cleaning up TC arbiter scheduling elements. These functions now fully
+  support tc-bw configuration on TC arbiter nodes.
 
-- Enhanced `esw_qos_vport_update_parent()` to handle transitions between
-  the three QoS states based on the current and new parent node types.
+- Added `esw_qos_tc_arbiter_get_bw_shares()` and
+  `esw_qos_set_tc_arbiter_bw_shares()` to handle the settings of
+  bandwidth shares for vports traffic class TSARs.
 
-This patch lays the groundwork for future support for configuring tc-bw
-on vports. Although the infrastructure is in place, full support for
-tc-bw is not yet implemented; attempts to set tc-bw on vports will
-return `-EOPNOTSUPP`.
-
-No functional changes are introduced at this stage.
+- Refactored `mlx5_esw_devlink_rate_node_tc_bw_set()` and
+  `mlx5_esw_devlink_rate_leaf_tc_bw_set()` to fully support configuring
+  tc-bw on devlink rate nodes and vports, respectively.
 
 Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
 Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 360 +++++++++++++++++-
- .../net/ethernet/mellanox/mlx5/core/eswitch.h |  13 +-
- 2 files changed, 352 insertions(+), 21 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 185 +++++++++++++++++-
+ 1 file changed, 180 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-index b17c3a82d175..afb00deaae16 100644
+index afb00deaae16..87c9789c2836 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-@@ -65,12 +65,16 @@ enum sched_node_type {
- 	SCHED_NODE_TYPE_VPORTS_TSAR,
- 	SCHED_NODE_TYPE_VPORT,
+@@ -67,6 +67,7 @@ enum sched_node_type {
  	SCHED_NODE_TYPE_TC_ARBITER_TSAR,
-+	SCHED_NODE_TYPE_RATE_LIMITER,
-+	SCHED_NODE_TYPE_VPORT_TC,
+ 	SCHED_NODE_TYPE_RATE_LIMITER,
+ 	SCHED_NODE_TYPE_VPORT_TC,
++	SCHED_NODE_TYPE_VPORTS_TC_TSAR,
  };
  
  static const char * const sched_node_type_str[] = {
- 	[SCHED_NODE_TYPE_VPORTS_TSAR] = "vports TSAR",
- 	[SCHED_NODE_TYPE_VPORT] = "vport",
+@@ -75,6 +76,7 @@ static const char * const sched_node_type_str[] = {
  	[SCHED_NODE_TYPE_TC_ARBITER_TSAR] = "TC Arbiter TSAR",
-+	[SCHED_NODE_TYPE_RATE_LIMITER] = "Rate Limiter",
-+	[SCHED_NODE_TYPE_VPORT_TC] = "vport TC",
+ 	[SCHED_NODE_TYPE_RATE_LIMITER] = "Rate Limiter",
+ 	[SCHED_NODE_TYPE_VPORT_TC] = "vport TC",
++	[SCHED_NODE_TYPE_VPORTS_TC_TSAR] = "vports TC TSAR",
  };
  
  struct mlx5_esw_sched_node {
-@@ -92,6 +96,8 @@ struct mlx5_esw_sched_node {
- 	struct list_head children;
- 	/* Valid only if this node is associated with a vport. */
- 	struct mlx5_vport *vport;
-+	/* Valid only when this node represents a traffic class. */
-+	u8 tc;
- };
- 
- static int esw_qos_num_tcs(struct mlx5_core_dev *dev)
-@@ -121,6 +127,14 @@ esw_qos_nodes_set_parent(struct list_head *nodes, struct mlx5_esw_sched_node *pa
- 
- void mlx5_esw_qos_vport_qos_free(struct mlx5_vport *vport)
- {
-+	if (vport->qos.sched_nodes) {
-+		int i, num_tcs = esw_qos_num_tcs(vport->qos.sched_node->esw->dev);
-+
-+		for (i = 0; i < num_tcs; i++)
-+			kfree(vport->qos.sched_nodes[i]);
-+		kfree(vport->qos.sched_nodes);
-+	}
-+
- 	kfree(vport->qos.sched_node);
- 	memset(&vport->qos, 0, sizeof(vport->qos));
- }
-@@ -145,11 +159,17 @@ mlx5_esw_qos_vport_get_parent(const struct mlx5_vport *vport)
+@@ -159,6 +161,11 @@ mlx5_esw_qos_vport_get_parent(const struct mlx5_vport *vport)
  static void esw_qos_sched_elem_warn(struct mlx5_esw_sched_node *node, int err, const char *op)
  {
  	switch (node->type) {
-+	case SCHED_NODE_TYPE_VPORT_TC:
++	case SCHED_NODE_TYPE_VPORTS_TC_TSAR:
 +		esw_warn(node->esw->dev,
-+			 "E-Switch %s %s scheduling element failed (vport=%d,tc=%d,err=%d)\n",
-+			 op, sched_node_type_str[node->type], node->vport->vport, node->tc, err);
++			 "E-Switch %s %s scheduling element failed (tc=%d,err=%d)\n",
++			 op, sched_node_type_str[node->type], node->tc, err);
 +		break;
- 	case SCHED_NODE_TYPE_VPORT:
+ 	case SCHED_NODE_TYPE_VPORT_TC:
  		esw_warn(node->esw->dev,
- 			 "E-Switch %s %s scheduling element failed (vport=%d,err=%d)\n",
- 			 op, sched_node_type_str[node->type], node->vport->vport, err);
- 		break;
-+	case SCHED_NODE_TYPE_RATE_LIMITER:
- 	case SCHED_NODE_TYPE_TC_ARBITER_TSAR:
- 	case SCHED_NODE_TYPE_VPORTS_TSAR:
- 		esw_warn(node->esw->dev,
-@@ -243,6 +263,23 @@ static int esw_qos_sched_elem_config(struct mlx5_esw_sched_node *node, u32 max_r
- 	return 0;
+ 			 "E-Switch %s %s scheduling element failed (vport=%d,tc=%d,err=%d)\n",
+@@ -344,7 +351,11 @@ static void esw_qos_normalize_min_rate(struct mlx5_eswitch *esw,
+ 		if (node->esw != esw || node->ix == esw->qos.root_tsar_ix)
+ 			continue;
+ 
+-		esw_qos_update_sched_node_bw_share(node, divider, extack);
++		/* Vports TC TSARs don't have a minimum rate configured,
++		 * so there's no need to update the bw_share on them.
++		 */
++		if (node->type != SCHED_NODE_TYPE_VPORTS_TC_TSAR)
++			esw_qos_update_sched_node_bw_share(node, divider, extack);
+ 
+ 		if (list_empty(&node->children))
+ 			continue;
+@@ -476,6 +487,129 @@ static void esw_qos_destroy_node(struct mlx5_esw_sched_node *node, struct netlin
+ 	__esw_qos_free_node(node);
  }
  
-+static int esw_qos_create_rate_limit_element(struct mlx5_esw_sched_node *node,
-+					     struct netlink_ext_ack *extack)
++static int esw_qos_create_vports_tc_node(struct mlx5_esw_sched_node *parent, u8 tc,
++					 struct netlink_ext_ack *extack)
 +{
-+	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
-+
-+	if (!mlx5_qos_element_type_supported(node->esw->dev,
-+					     SCHEDULING_CONTEXT_ELEMENT_TYPE_RATE_LIMIT,
-+					     SCHEDULING_HIERARCHY_E_SWITCH))
-+		return -EOPNOTSUPP;
-+
-+	MLX5_SET(scheduling_context, sched_ctx, max_average_bw, node->max_rate);
-+	MLX5_SET(scheduling_context, sched_ctx, element_type,
-+		 SCHEDULING_CONTEXT_ELEMENT_TYPE_RATE_LIMIT);
-+
-+	return esw_qos_node_create_sched_element(node, sched_ctx, extack);
-+}
-+
- static u32 esw_qos_calculate_min_rate_divider(struct mlx5_eswitch *esw,
- 					      struct mlx5_esw_sched_node *parent)
- {
-@@ -379,6 +416,31 @@ static int esw_qos_vport_create_sched_element(struct mlx5_esw_sched_node *vport_
- 	return esw_qos_node_create_sched_element(vport_node, sched_ctx, extack);
- }
- 
-+static int esw_qos_vport_tc_create_sched_element(struct mlx5_esw_sched_node *vport_tc_node,
-+						 u32 rate_limit_elem_ix,
-+						 struct netlink_ext_ack *extack)
-+{
-+	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
-+	struct mlx5_core_dev *dev = vport_tc_node->esw->dev;
++	u32 tsar_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
++	struct mlx5_core_dev *dev = parent->esw->dev;
++	struct mlx5_esw_sched_node *vports_tc_node;
 +	void *attr;
++	int err;
 +
 +	if (!mlx5_qos_element_type_supported(dev,
-+					     SCHEDULING_CONTEXT_ELEMENT_TYPE_VPORT_TC,
-+					     SCHEDULING_HIERARCHY_E_SWITCH))
++					     SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR,
++					     SCHEDULING_HIERARCHY_E_SWITCH) ||
++	    !mlx5_qos_tsar_type_supported(dev,
++					  TSAR_ELEMENT_TSAR_TYPE_DWRR,
++					  SCHEDULING_HIERARCHY_E_SWITCH))
 +		return -EOPNOTSUPP;
 +
-+	MLX5_SET(scheduling_context, sched_ctx, element_type,
-+		 SCHEDULING_CONTEXT_ELEMENT_TYPE_VPORT_TC);
-+	attr = MLX5_ADDR_OF(scheduling_context, sched_ctx, element_attributes);
-+	MLX5_SET(vport_tc_element, attr, vport_number, vport_tc_node->vport->vport);
-+	MLX5_SET(vport_tc_element, attr, traffic_class, vport_tc_node->tc);
-+	MLX5_SET(scheduling_context, sched_ctx, max_bw_obj_id, rate_limit_elem_ix);
-+	MLX5_SET(scheduling_context, sched_ctx, parent_element_id, vport_tc_node->parent->ix);
-+	MLX5_SET(scheduling_context, sched_ctx, bw_share, vport_tc_node->bw_share);
++	vports_tc_node = __esw_qos_alloc_node(parent->esw, 0, SCHED_NODE_TYPE_VPORTS_TC_TSAR,
++					      parent);
++	if (!vports_tc_node) {
++		NL_SET_ERR_MSG_MOD(extack, "E-Switch alloc node failed");
++		esw_warn(dev, "Failed to alloc vports TC node (tc=%d)\n", tc);
++		return -ENOMEM;
++	}
 +
-+	return esw_qos_node_create_sched_element(vport_tc_node, sched_ctx, extack);
++	attr = MLX5_ADDR_OF(scheduling_context, tsar_ctx, element_attributes);
++	MLX5_SET(tsar_element, attr, tsar_type, TSAR_ELEMENT_TSAR_TYPE_DWRR);
++	MLX5_SET(tsar_element, attr, traffic_class, tc);
++	MLX5_SET(scheduling_context, tsar_ctx, parent_element_id, parent->ix);
++	MLX5_SET(scheduling_context, tsar_ctx, element_type, SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR);
++
++	err = esw_qos_node_create_sched_element(vports_tc_node, tsar_ctx, extack);
++	if (err)
++		goto err_create_sched_element;
++
++	vports_tc_node->tc = tc;
++
++	return 0;
++
++err_create_sched_element:
++	__esw_qos_free_node(vports_tc_node);
++	return err;
++}
++
++static void
++esw_qos_tc_arbiter_get_bw_shares(struct mlx5_esw_sched_node *tc_arbiter_node, u32 *tc_bw)
++{
++	struct mlx5_esw_sched_node *vports_tc_node;
++
++	list_for_each_entry(vports_tc_node, &tc_arbiter_node->children, entry)
++		tc_bw[vports_tc_node->tc] = vports_tc_node->bw_share;
++}
++
++static void esw_qos_set_tc_arbiter_bw_shares(struct mlx5_esw_sched_node *tc_arbiter_node,
++					     u32 *tc_bw, struct netlink_ext_ack *extack)
++{
++	struct mlx5_esw_sched_node *vports_tc_node;
++
++	list_for_each_entry(vports_tc_node, &tc_arbiter_node->children, entry) {
++		u32 bw_share;
++		u8 tc;
++
++		tc = vports_tc_node->tc;
++		bw_share = tc_bw[tc] ?: MLX5_MIN_BW_SHARE;
++		esw_qos_sched_elem_config(vports_tc_node, 0, bw_share, extack);
++	}
++}
++
++static void esw_qos_destroy_vports_tc_nodes(struct mlx5_esw_sched_node *tc_arbiter_node,
++					    struct netlink_ext_ack *extack)
++{
++	struct mlx5_esw_sched_node *vports_tc_node, *tmp;
++
++	list_for_each_entry_safe(vports_tc_node, tmp, &tc_arbiter_node->children, entry)
++		esw_qos_destroy_node(vports_tc_node, extack);
++}
++
++static int esw_qos_create_vports_tc_nodes(struct mlx5_esw_sched_node *tc_arbiter_node,
++					  struct netlink_ext_ack *extack)
++{
++	struct mlx5_eswitch *esw = tc_arbiter_node->esw;
++	int err, i, num_tcs = esw_qos_num_tcs(esw->dev);
++
++	for (i = 0; i < num_tcs; i++) {
++		err = esw_qos_create_vports_tc_node(tc_arbiter_node, i, extack);
++		if (err)
++			goto err_tc_node_create;
++	}
++
++	return 0;
++
++err_tc_node_create:
++	esw_qos_destroy_vports_tc_nodes(tc_arbiter_node, NULL);
++	return err;
++}
++
++static int esw_qos_create_tc_arbiter_sched_elem(struct mlx5_esw_sched_node *tc_arbiter_node,
++						struct netlink_ext_ack *extack)
++{
++	u32 tsar_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
++	u32 tsar_parent_ix;
++	void *attr;
++
++	if (!mlx5_qos_tsar_type_supported(tc_arbiter_node->esw->dev,
++					  TSAR_ELEMENT_TSAR_TYPE_TC_ARB,
++					  SCHEDULING_HIERARCHY_E_SWITCH)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "E-Switch TC Arbiter scheduling element is not supported");
++		return -EOPNOTSUPP;
++	}
++
++	attr = MLX5_ADDR_OF(scheduling_context, tsar_ctx, element_attributes);
++	MLX5_SET(tsar_element, attr, tsar_type, TSAR_ELEMENT_TSAR_TYPE_TC_ARB);
++	tsar_parent_ix = tc_arbiter_node->parent ? tc_arbiter_node->parent->ix :
++			 tc_arbiter_node->esw->qos.root_tsar_ix;
++	MLX5_SET(scheduling_context, tsar_ctx, parent_element_id, tsar_parent_ix);
++	MLX5_SET(scheduling_context, tsar_ctx, element_type, SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR);
++	MLX5_SET(scheduling_context, tsar_ctx, max_average_bw, tc_arbiter_node->max_rate);
++	MLX5_SET(scheduling_context, tsar_ctx, bw_share, tc_arbiter_node->bw_share);
++
++	return esw_qos_node_create_sched_element(tc_arbiter_node, tsar_ctx, extack);
 +}
 +
  static struct mlx5_esw_sched_node *
- __esw_qos_alloc_node(struct mlx5_eswitch *esw, u32 tsar_ix, enum sched_node_type type,
- 		     struct mlx5_esw_sched_node *parent)
-@@ -575,12 +637,169 @@ static int esw_qos_tc_arbiter_scheduling_setup(struct mlx5_esw_sched_node *node,
- 	return -EOPNOTSUPP;
- }
+ __esw_qos_create_vports_sched_node(struct mlx5_eswitch *esw, struct mlx5_esw_sched_node *parent,
+ 				   struct netlink_ext_ack *extack)
+@@ -539,6 +673,9 @@ static void __esw_qos_destroy_node(struct mlx5_esw_sched_node *node, struct netl
+ {
+ 	struct mlx5_eswitch *esw = node->esw;
  
-+static int esw_qos_create_vport_tc_sched_node(struct mlx5_vport *vport,
-+					      u32 rate_limit_elem_ix,
-+					      struct mlx5_esw_sched_node *vports_tc_node,
-+					      struct netlink_ext_ack *extack)
++	if (node->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR)
++		esw_qos_destroy_vports_tc_nodes(node, extack);
++
+ 	trace_mlx5_esw_node_qos_destroy(esw->dev, node, node->ix);
+ 	esw_qos_destroy_node(node, extack);
+ 	esw_qos_normalize_min_rate(esw, NULL, extack);
+@@ -628,13 +765,38 @@ static void esw_qos_put(struct mlx5_eswitch *esw)
+ 
+ static void esw_qos_tc_arbiter_scheduling_teardown(struct mlx5_esw_sched_node *node,
+ 						   struct netlink_ext_ack *extack)
+-{}
 +{
-+	struct mlx5_esw_sched_node *vport_node = vport->qos.sched_node;
-+	struct mlx5_esw_sched_node *vport_tc_node;
-+	u8 tc = vports_tc_node->tc;
++	/* Clean up all Vports TC nodes within the TC arbiter node. */
++	esw_qos_destroy_vports_tc_nodes(node, extack);
++	/* Destroy the scheduling element for the TC arbiter node itself. */
++	esw_qos_node_destroy_sched_element(node, extack);
++}
+ 
+ static int esw_qos_tc_arbiter_scheduling_setup(struct mlx5_esw_sched_node *node,
+ 					       struct netlink_ext_ack *extack)
+ {
+-	NL_SET_ERR_MSG_MOD(extack, "TC arbiter elements are not supported.");
+-	return -EOPNOTSUPP;
++	u32 curr_ix = node->ix;
 +	int err;
 +
-+	vport_tc_node = __esw_qos_alloc_node(vport_node->esw, 0, SCHED_NODE_TYPE_VPORT_TC,
-+					     vports_tc_node);
-+	if (!vport_tc_node)
-+		return -ENOMEM;
-+
-+	vport_tc_node->min_rate = vport_node->min_rate;
-+	vport_tc_node->tc = tc;
-+	vport_tc_node->vport = vport;
-+	err = esw_qos_vport_tc_create_sched_element(vport_tc_node, rate_limit_elem_ix, extack);
-+	if (err)
-+		goto err_out;
-+
-+	vport->qos.sched_nodes[tc] = vport_tc_node;
-+
-+	return 0;
-+err_out:
-+	__esw_qos_free_node(vport_tc_node);
-+	return err;
-+}
-+
-+static void esw_qos_destroy_vport_tc_sched_elements(struct mlx5_vport *vport,
-+						    struct netlink_ext_ack *extack)
-+{
-+	int i, num_tcs = esw_qos_num_tcs(vport->qos.sched_node->esw->dev);
-+
-+	for (i = 0; i < num_tcs; i++) {
-+		if (vport->qos.sched_nodes[i])
-+			__esw_qos_destroy_node(vport->qos.sched_nodes[i], extack);
-+	}
-+
-+	kfree(vport->qos.sched_nodes);
-+	vport->qos.sched_nodes = NULL;
-+}
-+
-+static int esw_qos_create_vport_tc_sched_elements(struct mlx5_vport *vport,
-+						  enum sched_node_type type,
-+						  struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_esw_sched_node *vport_node = vport->qos.sched_node;
-+	struct mlx5_esw_sched_node *tc_arbiter_node, *vports_tc_node;
-+	int err, num_tcs = esw_qos_num_tcs(vport_node->esw->dev);
-+	u32 rate_limit_elem_ix;
-+
-+	vport->qos.sched_nodes = kcalloc(num_tcs, sizeof(struct mlx5_esw_sched_node *), GFP_KERNEL);
-+	if (!vport->qos.sched_nodes) {
-+		NL_SET_ERR_MSG_MOD(extack, "Allocating the vport TC scheduling elements failed.");
-+		return -ENOMEM;
-+	}
-+
-+	rate_limit_elem_ix = type == SCHED_NODE_TYPE_RATE_LIMITER ? vport_node->ix : 0;
-+	tc_arbiter_node = type == SCHED_NODE_TYPE_RATE_LIMITER ? vport_node->parent : vport_node;
-+	list_for_each_entry(vports_tc_node, &tc_arbiter_node->children, entry) {
-+		err = esw_qos_create_vport_tc_sched_node(vport, rate_limit_elem_ix, vports_tc_node,
-+							 extack);
-+		if (err)
-+			goto err_create_vport_tc;
-+	}
-+
-+	return 0;
-+
-+err_create_vport_tc:
-+	esw_qos_destroy_vport_tc_sched_elements(vport, NULL);
-+
-+	return err;
-+}
-+
-+static int esw_qos_vport_tc_enable(struct mlx5_vport *vport, enum sched_node_type type,
-+				   struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_esw_sched_node *vport_node = vport->qos.sched_node;
-+	int err;
-+
-+	if (type == SCHED_NODE_TYPE_TC_ARBITER_TSAR &&
-+	    MLX5_CAP_QOS(vport_node->esw->dev, log_esw_max_sched_depth) < 2) {
-+		NL_SET_ERR_MSG_MOD(extack, "Setting up TC Arbiter for a vport is not supported.");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	esw_assert_qos_lock_held(vport->dev->priv.eswitch);
-+
-+	if (type == SCHED_NODE_TYPE_RATE_LIMITER)
-+		err = esw_qos_create_rate_limit_element(vport_node, extack);
-+	else
-+		err = esw_qos_tc_arbiter_scheduling_setup(vport_node, extack);
++	err = esw_qos_create_tc_arbiter_sched_elem(node, extack);
 +	if (err)
 +		return err;
-+
-+	/* Rate limiters impact multiple nodes not directly connected to them
-+	 * and are not direct members of the QoS hierarchy.
-+	 * Unlink it from the parent to reflect that.
-+	 */
-+	if (type == SCHED_NODE_TYPE_RATE_LIMITER)
-+		list_del_init(&vport_node->entry);
-+
-+	err  = esw_qos_create_vport_tc_sched_elements(vport, type, extack);
++	/* Initialize the vports TC nodes within created TC arbiter TSAR. */
++	err = esw_qos_create_vports_tc_nodes(node, extack);
 +	if (err)
-+		goto err_sched_nodes;
++		goto err_vports_tc_nodes;
++
++	node->type = SCHED_NODE_TYPE_TC_ARBITER_TSAR;
 +
 +	return 0;
 +
-+err_sched_nodes:
-+	if (type == SCHED_NODE_TYPE_RATE_LIMITER) {
-+		esw_qos_node_destroy_sched_element(vport_node, NULL);
-+		list_add_tail(&vport_node->entry, &vport_node->parent->children);
-+	} else {
-+		esw_qos_tc_arbiter_scheduling_teardown(vport_node, NULL);
-+	}
++err_vports_tc_nodes:
++	/* If initialization fails, clean up the scheduling element
++	 * for the TC arbiter node.
++	 */
++	esw_qos_node_destroy_sched_element(node, NULL);
++	node->ix = curr_ix;
 +	return err;
-+}
-+
-+static void esw_qos_vport_tc_disable(struct mlx5_vport *vport, struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_esw_sched_node *vport_node = vport->qos.sched_node;
-+	enum sched_node_type curr_type = vport_node->type;
-+
-+	esw_qos_destroy_vport_tc_sched_elements(vport, extack);
-+
-+	if (curr_type == SCHED_NODE_TYPE_RATE_LIMITER)
-+		esw_qos_node_destroy_sched_element(vport_node, extack);
-+	else
-+		esw_qos_tc_arbiter_scheduling_teardown(vport_node, extack);
-+}
-+
-+static int esw_qos_set_vport_tcs_min_rate(struct mlx5_vport *vport, u32 min_rate,
-+					  struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_esw_sched_node *vport_node = vport->qos.sched_node;
-+	int err, i, num_tcs = esw_qos_num_tcs(vport_node->esw->dev);
-+
-+	for (i = 0; i < num_tcs; i++) {
-+		err = esw_qos_set_node_min_rate(vport->qos.sched_nodes[i], min_rate, extack);
-+		if (err)
-+			goto err_out;
-+	}
-+	vport_node->min_rate = min_rate;
-+
-+	return 0;
-+err_out:
-+	for (--i; i >= 0; i--)
-+		esw_qos_set_node_min_rate(vport->qos.sched_nodes[i], vport_node->min_rate, extack);
-+	return err;
-+}
-+
- static void esw_qos_vport_disable(struct mlx5_vport *vport, struct netlink_ext_ack *extack)
- {
- 	struct mlx5_esw_sched_node *vport_node = vport->qos.sched_node;
- 	struct mlx5_esw_sched_node *parent = vport_node->parent;
-+	enum sched_node_type curr_type = vport_node->type;
- 
--	esw_qos_node_destroy_sched_element(vport_node, extack);
-+	if (curr_type == SCHED_NODE_TYPE_VPORT)
-+		esw_qos_node_destroy_sched_element(vport_node, extack);
-+	else
-+		esw_qos_vport_tc_disable(vport, extack);
- 
- 	vport_node->bw_share = 0;
- 	list_del_init(&vport_node->entry);
-@@ -589,7 +808,8 @@ static void esw_qos_vport_disable(struct mlx5_vport *vport, struct netlink_ext_a
- 	trace_mlx5_esw_vport_qos_destroy(vport_node->esw->dev, vport);
  }
  
--static int esw_qos_vport_enable(struct mlx5_vport *vport, struct mlx5_esw_sched_node *parent,
-+static int esw_qos_vport_enable(struct mlx5_vport *vport, enum sched_node_type type,
-+				struct mlx5_esw_sched_node *parent,
- 				struct netlink_ext_ack *extack)
+ static int esw_qos_create_vport_tc_sched_node(struct mlx5_vport *vport,
+@@ -965,6 +1127,7 @@ static int esw_qos_vport_update(struct mlx5_vport *vport, enum sched_node_type t
  {
+ 	struct mlx5_esw_sched_node *curr_parent = vport->qos.sched_node->parent;
+ 	enum sched_node_type curr_type = vport->qos.sched_node->type;
++	u32 curr_tc_bw[IEEE_8021QAZ_MAX_TCS] = {0};
  	int err;
-@@ -597,10 +817,14 @@ static int esw_qos_vport_enable(struct mlx5_vport *vport, struct mlx5_esw_sched_
- 	esw_assert_qos_lock_held(vport->dev->priv.eswitch);
  
- 	esw_qos_node_set_parent(vport->qos.sched_node, parent);
--	err = esw_qos_vport_create_sched_element(vport->qos.sched_node, extack);
-+	if (type == SCHED_NODE_TYPE_VPORT)
-+		err = esw_qos_vport_create_sched_element(vport->qos.sched_node, extack);
-+	else
-+		err = esw_qos_vport_tc_enable(vport, type, extack);
+ 	esw_assert_qos_lock_held(vport->dev->priv.eswitch);
+@@ -976,11 +1139,19 @@ static int esw_qos_vport_update(struct mlx5_vport *vport, enum sched_node_type t
  	if (err)
  		return err;
  
-+	vport->qos.sched_node->type = type;
- 	esw_qos_normalize_min_rate(parent->esw, parent, extack);
++	if (curr_type == SCHED_NODE_TYPE_TC_ARBITER_TSAR && curr_type == type)
++		esw_qos_tc_arbiter_get_bw_shares(vport->qos.sched_node, curr_tc_bw);
++
+ 	esw_qos_vport_disable(vport, extack);
  
- 	return 0;
-@@ -628,7 +852,7 @@ static int mlx5_esw_qos_vport_enable(struct mlx5_vport *vport, enum sched_node_t
- 	sched_node->min_rate = min_rate;
- 	sched_node->vport = vport;
- 	vport->qos.sched_node = sched_node;
--	err = esw_qos_vport_enable(vport, parent, extack);
-+	err = esw_qos_vport_enable(vport, type, parent, extack);
- 	if (err)
- 		esw_qos_put(esw);
- 
-@@ -680,6 +904,8 @@ static int mlx5_esw_qos_set_vport_min_rate(struct mlx5_vport *vport, u32 min_rat
- 	if (!vport_node)
- 		return mlx5_esw_qos_vport_enable(vport, SCHED_NODE_TYPE_VPORT, NULL, 0, min_rate,
- 						 extack);
-+	else if (vport_node->type == SCHED_NODE_TYPE_RATE_LIMITER)
-+		return esw_qos_set_vport_tcs_min_rate(vport, min_rate, extack);
- 	else
- 		return esw_qos_set_node_min_rate(vport_node, min_rate, extack);
- }
-@@ -712,12 +938,59 @@ bool mlx5_esw_qos_get_vport_rate(struct mlx5_vport *vport, u32 *max_rate, u32 *m
- 	return enabled;
- }
- 
-+static int esw_qos_vport_tc_check_type(enum sched_node_type curr_type,
-+				       enum sched_node_type new_type,
-+				       struct netlink_ext_ack *extack)
-+{
-+	if (curr_type == SCHED_NODE_TYPE_TC_ARBITER_TSAR &&
-+	    new_type == SCHED_NODE_TYPE_RATE_LIMITER) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Cannot switch from vport-level TC arbitration to node-level TC arbitration");
-+		return -EOPNOTSUPP;
+ 	err = esw_qos_vport_enable(vport, type, parent, extack);
+-	if (err)
++	if (err) {
+ 		esw_qos_vport_enable(vport, curr_type, curr_parent, NULL);
++		extack = NULL;
 +	}
 +
-+	if (curr_type == SCHED_NODE_TYPE_RATE_LIMITER &&
-+	    new_type == SCHED_NODE_TYPE_TC_ARBITER_TSAR) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Cannot switch from node-level TC arbitration to vport-level TC arbitration");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int esw_qos_vport_update(struct mlx5_vport *vport, enum sched_node_type type,
-+				struct mlx5_esw_sched_node *parent,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_esw_sched_node *curr_parent = vport->qos.sched_node->parent;
-+	enum sched_node_type curr_type = vport->qos.sched_node->type;
-+	int err;
-+
-+	esw_assert_qos_lock_held(vport->dev->priv.eswitch);
-+	parent = parent ?: curr_parent;
-+	if (curr_type == type && curr_parent == parent)
-+		return 0;
-+
-+	err = esw_qos_vport_tc_check_type(curr_type, type, extack);
-+	if (err)
-+		return err;
-+
-+	esw_qos_vport_disable(vport, extack);
-+
-+	err = esw_qos_vport_enable(vport, type, parent, extack);
-+	if (err)
-+		esw_qos_vport_enable(vport, curr_type, curr_parent, NULL);
-+
-+	return err;
-+}
-+
- static int esw_qos_vport_update_parent(struct mlx5_vport *vport, struct mlx5_esw_sched_node *parent,
- 				       struct netlink_ext_ack *extack)
- {
- 	struct mlx5_eswitch *esw = vport->dev->priv.eswitch;
- 	struct mlx5_esw_sched_node *curr_parent;
--	int err;
-+	enum sched_node_type type;
++	if (curr_type == SCHED_NODE_TYPE_TC_ARBITER_TSAR && curr_type == type)
++		esw_qos_set_tc_arbiter_bw_shares(vport->qos.sched_node, curr_tc_bw, extack);
  
- 	esw_assert_qos_lock_held(esw);
- 	curr_parent = vport->qos.sched_node->parent;
-@@ -725,16 +998,17 @@ static int esw_qos_vport_update_parent(struct mlx5_vport *vport, struct mlx5_esw
- 	if (curr_parent == parent)
- 		return 0;
- 
--	esw_qos_vport_disable(vport, extack);
--
--	err = esw_qos_vport_enable(vport, parent, extack);
--	if (err) {
--		if (esw_qos_vport_enable(vport, curr_parent, NULL))
--			esw_warn(parent->esw->dev, "vport restore QoS failed (vport=%d)\n",
--				 vport->vport);
--	}
-+	/* Set vport QoS type based on parent node type if different from default QoS;
-+	 * otherwise, use the vport's current QoS type.
-+	 */
-+	if (parent->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR)
-+		type = SCHED_NODE_TYPE_RATE_LIMITER;
-+	else if (curr_parent->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR)
-+		type = SCHED_NODE_TYPE_VPORT;
-+	else
-+		type = vport->qos.sched_node->type;
- 
--	return err;
-+	return esw_qos_vport_update(vport, type, parent, extack);
- }
- 
- static void esw_qos_switch_vport_tcs_to_vport(struct mlx5_esw_sched_node *tc_arbiter_node,
-@@ -1025,6 +1299,14 @@ static bool esw_qos_validate_unsupported_tc_bw(struct mlx5_eswitch *esw, u32 *tc
- 	return true;
- }
- 
-+static bool esw_qos_vport_validate_unsupported_tc_bw(struct mlx5_vport *vport, u32 *tc_bw)
-+{
-+	struct mlx5_eswitch *esw = vport->qos.sched_node ?
-+				   vport->qos.sched_node->parent->esw : vport->dev->priv.eswitch;
-+
-+	return esw_qos_validate_unsupported_tc_bw(esw, tc_bw);
-+}
-+
- static bool esw_qos_tc_bw_disabled(u32 *tc_bw)
- {
- 	int i;
-@@ -1098,8 +1380,44 @@ int mlx5_esw_devlink_rate_leaf_tx_max_set(struct devlink_rate *rate_leaf, void *
- int mlx5_esw_devlink_rate_leaf_tc_bw_set(struct devlink_rate *rate_leaf, void *priv,
- 					 u32 *tc_bw, struct netlink_ext_ack *extack)
- {
--	NL_SET_ERR_MSG_MOD(extack, "TC bandwidth shares are not supported on leafs");
--	return -EOPNOTSUPP;
-+	struct mlx5_esw_sched_node *vport_node;
-+	struct mlx5_vport *vport = priv;
-+	struct mlx5_eswitch *esw;
-+	bool disable;
-+	int err = 0;
-+
-+	esw = vport->dev->priv.eswitch;
-+	if (!mlx5_esw_allowed(esw))
-+		return -EPERM;
-+
-+	disable = esw_qos_tc_bw_disabled(tc_bw);
-+	esw_qos_lock(esw);
-+
-+	if (!esw_qos_vport_validate_unsupported_tc_bw(vport, tc_bw)) {
-+		NL_SET_ERR_MSG_MOD(extack, "E-Switch traffic classes number is not supported");
-+		err = -EOPNOTSUPP;
-+		goto unlock;
-+	}
-+
-+	vport_node = vport->qos.sched_node;
-+	if (disable && !vport_node)
-+		goto unlock;
-+
-+	if (disable && vport_node->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR) {
-+		err = esw_qos_vport_update(vport, SCHED_NODE_TYPE_VPORT, NULL, extack);
-+		goto unlock;
-+	}
-+
-+	if (!vport_node) {
-+		err = mlx5_esw_qos_vport_enable(vport, SCHED_NODE_TYPE_TC_ARBITER_TSAR, NULL, 0, 0,
-+						extack);
-+		vport_node = vport->qos.sched_node;
-+	} else {
-+		err = esw_qos_vport_update(vport, SCHED_NODE_TYPE_TC_ARBITER_TSAR, NULL, extack);
-+	}
-+unlock:
-+	esw_qos_unlock(esw);
-+	return err;
- }
- 
- int mlx5_esw_devlink_rate_node_tc_bw_set(struct devlink_rate *rate_node, void *priv,
-@@ -1218,10 +1536,14 @@ int mlx5_esw_qos_vport_update_parent(struct mlx5_vport *vport, struct mlx5_esw_s
- 	}
- 
- 	esw_qos_lock(esw);
--	if (!vport->qos.sched_node && parent)
--		err = mlx5_esw_qos_vport_enable(vport, SCHED_NODE_TYPE_VPORT, parent, 0, 0, extack);
--	else if (vport->qos.sched_node)
-+	if (!vport->qos.sched_node && parent) {
-+		enum sched_node_type type = parent->type == SCHED_NODE_TYPE_TC_ARBITER_TSAR ?
-+					    SCHED_NODE_TYPE_RATE_LIMITER : SCHED_NODE_TYPE_VPORT;
-+
-+		err = mlx5_esw_qos_vport_enable(vport, type, parent, 0, 0, extack);
-+	} else if (vport->qos.sched_node) {
- 		err = esw_qos_vport_update_parent(vport, parent, extack);
-+	}
- 	esw_qos_unlock(esw);
  	return err;
  }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-index a83d41121db6..9b0be25631df 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-@@ -212,10 +212,19 @@ struct mlx5_vport {
+@@ -1415,6 +1586,8 @@ int mlx5_esw_devlink_rate_leaf_tc_bw_set(struct devlink_rate *rate_leaf, void *p
+ 	} else {
+ 		err = esw_qos_vport_update(vport, SCHED_NODE_TYPE_TC_ARBITER_TSAR, NULL, extack);
+ 	}
++	if (!err)
++		esw_qos_set_tc_arbiter_bw_shares(vport_node, tc_bw, extack);
+ unlock:
+ 	esw_qos_unlock(esw);
+ 	return err;
+@@ -1441,6 +1614,8 @@ int mlx5_esw_devlink_rate_node_tc_bw_set(struct devlink_rate *rate_node, void *p
+ 	}
  
- 	struct mlx5_vport_info  info;
- 
--	/* Protected with the E-Switch qos domain lock. */
-+	/* Protected with the E-Switch qos domain lock. The Vport QoS can
-+	 * either be disabled (sched_node is NULL) or in one of three states:
-+	 * 1. Regular QoS (sched_node is a vport node).
-+	 * 2. TC QoS enabled on the vport (sched_node is a TC arbiter).
-+	 * 3. TC QoS enabled on the vport's parent node
-+	 *    (sched_node is a rate limit node).
-+	 * When TC is enabled in either mode, the vport owns vport TC scheduling nodes.
-+	 */
- 	struct {
--		/* Vport scheduling element node. */
-+		/* Vport scheduling node. */
- 		struct mlx5_esw_sched_node *sched_node;
-+		/* Array of vport traffic class scheduling nodes. */
-+		struct mlx5_esw_sched_node **sched_nodes;
- 	} qos;
- 
- 	u16 vport;
+ 	err = esw_qos_node_enable_tc_arbitration(node, extack);
++	if (!err)
++		esw_qos_set_tc_arbiter_bw_shares(node, tc_bw, extack);
+ unlock:
+ 	esw_qos_unlock(esw);
+ 	return err;
 -- 
 2.44.0
 
