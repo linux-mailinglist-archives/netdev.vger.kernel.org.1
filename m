@@ -1,124 +1,74 @@
-Return-Path: <netdev+bounces-145663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56A399D0560
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 20:12:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FE29D05A0
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:06:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1545428209E
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 19:12:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AF15B21796
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 20:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABBE1DA632;
-	Sun, 17 Nov 2024 19:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC09C1DB95E;
+	Sun, 17 Nov 2024 20:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="19/3aQGa"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mC18zsML"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B401D0E36;
-	Sun, 17 Nov 2024 19:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12C31DA60F;
+	Sun, 17 Nov 2024 20:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731870765; cv=none; b=GmHWWbJLFcKbliBjYxvRUHWiIuC9D5mzdwE6jRswYc8DK4Ci5AkLWzG6pyo2cMsTxiCTD79n6wlcUiQSX3fD+5iHpjjjkNEaQOkJ4q7YcmNr2Daash6Fyxr8JP6RgUrvTdk7lITlMpMlLS+7W/n+a+h36apfH6fAYX/XkJMHO9g=
+	t=1731873984; cv=none; b=r65j9Qt987F0Rp0qJG1G6x02BpVcuZ0UVoYKnbLtfjVjnzgAIhgeYBCMkj9/2Avgek0F8LcxIML9ctDJrjw0FgSNdKQDrNL5x1Q28nC/Hti7JW94b8oHQuihu4NrfmBV4JW553lTaqvB9tclgU6/XTFai6UNyABHb5G73UVO71Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731870765; c=relaxed/simple;
-	bh=ASVA2amIFW5FENrDgEkM966w+kxcrbmrpSymk781uHo=;
+	s=arc-20240116; t=1731873984; c=relaxed/simple;
+	bh=OyxAN4YgaXUp4x+XaG2iuK6SIMvKnOiGTkjdOlJAyrU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hQPKz766eC5IuI1G5od1dKodpynuceL6ZuWcXKCsY8uqGZhKILQFNFW2eZchhK6HtB+fO7SzgrtJa2inZm/lbZc5eCxpaJKJ7q7lDyx+Ok81YAhDbXa5RXub2Em9VYvMAAHgJfKo+cNatdwh+yQKAT9fgsSkA4DShwTJWm/vJ88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=19/3aQGa; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HMfIEADOugcgiUAodv2gG493oC36UfBBY61jIgLvjF0=; b=19/3aQGa00zPOvQCtrhHc3HBuv
-	iE//3305Fi5/JLnYjfcmmoVRuTIL6G7KXc467yHydhoxGaGyqTEFARe2dj/fQraInPA7+pfP6+r5G
-	ThaKvzLBcumvvPd9dLoDYy8++1AKW8ZMp4mJsnYXRoEwJbE78/QhtnK2NQ1V3DL4DPKKY+KqIzq9H
-	imEJTa7IqtjNybIWsB8eDKilg3MI4f8kseKLQfwPy9tD1b4MAn3+bPYradiUnv0JYPbvdphGMxp0j
-	z9QHodNmPu4VdmidUhn2wzgcLUq3TF/ETexBcrxTm14Wwzmj4wrkyEbKxRMlSEnAdhuceEw3JFiOw
-	e14tmcow==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49210)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tCkhA-0000Zm-0Y;
-	Sun, 17 Nov 2024 19:12:28 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tCkh7-0004Lt-2f;
-	Sun, 17 Nov 2024 19:12:25 +0000
-Date: Sun, 17 Nov 2024 19:12:25 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: manas18244@iiitd.ac.in, Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>, Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] rust: simplify Result<()> uses
-Message-ID: <ZzpAGXVfBkJ23gCD@shell.armlinux.org.uk>
-References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
- <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch>
- <Zzo8Xx9tJdvEO1Q1@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tuym9p83yf1xU9wZ8sWaGAe3hw/01ZgipyskzeSokVR5BsDJFeFeNwllh+1N1IszpdHXphlK7/mNmbsjjq8qXtlmCCXKm0r8TU01elbMJ55EQgcuyoLGskIC1/BuqyW+Q7OOxcZUA5emtpEBoTAwWMgGrz3wv8r6tuGoXAtAVME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mC18zsML; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71351C4CECD;
+	Sun, 17 Nov 2024 20:06:23 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mC18zsML"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1731873981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OyxAN4YgaXUp4x+XaG2iuK6SIMvKnOiGTkjdOlJAyrU=;
+	b=mC18zsML78oK44vTAGfzIlRcbHSABMcqxb1jceIME38nVDjL//ZsQKeO/rOwTefJ1cSgMT
+	eWm1DsiL/dNk4Uh6mN5Yb8wX0Jl0J+Xh1WhnqQ86Ap2W1j0c5+tptSZhWaGkM/a6pqDZe5
+	d6KQzjvXosYx+b2MXTGqpA3TPd0KzWo=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 01568eab (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Sun, 17 Nov 2024 20:06:20 +0000 (UTC)
+Date: Sun, 17 Nov 2024 21:06:18 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+Cc: wireguard@lists.zx2c4.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] wireguard: allowedips: Fix useless call issue
+Message-ID: <ZzpMumfYVgV8fTFH@zx2c4.com>
+References: <20241115110721.22932-1-dheeraj.linuxdev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Zzo8Xx9tJdvEO1Q1@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241115110721.22932-1-dheeraj.linuxdev@gmail.com>
 
-Let's try that again... with Manas' address pasted in _before_ Andrew's
-"A" !
+On Fri, Nov 15, 2024 at 04:37:21PM +0530, Dheeraj Reddy Jonnalagadda wrote:
+> This commit fixes a useless call issue detected
+> by Coverity (CID 1508092). The call to
+> horrible_allowedips_lookup_v4 is unnecessary as
+> its return value is never checked.
 
-On Sun, Nov 17, 2024 at 06:56:31PM +0000, Russell King (Oracle) wrote:
-> On Sun, Nov 17, 2024 at 07:25:48PM +0100, Andrew Lunn wrote:
-> > On Sun, Nov 17, 2024 at 08:41:47PM +0530, Manas via B4 Relay wrote:
-> > > From: Manas <manas18244@iiitd.ac.in>
-> > > 
-> > > This patch replaces `Result<()>` with `Result`.
-> > > 
-> > > Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> > > Link: https://github.com/Rust-for-Linux/linux/issues/1128
-> > > Signed-off-by: Manas <manas18244@iiitd.ac.in>
-> > > ---
-> > >  drivers/net/phy/qt2025.rs        | 2 +-
-> > >  rust/kernel/block/mq/gen_disk.rs | 2 +-
-> > >  rust/kernel/uaccess.rs           | 2 +-
-> > >  rust/macros/lib.rs               | 6 +++---
-> > 
-> > Please split these patches up per subsystem, and submit them
-> > individually to the appropriate subsystems.
-> 
-> In addition, it would be good if the commit stated the rationale for
-> the change, rather than what the change is (which we can see from the
-> patch itself.)
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Applied to the wireguard tree, thanks.
 
