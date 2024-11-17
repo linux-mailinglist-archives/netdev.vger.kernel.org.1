@@ -1,127 +1,180 @@
-Return-Path: <netdev+bounces-145650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD649D0469
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 16:04:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21DE09D0471
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 16:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2A4281D72
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 15:04:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 984681F21B01
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 15:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9741D90B4;
-	Sun, 17 Nov 2024 15:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3568C1D8E18;
+	Sun, 17 Nov 2024 15:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lb9rrZSt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3N+T/Vs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB561D88D5;
-	Sun, 17 Nov 2024 15:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E7C8831;
+	Sun, 17 Nov 2024 15:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731855870; cv=none; b=dKSmRXK1v0RV/QKzS7KeaHciTSoMBpX9qi1VlS+dQHoarVCrna7OYE6U7KNT5OKsnGA9IkWlXIZ81dF2NqHdsjjxTW8BLxQIoUaNunn/fLP4XQwIiEir0bfXO3aPQ4Efg61/xE8tGEcP5gU8WJvzcZnG2eTOqh55Z2rtSlkToe0=
+	t=1731856310; cv=none; b=iwgwxOh69tWBA4Sc/ZMcAD/q24b7PT5bH8h0M1aoy0PnvVCqk/nkn11k/GjkmXZdsYXIsyme9Te7nL/VcpjNAYhIymiuvyrLiOflto2PUJMX2v+K8HH/uyEGTpWjL7m0pHKmueX+yS4OPbWNTGV0jx/3xDlAsvjzWYiLqUweV3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731855870; c=relaxed/simple;
-	bh=5tkeO5rU1xRGXTehyLb6AVPpffFFdbs0aUoVRgmj//A=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CyU2IzEMwaRHPS4aionn+Svof+8pQQ1yRIwxe+I4ipQWNUmhNG4YdkEpXRVclpi/CLhwufHvj+c4PXMEepIGMfPQSpcIbVc5pmq4w9+xVPR7k0X4YE9FJ4uVUDIFczBUmu2lmtcR//ayDnUVtNXIB9jbhZ2XmpGdd2/JB8OHJ+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lb9rrZSt; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-460c0f9c13eso28307671cf.0;
-        Sun, 17 Nov 2024 07:04:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731855865; x=1732460665; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nMUZ/lFrZhuWNRTmGZWkHzS3NTckv99Tt3mvMgBJPn0=;
-        b=Lb9rrZSt6Q4aeFU+/V5CCmSnAejYZAYK/mupnCR9dlIccNVVgytiirqV5YlnHR8gCs
-         a67cne0F9gTTTsjphR/mtay/n0bSvxxd3XxakrcGDBlcu92hOZIOkemMUXgUG5LBaW0s
-         58treBklh+Ix9mnuns9tfwjFlm7nJ7FmXqVHoH+w7l91iRt9mROgQhzP+0FOb/3Tqs5T
-         G4j/UMwJzZ8E/llVnD35lk9zXosWLVso+yRYad6Z2UuPdL7Pk7UN2SpX7N1aJ4W+9oWL
-         FNLcY+YFMsmSHoWvHgNR6eh0ceci2zKCrgV7q7v1uYO6nxKoIuruzDdznzaC2kte8L78
-         Vm0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731855865; x=1732460665;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nMUZ/lFrZhuWNRTmGZWkHzS3NTckv99Tt3mvMgBJPn0=;
-        b=IjX6Z886Tc2V4Sh7jP2Cezx8kKMYJ3tKTU/UKyQkx59x9yACQ1yNLckQOIcDWEOmA+
-         6lji5jaDS6avj3tRe+ERoAmaOzZ5yL+rJ5RoSPp7yG3eDAj/cfu9I+llatQYI5SpjtYQ
-         Gtd4jipio0dnVq6cbt4LUoRzIeclMApOL3krbIyFzZVcJ1KMUVQebgZqhuHqk1j9m+fc
-         ijvFxEq6QY9YYz6rKS7oOKmBZK8UamgODMOFAOxft9HH0/DoKQzHnbKh8VfhpegA/7D6
-         2bCCqEJm9kgo9uVwlYeGz/k3UHb4VeNB4iDqkZpn+xPptH3Q1C9VcGFG391jSjEL6aEh
-         mMVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHoL/TdSEKmplVRSeaj1uvolmQbuNBReTThSHDA8ZA2IU6kLmLam6OLVWKWc6URmmYaYKWsQIR@vger.kernel.org, AJvYcCVJhRyFxrJ327rrGqG8hvwaYiHfp7dA4eoWZAFdnePMQ5mVEZfxirwU1kHuxAZcVKEpJKCW6V0qJUOwcNc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+SzkTAiYLAmMvkAxNGqpfWZOTMFtFF/Rfzge5lTM3tIdtg2m8
-	FKuB+w8Zhpvf0D1NaPaXd+xWnUS3AQ6/CgvNL+aOReu3XgeYwvt3
-X-Google-Smtp-Source: AGHT+IFNUHsHK3UYkTxlpYXDnkKbEDYcCloDBC7fHSPIV6EjYUzsCWmbRR1tiASKVkzZmHnj37Z3pA==
-X-Received: by 2002:a05:622a:b:b0:461:7558:892f with SMTP id d75a77b69052e-46356b34f42mr234903361cf.15.1731855865300;
-        Sun, 17 Nov 2024 07:04:25 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635ab25bc8sm44615531cf.69.2024.11.17.07.04.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Nov 2024 07:04:24 -0800 (PST)
-Date: Sun, 17 Nov 2024 10:04:24 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Stas Sergeev <stsp2@yandex.ru>, 
- linux-kernel@vger.kernel.org
-Cc: Stas Sergeev <stsp2@yandex.ru>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- agx@sigxcpu.org, 
- jdike@linux.intel.com
-Message-ID: <673a05f83211d_11eccf2940@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241117090514.9386-1-stsp2@yandex.ru>
-References: <20241117090514.9386-1-stsp2@yandex.ru>
-Subject: Re: [PATCH net-next] tun: fix group permission check
+	s=arc-20240116; t=1731856310; c=relaxed/simple;
+	bh=YoWEgbjfpT0pRKmM5sLM3OnhUgtNHURpAF5a1fG7oDs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J/nGchVtusGuiLxHruCY2CcWGqWFNhN/EvvZSHjgmsbsDYc3RtP8nyN4ULmtaoRAR89OICicrayUvU4cwRCXI9Ftp/gJXpM/8IAMcFzCt4g7a5DDPEsRXuq7hPoJ/oYyhkpB3j2miT4bQCjH/oYBfkPtMQuP6fwFvTZe/JWjEbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3N+T/Vs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69DB0C4CECD;
+	Sun, 17 Nov 2024 15:11:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731856309;
+	bh=YoWEgbjfpT0pRKmM5sLM3OnhUgtNHURpAF5a1fG7oDs=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=E3N+T/Vs1LKBInl2ZXVI2j7Y1XIEiy3wAHvkLbMOkWst2Jsv0VjBfHu7BnIH2XFuH
+	 s09dnZ5QzmNf7OH+zXAGztFzgpUAXASstIgtIlEPHl58miSuq2iu4IJPGoOgKouPoY
+	 R37/pCb4ugofjQTdfZFwBtCNA6m0ne9QoZMsnbbkI41vR+L7FTIjq5as1rj5ek0nIC
+	 aTY88Hwwx7ZmdDt9+Pj2FIyT8CiXlqTykOZaPnT2nulvqSksN0aiFaxvaEVXfp6TAr
+	 C45hcOUXdd/bH9yYgNlO0d3tGHxob5S5ldyMOYobN7a1ez9uh6R6OMxqWv9KdqeOFC
+	 ge1TSPp2eY93g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B14BD68BEF;
+	Sun, 17 Nov 2024 15:11:49 +0000 (UTC)
+From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
+Date: Sun, 17 Nov 2024 20:41:47 +0530
+Subject: [PATCH] rust: simplify Result<()> uses
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
+X-B4-Tracking: v=1; b=H4sIALIHOmcC/x3MQQqAIBBA0avIrBM0grKrRAuxsQbKwqkoxLsnL
+ d/i/wSMkZChFwki3sS0hwJdCXCLDTNKmoqhVnWjtW4l03as5F8Zka/1lM5OprNeGeUMlOqI6On
+ 5j8OY8weuNWvsYQAAAA==
+X-Change-ID: 20241117-simplify-result-cad98af090c9
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, 
+ Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-block@vger.kernel.org, Manas <manas18244@iiitd.ac.in>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1731856307; l=3582;
+ i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
+ bh=9wh8APnbE+xtYBBHViec799odh7ToNYbNtboBILuiv4=;
+ b=KwKDJLX1CAhKLCiNJsRH41q4RnVX6JT2IaF2iIN5gA1wqesEONanU83urTsIDlPG8AdssXWZ4
+ jXKYUpk51h+ByiaQUvylhQUgWs6/9BfIElhdayxeAi1xSAwLjz9xKIc
+X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
+ pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
+X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
+ auth_id=196
+X-Original-From: Manas <manas18244@iiitd.ac.in>
+Reply-To: manas18244@iiitd.ac.in
 
-Stas Sergeev wrote:
-> Currently tun checks the group permission even if the user have matched.
-> Besides going against the usual permission semantic, this has a
-> very interesting implication: if the tun group is not among the
-> supplementary groups of the tun user, then effectively no one can
-> access the tun device. CAP_SYS_ADMIN still can, but its the same as
-> not setting the tun ownership.
-> 
-> This patch relaxes the group checking so that either the user match
-> or the group match is enough. This avoids the situation when no one
-> can access the device even though the ownership is properly set.
-> 
-> Also I simplified the logic by removing the redundant inversions:
-> tun_not_capable() --> !tun_capable()
-> 
-> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+From: Manas <manas18244@iiitd.ac.in>
 
-This behavior goes back through many patches to commit 8c644623fe7e:
+This patch replaces `Result<()>` with `Result`.
 
-    [NET]: Allow group ownership of TUN/TAP devices.
+Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+Link: https://github.com/Rust-for-Linux/linux/issues/1128
+Signed-off-by: Manas <manas18244@iiitd.ac.in>
+---
+ drivers/net/phy/qt2025.rs        | 2 +-
+ rust/kernel/block/mq/gen_disk.rs | 2 +-
+ rust/kernel/uaccess.rs           | 2 +-
+ rust/macros/lib.rs               | 6 +++---
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-    Introduce a new syscall TUNSETGROUP for group ownership setting of tap
-    devices. The user now is allowed to send packages if either his euid or
-    his egid matches the one specified via tunctl (via -u or -g
-    respecitvely). If both, gid and uid, are set via tunctl, both have to
-    match.
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..25c12a02baa255d3d5952e729a890b3ccfe78606 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -39,7 +39,7 @@ impl Driver for PhyQT2025 {
+     const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
+     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
+ 
+-    fn probe(dev: &mut phy::Device) -> Result<()> {
++    fn probe(dev: &mut phy::Device) -> Result {
+         // Check the hardware revision code.
+         // Only 0x3b works with this driver and firmware.
+         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index 708125dce96a934f32caab44d5e6cff14c4321a9..798c4ae0bdedd58221b5851a630c0e1052e0face 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -45,7 +45,7 @@ pub fn rotational(mut self, rotational: bool) -> Self {
+ 
+     /// Validate block size by verifying that it is between 512 and `PAGE_SIZE`,
+     /// and that it is a power of two.
+-    fn validate_block_size(size: u32) -> Result<()> {
++    fn validate_block_size(size: u32) -> Result {
+         if !(512..=bindings::PAGE_SIZE as u32).contains(&size) || !size.is_power_of_two() {
+             Err(error::code::EINVAL)
+         } else {
+diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
+index 05b0b8d13b10da731af62be03e1c2c13ced3f706..7c21304344ccd943816e38119a5be2ccf8d8e154 100644
+--- a/rust/kernel/uaccess.rs
++++ b/rust/kernel/uaccess.rs
+@@ -49,7 +49,7 @@
+ /// use kernel::error::Result;
+ /// use kernel::uaccess::{UserPtr, UserSlice};
+ ///
+-/// fn bytes_add_one(uptr: UserPtr, len: usize) -> Result<()> {
++/// fn bytes_add_one(uptr: UserPtr, len: usize) -> Result {
+ ///     let (read, mut write) = UserSlice::new(uptr, len).reader_writer();
+ ///
+ ///     let mut buf = KVec::new();
+diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+index 4ab94e44adfe3206faad159e81417ea41a35815b..463920353ca9c408f5d69e2626c13a173bae98d7 100644
+--- a/rust/macros/lib.rs
++++ b/rust/macros/lib.rs
+@@ -144,11 +144,11 @@ pub fn module(ts: TokenStream) -> TokenStream {
+ /// // Declares a `#[vtable]` trait
+ /// #[vtable]
+ /// pub trait Operations: Send + Sync + Sized {
+-///     fn foo(&self) -> Result<()> {
++///     fn foo(&self) -> Result {
+ ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
+ ///     }
+ ///
+-///     fn bar(&self) -> Result<()> {
++///     fn bar(&self) -> Result {
+ ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
+ ///     }
+ /// }
+@@ -158,7 +158,7 @@ pub fn module(ts: TokenStream) -> TokenStream {
+ /// // Implements the `#[vtable]` trait
+ /// #[vtable]
+ /// impl Operations for Foo {
+-///     fn foo(&self) -> Result<()> {
++///     fn foo(&self) -> Result {
+ /// #        Err(EINVAL)
+ ///         // ...
+ ///     }
 
-The choice evidently was on purpose. Even if indeed non-standard.
+---
+base-commit: b2603f8ac8217bc59f5c7f248ac248423b9b99cb
+change-id: 20241117-simplify-result-cad98af090c9
+
+Best regards,
+-- 
+Manas <manas18244@iiitd.ac.in>
+
+
 
