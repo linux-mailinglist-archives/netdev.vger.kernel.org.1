@@ -1,91 +1,84 @@
-Return-Path: <netdev+bounces-145688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1328C9D0642
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 22:27:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 004539D0647
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 22:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C75A8281F17
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:27:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB6C4281F5E
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 21:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BA91DDA32;
-	Sun, 17 Nov 2024 21:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D886D1DDA33;
+	Sun, 17 Nov 2024 21:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PD4QxxCd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YXrV112A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683EF1DD86E;
-	Sun, 17 Nov 2024 21:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E591DD86E;
+	Sun, 17 Nov 2024 21:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731878837; cv=none; b=PMrU+3NSS7Kxj3BovCx7K9U4rQJLV4V85NOVEvmhfyMw3LgyR8Mn6Ic4ZApqCpABdQpXb/lidVWhNnQi7d0etarbX8Wyj0wFK/jCiDT5tuE01U056lrT5iCG/16vt1L/4sQjFCtZNWv0MnZfyQwIZV8Gdio8yQt6uCxnsEHgQYc=
+	t=1731878911; cv=none; b=ROVLGrV/r9BJ3QW0XIfra7P8PzFxSUi4zgUyKkwdn1pjel34esjFZY9HU98FvEd5ZxUwG7JbZJXlEY3aMb7CU6yD27g5tJlsh0WvkaN5xHdOjS1T5xD7ktqViAReCY69wnfHomg5A+RHO1mk4yfKbsHvi2fCihr8xxXii6by3gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731878837; c=relaxed/simple;
-	bh=quAJ0+Xiv2mdjul6jMhvvyNZQdVKw7vu2Sc8utX20io=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r+nEcvO7BWrDyJJuDVgLvCyaDFsU0OIz7QV6tJ0kXNk4EFiuLKlwj1yF9SEXROTU32qDe68MBmfgnJuOjZzpzpg9QomK4hh5fPWfFMo1AVpDyeArq+mw8MFGKWqt9dN/H+Y8qOS9K3yU1To34hbo46WJeioUl7zhluKNQCcq8yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PD4QxxCd; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1731878911; c=relaxed/simple;
+	bh=Wu2ZYQnZnpM89I2UYYuSrf79m4Y8+Ten8StK7vYe4NQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aB8rInVRB+58ED/bnO/Js6buTgNofv4C8Vkg48mAm3OhGmTTdLadQrJaWfaNmEFHU8sZ3/Iucw+BYbQmsQS9HnSrZf79SwYEdox7SPNVy46N4j0XXGFsEd1g0LGtCdDmGiQ+xeGSGoTK1ZTKqAgOQ9OwaYhM3sKpEozD51xwvJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YXrV112A; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e625b00bcso2047962b3a.3;
-        Sun, 17 Nov 2024 13:27:15 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20cb7139d9dso33279155ad.1;
+        Sun, 17 Nov 2024 13:28:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731878834; x=1732483634; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731878909; x=1732483709; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dc113/JIf3uyVoCWaogY/LdAc8HXsoi5gOuOuhKxLYI=;
-        b=PD4QxxCdIkfOuM8NXkQFlEkH8zIIQgs5cFYcJDKoKHteqOFQ2tl/1an/FoEJEFq/Se
-         nRDVxrLFFXEO0AR0hN67ePBCNL0vs9M2hlJmkiv6wn221EarNdDOfjBvvpFUVxz1NOk5
-         tBsLBGSB00U8Q8wBw0cDmFutJB09KZstBc/tD5EGqTqF+ICzPLRQ5I9VR5z+yP1Mz1ll
-         tWJESbJiG6THZy31Vw19UEwuTvRWdJcrwLfv6VFHhu7EkHHBLdTVzwo7+2f92crP5TH8
-         1JUjgbFqjvRdZbbRkS/EJ7j7KTLqQsg/09z9Ya0P3LoNCVpIvwZnmv2OHMQ4d4t8JpDf
-         i1gA==
+        bh=2LHCzZcj4jlxO8OBofUgVOLc3VHA0hSzkDYf2n5ccE0=;
+        b=YXrV112AW+Sll5Hajwa6NE/DpPJyPXB8TX+taKGr5GjX5qvgxKbswjIAcP+WT3Mb/e
+         G3N5+XHLCnDy8gw3PvFGc6p2hbgXMS7x2Rh7RoQAjf3yorF4At2k6lh4nivsiZvTW1p4
+         W89jzAFCzA8BXt01pgca1KwtmZsgHt0GuvvzWGfQGq/5y+UdvskFltQltfqnGTMVsRbG
+         1ZMl+kZugoVOHZ5Ui8MwL542CHbW6EeOAlJ26tZ8eqHG1DDTxc2iZsJAr4KQ1JWeNkCQ
+         8vzo/jQUe1JRqj0UbGSgs4IYj23VTWpO1wJqG3ulPxZfMWM9J+KdEbTnaF2ftYle8Ggg
+         3XCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731878834; x=1732483634;
+        d=1e100.net; s=20230601; t=1731878909; x=1732483709;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Dc113/JIf3uyVoCWaogY/LdAc8HXsoi5gOuOuhKxLYI=;
-        b=b0L8R3TGG7Q03MFDI+rwAe7ujTHWgSsG2nsqP6BmmLMTH9JmXs15feKZ1JKi8Q9Jzk
-         FgwRgTmNFfrdPrsId1h6Tc1weJs+Bdc9nHpkrb4IGGMMuC1V1JX/UrnHFb4EahmZ9qXp
-         z5AfglVsbVU/58+QcoCzNguBYVMq/+r+U9dl+x0VL+i3q3KulkomgsaPz11EpWTislW8
-         Z8S59NiioGs/TF9KMb5z1pntOK9QKKi/Q5orIQSSAta9zaqeEcxSXTF8GjuDkGf1y0P+
-         wTGzy2fkmaMuQnQlFMOy/528CnXy2DJD1Vsfgr10rFTgAnDGFZrcwkLyVMX4Fzsb+8gF
-         iqDg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9IvhlvPyuIANq9ODcDXoSVpdEwsBFfQWQwttsZNsFokli3WVIAdCXBsZ/krou92ynIg6q4v3JJ9q5jes8o+6H+2U=@vger.kernel.org, AJvYcCXVRhdKbJjErQNSsO9a6SKbgSEBdwMj8RZSdPAGjmzbo8TC/Jr95HUl8oDrmYNvUGd6m4jOSEsbcVpiU1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8Ny/WJqZLePvJ0ea9wdULS4hCLqZ+s59+kgpfvnjJcNJeqJXC
-	4LoDOUCNs/Jy1enuXym070n3I5meIZmhwJFYV82wPb0XVc1JIxElTzcGtv6R
-X-Google-Smtp-Source: AGHT+IEdMz8uRtkMuxBjLFc8Jl6IwAPlV1iErNuRBhzNh16Dwy4QFAx06ao4jHuCzdE7cjxPLjR1ng==
-X-Received: by 2002:a17:90b:380a:b0:2ea:5fed:4a37 with SMTP id 98e67ed59e1d1-2ea5fed4bd9mr3022550a91.21.1731878834525;
-        Sun, 17 Nov 2024 13:27:14 -0800 (PST)
+        bh=2LHCzZcj4jlxO8OBofUgVOLc3VHA0hSzkDYf2n5ccE0=;
+        b=AX8dhVo1wJn6i6+wCp9C+ci+gyrX31gewAVZwJxg1LmHtc16sY6sgrWYcqk8z3Ev0B
+         WpkuOuLE8H5BY4O8p3eWvMIGq3yytIEV3YkQ0wAv8VoJUUp2jN+05/iyzRR2LdCjjMPv
+         AI9p2jP+JxBoyLCHcuiudnxBQifbUWbewPcxodgIrNWr+0hpEjeLZPeJl91Lu0nZWrDh
+         MbMEkSnFQeGn4o6NbZzbErMZZ+UyHOLwvGcWszWLsInDKLnSS+UBrcHsIFdUDhO11CvN
+         cKgfMjZb2NdNTMTUjsmBEVPlCK8pSZmeM+QiUCv05heK8rHSVZCNgGrvtQujCFtAsRZq
+         UIFw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPdcJzqG0sRzB2tnNt+tejZGJygZ2n4yPFIw0bvoFlRmIRMrFnu2A4b45qHrY0lQm54VV3ERZ+XnGTk0Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjjdWOBxThvBpyms+XTpZbqXWnyH21RwDGRn3RXukRFVcmfHW1
+	79/fjgsDtR56HjuUf6dB5s2KE17hEivKFeFD3Fg3Q1YiO+4okRfswAo+9A==
+X-Google-Smtp-Source: AGHT+IEKcyvOz8TIVnpDMBgvci1l0YcG5+1ZQOu0uNSb5yMEqzI+VbDE8Ye3HXsCailYsJQew1OmUA==
+X-Received: by 2002:a17:902:d503:b0:20c:ca42:e231 with SMTP id d9443c01a7336-211d0d62d3bmr146074705ad.6.1731878909519;
+        Sun, 17 Nov 2024 13:28:29 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0ec7c3asm44287745ad.65.2024.11.17.13.27.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0ec909asm44330845ad.97.2024.11.17.13.28.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Nov 2024 13:27:14 -0800 (PST)
+        Sun, 17 Nov 2024 13:28:29 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS ETHERNET SWITCH DRIVER)
-Subject: [PATCHv3 net-next] net: modernize ioremap in probe
-Date: Sun, 17 Nov 2024 13:27:11 -0800
-Message-ID: <20241117212711.13612-1-rosenp@gmail.com>
+	Luo Jie <quic_luoj@quicinc.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] net: mdio-ipq4019: fix wrong NULL check
+Date: Sun, 17 Nov 2024 13:28:27 -0800
+Message-ID: <20241117212827.13763-1-rosenp@gmail.com>
 X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,239 +88,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert platform_get_resource_bynam + devm_ioremap_resource to
-devm_platform_ioremap_resource_byname.
+devm_ioremap_resource returns a PTR_ERR when it fails, not NULL. OTOH
+this is conditionally set to either a PTR_ERR or a valid pointer. Use
+!IS_ERR_OR_NULL to check if we can use this.
 
-Convert platform_get_resource + devm_ioremap_resource to
-devm_platform_ioremap_resource.
-
-resource aquisition and ioremap can be performed in one step.
+Fixes: 23a890d493 ("net: mdio: Add the reset function for IPQ MDIO driver")
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- v3: reworded commit message again. Also removed devm_ioremap
- conversions. Even though they use normal resource, they are not
- the same.
- v2: fixed compilation errors on PPC and reworded commit message
- drivers/net/dsa/hirschmann/hellcreek.c         | 18 +++---------------
- drivers/net/ethernet/atheros/ag71xx.c          | 13 +++++--------
- drivers/net/ethernet/broadcom/bcm63xx_enet.c   |  6 ++----
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c    | 14 +++++---------
- drivers/net/ethernet/renesas/rswitch.c         |  9 +--------
- drivers/net/ethernet/renesas/rtsn.c            | 10 ++--------
- drivers/net/mdio/mdio-ipq4019.c                |  5 +----
- 7 files changed, 19 insertions(+), 56 deletions(-)
+ drivers/net/mdio/mdio-ipq4019.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-index 283ec5a6e23c..940c4fa6a924 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek.c
-@@ -1932,7 +1932,6 @@ static int hellcreek_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct hellcreek *hellcreek;
--	struct resource *res;
- 	int ret, i;
- 
- 	hellcreek = devm_kzalloc(dev, sizeof(*hellcreek), GFP_KERNEL);
-@@ -1982,23 +1981,12 @@ static int hellcreek_probe(struct platform_device *pdev)
- 
- 	hellcreek->dev = dev;
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsn");
--	if (!res) {
--		dev_err(dev, "No memory region provided!\n");
--		return -ENODEV;
--	}
--
--	hellcreek->base = devm_ioremap_resource(dev, res);
-+	hellcreek->base = devm_platform_ioremap_resource_byname(pdev, "tsn");
- 	if (IS_ERR(hellcreek->base))
- 		return PTR_ERR(hellcreek->base);
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ptp");
--	if (!res) {
--		dev_err(dev, "No PTP memory region provided!\n");
--		return -ENODEV;
--	}
--
--	hellcreek->ptp_base = devm_ioremap_resource(dev, res);
-+	hellcreek->ptp_base =
-+		devm_platform_ioremap_resource_byname(pdev, "ptp");
- 	if (IS_ERR(hellcreek->ptp_base))
- 		return PTR_ERR(hellcreek->ptp_base);
- 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index 3d4c3d8698e2..928d27b51b2a 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -1798,15 +1798,16 @@ static int ag71xx_probe(struct platform_device *pdev)
- 	if (!ndev)
- 		return -ENOMEM;
- 
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!res)
--		return -EINVAL;
--
- 	dcfg = of_device_get_match_data(&pdev->dev);
- 	if (!dcfg)
- 		return -EINVAL;
- 
- 	ag = netdev_priv(ndev);
-+
-+	ag->mac_base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
-+	if (IS_ERR(ag->mac_base))
-+		return PTR_ERR(ag->mac_base);
-+
- 	ag->mac_idx = -1;
- 	for (i = 0; i < ARRAY_SIZE(ar71xx_addr_ar7100); i++) {
- 		if (ar71xx_addr_ar7100[i] == res->start)
-@@ -1836,10 +1837,6 @@ static int ag71xx_probe(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, PTR_ERR(ag->mac_reset),
- 				     "missing mac reset");
- 
--	ag->mac_base = devm_ioremap_resource(&pdev->dev, res);
--	if (IS_ERR(ag->mac_base))
--		return PTR_ERR(ag->mac_base);
--
- 	/* ensure that HW is in manual polling mode before interrupts are
- 	 * activated. Otherwise ag71xx_interrupt might call napi_schedule
- 	 * before it is initialized by netif_napi_add.
-diff --git a/drivers/net/ethernet/broadcom/bcm63xx_enet.c b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-index 65e3a0656a4c..420317abe3d2 100644
---- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-+++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-@@ -2646,16 +2646,14 @@ static int bcm_enetsw_probe(struct platform_device *pdev)
- 	struct bcm_enet_priv *priv;
- 	struct net_device *dev;
- 	struct bcm63xx_enetsw_platform_data *pd;
--	struct resource *res_mem;
- 	int ret, irq_rx, irq_tx;
- 
- 	if (!bcm_enet_shared_base[0])
- 		return -EPROBE_DEFER;
- 
--	res_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq_rx = platform_get_irq(pdev, 0);
- 	irq_tx = platform_get_irq(pdev, 1);
--	if (!res_mem || irq_rx < 0)
-+	if (irq_rx < 0)
- 		return -ENODEV;
- 
- 	dev = alloc_etherdev(sizeof(*priv));
-@@ -2688,7 +2686,7 @@ static int bcm_enetsw_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto out;
- 
--	priv->base = devm_ioremap_resource(&pdev->dev, res_mem);
-+	priv->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(priv->base)) {
- 		ret = PTR_ERR(priv->base);
- 		goto out;
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 571631a30320..faf853edc0db 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -7425,21 +7425,17 @@ static int mvpp2_init(struct platform_device *pdev, struct mvpp2 *priv)
- static int mvpp2_get_sram(struct platform_device *pdev,
- 			  struct mvpp2 *priv)
- {
--	struct resource *res;
- 	void __iomem *base;
- 
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
--	if (!res) {
-+	base = devm_platform_ioremap_resource(pdev, 2);
-+	if (IS_ERR(base)) {
- 		if (has_acpi_companion(&pdev->dev))
- 			dev_warn(&pdev->dev, "ACPI is too old, Flow control not supported\n");
- 		else
--			dev_warn(&pdev->dev, "DT is too old, Flow control not supported\n");
--		return 0;
--	}
--
--	base = devm_ioremap_resource(&pdev->dev, res);
--	if (IS_ERR(base))
-+			dev_warn(&pdev->dev,
-+				 "DT is too old, Flow control not supported\n");
- 		return PTR_ERR(base);
-+	}
- 
- 	priv->cm3_base = base;
- 	return 0;
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 8d18dae4d8fb..8ef52fc46a01 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -2046,15 +2046,8 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- {
- 	const struct soc_device_attribute *attr;
- 	struct rswitch_private *priv;
--	struct resource *res;
- 	int ret;
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "secure_base");
--	if (!res) {
--		dev_err(&pdev->dev, "invalid resource\n");
--		return -EINVAL;
--	}
--
- 	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
-@@ -2074,7 +2067,7 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 
- 	platform_set_drvdata(pdev, priv);
- 	priv->pdev = pdev;
--	priv->addr = devm_ioremap_resource(&pdev->dev, res);
-+	priv->addr = devm_platform_ioremap_resource_byname(pdev, "secure_base");
- 	if (IS_ERR(priv->addr))
- 		return PTR_ERR(priv->addr);
- 
-diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
-index 6b3f7fca8d15..bfe08facc707 100644
---- a/drivers/net/ethernet/renesas/rtsn.c
-+++ b/drivers/net/ethernet/renesas/rtsn.c
-@@ -1297,14 +1297,8 @@ static int rtsn_probe(struct platform_device *pdev)
- 	ndev->netdev_ops = &rtsn_netdev_ops;
- 	ndev->ethtool_ops = &rtsn_ethtool_ops;
- 
--	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
--	if (!res) {
--		dev_err(&pdev->dev, "Can't find gptp resource\n");
--		ret = -EINVAL;
--		goto error_free;
--	}
--
--	priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
-+	priv->ptp_priv->addr =
-+		devm_platform_ioremap_resource_byname(pdev, "gptp");
- 	if (IS_ERR(priv->ptp_priv->addr)) {
- 		ret = PTR_ERR(priv->ptp_priv->addr);
- 		goto error_free;
 diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
-index 859302b0d38c..50afef293649 100644
+index dd3ed2d6430b..859302b0d38c 100644
 --- a/drivers/net/mdio/mdio-ipq4019.c
 +++ b/drivers/net/mdio/mdio-ipq4019.c
-@@ -327,7 +327,6 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
- {
- 	struct ipq4019_mdio_data *priv;
- 	struct mii_bus *bus;
--	struct resource *res;
- 	int ret;
- 
- 	bus = devm_mdiobus_alloc_size(&pdev->dev, sizeof(*priv));
-@@ -351,9 +350,7 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
- 
- 	/* The platform resource is provided on the chipset IPQ5018 */
- 	/* This resource is optional */
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
--	if (res)
--		priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
-+	priv->eth_ldo_rdy = devm_platform_ioremap_resource(pdev, 1);
- 
- 	bus->name = "ipq4019_mdio";
- 	bus->read = ipq4019_mdio_read_c22;
+@@ -256,7 +256,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
+ 	/* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
+ 	 * is specified in the device tree.
+ 	 */
+-	if (priv->eth_ldo_rdy) {
++	if (!IS_ERR_OR_NULL(priv->eth_ldo_rdy)) {
+ 		val = readl(priv->eth_ldo_rdy);
+ 		val |= BIT(0);
+ 		writel(val, priv->eth_ldo_rdy);
 -- 
 2.47.0
 
