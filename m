@@ -1,661 +1,549 @@
-Return-Path: <netdev+bounces-145646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB2689D0451
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 15:27:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B08869D0454
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 15:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9449828133E
-	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 14:26:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 292351F21667
+	for <lists+netdev@lfdr.de>; Sun, 17 Nov 2024 14:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4A21D8A16;
-	Sun, 17 Nov 2024 14:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF6E19414A;
+	Sun, 17 Nov 2024 14:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTl8Zjxd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kZZ3og2K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8DC194088;
-	Sun, 17 Nov 2024 14:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731853616; cv=none; b=tsD4SP7esby8jRr72X+cfYt8YL6BQdItfcrj8HtqWJ1k3FBaCVcv2yToe+krMcRIJZigOrL5nJzn6kUyP4Rp5gKVXAyNjOpiS2qzZjqAkv+a1BfGQ0oIvOknCotQu+VUKYcIgMBaJ4qlD8jaFz7DRPG1LJSqD9HOx56h4zUpMOU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731853616; c=relaxed/simple;
-	bh=rlGPExjWpNNdeYED0JKWdYccNVu9hTYOhBpVymvppKk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=msgTTuWWFLNvIYdZJz2oEc6AeDvFWrFOYvtg/TSoETLJYDvX+/RaB/oN9NriSPEen5Zb4JVc8Bkp+WtquykufCzbilFb5j9dFIx6S1SYTFc+9rKIPmGtIlJYFt8BfjJcv0jDv8uMD+9SznjdS8jnBk14uj5QRS/dKuBOVHONNsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTl8Zjxd; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa4b439c5e8so26731066b.2;
-        Sun, 17 Nov 2024 06:26:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731853613; x=1732458413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9HYiKCaAhfV0M9qDtG+udDyORRLxqLDx9oebdtmTlck=;
-        b=jTl8Zjxdqn4Lco9HtJpho/Tb70duRIo2WOCPxBuX1i5t7ZOqCYsczGpF6PAbeD8Gc8
-         doXs0UnKKhgESfwiEhPk15YkeoQQ7HSAsJotjWsdosrfdvuq+/cu+wwv9NiYXN3AXZ5V
-         2gkMfaCmff4byKjHWM+CAYMND3lhsNsgcIsqyaQB8GyLhz/vJu5dlB8VVjPcQUbzaAG7
-         eSFvjMIP8wIGUUX34kyM2zUw8DjFqgoHK4yPoVOnbFsobdZJKSlbOllq89exfBL4fc4N
-         x5q/XfPSkL5oT+Y5DvXXwCRFOnMqBU7mq82Q6j/uvNq2XYwKXYWO+2qFmZBT2e56JoFs
-         GZKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731853613; x=1732458413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9HYiKCaAhfV0M9qDtG+udDyORRLxqLDx9oebdtmTlck=;
-        b=mPklFg8RLVQM0UBPI3xe5XWQ17mYLJj98Eo0+T0FfTw9RlHK7M32mWV9BSn+luCKlM
-         tptQAKsUAvaIeqJAqJPOp7aqNx+YbrCau4fzv2yLxAMUtpicUUGuFxMMRAjphOiKRT/Y
-         GlA5rNLk+YVm52YC1ic6uqHg44kBBBPyQYNXyIqbivgw2H0vtocajmcQyL2B0hFTYCrz
-         xpMHsL3aRFCTy/yibIv7XhgK0yPQsPIykS2aUk/OJa3klc/k7ecUid9N1OE/EZWJtDua
-         FrMn8cA/y90DrxYe5htoaofjAk+z0Ping2MJ88708xoBaR9Eogw0RZusPW09bVn5BrtY
-         0lLA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2uNuUVnNMrH0sFhs3epse3QVCCBVbcvJqw+9o8KtIJIysjtxUMzj2kP+blaVEa+hvRWBaXNzAXc4=@vger.kernel.org, AJvYcCXtZcDy89VwB88BoD6YjxE+vvAzkL5MV2aENDoS/Hcfr2kIQYpD0bAWKuWQXqPSpRaeP/A2TvIF@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx35mMbxzie6NAGb6pxSCwVKzRC19JaR6CjUW6XQEq3ntppBKH1
-	4JvzgndPDl1o/xNfbxBWfjHzp2TmPaLUpuRtUazpatAycx3hR8yJeV3Ev2R0SS9gIZWF3EWFv/I
-	NGT7ue1FJuVgTf2BoO9WWlp9t9Fo=
-X-Google-Smtp-Source: AGHT+IGpRXIdaCjVtS0/8nCw0jeYpNLDY6OFi2E11trjvxCzNUnXNhV4LABh36/oWe1DYD7m5zxltJcd/OTQwhi4XZM=
-X-Received: by 2002:a17:907:70e:b0:a99:f945:8776 with SMTP id
- a640c23a62f3a-aa483426424mr875418666b.24.1731853612416; Sun, 17 Nov 2024
- 06:26:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1907F39FD6
+	for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 14:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731854000; cv=fail; b=HHVMSARTwpBL950F1dALi01mgdAO6tppxlEEQaBo3n3MzGjz3KyEYhyO+AkN8AFaJpSYPHGnTbmlOR75OEw6hIBKo8iZHGANfxL79LBEFDszk3n1lu7IdTxgpIadOqqzqQe1pkirNj/qyLIuU6A76seFCG6BSwyn3ku+pIUb6uE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731854000; c=relaxed/simple;
+	bh=vgqkw6/umfos8moHmqZd7P+K+/fb/TLZ5SwosMvkVlc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hgcznGAqB7DY+26tS5ndxQt3gKbtb85ieIJyZMpow+npR27ltfyHCKz5XiNfnxylvTa8GzCMbxY6OU7X5SB3FOaGGoGh867XfeEvnrZt0YYP20sQozgBncPtyNcIilV7AGDJAAEmoGN4HLYOV0HAAypXnunut9n+RyAQE7+nJxM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kZZ3og2K; arc=fail smtp.client-ip=40.107.92.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=K1uHG+QngPRtNdoJv5RjZ8W3yS0jMvJXp4rfmvruMM6feLCJ++rPsVZTBLgmTxSEpG5JwYun3goGZ6FdsjF7Xrsk2ICaIV+kejleJBd3LvmsGJu7j5p6hLVmGAeToOw7K/OWMJhfPLRqp1Em6+aY3I/sCUHBc2af6ybopLchZ4cI7XXniMKXVAObJXGtgmz9E32j40R3T6UEZxsbMGbVAJQdXaBvXh70dSS/scW6ORxUgwShVkcI+DaiLzEelwpGtPKKXcT/fSLptLUD/HsC7PBQ2lwuG5kmxy7MQG4pgvuZEYKt2dGuZ0LlPw3nFlHJ0F2LJIvIGMK7s//kRsFXvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=APQFtS4GkJQKDiAaISbwrH9VfU2iiaigcSMARu+085g=;
+ b=vx0niZboCo5DqJmHAW/z2c3cJUT653paUU0t2dBLCDGSPRfcGlGvIJiYmLekdO+jKF/KT0NdZ5Ko8tUG3WOmBS903ddDOhlOuOWD2066LPWmLjMbVZ/Fyd0QP6LToVtpf6UIsQkDGPbAucDOapCLjDd4wUtwh66jv+jhgP53ZBEtpYF1KCSzI/Cc4Q0kshaEm/fqLdO6q0Ve9+qpfRH321MJAdlICrbRBzmgdofuJio54kbN/ZpH4gbL2tKqTH+tnJMmzoT1j7ENXDo4z84vnmYW6/7SK9LLVJF3vkfOVb7yofkS5IF0TkmQqFXqAM1E28ZB7lUIwbImLIX4Xu5Xjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=APQFtS4GkJQKDiAaISbwrH9VfU2iiaigcSMARu+085g=;
+ b=kZZ3og2KJFaOjfAx2OYMCjCLInDdgeyMKOztasU6lWkl1WWpbKaG+Jj0VvQ9vra9xZvMDpDVYQe2m5d1mM+udnEf9We5kH0239x/iYpQ4YMnhL6GFNiTqyM7kDjrcQfksxqqNk+8gpwsd/t5wXI8k8sX3vHjx+KRi68lNq1IALU2tBxzppO9hn2JfJZM/DqIOsDloguduXixWJWX2JkCkg28+HW4PB/hW2jvJ/oyxbOrthOQehOGQ7uVscM94Y9r8CH8W/lJ6MOSFUEQauoUWM3LfJSuYyBI0F2gu7PxxqjMvs4mUCj6OL7/zR+3TxsdyvVEoHjnNnZ55gTa6Oc65w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+ by DM4PR12MB7742.namprd12.prod.outlook.com (2603:10b6:8:102::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Sun, 17 Nov
+ 2024 14:33:13 +0000
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2%3]) with mapi id 15.20.8158.021; Sun, 17 Nov 2024
+ 14:33:13 +0000
+Message-ID: <91609e70-110e-44b6-a45d-177f86ab7c99@nvidia.com>
+Date: Sun, 17 Nov 2024 16:33:06 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V2 3/8] devlink: Extend devlink rate API with
+ traffic classes bandwidth management
+To: Jiri Pirko <jiri@resnulli.us>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>
+References: <20241114220937.719507-1-tariqt@nvidia.com>
+ <20241114220937.719507-4-tariqt@nvidia.com>
+ <Zzb9m-nyVoHLtJ75@nanopsycho.orion>
+Content-Language: en-US
+From: Carolina Jubran <cjubran@nvidia.com>
+In-Reply-To: <Zzb9m-nyVoHLtJ75@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0149.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:95::20) To MW4PR12MB7141.namprd12.prod.outlook.com
+ (2603:10b6:303:213::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113173222.372128-1-ap420073@gmail.com> <20241113173222.372128-5-ap420073@gmail.com>
- <ZzeusGr18H98xSQN@x130>
-In-Reply-To: <ZzeusGr18H98xSQN@x130>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sun, 17 Nov 2024 23:26:40 +0900
-Message-ID: <CAMArcTWwnz8gLekM8vY0cZ1H4XEZOywhQP325Z-rvRN7Y+8chA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 4/7] net: ethtool: add support for configuring header-data-split-thresh
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, almasrymina@google.com, donald.hunter@gmail.com, 
-	corbet@lwn.net, michael.chan@broadcom.com, andrew+netdev@lunn.ch, 
-	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
-	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|DM4PR12MB7742:EE_
+X-MS-Office365-Filtering-Correlation-Id: afb374a8-7198-4552-35a2-08dd0714c42b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?alhyWlZacGNaL0t3clE2WGtjeWQ0YzVJd0lMM3NLZ0ZlNlBXMmFDejQ0ZG5G?=
+ =?utf-8?B?ZUM2aVRmcDlNWEpoaHpGVGJsNU5lMjZwRk9GT3hkNmdtamFxL0RNZUtjUGVP?=
+ =?utf-8?B?UmpuWHFqZlFnSEplMHQvUTFtekhoRCtETkxxcmYycE9ySnZ4L1N1czJpRkFZ?=
+ =?utf-8?B?Y2JUK2E5ZG5nTFhLRGZwU21BdmpzVjJVNXcrZDMxZFUvb2U2UUdWeWkyRHYv?=
+ =?utf-8?B?cGh5YWVPOHJqRjZ4YTVxdS82WVZNRjdMSlFFc0JTRzQ5ak16aHd2QmJiczR3?=
+ =?utf-8?B?NEh0aVJTYjkxU0tIMjdLRTZyemRRTWFMU2VOUUE4VmU5OXJRNUNTSlBiS1dn?=
+ =?utf-8?B?LzVFUVpFWm94V0txL1hvcWZvZXdsdjI4UUJ2KzRsZjk1MmR0WHpDL1VPZVJo?=
+ =?utf-8?B?NEQ2V2JGQU9aQzNFR2tGRXZDUitBUW1wOWpwQVdYYldIRUg0aVZJRUQwZUM4?=
+ =?utf-8?B?TDN2YnN5S2hJTitJWjIwRHNIdXZ5STlaR0NrYzRCYVRickt3K0tFUW5TL3NS?=
+ =?utf-8?B?OWQ4U3BXYkpTQm9QUnErdjZLUURvdDJtQ3lCdldnNDlsOGpnbGlNQ3BLU0xG?=
+ =?utf-8?B?U2M1S05WdTgydWxWTFF0MkZHK214c0lMUXEySlVpV0cwU1QyU3g3MFZxU29a?=
+ =?utf-8?B?ejd2amcyKzF0K3dTU2hoMk9lT3plMUdGbzlkckxLUU9sODlmZ2dxSEtHZVNF?=
+ =?utf-8?B?Uzd3VW81TkRyMGpPeWZFdTFUMm12bS91ZHIxNXpmRGZISUhPaFJOTEtUeWJP?=
+ =?utf-8?B?RVdyeFpaTCszMW9uaVVKM2Z1RmxXcnF4L25FQWZkYzZJZGo4eWpOcHg1NWRF?=
+ =?utf-8?B?dGtxd2d1N3NLSEQ0U1kwbFBtUk1RNUdZZ1hVanlkbDRmc2MxTi9jd1cyS2Q4?=
+ =?utf-8?B?V3UvZ1p0c2JOTEV4T1BjbHE0aTArcDhqd3lkbnBtcHBFSjRHaFFtZ05mOGNk?=
+ =?utf-8?B?V20rTDU0L1FBMXNxckNsOXFHMkQxcEFrd1dkSktUZytzM1hVc042RzV2SGtE?=
+ =?utf-8?B?MlFOYU9qRWJjOUNXUkVOZFQ4ZmlXYit2ZnJlNUN4cVNucFFoV0ZRL1lmYzF2?=
+ =?utf-8?B?YkZVcDNqcEd3cVhkOVJTOTlhQ1BEbFNLTzMxN2NrcDRlTGh1YmU4SEtNZTZ3?=
+ =?utf-8?B?N3g3eFQ3Vlc5MG9KeHZQaGpQTStFVHNVcDk3SFF5ZEx0ejJNWTJYYStWdFJZ?=
+ =?utf-8?B?TDRZbEJsQndjN1oyanhlL2FwTFdOMForYWxZaGpiWEdxMllxcXpaeGtMSEpu?=
+ =?utf-8?B?YlQwaklxK2s3ckszc2tRMkdkd21RQndaVXJaejByaGFZTlpGaC9iMzFwckI4?=
+ =?utf-8?B?blo5ZnA5Nll0RlVBY3QrVGtBa0crcXVGUWRUbUh5OWNVeGFpNkJsL2F0K253?=
+ =?utf-8?B?bzFKS0tOMWZ1dXRWbjM3dXhLZzgzNjNyWEJTR2xtaHZhN2UzQ011eG5HWEhk?=
+ =?utf-8?B?L2VrTVlOOXRnQllPTi9mSVJnZGMveDNBNmh0SFBvWFdHMnVCd2hzQ1VjTGZv?=
+ =?utf-8?B?WUl4RFJRMzUxZHdiQnlvMjJQU3JualhTM2kwemlGSDRsMzNISTAzV2s1QUhE?=
+ =?utf-8?B?TU1oVWZWVEZ6WFNBY3p0WjdoZ3h0bjN0THdudEx4YkFGdTg4dVdSL3VJdXZ4?=
+ =?utf-8?B?ZGdzbUJHN3NHUFphcEtJNkJTMjFINWhSdnRlTVNvNEJ0QlJPRGxzUHVkZ2RD?=
+ =?utf-8?B?ZW9MYzc2cTE4MVZvZWVBUEpqTmdYbkovUytXNXd6SU1uRmtMbUNlZ3E2dVhS?=
+ =?utf-8?Q?Wmoqy1fBSVxmPXto1tmqa07gvG6i/D0hQ2PvGpG?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Ulg4SnNHTE5yUVNVeXBSeGtWUTFHZWxNZUlWbW8yNzI2M1BPM2xrQ0lmRGVK?=
+ =?utf-8?B?Wk5XcUdGc0Y2NzN5VWloTVd4eEdKc2tuNHcvZUlZTHJ3a3FTVGt2UDlKZ0c2?=
+ =?utf-8?B?Z1VDYWdLVmFnalFPMWdxb0tZVnU0dWxlczFCWjl4U1BSdTZRS01qcUJiMmFF?=
+ =?utf-8?B?blZhUHVPSlNwaE9zVXpYcnl0UmJTanNSMnpsaFpSYmd4RVliNi9MeDE3ZnF1?=
+ =?utf-8?B?Yy8rOGNTWWZLUXdYY3doaVVzS09NSnB5bkM5cVprdEREclFvZmNlVnRnTFJr?=
+ =?utf-8?B?YWxZZVhhVlBUVWlKOVJlcHVaOWR6N2czeWhtTHUvQXRSR0tMbFl2czJjNkdt?=
+ =?utf-8?B?TElTVHNTTEgrQ1NGMjFSdklJalZOeUdOOXd1MFhkNUU1TUFQYWZpb0hvR2Rq?=
+ =?utf-8?B?Rk94UHJScEI3WWp2blVVbWw3WGJXUU1BNGhrWFZETWFFZXo4TUI4Y3hicXI4?=
+ =?utf-8?B?aFlHNVM4S3RXWEVCK3ZrdG5NaTd3aDUxdllJUlhuMUdOSnlWcUZrV2ZOZlIy?=
+ =?utf-8?B?aWlyQmRIbTcrMUhxNzNHeHhTbk05cURuREZ5bG9NMVNGMVlPU0Nuc25xK1B3?=
+ =?utf-8?B?QWZHcHFuTzdWSXMyL2NMZ3Q0NnMxQ1ByUmdvUXlkUXpqK3d3U05taXlEWC9Z?=
+ =?utf-8?B?cXZTaHBxVE8xRDgxeHRTOEJBbFY1WTdiQ3EwNys5aU5oSklsTFVEZ3ZJc0dr?=
+ =?utf-8?B?UUpOWG5qWngrMU5UMXFCRDFJdFlUVk9iUGFuSnRZdWdFOVNMN2ViUWJ0M1oz?=
+ =?utf-8?B?aXlqZzVRb1IvZXNmaFhNdUJQTVR1aWNMTUZRZUY4YkRzcGRvWHdpSk9FMStC?=
+ =?utf-8?B?Q3MxL3NWdTlUOHZtcTBDN3VmeDBKclhpcUFTNFRPSzFtNHpiRGF4eWYydDN1?=
+ =?utf-8?B?dFViMVVxOU9aUTZnV1RNOFJiQzZkWGlEWmR4cUV5UmYreEQ5UWpnSGMxaVNj?=
+ =?utf-8?B?QWVQZU5vT2gzdnBsSU1uYm5Jd3MxKzN5OVIwRlJQRVlMWXBRdklKWU14b01J?=
+ =?utf-8?B?S01KSC94YlF2amkvQmNNelFRMlR6S29rMGdjNGw2UWQ5RTRlT1RqM1JVM2dM?=
+ =?utf-8?B?ZDZ2WDVlVndSNUNnU1ZkZ0JSbVlRYWFFdGt2dFAwc0xnOXpBZnZuMzY4SWUr?=
+ =?utf-8?B?NUVUbWpFeTQ0cjNqMFk0RXZTNzRVbGppR01nTlBoMS9XbXFTQTNPT3NqOXhs?=
+ =?utf-8?B?MmFibnR6T1lwd2pNcmtyL3gzcHgvSElmU0hGWitVelkzSEtYNURTOUtwQ0Qz?=
+ =?utf-8?B?YWFFUysrcWpyRDBBbE9XQmFkc1VSbU5Ic3BPbzBEVlBOTVVHdVF6QmdjSTJk?=
+ =?utf-8?B?N2NBbWNDclpOTUVicUcxK2dVNitkUkhVeEE5elRCWkdPOEJ2ZTFlcG54YmlX?=
+ =?utf-8?B?ZnNLU3pJcjFOY2hKWHVSMXB3eGdrRkc3ZE5zVnMxZTRQSXJVM0RtWDdrS0xJ?=
+ =?utf-8?B?UnBBZlRGRkJIV3c2OGRNTm9INzVBL0JDQVNNVkxlblUrMWdhRURqRFRqVXBK?=
+ =?utf-8?B?dUZiaGZjZXFudC9BOXB6Ykk5bVp4NXpJeDBQUnhEem11cEFTU1c0UC8xVFQ2?=
+ =?utf-8?B?bzJPSmlTYmQwS1NzZWF2QUtlc1dHZHM3R016SCtZRnpuSDVJZkdpTEU1eWdv?=
+ =?utf-8?B?TEo1WEVEVGpZYXVDQkp2VVNQNGQ5NFc2U2RQUXQzV1N4ZzJQRFF6QTg2akhy?=
+ =?utf-8?B?RXJNbktpQ2c4YlpNOGVPZmIwNDlMdVFnNDNqSndqRlFXNmE4MlpVV3VGL3lY?=
+ =?utf-8?B?dWVGNjJ5ZXBvTm5nNmgxRmdYMVdVL2JJRi93UjY1ZW1HeFpydmV2UmZPeU8v?=
+ =?utf-8?B?ek1EejV0dUprMm85L29WSUFkcDFaY1ZxMXdKY0x4Ujl0T0xZK0g0alUrL1pH?=
+ =?utf-8?B?dnR4QlRTdWtIYTZBL1hwYi9LTS90ZVVOak5WczhrVGQ0bHdzTHlaUy9yZStP?=
+ =?utf-8?B?Z3c2b0hMYkx3VldYaENsL3JWZnJZbERjaUdieklrK0VibGtxOFZWYkhidytI?=
+ =?utf-8?B?RUNrempKcXorbldBQTUwUXBSL3UzTHcwek55VXJUa1RDR2Y3b3hGNWthVXJt?=
+ =?utf-8?B?eHRaZUwyRUdRRkVnMTJvR3dQOUxHUjg3QXh0aEFRRFkrWWxZdzZDeUNZQ21B?=
+ =?utf-8?Q?QY0ls+yzp7VPBGidkMBplPl+5?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: afb374a8-7198-4552-35a2-08dd0714c42b
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2024 14:33:13.1022
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6AEPLaitgpEWhOBw3BB8GLbYoRqA1qzvt2rTYBiUWRw66cZL2aaeCHHk4SYsqS1/AYGDxhl5Bhxks7ebEWZlxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7742
 
-On Sat, Nov 16, 2024 at 5:27=E2=80=AFAM Saeed Mahameed <saeed@kernel.org> w=
-rote:
+
+
+On 15/11/2024 9:51, Jiri Pirko wrote:
+> Thu, Nov 14, 2024 at 11:09:32PM CET, tariqt@nvidia.com wrote:
+>> From: Carolina Jubran <cjubran@nvidia.com>
+>>
+>> Introduce support for specifying bandwidth proportions between traffic
+>> classes (TC) in the devlink-rate API. This new option allows users to
+>> allocate bandwidth across multiple traffic classes in a single command.
+>>
+>> This feature provides a more granular control over traffic management,
+>> especially for scenarios requiring Enhanced Transmission Selection.
+>>
+>> Users can now define a specific bandwidth share for each traffic class,
+>> such as allocating 20% for TC0 (TCP/UDP) and 80% for TC5 (RoCE).
+>>
+>> Example:
+>> DEV=pci/0000:08:00.0
+>>
+>> $ devlink port function rate add $DEV/vfs_group tx_share 10Gbit \
+>>   tx_max 50Gbit tc-bw 0:20 1:0 2:0 3:0 4:0 5:80 6:0 7:0
+>>
+>> $ devlink port function rate set $DEV/vfs_group \
+>>   tc-bw 0:20 1:0 2:0 3:0 4:0 5:10 6:60 7:0
+>>
+>> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+>> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+>> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+>> ---
+>> Documentation/netlink/specs/devlink.yaml | 22 ++++++++
+>> include/net/devlink.h                    |  7 +++
+>> include/uapi/linux/devlink.h             |  4 ++
+>> net/devlink/netlink_gen.c                | 15 +++--
+>> net/devlink/netlink_gen.h                |  1 +
+>> net/devlink/rate.c                       | 71 +++++++++++++++++++++++-
+>> 6 files changed, 113 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+>> index 09fbb4c03fc8..68211b8218fd 100644
+>> --- a/Documentation/netlink/specs/devlink.yaml
+>> +++ b/Documentation/netlink/specs/devlink.yaml
+>> @@ -817,6 +817,16 @@ attribute-sets:
+>>        -
+>>          name: rate-tx-weight
+>>          type: u32
+>> +      -
+>> +        name: rate-tc-index
+>> +        type: u8
+>> +
+>> +      - name: rate-bw
+> 
+> This is bandwidth of tc. The name therefore should be "rate-tc-bw".
+> Could you also document units of this attr value?
+> 
 >
 
-Hi Saeed,
-Thank you so much for the review!
+I will rename it to rate-tc-bw and update the documentation to include 
+the valid range (0-100).
 
-> On 13 Nov 17:32, Taehee Yoo wrote:
-> >The header-data-split-thresh option configures the threshold value of
-> >the header-data-split.
-> >If a received packet size is larger than this threshold value, a packet
-> >will be split into header and payload.
-> >The header indicates TCP and UDP header, but it depends on driver spec.
-> >The bnxt_en driver supports HDS(Header-Data-Split) configuration at
-> >FW level, affecting TCP and UDP too.
-> >So, If header-data-split-thresh is set, it affects UDP and TCP packets.
-> >
-> >Example:
-> >   # ethtool -G <interface name> header-data-split-thresh <value>
-> >
-> >   # ethtool -G enp14s0f0np0 tcp-data-split on header-data-split-thresh =
-256
-> >   # ethtool -g enp14s0f0np0
-> >   Ring parameters for enp14s0f0np0:
-> >   Pre-set maximums:
-> >   ...
-> >   Header data split thresh:  256
-> >   Current hardware settings:
-> >   ...
-> >   TCP data split:         on
-> >   Header data split thresh:  256
-> >
-> >The default/min/max values are not defined in the ethtool so the drivers
-> >should define themself.
-> >The 0 value means that all TCP/UDP packets' header and payload
-> >will be split.
-> >
+>> +        type: u32
+>> +      -
+>> +        name: rate-tc-bw
+>> +        type: nest
+>> +        nested-attributes: dl-rate-tc-bw
+>>        -
+>>          name: region-direct
+>>          type: flag
+>> @@ -1225,6 +1235,16 @@ attribute-sets:
+>>        -
+>>          name: flash
+>>          type: flag
+>> +  -
+>> +    name: dl-rate-tc-bw
+>> +    subset-of: devlink
+>> +    attributes:
+>> +      -
+>> +        name: rate-tc-index
+>> +        type: u8
+>> +      -
+>> +        name: rate-bw
+>> +        type: u32
+>>
+>> operations:
+>>    enum-model: directional
+>> @@ -2148,6 +2168,7 @@ operations:
+>>              - rate-tx-max
+>>              - rate-tx-priority
+>>              - rate-tx-weight
+>> +            - rate-tc-bw
+>>              - rate-parent-node-name
+>>
+>>      -
+>> @@ -2168,6 +2189,7 @@ operations:
+>>              - rate-tx-max
+>>              - rate-tx-priority
+>>              - rate-tx-weight
+>> +            - rate-tc-bw
+>>              - rate-parent-node-name
+>>
+>>      -
+>> diff --git a/include/net/devlink.h b/include/net/devlink.h
+>> index fbb9a2668e24..277b826cdd60 100644
+>> --- a/include/net/devlink.h
+>> +++ b/include/net/devlink.h
+>> @@ -20,6 +20,7 @@
+>> #include <uapi/linux/devlink.h>
+>> #include <linux/xarray.h>
+>> #include <linux/firmware.h>
+>> +#include <linux/dcbnl.h>
+>>
+>> struct devlink;
+>> struct devlink_linecard;
+>> @@ -117,6 +118,8 @@ struct devlink_rate {
+>>
+>> 	u32 tx_priority;
+>> 	u32 tx_weight;
+>> +
+>> +	u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
+>> };
+>>
+>> struct devlink_port {
+>> @@ -1469,6 +1472,8 @@ struct devlink_ops {
+>> 					 u32 tx_priority, struct netlink_ext_ack *extack);
+>> 	int (*rate_leaf_tx_weight_set)(struct devlink_rate *devlink_rate, void *priv,
+>> 				       u32 tx_weight, struct netlink_ext_ack *extack);
+>> +	int (*rate_leaf_tc_bw_set)(struct devlink_rate *devlink_rate, void *priv,
+>> +				   u32 *tc_bw, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_tx_share_set)(struct devlink_rate *devlink_rate, void *priv,
+>> 				      u64 tx_share, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_tx_max_set)(struct devlink_rate *devlink_rate, void *priv,
+>> @@ -1477,6 +1482,8 @@ struct devlink_ops {
+>> 					 u32 tx_priority, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_tx_weight_set)(struct devlink_rate *devlink_rate, void *priv,
+>> 				       u32 tx_weight, struct netlink_ext_ack *extack);
+>> +	int (*rate_node_tc_bw_set)(struct devlink_rate *devlink_rate, void *priv,
+>> +				   u32 *tc_bw, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_new)(struct devlink_rate *rate_node, void **priv,
+>> 			     struct netlink_ext_ack *extack);
+>> 	int (*rate_node_del)(struct devlink_rate *rate_node, void *priv,
+>> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+>> index 9401aa343673..a66217808dd9 100644
+>> --- a/include/uapi/linux/devlink.h
+>> +++ b/include/uapi/linux/devlink.h
+>> @@ -614,6 +614,10 @@ enum devlink_attr {
+>>
+>> 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+>>
+>> +	DEVLINK_ATTR_RATE_TC_INDEX,		/* u8 */
+>> +	DEVLINK_ATTR_RATE_BW,			/* u32 */
+>> +	DEVLINK_ATTR_RATE_TC_BW,		/* nested */
+>> +
+>> 	/* Add new attributes above here, update the spec in
+>> 	 * Documentation/netlink/specs/devlink.yaml and re-generate
+>> 	 * net/devlink/netlink_gen.c.
+>> diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+>> index f9786d51f68f..fac062ede7a4 100644
+>> --- a/net/devlink/netlink_gen.c
+>> +++ b/net/devlink/netlink_gen.c
+>> @@ -18,6 +18,11 @@ const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_
+>> 	[DEVLINK_PORT_FN_ATTR_CAPS] = NLA_POLICY_BITFIELD32(15),
+>> };
+>>
+>> +const struct nla_policy devlink_dl_rate_tc_bw_nl_policy[DEVLINK_ATTR_RATE_BW + 1] = {
+>> +	[DEVLINK_ATTR_RATE_TC_INDEX] = { .type = NLA_U8, },
+>> +	[DEVLINK_ATTR_RATE_BW] = { .type = NLA_U32, },
+>> +};
+>> +
+>> const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1] = {
+>> 	[DEVLINK_ATTR_SELFTEST_ID_FLASH] = { .type = NLA_FLAG, },
+>> };
+>> @@ -496,7 +501,7 @@ static const struct nla_policy devlink_rate_get_dump_nl_policy[DEVLINK_ATTR_DEV_
+>> };
+>>
+>> /* DEVLINK_CMD_RATE_SET - do */
+>> -static const struct nla_policy devlink_rate_set_nl_policy[DEVLINK_ATTR_RATE_TX_WEIGHT + 1] = {
+>> +static const struct nla_policy devlink_rate_set_nl_policy[DEVLINK_ATTR_RATE_TC_BW + 1] = {
+>> 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> @@ -504,11 +509,12 @@ static const struct nla_policy devlink_rate_set_nl_policy[DEVLINK_ATTR_RATE_TX_W
+>> 	[DEVLINK_ATTR_RATE_TX_MAX] = { .type = NLA_U64, },
+>> 	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32, },
+>> 	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32, },
+>> +	[DEVLINK_ATTR_RATE_TC_BW] = NLA_POLICY_NESTED(devlink_dl_rate_tc_bw_nl_policy),
+>> 	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> };
+>>
+>> /* DEVLINK_CMD_RATE_NEW - do */
+>> -static const struct nla_policy devlink_rate_new_nl_policy[DEVLINK_ATTR_RATE_TX_WEIGHT + 1] = {
+>> +static const struct nla_policy devlink_rate_new_nl_policy[DEVLINK_ATTR_RATE_TC_BW + 1] = {
+>> 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> @@ -516,6 +522,7 @@ static const struct nla_policy devlink_rate_new_nl_policy[DEVLINK_ATTR_RATE_TX_W
+>> 	[DEVLINK_ATTR_RATE_TX_MAX] = { .type = NLA_U64, },
+>> 	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32, },
+>> 	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32, },
+>> +	[DEVLINK_ATTR_RATE_TC_BW] = NLA_POLICY_NESTED(devlink_dl_rate_tc_bw_nl_policy),
+>> 	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> };
+>>
+>> @@ -1164,7 +1171,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+>> 		.doit		= devlink_nl_rate_set_doit,
+>> 		.post_doit	= devlink_nl_post_doit,
+>> 		.policy		= devlink_rate_set_nl_policy,
+>> -		.maxattr	= DEVLINK_ATTR_RATE_TX_WEIGHT,
+>> +		.maxattr	= DEVLINK_ATTR_RATE_TC_BW,
+>> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+>> 	},
+>> 	{
+>> @@ -1174,7 +1181,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+>> 		.doit		= devlink_nl_rate_new_doit,
+>> 		.post_doit	= devlink_nl_post_doit,
+>> 		.policy		= devlink_rate_new_nl_policy,
+>> -		.maxattr	= DEVLINK_ATTR_RATE_TX_WEIGHT,
+>> +		.maxattr	= DEVLINK_ATTR_RATE_TC_BW,
+>> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+>> 	},
+>> 	{
+>> diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
+>> index 8f2bd50ddf5e..df37c3ef3113 100644
+>> --- a/net/devlink/netlink_gen.h
+>> +++ b/net/devlink/netlink_gen.h
+>> @@ -13,6 +13,7 @@
+>>
+>> /* Common nested types */
+>> extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_CAPS + 1];
+>> +extern const struct nla_policy devlink_dl_rate_tc_bw_nl_policy[DEVLINK_ATTR_RATE_BW + 1];
+>> extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
+>>
+>> /* Ops table for devlink */
+>> diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+>> index 8828ffaf6cbc..dbf1d552fae2 100644
+>> --- a/net/devlink/rate.c
+>> +++ b/net/devlink/rate.c
+>> @@ -86,7 +86,9 @@ static int devlink_nl_rate_fill(struct sk_buff *msg,
+>> 				int flags, struct netlink_ext_ack *extack)
+>> {
+>> 	struct devlink *devlink = devlink_rate->devlink;
+>> +	struct nlattr *nla_tc_bw;
+>> 	void *hdr;
+>> +	int i;
+>>
+>> 	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+>> 	if (!hdr)
+>> @@ -124,10 +126,29 @@ static int devlink_nl_rate_fill(struct sk_buff *msg,
+>> 			devlink_rate->tx_weight))
+>> 		goto nla_put_failure;
+>>
+>> -	if (devlink_rate->parent)
+>> -		if (nla_put_string(msg, DEVLINK_ATTR_RATE_PARENT_NODE_NAME,
+>> -				   devlink_rate->parent->name))
+>> +	nla_tc_bw = nla_nest_start(msg, DEVLINK_ATTR_RATE_TC_BW);
+>> +	if (!nla_tc_bw)
+>> +		goto nla_put_failure;
+>> +
+>> +	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
+> 
+> Wait, so you fill this up unconditionally? I mean, for set you check if
+> the driver supports it. For get you always fill this up? That looks
+> wrong. Any reason to do so?
+> 
 >
-> Users will need default/min/max so they know the capabilities of current
-> device, otherwise it's a guessing game.. why not add it ? also we need an
-> indication of when the driver doesn't support changing this config but
-> still want to report default maybe when (min=3D=3Dmax). And what is the d=
-efault
-> expected by drivers?
 
-I defined ETHTOOL_A_RINGS_HDS_THRESH_MAX, which indicates the maximum
-value of HDS-threshold from drivers. ethtool will show this value.
-I think the description needs to be changed.
+I followed the existing pattern in devlink, where attributes like 
+tx_share and tx_weight are filled unconditionally in the get operation.
+Should I still add a check to see if tc_bw_set is supported?
 
-I'm sure that if a driver doesn't support changing this value,
-it indicates that the driver only supports 0 as hds-threshold value.
-If so, I think It's okay to set ETHTOOL_A_RINGS_HDS_THRESH_MAX to 0.
-This is a GVE case, GVE doesn't support changing this value,
-it support only 0.
-
-I'm also sure that there is no case that NIC doesn't support changing
-HDS-thresh but the default value is not 0.
-
-I think the default value would be 0 if there are no special cases.
-The bnxt_en driver's default value is 256 because it has been being used.
-
->
-> >In general cases, HDS can increase the overhead of host memory and PCIe
-> >bus because it copies data twice.
->
-> what copy twice ? do you mean copy header into skb->data ?
-> this is driver implementation, other dirvers don't copy at all..
-
-Sorry for the ambiguous description,
-This means that DMA transfers the header/payload separately.
-
->
-> >So users should consider the overhead of HDS.
-> >If the HDS threshold is 0 and then the copybreak is 256 and the packet's
-> >payload is 8 bytes.
-> >So, two pages are used, one for headers and one for payloads.
-> >By the copybreak, only the headers page is copied and then it can be
-> >reused immediately and then a payloads page is still used.
-> >If the HDS threshold is larger than 8, both headers and payloads are
-> >copied and then a page can be recycled immediately.
-> >So, too low HDS threshold has larger disadvantages than advantages
-> >aspect of performance in general cases.
-> >Users should consider the overhead of this feature.
-> >
->
-> I really don't understand this example, rx-copybreak and hds shouldn't be
-> mixed up and the performance analysis you are describing above is driver
-> specific, some drivers build skbs around the whole frame, and in hds arou=
-nd
-> the header only, meaning for non hds case rx-copybreak doesn't make lots =
-of
-> sense and has no advantage, and for hds it's only one copy..
->
-> Maybe we should define what rx-copybreak should behave like when enabled
-> with hds.. for many drivers they implement copybreak  by copying the whol=
-e
-> fresh into a fresh skb->data wihtout splitting the header,
-> which would be wrong in case of hds enabled.
+>> +		struct nlattr *nla_tc_entry = nla_nest_start(msg, i);
+>> +
+>> +		if (!nla_tc_entry) {
+>> +			nla_nest_cancel(msg, nla_tc_bw);
+>> +			goto nla_put_failure;
+>> +		}
+>> +
+>> +		if (nla_put_u8(msg, DEVLINK_ATTR_RATE_TC_INDEX, i) ||
+>> +		    nla_put_u32(msg, DEVLINK_ATTR_RATE_BW, devlink_rate->tc_bw[i])) {
+>> +			nla_nest_cancel(msg, nla_tc_entry);
+>> +			nla_nest_cancel(msg, nla_tc_bw);
+>> 			goto nla_put_failure;
+>> +		}
+>> +
+>> +		nla_nest_end(msg, nla_tc_entry);
+>> +	}
+>> +
+>> +	nla_nest_end(msg, nla_tc_bw);
+>>
+>> 	genlmsg_end(msg, hdr);
+>> 	return 0;
+>> @@ -380,6 +401,38 @@ static int devlink_nl_rate_set(struct devlink_rate *devlink_rate,
+>> 		devlink_rate->tx_weight = weight;
+>> 	}
+>>
+>> +	if (attrs[DEVLINK_ATTR_RATE_TC_BW]) {
+>> +		struct nlattr *nla_tc_bw = attrs[DEVLINK_ATTR_RATE_TC_BW];
+>> +		struct nlattr *tb[DEVLINK_ATTR_RATE_BW + 1];
+>> +		u32 tc_bw[IEEE_8021QAZ_MAX_TCS] = {0};
+>> +		struct nlattr *nla_tc_entry;
+>> +		int rem, tc_index;
+>> +
+>> +		nla_for_each_nested(nla_tc_entry, nla_tc_bw, rem) {
+>> +			err = nla_parse_nested(tb, DEVLINK_ATTR_RATE_BW, nla_tc_entry,
+>> +					       devlink_dl_rate_tc_bw_nl_policy, info->extack);
+>> +			if (err)
+>> +				return err;
+>> +
+>> +			if (tb[DEVLINK_ATTR_RATE_TC_INDEX] && tb[DEVLINK_ATTR_RATE_BW]) {
+>> +				tc_index = nla_get_u8(tb[DEVLINK_ATTR_RATE_TC_INDEX]);
+> 
+> Ough, you trust user to provide you index to array. Recipe for disaster.
+> NLA_POLICY_RANGE() for tc-index would sanitize this. Btw, you use nested
+> array to carry rate-bw and tc-index attrs, isn't the array index good
+> enough? Then you can avoid tc-index attr (which in most cases holds
+> redundant index value). Or do you expect userspace to pass only partial
+> set of tcs?
+> 
 >
 
-Sorry for the driver-specific description, I will remove this example.
+I will drop the tc-index attribute as it is redundant. To address your 
+question: I expect userspace to always provide a complete set of tcs.
 
-I thought HDS with rx-copybreak is okay, but as per your concern,
-it could change that user expects for rx-copybreak.
-what do you think about it? should we disallow HDS + rx-copybreak?
+>> +				tc_bw[tc_index] = nla_get_u32(tb[DEVLINK_ATTR_RATE_BW]);
+>> +			}
+>> +		}
+>> +
+>> +		if (devlink_rate_is_leaf(devlink_rate))
+>> +			err = ops->rate_leaf_tc_bw_set(devlink_rate, devlink_rate->priv,
+>> +						       tc_bw, info->extack);
+>> +		else if (devlink_rate_is_node(devlink_rate))
+>> +			err = ops->rate_node_tc_bw_set(devlink_rate, devlink_rate->priv,
+>> +						       tc_bw, info->extack);
+>> +
+>> +		if (err)
+>> +			return err;
+>> +
+>> +		memcpy(devlink_rate->tc_bw, tc_bw, sizeof(tc_bw));
+>> +	}
+>> +
+>> 	nla_parent = attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME];
+>> 	if (nla_parent) {
+>> 		err = devlink_nl_rate_parent_node_set(devlink_rate, info,
+>> @@ -423,6 +476,12 @@ static bool devlink_rate_set_ops_supported(const struct devlink_ops *ops,
+>> 					    "TX weight set isn't supported for the leafs");
+>> 			return false;
+>> 		}
+>> +		if (attrs[DEVLINK_ATTR_RATE_TC_BW] && !ops->rate_leaf_tc_bw_set) {
+>> +			NL_SET_ERR_MSG_ATTR(info->extack,
+>> +					    attrs[DEVLINK_ATTR_RATE_TC_BW],
+>> +					    "TC bandwidth set isn't supported for the leafs");
+>> +			return false;
+>> +		}
+>> 	} else if (type == DEVLINK_RATE_TYPE_NODE) {
+>> 		if (attrs[DEVLINK_ATTR_RATE_TX_SHARE] && !ops->rate_node_tx_share_set) {
+>> 			NL_SET_ERR_MSG(info->extack, "TX share set isn't supported for the nodes");
+>> @@ -449,6 +508,12 @@ static bool devlink_rate_set_ops_supported(const struct devlink_ops *ops,
+>> 					    "TX weight set isn't supported for the nodes");
+>> 			return false;
+>> 		}
+>> +		if (attrs[DEVLINK_ATTR_RATE_TC_BW] && !ops->rate_node_tc_bw_set) {
+>> +			NL_SET_ERR_MSG_ATTR(info->extack,
+>> +					    attrs[DEVLINK_ATTR_RATE_TC_BW],
+>> +					    "TC bandwidth set isn't supported for the nodes");
+>> +			return false;
+>> +		}
+>> 	} else {
+>> 		WARN(1, "Unknown type of rate object");
+>> 		return false;
+>> -- 
+>> 2.44.0
+>>
 
-Thanks a lot!
-Taehee Yoo
-
-> >Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> >Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> >---
-> >
-> >v5:
-> > - No changes.
-> >
-> >v4:
-> > - Fix 80 charactor wrap.
-> > - Rename from tcp-data-split-thresh to header-data-split-thresh
-> > - Add description about overhead of HDS.
-> > - Add ETHTOOL_RING_USE_HDS_THRS flag.
-> > - Add dev_xdp_sb_prog_count() helper.
-> > - Add Test tag from Stanislav.
-> >
-> >v3:
-> > - Fix documentation and ynl
-> > - Update error messages
-> > - Validate configuration of tcp-data-split and tcp-data-split-thresh
-> >
-> >v2:
-> > - Patch added.
-> >
-> > Documentation/netlink/specs/ethtool.yaml     |  8 ++
-> > Documentation/networking/ethtool-netlink.rst | 79 ++++++++++++--------
-> > include/linux/ethtool.h                      |  6 ++
-> > include/linux/netdevice.h                    |  1 +
-> > include/uapi/linux/ethtool_netlink.h         |  2 +
-> > net/core/dev.c                               | 13 ++++
-> > net/ethtool/netlink.h                        |  2 +-
-> > net/ethtool/rings.c                          | 37 ++++++++-
-> > 8 files changed, 115 insertions(+), 33 deletions(-)
-> >
-> >diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/ne=
-tlink/specs/ethtool.yaml
-> >index 93369f0eb816..edc07cc290da 100644
-> >--- a/Documentation/netlink/specs/ethtool.yaml
-> >+++ b/Documentation/netlink/specs/ethtool.yaml
-> >@@ -220,6 +220,12 @@ attribute-sets:
-> >       -
-> >         name: tx-push-buf-len-max
-> >         type: u32
-> >+      -
-> >+        name: header-data-split-thresh
-> >+        type: u32
-> >+      -
-> >+        name: header-data-split-thresh-max
-> >+        type: u32
-> >
-> >   -
-> >     name: mm-stat
-> >@@ -1398,6 +1404,8 @@ operations:
-> >             - rx-push
-> >             - tx-push-buf-len
-> >             - tx-push-buf-len-max
-> >+            - header-data-split-thresh
-> >+            - header-data-split-thresh-max
-> >       dump: *ring-get-op
-> >     -
-> >       name: rings-set
-> >diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentatio=
-n/networking/ethtool-netlink.rst
-> >index b25926071ece..1fdfeca6f38e 100644
-> >--- a/Documentation/networking/ethtool-netlink.rst
-> >+++ b/Documentation/networking/ethtool-netlink.rst
-> >@@ -878,24 +878,35 @@ Request contents:
-> >
-> > Kernel response contents:
-> >
-> >-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D   =3D=3D=3D=3D=3D=3D  =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> >-  ``ETHTOOL_A_RINGS_HEADER``                nested  reply header
-> >-  ``ETHTOOL_A_RINGS_RX_MAX``                u32     max size of RX ring
-> >-  ``ETHTOOL_A_RINGS_RX_MINI_MAX``           u32     max size of RX mini=
- ring
-> >-  ``ETHTOOL_A_RINGS_RX_JUMBO_MAX``          u32     max size of RX jumb=
-o ring
-> >-  ``ETHTOOL_A_RINGS_TX_MAX``                u32     max size of TX ring
-> >-  ``ETHTOOL_A_RINGS_RX``                    u32     size of RX ring
-> >-  ``ETHTOOL_A_RINGS_RX_MINI``               u32     size of RX mini rin=
-g
-> >-  ``ETHTOOL_A_RINGS_RX_JUMBO``              u32     size of RX jumbo ri=
-ng
-> >-  ``ETHTOOL_A_RINGS_TX``                    u32     size of TX ring
-> >-  ``ETHTOOL_A_RINGS_RX_BUF_LEN``            u32     size of buffers on =
-the ring
-> >-  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``        u8      TCP header / data s=
-plit
-> >-  ``ETHTOOL_A_RINGS_CQE_SIZE``              u32     Size of TX/RX CQE
-> >-  ``ETHTOOL_A_RINGS_TX_PUSH``               u8      flag of TX Push mod=
-e
-> >-  ``ETHTOOL_A_RINGS_RX_PUSH``               u8      flag of RX Push mod=
-e
-> >-  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``       u32     size of TX push buf=
-fer
-> >-  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX``   u32     max size of TX push=
- buffer
-> >-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D   =3D=3D=3D=3D=3D=3D  =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> >+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-  =3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> >+  ``ETHTOOL_A_RINGS_HEADER``                        nested  reply heade=
-r
-> >+  ``ETHTOOL_A_RINGS_RX_MAX``                        u32     max size of=
- RX ring
-> >+  ``ETHTOOL_A_RINGS_RX_MINI_MAX``                   u32     max size of=
- RX mini
-> >+                                                            ring
-> >+  ``ETHTOOL_A_RINGS_RX_JUMBO_MAX``                  u32     max size of=
- RX jumbo
-> >+                                                            ring
-> >+  ``ETHTOOL_A_RINGS_TX_MAX``                        u32     max size of=
- TX ring
-> >+  ``ETHTOOL_A_RINGS_RX``                            u32     size of RX =
-ring
-> >+  ``ETHTOOL_A_RINGS_RX_MINI``                       u32     size of RX =
-mini ring
-> >+  ``ETHTOOL_A_RINGS_RX_JUMBO``                      u32     size of RX =
-jumbo
-> >+                                                            ring
-> >+  ``ETHTOOL_A_RINGS_TX``                            u32     size of TX =
-ring
-> >+  ``ETHTOOL_A_RINGS_RX_BUF_LEN``                    u32     size of buf=
-fers on
-> >+                                                            the ring
-> >+  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``                u8      TCP header =
-/ data
-> >+                                                            split
-> >+  ``ETHTOOL_A_RINGS_CQE_SIZE``                      u32     Size of TX/=
-RX CQE
-> >+  ``ETHTOOL_A_RINGS_TX_PUSH``                       u8      flag of TX =
-Push mode
-> >+  ``ETHTOOL_A_RINGS_RX_PUSH``                       u8      flag of RX =
-Push mode
-> >+  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``               u32     size of TX =
-push
-> >+                                                            buffer
-> >+  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX``           u32     max size of=
- TX push
-> >+                                                            buffer
-> >+  ``ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH``      u32     threshold o=
-f
-> >+                                                            header / da=
-ta split
-> >+  ``ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH_MAX``  u32     max thresho=
-ld of
-> >+                                                            header / da=
-ta split
-> >+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-  =3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> >
-> > ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT`` indicates whether the device is usab=
-le with
-> > page-flipping TCP zero-copy receive (``getsockopt(TCP_ZEROCOPY_RECEIVE)=
-``).
-> >@@ -930,18 +941,22 @@ Sets ring sizes like ``ETHTOOL_SRINGPARAM`` ioctl =
-request.
-> >
-> > Request contents:
-> >
-> >-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >-  ``ETHTOOL_A_RINGS_HEADER``            nested  reply header
-> >-  ``ETHTOOL_A_RINGS_RX``                u32     size of RX ring
-> >-  ``ETHTOOL_A_RINGS_RX_MINI``           u32     size of RX mini ring
-> >-  ``ETHTOOL_A_RINGS_RX_JUMBO``          u32     size of RX jumbo ring
-> >-  ``ETHTOOL_A_RINGS_TX``                u32     size of TX ring
-> >-  ``ETHTOOL_A_RINGS_RX_BUF_LEN``        u32     size of buffers on the =
-ring
-> >-  ``ETHTOOL_A_RINGS_CQE_SIZE``          u32     Size of TX/RX CQE
-> >-  ``ETHTOOL_A_RINGS_TX_PUSH``           u8      flag of TX Push mode
-> >-  ``ETHTOOL_A_RINGS_RX_PUSH``           u8      flag of RX Push mode
-> >-  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``   u32     size of TX push buffer
-> >-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> >+  ``ETHTOOL_A_RINGS_HEADER``                    nested  reply header
-> >+  ``ETHTOOL_A_RINGS_RX``                        u32     size of RX ring
-> >+  ``ETHTOOL_A_RINGS_RX_MINI``                   u32     size of RX mini=
- ring
-> >+  ``ETHTOOL_A_RINGS_RX_JUMBO``                  u32     size of RX jumb=
-o ring
-> >+  ``ETHTOOL_A_RINGS_TX``                        u32     size of TX ring
-> >+  ``ETHTOOL_A_RINGS_RX_BUF_LEN``                u32     size of buffers=
- on the
-> >+                                                        ring
-> >+  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``            u8      TCP header / da=
-ta split
-> >+  ``ETHTOOL_A_RINGS_CQE_SIZE``                  u32     Size of TX/RX C=
-QE
-> >+  ``ETHTOOL_A_RINGS_TX_PUSH``                   u8      flag of TX Push=
- mode
-> >+  ``ETHTOOL_A_RINGS_RX_PUSH``                   u8      flag of RX Push=
- mode
-> >+  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``           u32     size of TX push=
- buffer
-> >+  ``ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH``  u32     threshold of
-> >+                                                        header / data s=
-plit
-> >+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=
-=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> >
-> > Kernel checks that requested ring sizes do not exceed limits reported b=
-y
-> > driver. Driver may impose additional constraints and may not support al=
-l
-> >@@ -957,6 +972,10 @@ A bigger CQE can have more receive buffer pointers,=
- and in turn the NIC can
-> > transfer a bigger frame from wire. Based on the NIC hardware, the overa=
-ll
-> > completion queue size can be adjusted in the driver if CQE size is modi=
-fied.
-> >
-> >+``ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH`` specifies the threshold va=
-lue of
-> >+header / data split feature. If a received packet size is larger than t=
-his
-> >+threshold value, header and data will be split.
-> >+
-> > CHANNELS_GET
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> >diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> >index ecd52b99a63a..b4b6955d7ab9 100644
-> >--- a/include/linux/ethtool.h
-> >+++ b/include/linux/ethtool.h
-> >@@ -79,6 +79,8 @@ enum {
-> >  * @cqe_size: Size of TX/RX completion queue event
-> >  * @tx_push_buf_len: Size of TX push buffer
-> >  * @tx_push_buf_max_len: Maximum allowed size of TX push buffer
-> >+ * @hds_thresh: Threshold value of header-data-split-thresh
-> >+ * @hds_thresh_max: Maximum allowed threshold of header-data-split-thre=
-sh
-> >  */
-> > struct kernel_ethtool_ringparam {
-> >       u32     rx_buf_len;
-> >@@ -89,6 +91,8 @@ struct kernel_ethtool_ringparam {
-> >       u32     cqe_size;
-> >       u32     tx_push_buf_len;
-> >       u32     tx_push_buf_max_len;
-> >+      u32     hds_thresh;
-> >+      u32     hds_thresh_max;
-> > };
-> >
-> > /**
-> >@@ -99,6 +103,7 @@ struct kernel_ethtool_ringparam {
-> >  * @ETHTOOL_RING_USE_RX_PUSH: capture for setting rx_push
-> >  * @ETHTOOL_RING_USE_TX_PUSH_BUF_LEN: capture for setting tx_push_buf_l=
-en
-> >  * @ETHTOOL_RING_USE_TCP_DATA_SPLIT: capture for setting tcp_data_split
-> >+ * @ETHTOOL_RING_USE_HDS_THRS: capture for setting header-data-split-th=
-resh
-> >  */
-> > enum ethtool_supported_ring_param {
-> >       ETHTOOL_RING_USE_RX_BUF_LEN             =3D BIT(0),
-> >@@ -107,6 +112,7 @@ enum ethtool_supported_ring_param {
-> >       ETHTOOL_RING_USE_RX_PUSH                =3D BIT(3),
-> >       ETHTOOL_RING_USE_TX_PUSH_BUF_LEN        =3D BIT(4),
-> >       ETHTOOL_RING_USE_TCP_DATA_SPLIT         =3D BIT(5),
-> >+      ETHTOOL_RING_USE_HDS_THRS               =3D BIT(6),
-> > };
-> >
-> > #define __ETH_RSS_HASH_BIT(bit)       ((u32)1 << (bit))
-> >diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> >index 0aae346d919e..0c29068577c4 100644
-> >--- a/include/linux/netdevice.h
-> >+++ b/include/linux/netdevice.h
-> >@@ -4028,6 +4028,7 @@ struct sk_buff *dev_hard_start_xmit(struct sk_buff=
- *skb, struct net_device *dev,
-> >
-> > int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *pr=
-og);
-> > u8 dev_xdp_prog_count(struct net_device *dev);
-> >+u8 dev_xdp_sb_prog_count(struct net_device *dev);
-> > int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf);
-> > u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
-> >
-> >diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/e=
-thtool_netlink.h
-> >index 283305f6b063..7087c5c51017 100644
-> >--- a/include/uapi/linux/ethtool_netlink.h
-> >+++ b/include/uapi/linux/ethtool_netlink.h
-> >@@ -364,6 +364,8 @@ enum {
-> >       ETHTOOL_A_RINGS_RX_PUSH,                        /* u8 */
-> >       ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,                /* u32 */
-> >       ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,            /* u32 */
-> >+      ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH,       /* u32 */
-> >+      ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH_MAX,   /* u32 */
-> >
-> >       /* add new constants above here */
-> >       __ETHTOOL_A_RINGS_CNT,
-> >diff --git a/net/core/dev.c b/net/core/dev.c
-> >index 13d00fc10f55..0321d7cbce0f 100644
-> >--- a/net/core/dev.c
-> >+++ b/net/core/dev.c
-> >@@ -9474,6 +9474,19 @@ u8 dev_xdp_prog_count(struct net_device *dev)
-> > }
-> > EXPORT_SYMBOL_GPL(dev_xdp_prog_count);
-> >
-> >+u8 dev_xdp_sb_prog_count(struct net_device *dev)
-> >+{
-> >+      u8 count =3D 0;
-> >+      int i;
-> >+
-> >+      for (i =3D 0; i < __MAX_XDP_MODE; i++)
-> >+              if (dev->xdp_state[i].prog &&
-> >+                  !dev->xdp_state[i].prog->aux->xdp_has_frags)
-> >+                      count++;
-> >+      return count;
-> >+}
-> >+EXPORT_SYMBOL_GPL(dev_xdp_sb_prog_count);
-> >+
-> > int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
-> > {
-> >       if (!dev->netdev_ops->ndo_bpf)
-> >diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-> >index 203b08eb6c6f..9f51a252ebe0 100644
-> >--- a/net/ethtool/netlink.h
-> >+++ b/net/ethtool/netlink.h
-> >@@ -455,7 +455,7 @@ extern const struct nla_policy ethnl_features_set_po=
-licy[ETHTOOL_A_FEATURES_WANT
-> > extern const struct nla_policy ethnl_privflags_get_policy[ETHTOOL_A_PRI=
-VFLAGS_HEADER + 1];
-> > extern const struct nla_policy ethnl_privflags_set_policy[ETHTOOL_A_PRI=
-VFLAGS_FLAGS + 1];
-> > extern const struct nla_policy ethnl_rings_get_policy[ETHTOOL_A_RINGS_H=
-EADER + 1];
-> >-extern const struct nla_policy ethnl_rings_set_policy[ETHTOOL_A_RINGS_T=
-X_PUSH_BUF_LEN_MAX + 1];
-> >+extern const struct nla_policy ethnl_rings_set_policy[ETHTOOL_A_RINGS_H=
-EADER_DATA_SPLIT_THRESH_MAX + 1];
-> > extern const struct nla_policy ethnl_channels_get_policy[ETHTOOL_A_CHAN=
-NELS_HEADER + 1];
-> > extern const struct nla_policy ethnl_channels_set_policy[ETHTOOL_A_CHAN=
-NELS_COMBINED_COUNT + 1];
-> > extern const struct nla_policy ethnl_coalesce_get_policy[ETHTOOL_A_COAL=
-ESCE_HEADER + 1];
-> >diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-> >index c12ebb61394d..ca836aad3fa9 100644
-> >--- a/net/ethtool/rings.c
-> >+++ b/net/ethtool/rings.c
-> >@@ -61,7 +61,11 @@ static int rings_reply_size(const struct ethnl_req_in=
-fo *req_base,
-> >              nla_total_size(sizeof(u8))  +    /* _RINGS_TX_PUSH */
-> >              nla_total_size(sizeof(u8))) +    /* _RINGS_RX_PUSH */
-> >              nla_total_size(sizeof(u32)) +    /* _RINGS_TX_PUSH_BUF_LEN=
- */
-> >-             nla_total_size(sizeof(u32));     /* _RINGS_TX_PUSH_BUF_LEN=
-_MAX */
-> >+             nla_total_size(sizeof(u32)) +    /* _RINGS_TX_PUSH_BUF_LEN=
-_MAX */
-> >+             nla_total_size(sizeof(u32)) +
-> >+             /* _RINGS_HEADER_DATA_SPLIT_THRESH */
-> >+             nla_total_size(sizeof(u32));
-> >+             /* _RINGS_HEADER_DATA_SPLIT_THRESH_MAX*/
-> > }
-> >
-> > static int rings_fill_reply(struct sk_buff *skb,
-> >@@ -108,7 +112,12 @@ static int rings_fill_reply(struct sk_buff *skb,
-> >            (nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,
-> >                         kr->tx_push_buf_max_len) ||
-> >             nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,
-> >-                        kr->tx_push_buf_len))))
-> >+                        kr->tx_push_buf_len))) ||
-> >+          ((supported_ring_params & ETHTOOL_RING_USE_HDS_THRS) &&
-> >+           (nla_put_u32(skb, ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH,
-> >+                        kr->hds_thresh) ||
-> >+            nla_put_u32(skb, ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH_M=
-AX,
-> >+                        kr->hds_thresh_max))))
-> >               return -EMSGSIZE;
-> >
-> >       return 0;
-> >@@ -130,6 +139,7 @@ const struct nla_policy ethnl_rings_set_policy[] =3D=
- {
-> >       [ETHTOOL_A_RINGS_TX_PUSH]               =3D NLA_POLICY_MAX(NLA_U8=
-, 1),
-> >       [ETHTOOL_A_RINGS_RX_PUSH]               =3D NLA_POLICY_MAX(NLA_U8=
-, 1),
-> >       [ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN]       =3D { .type =3D NLA_U32 }=
-,
-> >+      [ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH]      =3D { .type =3D N=
-LA_U32 },
-> > };
-> >
-> > static int
-> >@@ -155,6 +165,14 @@ ethnl_set_rings_validate(struct ethnl_req_info *req=
-_info,
-> >               return -EOPNOTSUPP;
-> >       }
-> >
-> >+      if (tb[ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH] &&
-> >+          !(ops->supported_ring_params & ETHTOOL_RING_USE_HDS_THRS)) {
-> >+              NL_SET_ERR_MSG_ATTR(info->extack,
-> >+                                  tb[ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_=
-THRESH],
-> >+                                  "setting header-data-split-thresh is =
-not supported");
-> >+              return -EOPNOTSUPP;
-> >+      }
-> >+
-> >       if (tb[ETHTOOL_A_RINGS_CQE_SIZE] &&
-> >           !(ops->supported_ring_params & ETHTOOL_RING_USE_CQE_SIZE)) {
-> >               NL_SET_ERR_MSG_ATTR(info->extack,
-> >@@ -222,9 +240,24 @@ ethnl_set_rings(struct ethnl_req_info *req_info, st=
-ruct genl_info *info)
-> >                       tb[ETHTOOL_A_RINGS_RX_PUSH], &mod);
-> >       ethnl_update_u32(&kernel_ringparam.tx_push_buf_len,
-> >                        tb[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN], &mod);
-> >+      ethnl_update_u32(&kernel_ringparam.hds_thresh,
-> >+                       tb[ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRESH], &m=
-od);
-> >       if (!mod)
-> >               return 0;
-> >
-> >+      if (kernel_ringparam.tcp_data_split =3D=3D ETHTOOL_TCP_DATA_SPLIT=
-_ENABLED &&
-> >+          dev_xdp_sb_prog_count(dev)) {
-> >+              NL_SET_ERR_MSG(info->extack,
-> >+                             "tcp-data-split can not be enabled with si=
-ngle buffer XDP");
-> >+              return -EINVAL;
-> >+      }
-> >+
-> >+      if (kernel_ringparam.hds_thresh > kernel_ringparam.hds_thresh_max=
-) {
-> >+              NL_SET_BAD_ATTR(info->extack,
-> >+                              tb[ETHTOOL_A_RINGS_HEADER_DATA_SPLIT_THRE=
-SH_MAX]);
-> >+              return -ERANGE;
-> >+      }
-> >+
-> >       /* ensure new ring parameters are within limits */
-> >       if (ringparam.rx_pending > ringparam.rx_max_pending)
-> >               err_attr =3D tb[ETHTOOL_A_RINGS_RX];
-> >--
-> >2.34.1
-> >
-> >
 
