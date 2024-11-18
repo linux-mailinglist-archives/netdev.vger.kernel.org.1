@@ -1,276 +1,132 @@
-Return-Path: <netdev+bounces-145852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA51E9D12CF
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:20:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EA79D12E7
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:24:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B2C7283750
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:20:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FC1D28461A
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B297199FBF;
-	Mon, 18 Nov 2024 14:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78111AA1CD;
+	Mon, 18 Nov 2024 14:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dGSzo7Qr"
+	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b="TkFxCrjQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A606E1E871;
-	Mon, 18 Nov 2024 14:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDCB1A0B05
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 14:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731939620; cv=none; b=CPlKMOKib7y7F4gDFJeHNAEoTGC+jljfSx6JXrQUAIYbnlFRaJDurb5pfVvP4J0zCy05t9OETtH3VWdeW+opgn06No3kj0TB0sMStZTzkMG2Gj1CTI6+E6dXRIuurGesYWZh52ZqVW4UTx6BRt9rFnJt8Ai4X/s29k8g9L8OqIw=
+	t=1731939766; cv=none; b=pPgToe3E3ISeTfquqW6jxGqj705BdhKYjQNi+wkSKwsl3aVNdqcTla1wzkDBBPrS2gaQYSwDvAApEiCY0DTTZ8KlpmBk9acIR5SB8jHOhW56IAjKCSDyWLLRlLH1dDQ/Fz0tAPFIcXh/nSkjLIyROCfcq1J4KXXXz5OYx8X9qn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731939620; c=relaxed/simple;
-	bh=5zdc5yDcA29a0xhFW2zhxgI2AoKgeyu3kJazza0fKyg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s/VmfbS2ResUEqfSpwD7CvvmfjD2K092I4iqzHO2fLAeB4YmWzYVPFxOxCoxqkTQixmwvmhYJ/LYy73x0vSgvGjMJ5dTalyr2QLULaaZM0Rf/jOQ7h0/68106ZE19puuyeSlhK34GIjCC0EihCr2z7C+/OKU8l+dPrmSOGsxbaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=dGSzo7Qr; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AI82mup018506;
-	Mon, 18 Nov 2024 06:19:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=e3RFZtalqMokySmIITPzp0C
-	A15CGLdsWKD7j0mPpw54=; b=dGSzo7QrtuIXqXl+s/bi7Wigvr86+KoRl4WTTlW
-	U8hBm8cCnXoZiUO97MHiJodrEgVkwHctru9NnDeUgr6HIFijAa6dKyTfry4Md0/f
-	2OqXaFR1xaTiMry7G1xlQWkNBa6SydsBuVIaNYWsY21AyFB0OO/Kry5X/4d9Hhzh
-	nEAZ5R//6mc1Ljvl0eLHTjTJvTfJSLdZwEL/YzqbysVuP389lI3pU8vkg+lEZ4SK
-	D77Aj2Qhx0KhCoBQnWoWmDGjZe/C4sN3o+RP6FenbJWUcg0aDHEYYRPqN0NBXglD
-	2xOmLxx4OpY4aoawo31+DXdAqYyh+x+NUr69Q242OO49JfQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4301qcrjy1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 06:19:50 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 18 Nov 2024 06:19:49 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 18 Nov 2024 06:19:49 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 01ED53F708A;
-	Mon, 18 Nov 2024 06:19:48 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
-        <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
-        <egallen@redhat.com>, <konguyen@redhat.com>, <horms@kernel.org>,
-        <einstein.xue@synaxg.com>, Shinas Rasheed <srasheed@marvell.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH net-next v3] octeon_ep: add ndo ops for VFs in PF driver
-Date: Mon, 18 Nov 2024 06:19:35 -0800
-Message-ID: <20241118141936.1235170-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1731939766; c=relaxed/simple;
+	bh=0/JguiZcTPrNz/YSnYa6PH270B4ZDgqsime95IrntPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SRfW2NW/BUSSny3qIO9wthDfMryIdNiEjBmd1ttuNmoqmeVSIiieaDYPH/31glMHgBO/aTuzHZP4u820SqOgPsSrmRBy9Q++xjm5FjCOW0xTujKHH/K7BCTxIehU3ZfoFtMbN8fvIkd1tk/P/4oadUQ7OYwxDsahsL6rbDObTY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in; spf=pass smtp.mailfrom=iiitd.ac.in; dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b=TkFxCrjQ; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e61b47c6cso3554382b3a.2
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 06:22:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=iiitd.ac.in; s=google; t=1731939762; x=1732544562; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8U2P1opxMKXLCU8WluCY8oxXYTWyAxW/3p1HSS0hYGc=;
+        b=TkFxCrjQtoLEfTUtL6ah/uLRqqYZ+E8u4J682epsRchlgBYV0M1BSM8earQcMlG0e5
+         mmMdvDdqmOKwfrDZ4lelsCLAHA3UUgNcqBnJqjjrq8aKZtKCNAAl8yErmMyOeaK3z30c
+         c7e5e8H9fEzWDH1itMyZEEqYJWV7ZskYRypFc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731939762; x=1732544562;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8U2P1opxMKXLCU8WluCY8oxXYTWyAxW/3p1HSS0hYGc=;
+        b=gQVHl+pe/MWfzS7Y/HeSlD3pEDO2B0tKldR2RP5xbzqKDvlNQtxeXjCzFAw+1a6uwT
+         LFp88qudJ8Di8ziiuHLndXPA1VDeBguuBrynH5Z2u8SwdRePJxfQHc3v2yW5iD782YpS
+         jQVHh4fK7gJj6QOfU4j9K9JvrgvBk6E3ocj8okeDN+2lrR4mTqrFnrwIFz5eFNxboh/0
+         eaxULGGZFPNcx6qcau8ALCtVsxjgNXlqGVKCCL58FCnTZDBZbjvLCJjCn7v/GH1eOTM9
+         o8jRPkxOiPr9Csopcv5/XgkgvnSbAw/OSJda0O4bQuKtjUAdeK0MyTZOX8M9vT3RgfkJ
+         Cyhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVeEvEWxl/EOc5AfS2F95h6SGElSgN86EIm1Mxm81XgApPwG92Dj8iEw/3FmA/CeXEsfeTJgnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyrul5hv421slNmVQ4xoPhpLKs4hMtSufmb+SE966U4UfovGyNr
+	XuSk2LuUdy6bUYlcZxyvFGbm/R/7KYSNrEGsxBDMUM+KGtvOy3MX4H1CMKUVFCg=
+X-Google-Smtp-Source: AGHT+IGgcOjKbKA8w5b7kuKMeOESVvEYFAjmcimvNF36hlrzlrHCp7ZaXrb4iv9nf7aq17KqWEhawA==
+X-Received: by 2002:a05:6a00:1792:b0:71e:4bfb:a1f9 with SMTP id d2e1a72fcca58-72476d58965mr15670768b3a.22.1731939762414;
+        Mon, 18 Nov 2024 06:22:42 -0800 (PST)
+Received: from fedora ([103.3.204.127])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f8c1dc03fbsm6002289a12.70.2024.11.18.06.22.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2024 06:22:41 -0800 (PST)
+Date: Mon, 18 Nov 2024 19:52:29 +0530
+From: Manas <manas18244@iiitd.ac.in>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>, 
+	Alice Ryhl <aliceryhl@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] rust: block: simplify Result<()> in
+ validate_block_size return
+Message-ID: <oc2pslg33lfkwpjeho2trjltrg6nw2plxizvb7dq3gvlzkme6t@eauzzfnizzqu>
+References: <20241118-simplify-result-v2-0-9d280ada516d@iiitd.ac.in>
+ <20241118-simplify-result-v2-1-9d280ada516d@iiitd.ac.in>
+ <CANiq72=o56xxJLEo7VL=-wUfKa7jZ75Tg3rRHv+CHg9jaxqRQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Kca-lJ9Zxi7OniWXWTzg93hdaXrOWq5n
-X-Proofpoint-GUID: Kca-lJ9Zxi7OniWXWTzg93hdaXrOWq5n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+In-Reply-To: <CANiq72=o56xxJLEo7VL=-wUfKa7jZ75Tg3rRHv+CHg9jaxqRQA@mail.gmail.com>
 
-These APIs are needed to support applications that use netlink to get VF
-information from a PF driver.
+On 18.11.2024 15:08, Miguel Ojeda wrote:
+>On Mon, Nov 18, 2024 at 2:12 PM Manas via B4 Relay
+><devnull+manas18244.iiitd.ac.in@kernel.org> wrote:
+>>
+>> `Result` is used in place of `Result<()>` because the default type
+>> parameters are unit `()` and `Error` types, which are automatically
+>> inferred. This patch keeps the usage consistent throughout codebase.
+>
+>The tags you had in v1 (Link, Suggested-by) seem to have been removed.
+>
+>Nit: the usual style is to use the imperative tense when describing
+>the change that the patch performs, although that is not a hard rule,
+>e.g. you could say "Thus keep the usage consistent throughout the
+>codebase." in the last sentence.
+>
+Will do.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - Corrected line-wrap and space checkpatch errors
-  - Set spoof check as true and vf trusted as false to be default vf
-    configs
+>> Signed-off-by: Manas <manas18244@iiitd.ac.in>
+>
+>Same comment as in v1 about the "known identity".
+>
+Actually, "Manas" is my __official__ name.
 
-V2: https://lore.kernel.org/all/PH0PR18MB47344F6BCCD1B629AC012065C7252@PH0PR18MB4734.namprd18.prod.outlook.com/
-  - Corrected typos, and removed not supported ndo_set_vf* hooks
+>(The notes above apply to the other patches too).
+>
+>The change itself looks fine to me of course, so with those fixed,
+>please feel free to add in your next version:
+>
+>Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+>
+Adding tags in v3.
 
-V1: https://lore.kernel.org/all/20241107121637.1117089-1-srasheed@marvell.com/
-
- .../ethernet/marvell/octeon_ep/octep_main.c   | 46 ++++++++++++++++++-
- .../ethernet/marvell/octeon_ep/octep_main.h   |  2 +
- .../marvell/octeon_ep/octep_pfvf_mbox.c       | 24 +++++++++-
- .../marvell/octeon_ep/octep_pfvf_mbox.h       |  6 ++-
- 4 files changed, 73 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 549436efc204..226a44823401 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -1137,6 +1137,45 @@ static int octep_set_features(struct net_device *dev, netdev_features_t features
- 	return err;
- }
- 
-+static int octep_get_vf_config(struct net_device *dev, int vf,
-+			       struct ifla_vf_info *ivi)
-+{
-+	struct octep_device *oct = netdev_priv(dev);
-+
-+	ivi->vf = vf;
-+	ether_addr_copy(ivi->mac, oct->vf_info[vf].mac_addr);
-+	ivi->spoofchk = true;
-+	ivi->linkstate = IFLA_VF_LINK_STATE_ENABLE;
-+	ivi->trusted = oct->vf_info[vf].trusted;
-+	ivi->max_tx_rate = 10000;
-+	ivi->min_tx_rate = 0;
-+
-+	return 0;
-+}
-+
-+static int octep_set_vf_mac(struct net_device *dev, int vf, u8 *mac)
-+{
-+	struct octep_device *oct = netdev_priv(dev);
-+	int err;
-+
-+	if (!is_valid_ether_addr(mac)) {
-+		dev_err(&oct->pdev->dev, "Invalid  MAC Address %pM\n", mac);
-+		return -EADDRNOTAVAIL;
-+	}
-+
-+	dev_dbg(&oct->pdev->dev, "set vf-%d mac to %pM\n", vf, mac);
-+	ether_addr_copy(oct->vf_info[vf].mac_addr, mac);
-+	oct->vf_info[vf].flags |= OCTEON_PFVF_FLAG_MAC_SET_BY_PF;
-+
-+	err = octep_ctrl_net_set_mac_addr(oct, vf, mac, true);
-+	if (err)
-+		dev_err(&oct->pdev->dev,
-+			"Set VF%d MAC address failed via host control Mbox\n",
-+			vf);
-+
-+	return err;
-+}
-+
- static const struct net_device_ops octep_netdev_ops = {
- 	.ndo_open                = octep_open,
- 	.ndo_stop                = octep_stop,
-@@ -1146,6 +1185,8 @@ static const struct net_device_ops octep_netdev_ops = {
- 	.ndo_set_mac_address     = octep_set_mac,
- 	.ndo_change_mtu          = octep_change_mtu,
- 	.ndo_set_features        = octep_set_features,
-+	.ndo_get_vf_config       = octep_get_vf_config,
-+	.ndo_set_vf_mac          = octep_set_vf_mac
- };
- 
- /**
-@@ -1560,9 +1601,12 @@ static void octep_remove(struct pci_dev *pdev)
- static int octep_sriov_enable(struct octep_device *oct, int num_vfs)
- {
- 	struct pci_dev *pdev = oct->pdev;
--	int err;
-+	int i, err;
- 
- 	CFG_GET_ACTIVE_VFS(oct->conf) = num_vfs;
-+	for (i = 0; i < num_vfs; i++)
-+		oct->vf_info[i].trusted = false;
-+
- 	err = pci_enable_sriov(pdev, num_vfs);
- 	if (err) {
- 		dev_warn(&pdev->dev, "Failed to enable SRIOV err=%d\n", err);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-index fee59e0e0138..1c39833ffcc0 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-@@ -220,7 +220,9 @@ struct octep_iface_link_info {
- /* The Octeon VF device specific info data structure.*/
- struct octep_pfvf_info {
- 	u8 mac_addr[ETH_ALEN];
-+	u32 flags;
- 	u32 mbox_version;
-+	bool trusted;
- };
- 
- /* The Octeon device specific private data structure.
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-index e6eb98d70f3c..3024f6428838 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.c
-@@ -156,12 +156,24 @@ static void octep_pfvf_set_mac_addr(struct octep_device *oct,  u32 vf_id,
- {
- 	int err;
- 
-+	if ((oct->vf_info[vf_id].flags & OCTEON_PFVF_FLAG_MAC_SET_BY_PF) &&
-+	    !oct->vf_info[vf_id].trusted) {
-+		dev_err(&oct->pdev->dev,
-+			"VF%d attempted to override administrative set MAC address\n",
-+			vf_id);
-+		rsp->s_set_mac.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
-+		return;
-+	}
-+
- 	err = octep_ctrl_net_set_mac_addr(oct, vf_id, cmd.s_set_mac.mac_addr, true);
- 	if (err) {
- 		rsp->s_set_mac.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
--		dev_err(&oct->pdev->dev, "Set VF MAC address failed via host control Mbox\n");
-+		dev_err(&oct->pdev->dev, "Set VF%d MAC address failed via host control Mbox\n",
-+			vf_id);
- 		return;
- 	}
-+
-+	ether_addr_copy(oct->vf_info[vf_id].mac_addr, cmd.s_set_mac.mac_addr);
- 	rsp->s_set_mac.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
- }
- 
-@@ -171,10 +183,18 @@ static void octep_pfvf_get_mac_addr(struct octep_device *oct,  u32 vf_id,
- {
- 	int err;
- 
-+	if (oct->vf_info[vf_id].flags & OCTEON_PFVF_FLAG_MAC_SET_BY_PF) {
-+		dev_dbg(&oct->pdev->dev, "VF%d MAC address set by PF\n", vf_id);
-+		ether_addr_copy(rsp->s_set_mac.mac_addr,
-+				oct->vf_info[vf_id].mac_addr);
-+		rsp->s_set_mac.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
-+		return;
-+	}
- 	err = octep_ctrl_net_get_mac_addr(oct, vf_id, rsp->s_set_mac.mac_addr);
- 	if (err) {
- 		rsp->s_set_mac.type = OCTEP_PFVF_MBOX_TYPE_RSP_NACK;
--		dev_err(&oct->pdev->dev, "Get VF MAC address failed via host control Mbox\n");
-+		dev_err(&oct->pdev->dev, "Get VF%d MAC address failed via host control Mbox\n",
-+			vf_id);
- 		return;
- 	}
- 	rsp->s_set_mac.type = OCTEP_PFVF_MBOX_TYPE_RSP_ACK;
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-index 0dc6eead292a..386a095a99bc 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_pfvf_mbox.h
-@@ -8,8 +8,6 @@
- #ifndef _OCTEP_PFVF_MBOX_H_
- #define _OCTEP_PFVF_MBOX_H_
- 
--/* VF flags */
--#define OCTEON_PFVF_FLAG_MAC_SET_BY_PF  BIT_ULL(0) /* PF has set VF MAC address */
- #define OCTEON_SDP_16K_HW_FRS  16380UL
- #define OCTEON_SDP_64K_HW_FRS  65531UL
- 
-@@ -23,6 +21,10 @@ enum octep_pfvf_mbox_version {
- 
- #define OCTEP_PFVF_MBOX_VERSION_CURRENT	OCTEP_PFVF_MBOX_VERSION_V2
- 
-+/* VF flags */
-+/* PF has set VF MAC address */
-+#define OCTEON_PFVF_FLAG_MAC_SET_BY_PF  BIT(0)
-+
- enum octep_pfvf_mbox_opcode {
- 	OCTEP_PFVF_MBOX_CMD_VERSION,
- 	OCTEP_PFVF_MBOX_CMD_SET_MTU,
 -- 
-2.25.1
-
+Manas
 
