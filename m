@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-145881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA4569D13D5
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:00:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42EF99D13AA
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:52:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4860DB26DCE
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:52:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9291F23852
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635161A9B44;
-	Mon, 18 Nov 2024 14:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ED21A9B3D;
+	Mon, 18 Nov 2024 14:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lFAltZIX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PyiOO4Vl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0801A9B2F
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 14:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107811A9B34
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 14:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731941556; cv=none; b=aSEvgrK/YBfLJOMYPCMssniwZTbBNv09zT32MRTofnZ7PvalyRBHvKiH3GjbkC2/fkojVWwF0DXfYZrDzCO4Zo3kceXGeTO5g8qDOlhVe+QGLSya82qFisxFav3+AuGyommgRn6EhvwAHZe2TkVxvp78hc99QyKQoxA/Q6VQpI8=
+	t=1731941560; cv=none; b=hYg7OESJrHjWaDmM5M+Rjrt0suECn+hpIrHu8jsUc/Rbnc2P/reDcUrHP12hpYy7HJ9l9pGMZ81qf8SMsGUEv0+5qrm+TnFZXFPGVQf6KYzlQT2lbBJmeZBRSXtl7Wpb8byhDQrgT+U5HllR4K3BSX2/cFHYiS425s3qRVqrkZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731941556; c=relaxed/simple;
-	bh=K1E9UVnrxE4e530cdR9SpjTuzPhlFKkKNGdf73BObn8=;
+	s=arc-20240116; t=1731941560; c=relaxed/simple;
+	bh=ULVpsfd6yX1ZnvmuTVSBNsBKjYCvwRllmj5MPpr/Zyg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TAYJ94OvfFPMjofn3M8iZT5tWbfj4ZQbj5aoCgrZSsp0IptCTNjvmHd4kfRaoOk/ch4vwJobdVGHzrSMexzHj4N3ETMxhpbPH7AMzyP1CDVCwCROl7qEx4HddEgQmxI/pa/ECsp2Bg/4nUXN27lXMO7vuJgQJtxzVoAOy1JUSLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lFAltZIX; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=WG9v7UyG7xI4fS2OzQAv14PV8i/xV8SpXqMm1qWnryAas/SFSpZy5TD3cG6/6EiJbaCLHesQ6Exg1Bon0dGPvPzg2vgNhpn423qeiNVpB5U+XoqBI9hpF9+WGNIELdHiS5WH4NSJj6ohe0UZUhotoQcv0SpnWaRdK3YnFR8fvOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PyiOO4Vl; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4315df7b43fso37559875e9.0
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 06:52:34 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4316f3d3c21so35385495e9.3
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 06:52:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731941552; x=1732546352; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731941557; x=1732546357; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h0l3ZcsTH9NWt+PyKISaYzHPsV00B4daE0gTCSXmrws=;
-        b=lFAltZIXbWdY1Fq6v2VBQz3hN9u6h2uLUUbVqlEEp949A6zl18zFQQvYqH6gdn0L4K
-         SYliM8JSJQc+rmckJTOhNyF7RB8PzQVMdwAvZt1oTmFa1OLs2XIGaAWBqKAzZRDRf/ya
-         vkYM2peOPzTYv7WJPE5/qY0b2DKC3gPgyKZX8lGw92ed+7qf8xsonoZcgDbaXTbQElWn
-         xsQ/+FWyiirVXDZFmkSsl7KKzvl9YwW/XuQ7qHk2HVsz4o3DcqtyhtwKtjrXeO3dfL4V
-         +x+U57UGKYrcX0s+Q6PyTrMmTVoSWTFMC5Ws+D/8TLryKSl993Ywop2s3nM1gKe2GRML
-         N9zg==
+        bh=zU6lwIqx/RoICKHObiqUzLzsxG3XRnjTTOYZ2wKnqv4=;
+        b=PyiOO4Vl7GCOsQ7TL86Ks6Sp7VVJDBv4Kv/RI8bdOxRn4S+D/tWIafqQBYUIYe7nPg
+         W6ZfSQZan5jmY1xb8qCwGvr/ySh8K/3yzs4q92XC76amGhhtuCKQoRVT3Bz0FaJ0O93o
+         ZBfjRDZDXGCEoPN3YI6GdwYeqvhKN4NTxHiDCVNXn/KUGQPdiUB2CXwfX2Lylx7NxNsf
+         XYoRH5kvlkt0rTMvT5jMlTTJkeIKvWYJH+nGneUvtEcWvHKb08aFEaTc5VydVI7/EXr+
+         hbMt3QUaFSaPZE6B28PTRskGCR4Wz/XqJIIW7VBrhseOVr4g2NauWs2/WvG1pzAbkj2H
+         6aOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731941552; x=1732546352;
+        d=1e100.net; s=20230601; t=1731941557; x=1732546357;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h0l3ZcsTH9NWt+PyKISaYzHPsV00B4daE0gTCSXmrws=;
-        b=t//EtbUNaGZ7eWF207N1fIcB27qP3p1Y/yfcKwUd/bxqJ7MsOwbqc++HCrKiHaW/KM
-         l0GBoDnEDH9LXkid/MUp1e5sdaxyvaptyJCQWdipcGebUEvb1BJ9kAIdYVRhTlAszBrj
-         sVLtFxkIPZXzeDaTpTDiVzgQZ7b1JQ03j75bUjV2WwqSy3cylssQsXtabvV492BGUu+c
-         Ka9SgAGQd/2ZmdvkmiGnj26ol1uPzr4Wzdm9JbepP1nG7MFwAT+l7u3cFEqu8Lh+y/m+
-         b8mQZ/r7+2NMX/xIxj2TAlzIQBqQs9ayfIM1mANmistsO8giyZRuFVGV+I4NZH0JAE23
-         dCPg==
-X-Gm-Message-State: AOJu0YzmVNGX5YvLppAZc43hZ0QTgSvTzdUVXdDccOY9GfgH5UEzsyKc
-	G33+XGsFB5EdkMIQ+gMr9fsP3uuVpIs027RxKp18iVezCReuEfmrR1zcXH+kMkM=
-X-Google-Smtp-Source: AGHT+IFqNPLOHCsMfB1+tUk/61Gryfb+md/2sdwqTdXoyokK0/UU+JalOK76cDRLQofqqmPGxHdvEg==
-X-Received: by 2002:a05:600c:1d1b:b0:431:3933:1d30 with SMTP id 5b1f17b1804b1-432df72118dmr108722435e9.5.1731941552202;
-        Mon, 18 Nov 2024 06:52:32 -0800 (PST)
+        bh=zU6lwIqx/RoICKHObiqUzLzsxG3XRnjTTOYZ2wKnqv4=;
+        b=XJcrOtT9Xa1RhTrA2vwnX1erM5jCQbLfDEUfhdGqU2HnyjoIgf516kIyB/GDyMP1at
+         3VCiBKEiQmSyd6L1KCwM1rFkvkvqAcY6mlBIfrOR1ah+DKKmWF1aDER8jo3N493qRxyH
+         oEH7XIKhWN2zmzU/mwX6k4hjDqujXigyR6Fre+11bhlbsOna5JDFV6YCjMZny5bEjBxX
+         jxlx/D8rstLJQQZEtEJ2s4hpLqpHvW1DjUh1EKwkwCUOiVgt3xJ2MuSa2Zfvoy71mpXC
+         4xm01KUzjoa1bs4vfaxf0GSIFDzSNP1AdYESvW38YCx2sjG8fxK+MdIK3ZqpHSb5CVYo
+         pugQ==
+X-Gm-Message-State: AOJu0YwuGL21IHC3iqV88/TuMpFlAFQJr1tfCLQ09+kOUMkoowY17HtR
+	0Agzw1DND7mUqnjGtUU9BFDzfAGSTxd3GkuAGyTChbL93eOTSZ3V2+nw6+yGeEw=
+X-Google-Smtp-Source: AGHT+IH60fBtjdKf0ywXT/QXZz98x4qet5ODx5/p6TnH/8+b2cjZiCiRPrDLYrL3mYJ6woxbG31S+g==
+X-Received: by 2002:a05:600c:314a:b0:42c:a89e:b0e6 with SMTP id 5b1f17b1804b1-432df72c1b9mr103719445e9.11.1731941557002;
+        Mon, 18 Nov 2024 06:52:37 -0800 (PST)
 Received: from localhost.localdomain (20014C4E1E82D600957C45913C6586B5.dsl.pool.telekom.hu. [2001:4c4e:1e82:d600:957c:4591:3c65:86b5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da27fbd2sm162639285e9.19.2024.11.18.06.52.31
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da27fbd2sm162639285e9.19.2024.11.18.06.52.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 06:52:31 -0800 (PST)
+        Mon, 18 Nov 2024 06:52:36 -0800 (PST)
 From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
 To: netdev@vger.kernel.org
 Cc: fejes@inf.elte.hu,
@@ -75,9 +75,9 @@ Cc: fejes@inf.elte.hu,
 	pabeni@redhat.com,
 	willemb@google.com,
 	idosch@idosch.org
-Subject: [PATCH net-next v4 2/3] sock: support SO_PRIORITY cmsg
-Date: Mon, 18 Nov 2024 15:51:46 +0100
-Message-ID: <20241118145147.56236-3-annaemesenyiri@gmail.com>
+Subject: [PATCH net-next v4 3/3] selftests: net: test SO_PRIORITY ancillary data with cmsg_sender
+Date: Mon, 18 Nov 2024 15:51:47 +0100
+Message-ID: <20241118145147.56236-4-annaemesenyiri@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241118145147.56236-1-annaemesenyiri@gmail.com>
 References: <20241118145147.56236-1-annaemesenyiri@gmail.com>
@@ -89,259 +89,233 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The Linux socket API currently allows setting SO_PRIORITY at the
-socket level, applying a uniform priority to all packets sent through
-that socket. The exception to this is IP_TOS, when the priority value
-is calculated during the handling of
-ancillary data, as implemented in commit <f02db315b8d88>
-("ipv4: IP_TOS and IP_TTL can be specified as ancillary data").
-However, this is a computed
-value, and there is currently no mechanism to set a custom priority
-via control messages prior to this patch.
+Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
+ancillary data.
 
-According to this patch, if SO_PRIORITY is specified as ancillary data,
-the packet is sent with the priority value set through
-sockc->priority, overriding the socket-level values
-set via the traditional setsockopt() method. This is analogous to
-the existing support for SO_MARK, as implemented in commit
-<c6af0c227a22> ("ip: support SO_MARK cmsg").
+cmsg_so_priority.sh script added to validate SO_PRIORITY behavior 
+by creating VLAN device with egress QoS mapping and testing packet
+priorities using flower filters. Verify that packets with different
+priorities are correctly matched and counted by filters for multiple
+protocols and IP versions.
 
-If both cmsg SO_PRIORITY and IP_TOS are passed, then the one that
-takes precedence is the last one in the cmsg list.
-
-This patch has the side effect that raw_send_hdrinc now interprets cmsg
-IP_TOS.
-
-Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
+Suggested-by: Ido Schimmel <idosch@idosch.org>
 Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
 ---
- include/net/inet_sock.h | 2 +-
- include/net/ip.h        | 2 +-
- include/net/sock.h      | 4 +++-
- net/can/raw.c           | 2 +-
- net/core/sock.c         | 7 +++++++
- net/ipv4/ip_output.c    | 4 ++--
- net/ipv4/ip_sockglue.c  | 2 +-
- net/ipv4/raw.c          | 2 +-
- net/ipv6/ip6_output.c   | 3 ++-
- net/ipv6/ping.c         | 1 +
- net/ipv6/raw.c          | 3 ++-
- net/ipv6/udp.c          | 1 +
- net/packet/af_packet.c  | 2 +-
- 13 files changed, 24 insertions(+), 11 deletions(-)
+ tools/testing/selftests/net/cmsg_sender.c     |  11 +-
+ .../testing/selftests/net/cmsg_so_priority.sh | 147 ++++++++++++++++++
+ 2 files changed, 157 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
 
-diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index 56d8bc5593d3..3ccbad881d74 100644
---- a/include/net/inet_sock.h
-+++ b/include/net/inet_sock.h
-@@ -172,7 +172,7 @@ struct inet_cork {
- 	u8			tx_flags;
- 	__u8			ttl;
- 	__s16			tos;
--	char			priority;
-+	u32			priority;
- 	__u16			gso_size;
- 	u32			ts_opt_id;
- 	u64			transmit_time;
-diff --git a/include/net/ip.h b/include/net/ip.h
-index 0e548c1f2a0e..9f5e33e371fc 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -81,7 +81,6 @@ struct ipcm_cookie {
- 	__u8			protocol;
- 	__u8			ttl;
- 	__s16			tos;
--	char			priority;
- 	__u16			gso_size;
- };
- 
-@@ -96,6 +95,7 @@ static inline void ipcm_init_sk(struct ipcm_cookie *ipcm,
- 	ipcm_init(ipcm);
- 
- 	ipcm->sockc.mark = READ_ONCE(inet->sk.sk_mark);
-+	ipcm->sockc.priority = READ_ONCE(inet->sk.sk_priority);
- 	ipcm->sockc.tsflags = READ_ONCE(inet->sk.sk_tsflags);
- 	ipcm->oif = READ_ONCE(inet->sk.sk_bound_dev_if);
- 	ipcm->addr = inet->inet_saddr;
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 7464e9f9f47c..316a34d6c48b 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1814,13 +1814,15 @@ struct sockcm_cookie {
- 	u32 mark;
- 	u32 tsflags;
- 	u32 ts_opt_id;
-+	u32 priority;
- };
- 
- static inline void sockcm_init(struct sockcm_cookie *sockc,
- 			       const struct sock *sk)
+diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/selftests/net/cmsg_sender.c
+index 876c2db02a63..5267eacc35df 100644
+--- a/tools/testing/selftests/net/cmsg_sender.c
++++ b/tools/testing/selftests/net/cmsg_sender.c
+@@ -52,6 +52,7 @@ struct options {
+ 		unsigned int tclass;
+ 		unsigned int hlimit;
+ 		unsigned int priority;
++		unsigned int priority_cmsg;
+ 	} sockopt;
+ 	struct {
+ 		unsigned int family;
+@@ -59,6 +60,7 @@ struct options {
+ 		unsigned int proto;
+ 	} sock;
+ 	struct option_cmsg_u32 mark;
++	struct option_cmsg_u32 priority_cmsg;
+ 	struct {
+ 		bool ena;
+ 		unsigned int delay;
+@@ -97,6 +99,7 @@ static void __attribute__((noreturn)) cs_usage(const char *bin)
+ 	       "\n"
+ 	       "\t\t-m val  Set SO_MARK with given value\n"
+ 	       "\t\t-M val  Set SO_MARK via setsockopt\n"
++		   "\t\t-Q val  Set SO_PRIORITY via cmsg\n"
+ 	       "\t\t-d val  Set SO_TXTIME with given delay (usec)\n"
+ 	       "\t\t-t      Enable time stamp reporting\n"
+ 	       "\t\t-f val  Set don't fragment via cmsg\n"
+@@ -115,7 +118,7 @@ static void cs_parse_args(int argc, char *argv[])
  {
- 	*sockc = (struct sockcm_cookie) {
--		.tsflags = READ_ONCE(sk->sk_tsflags)
-+		.tsflags = READ_ONCE(sk->sk_tsflags),
-+		.priority = READ_ONCE(sk->sk_priority),
- 	};
- }
+ 	int o;
  
-diff --git a/net/can/raw.c b/net/can/raw.c
-index 255c0a8f39d6..46e8ed9d64da 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -962,7 +962,7 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- 	}
- 
- 	skb->dev = dev;
--	skb->priority = READ_ONCE(sk->sk_priority);
-+	skb->priority = sockc.priority;
- 	skb->mark = READ_ONCE(sk->sk_mark);
- 	skb->tstamp = sockc.transmit_time;
- 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9016f984d44e..a3d9941c1d32 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2947,6 +2947,13 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
- 	case SCM_RIGHTS:
- 	case SCM_CREDENTIALS:
- 		break;
-+	case SO_PRIORITY:
-+		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-+			return -EINVAL;
-+		if (!sk_set_prio_allowed(sk, *(u32 *)CMSG_DATA(cmsg)))
-+			return -EPERM;
-+		sockc->priority = *(u32 *)CMSG_DATA(cmsg);
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 0065b1996c94..cd3e788600cc 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1328,7 +1328,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- 	cork->ttl = ipc->ttl;
- 	cork->tos = ipc->tos;
- 	cork->mark = ipc->sockc.mark;
--	cork->priority = ipc->priority;
-+	cork->priority = ipc->sockc.priority;
- 	cork->transmit_time = ipc->sockc.transmit_time;
- 	cork->tx_flags = 0;
- 	sock_tx_timestamp(sk, &ipc->sockc, &cork->tx_flags);
-@@ -1465,7 +1465,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
- 		ip_options_build(skb, opt, cork->addr, rt);
- 	}
- 
--	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
-+	skb->priority = cork->priority;
- 	skb->mark = cork->mark;
- 	if (sk_is_tcp(sk))
- 		skb_set_delivery_time(skb, cork->transmit_time, SKB_CLOCK_MONOTONIC);
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index cf377377b52d..f6a03b418dde 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -315,7 +315,7 @@ int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
- 			if (val < 0 || val > 255)
- 				return -EINVAL;
- 			ipc->tos = val;
--			ipc->priority = rt_tos2priority(ipc->tos);
-+			ipc->sockc.priority = rt_tos2priority(ipc->tos);
+-	while ((o = getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l:L:H:")) != -1) {
++	while ((o = getopt(argc, argv, "46sS:p:P:m:M:n:d:tf:F:c:C:l:L:H:Q:")) != -1) {
+ 		switch (o) {
+ 		case 's':
+ 			opt.silent_send = true;
+@@ -148,6 +151,10 @@ static void cs_parse_args(int argc, char *argv[])
+ 			opt.mark.ena = true;
+ 			opt.mark.val = atoi(optarg);
  			break;
- 		case IP_PROTOCOL:
- 			if (cmsg->cmsg_len != CMSG_LEN(sizeof(int)))
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index 0e9e01967ec9..4304a68d1db0 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -358,7 +358,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
- 	skb_reserve(skb, hlen);
++		case 'Q':
++			opt.priority_cmsg.ena = true;
++			opt.priority_cmsg.val = atoi(optarg);
++			break;
+ 		case 'M':
+ 			opt.sockopt.mark = atoi(optarg);
+ 			break;
+@@ -252,6 +259,8 @@ cs_write_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
  
- 	skb->protocol = htons(ETH_P_IP);
--	skb->priority = READ_ONCE(sk->sk_priority);
-+	skb->priority = sockc->priority;
- 	skb->mark = sockc->mark;
- 	skb_set_delivery_type_by_clockid(skb, sockc->transmit_time, sk->sk_clockid);
- 	skb_dst_set(skb, &rt->dst);
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index f7b4608bb316..ec9673b7ab16 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1401,6 +1401,7 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
- 	cork->base.gso_size = ipc6->gso_size;
- 	cork->base.tx_flags = 0;
- 	cork->base.mark = ipc6->sockc.mark;
-+	cork->base.priority = ipc6->sockc.priority;
- 	sock_tx_timestamp(sk, &ipc6->sockc, &cork->base.tx_flags);
- 	if (ipc6->sockc.tsflags & SOCKCM_FLAG_TS_OPT_ID) {
- 		cork->base.flags |= IPCORK_TS_OPT_ID;
-@@ -1939,7 +1940,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 	hdr->saddr = fl6->saddr;
- 	hdr->daddr = *final_dst;
- 
--	skb->priority = READ_ONCE(sk->sk_priority);
-+	skb->priority = cork->base.priority;
- 	skb->mark = cork->base.mark;
- 	if (sk_is_tcp(sk))
- 		skb_set_delivery_time(skb, cork->base.transmit_time, SKB_CLOCK_MONOTONIC);
-diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
-index 88b3fcacd4f9..46b8adf6e7f8 100644
---- a/net/ipv6/ping.c
-+++ b/net/ipv6/ping.c
-@@ -119,6 +119,7 @@ static int ping_v6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		return -EINVAL;
- 
- 	ipcm6_init_sk(&ipc6, sk);
-+	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
- 	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
- 	ipc6.sockc.mark = READ_ONCE(sk->sk_mark);
- 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 8476a3944a88..a45aba090aa4 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -619,7 +619,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	skb_reserve(skb, hlen);
- 
- 	skb->protocol = htons(ETH_P_IPV6);
--	skb->priority = READ_ONCE(sk->sk_priority);
-+	skb->priority = sockc->priority;
- 	skb->mark = sockc->mark;
- 	skb_set_delivery_type_by_clockid(skb, sockc->transmit_time, sk->sk_clockid);
- 
-@@ -780,6 +780,7 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	ipcm6_init(&ipc6);
- 	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
- 	ipc6.sockc.mark = fl6.flowi6_mark;
-+	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
- 
- 	if (sin6) {
- 		if (addr_len < SIN6_LEN_RFC2133)
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 0cef8ae5d1ea..dcce9fd33e98 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1353,6 +1353,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	ipc6.gso_size = READ_ONCE(up->gso_size);
- 	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
- 	ipc6.sockc.mark = READ_ONCE(sk->sk_mark);
-+	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
- 
- 	/* destination address check */
- 	if (sin6) {
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 886c0dd47b66..f8d87d622699 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -3126,7 +3126,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
- 
- 	skb->protocol = proto;
- 	skb->dev = dev;
--	skb->priority = READ_ONCE(sk->sk_priority);
-+	skb->priority = sockc.priority;
- 	skb->mark = sockc.mark;
- 	skb_set_delivery_type_by_clockid(skb, sockc.transmit_time, sk->sk_clockid);
- 
+ 	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+ 			  SOL_SOCKET, SO_MARK, &opt.mark);
++	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
++			SOL_SOCKET, SO_PRIORITY, &opt.priority_cmsg);
+ 	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+ 			  SOL_IPV6, IPV6_DONTFRAG, &opt.v6.dontfrag);
+ 	ca_write_cmsg_u32(cbuf, cbuf_sz, &cmsg_len,
+diff --git a/tools/testing/selftests/net/cmsg_so_priority.sh b/tools/testing/selftests/net/cmsg_so_priority.sh
+new file mode 100755
+index 000000000000..e5919c5ed1a4
+--- /dev/null
++++ b/tools/testing/selftests/net/cmsg_so_priority.sh
+@@ -0,0 +1,147 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++IP4=192.0.2.1/24
++TGT4=192.0.2.2/24
++TGT4_NO_MASK=192.0.2.2
++TGT4_RAW=192.0.2.3/24
++TGT4_RAW_NO_MASK=192.0.2.3
++IP6=2001:db8::1/64
++TGT6=2001:db8::2/64
++TGT6_NO_MASK=2001:db8::2
++TGT6_RAW=2001:db8::3/64
++TGT6_RAW_NO_MASK=2001:db8::3
++PORT=1234
++DELAY=4000
++
++
++create_filter() {
++
++    local ns=$1
++    local dev=$2
++    local handle=$3
++    local vlan_prio=$4
++    local ip_type=$5
++    local proto=$6
++    local dst_ip=$7
++
++    local cmd="tc -n $ns filter add dev $dev egress pref 1 handle $handle \
++    proto 802.1q flower vlan_prio $vlan_prio vlan_ethtype $ip_type"
++
++    if [[ "$proto" == "u" ]]; then
++        ip_proto="udp"
++    elif [[ "$ip_type" == "ipv4" && "$proto" == "i" ]]; then
++        ip_proto="icmp"
++    elif [[ "$ip_type" == "ipv6" && "$proto" == "i" ]]; then
++        ip_proto="icmpv6"
++    fi
++
++    if [[ "$proto" != "r" ]]; then
++        cmd="$cmd ip_proto $ip_proto"
++    fi
++
++    cmd="$cmd dst_ip $dst_ip action pass"
++
++    eval $cmd
++}
++
++TOTAL_TESTS=0
++FAILED_TESTS=0
++
++check_result() {
++    ((TOTAL_TESTS++))
++    if [ "$1" -ne 0 ]; then
++        ((FAILED_TESTS++))
++    fi
++}
++
++cleanup() {
++    ip link del dummy1 2>/dev/null
++    ip -n ns1 link del dummy1.10 2>/dev/null
++    ip netns del ns1 2>/dev/null
++}
++
++trap cleanup EXIT
++
++
++
++ip netns add ns1
++
++ip -n ns1 link set dev lo up
++ip -n ns1 link add name dummy1 up type dummy
++
++ip -n ns1 link add link dummy1 name dummy1.10 up type vlan id 10 \
++        egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
++
++ip -n ns1 address add $IP4 dev dummy1.10
++ip -n ns1 address add $IP6 dev dummy1.10
++
++ip netns exec ns1 bash -c "
++sysctl -w net.ipv4.ping_group_range='0 2147483647'
++exit"
++
++
++ip -n ns1 neigh add $TGT4_NO_MASK lladdr 00:11:22:33:44:55 nud permanent dev \
++        dummy1.10
++ip -n ns1 neigh add $TGT6_NO_MASK lladdr 00:11:22:33:44:55 nud permanent dev dummy1.10
++ip -n ns1 neigh add $TGT4_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud permanent dev dummy1.10
++ip -n ns1 neigh add $TGT6_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud permanent dev dummy1.10
++
++tc -n ns1 qdisc add dev dummy1 clsact
++
++FILTER_COUNTER=10
++
++for i in 4 6; do
++    for proto in u i r; do
++        echo "Test IPV$i, prot: $proto"
++        for priority in {0..7}; do
++            if [[ $i == 4 && $proto == "r" ]]; then
++                TGT=$TGT4_RAW_NO_MASK
++            elif [[ $i == 6 && $proto == "r" ]]; then
++                TGT=$TGT6_RAW_NO_MASK
++            elif [ $i == 4 ]; then
++                TGT=$TGT4_NO_MASK
++            else
++                TGT=$TGT6_NO_MASK
++            fi
++
++            handle="${FILTER_COUNTER}${priority}"
++
++            create_filter ns1 dummy1 $handle $priority ipv$i $proto $TGT
++
++            pkts=$(tc -n ns1 -j -s filter show dev dummy1 egress \
++                | jq ".[] | select(.options.handle == ${handle}) | \
++                .options.actions[0].stats.packets")
++
++            if [[ $pkts == 0 ]]; then
++                check_result 0
++            else
++                echo "prio $priority: expected 0, got $pkts"
++                check_result 1
++            fi
++
++            ip netns exec ns1 ./cmsg_sender -$i -Q $priority -d "${DELAY}" -p $proto $TGT $PORT
++            ip netns exec ns1 ./cmsg_sender -$i -P $priority -d "${DELAY}" -p $proto $TGT $PORT
++
++
++            pkts=$(tc -n ns1 -j -s filter show dev dummy1 egress \
++                | jq ".[] | select(.options.handle == ${handle}) | \
++                .options.actions[0].stats.packets")
++            if [[ $pkts == 2 ]]; then
++                check_result 0
++            else
++                echo "prio $priority: expected 2, got $pkts"
++                check_result 1
++            fi
++        done
++        FILTER_COUNTER=$((FILTER_COUNTER + 10))
++    done
++done
++
++if [ $FAILED_TESTS -ne 0 ]; then
++    echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
++    exit 1
++else
++    echo "OK - All $TOTAL_TESTS tests passed"
++    exit 0
++fi
 -- 
 2.43.0
 
