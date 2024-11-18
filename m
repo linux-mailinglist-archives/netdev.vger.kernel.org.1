@@ -1,158 +1,212 @@
-Return-Path: <netdev+bounces-145799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1599D0F60
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:14:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5459D0F47
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:11:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0E9BB2EE1A
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:52:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E362B27DB1
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524F7199230;
-	Mon, 18 Nov 2024 10:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD550198A33;
+	Mon, 18 Nov 2024 11:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2QMRM1DI"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ekl0NLE7"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813EE198E9E;
-	Mon, 18 Nov 2024 10:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C45B14F102
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 11:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731927055; cv=none; b=EyCp86qQBXkGRbrm+lji1C0hOHZLxiAV9vFG8VHoakiNptdW/Z84zdFaU8xxNTb+PKfjuy2ce5hST+biCdOnAhvf0SX1TZKTcfJDYiIgSOq8i7fOrC9Jpe1l8WpOnph/B56QRZClF/4tr6CMRVGfYRQg88o9KaCTEuRHyIinwFk=
+	t=1731928006; cv=none; b=KRQPf/WrVjJNsxygyygbxaQyJclFIphWKyhoGEDk4EywSulmRTALB6hNHqk/7PLvtXVgPssnpljkeJyFRI8erVNnu1UBmEJ6eDcfnBpRB9jkVdAof9UK6KJjskMKixyAstChs20xAvghT4JveAS4fmdG2LTjbkP4VLNKPRXMUvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731927055; c=relaxed/simple;
-	bh=WHcuBnfq6kHAKbfDJXcBfPiEZxhyghgKgTGkb1xpg/A=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMg0KcyrUl2ATwvcONypVqCgecT5gSQVmj0cMetYcDct12DFctbppNIGZ+Mx0AV8ciPssSGy8+GUEVdqTAYa1f5VyA98REiy9aYHIbQ6j05db4f9iBHhGOZfVO2mnpjBA5NSJtJVKeBl2WxGycjQY7SsnFGk3KRdyXqhsfqoW5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2QMRM1DI; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1731927053; x=1763463053;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WHcuBnfq6kHAKbfDJXcBfPiEZxhyghgKgTGkb1xpg/A=;
-  b=2QMRM1DIElhNIshC7/I3idPgfU1jdX2m2bo1ySDwSOdOGgXIKz0USFxA
-   r8AqU3rvUqav7kUK4gr4Wy4A9lzOGoJXE1dvT88dzepPitXuLUHJ2RdJO
-   UnV7YQdJgzF5Qayp2EnYfHSSkR1gdPNNee12zIziXOJ8R8hQzk/0PkPDt
-   jeozMDdaO3zyK32t/TkvAcZQL6Tj1tq12USNGyepjJj9dj3w7GYnBvxTU
-   PzOUgjdfzrcYWkPJosTKmjx/RxXjFuakQJz9qWcOGebmdKzPIvigR8MyP
-   UtBNLxr7IRKhht4GCE7Eh6NtzyUvz2rdfy21aCHAs2gs4+R9dF2qH149A
-   Q==;
-X-CSE-ConnectionGUID: uRFJ4ooxRyO7bYFqsKsN5w==
-X-CSE-MsgGUID: G0gMqKqvRCGGT/jdUE4tjA==
-X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
-   d="scan'208";a="34949119"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Nov 2024 03:50:47 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Nov 2024 03:50:29 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 18 Nov 2024 03:50:25 -0700
-Date: Mon, 18 Nov 2024 10:50:25 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Conor Dooley <conor@kernel.org>
-CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
-	<jacob.e.keller@intel.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <devicetree@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2 8/8] dt-bindings: net: sparx5: document RGMII
- MAC delays
-Message-ID: <20241118105025.hjtji5cnl75rcrb4@DEN-DL-M70577>
-References: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
- <20241113-sparx5-lan969x-switch-driver-4-v2-8-0db98ac096d1@microchip.com>
- <20241114-liquefy-chasing-a85e284f14b9@spud>
+	s=arc-20240116; t=1731928006; c=relaxed/simple;
+	bh=IFcBtIn1LqFVelHm7kG7/Vy3ppN0z+ueq8gYg8sWEas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U6xaeoVrTWohA6Nno+piV0FOQPuAo1rwP/4zPUbtvZwfLcnXTeRCfluZj1IWOrdabYMGVFbOi8Zxa9aQhmthuPUM8vurUWA+hJKG9nU7/wbBw+re5YucVz3fS1vySIiwpusAOifgsf9ktKAe55OtpsCw0XHHna6cgAlWqovkM+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ekl0NLE7; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3822ec43fb0so2065616f8f.3
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 03:06:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1731928002; x=1732532802; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Q4K7ZFgLQYJQlGAzpq8RK54g3EqKOomWWOR+yhsr1qw=;
+        b=ekl0NLE713WVl+0iqMFWCUeOyXGpS1GTBNAadeC6CjQrpdNj1R2nypLRGP2uJjakH3
+         ma6jZAiH77JhVsgZkswVXE9+2l5Yia2YLgFg6gsC88yso321GFZfT27iEKVPgSJFNaM9
+         2W2NPkP0iv4jC4RM8EWyzp5JMVGQUDyQPWB8SMNIP/y8oyb8Hywli7WQnPgfo82zPfG6
+         rQCdFl5UhQJc+FctTaghJ0W1GD9XLogikkThFP7hwAl0gs65J49G1fTmGWNGUnJTfluX
+         zSVJrdJLD7Qsye3TVFGals+IXJ9hPI7Ba9b3ytrQIA7bHxP9wm9EHtPjUxegLnu5oju/
+         lOmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731928002; x=1732532802;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q4K7ZFgLQYJQlGAzpq8RK54g3EqKOomWWOR+yhsr1qw=;
+        b=kw+k0boEKGHysJGk/7MScZ8mvIl4h3dk5SpJDswOeudB3RumCSzauiDghSYQ1qAPbz
+         YblKRtMBVaDNOstOpZLyaXMMc6XYQSwPZ8GU5qLzhf3znMLf6+tkrt3C2fhd0gsMuiU2
+         cKyM8HR/UkGeiJ8nw2yCp+2437QCZPM/KEPP0PTnloUP7iZ0tGKzaScRNQF5DxjhrmtP
+         f59EteYA/1WctMSR/SadZHg06d8LwZyem3SwIEdJb6mfDM6xTVgWiobkEBiqIf120VKM
+         h+7T5xHJQPbo3ETsekEEDjpd5JM+TAMNAtuaIgtCCRZ3p0JxfbUw9g8kuoIpidHgBLw5
+         BCeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3aq6f3stTtFAuSNmbC4k/lFjvfY24Pdpwp7oLn6ufbrbNlxFwKJJPEMMgXM0ouA/iHe1B+QU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUQTdcNP26mKb83kyOqIfcLSRpo3egKzvQOMr7wC5cse1XdRda
+	6Ntg2blkhreSHOZhLNeQJWXg3jZ/10mfmREj0O3/oQC9TL6f464PrIKnR6fq0GY=
+X-Google-Smtp-Source: AGHT+IEHvVmgRYFNhCs4UC7E5RjVk5JwGYVdnUZOYcUXsiEIWSohYFEZO8cTVp2lMrq4C8xPl0BQ1Q==
+X-Received: by 2002:a05:6000:18af:b0:37d:4ef1:1820 with SMTP id ffacd0b85a97d-38225a91e80mr10392779f8f.40.1731928002298;
+        Mon, 18 Nov 2024 03:06:42 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.50])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38242eef982sm4319340f8f.8.2024.11.18.03.06.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2024 03:06:41 -0800 (PST)
+Date: Mon, 18 Nov 2024 12:06:34 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Easwar Hariharan <eahariha@linux.microsoft.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>,
+	Nicolas Palix <nicolas.palix@imag.fr>,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	James Smart <james.smart@broadcom.com>,
+	Dick Kennedy <dick.kennedy@broadcom.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+	Joe Lawrence <joe.lawrence@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Lucas Stach <l.stach@pengutronix.de>,
+	Russell King <linux+etnaviv@armlinux.org.uk>,
+	Christian Gmeiner <christian.gmeiner@gmail.com>,
+	Louis Peens <louis.peens@corigine.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
+	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org,
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org,
+	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org,
+	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org,
+	linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org,
+	oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>
+Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to secs_to_jiffies()
+Message-ID: <Zzsfuuv3AVomkMxn@pathway.suse.cz>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+ <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com>
+ <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241114-liquefy-chasing-a85e284f14b9@spud>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu>
 
-Hi Conor,
-
-> > The lan969x switch device supports two RGMII port interfaces that can be
-> > configured for MAC level rx and tx delays.
+On Sat 2024-11-16 11:10:52, Christophe Leroy wrote:
+> 
+> 
+> Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
+> > [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
 > > 
-> > Document two new properties {rx,tx}-internal-delay-ps. Make them
-> > required properties, if the phy-mode is one of: rgmii, rgmii_id,
-> > rgmii-rxid or rgmii-txid. Also specify accepted values.
+> > Changes made with the following Coccinelle rules:
 > > 
-> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> > @@ constant C; @@
+> > 
+> > - msecs_to_jiffies(C * 1000)
+> > + secs_to_jiffies(C)
+> > 
+> > @@ constant C; @@
+> > 
+> > - msecs_to_jiffies(C * MSEC_PER_SEC)
+> > + secs_to_jiffies(C)
+> > 
+> > Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 > > ---
-> >  .../bindings/net/microchip,sparx5-switch.yaml        | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
+> >   samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
+> >   samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
+> >   samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
+> >   3 files changed, 7 insertions(+), 7 deletions(-)
 > > 
-> > diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> > index dedfad526666..a3f2b70c5c77 100644
-> > --- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> > +++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> > @@ -129,6 +129,26 @@ properties:
-> >              minimum: 0
-> >              maximum: 383
-> >  
-> > +        allOf:
-> > +          - if:
-> > +              properties:
-> > +                phy-mode:
-> > +                  contains:
-> > +                    enum:
-> > +                      - rgmii
-> > +                      - rgmii-rxid
-> > +                      - rgmii-txid
-> > +                      - rgmii-id
-> > +            then:
-> > +              properties:
-> > +                rx-internal-delay-ps:
-> > +                  enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
-> > +                tx-internal-delay-ps:
-> > +                  enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
+> > diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
+> > index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
+> > --- a/samples/livepatch/livepatch-callbacks-busymod.c
+> > +++ b/samples/livepatch/livepatch-callbacks-busymod.c
+> > @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
+> >   {
+> >          pr_info("%s\n", __func__);
+> >          schedule_delayed_work(&work,
+> > -               msecs_to_jiffies(1000 * 0));
+> > +               secs_to_jiffies(0));
 > 
-> Properties should be define at the top level and constrained in the
-> if/then parts. Please move the property definitions out, and just leave
-> the required: bit here.
-> 
-> > +              required:
-> > +                - rx-internal-delay-ps
-> > +                - tx-internal-delay-ps
-> 
-> You've got no else, so these properties are valid even for !rgmii?
-> 
-> > +
-> >          required:
-> >            - reg
-> >            - phys
-> 
-> Additionally, please move the conditional bits below the required
-> property list.
-> 
-> Cheers,
-> Conor.
+> Using secs_to_jiffies() is pointless, 0 is universal, should become
+> schedule_delayed_work(&work, 0);
 
-I will be getting rid of the 'required' constraints in v3. What I hear
-you say, is that the two {rx,tx}-internal-delay-ps properties (incl.
-their enum values) should be moved out of the if/else and to the
-top-level - can you confirm this? Is specifying the values
-a property can take not considered a constraint?
+Yes, schedule_delayed_work(&work, 0) looks like the right solution.
 
-Thanks,
-Daniel
+Or even better, it seems that the delayed work might get replaced by
+a normal workqueue work.
+
+Anyway, I am working on a patchset which would remove this sample
+module. There is no need to put much effort into the clean up
+of this particular module. Do whatever is easiest for you.
+
+Best Regards,
+Petr
 
