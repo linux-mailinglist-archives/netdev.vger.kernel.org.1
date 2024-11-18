@@ -1,188 +1,197 @@
-Return-Path: <netdev+bounces-145819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E10139D109F
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:36:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FEDF9D10F0
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71AA31F232F1
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:36:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51BB4282E3B
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FA819AA68;
-	Mon, 18 Nov 2024 12:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E3F19884B;
+	Mon, 18 Nov 2024 12:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHCHKx4z"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="si6TuWGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BDD19A288
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B48014B07E;
+	Mon, 18 Nov 2024 12:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731933391; cv=none; b=qsWgd7hZ7Gee5oZDhGdzKsBY9efNN0kvnsusigtDFpxeQndyxMNosQLYWuSt1omm3yqiBY0E+QDp/DXcFtcIPRWWV9mini9q0gNZosCRViuvKXtBVaEILo4TFzLL32OYayGYSbO0Pxr3Tb9JTVHYJE5Ld/ZwVvsasXxtmPKT3SA=
+	t=1731934223; cv=none; b=Ujbbqnt2v8Jt1Ah1jYZgPOMunkaVvxE6+4BjT3oN028rMFENllRRHfWlLqwDcbC2srgluTWaOnqBSENZNQklqxV6ssVOh2jj9zKKY2yB18jjAZvWjEue+YpPoCcrUSIkPXk0rVZTvbySgMnRf77VkAYTTsFsMuMZ4qLI/89ZEtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731933391; c=relaxed/simple;
-	bh=au7Wcy3zIXPA3cFUczTfmlpykExc9P15BO1mTJXuI7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n0Xqu34sgz1CuWBo5qGCkn0buKBMjxQ6whLYkdYr1hOUcD3N8bIvSBTvI47edleWEaQ9sGld7wmgucHDd8wT9go1kOXuWfGWQyCU8mcQYBkiqjxhShmnCGtWfUlNWDoTmt8r698dlfxfqkkYtC1JR69Qr76L4kxuHrFMYpMqIU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHCHKx4z; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so1639288a12.1
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 04:36:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731933389; x=1732538189; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7KJ5UNj9SfGuydcrxRB331ERZl4+gXJ85bx84sJ/8k8=;
-        b=PHCHKx4zQpVcxKLx/fxkw+6d3R8HGmSVyG7g0oDlYwseFx2BUyyq2x+/wnNWnwFrN5
-         O+/jjd4+wKxR/RaIi9RYE6ZQh5ivs2Qnj3Dgmn5hExHyjcP2x4cEYMi/8zDhccRNCb2j
-         WFtJN+wvUMh90SloiDNOMB2NtJfwoqOOaNCHpVgncUtF8ksmTwOPm34IdHRP8JbO6Baz
-         AHCh0++DaI3lQynHeyP2tE18waX8nXRfRmtg4wBQH+8me/Y4Sr47ftKufK9qYMDuVsG6
-         l0ytgsCcXh/v5hmehAdvbBRnKBwtYSaOMnAa093ekMZ411bUyXzBHqLFm3xEJbrODmrm
-         R1ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731933389; x=1732538189;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7KJ5UNj9SfGuydcrxRB331ERZl4+gXJ85bx84sJ/8k8=;
-        b=vKbS/+aejirhKjBCNXu13XomnPYADKLxfejyrlaVRwxLWHymRzENWyFe4tGjohvcWR
-         +dW7kzciuSY5Jvoa85gpwX3vFIdsaaV1Tzm8101JizI+6xbBTUI288nExtDVBSm9OjOf
-         vqVwr2bQZh3phtYE+HkRCC989B/FEMAizHci26AJ13AdOMGWw4namh8AdwkHc1TX5YF2
-         N3P88mdAg9hw23EueL58Irzqus4MhxqeC2fsK/SDBAsMM9BIKdDUXPC8V5ysZj9wwxjs
-         ithX7lFnEomtHesDbytD9Fs6FK7I5RiYPhF/0fCHa46v0JJHIeqQ8WkFVBLYoGVhbLEc
-         cBKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWqECAD/VICEyV9piSJfxGoB23tvwOz0R8MjOqlr+n8nWezXzylMP5LlPoDqPWy+cETe1X7QIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYumvX/tnIGAnI0Mk1+TAi5+hfgDCKqIcWMvKVXDIuWGI93PS1
-	Ka/5T56FAMR/7X5+ivzNdRfyY2FB4oIA+aheZZKGY3iEgu4eIdIG
-X-Google-Smtp-Source: AGHT+IEnct71WolKRfBHKW6axNOm/sCfEZKazpHBYZOPbw5fSe3JV7G5kjMP5QCQYfcOnyo/pFGO2A==
-X-Received: by 2002:a05:6a20:12d0:b0:1db:fff7:25d5 with SMTP id adf61e73a8af0-1dc90b47573mr17650530637.19.1731933388603;
-        Mon, 18 Nov 2024 04:36:28 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724770eef34sm6133220b3a.8.2024.11.18.04.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 04:36:27 -0800 (PST)
-Date: Mon, 18 Nov 2024 12:36:20 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	roopa@cumulusnetworks.com, jiri@resnulli.us,
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com,
-	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>
-Subject: Re: [PATCH iproute2-next] iproute2: add 'ip monitor mcaddr' support
-Message-ID: <Zzs0xDi-3jdQSuk0@fedora>
-References: <20241117141655.2078777-1-yuyanghuang@google.com>
+	s=arc-20240116; t=1731934223; c=relaxed/simple;
+	bh=s58+oJpUcZU53E8zvr9EuG43vMWpmCCxA/lYnCWlie0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=MOhkVwwXvFW2uaNpRLhl1Vsit3rMsSVapG0U9i3A8N7dtWfy3IchgmYoweWJT5u05I08/v412YagrhovqEYCIX+24JmytRnIS8BqAI4NOznMrFaQeyGxebY1aFTD8Qmp2cpkGPREyxuCSbHfc5w6wYq+QdBy9YwSN5AUAaNJ//0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=si6TuWGl; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id 4063283838;
+	Mon, 18 Nov 2024 14:41:37 +0200 (EET)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS;
+	Mon, 18 Nov 2024 14:41:36 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 7D5553026AC;
+	Mon, 18 Nov 2024 14:41:25 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1731933686; bh=s58+oJpUcZU53E8zvr9EuG43vMWpmCCxA/lYnCWlie0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=si6TuWGlYBk+G6fQqyuo9TlTiEl6043HtoNQHe+IIoPBtwwMj3UWFkDQyq2VSIaDo
+	 +4GmqhYXrYKydei89Nsky+aPap/JMujkMQl2fi0XxSXBIb5TfnK492EcxKAjZ5X3Ba
+	 elu5nyO9AmeHEQgX2MdmaFtExY9aP4Kpn2LjPuDU=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4AICfNOD034252;
+	Mon, 18 Nov 2024 14:41:23 +0200
+Date: Mon, 18 Nov 2024 14:41:23 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: Jinghao Jia <jinghao7@illinois.edu>
+cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+        netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev,
+        kernel test robot <lkp@intel.com>, Ruowen Qin <ruqin@redhat.com>
+Subject: Re: [PATCH] ipvs: fix UB due to uninitialized stack access in
+ ip_vs_protocol_init()
+In-Reply-To: <20241111065105.82431-1-jinghao7@illinois.edu>
+Message-ID: <f97ef69b-a15e-03ab-5e24-c1dfd3c4542b@ssi.bg>
+References: <20241111065105.82431-1-jinghao7@illinois.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241117141655.2078777-1-yuyanghuang@google.com>
+Content-Type: text/plain; charset=US-ASCII
 
-On Sun, Nov 17, 2024 at 11:16:55PM +0900, Yuyang Huang wrote:
-> Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
-> multicast addresses. This update allows the command to listen for
-> events related to multicast address additions and deletions by
-> registering to the newly introduced RTNLGRP_IPV4_MCADDR and
-> RTNLGRP_IPV6_MCADDR netlink groups.
+
+	Hello,
+
+On Mon, 11 Nov 2024, Jinghao Jia wrote:
+
+> Under certain kernel configurations when building with Clang/LLVM, the
+> compiler does not generate a return or jump as the terminator
+> instruction for ip_vs_protocol_init(), triggering the following objtool
+> warning during build time:
 > 
-> This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
-> and RTNLGRP_IPV6_MCADDR being merged first.
+>   vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
 > 
-> Here is an example usage:
+> At runtime, this either causes an oops when trying to load the ipvs
+> module or a boot-time panic if ipvs is built-in. This same issue has
+> been reported by the Intel kernel test robot previously.
 > 
-> root@uml-x86-64:/# ip monitor mcaddr
-> 8: nettest123    inet6 mcast ff01::1 scope global
-> 8: nettest123    inet6 mcast ff02::1 scope global
-> 8: nettest123    inet mcast 224.0.0.1 scope link
-> 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-> Deleted 8: nettest123    inet mcast 224.0.0.1 scope link
-> Deleted 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-> Deleted 8: nettest123    inet6 mcast ff02::1 scope global
+> Digging deeper into both LLVM and the kernel code reveals this to be a
+> undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
+> of 64 chars to store the registered protocol names and leaves it
+> uninitialized after definition. The function calls strnlen() when
+> concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
+> strnlen() performs an extra step to check whether the last byte of the
+> input char buffer is a null character (commit 3009f891bb9f ("fortify:
+> Allow strlen() and strnlen() to pass compile-time known lengths")).
+> This, together with possibly other configurations, cause the following
+> IR to be generated:
 > 
-> Cc: Maciej Żenczykowski <maze@google.com>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+>   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
+>     %1 = alloca [64 x i8], align 16
+>     ...
+> 
+>   14:                                               ; preds = %11
+>     %15 = getelementptr inbounds i8, ptr %1, i64 63
+>     %16 = load i8, ptr %15, align 1
+>     %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
+>     %18 = icmp eq i8 %16, 0
+>     %19 = select i1 %17, i1 %18, i1 false
+>     br i1 %19, label %20, label %23
+> 
+>   20:                                               ; preds = %14
+>     %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
+>     ...
+> 
+>   23:                                               ; preds = %14, %11, %20
+>     %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
+>     ...
+>   }
+> 
+> The above code calculates the address of the last char in the buffer
+> (value %15) and then loads from it (value %16). Because the buffer is
+> never initialized, the LLVM GVN pass marks value %16 as undefined:
+> 
+>   %13 = getelementptr inbounds i8, ptr %1, i64 63
+>   br i1 undef, label %14, label %17
+> 
+> This gives later passes (SCCP, in particular) to more DCE opportunities
+> by propagating the undef value further, and eventually removes
+> everything after the load on the uninitialized stack location:
+> 
+>   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
+>     %1 = alloca [64 x i8], align 16
+>     ...
+> 
+>   12:                                               ; preds = %11
+>     %13 = getelementptr inbounds i8, ptr %1, i64 63
+>     unreachable
+>   }
+> 
+> In this way, the generated native code will just fall through to the
+> next function, as LLVM does not generate any code for the unreachable IR
+> instruction and leaves the function without a terminator.
+> 
+> Zero the on-stack buffer to avoid this possible UB.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
+> Co-developed-by: Ruowen Qin <ruqin@redhat.com>
+> Signed-off-by: Ruowen Qin <ruqin@redhat.com>
+> Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
+
+	Looks good to me, thanks! I assume it is for
+net-next/nf-next, right?
+
+Acked-by: Julian Anastasov <ja@ssi.bg>
+
 > ---
->  include/uapi/linux/rtnetlink.h |  8 ++++++++
->  ip/ipaddress.c                 | 17 +++++++++++++++--
->  ip/ipmonitor.c                 | 25 ++++++++++++++++++++++++-
->  3 files changed, 47 insertions(+), 3 deletions(-)
+>  net/netfilter/ipvs/ip_vs_proto.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
-> index 4e6c8e14..ccf26bf1 100644
-> --- a/include/uapi/linux/rtnetlink.h
-> +++ b/include/uapi/linux/rtnetlink.h
-> @@ -93,6 +93,10 @@ enum {
->  	RTM_NEWPREFIX	= 52,
->  #define RTM_NEWPREFIX	RTM_NEWPREFIX
+> diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
+> index f100da4ba3bc..a9fd1d3fc2cb 100644
+> --- a/net/netfilter/ipvs/ip_vs_proto.c
+> +++ b/net/netfilter/ipvs/ip_vs_proto.c
+> @@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
 >  
-> +	RTM_NEWMULTICAST,
-> +#define RTM_NEWMULTICAST RTM_NEWMULTICAST
-> +	RTM_DELMULTICAST,
-> +#define RTM_DELMULTICAST RTM_DELMULTICAST
->  	RTM_GETMULTICAST = 58,
->  #define RTM_GETMULTICAST RTM_GETMULTICAST
+>  int __init ip_vs_protocol_init(void)
+>  {
+> -	char protocols[64];
+> +	char protocols[64] = { 0 };
+>  #define REGISTER_PROTOCOL(p)			\
+>  	do {					\
+>  		register_ip_vs_protocol(p);	\
+> @@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
+>  		strcat(protocols, (p)->name);	\
+>  	} while (0)
 >  
-> @@ -772,6 +776,10 @@ enum rtnetlink_groups {
->  #define RTNLGRP_TUNNEL		RTNLGRP_TUNNEL
->  	RTNLGRP_STATS,
->  #define RTNLGRP_STATS		RTNLGRP_STATS
-> +	RTNLGRP_IPV4_MCADDR,
-> +#define RTNLGRP_IPV4_MCADDR	RTNLGRP_IPV4_MCADDR
-> +	RTNLGRP_IPV6_MCADDR,
-> +#define RTNLGRP_IPV6_MCADDR    RTNLGRP_IPV6_MCADDR
->  	__RTNLGRP_MAX
->  };
->  #define RTNLGRP_MAX	(__RTNLGRP_MAX - 1)
+> -	protocols[0] = '\0';
+> -	protocols[2] = '\0';
+>  #ifdef CONFIG_IP_VS_PROTO_TCP
+>  	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
+>  #endif
+> -- 
+> 2.47.0
 
-No need changes for headers. Stephen will sync the headers.
+Regards
 
-> @@ -220,6 +226,8 @@ int do_ipmonitor(int argc, char **argv)
->  			lmask |= IPMON_LNEXTHOP;
->  		} else if (strcmp(*argv, "stats") == 0) {
->  			lmask |= IPMON_LSTATS;
-> +		} else if (strcmp(*argv, "mcaddr") == 0) {
-> +			lmask |= IPMON_LMCADDR;
->  		} else if (strcmp(*argv, "all") == 0) {
->  			prefix_banner = 1;
->  		} else if (matches(*argv, "all-nsid") == 0) {
-> @@ -326,6 +334,21 @@ int do_ipmonitor(int argc, char **argv)
->  		exit(1);
->  	}
->  
-> +	if (lmask & IPMON_LMCADDR) {
-> +		if ((!preferred_family || preferred_family == AF_INET) &&
-> +			rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
+--
+Julian Anastasov <ja@ssi.bg>
 
-The rtnl_add_nl_group() should be aligned with the upper bracket. e.g.
-
-		if ((!preferred_family || preferred_family == AF_INET) &&
-		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
-
-> +			fprintf(stderr,
-> +				"Failed to add ipv4 mcaddr group to list\n");
-> +			exit(1);
-> +		}
-> +		if ((!preferred_family || preferred_family == AF_INET6) &&
-> +			rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
-
-Same with this one.
-
-Thanks
-Hangbin
 
