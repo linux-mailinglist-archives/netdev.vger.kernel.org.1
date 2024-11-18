@@ -1,67 +1,52 @@
-Return-Path: <netdev+bounces-145829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C699D1142
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:03:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7949D1177
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2683AB2649E
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:03:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBE15B21B65
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055961ABEA5;
-	Mon, 18 Nov 2024 13:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C025195FD1;
+	Mon, 18 Nov 2024 13:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TmHIZutI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOCS299h"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BCB21A265E;
-	Mon, 18 Nov 2024 13:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAD71E49B;
+	Mon, 18 Nov 2024 13:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731934886; cv=none; b=MxaiG5uirDbJRhfO9ccR2KHgS3FyfSH49532hmV66l4JJEOXvEv0xBxGStM0+pXtls1KKoyJYaTwy2QUCwyADAfT9Q4uBFN62hgvgCYYvagVn5vjkdzpygTPgrDbRbURVVGzmcXQGeyNDtILmX6hmMZMt7oX2TATCqe0g1CerK8=
+	t=1731935383; cv=none; b=Xyrm15qg1GRYWDxFrxD/u1qY6eXv6/unul9OxYZ6noP7AV/pB2MQNKsXg3Yzsfu8WtsVW7m7kK2DNzHE5JeGRlNZKPBo7Wl4VVZHsaqP5ntLUa/U5nAlIvnac2enUllKErUuHfBLAE0IRv89uN67m4kT9Imi8k1XTaBHp/sbV6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731934886; c=relaxed/simple;
-	bh=o0gsQLUEQBwVaB8DL86kcJ9iRFqkRAgI0i6UZvCJDyI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=slCY9CuC6J0+lMTSa6407FcaP2Uv0HmKyLIxDaXWvLRCjCYFWjSzjeDfGgLKmau7RqR7IN5CYLIG5GKyXlkQfHw4M5TVyLUNRqHUP3sPZjTgbCDCE8561i1rD+FclS+EQxGfDynPnzZE2tRRVANLananNQ0iVRFNpuPfTrZAAR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TmHIZutI; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1731934885; x=1763470885;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=o0gsQLUEQBwVaB8DL86kcJ9iRFqkRAgI0i6UZvCJDyI=;
-  b=TmHIZutISu5tTFRuV+GlLKmvNNLdecHTdrYsLTklY8RTihLvWJ6vTlPu
-   ZRYaINqTEJf1lU06bMx2g9eUjOLqyJuNH/pixSh8/9w6IgqTjZYuQ8SWG
-   zRMrHhnHvaqfmYNnkACup+6vRQhlwFfujqzGs8I1EhoDL/mSulc9DFmEy
-   vpWRKpopuvWbc4AgLRSPR7Q9LRwRXokk4APm/shiVcXqQGyVpURw1fkHW
-   P6TZKzEYx2uuB021/Do0EEVlQhBcNKg/h9Me1lcqthuruUgkCQFrpfOcZ
-   wr2Drp1z/NEsrHbEk94dD5ozoRUPjnJiny9jtfAeSPxtB5aE3AmEhDyzW
-   g==;
-X-CSE-ConnectionGUID: grjwx8pqQyysg5Oh3PusIg==
-X-CSE-MsgGUID: HYC7+POhSx6IjTmEcIZbtA==
-X-IronPort-AV: E=Sophos;i="6.12,164,1728975600"; 
-   d="scan'208";a="201886260"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Nov 2024 06:01:24 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Nov 2024 06:01:22 -0700
-Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 18 Nov 2024 06:01:19 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Mon, 18 Nov 2024 14:00:54 +0100
-Subject: [PATCH net-next v3 8/8] dt-bindings: net: sparx5: document RGMII
- delays
+	s=arc-20240116; t=1731935383; c=relaxed/simple;
+	bh=cQo4iAMdE75Iju1hmRvTp8v+SSIrunOvBCkb1Gi4F2E=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ULOrakvaSX5HZN20FCEln7b/Ba45ENh8AyaEdhe5HmiZdaYadkNNdd1JU8XpPd4j7OtNwRptq4Te9wF7DfaE8N2TvG2R2fcBPyPGyfYqt8mKFWb6enbgtDW3fSfZweNOD5Ptg44KJkGBiq9QqXJjbqjvPGUMLWhyaJP+okezZok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOCS299h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B8AA0C4CECC;
+	Mon, 18 Nov 2024 13:09:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731935381;
+	bh=cQo4iAMdE75Iju1hmRvTp8v+SSIrunOvBCkb1Gi4F2E=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=hOCS299hs+zrZICivNdsbZn90+4ryiqcy4A6IfFKQqJdNjPqtuc0b6nXQIyZ+QTtD
+	 2r0f1E2Nd/Khv/yzP5CAXaMdGVEPvs2Ea5BTJIEaa16kp+d80+LLHcFAhXNugG3ucL
+	 XKjE4/5l8q3Lv7IFd5YcRzN7Yb/MAp/SRR+O7z1TveTepu0m/EEzxLGf2D8gWi1pIz
+	 5GxPzS2p+XfSDm9UvYSB1exFSKSTcTVrYDRuWdLjY0gEbokm8qvTrozBo0cLFLiaPb
+	 iePIowrO8kUZ0VLTPlEnTMA9fMhaW+pLy2zrAQof2HJ3XKYdCBVuNC++j+JdemNLJv
+	 v+SJDxhTNJrcA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A46AED4921E;
+	Mon, 18 Nov 2024 13:09:41 +0000 (UTC)
+From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
+Date: Mon, 18 Nov 2024 18:39:34 +0530
+Subject: [PATCH net-next] net: phy: qt2025: simplify Result<()> in probe
+ return
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,64 +55,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241118-sparx5-lan969x-switch-driver-4-v3-8-3cefee5e7e3a@microchip.com>
-References: <20241118-sparx5-lan969x-switch-driver-4-v3-0-3cefee5e7e3a@microchip.com>
-In-Reply-To: <20241118-sparx5-lan969x-switch-driver-4-v3-0-3cefee5e7e3a@microchip.com>
-To: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
-	<jacob.e.keller@intel.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>
-CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-X-Mailer: b4 0.14-dev
+Message-Id: <20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in>
+X-B4-Tracking: v=1; b=H4sIAI48O2cC/x2MSwqDQBAFryK9tsH2A+pVgouoz6RBRzM9EUW8e
+ 4Ysi6LqIoNXGLXJRR67mq4ugqQJDe+ne4F1jEx5lpciUrPpss06nexh3znwJ0RVsfR904w1qgI
+ DxXjzmPT4jx/kENjhCNTd9w9rgZsTcgAAAA==
+X-Change-ID: 20241118-simplify-result-qt2025-1bb99d8e53ec
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, 
+ Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Manas <manas18244@iiitd.ac.in>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1731935374; l=1232;
+ i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
+ bh=b+u/enFxPC2OQb24qeuinsUzhoPbbFPNjp30yv8A78E=;
+ b=VVCd959mHl3fdAs00yFofntkbHvAfCQ2XltcauKLxVDNZfmtVWdVj1Nm4rF9y767uXY4UvSAY
+ qf/QRFW7KT3CjzzeOo61XIcbXoEmUYDUqLjvqyWWmeNhZuE4CwcHlJT
+X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
+ pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
+X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
+ auth_id=196
+X-Original-From: Manas <manas18244@iiitd.ac.in>
+Reply-To: manas18244@iiitd.ac.in
 
-The lan969x switch device supports two RGMII port interfaces that can be
-configured for MAC level rx and tx delays.
+From: Manas <manas18244@iiitd.ac.in>
 
-Document two new properties {rx,tx}-internal-delay-ps. Make them
-required properties, if the phy-mode is one of: rgmii, rgmii_id,
-rgmii-rxid or rgmii-txid. Also specify accepted values.
+probe returns a `Result<()>` type, which can be simplified as `Result`,
+due to default type parameters being unit `()` and `Error` types. This
+maintains a consistent usage of `Result` throughout codebase.
 
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+Signed-off-by: Manas <manas18244@iiitd.ac.in>
 ---
- .../bindings/net/microchip,sparx5-switch.yaml          | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ drivers/net/phy/qt2025.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-index dedfad526666..2e9ef0f7bb4b 100644
---- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-+++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-@@ -129,6 +129,24 @@ properties:
-             minimum: 0
-             maximum: 383
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..25c12a02baa255d3d5952e729a890b3ccfe78606 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -39,7 +39,7 @@ impl Driver for PhyQT2025 {
+     const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
+     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
  
-+          rx-internal-delay-ps:
-+            description: |
-+              RGMII Receive Clock Delay defined in pico seconds, used to select
-+              the DLL phase shift between 1000 ps (45 degree shift at 1Gbps) and
-+              3300 ps (147 degree shift at 1Gbps). A value of 0 ps will disable
-+              any delay. The Default is no delay.
-+            enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
-+            default: 0
-+
-+          tx-internal-delay-ps:
-+            description: |
-+              RGMII Transmit Clock Delay defined in pico seconds, used to select
-+              the DLL phase shift between 1000 ps (45 degree shift at 1Gbps) and
-+              3300 ps (147 degree shift at 1Gbps). A value of 0 ps will disable
-+              any delay. The Default is no delay.
-+            enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
-+            default: 0
-+
-         required:
-           - reg
-           - phys
+-    fn probe(dev: &mut phy::Device) -> Result<()> {
++    fn probe(dev: &mut phy::Device) -> Result {
+         // Check the hardware revision code.
+         // Only 0x3b works with this driver and firmware.
+         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
 
+---
+base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+change-id: 20241118-simplify-result-qt2025-1bb99d8e53ec
+
+Best regards,
 -- 
-2.34.1
+Manas <manas18244@iiitd.ac.in>
+
 
 
