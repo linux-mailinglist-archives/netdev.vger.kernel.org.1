@@ -1,244 +1,400 @@
-Return-Path: <netdev+bounces-145786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C5009D0DCE
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:09:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F268D9D0F9B
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D3B1283114
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:09:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 730B61F225F3
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9E3192D80;
-	Mon, 18 Nov 2024 10:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0813419413C;
+	Mon, 18 Nov 2024 11:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZSp1LHJX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LuFYA+zG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F714188CC6;
-	Mon, 18 Nov 2024 10:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF99155322
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 11:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731924576; cv=none; b=QQVjebl/R6nPwImFANgdsRE9Kvk3HUkWcOG+vdDdg13/++6b0MUauFHBRstNHlLcQnRy7o/JvTWUGLem/Ccoqz22L9XeQ8AYz2rM3nPeKzVW8WbKOe+ngXGL4LZvaDNEp3cHDBW1N9YyQU2TiuTxEf4fVVRcEc9TUO5U7Wzn928=
+	t=1731929151; cv=none; b=L2tDaVCbkcZ7cFP+vAhOseJyYnx6foYSHdP/Pvt+X7kzLTP7sjEFRCmkfLxD4jkfVgmAqOgpkF9zhEIwaCITs2gI2sLhBY3jYLMKOsAsuQEg64pBum8Qq78IYL/kziDGAa4xnWiKtFDdNI5h2+RcQI9R/UosFMdQYk9s0c0RSIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731924576; c=relaxed/simple;
-	bh=a2hdmi4aOqfEFoMDpXU5Bx+uDwTW5EoxJxpamlSobx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kpfe/95PH673AGPc7Hu/aSuECnJeVYcCrX4SqkznRX6TjlKO+MIFfdFCOSzmyE138gobT3WaThgcWC3JPiWiQzkkZk+adyFqnbWO7/rWtLxJBFyj9fD6RPO3F5/4xeLaheDGIqHLhomjlOfByUj6rCuMpaqw1ZUKofhED8gPSIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZSp1LHJX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79284C4CECC;
-	Mon, 18 Nov 2024 10:09:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731924575;
-	bh=a2hdmi4aOqfEFoMDpXU5Bx+uDwTW5EoxJxpamlSobx8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZSp1LHJX14zc8se7ncI9/dVefunWJQK3P9DzI0rzxZXIJTiQrCFKKct+6hFYafkO+
-	 dzWAyt3rd1+eG87AZfMlmdfnF6Fg2Dc19TeABJAc7dfnPWq0998afeq0lpISHL6Nq1
-	 UII5NYALwfOae/4qMitFs8BLl5d7bjkeWc9S6MM6PvsHT4AfAamtxp/qXe+wnv3a37
-	 D6rAzAKy8HgRwoMl4jG7YwmFOJ6QUmOAT1VWQqWZcVnq/dhf5iJsVWdPvhNP0TjNo1
-	 z4glpT4VYLHMfPIUCVWOeYgP8UOn3XAIiUqsL/YYcWD5EsINN7F0FCBpmYbDZV1bwS
-	 NdpT4HfUOlgmA==
-Date: Mon, 18 Nov 2024 18:09:17 +0800
-From: Geliang Tang <geliang@kernel.org>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev,
-	Mat Martineau <martineau@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Martin KaFai Lau <martin.lau@kernel.org>
-Subject: Re: [PATCH bpf-next/net 2/5] bpf: Add mptcp_subflow bpf_iter
-Message-ID: <ZzsSTUFwFxATGAqt@t480>
-References: <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-0-cf16953035c1@kernel.org>
- <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-2-cf16953035c1@kernel.org>
- <668e6f75-bdf3-44f8-a9e8-306fd4a22eb1@linux.dev>
+	s=arc-20240116; t=1731929151; c=relaxed/simple;
+	bh=S7ZAQ9BExb5yaWxkcmH/wmhoNXDc6Rx6Cj3RdeyR3vA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=oqLyhfOmfD8GO9QphSXaSnSWY8lL4vvY0bVG0JVkfD2Wx0Zc5I0fl1+UHvcDCY2Sv7jH12Xy3dX691Vvb+Ne8w6cIIEVq4F6Pk1yJRIPXH/IwrKZkbEXRBu/Z1vwZD4DQ9kXFmVN/TTGNkkvtrDRN9m+RvlR1XLDVMBZA1VlICM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LuFYA+zG; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731929150; x=1763465150;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=S7ZAQ9BExb5yaWxkcmH/wmhoNXDc6Rx6Cj3RdeyR3vA=;
+  b=LuFYA+zG/E+S6THK7a2Lzi7A6PHmJkBLL3tZ7oa2sINva5YOKSiO8Z9G
+   FwzAEc/KQrp0/Ot8dcMv1szQtL9QoTOvj6hrJSDQhzN89kUS/qTNHi2gS
+   LaKhzmQKD0JdG2CK+kQPUDiyOXshA9deMqwxU7Sh3IdoU0jChpdjKNc+I
+   y8TXq1CVt61oWONFihaRloT/n/GX4a7XZDxgQGrc1wcYOg+dUVx2Kb3Qk
+   eSvkHArVHMCEbGFv+6M3Cqi7ZwDrjB1iiVJud4QTywKsO4kvOemDgIcvp
+   6ZA2Xut72Mw7aLHjgEQWP4SBL6ZsP8oXNVqh5CSSNR11MUqvUeOujntCa
+   A==;
+X-CSE-ConnectionGUID: HwHQaOApSLSXeU3e/uWTOg==
+X-CSE-MsgGUID: pMLDCCsYSt6PkqiUhpTDUg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="49419155"
+X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
+   d="scan'208";a="49419155"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:25:49 -0800
+X-CSE-ConnectionGUID: GfszG/40S1SeiqVaR4OW5w==
+X-CSE-MsgGUID: lCHPkLZpSvi80Zz9nw+wgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
+   d="scan'208";a="94016517"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa004.fm.intel.com with ESMTP; 18 Nov 2024 03:25:46 -0800
+Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id EC67728197;
+	Mon, 18 Nov 2024 11:25:43 +0000 (GMT)
+From: Pawel Chmielewski <pawel.chmielewski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: pmenzel@molgen.mpg.de,
+	wojciech.drewek@intel.com,
+	marcin.szycik@intel.com,
+	netdev@vger.kernel.org,
+	rafal.romanowski@intel.com,
+	konrad.knitter@intel.com,
+	horms@kernel.org,
+	David.Laight@ACULAB.COM,
+	nex.sw.ncis.nat.hpm.dev@intel.com,
+	pio.raczynski@gmail.com,
+	sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com,
+	jiri@resnulli.us,
+	przemyslaw.kitszel@intel.com,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>
+Subject: [PATCH 4/8] ice, irdma: move interrupts code to irdma
+Date: Mon, 18 Nov 2024 11:16:30 +0100
+Message-Id: <20241118101630.2936711-1-pawel.chmielewski@intel.com>
+X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20241114122009.97416-5-michal.swiatkowski@linux.intel.com>
+References: <20241114122009.97416-5-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <668e6f75-bdf3-44f8-a9e8-306fd4a22eb1@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-Hi Martin,
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-On Mon, Nov 11, 2024 at 04:50:49PM -0800, Martin KaFai Lau wrote:
-> On 11/8/24 7:52 AM, Matthieu Baerts (NGI0) wrote:
-> > From: Geliang Tang <tanggeliang@kylinos.cn>
-> > 
-> > It's necessary to traverse all subflows on the conn_list of an MPTCP
-> > socket and then call kfunc to modify the fields of each subflow. In
-> > kernel space, mptcp_for_each_subflow() helper is used for this:
-> > 
-> > 	mptcp_for_each_subflow(msk, subflow)
-> > 		kfunc(subflow);
-> > 
-> > But in the MPTCP BPF program, this has not yet been implemented. As
-> > Martin suggested recently, this conn_list walking + modify-by-kfunc
-> > usage fits the bpf_iter use case.
-> > 
-> > So this patch adds a new bpf_iter type named "mptcp_subflow" to do
-> > this and implements its helpers bpf_iter_mptcp_subflow_new()/_next()/
-> > _destroy(). And register these bpf_iter mptcp_subflow into mptcp
-> > common kfunc set. Then bpf_for_each() for mptcp_subflow can be used
-> > in BPF program like this:
-> > 
-> > 	bpf_for_each(mptcp_subflow, subflow, msk)
-> > 		kfunc(subflow);
-> > 
-> > Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
-> > Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> > Reviewed-by: Mat Martineau <martineau@kernel.org>
-> > Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> > ---
-> > Notes:
-> > A few versions of this single patch have been previously posted to the
-> > BPF mailing list by Geliang, before continuing to the MPTCP mailing list
-> > only, with other patches of this series. The version of the whole series
-> > has been reset to 1, but here is the ChangeLog for this patch here:
-> >   - v2: remove msk->pm.lock in _new() and _destroy() (Martin)
-> >         drop DEFINE_BPF_ITER_FUNC, change opaque[3] to opaque[2] (Andrii)
-> >   - v3: drop bpf_iter__mptcp_subflow
-> >   - v4: if msk is NULL, initialize kit->msk to NULL in _new() and check
-> >         it in _next() (Andrii)
-> >   - v5: use list_is_last() instead of list_entry_is_head() add
-> >         KF_ITER_NEW/NEXT/DESTROY flags add msk_owned_by_me in _new()
-> >   - v6: add KF_TRUSTED_ARGS flag (Andrii, Martin)
-> > ---
-> >   net/mptcp/bpf.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 45 insertions(+)
-> > 
-> > diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
-> > index 6f96a5927fd371f8ea92cbf96c875edef9272b98..d107c2865e97e6ccffb9e0720dfbbd232b63a3b8 100644
-> > --- a/net/mptcp/bpf.c
-> > +++ b/net/mptcp/bpf.c
-> > @@ -29,6 +29,15 @@ static const struct btf_kfunc_id_set bpf_mptcp_fmodret_set = {
-> >   	.set   = &bpf_mptcp_fmodret_ids,
-> >   };
-> > +struct bpf_iter_mptcp_subflow {
-> > +	__u64 __opaque[2];
-> > +} __aligned(8);
-> > +
-> > +struct bpf_iter_mptcp_subflow_kern {
-> > +	struct mptcp_sock *msk;
-> > +	struct list_head *pos;
-> > +} __aligned(8);
-> > +
-> >   __bpf_kfunc_start_defs();
-> >   __bpf_kfunc static struct mptcp_sock *bpf_mptcp_sk(struct sock *sk)
-> > @@ -48,12 +57,48 @@ bpf_mptcp_subflow_tcp_sock(const struct mptcp_subflow_context *subflow)
-> >   	return mptcp_subflow_tcp_sock(subflow);
-> >   }
-> > +__bpf_kfunc static int
-> > +bpf_iter_mptcp_subflow_new(struct bpf_iter_mptcp_subflow *it,
-> > +			   struct mptcp_sock *msk)
-> > +{
-> > +	struct bpf_iter_mptcp_subflow_kern *kit = (void *)it;
-> > +
-> > +	kit->msk = msk;
-> > +	if (!msk)
-> > +		return -EINVAL;
-> > +
-> > +	msk_owned_by_me(msk);
-> 
-> I recalled in the earlier revision, a concern had already been brought up
-> about needing lock held and using the subflow iter in tracing. This patch
-> still has the subflow iter available to tracing [by
-> register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC)]. How is it supposed to
-> work? Adding msk_owned_by_me(msk) does not help. At best it will give a WARN
-> which is not good and then keep going even msk is not locked.
+Move responsibility of MSI-X requesting for RDMA feature from ice driver
+to irdma driver. It is done to allow simple fallback when there is not
+enough MSI-X available.
 
-I'll check lockdep_sock_is_held(msk) here in v2, and return NULL if msk
-socket is not locked.
+Change amount of MSI-X used for control from 4 to 1, as it isn't needed
+to have more than one MSI-X for this purpose.
 
-> 
-> Do you need to use subflow iter in tracing?
+Reduce the maximum number of interrupts requested by irdma to 64.
+This improves the overall utilization of interrupts by the base driver
+for systems with a large number of cores.
 
-No.
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
+---
+Proposed change for a v8 of original patch:
+ - Add a limit of 64 of MSI-X for RDMA, as suggested in [1]
 
-> 
-> The commit message mentioned it needs to modify the subflow. I don't see how
-> this modification could work in a tracing program also. It must be some non
-> tracing hooks? What is the plan on this hook? Is it a bpf_struct_ops or
-> something else?
+[1]: https://lore.kernel.org/netdev/5eca295e-1675-4779-b0d6-ec8a7550516f@intel.com/
+---
+ drivers/infiniband/hw/irdma/hw.c         |  2 -
+ drivers/infiniband/hw/irdma/main.c       | 50 +++++++++++++++++-
+ drivers/infiniband/hw/irdma/main.h       |  4 ++
+ drivers/net/ethernet/intel/ice/ice.h     |  1 -
+ drivers/net/ethernet/intel/ice/ice_idc.c | 64 ++++++------------------
+ drivers/net/ethernet/intel/ice/ice_irq.c |  3 +-
+ include/linux/net/intel/iidc.h           |  2 +
+ 7 files changed, 70 insertions(+), 56 deletions(-)
 
-We only plan to use it in struct_ops (mptcp bpf path manager [1], and mptcp
-packet scheduler [2]) and cgroup sockopt (mptcp setsockopt [3]).
+diff --git a/drivers/infiniband/hw/irdma/hw.c b/drivers/infiniband/hw/irdma/hw.c
+index ad50b77282f8..69ce1862eabe 100644
+--- a/drivers/infiniband/hw/irdma/hw.c
++++ b/drivers/infiniband/hw/irdma/hw.c
+@@ -498,8 +498,6 @@ static int irdma_save_msix_info(struct irdma_pci_f *rf)
+ 	iw_qvlist->num_vectors = rf->msix_count;
+ 	if (rf->msix_count <= num_online_cpus())
+ 		rf->msix_shared = true;
+-	else if (rf->msix_count > num_online_cpus() + 1)
+-		rf->msix_count = num_online_cpus() + 1;
+ 
+ 	pmsix = rf->msix_entries;
+ 	for (i = 0, ceq_idx = 0; i < rf->msix_count; i++, iw_qvinfo++) {
+diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
+index 3f13200ff71b..f538f4923825 100644
+--- a/drivers/infiniband/hw/irdma/main.c
++++ b/drivers/infiniband/hw/irdma/main.c
+@@ -206,6 +206,47 @@ static void irdma_lan_unregister_qset(struct irdma_sc_vsi *vsi,
+ 		ibdev_dbg(&iwdev->ibdev, "WS: LAN free_res for rdma qset failed.\n");
+ }
+ 
++static int irdma_init_interrupts(struct irdma_pci_f *rf, struct ice_pf *pf)
++{
++	int i;
++
++	rf->msix_count = num_online_cpus() + IRDMA_NUM_AEQ_MSIX;
++
++	if (rf->msix_count > IRDMA_MAX_MSIX)
++		rf->msix_count = IRDMA_MAX_MSIX;
++
++	rf->msix_entries = kcalloc(rf->msix_count, sizeof(*rf->msix_entries),
++				   GFP_KERNEL);
++	if (!rf->msix_entries)
++		return -ENOMEM;
++
++	for (i = 0; i < rf->msix_count; i++)
++		if (ice_alloc_rdma_qvector(pf, &rf->msix_entries[i]))
++			break;
++
++	if (i < IRDMA_MIN_MSIX) {
++		for (; i > 0; i--)
++			ice_free_rdma_qvector(pf, &rf->msix_entries[i]);
++
++		kfree(rf->msix_entries);
++		return -ENOMEM;
++	}
++
++	rf->msix_count = i;
++
++	return 0;
++}
++
++static void irdma_deinit_interrupts(struct irdma_pci_f *rf, struct ice_pf *pf)
++{
++	int i;
++
++	for (i = 0; i < rf->msix_count; i++)
++		ice_free_rdma_qvector(pf, &rf->msix_entries[i]);
++
++	kfree(rf->msix_entries);
++}
++
+ static void irdma_remove(struct auxiliary_device *aux_dev)
+ {
+ 	struct iidc_auxiliary_dev *iidc_adev = container_of(aux_dev,
+@@ -216,6 +257,7 @@ static void irdma_remove(struct auxiliary_device *aux_dev)
+ 
+ 	irdma_ib_unregister_device(iwdev);
+ 	ice_rdma_update_vsi_filter(pf, iwdev->vsi_num, false);
++	irdma_deinit_interrupts(iwdev->rf, pf);
+ 
+ 	pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(pf->pdev->devfn));
+ }
+@@ -230,9 +272,7 @@ static void irdma_fill_device_info(struct irdma_device *iwdev, struct ice_pf *pf
+ 	rf->gen_ops.unregister_qset = irdma_lan_unregister_qset;
+ 	rf->hw.hw_addr = pf->hw.hw_addr;
+ 	rf->pcidev = pf->pdev;
+-	rf->msix_count =  pf->num_rdma_msix;
+ 	rf->pf_id = pf->hw.pf_id;
+-	rf->msix_entries = &pf->msix_entries[pf->rdma_base_vector];
+ 	rf->default_vsi.vsi_idx = vsi->vsi_num;
+ 	rf->protocol_used = pf->rdma_mode & IIDC_RDMA_PROTOCOL_ROCEV2 ?
+ 			    IRDMA_ROCE_PROTOCOL_ONLY : IRDMA_IWARP_PROTOCOL_ONLY;
+@@ -281,6 +321,10 @@ static int irdma_probe(struct auxiliary_device *aux_dev, const struct auxiliary_
+ 	irdma_fill_device_info(iwdev, pf, vsi);
+ 	rf = iwdev->rf;
+ 
++	err = irdma_init_interrupts(rf, pf);
++	if (err)
++		goto err_init_interrupts;
++
+ 	err = irdma_ctrl_init_hw(rf);
+ 	if (err)
+ 		goto err_ctrl_init;
+@@ -311,6 +355,8 @@ static int irdma_probe(struct auxiliary_device *aux_dev, const struct auxiliary_
+ err_rt_init:
+ 	irdma_ctrl_deinit_hw(rf);
+ err_ctrl_init:
++	irdma_deinit_interrupts(rf, pf);
++err_init_interrupts:
+ 	kfree(iwdev->rf);
+ 	ib_dealloc_device(&iwdev->ibdev);
+ 
+diff --git a/drivers/infiniband/hw/irdma/main.h b/drivers/infiniband/hw/irdma/main.h
+index 9f0ed6e84471..53a20f2dd681 100644
+--- a/drivers/infiniband/hw/irdma/main.h
++++ b/drivers/infiniband/hw/irdma/main.h
+@@ -117,6 +117,10 @@ extern struct auxiliary_driver i40iw_auxiliary_drv;
+ 
+ #define IRDMA_IRQ_NAME_STR_LEN (64)
+ 
++#define IRDMA_NUM_AEQ_MSIX	1
++#define IRDMA_MIN_MSIX		2
++#define IRDMA_MAX_MSIX		64
++
+ enum init_completion_state {
+ 	INVALID_STATE = 0,
+ 	INITIAL_STATE,
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index bde04595b592..71525bf4918e 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -96,7 +96,6 @@
+ #define ICE_MIN_LAN_OICR_MSIX	1
+ #define ICE_MIN_MSIX		(ICE_MIN_LAN_TXRX_MSIX + ICE_MIN_LAN_OICR_MSIX)
+ #define ICE_FDIR_MSIX		2
+-#define ICE_RDMA_NUM_AEQ_MSIX	4
+ #define ICE_NO_VSI		0xffff
+ #define ICE_VSI_MAP_CONTIG	0
+ #define ICE_VSI_MAP_SCATTER	1
+diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ethernet/intel/ice/ice_idc.c
+index 145b27f2a4ce..bab3e81cad5d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_idc.c
++++ b/drivers/net/ethernet/intel/ice/ice_idc.c
+@@ -228,61 +228,34 @@ void ice_get_qos_params(struct ice_pf *pf, struct iidc_qos_params *qos)
+ }
+ EXPORT_SYMBOL_GPL(ice_get_qos_params);
+ 
+-/**
+- * ice_alloc_rdma_qvectors - Allocate vector resources for RDMA driver
+- * @pf: board private structure to initialize
+- */
+-static int ice_alloc_rdma_qvectors(struct ice_pf *pf)
++int ice_alloc_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry)
+ {
+-	if (ice_is_rdma_ena(pf)) {
+-		int i;
+-
+-		pf->msix_entries = kcalloc(pf->num_rdma_msix,
+-					   sizeof(*pf->msix_entries),
+-						  GFP_KERNEL);
+-		if (!pf->msix_entries)
+-			return -ENOMEM;
++	struct msi_map map = ice_alloc_irq(pf, true);
+ 
+-		/* RDMA is the only user of pf->msix_entries array */
+-		pf->rdma_base_vector = 0;
+-
+-		for (i = 0; i < pf->num_rdma_msix; i++) {
+-			struct msix_entry *entry = &pf->msix_entries[i];
+-			struct msi_map map;
++	if (map.index < 0)
++		return -ENOMEM;
+ 
+-			map = ice_alloc_irq(pf, false);
+-			if (map.index < 0)
+-				break;
++	entry->entry = map.index;
++	entry->vector = map.virq;
+ 
+-			entry->entry = map.index;
+-			entry->vector = map.virq;
+-		}
+-	}
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(ice_alloc_rdma_qvector);
+ 
+ /**
+  * ice_free_rdma_qvector - free vector resources reserved for RDMA driver
+  * @pf: board private structure to initialize
++ * @entry: MSI-X entry to be removed
+  */
+-static void ice_free_rdma_qvector(struct ice_pf *pf)
++void ice_free_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry)
+ {
+-	int i;
+-
+-	if (!pf->msix_entries)
+-		return;
+-
+-	for (i = 0; i < pf->num_rdma_msix; i++) {
+-		struct msi_map map;
++	struct msi_map map;
+ 
+-		map.index = pf->msix_entries[i].entry;
+-		map.virq = pf->msix_entries[i].vector;
+-		ice_free_irq(pf, map);
+-	}
+-
+-	kfree(pf->msix_entries);
+-	pf->msix_entries = NULL;
++	map.index = entry->entry;
++	map.virq = entry->vector;
++	ice_free_irq(pf, map);
+ }
++EXPORT_SYMBOL_GPL(ice_free_rdma_qvector);
+ 
+ /**
+  * ice_adev_release - function to be mapped to AUX dev's release op
+@@ -382,12 +355,6 @@ int ice_init_rdma(struct ice_pf *pf)
+ 		return -ENOMEM;
+ 	}
+ 
+-	/* Reserve vector resources */
+-	ret = ice_alloc_rdma_qvectors(pf);
+-	if (ret < 0) {
+-		dev_err(dev, "failed to reserve vectors for RDMA\n");
+-		goto err_reserve_rdma_qvector;
+-	}
+ 	pf->rdma_mode |= IIDC_RDMA_PROTOCOL_ROCEV2;
+ 	ret = ice_plug_aux_dev(pf);
+ 	if (ret)
+@@ -395,8 +362,6 @@ int ice_init_rdma(struct ice_pf *pf)
+ 	return 0;
+ 
+ err_plug_aux_dev:
+-	ice_free_rdma_qvector(pf);
+-err_reserve_rdma_qvector:
+ 	pf->adev = NULL;
+ 	xa_erase(&ice_aux_id, pf->aux_idx);
+ 	return ret;
+@@ -412,6 +377,5 @@ void ice_deinit_rdma(struct ice_pf *pf)
+ 		return;
+ 
+ 	ice_unplug_aux_dev(pf);
+-	ice_free_rdma_qvector(pf);
+ 	xa_erase(&ice_aux_id, pf->aux_idx);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+index 1a7d446ab5f1..80c9ee2e64c1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_irq.c
++++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+@@ -84,11 +84,12 @@ static struct ice_irq_entry *ice_get_irq_res(struct ice_pf *pf, bool dyn_only)
+ 	return entry;
+ }
+ 
++#define ICE_RDMA_AEQ_MSIX 1
+ static int ice_get_default_msix_amount(struct ice_pf *pf)
+ {
+ 	return ICE_MIN_LAN_OICR_MSIX + num_online_cpus() +
+ 	       (test_bit(ICE_FLAG_FD_ENA, pf->flags) ? ICE_FDIR_MSIX : 0) +
+-	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_NUM_AEQ_MSIX : 0);
++	       (ice_is_rdma_ena(pf) ? num_online_cpus() + ICE_RDMA_AEQ_MSIX : 0);
+ }
+ 
+ /**
+diff --git a/include/linux/net/intel/iidc.h b/include/linux/net/intel/iidc.h
+index 1c1332e4df26..13274c3def66 100644
+--- a/include/linux/net/intel/iidc.h
++++ b/include/linux/net/intel/iidc.h
+@@ -78,6 +78,8 @@ int ice_del_rdma_qset(struct ice_pf *pf, struct iidc_rdma_qset_params *qset);
+ int ice_rdma_request_reset(struct ice_pf *pf, enum iidc_reset_type reset_type);
+ int ice_rdma_update_vsi_filter(struct ice_pf *pf, u16 vsi_id, bool enable);
+ void ice_get_qos_params(struct ice_pf *pf, struct iidc_qos_params *qos);
++int ice_alloc_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry);
++void ice_free_rdma_qvector(struct ice_pf *pf, struct msix_entry *entry);
+ 
+ /* Structure representing auxiliary driver tailored information about the core
+  * PCI dev, each auxiliary driver using the IIDC interface will have an
+-- 
+2.37.3
 
-So I'll register this kfunc_set for BPF_PROG_TYPE_STRUCT_OPS and
-BPF_PROG_TYPE_CGROUP_SOCKOPT only in v2, not for BPF_PROG_TYPE_UNSPEC.
-
-> 
-> If it needs to modify the subflow, does it need to take the lock of the subflow?
-
-We will call the following mptcp_subflow_set_scheduled() kfunc to set the
-scheduled field of a subflow:
-
-void mptcp_subflow_set_scheduled(struct mptcp_subflow_context *subflow,
-                                 bool scheduled)
-{
-        WRITE_ONCE(subflow->scheduled, scheduled);
-}
-
-WRITE_ONCE is used here, and no additional lock of the subflow is used.
-
-Thanks,
--Geliang
-
-[1] https://github.com/multipath-tcp/mptcp_net-next/issues/74
-[2] https://github.com/multipath-tcp/mptcp_net-next/issues/75
-[3] https://github.com/multipath-tcp/mptcp_net-next/issues/484
-
-> 
-> > +
-> > +	kit->pos = &msk->conn_list;
-> > +	return 0;
-> > +}
-> > +
-> > +__bpf_kfunc static struct mptcp_subflow_context *
-> > +bpf_iter_mptcp_subflow_next(struct bpf_iter_mptcp_subflow *it)
-> > +{
-> > +	struct bpf_iter_mptcp_subflow_kern *kit = (void *)it;
-> > +
-> > +	if (!kit->msk || list_is_last(kit->pos, &kit->msk->conn_list))
-> > +		return NULL;
-> > +
-> > +	kit->pos = kit->pos->next;
-> > +	return list_entry(kit->pos, struct mptcp_subflow_context, node);
-> > +}
-> > +
-> > +__bpf_kfunc static void
-> > +bpf_iter_mptcp_subflow_destroy(struct bpf_iter_mptcp_subflow *it)
-> > +{
-> > +}
-> > +
-> >   __bpf_kfunc_end_defs();
-> >   BTF_KFUNCS_START(bpf_mptcp_common_kfunc_ids)
-> >   BTF_ID_FLAGS(func, bpf_mptcp_sk)
-> >   BTF_ID_FLAGS(func, bpf_mptcp_subflow_ctx)
-> >   BTF_ID_FLAGS(func, bpf_mptcp_subflow_tcp_sock)
-> > +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_new, KF_ITER_NEW | KF_TRUSTED_ARGS)
-> > +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_next, KF_ITER_NEXT | KF_RET_NULL)
-> > +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_destroy, KF_ITER_DESTROY)
-> >   BTF_KFUNCS_END(bpf_mptcp_common_kfunc_ids)
-> >   static const struct btf_kfunc_id_set bpf_mptcp_common_kfunc_set = {
-> > 
-> 
 
