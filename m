@@ -1,112 +1,134 @@
-Return-Path: <netdev+bounces-145711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4330D9D07EA
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 03:31:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 496BC9D07FA
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 03:55:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0049B21DBF
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 02:31:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3775281E24
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 02:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4B02AC17;
-	Mon, 18 Nov 2024 02:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F002329CF4;
+	Mon, 18 Nov 2024 02:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Cd0k8Q0g"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="r9DxHmAm"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAF51EEF9;
-	Mon, 18 Nov 2024 02:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B66EAE7;
+	Mon, 18 Nov 2024 02:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731897075; cv=none; b=cSzz2/cTOjbkjFXTCL/Lxx/LgaEgiYrVyCVQqOBHfDYgins0rFlE8OOYed+LI+kJXYxjpAEfygt3vbSHVVlfkgtFDefboKj0UqPseZDEPWqGVI67dscju4iJNfAqw4Biy9HoepAVfwqKy7GBt9Mzy1MHIrCjv5PhePm/g5wSPJo=
+	t=1731898519; cv=none; b=puHD3hEHd7jtb+z4gIhQsqz0LSp5uPUT8fx0XYyuDzkJOt1axrm917hWPdCiYstOudCr8/XJwgpKBn88EnFG80h/MEP8mYkqHyv9lNZgA5Au1Fx7hL3Ox4vc/+1C9ii2ZWNmDp+t0EtuIJlBn+FYAznx04eKm5IoWWlgFmuKSb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731897075; c=relaxed/simple;
-	bh=MpcA1Fa6BX7Wln9D1Mz/k90qkx70jn848o2sgz8m86w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SEYXlkyuwu3QyLdXeZ1LlQ+xXLa/cLmB63b5hnDQGPbDHkFKVzsJt+l8whN3peFQyEBsb00bZdt3C5jsA5J0n2BV+he0MKwyGouT/ZVbvGD9sG8FPn2oYC2D88JeTVKqFNvXVe+m11s+ZMjcgTbJEWDQhxNQBDXH0IuWyjtDXR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Cd0k8Q0g; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AI2Un4jA4174098, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1731897049; bh=MpcA1Fa6BX7Wln9D1Mz/k90qkx70jn848o2sgz8m86w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=Cd0k8Q0gzezuNjM2L5UQMBj/tv4LpU8GQ7bVWjhH4q/7dG0HJIuaCIY3bs+J1mx/c
-	 G4OEDjJKRuRh23P0wINKAniMJygdthrAai9WH8akWYeBJ6TLh9R5QL1XfQ5VIzLk2m
-	 K0WiUkKkuH4T5rNpqM6pKTkvzNeBpFaMp7mMCBzfdCkI6ySkY3Uu9dSlrDlgtG3hgE
-	 Ib3m+spttsXKJ7BkYkUQhiAnKxuwrToVJDrSCib9zkvgQgyZ8N/QSBhgEcTuZdl7YK
-	 pGjdD+OEKTGwS0pI36tjPToyYej8/iT5j4vwzdmxFlLUQeh/ROsg8psQfDVWMa81ZH
-	 d5lkxcIGLJh+w==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AI2Un4jA4174098
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Nov 2024 10:30:49 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 18 Nov 2024 10:30:49 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 18 Nov 2024 10:30:49 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
- RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
- 15.01.2507.035; Mon, 18 Nov 2024 10:30:49 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "horms@kernel.org" <horms@kernel.org>,
-        Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net v2 3/5] rtase: Add support for RTL907XD-VA PCIe port
-Thread-Topic: [PATCH net v2 3/5] rtase: Add support for RTL907XD-VA PCIe port
-Thread-Index: AQHbN0SFfyRIafwEokSyyOXB545urLK5wOOAgAKTAUA=
-Date: Mon, 18 Nov 2024 02:30:48 +0000
-Message-ID: <a0280d8e17ce4286b8070028e069d7e9@realtek.com>
-References: <20241115095429.399029-1-justinlai0215@realtek.com>
- <20241115095429.399029-4-justinlai0215@realtek.com>
- <939ab163-a537-417f-9edc-0823644a2a1d@lunn.ch>
-In-Reply-To: <939ab163-a537-417f-9edc-0823644a2a1d@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1731898519; c=relaxed/simple;
+	bh=wRPgT1yObEHD6svJnaOip0QGxnZUBOU5xL/pq0EZDYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=dCZvbOFul9wPQ0Pzk4oEyZWa+FB3815t23N6HlZiYidZRX+z2xURBY2zyLJgtbnA3X4e0tOeScPKVc/WQY3mHhlV8Yu8TEEmj9edAzSqcGoV58ulWKq9pFD1KGVf+cpIVJogPkoGIyOKugqA0n1sixumwY2Wrys9jbaYF1Bl6vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=r9DxHmAm; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1731898511;
+	bh=lA9p/6FlZ0uog6Hp8Mfew1zkqnhfYb5W0Rbs/v3d/MA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=r9DxHmAm7s/FlNVmJ5oX4b8Tn63VDPyWgkdf0QAEkHnSdVb5b6/TR/1+dot+5M09q
+	 Xt1mP1rwfXsSok2qEpqWgvkHwdRa4sjquKPu1iOGpLvFOJ2qm2/RCB5k9QIgJ3TIg+
+	 7RvuzOY/adSf1h10szEZT3HF2Y6MKK75/PBB8ordVt5shMFUlpJwwgmfaBRSDsN2Uu
+	 mbPaYYhyqc3ustpb6OzQZNnOG/N22vYZQcGpeJcgvPxE2jMgDRnHJ9mW4N3Y3N1EtY
+	 faXu6EgvV/tIMQDxF5c65yckXBMZE6Kp0CAQtTgMhTc5rRWJxFRA3OyLkZrtFMFFXv
+	 Vi7594J7p25Lw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XsC0b0bgLz4xfL;
+	Mon, 18 Nov 2024 13:55:10 +1100 (AEDT)
+Date: Mon, 18 Nov 2024 13:55:12 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20241118135512.1039208b@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/_/vmX0Hz1vripoj/QLgQntj";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
->=20
-> On Fri, Nov 15, 2024 at 05:54:27PM +0800, Justin Lai wrote:
-> > 1. Add RTL907XD-VA hardware version id.
-> > 2. Add the reported speed for RTL907XD-VA.
->=20
-> This is not a fix, it never worked on this device as far as i see. So
-> this should be for net-next.
->=20
-> Please separate these patches out into real fixes, and new features.
->=20
->         Andrew
+--Sig_/_/vmX0Hz1vripoj/QLgQntj
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your response. I will follow these guidelines for the
-categorization and upload the patch to net-next accordingly. I appreciate
-your assistance.
+Hi all,
+
+Today's linux-next merge of the net-next tree got a conflict in:
+
+  include/linux/phy.h
+
+between commit:
+
+  41ffcd95015f ("net: phy: fix phylib's dual eee_enabled")
+
+from the net tree and commit:
+
+  721aa69e708b ("net: phy: convert eee_broken_modes to a linkmode bitmap")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc include/linux/phy.h
+index 44890cdf40a2,b8346db42727..000000000000
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@@ -720,6 -721,11 +720,10 @@@ struct phy_device=20
+  	/* used for eee validation and configuration*/
+  	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported_eee);
+  	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising_eee);
++ 	/* Energy efficient ethernet modes which should be prohibited */
++ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_broken_modes);
+ -	bool eee_enabled;
++ 	bool enable_tx_lpi;
++ 	struct eee_config eee_cfg;
+ =20
+  	/* Host supported PHY interface types. Should be ignored if empty. */
+  	DECLARE_PHY_INTERFACE_MASK(host_interfaces);
+
+--Sig_/_/vmX0Hz1vripoj/QLgQntj
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc6rJAACgkQAVBC80lX
+0GyAOAf+JsvkHQtN6HM1uzq93ryqcOg8/QM2rbDuGAxiMphDc4vg+jUtiEuuOtHP
+Y1VwGaFYffonnh+nj72fZTx+hxWLk/SsQ4++ovlPKRRA7egDnMZ+lvFTiw5CjisH
+PqrDPPKYBixXnpP7lJZdMW9OzPUn3ziOOmlMbc1/OQVahLOYq5Nv6dCw6OCexgWT
+JCLRq1J0SwM6chF574CXu5iENguUEUGkTk+bZsRjX6bjhSodCEhMIwD6NZjAkOND
+dYQ1TyewL/Q7pWdcGrRwthWLZj7cA2HpM4zZ9kioZBqxh3pcIQoYdQT586T6hJ22
+/vEWrBHL+ofwDsE/sY6nbHYQCkFW4w==
+=VEEF
+-----END PGP SIGNATURE-----
+
+--Sig_/_/vmX0Hz1vripoj/QLgQntj--
 
