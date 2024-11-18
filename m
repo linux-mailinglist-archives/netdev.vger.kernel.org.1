@@ -1,121 +1,109 @@
-Return-Path: <netdev+bounces-145996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C0A9D19DF
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:48:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D512B9D1A0A
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 22:05:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4ADC4B22D8B
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:48:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6198AB22753
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3C11B6CE1;
-	Mon, 18 Nov 2024 20:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755741E767D;
+	Mon, 18 Nov 2024 21:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="I57jX91b"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ZhFZjeFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCBA171652;
-	Mon, 18 Nov 2024 20:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5782C1E5739;
+	Mon, 18 Nov 2024 21:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731962924; cv=none; b=GzB/mqmvxuw4HFPLPFUbF/Tstu8516YHieZ8UvqCvONGwX6Gq/DBSZWk8tGpBYdGklY2Ti5pmz6NVx+IG/vpIfjSduZ7wZA/eRBpmojVkHc7m0FAjozSCwQr+E0Ptpc79h2nwmsUXMovefu5rzDtNtsVZYxW7agFr59f1s/PTN4=
+	t=1731963932; cv=none; b=eH0qMcMQozf0Q8q9EpHy05E/n8MPFsYUxUi2ZzhBp8RfgqpEGIpdwpWPZTDoVM7F0UHVOoAEJC+nfEzgFWyErNizVz8jYaybg30rmJyLfBQz6Q8Zk8tL0XaN2/FVg071gCNcLTjf52Z1zx3/ifi396Wb5S/uXFHZNpuxwMfg3ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731962924; c=relaxed/simple;
-	bh=9aRhU7SYTiy9GTZdVZfR4WneooPr3fJ0MNcnsVkz+ac=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q+hCn4aKa2D+MBm4qgXO4Wyn5nDgSN6a1HHL/KOEunZlVFCp79kH1LyUagnArlA9lzONzGYwkcQ3Y5Le84WeWOlfV8KRhlTedKMMfI9tH46IMB4dD3ds+HtOObCc5DEUsE00C6BXntbrGKqTpEPfX5suR2XZ7H9zIl94VD5JhyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I57jX91b; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731962923; x=1763498923;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3tO4Q4IodwMB3txyonk+PdRsnAHyv4Ng/JNgI4AXdKU=;
-  b=I57jX91bbvfgpEwvCLLuE4r8ofOT1oAoQezzUGk0FXBoOtB/Rw+ZsdBh
-   Krq1F7WZ4+9hDkH4/vASd59CKIN1dPKiZJQsYm8nsnpUHiJB4szWXy2HZ
-   OwoW9em+tc0rwVF9wQUR1LBDWAobjSxxIzsi5SYQOL7oItXBDsz+iRCEi
-   s=;
-X-IronPort-AV: E=Sophos;i="6.12,164,1728950400"; 
-   d="scan'208";a="674618741"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 20:48:39 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:26921]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
- id 1bbcfe20-ac78-474e-94b5-fc72fd89125b; Mon, 18 Nov 2024 20:48:38 +0000 (UTC)
-X-Farcaster-Flow-ID: 1bbcfe20-ac78-474e-94b5-fc72fd89125b
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 18 Nov 2024 20:48:38 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.15) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 18 Nov 2024 20:48:34 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <liqiang64@huawei.com>
-CC: <alibuda@linux.alibaba.com>, <dengguangxing@huawei.com>,
-	<dust.li@linux.alibaba.com>, <gaochao24@huawei.com>,
-	<guwen@linux.alibaba.com>, <jaka@linux.ibm.com>,
-	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<luanjianhai@huawei.com>, <netdev@vger.kernel.org>,
-	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>,
-	<zhangxuzhou4@huawei.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net-next 1/1] Separate locks for rmbs/sndbufs linked lists of different lengths
-Date: Mon, 18 Nov 2024 12:48:31 -0800
-Message-ID: <20241118204831.70974-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241118132147.1614-2-liqiang64@huawei.com>
-References: <20241118132147.1614-2-liqiang64@huawei.com>
+	s=arc-20240116; t=1731963932; c=relaxed/simple;
+	bh=cCmISK6BnKASPnPfisyoQZpkhJsYpv3tV4Awm1tVG+s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lUcFbWNWR0TfnW6cvFH0R0KUCNi8iRxxvTXMheWrUKbm22jx5UO5qi61Hvl3qLudKb2kKkxvc/RDe3rSkzfWvH9r9p//ZaRbtGGM5Wqoz/HAQ91dntdusgoY7IPq0Z3AosKzDLOs/ehook3qodh8sab6ZTX+EtCVIhmU8DT8h/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ZhFZjeFb; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tD8vv-00HaWW-SO; Mon, 18 Nov 2024 22:05:19 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=SZ4ULW7QA2NHTeEfsW9RD+SClsi51owWe7zBsnnPzcM=
+	; b=ZhFZjeFbAKKEVzE5Snnwy+OMXz+pUH37PvMQDtjQiKIPcF86lH3EfniXju3sGD6nj1F94p5nt
+	IczTht1X+yzrxM5jyuIWiHhh49GqXFt9N0bRzyZypVe+IuBRe+gzNraOtU+8W/drsm/cISeKlVpwY
+	t2zstNtLTfZnByxadbEK6dSFwPHUoCIH2FLMOZdAinRpxqB+8KEkFg8AmTZr6ewVHTPE2ws6BrVFG
+	CgceAfD1WlmjDyPn4+UWLsH81+8FOetwDJSfnB5sDHVtcy34Jt286B5d4F/ZUpqNO9/n4BlnSs+Mv
+	mn+Ozp2R20ZfOvlIMyQ6uPa6n3VXtBWV+U9eCw==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tD8vv-0007dS-E1; Mon, 18 Nov 2024 22:05:19 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tD8vd-00DME4-Tz; Mon, 18 Nov 2024 22:05:02 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH bpf 0/4] bpf, vsock: Fix poll() and close()
+Date: Mon, 18 Nov 2024 22:03:40 +0100
+Message-Id: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKyrO2cC/x2MQQqAIBAAvxJ7biFNJPpKdChba0lSXIhA+nvSc
+ WBmCghlJoGxKZDpZuF4VVBtA+5Yrp2Qt8qgO22UUgPeEt2Ja/KYYgjoQhRCa7zpNdlBk4Oapky
+ en387QXVhft8Pku03EmsAAAA=
+X-Change-ID: 20241118-vsock-bpf-poll-close-64f432e682ec
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-From: liqiang <liqiang64@huawei.com>
-Date: Mon, 18 Nov 2024 21:21:47 +0800
-> @@ -596,10 +632,26 @@ static struct smc_buf_desc *smc_llc_get_next_rmb(struct smc_link_group *lgr,
->  static struct smc_buf_desc *smc_llc_get_first_rmb(struct smc_link_group *lgr,
->  						  int *buf_lst)
->  {
-> -	*buf_lst = 0;
-> +	smc_llc_lock_in_turn(lgr->rmbs_lock, buf_lst, SMC_LLC_INTURN_LOCK_INIT);
->  	return smc_llc_get_next_rmb(lgr, buf_lst, NULL);
->  }
->  
-> +static inline void smc_llc_bufs_wrlock_all(struct rw_semaphore *lock, int nums)
-> +{
-> +	int i = 0;
-> +
-> +	for (; i < nums; i++)
-> +		down_write(&lock[i]);
+Two small fixes for vsock: poll() missing a queue check, and close() not
+invoking sockmap cleanup.
 
-LOCKDEP will complain here.  You may want to test with
-CONFIG_PROVE_LOCKING=y
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (4):
+      bpf, vsock: Fix poll() missing a queue
+      selftest/bpf: Add test for af_vsock poll()
+      bpf, vsock: Invoke proto::close on close()
+      selftest/bpf: Add test for vsock removal from sockmap on close()
 
+ net/vmw_vsock/af_vsock.c                           | 70 ++++++++++++--------
+ .../selftests/bpf/prog_tests/sockmap_basic.c       | 77 ++++++++++++++++++++++
+ 2 files changed, 120 insertions(+), 27 deletions(-)
+---
+base-commit: 6c4139b0f19b7397286897caee379f8321e78272
+change-id: 20241118-vsock-bpf-poll-close-64f432e682ec
 
-> +}
-> +
-> +static inline void smc_llc_bufs_wrunlock_all(struct rw_semaphore *lock, int nums)
-> +{
-> +	int i = 0;
-> +
-> +	for (; i < nums; i++)
-> +		up_write(&lock[i]);
-> +}
-> +
->  static int smc_llc_fill_ext_v2(struct smc_llc_msg_add_link_v2_ext *ext,
->  			       struct smc_link *link, struct smc_link *link_new)
->  {
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
