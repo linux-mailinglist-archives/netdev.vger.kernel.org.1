@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-145746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 989719D09AA
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 07:32:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575D19D09AD
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 07:34:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F0611F21387
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 06:32:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0181D1F212B5
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 06:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3995014A08E;
-	Mon, 18 Nov 2024 06:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48771465AB;
+	Mon, 18 Nov 2024 06:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="qiY+21o/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jHZIIozn"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="f26oMOTx";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ByVYC1jS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC4817597;
-	Mon, 18 Nov 2024 06:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3D417597;
+	Mon, 18 Nov 2024 06:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731911551; cv=none; b=bNVINHaakVGhZNcUh61z01lkz576vrfaNhQEptLR3BJaxEvYPCgDtxW6aTT2VDXfs6mCENa+3516Y9bDDZY6B2UV6RyIqsymv3V0/J6k23GwA8BffOELg0RDDF1O253/MvvBsk3XHH90PA/ts9oRBOGkv5qojRURgG7Y8UcS6OQ=
+	t=1731911687; cv=none; b=rQhHIX7JZlO3CC5PGp9rP4QPsJlW8G1Np83H/ATrga91P/uhx3e4niUJroQQEzWpFMdhBC4/Rx8jlxnPexGmQDaHLKw0hyMJGqBVOzodRiky3dltiAcZbxxmHuLSt2XYV7FFDc67H/i2yMxa0W7K5IF4CtEPwLBXl4dPtjksMU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731911551; c=relaxed/simple;
-	bh=UhgwH34PVq//K2PaLvOWBtV3j8HhKT6IiphyPJfEs6E=;
+	s=arc-20240116; t=1731911687; c=relaxed/simple;
+	bh=IYIjzg8kyvzmuFMU/4DUw+BitkdNe7qrwPBfrFApES8=;
 	h=MIME-Version:Date:From:To:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=u5dwJLeXzAYBpUcANnN04RALX+pysCdr8qu1r/+sxjPZLCte2zTYkgmDAyV7ajOh6H9nPxPqIeAn7hHCy7N6dv/XXCb97FLMD66dgWdcstNclxzUqr8TXnpqAdAfOqbPVs/4HwiwtwVBdeSnRrqGRr37rnj41c4dm7Lwud2kXB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=qiY+21o/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jHZIIozn; arc=none smtp.client-ip=103.168.172.148
+	 Subject:Content-Type; b=KwLOxGovVn8Rm69svm/krB3Lgjec0ukXHqMzrQosxWp4FpFLTnYfJM3Ah7MI51fSTfkani8pHDB8ShE3umkoCesJdK++JqKNF6WRv2QWZE1ti1vS6Ph45Juad0m4tDfRZVzOL5SnkCym2FIm1Nh6v8umIaL2Tc4C1CvBNbZwPyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=f26oMOTx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ByVYC1jS; arc=none smtp.client-ip=103.168.172.159
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id B1E9A1380230;
-	Mon, 18 Nov 2024 01:32:25 -0500 (EST)
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 64F661140173;
+	Mon, 18 Nov 2024 01:34:44 -0500 (EST)
 Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Mon, 18 Nov 2024 01:32:25 -0500
+  by phl-compute-10.internal (MEProxy); Mon, 18 Nov 2024 01:34:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
 	:content-transfer-encoding:content-type:content-type:date:date
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1731911545;
-	 x=1731997945; bh=PtArSHe6OqREEyBvIEFXeJ+RDsFU75KyOaFO11n3GaE=; b=
-	qiY+21o/bWM7WXT5KF2T/ChJrHq2/5qVKkj5Yju2Xdr6T92sdiLLwCRGbEtvV+JE
-	+JbdFpAaEqrj/w3S4U914zGbygjCuJaImGTaPGAhD9tKyCnJU/dJ+rn+MdFByyUk
-	elSUZU2M6LNjiwY3fkXhlfZBEwW3c3QLFxmFbfzS+U5xv8a8INVaf+V8qvnYr8Nu
-	Vl16a2AJVijhG7tvMaC2jOhzkbYYh2VxH08m0oI5NzKB7xwbaUJoN2BamWe7a7Mx
-	jbvTrfJuDMDNFy8AY8ptFCTkkWr2BZSU87r4/HJnfMXoA+06ujS5J49wIh8MRujp
-	fGUQAGfv1xjy8JbCybN7/g==
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1731911684;
+	 x=1731998084; bh=hcVuGCXpjh4sHO0KZot3UFeVaekGrZHYxmKg3dP00JU=; b=
+	f26oMOTxjQ1y4UA0i8OttMyxO9ckgi/0AAEIWvKdehgRSW37ELwWLjEtYJC1/nJ2
+	Vu+eopIkuXLAtUQKZgf6eTWzAq1AEXze3LUAVAmzaU9OUXW1GXuB6gb3lmCuI+wy
+	0Ay8+mQwR0TH4E3fXVHnoiIpqM4GYzSOJxBWZS0BHCJGiGZ6etlBlI+Q9BgfNGtR
+	1H0yRzHfoBtKFy3Z8EaglBmog0FIeSrBDWup+4F6uSeZUwtDwWtawxOh0QCA9XgZ
+	Bm7Ii0+wFA2AlEJfTNnjSL0tkQQZvIYktcxoUd8d8NKUNbxwcWXsNkzAdrjUcONB
+	hogv2hk3wKxWR/QTyOIlCg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:content-transfer-encoding:content-type
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1731911545; x=1731997945; bh=P
-	tArSHe6OqREEyBvIEFXeJ+RDsFU75KyOaFO11n3GaE=; b=jHZIIoznQZ7TcxUNL
-	OOXBvC4o5Eg+T5UQyy1cUCEPV4wnaNX9h9cviZsxfpnavptD/ot0Xa0IMVgroMRm
-	LWov6N7JQJo0h9YZTNrTFF3Vdxyc4w69/72T1hMR4+j5Zg2ksulW9t1kvoLFzBBM
-	P1AMBC+5LrPfa/bdyLoUaGPPltIiO97iMPjrWBAVA/YolP69NYLa/E2FULAPrT+z
-	jblzEPX7E6mXBNlAnzK55PPOGMvwr+3pxbGjgStIEJcqr3BPXszBZSWcf1B/n6AR
-	Pv5T9SclHbx9NPLwQD9iICFcHCdxjfBJgRX5uQIUmJHFb7eZxL1iMB//GQjSn03d
-	/8QKg==
-X-ME-Sender: <xms:eN86Z5YXxtm1Hrie6adQKLGILsVOaKZC77bjfeP_vByWruOElQog6Q>
-    <xme:eN86ZwbrxszMvHAPI2cuVl2Y39EIA4-R5ShnL-k97VFJsRd0Cc-DKoJuidWtqIyEX
-    9y7mO49FZTsNRvmpg4>
+	:x-me-sender:x-sasl-enc; s=fm3; t=1731911684; x=1731998084; bh=h
+	cVuGCXpjh4sHO0KZot3UFeVaekGrZHYxmKg3dP00JU=; b=ByVYC1jSCEG+tqq0j
+	FL2lKfjHx6M9OG1U8EnIu5R80pYk8g8TyoLOO4zrzvJsG2wV9zfJKPs/nBgqFWrG
+	jemrWh/EZBTEwIhlBaFRTOGIWw9mLhouH6auQCmgCkkMe9JbgCw+u4e6QaWHX4Ac
+	sItf6/Q/ePqOocR1OTbay9I/0nfsDVklPu9bM1ojOF6kjijMokXIkM//s4Hc/TbM
+	p8Iu4HyQTQZJ4+DxoAGSKWD2ltEgIpZfF8GMRDc1+OZdjnxGE6UpiOfbkiwRFY19
+	f0XCeP4UU5/VeId1ft+wh46lGGjqhry8pVsbIm8Mhw+6u6/GN6EY4cPMUiIeZSFJ
+	ttfpw==
+X-ME-Sender: <xms:BOA6Z0Q0T-oEZnPGNiKVH_JiCGto2a8yh_7mONKoaAHewtR7TRs7rA>
+    <xme:BOA6Zxx1VFs01CbMiZqGHHlSmwoQKGe9LhLslA6SYbzBGrWmqs5eSF1a6_Q_cekvH
+    R-mu1t2zLMxmY2bfX8>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgdeljecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
     tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
     hsucdlqddutddtmdenucfjughrpefoggffhffvkfgjfhfutgfgsehtjeertdertddtnecu
     hfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvg
     eqnecuggftrfgrthhtvghrnhephfekledtffefhffghfetteehuefhgfetgefhtdeufedu
-    ueeltefghedtjeeifffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    ueeltefghedtjeeifffhnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrg
     hilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhm
     ohguvgepshhmthhpohhuthdprhgtphhtthhopehjrggtkhihpggthhhouhesrghsphgvvg
     guthgvtghhrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
@@ -80,14 +80,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgdeljecutefuodetggdote
     hrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgv
     fidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphdriigrsggvlhesphgvnh
     hguhhtrhhonhhigidruggv
-X-ME-Proxy: <xmx:eN86Z7_NwbygezGvZxC6RAqet2uq3vF5UyRu_linf2MaWyRyEot6lQ>
-    <xmx:eN86Z3qgVRDlcZPEXo96CJv7C83J_2cAOQ4XmNYCR92S9eIU1Iy56w>
-    <xmx:eN86Z0q0XtvnT5yldtyDdTOJGxAloql4lHDRhP9pOzRhTF3Q3OKJYA>
-    <xmx:eN86Z9Tba16-bRHEA6NqOpVE2-G-Jovop8M8olOFJFe0OfBvEGIH0w>
-    <xmx:ed86Z6jpnIvj9RNgX3pci9tRHArA2GJVSmc4v1gL_I_z3wO4a7FJx8TZ>
+X-ME-Proxy: <xmx:BOA6Zx1dXfkqH5sxerWQJZU5WioiWHtptgPGwlGQG1MbeSftWrfr3w>
+    <xmx:BOA6Z4AfCFCd_GLCdNZc_mXIRy922ujzdF4YZ2SVY8d5wR5v47XrXg>
+    <xmx:BOA6Z9gtBqYDxUV35AdkNZ39zdmjcEX65cP1oamlK_kofpC3a6m1xw>
+    <xmx:BOA6Z0ox2FF9kt7pvbT_O0n99yHqdCmtwJYNn6kNluVYWuczKGCClA>
+    <xmx:BOA6Z2acTbc-bdrz_g_BePaeOxeJvF-EaCgHttpHxNmFYHYdddSbO-_1>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id B967A2220071; Mon, 18 Nov 2024 01:32:24 -0500 (EST)
+	id 1F0652220072; Mon, 18 Nov 2024 01:34:44 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,7 +95,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 18 Nov 2024 07:32:03 +0100
+Date: Mon, 18 Nov 2024 07:34:23 +0100
 From: "Arnd Bergmann" <arnd@arndb.de>
 To: "Jacky Chou" <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
  "David S . Miller" <davem@davemloft.net>,
@@ -104,36 +104,30 @@ To: "Jacky Chou" <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
  krzk+dt@kernel.org, "Conor Dooley" <conor+dt@kernel.org>,
  "Philipp Zabel" <p.zabel@pengutronix.de>, Netdev <netdev@vger.kernel.org>,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <6a7570d0-2b3d-4403-afb1-f95433ad6ecb@app.fastmail.com>
-In-Reply-To: <20241118060207.141048-4-jacky_chou@aspeedtech.com>
+Message-Id: <4b1a9090-4134-4f77-a380-5ead03fd8ba8@app.fastmail.com>
+In-Reply-To: <20241118060207.141048-6-jacky_chou@aspeedtech.com>
 References: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
- <20241118060207.141048-4-jacky_chou@aspeedtech.com>
-Subject: Re: [net-next v2 3/7] net: ftgmac100: Add reset toggling for Aspeed SOCs
+ <20241118060207.141048-6-jacky_chou@aspeedtech.com>
+Subject: Re: [net-next v2 5/7] net: ftgmac100: add pin strap configuration for AST2700
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 On Mon, Nov 18, 2024, at 07:02, Jacky Chou wrote:
-> @@ -1969,10 +1971,29 @@ static int ftgmac100_probe(struct platform_device *pdev)
->  	}
+> @@ -351,6 +352,10 @@ static void ftgmac100_start_hw(struct ftgmac100 *priv)
+>  	if (priv->netdev->features & NETIF_F_HW_VLAN_CTAG_RX)
+>  		maccr |= FTGMAC100_MACCR_RM_VLAN;
 > 
->  	if (priv->is_aspeed) {
-> +		struct reset_control *rst;
+> +	if (of_device_is_compatible(priv->dev->of_node, "aspeed,ast2700-mac") 
+> &&
+> +	    phydev && phydev->interface == PHY_INTERFACE_MODE_RMII)
+> +		maccr |= FTGMAC100_MACCR_RMII_ENABLE;
 > +
->  		err = ftgmac100_setup_clk(priv);
->  		if (err)
->  			goto err_phy_connect;
-> 
-> +		rst = devm_reset_control_get_optional(priv->dev, NULL);
-> +		if (IS_ERR(rst))
-> +			goto err_register_netdev;
-> +		priv->rst = rst;
-> +
-> +		err = reset_control_assert(priv->rst);
+>  	/* Hit the HW */
 
-Since that reset line is optional, how about making it
-part of the normal probe procedure, not just the if(aspeed)
-section? It seems this does nothing for older devices but
-may help for future ones regardless of the SoC family.
+Is there a way to probe the presence of 64-bit addressing from
+hardware registers? That would be nicer than triggering it from
+the compatible string, given that any future SoC is likely
+also 64-bit.
 
       Arnd
 
