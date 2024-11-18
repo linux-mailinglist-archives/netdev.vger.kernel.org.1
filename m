@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-145796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F4569D0F49
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:11:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 041B69D0EE1
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:48:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5496B2BCE4
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B8E1F21FA4
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E53195FD1;
-	Mon, 18 Nov 2024 10:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5BA1990DC;
+	Mon, 18 Nov 2024 10:47:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4E8194AD6;
-	Mon, 18 Nov 2024 10:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A288196C6C;
+	Mon, 18 Nov 2024 10:47:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731926876; cv=none; b=EIKxShL+CAye1J1EMlPCOEv+2xU2+Yg3/JYLIf4JyZxFdHk8fRyCfNXKGukUn78gOvnjpVti5gmKQoRiYnFZlRTXLyGrk3eUQUECTlXbliasYmFboii7u7GSW/xlsN9C7Q5qEpXYN+/SFrzNEm5U3t+6KpIk12tk7bqu+jB1Oxo=
+	t=1731926878; cv=none; b=hMmXEybEXcaYOIf3IAIgD+LDoM3MVeWjPtRJalErPizSvx7Kg0RiY9ERcT1rsNLIeRlhV1Dz8b5lVJRzgWooM1YRxxaZKVfcy2vsoaY/BvvKVbIuSf+Gf2pNF3hETv2uT+fD3sA84bL1tmosV/EHw8EWGcLUURx6VGJaqmiZ3BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731926876; c=relaxed/simple;
-	bh=MFJtfGhQG+eUUL07mlL/G5apKuXSm2L4i8KUzokOPHw=;
+	s=arc-20240116; t=1731926878; c=relaxed/simple;
+	bh=dXLOxAWUC9uvWEp4IdnazNBiiiYWM19Awg/Y3cHQtN8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HzXhf4baMfSDrREFXg4dE8QnqgZ5x6Tkwep3vO9W9EC0+hn34lhiwGIiolnRwhWFM51fcUZ16z5Vo9HCXyCIyVw1l2Mns5hLv6Xhx25hFDmbbNxFbqbJiJ/NsqJy4vPFntehL01MU6NJOQh1ptekzhb9MxtFEWG3joOtX4TodFk=
+	 MIME-Version:Content-Type; b=cWn8mdW0RvqXyIajpSPWo4UrKyF3R+jJGaBmQj5L9Eg3ZZkb5xSg/VA5pi1xCOX3zaSbK7vZA5+HYHOJmawRxC8KDPeHnPkX1JZJaelP+aZFEyKECpnHR8Y0boXtgH3MpcRAFaq9ILhIeShnVEQCxQ/eRmKzTIgXCp1o6QPvQvU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -45,9 +45,9 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>
 CC: <jacky_chou@aspeedtech.com>
-Subject: [net-next 1/3] dt-bindings: net: add support for AST2700
-Date: Mon, 18 Nov 2024 18:47:33 +0800
-Message-ID: <20241118104735.3741749-2-jacky_chou@aspeedtech.com>
+Subject: [net-next 2/3] net: mdio: aspeed: Add support for AST2700
+Date: Mon, 18 Nov 2024 18:47:34 +0800
+Message-ID: <20241118104735.3741749-3-jacky_chou@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241118104735.3741749-1-jacky_chou@aspeedtech.com>
 References: <20241118104735.3741749-1-jacky_chou@aspeedtech.com>
@@ -60,29 +60,27 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-The AST2700 is the 7th generation SoC from Aspeed.
-Add compatible support for AST2700 in yaml.
+The Aspeed 7th generation SoC features three Aspeed MDIO.
+The design of AST2700 MDIO controller is the same as AST2600.
+Therefore, just add AST2700 compatible here.
 
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- .../devicetree/bindings/net/aspeed,ast2600-mdio.yaml          | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/mdio/mdio-aspeed.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml b/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-index d6ef468495c5..6dadca099875 100644
---- a/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-+++ b/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-@@ -19,7 +19,9 @@ allOf:
+diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
+index e55be6dc9ae7..4d5a115baf85 100644
+--- a/drivers/net/mdio/mdio-aspeed.c
++++ b/drivers/net/mdio/mdio-aspeed.c
+@@ -188,6 +188,7 @@ static void aspeed_mdio_remove(struct platform_device *pdev)
  
- properties:
-   compatible:
--    const: aspeed,ast2600-mdio
-+    enum:
-+      - aspeed,ast2600-mdio
-+      - aspeed,ast2700-mdio
- 
-   reg:
-     maxItems: 1
+ static const struct of_device_id aspeed_mdio_of_match[] = {
+ 	{ .compatible = "aspeed,ast2600-mdio", },
++	{ .compatible = "aspeed,ast2700-mdio", },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(of, aspeed_mdio_of_match);
 -- 
 2.25.1
 
