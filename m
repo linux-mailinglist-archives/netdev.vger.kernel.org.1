@@ -1,100 +1,87 @@
-Return-Path: <netdev+bounces-145818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122419D1091
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:30:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10139D109F
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:36:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BB73B22B7F
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:30:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71AA31F232F1
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D571993BD;
-	Mon, 18 Nov 2024 12:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FA819AA68;
+	Mon, 18 Nov 2024 12:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gWzZ1ooj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHCHKx4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5B9190665
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BDD19A288
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731933016; cv=none; b=eseB76voUMF3aJT2/hevppd3pQEt4PK2PsIGEqBZ6WQGkhU7MLxWtonIxgCiJi85TMtpeS3uT62fKj6xosMK5xui4gbjgJbxC+GU3iYC+7E1Bbo/EIWcUpBwPxcf60waBjt/ikJOH0fJakvPZO/PPnvjBtvj7Pw7XE26ECPfOR0=
+	t=1731933391; cv=none; b=qsWgd7hZ7Gee5oZDhGdzKsBY9efNN0kvnsusigtDFpxeQndyxMNosQLYWuSt1omm3yqiBY0E+QDp/DXcFtcIPRWWV9mini9q0gNZosCRViuvKXtBVaEILo4TFzLL32OYayGYSbO0Pxr3Tb9JTVHYJE5Ld/ZwVvsasXxtmPKT3SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731933016; c=relaxed/simple;
-	bh=NO6EOQUTyDmVY3USQKNqdzZmkrIFfdaDhePgnUCOeS4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qcgPMvllU79GKu9wGdUJKheMOySHh5Nw6WuZ6vBVM3wvhyMXb4m4xXj6MlDlUaNQuLPvGP05L7IIGNP+kdv6Osqm7VS6KooFw1GiqcwWYg+uxGke0PkIKqzpnv2Jnncw58zbVsbD2ILvtfMClqg1Yj7CrZbA0DoPZ5JhGaa55wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gWzZ1ooj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731933013;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NO6EOQUTyDmVY3USQKNqdzZmkrIFfdaDhePgnUCOeS4=;
-	b=gWzZ1ooj5TkE4mTkujbL++zzAY2AB5NYEZvwzhv1/y0T4gUo7bSQnLjO+xkFz/sfuHCc8d
-	VXXrawR3Nom2XP88ngGWY+asgrol8UAMKb2onFNw5eET5sjq+WHvxwP0aXBo8MoKjxO0ES
-	NxhXV7/fi7pdTgBsGDnMDJQAYHsjWf8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-198-m7tFEhjpMzaKL8E6a9mlbw-1; Mon, 18 Nov 2024 07:30:11 -0500
-X-MC-Unique: m7tFEhjpMzaKL8E6a9mlbw-1
-X-Mimecast-MFC-AGG-ID: m7tFEhjpMzaKL8E6a9mlbw
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4315cefda02so22281475e9.0
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 04:30:11 -0800 (PST)
+	s=arc-20240116; t=1731933391; c=relaxed/simple;
+	bh=au7Wcy3zIXPA3cFUczTfmlpykExc9P15BO1mTJXuI7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n0Xqu34sgz1CuWBo5qGCkn0buKBMjxQ6whLYkdYr1hOUcD3N8bIvSBTvI47edleWEaQ9sGld7wmgucHDd8wT9go1kOXuWfGWQyCU8mcQYBkiqjxhShmnCGtWfUlNWDoTmt8r698dlfxfqkkYtC1JR69Qr76L4kxuHrFMYpMqIU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHCHKx4z; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so1639288a12.1
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 04:36:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731933389; x=1732538189; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7KJ5UNj9SfGuydcrxRB331ERZl4+gXJ85bx84sJ/8k8=;
+        b=PHCHKx4zQpVcxKLx/fxkw+6d3R8HGmSVyG7g0oDlYwseFx2BUyyq2x+/wnNWnwFrN5
+         O+/jjd4+wKxR/RaIi9RYE6ZQh5ivs2Qnj3Dgmn5hExHyjcP2x4cEYMi/8zDhccRNCb2j
+         WFtJN+wvUMh90SloiDNOMB2NtJfwoqOOaNCHpVgncUtF8ksmTwOPm34IdHRP8JbO6Baz
+         AHCh0++DaI3lQynHeyP2tE18waX8nXRfRmtg4wBQH+8me/Y4Sr47ftKufK9qYMDuVsG6
+         l0ytgsCcXh/v5hmehAdvbBRnKBwtYSaOMnAa093ekMZ411bUyXzBHqLFm3xEJbrODmrm
+         R1ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731933010; x=1732537810;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NO6EOQUTyDmVY3USQKNqdzZmkrIFfdaDhePgnUCOeS4=;
-        b=UEXn1Zd2EopSIb3B4eOr+BIv/sfVxTQIDv9WbUSBWzvcPtgJ1pM0ughWJE8ISfU803
-         W37CuiTj79G0xcllLOg9EjbhqsokUM3nsLvcmRq5CMfv0pUJ6M6ZXN03WevTooMaJdDG
-         FgBMadLm6GOy/H0PZDwKRxhuYGLy0lDwIA4kByuZSpORPoHzi647qrMrWBCR8YLkusGP
-         TjrivWv1fg2tF+x/LYz3/H8YzrjP1NuMS2jl3xtV89TKqpXn9RBXjjGlgrgAmQUOKn0g
-         dfwo9yU2UlVnwtn7rLXQrSZl1fjNIVuAlVRnkd/RT8iaYJNFST4H6N75TTOkLFB1z4FS
-         Hp8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWgIJTIgTP3rmx57IUqjElkxGxLthnKmYGOEGRZ16K1m8RGY0mjf9LkG+I25EbbqX5P3EReJNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrnLdWs0qvhOFncGzMlCs+SsfW0XEc9Nv68nEF33Tqvaj2HewD
-	jVjFpzEqd4TKwhutIiUb4BPSbi/eN0DxA2ZSj4sDYEX5713kDIqqNDMEfuQI9qnmJWaUaqldGpS
-	ClDqVPCzMuhnvy6grWSneb2uUavXEhwPMfqdl27rFsLJ0ZuO3P7hzTA==
-X-Received: by 2002:a05:600c:1e27:b0:431:5043:87c3 with SMTP id 5b1f17b1804b1-432df78bb53mr83701335e9.22.1731933010547;
-        Mon, 18 Nov 2024 04:30:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH7oK0+2Gv2ZYhVUhG0VyLtCz8pqw41xvHq2CRum6J9E5cnOuLJcYos2MdCEG+4t+BLPsAE8Q==
-X-Received: by 2002:a05:600c:1e27:b0:431:5043:87c3 with SMTP id 5b1f17b1804b1-432df78bb53mr83701165e9.22.1731933010270;
-        Mon, 18 Nov 2024 04:30:10 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab72085sm158073035e9.3.2024.11.18.04.30.09
+        d=1e100.net; s=20230601; t=1731933389; x=1732538189;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7KJ5UNj9SfGuydcrxRB331ERZl4+gXJ85bx84sJ/8k8=;
+        b=vKbS/+aejirhKjBCNXu13XomnPYADKLxfejyrlaVRwxLWHymRzENWyFe4tGjohvcWR
+         +dW7kzciuSY5Jvoa85gpwX3vFIdsaaV1Tzm8101JizI+6xbBTUI288nExtDVBSm9OjOf
+         vqVwr2bQZh3phtYE+HkRCC989B/FEMAizHci26AJ13AdOMGWw4namh8AdwkHc1TX5YF2
+         N3P88mdAg9hw23EueL58Irzqus4MhxqeC2fsK/SDBAsMM9BIKdDUXPC8V5ysZj9wwxjs
+         ithX7lFnEomtHesDbytD9Fs6FK7I5RiYPhF/0fCHa46v0JJHIeqQ8WkFVBLYoGVhbLEc
+         cBKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWqECAD/VICEyV9piSJfxGoB23tvwOz0R8MjOqlr+n8nWezXzylMP5LlPoDqPWy+cETe1X7QIk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYumvX/tnIGAnI0Mk1+TAi5+hfgDCKqIcWMvKVXDIuWGI93PS1
+	Ka/5T56FAMR/7X5+ivzNdRfyY2FB4oIA+aheZZKGY3iEgu4eIdIG
+X-Google-Smtp-Source: AGHT+IEnct71WolKRfBHKW6axNOm/sCfEZKazpHBYZOPbw5fSe3JV7G5kjMP5QCQYfcOnyo/pFGO2A==
+X-Received: by 2002:a05:6a20:12d0:b0:1db:fff7:25d5 with SMTP id adf61e73a8af0-1dc90b47573mr17650530637.19.1731933388603;
+        Mon, 18 Nov 2024 04:36:28 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724770eef34sm6133220b3a.8.2024.11.18.04.36.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 04:30:09 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A8597164D318; Mon, 18 Nov 2024 13:30:08 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Ryan Wilson <ryantimwilson@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Network Development
- <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>, ryantimwilson@meta.com, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH bpf-next] bpf: Add multi-prog support for XDP BPF programs
-In-Reply-To: <CA+Fy8UaKWJ+8SoF_purtcOju-Xdt-m5qeUvg5keK3KGW9=ApQw@mail.gmail.com>
-References: <20241114170721.3939099-1-ryantimwilson@gmail.com>
- <CAADnVQJ2V6JnDhvNuqRHEmBcK-6Aty9GRkdRCGEyxnWnRrAKcA@mail.gmail.com>
- <CA+Fy8Ub7b1SXByugjDo-D13H_12w0iWzQhO-rf=MMhSjby+maA@mail.gmail.com>
- <874j48rc13.fsf@toke.dk>
- <CA+Fy8UaKWJ+8SoF_purtcOju-Xdt-m5qeUvg5keK3KGW9=ApQw@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 18 Nov 2024 13:30:08 +0100
-Message-ID: <87ed38ragf.fsf@toke.dk>
+        Mon, 18 Nov 2024 04:36:27 -0800 (PST)
+Date: Mon, 18 Nov 2024 12:36:20 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	roopa@cumulusnetworks.com, jiri@resnulli.us,
+	stephen@networkplumber.org, jimictw@google.com, prohr@google.com,
+	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>
+Subject: Re: [PATCH iproute2-next] iproute2: add 'ip monitor mcaddr' support
+Message-ID: <Zzs0xDi-3jdQSuk0@fedora>
+References: <20241117141655.2078777-1-yuyanghuang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,69 +89,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241117141655.2078777-1-yuyanghuang@google.com>
 
-Ryan Wilson <ryantimwilson@gmail.com> writes:
+On Sun, Nov 17, 2024 at 11:16:55PM +0900, Yuyang Huang wrote:
+> Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
+> multicast addresses. This update allows the command to listen for
+> events related to multicast address additions and deletions by
+> registering to the newly introduced RTNLGRP_IPV4_MCADDR and
+> RTNLGRP_IPV6_MCADDR netlink groups.
+> 
+> This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
+> and RTNLGRP_IPV6_MCADDR being merged first.
+> 
+> Here is an example usage:
+> 
+> root@uml-x86-64:/# ip monitor mcaddr
+> 8: nettest123    inet6 mcast ff01::1 scope global
+> 8: nettest123    inet6 mcast ff02::1 scope global
+> 8: nettest123    inet mcast 224.0.0.1 scope link
+> 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
+> Deleted 8: nettest123    inet mcast 224.0.0.1 scope link
+> Deleted 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
+> Deleted 8: nettest123    inet6 mcast ff02::1 scope global
+> 
+> Cc: Maciej Żenczykowski <maze@google.com>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+> ---
+>  include/uapi/linux/rtnetlink.h |  8 ++++++++
+>  ip/ipaddress.c                 | 17 +++++++++++++++--
+>  ip/ipmonitor.c                 | 25 ++++++++++++++++++++++++-
+>  3 files changed, 47 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
+> index 4e6c8e14..ccf26bf1 100644
+> --- a/include/uapi/linux/rtnetlink.h
+> +++ b/include/uapi/linux/rtnetlink.h
+> @@ -93,6 +93,10 @@ enum {
+>  	RTM_NEWPREFIX	= 52,
+>  #define RTM_NEWPREFIX	RTM_NEWPREFIX
+>  
+> +	RTM_NEWMULTICAST,
+> +#define RTM_NEWMULTICAST RTM_NEWMULTICAST
+> +	RTM_DELMULTICAST,
+> +#define RTM_DELMULTICAST RTM_DELMULTICAST
+>  	RTM_GETMULTICAST = 58,
+>  #define RTM_GETMULTICAST RTM_GETMULTICAST
+>  
+> @@ -772,6 +776,10 @@ enum rtnetlink_groups {
+>  #define RTNLGRP_TUNNEL		RTNLGRP_TUNNEL
+>  	RTNLGRP_STATS,
+>  #define RTNLGRP_STATS		RTNLGRP_STATS
+> +	RTNLGRP_IPV4_MCADDR,
+> +#define RTNLGRP_IPV4_MCADDR	RTNLGRP_IPV4_MCADDR
+> +	RTNLGRP_IPV6_MCADDR,
+> +#define RTNLGRP_IPV6_MCADDR    RTNLGRP_IPV6_MCADDR
+>  	__RTNLGRP_MAX
+>  };
+>  #define RTNLGRP_MAX	(__RTNLGRP_MAX - 1)
 
-> On Fri, Nov 15, 2024 at 3:07=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen =
-<toke@redhat.com> wrote:
->>
->> Hi Ryan
->>
->> I'll take a more detailed look at your patch later, but wanted to add
->> a few smallish comment now, see below:
->>
->>
->> Ryan Wilson <ryantimwilson@gmail.com> writes:
->> > On Thu, Nov 14, 2024 at 4:52=E2=80=AFPM Alexei Starovoitov
->> > <alexei.starovoitov@gmail.com> wrote:
->> >>
->> >> On Thu, Nov 14, 2024 at 9:07=E2=80=AFAM Ryan Wilson <ryantimwilson@gm=
-ail.com> wrote:
->> >> >
->> >> > Currently, network devices only support a single XDP program. Howev=
-er,
->> >> > there are use cases for multiple XDP programs per device. For examp=
-le,
->> >> > at Meta, we have XDP programs for firewalls, DDOS and logging that =
-must
->> >> > all run in a specific order. To work around the lack of multi-progr=
-am
->> >> > support, a single daemon loads all programs and uses bpf_tail_call()
->> >> > in a loop to jump to each program contained in a BPF map.
->> >>
->> >> The support for multiple XDP progs per netdev is long overdue.
->> >> Thank you for working on this!
->>
->> +1 on this!
->>
->>
->> [...]
->>
->> > Note for real drivers, we do not hit this code. This is how it works
->> > for real drivers:
->> > - When installing a BPF program on a driver, we call the driver's
->> > ndo_bpf() callback function with command =3D XDP_QUERY_MPROG_SUPPORT. =
-If
->> > this returns 0, then mprog is supported. Otherwise, mprog is not
->> > supported.
->>
->> We already have feature flags for XDP, so why not just make mprog
->> support a feature flag instead of the query thing? It probably should be
->> anyway, so it can also be reported to userspace.
->
-> Oh wow can't believe I missed the feature flag API. Yes, I'll use this
-> in v2 instead. Thanks for the suggestion!
+No need changes for headers. Stephen will sync the headers.
 
-Cool! You're welcome.
+> @@ -220,6 +226,8 @@ int do_ipmonitor(int argc, char **argv)
+>  			lmask |= IPMON_LNEXTHOP;
+>  		} else if (strcmp(*argv, "stats") == 0) {
+>  			lmask |= IPMON_LSTATS;
+> +		} else if (strcmp(*argv, "mcaddr") == 0) {
+> +			lmask |= IPMON_LMCADDR;
+>  		} else if (strcmp(*argv, "all") == 0) {
+>  			prefix_banner = 1;
+>  		} else if (matches(*argv, "all-nsid") == 0) {
+> @@ -326,6 +334,21 @@ int do_ipmonitor(int argc, char **argv)
+>  		exit(1);
+>  	}
+>  
+> +	if (lmask & IPMON_LMCADDR) {
+> +		if ((!preferred_family || preferred_family == AF_INET) &&
+> +			rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
 
-> And if it's exposed to userspace, users no longer need to guess if
-> their driver supports mprog or not - although hopefully this is an
-> intermediary state and the mprog migration for all drivers will be
-> relatively quick and painless.
+The rtnl_add_nl_group() should be aligned with the upper bracket. e.g.
 
-Famous last words? ;)
+		if ((!preferred_family || preferred_family == AF_INET) &&
+		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
 
--Toke
+> +			fprintf(stderr,
+> +				"Failed to add ipv4 mcaddr group to list\n");
+> +			exit(1);
+> +		}
+> +		if ((!preferred_family || preferred_family == AF_INET6) &&
+> +			rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
 
+Same with this one.
+
+Thanks
+Hangbin
 
