@@ -1,707 +1,560 @@
-Return-Path: <netdev+bounces-145985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8930E9D190A
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:36:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 752909D190C
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:37:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4AFBB22334
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 19:36:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1EE7B212D7
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 19:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FC21E501C;
-	Mon, 18 Nov 2024 19:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81D71E501C;
+	Mon, 18 Nov 2024 19:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lB3mxngc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hI64/J3D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2070.outbound.protection.outlook.com [40.107.93.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578AE14F9CF;
-	Mon, 18 Nov 2024 19:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731958603; cv=none; b=QdRaSDcuQH7QQi/iHw6Jx2/5W6TOKVWoMyoSFNpyWLSex0h/C06sFUKTqwKBVM4IWfsD4PJyE+K3Bmix6mxTMvDZ1O0ghO0YoZEA58K/VDHbkrdMWtUapNmX2hmLKafQjeqfwWHCvSm58DnaP0CqMTU2Rna4usFZvoBg7KVoqMI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731958603; c=relaxed/simple;
-	bh=rfyGJnVFPjIMsnyY0j/nZ/7GaNED2ggTZ0g3gLAHIjQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=sNmizGba6AbqieEwTZVlH7fYnLFhyLLujQ/N71oI5UA4WZla9Aptzay3n416ay4QrMMHO/4WHR3SH0Gz9EuEdiROCGGfnalqekb2mr8M9xe3tXO19E2wCT+RViT3FMlZQ1NPnRERbJVpcw/Pu7JhNApxwj4Ms344k1Qno7NtqOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lB3mxngc; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7242f559a9fso169913b3a.1;
-        Mon, 18 Nov 2024 11:36:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731958599; x=1732563399; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qANuAm7vLgV+XAw13VgujhjbJWUIzcEjMpJoBqhdbPM=;
-        b=lB3mxngctzFP4ik6EQcOGTgfzEfQA81Ex8bjryEKinC4QxKCtPa3gE9tlwwySozdpE
-         lpCNIOrTgLdKYK9UBiCHE/z5nJnnD2VW3Q+gko9DU7bX72WE6uPUACy92UVYNf0/8F8u
-         tXAMucH6yB3IitbhOeTzBQS6W3B97JTHhmuJIlj8C9NufHXASDBNo5uUUM2YNxK9bZCV
-         +X/SDum+9snDQn1W26KVo7P63g6qD/sdYoA/AfhU4+dGS43VqUzzDiXKgNOdxm9MdgW/
-         yubXhreWn9CTUChyrxWpsD+6023Duundgo4jylfvzuxktcSpgSVq/y7mmdq/6lPEGtlo
-         QvTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731958599; x=1732563399;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qANuAm7vLgV+XAw13VgujhjbJWUIzcEjMpJoBqhdbPM=;
-        b=q7FRmojqDNgwUntJXfARrULPTrT1bBYupCu+SSoYCpInyrcq4+5S/ke25byiA0ZJs4
-         M8QrWImh/e1Zm6jsMBR+oidyVxgiA1Ra78PPz1Fgl2O+M1hcDd2EAMX5AS2Se2HfE/DQ
-         ucwGO6nKrGKZBSkc+ZdkTa1PmsKCXZa2ud3pUhd7U6MTFpT0P/r5svxG2/8nY8TVANZv
-         GWENMnSwMmq85mVhzfewGc6cT9S4hyCS5S1zYHK41SrsUNOZl3/pS4390RKMZIjDx9WN
-         DYKO0BcLlpN7ngsqCdn3InEv7N/O/h6E0jWKIL739+NQBORYoGGcvxa4pUn1t/LfxiUl
-         Kgsw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1MWx59AAHA/YHFGuDnedgNB8YQsp4k+XMCqoMIPauWK0+U4jT3S3YpgyhVe3z3nNAhWr3tw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZ/dZDeX06rqERFSRhu4NbhreEKTi9U52NGrl1xPTsmPiFV94K
-	6v4M/8pwYTJRLe6BQ823MlFsSuA89HT7FpLp2pJK5m5mI61WmPcI
-X-Google-Smtp-Source: AGHT+IFZ08k36fgOP74GMco1xYetq84dlIfOzfjwzrlsU93gx6xbsdBIPilWhs92pYwCyjqg7aM1cA==
-X-Received: by 2002:a05:6a00:3a1f:b0:71e:692e:7afb with SMTP id d2e1a72fcca58-72476b72b62mr19321122b3a.5.1731958599300;
-        Mon, 18 Nov 2024 11:36:39 -0800 (PST)
-Received: from localhost.localdomain ([12.37.166.69])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724771c0d4esm6518159b3a.117.2024.11.18.11.36.37
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Nov 2024 11:36:38 -0800 (PST)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: torvalds@linux-foundation.org
-Cc: bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	peterz@infradead.org,
-	mingo@kernel.org,
-	jolsa@kernel.org,
-	martin.lau@kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] BPF changes for v6.13
-Date: Mon, 18 Nov 2024 11:36:35 -0800
-Message-Id: <20241118193635.77842-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C8B153BF0
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 19:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731958613; cv=fail; b=DJ7WFogQ6c5ieXKA1Ja59bKhIylQhOGr2ytS8XQvM+Z2yffHBwTc1f7LnOsIq0XdQ7tH82ZtoYZSXuOe9X4WcNEAcBJUwNlVoCgv0A1kykwU5Cw/oztu3/A6OzLrnyCKnCwtCIz0alLHM3ZLZOPFJYnCZW8LRrRASux78BSAREU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731958613; c=relaxed/simple;
+	bh=5R+OK4mufDSXnWCFsVvW+cAOiFGT1ZWBQrSo4XY6/O8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dGs6z37SP+rsia9s3YXvLCr4HzCWZtPvK4ew68/ZpAVjTcmRPfSfpMSFJStZdPzCxkATQKcm3+yjZU7eMK6Zgui16dZJuHcm2aYo9GbqcolQR54SAhaB8BrVUgNVXlEMVWgUliBjuNNttQgHZfzmSQXhC4wxBbyQqK80UvekoVA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hI64/J3D; arc=fail smtp.client-ip=40.107.93.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MIZQk9e79+HwsC4bIjyxhj7/iCtIIQ9SqSBva5ufGRhdQuC8Ew6k9WwZLIr1X2Br7DG17vAlvLo88RBcfpNxCYFYyqKFA9HkEzSqEtaiYLLH0MCmRkraxty9AvoJMp5OKzC28XaxZdmCCAvx9yxTEDFnkXVgxPVAQVlK1WFTcim34DocKuzMt/PcHteHCmtjAgLZuaNCjFktprZJhGNU02inAjBhUT1xq8m71e/1LAYiRK+IEx06/HB9VWTKpRNyMl31OQCSrOYEnOKCMso8Odkkd5tSd63nQnNeT3BTmFDER9Q/C39Jcs47I0XruMaDqsbWRWKKONac1k30KKjxsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KlA64x7IXcsH0HumOUfU0XXQk2vFis/sqylEKt1Mxns=;
+ b=C+6rccbtQIfkBlJ1Uz/cupZ8knIi3SAYV6JnVX3l73f1CI0A5pvwrb9ZSE5yntG7aXYvFe+f3U5l1y/7G57gMDuVXF0weS2XjqjDK6ASoURcUpAvLI72gPpUpc/1L3RAxB/LBeMN2wvCiInk+FHzJs6A3UGRZS2wUygC858ND3HNhhsCK4fz4sBpc92U7s09V6WBPRgn67ScuytKDCeuO/zstQapKuC/E6PvP3d+C46E+rqKrKBtJtz9pMgpKhXU6+534gMPWehuGb7KM9l4BhomRfdHTYBKuzWUsx+97qRNtFde17u4JMJncs1V2fRCsd4anL9HgLc/7LiTFdmHEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KlA64x7IXcsH0HumOUfU0XXQk2vFis/sqylEKt1Mxns=;
+ b=hI64/J3Dy735ZjIflLhfnSyr1bjHqQVtt9Iz+K3iPyVQPgh/N0qAcOWtPom0Hogd1mzyorDJKwc42OV7jnmwSPyqzdmT1kytndHQFVVFKjzSl9zctcYRQWeLgl0VyWvFpbA/CtJMhJ3VaTlsWuJYlUiTl79rIshUQEMVLdPEH+DqQsfN6WsfD4aBxvjMjvnEgsfNQTmUWerSb1vVOVYm20ZdxOIkmnSm12gFcT3tnMfmvyd0p7QAXYv6B4qtxDJ+lo8QexRJ5nGchjY+S/lcNQYGFLSh6s3qerpEDYprz9yKh1Otz9AzDacffuLulTEkZeKNyhwgZu9xIgdPok/LYg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com (2603:10b6:303:213::20)
+ by LV8PR12MB9419.namprd12.prod.outlook.com (2603:10b6:408:206::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Mon, 18 Nov
+ 2024 19:36:45 +0000
+Received: from MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2]) by MW4PR12MB7141.namprd12.prod.outlook.com
+ ([fe80::932c:7607:9eaa:b1f2%3]) with mapi id 15.20.8158.023; Mon, 18 Nov 2024
+ 19:36:45 +0000
+Message-ID: <b4aa8e75-600e-4dc5-8fe1-a6be7bb42017@nvidia.com>
+Date: Mon, 18 Nov 2024 21:36:38 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V3 3/8] devlink: Extend devlink rate API with
+ traffic classes bandwidth management
+To: Jiri Pirko <jiri@resnulli.us>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>
+References: <20241117205046.736499-1-tariqt@nvidia.com>
+ <20241117205046.736499-4-tariqt@nvidia.com>
+ <Zzr84MDdA5S3TadZ@nanopsycho.orion>
+Content-Language: en-US
+From: Carolina Jubran <cjubran@nvidia.com>
+In-Reply-To: <Zzr84MDdA5S3TadZ@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0199.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e5::19) To MW4PR12MB7141.namprd12.prod.outlook.com
+ (2603:10b6:303:213::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7141:EE_|LV8PR12MB9419:EE_
+X-MS-Office365-Filtering-Correlation-Id: cda38a05-d14f-4a38-65b7-08dd08085607
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TnVrT25QUW9ianlNSjZmNyt5RUlKeVhXUzhCTEQ5UWU5RHRwOHdKc1UvcDMr?=
+ =?utf-8?B?MWFkK0N6UG9LVmltV1d4cnl6Q0xxTzAvK0NlTmczanJRUmZVNmZmSWIxSnNj?=
+ =?utf-8?B?RFljTWc5cHcya0NnMS9jbTRkS2hpUzl6RXQxN1NybmpJTFQ1dnBBWklLK0pP?=
+ =?utf-8?B?dmMyRWhjMFRtZjRCdlNsdjg5VE82b3dHa0NLZDRhVGI2dmpQL1RRT1dteUpt?=
+ =?utf-8?B?c3RPczEvZnc1R0IxZUJ5NDUyKzloeWg4ZkFTaTBpUlJ0NGNXWjQ3NzZGaS9L?=
+ =?utf-8?B?QUVoNUttTUUzcG9BQ2dSc3VmRDhmdGtLOG1PdFk0MUUvd2I2bWNpVHNXTkZz?=
+ =?utf-8?B?bUthaEwzdHpPUkRhZlNzVWRlWi9zY1Z4TDhiYUFjcjdrUkxKUTVJdlo4SGdK?=
+ =?utf-8?B?MTFyMkNYUjZLMTFqbTNaaWtxdkhTQjI3NDV1VVhTK3NKS2JUR1oxVThtVThI?=
+ =?utf-8?B?aW9RNFg2Znlkb09lSy9UdG9RNDk0NHlZWU5zc0JqQWlqR050Y2hKZ3R5MFVU?=
+ =?utf-8?B?QXViRWFIR0M3aDhFZEVTTlovSmx2eWpGMGNQZU1vOTlILzdxRVFiM3lURUFj?=
+ =?utf-8?B?VjY4NVJzUndrOHpTNVdXS0N2OUx0OHJNQjNYbVhKYVhIVDFzSXprYUZHS2sz?=
+ =?utf-8?B?cUhaTFIzTDk1d0ZRNUFOdVkxZHN2c3NrYWg2Y2hOZXMzelVKbHM1SHFVd0I3?=
+ =?utf-8?B?aHZQMFFOd0NxS2ZpV3dCNDQxamd1eFFKdnBZRmd1c0ZDUExkcTl2K25tbW9m?=
+ =?utf-8?B?Y3dwUDliVVlZZDBidTUzOTI0ZWE4NXltMWNBbTlEcTViUlFORkh1U0puam1O?=
+ =?utf-8?B?dll1c25VSFJzM1ZsbVNtcjFQRmJPbXdSWXNkbU5NViszR1ExZTZCcW44S3hV?=
+ =?utf-8?B?eDRGYWhDRDNlSzMzTC9NM04za2xaaTIrLzFpYkd2ODRLeFoweVA3RUxCNnM1?=
+ =?utf-8?B?WFVkaGxXTHd4Z3hFRlZjNjlQUi96MHJuVUFDNWFsZlVuN0VVM0FyNTdOQXZG?=
+ =?utf-8?B?N3JCYTl4QlpyZzlwVXNBbkRwYmxPOUJUR1MzeTNXdURYNzVMdUpmdDREbkVI?=
+ =?utf-8?B?Qk5YdXArNG1CTTBncDd0Z28rWk9wS09aNSs1ZVAzSWhVcHZDdlVxOGM4TEpZ?=
+ =?utf-8?B?V2pUckR6OGlzNXVla1U0NTVBN1pHbDg1WlcvRzdUSERXQ0J1RXBJa09UTXNV?=
+ =?utf-8?B?NXArSnlQUGR1clZNcFlxTEo4bHBzVFJkUExlc2NkUWFJVExmVTllY1ZHOVlB?=
+ =?utf-8?B?L3VvN1c4Q0xvR2Z1MUt2ekhuaTRHOWhtM0VnK1NPSjRaL1RHeTNqQ2hpS0lO?=
+ =?utf-8?B?RFNWMUlvb2lrVmpvUnFQemlCb0UwQlJqQTY5T2pRRHNNYXhDS2RhRFhQS3Q2?=
+ =?utf-8?B?STFZQzZXRjZ1MUxLRi9FK2N6UjBIZVg0bE1vdlVJMUxWZGh2aGZKN200MEhx?=
+ =?utf-8?B?R2pyUlgrd3FZSVcxOTJGWldMNnB3a284WVNhWHBqWW1TQ0EwcHQ2WkNrdndR?=
+ =?utf-8?B?Y0s3QmtGZzV5MmJyY0RXNFVPd2hOVVg0WmQvckR0UFJleGY2SXZSV3dNY2dQ?=
+ =?utf-8?B?U09ySTlHSXkxZWRCaVIyOWZrV1c1aDUwa0hQZ3ZEUElNTGVEbFRDYkdSekZ6?=
+ =?utf-8?B?VmZQVUxHM3ZsaE1QTTh6NmY1empYODVMekJ2YkRNb2MwYmZzNGJRZHcvZ2pY?=
+ =?utf-8?B?MStFcXM3MjZQQWIrQW5xUk9QMGxiUmhtTlZpRTNmRmtKS2lURWdhYVRmV2NF?=
+ =?utf-8?Q?dv/Tes11RhqnxGcVC8XiULyYMp6YAt2q/mLJg0P?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7141.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?amI4WFV5RWwzNWJFdkV6dzgwc0FoSXNVTk5PNlZ5V1pOc0xkNU5wNlJINXRF?=
+ =?utf-8?B?Q1RJdTFXbWNBc3N4aXFWRkVzUWVVK1dCZEhlQUJOZnVOeVlQanZzZFhtRVl5?=
+ =?utf-8?B?Vk83N3hsQXdHc2V4eVVMVFJJYTIrMzgxVTArcjl2RlNUUG1CNEhSYnJiU250?=
+ =?utf-8?B?VVNNQzFXWkFmRUNGNUVpa1BrNnBGd05jRDRCenRaRmkwU0FVd2F5MUhRNVp3?=
+ =?utf-8?B?UlNnVWowWTNQVnFxWW1Md010Y1l6VXJJWW1SZ3VuZzdjOHNsK09uS1Ixbmhs?=
+ =?utf-8?B?d2FmTHE1SXd6UXUva2RvaWlzaE96aTZjeWhPNHN6ZlBMeWpHYnpUZ1BNQ2F0?=
+ =?utf-8?B?ZjFKV1V1T0tPMFhEKzZEOVRzOUNlTytQU3ZncnBkS1cyalNjZFdZRzd0MFdr?=
+ =?utf-8?B?MnRCR3RqVjVsdU1OaU5wd0hQU3hocVBZU0h0L0lXTDlKUEN4SUhONTQ4Mmoy?=
+ =?utf-8?B?Vkx0VDVkQ3g1UVlRRi9GVmRPeHp4dHdRKzcwLzlYK3F2Y2pweVUxUFpZSkdW?=
+ =?utf-8?B?UVlCekZ1OFFwdG1aVmNPN2oxWjdZcURWKytHdWl6ZlZ4ZkppTFUxbS9wWVIy?=
+ =?utf-8?B?S3JzRkFtZE5zU2J2NEpRMjFwaEpLL2dLUEwzVmFFVXZBUWp3ZUU1a2k4NW5K?=
+ =?utf-8?B?ZG5uMXNXQjhiSFQvb1h0K09wc0lLTmorL2ZTeFpEZkExVHR0L0czdjVxMjRp?=
+ =?utf-8?B?K0d4dnhzYjVEZmptdzlpWk1jWXBRTURLZmpwbFRVSmZWMjVJNXFlRE1lZS9q?=
+ =?utf-8?B?RTVJSis1aXlJYnlPNEFXN1NoNC9lU3N5VFZoL2V0UkpaQW1yNHlPTUpWTUhi?=
+ =?utf-8?B?aUZmMlpWSitwaXBJczZRZkdOL1pPQTByZmN4V3JvUUpGemxMNjdOai9yMndw?=
+ =?utf-8?B?NExHT3V2dXhCNUpIOGEydksvemhLc0REdjh5eXBQTGl3K0I3MlRCQVZuYjF6?=
+ =?utf-8?B?bm5QaXp6Vk91b1NoWW05UTdLTFF4S2YwMkZrdXU1Sm1wZjVNRXRMQXJ2SVdC?=
+ =?utf-8?B?dk0wZ0hscFlXN294S1dBMkNSTVFSRWlxOWpRNVprNnUyNGlnZjZwdFFKK1dE?=
+ =?utf-8?B?SWFlTElheWNuYUZKdjg4Z2FjdGh3MWhHd1g3R1A4eHYyblZWVGxpdEwwMTRx?=
+ =?utf-8?B?cGVra3liVkZMRHh1clJ2L3c2ZndXb1hqMGZreU0xNHBaUGl4SFJzQUNNT3Nm?=
+ =?utf-8?B?a2xFcFZWbjdJVmlYVTVuSklHbXIrVjhsTElRbWZwdVZhUG9CYkU3UTQ3SW1F?=
+ =?utf-8?B?S0QwczdIY3RFN0hPVkdQTzFyWmE1ZnNlallkK3R1aVJXU2tHK2ZlWi9vckl4?=
+ =?utf-8?B?dnI4QS82eWxCM0h2YjNSTzl6MUxyc1RrdE1taXFsWENtRzE0SEMrcldkSytB?=
+ =?utf-8?B?VDVJRTduTCsvWHpLMEovdE9IejRYM1Z3Yy82QWo0NUlPU0NUaS9TZXBJclNL?=
+ =?utf-8?B?N3V2SUVBQ0VzNXlGOUhZb1FPeDJGZFg1emIzcCs5QkwzSHFtaVlKK3NHSVlm?=
+ =?utf-8?B?REc2L3BWTktUZTFqRWlPbDhMVWIwaGRyNm9KTlU3Mm5UeGRuRis0eHRON2VS?=
+ =?utf-8?B?d1htSUR2dW5KWEZRSU5ub0FNcHdlVjRJR1duZFplWVBmY280M1ZJSHpBTmVh?=
+ =?utf-8?B?NlB0eEZGdTNKTHlBR2REQ21UMFp2dHZBdzNRekgrcm82QUkvL29oQXJMWmJU?=
+ =?utf-8?B?V0YydzkrazNobDd3VyszVVk5QzBCd1BONUJtdFZqV3JHUmFFSmo2MWlsWE1P?=
+ =?utf-8?B?dGg3MlAzVlFrVTAzNnRuZVV6T0g2eUJsKzdYZWtjNW9RaVFxbG9KVEJJaXBj?=
+ =?utf-8?B?cnJtYVNvbzVkZTJxazJYZUUrYkJJVC9OUU9XZ0NrcE5UNnVMRzI4bStNRmQ0?=
+ =?utf-8?B?N3BIK2FMOERJOFZvUG9TRFdqaERUOUUxckk4eEhPejJLNEplUDlWeHByZnJF?=
+ =?utf-8?B?azg0VG9YZEZ0Y3VOMzFPMkE0QjVKdEtFTmh4S2l2Z2pnejdoUnB0Z1NaN0x1?=
+ =?utf-8?B?OVFhYnBCdWtydlZ0Ulk0cnlIYlI5cno2YXIrUk5IZnVkQVgzVjJub0pwWCtx?=
+ =?utf-8?B?bGhmQWt1MURXRDRwZFVLWVFodnh3aU1CR3dTL241RmE1RGQ3UllhNmhrS1JG?=
+ =?utf-8?Q?TBMPh+fw6skOddu3cttxDhJ+Q?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cda38a05-d14f-4a38-65b7-08dd08085607
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7141.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2024 19:36:45.5577
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LPVuiDELxfFec2g26GQtyDS8SC+ooKUdRQBitb/O1f014+sJ0NBeGcZskSaRuVbihyjs0hB6v/xpiUsb3Jk8Uw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9419
+
+
+
+On 18/11/2024 10:37, Jiri Pirko wrote:
+> Sun, Nov 17, 2024 at 09:50:40PM CET, tariqt@nvidia.com wrote:
+>> From: Carolina Jubran <cjubran@nvidia.com>
+>>
+>> Introduce support for specifying bandwidth proportions between traffic
+>> classes (TC) in the devlink-rate API. This new option allows users to
+>> allocate bandwidth across multiple traffic classes in a single command.
+>>
+>> This feature provides a more granular control over traffic management,
+>> especially for scenarios requiring Enhanced Transmission Selection.
+>>
+>> Users can now define a specific bandwidth share for each traffic class,
+>> such as allocating 20% for TC0 (TCP/UDP) and 80% for TC5 (RoCE).
+>>
+>> Example:
+>> DEV=pci/0000:08:00.0
+>>
+>> $ devlink port function rate add $DEV/vfs_group tx_share 10Gbit \
+>>   tx_max 50Gbit tc-bw 0:20 1:0 2:0 3:0 4:0 5:80 6:0 7:0
+>>
+>> $ devlink port function rate set $DEV/vfs_group \
+>>   tc-bw 0:20 1:0 2:0 3:0 4:0 5:20 6:60 7:0
+>>
+>> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+>> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+>> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+>> ---
+>> Documentation/netlink/specs/devlink.yaml | 22 ++++++++
+>> include/net/devlink.h                    |  7 +++
+>> include/uapi/linux/devlink.h             |  3 +
+>> net/devlink/netlink_gen.c                | 14 +++--
+>> net/devlink/netlink_gen.h                |  1 +
+>> net/devlink/rate.c                       | 71 +++++++++++++++++++++++-
+>> 6 files changed, 113 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+>> index 09fbb4c03fc8..fece78ed60fe 100644
+>> --- a/Documentation/netlink/specs/devlink.yaml
+>> +++ b/Documentation/netlink/specs/devlink.yaml
+>> @@ -820,6 +820,19 @@ attribute-sets:
+>>        -
+>>          name: region-direct
+>>          type: flag
+>> +      -
+>> +        name: rate-tc-bw
+>> +        type: u32
+>> +        doc: |
+>> +             Specifies the bandwidth allocation for the Traffic Class as a
+>> +             percentage.
+>> +        checks:
+>> +          min: 0
+>> +          max: 100
+>> +      -
+>> +        name: rate-tc-bw-values
+>> +        type: nest
+>> +        nested-attributes: dl-rate-tc-bw-values
+> 
+> Hmm, it's not a simple nest. It's an array. You probably need something
+> like type: indexed-array here. Please make sure you make this working
+> with ynl. Could you also please add examples of get and set commands
+> using ynl to the patch description?
+> 
+> 
+
+It seems that type: indexed-array with sub-type: u32 would be the 
+correct approach. However, I noticed that this support appears to be 
+missing in the ynl-gen-c.py script in this series: 
+https://lore.kernel.org/all/20240404063114.1221532-3-liuhangbin@gmail.com/. 
+If this is indeed the case, how should I specify the min and max values 
+for the u32 entries in the indexed-array?
+
+>>
+>>    -
+>>      name: dl-dev-stats
+>> @@ -1225,6 +1238,13 @@ attribute-sets:
+>>        -
+>>          name: flash
+>>          type: flag
+>> +  -
+>> +    name: dl-rate-tc-bw-values
+>> +    subset-of: devlink
+>> +    attributes:
+>> +      -
+>> +        name: rate-tc-bw
+>> +        type: u32
+>>
+>> operations:
+>>    enum-model: directional
+>> @@ -2149,6 +2169,7 @@ operations:
+>>              - rate-tx-priority
+>>              - rate-tx-weight
+>>              - rate-parent-node-name
+>> +            - rate-tc-bw-values
+>>
+>>      -
+>>        name: rate-new
+>> @@ -2169,6 +2190,7 @@ operations:
+>>              - rate-tx-priority
+>>              - rate-tx-weight
+>>              - rate-parent-node-name
+>> +            - rate-tc-bw-values
+>>
+>>      -
+>>        name: rate-del
+>> diff --git a/include/net/devlink.h b/include/net/devlink.h
+>> index fbb9a2668e24..277b826cdd60 100644
+>> --- a/include/net/devlink.h
+>> +++ b/include/net/devlink.h
+>> @@ -20,6 +20,7 @@
+>> #include <uapi/linux/devlink.h>
+>> #include <linux/xarray.h>
+>> #include <linux/firmware.h>
+>> +#include <linux/dcbnl.h>
+>>
+>> struct devlink;
+>> struct devlink_linecard;
+>> @@ -117,6 +118,8 @@ struct devlink_rate {
+>>
+>> 	u32 tx_priority;
+>> 	u32 tx_weight;
+>> +
+>> +	u32 tc_bw[IEEE_8021QAZ_MAX_TCS];
+>> };
+>>
+>> struct devlink_port {
+>> @@ -1469,6 +1472,8 @@ struct devlink_ops {
+>> 					 u32 tx_priority, struct netlink_ext_ack *extack);
+>> 	int (*rate_leaf_tx_weight_set)(struct devlink_rate *devlink_rate, void *priv,
+>> 				       u32 tx_weight, struct netlink_ext_ack *extack);
+>> +	int (*rate_leaf_tc_bw_set)(struct devlink_rate *devlink_rate, void *priv,
+>> +				   u32 *tc_bw, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_tx_share_set)(struct devlink_rate *devlink_rate, void *priv,
+>> 				      u64 tx_share, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_tx_max_set)(struct devlink_rate *devlink_rate, void *priv,
+>> @@ -1477,6 +1482,8 @@ struct devlink_ops {
+>> 					 u32 tx_priority, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_tx_weight_set)(struct devlink_rate *devlink_rate, void *priv,
+>> 				       u32 tx_weight, struct netlink_ext_ack *extack);
+>> +	int (*rate_node_tc_bw_set)(struct devlink_rate *devlink_rate, void *priv,
+>> +				   u32 *tc_bw, struct netlink_ext_ack *extack);
+>> 	int (*rate_node_new)(struct devlink_rate *rate_node, void **priv,
+>> 			     struct netlink_ext_ack *extack);
+>> 	int (*rate_node_del)(struct devlink_rate *rate_node, void *priv,
+>> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+>> index 9401aa343673..0940f8770319 100644
+>> --- a/include/uapi/linux/devlink.h
+>> +++ b/include/uapi/linux/devlink.h
+>> @@ -614,6 +614,9 @@ enum devlink_attr {
+>>
+>> 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
+>>
+>> +	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
+>> +	DEVLINK_ATTR_RATE_TC_BW_VALUES,		/* nested */
+> 
+> "values" sounds odd. When I look at the rest of the similar nested
+> attrs, we use either "S" or "_LIST" as suffix. Also, Please have the
+> nested attr first and the u32 as second (again, the rest of the attrs
+> have it like that). So something like:
+> 
+> 	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
+> 	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
+>
+
+Thanks for pointing this out. I'll go with DEVLINK_ATTR_RATE_TC_BWS.
+  >> +
+>> 	/* Add new attributes above here, update the spec in
+>> 	 * Documentation/netlink/specs/devlink.yaml and re-generate
+>> 	 * net/devlink/netlink_gen.c.
+>> diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+>> index f9786d51f68f..231c2752538f 100644
+>> --- a/net/devlink/netlink_gen.c
+>> +++ b/net/devlink/netlink_gen.c
+>> @@ -18,6 +18,10 @@ const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_
+>> 	[DEVLINK_PORT_FN_ATTR_CAPS] = NLA_POLICY_BITFIELD32(15),
+>> };
+>>
+>> +const struct nla_policy devlink_dl_rate_tc_bw_values_nl_policy[DEVLINK_ATTR_RATE_TC_BW + 1] = {
+>> +	[DEVLINK_ATTR_RATE_TC_BW] = NLA_POLICY_RANGE(NLA_U32, 0, 100),
+>> +};
+>> +
+>> const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1] = {
+>> 	[DEVLINK_ATTR_SELFTEST_ID_FLASH] = { .type = NLA_FLAG, },
+>> };
+>> @@ -496,7 +500,7 @@ static const struct nla_policy devlink_rate_get_dump_nl_policy[DEVLINK_ATTR_DEV_
+>> };
+>>
+>> /* DEVLINK_CMD_RATE_SET - do */
+>> -static const struct nla_policy devlink_rate_set_nl_policy[DEVLINK_ATTR_RATE_TX_WEIGHT + 1] = {
+>> +static const struct nla_policy devlink_rate_set_nl_policy[DEVLINK_ATTR_RATE_TC_BW_VALUES + 1] = {
+>> 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> @@ -505,10 +509,11 @@ static const struct nla_policy devlink_rate_set_nl_policy[DEVLINK_ATTR_RATE_TX_W
+>> 	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32, },
+>> 	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32, },
+>> 	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> +	[DEVLINK_ATTR_RATE_TC_BW_VALUES] = NLA_POLICY_NESTED(devlink_dl_rate_tc_bw_values_nl_policy),
+>> };
+>>
+>> /* DEVLINK_CMD_RATE_NEW - do */
+>> -static const struct nla_policy devlink_rate_new_nl_policy[DEVLINK_ATTR_RATE_TX_WEIGHT + 1] = {
+>> +static const struct nla_policy devlink_rate_new_nl_policy[DEVLINK_ATTR_RATE_TC_BW_VALUES + 1] = {
+>> 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+>> 	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> @@ -517,6 +522,7 @@ static const struct nla_policy devlink_rate_new_nl_policy[DEVLINK_ATTR_RATE_TX_W
+>> 	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32, },
+>> 	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32, },
+>> 	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .type = NLA_NUL_STRING, },
+>> +	[DEVLINK_ATTR_RATE_TC_BW_VALUES] = NLA_POLICY_NESTED(devlink_dl_rate_tc_bw_values_nl_policy),
+>> };
+>>
+>> /* DEVLINK_CMD_RATE_DEL - do */
+>> @@ -1164,7 +1170,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+>> 		.doit		= devlink_nl_rate_set_doit,
+>> 		.post_doit	= devlink_nl_post_doit,
+>> 		.policy		= devlink_rate_set_nl_policy,
+>> -		.maxattr	= DEVLINK_ATTR_RATE_TX_WEIGHT,
+>> +		.maxattr	= DEVLINK_ATTR_RATE_TC_BW_VALUES,
+>> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+>> 	},
+>> 	{
+>> @@ -1174,7 +1180,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+>> 		.doit		= devlink_nl_rate_new_doit,
+>> 		.post_doit	= devlink_nl_post_doit,
+>> 		.policy		= devlink_rate_new_nl_policy,
+>> -		.maxattr	= DEVLINK_ATTR_RATE_TX_WEIGHT,
+>> +		.maxattr	= DEVLINK_ATTR_RATE_TC_BW_VALUES,
+>> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+>> 	},
+>> 	{
+>> diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
+>> index 8f2bd50ddf5e..a8f0f20f6f0b 100644
+>> --- a/net/devlink/netlink_gen.h
+>> +++ b/net/devlink/netlink_gen.h
+>> @@ -13,6 +13,7 @@
+>>
+>> /* Common nested types */
+>> extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_CAPS + 1];
+>> +extern const struct nla_policy devlink_dl_rate_tc_bw_values_nl_policy[DEVLINK_ATTR_RATE_TC_BW + 1];
+>> extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
+>>
+>> /* Ops table for devlink */
+>> diff --git a/net/devlink/rate.c b/net/devlink/rate.c
+>> index 8828ffaf6cbc..4eb0598d40f9 100644
+>> --- a/net/devlink/rate.c
+>> +++ b/net/devlink/rate.c
+>> @@ -86,7 +86,9 @@ static int devlink_nl_rate_fill(struct sk_buff *msg,
+>> 				int flags, struct netlink_ext_ack *extack)
+>> {
+>> 	struct devlink *devlink = devlink_rate->devlink;
+>> +	struct nlattr *nla_tc_bw;
+>> 	void *hdr;
+>> +	int i;
+>>
+>> 	hdr = genlmsg_put(msg, portid, seq, &devlink_nl_family, flags, cmd);
+>> 	if (!hdr)
+>> @@ -129,6 +131,19 @@ static int devlink_nl_rate_fill(struct sk_buff *msg,
+>> 				   devlink_rate->parent->name))
+>> 			goto nla_put_failure;
+>>
+>> +	nla_tc_bw = nla_nest_start(msg, DEVLINK_ATTR_RATE_TC_BW_VALUES);
+>> +	if (!nla_tc_bw)
+>> +		goto nla_put_failure;
+>> +
+>> +	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
+>> +		if (nla_put_u32(msg, DEVLINK_ATTR_RATE_TC_BW, devlink_rate->tc_bw[i])) {
+>> +			nla_nest_cancel(msg, nla_tc_bw);
+>> +			goto nla_put_failure;
+>> +		}
+>> +	}
+>> +
+>> +	nla_nest_end(msg, nla_tc_bw);
+>> +
+>> 	genlmsg_end(msg, hdr);
+>> 	return 0;
+>>
+>> @@ -316,11 +331,46 @@ devlink_nl_rate_parent_node_set(struct devlink_rate *devlink_rate,
+>> 	return 0;
+>> }
+>>
+>> +static int devlink_nl_rate_tc_bw_set(struct devlink_rate *devlink_rate,
+>> +				     struct genl_info *info,
+>> +				     struct nlattr *nla_tc_bw)
+>> +{
+>> +	struct devlink *devlink = devlink_rate->devlink;
+>> +	const struct devlink_ops *ops = devlink->ops;
+>> +	u32 tc_bw[IEEE_8021QAZ_MAX_TCS] = {0};
+> 
+> You don't need 0 between brackets.
+>
+
+I will drop this, thanks.
+
+> 
+>> +	struct nlattr *nla_tc_entry;
+>> +	int rem, err = 0, i = 0;
+>> +
+>> +	nla_for_each_nested(nla_tc_entry, nla_tc_bw, rem) {
+>> +		if (i >= IEEE_8021QAZ_MAX_TCS || nla_type(nla_tc_entry) != DEVLINK_ATTR_RATE_TC_BW)
+> 
+> Fill up an extack message with proper reasoning.
+> 
+> 
+>> +			return -EINVAL;
+>> +
+>> +		tc_bw[i++] = nla_get_u32(nla_tc_entry);
+>> +	}
+>> +
+>> +	if (i != IEEE_8021QAZ_MAX_TCS)
+>> +		return -EINVAL;
+>> +
+>> +	if (devlink_rate_is_leaf(devlink_rate))
+>> +		err = ops->rate_leaf_tc_bw_set(devlink_rate, devlink_rate->priv, tc_bw,
+>> +					       info->extack);
+>> +	else if (devlink_rate_is_node(devlink_rate))
+>> +		err = ops->rate_node_tc_bw_set(devlink_rate, devlink_rate->priv, tc_bw,
+>> +					       info->extack);
+>> +
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	memcpy(devlink_rate->tc_bw, tc_bw, sizeof(tc_bw));
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> static int devlink_nl_rate_set(struct devlink_rate *devlink_rate,
+>> 			       const struct devlink_ops *ops,
+>> 			       struct genl_info *info)
+>> {
+>> -	struct nlattr *nla_parent, **attrs = info->attrs;
+>> +	struct nlattr *nla_parent, *nla_tc_bw, **attrs = info->attrs;
+>> 	int err = -EOPNOTSUPP;
+>> 	u32 priority;
+>> 	u32 weight;
+>> @@ -380,6 +430,13 @@ static int devlink_nl_rate_set(struct devlink_rate *devlink_rate,
+>> 		devlink_rate->tx_weight = weight;
+>> 	}
+>>
+>> +	nla_tc_bw = attrs[DEVLINK_ATTR_RATE_TC_BW_VALUES];
+>> +	if (nla_tc_bw) {
+>> +		err = devlink_nl_rate_tc_bw_set(devlink_rate, info, nla_tc_bw);
+>> +		if (err)
+>> +			return err;
+>> +	}
+>> +
+>> 	nla_parent = attrs[DEVLINK_ATTR_RATE_PARENT_NODE_NAME];
+>> 	if (nla_parent) {
+>> 		err = devlink_nl_rate_parent_node_set(devlink_rate, info,
+>> @@ -423,6 +480,12 @@ static bool devlink_rate_set_ops_supported(const struct devlink_ops *ops,
+>> 					    "TX weight set isn't supported for the leafs");
+>> 			return false;
+>> 		}
+>> +		if (attrs[DEVLINK_ATTR_RATE_TC_BW_VALUES] && !ops->rate_leaf_tc_bw_set) {
+>> +			NL_SET_ERR_MSG_ATTR(info->extack,
+>> +					    attrs[DEVLINK_ATTR_RATE_TC_BW_VALUES],
+>> +					    "TC bandwidth set isn't supported for the leafs");
+>> +			return false;
+>> +		}
+>> 	} else if (type == DEVLINK_RATE_TYPE_NODE) {
+>> 		if (attrs[DEVLINK_ATTR_RATE_TX_SHARE] && !ops->rate_node_tx_share_set) {
+>> 			NL_SET_ERR_MSG(info->extack, "TX share set isn't supported for the nodes");
+>> @@ -449,6 +512,12 @@ static bool devlink_rate_set_ops_supported(const struct devlink_ops *ops,
+>> 					    "TX weight set isn't supported for the nodes");
+>> 			return false;
+>> 		}
+>> +		if (attrs[DEVLINK_ATTR_RATE_TC_BW_VALUES] && !ops->rate_node_tc_bw_set) {
+>> +			NL_SET_ERR_MSG_ATTR(info->extack,
+>> +					    attrs[DEVLINK_ATTR_RATE_TC_BW_VALUES],
+>> +					    "TC bandwidth set isn't supported for the nodes");
+>> +			return false;
+>> +		}
+>> 	} else {
+>> 		WARN(1, "Unknown type of rate object");
+>> 		return false;
+>> -- 
+>> 2.44.0
+>>
 
-Hi Linus,
-
-The following changes since commit 9f8e716d46c68112484a23d1742d9ec725e082fc:
-
-  Merge tag 'bpf-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf (2024-11-13 09:14:19 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/bpf-next-6.13
-
-for you to fetch changes up to 2c8b09ac2537299511c898bc71b1a5f2756c831c:
-
-  libbpf: Change hash_combine parameters from long to unsigned long (2024-11-16 11:01:38 -0800)
-
-----------------------------------------------------------------
-= BPF networking changes will come via net-next PR
-
-= Several arch/x86/ and uprobe patches are also in Ingo's PR:
-  https://lore.kernel.org/all/Zzt5lYZGF8IOrgpB@gmail.com/
-  They were pulled into bpf-next via stable tag 'perf-core-for-bpf-next'.
-  Then Jiri's uprobe session patches were applied on top.
-  tip or bpf-next PRs can be pulled in any order. sha-s are the same.
-
-= The following are the main BPF changes (there should be no conflicts):
-
-- Add BPF uprobe session support (Jiri Olsa)
-
-- Optimize uprobe performance (Andrii Nakryiko)
-
-- Add bpf_fastcall support to helpers and kfuncs (Eduard Zingerman)
-
-- Avoid calling free_htab_elem() under hash map bucket lock (Hou Tao)
-
-- Prevent tailcall infinite loop caused by freplace (Leon Hwang)
-
-- Mark raw_tracepoint arguments as nullable (Kumar Kartikeya Dwivedi)
-      
-- Introduce uptr support in the task local storage map (Martin KaFai Lau)
-
-- Stringify errno log messages in libbpf (Mykyta Yatsenko)
-
-- Add kmem_cache BPF iterator for perf's lock profiling (Namhyung Kim)
-
-- Support BPF objects of either endianness in libbpf (Tony Ambardar)
-
-- Add ksym to struct_ops trampoline to fix stack trace (Xu Kuohai)
-
-- Introduce private stack for eligible BPF programs (Yonghong Song)
-
-- Migrate samples/bpf tests to selftests/bpf test_progs (Daniel T. Lee)
-
-- Migrate test_sock to selftests/bpf test_progs (Jordan Rife)
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-----------------------------------------------------------------
-Abhinav Saxena (1):
-      bpf: Remove trailing whitespace in verifier.rst
-
-Alan Maguire (2):
-      selftests/bpf: Fix uprobe_multi compilation error
-      docs/bpf: Add description of .BTF.base section
-
-Alexei Starovoitov (17):
-      Merge branch 'selftests-bpf-migrate-and-remove-cgroup-tracing-related-tests'
-      Merge branch 'bpf-add-kmem_cache-iterator-and-kfunc'
-      Merge branch 'bpf-fix-tailcall-infinite-loop-caused-by-freplace'
-      Merge branch 'fix-libbpf-s-bpf_object-and-bpf-subskel-interoperability'
-      Merge branch 'share-user-memory-to-bpf-program-through-task-storage-map'
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      Merge branch 'fix-resource-leak-checks-for-tail-calls'
-      Merge branch 'handle-possible-null-trusted-raw_tp-arguments'
-      Merge branch 'fix-lockdep-warning-for-htab-of-map'
-      Merge branch 'refactor-lock-management'
-      Merge branch 'selftests-bpf-fix-for-bpf_signal-stalls-watchdog-for-test_progs'
-      Merge branch 'bpf-support-private-stack-for-bpf-progs'
-      Merge branch 'add-kernel-symbol-for-struct_ops-trampoline'
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      bpf: Introduce range_tree data structure and use it in bpf arena
-      selftests/bpf: Add a test for arena range tree algorithm
-      selftests/bpf: Fix build error with llvm 19
-
-Alistair Francis (1):
-      bpf: Move btf_type_is_struct_ptr() under CONFIG_BPF_SYSCALL
-
-Andrii Nakryiko (21):
-      Merge branch 'libbpf-selftests-bpf-support-cross-endian-usage'
-      Merge branch 'bpf_fastcall-attribute-in-vmlinux-h-and-bpf_helper_defs-h'
-      uprobes: switch to RCU Tasks Trace flavor for better performance
-      Merge branch 'bpf-static-linker-fix-linking-duplicate-extern-functions'
-      libbpf: fix sym_is_subprog() logic for weak global subprogs
-      libbpf: never interpret subprogs in .text as entry programs
-      selftests/bpf: add subprog to BPF object file with no entry programs
-      Merge branch 'implement-mechanism-to-signal-other-threads'
-      Merge branch 'fix-wmaybe-uninitialized-warnings-errors'
-      selftests/bpf: fix test_spin_lock_fail.c's global vars usage
-      libbpf: move global data mmap()'ing into bpf_object__load()
-      selftests/bpf: validate generic bpf_object and subskel APIs work together
-      libbpf: start v1.6 development cycle
-      selftests/bpf: drop unnecessary bpf_iter.h type duplication
-      uprobes: allow put_uprobe() from non-sleepable softirq context
-      uprobes: SRCU-protect uretprobe lifetime (with timeout)
-      Merge tag 'perf-core-for-bpf-next' from tip tree
-      Merge branch 'bpf-add-uprobe-session-support'
-      Merge branch 'libbpf-stringify-error-codes-in-log-messages'
-      Merge branch 'bpf-range_tree-for-bpf-arena'
-      bpf: use common instruction history across all states
-
-Björn Töpel (2):
-      libbpf: Add missing per-arch include path
-      selftests: bpf: Add missing per-arch include path
-
-Breno Leitao (1):
-      perf/x86/amd: Warn only on new bits set
-
-Chen Ni (1):
-      libbpf: Remove unneeded semicolon
-
-Christophe JAILLET (1):
-      bpf: Constify struct btf_kind_operations
-
-Daniel T. Lee (4):
-      selftests/bpf: migrate cgroup sock create test for setting iface/mark/prio
-      selftests/bpf: migrate cgroup sock create test for prohibiting sockets
-      samples/bpf: remove obsolete cgroup related tests
-      samples/bpf: remove obsolete tracing related tests
-
-Dapeng Mi (4):
-      perf/x86: Refine hybrid_pmu_type defination
-      x86/cpu/intel: Define helper to get CPU core native ID
-      perf/x86/intel: Support hybrid PMU with multiple atom uarchs
-      perf/x86/intel: Add PMU support for ArrowLake-H
-
-Eder Zulian (3):
-      resolve_btfids: Fix compiler warnings
-      libbpf: Prevent compiler warnings/errors
-      libsubcmd: Silence compiler warning
-
-Eduard Zingerman (9):
-      bpf: Allow specifying bpf_fastcall attribute for BPF helpers
-      bpf: __bpf_fastcall for bpf_get_smp_processor_id in uapi
-      bpf: Use KF_FASTCALL to mark kfuncs supporting fastcall contract
-      bpftool: __bpf_fastcall for kfuncs marked with special decl_tag
-      selftests/bpf: Fix backtrace printing for selftests crashes
-      selftests/bpf: watchdog timer for test_progs
-      selftests/bpf: add read_with_timeout() utility function
-      selftests/bpf: allow send_signal test to timeout
-      selftests/bpf: update send_signal to lower perf evemts frequency
-
-Eric Long (2):
-      libbpf: Do not resolve size on duplicate FUNCs
-      selftests/bpf: Test linking with duplicate extern functions
-
-Florian Schmaus (1):
-      kbuild,bpf: Pass make jobs' value to pahole
-
-Hou Tao (3):
-      bpf: Call free_htab_elem() after htab_unlock_bucket()
-      selftests/bpf: Move ENOTSUPP from bpf_util.h
-      selftests/bpf: Test the update operations for htab of maps
-
-Ihor Solodrai (5):
-      selftests/bpf: Remove test_skb_cgroup_id.sh from TEST_PROGS
-      selftests/bpf: Set vpath in Makefile to search for skels
-      libbpf: Change log level of BTF loading error message
-      selftests/bpf: Check for timeout in perf_link test
-      selftests/bpf: Set test path for token/obj_priv_implicit_token_envvar
-
-Jason Xing (2):
-      bpf: syscall_nrs: Disable no previous prototype warnning
-      bpf: handle implicit declaration of function gettid in bpf_iter.c
-
-Jiri Olsa (19):
-      selftests/bpf: Fix uprobe consumer test
-      selftests/bpf: Bail out quickly from failing consumer test
-      uprobe: Add data pointer to consumer handlers
-      uprobe: Add support for session consumer
-      selftests/bpf: Fix uprobe consumer test (again)
-      bpf: Allow return values 0 and 1 for kprobe session
-      bpf: Force uprobe bpf program to always return 0
-      bpf: Add support for uprobe multi session attach
-      bpf: Add support for uprobe multi session context
-      libbpf: Add support for uprobe multi session attach
-      selftests/bpf: Add uprobe session test
-      selftests/bpf: Add uprobe session cookie test
-      selftests/bpf: Add uprobe session recursive test
-      selftests/bpf: Add uprobe session verifier test for return value
-      selftests/bpf: Add kprobe session verifier test for return value
-      selftests/bpf: Add uprobe session single consumer test
-      selftests/bpf: Add uprobe sessions to consumer test
-      selftests/bpf: Add threads to consumer test
-      libbpf: Fix memory leak in bpf_program__attach_uprobe_multi
-
-Jordan Rife (4):
-      selftests/bpf: Migrate *_POST_BIND test cases to prog_tests
-      selftests/bpf: Migrate LOAD_REJECT test cases to prog_tests
-      selftests/bpf: Migrate BPF_CGROUP_INET_SOCK_CREATE test cases to prog_tests
-      selftests/bpf: Retire test_sock.c
-
-Juntong Deng (2):
-      bpf: Add bpf_task_from_vpid() kfunc
-      selftests/bpf: Add tests for bpf_task_from_vpid() kfunc
-
-Kan Liang (2):
-      perf/x86/rapl: Move the pmu allocation out of CPU hotplug
-      perf/x86/rapl: Clean up cpumask and hotplug
-
-Kui-Feng Lee (4):
-      bpf: Support __uptr type tag in BTF
-      bpf: Handle BPF_UPTR in verifier
-      libbpf: define __uptr.
-      selftests/bpf: Some basic __uptr tests
-
-Kumar Kartikeya Dwivedi (8):
-      bpf: Tighten tail call checks for lingering locks, RCU, preempt_disable
-      bpf: Unify resource leak checks
-      selftests/bpf: Add tests for tail calls with locks and refs
-      bpf: Mark raw_tp arguments with PTR_MAYBE_NULL
-      selftests/bpf: Clean up open-coded gettid syscall invocations
-      selftests/bpf: Add tests for raw_tp null handling
-      bpf: Refactor active lock management
-      bpf: Drop special callback reference handling
-
-Leon Hwang (4):
-      bpf: Prevent tailcall infinite loop caused by freplace
-      selftests/bpf: Add test to verify tailcall and freplace restrictions
-      bpf, bpftool: Fix incorrect disasm pc
-      bpf, x86: Propagate tailcall info only for subprogs
-
-Luo Yifan (2):
-      tools/bpf: Fix the wrong format specifier in bpf_jit_disasm
-      bpftool: Cast variable `var` to long long
-
-Manu Bretelle (1):
-      selftests/bpf: vm: Add support for VIRTIO_FS
-
-Markus Elfring (1):
-      bpf: Call kfree(obj) only once in free_one()
-
-Martin KaFai Lau (9):
-      Merge branch 'Retire test_sock.c'
-      bpf: Add "bool swap_uptrs" arg to bpf_local_storage_update() and bpf_selem_alloc()
-      bpf: Postpone bpf_selem_free() in bpf_selem_unlink_storage_nolock()
-      bpf: Postpone bpf_obj_free_fields to the rcu callback
-      bpf: Add uptr support in the map_value of the task local storage.
-      selftests/bpf: Test a uptr struct spanning across pages.
-      selftests/bpf: Add update_elem failure test for task storage uptr
-      selftests/bpf: Add uptr failure verifier tests
-      selftests/bpf: Create task_local_storage map with invalid uptr's struct
-
-Martin Kelly (1):
-      bpf: Update bpf_override_return() comment
-
-Matteo Croce (1):
-      bpf: fix argument type in bpf_loop documentation
-
-Menglong Dong (1):
-      bpf: Replace the document for PTR_TO_BTF_ID_OR_NULL
-
-Mykyta Yatsenko (6):
-      selftests/bpf: Emit top frequent code lines in veristat
-      selftests/bpf: Increase verifier log limit in veristat
-      libbpf: Introduce errstr() for stringifying errno
-      libbpf: Stringify errno in log messages in libbpf.c
-      libbpf: Stringify errno in log messages in btf*.c
-      libbpf: Stringify errno in log messages in the remaining code
-
-Namhyung Kim (6):
-      libbpf: Fix possible compiler warnings in hashmap
-      bpf: Add kmem_cache iterator
-      mm/bpf: Add bpf_get_kmem_cache() kfunc
-      selftests/bpf: Add a test for kmem_cache_iter
-      bpf: Add open coded version of kmem_cache iterator
-      selftests/bpf: Add a test for open coded kmem_cache iter
-
-Oleg Nesterov (9):
-      uprobes: don't abuse get_utask() in pre_ssout() and prepare_uretprobe()
-      uprobes: sanitiize xol_free_insn_slot()
-      uprobes: kill the unnecessary put_uprobe/xol_free_insn_slot in uprobe_free_utask()
-      uprobes: simplify xol_take_insn_slot() and its caller
-      uprobes: move the initialization of utask->xol_vaddr from pre_ssout() to xol_get_insn_slot()
-      uprobes: pass utask to xol_get_insn_slot() and xol_free_insn_slot()
-      uprobes: deny mremap(xol_vma)
-      uprobes: kill xol_area->slot_count
-      uprobes: fold xol_take_insn_slot() into xol_get_insn_slot()
-
-Puranjay Mohan (2):
-      bpf: Implement bpf_send_signal_task() kfunc
-      selftests/bpf: Augment send_signal test with remote signaling
-
-Sidong Yang (1):
-      libbpf: Change hash_combine parameters from long to unsigned long
-
-Tao Chen (1):
-      libbpf: Fix expected_attach_type set handling in program load callback
-
-Tony Ambardar (8):
-      libbpf: Improve log message formatting
-      libbpf: Fix header comment typos for BTF.ext
-      libbpf: Fix output .symtab byte-order during linking
-      libbpf: Support BTF.ext loading and output in either endianness
-      libbpf: Support opening bpf objects of either endianness
-      libbpf: Support linking bpf objects of either endianness
-      libbpf: Support creating light skeleton of either endianness
-      selftests/bpf: Support cross-endian building
-
-Viktor Malik (5):
-      bpftool: Prevent setting duplicate _GNU_SOURCE in Makefile
-      selftests/bpf: Disable warnings on unused flags for Clang builds
-      selftests/bpf: Allow building with extra flags
-      selftests/bpf: skip the timer_lockup test for single-CPU nodes
-      bpf: Do not alloc arena on unsupported arches
-
-Xu Kuohai (4):
-      bpf, arm64: Remove garbage frame for struct_ops trampoline
-      bpf: Remove unused member rcu from bpf_struct_ops_map
-      bpf: Use function pointers count as struct_ops links count
-      bpf: Add kernel symbol for struct_ops trampoline
-
-Yonghong Song (8):
-      bpf: Find eligible subprogs for private stack support
-      bpf: Enable private stack for eligible subprogs
-      bpf, x86: Avoid repeated usage of bpf_prog->aux->stack_depth
-      bpf, x86: Support private stack in jit
-      selftests/bpf: Add tracing prog private stack tests
-      bpf: Support private stack for struct_ops progs
-      selftests/bpf: Add struct_ops prog private stack tests
-      bpf: Add necessary migrate_disable to range_tree.
-
-Yuan Chen (1):
-      bpf: Fix the xdp_adjust_tail sample prog issue
-
-Zhang Jiao (1):
-      selftests/bpf: Add missing va_end.
-
-Zhu Jun (6):
-      tools/bpf: Remove unused variable from runqslower
-      samples/bpf: Remove unused variables
-      samples/bpf: Fix a resource leak
-      selftests/bpf: Removed redundant fd after close in bpf_prog_load_log_buf
-      samples/bpf: Remove unused variables in tc_l2_redirect_kern.c
-      samples/bpf: Remove unused variable in xdp2skb_meta_kern.c
-
- Documentation/bpf/btf.rst                          |  77 ++-
- Documentation/bpf/verifier.rst                     |   4 +-
- arch/Kconfig                                       |   1 +
- arch/arm64/net/bpf_jit_comp.c                      |  47 +-
- arch/x86/events/amd/core.c                         |  10 +-
- arch/x86/events/intel/core.c                       | 133 ++++-
- arch/x86/events/intel/ds.c                         |  21 +
- arch/x86/events/perf_event.h                       |  34 +-
- arch/x86/events/rapl.c                             | 130 ++---
- arch/x86/include/asm/cpu.h                         |   6 +
- arch/x86/kernel/cpu/intel.c                        |  15 +
- arch/x86/net/bpf_jit_comp.c                        | 149 ++++-
- include/linux/bpf.h                                |  63 ++-
- include/linux/bpf_local_storage.h                  |  12 +-
- include/linux/bpf_verifier.h                       |  67 ++-
- include/linux/btf.h                                |  22 +-
- include/linux/btf_ids.h                            |   1 +
- include/linux/cpuhotplug.h                         |   1 -
- include/linux/filter.h                             |   1 +
- include/linux/uprobes.h                            |  79 ++-
- include/uapi/linux/bpf.h                           |   9 +-
- kernel/bpf/Makefile                                |   3 +-
- kernel/bpf/arena.c                                 |  38 +-
- kernel/bpf/arraymap.c                              |  26 +-
- kernel/bpf/bpf_cgrp_storage.c                      |   4 +-
- kernel/bpf/bpf_inode_storage.c                     |   4 +-
- kernel/bpf/bpf_local_storage.c                     |  79 ++-
- kernel/bpf/bpf_struct_ops.c                        | 115 +++-
- kernel/bpf/bpf_task_storage.c                      |   7 +-
- kernel/bpf/btf.c                                   |  57 +-
- kernel/bpf/core.c                                  |   6 +
- kernel/bpf/dispatcher.c                            |   3 +-
- kernel/bpf/hashtab.c                               |  56 +-
- kernel/bpf/helpers.c                               |  29 +-
- kernel/bpf/kmem_cache_iter.c                       | 238 ++++++++
- kernel/bpf/memalloc.c                              |   5 +-
- kernel/bpf/range_tree.c                            | 272 +++++++++
- kernel/bpf/range_tree.h                            |  21 +
- kernel/bpf/syscall.c                               | 124 ++++-
- kernel/bpf/trampoline.c                            |  60 +-
- kernel/bpf/verifier.c                              | 597 ++++++++++++++------
- kernel/events/uprobes.c                            | 608 +++++++++++++++------
- kernel/trace/bpf_trace.c                           | 116 +++-
- kernel/trace/trace_uprobe.c                        |  12 +-
- mm/slab_common.c                                   |  19 +
- net/core/bpf_sk_storage.c                          |   6 +-
- samples/bpf/Makefile                               |  25 -
- samples/bpf/sock_flags.bpf.c                       |  47 --
- samples/bpf/syscall_nrs.c                          |   5 +
- samples/bpf/tc_l2_redirect_kern.c                  |   6 -
- samples/bpf/test_cgrp2_array_pin.c                 | 106 ----
- samples/bpf/test_cgrp2_attach.c                    | 177 ------
- samples/bpf/test_cgrp2_sock.c                      | 294 ----------
- samples/bpf/test_cgrp2_sock.sh                     | 137 -----
- samples/bpf/test_cgrp2_sock2.c                     |  95 ----
- samples/bpf/test_cgrp2_sock2.sh                    | 103 ----
- samples/bpf/test_cgrp2_tc.bpf.c                    |  56 --
- samples/bpf/test_cgrp2_tc.sh                       | 187 -------
- samples/bpf/test_current_task_under_cgroup.bpf.c   |  43 --
- samples/bpf/test_current_task_under_cgroup_user.c  | 115 ----
- samples/bpf/test_overhead_kprobe.bpf.c             |  41 --
- samples/bpf/test_overhead_raw_tp.bpf.c             |  17 -
- samples/bpf/test_overhead_tp.bpf.c                 |  23 -
- samples/bpf/test_overhead_user.c                   | 225 --------
- samples/bpf/test_override_return.sh                |  16 -
- samples/bpf/test_probe_write_user.bpf.c            |  52 --
- samples/bpf/test_probe_write_user_user.c           | 108 ----
- samples/bpf/tracex7.bpf.c                          |  15 -
- samples/bpf/tracex7_user.c                         |  56 --
- samples/bpf/xdp2skb_meta_kern.c                    |   2 +-
- samples/bpf/xdp_adjust_tail_kern.c                 |   1 +
- scripts/Makefile.btf                               |   6 +-
- scripts/bpf_doc.py                                 |  53 +-
- tools/bpf/bpf_jit_disasm.c                         |   2 +-
- tools/bpf/bpftool/Makefile                         |   6 +-
- tools/bpf/bpftool/btf.c                            | 100 +++-
- tools/bpf/bpftool/jit_disasm.c                     |  40 +-
- tools/bpf/resolve_btfids/main.c                    |   4 +-
- tools/bpf/runqslower/runqslower.bpf.c              |   1 -
- tools/include/uapi/linux/bpf.h                     |   9 +-
- tools/lib/bpf/Makefile                             |   3 +-
- tools/lib/bpf/bpf.c                                |   1 +
- tools/lib/bpf/bpf_gen_internal.h                   |   1 +
- tools/lib/bpf/bpf_helpers.h                        |   1 +
- tools/lib/bpf/btf.c                                | 308 ++++++++---
- tools/lib/bpf/btf.h                                |   3 +
- tools/lib/bpf/btf_dump.c                           |   7 +-
- tools/lib/bpf/btf_relocate.c                       |   2 +-
- tools/lib/bpf/elf.c                                |   4 +-
- tools/lib/bpf/features.c                           |  15 +-
- tools/lib/bpf/gen_loader.c                         | 190 +++++--
- tools/lib/bpf/hashmap.h                            |  20 +-
- tools/lib/bpf/libbpf.c                             | 526 +++++++++---------
- tools/lib/bpf/libbpf.h                             |   4 +-
- tools/lib/bpf/libbpf.map                           |   5 +
- tools/lib/bpf/libbpf_internal.h                    |  43 +-
- tools/lib/bpf/libbpf_version.h                     |   2 +-
- tools/lib/bpf/linker.c                             | 105 +++-
- tools/lib/bpf/relo_core.c                          |   2 +-
- tools/lib/bpf/ringbuf.c                            |  34 +-
- tools/lib/bpf/skel_internal.h                      |   3 +-
- tools/lib/bpf/str_error.c                          |  71 +++
- tools/lib/bpf/str_error.h                          |   7 +
- tools/lib/bpf/usdt.c                               |  32 +-
- tools/lib/bpf/zip.c                                |   2 +-
- tools/lib/subcmd/parse-options.c                   |   2 +-
- tools/testing/selftests/bpf/.gitignore             |   1 -
- tools/testing/selftests/bpf/Makefile               |  60 +-
- tools/testing/selftests/bpf/benchs/bench_trigger.c |   3 +-
- tools/testing/selftests/bpf/bpf_experimental.h     |   6 +
- .../selftests/bpf/bpf_testmod/bpf_testmod-events.h |   8 +
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        | 108 +++-
- .../selftests/bpf/bpf_testmod/bpf_testmod.h        |   5 +
- tools/testing/selftests/bpf/bpf_util.h             |  12 +
- tools/testing/selftests/bpf/config.vm              |   7 +-
- tools/testing/selftests/bpf/io_helpers.c           |  21 +
- tools/testing/selftests/bpf/io_helpers.h           |   7 +
- .../selftests/bpf/map_tests/task_storage_map.c     |   3 +-
- .../testing/selftests/bpf/prog_tests/bpf_cookie.c  |   2 +-
- tools/testing/selftests/bpf/prog_tests/bpf_iter.c  |  14 +-
- .../testing/selftests/bpf/prog_tests/bpf_tcp_ca.c  |   4 -
- tools/testing/selftests/bpf/prog_tests/cb_refs.c   |   4 +-
- .../selftests/bpf/prog_tests/cgrp_local_storage.c  |  10 +-
- .../testing/selftests/bpf/prog_tests/core_reloc.c  |   2 +-
- tools/testing/selftests/bpf/prog_tests/iters.c     |   4 +-
- .../selftests/bpf/prog_tests/kmem_cache_iter.c     | 126 +++++
- .../selftests/bpf/prog_tests/kprobe_multi_test.c   |   2 +
- .../selftests/bpf/prog_tests/linked_funcs.c        |   2 +-
- tools/testing/selftests/bpf/prog_tests/log_buf.c   |   3 -
- .../testing/selftests/bpf/prog_tests/lsm_cgroup.c  |   4 -
- .../testing/selftests/bpf/prog_tests/map_in_map.c  | 132 ++++-
- .../selftests/bpf/prog_tests/ns_current_pid_tgid.c |   2 +-
- tools/testing/selftests/bpf/prog_tests/perf_link.c |  15 +-
- .../testing/selftests/bpf/prog_tests/raw_tp_null.c |  25 +
- .../selftests/bpf/prog_tests/rcu_read_lock.c       |   4 +-
- .../testing/selftests/bpf/prog_tests/send_signal.c | 146 +++--
- tools/testing/selftests/bpf/prog_tests/sock_addr.c |   4 -
- .../testing/selftests/bpf/prog_tests/sock_create.c | 348 ++++++++++++
- .../{test_sock.c => prog_tests/sock_post_bind.c}   | 254 +++------
- .../bpf/prog_tests/struct_ops_private_stack.c      | 106 ++++
- .../testing/selftests/bpf/prog_tests/subskeleton.c |  76 ++-
- tools/testing/selftests/bpf/prog_tests/tailcalls.c | 128 ++++-
- .../testing/selftests/bpf/prog_tests/task_kfunc.c  |  80 +++
- .../selftests/bpf/prog_tests/task_local_storage.c  | 286 +++++++++-
- .../selftests/bpf/prog_tests/timer_lockup.c        |   6 +
- tools/testing/selftests/bpf/prog_tests/token.c     |  19 +-
- .../selftests/bpf/prog_tests/uprobe_multi_test.c   | 361 ++++++++++--
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
- tools/testing/selftests/bpf/progs/bpf_iter.h       | 167 ------
- .../selftests/bpf/progs/bpf_iter_bpf_array_map.c   |   2 +-
- .../selftests/bpf/progs/bpf_iter_bpf_hash_map.c    |   2 +-
- .../selftests/bpf/progs/bpf_iter_bpf_link.c        |   2 +-
- .../testing/selftests/bpf/progs/bpf_iter_bpf_map.c |   2 +-
- .../bpf/progs/bpf_iter_bpf_percpu_array_map.c      |   2 +-
- .../bpf/progs/bpf_iter_bpf_percpu_hash_map.c       |   2 +-
- .../bpf/progs/bpf_iter_bpf_sk_storage_helpers.c    |   2 +-
- .../bpf/progs/bpf_iter_bpf_sk_storage_map.c        |   2 +-
- .../selftests/bpf/progs/bpf_iter_ipv6_route.c      |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_ksym.c  |   2 +-
- .../testing/selftests/bpf/progs/bpf_iter_netlink.c |   2 +-
- .../selftests/bpf/progs/bpf_iter_setsockopt.c      |   2 +-
- .../selftests/bpf/progs/bpf_iter_setsockopt_unix.c |   2 +-
- .../testing/selftests/bpf/progs/bpf_iter_sockmap.c |   2 +-
- .../selftests/bpf/progs/bpf_iter_task_btf.c        |   2 +-
- .../selftests/bpf/progs/bpf_iter_task_file.c       |   2 +-
- .../selftests/bpf/progs/bpf_iter_task_stack.c      |   2 +-
- .../selftests/bpf/progs/bpf_iter_task_vmas.c       |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_tasks.c |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_tcp4.c  |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_tcp6.c  |   2 +-
- .../selftests/bpf/progs/bpf_iter_test_kern3.c      |   2 +-
- .../selftests/bpf/progs/bpf_iter_test_kern4.c      |   2 +-
- .../selftests/bpf/progs/bpf_iter_test_kern5.c      |   2 +-
- .../selftests/bpf/progs/bpf_iter_test_kern6.c      |   2 +-
- .../bpf/progs/bpf_iter_test_kern_common.h          |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_udp4.c  |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_udp6.c  |   2 +-
- tools/testing/selftests/bpf/progs/bpf_iter_unix.c  |   2 +-
- .../selftests/bpf/progs/bpf_iter_vma_offset.c      |   2 +-
- tools/testing/selftests/bpf/progs/cgroup_iter.c    |   3 +-
- .../selftests/bpf/progs/cgrp_ls_sleepable.c        |   3 +-
- .../testing/selftests/bpf/progs/exceptions_fail.c  |   4 +-
- .../testing/selftests/bpf/progs/kmem_cache_iter.c  | 108 ++++
- .../selftests/bpf/progs/kprobe_multi_verifier.c    |  31 ++
- tools/testing/selftests/bpf/progs/linked_funcs1.c  |   8 +
- tools/testing/selftests/bpf/progs/linked_funcs2.c  |   8 +
- tools/testing/selftests/bpf/progs/preempt_lock.c   |  14 +-
- tools/testing/selftests/bpf/progs/raw_tp_null.c    |  32 ++
- .../selftests/bpf/progs/struct_ops_detach.c        |  12 +
- .../selftests/bpf/progs/struct_ops_private_stack.c |  62 +++
- .../bpf/progs/struct_ops_private_stack_fail.c      |  62 +++
- .../bpf/progs/struct_ops_private_stack_recur.c     |  50 ++
- tools/testing/selftests/bpf/progs/tailcall_fail.c  |  64 +++
- .../selftests/bpf/progs/task_kfunc_common.h        |   1 +
- .../selftests/bpf/progs/task_kfunc_failure.c       |  14 +
- .../selftests/bpf/progs/task_kfunc_success.c       |  51 ++
- tools/testing/selftests/bpf/progs/task_ls_uptr.c   |  63 +++
- tools/testing/selftests/bpf/progs/tc_bpf2bpf.c     |   5 +-
- .../selftests/bpf/progs/test_send_signal_kern.c    |  35 +-
- .../selftests/bpf/progs/test_spin_lock_fail.c      |   4 +-
- .../selftests/bpf/progs/test_tp_btf_nullable.c     |   6 +-
- .../selftests/bpf/progs/update_map_in_htab.c       |  30 +
- .../selftests/bpf/progs/uprobe_multi_consumers.c   |   6 +-
- .../selftests/bpf/progs/uprobe_multi_session.c     |  71 +++
- .../bpf/progs/uprobe_multi_session_cookie.c        |  48 ++
- .../bpf/progs/uprobe_multi_session_recursive.c     |  44 ++
- .../bpf/progs/uprobe_multi_session_single.c        |  44 ++
- .../selftests/bpf/progs/uprobe_multi_verifier.c    |  31 ++
- tools/testing/selftests/bpf/progs/uptr_failure.c   | 105 ++++
- .../testing/selftests/bpf/progs/uptr_map_failure.c |  27 +
- .../selftests/bpf/progs/uptr_update_failure.c      |  42 ++
- .../selftests/bpf/progs/verifier_arena_large.c     | 110 +++-
- .../selftests/bpf/progs/verifier_private_stack.c   | 272 +++++++++
- .../selftests/bpf/progs/verifier_ref_tracking.c    |   4 +-
- tools/testing/selftests/bpf/progs/verifier_sock.c  |  60 ++
- .../selftests/bpf/progs/verifier_spin_lock.c       |   2 +-
- tools/testing/selftests/bpf/test_maps.c            |   4 -
- tools/testing/selftests/bpf/test_progs.c           | 114 +++-
- tools/testing/selftests/bpf/test_progs.h           |  14 +
- tools/testing/selftests/bpf/test_verifier.c        |   4 -
- tools/testing/selftests/bpf/uprobe_multi.c         |   4 +
- tools/testing/selftests/bpf/uptr_test_common.h     |  63 +++
- tools/testing/selftests/bpf/veristat.c             | 161 +++++-
- 223 files changed, 7718 insertions(+), 3774 deletions(-)
- create mode 100644 kernel/bpf/kmem_cache_iter.c
- create mode 100644 kernel/bpf/range_tree.c
- create mode 100644 kernel/bpf/range_tree.h
- delete mode 100644 samples/bpf/sock_flags.bpf.c
- delete mode 100644 samples/bpf/test_cgrp2_array_pin.c
- delete mode 100644 samples/bpf/test_cgrp2_attach.c
- delete mode 100644 samples/bpf/test_cgrp2_sock.c
- delete mode 100755 samples/bpf/test_cgrp2_sock.sh
- delete mode 100644 samples/bpf/test_cgrp2_sock2.c
- delete mode 100755 samples/bpf/test_cgrp2_sock2.sh
- delete mode 100644 samples/bpf/test_cgrp2_tc.bpf.c
- delete mode 100755 samples/bpf/test_cgrp2_tc.sh
- delete mode 100644 samples/bpf/test_current_task_under_cgroup.bpf.c
- delete mode 100644 samples/bpf/test_current_task_under_cgroup_user.c
- delete mode 100644 samples/bpf/test_overhead_kprobe.bpf.c
- delete mode 100644 samples/bpf/test_overhead_raw_tp.bpf.c
- delete mode 100644 samples/bpf/test_overhead_tp.bpf.c
- delete mode 100644 samples/bpf/test_overhead_user.c
- delete mode 100755 samples/bpf/test_override_return.sh
- delete mode 100644 samples/bpf/test_probe_write_user.bpf.c
- delete mode 100644 samples/bpf/test_probe_write_user_user.c
- delete mode 100644 samples/bpf/tracex7.bpf.c
- delete mode 100644 samples/bpf/tracex7_user.c
- create mode 100644 tools/testing/selftests/bpf/io_helpers.c
- create mode 100644 tools/testing/selftests/bpf/io_helpers.h
- create mode 100644 tools/testing/selftests/bpf/prog_tests/kmem_cache_iter.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/raw_tp_null.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_create.c
- rename tools/testing/selftests/bpf/{test_sock.c => prog_tests/sock_post_bind.c} (64%)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/struct_ops_private_stack.c
- delete mode 100644 tools/testing/selftests/bpf/progs/bpf_iter.h
- create mode 100644 tools/testing/selftests/bpf/progs/kmem_cache_iter.c
- create mode 100644 tools/testing/selftests/bpf/progs/kprobe_multi_verifier.c
- create mode 100644 tools/testing/selftests/bpf/progs/raw_tp_null.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_private_stack.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_private_stack_fail.c
- create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_private_stack_recur.c
- create mode 100644 tools/testing/selftests/bpf/progs/tailcall_fail.c
- create mode 100644 tools/testing/selftests/bpf/progs/task_ls_uptr.c
- create mode 100644 tools/testing/selftests/bpf/progs/update_map_in_htab.c
- create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_session.c
- create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_session_cookie.c
- create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_session_recursive.c
- create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_session_single.c
- create mode 100644 tools/testing/selftests/bpf/progs/uprobe_multi_verifier.c
- create mode 100644 tools/testing/selftests/bpf/progs/uptr_failure.c
- create mode 100644 tools/testing/selftests/bpf/progs/uptr_map_failure.c
- create mode 100644 tools/testing/selftests/bpf/progs/uptr_update_failure.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_private_stack.c
- create mode 100644 tools/testing/selftests/bpf/uptr_test_common.h
 
