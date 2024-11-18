@@ -1,126 +1,195 @@
-Return-Path: <netdev+bounces-145992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E60559D198E
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:20:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7059D19A8
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:28:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A05941F216AE
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:20:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DCA02817CD
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD0C1E570E;
-	Mon, 18 Nov 2024 20:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32ED21E5732;
+	Mon, 18 Nov 2024 20:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYBDO2nn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkrjFlzd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD7414D2BB
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 20:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EEA1D0DFC;
+	Mon, 18 Nov 2024 20:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731961212; cv=none; b=SHzsBCg4ZRGADUaFldfncbQJHTpNngLVj5ZyJWCL4UFpSpyJtQx7TabHt/VS4bVe/reQPrNQmYUoP0zDXQAhvXUSChqa6gat3BWhBqTOMZW2WfidRCZz40Y/00VD1o9bZ6Sgi0rd2GXyYBPPI/F84IIx4/durSUFBMcXcp9bNKU=
+	t=1731961701; cv=none; b=G4wlgQ4rRtw/zHomj1H/243FBz0waHzbNn4uKtDpyf8wZ5cSuPbbZw/orIawA51zGnhOqAXpUA4+8w0Du+blgz8Y4+FEdlT9goCoM2lcTmoHza4mRJPhdpG5/wxB5EGYOLco/6OlcsLOn4LZhcWQFzRnlfseNDy3csKmcy0448c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731961212; c=relaxed/simple;
-	bh=qhcVu3yT16vGDU4gfzDyKVVEehK5enaQQpZLZJY5YME=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=r5LzkeuD2fQ0rI9DJ9H/MOtYBBJWmiDo51qOXbgL8AMUfnHaKERgiDuhceiaElTZq5MWJF0JzodkexjkYVfhHb7jEOjLjDTqLk1qBBKHpl5yF3C2v3tyzevdiww6/TfE9Mfbjy5uedjMfMwLAeR6ffznqrsj5mhvnribofVN9lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYBDO2nn; arc=none smtp.client-ip=209.85.160.175
+	s=arc-20240116; t=1731961701; c=relaxed/simple;
+	bh=O3HSD73dd2STWTmBwHmLsB7H5lxT4RPcf/Bga/vpFwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DylBKy19TouzCqRpH1HExXxVrGNnpRyyUVD9wx6m9H+lRmaDGSOG7aB8iHszjM5jBEdioQQcE2T5qzXK0FKXGXdaoMmHsPAJh/SFglYZVOPKEgLMaChTM4ZT7Xrs+eJFCDCp4z/ybW9AH1EcXSuNaOD4UVp9aSWNyN0Ax7eHex4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fkrjFlzd; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4609b968452so32221371cf.3
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:20:10 -0800 (PST)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b1601e853eso168068885a.2;
+        Mon, 18 Nov 2024 12:28:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731961209; x=1732566009; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1731961698; x=1732566498; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+ahISKzlICL7xq2thX4QQ9VUlIqfnO9jRpsSa3e/Y+E=;
-        b=ZYBDO2nnHckQywDGP+KvBc5upWvuJvxVAprUknNLUgtv2C0qkuh88SwX9XPh78C/sz
-         cZgx4sMMpR0mXY0NR3YhrawQAXB/zX9hxHpYnlheRFoHnHMbo9jHCJC+OIqE6Qs3U9ec
-         udfAfeqq6qlFchlSTfBGo/u7ESj1fIZq+HQNH6NXMK1zccwNr1eEqAC4QEYNSHso2Jua
-         kxOreM4UL2AD4lbCQ3XjERa1prbkKOLWrTshjtd3A7cwqOHIADlosd6JZsF+Nqpt1n1V
-         WVLULABGn+nZGNZqK/3yS9Krm1g82SikI46z8J3ky6TOXTBtQcNkm+SRxWBV3I4UeGPS
-         extg==
+        bh=ut+d7DL7uqoI2pnr1wfCbwOzEdaLXHwjRahrl9zmYH8=;
+        b=fkrjFlzd/ACmg0DWmvFbLMD2mey5vydSxaOulDQYsDxTXVrnlTJYLpUZc8C23krc3W
+         RWCWLYuaszX57VS6Zx2LS7f/puyS/R2WVj7zhahzWGP/P//DTTuljafRY3I9J0qxmXJh
+         eHzUII9+5OCuZlSfAtYRoE4qdIiTx4kmIy5jL0VGVQv224nKQt0v69CqyJrLa3P/W8kX
+         +c6KNW8Ep7FCkun2cQqswTAAacQKfeOCwD4/FoT8y7vpBqdW07eYMqZ8YntHsAq9rf8P
+         4H1SPo4mxbSvBo0YctqCt+ENqNXco4ci98QMtT4gwIH4biFUmt+FGTEiuYVDGJ1T2WYq
+         G8OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731961209; x=1732566009;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+ahISKzlICL7xq2thX4QQ9VUlIqfnO9jRpsSa3e/Y+E=;
-        b=C/fOaKhBb7a8opphCJY78Zx5IRaSzeBNowXbXM5h0PAF43tBnC6dzci5KzKSu6RXny
-         nTc2VkvrKqPQd6aR/+IXcHNOy4MiV2UxuK1qRVggif3uZQJvp01kwXT9iM1oUqjVFkRL
-         M9gWiQZPTsG6FeXo0yxj0s9bX+3mlygFOJHt1mEyLnanmlI0Y2sIcof50Liq/eb1Et4x
-         lR6ghD33tNw/E8xEnbwgjaQJKuvpuId6MezdMcxOvDzSx60BQoaNpJw/5rcymDeb2QM0
-         fnbzxj42Hm7/no0OTX/5697t/JSOp/mkfMrA7PevwNiu+4e/lKKKguz39tBitNrqlD5J
-         giQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXovEDJ7TP9vXUpnMiLVAB1GYSk2R8RFVipc2UDvx2XEzrntrWBrdqaO4G47h27J97RRZfht2Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykER0Qc+XgdBk3MDi7P02CRVXdIRNHEdfZaQAoMswAnSCILSI8
-	GDwgbkB3dQvsvzd6IUg3uNY5ME5L0VCfZWEQhu7Y4xrqUPWZf/8lQcS0qA==
-X-Google-Smtp-Source: AGHT+IEfUYGXm2endIie61adx4oO5PavWA3pDy4aoOstqc1HJS5sycG5XKjTF2hZVhZ4PVcRA1iDHg==
-X-Received: by 2002:a05:6214:f66:b0:6d4:16e0:739a with SMTP id 6a1803df08f44-6d416e07684mr131030206d6.17.1731961209569;
-        Mon, 18 Nov 2024 12:20:09 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc38854sm39612916d6.54.2024.11.18.12.20.08
+        d=1e100.net; s=20230601; t=1731961698; x=1732566498;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ut+d7DL7uqoI2pnr1wfCbwOzEdaLXHwjRahrl9zmYH8=;
+        b=bYmRY4WlU3ONsv5doV2M89G0CJCPDWryhD1kgZQJLidA4x7BGZjb7jRABuQ9eb0Vu4
+         G1hrwev28pplTiprNaaUvUqG5e1oHmqP/RdEYfy6doBgnlUrDeGOK2h7PaPrac/BDUxh
+         9MjCbB3pfo7xOTaDm8f7nnfFZTD/pWZAuGDnkp+2Rsds+8nUb9XETJGU2GH/ov2ywDbo
+         0QpbcfgclfV1dnp9oYFpevzD8L/6wMmzTYjLggSH3z7ZDyfJ6x81rpr0Mtgg0vt0R/CX
+         SHTA+p9c25f2igADOmUstjSlpaRDKxgN8XWZ6rp1HzbSXCq8StWWVRMg+E+k23GVJ4eX
+         joKA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+zXot3Gc0BHBaOoaks/7A8Jqvw067aT0+0ZK4JFUG6AZDJYwabZtvicy5CFwHawsxuAGr9mg42KDBlw==@vger.kernel.org, AJvYcCUNuMcrR97ln1nB5zQmqYAeSYPa9ISHeZB+EbrI/u6dw1JDU7rUbmGEkPfU6hNJzRnrOHhV0o4Y@vger.kernel.org, AJvYcCVtqP9xeW6tD6j3QyiPFobc69lP7u6jw1Hxq3qTA5pGbq2Je4Awt9W3nJgavLpiN6/XtZb5W0xirzIirafIEHs=@vger.kernel.org, AJvYcCWA708bnG7Jph9o5wTmOKpXzarEZQXQgeGzbUTW1/eyLMx0FjGJ5zWaQU6cyC6CCXoKKES6Sa4hVAAXKWxd@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGHCXIi51y0uvXPjfhy1zVWCi7yQfwRoYihGuis1y0QTyQBDt7
+	/KYxw7dbZBlIWvwdC5H1EUxAs8vKzEuJdXPnTL3/KA88CbC51kpV
+X-Google-Smtp-Source: AGHT+IGcYiGJ+3lwBm589yH3iVd/ZN43viURBfqeOA4ouRBzJLMwUclDkj0RDkFm0gEdkdLWT6yw1A==
+X-Received: by 2002:a05:620a:44d1:b0:7b1:1cf6:cfd0 with SMTP id af79cd13be357-7b3622db90fmr2044601785a.33.1731961698332;
+        Mon, 18 Nov 2024 12:28:18 -0800 (PST)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a85e290sm23620385a.42.2024.11.18.12.28.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 12:20:09 -0800 (PST)
-Date: Mon, 18 Nov 2024 15:20:08 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
- netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu, 
- annaemesenyiri@gmail.com, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemb@google.com, 
- idosch@idosch.org
-Message-ID: <673ba178a008e_1d652429421@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241118145147.56236-3-annaemesenyiri@gmail.com>
-References: <20241118145147.56236-1-annaemesenyiri@gmail.com>
- <20241118145147.56236-3-annaemesenyiri@gmail.com>
-Subject: Re: [PATCH net-next v4 2/3] sock: support SO_PRIORITY cmsg
+        Mon, 18 Nov 2024 12:28:17 -0800 (PST)
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 41DD31200076;
+	Mon, 18 Nov 2024 15:28:17 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Mon, 18 Nov 2024 15:28:17 -0500
+X-ME-Sender: <xms:YaM7ZzgWVoZwHG7SqmII3Bqy51ecraXB_YwGq68JUlintFgAHicTwQ>
+    <xme:YaM7ZwDiM95fVLUh7feFrICS-BQniCJznPOVL0WYiITJWM6MbQM29OCHKIQREEHSn
+    RpvHYTzXKosAaNjqw>
+X-ME-Received: <xmr:YaM7ZzGSg4gGr9ebzj-xTWioQ0Sk6v4rx8hbS3xbHndSicbhS-GNSbMmldi1CA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfedtgddufeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpefftdeihfeigedtvdeuueffieetvedtgeejuefh
+    hffgudfgfeeggfeftdeigeehvdenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
+    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
+    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
+    mhgvpdhnsggprhgtphhtthhopedvgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    epmhgrnhgrshdukedvgeegsehiihhithgurdgrtgdrihhnpdhrtghpthhtohepfhhujhhi
+    thgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehtmhhgrhhosh
+    hssehumhhitghhrdgvughupdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhr
+    tghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplh
+    hinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegu
+    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvg
+    drtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:YaM7ZwSxbN0x5IyVrZ0R9eO62WJsQFvptIh35o3zeOBGMiYh7firJQ>
+    <xmx:YaM7Zwy7RNJlcXupukflmz20zByMfc8iOZq8_csqgcnfTvsRU2H6sg>
+    <xmx:YaM7Z24IR5-Zqr1VKjYhMYWuR5Hz5VqW5yoe5MWYnoIXVuUG_xiIgg>
+    <xmx:YaM7Z1z81j7Vcyk37ze46yxTPG33_n7WYdB41GdxvOD4BzEqIX6IfQ>
+    <xmx:YaM7ZwjoxF3zuufjHCBpx2QLgqscjiJ9H3KtNi5bay7lqtz5sTjIk_vz>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 18 Nov 2024 15:28:16 -0500 (EST)
+Date: Mon, 18 Nov 2024 12:28:15 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: manas18244@iiitd.ac.in
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] rust: macros: simplify Result<()> in function
+ returns
+Message-ID: <ZzujX5dXpUxwBFSU@tardis.local>
+References: <20241118-simplify-result-v3-0-6b1566a77eab@iiitd.ac.in>
+ <20241118-simplify-result-v3-3-6b1566a77eab@iiitd.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241118-simplify-result-v3-3-6b1566a77eab@iiitd.ac.in>
 
-Anna Emese Nyiri wrote:
-> The Linux socket API currently allows setting SO_PRIORITY at the
-> socket level, applying a uniform priority to all packets sent through
-> that socket. The exception to this is IP_TOS, when the priority value
-> is calculated during the handling of
-> ancillary data, as implemented in commit <f02db315b8d88>
-> ("ipv4: IP_TOS and IP_TTL can be specified as ancillary data").
-> However, this is a computed
-> value, and there is currently no mechanism to set a custom priority
-> via control messages prior to this patch.
+On Mon, Nov 18, 2024 at 08:07:00PM +0530, Manas via B4 Relay wrote:
+> From: Manas <manas18244@iiitd.ac.in>
 > 
-> According to this patch, if SO_PRIORITY is specified as ancillary data,
-> the packet is sent with the priority value set through
-> sockc->priority, overriding the socket-level values
-> set via the traditional setsockopt() method. This is analogous to
-> the existing support for SO_MARK, as implemented in commit
-> <c6af0c227a22> ("ip: support SO_MARK cmsg").
-> 
-> If both cmsg SO_PRIORITY and IP_TOS are passed, then the one that
-> takes precedence is the last one in the cmsg list.
-> 
-> This patch has the side effect that raw_send_hdrinc now interprets cmsg
-> IP_TOS.
-> 
-> Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
-> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+> Functions foo and bar in doctests return `Result<()>` type. This type
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Same nits here.
 
-Good catch on ipv6 ping.
+> can be simply written as `Result` as default type parameters are unit
+> `()` and `Error` types. Thus keep the usage of `Result` consistent.
+> 
+> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+> Link: https://github.com/Rust-for-Linux/linux/issues/1128
+> Signed-off-by: Manas <manas18244@iiitd.ac.in>
+
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+
+Regards,
+Boqun
+
+> ---
+>  rust/macros/lib.rs | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+> index 4ab94e44adfe3206faad159e81417ea41a35815b..463920353ca9c408f5d69e2626c13a173bae98d7 100644
+> --- a/rust/macros/lib.rs
+> +++ b/rust/macros/lib.rs
+> @@ -144,11 +144,11 @@ pub fn module(ts: TokenStream) -> TokenStream {
+>  /// // Declares a `#[vtable]` trait
+>  /// #[vtable]
+>  /// pub trait Operations: Send + Sync + Sized {
+> -///     fn foo(&self) -> Result<()> {
+> +///     fn foo(&self) -> Result {
+>  ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
+>  ///     }
+>  ///
+> -///     fn bar(&self) -> Result<()> {
+> +///     fn bar(&self) -> Result {
+>  ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
+>  ///     }
+>  /// }
+> @@ -158,7 +158,7 @@ pub fn module(ts: TokenStream) -> TokenStream {
+>  /// // Implements the `#[vtable]` trait
+>  /// #[vtable]
+>  /// impl Operations for Foo {
+> -///     fn foo(&self) -> Result<()> {
+> +///     fn foo(&self) -> Result {
+>  /// #        Err(EINVAL)
+>  ///         // ...
+>  ///     }
+> 
+> -- 
+> 2.47.0
+> 
+> 
 
