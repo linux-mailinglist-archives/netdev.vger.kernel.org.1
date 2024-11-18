@@ -1,135 +1,137 @@
-Return-Path: <netdev+bounces-145908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA8BB9D14C6
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:53:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC6C9D14CA
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:54:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9791E1F23446
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:53:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86CD82840F4
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97C3194A70;
-	Mon, 18 Nov 2024 15:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E331A0718;
+	Mon, 18 Nov 2024 15:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dLzD8jex"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qQ7Lv+2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A401DFFB
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 15:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F1B12EBE7;
+	Mon, 18 Nov 2024 15:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731945210; cv=none; b=Hc1BmN4uGytBxz9TRYzdjeJu+tQlIiIA+9cdFErS3MM1qGuJBidSBa6u9OE/88Rq29fyM6YYFppKYyf7ljR6XENNn1TD4VQO5HwwvQ3SFFcTlOZtGDGJl8F/T9E/nscB0ucMe6U5+2lLI4F7PR1w/Ar6X559legqnsiFQace+kA=
+	t=1731945254; cv=none; b=Ozh6gBy2Ap0IDJEHQfCgZrSSx2Zn88aYKUXeR35iWg/kkm+qhDwDWo2OsyLn0OM6CQ3E+gxtC4/uLqzB6BuF2/tZ0Bsb9aSF+Z7gxKlIxxRM86FeMLqTZdThbiGzKO/d02moEw/jnJYXwRuCWEtkceaTnPR2D3g1QsdaI6paAPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731945210; c=relaxed/simple;
-	bh=yRqXzEnPwFaa+auWM6yefjwq3R2Ids6AUNnZwvuKrg0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nwB9mNrYVIa3sPR+Mt0lh2w88OBaOcXbTM7lZGN/soNfmcveAeHLCbR5bonVeui67VBt2EOGxGt5HUSa5TpLzZXzbUGrRQHTCeyM6GLpBNr+gYbRjICzeAkrV0kKe7L67uSspBj92j/qQtnI8GwsEPnyr28tzYm/eNt9MLGuJNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dLzD8jex; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5ebc349204cso818180eaf.3
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 07:53:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731945208; x=1732550008; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M/HD3lzDxW/S30+fMzUpHxo+jEkPmHoNwk80gvA5gJc=;
-        b=dLzD8jexL4Q756d5OscIoUFARhlc4KipqyZxDvEl7XJ5EXBeM8EYeCuN68ky29QIif
-         /c+sA6ke2LHXW5jZDl0MzBGoZzokQ2fSbti6h7IHs/KNjzOyc9/9MaJW+V4An+faDkhJ
-         iMfpCPDYGu3HskT1cna2gn5HP2iiEmA4frL3YF4lqJF2yhk5YioEXkn/9dhHi01BFTO0
-         jhjtmVJvpBhB+wWeISVwKqKAUgwqZprPtTUCs5gCiIKTv6VRi6D6Fwnml1LLQbQ7kZm7
-         +VvQifg+kfRbRhRw2eLZK1StnUtnXXtVRnb1ejzY0dk9iK+X7hQ3UYUH6CWHlOxSsxPf
-         G4Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731945208; x=1732550008;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=M/HD3lzDxW/S30+fMzUpHxo+jEkPmHoNwk80gvA5gJc=;
-        b=warl53Vue0EXR3uPtvZF871UOXoO0gjY9s6iE69Aq118cQd2SmV6KPWMlqeMPgGoBh
-         u8BBEdvIJZNkZnOZz3Sp4p3+61CwP3v4AC7/OzZV1fMIHephWoYGeNCLAWIiDaqGdldW
-         0E+3P22YyAtD5wIHLGTdkFAoU7IQ7qPMzmFeEtPzWv50mejgvkj3oa99m+YK+VS6vNTG
-         u+toxxvbJ6nVt3uDf97eS0mRW47/Mor64LU6q+BxYdDgTABx50KSNxKPlsshdsu6BjoC
-         GtMt+5aRjCNykwMRoQfCPt3LcpcEDdQ/zFPbDof8c+CN+OX2kWh1A705e+ltyBnvEu7u
-         FIAQ==
-X-Gm-Message-State: AOJu0YyPozsOymHvI/2jaWe1qvPDKw9AFIt9UqCfNAs8HOIKK/4Th9b9
-	Lcb0rMR2LQlst5iAoEWq9nueP8GUNoBaJf/fNLoeoWDs13paUuqh
-X-Google-Smtp-Source: AGHT+IGBblPeWVmYqY0+g3oeZh+7/MykEkGilBfqBjewhDhKjWpH9CS4DcH3IQmBWMMODCnI3pZJkA==
-X-Received: by 2002:a05:6359:7602:b0:1c3:73ff:511e with SMTP id e5c5f4694b2df-1c6cd15959dmr461468955d.21.1731945208205;
-        Mon, 18 Nov 2024 07:53:28 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dd1fe49sm37443956d6.79.2024.11.18.07.53.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 07:53:27 -0800 (PST)
-Date: Mon, 18 Nov 2024 10:53:27 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Olech, Milena" <milena.olech@intel.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
- "Lobakin, Aleksander" <aleksander.lobakin@intel.com>
-Message-ID: <673b62f785bf3_1d65242948d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <PH7PR11MB5885EAC3A3687F97267F072E8E272@PH7PR11MB5885.namprd11.prod.outlook.com>
-References: <20241113154616.2493297-1-milena.olech@intel.com>
- <20241113154616.2493297-10-milena.olech@intel.com>
- <67366352c2c5b_3379ce29475@willemb.c.googlers.com.notmuch>
- <PH7PR11MB5885EAC3A3687F97267F072E8E272@PH7PR11MB5885.namprd11.prod.outlook.com>
-Subject: RE: [PATCH iwl-net 09/10] idpf: add support for Rx timestamping
+	s=arc-20240116; t=1731945254; c=relaxed/simple;
+	bh=4lpYUs5Dbj0T8zn97A2VEybvGIFft2BYYoXxSpx3bHU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Go+z/PEQgADuXhuJMc8D8SE/fBNR/eBsSA8hpFCXuqpiR1uEUDaFqTrqla7BSl0iI+mqRNzL/ffxR2tVsxGZYuf6Zy9s12rL3h5tfw7j57d56uIms16/+hFP8VwyhZ50KMMKe7ZSQq946KR7CXO1a0V6xPQ02d1zBIXzo0fl8pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qQ7Lv+2L; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIB4gaS022969;
+	Mon, 18 Nov 2024 15:54:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=SaDWlb
+	2kKaad3gP5OleofzMuysniJvB4P5iWE1Qjlb8=; b=qQ7Lv+2LJ5CnumzBzjAqxr
+	GunvUxdms9jNHeolIbO6z6aKh067VjHkVP3ahBhYvHTsC0FoTbCVPuVbDo0jQPws
+	uFOg+wTrZJuIOxe37ARIo74U1IvBaH65//fUuTGz+znTfWZl2XKRZqE7cIrL9n2G
+	rtP/32HvBwIWlMKNXR7H5c1ccTH9aVMc0tD0ATvlNh1AMH6lEFwHdHtbwdwm5gUZ
+	i2bgjKhbSq+M3CqZMjB4vPqUu/7xqLxo2tQ+rMDiGrUHO94/V19ez/Z0+mDj/aTC
+	iOZWlgetz8eejMwzRGRSBDbAmWJu8jlfW1ckA5c3h1VwotX2cvs+VBWWp9Z3JLBw
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xyu1gpwd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Nov 2024 15:54:07 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIEogGR021983;
+	Mon, 18 Nov 2024 15:54:06 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42y6qmtv09-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Nov 2024 15:54:06 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AIFs55p47972750
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 18 Nov 2024 15:54:05 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4345F58050;
+	Mon, 18 Nov 2024 15:54:05 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E27F158045;
+	Mon, 18 Nov 2024 15:54:04 +0000 (GMT)
+Received: from [9.61.240.76] (unknown [9.61.240.76])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 18 Nov 2024 15:54:04 +0000 (GMT)
+Message-ID: <542cb6ed-8e2b-407e-9f9d-037144740b93@linux.ibm.com>
+Date: Mon, 18 Nov 2024 09:54:04 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 3/3] vsock/test: verify socket options after setting
+ them
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+References: <20241113143557.1000843-1-kshk@linux.ibm.com>
+ <20241113143557.1000843-4-kshk@linux.ibm.com>
+ <yo2qj7psn3sqtyqgsfn6y2qtwcmyb4j7gwuffg34gwqwkrsyox@4aff3wvdrdgu>
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+In-Reply-To: <yo2qj7psn3sqtyqgsfn6y2qtwcmyb4j7gwuffg34gwqwkrsyox@4aff3wvdrdgu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KY8lgYHVVl13F8Rj2DQbSA6JJs9h1IRC
+X-Proofpoint-ORIG-GUID: KY8lgYHVVl13F8Rj2DQbSA6JJs9h1IRC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411180128
 
-Olech, Milena wrote:
-> On 11/14/2024 9:54 PM, Willem de Bruijn wrote:
+On 11/14/2024 04:28, Stefano Garzarella wrote:
+> On Wed, Nov 13, 2024 at 08:35:57AM -0600, Konstantin Shkolnyy wrote:
+[...]
+>> diff --git a/tools/testing/vsock/msg_zerocopy_common.c b/tools/ 
+>> testing/vsock/msg_zerocopy_common.c
+>> index 5a4bdf7b5132..8622e5a0f8b7 100644
+>> --- a/tools/testing/vsock/msg_zerocopy_common.c
+>> +++ b/tools/testing/vsock/msg_zerocopy_common.c
+>> @@ -14,16 +14,6 @@
+>>
+>> #include "msg_zerocopy_common.h"
+>>
+>> -void enable_so_zerocopy(int fd)
+>> -{
+>> -    int val = 1;
+>> -
+>> -    if (setsockopt(fd, SOL_SOCKET, SO_ZEROCOPY, &val, sizeof(val))) {
+>> -        perror("setsockopt");
+>> -        exit(EXIT_FAILURE);
+>> -    }
+>> -}
+>> -
 > 
-> > Milena Olech wrote:
-> > > Add Rx timestamp function when the Rx timestamp value is read directly 
-> > > from the Rx descriptor. Add supported Rx timestamp modes.
-> > > 
-> > > Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > > Signed-off-by: Milena Olech <milena.olech@intel.com>
-> > > ---
-> > >  drivers/net/ethernet/intel/idpf/idpf_ptp.c  | 74 
-> > > ++++++++++++++++++++-  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 
-> > > 30 +++++++++  drivers/net/ethernet/intel/idpf/idpf_txrx.h |  7 +-
-> > >  3 files changed, 109 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c 
-> > > b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> > > index f34642d10768..f9f7613f2a6d 100644
-> > > --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> > > +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> > > @@ -317,12 +317,41 @@ static int idpf_ptp_gettimex64(struct ptp_clock_info *info,
-> > >  	return 0;
-> > >  }
-> > >
-> > > +/**
-> > > + * idpf_ptp_update_phctime_rxq_grp - Update the cached PHC time for a given Rx
-> > > + *				     queue group.
-> > 
-> > Why does each receive group have a separate cached value?
-> > They're all caches of the same device clock.
+> Since the new API has a different name (i.e.
+> `enable_so_zerocopy_check()`), this `enable_so_zerocopy()` could stay
+> here, anyway I don't want to be too picky, I'm totally fine with this
+> change since it's now only used by vsock_perf ;-)
 > 
-> That's correct - they all caches values of the same PHC, however I would
-> like to have an effective method to access this value in hotpath where
-> I'm extending the Rx timestamp value to 64 bit.
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> For the same reason I cached Tx timestamp caps in
-> idpf_vport_init_fast_path_txqs.
 
-Oh to avoid reading a cold cacheline in the hot path. Okay, that makes
-sense. Please make a note of this in the commit message.
+Ok, let's keep it static then - it's simpler :-)
 
