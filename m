@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-145726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8019E9D092C
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 07:02:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 386489D0930
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 07:03:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 395D71F215FB
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 06:02:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5151B2230B
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 06:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B79148304;
-	Mon, 18 Nov 2024 06:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7930C149E0E;
+	Mon, 18 Nov 2024 06:02:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E3414659C;
-	Mon, 18 Nov 2024 06:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5B714831F;
+	Mon, 18 Nov 2024 06:02:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731909744; cv=none; b=E4xJKe5O2jqErWVD6rpcv37fGnZOy8NDClaTykQgSH9hmjbsa14JOYw8WKGt2vSsN9dbpnB2+y9ndqls3RdmvBR1ZkJXVoVlZ4H+Rnura8euCbN/5CBSpqn+y9wHVXmC0hX8m0Fd0pXh9ARnuX4+AotoLwYQLMFQTmP1A1RimqY=
+	t=1731909746; cv=none; b=tvXNcPuJRlYEBkbfrswl7KkvikTc89njUt2RVX+amvodI2VwE9e7vNtli85+PT6kI0gL9hJnraDwofeOUHQERRgMoPfXBy5jKPdOYhmyzZeOI/d3iaPtJ3ahsdIiqvznhITa7O5WPrgsxIM1RnnHNF0WYDowRTDfAZ4wo0i3yLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731909744; c=relaxed/simple;
-	bh=E6DZgxFASwkXaa+nRaWgDMNGtH9csCAM0/EQpYf//cM=;
+	s=arc-20240116; t=1731909746; c=relaxed/simple;
+	bh=lW3Yhn3mcDRma1Y+lv8Hv05//q7fTVEmZq6HiiPgyPQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=odlQ5YPyos2q2FdnZopzW3Og9UDEWkaT5UHG+3AE6POuY4XC9aX1xqZciCGKZi7kLu1rxfcLxH/odSUphcVypMM/U4m97cm8bvk6eB6ktc3Xrbr/hXOhmBIEkfH5sOkDgVrBjVi+Bu7lVdzhHRc924UKC7p2VmImu6C+DnP9D6o=
+	 MIME-Version:Content-Type; b=Ja6dBdPVtUI81Os4qpJTvEPHfeDF1f16bysAB2SwZIFkYP5Am8uwu4fFbLVq4KXYvhGUZcnm7v8+FmRXxjqOztymJiFXMFI/nKDXwxXGSluQNXhXBtIBvGYGHLR3cdkbmHBnGbWOs2mhEsfyhAhX111+3/nKFyA4HxhAvibMRnI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -43,9 +43,9 @@ To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
 CC: <jacky_chou@aspeedtech.com>
-Subject: [net-next v2 1/7] dt-bindings: net: ftgmac100: support for AST2700
-Date: Mon, 18 Nov 2024 14:02:01 +0800
-Message-ID: <20241118060207.141048-2-jacky_chou@aspeedtech.com>
+Subject: [net-next v2 2/7] net: faraday: Add ARM64 in FTGMAC100 for AST2700
+Date: Mon, 18 Nov 2024 14:02:02 +0800
+Message-ID: <20241118060207.141048-3-jacky_chou@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
 References: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
@@ -58,35 +58,37 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-The AST2700 is the 7th generation SoC from Aspeed.
-Add compatible support for AST2700 in yaml.
+AST2700 is a ARM 64-bit SoC and ftgmac100 adds support 64-bit
+DMA capability in AST2700.
 
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/faraday/Kconfig | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
-index 9bcbacb6640d..fffe5c51daa9 100644
---- a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
-+++ b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
-@@ -21,6 +21,7 @@ properties:
-               - aspeed,ast2400-mac
-               - aspeed,ast2500-mac
-               - aspeed,ast2600-mac
-+              - aspeed,ast2700-mac
-           - const: faraday,ftgmac100
+diff --git a/drivers/net/ethernet/faraday/Kconfig b/drivers/net/ethernet/faraday/Kconfig
+index c699bd6bcbb9..d5a088d88c3d 100644
+--- a/drivers/net/ethernet/faraday/Kconfig
++++ b/drivers/net/ethernet/faraday/Kconfig
+@@ -6,7 +6,7 @@
+ config NET_VENDOR_FARADAY
+ 	bool "Faraday devices"
+ 	default y
+-	depends on ARM || COMPILE_TEST
++	depends on ARM || ARM64 || COMPILE_TEST
+ 	help
+ 	  If you have a network (Ethernet) card belonging to this class, say Y.
  
-   reg:
-@@ -33,7 +34,7 @@ properties:
-     minItems: 1
-     items:
-       - description: MAC IP clock
--      - description: RMII RCLK gate for AST2500/2600
-+      - description: RMII RCLK gate for AST2500/2600/2700
+@@ -28,8 +28,7 @@ config FTMAC100
  
-   clock-names:
-     minItems: 1
+ config FTGMAC100
+ 	tristate "Faraday FTGMAC100 Gigabit Ethernet support"
+-	depends on ARM || COMPILE_TEST
+-	depends on !64BIT || BROKEN
++	depends on ARM || ARM64 || COMPILE_TEST
+ 	select PHYLIB
+ 	select MDIO_ASPEED if MACH_ASPEED_G6
+ 	select CRC32
 -- 
 2.25.1
 
