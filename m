@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-145802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63DA19D0F68
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:15:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06BA69D0FBA
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:29:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A2E928151B
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:15:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93C7BB2C27B
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36007194A63;
-	Mon, 18 Nov 2024 11:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEF8199E84;
+	Mon, 18 Nov 2024 11:15:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531C019883C;
-	Mon, 18 Nov 2024 11:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF4F1991B4;
+	Mon, 18 Nov 2024 11:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731928532; cv=none; b=LMlrxOr8zXtY6Er85Z/TqAidlyi2WE7C24MRyJ3S9qpDjRAp7gpjcTigqCLFelLSYEPVd/vKK9YS+ZKck450V85VO4ST2t5fUuawr1RKu49IL5ydREEiYIbgJew4h1sufUjok8K20LxiuDYtOZToTOn/bufkrJ+0XHNXF+DWhfk=
+	t=1731928533; cv=none; b=ohjUqsPM6X6kX28WY7BSiftNmj7/kqIq7Ta5saSk+k/lPVg9A/TT04l+Kr2HqUnPgusd77VDxSHCc+81n8MhJ/11ea0enPeoXNaqR+wY91uh201pF3fFhK1lSifUKbo3RV/5H3jUbGeEw/Gm3E/cD9V2y9BF1f2irUeF+dEIzzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731928532; c=relaxed/simple;
-	bh=jNsLMGobQevrogIk04wHrOqqXljj734U/1qK3g+NLEc=;
+	s=arc-20240116; t=1731928533; c=relaxed/simple;
+	bh=hUbpOBQHTbtfdvzsAVtzCs3iUvadK6+usE3uQvkGxv8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QiKo7CeuGEtKLV6jDjJo1+R6g3Cbwc6uO5c/CmA66EbwP+4aK9B0OrBwdm75OOU5RXKLFcTzLYhbju23inDIzlDt05ye9MF/i0wEGqrvc9R/eR7NrTCZK+NDo8a0ERmcYnfYez6vfihyiqQJyK4ONZ+IThq06SJXEa3EYtN215I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.53
+	 In-Reply-To:To:Cc; b=Lw6l7I/EHnMO5hVctNU/GCTcVXLAx5lgkqbDBCJ66GA0fOSj1QYZ1L3d14EI4iN/viHpS+DctcYNiIdqVFE+2x0M3j6SULbr2JOmLQ/CZm7DQ/+7bEMPeb/m4UqQS8+jZe7Fh8taWDbnL45Gz3cqlicD0RHCTVtgZP3rotD7ZbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53da353eb2eso2406752e87.3;
-        Mon, 18 Nov 2024 03:15:29 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5cefa22e9d5so5039774a12.3;
+        Mon, 18 Nov 2024 03:15:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731928528; x=1732533328;
+        d=1e100.net; s=20230601; t=1731928530; x=1732533330;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PYNQOUHaLoGGDTgK+d85aIvTAPV1PsbIBUKLL0iAuzA=;
-        b=oMvVyewIVrmlf+suAL9CKcmKkh8BXvSM7FATU39BZa1q1HcHoU/owvUl/6phvQqREz
-         QsbCGNKpvJnMERLPMUIHXezd7gMGjaXJuwPULusZpE5hsoDfsr/WvL2NsMOK9BPpldn/
-         nwqvnnuvPNUtEwF+Uag/3ThgOE4FkKm2kS5wlv99PyNY9/aW/rTn0UXrg9XupbUiOL7n
-         xlM9sx/Hvyowz02fTyhxF+3i+UT05b9OMPDoXE77/dJXpsvvaXJIQqMhBoSb7QprC0fS
-         nzUjhMbiRjtOTxxysRinkbNdckUlgDiG5b/+vwqqPmtq1yDORUVXDhP/tb1BlQw+VkPw
-         N8Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCVGhFPUH4WOAfHsbNWbN6IBRDKkvmVHijdvKMk9qrftrZMxfWxXq8SFcBCJZEFGU7dizxhOcL9CFZNttlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO8f2fEaDtWptvesUaCHTt537FMmOezZLxIM68Wc0nz4kHO1Xc
-	dqXOlxWuR6Dk1m0pg0W9wHQgQFgmkqTyhxGMnu3Vaz/MGUJ0a+53QgUgdg==
-X-Google-Smtp-Source: AGHT+IGOCnMGMQBO/OIYbCwLEh2a6L9UjxxaAI+Br6/K9J5lua3Oko5YEGdX8NkbWrAFC8wEoIx2Mg==
-X-Received: by 2002:a05:6512:3e29:b0:53d:a86e:4200 with SMTP id 2adb3069b0e04-53dab2a634emr6422698e87.21.1731928527836;
-        Mon, 18 Nov 2024 03:15:27 -0800 (PST)
-Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df26c84sm530075566b.35.2024.11.18.03.15.27
+        bh=h3C9Cy2PwedyMGVk1Gq1bLlgXzPcOJtWC+YvaIz1Ms8=;
+        b=u5bZI/so4vs+cYrhyAoXLeRMn/ul/LLtWdq2aGnUVb+LQq6uf+WA9C5s6WYnkzqdg/
+         wnRPT9nV4hI+ybc8HLLYaPGmjBgkxw1GwqIJlNdu9Lal19iSH/Em/C2cRE7TvvK+A5OF
+         +Yd6h1kfZQNW9LNhdB7XNt14YFqx64Zbyg864OZAbLfll4nFjb7eApk7h/T/kd5/CIi9
+         CKVLxc2NkIdz9OZQAMlKR8XNSTlrncu2WKqr+xFkv2odKHzFSuU9LYw6J3NAhOM6/LiS
+         GC8H8zqqNCC6sJMzMV/2CRl2MQMnM+8HtgvvsBlhHX+2rqsaIRXeQCUlXsoXvsRv9ufA
+         PIjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFeEskmRJi/fg7XF+HlKkOQNHHgQto7AdxtNDJHSn96PNrXVD4wVFA9c+ng8JarB9ymiD9ghMxinI3AhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEnaZQy3hndDyP0ACAKVmMcGm74MXVXYUVykdB/a+4YjidMrPt
+	4lvPv/zSnzqE0Oer4jGBTWgNHfeZDWgm75XsjO/5OA+6WksONe/JQnKAAw==
+X-Google-Smtp-Source: AGHT+IHhuT4e7nJTiIMuLfo2GRFHi1xzjE+zELwDWhWuKtbRoqVQJmGQ2pY2YOXBt8oeBKlouvlEdQ==
+X-Received: by 2002:a05:6402:5216:b0:5cf:ca7d:1749 with SMTP id 4fb4d7f45d1cf-5cfca7d1997mr2680176a12.7.1731928530058;
+        Mon, 18 Nov 2024 03:15:30 -0800 (PST)
+Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf79c0ac9asm4635073a12.54.2024.11.18.03.15.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 03:15:27 -0800 (PST)
+        Mon, 18 Nov 2024 03:15:28 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Date: Mon, 18 Nov 2024 03:15:17 -0800
-Subject: [PATCH net 1/2] netpoll: Use rcu_access_pointer() in
- __netpoll_setup
+Date: Mon, 18 Nov 2024 03:15:18 -0800
+Subject: [PATCH net 2/2] netpoll: Use rcu_access_pointer() in
+ netpoll_poll_lock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241118-netpoll_rcu-v1-1-a1888dcb4a02@debian.org>
+Message-Id: <20241118-netpoll_rcu-v1-2-a1888dcb4a02@debian.org>
 References: <20241118-netpoll_rcu-v1-0-a1888dcb4a02@debian.org>
 In-Reply-To: <20241118-netpoll_rcu-v1-0-a1888dcb4a02@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -76,27 +76,27 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>, paulmck@kernel.org
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1191; i=leitao@debian.org;
- h=from:subject:message-id; bh=jNsLMGobQevrogIk04wHrOqqXljj734U/1qK3g+NLEc=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnOyHMWilra8auAUEEo3NWZFkzLTM0n7FpaSkP/
- LtYioZp9LCJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzshzAAKCRA1o5Of/Hh3
- bXALD/94D1ThBLTcl+Chy4kO6shM14UmOqPmDNQMkP4n7ZVQtjZevVPkALImr3KcYVQ1WFMvBEU
- LqAA6NXOjtHz6TqgyzFIZQaD8BfkPfWVB82yfatJ7UEekTBeU3YxYTJBal3kX73tzjQxswyPRER
- CtsDUkzuyA4JIf/oMavgoSlDSfeywJCfWEwGzj7qIj6I4QzXR5MpQYMVbPxONAIGCp0CjtOQ3Ll
- D7p8otN4ePnVg8sgFs0twHMXfTG1XwaVno+lPm+g3LCE4WncoDRlUsjw6kwEaagwQDRqbh+ha6N
- qOasHFgnAxenGmffttrDgttIRhlqZkmgc7o4vzks1ZVnMEQlxguTnZH3RS+ii6PxPWn6NXcDzJy
- WRyj/xi2oiI0yg2T6olNZLK0yudOGvOAZuMb7JtpkIRBkqwnApsHS79JLNGmxK9jroEKYly+B0v
- 4URhXbumrQ3/3GSamr+v/TSxzgLv0qjkYcEPMhBcEuVOkKvHAp6K7lNd4r2Cr8shIip9UT8KTig
- dTjOBCoMTVgP/eD2Hk9cFH4b0e0eTcROxfAO/C1f+mwOjgUPtfczK4NMZ9xgfQBj+i/CX/lyIP6
- e6HXxffhWyTtALoy8j7scQ8G6joktYex8Vhcdj2XZiIm6fHowy4fda6MSQuiYnxmtglizbKjGNZ
- TP0oeKl3BKx5inA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1274; i=leitao@debian.org;
+ h=from:subject:message-id; bh=hUbpOBQHTbtfdvzsAVtzCs3iUvadK6+usE3uQvkGxv8=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnOyHMlCafKKthXqBntVibaGf1uz4y/4D80gRH3
+ k37dRLf9O+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzshzAAKCRA1o5Of/Hh3
+ bbYFD/0Vo+BPaX6InTTjgGQyg4mGLnf2pl48EkWZC9mU8JH2LdbvETj2gQK6+CB8ZVEcW4ceZwz
+ 18QegFwVo8QXRehEpzeyPtxKXAVHER9RcFQxegc51OQUzCH0jzf+eWCDABB8buFuhPMW++LMRzQ
+ 405n5zdzjgtD/bF8llyQPdiM30+CIwb74TMh3XRyCm+avodYFxmvH1u0EYDWfJncaq2yvxdGTk0
+ BtjCw6i72FUN9zaWqIPA3971ncQlKosD7xM38TolxJMUw4fDJzbcNuXBlIUehrasvoGqJ1ZQH1p
+ YWXRY+4Ka1Ep8korWvfS3DQRhAFUzrpEZEICuCcAs6huna7zCXxWp1F9uEEBlBpYsUJn/iLpYSu
+ BoWz+ed+FdGyZ39Xsj4aTGW11/AyszbqNbtvsCOsrWnq2eVkSCpm884nAXS9pjomYzgA4xLM0Gi
+ 0HjSFTtfd/ewY3sjd4ZE4X86OT39qVsPvD26K583vPbu6d7shkO00zaB/hijDemQr8CM8K4IX6S
+ nQM1Zli76fcoD3JKwPVgTcg48bah7SsDQeX/2b2478MdtAn/SYt30BjtEaRUuAINpMw66Vf3YNm
+ WaigrwgiEN8oNrsRLQ2XR4KK+zkdY61UZ9T63U0AaFikJ9QObWqVAFlyRt/94sd2B5P1qsgfNUU
+ pRJ3nny3cSPRgXQ==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-The ndev->npinfo pointer in __netpoll_setup() is RCU-protected but is being
-accessed directly for a NULL check. While no RCU read lock is held in this
-context, we should still use proper RCU primitives for consistency and
-correctness.
+The ndev->npinfo pointer in netpoll_poll_lock() is RCU-protected but is
+being accessed directly for a NULL check. While no RCU read lock is held
+in this context, we should still use proper RCU primitives for
+consistency and correctness.
 
 Replace the direct NULL check with rcu_access_pointer(), which is the
 appropriate primitive when only checking for NULL without dereferencing
@@ -104,24 +104,24 @@ the pointer. This function provides the necessary ordering guarantees
 without requiring RCU read-side protection.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
-Fixes: 8fdd95ec162a ("netpoll: Allow netpoll_setup/cleanup recursion")
+Fixes: bea3348eef27 ("[NET]: Make NAPI polling independent of struct net_device objects.")
 ---
- net/core/netpoll.c | 2 +-
+ include/linux/netpoll.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index aa49b92e9194babab17b2e039daf092a524c5b88..45fb60bc4803958eb07d4038028269fc0c19622e 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -626,7 +626,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
- 		goto out;
- 	}
+diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
+index cd4e28db0cbd77572a579aff2067b5864d1a904a..959a4daacea1f2f76536e309d198bc14407942a4 100644
+--- a/include/linux/netpoll.h
++++ b/include/linux/netpoll.h
+@@ -72,7 +72,7 @@ static inline void *netpoll_poll_lock(struct napi_struct *napi)
+ {
+ 	struct net_device *dev = napi->dev;
  
--	if (!ndev->npinfo) {
-+	if (!rcu_access_pointer(ndev->npinfo)) {
- 		npinfo = kmalloc(sizeof(*npinfo), GFP_KERNEL);
- 		if (!npinfo) {
- 			err = -ENOMEM;
+-	if (dev && dev->npinfo) {
++	if (dev && rcu_access_pointer(dev->npinfo)) {
+ 		int owner = smp_processor_id();
+ 
+ 		while (cmpxchg(&napi->poll_owner, -1, owner) != -1)
 
 -- 
 2.43.5
