@@ -1,269 +1,121 @@
-Return-Path: <netdev+bounces-145995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F5639D19D3
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:44:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C0A9D19DF
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD35F1F220EC
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:44:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4ADC4B22D8B
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADE81E5727;
-	Mon, 18 Nov 2024 20:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3C11B6CE1;
+	Mon, 18 Nov 2024 20:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SwSMowbK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="I57jX91b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A288A1C07CA
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 20:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCBA171652;
+	Mon, 18 Nov 2024 20:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731962681; cv=none; b=AIY2/rNxRMU0nSerAbczUHVl4vzVR+RhtWQDGBOWPYwgOYuicKwe4e1JqLhTRx8XqeFMkDCEEJRdH6gXzjemXFSj7eYNZbvKXRKtjWb28v4g/LvUyOH1HIlqEnD3tZ6Y4chJRJPvNLnG+YzCnUFvkDjXRlCZ+cLoziZgsr09Xyg=
+	t=1731962924; cv=none; b=GzB/mqmvxuw4HFPLPFUbF/Tstu8516YHieZ8UvqCvONGwX6Gq/DBSZWk8tGpBYdGklY2Ti5pmz6NVx+IG/vpIfjSduZ7wZA/eRBpmojVkHc7m0FAjozSCwQr+E0Ptpc79h2nwmsUXMovefu5rzDtNtsVZYxW7agFr59f1s/PTN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731962681; c=relaxed/simple;
-	bh=H0b+SpqbFoJPnwpm7c72ks/wxWmayaWT0c94/M3TaIw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bToVNIFtxDZdwPJqIJrBWPDJSrrn+LQwfkZyn5Az+8SkffKqpynt8zyiaSJEyH1NLkbcGHANt4rxEe7TNyFXDUvvmh7XVL3wjk2+ghSPV5lgzYUgD6VXzVGSFubS0dZwWTUT/JH+5jDzuZ1r1anaCVidrsS9FElGirJ6BLh2c4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SwSMowbK; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-211eb2be4a8so3055ad.1
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:44:39 -0800 (PST)
+	s=arc-20240116; t=1731962924; c=relaxed/simple;
+	bh=9aRhU7SYTiy9GTZdVZfR4WneooPr3fJ0MNcnsVkz+ac=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q+hCn4aKa2D+MBm4qgXO4Wyn5nDgSN6a1HHL/KOEunZlVFCp79kH1LyUagnArlA9lzONzGYwkcQ3Y5Le84WeWOlfV8KRhlTedKMMfI9tH46IMB4dD3ds+HtOObCc5DEUsE00C6BXntbrGKqTpEPfX5suR2XZ7H9zIl94VD5JhyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I57jX91b; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731962679; x=1732567479; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKTaVzXiCAec3Tyjrd89WA6CeVRBCOnqqKiIQ4/209w=;
-        b=SwSMowbKwp08InbAaKc2V3vbQ/uf/IovkSYTl3w6xjRXRRpGqKi/H3sNa7AxhBDxCC
-         E3yScrF5GEdfUckGWfrVQ4P9zuRwn9ZBhLHUj8bawkVqKkSHxPENRctEx9EEjBd3G7S5
-         dxW6qzD2XFs/p/iVSu+SHy3R7b6p5bwimmon99iTBdhfKhD39sDZSafbvbKW108cBL4q
-         mynoEJ0wJfm5XCdeIhjIMIzSAqj4E7xyOXeBbgQr/2W6//3K289w8HFSzYHOxK3MgFRQ
-         ney+fubK17Iku4fygN5DLHzLyLJgLOtPbAZErVpjQ+IiUfXOrQJy3uRGkyF46RWDOdDj
-         yK3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731962679; x=1732567479;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aKTaVzXiCAec3Tyjrd89WA6CeVRBCOnqqKiIQ4/209w=;
-        b=kqVsLei4i42Zf1+ArRG95P4RPOwmEQgh225yGAOGzAdXvXEQR/aDOqhFv9AxkGls7L
-         qTgSbZRiaHl/IFi3PQW6RLvKIvxHmtPaF6BbrdbGovfeD8aqMLIR1v+Nz5mbM5vvdA7H
-         1v9qPnC3bDkAuElwCPJpt/WH9dl0Mgehf+bK6+LWQVktqGUog8dGEsUz6ebT6LBdKzmG
-         tMf1tHbCOsgy3Cz3oeVTuJZvh8ISeOzm0a4reBIv4SvIR+n9lgY6XkRiRnrRK2lXAlkk
-         1IvMcp6YuxNR90qbOuWfqHogr6GITUl5zeXocxO2AKqW8ANe3tbCHO1RGIDLqDuA0mNp
-         OR6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWKO53OV3Q2uuQ0L893w2p3nyR4wDOfNVnmtlPaBxpZNGBCYXlDRiSEKm5HekTrLYQ6UoBcGXU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWwVfj2Dmx8SHbbUHn5pE8EQEvrunHckMYwARLRtebtHsnbhyH
-	7i4uIarEmGwHidkPVu+Qav41iMPcKQImADWh7CNr57/rCAfJHBr3SOiPuG3w7CC2gkGtutBaSXx
-	9N0ycudV9IezKuMlub6L49kO+On80C3rb5323wNsf82YjRumOZ2c5rSo=
-X-Gm-Gg: ASbGnctHvroXC7dpSYFwKlbDGQVDINdhxaUgF1MXl2LnLbZbWNU1BaX7DI1AUIM30iZ
-	1VC94y4YeoHwrnh7Xzw2WJNDaAoe3k97I
-X-Google-Smtp-Source: AGHT+IHGBmy57KAu0HlHubkKaTd1BqOfX8EYJnZETNfEPTp1FMAEayQici09tykpfSJn3YIPEIejT7GVORR65C3UiSg=
-X-Received: by 2002:a17:902:f68f:b0:1fc:60f2:a089 with SMTP id
- d9443c01a7336-2124ea7e89cmr326155ad.17.1731962678568; Mon, 18 Nov 2024
- 12:44:38 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731962923; x=1763498923;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=3tO4Q4IodwMB3txyonk+PdRsnAHyv4Ng/JNgI4AXdKU=;
+  b=I57jX91bbvfgpEwvCLLuE4r8ofOT1oAoQezzUGk0FXBoOtB/Rw+ZsdBh
+   Krq1F7WZ4+9hDkH4/vASd59CKIN1dPKiZJQsYm8nsnpUHiJB4szWXy2HZ
+   OwoW9em+tc0rwVF9wQUR1LBDWAobjSxxIzsi5SYQOL7oItXBDsz+iRCEi
+   s=;
+X-IronPort-AV: E=Sophos;i="6.12,164,1728950400"; 
+   d="scan'208";a="674618741"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 20:48:39 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:26921]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.2:2525] with esmtp (Farcaster)
+ id 1bbcfe20-ac78-474e-94b5-fc72fd89125b; Mon, 18 Nov 2024 20:48:38 +0000 (UTC)
+X-Farcaster-Flow-ID: 1bbcfe20-ac78-474e-94b5-fc72fd89125b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 18 Nov 2024 20:48:38 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.15) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 18 Nov 2024 20:48:34 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <liqiang64@huawei.com>
+CC: <alibuda@linux.alibaba.com>, <dengguangxing@huawei.com>,
+	<dust.li@linux.alibaba.com>, <gaochao24@huawei.com>,
+	<guwen@linux.alibaba.com>, <jaka@linux.ibm.com>,
+	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<luanjianhai@huawei.com>, <netdev@vger.kernel.org>,
+	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>,
+	<zhangxuzhou4@huawei.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net-next 1/1] Separate locks for rmbs/sndbufs linked lists of different lengths
+Date: Mon, 18 Nov 2024 12:48:31 -0800
+Message-ID: <20241118204831.70974-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241118132147.1614-2-liqiang64@huawei.com>
+References: <20241118132147.1614-2-liqiang64@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240905200551.4099064-1-jrife@google.com> <ZzpkPWrrb_Z2ZfCq@zx2c4.com>
-In-Reply-To: <ZzpkPWrrb_Z2ZfCq@zx2c4.com>
-From: Jordan Rife <jrife@google.com>
-Date: Mon, 18 Nov 2024 13:44:26 -0700
-Message-ID: <CADKFtnTThMBDKCXufNaeci5uCeddOgLvXmqszyJoT6N=6xtWug@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] wireguard: allowedips: Add
- WGALLOWEDIP_F_REMOVE_ME flag
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: wireguard@lists.zx2c4.com, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Jason,
+From: liqiang <liqiang64@huawei.com>
+Date: Mon, 18 Nov 2024 21:21:47 +0800
+> @@ -596,10 +632,26 @@ static struct smc_buf_desc *smc_llc_get_next_rmb(struct smc_link_group *lgr,
+>  static struct smc_buf_desc *smc_llc_get_first_rmb(struct smc_link_group *lgr,
+>  						  int *buf_lst)
+>  {
+> -	*buf_lst = 0;
+> +	smc_llc_lock_in_turn(lgr->rmbs_lock, buf_lst, SMC_LLC_INTURN_LOCK_INIT);
+>  	return smc_llc_get_next_rmb(lgr, buf_lst, NULL);
+>  }
+>  
+> +static inline void smc_llc_bufs_wrlock_all(struct rw_semaphore *lock, int nums)
+> +{
+> +	int i = 0;
+> +
+> +	for (; i < nums; i++)
+> +		down_write(&lock[i]);
 
-Thanks a lot for taking a look!
+LOCKDEP will complain here.  You may want to test with
+CONFIG_PROVE_LOCKING=y
 
-> I'm actually less enthusiastic about this part, but mainly because I
-> haven't looked closely at what the convention for this is. I was
-> wondering though - this adds WGALLOWEDIP_A_FLAGS, which didn't exist
-> before. Shouldn't some upper layer return a relevant value in that case?
-> And even within the existing flags, for WGPEER_A_FLAGS, for example, old
-> kernels check to see if there are new flags, for this purpose, e.g.:
->
->         if (attrs[WGPEER_A_FLAGS])
->                 flags = nla_get_u32(attrs[WGPEER_A_FLAGS]);
->         ret = -EOPNOTSUPP;
->         if (flags & ~__WGPEER_F_ALL)
->                 goto out;
->
-> So I think we might be able to avoid having to bump the version number.
-> GENL is supposed to be extensible like this.
 
-I think the challenge with WGALLOWEDIP_A_FLAGS in particular is that
-because it didn't exist since the beginning like WGPEER_A_FLAGS, there
-are kernels out there that have no knowledge of it and wouldn't have
-this check in place. While I think it's a good idea to replicate this
-check for WGALLOWEDIP_A_FLAGS as well for future compatibility, we
-still need some way for clients to probe whether or not this feature
-is supported in case they're running on an older kernel. If we want to
-keep the version number as-is, I see a few alternatives:
-
-1. Include WGALLOWEDIP_A_FLAGS in the response of WG_CMD_GET_DEVICE.
-This would be a new field inside each entry of WGPEER_A_ALLOWEDIPS. If
-the result of WG_CMD_GET_DEVICE contains WGALLOWEDIP_A_FLAGS then a
-client knows that it can use features WGALLOWEDIP_F_REMOVE_ME. It
-could potentially be used later to contain persistent flags for an IP,
-but for now would just be zeroed out. This fails if there are no
-allowed IPs configured for the device you're trying to configure, but
-in the case where you're trying to use WGALLOWEDIP_F_REMOVE_ME you
-probably would.
-2. Keep everything the same. Don't bump the version number. Clients
-could in theory try to use WGALLOWEDIP_A_FLAGS with WG_CMD_SET_DEVICE
-then check if their request had the intended effect (e.g. checking if
-the IP was removed).
-
-I slightly prefer approach 1 myself, as I feel it's a bit cleaner, but
-I'm happy to discuss some other approaches here. I'm trying to think
-about how these probes could be used inside the WireGuard Go library
-and wg itself. Assuming approach one,
-
-* For libraries that manage WireGuard like
-golang.zx2c4.com/wireguard/wgctrl the first time a client uses
-.Device() (WG_CMD_GET_DEVICE under the hood) there would need to be
-some logic that looks at WGPEER_A_ALLOWEDIPS for one of the peers and
-sets some internal flag like c.supportsAllowedIPFlags. When a client
-later calls c.ConfigureDevice() the library would disallow direct IP
-removal if the feature is not supported (c.supportsAllowedIPFlags !=
-nil && !*c.supportsAllowedIPFlags). Alternatively, you could do all
-this up front while initializing the client by creating some dummy
-device + peer, adding some IP, then using WG_CMD_GET_DEVICE to see if
-WGALLOWEDIP_A_FLAGS is present in the result.
-* Similarly for wg, if the user is trying to remove an allowed IP
-you'd first query the allowed IP for a peer and check for
-WGALLOWEDIP_A_FLAGS if it doesn't exist in the response then the
-command would fail and print something like "not supported".
-
-Bumping WG_GENL_VERSION is cleaner still, since clients in userspace
-just need to check an integer value and avoid any probing logic.
-However, like you I am unsure what the convention is here and whether
-or not this has any unintended effects.
-
-> This file doesn't really do the _ prefix thing anywhere. Can you call
-> this something more descriptive, like "remove_node"?
-
-Sure. I'll update this in v3.
-
-> Reasoning for this is that it copies the logic in add()?
-
-As for the cidr > bits check, the intent was simply to fail if the
-user passes an invalid value for WGALLOWEDIP_A_CIDR_MASK. Although,
-unlike the add() case, I suppose we could just remove this check.
-Worst case if a user passes something high like 255 remove() would
-just be a no-op. It looks safe to remove !peer check as well. I can
-update this in v3.
-
-> What's the reasoning behind returning success when it can't find the
-> node? Because in that case it's already removed so the function is
-> idempotent? And you checked that nothing really cares about the return
-> value there anyway? Or is this a mistake and you meant to return
-> something else? I can imagine good reasoning in either direction; I'd
-> just like to learn that your choice is deliberate.
-
-Yes, I opted for idempotence here intentionally. At least for the use
-cases I have in mind the intent is basically "remove all these allowed
-IPs from this peer if they exist". If an allowed IP already got
-removed or is mapped to another peer somehow then that's fine. I'd
-imagine it complicates the code in userspace to have to deal with
-corner cases involving possible error codes returned when removing a
-batch of allowed IPs. You'd need to query the device again, reform
-your request, etc. I /think/ add() is idempotent as well in cases
-where you re-add an IP to a peer, so there's some symmetry here.
-Perhaps if there are use cases that need more stricter checks in the
-future we could introduce a new flag to return an error code in this
-case.
-
-> As I mentioned above, you need to do the dance of:
->
->         ret = -EOPNOTSUPP;
->         if (flags & ~__WGALLOWEDIP_F_ALL)
->                 goto out;
->
-> So that we can safely extend this later.
-
-Good idea. I will add this in v3 as well.
-
-> We get 100 chars now, so you can rewrite this as:
->
->                         ret = wg_allowedips_remove_v4(&peer->device->peer_allowedips,
->                                                       nla_data(attrs[WGALLOWEDIP_A_IPADDR]), cidr,
->                                                       peer, &peer->device->device_update_lock);
-
-Nice, will do.
-
-> That comma should be a semicolon because what comes after is a complete
-> sentence, and there's no conjunction.
-
-Good point. I think we might actually need a comma /after/ otherwise:
-"...; otherwise, ...": "WGALLOWEDIP_F_REMOVE_ME if the specified IP
-should be removed; otherwise, this IP will be added if it is not
-already present".
-
-> I'm not so keen on this, simply because we've been able to do everything
-> else in that script and keeping with the "make sure the userspace
-> tooling" paradigm. There are two options:
->
-> 1. Rewrite netns.sh all in C, only depending on libnl or whatever (which
->    I would actually really *love* to see happen). This would change the
->    testing paradigm, but I'd be okay with that if it's done well and all
->    at once.
->
-> 2. Add support for this new flag to wg(8) (which I think is necessary
->    anyway for this to land; kernel features and userspace support oughta
->    be posted at once).
->
->
-> Thanks for the patch. I like the feature and I'm happy you posted this.
-
-Option 1 seems like a heavy lift for this patch. I think option 2
-makes more sense, as long as there is an understanding that netns.sh
-needs to be run with the latest and greatest version of wg in order
-for all tests to pass. Maybe we can add a version check to selectively
-disable the remove IP tests if wg is on an older version. I agree
-though that long term option 1 would be nice, as it provides a finer
-level of control and tests could be run without as many external
-dependencies. I can get rid of the remove-ip cruft and send two
-patches to the wireguard mailing list if that works, one for the
-kernel and one for wireguard-tools.
-
-However, this raises some questions about the wg interface itself
-which would be used both by netns.sh and end users. Looking at the
-current interface for wg, the way to configure allowed IPs currently
-is "wg set". For example,
-
-wg set peer ABCD... allowed-ips 192.168.0.24/32,192.168.0.44/32,192.168.0.88/32
-
-The intended effect is to completely replace the allowed IPs for that
-peer rather than to make an incremental change. I think we'll need to
-extend the interface a bit. There are a few directions we can take
-here:
-
-1. Add a new flag to "wg set" like --incremental in which case it
-won't use WGPEER_F_REPLACE_ALLOWEDIPS under the hood. Support addition
-or removal of allowed IPs with a "-" suffix on CIDRs you want to
-remove (192.168.0.24/32-,192.168.0.44/32-,192.168.0.88/32).
-2. Same as 1 but with a new argument name, allowed-ips-diff instead of
-the --incremental flag. This appears more in line with the current
-style of wg's arguments.
-
-There are a lot more variations here, so I wanted to get your input
-here before just picking a direction. Thanks again for the thorough
-feedback!
-
--Jordan
+> +}
+> +
+> +static inline void smc_llc_bufs_wrunlock_all(struct rw_semaphore *lock, int nums)
+> +{
+> +	int i = 0;
+> +
+> +	for (; i < nums; i++)
+> +		up_write(&lock[i]);
+> +}
+> +
+>  static int smc_llc_fill_ext_v2(struct smc_llc_msg_add_link_v2_ext *ext,
+>  			       struct smc_link *link, struct smc_link *link_new)
+>  {
 
