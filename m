@@ -1,95 +1,112 @@
-Return-Path: <netdev+bounces-145710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4CB99D079C
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 02:35:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4330D9D07EA
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 03:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A099281DFA
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:35:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0049B21DBF
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 02:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083251EEE0;
-	Mon, 18 Nov 2024 01:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4B02AC17;
+	Mon, 18 Nov 2024 02:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="a03Dkdfl"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Cd0k8Q0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2CD17BA3;
-	Mon, 18 Nov 2024 01:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAF51EEF9;
+	Mon, 18 Nov 2024 02:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731893724; cv=none; b=RP7f8yHcotxHoqckv5I95dZ0gVVgH/7K7PZdjW0HffXjr7+Dd8sZu0REXv+N+mD7QM+g0yhY+p099qYdKy2po/5ZZglnf2pO2Bc1oLWwqJuLghrOQAoBFlyxV2XMJDCmI9BvmQZJbgiy4dO+SlXc+e6UgZb/NI/88eAE2Hj7iz8=
+	t=1731897075; cv=none; b=cSzz2/cTOjbkjFXTCL/Lxx/LgaEgiYrVyCVQqOBHfDYgins0rFlE8OOYed+LI+kJXYxjpAEfygt3vbSHVVlfkgtFDefboKj0UqPseZDEPWqGVI67dscju4iJNfAqw4Biy9HoepAVfwqKy7GBt9Mzy1MHIrCjv5PhePm/g5wSPJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731893724; c=relaxed/simple;
-	bh=h450FS+N4JQKnGl6Cjq5GAKaXyzhyQUvhLoUGtWhzaA=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Wz03PeKNe5uuQ07BFK6QteZRTxny/xqXkkM89QSVIRFfuWycCyAcbmgkCEnuMCFjgaq3xCsA46Zocf0DHfPO+JtuI0q9lZ121mvAaYIHxyLHmbVfXE6ws+bTSceO7zcqbRCVVZ5PTAt/IPviqqKQH2Q7z/pA7LAsF0FsRsVSFX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=a03Dkdfl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFBA7C4CED8;
-	Mon, 18 Nov 2024 01:35:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="a03Dkdfl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1731893721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type;
-	bh=h450FS+N4JQKnGl6Cjq5GAKaXyzhyQUvhLoUGtWhzaA=;
-	b=a03DkdflbmPZWuEwvO18XrKnATy+LlD7itvHB17nH4cSRJBwaGhKeENUIszf8TIOUfii57
-	twQ7JtvfsC6fI6njc1Ysr8EyzAbbFfCFg0jT18DMUGai7R/NqiQLWDWFGaPcc9F+gIiAOb
-	mp8sOiy1RimWDF3C+nl0oY6cu5xVPSs=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2ea50c24 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 18 Nov 2024 01:35:21 +0000 (UTC)
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-2967c76318fso300387fac.2;
-        Sun, 17 Nov 2024 17:35:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWU85TsKs3mi26dzwhslvbGrnmZLaznpjW9VZXP5jnA6NygL1TZ8KVcN/lwcRgzNJzLoIEdgakPVqA+oYY=@vger.kernel.org, AJvYcCX1QoylgCrXk0DnDHOqYc64m5bZFul0dsfNdJGSv8n7J5b0u2OWCDqXFGpKReZBejZtHjg9ll7H@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxs+yIErPOyHwZIDPLONkse1u3Jed+MJbY9Mncad6dwu8WmEt+z
-	bbKFDhH/rn5Zb1q1Ul/bvuJLcdP6xf2uqIq7LYs6K4y6wQBwfdKBmFwg2SyvonJKfIF2ODvAl91
-	Xy/xEp3Y4h+W9TQo16gJYxCidGIc=
-X-Google-Smtp-Source: AGHT+IHve+FfLk0qGd3A+fSIrQMtA+DGCD0QPeBGZ5t0GxkKmEBP1pNmF4QCtUQzBVHsIV31XTsMwLw8+B8F8/wH7CQ=
-X-Received: by 2002:a05:6870:1e8b:b0:288:57fa:961d with SMTP id
- 586e51a60fabf-2962e2a2d1emr7370424fac.38.1731893720457; Sun, 17 Nov 2024
- 17:35:20 -0800 (PST)
+	s=arc-20240116; t=1731897075; c=relaxed/simple;
+	bh=MpcA1Fa6BX7Wln9D1Mz/k90qkx70jn848o2sgz8m86w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SEYXlkyuwu3QyLdXeZ1LlQ+xXLa/cLmB63b5hnDQGPbDHkFKVzsJt+l8whN3peFQyEBsb00bZdt3C5jsA5J0n2BV+he0MKwyGouT/ZVbvGD9sG8FPn2oYC2D88JeTVKqFNvXVe+m11s+ZMjcgTbJEWDQhxNQBDXH0IuWyjtDXR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Cd0k8Q0g; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AI2Un4jA4174098, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1731897049; bh=MpcA1Fa6BX7Wln9D1Mz/k90qkx70jn848o2sgz8m86w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=Cd0k8Q0gzezuNjM2L5UQMBj/tv4LpU8GQ7bVWjhH4q/7dG0HJIuaCIY3bs+J1mx/c
+	 G4OEDjJKRuRh23P0wINKAniMJygdthrAai9WH8akWYeBJ6TLh9R5QL1XfQ5VIzLk2m
+	 K0WiUkKkuH4T5rNpqM6pKTkvzNeBpFaMp7mMCBzfdCkI6ySkY3Uu9dSlrDlgtG3hgE
+	 Ib3m+spttsXKJ7BkYkUQhiAnKxuwrToVJDrSCib9zkvgQgyZ8N/QSBhgEcTuZdl7YK
+	 pGjdD+OEKTGwS0pI36tjPToyYej8/iT5j4vwzdmxFlLUQeh/ROsg8psQfDVWMa81ZH
+	 d5lkxcIGLJh+w==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AI2Un4jA4174098
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 18 Nov 2024 10:30:49 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 18 Nov 2024 10:30:49 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 18 Nov 2024 10:30:49 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Mon, 18 Nov 2024 10:30:49 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net v2 3/5] rtase: Add support for RTL907XD-VA PCIe port
+Thread-Topic: [PATCH net v2 3/5] rtase: Add support for RTL907XD-VA PCIe port
+Thread-Index: AQHbN0SFfyRIafwEokSyyOXB545urLK5wOOAgAKTAUA=
+Date: Mon, 18 Nov 2024 02:30:48 +0000
+Message-ID: <a0280d8e17ce4286b8070028e069d7e9@realtek.com>
+References: <20241115095429.399029-1-justinlai0215@realtek.com>
+ <20241115095429.399029-4-justinlai0215@realtek.com>
+ <939ab163-a537-417f-9edc-0823644a2a1d@lunn.ch>
+In-Reply-To: <939ab163-a537-417f-9edc-0823644a2a1d@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 18 Nov 2024 02:35:09 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oMT7+VnYrrj7JSdmPCOn6WOdHWMnbPV6tUJicT8i4dKA@mail.gmail.com>
-Message-ID: <CAHmME9oMT7+VnYrrj7JSdmPCOn6WOdHWMnbPV6tUJicT8i4dKA@mail.gmail.com>
-Subject: WireGuard & Linux kernel RNG @ FOSDEM 2025
-To: WireGuard mailing list <wireguard@lists.zx2c4.com>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Hey folks,
+>=20
+> On Fri, Nov 15, 2024 at 05:54:27PM +0800, Justin Lai wrote:
+> > 1. Add RTL907XD-VA hardware version id.
+> > 2. Add the reported speed for RTL907XD-VA.
+>=20
+> This is not a fix, it never worked on this device as far as i see. So
+> this should be for net-next.
+>=20
+> Please separate these patches out into real fixes, and new features.
+>=20
+>         Andrew
 
-On February 1 & 2, 2025 in Brussels, the FOSDEM [0] conference will
-take place. This year, there's going to be a stand during those two
-days dedicated to answering questions and interacting with the
-community regarding WireGuard and the Linux kernel RNG [1], and
-perhaps other cryptography or networking adjacent topics, in addition
-to the bonanza of stickers and such of course. I'll be running the
-stand and will be hanging out there most of the two days.
-
-If anybody would like to help run the stand with me or organize
-anything around it, please don't hesitate to drop me an email. I think
-this presents a nice moment for the community, both to pull together
-developers and other interested parties into a common place to talk
-and discuss, and moreover to help with education and awareness in ways
-that "read the docs" or "ask on IRC" don't.
-
-Looking forward to seeing some of you there.
-
-Regards,
-Jason
-
-[0] https://fosdem.org/2025/
-[1] https://fosdem.org/2025/news/2024-11-16-stands-announced/
+Thank you for your response. I will follow these guidelines for the
+categorization and upload the patch to net-next accordingly. I appreciate
+your assistance.
 
