@@ -1,120 +1,174 @@
-Return-Path: <netdev+bounces-146004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB51F9D1A81
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 22:23:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF5CA9D1A93
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 22:24:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 844901F22631
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:23:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 306F2B218F4
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80401E4937;
-	Mon, 18 Nov 2024 21:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88A6B1E5730;
+	Mon, 18 Nov 2024 21:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IfJRWo4k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="PlqX2to/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072121B0F3C
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 21:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B571C07FB
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 21:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731964999; cv=none; b=MKk0X2rGBVNnFRt4Wc4ZEqpeYTNvEU21F+bOFaRQ0IV2ppumQzMclFXRqht0AQ4MrZfF2tNi7+FWvq1ukmCDYyVwAB50JDKGyCn2715m/qquAzBwqoWnm9TyDarMCtex6Keoooik9N+lZN/Kg5xFQT3mJDqQSh4bKGGMWAmpm3M=
+	t=1731965084; cv=none; b=YVw358w5E8xjorct5PnSBK0qPAaR8au70pR9TeLRJq/0/V9bHPrw4zdzzG/H3jYc4h4YepdWZ2BAtnPezycqfOuweCcJJQardJkI4eXrlypdiKQVc+GneoGA0Knmdqys7bDRaA+5OhRBMhCGl7jrdoofpgKkEQNw7ZPR4EKcKd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731964999; c=relaxed/simple;
-	bh=zQrZapCNTmA++R+1yxOgnkiRv1lT4Ubz58S6wkr4b1s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P54d6kXjO32XO2O64bObBd22ZI6ndp+t0aq5Xlr8AoCbOMajQsPP5HPJOgNbBp8Grh603bZ/21WhvNXWjzAasXP+HGVbNTvOphQGbw3EVTRmh02m8EDFjKJTfX3mpEEXAsdtY3BuesrtiJzfP+vjyMn1id7h1Jz+xXj6E9Q7Cy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IfJRWo4k; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-83ab21c26e5so9657739f.1
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 13:23:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1731964997; x=1732569797; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZyDvAGYi5T8+sdcs8eDCmKmBYh7FKG7ipAEEuipY0ik=;
-        b=IfJRWo4k4IMtT/AVf2rNS+je8YjkQz9Cr5xXZhJgpQqDtqDA1AAiPwkj++dU8f5v4X
-         aN/vuh2S6K9mNIrDL0eLYWJSM3HLvQ2VW9H6dnfZNQo5zviRGbqsFLH1A8Lh8eyc7klp
-         JCRRpkFuskz+BiBkN6TddI0QQv8a0+vvJDEgQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731964997; x=1732569797;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZyDvAGYi5T8+sdcs8eDCmKmBYh7FKG7ipAEEuipY0ik=;
-        b=L7vJcsPfR6EdfQTsjKPNdheou7fJIpIEI8yBw11bGvvLHhYEsN88h14SD6BLZdxdhp
-         DP0oRaPW5lEH9liCgPkEwWY1vppHHKUEG6CKrYCQWNkijnSkE+zo/n8cXxdEIvmXbJ3T
-         qSmhhvgZ1Ki/Xt5FCYgVSmUuHaBxvtOxyOofhpabLKAGuGRSVX5a3kxeyi+t9DYYVvEm
-         gDwj5yei42gP3rZBTu8JoLuGaawqtBQYgr5yyvCIWkRpF1s4tRYvOBW69YAvdNs2gGjC
-         jlRzkMjVGwWgNt2Z0z/WUD7KDEn2ljbU09NCf7SymwhWI1N8WzNaAcHILyagWpidUFDj
-         khQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxNxSD8/fruHLMq2A/1yNLxA/ZjyK3OZpEGs5bzuPYF92D6eBDi3+SjZg1ciHBJnK/NgBFoR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykVi77ASModra71ezsY3NNUSeGi7VlVOEK47dSp5GxPQ5/ntRk
-	UzfBIdxUjiTorLuDWkv/GMn/NVgW4G2b/cBOpyvFykztLZNVqCADUc0CGgsSpSw=
-X-Google-Smtp-Source: AGHT+IGftuaEBzutGH+8Aquw3I/5OGKpN71hV5gOnkYelzzleuOKQUzkqND82BIARdwSZ5YNDjxkDQ==
-X-Received: by 2002:a05:6602:1614:b0:83a:7a19:1de0 with SMTP id ca18e2360f4ac-83e6c315b31mr1545981939f.14.1731964997144;
-        Mon, 18 Nov 2024 13:23:17 -0800 (PST)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e06d6eb863sm2310326173.30.2024.11.18.13.23.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Nov 2024 13:23:16 -0800 (PST)
-Message-ID: <c7f483b0-31de-4098-9416-18dfd0944550@linuxfoundation.org>
-Date: Mon, 18 Nov 2024 14:23:15 -0700
+	s=arc-20240116; t=1731965084; c=relaxed/simple;
+	bh=O5a25Qtjne3Zv/V3w2gZEoZkgc2X9l6XRk87LsCYa/I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lm7Q1lyrw9Ly76pt95yavIsxYIJanurq1iEsLSHM417DWd+A+0yHAXWgunzpAYf88ymBYexgJEY1w2iGZmKaMGtroPPAw/9ahxu5XRtpy3NaizHVF9b1GMe3cdGCRqTWRsyXwtDpMBDfyw4THDKdqUuvjw6fZ55ruUxBzrDyvv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=PlqX2to/; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=G66iKZoEMFWqwAOVsg26zAkA1V0L1hFf4xkQ1b8KXH8=; t=1731965081; x=1732829081; 
+	b=PlqX2to/LmpcP/W97Nb4tT1k56mJcnF+sZC5BYgLtY3k+eQuUy1TTuJgdnV7M8pFJ3L8TDqDsPl
+	huR6uSIXZRhd0+WhNbG9mCiJpvEmEWIVGpJnlwgCsP3y7/JGFayNSsqNabgvqJsxkVCTODaK7ViXQ
+	2Jgv8greOxqUMjLL6xL7i/9PcrZQnWFe60sD9gA1pgjnyojM0XFbbJA6OzhZ8d8WLixcmE0qQeJ4X
+	0md1HGegbQzBTSijA2J1y7mthK1BZWZfqMqVX3BjQaqQOuBkLvsq5H+K4mE1iMpQFnxQxMvx9obwV
+	F8yPR2OPsaYpXWJflZ6KOHtXdgRomwY5ZBpw==;
+Received: from mail-ot1-f44.google.com ([209.85.210.44]:47502)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tD9EY-00026p-Gr; Mon, 18 Nov 2024 13:24:35 -0800
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7180d9d0dcbso1334383a34.3;
+        Mon, 18 Nov 2024 13:24:34 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXEufbhj2gNGw+DdNemx3M4L5lXRrt2in4F/qbWQOmHOk9QOXr9RIPnMgLPxQitSIyEYpsXYItuOCk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMRup/ldynr6QB6C0VYzXVEZN4wrMwQNYQX0b5hD6COaSadTip
+	B/vv1fzihhiuNUFvgnLgNLyZwn5cHEt+HfOyy+1pm7KgTlJSOfvHmuVyrX1Tb8U9SREgwzxxmuw
+	UqnLfcybA3ObowP7TJwkNHW+x4XU=
+X-Google-Smtp-Source: AGHT+IEx9eUcIdlRPEhBEDAM9A5zhDSrhkSzbONS0gxAHLCxeSaVTovr4IR9SMZvhsC5ZyFtLyllr3iRH6dOduPC4is=
+X-Received: by 2002:a05:6830:a91:b0:718:d7c:2ef2 with SMTP id
+ 46e09a7af769-71a778fd183mr11365768a34.1.1731965073876; Mon, 18 Nov 2024
+ 13:24:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: qt2025: simplify Result<()> in probe
- return
-To: Manas <manas18244@iiitd.ac.in>, Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in>
- <2f3b1fc2-70b1-4ffe-b41c-09b52ce21277@lunn.ch>
- <otjcobbaclrdv4uz3oikh5gdtusvxdoczopgfnf6erz5kdlsto@mgpf4mne3uqb>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <otjcobbaclrdv4uz3oikh5gdtusvxdoczopgfnf6erz5kdlsto@mgpf4mne3uqb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241111234006.5942-13-ouster@cs.stanford.edu> <202411132114.VB5yFmtR-lkp@intel.com>
+In-Reply-To: <202411132114.VB5yFmtR-lkp@intel.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 18 Nov 2024 13:23:57 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmyeJ2HWxOZj8uY0_Cu47Yy_hAYfSRGmYpNfLGd2PR7Q-Q@mail.gmail.com>
+Message-ID: <CAGXJAmyeJ2HWxOZj8uY0_Cu47Yy_hAYfSRGmYpNfLGd2PR7Q-Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
+To: kernel test robot <lkp@intel.com>
+Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org, 
+	oe-kbuild-all@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 1a99e790efc5595ebc7b409aae77a077
 
-On 11/18/24 07:28, Manas wrote:
-> On 18.11.2024 15:15, Andrew Lunn wrote:
->> On Mon, Nov 18, 2024 at 06:39:34PM +0530, Manas via B4 Relay wrote:
->>> From: Manas <manas18244@iiitd.ac.in>
->>>
->>> probe returns a `Result<()>` type, which can be simplified as `Result`,
->>> due to default type parameters being unit `()` and `Error` types. This
->>> maintains a consistent usage of `Result` throughout codebase.
->>>
->>> Signed-off-by: Manas <manas18244@iiitd.ac.in>
->>
->> Miguel has already pointed out, this is probably not sufficient for a
->> signed-off-by: You need a real name here, in order to keep the lawyers happy.
->>
-> Hi Andrew, I did clarify that "Manas" is my real name, (as in what the official
-> documents have). It is not a pseudonym. I am unsure if I am missing something
-> here.
-> 
+I believe I have fixed all of the kernel test robot issues reported
+under this subject line.
 
-Using your full name in your Signed-off-by clearly identifies the author.
-I would recommend going that route.
+-John-
 
-thanks,
--- Shuah
+
+On Wed, Nov 13, 2024 at 5:53=E2=80=AFAM kernel test robot <lkp@intel.com> w=
+rote:
+>
+> Hi John,
+>
+> kernel test robot noticed the following build warnings:
+>
+> [auto build test WARNING on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/ne=
+t-homa-define-user-visible-API-for-Homa/20241112-074535
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20241111234006.5942-13-ouster%40=
+cs.stanford.edu
+> patch subject: [PATCH net-next v2 12/12] net: homa: create Makefile and K=
+config
+> config: riscv-randconfig-r112-20241113 (https://download.01.org/0day-ci/a=
+rchive/20241113/202411132114.VB5yFmtR-lkp@intel.com/config)
+> compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 5=
+92c0fe55f6d9a811028b5f3507be91458ab2713)
+> reproduce: (https://download.01.org/0day-ci/archive/20241113/202411132114=
+.VB5yFmtR-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202411132114.VB5yFmtR-lkp=
+@intel.com/
+>
+> sparse warnings: (new ones prefixed by >>)
+> >> net/homa/homa_sock.c:201:31: sparse: sparse: cast removes address spac=
+e '__rcu' of expression
+>    net/homa/homa_sock.c:248:17: sparse: sparse: context imbalance in 'hom=
+a_sock_shutdown' - different lock contexts for basic block
+>    net/homa/homa_sock.c:303:21: sparse: sparse: context imbalance in 'hom=
+a_sock_bind' - different lock contexts for basic block
+>
+> vim +/__rcu +201 net/homa/homa_sock.c
+>
+> 8ddf00265eb650 John Ousterhout 2024-11-11  183
+> 8ddf00265eb650 John Ousterhout 2024-11-11  184  /*
+> 8ddf00265eb650 John Ousterhout 2024-11-11  185   * homa_sock_unlink() - U=
+nlinks a socket from its socktab and does
+> 8ddf00265eb650 John Ousterhout 2024-11-11  186   * related cleanups. Once=
+ this method returns, the socket will not be
+> 8ddf00265eb650 John Ousterhout 2024-11-11  187   * discoverable through t=
+he socktab.
+> 8ddf00265eb650 John Ousterhout 2024-11-11  188   */
+> 8ddf00265eb650 John Ousterhout 2024-11-11  189  void homa_sock_unlink(str=
+uct homa_sock *hsk)
+> 8ddf00265eb650 John Ousterhout 2024-11-11  190  {
+> 8ddf00265eb650 John Ousterhout 2024-11-11  191          struct homa_sockt=
+ab *socktab =3D hsk->homa->port_map;
+> 8ddf00265eb650 John Ousterhout 2024-11-11  192          struct homa_sockt=
+ab_scan *scan;
+> 8ddf00265eb650 John Ousterhout 2024-11-11  193
+> 8ddf00265eb650 John Ousterhout 2024-11-11  194          /* If any scans r=
+efer to this socket, advance them to refer to
+> 8ddf00265eb650 John Ousterhout 2024-11-11  195           * the next socke=
+t instead.
+> 8ddf00265eb650 John Ousterhout 2024-11-11  196           */
+> 8ddf00265eb650 John Ousterhout 2024-11-11  197          spin_lock_bh(&soc=
+ktab->write_lock);
+> 8ddf00265eb650 John Ousterhout 2024-11-11  198          list_for_each_ent=
+ry(scan, &socktab->active_scans, scan_links) {
+> 8ddf00265eb650 John Ousterhout 2024-11-11  199                  if (!scan=
+->next || scan->next->sock !=3D hsk)
+> 8ddf00265eb650 John Ousterhout 2024-11-11  200                          c=
+ontinue;
+> 8ddf00265eb650 John Ousterhout 2024-11-11 @201                  scan->nex=
+t =3D (struct homa_socktab_links *)hlist_next_rcu(&scan
+> 8ddf00265eb650 John Ousterhout 2024-11-11  202                           =
+       ->next->hash_links);
+> 8ddf00265eb650 John Ousterhout 2024-11-11  203          }
+> 8ddf00265eb650 John Ousterhout 2024-11-11  204          hlist_del_rcu(&hs=
+k->socktab_links.hash_links);
+> 8ddf00265eb650 John Ousterhout 2024-11-11  205          spin_unlock_bh(&s=
+ocktab->write_lock);
+> 8ddf00265eb650 John Ousterhout 2024-11-11  206  }
+> 8ddf00265eb650 John Ousterhout 2024-11-11  207
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
