@@ -1,205 +1,127 @@
-Return-Path: <netdev+bounces-145804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 139EB9D0F6B
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:16:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C98D79D0FA7
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:27:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF9991F226D8
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:16:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7725E1F2261A
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04D9198A39;
-	Mon, 18 Nov 2024 11:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B2D198A39;
+	Mon, 18 Nov 2024 11:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dfaGrnFd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cwk2KtJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799B8197A92;
-	Mon, 18 Nov 2024 11:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731928558; cv=fail; b=qnzL6nGG5tmb0emNJy+eLwB8rE8yJ3GFESot3VrFIZUXqnySqVnFdrUJMBQD+rwkCbns7MJcUYyG0+rOTcHg1N1vt+JbvOEAWo42Wa+UstLv4TCO26C6ISHRNS4madM0wOsvyzd2OhJrmgSx1hawrk2wUf2z6hgfunnO0DzB9cQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731928558; c=relaxed/simple;
-	bh=FtWmxDPxHT5fiqQM4YUSGcS5TuqvIFumR6P0w2v9uvg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=O/9NCUkOS9kQuKg4rrpXW8o2+15qR0546cPOMYfPTN4sBkkkXsLXf+L9+Aj0hxVMLPtMYcXQsScIcSXF4/jLR5rIt2BcNbr5lGBPi7UkAFMPk0iOM+BVxFlhF13rqaMqYEa0oIAUD9nhF8+3ywLVb5y/VNG5zQ0cnhW/Pffdr1U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dfaGrnFd; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731928557; x=1763464557;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=FtWmxDPxHT5fiqQM4YUSGcS5TuqvIFumR6P0w2v9uvg=;
-  b=dfaGrnFdheLfYyBMD6A+zZ9v9lMvXif8U4UCX0JWT8wl/EB65Xxe9xhh
-   sHFX+0xbzFMhbxrJh62mjQwwK+XOTj0oa15QRSqqQkRMKJipxEBM05wfu
-   dUy5ptu4Cdkt2qTTot8GInG7X/57uT1ZliF/e2xZBKBrGMI2Bajy+WMrF
-   WaynZMYBZ7PYl3wQTQOBRJ81Ni6u4qnfo91AlbovlQ0CGohlstujtUvMH
-   vzyMC0W5gGrrGYXU2DMHhXJGNay7D99gQfFIoP2F1t1gk1NcLHv9LI42j
-   OO2Mng4lbz3jxDwZAmFtujIZSw+cwHLW6tDE9dJDZtdwfsqWzyd8QJZ8Y
-   w==;
-X-CSE-ConnectionGUID: EP717krvS5KDISe0hRHsaQ==
-X-CSE-MsgGUID: /VVJteByQe+QHpxZ4qUu3g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="43266239"
-X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
-   d="scan'208";a="43266239"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:15:56 -0800
-X-CSE-ConnectionGUID: /+qPDHxcR5yRBRlU1+3SiQ==
-X-CSE-MsgGUID: ROv2onekSe+3TEd/iFYa0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
-   d="scan'208";a="120048775"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Nov 2024 03:15:55 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 18 Nov 2024 03:15:55 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 18 Nov 2024 03:15:55 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.47) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 18 Nov 2024 03:15:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o2Qw3MFfRALVWKMwiTaLLSjF5B4FGF8uqQ7y1xDDoCrjgL1b4shFr6CU55axlH/vxl/s/2Uw9eURP9ld0nkPxf5xX0IihcAjRc1l3mg7riUFojCO/vO2z5ANcBZ0JNNgLmERQ2tIhzAcoqeRZNezMYACiI68qBOuwDl3896zg3nGgLK8+UmCr8PUBnWcuA6pzbqfcPgWJ/GC99Z54giBj2Eb1suUMJHbSSxgpNkcgtnQmIyt5BFpCkE1ERq9ud8qdP4J4BxSzWFfsXYZdK50xrijXxrOffIqG5duq2258abPX8ig0J5VJchE3dwjSP4D5LVQkmzkQHb7/M9/vzrAZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4hFoQ/fCujjkSKNDLgE9JiJS3+4mPGQv8fF+zFTQaFs=;
- b=vTwdtTlWdqcqcHxrQSj4c/FNaGiiL4yOiCOOAN+pgtoarJlPKookbgNl1JKfT7ZHxf0HfxYKOkGktRcLR2x25LjZYERhbaE7e4dV94PKWjRZCB5uu+vYyiXPfxwpbChc0PyGAgoK0fsHlgakfiPkAriuePIvPkun+8vymUnTjKGSQRBh+z3wYozqssuZu4DC5LrTW9oOJsoIDs4H/fBCiMsm5HJS6yiXShIwNCW83Q9PN1pA5DnWAY9OyJ7iLBWaAjAAsWhLJ+ERrXY2t6mGtyYB84rWcUmelTYWWv4x9YQtIpgsRmTRw67o6dVbtrO2QTNaVI6334dA9qw+9wfpqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
- LV2PR11MB6071.namprd11.prod.outlook.com (2603:10b6:408:178::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.19; Mon, 18 Nov
- 2024 11:15:53 +0000
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955%7]) with mapi id 15.20.8158.019; Mon, 18 Nov 2024
- 11:15:53 +0000
-Date: Mon, 18 Nov 2024 12:15:40 +0100
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Justin Lai <justinlai0215@realtek.com>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-	<larry.chiu@realtek.com>
-Subject: Re: [PATCH net v3 4/4] rtase: Add defines for hardware version id
-Message-ID: <Zzsh3AjTAnQoKKTl@localhost.localdomain>
-References: <20241118040828.454861-1-justinlai0215@realtek.com>
- <20241118040828.454861-5-justinlai0215@realtek.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241118040828.454861-5-justinlai0215@realtek.com>
-X-ClientProxiedBy: DUZPR01CA0009.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:3c3::16) To DS0PR11MB8665.namprd11.prod.outlook.com
- (2603:10b6:8:1b8::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A2919884B;
+	Mon, 18 Nov 2024 11:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731929261; cv=none; b=SOq66963A1rsf6ISCntofqzC0BQnYw0kSmJoIFvf7ZcAhhSeZzUYSanitnjBUTABGwOprLnGWs36ye7Khd8MAtOSMYKiE8v1ICXWXN5r0yV72t6WNQXlLQsHOoR5hZiUJ1WJXVpfCx3XSZTeagg0iBA0ZEDO7UtT2sw6D9j3TKk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731929261; c=relaxed/simple;
+	bh=XzSXgYfcoT1U8q5HfLv6ZN8Sc+0cViVPj/g3CvWfLnA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EEhTi9KjJ+IgPT+2Um1aspIq98ZmuE4sTsKUNJIyH8dsVFy62io3sy5ywslS5fGmLlym0aZG/nqLmUb6nsE7zSnUkZpRtHvGJyche+orD9F6D8EaoB1gBOPQdeLNsW95T2H6AqzumNZZBL4Vi6J7OanyttofxbMd6k+f2qY9AJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cwk2KtJ4; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aWVvJstqu9oec/DoTVTnJT7l6FlIcFpKbuGY46oxk6U=; b=cwk2KtJ4V+P6+P9vEVpTY7PwsN
+	1XNQDV9EPdUIi0MXxbA152apmmiU1F/1puH6c8Ut39T+KkGzMaoVdjScT9xBGduCB9bjQLXjoFx6Z
+	0qe2z1SuCHJL1fAXCg+IvRaajK9aZNdbmVWWPqYaUGHrLEdepPSZ4Sn/3+CtJaF8PMU0L39PAdozl
+	88DnDLXFJe52T/zbpsQD/Q6nkNv24ism4JHUOog/KGF/MnXuXSeshbiExUhPf9OdZAd4NJ9tj3DOS
+	xDiELwQK3h0shwfx5CXEEAbiUdiZ3z01RuURY9cRxNI8uRLcnkI3LjcCkM2r9JddEDHuCOPdnfDEP
+	HDNrau2w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53254)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tCzum-0001dc-2F;
+	Mon, 18 Nov 2024 11:27:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tCzuj-00053M-2b;
+	Mon, 18 Nov 2024 11:27:29 +0000
+Date: Mon, 18 Nov 2024 11:27:29 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: mdio-ipq4019: fix wrong NULL check
+Message-ID: <ZzskoS2jwC6eLlmD@shell.armlinux.org.uk>
+References: <20241117212827.13763-1-rosenp@gmail.com>
+ <5562cf54-d1bd-4235-b232-33f5cca40b85@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|LV2PR11MB6071:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70b7ec4e-3292-45bb-7a05-08dd07c25d73
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?smGdIKcii/ys+DXxc9iLI19DewaTv7+Yntjug4HQcGDyJSkfaXd5fVe2HDdQ?=
- =?us-ascii?Q?ve3UBzSlJypuS+UWMb+cIioepGoLXFk/8G3R/YIc6nLXMFaolbinzpgeiEDo?=
- =?us-ascii?Q?wKM4afjTpZrTUGioVzJHIyOOxUqqU5amkkr/btBePp/ru8i4D5yH0OS0dqic?=
- =?us-ascii?Q?bRIsxXHG+Hgo3qx8m0p8+PTeLyrb56dIogsOrNbcDSL8+b+RdnLeAm4cV+vb?=
- =?us-ascii?Q?H0WW+anJHFPM0I0zcR9F5+rSGXfuUCrUsDm3a1+P5C+t/wubEumJCxt5nSdG?=
- =?us-ascii?Q?ZLEW5W1oC6R8Z4i7BODCxmPHzifO982i1kMApCO73wmIaQ/6f1u/TmJK4tKW?=
- =?us-ascii?Q?LP7kpbHMu+hdvzynx7mfNxFYGQ/y0thoFn57XO1yPFamwB69hb3DMdRQHOtc?=
- =?us-ascii?Q?GezRpZUVyUEW2r4tj0YL/RJJFUUFN4IHduF1J6SAQnOEl+eZVvwFn2T8oysC?=
- =?us-ascii?Q?kEEu/osJrbeELSuxSRSOnK84tYocLMBbtZ6s+cS9HgSd6oTS/DAmN8ruUp2f?=
- =?us-ascii?Q?SffI6AR6vxy9TIZ3vEFgV2ucsM7J9mPOXFAD5w/eAnEehQVIuIIB4nygSMIH?=
- =?us-ascii?Q?mae4SrWEz6EYl1jSIZVxkxKo3MXfW3C0npaz01qb07xu81UtJJ1wZAp1CeWa?=
- =?us-ascii?Q?K4uwsoF9/9mraStdhOb6D0tCkXPZQshN1lbL4RoAk7pd9Rlff8yBoy/zPipL?=
- =?us-ascii?Q?ojs7l+12vv0TCVBT0GAYrkaqIWfQ/7rGGxY3BfB7pZtyGIm4c6hpna2b8P3P?=
- =?us-ascii?Q?pbTpzUR4iDskVYJ2n1Ixb2NcfHfFgV4Wf+FlnVbxLcr+eHjOHft7HjXoc2ow?=
- =?us-ascii?Q?bOdFjeifiKL3nJEZPv/s0JgebqtMf+uxjGGOCbPY24axDrH2ls0DPvr0Z7rD?=
- =?us-ascii?Q?ZPP6Xv6AH3rb7nBXSky+Vf+RIfDBIvvXrcqRPOw78EvGgMTRhBz/6f57tOkz?=
- =?us-ascii?Q?la5mTvVKgCmlIRLIH1A2EtlZwmuTQWTPzzqRQsAfbgV+Aq0AcsIKXRih46x4?=
- =?us-ascii?Q?joxySkwrsgvTwnfjsNUBV1jKh9QB8t1Lx+7U7A6zz3JygcRsBx8QvynO+AZo?=
- =?us-ascii?Q?ZHsyWSkm1PLvMoeqRSKHgfmNwWbP3w8PoStbyd/PJ7HXdOp+nWq7PwCIsZ1+?=
- =?us-ascii?Q?E1SAg6r7U8B5JqHBIVFSHJ5FWkepob2IQuFrvEX01of3uN6XR/+UDr1lJCiW?=
- =?us-ascii?Q?NJhamuZsaMjYpmdTNLevs2QggCRrmDD88ti25vRmYs1aHmdtHTqTUsKe0uGh?=
- =?us-ascii?Q?7RpypkSorQZQlqohXH5DYgLTF1kkUqUrCnRzTCz7EAaCdjP6g4tc2Sopm8Vs?=
- =?us-ascii?Q?wR4WJOapVCBWlqP+GygIX3Ri?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?W4kqjUSJCPapGzuwOaronO+y8TJRZ6oqukWDm8u65/qZTJzj7pz0p4gYhSQT?=
- =?us-ascii?Q?J//VPK+7TSswKKwUQ9+rHOBL74x2F7JF2Ws0g4RJxxOtEnqSKBf+t2utwRas?=
- =?us-ascii?Q?vavQhxqod/SlDQCizmLp9CyegIizaJmiUwYr10iPGJDe8UUc1J/RUMS4jl2L?=
- =?us-ascii?Q?uns+3dBTSXG06cpCYgYNqtpWSADHyejU8hPOfr8wrCCe2N6cOnvCKbxgRK/m?=
- =?us-ascii?Q?G/rzCmCRskw9Pu2Kf4LQX2/NFW5uuPCSluujsoBiA2kLj6U5pjdNmHq8MyBb?=
- =?us-ascii?Q?Er4F2TL7+dIaY2oQE02YF+xz+5YGIxCvJP6Kg63yVbszibuRUmmqdF3Xb97U?=
- =?us-ascii?Q?BP2ldvi40+u+ERcVMdm458RZqFzQgD/H9ChIdgsBme15jQ/zq8hvz6i0KWu9?=
- =?us-ascii?Q?PQdz+6nDjLMzgu700dCknrikEcFU04WgCMNRxbAYxCvNzQhJ3sBNGakCLgbp?=
- =?us-ascii?Q?LxeLoBmNuPv5+aNfsZIOxGnHXUrx2CTXXpDZdjVvXt9V4TcTqJ4pe5i4dSOF?=
- =?us-ascii?Q?l7kTtg48VVj2z7O/rX+PnkkGNyp2ch+1gnTidQ3UfJsP3Xo4Qpzp8foIxiPX?=
- =?us-ascii?Q?GFKzw2TZX15L30vxOzMkgFxqbBKzMORf7j/tcR5uTDoV4AKsBoED8ENSsXzN?=
- =?us-ascii?Q?ukTDtWW1gfBjDExgFdcu15ACA4abmV4J50SsPITv6N4AbuQRDNr09HfMgZz5?=
- =?us-ascii?Q?20J6lbTDKPqQZk2lMCF1MqTwjWwpSD5vnN0uLSyZljt3J8ilEYCnFyQZMdiz?=
- =?us-ascii?Q?6QPuHeuU6TojtwzByEb4BNKbR40+8nv4EUryjnIQu9kq34MMohvwz47NFYGe?=
- =?us-ascii?Q?TRO+CO1kC5xhukn3FX8NEI80iY0UsZHCEyhnyhJ9bPkfjlTLoM2DRKyGM8kr?=
- =?us-ascii?Q?EcdOw3h48cZsftUsur1Mv1yE5dVe+mEaTQzhu581+ZklbpdQDnvjLYDpV6Sw?=
- =?us-ascii?Q?WeWcqILDj6Qp940BFVb7nOWbgoie9DHyVZYnCRb6rH94SnyjmImI1n0l2w1o?=
- =?us-ascii?Q?OiKBwJLhvqT6ipKPrfk+SfBSM66atnHvalMjE1Fdm5PvTaMo1OvrKFctNANm?=
- =?us-ascii?Q?91W9kmzCz7eXIM8ailjmgMlUsUn3YwWjAkoqQpCplQx6HHWk67uiYLoYeLdu?=
- =?us-ascii?Q?rUEIvlTw6Vr5AyXJvng40w4jUlfe8BgHF4n7A6gTOoZVLYL/u2isBJ8LwYZT?=
- =?us-ascii?Q?JOHrnLeyFpCdUUUuuomvR9Y1bZSlh05QZpi2Pb/QffGSMhX75Y+anL3i9v2V?=
- =?us-ascii?Q?yYemXIt1ePL1l/rm4Wkrg5hQCB7Isy/qd2ZxF9t5Ht35K3TyUBBEV8Xbj1e1?=
- =?us-ascii?Q?Zt3At13KB2v+0y38zaY8neG8z+4zx0jlZRMZUOzH0HvImTIzC79YdN3aMdQ0?=
- =?us-ascii?Q?V3O94+j+BX3KRf7A2wKFukbYQE0MDSgif3u6+3pMlRZDsg6v31r98xGNDlFo?=
- =?us-ascii?Q?cxdJVPItQpsHZSiciJ3EXEiCjyKrS5NqgAxxyL01SUhI+DiP4KmEfDUSdUpn?=
- =?us-ascii?Q?Wax+cQI7aVvETTRSlX4LowFM2fwi2NfCRjSQ8GI2ny3pKZkJV9MVHmVbqFnj?=
- =?us-ascii?Q?vtQrek/2+mfem5F4Tig4/6mE8fomceDjPHHVW+Ci9zLas1pQYi38Pd7NNYiV?=
- =?us-ascii?Q?Aw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70b7ec4e-3292-45bb-7a05-08dd07c25d73
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2024 11:15:53.1095
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IVVU5rkxP1LSUNtQxoA9aEAIvBM2Q9GZC13WMX7WolgJhGLfGHwLCW9tSXUao+OiwCI57mRoCjnEhtY3vvhzhA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB6071
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5562cf54-d1bd-4235-b232-33f5cca40b85@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Nov 18, 2024 at 12:08:28PM +0800, Justin Lai wrote:
-> Add defines for hardware version id.
+On Mon, Nov 18, 2024 at 06:26:27PM +0800, Jie Luo wrote:
+> On 11/18/2024 5:28 AM, Rosen Penev wrote:
+> > devm_ioremap_resource returns a PTR_ERR when it fails, not NULL. OTOH
+> > this is conditionally set to either a PTR_ERR or a valid pointer. Use
+> > !IS_ERR_OR_NULL to check if we can use this.
+> > 
+> > Fixes: 23a890d493 ("net: mdio: Add the reset function for IPQ MDIO driver")
+> > 
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > ---
+> >   drivers/net/mdio/mdio-ipq4019.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
+> > index dd3ed2d6430b..859302b0d38c 100644
+> > --- a/drivers/net/mdio/mdio-ipq4019.c
+> > +++ b/drivers/net/mdio/mdio-ipq4019.c
+> > @@ -256,7 +256,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
+> >   	/* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
+> >   	 * is specified in the device tree.
+> >   	 */
+> > -	if (priv->eth_ldo_rdy) {
+> > +	if (!IS_ERR_OR_NULL(priv->eth_ldo_rdy)) {
+> >   		val = readl(priv->eth_ldo_rdy);
+> >   		val |= BIT(0);
+> >   		writel(val, priv->eth_ldo_rdy);
 > 
-> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> ---
->  drivers/net/ethernet/realtek/rtase/rtase.h      |  5 ++++-
->  drivers/net/ethernet/realtek/rtase/rtase_main.c | 12 ++++++------
->  2 files changed, 10 insertions(+), 7 deletions(-)
-> 
+> Reviewed-by: Luo Jie <quic_luoj@quicinc.com>
 
-The patch is addressed to the "net" tree, but "Fixes" tag is missing.
-Also, the patch does not look like a bugfix it's rather an improvement
-of coding style with no functional changes. That's why I doubt it should go
-to the "net" tree.
+Looking at the setup of this:
 
-Thanks,
-Michal
+        /* The platform resource is provided on the chipset IPQ5018 */
+        /* This resource is optional */
+        res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+        if (res)
+                priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
+
+While this is optional, surely the optional part is whether resource 1
+is provided or not. If the resource is provided, but we fail to ioremap
+it, isn't that an error which should be propagated? In that situation,
+isn't the firmware saying "we have a second resource" but failing to
+map it should be an error?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
