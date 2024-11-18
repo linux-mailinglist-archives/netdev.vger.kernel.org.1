@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-145831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A7949D1177
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:09:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12FD9D1189
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBE15B21B65
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:09:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 430B5B2465D
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 13:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C025195FD1;
-	Mon, 18 Nov 2024 13:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7271E19D89D;
+	Mon, 18 Nov 2024 13:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOCS299h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LP/qL+2l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAD71E49B;
-	Mon, 18 Nov 2024 13:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4443919ABCB;
+	Mon, 18 Nov 2024 13:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731935383; cv=none; b=Xyrm15qg1GRYWDxFrxD/u1qY6eXv6/unul9OxYZ6noP7AV/pB2MQNKsXg3Yzsfu8WtsVW7m7kK2DNzHE5JeGRlNZKPBo7Wl4VVZHsaqP5ntLUa/U5nAlIvnac2enUllKErUuHfBLAE0IRv89uN67m4kT9Imi8k1XTaBHp/sbV6A=
+	t=1731935539; cv=none; b=BPGw8fHRyQ+AcTVpb/yfMXDoOia5RkZvw8adY2T4+RoMdx20yn1O9enzjaGSc3G+L0qyDY38DmriiVQyex/yyA9QCiVCDeKyZ6D5kqp92vduhje7zQkrGQKyfHKb2PCtdo2bFnAhBPQAxSDdG+JThHdHgvNtZ4IpUvFmbLinm/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731935383; c=relaxed/simple;
-	bh=cQo4iAMdE75Iju1hmRvTp8v+SSIrunOvBCkb1Gi4F2E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ULOrakvaSX5HZN20FCEln7b/Ba45ENh8AyaEdhe5HmiZdaYadkNNdd1JU8XpPd4j7OtNwRptq4Te9wF7DfaE8N2TvG2R2fcBPyPGyfYqt8mKFWb6enbgtDW3fSfZweNOD5Ptg44KJkGBiq9QqXJjbqjvPGUMLWhyaJP+okezZok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOCS299h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8AA0C4CECC;
-	Mon, 18 Nov 2024 13:09:41 +0000 (UTC)
+	s=arc-20240116; t=1731935539; c=relaxed/simple;
+	bh=WmVgkz0KTZN8na8N+JVCaFWKKPWLYbasqjQVdB8DB5U=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Y6a9qV5fjfBE47cmAh9QtKYyWlQdY8elPlweZ9la83AbVrarzx1vRZl2cac7s7UkOhTJ3uJMF2Fnu9rpa00FJcSnIhZrKxNyFkr91VWm7Fc5HyjYZ4QLZXjs3hkQW1PmQJkCOZA77gTIYLI3Gk8QZ+evwbEAKCCVOV00Pl5Uhho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LP/qL+2l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C70A8C4CECC;
+	Mon, 18 Nov 2024 13:12:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731935381;
-	bh=cQo4iAMdE75Iju1hmRvTp8v+SSIrunOvBCkb1Gi4F2E=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=hOCS299hs+zrZICivNdsbZn90+4ryiqcy4A6IfFKQqJdNjPqtuc0b6nXQIyZ+QTtD
-	 2r0f1E2Nd/Khv/yzP5CAXaMdGVEPvs2Ea5BTJIEaa16kp+d80+LLHcFAhXNugG3ucL
-	 XKjE4/5l8q3Lv7IFd5YcRzN7Yb/MAp/SRR+O7z1TveTepu0m/EEzxLGf2D8gWi1pIz
-	 5GxPzS2p+XfSDm9UvYSB1exFSKSTcTVrYDRuWdLjY0gEbokm8qvTrozBo0cLFLiaPb
-	 iePIowrO8kUZ0VLTPlEnTMA9fMhaW+pLy2zrAQof2HJ3XKYdCBVuNC++j+JdemNLJv
-	 v+SJDxhTNJrcA==
+	s=k20201202; t=1731935538;
+	bh=WmVgkz0KTZN8na8N+JVCaFWKKPWLYbasqjQVdB8DB5U=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=LP/qL+2lfi/zbVVNNr0bAj+T1gDAnDi1DBew1sI7oiWN5BAK8sZY0l65P5HhilE/C
+	 5hAz+KafY56n3VNWSz/XYyg8JIgAUZjoFCg1AmHEn43dDwHoZeGB8EsJXSS1ZzvCTy
+	 XqLguAAewLyTm+EcXLACOZF5+S/+4Wx0ZbQPv8zVgMUtg432RYo4kStZvTZDYuWpg6
+	 OaE5MmAXoSB0PPWnP3Ju2URFP/9MQ08i6KT4JgNLvEA+X95JmiPbcYLdiW3XKPZq33
+	 R6ZE0SWQdF8UzUc1PEUPU/k8GFMsinLHPa3FLEmlQcOeTTPAZ8OxeASsLeK9dVy2nk
+	 9+wyGMb1ZiPiA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A46AED4921E;
-	Mon, 18 Nov 2024 13:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B06C2D4921D;
+	Mon, 18 Nov 2024 13:12:18 +0000 (UTC)
 From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
-Date: Mon, 18 Nov 2024 18:39:34 +0530
-Subject: [PATCH net-next] net: phy: qt2025: simplify Result<()> in probe
- return
+Subject: [PATCH v2 0/3] rust: simplify Result<()> uses
+Date: Mon, 18 Nov 2024 18:42:16 +0530
+Message-Id: <20241118-simplify-result-v2-0-9d280ada516d@iiitd.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,27 +55,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in>
-X-B4-Tracking: v=1; b=H4sIAI48O2cC/x2MSwqDQBAFryK9tsH2A+pVgouoz6RBRzM9EUW8e
- 4Ysi6LqIoNXGLXJRR67mq4ugqQJDe+ne4F1jEx5lpciUrPpss06nexh3znwJ0RVsfR904w1qgI
- DxXjzmPT4jx/kENjhCNTd9w9rgZsTcgAAAA==
-X-Change-ID: 20241118-simplify-result-qt2025-1bb99d8e53ec
+X-B4-Tracking: v=1; b=H4sIADA9O2cC/3WNOw6DMBAFr4K2jpHX+Zoq94go/A0rEUC2YwUh3
+ z0OfcoZ6c3bILpALkLXbBBcpkjzVEEcGjCDmp6Oka0MgosTIl5ZpNcykl9ZcPE9JmaUlTflueR
+ GQl0twXn67MVHX3mgmOaw7gcZf/Z/KyNDdtYctRVHri76TkTJtsq0NEFfSvkC3CcBmbAAAAA=
+X-Change-ID: 20241117-simplify-result-cad98af090c9
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
  Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
  Heiner Kallweit <hkallweit1@gmail.com>, 
  Russell King <linux@armlinux.org.uk>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>
 Cc: Shuah Khan <skhan@linuxfoundation.org>, 
  Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, 
  rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Manas <manas18244@iiitd.ac.in>
+ linux-block@vger.kernel.org, Manas <manas18244@iiitd.ac.in>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1731935374; l=1232;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1731935537; l=1033;
  i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
- bh=b+u/enFxPC2OQb24qeuinsUzhoPbbFPNjp30yv8A78E=;
- b=VVCd959mHl3fdAs00yFofntkbHvAfCQ2XltcauKLxVDNZfmtVWdVj1Nm4rF9y767uXY4UvSAY
- qf/QRFW7KT3CjzzeOo61XIcbXoEmUYDUqLjvqyWWmeNhZuE4CwcHlJT
+ bh=WmVgkz0KTZN8na8N+JVCaFWKKPWLYbasqjQVdB8DB5U=;
+ b=W00j64SL9Dv1dPccbNFTCfQ84f/jDzQt98GYrhDhY0xUqx+f7zICm4a6ZSQ3LBA6Y8J51Kc8A
+ cPZHxJjjyADDedbj0d7qJIBqoPCG3Z0/5kyJlzuBkArhquRYEAjYfYg
 X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
  pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
 X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
@@ -83,34 +87,30 @@ X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
 X-Original-From: Manas <manas18244@iiitd.ac.in>
 Reply-To: manas18244@iiitd.ac.in
 
-From: Manas <manas18244@iiitd.ac.in>
-
-probe returns a `Result<()>` type, which can be simplified as `Result`,
-due to default type parameters being unit `()` and `Error` types. This
-maintains a consistent usage of `Result` throughout codebase.
-
 Signed-off-by: Manas <manas18244@iiitd.ac.in>
 ---
- drivers/net/phy/qt2025.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..25c12a02baa255d3d5952e729a890b3ccfe78606 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -39,7 +39,7 @@ impl Driver for PhyQT2025 {
-     const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
-     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
- 
--    fn probe(dev: &mut phy::Device) -> Result<()> {
-+    fn probe(dev: &mut phy::Device) -> Result {
-         // Check the hardware revision code.
-         // Only 0x3b works with this driver and firmware.
-         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+Changes in v2:
+- rust: split patches according to various subsystems
+- rust: add rationale for change
+- qt2025: removed qt2025 patch from this series and sent it separately
+  to netdev subsystem
+  Link to qt2025 patch:
+  https://lore.kernel.org/netdev/20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in/
+- Link to v1: https://lore.kernel.org/r/20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in
 
 ---
-base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
-change-id: 20241118-simplify-result-qt2025-1bb99d8e53ec
+Manas (3):
+      rust: block: simplify Result<()> in validate_block_size return
+      rust: uaccess: simplify Result<()> in bytes_add_one return
+      rust: macros: simplify Result<()> in function returns
+
+ rust/kernel/block/mq/gen_disk.rs | 2 +-
+ rust/kernel/uaccess.rs           | 2 +-
+ rust/macros/lib.rs               | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+---
+base-commit: b2603f8ac8217bc59f5c7f248ac248423b9b99cb
+change-id: 20241117-simplify-result-cad98af090c9
 
 Best regards,
 -- 
