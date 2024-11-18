@@ -1,173 +1,271 @@
-Return-Path: <netdev+bounces-145808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D65589D0FDC
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:39:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BF89D1045
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:59:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95E10283061
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:39:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E12571F21901
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8589A1993B9;
-	Mon, 18 Nov 2024 11:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DD0194A73;
+	Mon, 18 Nov 2024 11:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7eNNTmO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f4FkG9ve"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4702018B47E
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 11:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731929919; cv=none; b=osbtTKaar8GmAiRD+TkTcBYE+vJfYyxwRWNPMBN3js+sH+sJ9Hvf1ZYT/OdBqlQUMrKJ1Cxty4UU0zAcODEdyS36siHF7JVbH4qoi0p2VLDrubj0tMrb8r7pYl2w4F7DmtRlrGcMxm9YWeMspIFgxw1k1S00mH0b60p2P4+2OgM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731929919; c=relaxed/simple;
-	bh=8gdflFgjNrJ0YOs0tfdGdr2zUIj1LGSP9Jx3xu2/Z2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mV+GFAvDg3tjULfZDamdAmW0yUpJ8ffDWQ4Ge5x22XbzMNTbRAbGEeebGMLLP1E58i2k8iOhu8JoDSixXjzoWnoIYKVw+MO6V/CBtDMZltqw75IM1FO0dmTd0kJCG95SnuhqKt8Oc1bHpUB4I8vhTv4gcMwEdSEZ3U55gOW2RHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G7eNNTmO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731929915;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gw5bD5S7SVN4RsLiLhtGKlhV9ZJYhsd8Se2piSJ4RY4=;
-	b=G7eNNTmONSsOBetjlaO3+jnqUiOrAfSRoIytetmx9LIsBeYAxO2vazaaIJ1PX7/DRVWUkd
-	uYen3Pf735k41L/Bcy4UhgzGa7Yz3aFMZN7Lf79DpD2Xl3oph7X4meo7tPaENz5zjI1Wxo
-	rbgP6LHMbkFgPu93MH8+f43FncMYCoE=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-139-eWzYHPLNOHaHM2k7FH9EBg-1; Mon, 18 Nov 2024 06:38:34 -0500
-X-MC-Unique: eWzYHPLNOHaHM2k7FH9EBg-1
-X-Mimecast-MFC-AGG-ID: eWzYHPLNOHaHM2k7FH9EBg
-Received: by mail-yb1-f199.google.com with SMTP id 3f1490d57ef6-e38192eef3dso4961497276.2
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 03:38:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731929913; x=1732534713;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gw5bD5S7SVN4RsLiLhtGKlhV9ZJYhsd8Se2piSJ4RY4=;
-        b=X1dOXG0VPfnR/3GHbQsPnhG4Uhf1lk6lgJrSbSuP/zerqPLbT3cNn9Yw+nQETW1Kqp
-         H4rRKpgKIARlcS2xrPNGchO73iUdgcX4MvvK567J2ZVC/18txVxkup6pxG3meYnd1O7r
-         tPBYJFcmC83YBadG0j+0y7J4vWZNiZbq94ECnKLOpFa9VmxrFVK2vqBZ0R7VBC+4nkYd
-         U6KJAbrF6dX8rzM4qzJ4b38Hp9lpYHfNrXARw1qapgYSYEuB7e6AHvjHEjKSYjUmx4SS
-         KKNJxkaw8CSyRLyXbMoPqT1f1amZGQFmK4iasP+OFe20sIJbcEEg8sVc/s+gS+X2k64e
-         I+aw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkIvyUFcpTwZCPJsLKgi33V8/1LyQoVNSwLLYjRgqbdJwDnge/Np3LcDCV0c8SMu453E/W/Qo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTkTx5oUbtKPx3vyXSBzCkcheKATqCtBh1z0VrTPwN+9qyd7lF
-	TJqwwY7aJETi3ZifSsTszXQTr9cdQ1T4ZUYiBzbYh41lnyPLAz3aYqCPGJ7JpFODJES7/XrBScA
-	ygV1OH/XxyiZyaXjP4aNwaoe0oq11qHrC2kqhV+aEF4VH8EYakUtO3g==
-X-Received: by 2002:a05:6902:1109:b0:e38:a15d:409d with SMTP id 3f1490d57ef6-e38a15d4424mr2161040276.13.1731929913534;
-        Mon, 18 Nov 2024 03:38:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGQnbgCNr3UNGZv40fiiuJH5q+gMcuQO3YMFlFbx+8I0jqkmXUewKgQYLeMIrdZYVymoVOu/g==
-X-Received: by 2002:a05:6902:1109:b0:e38:a15d:409d with SMTP id 3f1490d57ef6-e38a15d4424mr2161024276.13.1731929913163;
-        Mon, 18 Nov 2024 03:38:33 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40da59a8dsm34584006d6.0.2024.11.18.03.38.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Nov 2024 03:38:32 -0800 (PST)
-Message-ID: <f95ec5a6-72c5-4c99-91b9-8317ca5d7207@redhat.com>
-Date: Mon, 18 Nov 2024 12:38:28 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5122CCC0
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 11:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731931143; cv=fail; b=uLm5zsbNB3LeoI4mNPy/WSZKpFvKO9WrLjQ+p4t+CS2fRMm02LEfmevl9MG2nQJX1erEqJopM1qraRqeCCBuTVrZAjrq4j7zmc8MUuStxkgNLN7pvG+huVoVejJgsfDGHI5Q7hyMvnZQcLCVixp3q2I+eQfwiq5MU5s4W6benqA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731931143; c=relaxed/simple;
+	bh=57ajfRppuOUmAi/Tsxb7bw6y+AIg1QKfa33/48jLUB8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UnkFmZVybOcI1LGoFehlK87ntEchCvZSqLcH9Oz3mlzdB4qbgkiDdTzqj3yAa2OBdkzwTlaIZOnz57L4RD1LeehNEEuNdR2jsqDvadbPPa1CozJ3q2UnuXXkFIerFXz0vM+kBAAWYpU/y7Qblwwdqtddd3WaHUBdXYeorkrZ1bI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f4FkG9ve; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731931141; x=1763467141;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=57ajfRppuOUmAi/Tsxb7bw6y+AIg1QKfa33/48jLUB8=;
+  b=f4FkG9vefYQfAaJyD8jwYPA9vBKW8VdcbgQP6hNhn3Cu6ScBkONlKP5c
+   vMLV8zlR//kOVJF/eyggxchUAAfN4oR0QBEjpSg6ETa+8m98YwZlEpuBr
+   v6rXbaIM5RYE9yuafkM8cCZVGwdq1uXJBxgFihL4HStLzU/teZXquCtpv
+   Yllts7PBS2wlHwwLtbJ2pKJnSFyqAjg7H0WqrN/b+S8gTqbGCo0rI1HJH
+   dOk+ijVEnfr33qXzHEeLhPJSxbJyKM0p3cLAtswfCXX9fg7qc2kvleKly
+   Zn8/Rz79mu5ytXO1o6Mt9493pX9pZmc8ns4Qc/dsfS4xdivi1zgE5Tgh9
+   A==;
+X-CSE-ConnectionGUID: y8dvxKfoRQWWjzVe74KzEw==
+X-CSE-MsgGUID: JY9QzZe7RZ+AORIG+zammw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="31808276"
+X-IronPort-AV: E=Sophos;i="6.12,164,1728975600"; 
+   d="scan'208";a="31808276"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:59:01 -0800
+X-CSE-ConnectionGUID: cRTc3tUgSeGzDoSdn1bpJg==
+X-CSE-MsgGUID: J9MAJKDZQnWxCvXPXWgxxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,164,1728975600"; 
+   d="scan'208";a="126744739"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Nov 2024 03:59:01 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 18 Nov 2024 03:59:00 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 18 Nov 2024 03:59:00 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.47) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 18 Nov 2024 03:59:00 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CnYV1eUk0NrTZCgcoZfARv7PUkemSRwlEL6uCgHqQFh5YJW9sFfNB+E6q+/tAkc0s+8EDU2sYcYchKn1DRQrIC/x0xJWS7TZ5PglmBiN/IAo2rWtZgolxDhsnCZy8U/YF7VFDzApPMh6kfDF+TFG0u/QK6Okq7Rk5s56GXqRpMbzn3i0Ai9EtmGqmzT8hVnSQRjj5QaveZcoXfmLK1I4RvvPWYK6uYQMRV7S4PBlU6RB1cZpyYLZvhmRqFYGKvFSLTkwzf3knMDh3nJ/kUQi5ITvDLfDHgcuqqFh8XrMKN6CYja7bBNTP6+78x5uCww95BUA3gEB77ztIDcq2Gmetw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8nKJHx2SN3ZFtv75ap/Y+fxsI0nvroHaLShLYAEPrcM=;
+ b=fv0GwpGpRv1/86xlpbGxiuOpLXLXbgzHhYa7Hxp5GDRwv8cy/wSmTAE/x+UHV4YEbEPSSYySi2B0lp9AREYhlH9IETBGUIW0HYn1gYeZVtxsWGCZVj86o6d76EHt6bCffsMqNkSMzTEIDANrHPmjW/zqRDR1C4/1jA4+W09gOv/2MNnKE466dXfOSkk+DHy+coHIyvDBcxUOk137658qXbiLLFXcEryAeSpzFuep2Mz3GRn+OW2NMV7oMpDlzOir4J1dmAKJcQy5JHXAVCLeV32E1cvJxUuT13x1sy3cjf8pNaUKSKzx1y5/URykVN5GI+nJRgGPdwe2A+S9wSHXlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DM4PR11MB6550.namprd11.prod.outlook.com (2603:10b6:8:b4::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Mon, 18 Nov
+ 2024 11:58:57 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%5]) with mapi id 15.20.8158.023; Mon, 18 Nov 2024
+ 11:58:57 +0000
+Message-ID: <1c737424-7f27-4318-8959-69bde80ceed0@intel.com>
+Date: Mon, 18 Nov 2024 12:58:53 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ice: fw and port health
+ status
+To: Konrad Knitter <konrad.knitter@intel.com>
+CC: Brett Creeley <brett.creeley@amd.com>, <anthony.l.nguyen@intel.com>,
+	<netdev@vger.kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<dumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>, "Sharon
+ Haroni" <sharon.haroni@intel.com>, <intel-wired-lan@lists.osuosl.org>
+References: <20241118104810.477794-1-konrad.knitter@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20241118104810.477794-1-konrad.knitter@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA0P291CA0014.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::19) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ip: fix unexpected return in
- fib_validate_source()
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- Menglong Dong <dongml2@chinatelecom.cn>,
- syzbot+52fbd90f020788ec7709@syzkaller.appspotmail.com
-References: <20241118091427.2164345-1-dongml2@chinatelecom.cn>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241118091427.2164345-1-dongml2@chinatelecom.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM4PR11MB6550:EE_
+X-MS-Office365-Filtering-Correlation-Id: 402b3754-edf0-40aa-f1a6-08dd07c86207
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TEtOZzM4VXVEYmc3cjQzWFhzdGJTWmhyRU4vdUtvaGZjTkFsWjVlYU1xc0Ry?=
+ =?utf-8?B?Z0ZLNmovcndiRDNlblYwWXlaRTFzV25xYkxBQVc2YzFhdVpoSHFyN2JsV01I?=
+ =?utf-8?B?b0JsY3BqRkR0eUtCaW1HOEI0R1hUdUNvWUhKek4xV0VKdU95UmVXNk9FNWo5?=
+ =?utf-8?B?OWs0RnpkS3RiME9RUnpqaThISHFQRnpuRFJORFp3blN3UUx0T3dkS3dmM2Rq?=
+ =?utf-8?B?L3VWckNyeVpmbnBYZmZYRFRwdks0aHVHdG00UXIyUHZyY1JYQ20vUTczR3ZW?=
+ =?utf-8?B?Slp6SWhhdmtsVUtOemQ3S3hDSVltOVFTVGFjdGJkYUJpbzE0SkZhNWtRQXQx?=
+ =?utf-8?B?bjhsQ3l1MUVxSnZlNlY5SmZ1azZ4VUtMcVZFTFRYQTMybTNNb3krV2R5a1BQ?=
+ =?utf-8?B?SkRmY1ZMTTE4cjQ0S2xiR1hSZisvQUxYZ1lPYzdDTnhRRnpOYkRvb1QrcTJY?=
+ =?utf-8?B?UE5mbldiYUtyOEZrc2lCbzh1eWNUdE5MTTBSZmxZOGRYN2ZNbVdxdTZTcVk0?=
+ =?utf-8?B?ZTk3eTNlN2ZLd2p6bE5oTUNtWnJuemVWOGI4Zk92NmRZN0orbHQ4YWhZK2Fv?=
+ =?utf-8?B?d0plTE1LTmp0dlIwUnlpWFJCdWY2ZkVBVll1c0dzU3R4ODF6NjBwR3FUYm1L?=
+ =?utf-8?B?eHdLN1N1bTBLTjMzMjdoSDdjbDFTMVZoc1RZV0dOTFd1VkJVRllFZjlMOU05?=
+ =?utf-8?B?WkpPTVdZVnlBOXRGT3VBSjFMdVovVDRsMVhtTHVVdXA5bHlsZEIwbmM0czJi?=
+ =?utf-8?B?RnBxR1N5RVRiRWZuTS8zZUVUU1RpdEZLRnF3OHJHbmZBbUw5MkdtNCtKSnMr?=
+ =?utf-8?B?NHk5eGg3dkhVanZ1WkFxb2ZCZVV4aFBaTnExTlRudzRvT1NqOGlFVzV5Mnkz?=
+ =?utf-8?B?bnViYS84U20veStFTXBnUko0QVo2OEExM0R2aWRrZU5lOUM3RlNDbFQ3clV6?=
+ =?utf-8?B?eWtmTTVDSlBIa3l1MW54aGdDVjBaUW10bjV0Q0pkd1VXWkUwNTJuc1NvR3lp?=
+ =?utf-8?B?M2hHT01DV1hXNjVwZm5FZFFwOFZPV1BSbnovSDQvaHRFZWhpekh1VDJVRjl6?=
+ =?utf-8?B?Q0t2VE0wV2kvN0RIL29WSHh1bGhnVXNLNHk0TnU1Y0haZGQrK21KeUFnbHhi?=
+ =?utf-8?B?T2o2RUNLZ09YQVpmTC9kaUQyUFc4NVZFZUwxclFmT1ZjRzZ3WmxsRkIzSmpi?=
+ =?utf-8?B?TE4vMlBXN3huMjA4RUx5cW11L2djNDR6UDZSNks4OFAxY3AzKyt4RnowR1hF?=
+ =?utf-8?B?YXc5bXg3SHZHd3RLWlV4TWc1Vm80U1cyb0NtK0JvdUkvVUU3WDlTV1dpMDhy?=
+ =?utf-8?B?K2E1bE1sNXMvWXFqaFZJVXVpcUtDRWlINmJNOC9kVXFteXV3cjYrZ05YWFpy?=
+ =?utf-8?B?cUhocENxZUZHbTlUU01NSm5Oa0EvbEdVL2tRdlZhajJqZjFOd0hrK2xySElv?=
+ =?utf-8?B?NW1wcmVQaWM2VHlrb2hrTUcyT0xTZERUT0hKWWkvcVQrNmp6aUpJQXV2b0xQ?=
+ =?utf-8?B?UG5pVm5FNDVyRWE4N3E3ZnllLzBaZHR6eHlxME5Ob3ZCTmdzUm10eFpManBI?=
+ =?utf-8?B?M2habVg1V0JvSFR5WDNYRW52NUxYUWdUdmZWU0g1RkhqeXIrR0ZySHdaTDhx?=
+ =?utf-8?B?ZWd6U0ttK3RSSUhtK2NUK0dPb2I1aTBUWmlMSStBM0ZWdENlWmU3ZENDSjRZ?=
+ =?utf-8?B?KzZIbDVvaTBwelNoRVBuVUgzbUdTSHV3eGJSQmRkRlBmQUg2U1hjOE9EVWlS?=
+ =?utf-8?Q?h8Di1i7FVMbaGKlqevQdi34uFGQNppgGMCDht3j?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZW82TGhweVpiT1dTdkJFWmVHc3hsdW9DbWY1c2U0eDRpNCtVb1BWS2JXVjV5?=
+ =?utf-8?B?Wm90RUdERUxxbVlyZ1FqeTVzMVR2cjNXUjJ6dVE3ZG9EOVpjeVRXN2dDS2JH?=
+ =?utf-8?B?blY0dVNpMWFwbzZyZVlGUk5hY3dkdWpqbXhQNjhMVS9QTnRyQ3ZqK0FPTXhp?=
+ =?utf-8?B?blh5dktaTm03THZsd3M2UGVlelBJdjFPemNQVWwzWVF0RGR0TiticEdRb1JK?=
+ =?utf-8?B?eDdxUE0yS0o1TXoydFM1ZHFxejlEelJuOWhSeE5wZnhIZVRGZDYva2V3eXUv?=
+ =?utf-8?B?YnhScVMydHVqdi96Y3F4T0tTTld6cUl4MDdONkRGMzdnSlBhdnN0MXNOL3Yz?=
+ =?utf-8?B?RWF0TENicE1QV3VCYll1NXo1U3V2MzVZUFpRYmVVL3FLWUNTZDZtK3hsL09P?=
+ =?utf-8?B?TWVEQVp0QnI2VlhJVHFhKy9YK0JOa1c0ajFtSEh5Z1lnZ0NrNE80QzJOV3Yx?=
+ =?utf-8?B?ci9ESUNqUGU4dHhFREVwSlRFZVpzZWY5RVVDbExnb0Nuam1Tc1NhM1BkT3R4?=
+ =?utf-8?B?ODBwWmlUcXM1emYzMjF5ak9sRVF1a3A1Z3BxcVJKVWxjT3FTdkZ6amZVUlA2?=
+ =?utf-8?B?ODdsa1pNY0IxM25FT1BNK002U2VHbm5GSUpPZ29SM0FGU3AvRzZZNkZlL3dG?=
+ =?utf-8?B?RmEwSEtTRjE5dDh6SEFpRXNFWFZHdDBhNldvMXU3UFlkSmQrTGVqMXlzeWlw?=
+ =?utf-8?B?NCtIMllpbGp0WXdhK2VCWFJJaTFuVVdGbVl3OEJIVkEzOVNQdE1LMXh4b2pE?=
+ =?utf-8?B?S3g2RDd6MzFqUHRHUmhHSG9tMDEvUVB0WC95MTNQY1dPWEZmSDkwTnBEaWlT?=
+ =?utf-8?B?cHh3Wlp2Rjc1TjRSdG9GMlYyalZrT0pYS3hXUWlyRHlBUkI2T3QrMmNmV0Vk?=
+ =?utf-8?B?bFRUOW5yTC8zb1lEalNYdFViNWdNcnA5UStPdUhnSkgycnFaekFYZXpLMlBi?=
+ =?utf-8?B?b09SNDB2UmFaSGVwQnF3QUFBQW9TYmE1Nkw5bEhUYnNaT1BrQzVneDNaa29F?=
+ =?utf-8?B?ckwzRGtuWVdTaUl3M0QrelpycVZsOWlnSTE4amhkNGp5cjkvQ2s4VWhNQkFU?=
+ =?utf-8?B?cVo3SnEyeWtzblN5VS9WbCtOSWVrLzhRWWlBMHMvV2FIcm9rWnJyUUZRZzYw?=
+ =?utf-8?B?dmw5QmpJakRBT0hLbWZJNjBYam9PaXNRd3B6ejh0WHgzVzFpaEV6Vjh5RHEr?=
+ =?utf-8?B?WUtxMDdLZS8vcDYrUDZ4cFphOG1ZRXVRNzZYN0hSZy9NTlhwTnJrZzkycjA2?=
+ =?utf-8?B?d1pPVFdIN2MxenhsUFJFSllBN204NmpaemxsU3V4YXA4M1FaVk02T1JHY1N5?=
+ =?utf-8?B?UHNtVERtUGE1WFo1S2Mzb3pxQ0hxcU1uL0VGZVdSbERqTzZtdGdhdHFEMTlw?=
+ =?utf-8?B?SWxZclZ6aTRvNXZ1aXMxVnNxTDJSVHMrY21kWXNMbzc5TEhDTVppUlhtTzJM?=
+ =?utf-8?B?MlExdmJ2OEwrTXFwa25lNXhTZWI5SFQ2TVQ2ekphM2ExdEU1RERXWGMyUlc4?=
+ =?utf-8?B?ZGtGODlPM3BKb1pkeXBEdG1ibDlHVXcrK3h2bjI1a0pxUmljV0U2TXhLMHpr?=
+ =?utf-8?B?MHhTYmFBOCt6SGRCTE1SRUJXMnlJK2xxVDBuelNTMHBhTS9CU2VLY1FYL0FJ?=
+ =?utf-8?B?NG00bXlBdzFZTlBEYXZuRThpZGVpMlJlaEpxaTlEbGZIcVVHdkhteldPdkFr?=
+ =?utf-8?B?dEJLOXY0M2NicHBwMk95L0hvWmVPbTdPNk5DSTlPZkJHNmp5Q2VPWWpac2V1?=
+ =?utf-8?B?RUU4QUY2dFNPaVordUttYmU2RStsZWpJVS9MMXlmdDErYkN3d0tJZGhqZlFU?=
+ =?utf-8?B?RXdFdElYT2xNbysxcWNHM0RmQ2JBR3NRRy80SzBQeitEVXY4UDlIY3h4VXF0?=
+ =?utf-8?B?TmpuTC9nYlVZbWJlS1pIelExNU54Q0Z6QzRHZTdSTG95RTNMQzg1bXVyblha?=
+ =?utf-8?B?eG1EWW15N2pyWkl0c2Rtbi92Ync4M2FEWHhvUUxoRmxtM205MEtENXJIRkk4?=
+ =?utf-8?B?Z0E3aFRMdlBidTRKanU5TXNicEI5WmRjODZ3eVdlS3NpdWdvWS9yZnVxMitW?=
+ =?utf-8?B?eExzY1JUVTcrS1A2ZlIySjBabiszb2htTm04K00wa1ZycUo1QmJnd3orMDd6?=
+ =?utf-8?B?R055eXZEem9hM2pibG5JMGgxMm9KZUp0QzlKQjBzUllkTTVxdFlCdUlTUEdP?=
+ =?utf-8?B?bnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 402b3754-edf0-40aa-f1a6-08dd07c86207
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2024 11:58:57.7925
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VVKdwrhqlaTI8nHxJ43zkKkkf0g4ojPVsLvmnR6dPB+wQ3JZh6DfT9BKVPW4AWQtPIRSB9NBvQ85/HooDZzmme+IZAwhVjKi1TWFBQFz9N4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6550
+X-OriginatorOrg: intel.com
 
-On 11/18/24 10:14, Menglong Dong wrote:
-> The errno should be replaced with drop reasons in fib_validate_source(),
-> and the "-EINVAL" shouldn't be returned. And this causes a warning, which
-> is reported by syzkaller:
+On 11/18/24 11:48, Konrad Knitter wrote:
+> Firmware generates events for global events or port specific events.
 > 
-> netlink: 'syz-executor371': attribute type 4 has an invalid length.
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 5842 at net/core/skbuff.c:1219 __sk_skb_reason_drop net/core/skbuff.c:1216 [inline]
-> WARNING: CPU: 0 PID: 5842 at net/core/skbuff.c:1219 sk_skb_reason_drop+0x87/0x380 net/core/skbuff.c:1241
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5842 Comm: syz-executor371 Not tainted 6.12.0-rc6-syzkaller-01362-ga58f00ed24b8 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-> RIP: 0010:__sk_skb_reason_drop net/core/skbuff.c:1216 [inline]
-> RIP: 0010:sk_skb_reason_drop+0x87/0x380 net/core/skbuff.c:1241
-> Code: 00 00 00 fc ff df 41 8d 9e 00 00 fc ff bf 01 00 fc ff 89 de e8 ea 9f 08 f8 81 fb 00 00 fc ff 77 3a 4c 89 e5 e8 9a 9b 08 f8 90 <0f> 0b 90 eb 5e bf 01 00 00 00 89 ee e8 c8 9f 08 f8 85 ed 0f 8e 49
-> RSP: 0018:ffffc90003d57078 EFLAGS: 00010293
-> RAX: ffffffff898c3ec6 RBX: 00000000fffbffea RCX: ffff8880347a5a00
-> RDX: 0000000000000000 RSI: 00000000fffbffea RDI: 00000000fffc0001
-> RBP: dffffc0000000000 R08: ffffffff898c3eb6 R09: 1ffff110023eb7d4
-> R10: dffffc0000000000 R11: ffffed10023eb7d5 R12: dffffc0000000000
-> R13: ffff888011f5bdc0 R14: 00000000ffffffea R15: 0000000000000000
-> FS:  000055557d41e380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000056519d31d608 CR3: 000000007854e000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  kfree_skb_reason include/linux/skbuff.h:1263 [inline]
->  ip_rcv_finish_core+0xfde/0x1b50 net/ipv4/ip_input.c:424
->  ip_list_rcv_finish net/ipv4/ip_input.c:610 [inline]
->  ip_sublist_rcv+0x3b1/0xab0 net/ipv4/ip_input.c:636
->  ip_list_rcv+0x42b/0x480 net/ipv4/ip_input.c:670
->  __netif_receive_skb_list_ptype net/core/dev.c:5715 [inline]
->  __netif_receive_skb_list_core+0x94e/0x980 net/core/dev.c:5762
->  __netif_receive_skb_list net/core/dev.c:5814 [inline]
->  netif_receive_skb_list_internal+0xa51/0xe30 net/core/dev.c:5905
->  netif_receive_skb_list+0x55/0x4b0 net/core/dev.c:5957
->  xdp_recv_frames net/bpf/test_run.c:280 [inline]
->  xdp_test_run_batch net/bpf/test_run.c:361 [inline]
->  bpf_test_run_xdp_live+0x1b5e/0x21b0 net/bpf/test_run.c:390
->  bpf_prog_test_run_xdp+0x805/0x11e0 net/bpf/test_run.c:1318
->  bpf_prog_test_run+0x2e4/0x360 kernel/bpf/syscall.c:4266
->  __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5671
->  __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
->  __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
->  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5758
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f18af25a8e9
-> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffee4090af8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f18af25a8e9
-> RDX: 0000000000000048 RSI: 0000000020000600 RDI: 000000000000000a
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> Driver shall subscribe for health status events from firmware on supported
+> FW versions >= 1.7.6.
+> Driver shall expose those under specific health reporter, two new
+> reporters are introduced:
+> - FW health reporter shall represent global events (problems with the
+> image, recovery mode);
+> - Port health reporter shall represent port-specific events (module
+> failure).
 > 
-> Fix it by returning "-SKB_DROP_REASON_IP_LOCAL_SOURCE" instead of
-> "-EINVAL" in fib_validate_source().
+> Firmware only reports problems when those are detected, it does not store
+> active fault list.
+> Driver will hold only last global and last port-specific event.
+> Driver will report all events via devlink health report,
+> so in case of multiple events of the same source they can be reviewed
+> using devlink autodump feature.
 > 
-> Reported-by: syzbot+52fbd90f020788ec7709@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6738e539.050a0220.e1c64.0002.GAE@google.com/
-> Fixes: 82d9983ebeb8 ("net: ip: make ip_route_input_noref() return drop reasons")
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> $ devlink health
+> 
+> pci/0000:b1:00.3:
+>    reporter fw
+>      state healthy error 0 recover 0 auto_dump true
+>    reporter port
+>      state error error 1 recover 0 last_dump_date 2024-03-17
+> 	last_dump_time 09:29:29 auto_dump true
+> 
+> $ devlink health diagnose pci/0000:b1:00.3 reporter port
+> 
+>    Syndrome: 262
+>    Description: Module is not present.
+>    Possible Solution: Check that the module is inserted correctly.
+>    Port Number: 0
+> 
+> Tested on Intel Corporation Ethernet Controller E810-C for SFP
+> 
+> Co-developed-by: Sharon Haroni <sharon.haroni@intel.com>
+> Signed-off-by: Sharon Haroni <sharon.haroni@intel.com>
+> Co-developed-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+> Signed-off-by: Nicholas Nunley <nicholas.d.nunley@intel.com>
+> Co-developed-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 
-Thanks for the quick turnaround!
+Brett signed-off as an Intel employee, and this should not be modified.
+But it's very good that you have CC'd the new address.
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
 
+There is no mention that this depends on my series, still in Tony's
+queue.
+
+> ---
+>   .../net/ethernet/intel/ice/devlink/health.c   | 290 +++++++++++++++++-
+>   .../net/ethernet/intel/ice/devlink/health.h   |  12 +
+>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  87 ++++++
+>   drivers/net/ethernet/intel/ice/ice_common.c   |  37 +++
+>   drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+>   drivers/net/ethernet/intel/ice/ice_main.c     |   3 +
+>   drivers/net/ethernet/intel/ice/ice_type.h     |   5 +
+>   7 files changed, 429 insertions(+), 7 deletions(-)
+
+Weirdly I find it nice for review despite the size, at least
+in a way that I think it's actually good enough when not split into
+multiple patches.
 
