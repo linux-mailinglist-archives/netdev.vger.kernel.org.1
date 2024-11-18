@@ -1,100 +1,106 @@
-Return-Path: <netdev+bounces-145935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1570B9D1585
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:41:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92A0B9D1584
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:41:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BACAB251D8
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:39:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 759ECB2D296
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155241B21A0;
-	Mon, 18 Nov 2024 16:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388971C07DE;
+	Mon, 18 Nov 2024 16:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="TXLIKwoL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cfq4RUPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB92F225D6
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 16:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5401BDAB9
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 16:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731947937; cv=none; b=pbrUu6S2sAR2W8nsqrbOGeDr5w84+EAKwnS1cwAftVAN6+0FIhtGtRaKGSNtFOqMklbiNHYBFUgwFhwnY3QfDidQjLew5uW1VWLHF8F4eQA+3o5Gna+qVCPv0KPnj4wtwhxT6WU4Nok0+2Em5XMaWLX7IIXCf1h+61aNEABijEM=
+	t=1731947978; cv=none; b=Teij0E/JoketjIajZxfym+jMvZWDxDtGzrtLpCmgEY9H91qVmun7X/Wn6lcgKnBphw8RuR6xRMnwGevAkcnR1I1796Mvm3Qgg/OVsCiRk/f1MoSrTa1aDdJLGYruAdgruUNsuJz4DdOLC+3UTFHw7tBMuDDzp+Pwqdo+TWhxqOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731947937; c=relaxed/simple;
-	bh=UGXiLmY28Qvmoa7dQpAUBYhEp6CXGy6eDDdScHBO/eg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LA7JQOYwOelgq6BM7tDQBFvz3Tmtzlytc43IPEAdRlT5JwNYqPFL7IaZOXgCZA5ZdPOuZA7hyzs4HsWuWHI6rAIHclmIXEVI3wCy72Wt9D3aSOCP9/NoGde4Qri2zkwUY3QsxKZyFgbzZ9vcoz/mH5mPxL8NW3YU/DPWlIC+b/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=TXLIKwoL; arc=none smtp.client-ip=148.163.129.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 2E6DE780078;
-	Mon, 18 Nov 2024 16:38:47 +0000 (UTC)
-Received: from [172.20.0.209] (unknown [12.22.205.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	s=arc-20240116; t=1731947978; c=relaxed/simple;
+	bh=4VLAsz3gLkTJFtFpCPDvTF204CR43uOYtq/o7M5cR6I=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Mo4o61W11wm61/9O0tSfhzbz1Ll295r4T9+UDKR83PN4fK6oylzYkCultnRW8x3nIDlKCAWPf4U04CTrNFfrooeRo/H++fjsFIBvJcYNFQ3oywnl7C5leFFWcWkGm0PjOO1107F6bfIGKuJXnDu9J0vNnc4nba/fa/Px2ixXlbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cfq4RUPD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731947975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5TBgXpcOkE91KJWIrvCU0ksBJeSHSjTfC1vv3ct4vww=;
+	b=Cfq4RUPDuzUUTdZG/jIqxj2V6vs2OHSm9q7v3uW656eGUSH/g6E6q+Rw6+M30C1mpx+Y7V
+	9CQE3mtquEMnmvGw9/Rtl4mH9OfpB3GU3F8r5Q24+6EXo6sgR/lptsM2tgBrGHdFhW+VnG
+	OA6gvrFuZEYiPTk98EjPpZ0XKZlyB2I=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-r1Nbp_NqPiyaaS_1Yh73TA-1; Mon,
+ 18 Nov 2024 11:39:32 -0500
+X-MC-Unique: r1Nbp_NqPiyaaS_1Yh73TA-1
+X-Mimecast-MFC-AGG-ID: r1Nbp_NqPiyaaS_1Yh73TA
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 83A6213C2B0;
-	Mon, 18 Nov 2024 08:38:46 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 83A6213C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1731947926;
-	bh=UGXiLmY28Qvmoa7dQpAUBYhEp6CXGy6eDDdScHBO/eg=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=TXLIKwoLz9+Vb96h6gNA6XjbZ/lRuofkodN4oo6cJHMWNGIT94SLL/zXtqqPaeU39
-	 MEYhDg7/0yXU2aHa401DrgMuycCPiT5Gy9VFWFAoVAFKHXZWI8Nmb/sQM2QiUsYPvd
-	 6i7oxjBX6NhlrX+/yr5cD5h8w4V12F5BoUDa5oKg=
-Message-ID: <3c146ffd-0ecf-45f8-92b6-1cf96a3f5d20@candelatech.com>
-Date: Mon, 18 Nov 2024 08:38:46 -0800
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6604A19560BA;
+	Mon, 18 Nov 2024 16:39:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.207])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8E035195607C;
+	Mon, 18 Nov 2024 16:39:21 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <b7135da8-a04f-48ec-957f-09542178b861@ijzerbout.nl>
+References: <b7135da8-a04f-48ec-957f-09542178b861@ijzerbout.nl> <20241108173236.1382366-1-dhowells@redhat.com> <20241108173236.1382366-8-dhowells@redhat.com>
+To: Kees Bakker <kees@ijzerbout.nl>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 07/33] netfs: Abstract out a rolling folio buffer implementation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: GRE tunnels bound to VRF
-To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
- netdev <netdev@vger.kernel.org>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
- <88c439e9-0771-4bfc-a4af-70b4be76ea1f@orange.com>
-Content-Language: en-MW
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <88c439e9-0771-4bfc-a4af-70b4be76ea1f@orange.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MDID: 1731947928-gnQQFDSDvX9T
-X-MDID-O:
- us5;ut7;1731947928;gnQQFDSDvX9T;<greearb@candelatech.com>;2a320b93dc8a19c3bbe1022bab805ac5
-X-PPE-TRUSTED: V=1;DIR=OUT;
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <941711.1731947960.1@warthog.procyon.org.uk>
+Date: Mon, 18 Nov 2024 16:39:20 +0000
+Message-ID: <941712.1731947960@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 11/17/24 2:41 PM, Alexandre Ferrieux wrote:
-> On 17/11/2024 19:40, Ben Greear wrote:
->> Hello,
->>
->> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
->> underlying traffic?
->>
->> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
->> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
->> gre interfaces and have that go out whatever the ethernet VRFs route to...
-> 
-> A netns is vastly more flexible than a VRF, with much cleaner operation. In your
-> case I'd just move each eth to a separate netns, and create its GRE there.
-> 
+Kees Bakker <kees@ijzerbout.nl> wrote:
 
-I vastly prefer VRF since it is cleaner for my use case.  But glad to know
-netns works well for you.
+> > +		wreq->buffer.iter = wreq->buffer.iter;
+> Is this correct, an assignment to itself?
 
-Thanks,
-Ben
+That should just be removed.  Both branches of the preceding if-statement set
+it.
 
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+David
+
 
