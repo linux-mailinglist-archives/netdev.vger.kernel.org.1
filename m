@@ -1,108 +1,147 @@
-Return-Path: <netdev+bounces-145776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18F69D0B50
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:00:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3649D0B5E
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:05:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 316F52827C5
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:00:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF704282968
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09978148FF6;
-	Mon, 18 Nov 2024 09:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1141714B7;
+	Mon, 18 Nov 2024 09:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kb3sBtyE"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="mC/SRVKG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cI17NtaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E939D2110E
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 09:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00882907;
+	Mon, 18 Nov 2024 09:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731920444; cv=none; b=cMETMPTUxQBgX24cfLIynEqRvbr02IFy2Wqn8n6PBllE6RzwkO2Zkl67XD7PPkNXtyidWp2QYwcIxA4mezqTzZDaGM6qO881JQDdQyGEFE4wgsbxN3tP6zK0EzNDc5N+r0lRK64wPRQ7p2ezQQFDiPYhAXq6MmoiTgc2P2Vb1bQ=
+	t=1731920712; cv=none; b=UtG261GJ+IQE0NSdnn7SffsoJtCcIJeRqRHhF61Fv+p8B0oSk1G0kJgzBU4ImMnUHxD9tAZD/H4TrHbR8RT1+3xVk2trO4b9rGAm8XYb4S9Vo97nY0vcgtMoJLNGRAAl99GGM6cdQtcRipR3ofd3+jr+SriZE09N/j7n1WBhwkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731920444; c=relaxed/simple;
-	bh=OX4xRIdK49sRmIqTk1uovx4zGNvomeZS27VLhEI7gNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TiaD9MJodHrPSZgJOElDuiI49pP5JfkxfiefQzngbHSSCFC7TVqZswhvo+VUhfiy+rGbYDZF/JODC4GMahARETW8KsRXD9+fKMRgK/lnZSAjTJQgSci/h+X7L2sIZyxDifMJ4YGDJNe51dZx6ZkoYNkGCfl4yLzITHKl6+c/NbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kb3sBtyE; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id D91321140222;
-	Mon, 18 Nov 2024 04:00:41 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Mon, 18 Nov 2024 04:00:41 -0500
+	s=arc-20240116; t=1731920712; c=relaxed/simple;
+	bh=+s588WJ4gk9wbw75TVV+RheBWqaKRkOZn+a+pEIAwX4=;
+	h=MIME-Version:Date:From:To:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=eJ2nNorpJvDhtSAnhk4lxQ8elvFaB6+M7fyKO5BQD6hZyyFF5VZ6T+XvIQRDMwKKASjd/FAsySSPapG1XVPvZsvs2OhgmXSR2HRgvtjfgCwcPdjNpRYxv0OQhImgSX7GrK43IlXY4f6Dnt4CM80qG/HF6z/UGHMXh7rg1ldGDx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=mC/SRVKG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cI17NtaH; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id C9979138070D;
+	Mon, 18 Nov 2024 04:05:08 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Mon, 18 Nov 2024 04:05:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:content-transfer-encoding:content-type:content-type:date:date
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1731920708;
+	 x=1732007108; bh=gf4HA4MAdbhLcSvM8TnDWCU5nuBOYRd+UnKEWXA6Tls=; b=
+	mC/SRVKGvsslm21o20Z5VIyi1gQ6PypC3svwUI6xeYW3iBshmejaNdekK5xf0/Hn
+	Vr54P/doV/GkiRhEEtYSJFqDjZc2gspn9wYVX9Bmc+HNfwhvP/8oiHRa+bjEP6vP
+	2TAZGQ1UY59Ede2j6zhrawLwgUZyk6mGE23etSPEhLns9gdw/6ZgPAcn/zt6uYgf
+	LIq/Y6R44EquJh9i58G2fElo0IIMfKIm7jMsPbuIb/+5svyd1ctq/YyRtx55PfUW
+	i1lGekmsHlK1MREs6NlkZoXLN0IRYvZMXcTuE/BOtU+oWhtT+YOfarKiXceWQO1e
+	XR7rz8tiMxqV6yU+DCJkQg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1731920441; x=1732006841; bh=5fC/Pq5ZuBb6DF3/GCNWrhgYuNNgmF8cm5w
-	99GYk0mk=; b=kb3sBtyEURUBuTZfFgGlwRrE4J+Htr5iMWXIwGAleuhzh1SKc4q
-	HeG9Wh/QTNgDLVXwtafgkrzjSVW1DvTsv5dS2YgsM8UUfL0qR1uIopWJ+J/iOUtS
-	GofLVn51icyoy7MbWMMBTrG9GADF0kSSpQd2Y86+DAaSuizFsinFx5/wWPJCSG1i
-	ZeFeDVYt53PZHHXM3EUooQNHvt0/25MtKtBW7WdEwhh97hoWfPDD9HslXfTEGP9t
-	WTj1OAc6AZcap9CXUYIXqto839gMd0HQ66VL7B7/W7JULrrTi+GOqZuU2jDhqmh2
-	YxtEQcYqpvXHsnuv6vVWxiMPdZ1JQVq+vrQ==
-X-ME-Sender: <xms:OQI7Z0CQLYYVPnT_tKI9mYfYsf-Ig3uV6sdNVuSnrqMwqtvQyQkYIA>
-    <xme:OQI7Z2gH9tP8dreYtJwNpKgmtvjwBE9t6eWveT4xwh6-Pb67zxzRvKfPMxRHzPM_C
-    Kk29-l6Vs28eIQ>
-X-ME-Received: <xmr:OQI7Z3nvqEVLD9Wbwlyk2Z5kPHptJN63gL17pDR1dto3YlW053ajN0ZOinej>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgdduvdeiucetufdoteggodetrfdotf
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1731920708; x=1732007108; bh=g
+	f4HA4MAdbhLcSvM8TnDWCU5nuBOYRd+UnKEWXA6Tls=; b=cI17NtaHx6pDVnb06
+	SUikQtCpalUARm7oJK3+za00Xv2XSAbc6nbQWUhSEMzT4JhfXKSZxQ+W5phg9F4S
+	Jgu6zIdVKibt4rTiDHcGQxfOqgGoMhKKel6c4pRYY9XK3C2igRwFSJQPKrxjFmST
+	jI8jc0zJ1sj6ddvxC4PaFY99re+xaNg6xHkRcpVxfxIiekQAW6ql/56VChx3Enzj
+	1GTllnaXt1pib6qhIsEk7jL4Ece6F8M9pgmaHy5oOC6Zi0VxLKmFQIk4X2Cze1Aw
+	EwK4w3ZvIIyT4NrHiz7q2VJn1fZvyVeeig1iBH5CU9cR+u7OaEgAYVd+RCNihMgl
+	n5lSw==
+X-ME-Sender: <xms:QwM7Z5e-BLKlUy6vneE6wXTvk0vIZrY5PNL9yM_KIpmsFJqg64Q8qQ>
+    <xme:QwM7Z3PsavxoblcxLEK8JGlXkzl_wz4nHSEtibptCih1YXZJHFqfXRME2Hsh0Vcey
+    zt2J39BHSLm1m9rto4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgdduvdejucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
     rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
-    hrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieef
-    gfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthht
-    ohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepghhrvggvrghrsgestggrnh
-    guvghlrghtvggthhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghr
-    nhgvlhdrohhrgh
-X-ME-Proxy: <xmx:OQI7Z6wYhGbCFLCZI4gsMzTGojqkBMWr6HPPfSWrS1zpA191TVOVyA>
-    <xmx:OQI7Z5TNPHe4ryi6FNUiaI90hFk7yd2FnO8ESkBaDJ025UwDe0a41Q>
-    <xmx:OQI7Z1Yc7cLni9p6sYBnQRX9NdSWdWM5aSrvlUzu9vbVLmmyEHD4SA>
-    <xmx:OQI7ZyTmTyz9tw8XWQMYhesH15CoCNzobRc6EuyMXVgJGMCHnZ7fBA>
-    <xmx:OQI7Z4INjcK-JJCXRTs1K4IWBFLQbFxQIINvb14WaEyVu0q4n0s41bS7>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 18 Nov 2024 04:00:40 -0500 (EST)
-Date: Mon, 18 Nov 2024 11:00:37 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Ben Greear <greearb@candelatech.com>
-Cc: netdev <netdev@vger.kernel.org>
-Subject: Re: GRE tunnels bound to VRF
-Message-ID: <ZzsCNUN1vl01uZcX@shredder>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+    htshculddquddttddmnecujfgurhepofggfffhvffkjghfufgtgfesthejredtredttden
+    ucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdrug
+    gvqeenucggtffrrghtthgvrhhnpefhkeeltdfffefhgffhteetheeuhffgteeghfdtueef
+    udeuleetgfehtdejieffhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopedufedp
+    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjhgrtghkhigptghhohhusegrshhpvg
+    gvughtvggthhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
+    vghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
+    hopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgu
+    theskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughr
+    vgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehprdiirggsvghlsehpvg
+    hnghhuthhrohhnihigrdguvg
+X-ME-Proxy: <xmx:QwM7ZyhXWjWwuzAyeJhvSyzkoOA9KW09C6TAiJUyJmpq5GdwXGQjHg>
+    <xmx:QwM7Zy94iC8McJYeioPwCoyzH8mqayiLyLatgUEmeE31BZGLpXdKAA>
+    <xmx:QwM7Z1sqraKGDKRBfuMwShDVaI7ZOyyVKAhENwLGNp4syP0f7G2j_A>
+    <xmx:QwM7ZxFnk07XbJDlrGWBqTPWGtCc7c4unC4UDac_HbYXhv6efCTdBA>
+    <xmx:RAM7Z-Gwjz9sEbnLXhN_Ic0w5Iv_U9X5XxsEh8XfQlBlN5ZUJOSLJjNU>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 77F842220071; Mon, 18 Nov 2024 04:05:07 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+Date: Mon, 18 Nov 2024 10:04:37 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Jacky Chou" <jacky_chou@aspeedtech.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>,
+ "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, Netdev <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Message-Id: <e0ad34dc-cc11-428e-8bf0-c764612452e0@app.fastmail.com>
+In-Reply-To: 
+ <SEYPR06MB51341859052E393D404F4E519D272@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
+ <20241118060207.141048-6-jacky_chou@aspeedtech.com>
+ <4b1a9090-4134-4f77-a380-5ead03fd8ba8@app.fastmail.com>
+ <SEYPR06MB51341859052E393D404F4E519D272@SEYPR06MB5134.apcprd06.prod.outlook.com>
+Subject: Re: [net-next v2 5/7] net: ftgmac100: add pin strap configuration for AST2700
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 17, 2024 at 10:40:18AM -0800, Ben Greear wrote:
-> Hello,
-> 
-> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
-> underlying traffic?
-> 
-> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
-> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
-> gre interfaces and have that go out whatever the ethernet VRFs route to...
+On Mon, Nov 18, 2024, at 08:51, Jacky Chou wrote:
+ 
+>> Is there a way to probe the presence of 64-bit addressing from hardware
+>> registers? That would be nicer than triggering it from the compatible string,
+>> given that any future SoC is likely also 64-bit.
 
-You can set eth{1,2} as the "physical device" of gre{0,1}
+I just realized I replied to the wrong email, I meant to send
+my question as a reply to patch 4/7. The patch for the pin strap
+looks fine.
 
-ip link add name gre0 up type gre [...] dev eth1
-ip link add name gre1 up type gre [...] dev eth2
+> There is no register indicated about 64-bit address support in the 
+> ftgmac100 of Aspeed 7th generation. Therefore, we use the compatible
+> to configure pin strap and DMA mask.
 
-The "physical device" can be any interface in the VRF, not necessarily
-eth{1,2}.
+Later in the series you just unconditionally write the 64-bit
+address, so it appears that the ftgmac100 can actually do
+64-bti addressing all along, and this doesn't have to be
+conditional at all, the call to dma_set_mask_and_coherent()
+only tells the kernel that the device can do it, which should
+work on all of them. Since the other devices won't have a
+larger "dma-ranges" configuration in DT, and no RAM above
+32-bit addressing, it should have no effect.
+
+Just make that part in patch 5 unconditional.
+
+     Arnd
 
