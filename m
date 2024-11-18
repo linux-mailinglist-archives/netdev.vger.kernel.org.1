@@ -1,61 +1,71 @@
-Return-Path: <netdev+bounces-145782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 702399D0BE6
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:37:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07989D0C18
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:45:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE2AAB25707
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A2C282E82
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961D518FDD8;
-	Mon, 18 Nov 2024 09:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F71E186E2E;
+	Mon, 18 Nov 2024 09:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JyhQfIzJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DKYDEHBX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D37186E46;
-	Mon, 18 Nov 2024 09:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017D81EB48;
+	Mon, 18 Nov 2024 09:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731922640; cv=none; b=QVYuOfSlIRN+KgL8MdrOg8fMhIDe4JZI7ZROV6SmIJEOFErJJqt0dSPVL40CxOakvsBmyLGMFskEtfHBudk7A7tbzGQx/bVgmlKvKKWtmRKk1yPCTbQnsPoNyqVW4TIKGl76kV/y/6RUl8zFO0obKL5b9Q/eeL9nhjsd2RgJxwU=
+	t=1731923132; cv=none; b=kt1Mt4LjYcziFCfDSQya2wxR/vlVDLTYW7qSpL1lnN+qXCWuR+zbMuyzy65GRFu69XCn2urgXWgu0budQ8NQrbetOT8c1ZeErTjCVCyRplWj24SpRMgriNmQ0F+kW7Y8W4yYNUnZegGv7GkEVfYvo58pkMlKY9IjrbK36YhYU4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731922640; c=relaxed/simple;
-	bh=9LFqkLWkNELB0zz0PQ/SBJJxRnjhZ41FKHaJNoaBj0I=;
+	s=arc-20240116; t=1731923132; c=relaxed/simple;
+	bh=zZ+USi14GEFg5Ab7la/alqdEpDJQDirej+0sPreZ4is=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A3q+XU/j5IdIXjNI11AZex77CfBxn5R8oRXet9DoLlwq0D/SrUFNU+31tWEInS/AyeR/NSvUMPlu0WG8o+jEreNWGOfDeXV1LrT66Y43v60Alg6myz6e/LwzCb+nvH5raJ4lTI3X/wQZHnLmdkoGxaUvHti/h3BZsBmk7/iuuwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JyhQfIzJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81FF4C4CECC;
-	Mon, 18 Nov 2024 09:37:17 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=bVa3vyykdptN1LG7uV0BJtmb1AI28dFlU1kRnxNsNn5f9SeVCwbHMEsSvgS6bu0VnS48Px1RY4A0zLvH6zH0ikG5FoXFRg5ul5Puq+ZzPYGvP2Tbef1SiX2QhHAEUTcNYf5WjSgrjDFdCyqr+O/8GXWEUiccYkWiMwBTUxmnOAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DKYDEHBX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B62EC4CECC;
+	Mon, 18 Nov 2024 09:45:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731922638;
-	bh=9LFqkLWkNELB0zz0PQ/SBJJxRnjhZ41FKHaJNoaBj0I=;
+	s=k20201202; t=1731923131;
+	bh=zZ+USi14GEFg5Ab7la/alqdEpDJQDirej+0sPreZ4is=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JyhQfIzJe3wRRsst2j++ZbOlO8oOhqOB4IvQr3WeO7wKreQJ48LKAWX+i+CDYpieL
-	 jny8xf9sUH6OApc+O0YcpkO6+jKedHfwfQYlyXZzd2/HNZyMvo+gRWbY6Z5XBVQIDq
-	 dtwuN92FjJtRfBxZtiZ7iurYkhQCVEamTs9chXNM7jFVFaIT00CdK38GHuQQG4PEW1
-	 R1r4b/d6sKnBb+eXv6MdqTQmksz3RPnzqPwBM9B/NNfzLbQcEqRCZSecqfj/PekGlf
-	 ITQtodU01d98jAzuxEcTbJ7lhkc4MGL92p3RpdYodxa1uXG4pwz8S9yej660vSFuI0
-	 kJ7eUGfbB4qLQ==
-Date: Mon, 18 Nov 2024 11:37:12 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux390-list@tuxmaker.boeblingen.de.ibm.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net/smc: Run patches also by RDMA ML
-Message-ID: <20241118093712.GA8673@unreal>
-References: <20241115-smc_lists-v1-1-a0a438125f13@linux.ibm.com>
- <20241117100156.GA28954@unreal>
- <bd8e196839281fd324721650c5974db35b7990ec.camel@linux.ibm.com>
+	b=DKYDEHBXCQTfzeNrtukRXMu+WuGBS3S3sD3h+S7oxRzGq7t4GQ0/yjc+Wr8M9P/Ex
+	 MUPCk3ENFClHNz+eZYEg+0/vMOW0rFN+0Ilayjh8uyJTTSCcvrQXpaNO3Ucblm5dNG
+	 ZOoD0yKve1bDMvrLlxuS2qAWEndVEpMEAYKM+oo/0veTY19kFnmCBFndbtwzJ0Z7I1
+	 iXkx5qCK/WDgRUGJ17+Y1A3x4G/rtn/8nYi8oNWESE2SOXXOMs50SFLigo9K2wd8y4
+	 f1xnyMBtqbnJrIbfSol1cbu/DFPig7F4cxYqhnTSagoYR3J2GKfyRDbg0/yMK7NERG
+	 xjHMCtPwo31yg==
+Date: Mon, 18 Nov 2024 17:45:18 +0800
+From: Geliang Tang <geliang@kernel.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev,
+	Mat Martineau <martineau@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next/net 1/5] bpf: Register mptcp common kfunc set
+Message-ID: <ZzsMrvdnqLd8CVRQ@t480>
+References: <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-0-cf16953035c1@kernel.org>
+ <20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-1-cf16953035c1@kernel.org>
+ <fe7a61b3-627f-4e60-9bba-28a4d40d1ec8@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,43 +74,140 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bd8e196839281fd324721650c5974db35b7990ec.camel@linux.ibm.com>
+In-Reply-To: <fe7a61b3-627f-4e60-9bba-28a4d40d1ec8@linux.dev>
 
-On Mon, Nov 18, 2024 at 09:46:28AM +0100, Gerd Bayer wrote:
-> On Sun, 2024-11-17 at 12:01 +0200, Leon Romanovsky wrote:
-> > On Fri, Nov 15, 2024 at 06:44:57PM +0100, Gerd Bayer wrote:
-> > > Commits for the SMC protocol usually get carried through the netdev
-> > > mailing list. Some portions use InfiniBand verbs that are discussed on
-> > > the RDMA mailing list. So run patches by that list too to increase the
-> > > likelihood that all interested parties can see them.
-> > > 
-> > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > > ---
-> > > ---
-> > >  MAINTAINERS | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 32d157621b44fb919307e865e2481ab564eb17df..16024268b5fc1feb6c0d01eab3048bd9255d0bf9 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -20943,6 +20943,7 @@ M:	Jan Karcher <jaka@linux.ibm.com>
-> > >  R:	D. Wythe <alibuda@linux.alibaba.com>
-> > >  R:	Tony Lu <tonylu@linux.alibaba.com>
-> > >  R:	Wen Gu <guwen@linux.alibaba.com>
-> > > +L:	linux-rdma@vger.kernel.org
-> > >  L:	linux-s390@vger.kernel.org
+Hi Martin,
+
+Thanks for the review.
+
+On Mon, Nov 11, 2024 at 04:25:52PM -0800, Martin KaFai Lau wrote:
+> On 11/8/24 7:52 AM, Matthieu Baerts (NGI0) wrote:
+> > From: Geliang Tang <tanggeliang@kylinos.cn>
 > > 
+> > MPTCP helper mptcp_sk() is used to convert struct sock to mptcp_sock.
+> > Helpers mptcp_subflow_ctx() and mptcp_subflow_tcp_sock() are used to
+> > convert between struct mptcp_subflow_context and sock. They all will
+> > be used in MPTCP BPF programs too.
+> > 
+> > This patch defines corresponding wrappers of them, and put the
+> > wrappers into mptcp common kfunc set and register the set with the
+> > flag BPF_PROG_TYPE_UNSPEC to let them accessible to all types of BPF
+> > programs.
+> > 
+> > Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> > Reviewed-by: Mat Martineau <martineau@kernel.org>
+> > Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> > Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> > ---
+> >   net/mptcp/bpf.c | 40 +++++++++++++++++++++++++++++++++++++++-
+> >   1 file changed, 39 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
+> > index 8a16672b94e2384f5263e1432296cbca1236bb30..6f96a5927fd371f8ea92cbf96c875edef9272b98 100644
+> > --- a/net/mptcp/bpf.c
+> > +++ b/net/mptcp/bpf.c
+> > @@ -29,8 +29,46 @@ static const struct btf_kfunc_id_set bpf_mptcp_fmodret_set = {
+> >   	.set   = &bpf_mptcp_fmodret_ids,
+> >   };
+> > +__bpf_kfunc_start_defs();
+> > +
+> > +__bpf_kfunc static struct mptcp_sock *bpf_mptcp_sk(struct sock *sk)
+> > +{
+> > +	return mptcp_sk(sk);
+> > +}
+> > +
+> > +__bpf_kfunc static struct mptcp_subflow_context *
+> > +bpf_mptcp_subflow_ctx(const struct sock *sk)
+> > +{
+> > +	return mptcp_subflow_ctx(sk);
 > 
-> Hi Leon,
-> 
-> > Why don't we have netdev ML here too?
-> 
-> since all smc code resides in net/smc the filter tag F: net/ in
-> "NETWORKING [GENERAL]" provides that. My first internal draft contained
-> an explicit L: tag for the netdev ML, but I dropped it to avoid any
-> redundancy.
+> This returns "struct mptcp_subflow_context *" without checking the sk is a
+> mptcp subflow or not...
 
-Thanks for the explanation,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+I checked it in patch 5 in the bpf program. I'll move this check into
+bpf_mptcp_subflow_ctx() in v2.
+
+> 
+> > +}
+> > +
+> > +__bpf_kfunc static struct sock *
+> > +bpf_mptcp_subflow_tcp_sock(const struct mptcp_subflow_context *subflow)
+> > +{
+> > +	return mptcp_subflow_tcp_sock(subflow);
+> 
+> ...and then the "struct mptcp_subflow_context *" can be used by this kfunc
+> here. Is it really safe?
+
+I'll add null-check for subflow here too in v2.
+
+> 
+> > +}
+> > +
+> > +__bpf_kfunc_end_defs();
+> > +
+> > +BTF_KFUNCS_START(bpf_mptcp_common_kfunc_ids)
+> > +BTF_ID_FLAGS(func, bpf_mptcp_sk)
+> > +BTF_ID_FLAGS(func, bpf_mptcp_subflow_ctx)
+> > +BTF_ID_FLAGS(func, bpf_mptcp_subflow_tcp_sock)
+> 
+> All of them has no KF_TRUSTED_ARGS or KF_RCU, so the returned ptr is
+
+KF_TRUSTED_ARGS should be added for bpf_mptcp_sk() indeed, but not for
+bpf_mptcp_subflow_ctx() or bpf_mptcp_subflow_tcp_sock(), since the parameters
+'subflow' or 'sk' of the latter two functions are not pointers which are
+passed as tracepoint or struct_ops callback arguments, but pointers returned
+from kfuncs. I'll add KF_RET_NULL flag for all of them.
+
+> supposed to be read-only? Why are they needed and why bpf_rdonly_cast (aka
+> the bpf_core_cast in libbpf) cannot be used?
+
+The returned ptrs will pass to kfuncs. If bpf_rdonly_cast() is used here, a
+"untrusted_ptr_" error occurs:
+
+# ; msk = bpf_core_cast(sk, struct mptcp_sock); @ mptcp_bpf_iters.c:29
+# 9: (18) r2 = 0x3f95                   ; R2_w=16277
+# 11: (85) call bpf_rdonly_cast#53914   ; R0_w=untrusted_ptr_mptcp_sock()
+# ; if (!msk || msk->pm.server_side || !msk->pm.subflows) @ mptcp_bpf_iters.c:30
+# 12: (15) if r0 == 0x0 goto pc+50      ; R0_w=untrusted_ptr_mptcp_sock()
+# 13: (71) r1 = *(u8 *)(r0 +2785)       ; R0_w=untrusted_ptr_mptcp_sock() R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
+# 14: (56) if w1 != 0x0 goto pc+48      ; R1_w=0
+# 15: (71) r1 = *(u8 *)(r0 +2794)       ; R0_w=untrusted_ptr_mptcp_sock() R1_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
+# 16: (16) if w1 == 0x0 goto pc+46      ; R1_w=scalar(smin=umin=smin32=umin32=1,smax=umax=smax32=umax32=255,var_off=(0x0; 0xff))
+# ; msk = bpf_mptcp_sock_acquire(msk); @ mptcp_bpf_iters.c:33
+# 17: (bf) r1 = r0                      ; R0_w=untrusted_ptr_mptcp_sock() R1_w=untrusted_ptr_mptcp_sock()
+# 18: (85) call bpf_mptcp_sock_acquire#24762
+# arg#0 is untrusted_ptr_ expected ptr_ or socket
+# processed 18 insns (limit 1000000) max_states_per_insn 0 total_states 1 peak_states 1 mark_read 1
+# -- END PROG LOAD LOG --
+
+And I don't know how to fix it. So I added a new kfunc wrapper
+bpf_mptcp_sk() instead.
+
+Please give me some advice, thanks.
+
+-Geliang
+
+> 
+> pw-bot: cr
+> 
+> > +BTF_KFUNCS_END(bpf_mptcp_common_kfunc_ids)
+> > +
+> > +static const struct btf_kfunc_id_set bpf_mptcp_common_kfunc_set = {
+> > +	.owner	= THIS_MODULE,
+> > +	.set	= &bpf_mptcp_common_kfunc_ids,
+> > +};
+> > +
+> >   static int __init bpf_mptcp_kfunc_init(void)
+> >   {
+> > -	return register_btf_fmodret_id_set(&bpf_mptcp_fmodret_set);
+> > +	int ret;
+> > +
+> > +	ret = register_btf_fmodret_id_set(&bpf_mptcp_fmodret_set);
+> > +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
+> > +					       &bpf_mptcp_common_kfunc_set);
+> > +
+> > +	return ret;
+> >   }
+> >   late_initcall(bpf_mptcp_kfunc_init);
+> > 
 
