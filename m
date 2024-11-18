@@ -1,149 +1,107 @@
-Return-Path: <netdev+bounces-145706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1AE9D075C
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 02:02:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D92439D0766
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 02:12:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC3A1F21B1A
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:02:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 921711F22794
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473CDEEBB;
-	Mon, 18 Nov 2024 01:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E1F1BC20;
+	Mon, 18 Nov 2024 01:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EXd+wdK8"
+	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b="jwURfuKy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7532B79CF;
-	Mon, 18 Nov 2024 01:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6161BC3F
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 01:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731891744; cv=none; b=A3h3dkybeE6OSLVjAzxBwLRGq5KGG34gdz/CXCe1v32u4HGTsvTCIq0myHQSsu/N4hBf30VnDk9HjqoRfTGLNv8P+b5zGaDKh73PCXpATTkWIZSL/b2/hVnnMyHVX+m+HpOje4kUvu13GV6oKJabx9EC8uGR26XcFwCCt3cLPBU=
+	t=1731892327; cv=none; b=YU4+TpEMInMsPoIx34oinbpp0mJT5lxxuVKi5wKckKyke13E+Zd4MkzTm1Mj2MWXTASL9CUDaoR98gjON0aZ7JfPsN0koNqyneW+/1q8HgIhwzUoeFgrdHZ2O0QHaYqXHhwOgeFb5Rh8QZOcbr92sc+GLFWztEWa6jhFmdg42HA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731891744; c=relaxed/simple;
-	bh=IGNouuMdJ5XOR/9dlU6EcY6EPlihRfta8uOShRul4vI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Qba81UimtPyD5R2m+2TntA4dVQ1DhF3a8pC7awn2Fv5F9rMOpA1sr0aNqyifu0PtyI0X3Gp4UJJDuwOKK8KO1sN+LkgQYcoHrPqhVcQ/pNH3iMMay9y7kXDIjK1jjyBBj5V+rwf6qUFKa7hzwDXBlh8kuyP0WKXDfW+KyituQgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EXd+wdK8; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AHDuAdB003341;
-	Mon, 18 Nov 2024 01:02:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	dBDM9G0SVfojD6pu0UvAgUdsM+YYMATzysm281v9ueU=; b=EXd+wdK8HIC/Nvtl
-	NGive39yhottlqLNbn5bNKrZHq2qv3PmlWfmKAknt0ijOq57vCafjBkVNFzfcOVg
-	UUQFUI3V9tGNDqyIEMhXh7oJrL1f+fosSQLxAtIu1VEcBTVTnqDcXzDa+Xz2VnfV
-	GmYTN71ftizHRxbIbdEe5sbxIB+MyV+JuFRuqY9Ur8Tv/LDWJ3sV0PwIwON2hAlF
-	9mI4Spzjf4ck2BWQRz6yVpqU1sCVstDuMCmUKXKCueGsGUehrZ/ENSpwv20P4aqO
-	smplmIU/rqTiq3qiKww/0shEDh/hhu/CYsRLNQ8o1vq7koGlGNkgVQ420q62hcXp
-	86TIMw==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42xkv9u01w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 01:02:05 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AI124rC019347
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 01:02:04 GMT
-Received: from [10.253.15.8] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 17 Nov
- 2024 17:02:00 -0800
-Message-ID: <6fd79a88-bab4-477c-aaf0-0dffb80e103c@quicinc.com>
-Date: Mon, 18 Nov 2024 09:01:58 +0800
+	s=arc-20240116; t=1731892327; c=relaxed/simple;
+	bh=8jguRpTCIFX5X4hwFVJsZtjemrkZFYD9SjCUJnKItdc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jUCBm8GXYaPAYVOtrpkWwYmmy/fV2uq6yUgNg54oiEtJlfZM8glbxuzi+W15nWdv6hopI0tEtdsgQoDkicSHdohUrZH/e8ADYFEfRvQqBjmneASs6Veo72+5LIP/Ef2oFxI4BsSY3Z1aafd2fIAhvJKgooaYGIPDKLJwx5lLVSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in; spf=pass smtp.mailfrom=iiitd.ac.in; dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b=jwURfuKy; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c6f492d2dso13339365ad.0
+        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 17:12:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=iiitd.ac.in; s=google; t=1731892324; x=1732497124; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V7XycAloiFoCMfmssnZcbAgPsNHHq3RcS44NRT2jaAI=;
+        b=jwURfuKyWIi6U7Qg3dWQM3pz/EMpp/6U7KmIKnqOoSnY4YGIkuJefT5TNyrVWMcel1
+         9vF3amvSz35vkJtufx8Y13SQzgwcrxtGSho47dupVvsDvyaphQ/8SlawbVzwrdu1+MzW
+         OL5D6xgxScKgSyG8L0jD5ptijFHmCpVm27eNg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731892324; x=1732497124;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V7XycAloiFoCMfmssnZcbAgPsNHHq3RcS44NRT2jaAI=;
+        b=gX/e8yMH+s7c7eIk+MJcKu5NrePPa9nHPgX/wFRr9mYiGgwkmvsJP3FG11OqzPrhva
+         h92lJ/aOC0EDvOjyeIkFNMeWzSgsdttYjvuxSQCAKmQigMo47Fek6PygNI1wdRRxX/Jz
+         LdwfwLVtGep1C2UcP2GVCd0SAoial8xZeNPqX1n4QkuTNhUzIVEsTm/KlkVIAOHI1m3+
+         np8YHLrtpFmwafxHaMIySvWlLg9FCbojCXsvLdCZmVRGLknkfLNWn9rUiD3SE5ewooW4
+         0qyuqdKEbrsjsMnM+ppmgblovrhokJqTs3H42i/Z9aawqd+zkjhzyFpLxTIYRWCwTHLe
+         06Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCUPKbOdxv/EF78FlJINuKC1rlspch81jCjbrH2bJ/SDdw6Pj3rBKnNehJUiQMSvX4PSyK5PaTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyykNiLt6RUDPLanXGz6YcK37Mtds4gJ11E1/cSIoR0J3fkB7yT
+	ridAWhA22MG4BlzCNYFLFIwHBRiHAe/9/7ZaBRS0PZlsPvozZF1ci5am8/I1eso=
+X-Google-Smtp-Source: AGHT+IHRSOFCwCSJbllUPYVx/zvEltTAQTSkv822oSEiRkDjFOTOd3vI//iN+/Xz+fTAre/iOFBDmw==
+X-Received: by 2002:a17:903:22c4:b0:20b:861a:25c7 with SMTP id d9443c01a7336-211d0f1183dmr149393135ad.54.1731892323798;
+        Sun, 17 Nov 2024 17:12:03 -0800 (PST)
+Received: from fedora ([103.3.204.126])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea5fe3e689sm1449857a91.6.2024.11.17.17.11.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Nov 2024 17:12:03 -0800 (PST)
+Date: Mon, 18 Nov 2024 06:41:50 +0530
+From: Manas <manas18244@iiitd.ac.in>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>, 
+	Alice Ryhl <aliceryhl@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] rust: simplify Result<()> uses
+Message-ID: <5qtqdzljvzly5onzhfdq63fzcqcj26ybktm2cgomijpnfnyrbj@ln2kbp73csf6>
+References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
+ <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch>
+ <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
+ <q5xmd3g65jr4lmnio72pcpmkmvlha3u2q3fohe2wxlclw64adv@wjon44dqnn7e>
+ <CANiq72kQJw4=qBEPwykrWBsqmycwS+mR27OE2dTPQd3tKjx-Tw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] arm64: dts: qcom: qcs615: add ethernet node
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>
-References: <20241010-dts_qcs615-v1-0-05f27f6ac4d3@quicinc.com>
- <20241010-dts_qcs615-v1-1-05f27f6ac4d3@quicinc.com>
- <1e902d79-5dad-4d12-a80e-464dbcf851c3@oss.qualcomm.com>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <1e902d79-5dad-4d12-a80e-464dbcf851c3@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: IAhippoAc_vikBIui2nQ2bnbb1RPaiPx
-X-Proofpoint-GUID: IAhippoAc_vikBIui2nQ2bnbb1RPaiPx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxlogscore=908 priorityscore=1501 suspectscore=0
- malwarescore=0 phishscore=0 impostorscore=0 mlxscore=0 bulkscore=0
- clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411180008
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CANiq72kQJw4=qBEPwykrWBsqmycwS+mR27OE2dTPQd3tKjx-Tw@mail.gmail.com>
 
-
-
-On 2024-11-16 03:11, Konrad Dybcio wrote:
-> On 10.10.2024 5:05 AM, Yijie Yang wrote:
->> Add ethqos ethernet controller node for QCS615 SoC.
->>
->> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->> ---
->>   arch/arm64/boot/dts/qcom/qcs615.dtsi | 27 +++++++++++++++++++++++++++
->>   1 file changed, 27 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/qcs615.dtsi b/arch/arm64/boot/dts/qcom/qcs615.dtsi
->> index 0d8fb557cf48..ba737cd89679 100644
->> --- a/arch/arm64/boot/dts/qcom/qcs615.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/qcs615.dtsi
->> @@ -420,6 +420,33 @@ soc: soc@0 {
->>   		#address-cells = <2>;
->>   		#size-cells = <2>;
->>   
->> +		ethernet: ethernet@20000 {
->> +			compatible = "qcom,qcs615-ethqos", "qcom,sm8150-ethqos";
->> +			reg = <0x0 0x20000 0x0 0x10000>,
->> +			      <0x0 0x36000 0x0 0x100>;
-> 
-> Please pad the address part to 8 hex digits with leading zeroes
-> 
->> +			reg-names = "stmmaceth", "rgmii";
->> +
->> +			clocks = <&gcc GCC_EMAC_AXI_CLK>,
->> +			         <&gcc GCC_EMAC_SLV_AHB_CLK>,
->> +			         <&gcc GCC_EMAC_PTP_CLK>,
->> +			         <&gcc GCC_EMAC_RGMII_CLK>;
->> +			clock-names = "stmmaceth", "pclk", "ptp_ref", "rgmii";
-> 
-> Please make this a vertical list, just like clocks
-
-Sure, I will revise.
-
-> 
-> Konrad
+On 18.11.2024 01:54, Miguel Ojeda wrote:
+>By the way, for the purposes of the Signed-off-by, is "Manas" a "known
+>identity" (please see [1])?
+>
+>[1] https://docs.kernel.org/process/submitting-patches.html#sign-your-work-the-developer-s-certificate-of-origin
+>
+Yes.
 
 -- 
-Best Regards,
-Yijie
-
+Manas
 
