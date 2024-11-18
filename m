@@ -1,55 +1,74 @@
-Return-Path: <netdev+bounces-145987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155309D193B
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:50:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C2C9D194D
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0E3283ECA
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 19:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68F25286B1F
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 19:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32DF71E767B;
-	Mon, 18 Nov 2024 19:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7F01E630D;
+	Mon, 18 Nov 2024 19:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="UBzFkcdS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXbIxAI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA251E884F
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 19:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAFC191F99;
+	Mon, 18 Nov 2024 19:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731959339; cv=none; b=kxUALOTvmGNOTpUhnBvHAFxmkRffRAd0VtbgQyqB53XekBadW8FHDlC1uZM/me29pwFNxCiO1acw1Le9JlETbad2oSB+KP1tTtUbXHuKfPy4zEUqcTCiYXRTgV07U8hz2xaEZ7c01d16vPPH0cNcfuuIqDqS4LpBXeuDNcdI/+I=
+	t=1731959493; cv=none; b=rOf8ChhapmxLbby/gwLvgoejV7LKMdVVsKE3k/U/laC3GdXGq+DPdRjajA92AHmn7KzOywxZ4pmrRKoQQX8GFb5BkLU9PcFbro5aBgxU06m2P/bnsI96sk6a/LYdzJfR7+nANTXYEQ/Hv95qoLYoCsVBKcsC5liuwjd1/RmQXDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731959339; c=relaxed/simple;
-	bh=yBX5N+9//W2xVv2JaRA75drvXz2yEwJ1eXsNwFDP0mc=;
+	s=arc-20240116; t=1731959493; c=relaxed/simple;
+	bh=GHixYrJ1x07M3jD1M1FiEAYqXF3dU1cwh+uCvNG1lVg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EajqrMsAhZQjkPxGT9Cy5rfsmuTSd0Xxsy85RCvd0X5ufGipkvXca/wCFcxB5zFCJ5eFaZgiCo7ucmV01F65Kpn2mfFn3ZHXqnbox0CNegozlPnsNNTHRUrnKMfxnYm9yoWBlt70t9+yO77me/UhdZnqmWidQSdLixei0hHJOqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=UBzFkcdS; arc=none smtp.client-ip=148.163.129.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id F41B2400072;
-	Mon, 18 Nov 2024 19:48:54 +0000 (UTC)
-Received: from [IPV6:2607:fb90:7393:a63:d3b5:d0bd:6d1f:8490] (unknown [172.56.241.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id B4CD413C2B0;
-	Mon, 18 Nov 2024 11:48:52 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com B4CD413C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1731959333;
-	bh=yBX5N+9//W2xVv2JaRA75drvXz2yEwJ1eXsNwFDP0mc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UBzFkcdScO467TlhK+AtNr5yWrQAFtx8EI4mJkT3xrfS5y/ImT//c48yJiCCKU7Y0
-	 JGqUgAVhIWW0knCBmncWK+1FEz0gAgXT+djPs2wrzDEfSF0IT9AQL7fjrRAfdrC6IU
-	 ymYcG8cmf9estOy4pOg0T8ltWMdpSf1mI1Uu33Bs=
-Message-ID: <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
-Date: Mon, 18 Nov 2024 11:48:49 -0800
+	 In-Reply-To:Content-Type; b=I9m7pfI/p49mW8JGLZKbbdQYVH8d04YnkpWmulwAdWBMsjDzdv8eVOGx45rT56fSD50SJdzL7iIAvtmeR2kBgJRzXDX8xbqemr60s8m9brtGm/MpFxHrlsetoxud125IxNE/AIhEPNcJMXif0YCsc3e0pwpIMT/3bKF/CCynWp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kXbIxAI0; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43161c0068bso20521115e9.1;
+        Mon, 18 Nov 2024 11:51:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731959490; x=1732564290; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TqGu+uXYYrHTakuMeQQsilwXyfHug/xVXhU8NF+CzFU=;
+        b=kXbIxAI0SJLAQMCoTp6JF2efozp2GrmL4RUTRwNqpfKXDGzTNWsCMJjqKapF7HHpVN
+         FlrNXrJmf5JIPTrvEVobNFNyk6ptXuqFiDF+CJM5Duok/y9nhUpB4lIV/0fXJCCHx9zu
+         KLchnzA+b1xNY2EU1G9Bk5pqZqLW96ZKScfByq5vhgIxqYsVhKnI4qxqinazkSwgUP0l
+         Tanteqxmamnwe7knz3y213SKHo5WPwFkKh3KLEkAR8TZIg5T/t5LFFJCGV7qmz8E1Qra
+         nR/43qdrlnqSsu1Y8z7DDTKzrGBVw9pVjsyiHpcHgaVKzTShUJiGFWsLK2kdpv/kUlup
+         5FtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731959490; x=1732564290;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TqGu+uXYYrHTakuMeQQsilwXyfHug/xVXhU8NF+CzFU=;
+        b=ik0ptw5BJ7Ik2/ejBO6d1faDiCMdIClmsHtS9GZ3mQPSDIRdzOQJ53TAytuZeJsd26
+         wrkxOgIHa4GTHHXO6GwFEVB24oo7dVKDEKlVNtUAOwUr03d4e2IqOc7jgchBfRs/8Ibw
+         cwqihtDs/VApodRBuQW4SuJ6PXQ6/a+ZjXLk2LZRw97N3X/36eD/+auvBp1RmLOZvqg0
+         qhfvLJyDqUY88X8K3K3SlRSGWs5Atitwv7cuAlQo7sEezbgsMUeIL4+t004hGYgi/GoJ
+         m2l4anbl8r0ceHQX2eLdThH+4DibSq0yCD0ETchGUCS8rHXN8rh7wU09Q8PiGSQy3hRI
+         +dvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV3o69JPW0SnWyt61BsXyKvGwaavTrBiPEK4WmQUWooOkIfU/vXWdiNJ0LPaT2KubOl5IHx6kk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxlpVRNrstTQ4Oq8cCVsPTCqOSfeL7j1Wmswqnt9td9LQK3M7q
+	QD0Nn67Fn0uAod9FPr3yK6gxMfu154SIlfdtNmlJXrqWwEW6A91t
+X-Google-Smtp-Source: AGHT+IGOb8vMGxRxVtw8SCxNu2za26WydpCvIj/AdUfMeUUMHq9FK0WSsLnEm7vdhgAOFW83gOCr5g==
+X-Received: by 2002:a05:600c:3111:b0:431:5c7b:e937 with SMTP id 5b1f17b1804b1-432df74c8bdmr132729305e9.17.1731959490148;
+        Mon, 18 Nov 2024 11:51:30 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da28cb89sm169139855e9.34.2024.11.18.11.51.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2024 11:51:29 -0800 (PST)
+Message-ID: <17c64a08-53b4-4d34-8bbe-f7d29653a2f8@gmail.com>
+Date: Mon, 18 Nov 2024 21:52:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,57 +76,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: GRE tunnels bound to VRF
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev <netdev@vger.kernel.org>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
- <ZzsCNUN1vl01uZcX@shredder>
-Content-Language: en-MW
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <ZzsCNUN1vl01uZcX@shredder>
+Subject: Re: [PATCH 10/15] net: wwan: t7xx: don't include 'pm_wakeup.h'
+ directly
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: linux-kernel@vger.kernel.org,
+ Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+ Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+ Liu Haijun <haijun.liu@mediatek.com>,
+ Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+ Loic Poulain <loic.poulain@linaro.org>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20241118072917.3853-1-wsa+renesas@sang-engineering.com>
+ <20241118072917.3853-11-wsa+renesas@sang-engineering.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20241118072917.3853-11-wsa+renesas@sang-engineering.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-MDID: 1731959335-0wO8PpPw3nAS
-X-MDID-O:
- us5;ut7;1731959335;0wO8PpPw3nAS;<greearb@candelatech.com>;a7e0f01e4f1a90fc9a5deb2f83c822d4
-X-PPE-TRUSTED: V=1;DIR=OUT;
 
-On 11/18/24 1:00 AM, Ido Schimmel wrote:
-> On Sun, Nov 17, 2024 at 10:40:18AM -0800, Ben Greear wrote:
->> Hello,
->>
->> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
->> underlying traffic?
->>
->> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
->> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
->> gre interfaces and have that go out whatever the ethernet VRFs route to...
+On 18.11.2024 09:29, Wolfram Sang wrote:
+> The header clearly states that it does not want to be included directly,
+> only via 'device.h'. 'platform_device.h' works equally well. Remove the
+> direct inclusion.
 > 
-> You can set eth{1,2} as the "physical device" of gre{0,1}
-> 
-> ip link add name gre0 up type gre [...] dev eth1
-> ip link add name gre1 up type gre [...] dev eth2
-> 
-> The "physical device" can be any interface in the VRF, not necessarily
-> eth{1,2}.
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
-Hello,
-
-Thanks for that suggestion.
-
-I'm trying to implement this, but not having much luck.  My current approach
-is trying to put gre0 in one VRF, attached to a VETH device in a different VRF.
-
-Would you expect that to work?
-
-And also, is there any way to delete a gre netdev?  ip link delete gre0 doesn't
-complain, and doesn't work.
-
-Thanks,
-Ben
-
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
