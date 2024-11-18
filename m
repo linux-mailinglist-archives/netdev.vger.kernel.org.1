@@ -1,854 +1,108 @@
-Return-Path: <netdev+bounces-145775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 773709D0B42
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:55:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E18F69D0B50
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D6E7B228AB
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 08:55:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 316F52827C5
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D6F188CDC;
-	Mon, 18 Nov 2024 08:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09978148FF6;
+	Mon, 18 Nov 2024 09:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kb3sBtyE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAB5188014
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 08:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E939D2110E
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 09:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731920063; cv=none; b=plKROToetOzuIyp982s3i/QtiovufX0tbVVHbZiciHCKdqpoPaCxTFg5+d4169iWp825h7AchBuVQyS7VWwSj+9WvyQJ2kq6kLSeDthldEgtcrudVRaxYRx2IuyJWr7fM0Y8C8KW/1u0iUyd9pidkBajckhHh2oiO2OZ0cLo9yM=
+	t=1731920444; cv=none; b=cMETMPTUxQBgX24cfLIynEqRvbr02IFy2Wqn8n6PBllE6RzwkO2Zkl67XD7PPkNXtyidWp2QYwcIxA4mezqTzZDaGM6qO881JQDdQyGEFE4wgsbxN3tP6zK0EzNDc5N+r0lRK64wPRQ7p2ezQQFDiPYhAXq6MmoiTgc2P2Vb1bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731920063; c=relaxed/simple;
-	bh=OLoSIgvibzcqICM5zV38L9wYfZuQ6AFPW9EK6qeHVqI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sXfcgm5jWfl3Jb+BTA6pUPRZtL9n7ZCWM9BqHetvi9Jx+AULW13Ct11y44ShsiUF8mVqvMZkwO9s/6jP4TyySicadE7wn50ERyrb/oxrDQv1tk43CIOykIC8WyQZFa6vAg9gOj2XP8O7y9aBFbMN+i485+NLhhppeo9fohIRa9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a5b2ec15a9so17407705ab.3
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 00:54:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731920060; x=1732524860;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MM/AMVgpJsoR0NkR5uLiO7VA9jKn8GQFkweduVpAl7Y=;
-        b=g7oKbTXn8LNG1R5BhDrO/kWlbXMwtbKIT/IGqByp/Dx6PIH8/LX0BkxBEta4sSJftk
-         UWqKJxHg/vEgAGj5TJeVZE9S2eSE7fFo1joP3zmjAcdpDswPJlblpipf3MTEEExEPSkl
-         7QxOhX1C3hgnsdygQ7ZIWK3i99WVyHtL9TEN6Ptq/UFpJ9nKI3iKHQau0CatFerZEib5
-         XKAwT1BXioVkobWtx3TIpCGi+PdYDm7M2GR+VpsJjjLp5ShepwL+Dp2L2gBiYt3vMEdB
-         yWtaoUT/c4H7+vzubSQDm85k83VqnXY3v/4iTG/AlXWuQ969rriGJTjyWaxXUFfmPeFT
-         EvOw==
-X-Forwarded-Encrypted: i=1; AJvYcCXrV7hOH3XELgi3KdduK30uePXeFdaXTSL0izHmM74qON/D/UW9c8ONEFO+dKGYxvHu+YnnXn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFF5+acV/qjq2aZ7LmJ1ut2c84mLV9Durd8x1JQYuz/XkJZz+6
-	fhIjHhMkpX9qXkXc/nBOWTM0YW7dI6/s4q6ZPQTwRtT/tQSvcFtMpJwdGcu/1RjOueEaUcwOZgY
-	OEESGKJaQP0qh0egblaGZH5YCEkN51Ff2sbUPGD5otcEyapvkBAvk+QQ=
-X-Google-Smtp-Source: AGHT+IGKtOWEzAwrP5czfnV2ERuGXwbcv0dE1GCO1KEWTlwmVcKNfDfFpcCH6l9GciKEzMaigDs/kta8rjnJu3wq15Bqn34BHXl4
+	s=arc-20240116; t=1731920444; c=relaxed/simple;
+	bh=OX4xRIdK49sRmIqTk1uovx4zGNvomeZS27VLhEI7gNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TiaD9MJodHrPSZgJOElDuiI49pP5JfkxfiefQzngbHSSCFC7TVqZswhvo+VUhfiy+rGbYDZF/JODC4GMahARETW8KsRXD9+fKMRgK/lnZSAjTJQgSci/h+X7L2sIZyxDifMJ4YGDJNe51dZx6ZkoYNkGCfl4yLzITHKl6+c/NbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kb3sBtyE; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D91321140222;
+	Mon, 18 Nov 2024 04:00:41 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Mon, 18 Nov 2024 04:00:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1731920441; x=1732006841; bh=5fC/Pq5ZuBb6DF3/GCNWrhgYuNNgmF8cm5w
+	99GYk0mk=; b=kb3sBtyEURUBuTZfFgGlwRrE4J+Htr5iMWXIwGAleuhzh1SKc4q
+	HeG9Wh/QTNgDLVXwtafgkrzjSVW1DvTsv5dS2YgsM8UUfL0qR1uIopWJ+J/iOUtS
+	GofLVn51icyoy7MbWMMBTrG9GADF0kSSpQd2Y86+DAaSuizFsinFx5/wWPJCSG1i
+	ZeFeDVYt53PZHHXM3EUooQNHvt0/25MtKtBW7WdEwhh97hoWfPDD9HslXfTEGP9t
+	WTj1OAc6AZcap9CXUYIXqto839gMd0HQ66VL7B7/W7JULrrTi+GOqZuU2jDhqmh2
+	YxtEQcYqpvXHsnuv6vVWxiMPdZ1JQVq+vrQ==
+X-ME-Sender: <xms:OQI7Z0CQLYYVPnT_tKI9mYfYsf-Ig3uV6sdNVuSnrqMwqtvQyQkYIA>
+    <xme:OQI7Z2gH9tP8dreYtJwNpKgmtvjwBE9t6eWveT4xwh6-Pb67zxzRvKfPMxRHzPM_C
+    Kk29-l6Vs28eIQ>
+X-ME-Received: <xmr:OQI7Z3nvqEVLD9Wbwlyk2Z5kPHptJN63gL17pDR1dto3YlW053ajN0ZOinej>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgdduvdeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
+    hrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieef
+    gfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthht
+    ohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepghhrvggvrghrsgestggrnh
+    guvghlrghtvggthhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghr
+    nhgvlhdrohhrgh
+X-ME-Proxy: <xmx:OQI7Z6wYhGbCFLCZI4gsMzTGojqkBMWr6HPPfSWrS1zpA191TVOVyA>
+    <xmx:OQI7Z5TNPHe4ryi6FNUiaI90hFk7yd2FnO8ESkBaDJ025UwDe0a41Q>
+    <xmx:OQI7Z1Yc7cLni9p6sYBnQRX9NdSWdWM5aSrvlUzu9vbVLmmyEHD4SA>
+    <xmx:OQI7ZyTmTyz9tw8XWQMYhesH15CoCNzobRc6EuyMXVgJGMCHnZ7fBA>
+    <xmx:OQI7Z4INjcK-JJCXRTs1K4IWBFLQbFxQIINvb14WaEyVu0q4n0s41bS7>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 18 Nov 2024 04:00:40 -0500 (EST)
+Date: Mon, 18 Nov 2024 11:00:37 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Ben Greear <greearb@candelatech.com>
+Cc: netdev <netdev@vger.kernel.org>
+Subject: Re: GRE tunnels bound to VRF
+Message-ID: <ZzsCNUN1vl01uZcX@shredder>
+References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1feb:b0:3a7:1bd9:ec46 with SMTP id
- e9e14a558f8ab-3a747f2c3d1mr99697775ab.0.1731920060357; Mon, 18 Nov 2024
- 00:54:20 -0800 (PST)
-Date: Mon, 18 Nov 2024 00:54:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <673b00bc.050a0220.87769.0027.GAE@google.com>
-Subject: [syzbot] [wireless?] INFO: rcu detected stall in cfg80211_wiphy_work (2)
-From: syzbot <syzbot+858514d213c2ff9b671e@syzkaller.appspotmail.com>
-To: gregkh@linuxfoundation.org, johannes@sipsolutions.net, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	marcello.bauer@9elements.com, netdev@vger.kernel.org, rafael@kernel.org, 
-	stern@rowland.harvard.edu, sylv@sylv.io, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
 
-Hello,
+On Sun, Nov 17, 2024 at 10:40:18AM -0800, Ben Greear wrote:
+> Hello,
+> 
+> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
+> underlying traffic?
+> 
+> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
+> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
+> gre interfaces and have that go out whatever the ethernet VRFs route to...
 
-syzbot found the following issue on:
+You can set eth{1,2} as the "physical device" of gre{0,1}
 
-HEAD commit:    f1b785f4c787 Merge tag 'for_linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=115c6ce8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=327b6119dd928cbc
-dashboard link: https://syzkaller.appspot.com/bug?extid=858514d213c2ff9b671e
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136594c0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1691c130580000
+ip link add name gre0 up type gre [...] dev eth1
+ip link add name gre1 up type gre [...] dev eth2
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2eb65d2a03c1/disk-f1b785f4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/70c538f32a8e/vmlinux-f1b785f4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/79fc36f9a44b/bzImage-f1b785f4.xz
-
-The issue was bisected to:
-
-commit a7f3813e589fd8e2834720829a47b5eb914a9afe
-Author: Marcello Sylvester Bauer <sylv@sylv.io>
-Date:   Thu Apr 11 14:51:28 2024 +0000
-
-    usb: gadget: dummy_hcd: Switch to hrtimer transfer scheduler
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a8e1a7980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13a8e1a7980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15a8e1a7980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+858514d213c2ff9b671e@syzkaller.appspotmail.com
-Fixes: a7f3813e589f ("usb: gadget: dummy_hcd: Switch to hrtimer transfer scheduler")
-
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	(detected by 0, t=10503 jiffies, g=8301, q=11 ncpus=2)
-rcu: All QSes seen, last rcu_preempt kthread activity 10503 (4294968050-4294957547), jiffies_till_next_fqs=1, root ->qsmask 0x0
-rcu: rcu_preempt kthread starved for 10503 jiffies! g8301 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task    
- stack:28416 pid:17    tgid:17    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5328 [inline]
- __schedule+0xe55/0x5740 kernel/sched/core.c:6693
- __schedule_loop kernel/sched/core.c:6770 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6785
- schedule_timeout+0x136/0x2a0 kernel/time/timer.c:2615
- rcu_gp_fqs_loop+0x1eb/0xb00 kernel/rcu/tree.c:2045
- rcu_gp_kthread+0x271/0x380 kernel/rcu/tree.c:2247
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 0 UID: 0 PID: 1335 Comm: kworker/u8:6 Not tainted 6.12.0-rc7-syzkaller-00042-gf1b785f4c787 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Workqueue: events_unbound cfg80211_wiphy_work
-
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x31/0x80 kernel/locking/spinlock.c:194
-Code: f5 53 48 8b 74 24 10 48 89 fb 48 83 c7 18 e8 66 a2 44 f6 48 89 df e8 7e 1f 45 f6 f7 c5 00 02 00 00 75 23 9c 58 f6 c4 02 75 37 <bf> 01 00 00 00 e8 95 28 36 f6 65 8b 05 a6 e1 dd 74 85 c0 74 16 5b
-RSP: 0018:ffffc90000007bd0 EFLAGS: 00000246
-
-RAX: 0000000000000002 RBX: ffff888144be4000 RCX: 1ffffffff2dcb1b0
-RDX: 0000000000000000 RSI: ffffffff8b6ccfc0 RDI: ffffffff8bd1b3c0
-RBP: 0000000000000246 R08: 0000000000000001 R09: fffffbfff2dc5d95
-R10: ffffffff96e2ecaf R11: 0000000000000000 R12: ffff888144fa4468
-R13: ffff888144fa4470 R14: ffff888144fa4418 R15: 1ffff92000000fad
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffe945a6f48 CR3: 000000000df7c000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
- dummy_timer+0x1e49/0x3930 drivers/usb/gadget/udc/dummy_hcd.c:2010
- __run_hrtimer kernel/time/hrtimer.c:1691 [inline]
- __hrtimer_run_queues+0x20a/0xae0 kernel/time/hrtimer.c:1755
- hrtimer_run_softirq+0x17d/0x350 kernel/time/hrtimer.c:1772
- handle_softirqs+0x213/0x8f0 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu kernel/softirq.c:637 [inline]
- irq_exit_rcu+0xbb/0x120 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0xa4/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:__asan_memset+0x18/0x50 mm/kasan/shadow.c:84
-Code: 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 41 54 41 89 f4 55 48 89 d5 ba 01 00 00 00 53 48 8b 4c 24 18 <48> 89 ee 48 89 fb e8 bd f0 ff ff 84 c0 74 12 48 89 ea 44 89 e6 48
-RSP: 0018:ffffc900048ef7c0 EFLAGS: 00000246
-
-RAX: 0000000000000000 RBX: ffff88806de639e8 RCX: ffffffff8a9f8936
-RDX: 0000000000000001 RSI: 000000000000007f RDI: ffff88806de639f0
-RBP: 0000000000000005 R08: 0000000000000005 R09: 0000000000000002
-R10: 0000000000000001 R11: 0000000000000052 R12: 000000000000007f
-R13: ffff88806de63800 R14: 0000000000000028 R15: ffff88806e1ef950
- ieee80211_clear_tpe+0x166/0x290 net/mac80211/util.c:4446
- ieee802_11_parse_elems_full+0x205/0x1680 net/mac80211/parse.c:971
- ieee802_11_parse_elems_crc net/mac80211/ieee80211_i.h:2385 [inline]
- ieee802_11_parse_elems net/mac80211/ieee80211_i.h:2392 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1575 [inline]
- ieee80211_ibss_rx_queued_mgmt+0xc4f/0x2f40 net/mac80211/ibss.c:1606
- ieee80211_iface_process_skb net/mac80211/iface.c:1603 [inline]
- ieee80211_iface_work+0xc0b/0xf00 net/mac80211/iface.c:1657
- cfg80211_wiphy_work+0x3d9/0x550 net/wireless/core.c:440
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_ctl_callback - urb status -71
-yealink 2-1:36.0: urb_irq_callback - urb status -71
-yealink 2-1:36.0: unexpected response 0
-yealink 2-1:36.0: urb_irq_callback - usb_submit_urb failed -19
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-yealink 1-1:36.0: urb_ctl_callback - urb status -71
-yealink 1-1:36.0: urb_irq_callback - urb status -71
-yealink 1-1:36.0: unexpected response 0
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+The "physical device" can be any interface in the VRF, not necessarily
+eth{1,2}.
 
