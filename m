@@ -1,125 +1,127 @@
-Return-Path: <netdev+bounces-145863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F01D9D12F2
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:28:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEDC9D1334
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:37:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B60A1F21A5B
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:28:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C136B240BB
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722031A0B0C;
-	Mon, 18 Nov 2024 14:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D220819FA92;
+	Mon, 18 Nov 2024 14:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b="DqaK7Ec+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oafBZTBN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83E0DDC1
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 14:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35E719644B;
+	Mon, 18 Nov 2024 14:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731940117; cv=none; b=IeFx2aw+iTQBy7nXO+Rs09fJm7UsTryl4Dm9/pu2C9D4vIwZnCeAio5371hIL871iTsoNDL9LSOND6pAmP9fq6p2jJm7ZTjAyVSJZeRNEp8MCzoR6nzG09LBwAlBCCQpcU8oFEldFCc9J+DDG+ItdC6CFkqlYkEEQ9i30i9TYmo=
+	t=1731940238; cv=none; b=hofyNgxrROt1x0htc9i2EdetaHKIt3IRzryqKUMEJmJ10czPTbYt1Kg06UAWi4od49r6CPFN2HWO8BZiJDGdQ0rnWbGHXylGw8HgdUoj5F++vTuafvhGzUCKofhHUV2NWdJ75biNb4+Kr6uMcYSbIF+Ig6PPUmDTJ3dWTwh3bEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731940117; c=relaxed/simple;
-	bh=wdVLGAc1XWsSG5qAPwHUk3JBsnbEkFb8CKQE2ZmKQ9k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TWRPgk84Y62zlBra0KQsmXY0NV/tXNj2o1Pjm23WveDCjE5AUFxn55g3icoVo0LHHSd8p4BmsqwzJApneR2RPHe9PmVsV4Eva/egCc23biG3RGLsO+won7Fpe9HISv/SFvERlHLdEoejTkmgzOg5sdXeTuacbnVMf0xXlQ8Yb+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in; spf=pass smtp.mailfrom=iiitd.ac.in; dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b=DqaK7Ec+; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7206304f93aso1574459b3a.0
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 06:28:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=iiitd.ac.in; s=google; t=1731940115; x=1732544915; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IJ/OAdBG5AB8YI4ghzNAiU9cnKHlbBpEeuCaXgo24T0=;
-        b=DqaK7Ec+QPGHa9mZI8jSXmw36b84sEyxgiJHXIb0mxWunVs4sHZsF7zovfcCbg+6ts
-         2qjQG6oniC9lf2bS36I+MH4GIHZbd/436ZM4G6rMJ1OsSQya62CbsbkEeoL/t1umk9Cz
-         mQSZrum4UqIgPU3ndJhh2CPYa3+W3dzVNtVqw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731940115; x=1732544915;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IJ/OAdBG5AB8YI4ghzNAiU9cnKHlbBpEeuCaXgo24T0=;
-        b=iV9TaUMApx38U8abtSDUetxt8z1m8qmMrMqIEfQQdkM2t9TcRp5nGEhHO/evuwmGMf
-         SKYm8xzHa6+4Y3e8W1M9UNQ1fvCzRxjZ6kBdE9aSFbvLWqNyfLhKTteEY53tIHHtzCux
-         wckW2xLgzMeg0o9y5EsXkkTEZ6kZ+w9grdexdmC3HW51VxzWMoNKyvYBMnJ8Q1+xaDMb
-         I99PCvvR1rcS0viQc3KsoHrHngj0PL6yElVr861qix+D7g1hPV9zmRf4YYvyVnnhpZGn
-         R4kxWCQiscRwQD8w4ogxY7+sBks2BvnNkbgPe7JNG7UGiJ6Vv2BnWbhfevZM1YgPsLEW
-         GjnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVjPYHc8gqSx7ox9tpCaDSunEgqINiF98+4Qq1zuNzt8+2q3LaYdV2eg7d7ZLznHeHKIsfL38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwycgwMlnSb18YJ6c7CLtdOXnE7LQ2veIuUbV9igp1gTPlO2iJ6
-	G6/pvRv0/ES6JhwUOtdJayIWnoW7QwJz5RS8MvURKtc9klHPtA+Pj4+gIL+p5P4=
-X-Google-Smtp-Source: AGHT+IGmrSwC5OOr5CGGm+qfWv1p8qUdKfi5IPTRczbzTJTNgxVyziglqADNl9EoIejb73uMCQdBzg==
-X-Received: by 2002:a05:6a00:1488:b0:71e:104d:6316 with SMTP id d2e1a72fcca58-7247709d4c1mr15508159b3a.21.1731940115150;
-        Mon, 18 Nov 2024 06:28:35 -0800 (PST)
-Received: from fedora ([103.3.204.126])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724771c0d37sm6431267b3a.104.2024.11.18.06.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 06:28:34 -0800 (PST)
-Date: Mon, 18 Nov 2024 19:58:24 +0530
-From: Manas <manas18244@iiitd.ac.in>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qt2025: simplify Result<()> in probe
+	s=arc-20240116; t=1731940238; c=relaxed/simple;
+	bh=FXq5Cf7VHzuwBMR/MOh2YNWTogYHGhhe16mnSSQYCcA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mbvR1ylA67YAjkn3y+D2Q6Vg0U0XSTC6sCaSJ5/0Yri9tEI4fqE/CZ3H5jHDyAdLGfbFmZiKZs1BjzUZ3H0yBa0rF3yDzVaTFDcpXEdd3WQLDn/M4NHEIQeahVbm7/mhkkNe0YVL13A5sUptKnX++biRU7BLyUVtCDjSRFGut3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oafBZTBN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 29677C4CED6;
+	Mon, 18 Nov 2024 14:30:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731940238;
+	bh=FXq5Cf7VHzuwBMR/MOh2YNWTogYHGhhe16mnSSQYCcA=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=oafBZTBN6oM83s6qc8zTXIdfC/ZRGXKP1YY4TvT/xg81NyJMlfISNvcbl3j7UO/Ri
+	 iX2kpv40Mryg+f744vnFLgBSIKUi2TzFHtUiLy+nfcI22ExsJof9hl7J7UA/DMA6AE
+	 fWiVPU6qR4T4jYbdciQVXPOcJ2yOPKvG0rMDcXu9wUa8t+Npe+XOxbDXX2AxRi0WgJ
+	 CIBkG7auw+BaCS/0USFugCc7PMEOrp82zY3ZQ56R0xhIbYMKBu9rGEz+bqvQ3xRZwW
+	 rAdEJFbwZFFhoFyDdSEbXsKi4oSKhxkc7YsnEYpnm6ulbM8gZLnw4JjlQYzlpRLeJB
+	 A86ii8i47bRyg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15317D4921D;
+	Mon, 18 Nov 2024 14:30:38 +0000 (UTC)
+From: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
+Date: Mon, 18 Nov 2024 20:00:36 +0530
+Subject: [PATCH net-next v2] net: phy: qt2025: simplify Result<()> in probe
  return
-Message-ID: <otjcobbaclrdv4uz3oikh5gdtusvxdoczopgfnf6erz5kdlsto@mgpf4mne3uqb>
-References: <20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in>
- <2f3b1fc2-70b1-4ffe-b41c-09b52ce21277@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <2f3b1fc2-70b1-4ffe-b41c-09b52ce21277@lunn.ch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241118-simplify-result-qt2025-v2-1-af1bcff5d101@iiitd.ac.in>
+X-B4-Tracking: v=1; b=H4sIAItPO2cC/4WNQQ6CMBBFr0Jm7RCnSgRX3sOwgHYqk2DBthII6
+ d1tuIDLl5f//g6BvXCAe7GD50WCTC6DOhWgh869GMVkBnVWVyKqMch7HsVu6Dl8x4ifmFWF1Pd
+ NY2quLqwhj2fPVtYj/ATHER2vEdpsBglx8tvxuNDh/8UXQkKrTKPZ0s3q7iEi0ZSdLsVBm1L6A
+ TNXe4bIAAAA
+X-Change-ID: 20241118-simplify-result-qt2025-1bb99d8e53ec
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>, 
+ Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Miguel Ojeda <ojeda@kernel.org>, Manas <manas18244@iiitd.ac.in>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1731940236; l=1498;
+ i=manas18244@iiitd.ac.in; s=20240813; h=from:subject:message-id;
+ bh=aNU3+RJ8lBcv7tT/MtgstLYhDl/ERX/hXonU5AJGIRw=;
+ b=aKxqt8ceYzbm2O7JpvqJGoSp1qYHMsTzRsrMTB8+OS1LGL00Tyy6twRxjXiO4RBEuY8TARKEm
+ YjN5JzMkyPvDkEbaNYjUkvGjmzeQLN61vIPio3EC07kOSA6oeNMAxDO
+X-Developer-Key: i=manas18244@iiitd.ac.in; a=ed25519;
+ pk=pXNEDKd3qTkQe9vsJtBGT9hrfOR7Dph1rfX5ig2AAoM=
+X-Endpoint-Received: by B4 Relay for manas18244@iiitd.ac.in/20240813 with
+ auth_id=196
+X-Original-From: Manas <manas18244@iiitd.ac.in>
+Reply-To: manas18244@iiitd.ac.in
 
-On 18.11.2024 15:15, Andrew Lunn wrote:
->On Mon, Nov 18, 2024 at 06:39:34PM +0530, Manas via B4 Relay wrote:
->> From: Manas <manas18244@iiitd.ac.in>
->>
->> probe returns a `Result<()>` type, which can be simplified as `Result`,
->> due to default type parameters being unit `()` and `Error` types. This
->> maintains a consistent usage of `Result` throughout codebase.
->>
->> Signed-off-by: Manas <manas18244@iiitd.ac.in>
->
->Miguel has already pointed out, this is probably not sufficient for a
->signed-off-by: You need a real name here, in order to keep the lawyers happy.
->
-Hi Andrew, I did clarify that "Manas" is my real name, (as in what the official
-documents have). It is not a pseudonym. I am unsure if I am missing something
-here.
+From: Manas <manas18244@iiitd.ac.in>
 
->Also, each subsystem has its own way of doing things. Please take a
->read of:
->
->https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->
->    Andrew
->
->---
->pw-bot: cr
-I did take a look at the subsystem docs. I added target tree `net-next` and
-added all prefixes. I thought `Fixes:` tag wouldn't be appropriate here.
+probe returns a `Result<()>` type, which can be simplified as `Result`,
+due to default type parameters being unit `()` and `Error` types. This
+maintains a consistent usage of `Result` throughout codebase.
 
-I missed the Link: and Suggested by: tags as I was moving from v1. I will add
-those.
+Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+Link: https://github.com/Rust-for-Linux/linux/issues/1128
+Signed-off-by: Manas <manas18244@iiitd.ac.in>
+---
+Changes in v2:
+- Add Link: and Suggested-by: tags
+- Link to v1: https://lore.kernel.org/r/20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in
+---
+ drivers/net/phy/qt2025.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 1ab065798175b4f54c5f2fd6c871ba2942c48bf1..25c12a02baa255d3d5952e729a890b3ccfe78606 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -39,7 +39,7 @@ impl Driver for PhyQT2025 {
+     const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
+     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
+ 
+-    fn probe(dev: &mut phy::Device) -> Result<()> {
++    fn probe(dev: &mut phy::Device) -> Result {
+         // Check the hardware revision code.
+         // Only 0x3b works with this driver and firmware.
+         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+
+---
+base-commit: 8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b
+change-id: 20241118-simplify-result-qt2025-1bb99d8e53ec
+
+Best regards,
 -- 
-Manas
+Manas <manas18244@iiitd.ac.in>
+
+
 
