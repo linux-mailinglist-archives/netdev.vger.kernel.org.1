@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-145801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080809D0F66
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:15:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63DA19D0F68
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8D3D1F226E4
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:15:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A2E928151B
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3384B194A63;
-	Mon, 18 Nov 2024 11:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36007194A63;
+	Mon, 18 Nov 2024 11:15:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BE21EA73;
-	Mon, 18 Nov 2024 11:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531C019883C;
+	Mon, 18 Nov 2024 11:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731928530; cv=none; b=IwkxLUxPNfyYnlJYIX8wC9jIt+wmHbMl6zTVg3Sc6YuLEYBpbYkaM6YrHW7Zu7oP1IvKXh1AhGF16xy2czwX5OeirN67Y0gdlZiw9V9mlECDmBL00eNDdU/wCj6eu3PmBKnO5FbQRiIVcqK1qBK8A6SZeKIqODn0VnFhIj10Wi4=
+	t=1731928532; cv=none; b=LMlrxOr8zXtY6Er85Z/TqAidlyi2WE7C24MRyJ3S9qpDjRAp7gpjcTigqCLFelLSYEPVd/vKK9YS+ZKck450V85VO4ST2t5fUuawr1RKu49IL5ydREEiYIbgJew4h1sufUjok8K20LxiuDYtOZToTOn/bufkrJ+0XHNXF+DWhfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731928530; c=relaxed/simple;
-	bh=Fm7X1rCptseYOQiiHdn+GV/CEfNvRsjcmulihtwd6HY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=svtcLmE7MdTdqiBq1N3P8Sp24MWT1dF9BjWg81ijrKFMTtlHPtS+pkMHZ+Us6v2mMtvmCloiT10MClofxqEPNX9oUSY002ewg+GyGFB+TkIIYLseyzk5QUQDCexcZbliZNurrptL5T3fg3fq3sFgdTSVXvAN5y3Ez8kF7XWmX6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
+	s=arc-20240116; t=1731928532; c=relaxed/simple;
+	bh=jNsLMGobQevrogIk04wHrOqqXljj734U/1qK3g+NLEc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=QiKo7CeuGEtKLV6jDjJo1+R6g3Cbwc6uO5c/CmA66EbwP+4aK9B0OrBwdm75OOU5RXKLFcTzLYhbju23inDIzlDt05ye9MF/i0wEGqrvc9R/eR7NrTCZK+NDo8a0ERmcYnfYez6vfihyiqQJyK4ONZ+IThq06SJXEa3EYtN215I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5cfc19065ffso1401449a12.3;
-        Mon, 18 Nov 2024 03:15:28 -0800 (PST)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53da353eb2eso2406752e87.3;
+        Mon, 18 Nov 2024 03:15:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731928526; x=1732533326;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Wc8nCj4TtWo7FA9cSZQ0Nu/OW7rY/eT8fw4KumJRGo4=;
-        b=RTYnz8ReIE4E5C6UhHepGwHvlpHqF59MTQ4I1TiRB9N4WydCRiLWm48kjEBw8Oc6jT
-         StKnDXD88xvXcb/XGet6q7cAxolYFupBKMIzYy9N1UEqxvhESnxnOr46qMPLAi2EygoE
-         5jrevyXT72mRnls8ijuhC7E1az9HZyjtWO/u1bL4Z6hFeTp9fBgzH4b0SLHE7cllBbWl
-         A5Z5joEUCXQMJ3duGUYe5vQYvCGMR9VROgjWg+f/GbrcKX3lzos7p70Bez/ZU8Jy28vB
-         XBFHUa6gjM98cSn2Yi3I5kki6DuKucDG2duDvJlEJRL21UTSt1E142SYpmeHH1jJ6WYg
-         Ah0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUkssM7TRfjgQz00ziTIVDQ/pp6BBKyo3g8URhxTcPq6w/Dlpwt/Ho1NP7pPvl/Lmvl1+F3K7yTpoial8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHIrCaxVnDFmG8oVpgRsbolCl917BWmpC+4JIUViyvtw8jdndm
-	5+7V8/SlEaPS72l4+ILGL14UztrMXudyYws3mr9FYYJI/0/sXDjxTGyuFQ==
-X-Google-Smtp-Source: AGHT+IH6MC6KGNivA5kwCnNlP05Ibmy/yfYeZZQl/Oq42vvjhyBR3dzRoLPk+kA0NewKoZetw+kNmA==
-X-Received: by 2002:a17:907:31c2:b0:a9e:c4d2:fff0 with SMTP id a640c23a62f3a-aa483527166mr844880166b.45.1731928526328;
-        Mon, 18 Nov 2024 03:15:26 -0800 (PST)
-Received: from localhost (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df779afsm526330666b.85.2024.11.18.03.15.25
+        d=1e100.net; s=20230601; t=1731928528; x=1732533328;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PYNQOUHaLoGGDTgK+d85aIvTAPV1PsbIBUKLL0iAuzA=;
+        b=oMvVyewIVrmlf+suAL9CKcmKkh8BXvSM7FATU39BZa1q1HcHoU/owvUl/6phvQqREz
+         QsbCGNKpvJnMERLPMUIHXezd7gMGjaXJuwPULusZpE5hsoDfsr/WvL2NsMOK9BPpldn/
+         nwqvnnuvPNUtEwF+Uag/3ThgOE4FkKm2kS5wlv99PyNY9/aW/rTn0UXrg9XupbUiOL7n
+         xlM9sx/Hvyowz02fTyhxF+3i+UT05b9OMPDoXE77/dJXpsvvaXJIQqMhBoSb7QprC0fS
+         nzUjhMbiRjtOTxxysRinkbNdckUlgDiG5b/+vwqqPmtq1yDORUVXDhP/tb1BlQw+VkPw
+         N8Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCVGhFPUH4WOAfHsbNWbN6IBRDKkvmVHijdvKMk9qrftrZMxfWxXq8SFcBCJZEFGU7dizxhOcL9CFZNttlM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO8f2fEaDtWptvesUaCHTt537FMmOezZLxIM68Wc0nz4kHO1Xc
+	dqXOlxWuR6Dk1m0pg0W9wHQgQFgmkqTyhxGMnu3Vaz/MGUJ0a+53QgUgdg==
+X-Google-Smtp-Source: AGHT+IGOCnMGMQBO/OIYbCwLEh2a6L9UjxxaAI+Br6/K9J5lua3Oko5YEGdX8NkbWrAFC8wEoIx2Mg==
+X-Received: by 2002:a05:6512:3e29:b0:53d:a86e:4200 with SMTP id 2adb3069b0e04-53dab2a634emr6422698e87.21.1731928527836;
+        Mon, 18 Nov 2024 03:15:27 -0800 (PST)
+Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df26c84sm530075566b.35.2024.11.18.03.15.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 03:15:25 -0800 (PST)
+        Mon, 18 Nov 2024 03:15:27 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-Subject: [PATCH net 0/2] netpoll: Use RCU primitives for npinfo pointer
- access
-Date: Mon, 18 Nov 2024 03:15:16 -0800
-Message-Id: <20241118-netpoll_rcu-v1-0-a1888dcb4a02@debian.org>
+Date: Mon, 18 Nov 2024 03:15:17 -0800
+Subject: [PATCH net 1/2] netpoll: Use rcu_access_pointer() in
+ __netpoll_setup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,10 +65,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAMQhO2cC/x3MawpAQBQG0K3cvt+m3MkjsxVJHhe3NDSDlOxdO
- Qs4D6IElQhHD4JcGnXzcMQJYVg6P4vREY5gU5sxc268HPu2rm0YTiM926rImfuSkRD2IJPe/1b
- Dy4HmfT/WCmIAYgAAAA==
-X-Change-ID: 20241115-netpoll_rcu-eb1296511b71
+Message-Id: <20241118-netpoll_rcu-v1-1-a1888dcb4a02@debian.org>
+References: <20241118-netpoll_rcu-v1-0-a1888dcb4a02@debian.org>
+In-Reply-To: <20241118-netpoll_rcu-v1-0-a1888dcb4a02@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -77,61 +76,54 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>, paulmck@kernel.org
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1263; i=leitao@debian.org;
- h=from:subject:message-id; bh=Fm7X1rCptseYOQiiHdn+GV/CEfNvRsjcmulihtwd6HY=;
- b=owEBbAKT/ZANAwAIATWjk5/8eHdtAcsmYgBnOyHMErtDbbsgRv7aBSysHxC9Yoro18RyV4IKP
- I3b2qvmEv2JAjIEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzshzAAKCRA1o5Of/Hh3
- bdc6D/dZwS2S3pxXkN5wfeusbymKpKl6epvnYa/pl3WJRSbh5e4kqNE+NG2HxoUD3QO29EqbCSk
- e0zVZUCj7mEYJg5OnwcEtByPsp+xYobSXomdM9dOy3CtVXfcnw58ztjukGItv4CtyJATWqNvGV7
- 5BeTwI5anP65Rm84SD05QbK+7hw8SM8GHG66659uASymBzLX0MSMQUpy4kyTX0L/G1J2xdCm5YD
- VqhKefrmZjqayoAmBUoSQN1DIMr8wrcODxGADdUB9a3W7qmEmpf99Cgux89DB6KvUa3p1pASsC6
- 6lpISEzC2krM3hNr/ddPOhJIgg+3/bfoST/F1yUE5eXQx078sPa32MN/5xmCuNMh5ks/aHy3KI5
- LVAS5FL6FaxGUC5yj/vCQ1P9DFy/InpkzZ8OyWcgAGW+325af713+h5unzE8iv2dzFjes1s8orR
- FUb2HZKBf3Nk2ZZszuAAuZ8N6xNMLodsaERx1ZEQ4X/tGkx5jVSa2S1tw3GSyoIVAmFKKr+fKN+
- /NZPgi50k4+iVGUmnHMmqyyw/BSFirnEhY6eZJskZe7SGT2IvSpwYGUQskIhVB6HsoMJSuG20Dz
- U5JPufRYbBCKpXMdudaOfnNYmkQr4zDMQHDNcdXVmUT29DNsoSp7MyrIiFWbD8uiBTCIYGQd8lX
- X8VjDgf/o9oFj
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1191; i=leitao@debian.org;
+ h=from:subject:message-id; bh=jNsLMGobQevrogIk04wHrOqqXljj734U/1qK3g+NLEc=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnOyHMWilra8auAUEEo3NWZFkzLTM0n7FpaSkP/
+ LtYioZp9LCJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZzshzAAKCRA1o5Of/Hh3
+ bXALD/94D1ThBLTcl+Chy4kO6shM14UmOqPmDNQMkP4n7ZVQtjZevVPkALImr3KcYVQ1WFMvBEU
+ LqAA6NXOjtHz6TqgyzFIZQaD8BfkPfWVB82yfatJ7UEekTBeU3YxYTJBal3kX73tzjQxswyPRER
+ CtsDUkzuyA4JIf/oMavgoSlDSfeywJCfWEwGzj7qIj6I4QzXR5MpQYMVbPxONAIGCp0CjtOQ3Ll
+ D7p8otN4ePnVg8sgFs0twHMXfTG1XwaVno+lPm+g3LCE4WncoDRlUsjw6kwEaagwQDRqbh+ha6N
+ qOasHFgnAxenGmffttrDgttIRhlqZkmgc7o4vzks1ZVnMEQlxguTnZH3RS+ii6PxPWn6NXcDzJy
+ WRyj/xi2oiI0yg2T6olNZLK0yudOGvOAZuMb7JtpkIRBkqwnApsHS79JLNGmxK9jroEKYly+B0v
+ 4URhXbumrQ3/3GSamr+v/TSxzgLv0qjkYcEPMhBcEuVOkKvHAp6K7lNd4r2Cr8shIip9UT8KTig
+ dTjOBCoMTVgP/eD2Hk9cFH4b0e0eTcROxfAO/C1f+mwOjgUPtfczK4NMZ9xgfQBj+i/CX/lyIP6
+ e6HXxffhWyTtALoy8j7scQ8G6joktYex8Vhcdj2XZiIm6fHowy4fda6MSQuiYnxmtglizbKjGNZ
+ TP0oeKl3BKx5inA==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-The net_device->npinfo pointer is marked with __rcu, indicating it requires
-proper RCU access primitives:
+The ndev->npinfo pointer in __netpoll_setup() is RCU-protected but is being
+accessed directly for a NULL check. While no RCU read lock is held in this
+context, we should still use proper RCU primitives for consistency and
+correctness.
 
-  struct net_device {
-	...
-	struct netpoll_info __rcu *npinfo;
-	...
-  };
-
-Direct access to this pointer can lead to issues such as:
-- Compiler incorrectly caching/reusing stale pointer values
-- Missing memory ordering guarantees
-- Non-atomic pointer loads
-
-Replace direct NULL checks of npinfo with rcu_access_pointer(),
-which provides the necessary memory ordering guarantees without the
-overhead of a full RCU dereference, since we only need to verify
-if the pointer is NULL.
-
-In both cases, the RCU read lock is not held when the function is being
-called. I checked that by using lockdep_assert_in_rcu_read_lock(), and
-seeing the warning on both cases.
+Replace the direct NULL check with rcu_access_pointer(), which is the
+appropriate primitive when only checking for NULL without dereferencing
+the pointer. This function provides the necessary ordering guarantees
+without requiring RCU read-side protection.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes: 8fdd95ec162a ("netpoll: Allow netpoll_setup/cleanup recursion")
 ---
-Breno Leitao (2):
-      netpoll: Use rcu_access_pointer() in __netpoll_setup
-      netpoll: Use rcu_access_pointer() in netpoll_poll_lock
+ net/core/netpoll.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- include/linux/netpoll.h | 2 +-
- net/core/netpoll.c      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
----
-base-commit: 8ffade77b6337a8767fae9820d57d7a6413dd1a1
-change-id: 20241115-netpoll_rcu-eb1296511b71
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index aa49b92e9194babab17b2e039daf092a524c5b88..45fb60bc4803958eb07d4038028269fc0c19622e 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -626,7 +626,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+ 		goto out;
+ 	}
+ 
+-	if (!ndev->npinfo) {
++	if (!rcu_access_pointer(ndev->npinfo)) {
+ 		npinfo = kmalloc(sizeof(*npinfo), GFP_KERNEL);
+ 		if (!npinfo) {
+ 			err = -ENOMEM;
 
-Best regards,
 -- 
-Breno Leitao <leitao@debian.org>
+2.43.5
 
 
