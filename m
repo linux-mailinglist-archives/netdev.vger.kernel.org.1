@@ -1,120 +1,168 @@
-Return-Path: <netdev+bounces-145878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5063B9D138D
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:49:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB85A9D13C4
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBB9F1F22827
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:49:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82808B23A51
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68A21A0B00;
-	Mon, 18 Nov 2024 14:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77A11A9B26;
+	Mon, 18 Nov 2024 14:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ER1Zc8yg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ft2fTQVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8D3186E2F;
-	Mon, 18 Nov 2024 14:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB191A3A8A
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 14:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731941346; cv=none; b=CwPjg2+OYuV6ENb4YARAYBxHhz9KdvYdUZvbNsRdtAc9sLTjhYdIIA8/xClFQAkf78tuFVq6quDu9kIyUIkAk9ZxFgZZpD0tkOHgDYJUWfVaym8VgGFxD7zIuh5SzzMeK0UIVJXQ5K7DvdN1Oyt5CMEiBR9cVecm/OEuzXhI+i8=
+	t=1731941545; cv=none; b=F0W38kCiSW4e8AaXm7eo2BZp3RgoO8xP1hdEGVqsG1y6hz0ZGmgyPl4CKyimKZvBHrF/RkUe/xaS5kWjHgtyooMb6/ORhEktzbC8l1eHpl28vsMxb7NffF4zkxygABeu5uNLIx0/Vx8SRbjy1gEZzH5eOewnPaLT2axPFaf58k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731941346; c=relaxed/simple;
-	bh=jq2kdpRsEvipUj2yLaKB6TVHsx3WzL+SIjcjXghaeT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQgR+5+hc/2QiFnppXwrDBl/5LYW2qsDyG3+STo7CB1INB1dRR4qAJTe9Tl3KwKP7IHMiFU0MdN1vzdg8dW2qiMeTS7IY9hggF4hiuL7AjmER1PHSbmpz0FFkF6DY548eOQA9L1Oqy1MQrLjrUXeB4NeS5qyWo0l8naySAhdCf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ER1Zc8yg; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1731941545; c=relaxed/simple;
+	bh=V+cOxus+m4mto/XLwZ55NH/beRYUYG6PFXLvlgv9o7o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LQ7+CPJ2BiXasiElflxEMwONmlyGb8H0PYClDqrKCSJKTXlo8DBI9gcgkO+QKFjxMmWi7paF36L9sUvgfg47jzAbyMFEjt+BXAjL6mf4aaUoq4mlMXc9/iubFJkNKZdGkjBbjsG0WcDFMXFJVS1t4bhoqGgnbzkPBqb4SXScc3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ft2fTQVV; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43158124a54so2872425e9.3;
-        Mon, 18 Nov 2024 06:49:04 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-382442b7d9aso973255f8f.1
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 06:52:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731941343; x=1732546143; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sKPU7OueWbmOZ0vLDtsCLawk5Pg/j927rqgWt1B9QqA=;
-        b=ER1Zc8yglF4kpWG18MwRnydkbjt7Qwt9Ypc4GJvTerWWJXNMokslQ63ji9JICVSQE0
-         fqaRiO3SU7xv63rtJbC4N+VMJMAcwCf9ZCQGR+WsHm/Bqz1SGTI7+KEB8MuS7mx8xaWW
-         IxKhDCZRTR0EyNR+qBrx+yLrWDMkz1Zmb2105r1XBVXOyTbWIO4Rn6FdaAFUWMzkKcJE
-         CMaUXnRM9xHmj/IXx518uh7l15emc1xWkgHOMyTIDQp7O/r2iFLW2M3P7AjMwIjYg3gV
-         36Mzn53gOtgIpqKeiH208fzCK4qBVky+mlL5khiFZ8KClEb0YOqq9gmMTTb9STkz4vZZ
-         1vOg==
+        d=gmail.com; s=20230601; t=1731941542; x=1732546342; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rs5GnrU4nV8Cb5CVopjjXpHrH0KmJoeas3gG+FzG+Bs=;
+        b=ft2fTQVVn6amdRpuqjNzTWeNLyGkDn5WPR9x/ygBWngj6WAU/k44CNSPkTJ/e6+/Tk
+         a6d9cRz8qOtOUajPkArSkadBpya6ykjkP1Io8uxgogDqycb3Toxq7NGpUCwf5YgbYJ/j
+         +ShdQOIzv2LmzEz3tSbaI4O5U8vLKVKvxG2XwskaIEZnJC7Dl3nhmVkPVQQYv8Z7UaA6
+         ErTcoivnoLaD3fHE3WC0tnh6ZTpoyIz1cnw2vMhahoDkNY4TcY6LJgSbyB4TTYkj7RkO
+         O8pXgC3g7IJUy8yxlmgoEgZWLhxgDfe1voKTCv5EkssdderCXSCBQSIAP6XMrJUSbsc2
+         QNhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731941343; x=1732546143;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sKPU7OueWbmOZ0vLDtsCLawk5Pg/j927rqgWt1B9QqA=;
-        b=m5E8r/l+juzHzuwqtqjT6rz52AKk6aUDVfV3Nld0REhQwSTmKIKxXUkjZUzW+IS9Jk
-         M/eI8/Zp/kIOQvRoiz00wNeGhw3cWrCt6hQ0Mhzp5KGk+MWh25NCdqgf2pzE4f2qIDJV
-         VOCXiuCcTWzKe4k1TSIMuJzY20jMYaYaOQUAVrzDXdtICvPrUUqrvjMfDNpyBjaYdHDD
-         y8BznAQY7XQn5mouhC8Ln26vlD+aNjmf8gMRKYzh58YZSUGExtsuLhscN/OP3/n2om+u
-         rWZOW/tI2uht+fJ2VthfXIBJuKP/l1ti9cyOpVKk7DO8rRN4eIyV6StCVqLLanUz1Zf1
-         UYuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUg2dy6n0D71iyM45wH1L9TVUJbx35occSuxPNjGW3A9QsNTfl8E94KrH0Jfabdrp8OgvRKm0Xa@vger.kernel.org, AJvYcCVBdCTkJfEsVQWO5K/8eu4ZP9mvRwEsOFYCpUbwuqIm4Vx1nlVoS/AV8/7GTc8HbdYd5l8iaY2m/GY3X/S1@vger.kernel.org, AJvYcCWPK+AuMUGbFuDUdzL3S02NqY8mAuBnldh745TCt84N/OSn+tkV8ZTbEmqQoUUHd9mfjQv1YeFs8fAC@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj2/UvV8IO6bAk/1wGQSdDVAvYOnXPhnFxdWC/jl20DRHBq03e
-	kZvNOq+J91/DyU6w3ro3hagCCScqq4B0cPYSK8Cn4SXtjSTL9hYr
-X-Google-Smtp-Source: AGHT+IE012wnk28ETZsyQ8SITxH5vWI1jMJO1ED40DmOrjl3fn2iD7Eo7QE/jKPdNaugtPxI9JxYbg==
-X-Received: by 2002:a5d:598f:0:b0:382:4378:464b with SMTP id ffacd0b85a97d-38243784b86mr1535185f8f.10.1731941343057;
-        Mon, 18 Nov 2024 06:49:03 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3821adad619sm12908879f8f.27.2024.11.18.06.49.01
+        d=1e100.net; s=20230601; t=1731941542; x=1732546342;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rs5GnrU4nV8Cb5CVopjjXpHrH0KmJoeas3gG+FzG+Bs=;
+        b=siZKz6YIbj5tIlRw3IfgmcOvdOu4xo+FZwzhUhX3p7aSsrMAJL8C9xlJQ5184xhjiD
+         b5DYielCAoze8DvzMfqnO+u7rhqnKDP2ZbPKZBHzWe6+lup5uF1xpyIBWHC5z0Gl0I5A
+         Mxw5gF9VZnsbNC/5aBtft7ebiR37J96RNIoUOZdz+m4lqmbpM2vFnD5e8BBcqsCSW3eW
+         4tn2bfKovyxsO0xtQ4Uf/8rfAfuCxo6SJyv6Y2Xdr0F+AZHn76RVkwXQzw2k7wpcp6ah
+         yQCzsS/57xVQvUmyafgskcBDJ9+esyS74ifZDY0KdtQgzWEmdvxGiwB/6+aCPDNN9SB4
+         3pVA==
+X-Gm-Message-State: AOJu0Yz36shRHOBbl/ki3G1+1Uq5babVlt6ViMB8qhyI9MCVgzGfpUbR
+	zPJ3ENngtcsKuhfRTKR6/QRvNA4Tsxsi5TZS3OWskgR3ZzlelinC6ixZuUpL2kY=
+X-Google-Smtp-Source: AGHT+IEBA4nheQMLIHm+Fdcf8KX32ILarbbj5DpZ/AhPmb5FWpkmfWutZ0Hma6kxcNCPjwlh81TKUw==
+X-Received: by 2002:a05:6000:1866:b0:382:51f:6371 with SMTP id ffacd0b85a97d-3822590480dmr9631367f8f.15.1731941541909;
+        Mon, 18 Nov 2024 06:52:21 -0800 (PST)
+Received: from localhost.localdomain (20014C4E1E82D600957C45913C6586B5.dsl.pool.telekom.hu. [2001:4c4e:1e82:d600:957c:4591:3c65:86b5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da27fbd2sm162639285e9.19.2024.11.18.06.52.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 06:49:02 -0800 (PST)
-Date: Mon, 18 Nov 2024 16:48:59 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v7 0/4] net: dsa: Add Airoha AN8855 support
-Message-ID: <20241118144859.4hwgpxtql5fplcyt@skbuf>
-References: <20241117132811.67804-1-ansuelsmth@gmail.com>
+        Mon, 18 Nov 2024 06:52:21 -0800 (PST)
+From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+To: netdev@vger.kernel.org
+Cc: fejes@inf.elte.hu,
+	annaemesenyiri@gmail.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	idosch@idosch.org
+Subject: [PATCH net-next v4 0/3] Add support for SO_PRIORITY cmsg
+Date: Mon, 18 Nov 2024 15:51:44 +0100
+Message-ID: <20241118145147.56236-1-annaemesenyiri@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241117132811.67804-1-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Christian,
+Introduce a new helper function, `sk_set_prio_allowed`,
+to centralize the logic for validating priority settings.
+Add support for the `SO_PRIORITY` control message,
+enabling user-space applications to set socket priority
+via control messages (cmsg).
 
-On Sun, Nov 17, 2024 at 02:27:55PM +0100, Christian Marangi wrote:
-> This small series add the initial support for the Airoha AN8855 Switch.
-> 
-> It's a 5 port Gigabit Switch with SGMII/HSGMII upstream port.
-> 
-> This is starting to get in the wild and there are already some router
-> having this switch chip.
-> 
-> It's conceptually similar to mediatek switch but register and bits
-> are different. And there is that massive Hell that is the PCS
-> configuration.
-> Saddly for that part we have absolutely NO documentation currently.
-> 
-> There is this special thing where PHY needs to be calibrated with values
-> from the switch efuse. (the thing have a whole cpu timer and MCU)
+Patch Overview:
 
-Have you run the scripts in tools/testing/selftests/drivers/net/dsa/?
-Could you post the results?
+Patch 1/3: Introduce `sk_set_prio_allowed` helper function.
+Patch 2/3: Add support for setting `SO_PRIORITY` via control messages
+Patch 3/3: Add test for SO_PRIORITY setting via control messages
+
+v4:
+
+- Carry Eric's and Willem's "Reviewed-by" tags from v3 to 
+  patch 1/3 since that is resubmitted without changes.
+- Updated description in patch 2/3.
+- Missing ipc6.sockc.priority field added in ping_v6_sendmsg()
+  in patch 2/3.
+- Update cmsg_so_priority.sh to test SO_PRIORITY sockopt and cmsg
+  setting with VLAN priority tagging in patch 3/3. (Ido Schimmel) 
+- Rebased on net-next.
+
+v3:
+
+https://lore.kernel.org/netdev/20241107132231.9271-1-annaemesenyiri@gmail.com/
+- Updated cover letter text.
+- Removed priority field from ipcm_cookie.
+- Removed cork->tos value check from ip_setup_cork, so
+  cork->priority will now take its value from ipc->sockc.priority.
+- Replaced ipc->priority with ipc->sockc.priority
+  in ip_cmsg_send().
+- Modified the error handling for the SO_PRIORITY
+  case in __sock_cmsg_send().
+- Added missing initialization for ipc6.sockc.priority.
+- Introduced cmsg_so_priority.sh test script.
+- Modified cmsg_sender.c to set priority via control message (cmsg).
+- Rebased on net-next.
+
+v2:
+
+https://lore.kernel.org/netdev/20241102125136.5030-1-annaemesenyiri@gmail.com/
+- Introduced sk_set_prio_allowed helper to check capability
+  for setting priority.
+- Removed new fields and changed sockcm_cookie::priority
+  from char to u32 to align with sk_buff::priority.
+- Moved the cork->tos value check for priority setting
+  from __ip_make_skb() to ip_setup_cork().
+- Rebased on net-next.
+
+v1:
+
+https://lore.kernel.org/all/20241029144142.31382-1-annaemesenyiri@gmail.com/
+
+Anna Emese Nyiri (3):
+  Introduce sk_set_prio_allowed helper function
+  support SO_PRIORITY cmsg
+  test SO_PRIORITY ancillary data with cmsg_sender
+
+ include/net/inet_sock.h                       |   2 +-
+ include/net/ip.h                              |   2 +-
+ include/net/sock.h                            |   4 +-
+ net/can/raw.c                                 |   2 +-
+ net/core/sock.c                               |  18 ++-
+ net/ipv4/ip_output.c                          |   4 +-
+ net/ipv4/ip_sockglue.c                        |   2 +-
+ net/ipv4/raw.c                                |   2 +-
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/ipv6/ping.c                               |   1 +
+ net/ipv6/raw.c                                |   3 +-
+ net/ipv6/udp.c                                |   1 +
+ net/packet/af_packet.c                        |   2 +-
+ tools/testing/selftests/net/cmsg_sender.c     |  11 +-
+ .../testing/selftests/net/cmsg_so_priority.sh | 147 ++++++++++++++++++
+ 15 files changed, 189 insertions(+), 15 deletions(-)
+ create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
+
+-- 
+2.43.0
+
 
