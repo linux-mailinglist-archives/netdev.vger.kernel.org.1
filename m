@@ -1,160 +1,166 @@
-Return-Path: <netdev+bounces-145702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67BC49D0735
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:12:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ECC19D074D
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:45:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19851F2121E
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 00:12:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4424281AB9
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 00:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA3B819;
-	Mon, 18 Nov 2024 00:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738281C27;
+	Mon, 18 Nov 2024 00:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b="Gu4Zuf19"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LJsnzDH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E84A23
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 00:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99A5360;
+	Mon, 18 Nov 2024 00:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731888710; cv=none; b=fDndG+q1ER4HbFyvoRH0T0vVoH9xQsvpKjH3RTWAvqNB2W9hUcB+Bm1i9BdFEeSTera/pGMR13aUxDXdUl5K/jKpVjdNx4wMKDEW/0IGOEpHwd8u09QumJV6Sen+DnEL2GgQlreT0yzU990sk5np6vmnilxflGX2+R+XWWClKHk=
+	t=1731890726; cv=none; b=Ed9E0vIKG5WX4z7srtmFKqoYScIQ6ucDgkXbit5+h6w71ONIpEOHJ27FvZB0f7NwYtzMg0s30KfakfT59l5JuoTPuRDjDum8g+VQkYscf9pAfUP9HfiWdJuUho7baMKJdEBDe5vQESX9MqmbcJ9VgZqCUmzu9i+zdDdd60mRsiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731888710; c=relaxed/simple;
-	bh=SoiSwSD49lv0IM/8lxFpHyYRjD/sbJDFjhrLAiQDzxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QeEeiZNl+z/7p2rcd+x6vqYNODSpa/Iz6mcuhU0sXg8CVVSEWfsIy8ZjYlFMDshT7r46roXCJS8em7RTA7xr7UkBXEr8Ss+1ZVIZPPhlgPITW7x64Nz4kSvpNL5KNUYro9VXCl6HqxXQFX1m4oCAdaDozHqfHigPrBHr9SguKVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in; spf=pass smtp.mailfrom=iiitd.ac.in; dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b=Gu4Zuf19; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20ce65c8e13so25499875ad.1
-        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 16:11:46 -0800 (PST)
+	s=arc-20240116; t=1731890726; c=relaxed/simple;
+	bh=kA1ByiXY5K+rLi2sj3wYU2ocSKz5rgoe8y46HvzPwAw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jGJqXh0bz2k/hFBTSYQpHm0d5d2/ynnJfhnND5Ch+VyCRedmR2ZTLFhZbfcBATnam15ar7CGEZPCowd1aLptBo5ccEZqiGp5j4uQWBET2lZT9pJ76sr1jtA+X84KBxIHyQrBRTGP/3JgL2ovR222VxYS2kFAu8B6e2E1nzOp0io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LJsnzDH4; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20c693b68f5so23713035ad.1;
+        Sun, 17 Nov 2024 16:45:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=iiitd.ac.in; s=google; t=1731888706; x=1732493506; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fzm439oR2uLsNkSgKqi/IwHWxPKHwC9Szch4YmaJqco=;
-        b=Gu4Zuf19xD7wEZztbR94q9cks+9MwBC71zPvxPDdrh91SvmD1TW5//EWdkhWfSV4tC
-         EekkYtEBNvtuqCCsl9jb+VhWBuZyc/BB/iGuLL0Hxz0n/sXWmhsxs/HQdqKv446+ahll
-         pJWcgm+8EHF8HJefDiZNP85jc9MrUvnNJU7Yk=
+        d=gmail.com; s=20230601; t=1731890724; x=1732495524; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IRX0VvHiJZKtt9cfwQ9mhCnJ4ZqP3u+/oVwNiKN8Xgs=;
+        b=LJsnzDH48Cu6SYZomkNFE1Fm7rwyptvnjIL4+Sct24ayN78ktFwV9v+VRHVZg84uVM
+         rrBNY1m1lgipH4omKwBNQgsxsVxuz5vD25m4f2CC6UrEr5DXFKtoHAHSCmeKQ5h3bCO6
+         2oemaA3XxUSP+xZyYqcDWIJoQ/h1qE39PahW5ra0oZebpkcqCl5hzDWSfgMB3f94264g
+         VKbdubmBNy4B2cQNYWc1Wol3aTCr6s4l4OIk4ljWhR3BIvcIkB/AZ4nX2Xdnr7pMUyHL
+         QJJAy7C5tBo/71iw9a+xM1ZgxyzjpabDgEmC0DfhG8OG8oy5iDqgSIdvhbsjDBO42gIb
+         cLag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731888706; x=1732493506;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzm439oR2uLsNkSgKqi/IwHWxPKHwC9Szch4YmaJqco=;
-        b=Q4MKYIPJTiTWbChRWdG2XWMv6Tyi4/zXTh+u5NtaIyEzZ0pWSSA3+1eIDAFgL1KiD6
-         tmWG8REPa0m5dn6sdyPIqe5hgohrLuZTXSA080zrjyen5+zN/YV6RWNVRyTkeNhrMvG1
-         f7QxvFhjtrb7RVv319Ky1yDvWNkB69ZBuCgXZuEvQVHZ8tZFdZ8t2q6tneilCZXogqzf
-         70Cdda/IhRTJJ5xELhykpiPn8ANDyN5NQQC1z6X0uzv7VFPUAGkMxrQpPSBBZ/LpkUbp
-         eYm3RDACR1u+qoXpEUgUKG57ZlZswkscwsibiXWA/N0/7D7hTf32rRynf6+RcYT8mRZV
-         L4Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHk3fg/VUm3xtBxY8RAa7SNRlWyd6HdEbZF96MqZuBjoSFKL6kI1hVkZneyyIw8xhag9egH6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnlIfQMewcdJopSkzG4lrv+IsYeohUwpqG1nZ02iDtecKZ66MB
-	aV5QY/rA9KwEEe15OcJEx7caNrrNHp3Kno3ir+kW6SGxekd29nODhdNP5X7boVM=
-X-Google-Smtp-Source: AGHT+IEWvPNXF0LNjE2M13xB8ELSPmICXmcw9ZU6urY/s0XrAzOHzNs7phP0Ghc42LEvoQ5pq6eqTA==
-X-Received: by 2002:a17:903:11cd:b0:20c:ecd8:d0af with SMTP id d9443c01a7336-211d0d5eea4mr149867975ad.9.1731888706270;
-        Sun, 17 Nov 2024 16:11:46 -0800 (PST)
-Received: from fedora ([103.3.204.127])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211f6769057sm26344825ad.206.2024.11.17.16.11.37
+        d=1e100.net; s=20230601; t=1731890724; x=1732495524;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IRX0VvHiJZKtt9cfwQ9mhCnJ4ZqP3u+/oVwNiKN8Xgs=;
+        b=CWdqviBW4W2sS0z10NC0YyAqO3BCIad2mXR20eWU7ZYycjdbTbq0JppiOt+8t9E6xx
+         2bd6vPKhEEtnPAE6p94hePN5hJw4axaAlIBZ0+qEATCtY7k4n/X6wLGObs2Ogmy64XFq
+         YkVX7o7MyloHQSNTZRhY5TvKaEUvkgFIyADq6etutJrRmlncOjIjEY2qC8xL0gPrrETs
+         NHLK/80BM/u2RBv56Hfl2u1RqzYvYCKRbLPDqjccslinKXD3/Z82TKuN6ucCIrRnUKzt
+         4jZyjyMRbxX6/SF+8IYccWU/8CzW6/7sZ9UrvKcBInOjzTq3HchoVdInA1NkjN+NzTC6
+         6wHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGt7zOHiprE/yYbvUQ54U7R81DQl3ozqldhJYYVdyBp/cZoeJBHcDNxPwZHE3u49UKDRpltLPa@vger.kernel.org, AJvYcCWenQTLdekv9uzcwTyAM4s88KlNT+2vbvrk8JvsqQLanvspfSLCjApmtMhRhlsZBXyyDFZP0gIcjcWkM1k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjIWz227/RkT1gOsJ+vig7RbTsjL8t9ceKuvD5eCUomScfeFR4
+	O2eQwBPNETJefQyNfzOEHF24Kp+OTWag+NnpDVJBPlQueg/5P7+z
+X-Google-Smtp-Source: AGHT+IGOU+A5Ft/ye7AqGZPzV4VIl7z1rxYSR/mHQnn0ZjHcrJGHWCkjJQMp6jVGLMA3rHxeySMqTA==
+X-Received: by 2002:a17:902:e750:b0:20b:8ef3:67a with SMTP id d9443c01a7336-211d0d6ee87mr124722665ad.7.1731890724176;
+        Sun, 17 Nov 2024 16:45:24 -0800 (PST)
+Received: from harry-home.bne.opengear.com (122-151-100-51.dyn.ip.vocus.au. [122.151.100.51])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0dc31basm46031655ad.8.2024.11.17.16.45.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Nov 2024 16:11:45 -0800 (PST)
-Date: Mon, 18 Nov 2024 05:41:32 +0530
-From: Manas <manas18244@iiitd.ac.in>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>, 
-	Alice Ryhl <aliceryhl@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] rust: simplify Result<()> uses
-Message-ID: <q5xmd3g65jr4lmnio72pcpmkmvlha3u2q3fohe2wxlclw64adv@wjon44dqnn7e>
-References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
- <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch>
- <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
+        Sun, 17 Nov 2024 16:45:23 -0800 (PST)
+From: Qingtao Cao <qingtao.cao.au@gmail.com>
+X-Google-Original-From: Qingtao Cao <qingtao.cao@digi.com>
+To: 
+Cc: Qingtao Cao <qingtao.cao@digi.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1 1/1] net: mv643xx_eth: disable IP tx checksum with jumbo frames for Armada 310
+Date: Mon, 18 Nov 2024 10:45:09 +1000
+Message-Id: <20241118004509.200828-1-qingtao.cao@digi.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
 
-On 17.11.2024 21:49, Miguel Ojeda wrote:
->On Sun, Nov 17, 2024 at 7:26 PM Andrew Lunn <andrew@lunn.ch> wrote:
->>
->> Please split these patches up per subsystem, and submit them
->> individually to the appropriate subsystems.
->
->That is good advice, although if you and block are Ok with an Acked-by
->(assuming a good v2), we could do that too.
->
->Manas: I forgot to mention in the issue that this could be a good case
->for a `checkpatch.pl` check (I added it now). It would be great if you
->could add that in a different (and possibly independent) patch.
->
->Of course, it is not a requirement, but it would be a nice opportunity
->to contribute something extra related to this :)
->
+The Ethernet controller found in Armada 310 doesn't support TCP/IP checksum
+with frame sizes larger than its TX checksum offload limit
 
-On 17.11.2024 18:56, Russell King (Oracle) wrote:
->On Sun, Nov 17, 2024 at 07:25:48PM +0100, Andrew Lunn wrote:
->> On Sun, Nov 17, 2024 at 08:41:47PM +0530, Manas via B4 Relay wrote:
->> > From: Manas <manas18244@iiitd.ac.in>
->> >
->> > This patch replaces `Result<()>` with `Result`.
->> >
->> > Suggested-by: Miguel Ojeda <ojeda@kernel.org>
->> > Link: https://github.com/Rust-for-Linux/linux/issues/1128
->> > Signed-off-by: Manas <manas18244@iiitd.ac.in>
->> > ---
->> >  drivers/net/phy/qt2025.rs        | 2 +-
->> >  rust/kernel/block/mq/gen_disk.rs | 2 +-
->> >  rust/kernel/uaccess.rs           | 2 +-
->> >  rust/macros/lib.rs               | 6 +++---
->>
->> Please split these patches up per subsystem, and submit them
->> individually to the appropriate subsystems.
->
->In addition, it would be good if the commit stated the rationale for
->the change, rather than what the change is (which we can see from the
->patch itself.)
->
+When the path MTU is larger than this limit, the skb_warn_bad_offload will
+throw out a warning oops
 
-Thanks Andrew, Rusell and Miguel for the feedback.
+Disable the TX checksum offload (NETIF_F_IP_CSUM) when the MTU is set to a
+value larger than this limit, the NETIF_F_TSO will automatically be disabled
+as a result and the IP stack will calculate jumbo frames' checksum instead.
 
-Russell: I will edit the commit message to say something like, use the
-standard way of `Result<()>` which is `Result` and keep things consistent wrt
-other parts of codebase.
+Signed-off-by: Qingtao Cao <qingtao.cao@digi.com>
+---
+ drivers/net/ethernet/marvell/mv643xx_eth.c | 23 +++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-Andrew, Miguel:
-
-I can split it in the following subsystems:
-
-   rust: block:
-   rust: uaccess:
-   rust: macros:
-   net: phy: qt2025:
-
-Should I do a patch series for first three, and put an individual patch for
-qt2025?
-
-Also, I can work on the checkpatch.pl after this.
-
+diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
+index 9e80899546d9..808877dd3549 100644
+--- a/drivers/net/ethernet/marvell/mv643xx_eth.c
++++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
+@@ -2558,6 +2558,23 @@ static int mv643xx_eth_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+ 	return ret;
+ }
+ 
++static netdev_features_t mv643xx_eth_fix_features(struct net_device *dev,
++						  netdev_features_t features)
++{
++	struct mv643xx_eth_private *mp = netdev_priv(dev);
++
++	if (mp->shared->tx_csum_limit &&
++	    dev->mtu > mp->shared->tx_csum_limit) {
++		/* Kernel disables TSO when there is no TX checksum offload */
++		features &= ~NETIF_F_IP_CSUM;
++		netdev_info(dev,
++			    "Disable IP TX checksum and TSO offload for MTU > %dB\n",
++			    mp->shared->tx_csum_limit);
++	}
++
++	return features;
++}
++
+ static int mv643xx_eth_change_mtu(struct net_device *dev, int new_mtu)
+ {
+ 	struct mv643xx_eth_private *mp = netdev_priv(dev);
+@@ -2566,8 +2583,10 @@ static int mv643xx_eth_change_mtu(struct net_device *dev, int new_mtu)
+ 	mv643xx_eth_recalc_skb_size(mp);
+ 	tx_set_rate(mp, 1000000000, 16777216);
+ 
+-	if (!netif_running(dev))
++	if (!netif_running(dev)) {
++		netdev_update_features(dev);
+ 		return 0;
++	}
+ 
+ 	/*
+ 	 * Stop and then re-open the interface. This will allocate RX
+@@ -2581,6 +2600,7 @@ static int mv643xx_eth_change_mtu(struct net_device *dev, int new_mtu)
+ 			   "fatal error on re-opening device after MTU change\n");
+ 	}
+ 
++	netdev_update_features(dev);
+ 	return 0;
+ }
+ 
+@@ -3079,6 +3099,7 @@ static const struct net_device_ops mv643xx_eth_netdev_ops = {
+ 	.ndo_set_mac_address	= mv643xx_eth_set_mac_address,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_eth_ioctl		= mv643xx_eth_ioctl,
++	.ndo_fix_features       = mv643xx_eth_fix_features,
+ 	.ndo_change_mtu		= mv643xx_eth_change_mtu,
+ 	.ndo_set_features	= mv643xx_eth_set_features,
+ 	.ndo_tx_timeout		= mv643xx_eth_tx_timeout,
 -- 
-Manas
+2.34.1
+
 
