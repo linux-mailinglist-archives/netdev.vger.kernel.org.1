@@ -1,179 +1,160 @@
-Return-Path: <netdev+bounces-145700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEA99D072C
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:00:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67BC49D0735
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 01:12:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4516BB219D2
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 00:00:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19851F2121E
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 00:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9B342A9D;
-	Mon, 18 Nov 2024 00:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA3B819;
+	Mon, 18 Nov 2024 00:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="FRvxydlV"
+	dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b="Gu4Zuf19"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic304-10.consmr.mail.bf2.yahoo.com (sonic304-10.consmr.mail.bf2.yahoo.com [74.6.128.33])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5BD4437
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 00:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.128.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E84A23
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 00:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731888015; cv=none; b=OobtZfZiwMvU7iZmbArWWsczAMReK/8rCI9uE304ur/35XGinsNDLSttwMe4KggPa90EoJczz2bAThqBVeK93ZzNhLMLLOaudGx6cazxojySFqVvUE3aE3bu/mPaWvrGCEDtXf6dynXeaLLkHEctANTDxEIC9e7ZHQFYmoo4gGg=
+	t=1731888710; cv=none; b=fDndG+q1ER4HbFyvoRH0T0vVoH9xQsvpKjH3RTWAvqNB2W9hUcB+Bm1i9BdFEeSTera/pGMR13aUxDXdUl5K/jKpVjdNx4wMKDEW/0IGOEpHwd8u09QumJV6Sen+DnEL2GgQlreT0yzU990sk5np6vmnilxflGX2+R+XWWClKHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731888015; c=relaxed/simple;
-	bh=YUce759kQ7h05bVUbjxEdZsIcSJvZgYa1EEcx85iesg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UMkxXZgzdozuLZ7xyeb4cfeKDoNk88dfIAlh6YS2AGzWzo4Ty6t8UTs9tAN1bdNUISMF1EKD/RIiJzi0Eu0TbMOJh20fvkG757aeSu2Km9t85+MIiMg7q5ULvdJDxtQwEL4G+EwgNzdD33Xj5Yjrxw1VQ5GqCvjDbhz8m8yVpIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=FRvxydlV; arc=none smtp.client-ip=74.6.128.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1731888013; bh=sRhtt7tAu+00jSTS4pSlYyOtlC3u9JS4ZajQtj5R2sU=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=FRvxydlVb9DnHyEB0Qd/+Jdbm0txBdhQGXsrLlDLRK934aF5HsgdrG9p5Hh/GxMw5Yo9xlnyoS0IEHTeu8JDsRpa0eg1BK2T9cvd8JrVMnM31a/DYYVKTaahOw9TjRziqTLBtpPCkIZ4Rsdkve22qSlSHmPTRLZBLHKte/1UkUJoad1vRDRLo3T2nmEC2SPfEoC/ar0ZxDIVosPX/smOrb5LdsN0WeOf9atLEXHtfDvxCbO2MpgA32BzFpEP7s4UImM4XX+8S7dMSh7sEMaydLfGNkehiFEAg/iOtTdzqBxdFzuI9M/JSwqItn4yu3HvlG/P904NUnpKdPIjxiI+Dg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1731888013; bh=86UgW5vsC9UFrjd/hPlhn2JVBmMFjshctjO7PaDmBy3=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=r40Bvl7ZitVnSHPk9YSFgJnTr7vUsE07pS9a66BSzakWztGzsyoBRa5okAqwJCMaFKV5xnKLG7bJPFlk1J9KC4DoLSQwGULvtpNDo9OfbjRqZFDrbp4XXwFhgXN8g6dBABeoeaUmBujMzHsXHTPVx0JATzgqBAPr36uD2ZfAUozh+s+brDCtosyJFspssiR2QhlYWtpcLOGXnHOsl3vQN3oaKq8UMzzH9LEnRNq52cQdHcrwRmvxQtIQeDPJRrPe6qJs3uK8A/yLIqFQTUWE+URiFnkuuzxPpu7BdVKnddGGbdIzZ7NKvHOxqPYNj0fGU7BfuvINKyYUbKkhQwi3tQ==
-X-YMail-OSG: S28iDfEVM1noTl7odYQW8JPO9sf.F5u2nsp1airlMe9S31uaNGAvXgAoPzFtXl2
- 9oreKtx2ZNdofskNJIu0WZljQNYwzhygrkTHY5g8DJZsyKtGo2raK96QhLbzl5VB28hNq0UM5jx8
- lv2HRD8Z3osIA.8BuJxQcA9QGmfk0CuOF5v3aUJ2OcsuRTX7iRMyTdYIkeymh57FChaJmuZwgiaz
- 0f6_mt9q88AKc7VsTGeP_XW7kqDJGozfxHARHvfoUExqntQLN0bazkeVlovBDEBB_UxVtWz2Q5hR
- 0MJTeSgFtqmEVkuMqp.5tjTU2SBaQKsWFTJ65td9Uw7vchjijpWk6fBlxFNrg8i3tsyGz9fclVBx
- 3fmaCiSw5KbO5nGsEJks7e0l.Qr4i85KlAMMNY8HPHzKaRhMdbRsdWGanmjyq4DuxGXGtgX4tZmj
- WGv1_9IFEdLBFqBGj3rVlLfpY.eanMlhO797o7gmt4f.IuNiIvcnxbP2ZWGWG0YOZRtQPC9eLE5k
- aJuXjk6d3X6IijGIgU9sgAfSciL44AKmmLdeXX1UHO7c8QBNfBDmbXKlDyDfjQFqxtUp2ibH3HBR
- Z4qJcfOXj.e81R9GepBCF2nWR8Gxdn6xW3jEfdwjUF3ZNEl1O8QsZU1TZuDQODO0HWXkvYw5fBTb
- 4cvN1wUwMfDYZRx4rdYb0d9IvrA9D3d21HELuFyzj3EDyPLXZO14Rxi.B4NQAhW1Nt4wX6A6J6k3
- 0ilK3uxcLgxQl8iMh0DqHhrAukgYo4hqzP5efJr9yHfhu3xTCpOQweWx1i4yCB2Uu0vqlmqjXZi4
- 5cWExHRl0sNKpdfYBAct151Yd0n7Pj7CMYw8EBpRMpzLdePq2ZcW6uo6UZOr2C6oR30.4lvO17vm
- eiJKGVoyTJBYHfRatc3ZMgw837N901d0mE1pgcEq0.4h2rK9.i9MAK78WSkVQkJyqBLFWyDAsp14
- zG8y.QsjShfTfGUHRXXoCn0N6U1Cw90sLwns.y4HBfoR3MClQE28TzfQT0a9D6mql2sE0wfsK6m7
- nABNdMInrALemE.1uVi1cFpZps6ERtwfZex7PmUH98bTOxwSGp8jntiZNNvOQpjFPcnSEZz97PrQ
- MFTcLoOQsRosjb9YSLTYmvKhwdEWzIWDUOaxRuPAmbtea883Ym17fFiwxNVQt.iVHv4TWgnOXLNI
- XMfz9tR8zuyuZ8j7Y_QlgL3buZz1jkDuUyeqSDDUtJvRmPblofwgVh5_A.eI8p1YAFRJDp1C9Jn0
- m1eS4JP_tvo.9fxMPb.Cv0rdkemmIE1EDaFTHKztmNRPa093hlvaVGGyzjEfHXm5T0WJ3rdH0xFq
- IhtcpSH0Gki3jtNstYV_fRoSp9fCUinBgMVbW5oeMA3RU4blhIXpqSrasNXyLfiGycoycoKSeQXn
- 1rj8_gHDr1MPo3yP9vE4gIlj3CeS6rjJFyc.xflvEMqcb8rQ7GDV4.1T8rbiVCjMJEPDioBU0aoW
- xB9WQEUzkvHowvEfeVPjpWdLFMg26pYgEKcFOCQ4N.zwqtnuRMK22sTaf.8mAxLahnsUSJ7YNIW9
- Zqv9aBFPxiQBXeMZAILz94g5WYD_OcrgSmhxohUvYlvSfCWSdl7d07YRG70CVujSn9h434ztDjpN
- qzPIMkMsZsI33vZv2mnXEsfzleQm3xH.L3I5vJ.WlLeMhIF3qnIQMytOCNKk3QUPvEBEW0TJvSq1
- ZiIjZy_iz2YKAxfaEaQdRbfqdikczKpfSr7IGJTGJW6zStGnW0r_jitPVkpTEkaOjjG_A8ngAQix
- 7KWViNCkjTiZuZzFyZ6KC_3gR3FfoTEUyfkGLlUgNXJ.OHxn4QdWqS.TT6uSqc0YYEIC70RcUVSt
- EleH3VWBJ4m6eIIuB8sRtrkYjzK3a15Dwkf95yRZAGwQO7lrcQHGjnNtbp_ARLB3Usp5_9gd0VmN
- 1rUq_MlwV2m3.dl_wdsuKz76IMGZmlJROtSKrFw3eJcJviun1EIPh0gvUb.WSey.W4MKDHgDYnDG
- mZC0AIx0.vS6_c5LaZfuBTgbjVs2T2QZ8EuD6M255ovBVxKFJFIG7bFPEkpGWdCc9F1EAMoxKO3a
- voaFOv3amheJ9SPlp4oVcAL0VsZXRGeStRabj_tOOq.OnmN66NgA.iYQoYJj70bwiwtnnq912SSB
- XdH7kZ0HrmNz2V4GLvyEm0jNIKAVoOoZirS_MVWB896H1WqY9yLdJUkJ_1o73VEIf4VmyUxJ86Fb
- Na5SOQDQIkhj5DHSgwGTV5R967U4dzs.dTUPuj3XIfsGx8fYGU8Ie6d3XbuSu0CNedazwqlzDaov
- cC.aNhpdN
-X-Sonic-MF: <dullfire@yahoo.com>
-X-Sonic-ID: fdd3bdbc-4c3b-4a06-a8ff-2ca1c6d1e07c
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.bf2.yahoo.com with HTTP; Mon, 18 Nov 2024 00:00:13 +0000
-Received: by hermes--production-ne1-bfc75c9cd-n46s2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID c49c6779fa1a016527bc8d82f3fd465e;
-          Sun, 17 Nov 2024 23:50:01 +0000 (UTC)
-From: dullfire@yahoo.com
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Mostafa Saleh <smostafa@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Cc: Jonathan Currier <dullfire@yahoo.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/2] net/niu: niu requires MSIX ENTRY_DATA fields touch before entry reads
-Date: Sun, 17 Nov 2024 17:48:43 -0600
-Message-ID: <20241117234843.19236-3-dullfire@yahoo.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241117234843.19236-1-dullfire@yahoo.com>
-References: <20241117234843.19236-1-dullfire@yahoo.com>
+	s=arc-20240116; t=1731888710; c=relaxed/simple;
+	bh=SoiSwSD49lv0IM/8lxFpHyYRjD/sbJDFjhrLAiQDzxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QeEeiZNl+z/7p2rcd+x6vqYNODSpa/Iz6mcuhU0sXg8CVVSEWfsIy8ZjYlFMDshT7r46roXCJS8em7RTA7xr7UkBXEr8Ss+1ZVIZPPhlgPITW7x64Nz4kSvpNL5KNUYro9VXCl6HqxXQFX1m4oCAdaDozHqfHigPrBHr9SguKVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in; spf=pass smtp.mailfrom=iiitd.ac.in; dkim=pass (1024-bit key) header.d=iiitd.ac.in header.i=@iiitd.ac.in header.b=Gu4Zuf19; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iiitd.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iiitd.ac.in
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20ce65c8e13so25499875ad.1
+        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 16:11:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=iiitd.ac.in; s=google; t=1731888706; x=1732493506; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fzm439oR2uLsNkSgKqi/IwHWxPKHwC9Szch4YmaJqco=;
+        b=Gu4Zuf19xD7wEZztbR94q9cks+9MwBC71zPvxPDdrh91SvmD1TW5//EWdkhWfSV4tC
+         EekkYtEBNvtuqCCsl9jb+VhWBuZyc/BB/iGuLL0Hxz0n/sXWmhsxs/HQdqKv446+ahll
+         pJWcgm+8EHF8HJefDiZNP85jc9MrUvnNJU7Yk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731888706; x=1732493506;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fzm439oR2uLsNkSgKqi/IwHWxPKHwC9Szch4YmaJqco=;
+        b=Q4MKYIPJTiTWbChRWdG2XWMv6Tyi4/zXTh+u5NtaIyEzZ0pWSSA3+1eIDAFgL1KiD6
+         tmWG8REPa0m5dn6sdyPIqe5hgohrLuZTXSA080zrjyen5+zN/YV6RWNVRyTkeNhrMvG1
+         f7QxvFhjtrb7RVv319Ky1yDvWNkB69ZBuCgXZuEvQVHZ8tZFdZ8t2q6tneilCZXogqzf
+         70Cdda/IhRTJJ5xELhykpiPn8ANDyN5NQQC1z6X0uzv7VFPUAGkMxrQpPSBBZ/LpkUbp
+         eYm3RDACR1u+qoXpEUgUKG57ZlZswkscwsibiXWA/N0/7D7hTf32rRynf6+RcYT8mRZV
+         L4Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHk3fg/VUm3xtBxY8RAa7SNRlWyd6HdEbZF96MqZuBjoSFKL6kI1hVkZneyyIw8xhag9egH6g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnlIfQMewcdJopSkzG4lrv+IsYeohUwpqG1nZ02iDtecKZ66MB
+	aV5QY/rA9KwEEe15OcJEx7caNrrNHp3Kno3ir+kW6SGxekd29nODhdNP5X7boVM=
+X-Google-Smtp-Source: AGHT+IEWvPNXF0LNjE2M13xB8ELSPmICXmcw9ZU6urY/s0XrAzOHzNs7phP0Ghc42LEvoQ5pq6eqTA==
+X-Received: by 2002:a17:903:11cd:b0:20c:ecd8:d0af with SMTP id d9443c01a7336-211d0d5eea4mr149867975ad.9.1731888706270;
+        Sun, 17 Nov 2024 16:11:46 -0800 (PST)
+Received: from fedora ([103.3.204.127])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211f6769057sm26344825ad.206.2024.11.17.16.11.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Nov 2024 16:11:45 -0800 (PST)
+Date: Mon, 18 Nov 2024 05:41:32 +0530
+From: Manas <manas18244@iiitd.ac.in>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>, 
+	Alice Ryhl <aliceryhl@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] rust: simplify Result<()> uses
+Message-ID: <q5xmd3g65jr4lmnio72pcpmkmvlha3u2q3fohe2wxlclw64adv@wjon44dqnn7e>
+References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
+ <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch>
+ <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
 
-From: Jonathan Currier <dullfire@yahoo.com>
+On 17.11.2024 21:49, Miguel Ojeda wrote:
+>On Sun, Nov 17, 2024 at 7:26 PM Andrew Lunn <andrew@lunn.ch> wrote:
+>>
+>> Please split these patches up per subsystem, and submit them
+>> individually to the appropriate subsystems.
+>
+>That is good advice, although if you and block are Ok with an Acked-by
+>(assuming a good v2), we could do that too.
+>
+>Manas: I forgot to mention in the issue that this could be a good case
+>for a `checkpatch.pl` check (I added it now). It would be great if you
+>could add that in a different (and possibly independent) patch.
+>
+>Of course, it is not a requirement, but it would be a nice opportunity
+>to contribute something extra related to this :)
+>
 
-Fix niu_try_msix() to not cause a fatal trap on sparc systems.
+On 17.11.2024 18:56, Russell King (Oracle) wrote:
+>On Sun, Nov 17, 2024 at 07:25:48PM +0100, Andrew Lunn wrote:
+>> On Sun, Nov 17, 2024 at 08:41:47PM +0530, Manas via B4 Relay wrote:
+>> > From: Manas <manas18244@iiitd.ac.in>
+>> >
+>> > This patch replaces `Result<()>` with `Result`.
+>> >
+>> > Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+>> > Link: https://github.com/Rust-for-Linux/linux/issues/1128
+>> > Signed-off-by: Manas <manas18244@iiitd.ac.in>
+>> > ---
+>> >  drivers/net/phy/qt2025.rs        | 2 +-
+>> >  rust/kernel/block/mq/gen_disk.rs | 2 +-
+>> >  rust/kernel/uaccess.rs           | 2 +-
+>> >  rust/macros/lib.rs               | 6 +++---
+>>
+>> Please split these patches up per subsystem, and submit them
+>> individually to the appropriate subsystems.
+>
+>In addition, it would be good if the commit stated the rationale for
+>the change, rather than what the change is (which we can see from the
+>patch itself.)
+>
 
-Set PCI_DEV_FLAGS_MSIX_TOUCH_ENTRY_DATA_FIRST on the struct pci_dev to
-work around a bug in the hardware or firmware.
+Thanks Andrew, Rusell and Miguel for the feedback.
 
-For each vector entry in the msix table, niu chips will cause a fatal
-trap if any registers in that entry are read before that entries'
-ENTRY_DATA register is written to. Testing indicates writes to other
-registers are not sufficient to prevent the fatal trap, however the value
-does not appear to matter. This only needs to happen once after power up,
-so simply rebooting into a kernel lacking this fix will NOT cause the
-trap.
+Russell: I will edit the commit message to say something like, use the
+standard way of `Result<()>` which is `Result` and keep things consistent wrt
+other parts of codebase.
 
-NON-RESUMABLE ERROR: Reporting on cpu 64
-NON-RESUMABLE ERROR: TPC [0x00000000005f6900] <msix_prepare_msi_desc+0x90/0xa0>
-NON-RESUMABLE ERROR: RAW [4010000000000016:00000e37f93e32ff:0000000202000080:ffffffffffffffff
-NON-RESUMABLE ERROR:      0000000800000000:0000000000000000:0000000000000000:0000000000000000]
-NON-RESUMABLE ERROR: handle [0x4010000000000016] stick [0x00000e37f93e32ff]
-NON-RESUMABLE ERROR: type [precise nonresumable]
-NON-RESUMABLE ERROR: attrs [0x02000080] < ASI sp-faulted priv >
-NON-RESUMABLE ERROR: raddr [0xffffffffffffffff]
-NON-RESUMABLE ERROR: insn effective address [0x000000c50020000c]
-NON-RESUMABLE ERROR: size [0x8]
-NON-RESUMABLE ERROR: asi [0x00]
-CPU: 64 UID: 0 PID: 745 Comm: kworker/64:1 Not tainted 6.11.5 #63
-Workqueue: events work_for_cpu_fn
-TSTATE: 0000000011001602 TPC: 00000000005f6900 TNPC: 00000000005f6904 Y: 00000000    Not tainted
-TPC: <msix_prepare_msi_desc+0x90/0xa0>
-g0: 00000000000002e9 g1: 000000000000000c g2: 000000c50020000c g3: 0000000000000100
-g4: ffff8000470307c0 g5: ffff800fec5be000 g6: ffff800047a08000 g7: 0000000000000000
-o0: ffff800014feb000 o1: ffff800047a0b620 o2: 0000000000000011 o3: ffff800047a0b620
-o4: 0000000000000080 o5: 0000000000000011 sp: ffff800047a0ad51 ret_pc: 00000000005f7128
-RPC: <__pci_enable_msix_range+0x3cc/0x460>
-l0: 000000000000000d l1: 000000000000c01f l2: ffff800014feb0a8 l3: 0000000000000020
-l4: 000000000000c000 l5: 0000000000000001 l6: 0000000020000000 l7: ffff800047a0b734
-i0: ffff800014feb000 i1: ffff800047a0b730 i2: 0000000000000001 i3: 000000000000000d
-i4: 0000000000000000 i5: 0000000000000000 i6: ffff800047a0ae81 i7: 00000000101888b0
-I7: <niu_try_msix.constprop.0+0xc0/0x130 [niu]>
-Call Trace:
-[<00000000101888b0>] niu_try_msix.constprop.0+0xc0/0x130 [niu]
-[<000000001018f840>] niu_get_invariants+0x183c/0x207c [niu]
-[<00000000101902fc>] niu_pci_init_one+0x27c/0x2fc [niu]
-[<00000000005ef3e4>] local_pci_probe+0x28/0x74
-[<0000000000469240>] work_for_cpu_fn+0x8/0x1c
-[<000000000046b008>] process_scheduled_works+0x144/0x210
-[<000000000046b518>] worker_thread+0x13c/0x1c0
-[<00000000004710e0>] kthread+0xb8/0xc8
-[<00000000004060c8>] ret_from_fork+0x1c/0x2c
-[<0000000000000000>] 0x0
-Kernel panic - not syncing: Non-resumable error.
+Andrew, Miguel:
 
-Fixes: 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X entries")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jonathan Currier <dullfire@yahoo.com>
----
- drivers/net/ethernet/sun/niu.c | 2 ++
- 1 file changed, 2 insertions(+)
+I can split it in the following subsystems:
 
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index 41a27ae58ced..f5449b73b9a7 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -9058,6 +9058,8 @@ static void niu_try_msix(struct niu *np, u8 *ldg_num_map)
- 		msi_vec[i].entry = i;
- 	}
- 
-+	pdev->dev_flags |= PCI_DEV_FLAGS_MSIX_TOUCH_ENTRY_DATA_FIRST;
-+
- 	num_irqs = pci_enable_msix_range(pdev, msi_vec, 1, num_irqs);
- 	if (num_irqs < 0) {
- 		np->flags &= ~NIU_FLAGS_MSIX;
+   rust: block:
+   rust: uaccess:
+   rust: macros:
+   net: phy: qt2025:
+
+Should I do a patch series for first three, and put an individual patch for
+qt2025?
+
+Also, I can work on the checkpatch.pl after this.
+
 -- 
-2.45.2
-
+Manas
 
