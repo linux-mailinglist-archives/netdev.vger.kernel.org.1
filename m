@@ -1,310 +1,269 @@
-Return-Path: <netdev+bounces-145994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E38E9D19B4
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:36:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F5639D19D3
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13CEEB219EF
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:36:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD35F1F220EC
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F0D1E5015;
-	Mon, 18 Nov 2024 20:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADE81E5727;
+	Mon, 18 Nov 2024 20:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noEUFqcD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SwSMowbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486B514BF8F
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 20:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A288A1C07CA
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 20:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731962158; cv=none; b=SQFscNRgoPZ3EjEMhwjXGndVR8orRTHsK2JTtn0CdUiRASBYo9JehMG8ko08K4Ph9JWODLo09zgmftsDGyfSWb703aCrT/MxvLMmfCDpon87v5WxPx0FTtk7XXZP0V2rQwgg+UNWVr2WL2r+7GPquyBOzNMQUWWfiKTjPtvN4wY=
+	t=1731962681; cv=none; b=AIY2/rNxRMU0nSerAbczUHVl4vzVR+RhtWQDGBOWPYwgOYuicKwe4e1JqLhTRx8XqeFMkDCEEJRdH6gXzjemXFSj7eYNZbvKXRKtjWb28v4g/LvUyOH1HIlqEnD3tZ6Y4chJRJPvNLnG+YzCnUFvkDjXRlCZ+cLoziZgsr09Xyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731962158; c=relaxed/simple;
-	bh=qP2Gn0FvyzE2X1n9fxM7Kdewy8cFydDfpI8dRuQlwqU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=JROxo6QUz0SOt5BvBlGWzpahjMNb3hePbj1akuIYyDESb7pBJVHFM0SdQ8ZTF3ZwUVFGLqTFIvC3aFavqs7oiOEV40uVUyBbJceL1NQULNsunKIkp875lcI+sTwQaewUNymaq4GlO3A5cxcs4T1Sdw1Ad8c+kniPKADdL8YKoRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=noEUFqcD; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6d402ce7aa3so23768146d6.1
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:35:55 -0800 (PST)
+	s=arc-20240116; t=1731962681; c=relaxed/simple;
+	bh=H0b+SpqbFoJPnwpm7c72ks/wxWmayaWT0c94/M3TaIw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bToVNIFtxDZdwPJqIJrBWPDJSrrn+LQwfkZyn5Az+8SkffKqpynt8zyiaSJEyH1NLkbcGHANt4rxEe7TNyFXDUvvmh7XVL3wjk2+ghSPV5lgzYUgD6VXzVGSFubS0dZwWTUT/JH+5jDzuZ1r1anaCVidrsS9FElGirJ6BLh2c4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SwSMowbK; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-211eb2be4a8so3055ad.1
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:44:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731962155; x=1732566955; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bf6KRH15a4iQ1V/X//Zf/VuIkJmHJ5qMcshZM0TdNHQ=;
-        b=noEUFqcDbcm+8uvpffm0zhzX4ov/BO2pT1qqsUt5IR09qnDF5JA35d5eSLjZXfmm6k
-         R2DAen6rVa1EudFMznRALtOoVkhN2Y3RBShL9KV72wVfRJKhpVFvHvw5R1Jq/AxfskWU
-         6t0uI2AtSLhJexH28HtKDjsAa6dgR/gVliM+kC9A1X2sSzUc9yigOcKmLUsBLADbN0N6
-         yPuS+06ZkVmY/JXq41oYiV0g1NpLw9fCwrm8CU1LmjRn6vEIFCH1kvYu28YHE9dq25nE
-         e7bOz5FHcrCLQkAygPNfoSAQ+eck7Qh3gH2uPdiMiY1mwwg2JJdZgebMulrJyb1q7k7F
-         FqDQ==
+        d=google.com; s=20230601; t=1731962679; x=1732567479; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKTaVzXiCAec3Tyjrd89WA6CeVRBCOnqqKiIQ4/209w=;
+        b=SwSMowbKwp08InbAaKc2V3vbQ/uf/IovkSYTl3w6xjRXRRpGqKi/H3sNa7AxhBDxCC
+         E3yScrF5GEdfUckGWfrVQ4P9zuRwn9ZBhLHUj8bawkVqKkSHxPENRctEx9EEjBd3G7S5
+         dxW6qzD2XFs/p/iVSu+SHy3R7b6p5bwimmon99iTBdhfKhD39sDZSafbvbKW108cBL4q
+         mynoEJ0wJfm5XCdeIhjIMIzSAqj4E7xyOXeBbgQr/2W6//3K289w8HFSzYHOxK3MgFRQ
+         ney+fubK17Iku4fygN5DLHzLyLJgLOtPbAZErVpjQ+IiUfXOrQJy3uRGkyF46RWDOdDj
+         yK3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731962155; x=1732566955;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bf6KRH15a4iQ1V/X//Zf/VuIkJmHJ5qMcshZM0TdNHQ=;
-        b=vtZB1e0vPnavPZUcYf5eqawyDdvGVMS9R1aP8++c4VOKcDL67UU6jZaQ197lu6taZb
-         vxMb6wwIVaLiWp4G8te1ULwRN6NJODbEKBIPfxBbV2vvQy4JtwnY1h6vO4tIOcbOk7de
-         JGdWMvokLwEPPtL4+XQOL2an9O7Gq/tHZjfZ/yyUWhbfncrNctdcrgBlvoiRa0jpIQoy
-         3l6s9e4HrZo8fVfpDi4IuidJXhGhW6L94SkJdXHLSw8n/Gb/3PW8FO/3eFy6lHqwNtBj
-         evX3qu6S9XtdL9rr62xa0slZbj0XFNP6v99E93QZ7yY0edhhdu3B+tF0pFzJjgll8whm
-         GhgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVU3hol91qPCpFjElNA0aAGv5DwY8MPunFkcCfxfxjOtlz0CUvI5qlVQiqAtzjBrE6IQcKLli8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRtEUlZsHNLocChgPz071t1q0mA+iCkvpjjHuBr9gMjMmrS2X/
-	BOMKYuI9tnkjr3ZE9WHdApyK0i44CgzTu3h9l5H2izOi8LjJtotM
-X-Google-Smtp-Source: AGHT+IF1p3iUXICx7931OXtB04PZBLDz30jWWGmaPoLplsKbG4OL1SAqMg8JtuK3qLDYuHM2FqK+rg==
-X-Received: by 2002:a05:6214:2689:b0:6d4:1425:6d30 with SMTP id 6a1803df08f44-6d414257096mr141508896d6.45.1731962155132;
-        Mon, 18 Nov 2024 12:35:55 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc1f49asm39671836d6.50.2024.11.18.12.35.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 12:35:54 -0800 (PST)
-Date: Mon, 18 Nov 2024 15:35:54 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
- netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu, 
- annaemesenyiri@gmail.com, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemb@google.com, 
- idosch@idosch.org
-Message-ID: <673ba52a4374f_1d652429476@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241118145147.56236-4-annaemesenyiri@gmail.com>
-References: <20241118145147.56236-1-annaemesenyiri@gmail.com>
- <20241118145147.56236-4-annaemesenyiri@gmail.com>
-Subject: Re: [PATCH net-next v4 3/3] selftests: net: test SO_PRIORITY
- ancillary data with cmsg_sender
+        d=1e100.net; s=20230601; t=1731962679; x=1732567479;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aKTaVzXiCAec3Tyjrd89WA6CeVRBCOnqqKiIQ4/209w=;
+        b=kqVsLei4i42Zf1+ArRG95P4RPOwmEQgh225yGAOGzAdXvXEQR/aDOqhFv9AxkGls7L
+         qTgSbZRiaHl/IFi3PQW6RLvKIvxHmtPaF6BbrdbGovfeD8aqMLIR1v+Nz5mbM5vvdA7H
+         1v9qPnC3bDkAuElwCPJpt/WH9dl0Mgehf+bK6+LWQVktqGUog8dGEsUz6ebT6LBdKzmG
+         tMf1tHbCOsgy3Cz3oeVTuJZvh8ISeOzm0a4reBIv4SvIR+n9lgY6XkRiRnrRK2lXAlkk
+         1IvMcp6YuxNR90qbOuWfqHogr6GITUl5zeXocxO2AKqW8ANe3tbCHO1RGIDLqDuA0mNp
+         OR6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWKO53OV3Q2uuQ0L893w2p3nyR4wDOfNVnmtlPaBxpZNGBCYXlDRiSEKm5HekTrLYQ6UoBcGXU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWwVfj2Dmx8SHbbUHn5pE8EQEvrunHckMYwARLRtebtHsnbhyH
+	7i4uIarEmGwHidkPVu+Qav41iMPcKQImADWh7CNr57/rCAfJHBr3SOiPuG3w7CC2gkGtutBaSXx
+	9N0ycudV9IezKuMlub6L49kO+On80C3rb5323wNsf82YjRumOZ2c5rSo=
+X-Gm-Gg: ASbGnctHvroXC7dpSYFwKlbDGQVDINdhxaUgF1MXl2LnLbZbWNU1BaX7DI1AUIM30iZ
+	1VC94y4YeoHwrnh7Xzw2WJNDaAoe3k97I
+X-Google-Smtp-Source: AGHT+IHGBmy57KAu0HlHubkKaTd1BqOfX8EYJnZETNfEPTp1FMAEayQici09tykpfSJn3YIPEIejT7GVORR65C3UiSg=
+X-Received: by 2002:a17:902:f68f:b0:1fc:60f2:a089 with SMTP id
+ d9443c01a7336-2124ea7e89cmr326155ad.17.1731962678568; Mon, 18 Nov 2024
+ 12:44:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240905200551.4099064-1-jrife@google.com> <ZzpkPWrrb_Z2ZfCq@zx2c4.com>
+In-Reply-To: <ZzpkPWrrb_Z2ZfCq@zx2c4.com>
+From: Jordan Rife <jrife@google.com>
+Date: Mon, 18 Nov 2024 13:44:26 -0700
+Message-ID: <CADKFtnTThMBDKCXufNaeci5uCeddOgLvXmqszyJoT6N=6xtWug@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] wireguard: allowedips: Add
+ WGALLOWEDIP_F_REMOVE_ME flag
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: wireguard@lists.zx2c4.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Anna Emese Nyiri wrote:
-> Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
-> ancillary data.
-> 
-> cmsg_so_priority.sh script added to validate SO_PRIORITY behavior 
-> by creating VLAN device with egress QoS mapping and testing packet
-> priorities using flower filters. Verify that packets with different
-> priorities are correctly matched and counted by filters for multiple
-> protocols and IP versions.
-> 
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> ---
->  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
->  .../testing/selftests/net/cmsg_so_priority.sh | 147 ++++++++++++++++++
->  2 files changed, 157 insertions(+), 1 deletion(-)
->  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
-> 
+Hi Jason,
 
-> +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
-> @@ -0,0 +1,147 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +IP4=192.0.2.1/24
-> +TGT4=192.0.2.2/24
-> +TGT4_NO_MASK=192.0.2.2
+Thanks a lot for taking a look!
 
-nit, avoid duplication:
+> I'm actually less enthusiastic about this part, but mainly because I
+> haven't looked closely at what the convention for this is. I was
+> wondering though - this adds WGALLOWEDIP_A_FLAGS, which didn't exist
+> before. Shouldn't some upper layer return a relevant value in that case?
+> And even within the existing flags, for WGPEER_A_FLAGS, for example, old
+> kernels check to see if there are new flags, for this purpose, e.g.:
+>
+>         if (attrs[WGPEER_A_FLAGS])
+>                 flags = nla_get_u32(attrs[WGPEER_A_FLAGS]);
+>         ret = -EOPNOTSUPP;
+>         if (flags & ~__WGPEER_F_ALL)
+>                 goto out;
+>
+> So I think we might be able to avoid having to bump the version number.
+> GENL is supposed to be extensible like this.
 
-TGT4_NO_MASK=192.0.2.2
-TGT4="${TGT4_NO_MASK}/24"
+I think the challenge with WGALLOWEDIP_A_FLAGS in particular is that
+because it didn't exist since the beginning like WGPEER_A_FLAGS, there
+are kernels out there that have no knowledge of it and wouldn't have
+this check in place. While I think it's a good idea to replicate this
+check for WGALLOWEDIP_A_FLAGS as well for future compatibility, we
+still need some way for clients to probe whether or not this feature
+is supported in case they're running on an older kernel. If we want to
+keep the version number as-is, I see a few alternatives:
 
-etc.
+1. Include WGALLOWEDIP_A_FLAGS in the response of WG_CMD_GET_DEVICE.
+This would be a new field inside each entry of WGPEER_A_ALLOWEDIPS. If
+the result of WG_CMD_GET_DEVICE contains WGALLOWEDIP_A_FLAGS then a
+client knows that it can use features WGALLOWEDIP_F_REMOVE_ME. It
+could potentially be used later to contain persistent flags for an IP,
+but for now would just be zeroed out. This fails if there are no
+allowed IPs configured for the device you're trying to configure, but
+in the case where you're trying to use WGALLOWEDIP_F_REMOVE_ME you
+probably would.
+2. Keep everything the same. Don't bump the version number. Clients
+could in theory try to use WGALLOWEDIP_A_FLAGS with WG_CMD_SET_DEVICE
+then check if their request had the intended effect (e.g. checking if
+the IP was removed).
 
-Or even drop the versions with the suffix and add that
-explicitly where used.
+I slightly prefer approach 1 myself, as I feel it's a bit cleaner, but
+I'm happy to discuss some other approaches here. I'm trying to think
+about how these probes could be used inside the WireGuard Go library
+and wg itself. Assuming approach one,
 
-> +TGT4_RAW=192.0.2.3/24
-> +TGT4_RAW_NO_MASK=192.0.2.3
-> +IP6=2001:db8::1/64
-> +TGT6=2001:db8::2/64
-> +TGT6_NO_MASK=2001:db8::2
-> +TGT6_RAW=2001:db8::3/64
-> +TGT6_RAW_NO_MASK=2001:db8::3
-> +PORT=1234
-> +DELAY=4000
-> +
-> +
-> +create_filter() {
-> +
-> +    local ns=$1
-> +    local dev=$2
-> +    local handle=$3
-> +    local vlan_prio=$4
-> +    local ip_type=$5
-> +    local proto=$6
-> +    local dst_ip=$7
-> +
-> +    local cmd="tc -n $ns filter add dev $dev egress pref 1 handle $handle \
-> +    proto 802.1q flower vlan_prio $vlan_prio vlan_ethtype $ip_type"
+* For libraries that manage WireGuard like
+golang.zx2c4.com/wireguard/wgctrl the first time a client uses
+.Device() (WG_CMD_GET_DEVICE under the hood) there would need to be
+some logic that looks at WGPEER_A_ALLOWEDIPS for one of the peers and
+sets some internal flag like c.supportsAllowedIPFlags. When a client
+later calls c.ConfigureDevice() the library would disallow direct IP
+removal if the feature is not supported (c.supportsAllowedIPFlags !=
+nil && !*c.supportsAllowedIPFlags). Alternatively, you could do all
+this up front while initializing the client by creating some dummy
+device + peer, adding some IP, then using WG_CMD_GET_DEVICE to see if
+WGALLOWEDIP_A_FLAGS is present in the result.
+* Similarly for wg, if the user is trying to remove an allowed IP
+you'd first query the allowed IP for a peer and check for
+WGALLOWEDIP_A_FLAGS if it doesn't exist in the response then the
+command would fail and print something like "not supported".
 
-nit: indentation on line break. Break inside string is ideally avoided too.
+Bumping WG_GENL_VERSION is cleaner still, since clients in userspace
+just need to check an integer value and avoid any probing logic.
+However, like you I am unsure what the convention is here and whether
+or not this has any unintended effects.
 
-perhaps just avoid the string and below call
+> This file doesn't really do the _ prefix thing anywhere. Can you call
+> this something more descriptive, like "remove_node"?
 
-    tc -n "$ns" filter add dev "$dev" \
-            egress pref 1 handle "$handle" proto 802.1q \
-            dst_ip "$dst_ip" "$ip_proto_opt"
-            flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
-	    action pass
-> +
-> +    if [[ "$proto" == "u" ]]; then
-> +        ip_proto="udp"
-> +    elif [[ "$ip_type" == "ipv4" && "$proto" == "i" ]]; then
-> +        ip_proto="icmp"
-> +    elif [[ "$ip_type" == "ipv6" && "$proto" == "i" ]]; then
-> +        ip_proto="icmpv6"
-> +    fi
-> +
-> +    if [[ "$proto" != "r" ]]; then
-> +        cmd="$cmd ip_proto $ip_proto"
-> +    fi
-> +
-> +    cmd="$cmd dst_ip $dst_ip action pass"
-> +
-> +    eval $cmd
-> +}
-> +
-> +TOTAL_TESTS=0
-> +FAILED_TESTS=0
-> +
-> +check_result() {
-> +    ((TOTAL_TESTS++))
-> +    if [ "$1" -ne 0 ]; then
-> +        ((FAILED_TESTS++))
-> +    fi
-> +}
-> +
-> +cleanup() {
-> +    ip link del dummy1 2>/dev/null
+Sure. I'll update this in v3.
 
-Both devices are in ns1.
+> Reasoning for this is that it copies the logic in add()?
 
-No need to clean up the devices explicitly. Just deleting the netns
-will remove them.
+As for the cidr > bits check, the intent was simply to fail if the
+user passes an invalid value for WGALLOWEDIP_A_CIDR_MASK. Although,
+unlike the add() case, I suppose we could just remove this check.
+Worst case if a user passes something high like 255 remove() would
+just be a no-op. It looks safe to remove !peer check as well. I can
+update this in v3.
 
-> +    ip -n ns1 link del dummy1.10 2>/dev/null
-> +    ip netns del ns1 2>/dev/null
+> What's the reasoning behind returning success when it can't find the
+> node? Because in that case it's already removed so the function is
+> idempotent? And you checked that nothing really cares about the return
+> value there anyway? Or is this a mistake and you meant to return
+> something else? I can imagine good reasoning in either direction; I'd
+> just like to learn that your choice is deliberate.
 
-> +}
-> +
-> +trap cleanup EXIT
-> +
-> +
-> +
-> +ip netns add ns1
-> +
-> +ip -n ns1 link set dev lo up
-> +ip -n ns1 link add name dummy1 up type dummy
-> +
-> +ip -n ns1 link add link dummy1 name dummy1.10 up type vlan id 10 \
-> +        egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
-> +
-> +ip -n ns1 address add $IP4 dev dummy1.10
-> +ip -n ns1 address add $IP6 dev dummy1.10
-> +
-> +ip netns exec ns1 bash -c "
-> +sysctl -w net.ipv4.ping_group_range='0 2147483647'
-> +exit"
+Yes, I opted for idempotence here intentionally. At least for the use
+cases I have in mind the intent is basically "remove all these allowed
+IPs from this peer if they exist". If an allowed IP already got
+removed or is mapped to another peer somehow then that's fine. I'd
+imagine it complicates the code in userspace to have to deal with
+corner cases involving possible error codes returned when removing a
+batch of allowed IPs. You'd need to query the device again, reform
+your request, etc. I /think/ add() is idempotent as well in cases
+where you re-add an IP to a peer, so there's some symmetry here.
+Perhaps if there are use cases that need more stricter checks in the
+future we could introduce a new flag to return an error code in this
+case.
 
-Same point on indentation on line continuation.
+> As I mentioned above, you need to do the dance of:
+>
+>         ret = -EOPNOTSUPP;
+>         if (flags & ~__WGALLOWEDIP_F_ALL)
+>                 goto out;
+>
+> So that we can safely extend this later.
 
-No need for explicit exit.
+Good idea. I will add this in v3 as well.
 
-> +
-> +
-> +ip -n ns1 neigh add $TGT4_NO_MASK lladdr 00:11:22:33:44:55 nud permanent dev \
-> +        dummy1.10
-> +ip -n ns1 neigh add $TGT6_NO_MASK lladdr 00:11:22:33:44:55 nud permanent dev dummy1.10
-> +ip -n ns1 neigh add $TGT4_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud permanent dev dummy1.10
-> +ip -n ns1 neigh add $TGT6_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud permanent dev dummy1.10
-> +
-> +tc -n ns1 qdisc add dev dummy1 clsact
-> +
-> +FILTER_COUNTER=10
-> +
-> +for i in 4 6; do
-> +    for proto in u i r; do
-> +        echo "Test IPV$i, prot: $proto"
-> +        for priority in {0..7}; do
-> +            if [[ $i == 4 && $proto == "r" ]]; then
-> +                TGT=$TGT4_RAW_NO_MASK
-> +            elif [[ $i == 6 && $proto == "r" ]]; then
-> +                TGT=$TGT6_RAW_NO_MASK
-> +            elif [ $i == 4 ]; then
-> +                TGT=$TGT4_NO_MASK
-> +            else
-> +                TGT=$TGT6_NO_MASK
-> +            fi
-> +
-> +            handle="${FILTER_COUNTER}${priority}"
-> +
-> +            create_filter ns1 dummy1 $handle $priority ipv$i $proto $TGT
-> +
-> +            pkts=$(tc -n ns1 -j -s filter show dev dummy1 egress \
-> +                | jq ".[] | select(.options.handle == ${handle}) | \
+> We get 100 chars now, so you can rewrite this as:
+>
+>                         ret = wg_allowedips_remove_v4(&peer->device->peer_allowedips,
+>                                                       nla_data(attrs[WGALLOWEDIP_A_IPADDR]), cidr,
+>                                                       peer, &peer->device->device_update_lock);
 
-Can jq be assumed installed on all machines?
+Nice, will do.
 
-> +                .options.actions[0].stats.packets")
-> +
-> +            if [[ $pkts == 0 ]]; then
-> +                check_result 0
-> +            else
-> +                echo "prio $priority: expected 0, got $pkts"
-> +                check_result 1
-> +            fi
-> +
-> +            ip netns exec ns1 ./cmsg_sender -$i -Q $priority -d "${DELAY}" -p $proto $TGT $PORT
-> +            ip netns exec ns1 ./cmsg_sender -$i -P $priority -d "${DELAY}" -p $proto $TGT $PORT
-> +
-> +
-> +            pkts=$(tc -n ns1 -j -s filter show dev dummy1 egress \
-> +                | jq ".[] | select(.options.handle == ${handle}) | \
-> +                .options.actions[0].stats.packets")
-> +            if [[ $pkts == 2 ]]; then
-> +                check_result 0
-> +            else
-> +                echo "prio $priority: expected 2, got $pkts"
-> +                check_result 1
+> That comma should be a semicolon because what comes after is a complete
+> sentence, and there's no conjunction.
 
-I'd test -Q and -p separately. A bit of extra code to repeat the pkts
-read. But worth it.
+Good point. I think we might actually need a comma /after/ otherwise:
+"...; otherwise, ...": "WGALLOWEDIP_F_REMOVE_ME if the specified IP
+should be removed; otherwise, this IP will be added if it is not
+already present".
 
-> +            fi
-> +        done
-> +        FILTER_COUNTER=$((FILTER_COUNTER + 10))
-> +    done
-> +done
-> +
-> +if [ $FAILED_TESTS -ne 0 ]; then
-> +    echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
-> +    exit 1
-> +else
-> +    echo "OK - All $TOTAL_TESTS tests passed"
-> +    exit 0
-> +fi
-> -- 
-> 2.43.0
-> 
+> I'm not so keen on this, simply because we've been able to do everything
+> else in that script and keeping with the "make sure the userspace
+> tooling" paradigm. There are two options:
+>
+> 1. Rewrite netns.sh all in C, only depending on libnl or whatever (which
+>    I would actually really *love* to see happen). This would change the
+>    testing paradigm, but I'd be okay with that if it's done well and all
+>    at once.
+>
+> 2. Add support for this new flag to wg(8) (which I think is necessary
+>    anyway for this to land; kernel features and userspace support oughta
+>    be posted at once).
+>
+>
+> Thanks for the patch. I like the feature and I'm happy you posted this.
 
+Option 1 seems like a heavy lift for this patch. I think option 2
+makes more sense, as long as there is an understanding that netns.sh
+needs to be run with the latest and greatest version of wg in order
+for all tests to pass. Maybe we can add a version check to selectively
+disable the remove IP tests if wg is on an older version. I agree
+though that long term option 1 would be nice, as it provides a finer
+level of control and tests could be run without as many external
+dependencies. I can get rid of the remove-ip cruft and send two
+patches to the wireguard mailing list if that works, one for the
+kernel and one for wireguard-tools.
 
+However, this raises some questions about the wg interface itself
+which would be used both by netns.sh and end users. Looking at the
+current interface for wg, the way to configure allowed IPs currently
+is "wg set". For example,
+
+wg set peer ABCD... allowed-ips 192.168.0.24/32,192.168.0.44/32,192.168.0.88/32
+
+The intended effect is to completely replace the allowed IPs for that
+peer rather than to make an incremental change. I think we'll need to
+extend the interface a bit. There are a few directions we can take
+here:
+
+1. Add a new flag to "wg set" like --incremental in which case it
+won't use WGPEER_F_REPLACE_ALLOWEDIPS under the hood. Support addition
+or removal of allowed IPs with a "-" suffix on CIDRs you want to
+remove (192.168.0.24/32-,192.168.0.44/32-,192.168.0.88/32).
+2. Same as 1 but with a new argument name, allowed-ips-diff instead of
+the --incremental flag. This appears more in line with the current
+style of wg's arguments.
+
+There are a lot more variations here, so I wanted to get your input
+here before just picking a direction. Thanks again for the thorough
+feedback!
+
+-Jordan
 
