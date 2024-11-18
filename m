@@ -1,147 +1,105 @@
-Return-Path: <netdev+bounces-145777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3649D0B5E
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:05:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B88B9D0B97
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF704282968
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:05:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4DCC282A79
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1141714B7;
-	Mon, 18 Nov 2024 09:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="mC/SRVKG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cI17NtaH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B9E18B47E;
+	Mon, 18 Nov 2024 09:26:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00882907;
-	Mon, 18 Nov 2024 09:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59E1188A0D;
+	Mon, 18 Nov 2024 09:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731920712; cv=none; b=UtG261GJ+IQE0NSdnn7SffsoJtCcIJeRqRHhF61Fv+p8B0oSk1G0kJgzBU4ImMnUHxD9tAZD/H4TrHbR8RT1+3xVk2trO4b9rGAm8XYb4S9Vo97nY0vcgtMoJLNGRAAl99GGM6cdQtcRipR3ofd3+jr+SriZE09N/j7n1WBhwkY=
+	t=1731921986; cv=none; b=t2C/P7mfgl580uS9TSIiwpfdvVv7TXQRZGbDTBZlO7vLiRVOqcVX5V3W9WyawCIj01Ky2oWfu+bknANQWShoeRWX5VgsWRRnNW4kQFeSz29CJQe4roOhK+Clo8ggWcLRbF7KgNO+w9Pxw+6FN8zwCbIrtPU+ldK5lN2J4VqPVz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731920712; c=relaxed/simple;
-	bh=+s588WJ4gk9wbw75TVV+RheBWqaKRkOZn+a+pEIAwX4=;
-	h=MIME-Version:Date:From:To:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=eJ2nNorpJvDhtSAnhk4lxQ8elvFaB6+M7fyKO5BQD6hZyyFF5VZ6T+XvIQRDMwKKASjd/FAsySSPapG1XVPvZsvs2OhgmXSR2HRgvtjfgCwcPdjNpRYxv0OQhImgSX7GrK43IlXY4f6Dnt4CM80qG/HF6z/UGHMXh7rg1ldGDx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=mC/SRVKG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cI17NtaH; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id C9979138070D;
-	Mon, 18 Nov 2024 04:05:08 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Mon, 18 Nov 2024 04:05:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1731920708;
-	 x=1732007108; bh=gf4HA4MAdbhLcSvM8TnDWCU5nuBOYRd+UnKEWXA6Tls=; b=
-	mC/SRVKGvsslm21o20Z5VIyi1gQ6PypC3svwUI6xeYW3iBshmejaNdekK5xf0/Hn
-	Vr54P/doV/GkiRhEEtYSJFqDjZc2gspn9wYVX9Bmc+HNfwhvP/8oiHRa+bjEP6vP
-	2TAZGQ1UY59Ede2j6zhrawLwgUZyk6mGE23etSPEhLns9gdw/6ZgPAcn/zt6uYgf
-	LIq/Y6R44EquJh9i58G2fElo0IIMfKIm7jMsPbuIb/+5svyd1ctq/YyRtx55PfUW
-	i1lGekmsHlK1MREs6NlkZoXLN0IRYvZMXcTuE/BOtU+oWhtT+YOfarKiXceWQO1e
-	XR7rz8tiMxqV6yU+DCJkQg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-transfer-encoding:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1731920708; x=1732007108; bh=g
-	f4HA4MAdbhLcSvM8TnDWCU5nuBOYRd+UnKEWXA6Tls=; b=cI17NtaHx6pDVnb06
-	SUikQtCpalUARm7oJK3+za00Xv2XSAbc6nbQWUhSEMzT4JhfXKSZxQ+W5phg9F4S
-	Jgu6zIdVKibt4rTiDHcGQxfOqgGoMhKKel6c4pRYY9XK3C2igRwFSJQPKrxjFmST
-	jI8jc0zJ1sj6ddvxC4PaFY99re+xaNg6xHkRcpVxfxIiekQAW6ql/56VChx3Enzj
-	1GTllnaXt1pib6qhIsEk7jL4Ece6F8M9pgmaHy5oOC6Zi0VxLKmFQIk4X2Cze1Aw
-	EwK4w3ZvIIyT4NrHiz7q2VJn1fZvyVeeig1iBH5CU9cR+u7OaEgAYVd+RCNihMgl
-	n5lSw==
-X-ME-Sender: <xms:QwM7Z5e-BLKlUy6vneE6wXTvk0vIZrY5PNL9yM_KIpmsFJqg64Q8qQ>
-    <xme:QwM7Z3PsavxoblcxLEK8JGlXkzl_wz4nHSEtibptCih1YXZJHFqfXRME2Hsh0Vcey
-    zt2J39BHSLm1m9rto4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrvdelgdduvdejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvffkjghfufgtgfesthejredtredttden
-    ucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdrug
-    gvqeenucggtffrrghtthgvrhhnpefhkeeltdfffefhgffhteetheeuhffgteeghfdtueef
-    udeuleetgfehtdejieffhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopedufedp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjhgrtghkhigptghhohhusegrshhpvg
-    gvughtvggthhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
-    hopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgu
-    theskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughr
-    vgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehprdiirggsvghlsehpvg
-    hnghhuthhrohhnihigrdguvg
-X-ME-Proxy: <xmx:QwM7ZyhXWjWwuzAyeJhvSyzkoOA9KW09C6TAiJUyJmpq5GdwXGQjHg>
-    <xmx:QwM7Zy94iC8McJYeioPwCoyzH8mqayiLyLatgUEmeE31BZGLpXdKAA>
-    <xmx:QwM7Z1sqraKGDKRBfuMwShDVaI7ZOyyVKAhENwLGNp4syP0f7G2j_A>
-    <xmx:QwM7ZxFnk07XbJDlrGWBqTPWGtCc7c4unC4UDac_HbYXhv6efCTdBA>
-    <xmx:RAM7Z-Gwjz9sEbnLXhN_Ic0w5Iv_U9X5XxsEh8XfQlBlN5ZUJOSLJjNU>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 77F842220071; Mon, 18 Nov 2024 04:05:07 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1731921986; c=relaxed/simple;
+	bh=OVwFVUiY+VLSoK/903nT9owaFfGg3Q/SlJs3t3OeFbM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FbB96LLf9NcIKCcLYpiNq/th3bx9knTIAYT5SOOB29/GDWkqhswH1iu5M+ER/LpA6WPbl3/hPtLCO0bZEyIaPWh1QZpflPf7sJ2QOOLvLuR+eO5pXs5iTQNVWeQRO1YrPXrbxI/AGqOzARUu49hfdltvU5bHB+EwdNqoHLDx0LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XsMDG2sx9z1V4b0;
+	Mon, 18 Nov 2024 17:05:50 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id EE946140393;
+	Mon, 18 Nov 2024 17:08:25 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 18 Nov 2024 17:08:25 +0800
+Message-ID: <40c9b515-1284-4c49-bdce-c9eeff5092f9@huawei.com>
+Date: Mon, 18 Nov 2024 17:08:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 18 Nov 2024 10:04:37 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Jacky Chou" <jacky_chou@aspeedtech.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>,
- "Philipp Zabel" <p.zabel@pengutronix.de>, Netdev <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <e0ad34dc-cc11-428e-8bf0-c764612452e0@app.fastmail.com>
-In-Reply-To: 
- <SEYPR06MB51341859052E393D404F4E519D272@SEYPR06MB5134.apcprd06.prod.outlook.com>
-References: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
- <20241118060207.141048-6-jacky_chou@aspeedtech.com>
- <4b1a9090-4134-4f77-a380-5ead03fd8ba8@app.fastmail.com>
- <SEYPR06MB51341859052E393D404F4E519D272@SEYPR06MB5134.apcprd06.prod.outlook.com>
-Subject: Re: [net-next v2 5/7] net: ftgmac100: add pin strap configuration for AST2700
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
+ has already unbound
+To: Jesper Dangaard Brouer <hawk@kernel.org>,
+	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <fanghaiqing@huawei.com>,
+	<liuyonglong@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Andrew
+ Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, kernel-team
+	<kernel-team@cloudflare.com>
+References: <20241022032214.3915232-1-linyunsheng@huawei.com>
+ <20241022032214.3915232-4-linyunsheng@huawei.com>
+ <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
+ <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
+ <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
+ <0c146fb8-4c95-4832-941f-dfc3a465cf91@kernel.org>
+ <204272e7-82c3-4437-bb0d-2c3237275d1f@huawei.com>
+ <4564c77b-a54d-4307-b043-d08e314c4c5f@huawei.com> <87ldxp4n9v.fsf@toke.dk>
+ <eab44c89-5ada-48b6-b880-65967c0f3b49@huawei.com>
+ <be049c33-936a-4c93-94ff-69cd51b5de8e@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <be049c33-936a-4c93-94ff-69cd51b5de8e@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Mon, Nov 18, 2024, at 08:51, Jacky Chou wrote:
- 
->> Is there a way to probe the presence of 64-bit addressing from hardware
->> registers? That would be nicer than triggering it from the compatible string,
->> given that any future SoC is likely also 64-bit.
+On 2024/11/12 22:19, Jesper Dangaard Brouer wrote:
+>>
+>> Yes, there seems to be many MM system internals, like the CONFIG_SPARSEMEM*
+>> config, memory offline/online and other MM specific optimization that it
+>> is hard to tell it is feasible.
+>>
+>> It would be good if MM experts can clarify on this.
+>>
+> 
+> Yes, please.  Can Alex Duyck or MM-experts point me at some code walking
+> entire system page table?
+> 
+> Then I'll write some kernel code (maybe module) that I can benchmark how
+> long it takes on my machine with 384GiB. I do like Alex'es suggestion,
+> but I want to assess the overhead of doing this on modern hardware.
+> 
 
-I just realized I replied to the wrong email, I meant to send
-my question as a reply to patch 4/7. The patch for the pin strap
-looks fine.
+After looking more closely into MM subsystem, it seems there is some existing
+pattern or API to walk the entire pages from the buddy allocator subsystem,
+see the kmemleak_scan() in mm/kmemleak.c:
+https://elixir.bootlin.com/linux/v6.12/source/mm/kmemleak.c#L1680
 
-> There is no register indicated about 64-bit address support in the 
-> ftgmac100 of Aspeed 7th generation. Therefore, we use the compatible
-> to configure pin strap and DMA mask.
-
-Later in the series you just unconditionally write the 64-bit
-address, so it appears that the ftgmac100 can actually do
-64-bti addressing all along, and this doesn't have to be
-conditional at all, the call to dma_set_mask_and_coherent()
-only tells the kernel that the device can do it, which should
-work on all of them. Since the other devices won't have a
-larger "dma-ranges" configuration in DT, and no RAM above
-32-bit addressing, it should have no effect.
-
-Just make that part in patch 5 unconditional.
-
-     Arnd
+I used that to walk the pages in a arm64 system with over 300GB memory,
+it took about 1.3 sec to do the walking, which seems acceptable?
 
