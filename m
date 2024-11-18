@@ -1,137 +1,103 @@
-Return-Path: <netdev+bounces-145909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFC6C9D14CA
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:54:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 024399D14D0
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:55:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86CD82840F4
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:54:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A25EB1F236C7
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E331A0718;
-	Mon, 18 Nov 2024 15:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC591A0718;
+	Mon, 18 Nov 2024 15:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qQ7Lv+2L"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o2BM5QHw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F1B12EBE7;
-	Mon, 18 Nov 2024 15:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AE448CFC;
+	Mon, 18 Nov 2024 15:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731945254; cv=none; b=Ozh6gBy2Ap0IDJEHQfCgZrSSx2Zn88aYKUXeR35iWg/kkm+qhDwDWo2OsyLn0OM6CQ3E+gxtC4/uLqzB6BuF2/tZ0Bsb9aSF+Z7gxKlIxxRM86FeMLqTZdThbiGzKO/d02moEw/jnJYXwRuCWEtkceaTnPR2D3g1QsdaI6paAPs=
+	t=1731945299; cv=none; b=M8K9CXIjGmtZ+II2o1MkRlLAlUZKAX63nUbNVN/lt+ZUo/wgWaLfSQUn/a/OVJg0RKt5Ga7wngclf9wsS0NtuB+AC2NOi7I3aFhtI3EvK/JgJImih2YhTuqXq/ec06FK8KF90RO89/otgnWbxAB1hQVY7ZSCmwPWVOFHMr3ytug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731945254; c=relaxed/simple;
-	bh=4lpYUs5Dbj0T8zn97A2VEybvGIFft2BYYoXxSpx3bHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Go+z/PEQgADuXhuJMc8D8SE/fBNR/eBsSA8hpFCXuqpiR1uEUDaFqTrqla7BSl0iI+mqRNzL/ffxR2tVsxGZYuf6Zy9s12rL3h5tfw7j57d56uIms16/+hFP8VwyhZ50KMMKe7ZSQq946KR7CXO1a0V6xPQ02d1zBIXzo0fl8pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qQ7Lv+2L; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIB4gaS022969;
-	Mon, 18 Nov 2024 15:54:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=SaDWlb
-	2kKaad3gP5OleofzMuysniJvB4P5iWE1Qjlb8=; b=qQ7Lv+2LJ5CnumzBzjAqxr
-	GunvUxdms9jNHeolIbO6z6aKh067VjHkVP3ahBhYvHTsC0FoTbCVPuVbDo0jQPws
-	uFOg+wTrZJuIOxe37ARIo74U1IvBaH65//fUuTGz+znTfWZl2XKRZqE7cIrL9n2G
-	rtP/32HvBwIWlMKNXR7H5c1ccTH9aVMc0tD0ATvlNh1AMH6lEFwHdHtbwdwm5gUZ
-	i2bgjKhbSq+M3CqZMjB4vPqUu/7xqLxo2tQ+rMDiGrUHO94/V19ez/Z0+mDj/aTC
-	iOZWlgetz8eejMwzRGRSBDbAmWJu8jlfW1ckA5c3h1VwotX2cvs+VBWWp9Z3JLBw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xyu1gpwd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 15:54:07 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIEogGR021983;
-	Mon, 18 Nov 2024 15:54:06 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42y6qmtv09-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 15:54:06 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AIFs55p47972750
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Nov 2024 15:54:05 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4345F58050;
-	Mon, 18 Nov 2024 15:54:05 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E27F158045;
-	Mon, 18 Nov 2024 15:54:04 +0000 (GMT)
-Received: from [9.61.240.76] (unknown [9.61.240.76])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 18 Nov 2024 15:54:04 +0000 (GMT)
-Message-ID: <542cb6ed-8e2b-407e-9f9d-037144740b93@linux.ibm.com>
-Date: Mon, 18 Nov 2024 09:54:04 -0600
+	s=arc-20240116; t=1731945299; c=relaxed/simple;
+	bh=KWjaldySSsYfQCb+Fv1nXh6FZAdhvSHeg1RBQdsBVf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j+WHy5WptAm/kDP4eDf2929Mk0Q/CmSyrpf3yryiwHl+SLAkFnm2dy4XX9hYQYUdWTBfvHEMRzWQkzoV439Wcv9lP5+2QK4GSXKWsAnscCIqW3HyIbqJAYDfPOjG7DR6e/xRWXuYqd24lYvCE/AG+ZSG4uYs8doH/S63llf02EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o2BM5QHw; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CF4F20005;
+	Mon, 18 Nov 2024 15:54:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731945293;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KWjaldySSsYfQCb+Fv1nXh6FZAdhvSHeg1RBQdsBVf8=;
+	b=o2BM5QHwOM9jIig3NLGd5FDgFvDpNzcM36wQa5NARzekPb/pj7gB0mOSC9JaANGhYCcY9q
+	qpM/6ojDZQaViCYcreN+FL/vQO4v8MTzQXp35MtLGOpKh5zGVCm6MMnhZ6FOH7/1ZyY/Mh
+	zberEPyKb2XCgNUmA4SPa3Xd9Vj7+avL4asbVL2OdGT7rOTl/H2POaDseg6ktW5mG1w6C7
+	PbpQKkKU44v1Ms8pA5luj0l1q4IxcJmYGQiQDpYpNFHR97HeM0x7qOO2ixZ2z+iwedaBcA
+	lXKynAIpWHh1at+lCyTcWXnpIWC3ERtrHrDusEfmGaRnNdrQrMlO6eycPqTOLA==
+Date: Mon, 18 Nov 2024 16:54:51 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Suraj Gupta <suraj.gupta2@amd.com>
+Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <kuba@kernel.org>, <pabeni@redhat.com>, <michal.simek@amd.com>,
+ <sean.anderson@linux.dev>, <radhey.shyam.pandey@amd.com>,
+ <horms@kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <git@amd.com>, <harini.katakam@amd.com>
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: xlnx,axi-ethernet: Add
+ bindings for AXI 2.5G MAC
+Message-ID: <20241118165451.6a8b53ed@fedora.home>
+In-Reply-To: <20241118081822.19383-2-suraj.gupta2@amd.com>
+References: <20241118081822.19383-1-suraj.gupta2@amd.com>
+	<20241118081822.19383-2-suraj.gupta2@amd.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/3] vsock/test: verify socket options after setting
- them
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
-References: <20241113143557.1000843-1-kshk@linux.ibm.com>
- <20241113143557.1000843-4-kshk@linux.ibm.com>
- <yo2qj7psn3sqtyqgsfn6y2qtwcmyb4j7gwuffg34gwqwkrsyox@4aff3wvdrdgu>
-From: Konstantin Shkolnyy <kshk@linux.ibm.com>
-In-Reply-To: <yo2qj7psn3sqtyqgsfn6y2qtwcmyb4j7gwuffg34gwqwkrsyox@4aff3wvdrdgu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KY8lgYHVVl13F8Rj2DQbSA6JJs9h1IRC
-X-Proofpoint-ORIG-GUID: KY8lgYHVVl13F8Rj2DQbSA6JJs9h1IRC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
- bulkscore=0 spamscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
- clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411180128
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 11/14/2024 04:28, Stefano Garzarella wrote:
-> On Wed, Nov 13, 2024 at 08:35:57AM -0600, Konstantin Shkolnyy wrote:
-[...]
->> diff --git a/tools/testing/vsock/msg_zerocopy_common.c b/tools/ 
->> testing/vsock/msg_zerocopy_common.c
->> index 5a4bdf7b5132..8622e5a0f8b7 100644
->> --- a/tools/testing/vsock/msg_zerocopy_common.c
->> +++ b/tools/testing/vsock/msg_zerocopy_common.c
->> @@ -14,16 +14,6 @@
->>
->> #include "msg_zerocopy_common.h"
->>
->> -void enable_so_zerocopy(int fd)
->> -{
->> -    int val = 1;
->> -
->> -    if (setsockopt(fd, SOL_SOCKET, SO_ZEROCOPY, &val, sizeof(val))) {
->> -        perror("setsockopt");
->> -        exit(EXIT_FAILURE);
->> -    }
->> -}
->> -
-> 
-> Since the new API has a different name (i.e.
-> `enable_so_zerocopy_check()`), this `enable_so_zerocopy()` could stay
-> here, anyway I don't want to be too picky, I'm totally fine with this
-> change since it's now only used by vsock_perf ;-)
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
+Hello,
 
-Ok, let's keep it static then - it's simpler :-)
+On Mon, 18 Nov 2024 13:48:21 +0530
+Suraj Gupta <suraj.gupta2@amd.com> wrote:
+
+> AXI 1G/2.5G Ethernet subsystem supports 1G and 2.5G speeds. "max-speed"
+> property is used to distinguish 1G and 2.5G MACs of AXI 1G/2.5G IP.
+> max-speed is made a required property, and it breaks DT ABI but driver
+> implementation ensures backward compatibility and assumes 1G when this
+> property is absent.
+> Modify existing bindings description for 2.5G MAC.
+
+That may be a silly question, but as this is another version of the IP
+that behaves differently than the 1G version, could you use instead a
+dedicated compatible string for the 2.5G variant ?
+
+As the current one is :
+
+compatible = "xlnx,axi-ethernet-1.00.a";
+
+it seems to already contain some version information.
+
+But I might also be missing something :)
+
+Best regards,
+
+Maxime
+
 
