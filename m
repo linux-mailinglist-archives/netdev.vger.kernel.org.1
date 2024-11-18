@@ -1,127 +1,175 @@
-Return-Path: <netdev+bounces-145806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98D79D0FA7
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:27:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1F09D0FB2
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 12:28:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7725E1F2261A
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:27:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE4A1282BA0
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B2D198A39;
-	Mon, 18 Nov 2024 11:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2991990B5;
+	Mon, 18 Nov 2024 11:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cwk2KtJ4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m/8JdPtt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A2919884B;
-	Mon, 18 Nov 2024 11:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CEB193435;
+	Mon, 18 Nov 2024 11:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731929261; cv=none; b=SOq66963A1rsf6ISCntofqzC0BQnYw0kSmJoIFvf7ZcAhhSeZzUYSanitnjBUTABGwOprLnGWs36ye7Khd8MAtOSMYKiE8v1ICXWXN5r0yV72t6WNQXlLQsHOoR5hZiUJ1WJXVpfCx3XSZTeagg0iBA0ZEDO7UtT2sw6D9j3TKk=
+	t=1731929318; cv=none; b=JnrC+Kz56QPCbLm7I6ZVfVM0cpoO5CDPtSKEOWNVpXtSgXfVSJye83CT+cYeHUG2AfFGfEjU3RAZOqE1Ub43cdqrad51fWCka6hp472svUdaM4CAbIToFFnSJ+aDn9lkaCrtIE3s01jarq0m1HyLxtnaKenW2NNbsmOc7MiEwxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731929261; c=relaxed/simple;
-	bh=XzSXgYfcoT1U8q5HfLv6ZN8Sc+0cViVPj/g3CvWfLnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEhTi9KjJ+IgPT+2Um1aspIq98ZmuE4sTsKUNJIyH8dsVFy62io3sy5ywslS5fGmLlym0aZG/nqLmUb6nsE7zSnUkZpRtHvGJyche+orD9F6D8EaoB1gBOPQdeLNsW95T2H6AqzumNZZBL4Vi6J7OanyttofxbMd6k+f2qY9AJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cwk2KtJ4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=aWVvJstqu9oec/DoTVTnJT7l6FlIcFpKbuGY46oxk6U=; b=cwk2KtJ4V+P6+P9vEVpTY7PwsN
-	1XNQDV9EPdUIi0MXxbA152apmmiU1F/1puH6c8Ut39T+KkGzMaoVdjScT9xBGduCB9bjQLXjoFx6Z
-	0qe2z1SuCHJL1fAXCg+IvRaajK9aZNdbmVWWPqYaUGHrLEdepPSZ4Sn/3+CtJaF8PMU0L39PAdozl
-	88DnDLXFJe52T/zbpsQD/Q6nkNv24ism4JHUOog/KGF/MnXuXSeshbiExUhPf9OdZAd4NJ9tj3DOS
-	xDiELwQK3h0shwfx5CXEEAbiUdiZ3z01RuURY9cRxNI8uRLcnkI3LjcCkM2r9JddEDHuCOPdnfDEP
-	HDNrau2w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53254)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tCzum-0001dc-2F;
-	Mon, 18 Nov 2024 11:27:33 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tCzuj-00053M-2b;
-	Mon, 18 Nov 2024 11:27:29 +0000
-Date: Mon, 18 Nov 2024 11:27:29 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: mdio-ipq4019: fix wrong NULL check
-Message-ID: <ZzskoS2jwC6eLlmD@shell.armlinux.org.uk>
-References: <20241117212827.13763-1-rosenp@gmail.com>
- <5562cf54-d1bd-4235-b232-33f5cca40b85@quicinc.com>
+	s=arc-20240116; t=1731929318; c=relaxed/simple;
+	bh=eflO5BqcAdiHnObc19vuFxv1kFN4bcVh6FEadC6e/J0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=T6XTRc2TTB2/I+CZHGZuUSK0AknwoSwHSo949+Nym4GcNaA1BlRudEmeGAU281/nBBS5e6xY1e3dBX9ePi/Qa/XKhN9ezXEA2At2vFfYkmKSzjfzc8sJ9SnY2PWPA/JNZG0ZxnJH7JF2+GI77HKU6YblxQ9ubYC+HAUYgZ+eA/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m/8JdPtt; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731929317; x=1763465317;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=eflO5BqcAdiHnObc19vuFxv1kFN4bcVh6FEadC6e/J0=;
+  b=m/8JdPttVwUXB5ZhVtJXKSa0qsOobC2hjqN6pZsmq5ZFypOQD0vpYCKi
+   6N1ldEbE7IX6cI/JPyGTLJphyOa8qs7J9LsaxXS2T3h8Mhe6xE4mY1tCq
+   la+qvukZUQkQzQX1jOk/yyCJz5ix7tej6qx7AKwllnCOC3Et+dvcKuxG9
+   LXStNjnOvrJXlYrTiY1ntu1sKAVgK/JY8xFxs4yjkzgF5gBfMcVG1hKyP
+   CzsFthbx3Wj2ZxKf6rqqMH7sS4Qcl9NdLn+cy8xySJrxnbQSORPrnwSim
+   f6cncK9WeAZ8+6pNGUyjtvGlSKM4rqt4BllKp/b4Xc/1nPtj0a8wp3UK6
+   A==;
+X-CSE-ConnectionGUID: NZT1qeH0SnGr7jSWfhdmHw==
+X-CSE-MsgGUID: FLXFwY+gRrWhIKX7RjAeSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11259"; a="42396204"
+X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
+   d="scan'208";a="42396204"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:28:31 -0800
+X-CSE-ConnectionGUID: rRdUd/MrRkyoZEJD1Sac1Q==
+X-CSE-MsgGUID: apTDPmdSTQ+3Y3NYJwg9xw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,163,1728975600"; 
+   d="scan'208";a="89329614"
+Received: from mwiniars-desk2.ger.corp.intel.com (HELO [10.245.246.149]) ([10.245.246.149])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2024 03:28:08 -0800
+Message-ID: <62c1e9e941cec75cf8771761fb9981879fefcce5.camel@linux.intel.com>
+Subject: Re: [PATCH 08/22] drm/xe: Convert timeout to secs_to_jiffies()
+From: Thomas =?ISO-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
+To: Easwar Hariharan <eahariha@linux.microsoft.com>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,  Nicolas Palix
+ <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
+ <haojian.zhuang@gmail.com>, Robert Jarzmik <robert.jarzmik@free.fr>,
+ Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
+ Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
+ Marchi <lucas.demarchi@intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
+ <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
+ <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>, Dick Kennedy
+ <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
+ <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
+ <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Jack
+ Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, Broadcom
+ internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo
+ Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,  Josh Poimboeuf
+ <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, Miroslav Benes
+ <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
+ <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
+ <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>, Russell King
+ <linux+etnaviv@armlinux.org.uk>,  Christian Gmeiner
+ <christian.gmeiner@gmail.com>, Louis Peens <louis.peens@corigine.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao
+ <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr, 
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org,  linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org,  ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org,  linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org,  oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+Date: Mon, 18 Nov 2024 12:27:53 +0100
+In-Reply-To: <20241115-converge-secs-to-jiffies-v1-8-19aadc34941b@linux.microsoft.com>
+References: 
+	<20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
+	 <20241115-converge-secs-to-jiffies-v1-8-19aadc34941b@linux.microsoft.com>
+Autocrypt: addr=thomas.hellstrom@linux.intel.com; prefer-encrypt=mutual;
+ keydata=mDMEZaWU6xYJKwYBBAHaRw8BAQdAj/We1UBCIrAm9H5t5Z7+elYJowdlhiYE8zUXgxcFz360SFRob21hcyBIZWxsc3Ryw7ZtIChJbnRlbCBMaW51eCBlbWFpbCkgPHRob21hcy5oZWxsc3Ryb21AbGludXguaW50ZWwuY29tPoiTBBMWCgA7FiEEbJFDO8NaBua8diGTuBaTVQrGBr8FAmWllOsCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQuBaTVQrGBr/yQAD/Z1B+Kzy2JTuIy9LsKfC9FJmt1K/4qgaVeZMIKCAxf2UBAJhmZ5jmkDIf6YghfINZlYq6ixyWnOkWMuSLmELwOsgPuDgEZaWU6xIKKwYBBAGXVQEFAQEHQF9v/LNGegctctMWGHvmV/6oKOWWf/vd4MeqoSYTxVBTAwEIB4h4BBgWCgAgFiEEbJFDO8NaBua8diGTuBaTVQrGBr8FAmWllOsCGwwACgkQuBaTVQrGBr/P2QD9Gts6Ee91w3SzOelNjsus/DcCTBb3fRugJoqcfxjKU0gBAKIFVMvVUGbhlEi6EFTZmBZ0QIZEIzOOVfkaIgWelFEH
+Organization: Intel Sweden AB, Registration Number: 556189-6027
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-3.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5562cf54-d1bd-4235-b232-33f5cca40b85@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Nov 18, 2024 at 06:26:27PM +0800, Jie Luo wrote:
-> On 11/18/2024 5:28 AM, Rosen Penev wrote:
-> > devm_ioremap_resource returns a PTR_ERR when it fails, not NULL. OTOH
-> > this is conditionally set to either a PTR_ERR or a valid pointer. Use
-> > !IS_ERR_OR_NULL to check if we can use this.
-> > 
-> > Fixes: 23a890d493 ("net: mdio: Add the reset function for IPQ MDIO driver")
-> > 
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > ---
-> >   drivers/net/mdio/mdio-ipq4019.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
-> > index dd3ed2d6430b..859302b0d38c 100644
-> > --- a/drivers/net/mdio/mdio-ipq4019.c
-> > +++ b/drivers/net/mdio/mdio-ipq4019.c
-> > @@ -256,7 +256,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
-> >   	/* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
-> >   	 * is specified in the device tree.
-> >   	 */
-> > -	if (priv->eth_ldo_rdy) {
-> > +	if (!IS_ERR_OR_NULL(priv->eth_ldo_rdy)) {
-> >   		val = readl(priv->eth_ldo_rdy);
-> >   		val |= BIT(0);
-> >   		writel(val, priv->eth_ldo_rdy);
-> 
-> Reviewed-by: Luo Jie <quic_luoj@quicinc.com>
+On Fri, 2024-11-15 at 21:22 +0000, Easwar Hariharan wrote:
+> Changes made with the following Coccinelle rules:
+>=20
+> @@ constant C; @@
+>=20
+> - msecs_to_jiffies(C * 1000)
+> + secs_to_jiffies(C)
+>=20
+> @@ constant C; @@
+>=20
+> - msecs_to_jiffies(C * MSEC_PER_SEC)
+> + secs_to_jiffies(C)
+>=20
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+Reviewed-by: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
 
-Looking at the setup of this:
+<
+> ---
+> =C2=A0drivers/gpu/drm/xe/xe_device.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/gpu/drm/xe/xe_device.c
+> b/drivers/gpu/drm/xe/xe_device.c
+> index
+> a1987b554a8d2aa42b29301f2853edddfda7fda5..bb3338ef4191e76128611eeb953
+> 1c9d2089db85a 100644
+> --- a/drivers/gpu/drm/xe/xe_device.c
+> +++ b/drivers/gpu/drm/xe/xe_device.c
+> @@ -502,7 +502,7 @@ static int wait_for_lmem_ready(struct xe_device
+> *xe)
+> =C2=A0	drm_dbg(&xe->drm, "Waiting for lmem initialization\n");
+> =C2=A0
+> =C2=A0	start =3D jiffies;
+> -	timeout =3D start + msecs_to_jiffies(60 * 1000); /* 60 sec! */
+> +	timeout =3D start + secs_to_jiffies(60); /* 60 sec! */
+> =C2=A0
+> =C2=A0	do {
+> =C2=A0		if (signal_pending(current))
+>=20
 
-        /* The platform resource is provided on the chipset IPQ5018 */
-        /* This resource is optional */
-        res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-        if (res)
-                priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
-
-While this is optional, surely the optional part is whether resource 1
-is provided or not. If the resource is provided, but we fail to ioremap
-it, isn't that an error which should be propagated? In that situation,
-isn't the firmware saying "we have a second resource" but failing to
-map it should be an error?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
