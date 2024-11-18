@@ -1,105 +1,112 @@
-Return-Path: <netdev+bounces-145780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B88B9D0B97
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:26:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A85D9D0B67
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4DCC282A79
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:26:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40ABF282886
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 09:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B9E18B47E;
-	Mon, 18 Nov 2024 09:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C257188704;
+	Mon, 18 Nov 2024 09:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SrHKJxVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59E1188A0D;
-	Mon, 18 Nov 2024 09:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711A2153836;
+	Mon, 18 Nov 2024 09:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731921986; cv=none; b=t2C/P7mfgl580uS9TSIiwpfdvVv7TXQRZGbDTBZlO7vLiRVOqcVX5V3W9WyawCIj01Ky2oWfu+bknANQWShoeRWX5VgsWRRnNW4kQFeSz29CJQe4roOhK+Clo8ggWcLRbF7KgNO+w9Pxw+6FN8zwCbIrtPU+ldK5lN2J4VqPVz4=
+	t=1731920958; cv=none; b=SuSiLriHRK/KW5xdvDsB8R4nON46U4DL2dRu2Sr6gCJRkyXE0x8TQ5odToXUE2wwTzwkBVtoDTaoCV4qSO141U2xOBd3HKoFV2p30/oHgEoDRLryeu7fRmQ/2toapSQf/FHOOYmmT3FwpPetB0pEuxby8R3NOro2SeWMi+pbd6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731921986; c=relaxed/simple;
-	bh=OVwFVUiY+VLSoK/903nT9owaFfGg3Q/SlJs3t3OeFbM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FbB96LLf9NcIKCcLYpiNq/th3bx9knTIAYT5SOOB29/GDWkqhswH1iu5M+ER/LpA6WPbl3/hPtLCO0bZEyIaPWh1QZpflPf7sJ2QOOLvLuR+eO5pXs5iTQNVWeQRO1YrPXrbxI/AGqOzARUu49hfdltvU5bHB+EwdNqoHLDx0LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XsMDG2sx9z1V4b0;
-	Mon, 18 Nov 2024 17:05:50 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id EE946140393;
-	Mon, 18 Nov 2024 17:08:25 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 18 Nov 2024 17:08:25 +0800
-Message-ID: <40c9b515-1284-4c49-bdce-c9eeff5092f9@huawei.com>
-Date: Mon, 18 Nov 2024 17:08:25 +0800
+	s=arc-20240116; t=1731920958; c=relaxed/simple;
+	bh=YWLswSe7WZP9b/xSFZ5CYmi1IPuOZDQasiG6yEaMH7c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kPATJDQxnuDqq3HIird9NgfoYm62/XskzLCsn4tSnMO4OVudE8bHxyAoqhIkmBQHN/wSysTzBmPyu79ILaIpctipU+/Ipeq+HgwQ9xlsk3rCxvJmWXecPA1qCmgpBaWZzuDpiW/S7x9DnrG/gElmsY5c6VUY72o0XxfZRor7oYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SrHKJxVR; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-211f6e1c865so3390455ad.3;
+        Mon, 18 Nov 2024 01:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731920956; x=1732525756; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YWLswSe7WZP9b/xSFZ5CYmi1IPuOZDQasiG6yEaMH7c=;
+        b=SrHKJxVR7m3oU7mRrxp5tp8195/a4J6qbqwx0P9bQd7Knry67ARKGLZGc/ChpUs4J6
+         qbYAKwJe+9+JZFRVNcFJ/S9ph2QAMq/XIf8m1GH44EqLZ9IpZ1m+FY4m8sqjT/TJiVih
+         m4zIzrUnyDn3S5JK3/VfiltW7ATbAkEdTzOQhNNQl9g9+pRjckhBP2e3u/edPQTbx7Pm
+         oeONCrxqOzYtmBj2ABTN8bCWRqFEKWOcj2qANX1O6CSz2HBCvCJ7gW4we0xqHCSDoWI9
+         XB0WWn5e1VC+mblw1PtkIx4Hs0Uu7lulKxRKtkdkw2WmDnVcvOCKIYdJgjV/+FgLemR7
+         TWDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731920956; x=1732525756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YWLswSe7WZP9b/xSFZ5CYmi1IPuOZDQasiG6yEaMH7c=;
+        b=Y3h4G0aZ+M1822mX2CQnmJj6hrMKc3c+GkYktG5vi22ZmN1qlWwhO7iZhU2XvJaiOw
+         MplHCo1w5DOvwUy1d6AJtRT86Oi8fnc4F/giGvOB1HPSgw9hhFtds5ZJX+Km/5Hyvs6o
+         uLIs29bX95fquM5WwnrkJFoj8sxvotohmb4XRtEJyWk4mmt2K/noD/UdFDhV6dIi24pi
+         o165Gcz96ImiNP87qAd7Ev+H30mA91fLfKgLibk+Mk9UJKLcCcqYXGivQfmcJ2IZp4ot
+         5PXxhaVyxrTkhwUDN+Vid5QYDnDHeVB+yHSUOfqINjL9s4gtMFrjJezqf33njBTsC2wr
+         jTBA==
+X-Forwarded-Encrypted: i=1; AJvYcCU03h+yQ9j8YpWkmc8W/CafvKWk+WILvJJTyP9Ct2F7jMFVVjlBbNJMujOaiJPN9g+hHMuf0XjcVY3PzpoEfDw=@vger.kernel.org, AJvYcCVanOkH3CTEMcQgtBeinFSjgUD0dNL6pOwxSvXtVjaj1G9vanx+aBBQk02FkRyBPL0UTVSFU9/CWDyhsw==@vger.kernel.org, AJvYcCWlKh5mnQg1gyTrHyPTM/lF+rBEf0GIBcDWXfuyWUK+E0NsU71JpoVkwwvSYcZ54LdVXmZKSkN4@vger.kernel.org, AJvYcCXUk5TAd4YxOB+1GmpcWssfhQ7NDa7hbAnwfpNGVJWe22VyhqCSP+xbgHSS+UhhBFMY3+R5YugdmxcDJdCx@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ0azNHph2gIIKIoqeTklXIexz+vGkdviQnAuJO8a9t/Q79ft4
+	u36DAp9xjSJRcmz4185sMqRUcBBZ3s7SoWYbCvosccudJMdIa+EqGLR+8Rsd3Kr48xnwXWYVlCM
+	UzB/4TYAEVGb8/xha6cfDprKAVzQ=
+X-Google-Smtp-Source: AGHT+IFpWfv5PIcWHbtZu/kn7bRyyJbKbZRumMvg1pEzQh+tSLDv2nY2KMHanrDXfZai+jdjAHxB8cHLncAz8ePurYk=
+X-Received: by 2002:a17:90b:1e50:b0:2ea:715b:72ba with SMTP id
+ 98e67ed59e1d1-2ea715b7581mr1460462a91.9.1731920955682; Mon, 18 Nov 2024
+ 01:09:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
- has already unbound
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
-	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <zhangkun09@huawei.com>, <fanghaiqing@huawei.com>,
-	<liuyonglong@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
- Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Andrew
- Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, <linux-mm@kvack.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, kernel-team
-	<kernel-team@cloudflare.com>
-References: <20241022032214.3915232-1-linyunsheng@huawei.com>
- <20241022032214.3915232-4-linyunsheng@huawei.com>
- <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
- <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
- <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
- <0c146fb8-4c95-4832-941f-dfc3a465cf91@kernel.org>
- <204272e7-82c3-4437-bb0d-2c3237275d1f@huawei.com>
- <4564c77b-a54d-4307-b043-d08e314c4c5f@huawei.com> <87ldxp4n9v.fsf@toke.dk>
- <eab44c89-5ada-48b6-b880-65967c0f3b49@huawei.com>
- <be049c33-936a-4c93-94ff-69cd51b5de8e@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <be049c33-936a-4c93-94ff-69cd51b5de8e@kernel.org>
+References: <20241117-simplify-result-v1-1-5b01bd230a6b@iiitd.ac.in>
+ <3721a7b2-4a8f-478c-bbeb-fdf22ded44c9@lunn.ch> <CANiq72kk0gsC8gohDT9aqY6r4E+pxNC6=+v8hZqthbaqzrFhLg@mail.gmail.com>
+ <q5xmd3g65jr4lmnio72pcpmkmvlha3u2q3fohe2wxlclw64adv@wjon44dqnn7e>
+ <CANiq72kQJw4=qBEPwykrWBsqmycwS+mR27OE2dTPQd3tKjx-Tw@mail.gmail.com> <5qtqdzljvzly5onzhfdq63fzcqcj26ybktm2cgomijpnfnyrbj@ln2kbp73csf6>
+In-Reply-To: <5qtqdzljvzly5onzhfdq63fzcqcj26ybktm2cgomijpnfnyrbj@ln2kbp73csf6>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 18 Nov 2024 10:09:03 +0100
+Message-ID: <CANiq72koO_gdhP_5hzNz5AH-JQNoAzpszpeVR_BV14Nw-OWhzw@mail.gmail.com>
+Subject: Re: [PATCH] rust: simplify Result<()> uses
+To: Manas <manas18244@iiitd.ac.in>
+Cc: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Anup Sharma <anupnewsmail@gmail.com>, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/11/12 22:19, Jesper Dangaard Brouer wrote:
->>
->> Yes, there seems to be many MM system internals, like the CONFIG_SPARSEMEM*
->> config, memory offline/online and other MM specific optimization that it
->> is hard to tell it is feasible.
->>
->> It would be good if MM experts can clarify on this.
->>
-> 
-> Yes, please.  Can Alex Duyck or MM-experts point me at some code walking
-> entire system page table?
-> 
-> Then I'll write some kernel code (maybe module) that I can benchmark how
-> long it takes on my machine with 384GiB. I do like Alex'es suggestion,
-> but I want to assess the overhead of doing this on modern hardware.
-> 
+On Mon, Nov 18, 2024 at 2:12=E2=80=AFAM Manas <manas18244@iiitd.ac.in> wrot=
+e:
+>
+> Yes.
 
-After looking more closely into MM subsystem, it seems there is some existing
-pattern or API to walk the entire pages from the buddy allocator subsystem,
-see the kmemleak_scan() in mm/kmemleak.c:
-https://elixir.bootlin.com/linux/v6.12/source/mm/kmemleak.c#L1680
+I was asking because the kernel does not accept anonymous
+contributions, so when someone uses a single (common, I think?) word
+as their identity, it may not be enough to find the contributor again
+in the future if the email changes.
 
-I used that to walk the pages in a arm64 system with over 300GB memory,
-it took about 1.3 sec to do the walking, which seems acceptable?
+Thanks!
+
+Cheers,
+Miguel
 
