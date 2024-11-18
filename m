@@ -1,195 +1,310 @@
-Return-Path: <netdev+bounces-145993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD7059D19A8
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:28:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E38E9D19B4
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 21:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DCA02817CD
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:28:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13CEEB219EF
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 20:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32ED21E5732;
-	Mon, 18 Nov 2024 20:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F0D1E5015;
+	Mon, 18 Nov 2024 20:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkrjFlzd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noEUFqcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EEA1D0DFC;
-	Mon, 18 Nov 2024 20:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486B514BF8F
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 20:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731961701; cv=none; b=G4wlgQ4rRtw/zHomj1H/243FBz0waHzbNn4uKtDpyf8wZ5cSuPbbZw/orIawA51zGnhOqAXpUA4+8w0Du+blgz8Y4+FEdlT9goCoM2lcTmoHza4mRJPhdpG5/wxB5EGYOLco/6OlcsLOn4LZhcWQFzRnlfseNDy3csKmcy0448c=
+	t=1731962158; cv=none; b=SQFscNRgoPZ3EjEMhwjXGndVR8orRTHsK2JTtn0CdUiRASBYo9JehMG8ko08K4Ph9JWODLo09zgmftsDGyfSWb703aCrT/MxvLMmfCDpon87v5WxPx0FTtk7XXZP0V2rQwgg+UNWVr2WL2r+7GPquyBOzNMQUWWfiKTjPtvN4wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731961701; c=relaxed/simple;
-	bh=O3HSD73dd2STWTmBwHmLsB7H5lxT4RPcf/Bga/vpFwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DylBKy19TouzCqRpH1HExXxVrGNnpRyyUVD9wx6m9H+lRmaDGSOG7aB8iHszjM5jBEdioQQcE2T5qzXK0FKXGXdaoMmHsPAJh/SFglYZVOPKEgLMaChTM4ZT7Xrs+eJFCDCp4z/ybW9AH1EcXSuNaOD4UVp9aSWNyN0Ax7eHex4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fkrjFlzd; arc=none smtp.client-ip=209.85.222.169
+	s=arc-20240116; t=1731962158; c=relaxed/simple;
+	bh=qP2Gn0FvyzE2X1n9fxM7Kdewy8cFydDfpI8dRuQlwqU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=JROxo6QUz0SOt5BvBlGWzpahjMNb3hePbj1akuIYyDESb7pBJVHFM0SdQ8ZTF3ZwUVFGLqTFIvC3aFavqs7oiOEV40uVUyBbJceL1NQULNsunKIkp875lcI+sTwQaewUNymaq4GlO3A5cxcs4T1Sdw1Ad8c+kniPKADdL8YKoRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=noEUFqcD; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b1601e853eso168068885a.2;
-        Mon, 18 Nov 2024 12:28:19 -0800 (PST)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6d402ce7aa3so23768146d6.1
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 12:35:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731961698; x=1732566498; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1731962155; x=1732566955; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ut+d7DL7uqoI2pnr1wfCbwOzEdaLXHwjRahrl9zmYH8=;
-        b=fkrjFlzd/ACmg0DWmvFbLMD2mey5vydSxaOulDQYsDxTXVrnlTJYLpUZc8C23krc3W
-         RWCWLYuaszX57VS6Zx2LS7f/puyS/R2WVj7zhahzWGP/P//DTTuljafRY3I9J0qxmXJh
-         eHzUII9+5OCuZlSfAtYRoE4qdIiTx4kmIy5jL0VGVQv224nKQt0v69CqyJrLa3P/W8kX
-         +c6KNW8Ep7FCkun2cQqswTAAacQKfeOCwD4/FoT8y7vpBqdW07eYMqZ8YntHsAq9rf8P
-         4H1SPo4mxbSvBo0YctqCt+ENqNXco4ci98QMtT4gwIH4biFUmt+FGTEiuYVDGJ1T2WYq
-         G8OQ==
+        bh=bf6KRH15a4iQ1V/X//Zf/VuIkJmHJ5qMcshZM0TdNHQ=;
+        b=noEUFqcDbcm+8uvpffm0zhzX4ov/BO2pT1qqsUt5IR09qnDF5JA35d5eSLjZXfmm6k
+         R2DAen6rVa1EudFMznRALtOoVkhN2Y3RBShL9KV72wVfRJKhpVFvHvw5R1Jq/AxfskWU
+         6t0uI2AtSLhJexH28HtKDjsAa6dgR/gVliM+kC9A1X2sSzUc9yigOcKmLUsBLADbN0N6
+         yPuS+06ZkVmY/JXq41oYiV0g1NpLw9fCwrm8CU1LmjRn6vEIFCH1kvYu28YHE9dq25nE
+         e7bOz5FHcrCLQkAygPNfoSAQ+eck7Qh3gH2uPdiMiY1mwwg2JJdZgebMulrJyb1q7k7F
+         FqDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731961698; x=1732566498;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ut+d7DL7uqoI2pnr1wfCbwOzEdaLXHwjRahrl9zmYH8=;
-        b=bYmRY4WlU3ONsv5doV2M89G0CJCPDWryhD1kgZQJLidA4x7BGZjb7jRABuQ9eb0Vu4
-         G1hrwev28pplTiprNaaUvUqG5e1oHmqP/RdEYfy6doBgnlUrDeGOK2h7PaPrac/BDUxh
-         9MjCbB3pfo7xOTaDm8f7nnfFZTD/pWZAuGDnkp+2Rsds+8nUb9XETJGU2GH/ov2ywDbo
-         0QpbcfgclfV1dnp9oYFpevzD8L/6wMmzTYjLggSH3z7ZDyfJ6x81rpr0Mtgg0vt0R/CX
-         SHTA+p9c25f2igADOmUstjSlpaRDKxgN8XWZ6rp1HzbSXCq8StWWVRMg+E+k23GVJ4eX
-         joKA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+zXot3Gc0BHBaOoaks/7A8Jqvw067aT0+0ZK4JFUG6AZDJYwabZtvicy5CFwHawsxuAGr9mg42KDBlw==@vger.kernel.org, AJvYcCUNuMcrR97ln1nB5zQmqYAeSYPa9ISHeZB+EbrI/u6dw1JDU7rUbmGEkPfU6hNJzRnrOHhV0o4Y@vger.kernel.org, AJvYcCVtqP9xeW6tD6j3QyiPFobc69lP7u6jw1Hxq3qTA5pGbq2Je4Awt9W3nJgavLpiN6/XtZb5W0xirzIirafIEHs=@vger.kernel.org, AJvYcCWA708bnG7Jph9o5wTmOKpXzarEZQXQgeGzbUTW1/eyLMx0FjGJ5zWaQU6cyC6CCXoKKES6Sa4hVAAXKWxd@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGHCXIi51y0uvXPjfhy1zVWCi7yQfwRoYihGuis1y0QTyQBDt7
-	/KYxw7dbZBlIWvwdC5H1EUxAs8vKzEuJdXPnTL3/KA88CbC51kpV
-X-Google-Smtp-Source: AGHT+IGcYiGJ+3lwBm589yH3iVd/ZN43viURBfqeOA4ouRBzJLMwUclDkj0RDkFm0gEdkdLWT6yw1A==
-X-Received: by 2002:a05:620a:44d1:b0:7b1:1cf6:cfd0 with SMTP id af79cd13be357-7b3622db90fmr2044601785a.33.1731961698332;
-        Mon, 18 Nov 2024 12:28:18 -0800 (PST)
-Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a85e290sm23620385a.42.2024.11.18.12.28.17
+        d=1e100.net; s=20230601; t=1731962155; x=1732566955;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bf6KRH15a4iQ1V/X//Zf/VuIkJmHJ5qMcshZM0TdNHQ=;
+        b=vtZB1e0vPnavPZUcYf5eqawyDdvGVMS9R1aP8++c4VOKcDL67UU6jZaQ197lu6taZb
+         vxMb6wwIVaLiWp4G8te1ULwRN6NJODbEKBIPfxBbV2vvQy4JtwnY1h6vO4tIOcbOk7de
+         JGdWMvokLwEPPtL4+XQOL2an9O7Gq/tHZjfZ/yyUWhbfncrNctdcrgBlvoiRa0jpIQoy
+         3l6s9e4HrZo8fVfpDi4IuidJXhGhW6L94SkJdXHLSw8n/Gb/3PW8FO/3eFy6lHqwNtBj
+         evX3qu6S9XtdL9rr62xa0slZbj0XFNP6v99E93QZ7yY0edhhdu3B+tF0pFzJjgll8whm
+         GhgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVU3hol91qPCpFjElNA0aAGv5DwY8MPunFkcCfxfxjOtlz0CUvI5qlVQiqAtzjBrE6IQcKLli8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRtEUlZsHNLocChgPz071t1q0mA+iCkvpjjHuBr9gMjMmrS2X/
+	BOMKYuI9tnkjr3ZE9WHdApyK0i44CgzTu3h9l5H2izOi8LjJtotM
+X-Google-Smtp-Source: AGHT+IF1p3iUXICx7931OXtB04PZBLDz30jWWGmaPoLplsKbG4OL1SAqMg8JtuK3qLDYuHM2FqK+rg==
+X-Received: by 2002:a05:6214:2689:b0:6d4:1425:6d30 with SMTP id 6a1803df08f44-6d414257096mr141508896d6.45.1731962155132;
+        Mon, 18 Nov 2024 12:35:55 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc1f49asm39671836d6.50.2024.11.18.12.35.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 12:28:17 -0800 (PST)
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 41DD31200076;
-	Mon, 18 Nov 2024 15:28:17 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Mon, 18 Nov 2024 15:28:17 -0500
-X-ME-Sender: <xms:YaM7ZzgWVoZwHG7SqmII3Bqy51ecraXB_YwGq68JUlintFgAHicTwQ>
-    <xme:YaM7ZwDiM95fVLUh7feFrICS-BQniCJznPOVL0WYiITJWM6MbQM29OCHKIQREEHSn
-    RpvHYTzXKosAaNjqw>
-X-ME-Received: <xmr:YaM7ZzGSg4gGr9ebzj-xTWioQ0Sk6v4rx8hbS3xbHndSicbhS-GNSbMmldi1CA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfedtgddufeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpefftdeihfeigedtvdeuueffieetvedtgeejuefh
-    hffgudfgfeeggfeftdeigeehvdenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
-    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
-    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
-    mhgvpdhnsggprhgtphhtthhopedvgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    epmhgrnhgrshdukedvgeegsehiihhithgurdgrtgdrihhnpdhrtghpthhtohepfhhujhhi
-    thgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehtmhhgrhhosh
-    hssehumhhitghhrdgvughupdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhr
-    tghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplh
-    hinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegu
-    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvg
-    drtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:YaM7ZwSxbN0x5IyVrZ0R9eO62WJsQFvptIh35o3zeOBGMiYh7firJQ>
-    <xmx:YaM7Zwy7RNJlcXupukflmz20zByMfc8iOZq8_csqgcnfTvsRU2H6sg>
-    <xmx:YaM7Z24IR5-Zqr1VKjYhMYWuR5Hz5VqW5yoe5MWYnoIXVuUG_xiIgg>
-    <xmx:YaM7Z1z81j7Vcyk37ze46yxTPG33_n7WYdB41GdxvOD4BzEqIX6IfQ>
-    <xmx:YaM7ZwjoxF3zuufjHCBpx2QLgqscjiJ9H3KtNi5bay7lqtz5sTjIk_vz>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 18 Nov 2024 15:28:16 -0500 (EST)
-Date: Mon, 18 Nov 2024 12:28:15 -0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: manas18244@iiitd.ac.in
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] rust: macros: simplify Result<()> in function
- returns
-Message-ID: <ZzujX5dXpUxwBFSU@tardis.local>
-References: <20241118-simplify-result-v3-0-6b1566a77eab@iiitd.ac.in>
- <20241118-simplify-result-v3-3-6b1566a77eab@iiitd.ac.in>
+        Mon, 18 Nov 2024 12:35:54 -0800 (PST)
+Date: Mon, 18 Nov 2024 15:35:54 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: fejes@inf.elte.hu, 
+ annaemesenyiri@gmail.com, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemb@google.com, 
+ idosch@idosch.org
+Message-ID: <673ba52a4374f_1d652429476@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241118145147.56236-4-annaemesenyiri@gmail.com>
+References: <20241118145147.56236-1-annaemesenyiri@gmail.com>
+ <20241118145147.56236-4-annaemesenyiri@gmail.com>
+Subject: Re: [PATCH net-next v4 3/3] selftests: net: test SO_PRIORITY
+ ancillary data with cmsg_sender
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241118-simplify-result-v3-3-6b1566a77eab@iiitd.ac.in>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 18, 2024 at 08:07:00PM +0530, Manas via B4 Relay wrote:
-> From: Manas <manas18244@iiitd.ac.in>
+Anna Emese Nyiri wrote:
+> Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
+> ancillary data.
 > 
-> Functions foo and bar in doctests return `Result<()>` type. This type
-
-Same nits here.
-
-> can be simply written as `Result` as default type parameters are unit
-> `()` and `Error` types. Thus keep the usage of `Result` consistent.
+> cmsg_so_priority.sh script added to validate SO_PRIORITY behavior 
+> by creating VLAN device with egress QoS mapping and testing packet
+> priorities using flower filters. Verify that packets with different
+> priorities are correctly matched and counted by filters for multiple
+> protocols and IP versions.
 > 
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1128
-> Signed-off-by: Manas <manas18244@iiitd.ac.in>
-
-Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
-
-Regards,
-Boqun
-
+> Suggested-by: Ido Schimmel <idosch@idosch.org>
+> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
 > ---
->  rust/macros/lib.rs | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
+>  .../testing/selftests/net/cmsg_so_priority.sh | 147 ++++++++++++++++++
+>  2 files changed, 157 insertions(+), 1 deletion(-)
+>  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
 > 
-> diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-> index 4ab94e44adfe3206faad159e81417ea41a35815b..463920353ca9c408f5d69e2626c13a173bae98d7 100644
-> --- a/rust/macros/lib.rs
-> +++ b/rust/macros/lib.rs
-> @@ -144,11 +144,11 @@ pub fn module(ts: TokenStream) -> TokenStream {
->  /// // Declares a `#[vtable]` trait
->  /// #[vtable]
->  /// pub trait Operations: Send + Sync + Sized {
-> -///     fn foo(&self) -> Result<()> {
-> +///     fn foo(&self) -> Result {
->  ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
->  ///     }
->  ///
-> -///     fn bar(&self) -> Result<()> {
-> +///     fn bar(&self) -> Result {
->  ///         kernel::build_error(VTABLE_DEFAULT_ERROR)
->  ///     }
->  /// }
-> @@ -158,7 +158,7 @@ pub fn module(ts: TokenStream) -> TokenStream {
->  /// // Implements the `#[vtable]` trait
->  /// #[vtable]
->  /// impl Operations for Foo {
-> -///     fn foo(&self) -> Result<()> {
-> +///     fn foo(&self) -> Result {
->  /// #        Err(EINVAL)
->  ///         // ...
->  ///     }
-> 
+
+> +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
+> @@ -0,0 +1,147 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +IP4=192.0.2.1/24
+> +TGT4=192.0.2.2/24
+> +TGT4_NO_MASK=192.0.2.2
+
+nit, avoid duplication:
+
+TGT4_NO_MASK=192.0.2.2
+TGT4="${TGT4_NO_MASK}/24"
+
+etc.
+
+Or even drop the versions with the suffix and add that
+explicitly where used.
+
+> +TGT4_RAW=192.0.2.3/24
+> +TGT4_RAW_NO_MASK=192.0.2.3
+> +IP6=2001:db8::1/64
+> +TGT6=2001:db8::2/64
+> +TGT6_NO_MASK=2001:db8::2
+> +TGT6_RAW=2001:db8::3/64
+> +TGT6_RAW_NO_MASK=2001:db8::3
+> +PORT=1234
+> +DELAY=4000
+> +
+> +
+> +create_filter() {
+> +
+> +    local ns=$1
+> +    local dev=$2
+> +    local handle=$3
+> +    local vlan_prio=$4
+> +    local ip_type=$5
+> +    local proto=$6
+> +    local dst_ip=$7
+> +
+> +    local cmd="tc -n $ns filter add dev $dev egress pref 1 handle $handle \
+> +    proto 802.1q flower vlan_prio $vlan_prio vlan_ethtype $ip_type"
+
+nit: indentation on line break. Break inside string is ideally avoided too.
+
+perhaps just avoid the string and below call
+
+    tc -n "$ns" filter add dev "$dev" \
+            egress pref 1 handle "$handle" proto 802.1q \
+            dst_ip "$dst_ip" "$ip_proto_opt"
+            flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
+	    action pass
+> +
+> +    if [[ "$proto" == "u" ]]; then
+> +        ip_proto="udp"
+> +    elif [[ "$ip_type" == "ipv4" && "$proto" == "i" ]]; then
+> +        ip_proto="icmp"
+> +    elif [[ "$ip_type" == "ipv6" && "$proto" == "i" ]]; then
+> +        ip_proto="icmpv6"
+> +    fi
+> +
+> +    if [[ "$proto" != "r" ]]; then
+> +        cmd="$cmd ip_proto $ip_proto"
+> +    fi
+> +
+> +    cmd="$cmd dst_ip $dst_ip action pass"
+> +
+> +    eval $cmd
+> +}
+> +
+> +TOTAL_TESTS=0
+> +FAILED_TESTS=0
+> +
+> +check_result() {
+> +    ((TOTAL_TESTS++))
+> +    if [ "$1" -ne 0 ]; then
+> +        ((FAILED_TESTS++))
+> +    fi
+> +}
+> +
+> +cleanup() {
+> +    ip link del dummy1 2>/dev/null
+
+Both devices are in ns1.
+
+No need to clean up the devices explicitly. Just deleting the netns
+will remove them.
+
+> +    ip -n ns1 link del dummy1.10 2>/dev/null
+> +    ip netns del ns1 2>/dev/null
+
+> +}
+> +
+> +trap cleanup EXIT
+> +
+> +
+> +
+> +ip netns add ns1
+> +
+> +ip -n ns1 link set dev lo up
+> +ip -n ns1 link add name dummy1 up type dummy
+> +
+> +ip -n ns1 link add link dummy1 name dummy1.10 up type vlan id 10 \
+> +        egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+> +
+> +ip -n ns1 address add $IP4 dev dummy1.10
+> +ip -n ns1 address add $IP6 dev dummy1.10
+> +
+> +ip netns exec ns1 bash -c "
+> +sysctl -w net.ipv4.ping_group_range='0 2147483647'
+> +exit"
+
+Same point on indentation on line continuation.
+
+No need for explicit exit.
+
+> +
+> +
+> +ip -n ns1 neigh add $TGT4_NO_MASK lladdr 00:11:22:33:44:55 nud permanent dev \
+> +        dummy1.10
+> +ip -n ns1 neigh add $TGT6_NO_MASK lladdr 00:11:22:33:44:55 nud permanent dev dummy1.10
+> +ip -n ns1 neigh add $TGT4_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud permanent dev dummy1.10
+> +ip -n ns1 neigh add $TGT6_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud permanent dev dummy1.10
+> +
+> +tc -n ns1 qdisc add dev dummy1 clsact
+> +
+> +FILTER_COUNTER=10
+> +
+> +for i in 4 6; do
+> +    for proto in u i r; do
+> +        echo "Test IPV$i, prot: $proto"
+> +        for priority in {0..7}; do
+> +            if [[ $i == 4 && $proto == "r" ]]; then
+> +                TGT=$TGT4_RAW_NO_MASK
+> +            elif [[ $i == 6 && $proto == "r" ]]; then
+> +                TGT=$TGT6_RAW_NO_MASK
+> +            elif [ $i == 4 ]; then
+> +                TGT=$TGT4_NO_MASK
+> +            else
+> +                TGT=$TGT6_NO_MASK
+> +            fi
+> +
+> +            handle="${FILTER_COUNTER}${priority}"
+> +
+> +            create_filter ns1 dummy1 $handle $priority ipv$i $proto $TGT
+> +
+> +            pkts=$(tc -n ns1 -j -s filter show dev dummy1 egress \
+> +                | jq ".[] | select(.options.handle == ${handle}) | \
+
+Can jq be assumed installed on all machines?
+
+> +                .options.actions[0].stats.packets")
+> +
+> +            if [[ $pkts == 0 ]]; then
+> +                check_result 0
+> +            else
+> +                echo "prio $priority: expected 0, got $pkts"
+> +                check_result 1
+> +            fi
+> +
+> +            ip netns exec ns1 ./cmsg_sender -$i -Q $priority -d "${DELAY}" -p $proto $TGT $PORT
+> +            ip netns exec ns1 ./cmsg_sender -$i -P $priority -d "${DELAY}" -p $proto $TGT $PORT
+> +
+> +
+> +            pkts=$(tc -n ns1 -j -s filter show dev dummy1 egress \
+> +                | jq ".[] | select(.options.handle == ${handle}) | \
+> +                .options.actions[0].stats.packets")
+> +            if [[ $pkts == 2 ]]; then
+> +                check_result 0
+> +            else
+> +                echo "prio $priority: expected 2, got $pkts"
+> +                check_result 1
+
+I'd test -Q and -p separately. A bit of extra code to repeat the pkts
+read. But worth it.
+
+> +            fi
+> +        done
+> +        FILTER_COUNTER=$((FILTER_COUNTER + 10))
+> +    done
+> +done
+> +
+> +if [ $FAILED_TESTS -ne 0 ]; then
+> +    echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
+> +    exit 1
+> +else
+> +    echo "OK - All $TOTAL_TESTS tests passed"
+> +    exit 0
+> +fi
 > -- 
-> 2.47.0
+> 2.43.0
 > 
-> 
+
+
 
