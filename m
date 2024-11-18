@@ -1,109 +1,122 @@
-Return-Path: <netdev+bounces-145927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E984E9D1503
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:06:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 457EA9D1512
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9504C1F2168A
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:06:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CB9B281291
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077AE1BDA95;
-	Mon, 18 Nov 2024 16:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26D11BD007;
+	Mon, 18 Nov 2024 16:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LLli5seL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Jll7pIfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7988F1BD9C3;
-	Mon, 18 Nov 2024 16:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64521AF0DE;
+	Mon, 18 Nov 2024 16:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731945948; cv=none; b=Nh92x8hKhYmwoCXn0WHDg8lDMg9Y1hjYaWsb36jh0QRxnt8iPvIiWex8ztdwsa6wONLXqHwR7aS58CglCWHa0DfmwSEpl4Q0Enra2UkTYsPVoZm+Ql0watZUJ1LjGY3vTRQzI7cVi27MttRLFosWZfkwXNssKO9p1HZOR7ajjS8=
+	t=1731946150; cv=none; b=ZBqrU9tPykErbAVeM8pmByTcspqlLdF82I8078fh/ZXymtgp7K7gic0sDLKhYEcXaKcmHV+vT4EJo1nsl8E1OWdHTjChG3HlSKmUeWtbOvC5FOux94WRkrYYI/8M0c5f+hPEu6mrH/IkHdkV0W+Za+JMMYdR/1JrLhWvgODOb8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731945948; c=relaxed/simple;
-	bh=k44zIQ0S4MFwyQTY6IZW4xAiVOSmjLBV0+3wLzd1ukU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YpIdsD4EHmM5FRiQ+x+6km6ODUozJVQ5AlW4bn6l7LfxYtKJQSqyMPB6NJvo/rD3V6rLJhIGjoKIDuY2EfZkS8yedYVJCSAZrMZ+JiCWZK8D7ZfUdEkxjiTMmee8y5YRDmlKPuKsix1mYGbyUZV32yFVRxjIlTQIdnMy4fW/bJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LLli5seL; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7ee36621734so774346a12.3;
-        Mon, 18 Nov 2024 08:05:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731945947; x=1732550747; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k44zIQ0S4MFwyQTY6IZW4xAiVOSmjLBV0+3wLzd1ukU=;
-        b=LLli5seLjiuXCAh3/gmLAEF9+avTX6hxMq2XXYz/5ftLyfQyuJC15pp4aTtufZxVaN
-         MJJvdHpX6rw+bLXhj0DfpG8mjZxi+3/nVlAaxfBX6314dtl7S6XQKUxQ7SFMxF35xb4z
-         5h6c8ZArcxC4YHMhPd0jAeq6kfQZ82Uj0xVct0GRX14nA7sQH1Npvb56V/1PT5zgMgBG
-         2rUXl9LIb4F8NA9acwA/sj8UO8xyT4FqWa2A0uApxJVpDU5oeP9cR9zFkshQ+9Di8waO
-         WGRc5zAEIGIpuFkSB4+xi//EDUNZnvziPelWu28jPhH0pZPd1b2Gg32roNDOD9R/v4FD
-         uPiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731945947; x=1732550747;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k44zIQ0S4MFwyQTY6IZW4xAiVOSmjLBV0+3wLzd1ukU=;
-        b=pOLdzd6KuOlkjdutLH4DG3oBTeW3qAYwhAxqaqMJdsfL4pGJ4EhCteDStj5x5wNuz0
-         04GM/kLrenoL7MtKU/m1NKtJgXyS11YY5hOF2jrf3ZhxM3D8yn+6krz/AmZc44KdZtO9
-         Mnp9oQToqN3+yGPDUTqH7Z8SjbWQbHn0LUxAsE8OFRQf7KG0LcZEUAaZEh61na2/z0Y8
-         4pMtoItdl82qcGWobnaB8+ld4XqPGUMYNtmhXabnaXfiYgu41YtXgeIly6Eb48oJsGx5
-         igSMB+Rgtc1dzP3jsozTDYtJrknU2qaYRBQ+/TvVvx1PnFTuk1M497dtAoCGWvFycM7a
-         uH7w==
-X-Forwarded-Encrypted: i=1; AJvYcCUxXzwiNKZrWejy6k00Oea/VlOfkEd+xtdNcrpYQK69fc1HeZu0FFdldy3x6oT4+0iGftaw3Ib0aT+HzQQ=@vger.kernel.org, AJvYcCXXN3Srm13ria3oCKrq55pWU6ENyJ0M4tfyG7vuS51hi/lAAzQFn/2TAVqNB2cwiV41s3y3eYsFlGwX1DJo+Rw=@vger.kernel.org, AJvYcCXxD/bTSOQk7tUn0eFk83rpHTNZmmt2/Add6pPJqoFtMgsb43iWyCkre3kEoPHfDxYnd3VWdzgL@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrf9UADxAVMCFGHDYbvq4AliK5KT+2gKTIhVXQbeJdNRuef4dI
-	0MH91n0P6Do/tWXFw7ycSk0LDvD3wpmgYhwEIRlIDkEPGsxOmHR3AqtXQSot5Og19urfLYYe3gT
-	fuAGypvFoEgsoU5k982FWKMzaoPs=
-X-Google-Smtp-Source: AGHT+IG6S0sFFkoTAiVrefbp6oMfjC8RUwZjjcfme6xYZ4N6NBZUd2AdnNdpwM3Ebrm1W/5HvpkaOSQrxgVW4ICIC8E=
-X-Received: by 2002:a17:90a:e7c2:b0:2ea:509b:c871 with SMTP id
- 98e67ed59e1d1-2ea509bcad4mr3444540a91.6.1731945946604; Mon, 18 Nov 2024
- 08:05:46 -0800 (PST)
+	s=arc-20240116; t=1731946150; c=relaxed/simple;
+	bh=nEvthwO+4LqLtkXsIaNW/tRVsCKmJTHXmqJVAOrMq3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BxBDp47byG72+pSNaXFfMa+14NURGH9+qMSPWAC/S5FkIBVFVwWciXVuDXJgzxwjSl4LSg9NPkYyWbThIdylzhCbcy7tX1mkMPMB+63zPzIv9dhLENRSA38G7Yi97F36MDbZ6XaUYVI3lirFDKt82cV/rtvhpPwukoY92qiee5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Jll7pIfW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gZuZhrm0652z1EXnExgABXIbM9+BwJr+Kdt0AwKAMU0=; b=Jll7pIfW2nbVFGgch2ygidFhCi
+	Rni6unl3BkZ0/wVEt3lFfCADnKXeLCyPqdBABrpZwSDpgYj5FLsaLlnJXTMNv/y+ClQbt2b0f36OZ
+	+FM7RXKbCAuJO8c9OOAyXcSYm4I22ACS1h+6ifnLGK7lP2UBMdv2wHoqnkzNJiDqsJx065CvnZjA0
+	xu+dr81JSNDFLIVaclttjsTnfq4ffyiSNKLyEVq+AaD+kqPXXnH1TzRYyAoYEhErk6bhtBU0A4Qtg
+	pySkMgQrCqJCTuqff3Tf34Qb+vDFmPy3CBCny60KZOAiYxcDadZQQPDh2/pnDG4teftKcdCBkQe6A
+	0e/SxJig==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33504)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tD4J6-00026H-1z;
+	Mon, 18 Nov 2024 16:08:57 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tD4J5-0005CY-1G;
+	Mon, 18 Nov 2024 16:08:55 +0000
+Date: Mon, 18 Nov 2024 16:08:55 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, michal.simek@amd.com,
+	radhey.shyam.pandey@amd.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, git@amd.com, harini.katakam@amd.com
+Subject: Re: [PATCH net-next 2/2] net: axienet: Add support for AXI 2.5G MAC
+Message-ID: <Zztml-Te38P3M7cM@shell.armlinux.org.uk>
+References: <20241118081822.19383-1-suraj.gupta2@amd.com>
+ <20241118081822.19383-3-suraj.gupta2@amd.com>
+ <ZztjvkxbCiLER-PJ@shell.armlinux.org.uk>
+ <657764fd-68a1-4826-b832-3bda91a0c13b@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241118-simplify-result-qt2025-v2-1-af1bcff5d101@iiitd.ac.in>
-In-Reply-To: <20241118-simplify-result-qt2025-v2-1-af1bcff5d101@iiitd.ac.in>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 18 Nov 2024 17:05:34 +0100
-Message-ID: <CANiq72n_ERNd4=n1r6MOhOzii-EG6ie84tk4M8rg9zYXus-J7w@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: phy: qt2025: simplify Result<()> in
- probe return
-To: manas18244@iiitd.ac.in
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Anup Sharma <anupnewsmail@gmail.com>, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <657764fd-68a1-4826-b832-3bda91a0c13b@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Nov 18, 2024 at 3:30=E2=80=AFPM Manas via B4 Relay
-<devnull+manas18244.iiitd.ac.in@kernel.org> wrote:
->
-> From: Manas <manas18244@iiitd.ac.in>
->
-> probe returns a `Result<()>` type, which can be simplified as `Result`,
-> due to default type parameters being unit `()` and `Error` types. This
-> maintains a consistent usage of `Result` throughout codebase.
->
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1128
-> Signed-off-by: Manas <manas18244@iiitd.ac.in>
+On Mon, Nov 18, 2024 at 11:00:22AM -0500, Sean Anderson wrote:
+> On 11/18/24 10:56, Russell King (Oracle) wrote:
+> > On Mon, Nov 18, 2024 at 01:48:22PM +0530, Suraj Gupta wrote:
+> >> Add AXI 2.5G MAC support, which is an incremental speed upgrade
+> >> of AXI 1G MAC and supports 2.5G speed only. "max-speed" DT property
+> >> is used in driver to distinguish 1G and 2.5G MACs of AXI 1G/2.5G IP.
+> >> If max-speed property is missing, 1G is assumed to support backward
+> >> compatibility.
+> >> 
+> >> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
+> >> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+> >> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> >> ---
+> > 
+> > ...
+> > 
+> >> -	lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
+> >> -		MAC_10FD | MAC_100FD | MAC_1000FD;
+> >> +	lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+> >> +
+> >> +	/* Set MAC capabilities based on MAC type */
+> >> +	if (lp->max_speed == SPEED_1000)
+> >> +		lp->phylink_config.mac_capabilities |= MAC_10FD | MAC_100FD | MAC_1000FD;
+> >> +	else
+> >> +		lp->phylink_config.mac_capabilities |= MAC_2500FD;
+> > 
+> > The MAC can only operate at (10M, 100M, 1G) _or_ 2.5G ?
+> 
+> It's a PCS limitation. It either does (1000Base-X and/or SGMII) OR
+> (2500Base-X). The MAC itself doesn't have this limitation AFAIK.
 
-Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+That means the patch is definitely wrong, and the proposed DT
+change is also wrong.
 
-Cheers,
-Miguel
+If it's a limitation of the PCS, that limitation should be applied
+via the PCS's .pcs_validate() method, not at the MAC level.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
