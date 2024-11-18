@@ -1,121 +1,105 @@
-Return-Path: <netdev+bounces-145784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C6C9D0DAD
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:03:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3A079D0DCB
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 11:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FB50B20D42
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:03:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F2C11F20F92
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 10:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A42183CA6;
-	Mon, 18 Nov 2024 10:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5812192B89;
+	Mon, 18 Nov 2024 10:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+F2JxXO"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E93617CA1D
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 10:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAF83D551;
+	Mon, 18 Nov 2024 10:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731924218; cv=none; b=qMZeupDvtFx0Ju2rKxgF6hI4Nzntn+IEOazmlZ9iaZwC3uBrUeMTwpft6A2SItwZQHChRU+OyHOy4zZkn1Dq0vlIHVo5mcUWfOv75kcKDjzrOrdSW2cPj600awP5zsAmHNc9RtDC67El+wu+phlc9KuYPfLbSZA3KnxXyabizTo=
+	t=1731924544; cv=none; b=DVAdD4uUZJ6p7TQxbo6nhj4s9+SpB88R5cfEkcrP/SUXTQnv5w0AMy5I0qAKXu6qIlmhdV7tE1uhfe95RbTpA8CJcr2X7kskz0Eb3No+1HdEOOcZxuSPt2mpUYlM9rwv7xEWlyvkHo2ye/Kyls/uAFQiNmNeTkGb9tK/5+L98GU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731924218; c=relaxed/simple;
-	bh=GFQSVCl4K37MQjWEzu72cr7MXAs0WnAx4CBpZjgy2LQ=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iN7UyQA69b0K5IAlWvTWnPtYk2jB95215al7FDMcjuujR+qQ+C66JCCGZqoiLzI761V/Elm2hqDCHQAX9kdimaTFx4AppHoOmQc8ZX2VcNeCAfqqFsE4wfz5ZT1KrB+2OONbFImA8SOZwom7ath5hex41sq3NuTQQMo7mo14x/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1tCybF-0007Ds-Nz; Mon, 18 Nov 2024 11:03:17 +0100
-Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1tCybE-001NKT-0u;
-	Mon, 18 Nov 2024 11:03:16 +0100
-Received: from pza by lupine with local (Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1tCybE-0004a9-0g;
-	Mon, 18 Nov 2024 11:03:16 +0100
-Message-ID: <bcb86fdbdc7be8f96a451df2d8e479e123ad8924.camel@pengutronix.de>
-Subject: Re: [net-next v2 3/7] net: ftgmac100: Add reset toggling for Aspeed
- SOCs
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch, 
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org,  devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Mon, 18 Nov 2024 11:03:16 +0100
-In-Reply-To: <20241118060207.141048-4-jacky_chou@aspeedtech.com>
-References: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
-	 <20241118060207.141048-4-jacky_chou@aspeedtech.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1731924544; c=relaxed/simple;
+	bh=uOa3gBdo4b6Q4eMJGRlTULLTC7vcRFD/paGu9QaEraI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3nnfYem/2KxnDtTiHXMMgehBS2nUjA+1hNUBFXv6d8L/WIB8QMoHdeQ1DnHwsddRmSeer5uRhFrYUhrHr0nqHsproB+H5rTr+kTnOga0eQe2CmFo/GLgvpznXNzCW3AxFBgWqF0cf7rhyFwx8clu7Uqzgmf5Lgx60/friVTMKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+F2JxXO; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7f8095a200eso2751308a12.1;
+        Mon, 18 Nov 2024 02:09:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731924543; x=1732529343; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Goi/04yT5xIN7OeRKBKYdqRHma0hsyOKgiMd+irV+s=;
+        b=d+F2JxXOVzzW2dipq/Ore0dUIzfhMaYwnJ2E6okGJjay3n4JcMwdT2aJStev7XH0H1
+         Lt+/EZmxqB+opdiMxY5ow1C+uKdg6sLfR6Nuw+IjLou4cOpmJEsn5eN4jeo9M5UiWbA0
+         2QeianR8HXPbnKXw8deJ54CumAg5weh2gGsXW3z+T5NlW4rclzcHLZRrtPlgfdjH7d94
+         FIGXxGPWCEtVvDhnvhZP23mIQpCszgQ6yDbNrX7qMRQ/V7EPrSxJ77LrcfXR32rOwYPK
+         K85rJZEii7AQcewioZvAERQC4h1lxXlx75/mTr4ZcMz4MAVxuJjfCPDTAlrRav2ywys1
+         iE/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731924543; x=1732529343;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Goi/04yT5xIN7OeRKBKYdqRHma0hsyOKgiMd+irV+s=;
+        b=whZrgpgY9iiLEHUcMz60hxs39ZH5mN33YJ9kQfa2R4Cj2w4kvsO6xRWqGUf3zoRIdN
+         llR+CbrwShXVCYgyZH3sxY2o05SSUxBYHPa/6XTzHz3iXN7wXNNRTmYl8TDXBb5w9ZE6
+         XUBu4RYosrDED1sHbJbYgvJJq/JW+Al9KOdZNArUiMka/380MR8DXWRvKk+kVdDzOaBI
+         b42gca/AdHxz4Vubu38hgGVnVFZsIIkccaWD2Ok5KxvNYXrbkIuxDkya3uji5tAQgtJ5
+         PEWhl61PDR1jVPxv6ivJ7Woq3QlcZ3G3megNEMgFDx7PPcpHzRfGkInsTYuyBcWO5LGv
+         ioBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFYmznzBMLtSsqTff9g+WYNMMhpfLU28Lo0r/bcb/y39mPBzAdfXpilXFcaJLQNpEscDDSbEhDz7xI+TxyNn+T@vger.kernel.org, AJvYcCVqZurtBIYRb7Ss1XK6iy348ZSv3CEw0MD6HhU6N0RP8fFc6OS4cye9uOynXHnahh2YqZcIRm/1r3htUXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDI/8rx2YtbAu6flQwJ90gaXLZQdNcaSpC7MQxu0pDRTO5uKMj
+	SUD3V/1OKhvH/a+DftDLBDjJoB8SNyiapM5SgpOJW6MCPxZ94+IpiwZdMPS3VYY=
+X-Google-Smtp-Source: AGHT+IGUsm9S0hEZ6xp7ESqNA2ThEEcxKekQUPQciNMBgUVwcC33mAfegzLfpusuFWYQvVKGptTr9A==
+X-Received: by 2002:a05:6a21:3282:b0:1d4:f7e9:172a with SMTP id adf61e73a8af0-1dc8069161bmr27734319637.23.1731924542658;
+        Mon, 18 Nov 2024 02:09:02 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f8c1dc658csm5605511a12.69.2024.11.18.02.08.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2024 02:09:01 -0800 (PST)
+Date: Mon, 18 Nov 2024 10:08:55 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	wireguard@lists.zx2c4.com, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net-next] selftests: wireguards: use nft by default
+Message-ID: <ZzsSN49rftIlBhtf@fedora>
+References: <20241111041902.25814-1-liuhangbin@gmail.com>
+ <ZzpNXM17NX3nVzMl@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZzpNXM17NX3nVzMl@zx2c4.com>
 
-On Mo, 2024-11-18 at 14:02 +0800, Jacky Chou wrote:
-> Toggle the SCU reset before hardware initialization.
->=20
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/ethernet/faraday/ftgmac100.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ether=
-net/faraday/ftgmac100.c
-> index 17ec35e75a65..cae23b712a6d 100644
-> --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> @@ -9,6 +9,7 @@
->  #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
-> =20
->  #include <linux/clk.h>
-> +#include <linux/reset.h>
->  #include <linux/dma-mapping.h>
->  #include <linux/etherdevice.h>
->  #include <linux/ethtool.h>
-> @@ -98,6 +99,7 @@ struct ftgmac100 {
->  	struct work_struct reset_task;
->  	struct mii_bus *mii_bus;
->  	struct clk *clk;
-> +	struct reset_control *rst;
-> =20
->  	/* AST2500/AST2600 RMII ref clock gate */
->  	struct clk *rclk;
-> @@ -1969,10 +1971,29 @@ static int ftgmac100_probe(struct platform_device=
- *pdev)
->  	}
-> =20
->  	if (priv->is_aspeed) {
-> +		struct reset_control *rst;
-> +
->  		err =3D ftgmac100_setup_clk(priv);
->  		if (err)
->  			goto err_phy_connect;
-> =20
-> +		rst =3D devm_reset_control_get_optional(priv->dev, NULL);
+On Sun, Nov 17, 2024 at 09:09:00PM +0100, Jason A. Donenfeld wrote:
+> On Mon, Nov 11, 2024 at 04:19:02AM +0000, Hangbin Liu wrote:
+> > Use nft by default if it's supported, as nft is the replacement for iptables,
+> > which is used by default in some releases. Additionally, iptables is dropped
+> > in some releases.
+>  
+> Rather than having this optionality, I'd rather just do everything in
+> one way or the other. So if you're adamant that we need to use nft, just
+> convert the whole thing. And then subsequently, make sure that the qemu
+> test harness supports it. That should probably be a series.
 
-Please use devm_reset_control_get_optional_exclusive() directly.
+Thanks, I will do an update for the qemu test.
 
-
-regards
-Philipp
+Hangbin
 
