@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-145859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C089D12DD
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:22:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA339D12F1
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:28:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48E341F22E9D
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:22:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E90BB23BC1
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 14:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82191BD01F;
-	Mon, 18 Nov 2024 14:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF8F3B192;
+	Mon, 18 Nov 2024 14:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ThzumbFM"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5661AF0A5;
-	Mon, 18 Nov 2024 14:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CE17483;
+	Mon, 18 Nov 2024 14:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731939640; cv=none; b=TZB/oVfZ6oRSq4VhEy3lrRyUvCBkd3y4KJdWj0YfnKSNxxF9iaN0up5r67+69rbMt20iNJsrGd+6Wl8DCL68+eUPpq3nIGDwCy/I5IXXWGlvxvsxt2Hghar3hrE/djRFmQIEAsR8nkRbZK3XnpR1N0oCEo/AEzMcjHTVK3qhcow=
+	t=1731939337; cv=none; b=aErUc2bR+VTco9XX1Z6bi2iyvb8I0Styd8nu9SejnMu65nV3SnOCS+kAouxM4Q/0yCoTc5yWqD4KRrqQlZ5DqMMnGZO2sV5fvv6SG1WXwhYTbqP6aDslUoAUOwZA6TicCrCRr2FkajIFWzXr2TqQ5Re6L+ApLeX00aWRTt2m0sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731939640; c=relaxed/simple;
-	bh=FUDxglx01sRgab9GHliuU2m1EoSE1igfBs/5yoKEftc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wd3OlpK/H62mHDWUsyAT5h9P8puUp20r+6TulG8kh4+GkFtw5kHNdTqcphr9fUz1Wz9tURb2E9WP6l7j6iKqUSDdv8aVa0ju+6QCg8SlaUd+x2kHqPzG/WbyWp+qEN6ydkSwz0JAbestsY7U0EYV1qU/4Ibbu7A/r+tyrGH3MW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XsV8S28zNz1V4dV;
-	Mon, 18 Nov 2024 22:18:00 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 24454180064;
-	Mon, 18 Nov 2024 22:20:36 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 18 Nov 2024 22:20:35 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>, <hkelam@marvell.com>
-Subject: [PATCH V4 net-next 7/7] net: hibmcge: Add nway_reset supported in this module
-Date: Mon, 18 Nov 2024 22:13:39 +0800
-Message-ID: <20241118141339.3224263-8-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241118141339.3224263-1-shaojijie@huawei.com>
-References: <20241118141339.3224263-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1731939337; c=relaxed/simple;
+	bh=pLw8yLEbJuvUtq9sxywo7ARuhOc5cWXO/kJtX8g68XQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EoDCj8VToVId0kIUNZnxN8dYqmF1JpN/hw8hh6Em40TxMjyrjGfmEaFeZXKrjz3rbC3eAULQgXKsBxJzCC+PPlYp9pIs1EN1V2Z4cSmHqW50EZmeDds6kGn1bCI0bKHH6vnjR4vdO0ObXXph7ngbw4N/eMjKLHNgzJVvuiQ+fQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ThzumbFM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=osWqrHi1PTnMhMN1ifWmZoFzhh+9H9ujv9/LFvTGxmM=; b=ThzumbFMkF9hLn0QG1QYfcRDGP
+	//KKlsqblN9hrJCe7/aZIpkKJlxEtuYEjNlBX67Cw3Jgz/pQKy2+vWUhiGLm52PH2ObST/MBVf7VZ
+	Zeg+X8o7hW0YRIm9v7PZLsnPrNoTVoEU0O4WMjIgxIcN+ufS8UHeH630mQDJNP1AK6pU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tD2XC-00Dg4Q-2X; Mon, 18 Nov 2024 15:15:22 +0100
+Date: Mon, 18 Nov 2024 15:15:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: manas18244@iiitd.ac.in
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Anup Sharma <anupnewsmail@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: qt2025: simplify Result<()> in probe
+ return
+Message-ID: <2f3b1fc2-70b1-4ffe-b41c-09b52ce21277@lunn.ch>
+References: <20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241118-simplify-result-qt2025-v1-1-f2d9cef17fca@iiitd.ac.in>
 
-Add nway_reset supported in this module
+On Mon, Nov 18, 2024 at 06:39:34PM +0530, Manas via B4 Relay wrote:
+> From: Manas <manas18244@iiitd.ac.in>
+> 
+> probe returns a `Result<()>` type, which can be simplified as `Result`,
+> due to default type parameters being unit `()` and `Error` types. This
+> maintains a consistent usage of `Result` throughout codebase.
+> 
+> Signed-off-by: Manas <manas18244@iiitd.ac.in>
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Miguel has already pointed out, this is probably not sufficient for a
+signed-off-by: You need a real name here, in order to keep the lawyers happy.
+
+Also, each subsystem has its own way of doing things. Please take a
+read of:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+    Andrew
+
 ---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-index e27f835a3230..9ff08154908d 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-@@ -186,6 +186,7 @@ static const struct ethtool_ops hbg_ethtool_ops = {
- 	.get_pauseparam         = hbg_ethtool_get_pauseparam,
- 	.set_pauseparam         = hbg_ethtool_set_pauseparam,
- 	.reset			= hbg_ethtool_reset,
-+	.nway_reset		= phy_ethtool_nway_reset,
- };
- 
- void hbg_ethtool_set_ops(struct net_device *netdev)
--- 
-2.33.0
-
+pw-bot: cr
 
