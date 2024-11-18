@@ -1,92 +1,100 @@
-Return-Path: <netdev+bounces-145717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF899D083E
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 04:56:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 075A59D083F
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 04:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 885031F2116E
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 03:56:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7877A281AA1
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 03:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D6D43ABD;
-	Mon, 18 Nov 2024 03:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8285B1FB;
+	Mon, 18 Nov 2024 03:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JgceEdAQ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dqrQYIft"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD7717C98
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 03:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5EA43ABD
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 03:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731902166; cv=none; b=dcmdyKZJ1y3/2dyNAjuR7/F2sUWRubNLp/W8ZLoEV+DM0BfTlkQzUofqLfuT7cWimbsZRYgg/kyus7zq3JOSUfUvYnwVLJWGl99DB2M6COmxoFBN4eSmbP/A+dmRSwskCtyd0IZYnR5yatV1lH/jKpq1Zagx4bjCCUbFlqqeVcg=
+	t=1731902230; cv=none; b=hR4De5qPuDwWY1ZSybrmwZfdhRqy4NIwjuCGOQ8t5dFwOcJa6JoCzaTY74LzgyvriSBZrSEbrQLbvcjsV8LAAV5KSVToBRJYE5SZDa9CGqHVQyRGlOH2LbdKUopibbodZLsoWOtKMspBXIbrtK8BvKe3Z4J2XfZeiEh5rc4ROHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731902166; c=relaxed/simple;
-	bh=437I/bVvzH+Ak6NNAl5ScrSXb/w+B2/kaRVDPjaEH4E=;
+	s=arc-20240116; t=1731902230; c=relaxed/simple;
+	bh=6k8n4GLoRVDY+pXGKiKlo4AeD5qgwFq+iFDNCDgBs34=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i4utheWTbzheXKSLW5OCi0XAySyQJo7K+ZxcNrfG7k/ACwd7iXXTVIWS7piRnlhthpPCeCq4RdOfIa1EfPzsZPIb3YXAELp8jYGo/KnR9UcUI+XB/W0d8Y/mLMXGFflw97f78Fvl27bFC2183dJ1XJzWVEuU6lPFFCnbXWEbniI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JgceEdAQ; arc=none smtp.client-ip=209.85.167.53
+	 To:Cc:Content-Type; b=qJ0UkxjNjdfF8ToUGfjufUX3lmMbb1WxqOv3Wbf2pFLKWPSJdDh1I8kieU6Me+0HonccJioruv8D5mUlnBFp+1ZgXKuHFi45J7qpqUJqDQmdLebzmkseSGJctOIHSsJUJmtE8FhMkL74yKstH41JeNQlPBlbKRdMPn5a6ov+K5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dqrQYIft; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-539f1292a9bso4288380e87.2
-        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 19:56:04 -0800 (PST)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53a097aa3daso1286638e87.1
+        for <netdev@vger.kernel.org>; Sun, 17 Nov 2024 19:57:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731902163; x=1732506963; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1731902227; x=1732507027; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=437I/bVvzH+Ak6NNAl5ScrSXb/w+B2/kaRVDPjaEH4E=;
-        b=JgceEdAQrBkPpJoDJlftJo4q+MCPm99Oro0C6djkMFfzgci9VJYibPGr3awrKxKXoi
-         QaBpdKt94UOTLDp/5Lys311GnyfKm9rkacwi2zylAP9jAws+CmrzKSbJ8+k6L3D7qk+E
-         aRMDLlYamJ83YVmPDwHna2OGKZzk6WxBHVRdM=
+        bh=EVzPqKKljQ4d6eFMuTeQCpkMqtT859B72YsEwrpPjV8=;
+        b=dqrQYIftq50p1svm6a1HM/wZWlHM/r0Kq005uMsvUP5UFOQSwJNferjh96T1jRSWyF
+         lKjCdm6BO7D36XWQ/x0CTefF3quh+VQiHjsqD0zfqD+n8diOdheLa4Dcy56Q9lRyONJ1
+         FvQCtnh3VceWKjfqI2bklxPsZMm1iRe57ZVmg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731902163; x=1732506963;
+        d=1e100.net; s=20230601; t=1731902227; x=1732507027;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=437I/bVvzH+Ak6NNAl5ScrSXb/w+B2/kaRVDPjaEH4E=;
-        b=qCPWheRV5YkhHm5mkCNezIEhvleGma3DtCagLsMJxEz9vGSf7B8Nu1P2I9r7JZorMi
-         wYg7arghcN3/LZEKpSvOHiQ/1E8TYNdfRqLrFBySQ5elEFGXaPS0MyOxov9oMe9Kunbc
-         cdTYhfVzWl9JXConA7nNe/KX9N68k9G/Swz0k31Augefevq/OwF2CsgKYNGSuqSFksdt
-         +563Wfg60oZIYpGr54nK8/615kDP7VA10qPHxipxRticcN1PIEdr5ubnkpxFvI1ObMMU
-         UfMLCTbASPnavnctGo6oIxLN6u5Hv6hF8IHNmzNY4CRv1ZxOzlOlsRQEidVGfQWBU+h/
-         0bxA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5YjICF+1JItlTUzVjIQdCOJw4zHtXDfriyWvT/ZSAHAs03z7+rk/He4yDXBt3KrietjQ2p6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbAjqiJFHZgv/rqp29Kweh7hODAe9IAYKC9r2H0Ips0i0dSYS5
-	HD9yQ6iAusNXAGxpt3qyYISzYdAweHkQ2IUIKTob+btQuGEZKtfC4FRROh2kcdpt9Qd9NSog1M9
-	V2FdlvV9MociSBChg2tXVVEoMsRzESO6iR6W2
-X-Google-Smtp-Source: AGHT+IGJB/XtuuAH6fhL0uoaE8J8vo/c5TAFSL20FxElGpyn5v/SBRdvpFiScoepJzO499vKoYPlRf/5qn2byq/Yzg4=
-X-Received: by 2002:a05:6512:3b9e:b0:539:9524:92bc with SMTP id
- 2adb3069b0e04-53dab3bbfdbmr3961021e87.55.1731902162995; Sun, 17 Nov 2024
- 19:56:02 -0800 (PST)
+        bh=EVzPqKKljQ4d6eFMuTeQCpkMqtT859B72YsEwrpPjV8=;
+        b=YKeowcRTwI6rV9x/EH3jSnIzD9BCOh7tL+F4Wmf9h6CSggaBjs1GVY3m4gJLzwmA0i
+         8iysMXTNl90DO3saO74RsB4VZENHjr87wbtgDChqCX1H/miTDVoZikf51cR1LanBHXU+
+         0h4wujsrt68VhGtWaZdMG23LC4pM9ytZ6E1jVGm5ssN8PBIQzxKnHr+Gml7zfRDxsn96
+         MDX/mWM3qzAum2f6VM4FBBZciaLvGesiU98aaR05X71krn7Dzq3kd2jZcs3oxK8MBiDc
+         7WKQJ9icifkStlHxe2GhpYF6/RPGYRsGwRS900Isr44zt7731FltwUdg+6wHKMnjELoR
+         872w==
+X-Forwarded-Encrypted: i=1; AJvYcCWuAHmDN+fmelyfKUmPF2jkDEW5apZPOOTmrUhwO4ViITAsy49Mz3FZPc70+Z166RvXvqSGGhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD6b/l0dWOpoc2RdEGX35SHr9CcrqPMnkUIueNndSIkeq0JRiX
+	1ZUNgV+O7jKYwkRHscvk2OKOarsIrfa7MYQabYkmDcl/hFjIGNUmoQ8qj7IiPbl9HYesBDejpZL
+	ipxyDyO4NgNVtlkaH4Ni4fG/NKP/y24Ebl4pE
+X-Google-Smtp-Source: AGHT+IGRE6hazZKCDUPk1vCk2J7CTxIAflGfyr+J8MUAnY/tVxGqKceLnI6NFkRVje4R6Uf3bkPtYTW+gUPzzl9AYnY=
+X-Received: by 2002:a05:6512:3d21:b0:535:68ab:7fdd with SMTP id
+ 2adb3069b0e04-53dab29ad74mr3738332e87.19.1731902226986; Sun, 17 Nov 2024
+ 19:57:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241115015344.757567-1-kuba@kernel.org> <20241115015344.757567-2-kuba@kernel.org>
-In-Reply-To: <20241115015344.757567-2-kuba@kernel.org>
+References: <20241115015344.757567-1-kuba@kernel.org> <20241115015344.757567-4-kuba@kernel.org>
+In-Reply-To: <20241115015344.757567-4-kuba@kernel.org>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 18 Nov 2024 09:25:51 +0530
-Message-ID: <CAH-L+nPO1C5YEvKhB298=WJ6X7WYDC39MFpqh1H4RODQhcfJhA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/5] eth: fbnic: add missing SPDX headers
+Date: Mon, 18 Nov 2024 09:26:55 +0530
+Message-ID: <CAH-L+nNEtxhb7ZBxuSaQ+z9mxncri9zBzb9cDLvJN904vw82pA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/5] eth: fbnic: add basic debugfs structure
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
 	pabeni@redhat.com, alexanderduyck@fb.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003b635c062727e583"
+	boundary="0000000000000b95e0062727e97f"
 
---0000000000003b635c062727e583
+--0000000000000b95e0062727e97f
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Nov 15, 2024 at 7:24=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
 ote:
 >
-> Paolo noticed that we are missing SPDX headers, add them.
+> Add the usual debugfs structure:
+>
+>  fbnic/
+>    $pci-id/
+>      device-fileA
+>      device-fileB
+>
+> This patch only adds the directories, subsequent changes
+> will add files.
 >
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
@@ -98,7 +106,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh A P
 
---0000000000003b635c062727e583
+--0000000000000b95e0062727e97f
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -170,14 +178,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIN6hunfHoPHQLo6L3E9fyoaR4hWEFzUFRU3szXcFsm72MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTExODAzNTYwM1owaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIBeSi+FpDA4WnUvx5OZ/FddB/+hcwqEMbAhygmxE4z3nMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTExODAzNTcwN1owaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB14ocisD22
-u8uLeaIvXFKtr0UPUukyvoO3jEv284aZGkwV2tv5nAObl+O2U7xewa780V/RRKSUuJMpoqHOQYJ3
-/Zh4GFWeFiNIUtLOS3Cw3BNhL0ICrCaQu38m9Cn9UOy+P7CgeZljg9NHbfUzy1yOSKQt1MuqWOam
-J1rWdFARm7sZGpAG+E2BDgoTBg9KfCjeFXz4UP+yFiucnHtYtOk6SCBpBBTNJYrcLHcL2ABxt20M
-IrDQI4WV4ueyJl8e7ky27tEYg0DXXOkp6VLFSvIZoAgotF9Bzvfri2RCyHX1HWU4ibJDqzryftpL
-O211oUbypDIv2iTjmKQ5K/XHyGMm
---0000000000003b635c062727e583--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAOiKQOHznt
+9CPH8OL/hyJOsFTKTJbyjNXzwtFDueS+4jhI2KiuuS0P6oU2LEHrFNwMBduDcz8y2sH1uiuq+TNy
+VfeloczNzFIUQ5ZEea4KZF18bEmOQpZUyA+WvKOKQ04/DMBEsPmc3sAc+CFCiQP1LcwdK1rWmMu0
+GzaZHzZZnP/OgMxdpU+s/R4ofoJgHPLmTQCSvmw/JLpAZnLgcvhuphopaSdavu/TL9k1tr2F0DDU
+uJ9oSDj0DJw7LAEiQ2AHvz/exl67Kt/eWJ8VbK5IbmcgANO4UB/0GaoETl6KAFquMTRHpVf5irZT
+mYhkbZV1Uxmhh14LgO4JiHuKWLa5
+--0000000000000b95e0062727e97f--
 
