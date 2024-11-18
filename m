@@ -1,530 +1,324 @@
-Return-Path: <netdev+bounces-145925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BAC9D151F
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:13:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B03E19D1590
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:44:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04D55B2F52D
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:03:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94690B21F7F
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E8F1BD007;
-	Mon, 18 Nov 2024 16:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB101BD9D0;
+	Mon, 18 Nov 2024 16:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UmPRUkd5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Y+WuHOcb"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2045.outbound.protection.outlook.com [40.107.244.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BE41B6CFC;
-	Mon, 18 Nov 2024 16:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E521B21A0;
+	Mon, 18 Nov 2024 16:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731945768; cv=fail; b=D2PaLTEHLpbe9TcLBWaa1lnnGaB2qUVIQosmgNHaeyApEoczwCpICvIPUSxdQ8rJO8ZsogQoIkrUF3ZDBPq9xUawfIC819knlwyoSE81vcdaZ9wsxcttIXXQNtuUHmlZSLwRGA0swZfXyDGhyaQX/y3+oaXYmesXUOpPgdyxuW4=
+	t=1731948289; cv=fail; b=rmREVtairBU928dRHa89LHCYLWp8iXX0LGiWHozs/71zOfe2q9+2mO8Pm1HZYB2DmbhqhJUYBjYnVEkEmJEc054xCqFFtVBUbpFBS9oJPkfsat/brYu3UZ0/bUEMUfhJoxIlXiLPG9HMfApVldxYN7FZxRUvM9k7cN5V15j9OB0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731945768; c=relaxed/simple;
-	bh=sa+vZ4cO2nKVCAsPHtSng8OI9lMw+dXg1EIFqUVLVto=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rQbQsKUwXxZry6bsO97x2nQ/Ehdb01+opkn42RyN73fGa38kkTXEtaF4BGGUONBKawxAoBQ/aw8hksPvZOujd7kZ9U/LHlAmxhJy5pOKMsq8t+FHLBv9hc3CQB5I4nECb+BsUgDqZo5p3D3wX0XkaJcVpMi5CDUgbk3vCsgeh+U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UmPRUkd5; arc=fail smtp.client-ip=40.107.236.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1731948289; c=relaxed/simple;
+	bh=VKgQGecVFTuUEOQxBBhDHN1fDy/bddm6/S6MvOWtx+8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SMSxhXhtWS44uKv5N9qn9XnNyUoxQucjnK2GtQJHok2RhhytFgAr4hq3G2ve3U9xr3VYtaCX8VAnt95+1s59jiI+y+ywjfTN05JQ0M0MRJi64+ksoz4QX2dLfROjHku/BJn2U8bTwhADQx8I74wY5THYk7w1yMTeEX1TUICsYMs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Y+WuHOcb; arc=fail smtp.client-ip=40.107.244.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wK7liPe1gBKAasHnMhCs2sTQelfMfJAvAzRtTduoSavfabo5JwHMY7/zRpro9TewZDerIrcxI73m0EqW6BhELEI9jlmil1MLiw31jSBF8JYgESkvnwd87gd3A2BpWB1C4WedMBsb/tyhGe0DJCVxwVopNy/Do2K3sO8zaUpaV4+TtkWDJ5eI7WVGoGSLXbMpNYPO2dIT3sPKGbEPpeC/XqVStSHhT9GDMwHCX5mDJN7OhUGHGyrU8je0b6buszFoB8liJwShbxYheb8nKiWOWmrSdO1lrlvJKkBEmOqKIC7juL0XoR3Rt9vHt6kWwgHNMQOGib3rCw+Rzqg8nOljDw==
+ b=aTxuR0oxT5zWqxlz0N+NCwhEbNE+GUJV0rItmhxfpKjgB51xZ6kvTDEtkfAikVi8BXCXlTKbc3wqHLrcgc+4dcEc5usaRuuZPdNlRL7HLGiKqNcLMi01UV9zfop/8fHCZHB1orKJ+Ha53YobODD8sRiq8KHw8pTlZiqFaYbB01+3IhAEScOKW1Q18azeKN7GVe4Gf8vcIfqJTZCx7FvyYzlgZ1BjaBfbnd5oAioCMqwDSX5R5RehjKqDoj4FAVT63CgqHetTLP7/OxyOVo9P5CpUsbEzkzR6zFZm9Nzooj2OboX1xmEysXRYcsbogsW4pvN2m7qy1icqAXiDNhUHOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oZq6qzGt8ei5DmYVubXAiDaB7Wew5c75RnjQVh/liIA=;
- b=icIOsqZw0I5gdaGkLoVITgOggCMNV24wgCN2FftyYyl3wjjTawTYXN4G6/ywMNmJuOX8ibMrhcjbw074gIeCOBcUpE6H9Z2dg01+umiAvrxcgBIlGTsMZy257bqsi0nZzoeKyRhS+KTshIPBEq8CqylkKwrtNqfPFfO0hwM7emZwj3hyhQvL+v1+yws4PqwFAMw2NqmHZxywGyTHKjrOmvcCbb8E2YOxRnoD6sydEx2r/eC/IivkRHpEpugQQzlnuhtC1eWT44Js9MShHh9nCsoxHm5tF5TUaf+9YTS5JRSxrHVUm3MDvVm9+y/COs7bAcYUCXAPl71Z+km9qJIbBA==
+ bh=Vl8ioyh1KgdbzOpfUw95fWBZVBJ3GJXFvSW3lmy0zmg=;
+ b=N3+qgv3ns8OhEz8GkoATl6Fev6nYfodfjVrfzNWUgf2ZeDY8k+aiyb0NyRkwEgsaYwkyWU+r6gvxSocBQq0wKmFGqoyyE563AUKROd75oK80PhT3C3d1G8o6OYJC8blbKMNFz8trVNKGh/+LERdIeJpLvviQCRJPYA8dzV6xhwVfACOKMbfrZzWHRmkwXN0W26FU986zuRrjhSkhI+libP2HtEEU3G+I3Qy5AerN/Z4ByzPMMIWEBP9AL2DjecD1cIbxpd131bcoodUsHksYtutxxxlVkYfeVgsj5D3DEKAyjcap3eljAz2z89aVnLcNDc++Wr9vrhKhV2fy4BF10g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ 165.204.84.12) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oZq6qzGt8ei5DmYVubXAiDaB7Wew5c75RnjQVh/liIA=;
- b=UmPRUkd5NP+hiMdUnIeXqwBGDJMbP/SPDWLLWqpBHrZw9+6/ahiq0Tp7o686r8qf3b1vVKEEeMBXRg9DiU4fXE8BYZEswSkf7bhGBUCHVICc/D++Lmji/z3qQmGFPbc4KCkrILPHA06johwXH7JN2CH1Y/WP3n/MIO9sPTe7BkI2c4fqs+YDXGUguFglDMO/YTM+IxpX2LRrZ846KulmOSzHb8DbpP0Fs8CHWSxY90d0hghxw5vqjdv/XJwdvMAtM9II9fQtL58GPg6NFPfr7xbRxvZeHDo8BoUPD6H6dPNepxRREQZJkLAbE/fOzuUkojdZZj/a/PPrkYSoJ8S8OA==
-Received: from PH3PEPF000040A0.namprd05.prod.outlook.com (2603:10b6:518:1::51)
- by DM6PR12MB4249.namprd12.prod.outlook.com (2603:10b6:5:223::14) with
+ bh=Vl8ioyh1KgdbzOpfUw95fWBZVBJ3GJXFvSW3lmy0zmg=;
+ b=Y+WuHOcb+OiK6l7M8JnKjHwNlPCp8GKRE1MBu8NpxdJ3MnN3Ryp9tmvHWaTZHVu67/KhWYJEiWFl0HpVDzuxSanUjWxVyycVApZSxJx5czwRYsbddfK689qGJc4Rw8ctisSx1gxckUVn+bP/AZBVYl6MSbbAgq1DwATygBULuYA=
+Received: from BN9PR03CA0659.namprd03.prod.outlook.com (2603:10b6:408:13b::34)
+ by DS0PR12MB8197.namprd12.prod.outlook.com (2603:10b6:8:f1::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23; Mon, 18 Nov
- 2024 16:02:39 +0000
-Received: from CY4PEPF0000EDD3.namprd03.prod.outlook.com
- (2a01:111:f403:f912::1) by PH3PEPF000040A0.outlook.office365.com
- (2603:1036:903:49::3) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.18 via Frontend
- Transport; Mon, 18 Nov 2024 16:02:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EDD3.mail.protection.outlook.com (10.167.241.199) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8158.14 via Frontend Transport; Mon, 18 Nov 2024 16:02:38 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 18 Nov
- 2024 08:02:14 -0800
-Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 18 Nov
- 2024 08:02:07 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
- Machata" <petrm@nvidia.com>, <mlxsw@nvidia.com>, Shuah Khan
-	<shuah@kernel.org>, Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu
-	<liuhangbin@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [RFC PATCH net-next 11/11] selftests: forwarding: Add a selftest for the new reserved_bits UAPI
-Date: Mon, 18 Nov 2024 17:43:17 +0100
-Message-ID: <19411b7f8657ba2ded8c6d257223aa5117ce5344.1731941465.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <cover.1731941465.git.petrm@nvidia.com>
-References: <cover.1731941465.git.petrm@nvidia.com>
+ 2024 16:44:45 +0000
+Received: from BL02EPF0001A100.namprd03.prod.outlook.com
+ (2603:10b6:408:13b:cafe::e5) by BN9PR03CA0659.outlook.office365.com
+ (2603:10b6:408:13b::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23 via Frontend
+ Transport; Mon, 18 Nov 2024 16:44:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.12)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.12 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.12; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.12) by
+ BL02EPF0001A100.mail.protection.outlook.com (10.167.242.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8158.14 via Frontend Transport; Mon, 18 Nov 2024 16:44:44 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 18 Nov
+ 2024 10:44:44 -0600
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 18 Nov
+ 2024 10:44:43 -0600
+Received: from xcbalucerop41x.xilinx.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 18 Nov 2024 10:44:42 -0600
+From: <alejandro.lucero-palau@amd.com>
+To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
+	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>
+CC: Alejandro Lucero <alejandro.lucero-palau@amd.com>
+Subject: [PATCH v5 00/27] cxl: add type2 device basic support
+Date: Mon, 18 Nov 2024 16:44:07 +0000
+Message-ID: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD3:EE_|DM6PR12MB4249:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8e8605f0-b26b-4b0b-cdfe-08dd07ea6ccb
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A100:EE_|DS0PR12MB8197:EE_
+X-MS-Office365-Filtering-Correlation-Id: b037f004-d9c2-4e8a-4de8-08dd07f04e88
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zSb9xsTa3gA3WL1Ekdd4lJ1ChwfArh4U0Ck7XPHYdaYGwhHuqitVl4EWDkPE?=
- =?us-ascii?Q?Miarzum3bdh2FLlhU4n8nW6ACbOMBpZsj5EJR20JTCtPY3AOyIBi/Qw1BZeb?=
- =?us-ascii?Q?WC0V4Gz3cPP7aL8Fd5te3q0hbKYnFWNNdzcAcLwgKJbXhwWmdE8E55un/PdI?=
- =?us-ascii?Q?exa+ZVMhFIReXIE0MLJ5shl1hthCj+YZWYDrMxrZL9Vge5etDtDsgcFrH+QJ?=
- =?us-ascii?Q?s5L5qgFy5WfKRQKv7mfyCLrbX0HPHi2sUBG3AEd5oz0XKs+AxfOq8y+tedvK?=
- =?us-ascii?Q?2tciMWjhhBtVLNhisNAJp93YiNx3wXrsrz/SlZmYSpRQhw0GFJr3T9fKU8Cp?=
- =?us-ascii?Q?/brrGXN2zJpNPa3M2TafMce9XPMG9maPPiw7CtEJZ58zmQGRADqnh6LMPHmH?=
- =?us-ascii?Q?3a6ZFjYM0B9+jD9N+GM6zuLaQLpkm2ugcuSJnhBaeNdEEkN5tU+/PEwiFkID?=
- =?us-ascii?Q?i5scwheAfZqpSmhZcXM6VfBdnAUM17SMYpxrRFhD11Ne4k+jp2q2inTGFr/d?=
- =?us-ascii?Q?giGtVBxMySsS6F37xSJdlfcBOmFbGnYhLI/N8LYFTzv7BrhqjW5JhHaW03lu?=
- =?us-ascii?Q?YONtQOpwWe/uS81LPd6V680FdGohK3os+QOBCrUQGieiKWQ5RG4fTlX+ZPkL?=
- =?us-ascii?Q?nWnePZCRuPRJ2zn/znBL28mQxtMF5/xgJwaSTOPQG6Wn0aBlOMFikeZVJ+t5?=
- =?us-ascii?Q?5Lv0NtZd1kKwSzCouypNSPm4fbHZt5Y97hZf7/dElLjl87GM+Wf/uBmQs7gJ?=
- =?us-ascii?Q?LDHgMTQxCyLIXX06sCsyNfqS6AxlfECIErFJRN+U2chATxpTPS3QGCErNsAo?=
- =?us-ascii?Q?VLEJFBk0vBPxSr5eO77jcjqZ+Y2sTa1orFfNdJpbSZ/wKCGYAK0l05r5YLjE?=
- =?us-ascii?Q?17c+26qgcmCXcPKAuzn9W9d/gDg9M4RuNtfOsDQsAfu5eG31kLEZmHZ14sBR?=
- =?us-ascii?Q?y9Upj+qId9w1jXV/G2tyM5WZlgqAZZGlvGNe916dy84w6s61E0dz3GIPAaDC?=
- =?us-ascii?Q?eiWJD4AmT+wgKxEHyoXM5yy7wb7GJZz9ZgvSDyIbNX49bp92TriVjSyHzSvZ?=
- =?us-ascii?Q?YIgHWnWbegzWG6Lf4dYi5DocglApJz8WuzGq2USp0Z4+VcCoqNqwL06Qz9fQ?=
- =?us-ascii?Q?YTmVME8zKqGwA0/h5Z5kEkONqy1j+pzXx90km+o7feSArpDGaFMtsyTGAHP/?=
- =?us-ascii?Q?n9QusytaLrY0SxU4ChV2XZhvxvaoHPgbtkWnhYThzGzwaJ///6CeZSD/V5bT?=
- =?us-ascii?Q?cjBd+kKz5E5POjr0QjoSUreDL4hmNi+jzZy11UibXma9T/KAgwGlEkF5Jcm3?=
- =?us-ascii?Q?VfEWZs8FWReGMBPM683h4ALJDgErWtK68kvWaG/KP9HkKsIfTXeomIxZqR0g?=
- =?us-ascii?Q?Vcv2hCVjHKL3fyRwn5gHqSzRzIayn89iQgWJg5SlaI9dDTv1yA=3D=3D?=
+	=?utf-8?B?Y2xvRFRLWnBJYlJIL1Eyb0FacVNjcHJ3VnJrb0FEVktsTnlueDVNREhDZU90?=
+ =?utf-8?B?clhXUXRFUHN0bjJ2MlZEQ1JSYlExOGMrbTJKQ1NvMU04eFNwT0hyYnBKNzZi?=
+ =?utf-8?B?bWF3UjZ6YWM0OTAwZ3B4eHcrNnZqYmpZZmY0UHZmT2RLNmh0c09WZlN0NElK?=
+ =?utf-8?B?UDY5NHZxOFo3bWZ4bzU0TWpJanFRdXYza0ZPcFllaWtCbThFOUdrTzRZY3Zy?=
+ =?utf-8?B?VXR1RG03anN2NzdoR0VaZkJoM0U0OTZWYW5PSDhicUVKWVJhdFh0TkxUME40?=
+ =?utf-8?B?TzRHVGpZQUxUOXdXallXd0FNbEl5ZG9RV3czb25aQWlyVlpmbGNQbDJtZEtl?=
+ =?utf-8?B?T2R4YXhJT2ZtOFZrNVM5cXF4TXZKOTRPY3N4RG5rRCsrSjdBdW9mdEhiMmQr?=
+ =?utf-8?B?dnBlbUFTSEx4eXB0RE9rWWFqWmRzRExQQXN3MGc0VmNFZW43d0h3UXVrUC9C?=
+ =?utf-8?B?ekZKS2lmRzQ5L3NZM09jaDNwQ3JtUWNDK3FjUm1MR0ZsdDArUXNCWjF1Zy81?=
+ =?utf-8?B?UUN6L1UwcTBTaE1TcHI5dm8yN3h0cnRJQU1WU3dVZm12M3pheVhvSFRMVkRv?=
+ =?utf-8?B?QXJyQWNpTWx3RHlXNlhKS0FsdGJ1SWNjN0RNWlR2NFJpbTl1ZnBqM28vVGh6?=
+ =?utf-8?B?L0ZSZ0Q2aWtTSjkzOWJNbENOU1pTT3g0b0pKQjRiRzR2VEdRUVY4aVlpYVhZ?=
+ =?utf-8?B?YSswK3IwK0NpN3hadE9RUEV1dDdjSUtXZjdaeEd4ZFJlRU9laEczYkUxd1RE?=
+ =?utf-8?B?Y1JzZzRQTzYwSFdlb01QbzI1eG5YbFZKbEVZQlJlMCsxdk52bDc0NUlhNHVy?=
+ =?utf-8?B?QXZoZ0xQTFFTNXRyWmxPOFBWUS9rUStvdDJjUkh0QU1zWGZPSitKNVk3TGZQ?=
+ =?utf-8?B?Z2VBUHUrVGJqc2E3SFBseU9FVGk2SlVSK3VxeWx0UTgwUjRrTkFWeEhtS3Bv?=
+ =?utf-8?B?Q2dwM1NuaXp4ZTREeWYvVVRnTGM3MXNRWGU5S1Rob0pWSlh6alJESGhLK0dR?=
+ =?utf-8?B?dzk3ME9RWVBPVExjVjltcW5BbEZJWGhUOEtvK05aZWcwOGV0T2NpWVEwelpC?=
+ =?utf-8?B?dng4b2dYb25LR2pxSlZuckg2aEEzMFgyMndlaEs2WTZSaVBrL1l3TDFwMnFL?=
+ =?utf-8?B?SWJ4eUpsV2ZqMTdTNTZlbm1NNExkTWszazhjbnhQRVA4dmVvQmt1VlVIMUpq?=
+ =?utf-8?B?WDhaejRuUHg5Q0VheWk4Mk50N0pFQWQ4eVVxT2s1NEdXSEtKNXNzd2NsaWtj?=
+ =?utf-8?B?U2dqZDIzOGlKQkxkK1ZTMVA1cFlCUUM1NjNic1Q2R2dSOFdlclk3VCtUT1lZ?=
+ =?utf-8?B?NzFSUlVReFZSZTdxR0t4RWNKbHdhbW1Gb2NOTUtxYW40dENpa2VqRDVFekhX?=
+ =?utf-8?B?N1NoSHpxSGFoNzVIQ3VBZkxFQjBWbFNtNGV0dnlsenN6WVJmdklkczZRRlRx?=
+ =?utf-8?B?N1ZZUWxxamZzSWUwZGhSbHhEUExIV05OVEsvdWt4QzlYdHRZbmIvZjJRSTBT?=
+ =?utf-8?B?MVNtc3RBK1Q2U2pYY2tFRHhjd0hZMlVCeTZVaGVhKy95eUNCd1RCb0lydTU1?=
+ =?utf-8?B?elQzSjVvMjl5dEN0UkJKck0wZUZBRCtub0VUdEtqSGFvV0p4bisrQWlZMWph?=
+ =?utf-8?B?dG1jWG5aSWd4cTVtdUF6bU9TeFRQWUt0NTkybTJLbUU0dnZMR24rSWNsVnAv?=
+ =?utf-8?B?SWpvMGswM0ZYS2lCUVZVMFF2aVJiRXR4YmVNWjlSem84SlVLNnNGa0VReXVQ?=
+ =?utf-8?B?aVBSbFU0YWV4d3VpZ09UNk1lc2wyZmtiTHhrQzlkU3NMVjFWUXE5N0M3TnFV?=
+ =?utf-8?B?RTc1NlJqcWk3U3hQT2dML1RxamFjK1h1MGh6YzRCV2hLelYxMURKSzFIZ2ht?=
+ =?utf-8?B?bEVhYS9vb1BQeWhZWUthNjM2YWhjUzRORmZUeVFXSmxzVXc9PQ==?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2024 16:02:38.4266
+	CIP:165.204.84.12;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:atlvpn-bp.amd.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2024 16:44:44.6954
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e8605f0-b26b-4b0b-cdfe-08dd07ea6ccb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-Network-Message-Id: b037f004-d9c2-4e8a-4de8-08dd07f04e88
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.12];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD3.namprd03.prod.outlook.com
+	BL02EPF0001A100.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4249
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8197
 
-Run VXLAN packets through a gateway. Flip individual bits of the packet
-and/or reserved bits of the gateway, and check that the gateway treats the
-packets as expected.
+From: Alejandro Lucero <alejandro.lucero-palau@amd.com>
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
+v5 changes:
 
-Notes:
-CC: Shuah Khan <shuah@kernel.org>
-CC: Benjamin Poirier <bpoirier@nvidia.com>
-CC: Hangbin Liu <liuhangbin@gmail.com>
-CC: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: linux-kselftest@vger.kernel.org
+ - Fix SFC configuration based on kernel CXL configuration
+ - Add subset check for capabilities.
+ - fix region creation when HDM decoders programmed by firmware/BIOS (Ben
+   Cheatham)
+ - Add option for creating dax region based on driver decission (Ben
+   Cheatham)
+ - Using sfc probe_data struct for keeping sfc cxl data
 
- .../net/forwarding/vxlan_reserved.sh          | 352 ++++++++++++++++++
- 1 file changed, 352 insertions(+)
- create mode 100755 tools/testing/selftests/net/forwarding/vxlan_reserved.sh
+v4 changes:
+  
+ - Use bitmap for capabilities new field (Jonathan Cameron)
 
-diff --git a/tools/testing/selftests/net/forwarding/vxlan_reserved.sh b/tools/testing/selftests/net/forwarding/vxlan_reserved.sh
-new file mode 100755
-index 000000000000..46c31794b91b
---- /dev/null
-+++ b/tools/testing/selftests/net/forwarding/vxlan_reserved.sh
-@@ -0,0 +1,352 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# +--------------------+
-+# | H1 (vrf)           |
-+# |    + $h1           |
-+# |    | 192.0.2.1/28  |
-+# +----|---------------+
-+#      |
-+# +----|--------------------------------+
-+# | SW |                                |
-+# | +--|------------------------------+ |
-+# | |  + $swp1           BR1 (802.1d) | |
-+# | |                                 | |
-+# | |  + vx1 (vxlan)                  | |
-+# | |    local 192.0.2.17             | |
-+# | |    id 1000 dstport $VXPORT      | |
-+# | +---------------------------------+ |
-+# |                                     |
-+# |  192.0.2.32/28 via 192.0.2.18       |
-+# |                                     |
-+# |  + $rp1                             |
-+# |  | 192.0.2.17/28                    |
-+# +--|----------------------------------+
-+#    |
-+# +--|----------------------------------+
-+# |  |                                  |
-+# |  + $rp2                             |
-+# |    192.0.2.18/28                    |
-+# |                                     |
-+# | VRP2 (vrf)                          |
-+# +-------------------------------------+
-+
-+: ${VXPORT:=4789}
-+: ${ALL_TESTS:="
-+	default_test
-+	plain_test
-+	reserved_0_test
-+	reserved_10_test
-+	reserved_31_test
-+	reserved_56_test
-+	reserved_63_test
-+    "}
-+
-+NUM_NETIFS=4
-+source lib.sh
-+
-+h1_create()
-+{
-+	simple_if_init $h1 192.0.2.1/28
-+	defer simple_if_fini $h1 192.0.2.1/28
-+
-+	tc qdisc add dev $h1 clsact
-+	defer tc qdisc del dev $h1 clsact
-+
-+	tc filter add dev $h1 ingress pref 77 \
-+	   prot ip flower skip_hw ip_proto icmp action drop
-+	defer tc filter del dev $h1 ingress pref 77
-+}
-+
-+switch_create()
-+{
-+	ip_link_add br1 type bridge vlan_filtering 0 mcast_snooping 0
-+	# Make sure the bridge uses the MAC address of the local port and not
-+	# that of the VxLAN's device.
-+	ip_link_set_addr br1 $(mac_get $swp1)
-+	ip_link_set_up br1
-+
-+	ip_link_set_up $rp1
-+	ip_addr_add $rp1 192.0.2.17/28
-+	ip_route_add 192.0.2.32/28 nexthop via 192.0.2.18
-+
-+	ip_link_set_master $swp1 br1
-+	ip_link_set_up $swp1
-+}
-+
-+vrp2_create()
-+{
-+	simple_if_init $rp2 192.0.2.18/28
-+	defer simple_if_fini $rp2 192.0.2.18/28
-+}
-+
-+setup_prepare()
-+{
-+	h1=${NETIFS[p1]}
-+	swp1=${NETIFS[p2]}
-+
-+	rp1=${NETIFS[p3]}
-+	rp2=${NETIFS[p4]}
-+
-+	vrf_prepare
-+	defer vrf_cleanup
-+
-+	forwarding_enable
-+	defer forwarding_restore
-+
-+	h1_create
-+	switch_create
-+
-+	vrp2_create
-+}
-+
-+vxlan_header_bytes()
-+{
-+	local vni=$1; shift
-+	local -a extra_bits=("$@")
-+	local -a bits
-+	local i
-+
-+	for ((i=0; i < 64; i++)); do
-+		bits[i]=0
-+	done
-+
-+	# Bit 4 is the I flag and is always on.
-+	bits[4]=1
-+
-+	for i in ${extra_bits[@]}; do
-+		bits[i]=1
-+	done
-+
-+	# Bits 32..55 carry the VNI
-+	local mask=0x800000
-+	for ((i=0; i < 24; i++)); do
-+		bits[$((i + 32))]=$(((vni & mask) != 0))
-+		((mask >>= 1))
-+	done
-+
-+	local bytes
-+	for ((i=0; i < 8; i++)); do
-+		local byte=0
-+		local j
-+		for ((j=0; j < 8; j++)); do
-+			local bit=${bits[8 * i + j]}
-+			((byte += bit << (7 - j)))
-+		done
-+		bytes+=$(printf %02x $byte):
-+	done
-+
-+	echo ${bytes%:}
-+}
-+
-+neg_bytes()
-+{
-+	local bytes=$1; shift
-+
-+	local -A neg=([0]=f [1]=e [2]=d [3]=c [4]=b [5]=a [6]=9 [7]=8
-+		      [8]=7 [9]=6 [a]=5 [b]=4 [c]=3 [d]=2 [e]=1 [f]=0 [:]=:)
-+	local out
-+	local i
-+
-+	for ((i=0; i < ${#bytes}; i++)); do
-+		local c=${bytes:$i:1}
-+		out+=${neg[$c]}
-+	done
-+	echo $out
-+}
-+
-+vxlan_ping_do()
-+{
-+	local count=$1; shift
-+	local dev=$1; shift
-+	local next_hop_mac=$1; shift
-+	local dest_ip=$1; shift
-+	local dest_mac=$1; shift
-+	local vni=$1; shift
-+	local reserved_bits=$1; shift
-+
-+	local vxlan_header=$(vxlan_header_bytes $vni $reserved_bits)
-+
-+	$MZ $dev -c $count -d 100msec -q \
-+		-b $next_hop_mac -B $dest_ip \
-+		-t udp sp=23456,dp=$VXPORT,p=$(:
-+		    )"$vxlan_header:"$(              : VXLAN
-+		    )"$dest_mac:"$(                  : ETH daddr
-+		    )"00:11:22:33:44:55:"$(          : ETH saddr
-+		    )"08:00:"$(                      : ETH type
-+		    )"45:"$(                         : IP version + IHL
-+		    )"00:"$(                         : IP TOS
-+		    )"00:54:"$(                      : IP total length
-+		    )"99:83:"$(                      : IP identification
-+		    )"40:00:"$(                      : IP flags + frag off
-+		    )"40:"$(                         : IP TTL
-+		    )"01:"$(                         : IP proto
-+		    )"00:00:"$(                      : IP header csum
-+		    )"$(ipv4_to_bytes 192.0.2.3):"$( : IP saddr
-+		    )"$(ipv4_to_bytes 192.0.2.1):"$( : IP daddr
-+		    )"08:"$(                         : ICMP type
-+		    )"00:"$(                         : ICMP code
-+		    )"8b:f2:"$(                      : ICMP csum
-+		    )"1f:6a:"$(                      : ICMP request identifier
-+		    )"00:01:"$(                      : ICMP request seq. number
-+		    )"4f:ff:c5:5b:00:00:00:00:"$(    : ICMP payload
-+		    )"6d:74:0b:00:00:00:00:00:"$(    :
-+		    )"10:11:12:13:14:15:16:17:"$(    :
-+		    )"18:19:1a:1b:1c:1d:1e:1f:"$(    :
-+		    )"20:21:22:23:24:25:26:27:"$(    :
-+		    )"28:29:2a:2b:2c:2d:2e:2f:"$(    :
-+		    )"30:31:32:33:34:35:36:37"
-+}
-+
-+vxlan_device_add()
-+{
-+	ip_link_add vx1 up type vxlan id 1000		\
-+		local 192.0.2.17 dstport "$VXPORT"	\
-+		nolearning noudpcsum tos inherit ttl 100 "$@"
-+	ip_link_set_master vx1 br1
-+}
-+
-+vxlan_all_reserved_bits()
-+{
-+	local i
-+
-+	for ((i=0; i < 64; i++)); do
-+		if ((i == 4 || i >= 32 && i < 56)); then
-+			continue
-+		fi
-+		echo $i
-+	done
-+}
-+
-+vxlan_ping_vanilla()
-+{
-+	vxlan_ping_do 10 $rp2 $(mac_get $rp1) 192.0.2.17 $(mac_get $h1) 1000
-+}
-+
-+vxlan_ping_reserved()
-+{
-+	for bit in $(vxlan_all_reserved_bits); do
-+		vxlan_ping_do 1 $rp2 $(mac_get $rp1) \
-+			      192.0.2.17 $(mac_get $h1) 1000 "$bit"
-+		((n++))
-+	done
-+}
-+
-+vxlan_ping_test()
-+{
-+	local what=$1; shift
-+	local get_stat=$1; shift
-+	local expect=$1; shift
-+
-+	RET=0
-+
-+	local t0=$($get_stat)
-+
-+	"$@"
-+	check_err $? "Failure when running $@"
-+
-+	local t1=$($get_stat)
-+	local delta=$((t1 - t0))
-+
-+	((expect == delta))
-+	check_err $? "Expected to capture $expect packets, got $delta."
-+
-+	log_test "$what"
-+}
-+
-+__default_test_do()
-+{
-+	local n_allowed_bits=$1; shift
-+	local what=$1; shift
-+
-+	vxlan_ping_test "$what: clean packets" \
-+		"tc_rule_stats_get $h1 77 ingress" \
-+		10 vxlan_ping_vanilla
-+
-+	local t0=$(link_stats_get vx1 rx errors)
-+	vxlan_ping_test "$what: mangled packets" \
-+		"tc_rule_stats_get $h1 77 ingress" \
-+		$n_allowed_bits vxlan_ping_reserved
-+	local t1=$(link_stats_get vx1 rx errors)
-+
-+	RET=0
-+	local expect=$((39 - n_allowed_bits))
-+	local delta=$((t1 - t0))
-+	((expect == delta))
-+	check_err $? "Expected $expect error packets, got $delta."
-+	log_test "$what: drops reported"
-+}
-+
-+default_test_do()
-+{
-+	vxlan_device_add
-+	__default_test_do 0 "Default"
-+}
-+
-+default_test()
-+{
-+	in_defer_scope \
-+	    default_test_do
-+}
-+
-+plain_test_do()
-+{
-+	vxlan_device_add reserved_bits 0xf7ffffff000000ff
-+	__default_test_do 0 "reserved_bits 0xf7ffffff000000ff"
-+}
-+
-+plain_test()
-+{
-+	in_defer_scope \
-+	    plain_test_do
-+}
-+
-+reserved_test()
-+{
-+	local bit=$1; shift
-+
-+	local allowed_bytes=$(vxlan_header_bytes 0xffffff $bit)
-+	local reserved_bytes=$(neg_bytes $allowed_bytes)
-+	local reserved_bits=${reserved_bytes//:/}
-+
-+	vxlan_device_add reserved_bits 0x$reserved_bits
-+	__default_test_do 1 "reserved_bits 0x$reserved_bits"
-+}
-+
-+reserved_0_test()
-+{
-+	in_defer_scope \
-+	    reserved_test 0
-+}
-+
-+reserved_10_test()
-+{
-+	in_defer_scope \
-+	    reserved_test 10
-+}
-+
-+reserved_31_test()
-+{
-+	in_defer_scope \
-+	    reserved_test 31
-+}
-+
-+reserved_56_test()
-+{
-+	in_defer_scope \
-+	    reserved_test 56
-+}
-+
-+reserved_63_test()
-+{
-+	in_defer_scope \
-+	    reserved_test 63
-+}
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+setup_wait
-+tests_run
-+
-+exit $EXIT_STATUS
+ - Use cxl_mem attributes for sysfs based on device type (Dave Jian)
+
+ - Add conditional cxl sfc compilation relying on kernel CXL config (kernel test robot)
+
+ - Add sfc changes in different patches for facilitating backport (Jonathan Cameron)
+
+ - Remove patch for dealing with cxl modules dependencies and using sfc kconfig plus
+   MODULE_SOFTDEP instead.
+
+v3 changes:
+
+ - cxl_dev_state not defined as opaque but only manipulated by accel drivers
+   through accessors.
+
+ - accessors names not identified as only for accel drivers.
+
+ - move pci code from pci driver (drivers/cxl/pci.c) to generic pci code
+   (drivers/cxl/core/pci.c).
+
+ - capabilities field from u8 to u32 and initialised by CXL regs discovering
+   code.
+
+ - add capabilities check and removing current check by CXL regs discovering
+   code.
+
+ - Not fail if CXL Device Registers not found. Not mandatory for Type2.
+
+ - add timeout in acquire_endpoint for solving a race with the endpoint port
+   creation.
+
+ - handle EPROBE_DEFER by sfc driver.
+
+ - Limiting interleave ways to 1 for accel driver HPA/DPA requests.
+
+ - factoring out interleave ways and granularity helpers from type2 region
+   creation patch.
+
+ - restricting region_creation for type2 to one endpoint decoder.
+
+ - add accessor for release_resource.
+
+ - handle errors and errors messages properly.
+
+
+v2 changes:
+
+I have removed the introduction about the concerns with BIOS/UEFI after the
+discussion leading to confirm the need of the functionality implemented, at
+least is some scenarios.
+
+There are two main changes from the RFC:
+
+1) Following concerns about drivers using CXL core without restrictions, the CXL
+struct to work with is opaque to those drivers, therefore functions are
+implemented for modifying or reading those structs indirectly.
+
+2) The driver for using the added functionality is not a test driver but a real
+one: the SFC ethernet network driver. It uses the CXL region mapped for PIO
+buffers instead of regions inside PCIe BARs.
+
+
+
+RFC:
+
+Current CXL kernel code is focused on supporting Type3 CXL devices, aka memory
+expanders. Type2 CXL devices, aka device accelerators, share some functionalities
+but require some special handling.
+
+First of all, Type2 are by definition specific to drivers doing something and not just
+a memory expander, so it is expected to work with the CXL specifics. This implies the CXL
+setup needs to be done by such a driver instead of by a generic CXL PCI driver
+as for memory expanders. Most of such setup needs to use current CXL core code
+and therefore needs to be accessible to those vendor drivers. This is accomplished
+exporting opaque CXL structs and adding and exporting functions for working with
+those structs indirectly.
+
+Some of the patches are based on a patchset sent by Dan Williams [1] which was just
+partially integrated, most related to making things ready for Type2 but none
+related to specific Type2 support. Those patches based on Dan´s work have Dan´s
+signing as co-developer, and a link to the original patch.
+
+A final note about CXL.cache is needed. This patchset does not cover it at all,
+although the emulated Type2 device advertises it. From the kernel point of view
+supporting CXL.cache will imply to be sure the CXL path supports what the Type2
+device needs. A device accelerator will likely be connected to a Root Switch,
+but other configurations can not be discarded. Therefore the kernel will need to
+check not just HPA, DPA, interleave and granularity, but also the available
+CXL.cache support and resources in each switch in the CXL path to the Type2
+device. I expect to contribute to this support in the following months, and
+it would be good to discuss about it when possible.
+
+[1] https://lore.kernel.org/linux-cxl/98b1f61a-e6c2-71d4-c368-50d958501b0c@intel.com/T/
+
+Alejandro Lucero (27):
+  cxl: add type2 device basic support
+  sfc: add cxl support using new CXL API
+  cxl: add capabilities field to cxl_dev_state and cxl_port
+  cxl/pci: add check for validating capabilities
+  cxl: move pci generic code
+  cxl: add function for type2 cxl regs setup
+  sfc: use cxl api for regs setup and checking
+  cxl: add functions for resource request/release by a driver
+  sfc: request cxl ram resource
+  cxl: harden resource_contains checks to handle zero size resources
+  cxl: add function for setting media ready by a driver
+  sfc: set cxl media ready
+  cxl: prepare memdev creation for type2
+  sfc: create type2 cxl memdev
+  cxl: define a driver interface for HPA free space enumeration
+  sfc: obtain root decoder with enough HPA free space
+  cxl: define a driver interface for DPA allocation
+  sfc: get endpoint decoder
+  cxl: make region type based on endpoint type
+  cxl/region: factor out interleave ways setup
+  cxl/region: factor out interleave granularity setup
+  cxl: allow region creation by type2 drivers
+  sfc: create cxl region
+  cxl: add region flag for precluding a device memory to be used for dax
+  sfc: specify avoid dax when cxl region is created
+  cxl: add function for obtaining params from a region
+  sfc: support pio mapping based on cxl
+
+ drivers/cxl/core/cdat.c               |   3 +
+ drivers/cxl/core/hdm.c                | 160 ++++++++--
+ drivers/cxl/core/memdev.c             | 123 +++++++-
+ drivers/cxl/core/pci.c                | 132 ++++++++
+ drivers/cxl/core/port.c               |  11 +-
+ drivers/cxl/core/region.c             | 414 ++++++++++++++++++++++----
+ drivers/cxl/core/regs.c               |  30 +-
+ drivers/cxl/cxl.h                     |  17 +-
+ drivers/cxl/cxlmem.h                  |   5 +
+ drivers/cxl/cxlpci.h                  |  19 +-
+ drivers/cxl/mem.c                     |  25 +-
+ drivers/cxl/pci.c                     |  99 +++---
+ drivers/cxl/port.c                    |   5 +-
+ drivers/net/ethernet/sfc/Kconfig      |   7 +
+ drivers/net/ethernet/sfc/Makefile     |   1 +
+ drivers/net/ethernet/sfc/ef10.c       |  49 ++-
+ drivers/net/ethernet/sfc/efx.c        |  24 +-
+ drivers/net/ethernet/sfc/efx_cxl.c    | 181 +++++++++++
+ drivers/net/ethernet/sfc/efx_cxl.h    |  28 ++
+ drivers/net/ethernet/sfc/mcdi_pcol.h  |  12 +
+ drivers/net/ethernet/sfc/net_driver.h |  12 +
+ drivers/net/ethernet/sfc/nic.h        |   3 +
+ include/cxl/cxl.h                     |  82 +++++
+ include/cxl/pci.h                     |  23 ++
+ 24 files changed, 1269 insertions(+), 196 deletions(-)
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+ create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
+ create mode 100644 include/cxl/cxl.h
+ create mode 100644 include/cxl/pci.h
+
 -- 
-2.47.0
+2.17.1
 
 
