@@ -1,107 +1,120 @@
-Return-Path: <netdev+bounces-145913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 056959D14E1
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:00:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBE59D14FD
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:05:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF85328408D
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:00:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57E351F230BF
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2561A9B3D;
-	Mon, 18 Nov 2024 16:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10BA1BD00A;
+	Mon, 18 Nov 2024 16:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WRZ32geY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgWUCbXz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209974437A
-	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 16:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28283199EBB;
+	Mon, 18 Nov 2024 16:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731945631; cv=none; b=aZ2hUNXPUEghl0dbcF5wZ8iA/ZWvKNVc+KCZ1G6wwgMGvAgO/AdzzkJsTrfa84mzMKEHJmd1A3JL9gWlciFdrUa+EcF5QWvzzkPKX0YQ9ycDV9neQOlqE9fCzBWr6PewcpPYEZL3zd15YANYOPZJquJlomHPeF26V6QBsbMaVbo=
+	t=1731945918; cv=none; b=iDUg2ygqtHHzjywvKGCtzyFgmpwCROhXkQycGvcC5tGWN4BsVrcIVJgZPUK4e2XIZiv1iYiyWnB53QOlHSFeG5UghaZHGwmohm+pL0CvJEl7ydAeCgBoH2BHbvcx0kuDKSaG63t3QEOFU43FbbrN7QkU6gP3sIhHNZuDOr78Dc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731945631; c=relaxed/simple;
-	bh=Ge0r2Ea6KyPvO6/MOe8wxcNH8Q7DIB9dNFPGQKRqvQQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OFr+Bxrzll7OpQSk9iIcM0iotNDdyMu0mmJfn8B3liOqmjYP98phSTQ/mQB4PNJqWg4zYwwiMb0Mg4k4MpsHOT3GjyNfCqPucg0dE1iXU0+QDqwYcMtEOVMUWnjVJPXqsTrp3UfQkIg+35nkO+Ed73et1gYVasL8dVx2UOKhERg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WRZ32geY; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <657764fd-68a1-4826-b832-3bda91a0c13b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731945627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hZI0ToznCzhjHwYsDSDb01BcP4KuLMwEBrhHNS7BIoc=;
-	b=WRZ32geYK58tbEOuvHdtvVxm1DNs9niOmZol4nD0+3Mp8Dh6xJRI+uVBqTQza9gc5xn31a
-	72onjs3SehhdwbFfty9nLDSfYnnlGGc+e29TYEanwsJgvAy5RVSwrmcCrNMPECyUdxetI4
-	aEM2/YUCYARPqIpYkKl9Nf1sh+X0xtg=
-Date: Mon, 18 Nov 2024 11:00:22 -0500
+	s=arc-20240116; t=1731945918; c=relaxed/simple;
+	bh=hsAHXyza+Ekt0ZAhdLdC3ZCXUpqpsIDj+IhhvOf4uCs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XTXJxvjypv45VD/dTve0+u3pkccaSMfhbF7RVpjB5iMtyX4l4m99W/7NckpKhwXaj/czODTFKsmpUymW342YgnyN/b+X1TtDfVFY1p4qGNZcG3WdQsWe6E+87VApBP1QFSeQ5OrheUrUcy1hmQiLtts8Hb5bFwglAuBRyuJbo88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgWUCbXz; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7c3d415f85eso728342a12.0;
+        Mon, 18 Nov 2024 08:05:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731945916; x=1732550716; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hsAHXyza+Ekt0ZAhdLdC3ZCXUpqpsIDj+IhhvOf4uCs=;
+        b=OgWUCbXzwCGHcdgI0bdUB2OmCwfgvnk45P2Zvp5E2on3HGCL2tYmXjDq6+A6MPUo+7
+         h8SiKFzMJ35TSPIbKZ/UkYO4/j/yjodFZxFSlmuYTSIueXT7Z7GpBuqE3qqzwTdh306M
+         h1QlIIskf1t5HY+cfR4bFuwJ5ACf5q57d2qLSUgdXo+D6HD6sAvtiDH7hluMUcPXizu2
+         Yh6JP6Od3hDB1NNW8E7leMFylacfYpPqP4qN2oTUZu+Pd+ZrMWZD8ayoaTTUZFsPoQOX
+         F4vgsM60UdmBMLFGwVfyHV3KsXOKtTNQBzLCAt/z5FAE+sSsqMaT5QyDqevfA1ak2Hg5
+         Fw9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731945916; x=1732550716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hsAHXyza+Ekt0ZAhdLdC3ZCXUpqpsIDj+IhhvOf4uCs=;
+        b=BJAO11Y+El5Kvgv62ngRv40KXuQm1BS992VXsxpLC8XlLvRJ2rgEy62wTjMixKXxTf
+         skwihyRqo5duoLF3uelH+UQx5rutKKZ9qn29PARJKmk7jD2kS4i1slF/sqwX92YsLZut
+         VmBk5qUZFmjwQZ8vNz7QVddItkgtS0I9eg/UEZPvHo//gun/mYCLgvXKLYUMG0mRccrr
+         UdSBsbC89zADuWD7bR2D06j4u/BfJFx++xDswRUmD5K9COlK5ZsSQLYikUyXxo2bRz21
+         VrZpDd0WlDEKabWvEHk4xa1e6HZswDcZi3mEATdfZTgUpnOfAxJS7Oyxi0zVg4eO9PxR
+         AojA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2SZD/utzJuJrgz6+IQyzcKBLK1g5dEEF6LIDrWZaCCQnVpPfaFsHWnswUHlHDdkfAmz85fw8Z@vger.kernel.org, AJvYcCVa/jaB0vuhMha0+47TxnpntBOYX3m84TE622RnbSnI9ugbkSmjHuOe5xohAkaVwAtcwaB4zBEpS4uW3RniSYw=@vger.kernel.org, AJvYcCW9AaGyng07JdGEC+7xUqyxGx8g1mGrwcmM8oPLG4X3YGKMu3e71I7XOIPp9DkBMDi+AkotRgdUI/yaVzmT@vger.kernel.org, AJvYcCWzWjkWFwEJp6F5Ss1Hws/XH7ET0cgndt6SO/zlkYllfhZ5b/aHdcrPaGEFPadecms58LRR7tt2hnE5uQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP52GINNjLiLNiwCnf2rM0azf1/0t7jzABKgdMpHGjkMPLNemP
+	yv2LPGOi1oplmxh62fedazwaoCzD9rtL+FzC2zvzcRqzVwrLpG+4BVvFAZTzk/L8g0hvx74GCP0
+	wTYYZ+M5gVrzksXhH9BUjuCWwnkM=
+X-Google-Smtp-Source: AGHT+IERvQCeacQ2iD8YKp4au7PeRxQi4qWpIrbnEyp+ndrdW3bosmw34d7KBAiPna10cFF4b4AOtgiB3VmeU4wRoy8=
+X-Received: by 2002:a17:902:c945:b0:20c:6bff:fcbf with SMTP id
+ d9443c01a7336-211d0ec63f6mr71034585ad.10.1731945916182; Mon, 18 Nov 2024
+ 08:05:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/2] net: axienet: Add support for AXI 2.5G MAC
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Suraj Gupta <suraj.gupta2@amd.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
- radhey.shyam.pandey@amd.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- git@amd.com, harini.katakam@amd.com
-References: <20241118081822.19383-1-suraj.gupta2@amd.com>
- <20241118081822.19383-3-suraj.gupta2@amd.com>
- <ZztjvkxbCiLER-PJ@shell.armlinux.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <ZztjvkxbCiLER-PJ@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20241118-simplify-result-v3-0-6b1566a77eab@iiitd.ac.in> <20241118-simplify-result-v3-1-6b1566a77eab@iiitd.ac.in>
+In-Reply-To: <20241118-simplify-result-v3-1-6b1566a77eab@iiitd.ac.in>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 18 Nov 2024 17:05:03 +0100
+Message-ID: <CANiq72mzCSmLG0_Vqu=sCO7TBPzXtea3HPw5TjT_gYKEh7_1NA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] rust: block: simplify Result<()> in
+ validate_block_size return
+To: manas18244@iiitd.ac.in
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Alice Ryhl <aliceryhl@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Anup Sharma <anupnewsmail@gmail.com>, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/18/24 10:56, Russell King (Oracle) wrote:
-> On Mon, Nov 18, 2024 at 01:48:22PM +0530, Suraj Gupta wrote:
->> Add AXI 2.5G MAC support, which is an incremental speed upgrade
->> of AXI 1G MAC and supports 2.5G speed only. "max-speed" DT property
->> is used in driver to distinguish 1G and 2.5G MACs of AXI 1G/2.5G IP.
->> If max-speed property is missing, 1G is assumed to support backward
->> compatibility.
->> 
->> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
->> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
->> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
->> ---
-> 
-> ...
-> 
->> -	lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
->> -		MAC_10FD | MAC_100FD | MAC_1000FD;
->> +	lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
->> +
->> +	/* Set MAC capabilities based on MAC type */
->> +	if (lp->max_speed == SPEED_1000)
->> +		lp->phylink_config.mac_capabilities |= MAC_10FD | MAC_100FD | MAC_1000FD;
->> +	else
->> +		lp->phylink_config.mac_capabilities |= MAC_2500FD;
-> 
-> The MAC can only operate at (10M, 100M, 1G) _or_ 2.5G ?
+On Mon, Nov 18, 2024 at 3:37=E2=80=AFPM Manas via B4 Relay
+<devnull+manas18244.iiitd.ac.in@kernel.org> wrote:
+>
+> From: Manas <manas18244@iiitd.ac.in>
+>
+> `Result` is used in place of `Result<()>` because the default type
+> parameters are unit `()` and `Error` types, which are automatically
+> inferred. Thus keep the usage consistent throughout codebase.
+>
+> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
+> Link: https://github.com/Rust-for-Linux/linux/issues/1128
+> Signed-off-by: Manas <manas18244@iiitd.ac.in>
 
-It's a PCS limitation. It either does (1000Base-X and/or SGMII) OR
-(2500Base-X). The MAC itself doesn't have this limitation AFAIK.
+If block wants to pick this one up independently:
 
---Sean
+Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
 
-> Normally, max speeds can be limited using phylink_limit_mac_speed()
-> which will clear any MAC capabilities for speeds faster than the
-> speed specified.
-> 
+(Note: normally you would carry the review/tested tags you were given
+in a previous version, unless you made significant changes)
+
+Thanks!
+
+Cheers,
+Miguel
 
