@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-145968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C49C9D16A0
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 18:00:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8418F9D16A3
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 18:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D792B1F223DE
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:00:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBD51B27154
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 17:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAD81BD4E2;
-	Mon, 18 Nov 2024 17:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832FE1C1ACF;
+	Mon, 18 Nov 2024 17:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwKJmait"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+odnam8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D1518B47E;
-	Mon, 18 Nov 2024 17:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F34918B47E
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 17:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731949219; cv=none; b=fhHbigHlVgO2+QIMvF4kj3W+FxGDS6NDPJNUVW/tgC1VnVHLmwokM30wi7WrJ1ntj4sPqa4jE+hj+S3f7ILgX4ODZMLbwBn4Ex8GsaGlOFRH9/FpxWcXOjdKkvfCy5GMDOx3O3jIaGEbD+96dg3BfPMlK5VaGth991s0X7KyYpo=
+	t=1731949223; cv=none; b=npAcHw4v+QncLF9uMfr2pS8tscbUtZf4Xw+ixd77jeYhM+2YuOcR0Js5P4wWfH/WBWVKu/2+O9d2Tu/Zp5jtY1xYX3YVOnrkCAszsNSckGzAK9lgXCxreTW5BdMeDDaaaWL9KwE9AyvlSXfKnKtDf18AuVQHP/K9oJ1wI/XoqXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731949219; c=relaxed/simple;
-	bh=ekE1O8xyEVJFoKtw0C3VA+kT2P+GQt3Yk/reFDaycPU=;
+	s=arc-20240116; t=1731949223; c=relaxed/simple;
+	bh=74hiOyEt0taKhGeoL7ZDX4n4Po+OeKIsKKjjpTGtaI8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cbQh2XxIGgkiRFWWAwd8fJCSOrf6AVRYa4YqbuBnk82PKMp7PATzATPuMZd5qARD7DOj+17TNN8aDkmcWYr27+i93q3759CriaVpUZ866CoL2+m86YURuzaREfh9PMZSkYn26Dklgrxh7FgM/fuL1J4qUXH6xvUHZ1P6571ngJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwKJmait; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F61C4CECC;
-	Mon, 18 Nov 2024 17:00:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=id8ZZzobWgrBNStFXabg6B1rSPainxl3mbPWx/ngORhEIfXCA/IwmfmsQA8mMMZN0WFJfqzW60aLJTflw28pGacpnBKIQ/v2srdCjHietb90W6Lpcyuql4g/RYfOqJLPD36IGFJFEGGdJGWPci14OaiQNgR1TPSSj/Yey5l3wsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+odnam8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB94AC4CECC;
+	Mon, 18 Nov 2024 17:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731949219;
-	bh=ekE1O8xyEVJFoKtw0C3VA+kT2P+GQt3Yk/reFDaycPU=;
+	s=k20201202; t=1731949222;
+	bh=74hiOyEt0taKhGeoL7ZDX4n4Po+OeKIsKKjjpTGtaI8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RwKJmaitQhxE25emSDMbNhsN2ui59x3qyMzy5f1yYIWY0L4Ex7m+FqgJtoeDzAKA8
-	 Tny44j+yEFbROiB8r+aDBG591EwPxiwMpInKGgvaabLCAykqT8AoDFJbfMT57zYyfN
-	 kZP/f0Wj58X9YHtKUSLVKVEwnFeGzGaq+JOIzpeP5leLa1o/7G4stYmJkJatlAqaWX
-	 dOygGroPUqEeGaDDdWnJYsYNtUmLI6e053dXNVXHdj0lWlIrguhW47vK8E4JVVumxe
-	 6D21fQ8iUulmfFeQ4mawarArAcz5IkL/5HEfZHrW05pD+tH/5ePW83Q0LwGs8hY2iX
-	 MRhJ6gCyL2Ksg==
+	b=a+odnam8QjbYMfLCQw96CwsM299axoQDOzaT0qFeo8vayoSjQCwT5Y0TxgO8Oj3Dz
+	 nYDFaRmaC4cSACVTar6Q0g7z5qpukqDcTRLV3jaB0kYB2kWlngUaEc4HDqyznLSPoa
+	 iEbpmZ2wWVOqswV6qIv6c4h+bGwbd/kbvOG30rRm1eAzSUwcgajxhklzSxcRVEJpFt
+	 vH8GS5oZS2qxqP5JD3uEMoredE4DK1ApJ95qeZxeBNyQFAU/+iWtiXFmrfpHZhzqOT
+	 fUpnVMLd0cs+qMyepT9Q2ZKFtkxPh6wos/9FBZl6vgW0TcU5/yIMoEumR9jvdeKfDY
+	 cOmoJr1cG8/rQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEF03809A80;
-	Mon, 18 Nov 2024 17:00:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7131E3809A80;
+	Mon, 18 Nov 2024 17:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v1 0/6] iplink_can: preparation before
- introduction of CAN XL
+Subject: Re: [PATCH iproute2-next v1] tc: Add support for Hold/Release mechanism
+ in TSN as per IEEE 802.1Q-2018
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173194923075.4109060.18408610499610779344.git-patchwork-notify@kernel.org>
-Date: Mon, 18 Nov 2024 17:00:30 +0000
-References: <20241112172812.590665-8-mailhol.vincent@wanadoo.fr>
-In-Reply-To: <20241112172812.590665-8-mailhol.vincent@wanadoo.fr>
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com,
- linux-can@vger.kernel.org, mkl@pengutronix.de, socketcan@hartkopp.net,
- mbro1689@gmail.com, linux-kernel@vger.kernel.org
+ <173194923408.4109060.4045390927300131499.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Nov 2024 17:00:34 +0000
+References: <20241112040029.3196975-1-yong.liang.choong@linux.intel.com>
+In-Reply-To: <20241112040029.3196975-1-yong.liang.choong@linux.intel.com>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us
 
 Hello:
 
-This series was applied to iproute2/iproute2-next.git (main)
+This patch was applied to iproute2/iproute2-next.git (main)
 by David Ahern <dsahern@kernel.org>:
 
-On Wed, 13 Nov 2024 02:27:50 +0900 you wrote:
-> An RFC was sent last weekend to kick-off the discussion of the
-> introduction of CAN XL: [1] for the kernel side and [2] for the
-> iproute2 interface. While the series received some positive feedback,
-> it is far from completion. Some work is still needed to:
+On Tue, 12 Nov 2024 12:00:29 +0800 you wrote:
+> This commit enhances the q_taprio module by adding support for the
+> Hold/Release mechanism in Time-Sensitive Networking (TSN), as specified
+> in the IEEE 802.1Q-2018 standard.
 > 
->   - adjust the nesting of the IFLA_CAN_XL_DATA_BITTIMING_CONST in the
->     netlink interface
+> Changes include:
+> - Addition of `TC_TAPRIO_CMD_SET_AND_HOLD` and `TC_TAPRIO_CMD_SET_AND_RELEASE`
+> cases in the `entry_cmd_to_str` function to return "H" and "R" respectively.
+> - Addition of corresponding string comparisons in the `str_to_entry_cmd`
+> function to map "H" and "R" to `TC_TAPRIO_CMD_SET_AND_HOLD` and
+> `TC_TAPRIO_CMD_SET_AND_RELEASE`.
 > 
 > [...]
 
 Here is the summary with links:
-  - [iproute2-next,v1,1/6] iplink_can: remove unused FILE *f parameter in three functions
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=df72757907f3
-  - [iproute2-next,v1,2/6] iplink_can: reduce the visibility of tdc in can_parse_opt()
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=3bd5fb4d57aa
-  - [iproute2-next,v1,3/6] iplink_can: remove newline at the end of invarg()'s messages
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=9b1f33d5a46d
-  - [iproute2-next,v1,4/6] iplink_can: use invarg() instead of fprintf()
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=68aaea862838
-  - [iproute2-next,v1,5/6] iplink_can: add struct can_tdc
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=aac087a0108b
-  - [iproute2-next,v1,6/6] iplink_can: rename dbt into fd_dbt in can_parse_opt()
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=3f2ab9d6070e
+  - [iproute2-next,v1] tc: Add support for Hold/Release mechanism in TSN as per IEEE 802.1Q-2018
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=863c96cea49d
 
 You are awesome, thank you!
 -- 
