@@ -1,75 +1,59 @@
-Return-Path: <netdev+bounces-145905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-145906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D969D14A0
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:42:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C79769D149C
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 16:40:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B16D6B25CC2
-	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:37:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89FCD2835D0
+	for <lists+netdev@lfdr.de>; Mon, 18 Nov 2024 15:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1298C1B21A0;
-	Mon, 18 Nov 2024 15:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB7C1AA1E5;
+	Mon, 18 Nov 2024 15:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AUVSmCQs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FC118EFDE;
-	Mon, 18 Nov 2024 15:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7932812EBE7
+	for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 15:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731944270; cv=none; b=d20FaJFIsFBMYvhtX8ZRWDFbCLYHz+bUPd0KKFckTDPy0Vsbi6L9qIg5JZbYfmfS275JrFLTLgGA/5FTdahhZd2ba/jU48aManxv+7RpVYnmAl1ICWV15o5icL+4peYzZkEAkONUN/+lSkKOUk3Rflj63Io690PfG3poSYSBXYA=
+	t=1731944440; cv=none; b=U+YUmFkpq1fM6SSCmfZzvJEqi/BIl8vctf/MgnbKZM0QlfVodwPHr57oNJ7ddWDecqABce4EDDt78UKGxktNfYrJCBPNXcIoVtOWeP68+xFX77rzn9iZQHCcw7O77+R+Yl2kdffGpCk3khaWv8JsZb7bufrE+ctsxC+cAoO0lmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731944270; c=relaxed/simple;
-	bh=B0VubLmz0Pv7VwrqAtHiycswd5+LrMziyvAc9MpzHzc=;
+	s=arc-20240116; t=1731944440; c=relaxed/simple;
+	bh=/Km9YxFLkfZCEQpk5SszycM2L9NSlGTGg37GnpbUWbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k9ECP+d6iXLYC/antTviUqhbqHcn2y1YjmUUz1hg20Ed2wLERfm+NQzdlPgcj6ZcSWVI9+X5PhbhnyB0ihXHJGLbavVaIOyNVI4ruwdNzi731hcA0/e58xavImNxus2amD/Wv6t6H1i0ciNwzhxtdpCAd8/8QnNp/NAHowGYAEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5cf6f804233so4683711a12.2;
-        Mon, 18 Nov 2024 07:37:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731944266; x=1732549066;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OEVzQiFOyDIQvdPbae67vbqyUHweeO/zHbrTBMA03mY=;
-        b=LrMn6Afaeecqi/K8ySPJWXuPB7eFI19eo4MfNBnVmnGRrwDvarvKqmxZIHiWhoWAxk
-         73lLXOdeGbTYLH0fWCCczjOS4jNv6J/psK+7A+RgbJwoXyVYIUDYgtvWWXkMsh3EB/TR
-         Xs37n37CO1LfQZ7ZsieNEVTrrmC6+YQWo5tL47EH336Zv2KhMlEY0u9t40MO0CarLS7s
-         odUAuyYdS0I3CViDoE1DMuOqtmPxDXvdeFmyn77aeZNJwBsY2s0i9MwrLK+Luus9HxJg
-         e4u/POEXhSr7VugVW2OVB2dj+xzrKlqAZnNh9L8PjKt4bSM9PPzf2HDbwN5XX2Cla6Gz
-         eTBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvoSifJhBVvfysftKZBxk+mmzOLwbiiqkOeuGS3LNljfn08P8a+XYp8N7/fuBfNdDFWdrnq4g2urz+pv0=@vger.kernel.org, AJvYcCWI7apLMpu8Lycqu8E/nt7mFX/p7GtdaSt0eFI+q9x/0nARhlNRkex9LmZ1n4i2lJEuvryP2EuU@vger.kernel.org
-X-Gm-Message-State: AOJu0YysmjDvfFU7hPZ+Myqm6APmgS7Zkih3HJmT5mXFlRBOkp4xSmEj
-	abqwnVuiGHMGzKKgf54wO54yKf8tMOtuTz94ddUSHT/xjAUCpNl3
-X-Google-Smtp-Source: AGHT+IHQ8CAAWSP5RfIdvWUK2Cj8/LDiPNPVOPfAUOxhYEoSqtKGFv7nzXXwas1cSy2GOX0gKOKPTg==
-X-Received: by 2002:a17:907:3f97:b0:a9a:49a8:f1fa with SMTP id a640c23a62f3a-aa48341263dmr548012366b.23.1731944266407;
-        Mon, 18 Nov 2024 07:37:46 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20e043316sm552492866b.135.2024.11.18.07.37.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 07:37:45 -0800 (PST)
-Date: Mon, 18 Nov 2024 07:37:43 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	paulmck@kernel.org
-Subject: Re: [PATCH net 2/2] netpoll: Use rcu_access_pointer() in
- netpoll_poll_lock
-Message-ID: <20241118-bipedal-beryl-peccary-ed32da@leitao>
-References: <20241118-netpoll_rcu-v1-0-a1888dcb4a02@debian.org>
- <20241118-netpoll_rcu-v1-2-a1888dcb4a02@debian.org>
- <ZzsxDhFqALWCojNb@localhost.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=vAabtPp3rImJT0Dnxl23WYZHHooUuFDNTKu+PV5dnSCeEBOZe8OTRZTW/fY3WIc56VilqxP4VJ3plduZ6xI0SlaLWbw3FDhLh1eB5sA7vOgJSJUUfUwVXo9YyQwP2HK0ay8WteRILzerqoo3LYuJHg8VUH8k+CA99745n/HTa8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AUVSmCQs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=afqFc3Q9dQzZ/p9Hug2RfDnAeaQrSRGFJv/Jafb1wKw=; b=AUVSmCQsjIkXe/evRIkAgJeZEZ
+	oCOgD2/OwRsmJUJ94aPxunE4lQ6A2GfLWB1dHjN4WWiELj7BTvvVYXdS5jyzRWIJYMIu5NqdpPhve
+	JEvsIGYVxXQemK8Mz5pfkb5dLmPr4fgZ2OcVxbiCA4s/soAOZ2rlUAlss1U9FFyA1h4M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tD3rb-00DggU-Oo; Mon, 18 Nov 2024 16:40:31 +0100
+Date: Mon, 18 Nov 2024 16:40:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, alexanderduyck@fb.com,
+	Sanman Pradhan <sanman.p211993@gmail.com>
+Subject: Re: [PATCH net-next 4/5] eth: fbnic: add PCIe hardware statistics
+Message-ID: <4a543595-672a-4554-9cef-9a863ed23ca8@lunn.ch>
+References: <20241115015344.757567-1-kuba@kernel.org>
+ <20241115015344.757567-5-kuba@kernel.org>
+ <1ed2ba1e-b87f-4738-9d72-da7c5a7180e2@lunn.ch>
+ <20241118073501.4e44d114@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,35 +62,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZzsxDhFqALWCojNb@localhost.localdomain>
+In-Reply-To: <20241118073501.4e44d114@kernel.org>
 
-On Mon, Nov 18, 2024 at 01:20:30PM +0100, Michal Kubiak wrote:
-> On Mon, Nov 18, 2024 at 03:15:18AM -0800, Breno Leitao wrote:
-> > The ndev->npinfo pointer in netpoll_poll_lock() is RCU-protected but is
-> > being accessed directly for a NULL check. While no RCU read lock is held
-> > in this context, we should still use proper RCU primitives for
-> > consistency and correctness.
+On Mon, Nov 18, 2024 at 07:35:01AM -0800, Jakub Kicinski wrote:
+> On Sun, 17 Nov 2024 21:19:00 +0100 Andrew Lunn wrote:
+> > > +/* PUL User Registers*/
+> > > +#define FBNIC_PUL_USER_OB_RD_TLP_CNT_31_0 \
+> > > +					0x3106e		/* 0xc41b8 */  
 > > 
-> > Replace the direct NULL check with rcu_access_pointer(), which is the
-> > appropriate primitive when only checking for NULL without dereferencing
-> > the pointer. This function provides the necessary ordering guarantees
-> > without requiring RCU read-side protection.
+> > Is there a comment somewhere which explains what these comments mean?
+> > Otherwise they appear to be useless magic numbers.
+> 
+> The number on the left is the number on the right divided by 4.
+> We index the registers as an array of u32s so the define is an index,
+> but for grep-ability we add the absolute address in the comment.
+
+Ah, O.K. Maybe a comment about this would be nice.
+
+> > > +static void fbnic_hw_stat_rst64(struct fbnic_dev *fbd, u32 reg, s32 offset,
+> > > +				struct fbnic_stat_counter *stat)
+> > > +{
+> > > +	/* Record initial counter values and compute deltas from there to ensure
+> > > +	 * stats start at 0 after reboot/reset. This avoids exposing absolute
+> > > +	 * hardware counter values to userspace.
+> > > +	 */
+> > > +	stat->u.old_reg_value_64 = fbnic_stat_rd64(fbd, reg, offset);  
 > > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Fixes: bea3348eef27 ("[NET]: Make NAPI polling independent of struct net_device objects.")
+> > I don't know how you use these stats, but now they are in debugfs, do
+> > they actually need to be 0 after reboot/reset? For most debugging
+> > performance issues with statistics, i want to know how much a counter
+> > goes up per second, so userspace will be reading the values twice with
+> > a sleep, and doing a subtractions anyway. So why not make the kernel
+> > code simpler?
 > 
-> nitpick: As for the first patch - please check the tags order.
-> 
-> Thanks,
-> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> Right, there is no strong reason to reset debugfs stats. OTOH
+> consistent behavior across all stats is nice (from rtnl stats 
+> to debugfs). And we will need the reset helpers for other stats.
+> Meta uses a lot of multi-host systems, the NIC is reset much
+> less often than the machines. Starting at 0 is convenient for 
+> manual debug.
 
-Thanks for the review.
+If the code is being reused, then O.K.
 
-I am not planning to resend it now, since I think maintainer's tooling will
-reorder that.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-If that is not true, I am more than happy to resend fixing the order.
-
-Thanks
-Breno
+    Andrew
 
