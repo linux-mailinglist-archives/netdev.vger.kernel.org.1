@@ -1,83 +1,89 @@
-Return-Path: <netdev+bounces-146164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08FDB9D227F
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:28:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2BC9D2286
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6006AB21965
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:28:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6527C1F21401
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E0A19E83C;
-	Tue, 19 Nov 2024 09:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D787613FD83;
+	Tue, 19 Nov 2024 09:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FUy17ijU"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vI11EZuP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3288153573
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 09:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76297139566
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 09:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732008509; cv=none; b=dlaqC4JxQ/SftFPmaWdPVBCnNts1P8n7MsJYZk6oz9I96+UbcB3Z6jrOLl6YDuFsp9iVVGDbQK+boMplrcAGGajjxHrtIgToxBbrJ3AwQ+Cp8XPWTqmLEGBMRafKDt9PgJApgeFqLdwmmvmTHnE5OpqNvIZTyLA/RS0b6Atl/XE=
+	t=1732008672; cv=none; b=LD9M5GKC9W4zfu8rLS23haJdMigTQNkM0mlzyeD/nUWznS7v6HsX4Zrmt1aGrAIhG0FVdOvXlC1mHvhNPA6+UM0Up8hSFbZndZOgVoZ8fO2MG7yejMFLnqpqwRp5PYFwAo4rMdfoXYxRz3Rt7QAOTK3+EZpxYZSxUxs6D4KECtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732008509; c=relaxed/simple;
-	bh=JdpVvRhcurMNpFjbxy3BGYACwlmyPyA5j9wR7fI/7Bc=;
+	s=arc-20240116; t=1732008672; c=relaxed/simple;
+	bh=6Dmdl9IItyp8HHKlAi+EzKPP4xsuHCy1g+kX8mSRt8g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kSbuCmZOT9fsmu1JC8p/z/LaabSYgIyluzQxAY9w1oC+2lpsX2K8nHX9ei0CPVrBU03uqlMGDqwAzxmJvS/MdqoJPmxYYE2rD78atqRqdJOgH5g98zAWgHx9C3aYH0AOflIidXG4zAZMs/P280HG3Nf+1IHWff5ICRtsDZ1/fHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=FUy17ijU; arc=none smtp.client-ip=209.85.128.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZO+6uDA1CfGLmmZbZqdQxTqz8fRIETOaUJlFuhjWen+FWDk9nuEnRRhxQvjb27prT9yK6LQQct5dnr2GUaQsvDXAHcZaiWHWIoYtjlKj2Iw3CeTf6SLdOJ5CIXJ+NztPycnN8ftrb1bXBrlLBTjBD94OraCwt4iUk5BWqzbbt5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vI11EZuP; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-431481433bdso36132695e9.3
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:28:26 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-38248b810ffso499027f8f.0
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:31:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1732008505; x=1732613305; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1732008668; x=1732613468; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdpVvRhcurMNpFjbxy3BGYACwlmyPyA5j9wR7fI/7Bc=;
-        b=FUy17ijUzZ5VfjRHZrHcWjF/Asyw4E29SdroAwQMl58d6BpXbTyhlcd1CtaSlwYlgS
-         /EPIE4q3sAzEW3O25wqD7ycClJuNgjSxATLqqwsnhnS9/QiOpqRC6siwMfKlE+joL1VS
-         wEzNT/MI82xSW979sBXdcqy5yUPcpn9WlYqeY/78Q89TXyfpCrIlfwJPZoW/K7DMIfzu
-         ckJ9V+fp5fg5vOwGbjqyvxZi7OyGDl+ZAj24tHtx1N3/23ZJLDRNGFWjxZ8b71zDTke6
-         x3hS4fLuFPwhX4Y44ATCjKBYE6A2O6phAprLmurwmptjof5kDvxgaEW99Z36Il64D58l
-         95pA==
+        bh=69Eh6f2nHrxn6OhhoJX7OXsqWEyE+bPtjMxfpqvMJo8=;
+        b=vI11EZuPxbsVUumTGScFaSa07Cxy0ypHrpOZgBhxS8T06JXBbyevQ58kVHYuTqJn5d
+         Fc4hA/c91RBnMqhzqELP3PTs3uNaosheUFAMfsTPRunotljJUrjY2Yx6AYgTYRl1grHF
+         ALakdGvCUsrHOz+xKgrW5UreLV6rHbDZlzKl7uD2EMQPa3iz2aXUDfVu3iCl4xqYSmvA
+         8N5iiN2i8l99p3fDtqATIbtRESS4AwHCZXSF8nlWf9n2TFJAynpqOaM1PLGUplLTHLfH
+         735oZrrYCauqwqopV8xDfAwZ578fhyvtg+ti5fKkVwpQTYdU3YdbuAwbQXUoG0F8xNPi
+         5P5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732008505; x=1732613305;
+        d=1e100.net; s=20230601; t=1732008668; x=1732613468;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JdpVvRhcurMNpFjbxy3BGYACwlmyPyA5j9wR7fI/7Bc=;
-        b=X1uXWIP2DkTD13/JeOlxzCn5psV7uB0It5SXkElV9a/EW3RnIzw6LAZRdCY2A4dg+O
-         v4qLHFw1vSSC4SKtMqXrwk/OYazvwg/Y1kmGxFfFX7sBZA5gy6Lhf2+Vcu6okw+0lPNK
-         PyI11UI+dbqGit4bYw4TqudXevIFLebO0Jovt/tzu3Be39jgz1SZf6nFpuqjbiV+cmEp
-         rZ7nVB9dmgQJ4l772IIykHntwnWixOYWoWc50jG1W1VphhpKmpbn1vW3Fc2t+iETJN8N
-         ep2QTPy6HgtGekcHtU3wbameIecWOjTKhH+A3QtpPAoUEDFzBkR0dmzwVHcZ1+H9gHK5
-         dyTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPVfJJxPJaazovXlMeAQkKN5LSuT+/QNbnuJOUNp8FXodxJd9tMazQ72zPzBFNqHAj61mrteE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgMjkVoY9FLimMB4bByF4cjtFl8jpdbz/ujD8NBqY0uXROnpBL
-	9VciwFHLsMH+asOUfgCDBYp39gHQHp0zvw74fZvJ20+WWXNbZ1zluQx85k6iqpI=
-X-Google-Smtp-Source: AGHT+IHo/P7Rcl7U+JKZhGL/GYdkQIs84l1Eca9m06vL8Pg17crKMmGeAy2v0M0/VijarsnJSxfqcg==
-X-Received: by 2002:a05:600c:1c11:b0:432:9fdb:1490 with SMTP id 5b1f17b1804b1-432df717bd8mr121164445e9.7.1732008504779;
-        Tue, 19 Nov 2024 01:28:24 -0800 (PST)
+        bh=69Eh6f2nHrxn6OhhoJX7OXsqWEyE+bPtjMxfpqvMJo8=;
+        b=qDilggbNK/FNgvpKgYNuiAFC2H9tm9KVo8ox8SOukTimda26WUvmVgPLCgwAkjvh5a
+         Bk/98PL8NMLsPaXqyAkFNLwdpDCIqEriGSfPbEzz63AykaAce0N9K9Fma9L8GKjdIKaW
+         vHcIP6iRRVvpA1iuChh0fyAfNMdikIoSRLYwmE4k1y8PHFXvmshkpqe7qHC8/DQFRZt3
+         IwWl+9jB0CJIZqKrMewjAvN7/3gJ/uoSLithBvz165SdL62Pjo42Adp2rGFBG0Ap3JGl
+         /5sqYrUIQMf7O2N7MqLKdN1mAH63gSh1DFHDkKPx8nnEK7D7jYL3RmasK2xXJz13+Nf+
+         Vsag==
+X-Forwarded-Encrypted: i=1; AJvYcCVCqAu1MDfWX+TZQ9v45PvuLiuxG18CgqZmstqATtN/ltd/MLAWPw2VWvOweecqaCUdwVP9DLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNMhgEYXCMqwjdo9hoYArhMKKHpyPcLzLiELpPjHZqUKLLe+42
+	7VC71jacOZ+w8VmmKcUbVUNYwv4KSff58ljQFDryk4KPzE/xsNVJI4RwY6Hqxfw=
+X-Google-Smtp-Source: AGHT+IF5cuRARF1J6DhAqhBp0a273rSZfoETzT03SqV0DnHwI2SodUwM73fOtUocXPKY2BTjsWBjJA==
+X-Received: by 2002:a05:6000:18a5:b0:382:3f31:f39b with SMTP id ffacd0b85a97d-3823f31f5d6mr6011736f8f.25.1732008667642;
+        Tue, 19 Nov 2024 01:31:07 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab72141sm185755975e9.1.2024.11.19.01.28.23
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3823bca7305sm8994657f8f.44.2024.11.19.01.31.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 01:28:24 -0800 (PST)
-Date: Tue, 19 Nov 2024 10:28:20 +0100
+        Tue, 19 Nov 2024 01:31:07 -0800 (PST)
+Date: Tue, 19 Nov 2024 10:31:03 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ido Schimmel <idosch@idosch.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] rocker: fix link status detection in
- rocker_carrier_init()
-Message-ID: <ZzxaNFWQlamJJjFS@nanopsycho.orion>
-References: <20241114151946.519047-1-dmantipov@yandex.ru>
- <20241118184201.3d1e7a13@kernel.org>
+To: Carolina Jubran <cjubran@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>, donald.hunter@gmail.com
+Subject: Re: [PATCH net-next V3 3/8] devlink: Extend devlink rate API with
+ traffic classes bandwidth management
+Message-ID: <Zzxa13xPBZGxRC01@nanopsycho.orion>
+References: <20241117205046.736499-1-tariqt@nvidia.com>
+ <20241117205046.736499-4-tariqt@nvidia.com>
+ <Zzr84MDdA5S3TadZ@nanopsycho.orion>
+ <b4aa8e75-600e-4dc5-8fe1-a6be7bb42017@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,22 +92,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241118184201.3d1e7a13@kernel.org>
+In-Reply-To: <b4aa8e75-600e-4dc5-8fe1-a6be7bb42017@nvidia.com>
 
-Tue, Nov 19, 2024 at 03:42:01AM CET, kuba@kernel.org wrote:
->On Thu, 14 Nov 2024 18:19:46 +0300 Dmitry Antipov wrote:
->> Since '1 << rocker_port->pport' may be undefined for port >= 32,
->> cast the left operand to 'unsigned long long' like it's done in
->> 'rocker_port_set_enable()' above. Compile tested only.
+Mon, Nov 18, 2024 at 08:36:38PM CET, cjubran@nvidia.com wrote:
 >
->Jiri, random thought - any sense if anyone still uses rocker?
->IIUC the goal was similar to netdevsim - SW testing / modeling
->but we don't really have any upstream tests against it..
-
-Afaik some people are still using it for testing. I got couple emails in
-the past. Not sure now. The thing is, rocker has real datapath,
-comparing to netdevsim.
-
 >
->Unrelated to the patch, so dropping the author from CC.
+>On 18/11/2024 10:37, Jiri Pirko wrote:
+>> Sun, Nov 17, 2024 at 09:50:40PM CET, tariqt@nvidia.com wrote:
+>> > From: Carolina Jubran <cjubran@nvidia.com>
+
+[...]
+
+>> > diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+>> > index 09fbb4c03fc8..fece78ed60fe 100644
+>> > --- a/Documentation/netlink/specs/devlink.yaml
+>> > +++ b/Documentation/netlink/specs/devlink.yaml
+>> > @@ -820,6 +820,19 @@ attribute-sets:
+>> >        -
+>> >          name: region-direct
+>> >          type: flag
+>> > +      -
+>> > +        name: rate-tc-bw
+>> > +        type: u32
+>> > +        doc: |
+>> > +             Specifies the bandwidth allocation for the Traffic Class as a
+>> > +             percentage.
+>> > +        checks:
+>> > +          min: 0
+>> > +          max: 100
+>> > +      -
+>> > +        name: rate-tc-bw-values
+>> > +        type: nest
+>> > +        nested-attributes: dl-rate-tc-bw-values
+>> 
+>> Hmm, it's not a simple nest. It's an array. You probably need something
+>> like type: indexed-array here. Please make sure you make this working
+>> with ynl. Could you also please add examples of get and set commands
+>> using ynl to the patch description?
+>> 
+>> 
+>
+>It seems that type: indexed-array with sub-type: u32 would be the correct
+>approach. However, I noticed that this support appears to be missing in the
+>ynl-gen-c.py script in this series:
+>https://lore.kernel.org/all/20240404063114.1221532-3-liuhangbin@gmail.com/.
+>If this is indeed the case, how should I specify the min and max values for
+>the u32 entries in the indexed-array?
+
+Not sure. Perhaps Jakub/Donald would know. Ccing.
 
