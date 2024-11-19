@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-146052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FA59D1D8B
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:47:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CBE9D1D94
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:49:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05603281383
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:47:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4616D281C23
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEF822619;
-	Tue, 19 Nov 2024 01:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D207A139566;
+	Tue, 19 Nov 2024 01:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="CioJkKLH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uzjToPKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAE81BC2A
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EA013665A;
+	Tue, 19 Nov 2024 01:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731980846; cv=none; b=S7EWxMLA0tjI56JzXVzJDYxuTc+Gu3aX9+6eS6QmVSvj4Uf77U41k29uQb3ICH0TgiucTx0DdaOouqNA/DdTQJtO6s0LHLwuEP9XaFWhSeV0KQ+mCGk7FPDQMGmXqtLhDp5t74Y6e/FoiAZBgnfbeUXcEYzZs3TLdl1+0mqMAxE=
+	t=1731980917; cv=none; b=J9g6heE5q+vPIpADbGTIVn/bQFJMSX98253qVuASUvSPg07c9etrm3YGDbfj3KDPsJtlGlbn/xgq+qvioUEcWyDEjBVpuWVYyuCNGrcRvUVkaf3DJSeDes9Oxh1wCY6og3N/JkELqOM77kW2kSkAIqoCkDAstgsjTbiDN6djhhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731980846; c=relaxed/simple;
-	bh=j5WxfRQC5jwGpkbKBTTUzm4fUjxqxW59kP6t1LgCYS8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cmrNWBE8/EYcMsK83o1HBc6gc+mvLuotF+Gk2Z5P+O2WPj19YAYX00dTr/g3zTrVjTAzEhCxmYdZvLo5cFkpZ/1+BAxh13N5SruAQxJfg2Oz/RESPBgTaVABqfC5SMzJp53MAq/y4AaAw4NAP54T/l4rbeOOs19P4WiNWawimYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=CioJkKLH; arc=none smtp.client-ip=148.163.129.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 62AB828006D;
-	Tue, 19 Nov 2024 01:47:16 +0000 (UTC)
-Received: from [IPV6:2607:fb90:7312:5479:23bd:24ab:9b46:7022] (unknown [172.56.241.94])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id AFC0613C2B0;
-	Mon, 18 Nov 2024 17:47:15 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com AFC0613C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1731980835;
-	bh=j5WxfRQC5jwGpkbKBTTUzm4fUjxqxW59kP6t1LgCYS8=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=CioJkKLHgqfGC6g0M3MZonSVc8OS2H1X3/XzzqaSJvcRvtAYBSjYHyhbIL1nSYI9b
-	 7YP9eWuMX+Zi+yg0fK1x7XLeU+zIqzkLJmTirkLBQVivBer56QzW3IomnOzk5qzBgU
-	 tTxPMtCZJ/B7GgPybKd1/WI07p4Nq6TgcjVm3Pu8=
-Message-ID: <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com>
-Date: Mon, 18 Nov 2024 17:47:12 -0800
+	s=arc-20240116; t=1731980917; c=relaxed/simple;
+	bh=d5wR9tz08ve/15avuwqwuykFksaoFpcmxl/uzElJIoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lcd2aWGrHm93+u90ol+0rWw/HGZFqE43d5WAHUrV9POcgKUoFI2g4ioXJGZZWrboWoFCK2QS8gyb54dOXc2BBn6Ioi4zU4JXZ368NeL90i5YFQaHDw4PEP96p61MMVg1ly5GwIB71FJcA3expS7rKOciSHBkSHHHtAu3DoxndzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uzjToPKK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8U8UwDGXeKDkqdmDQD2AJ6C8adRsvYsEsUh2q0q8beE=; b=uzjToPKKzfDbUOnMQ8BEFtGznv
+	HP/d4wX3y4jUF9yLCoXy/fI+gFmjX6TMNsWTRweaxbcGNOgkr+7lVo8hrl226YdeZTsmqdthvjGYv
+	sm3Qoh3WHHy4iU9zQbBTSZpJBdWC/qZuf8nkAJOg4iJhhhqH3twZ42e9mmHR3EOgLjyM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tDDLn-00DjVx-O7; Tue, 19 Nov 2024 02:48:19 +0100
+Date: Tue, 19 Nov 2024 02:48:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Joey Lu <a0987203069@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
+	richardcochran@gmail.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, ychuang3@nuvoton.com, schung@nuvoton.com,
+	yclu4@nuvoton.com, peppe.cavallaro@st.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH v3 3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for
+ Nuvoton MA35 family
+Message-ID: <4d44bc93-6a81-4dc8-9f22-a103882f25e1@lunn.ch>
+References: <20241118082707.8504-1-a0987203069@gmail.com>
+ <20241118082707.8504-4-a0987203069@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: GRE tunnels bound to VRF
-From: Ben Greear <greearb@candelatech.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev <netdev@vger.kernel.org>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
- <ZzsCNUN1vl01uZcX@shredder>
- <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
-Content-Language: en-MW
-Organization: Candela Technologies
-In-Reply-To: <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-MDID: 1731980837-wjwe4CmXjNkc
-X-MDID-O:
- us5;ut7;1731980837;wjwe4CmXjNkc;<greearb@candelatech.com>;a7e0f01e4f1a90fc9a5deb2f83c822d4
-X-PPE-TRUSTED: V=1;DIR=OUT;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241118082707.8504-4-a0987203069@gmail.com>
 
-On 11/18/24 11:48 AM, Ben Greear wrote:
-> On 11/18/24 1:00 AM, Ido Schimmel wrote:
->> On Sun, Nov 17, 2024 at 10:40:18AM -0800, Ben Greear wrote:
->>> Hello,
->>>
->>> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
->>> underlying traffic?
->>>
->>> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
->>> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
->>> gre interfaces and have that go out whatever the ethernet VRFs route to...
->>
->> You can set eth{1,2} as the "physical device" of gre{0,1}
->>
->> ip link add name gre0 up type gre [...] dev eth1
->> ip link add name gre1 up type gre [...] dev eth2
->>
->> The "physical device" can be any interface in the VRF, not necessarily
->> eth{1,2}.
-> 
-> Hello,
-> 
-> Thanks for that suggestion.
-> 
-> I'm trying to implement this, but not having much luck.  My current approach
-> is trying to put gre0 in one VRF, attached to a VETH device in a different VRF.
-> 
-> Would you expect that to work?
+> +	if (of_property_read_u32(dev->of_node, "tx-internal-delay-ps", &arg)) {
+> +		tx_delay = 0; /* Default value is 0 */
+> +	} else {
+> +		if (arg <= 2000) {
+> +			tx_delay = (arg == 2000) ? 0xF : (arg / PATH_DELAY_DEC);
+> +			dev_dbg(dev, "Set Tx path delay to 0x%x\n", tx_delay);
 
-I found some other problems with my config, will try this again now that some other
-problems are solved...
+The device tree binding says:
 
-> 
-> And also, is there any way to delete a gre netdev?  ip link delete gre0 doesn't
-> complain, and doesn't work.
++  tx-internal-delay-ps:
++    enum: [0, 2000]
 
-I found answer to this, for reference, it seems gre0 is default instance built by the
-ip_gre module when it is loaded, and used for special purpose.
 
-Thanks,
-Ben
+So only two values are allowed. Yet the C code is
 
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+arg / PATH_DELAY_DEC
+
+which seems to allow 16 values?
+
+Please make this consistent.
+
+
+    Andrew
+
+---
+pw-bot: cr
 
