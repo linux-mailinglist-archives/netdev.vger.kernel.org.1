@@ -1,114 +1,156 @@
-Return-Path: <netdev+bounces-146242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFDCA9D26AC
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:15:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88D79D26B9
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:19:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6D70280633
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:15:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88DFE2829CE
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878C51C07EC;
-	Tue, 19 Nov 2024 13:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E961CC8A0;
+	Tue, 19 Nov 2024 13:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IXnPCyPM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Yuo+S+AB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A701CACFE
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 13:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC2212B93;
+	Tue, 19 Nov 2024 13:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732022115; cv=none; b=bAsjYq3m3tx2riMOwKpI1TH8jmaaoa640aIClPiBMHcXpMnvnZA0psZmxd1cTSMHDmS1S3HMa0CCvhm1pmXmBK3VIfGlzUe05OzSP1UguIQEvl4zUROzQ5GS3Bn/AHf5Dawh49Rr6Q4mG/bGCHQAH7r0YFpD4e9rJ2EAZqCq27E=
+	t=1732022358; cv=none; b=XRFCrqUUtGJAqyvvs1vJ/gXDTTFxhZaJE2lrzaWFdneUs3X/qcV+LLMKCxtdYaVP5zUB8Oc/LffE8Li7TUTyTYTaAE3+EqMemBAdPWPLbdWuaRGog4xt3zz1v4rXbVU2ug7T8kZjIpOkCD8GA6zs2K/e+IJ6OwTDVH73ntYJCJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732022115; c=relaxed/simple;
-	bh=M5G5UTextI8QbNeVPUDyHyy55L0RD5RgFnNSJMphWfQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=qfD4RjrU/pC1ppDhUF6o8i0CxuAXtCy74/h26UDRqHxtpvctCDKtB8LUegvGNqDaLz8NGPjEC9XTFKV9vPthu3IsZocoeufa4dgvHpo+B5oUtVFYsxml6avtFCEXqcCpDicP5zaxy1Qq2KPcKyLmpQvCPsqVNMl6KWSiFpAyPm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IXnPCyPM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732022113;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=M5G5UTextI8QbNeVPUDyHyy55L0RD5RgFnNSJMphWfQ=;
-	b=IXnPCyPMAM6LoZ+M3RuqWt4bX0Rrw5Zp5ji3mi2QGZmMpqWFvcUFfY+zXuPNCwwS1Wp5Hm
-	zQhiMdutx1GA9uqaldOuifiJYJGg24Me2dQwXH8ZKg9O5PO8ZV0KTLcmlwzaISSLVWrmJY
-	ZAbV6HUuAiq94evYWZq9aEoLEcJGYdM=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-I0njhTfZMwm--By3l6atAA-1; Tue, 19 Nov 2024 08:15:11 -0500
-X-MC-Unique: I0njhTfZMwm--By3l6atAA-1
-X-Mimecast-MFC-AGG-ID: I0njhTfZMwm--By3l6atAA
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-460b638b668so15615981cf.0
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 05:15:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732022110; x=1732626910;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=M5G5UTextI8QbNeVPUDyHyy55L0RD5RgFnNSJMphWfQ=;
-        b=ccPcTS/MIRwmmw+v8X/faaQ6OSHSsvXH4HnjK3rMPzgNojRtESi2QxRJpRyh/SK2MN
-         RzdCbhzJZgluWbDwG+a/SOZDl/8SjDg7vO4y1grmEs9rTnnnNN+R/IFKrQSLhFYjOzPi
-         BElubz7Eur0zidzO3Htw+XOxZbXTxqPF5iAzVIAu9zIXeaKcKRMI/q9Zz+Sx2CJlgE48
-         cgfTvVSHB/Kfe4Xxnk/AdX6d58hKIYuwlfs9Hsvsx5aWGIFjsQZre+YNmxdDzzfs+x3h
-         HZq79RC1M3+1X7lhlkHg25CLlOcQ03lmXY4LMGrhk5luwSHnffFs40iM7U3Hc0cO+8Cs
-         Y9Bw==
-X-Gm-Message-State: AOJu0Yxk0GANblclgDrzJb3ZanXwyC2d3UD53/+zaJ2ot88Je35BB5ZL
-	ZAXS7LM7YAO1csWykZA5ouB42bVBnDgRh0DGf2kEzL3DzwHT6TZ7cHSAOO1th0D2V80OK9OQniT
-	EwMKyp4g5qROfnYfUhhV0MmGqLNZUIsDhjCgJbza5O+aDa/9Uj3ck7zmTqYDqOw==
-X-Received: by 2002:a05:622a:15d0:b0:461:646c:b8fc with SMTP id d75a77b69052e-46363e397d7mr254313431cf.23.1732022110401;
-        Tue, 19 Nov 2024 05:15:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHIGK74cWDAmhNUwOt0VE9LpjG7zVz6hXYHiICaYeQ4nU5P3aZ4b6dUR+WM0kjwSDOtUV5IDA==
-X-Received: by 2002:a05:622a:15d0:b0:461:646c:b8fc with SMTP id d75a77b69052e-46363e397d7mr254313151cf.23.1732022110126;
-        Tue, 19 Nov 2024 05:15:10 -0800 (PST)
-Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46392b9b2besm10831431cf.10.2024.11.19.05.15.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 05:15:09 -0800 (PST)
-Message-ID: <f769256c-d51c-4983-b7a5-015add42ca35@redhat.com>
-Date: Tue, 19 Nov 2024 14:15:07 +0100
+	s=arc-20240116; t=1732022358; c=relaxed/simple;
+	bh=heC2W64u9lxX7hBxk0vAcv1W8KZWJh4QrGipH65lbFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=csTE4VQ4wF42uBovE1YKbsLGaNbFKsOyjK7VJ3VEATqw4r8iqBgmXw9St3NCZAWAsPVwfbtALtsCp8eehChxKMh2nepSIaDu02doM2Sob2v0KT6OhDQIXX77Nkj+1szWCbqyKWgWTtz0tMzzYcvouAT3Eaca8YKO+FqrxwwxwjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Yuo+S+AB; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1KfrneJwcEYheNMfrfNjo9ZS+UmR5Cm/dBZt4GtnUto=; b=Yuo+S+ABzgWzxo66fZkvUu6o27
+	vfWE9FjKlYV+KJ8wcwM7CebRfvCMx7OARYV8OdeXQavI+GSleh17Vu3BiH1aJQDg9HYMutx4QxydA
+	x8YYT4e4um83vyek8UCkxqm0MKotYh/If+v/TadtBVchaqBqNjZ7F4UpO4iMdQ+itOG9kou99WkT5
+	8+Sudruhf7TBRjsVtyaqMYTn4OQWENzMYAAfVbGP+KKSgydLanki238hkjHHo7/0ZmNYhv9aC8Jht
+	Wy2vsk4WBAYk5DeDwse5jm5kepiHqpr1AGiOKAFjS9iRM1AkF7LnrZF7dmVix9kCeFKuLtXGss+Pa
+	XZsl+D4A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38246)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tDO8B-0003a0-2D;
+	Tue, 19 Nov 2024 13:19:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tDO89-00065G-0t;
+	Tue, 19 Nov 2024 13:18:57 +0000
+Date: Tue, 19 Nov 2024 13:18:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
+Cc: Sean Anderson <sean.anderson@linux.dev>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"Simek, Michal" <michal.simek@amd.com>,
+	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"git (AMD-Xilinx)" <git@amd.com>,
+	"Katakam, Harini" <harini.katakam@amd.com>
+Subject: Re: [PATCH net-next 2/2] net: axienet: Add support for AXI 2.5G MAC
+Message-ID: <ZzyQQV4qM_fTrpMf@shell.armlinux.org.uk>
+References: <20241118081822.19383-1-suraj.gupta2@amd.com>
+ <20241118081822.19383-3-suraj.gupta2@amd.com>
+ <ZztjvkxbCiLER-PJ@shell.armlinux.org.uk>
+ <657764fd-68a1-4826-b832-3bda91a0c13b@linux.dev>
+ <Zztml-Te38P3M7cM@shell.armlinux.org.uk>
+ <BL3PR12MB65716077E66F2141CC618DD9C9202@BL3PR12MB6571.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Russell King <linux@armlinux.org.uk>, Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Paolo Abeni <pabeni@redhat.com>
-Subject: net vs net-next conflicts while cross merging
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL3PR12MB65716077E66F2141CC618DD9C9202@BL3PR12MB6571.namprd12.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi,
+On Tue, Nov 19, 2024 at 10:28:48AM +0000, Gupta, Suraj wrote:
+> > -----Original Message-----
+> > From: Russell King <linux@armlinux.org.uk>
+> > 
+> > On Mon, Nov 18, 2024 at 11:00:22AM -0500, Sean Anderson wrote:
+> > > On 11/18/24 10:56, Russell King (Oracle) wrote:
+> > > > On Mon, Nov 18, 2024 at 01:48:22PM +0530, Suraj Gupta wrote:
+> > > >> Add AXI 2.5G MAC support, which is an incremental speed upgrade of
+> > > >> AXI 1G MAC and supports 2.5G speed only. "max-speed" DT property is
+> > > >> used in driver to distinguish 1G and 2.5G MACs of AXI 1G/2.5G IP.
+> > > >> If max-speed property is missing, 1G is assumed to support backward
+> > > >> compatibility.
+> > > >>
+> > > >> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
+> > > >> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+> > > >> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> > > >> ---
+> > > >
+> > > > ...
+> > > >
+> > > >> -  lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE |
+> > MAC_ASYM_PAUSE |
+> > > >> -          MAC_10FD | MAC_100FD | MAC_1000FD;
+> > > >> +  lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE |
+> > > >> + MAC_ASYM_PAUSE;
+> > > >> +
+> > > >> +  /* Set MAC capabilities based on MAC type */  if (lp->max_speed
+> > > >> + == SPEED_1000)
+> > > >> +          lp->phylink_config.mac_capabilities |= MAC_10FD |
+> > > >> + MAC_100FD | MAC_1000FD;  else
+> > > >> +          lp->phylink_config.mac_capabilities |= MAC_2500FD;
+> > > >
+> > > > The MAC can only operate at (10M, 100M, 1G) _or_ 2.5G ?
+> > >
+> > > It's a PCS limitation. It either does (1000Base-X and/or SGMII) OR
+> > > (2500Base-X). The MAC itself doesn't have this limitation AFAIK.
+> > 
+> > That means the patch is definitely wrong, and the proposed DT change is also
+> > wrong.
+> > 
+> > If it's a limitation of the PCS, that limitation should be applied via the PCS's
+> > .pcs_validate() method, not at the MAC level.
+> > 
+> As mentioned in IP PG (https://docs.amd.com/r/en-US/pg051-tri-mode-eth-mac/Ethernet-Overview#:~:text=Typical%20Ethernet%20Architecture-,MAC,-For%2010/100), it's limitation in MAC also.
 
-I just cross-merged net into net-next for the 6.13 PR. There was 2
-conflicts:
+I'm not reading it as a limitation of the MAC.
 
-include/linux/phy.h
-41ffcd95015f net: phy: fix phylib's dual eee_enabled
-21aa69e708b net: phy: convert eee_broken_modes to a linkmode bitmap
+The limitation stated there is that internal mode (GMII) is only
+supported for 2.5Gbps speeds. At 2.5Gbps speeds, the clock rate is
+increased from 125MHz to 312.5MHz (which makes it non-compliant
+with 802.3-2008, because that version doesn't define 2.5Gbps speeds.)
 
-drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-2160428bcb20 net: txgbe: fix null pointer to pcs
-2160428bcb20 net: txgbe: remove GPIO interrupt controller
+So long as the clock rate and interface can be safely switched, I
+don't see any reason to restrict the MAC itself to be either
+10/100/1G _or_ 2.5G.
 
-@Russel, @Jiawen: could you please double check that the resolution is
-correct?
+Note that 2.5G will only become available if it is supported by one
+of the supported interface modes (e.g. 2500base-X). If the supported
+interface modes do not include a mode that supports >1G, then 2.5G
+won't be available even if MAC_2500FD is set in mac_capabilities.
 
-I solved the phy.h conflict as reported here:
-https://lore.kernel.org/all/20241118135512.1039208b@canb.auug.org.au/
-
-Thanks!
-
-Paolo
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
