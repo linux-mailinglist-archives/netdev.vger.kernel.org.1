@@ -1,127 +1,192 @@
-Return-Path: <netdev+bounces-146142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6AD9D21B1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:38:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ABAF9D21C7
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:45:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D7D31F22233
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:38:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A6C4285629
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFFC1925B3;
-	Tue, 19 Nov 2024 08:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7118198A07;
+	Tue, 19 Nov 2024 08:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="NZFt2fWu"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D08158D96;
-	Tue, 19 Nov 2024 08:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A7F13C8F3
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732005512; cv=none; b=ulejSL8LBm9cvTprUjZILGnBDCmUzdOqnDOnwx3EtKKmKJz3n0lq+V7Zryl8R5E0sjhbRunU8ZJ5I6nILoFgDZaCKbYBO3SJpbamNtjXTPaabeXtsuOj6DdrB4ePNdHHFL90/jEjh5a/a2KaLGJ9ehpSWoHHRK7NqbRlPwwOHFM=
+	t=1732005927; cv=none; b=S8v9W/lhb/vzcexOfEO1k17WUOAodINX8bV2CG5yle8Gdoaah9T8AtFb38eEaMz9OH/NkKvEtNKX4s5t7tcjw3/PQSZtsEFbcdYafTuPtYdXHwygIf0NQkJV5MLXLgtiv3LOweOpxwYQlEKdx3J6PAGqka2Rj08nZLPCGslqFIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732005512; c=relaxed/simple;
-	bh=8MOZvwOA2k/at8HFZualT9WLA3LcWXeKk9wIaUaDI/E=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=oeOxC6usWSjjAtzRSPX7iAgYAvNBpB1Go6ao1WLPgfy+lSdNbe8HqpDXQBHxtapVu2HGZ2w0lpEZNKsL3Wiz9bOkX2S7r99dpAgpkOw8n/BKKR5aL5b8iGoWiByM+j562oba6GYfMIs0LlvdluwrXlnBvFI0RsSLERT0voLFH/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XsyWB1sppz1V4kG;
-	Tue, 19 Nov 2024 16:35:50 +0800 (CST)
-Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1D104180105;
-	Tue, 19 Nov 2024 16:38:27 +0800 (CST)
-Received: from kwepemn500013.china.huawei.com (7.202.194.154) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 19 Nov 2024 16:38:26 +0800
-Received: from dggpeml100007.china.huawei.com (7.185.36.28) by
- kwepemn500013.china.huawei.com (7.202.194.154) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 19 Nov 2024 16:38:26 +0800
-Received: from dggpeml100007.china.huawei.com ([7.185.36.28]) by
- dggpeml100007.china.huawei.com ([7.185.36.28]) with mapi id 15.01.2507.039;
- Tue, 19 Nov 2024 16:38:26 +0800
-From: mengkanglai <mengkanglai2@huawei.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, "edumazet@google.com" <edumazet@google.com>, "Fengtao
- (fengtao, Euler)" <fengtao40@huawei.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Yanan
- (Euler)" <yanan@huawei.com>
-Subject: =?gb2312?B?UkU6tPC4tDoga2VybmVsIHRjcCBzb2NrZXRzIHN0dWNrIGluIEZJTl9XQUlU?=
- =?gb2312?Q?1_after_call_tcp=5Fclose?=
-Thread-Topic: =?gb2312?B?tPC4tDoga2VybmVsIHRjcCBzb2NrZXRzIHN0dWNrIGluIEZJTl9XQUlUMSBh?=
- =?gb2312?Q?fter_call_tcp=5Fclose?=
-Thread-Index: Ads6WLnMxTxT5H3UTJOsoe68wa8MAw==
-Date: Tue, 19 Nov 2024 08:38:26 +0000
-Message-ID: <d46151818b694dc79b488061817d3d73@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1732005927; c=relaxed/simple;
+	bh=S+U+AjJRasPBDpiweR/FNZIR/50o66YkmWzkir4ZW2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A8dZ5SeKq3CWVB0r3Hau6NPfPOQS5AItmn3Lwj4S7zJje7E9CnW34t8OA3wuIOo5gcORzsYfCLlpn39HnolxLsxDxyEvjLO0seqyKC3R4OC3wOfjJQB1MTQ5CqSwYfSlHux1HkFLSgxyxStpZjjMhl+cANa2WgrdsEDePUhuoFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=NZFt2fWu; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5cef772621eso6569237a12.3
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:45:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1732005924; x=1732610724; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8fuT97yI4Tuoujm6UUjQklceuyk/9Xj1w4bHDEeWvaU=;
+        b=NZFt2fWu8dOjBBBmYCqenDv3ennpH6FbIcESjm/hstKFJns5mBjpG1DO5JFh1FlLHB
+         dX3RYgUxDWzzrCE76ZQJUCXVcvWPssKbjP/Rz0cpH3w1SBzy5aNkcAPKkFV8RjTImcvU
+         rEBq5oX3J73S533c6A8gEIsy+vSeAxjGRzAxm3r/TzZrjRQEnCkr5s00WlFcGq3B8nMU
+         Wy30IYOdMFLKLO1wfgOulROSYXhUfxqc/ZVmPAY+pjmyt3NY45GoaHWp7P4wtzX+IBuk
+         GCNf4/abP9q9L9qxBVPMHm8sTTzFh8oSNR6QICf8eoyJGYUxGdOPpT23D8bpjEWH9tVq
+         5OUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732005924; x=1732610724;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8fuT97yI4Tuoujm6UUjQklceuyk/9Xj1w4bHDEeWvaU=;
+        b=BqkD8hRVUKCAZWiJnVma2J/eR9QGy+YwbW2k9dbiHH7JnD1GXT5Z7t1PPp3MEIDCki
+         /Ih0QDT4mWeTGtNgHICJicv1FuH4IlzbAJ7qygRjQ5pcdubMamrrp/Ul1YIfYvbhq0HK
+         LTNfie9c84nck9tngnmLOqEbXyxH9Pkpdr7O7Yw/jzzX5tZY1++LzD8bKwakWS1Hu/DT
+         qOQiRgOoYAhd047ifpuMJtZ6PhOHJEVpsVWpdkVjRRR8z3BgqbeuMyzkln/aJNuo2k7X
+         MS79olyEqVNk2UqCXXvlp+JA06dgjp8sWcU99BqTW4vd+V0VDQA1BKWpZPw+nHxens7K
+         1vMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWXQmR4iwVkQWYMT67+ffeEG1PGfloPP2AUJmP2f5cMpFeh+s/djJGtMvfCgyfycXyy8DzQ9tI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztLgfVTjYWaXurWwY6qi6QC/J0iKS3AP7tGItTaVP9kvUQcUtr
+	RUsR8kra+Wa9WWe96de2Ga8RKzyjQJhZAGbXg7hVXdoHOM4D4VLrL8PEJLak6gg=
+X-Google-Smtp-Source: AGHT+IGWgWvrU3iW9fpLyl65j2i8nKGQqJjCyR6GPI7QRQB3gyIMeqWk8joXLkagDKieL4IvEbilPA==
+X-Received: by 2002:a05:6402:2794:b0:5c9:6f20:4cf1 with SMTP id 4fb4d7f45d1cf-5cf8fd04bf8mr13901074a12.27.1732005924036;
+        Tue, 19 Nov 2024 00:45:24 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:a2be:8cd5:8845:cfce? ([2001:67c:2fbc:1:a2be:8cd5:8845:cfce])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cfaca26fdesm3336525a12.47.2024.11.19.00.45.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 00:45:23 -0800 (PST)
+Message-ID: <855e6fee-5f0a-439d-a6c5-6829db4ecbfa@openvpn.net>
+Date: Tue, 19 Nov 2024 09:45:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 04/23] ovpn: add basic interface
+ creation/destruction/management routines
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-4-de4698c73a25@openvpn.net>
+ <4b6f2e30-5e94-475d-97ec-d59e59f0bf6b@gmail.com>
+ <0f19828c-9808-427f-b620-fd3bc9f2e5db@openvpn.net>
+ <709d415d-859d-4342-80b7-908c04b28621@gmail.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <709d415d-859d-4342-80b7-908c04b28621@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-PiAtLS0tLdPKvP7Urbz+LS0tLS0NCj4gt6K8/sjLOiBLdW5peXVraSBJd2FzaGltYSA8a3VuaXl1
-QGFtYXpvbi5jb20+IA0KPiC3osvNyrG85DogMjAyNMTqMTHUwjE0yNUgMjo1Ng0KPiDK1bz+yMs6
-IG1lbmdrYW5nbGFpIDxtZW5na2FuZ2xhaTJAaHVhd2VpLmNvbT4NCj4gs63LzTogZGF2ZW1AZGF2
-ZW1sb2Z0Lm5ldDsgZHNhaGVybkBrZXJuZWwub3JnOyBlZHVtYXpldEBnb29nbGUuY29tOyBGZW5n
-dGFvIChmZW5ndGFvLCBFdWxlcikgPGZlbmd0YW80MEBodWF3ZWkuY29tPjsga3ViYUBrZXJuZWwu
-b3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBuZXRkZXZAdmdlci5rZXJuZWwub3Jn
-OyBwYWJlbmlAcmVkaGF0LmNvbTsgWWFuYW4gKEV1bGVyKSA8eWFuYW5AaHVhd2VpLmNvbT47IGt1
-bml5dUBhbWF6b24uY29tDQo+INb3zOI6IFJlOiBrZXJuZWwgdGNwIHNvY2tldHMgc3R1Y2sgaW4g
-RklOX1dBSVQxIGFmdGVyIGNhbGwgdGNwX2Nsb3NlDQo+IA0KPiBGcm9tOiBtZW5na2FuZ2xhaSA8
-bWVuZ2thbmdsYWkyQGh1YXdlaS5jb20+DQo+IERhdGU6IFdlZCwgMTMgTm92IDIwMjQgMTI6NDA6
-MzQgKzAwMDANCj4gPiBIZWxsbywgRXJpYzoNCj4gPiBDb21taXQgMTUxYzljNzI0ZDA1ICh0Y3A6
-IHByb3Blcmx5IHRlcm1pbmF0ZSB0aW1lcnMgZm9yIGtlcm5lbCANCj4gPiBzb2NrZXRzKSBpbnRy
-b2R1Y2UgaW5ldF9jc2tfY2xlYXJfeG1pdF90aW1lcnNfc3luYyBpbiB0Y3BfY2xvc2UuDQo+ID4g
-Rm9yIGtlcm5lbCBzb2NrZXRzIGl0IGRvZXMgbm90IGhvbGQgc2stPnNrX25ldF9yZWZjbnQsIGlm
-IHRoaXMgaXMgDQo+ID4ga2VybmVsIHRjcCBzb2NrZXQgaXQgd2lsbCBjYWxsIHRjcF9zZW5kX2Zp
-biBpbiBfX3RjcF9jbG9zZSB0byBzZW5kIEZJTiANCj4gPiBwYWNrZXQgdG8gcmVtb3RlcyBzZXJ2
-ZXIsDQo+IA0KPiBKdXN0IGN1cmlvdXMgd2hpY2ggc3Vic3lzdGVtIHRoZSBrZXJuZWwgc29ja2V0
-IGlzIGNyZWF0ZWQgYnkuDQo+IA0KPiBSZWNlbnRseSwgQ0lGUyBhbmQgc3VucnBjIGFyZSAoYmVp
-bmcpIGNvbnZlcnRlZCB0byBob2xkIG5ldCByZWZjbnQuDQo+IA0KPiBDSUZTOiBodHRwczovL2dp
-dC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC90b3J2YWxkcy9saW51eC5naXQv
-Y29tbWl0Lz9pZD1lZjcxMzRjN2ZjNDhlMTQ0MWIzOThlNTVhODYyMjMyODY4YTZmMGE3DQo+IHN1
-bnJwYzogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzIwMjQxMTEyMTM1NDM0LjgwMzg5
-MC0xLWxpdWppYW41NkBodWF3ZWkuY29tLw0KPiANCj4gSSByZW1lbWJlciBSRFMncyBsaXN0ZW5l
-ciBkb2VzIG5vdCBob2xkIHJlZmNudCBidXQgb3RoZXIgY2xpZW50IHNvY2tldHMgKFNNQywgUkRT
-LCBNUFRDUCwgQ0lGUywgc3VucnBjKSBkby4NCj4gDQo+IEkgdGhpbmsgYWxsIFRDUCBrZXJuZWwg
-c29ja2V0cyBzaG91bGQgaG9sZCBuZXRucyByZWZjbnQgZXhjZXB0IGZvciBvbmUgY3JlYXRlZCBh
-dCBwZXJuZXRfb3BlcmF0aW9ucy5pbml0KCkgaG9vayBsaWtlIFJEUy4NCj4gDQo+ID4gaWYgdGhp
-cyBmaW4gcGFja2V0IGxvc3QgZHVlIHRvIG5ldHdvcmsgZmF1bHRzLCB0Y3Agc2hvdWxkIHJldHJh
-bnNtaXQgDQo+ID4gdGhpcyBmaW4gcGFja2V0LCBidXQgdGNwX3RpbWVyIHN0b3BwZWQgYnkgaW5l
-dF9jc2tfY2xlYXJfeG1pdF90aW1lcnNfc3luYy4NCj4gPiB0Y3Agc29ja2V0cyBzdGF0ZSB3aWxs
-IHN0dWNrIGluIEZJTl9XQUlUMSBhbmQgbmV2ZXIgZ28gYXdheS4gSSB0aGluayANCj4gPiBpdCdz
-IG5vdCByaWdodC4NCg0KDQpJIGZvdW5kIHRoaXMgcHJvYmxlbSB3aGVuIHRlc3RpbmcgbmZzLiBz
-dW5ycGM6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL25ldGRldi8yMDI0MTExMjEzNTQzNC44MDM4
-OTAtMS1saXVqaWFuNTZAaHVhd2VpLmNvbS8gd2lsbCBzb2x2ZSB0aGlzIHByb2JsZW0uIA0KSSBh
-Z3JlZSB3aXRoIHRoYXQgYWxsIFRDUCBrZXJuZWwgc29ja2V0cyBzaG91bGQgaG9sZCBuZXRucyBy
-ZWZjbnQuDQpIb3dldmVyLCBmb3Iga2VybmVsIHRjcCBzb2NrZXRzIGNyZWF0ZWQgYnkgb3RoZXIg
-a2VybmVsIG1vZHVsZXMgdGhyb3VnaCBzb2NrX2NyZWF0ZV9rZXJuIG9yIHNrX2FsbG9jKGtlcm49
-MCksIGl0IG1lYW5zIHRoYXQgdGhleSBtdXN0IG5vdyBob2xkIHNrX25ldF9yZWZjbmYsIG90aGVy
-d2lzZSBmaW4gd2lsbCBvbmx5IGJlIHNlbnQgb25jZSBhbmQgd2lsbCBub3QgYmUgcmV0cmFuc21p
-dHRlZCB3aGVuIHRoZSBzb2NrZXQgaXMgcmVsZWFzZWQuQnV0IG90aGVyIHVzZSB0Y3AgbW9kdWxl
-cyBtYXkgbm90IGJlIGF3YXJlIG9mIGhvbGQgc2tfbmV0X3JlZmNudC4gc2hvdWxkIHdlIGFkZCBh
-IGNoZWNrIGluIHRjcF9jbG9zZaO/DQoNCi0tLQ0KZGlmZiAtLWdpdCBhL25ldC9pcHY0L3RjcC5j
-IGIvbmV0L2lwdjQvdGNwLmMNCmluZGV4IGZiOTIwMzY5Yy4uNmI5MjAyNmE0IDEwMDY0NA0KLS0t
-IGEvbmV0L2lwdjQvdGNwLmMNCisrKyBiL25ldC9pcHY0L3RjcC5jDQpAQCAtMjgwNCw3ICsyODA0
-LDcgQEAgdm9pZCB0Y3BfY2xvc2Uoc3RydWN0IHNvY2sgKnNrLCBsb25nIHRpbWVvdXQpDQogICAg
-ICAgIGxvY2tfc29jayhzayk7DQogICAgICAgIF9fdGNwX2Nsb3NlKHNrLCB0aW1lb3V0KTsNCiAg
-ICAgICAgcmVsZWFzZV9zb2NrKHNrKTsNCi0gICAgICAgaWYgKCFzay0+c2tfbmV0X3JlZmNudCkN
-CisgICAgICAgaWYgKHNrLT5uZXQgIT0gJmluaXRfbmV0ICYmICFzay0+c2tfbmV0X3JlZmNudCkN
-CiAgICAgICAgICAgICAgICBpbmV0X2Nza19jbGVhcl94bWl0X3RpbWVyc19zeW5jKHNrKTsNCiAg
-ICAgICAgc29ja19wdXQoc2spOw0KIH0NCg==
+On 19/11/2024 04:08, Sergey Ryazanov wrote:
+> On 15.11.2024 16:03, Antonio Quartulli wrote:
+>> On 10/11/2024 21:42, Sergey Ryazanov wrote:
+>>> Missed the most essential note regarding this patch :)
+>>>
+>>> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>>>> +static int ovpn_net_open(struct net_device *dev)
+>>>> +{
+>>>> +    netif_tx_start_all_queues(dev);
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>> +static int ovpn_net_stop(struct net_device *dev)
+>>>> +{
+>>>> +    netif_tx_stop_all_queues(dev);
+>>>
+>>> Here we stop a user generated traffic in downlink. Shall we take care 
+>>> about other kinds of traffic: keepalive, uplink?
+>>
+>> Keepalive is "metadata" and should continue to flow, regardless of 
+>> whether the user interface is brought down.
+>>
+>> Uplink traffic directed to *this* device should just be dropped at 
+>> delivery time.
+>>
+>> Incoming traffic directed to other peers will continue to work.
+> 
+> How it's possible? AFAIU, the module uses the kernel IP routing 
+> subsystem. Putting the interface down will effectively block a client- 
+> to-client packet to reenter the interface.
+
+True.
+At least part of the traffic is stopped (traffic directed to the VPN IP 
+of a peer will still flow as it does not require a routing table lookup).
+
+I circled this discussion through the other devs to see what perspective 
+they would bring and we also agree that if something is stopping, better 
+stop the entire infra.
+
+Also, if a user is fumbling with the link state, they are probably 
+trying to bring the VPN down.
+
+I will go that way and basically perform the same cleanup as if the 
+interface is being deleted.
+
+"the party is over"[cit.] :)
+
+Regards,
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
