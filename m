@@ -1,196 +1,222 @@
-Return-Path: <netdev+bounces-146346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC4A9D2FA7
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 21:40:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6B49D2FB8
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 21:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F165283BDA
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 20:40:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFC4BB2A8D9
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 20:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143141D61A2;
-	Tue, 19 Nov 2024 20:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9421D1305;
+	Tue, 19 Nov 2024 20:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="mq6syHF9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NV6Ire6I"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MteUbpLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2071.outbound.protection.outlook.com [40.107.244.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACB21D54E7;
-	Tue, 19 Nov 2024 20:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732048763; cv=none; b=cUh1GZgmR7hkKaAfH9pTjiiTxIKsRRdRAjYqzuXwq+tAglJCmPZOTN0+JDDFN+uRdBySrksqbt4dSlX+13YcEw+CtdqFjfzOfqjY/5g66rnMP72X9nTzO+/mbdeLUuuaxWyqmlQuTB8IrT4ZAqcgr6c6z6ZtnbFiTFy7Zoud0nM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732048763; c=relaxed/simple;
-	bh=I3EJilw1V+I3SliTWa57THh7EDEQhro06SJUzckDtsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MEI1yCs5H7dXGApTJaygiKpbVnJVpq5fl+0WrxlEy0mpr0V3xnERVRkbWMZnEQusHKyTCgexzXBXXi6lfAXUQ1pqo2g6Wq/utJYDSEoMVT6Vsr8kVS2CdC91/GoIUnlIv373THxWaZc6MdQrUlU6gQNAieCY5VZh77V1iD721GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=mq6syHF9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NV6Ire6I; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A5512114021D;
-	Tue, 19 Nov 2024 15:39:19 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Tue, 19 Nov 2024 15:39:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1732048759;
-	 x=1732135159; bh=t8pRxtE5/ITErPKjZ8wNtIWZlnuceIzAZrf0pP0tMDU=; b=
-	mq6syHF9D//PyhfC/pPcqGqtBZQZLMmr8hW6klSjRD/wXkmp+k67GrpJZGUpVvM7
-	Y494WDA8oUQIsjN6536a/OCGYjOBMrUMIdJvnHVDANI7cW4980MrQohKNifPKAwN
-	6K+lYr48FURBqqAMPgW1D1s4bpkVCy9B00T1PQ7Ts63ZdcnmTLz4GL+8E64g6S0f
-	hQk/o46dYdI0NCP0yAr+Tghb7x4eY18Ludq/fKtMy7XDhotUrcyLi21DUup+AHyo
-	dVoZidaydJ50yAavLkIvIEb4RiPeIlazQXiCEmlajSh9OKUBzyZ60Yi2Mvwz8Fvz
-	S/R187IjqL+CZHPLp8ORWw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1732048759; x=
-	1732135159; bh=t8pRxtE5/ITErPKjZ8wNtIWZlnuceIzAZrf0pP0tMDU=; b=N
-	V6Ire6I76sMFGW1/KIi87EKnPcHu833RafEq29MiVvyCWLqasz81srTmYpiq+FHF
-	4BVGxIBn5FDIoz55BkvOIHu927JWqQsUB/+a4h2vw6R7/CAS85w2/JFUWrq6uEvD
-	zFbi7TN0eQmz9rbnS6A2AESu08f58SySZD4WsibeY64DzRupz1NqR8JHOCLG//MB
-	vXHn1ixCI+sm/37YD2d+lTPiIcP9X5ECpHHXMmurBO/gaV3w8T8K8HPgBF/ZQs+N
-	kZ1Jkn7nE0Gu0hkvi2i2LBXIh/ZArEmX2abMiW/9BIOoTorD53HthL/36bMjPPvs
-	i+JcBS6J/S1goEe6GmCtA==
-X-ME-Sender: <xms:dvc8Z4-tiiSQm_RNQZCZsdbEfJn-4pn-fXkUTS5DKfYphQjlnQ9oPw>
-    <xme:dvc8Zwt8xHBDa4uIlF0UPsL6LANpDNto45-S2jU4gsgeMTsVU2EyTOm7riyXtYQDQ
-    rkwiVRPMML5l0szTQ8>
-X-ME-Received: <xmr:dvc8Z-AKn2aitm1cJe2nS576EOEhhFqt_4AoMsJGOZ4ClRUUZ8mevNmU_7OQh_reUuThCuJevDUngLA4SXJ71O29suKucDGasw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfedvgddufeejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
-    gvrhhluhhnugesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeevteeg
-    tddvvdfhtdekgefhfeefheetheekkeegfeejudeiudeuleegtdehkeekteenucevlhhush
-    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshho
-    uggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopedujedpmh
-    houggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhoshgvnhhpsehgmhgrihhlrdgtohhm
-    pdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepkhhurhhtsehlihhnuhhtrhhonhhigidruggvpdhrtghpthhtoheprghnughrvgif
-    sehluhhnnhdrtghhpdhrtghpthhtohepohhlthgvrghnvhesghhmrghilhdrtghomhdprh
-    gtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvggu
-    uhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:dvc8Z4dN4CDV7wD_SwOwokrVDqNKTnwNVJTxZA1tUUkM3Ou077WDXw>
-    <xmx:dvc8Z9MQ4EtC1387DiA06IFc45H75Us8oyLwrjqIwNeDAFJHqy-RZg>
-    <xmx:dvc8ZylY75pvjm8GGTEA8fTYeRujTjntxcEW29wHmVpwHfsQWvaivQ>
-    <xmx:dvc8Z_vwhkcR4MsiKLLgmE-LZKPagdewwgwcNotk37Bn3WncsNL7tQ>
-    <xmx:d_c8Z-wwOHaxkZsi8BELPflMV_6mbeN6U-NJo5luebBj9YXhqNbl6mCV>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 19 Nov 2024 15:39:18 -0500 (EST)
-Date: Tue, 19 Nov 2024 21:39:16 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:RENESAS ETHERNET SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
-Subject: Re: [PATCHv3 net-next] net: modernize ioremap in probe
-Message-ID: <20241119203916.GP5315@ragnatech.se>
-References: <20241117212711.13612-1-rosenp@gmail.com>
- <20241117223850.GK5315@ragnatech.se>
- <CAKxU2N_VMSEo30u-C1VK4+jBSUBTo6QT1vgd14RQSS=P+g9w+w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97B61CBA1A;
+	Tue, 19 Nov 2024 20:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732048837; cv=fail; b=E/sROqM7cfNbu4cXpIuZbotHvTDM3tyZiZYEHLyXo35ERZZA3IHI+3axXlQnYLna/1laoranViXVYP6qsHe2hzPXR1sL3rrWz0CgIHTe7EbRCKcu1zNgvLfsfhsLMxewuOE1mnNAIRhIONDDuwPOvrNLBi4ejC1SOl3iVo6oaDo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732048837; c=relaxed/simple;
+	bh=w8V4QhtEWFpHvUIK0/v9LJdl/EJCfeZjwR/xJyjvhIM=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sZb8CUNsqOws0V6yEx3hotsfOKWsqWOG6irgdXSq5Zt1wiKKfaNFziFFad+L8rMIgMw5tJUl1Exx4WtUwqd/atDjw8w/wzRpoXFI6ROFDZ2mJPI7NE/s4cT0GvXMpNjWXDsKUEfTeiCZJvyjs7S7Mc5vVoi0VUN2ja7gl0aGNPA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MteUbpLW; arc=fail smtp.client-ip=40.107.244.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oT3ZYKAQ6srjFvBHy7g/wufzHY1KG+zT9TYoSOgaTZdrYpevY9DFyH8TExf6uLJFEBrz+nQDvgl+WSfFe9bwU42f/K9zcXgFGQTY8TV0szEaZZlue3Yc4QlYpxrHshWm/LFa9X+xLM4tam94EIRKPzqQhzDtWw/dYwyySuYdPgufjcJw2cjv+a65ghnPbuknk1cRHCOYLr1ZvSK95GRKk01TcHb9RnSnlq+DEbWlk0h5oPzW5/aWX8Ii6U3VzbnQ3ixxdfY7EiE90ysCPgHT2N+77t5oSMghdBy83SXIjNimjR/Oe6OmJC1ZLcW9b1NX+JBEJpjyccb8QbWNXV8CBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7TZu2WfEMr46tfKIkxqiO5bi3QMg6H7A+V9uPMyRQ3Y=;
+ b=e22gwNVLMPrpvLYx19w5ZmzUOxedf5yF3lf4y/qhXS+ug4NHjqulTutMr5P6CkiLeo4sttlBGKX1SfDAuQCv/IHys3o3DKZIgQpdbIRfmyddei5KY5O2ByUzMNUjWrzCmYmaPeGFzF0ZC6ljY5seyQdin2wb/W1eHyikt941JtYqcVdlRgBzeyvyLqMd0Ra0etiULPoYxn/5x8wlxReajnnSZfpTGoOhQnoQ5Z7iPBpVVwCidJFaKsvOuFDZyJ0iLoSJGHTXCvNbtAndsl6xX+I5KcKhbCl/gUVCI7xjs4wE2KE5aAvYadfD1Md9z/73tkluWZsZqqB09eMhJw78vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=amd.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7TZu2WfEMr46tfKIkxqiO5bi3QMg6H7A+V9uPMyRQ3Y=;
+ b=MteUbpLW9uVWKfOtiuPZQ2tspzPNxtguHrr/t5XsC7IrRMokeX0ztBadTSEFQ5bwX0OhF44U/vtwjKmxBMBU91GwbfYZZXvgpBSPzZDva1NvaFwld5pP8KRIuBE8J/JGQ49NEkokNhR22hWH80yIUN2uejJkELx/rZfXHmEGP4ztowUikmUYTQ4JA6sP1T0hYDlbKoZBrr9TcNZGWaPHK22Dui/EBeY7hHZRF6nFBeuVyvELFNZJQluqUKxEhd7tcRM0HV2WsJCmG/fnX+ozAjK0tPie8CVj7iItHCwcCVeM8RbrEw1R5PHk+rLEW8JV8HWnMhfdSh4Al8ZMXzKgzg==
+Received: from SN6PR04CA0093.namprd04.prod.outlook.com (2603:10b6:805:f2::34)
+ by DS7PR12MB5886.namprd12.prod.outlook.com (2603:10b6:8:79::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.23; Tue, 19 Nov 2024 20:40:32 +0000
+Received: from SN1PEPF0002636C.namprd02.prod.outlook.com
+ (2603:10b6:805:f2:cafe::81) by SN6PR04CA0093.outlook.office365.com
+ (2603:10b6:805:f2::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23 via Frontend
+ Transport; Tue, 19 Nov 2024 20:40:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002636C.mail.protection.outlook.com (10.167.241.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8158.14 via Frontend Transport; Tue, 19 Nov 2024 20:40:31 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 19 Nov
+ 2024 12:40:21 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 19 Nov
+ 2024 12:40:20 -0800
+Received: from localhost (10.127.8.9) by mail.nvidia.com (10.129.68.10) with
+ Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 19 Nov 2024
+ 12:40:18 -0800
+Date: Tue, 19 Nov 2024 22:40:18 +0200
+From: Zhi Wang <zhiw@nvidia.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
+	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, Alejandro Lucero
+	<alucerop@amd.com>
+Subject: Re: [PATCH v5 26/27] cxl: add function for obtaining params from a
+ region
+Message-ID: <20241119224018.00005f7d@nvidia.com>
+In-Reply-To: <20241118164434.7551-27-alejandro.lucero-palau@amd.com>
+References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
+	<20241118164434.7551-27-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N_VMSEo30u-C1VK4+jBSUBTo6QT1vgd14RQSS=P+g9w+w@mail.gmail.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636C:EE_|DS7PR12MB5886:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca083f30-c737-47e3-d380-08dd08da6951
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EYoMJyA5HDis2i91J6nAOpInwgAJogeZSNWLHy3w6BkguKPM+hmXWQFmjSyw?=
+ =?us-ascii?Q?x01mKPJPYnUa9G3ZZX1TNmKWxaXw0oZu/VxP3jWz9WdE4vu6+EaEFUgps/Z6?=
+ =?us-ascii?Q?bodRNPgfzs48oIjIjwjdPzirfFGlJDBBZ61/Ewb66CIniv8oeiv3iYU2t/ih?=
+ =?us-ascii?Q?jl+jb/PXxtFMIV1Tl9Hil1JTqathfvxE+GyfRDyKfvyjU7vz3mDkn2XbQXfd?=
+ =?us-ascii?Q?QPTwcd1u1vlQlni3zHkF4L4YGv3CW5NFvFk3G3YEKBF08aBUogMV1U9IJ4DZ?=
+ =?us-ascii?Q?ZKrVkZEn5mH2Ivt+o2fzxCZOe+hiS17xdR2O3twZYha/VcdIxlL9nIPyTZp2?=
+ =?us-ascii?Q?iMFzeD1Kvp/u53x7BPvl344lfpHEGDmxd7blVvK80tiXYJ8nRpeMgIBB02mv?=
+ =?us-ascii?Q?6LMEK6q1+DsMFn748tjcVtbnF3z0UMklfW+iK7swSKDZJ8x8xCb6YvnEPXen?=
+ =?us-ascii?Q?+QuNaLX7hf0gcdQMczJAeHYMfylhYn7C40Bt9XCVsxTWKsD4B+U6NPreJ7aJ?=
+ =?us-ascii?Q?gyYEnmHzoh9Z9du1t52F/qYvgxjp5UXsSJZ0KtYIzoj6B38EDGm5XdgH4Syb?=
+ =?us-ascii?Q?5AT8udeXLEMQFjcAKkN5BiE4Eqm4MpSmT0EStdd/zcb39gm2bfcXbKttwD9d?=
+ =?us-ascii?Q?GVvj5TE/4nSfQmRNyXuuGd5igNlHhV9g/kHVIpzjKqthQUgZZn/k07Iy8oF3?=
+ =?us-ascii?Q?UdXK0x+SFXshzzxdPJD1ViaqD6cpw3JT7M5y01JMV/fA68/OJ8wy6/nXQMKV?=
+ =?us-ascii?Q?Aliftf4OB54LKyfc9fgk6sLokoBdBHkNQQlE4X4KGUmYFvc7YT9KtqYqU7yK?=
+ =?us-ascii?Q?YSdFYKVzY93o3EuU5Cj/M12xZmqUZXjRIb83cXKOLkqR1h5KdWWQDuvDQUUS?=
+ =?us-ascii?Q?M3Es0hG06bngsKCo6PTY4wzcR9PmnDBE5JXMfCC/EHyW99fI8FzZ5a+aMVec?=
+ =?us-ascii?Q?xbcqnJxwIXThkFWXpUqHMuPMmuk5LyP49pyriu6QInDRNoDpF0D4Atb4HCFc?=
+ =?us-ascii?Q?Z4iGE+A7IxDEVVlpXoOuqvF8QX4m3uh8bM7PJ5s8Z/mGHk4ZgSlnsm9C+X/1?=
+ =?us-ascii?Q?VhTEgBmKF0lGulX3RsFGtmyZuFAn4fCRCaIMGAk0Z8wuqZauTdKasKveb9Uz?=
+ =?us-ascii?Q?RrekrTxRR8uKHK7Oxi0QujGLWY5aRHUD4/54eEkIlkmLoHAdT8wMffWoho/2?=
+ =?us-ascii?Q?UatPcN18GC7Xv7FL4MgLihcXIwnEZ1SMF29Ar0hr2n/DH6JEd+FcTR7MNdLC?=
+ =?us-ascii?Q?d4lQAV2K5iNNWPMcVy/TjzJfhc23YUKGdHb+x6FIicaOOgOFyyi8rs/+qRki?=
+ =?us-ascii?Q?2tbidAHBls+xgvsvOk/nGyg3uCdTsyH5/PWVVRFDnHT+jESD+YHvsCfndzqN?=
+ =?us-ascii?Q?dU6bTt74m8b0FnPgspLRvG0zYQ1+mRVE9FrlJHRD+vLUiiI/KA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2024 20:40:31.7778
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca083f30-c737-47e3-d380-08dd08da6951
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002636C.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5886
 
-On 2024-11-17 15:07:53 -0800, Rosen Penev wrote:
-> On Sun, Nov 17, 2024 at 2:38 PM Niklas Söderlund
-> <niklas.soderlund@ragnatech.se> wrote:
-> >
-> > Hello Rosen,
-> >
-> > Thanks for your work.
-> >
-> > On 2024-11-17 13:27:11 -0800, Rosen Penev wrote:
-> >
-> > > diff --git a/drivers/net/ethernet/renesas/rtsn.c
-> > > b/drivers/net/ethernet/renesas/rtsn.c
-> > > index 6b3f7fca8d15..bfe08facc707 100644
-> > > --- a/drivers/net/ethernet/renesas/rtsn.c
-> > > +++ b/drivers/net/ethernet/renesas/rtsn.c
-> > > @@ -1297,14 +1297,8 @@ static int rtsn_probe(struct platform_device *pdev)
-> > >       ndev->netdev_ops = &rtsn_netdev_ops;
-> > >       ndev->ethtool_ops = &rtsn_ethtool_ops;
-> > >
-> > > -     res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
-> > > -     if (!res) {
-> > > -             dev_err(&pdev->dev, "Can't find gptp resource\n");
-> > > -             ret = -EINVAL;
-> > > -             goto error_free;
-> > > -     }
-> > > -
-> > > -     priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
-> > > +     priv->ptp_priv->addr =
-> > > +             devm_platform_ioremap_resource_byname(pdev, "gptp");
-> > >       if (IS_ERR(priv->ptp_priv->addr)) {
-> > >               ret = PTR_ERR(priv->ptp_priv->addr);
-> > >               goto error_free;
-> >
-> > You have a similar construct using platform_get_resource_byname() a few
-> > lines above this one. Please convert both uses, or none, mixing them is
-> > just confusing IMHO.
-> that cannot be converted.
+On Mon, 18 Nov 2024 16:44:33 +0000
+<alejandro.lucero-palau@amd.com> wrote:
+
+LGTM. Reviewed-by: Zhi Wang <zhiw@nvidia.com>
+
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> devm_platform_ioremap_resource_byname has no res parameter, which is a
-> problem as there's this lovely line below it.
+> A CXL region struct contains the physical address to work with.
 > 
-> ndev->base_addr = res->start;
+> Add a function for given a opaque cxl region struct returns the params
+> to be used for mapping such memory range.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/region.c | 16 ++++++++++++++++
+>  drivers/cxl/cxl.h         |  2 ++
+>  include/cxl/cxl.h         |  2 ++
+>  3 files changed, 20 insertions(+)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index eff3ad788077..fa44a60549f7 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -2663,6 +2663,22 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
+>  	return ERR_PTR(rc);
+>  }
+>  
+> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
+> +			  resource_size_t *end)
+> +{
+> +	if (!region)
+> +		return -ENODEV;
+> +
+> +	if (!region->params.res)
+> +		return -ENOSPC;
+> +
+> +	*start = region->params.res->start;
+> +	*end = region->params.res->end;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_get_region_params, CXL);
+> +
+>  static ssize_t __create_region_show(struct cxl_root_decoder *cxlrd, char *buf)
+>  {
+>  	return sysfs_emit(buf, "region%u\n", atomic_read(&cxlrd->region_id));
+> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+> index ee3385db5663..7b46d313e581 100644
+> --- a/drivers/cxl/cxl.h
+> +++ b/drivers/cxl/cxl.h
+> @@ -913,6 +913,8 @@ void cxl_coordinates_combine(struct access_coordinate *out,
+>  
+>  bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port);
+>  
+> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
+> +			  resource_size_t *end);
+>  /*
+>   * Unit test builds overrides this to __weak, find the 'strong' version
+>   * of these symbols in tools/testing/cxl/.
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 2a8ebabfc1dd..f14a3f292ad8 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -77,4 +77,6 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+>  				     bool avoid_dax);
+>  
+>  int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
+> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
+> +			  resource_size_t *end);
+>  #endif
 
-I see, maybe we can refactor that too? I see not all drivers set 
-base_addr, and some even set it to the remapped memory returned by 
-devm_platform_ioremap_resource_byname() or such.
-
-The documentation for this field is not crystal clear for me and it is 
-marked with a FIXME in the definition.
-
-struct net_device {
-
-	...
-
-	/*
-	 *	I/O specific fields
-	 *	FIXME: Merge these and struct ifmap into one
-	 */
-	unsigned long		mem_end;
-	unsigned long		mem_start;
-	unsigned long		base_addr;
-
-	...
-
-> >
-> > --
-> > Kind Regards,
-> > Niklas Söderlund
-
--- 
-Kind Regards,
-Niklas Söderlund
 
