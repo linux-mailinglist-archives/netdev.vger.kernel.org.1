@@ -1,202 +1,243 @@
-Return-Path: <netdev+bounces-146287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CDBA9D29A3
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:30:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36909D297B
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2EEFB34594
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:16:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E842282EB0
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC2F1D1310;
-	Tue, 19 Nov 2024 15:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA471CEAAE;
+	Tue, 19 Nov 2024 15:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7eFK/j7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gpm8Ld4U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1268C1D079C;
-	Tue, 19 Nov 2024 15:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732029272; cv=none; b=kIb9IV77WOWaCyT0HA7iNYV4vpf512DRfTP7W/gnhInYWCE9eifqLWHhsxxUFCVDeObeQ7slb4gEKbpG64jbiXvnv0VXcPAvnEDQ55OVnP6JBRnVDBYP37aPuJ/9IKyykU68EbQcLhUVna+1DQpyJwuWaF100mG/FzaoNS6AC6g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732029272; c=relaxed/simple;
-	bh=C5GRLROYZ4nayOiEJAlz8BN2uZv15qhIMr9SsUrQPKU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=g1tSD/nZxqvTVqiJ1RBxHmvuI7ytDH5K9Wr+EPqoAlIYQ2sZzUtrcA0oi0cfkB6gmWW0hbgNchrwcT3gbg1NCrkVPByekH5aOCFBDtbIyyp+X1JLfikAMe7pLIYBGWz00tZE7QaeuOUwjroxEpID5k+QF+fma3vnU5O8R/LEICY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U7eFK/j7; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6d40ae72d35so26599896d6.1;
-        Tue, 19 Nov 2024 07:14:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732029270; x=1732634070; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dcqnz80MpP4iXfsrndcMxetFW6SC6yVqvqpZqY7cMgQ=;
-        b=U7eFK/j7ND0X0amQFlw/YWS0mGyguAHyuZ/d8UCnE2JnCbr5mc56/ITyRv01paH89k
-         rVzit2/bzTcOYoH13fEj1m9im2isMEjxcbgDaPbRGyCDwd4gBo7jvNI+T3mqFPQ8A5hA
-         SDfJtlJ+ap0o6rtIdIDUvGcaKwBPxgEtIPYs2/ujEZsWJI0GAQNUkvhjLDO7Y+ZEIGEB
-         vhUhAlcTG7I9uEGGQXYLBDFMIQv49ueK9ZOBXAN9ISEWmYsS/xQ7pEHu8Mlwg2PY91LO
-         26RF9rLAwKjj7ELnDTQ3Os3lXT6lSJjU3nsubb4ckcwt1KtNPVVIFg1gS5jqA3hsFKw0
-         GJKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732029270; x=1732634070;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dcqnz80MpP4iXfsrndcMxetFW6SC6yVqvqpZqY7cMgQ=;
-        b=wB80KhZlPMgPya/QYuSsT4xG6lcNN5ibgAGzI2r9tVGyJ26vDFfMGPhRBY9tyJR+dR
-         9y9Ohi+bJTmVjpnmTS3kdcBsCgoMljh8R/G9O4HOW55wRQj7hnDWw/z3Eo7/6cP7tuTv
-         /ffJowSsHPLdbKQNJBLL9H88KlgEfG3+UjzQ53k61KJoz9USzopKyEzJNo9n4akJ/k6I
-         zs4gYBO011Mr57uJuYMjj8ztBR+LuqxhQKSqFYzt6FaUXfYcL4wUJFuG6PkTrwu9cLhg
-         Cy41Ecx5hphz8kv1MZvx+VSicL5pOT6ZDOn7N8bhSJQc9xzgH+gzJnFMI+FMuYtFSoXi
-         GtlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJt95WOk3V9mCHNNwMCOA164GrYFkydQErLmSrAevliv8XY+MMdyb8rLRW1X96TJyRJfYMQQSVY8gm1WY8@vger.kernel.org, AJvYcCVG3Qloqj8L0eIcHsCO2CkQTU6v3LQa0gV7TJayqHUOkq4RDEBTWVDiUtT4jdryVahplyRZVQ2d@vger.kernel.org, AJvYcCW7+x5fAr/6wgnjHbiUezjYIHGmg2olvt3IKDzpSe83/iWeviutmUITIOBBdOHpw3ZHyWk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKoaPmXJTjLJI0ZWRuM3h9FPTfR4/vHYFA0yRqhPXC03VvUBbV
-	+1ZArMBU9OJHDGFTsPAoODiCnE1I7nW2amD5LMqFwCZPAp2RUxBM
-X-Google-Smtp-Source: AGHT+IE0bGSVqDFUeRoLXzkS8wWS4ocwNWKCXjefV75pM9MI5oZn7C3M9x7trdzzWOgZjQ7bE4UGpg==
-X-Received: by 2002:a05:6214:20a8:b0:6d4:1ea3:9829 with SMTP id 6a1803df08f44-6d41ea39bb7mr122723636d6.30.1732029269883;
-        Tue, 19 Nov 2024 07:14:29 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc47834sm48976676d6.62.2024.11.19.07.14.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 07:14:29 -0800 (PST)
-Date: Tue, 19 Nov 2024 10:14:28 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <673cab54db1c1_2a097e2948c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <52650a34-f9f9-4769-8d16-01f549954ddf@intel.com>
-References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
- <20241115184301.16396cfe@kernel.org>
- <6738babc4165e_747ce29446@willemb.c.googlers.com.notmuch>
- <52650a34-f9f9-4769-8d16-01f549954ddf@intel.com>
-Subject: Re: [PATCH net-next v5 00/19] xdp: a fistful of generic changes
- (+libeth_xdp)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A482512CDAE;
+	Tue, 19 Nov 2024 15:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732029728; cv=fail; b=hbZJBP978SNOz5BAFM7WCGjeHmUHgrK7guv1wALRKWMgz4Qkl7WoCHhg9AwK/uWl+yzhinbhCAmvBWyje4GWm6w0b4pwWuWcnwO1BWOKoRX5GrrdlXezE4ds8pVwAYu9rwt3TakEOdnVBXdtyQSJ/PKGNswBpi/rsALPGK9Qg6k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732029728; c=relaxed/simple;
+	bh=qE9zCpy0SaJ2/fQUe2kRFK/hK7leL2LbSzKApSF3/c0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nx53ksQW5YwflB846b7rpYnKoAS/3Ti51zEj0jzJi3OiU6P3Ng+UIV84s7WItGB/X4Xj80VVF+a/ZR2GlfgWEMspOZJGWkxb2Hucih7rEKI3JU5s+A/jrkD4ocMddEyO1jceRdwNpDGTBwHr941W0W7h4KDktMUiWkHEyEWrJBc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gpm8Ld4U; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732029726; x=1763565726;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=qE9zCpy0SaJ2/fQUe2kRFK/hK7leL2LbSzKApSF3/c0=;
+  b=gpm8Ld4Uz1wIuEBQ7PGSWr6GQw7EWvohTiteO+FrssQ2vxTxaovTCEXy
+   90ZF6wbHDj05dDjsZpbdknbmYmYxWlp61R5eoR3zeQSzdlpn+x4xqWall
+   Yb8eD3Q1n4sRNDTEg4EKVWOZjzX9jJzV9oOTBg4CBlt5x4fE55rDGgU9/
+   Bb5CAVUw3lKmPg3GT4JL0leISW+tUaFAft9+DNHw6nBmUi0P979EV1rkK
+   y4Iw82UoQ2/Cmk/H3p5NaNmERytGAEhhiglHVzog8AUyBBNQX9s/H6rs1
+   RzOUi+2lARApQpodo0V1VInReEwu5NL/S6XvRVzI3fq5VFaPZd/0gxL2W
+   g==;
+X-CSE-ConnectionGUID: 1bdnwydkTziiNbmAg0LuOg==
+X-CSE-MsgGUID: P2oTyE8LSmy7dKreo9HYtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="32144569"
+X-IronPort-AV: E=Sophos;i="6.12,166,1728975600"; 
+   d="scan'208";a="32144569"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 07:22:06 -0800
+X-CSE-ConnectionGUID: StH/tGw2QoCBtgaUs6LSLA==
+X-CSE-MsgGUID: QYP48rAuTKaq0gdnKy0kVg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,166,1728975600"; 
+   d="scan'208";a="127116077"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Nov 2024 07:22:06 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 19 Nov 2024 07:22:05 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 19 Nov 2024 07:22:05 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.177)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 19 Nov 2024 07:22:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Y1FToKfK+Yynen3QhcycsZznFrEJypIsaSnO9Yayk+nqLny5Co0VYkKopTfg84mPJgEdy13v9V/rIcEeeiFvhjKO8KkDh8ammTve57SBoDPgnbEO68gtETQ2GWtNxsHejq4Gf//JIszTdTnBQgZXaUhXMxDCtNaQ8bRZdnLN3/9OxI+iIofrCuUvauoXevhphGgNcBvWDoyHKHHhTLyawoABDuUYJdCAfYDs4iM9YLB5oFHVM1TztmHV1Iots2yH1ilOmwRHulQJZBqWNeVr5moqdnWGaeDLtkr7tET28Mq3IZeqs/vKJ4qz1GwSIYra12viLlF0ibbJgOlN4n6jLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hh+WLf639aK4P37QjwMenEMDIozyt46Ub4kNdsPVH+Y=;
+ b=KmaXKbk3Shxzm85bpJI6jFbtkqy3dTPnBq7SO16+JhSeU9LbJ4YjT6dJafwSRSfImVue+49xn+EsDnMe3ixIQAHiVyNeMOFyfKQn89xeEzr62HYZkf713B9CsHJhbztNW4EXpf94WGd/8GOwViaub01Hwr4lSPUSYhb37UCz9VwBU9Xntk/DAjz4NE/NQF+PxsPSvTXJGy9ehAVEP1+W/PwmhxGLKaXupAf6ORDsRVI9dLi6qzLSEpKOpA0TAxuz9CgOiuAcfO8e1kvZ6U0auo0NUl4Rmn9NrD8v0CmyN5cokrq9o78+SbXKIXf0NJ0utxUIReb6xTngLrAHtKoOYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
+ MW4PR11MB6861.namprd11.prod.outlook.com (2603:10b6:303:213::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Tue, 19 Nov
+ 2024 15:22:00 +0000
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955%7]) with mapi id 15.20.8158.021; Tue, 19 Nov 2024
+ 15:22:00 +0000
+Date: Tue, 19 Nov 2024 16:21:48 +0100
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Justin Lai <justinlai0215@realtek.com>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+	<larry.chiu@realtek.com>
+Subject: Re: [PATCH net v4 4/4] rtase: Add defines for hardware version id
+Message-ID: <ZzytDBkUFWYjTTgU@localhost.localdomain>
+References: <20241119095706.480752-1-justinlai0215@realtek.com>
+ <20241119095706.480752-5-justinlai0215@realtek.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241119095706.480752-5-justinlai0215@realtek.com>
+X-ClientProxiedBy: DUZPR01CA0068.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:3c2::18) To DS0PR11MB8665.namprd11.prod.outlook.com
+ (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|MW4PR11MB6861:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d3d14e6-9126-4136-e323-08dd08ade9a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?5pULGal4P3UQPwb+sUzlIuaj/I8colwK3yuhuelhjKVd2Q1nSGZ4Pq52Wc8n?=
+ =?us-ascii?Q?mxNsRF3E2vP/Ennx5N/rgrAtEeDfZ0iPO8zmHW/7AkWLShVvqbNM7krBP1VL?=
+ =?us-ascii?Q?9GdsgaxrWvhYkPZczTDZMELwhtvNJuMyM1XhqWG0xlAk8rc3LF/zZC0lIzIS?=
+ =?us-ascii?Q?D2pM+do5OdaWREqxuXFVVfn+b214xDp6MDPDYgVVCmI4W4+h9pQ6nbNPKnfd?=
+ =?us-ascii?Q?0Ot/51Dx2oHecw/NQUmCHdKSPUKBHK1UGsjBZ1u9T8rdOxCzIo5a/8NmZBxh?=
+ =?us-ascii?Q?TgV4blhaZ03C1jK3Qzjj24gfe9rMNEZN7NFFolkbaXyja560M3KGrx4xEFq4?=
+ =?us-ascii?Q?62d+iPD35ivx+P0B9Q5OtE8pTutwHOeGUxAGidWnIVqFyRgYg/XeVpnyPtyS?=
+ =?us-ascii?Q?Zb+pfbuvikA5RdMsJKyRRPnWR/6QRjAM3GPn03GRFVsyWUxhk451Ml89AJC3?=
+ =?us-ascii?Q?aWeYjhmxg7yR8euN4pXYSnfWien2K9GITgdHHZEHuEp6Mitzb1YinFubFgX4?=
+ =?us-ascii?Q?4xs0G9b+89ahT14fCKuw/wKtSO35zFMuFInKcI1Jtjybqr23pRL4Y7L6Tv15?=
+ =?us-ascii?Q?bfqbkXZNjOIlq5FLzW1+t6kPiHFwHX2D56cswNpLB+ZxcH61EOhOPRIfy3Uz?=
+ =?us-ascii?Q?nlQJ1LQsNVKMdN7aCUYbIZlkz828Bj8H2dcZO1Nv5KBR19V/RIVi9AY3KR+4?=
+ =?us-ascii?Q?LTZG3EoYqRHw8h4l75PcmihFbxdziN587puZZx1kQBC0A4okyVrt2Jcy1lYc?=
+ =?us-ascii?Q?MFxAdhJp1ae7bgIW0IvqCFSjXdwc7TaIYs2yjWEHuZp3o4dL1DEh0mFO/72F?=
+ =?us-ascii?Q?BDXeHUJe3I2KiGxuOMl2TcwaaweF6dtm8BbMNhbGvUSK21V+z4aICyOaHU7o?=
+ =?us-ascii?Q?AnBAeUfeP0LQaiRpMG8fovURn97eQEuS4+y17kbqBZnI99PPdAH+jQILk4ey?=
+ =?us-ascii?Q?vh2sc7lQzkh3Y+kwmS6AQeUo/zbdHZ85hsDRKkZuMqo7JjSLTFdlFa2g8VGb?=
+ =?us-ascii?Q?JQEv/Dy7E0MteETNYjrjrZFCyScVpAtF5Z5TtDwFiYS0JV1gJ6pSapZvRxE2?=
+ =?us-ascii?Q?DdJR0nYSclqeoxwArI20mkys62UEO0Fzp8tNaCz10ZZkVuoQHQVaZqPfQVvc?=
+ =?us-ascii?Q?Izd+jtNHxrY3SAftkp3e1Uj2QnmBa661tTCoh83GlGSuoHcbIoTTt1wHh6ei?=
+ =?us-ascii?Q?Jweqt1BSWjBAq7yLGgmwkajSS837MaCrwYtsy8/z//1FankLF0UM/ZXS2xoz?=
+ =?us-ascii?Q?n4bgSqQ9S7FzNAIucHzbFTYywEDzyHiqt/pwd7YP4C+04BTx18PHdCML1yvy?=
+ =?us-ascii?Q?eRtleN5UXj9UHGM7sCuWJo2T?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ORAOUTGKeNzAwz2ap7VW0zV1BqEAzERV+cEJ9SbjhOkAyBuRfcELDiSPNGYq?=
+ =?us-ascii?Q?FuC5ms2KGRGrQxg3EYjExktt+qycUfPZpFHgYPj66GEuhYrpkRxHRUfkOucB?=
+ =?us-ascii?Q?G/Rgrf5F0qxSjeCawWAs4Qdh4Q5uWgC1c2+eT5xMZNqxhH2PNF7SUzn5Ey50?=
+ =?us-ascii?Q?kiGOKqXkpZkUrwRXsWDYL++IwizEcNnag1Si3brPZn5tCTfClqTbC53tAFgx?=
+ =?us-ascii?Q?mepa0/QJz2NhBQ79nDKvF1cIFfOojC+DV/7yfG8wkfIJKzWf+0rXY8OthxER?=
+ =?us-ascii?Q?+h5VGwHjaKgkvITapjB6CFcMqm8khoTvp8tuAre/2tA1aY63qCoGR6uayAHh?=
+ =?us-ascii?Q?epXtdHkN+PFSHsc4g5aPD/KFVloelTcMbUE0ctXM+SOcOKclpsAU7CfDSk5W?=
+ =?us-ascii?Q?YMSfBXBL6lPXbNBkIdCKtByaRh+q3xAOh+0e8dnzTVwSQgDOYW2/jeGdYt9D?=
+ =?us-ascii?Q?Jt4scfxJP/3yPcqGfsj13oTlr9rdMMUAqWICXbIwtIlpIkCD2vvgoQRzbhBh?=
+ =?us-ascii?Q?QSDm1Nrc0di4bcTfFdfm1LOKZI/XsuuYRpD5UUcOrBAfdcBL3bAk3aiRQYGa?=
+ =?us-ascii?Q?IcWQxDnV78kqgiVFIy8qDgf8qhHI09BetNv6c5gAuZPtGxEkF0xmnaDO41Rj?=
+ =?us-ascii?Q?q8zXKQ+UfGRvyJ4EJGFfPBjp4uALY/rdy+poNdXckIf7NS804IGVnguLn+0O?=
+ =?us-ascii?Q?LwGGXcCSXiMVOubdy3esUwKgX8qxc5iQiEbGLP0M6klc8qqHXaHvErnDmlW5?=
+ =?us-ascii?Q?bTUnfXVSi0iM3LipqthwptTPoQBeubaJacBqwwv61Mnm+NGK8F8H7W7NVdSs?=
+ =?us-ascii?Q?qS8mZ4sMlJ7JEe+dIeIQD23zXBZjisquF7xDdJs9O0Y6l5DMuuNZ4l1cppjt?=
+ =?us-ascii?Q?0TcZJ4Blqh7u4Dd5kNPQZuSA2+cfmTrWZuJCp5u7Clfd+2Nyq9y5ezu9+zcs?=
+ =?us-ascii?Q?CpjxTHpqKPxcYybvev1DfnsyBiNDMUrjYNrbsZ+/aWvYs7gnas0grBWQxda0?=
+ =?us-ascii?Q?SksGx+Xd5hDaiPdWWLQ95ZhFzO7IiFyD1gnSXqYd5FReEEl5/FYF11NZf1b+?=
+ =?us-ascii?Q?HqVzqWOqK9rK4HAOzVXcfBeUpwpSCSWcoAVXTfg+4VkY3dlfgW5HCbA54gkJ?=
+ =?us-ascii?Q?6DqDQ+0ASVQJYux/ctK+fkEkzjzIniYVJK/uCQhke4holoul7QY6TthVYi3G?=
+ =?us-ascii?Q?1H2KEK6uNNdpQckSO6K3VuJ/DjUqBaDoIaobdO6H1Hqrs4USNxy9sZcxtOD1?=
+ =?us-ascii?Q?4GHBfe5XIdv02RxVAz3301MYwzVjL4dpRh36R2wAHDMFoKkloykyO/WTEAtO?=
+ =?us-ascii?Q?2aqBvzowC/4Oi8c8tFpVg8hDL96FEVc+l95fR4SZpUJr84NCKQHA/Mf3rRJK?=
+ =?us-ascii?Q?N/QmrU7TnCKqG6D/ejQcqq/W1AolH1mkTqCzZX+gSL2o7j4NFZNWFPm30hgN?=
+ =?us-ascii?Q?cNe0HA6Ce6vtrpJXcx27+P+pK1KOhqruSETRpTmkR8q1ygabRf8tsvnfa7nc?=
+ =?us-ascii?Q?+FKIxL3mxz/d1+EpWpShUYJ5f7xJdWQye6GRwh5AWubVwFlz+I3RyuOUQmNZ?=
+ =?us-ascii?Q?cXgJZiBXwZRVJXm8lAxWdZ5Us67bEuUTiub6ovK8qTWLupPdk9yF2+54f70l?=
+ =?us-ascii?Q?zA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d3d14e6-9126-4136-e323-08dd08ade9a1
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2024 15:21:59.9836
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ItZz4rZ231IF67PUpofPGZdaMLyt3/jKlpvSVytvXfy33nkgwY5f2iKLdCt6Hk3pvlBrEfs4dMU8lhBQEwKNfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6861
+X-OriginatorOrg: intel.com
 
-Alexander Lobakin wrote:
-> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
-> Date: Sat, 16 Nov 2024 10:31:08 -0500
+On Tue, Nov 19, 2024 at 05:57:06PM +0800, Justin Lai wrote:
+> Add defines for hardware version id.
 > 
-> > Jakub Kicinski wrote:
-> >> On Wed, 13 Nov 2024 16:24:23 +0100 Alexander Lobakin wrote:
-> >>> Part III does the following:
-> >>> * does some cleanups with marking read-only bpf_prog and xdp_buff
-> >>>   arguments const for some generic functions;
-> >>> * allows attaching already registered XDP memory model to Rxq info;
-> >>> * allows mixing pages from several Page Pools within one XDP frame;
-> >>> * optimizes &xdp_frame structure and removes no-more-used field;
-> >>> * adds generic functions to build skbs from xdp_buffs (regular and
-> >>>   XSk) and attach frags to xdp_buffs (regular and XSk);
-> >>> * adds helper to optimize XSk xmit in drivers;
-> >>> * extends libeth Rx to support XDP requirements (headroom etc.) on Rx;
-> >>> * adds libeth_xdp -- libeth module with common XDP and XSk routines.
-> >>
-> >> This clearly could be multiple series, please don't go over the limit.
-> > 
-> > Targeting different subsystems and thus reviewers. The XDP, page_pool
-> > and AF_XDP changes might move faster on their own.
+> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> ---
+>  drivers/net/ethernet/realtek/rtase/rtase.h      |  5 ++++-
+>  drivers/net/ethernet/realtek/rtase/rtase_main.c | 12 ++++++------
+>  2 files changed, 10 insertions(+), 7 deletions(-)
 > 
-> Reviewers for page_pool, XDP and XSk (no idea why everyone name it
-> AF_XDP) are 90% time the same people.
-> Often times, you can't avoid cross-subsystem patches. These three are
-> closely tied to each other.
-> 
-> > 
-> > If pulling those out into separate series, that also allows splitting
-> > up the last patch. That weighs in at 3481 LoC, out of 4400 for the
-> > series.
-> 
-> 1500 of which is kdoc if you read the cover letter.
-> 
-> libeth_xdp depends on every patch from the series. I don't know why you
-> believe this might anyhow move faster. Almost the whole series got
-> reviewed relatively quickly, except drivers/intel folder which people
-> often tend to avoid.
-
-Smaller focused series might have been merged already.
- 
-> I remind you that the initial libeth + iavf series (11 patches) was
-> baking on LKML for one year. Here 2 Chapters went into the kernel within
-> 2 windows and only this one (clearly much bigger than the previous ones
-> and containing only generic changes in contrary to the previous which
-> had only /intel code) didn't follow this rule, which doesn't
-> unnecessarily mean it will stuck for too long.
-> 
-> (+ I clearly mentioned several times that Chapter III will take longer
->  than the rest and each time you had no issues with that)
-
-This is a misunderstanding. I need a working feature, on a predictable
-timeline, in distro kernels.
-
-> > 
-> > The first 3 patches are not essential to IDFP XDP + AF_XDP either.
-> 
-> You don't seem to read the code. libeth_xdp won't even build without them.
-
-Not as written, no, obviously.
-
-> I don't believe the model taken by some developers (not spelling names
-> loud) "let's submit minimal changes and almost draft code, I promise
-> I'll create a todo list and will be polishing it within next x years"
-> works at all, not speaking that it may work better than sending polished
-> mature code (I hope it is).
-> 
-> > The IDPF feature does not have to not depend on them.
-> > 
-> > Does not matter for upstream, but for the purpose of backporting this
-> > to distro kernels, it helps if the driver feature minimizes dependency
-> > on core kernel API changes. If patch 19 can be made to work without
-> 
-> OOT style of thinking.
-> Minimizing core changes == artificial self-limiting optimization and
-> functionality potential.
-> New kernels > LTSes and especially custom kernels which receive
-> non-upstream (== not officially supported by the community) feature
-> backports. Upstream shouldn't sacrifice anything in favor of those, this
-> way we end up one day sacrificing stuff for out-of-tree drivers (which I
-> know some people already try to do).
-
-Opinionated positions. Nice if you have unlimited time.
-
-> > some of the changes in 1..18, that makes it more robust from that PoV.
-> 
-> No it can't, I thought people first read the code and only then comment,
-> otherwise it's just wasting time.
->
-> Thanks,
-> Olek
+> diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
+> index 547c71937b01..4a4434869b10 100644
+> --- a/drivers/net/ethernet/realtek/rtase/rtase.h
+> +++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+> @@ -9,7 +9,10 @@
+>  #ifndef RTASE_H
+>  #define RTASE_H
+>  
+> -#define RTASE_HW_VER_MASK 0x7C800000
+> +#define RTASE_HW_VER_MASK     0x7C800000
+> +#define RTASE_HW_VER_906X_7XA 0x00800000
+> +#define RTASE_HW_VER_906X_7XC 0x04000000
+> +#define RTASE_HW_VER_907XD_V1 0x04800000
+>  
+>  #define RTASE_RX_DMA_BURST_256       4
+>  #define RTASE_TX_DMA_BURST_UNLIMITED 7
+> diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> index 26331a2b7b2d..1bfe5ef40c52 100644
+> --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> @@ -1720,11 +1720,11 @@ static int rtase_get_settings(struct net_device *dev,
+>  						supported);
+>  
+>  	switch (tp->hw_ver) {
+> -	case 0x00800000:
+> -	case 0x04000000:
+> +	case RTASE_HW_VER_906X_7XA:
+> +	case RTASE_HW_VER_906X_7XC:
+>  		cmd->base.speed = SPEED_5000;
+>  		break;
+> -	case 0x04800000:
+> +	case RTASE_HW_VER_907XD_V1:
+>  		cmd->base.speed = SPEED_10000;
+>  		break;
+>  	}
 
 
+This is new code added in the patch #2.
+I understand that you want to have those preprocessor definitions in a
+separate patch, but why does this patch have to be the last one?
+If you had included this change before the patch #2, you would be able
+to send the final version of the above code (with no intermediate
+changes).
+
+Thanks,
+Michal
 
