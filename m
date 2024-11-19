@@ -1,288 +1,126 @@
-Return-Path: <netdev+bounces-146221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516029D2513
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:41:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5606A9D250C
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12921281D43
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:41:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F3731F22D8C
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C728C1C9ED6;
-	Tue, 19 Nov 2024 11:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5ABD1C9EBF;
+	Tue, 19 Nov 2024 11:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="fq0Mz12l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DP0YiKqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2061.outbound.protection.outlook.com [40.107.247.61])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C161C9EBF;
-	Tue, 19 Nov 2024 11:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732016484; cv=fail; b=Aq6Ejpze8ltVUJB6/mTJ9o9d5P+/w/v5WRsQZdUr/W+W6mMVKe4+7cXZGJLYBr84JnjUS1eq1MkddS50a/5Xd3xzP3PEMQ7ttzk4z2qqXID8dCawS2b2x6jCHj+yoOMD0+Q9DXMTTgzOfBegk5jBCpQWWD5hc6AB9UFP6nXL7BE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732016484; c=relaxed/simple;
-	bh=bP3SWjoQiJ4ynOxJN64BOroPXNDPYAsL2qO0YuoaqsI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FWHaTSIt1vxBBXJfhC3ZZ4WbInjJ6GdmrfD/+qruNRGJ9ld80CMl9vbbPAv94rnMK/tx8NLAYPoUHww3ggmvik9dfDZRUPZqo3J8BEEJxVnaIL1Ckk96m9DiFRA8u2QyRn+lPbKY+9ShS/KkvlSxCABkurDQ2VjfbvDN1aWkpOg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=fq0Mz12l; arc=fail smtp.client-ip=40.107.247.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ipkLUPAHKlXYeskIuihr1yBNNDGwNBeEcfcpMvmDct6TPpjxnrerHCmH6sZk56ORvRxHFQQ0q/M8k8qzhgWmlEp/zOB6o1ofV3o27oPjRoNeVno4je2e2OcEp9ykLB5hOmCsj3/6HFJVv4kRsCLC9L/FL2PutdHh4akViwRoJkSqgdSfm7qzYWt4LJU5zFxCOm/ng9++diw5ctNIubbUl0BlNORBcJWTUYI6YBYcf3RsmOXn0CtarwJ2o2yfVCAKxwQ4JkyLqOyILuKn47E0VmDU7/nMuwmexZFDivTdNgDiI2DI5pyYawKxTl775yfPIX1/d1+Ek+P7Ssafbf+Trg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lXIf5BwEw/hX3T1sOfh4S/jA7b/0R+u462cbD/nIbGE=;
- b=kQmbcXDtOj00kxek1YuxRXaaqX4/lmfOWUN4qu7ObhdJz3oYsDm1lDfjsiqlGEiIWQKYxCKVdzdNMM1S+PqWC+F1Bcv0rUA7R9JdCXvqjpAV7ENZT713xiXLnhdpeF79a8g0FWRHLFG/aP8ybtuQlkgqApMA5gvtgQ3OcXviCt463vAIAm212iB/B/waEeLoIQA9iOYro3pVHzd5+EY5FtaotRnr7gbSyQelBCJqYPIpezTh46hiFA2XXcGrwRexOV8aJBHHWyu+CYzkJk1dKwhOZCUetBC8XfZfQWylbkObj0Q5aZoM+n7fmnj7cvA3yxhb7fvsLFqaGGc0SX2nDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lXIf5BwEw/hX3T1sOfh4S/jA7b/0R+u462cbD/nIbGE=;
- b=fq0Mz12larU50P/Px/tJXFJnKs176wgUbYnoVtNbsDPz4fbgOobjY+6eBuCPmlHhvWOsHMtPz77aP9prJb6XXl62KUEmRHSzY46w2R3XUDPrWFAZGvg8rpfF6+JiAvSHae8mMbj+PR2cBbqAFg8Ogac21X4ZimPwqYHAaMHjVY6GMyi8vW0I4Yg66yJ0UCA2NfNEwzlncjUiXkADM4PPFBLotr4ZvPvjUV9iyp+VB06q9+tGPVUzSjJTpVSdf9lQqANx9310DuNKfg+274NUqrz3VDTYfzE34KBj41O+DSwQqbX7h14gH3aXdcJjDKpG9eg86T/+qTHerOwE3PfGQQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from DU0PR04MB9251.eurprd04.prod.outlook.com (2603:10a6:10:352::15)
- by AM8PR04MB7409.eurprd04.prod.outlook.com (2603:10a6:20b:1c5::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.24; Tue, 19 Nov
- 2024 11:41:18 +0000
-Received: from DU0PR04MB9251.eurprd04.prod.outlook.com
- ([fe80::708f:69ee:15df:6ebd]) by DU0PR04MB9251.eurprd04.prod.outlook.com
- ([fe80::708f:69ee:15df:6ebd%6]) with mapi id 15.20.8158.021; Tue, 19 Nov 2024
- 11:41:18 +0000
-Message-ID: <9dcc883c-0990-41b3-ae9e-eb1afdabeb65@oss.nxp.com>
-Date: Tue, 19 Nov 2024 13:40:54 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
- lines
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Marc Kleine-Budde <mkl@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>,
- Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>,
- Enric Balletbo <eballetb@redhat.com>
-References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
- <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
- <57915ed9-e57e-4ca3-bc31-6405893c937e@wanadoo.fr>
- <bfa5200d-6e56-417d-ac3b-52390398dba2@oss.nxp.com>
- <f84991f7-66c6-4366-9953-b230761b6b7a@wanadoo.fr>
- <7a91c06f-6ea3-4262-82a3-9a1daf481f82@wanadoo.fr>
-Content-Language: en-US
-From: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-In-Reply-To: <7a91c06f-6ea3-4262-82a3-9a1daf481f82@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM9P192CA0004.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:20b:21d::9) To DU0PR04MB9251.eurprd04.prod.outlook.com
- (2603:10a6:10:352::15)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0946D1C876D
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 11:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732016468; cv=none; b=ogVmk/hNIyarh1Z1TW7jNUi0ELkZsOedbTomd6kWL/Rb5lUYF+WEnadQwQdO3t8fm6BPIc0t31OblaZGSdtL+QNBRGFm4bj92DT9MTvDyTVndOYOIzx8dTXdGoTI5BDkyTBsPz+F1TboVhv7ki3hhIsPBow4rAdSozbQRC37f/A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732016468; c=relaxed/simple;
+	bh=B6tGFGc/acnVM3Qye2kgK47gJP4agRKP+KzyCFDdH6g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G+CvjUNtItubCMn1lqwoaayd7PVPgiHNA6wiMnHc7ieb77/Zciy5kvoPnY/4VYSo3gxyHcUoVhF3RAwJ+il7PlM5BrS4qNfjf/+RayAsQFOdI1RC2dTZObeOEr7GJeaRlkWAC0xHbI+zuuE2R0ZF4l688CeflyvEaEDs05z++eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DP0YiKqT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732016466;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iSO7rRgJI8m9saV4ky7Ejp+AThjtq//l80mNHJPVY1A=;
+	b=DP0YiKqT9vOn2Ki/CuDdBcI4vNLQlYyC0HhEchXXBRlcCPRqFXY902rOpQo5uhSt38PBkI
+	fplbK59WdPawl/nCv63BVYWc8W+jV39WYO61MzoAovthhO7TnRzzfIy9BFj83Ufhpl5SM0
+	SUPTZ8V2mcJXcihng9jAwRdCsRuj8GM=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-UbBaoZb5OJ6hGyJXihS9sw-1; Tue, 19 Nov 2024 06:41:04 -0500
+X-MC-Unique: UbBaoZb5OJ6hGyJXihS9sw-1
+X-Mimecast-MFC-AGG-ID: UbBaoZb5OJ6hGyJXihS9sw
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6d425b9dedeso11152606d6.3
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 03:41:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732016464; x=1732621264;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iSO7rRgJI8m9saV4ky7Ejp+AThjtq//l80mNHJPVY1A=;
+        b=tcEsTpQbAvdPmVS0rx7qDuARdQvCCXivW5BKIZ5/FedsOvafunMB5omF4pQxYzmmYC
+         5aOIVCJxHk3nhK+wiVBPS7V7GE00J46vdjRbeyab5TIFn7ze7Ojgyd8W5byZzq8CJ9eH
+         j28jIEjYVThvd9+cNsKoPPf4ftuigWrVI41Pe3mXOt03O50iPl+tEMqUXWqB7yEoVXXL
+         QZGYGA4dfbpRBT8SG7X3drHJxTy+6FOp8IQ7jUxQQeUanejjozGslWd91Jf9yMKM7tqu
+         XON5U3hymMAq0pJ2PPAe0dDx1ywaNuOGv5RB6i8ImDWYOD0/sI6IPTs/DK2e/mp1SnRy
+         1HsQ==
+X-Gm-Message-State: AOJu0Ywg/SzxOONU1Cf6d/9Ffc+J+IPX25kceCyGx8bAxPhNZzwYl68J
+	dkw54i9ZmxTmgV7pkI55aidDz3Rv/Rb6brq0PMhcJZCo3DY2GlZQASNn5AqMrgKJ1QqxNipyAVi
+	J5f0OG9k4GfEW3e9BilEdPxxITGKl8m7GYxB8wHUfldud/+U2X7B9Vg==
+X-Received: by 2002:a05:6214:c65:b0:6d4:ab3:e19b with SMTP id 6a1803df08f44-6d40ab3e1abmr192732236d6.42.1732016464383;
+        Tue, 19 Nov 2024 03:41:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHSL+CvUXEPORupLRfcZC0IPSOYYNVWZYJtS4mmscYBrBcgg3M5ByxsUOZ5P6MeA/A9Dqar/A==
+X-Received: by 2002:a05:6214:c65:b0:6d4:ab3:e19b with SMTP id 6a1803df08f44-6d40ab3e1abmr192732066d6.42.1732016464058;
+        Tue, 19 Nov 2024 03:41:04 -0800 (PST)
+Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dc7ada9sm47266936d6.69.2024.11.19.03.41.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 03:41:03 -0800 (PST)
+Message-ID: <06940878-8a7c-441c-958b-7cd7e7408beb@redhat.com>
+Date: Tue, 19 Nov 2024 12:40:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR04MB9251:EE_|AM8PR04MB7409:EE_
-X-MS-Office365-Filtering-Correlation-Id: 248a8b72-3bf9-454a-a059-08dd088f1507
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YjBrQ0RiOEZrNWw3NUhiY1VuRzVFWmp5VW9kTkpiZ3oyMWhWMElna0JDM1kr?=
- =?utf-8?B?WjdNU0NMOFFJeXkwWUJ1NlpBVng2SDhFc2FLazNDZWc4MXk0VmZqQTNySldm?=
- =?utf-8?B?YkFSem5Ec3lnZEFNZUordm9GU0xvMW13aldZMkd0bmpHV0owaytIVi8zV0pB?=
- =?utf-8?B?STFCY0taME5UVXNxc3E5Z1VndlFlclpTMUpMQVM3ejZCSGN3MElBbmxXd29o?=
- =?utf-8?B?WHZxRWkxZ1NVd3FFbnhXbnJxQ0t5NHJlLzhud3NtQlNIdUNQVFNtY3l5RWVT?=
- =?utf-8?B?R3NNZ1pkZFFlMW5FdktqeGkzSFMvTEY3cG9qRE91MmxhTjB5dWNNMXJxaVRR?=
- =?utf-8?B?Qk1LdkZZWVhldUxXb1huYTdacHBCRlpRaDBQeGZmSGJuaThNSHlJbTlENTJ6?=
- =?utf-8?B?dlBVODY3K2pyaWprRFA5QUdMK0ZPa0IySmNDcmFDL3R3ZHdtUlR0ZzJrNE4w?=
- =?utf-8?B?N3cvS0Y5Ukp4bjBJalhOaXF0MEd0TlFjTnZQMjFQNnd1OXZkZUJKd1BsS1g1?=
- =?utf-8?B?QkJqbnRtUm5YQ3h0VDAxQnMzc2Fyc211L0NGREhMbmlRTVR4cmF4YWFOeVZU?=
- =?utf-8?B?MmFReFU3enl3WStQZGk1WDNidllYeEYrRGcyaE5EOWFRc1VFUTAxSng4b2Rt?=
- =?utf-8?B?SUVId2hJV3RKbVg0VGl3U3VJWWNVbE1xZm9ObjhzNzFCVkxaaXh2bVh0VnFu?=
- =?utf-8?B?ckNOa0kvTUJYaHhTOU56WGUwUnU3bGovSy9hYUduOVcvVi9PTUJZZUYvMzg1?=
- =?utf-8?B?d2g1eHNmL3hTTTBxNjlIcUlUNytUWmQ5NDVqT2JYV0tZT2wyQjVOdXBWZlc1?=
- =?utf-8?B?RU1SNW5wN0NNNFVXSHFEdWlSQ1h5ZVBBVS84a0dpalhJVC9Yd2E1eEJiYjN0?=
- =?utf-8?B?OFRZSnVLVEROL0JrdTdTcUNpVkVwVkc2d1hoTG15Ty9VdjJ2MEZtMWxrMi9k?=
- =?utf-8?B?ZW9md2N0NmlmeldVQTR2MmV1YWNFejVJcGh4S25IdzZWWWEzU0szTDBuRnZW?=
- =?utf-8?B?eUUwcGFMWkE3YkJjYjZ2UGNhU2kxNExBNWR1bWMyMFRJeEJlWWRXcElGWmFh?=
- =?utf-8?B?RURoRVNHbEpUVGZwVXVCbzNSbmpoVmRpR2wySUVUYm8rbVNETmVpVUVQSlRw?=
- =?utf-8?B?OGc1cnJ4MnFER3gvSHc5OEpYQURDS3Q2b1B3RjN2QW1FcWJrRlIzMUJtcndX?=
- =?utf-8?B?SUhOd2tBTUNBQmYxRDJHR2dQZStia2g3amN4Z2JLaFh2U1hPZWdYWXJSVVU2?=
- =?utf-8?B?WU92MjZOMzBLVk01eVZOamgyanNIRmhUZEM2bFVGUWFkUXBrNVZ5dG4yTzBT?=
- =?utf-8?B?RFY0VkVzK2YrT0dtdWN0UnZ3bVBtRlRXRFR1SFBQaDZLaml5UDZiYXBTUEZL?=
- =?utf-8?B?dXlvdjQzN0taeXF0aXpGYi9ianJMUkhXWXoySTROSDlQaFowMmhMNUwzN1Bi?=
- =?utf-8?B?QitWS1JjTms0Yk9aMDRiTWdMRUw1SjdKRnM3R0hXNllmYWxEVWdMaisvVE0v?=
- =?utf-8?B?NTkvd2k3RE5CbHJHUmtjeXJPb2NZTG5XQ3VPRTFyR20wOGZOeFBvKzIwMVd5?=
- =?utf-8?B?ZmpoKzBmVzBISXlpYTZBL1FiM2xXZUM5Vktzb25mOTR1c1NCc3l4SDhNUTVM?=
- =?utf-8?B?bjFlN0p2NlBLRklSSlRYQmNoSEJOT3V0MjMwbDJQWG1uZFNwZlFBQWV0bHdO?=
- =?utf-8?B?Um1Ja242bzdocForN2lDM3c5empPTi9Kb0V5b1Q4MWJ6UFJFc1lGZnhUbk90?=
- =?utf-8?B?bmZ6UlBFVlBzVUlyMFdueUx6bnBJU1NrbUlKV0xuUXhna2RQNDQraGZ4dHc3?=
- =?utf-8?Q?45E5nDx8cKDV9TWwdJjFuHxXhi1QMBCRuQQZk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9251.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SWVkL1FTVHUrTmkvTVBKUEJhSitFNEx2R21Odjh5WStzRWFvTllHbU9aQk1D?=
- =?utf-8?B?eW9HQitkQ0pIMFFPazBnakZQejhWblk4WjFyS0dwbUpmQWJhSWd6T1lFM1pL?=
- =?utf-8?B?Ky9aeGg4SXNkU1lJZ0Nudml3STVPQ2VXSW5VVkZLQngyYXdwL0ZlRTdhN0Nu?=
- =?utf-8?B?cDZncEIwYTRuZHR5Qk91cWY3NktWTlBuL0dMRDlKVmZGM3V3NHVsZ0VKSWg5?=
- =?utf-8?B?eHFWUDBWQXRTT1E5cXhQcEZZTW5tcmJrbWlFMys0eTJsU21EdDEzbkpuNGlu?=
- =?utf-8?B?S2x1a1l3RUFLYytXaHFwRHoyQXNtck1sMno1Qm1zdnlrN1Fsby9XRWIyV2Jr?=
- =?utf-8?B?THN1S1BjWm5hL1pHb3l5eUxNR0k2TmhLbTNlZVpTQzdTTVdJckZrWjZOWG1K?=
- =?utf-8?B?YWVpTTh6VjUzM3ViakVvc2d0cTJRRmd0dk54K3Q2V0hVM3YzRzV0eHlydWN1?=
- =?utf-8?B?WDN6amZSdWY3dGZMS2NGcEJJN3FrQmM4WXVDTUFycEZzNnc4WVRhUzZub2Jp?=
- =?utf-8?B?YWNFS1BOcGtsbTRHTld6ZXFpN0Y3SkdJeHFJbVk0MnVzTG9TYXJZQUxHSXNP?=
- =?utf-8?B?YkJzdmVzOU83aVlRM1Q1SzlUaHg5b3M5Zm9zRjAxeGFBcnVDR1hqTDFTUkpY?=
- =?utf-8?B?Z1EvOXpWMm5ISXZuRElIQytwN1hFdUpyemJSL0syc0lCbmdtOTI2eTd5eUpM?=
- =?utf-8?B?VGxLdHhPTmNTZlRPdkJGOFphVE5rKzNKTjlmcWVjcFlvdzJGaUVzVGVBTGsw?=
- =?utf-8?B?Yzg3bG5PRDNYdU1BQUhobGZoOGlCTmpzUEFPSlk2QVkxdU1CRENIbzRJTXZo?=
- =?utf-8?B?Y3pkYzBPOEsrU1pTSGFYbllVSkFSam1qbGZ6TGZqNTlHWlhHeGNjcTdKMlQy?=
- =?utf-8?B?azk3RFJoazJXQkRITmUyY21Bc05rNUJrbnpTeWs0d3hFeTkydmdndkl6bnNY?=
- =?utf-8?B?Z1ZSN0RqQ1pocW5KMGJaWkpobTY0STVrSWhsb1ZoZ0t5dGd5elZTS3h1WGgy?=
- =?utf-8?B?eVF2b3RxemtxZE5OcndZNTUwUHhJMmFaM2Vqb1BiZXF2M1ZNakJ2UDdrS3Jh?=
- =?utf-8?B?S1kyRjA0ajd1SmJISjZKekcxeFZYWFdFMlpLR3BSQkg2WHlDZFFVVUxZS3Zx?=
- =?utf-8?B?Wi9HclFWY3VOZnczVzNGYnFkTWlWTEJEWkFvTm1ub3hPTjRpQ2didDY2SlpH?=
- =?utf-8?B?dnlYbDZOTWl1enJ2UWtIZTI4Y3lIdUhuUk0vSjBCeDBwdytRZkoxZ1hmdzNy?=
- =?utf-8?B?UnlWVG0vdzYyRUpzZjRXN1UzOVJnemdWK0YxbnkwcllyQkRwODREYm9hNUs5?=
- =?utf-8?B?eXR3bUNOZlU4bHRINFB2eFI5bGxTSXdLRi9KanJ2cE5Jd2srdmN1MGRWSC9F?=
- =?utf-8?B?OExYZk5lWlRRbThsNVZZWnZITzdFWmtsRXhhSjdReVd0a1JqdE42ZnJscVBu?=
- =?utf-8?B?WTlWcXpFWEtKVTgrdUVtTzNBbmdPM210RHgrVFJ5ZHdBNEVNR3BIekgzWWsx?=
- =?utf-8?B?ZDFQclVTbVlIakh4Q0drcm1VanZ6d0cxWWk4cnpHbG5oaWROOVJxdE95TFB6?=
- =?utf-8?B?VjlGTnR4N29GTUZOVXFzbVJJQlhjUWxXMFhDWlpBZ2hwS2E4VzZHNmZZaWJs?=
- =?utf-8?B?Mkg3K0RRWDJqZytEUG9KczRDNXIwSWZkUDZMdzNBYnowdnhpSHJreit3ODNZ?=
- =?utf-8?B?SFVwcHBiUFJQTTJLQjZSWXJCcWMySkJDRlAvNEU3dzRyY050eC9XdVVaRGFF?=
- =?utf-8?B?YlpEY2pya1NSa1B3aU9WMWJqeUhBcEJ4SHN3bk9VUGFTK0NKNU5hbXU0dDV3?=
- =?utf-8?B?YzZPWGhzY3RxdGR5N0J2UThPS3FURnBCa3JDR0Q1L0xPUXNSZUtyUldsMU1O?=
- =?utf-8?B?M3V5TzdlR29jNkhnTDMvNTNZN2ZMRXN0WGFBQk9FWVllT1c2d3Z4bVJXdXA2?=
- =?utf-8?B?eFlTWDdiYk9iZFB2VG5zcWdvMzdBS0N4NGZZSWVGc3Y5aFlyd2huN2FvYmo4?=
- =?utf-8?B?blhTV25kamEzbkIyY3k0TWdZZVJwQ25PUFFQZzVNbTNsRnFHRzk3VklmYmpG?=
- =?utf-8?B?MU9JVW4zcTVpeUkzL3BGS2JWeCtWNEF4T3ltMWxZUjJ2N1Z0NnNQcDFoT28w?=
- =?utf-8?B?ODhRdHZkNS9jM0piNVVLWkxsNmZrK2VoUFRxUDBsQ2IzOURrRUpiQUpLVm9l?=
- =?utf-8?Q?HCpbtABHucsKRdQaV4FHVHE=3D?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 248a8b72-3bf9-454a-a059-08dd088f1507
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9251.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2024 11:41:18.5741
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1/a5BHuHo9e+FUSkW50hYanlitBHxwnr1XdKiTFTur7Ud6wSc5EBs1ngu0w5Hex+zALQN5YKsp+wlFPokqMsFX8Jiqd0kWWd02Vc3liXHwY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7409
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] mm: page_frag: fix a compile error when
+ kernel is not compiled
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: netdev@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ Alexander Duyck <alexanderduyck@fb.com>, Linux-MM <linux-mm@kvack.org>,
+ Mark Brown <broonie@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241119033012.257525-1-linyunsheng@huawei.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241119033012.257525-1-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 11/19/2024 1:36 PM, Vincent Mailhol wrote:
-> On 19/11/2024 at 20:26, Vincent Mailhol wrote:
->> On 19/11/2024 at 19:01, Ciprian Marian Costea wrote:
->>> On 11/19/2024 11:26 AM, Vincent Mailhol wrote:
->>>> On 19/11/2024 at 17:10, Ciprian Costea wrote:
->>
->> (...)
->>
->>>>>    +    if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
->>>>> +        err = request_irq(priv->irq_secondary_mb,
->>>>> +                  flexcan_irq, IRQF_SHARED, dev->name, dev);
->>>>> +        if (err)
->>>>> +            goto out_free_irq_err;
->>>>> +    }
->>>>
->>>> Is the logic here correct?
->>>>
->>>>     request_irq(priv->irq_err, flexcan_irq, IRQF_SHARED, dev->name, dev);
->>>>
->>>> is called only if the device has the FLEXCAN_QUIRK_NR_IRQ_3 quirk.
->>>>
->>>> So, if the device has the FLEXCAN_QUIRK_SECONDARY_MB_IRQ but not the
->>>> FLEXCAN_QUIRK_NR_IRQ_3, you may end up trying to free an irq which was
->>>> not initialized.
->>>>
->>>> Did you confirm if it is safe to call free_irq() on an uninitialized irq?
->>>>
->>>> (and I can see that currently there is no such device with
->>>> FLEXCAN_QUIRK_SECONDARY_MB_IRQ but without FLEXCAN_QUIRK_NR_IRQ_3, but
->>>> who knows if such device will be introduced in the future?)
->>>>
->>>
->>> Hello Vincent,
->>>
->>> Thanks for your review. Indeed this seems to be an incorrect logic since
->>> I do not want to create any dependency between 'FLEXCAN_QUIRK_NR_IRQ_3'
->>> and 'FLEXCAN_QUIRK_SECONDARY_MB_IRQ'.
->>>
->>> I will change the impacted section to:
->>>      if (err) {
->>>          if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3)
->>>              goto out_free_irq_err;
->>>          else
->>>              goto out_free_irq;
->>>      }
->>
->> This is better. Alternatively, you could move the check into the label:
->>
->>    out_free_irq_err:
->>    	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3)
->>    		free_irq(priv->irq_err, dev);
->>
->> But this is not a strong preference, I let you pick the one which you
->> prefer.
+On 11/19/24 04:30, Yunsheng Lin wrote:
+> page_frag test module is an out of tree module, but built
+> using KDIR as the main kernel tree, the mm test suite is
+> just getting skipped if newly added page_frag test module
+> fails to compile due to kernel not yet compiled.
 > 
-> On second thought, it is a strong preference. If you keep the
+> Fix the above problem by ensuring both kernel is built first
+> and a newer kernel which has page_frag_cache.h is used.
 > 
-> 	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3)
-> 		goto out_free_irq_err;
-> 	else
-> 		goto out_free_irq;
-> 
-> then what if more code with a clean-up label is added to flexcan_open()?
-> I am thinking of this:
-> 
->    out_free_foo:
->    	free(foo);
->    out_free_irq_err:
->    	free_irq(priv-irq_err, dev);
->    out_free_irq_boff:
->    	free_irq(priv->irq_boff, dev);
-> 
-> Jumping to out_free_foo would now be incorrect because the
-> out_free_irq_err label would also be visited.
-> 
+> CC: Andrew Morton <akpm@linux-foundation.org>
+> CC: Alexander Duyck <alexanderduyck@fb.com>
+> CC: Linux-MM <linux-mm@kvack.org>
+> Fixes: 7fef0dec415c ("mm: page_frag: add a test module for page_frag")
+> Fixes: 65941f10caf2 ("mm: move the page fragment allocator from page_alloc into its own file")
+> Reported-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> Tested-by: Mark Brown <broonie@kernel.org>
 
-Correct, moving the check under the label would be better. Thanks.
-I will change accordingly in V2.
+I'm closing the net-next PR right now, and we must either apply this
+patch even on short notice or reverting the blamed series.
 
+As this fix should not cause any more conflict than the original series,
+looks reasonable to me and has been tested by Mark, I'm going to apply it.
 
-Best Regards,
-Ciprian
-
->>>>>        flexcan_chip_interrupts_enable(dev);
->>>>>          netif_start_queue(dev);
->>>>>          return 0;
->>>>>    + out_free_irq_err:
->>>>> +    free_irq(priv->irq_err, dev);
->>>>>     out_free_irq_boff:
->>>>>        free_irq(priv->irq_boff, dev);
->>>>>     out_free_irq:
->>
->> (...)
-> 
-> Yours sincerely,
-> Vincent Mailhol
-> 
+/P
 
 
