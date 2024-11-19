@@ -1,124 +1,114 @@
-Return-Path: <netdev+bounces-146259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BABDD9D2850
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:37:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 094F79D2868
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68F511F216DD
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:37:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2F2E28386B
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4139E1CCEE1;
-	Tue, 19 Nov 2024 14:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277591CEEA5;
+	Tue, 19 Nov 2024 14:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="ea30Z+f/"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="T+Skah1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34AAE57D;
-	Tue, 19 Nov 2024 14:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7527D1CBEAD;
+	Tue, 19 Nov 2024 14:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732027051; cv=none; b=APrUCw4EHSzk4/kmt84HN89uFew9hYNUvwzUptTitE3kjrRG58PM5YYdWYPwsVpqqO3DszWFIj9+YZzo0hvvdcn91ym/mHS+fQyHTYE5VlSkYlEhIJvBxu3RoluY/3xfyBkwHrRE8Q/EzkhkTk68GaYCbtnYQ3BAcBPGtQIUW1c=
+	t=1732027373; cv=none; b=fIlajtE0XDUdHgeO0jqZuBxe2+J/OWnPiE3cb1WcNn4+Zdr6768IRkUiwDoti+VIdfi6NiShosqjeV0R9YnH8dE9hZplGayQulmciVWup/b8yI9WJvdx9IAepadB5LdcOWZKNuwdZyUajFk1r/9VdRXo8JRMDtRnH8G6nG9fTXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732027051; c=relaxed/simple;
-	bh=eFlAIRQOqdtMQ86+sZD38hKpZm2bIwb7xLJUaTtTn94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dAUbqmZ3isnkpgvLC6TxlwG19janbkfwjbYYroygG0YNQbGpWO4ma/1zWkHYdLFtNQq6JjpiJixApGxdmxzLB3nt2Tio7ITHj6O3x8tbWi89Z6NjUegT4lTfwj4pUrnxCaZ2Y7JjYk9AGLw8emP+nI54o2QHNTzZJTAJvp9V2YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=ea30Z+f/; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=D9+QT/PGS7TNywt2V5GvWPp0z/RDdp7emmM5ESDUzdg=; b=ea30Z+f/yyDdDbUYNySDZ+u9gt
-	DhDZP1ZwNTOKp91YVMeM06M7lliHi/hSiMDLj7Qykf7LjXucE+eNwapyPxHDsuHeQq+FIxX1ieh2S
-	oynuuq7thdxh9lFkFu4d2vtwoA4oFahrr2I6cAnXDAXjPcVdCF8RkU2bUREDWqInwtx7wqAQv17kh
-	EiPO5N+YwVK4Caso1gJKQ27e1OZWw9Q0HBQ6H888jT8ZLV5FbuPFq+8ZpKfMVX9Uw9e7E+OmbMciF
-	NeQPyGzAjj0Hbi4V82PH4nNUqQyrGRNI5BuC9jd2XpD0TQj31dUril7ZmGu8e0ThNX4r46IHeL7lk
-	JBHC8CYw==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1tDPM3-000000002ZO-15PU;
-	Tue, 19 Nov 2024 15:37:23 +0100
-Date: Tue, 19 Nov 2024 15:37:23 +0100
-From: Phil Sutter <phil@nwl.cc>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Florian Westphal <fw@strlen.de>, wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 net-next] selftests: wireguards: use nft by default
-Message-ID: <Zzyio98xh1GN08wN@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Florian Westphal <fw@strlen.de>, wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241111041902.25814-1-liuhangbin@gmail.com>
- <ZzpNXM17NX3nVzMl@zx2c4.com>
- <Zzw8rb202R6FWVHs@fedora>
+	s=arc-20240116; t=1732027373; c=relaxed/simple;
+	bh=hrOJnp6uw/S7AuyjkakdDSA5Zg13TNT4jJ6P95hU7JI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EDtkBINshaeO7Yl7vcA4GdXAUTthZDNvz1LtiLnAsDEg7yuirUgmUfZt7j6iDc366NpbTPm2TMh3t8SHroKRL4bL9svwhSDkdjYv0NgBTWbkLKKLoCtjXjRop/cTML1IEOgwJNo5V3bu4K/4GvlGhr8OR2mkaHQktKKpPIVs3+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=T+Skah1F; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 620B2403E5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1732027370; bh=S7Mai6xFGBYX5PLF0oowGY9tbWsB+DPe1mZxbg4En+o=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=T+Skah1FkKdt0HwItZfkgqz0YLC5XTymeP4Oz+Q/qvhI4hpIZEEnUXyf/iD67yZHd
+	 qmSL4sp9T2i/m30/zSVP/Bqk44q/QL269v7OR0w9w82+RAzrKzfCRX5pk37fZcELdX
+	 jGJJyzEzNwgOfDaZYSxXzDhFzAfxjLeqZCWTz161GAjQsn4OaBJJZqw9dzwBQWEufW
+	 vGBSNBqHtMAKy/jGSaSWddASbH+x3j/T6H5RjOe99PzgAGlRaov4kIrzmR97L4I4jb
+	 9Z6yQfQ+mqGCT0gTLzMSXyzSYQL40RS7agcP1gygRdtEd9Ygm8xhkdfdjVP657Jebu
+	 kiZh3BQdMQsnA==
+Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 620B2403E5;
+	Tue, 19 Nov 2024 14:42:50 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Jakub Kicinski <kuba@kernel.org>, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, pablo@netfilter.org, richardcochran@gmail.com,
+ johannes@sipsolutions.net, loic.poulain@linaro.org,
+ ryazanov.s.a@gmail.com, dsahern@kernel.org, wintera@linux.ibm.com,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, jhs@mojatatu.com,
+ jiri@resnulli.us, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
+ netfilter-devel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] net: reformat kdoc return statements
+In-Reply-To: <20241118163308.318d8a6b@kernel.org>
+References: <20241115163612.904906-1-kuba@kernel.org>
+ <ZzjHH-L-ylLe0YhU@shell.armlinux.org.uk>
+ <20241118163308.318d8a6b@kernel.org>
+Date: Tue, 19 Nov 2024 07:42:49 -0700
+Message-ID: <87v7wjffo6.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zzw8rb202R6FWVHs@fedora>
+Content-Type: text/plain
 
-Hangbin,
+Jakub Kicinski <kuba@kernel.org> writes:
 
-On Tue, Nov 19, 2024 at 07:22:21AM +0000, Hangbin Liu wrote:
-> On Sun, Nov 17, 2024 at 09:09:00PM +0100, Jason A. Donenfeld wrote:
-> > On Mon, Nov 11, 2024 at 04:19:02AM +0000, Hangbin Liu wrote:
-> > > Use nft by default if it's supported, as nft is the replacement for iptables,
-> > > which is used by default in some releases. Additionally, iptables is dropped
-> > > in some releases.
-> >  
-> > Rather than having this optionality, I'd rather just do everything in
-> > one way or the other. So if you're adamant that we need to use nft, just
-> > convert the whole thing. And then subsequently, make sure that the qemu
-> > test harness supports it. That should probably be a series.
-> 
-> Hmm, try build nft but got error
-> 
-> # make -C tools/testing/selftests/wireguard/qemu/
-> make: Entering directory '/home/net/tools/testing/selftests/wireguard/qemu'
-> Building for x86_64-linux-musl using x86_64-redhat-linux
-> cd /home/net/tools/testing/selftests/wireguard/qemu/build/x86_64/nftables-1.0.9 && ./configure --prefix=/ --build=x86_64-redhat-linux --host=x86_64-linux-musl --enable-static --disable-shared
-> checking for a BSD-compatible install... /usr/bin/install -c
-> checking whether build environment is sane... yes
-> ...
-> checking for pkg-config... /usr/bin/pkg-config
-> configure: WARNING: using cross tools not prefixed with host triplet
-> checking pkg-config is at least version 0.9.0... yes
-> checking for libmnl >= 1.0.4... yes
-> checking for libnftnl >= 1.2.6... yes
-> checking for __gmpz_init in -lgmp... no
-> configure: error: No suitable version of libgmp found
+> On Sat, 16 Nov 2024 16:23:59 +0000 Russell King (Oracle) wrote:
+>> On Fri, Nov 15, 2024 at 08:36:12AM -0800, Jakub Kicinski wrote:
+>> > kernel-doc -Wall warns about missing Return: statement for non-void
+>> > functions. We have a number of kdocs in our headers which are missing
+>> > the colon, IOW they use
+>> >  * Return some value
+>> > or
+>> >  * Returns some value
+>> > 
+>> > Having the colon makes some sense, it should help kdoc parser avoid
+>> > false positives. So add them. This is mostly done with a sed script,
+>> > and removing the unnecessary cases (mostly the comments which aren't
+>> > kdoc).  
+>> 
+>> I wonder about this... I suspect it's going to be a constant battle to
+>> ensure that docs use Return: or Returns: because it's not "natural"
+>> when writing documentation.
+>> 
+>> Maybe the tooling should accept a sentence starting "Return(s?)" and
+>> convert it to "Return(s):" in generated documentation?
+>
+> I missed this merge window, so we have time, let's ask Jon.
+>
+> Jon, do you have a preference on making the kernel-doc formatting
+> accept "* Return" without the colon? vs fixing all the mis-formatting?
+> Looks like we have roughly 100 of those in networking headers 
+> (just counting those under include/).
 
-You may find proper details about the failure in config.log. My guess is
-the cross build prevents host libraries from being used. (No idea why
-your manual call works, though.)
+I guess my preference would be to fix the comments and keep the tighter
+rule for the format.  It's not something I feel hugely strongly about,
+though, so I don't think I would try to block an attempt to go the other
+way.
 
-> But I can config it manually like: ./configure --prefix=/ --build=x86_64-redhat-linux --host=x86_64-linux-musl --enable-static
-> --disable-shared correctly
-> 
-> Do you have any idea?
+Thanks,
 
-You may just pass '--with-mini-gmp' to nftables' configure call to avoid
-the external dependency.
-
-Cheers, Phil
+jon
 
