@@ -1,62 +1,67 @@
-Return-Path: <netdev+bounces-146083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCC8E9D1E9A
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 04:06:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FCC9D1EA1
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 04:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41B1EB20AAD
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 03:06:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED97028313E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 03:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F394013C9A4;
-	Tue, 19 Nov 2024 03:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51568145348;
+	Tue, 19 Nov 2024 03:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SgfqhXwp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGWzVf9f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97E4C2C9;
-	Tue, 19 Nov 2024 03:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB7D13775E;
+	Tue, 19 Nov 2024 03:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731985580; cv=none; b=P7pVwqxOuGt5y020IBP9mTCcIKb3gzcUDyQB7SJ0qM5KP/GY0t+2dXxaelXweNEOgK/8y4wReQuI07D0f0C8+LGKQsig8tLF9Icp0jMojsYbgR25T3wOzNrhTxDoGZPPqJTGq78K/U5wQkwCKuIvA1JtFytS6s7rAuTgAAPhRYQ=
+	t=1731985623; cv=none; b=J/nYG2R5emdrf/B6Qxy3Dl2KSYZ4F9NsyllYHkj7yoySGJR7DnYpoPij/1OiRvUaD+7+RsN3Mk2Fe3116qE2u/q0oL0QshQqpQvBEZiBqGmp9S4Tl9TJs9gSJ+wjbd+WZO1Irjked3EPtpg5MZXfnx2PwkrIcT8JwpVf0UCHdyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731985580; c=relaxed/simple;
-	bh=ZFh8d7e1KJXfSxhw1u6k7njlwVEal78ah60HtzMn0fs=;
+	s=arc-20240116; t=1731985623; c=relaxed/simple;
+	bh=PGoG8fEB7llM322/jpcOwn3LGAi0gafsk5SM9vL39KQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mUFPeNy+HKmFSK4uIVTBMmygcl81SSLkTx/EJobDzykJ4Op27uxHahPfGUDN1tioYOQ55DFfBmiDR1svsWKyyykwnPOUM1XZdy7s/TgVE6haNfqSvEU9mHyjKDNtv4adMhm0YKMFkdyPEQO/TTCcORELAgtAh9iSfGBsT14WhNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SgfqhXwp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DBB3C4CECF;
-	Tue, 19 Nov 2024 03:06:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=H9KUdDdg2Pywl0c/wAu2E7DH5nMKCEX8sNTgvGUmZ/DWaNLS+RDwx9R/DRSGoVlKnr9uib+00w3veqmIB97V8s7WNkAk2YMIr03I8FHs3J45z8Km4wqwr6mRNvA6Gl9VV940/X9STBtscGXroR0mjpZ3XmSFmzGBhnVJ2yyKl18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGWzVf9f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAD48C4CECF;
+	Tue, 19 Nov 2024 03:07:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731985577;
-	bh=ZFh8d7e1KJXfSxhw1u6k7njlwVEal78ah60HtzMn0fs=;
+	s=k20201202; t=1731985622;
+	bh=PGoG8fEB7llM322/jpcOwn3LGAi0gafsk5SM9vL39KQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SgfqhXwprt9DoJrZEk/vD0l84p1yH4uOa2IrWPQylZhZuPI7LSz8PcDZJVDuWIaRq
-	 GJxR8d3ZKYCuZQYfKHPtVX46Fgz+YI4XUxiZHTMcxSq6uzds/BCy1rUM2EpZ1uISDF
-	 wOVC603adkZghCq1J4QP31wkBiAiNTaj74ySu0tF9nlJGRcAG2HFkHLfPYqMz0//gp
-	 Jh0ZAofrrTBBkiPFal+pykB0KB6WgZNp1ZnplMzB3m0ga29hiZ9XRYQcsmLfV7D5Aq
-	 uE5eqOmGAma+Orv3uZAzoyvDDy2xWecmcTeZCMzulBclEj5gwbRw/MCICgCLP47VRU
-	 u33WqamQ3xu8g==
-Date: Mon, 18 Nov 2024 19:06:15 -0800
+	b=oGWzVf9fm47IURqF82sBjxlSLSQaSxQvnftln+sAaadyrOaTpKmG1QB1++Q+XtGq2
+	 iqnrNBO0CyTqqEwlU/q+011kC2hwIrbq/6K0SGXImw3qfRg1+XKGoOsssJ5vIMkYcz
+	 Z6YQRFxP4izqrZoqEbsdoy+taGRJqRWgfpsrekJKESn6nbT7e6NOHGhh6GN5IbeTmn
+	 lzthFeg7CnYNFnEs0XFbrLEZd2ql/Jl9IGwusT5cDv1Qr6Psf8Q5n6XqbkH/peqmPn
+	 uwk0TjN/tbOC/IkQ2CmF/L5xISUzVUBpQQlxdujGCk9lYUVk7IvT7QmP1ZZAPQtMkX
+	 AVNlOOjcQBmSw==
+Date: Mon, 18 Nov 2024 19:07:00 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Manas via B4 Relay <devnull+manas18244.iiitd.ac.in@kernel.org>
-Cc: manas18244@iiitd.ac.in, FUJITA Tomonori <fujita.tomonori@gmail.com>,
- Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <skhan@linuxfoundation.org>, Anup Sharma <anupnewsmail@gmail.com>,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-kernel@vger.kernel.org, Miguel Ojeda <ojeda@kernel.org>
-Subject: Re: [PATCH net-next v2] net: phy: qt2025: simplify Result<()> in
- probe return
-Message-ID: <20241118190615.350072d5@kernel.org>
-In-Reply-To: <20241118-simplify-result-qt2025-v2-1-af1bcff5d101@iiitd.ac.in>
-References: <20241118-simplify-result-qt2025-v2-1-af1bcff5d101@iiitd.ac.in>
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
+ Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
+ osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
+ linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+ linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 0/5] net: Improve netns handling in RTNL and
+ ip_tunnel
+Message-ID: <20241118190700.4c1b8156@kernel.org>
+In-Reply-To: <20241118143244.1773-1-shaw.leon@gmail.com>
+References: <20241118143244.1773-1-shaw.leon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,11 +71,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 18 Nov 2024 20:00:36 +0530 Manas via B4 Relay wrote:
-> Signed-off-by: Manas <manas18244@iiitd.ac.in>
+On Mon, 18 Nov 2024 22:32:39 +0800 Xiao Liang wrote:
+> This patch series includes some netns-related improvements and fixes for
+> RTNL and ip_tunnel, to make link creation more intuitive:
+> 
+>  - Creating link in another net namespace doesn't conflict with link names
+>    in current one.
+>  - Refector rtnetlink link creation. Create link in target namespace
+>    directly. Pass both source and link netns to drivers via newlink()
+>    callback.
+> 
+> So that
+> 
+>   # ip link add netns ns1 link-netns ns2 tun0 type gre ...
+> 
+> will create tun0 in ns1, rather than create it in ns2 and move to ns1.
+> And don't conflict with another interface named "tun0" in current netns.
 
-The Signed-off-by tag has legal implications, please use your full
-name.
+## Form letter - net-next-closed
+
+The merge window for v6.13 has begun and net-next is closed for new drivers,
+features, code refactoring and optimizations. We are currently accepting
+bug fixes only.
+
+Please repost when net-next reopens after Dec 2nd.
+
+RFC patches sent for review only are welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 -- 
-pw-bot: cr
+pw-bot: defer
+
 
