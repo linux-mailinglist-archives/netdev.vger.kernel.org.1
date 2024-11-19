@@ -1,128 +1,182 @@
-Return-Path: <netdev+bounces-146203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5279D23C8
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:48:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E03D9D23F0
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:52:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECBAC1F228F1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:48:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7D9AB23D21
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A061C3F26;
-	Tue, 19 Nov 2024 10:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02C91C68AA;
+	Tue, 19 Nov 2024 10:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DSAnGICn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="g7jWs5Et"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDE11C1ABC
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C569B1C302C
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732013264; cv=none; b=IdUmTePQzeh5IOV5QaPHfMgKFH/4xvMQstopDO2nMBGa4VNp7kF1a5uFdIrhO3DtDEnShLsCNGS5EA9EcPTFVBH78nvdui4roe234stE/ahezurvbys0Uo/QTqyXwL4lqef5PoFFeSmUQS2H5R7+ecvv4foevYPE0g6Lt6aUUzs=
+	t=1732013504; cv=none; b=ZYpJKMvTkSYpjj/inq5xynfB1wqbMz8UeTIseOzHKZqADOm+3QBzIxG9b3RqDwt/gSEEiZjxfjbopLyYIwLue3pWXdI2Hc9afS9Lj6ZGaVGCOjuE9hrE9RNI5ZqyCFIbHQpVZ+JZe6yTtts5LP3duHFOC0NIS4aGMTf2LXXCtWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732013264; c=relaxed/simple;
-	bh=6VCRFnCX3pfgj4fK4Xruwd8ELWuUcPyHUTVhmyFVH0s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TQZzvhbm6aQOQt4rxdTGwL03jgdLboNaj2beTcpiPIXQpjmDqrlaOLkC+0QsWi/tc84lOKBMjegomyx5BKqNsVdMxXH8zqERUx9rkF1GffejkoYZSBgpu940JfdP9bdXlSIfZpCdvkeDVT+ZTbRnkQeNK2OQOttGz5VwjTBMajQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DSAnGICn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732013261;
+	s=arc-20240116; t=1732013504; c=relaxed/simple;
+	bh=7iL1XS475ANJ2Yig/uM16IfiHC6nZNBpriUUEEf5IgI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=hM5dYumEnZEbnzGkNYl5LsRN0loMf3I/WukpX8b0XVF/1gjdcO87ZSJbqzsUE1Tz9/Ctt+Y5CQUImMLRmeEWsU/ihGAVBC7ak6O7Ipl0Sf+lkfN8r/nF81AqTrmcMqfjxmq9MPoCu4oTnis3x/uE3uIYDpfrnA9zunoD+ggefVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=g7jWs5Et; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C76940003;
+	Tue, 19 Nov 2024 10:51:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732013498;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lbq4GTD2ZW1VFhzZ9Ih2F0hJrIDKiy6HQqH3WOgrSvw=;
-	b=DSAnGICnYZ/LSDkTvNvW+0nc13xCmE67aGex7OjLGLZAQ1/4jbaZFEBL12NbizOsVM1GcU
-	+/5afBsrn7XzvTX07HTkGhicHrYSFz27gBSNyed00wbi6PAbNbvKSPn/cr214/vK7vS9z2
-	xr8Ikw0JjbycVwEELuPAh8+jAFMsca4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-151-SUW3VP67Njy-eY8ukiIGeA-1; Tue, 19 Nov 2024 05:47:40 -0500
-X-MC-Unique: SUW3VP67Njy-eY8ukiIGeA-1
-X-Mimecast-MFC-AGG-ID: SUW3VP67Njy-eY8ukiIGeA
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-431673032e6so33443075e9.0
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 02:47:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732013259; x=1732618059;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lbq4GTD2ZW1VFhzZ9Ih2F0hJrIDKiy6HQqH3WOgrSvw=;
-        b=KxBBXQOCxmoV78UQzNgpgvnxGOnAxA/Rdy53tZ44lXCFN/gubA9zPDFsCZQ6j+WVHN
-         ppjwLW7mUq9l+xHALl3Qy1efqsAFrDImt/oIFPM7NN4zqMc9/ya86Iq3IwOlEm+a2BDV
-         bjjwnbsrWErVQRuZAX+zwtLRt1tRMKSSkOyaptzBtX0Gs6frcMQQr1jNoWVgt76qR6cd
-         n91XptpXEF4cfAUhAKoQEJ9n7ZyHLqq/6sbk70XZC1jmHjIXC3DWa0boXUskUoOD9g7c
-         dJIlASKhv9lraqfRcf94XLp5nb/dtUO1+Cz8okyCx9kSQdMZDrKxRw+P62v6i3jvAaSt
-         n6+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXO3U3x9uAfUd/TXIPLp3Gvn7m1n1FOOaL+ywdKBcDWe5/Bwd6kmr9uyYLr9kvoucz4z2p5xbY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb5pBPWuH9+jX3mGQLHqo0rRiuVwBF4hb1PE4wH2+5OozwkscR
-	QsNx0eYue407s1MvHDUR4hWXNvJ2/cQhYVnG5ZPFB4Pz04kz1fLMqgltLssSja0UKDtME05fD4L
-	Oxv/FLqFI4gplLPpdRTskdcXa+aX2dUluUWAd8mqeHxycESX7S6DYgA==
-X-Received: by 2002:a05:600c:1c09:b0:431:5f1c:8352 with SMTP id 5b1f17b1804b1-432df71d609mr136397815e9.5.1732013259174;
-        Tue, 19 Nov 2024 02:47:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHXQU8bYBZyo+JtkpZZANf/ov31RNF5jrSGWsBbL2ftQ1DTgrFXVNSX9siT2RRWrGpE1HT9Bg==
-X-Received: by 2002:a05:600c:1c09:b0:431:5f1c:8352 with SMTP id 5b1f17b1804b1-432df71d609mr136397625e9.5.1732013258844;
-        Tue, 19 Nov 2024 02:47:38 -0800 (PST)
-Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38247d065c3sm5791778f8f.87.2024.11.19.02.47.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 02:47:38 -0800 (PST)
-Message-ID: <1bc6fbd9-aa04-4bed-b435-262edd8f2d37@redhat.com>
-Date: Tue, 19 Nov 2024 11:47:37 +0100
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tcr9GVLPIzHgr8P8T++QvQfJBYgYKFJrLFexketQXq4=;
+	b=g7jWs5EtUS++GXlmfLzywF7nz5JhWsOasBSkGYK0rRCtTyR21KyicwTcg+ivdkWjT85Tgu
+	CySW9fW/sQX/zQVCYtmDEC2H73RITriFFRfMm9MK1kQZkUcsvDdWAK0gGKxvhGq5ildXkH
+	OG+Qb7cWyUlE/cpE/Zn7i1be/6N4WTCPMP2LcsRdvMpolx4e2ye0hx52yZrCHQPYFNpKVD
+	gKangt9C8OTjX3TemmJuwM+HV4JiCspt5d7iPHJI95rFyeCxcJv56E/7VXosSDAC7KnlP4
+	XEguQ7o17QSH41hZ38GXiJt3wfViEFM1bFmYzTQ9kCMOby3JXf6TLX0lDbV00g==
+Date: Tue, 19 Nov 2024 11:51:36 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+ Russell King <linux@armlinux.org.uk>, Romain Gantois
+ <romain.gantois@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Kory
+ Maincent <kory.maincent@bootlin.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Moving forward with stacked PHYs
+Message-ID: <20241119115136.74297db7@fedora.home>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/4] net: ipv6: seg6_iptunnel: mitigate
- 2-realloc issue
-To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, linux-kernel@vger.kernel.org,
- David Lebrun <dlebrun@google.com>
-References: <20241118131502.10077-1-justin.iurman@uliege.be>
- <20241118131502.10077-4-justin.iurman@uliege.be>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241118131502.10077-4-justin.iurman@uliege.be>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 11/18/24 14:15, Justin Iurman wrote:
+Hi Netdev,
+
+With Romain, we're currently trying to work on the stacked PHY problem,
+where we'd like to get a proper support for Copper SFPs that are driven
+by a media converter :
+
+     RGMII       SGMII  +sfp----+
+MAC ------- PHY ------- | PHY   |
+                        +-------+
+
+This is one of the cases where we have multiple PHYs on the link, on my
+side I've been working on PHY muxes with parallel PHYs on the link :
+
+
+       +-- PHY
+MAC ---|
+       +-- PHY
+      =20
+Both of these use-cases share one common issue, which is that some parts
+of the kernel will try to directly access netdev->phydev, assuming there's
+one and only PHY device that sits behind a MAC.
+
+In the past months, I've worked on introducing the phy_link_topology, that
+keeps track of all the PHYs that are sitting behind a netdev, and I've
+used that infrastructure for some netlink commands that would access
+the netdev->phydev field and replace that with :
+  - A way to list the PHYs behind a netdev
+  - Allowing netlink commands to target a specific PHY, and not "just"
+    the netdev->phydev PHY.
+   =20
+On that front, there's more work coming to improve on that :
+  - It would be good if the stats reported through ethtool would account
+    for all the PHYs on the link, so that we would get a full overview
+    of all stats from all components of the link
+  - A netlink notification to indicate that a new PHY was found on the
+    link is also in the plans.
+   =20
+There's a lot more work to do however, as these user-facing commands aren't
+the only place where netdev->phydev is used.
+
+The first place are the MAC drivers. For this, there seems to be 2 options :
+
+ - move to phylink. The phylink API is pretty well designed as it makes
+   the phydev totally irrelevant for the MAC driver. The MAC driver doesn't
+   even need to know if it's connected to a PHY or something else (and SFP
+   cage for example). That's nice, but there are still plenty of drivers
+   that don't use phylink.
+  =20
+ - Introduce a new set of helpers that would abstact away the phydev from
+   the netdev, but in a more straightforward way. MAC drivers that directly
+   access netdev->phydev to configure the PHY's internal state or get some
+   PHY info would instead be converted to using a set of helpers that will
+   take the netdev as a parameter :
+  =20
+ static void ftgmac100_adjust_link(struct net_device *netdev)
+ {
++	int phy_link, phy_speed, phy_duplex;
+ 	struct ftgmac100 *priv =3D netdev_priv(netdev);
+ 	struct phy_device *phydev =3D netdev->phydev;
+ 	bool tx_pause, rx_pause;
+ 	int new_speed;
+=20
++	netdev_phy_link_settings(netdev, &phy_link, &phy_speed, &phy_duplex);
++
+ 	/* We store "no link" as speed 0 */
+-	if (!phydev->link)
++	if (!phy_link)
+ 		new_speed =3D 0;
+ 	else
+-		new_speed =3D phydev->speed;
++		new_speed =3D phy_speed;
 [...]
->  /* encapsulate an IPv6 packet within an outer IPv6 header with reduced SRH */
->  static int seg6_do_srh_encap_red(struct sk_buff *skb,
-> -				 struct ipv6_sr_hdr *osrh, int proto)
-> +				 struct ipv6_sr_hdr *osrh, int proto,
-> +				 struct dst_entry *dst)
->  {
->  	__u8 first_seg = osrh->first_segment;
-> -	struct dst_entry *dst = skb_dst(skb);
-> -	struct net *net = dev_net(dst->dev);
-> +	struct net *net = dev_net(skb_dst(skb)->dev);
->  	struct ipv6hdr *hdr, *inner_hdr;
->  	int hdrlen = ipv6_optlen(osrh);
->  	int red_tlv_offset, tlv_offset;
 
+   The above is just an example of such helpers, Romain is currently
+   investigating this and going over all the MAC drivers out there to
+   assess to what extent they are directly accessing the netdev->phydev,
+   and wrapping that with phydev-independent helpers.
 
-Minor nit: please respect the reverse x-mas tree order above.
-Also the code would probably be more readable with:
+   The idea here is to avoid accessing phydev directly from the MAC
+   driver, and have a helper query the parameters for us. This helper
+   could make use of netdev->phydev, but also use phy_link_topology
+   to get an aggregated version of these parameters, if there are chained
+   PHYs for example.
+  =20
+There are other parts of the kernel that accesses the netdev->phydev. There
+are a few places in DSA where this is done, but the same helpers as the ones
+introduced for MAC drivers could be used. The other remaining part would
+be the Timestamping code, but K=C3=B6ry Maincent is currently working on an
+series to help deal with the various timestamping sources, that will also
+help on removing this strong netdev->phydev dependency.
+  =20
+Finally, there's the whole work of actually configuring the PHY themselves
+correctly when they are chained to one another, and getting the logic right
+for the link-up/down detection, getting the ksettings values aggregated
+correctly, etc.
 
-	struct dst_entry *old_dst = skb_dst(skb);
+We have some local patches as well for that, to handle the stacked PHY
+state-machine synchronisation, link-reporting and negociation but
+it's still WIP to cover all the corner-cases and hard-to-test features, for
+example how to deal with WoL or EEE in these situations.
 
-and using 'old_dst' instead of 'skb_dst(skb)'
+Please don't hesitate to give any comments, remarks or point some shortcomi=
+ngs
+if you see any. We've tried to keep this mail short but we'll be happy to
+discuss any details. We're really looking for some feedback on that overall
+approach before sending any RFC, but of course if you prefer to discuss over
+some actual code we can move forward and send RFC code when it's a bit more
+polished.
 
-Cheers,
+Thanks a lot,
 
-Paolo
-
+Maxime Chevallier & Romain Gantois
 
