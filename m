@@ -1,113 +1,140 @@
-Return-Path: <netdev+bounces-146042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3AF89D1CD9
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:00:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E949D1CDB
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C802B21401
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:00:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF36A1F21B26
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6ABF34CC4;
-	Tue, 19 Nov 2024 01:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90544134BD;
+	Tue, 19 Nov 2024 01:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3jM89Q1r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPT3oONR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B323B20328;
-	Tue, 19 Nov 2024 01:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E012DA93D
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731978010; cv=none; b=T+nkriHsN/iqirDu7PvSrfDbUC4qZX1ywmZPKV2CmHbx+VveGNpXwSPZneB8Z7OXXR39g7UQaEgFO75lg3AneInMGoZcqT32suXlLVeB2Y6qXAFE3gItctPbIMMfUJPfvv7Y8dvztseMIol/jpeZoXOr9omY5jyLDHPwb8KdUng=
+	t=1731978079; cv=none; b=kcMqiDABIHGflxthsjIYIpSLqQlcHGbMHElUa0VXW/aq8dM7sHfpOE0fouvA2tzgP92YdpV1K/DJ+H0shM5gBGayacjqg7zrXhqrL29zwtdessIiByTUddiUhJ+lEL0QZvPiAgJuDouI+GYwxG7YBuO3hH3f1vwjhnest5g6DuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731978010; c=relaxed/simple;
-	bh=+YnG/FCxZp94SDKmGouq92sDGcy/8RbPvZOvOm3Mpts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Emd0a8/0vCAFcpsux2tRnCRVieZQjAZb9iuZ8Hn09iEr33OCMttzIHPv0yrxNed9S2ZZAIKIOAT3pmlLhk2kL6pZEgviFleknAPEcdcpmnFIntCFxlb9UMA/m/oKdsN9E3BKYjRiV/7kEzanvcchouwxeXwAhfIA+m0H9fyIJus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3jM89Q1r; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xySWq+GoYzDun91uVlEVQ1i2/eAkfhtKbJiC0a+d9TQ=; b=3jM89Q1rX/g8rqO/mJtBMQQbFE
-	qesK0GQlBUhRCDTUfHew7ib3HHikAuepx1ogjBbsOJKdswtGDsjLij3ePm8KwIXY86B4h7wazvUDj
-	r4o2jwdNDte2bw6qsCsDIyr94idpPNTvJMP6X7vHFkjMx5+x0yg/arxqHuLjQIFlZKaU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tDCaw-00Dj0f-SL; Tue, 19 Nov 2024 01:59:54 +0100
-Date: Tue, 19 Nov 2024 01:59:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Russell King <linux@armlinux.org.uk>, jacob.e.keller@intel.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v2 8/8] dt-bindings: net: sparx5: document RGMII
- MAC delays
-Message-ID: <5b9d79f1-ccdd-47c3-a02a-5ff0b12c1fb8@lunn.ch>
-References: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
- <20241113-sparx5-lan969x-switch-driver-4-v2-8-0db98ac096d1@microchip.com>
- <29ddbe38-3aac-4518-b9f3-4d228de08360@lunn.ch>
- <20241115092237.gzpat4x6kjipb2x7@DEN-DL-M70577>
+	s=arc-20240116; t=1731978079; c=relaxed/simple;
+	bh=Z702crGgqYVSufi49t0mOLqFv7022Qi8J5pQxh5xTgo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YqZzZ2YHBI7DsqNTNFSoHB0RTPRihSl9VXJeQsgTxmkoKXYmFNZL+8ypCBUmr4ge33YJgrecyrLD/tLvyTmEQGox1kNyZ6qOYuvS5f5LaBbNX6DxaaSLfUMi9okMncREB2C0dGz0HW9/Y29yO434KxthDp19J1v8ImMKM0bUUss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPT3oONR; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43161e7bb25so40282085e9.2
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 17:01:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731978076; x=1732582876; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1Dy+y/Sg7BxkuaJRt8lN8ekR1rY4pdHsedbh1qGx8MM=;
+        b=aPT3oONRdALV0fIsnr1yMFscc6zMd2ix7vE5W2CzIZP7m+QBvwGNUm809goPTwjeKz
+         hs+gaeJ8866SmEHVm6YY2A4zyDv7NaDaLPYnQAXyt4ifED4yOdD+clt6ZN2n8zXJQ389
+         k7PrSkjtm2YyGPipwy4ZMa4G3mcoG9avLT0+AMH6mn5YG06vwqt1oU55Lljuh9VeYMMn
+         eGVnDpOWcZXmxnSPcvnCVhkVg0+E9nvDEVd6pl1mjgb4sjjZhUhDfpT5WmG+12NTxpCF
+         TmsuV1rUsmKgJ7VKq+iXNHASm1UYfCWv8OD3gyqqXWNUX1f9SlPqr8KHsCM6kIL/7MZs
+         K9xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731978076; x=1732582876;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Dy+y/Sg7BxkuaJRt8lN8ekR1rY4pdHsedbh1qGx8MM=;
+        b=mEhi6hCGEJUQ8+tZ9a2FlPpHOz4fDAKlRbDVSyVHX3rI3dNGlAds/KtUUkqq12t8dS
+         YK+em7XmhQI2FjIeQb1GKik0eUmKC+3aWZeySTRZ5iEE0pfKMNT2yLeDnPgT2z9/hOM/
+         8qUvyGv1FIR0qdK1WlzDWubGBkDvSx2P3bxkaOt0y8kQrcK8oqH/mggZh4Ex7d/vFzaQ
+         FINaKryhqEbzfAYOSQIetGwCToH1SwBGpT0u53VPL4OiQWSsrYqDx3HK5+qPlDLGbgaQ
+         I67IjorWd/4I2YbIMypwG8BDZT1eQbY/ICJGDNqTXvn2560N7Lecw/liKPs+Bm8BcE4c
+         R7HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNAzpktL23Xpy83Uu2ZLKFWb+0UZkM2m1FNTtCgWnSTCh4n8WVjyFFoE6YlX0v1ymDQbVlUnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywlwh8B4ekCDk1IDDxdgbCI5HQJZ2qFnERz/1ZvIzdT0wOoEl2F
+	cUhAqPP6+gMD8X0IYFZ0s9w9ix3ACAE4/SdIWllQWH4gtWpIyxB5
+X-Google-Smtp-Source: AGHT+IEizM8QYmdo4n+yxWV+vTQ5NKdtCjht1TWjEzKwHsEwScR3M5pGs6mWJKIG4P+ZrrDw5YPuqw==
+X-Received: by 2002:a05:600c:190c:b0:431:55af:a230 with SMTP id 5b1f17b1804b1-432df798ea0mr108474025e9.33.1731978075857;
+        Mon, 18 Nov 2024 17:01:15 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab76dafsm172723215e9.10.2024.11.18.17.01.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2024 17:01:14 -0800 (PST)
+Message-ID: <7e5e2bda-e80d-46ec-816a-613c5808222e@gmail.com>
+Date: Tue, 19 Nov 2024 03:01:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115092237.gzpat4x6kjipb2x7@DEN-DL-M70577>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,v2] [PATCH net-next v2] net: wwan: t7xx: Change
+ PM_AUTOSUSPEND_MS to 5000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: wojackbb@gmail.com, netdev@vger.kernel.org,
+ chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+ haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
+ ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+ angelogioacchino.delregno@collabora.com, linux-mediatek@lists.infradead.org,
+ matthias.bgg@gmail.com
+References: <20241114102002.481081-1-wojackbb@gmail.com>
+ <6835fde6-0863-49e8-90e8-be88e86ef346@gmail.com>
+ <20241115152153.5678682f@kernel.org>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20241115152153.5678682f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 15, 2024 at 09:22:37AM +0000, Daniel Machon wrote:
-> Hi Andrew,
+On 16.11.2024 01:21, Jakub Kicinski wrote:
+> On Thu, 14 Nov 2024 20:54:20 +0200 Sergey Ryazanov wrote:
+>>> We tested Fibocom FM350 and our products using the t7xx and they all
+>>> benefited from this.
+>>
+>> Possible negative outcomes for data transmission still need
+>> clarification. Let me repeat it here.
+>>
+>> On 06.11.2024 13:10, 吳逼逼 wrote:
+>>> Receiving or sending data will cause PCIE to change D3 Cold to D0 state.
+>>
+>> Am I understand it correctly that receiving IP packets on downlink will
+>> cause PCIe link re-activation?
+>>
+>>
+>> I am concerned about a TCP connection that can be idle for a long period
+>> of time. For example, an established SSH connection can stay idle for
+>> minutes. If I connected to a server and execute something like this:
+>>
+>> user@host$ sleep 20 && echo "Done"
+>>
+>> Will I eventually see the "Done" message or will the autosuspended modem
+>> effectively block any incoming traffic? And how long does it take for
+>> the modem to wake up and deliver a downlink packet to the host? Have you
+>> measured StDev change?
 > 
-> > > The lan969x switch device supports two RGMII port interfaces that can be
-> > > configured for MAC level rx and tx delays.
-> > >
-> > > Document two new properties {rx,tx}-internal-delay-ps. Make them
-> > > required properties, if the phy-mode is one of: rgmii, rgmii_id,
-> > > rgmii-rxid or rgmii-txid. Also specify accepted values.
-> > 
-> > This is unusual if you look at other uses of {rt}x-internal-delay-ps.
-> > It is generally an optional parameter, and states it defaults to 0 if
-> > missing, and is ignored by the driver if phy-mode is not an rgmii
-> > variant.
+> He's decreasing the sleep timer from 20 to 5 sec, both of which
+> are very high for networking, anyway. You appear to be questioning
+> autosuspend itself but it seems to have been added 2 years ago already.
 > 
-> Is unusual bad? :-)
+> What am I missing?
 
-Depends. Having a uniform usage is good, it causes less confusion. But
-strict enforcement also has its plus side.
+Some possible funny side-effect of sleeping with this chipset. Like 
+loosing network connection and dropping TCP sessions. I hope that 20 
+seconds was putted on purpose.
 
-> I thought that requiring the properties would make
-> misconfigurations (mismatching phy-modes and MAC delays) more obvious,
-> as you were forced to specify exactly what combination you want in the
-> DT.  Maybe not. I can change it,  no problem.
+Suddenly, I don't have this modem at hand and want to be sure that we 
+are not going to receive a stream of bug reports.
 
-Do these ports only support RGMII? The general pattern is that ports
-supporting RGMII also support other modes, GMII, MII, rev-GMII,
-rev-MII etc. For these other modes RGMII delays are meaningless. The
-general pattern is that they are allowed in DT, but are just ignored.
-
-If the LAN969x ports only support RGMII, and you are enforcing the
-four RGMII modes in DT, you could also enforce the delays are present
-and only have all allowed values. But i would not have the enforcement
-any more strict than the other ports. Do you enforce the phy-modes for
-the ports with a PCS?
-
-	Andrew
+--
+Sergey
 
