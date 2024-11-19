@@ -1,92 +1,65 @@
-Return-Path: <netdev+bounces-146355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6CDF9D3055
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 23:14:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AB2F9D305F
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 23:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5023C1F24591
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 22:14:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3E2A283C52
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 22:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCCB1D4150;
-	Tue, 19 Nov 2024 22:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63C01D173F;
+	Tue, 19 Nov 2024 22:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNxHbz+G"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="PA49VzwL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D0B1D5CDB;
-	Tue, 19 Nov 2024 22:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C55319CC34;
+	Tue, 19 Nov 2024 22:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732054443; cv=none; b=dTmhn0gaqzEt6Uw69sImGukQr21V4/U3CV7UuebT6GC/v56j+aijFP67dNPgl/bpk28ZoCdyejS14d5mFuJE2+zZd8biu6Kc65QgdcJGU8TQM6nLFaMoasizY+WHrr/SpKm8oeCCqni/WnImhqRFpWoXBNuR2/f2THl6YOuVV58=
+	t=1732054919; cv=none; b=qQ9hKZehK3tWLbdvacz/FnjEnQ/QQ+u9+6svX3zJLFXkNKQ5GYDUvrZxoj2GUfyhFT/goKENMBuD2OSWNPP2kW4o3xRN5W5jYQK0wF17v5q8xs97wuJDS0rtr2HZsLvM52oJFYEb0dLLBk7ROG0DG6T2ON4f45Wl7mb0mJGrsl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732054443; c=relaxed/simple;
-	bh=lzP7Gvkcx/FmhvwQSpENog9t68uKeMkJZy5qk0I1338=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oKgL2QjJA58FLcsTW/n5e/plVKBr/jv43yjD0D6i8JnX4sGC2a1wq/evHYX/vpaRsMO/Isoxye8vgOVJDz7REXQywvNUwSmiMxn2S31uVRumP2OsnpA+Nq2N77R8IB6i1Oiw1PtdYRsStx/t1QP+1QgRw6Qr5IC0uhsbWuNACII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eNxHbz+G; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1ecbso2085105a12.0;
-        Tue, 19 Nov 2024 14:14:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732054440; x=1732659240; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jLg3Zgz+FEDEY+dTOsaG0ncu4gz3SWEdaD0wc9B4rSY=;
-        b=eNxHbz+Gq/W1hz5k+I/CsiJCAZXmQkeRp9OtcZAK3hW2pM2WXICWsfbE9eMOmOy4U3
-         qWKTmcOYyZDK25p2EzUM0IZykgwmcbgKz6Qfm69lfuJ6BbK2zIzrHy+DpfPeILGBNuIY
-         bTCi0NNiO/GcwswP460LYFrD8bbTxDrEH3JdLv7fMxqBRKiYzkxzSfx1dEh7c73rB9OQ
-         5UnmeZv+oV4HpIi0JfSFwSSvZ0F0ynmi8MP2UZUHbxPXJh6i3k/Gp3dSeUCh/eHa9ocW
-         YXfMyAQE809VGsLKCE/qZxuj+V+D1xT5C2fQdNQFD8hsE1xkJs6V++KVzyzxIs3QbPzO
-         h2dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732054440; x=1732659240;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jLg3Zgz+FEDEY+dTOsaG0ncu4gz3SWEdaD0wc9B4rSY=;
-        b=GOcInnjg49R0RMaAXbM+H6gPcwLyZQBvT3BxzE5UZFJtk1pZS/UGypGxyypvfQMada
-         EH17lvx4YB2muTVdmzd5shE72L7qEKrjqaHOwbGVKJbD2/8sqg5xDacBEEPHyO3/xGhM
-         5N5C11A6EuYkd3amHp+EmB/dUvbcAi9Dj2L+YhN8pwcS6tre8wRrep42HlFYFzFslSMn
-         m04+hOXuhabIPUmbpA+dvza2WsMpd2O24If+wqdFII13ta2R0JYcsuLjxRayqT3Op1Kq
-         XqflkJ0/PgAtfjkEEptxi4Z3GQNU1LKfOaY+pUdz7Zi+2J310YhtS7t6PyodpvM1+xSN
-         gSIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUoXt2kfm63qVdQEAWoy3J/7ZjdmH27/1K7QPExlXhOdl/JaK36Zpb81DBBiMz6liuoYfcN7J5zcPDPsrg=@vger.kernel.org, AJvYcCWlz/6fJeqi8BzNV3sFk3ou4uUhUN2EKAggDSJtipvynl6XaQBgE4SsUZEC+iLzP/4N1TcfxmWG@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmFqG6MDKPLO67zri9VD5LLQdFVo6TGJPLBcKfVJ8DsxVYAHWb
-	bBO1+KtLv8blFbYMBwNLaRAJJCNz3hkCEq/wke2TbPn7dq8COAQZ
-X-Google-Smtp-Source: AGHT+IF/SBX+B2+021nCX1tdeI9ozu3Mfn3ca5/E2iXbH7GqBvRnxzsFafGMnb4PILGaYjVb+4BGLw==
-X-Received: by 2002:a05:6402:524a:b0:5cf:e218:a4ae with SMTP id 4fb4d7f45d1cf-5cff4cdd75dmr163238a12.31.1732054439744;
-        Tue, 19 Nov 2024 14:13:59 -0800 (PST)
-Received: from rex.hwlab.vusec.net (lab-4.lab.cs.vu.nl. [192.33.36.4])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cff45504fcsm133484a12.89.2024.11.19.14.13.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 14:13:59 -0800 (PST)
-From: Brian Johannesmeyer <bjohannesmeyer@gmail.com>
-To: Ronak Doshi <ronak.doshi@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-	Raphael Isemann <teemperor@gmail.com>,
-	Cristiano Giuffrida <giuffrida@cs.vu.nl>,
-	Herbert Bos <h.j.bos@vu.nl>
-Subject: [RFC v2 1/2] vmxnet3: Fix inconsistent DMA accesses in vmxnet3_probe_device()
-Date: Tue, 19 Nov 2024 23:13:53 +0100
-Message-Id: <20241119221353.3912257-3-bjohannesmeyer@gmail.com>
+	s=arc-20240116; t=1732054919; c=relaxed/simple;
+	bh=8FVCSxSQTelW31MsDm/blZ9llB9O21mFfgDIlRoh2Z8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GVEf9n5c3vocMjuB1Ap9YDfrSBMCXDljirtKcphtqSntYtsZvY8eLeFUcVLER63shA945ij97TVegYXFosVBR9hBY93h9jfuRO/zWMDoBET9JtmIhVQEFlGeHqJZ1l2gnhnPxixojvvA9KiepXZP8ZkpfSvC2RWmulzt7mhrMxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=PA49VzwL; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 23F62200CCF2;
+	Tue, 19 Nov 2024 23:21:50 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 23F62200CCF2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1732054910;
+	bh=qFTwVPUl3pWCqDoqp72YOUWqs6pUOYZ0WGgECjHGcD8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PA49VzwLEu5FRtc49Ka5pU3qiV3zwU4uQj2L0klt9q4w3Aj6pjU1Q5Xz7VCDt7gnC
+	 RRfiWRnWDpwXSiKxlf2Is0DoGPU9TNMcVgrlSEHXHSDSrvwltW2KKz+CXsREOzX5BO
+	 3I1GbAwb3+h2m8UnYB80qLogHK1r/KhAybleizOZY4wSBr4UxI+bLJd3wfJinBeNkX
+	 sDyPCF7iOwwIcWTV9jx4ymjVCzRsYM2rgSRjVMNeEjHTlJh0zcGkzaOUPs/Wl/fsH2
+	 rpm7T6vqin/UC8ta6ciqau4NdmLbu+cAc4GsHD1+rzTWsbv6e/xpEmW/q0miQofbst
+	 gRcieELVEbl4w==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next v5 0/4] Mitigate the two-reallocations issue for iptunnels
+Date: Tue, 19 Nov 2024 23:21:35 +0100
+Message-Id: <20241119222139.14338-1-justin.iurman@uliege.be>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241119221353.3912257-1-bjohannesmeyer@gmail.com>
-References: <20241119221353.3912257-1-bjohannesmeyer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,65 +68,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After mapping `adapter` to streaming DMA, but before accessing it,
-synchronize it to the CPU. Then, before returning, synchronize it back to
-the device. This mitigates any inconsistent accesses to it from
-vmxnet3_probe_device().
+v5:
+- address Paolo's comments
+- s/int dst_dev_overhead()/unsigned int dst_dev_overhead()/
+v4:
+- move static inline function to include/net/dst.h
+v3:
+- fix compilation error in seg6_iptunnel
+v2:
+- add missing "static" keywords in seg6_iptunnel
+- use a static-inline function to return the dev overhead (as suggested
+  by Olek, thanks)
 
-Co-developed-by: Raphael Isemann <teemperor@gmail.com>
-Signed-off-by: Raphael Isemann <teemperor@gmail.com>
-Signed-off-by: Brian Johannesmeyer <bjohannesmeyer@gmail.com>
----
- drivers/net/vmxnet3/vmxnet3_drv.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+The same pattern is found in ioam6, rpl6, and seg6. Basically, it first
+makes sure there is enough room for inserting a new header:
 
-diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-index 7fa74b8b2100..032d3cd34be1 100644
---- a/drivers/net/vmxnet3/vmxnet3_drv.c
-+++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-@@ -3623,6 +3623,8 @@ vmxnet3_probe_device(struct pci_dev *pdev,
- 	int num_rx_queues;
- 	int queues;
- 	unsigned long flags;
-+	struct device *dev;
-+	dma_addr_t adapter_pa;
- 
- 	if (!pci_msi_enabled())
- 		enable_mq = 0;
-@@ -3662,14 +3664,19 @@ vmxnet3_probe_device(struct pci_dev *pdev,
- 	}
- 
- 	spin_lock_init(&adapter->cmd_lock);
--	adapter->adapter_pa = dma_map_single(&adapter->pdev->dev, adapter,
--					     sizeof(struct vmxnet3_adapter),
--					     DMA_TO_DEVICE);
--	if (dma_mapping_error(&adapter->pdev->dev, adapter->adapter_pa)) {
-+	dev = &adapter->pdev->dev;
-+	adapter_pa = dma_map_single(dev, adapter,
-+				    sizeof(struct vmxnet3_adapter),
-+				    DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, adapter_pa)) {
- 		dev_err(&pdev->dev, "Failed to map dma\n");
- 		err = -EFAULT;
- 		goto err_set_mask;
- 	}
-+	dma_sync_single_for_cpu(dev, adapter_pa,
-+				sizeof(struct vmxnet3_adapter), DMA_TO_DEVICE);
-+	adapter->adapter_pa = adapter_pa;
-+
- 	adapter->shared = dma_alloc_coherent(
- 				&adapter->pdev->dev,
- 				sizeof(struct Vmxnet3_DriverShared),
-@@ -3928,6 +3935,9 @@ vmxnet3_probe_device(struct pci_dev *pdev,
- 	}
- 
- 	vmxnet3_check_link(adapter, false);
-+	dma_sync_single_for_device(dev, adapter_pa,
-+				   sizeof(struct vmxnet3_adapter),
-+				   DMA_TO_DEVICE);
- 	return 0;
- 
- err_register:
+(1) err = skb_cow_head(skb, len + skb->mac_len);
+
+Then, when the insertion (encap or inline) is performed, the input and
+output handlers respectively make sure there is enough room for layer 2:
+
+(2) err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+
+skb_cow_head() does nothing when there is enough room. Otherwise, it
+reallocates more room, which depends on the architecture. Briefly,
+skb_cow_head() calls __skb_cow() which then calls pskb_expand_head() as
+follows:
+
+pskb_expand_head(skb, ALIGN(delta, NET_SKB_PAD), 0, GFP_ATOMIC);
+
+"delta" represents the number of bytes to be added. This value is
+aligned with NET_SKB_PAD, which is defined as follows:
+
+NET_SKB_PAD = max(32, L1_CACHE_BYTES)
+
+... where L1_CACHE_BYTES also depends on the architecture. In our case
+(x86), it is defined as follows:
+
+L1_CACHE_BYTES = (1 << CONFIG_X86_L1_CACHE_SHIFT)
+
+... where (again, in our case) CONFIG_X86_L1_CACHE_SHIFT equals 6
+(=X86_GENERIC).
+
+All this to say, skb_cow_head() would reallocate to the next multiple of
+NET_SKB_PAD (in our case a 64-byte multiple) when there is not enough
+room.
+
+Back to the main issue with the pattern: in some cases, two
+reallocations are triggered, resulting in a performance drop (i.e.,
+lines (1) and (2) would both trigger an implicit reallocation). How's
+that possible? Well, this is kind of bad luck as we hit an exact
+NET_SKB_PAD boundary and when skb->mac_len (=14) is smaller than
+LL_RESERVED_SPACE(dst->dev) (=16 in our case). For an x86 arch, it
+happens in the following cases (with the default needed_headroom):
+
+- ioam6:
+ - (inline mode) pre-allocated data trace of 236 or 240 bytes
+ - (encap mode) pre-allocated data trace of 196 or 200 bytes
+- seg6:
+ - (encap mode) for 13, 17, 21, 25, 29, 33, ...(+4)... prefixes
+
+Let's illustrate the problem, i.e., when we fall on the exact
+NET_SKB_PAD boundary. In the case of ioam6, for the above problematic
+values, the total overhead is 256 bytes for both modes. Based on line
+(1), skb->mac_len (=14) is added, therefore passing 270 bytes to
+skb_cow_head(). At that moment, the headroom has 206 bytes available (in
+our case). Since 270 > 206, skb_cow_head() performs a reallocation and
+the new headroom is now 206 + 64 (NET_SKB_PAD) = 270. Which is exactly
+the room we needed. After the insertion, the headroom has 0 byte
+available. But, there's line (2) where 16 bytes are still needed. Which,
+again, triggers another reallocation.
+
+The same logic is applied to seg6 (although it does not happen with the
+inline mode, i.e., -40 bytes). It happens with other L1 cache shifts too
+(the larger the cache shift, the less often it happens). For example,
+with a +32 cache shift (instead of +64), the following number of
+segments would trigger two reallocations: 11, 15, 19, ... With a +128
+cache shift, the following number of segments would trigger two
+reallocations: 17, 25, 33, ... And so on and so forth. Note that it is
+the same for both the "encap" and "l2encap" modes. For the "encap.red"
+and "l2encap.red" modes, it is the same logic but with "segs+1" (e.g.,
+14, 18, 22, 26, etc for a +64 cache shift). Note also that it may happen
+with rpl6 (based on some calculations), although it did not in our case.
+
+This series provides a solution to mitigate the aforementioned issue for
+ioam6, seg6, and rpl6. It provides the dst_entry (in the cache) to
+skb_cow_head() **before** the insertion (line (1)). As a result, the
+very first iteration would still trigger two reallocations (i.e., empty
+cache), while next iterations would only trigger a single reallocation.
+
+Justin Iurman (4):
+  include: net: add static inline dst_dev_overhead() to dst.h
+  net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue
+  net: ipv6: seg6_iptunnel: mitigate 2-realloc issue
+  net: ipv6: rpl_iptunnel: mitigate 2-realloc issue
+
+ include/net/dst.h         |  9 +++++
+ net/ipv6/ioam6_iptunnel.c | 73 ++++++++++++++++-----------------
+ net/ipv6/rpl_iptunnel.c   | 46 +++++++++++----------
+ net/ipv6/seg6_iptunnel.c  | 85 ++++++++++++++++++++++++---------------
+ 4 files changed, 123 insertions(+), 90 deletions(-)
+
 -- 
 2.34.1
 
