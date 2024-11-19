@@ -1,248 +1,128 @@
-Return-Path: <netdev+bounces-146322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122C99D2E52
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 19:49:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7EBC9D2D85
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 19:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C428BB34DF1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:03:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 719BB1F260D2
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EF61D5148;
-	Tue, 19 Nov 2024 18:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6791D14FD;
+	Tue, 19 Nov 2024 18:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="isaRW3Ie"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1LtgXUb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6608E1D1F72
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 18:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED50F1CF7BE
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 18:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732039317; cv=none; b=QATlqXPfcOOG9scO64Nm8GnqExdjqFdotfq7r/OyavvOBlZ/h7c5ySDwCBS34M5e8Q+8yoYpkD29q8V6RB2gnrvUFNeNBF4JBor2EsJ8mC9OqRa+4M0yS3LGDcn6AeY3/c1uaZ6nxbN1yFQMq0ENRoTp/XyEIsCzdkFI0FVgL18=
+	t=1732039486; cv=none; b=b1CNtXSPUZeaKZUuFaobuXi9bN/8uAELGVaAtbKqBjnZIofoZ+RMZD2WUY14aWgVaJu2h3C0kAaxqcqODX/YmWP/Mx2X9LiQC8LlNZ+SQKBrWyX1az0J3jwRT3uQuaU5OQe+cY8k/Krx1EyWHDozkqh3Nhs1rwD9attWLB+jTxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732039317; c=relaxed/simple;
-	bh=mY2B16Jg1HevzyyGsz+nwnAs3nPKRh9ijrKbIzNPZxM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=te4LmAzvOJbAxVhNHSBDDEYJ9SqaVRWvn9To6EgtTrWJxCEFpyfnvlMAT6dJs+ad9AzEuUjjF8bL9No2YYEsbRePR0qvTs4rJFEbzSLtJyqkkQ/gpy0CajRgN9oyADh4pY/m+7ajMee6wi2U3E4eXmpKUIyI9YyKchTkYsOf0EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=isaRW3Ie; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7f45ab88e7fso920365a12.1
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:01:55 -0800 (PST)
+	s=arc-20240116; t=1732039486; c=relaxed/simple;
+	bh=T9H7J35boGQ/S2lh3DCWExVaNekUfzLOlJkJdFAwyzw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ObnqpXFSYxvbbV9jd6T37aqIxQoSY5YOM/iEHt16hAAFnhczGrYUwYvZDT4Dm+SyeM6Ul7rDQFx9Xj6qKYZzNeAE8blYZ/lrQ5+wJk15xpmVq3fSME/47oxGvKAbDAt6bWoV5xziWX7TnN3jwtf3S4uQaz/sWwS6OXtw8fN/Mtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q1LtgXUb; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3e607556c83so742405b6e.1
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:04:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732039315; x=1732644115; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EzKEHGOaAB0kwkIGopO6SNSHuHg3ZoHwRJ1ZW9bAnjg=;
-        b=isaRW3IeoTpM0tqMGZHcXrYxkci/vLguYpnkT6I07o289g0F9P1EgMJvUx0GOtFeAa
-         8cnmO/MHnamiSqYqSHTdQN792UbRyoHfwfW4QaMUkenlpQEIAPCBN9E2ND/iw05aIYz3
-         q20CbDUb8wBLGhCUUSupRgZzXg3nl19gI5EnuBaDUtaujBO4k4RorMNXJoaydm2ZTVx3
-         ojN9CTudYZajFn3e2pF6O0u1lhhDZ6QQK7s6mK5l5BPZ1H3J7NW33Z7npFib33zdgtvu
-         vgIKxtJDNfdrbVs5JxdKNrD5G6bpQ8CKdJywkrdmaxlm/N6oDYDAg2C0ct/ZQuHrr99B
-         H+vA==
+        d=gmail.com; s=20230601; t=1732039484; x=1732644284; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T9H7J35boGQ/S2lh3DCWExVaNekUfzLOlJkJdFAwyzw=;
+        b=Q1LtgXUbnW77xwADbwNNE6KL3Pp12f0vxexDiN9sKeuKeHjrfzqhd6ENapkDsy06Kx
+         N+MlAozWJYau3nnNQqMDTazhVWrLkep8HujQWL8wY/6/Sfkf8roghdGKhVAJ8yNTxcOa
+         HsSWDsz7PCt/rjWXqXDxWKduyx8HzVNnMHk+oMN+eNDks3vVMfAJcrgvNOwHveznrBWn
+         jd5IsXl5Nv72eggUD1IvRz31PpTHLgCJKsNRbIY883aNxWWasc3pXVYQjSbcveqH0Ipb
+         UAREsBnKLCDdAB9AkkU3bbpEJ7Qdz1ZcqNerH3zptxm491sU4PTQ64mt4BFh5ZzAhQgX
+         ooXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732039315; x=1732644115;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EzKEHGOaAB0kwkIGopO6SNSHuHg3ZoHwRJ1ZW9bAnjg=;
-        b=p9HPExWDDaEp4Xmms0YK4JjlDM6nHuJHB/tl+FNwQq9Ztzy7uj9ai4bXlLlB4lv+BS
-         iNcKPs8jP9A5Olz8mSEBw4KLsVMtrVQUay9VuSz0V71NErdx6CbE3OIA/3BhrFMHYYmj
-         fQYarOZF4Pl5xnuLA4BeCHIPpnWcr/UW3skk+whaDaJ0FVam7EXYMM16Ew27gz8ip43s
-         mgnMo3TcqbaDAK1AbSD3DkRYWhKbOAZgE6N6Qr74R7W3pGSYRRDEBqQBeBoqhGvC7K6i
-         eNoJKfzfHIMLSmbIATgO0WWEc+tkpL04brK2hChapgZKI6GxRvX+LdK1IKk3KrBGbxMX
-         r0lg==
-X-Gm-Message-State: AOJu0YzLpvlVqpMSzTWL1oCe+frXIe2ZkmbSXfzh/h/AqkENynta/BEU
-	orjWACVDv+rLZwhR4GkMjBfyg51p20WhwqKCpvagWNAqJL+fnJ3z1eJIJD+MHBM=
-X-Google-Smtp-Source: AGHT+IFu2qPy43TyRaSt4+ba/nx6VYcvua0Eezv9CSyMPGGXTdf4XhSFq9W+mz68G4o4mtk0HRLpJQ==
-X-Received: by 2002:a05:6a20:7491:b0:1db:f89a:c6fe with SMTP id adf61e73a8af0-1dc90bde9e5mr25578333637.32.1732039314442;
-        Tue, 19 Nov 2024 10:01:54 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1256:1:80c:c984:f4f1:951f? ([2620:10d:c090:500::5:18b1])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f8c1dac9a8sm8030118a12.55.2024.11.19.10.01.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 10:01:53 -0800 (PST)
-Message-ID: <341cc328-1454-44b1-bd58-93fa18bc72de@davidwei.uk>
-Date: Tue, 19 Nov 2024 10:01:49 -0800
+        d=1e100.net; s=20230601; t=1732039484; x=1732644284;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T9H7J35boGQ/S2lh3DCWExVaNekUfzLOlJkJdFAwyzw=;
+        b=iq2LCauO8yYwbJ135Ghw7dcagvQ3g+YRolkrKK4cg53qqxyMkO114Uo7eJZ1sItzCd
+         jxaTWujM61DhxJ15bvyKbajG2NJXOXM1BJEWahpiJp/0OXQiPA89lI5Sz8z2Cola3Iaf
+         v9bDFd1o0191+mF3OdNfaigNF3wt6+sutd0Q9pGVIS3kigMNAVVbJwSSZIehWHzi1DQi
+         cg1h79XyFPG5cnxrG8PM0UspZY8kci2SCQsHMOVIr9Qo5/FvRfzDANCvvTa3MiIip1Gf
+         YSccGcsJFLO5IWQKxrrQ6GakNwv4VQvhqqrZ0RMOHfDJVr1cdXHkC2XcYiLrpg1nUp0e
+         ziTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfKYGIBxhRGK47c9Nchwao0pTujK2oBJ2S7HQMe/1l+w13vVRqsoW/gFBTJZRYCyk//BBGYPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUwj2hPrJgfhwR+uxDY4VD4FqovHm/Lyem8H9woczR097dxu6b
+	qivDcGKaTJFjShiLwRy4N/atyXnnj1GKyhV3KeFQkdkDZn1hH0Wk+viRkmZEgITV6lnFBYjP4CM
+	LyhHA72LcQKjc8HajJx/5tAQq9zg=
+X-Google-Smtp-Source: AGHT+IHCLKcX+haFD1McFVPUfGnofTUCmgA179ydnpbFnlvjrqkbUDXdD9lpqzIXjNSURrUI9NjLFVjxlOK+Jw1OLPg=
+X-Received: by 2002:a05:6808:1b11:b0:3e6:3647:ba55 with SMTP id
+ 5614622812f47-3e7bc8546a8mr15820067b6e.32.1732039483856; Tue, 19 Nov 2024
+ 10:04:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] s390/iucv: MSG_PEEK causes memory leak in
- iucv_sock_destruct()
-Content-Language: en-GB
-To: Alexandra Winter <wintera@linux.ibm.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>, Simon Horman <horms@kernel.org>,
- Sidraya Jayagond <sidraya@linux.ibm.com>
-References: <20241119152219.3712168-1-wintera@linux.ibm.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20241119152219.3712168-1-wintera@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+ <ZzsCNUN1vl01uZcX@shredder> <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
+ <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com> <b8b88a15-5b62-4991-ab0c-bb30a51e7be6@candelatech.com>
+ <4a2f7ad9-6d38-4d9e-b665-80c29ff726d6@kernel.org> <303f83f8-e2cc-4a33-8bfe-ba490f932f18@candelatech.com>
+In-Reply-To: <303f83f8-e2cc-4a33-8bfe-ba490f932f18@candelatech.com>
+From: Eyal Birger <eyal.birger@gmail.com>
+Date: Tue, 19 Nov 2024 10:04:32 -0800
+Message-ID: <CAHsH6GsiQGwP329zW2ZTB4q8fQnJm4dLRbZFCOvT842Z=LdDyg@mail.gmail.com>
+Subject: Re: GRE tunnels bound to VRF
+To: Ben Greear <greearb@candelatech.com>
+Cc: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@idosch.org>, 
+	netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-11-19 07:22, Alexandra Winter wrote:
-> From: Sidraya Jayagond <sidraya@linux.ibm.com>
-> 
-> Passing MSG_PEEK flag to skb_recv_datagram() increments skb refcount
-> (skb->users) and iucv_sock_recvmsg() does not decrement skb refcount
-> at exit.
-> This results in skb memory leak in skb_queue_purge() and WARN_ON in
-> iucv_sock_destruct() during socket close. To fix this decrease
-> skb refcount by one if MSG_PEEK is set in order to prevent memory
-> leak and WARN_ON.
-> 
-> WARNING: CPU: 2 PID: 6292 at net/iucv/af_iucv.c:286 iucv_sock_destruct+0x144/0x1a0 [af_iucv]
-> CPU: 2 PID: 6292 Comm: afiucv_test_msg Kdump: loaded Tainted: G        W          6.10.0-rc7 #1
-> Hardware name: IBM 3931 A01 704 (z/VM 7.3.0)
-> Call Trace:
->         [<001587c682c4aa98>] iucv_sock_destruct+0x148/0x1a0 [af_iucv]
->         [<001587c682c4a9d0>] iucv_sock_destruct+0x80/0x1a0 [af_iucv]
->         [<001587c704117a32>] __sk_destruct+0x52/0x550
->         [<001587c704104a54>] __sock_release+0xa4/0x230
->         [<001587c704104c0c>] sock_close+0x2c/0x40
->         [<001587c702c5f5a8>] __fput+0x2e8/0x970
->         [<001587c7024148c4>] task_work_run+0x1c4/0x2c0
->         [<001587c7023b0716>] do_exit+0x996/0x1050
->         [<001587c7023b13aa>] do_group_exit+0x13a/0x360
->         [<001587c7023b1626>] __s390x_sys_exit_group+0x56/0x60
->         [<001587c7022bccca>] do_syscall+0x27a/0x380
->         [<001587c7049a6a0c>] __do_syscall+0x9c/0x160
->         [<001587c7049ce8a8>] system_call+0x70/0x98
->         Last Breaking-Event-Address:
->         [<001587c682c4a9d4>] iucv_sock_destruct+0x84/0x1a0 [af_iucv]
-> 
-> Fixes: eac3731bd04c ("[S390]: Add AF_IUCV socket support")
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
-> Signed-off-by: Sidraya Jayagond <sidraya@linux.ibm.com>
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> ---
-> The following mailaddresses are no longer active:
-> Frank Pavlic <fpavlic@de.ibm.com> (blamed_fixes:1/1=100%)
-> Martin Schwidefsky <schwidefsky@de.ibm.com> (blamed_fixes:1/1=100%)
-> ---
->  net/iucv/af_iucv.c | 26 +++++++++++++++++---------
->  1 file changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
-> index c00323fa9eb6..7929df08d4e0 100644
-> --- a/net/iucv/af_iucv.c
-> +++ b/net/iucv/af_iucv.c
-> @@ -1236,7 +1236,9 @@ static int iucv_sock_recvmsg(struct socket *sock, struct msghdr *msg,
->  		return -EOPNOTSUPP;
->  
->  	/* receive/dequeue next skb:
-> -	 * the function understands MSG_PEEK and, thus, does not dequeue skb */
-> +	 * the function understands MSG_PEEK and, thus, does not dequeue skb
-> +	 * only refcount is increased.
-> +	 */
->  	skb = skb_recv_datagram(sk, flags, &err);
+On Tue, Nov 19, 2024 at 8:58=E2=80=AFAM Ben Greear <greearb@candelatech.com=
+> wrote:
+>
+> On 11/19/24 8:36 AM, David Ahern wrote:
+> > On 11/19/24 7:59 AM, Ben Greear wrote:
+> >>
+> >> Ok, I am happy to report that GRE with lower-dev bound to one VRF and
+> >> greX in a different
+> >> VRF works fine.
+> >>
+> >
+> > mind sending a selftest that also documents this use case?
+> >
+>
+> I don't have an easy way to extract this into a shell script, but
+> at least as description:
 
-I checked the call graph and `flags` is passed through:
+FWIW I once created a tool for helping to jumpstart such scripts - see
+https://www.netpen.io
 
-skb_recv_datagram()
-  -> __skb_recv_datagram()
-    -> __skb_try_recv_datagram()
-      -> __skb_try_recv_from_queue()
+If I use it to create something similar to what you've described, the
+outcome is something like this (the link just encodes the relevant
+diagram info in b64):
 
-If MSG_PEEK is set and a valid skb is returned then skb->users is
-incremented.
+https:://netpen.io/shared/eyJzZXR0aW5ncyI6eyJ0aXRsZSI6IkdSRSBFeGFtcGxlIn0sI=
+ml0ZW1zIjpbeyJzdWJuZXQiOnsibmFtZSI6ImdyZWVuIiwiY2lkciI6IjE5OC41MS4xMDAuMC8y=
+NCJ9fSx7InN1Ym5ldCI6eyJuYW1lIjoiYmx1ZSIsImNpZHIiOiIxMC4wLjAuMC8yNCJ9fSx7Im5=
+ldG5zIjp7Im5hbWUiOiJuczEifX0seyJ2ZXRoIjp7Im5hbWUiOiJ2IiwiZGV2MSI6eyJuZXRucy=
+I6Im5ldG5zLm5zMSIsInN1Ym5ldHMiOlsic3VibmV0LmdyZWVuIl0sImV0aHRvb2wiOnt9LCJ0Y=
+yI6e319LCJkZXYyIjp7Im5ldG5zIjoibmV0bnMubnMxIiwic3VibmV0cyI6WyJzdWJuZXQuZ3Jl=
+ZW4iXX19fSx7InZyZiI6eyJuYW1lIjoidnJmZ3JlZW4iLCJuZXRucyI6Im5ldG5zLm5zMSIsIm1=
+lbWJlcnMiOlsidmV0aC52LmRldjIiXX19LHsidnJmIjp7Im5hbWUiOiJ2cmZibHVlIiwibmV0bn=
+MiOiJuZXRucy5uczEiLCJtZW1iZXJzIjpbInZldGgudi5kZXYxIl19fSx7InR1bm5lbCI6eyJuY=
+W1lIjoiZ3JlMSIsIm1vZGUiOiJncmUiLCJzdWJuZXRzIjpbInN1Ym5ldC5ibHVlIl0sImxpbmsx=
+IjoidmV0aC52LmRldjEiLCJsaW5rMiI6InZldGgudi5kZXYyIiwiZGV2MSI6eyJuZXRucyI6Im5=
+ldG5zLm5zMyJ9LCJkZXYyIjp7Im5ldG5zIjoibmV0bnMubnMyIn19fSx7Im5ldG5zIjp7Im5hbW=
+UiOiJuczIifX0seyJuZXRucyI6eyJuYW1lIjoibnMzIn19XX0=3D
 
->  	if (!skb) {
->  		if (sk->sk_shutdown & RCV_SHUTDOWN)
-> @@ -1252,9 +1254,8 @@ static int iucv_sock_recvmsg(struct socket *sock, struct msghdr *msg,
->  
->  	cskb = skb;
->  	if (skb_copy_datagram_msg(cskb, offset, msg, copied)) {
-> -		if (!(flags & MSG_PEEK))
-> -			skb_queue_head(&sk->sk_receive_queue, skb);
-> -		return -EFAULT;
-> +		err = -EFAULT;
-> +		goto err_out;
-
-Previous behaviour is unchanged. Now if MSG_PEEK is set then skb->users
-is decremented. At this point skb is guaranteed to be valid.
-
->  	}
->  
->  	/* SOCK_SEQPACKET: set MSG_TRUNC if recv buf size is too small */
-> @@ -1271,11 +1272,8 @@ static int iucv_sock_recvmsg(struct socket *sock, struct msghdr *msg,
->  	err = put_cmsg(msg, SOL_IUCV, SCM_IUCV_TRGCLS,
->  		       sizeof(IUCV_SKB_CB(skb)->class),
->  		       (void *)&IUCV_SKB_CB(skb)->class);
-> -	if (err) {
-> -		if (!(flags & MSG_PEEK))
-> -			skb_queue_head(&sk->sk_receive_queue, skb);
-> -		return err;
-> -	}
-> +	if (err)
-> +		goto err_out;
-
-Same as above.
-
->  
->  	/* Mark read part of skb as used */
->  	if (!(flags & MSG_PEEK)) {
-> @@ -1331,8 +1329,18 @@ static int iucv_sock_recvmsg(struct socket *sock, struct msghdr *msg,
->  	/* SOCK_SEQPACKET: return real length if MSG_TRUNC is set */
->  	if (sk->sk_type == SOCK_SEQPACKET && (flags & MSG_TRUNC))
->  		copied = rlen;
-> +	if (flags & MSG_PEEK)
-> +		skb_unref(skb);
-
-I checked that all return paths with MSG_PEEK and a valid skb result in
-skb_unref().
-
-The remaining return paths either have !MSG_PEEK or !skb:
-
-(1)
-	if (!skb) {
-		if (sk->sk_shutdown & RCV_SHUTDOWN)
-			return 0;
-		return err;
-	}
-
-(2)
-	if (!(flags & MSG_PEEK)) {
-		...
-		if (iucv->transport == AF_IUCV_TRANS_HIPER) {
-			atomic_inc(&iucv->msg_recv);
-			if (atomic_read(&iucv->msg_recv) > iucv->msglimit) {
-				WARN_ON(1);
-				iucv_sock_close(sk);
-				return -EFAULT;
-			}
-		}
-		...
-	}
-
->  
->  	return copied;
-> +
-> +err_out:
-> +	if (!(flags & MSG_PEEK))
-> +		skb_queue_head(&sk->sk_receive_queue, skb);
-> +	else
-> +		skb_unref(skb);
-> +
-> +	return err;
->  }
->  
->  static inline __poll_t iucv_accept_poll(struct sock *parent)
-
-Reviewed-by: David Wei <dw@davidwei.uk>
+Eyal.
 
