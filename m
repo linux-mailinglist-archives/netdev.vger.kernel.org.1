@@ -1,119 +1,120 @@
-Return-Path: <netdev+bounces-146310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECF49D2C15
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:06:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09989D2BE3
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:58:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1EF6B2F56C
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:54:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A433A1F22E01
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9C11D12ED;
-	Tue, 19 Nov 2024 16:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7140D1D0F41;
+	Tue, 19 Nov 2024 16:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gJuC4oUg"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="P5sP+b/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72261D0B91;
-	Tue, 19 Nov 2024 16:48:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3E01CEAAA
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 16:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732034935; cv=none; b=c0/LvLvN7r0p5J2fQeog4LdlItcIUR3C3q+THxTYVCzpBWMjHBTEQgHyUy/BQfNvEGNrHnsfdAMpdjIcci4SuPBJpwG/4XWXFBEyXTy06yf3frxcpbvseKzwGFIXefRBOuoH/ieM1haCfCVeTlfRMJXgpEx+EOoy1Yesw7eihGY=
+	t=1732035233; cv=none; b=mrtwL5cYh58qG5WvjiBDshocbA7/wp/udCkdPpgkU6YRhEsGL6hGf3g/s9e4pgeft9HZ4ib332gN1Bl8YzlKkgrPJIR/L+5OjM7SlGbdpAdEtjBz284yeP9LkLrbxqiNRzhtCsF5ZivyKdJIEMujMaKaP+QTaT7H5K7Ei8IrHxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732034935; c=relaxed/simple;
-	bh=06NyFvjw2Q40R+hhk2MKIcCrfow60pW8VAFXwQATsuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OQx1Yhau28AzUPQb/j6QWqEwShZiqh7Xl50IVwBdYz21JV/LNTMGrbBvi9CTjH/iWbxmxk9d55XggRjG0Y1iDXnOKm/0CyBJTdiZQP2216TBGChlytJ/TJl4tnsqfMseuupPleeUoUesvdeOgVALXD4JigZ4rtuipkj4uGSm8pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gJuC4oUg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3fvujAh94U3kGDVymnc9jtTk3gFEdDGf2+Wqo/Pnpo4=; b=gJuC4oUgF5yfaJf1hVqxnO4d/l
-	nZwoni126YdD7HgeHlxvmxyw3d9qn8oLF6+lLaH8yFtFxQ3bgaydz3ByUBjOZZ7q3YMvIV1Wx4sAF
-	oEWKn3V19Wxmg2ukOUOqO8sBYsaX7CIPNsHoAK0oKCEGSb1hZB2jj4dWmbdIvbFEiGmBBBJfK7OpE
-	sinVcRn/ed+ur58P4MZhOaA3Z8X8cTstuwmTfMZHY9DXB+7ZSUN7EKaknxuyPlR3Q6jIWDWnrs2C/
-	XbI7MA4r4eoXjzkLYZgcHMeyoLajQph4dcBob6+CslmzxPyUL0Cat1OoFgxeF06+8dZMT34FL+pcV
-	tJEL/xjA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36672)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tDROz-00042u-34;
-	Tue, 19 Nov 2024 16:48:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tDROx-0006Dy-36;
-	Tue, 19 Nov 2024 16:48:32 +0000
-Date: Tue, 19 Nov 2024 16:48:31 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: jan.petrous@oss.nxp.com
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v5 12/16] net: dwmac-sti: Use helper rgmii_clock
-Message-ID: <ZzzBXwZNpCTKvSTp@shell.armlinux.org.uk>
-References: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
- <20241119-upstream_s32cc_gmac-v5-12-7dcc90fcffef@oss.nxp.com>
+	s=arc-20240116; t=1732035233; c=relaxed/simple;
+	bh=XGrwKi67XF737xdiMkAN/AopG51wUhl1vugsRFoUkBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PS0p07W7VA5EN4WaBPwARrusfcREJyFCavPi12AcagoOoZvx0WdLga5hPCPSijKXYdI8m0WuESZbFnMHzYR7NK1K93+Msrjkz3/uW2Y4DdL/8XzTyPwMiVSdokPvwZa0VfN37YhxwHkzOFg6G0Ip1wTYBrit0GlorfOamI2hgmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=P5sP+b/f; arc=none smtp.client-ip=148.163.129.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id B9DCA340066;
+	Tue, 19 Nov 2024 16:53:48 +0000 (UTC)
+Received: from [172.20.0.209] (unknown [12.22.205.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail3.candelatech.com (Postfix) with ESMTPSA id 85F1113C2B0;
+	Tue, 19 Nov 2024 08:53:47 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 85F1113C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1732035228;
+	bh=XGrwKi67XF737xdiMkAN/AopG51wUhl1vugsRFoUkBw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=P5sP+b/fCh99OBgzLGOgzrBElrdgij7MQV2JszYWcXDHNEBionuRmx1A3WtGapmgs
+	 SqX+EdnL8g2LAa+1iPtfmlGFNzbWLI33e6f8yZlrj12g62prXMVyHPAc4aUQ2zrQXo
+	 hC6NX3H38P8qra0xNTGqTlBv/W9CWztTavP+Dtx4=
+Message-ID: <303f83f8-e2cc-4a33-8bfe-ba490f932f18@candelatech.com>
+Date: Tue, 19 Nov 2024 08:53:47 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119-upstream_s32cc_gmac-v5-12-7dcc90fcffef@oss.nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: GRE tunnels bound to VRF
+To: David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@idosch.org>
+Cc: netdev <netdev@vger.kernel.org>
+References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+ <ZzsCNUN1vl01uZcX@shredder>
+ <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
+ <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com>
+ <b8b88a15-5b62-4991-ab0c-bb30a51e7be6@candelatech.com>
+ <4a2f7ad9-6d38-4d9e-b665-80c29ff726d6@kernel.org>
+Content-Language: en-MW
+From: Ben Greear <greearb@candelatech.com>
+Organization: Candela Technologies
+In-Reply-To: <4a2f7ad9-6d38-4d9e-b665-80c29ff726d6@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MDID: 1732035229-1HnZjzXN1SbO
+X-MDID-O:
+ us5;ut7;1732035229;1HnZjzXN1SbO;<greearb@candelatech.com>;5d0776c40008f739dc5c0270debef63d
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
-On Tue, Nov 19, 2024 at 04:00:18PM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+On 11/19/24 8:36 AM, David Ahern wrote:
+> On 11/19/24 7:59 AM, Ben Greear wrote:
+>>
+>> Ok, I am happy to report that GRE with lower-dev bound to one VRF and
+>> greX in a different
+>> VRF works fine.
+>>
 > 
-> Utilize a new helper function rgmii_clock().
+> mind sending a selftest that also documents this use case?
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+I don't have an easy way to extract this into a shell script, but
+at least as description:
 
-Thanks!
+Create VETH pair: rddVR0 rddVR1 in my case
+rddVR0 has IP 2.2.2.1, in vrf0
+rddVR1 has IP 2.2.2.2, in vrf1
+
+# Create GRE device bound to rddVR1 (and indirectly bound to vrf1):
+ip link add name gre1 up type gre remote 2.2.2.1 local 2.2.2.2 ttl 255 dev rddVR1
+
+# Create GRE device bound to rddVR0 (and indirectly bound to vrf0)
+ip link add name gre2 up type gre remote 2.2.2.2 local 2.2.2.1 ttl 255 dev rddVR0
+
+Add gre1 to vrf11
+Add gre2 to vrf00
+
+
+gre1 IP address can be 10.1.1.2/32
+gre2 IP address can be 10.1.1.1/32
+
+And then you can generate TCP/UDP traffic between gre1 and gre2 if you bind to them in the normal
+manner when using VRFs (SO_BINDTODEV or similar).
+
+Thanks,
+Ben
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
 
