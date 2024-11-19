@@ -1,81 +1,55 @@
-Return-Path: <netdev+bounces-146214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3A99D24AD
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:18:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E679D24C9
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:26:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5192283A08
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:18:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79651B26499
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A9D1C4A36;
-	Tue, 19 Nov 2024 11:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A30D1C4A08;
+	Tue, 19 Nov 2024 11:26:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwTp4ote"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="dD5In/S0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB711B0F2C
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 11:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730A0198A37;
+	Tue, 19 Nov 2024 11:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732015093; cv=none; b=FA/2wI6JcvIN5sti7T/IKqrMNX8ALqxGoB2LKk148Z/H7EeJYSQ5acMrACaD6/M4dFvpISv5zW9IX152NXpyZzE8M9OE/Zy1IfHFX2fiGpFaBbcms0V4XVso/EBw6CCO4P2/OOXF1cYg0pxSrrkuuTiPFahGOqxCtIAZhCzaixs=
+	t=1732015600; cv=none; b=Tkcw9N2q5AnbXHm3thpNOaLjFUFGca6ywVPOIWVjzFQZoWlL26H+nqlOkiF/ageX/PH5KUX6Slz17Uu4aIuAOiRZ4SxYrPMStiqQunfPJ9W1ZD0NvU1KPqmpf5EBVnGAt7YfgA2MzYJcJV8VphVj1kDMqBH2SEm1V6j534TSxrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732015093; c=relaxed/simple;
-	bh=7KnqngzIweImov/bg+EQOYAdCfmPCJgVOCZnMrcp46Y=;
+	s=arc-20240116; t=1732015600; c=relaxed/simple;
+	bh=jikjswAKs7ol2d86wYoGsx6UY//r1CS50Ko2Q/uD/Io=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LCowg70WFW4jJi/ukWG9ubzaRp0jL71VWnP1h9MjaW+jRm9zFwPRCvCqvr3vhV6ExMIqFntd/A7U/bjlU1/hsOo4SOncZe37421clXfdXrWWmv26lmEOYw8+e+k0CWiv0iiyZtmYIreaG/xoIyamJcAmz3EWR5ZUjuk8v2Y+5fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IwTp4ote; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732015090;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WSBouoRatInqJbfUCy4gUiCHF5kDVST7sA6zTlqHn1A=;
-	b=IwTp4ote9IueFqjdrOqb80yFNlFWNE3R/MdBi+Baga4oH+PXOF22U5lC6FaMH2IY4DEowY
-	o7+3RiYKCOybspGmokhMBGYA0xQZDWKGaQ/Zle8JPF0vDv27PljrvIB/ruzFOrye4U623d
-	CCo0KKx2KmSpzXOg2PbchL0FHH+41Io=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-hQK-KUmKPGeLt91iTZ6ieg-1; Tue, 19 Nov 2024 06:18:08 -0500
-X-MC-Unique: hQK-KUmKPGeLt91iTZ6ieg-1
-X-Mimecast-MFC-AGG-ID: hQK-KUmKPGeLt91iTZ6ieg
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-e388c4bd92bso4032667276.1
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 03:18:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732015088; x=1732619888;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WSBouoRatInqJbfUCy4gUiCHF5kDVST7sA6zTlqHn1A=;
-        b=CrCjIr8h4Q+KtldUUOoIgDIY+9FqYx6GnozGQHBft7uN6aT7i1HvJBf7XIz2BTSaKO
-         2mrBdEyjB6JrmqtNJvCJQTFxYEBlzWYsciv7mi4irGZrySflcu4OQBgh3ToR6iD8kc4b
-         HMUa0qhwT6hAoR/+T1FpUyionaq+QMoHz6RebRkZQZmxNWbT+PtZwEXJbdY2qbpYwjv+
-         Zz3seIRHwyP1mHSGzPdYzoR+7tC0myaVMOVrULIeIixWNSDwZFbNx9hON/6b+MkLfyUv
-         dxUHCyQ2APzig0FzrArEnh9lzPefRuzOD+MA97Zj2NXHx7qZtMAEzC2NlgzBis/aSls6
-         TejQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhAKDgeRg5TGcDLF9se1zORpXO38ZC2YXSDzzkfMhWiPBMmfiwbe4CEVfMJwoDO8Bk3/z9Lxo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylrUGiv4p9SHraj7ah2PJCVbub1rnxBtqoQFy5wGVFwzhE/K1x
-	NUgkObo8PZFRBSrlvrIKvScfE5kIYPRmGf25SGJI9O6Y6yhe2x30y2A2vIh+FsDk8Xv/I/fBFhM
-	EGaHAI6+23oxVm8FVMCPbFlM4YaFJEINilGSHuuXTZHoa1kc2APbNqQ==
-X-Received: by 2002:a05:6902:298a:b0:e30:cc00:b010 with SMTP id 3f1490d57ef6-e382614f9c8mr10200264276.25.1732015088320;
-        Tue, 19 Nov 2024 03:18:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE96zkhRwyQeB2qy8231vJaIKfZPGcGVKna3QNScGbU8jvugvr7WKVQycq/NpiNX4wDg/wBiQ==
-X-Received: by 2002:a05:6902:298a:b0:e30:cc00:b010 with SMTP id 3f1490d57ef6-e382614f9c8mr10200247276.25.1732015088026;
-        Tue, 19 Nov 2024 03:18:08 -0800 (PST)
-Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46392c44142sm9845691cf.85.2024.11.19.03.18.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 03:18:07 -0800 (PST)
-Message-ID: <3cfc2e90-c9b4-425d-80f4-ddace9aff021@redhat.com>
-Date: Tue, 19 Nov 2024 12:18:00 +0100
+	 In-Reply-To:Content-Type; b=XTj0YeWDFr+26Su8EJFlLEAPGtd1YmyitqijGRAxKqW6gpRfKv6F0I8It1fNZPk+XSoTWQTCXROMG2HztKeaxCh+kqVUTKyzsLkePRSnM6ahQL/LLOHkjHvfEGHL/Yhg/txCRSY1oqgzkCug2sBLYCpf/aHjemsoU0FbyH6okoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=dD5In/S0; arc=none smtp.client-ip=80.12.242.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id DMNHtEHNmNywhDMNIthG2G; Tue, 19 Nov 2024 12:26:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1732015595;
+	bh=d9GXcffo0UAX9pD8MRFRvCySp0v93Es0xkObTh1140o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=dD5In/S04frbfPzHzkSlfngFTsOTi/1BdloRL546rlbqNKsazcYCgHaFYx2xGnCWK
+	 DkRKSXvHVziTyYsylfNvmgM7XUBAn7TiJ9XUNGojfc96r7k/jQOueoXvGUUnOD290K
+	 P37KMcSaylJNiEgzRZIsDtxkD18NkhW62HlNEoJeJbXVpfde5GhyhV4ONTlrWX1a+O
+	 aY2Cj1KwuxtgfMyzd+KT5YreEiVwLtKZnwJnFTcCYgtverp+jT0hUn+ApIWLA+t/Zx
+	 bxOZBYw4aGn8VIEvQEpCD04GtgTWpOLPcev/awAWKQxe1ynVQ4ryGZNxu8nRNrw0Zj
+	 +scF5J1bswNBw==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 19 Nov 2024 12:26:35 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <f84991f7-66c6-4366-9953-b230761b6b7a@wanadoo.fr>
+Date: Tue, 19 Nov 2024 20:26:26 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,48 +57,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Add standalone ethernet MAC entries for qcs615
-To: Yijie Yang <quic_yijiyang@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
+ lines
+To: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, quic_tingweiz@quicinc.com,
- quic_aiquny@quicinc.com, quic_tengfan@quicinc.com, quic_jiegan@quicinc.com,
- quic_jingyw@quicinc.com, quic_jsuraj@quicinc.com
-References: <20241118-schema-v1-0-11b7c1583c0c@quicinc.com>
+ imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>,
+ Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>,
+ Enric Balletbo <eballetb@redhat.com>
+References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
+ <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+ <57915ed9-e57e-4ca3-bc31-6405893c937e@wanadoo.fr>
+ <bfa5200d-6e56-417d-ac3b-52390398dba2@oss.nxp.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241118-schema-v1-0-11b7c1583c0c@quicinc.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+In-Reply-To: <bfa5200d-6e56-417d-ac3b-52390398dba2@oss.nxp.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/18/24 07:16, Yijie Yang wrote:
-> Add separate EMAC entries for qcs615 since its core version is 2.3.1,
-> compared to sm8150's 2.1.2.
+On 19/11/2024 at 19:01, Ciprian Marian Costea wrote:
+> On 11/19/2024 11:26 AM, Vincent Mailhol wrote:
+>> On 19/11/2024 at 17:10, Ciprian Costea wrote:
+
+(...)
+
+>>>   +    if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
+>>> +        err = request_irq(priv->irq_secondary_mb,
+>>> +                  flexcan_irq, IRQF_SHARED, dev->name, dev);
+>>> +        if (err)
+>>> +            goto out_free_irq_err;
+>>> +    }
+>>
+>> Is the logic here correct?
+>>
+>>    request_irq(priv->irq_err, flexcan_irq, IRQF_SHARED, dev->name, dev);
+>>
+>> is called only if the device has the FLEXCAN_QUIRK_NR_IRQ_3 quirk.
+>>
+>> So, if the device has the FLEXCAN_QUIRK_SECONDARY_MB_IRQ but not the
+>> FLEXCAN_QUIRK_NR_IRQ_3, you may end up trying to free an irq which was
+>> not initialized.
+>>
+>> Did you confirm if it is safe to call free_irq() on an uninitialized irq?
+>>
+>> (and I can see that currently there is no such device with
+>> FLEXCAN_QUIRK_SECONDARY_MB_IRQ but without FLEXCAN_QUIRK_NR_IRQ_3, but
+>> who knows if such device will be introduced in the future?)
+>>
 > 
-> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
-## Form letter - net-next-closed
+> Hello Vincent,
+> 
+> Thanks for your review. Indeed this seems to be an incorrect logic since
+> I do not want to create any dependency between 'FLEXCAN_QUIRK_NR_IRQ_3'
+> and 'FLEXCAN_QUIRK_SECONDARY_MB_IRQ'.
+> 
+> I will change the impacted section to:
+>     if (err) {
+>         if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3)
+>             goto out_free_irq_err;
+>         else
+>             goto out_free_irq;
+>     }
 
-The merge window for v6.13 has begun and net-next is closed for new
-drivers, features, code refactoring and optimizations. We are currently
-accepting bug fixes only.
+This is better. Alternatively, you could move the check into the label:
 
-Please repost when net-next reopens after Dec 2nd.
+  out_free_irq_err:
+  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_NR_IRQ_3)
+  		free_irq(priv->irq_err, dev);
 
-RFC patches sent for review only are welcome at any time.
+But this is not a strong preference, I let you pick the one which you
+prefer.
 
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+>>>       flexcan_chip_interrupts_enable(dev);
+>>>         netif_start_queue(dev);
+>>>         return 0;
+>>>   + out_free_irq_err:
+>>> +    free_irq(priv->irq_err, dev);
+>>>    out_free_irq_boff:
+>>>       free_irq(priv->irq_boff, dev);
+>>>    out_free_irq:
 
+(...)
+
+
+Yours sincerely,
+Vincent Mailhol
 
 
