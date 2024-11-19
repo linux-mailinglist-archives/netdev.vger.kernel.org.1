@@ -1,133 +1,208 @@
-Return-Path: <netdev+bounces-146266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A55B9D28C0
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:59:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 918C89D28D7
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3B3E280E0D
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:59:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CCF5282C3E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E19C1CEE91;
-	Tue, 19 Nov 2024 14:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2981CFEA8;
+	Tue, 19 Nov 2024 15:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="h3aEOqpG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3Li6Unu"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034B81CF296
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 14:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791B51CF5FF;
+	Tue, 19 Nov 2024 15:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732028378; cv=none; b=flXnlpdyoQVkLKRRbN4voVYUYre2/3LoA3hQBUy0VlI9YCbdI44mqQ2/sDM8P50J5RbbipredVDRQEy0BX06t03xRU11XQupImzl+nat4YWMAB0HT/PXrh7OSnGcBRtW7G3fcEeOMOlBs2ClrJo9dqEgFRMNN49aqWiP7X9TPBs=
+	t=1732028464; cv=none; b=BfGxgHElloSjVmgB6gmhFB6POeBlgicGMszxw15V7KbkOB+HmdL/4VUxWEtijYJbSUD5BOOkPIF2iGHWyDX3jXIgZM3Db0yCZ1ZjyUShrC6cbm7tAW2MDTgQgpnIrF0SzHtUtjGpYpDVFkprEgMbu48akNMCPvXt1/L7JIo0aIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732028378; c=relaxed/simple;
-	bh=rpcNWXGYDIWTYOMlYLXYd+yPHO0MrCXcIaSwMc/b29U=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=FGLwkL2CCkKaDW7wGxwHmTf/cmqzkMZ+tEzPTL3uUTc+GdVQ5Cyu22fjPome63kUVV8xpD045lDF1dX26B1AFxlHCMIzN9+GSg3L3OH4vqeGGzUXkpL/t10WEW+2N67Tux0YlQR08+ip4pI767dT95e1a9dY6pOOJlKxpXhaX7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=h3aEOqpG; arc=none smtp.client-ip=148.163.129.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id C4F97240089;
-	Tue, 19 Nov 2024 14:59:33 +0000 (UTC)
-Received: from [172.20.0.209] (unknown [12.22.205.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 2CED413C2B0;
-	Tue, 19 Nov 2024 06:59:33 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 2CED413C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1732028373;
-	bh=rpcNWXGYDIWTYOMlYLXYd+yPHO0MrCXcIaSwMc/b29U=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=h3aEOqpGW5/rNkzsINRKGIYE+Wwr81lSCLooXrgdOCX822kBZEBa4+3t8nMdS68lS
-	 fIwJL4eVvn8TO9M7fXmAwOFnCkwIRzOc2BIFHQOgyR/y0F6d3y5u/UgTzx0Q1O96Mq
-	 sP8GQFCHMnjHIyKIJeKsnP9NM6QCyoC18Qwv+0No=
-Message-ID: <b8b88a15-5b62-4991-ab0c-bb30a51e7be6@candelatech.com>
-Date: Tue, 19 Nov 2024 06:59:32 -0800
+	s=arc-20240116; t=1732028464; c=relaxed/simple;
+	bh=pVAFeeVG2DCukahRjWJuvO3U02Z08EkvjUFFYYALKE0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=q9gOPv56Fg6M0RYYU2CY+6aVT8k/6HG+frqQ6IerBdpu8L02RZpDcT9FMPRUGFepeE+rCgGYOf4irn+v9S07m/tM/0DdOY2O/tcK7lkkQecoiv68Xj/KB+cayNljIJou8azhr6BrMaBwB6wSxwF7OGFPPHMxhxov1yrA4Hz38F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3Li6Unu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08FE6C4CEDA;
+	Tue, 19 Nov 2024 15:01:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732028464;
+	bh=pVAFeeVG2DCukahRjWJuvO3U02Z08EkvjUFFYYALKE0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=s3Li6UnuNT5RQYo/zUciXhnbKgHOYayZxKFJg6AN5phjZ3W58eCYbJMyPvc2yik9h
+	 sHyrgpgbrknOu+KmoM2hXXiAkFbggH3vbPHFPS7pcSEVbojTBDF08HPzSKpLNfX/8/
+	 oQ5mNGzVi9mr9Hfxfo8ROoSHNdipKBrhAJOMpict3KLTjCGiViaWJBE9y6oQyD9/1P
+	 b6e8C3GQ/6Xwa2S1KcOOJaAfCnlN2eAAKN8CGdg7W8AAaY3YYmglX6zUKz5FMB+FR9
+	 CUxT0fziszG+iB8iqr8V2TZ6S/ybDU5MNbeRqmRQGU/ZK5W1SoeqcwM9bHipK3N+M5
+	 8fE7tQfEnNIWA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7BC2D44166;
+	Tue, 19 Nov 2024 15:01:03 +0000 (UTC)
+From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Subject: [PATCH v5 00/16] Add support for Synopsis DWMAC IP on NXP
+ Automotive SoCs S32G2xx/S32G3xx/S32R45
+Date: Tue, 19 Nov 2024 16:00:06 +0100
+Message-Id: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: GRE tunnels bound to VRF
-From: Ben Greear <greearb@candelatech.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev <netdev@vger.kernel.org>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
- <ZzsCNUN1vl01uZcX@shredder>
- <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
- <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com>
-Content-Language: en-MW
-Organization: Candela Technologies
-In-Reply-To: <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-MDID: 1732028374-JMNnj7EPBC8w
-X-MDID-O:
- us5;ut7;1732028374;JMNnj7EPBC8w;<greearb@candelatech.com>;a7e0f01e4f1a90fc9a5deb2f83c822d4
-X-PPE-TRUSTED: V=1;DIR=OUT;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPanPGcC/23NTQ6DIBCG4asY1sXwp2JXvUfTGMBRWSgGLLEx3
+ r3oqk1cvl8yz2wogLcQ0D3bkIdog3VTiuKWITOoqQds29SIESZIzTh+z2HxoMYmcGZM04/K4FL
+ WFHRVaMpKlC5nD51dT/X5Sj3YsDj/OZ9EfqynRwm99iLHBLdS6EKVla45ebgQ8mmdc+NGdIhR/
+ ChMXisiKYSXVHaUAAf2r+z7/gXRWiNL/gAAAA==
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>, 
+ Minda Chen <minda.chen@starfivetech.com>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Iyappan Subramanian <iyappan@os.amperecomputing.com>, 
+ Keyur Chudgar <keyur@os.amperecomputing.com>, 
+ Quan Nguyen <quan@os.amperecomputing.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev, 
+ devicetree@vger.kernel.org, NXP S32 Linux Team <s32@nxp.com>, 
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ Serge Semin <fancer.lancer@gmail.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1732028461; l=4698;
+ i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
+ bh=pVAFeeVG2DCukahRjWJuvO3U02Z08EkvjUFFYYALKE0=;
+ b=Vj3ROUS5xQl+NqauDwLdZGqJP2dxkT/zv8Qbu47euONS50UQW0jbAAQWFqlbgLGeN/5P57lNq
+ kfxiCPqFF7aAWdBimViMevvgY0CZHwKckLHBarZAtknSzU1CtvbBsv0
+X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
+ pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
+X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
+ auth_id=217
+X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Reply-To: jan.petrous@oss.nxp.com
 
-On 11/18/24 5:47 PM, Ben Greear wrote:
-> On 11/18/24 11:48 AM, Ben Greear wrote:
->> On 11/18/24 1:00 AM, Ido Schimmel wrote:
->>> On Sun, Nov 17, 2024 at 10:40:18AM -0800, Ben Greear wrote:
->>>> Hello,
->>>>
->>>> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
->>>> underlying traffic?
->>>>
->>>> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
->>>> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
->>>> gre interfaces and have that go out whatever the ethernet VRFs route to...
->>>
->>> You can set eth{1,2} as the "physical device" of gre{0,1}
->>>
->>> ip link add name gre0 up type gre [...] dev eth1
->>> ip link add name gre1 up type gre [...] dev eth2
->>>
->>> The "physical device" can be any interface in the VRF, not necessarily
->>> eth{1,2}.
->>
->> Hello,
->>
->> Thanks for that suggestion.
->>
->> I'm trying to implement this, but not having much luck.  My current approach
->> is trying to put gre0 in one VRF, attached to a VETH device in a different VRF.
->>
->> Would you expect that to work?
-> 
-> I found some other problems with my config, will try this again now that some other
-> problems are solved...
+The SoC series S32G2xx and S32G3xx feature one DWMAC instance,
+the SoC S32R45 has two instances. The devices can use RGMII/RMII/MII
+interface over Pinctrl device or the output can be routed
+to the embedded SerDes for SGMII connectivity.
 
-Ok, I am happy to report that GRE with lower-dev bound to one VRF and greX in a different
-VRF works fine.
+The provided stmmac glue code implements only basic functionality,
+interface support is restricted to RGMII only. More, including
+SGMII/SerDes support will come later.
 
-Thanks,
-Ben
+This patchset adds stmmac glue driver based on downstream NXP git [0].
 
-> 
->>
->> And also, is there any way to delete a gre netdev?  ip link delete gre0 doesn't
->> complain, and doesn't work.
-> 
-> I found answer to this, for reference, it seems gre0 is default instance built by the
-> ip_gre module when it is loaded, and used for special purpose.
-> 
-> Thanks,
-> Ben
-> 
+[0] https://github.com/nxp-auto-linux/linux
 
+v5:
+- yaml: refactored compatible string to use fallback
+- yaml: fix indention in example
+- fix xmas tree formating in local variable declarations
+- removed lazy rx clk setup
+- drop PTP clock reading patch and replace it with stmmac_platform fix
 
+v4:
+- fixed empty commit messages for rgmi_clock() helper patches
+- fixed yaml path in MAINTAINERS
+- switched to platform_driver::remove() as suggested Uwe
+- yaml: returned back all compatibility sting values
+- added better commit description for rgmii_clock() helper
+- Link to v3: https://lore.kernel.org/r/20241013-upstream_s32cc_gmac-v3-0-d84b5a67b930@oss.nxp.com
+
+v3:
+- switched to b4 WoW to overcome threading issue with b4
+- extracted the hunk with the typo fix from v2 patch#1 to separate patch
+  as Jacob suggested
+- removed dead code for RMII/MII support, which will be added alter
+- used new rgmii_clock() helper in other stmmac:dwmac glue drivers
+- yaml: compatible strings compressed to simple one "nxp,s32-dwmac",
+  removed duplicated required properties, already defined in snps,dwmac,
+  fixed example
+
+v2:
+- send to wider audience as first version missed many maintainers
+- created rgmi_clk() helper as Russell suggested (see patch#4)
+- address Andrew's, Russell's, Serge's and Simon's comments
+
+Message-ID: <AM9PR04MB85066576AD6848E2402DA354E2832@AM9PR04MB8506.eurprd04.prod.outlook.com>
+
+Cc: 
+
+Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+---
+Changes in v5:
+- EDITME: describe what is new in this series revision.
+- EDITME: use bulletpoints and terse descriptions.
+- Link to v4: https://lore.kernel.org/r/20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com
+
+---
+Jan Petrous (OSS) (16):
+      net: driver: stmmac: Fix CSR divider comment
+      net: driver: stmmac: Extend CSR calc support
+      net: stmmac: Fix clock rate variables size
+      net: phy: Add helper for mapping RGMII link speed to clock rate
+      net: dwmac-dwc-qos-eth: Use helper rgmii_clock
+      net: dwmac-imx: Use helper rgmii_clock
+      net: dwmac-intel-plat: Use helper rgmii_clock
+      net: dwmac-rk: Use helper rgmii_clock
+      net: dwmac-starfive: Use helper rgmii_clock
+      net: macb: Use helper rgmii_clock
+      net: xgene_enet: Use helper rgmii_clock
+      net: dwmac-sti: Use helper rgmii_clock
+      dt-bindings: net: Add DT bindings for DWMAC on NXP S32G/R SoCs
+      net: stmmac: dwmac-s32: add basic NXP S32G/S32R glue driver
+      MAINTAINERS: Add Jan Petrous as the NXP S32G/R DWMAC driver maintainer
+      net: stmmac: platform: Fix PTP clock rate reading
+
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 105 +++++++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   3 +
+ MAINTAINERS                                        |   7 +
+ drivers/net/ethernet/apm/xgene/xgene_enet_hw.c     |  16 +-
+ drivers/net/ethernet/cadence/macb_main.c           |  14 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  12 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/common.h       |   2 +
+ .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c    |  15 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel-plat.c |  20 +-
+ .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     |  30 +--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c    | 204 +++++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwmac-starfive.c   |  19 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c    |  18 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   6 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |   4 +-
+ include/linux/phy.h                                |  23 +++
+ include/linux/stmmac.h                             |  10 +-
+ 21 files changed, 404 insertions(+), 120 deletions(-)
+---
+base-commit: 158f238aa69d91ad74e535c73f552bd4b025109c
+change-id: 20240923-upstream_s32cc_gmac-6891eb75b126
+
+Best regards,
 -- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+
+
 
