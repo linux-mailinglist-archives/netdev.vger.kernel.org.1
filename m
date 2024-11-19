@@ -1,109 +1,103 @@
-Return-Path: <netdev+bounces-146058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B3F69D1DA4
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:52:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC16D9D1DA8
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09F891F223E6
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:52:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4289EB20C83
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0894B86252;
-	Tue, 19 Nov 2024 01:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D3012EBE9;
+	Tue, 19 Nov 2024 01:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qokv2DXP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqJ8t5mi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652942E3EB;
-	Tue, 19 Nov 2024 01:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEE5E56A;
+	Tue, 19 Nov 2024 01:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731981150; cv=none; b=OZWrbYX8/6WMASRVU9LVSCbvQLN8mjFMos8JjaK0ge0rt0PzVoR0T8Eb7To0oJDlCTC1iij7t8pEeXlIWGaUvaE/DEO/Y+VvecXlC5n+yjnuq8XnpoPRYqpfi1Af1LkBO/7sJ0n1/HWzUF4tavw0rsNvvU9mMk2M9vHQoiR9jGI=
+	t=1731981345; cv=none; b=iWyT5d5+PNFqQ0mzUJmFNIPMU5Jic7Ioyjv2vzbSQaY3ALayrcLvJUxegImO+8ZyQL4v0+SleUfIqB5GyfpiKiKy9bKFsCf1Q6Lowgg8hZgkosa2M2Y6CicR/fgE/ohuRci+49PNSetcmiAhFSRY7Cx3HIShKhZW1MzGc4c/88E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731981150; c=relaxed/simple;
-	bh=0ae1K5p4ElQdh94m5eUWpua2D8G6Ytdrfz3mhxapIE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ACHYkLTbtZgXDeEkZq2uy/s1UIR1sgnRafrTnQEpUjAqw7m29xsBmCrVfn4bkvNdfhPRG+nQA/36pLkm6OVJCyTNTRZm7mzsZEWwcW5GKUSMt7o3TOsn5xOfbeLNrtPK8O6C49DostgTLP0vcf/Uvhi0AtzYP3X6EQlo/pvGFjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qokv2DXP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=SxM76o8BGy53AtlOJoitl7JV8kJz7mesTX75V2BZ4D4=; b=qo
-	kv2DXPF5NrFtTmXJuEOhpovQLZUIAGFuSld5TeLwIPl4mLkHcAF1mYH216IVlMWFOR4wCy9/us05n
-	wPB7GLUOqbaKO12CCPHEKGt2dCOpkA+ildcppazSaUoNRItAVq6uDUkenkPYF6Km+XGmoh7xYVLE4
-	Nwvweckmq3fDjYo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tDDPX-00DjZv-5j; Tue, 19 Nov 2024 02:52:11 +0100
-Date: Tue, 19 Nov 2024 02:52:11 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrew Jeffery <andrew@codeconstruct.com.au>
-Cc: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, joel@jms.id.au, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next 3/3] net: mdio: aspeed: Add dummy read for fire control
-Message-ID: <b8986779-27eb-4b60-b180-24d84ca9a501@lunn.ch>
-References: <20241118104735.3741749-1-jacky_chou@aspeedtech.com>
- <20241118104735.3741749-4-jacky_chou@aspeedtech.com>
- <0d53f5fbb6b3f1eb01e601255f7e5ee3d1c45f93.camel@codeconstruct.com.au>
+	s=arc-20240116; t=1731981345; c=relaxed/simple;
+	bh=ZPJK+nk8hgdsklI/K/2mlQ2j6dlpYyZucUmE40Y6YVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aR46k/49Adzdbc7egubzQI24L35yWOg+V4ei64BN/Ha4E+TJZKzoNTah+z46hsSTMGyWTSYeYl+ZCZl8SZeS4/om07OxyrclZQDSRA9PUcdc+6NnO2dzQnK6W3z293snm0gUBSMgfXQXRyaSztXlsq8Nq2Cj05y/Rk971ujx2iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqJ8t5mi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 410B8C4CECC;
+	Tue, 19 Nov 2024 01:55:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731981344;
+	bh=ZPJK+nk8hgdsklI/K/2mlQ2j6dlpYyZucUmE40Y6YVg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tqJ8t5mic1QVFCR2B5E58FQO0uOQLvY+D1C0rtU3bI/yms+Ba6oXxpXDTfTd60Y9l
+	 r3bpU3X7EJx1cA7NWaH3Wp1HfjuHVKsRP3STZYARtme5OC3MFKMxhsQpFMbk72Kggu
+	 trnyCDdaRkhnL8utDYJaT1JSnemPfvqgb44y0UBVTGj3ESgpJHP4zJA9KOzoQEvN8Z
+	 QsU9prxVPQkl4t/AtPDstliT7Xk3zlIoI2fqy8nyA0im9+S4D/3DTTTVR2AlFExjBN
+	 z2vuCp796q54cObr/0baHz7gzbhOQ346262NPqUv6tp2wM5X+v1oj4Of2xN+vKUS5k
+	 amOrddSNXTGXg==
+Date: Mon, 18 Nov 2024 17:55:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Til Kaiser <mail@tk154.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: sysfs: also pass network device driver
+ to uevent
+Message-ID: <20241118175543.1fbcab44@kernel.org>
+In-Reply-To: <20241116163206.7585-2-mail@tk154.de>
+References: <20241115140621.45c39269@kernel.org>
+	<20241116163206.7585-1-mail@tk154.de>
+	<20241116163206.7585-2-mail@tk154.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0d53f5fbb6b3f1eb01e601255f7e5ee3d1c45f93.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 19, 2024 at 09:35:39AM +1030, Andrew Jeffery wrote:
-> Hi Jacky,
+On Sat, 16 Nov 2024 17:30:30 +0100 Til Kaiser wrote:
+> Currently, for uevent, the interface name and
+> index are passed via shell variables.
 > 
-> On Mon, 2024-11-18 at 18:47 +0800, Jacky Chou wrote:
-> > Add a dummy read to ensure triggering mdio controller before starting
-> > polling the status of mdio controller.
-> > 
-> > Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> > ---
-> >  drivers/net/mdio/mdio-aspeed.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-
-> > aspeed.c
-> > index 4d5a115baf85..feae30bc3e78 100644
-> > --- a/drivers/net/mdio/mdio-aspeed.c
-> > +++ b/drivers/net/mdio/mdio-aspeed.c
-> > @@ -62,6 +62,8 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8
-> > st, u8 op, u8 phyad, u8 regad,
-> >                 | FIELD_PREP(ASPEED_MDIO_DATA_MIIRDATA, data);
-> >  
-> >         iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
-> > +       /* Add dummy read to ensure triggering mdio controller */
-> > +       (void)ioread32(ctx->base + ASPEED_MDIO_CTRL);
+> This commit also passes the network device
+> driver as a shell variable to uevent.
 > 
-> Why do this when the same register is immediately read by
-> readl_poll_timeout() below?
+> One way to retrieve a network interface's driver
+> name is to resolve its sysfs device/driver symlink
+> and then substitute leading directory components.
 > 
-> If there is a reason, I'd like some more explanation in the comment
-> you've added, discussing the details of the problem it's solving when
-> taking into account the readl_poll_timeout() call.
+> You could implement this yourself (e.g., like udev from
+> systemd does) or with Linux tools by using a combination
+> of readlink and shell substitution or basename.
+> 
+> The advantages of passing the driver directly through uevent are:
+>  - Linux distributions don't need to implement additional code
+>    to retrieve the driver when, e.g., interface events happen.
+>  - There is no need to create additional process forks in shell
+>    scripts for readlink or basename.
+>  - If a user wants to check his network interface's driver on the
+>    command line, he can directly read it from the sysfs uevent file.
 
-Also, is this a fix? Should it have a Fixes: tag? If so, it should not
-be part of this series, assuming the older devices have the same
-issue.
+Thanks for the info, since you're working on an open source project 
+- I assume your exact use case is not secret, could you spell it 
+out directly? What device naming are you trying to achieve based on
+what device drivers? In my naive view we have 200+ Ethernet drivers 
+so listing Ethernet is not scalable. I'm curious what you're matching,
+how many drivers you need to list, and whether we could instead add a
+more general attribute...
 
-	Andrew
+Those questions aside, I'd like to get an ack from core driver experts
+like GregKH on this. IDK what (if any) rules there are on uevents.
+The merge window has started so we are very unlikely to hear from them
+now, all maintainers will be very busy. Please repost v3 in >=two weeks
+and CC Greg (and whoever else is reviewing driver core and/or uevent
+changes according to git logs).
+-- 
+pw-bot: defer
 
