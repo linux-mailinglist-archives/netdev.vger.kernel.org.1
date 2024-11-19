@@ -1,227 +1,280 @@
-Return-Path: <netdev+bounces-146148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C12879D21BE
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:41:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 943399D2199
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:30:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8076F284AC1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:41:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5320328168E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90ADD1C1F0E;
-	Tue, 19 Nov 2024 08:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C2D1A00F2;
+	Tue, 19 Nov 2024 08:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ETwhfEtp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGTtAHDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2062.outbound.protection.outlook.com [40.107.105.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38FD19C558;
-	Tue, 19 Nov 2024 08:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732005604; cv=fail; b=exM5dLl1xJOT9ONGaGTQUZQbJtFpAWj1CRg9SWVaYYXf5Cqhsasp2U53A+ham+K/VvK1zFU/sI9dwsiJkOzwKxaUkMrwFZrbxzhyb/xW5JBzb2TEYm06h10XvLPlIbnUevNW9MN+9Wa8Xmk/hTtspYT1NHzOrDJ8gn+Ru5ZfFCE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732005604; c=relaxed/simple;
-	bh=Kve0H5+o37kDdj12/XZbbiAVDS9NZyL01nZ2uyO52Hk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dkiUGXkSpQcGA8+I49yRAARUwpQRYh6o1ioUSnRxOR9fAgUwNJ1Pgv4SohWyXlMJGkceAWWJ3COMHpnbBapRBb3K00QZJYnQxfbiDH99awnEqSUBTAR8YEtnQyRuUf3BRIKvlMkTWHFaUskS3aSda1/KkRQePM5dOIo4aDStVOY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ETwhfEtp; arc=fail smtp.client-ip=40.107.105.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iWC7WeXmswOUe6AVklTjcsN9J6UbCyzTZlTxzO6Fy4Xk3E1j0axeRowTZQWWTBwvrxJ3rE5y2k7l9BQAimcCeZ3lqXwzn5mmCwi3AHOpq1lnU1vqjBXKnM/8rj0X/iYpxGxC54Vnd2NaqcxN9zdY1lMLffQvl1oCcqMQYs8Aaf9RFmwuCGylgK3+YOsIEdQ0d7rpye14PO2WZLu6nN2joWGn1iuG5vfsGdmr7eiYXJkyYRIB+JsvYLzyYMaghJ9590p7plJ3gcbRQh5ILwth/ZZ+GQKQsv0tifpPQVwoTkw2COzEqPq/wJbQcjwfbX3mZ4EiIl+wO/L1BM2dL1hIUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uWi/3hfJJLhdUExR37GH35NJkVcvWklV8n+CoIbZYbE=;
- b=QPUjZjX8Mw4KTSvn1jtw6uFuV4EFHJuDnKnBfR8Naf2IjQ0rSh2WxAaT5RHS5XDFVeATWPtqWtYpTApBfHU/ZdOblcncoZ/hNRYRbD+JutkiqILR6XoCasgaBnN6fpFQoaxsvDJ2SZeAGBjPS9+rxVvqV4yaTD/pYrMS3ozTcZzCzDLqbjlE9n5N2h0XkbfDxvhZiSPmKjBUl7ZZtTvryu1DeHadgOTfSRqtkfFSRRPVF94dRAwsNBCPiOeFfwufSxeZSAWxO+ClAFxh4ckpufg711fqYFeyKPbYGp6/PrmfBvhQLsL46PhzOSgqDzFMS5sZDJqqnKwM4zhBlzEYvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uWi/3hfJJLhdUExR37GH35NJkVcvWklV8n+CoIbZYbE=;
- b=ETwhfEtp7o4GaARz8ur+o4maT2jTGkuZ754nzphPdTe+/ZYuNb7J5aoOa71VemrIr9K/140/yShVY0teM8lYRcKY3ci17H0zcuLSLgOmrMFUIRxN5dwdGxjff5k/cW77psAQbI8r7Q+d6d0pa9CASPOidOEEKjXwuaJHSmctT3jPuIb5Az2Uv7Ffa43DQDbaNrbu10/v92CVxY/ABpcRCt9WHyqJkf1KZh6D7dZxEWAGGINwer3O5And7unPQaE33nfdyFDbBQr87kCD73PI34To+5UH00AcNUmsxLwgvoKWd4Sw6chXn7HEKV5xmSYyLZljNy8VcZCyp6+teOn89g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by VI2PR04MB10266.eurprd04.prod.outlook.com (2603:10a6:800:22b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23; Tue, 19 Nov
- 2024 08:39:59 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8158.023; Tue, 19 Nov 2024
- 08:39:58 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	frank.li@nxp.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH v6 net-next 5/5] net: enetc: add UDP segmentation offload support
-Date: Tue, 19 Nov 2024 16:23:44 +0800
-Message-Id: <20241119082344.2022830-6-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241119082344.2022830-1-wei.fang@nxp.com>
-References: <20241119082344.2022830-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2P153CA0019.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::10) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B3419D06A
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732005005; cv=none; b=pukXz8wJHUwLMHlkn6sFv0cApnx1J7AWF5eMQ05UFO2N8Jxfh9COEnq0rv5XDjf9Lc+/knPK4Ey1U0PBdb3QmQ01Pwj43uosKntIjNRaISvL6fUa7xZcKopyJ70fTP0FmD2fSpzJUp6XNWpCs1by8P5N6v7EbY086wqkuhzb540=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732005005; c=relaxed/simple;
+	bh=+xKCrPwQVHWM0r18FvOpIwNqva/kAUIiweoFAE7ZwzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PFyOdBogJiQTzrbvexKDqyEulnv4BuiCwj4lMB7AITRtodYoqsv5uo+INpQwetpVewAe84zlqG0ggp2LXjEvCj912xRhOJQzlr5XI2wQQMWt2dvyaPReqnCi7aNM67THvwuKKjY9D+ENgbPXxfVEpGwa4tpx3OksFmAN/OwoBqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GGTtAHDG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732005002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xTLxAWYQ1JNcTU0UUWCX6oUrShuLfa8MUCD9ctjzgKA=;
+	b=GGTtAHDGoa4//IKKyRRDqxZ1KbJ6UnluMRm/sPuc0S2gq1cwPRT8PWChHW8MXxwuwIVE9l
+	yx6g8cO+ZxtBHMrkM+CxoE52UtPTTOXZEKJH8F2nzK53tRlWXMdQ5FrTGc+jr1xZv4zirc
+	D1SB5sifdJKJsPLOdOUeJq8fxSF4APs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-16-vULGM0f8NEuwos4PdIUb4A-1; Tue, 19 Nov 2024 03:30:01 -0500
+X-MC-Unique: vULGM0f8NEuwos4PdIUb4A-1
+X-Mimecast-MFC-AGG-ID: vULGM0f8NEuwos4PdIUb4A
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a9a22a62e80so44412966b.1
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:30:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732005000; x=1732609800;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xTLxAWYQ1JNcTU0UUWCX6oUrShuLfa8MUCD9ctjzgKA=;
+        b=NK/ITK6PQjGbqeNAPSctRquy7Gnaq0C5RiupaQP45/9JYNA5RINIkILws4nGzqbUMA
+         /JDaVgVqkSZQrVDNX7xBmeJ+Pm4OletIEr75pFEQxybiWGvlTuTVQFTujq4pJqqpcyyD
+         NkKBxBEW6WSh/uZ5hb9WcrIgfyxTWsDT/cfQ4Ll+4j019JanA3YNZa5CUhbbihelpc0P
+         WRXkOBjHTNbM8QpEm1dc1dV5NGxQ47fqyPknN1KO7lszFYHiJ4vimzo95YykZ1BDkUU5
+         ZRw2ijb3YX1Y230uHD67LbXMmyrUG7chRJjL8/qFWUUsCW1rDI/CWnFW4AP3NWQC2MOE
+         Mjag==
+X-Gm-Message-State: AOJu0YzO7ql2NaTEXZWKZrCpo3hsQ+ghJlKjG3FXhAPAOCauAGFXivDu
+	2SW703M4IKoKN8qcYunAcusQ7INLAV2iVren96GA9eAhQEcIo76tJHPWX+3bpA7/eENFIsBSoy7
+	vx8DZB2+RNkq2fJZUCABXFezV6zrcFBCh2tePI/A5tGcgb+UVU7EJ0g==
+X-Received: by 2002:a17:907:d19:b0:a9e:b5d0:4ab7 with SMTP id a640c23a62f3a-aa483556727mr1382682566b.52.1732005000139;
+        Tue, 19 Nov 2024 00:30:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFxd7z957UsxaATiVx0EDfbn0BFQH51aHLzQfor6HWy4iT3aPDneL8plKb/5vnwG3RSEd0qgw==
+X-Received: by 2002:a17:907:d19:b0:a9e:b5d0:4ab7 with SMTP id a640c23a62f3a-aa483556727mr1382676566b.52.1732004999357;
+        Tue, 19 Nov 2024 00:29:59 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-129.retail.telecomitalia.it. [79.46.200.129])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df4e7bfsm624064866b.42.2024.11.19.00.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2024 00:29:58 -0800 (PST)
+Date: Tue, 19 Nov 2024 09:29:53 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <graf@amazon.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, Asias He <asias@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH] vsock/virtio: Remove queued_replies pushback logic
+Message-ID: <efsbknrsmen47tlay7cjrbo5qvmu4bcrmi2lvploi6qq5wpwet@wuu5mfgc3a34>
+References: <20241115103016.86461-1-graf@amazon.com>
+ <yjhfe5bsnfpqbnibxl2urrnuowzitxnrbodlihz4y5csig7e7p@drgxxxxgokfo>
+ <dca2f6ff-b586-461d-936d-e0b9edbe7642@amazon.com>
+ <CAGxU2F6eJA+vpYVbE0HNW794pF6wLL+o=92NYMQVvmFWnpNPaA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|VI2PR04MB10266:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6539f024-7d6e-4dbd-cbd6-08dd0875c054
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|52116014|376014|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9ndT0OOpIa9fYBnGjwqQd1eFvYYaVHCDhgxpopQrM3gw70ZH1BRBjniF8MpG?=
- =?us-ascii?Q?urzLb8+BSwB5psVltNChDew+0nmQjmDdURFwLH74QLQaKOIdpK3yaIuk09o5?=
- =?us-ascii?Q?PuD9J31RuDQUIWoNmvHvp6CN8zg+k4lhAEpekk/sFZdwwoVnIwnSk8G2Inuu?=
- =?us-ascii?Q?8upkymqF9vKSYqtpJaP0KctC5RIPVLSubjNnMhVIpdmNxeV3sS37+f/RfK4H?=
- =?us-ascii?Q?nqsH9zdsUoOCtA64fmsn9TofQWFzhr9/vpur7qRz3HMa5lZ2ll5+EzJFoRrl?=
- =?us-ascii?Q?ZTvv8v80p87Ht2Y3qfhsOPPoFWKhOcogWmVcKEoAk7+ImRUbaRYe+DzHyFSL?=
- =?us-ascii?Q?9S614Eoc7hpKKGOVOgrb0sueWNv6cLhvUyKuG9V7qnSBKQfPMQS3oSqJW500?=
- =?us-ascii?Q?aeMzZogtAmzK543TIcRTxIzzojBeWhAmEmgWRgpXXtcHtHSdxmvEnRwHYNVs?=
- =?us-ascii?Q?DMWLSrwGCEojCdK4px24sIMFn+N08nn3oJv9xkKQyP2q969jPm+RY7Mm3och?=
- =?us-ascii?Q?CMrGWgK+pj99m/WsXLewCuBptnoKXrdZgXjipiMjN8LmqUyoLLuTsseA6kK2?=
- =?us-ascii?Q?lboQMFpa4khJVL9W+5brItQXgLIH1Z7EF2AN3FvX8diJNGrxPjygkqO+fSxs?=
- =?us-ascii?Q?S9ElR0qZenwXu1aUmoVgovn2smryS1zozeqlgSfVtLI4fxPJiiyMezbL588b?=
- =?us-ascii?Q?rSw1vxwq+99enC4Qg1ryoCvq0ZtDbd+b/Ho7X9urfyB6jSeRfCHibnwG/jIv?=
- =?us-ascii?Q?feMDL4pVx/BUyStOfzhrcIGoRU/mMW39PtyK0MXTC0jnIdbXlmDNgmbUKJ/F?=
- =?us-ascii?Q?fuCkeoL5RC/AK3AbnUK45Hz/ElcmUKurmhW7RjrpQ9ZdS1rcnKr1APLcKaKI?=
- =?us-ascii?Q?5HylLoUy4Uby5U8XNOhKvTmTh7Ru13+ujkcWQGikmRvGdYfWgyJXOValL4A9?=
- =?us-ascii?Q?31Aw2Vt0BEzc8S2moGN6Tsc7p+m7XCVr7enZ/8S1qr2CC4JwOPMpB9kOr3pX?=
- =?us-ascii?Q?S3IGKRQZAXCrJsEp/q3r7RZ2gdcueC8T87hkF1BcMEnZYlH9Rkndi2AZdoJs?=
- =?us-ascii?Q?4mTqWbuz4O3OthE4KCTRw1t+vofL5tW0GDNBNvB7eg3VPlwXxundIAJcKyac?=
- =?us-ascii?Q?X5/oaq+M2oZJL4r6UEY4GA15uLKyh3g3Tmq7pKp0fizzLbGp/kAm+mrQfFgq?=
- =?us-ascii?Q?zAnZHHjohcGJcVGad3kOFWybhil0maGKlKta8gsLcoRJ5dMCHhfIjFich/kv?=
- =?us-ascii?Q?uE3tOcr4o9svmN0t1Yh8taHzcweoPQjZwdZxhYw8P8itvtebNx7B8ead8nRP?=
- =?us-ascii?Q?GFPb/reAhLmuI1sphSFVAma0QVggJiTzWpfiD3rlqClzDXtEwyPO1ML7W5G7?=
- =?us-ascii?Q?pxx4dyw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?twsroAGYTMD85alJzc7pxILrmAq4XMdKFlS5dYlMrjTLnoQ+xoT+1rqsz9bK?=
- =?us-ascii?Q?0u7ikgjeuIwjrcif5m+CQjA1LGcJIlIjPlu5hnIcUQnd2W8Y+QjQHJ/6WVMm?=
- =?us-ascii?Q?FyFyjyVrFS4sInbLjcPl6nhdYL2JQdm5hwylgF99qLCK6wJRjlmG/6sciVUN?=
- =?us-ascii?Q?CQjPW8/EpE1YAs6i0zFQduVrpZjouDweY9s5k3sd3eoWT3uxd4H4jNqBbuMU?=
- =?us-ascii?Q?JcbP+RRH4aNBorTm1Xfqd3nBS3LtarB91r1hRT1VXXe1uhv5WAcRLYDcOb0j?=
- =?us-ascii?Q?rn7kTkP4oPJ5DrRt2cBVmdUT54scENHYT3OOFJiSwYPdHJfH9sbChh2gKlkS?=
- =?us-ascii?Q?bNQZDl4ISFXLiBAx8U6N46k3BMvVunSF+XBxrtGjih5y8a8ppi6hmY6gnW7R?=
- =?us-ascii?Q?Go4EWXLD4AXAiPKS8+Q4FimeXbfkkV4/FpVgYHMkrud5c53ckIFZ3yt7BKUS?=
- =?us-ascii?Q?3wFdpG8Fup8L16daG2+Ho7tIOSQYOoEHcswxM8gy5tQiruJNKNwY96ooKgXW?=
- =?us-ascii?Q?qbjx8xh+ubYvoJ6PBNbkrFz2SabWVOoP5/vi0PscOY7pgxgEDwYwSqp/BSvR?=
- =?us-ascii?Q?nBusn3qpq+cg2VB27W9WDJHY+wD7igJXatMr6Qs4PLbtqqriJTwBf1EMmRnm?=
- =?us-ascii?Q?7Jjy39/PnDHlqsGPTH5rBnu58V1z2wANw7YJYejFf7L89r4WZudHnlts4Ivr?=
- =?us-ascii?Q?NORqXTAUlRPJekcBvTOGrVgwjmfJQDW6nxPTwC0nna/eDqkF1Wi4brW8c9KW?=
- =?us-ascii?Q?V7vlMqe5WRg6pqvtScWvhOUWZSOwCSDylwjlknb2rtvoQnnLncpSk+Jx5ls/?=
- =?us-ascii?Q?N7RuLnliOYLzSEUpAazROVjWreja9DDX4/7bw4750zLzEy4PAYRlMtaiE/u+?=
- =?us-ascii?Q?8M0eexS08MDaVTQRbM+4nX3gRzfYQ1vG9Gz0FGdpe5D8ajvlAAbNnxxe7K8G?=
- =?us-ascii?Q?23MYWLFVR9ki+vsLJhPhNJZeZ/rnmOy5vr12hjCnxgrG7kxUxC8FjHLOizTB?=
- =?us-ascii?Q?p741fw2KCWppqQR8F+ESqTxRnXGKDwFTS0526R8URLY7wHCHBUh9ERumVXzS?=
- =?us-ascii?Q?gRMyLAhl7NtLhWVcmy7uFug8SSxlTJMrDi41A8acecb6A4/ZW4j/T59//KbO?=
- =?us-ascii?Q?8y/CShSbpwM/a2alnasfElxGHGjsNnGXG+9yB0QHUb9blOitT3kn4vuBJqU1?=
- =?us-ascii?Q?2ZMBwPASJepKUG3+vKPxsp/yr9CTyZwjsjZyFXj+anvcW1FJY9TbF5vnyVn2?=
- =?us-ascii?Q?gSDSxHMlf81UlfKftd2ZJqgy+2cpz2TS751FfU7v9WgzcihX9qYI2jbBl0AQ?=
- =?us-ascii?Q?H8xUXVhF4vbJMPN7PnNOK0nax8QdzzUqCLrtO8G+INsmxqECtvNiwLtM0sMH?=
- =?us-ascii?Q?yBFDiYWsZHt6wHNO4fxpS86xRU2wteP2nz4Sy5tsQi16e70tQWbXzEhZh4GI?=
- =?us-ascii?Q?j6qYLRFUu3+T0tSbAznxOxmg/wKZkyuPOomka4wUIMTJ+jp1SgCVSPCq1fvO?=
- =?us-ascii?Q?r+bzI+MhwP1ydZrIbQkfgSHMG0YblixcxUtSWWO7UP7IYi0LF8AQPOJhWwy5?=
- =?us-ascii?Q?8odcITPSzgzAyB4YQ9C/IfsPuTpuUa3pAdHqIzvf?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6539f024-7d6e-4dbd-cbd6-08dd0875c054
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2024 08:39:58.9282
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zHL8V2r+qf8z3g0eoZ87+Ji9hoh/h4pMkNlPT7iytW4YW5kCMDtgDF/to2eUR3jR6oJE/mDdUoWRw5P+RwYxSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10266
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGxU2F6eJA+vpYVbE0HNW794pF6wLL+o=92NYMQVvmFWnpNPaA@mail.gmail.com>
 
-Set NETIF_F_GSO_UDP_L4 bit of hw_features and features because i.MX95
-enetc and LS1028A driver implements UDP segmentation.
+On Mon, Nov 18, 2024 at 03:07:43PM +0100, Stefano Garzarella wrote:
+>On Fri, Nov 15, 2024 at 4:49 PM Alexander Graf <graf@amazon.com> wrote:
+>>
+>> Hi Stefano,
+>>
+>> On 15.11.24 12:59, Stefano Garzarella wrote:
+>> >
+>> > On Fri, Nov 15, 2024 at 10:30:16AM +0000, Alexander Graf wrote:
+>> >> Ever since the introduction of the virtio vsock driver, it included
+>> >> pushback logic that blocks it from taking any new RX packets until the
+>> >> TX queue backlog becomes shallower than the virtqueue size.
+>> >>
+>> >> This logic works fine when you connect a user space application on the
+>> >> hypervisor with a virtio-vsock target, because the guest will stop
+>> >> receiving data until the host pulled all outstanding data from the VM.
+>> >
+>> > So, why not skipping this only when talking with a sibling VM?
+>>
+>>
+>> I don't think there is a way to know, is there?
+>>
+>
+>I thought about looking into the header and check the dst_cid.
+>If it's > VMADDR_CID_HOST, we are talking with a sibling VM.
+>
+>>
+>> >
+>> >>
+>> >> With Nitro Enclaves however, we connect 2 VMs directly via vsock:
+>> >>
+>> >>  Parent      Enclave
+>> >>
+>> >>    RX -------- TX
+>> >>    TX -------- RX
+>> >>
+>> >> This means we now have 2 virtio-vsock backends that both have the
+>> >> pushback
+>> >> logic. If the parent's TX queue runs full at the same time as the
+>> >> Enclave's, both virtio-vsock drivers fall into the pushback path and
+>> >> no longer accept RX traffic. However, that RX traffic is TX traffic on
+>> >> the other side which blocks that driver from making any forward
+>> >> progress. We're not in a deadlock.
+>> >>
+>> >> To resolve this, let's remove that pushback logic altogether and rely on
+>> >> higher levels (like credits) to ensure we do not consume unbounded
+>> >> memory.
+>> >
+>> > I spoke quickly with Stefan who has been following the development from
+>> > the beginning and actually pointed out that there might be problems
+>> > with the control packets, since credits only covers data packets, so
+>> > it doesn't seem like a good idea remove this mechanism completely.
+>>
+>>
+>> Can you help me understand which situations the current mechanism really
+>> helps with, so we can look at alternatives?
+>
+>Good question!
+>I didn't participate in the initial development, so what I'm telling
+>you is my understanding.
+>@Stefan feel free to correct me!
+>
+>The driver uses a single workqueue (virtio_vsock_workqueue) where it
+>queues several workers. The ones we are interested in are:
+>1. the one to handle avail buffers in the TX virtqueue (send_pkt_work)
+>2. the one for used buffers in the RX virtqueue (rx_work)
+>
+>Assuming that the same kthread executes the different workers, it
+>seems to be more about making sure that the RX worker (i.e. rx_work)
+>does not consume all the execution time, leaving no room for TX
+>(send_pkt_work). Especially when there are a lot of messages queued in
+>the TX queue that are considered as response for the host. (The
+>threshold seems to be the size of the virtqueue).
+>
+>That said, perhaps just adopting a technique like the one in vhost
+>(byte_weight in vhost_dev_init(), vhost_exceeds_weight(), etc.) where
+>after a certain number of packets/bytes handled, the worker terminates
+>its work and reschedules, could give us the same guarantees, in a
+>simpler way.
 
-- i.MX95 ENETC supports UDP segmentation via LSO.
-- LS1028A ENETC supports UDP segmentation since the commit 3d5b459ba0e3
-("net: tso: add UDP segmentation support").
+Thinking more about, perhaps now I understand better why it was
+introduced, and it should be related to the above.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
----
-v2: rephrase the commit message
-v3: no changes
-v4: fix typo in commit message
-v5: no changes
-v6: no changes
----
- drivers/net/ethernet/freescale/enetc/enetc_pf_common.c | 6 ++++--
- drivers/net/ethernet/freescale/enetc/enetc_vf.c        | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+In practice, "replies" are almost always queued in the intermediate
+queue (send_pkt_queue) directly by the RX worker (rx_work) during its
+execution. These are direct responses handled by
+virtio_transport_recv_pkt() to requests coming from the other peer (the
+host usually or sibling VM in your case). This happens for example
+calling virtio_transport_reset_no_sock() if a socket is not found, or
+sending back VIRTIO_VSOCK_OP_RESPONSE packet to ack a request of a
+connection coming with a VIRTIO_VSOCK_OP_REQUEST packet.
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 82a67356abe4..76fc3c6fdec1 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -110,11 +110,13 @@ void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
- 	ndev->hw_features = NETIF_F_SG | NETIF_F_RXCSUM |
- 			    NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX |
- 			    NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_LOOPBACK |
--			    NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6;
-+			    NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6 |
-+			    NETIF_F_GSO_UDP_L4;
- 	ndev->features = NETIF_F_HIGHDMA | NETIF_F_SG | NETIF_F_RXCSUM |
- 			 NETIF_F_HW_VLAN_CTAG_TX |
- 			 NETIF_F_HW_VLAN_CTAG_RX |
--			 NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6;
-+			 NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6 |
-+			 NETIF_F_GSO_UDP_L4;
- 	ndev->vlan_features = NETIF_F_SG | NETIF_F_HW_CSUM |
- 			      NETIF_F_TSO | NETIF_F_TSO6;
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-index 052833acd220..ba71c04994c4 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
-@@ -138,11 +138,13 @@ static void enetc_vf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
- 	ndev->hw_features = NETIF_F_SG | NETIF_F_RXCSUM |
- 			    NETIF_F_HW_VLAN_CTAG_TX |
- 			    NETIF_F_HW_VLAN_CTAG_RX |
--			    NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6;
-+			    NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6 |
-+			    NETIF_F_GSO_UDP_L4;
- 	ndev->features = NETIF_F_HIGHDMA | NETIF_F_SG | NETIF_F_RXCSUM |
- 			 NETIF_F_HW_VLAN_CTAG_TX |
- 			 NETIF_F_HW_VLAN_CTAG_RX |
--			 NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6;
-+			 NETIF_F_HW_CSUM | NETIF_F_TSO | NETIF_F_TSO6 |
-+			 NETIF_F_GSO_UDP_L4;
- 	ndev->vlan_features = NETIF_F_SG | NETIF_F_HW_CSUM |
- 			      NETIF_F_TSO | NETIF_F_TSO6;
- 
--- 
-2.34.1
+Because of this, if the number of these "replies" exceeds an arbitrary
+threshold, the RX worker decides to de-schedule itself, to give space to
+the TX worker (send_pkt_work) to move those "replies" from the
+intermediate queue into the TX virtqueue, at which point the TX worker
+will reschedule the RX worker to continue the job. So more than avoiding
+deadlock, it seems to be a mechanism to avoid starvation.
+
+Note that this is not necessary in vhost-vsock (which uses the same
+functions as this driver, e.g. virtio_transport_recv_pkt), because both
+workers already use vhost_exceeds_weight() to avoid this problem as
+well.
+
+At this point I think that doing something similar to vhost here as well
+would allow us not only to avoid the problem that `queued_replies`
+should avoid, but also that the RX worker monopolizes the workqueue
+during data transfer.
+
+Thanks,
+Stefano
+
+>
+>>
+>>
+>> >
+>> >>
+>> >> Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+>> >
+>> > I'm not sure we should add this Fixes tag, this seems very risky
+>> > backporting on stable branches IMHO.
+>>
+>>
+>> Which situations do you believe it will genuinely break anything in?
+>
+>The situation for which it was introduced (which I don't know
+>precisely because I wasn't following vsock yet).
+>Removing it completely without being sure that what it was developed
+>for is okay is risky to me.
+>
+>Support for sibling VMs has only recently been introduced, so I'd be
+>happier making these changes just for that kind of communication.
+>
+>That said, the idea of doing like vhost might solve all our problems,
+>so in that case maybe it might be okay.
+>
+>> As
+>> it stands today, if you run upstream parent and enclave and hammer them
+>> with vsock traffic, you get into a deadlock. Even without the flow
+>> control, you will never hit a deadlock. But you may get a brown-out like
+>> situation while Linux is flushing its buffers.
+>>
+>> Ideally we want to have actual flow control to mitigate the problem
+>> altogether. But I'm not quite sure how and where. Just blocking all
+>> receiving traffic causes problems.
+>>
+>>
+>> > If we cannot find a better mechanism to replace this with something
+>> > that works both guest <-> host and guest <-> guest, I would prefer
+>> > to do this just for guest <-> guest communication.
+>> > Because removing this completely seems too risky for me, at least
+>> > without a proof that control packets are fine.
+>>
+>>
+>> So your concern is that control packets would not receive pushback, so
+>> we would allow unbounded traffic to get queued up?
+>
+>Right, most of `reply` are control packets (reset and response IIUC)
+>that are not part of the credit mechanism, so I think this confirms
+>what Stefan was telling me.
+>
+>> Can you suggest
+>> options to help with that?
+>
+>Maybe mimic vhost approach should help, or something similar.
+>
+>That said, did you really encounter a real problem or is it more of a
+>patch to avoid future problems.
+>
+>Because it would be nice to have a test that emphasizes this problem
+>that we can use to check that everything is okay if we adopt something
+>different. The same goes for the problem that this mechanism wants to
+>avoid, I'll try to see if I have time to write a test so we can use
+>it.
+>
+>
+>Thanks,
+>Stefano
 
 
