@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-146076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B612C9D1E85
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 04:00:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E61159D1E88
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 04:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7574628311F
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 03:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABB4A282C7E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 03:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557BB1459FD;
-	Tue, 19 Nov 2024 03:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EBC126F0A;
+	Tue, 19 Nov 2024 03:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5EGpenB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cORlJbS6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7FE1A28C;
-	Tue, 19 Nov 2024 03:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA401A28C;
+	Tue, 19 Nov 2024 03:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731985223; cv=none; b=prhFezcsspBSAaFNONd7plCxg5jTOeLjwOKjNDs857QSpOvdSRZ61VCnuARmEOEYXvSZJkoL9A+DhTJPuG4l4yN7bmFU7T2Pr4yirGdRRjKj1oE/KswCqULxEjPs43zA3iDdFwulX7DbdhUefG9q7cqegPG0YR4tsIQ3M4lTJcU=
+	t=1731985228; cv=none; b=t1YogcqmEBdh5JdNhmlGxDPAnLT8mCmWfUfhuAhdf1AzVEvygUEO+zNyL7cr3/8qkiUiXY4+EKx+YegWdtIjLUKK/azrhVIGYS6kc2vAq7XO3GssOKzbrU4pYmm2NQ1NLxZitdIRwk1sO/CaC9ftaWqNoRR+Vvsi+ZSEEYayl9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731985223; c=relaxed/simple;
-	bh=HRSm8FbXAddqPiftvjnkUJyUs2zRtISWFUZwjHfSjf8=;
+	s=arc-20240116; t=1731985228; c=relaxed/simple;
+	bh=/Mvt36S/RdlWwZDHxJ+uh+u0ea1LA9OjZPho7cXNQ2M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I3trB6C7rv/FI40c0xxKD8wbe1ZWaYJtPaK3VJMTL5ZpPZw/wC5Zvheh1QWDyjJflZsFgN935/zx58rP/HFmkLQd240TorsVLGaf3zMTC0g/7+f5io9nO1OOD+VJ3QRRC/nkQ4Hh9srgc8C5FziKOrtjM5bjSdy/0LctCpWVTp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p5EGpenB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BBBC4CED6;
-	Tue, 19 Nov 2024 03:00:22 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OyJqqQVMcne4MbOmGunsW30hURkBLuJ+oQX3Rffiua4z5/SdpOtTySXzWPv4AJ0nyIkhRGZOvfiLzuRUPIA4k/qQ+FKPcSeypt6M5GgeuAavlqv26JajLuRUAkRq8o2UutrNCxGOy7N8y9aa1J95BZBo/ovsoA3meHlvbToQty4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cORlJbS6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49B33C4CECC;
+	Tue, 19 Nov 2024 03:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731985222;
-	bh=HRSm8FbXAddqPiftvjnkUJyUs2zRtISWFUZwjHfSjf8=;
+	s=k20201202; t=1731985227;
+	bh=/Mvt36S/RdlWwZDHxJ+uh+u0ea1LA9OjZPho7cXNQ2M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p5EGpenB/+2G+Rezfd8J0qvOPxQjfa/O3CMCq+lXiMScq9+QIfXoOvhIROTJsnWKF
-	 NGbLyYDzjFLDJt5jE3MdK0jKBg7uYr5adyKfnFOIe9QlRy0uqbZd4ZJS78z25wAAme
-	 OEfLO/4aNZX67k+UNArDX+Y4p3hiv6yLV4BBIkHxqnNgWIdqg6llzloB2fWCvQWoya
-	 tI2oioY0Kh1jWmgMYdKFzND/Tb+7e5wnc5IV+JwBbwXrk4rRX0OktLyVeFoY2ZTjGV
-	 X1X5NKayAV+ZbJd7G2iIRJc8f0xQaN7UIxlMXkvLDGTOY7mcL8ZbxBaOx9PHdat8C7
-	 zBT+LZXG5zZuA==
+	b=cORlJbS6EfHdS5/8c87oBeUZ+DOlNEwWOw36y8Qyjox+yhwGrX4FpT/Gy3PpaqTL8
+	 EenTVTfLFSdPaDpuJbaAqp2pTrK3/IXoN+fK+PC8oV/KsY7o4+wNA21LyiWDWrl/r6
+	 E2F/5B195ea1IPwmHJdVE3+l63AQ130eCMXHf4IJ3O+NpmLxQMYiN8fttjrNPvwVsg
+	 MMReT+QPp3FlYksurZYmMy1GED1qtS3Y0AGBmc/oxLMdclsa3FLkLKR5lPYiyW0t87
+	 rECsNgGsLFThKPbQvtTHY0ZWS3OWX69x1PlpauhlbpfpCJ3OaM1mRSDiaiROrb9aVR
+	 x9qTP9yvntIGg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D673809A80;
-	Tue, 19 Nov 2024 03:00:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF1F3809A80;
+	Tue, 19 Nov 2024 03:00:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] MAINTAINERS: exclude can core,
- drivers and DT bindings from netdev ML
+Subject: Re: [PATCH net-next] selftests: net: netlink-dumps: validation checks
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173198523378.84991.13613749384566676729.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Nov 2024 03:00:33 +0000
-References: <20241115195609.981049-1-kuba@kernel.org>
-In-Reply-To: <20241115195609.981049-1-kuba@kernel.org>
+ <173198523877.84991.11510166168893200267.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Nov 2024 03:00:38 +0000
+References: <20241115003248.733862-1-kuba@kernel.org>
+In-Reply-To: <20241115003248.733862-1-kuba@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, mailhol.vincent@wanadoo.fr, mkl@pengutronix.de,
- socketcan@hartkopp.net, linux-can@vger.kernel.org
+ pabeni@redhat.com, linux-kselftest@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 15 Nov 2024 11:56:09 -0800 you wrote:
-> CAN networking and drivers are maintained by Marc, Oliver and Vincent.
-> Marc sends us already pull requests with reviewed and validated code.
-> Exclude the CAN patch postings from the netdev@ mailing list to lower
-> the patch volume there.
+On Thu, 14 Nov 2024 16:32:48 -0800 you wrote:
+> The sanity checks are going to get silently cast to unsigned
+> and always pass. Cast the sizeof to signed size.
 > 
-> Link: https://lore.kernel.org/20241113193709.395c18b0@kernel.org
-> Acked-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-> Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: linux-kselftest@vger.kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] MAINTAINERS: exclude can core, drivers and DT bindings from netdev ML
-    https://git.kernel.org/netdev/net/c/4262bacb748f
+  - [net-next] selftests: net: netlink-dumps: validation checks
+    https://git.kernel.org/netdev/net-next/c/357c52ff860b
 
 You are awesome, thank you!
 -- 
