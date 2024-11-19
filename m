@@ -1,155 +1,111 @@
-Return-Path: <netdev+bounces-146150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D519D21CA
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:46:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F0D9D21D7
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5412B23169
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:46:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4F161F21602
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB8B198A1A;
-	Tue, 19 Nov 2024 08:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDCC19D88F;
+	Tue, 19 Nov 2024 08:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Jqnuhnug"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LHU0IYU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF37146D53
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6660719D072;
+	Tue, 19 Nov 2024 08:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732005962; cv=none; b=JrljMAAFVK+/dk8WJBifI5tChlRvZBxWxrt/weLZbiWUiaiQ3mIdnD0n7sIBltqTz/2Gu2+bJcoJUuaUP65PQGR9TQi3t8kBjq7bAkfc1dXudmPfwOWJ2LYbeBqTEmCbq0dq/p6zZ6/f+Uw7TiuJQiDqDTkQVl9AvL2mo4ETxxs=
+	t=1732006183; cv=none; b=KaVtTqqr7Igh1lNNJk6/UJfZeMgMPlftIb5KORmfP9IDh4HZYtcPhCSXLBoeqOT9YV9ur+MC1QdqscstA4NMW0Vp/38XAVA+eIqEiSEnrJ8yBf9YZACzJz9brq0Xo8PuHjfMP/cuotMyIsFtgm1Wy0PiGbYTD9mAM0v30x/1DjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732005962; c=relaxed/simple;
-	bh=iQ0IbxDdW3Y2YRmfWIJoRW6LS8pVH/ryYdqv9ynE6Xo=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dd7W2IYXwcQ19sKx9Xr0XiPe+ceq569IvCyoPWOgxF/8sGconk0rcXBbLX8HGXtE7vk49j0TqVNa3PSou9zi9rvZH5BLD1R9+TCeAlStnlLYLSF7A20tVnXSeuuK9OyLgcJfi0fhgNP/vfK/oFEHZipJ3HtUB3qswI1QDX2yFfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Jqnuhnug; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732005961; x=1763541961;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=2/sateXWcvrQHE3ACa2j9qHVcYruMu2eFlN2hXfLP2Y=;
-  b=Jqnuhnugy2g4e/p+AwlRNmsoI6iTJBYfmBBGnZHnsBx17zUV7hOKmX/K
-   HcEAQrxC6tfTvygFmRyl5vUUAWZu+KTKF4ysvD6EmCf1Li8av671t97Wz
-   NcvMwSsOkpp0KgSU0b/REQW1xBVg+onYNeV7QG7ppaUH5j+sM+XdtfveJ
-   c=;
-X-IronPort-AV: E=Sophos;i="6.12,165,1728950400"; 
-   d="scan'208";a="776831212"
-Subject: RE: [PATCH v4 net-next 3/3] net: ena: Add PHC documentation
-Thread-Topic: [PATCH v4 net-next 3/3] net: ena: Add PHC documentation
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 08:45:55 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:22286]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.31.126:2525] with esmtp (Farcaster)
- id 37568dfa-9180-4a36-addc-82166bcb1c1f; Tue, 19 Nov 2024 08:45:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 37568dfa-9180-4a36-addc-82166bcb1c1f
-Received: from EX19D010EUA004.ant.amazon.com (10.252.50.94) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 19 Nov 2024 08:45:53 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D010EUA004.ant.amazon.com (10.252.50.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 19 Nov 2024 08:45:52 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 19 Nov 2024 08:45:52 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Richard Cochran <richardcochran@gmail.com>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David"
-	<dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky,
- Alexander" <matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson,
- Matt" <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara,
- Nafea" <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Thread-Index: AQHbNnwBYT2f8QoaH0qt+HbH+6LQELK6ugMAgAAB9wCAA5OIgA==
-Date: Tue, 19 Nov 2024 08:45:52 +0000
-Message-ID: <a86eb32a374d4853a409c02777e71501@amazon.com>
-References: <20241114095930.200-1-darinzon@amazon.com>
- <20241114095930.200-4-darinzon@amazon.com>
- <ZzlMlnDvhBntNkDS@hoboy.vegasvil.org> <ZzlOPEyFxOjvPJd2@hoboy.vegasvil.org>
-In-Reply-To: <ZzlOPEyFxOjvPJd2@hoboy.vegasvil.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1732006183; c=relaxed/simple;
+	bh=uMgB+5uUNBgBUTbqdd8UUwDS+ZOWODedX2q3Khw1kd4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=INXn8d6kTj1bHv6zbnJyxB8SaGrHWpb5zoLyBHTmT2DLk6vc4UwvZnA9q5nDxFVLITBn03RZIBomE2lBfRom6K/1t68YzinBWX74wvAbXU5y6zr6DGSIWY/Su1R43/TYYu8F/a1N5vKsIbHZLN/eJZEmdKWu2p/ExBZsj1RBynk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LHU0IYU/; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 642B8E000A;
+	Tue, 19 Nov 2024 08:49:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732006173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HLPwCmOJirkQA+SOX3QaF6mG/lQKRCB2VKXxApvD/+E=;
+	b=LHU0IYU/Dt3gn3KgUYMOd73LyhehQ0wcaSJZqRg0my8nsoWc3KdrD/v4XDNs98GLgGDwBN
+	Ipj182mNpTD7pRwvOUdyJQKwOCMEPwLS0+M9ECMzgHqIkCCmfjvt4Uk9qZdOZo1cs1Fba2
+	Z895Rztex1HtXEf10SFAxELMMdtTGQceSLVuRnEGeWq3P0PYiC0ds+E//aZdZUC82MZJzL
+	O1dMNG5Q2of+mK+IjcESkXHOirU6OC3fQ1ZACajaXlu3WsuO9HC3i595KsyJpRtpzPbAQP
+	BPCveF6kpq7XjWwkKUTzqnB9fPkcosydsQj5TnKm6Wv3ziFr8U5Wx9DShrW8hA==
+Message-ID: <66c6702a-d4a8-4354-8cd3-6edc93d0ae79@bootlin.com>
+Date: Tue, 19 Nov 2024 09:49:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 09/13] selftests/bpf: move ip checksum helper
+ to network helpers
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Bastien Curutchet <bastien.curutchet@bootlin.com>, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com>
+ <20241114-flow_dissector-v2-9-ee4a3be3de65@bootlin.com>
+ <ZzdpeMsHGh1zCZei@mini-arch>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <ZzdpeMsHGh1zCZei@mini-arch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-> On Sat, Nov 16, 2024 at 05:53:26PM -0800, Richard Cochran wrote:
-> > On Thu, Nov 14, 2024 at 11:59:30AM +0200, David Arinzon wrote:
-> >
-> > > +**phc_skp**         Number of skipped get time attempts (during bloc=
-k
-> period).
-> > > +**phc_err**         Number of failed get time attempts (entering int=
-o
-> block state).
-> >
-> > Just curious...  I understand that the HW can't support a very high
-> > rate of gettime calls and that the driver will throttle them.
-> >
-> > But why did you feel the need to document the throttling behavior in
-> > such a overt way?  Are there user space programs out there calling
-> > gettime excessively?
->=20
-> Answering my own question (maybe)
->=20
-> I see that your PHC only supports gettime(), and so I guess you must have
-> some atypical system setup in mind.
->=20
-> I didn't see any comments in the cover letter or in the patch about why t=
-he
-> PHC isn't adjustable or how offering gettime() only is useful?
->=20
-> Thanks,
-> Richard
+Hello Stanislas,
 
-Hi Richard
-=09
-Thank you for the queries.
+On 11/15/24 16:32, Stanislav Fomichev wrote:
+> On 11/14, Alexis Lothoré (eBPF Foundation) wrote:
+>> +static unsigned long add_csum_hword(const __u16 *start, int num_u16)
+>> +{
+>> +	unsigned long sum = 0;
+>> +	int i;
+>> +
+>> +	for (i = 0; i < num_u16; i++)
+>> +		sum += start[i];
+>> +
+>> +	return sum;
+>> +}
+> 
+> Sorry for nitpicking, but can we call it csum_partial? And match
+> kernel's prototype with extra sum argument? Should be more greppable
+> for the future test cases that might want to use it...
 
-Our device limits the number of requests per client (VM) through throttling=
-.
-To avoid reaching our device throttling limit and ensure a fail-fast mechan=
-ism,
-the driver preemptively applies throttling.
-In addition, AWS cannot be adjusted or controlled by the OS/User to correct=
- any time deviations,
-instead, AWS manages the synchronization and accuracy of the clock internal=
-ly and provides a
-pre-disciplined clock that already adheres to Coordinated Universal Time (U=
-TC) standards.
-An upcoming patch, which is a continuation of https://lore.kernel.org/netde=
-v/4c2e99b4-b19e-41f5-a048-3bcc8c33a51c@lunn.ch/T/#m58cf9b05b34046b3952ae8bf=
-4cc7d7f2c8b011d7,
-will introduce the error bound in ENA PHC, providing internal AWS accuracy =
-error measurements (in nanoseconds).
-
-Thanks,
-David
+Sure. TBH I did not realize that those were based on the kernel ones. I'll
+update this to keep the same prototype.
 
 
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
