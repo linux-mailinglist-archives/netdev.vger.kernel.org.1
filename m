@@ -1,138 +1,130 @@
-Return-Path: <netdev+bounces-146112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A61839D1F71
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 05:52:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13609D2069
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 07:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 486BC1F21142
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 04:52:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A9A280DAB
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 06:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594961369BB;
-	Tue, 19 Nov 2024 04:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F357126BFA;
+	Tue, 19 Nov 2024 06:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QZU3avrX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OS2Oge+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4584029CA
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 04:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9E61EEE0
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 06:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731991925; cv=none; b=kopa9inriQ9C09vVzEhUw+yyNJtwj6kDW0oGhhDBWV3CwRcDHA7PeEhH3h2sPnvoRjqruIxWDNMG3CyYa1F1pWEWiViridOUZkwzG6nhIhILHvZ8eDaF0qarByDWLMeCf1V86ZFO+giCneVco89bD3G7fv8nqBbYxF95rcDdj3Y=
+	t=1731998809; cv=none; b=GQ+Gubkm9Oy5XgQqKa43Er4mJ9f+SyNplj2qBwTD1VhRAKnqTR1I46Wo6Hj2ark1s3kZ5MMel6A6CGu+fs0gwZ+q74igbLr9re0qfMOR0wr5GM37ojcIjc4xLGMEzDnTe/K0GugxbaAdNgEx0RBNzbEU1KYb2g0FEEcpa6gIpQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731991925; c=relaxed/simple;
-	bh=HqjqJsv2qL8vAkrr/L0CfwlII9JUFNGwgcw05Hn98rA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bcV/KWtuIWW/y72yWwZm/RIoV1RR0jBC0qxjTH6y9M13za+a7JP8ZvwFW4Nknj4v/tslq3zionWFYiwXIVLubKjmPVb+RkXcN4vc5Urm7C+ZSSqkyWQLHYLb86uJ9ijOSwOQzpfpplylvdFB+ZC5vuUr/rBUvsiXJoYpWTiIoZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QZU3avrX; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ea2dd09971so386026a91.3
-        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 20:52:02 -0800 (PST)
+	s=arc-20240116; t=1731998809; c=relaxed/simple;
+	bh=0z1vsNdKrgYHCrrqESVjUREFmqxvtxnCsQDRVR/L304=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=PLl+UTWCyslCMU55THogNGvC06VQrUlRMIR/f8RI6V4/K5t0o7Tmcy519FgJREmt2TLA/XbtB1SRaTpYoRWaNhMvGwJWf+FNH0m/utq5FdlVxIahLoczBNoHRTUHTycg9CIVjCMP/j78R/ocbgSvGTPp7pqjjyTjS5U8dmQS07A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OS2Oge+m; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5cfd3a7e377so1579542a12.2
+        for <netdev@vger.kernel.org>; Mon, 18 Nov 2024 22:46:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731991922; x=1732596722; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vBdYSrze1oO/45stSvAjGcpqVYE9fkCz+eEQBnB3CAU=;
-        b=QZU3avrXjn40gXJvPCd8kmOvNh0f6Frw2dOqZRvgmxe4+oo8LQREmYg9fxyqnKWmA8
-         N1CPT7nusKTjZ3/TeJtSRkecTFn+hIMUCzjblRLb3gweCkYlaXAHOldXXT0SyvrEIIa9
-         Qn7Ks2s+9mes5lskNMmocraex54sHW5uy8s1A=
+        d=gmail.com; s=20230601; t=1731998806; x=1732603606; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lOvPz3IPVYkDkdKecjW8ncUGqm3Qe5ppUInBCbIjDo4=;
+        b=OS2Oge+m84XXvTvk5dO6a9HCFohtjTpBUJh1xKrSQt7amaAsyZdEg092Rz77q8EPTi
+         8pxaR5Siprn0Ex+/RgWfDdXRture52VVz9J1izTPy8bpHbHn+EoNRHKyR2WLSZPI45gl
+         ade7d7EJvz++hOLI5N/iLo9Vu7qFz6ZiU6TmZ75wx3JZPtgTwxnRJMoTp+l/ZKwEpkjc
+         x8l+dVZSnjGgBY0J05M7LF7763WMrNGQcM39/rQWg33oRhmth9L8Wa+Gvbgkeuntkzrk
+         KbqsYh83XOT97NdigvAUoRsHhG2PlMk7ylEwBt2D5srjJNaRqfFD5ci/WbhOB+ZgGamS
+         M79Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731991922; x=1732596722;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vBdYSrze1oO/45stSvAjGcpqVYE9fkCz+eEQBnB3CAU=;
-        b=hbql/Qtk9SPuUPYNnfKF55YWWD9+TdG291EHLfLq4XyQEKIspqtS6lrU00jarOnw8P
-         EVdLCIukQrt03OEc8WnMqdTo8QtlnP4Uc/ARk/rwoiiSxdOBG5kLnf1XeyM00JFG62kT
-         j92sR2RKAlifjUxYzPzLrO4shbWMYSh6lnrNBEftl6N9E/o+NB1UIX4X/vgAE4FBQimm
-         QCPWr+bWh/R14DdVPpfbd2CEPPLjwGl4mzEWg/0i8Otyb/yJNl3AwvWWlWmWRM6GhY+F
-         O0k40gw3au06yee2zHDIDj2bgVqLZFifa9cWaKiyWHey8siH7Fo9eyyq8UdBeYggBUyM
-         czbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWECQf0QTIgpt7FG+GSVE0k5RCuFn21tySMT8/59N4lKCS/qEZs5u2In+eAH42NU/vdXJ8pQWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDibzQm9FJm39+QOdwk7iBf1Gu2FnS+XKg5Tb0EOC6Hg6v6L6I
-	1YpfFDZgh5yF6X81XNqFRMKNT0Gj2RTIeVXWDYGweSFnYl4iQc+Y96Qxg3J14A==
-X-Google-Smtp-Source: AGHT+IFP8pqLDy4cOIbaIjTRmHyfeZ993Dxy7MAICup+qcs0iARcu/zYlI/fUfv6SppLnzDwKOQZJQ==
-X-Received: by 2002:a17:90b:4ad2:b0:2ea:670c:c6a2 with SMTP id 98e67ed59e1d1-2ea670cc714mr8798454a91.16.1731991922439;
-        Mon, 18 Nov 2024 20:52:02 -0800 (PST)
-Received: from PC-MID-R740.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea35c433a6sm5234361a91.14.2024.11.18.20.51.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 20:52:01 -0800 (PST)
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-To: davem@davemloft.net
-Cc: michael.chan@broadcom.com,
-	edumazet@google.com,
-	gospo@broadcom.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net] tg3: Set coherent DMA mask bits to 31 for BCM57766 chipsets
-Date: Mon, 18 Nov 2024 21:57:41 -0800
-Message-Id: <20241119055741.147144-1-pavan.chebbi@broadcom.com>
-X-Mailer: git-send-email 2.39.1
+        d=1e100.net; s=20230601; t=1731998806; x=1732603606;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lOvPz3IPVYkDkdKecjW8ncUGqm3Qe5ppUInBCbIjDo4=;
+        b=gfXGNgxlQHEPXopaT+LbUt6WPE9sF8+O3t6BK/nHuwx6yX8GVJ12CQl4SgOgxkcBN8
+         hH1mPDNUGEnl4gDDYnuNFFf2P9BDRZiU5KvC5tVVu1yFDOQpACsarljbnXI+C3cXSxr3
+         Abn0KjsGOgMYsEvkXkb2zS4HuzdVAaXi92zpenVZxzXuRttHrJhs08yrVD+qZTL1NwEu
+         6EcuW0B7uGrRCjTzm3cHFv0/HBUe9pu40dAA6Bh4oSv6TLlzJ/sClKAErXAUt+fP4vCB
+         l5OAuRt8g7tbXu/LL727ONr8d++U5X6Pv1hyMGkAFAZuk05INZPe6uLA2+249XvsAAeD
+         VEsw==
+X-Forwarded-Encrypted: i=1; AJvYcCX83TYu/5rh4v7o3pD764OEPykVex7m87uEcCSXU6clJEktDT1mXyq/4yTlb+m61FPKVk4jhsM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfO/XNeiArOf4DKwJh5GSz9xfjH/HueizNhuF37vBDniI2382f
+	+peAKnWz5DElhz4w1ltRm58bdObJCmbTYrYjZ7Reopp0Pe06WTjd
+X-Google-Smtp-Source: AGHT+IFun732DYghNZrKN7QIj0owXyXQDfXF+RG55WwLYPVPI/Kub5U85BP9+1pLrjhsjH9Mip/vmg==
+X-Received: by 2002:a50:d719:0:b0:5cf:b002:6677 with SMTP id 4fb4d7f45d1cf-5cfb0027395mr6211471a12.15.1731998805692;
+        Mon, 18 Nov 2024 22:46:45 -0800 (PST)
+Received: from [127.0.0.1] ([193.252.113.11])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf79bb329bsm5428406a12.38.2024.11.18.22.46.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2024 22:46:44 -0800 (PST)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+Message-ID: <96ec3de5-76a8-4d72-b8d7-feedff4a3af8@orange.com>
+Date: Tue, 19 Nov 2024 07:46:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: RFC: chasing all idr_remove() misses
+To: Cong Wang <xiyou.wangcong@gmail.com>,
+ Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, edumazet@google.com, jhs@mojatatu.com,
+ jiri@resnulli.us, horms@kernel.org, netdev@vger.kernel.org
+References: <20241110172836.331319-1-alexandre.ferrieux@orange.com>
+ <173147403002.787328.3694466422358304986.git-patchwork-notify@kernel.org>
+ <40bb5d4c-e21d-4eac-aec0-25b2f722be6d@orange.com>
+ <ZzwLU6JHOTmZQ4oS@pop-os.localdomain>
+Content-Language: fr, en-US
+Organization: Orange
+In-Reply-To: <ZzwLU6JHOTmZQ4oS@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The hardware on Broadcom 1G chipsets have a known limitation
-where they cannot handle DMA addresses that cross over 4GB.
-When such an address is encountered, the hardware sets the
-address overflow error bit in the DMA status register and
-triggers a reset.
+On 19/11/2024 04:51, Cong Wang wrote:
+> On Thu, Nov 14, 2024 at 07:24:27PM +0100, Alexandre Ferrieux wrote:
+>> Hi,
+>> 
+>> In the recent fix of u32's IDR leaks, one side remark is that the problem went
+>> unnoticed for 7 years due to the NULL result from idr_remove() being ignored at
+>> this call site.
+>> [...]
+>> So, unless we have reasons to think cls_u32 was the only place where two ID
+>> encodings might lend themselves to confusion, I'm wondering if it wouldn't make
+>> sense to chase the issue more systematically:
+>> 
+>>  - either with WARN_ON[_ONCE](idr_remove()==NULL) on each call site individually
+>> (a year-long endeavor implying tens of maintainers)
+>> 
+>>  - or with WARN_ON[_ONCE] just before returning NULL within idr_remove() itself,
+>> or even radix_tree_delete_item().
+>> 
+>> Opinions ?
+> 
+> Yeah, or simply WARN_ON uncleaned IDR in idr_destroy(), which is a more
+> common pattern.
 
-However, BCM57766 hardware is setting the overflow bit and
-triggering a reset in some cases when there is no actual
-underlying address overflow. The hardware team analyzed the
-issue and concluded that it is happening when the status
-block update has an address with higher (b16 to b31) bits
-as 0xffff following a previous update that had lowest bits
-as 0xffff.
+No, in the general case, idr_destroy() only happens at the end of life of an IDR
+set. Some structures in the kernel have a long lifetime, which means possibly
+splipping out of fuzzers' scrutiny.
 
-To work around this bug in the BCM57766 hardware, set the
-coherent dma mask from the current 64b to 31b. This will
-ensure that upper bits of the status block DMA address are
-always at most 0x7fff, thus avoiding the improper overflow
-check described above. This work around is intended for only
-status block and ring memories and has no effect on TX and
-RX buffers as they do not require coherent memory.
+As an illustration, in cls_u32 itself, in the 2048-delete-add loop I use in the
+tdc test committed with the fix, idr_destroy(&tp_c->handle_idr) is called only
+at the "cleanup" step, when deleting the interface.
 
-Fixes: 72f2afb8a685 ("[TG3]: Add DMA address workaround")
-Reported-by: Salam Noureddine <noureddine@arista.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
----
- drivers/net/ethernet/broadcom/tg3.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 378815917741..d178138981a9 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -17801,6 +17801,9 @@ static int tg3_init_one(struct pci_dev *pdev,
- 	} else
- 		persist_dma_mask = dma_mask = DMA_BIT_MASK(64);
- 
-+	if (tg3_asic_rev(tp) == ASIC_REV_57766)
-+		persist_dma_mask = DMA_BIT_MASK(31);
-+
- 	/* Configure DMA attributes. */
- 	if (dma_mask > DMA_BIT_MASK(32)) {
- 		err = dma_set_mask(&pdev->dev, dma_mask);
--- 
-2.39.1
+You can only imagine, in the hundreds of other uses of IDR, the "miss rate" that
+would follow from targeting idr_destroy() instead of idr_remove().
 
 
