@@ -1,238 +1,116 @@
-Return-Path: <netdev+bounces-146153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1AC9D21EB
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:53:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2AD9D21F7
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:57:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E62C61F228A3
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:53:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0BD91F226D4
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950031BCA0A;
-	Tue, 19 Nov 2024 08:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDD11A9B24;
+	Tue, 19 Nov 2024 08:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YwX88J07"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X/p7my+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879451AAE33
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BA41798C;
+	Tue, 19 Nov 2024 08:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732006379; cv=none; b=rXCZryHmkDxm0fOP5E3uIAvEZRbGRo1Enlop6wpN+DPrAenGRa/qSwufECM629eG+BXu8DWC2d0NIoJvhTha9wqnpUjpkz15BUCCHaIiVWVY2OwlfEBpDykQHQKfLeUGkfHNhVyizxDNnUDXlXA/UplP214RDuaxOguX0pwGYtk=
+	t=1732006642; cv=none; b=qo9IdJVfbTYP08XZGoc+kChPCqpkKKZ8aJcMgY+RlKpohFNzA9c/MmU9FokmMbKAeoYMP/zlkywdAbG1ELspXtZ5BAg6g9uVCYvo2zukLlJcbkr6K8VVNAh2vtuVcrUknbdPch3L4cEPmoG220BdTqfFI+Nkt/VW5es3azU8H5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732006379; c=relaxed/simple;
-	bh=1PQE1f1xCJGY7Tky1gUdhI5mXqSifmAXMo1KKarsrpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uPYdYP2QseFInDpHjYtaBPV/xFWY8HGbrrK/X4CkWwv7ZTs4/nmAgvSiHQc3Ebp5IynLNNQlH7tyL/vc9DnUKDa86fw7ImGb8/xqzb2rhwixrFxdR6tFUZUiUnRQjvJpTP6i0jShPIiiFoXWW+iKLwZNvfPDC5aZf59prp6z3so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YwX88J07; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4315df7b43fso5830925e9.0
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:52:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1732006375; x=1732611175; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qaBG3Z7R9DOuiOybc185RSD4M8rIPEBBhrkZgjFmOxU=;
-        b=YwX88J07/QkBNEkAjW82kPZVlFUMTCMLsjf6gwhsceK2l+pfQq+2IhMEYkPxcbHwhM
-         iIQcYiE8dfVaomj+NhbmG33a7kOfZvnjheNotc1ehgHzsh9k5KiMvqplMIWd1Ktpn9J3
-         Jl0NwUBhIo15kB0LHJKNp3KvnQt5IzMLrmOUt5OqKtW5fSa8heyxjOg/WBK+TsNjc4QK
-         7m994E+mkEwkTIETkvQ3HV9EOmS6rF7kT/r6PvKAWOsvp3P9FDmpG8UYYfYu5j2pKTin
-         nV23yVqo7cve/XHz6GfmTRniT88Dp7udY5CmrOUKjj10LxJKyDd7AoBmqCML/ASfnVOk
-         i85A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732006375; x=1732611175;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qaBG3Z7R9DOuiOybc185RSD4M8rIPEBBhrkZgjFmOxU=;
-        b=bUP7QWX0fTTtDOjPFa9ZG+eBgEy51Dpxl0jVHvIbNUX1aQ5kvfCwlEVBoB+2hlxywi
-         fMpyQAaPUdmlZbYTREoIuJpLqABefc4SFLpbMbG6gf/do7y2JHeKbGb/w5yIbVhayDra
-         M/ig/kY1lsRrptErWFLNirTf1DOFodfwLSGeq9vexx5kPKex/HVI84Lr1VpK8u7QZ7jB
-         XtUPZMzHe7TztZKTIS92Kj573hO39+RnLm++0LJMYvbl7o9QQ3NTu7LgtfTLRr1nb8ti
-         NXXLEjA9jQO41+LXnizFj4o+/BLyKUxKroYZMHeKLdvItAKLDNeGlnJ3tHfU44h4Ax9K
-         Q2/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXVtIzac1uWBYksfQUIOL2km9kcwXetB/1gM1gJ+10RIll10ymZcUQWE4l9zdkC+vVQRx/xLC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrAmOVJ2lFNBiiJPMdj8FCJyMboFSOzbGX5x8162dezo33KWLY
-	+i/YSdC1T9w/9NroXyiE5aEDzpxkiHHZcan/vWIrHmhSMzfPi/BzAkqHkSy3d2w=
-X-Google-Smtp-Source: AGHT+IHrqP9nC2rPwknktgIKbjWoIt1yh0m5e2N0IUvcTBAuP3H8V/AdHOWp2OIw94YWQU//ijQi/A==
-X-Received: by 2002:a5d:6d0f:0:b0:382:2492:3218 with SMTP id ffacd0b85a97d-38225aaee39mr12773115f8f.47.1732006374705;
-        Tue, 19 Nov 2024 00:52:54 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.50])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3824a8109a7sm3705943f8f.104.2024.11.19.00.52.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 00:52:54 -0800 (PST)
-Date: Tue, 19 Nov 2024 09:52:46 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jack Wang <jinpu.wang@cloud.ionos.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
-	Joe Lawrence <joe.lawrence@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Lucas Stach <l.stach@pengutronix.de>,
-	Russell King <linux+etnaviv@armlinux.org.uk>,
-	Christian Gmeiner <christian.gmeiner@gmail.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
-	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org,
-	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org,
-	linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org,
-	oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to secs_to_jiffies()
-Message-ID: <ZzxR3uAcWFEPUIUK@pathway.suse.cz>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com>
- <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu>
- <Zzsfuuv3AVomkMxn@pathway.suse.cz>
- <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com>
+	s=arc-20240116; t=1732006642; c=relaxed/simple;
+	bh=01mOnY+a8qSh1SokfXxE9W5gK3wHTvzsLqt9Vk0HDG0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XTj6vDJ9zUomyExd9+UR5HLI/S3VrtwswBNVEBo4lMu3dp5RasKYCfaqQPqwIue30dinnWHuqM+CnMBCzeKgPSIAgdT1mK9xyITYpuT3kJRKSLMBTVoiPw3WcLFFqTCLGZVC6lAJ8aCqKs4dgXvAq7xf3X+oIDWmptjQHkM5d4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X/p7my+z; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 07C5740012;
+	Tue, 19 Nov 2024 08:57:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732006632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qDLMX9bwiKUPXm5HqirAa1WgF18sn8QriLeZ4mKqO1s=;
+	b=X/p7my+zUThqfZtd/oVsk84v3RaXRAVl04osFZ0G8CSXu1bzLEaNt7ygD6XcYFErj8UJk7
+	dtxVD5UquR/Goz8gYhMmqqI0712YnCZoiKAfqt3OyFh+keXS+0d5JCz2Y+sqwiKuRTnvM5
+	vG5ZbEnyVJPQXYVtuUAmcr7IPuTjV71yHL1pRL8RU0Df9Z5kWdEgX+irCnyUlsfn76lzSQ
+	Exm6QG8MuTNTf1C09Qvm0PtW5mQWHOo9RUJzmvTUfgODq8vxtejUF5A65tKwg48wCf1tNj
+	qAyBhSA/DQsBJXhCqmV7j3DcZy7IFuOHW/Fj1Wg9EJfZHlq4Xwxc4ppgIeNEwQ==
+Message-ID: <20802d12-004a-4b04-9b7d-93dc8b9866df@bootlin.com>
+Date: Tue, 19 Nov 2024 09:57:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 11/13] selftests/bpf: add network helpers to
+ generate udp checksums
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Bastien Curutchet <bastien.curutchet@bootlin.com>, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com>
+ <20241114-flow_dissector-v2-11-ee4a3be3de65@bootlin.com>
+ <ZzdunVLMaX1iy85i@mini-arch>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <ZzdunVLMaX1iy85i@mini-arch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com>
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Mon 2024-11-18 10:18:49, Easwar Hariharan wrote:
-> On 11/18/2024 3:06 AM, Petr Mladek wrote:
-> > On Sat 2024-11-16 11:10:52, Christophe Leroy wrote:
-> >>
-> >>
-> >> Le 15/11/2024 ‡ 22:26, Easwar Hariharan a Ècrit†:
-> >>> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. DÈcouvrez pourquoi ceci est important ‡ https://aka.ms/LearnAboutSenderIdentification ]
-> >>>
-> >>> Changes made with the following Coccinelle rules:
-> >>>
-> >>> @@ constant C; @@
-> >>>
-> >>> - msecs_to_jiffies(C * 1000)
-> >>> + secs_to_jiffies(C)
-> >>>
-> >>> @@ constant C; @@
-> >>>
-> >>> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> >>> + secs_to_jiffies(C)
-> >>>
-> >>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> >>> ---
-> >>>   samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
-> >>>   samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
-> >>>   samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
-> >>>   3 files changed, 7 insertions(+), 7 deletions(-)
-> >>>
-> >>> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
-> >>> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
-> >>> --- a/samples/livepatch/livepatch-callbacks-busymod.c
-> >>> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
-> >>> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
-> >>>   {
-> >>>          pr_info("%s\n", __func__);
-> >>>          schedule_delayed_work(&work,
-> >>> -               msecs_to_jiffies(1000 * 0));
-> >>> +               secs_to_jiffies(0));
-> >>
-> >> Using secs_to_jiffies() is pointless, 0 is universal, should become
-> >> schedule_delayed_work(&work, 0);
-> > 
-> > Yes, schedule_delayed_work(&work, 0) looks like the right solution.
-> > 
-> > Or even better, it seems that the delayed work might get replaced by
-> > a normal workqueue work.
-> > 
-> > Anyway, I am working on a patchset which would remove this sample
-> > module. There is no need to put much effort into the clean up
-> > of this particular module. Do whatever is easiest for you.
-> > 
-> > Best Regards,
-> > Petr
+On 11/15/24 16:54, Stanislav Fomichev wrote:
+> On 11/14, Alexis Lothor√© (eBPF Foundation) wrote:
+>> +static inline __sum16 build_udp_v4_csum(const struct iphdr *iph, __u8 l4_proto,
+>> +					__u16 l4_len, const void *l4_start,
+>> +					int num_words)
+>> +{
+>> +	unsigned long pseudo_sum;
+>> +	int num_u16 = sizeof(iph->saddr); /* halfwords: twice byte len */
+>> +
+>> +	pseudo_sum = add_csum_hword((void *)&iph->saddr, num_u16);
+>> +	pseudo_sum += htons(l4_proto);
+>> +	pseudo_sum += l4_len;
+>> +	pseudo_sum += add_csum_hword(l4_start, num_words);
+>> +	return csum_fold(pseudo_sum);
 > 
-> If we're removing the module, I'll drop it from the series. Just to
-> clarify, do you mean to remove all of samples/livepatch/* or some
-> particular file(s)?
+> I was expecting to see a call to csum_tcpudp_magic here. And csum_ipv6_magic
+> down below. These build pseudo header csum, so no need to manually do it
+> again.
 
-To be precise, I am going to replace:
+I initially tried to fit csum_tcpudp_magic here and did not manage to make a
+valid UDP checksum, but after more attempts, it looks like I had a
+misunderstanding this checksum computation. I am now able to used
+csum_tcpudp_magic in build_udp_v4_csum, it will be fixed in the next revision :)
 
-	samples/livepatch/livepatch-callbacks-demo.c
-	samples/livepatch/livepatch-callbacks-mod.c
-	samples/livepatch/livepatch-callbacks-busymod.c
+Thanks,
 
-with a completely different modules because I am reworking the
-callbacks API.
+Alexis
 
-All other sample modules are going to stay.
-
-Feel free to remove livepatch-callbacks-busymod.c from the patchset.
-But also feel free to keep it. The API rework goes slowly. I am not
-sure if it would be ready for 6.14.
-
-Best Regards,
-Petr
+-- 
+Alexis Lothor√©, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
