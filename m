@@ -1,320 +1,152 @@
-Return-Path: <netdev+bounces-146316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DF99D2C70
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:23:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE15A9D2CC1
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:36:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE523B2AEC1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:20:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2166DB3DA85
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FFE1D1F46;
-	Tue, 19 Nov 2024 17:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E88C1D4176;
+	Tue, 19 Nov 2024 17:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKM9Iji4"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="tq57xr6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916ED1D173E
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 17:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBAC1D3639
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 17:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732036822; cv=none; b=QlEh7FD1ScpD9Hr0ReLDoYyPS17/1t5czwhIGmDpR0+bzr6o6/0GZPm0JhqV+XG2yaAa/FJp/dqd/xYl4LtWnKpJX2X/4aw0MgyOltWsh9SBmMRs8C1hyCCLEFUYBf+Pp1pAruRyZ3wwPTUkYPMK5hM02XxhQSopWWvui2OTt/U=
+	t=1732037269; cv=none; b=ThmFDdhWYRF0oksBqXfXEEBKTmLRkvtvVuXdXhuBA3ziOQdryuZt0SKXdUKGIQ6HP+d1z0Beq2UH8rVNsJrRhe2lNnP2vzULfPcHlc6wSYwctTHHthZpMGykbJ2uyuaN1EBFT0x2flnjK/VV/RiEPNP4o5lmwrV+3CpyFkeZwi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732036822; c=relaxed/simple;
-	bh=1PiG9NNQMJeY6K+RrrmYajQu8cAEeQJzhvtH3P3IZ/8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Txht2swti7n7F9wTKXih9EXoRtFvxsgzHcH+YrYZFLzwljnVG8LqKP+WtbTziPfHHfKMzXm8B1mwKgLxQ8dasu9wSdeks+GvCUHOHRmZVUql65VPpkAvze7oiJ5EbRrczVYlrzNW0LLektEwcu/0Wy98NDSvmrThT93rlZoJg1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CKM9Iji4; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-83a9cd37a11so43367239f.3
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 09:20:19 -0800 (PST)
+	s=arc-20240116; t=1732037269; c=relaxed/simple;
+	bh=irfr0wUkMdTaL/yDqhFIaTKzeomftakGMKe8SGtSv3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Xk/sveL9LbtzomYqfTpctYvmJ8/lNjR3cj0NRcd8RyEWXDWdBaRAcjzjz5On51kE9p9jX+fv5a7pyxGHVq3nwiOXulCc38zz04eWo9ftxeOLGdSyp9MQP02LIC3D1w04YSCLircZL+MiT67Nhk31H01L5qp6vA8gI0WcysOtPLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=tq57xr6L; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7e6d04f74faso163a12.1
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 09:27:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732036818; x=1732641618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hEtmknH6jBOs2M/FU6TYLuUeV4Uq2nbY08Ew6/G63oc=;
-        b=CKM9Iji4EqgSQ3CHB7HdkKnry5JeacbcOg6wZDnbyr/Oy5LLwCnVRFwXioUqPTZD3F
-         2we1rTiTvabEyuGXqsso9aeziy+yNPfSekDNWgFKqWQaJucUwqUHKCd33rujl5ve7xST
-         MoBge5SJvTe+dAb335cr8vOtaV1xCFvgX+YWns5VMg/k6gcy+4QqPBW1Yw2dRCqQU5y0
-         BqkwjsHv5zzShnuB/YjpzWnhdWgl2z60xakjZET5rHDSomm7aYcyL+3sfAF8qZ39Nqay
-         s8uK02WovOtHwNDXOtXpf5/izER9n7wmbVVXco12AF1frs4/0APCRs0+ikNu2Ghf3SqZ
-         npvw==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1732037265; x=1732642065; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MLGzDuB6bBk2R3r8V2F/ZqYhmvXEFcQ6FBBynbvI8ps=;
+        b=tq57xr6LK/GjfQ0tl+DaErCjJ+nXpTC9qN0zqlX0ANZh2XDvDqWq84waMYXY1SJpDD
+         yngkpF9OTaZLudR82EYFP6RTyvOrZgs6U7Rwsr+eZKD7U7Y61Re+icJRGjtHIQfp/1a5
+         y49IhkJJ8tEiBB01qp66Txa8U41Z/2mDb4nSrk3x66If4SQ2QbV68w33m0PMn9is9gCi
+         TI5GywlU6w3YhQgLY4rnyR9XQYO6JyhLFmXm36fy16BrpnS2FSvubs6WXhw4zYerHc6h
+         ydsrMJiQwYGoWUdwePjTQOeEVjtbPloKlMYeIp1dTP7sFrXqhJAbgDPRiz7QYw7JOaCn
+         eVEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732036818; x=1732641618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hEtmknH6jBOs2M/FU6TYLuUeV4Uq2nbY08Ew6/G63oc=;
-        b=e29SbLtkr0Trs9DppnRnpS0BIXJJgLNe9tN3ZsvqdiZM32CjcDRiCXEHefJ6OClGfp
-         OXelpe+3MsP0tcROZMN4303bkDB0VWF7G1rKrVGnXXz8NFoOtNeMHVzHHE7RfqzaO4+l
-         1XgxcSvu3IQGcSDf/MzrszPFuYQEGknHv1aR4mUC6UzeMU42ho7rKsjEiaNLajaFUNKr
-         +Sb61Fi/PImfD8cQaQRt/4aRMUB3pjyGAf3CVjLtKA3YGTkxkRbl7FQCgl8cdvhQvvFW
-         WAqkc2bTeJJBtbcG/wLIf+TpqF4d9aLMWv2BcwWq1i0SD+259VmUn6TTO+qi0hE/VebG
-         HK1g==
-X-Gm-Message-State: AOJu0YxwDj82Tf/ezhP3JMYgOcIKYqCiP1J9q/JU9bRG5q5dSy76+fjQ
-	t54ugJpnSBIoBQX4rSWy7MVTKy+2FtpQ63eO0WqspNUA+sNU+vbZl2HO1imfgprLykQXB9NRVQU
-	uKBWfaPW7gTRXMXzYsl2oJRVWWZQ=
-X-Google-Smtp-Source: AGHT+IFNIU6k8F7ArLdllOif5oxK5fn3RcxneCvAOS8KIf6eHxb1iSvuyH2Ufjf7VMOjrqUylKMd1WrU5DVwl+8nLiw=
-X-Received: by 2002:a05:6602:1614:b0:83a:7a19:1de0 with SMTP id
- ca18e2360f4ac-83e6c315b31mr1918726539f.14.1732036818560; Tue, 19 Nov 2024
- 09:20:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732037265; x=1732642065;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MLGzDuB6bBk2R3r8V2F/ZqYhmvXEFcQ6FBBynbvI8ps=;
+        b=aJXsicwJa+jumBryJBk7Doxw0ljcxE+VOylvXHf0AWIx16heF/o3xS0qaP85mgxXYo
+         TWtGMQQ//c18LdWRQJiGhRW22gImYOnuX+KGnte//mL9MRDakKEIwRdVbvTEBshA+JoD
+         X1BwhMl6jiChh8nD9g6kGOlrDwmWJcxvnZ+6WAnlyA2Oi+pMDHrZIaTnbT03UJOMV6Zy
+         /XazUple93TDI3aI3zQ6rYc9UM5zKyFw2+K2m59hrxs6dU1WfRkpsDcTJ8ollSx7L8u6
+         rd4GIn6tpOpX2G2x/41CuOCOWBzO/7ywWe5swozHUdrpGEpQnkc7f0QZeHGJ8faXkHTY
+         VtIg==
+X-Gm-Message-State: AOJu0YySxWe/V2LLwEFxn71VlW65/lX47h6hqcl6X2O13KeVJa1RsLBg
+	HG1yHQ55zIfG5sYX/uRWWEIPM2FMCLQAzonYdnWCFZ/cMXxXyd1lewM7ZPKe2h1DFAA8dDPSyG2
+	jD+Q=
+X-Google-Smtp-Source: AGHT+IEzKTuROz2SzDZftXhub++V872vT3mCYN3awJHqnvVO/Ti2Pi0oRpfNU6MvVtthpUTAsoetiw==
+X-Received: by 2002:a17:90a:da84:b0:2ea:5c01:c1ab with SMTP id 98e67ed59e1d1-2eaaa75c8e1mr6264669a91.1.1732037265278;
+        Tue, 19 Nov 2024 09:27:45 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ea67700e19sm4654246a91.19.2024.11.19.09.27.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2024 09:27:45 -0800 (PST)
+Date: Tue, 19 Nov 2024 09:27:43 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [ANNOUNCE] iproute2 6.12 release
+Message-ID: <20241119092743.6a1bdcb7@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241118145147.56236-1-annaemesenyiri@gmail.com>
- <20241118145147.56236-4-annaemesenyiri@gmail.com> <673ba52a4374f_1d652429476@willemb.c.googlers.com.notmuch>
-In-Reply-To: <673ba52a4374f_1d652429476@willemb.c.googlers.com.notmuch>
-From: Anna Nyiri <annaemesenyiri@gmail.com>
-Date: Tue, 19 Nov 2024 18:20:05 +0100
-Message-ID: <CAKm6_RtbJoysoteLH0Q6QQ4XH=wshSHgBeQ6DJRMos7-7G-xwg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 3/3] selftests: net: test SO_PRIORITY
- ancillary data with cmsg_sender
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, idosch@idosch.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Thank you for the feedback, I will update the test.
-Since the features are working well and the issues in the test are
-cosmetic, could it be merged in its current state?
-After the merge, I would submit the correction as a fix.
+This is regular release of iproute2 corresponding to the 6.12 kernel.
+Release is smaller than usual less activity.
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> ezt =C3=ADrta (id=C5=91p=
-ont:
-2024. nov. 18., H, 21:35):
->
-> Anna Emese Nyiri wrote:
-> > Extend cmsg_sender.c with a new option '-Q' to send SO_PRIORITY
-> > ancillary data.
-> >
-> > cmsg_so_priority.sh script added to validate SO_PRIORITY behavior
-> > by creating VLAN device with egress QoS mapping and testing packet
-> > priorities using flower filters. Verify that packets with different
-> > priorities are correctly matched and counted by filters for multiple
-> > protocols and IP versions.
-> >
-> > Suggested-by: Ido Schimmel <idosch@idosch.org>
-> > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> > ---
-> >  tools/testing/selftests/net/cmsg_sender.c     |  11 +-
-> >  .../testing/selftests/net/cmsg_so_priority.sh | 147 ++++++++++++++++++
-> >  2 files changed, 157 insertions(+), 1 deletion(-)
-> >  create mode 100755 tools/testing/selftests/net/cmsg_so_priority.sh
-> >
->
-> > +++ b/tools/testing/selftests/net/cmsg_so_priority.sh
-> > @@ -0,0 +1,147 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +IP4=3D192.0.2.1/24
-> > +TGT4=3D192.0.2.2/24
-> > +TGT4_NO_MASK=3D192.0.2.2
->
-> nit, avoid duplication:
->
-> TGT4_NO_MASK=3D192.0.2.2
-> TGT4=3D"${TGT4_NO_MASK}/24"
->
-> etc.
->
-> Or even drop the versions with the suffix and add that
-> explicitly where used.
->
-> > +TGT4_RAW=3D192.0.2.3/24
-> > +TGT4_RAW_NO_MASK=3D192.0.2.3
-> > +IP6=3D2001:db8::1/64
-> > +TGT6=3D2001:db8::2/64
-> > +TGT6_NO_MASK=3D2001:db8::2
-> > +TGT6_RAW=3D2001:db8::3/64
-> > +TGT6_RAW_NO_MASK=3D2001:db8::3
-> > +PORT=3D1234
-> > +DELAY=3D4000
-> > +
-> > +
-> > +create_filter() {
-> > +
-> > +    local ns=3D$1
-> > +    local dev=3D$2
-> > +    local handle=3D$3
-> > +    local vlan_prio=3D$4
-> > +    local ip_type=3D$5
-> > +    local proto=3D$6
-> > +    local dst_ip=3D$7
-> > +
-> > +    local cmd=3D"tc -n $ns filter add dev $dev egress pref 1 handle $h=
-andle \
-> > +    proto 802.1q flower vlan_prio $vlan_prio vlan_ethtype $ip_type"
->
-> nit: indentation on line break. Break inside string is ideally avoided to=
-o.
->
-> perhaps just avoid the string and below call
->
->     tc -n "$ns" filter add dev "$dev" \
->             egress pref 1 handle "$handle" proto 802.1q \
->             dst_ip "$dst_ip" "$ip_proto_opt"
->             flower vlan_prio "$vlan_prio" vlan_ethtype "$ip_type" \
->             action pass
-> > +
-> > +    if [[ "$proto" =3D=3D "u" ]]; then
-> > +        ip_proto=3D"udp"
-> > +    elif [[ "$ip_type" =3D=3D "ipv4" && "$proto" =3D=3D "i" ]]; then
-> > +        ip_proto=3D"icmp"
-> > +    elif [[ "$ip_type" =3D=3D "ipv6" && "$proto" =3D=3D "i" ]]; then
-> > +        ip_proto=3D"icmpv6"
-> > +    fi
-> > +
-> > +    if [[ "$proto" !=3D "r" ]]; then
-> > +        cmd=3D"$cmd ip_proto $ip_proto"
-> > +    fi
-> > +
-> > +    cmd=3D"$cmd dst_ip $dst_ip action pass"
-> > +
-> > +    eval $cmd
-> > +}
-> > +
-> > +TOTAL_TESTS=3D0
-> > +FAILED_TESTS=3D0
-> > +
-> > +check_result() {
-> > +    ((TOTAL_TESTS++))
-> > +    if [ "$1" -ne 0 ]; then
-> > +        ((FAILED_TESTS++))
-> > +    fi
-> > +}
-> > +
-> > +cleanup() {
-> > +    ip link del dummy1 2>/dev/null
->
-> Both devices are in ns1.
->
-> No need to clean up the devices explicitly. Just deleting the netns
-> will remove them.
->
-> > +    ip -n ns1 link del dummy1.10 2>/dev/null
-> > +    ip netns del ns1 2>/dev/null
->
-> > +}
-> > +
-> > +trap cleanup EXIT
-> > +
-> > +
-> > +
-> > +ip netns add ns1
-> > +
-> > +ip -n ns1 link set dev lo up
-> > +ip -n ns1 link add name dummy1 up type dummy
-> > +
-> > +ip -n ns1 link add link dummy1 name dummy1.10 up type vlan id 10 \
-> > +        egress-qos-map 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
-> > +
-> > +ip -n ns1 address add $IP4 dev dummy1.10
-> > +ip -n ns1 address add $IP6 dev dummy1.10
-> > +
-> > +ip netns exec ns1 bash -c "
-> > +sysctl -w net.ipv4.ping_group_range=3D'0 2147483647'
-> > +exit"
->
-> Same point on indentation on line continuation.
->
-> No need for explicit exit.
->
-> > +
-> > +
-> > +ip -n ns1 neigh add $TGT4_NO_MASK lladdr 00:11:22:33:44:55 nud permane=
-nt dev \
-> > +        dummy1.10
-> > +ip -n ns1 neigh add $TGT6_NO_MASK lladdr 00:11:22:33:44:55 nud permane=
-nt dev dummy1.10
-> > +ip -n ns1 neigh add $TGT4_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud per=
-manent dev dummy1.10
-> > +ip -n ns1 neigh add $TGT6_RAW_NO_MASK lladdr 00:11:22:33:44:66 nud per=
-manent dev dummy1.10
-> > +
-> > +tc -n ns1 qdisc add dev dummy1 clsact
-> > +
-> > +FILTER_COUNTER=3D10
-> > +
-> > +for i in 4 6; do
-> > +    for proto in u i r; do
-> > +        echo "Test IPV$i, prot: $proto"
-> > +        for priority in {0..7}; do
-> > +            if [[ $i =3D=3D 4 && $proto =3D=3D "r" ]]; then
-> > +                TGT=3D$TGT4_RAW_NO_MASK
-> > +            elif [[ $i =3D=3D 6 && $proto =3D=3D "r" ]]; then
-> > +                TGT=3D$TGT6_RAW_NO_MASK
-> > +            elif [ $i =3D=3D 4 ]; then
-> > +                TGT=3D$TGT4_NO_MASK
-> > +            else
-> > +                TGT=3D$TGT6_NO_MASK
-> > +            fi
-> > +
-> > +            handle=3D"${FILTER_COUNTER}${priority}"
-> > +
-> > +            create_filter ns1 dummy1 $handle $priority ipv$i $proto $T=
-GT
-> > +
-> > +            pkts=3D$(tc -n ns1 -j -s filter show dev dummy1 egress \
-> > +                | jq ".[] | select(.options.handle =3D=3D ${handle}) |=
- \
->
-> Can jq be assumed installed on all machines?
->
-> > +                .options.actions[0].stats.packets")
-> > +
-> > +            if [[ $pkts =3D=3D 0 ]]; then
-> > +                check_result 0
-> > +            else
-> > +                echo "prio $priority: expected 0, got $pkts"
-> > +                check_result 1
-> > +            fi
-> > +
-> > +            ip netns exec ns1 ./cmsg_sender -$i -Q $priority -d "${DEL=
-AY}" -p $proto $TGT $PORT
-> > +            ip netns exec ns1 ./cmsg_sender -$i -P $priority -d "${DEL=
-AY}" -p $proto $TGT $PORT
-> > +
-> > +
-> > +            pkts=3D$(tc -n ns1 -j -s filter show dev dummy1 egress \
-> > +                | jq ".[] | select(.options.handle =3D=3D ${handle}) |=
- \
-> > +                .options.actions[0].stats.packets")
-> > +            if [[ $pkts =3D=3D 2 ]]; then
-> > +                check_result 0
-> > +            else
-> > +                echo "prio $priority: expected 2, got $pkts"
-> > +                check_result 1
->
-> I'd test -Q and -p separately. A bit of extra code to repeat the pkts
-> read. But worth it.
->
-> > +            fi
-> > +        done
-> > +        FILTER_COUNTER=3D$((FILTER_COUNTER + 10))
-> > +    done
-> > +done
-> > +
-> > +if [ $FAILED_TESTS -ne 0 ]; then
-> > +    echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
-> > +    exit 1
-> > +else
-> > +    echo "OK - All $TOTAL_TESTS tests passed"
-> > +    exit 0
-> > +fi
-> > --
-> > 2.43.0
-> >
->
->
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.12.0.tar.gz
+
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+
+Contributions:
+
+Dario Binacchi (3):
+      bridge: mst: fix a musl build issue
+      bridge: mst: fix a further musl build issue
+      arpd: use designated initializers for msghdr structure
+
+David Ahern (2):
+      Update kernel headers
+      Update kernel headers
+
+Davide Caratti (1):
+      tc: f_flower: add support for matching on tunnel metadata
+
+Denis Kirjanov (2):
+      lib: utils: close file handle on error
+      lib: names: check calloc return value in db_names_alloc
+
+Hangbin Liu (1):
+      ip/ipmroute: use preferred_family to get prefix
+
+Jakub Kicinski (1):
+      ip: netconf: fix overzealous error checking
+
+Justin Iurman (2):
+      ip: lwtunnel: tunsrc support
+      man8: ip-route: update documentation
+
+Nicolas Dichtel (1):
+      iplink: fix fd leak when playing with netns
+
+Nikolay Aleksandrov (2):
+      ip/netkit: print peer policy
+      bridge: add ip/iplink_bridge files to MAINTAINERS
+
+Petr Machata (1):
+      ip: nexthop: Support 16-bit nexthop weights
+
+Stephen Hemminger (6):
+      uapi: update headers
+      bridge: catch invalid stp state
+      netem: swap transposed calloc args
+      uapi: update of bpf.h
+      uapi: update to bpf.h
+      v6.12.0
+
+Tobias Waldekranz (1):
+      bridge: Remove duplicated textification macros
+
+Xiao Liang (2):
+      ip: Move of set_netnsid_from_name() to namespace.c
+      iplink: Fix link-netns id and link ifindex
+
+wenglianfa (1):
+      rdma: Fix help information of 'rdma resource'
+
 
