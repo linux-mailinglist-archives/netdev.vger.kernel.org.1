@@ -1,143 +1,119 @@
-Return-Path: <netdev+bounces-146223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FCBF9D2517
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:43:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E5579D251A
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:44:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA92328103C
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:43:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E05A2B24E95
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678921C9EC6;
-	Tue, 19 Nov 2024 11:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9A01C9ED5;
+	Tue, 19 Nov 2024 11:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ATJ61zkg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NHA0Q0Bf"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3061C4A24;
-	Tue, 19 Nov 2024 11:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC831C4A24
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 11:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732016631; cv=none; b=f0nZ7DtDt5vgzWSTbEEUmfmtzhAqDBj3IDZQb5QQRxgksKfEZo217ltfOmIiJOolFj6dKACw4JvHaHmPu9RmhkwMwXRPRxygeMItgn5L5exB5QyrCnin/mq31vOrBpCjpI7l1wargRYp8edeDmqkurzj1UgjJXJj1FK4z/o12aY=
+	t=1732016675; cv=none; b=XoTtIt+YS0ycCwUsvKJ1pmqJDa6xK6CeEEysBAK9bKdDBeoWsRPXRjkLCqoc+x/MlXMTbAODnUkvBy8nGMExQlYfThLCZ/INHRBQecKe9nBEDK0nyUtiEDLJ/sh0QjEUgd9egO59QvCRJdRwPOEKqMtbpP4fC0U5OFom0Yq/S2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732016631; c=relaxed/simple;
-	bh=oqBZU2s9GX4I4okgxGMVB9lX+KBfjQKxbdgLLlfDkEU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lfEzQCstukaZ8JsS7jQ31edsMUkpI8AMbIqdYfr32jEsY5hm1IBfXXMpUV03ThSCY8wan9wxS0yX1Qz1Qv64UqJPZ/j+9kG17sZk1XUX6NYpkV9EVFDfZxca8FoaUb5v+e8lXiSOCHa7VYGmoPklbOqXZLOchaITHQaoM4UEPeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ATJ61zkg; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1732016629; x=1763552629;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oqBZU2s9GX4I4okgxGMVB9lX+KBfjQKxbdgLLlfDkEU=;
-  b=ATJ61zkgdQRSfG0Hz11zLx9lsIngR5OIibeUHBs4DMzN75QHDUJcDZdd
-   AkgevlOIhY5ntgewQuXyXfucsJp97yQTmGIVR8bkJd0xM2JTka/L+UeEF
-   G+HxuIngnlnlKvf5/TFM2V3zqCBz0Ks1SqIbRFGx1X47XQN+Sz3xXFgp0
-   YUbSNua44RCP1wh+pyJcXDUAU/FFf5fy0ImkcUWEBLvB35BCS125Fx6JE
-   1gO4ZsFbFdbMYzK4fHiFY9uHeGgdYiixRiUgQRqau3bbHuSgW018V+Q8k
-   Ko1BX7FJNfIyZR8BHNfnvwn9c1l7fThGHkqc38aXutzq9TVa/+2FQOOGT
-   Q==;
-X-CSE-ConnectionGUID: BWklstq0SNCOj2gcHvaF3Q==
-X-CSE-MsgGUID: 05g4JmwuT3OCtZoW+/CaAw==
-X-IronPort-AV: E=Sophos;i="6.12,165,1728975600"; 
-   d="scan'208";a="34225248"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Nov 2024 04:43:41 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Nov 2024 04:43:08 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 19 Nov 2024 04:43:05 -0700
-Date: Tue, 19 Nov 2024 11:43:04 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
- Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
-	<Steen.Hegelund@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
-	<jacob.e.keller@intel.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <devicetree@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2 8/8] dt-bindings: net: sparx5: document RGMII
- MAC delays
-Message-ID: <20241119114304.u47srawc2t6ymvf6@DEN-DL-M70577>
-References: <20241113-sparx5-lan969x-switch-driver-4-v2-0-0db98ac096d1@microchip.com>
- <20241113-sparx5-lan969x-switch-driver-4-v2-8-0db98ac096d1@microchip.com>
- <29ddbe38-3aac-4518-b9f3-4d228de08360@lunn.ch>
- <20241115092237.gzpat4x6kjipb2x7@DEN-DL-M70577>
- <5b9d79f1-ccdd-47c3-a02a-5ff0b12c1fb8@lunn.ch>
+	s=arc-20240116; t=1732016675; c=relaxed/simple;
+	bh=f4tKIcMN7vBtR4ST2FQCV5bl7OuhORHbAKErSqdp4Ok=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HbOR1UE4oYBQz0C9jiuVFJn39v3rcPylpKv7vpFhskAZo5/68JkvvApFTc1vuG6Un+6AL0MDDpqmMNw8k4CKohNF03T+B7UpMDhbNiA657nNWLK5SryCK3YVPKX0qihNY/EQSgFlrC0Dp5N0Yj8OAB2BQZULOpKs3Tsj5sPTMCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NHA0Q0Bf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732016673;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f4tKIcMN7vBtR4ST2FQCV5bl7OuhORHbAKErSqdp4Ok=;
+	b=NHA0Q0BfTdzly151nlhOVKNeJ1/5EGQa/Flrjzm3knabeVXtILFDVakZSMnC1cRbIMfcZ0
+	TJt5+W5sIKAb5sYruysT1aKpnSzQHpW04sGyup0NfdFeLUHzVKfh8FzwOIo+YFVTgFctk2
+	1pQfqOsEsVAe19SmdrECH81ZHNLEp4U=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-219-jDAoH0RYO1C2yq5GWed1-A-1; Tue, 19 Nov 2024 06:44:32 -0500
+X-MC-Unique: jDAoH0RYO1C2yq5GWed1-A-1
+X-Mimecast-MFC-AGG-ID: jDAoH0RYO1C2yq5GWed1-A
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b14a4e771fso87619985a.3
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 03:44:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732016671; x=1732621471;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f4tKIcMN7vBtR4ST2FQCV5bl7OuhORHbAKErSqdp4Ok=;
+        b=WfRXIqGqzgpPqMsxHpQhlUvZj3oi9cL/TUynIrdWVGlDCptSVBPwjOED9DTWCzhjSd
+         nyrb9WLCRytlUW9NbiHy3ryA7Kv6jhBOT6reDRFCHDuVQGCHIpQFDwp2hwTmPXrE4oMS
+         tArwgLSr0FBeph7o+Kdlg6rlVftP8AAL/KwC+IxIQ6wjLHpfw8gXWLblR7pGNGyskyx7
+         PcTrHYYoBPW6rFDO8Nsuv40HFEV5LSZu8ZbH4ItakuFJgd1lRGQodNfEJtFm+9DDbeNP
+         Mq5d8n8TKrSpbciEssjwQzXni2n+ihfwAUniBgNzcGXDowdcmOuAMQO5XKD73tPzTsxI
+         BSNg==
+X-Gm-Message-State: AOJu0YzU3b1w+kNxN2pwE/exYTOwZb22U9P/tGX6ufuv5O1FkZdAUMKB
+	smgn725SM2cJa+9KW5wYEemmiqp4vEp8QBXhcB3z3FWAHbobeX/Bs4/jxqWfQ941gHxvU04kQZG
+	95P/5q6z5NINqKRFXEs4VGjsU4yU0tt/U+AF/ejvi/7CwFpchB8kWtA==
+X-Received: by 2002:a05:620a:1a89:b0:7a9:bdd4:b4ea with SMTP id af79cd13be357-7b36229f0c9mr2162369985a.9.1732016671626;
+        Tue, 19 Nov 2024 03:44:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEK5+OxRQWXQHKP5IEgPJVLZTHomJ4aAb+TacL2h3S/6VXE1p2FnFeTpNsWz1IQmPlXUYA02w==
+X-Received: by 2002:a05:620a:1a89:b0:7a9:bdd4:b4ea with SMTP id af79cd13be357-7b36229f0c9mr2162366785a.9.1732016671249;
+        Tue, 19 Nov 2024 03:44:31 -0800 (PST)
+Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a8643dcsm84759285a.61.2024.11.19.03.44.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 03:44:30 -0800 (PST)
+Message-ID: <31508271-5087-4d55-a509-13bb7218824f@redhat.com>
+Date: Tue, 19 Nov 2024 12:44:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <5b9d79f1-ccdd-47c3-a02a-5ff0b12c1fb8@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 net-next 0/5] Add more feautues for ENETC v4 - round 1
+To: Wei Fang <wei.fang@nxp.com>, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, frank.li@nxp.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
+References: <20241119082344.2022830-1-wei.fang@nxp.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241119082344.2022830-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> > Hi Andrew,
-> >
-> > > > The lan969x switch device supports two RGMII port interfaces that can be
-> > > > configured for MAC level rx and tx delays.
-> > > >
-> > > > Document two new properties {rx,tx}-internal-delay-ps. Make them
-> > > > required properties, if the phy-mode is one of: rgmii, rgmii_id,
-> > > > rgmii-rxid or rgmii-txid. Also specify accepted values.
-> > >
-> > > This is unusual if you look at other uses of {rt}x-internal-delay-ps.
-> > > It is generally an optional parameter, and states it defaults to 0 if
-> > > missing, and is ignored by the driver if phy-mode is not an rgmii
-> > > variant.
-> >
-> > Is unusual bad? :-)
-> 
-> Depends. Having a uniform usage is good, it causes less confusion. But
-> strict enforcement also has its plus side.
-> 
-> > I thought that requiring the properties would make
-> > misconfigurations (mismatching phy-modes and MAC delays) more obvious,
-> > as you were forced to specify exactly what combination you want in the
-> > DT.  Maybe not. I can change it,  no problem.
-> 
-> Do these ports only support RGMII? The general pattern is that ports
-> supporting RGMII also support other modes, GMII, MII, rev-GMII,
-> rev-MII etc. For these other modes RGMII delays are meaningless. The
-> general pattern is that they are allowed in DT, but are just ignored.
+On 11/19/24 09:23, Wei Fang wrote:
+> Compared to ENETC v1 (LS1028A), ENETC v4 (i.MX95) adds more features, and
+> some features are configured completely differently from v1. In order to
+> more fully support ENETC v4, these features will be added through several
+> rounds of patch sets. This round adds these features, such as Tx and Rx
+> checksum offload, increase maximum chained Tx BD number and Large send
+> offload (LSO).
 
-RGMII and RMII.
+## Form letter - net-next-closed
 
-> 
-> If the LAN969x ports only support RGMII, and you are enforcing the
-> four RGMII modes in DT, you could also enforce the delays are present
-> and only have all allowed values. But i would not have the enforcement
-> any more strict than the other ports. Do you enforce the phy-modes for
-> the ports with a PCS?
+The merge window for v6.13 has begun and net-next is closed for new
+drivers, features, code refactoring and optimizations. We are currently
+accepting bug fixes only.
 
-No, we do not enforce that in the DT. For the PCS ports, you can specify
-whatever phy-mode in the DT, and if that phy-mode is not advertised in
-the driver, it will just be rejected.
+Please repost when net-next reopens after Dec 2nd.
 
-I decided to go ahead with v3 (which needs to be reposted when net-next
-opens), where the properties are not required.
+RFC patches sent for review only are welcome at any time.
 
-> 
->         Andrew
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 
-Thanks for your feedback.
 
-/Daniel
 
