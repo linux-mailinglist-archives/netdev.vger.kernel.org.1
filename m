@@ -1,92 +1,84 @@
-Return-Path: <netdev+bounces-146285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6794D9D2997
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:28:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57FB69D2954
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 16:14:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B56B2AC29
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:14:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56381F22001
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428C61CC89A;
-	Tue, 19 Nov 2024 15:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D7D1D079F;
+	Tue, 19 Nov 2024 15:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="j0NVwEar"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FaCH43yW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950C71CF5E9
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 15:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B2D1D0950;
+	Tue, 19 Nov 2024 15:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732029172; cv=none; b=oW0t8m8JrPJPB84rsKazUT7tNzizviftQSIjFRnOc/xut2qwsyYZe5moi95bfdZSugcmEVCDzMin1RUUhhsrb86QbgvktlahWaEf2zTgm4dXhTXPokQGemdi7tvxqqDzZUOkKqkHG3pvrBDWpVfyjqHjpeqZNIxrmVkJ4XgxuhU=
+	t=1732029186; cv=none; b=nZZMd8UkSwmBLEs4S9DxjB5KjVzbZl11/eaYiFDEsMkvJudZfCKNYsUdaP64Mp51jJWCHcG/S1QWd2+/YFoxnJb4JKibD3BsRQ/YyKlc9IDeRxBnf0L3asRkL+w5Kd6wTQTseSU7gcARsLD84m1JVts4UCQcBxnMvrCkQjok43g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732029172; c=relaxed/simple;
-	bh=na11rZZxbjaWWHHHvqe7qQmgWk4VpY4seLp9B30OY0M=;
+	s=arc-20240116; t=1732029186; c=relaxed/simple;
+	bh=tiLrsshJNzrJ9KW7m2vRVm9HcPFidQhW9xkZNsRaWak=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HiFkhY5QXARsHGIbVF/c8Yeft7wYkETbGeyoi1V7yJkfMU8plfSNE9qparH0Dtf0IXxOixfF6uH7O44mPtteIZqj2CKybBuQQNjSpKt7RYJ70Wy1fPJ1UiAE8xbz3oIX/A20sDigDCJ39mS6daJkH23lPsXvscy/HWJbINt9Hyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=j0NVwEar; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4315df7b43fso9647075e9.0
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 07:12:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1732029168; x=1732633968; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9emVvMlIQyUe97EHGi47adssysazKApKvK3J5heDDH0=;
-        b=j0NVwEar2aM1gTZSMdCHMoTfZzA0ivsvPpd0665aN8+ZwZnjo0iG5VArDjwQGfILMP
-         7+n75Pngh+uWT0nd0pmZuZohjirRlEPL/xqtLkpcMG4M7q1XE3sm14h8Vh8tl8e1k7wO
-         DMA9V54N4IlfFAFFTTztaz5AWhfoBT6YpqRIZ2fqeII3fbt1yimrv0dXRBPJP1mnTAc8
-         M4atZifyumYzR1oCvFUwBdaXAABwsN8lcdN/U3gKF/Y9d1q/sK+h1fvRXBSq1G66F4t+
-         s/dplg2s+5uW8x9o03S7j6QlsvCJgHAJlQf6+8RqCEzk5g4U3gqjdE5bw3ieBRepEYAk
-         nxaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732029168; x=1732633968;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9emVvMlIQyUe97EHGi47adssysazKApKvK3J5heDDH0=;
-        b=m9ruNhLnXK5TrjbpdXbYMhUvE/F3oZo/Dx1Kcw/I4Tzc9H2u4mTIZWKn8WpKL0Bf1w
-         ZZD0S/CU6UuGYjWq18b1tjBuq+YaANQCW3EA3/o/Xo/Hu/gOs++wxxkdpW1p4c2ANWRf
-         SlrfW9bd2UTtTBVirbby6WKKPqwHBje7Tzuda1lrDE+1DA2mn2VndYIHyiZjoziyMwMx
-         PxcAkCGw3bF6vh7bBeAeVMgAnRb8HkGHydQBbmb8bIRz2mao51E+RlaseuBew0NWrxRN
-         M28J5IwdFA4VFd7OTG1YJhHwPcKJGQ0cKz+4RlWLGqjzZcGP6PxZrKQ6grmAaMWS5fLj
-         icQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXzJMqNzga2fod2nyvbN/Xg6D8zhcZlZWafGaWjqigk/oGZcyuntMZ6JEUEYPou8V+e1TFj8xU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJpfZd7Xgc/g2Go44Ydy3lrANCDyMp4dAdE0B6gJXD0cBNgTtw
-	G9fL7dk2NKmTQZueEXERJhtkCQefOChhP+heFKiT3Dn6azlpWMihRT7oL/LUITk=
-X-Google-Smtp-Source: AGHT+IEmx4f7AlU+sb5maEbNkOSgm62MCm+NueI5hUbIOcQ1tGczbv/AsM4N3gPa1fU77IsXFs0RnQ==
-X-Received: by 2002:a05:600c:1c98:b0:431:5a0e:fa2e with SMTP id 5b1f17b1804b1-432df78a858mr121999375e9.21.1732029167717;
-        Tue, 19 Nov 2024 07:12:47 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab807d4sm195476435e9.21.2024.11.19.07.12.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 07:12:47 -0800 (PST)
-Date: Tue, 19 Nov 2024 16:12:44 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Carolina Jubran <cjubran@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, donald.hunter@gmail.com
-Subject: Re: [PATCH net-next V3 3/8] devlink: Extend devlink rate API with
- traffic classes bandwidth management
-Message-ID: <Zzyq7BEoaJHk4uy8@nanopsycho.orion>
-References: <20241117205046.736499-1-tariqt@nvidia.com>
- <20241117205046.736499-4-tariqt@nvidia.com>
- <Zzr84MDdA5S3TadZ@nanopsycho.orion>
- <b4aa8e75-600e-4dc5-8fe1-a6be7bb42017@nvidia.com>
- <Zzxa13xPBZGxRC01@nanopsycho.orion>
- <20241119063313.5bc46276@kernel.org>
- <ZzykxEIYZPjjRbVy@nanopsycho.orion>
- <20241119065118.24936744@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cDwe3q0BWnHQUCOZ/aXbGRUY3+RXyTgeSkjuOoOZA7LTewZ139GfFWq8AEnchdI6l+EJbwJNDDd+PkK4kNa3zkRUH21uHkTO4sOejcqjArNAcnX40ZKrXTvgEF3PKY0F6kmbUlFtnoJnLKZtH2S6m3792bhVChS+EgcZKfmZggM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=FaCH43yW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=poVgrhfUM+w7fZDkJyIhYRLNyzyYxc9sRedM9mebQyU=; b=FaCH43yWjab6ndkadF8fIiRFz1
+	zMdvViicV8uSf7OH8YbZP+N1mNCX82vf0lppr2RYLCo+zGlJRe9mjnx7EauAwuLxkvViXEtLXAc4O
+	KkB4cuGmG8IsldKM5SiReNHK4rSCGBTHO28XXGAgxRwODxdSiCyZAJnZNvFJl7VMrOUL4AFrpdx42
+	c0fq5Ci8Dw68TJu9WhKbcOY1ZRlQOA8Y75/uH2XK37+85pfdLzwPcY6gp4iwn6jBeboeJGMysgED3
+	HdC8gy7uUGoKhwf0ZC8faNEteVT0RLwxJPM111Ubu7jBNSrD8Mqs9yP3qwKRJK8hAWKAJEXs050an
+	VGtPADUQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42520)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tDPuJ-0003n3-2E;
+	Tue, 19 Nov 2024 15:12:48 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tDPuH-00069E-0j;
+	Tue, 19 Nov 2024 15:12:45 +0000
+Date: Tue, 19 Nov 2024 15:12:45 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
+Cc: Sean Anderson <sean.anderson@linux.dev>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"Simek, Michal" <michal.simek@amd.com>,
+	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"git (AMD-Xilinx)" <git@amd.com>,
+	"Katakam, Harini" <harini.katakam@amd.com>
+Subject: Re: [PATCH net-next 2/2] net: axienet: Add support for AXI 2.5G MAC
+Message-ID: <Zzyq7eLyALyXnvuS@shell.armlinux.org.uk>
+References: <20241118081822.19383-1-suraj.gupta2@amd.com>
+ <20241118081822.19383-3-suraj.gupta2@amd.com>
+ <ZztjvkxbCiLER-PJ@shell.armlinux.org.uk>
+ <657764fd-68a1-4826-b832-3bda91a0c13b@linux.dev>
+ <Zztml-Te38P3M7cM@shell.armlinux.org.uk>
+ <BL3PR12MB65716077E66F2141CC618DD9C9202@BL3PR12MB6571.namprd12.prod.outlook.com>
+ <ZzyQQV4qM_fTrpMf@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,26 +87,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241119065118.24936744@kernel.org>
+In-Reply-To: <ZzyQQV4qM_fTrpMf@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Tue, Nov 19, 2024 at 03:51:18PM CET, kuba@kernel.org wrote:
->On Tue, 19 Nov 2024 15:46:28 +0100 Jiri Pirko wrote:
->> >> Not sure. Perhaps Jakub/Donald would know. Ccing.  
->> >
->> >I haven't read full context, but all "nested" arrays are discouraged.
->> >Use:
->> >	multi-attr: true
->> >and repeat the entries without wrapping them into another attr.  
->> 
->> But we need to use the array index. It looks a bit odd to me to depent
->> on the index in multi-attr in general. It is not guaranteed other
->> atrributes don't get in the middle. Ordering should be maintained, that
->> is ok.
->> 
->> How about to have a nest that contain just one multi-attr attribute?
->
->You can make the entry a nest and put the index inside, if it is 
->significant.
+On Tue, Nov 19, 2024 at 01:18:57PM +0000, Russell King (Oracle) wrote:
+> On Tue, Nov 19, 2024 at 10:28:48AM +0000, Gupta, Suraj wrote:
+> > > -----Original Message-----
+> > > From: Russell King <linux@armlinux.org.uk>
+> > > 
+> > > On Mon, Nov 18, 2024 at 11:00:22AM -0500, Sean Anderson wrote:
+> > > > On 11/18/24 10:56, Russell King (Oracle) wrote:
+> > > > > On Mon, Nov 18, 2024 at 01:48:22PM +0530, Suraj Gupta wrote:
+> > > > >> Add AXI 2.5G MAC support, which is an incremental speed upgrade of
+> > > > >> AXI 1G MAC and supports 2.5G speed only. "max-speed" DT property is
+> > > > >> used in driver to distinguish 1G and 2.5G MACs of AXI 1G/2.5G IP.
+> > > > >> If max-speed property is missing, 1G is assumed to support backward
+> > > > >> compatibility.
+> > > > >>
+> > > > >> Co-developed-by: Harini Katakam <harini.katakam@amd.com>
+> > > > >> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+> > > > >> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> > > > >> ---
+> > > > >
+> > > > > ...
+> > > > >
+> > > > >> -  lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE |
+> > > MAC_ASYM_PAUSE |
+> > > > >> -          MAC_10FD | MAC_100FD | MAC_1000FD;
+> > > > >> +  lp->phylink_config.mac_capabilities = MAC_SYM_PAUSE |
+> > > > >> + MAC_ASYM_PAUSE;
+> > > > >> +
+> > > > >> +  /* Set MAC capabilities based on MAC type */  if (lp->max_speed
+> > > > >> + == SPEED_1000)
+> > > > >> +          lp->phylink_config.mac_capabilities |= MAC_10FD |
+> > > > >> + MAC_100FD | MAC_1000FD;  else
+> > > > >> +          lp->phylink_config.mac_capabilities |= MAC_2500FD;
+> > > > >
+> > > > > The MAC can only operate at (10M, 100M, 1G) _or_ 2.5G ?
+> > > >
+> > > > It's a PCS limitation. It either does (1000Base-X and/or SGMII) OR
+> > > > (2500Base-X). The MAC itself doesn't have this limitation AFAIK.
+> > > 
+> > > That means the patch is definitely wrong, and the proposed DT change is also
+> > > wrong.
+> > > 
+> > > If it's a limitation of the PCS, that limitation should be applied via the PCS's
+> > > .pcs_validate() method, not at the MAC level.
+> > > 
+> > As mentioned in IP PG (https://docs.amd.com/r/en-US/pg051-tri-mode-eth-mac/Ethernet-Overview#:~:text=Typical%20Ethernet%20Architecture-,MAC,-For%2010/100), it's limitation in MAC also.
+> 
+> I'm not reading it as a limitation of the MAC.
+> 
+> The limitation stated there is that internal mode (GMII) is only
+> supported for 2.5Gbps speeds. At 2.5Gbps speeds, the clock rate is
+> increased from 125MHz to 312.5MHz (which makes it non-compliant
+> with 802.3-2008, because that version doesn't define 2.5Gbps speeds.)
+> 
+> So long as the clock rate and interface can be safely switched, I
+> don't see any reason to restrict the MAC itself to be either
+> 10/100/1G _or_ 2.5G.
+> 
+> Note that 2.5G will only become available if it is supported by one
+> of the supported interface modes (e.g. 2500base-X). If the supported
+> interface modes do not include a mode that supports >1G, then 2.5G
+> won't be available even if MAC_2500FD is set in mac_capabilities.
 
-Okay, sounds fine to me.
+Reading further, PG047 which is the PCS, suggests that it can operate
+at 10, 100, 1G, and 2.5G.
+
+Moreover, what I read there is that where a PCS core supports 2.5G, it
+can operate at 10, 100, 1G or 2.5G depending on the clock. Note 2 in
+"Transceiver ports".
+
+However, it doesn't support TBI at 2.5Gbps mode, only the 2500BASE-X
+PMA/PMD.
+
+Also states "The core operates at 125 MHz for the 1 Gbps data rate
+(1.25Gbps line rate) and 312.5 MHz at 2.5 Gbps data rates (3.125 Gbps
+line rate) in modes having device transceivers." These differences in
+clocking are typical for systems that support 1G and 2.5G.
+
+So, I'm still wondering what the limitation is. If the MAC transmit
+clock can only run at 125MHz, or only at 312.5MHz, depending on the
+design, then yes, it would be appropriate to limit the MAC to 1G
+(and below) or 2.5G speeds.
+
+However, if there's designs that allow the transmit clock to be
+configured at run time, then the system supports both speeds.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
