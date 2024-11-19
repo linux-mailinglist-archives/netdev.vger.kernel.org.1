@@ -1,92 +1,93 @@
-Return-Path: <netdev+bounces-146263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 856E39D28A1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:54:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 888F39D28B8
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:57:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBFDEB21D27
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:54:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 432EDB29D97
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CDB1CC174;
-	Tue, 19 Nov 2024 14:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E5F1CF5DA;
+	Tue, 19 Nov 2024 14:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P0aQc86u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cM8S3Dcl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9C843179
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 14:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5542C1CEAA2;
+	Tue, 19 Nov 2024 14:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732028052; cv=none; b=r81DUse0u11HorMRDJ7Mkot7xak72dWmnblqlCBTLYaahN6uwaaHcbrzOCjKAFs5Q2jLjO8qYTZ1SYdAjgFahCc02fQqlu6PFQxG2xWXJ21vVTuo0i1b1iH14Zwt/nvBnNDHyG8ydxkgMkEmVnUvCo/q7qQgIeO3MW56Fxz/lEU=
+	t=1732028181; cv=none; b=ZGjlOYwdhGUBa0FOCir8yE8T7seDrbqoKR819OGaNr47mIyd1AZOkQMLXLexHA6tVCzKYGlu4AjMimlDFVV2GnNWIsywsQiqIlrDEYLMes7jQiPnOAH97abqio/YGPcyx+N8aATdNF4BWqhP5DQO1gdjxv384Y+60Qroe7wQPiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732028052; c=relaxed/simple;
-	bh=lInCZp2xKgUZhAB/044xKlF58GdtVm2BUsygsBtHeB4=;
+	s=arc-20240116; t=1732028181; c=relaxed/simple;
+	bh=ppUWTmFX24mYYKF9QRClgtlq6a/mWwX82JjPsCdrs6c=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NOFGVkde+n0KlKfCAEP8dpF0yO6aF6W+dxtjvYdFfDWQ0nCArDGRZ763ijwwAtNQx3EoaR/Y3L+e0poCWbqYiBH/EvGv31BOhthnlm1VfUf+q1Et2tlMxxSYyFC1KRD44KCuYSgObamEJvKOuNl7gQDThXt6wLVjtpzFA+HKjCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P0aQc86u; arc=none smtp.client-ip=209.85.161.49
+	 Mime-Version:Content-Type; b=srmNEo5dRRjDE136eqpzQ+I27Byp2H1vDe5r1s73RW4OOLebvzQrCLqKKc9bbUcesBzPQrtq6SQSTgEF4o/Db88vsMwXMfqXxuiL8DeMBJza6ZS0T87yWclWWCiwX3vMSeOMY4TI+IyqCqq75ZJS2CH5pEPUvbFzQUz7Z9pvaTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cM8S3Dcl; arc=none smtp.client-ip=209.85.219.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5ee354637b4so565710eaf.3
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 06:54:10 -0800 (PST)
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e387fdd1ec4so2130230276.0;
+        Tue, 19 Nov 2024 06:56:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732028050; x=1732632850; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732028177; x=1732632977; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NaqUrT8Kzq3UMcB3TNf5QwaQzz6MIqNclugaH7J2qa8=;
-        b=P0aQc86uSyK873nKwBbJfMpPiRhDNL4CtJKypaMezLRt9QU6oW6ooV7LSuDm+aDFwY
-         4Wot4Bm2g9JwxvVNYEZTUH8mPQ4iPV69ty4WtAn/8XDoHuVThCvt9QMHoW3mF+VjP4+2
-         LbMaaK2siJSSIY0zUHdNHQlM9t85KnRuW6y/aJIf7wIAZ4mXXrCgeN8UD4nt/zL9i2oM
-         IMeXFl1CPW9iwVKw0TGx3DcYKcngNjWTR98iOk3xFVrJTs8Er/4Q8j9ZItUg33GGxDWL
-         n2etnI+s6X9IPVwXgucg/l8c8LDIxd+HHDXeu2UEipqhJzvZHqJbFALVNUF0Ub28WA7E
-         fndQ==
+        bh=4mKc83Z9HOLY249Nin7rQjs6BHlM/yh/iEiCfe28AgI=;
+        b=cM8S3DclSzEaX9vBItpn3NSvwhjZw4KxCIcTh+Yx6CUzUs6CtOxbEg5EBbV0ViSIYU
+         06CkV1WTYG5sJXZFUjUSYvetCyV9ZZ5s8gvNT4VLoRxhfI0BQpbTjLfil6le87OUf57p
+         j4mcYgRydYbK7FzGcisNYlkZpNuoiHUlfIZA5qYoB7qz0zRQgDypABH91malBZF/FdUI
+         EDvicIx1ztp3ipejOJjSIBxlpNiKabevLQJ5XkMfitO+mi0/gNAA6mlYxJPpjk+pxDB6
+         11qXAhlTDy0uXtjRAp1zvRvFK99ZUCnv8FVQfkJ1JWFK1H7VPgNIUV2v8aO1NP+KaOPS
+         effg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732028050; x=1732632850;
+        d=1e100.net; s=20230601; t=1732028177; x=1732632977;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=NaqUrT8Kzq3UMcB3TNf5QwaQzz6MIqNclugaH7J2qa8=;
-        b=YjRPSPpAFv8SQAJfy0U74m4A1Qust6cuWv7+8eZYd+r1uIHxS7KX+oe88LCgp5kDl3
-         L937nZbojq2GLvfw+PYZPP4b8W7RZK+YWUPCsry37DOSawJte4N+28Wr4QKRIMthg6lh
-         VZI1QA3QrGiyF8cUGUeexTGAkX3whEXjnL5xHY6FrX08p/soD+V2NYUUYe71X4S45kUU
-         PzOES19p2PUrMze+ydb2znJGxaD7pH3DyXfQIwHd+++Sj27bxPLO/QxJboKGG9l86szL
-         Urd27pWgGFhg7NgbGMk8jlM9NxiRJ7TXIOmopLkLOf04NkP1eqIzLmSy0w+4GKmGf3Lb
-         bhzA==
-X-Forwarded-Encrypted: i=1; AJvYcCWd5d4daq4Q5gL43INWWwJkPH4Y1stLcX593qJCgivB3aIPNauxaeGue3ee4N8dZLJ9jDa6MFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOO/BlpCur0rD6a59Rb6OQcPjIM5PKs0xjQwpEzZAc2zwEv6yE
-	YfQ9UYa+9m/TSn0FHGhpqEeOApE07JEUaF1fsKzr2cnDV2bSq24e
-X-Google-Smtp-Source: AGHT+IGICjymsJKPKl6NOyIMIYXWvGmbp+D/Z9wfWLoDwKHaHW0FfKcrlwD8buwlxkb1rJjliGsM7A==
-X-Received: by 2002:a05:6358:2193:b0:1bc:573a:401a with SMTP id e5c5f4694b2df-1c6cd1fe0bfmr619665655d.5.1732028049964;
-        Tue, 19 Nov 2024 06:54:09 -0800 (PST)
+        bh=4mKc83Z9HOLY249Nin7rQjs6BHlM/yh/iEiCfe28AgI=;
+        b=TNGd5JKNL24Jntqz9oDZQI2lMtfWA+bEr47DGF1cVD5PYcEbsU7n7tsovMu8F4sjzJ
+         XAYNjoGRrEUzLCA7AiefwBFScgYba0qme6avHMy8AV4WLuqYrh05BUti7JK+ubmmH82Q
+         +13zWFO/qZ5AyVwt3BVnZJOMm7In9pYF66jC7vm5z5yClYSO2U4WPNkZdG/Pdvpq9HEE
+         YRvmuanvKk74KPpkM5TQ33EaIytBVf1voeYfOxna+ja74AOgMFL+1pac6LxWjn7/tTFT
+         bNz11Ld7cSV2HHTzLlP5aAh3OyYOq1bT5Oe4eHb1tpY1tyQ7Ts66ev/hdweyzPFMEqw4
+         hTVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAAlT0Q1aCQcQ7uMt92QEsERunatRRC9KRpdibq5Esq5V+wMTPLYqa1rEEFf73TMXqfu0k++Y2a5ut7tc=@vger.kernel.org, AJvYcCUG0tqzHRAjNd/EXPId5mP274hoTRTUO/Q4yayjuV/vv7hWmBMWJh7NQsJ0MRknTYv+BkI1VcJU@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE6ymnFlxij+tCqShCH2nVUEQ/ooKnDy7Kl0M/mvaKSUj15BlC
+	coS0XMGpdJU05pYlFLH6fQD9IdhcB/tOoyULmF1VaQlbjoU3cmG1
+X-Google-Smtp-Source: AGHT+IGsmqH5sooiWWCQd3ivA8DTUDK4u8jFRlL3c45aXghHuCORBnM2NfkGYVPXYfr7Z02EvlM3yw==
+X-Received: by 2002:a05:6902:124b:b0:e30:c261:4d57 with SMTP id 3f1490d57ef6-e382614635emr14593861276.27.1732028177178;
+        Tue, 19 Nov 2024 06:56:17 -0800 (PST)
 Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b37a89fac6sm98476785a.108.2024.11.19.06.54.09
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46392bbbf3esm11805901cf.41.2024.11.19.06.56.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 06:54:09 -0800 (PST)
-Date: Tue, 19 Nov 2024 09:54:09 -0500
+        Tue, 19 Nov 2024 06:56:16 -0800 (PST)
+Date: Tue, 19 Nov 2024 09:56:16 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Stefano Brivio <sbrivio@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, 
+To: stsp <stsp2@yandex.ru>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ linux-kernel@vger.kernel.org
+Cc: Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
  netdev@vger.kernel.org, 
- David Gibson <david@gibson.dropbear.id.au>, 
- Ed Santiago <santiago@redhat.com>, 
- Paul Holzinger <pholzing@redhat.com>, 
- Mike Manning <mvrmanning@gmail.com>
-Message-ID: <673ca6911817c_2a097e29430@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241119133336.3e389752@elisabeth>
-References: <20241114215414.3357873-1-sbrivio@redhat.com>
- <20241114215414.3357873-2-sbrivio@redhat.com>
- <6737896d3b97b_3d5f2c29459@willemb.c.googlers.com.notmuch>
- <20241115191024.5bc07d74@elisabeth>
- <20241115192342.73f5ea19@elisabeth>
- <20241119133336.3e389752@elisabeth>
-Subject: Re: [PATCH RFC net 1/2] datagram: Rehash sockets only if local
- address changed for their family
+ agx@sigxcpu.org, 
+ jdike@linux.intel.com, 
+ Guido Guenther <agx@sigxcpu.org>
+Message-ID: <673ca7102dba5_2a097e2948f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <610a9e2a-aa6b-4a2a-ac5d-3ea597b16430@yandex.ru>
+References: <20241117090514.9386-1-stsp2@yandex.ru>
+ <673a05f83211d_11eccf2940@willemb.c.googlers.com.notmuch>
+ <610a9e2a-aa6b-4a2a-ac5d-3ea597b16430@yandex.ru>
+Subject: Re: [PATCH net-next] tun: fix group permission check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,66 +96,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Stefano Brivio wrote:
-> On Fri, 15 Nov 2024 19:23:42 +0100
-> Stefano Brivio <sbrivio@redhat.com> wrote:
-> 
-> > > On Fri, 15 Nov 2024 12:48:29 -0500
-> > > Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
-> > >   
-> > > > Stefano Brivio wrote:    
-> > > >
-> > > > [...]
-> > > >
-> > > > > diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
-> > > > > index cc6d0bd7b0a9..d52333e921f3 100644
-> > > > > --- a/net/ipv4/datagram.c
-> > > > > +++ b/net/ipv4/datagram.c
-> > > > > @@ -65,7 +65,7 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len
-> > > > >  		inet->inet_saddr = fl4->saddr;	/* Update source address */
-> > > > >  	if (!inet->inet_rcv_saddr) {
-> > > > >  		inet->inet_rcv_saddr = fl4->saddr;
-> > > > > -		if (sk->sk_prot->rehash)
-> > > > > +		if (sk->sk_prot->rehash && sk->sk_family == AF_INET)
-> > > > >  			sk->sk_prot->rehash(sk);      
-> > > > 
-> > > > When is sk_family != AF_INET in __ip4_datagram_connect?    
-> 
-> So, this is the only "mismatching" case (by design) I can actually
-> reproduce. Long story short:
-> 
-> int __ip6_datagram_connect(struct sock *sk, struct sockaddr *uaddr,
-> 			   int addr_len)
-> {
-> 
-> 	[...]
-> 
-> 	if (usin->sin6_family == AF_INET) {
-> 		if (ipv6_only_sock(sk))
-> 			return -EAFNOSUPPORT;
-> 		err = __ip4_datagram_connect(sk, uaddr, addr_len);
-> 
-> 		[...]
-> 
-> here we (intentionally) call __ip4_datagram_connect() on an AF_INET6
-> socket because we're connecting a dual-stack socket to an IPv4 address.
-> 
-> This happens for me with sshd (from OpenSSH) doing getaddrinfo() at
-> boot, it's some DNS stuff, but I didn't trace it all the way. You can
-> also reproduce it with:
-> 
->   socat UDP6-LISTEN:1337,null-eof STDOUT & { sleep 1; : | socat STDIN UDP4:0:1337,shut-null; }
-> 
-> All in all, I would keep those checks. Even if this is the only case
-> we currently see, the assumptions __ip4_datagram_connect() <-> AF_INET
-> and __ip6_datagram_connect() <-> AF_INET6 don't hold in general.
-> 
-> Or do you find them exceedingly verbose / harmful for any other reason?
-> 
-> I would also make it clearer in the commit message why we need them
-> in the next patch (once net-next reopens).
+stsp wrote:
+> 17.11.2024 18:04, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > Stas Sergeev wrote:
+> >> Currently tun checks the group permission even if the user have matc=
+hed.
+> >> Besides going against the usual permission semantic, this has a
+> >> very interesting implication: if the tun group is not among the
+> >> supplementary groups of the tun user, then effectively no one can
+> >> access the tun device. CAP_SYS_ADMIN still can, but its the same as
+> >> not setting the tun ownership.
+> >>
+> >> This patch relaxes the group checking so that either the user match
+> >> or the group match is enough. This avoids the situation when no one
+> >> can access the device even though the ownership is properly set.
+> >>
+> >> Also I simplified the logic by removing the redundant inversions:
+> >> tun_not_capable() --> !tun_capable()
+> >>
+> >> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+> > This behavior goes back through many patches to commit 8c644623fe7e:
+> >
+> >      [NET]: Allow group ownership of TUN/TAP devices.
+> >
+> >      Introduce a new syscall TUNSETGROUP for group ownership setting =
+of tap
+> >      devices. The user now is allowed to send packages if either his =
+euid or
+> >      his egid matches the one specified via tunctl (via -u or -g
+> >      respecitvely). If both, gid and uid, are set via tunctl, both ha=
+ve to
+> >      match.
+> >
+> > The choice evidently was on purpose. Even if indeed non-standard.
+> =
 
-Thanks for that context. Sounds good to me.
+> So what would you suggest?
+> Added Guido Guenther <agx@sigxcpu.org> to CC
+> for an opinion.
+> The main problem here is that by
+> setting user and group properly, you
+> end up with device inaccessible by
+> anyone, unless the user belongs to
+> the tun group. I don't think someone
+> wants to set up inaccessible devices,
+> so this property doesn't seem useful.
+> OTOH if the user does have that group
+> in his list, then, AFAICT, adding such
+> group to tun changes nothing: neither
+> limits nor extends the scope.
+> If you had group already set and you
+> set also user, then you limit the scope,
+> but its the same as just setting user alone.
+> So I really can't think of any valid usage
+> scenario of setting both tun user and tun
+> group.
+
+Understood. If no one comments before the window reopens, I think it's
+fine to just resubmit.
+
 
