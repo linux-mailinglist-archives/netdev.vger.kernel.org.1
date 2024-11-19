@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-146066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C119D1E53
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 03:35:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4347F9D1E5A
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 03:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E48461F22699
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:35:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D40C9B24ADE
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0F41386C9;
-	Tue, 19 Nov 2024 02:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616FA13AD05;
+	Tue, 19 Nov 2024 02:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QWi6g7Xj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UA1SyeV6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD12A78C76;
-	Tue, 19 Nov 2024 02:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376721384BF;
+	Tue, 19 Nov 2024 02:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731983716; cv=none; b=MVrBzBfxGwpkFB2p9x/MNplIdrmmhAlcvykzTEV/1TaO4ZOGFfptUAhaFVChH6QerVU5sUxQM14gxRN1d0shu4KCYbqbhNP3CjJWV0O1rSywvJ1AkRCFW4OnnwRyRJF6GatbnX3VC06gUlRtnTHiWl0VvdYaCE13sS7H9/TjGSQ=
+	t=1731983874; cv=none; b=bBunYNgpm8fHNpdpxTUPVZZ8KDew6ejWGRTxefcUn4k5YcN8GogLBuh7pUplZM36cGaSL7Bg7sBLx37qoekL3Cr+9ihDOlaDvyfq8S3hPA3SYRphKQwHgks9dO1EVWu8DSSDdAqy1Pfv4fcpYlHQ0O+94LX0a9QadVhJuZoDcoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731983716; c=relaxed/simple;
-	bh=1GoX5IhsH8FcKHG+6blRbHEVULqXKn7EekxL9MIkGcY=;
+	s=arc-20240116; t=1731983874; c=relaxed/simple;
+	bh=YHJ2SUXafE6/gT6PfhPNG7UtEg908N6mmveYhYbbA3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=owUUJuwhva9Toke8ibEBHlyHy5t5xZ9MlBqRA0M+7Gbxx2uq8jdCQ5oQ0ONFPsqwgkMq6jk6EbVuW3xeUALtoYDJxtgc0iBiwnQMFShJm8pGPvVsB2DfrqD/5t5clMxF0tSOxlI9WoZknVP2F7D/K4TzjCOzDJPyyVvmP+OxotA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QWi6g7Xj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EE73C4CECC;
-	Tue, 19 Nov 2024 02:35:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uaFD8UzEVkjc22N9y1nYbFuP8WZMCv4DiGnTh5dPao9SEqfR0MuI/grcrywve4zwpQiCW28BTu4GNLN3H4BTqwWDKAkcq/QUFpOWb+Lm3VdLPEW8PVnyfY54d6ugYkiUCeBtec6XuJOOvCULiRJnXv80n9SuiDxzIGmwvot5SB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UA1SyeV6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55348C4CECC;
+	Tue, 19 Nov 2024 02:37:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731983716;
-	bh=1GoX5IhsH8FcKHG+6blRbHEVULqXKn7EekxL9MIkGcY=;
+	s=k20201202; t=1731983873;
+	bh=YHJ2SUXafE6/gT6PfhPNG7UtEg908N6mmveYhYbbA3I=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QWi6g7XjppUoNmrHz6q2GJ0f3w6TCROAQ9i8Hp/l0HZUYnQNUO7LwRi4a+u9aor94
-	 aszSjJYd31LOP8n59qK+32uMYFH9w/8SHv+UvqulaE7zahLZILqNrSQu2adKyZpm1u
-	 K9SSEWBqF4JFaTlAC9mwYXrCGCRdRfDZgyIJ3tqxCnrXeE3AHX1GmqV5SV4agYaC3K
-	 qmSH/LjY7PVmHRYXwQYrHc6P6vYstBJdeaGUmskMj7OCqdiYbxCUHa07TDYQAMgwWv
-	 RgnXDcR2ZC1om6Z3ZB7y69IzVW3R0jNyF8jFM4yw3cItIhQsuyPvQubwRFpuvL0XHF
-	 +DruudrtZySSQ==
-Date: Mon, 18 Nov 2024 18:35:14 -0800
+	b=UA1SyeV6pioCQxSNtgeS0CIv/p5wtml1yuiM3ihT0x94pqRKSgX42W0KhkRWhvaXM
+	 gQrSVk62XxdyYb9TF3Aasu0Ay/C8NRN9ywKLViFMzHkPLwMgxmd97awchYza+yADwE
+	 HtxRiboG6+NHyxtf/IXWPMfetx3X5L591golU0zstRC6qtkeAwr3yQR6P+BNI70HEK
+	 Ko1+NfDdpQbQvgOIacmZyR7OHfJ5aSEMqc9CqAi18JAge5+T7PNKEq/ikRyfnmp6BV
+	 UH8agGW+/cjgO4/99cUuhd6tdvmMlEcBSCIfUlsBt/fhD37IcmBqLWe17IXsxLS9Cs
+	 xQgVeuXoC2hTg==
+Date: Mon, 18 Nov 2024 18:37:51 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+To: Li Li <dualli@chromium.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com,
+ gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
+ maco@android.com, joel@joelfernandes.org, brauner@kernel.org,
+ cmllamas@google.com, surenb@google.com, arnd@arndb.de,
+ masahiroy@kernel.org, bagasdotme@gmail.com, horms@kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, max@kutsevol.com, thepacketgeek@gmail.com,
- vlad.wing@gmail.com, davej@codemonkey.org.uk
-Subject: Re: [PATCH net-next 4/4] netconsole: selftest: Validate CPU number
- auto-population in userdata
-Message-ID: <20241118183514.112db8b9@kernel.org>
-In-Reply-To: <20241113-netcon_cpu-v1-4-d187bf7c0321@debian.org>
-References: <20241113-netcon_cpu-v1-0-d187bf7c0321@debian.org>
-	<20241113-netcon_cpu-v1-4-d187bf7c0321@debian.org>
+ netdev@vger.kernel.org, hridya@google.com, smoreland@google.com,
+ kernel-team@android.com
+Subject: Re: [PATCH net-next v8 0/2] binder: report txn errors via generic
+ netlink
+Message-ID: <20241118183751.77c7b0b8@kernel.org>
+In-Reply-To: <20241113193239.2113577-1-dualli@chromium.org>
+References: <20241113193239.2113577-1-dualli@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,14 +67,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Nov 2024 07:10:55 -0800 Breno Leitao wrote:
-> +	if ! grep -q "cpu=[0-9]\+" "${TMPFILENAME}"; then
-> +		echo "FAIL: 'cpu=' not found in ${TMPFILENAME}" >&2
-> +		cat "${TMPFILENAME}" >&2
-> +		exit "${ksft_fail}"
-> +	fi
+On Wed, 13 Nov 2024 11:32:37 -0800 Li Li wrote:
+> Jakub Kicinski (1):
+>   tools: ynl-gen: allow uapi headers in sub-dirs
 
-Could we try to do something like pick a 'random' CPU ID from sysfs,
-taskset the write / echo, and match that the incoming message has the
-expected CPU ID, not just any?
+I'll take a look at your code later in the week (the merge window 
+has started), but I'll apply patch 1 (AKA my own patch) already.
+Fewer potential cross-tree conflicts.
 
