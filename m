@@ -1,125 +1,241 @@
-Return-Path: <netdev+bounces-146330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0DF9D2DD2
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 19:23:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CC939D2E68
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 19:55:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 796E528382C
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:22:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E51EB37E17
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922761D1F44;
-	Tue, 19 Nov 2024 18:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D5A1D1F73;
+	Tue, 19 Nov 2024 18:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="klRdFrLU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jlL9yv8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609081D097F;
-	Tue, 19 Nov 2024 18:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8508A1D3195;
+	Tue, 19 Nov 2024 18:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732040578; cv=none; b=m1g8FU/ieTmx/kFCPRx9/U2aqH12zwF5zw6XLjjxdbeagDQ+FdFNuDZshgcx5aH5aWhe3Yhw+G3mxpTTbjjHeiKeAV8VRrR1G6IU3IkiD8A5VuU6M4vxnOGaC5DA56P8yJhjNKGTZpUkk1fCbq4m/4jw78d83O3s2CXZWHHx0tg=
+	t=1732040688; cv=none; b=ctUh1c/ZW1RKopBBqSYDdkaxVpIH5IenS/ixMdq6pPl05hRzOiA7zdbRHZqXtN5XHipDXZqfsk5MZ2nBqxap6tnTLPMvyNICF33rexPBMhvRBHz457lA0PUoM0X5+TQhFcCSFxYyc+n3T5LmGI/I9PM7bBa26yCfj4/19hkjHNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732040578; c=relaxed/simple;
-	bh=H+g7KtGZVKeFClzWJ6E9sLHyjgEpc8Kl/xs6k2Oomfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HHyXM3GHgA4kLy4CMycsQncfb6FJQQ4/qPx8xjdxiyVTcOYUw8AleQ92bjb4syS8WJQRHzty605qkEpo65riXZZI4dFlhrv9gl+cIv8dU8Fg1UZ3/2LUlLNOsDJkx9p9vp3P/q6WsR/pMWXGpe1iATTpTgVWKdwZSuZUBIyI6Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=klRdFrLU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3913C4CECF;
-	Tue, 19 Nov 2024 18:22:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732040577;
-	bh=H+g7KtGZVKeFClzWJ6E9sLHyjgEpc8Kl/xs6k2Oomfs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=klRdFrLUo7vC2s64ErxhsqLMBiAAqDKLzqloFX+Z82AgvFl8Uzxha69clYR4sSuZ1
-	 t/LzpL3zrD/m/aYdQTCNiez/T64V2rlZBgpxpYudrtDDgm2Eb409gWOaSeF7FJKr48
-	 zqw6wTSko2rKTg/D9H/3aeKPT7xAuWDbXMifiwXY3i+xyIrrtrd8BDtPL0xfDPvXqA
-	 RcerYNuVRXMRo88IjKv4sCFdiFDCL6ZLmgkZxK/Qb1ZJCqssKSYapKSv3inaBhjTpR
-	 UFsyDpQfyRFni+XE7/X8/0ovla3H+pwjyXwvcwxYRIiZnPIUEpn72ICbBOu9qWzdjS
-	 +EZTZtx6FvY2w==
-Date: Tue, 19 Nov 2024 12:22:55 -0600
-From: Rob Herring <robh@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Russell King <linux@armlinux.org.uk>, jacob.e.keller@intel.com,
-	krzk+dt@kernel.org, conor+dt@kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v3 8/8] dt-bindings: net: sparx5: document RGMII
- delays
-Message-ID: <20241119182255.GA1967508-robh@kernel.org>
-References: <20241118-sparx5-lan969x-switch-driver-4-v3-0-3cefee5e7e3a@microchip.com>
- <20241118-sparx5-lan969x-switch-driver-4-v3-8-3cefee5e7e3a@microchip.com>
+	s=arc-20240116; t=1732040688; c=relaxed/simple;
+	bh=4wU3fPyGfq6oK3/tU8QEiILOw7mZnTD6hNSiJ50ffE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K15zf4oj0Qd1XsAtjWdxKckuIStg3/LX64Mt90SZc4/2I/ufIUXXPh1CBBjmS0zdcGIavvRxr1XHZuSmPOccOTyRIgU+13NFmeFicvQw1P/vCoorHqhFiRRra+3Nd2fdpvd2cHPA4cmM6zUXInUeoXZqMVNtIzaabeTwvlVG8L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jlL9yv8V; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732040687; x=1763576687;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=4wU3fPyGfq6oK3/tU8QEiILOw7mZnTD6hNSiJ50ffE4=;
+  b=jlL9yv8Vg2qiQTmlsFRHM56r2xdiyuJp6TtCvJXhgK2NRMurNYtcVVae
+   pOccbRGDbt0YC3HrLWWoWlqgcZz8Ow+K7fFIoGIFHaiCka1DpybzpCNlV
+   CoMs1mBxc0UArkUqvZbYdUA2oXBgPVrOB1hzmZtoDeRnN5en+wYkt6Lop
+   nb8ryTnho7kmqn27sNZ6eUmXU9b40k7jtI1COcT88J8Shk89WgfB+wFdW
+   UQxcux0sXWv5SPvlwZiD0u9ZNIfdO+WtWk564oHM8spyc7FtHHeL5vTnd
+   kZY5HN5O9WfvRpkXYTzJnNONIZNYU23mVv/YVUhvm4XTFdrRBRsS4qjrG
+   A==;
+X-CSE-ConnectionGUID: z0KOrCadReyC5Rz3Oz+6pg==
+X-CSE-MsgGUID: AA5IAw0kRMeKgIwhjXn+3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="31471519"
+X-IronPort-AV: E=Sophos;i="6.12,166,1728975600"; 
+   d="scan'208";a="31471519"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 10:24:46 -0800
+X-CSE-ConnectionGUID: fMbPyOy6SDad189fK8GVPg==
+X-CSE-MsgGUID: N8zWcVvtQEuIzg7lHm3gJA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,166,1728975600"; 
+   d="scan'208";a="89767694"
+Received: from inaky-mobl1.amr.corp.intel.com (HELO [10.125.109.91]) ([10.125.109.91])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 10:24:45 -0800
+Message-ID: <75e8c64e-5d0c-4ebf-843e-e5e4dd0aa5ec@intel.com>
+Date: Tue, 19 Nov 2024 11:24:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241118-sparx5-lan969x-switch-driver-4-v3-8-3cefee5e7e3a@microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 13/27] cxl: prepare memdev creation for type2
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
+ <20241118164434.7551-14-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20241118164434.7551-14-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 18, 2024 at 02:00:54PM +0100, Daniel Machon wrote:
-> The lan969x switch device supports two RGMII port interfaces that can be
-> configured for MAC level rx and tx delays.
+
+
+On 11/18/24 9:44 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Document two new properties {rx,tx}-internal-delay-ps. Make them
-> required properties, if the phy-mode is one of: rgmii, rgmii_id,
-> rgmii-rxid or rgmii-txid. Also specify accepted values.
-
-Doesn't look like they are required to me.
-
+> Current cxl core is relying on a CXL_DEVTYPE_CLASSMEM type device when
+> creating a memdev leading to problems when obtaining cxl_memdev_state
+> references from a CXL_DEVTYPE_DEVMEM type. This last device type is
+> managed by a specific vendor driver and does not need same sysfs files
+> since not userspace intervention is expected.
 > 
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> Create a new cxl_mem device type with no attributes for Type2.
+> 
+> Avoid debugfs files relying on existence of clx_memdev_state.
+> 
+> Make devm_cxl_add_memdev accesible from a accel driver.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 > ---
->  .../bindings/net/microchip,sparx5-switch.yaml          | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+>  drivers/cxl/core/cdat.c   |  3 +++
+>  drivers/cxl/core/memdev.c | 15 +++++++++++++--
+>  drivers/cxl/core/region.c |  3 ++-
+>  drivers/cxl/mem.c         | 25 +++++++++++++++++++------
+>  include/cxl/cxl.h         |  2 ++
+>  5 files changed, 39 insertions(+), 9 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> index dedfad526666..2e9ef0f7bb4b 100644
-> --- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> +++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
-> @@ -129,6 +129,24 @@ properties:
->              minimum: 0
->              maximum: 383
+> diff --git a/drivers/cxl/core/cdat.c b/drivers/cxl/core/cdat.c
+> index e9cd7939c407..192cff18ea25 100644
+> --- a/drivers/cxl/core/cdat.c
+> +++ b/drivers/cxl/core/cdat.c
+> @@ -577,6 +577,9 @@ static struct cxl_dpa_perf *cxled_get_dpa_perf(struct cxl_endpoint_decoder *cxle
+>  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
+>  	struct cxl_dpa_perf *perf;
 >  
-> +          rx-internal-delay-ps:
-> +            description: |
-
-Don't need '|' if there is not formatting to preserve.
-
-> +              RGMII Receive Clock Delay defined in pico seconds, used to select
-> +              the DLL phase shift between 1000 ps (45 degree shift at 1Gbps) and
-> +              3300 ps (147 degree shift at 1Gbps). A value of 0 ps will disable
-> +              any delay. The Default is no delay.
-> +            enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
-> +            default: 0
+> +	if (!mds)
+> +		return ERR_PTR(-EINVAL);
 > +
-> +          tx-internal-delay-ps:
-> +            description: |
-> +              RGMII Transmit Clock Delay defined in pico seconds, used to select
-> +              the DLL phase shift between 1000 ps (45 degree shift at 1Gbps) and
-> +              3300 ps (147 degree shift at 1Gbps). A value of 0 ps will disable
-> +              any delay. The Default is no delay.
-> +            enum: [0, 1000, 1700, 2000, 2500, 3000, 3300]
-> +            default: 0
+>  	switch (mode) {
+>  	case CXL_DECODER_RAM:
+>  		perf = &mds->ram_perf;
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index d746c8a1021c..df31eea0c06b 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -547,9 +547,17 @@ static const struct device_type cxl_memdev_type = {
+>  	.groups = cxl_memdev_attribute_groups,
+>  };
+>  
+> +static const struct device_type cxl_accel_memdev_type = {
+> +	.name = "cxl_memdev",
+> +	.release = cxl_memdev_release,
+> +	.devnode = cxl_memdev_devnode,
+> +};
 > +
->          required:
->            - reg
->            - phys
-> 
-> -- 
-> 2.34.1
-> 
+>  bool is_cxl_memdev(const struct device *dev)
+>  {
+> -	return dev->type == &cxl_memdev_type;
+> +	return (dev->type == &cxl_memdev_type ||
+> +		dev->type == &cxl_accel_memdev_type);
+> +
+>  }
+>  EXPORT_SYMBOL_NS_GPL(is_cxl_memdev, CXL);
+
+Does type2 device also exports a CDAT?
+
+I'm also wondering if we should have distinctive helpers:
+is_cxl_type3_memdev()
+is_cxl_type2_memdev()
+
+and is_cxl_memdev() is just calling those two helpers above. 
+
+And if no CDAT is exported, we should change the is_cxl_memdev() to is_cxl_type3_memdev() in read_cdat_data(). 
+
+DJ
+
+>  
+> @@ -660,7 +668,10 @@ static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
+>  	dev->parent = cxlds->dev;
+>  	dev->bus = &cxl_bus_type;
+>  	dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
+> -	dev->type = &cxl_memdev_type;
+> +	if (cxlds->type == CXL_DEVTYPE_DEVMEM)
+> +		dev->type = &cxl_accel_memdev_type;
+> +	else
+> +		dev->type = &cxl_memdev_type;
+>  	device_set_pm_not_required(dev);
+>  	INIT_WORK(&cxlmd->detach_work, detach_memdev);
+>  
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index dff618c708dc..622e3bb2e04b 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -1948,7 +1948,8 @@ static int cxl_region_attach(struct cxl_region *cxlr,
+>  		return -EINVAL;
+>  	}
+>  
+> -	cxl_region_perf_data_calculate(cxlr, cxled);
+> +	if (cxlr->type == CXL_DECODER_HOSTONLYMEM)
+> +		cxl_region_perf_data_calculate(cxlr, cxled);
+>  
+>  	if (test_bit(CXL_REGION_F_AUTO, &cxlr->flags)) {
+>  		int i;
+> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+> index a9fd5cd5a0d2..cb771bf196cd 100644
+> --- a/drivers/cxl/mem.c
+> +++ b/drivers/cxl/mem.c
+> @@ -130,12 +130,18 @@ static int cxl_mem_probe(struct device *dev)
+>  	dentry = cxl_debugfs_create_dir(dev_name(dev));
+>  	debugfs_create_devm_seqfile(dev, "dpamem", dentry, cxl_mem_dpa_show);
+>  
+> -	if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
+> -		debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
+> -				    &cxl_poison_inject_fops);
+> -	if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
+> -		debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
+> -				    &cxl_poison_clear_fops);
+> +	/*
+> +	 * Avoid poison debugfs files for Type2 devices as they rely on
+> +	 * cxl_memdev_state.
+> +	 */
+> +	if (mds) {
+> +		if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
+> +			debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
+> +					    &cxl_poison_inject_fops);
+> +		if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
+> +			debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
+> +					    &cxl_poison_clear_fops);
+> +	}
+>  
+>  	rc = devm_add_action_or_reset(dev, remove_debugfs, dentry);
+>  	if (rc)
+> @@ -219,6 +225,13 @@ static umode_t cxl_mem_visible(struct kobject *kobj, struct attribute *a, int n)
+>  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
+>  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
+>  
+> +	/*
+> +	 * Avoid poison sysfs files for Type2 devices as they rely on
+> +	 * cxl_memdev_state.
+> +	 */
+> +	if (!mds)
+> +		return 0;
+> +
+>  	if (a == &dev_attr_trigger_poison_list.attr)
+>  		if (!test_bit(CXL_POISON_ENABLED_LIST,
+>  			      mds->poison.enabled_cmds))
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 6033ce84b3d3..5608ed0f5f15 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -57,4 +57,6 @@ int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
+>  int cxl_request_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
+>  int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
+>  void cxl_set_media_ready(struct cxl_dev_state *cxlds);
+> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+> +				       struct cxl_dev_state *cxlds);
+>  #endif
+
 
