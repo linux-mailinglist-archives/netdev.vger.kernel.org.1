@@ -1,278 +1,216 @@
-Return-Path: <netdev+bounces-146157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A136F9D222E
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:10:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 991779D2239
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AE731F246C7
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:10:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63876B21195
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826461AA1FA;
-	Tue, 19 Nov 2024 09:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A028B1B654E;
+	Tue, 19 Nov 2024 09:10:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SIRiPqoh";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="eLQee8Kl";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SIRiPqoh";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="eLQee8Kl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPlVJLAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F77314F9E7;
-	Tue, 19 Nov 2024 09:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5A419D072;
+	Tue, 19 Nov 2024 09:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732007400; cv=none; b=lU+W41mnMqaAhgWt1gKu5IVxEhY91gqMALW6qTmiynVTAr3NFfbUUZJ504hv+5/Ou54EpnVOeF5MGlRrV6J/32sg9hR6hufWaUurxoi59Ja6ZZ2KYy1qG4HhaUZsz/9xRdpdyAdTGH05LRSYe0LDSGyCR6PabMgSC+8bqRKvCOY=
+	t=1732007440; cv=none; b=Xi/m0jZ0lKyqUH/4yf9P/fu0osFzTJiLbDfMknE/sGFu+a4XQYvnQk5PTSQtfVJwU1T1UC4RmFqkvUZ2q763WkpDJAVryPN8fTk0pfJc2ZHUeJOXQNTVsgICSuf6V8jENeQWFg2sCON0agKbvSmB3wiLAwYg0xm0JLHkc45g+WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732007400; c=relaxed/simple;
-	bh=rTSC72Q3RUvCXGNxls7pNO6M4v16CSV9HDax5AEJtQA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=SSVe9AvJk0beZ/AsUxIRSj8xfF6CFTOiTyX2xwVbaocG1s7CPVxT3ckllwKTgJEMrp5FsXMawQHAT59numAyi+TIumk6LHtF3Slsha1rGN0XTDdxjMSCM8idy7d1xYr/VaRnZ9qDYMInpYmQpTH7YWS43U/wwF9XxnoRhBX1DgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SIRiPqoh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=eLQee8Kl; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SIRiPqoh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=eLQee8Kl; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from pobox.suse.cz (unknown [10.100.2.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D475321901;
-	Tue, 19 Nov 2024 09:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1732007396; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=SIRiPqohnfZsfiR8rWfugglV6kBt9WZNkpsbbr+OOaRL3B/gLbNYdP82bjB0S/Sjpyp4Dh
-	6DaUo1iD8tvsOcOGm8MLnAkvlYyhNoN/BKk+Nu5/yLAfPrF9/Eu//yrmX3tKwCADYf1zxx
-	7juTShWa4+8m5I6ysJKabU6DZBznQQA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1732007396;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=eLQee8Kl//Z+uAJMSQ8O/3uMhn0cIi08Nnfcslit1gjRhYGbaqZ6swdcVqziESyeoUyf0K
-	N0AZng7gJdnO9PAg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1732007396; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=SIRiPqohnfZsfiR8rWfugglV6kBt9WZNkpsbbr+OOaRL3B/gLbNYdP82bjB0S/Sjpyp4Dh
-	6DaUo1iD8tvsOcOGm8MLnAkvlYyhNoN/BKk+Nu5/yLAfPrF9/Eu//yrmX3tKwCADYf1zxx
-	7juTShWa4+8m5I6ysJKabU6DZBznQQA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1732007396;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=eLQee8Kl//Z+uAJMSQ8O/3uMhn0cIi08Nnfcslit1gjRhYGbaqZ6swdcVqziESyeoUyf0K
-	N0AZng7gJdnO9PAg==
-Date: Tue, 19 Nov 2024 10:09:55 +0100 (CET)
-From: Miroslav Benes <mbenes@suse.cz>
-To: Petr Mladek <pmladek@suse.com>
-cc: Easwar Hariharan <eahariha@linux.microsoft.com>, 
-    Christophe Leroy <christophe.leroy@csgroup.eu>, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, 
-    Jozsef Kadlecsik <kadlec@netfilter.org>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-    Julia Lawall <Julia.Lawall@inria.fr>, 
-    Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, 
-    Haojian Zhuang <haojian.zhuang@gmail.com>, 
-    Robert Jarzmik <robert.jarzmik@free.fr>, 
-    Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>, 
-    Vasily Gorbik <gor@linux.ibm.com>, 
-    Alexander Gordeev <agordeev@linux.ibm.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
-    Oded Gabbay <ogabbay@kernel.org>, 
-    Lucas De Marchi <lucas.demarchi@intel.com>, 
-    =?ISO-8859-15?Q?Thomas_Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>, 
-    Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-    Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-    Maxime Ripard <mripard@kernel.org>, 
-    Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
-    Simona Vetter <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>, 
-    Praveen Kaligineedi <pkaligineedi@google.com>, 
-    Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    James Smart <james.smart@broadcom.com>, 
-    Dick Kennedy <dick.kennedy@broadcom.com>, 
-    "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-    "Martin K. Petersen" <martin.petersen@oracle.com>, 
-    =?ISO-8859-15?Q?Roger_Pau_Monn=E9?= <roger.pau@citrix.com>, 
-    Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, 
-    Jeff Johnson <jjohnson@kernel.org>, 
-    Catalin Marinas <catalin.marinas@arm.com>, 
-    Andrew Morton <akpm@linux-foundation.org>, 
-    Jack Wang <jinpu.wang@cloud.ionos.com>, 
-    Marcel Holtmann <marcel@holtmann.org>, 
-    Johan Hedberg <johan.hedberg@gmail.com>, 
-    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-    Florian Fainelli <florian.fainelli@broadcom.com>, 
-    Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
-    Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-    Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
-    Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
-    Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, 
-    Takashi Iwai <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>, 
-    Russell King <linux+etnaviv@armlinux.org.uk>, 
-    Christian Gmeiner <christian.gmeiner@gmail.com>, 
-    Louis Peens <louis.peens@corigine.com>, 
-    Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-    Naveen N Rao <naveen@kernel.org>, 
-    Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, cocci@inria.fr, 
-    linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
-    dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
-    linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
-    linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-    ath11k@lists.infradead.org, linux-mm@kvack.org, 
-    linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev, 
-    linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org, 
-    live-patching@vger.kernel.org, linux-sound@vger.kernel.org, 
-    etnaviv@lists.freedesktop.org, oss-drivers@corigine.com, 
-    linuxppc-dev@lists.ozlabs.org, 
-    Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to
- secs_to_jiffies()
-In-Reply-To: <ZzxR3uAcWFEPUIUK@pathway.suse.cz>
-Message-ID: <alpine.LSU.2.21.2411191006340.15289@pobox.suse.cz>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com> <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com> <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu> <Zzsfuuv3AVomkMxn@pathway.suse.cz>
- <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com> <ZzxR3uAcWFEPUIUK@pathway.suse.cz>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+	s=arc-20240116; t=1732007440; c=relaxed/simple;
+	bh=klvYqdvZj+RbuOlNJ198QZqAWt60/GPJdcJ4YVksHnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OkxP9sGIRW4QoBS/uYZK4ZJqRkLdm+cOgXPf0zfbcJXgf3aoq703FNHGzYydhlByPnJIemh0DYOJVRYJdsn9G7C6sqJFr8Hr1dg5DMbNtzWxvlrxeTOtgfiG0NIywMi+IcnaWGIX5yB0oZgcWJ9EnrukSY+iQlPb3ZOANM5MSh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SPlVJLAl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E930BC4CECF;
+	Tue, 19 Nov 2024 09:10:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732007439;
+	bh=klvYqdvZj+RbuOlNJ198QZqAWt60/GPJdcJ4YVksHnQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SPlVJLAlOgxCWtJQzSHwjCN209bg88x6pc9XD+FZ3rykPebtUGROkz4itBCBac1zP
+	 H/i4n/yQpQGl1uhOJx1YNNBu2zeE8pJsVNtRZ0PsdXs0w8LWLM9NvQ31c5pXYv6qj9
+	 dWg86DnZQt13T0rixVzazJXTBqkFkxS93NyHkQNX+7UTLQeyEoLKZm1qH0EQDk/BAY
+	 1L5S32NdHcvQoNDV6cgJpUlSj0LKTOO6SuPcYy/Yn07LnZV0fuUP5nQMROHe642tP1
+	 6M0PQuviMBUGsDmdic9JAuX7p12PzRzQdTByfh0p44s03nCNL6fcPZfzOHBrxmKq2c
+	 jUYxkiKVtlcKg==
+Message-ID: <81ab828c-3584-491d-8ce7-0d309758457a@kernel.org>
+Date: Tue, 19 Nov 2024 10:10:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="1678380546-1247530484-1732007229=:15289"
-Content-ID: <alpine.LSU.2.21.2411191007130.15289@pobox.suse.cz>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
-	FROM_EQ_ENVFROM(0.00)[];
-	ARC_NA(0.00)[];
-	REDIRECTOR_URL(0.00)[aka.ms];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux.microsoft.com,csgroup.eu,netfilter.org,davemloft.net,google.com,kernel.org,redhat.com,inria.fr,imag.fr,zonque.org,gmail.com,free.fr,armlinux.org.uk,linux.ibm.com,habana.ai,intel.com,linux.intel.com,suse.de,ffwll.ch,lunn.ch,broadcom.com,hansenpartnership.com,oracle.com,citrix.com,kernel.dk,arm.com,linux-foundation.org,cloud.ionos.com,holtmann.org,linuxfoundation.org,perex.cz,suse.com,pengutronix.de,corigine.com,ellerman.id.au,vger.kernel.org,lists.infradead.org,lists.freedesktop.org,lists.xenproject.org,kvack.org,lists.linux.dev,lists.ozlabs.org,linutronix.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,etnaviv];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[94];
-	RCVD_COUNT_ZERO(0.00)[0];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLst1ywfnn8h7y4sspo7cfrpds)];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com,free.fr]
-X-Spam-Score: -5.80
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] dt-bindings: net: can: atmel: Convert to json schema
+To: Charan.Pedumuru@microchip.com
+Cc: mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, Nicolas.Ferre@microchip.com,
+ alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20241003-can-v2-1-85701d3296dd@microchip.com>
+ <xykmnsibdts7u73yu7b2vn3w55wx7puqo2nwhsji57th7lemym@f4l3ccxpevo4>
+ <cd3a9342-3863-4a81-9b09-db7b8da1d561@microchip.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <cd3a9342-3863-4a81-9b09-db7b8da1d561@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---1678380546-1247530484-1732007229=:15289
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <alpine.LSU.2.21.2411191007131.15289@pobox.suse.cz>
-
-On Tue, 19 Nov 2024, Petr Mladek wrote:
-
-> On Mon 2024-11-18 10:18:49, Easwar Hariharan wrote:
-> > On 11/18/2024 3:06 AM, Petr Mladek wrote:
-> > > On Sat 2024-11-16 11:10:52, Christophe Leroy wrote:
-> > >>
-> > >>
-> > >> Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
-> > >>> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> > >>>
-> > >>> Changes made with the following Coccinelle rules:
-> > >>>
-> > >>> @@ constant C; @@
-> > >>>
-> > >>> - msecs_to_jiffies(C * 1000)
-> > >>> + secs_to_jiffies(C)
-> > >>>
-> > >>> @@ constant C; @@
-> > >>>
-> > >>> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> > >>> + secs_to_jiffies(C)
-> > >>>
-> > >>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> > >>> ---
-> > >>>   samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
-> > >>>   samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
-> > >>>   samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
-> > >>>   3 files changed, 7 insertions(+), 7 deletions(-)
-> > >>>
-> > >>> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
-> > >>> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
-> > >>> --- a/samples/livepatch/livepatch-callbacks-busymod.c
-> > >>> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
-> > >>> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
-> > >>>   {
-> > >>>          pr_info("%s\n", __func__);
-> > >>>          schedule_delayed_work(&work,
-> > >>> -               msecs_to_jiffies(1000 * 0));
-> > >>> +               secs_to_jiffies(0));
-> > >>
-> > >> Using secs_to_jiffies() is pointless, 0 is universal, should become
-> > >> schedule_delayed_work(&work, 0);
-> > > 
-> > > Yes, schedule_delayed_work(&work, 0) looks like the right solution.
-> > > 
-> > > Or even better, it seems that the delayed work might get replaced by
-> > > a normal workqueue work.
-> > > 
-> > > Anyway, I am working on a patchset which would remove this sample
-> > > module. There is no need to put much effort into the clean up
-> > > of this particular module. Do whatever is easiest for you.
-> > > 
-> > > Best Regards,
-> > > Petr
-> > 
-> > If we're removing the module, I'll drop it from the series. Just to
-> > clarify, do you mean to remove all of samples/livepatch/* or some
-> > particular file(s)?
+On 13/11/2024 06:30, Charan.Pedumuru@microchip.com wrote:
+> On 03/10/24 14:04, Krzysztof Kozlowski wrote:
+>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+>>
+>> On Thu, Oct 03, 2024 at 10:37:03AM +0530, Charan Pedumuru wrote:
+>>> Convert atmel-can documentation to yaml format
+>>>
+>>> Signed-off-by: Charan Pedumuru <charan.pedumuru@microchip.com>
+>>> ---
+>>> Changes in v2:
+>>> - Renamed the title to "Microchip AT91 CAN controller"
+>>> - Removed the unnecessary labels and add clock properties to examples
+>>> - Removed if condition statements and made clock properties as default required properties
+>>> - Link to v1: https://lore.kernel.org/r/20240912-can-v1-1-c5651b1809bb@microchip.com
+>>> ---
+>>>   .../bindings/net/can/atmel,at91sam9263-can.yaml    | 58 ++++++++++++++++++++++
+>>>   .../devicetree/bindings/net/can/atmel-can.txt      | 15 ------
+>>>   2 files changed, 58 insertions(+), 15 deletions(-)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml b/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml
+>>> new file mode 100644
+>>> index 000000000000..c818c01a718b
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml
+>>> @@ -0,0 +1,58 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/can/atmel,at91sam9263-can.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Microchip AT91 CAN Controller
+>>> +
+>>> +maintainers:
+>>> +  - Nicolas Ferre <nicolas.ferre@microchip.com>
+>>> +
+>>> +allOf:
+>>> +  - $ref: can-controller.yaml#
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    oneOf:
+>>> +      - enum:
+>>> +          - atmel,at91sam9263-can
+>>> +          - atmel,at91sam9x5-can
+>>> +      - items:
+>>> +          - enum:
+>>> +              - microchip,sam9x60-can
+>>> +          - const: atmel,at91sam9x5-can
+>> That is not what old binding said.
 > 
-> To be precise, I am going to replace:
-> 
-> 	samples/livepatch/livepatch-callbacks-demo.c
-> 	samples/livepatch/livepatch-callbacks-mod.c
-> 	samples/livepatch/livepatch-callbacks-busymod.c
-> 
-> with a completely different modules because I am reworking the
-> callbacks API.
-> 
-> All other sample modules are going to stay.
-> 
-> Feel free to remove livepatch-callbacks-busymod.c from the patchset.
-> But also feel free to keep it. The API rework goes slowly. I am not
-> sure if it would be ready for 6.14.
+> Apologies for the late reply, the driver doesn't have compatible with 
+> "microchip,sam9x60-can",
+> so I made "atmel,at91sam9x5-can" as fallback driver
 
-I would propose that Easwar goes on with his work and prepares an updated 
-version of the patch based on Christophe's feedback. That is, disregarding 
-Petr's rework for now. The patch set has a higher chance to be merged 
-sooner. Petr can then easily rebase. If there is a conflict, we will 
-handle it as usual. What do you think?
+Any changes to the binding must be clearly expressed in the commit msg,
+with appropriate reasoning.
 
-Miroslav
---1678380546-1247530484-1732007229=:15289--
+> 
+>>> +
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  interrupts:
+>>> +    maxItems: 1
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 1
+>>> +
+>>> +  clock-names:
+>>> +    items:
+>>> +      - const: can_clk
+>> These are new...
+> 
+> These were already defined in the previous revision.
+
+Any changes to the binding must be clearly expressed in the commit msg,
+with appropriate reasoning.
+
+
+> 
+>>
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +  - interrupts
+>>> +  - clocks
+>>> +  - clock-names
+>> Here the same. Each change to the binding should be explained (answer
+>> to the: why) in commit msg.
+> 
+> Sure, I will include the reason for changes in commit message for the 
+> next revision.
+> 
+
+Why am I repeating myself...
+
+
+Best regards,
+Krzysztof
+
 
