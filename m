@@ -1,63 +1,81 @@
-Return-Path: <netdev+bounces-146178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC259D2310
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:10:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6329D231F
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7A3D1F22AC8
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:10:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2F01F21DE5
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2037F1C2337;
-	Tue, 19 Nov 2024 10:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8177E1C1AD1;
+	Tue, 19 Nov 2024 10:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Qjh2tP42"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eAOMoBgM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E6A1C1F3A;
-	Tue, 19 Nov 2024 10:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48A2198A35
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732010987; cv=none; b=h1Rmi1fTI8WrfovGQOu1GRP3/H4KqdgcfPp/HJpdptGDfxAYwrnJ9re4l9Q7a1rvgip/ziWpcYp+HZ0l75uznKiMiWOBP/3XIR903/7QmkjKR5lNunIBMVJRPYSU8Wz8gQajBX3JLQWMdiZT1djRzkjnVn0kIPUI8UhxY5Ua/7k=
+	t=1732011144; cv=none; b=mfOXynu+wwMMFadQwGp20GG4+VK/bOCHAQeazQlTlO2uVxWVbh3pseYtidD4uWj0CLq42LE4ZCBp/PN/LhUkSFofKVRl9BVAOsG71qLrwNa5fMru0G6IPXyMDlXqoBACsxN2dVLGaeQQja6MFvIZPY/5oDoeXHV3zAZhcgHpSAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732010987; c=relaxed/simple;
-	bh=qCM/BD2d2XRDO+xHm4vYlmulmyGGTG6JrTkNggCYSjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=S4I7eW466qWURpUX1pPHyqggORsLY4ov5rnWufHLFT0aH1lyJV21+xiZQbv6moEd5S+r0t9VWJd2D0m25uHH88NtE6ie2ZLAEuQwKh3ULWUdXVKO6XvfoTHuiARFoIThAhu6SQvIdsM/aD1Cd1DHVeWSLoozxay4d92AXLJAT+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Qjh2tP42; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AJ82xHe027204;
-	Tue, 19 Nov 2024 10:09:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	9c34ss6wN9Ih/urztOFDrG4TB01mnTTGNmvdN4JQ800=; b=Qjh2tP42zbjK8Xi/
-	gBEMYaGToScFLIL3pC4IS+zVHgNQRF3nABAl/+DGc9vrmkJmj185QMpy4uNTeMDG
-	4BVMtnbAdcCtSpDibEqii7mMWsDcKponMDH+E1Y3sO6kMhCxV1W9dCVR2grfjWQM
-	blmT7wZVU1P63B52zGWWpTnM6hWN6cyKOdLxCMjGA0wnuiwa1wHEzvq3/0gvQAio
-	1xy/ThZeNJ9K5X+jlUMA2e1rqPXRA1+ESYXLRTj25+V5H2b05yIlTUNRpuSA2+cL
-	gR8rvQ0bjle+BnTau0myvdleDTsbOeH1zHn9mECHWB9tSwqfo9gY4he4zQjEuSrC
-	/6CJGg==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4308y7t7ab-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 10:09:39 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AJA9cvc005240
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 10:09:38 GMT
-Received: from [10.253.15.8] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 19 Nov
- 2024 02:09:35 -0800
-Message-ID: <89a4f120-6cfd-416d-ab55-f0bdf069d9ce@quicinc.com>
-Date: Tue, 19 Nov 2024 18:09:32 +0800
+	s=arc-20240116; t=1732011144; c=relaxed/simple;
+	bh=RZKQppqR9ulv5+UY512XsPJDhRPR3ltZNrET/GxkkTI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Me3hTd2jIP3L4y2/9ip0nRpqJnmf+Ip5CSIH8hq52hofo0QgQzD4rONBW0kfKpxwSZKFHb5QRUdT1D8NsRr1s7fNjDGpO86vNSMPyC5PYTfJ6Ngpfa+9j58rBWt+6yNfg0yEUezla5+uNnz2A0ci8tDtR9DT3Q0HHxI5StzAvUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eAOMoBgM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732011141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W/ll/h4cIcHRULNe5533lZjrqgLdazs+/VxZDeHMmso=;
+	b=eAOMoBgMKSK4XhOwf+UNI2cXqdojeWeKoNEJ5kxR5OcgATAqvX7Ic/GtnPv32uW3y3HVNg
+	h4XEkX8NbHpgXCNrvzswOMx9+8i0S/bqd6oCQfAS88dHRyTwADYq4z3houk0NzaczdTmPO
+	angdoWu71Ji0Gl94KroFouQzA27Xb04=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-363-70SlRvb7Oj-lR1KDoB7Izw-1; Tue, 19 Nov 2024 05:12:20 -0500
+X-MC-Unique: 70SlRvb7Oj-lR1KDoB7Izw-1
+X-Mimecast-MFC-AGG-ID: 70SlRvb7Oj-lR1KDoB7Izw
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-382342b66f5so1774392f8f.1
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 02:12:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732011139; x=1732615939;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/ll/h4cIcHRULNe5533lZjrqgLdazs+/VxZDeHMmso=;
+        b=fxExBLk5v6dT4nfVEKC93zMmLnloJdlai0a4SXdaDy67P9shR/FqRTVISug9MnRi1n
+         dDo9aqX/Ujraef0AaE8sfK70SkE4KKl8inWS1/ns5ZB9unUc9zBZIOpBkZVoH776MDJN
+         XC05/MbOu6jM7qlIfGhK0BusNoXZ1jjl5fedEVq1Aj8a1jzHR4FWjnaQhM5GFvxmkklV
+         +QRWzM3+c7XBjsGh2f0rUT2mt9J9M4Gf6NyIjcM87EtDcp8KrvW6HINAwPeND70im4Qv
+         tGVh48ZvCjJQrZOhEjmHjKayEBfotCX4R8j47ll0qxYgOVlHrfVS5hDFIFZzlDNMeQol
+         rFrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdVxyyQsQalatTpcYthwPcMj/PCcynF47sSJ4y/OOeNhVdBh+/YBCSeKe8Y8LeXsp0mV+m0QM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxaf70Qq8kHqF4SOZ5u2xiYoFXCihE8Adwdofzsd4ydeTvOJ18S
+	AW8PgvRBNA44dNtKTWfMg4YRYGkcVfK/hSAOLi4uKUYelsdtloQ5u2ki5U8ThDpnRJ1WnVBWzhB
+	V8o0XvvpdARBhf0R5ZWP+u0A7J6SBGj4ZO8YAb8ihROd+okuhF7mYgw==
+X-Received: by 2002:a5d:64c8:0:b0:382:2d59:b166 with SMTP id ffacd0b85a97d-3822d59b4c3mr9274035f8f.31.1732011139222;
+        Tue, 19 Nov 2024 02:12:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFsZiTehmq/TGAqmnasd9Ezz+OKagNClXCsAKRt9ii4MiUiLKopP3o2dTpIdkPJjOhag9LPew==
+X-Received: by 2002:a5d:64c8:0:b0:382:2d59:b166 with SMTP id ffacd0b85a97d-3822d59b4c3mr9274006f8f.31.1732011138858;
+        Tue, 19 Nov 2024 02:12:18 -0800 (PST)
+Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38246b7db13sm5907061f8f.91.2024.11.19.02.12.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 02:12:18 -0800 (PST)
+Message-ID: <554d8684-7eec-4379-9a21-0b4a562358be@redhat.com>
+Date: Tue, 19 Nov 2024 11:12:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,98 +83,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
- node
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
- <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
- <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
+Subject: Re: [PATCH net-next v4 3/3] selftests: nic_performance: Add selftest
+ for performance of NIC driver
+To: Mohan Prasad J <mohan.prasad@microchip.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch
+Cc: edumazet@google.com, shuah@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, horms@kernel.org, brett.creeley@amd.com,
+ rosenp@gmail.com, UNGLinuxDriver@microchip.com, willemb@google.com,
+ petrm@nvidia.com
+References: <20241114192545.1742514-1-mohan.prasad@microchip.com>
+ <20241114192545.1742514-4-mohan.prasad@microchip.com>
 Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: UkIQBjkpsTakiHMRX2lZ8nhElW8FNiVO
-X-Proofpoint-GUID: UkIQBjkpsTakiHMRX2lZ8nhElW8FNiVO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- mlxlogscore=697 clxscore=1015 suspectscore=0 adultscore=0
- priorityscore=1501 phishscore=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2411190071
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241114192545.1742514-4-mohan.prasad@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 11/14/24 20:25, Mohan Prasad J wrote:
+> +#Setup:
+> +#Connect the DUT PC with NIC card to partner pc back via ethernet medium of your choice(RJ45, T1)
+> +#
+> +#        DUT PC                                              Partner PC
+> +#┌───────────────────────┐                         ┌──────────────────────────┐
+> +#│                       │                         │                          │
+> +#│                       │                         │                          │
+> +#│           ┌───────────┐                         │                          │
+> +#│           │DUT NIC    │         Eth             │                          │
+> +#│           │Interface ─┼─────────────────────────┼─    any eth Interface    │
+> +#│           └───────────┘                         │                          │
+> +#│                       │                         │                          │
+> +#│                       │                         │                          │
+> +#└───────────────────────┘                         └──────────────────────────┘
+> +#
+> +#Configurations:
+> +#To prevent interruptions, Add ethtool, ip to the sudoers list in remote PC and get the ssh key from remote.
+> +#Required minimum ethtool version is 6.10
+> +#Change the below configuration based on your hw needs.
+> +# """Default values"""
+> +#time_delay = 8 #time taken to wait for transitions to happen, in seconds.
+> +#test_duration = 10  #performance test duration for the throughput check, in seconds.
+> +#send_throughput_threshold = 80 #percentage of send throughput required to pass the check
+> +#receive_throughput_threshold = 50 #percentage of receive throughput required to pass the check
 
+Very likely we will have to tune the thresholds and possibly make them
+dependent on the H/W and S/W setup (Kconf), but overall I think it makes
+sense as a first step.
 
-On 2024-11-19 09:27, Andrew Lunn wrote:
-> On Mon, Nov 18, 2024 at 02:44:02PM +0800, Yijie Yang wrote:
->> Enable the ethernet node, add the phy node and pinctrl for ethernet.
->>
->> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->> ---
->>   arch/arm64/boot/dts/qcom/qcs615-ride.dts | 106 +++++++++++++++++++++++++++++++
->>   1 file changed, 106 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/qcs615-ride.dts b/arch/arm64/boot/dts/qcom/qcs615-ride.dts
->> index ee6cab3924a6d71f29934a8debba3a832882abdd..299be3aa17a0633d808f4b5d32aed946f07d5dfd 100644
->> --- a/arch/arm64/boot/dts/qcom/qcs615-ride.dts
->> +++ b/arch/arm64/boot/dts/qcom/qcs615-ride.dts
->> @@ -5,6 +5,7 @@
->>   /dts-v1/;
->>   
->>   #include <dt-bindings/regulator/qcom,rpmh-regulator.h>
->> +#include <dt-bindings/gpio/gpio.h>
->>   #include "qcs615.dtsi"
->>   / {
->>   	model = "Qualcomm Technologies, Inc. QCS615 Ride";
->> @@ -196,6 +197,60 @@ vreg_l17a: ldo17 {
->>   	};
->>   };
->>   
->> +&ethernet {
->> +	status = "okay";
->> +
->> +	pinctrl-0 = <&ethernet_defaults>;
->> +	pinctrl-names = "default";
->> +
->> +	phy-handle = <&rgmii_phy>;
->> +	phy-mode = "rgmii";
-> 
-> That is unusual. Does the board have extra long clock lines?
+Thanks,
 
-Do you mean to imply that using RGMII mode is unusual? While the EMAC 
-controller supports various modes, due to hardware design limitations, 
-only RGMII mode can be effectively implemented.
-
-> 
->> +	max-speed = <1000>;
-> 
-> Why do you have this property? It is normally used to slow the MAC
-> down because of issues at higher speeds.
-
-According to the databoot, the EMAC in RGMII mode can support speeds of 
-up to 1Gbps.
-
-> 
-> 	Andrew
-
--- 
-Best Regards,
-Yijie
+Paolo
 
 
