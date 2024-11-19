@@ -1,81 +1,63 @@
-Return-Path: <netdev+bounces-146205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331569D23F9
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:53:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3169B9D242C
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B78A2B22F0A
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:52:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71F21F21389
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9B91C4A2F;
-	Tue, 19 Nov 2024 10:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD57F1C6F71;
+	Tue, 19 Nov 2024 10:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YzWPrHsn"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="a/byO64M"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2681C4A27
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1441C68BE;
+	Tue, 19 Nov 2024 10:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732013525; cv=none; b=YfiBKr3nSg1sAsJSs+YWazQyN2fs33yvc0gkqbKzSI7neVtjS2LOFAcwjtn8GJgfY6CzY4/w9Yfv4sJwGfYUioCZX3iDaRXPQdaQGL31dASmInkeOnVT9Dom8qvTN8jEkDszYt8zUVp7lSqb3E71exuhh6ZBHPd0ex5R5PGZq8k=
+	t=1732013694; cv=none; b=EIKZGlTgjvrL8ulrPSFMp/g3HCtAVvDVKu/XtdKz+N4MqCMHHMv6R67cvPsn/iHvTRfGO7CCNY4+E9f3dkkOzrOeerua5F1g5o80oqIOyMZiyoUDkMkROXery48lVe6G+V1vmiW9TaW11VQ1FPe5PCjF+N4PDz3WonYUpMW4Wxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732013525; c=relaxed/simple;
-	bh=hLLJbtoq4usZ8DQwEYJWjvTAZqWoe6mvoTy2U+weHIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A8Y7/EAW1nQDWwd4vtsF/2tW4fZUsWF2Qhw1tSRCSC1JgjYCrm6A/3E/l7fNLkdZwX1qiHuvk/RK4cGJttH0HgWA+kqBAuKxFFpVRbtwr8KX5EkkB/CirAnaz5T3picT2TGyucMcboHBFU+cGXhKM7svaikW1Q6fyPIxwulIGmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YzWPrHsn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732013521;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y81IMujErJUfbaKhEYW3qiziAM0qahIoRyTbCf9p3vY=;
-	b=YzWPrHsnJYz5MXM4Xxdd9bWlKsy47ic10u0H31RpJcSz0buhs5a+wpB15NHKcuoncO5KBL
-	ZuejCrLw39OnyW6MkZD9Ydtg+894aYybso2PDuBxgITSxARjChxUeIf03vN3h7mPY9SNDU
-	FstSjx0w/Yet7xPiEPG3Py0OijXD12s=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-292-hRDVk1KOOiGNl14lP64AZw-1; Tue, 19 Nov 2024 05:52:00 -0500
-X-MC-Unique: hRDVk1KOOiGNl14lP64AZw-1
-X-Mimecast-MFC-AGG-ID: hRDVk1KOOiGNl14lP64AZw
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-381d07c377cso2182093f8f.1
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 02:51:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732013519; x=1732618319;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y81IMujErJUfbaKhEYW3qiziAM0qahIoRyTbCf9p3vY=;
-        b=I5TzCkuzLYKn/kd07mZFqz0yT6UDT26VviJu0WcIfBa2kbwI/e+cZ/aHjeiTtAfaLf
-         Tg8SQm2/xVLLFvfxzqk7HldfJGM9Mys7XAoAP+S8lcb1RCfQYqf5fG8xkX6RJdeSxIe4
-         nelWwxftLiBY+ZsdYafu3dRa8s4cbB4fdi8vfUoeCvm1m0Sraea/kXoHvWySYdjzgJzr
-         3dDrLtUHsdLljf6K81DChw6iH1Rhi1UxZdPJAhyuUhxd6sABJ36ZydTPurrfEa5QqboJ
-         Eg6ZMSH6o08AMAVn395XVul2iP0Ildq8EN2U7tCxthhFgwJf6nGAIjbOto9P9b6H9/JO
-         gfpw==
-X-Forwarded-Encrypted: i=1; AJvYcCV9Iyg/3Nehj4T4V7Hx1Nwtvz/9pOmwRyJgy6Yd3EeIfG8nFE9pxj2Pk9brUDnwOMGBpCmnPoM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywrny1Bs+kz9LFNgEpBzZALUKoWpiXmItq/giQMU9K9cbFM7th1
-	QM5cTKstUov4CxSdKZH46sW6qQX65+e1xHNfj6V88o/i0S3YGkAMfPkYe4Kv5Pp5izfa7vV+YS6
-	zZFPIGz7UMVz5Grkb/3DlYbEEJl+pk827PmQpWX/nN9Ea2db5/3VZKg==
-X-Received: by 2002:a05:6000:788:b0:37d:4376:6e1d with SMTP id ffacd0b85a97d-38225ab76e7mr14040305f8f.41.1732013518789;
-        Tue, 19 Nov 2024 02:51:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFIHjGWkZEON2R3W6W39hILTmAYF+lwi0WIxVEzV2PccsKxFzKoK54PnsNqNYxKcc03cG0XAg==
-X-Received: by 2002:a05:6000:788:b0:37d:4376:6e1d with SMTP id ffacd0b85a97d-38225ab76e7mr14040280f8f.41.1732013518410;
-        Tue, 19 Nov 2024 02:51:58 -0800 (PST)
-Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-382388d1d00sm9474699f8f.29.2024.11.19.02.51.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 02:51:57 -0800 (PST)
-Message-ID: <d772d47e-5dc0-4295-a302-e17e75ca8dd1@redhat.com>
-Date: Tue, 19 Nov 2024 11:51:56 +0100
+	s=arc-20240116; t=1732013694; c=relaxed/simple;
+	bh=6gQoT8/TLpzxFQtr4q4xynhJWVCAX993McBZckQUW+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MQ9tQhaPEEFhm73/YW+50iXjtdynTm4WEzvXd2Wvn5CDvBg3xvFwbW6LYSwJ7w25FJ2yr7mE7/oM7X2rxPi6ChVyGee4PxtwmWZkacOXyolmKOXjFX/RgdI5nZ6BGirgPb1jEazg2GYgBGKSFrVgLU2O99p8k4OLT7FD31xIgFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=a/byO64M; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AJAjDS8003860;
+	Tue, 19 Nov 2024 10:54:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	lereNHPBQqwXXILcBETEFbas5Mk9L0De1Vw2tJ3965I=; b=a/byO64MNFF3olrW
+	nM5QFIuvgpNZlEu7udiGVNx27+bhxRW8RYoY4zbd7Mm9XdNkrMxoBEpqsp+nI54F
+	XVhQxLiljvIbyuWt5bXxWwEkeqIZzqfsp98HxaCqgufRtbkUfjEzfii0bOAuBh+k
+	B3ah6J8KuddN2s5kNvFbHr/NypwPOg0bv78mQqD5pxuEjIBjl5BesMgtM6QFlHwg
+	sUB1GC9z/aZd+WpgeiTlaR2rgBcKnfXQzFSAaMtQTVh0ENGMV0QCR9P2TEwSaJS6
+	ORGzJlNNUsxU2SuhoHTB7P4vcPgf/n/hZEJMU2a5JLjHC0R7ZX/KCtXvsWsbdUhF
+	IG1aOA==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4308y929ga-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 10:54:38 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AJAsSK7011994
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 10:54:36 GMT
+Received: from [10.253.72.205] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 19 Nov
+ 2024 02:54:13 -0800
+Message-ID: <b8beb23a-6e39-4534-b7a2-5b0627373fb6@quicinc.com>
+Date: Tue, 19 Nov 2024 18:54:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,63 +65,116 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tun: fix group permission check
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Stas Sergeev <stsp2@yandex.ru>, linux-kernel@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, agx@sigxcpu.org,
- jdike@linux.intel.com
-References: <20241117090514.9386-1-stsp2@yandex.ru>
- <673a05f83211d_11eccf2940@willemb.c.googlers.com.notmuch>
- <673bb45c6f64b_200fa9294ee@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net] net: mdio-ipq4019: fix wrong NULL check
+To: Rosen Penev <rosenp@gmail.com>,
+        "Russell King (Oracle)"
+	<linux@armlinux.org.uk>
+CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        open list <linux-kernel@vger.kernel.org>
+References: <20241117212827.13763-1-rosenp@gmail.com>
+ <5562cf54-d1bd-4235-b232-33f5cca40b85@quicinc.com>
+ <ZzskoS2jwC6eLlmD@shell.armlinux.org.uk>
+ <CAKxU2N_zcNB-0gBKPnPo3kjZ7mZpzbiB63JFGVZ5jd1U-LjxSA@mail.gmail.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <673bb45c6f64b_200fa9294ee@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <CAKxU2N_zcNB-0gBKPnPo3kjZ7mZpzbiB63JFGVZ5jd1U-LjxSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: RASfQEAbZ03XBjpaKBC5KkgJyHTaPpUh
+X-Proofpoint-GUID: RASfQEAbZ03XBjpaKBC5KkgJyHTaPpUh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ impostorscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1015 suspectscore=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2411190078
 
-On 11/18/24 22:40, Willem de Bruijn wrote:
-> Willem de Bruijn wrote:
->> Stas Sergeev wrote:
->>> Currently tun checks the group permission even if the user have matched.
->>> Besides going against the usual permission semantic, this has a
->>> very interesting implication: if the tun group is not among the
->>> supplementary groups of the tun user, then effectively no one can
->>> access the tun device. CAP_SYS_ADMIN still can, but its the same as
->>> not setting the tun ownership.
+
+
+On 11/19/2024 5:12 AM, Rosen Penev wrote:
+> On Mon, Nov 18, 2024 at 3:27 AM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+>>
+>> On Mon, Nov 18, 2024 at 06:26:27PM +0800, Jie Luo wrote:
+>>> On 11/18/2024 5:28 AM, Rosen Penev wrote:
+>>>> devm_ioremap_resource returns a PTR_ERR when it fails, not NULL. OTOH
+>>>> this is conditionally set to either a PTR_ERR or a valid pointer. Use
+>>>> !IS_ERR_OR_NULL to check if we can use this.
+>>>>
+>>>> Fixes: 23a890d493 ("net: mdio: Add the reset function for IPQ MDIO driver")
+>>>>
+>>>> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+>>>> ---
+>>>>    drivers/net/mdio/mdio-ipq4019.c | 2 +-
+>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
+>>>> index dd3ed2d6430b..859302b0d38c 100644
+>>>> --- a/drivers/net/mdio/mdio-ipq4019.c
+>>>> +++ b/drivers/net/mdio/mdio-ipq4019.c
+>>>> @@ -256,7 +256,7 @@ static int ipq_mdio_reset(struct mii_bus *bus)
+>>>>      /* To indicate CMN_PLL that ethernet_ldo has been ready if platform resource 1
+>>>>       * is specified in the device tree.
+>>>>       */
+>>>> -   if (priv->eth_ldo_rdy) {
+>>>> +   if (!IS_ERR_OR_NULL(priv->eth_ldo_rdy)) {
+>>>>              val = readl(priv->eth_ldo_rdy);
+>>>>              val |= BIT(0);
+>>>>              writel(val, priv->eth_ldo_rdy);
 >>>
->>> This patch relaxes the group checking so that either the user match
->>> or the group match is enough. This avoids the situation when no one
->>> can access the device even though the ownership is properly set.
->>>
->>> Also I simplified the logic by removing the redundant inversions:
->>> tun_not_capable() --> !tun_capable()
->>>
->>> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+>>> Reviewed-by: Luo Jie <quic_luoj@quicinc.com>
 >>
->> This behavior goes back through many patches to commit 8c644623fe7e:
+>> Looking at the setup of this:
 >>
->>     [NET]: Allow group ownership of TUN/TAP devices.
+>>          /* The platform resource is provided on the chipset IPQ5018 */
+>>          /* This resource is optional */
+>>          res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+>>          if (res)
+>>                  priv->eth_ldo_rdy = devm_ioremap_resource(&pdev->dev, res);
 >>
->>     Introduce a new syscall TUNSETGROUP for group ownership setting of tap
->>     devices. The user now is allowed to send packages if either his euid or
->>     his egid matches the one specified via tunctl (via -u or -g
->>     respecitvely). If both, gid and uid, are set via tunctl, both have to
->>     match.
->>
->> The choice evidently was on purpose. Even if indeed non-standard.
+>> While this is optional, surely the optional part is whether resource 1
+>> is provided or not. If the resource is provided, but we fail to ioremap
+>> it, isn't that an error which should be propagated? In that situation,
+>> isn't the firmware saying "we have a second resource" but failing to
+>> map it should be an error?
+
+Agree. The fail to ioremap resource 1 needs to be captured and
+propagated if the resource 1 is provided by DTS.
+
 > 
-> I should clarify that I'm not against bringing this file in line with
-> normal user/group behavior.
+> Another way to look at it is, if we convert this to
 > 
-> Just want to give anyone a chance to speak up if they disagree and/or
-> recall why the code was originally written as it is.
+> devm_platform_get_and_ioremap_resource(pdev, 1, &res);
+> 
+> it seems to only write to res if platform_get_resource succeeds and
+> otherwise doesn't care. The only real way to check if found is
+> !IS_ERR().
+> 
+> Actually the more appropriate function here is
+> devm_platform_ioremap_resource , which doesn't write to a struct
+> resource.
+> 
 
-I think we can't accept a behaviour changing patch this late in the
-cycle. If an agreement is reached it should be reposted after the merge
-window.
+The resource 1 is optional, so devm_platform_ioremap_resource can't
+be used here, otherwise the error will be returned if the resource 1
+is not provided.
 
-/P
+>>
+>> --
+>> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+>> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
 
