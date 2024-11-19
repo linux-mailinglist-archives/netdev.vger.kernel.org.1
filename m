@@ -1,92 +1,129 @@
-Return-Path: <netdev+bounces-146040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B6B19D1CC2
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:49:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC9C9D1CD0
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:50:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20BA92823A6
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 00:49:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42485B20C3E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 00:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA68847B;
-	Tue, 19 Nov 2024 00:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614801CA84;
+	Tue, 19 Nov 2024 00:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gdJAWpZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.enpas.org (zhong.enpas.org [46.38.239.100])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282FF1F941;
-	Tue, 19 Nov 2024 00:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.239.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7502E571;
+	Tue, 19 Nov 2024 00:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731977345; cv=none; b=ni/rPqlY2sEw7PodNlQRM+oDf44FU0FCYs+zIG1Ij3NdGi7nfDbDQHDywsbh6kmMRvQORSXdliGQp2mK4ikBHiuIPl6VAynjEWDo7QMY0q5sZssKmH0ryzjOx8ELT8ixsehlwtsaU6EDThES1zjvxyGkubVps/PR14Hl40zMl7M=
+	t=1731977452; cv=none; b=pPVIjDKYRETkR8UUdXWjOqpqHT3zSiApYc8He3yUm7K3bE+N6ucrz2GpkxGA1cL/wFoivfth6za5dAVjetFbUzodAmcrq4AHRHc0EEU7TjAkwczFBCjj9tNPw/rCygYV5FDPd5ZyonOzKFpkCtzympxWMMgew9eOyqSNgYhpDhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731977345; c=relaxed/simple;
-	bh=J+WPrwsuAWpNkX7H54JmUhwKRSLKv+/L5TWT0yg4wEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YxU654aRtnEWnOfcs0iSILvBFPSVPJ6qtc+6Mbfqb3SZfeSkuEUaB75j3pYROyW60Vnga5Q5Q0REwkllJgw0kQ29l+ekQH/aCnb93drBsV+76yuu+HlA0Wl3Ua8dJhjaJcmag8u1wW+L/YiKCr+KHFCQySq3nMJ74dfuV7p5nXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enpas.org; spf=pass smtp.mailfrom=enpas.org; arc=none smtp.client-ip=46.38.239.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enpas.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enpas.org
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by mail.enpas.org (Postfix) with ESMTPSA id 890EB102ECB;
-	Tue, 19 Nov 2024 00:48:56 +0000 (UTC)
-Message-ID: <8c358157-d28d-4c42-b983-4191061edd70@enpas.org>
-Date: Tue, 19 Nov 2024 09:48:53 +0900
+	s=arc-20240116; t=1731977452; c=relaxed/simple;
+	bh=oKvwEHGtm66d7BtQ1RrEnikv3MNsf9JdLDKGDfa9S8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bzTKAQF3GaMPV5NQ/Aj0DZmXQlGW3WmsqbF3e5WkBC17amFPV/HelUy0gro4Acd2THWp4Kd/rdhKRHdzf1sPM065eWJ8cxv6qouoOdgegdU3pTBI8bBry0d+/AuyDVFwBUWXvFDstesYViaYwOzJZ6JLTXTvlFPW/AhVMrZfTtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gdJAWpZk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/zdxN2vOlsEF33q9U+oiEdloUgcORSZgWWNMJG2WpeU=; b=gdJAWpZktRAlIE8dOIH3n2I7AI
+	Hb84rSn0XKZd3SBkyAz4px0n7Ue0Z6EvSKneVjlhDoHp5BiQTiyJIpNk18dfGtwFKxHDBjkpPDQuG
+	tW0kuUzTUGD02z+HiUBGReDEioYavOGrcsrVmOE2wGImuWefDqqAiZhsPG0vfGWj36MY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tDCRe-00Diud-Hx; Tue, 19 Nov 2024 01:50:18 +0100
+Date: Tue, 19 Nov 2024 01:50:18 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parker Newman <parker@finest.io>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Parker Newman <pnewman@connecttech.com>
+Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-tegra: Read iommu stream id
+ from device tree
+Message-ID: <984a8471-7e49-4549-9d8a-48e1a29950f6@lunn.ch>
+References: <cover.1731685185.git.pnewman@connecttech.com>
+ <f2a14edb5761d372ec939ccbea4fb8dfd1fdab91.1731685185.git.pnewman@connecttech.com>
+ <ed2ec1c2-65c7-4768-99f1-987e5fa39a54@redhat.com>
+ <20241115135940.5f898781.parker@finest.io>
+ <bb52bdc1-df2e-493d-a58f-df3143715150@lunn.ch>
+ <20241118084400.35f4697a.parker@finest.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] can: can327: fix snprintf() limit in
- can327_handle_prompt()
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <c896ba5d-7147-4978-9e25-86cfd88ff9dc@stanley.mountain>
- <6db4d783-6db2-4b86-887c-3c95d6763774@wanadoo.fr>
- <4ff913b9-93b3-4636-b0f6-6e874f813d2f@stanley.mountain>
- <9d6837c1-6fd1-4cc6-8315-c1ede8f20add@wanadoo.fr>
- <20241114-olive-petrel-of-culture-5ae519-mkl@pengutronix.de>
- <7841268c-c8dc-4db9-b2dd-c2c5fc366022@wanadoo.fr>
- <0c4ebaf0-a6c5-4852-939b-e7ac135f6f32@stanley.mountain>
- <7d4b176b-6b44-450b-ab2d-847e5199d1b9@wanadoo.fr>
- <e5572514-83d7-4b7e-b4f0-5318c6722250@stanley.mountain>
-From: Max Staudt <max@enpas.org>
-In-Reply-To: <e5572514-83d7-4b7e-b4f0-5318c6722250@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241118084400.35f4697a.parker@finest.io>
 
-Hi all,
+> This is not a new dt property, the "iommus" property is an existing property
+> that is parsed by the Nvidia implementation of the arm-smmu driver.
+> 
+> Here is a snippet from the device tree:
+> 
+> smmu_niso0: iommu@12000000 {
+>         compatible = "nvidia,tegra234-smmu", "nvidia,smmu-500";
+> ...
+> }
+> 
+> /* MGBE0 */
+> ethernet@6800000 {
+> 	compatible = "nvidia,tegra234-mgbe";
+> ...
+> 	iommus = <&smmu_niso0 TEGRA234_SID_MGBE>;
+> ...
+> }
+> 
+> /* MGBE1 */
+> ethernet@6900000 {
+> 	compatible = "nvidia,tegra234-mgbe";
+> ...
+> 	iommus = <&smmu_niso0 TEGRA234_SID_MGBE_VF1>;
+> ...
+> }
 
-As promised, here is a patch cleaning up can327's payload "encoding" 
-(the hex dump part), plus a comment explaining why Dan's finding turned 
-out not to be security relevant. It's as Vincent already explained, plus 
-additional background information:
+What i was meaning does the nvidia,tegra234-mgbe binding allow iommus?
+I just checked, yes it does.
 
-  
-https://lore.kernel.org/linux-can/20241119003815.767004-1-max@enpas.org/T/
+> If the iommus property is missing completely from the MGBE's device tree node it
+> causes secure read/write errors which spam the kernel log and can cause crashes.
+> 
+> I can add the fallback in V2 with a warning if that is preferred.
 
-I've taken the liberty of not CC'ing the network maintainers on that 
-patch, hence this email with a pointer to it for anyone interested. In 
-the end, while it looked worrying at first, it ended up being just a 
-minor cleanup.
+The fact it crashed makes me think it is optional. Any existing users
+must work, otherwise it would crash, and then be debugged. I guess you
+are pushing the usage further, and so have come across this condition.
 
+Is the iommus a SoC property, or a board property? If it is a SoC
+property, could you review all the SoC .dtsi files and fix up any
+which are missing the property?
 
-Thanks Dan for pointing out that ugly piece of code. I'd really like to 
-one day find the time to do some further cleanup, and especially further 
-commenting in order to reduce the bus factor, but oh well...
+Adding a warning is O.K, but ideally the missing property should be
+added first.
 
+The merge window is open now, so patches will need to wait two weeks.
 
-Max
-
+	Andrew
 
