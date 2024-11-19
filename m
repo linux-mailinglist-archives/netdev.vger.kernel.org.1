@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-146125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9849C9D20E2
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:41:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C419D20EB
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:43:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62AC9281CB2
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 07:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5EFB2820C3
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 07:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC46196C7C;
-	Tue, 19 Nov 2024 07:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CC2195F28;
+	Tue, 19 Nov 2024 07:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1dK3y78"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hDz8vjsD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910E91482F3;
-	Tue, 19 Nov 2024 07:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CE4194A60;
+	Tue, 19 Nov 2024 07:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732002051; cv=none; b=gGm7TEmf+c0VyMjNoEa6VNT9pvV00paZg4AR8OKpTRAThYZBrlzDZPjgQApVv42IiraKl8hsUJC2HvUBI3aCJlGYxUsRgM2LyeQg3xtGE8z8T/4K/T1GUKT6D/36Sbh2HtKRBlk2LVkmfF+Q12Q1Kg6VqdQA7YT8hetKNKUTvxw=
+	t=1732002186; cv=none; b=SzJW9cvdURGcwVD6bfkK6hN6/Qt+dtkNXo416KlVCGXsboGUliPCB2V6I60ItMj70NTyKUwJFHS4rWdarPTP0KiUBb8k/aTgqCbj4BivMATTpN22XfdzSE0+PDRjlqcN6HE9aqJ6ZwyeD0bgXNYzt7VJTPbndjJM10DDFAlCxN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732002051; c=relaxed/simple;
-	bh=kgkPNYxGxqHFjWOcGvWsb/pjlSuJLCGIWHdWG9UrqR0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Kc+WWHIdWhB6Kd14gBZheymjVzDlTKbooDG/2egkfxCosweyBPP1zhW/088wXnQ7eRXP2OwY/THK7/dRTC6OVyrihzr45UUbSZF9ARjTD4mwyjWVfJeKWTX9nY3MJLsf2hPkGQSxfiSQB5sc+yZgR6c7cZiqYSL9g2sehFSmhN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1dK3y78; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC6CC4CECF;
-	Tue, 19 Nov 2024 07:40:46 +0000 (UTC)
+	s=arc-20240116; t=1732002186; c=relaxed/simple;
+	bh=qyR70PrnNAPmnXsc8jR8pMBcyHivgFHXaVTaSMBOvDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f9zSI0S0Ve4FyPFvfUnRXwVobm3yo3TEL1PJTT6ZNSpAyBAY/DtTPEvzJgzXOpT3xr53RgQnorvw/onv6CPya+BpdsLsZqfIX6QXqwpo5f31xqaOCy+0NJ5ucVDW5MIstuy1HjFLM+YGh48TCvJXqQpQKvPYUWGmpJQE4aY4gus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hDz8vjsD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0617BC4CED1;
+	Tue, 19 Nov 2024 07:43:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732002051;
-	bh=kgkPNYxGxqHFjWOcGvWsb/pjlSuJLCGIWHdWG9UrqR0=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=o1dK3y781Lf3gJcAaXWMpVBuRzQh1Bv1mydHDaKsufSvoCsoXDG4HyWvAGj6fiqMt
-	 vZGbq6fDIyMI297eAssyETvb2jDWQ6MMmnS5R67+joQwKRdgZVZrV7uJIhGfEUDjX2
-	 Ym3T6h2s2lbs60cQqo1lw2Noi47IIYvN2IbYVhmrhooMRpawWIzTdCmKt3rFw0MnDE
-	 81LtEX8a4sWNajxQ0MV5os1sihSW7shmKb+LBKlJjhL+KIExOAKtbSAUl8gBuUa/qj
-	 GWriVPndWsUBqjBXBqB4TB37FwnSLRndeaXPANwxkp2dNQQH/1syzw3mLJr3gVX//i
-	 U/n4VyXzI9Rdw==
-Message-ID: <10d4050b-47c8-4ba1-9c47-7fd12187186f@kernel.org>
-Date: Tue, 19 Nov 2024 08:40:44 +0100
+	s=k20201202; t=1732002185;
+	bh=qyR70PrnNAPmnXsc8jR8pMBcyHivgFHXaVTaSMBOvDk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hDz8vjsDSvMrXWE1VceX9bVYWMgYAUhM22+/0ZsvEtDYhUwplRjd3D2ahxi4r8UOZ
+	 EECueSJkWaYuuwl/RQrxKFHgNaZeT9eCDNnWoIQ8IFHc3IglpRMY6Vr/1Mp5WGb3X+
+	 V7dWYTGCll5AJH0ujL4/o1hVLQyLbj9HxqyE2vvI4Plh2q0yj11gbo+rP271nEqps9
+	 2Hp695wba6QqFnYa2fUwWGdVo2wntvuIkY8+IOUmdbg+L+zugYcse0JRgpaBzuH1g0
+	 eWW3FxisEDhX6L97n/H2MFbe3UsrHhgDTmSa4fVThi2QXDm/cSB7HwENpNky5DRYHq
+	 fsiKhJ7BaVL8Q==
+Message-ID: <f5694621-2abb-4637-9826-97e7bde88b72@kernel.org>
+Date: Tue, 19 Nov 2024 08:42:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,15 +50,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v2 1/7] dt-bindings: net: ftgmac100: support for
- AST2700
-To: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: xlnx,axi-ethernet: Add
+ bindings for AXI 2.5G MAC
+To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- p.zabel@pengutronix.de, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241118060207.141048-1-jacky_chou@aspeedtech.com>
- <20241118060207.141048-2-jacky_chou@aspeedtech.com>
+ pabeni@redhat.com, michal.simek@amd.com, sean.anderson@linux.dev,
+ radhey.shyam.pandey@amd.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, git@amd.com, harini.katakam@amd.com
+References: <20241118081822.19383-1-suraj.gupta2@amd.com>
+ <20241118081822.19383-2-suraj.gupta2@amd.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -104,43 +105,45 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241118060207.141048-2-jacky_chou@aspeedtech.com>
+In-Reply-To: <20241118081822.19383-2-suraj.gupta2@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 18/11/2024 07:02, Jacky Chou wrote:
-> The AST2700 is the 7th generation SoC from Aspeed.
-> Add compatible support for AST2700 in yaml.
+On 18/11/2024 09:18, Suraj Gupta wrote:
+> AXI 1G/2.5G Ethernet subsystem supports 1G and 2.5G speeds. "max-speed"
+> property is used to distinguish 1G and 2.5G MACs of AXI 1G/2.5G IP.
+> max-speed is made a required property, and it breaks DT ABI but driver
+> implementation ensures backward compatibility and assumes 1G when this
+> property is absent.
+> Modify existing bindings description for 2.5G MAC.
 > 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
 
-Please use standard email subjects, so with the PATCH keyword in the
-title. `git format-patch -vX` helps here to create proper versioned
-patches. Another useful tool is b4. Skipping the PATCH keyword makes
-filtering of emails more difficult thus making the review process less
-convenient.
+Please start using b4. This thread is a mess.
 
-For net next it is PATCH net-next
+Do not attach (thread) your patchsets to some other threads (unrelated
+or older versions). This buries them deep in the mailbox and might
+interfere with applying entire sets.
 
 <form letter>
-This is a friendly reminder during the review process.
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
 
-It looks like you received a tag and forgot to add it.
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
 
-If you do not know the process, here is a short explanation:
-Please add Acked-by/Reviewed-by/Tested-by tags when posting new
-versions, under or above your Signed-off-by tag. Tag is "received", when
-provided in a message replied to you on the mailing list. Tools like b4
-can help here. However, there's no need to repost patches *only* to add
-the tags. The upstream maintainer will do that for tags received on the
-version they apply.
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time.
 
-https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/submitting-patches.rst#L577
-
-If a tag was not added on purpose, please state why and what changed.
+Please kindly resend and include all necessary To/Cc entries.
 </form letter>
-
-I am not going to do the work twice.
 
 Best regards,
 Krzysztof
