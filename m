@@ -1,51 +1,80 @@
-Return-Path: <netdev+bounces-146207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 188159D243A
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:55:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F380C9D245A
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87B21F22BBA
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7A0F282DE1
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F661C4A03;
-	Tue, 19 Nov 2024 10:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0641C462D;
+	Tue, 19 Nov 2024 11:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="uk4lWcT6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAV/hKZf"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501a.mail.yandex.net (forward501a.mail.yandex.net [178.154.239.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761EC1C07D3;
-	Tue, 19 Nov 2024 10:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D004B1B0F2C
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 11:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732013711; cv=none; b=Y6eDKarqDHW4btV/AQLN5bNGuJ+KeLBdyRKeAHL1R/h2eXjuncbZvMqGU1A6ik2YmMJPck2Htt4Y3WIdxygOnWPf7eN8YdQ9GDRrp5K4qoFeHsVxNdE2J1XVeM3jD/jzZJtAXhuNg4StUuEwbGRAuylxRKXKiKD9pi6PGJuGXH4=
+	t=1732014103; cv=none; b=bC0vZ7ddTYNRrs15SJ+7a0H6UIjNVxSi7quR6kC1wlu6RlbCp8cU+TuICpdp0DCvVRUEYyO87pKAHDNh+Zz6GIpGAnP0Gyqpcv0mmuR2sFuXysRH4+uTBMSB4pikMtABCHcb7q4Taxc9IqHUIQqIXA0cyKTe1icQGAuFPbo41j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732013711; c=relaxed/simple;
-	bh=wSnrpm26gTZo4rHtAZAPpI+Rk9ESN7UlI8KwJwU60k4=;
+	s=arc-20240116; t=1732014103; c=relaxed/simple;
+	bh=dbMltewUQlMW0Sem8DhCaaHZBlr9ohwY1znjXghpqK8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rxv3qzAQJDiePruVG4nwDEq98bik2p6DdqYkAmoENe6wiYw3Cokz5sFV445VJH16oMl33wdV8atai3Ylo4cfWmWHlzJx4hCv/50YwLhLsePjJrD2z0AeF1f3y7rbp6rMpaExjscTZeK06hAkEK8Svv85EEVwTtMVzlFmmN7VFuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=uk4lWcT6; arc=none smtp.client-ip=178.154.239.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0f:26bf:0:640:efa0:0])
-	by forward501a.mail.yandex.net (Yandex) with ESMTPS id 5F40561544;
-	Tue, 19 Nov 2024 13:54:59 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id usO0U3sOma60-vLRvFFuL;
-	Tue, 19 Nov 2024 13:54:58 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1732013698; bh=wSnrpm26gTZo4rHtAZAPpI+Rk9ESN7UlI8KwJwU60k4=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=uk4lWcT6pKbUuoXoYHz8x/gBBW4UX3MgeZLq9TLH7uREN+7baPpqppAY+cJlm9TQw
-	 xdXdvJI5wclfpMoEullgz05ZU50ZOA/q7KObIjp25BS+XIgumKCCRXErLMUuSg4iVd
-	 CLqYpsoibOuUOsXl0Su9DzL4hfFOvemMPleW30B8=
-Authentication-Results: mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <e94cb653-5bd3-4cb4-a3d4-3bac64f2ee61@yandex.ru>
-Date: Tue, 19 Nov 2024 13:54:56 +0300
+	 In-Reply-To:Content-Type; b=mMAybw5g9ClS7/yg8+0DUQMNezZn9E2ygRZjMFP1DIyGeFKD+38YWBOfW5CDtojEc20BPaBOQv7qrLbHKv/ETRwLvICZrfu08iBDf4oPeHYDlkJHO836kxdeLDgx6DEMU19xWIILQgaxxg59Dy6/ff8ZHSZOp8wqngZqwTBDv00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAV/hKZf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732014100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z5x1zAmftlOxErhov99kYFrr4C3ad6y3JktV/UxDbWo=;
+	b=DAV/hKZfoF1/mh56DbG5GESpXEQXO/fIv47lOzXymYGFA71dPd85/zleF1zCJNXj85zTZw
+	NhMn/sTmBFNKs4Egfz5HU7bGifvcv99zPvITY43GbkPpXFI0o7bLkV6hL047lP6PMSBzRS
+	Vp+gRW3j1gNOQKPH7KC7zxNvozEUDrs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375-RISCUlnJNlCXHH_yVXGEZA-1; Tue, 19 Nov 2024 06:01:37 -0500
+X-MC-Unique: RISCUlnJNlCXHH_yVXGEZA-1
+X-Mimecast-MFC-AGG-ID: RISCUlnJNlCXHH_yVXGEZA
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-432d04b3d40so33470525e9.1
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 03:01:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732014096; x=1732618896;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z5x1zAmftlOxErhov99kYFrr4C3ad6y3JktV/UxDbWo=;
+        b=Fq54uxj3ZLBJwCNDLw8ZiMQY0CKdhKnUCSSx/SqC3LdVqFMi4OAa7rH8NIy8fKxXy0
+         WDhtVssMV7mKXeuJCLtsEj+lVcvYhgOkPmxX3AWb/hxbgN/BG3G7Sgj0alwZGrUtGGPT
+         fDeuvi8RAm9MuDVmQV3rgi2G2Oa3ioEYF90cSfoTHjAJhF0xrNcytnpbJYivy0MxvGl8
+         POF9YrZRciBhcWoPwU2sfU8U9+p83lx43SJfZ4/0TFiCp1EeHiMReoecHKUXdfXZXbjg
+         WuTTAIqTIsNi9jtnebUMhNSD+FvFitXjo3Ru2o2wKDNt6jEG62JwB4cCpkVlHx9TrPVx
+         GoVQ==
+X-Gm-Message-State: AOJu0YyHq9EDqRrRxEx9KYXYGj5TrndnXMj92EC1hlKD0D+xqCMxekc2
+	U+yvnx48zxtu9efMb1QWrY8TQvv6j0eJw3eComybHAu3iY3Muln0whrrmVumerDiM5kH5TwI/wh
+	TrHOtAtYXeTtBQYqHmHKHZGX44DqZgX77OZDgiIWtziBzrFBigsvgyg==
+X-Received: by 2002:a05:600c:190c:b0:431:55af:a230 with SMTP id 5b1f17b1804b1-432df798ea0mr120186435e9.33.1732014096350;
+        Tue, 19 Nov 2024 03:01:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEUgk3hoEITcm/fHjPQY0HbLJGUt2q30yrEQzJiBHczy6KT7QlivIFvtIT5gOta2ObouSh3gg==
+X-Received: by 2002:a05:600c:190c:b0:431:55af:a230 with SMTP id 5b1f17b1804b1-432df798ea0mr120186245e9.33.1732014096054;
+        Tue, 19 Nov 2024 03:01:36 -0800 (PST)
+Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac21a15sm187619345e9.38.2024.11.19.03.01.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 03:01:35 -0800 (PST)
+Message-ID: <de23f3cd-833a-44c0-91bc-5a013458a05f@redhat.com>
+Date: Tue, 19 Nov 2024 12:01:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,29 +82,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tun: fix group permission check
+Subject: Re: [PATCH] net/core/dev_ioctl: avoid invoking modprobe with empty
+ ifr_name
+To: Song Chen <chensong_2000@189.cn>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, kory.maincent@bootlin.com,
+ aleksander.lobakin@intel.com, willemb@google.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241117045512.111515-1-chensong_2000@189.cn>
 Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- linux-kernel@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, agx@sigxcpu.org,
- jdike@linux.intel.com
-References: <20241117090514.9386-1-stsp2@yandex.ru>
- <673a05f83211d_11eccf2940@willemb.c.googlers.com.notmuch>
- <673bb45c6f64b_200fa9294ee@willemb.c.googlers.com.notmuch>
- <d772d47e-5dc0-4295-a302-e17e75ca8dd1@redhat.com>
-From: stsp <stsp2@yandex.ru>
-In-Reply-To: <d772d47e-5dc0-4295-a302-e17e75ca8dd1@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241117045512.111515-1-chensong_2000@189.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-19.11.2024 13:51, Paolo Abeni пишет:
-> I think we can't accept a behaviour changing patch this late in the
-> cycle. If an agreement is reached it should be reposted after the merge
-> window.
->
-> /P
-Noted, thanks.
+On 11/17/24 05:55, Song Chen wrote:
+> dev_ioctl handles requests from user space if a process calls
+> ioctl(sockfd, SIOCGIFINDEX, &ifr). However, if this user space
+> process doesn't have interface name well specified, dev_ioctl
+> doesn't give it an essential check, as a result, dev_load will
+> invoke modprobe with a nonsense module name if the user happens
+> to be sys admin or root, see following code in dev_load:
+> 
+>     no_module = !dev;
+>     if (no_module && capable(CAP_NET_ADMIN))
+>         no_module = request_module("netdev-%s", name);
+>     if (no_module && capable(CAP_SYS_MODULE))
+>         request_module("%s", name);
+> 
+> This patch checks if ifr_name is empty at the beginning, reduces
+> the overhead of calling modprobe.
+
+AFAICS technically this optimize a slow path (bad input from the
+user-space) at the expense of the more usual path (additional unneeded
+conditional) and still AFAICS, there are no functional issues addressed
+here.
+
+Note that even the latter more usual path is not a fast path, still the
+optimization is not worthy.
+
+/P
+
 
