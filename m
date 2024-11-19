@@ -1,102 +1,85 @@
-Return-Path: <netdev+bounces-146255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871B79D2771
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:56:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 775259D2815
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 15:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D01F283A7E
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:56:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31A831F24728
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61B41CCEC6;
-	Tue, 19 Nov 2024 13:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6E451CDA39;
+	Tue, 19 Nov 2024 14:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Omq3yR3i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tooqZ7lK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF211CCB49;
-	Tue, 19 Nov 2024 13:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D131CBE8D;
+	Tue, 19 Nov 2024 14:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732024572; cv=none; b=RCq+MkoCVYdsCYNlWPgWEy79cROhhasq2Gg5a2TlBDYuZj+j7g0t6L3fNq5GqoBw6hPrXTPH8euMjTdTy/d3r0s6vsdgPpd2vrNjniI0d/WvCwWG8fTkVc/akDh9ECtDiEwQXijWJ4PHWj6Sq3yu/l16hzL4ELFGjGss9IXoQnM=
+	t=1732026345; cv=none; b=DHJZzd1hHKfH89NndXA7QPmkjZCsZHGOj7ETSuUVAUxA46vv/J0t/cSBwzzOtkDvhEI0JHnsQTxt+pKv02xVOgNv1RKeS2U5enn+RP/Bn+65bKCmSsXA2fjQvF79flCiRq1snNMwqE3Lw+PJMnQBST5eIVAgEhEjr6nyU5p4bm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732024572; c=relaxed/simple;
-	bh=dUr1ksQjD6QtL3/P9QDx5wpmFKIc2GdtHZbukytewiI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hpNc1cVXAAATdKzVjW258rJIbpxkip1pdFz6caWnXntNm1yT5oF9J/zaSBAMcocTUp3/sCUFEiLpN8gJf3GAyK5bmOHgqa4iLCfM0TO9D9shDEi8OmO2oZkiutLim1GfYEeKhR/HQ8406Witm+elIK6Zze3Xzvm6+PVowUj2tIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Omq3yR3i; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8phBlKnPGyquZpUR4CtoI5JKyG39N4jtaX8T9/dhoVE=; b=Omq3yR3iFFtSeRX03YohOOeDTb
-	Gvg7+hksVB7P1htaGtkk6FzzVzmP3tupywqmcA63m9N43s5GhqyReBJQnh+N+x8nqk6ke8y8ERILN
-	argxdK/h76qHrS1QPe1K5JU3+NV5pjuvjo9SR+lXP9m3Hg667DTYA97EPvWt2iA9tWFc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tDOhu-00DoDg-Nf; Tue, 19 Nov 2024 14:55:54 +0100
-Date: Tue, 19 Nov 2024 14:55:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	joel@jms.id.au, andrew@codeconstruct.com.au, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: mdio: aspeed: Add dummy read for fire control
-Message-ID: <27a39b05-3029-4b31-ada7-542e23e4de8b@lunn.ch>
-References: <20241119095141.1236414-1-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1732026345; c=relaxed/simple;
+	bh=mjmuQ5REEGrJNiwfId8qSYDdZ9xIZ6W//wGJVaY2Mh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CxvLqB4xlwAW0Kkiu5SqYBMI831hwe9CY3Xl8FpBOQ/7Byi/2nwCVhxTh4YC4r/f93cbH3NDEKWoNb96AEOcTCvPZ+mF6LP1tsXP+8fsJYsusxoRMPxC1vmfJB4nvNGktEz2G8e2N0nmGLZ3jlB82tsLuCDB7JbIfoLowvTmaoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tooqZ7lK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD441C4CED0;
+	Tue, 19 Nov 2024 14:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732026345;
+	bh=mjmuQ5REEGrJNiwfId8qSYDdZ9xIZ6W//wGJVaY2Mh0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tooqZ7lKmc3u22VG1T3RT+aV21g+7MzJh0jOrENS5symZUeqUx9x3GboDdxWoxeUD
+	 4iA2AWldYyxFuQGOIItG+us8hp1y+iOCdsYdZpkQy/34fMyMLj81ZcgVYpSD76nYVA
+	 8SnCl9CjS0uzSU0GKEpgZy6CK2Oi9BhNRuR/bkeiad5ITWUcVBOjBAbIApwNGYje7S
+	 BLbe/TUqzKVs+4LWjHDHidP4zUKK3UZzD4QKUB6+GePIrbpHSUdsDbZchazYjKKCKG
+	 FSYTAAHjrjtZbbnij1FtlSoRf2Fna0xBpe1eMshNvjbbMFlHGWrQI2j18DK/4i7zHQ
+	 PhUiEMIHkZGyg==
+Date: Tue, 19 Nov 2024 06:25:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "John Fastabend" <john.fastabend@gmail.com>, Andrii Nakryiko
+ <andrii@kernel.org>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Magnus Karlsson
+ <magnus.karlsson@intel.com>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
+ <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 00/19] xdp: a fistful of generic changes
+ (+libeth_xdp)
+Message-ID: <20241119062543.242dc6a9@kernel.org>
+In-Reply-To: <63df7a6a-bb4a-410d-9060-be47c9d9a157@intel.com>
+References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
+	<20241115184301.16396cfe@kernel.org>
+	<63df7a6a-bb4a-410d-9060-be47c9d9a157@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119095141.1236414-1-jacky_chou@aspeedtech.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 19, 2024 at 05:51:41PM +0800, Jacky Chou wrote:
-> When the command bus is sometimes busy, it may cause the command is not
-> arrived to MDIO controller immediately. On software, the driver issues a
-> write command to the command bus does not wait for command complete and
-> it returned back to code immediately. But a read command will wait for
-> the data back, once a read command was back indicates the previous write
-> command had arrived to controller.
-> Add a dummy read to ensure triggering mdio controller before starting
-> polling the status of mdio controller to avoid polling unexpected timeout.
-
-Please have another attempt at writing the commit message.
-
-> Fixes: a9770eac511a ("net: mdio: Move MDIO drivers into a new subdirectory")
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/mdio/mdio-aspeed.c | 2 ++
->  1 file changed, 2 insertions(+)
+On Tue, 19 Nov 2024 13:06:56 +0100 Alexander Lobakin wrote:
+> > This clearly could be multiple series, please don't go over the limit.  
 > 
-> diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
-> index c2170650415c..373902d33b96 100644
-> --- a/drivers/net/mdio/mdio-aspeed.c
-> +++ b/drivers/net/mdio/mdio-aspeed.c
-> @@ -62,6 +62,8 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st, u8 op, u8 phyad, u8 regad,
->  		| FIELD_PREP(ASPEED_MDIO_DATA_MIIRDATA, data);
->  
->  	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
-> +	/* Add dummy read to ensure triggering mdio controller */
-> +	(void)ioread32(ctx->base + ASPEED_MDIO_CTRL);
+> Sorta.
+> I think I'll split it into two: changing the current logic + adding new
+> functions and libeth_xdp. Maybe I could merge the second one with the
+> Chapter IV, will see.
 
-Maybe: /* Dummy read to flush previous write to controller */
-
-
-    Andrew
-
----
-pw-bot: cr
+FWIW I was tempted to cherry-pick patches 2, 4, 5, 6, and 7, since they
+look uncontroversial and stand on their own. But wasn't 100% sure I'm
+not missing a dependency. Then I thought - why take the risk, let me
+complain instead :) Easier to make progress with smaller series..
 
