@@ -1,261 +1,207 @@
-Return-Path: <netdev+bounces-146161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94B39D2266
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:22:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1F19D2276
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 509101F228AF
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A941E1F229C5
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E2219D8AC;
-	Tue, 19 Nov 2024 09:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7611A705C;
+	Tue, 19 Nov 2024 09:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VQQs/lGG"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="OBgK1bxg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from smtp.smtpout.orange.fr (smtp-25.smtpout.orange.fr [80.12.242.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1374B199EAD
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 09:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642D619C54F;
+	Tue, 19 Nov 2024 09:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732008141; cv=none; b=IgYrq0/4ITgCsE4lD5CZgT0GWAFPhFkbry4Izb2Z6TlWROAP95qDIP2+fYV3zP+RwQsDTXk+p7Jtr0iKMNUxiYB+QAeviDX76MfCUJDVl+yKEFTUryjzHHdugtA4EjOW6TnFZ0iKhBBtgb7IGGFDe80qDWATSMLYiG4eOhIXosw=
+	t=1732008436; cv=none; b=sqvSR4anK19onABy444a67Rj4uFNos0UL0RI7nAC9/5kK/KXne5Erz3TPdNWDXvHlIHIXUXRyRwRvZ69poAYMIz18+uI6mBA574zHjZPH9l9feeAbdZjRTCQVcMX+lAKv5RoHycs7m5vMgFiaDN1kPJURSYvl7A69rFY6MO9sMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732008141; c=relaxed/simple;
-	bh=fceHBG+X2UvRjBjCIsgvbxZ9WnEIjCTyT91cqSLZzVM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZCzt0AfVQaehzqj520JdmUi9rW8d5b+PT72/tF/IafBof0zee/wH13/KcxU3SGIPVm99tYxEKfEqipHdAlBfSHjxblrCt9K93JKTpQGU5+j9FwEOfKikc+CQqLIOzA7dJiOePeGP3f+MTa37LQWTJ9PK3SMiSc7DHYzaKl8HIew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VQQs/lGG; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-539e64ed090so3e87.1
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:22:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732008138; x=1732612938; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FZGge2oSrz74lJ2XqbgtrMjv2pUp4AiCFkma9PNCogA=;
-        b=VQQs/lGGxA2N9IOK+b2fSkafXp9IJ8kEmDYiFvuziQJ63p+p2IPQU/ydHZ0D1rDxRu
-         gr7M0UDgjnFuK7+PePepJzBJAcraFF7UJx67mu6guSHe4TAb07ykyzml/x0TMDOU9wZh
-         C92qQL5dlKCf58zhQgrW+KfCQBi2wnhilLAl91FtCOgqr2nKRcZKMPHweKkv8E82Gy3o
-         TkqxpCFVj9vBexIGqVepVfatjdba3FOYnEc7IKVEOYym8wcMqGbqAFMZh9E+AGPVHiHW
-         uWJSJMVfZ8BP/c48G6pETppeEeONgQBk8l6Iy4OXseOzTtIusdnyce68ikmKm2CSfe5R
-         T6qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732008138; x=1732612938;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FZGge2oSrz74lJ2XqbgtrMjv2pUp4AiCFkma9PNCogA=;
-        b=Uqtvu3SZsoWYn34udmmL14ig3W0NjmTeNMgouLENTi4PJoHS6+UIIZ+PmyaKFhJ4W1
-         a5UkD8ziL3OT985BwZu9zUT0i7PtKlWlS8tCI1WyMlhbtEvR26UEWdAdBsuQZDu8Dobc
-         PTyoKhSH7Qe3Km3gqdtMZe/lUrkXlccG9+/flYeyQnHWkCnlf+8I78X/3NH7AhSX/0mF
-         LZRzg3OhYsKJkdAhkEPeYJ6Ip30In5gsRkK/avaJ63AGGa8cXr50Wfht4fQFUmi+EnvZ
-         U20ZbJtbHXu3EVPV83oap6iGHJuC98yWJoec0RQ6XqbBsiuV5UwHID8v9gHl1qZCveoO
-         JQcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVy7Mg6n+oE5Wz+IdYGpoZMG7C9KRirnYcYlNjAge2Ur6bYQiK159ep4rs8ITNQ5x/XDvhlh68=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+V9P1xyqTY03v4eA98uGWqGNr9DyLU/Jtt3S7VcRdqWtekaHO
-	ECY0x47oDzufl+QS5zefKI4NXvKZwPPIJqiKuenkQ4MIF/E4mhZE9gH/E4MDcqI0aFq/Gh5NyGM
-	xfxkEWfLY41jxQGSJBVbiBW2cwVGQpro7C0pt
-X-Gm-Gg: ASbGncvMorER/j7NO/9Sc6qKRpAJAZFs6Tte8j8b08gpyeUr9eKN8dl5BdHZbRxRV2o
-	Nx5BsVNz3u8LkCo5ALSfN9aIE/RzBk7aBnn/9qJ+rQPSe6O1kyXtXkWtk3kvetg==
-X-Google-Smtp-Source: AGHT+IHk1jZ3UBUvPXEVuhDJpKcI8fg2iN9a0VPw8aqiyZDZiC8DZKXfiTozgOoz4bmNpdIlS7WXZ4l6JLgoIfBqtCY=
-X-Received: by 2002:a19:ad0d:0:b0:53d:be11:5fca with SMTP id
- 2adb3069b0e04-53dbf8985f0mr8e87.1.1732008135454; Tue, 19 Nov 2024 01:22:15
- -0800 (PST)
+	s=arc-20240116; t=1732008436; c=relaxed/simple;
+	bh=f5ihpDJvqgir0zv3QuZSwywjiBQF+KN1/Y5HpEPSIiI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lRuYhGooZAxgn39t+4S2RjxBYLzf6pdif3D0sG9RxzQUjUWlIJp2xwj5ZcpzVM+zNzAdWQFxABUj73MzxeIulE3/BrV4A5SKHCAPlmZeZpsrAeP5vro5nTzojBLhY1g8b0+nAhp4WfPTSoZm3OqRfGtHoyPMNWb4HZ8wjdQ8/BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=OBgK1bxg; arc=none smtp.client-ip=80.12.242.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id DKVZtsAoVdDuoDKVatxUbR; Tue, 19 Nov 2024 10:27:03 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1732008423;
+	bh=fyZEfuN/RV8KWKotZDgCoJOAeqacw5DLGXuvDWF6C8E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=OBgK1bxgCLcgXVA4T6noDrGW+Cl3qCA8KWHR+nbfwNGyShxwaeJoK7+F8hSFc3QG8
+	 oTd0onsCbce7dhtuxEJ2aKDFedzM5vl9GYJJFA7O0wWdUW/VeQ9r4fh7QhEaYx2tdq
+	 Oar18FH6zHMTp82VwAfIG6hJbYK8Diz4bi3cyez1f3Y814FrCrRq3Pn8jIfFghEIEw
+	 c+HehiRTck6rQQOoP/Qkq3zRgHebVY1tXwo/ZrsY6Jnzp37QqhvSz030Ky5iaXEzE4
+	 rtMFfpgNMbgfR1IF1vOkfal/AEg5E6YHih9R06ER90GINggZx308IJ0U3TArkiyP9I
+	 ZFLeV/cX/Gw8A==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 19 Nov 2024 10:27:03 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <57915ed9-e57e-4ca3-bc31-6405893c937e@wanadoo.fr>
+Date: Tue, 19 Nov 2024 18:26:51 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241117141137.2072899-1-yuyanghuang@google.com> <ZzxAqq-TqLts1o4V@fedora>
-In-Reply-To: <ZzxAqq-TqLts1o4V@fedora>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Tue, 19 Nov 2024 18:21:38 +0900
-Message-ID: <CADXeF1GEzTO4BuVnci0Vvorah+vCcrTZR9EE3ohQrN_TKnfL0A@mail.gmail.com>
-Subject: Re: [PATCH net-next, v2] netlink: add IGMP/MLD join/leave notifications
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>, Patrick Ruddy <pruddy@vyatta.att-mail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
+ lines
+To: Ciprian Costea <ciprianmarian.costea@oss.nxp.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>,
+ Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>,
+ Enric Balletbo <eballetb@redhat.com>
+References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
+ <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+In-Reply-To: <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Hangbin
+On 19/11/2024 at 17:10, Ciprian Costea wrote:
+> From: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+> 
+> On S32G2/S32G3 SoC, there are separate interrupts
+> for state change, bus errors, MBs 0-7 and MBs 8-127 respectively.
+> 
+> In order to handle this FlexCAN hardware particularity, reuse
+> the 'FLEXCAN_QUIRK_NR_IRQ_3' quirk provided by mcf5441x's irq
+> handling support.
+> 
+> Additionally, introduce 'FLEXCAN_QUIRK_SECONDARY_MB_IRQ' quirk,
+> which can be used in case there are two separate mailbox ranges
+> controlled by independent hardware interrupt lines, as it is
+> the case on S32G2/S32G3 SoC.
+> 
+> Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+> ---
+>  drivers/net/can/flexcan/flexcan-core.c | 25 +++++++++++++++++++++++--
+>  drivers/net/can/flexcan/flexcan.h      |  3 +++
+>  2 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
+> index f0dee04800d3..dc56d4a7d30b 100644
+> --- a/drivers/net/can/flexcan/flexcan-core.c
+> +++ b/drivers/net/can/flexcan/flexcan-core.c
+> @@ -390,9 +390,10 @@ static const struct flexcan_devtype_data nxp_s32g2_devtype_data = {
+>  	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
+>  		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_BROKEN_PERR_STATE |
+>  		FLEXCAN_QUIRK_USE_RX_MAILBOX | FLEXCAN_QUIRK_SUPPORT_FD |
+> -		FLEXCAN_QUIRK_SUPPORT_ECC |
+> +		FLEXCAN_QUIRK_SUPPORT_ECC | FLEXCAN_QUIRK_NR_IRQ_3 |
+>  		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
+> -		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
+> +		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR |
+> +		FLEXCAN_QUIRK_SECONDARY_MB_IRQ,
+>  };
+>  
+>  static const struct can_bittiming_const flexcan_bittiming_const = {
+> @@ -1771,12 +1772,21 @@ static int flexcan_open(struct net_device *dev)
+>  			goto out_free_irq_boff;
+>  	}
+>  
+> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
+> +		err = request_irq(priv->irq_secondary_mb,
+> +				  flexcan_irq, IRQF_SHARED, dev->name, dev);
+> +		if (err)
+> +			goto out_free_irq_err;
+> +	}
 
-Thanks for the review feedback.
+Is the logic here correct?
 
->Why the IPv4 scope use RT_SCOPE_LINK,
+  request_irq(priv->irq_err, flexcan_irq, IRQF_SHARED, dev->name, dev);
 
-I'm unsure if I'm setting the IPv4 rt scope correctly.
+is called only if the device has the FLEXCAN_QUIRK_NR_IRQ_3 quirk.
 
-I read the following document for rtm_scope:
+So, if the device has the FLEXCAN_QUIRK_SECONDARY_MB_IRQ but not the
+FLEXCAN_QUIRK_NR_IRQ_3, you may end up trying to free an irq which was
+not initialized.
 
-```
-/* rtm_scope
+Did you confirm if it is safe to call free_irq() on an uninitialized irq?
 
-   Really it is not scope, but sort of distance to the destination.
-   NOWHERE are reserved for not existing destinations, HOST is our
-   local addresses, LINK are destinations, located on directly attached
-   link and UNIVERSE is everywhere in the Universe.
+(and I can see that currently there is no such device with
+FLEXCAN_QUIRK_SECONDARY_MB_IRQ but without FLEXCAN_QUIRK_NR_IRQ_3, but
+who knows if such device will be introduced in the future?)
 
-   Intermediate values are also possible f.e. interior routes
-   could be assigned a value between UNIVERSE and LINK.
-*/
-```
+>  	flexcan_chip_interrupts_enable(dev);
+>  
+>  	netif_start_queue(dev);
+>  
+>  	return 0;
+>  
+> + out_free_irq_err:
+> +	free_irq(priv->irq_err, dev);
+>   out_free_irq_boff:
+>  	free_irq(priv->irq_boff, dev);
+>   out_free_irq:
+> @@ -1808,6 +1818,9 @@ static int flexcan_close(struct net_device *dev)
+>  		free_irq(priv->irq_boff, dev);
+>  	}
+>  
+> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ)
+> +		free_irq(priv->irq_secondary_mb, dev);
+> +
+>  	free_irq(dev->irq, dev);
+>  	can_rx_offload_disable(&priv->offload);
+>  	flexcan_chip_stop_disable_on_error(dev);
+> @@ -2197,6 +2210,14 @@ static int flexcan_probe(struct platform_device *pdev)
+>  		}
+>  	}
+>  
+> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
+> +		priv->irq_secondary_mb = platform_get_irq(pdev, 3);
+> +		if (priv->irq_secondary_mb < 0) {
+> +			err = priv->irq_secondary_mb;
+> +			goto failed_platform_get_irq;
+> +		}
+> +	}
+> +
+>  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SUPPORT_FD) {
+>  		priv->can.ctrlmode_supported |= CAN_CTRLMODE_FD |
+>  			CAN_CTRLMODE_FD_NON_ISO;
+> diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/flexcan.h
+> index 4933d8c7439e..d4b1a954c538 100644
+> --- a/drivers/net/can/flexcan/flexcan.h
+> +++ b/drivers/net/can/flexcan/flexcan.h
+> @@ -70,6 +70,8 @@
+>  #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
+>  /* Setup stop mode with ATF SCMI protocol to support wakeup */
+>  #define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
+> +/* Setup secondary mailbox interrupt */
+> +#define FLEXCAN_QUIRK_SECONDARY_MB_IRQ	BIT(18)
+>  
+>  struct flexcan_devtype_data {
+>  	u32 quirks;		/* quirks needed for different IP cores */
+> @@ -105,6 +107,7 @@ struct flexcan_priv {
+>  	struct regulator *reg_xceiver;
+>  	struct flexcan_stop_mode stm;
+>  
+> +	int irq_secondary_mb;
+>  	int irq_boff;
+>  	int irq_err;
+>  
 
-I believe RT_SCOPE_LINK is the closest match to the use case. IGMP
-packets have a TTL of 1, so they are not forwarded to other networks.
+Yours sincerely,
+Vincent Mailhol
 
-I saw the RT_SCOPE_LINK was chosen in the original patch so I followed
-the same pattern.
-
-Link: https://lore.kernel.org/r/20180906091056.21109-1-pruddy@vyatta.att-ma=
-il.com
-
-Please kindly advise here if we have more proper logic.
-
->And IPv6 use RT_SCOPE_UNIVERSE by default?
-
-Since IPv6 provides the `static inline int ipv6_addr_scope(const
-struct in6_addr *addr)` helper function, we should utilize it to
-correctly determine the address scope. We have the logic like follows
-in addrconf.c to determine the rt_scope.
-
-```
-static inline int rt_scope(int ifa_scope)
-{
-    if (ifa_scope & IFA_HOST)
-       return RT_SCOPE_HOST;
-    else if (ifa_scope & IFA_LINK)
-        return RT_SCOPE_LINK;
-    else if (ifa_scope & IFA_SITE)
-        return RT_SCOPE_SITE;
-    else
-        return RT_SCOPE_UNIVERSE;
-}
-
-```
-
-However, I found the addrconf.c:inet6_fill_ifmcaddr() is using the
-following logic so I am trying to make the notification logic
-consistent with dump logic.
-
-Maybe we should update `inet6_fill_ifmcaddr()` to use
-`ipv6_addr_scope()` to determine the scope properly?
-
-```
-static int inet6_fill_ifmcaddr(struct sk_buff *skb,
-                  const struct ifmcaddr6 *ifmca,
-                  struct inet6_fill_args *args)
-{
-    int ifindex =3D ifmca->idev->dev->ifindex;
-    u8 scope =3D RT_SCOPE_UNIVERSE;
-    struct nlmsghdr *nlh;
-    if (ipv6_addr_scope(&ifmca->mca_addr) & IFA_SITE)
-        scope =3D RT_SCOPE_SITE;
-```
-
-
-In general, I am not sure if the scope information is truly necessary
-for IPv4 and IPv6 multicast notifications. In my experience, only the
-address itself is needed.  The `ip maddr` command also omits scope.
-Perhaps I'm missing some use cases where scope is essential.
-
->Not sure if we really need this WARN_ON. Wait for others comments.
-
-I try to follow the existing code pattern in addrconf.c; for example:
-
-```
-err =3D inet6_fill_ifaddr(skb, ifa, &fillargs);
-if (err < 0) {
-    /* -EMSGSIZE implies BUG in inet6_ifaddr_msgsize() */
-    WARN_ON(err =3D=3D -EMSGSIZE);
-    kfree_skb(skb);
-    goto errout_ifa;
-}
-```
-
-Thanks,
-Yuyang
-
-On Tue, Nov 19, 2024 at 4:39=E2=80=AFPM Hangbin Liu <liuhangbin@gmail.com> =
-wrote:
->
-> Hi Yuyang,
-> On Sun, Nov 17, 2024 at 11:11:37PM +0900, Yuyang Huang wrote:
-> > +static int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *=
-dev,
-> > +                           __be32 addr, int event)
-> > +{
-> > +     struct ifaddrmsg *ifm;
-> > +     struct nlmsghdr *nlh;
-> > +
-> > +     nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
-> > +     if (!nlh)
-> > +             return -EMSGSIZE;
-> > +
-> > +     ifm =3D nlmsg_data(nlh);
-> > +     ifm->ifa_family =3D AF_INET;
-> > +     ifm->ifa_prefixlen =3D 32;
-> > +     ifm->ifa_flags =3D IFA_F_PERMANENT;
-> > +     ifm->ifa_scope =3D RT_SCOPE_LINK;
->
-> Why the IPv4 scope use RT_SCOPE_LINK,
->
-> > +static int inet6_fill_ifmcaddr(struct sk_buff *skb, struct net_device =
-*dev,
-> > +                            const struct in6_addr *addr, int event)
-> > +{
-> > +     struct ifaddrmsg *ifm;
-> > +     struct nlmsghdr *nlh;
-> > +     u8 scope;
-> > +
-> > +     scope =3D RT_SCOPE_UNIVERSE;
-> > +     if (ipv6_addr_scope(addr) & IFA_SITE)
-> > +             scope =3D RT_SCOPE_SITE;
->
-> And IPv6 use RT_SCOPE_UNIVERSE by default?
->
-> > +
-> > +     nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
-> > +     if (!nlh)
-> > +             return -EMSGSIZE;
-> > +
-> > +     ifm =3D nlmsg_data(nlh);
-> > +     ifm->ifa_family =3D AF_INET6;
-> > +     ifm->ifa_prefixlen =3D 128;
-> > +     ifm->ifa_flags =3D IFA_F_PERMANENT;
-> > +     ifm->ifa_scope =3D scope;
-> > +     ifm->ifa_index =3D dev->ifindex;
-> > +
-> > +static void inet6_ifmcaddr_notify(struct net_device *dev,
-> > +                               const struct in6_addr *addr, int event)
-> > +{
-> > +     struct net *net =3D dev_net(dev);
-> > +     struct sk_buff *skb;
-> > +     int err =3D -ENOBUFS;
-> > +
-> > +     skb =3D nlmsg_new(NLMSG_ALIGN(sizeof(struct ifaddrmsg))
-> > +                     + nla_total_size(16), GFP_ATOMIC);
-> > +     if (!skb)
-> > +             goto error;
-> > +
-> > +     err =3D inet6_fill_ifmcaddr(skb, dev, addr, event);
-> > +     if (err < 0) {
-> > +             WARN_ON(err =3D=3D -EMSGSIZE);
->
-> Not sure if we really need this WARN_ON. Wait for others comments.
->
-> Thanks
-> Hangbin
 
