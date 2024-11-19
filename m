@@ -1,88 +1,122 @@
-Return-Path: <netdev+bounces-146051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516F09D1D80
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:45:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FA59D1D8B
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 02:47:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 003D71F22147
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:45:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05603281383
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 01:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0495213775E;
-	Tue, 19 Nov 2024 01:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEF822619;
+	Tue, 19 Nov 2024 01:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mzdPWv8O"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="CioJkKLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC2512CDAE
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAE81BC2A
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 01:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731980698; cv=none; b=UbqnQvTbUMrvm6OR89oATz4PkJvoraLjW7szTf2DzF+/uGqVvefFoSDq0Lc1QldIjGxWIMBqy9gzg2YKPxk4afuGxPvnJDieWsYSjHt1spUz/+m7uWL9RFHgDXv+qT432k2qqhV5rNOn+8yj9CNZLDA/JdfVdeuelbmSL8Upbv0=
+	t=1731980846; cv=none; b=S7EWxMLA0tjI56JzXVzJDYxuTc+Gu3aX9+6eS6QmVSvj4Uf77U41k29uQb3ICH0TgiucTx0DdaOouqNA/DdTQJtO6s0LHLwuEP9XaFWhSeV0KQ+mCGk7FPDQMGmXqtLhDp5t74Y6e/FoiAZBgnfbeUXcEYzZs3TLdl1+0mqMAxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731980698; c=relaxed/simple;
-	bh=Z/txLvl4Yc8TUyGQzPm6CNP9JhRwBWqdG1jlFr/G05U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ke6UmGxu74i3a3vf9caCa2mNrCTNfj3cfQUHNogyqipvkK9GOandwozYOdJLSsTlh0KXCWdhMfSk46JkCCUWpVFDkAwjGdzdaSSQHHvnidXKuMBqfRa5ELbHd0VaFcJRHyPE592KaTSW0oN9+V//qeY15/gJJlEmW5LkNzv177k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mzdPWv8O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98427C4CECC;
-	Tue, 19 Nov 2024 01:44:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731980698;
-	bh=Z/txLvl4Yc8TUyGQzPm6CNP9JhRwBWqdG1jlFr/G05U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mzdPWv8O3YLS4zPylsi73dd4hK17RL310ZjbTLYXmccEirAGDjvq60xaR4g1/23Dz
-	 xFRAt+bAHGiqpS6zYtrZVnOSa5NM+u1h+7/mHRwSIxrDxVJsQo3lZZHwF2Dkm/LnaC
-	 rr+210O6vQpnDA+0+5VaFVESxlzQdIv2MZFYLAcsd7IyKucUY8vgxpHCxfsPQuDDAn
-	 3dLy7wcXePMnrgiYg750wOShf7CxbS9QrgQYqE73sDkqjpdA/j39urb+MiD7hYr3jd
-	 ZXu5DTxiBk7S8Rf9QLOtmFJjdPnEN47syrhvUuLvPAqI8zHW1/8lplv6YSpSL2k8+F
-	 bzsZhhHVfmAyQ==
-Date: Mon, 18 Nov 2024 17:44:56 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: wojackbb@gmail.com, netdev@vger.kernel.org,
- chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
- ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- angelogioacchino.delregno@collabora.com,
- linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
-Subject: Re: [net-next,v2] [PATCH net-next v2] net: wwan: t7xx: Change
- PM_AUTOSUSPEND_MS to 5000
-Message-ID: <20241118174456.463c2817@kernel.org>
-In-Reply-To: <7e5e2bda-e80d-46ec-816a-613c5808222e@gmail.com>
-References: <20241114102002.481081-1-wojackbb@gmail.com>
-	<6835fde6-0863-49e8-90e8-be88e86ef346@gmail.com>
-	<20241115152153.5678682f@kernel.org>
-	<7e5e2bda-e80d-46ec-816a-613c5808222e@gmail.com>
+	s=arc-20240116; t=1731980846; c=relaxed/simple;
+	bh=j5WxfRQC5jwGpkbKBTTUzm4fUjxqxW59kP6t1LgCYS8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=cmrNWBE8/EYcMsK83o1HBc6gc+mvLuotF+Gk2Z5P+O2WPj19YAYX00dTr/g3zTrVjTAzEhCxmYdZvLo5cFkpZ/1+BAxh13N5SruAQxJfg2Oz/RESPBgTaVABqfC5SMzJp53MAq/y4AaAw4NAP54T/l4rbeOOs19P4WiNWawimYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=CioJkKLH; arc=none smtp.client-ip=148.163.129.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 62AB828006D;
+	Tue, 19 Nov 2024 01:47:16 +0000 (UTC)
+Received: from [IPV6:2607:fb90:7312:5479:23bd:24ab:9b46:7022] (unknown [172.56.241.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail3.candelatech.com (Postfix) with ESMTPSA id AFC0613C2B0;
+	Mon, 18 Nov 2024 17:47:15 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com AFC0613C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1731980835;
+	bh=j5WxfRQC5jwGpkbKBTTUzm4fUjxqxW59kP6t1LgCYS8=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=CioJkKLHgqfGC6g0M3MZonSVc8OS2H1X3/XzzqaSJvcRvtAYBSjYHyhbIL1nSYI9b
+	 7YP9eWuMX+Zi+yg0fK1x7XLeU+zIqzkLJmTirkLBQVivBer56QzW3IomnOzk5qzBgU
+	 tTxPMtCZJ/B7GgPybKd1/WI07p4Nq6TgcjVm3Pu8=
+Message-ID: <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com>
+Date: Mon, 18 Nov 2024 17:47:12 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: GRE tunnels bound to VRF
+From: Ben Greear <greearb@candelatech.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: netdev <netdev@vger.kernel.org>
+References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
+ <ZzsCNUN1vl01uZcX@shredder>
+ <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
+Content-Language: en-MW
+Organization: Candela Technologies
+In-Reply-To: <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-MDID: 1731980837-wjwe4CmXjNkc
+X-MDID-O:
+ us5;ut7;1731980837;wjwe4CmXjNkc;<greearb@candelatech.com>;a7e0f01e4f1a90fc9a5deb2f83c822d4
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
-On Tue, 19 Nov 2024 03:01:47 +0200 Sergey Ryazanov wrote:
-> > He's decreasing the sleep timer from 20 to 5 sec, both of which
-> > are very high for networking, anyway. You appear to be questioning
-> > autosuspend itself but it seems to have been added 2 years ago already.
-> > 
-> > What am I missing?  
+On 11/18/24 11:48 AM, Ben Greear wrote:
+> On 11/18/24 1:00 AM, Ido Schimmel wrote:
+>> On Sun, Nov 17, 2024 at 10:40:18AM -0800, Ben Greear wrote:
+>>> Hello,
+>>>
+>>> Is there any (sane) way to tell a GRE tunnel to use a VRF for its
+>>> underlying traffic?
+>>>
+>>> For instance, if I have eth1 in a VRF, and eth2 in another VRF, I'd like gre0 to be bound
+>>> to the eth1 VRF and gre1 to the eth2 VRF, with ability to send traffic between the two
+>>> gre interfaces and have that go out whatever the ethernet VRFs route to...
+>>
+>> You can set eth{1,2} as the "physical device" of gre{0,1}
+>>
+>> ip link add name gre0 up type gre [...] dev eth1
+>> ip link add name gre1 up type gre [...] dev eth2
+>>
+>> The "physical device" can be any interface in the VRF, not necessarily
+>> eth{1,2}.
 > 
-> Some possible funny side-effect of sleeping with this chipset. Like 
-> loosing network connection and dropping TCP sessions. I hope that 20 
-> seconds was putted on purpose.
+> Hello,
 > 
-> Suddenly, I don't have this modem at hand and want to be sure that we 
-> are not going to receive a stream of bug reports.
+> Thanks for that suggestion.
+> 
+> I'm trying to implement this, but not having much luck.  My current approach
+> is trying to put gre0 in one VRF, attached to a VETH device in a different VRF.
+> 
+> Would you expect that to work?
 
-Power saving is always tricky, but they say they tested. I think we
-should give it a go, worst case - it will be an easy revert.
+I found some other problems with my config, will try this again now that some other
+problems are solved...
+
+> 
+> And also, is there any way to delete a gre netdev?  ip link delete gre0 doesn't
+> complain, and doesn't work.
+
+I found answer to this, for reference, it seems gre0 is default instance built by the
+ip_gre module when it is loaded, and used for special purpose.
+
+Thanks,
+Ben
+
+-- 
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
 
