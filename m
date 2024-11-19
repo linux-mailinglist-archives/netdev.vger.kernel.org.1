@@ -1,96 +1,76 @@
-Return-Path: <netdev+bounces-146312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9879D2BF6
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:00:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A9BC9D2CDF
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 314D32898D1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:00:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3970DB30949
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314051CF7C2;
-	Tue, 19 Nov 2024 16:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eZ9bfCpx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDDB1D0B95;
+	Tue, 19 Nov 2024 17:07:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4594E1D0F49;
-	Tue, 19 Nov 2024 16:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6448714A639;
+	Tue, 19 Nov 2024 17:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732035546; cv=none; b=c38j7mvIV38rQRctf/ZS9PGMBlV+xKZA3XrPPTQLBCNDWkHBw6R+0NUM5sPdqYkZqxEODzQFm9Lw5cWYbQXGorI8mJR5CexqRzOOIivfjGwyIp77zORiu48sa3H35zHRIDdqbdBPa43aQ9tbblHjXcUILWM40wN4SF80VGRhT98=
+	t=1732036072; cv=none; b=llS9Pz2Qxa5Qi7kzfLj42cfhokELK1g4Cqmgqbv7czpxGvKnIyfY+/AwwDxVtoHOiJCMHWL3rceKc1SMTys3+oBs6OEQoFXMR4ZEMasriVdsD9qRYtzdGYLNEvN2avWvXXgH3lDaAGwwBnuwgJMT9vv0aTd9QPJJWlqTjLvH9Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732035546; c=relaxed/simple;
-	bh=V7GwxDNtO+0vjzdrlhHixsMdYo76ZUj0MPyVDNiQwhU=;
+	s=arc-20240116; t=1732036072; c=relaxed/simple;
+	bh=/eMefCL6Nmke9tyGIDIOTzluMSRQ6dN1d/wEhqhLEHo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jZa8hCkv0lk23guvDyzw4AX8MLiZp1ZEBJQsGSOCXfR6u3dQyPYPaY0kJuOsOt+RskWT0Z6xQBFn4td8DJO2UurVbPjGZRr4I5eHFlHB6+fr2aFSQik/5gjEBIrTcRBYDvFhFNO/9QUrlGClmMb6kmPopM/DRS4eB5RaDweT7OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eZ9bfCpx; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MRgKfDm6SLZPUOjZWm7E2J355C+3AiPl4vo6Sh5h9Y0=; b=eZ9bfCpxoOoSCMceJkHkHIVdUY
-	s648Z3CAxIhZUFTln/z86bH7JDS/jFFFFmXHYVol376Xe16OfvivyB+sUNmyeGkQgrJzx+JfgSSbB
-	4eTXxtFT7yTD+b8pGlcB2Y3rRPwcr5E0PbPxeqG4tLrVDzw0r2N+A8dBnk7Ge4fhwG5So+cqpbjVt
-	sr3A0y68ZNkLmo1avLJ0WYYb4h9qcGqm+L5XRICbhGgtAc4WSeKFFimWwnMmfUXLAYo0jcU8uvqqY
-	B/dwGXfehr1KxR9XzelgfX2kG1AL2dhnIdL8L9UAjeRGXWPecsLakAler2kYTeOBkrPMYFzyFkPR9
-	YhUvOnyA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57438)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tDRYl-00044z-03;
-	Tue, 19 Nov 2024 16:58:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tDRYh-0006ED-1Q;
-	Tue, 19 Nov 2024 16:58:35 +0000
-Date: Tue, 19 Nov 2024 16:58:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: jan.petrous@oss.nxp.com
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=g9xL6eVv42ZTtbZJciTT9DkNJWKRoNhnO8dARyTneztRy1raefHEz43ImP6Req89f/83BqBGtTEw/LAo4JOMaTat/b4Xlsh5iL2q6hBz9Ijsur0PbVljkM/a/YnpWy5FjS97rayAYnj3WiPP0QReUVoTjSNQJUOzUfeWYyue6KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5ced377447bso8170302a12.1;
+        Tue, 19 Nov 2024 09:07:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732036069; x=1732640869;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CO3DmDyk2Ke5HC3Rep1JIDjgJE+KxbTNcrUJlPMJpRU=;
+        b=OcBvouMUqjDnpm3May41R50Cq4do95jQnvlgig776CTUT7l1s9TB4mAl4VMD3DyT8F
+         i+ZHsnV8929lZGkQG3k3lvXD3IvPyO3qeCbZUJNee+Zl/9/MpKypKY2s7oVvdKLzFswh
+         pf9o8f4y1oCnmd44yq6U/eCLQzpj83FxwpOrAju59ya6JQ6iJqVU7rD4UPsqCCmENXJo
+         VwpQWvACeXW3NNfKYGcAN/yQvCmFZmflHNPjdbZHLsl+UbNewm+IK4X5rIr3vv03I7Tw
+         TJn0Av1tD1nnmYmzzIwhA44vaMOClNsvxV+VNkHdZ+lEVz/YYJJ00n20yjofJna35zji
+         DA8g==
+X-Forwarded-Encrypted: i=1; AJvYcCV5bZgL1lt/wU1l1MNlGuBlGWaJWwkkJWqHRbgOH5aKsY+zeAZud1K9UBcHJXnJOM/IzJ9gNM0+@vger.kernel.org, AJvYcCVi6jHOlDB7mOGNP0cOlh5wr6AygwGfIyG5E+lB+/tcyksR9ITrvddf6M8cXH0MhriQMUV4Z6UJGAY=@vger.kernel.org, AJvYcCWBETCUFHJzHM7Tuo20qEEhsqRIl01JvB4lVBVG2z5ib91EpmPiu0k6xmbGfonTT/SVSS5T40SH/vWx3cvs@vger.kernel.org, AJvYcCWef5tEbOY8FY2ZGx/yD3Wo+f7Iv3XkrPTrjppNTahQWQVvZBMzMmh5XUYcksu9ldywocP1x+3CAQpx4/VjIfQW@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQx/AyuJGpb4Q8dN1hTgcgUu0E+AcvZkkuG0grWG7IrcVzE0aD
+	6dy4ZPaSjc40CaGJETYuAQdIQOCcY5o7q0HUpLNChWp4cW0iRKa/
+X-Google-Smtp-Source: AGHT+IGrdjBEX3xCb7oVm3Do1Lo3MG9PQDXDyZjN11EqcOgR1O7iu5WnoajOMZ/Jh2txK9eYMNPVWQ==
+X-Received: by 2002:a17:907:3f8d:b0:a9e:b471:8006 with SMTP id a640c23a62f3a-aa483508ae4mr1527245266b.43.1732036068486;
+        Tue, 19 Nov 2024 09:07:48 -0800 (PST)
+Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df52adasm668235966b.81.2024.11.19.09.07.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2024 09:07:48 -0800 (PST)
+Date: Tue, 19 Nov 2024 09:07:45 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v5 14/16] net: stmmac: dwmac-s32: add basic NXP S32G/S32R
- glue driver
-Message-ID: <ZzzDu0tcyixAZ8l1@shell.armlinux.org.uk>
-References: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
- <20241119-upstream_s32cc_gmac-v5-14-7dcc90fcffef@oss.nxp.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, max@kutsevol.com,
+	thepacketgeek@gmail.com, vlad.wing@gmail.com,
+	davej@codemonkey.org.uk
+Subject: Re: [PATCH net-next 2/4] netconsole: Add option to auto-populate CPU
+ number in userdata
+Message-ID: <20241119-talented-strong-grouse-1f02fd@leitao>
+References: <20241113-netcon_cpu-v1-0-d187bf7c0321@debian.org>
+ <20241113-netcon_cpu-v1-2-d187bf7c0321@debian.org>
+ <20241118183336.34e42b01@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,141 +79,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241119-upstream_s32cc_gmac-v5-14-7dcc90fcffef@oss.nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241118183336.34e42b01@kernel.org>
 
-On Tue, Nov 19, 2024 at 04:00:20PM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Hello Jakub,
+
+On Mon, Nov 18, 2024 at 06:33:36PM -0800, Jakub Kicinski wrote:
+> Sorry for the late review, I think this will miss v6.13 :(
+
+That is fine, there is no rush for this change.
+
+> On Wed, 13 Nov 2024 07:10:53 -0800 Breno Leitao wrote:
+> >  /**
+> >   * struct netconsole_target - Represents a configured netconsole target.
+> >   * @list:	Links this target into the target_list.
+> > @@ -97,6 +105,7 @@ static struct console netconsole_ext;
+> >   * @userdata_group:	Links to the userdata configfs hierarchy
+> >   * @userdata_complete:	Cached, formatted string of append
+> >   * @userdata_length:	String length of userdata_complete
+> > + * @userdata_auto:	Kernel auto-populated bitwise fields in userdata.
+> >   * @enabled:	On / off knob to enable / disable target.
+> >   *		Visible from userspace (read-write).
+> >   *		We maintain a strict 1:1 correspondence between this and
+> > @@ -123,6 +132,7 @@ struct netconsole_target {
+> >  	struct config_group	userdata_group;
+> >  	char userdata_complete[MAX_USERDATA_ENTRY_LENGTH * MAX_USERDATA_ITEMS];
+> >  	size_t			userdata_length;
+> > +	enum userdata_auto	userdata_auto;
 > 
-> NXP S32G2xx/S32G3xx and S32R45 are automotive grade SoCs
-> that integrate one or two Synopsys DWMAC 5.10/5.20 IPs.
+> If you want to set multiple bits here type should probably be unsigned
+> long. Otherwise the enum will contain combination of its values, which
+> are in themselves not valid enum values ... if that makes sense.
+
+Yes, it does make sense. I had the feeling that something was off as
+well, but I was unclear if using something different than `enum
+userdata_auto` would be better. I will change to `unsigned long`
 > 
-> The basic driver supports only RGMII interface.
+> >  #endif
+> >  	bool			enabled;
+> >  	bool			extended;
 > 
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-
-One thing that stands out to me in this is the duplication of the PHY
-interface mode. I would much prefer if we didn't end up with multiple
-copies, but instead made use of the one already in plat_stmmacenet_data
-maybe by storing a its pointer in struct s32_priv_data?
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig     |  12 ++
->  drivers/net/ethernet/stmicro/stmmac/Makefile    |   1 +
->  drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 204 ++++++++++++++++++++++++
->  3 files changed, 217 insertions(+)
+> > +	/* Check if CPU NR should be populated, and append it to the user
+> > +	 * dictionary.
+> > +	 */
+> > +	if (child_count < MAX_USERDATA_ITEMS && nt->userdata_auto & AUTO_CPU_NR)
+> > +		scnprintf(&nt->userdata_complete[complete_idx],
+> > +			  MAX_USERDATA_ENTRY_LENGTH, " cpu=%u\n",
+> > +			  raw_smp_processor_id());
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 05cc07b8f48c..a6579377bedb 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -154,6 +154,18 @@ config DWMAC_RZN1
->  	  the stmmac device driver. This support can make use of a custom MII
->  	  converter PCS device.
->  
-> +config DWMAC_S32
-> +	tristate "NXP S32G/S32R GMAC support"
-> +	default ARCH_S32
-> +	depends on OF && (ARCH_S32 || COMPILE_TEST)
-> +	help
-> +	  Support for ethernet controller on NXP S32CC SOCs.
-> +
-> +	  This selects NXP SoC glue layer support for the stmmac
-> +	  device driver. This driver is used for the S32CC series
-> +	  SOCs GMAC ethernet controller, ie. S32G2xx, S32G3xx and
-> +	  S32R45.
-> +
->  config DWMAC_SOCFPGA
->  	tristate "SOCFPGA dwmac support"
->  	default ARCH_INTEL_SOCFPGA
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> index c2f0e91f6bf8..1e87e2652c82 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> @@ -22,6 +22,7 @@ obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
->  obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
->  obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
->  obj-$(CONFIG_DWMAC_RZN1)	+= dwmac-rzn1.o
-> +obj-$(CONFIG_DWMAC_S32)		+= dwmac-s32.o
->  obj-$(CONFIG_DWMAC_SOCFPGA)	+= dwmac-altr-socfpga.o
->  obj-$(CONFIG_DWMAC_STARFIVE)	+= dwmac-starfive.o
->  obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> new file mode 100644
-> index 000000000000..9af7cd093100
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-> @@ -0,0 +1,204 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * NXP S32G/R GMAC glue layer
-> + *
-> + * Copyright 2019-2024 NXP
-> + *
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/clk-provider.h>
-> +#include <linux/device.h>
-> +#include <linux/ethtool.h>
-> +#include <linux/io.h>
-> +#include <linux/module.h>
-> +#include <linux/of_mdio.h>
-> +#include <linux/of_address.h>
-> +#include <linux/phy.h>
-> +#include <linux/phylink.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/stmmac.h>
-> +
-> +#include "stmmac_platform.h"
-> +
-> +#define GMAC_TX_RATE_125M	125000000	/* 125MHz */
-> +
-> +/* SoC PHY interface control register */
-> +#define PHY_INTF_SEL_MII	0x00
-> +#define PHY_INTF_SEL_SGMII	0x01
-> +#define PHY_INTF_SEL_RGMII	0x02
-> +#define PHY_INTF_SEL_RMII	0x08
-> +
-> +struct s32_priv_data {
-> +	void __iomem *ioaddr;
-> +	void __iomem *ctrl_sts;
-> +	struct device *dev;
-> +	phy_interface_t intf_mode;
-> +	struct clk *tx_clk;
-> +	struct clk *rx_clk;
-> +};
-> +
-> +static int s32_gmac_write_phy_intf_select(struct s32_priv_data *gmac)
-> +{
-> +	u32 intf_sel;
-> +
-> +	switch (gmac->intf_mode) {
-> +	case PHY_INTERFACE_MODE_RGMII:
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +		intf_sel = PHY_INTF_SEL_RGMII;
-> +		break;
-> +	default:
-> +		dev_err(gmac->dev, "Unsupported PHY interface: %s\n",
-> +			phy_modes(gmac->intf_mode));
-> +		return -EINVAL;
-> +	}
+> I guess it may be tricky for backward compat, but shouldn't we return
+> an error rather than silently skip?
 
-This can be simplfied to:
+yes, this should be easy to do, in fact. Probably return -E2BIG to
+userspace when trying to update the entry. I thought about something as
+the following patch, and piggy-back into it.
 
-	if (!phy_interface_mode_is_rgmii(...)) {
-		dev_err(gmac->dev, "Unsupported PHY interface: %s\n",
-			phy_modes(...));
-		return -EINVAL;
-	}
+   Author: Breno Leitao <leitao@debian.org>
+   Date:   Tue Nov 19 04:32:56 2024 -0800
+   
+       netconsole: Enforce userdata entry limit
+   
+       Currently, attempting to add more than MAX_USERDATA_ITEMS to the userdata
+       dictionary silently fails. This patch modifies the code to return -E2BIG
+       when the number of elements exceeds the preallocated limit, providing clear
+       feedback to userspace about the failure.
+   
+       Suggested-by: Jakub Kicinski <kuba@kernel.org>
+       Signed-off-by: Breno Leitao <leitao@debian.org>
+   
+   diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+   index 4ea44a2f48f7b..41cff8c8e8f42 100644
+   --- a/drivers/net/netconsole.c
+   +++ b/drivers/net/netconsole.c
+   @@ -692,10 +692,11 @@ static ssize_t userdatum_value_show(struct config_item *item, char *buf)
+    	return sysfs_emit(buf, "%s\n", &(to_userdatum(item)->value[0]));
+    }
+   
+   -static void update_userdata(struct netconsole_target *nt)
+   +static int update_userdata(struct netconsole_target *nt)
+    {
+    	int complete_idx = 0, child_count = 0;
+    	struct list_head *entry;
+   +	int ret = 0;
+   
+    	/* Clear the current string in case the last userdatum was deleted */
+    	nt->userdata_length = 0;
+   @@ -705,8 +706,10 @@ static void update_userdata(struct netconsole_target *nt)
+    		struct userdatum *udm_item;
+    		struct config_item *item;
+   
+   -		if (child_count >= MAX_USERDATA_ITEMS)
+   +		if (child_count >= MAX_USERDATA_ITEMS) {
+   +			ret = -E2BIG;
+    			break;
+   +		}
+    		child_count++;
+   
+    		item = container_of(entry, struct config_item, ci_entry);
+   @@ -726,6 +729,7 @@ static void update_userdata(struct netconsole_target *nt)
+    	}
+    	nt->userdata_length = strnlen(nt->userdata_complete,
+    				      sizeof(nt->userdata_complete));
+   +	return ret;
+    }
+   
+    static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
+   @@ -748,8 +752,9 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
+   
+    	ud = to_userdata(item->ci_parent);
+    	nt = userdata_to_target(ud);
+   -	update_userdata(nt);
+   -	ret = count;
+   +	ret = update_userdata(nt);
+   +	if (!ret)
+   +		ret = count;
+    out_unlock:
+    	mutex_unlock(&dynamic_netconsole_mutex);
+    	return ret;
+   
 
-Also, would it not be better to validate this in s32_dwmac_probe()?
+> 
+> >  	nt->userdata_length = strnlen(nt->userdata_complete,
+> >  				      sizeof(nt->userdata_complete));
+> >  }
+> > @@ -757,7 +788,36 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
+> >  	return ret;
+> >  }
+> >  
+> > +static ssize_t populate_cpu_nr_store(struct config_item *item, const char *buf,
+> > +				     size_t count)
+> > +{
+> > +	struct netconsole_target *nt = to_target(item->ci_parent);
+> > +	bool cpu_nr_enabled;
+> > +	ssize_t ret;
+> > +
+> > +	if (!nt)
+> > +		return -EINVAL;
+> 
+> Can this happen? Only if function gets called with a NULL @item
+> which would be pretty nutty.
 
-Thanks.
+Probably not. It is just me being chicken here. I will remove it for the
+next version.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks for the review,
+--breno
 
