@@ -1,141 +1,176 @@
-Return-Path: <netdev+bounces-146201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1929D23A4
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:32:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708FA9D23B5
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1829B1F21C92
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:32:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94428B22474
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC791C07D3;
-	Tue, 19 Nov 2024 10:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7BE1C07ED;
+	Tue, 19 Nov 2024 10:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYPZokXi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fr6etpSJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804F2150981
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32131AA1C2
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 10:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732012324; cv=none; b=nXmrMOO3tOBd0QQjEWoHLDGNssNbL1rvCec9GEdvTse7KMJEXP4UrnQ492yGv79nlZHgFgjgChDugZf3ZKlNXkA/vfCVNCSUABk2wtwPJ89Mq05tudkTqHAZ3+FwEaA3+wR+zqT18hDOmrCf1HNVpFg8biXriikGNmwbcINZhOA=
+	t=1732012956; cv=none; b=XRg/sWkTX96oFn9OZitZmbfjoB1QR73wDjz369h+0WhROcho7NVgUY3zbo5I5GUBrn4yxNWrs0EOOnNbfdwSPI/mgyypZPOv4Px5GtT47MlbVAv0ymCOtpphw6laKnI0jKi6gLbnmU5u3LKAuGSs7vGx1vphuf1x7+Rr26zwAFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732012324; c=relaxed/simple;
-	bh=BlAjTcLgGJY8uAZ7SU9fmGPwNwkxmWnaguL65nNmxGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zk+emokexsFAvxO9odmCsF+1QRNf1lOnweyAexebJRTjSKn5lw6CBKrY4bcMO2joOhPfzZbvIHdjvgyBaXucJ8SoA3qAEHqN4M4uHChJ0tmQCc+RRpbkcfMq3bYWKcDpzEY4TIVE1OlUo81ZBXl8e3/ictL9OXz4nuqlOAULjKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYPZokXi; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1732012956; c=relaxed/simple;
+	bh=ewe+cfyQwD7+rJCJr16o7cmU5gq054F741Kf/9i6o6Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XNF5I4QKtvdT3xddSs/aibM+GNvvf3llP4i36N8Zcb5fKJhcdE/6ElMrjSLuJ+L7GtObacUcf6/ILmdqBqUOxR8Kd2QG4L7YiD7+PwRatFpwSoIaktDg5oSljasYC1hyHJpUadEMCy5pwXS7sI/0yReOuO2nJYRWAICCOq3U7Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fr6etpSJ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732012321;
+	s=mimecast20190719; t=1732012953;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XZR/k63cZYtzau/fs0C+ufqda6l8PKbNVPXXgaTEROQ=;
-	b=aYPZokXiUnz3PPTssRP6mm2ahpRdvoHAMbEyyp25MmWCbv/yjvPTp213/+O5thG/3DC4mA
-	k7OVzuDsZwh+XjmCcYrtoZaY4oLvTyQrx02h+UVBBU9XmcKgEMbCVTSvhmegJICJN38I3W
-	XfI9GxZ2g9ak0FAVEGKq7XttiMHQK+k=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LOP/RMPMxHHNNNBECV4o0kJqqFs4JqBWrC0Coyjk7xQ=;
+	b=fr6etpSJuwv50jN9otYjeVvp3RYZ2IcdngI1lOcfC/xilmFeOJJ4j/qASYcFE+b0Ke3sRb
+	+IHbQb6adXosdPC7N1wlGkYxbGVuDIGowazN4B731SNbVeiJvgpLmEvsxxuIybYzviPbiQ
+	fjxxB8EFsD+JNVOA8qpLNc/pTr00Oso=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-458-WwuHwbkrPsWMmRSinijLCQ-1; Tue, 19 Nov 2024 05:31:59 -0500
-X-MC-Unique: WwuHwbkrPsWMmRSinijLCQ-1
-X-Mimecast-MFC-AGG-ID: WwuHwbkrPsWMmRSinijLCQ
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3e60e1775bdso4539258b6e.2
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 02:31:59 -0800 (PST)
+ us-mta-255-Qqavb3PUNlyC45-KsJJEtg-1; Tue, 19 Nov 2024 05:42:29 -0500
+X-MC-Unique: Qqavb3PUNlyC45-KsJJEtg-1
+X-Mimecast-MFC-AGG-ID: Qqavb3PUNlyC45-KsJJEtg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43159603c92so22147795e9.2
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 02:42:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732012319; x=1732617119;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XZR/k63cZYtzau/fs0C+ufqda6l8PKbNVPXXgaTEROQ=;
-        b=RoHv+ZvC+BaTqRsNwilFXHKPcmhClHfbtq/fPFf1Hfe22gFumhSfLSQIun8aSFUuz7
-         zfiWdflbvjLEOPUECjOcWdPSI8CjoI1ce3VFrT47uT9cMXLMIvBf7kMBErF9UWo4r3xR
-         2+91RtmhrHfFt58u9W79o19ch4SYDNmkmhAsKUzhFOq6pVc6NQNIn433ILXuS5MWetOZ
-         iL/onAzoHqmMGX1QRlAjN+pmomUMLowGOkGx6CE91PSdvMCUTmFogPNkANTUth5zcPVD
-         uZQz/a2qPRuoaVd+EuM3A4dBvBubba6Nv+i1DRoJD+amY0NFjMn44HHovzG1LpoTedcH
-         lXGw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQdxlann5AIXy7RsFfhb+DovbUrZr+zV73uQIWIsD4jBKNZ++u7IuPIfpHS5Ejov7+Y4F7mLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyF7yAq1JGMgHJ6Q74xxOcWsPdZ9kB74SGDA7G1W7WvnE1hTyjK
-	+GWlyiGjd5Wa0tYjcdX5qy/88+Qr9P4eMOjMjMyioqQzGF/XKg9lj4pYccX4iv6CQED3qMSIeaV
-	cYnX/t8J0nJZDPDzBC8fud4lIkOB+UvV3NiD099f3UrtaIqXwLfmTHQ==
-X-Received: by 2002:a05:6808:1a0f:b0:3e5:ed42:ef13 with SMTP id 5614622812f47-3e7bc7b5902mr14809456b6e.11.1732012319013;
-        Tue, 19 Nov 2024 02:31:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWEwvUPqOGaW7LnP5oJa5I+dvpQDN13kppHSp+DXkJ5wuJF6S6yGrtvxP38Z3lsuqk+AOaDw==
-X-Received: by 2002:a05:6808:1a0f:b0:3e5:ed42:ef13 with SMTP id 5614622812f47-3e7bc7b5902mr14809420b6e.11.1732012318535;
-        Tue, 19 Nov 2024 02:31:58 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-129.retail.telecomitalia.it. [79.46.200.129])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40ddd02cesm46568686d6.121.2024.11.19.02.31.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 02:31:57 -0800 (PST)
-Date: Tue, 19 Nov 2024 11:31:49 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jia He <justin.he@arm.com>, Arseniy Krasnov <avkrasnov@salutedevices.com>, 
-	Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
-	George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 0/3] virtio/vsock: Fix memory leaks
-Message-ID: <7wixs5lrstuggf2xwgu6qva2t6atqnthcxycg6mpfpx52gl6fq@qmwb6gtgpad2>
-References: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
+        d=1e100.net; s=20230601; t=1732012948; x=1732617748;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LOP/RMPMxHHNNNBECV4o0kJqqFs4JqBWrC0Coyjk7xQ=;
+        b=UJTPI1GZdz88Xy/GUFRGZF6cWQtd5ixIMBd45BU1PYFen/SATUIxPTrOKs42PTDvb2
+         fzqNYKkKfzk+VdDoBG9ZGoRwGYM5GMLcikk1MV/fzLDRhNM304NqJniOkRor6X6nhkHt
+         2tCNybV0F1P+aW8UKHsXsKlYxTQ+F+ppIWr1yv5fsbWdBDIKZM7IUTLzfygxhmzlfm99
+         ujbmA2Mgs8B3Btrri+qZocQod9fW8jRykyZl7YosWFNkQpmh5G+SI+57PwhMJOBR7Xn/
+         xCSrCtNnKusmX+sGFRQYfOB/6Pp722hnDewNQDN0LyjMbs7626VvBmq6L+kqB63v1ggf
+         nU2g==
+X-Forwarded-Encrypted: i=1; AJvYcCW1XkY8FN6KD4lHrwcYXPIdZMMT/R7vNwNc5beljZAJQEAusZQTlRXn5ZmBBhmGLAysbAcw7CY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcJg4cQ0BXLhoRZ1bqrCC9ZWHolgW+PMlcJ2GiwKZ4cKQnih4p
+	D/JPGUIte2ZeSTOaE6J+4ZwLqhOYW6D+591T/2sbUIFPwyyqKk60AOxu5GAtg+qlx7lGjh80IQV
+	vnwXvFAYGYvV8hYUGzIXYSExwUq3IQVbygAlBYGo5XLeN8XpfZM5Dhfm89enUkQ==
+X-Received: by 2002:a05:600c:c08:b0:432:7c08:d121 with SMTP id 5b1f17b1804b1-432df741a8bmr145799375e9.12.1732012948092;
+        Tue, 19 Nov 2024 02:42:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHfHJlIc9PLE+unJO/W7yCVBm8wQp3FJKAGZyEH5HxokmBA6R2bJgaIEHsgK1DXLxfEtANLnA==
+X-Received: by 2002:a05:600c:c08:b0:432:7c08:d121 with SMTP id 5b1f17b1804b1-432df741a8bmr145799185e9.12.1732012947777;
+        Tue, 19 Nov 2024 02:42:27 -0800 (PST)
+Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432da299dadsm189813325e9.43.2024.11.19.02.42.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2024 02:42:27 -0800 (PST)
+Message-ID: <82c02bbc-5d64-464d-83c1-66f1d71a1a44@redhat.com>
+Date: Tue, 19 Nov 2024 11:42:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 2/4] net: ipv6: ioam6_iptunnel: mitigate
+ 2-realloc issue
+To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, linux-kernel@vger.kernel.org
+References: <20241118131502.10077-1-justin.iurman@uliege.be>
+ <20241118131502.10077-3-justin.iurman@uliege.be>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241118131502.10077-3-justin.iurman@uliege.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Michal,
+On 11/18/24 14:15, Justin Iurman wrote:
+> @@ -387,45 +392,40 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  		goto drop;
+>  	}
+>  
+> -	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+> -	if (unlikely(err))
+> -		goto drop;
+> +	if (unlikely(!dst)) {
+> +		struct ipv6hdr *hdr = ipv6_hdr(skb);
+> +		struct flowi6 fl6;
+> +
+> +		memset(&fl6, 0, sizeof(fl6));
+> +		fl6.daddr = hdr->daddr;
+> +		fl6.saddr = hdr->saddr;
+> +		fl6.flowlabel = ip6_flowinfo(hdr);
+> +		fl6.flowi6_mark = skb->mark;
+> +		fl6.flowi6_proto = hdr->nexthdr;
+> +
+> +		dst = ip6_route_output(net, NULL, &fl6);
+> +		if (dst->error) {
+> +			err = dst->error;
+> +			dst_release(dst);
+> +			goto drop;
+> +		}
+>  
+> -	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
+>  		local_bh_disable();
+> -		dst = dst_cache_get(&ilwt->cache);
+> +		dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
+>  		local_bh_enable();
+>  
+> -		if (unlikely(!dst)) {
+> -			struct ipv6hdr *hdr = ipv6_hdr(skb);
+> -			struct flowi6 fl6;
+> -
+> -			memset(&fl6, 0, sizeof(fl6));
+> -			fl6.daddr = hdr->daddr;
+> -			fl6.saddr = hdr->saddr;
+> -			fl6.flowlabel = ip6_flowinfo(hdr);
+> -			fl6.flowi6_mark = skb->mark;
+> -			fl6.flowi6_proto = hdr->nexthdr;
+> -
+> -			dst = ip6_route_output(net, NULL, &fl6);
+> -			if (dst->error) {
+> -				err = dst->error;
+> -				dst_release(dst);
+> -				goto drop;
+> -			}
+> -
+> -			local_bh_disable();
+> -			dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
+> -			local_bh_enable();
+> -		}
+> +		err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+> +		if (unlikely(err))
+> +			goto drop;
+> +	}
+>  
+> -		skb_dst_drop(skb);
+> -		skb_dst_set(skb, dst);
+> +	skb_dst_drop(skb);
+> +	skb_dst_set(skb, dst);
 
-On Thu, Nov 07, 2024 at 09:46:11PM +0100, Michal Luczaj wrote:
->Short series fixing some memory leaks that I've stumbled upon while 
->toying
->with the selftests.
+Why the above 2 statements are not done only in case of ip address
+match, as in the existing code?
 
-Are these tests already upstream?
-I would like to add them to my suite, can you tell me how to run them?
+>  
+> +	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr))
+>  		return dst_output(net, sk, skb);
+> -	}
+
 
 Thanks,
-Stefano
 
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
->Changes in v2:
->- Remove the refactoring patch from the series [Stefano]
->- PATCH 2: Drop "virtio" from the commit title [Stefano]
->- Collect Reviewed-by [Stefano]
->- Link to v1: https://lore.kernel.org/r/20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co
->
->---
->Michal Luczaj (3):
->      virtio/vsock: Fix accept_queue memory leak
->      vsock: Fix sk_error_queue memory leak
->      virtio/vsock: Improve MSG_ZEROCOPY error handling
->
-> net/vmw_vsock/af_vsock.c                | 3 +++
-> net/vmw_vsock/virtio_transport_common.c | 9 +++++++++
-> 2 files changed, 12 insertions(+)
->---
->base-commit: 71712cf519faeed529549a79559c06c7fc250a15
->change-id: 20241106-vsock-mem-leaks-9b63e912560a
->
->Best regards,
->-- 
->Michal Luczaj <mhal@rbox.co>
->
+Paolo
 
 
