@@ -1,55 +1,52 @@
-Return-Path: <netdev+bounces-146162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1F19D2276
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:27:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24909D227B
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:28:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A941E1F229C5
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:27:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9827E281414
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7611A705C;
-	Tue, 19 Nov 2024 09:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C8B1AE018;
+	Tue, 19 Nov 2024 09:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="OBgK1bxg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Czr6kP3k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-25.smtpout.orange.fr [80.12.242.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642D619C54F;
-	Tue, 19 Nov 2024 09:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58AD146A73;
+	Tue, 19 Nov 2024 09:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732008436; cv=none; b=sqvSR4anK19onABy444a67Rj4uFNos0UL0RI7nAC9/5kK/KXne5Erz3TPdNWDXvHlIHIXUXRyRwRvZ69poAYMIz18+uI6mBA574zHjZPH9l9feeAbdZjRTCQVcMX+lAKv5RoHycs7m5vMgFiaDN1kPJURSYvl7A69rFY6MO9sMg=
+	t=1732008487; cv=none; b=uF7MBiLmr2hQM5sx8t5seljSc0REDtdDOfAhgaJOrusyvTX94XMilGEX5E/F66IQ5RKjSi8EJpH9kJYo+cxtulvSi0IvahQoIl1+qLTiGzg01XsVTStN02ACfEyGpESMWrGvgDS5dGc+cQIS5r8gd/QqZQPbeFtHjD24zEUhXks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732008436; c=relaxed/simple;
-	bh=f5ihpDJvqgir0zv3QuZSwywjiBQF+KN1/Y5HpEPSIiI=;
+	s=arc-20240116; t=1732008487; c=relaxed/simple;
+	bh=l6hYH+I/d3+UJSlXa8HB0USEK3x/u7b1hmfa+gelN5c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lRuYhGooZAxgn39t+4S2RjxBYLzf6pdif3D0sG9RxzQUjUWlIJp2xwj5ZcpzVM+zNzAdWQFxABUj73MzxeIulE3/BrV4A5SKHCAPlmZeZpsrAeP5vro5nTzojBLhY1g8b0+nAhp4WfPTSoZm3OqRfGtHoyPMNWb4HZ8wjdQ8/BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=OBgK1bxg; arc=none smtp.client-ip=80.12.242.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id DKVZtsAoVdDuoDKVatxUbR; Tue, 19 Nov 2024 10:27:03 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1732008423;
-	bh=fyZEfuN/RV8KWKotZDgCoJOAeqacw5DLGXuvDWF6C8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=OBgK1bxgCLcgXVA4T6noDrGW+Cl3qCA8KWHR+nbfwNGyShxwaeJoK7+F8hSFc3QG8
-	 oTd0onsCbce7dhtuxEJ2aKDFedzM5vl9GYJJFA7O0wWdUW/VeQ9r4fh7QhEaYx2tdq
-	 Oar18FH6zHMTp82VwAfIG6hJbYK8Diz4bi3cyez1f3Y814FrCrRq3Pn8jIfFghEIEw
-	 c+HehiRTck6rQQOoP/Qkq3zRgHebVY1tXwo/ZrsY6Jnzp37QqhvSz030Ky5iaXEzE4
-	 rtMFfpgNMbgfR1IF1vOkfal/AEg5E6YHih9R06ER90GINggZx308IJ0U3TArkiyP9I
-	 ZFLeV/cX/Gw8A==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 19 Nov 2024 10:27:03 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <57915ed9-e57e-4ca3-bc31-6405893c937e@wanadoo.fr>
-Date: Tue, 19 Nov 2024 18:26:51 +0900
+	 In-Reply-To:Content-Type; b=uH5+8tiPjq+aT5FESD41EL3Hr1MNVB5RKbkOxYvYwL7/tq8e+wduc71DCq18RedxwwufC5HAFz972JUK05gL1JBIuCwxaiD2NWXYjosRm3HDEeZDGfOL56pbmZzsO6QeI8RHJQ27hTgTQWFFEVchBePL25uTesRCBLwo/UoEanM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Czr6kP3k; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7AC911BF210;
+	Tue, 19 Nov 2024 09:28:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732008483;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OJFJAzaHJtAyyv/3A38xMOz0wya1baJ7i0fcR4cZHE4=;
+	b=Czr6kP3kyFhvkCye2LC+mi2d7NSViteSWrHph0CH1VvIWXvZ/yKKRSUK2xKWW33oCbAbsd
+	cdPa9iqHQ/+F8FGddQkwZoAweMTvqNRZlVJGXxfMiT2l1Wd3ApVJ5vjjUqFSmgq/RqyI+l
+	Ask/QVWKzxDLCP4uQfEyOe9NvX2G4KA2OtdUx9lCBOyms6dAHUr8ji3XcVCbmlgmRFbCVN
+	NuYRBrf7oB9p9T8WHGdZkClVRSWhRM0XV+whP05wnAeI+E5rUMt9f621lJC8WG5vqPD1YM
+	SyexSHszd1nK5Ti58uplcnlnpJn+5URDVkOWwo1gI1xYcNkV1TwtEpZ/JG0E6Q==
+Message-ID: <ffc76427-8268-4d48-ae5a-430b1129f6b0@bootlin.com>
+Date: Tue, 19 Nov 2024 10:28:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,151 +54,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
- lines
-To: Ciprian Costea <ciprianmarian.costea@oss.nxp.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>,
- Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>,
- Enric Balletbo <eballetb@redhat.com>
-References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
- <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+Subject: Re: [PATCH bpf-next v2 12/13] selftests/bpf: migrate bpf flow
+ dissectors tests to test_progs
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Bastien Curutchet <bastien.curutchet@bootlin.com>, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com>
+ <20241114-flow_dissector-v2-12-ee4a3be3de65@bootlin.com>
+ <ZzdyswzsKSYwkY__@mini-arch>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
 Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-In-Reply-To: <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+In-Reply-To: <ZzdyswzsKSYwkY__@mini-arch>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On 19/11/2024 at 17:10, Ciprian Costea wrote:
-> From: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+On 11/15/24 17:11, Stanislav Fomichev wrote:
+> On 11/14, Alexis Lothoré (eBPF Foundation) wrote:
+>> +		if (!ASSERT_GE(err, 0, "do_rx"))
+>> +			break;
 > 
-> On S32G2/S32G3 SoC, there are separate interrupts
-> for state change, bus errors, MBs 0-7 and MBs 8-127 respectively.
+> You seem to be already doing similar ASSERT_GE inside the do_rx, maybe
+> drop one?
+
+True, I'll drop the inner ASSERTS to align with do_tx.
+
+[...]
+
+>> +static void port_range_shutdown(void)
+>> +{
+>> +	remove_filter();
+>> +}
 > 
-> In order to handle this FlexCAN hardware particularity, reuse
-> the 'FLEXCAN_QUIRK_NR_IRQ_3' quirk provided by mcf5441x's irq
-> handling support.
+> nit: Maybe use remove_filter directly as .test_teardown? These extra
+> wrappers are not adding anything (imho).
+
+Yeah, I initially added port_range_shutdown to make init and shutdown functions
+"symmetrical", but in the end that's purely cosmetic. I'll use directly
+remove_filter.
+
+[...]
+
+>> +		test = (struct test_configuration *)&tests_input[i];
 > 
-> Additionally, introduce 'FLEXCAN_QUIRK_SECONDARY_MB_IRQ' quirk,
-> which can be used in case there are two separate mailbox ranges
-> controlled by independent hardware interrupt lines, as it is
-> the case on S32G2/S32G3 SoC.
-> 
-> Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-> ---
->  drivers/net/can/flexcan/flexcan-core.c | 25 +++++++++++++++++++++++--
->  drivers/net/can/flexcan/flexcan.h      |  3 +++
->  2 files changed, 26 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-> index f0dee04800d3..dc56d4a7d30b 100644
-> --- a/drivers/net/can/flexcan/flexcan-core.c
-> +++ b/drivers/net/can/flexcan/flexcan-core.c
-> @@ -390,9 +390,10 @@ static const struct flexcan_devtype_data nxp_s32g2_devtype_data = {
->  	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
->  		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_BROKEN_PERR_STATE |
->  		FLEXCAN_QUIRK_USE_RX_MAILBOX | FLEXCAN_QUIRK_SUPPORT_FD |
-> -		FLEXCAN_QUIRK_SUPPORT_ECC |
-> +		FLEXCAN_QUIRK_SUPPORT_ECC | FLEXCAN_QUIRK_NR_IRQ_3 |
->  		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
-> -		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-> +		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR |
-> +		FLEXCAN_QUIRK_SECONDARY_MB_IRQ,
->  };
->  
->  static const struct can_bittiming_const flexcan_bittiming_const = {
-> @@ -1771,12 +1772,21 @@ static int flexcan_open(struct net_device *dev)
->  			goto out_free_irq_boff;
->  	}
->  
-> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
-> +		err = request_irq(priv->irq_secondary_mb,
-> +				  flexcan_irq, IRQF_SHARED, dev->name, dev);
-> +		if (err)
-> +			goto out_free_irq_err;
-> +	}
+> nit: What's the purpose of the cast? Is it to de-constify? Can we
+> change run_test arguments to accept const struct test_configuration
+> ptr instead?
 
-Is the logic here correct?
+Yes, that's an omission on my side. I initially thought about making the test
+runner function rewrite some fields in the test configuration, but I finally did
+not need to do this. I'll drop the cast and propagate the const
 
-  request_irq(priv->irq_err, flexcan_irq, IRQF_SHARED, dev->name, dev);
+Thanks again for the review ! I'll prepare the next revision with all your
+comments addressed.
 
-is called only if the device has the FLEXCAN_QUIRK_NR_IRQ_3 quirk.
+Alexis
 
-So, if the device has the FLEXCAN_QUIRK_SECONDARY_MB_IRQ but not the
-FLEXCAN_QUIRK_NR_IRQ_3, you may end up trying to free an irq which was
-not initialized.
 
-Did you confirm if it is safe to call free_irq() on an uninitialized irq?
-
-(and I can see that currently there is no such device with
-FLEXCAN_QUIRK_SECONDARY_MB_IRQ but without FLEXCAN_QUIRK_NR_IRQ_3, but
-who knows if such device will be introduced in the future?)
-
->  	flexcan_chip_interrupts_enable(dev);
->  
->  	netif_start_queue(dev);
->  
->  	return 0;
->  
-> + out_free_irq_err:
-> +	free_irq(priv->irq_err, dev);
->   out_free_irq_boff:
->  	free_irq(priv->irq_boff, dev);
->   out_free_irq:
-> @@ -1808,6 +1818,9 @@ static int flexcan_close(struct net_device *dev)
->  		free_irq(priv->irq_boff, dev);
->  	}
->  
-> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ)
-> +		free_irq(priv->irq_secondary_mb, dev);
-> +
->  	free_irq(dev->irq, dev);
->  	can_rx_offload_disable(&priv->offload);
->  	flexcan_chip_stop_disable_on_error(dev);
-> @@ -2197,6 +2210,14 @@ static int flexcan_probe(struct platform_device *pdev)
->  		}
->  	}
->  
-> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
-> +		priv->irq_secondary_mb = platform_get_irq(pdev, 3);
-> +		if (priv->irq_secondary_mb < 0) {
-> +			err = priv->irq_secondary_mb;
-> +			goto failed_platform_get_irq;
-> +		}
-> +	}
-> +
->  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SUPPORT_FD) {
->  		priv->can.ctrlmode_supported |= CAN_CTRLMODE_FD |
->  			CAN_CTRLMODE_FD_NON_ISO;
-> diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/flexcan.h
-> index 4933d8c7439e..d4b1a954c538 100644
-> --- a/drivers/net/can/flexcan/flexcan.h
-> +++ b/drivers/net/can/flexcan/flexcan.h
-> @@ -70,6 +70,8 @@
->  #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
->  /* Setup stop mode with ATF SCMI protocol to support wakeup */
->  #define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
-> +/* Setup secondary mailbox interrupt */
-> +#define FLEXCAN_QUIRK_SECONDARY_MB_IRQ	BIT(18)
->  
->  struct flexcan_devtype_data {
->  	u32 quirks;		/* quirks needed for different IP cores */
-> @@ -105,6 +107,7 @@ struct flexcan_priv {
->  	struct regulator *reg_xceiver;
->  	struct flexcan_stop_mode stm;
->  
-> +	int irq_secondary_mb;
->  	int irq_boff;
->  	int irq_err;
->  
-
-Yours sincerely,
-Vincent Mailhol
-
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
