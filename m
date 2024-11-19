@@ -1,75 +1,46 @@
-Return-Path: <netdev+bounces-146136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B08549D215B
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:12:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2CF49D2160
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98E51B21BD1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:12:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CCE8B21525
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063291991D2;
-	Tue, 19 Nov 2024 08:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Vyd5bfff"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ED51586FE;
+	Tue, 19 Nov 2024 08:13:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8ABF15530B
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD271482E8;
+	Tue, 19 Nov 2024 08:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732003922; cv=none; b=JsUBDAEClhUKLOuMJ0fnnbHFxKka+kFc7X9WkDD/TCGG4K4txcXTB6MfwmcMWLa3Ko/fe86Ci8TMw1YRIdrLGsVbL1XmxMk3M0TJxzSFC07KVm0TbD19ULHsduKO1vP5jtMCpvRNJyU+xKAP3mZir47Lu25Xpq1J5uknWt06z8w=
+	t=1732004012; cv=none; b=bheK+oiHEu7X9k1VZiUODaIA2TA8XCw4SYl3rqlVxnGiRAjVl5l49Ar2GGfcDY/0FtpKLypBMCUm7nGNEWoja0Bb4WnjOzZUShKmuG2zqPxNlSUKZS/fxjRmU3PrHduIv7fVCrq2G3wBlOu+Fb6VL+dlws9/k3VvciTbLU4P7ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732003922; c=relaxed/simple;
-	bh=mZSOgAIJ9NQlBbnjGuNL9GCAEtQvEwE5gZPj8ZsPTmw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VTGzliXXehqFpK4GCIe5BVLlNmuXVmhyKfETIru1+M5vvDvQzLUsxwwn57SUYSQS3aeaYf+Cs1YRDQ7YSaVS2Jc1J2UNwTKpqCXBTbcVCcF8bK0gZEW6lEI+vJnp/WxKj08dsG9mP83YOsqojqr1+kaSXtv7TfI1OZuJCXMxfM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Vyd5bfff; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5cf6f804233so5603985a12.2
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:11:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1732003918; x=1732608718; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=S7sp6JKldxsMXdVOcOzkydJkQRdJp3pYKuEh/Kb4tLA=;
-        b=Vyd5bfffGxvxUQ/zNOGmBelb9TMd+YmTN1gnCFpJ9MyRM5jKoFzt/7W4kn4JNvwYOz
-         jeV3EidnG9rxywNPM/K4azhHzkpm52hiDCIbORqlSeGA6vCWkcZQ9O2d2SAU/Zdwm0ys
-         ZbeIJPjj82kfvkIwUHsVRy5/O12BvOb8/Hzka0MeNSyk99nlmnUDUaWCffHPYvMwEqUm
-         xJ2sRMNmFRygJgpQwhqdTbO2jtcWBY7CZqqJbxQ/6IfA79F9IXAD3m+FlYk35tasFxKO
-         0OiJ35WsyfmsHRivlNWtp0Nrnjt3OlqublsE5gULzH973KCADOCmXFismbDHaALClJVg
-         Q7WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732003918; x=1732608718;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S7sp6JKldxsMXdVOcOzkydJkQRdJp3pYKuEh/Kb4tLA=;
-        b=Nihc+4UeS/SBPspxUxsPDtIcTd8mFXoYbVEOl2rQXCUY36cF0YUuCIHs5BrL5TX4+3
-         5ttE/wYSE/akkwvuoc/B/y6A8nOQ6emyG2ZGoHaSwXZSXovDjEpqIHa9nvPeedyOfNk0
-         REe+tlOkkRK6Ak+SJBeB8+LeOrb5Bf4sviL6uHRk/XazB1hAQlYWwhwWAzJb4/K5I0D9
-         Z9X9wx/fBc18oNp9zIoKK7VSSLwuAMUe8U+f30VouJNijIFrijqCwECirpNxFMH4807a
-         GdP+7jtG73WVCOR+vbhTxqVTIhsymycMDoeEUpZ7DuPlT1q7ln/0pB4HdD87ciSPS1oZ
-         1sCg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUEaQ3cgK3yA0k3AZvNQnrqqLS49u8/PfKJbcq7kI8zkCeCN8jAJkNBMCQKErvHCLknudKdsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRUVSh9UGIonL8zhpF4GqDhqwyDWyppzB28+ThP/qrt9b+qb4H
-	/svAmZFBGn1v45BhjYm9Sm+RXiuljWx89mfqlAc+btGXZbWpqFtQgtdJXcso08E=
-X-Google-Smtp-Source: AGHT+IG020h4UTtFNYY64dTTB51Gnob4K6UqrXp/mnQSuAaHkXnUhr1wcyWGiHeDd682Pnk7dK4/jQ==
-X-Received: by 2002:a05:6402:5108:b0:5cf:c303:c598 with SMTP id 4fb4d7f45d1cf-5cfc303c7edmr5890132a12.11.1732003918227;
-        Tue, 19 Nov 2024 00:11:58 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:a2be:8cd5:8845:cfce? ([2001:67c:2fbc:1:a2be:8cd5:8845:cfce])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cfbddf326esm2461317a12.82.2024.11.19.00.11.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 00:11:57 -0800 (PST)
-Message-ID: <a374cd1d-b395-42d6-b7e8-083bd2d2f5dd@openvpn.net>
-Date: Tue, 19 Nov 2024 09:12:25 +0100
+	s=arc-20240116; t=1732004012; c=relaxed/simple;
+	bh=YutjBmox/hv7aW2stkLhLIQICRSFJZs1ziNBjr9iBLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=P2diMKnfvhemnYGFS6r4uk6hHj+E2AGbQLIdJZP98QvL9I8YdS8NaqEvaBzd1o7J0i8v2GwPNfThL/ylzquikD3aThiRLwVU3TL/F+su/lyHPbJ/VeL191v3dhr7DUn/WorhbnIoCkogZ6bhQG3Kl6iixxrQHuAfUhf2/TaZh+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XsxyL5XQyz1V4gB;
+	Tue, 19 Nov 2024 16:10:50 +0800 (CST)
+Received: from kwepemf200001.china.huawei.com (unknown [7.202.181.227])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8F172180B99;
+	Tue, 19 Nov 2024 16:13:27 +0800 (CST)
+Received: from [10.110.54.32] (10.110.54.32) by kwepemf200001.china.huawei.com
+ (7.202.181.227) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 19 Nov
+ 2024 16:13:26 +0800
+Message-ID: <debb5f7d-8031-4aab-93d6-dd54a37c6c1d@huawei.com>
+Date: Tue, 19 Nov 2024 16:13:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,114 +48,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 03/23] ovpn: add basic netlink support
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-3-de4698c73a25@openvpn.net>
- <52a2f654-29e5-4567-b5f8-8362fa55c1e1@gmail.com>
- <a8f3a9ca-698d-4b4e-ab4b-7d8aa651dddc@openvpn.net>
- <a125f933-b985-441e-9fac-49002bc5933a@gmail.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <a125f933-b985-441e-9fac-49002bc5933a@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH net-next 1/1] Separate locks for rmbs/sndbufs linked lists
+ of different lengths
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: <alibuda@linux.alibaba.com>, <dengguangxing@huawei.com>,
+	<dust.li@linux.alibaba.com>, <gaochao24@huawei.com>,
+	<guwen@linux.alibaba.com>, <jaka@linux.ibm.com>,
+	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<luanjianhai@huawei.com>, <netdev@vger.kernel.org>,
+	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>, <zhangxuzhou4@huawei.com>
+References: <20241118132147.1614-2-liqiang64@huawei.com>
+ <20241118204831.70974-1-kuniyu@amazon.com>
+From: Li Qiang <liqiang64@huawei.com>
+In-Reply-To: <20241118204831.70974-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemf200001.china.huawei.com (7.202.181.227)
 
-On 19/11/2024 03:05, Sergey Ryazanov wrote:
-> On 15.11.2024 12:05, Antonio Quartulli wrote:
->> On 09/11/2024 00:15, Sergey Ryazanov wrote:
->>> On 29.10.2024 12:47, Antonio Quartulli wrote:
->>>> @@ -37,7 +41,7 @@ static int ovpn_newlink(struct net *src_net, 
->>>> struct net_device *dev,
->>>>   }
->>>>   static struct rtnl_link_ops ovpn_link_ops = {
->>>> -    .kind = "ovpn",
->>>> +    .kind = OVPN_FAMILY_NAME,
->>>
->>> nit: are you sure that the link kind is the same as the GENL family? 
->>> I mean, they are both deriviated from the protocol name that is 
->>> common for both entities, but is it making RTNL kind a derivative of 
->>> GENL family?
->>
->> I just want to use the same name everywhere and I thought it doesn't 
->> make sense to create a separate define (they can be decoupled later 
->> should see any need for that).
->> But I can add:
->>
->> #define OVPN_RTNL_LINK_KIND OVPN_FAMILY_NAME
->>
->> to make this relationship explicit?
+
+
+在 2024/11/19 4:48, Kuniyuki Iwashima 写道:
+> From: liqiang <liqiang64@huawei.com>
+> Date: Mon, 18 Nov 2024 21:21:47 +0800
+>> @@ -596,10 +632,26 @@ static struct smc_buf_desc *smc_llc_get_next_rmb(struct smc_link_group *lgr,
+>>  static struct smc_buf_desc *smc_llc_get_first_rmb(struct smc_link_group *lgr,
+>>  						  int *buf_lst)
+>>  {
+>> -	*buf_lst = 0;
+>> +	smc_llc_lock_in_turn(lgr->rmbs_lock, buf_lst, SMC_LLC_INTURN_LOCK_INIT);
+>>  	return smc_llc_get_next_rmb(lgr, buf_lst, NULL);
+>>  }
+>>  
+>> +static inline void smc_llc_bufs_wrlock_all(struct rw_semaphore *lock, int nums)
+>> +{
+>> +	int i = 0;
+>> +
+>> +	for (; i < nums; i++)
+>> +		down_write(&lock[i]);
 > 
-> Can we just leave it as literal? This string is going to be a part of 
-> ABI and there will be no chance to change it in the future. So, what the 
-> purpose to define it using a macro if it's self-descriptive?
+> LOCKDEP will complain here.  You may want to test with
+> CONFIG_PROVE_LOCKING=y
 
-I don't truly have a strong opinion, but the netlink family name is also 
-expected to not change anytime soon.
-
-Anyway, I see that using the literal is pretty common across all other 
-drivers, therefore I'll go for it as well.
+Thanks for your reply, other implementations should be considered here.
 
 > 
-> People also like to define a macro with a generic name like DRV_NAME and 
-> use it everywhere. What also looks reasonable.
-
-Yeah, that's exactly how I am using OVPN_FAMILY_NAME.
-Anyway, I am switching to literal.
-
-Regards,
-
 > 
-> -- 
-> Sergey
+>> +}
+>> +
+>> +static inline void smc_llc_bufs_wrunlock_all(struct rw_semaphore *lock, int nums)
+>> +{
+>> +	int i = 0;
+>> +
+>> +	for (; i < nums; i++)
+>> +		up_write(&lock[i]);
+>> +}
+>> +
+>>  static int smc_llc_fill_ext_v2(struct smc_llc_msg_add_link_v2_ext *ext,
+>>  			       struct smc_link *link, struct smc_link *link_new)
+>>  {
+> 
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+Cheers,
+Li Qiang
 
 
