@@ -1,280 +1,127 @@
-Return-Path: <netdev+bounces-146141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943399D2199
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:30:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6AD9D21B1
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:38:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5320328168E
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:30:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D7D31F22233
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C2D1A00F2;
-	Tue, 19 Nov 2024 08:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGTtAHDG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFFC1925B3;
+	Tue, 19 Nov 2024 08:38:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B3419D06A
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D08158D96;
+	Tue, 19 Nov 2024 08:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732005005; cv=none; b=pukXz8wJHUwLMHlkn6sFv0cApnx1J7AWF5eMQ05UFO2N8Jxfh9COEnq0rv5XDjf9Lc+/knPK4Ey1U0PBdb3QmQ01Pwj43uosKntIjNRaISvL6fUa7xZcKopyJ70fTP0FmD2fSpzJUp6XNWpCs1by8P5N6v7EbY086wqkuhzb540=
+	t=1732005512; cv=none; b=ulejSL8LBm9cvTprUjZILGnBDCmUzdOqnDOnwx3EtKKmKJz3n0lq+V7Zryl8R5E0sjhbRunU8ZJ5I6nILoFgDZaCKbYBO3SJpbamNtjXTPaabeXtsuOj6DdrB4ePNdHHFL90/jEjh5a/a2KaLGJ9ehpSWoHHRK7NqbRlPwwOHFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732005005; c=relaxed/simple;
-	bh=+xKCrPwQVHWM0r18FvOpIwNqva/kAUIiweoFAE7ZwzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PFyOdBogJiQTzrbvexKDqyEulnv4BuiCwj4lMB7AITRtodYoqsv5uo+INpQwetpVewAe84zlqG0ggp2LXjEvCj912xRhOJQzlr5XI2wQQMWt2dvyaPReqnCi7aNM67THvwuKKjY9D+ENgbPXxfVEpGwa4tpx3OksFmAN/OwoBqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GGTtAHDG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732005002;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xTLxAWYQ1JNcTU0UUWCX6oUrShuLfa8MUCD9ctjzgKA=;
-	b=GGTtAHDGoa4//IKKyRRDqxZ1KbJ6UnluMRm/sPuc0S2gq1cwPRT8PWChHW8MXxwuwIVE9l
-	yx6g8cO+ZxtBHMrkM+CxoE52UtPTTOXZEKJH8F2nzK53tRlWXMdQ5FrTGc+jr1xZv4zirc
-	D1SB5sifdJKJsPLOdOUeJq8fxSF4APs=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-16-vULGM0f8NEuwos4PdIUb4A-1; Tue, 19 Nov 2024 03:30:01 -0500
-X-MC-Unique: vULGM0f8NEuwos4PdIUb4A-1
-X-Mimecast-MFC-AGG-ID: vULGM0f8NEuwos4PdIUb4A
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a9a22a62e80so44412966b.1
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:30:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732005000; x=1732609800;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xTLxAWYQ1JNcTU0UUWCX6oUrShuLfa8MUCD9ctjzgKA=;
-        b=NK/ITK6PQjGbqeNAPSctRquy7Gnaq0C5RiupaQP45/9JYNA5RINIkILws4nGzqbUMA
-         /JDaVgVqkSZQrVDNX7xBmeJ+Pm4OletIEr75pFEQxybiWGvlTuTVQFTujq4pJqqpcyyD
-         NkKBxBEW6WSh/uZ5hb9WcrIgfyxTWsDT/cfQ4Ll+4j019JanA3YNZa5CUhbbihelpc0P
-         WRXkOBjHTNbM8QpEm1dc1dV5NGxQ47fqyPknN1KO7lszFYHiJ4vimzo95YykZ1BDkUU5
-         ZRw2ijb3YX1Y230uHD67LbXMmyrUG7chRJjL8/qFWUUsCW1rDI/CWnFW4AP3NWQC2MOE
-         Mjag==
-X-Gm-Message-State: AOJu0YzO7ql2NaTEXZWKZrCpo3hsQ+ghJlKjG3FXhAPAOCauAGFXivDu
-	2SW703M4IKoKN8qcYunAcusQ7INLAV2iVren96GA9eAhQEcIo76tJHPWX+3bpA7/eENFIsBSoy7
-	vx8DZB2+RNkq2fJZUCABXFezV6zrcFBCh2tePI/A5tGcgb+UVU7EJ0g==
-X-Received: by 2002:a17:907:d19:b0:a9e:b5d0:4ab7 with SMTP id a640c23a62f3a-aa483556727mr1382682566b.52.1732005000139;
-        Tue, 19 Nov 2024 00:30:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFxd7z957UsxaATiVx0EDfbn0BFQH51aHLzQfor6HWy4iT3aPDneL8plKb/5vnwG3RSEd0qgw==
-X-Received: by 2002:a17:907:d19:b0:a9e:b5d0:4ab7 with SMTP id a640c23a62f3a-aa483556727mr1382676566b.52.1732004999357;
-        Tue, 19 Nov 2024 00:29:59 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-129.retail.telecomitalia.it. [79.46.200.129])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20df4e7bfsm624064866b.42.2024.11.19.00.29.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 00:29:58 -0800 (PST)
-Date: Tue, 19 Nov 2024 09:29:53 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Graf <graf@amazon.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, Asias He <asias@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <efsbknrsmen47tlay7cjrbo5qvmu4bcrmi2lvploi6qq5wpwet@wuu5mfgc3a34>
-References: <20241115103016.86461-1-graf@amazon.com>
- <yjhfe5bsnfpqbnibxl2urrnuowzitxnrbodlihz4y5csig7e7p@drgxxxxgokfo>
- <dca2f6ff-b586-461d-936d-e0b9edbe7642@amazon.com>
- <CAGxU2F6eJA+vpYVbE0HNW794pF6wLL+o=92NYMQVvmFWnpNPaA@mail.gmail.com>
+	s=arc-20240116; t=1732005512; c=relaxed/simple;
+	bh=8MOZvwOA2k/at8HFZualT9WLA3LcWXeKk9wIaUaDI/E=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=oeOxC6usWSjjAtzRSPX7iAgYAvNBpB1Go6ao1WLPgfy+lSdNbe8HqpDXQBHxtapVu2HGZ2w0lpEZNKsL3Wiz9bOkX2S7r99dpAgpkOw8n/BKKR5aL5b8iGoWiByM+j562oba6GYfMIs0LlvdluwrXlnBvFI0RsSLERT0voLFH/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XsyWB1sppz1V4kG;
+	Tue, 19 Nov 2024 16:35:50 +0800 (CST)
+Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1D104180105;
+	Tue, 19 Nov 2024 16:38:27 +0800 (CST)
+Received: from kwepemn500013.china.huawei.com (7.202.194.154) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 19 Nov 2024 16:38:26 +0800
+Received: from dggpeml100007.china.huawei.com (7.185.36.28) by
+ kwepemn500013.china.huawei.com (7.202.194.154) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 19 Nov 2024 16:38:26 +0800
+Received: from dggpeml100007.china.huawei.com ([7.185.36.28]) by
+ dggpeml100007.china.huawei.com ([7.185.36.28]) with mapi id 15.01.2507.039;
+ Tue, 19 Nov 2024 16:38:26 +0800
+From: mengkanglai <mengkanglai2@huawei.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "dsahern@kernel.org"
+	<dsahern@kernel.org>, "edumazet@google.com" <edumazet@google.com>, "Fengtao
+ (fengtao, Euler)" <fengtao40@huawei.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Yanan
+ (Euler)" <yanan@huawei.com>
+Subject: =?gb2312?B?UkU6tPC4tDoga2VybmVsIHRjcCBzb2NrZXRzIHN0dWNrIGluIEZJTl9XQUlU?=
+ =?gb2312?Q?1_after_call_tcp=5Fclose?=
+Thread-Topic: =?gb2312?B?tPC4tDoga2VybmVsIHRjcCBzb2NrZXRzIHN0dWNrIGluIEZJTl9XQUlUMSBh?=
+ =?gb2312?Q?fter_call_tcp=5Fclose?=
+Thread-Index: Ads6WLnMxTxT5H3UTJOsoe68wa8MAw==
+Date: Tue, 19 Nov 2024 08:38:26 +0000
+Message-ID: <d46151818b694dc79b488061817d3d73@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGxU2F6eJA+vpYVbE0HNW794pF6wLL+o=92NYMQVvmFWnpNPaA@mail.gmail.com>
 
-On Mon, Nov 18, 2024 at 03:07:43PM +0100, Stefano Garzarella wrote:
->On Fri, Nov 15, 2024 at 4:49 PM Alexander Graf <graf@amazon.com> wrote:
->>
->> Hi Stefano,
->>
->> On 15.11.24 12:59, Stefano Garzarella wrote:
->> >
->> > On Fri, Nov 15, 2024 at 10:30:16AM +0000, Alexander Graf wrote:
->> >> Ever since the introduction of the virtio vsock driver, it included
->> >> pushback logic that blocks it from taking any new RX packets until the
->> >> TX queue backlog becomes shallower than the virtqueue size.
->> >>
->> >> This logic works fine when you connect a user space application on the
->> >> hypervisor with a virtio-vsock target, because the guest will stop
->> >> receiving data until the host pulled all outstanding data from the VM.
->> >
->> > So, why not skipping this only when talking with a sibling VM?
->>
->>
->> I don't think there is a way to know, is there?
->>
->
->I thought about looking into the header and check the dst_cid.
->If it's > VMADDR_CID_HOST, we are talking with a sibling VM.
->
->>
->> >
->> >>
->> >> With Nitro Enclaves however, we connect 2 VMs directly via vsock:
->> >>
->> >>  Parent      Enclave
->> >>
->> >>    RX -------- TX
->> >>    TX -------- RX
->> >>
->> >> This means we now have 2 virtio-vsock backends that both have the
->> >> pushback
->> >> logic. If the parent's TX queue runs full at the same time as the
->> >> Enclave's, both virtio-vsock drivers fall into the pushback path and
->> >> no longer accept RX traffic. However, that RX traffic is TX traffic on
->> >> the other side which blocks that driver from making any forward
->> >> progress. We're not in a deadlock.
->> >>
->> >> To resolve this, let's remove that pushback logic altogether and rely on
->> >> higher levels (like credits) to ensure we do not consume unbounded
->> >> memory.
->> >
->> > I spoke quickly with Stefan who has been following the development from
->> > the beginning and actually pointed out that there might be problems
->> > with the control packets, since credits only covers data packets, so
->> > it doesn't seem like a good idea remove this mechanism completely.
->>
->>
->> Can you help me understand which situations the current mechanism really
->> helps with, so we can look at alternatives?
->
->Good question!
->I didn't participate in the initial development, so what I'm telling
->you is my understanding.
->@Stefan feel free to correct me!
->
->The driver uses a single workqueue (virtio_vsock_workqueue) where it
->queues several workers. The ones we are interested in are:
->1. the one to handle avail buffers in the TX virtqueue (send_pkt_work)
->2. the one for used buffers in the RX virtqueue (rx_work)
->
->Assuming that the same kthread executes the different workers, it
->seems to be more about making sure that the RX worker (i.e. rx_work)
->does not consume all the execution time, leaving no room for TX
->(send_pkt_work). Especially when there are a lot of messages queued in
->the TX queue that are considered as response for the host. (The
->threshold seems to be the size of the virtqueue).
->
->That said, perhaps just adopting a technique like the one in vhost
->(byte_weight in vhost_dev_init(), vhost_exceeds_weight(), etc.) where
->after a certain number of packets/bytes handled, the worker terminates
->its work and reschedules, could give us the same guarantees, in a
->simpler way.
-
-Thinking more about, perhaps now I understand better why it was
-introduced, and it should be related to the above.
-
-In practice, "replies" are almost always queued in the intermediate
-queue (send_pkt_queue) directly by the RX worker (rx_work) during its
-execution. These are direct responses handled by
-virtio_transport_recv_pkt() to requests coming from the other peer (the
-host usually or sibling VM in your case). This happens for example
-calling virtio_transport_reset_no_sock() if a socket is not found, or
-sending back VIRTIO_VSOCK_OP_RESPONSE packet to ack a request of a
-connection coming with a VIRTIO_VSOCK_OP_REQUEST packet.
-
-Because of this, if the number of these "replies" exceeds an arbitrary
-threshold, the RX worker decides to de-schedule itself, to give space to
-the TX worker (send_pkt_work) to move those "replies" from the
-intermediate queue into the TX virtqueue, at which point the TX worker
-will reschedule the RX worker to continue the job. So more than avoiding
-deadlock, it seems to be a mechanism to avoid starvation.
-
-Note that this is not necessary in vhost-vsock (which uses the same
-functions as this driver, e.g. virtio_transport_recv_pkt), because both
-workers already use vhost_exceeds_weight() to avoid this problem as
-well.
-
-At this point I think that doing something similar to vhost here as well
-would allow us not only to avoid the problem that `queued_replies`
-should avoid, but also that the RX worker monopolizes the workqueue
-during data transfer.
-
-Thanks,
-Stefano
-
->
->>
->>
->> >
->> >>
->> >> Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
->> >
->> > I'm not sure we should add this Fixes tag, this seems very risky
->> > backporting on stable branches IMHO.
->>
->>
->> Which situations do you believe it will genuinely break anything in?
->
->The situation for which it was introduced (which I don't know
->precisely because I wasn't following vsock yet).
->Removing it completely without being sure that what it was developed
->for is okay is risky to me.
->
->Support for sibling VMs has only recently been introduced, so I'd be
->happier making these changes just for that kind of communication.
->
->That said, the idea of doing like vhost might solve all our problems,
->so in that case maybe it might be okay.
->
->> As
->> it stands today, if you run upstream parent and enclave and hammer them
->> with vsock traffic, you get into a deadlock. Even without the flow
->> control, you will never hit a deadlock. But you may get a brown-out like
->> situation while Linux is flushing its buffers.
->>
->> Ideally we want to have actual flow control to mitigate the problem
->> altogether. But I'm not quite sure how and where. Just blocking all
->> receiving traffic causes problems.
->>
->>
->> > If we cannot find a better mechanism to replace this with something
->> > that works both guest <-> host and guest <-> guest, I would prefer
->> > to do this just for guest <-> guest communication.
->> > Because removing this completely seems too risky for me, at least
->> > without a proof that control packets are fine.
->>
->>
->> So your concern is that control packets would not receive pushback, so
->> we would allow unbounded traffic to get queued up?
->
->Right, most of `reply` are control packets (reset and response IIUC)
->that are not part of the credit mechanism, so I think this confirms
->what Stefan was telling me.
->
->> Can you suggest
->> options to help with that?
->
->Maybe mimic vhost approach should help, or something similar.
->
->That said, did you really encounter a real problem or is it more of a
->patch to avoid future problems.
->
->Because it would be nice to have a test that emphasizes this problem
->that we can use to check that everything is okay if we adopt something
->different. The same goes for the problem that this mechanism wants to
->avoid, I'll try to see if I have time to write a test so we can use
->it.
->
->
->Thanks,
->Stefano
-
+PiAtLS0tLdPKvP7Urbz+LS0tLS0NCj4gt6K8/sjLOiBLdW5peXVraSBJd2FzaGltYSA8a3VuaXl1
+QGFtYXpvbi5jb20+IA0KPiC3osvNyrG85DogMjAyNMTqMTHUwjE0yNUgMjo1Ng0KPiDK1bz+yMs6
+IG1lbmdrYW5nbGFpIDxtZW5na2FuZ2xhaTJAaHVhd2VpLmNvbT4NCj4gs63LzTogZGF2ZW1AZGF2
+ZW1sb2Z0Lm5ldDsgZHNhaGVybkBrZXJuZWwub3JnOyBlZHVtYXpldEBnb29nbGUuY29tOyBGZW5n
+dGFvIChmZW5ndGFvLCBFdWxlcikgPGZlbmd0YW80MEBodWF3ZWkuY29tPjsga3ViYUBrZXJuZWwu
+b3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBuZXRkZXZAdmdlci5rZXJuZWwub3Jn
+OyBwYWJlbmlAcmVkaGF0LmNvbTsgWWFuYW4gKEV1bGVyKSA8eWFuYW5AaHVhd2VpLmNvbT47IGt1
+bml5dUBhbWF6b24uY29tDQo+INb3zOI6IFJlOiBrZXJuZWwgdGNwIHNvY2tldHMgc3R1Y2sgaW4g
+RklOX1dBSVQxIGFmdGVyIGNhbGwgdGNwX2Nsb3NlDQo+IA0KPiBGcm9tOiBtZW5na2FuZ2xhaSA8
+bWVuZ2thbmdsYWkyQGh1YXdlaS5jb20+DQo+IERhdGU6IFdlZCwgMTMgTm92IDIwMjQgMTI6NDA6
+MzQgKzAwMDANCj4gPiBIZWxsbywgRXJpYzoNCj4gPiBDb21taXQgMTUxYzljNzI0ZDA1ICh0Y3A6
+IHByb3Blcmx5IHRlcm1pbmF0ZSB0aW1lcnMgZm9yIGtlcm5lbCANCj4gPiBzb2NrZXRzKSBpbnRy
+b2R1Y2UgaW5ldF9jc2tfY2xlYXJfeG1pdF90aW1lcnNfc3luYyBpbiB0Y3BfY2xvc2UuDQo+ID4g
+Rm9yIGtlcm5lbCBzb2NrZXRzIGl0IGRvZXMgbm90IGhvbGQgc2stPnNrX25ldF9yZWZjbnQsIGlm
+IHRoaXMgaXMgDQo+ID4ga2VybmVsIHRjcCBzb2NrZXQgaXQgd2lsbCBjYWxsIHRjcF9zZW5kX2Zp
+biBpbiBfX3RjcF9jbG9zZSB0byBzZW5kIEZJTiANCj4gPiBwYWNrZXQgdG8gcmVtb3RlcyBzZXJ2
+ZXIsDQo+IA0KPiBKdXN0IGN1cmlvdXMgd2hpY2ggc3Vic3lzdGVtIHRoZSBrZXJuZWwgc29ja2V0
+IGlzIGNyZWF0ZWQgYnkuDQo+IA0KPiBSZWNlbnRseSwgQ0lGUyBhbmQgc3VucnBjIGFyZSAoYmVp
+bmcpIGNvbnZlcnRlZCB0byBob2xkIG5ldCByZWZjbnQuDQo+IA0KPiBDSUZTOiBodHRwczovL2dp
+dC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC90b3J2YWxkcy9saW51eC5naXQv
+Y29tbWl0Lz9pZD1lZjcxMzRjN2ZjNDhlMTQ0MWIzOThlNTVhODYyMjMyODY4YTZmMGE3DQo+IHN1
+bnJwYzogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzIwMjQxMTEyMTM1NDM0LjgwMzg5
+MC0xLWxpdWppYW41NkBodWF3ZWkuY29tLw0KPiANCj4gSSByZW1lbWJlciBSRFMncyBsaXN0ZW5l
+ciBkb2VzIG5vdCBob2xkIHJlZmNudCBidXQgb3RoZXIgY2xpZW50IHNvY2tldHMgKFNNQywgUkRT
+LCBNUFRDUCwgQ0lGUywgc3VucnBjKSBkby4NCj4gDQo+IEkgdGhpbmsgYWxsIFRDUCBrZXJuZWwg
+c29ja2V0cyBzaG91bGQgaG9sZCBuZXRucyByZWZjbnQgZXhjZXB0IGZvciBvbmUgY3JlYXRlZCBh
+dCBwZXJuZXRfb3BlcmF0aW9ucy5pbml0KCkgaG9vayBsaWtlIFJEUy4NCj4gDQo+ID4gaWYgdGhp
+cyBmaW4gcGFja2V0IGxvc3QgZHVlIHRvIG5ldHdvcmsgZmF1bHRzLCB0Y3Agc2hvdWxkIHJldHJh
+bnNtaXQgDQo+ID4gdGhpcyBmaW4gcGFja2V0LCBidXQgdGNwX3RpbWVyIHN0b3BwZWQgYnkgaW5l
+dF9jc2tfY2xlYXJfeG1pdF90aW1lcnNfc3luYy4NCj4gPiB0Y3Agc29ja2V0cyBzdGF0ZSB3aWxs
+IHN0dWNrIGluIEZJTl9XQUlUMSBhbmQgbmV2ZXIgZ28gYXdheS4gSSB0aGluayANCj4gPiBpdCdz
+IG5vdCByaWdodC4NCg0KDQpJIGZvdW5kIHRoaXMgcHJvYmxlbSB3aGVuIHRlc3RpbmcgbmZzLiBz
+dW5ycGM6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL25ldGRldi8yMDI0MTExMjEzNTQzNC44MDM4
+OTAtMS1saXVqaWFuNTZAaHVhd2VpLmNvbS8gd2lsbCBzb2x2ZSB0aGlzIHByb2JsZW0uIA0KSSBh
+Z3JlZSB3aXRoIHRoYXQgYWxsIFRDUCBrZXJuZWwgc29ja2V0cyBzaG91bGQgaG9sZCBuZXRucyBy
+ZWZjbnQuDQpIb3dldmVyLCBmb3Iga2VybmVsIHRjcCBzb2NrZXRzIGNyZWF0ZWQgYnkgb3RoZXIg
+a2VybmVsIG1vZHVsZXMgdGhyb3VnaCBzb2NrX2NyZWF0ZV9rZXJuIG9yIHNrX2FsbG9jKGtlcm49
+MCksIGl0IG1lYW5zIHRoYXQgdGhleSBtdXN0IG5vdyBob2xkIHNrX25ldF9yZWZjbmYsIG90aGVy
+d2lzZSBmaW4gd2lsbCBvbmx5IGJlIHNlbnQgb25jZSBhbmQgd2lsbCBub3QgYmUgcmV0cmFuc21p
+dHRlZCB3aGVuIHRoZSBzb2NrZXQgaXMgcmVsZWFzZWQuQnV0IG90aGVyIHVzZSB0Y3AgbW9kdWxl
+cyBtYXkgbm90IGJlIGF3YXJlIG9mIGhvbGQgc2tfbmV0X3JlZmNudC4gc2hvdWxkIHdlIGFkZCBh
+IGNoZWNrIGluIHRjcF9jbG9zZaO/DQoNCi0tLQ0KZGlmZiAtLWdpdCBhL25ldC9pcHY0L3RjcC5j
+IGIvbmV0L2lwdjQvdGNwLmMNCmluZGV4IGZiOTIwMzY5Yy4uNmI5MjAyNmE0IDEwMDY0NA0KLS0t
+IGEvbmV0L2lwdjQvdGNwLmMNCisrKyBiL25ldC9pcHY0L3RjcC5jDQpAQCAtMjgwNCw3ICsyODA0
+LDcgQEAgdm9pZCB0Y3BfY2xvc2Uoc3RydWN0IHNvY2sgKnNrLCBsb25nIHRpbWVvdXQpDQogICAg
+ICAgIGxvY2tfc29jayhzayk7DQogICAgICAgIF9fdGNwX2Nsb3NlKHNrLCB0aW1lb3V0KTsNCiAg
+ICAgICAgcmVsZWFzZV9zb2NrKHNrKTsNCi0gICAgICAgaWYgKCFzay0+c2tfbmV0X3JlZmNudCkN
+CisgICAgICAgaWYgKHNrLT5uZXQgIT0gJmluaXRfbmV0ICYmICFzay0+c2tfbmV0X3JlZmNudCkN
+CiAgICAgICAgICAgICAgICBpbmV0X2Nza19jbGVhcl94bWl0X3RpbWVyc19zeW5jKHNrKTsNCiAg
+ICAgICAgc29ja19wdXQoc2spOw0KIH0NCg==
 
