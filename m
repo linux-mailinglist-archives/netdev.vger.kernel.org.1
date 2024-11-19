@@ -1,158 +1,118 @@
-Return-Path: <netdev+bounces-146314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F939D2CF0
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:48:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D721F9D2C2C
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 18:11:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E53F2B3049C
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:09:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 856551F215E9
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 17:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8351D0E10;
-	Tue, 19 Nov 2024 17:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A061D0B95;
+	Tue, 19 Nov 2024 17:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V+EI5x9f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BSgW026t"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DF125763;
-	Tue, 19 Nov 2024 17:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA3B1D0967;
+	Tue, 19 Nov 2024 17:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732036189; cv=none; b=CJ46I1WlfyfAPDPH3GlKhmloRYEfZwnsTZvOQyr2c7XAvfSQ13eDdTdG1z4emGw+/IoM7MeDEh1VLciqFR+P0+aqhgsqcI9/dr3v24o/q/8EFi1NF4CNJA8NDGdOCyTvjxAJLddlCd48ajHfcvreTaRZUXfCmPzPOfoKoSnfXnw=
+	t=1732036271; cv=none; b=V+dttQlMueAgxjW/9pSj9oUroMl4XcWEuSGykQSk1s8x+KdfmxrWDgrdFkyZ/HpRP3uZauvCfkaBNRT3CY1tVUrYKT+VWAwBh8TEAJKW+J9XGPlPoDwJoCNyzWTTJihBhoNBjLkE8ypH2QaiGbK2Ia5uB//SludCyRrzG/GaSJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732036189; c=relaxed/simple;
-	bh=L6lD6VmUqKcxEpjKjYStL9tVt6sSY1vJPeuxibqExWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NR5BQNyA7o1X9Ga2pLTzYcDtd0klVW1dx6dGIWSNrd4Vn/MFIxBhhQWYF8nymWt8+9q7PgqUr30CnhmBiXUZqLgMcKdV5Upb2OKC35m6boLez0xjVQxC95suvYPB7o4KD2UED8ujf2CsI8/h7+Sg5w2lYV5ck6Kbci3I8z2n7QQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V+EI5x9f; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2g7o3qX8HNqQpFdW0w76lQBmquzjn2sh9zKqXbBe8z0=; b=V+EI5x9fdojHa+anMP+6+G+WQt
-	Jn4L/qLS3VTeYjRZ+pBRZLjIEE8enEx4vn2xbr/luVIYyY6m9nDcQs7pVPOy0lxeGqPvCVMDwAx1A
-	HNMs0PYLQYjSkhPD62Wcj+J4sjXT4LxLIBdYIae6PZhJXGxRDEemHRtx/4aHCAQ2U5jKJM19Crozs
-	y1PG0S6Sjr3H0yCuZN1ohVwOfvvn6D6b2OSeWmvplezsngcROc8iU9+ti2ZvRZoKjtCUwAgXct6vj
-	nVcTMFHA5wpxhl9NB2eNsLGxBwYL4S+6y61wRoLiSm7qyddvniWDjQaqO9JSFFo4xRL+lYoQLvQPF
-	R973z1sQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33436)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tDRj6-00047C-1y;
-	Tue, 19 Nov 2024 17:09:21 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tDRj1-0006En-2U;
-	Tue, 19 Nov 2024 17:09:15 +0000
-Date: Tue, 19 Nov 2024 17:09:15 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: jan.petrous@oss.nxp.com
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v5 16/16] net: stmmac: platform: Fix PTP clock rate
- reading
-Message-ID: <ZzzGO5zgDvIK6JJ_@shell.armlinux.org.uk>
-References: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
- <20241119-upstream_s32cc_gmac-v5-16-7dcc90fcffef@oss.nxp.com>
+	s=arc-20240116; t=1732036271; c=relaxed/simple;
+	bh=3eB8JTS8q4GTl9FnLSmmAdqR6Vgm1FF7PeV0Sku2fOo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n+tokIfCr83RbO8O2PSyMiutjlgQzF4IrwQeCIzMip68s7EAeoPhRwA601b8ih6uPla3OeuwSqynqjllMFDzfJ4gSHGR3+j+qCOsyBciYLkk6AvuhStXhYM1VFFumtczvtYo/I9x/xsFARdoYOAgi7525sN2dgeXJiK+YlJvIv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BSgW026t; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9e44654ae3so732272366b.1;
+        Tue, 19 Nov 2024 09:11:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732036268; x=1732641068; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3eB8JTS8q4GTl9FnLSmmAdqR6Vgm1FF7PeV0Sku2fOo=;
+        b=BSgW026tMn0bZseBke1z7Zzmcpw1qbPBzmZYOL7iwCG86leOeEH5tySDlmr5ngtrc3
+         9DYtTYzvQezS5zVnCUZ209iJylmBhVFa4oqRjQuimRv/ZZbjrLRZRGSmXixuMtoD2N+c
+         7DBpyiYrN7RZrDEQy0pCG28hb+gNeHtIYPweSQJu2FKKjDyifURWYIiYFEtMDw9RJuIv
+         GD+WJbvbGT8FOu5cpJdzg/DThpftTTyXoQF1L+RSeHK+UvDGWrRz/bHVO33c9g757lZe
+         gHO04pFCGmp792YXJ6OsWW999WSYxu7HEA16DerB/mFj56j/LsBHUekFHJBZNhNnLUIw
+         jqnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732036268; x=1732641068;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3eB8JTS8q4GTl9FnLSmmAdqR6Vgm1FF7PeV0Sku2fOo=;
+        b=ZiaJAwE52t0+GkWJouV6/4Aoim2qpv0jhVNO5nzLQaB5Ny5+m5WxDinw9V9k4qzdw/
+         gwB+nuYU3AhkITWE8PIHfU8l6BGq/3ZmqCpees+EU6xdxx14MdZY2ZAqKDVig69XtPmn
+         QXRW62yZJ+NJbmnrY+htpg+THOU7caeHkCRrKBkrVtS/FS+ti8cxsIl3x6aQtG2tPrZF
+         KKhyv4xn95MxnLdzRDB51PKu0JoeZIFGdaDL/YkvRScStTwQnFfzj+zKCWtOxLdrx36h
+         NCIdiDBL8B9yvkHEkedQzCpohRakOCOCFbgWYpP5fG4hUlRvvPDKswpYIZgVVGBkLgod
+         t3BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDUV9bpWZD70OUWilEpisda4wN2iuG9tYiCQtwu0UX7xK2E67ZQiy3Hv+DUIc0+JWKoyAeG1yp@vger.kernel.org, AJvYcCUvvC3F508RuGKo+a9MSShx63Y/fVrVIaWWdSvzgha0EPsZSFCGTdYgfaF+JOx/p1ltiW1EEVW0iTjsWI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYxKqlpnt9PM/w8vW9igUfNvLfZzxa4zB4f/LQRHK8EMgCBYDE
+	jrr1EspnQHPI72yPsJre3n4OmXCX5/qL1xcemA3yLGIZanK6IbVwtKJd5P4y+zysjFQSrNexrYv
+	DRDz4421JjW9m/7NYsVGD07A7akQ=
+X-Google-Smtp-Source: AGHT+IEqLza03QisK2XVyzlo7WJSd8LkXpH8Z02+OCqp+DU0oBPgqAy2zWR5gt6GUQAk71pWPVJuKjfju8RaHEwE8mg=
+X-Received: by 2002:a17:907:3181:b0:a9a:15fb:727a with SMTP id
+ a640c23a62f3a-aa48340f21fmr1457050966b.13.1732036268062; Tue, 19 Nov 2024
+ 09:11:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119-upstream_s32cc_gmac-v5-16-7dcc90fcffef@oss.nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20241113200001.3567479-1-bjohannesmeyer@gmail.com>
+ <20241114193855.058f337f@kernel.org> <CAOZ5it3cgGB6D8jsFp2oRCY5DpO5hoomsi-OvP+55R2cfwkGgA@mail.gmail.com>
+ <20241118161615.2d0f101b@kernel.org>
+In-Reply-To: <20241118161615.2d0f101b@kernel.org>
+From: Brian Johannesmeyer <bjohannesmeyer@gmail.com>
+Date: Tue, 19 Nov 2024 10:10:54 -0700
+Message-ID: <CAOZ5it1S+fiV5Nz8Fivq0MM3dLFS+Rv90v9izgGkZMJhz69fXQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] vmxnet3: Fix inconsistent DMA accesses
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ronak Doshi <ronak.doshi@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Raphael Isemann <teemperor@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 19, 2024 at 04:00:22PM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> 
-> The stmmac driver supports many vendors SoCs using Synopsys-licensed
-> Ethernet controller IP. Most of these vendors reuse the stmmac_platform
-> codebase, which has a potential PTP clock initialization issue.
-> The PTP clock rate reading might require ungating what is not provided.
-> 
-> Fix the PTP clock initialization by enabling it immediately.
-> 
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index b1e4df1a86a0..db3e8ef4fc3a 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -632,7 +632,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
->  	clk_prepare_enable(plat->pclk);
->  
->  	/* Fall-back to main clock in case of no PTP ref is passed */
-> -	plat->clk_ptp_ref = devm_clk_get(&pdev->dev, "ptp_ref");
-> +	plat->clk_ptp_ref = devm_clk_get_enabled(&pdev->dev, "ptp_ref");
->  	if (IS_ERR(plat->clk_ptp_ref)) {
->  		plat->clk_ptp_rate = clk_get_rate(plat->stmmac_clk);
->  		plat->clk_ptp_ref = NULL;
+> What is the purpose of the first patch? Is it sufficient to make
+> the device work correctly?
+The purpose of the first patch is to fix the inconsistent accesses in
+`vmxnet3_probe_device()`. This only partially fixes the issue,
+however, because there are inconsistent accesses elsewhere in the
+driver. So, no, it does not make the device work *entirely* correctly.
 
-Looking at where the driver makes use of clk_ptp_ref, it currently
-prepares and enables this clock via stmmac_open(), disables and
-unprepares via stmmac_release().
+> If yes, why do we need patch 2.
+> If no, why do we have patch 1, instead of a revert / patch 2...
+The answer is that the way I submitted this patch series was a
+mistake. Specifically, I submitted it as: (i) patch 1 is applied on
+master, *and* (ii) patch 2 is applied on patch 1.
 
-There could be a platform where this is being used as a power saving
-measure, and replacing devm_clk_get() with devm_clk_get_enabled() will
-defeat that.
+Instead, the way I should have submitted it was: (i) patch 1 is
+applied on master, *or* (ii) a corrected version of patch 2 is applied
+on master. (By "a corrected version of patch 2", I mean not
+pointlessly reverting patch 1.)
 
-I would suggest that if you need the clock to be enabled in order to
-get its rate, then the call to clk_get_rate() should have the
-enable/disable around it to allow these other sites to work as they
-have done.
+The difference being:
+- If `adapter` *should* be mapped to DMA, then patch 1 is the way to go. Or,
+- If `adapter` *should not* be mapped to DMA, then a corrected version
+of patch 2 is the way to go.
 
-Alternatively, we may take the view that the power saving is not
-necessary, or stopping the clock is not a good idea (loss of time
-in the 1588 block?) so the above changed would be sensible but only
-if the clk_prepare_enable() and clk_disable_unprepare() calls on
-this particular clock are also removed.
+I hope this clears things up. I'm sorry for the confusion I caused. I
+will submit a V2 patch series that makes this clear.
 
-I can't say which is the correct way forward.
+Thanks,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Brian
 
