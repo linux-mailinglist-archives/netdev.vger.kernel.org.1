@@ -1,148 +1,150 @@
-Return-Path: <netdev+bounces-146228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09EEC9D254B
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:10:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1479D254E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5F481F21B67
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:10:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38F24B23B10
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D001CBE92;
-	Tue, 19 Nov 2024 12:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674951CBE9C;
+	Tue, 19 Nov 2024 12:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="jkp7E/eo"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="YQzs/lkE"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604071CACFA
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 12:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A861CBEA2;
+	Tue, 19 Nov 2024 12:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732018242; cv=none; b=i+FmUtKjJ64cTBimwGLziOR++BXvyYGW4Ue50JIqgVsUd9MTIhU5Zom1SiHU+iEuU10ZQm1eq9XsaFcUo+vhxHxIvQ+Sq6a5+ypGYsvf37WkSGse76RJPdOeFm4/50G3Yg1l18eMHpK7Yf6ZhNc5PlNmjnSaUdpIk+o0rqvlfak=
+	t=1732018251; cv=none; b=PNCgx/x7jwWHlnBKUK9qjSwKodNMCcLVKF99IZZhBOlMQsTK228pyuQNxMiB+HlEu51mcnByxR1frHlcuHVQ3rBBThDcd7xGYPFr8T1PYrFkMg0hL2CiqKByVz59rgJFgua1Iy0925XUe7xUavqBod6krCyxJrU3t0sm2MdTUqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732018242; c=relaxed/simple;
-	bh=aoiTAVNu0L/o2+glOeEGnKXxQbXq574jildBqVT3SiY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PkfP1wuI+e7oaiOMuFKnx5vKPVXfYH3W+aneLpyZ9mNmufqIV8cEaxfhNxLFqotaKR53FYIHYXDfpDYaRn6GQwt67UiXkAyzpNe96jDOFQHnC1h8gZSxPNyUySHSmlTocEnxIXK0Q1vnNNG7FEDAJ58IiA8ByyAnFbMw02kwRN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=jkp7E/eo; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id BC0562074F;
-	Tue, 19 Nov 2024 13:10:30 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QIUZdkMRhFCm; Tue, 19 Nov 2024 13:10:29 +0100 (CET)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D8A2E206F0;
-	Tue, 19 Nov 2024 13:10:29 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D8A2E206F0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1732018229;
-	bh=LQgMRATZaSVOiKCujBqs73jTJv7TQwPNfjl6DFx0wuc=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=jkp7E/eodftu5ppdHI/Uyxal567dcQfpm4f6BlFLE2tNfQnvHU/nFCRnbILX8xWdY
-	 /VtjtRxXku2zeBZ/s6aEtqrtz9iKG5hXJwdu6F9wzIpUy2BjjiIv6eQpUNJTgA58MW
-	 xdmm4yw340rttUFn2ixOdLQTBpeVi5eT7yn4FDgyEf/EAWOE7hjLDTxrOwHsu0GWnw
-	 +0hFwpSqB0hWr9OxTLqWuV/QS4BilPbs41Vs+e9sc3DFyiMo3bd2YXFGr7x882C7MF
-	 n4ZQ4ruKrOGgFnAzIcsCPUa+kW9sT8FtMzWfx9KMUJyTKe3TD6aPgowlO+LqnPrxfN
-	 aoHavAwAwCYqg==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 19 Nov 2024 13:10:29 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 19 Nov
- 2024 13:10:29 +0100
-Date: Tue, 19 Nov 2024 13:10:26 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Christian Hopps <chopps@chopps.org>
-CC: <devel@linux-ipsec.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>, Florian Westphal <fw@strlen.de>, Sabrina Dubroca
-	<sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony Antony
-	<antony@phenome.org>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v14 00/15] Add IP-TFS mode to
- xfrm
-Message-ID: <ZzyAMsShJSt8nyZU@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <20241114070713.3718740-1-chopps@chopps.org>
+	s=arc-20240116; t=1732018251; c=relaxed/simple;
+	bh=05fpO7BzPwjbenkCrUKrYY+/DfO4tCIfVL4XejHfZ7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JJfh8EdEHEDEp/UEs+TmSLSe/NVqmtztF615JVAXCWrMI34ZjXW2tBJD9D0YQVfBmGzlM1WBacUKA1/4pK+qn4oAZhYgEV/M4C0/fvpjcQ+l8JE2zUsD6YQoccbIqFTXq1mlJdUWyT0zFOhlDdasMMergA/PWoC6eRxAOykB+s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=YQzs/lkE; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4AJCAYfB3872011
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 19 Nov 2024 06:10:35 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1732018235;
+	bh=FCGHGADOR/Gid+oabOsKGIdb9QgjKW0XNbA9D4BfNmI=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=YQzs/lkEaxGSCeq4kMeO7PahgeK6bOL41W2WYwflyX22ug7Ri0f/Cs8tziOBuD13I
+	 5+TYBZ2BCHxq3o3Kqm/MGtwUpLgKndNe9RQoRS3ngdI/cwjc89JLba6J6cTaTylKJX
+	 kG9TKC20J6Y0fu5atH7JqHImnUmIgXf6S36ahtWk=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4AJCAYX4082124;
+	Tue, 19 Nov 2024 06:10:34 -0600
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 19
+ Nov 2024 06:10:34 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 19 Nov 2024 06:10:34 -0600
+Received: from [137.167.1.99] (lt5cg1094w5k.dhcp.ti.com [137.167.1.99] (may be forged))
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4AJCAVFO122922;
+	Tue, 19 Nov 2024 06:10:31 -0600
+Message-ID: <1e84b675-a0a0-414c-9f42-45a958dc0724@ti.com>
+Date: Tue, 19 Nov 2024 14:10:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241114070713.3718740-1-chopps@chopps.org>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/17] dt-bindings: net: wireless: cc33xx: Add
+ ti,cc33xx.yaml
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Sabeeh Khan
+	<sabeeh-khan@ti.com>
+References: <20241107125209.1736277-1-michael.nemanov@ti.com>
+ <20241107125209.1736277-2-michael.nemanov@ti.com>
+ <y4ffzjekeccqg2tv7d54ilwbz3nhm4jkcq3fyg5tmpbupsqirn@dq3kjtwkllds>
+ <2b0e95be-8192-416f-8655-631d6cecc336@ti.com>
+ <1651f579-6f9b-4c98-b273-0d7de4e99478@kernel.org>
+Content-Language: en-US
+From: "Nemanov, Michael" <michael.nemanov@ti.com>
+In-Reply-To: <1651f579-6f9b-4c98-b273-0d7de4e99478@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Thu, Nov 14, 2024 at 02:06:57 -0500, Christian Hopps via Devel wrote:
-> * Summary of Changes:
+On 11/19/2024 11:15 AM, Krzysztof Kozlowski wrote:
+> On 12/11/2024 07:45, Nemanov, Michael wrote:
+>> On 11/8/2024 2:02 PM, Krzysztof Kozlowski wrote:
+>>> On Thu, Nov 07, 2024 at 02:51:53PM +0200, Michael Nemanov wrote:
+>>>> Add device-tree bindings for the CC33xx family.
+>>>>
+>>>> Signed-off-by: Michael Nemanov <michael.nemanov@ti.com>
+>>>> ---
+>>>>    .../bindings/net/wireless/ti,cc33xx.yaml      | 59 +++++++++++++++++++
+>>>>    1 file changed, 59 insertions(+)
+>>>>    create mode 100644 Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+>>>>
+>>>
+>>> <form letter>
+>>> This is a friendly reminder during the review process.
+>>>
+>>> It seems my or other reviewer's previous comments were not fully
+>>> addressed. Maybe the feedback got lost between the quotes, maybe you
+>>> just forgot to apply it. Please go back to the previous discussion and
+>>> either implement all requested changes or keep discussing them.
+>>>
+>>> Thank you.
+>>> </form letter>
+>>>
+>>> Best regards,
+>>> Krzysztof
+>>>
+>>
+>> Are you referring to
+>>
+>>> diff --git a/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml b/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+>>
+>> ...
+>>
+>>> +
+>>> +properties:
+>>> +  $nodename:
+>>> +    pattern: "^wifi@2"
+>>
+>> ?
+>>
+>> If so, I replied here
+>> https://lore.kernel.org/linux-wireless/8024aa1c-5bd1-40d8-b0c3-14b5fcd992e2@ti.com/#t
+>> But if you don't think it's worthwhile I'll remove it.
 > 
-> This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
-> (AggFrag encapsulation) has been standardized in RFC9347.
+> I asked you to remove it. It's not correct, not needed, not beneficial
+> at all. It is actually harmful because limits re-use. dtc already checks
+> this.
 > 
->   Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+> Best regards,
+> Krzysztof
 > 
-> This feature supports demand driven (i.e., non-constant send rate)
-> IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
-> payload type supports aggregation and fragmentation of the inner IP
-> packet stream which in turn yields higher small-packet bandwidth as well
-> as reducing MTU/PMTU issues. Congestion control is unimplementated as
-> the send rate is demand driven rather than constant.
-> 
-> In order to allow loading this fucntionality as a module a set of
-> callbacks xfrm_mode_cbs has been added to xfrm as well.
-> 
-> Patchset Structure:
-> -------------------
-> 
-> The first 5 commits are changes to the net and xfrm infrastructure to
-> support the callbacks as well as more generic IP-TFS additions that
-> may be used outside the actual IP-TFS implementation.
-> 
->   - xfrm: config: add CONFIG_XFRM_IPTFS
->   - include: uapi: protocol number and packet structs for AGGFRAG in ESP
->   - xfrm: netlink: add config (netlink) options
->   - xfrm: add mode_cbs module functionality
->   - xfrm: add generic iptfs defines and functionality
-> 
-> The last 10 commits constitute the IP-TFS implementation constructed in
-> layers to make review easier. The first 9 commits all apply to a single
-> file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
-> header file along with the use of these new tracepoint calls.
-> 
->   - xfrm: iptfs: add new iptfs xfrm mode impl
->   - xfrm: iptfs: add user packet (tunnel ingress) handling
->   - xfrm: iptfs: share page fragments of inner packets
->   - xfrm: iptfs: add fragmenting of larger than MTU user packets
->   - xfrm: iptfs: add basic receive packet (tunnel egress) handling
->   - xfrm: iptfs: handle received fragmented inner packets
->   - xfrm: iptfs: add reusing received skb for the tunnel egress packet
->   - xfrm: iptfs: add skb-fragment sharing code
->   - xfrm: iptfs: handle reordering of received packets
->   - xfrm: iptfs: add tracepoint functionality
 
-I did several functional tests with the entire patch set.
+OK, I'll remove it in the next iteration.
 
-Tested-by: Antony Antony <antony.antony@secunet.com>
-
-Feel free to add this tag in the next re-base.
-
-thanks,
--antony
+Regards,
+Michael.
 
