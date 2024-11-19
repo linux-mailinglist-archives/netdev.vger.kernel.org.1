@@ -1,80 +1,51 @@
-Return-Path: <netdev+bounces-146208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F380C9D245A
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:01:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A9379D2485
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 12:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7A0F282DE1
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:01:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8E3BB2753C
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 11:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0641C462D;
-	Tue, 19 Nov 2024 11:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CEF1C6F73;
+	Tue, 19 Nov 2024 11:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAV/hKZf"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="PxttJcsg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from forward500a.mail.yandex.net (forward500a.mail.yandex.net [178.154.239.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D004B1B0F2C
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 11:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED911C68B2;
+	Tue, 19 Nov 2024 11:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732014103; cv=none; b=bC0vZ7ddTYNRrs15SJ+7a0H6UIjNVxSi7quR6kC1wlu6RlbCp8cU+TuICpdp0DCvVRUEYyO87pKAHDNh+Zz6GIpGAnP0Gyqpcv0mmuR2sFuXysRH4+uTBMSB4pikMtABCHcb7q4Taxc9IqHUIQqIXA0cyKTe1icQGAuFPbo41j0=
+	t=1732014210; cv=none; b=XfkMAzEI1ny77/KbpnxzdTLJzkR7MhJtgge+c87SL5qgH97jqVMMB+zgiRrlNxDRaRAI9TMC/Jh+2n0lOb9ZTDAEUmXtQaEtrM7bHwOGmODnx1z8lWgiy9L24fUzDXZXpr8oGQAiMTHJ0HwUq7gLEBIedkhmxiR43UmZPYs4s2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732014103; c=relaxed/simple;
-	bh=dbMltewUQlMW0Sem8DhCaaHZBlr9ohwY1znjXghpqK8=;
+	s=arc-20240116; t=1732014210; c=relaxed/simple;
+	bh=aJ5K2q9mqNSqTCgXLexrzoLohS/CKe1+e+l1a0CAFX8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mMAybw5g9ClS7/yg8+0DUQMNezZn9E2ygRZjMFP1DIyGeFKD+38YWBOfW5CDtojEc20BPaBOQv7qrLbHKv/ETRwLvICZrfu08iBDf4oPeHYDlkJHO836kxdeLDgx6DEMU19xWIILQgaxxg59Dy6/ff8ZHSZOp8wqngZqwTBDv00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DAV/hKZf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732014100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z5x1zAmftlOxErhov99kYFrr4C3ad6y3JktV/UxDbWo=;
-	b=DAV/hKZfoF1/mh56DbG5GESpXEQXO/fIv47lOzXymYGFA71dPd85/zleF1zCJNXj85zTZw
-	NhMn/sTmBFNKs4Egfz5HU7bGifvcv99zPvITY43GbkPpXFI0o7bLkV6hL047lP6PMSBzRS
-	Vp+gRW3j1gNOQKPH7KC7zxNvozEUDrs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375-RISCUlnJNlCXHH_yVXGEZA-1; Tue, 19 Nov 2024 06:01:37 -0500
-X-MC-Unique: RISCUlnJNlCXHH_yVXGEZA-1
-X-Mimecast-MFC-AGG-ID: RISCUlnJNlCXHH_yVXGEZA
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-432d04b3d40so33470525e9.1
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 03:01:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732014096; x=1732618896;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z5x1zAmftlOxErhov99kYFrr4C3ad6y3JktV/UxDbWo=;
-        b=Fq54uxj3ZLBJwCNDLw8ZiMQY0CKdhKnUCSSx/SqC3LdVqFMi4OAa7rH8NIy8fKxXy0
-         WDhtVssMV7mKXeuJCLtsEj+lVcvYhgOkPmxX3AWb/hxbgN/BG3G7Sgj0alwZGrUtGGPT
-         fDeuvi8RAm9MuDVmQV3rgi2G2Oa3ioEYF90cSfoTHjAJhF0xrNcytnpbJYivy0MxvGl8
-         POF9YrZRciBhcWoPwU2sfU8U9+p83lx43SJfZ4/0TFiCp1EeHiMReoecHKUXdfXZXbjg
-         WuTTAIqTIsNi9jtnebUMhNSD+FvFitXjo3Ru2o2wKDNt6jEG62JwB4cCpkVlHx9TrPVx
-         GoVQ==
-X-Gm-Message-State: AOJu0YyHq9EDqRrRxEx9KYXYGj5TrndnXMj92EC1hlKD0D+xqCMxekc2
-	U+yvnx48zxtu9efMb1QWrY8TQvv6j0eJw3eComybHAu3iY3Muln0whrrmVumerDiM5kH5TwI/wh
-	TrHOtAtYXeTtBQYqHmHKHZGX44DqZgX77OZDgiIWtziBzrFBigsvgyg==
-X-Received: by 2002:a05:600c:190c:b0:431:55af:a230 with SMTP id 5b1f17b1804b1-432df798ea0mr120186435e9.33.1732014096350;
-        Tue, 19 Nov 2024 03:01:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEUgk3hoEITcm/fHjPQY0HbLJGUt2q30yrEQzJiBHczy6KT7QlivIFvtIT5gOta2ObouSh3gg==
-X-Received: by 2002:a05:600c:190c:b0:431:55af:a230 with SMTP id 5b1f17b1804b1-432df798ea0mr120186245e9.33.1732014096054;
-        Tue, 19 Nov 2024 03:01:36 -0800 (PST)
-Received: from [192.168.1.14] (host-79-55-200-170.retail.telecomitalia.it. [79.55.200.170])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dac21a15sm187619345e9.38.2024.11.19.03.01.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 03:01:35 -0800 (PST)
-Message-ID: <de23f3cd-833a-44c0-91bc-5a013458a05f@redhat.com>
-Date: Tue, 19 Nov 2024 12:01:34 +0100
+	 In-Reply-To:Content-Type; b=VV3woKmIqqg5wYmMnatnRu6YeMJPdEaFOwU1pkjhBoN6Vkp0S817FtdiuTACCh/Q8tX40PGqRpjOvDFJK3bzeTnMaQvwHWkAxbvwdTHcI3TKd0JOW6qmcZWToMkrTTMlf5/LhJM1hjuANnbVJSuB9ZEd9fb5yCga/khPTvXjoNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=PxttJcsg; arc=none smtp.client-ip=178.154.239.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net [IPv6:2a02:6b8:c15:339a:0:640:a002:0])
+	by forward500a.mail.yandex.net (Yandex) with ESMTPS id D8A89613BF;
+	Tue, 19 Nov 2024 14:03:19 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id H3PcixrOpa60-LLeEi36o;
+	Tue, 19 Nov 2024 14:03:18 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1732014198; bh=exOOjxGX9sMW0VLoYv1+HLZua1oxjjGv4JrDpnhbuc4=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=PxttJcsgethQmC8dPISISo6PA4S6ClNmXZMlR4V9AkQnJy0xpeSOcoWS7IUL34zXY
+	 Zmw2tPi/zaar7cQ36yHJHiSHDtvxpzNSugDSCS2NGIM8u48eow3UE0Fsf3qLBYq1Tg
+	 2ee37Y9Y4XcmkyekWEvxWYMooXBP6ZGJ/ezj7VZs=
+Authentication-Results: mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <f7fd4a35-3c04-4eb0-a58d-18ed8d7210b9@yandex.ru>
+Date: Tue, 19 Nov 2024 14:03:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,44 +53,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/core/dev_ioctl: avoid invoking modprobe with empty
- ifr_name
-To: Song Chen <chensong_2000@189.cn>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, kory.maincent@bootlin.com,
- aleksander.lobakin@intel.com, willemb@google.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241117045512.111515-1-chensong_2000@189.cn>
+Subject: Re: [PATCH v2] net/unix: pass pidfd flags via SCM_PIDFD cmsg
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241117045512.111515-1-chensong_2000@189.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: almasrymina@google.com, asml.silence@gmail.com, axboe@kernel.dk,
+ brauner@kernel.org, cyphar@cyphar.com, davem@davemloft.net,
+ edumazet@google.com, gouhao@uniontech.com, horms@kernel.org,
+ kees@kernel.org, krisman@suse.de, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, mhal@rbox.co,
+ netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com,
+ quic_abchauha@quicinc.com, shuah@kernel.org, tandersen@netflix.com,
+ viro@zeniv.linux.org.uk, willemb@google.com
+References: <20241114091909.3552288-1-stsp2@yandex.ru>
+ <20241116011038.94912-1-kuniyu@amazon.com>
+From: stsp <stsp2@yandex.ru>
+In-Reply-To: <20241116011038.94912-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 11/17/24 05:55, Song Chen wrote:
-> dev_ioctl handles requests from user space if a process calls
-> ioctl(sockfd, SIOCGIFINDEX, &ifr). However, if this user space
-> process doesn't have interface name well specified, dev_ioctl
-> doesn't give it an essential check, as a result, dev_load will
-> invoke modprobe with a nonsense module name if the user happens
-> to be sys admin or root, see following code in dev_load:
-> 
->     no_module = !dev;
->     if (no_module && capable(CAP_NET_ADMIN))
->         no_module = request_module("netdev-%s", name);
->     if (no_module && capable(CAP_SYS_MODULE))
->         request_module("%s", name);
-> 
-> This patch checks if ifr_name is empty at the beginning, reduces
-> the overhead of calling modprobe.
-
-AFAICS technically this optimize a slow path (bad input from the
-user-space) at the expense of the more usual path (additional unneeded
-conditional) and still AFAICS, there are no functional issues addressed
-here.
-
-Note that even the latter more usual path is not a fast path, still the
-optimization is not worthy.
-
-/P
-
+16.11.2024 04:10, Kuniyuki Iwashima пишет:
+> Now this allows sending pidfd without SO_PASSPIDFD, so you need to
+> add a validation for "if (!msg->msg_control)" in __scm_recv_common().
+Will do, thanks.
+Btw don't we need MSG_CTRUNC in
+such case even if "msg_control"exists? Or the established practice is to 
+just drop cmsg silently? I mean, something like the below: --- 
+a/include/net/scm.h +++ b/include/net/scm.h @@ -176,12 +176,19 @@ static 
+inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg, 
+if (!msg->msg_control) { if (test_bit(SOCK_PASSCRED, &sock->flags) || 
+test_bit(SOCK_PASSPIDFD, &sock->flags) || - scm->fp || 
+scm_has_secdata(sock)) + scm->fp || scm_has_secdata(sock) || + 
+scm->pidfd_flags) msg->msg_flags |= MSG_CTRUNC; scm_destroy(scm); return 
+false; } + if (!test_bit(SOCK_PASSPIDFD, &sock->flags) && 
+scm->pidfd_flags) { + msg->msg_flags |= MSG_CTRUNC; + scm_destroy(scm); 
++ return false; + } + if (test_bit(SOCK_PASSCRED, &sock->flags)) { 
+struct user_namespace *current_ns = current_user_ns(); struct ucred 
+ucreds = {
 
