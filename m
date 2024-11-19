@@ -1,192 +1,409 @@
-Return-Path: <netdev+bounces-146138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A713D9D2166
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:15:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133B49D217E
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAB71F217EC
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:15:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90FC281DF7
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617D014F125;
-	Tue, 19 Nov 2024 08:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07201158874;
+	Tue, 19 Nov 2024 08:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Ro01NaRU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1zI5YB4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4257A1A28C
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82E01A28C
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 08:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732004147; cv=none; b=ra5tYbJ0jBuq+WmBIbSlgCuqa2/gydyGJWtFHN78JjKjh8+dKj4thHw7KpFA5q7MAkInbiwV5ujdllhLjXXaUXVF0SO15ofDw04asfsFEMcRctVceszb+a20NWpvoY2q6MxM9XZYGpsvJaH1B6pUFn6wkdz6HnZoFCIaWfWlg6M=
+	t=1732004414; cv=none; b=CbcNPFuvMHRXQcWSG+fZx6DOm9dQes3txdajUY9YqvRoPk3qXWV7poOj87NI5N184Tf6n7fjmeFKp2MxJPm+drA3uZ87cDskvirp+4uHWJW3igQLidFeyGoY54eGWkBgsmn+CN+dcTct8hiPsciNQeJbsJO4rdu1sVJRwmE5mRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732004147; c=relaxed/simple;
-	bh=nh3qg+dpw6wJugS2b0ETXcerIj6+agTQV21HgtF5r0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EvBoJnxjk+A3TwJq02bG8YmNe7OrgvQxDKazb13cLbP/7ThSgLchETP/O52odI48+LgcH/s9uI5IkBl1+Xtvrd9sh/G3Tq5XFNo6cNYYhwzMS2kITQc9bwjdcrpls/yrsBf0esSMBbND2p38L88uqWRWh9SFLlkZWyz6DgZYGWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Ro01NaRU; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa1e87afd31so408414466b.3
-        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:15:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1732004143; x=1732608943; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dlb3+qv9gg1JV6Cl4CDNWBpSyFp7lVILgVs8ILCA4eA=;
-        b=Ro01NaRUbn91xcHQ78cM0iBrNZ9ea/UBCjrf/vNfO5qLF5Yl28iYAkw9kb0Awln3xx
-         XpdRLEza4+gqgeqP1sK1LmBVYgRlzuFE3Jh+/X1A4Yncdoem4g414dGjJRwQrKV1mIpR
-         zzl5iPlVUhzIkNDMI6aD+d4kc1qMTJQgkvU2qKmFEWXvQ/OAczitTJb02Hvi0JibgyyD
-         pRQRHHqLpyjRx6Upd8p2q6OCQA/Xw5juFo/Err7XvQP0ykbeTYiD3KcfkYAjha3BF8Di
-         MVmpVgPmQpUMyxtN+5ucZoYiPJEtr6F45dk/+CK6QFrIQ2A7oLUM2EHXZ2ay2H0OG7LA
-         R5lQ==
+	s=arc-20240116; t=1732004414; c=relaxed/simple;
+	bh=3zZ62U4qhco3CNHwgl7skCP7WNUKVcEgubRQm3RM3PM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n2/6e0XoDeym1xtOjzTQPGfpI3HAjvjzbY1CqXZ7jTXB4ANaXWdIY7VzFY0lGeZVl7el2awQoMpEWmQqoXdvvvtwVuTkQAF6/UPtzJKFb8cBODQibMagiUhfVfI8hSZ9Py+Ib8yzxp2EHHLxyyB0LAY1+sMkZed3PEiu7+ePxeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D1zI5YB4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732004411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N1CXWCUIN02YGV/rD9pOZpyC66KfILNm9G423syFn+E=;
+	b=D1zI5YB45mrqmoKvT6TWcpZSbhphWv3RM6XdVFu2PoYJW0l945H8GY8nsf0ju+BWuMFkdD
+	96v3JrBM0aXH6k0mDhkdHkWcouXriy7STtRw0ZBXb+jp/oOHIYji+0o9Iud1NHchfu6JWP
+	2VU7zujKAesulZBMQPHAUoH0nvqJG8U=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-PYQu1j-BNkqVUXHbcZMJbQ-1; Tue, 19 Nov 2024 03:20:09 -0500
+X-MC-Unique: PYQu1j-BNkqVUXHbcZMJbQ-1
+X-Mimecast-MFC-AGG-ID: PYQu1j-BNkqVUXHbcZMJbQ
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3e61c30daf2so581088b6e.3
+        for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 00:20:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732004143; x=1732608943;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dlb3+qv9gg1JV6Cl4CDNWBpSyFp7lVILgVs8ILCA4eA=;
-        b=rrWgLm87CEB5D9vWDNb9NgBlLz6VhIEQTtTbNGNAsY0Z7xjp1yiZh/d8q+tHicMiW7
-         gU2jXEhR0Dg2fJG+U09mfWMNubnCKUF1WdB6hTPJmG0GqLkWXiC4NvcldyLtQ80LQmin
-         XVs3PJdq79+KQ+JIdA8UxnM+JJLrX8caIDfn5pNx78jmNN599FvcxP4VTMz6jUtkS+EI
-         7yYj5rPnLY3b0YzTJ31fuKrICL5N7ktNtdwlmdJUy3n/YeIbpl9vfNQpdhRPrINrIHuT
-         nzgLoOjeZkDzZKmALrETL06Rk72q4t0nMixbIjww50DEvurmYpKkOvcB0JYNoEnYuZqm
-         FOJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV85HctPnnFmYERYKSawRX04a1EAqkStQPsmbE39CkD3FLW0N6aPvsjJRiOA5RwbPM49ERBljo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywvwt+MtBGfCYNMMZHRCM6b+O8x6e7mwRf4Ehc3wr1QeJbVjayc
-	6DfoSBbEX+h5GKv/qy9XwrEQwuegNyVjtmRJDMTUBXZO3pHKJyGl4AF7cWZeGHc=
-X-Google-Smtp-Source: AGHT+IH1oPLqiWB9nvjMfiow2lsNMatAoaYTZq+VpYZVjDfmiH/yzZPdZ9PNMrDF2+D834C4i02E5A==
-X-Received: by 2002:a17:906:6a20:b0:a9e:c267:78c5 with SMTP id a640c23a62f3a-aa483553e28mr1404043466b.55.1732004143604;
-        Tue, 19 Nov 2024 00:15:43 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:a2be:8cd5:8845:cfce? ([2001:67c:2fbc:1:a2be:8cd5:8845:cfce])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20dffaa0fsm628382066b.106.2024.11.19.00.15.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2024 00:15:43 -0800 (PST)
-Message-ID: <22d63b13-2c20-4ee7-9783-7b061bd6d942@openvpn.net>
-Date: Tue, 19 Nov 2024 09:16:11 +0100
+        d=1e100.net; s=20230601; t=1732004409; x=1732609209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N1CXWCUIN02YGV/rD9pOZpyC66KfILNm9G423syFn+E=;
+        b=ToieFNiz2ir4TJ2qgtCroXc2jzpygKDY5Hz4BpTLJYMZjMhqB6PAbVF9ZcaFsmLWiS
+         6BIXZ3eqrZzGxpzijBJo1jv3vbRd+7g9jr4666ahF2ttivmUIyWBhlmg2GIxvxc0M9Qw
+         iQvxzg4bcSxhUiGg4B/BbbuUGmll/Of+9EHRlomE+aBLNKquj63+KynMMdMZngpxWdka
+         JVo0VUiR23ThyWwN42Dpj6aSE57yuTPKauh9w9Ie4+0/ObmNjoMeAjBv8+9s842fbWnK
+         hl86WrmHGGChRhduRwfcfBGtmdwHu5fkNV/rDeTJ/31lHTeP+AlkX5Ms/CBCtm1T9saU
+         NbGA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5lDjemo7Y/S/w2jCaAA7gYDz4ok0zEY7L982u0vhMYrDIWKj4Q1LEnVEF7mkMLEtctpRb1z8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwM5f0KFC6FE/+4Jez/M2bXce1ESFJtbUMhCbVZj6XuT91hH/Zu
+	zozncdQDmTuZidfsFUbtlLW2+9IYVT8eT40VR8u8LZOQfPkW/V7t/U14u+mBgbdmyd8empDir/A
+	DU7/3UJhIEuHJzud4uieorwb23N6crX9qynw42Lobpn9kXPChCmKLKb+RFLuIEhCaHUzgrTYKox
+	U8933XSUG15fWHseZJzDmBdw2ZMqiZ
+X-Gm-Gg: ASbGncubNGd/19EDjkMllr8P0dMyhe/NDfceiW5EvQiZfQraqk+xMR5PEJ3bU+wgA9w
+	upvwrujiTbbU3Z6f1jQ85QOK76H9i3+k=
+X-Received: by 2002:a05:6870:7906:b0:285:82b3:6313 with SMTP id 586e51a60fabf-2962dd36d65mr3241688fac.6.1732004408802;
+        Tue, 19 Nov 2024 00:20:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEVej4KCimNB7KEy4PUfgoVZNkglQWU1zdKBUn/nZrc5o20NvTcXpXkLvp2atTFp53OWYaPthw/YPmVvvtETQo=
+X-Received: by 2002:a05:6870:7906:b0:285:82b3:6313 with SMTP id
+ 586e51a60fabf-2962dd36d65mr3241676fac.6.1732004408418; Tue, 19 Nov 2024
+ 00:20:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 03/23] ovpn: add basic netlink support
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-3-de4698c73a25@openvpn.net>
- <21c0887b-1c7d-424d-a723-2a8d212cbde1@gmail.com>
- <dc63a3cb-7ace-4aca-9b67-f3c50297b2d2@openvpn.net>
- <b624293b-5143-4602-bf50-f4a14ff83d3a@gmail.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
- X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
- voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
- EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
- qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
- WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
- dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
- RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
- Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
- rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
- YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
- FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
- L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
- fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
- 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
- IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
- tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
- 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
- r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
- PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
- DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
- u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
- jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
- vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
- U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
- p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
- sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
- aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
- AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
- pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
- zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
- BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
- wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
- 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
- ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
- DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
- BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
- +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
-Organization: OpenVPN Inc.
-In-Reply-To: <b624293b-5143-4602-bf50-f4a14ff83d3a@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20241115194216.2718660-1-aleksandr.loktionov@intel.com>
+In-Reply-To: <20241115194216.2718660-1-aleksandr.loktionov@intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Tue, 19 Nov 2024 09:19:56 +0100
+Message-ID: <CADEbmW0vc-M+xEHCeL+92TecJTNRB_GvzsBjAaMz8n2kCjT3mw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5] i40e: add ability to reset
+ VF for Tx and Rx MDD events
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com, 
+	netdev@vger.kernel.org, Jan Sokolowski <jan.sokolowski@intel.com>, 
+	Padraig J Connolly <padraig.j.connolly@intel.com>, maciej.fijalkowski@intel.com, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Nov 15, 2024 at 8:42=E2=80=AFPM Aleksandr Loktionov
+<aleksandr.loktionov@intel.com> wrote:
+> Implement "mdd-auto-reset-vf" priv-flag to handle Tx and Rx MDD events fo=
+r VFs.
+> This flag is also used in other network adapters like ICE.
+>
+> Usage:
+> - "on"  - The problematic VF will be automatically reset
+>           if a malformed descriptor is detected.
+> - "off" - The problematic VF will be disabled.
+>
+> In cases where a VF sends malformed packets classified as malicious, it c=
+an
+> cause the Tx queue to freeze, rendering it unusable for several minutes. =
+When
+> an MDD event occurs, this new implementation allows for a graceful VF res=
+et to
+> quickly restore operational state.
+>
+> Currently, VF queues are disabled if an MDD event occurs. This patch adds=
+ the
+> ability to reset the VF if a Tx or Rx MDD event occurs. It also includes =
+MDD
+> event logging throttling to avoid dmesg pollution and unifies the format =
+of
+> Tx and Rx MDD messages.
+>
+> Note: Standard message rate limiting functions like dev_info_ratelimited(=
+)
+> do not meet our requirements. Custom rate limiting is implemented,
+> please see the code for details.
+>
+> Co-developed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Co-developed-by: Padraig J Connolly <padraig.j.connolly@intel.com>
+> Signed-off-by: Padraig J Connolly <padraig.j.connolly@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> v4->v5 + documentation - 2nd clear_bit(__I40E_MDD_EVENT_PENDING) * rate l=
+imit
+> v3->v4 refactor two helper functions into one
+> v2->v3 fix compilation issue
+> v1->v2 fix compilation issue
+> ---
+>  .../device_drivers/ethernet/intel/i40e.rst    |  12 ++
+>  drivers/net/ethernet/intel/i40e/i40e.h        |   4 +-
+>  .../net/ethernet/intel/i40e/i40e_debugfs.c    |   2 +-
+>  .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   | 107 +++++++++++++++---
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   2 +-
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  11 +-
+>  7 files changed, 123 insertions(+), 17 deletions(-)
+[...]
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/et=
+hernet/intel/i40e/i40e_main.c
+> index cbcfada..b1f7316 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -11189,22 +11189,88 @@ static void i40e_handle_reset_warning(struct i4=
+0e_pf *pf, bool lock_acquired)
+>         i40e_reset_and_rebuild(pf, false, lock_acquired);
+>  }
+>
+> +/**
+> + * i40e_print_vf_mdd_event - print VF Tx/Rx malicious driver detect even=
+t
+> + * @pf: board private structure
+> + * @vf: pointer to the VF structure
+> + * @is_tx: true - for Tx event, false - for  Rx
+> + */
+> +static void i40e_print_vf_mdd_event(struct i40e_pf *pf, struct i40e_vf *=
+vf,
+> +                                      bool is_tx)
+> +{
+> +       dev_err(&pf->pdev->dev, is_tx ?
+> +               "%lld Tx Malicious Driver Detection events detected on PF=
+ %d VF %d MAC %pm. mdd-auto-reset-vfs=3D%s\n" :
+> +               "%lld Rx Malicious Driver Detection events detected on PF=
+ %d VF %d MAC %pm. mdd-auto-reset-vfs=3D%s\n",
+
+I disagree with your argument from the v3 thread about greppability.
+I think using "%lld %cx [...]" and
+  is_tx ? 'T' : 'R',
+the string would still be easy enough to grep for.
+But opinions may vary about this. So
+
+Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
 
 
 
-On 19/11/2024 03:23, Sergey Ryazanov wrote:
-> On 15.11.2024 12:19, Antonio Quartulli wrote:
->> On 09/11/2024 00:31, Sergey Ryazanov wrote:
->>> On 29.10.2024 12:47, Antonio Quartulli wrote:
->>>> +/**
->>>> + * struct ovpn_struct - per ovpn interface state
->>>> + * @dev: the actual netdev representing the tunnel
->>>> + * @dev_tracker: reference tracker for associated dev
->>>> + */
->>>> +struct ovpn_struct {
->>>
->>> There is no standard convention how to entitle such structures, so 
->>> the question is basically of out-of-curiosity class. For me, having a 
->>> sturcuture with name 'struct' is like having no name. Did you 
->>> consider to use such names as ovpn_dev or ovpn_iface? Meaning, using 
->>> a name that gives a clue regarding the scope of the content.
->>
->> Yes, I wanted to switch to ovpn_priv, but  did not care much for the 
->> time being :)
->>
->> I can still do it now in v12.
-> 
-> This topic caused me the biggest doubts. I don't want to ask to rename 
-> everything on the final lap. Just want to share an outside perspective 
-> on the structure name. And let you decide is it worth or not.
-> 
-> And if you ask me, ovpn_priv does not give a clue either. The module is 
-> too complex for a vague structure name, even after your great work on 
-> clearing its design.
 
-Well, the word "priv" to me resembles the "netdev_priv()" call, so it's 
-kinda easier to grasp what this is about.
-In batman-adv we used the same suffix and it was well received.
-Also, if you grep for "_priv " in drivers/net you will see that this is 
-a common pattern.
-
-Since I already had in mind to change this struct name, I moved on and 
-renamed it to ovpn_priv throughput the patchset (git rebase --exec is my 
-friend ;)).
-
-Thanks
-
-Regards,
-
-> 
-> -- 
-> Sergey
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+> +               is_tx ? vf->mdd_tx_events.count : vf->mdd_rx_events.count=
+,
+> +               pf->hw.pf_id,
+> +               vf->vf_id,
+> +               vf->default_lan_addr.addr,
+> +               str_on_off(test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flag=
+s)));
+> +}
+> +
+> +/**
+> + * i40e_print_vfs_mdd_events - print VFs malicious driver detect event
+> + * @pf: pointer to the PF structure
+> + *
+> + * Called from i40e_handle_mdd_event to rate limit and print VFs MDD eve=
+nts.
+> + */
+> +static void i40e_print_vfs_mdd_events(struct i40e_pf *pf)
+> +{
+> +       unsigned int i;
+> +
+> +       /* check that there are pending MDD events to print */
+> +       if (!test_and_clear_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state))
+> +               return;
+> +
+> +       if (!__ratelimit(&pf->mdd_message_rate_limit))
+> +               return;
+> +
+> +       for (i =3D 0; i < pf->num_alloc_vfs; i++) {
+> +               struct i40e_vf *vf =3D &pf->vf[i];
+> +               bool is_printed =3D false;
+> +
+> +               /* only print Rx MDD event message if there are new event=
+s */
+> +               if (vf->mdd_rx_events.count !=3D vf->mdd_rx_events.last_p=
+rinted) {
+> +                       vf->mdd_rx_events.last_printed =3D vf->mdd_rx_eve=
+nts.count;
+> +                       i40e_print_vf_mdd_event(pf, vf, false);
+> +                       is_printed =3D true;
+> +               }
+> +
+> +               /* only print Tx MDD event message if there are new event=
+s */
+> +               if (vf->mdd_tx_events.count !=3D vf->mdd_tx_events.last_p=
+rinted) {
+> +                       vf->mdd_tx_events.last_printed =3D vf->mdd_tx_eve=
+nts.count;
+> +                       i40e_print_vf_mdd_event(pf, vf, true);
+> +                       is_printed =3D true;
+> +               }
+> +
+> +               if (is_printed && !test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, =
+pf->flags))
+> +                       dev_info(&pf->pdev->dev,
+> +                                "Use PF Control I/F to re-enable the VF =
+#%d\n",
+> +                                i);
+> +       }
+> +}
+> +
+>  /**
+>   * i40e_handle_mdd_event
+>   * @pf: pointer to the PF structure
+>   *
+>   * Called from the MDD irq handler to identify possibly malicious vfs
+>   **/
+>  static void i40e_handle_mdd_event(struct i40e_pf *pf)
+>  {
+>         struct i40e_hw *hw =3D &pf->hw;
+>         bool mdd_detected =3D false;
+>         struct i40e_vf *vf;
+>         u32 reg;
+>         int i;
+>
+> -       if (!test_bit(__I40E_MDD_EVENT_PENDING, pf->state))
+> +       if (!test_and_clear_bit(__I40E_MDD_EVENT_PENDING, pf->state)) {
+> +               /* Since the VF MDD event logging is rate limited, check =
+if
+> +                * there are pending MDD events.
+> +                */
+> +               i40e_print_vfs_mdd_events(pf);
+>                 return;
+> +       }
+>
+>         /* find what triggered the MDD event */
+>         reg =3D rd32(hw, I40E_GL_MDET_TX);
+> @@ -11248,36 +11314,48 @@ static void i40e_handle_mdd_event(struct i40e_p=
+f *pf)
+>
+>         /* see if one of the VFs needs its hand slapped */
+>         for (i =3D 0; i < pf->num_alloc_vfs && mdd_detected; i++) {
+> +               bool is_mdd_on_tx =3D false;
+> +               bool is_mdd_on_rx =3D false;
+> +
+>                 vf =3D &(pf->vf[i]);
+>                 reg =3D rd32(hw, I40E_VP_MDET_TX(i));
+>                 if (reg & I40E_VP_MDET_TX_VALID_MASK) {
+> +                       set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
+>                         wr32(hw, I40E_VP_MDET_TX(i), 0xFFFF);
+> -                       vf->num_mdd_events++;
+> -                       dev_info(&pf->pdev->dev, "TX driver issue detecte=
+d on VF %d\n",
+> -                                i);
+> -                       dev_info(&pf->pdev->dev,
+> -                                "Use PF Control I/F to re-enable the VF\=
+n");
+> +                       vf->mdd_tx_events.count++;
+>                         set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
+> +                       is_mdd_on_tx =3D true;
+>                 }
+>
+>                 reg =3D rd32(hw, I40E_VP_MDET_RX(i));
+>                 if (reg & I40E_VP_MDET_RX_VALID_MASK) {
+> +                       set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
+>                         wr32(hw, I40E_VP_MDET_RX(i), 0xFFFF);
+> -                       vf->num_mdd_events++;
+> -                       dev_info(&pf->pdev->dev, "RX driver issue detecte=
+d on VF %d\n",
+> -                                i);
+> -                       dev_info(&pf->pdev->dev,
+> -                                "Use PF Control I/F to re-enable the VF\=
+n");
+> +                       vf->mdd_rx_events.count++;
+>                         set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
+> +                       is_mdd_on_rx =3D true;
+> +               }
+> +
+> +               if ((is_mdd_on_tx || is_mdd_on_rx) &&
+> +                   test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags)) {
+> +                       /* VF MDD event counters will be cleared by
+> +                        * reset, so print the event prior to reset.
+> +                        */
+> +                       if (is_mdd_on_rx)
+> +                               i40e_print_vf_mdd_event(pf, vf, false);
+> +                       if (is_mdd_on_tx)
+> +                               i40e_print_vf_mdd_event(pf, vf, true);
+> +
+> +                       i40e_vc_reset_vf(vf, true);
+>                 }
+>         }
+>
+> -       /* re-enable mdd interrupt cause */
+> -       clear_bit(__I40E_MDD_EVENT_PENDING, pf->state);
+>         reg =3D rd32(hw, I40E_PFINT_ICR0_ENA);
+>         reg |=3D  I40E_PFINT_ICR0_ENA_MAL_DETECT_MASK;
+>         wr32(hw, I40E_PFINT_ICR0_ENA, reg);
+>         i40e_flush(hw);
+> +
+> +       i40e_print_vfs_mdd_events(pf);
+>  }
+>
+>  /**
+> @@ -15970,6 +16048,9 @@ static int i40e_probe(struct pci_dev *pdev, const=
+ struct pci_device_id *ent)
+>                          ERR_PTR(err),
+>                          i40e_aq_str(&pf->hw, pf->hw.aq.asq_last_status))=
+;
+>
+> +       /* VF MDD event logs are rate limited to one second intervals */
+> +       ratelimit_state_init(&pf->mdd_message_rate_limit, 1 * HZ, 1);
+> +
+>         /* Reconfigure hardware for allowing smaller MSS in the case
+>          * of TSO, so that we avoid the MDD being fired and causing
+>          * a reset in the case of small MSS+TSO.
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers=
+/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index 662622f..5b4618e 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> @@ -216,7 +216,7 @@ void i40e_vc_notify_vf_reset(struct i40e_vf *vf)
+>   * @notify_vf: notify vf about reset or not
+>   * Reset VF handler.
+>   **/
+> -static void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
+> +void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
+>  {
+>         struct i40e_pf *pf =3D vf->pf;
+>         int i;
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers=
+/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+> index 66f95e2..5cf74f1 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+> @@ -64,6 +64,12 @@ struct i40evf_channel {
+>         u64 max_tx_rate; /* bandwidth rate allocation for VSIs */
+>  };
+>
+> +struct i40e_mdd_vf_events {
+> +       u64 count;      /* total count of Rx|Tx events */
+> +       /* count number of the last printed event */
+> +       u64 last_printed;
+> +};
+> +
+>  /* VF information structure */
+>  struct i40e_vf {
+>         struct i40e_pf *pf;
+> @@ -92,7 +98,9 @@ struct i40e_vf {
+>
+>         u8 num_queue_pairs;     /* num of qps assigned to VF vsis */
+>         u8 num_req_queues;      /* num of requested qps */
+> -       u64 num_mdd_events;     /* num of mdd events detected */
+> +       /* num of mdd tx and rx events detected */
+> +       struct i40e_mdd_vf_events mdd_rx_events;
+> +       struct i40e_mdd_vf_events mdd_tx_events;
+>
+>         unsigned long vf_caps;  /* vf's adv. capabilities */
+>         unsigned long vf_states;        /* vf's runtime states */
+> @@ -120,6 +128,7 @@ int i40e_alloc_vfs(struct i40e_pf *pf, u16 num_alloc_=
+vfs);
+>  int i40e_vc_process_vf_msg(struct i40e_pf *pf, s16 vf_id, u32 v_opcode,
+>                            u32 v_retval, u8 *msg, u16 msglen);
+>  int i40e_vc_process_vflr_event(struct i40e_pf *pf);
+> +void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf);
+>  bool i40e_reset_vf(struct i40e_vf *vf, bool flr);
+>  bool i40e_reset_all_vfs(struct i40e_pf *pf, bool flr);
+>  void i40e_vc_notify_vf_reset(struct i40e_vf *vf);
+> --
+> 2.25.1
+>
 
 
