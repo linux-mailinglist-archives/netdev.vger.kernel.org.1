@@ -1,52 +1,65 @@
-Return-Path: <netdev+bounces-146154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B2AD9D21F7
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:57:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7F99D2223
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 10:06:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0BD91F226D4
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 08:57:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECE98B20C95
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 09:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDD11A9B24;
-	Tue, 19 Nov 2024 08:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A896C1925B3;
+	Tue, 19 Nov 2024 09:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X/p7my+z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PqFZP3J9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BA41798C;
-	Tue, 19 Nov 2024 08:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C6F12CDAE;
+	Tue, 19 Nov 2024 09:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732006642; cv=none; b=qo9IdJVfbTYP08XZGoc+kChPCqpkKKZ8aJcMgY+RlKpohFNzA9c/MmU9FokmMbKAeoYMP/zlkywdAbG1ELspXtZ5BAg6g9uVCYvo2zukLlJcbkr6K8VVNAh2vtuVcrUknbdPch3L4cEPmoG220BdTqfFI+Nkt/VW5es3azU8H5E=
+	t=1732007201; cv=none; b=VJV1872FJiLNe8ay4dJj4LlRLTiMuvDRCTPQ4Ap+uxJZGTiAbaPlTtPs4g+GDJ10Q5kB+9aH18CToc1KjS+8bRP79YGdCnItHaEsPhdYzirJxmUNiGeYu5vDwMgAF+haFbDjIfrGZ3X+9U1r3NOKuaewu/gaX/fxXz+5iD32pBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732006642; c=relaxed/simple;
-	bh=01mOnY+a8qSh1SokfXxE9W5gK3wHTvzsLqt9Vk0HDG0=;
+	s=arc-20240116; t=1732007201; c=relaxed/simple;
+	bh=HtjEr6MyQAiTzXqILd1meE2GmGtMVF3rg86A6w3dlq4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XTj6vDJ9zUomyExd9+UR5HLI/S3VrtwswBNVEBo4lMu3dp5RasKYCfaqQPqwIue30dinnWHuqM+CnMBCzeKgPSIAgdT1mK9xyITYpuT3kJRKSLMBTVoiPw3WcLFFqTCLGZVC6lAJ8aCqKs4dgXvAq7xf3X+oIDWmptjQHkM5d4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X/p7my+z; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 07C5740012;
-	Tue, 19 Nov 2024 08:57:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732006632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qDLMX9bwiKUPXm5HqirAa1WgF18sn8QriLeZ4mKqO1s=;
-	b=X/p7my+zUThqfZtd/oVsk84v3RaXRAVl04osFZ0G8CSXu1bzLEaNt7ygD6XcYFErj8UJk7
-	dtxVD5UquR/Goz8gYhMmqqI0712YnCZoiKAfqt3OyFh+keXS+0d5JCz2Y+sqwiKuRTnvM5
-	vG5ZbEnyVJPQXYVtuUAmcr7IPuTjV71yHL1pRL8RU0Df9Z5kWdEgX+irCnyUlsfn76lzSQ
-	Exm6QG8MuTNTf1C09Qvm0PtW5mQWHOo9RUJzmvTUfgODq8vxtejUF5A65tKwg48wCf1tNj
-	qAyBhSA/DQsBJXhCqmV7j3DcZy7IFuOHW/Fj1Wg9EJfZHlq4Xwxc4ppgIeNEwQ==
-Message-ID: <20802d12-004a-4b04-9b7d-93dc8b9866df@bootlin.com>
-Date: Tue, 19 Nov 2024 09:57:09 +0100
+	 In-Reply-To:Content-Type; b=celBKSwspmyhnDu669PUmMjQlm1pYq9qIFPVgQde+Fp96ctjQeBVwuX8D/iYZcUJWWaGSPIqGToOUlx5PwxUTR26YxNB9SsMzYJqu5GvFDfuNK/5JK54OHT0nmmQjTjxuZ62OsK+3zSaXem6oIwkfZOAyEP0Beiac1c0Nrw+2a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PqFZP3J9; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732007200; x=1763543200;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HtjEr6MyQAiTzXqILd1meE2GmGtMVF3rg86A6w3dlq4=;
+  b=PqFZP3J9s/1aoYNP4DglFf9JQGx6QGRSCKGUrXbQL7e2SF1todx4MyjB
+   15snAYVIKjrylBAeFPu3lSpzvSEFMOLAlP59VUd4kpD/5G1bHbAEqrqQr
+   ZIXdaMohJTLU3FsII2kidyEKczbTRvG94tnUQcbFtTXnxsAS5a7Krhcq9
+   hYq2buEM03o4PrRbsx81PnJ/fBtF+qvvsqP0aUMVx5WbKpMhl15xyIXNe
+   OtNI8TfRogQClKVze5HeHN9OMC/yfefjFXN3ljaGWACi/6Nxvz+Fwj795
+   h012i0BJuYVtMzm0QME8ySgcRCsTnyIBtavYjUzV6q2VgjgoGPZSH6kqr
+   g==;
+X-CSE-ConnectionGUID: ObkncoqLQG2EihhT+blugg==
+X-CSE-MsgGUID: qMs+8ouDT0eNEuenTXYg5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11260"; a="19605052"
+X-IronPort-AV: E=Sophos;i="6.12,165,1728975600"; 
+   d="scan'208";a="19605052"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 01:06:39 -0800
+X-CSE-ConnectionGUID: zsvHZ+PwTi68k0a9K6UDpA==
+X-CSE-MsgGUID: 4tKkEW0eSyiBbNpB7+8d9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,165,1728975600"; 
+   d="scan'208";a="89905283"
+Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.75.104]) ([10.247.75.104])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 01:06:36 -0800
+Message-ID: <c1bb831c-fd88-4b03-bda6-d8f4ec4a1681@linux.intel.com>
+Date: Tue, 19 Nov 2024 17:06:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,63 +67,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 11/13] selftests/bpf: add network helpers to
- generate udp checksums
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
- <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Bastien Curutchet <bastien.curutchet@bootlin.com>, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com>
- <20241114-flow_dissector-v2-11-ee4a3be3de65@bootlin.com>
- <ZzdunVLMaX1iy85i@mini-arch>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH net v2 1/2] net: phy: replace phydev->eee_enabled with
+ eee_cfg.eee_enabled
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
+ <20241115111151.183108-2-yong.liang.choong@linux.intel.com>
+ <ZzdOkE0lqpl6wx2d@shell.armlinux.org.uk>
 Content-Language: en-US
-In-Reply-To: <ZzdunVLMaX1iy85i@mini-arch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <ZzdOkE0lqpl6wx2d@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 11/15/24 16:54, Stanislav Fomichev wrote:
-> On 11/14, Alexis Lothoré (eBPF Foundation) wrote:
->> +static inline __sum16 build_udp_v4_csum(const struct iphdr *iph, __u8 l4_proto,
->> +					__u16 l4_len, const void *l4_start,
->> +					int num_words)
->> +{
->> +	unsigned long pseudo_sum;
->> +	int num_u16 = sizeof(iph->saddr); /* halfwords: twice byte len */
->> +
->> +	pseudo_sum = add_csum_hword((void *)&iph->saddr, num_u16);
->> +	pseudo_sum += htons(l4_proto);
->> +	pseudo_sum += l4_len;
->> +	pseudo_sum += add_csum_hword(l4_start, num_words);
->> +	return csum_fold(pseudo_sum);
+
+
+On 15/11/2024 9:37 pm, Russell King (Oracle) wrote:
+> On Fri, Nov 15, 2024 at 07:11:50PM +0800, Choong Yong Liang wrote:
+>> Not all PHYs have EEE enabled by default. For example, Marvell PHYs are
+>> designed to have EEE hardware disabled during the initial state.
+>>
+>> In the initial stage, phy_probe() sets phydev->eee_enabled to be disabled.
+>> Then, the MAC calls phy_support_eee() to set eee_cfg.eee_enabled to be
+>> enabled. However, when phy_start_aneg() is called,
+>> genphy_c45_an_config_eee_aneg() still refers to phydev->eee_enabled.
+>> This causes the 'ethtool --show-eee' command to show that EEE is enabled,
+>> but in actuality, the driver side is disabled.
+>>
+>> This patch will remove phydev->eee_enabled and replace it with
+>> eee_cfg.eee_enabled. When performing genphy_c45_an_config_eee_aneg(),
+>> it will follow the master configuration to have software and hardware
+>> in sync.
 > 
-> I was expecting to see a call to csum_tcpudp_magic here. And csum_ipv6_magic
-> down below. These build pseudo header csum, so no need to manually do it
-> again.
+> Hmm. I'm not happy with how you're handling my patch. I would've liked
+> some feedback on it (thanks for spotting that the set_eee case needed
+> to pass the state to genphy_c45_an_config_eee_aneg()).
+> 
+> However, what's worse is, that the bulk of this patch is my work, yet
+> you've effectively claimed complete authorship of it in the way you
+> are submitting this patch. Moreover, you are violating the kernel
+> submission rules, as the Signed-off-by does not include one for me
+> (which I need to explicitly give.) I was waiting for the results of
+> your testing before finalising the patch.
+> 
+> The patch needs to be authored by me, the first sign-off needs to be
+> me, then optionally Co-developed-by for you, and then your sign-off.
+> 
+> See Documentation/process/submitting-patches.rst
+> 
+> Thanks.
+> 
+> pw-bot: cr
+> 
 
-I initially tried to fit csum_tcpudp_magic here and did not manage to make a
-valid UDP checksum, but after more attempts, it looks like I had a
-misunderstanding this checksum computation. I am now able to used
-csum_tcpudp_magic in build_udp_v4_csum, it will be fixed in the next revision :)
+Sorry for the late reply; I just got back from my sick leave. I wasn't 
+aware that you had already submitted a patch. I thought I should include it 
+in my patch series. However, I think I messed up the "Signed-off" part. 
+Sorry about that.
 
-Thanks,
+The testing part actually took quite some time to complete, and I was 
+already sick last Friday. I was only able to complete the patch series and 
+resubmit the patch, and I thought we could discuss the test results from 
+the patch series. The issue was initially found with EEE on GPY PHY working 
+together with ptp4l, and it did not meet the expected results. There are 
+many things that need to be tested, as it is not only Marvell PHY that has 
+the issue.
 
-Alexis
+With your patch, most of the issues were resolved based on the testing. 
+However, the set_eee was using the old value of eee_enabled and was not 
+able to turn EEE on or off. I think Heiner's patch already solved that part.
 
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+With all the solutions provided, I think the only patch left that I need to 
+submit is the one calling 'phy_support_eee()' from stmmac.
 
