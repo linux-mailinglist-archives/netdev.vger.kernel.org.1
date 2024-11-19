@@ -1,107 +1,132 @@
-Return-Path: <netdev+bounces-146246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D03C9D26D6
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:29:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDA7B9D26F7
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 14:32:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52F12280624
-	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:29:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B1E1F24327
+	for <lists+netdev@lfdr.de>; Tue, 19 Nov 2024 13:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADBF1CC8AE;
-	Tue, 19 Nov 2024 13:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 451271CDA25;
+	Tue, 19 Nov 2024 13:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hl02erM0"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="saMNt/g0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B17212B93
-	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 13:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7E51CD200
+	for <netdev@vger.kernel.org>; Tue, 19 Nov 2024 13:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732022959; cv=none; b=kDSk+Igc84ZmCH7K+vK2rGmofwklMol7xcdzbtFSBVMgknnQPkx9mcL533KrsTylJzjGQ22lzVtTFyGC/GxNBWsYxwfuQwzo5lp/Q3+cMMvgmpEjtDCdHohMNmw9ESuZeLseVCWMDqklVRUc73TuBgwOpPxJ9avpxc++T3CxNrA=
+	t=1732023142; cv=none; b=aZvrtuOZ7I+vsmITNM0sTE5kv0qJW/MAkL0IS1YrYmlKl8sU95VCWUBps4LyRxsr0oSNd0rUzIUWI12ClN1AGsZUdpkiTe3505SGmMONAEu4xw9gDc7wwuSnFYBtgkrnQHItK9uuOedvWFMh2HAnIc5RTkesx5QurWALfeUENcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732022959; c=relaxed/simple;
-	bh=OFMtQQGkYNSogaygt0GGLKqqJMELOnRHLhJE/uoLrcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S/IB035DslfLngI+RtzEvt1EKZc1eZofRSxmruRDKPapg35R36tV50Ne/GXAYqp9rixAzgf7JazRlb1lX4bqRdrO7ZcSXkM0EJ9gDkPLb8ltSfHqycvmaECF5D4Pau9v4gM7f76B/AbD2NeudBVnLDihOAYhrNZOhLH9tZWhbJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hl02erM0; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Vn2P3uTBsRzvIZ/3XFhSCNNfBKVD7HxBRa4ItsoU5N0=; b=hl02erM0p9DX9taBwi8MCFbwXj
-	ybI8z4xKO7OXzr1UBQb2j/EdVowSA6jCt3YCGA1KWrzvj6VEf2Rw3Hh+cFZkQfGfvYV/UrBFYKZnc
-	oDjgSFMsiBQHJIg23nVxp2Sw681DJNVaooN53GU8E/SuH40B394yFF34L+kZY76dCbC4fyMrY+FHI
-	W02SN980bcQC4ARyvrouTsF5ZRlPW9yUR1fGVGNKsF7KFbAUyqi6oZJO2tZS0TSpjMxzV3ILzjRw7
-	xPkogNncjQJE0Rixyuf/9OzPi7uNgyrKuOO865f5gOqVJZqO+ceOhRs6l9XREjj1Pss4lTs7sVUuN
-	wLGRR80Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36252)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tDOI3-0003b7-0C;
-	Tue, 19 Nov 2024 13:29:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tDOHz-00065Y-1X;
-	Tue, 19 Nov 2024 13:29:07 +0000
-Date: Tue, 19 Nov 2024 13:29:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: net vs net-next conflicts while cross merging
-Message-ID: <ZzySo2clykoS7-5a@shell.armlinux.org.uk>
-References: <f769256c-d51c-4983-b7a5-015add42ca35@redhat.com>
+	s=arc-20240116; t=1732023142; c=relaxed/simple;
+	bh=R1N7tuV3toAcK96W6gsrUGEuM8/UuBdRJ2bRHdfTqeQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=f1q21jZ8/o4RcsaqMzU2TcYy6Jl+P9Ww0MB1p8tRV245pyrDWY3FLu1maYZg7OAzTagTsjvmUd7P69fmL66YSPyhyxIZUKnShVFvmglimuJVKaJQaVn519+L3YPohScjLDDGAdS9UI3AIm7lIKixyM87nSVdctZRBKnjJpi4R20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=saMNt/g0; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tDOKv-0024Kx-KJ; Tue, 19 Nov 2024 14:32:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=zFb0s9I2ZS6P3vudh9lt5OZE4zI28ib5bkNvsnSR5V4=
+	; b=saMNt/g0vqhrUVcIU0xIw84mf5iSlYd3Wyx6FqVAQiqY4s6/iAH59oxBLFYwZOxBVo7JH2/fr
+	qfba2alj+6T7CoOktEE+C9U9MC/TI/Ut7H5gw0BeDvOhfvVYJ6KyCJ4CuKa3y12g8CiFOKnluHkqd
+	Qx3/t+mY+NCdATz+aiDJWwY9CbksFVldZxL7YPOD8M18tWcs++kJn7NkEDbonbZ7N8/nMhY8BH77Z
+	PWyOyoM00A7ROR9faCWfiXrjZaC5Zt6BHS0xoJrIRLSdrLGPjfgWTrao8D3xf9bm59WA2G67BMkGA
+	KR9L+nFukBg0y6lw3aVigjjO4gDYB1R4QCg8QQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tDOKv-0006N3-0w; Tue, 19 Nov 2024 14:32:09 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tDOKj-000XIx-0V; Tue, 19 Nov 2024 14:31:57 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v3 0/4] net: Fix some callers of copy_from_sockptr()
+Date: Tue, 19 Nov 2024 14:31:39 +0100
+Message-Id: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f769256c-d51c-4983-b7a5-015add42ca35@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADuTPGcC/4XNQQqDMBAF0KuUWXeKExWTrnqP0kUSxxoKRhIJi
+ nj3hlDoptDln89/s0Pk4DjC9bRD4OSi81MO9fkEdtTTk9H1OYOoRENEDUZvX/MS0Pp5w8GtHLF
+ WSrHWkrQmyMM5cCny7g4TL/DIx9HFxYetPEpUqo/Z/jITYYU9ydrKbrCmb2/B+PVifcGS+A+ID
+ ChDom0sSdPpL3AcxxvpusTU+AAAAA==
+X-Change-ID: 20241114-sockptr-copy-fixes-3999eaa81aa1
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>, 
+ Michal Luczaj <mhal@rbox.co>, David Wei <dw@davidwei.uk>
+X-Mailer: b4 0.14.2
 
-On Tue, Nov 19, 2024 at 02:15:07PM +0100, Paolo Abeni wrote:
-> @Russel, @Jiawen: could you please double check that the resolution is
-> correct?
+Some callers misinterpret copy_from_sockptr()'s return value. The function
+follows copy_from_user(), i.e. returns 0 for success, or the number of
+bytes not copied on error. Simply returning the result in a non-zero case
+isn't usually what was intended.
 
-Will do, but... Linus has recently been ranting to Andrew about latin-1
-vs UTF-8 messing up the spelling of people's names. I find this
-somewhat hypocritical. Each time I see this kind of thing, it makes me
-sick.
+Compile tested with CONFIG_LLC, CONFIG_AF_RXRPC, CONFIG_BT enabled.
 
-As someone who's name regularly gets mis-spelled (for god knows what
-reason...)
+Last patch probably belongs more to net-next, if any. Here as an RFC.
 
-Either we care about correct spelling of people's names, or we don't.
-If we do, then more effort needs to be made to spell my name correctly.
-If we don't, then I'll stop complaining. However, we can't have "we
-must spell non-latin-1 names correctly" but then go and consistently mis-
-spell other people's names and not bat an eye.
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v3:
+- rxrpc/llc: Drop the non-essential changes
+- rxrpc/llc: Replace the deprecated copy_from_sockptr() with
+  copy_safe_from_sockptr() [David Wei]
+- Collect Reviewed-by [David Wei]
+- Link to v2: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co
 
-I'm asking for equality please.
+Changes in v2:
+- Fix the fix of llc_ui_setsockopt()
+- Switch "bluetooth:" to "Bluetooth:" [bluez.test.bot]
+- Collect Reviewed-by [Luiz Augusto von Dentz]
+- Link to v1: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co
 
-(And yes, my name does and has been mis-spelled in commits merged into
-the kernel.)
+---
+Michal Luczaj (4):
+      Bluetooth: Improve setsockopt() handling of malformed user input
+      llc: Improve setsockopt() handling of malformed user input
+      rxrpc: Improve setsockopt() handling of malformed user input
+      net: Comment copy_from_sockptr() explaining its behaviour
 
-> I solved the phy.h conflict as reported here:
-> https://lore.kernel.org/all/20241118135512.1039208b@canb.auug.org.au/
+ include/linux/sockptr.h           |  2 ++
+ include/net/bluetooth/bluetooth.h |  9 ---------
+ net/bluetooth/hci_sock.c          | 14 +++++++-------
+ net/bluetooth/iso.c               | 10 +++++-----
+ net/bluetooth/l2cap_sock.c        | 20 +++++++++++---------
+ net/bluetooth/rfcomm/sock.c       |  9 ++++-----
+ net/bluetooth/sco.c               | 11 ++++++-----
+ net/llc/af_llc.c                  |  2 +-
+ net/rxrpc/af_rxrpc.c              |  7 ++++---
+ 9 files changed, 40 insertions(+), 44 deletions(-)
+---
+base-commit: 66418447d27b7f4c027587582a133dd0bc0a663b
+change-id: 20241114-sockptr-copy-fixes-3999eaa81aa1
 
-Looks fine to me.
-
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Michal Luczaj <mhal@rbox.co>
+
 
