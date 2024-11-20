@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-146418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C14089D34E5
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:57:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736E69D34E7
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:57:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86E672825AA
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:57:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0741F22B86
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AF8158DD1;
-	Wed, 20 Nov 2024 07:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B77D15B551;
+	Wed, 20 Nov 2024 07:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="V0zhzWaG"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="AKmePGHX"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597E1155325;
-	Wed, 20 Nov 2024 07:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336D4157E78;
+	Wed, 20 Nov 2024 07:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732089431; cv=none; b=ftk0/6e0+2RyGpug62dl04/OFrJg/9sejcdamJv9kUsiHg+0uiLXV9cgYl92amHFvMciBjUG1G6etXgl1kIFUwrz82tG8CTXhXDZwWHuPYFvl/RjJKFlIKqFfDL0IiNjnMH7RznfBRtx6OV8KHFnHH9PetolCXOFLmWvEgI09rU=
+	t=1732089440; cv=none; b=he9dQU8C2HcQsf29uaM0VWzxnKiGIXan1EId10I3lIdHyd9XagyemOWbze+c02NNIAE9vjG6fDrUA3XoSxszAB7BZm8/uZbinPWIDmXaXVmV/CVHG8V33LIf5NORrjLvRb76TJQmpDGhVfr5lR6e0+++it9jM+q4lzFmozZ1mWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732089431; c=relaxed/simple;
-	bh=w8HKr7mHvGUeZYvGZ9jSxlUl2wzwUTO1cmkE/Z005TU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bKjmLGQMMtP5fMQx1roOF1YgYHPgQEMjX3vxK6XXaXJCSuxp2wfIno8NrMWoR4KOPlOz7b5WQ5Hvmf6UeJNahwjkDQiRMfQWdvm/2VWnELSNMPbBf2PGB167Wldg3Y1cgmI3qNOtzgNnVlNhrUsKqxlJg3vTO7EgXAdubNXs/AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=V0zhzWaG; arc=none smtp.client-ip=211.75.126.72
+	s=arc-20240116; t=1732089440; c=relaxed/simple;
+	bh=jupBb4ye504kRCeeubDO/UeYQKREE72u1jkJWZkacUA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mSwWQ/S5aAjtDdD4omQJa9u5dvTTLecCh0RYC0iLeGarWYUUeiuL5bYu6boRH3Dc6CqWXD8pZ0M3KeYhpXVXenQehGNLKjQgP4xpUMZ9pfYSPvc7nZwdgswtUfQmc7q9WE1GMjgqad2uQ71NPvPnz9pUnbQiBhBu1kAsm31Bi3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=AKmePGHX; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AK7uWZc93743917, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AK7uuhqF3745295, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1732089392; bh=w8HKr7mHvGUeZYvGZ9jSxlUl2wzwUTO1cmkE/Z005TU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=V0zhzWaGkJZC5/ZkqqBRO6Vn7yeu5p6qvPKEDUwJoKAbxCqyBO5U7Lwz4486ty6sB
-	 eVc8ws5WGqzMw5tOM1deW1zEtHJfcQ/CwGSxU1JWu6CgRH1glGbTw3/tcof9vw5a+w
-	 Gn0mMALHpZcMAvDTsUBoSpUU1OGzGTDrbAIbXy0GaPo64zanxiGmd5U9qEoSVCoCQ2
-	 8hnhDLzcjrZ6ZMfNn3WQ3zgLTE4Oy6O/SMGxj+pixW8YAr4GE00ASE/6VSfUJvCGyQ
-	 p2HmH5iq391NWWrzsPgTkrzlcs9Qg6b9Akz3Xkc83Br1VHD6xsH7dbT30fSe411/0P
-	 N9o7AXjOtvwag==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AK7uWZc93743917
+	t=1732089417; bh=jupBb4ye504kRCeeubDO/UeYQKREE72u1jkJWZkacUA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=AKmePGHX8BwitOciXwoMVm7i3lz+kQa6sAmUnHi/YJvVAQd/WgCZBLl1kJj1dctd0
+	 CMQ7AD0DaVvUE926w7o/Ja4mmaJjjjaMNRn4rfePvLBtCNcPL5p72HzBm9/xecrvep
+	 OYHoyTdgGc0qflCG8xiQnO84nb51azyRzPtG7wWtu2ukm3cSPe5TgY0VW5D99Dsm2b
+	 hOyyEB/toJ2rkcI/Y+ThQ0QvsXzKsLiEkcSE0Kj3ugeipXEnF1uPuhIsSOfj/ykHlr
+	 c4grwyY/zgGlGwrRDi4MzZiEMoN/sklcmvuM5f0y9WDJNz6rSRnTKDH2FqdYEPgEKN
+	 8R33EnlROcCwg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AK7uuhqF3745295
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 20 Nov 2024 15:56:32 +0800
+	Wed, 20 Nov 2024 15:56:57 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 20 Nov 2024 15:56:32 +0800
+ 15.1.2507.39; Wed, 20 Nov 2024 15:56:57 +0800
 Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 20 Nov
- 2024 15:56:31 +0800
+ 2024 15:56:56 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -61,10 +62,12 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <michal.kubiak@intel.com>, <pkshih@realtek.com>,
         <larry.chiu@realtek.com>, Justin Lai
 	<justinlai0215@realtek.com>
-Subject: [PATCH net v5 0/3] Correcting switch hardware versions and reported speeds
-Date: Wed, 20 Nov 2024 15:56:21 +0800
-Message-ID: <20241120075624.499464-1-justinlai0215@realtek.com>
+Subject: [PATCH net v5 1/3] rtase: Refactor the rtase_check_mac_version_valid() function
+Date: Wed, 20 Nov 2024 15:56:22 +0800
+Message-ID: <20241120075624.499464-2-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241120075624.499464-1-justinlai0215@realtek.com>
+References: <20241120075624.499464-1-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,37 +79,93 @@ Content-Type: text/plain
 X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
  RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-This patch set mainly involves correcting switch hardware versions and
-reported speeds.
-Details are as follows:
-1. Refactor the rtase_check_mac_version_valid() function.
-2. Correct the speed for RTL907XD-V1
-3. Corrects error handling of the rtase_check_mac_version_valid()
+Different hardware requires different configurations, but this distinction
+was not made previously. Additionally, the error message was not clear
+enough. Therefore, this patch will address the issues mentioned above.
 
-v1 -> v2:
-- Add Fixes: tag.
-- Add defines for hardware version id.
-- Modify the error message for an invalid hardware version ID.
+Fixes: a36e9f5cfe9e ("rtase: Add support for a pci table in this module")
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+---
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  7 ++++-
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 28 +++++++++++--------
+ 2 files changed, 22 insertions(+), 13 deletions(-)
 
-v2 -> v3:
-- Remove the patch "Add support for RTL907XD-VA PCIe port".
-
-v3 -> v4:
-- Modify commit message to describe the main reason for the fix.
-
-v4 -> v5
-- Integrate the addition of defines for hardware version ID into the patch
-"rtase: Refactor the rtase_check_mac_version_valid() function."
-
-Justin Lai (3):
-  rtase: Refactor the rtase_check_mac_version_valid() function
-  rtase: Correct the speed for RTL907XD-V1
-  rtase: Corrects error handling of the rtase_check_mac_version_valid()
-
- drivers/net/ethernet/realtek/rtase/rtase.h    |  7 ++-
- .../net/ethernet/realtek/rtase/rtase_main.c   | 43 +++++++++++++------
- 2 files changed, 36 insertions(+), 14 deletions(-)
-
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
+index 583c33930f88..4a4434869b10 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase.h
++++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+@@ -9,7 +9,10 @@
+ #ifndef RTASE_H
+ #define RTASE_H
+ 
+-#define RTASE_HW_VER_MASK 0x7C800000
++#define RTASE_HW_VER_MASK     0x7C800000
++#define RTASE_HW_VER_906X_7XA 0x00800000
++#define RTASE_HW_VER_906X_7XC 0x04000000
++#define RTASE_HW_VER_907XD_V1 0x04800000
+ 
+ #define RTASE_RX_DMA_BURST_256       4
+ #define RTASE_TX_DMA_BURST_UNLIMITED 7
+@@ -327,6 +330,8 @@ struct rtase_private {
+ 	u16 int_nums;
+ 	u16 tx_int_mit;
+ 	u16 rx_int_mit;
++
++	u32 hw_ver;
+ };
+ 
+ #define RTASE_LSO_64K 64000
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index f8777b7663d3..c2999e24904d 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -1972,20 +1972,21 @@ static void rtase_init_software_variable(struct pci_dev *pdev,
+ 	tp->dev->max_mtu = RTASE_MAX_JUMBO_SIZE;
+ }
+ 
+-static bool rtase_check_mac_version_valid(struct rtase_private *tp)
++static int rtase_check_mac_version_valid(struct rtase_private *tp)
+ {
+-	u32 hw_ver = rtase_r32(tp, RTASE_TX_CONFIG_0) & RTASE_HW_VER_MASK;
+-	bool known_ver = false;
++	int ret = -ENODEV;
+ 
+-	switch (hw_ver) {
+-	case 0x00800000:
+-	case 0x04000000:
+-	case 0x04800000:
+-		known_ver = true;
++	tp->hw_ver = rtase_r32(tp, RTASE_TX_CONFIG_0) & RTASE_HW_VER_MASK;
++
++	switch (tp->hw_ver) {
++	case RTASE_HW_VER_906X_7XA:
++	case RTASE_HW_VER_906X_7XC:
++	case RTASE_HW_VER_907XD_V1:
++		ret = 0;
+ 		break;
+ 	}
+ 
+-	return known_ver;
++	return ret;
+ }
+ 
+ static int rtase_init_board(struct pci_dev *pdev, struct net_device **dev_out,
+@@ -2105,9 +2106,12 @@ static int rtase_init_one(struct pci_dev *pdev,
+ 	tp->pdev = pdev;
+ 
+ 	/* identify chip attached to board */
+-	if (!rtase_check_mac_version_valid(tp))
+-		return dev_err_probe(&pdev->dev, -ENODEV,
+-				     "unknown chip version, contact rtase maintainers (see MAINTAINERS file)\n");
++	ret = rtase_check_mac_version_valid(tp);
++	if (ret != 0) {
++		dev_err(&pdev->dev,
++			"unknown chip version: 0x%08x, contact rtase maintainers (see MAINTAINERS file)\n",
++			tp->hw_ver);
++	}
+ 
+ 	rtase_init_software_variable(pdev, tp);
+ 	rtase_init_hardware(tp);
 -- 
 2.34.1
 
