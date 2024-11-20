@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-146390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D749A9D33BF
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:48:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CF19D33C3
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D4072835A4
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 06:48:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BFD5B23986
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 06:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59276165F0C;
-	Wed, 20 Nov 2024 06:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507F3177998;
+	Wed, 20 Nov 2024 06:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ke954XUX"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nsoYeUbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CBB12E5B;
-	Wed, 20 Nov 2024 06:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6243516F8E5;
+	Wed, 20 Nov 2024 06:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732085302; cv=none; b=jpSnZQqSLGD+FwZflfiScCfhfDLUngYCtQAkW2V6PMTJ3zEwHaUSdV3t0fax/hCqDf2/pR4pHvRGNYS9AazfnrH2gPBlp4I5yfruHxNyNAr0FF48GsDmNeKQPB5hlJnh94GFs8rjTfbwG6eREkqNGWX0+mS1eimEc4936rQlhwU=
+	t=1732085306; cv=none; b=M5zD54bPM8G/jAijl3XfoTyQYzx2krR0Pz86hNhZRAB/BM5mC4P24Xc3CEYAQdeOgK2WScnGNcM/ieprTX2hsDg4pwbzA97k9j138UARrYYnvIkUqi0XqiRFunGmiyZ98QdhEvuZipmqGyzKt+kQZ9TKKbUGfcGtZejTSZZtpmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732085302; c=relaxed/simple;
-	bh=toOq20qVXZzub2JqslpVXaa5G6T1/Fn2No54S89QEQE=;
+	s=arc-20240116; t=1732085306; c=relaxed/simple;
+	bh=gF13eQVa0Ocaq1UGdDe667AyqYd4x7jSGMSKC4l9o1c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MzlKGsrYc7PATiC15fvfWeRPUkjNfqzXl9/OoLbxytcUOMpYeaZtFhQcB1rGzgCvr/T39gP9d1/eRkWM/o8U0bcmuonjQiPfY9n6vz/x/VTkHIVOhpHK+DWPCy927JOfnGxBEDU45N/F4gpARDNOPHTlnXAkAyow4d6/DEdAQYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ke954XUX; arc=none smtp.client-ip=220.197.31.2
+	 MIME-Version; b=K01y6B00IA50FlSjJX31YQnLh9QE/1cJo+YQWvg1o3lQfrGSgpi1SIFcmWfOsancBpPu3eVvqhpfSmE7gh8cm2ThQtlcUS3UzCLpOudUT8IbbMdl8GqcFWZbIAVwtBRHJBsslEDADBqSPsskoDWQWqgWbGdvyZSTvhiS+0a9fh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nsoYeUbK; arc=none smtp.client-ip=220.197.31.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=bmhQu
-	nCpSSNOOQvTNauj7axcKMoPEb4r9c+M61pUEm0=; b=ke954XUXCBwoIJY01ZbPP
-	CVA1smL1UXQJ/yJEvewmr+lrRDIVJA6FXweFajAj8cmMIa683V8La64tisCgZS4m
-	7HI8FZCU16gaB+Hgg24YurKJ7SK0dafUSDNasqdnz8u+lmkuviamNY7/Zd7GXjTD
-	TxKaT0ghXhyaLW/AFXvuSA=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=6ho3G
+	nqgGCt9fsxOHh+xodC+HlFBZfqO/I/iBHnLVCg=; b=nsoYeUbKFSvmbSvLA/Q68
+	lK8AQuvwO95fHEoj+QhFjv6DpRUBO6APzClm9J1nlFWnyGY2fAnqcouRAZfLE8v5
+	NUE6OEKlGBtiRep6ui6X11Wpd9p57xnQG0ukhOXDVFJxazJSPm4bgc7UaQigBtok
+	39+ru3S1RRuuz5Rn0ppXYs=
 Received: from localhost.localdomain (unknown [193.203.214.57])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDnD1j4hT1nTO3OIQ--.22522S5;
-	Wed, 20 Nov 2024 14:47:24 +0800 (CST)
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDnD1j4hT1nTO3OIQ--.22522S6;
+	Wed, 20 Nov 2024 14:47:26 +0800 (CST)
 From: Ran Xiaokai <ranxiaokai627@163.com>
 To: juri.lelli@redhat.com,
 	vincent.guittot@linaro.org,
@@ -50,9 +50,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org,
 	netdev@vger.kernel.org,
 	dev@openvswitch.org
-Subject: [PATCH 1/4] sched/topology: convert call_rcu(free_ctx) to kfree_rcu()
-Date: Wed, 20 Nov 2024 06:47:13 +0000
-Message-Id: <20241120064716.3361211-2-ranxiaokai627@163.com>
+Subject: [PATCH 2/4] perf/core: convert call_rcu(free_ctx) to kfree_rcu()
+Date: Wed, 20 Nov 2024 06:47:14 +0000
+Message-Id: <20241120064716.3361211-3-ranxiaokai627@163.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241120064716.3361211-1-ranxiaokai627@163.com>
 References: <20241120064716.3361211-1-ranxiaokai627@163.com>
@@ -63,55 +63,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnD1j4hT1nTO3OIQ--.22522S5
-X-Coremail-Antispam: 1Uf129KBjvJXoW7AF1fJFyDKFy7ZF1rtw1DZFb_yoW8XrW5pF
-	WrGryUKw4vyws7J397Xr18CrWUur9rX34a9a4UCw4fAr9xJw1vvF1qvF1IqFyY9rWvkF4a
-	vF1jy39Fga17trDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UtHUgUUUUU=
-X-CM-SenderInfo: xudq5x5drntxqwsxqiywtou0bp/1tbiqRudTGc9e4T0vgAAsM
+X-CM-TRANSID:_____wDnD1j4hT1nTO3OIQ--.22522S6
+X-Coremail-Antispam: 1Uf129KBjvdXoWrtF1fXw17AF1rKF17Gw18uFg_yoWkuwb_Xw
+	47JF9Fgw4jya9xZryDua13tr10qa9rta1Fyrs7tFZrJFy5Jws0yr1SyrZrZr95XanrZa43
+	KwsxXFn0qw48AjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1p6zUUUUUU==
+X-CM-SenderInfo: xudq5x5drntxqwsxqiywtou0bp/1tbiqRudTGc9e4T0vgABsN
 
 From: Ran Xiaokai <ran.xiaokai@zte.com.cn>
 
-The rcu callback free_asym_cap_entry() simply calls kfree().
+The rcu callback free_ctx() simply calls kfree().
 It's better to directly call kfree_rcu().
 
 Signed-off-by: Ran Xiaokai <ran.xiaokai@zte.com.cn>
 ---
- kernel/sched/topology.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ kernel/events/core.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
-diff --git a/kernel/sched/topology.c b/kernel/sched/topology.c
-index 9748a4c8d668..60ff3ba1d6ff 100644
---- a/kernel/sched/topology.c
-+++ b/kernel/sched/topology.c
-@@ -1382,12 +1382,6 @@ asym_cpu_capacity_classify(const struct cpumask *sd_span,
- 
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 065f9188b44a..7f4cc9c41bbe 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -1210,14 +1210,6 @@ static void free_task_ctx_data(struct pmu *pmu, void *task_ctx_data)
+ 		kmem_cache_free(pmu->task_ctx_cache, task_ctx_data);
  }
  
--static void free_asym_cap_entry(struct rcu_head *head)
+-static void free_ctx(struct rcu_head *head)
 -{
--	struct asym_cap_data *entry = container_of(head, struct asym_cap_data, rcu);
--	kfree(entry);
+-	struct perf_event_context *ctx;
+-
+-	ctx = container_of(head, struct perf_event_context, rcu_head);
+-	kfree(ctx);
 -}
 -
- static inline void asym_cpu_capacity_update_data(int cpu)
+ static void put_ctx(struct perf_event_context *ctx)
  {
- 	unsigned long capacity = arch_scale_cpu_capacity(cpu);
-@@ -1438,7 +1432,7 @@ static void asym_cpu_capacity_scan(void)
- 	list_for_each_entry_safe(entry, next, &asym_cap_list, link) {
- 		if (cpumask_empty(cpu_capacity_span(entry))) {
- 			list_del_rcu(&entry->link);
--			call_rcu(&entry->rcu, free_asym_cap_entry);
-+			kfree_rcu(entry, rcu);
- 		}
- 	}
- 
-@@ -1449,7 +1443,7 @@ static void asym_cpu_capacity_scan(void)
- 	if (list_is_singular(&asym_cap_list)) {
- 		entry = list_first_entry(&asym_cap_list, typeof(*entry), link);
- 		list_del_rcu(&entry->link);
--		call_rcu(&entry->rcu, free_asym_cap_entry);
-+		kfree_rcu(entry, rcu);
+ 	if (refcount_dec_and_test(&ctx->refcount)) {
+@@ -1225,7 +1217,7 @@ static void put_ctx(struct perf_event_context *ctx)
+ 			put_ctx(ctx->parent_ctx);
+ 		if (ctx->task && ctx->task != TASK_TOMBSTONE)
+ 			put_task_struct(ctx->task);
+-		call_rcu(&ctx->rcu_head, free_ctx);
++		kfree_rcu(ctx, rcu_head);
  	}
  }
  
