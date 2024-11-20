@@ -1,197 +1,131 @@
-Return-Path: <netdev+bounces-146367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9246D9D315F
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 01:20:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2369D3166
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 01:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CF311F219AF
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 00:20:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 126031F2313F
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 00:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9CBB4A23;
-	Wed, 20 Nov 2024 00:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C6DF9D9;
+	Wed, 20 Nov 2024 00:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icM3enFw"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mc2JLndg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15254647;
-	Wed, 20 Nov 2024 00:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D53FF9FE;
+	Wed, 20 Nov 2024 00:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732062004; cv=none; b=VedtglLvnL2WHW3s6DPiLqUiqPudFNkrRo4cNMktZkqqWXLsbHZ70b3D4Kxks8NxzFFDn2YzhG+P81lBqkhZJuKZH24rEkw6/sw39Ye6Ucglsktfh0slxKt2YOZ2b8Qfb6y1PZoq3mLJF+DN76Pc0WrUkQoHLwl3v/W7nqLexFo=
+	t=1732062626; cv=none; b=EMl29rcmeCdJl8WcqUo+4mIKTdlH93qMXLZjPl/UadcYKPhwLb/8s08kqI0tCZod5ufv1pJhR3xosPMepntGlZdyK0VGjDUX+ukbB5ILwNFIAhInZAlEssTsG3/0JmlbYd0TP+YRAc5qOUJLxfrMHq5FxH77jQH0Y+yY+aKRLZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732062004; c=relaxed/simple;
-	bh=tffTpPg9rATtnzAwirYZjiWerQgCm6dW1J0qRe0a+PM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xs3LMA+iD/1DcfFzsr/qW5IEiy+VGPx+Wv1oL0VD3Nf0OBfPTSnNUPBuINE7yVwwsU2i9NHLkcs0KU6JyFD068FNc/rYCnCQP141vdA4nn8EwBXs4+7zD7iGztxK5/Wfd4cEVtGUQF4S1vUCkizXnzAgVhJ75v/Vw4YnoVKGMQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=icM3enFw; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ea527ae14aso1156042a91.1;
-        Tue, 19 Nov 2024 16:20:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732062002; x=1732666802; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rfOtefJc4QMbrWO0NVuhXeyUXomckquTaAfyd1RDazg=;
-        b=icM3enFwrWsaj3Pq06zdwpKjw22GD1931f/TW92Mi9rrLivyOz9na1me6lNuzVLOQ7
-         3EEoLE1lcVWMDQez1bx9jtSDpz4M7/otzqyx+mzU8nbxAN+mK3LAceumao8EdI0C/G2Y
-         eBW/MPRT8CklvuGxjxPEzJk/s0uSZgSmwgFZaTHih3L5kIh3dhUzl9bUp09siMmR8Anl
-         vzth9JvlQf2lftObPRG8A/eq00MXTbc5bvmLdfWB4piRnS6+VzSAbQ3momSKejKQerG/
-         ZtGqKVs34x70YkDdfLZrWtrLvW5+DTSokPYhUFLd+Eju4vQUPb7rEEFY42WfCieE8iW9
-         G/qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732062002; x=1732666802;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rfOtefJc4QMbrWO0NVuhXeyUXomckquTaAfyd1RDazg=;
-        b=voGLTnwkX83gWAOg1R5Dabc1thV/nZFpIOF2I9/kSNeslyqZ0v28IfH+IMh5zgJWaD
-         Bdq9Rx5wdNHx5iRskygO1nBPbq6JqHXiH5n76GqZ9xZ9KHQiQwgNtwJtwbufqy5t3wI5
-         kfFhKYY9ksQb7LwxgZNpONNOg0/rAqRZE8rVuu6ehsc2B2QIMZkqB1puNWxLdB5/uKrw
-         4/ddbjOWX4jiZBV8VSJw/3FHhxfpWdrM/MBdbn4VQLpadDQ+7vAQD/jO4uEVXejyWO/c
-         oML/PJ4g8v6UgVYV7MrgaaxAKoL5Tsdnmm1WHrfAIpm9ZjL3Na61U+Q3vcMuWiMjU9Wu
-         0U3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWCv+wNb8PG4AUvJ3s/TrBSnMF/yGEjxRiugBUB+A+zUEagh7i5BhTxaoy3QPy6YHc233FLIkVq@vger.kernel.org, AJvYcCWeFk7m+P9XRxcMg5BnYxPyG0r9D49ip2h9FFCYdQdiQzF23yQKCK8ahnIZ8hNydfQbHq59Tw/ucwq01oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb16Err/eKSowM4wf2WlTXzUvgXOtET2jsCne4RgaP+FhQL0qX
-	qoTydqCDvaN61O3/KUcb1jb6eFPh2q4u9Lz4yR7j0x1ToEogdBdwOika2Nn21hN4U8UOWxdEctA
-	iNieCmXA8NvPj/WhEPxAgHDtvLY8=
-X-Gm-Gg: ASbGncsm//1FC/NgwvjrmB+zpZVbYR3m57Lwxt3RdlHZIvazl/DoQINJ5dR98OdNf2S
-	YukdCaZCrUmUIDDp/Ds9IKkX/O8PTr9E=
-X-Google-Smtp-Source: AGHT+IFeHhLBLADhTmN6NURSzRgBeGkE7BulzP2DU+xkLm6ttNjZngS+9SrzBgqtUNZ+usG4nnueqm1tD6g1F6iovJk=
-X-Received: by 2002:a17:90b:35c7:b0:2ea:9ccb:d1fe with SMTP id
- 98e67ed59e1d1-2eaca1f5ab5mr1109554a91.0.1732062002160; Tue, 19 Nov 2024
- 16:20:02 -0800 (PST)
+	s=arc-20240116; t=1732062626; c=relaxed/simple;
+	bh=Tj39gEQRUnuZujqX2/SNkK2rF5SE+IM6h9lUEGWn254=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=lG/8RRa2c7qhNal61PZq0swEVbu+fDQTVrHHrh7my7VjDHft0Y1Jn6A7XxZVWHFRUrF39Lh7HlwH4Kx81C3GBRDkQNDbzo4KTKUjVnPjvwfWcjgXxEOnX4hg4lUPb44PB5kxQ2y6SIdaDB/ib31lUa40kD0IIA+o7jJJmCsfm2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mc2JLndg; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1732062614;
+	bh=xgE8VEddh66b6D5zGoRX/UR/hABPOyWddRiDV3o9Iqc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mc2JLndgDTR8x68KMC8rykavNvJ3fiwGig9qJ0Mx9UA5PA4C7DQ6dOlU2Cgwykfg1
+	 7pmf3wKU3QJl5Os4iSFtV/DGVXptML1tYstxxm9CI1MKdFREMdHMKR9wFy2mpUqwQX
+	 pJvCOFNg+dqXyQME9QxnPhccO8Njb1BzJ0AnjodP4Y/s05dDTmRWYsFci5/1byFj4R
+	 yVdXFleOrbSOwtMyGrYjePp0y7hDjIAO7/3GE02C6BfBlYduzWZGafwjCF+/zDefdH
+	 eLPx2l2P6EGC5WMU+IUnxbasmQOo06zaU9fJyP3f6Sas1EtrrjRWraKuOxK/SbJUKj
+	 KoB0H+BlAGX8w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XtMhP2JjKz4w2L;
+	Wed, 20 Nov 2024 11:30:13 +1100 (AEDT)
+Date: Wed, 20 Nov 2024 11:30:15 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Jeff Layton <jlayton@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the ceph tree with the net tree
+Message-ID: <20241120113015.294cf1d2@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
- <20241115160816.09df40eb@kernel.org> <CAJwJo6ax-Ltpa2xY7J7VxjDkUq_5NJqYx_g+yNn9yfrNHfWeYA@mail.gmail.com>
- <20241115175838.4dec771a@kernel.org> <CAJwJo6YdAEj1GscO-DQ2hAHeS3cvqU_xev3TKbpLSqf-EqiMiQ@mail.gmail.com>
- <20241118161243.21dd9bc0@kernel.org>
-In-Reply-To: <20241118161243.21dd9bc0@kernel.org>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Wed, 20 Nov 2024 00:19:50 +0000
-Message-ID: <CAJwJo6YcPt5+9uQt4yuYS_7o+O8ubjEgOBrq9RmH+b8OpJxdGA@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Ivan Delalande <colona@arista.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mptcp@lists.linux.dev, Johannes Berg <johannes@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/DaF8sq.aa1GmhT4rubJOvbh";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, 19 Nov 2024 at 00:12, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Sat, 16 Nov 2024 03:52:47 +0000 Dmitry Safonov wrote:
-> > Kind of agree. But then, it seems to be quite rare. Even on a
-> > purposely created selftest it fires not each time (maybe I'm not
-> > skilful enough). Yet somewhat sceptical about a re-try in the kernel:
-> > the need for it is caused by another thread manipulating keys, so we
-> > may need another re-try after the first re-try... So, then we would
-> > have to introduce a limit on retries :D
->
-> Wouldn't be the first time ;)
-> But I'd just retry once with a "very large" buffer.
->
-> > Hmm, what do you think about a kind of middle-ground/compromise
-> > solution: keeping this NLM_F_DUMP_INTR flag and logic, but making it
-> > hardly ever/never happen by purposely allocating larger skb. I don't
-> > want to set some value in stone as one day it might become not enough
-> > for all different socket infos, but maybe just add 4kB more to the
-> > initial allocation? So, for it to reproduce, another thread would have
-> > to add 4kB/sizeof(tcp_diag_md5sig) = 4kB/100 ~= 40 MD5 keys on the
-> > socket between this thread's skb allocation and filling of the info
-> > array. I'd call it "attempting to be nice to a user, but not at their
-> > busylooping expense".
->
-> The size of the retry buffer should be larger than any valid size.
-> We can add a warning if calculated size >= 32kB.
+--Sig_/DaF8sq.aa1GmhT4rubJOvbh
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Currently, md5/ao keys are limited by sock_kmalloc(), which uses
-optmem_max sysctl limit. The default nowadays is 128KB.
+Hi all,
 
-From [1] I see that the current in-kernel (struct tcp_md5sig_key) hits
-optmem_max on
-# ok 38 optmem limit was hit on adding 655 key
-IOW, with the default limit and sizeof(struct tcp_diag_md5sig) = 100,
-the maximum skb size would be ~= 65Kb. Sounds a little too big for
-kmemcache allocation.
+Today's linux-next merge of the ceph tree got a conflict in:
 
-Initially, my idea was to limit this old version of tcp-md5-diag by
-U16_MAX. Now I'm thinking of adopting your idea by always allocating
-32kB skb for single-message and marking it somehow, if it's not big
-enough to fit all the keys on a socket (NLM_F_DUMP_INTR or any other
-alternative for userspace to get a clue that the single message wasn't
-enough).
+  MAINTAINERS
 
-Then, as I planned, teach the multi-message dump iterator to stop
-between recvmsg() on N-th md5/ao key and continue the dump from that
-key on the next recvmsg().
+between commit:
 
-> If we support an inf number of md5 keys we need to cap it.
+  4262bacb748f ("MAINTAINERS: exclude can core, drivers and DT bindings fro=
+m netdev ML")
 
-Yeah, unfortunately, we have some customers with 1000 peers (and
-because of that we internally test BGP with even more peers).
-And that's with an assumption of one key per peer, which is not
-necessarily true for AO.
+from the net tree and commit:
 
-> Eric is back later this week, perhaps we should wait for his advice.
+  6779c9d59a07 ("MAINTAINERS: exclude net/ceph from networking")
 
-Sure, I will be glad to have advice from you both, thanks!
+from the ceph tree.
 
-> > > Right, the table based parsing doesn't work well with multi-attr,
-> > > but other table formats aren't fundamentally better. Or at least
-> > > I never came up with a good way of solving this. And the multi-attr
-> > > at least doesn't suffer from the u16 problem.
-> >
-> > Yeah, also an array of structs that makes it impossible to extend such
-> > an ABI with new members.
-> >
-> > And with regards to u16, I was thinking of this diff for net-next, but
-> > was not sure if it's worth it:
-> >
-> > diff --git a/lib/nlattr.c b/lib/nlattr.c
-> > index be9c576b6e2d..01c5a49ffa34 100644
-> > --- a/lib/nlattr.c
-> > +++ b/lib/nlattr.c
-> > @@ -903,6 +903,9 @@ struct nlattr *__nla_reserve(struct sk_buff *skb,
-> > int attrtype, int attrlen)
-> >  {
-> >   struct nlattr *nla;
-> >
-> > + DEBUG_NET_WARN_ONCE(attrlen >= U16_MAX,
-> > +     "requested nlattr::nla_len %d >= U16_MAX", attrlen);
-> > +
-> >   nla = skb_put(skb, nla_total_size(attrlen));
-> >   nla->nla_type = attrtype;
-> >   nla->nla_len = nla_attr_size(attrlen);
->
-> I'm slightly worried that this can be triggered already from user
-> space, but we can try DEBUG_NET_* and see. Here and in nla_nest_end().
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
-Yeah, I thought that CONFIG_DEBUG_NET is not enabled on generic
-distros, but the description is:
-:          Enable extra sanity checks in networking.
-:          This is mostly used by fuzzers, but is safe to select.
+--=20
+Cheers,
+Stephen Rothwell
 
-not sure if that guards any production users from enabling it.
-But that would be interesting to see if, with those new additions,
-netdev doesn't produce any warnings.
+diff --cc MAINTAINERS
+index 54fc0c1232b8,3771691fa978..000000000000
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@@ -16235,7 -16179,7 +16236,8 @@@ X:	include/net/mac80211.
+  X:	include/net/wext.h
+  X:	net/9p/
+  X:	net/bluetooth/
+ +X:	net/can/
++ X:	net/ceph/
+  X:	net/mac80211/
+  X:	net/rfkill/
+  X:	net/wireless/
 
-[1] https://netdev-3.bots.linux.dev/vmksft-tcp-ao/results/867500/14-setsockopt-closed-ipv4/stdout
+--Sig_/DaF8sq.aa1GmhT4rubJOvbh
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Thanks,
-             Dmitry
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc9LZcACgkQAVBC80lX
+0GyhAgf/XHLwOcd9hP83RfBiS+nYp/gLhU5fkhsyd8y6YM/RHAhgpEj0+TzFrW+O
+ClwWaVIebEE3x2KOgw6QuPXQmvi+AJ0YJz+ZNTkxGXVb8cAL8Gi6RnP8xwlepxoE
+jAVH93XesiKQIrzTOMxdhP7+3De+Bs42Zz/nO/V2GqGbcSDOm/p7RnLgZE5Hv8ZG
+bn6rpZLS1SFjqcCc/TxnxjT1g0kLIwNUBZ7s/CTugcKQ9LAmQ+nQ/k7zzriNqbPb
+rBbI2tHM8x9JrDhahrItOcS3bedhayknnG48kKBG3mAtR8/ZVQ+eZst37kKMKclJ
+uBhxbupBrVkiFjYWK5LfMolRA2+J2g==
+=Dpml
+-----END PGP SIGNATURE-----
+
+--Sig_/DaF8sq.aa1GmhT4rubJOvbh--
 
