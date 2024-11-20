@@ -1,124 +1,158 @@
-Return-Path: <netdev+bounces-146384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE369D339A
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:34:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 189A99D33B7
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:40:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A8F284724
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 06:34:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFBDF1F23E21
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 06:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F929158558;
-	Wed, 20 Nov 2024 06:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034FB15B97E;
+	Wed, 20 Nov 2024 06:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Fpyz7lNA"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="asGOkefe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929D874040;
-	Wed, 20 Nov 2024 06:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B01157E78;
+	Wed, 20 Nov 2024 06:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732084465; cv=none; b=f1zPxW8UCxw4mAV2imCueJvAzosP9W9FO+7TXGRqW6nsJxrkqRr1WXh31wcxPiBjUHSd0Hkj+ibIWFJIDKO0AT6zyYp3h2SbJq52kMkW+VuhTYsI+Tqx5f/xKuCia5sS2k95tCpcilpdn0ahslLXAAnnnfUyP1CTxpt/JYJUY1A=
+	t=1732084841; cv=none; b=MjXglJSacvIg0sLNbFHEfZIIZfWenGBXM7sLyeBIR14AL5hE8OB7NbpLIPqsU1dYxLEFqJ9AXsItUCDd3dYwchbh+aitZs7A6mEP17UK94GEPbZFzsyCk8JToG41T59bBWkPrDHWyzvOH8eQfGjfDvt9tPTHS9FESSnsewvasqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732084465; c=relaxed/simple;
-	bh=3uumOuNXlCpu8TMT0VJQpUU4Tx+FKX2daARpB3THYQk=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=oVd22zfM7cVyQwK4fVjI0FyIyp8Ev/eIs8mUeP9JG+mxvUKaZ2D3yiGVxY3lJHHe2DUUGyKDHFFaoosqmPqy2Ol50VPpFCsizZKXzznBRmv5kIJ87QV32KzYub0fwbbSL7L3owfvzI6AH9BnzGOQiNVFzRCU/tMRYcsHE0Fw2Fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=Fpyz7lNA; arc=none smtp.client-ip=162.62.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1732084457;
-	bh=f6l5ar/S69nXGkZml8nQA3BBhPwpLDKxZGJrvkTNWD0=;
-	h=From:To:Cc:Subject:Date;
-	b=Fpyz7lNAk/WOKk2XCDg8XLERM1L26UDJ8rQqwnf1UNpP4eR0Fv4WSrhOeHSbLrrWy
-	 30fhhaifOQT8Mv5ahUebQ9GnUq9Is4euBHY8PuUEi8tMKgxZlvOwGd0rKoaOF7uPAy
-	 IFvLNBI7fo+QhmhYlfvtBz6yJvg0RTGpeD3Q27bQ=
-Received: from localhost.localdomain ([111.48.58.13])
-	by newxmesmtplogicsvrszb21-0.qq.com (NewEsmtp) with SMTP
-	id 6F611248; Wed, 20 Nov 2024 14:27:54 +0800
-X-QQ-mid: xmsmtpt1732084074tzesikb58
-Message-ID: <tencent_9E44A7B2F489B91A12A11C2639C5A4B9F40A@qq.com>
-X-QQ-XMAILINFO: NCmjBvJFq6XN2aVtkB2vMkETWjYiChSTJ1rjUva3trTa8Tl8g/UVlYgjz4e+jj
-	 8OxCJ89zkrYHTr06rrr54Mvi2qiAcveXAVDf4FUMAFM7KkrhTQvrPLj8+02eAMW4okyQ3wWeCayv
-	 dtOO9ck8vNpgj/Dt0V0vKGRvisCitZlbAYHJMgstSq7qdYW7OYNEB0+ritCrINGbi4EP0xQXie0h
-	 p73vqudjtLPvCkrzltSBcvzuwMU7kX4/xBrAP/ibjIpS0ghZhmcTo9yGCwaKk2Z1OAN0AbwDgG+G
-	 rz31PJI674Pk4v+FxrHnAxpRrcCjlpH8pXAMcPcKVaQ7DIN793ASvjbILaX/6IuztRGO4PAmiPIK
-	 JF0MGYbTm8RJRDyJWyeDjuUpm72ZwvXz76omvNvKyEaUhmqiXgA7UplyLQWu7RIla92URTitzeol
-	 cP53lGHtj2ZQ5thcyJeJQyUsB0rJ/uv7x5mk2n6mS1/4aQ7oMwrVVW1QyUbJkBELR8e4IkLukxXA
-	 YQrzbxFsUR6euwiP2wvIv92qXvEJn3gN8oph4CdbYMiYyL7ykAOHLUBz5ZfNlcm72Ch15cWXUkN9
-	 6LOJOuoPgrfs93FJ8VQm5SB9YBW9iSTyXsLvAPUFeIaDNSRAX/TxGEeDw0s7KZIVSrr5HEWSHjGM
-	 jYRKouu6dtoqzj3u/iYDzJjR8pD0VNzqP4EfgWoHpB7imzxK4kIsPBaFODKgGMlvXNIMkB47VZ56
-	 p40p/uSmKCR5/JTqPWJiAlKHze9e35ux2WQ2RmHYb75g4iCs4NHSgnXyzmYWew6YcRxqSTODNaKR
-	 0Mf1RvVXBI2QP/WvYCvyWCpCcBHDvLkV/JPQxKgJR7Ljun4ZdHfxHz8kskORNgjJ8xGQ1nBRMSKC
-	 4kdQD0/LQQEP3FvUZBfr740p8mYEfhO4OH1kUXhE21U4/ukflO1OaA3ro5v1JxOhNwtuKGHTY67k
-	 SyAGTgdgQCL0pWY+15o0lhB8FCieO4aVw/AbL88ItgbJPCuwNeQPfZY8bHLSMY5a5+JuB0y7h0U5
-	 g5Hmeogw==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Cong Yi <yicong.srfy@foxmail.com>
-To: linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Cong Yi <yicong@kylinos.cn>
-Subject: [PATCH] net: phylink: Separating two unrelated definitions for improving code readability
-Date: Wed, 20 Nov 2024 14:27:53 +0800
-X-OQ-MSGID: <20241120062753.140472-1-yicong.srfy@foxmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1732084841; c=relaxed/simple;
+	bh=AQHav6mq9jxb1m5+yTFlphJaUhWsChLctAm9ANCkOKg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=r2ZKFrxPMEwmtJcI9b51kzdrkdeVPGf2b/KvX0KHM7HFBKyLunaoKQQdyiATsst/hkWa64l14O87fCTWWZaelib6fXWkADvNAu5A3GRMHX1X/5BraZM7275cDxdODr6xDs1VloAFH9Qm1msSjCtkTMluvE6lmzwQxU+w+TowjVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=asGOkefe; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4AK6e7sU53657917, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1732084807; bh=AQHav6mq9jxb1m5+yTFlphJaUhWsChLctAm9ANCkOKg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=asGOkefe8ykStiyCN1wnzNQEwOGZsMb0yJoQEB9yCP+JBQugbJvJPmbu/uq8GrUDC
+	 tv3Y2kZnQZk0JBnBOlujjG/fsTAf9PF6utydKZdK5ccVS5w3l5LJu7qEgdHHrOAwCH
+	 Ug78t65S0qIO4QrECZbiADFkNJ2c8NcmERmeqlZzMfxGF9+jasrXpsm9GTUwxjqcAk
+	 VuyZP0adXly6+Fh7WVXqsvE0hijoxnz+PCrsWmy5a0z+zsqxfRveZMCBKDy5IlooqI
+	 nJvphtPmbSrWf5Kdmx7YeBT0tTD5gTrYjDcI7rZweOjKDFFvCCpSCfqfzvBgT5sj2C
+	 UvdyqklMUS0/g==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 4AK6e7sU53657917
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 20 Nov 2024 14:40:07 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 20 Nov 2024 14:40:07 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 20 Nov 2024 14:40:06 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Wed, 20 Nov 2024 14:40:06 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Michal Kubiak <michal.kubiak@intel.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "horms@kernel.org" <horms@kernel.org>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net v3 4/4] rtase: Add defines for hardware version id
+Thread-Topic: [PATCH net v3 4/4] rtase: Add defines for hardware version id
+Thread-Index: AQHbOW/NBxXm0bSy4UegwMBfAsYEBbK8XWoAgAHO/AD//8cGgIABwMDA
+Date: Wed, 20 Nov 2024 06:40:06 +0000
+Message-ID: <3fc55df5a3e84743a93a16f4a8807dfe@realtek.com>
+References: <20241118040828.454861-1-justinlai0215@realtek.com>
+ <20241118040828.454861-5-justinlai0215@realtek.com>
+ <Zzsh3AjTAnQoKKTl@localhost.localdomain>
+ <7c1a67a1ec7b4b1eb4965575b625a628@realtek.com>
+ <Zzx2ccp65u+AkxHt@localhost.localdomain>
+In-Reply-To: <Zzx2ccp65u+AkxHt@localhost.localdomain>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Cong Yi <yicong@kylinos.cn>
+>=20
+> On Tue, Nov 19, 2024 at 07:22:46AM +0000, Justin Lai wrote:
+> > >
+> > > On Mon, Nov 18, 2024 at 12:08:28PM +0800, Justin Lai wrote:
+> > > > Add defines for hardware version id.
+> > > >
+> > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > > > ---
+> > > >  drivers/net/ethernet/realtek/rtase/rtase.h      |  5 ++++-
+> > > >  drivers/net/ethernet/realtek/rtase/rtase_main.c | 12 ++++++------
+> > > >  2 files changed, 10 insertions(+), 7 deletions(-)
+> > > >
+> > >
+> > > The patch is addressed to the "net" tree, but "Fixes" tag is missing.
+> > > Also, the patch does not look like a bugfix it's rather an
+> > > improvement of coding style with no functional changes. That's why I =
+doubt
+> it should go to the "net"
+> > > tree.
+> > >
+> > > Thanks,
+> > > Michal
+> >
+> > Hi Michal,
+> >
+> > This patch introduces multiple defines for hardware version IDs,
+> > rather than addressing any issues related to the function logic, which
+> > is why it does not include a "Fixes:" tag. The reason for isolating
+> > this change in a separate patch is to maintain a "single patch, single
+> purpose" approach.
+> > Additionally, these defines will be used in other patches within the
+> > same patch set, which is why they are included in this patch set as a w=
+hole.
+> >
+> > Justin
+> >
+>=20
+> Hi Justin,
+>=20
+> I understand the purpose of the patch, however the patch is addressed to =
+the
+> "net" tree. Each patch sent to "net" tree should have "Fixes" tag, becaus=
+e that
+> tree is for fixes only.
+> You may consider sending the patch to the "net-next", (which is closed no=
+w
+> because of the merge window).
+>=20
+> Thanks,
+> Michal
 
-After the support of PCS state machine, phylink and pcs two
-unrelated state enum definitions are put together, which brings
-some confusion to code reading.
+Hi Michal,
 
-This patch defines the two separately.
+Thank you for your suggestion. Upon further consideration, I agree
+that the addition of the hardware version ID definitions should have been
+implemented directly when fixing the related issue. I will make the
+necessary changes accordingly.
 
-Signed-off-by: Cong Yi <yicong@kylinos.cn>
----
- drivers/net/phy/phylink.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 3e9957b6aa14..1c65fd29538d 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -30,11 +30,13 @@
- 	(ADVERTISED_TP | ADVERTISED_MII | ADVERTISED_FIBRE | \
- 	 ADVERTISED_BNC | ADVERTISED_AUI | ADVERTISED_Backplane)
- 
--enum {
-+enum phylink_disable_state {
- 	PHYLINK_DISABLE_STOPPED,
- 	PHYLINK_DISABLE_LINK,
- 	PHYLINK_DISABLE_MAC_WOL,
-+};
- 
-+enum phylink_pcs_state {
- 	PCS_STATE_DOWN = 0,
- 	PCS_STATE_STARTING,
- 	PCS_STATE_STARTED,
-@@ -76,7 +78,7 @@ struct phylink {
- 	struct phylink_link_state phy_state;
- 	struct work_struct resolve;
- 	unsigned int pcs_neg_mode;
--	unsigned int pcs_state;
-+	enum phylink_pcs_state pcs_state;
- 
- 	bool link_failed;
- 	bool using_mac_select_pcs;
--- 
-2.25.1
-
+Justin
 
