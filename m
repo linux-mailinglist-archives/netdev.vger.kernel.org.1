@@ -1,131 +1,121 @@
-Return-Path: <netdev+bounces-146520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C5639D3F56
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:48:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A25A49D3E9B
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E19CBB35EAD
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:09:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69019281DEC
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B901D86EC;
-	Wed, 20 Nov 2024 14:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE5F1D95B3;
+	Wed, 20 Nov 2024 14:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="ONzI589g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QJ/BllcH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5E31C4A18
-	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 14:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3441D9329;
+	Wed, 20 Nov 2024 14:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732114611; cv=none; b=EA4MEdZ1EywrlNMNd9irg/SrswqqWzNbg34Eoluv3k210PS8wMtoEbfzGff5nQFH9WiboTy8/B+o6gg32dwLJxsmVYH6US1vGB2E3FzG2frJcC3aCDj0zawzmOB6OhNMwvoiKPvVRQvZVHRgOM6l6qt6lGMy50k6WCb7YLf08u0=
+	t=1732114685; cv=none; b=C1o7HYcqIGA8ccQU9uU0zjjCtRIvtZMU36lpUVJvV6TACIrfGQQyGaYmKKFNSS1/AJ19HalLTKx1k6otZoVY1R51tbssL30kbtqUxRkahwjabNFPzKf1kBjtlC9ZbGxI5JIB5Jc2yoL51cInnatPpU4VLjZbmENklEzP1+hWHn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732114611; c=relaxed/simple;
-	bh=HFi3iYVf2L2AZYU4Q1oHE4nthfnWHmyGbKDeHcSz6sE=;
+	s=arc-20240116; t=1732114685; c=relaxed/simple;
+	bh=8CMRHB2cxqTmamBsqg9uudH9g9ASPeTH0X8IvXsphJI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mzUhNhA1UU5b6H2TH/Ed0MTI5hZC2c4T8DsTNO80hPSejgblUHhHc8+OPaWIcD4WD6mdanNfLdL4HrwDLmSZUU/+qdUhxspG1SFB8s9P8OTEDmLqBpV3hsshIqj16B/mNmce/yK6Z+UupAIJploz0GzcIgKsKGpYrikMQQUvbS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=ONzI589g; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-431688d5127so18847795e9.0
-        for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 06:56:49 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DpTjNv9JJTfh9A8bsAIhBb6irl7F327iU1zgRdT9eNoeV3ghDJO0Uvg8wlLHzQ+1zTa2r6SywsAU7pFEksa7phrjYFCzfQxJ/Evz781z++c5h8cc0GYhWF9CkGvTvInsUrKock/g0nyn/dBggPy80hdOuaDZQEiuOkXIMJd9Kr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QJ/BllcH; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ea2dd09971so1900267a91.3;
+        Wed, 20 Nov 2024 06:58:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1732114608; x=1732719408; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732114683; x=1732719483; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/WhX7sy9ylH8oB54T8NmaXKVtwnhmbfEVEz1XB5edX8=;
-        b=ONzI589ge5HADKWKUKx3ni1XbJQZ0oggiJ4CwSrHcgFeeowkHuAINGp0of0vMJplCP
-         ot1iXoCjakEM10mVVfWzOrnyD0CGp1YEC9aJGFmP1DKMxHOEeVjxhJK7WScRToCgIn+z
-         Mo13Q0ezxR/4NcGbmPp4gwyFAPe54xX3DhL4B8ZrZlOHWpzLGLWepvLghNwwaW2YRT0O
-         oUTPsZ/Ac5zdFFV67o1zhN/9zpa5EbiuvOTsCk1CDEOKWOri6RIkKd/yD05OUr3GY+JR
-         tQ9VW1c8UAswil97UqFLrS5NzlO8B1nDw3cJW8d3arfe4a4lORM9pkUKS4udfJlyRAUG
-         SWsw==
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V5tRs5SDxCA6uVSrjq3npJTWFM0ZTaUuFsUk1yMWVPU=;
+        b=QJ/BllcH641o7SQSu5OaHg+rFWIXm5INxRqB+4chvijzOgMh2AKP7MCG6fcN4aUU63
+         eyKo4cbv8dKwfk+GEMtG5zIrHd3QpfiDz1omwc6HeTYp5d20k0wn6ofouoAFQWvoMBEG
+         c2B6YZACUIFjh/iclEbqmWqHkao6cFgZkH0P9R/P/p7oFVTW1BMkT3K/CvR/XGIAZFFZ
+         mSqMt1F3mtpO0oZ2fuI/PL2ipl9RrfFxnynpGbusX+4rCfMXvtKo3AxiOoeI3+OTS5B0
+         M43PiLURO33MprfaHfnjHZc+Y/AWHoCr20hWDtZh//7EU5smD8VZBDVKQmregbBcgeTK
+         np0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732114608; x=1732719408;
+        d=1e100.net; s=20230601; t=1732114683; x=1732719483;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/WhX7sy9ylH8oB54T8NmaXKVtwnhmbfEVEz1XB5edX8=;
-        b=niH9ytbXOUkWDsK/T4pGYFu1uQr0DH5OplZhLdTrEmnVPZy9zzNha6VBMD/YhCkTJ2
-         j6vP9qEvuECXW70UX+WNX6hX2mTIBq+JgEmNMLjOFipYyqS+F7ZQwGPm5xKlV8QHpT/2
-         An9qWpfMoz6Gt13i/i5kjBO++ptoH5gMuGAP7+3jrGY3gtCTVmP+dBgVFzpml3dfCKKR
-         vpfki2CDSRyRrMFcYQ+jfEebwQoCpOzYCiBhwmmefnsOMcOEJulkk5L6etTQ4ZAhl9t4
-         0Hrw8OhbuEJLzY2lqnpkv7HIrvOU63Ay2iLyHWzBeAlpmXwMHuTGit1gCNmbXwCHabkR
-         swpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXY+VzhcZela2xM70Sipn7X51CgN49zlVIiAX87q/omA6SdueSOAigxGpx5zN3QK8iYBMNwUFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR0TmsrefMbDreury0/JFK+iSCtpego+D2TufH3Wz3nKbHguxc
-	S0eNYFBD7DUXIN1EFRi6Xaeu+nzIO8XjeB4kXrWHelZIM9G9ZGylFiN7nqHRWMA=
-X-Google-Smtp-Source: AGHT+IHrKfGLOGxnCvfbK0rlizot2Xe7bNWUl7+WlgkZB4qaV364sHZfb2rsYw8BE+EFPgwo4ike+Q==
-X-Received: by 2002:a05:600c:4f83:b0:431:50fa:89c4 with SMTP id 5b1f17b1804b1-433489868e5mr29893195e9.3.1732114608102;
-        Wed, 20 Nov 2024 06:56:48 -0800 (PST)
-Received: from localhost (p509159f1.dip0.t-ipconnect.de. [80.145.89.241])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825493ea7fsm2279732f8f.90.2024.11.20.06.56.47
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V5tRs5SDxCA6uVSrjq3npJTWFM0ZTaUuFsUk1yMWVPU=;
+        b=VDzi/U5hBDPxOa632rOU6iK0W7TvYZ+13ClFKqjbGRaeUCOZnOujEeWg8rYfljyTBj
+         D1T1+Kr5tpZUncFs64e0opKIkDXHwsMRrBuv8u2jJwE3PDAHz41kk1rL6p1NZHFhwAse
+         oFunpMHwR/EzBh57oOA5REFzCnWjpq+JNqXocr620UjN7dj2mIW2yyYjUIsnDftstnSs
+         GuH8uJUQZAkPZs7UshUwXtQWOyfqVADEQ3M8LAQZKwpnijgHAJhUtYdmVg+8HXjF7KCD
+         YVxJdMINXIhpx/ce6HqmdABVJmQz0T9Tf2s6fnmblS78bKiJjxXZly9jMXELtWKSqI5g
+         LR8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWp4Q5BAn5M3KbfF82uvzo9irM9FX5fKIr2ZbnPFWd3CLEf9xyFHcZQTCaCGA13m9kOOT+mf3Gm@vger.kernel.org, AJvYcCXG+me+UZP6YlDT4K5pPDS1yMiRy5o1oujCwou2krF+JXhYMy40orMW75WxRx4uceSa0NKUTASq+fUQDnU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybVAcHLrIGTbFC2HIBNh4HlBn7T5eoJnkHFUhV1DPTXKOd2+7a
+	F6XAJw/p4nzDyZU6UCqWQCeu6peRtlENsPATbdmxtce4Ti4qceHZ
+X-Google-Smtp-Source: AGHT+IFV7iRAEgSa8oH8+7AoTvx0uOegkgCNlN1vBcrbCPN/pmNqJi3DO6BRx8wXmhFSKq6G9fmCIQ==
+X-Received: by 2002:a17:90b:4d0a:b0:2ea:94a1:f653 with SMTP id 98e67ed59e1d1-2eaca7ddfd1mr3149652a91.31.1732114682861;
+        Wed, 20 Nov 2024 06:58:02 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ead02ea238sm1404275a91.10.2024.11.20.06.58.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2024 06:56:47 -0800 (PST)
-Date: Wed, 20 Nov 2024 15:56:46 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Joey Lu <a0987203069@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com, schung@nuvoton.com, 
-	yclu4@nuvoton.com, peppe.cavallaro@st.com, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v3 3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for
- Nuvoton MA35 family
-Message-ID: <klp4a7orsswfvh7s33575glcxhlwql2b7otrpchvucajydihsi@dqdkugwf5ze5>
-References: <20241118082707.8504-1-a0987203069@gmail.com>
- <20241118082707.8504-4-a0987203069@gmail.com>
+        Wed, 20 Nov 2024 06:58:02 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Wed, 20 Nov 2024 06:58:01 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RESEND PATCH] net: microchip: vcap: Add typegroup table
+ terminators in kunit tests
+Message-ID: <24a5975e-a022-4bf4-a2ec-76012f977806@roeck-us.net>
+References: <20241119213202.2884639-1-linux@roeck-us.net>
+ <20241120105202.cvmhyfzvaz6bdkfd@DEN-DL-M70577>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="xlycwx5h2jmtpvei"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241118082707.8504-4-a0987203069@gmail.com>
+In-Reply-To: <20241120105202.cvmhyfzvaz6bdkfd@DEN-DL-M70577>
 
+On Wed, Nov 20, 2024 at 10:52:02AM +0000, Daniel Machon wrote:
+> Hi Guenter,
+> 
+> > Comments in the code state that "A typegroup table ends with an all-zero
+> > terminator". Add the missing terminators.
+> > 
+> > Some of the typegroups did have a terminator of ".offset = 0, .width = 0,
+> > .value = 0,". Replace those terminators with "{ }" (no trailing ',') for
+> > consistency and to excplicitly state "this is a terminator".
+> > 
+> > Fixes: 67d637516fa9 ("net: microchip: sparx5: Adding KUNIT test for the VCAP API")
+> > Cc: Steen Hegelund <steen.hegelund@microchip.com>
+> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > ---
+> > resend: forgot to copy netdev@.
+> 
+> You are missing the target tree in the subject - in this case it should be
+> 'net'
 
---xlycwx5h2jmtpvei
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH v3 3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for
- Nuvoton MA35 family
-MIME-Version: 1.0
+Sorry, I seem to be missing something. The subject starts with
+"net: microchip: vcap: Add ...". How should it look like instead ?
 
-Hello,
-
-On Mon, Nov 18, 2024 at 04:27:07PM +0800, Joey Lu wrote:
-> +static struct platform_driver nuvoton_dwmac_driver = {
-> +	.probe  = nuvoton_gmac_probe,
-> +	.remove_new = stmmac_pltfr_remove,
-
-Please use .remove instead of .remove_new.
-
-Thanks
-Uwe
-
---xlycwx5h2jmtpvei
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmc9+KwACgkQj4D7WH0S
-/k7LQgf9Gwj9QyarYndFEA5e8v9OUMxfn6Cu7vJ3gmwOZLcBm0Oi+KHCfrK/5oMe
-BYJvIWmrL6AbSFQqaIp38aZmWH2UiKV3KCeRx2kikFou49njcPVyqAKzwpCCi5TE
-6XTZpAg/OHN3kJOiLwN4RZVsnsA4pR1VQVIdch+oGFMyKEgyu85MLpjeQecxRCT/
-RP/bgKRO/OTWrrtnIewHNV2YsehEzx/+wY9gCh6lEVzBJYDGNNkZf49WdTO5nF1G
-KB/pOfKMX4LrldyqelhrRyOOkqDa2mtB5gVdJf5vGP64XwbyxPhzUbblHk/cc5O3
-wThAhMtIKX1kBcxmm20loeBenE3nrg==
-=CCaY
------END PGP SIGNATURE-----
-
---xlycwx5h2jmtpvei--
+Thanks,
+Guenter
 
