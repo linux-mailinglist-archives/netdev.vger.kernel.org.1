@@ -1,181 +1,96 @@
-Return-Path: <netdev+bounces-146457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 534E19D3887
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:42:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 902719D386E
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0143C1F23D7D
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:42:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47578284E93
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33FC19EED7;
-	Wed, 20 Nov 2024 10:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB122187859;
+	Wed, 20 Nov 2024 10:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ycD4IP0/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484C819D060;
-	Wed, 20 Nov 2024 10:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2114974040
+	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 10:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732099305; cv=none; b=Z38+ApbL/XeJbILBkP85+3mGW6AYHEFRqeTQvNSqa1ra/1iF1cOWM5T/o6ugIJmXwscyuq7qNnUITy3oDBOXbO/d57kHxft9aosH+OdPvfA/4645m4dT8jjKWvtc0ykNHUej/L+TE5y2Az6Gy1zKcJ6PnRTxLNjJTs0Z6oEJ/7c=
+	t=1732098919; cv=none; b=IrHGFwSHS2ka7U4iNxZagTL9ejGZXKvrdaFhhK80dIwss4n5UwW/PFLnfHRCbaIjkgi63w5oyI/J1VB5CzJAsUB7Kgjgoxt0yZ8by2164VZQ18gYgt+FMl0AKHLkrotiynLxb1DoRzwbCmprFA7JuGIiVk2wvdh/LkCiHlVZyAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732099305; c=relaxed/simple;
-	bh=mcby2DGppHd18uHygt54sfA41+/bgOa1b8xhVO49ZeU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NX1ISy/f8mtJ32h9fbNk85Av6Gm0wgQbNK4IWyMIkvyDSnSVCtJK4WucqyNlXSjS37u2o7wyikTu/t6/EPvV92ktARYtb5dGfJrVuM4kMxj+ZdYS6HweSMdEB022kt22vKEIK2Y1pcNPiIHCis/VMPvro1ZZCWpH6u6EoRxEOkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XtdBs1qkjz1V4dw;
-	Wed, 20 Nov 2024 18:39:01 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 819D01800F2;
-	Wed, 20 Nov 2024 18:41:39 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 20 Nov 2024 18:41:39 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <liuyonglong@huawei.com>, <fanghaiqing@huawei.com>,
-	<zhangkun09@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, Robin Murphy
-	<robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, Andrew
- Morton <akpm@linux-foundation.org>, IOMMU <iommu@lists.linux.dev>, MM
-	<linux-mm@kvack.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH RFC v4 3/3] page_pool: skip dma sync operation for inflight pages
-Date: Wed, 20 Nov 2024 18:34:55 +0800
-Message-ID: <20241120103456.396577-4-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241120103456.396577-1-linyunsheng@huawei.com>
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1732098919; c=relaxed/simple;
+	bh=XnRn8fPMaE/oq34tllE91lDCQp2ao2urRaiU6rBouGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=omXdyrR7RCfgt16aq1Q9LPaYtbC+d7zpDo5NCsvxFUpZnWHJQcduaxUCt5Z4kP1yJZTI0qDgfDCT1VMKDDkvJVnJmifpze+cj5M7jQsaLU1KpzHHH2vnp+Iwrcitoo6EdVnWsZ/1SHXwyROf13FpyVvcOt+hpX76qvIzV+FqUps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ycD4IP0/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vk1zGBSoY4OhmdTphTqEqB7U0YmG4PuU12CSPPBAU1w=; b=ycD4IP0/qp2ThZSdj8CNyzM0Dp
+	j8HcW36wc6eZtk2myqHaYft0GkGRrQyDkeyAEUwRY2LRfr3YAza/g+ITYXhvPOul6+gYln+WWnycL
+	s0q1kBx9N0mJeZKNHBN2izzky0nQVpFBKDCaQ7ko+/Zu7Co44J9ZjtY0yeEkRmpbtApQ7PtKGfkvN
+	5QjbQXQIIgY7LonxoPTF15XACgk+Z5OZIibQ6rbFJyVxbRR/LANcW3nVhWYawsOgGqgVUWDtXu9Qw
+	Z2jpiXVJ4+64w+KJ8un9NYyeEMCCy4P2VpPXjggU8vSsXmOFLQru6NtkBCkQ0fFHcwYuqw8a8Rdwq
+	nwyAtgTw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60048)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tDi3B-0005Ij-1m;
+	Wed, 20 Nov 2024 10:35:10 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tDi39-00070Z-2T;
+	Wed, 20 Nov 2024 10:35:07 +0000
+Date: Wed, 20 Nov 2024 10:35:07 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 net] net: phy: ensure that
+ genphy_c45_an_config_eee_aneg() sees new value of
+ phydev->eee_cfg.eee_enabled
+Message-ID: <Zz27WyoSjlg73Shh@shell.armlinux.org.uk>
+References: <a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Skip dma sync operation for inflight pages before the
-page_pool_destroy() returns to the driver as DMA API
-expects to be called with a valid device bound to a
-driver as mentioned in [1].
+On Sat, Nov 16, 2024 at 09:52:15PM +0100, Heiner Kallweit wrote:
+> This is a follow-up to 41ffcd95015f ("net: phy: fix phylib's dual
+> eee_enabled") and resolves an issue with genphy_c45_an_config_eee_aneg()
+> (called from genphy_c45_ethtool_set_eee) not seeing the new value of
+> phydev->eee_cfg.eee_enabled.
+> 
+> Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-After page_pool_destroy() is called, the page is not
-expected to be recycled back to pool->alloc cache and
-dma sync operation is not needed when the page is not
-recyclable or pool->ring is full, so only skip the dma
-sync operation for the infilght pages by clearing the
-pool->dma_sync under protection of rcu lock when page
-is recycled to pool->ring to ensure that there is no
-dma sync operation called after page_pool_destroy() is
-returned.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-1. https://lore.kernel.org/all/caf31b5e-0e8f-4844-b7ba-ef59ed13b74e@arm.com/
-CC: Robin Murphy <robin.murphy@arm.com>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-CC: Andrew Morton <akpm@linux-foundation.org>
-CC: IOMMU <iommu@lists.linux.dev>
-CC: MM <linux-mm@kvack.org>
-Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- net/core/page_pool.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+Thanks!
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 33a314abbba4..0bde7c6c781a 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -712,7 +712,8 @@ static void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
- 	rcu_read_unlock();
- }
- 
--static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
-+static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem,
-+				      unsigned int dma_sync_size)
- {
- 	int ret;
- 	/* BH protection not needed if current is softirq */
-@@ -723,10 +724,13 @@ static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
- 
- 	if (!ret) {
- 		recycle_stat_inc(pool, ring);
--		return true;
-+
-+		rcu_read_lock();
-+		page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
-+		rcu_read_unlock();
- 	}
- 
--	return false;
-+	return !ret;
- }
- 
- /* Only allow direct recycling in special circumstances, into the
-@@ -779,10 +783,11 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
- 	if (likely(__page_pool_page_can_be_recycled(netmem))) {
- 		/* Read barrier done in page_ref_count / READ_ONCE */
- 
--		page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
--
--		if (allow_direct && page_pool_recycle_in_cache(netmem, pool))
-+		if (allow_direct && page_pool_recycle_in_cache(netmem, pool)) {
-+			page_pool_dma_sync_for_device(pool, netmem,
-+						      dma_sync_size);
- 			return 0;
-+		}
- 
- 		/* Page found as candidate for recycling */
- 		return netmem;
-@@ -845,7 +850,7 @@ void page_pool_put_unrefed_netmem(struct page_pool *pool, netmem_ref netmem,
- 
- 	netmem =
- 		__page_pool_put_page(pool, netmem, dma_sync_size, allow_direct);
--	if (netmem && !page_pool_recycle_in_ring(pool, netmem)) {
-+	if (netmem && !page_pool_recycle_in_ring(pool, netmem, dma_sync_size)) {
- 		/* Cache full, fallback to free pages */
- 		recycle_stat_inc(pool, ring_full);
- 		page_pool_return_page(pool, netmem);
-@@ -903,14 +908,18 @@ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
- 
- 	/* Bulk producer into ptr_ring page_pool cache */
- 	in_softirq = page_pool_producer_lock(pool);
-+	rcu_read_lock();
- 	for (i = 0; i < bulk_len; i++) {
- 		if (__ptr_ring_produce(&pool->ring, data[i])) {
- 			/* ring full */
- 			recycle_stat_inc(pool, ring_full);
- 			break;
- 		}
-+		page_pool_dma_sync_for_device(pool, (__force netmem_ref)data[i],
-+					      -1);
- 	}
- 	recycle_stat_add(pool, ring, i);
-+	rcu_read_unlock();
- 	page_pool_producer_unlock(pool, in_softirq);
- 
- 	/* Hopefully all pages was return into ptr_ring */
-@@ -1200,6 +1209,8 @@ void page_pool_destroy(struct page_pool *pool)
- 	if (!page_pool_release(pool))
- 		return;
- 
-+	pool->dma_sync = false;
-+
- 	/* Paired with rcu lock in page_pool_napi_local() to enable clearing
- 	 * of pool->p.napi in page_pool_disable_direct_recycling() is seen
- 	 * before returning to driver to free the napi instance.
 -- 
-2.33.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
