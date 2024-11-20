@@ -1,119 +1,125 @@
-Return-Path: <netdev+bounces-146428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 729859D35BA
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:44:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ADFB9D35BD
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:44:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0585DB23EAC
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:43:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF71FB23F9B
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4067B17E46E;
-	Wed, 20 Nov 2024 08:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3026D175D3A;
+	Wed, 20 Nov 2024 08:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="S3N26LNU"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="F4l6ECJI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CF8848C;
-	Wed, 20 Nov 2024 08:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CB160DCF;
+	Wed, 20 Nov 2024 08:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732092230; cv=none; b=RFNKjJFhtn9x1eRcl9UZ4sMt7nCkYdO78gIf8rCKrMFymQe7wwqZgZR9+pnlohw7n7tsX7uATi13I+RZ9hv6B+KBThROfzfquV6yzp+igaKWDMUjJzVt7Ss4xSFm5nCv4TMImTPttC4SBOiAFM+cICnaeYIPewk5MJyWJO99jtM=
+	t=1732092258; cv=none; b=fxu1eZcfQq5vWyhtxLMn+TJwB0Zk9RHAW1hlYzdOWyroam1vVUppPn2lHWp56MI7eJ/W5EPO3ZXMmNgczsZbtmBazEXhDySjx52Orsa4qzB9hbIAksHQ8GLbri5JlHBG/wnTsv33MTpBWg01FNvu1Op7gRDeiqZL+WZxqZAypmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732092230; c=relaxed/simple;
-	bh=s7HZN9wqRJTa3F166GZNhsc7AcNOq15GYt2NgWafsdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eojDctPgJmhYis6fm/R+OEVvrkVwkN7iNoaLn4InVQFPHpKsIyd8uMmM0Lowq2FqTZtIhmIRCTFgaBvT7QqT9/tHzTs3vuOzAEbOkeRp3XgwnFEAAxC1rxaaREAXQUV5EdhyJEkbcPTRMHRz62gXJHzNExPv6/jIaTLApNhP4fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=S3N26LNU; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 990346000F;
-	Wed, 20 Nov 2024 08:43:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732092220;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Stw1ZeJMKJorc1lwBQ/6FvPBootFID/HdRZ4NSNz5E=;
-	b=S3N26LNUg+yg4Gfy6ATW+vUqdJuEV2u5/+u4AK1NRHLMMu6ElvUZ+OYjtWGDzzHXUEV7dj
-	FZLMmAPGySelqyxEnTsln7iqvrYUr+I0lL4ox+5rhA+zRSaxVUlZ5bA5pRNzMfXFlmLZqQ
-	NjzKeS6NhpIuQ8wNBaN736iGKLjTDIw4X8eU9NwVAY34kjOXSF1coM5KNTFQPGfQ7sLQes
-	qOiKCuim7BQaMrbHAlZOeZ8CH3R7GWuWS0bKZNsJ5tlDNQsKNYbcZsTNaubAlLzfMac+oT
-	MMRjOBXrAmGlVq4QDcOl+PPJNYLOimVyFdSX46ctYavffMkMjdDkgHyA6eLnvQ==
-Date: Wed, 20 Nov 2024 09:43:36 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>, Uwe
- =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@baylibre.com>,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next v2 01/10] net: freescale: ucc_geth: Drop
- support for the "interface" DT property
-Message-ID: <20241120094336.22f95926@fedora-2.home>
-In-Reply-To: <20241115121914.GL1062410@kernel.org>
-References: <20241114153603.307872-1-maxime.chevallier@bootlin.com>
-	<20241114153603.307872-2-maxime.chevallier@bootlin.com>
-	<20241115121914.GL1062410@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1732092258; c=relaxed/simple;
+	bh=ZwL5nJU69RtxhYAVBEXOeYIdOuT/3F+tq9tKpVGlSkM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HWRI3OqyrWfXpkLLuzDuAChwfjh9kbzSzsy4RDDC9kTKEtxeiXbsDy5Rl/b7/bzUm6uuPrWiZdR+DGivYbsxFO4tKBtwx8skdSXPUDxIFVhcR+CSL+sNI9CVTFSXSQnATGpHynPe2oC+DfK+7XY1+dhXB+PTX2DYHLmhWnnV+D4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=F4l6ECJI; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=pRL1Ekiwy+zEofAVAD4Ucj85UIwWt6jNTF2bWcmmVGg=;
+	t=1732092256; x=1733301856; b=F4l6ECJIrZaGqVeCAG19vReX6nDC8C1pjkQ4dY7jFGeCNzZ
+	hMVk25opdpUGkIQGpq/sKz1tDlW++CoeJbmS/d86iZhEwETh06dKa+EgS+2hvD0QR9gVcSdk5fs1p
+	ZxAYL8J6fF6C8ifNn/g45HsXVdL78FiXC9eB4k6rp0vKCS4yjoJfMx2abQMqKCCSQq8uQvHVJZmXu
+	hkW/02PZC+eiUkTeLRyAUzCiRQV2KkrUDl1l4ssD5qiLyLBvhcNLaH6y8XCzSkf4Ltczd94kI6Q3h
+	H0iKXfzaTgFdr40h/3XJExFXmHQT9lBvdBQlMtLW4lztU3CTWLgxsnbB54FTXm4A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1tDgJg-00000009eET-1LPC;
+	Wed, 20 Nov 2024 09:44:04 +0100
+Message-ID: <7fb38122abcbcf28f7af8b9891d0b0852c01f088.camel@sipsolutions.net>
+Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>, Dmitry Safonov via B4 Relay
+	 <devnull+0x7f454c46.gmail.com@kernel.org>
+Cc: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, Ivan Delalande
+ <colona@arista.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+ <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  mptcp@lists.linux.dev
+Date: Wed, 20 Nov 2024 09:44:03 +0100
+In-Reply-To: <20241115160816.09df40eb@kernel.org>
+References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
+	 <20241115160816.09df40eb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-malware-bazaar: not-scanned
 
-Hello Simon,
+(Sorry, late to the party)
 
-On Fri, 15 Nov 2024 12:19:14 +0000
-Simon Horman <horms@kernel.org> wrote:
+On Fri, 2024-11-15 at 16:08 -0800, Jakub Kicinski wrote:
+> On Wed, 13 Nov 2024 18:46:39 +0000 Dmitry Safonov via B4 Relay wrote:
+> > 2. Inet-diag allocates netlink message for sockets in
+> >    inet_diag_dump_one_icsk(), which uses a TCP-diag callback
+> >    .idiag_get_aux_size(), that pre-calculates the needed space for
+> >    TCP-diag related information. But as neither socket lock nor
+> >    rcu_readlock() are held between allocation and the actual TCP
+> >    info filling, the TCP-related space requirement may change before
+> >    reaching tcp_diag_put_md5sig(). I.e., the number of TCP-MD5 keys on
+> >    a socket. Thankfully, TCP-MD5-diag won't overwrite the skb, but will
+> >    return EMSGSIZE, triggering WARN_ON() in inet_diag_dump_one_icsk().
+>=20
+> Would it be too ugly if we simply retried with a 32kB skb if the initial
+> dump failed with EMSGSIZE?
 
-[...]
-> > @@ -3627,18 +3588,17 @@ static int ucc_geth_probe(struct platform_device* ofdev)
-> >  	/* Find the TBI PHY node.  If it's not there, we don't support SGMII */
-> >  	ug_info->tbi_node = of_parse_phandle(np, "tbi-handle", 0);
-> >  
-> > -	/* get the phy interface type, or default to MII */
-> > -	prop = of_get_property(np, "phy-connection-type", NULL);
-> > -	if (!prop) {
-> > -		/* handle interface property present in old trees */
-> > -		prop = of_get_property(ug_info->phy_node, "interface", NULL);
-> > -		if (prop != NULL) {
-> > -			phy_interface = enet_to_phy_interface[*prop];
-> > -			max_speed = enet_to_speed[*prop];
-> > -		} else
-> > -			phy_interface = PHY_INTERFACE_MODE_MII;
-> > -	} else {
-> > -		phy_interface = to_phy_interface((const char *)prop);
-> > +	prop = of_get_property(ug_info->phy_node, "interface", NULL);
-> > +	if (prop) {
-> > +		dev_err(&ofdev->dev,
-> > +			"Device-tree property 'interface' is no longer supported. Please use 'phy-connection-type' instead.");
-> > +		goto err_put_tbi;  
-> 
-> Hi Maxime,
-> 
-> This goto will result in err being returned by this function.
-> But here err is 0. Should it be set to an error value instead?
-> 
-> Flagged by Smatch.
+We have min_dump_alloc, which a number of places are setting much higher
+than the default, partially at least because there were similar issues,
+e.g. in nl80211. See e.g. nl80211_dump_wiphy() doing it dynamically.
 
-arg yes you're right. I'll address this in the next iteration.
+Kind of ugly? Sure! And we shouldn't use it now with newer userspace
+that knows to request a more finely split dump. For older userspace it's
+the only way though.
 
-Thanks,
+Also, we don't even give all the data to older userspace (it must
+support split dumps to get information about the more modern features, 6
+GHz channels, etc.), but I gather that's not an option here.
 
-Maxime
+> Another option would be to automatically grow the skb. The size
+> accounting is an endless source of bugs. We'd just need to scan
+> the codebase to make sure there are no cases where someone does
+>=20
+> 	ptr =3D __nla_reserve();
+> 	nla_put();
+> 	*ptr =3D 0;
+>=20
+> Which may be too much of a project and source of bugs in itself.
+>=20
+> Or do both, retry as a fix, and auto-grow in net-next.
 
+For auto-grow you'd also have to have information about the userspace
+buffer, I think? It still has to fit there, might as well fail anyway if
+that buffer is too small? I'm not sure we have that link back? But I'm
+not really sure right now, just remember this as an additional wrinkle
+from the above-mentioned nl80211 problem.
+
+johannes
 
