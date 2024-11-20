@@ -1,131 +1,110 @@
-Return-Path: <netdev+bounces-146460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C28CA9D38AB
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:48:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 606FF9D38BE
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:52:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F6E61F21573
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:48:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDE25283D21
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D244019C54D;
-	Wed, 20 Nov 2024 10:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D7C15B135;
+	Wed, 20 Nov 2024 10:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y+K0TzUt"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="z/UoO0WB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5586E187859;
-	Wed, 20 Nov 2024 10:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0994633C5;
+	Wed, 20 Nov 2024 10:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732099699; cv=none; b=b0XaPN0ej/CiAOUwOzfbdt9t2a43XyCcoSkDMuavj+QZ/9MxR8B1GPfnhxOiIYBZZRIZtBGvLXcxprgzuJ7d/wQuhSBaHiEhEwut7hgHlzbl5PGGeRV6qfJ60LanumeezENsAfV7D2zdp5p9uVg0tLcTHfinO/Y5yYrFybqYI/k=
+	t=1732099929; cv=none; b=NTVCpjoxU9DRpSTg7vlJf/qOPXi6sLOzchQc7Bzsheam2E4PSDn+Q/oLNbvgXX0q9HhZPavd6b8f/TF1RFfyPdfeF83T39TP5MpZ/eGaiwFH7rLCzADsIBi0pDL3qA8p5YMuhhc0IODLINeHdoozoDEBn/l3tG34+1s5SUyKJKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732099699; c=relaxed/simple;
-	bh=DdnwLC1nlOOJXfXe14SuzanZGrbtUU6kyE6ng30glmk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WpYDPAyeJ5sMOf+mCg1jPPQNNMjqoUifvvd3amd+pQxHWODkBUDYYovHK+4z8pqbdUtjC/WOoh2Vp7TVFxGXrDkfOjZA9qlbIABQgpASXv70Ilu78QDZSfV0G6hgIlJpz8+qWFZaV8yw6BzEpZtZUpyxlcy5AO3APsXaxJeIesA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y+K0TzUt; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1732099929; c=relaxed/simple;
+	bh=DQRkqPQ7KKWFWhiQ+UDyS/VSm50G31LKA/NUgqhkKDs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HA1logQ12XC4jv4ih7mhzUmOpNjuD6ycMHszk1BYC/IoEYJ8UUWJcfwyEE4rzZ3RxkGJCxdsJ2jJIUSUsme5m3pK3fX04eaHwFPqH3HIOJsLtckJVnBFnRAQ+xCpUTsywYSJ6rdsLUbEP7qBfg+KX1cYkhSwVa22rUoA/5xVeVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=z/UoO0WB; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732099698; x=1763635698;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=DdnwLC1nlOOJXfXe14SuzanZGrbtUU6kyE6ng30glmk=;
-  b=Y+K0TzUtqBl3wHKabT50/bOCQGvo03J4OGbkcQA+6Uu7FZlyQAX/jqJl
-   gBktxxGs0NXpzAakvWx93K3fi4GsHcFhcgMKrHqECttRsuccMNSfoPXud
-   CB0MAtYsjI9o0D4SQhcZIwZPiPTRoEorgz/yIP3uCxj0bCoTCSwW4UTiG
-   0QRJSW3/PELJzI5KHHrn+aUjkUdJghx9PtHLVMLGxm/0IYvax587uPqrW
-   zsKI5iwPKHc3jpfX7cI4VN9z8rjpOKx1ZgauRwXXwQnua6Wt2ic9rRg3z
-   BkZ7JSiIYzuZ5p2xgBOcaYEWlhQE5lW5crOu3KYyuwEBd6K0K5i7TYJtr
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1732099928; x=1763635928;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DQRkqPQ7KKWFWhiQ+UDyS/VSm50G31LKA/NUgqhkKDs=;
+  b=z/UoO0WBqqOCKnG5+QHH4bIlNSqtgFF6S3eOJ4NaUainFGI5iyjLQuj1
+   AkpcDtvU5HdZrqrCVBTPHCfHfDM49I2LfZtzgMDl/iXDxZJkE35Y1k3AE
+   6bQVYQ21mq7jEOz9Ftw3rVUyPa9rhBzV8NoFsUNCeyJv86megNiwOtXKo
+   FVrVOAh0r9V/I9dpEPv1UiQoas41UIrkmp8qIXT9fdMGNsCbpe6/MG0mM
+   qqNqkDSem9OwowLeNyETYMc9DgVFJTU9megqHQsoK9xzpCraLRZja8knY
+   DG8TJklE6NMETBvq/j1rrGIE1KX27dsLEWiOF+gIJ/dcIB8ZLQCCgd54X
    Q==;
-X-CSE-ConnectionGUID: D9U4O8JmT9eLJYhJcgcxKQ==
-X-CSE-MsgGUID: J4NYQ8oRSTy/LSPbahvgPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="31521005"
+X-CSE-ConnectionGUID: JrZ1f6mESWimvMFQPOoHiw==
+X-CSE-MsgGUID: XgJw+zkXQ5Sthtr9YnRH0g==
 X-IronPort-AV: E=Sophos;i="6.12,169,1728975600"; 
-   d="scan'208";a="31521005"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 02:48:17 -0800
-X-CSE-ConnectionGUID: W48YHOZpTiGL35DWyTxvhg==
-X-CSE-MsgGUID: BIrFOaQ7Sv+bsw9FnoXbDA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,169,1728975600"; 
-   d="scan'208";a="89677797"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.82.175]) ([10.247.82.175])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 02:48:13 -0800
-Message-ID: <14202f42-5408-4127-8664-8ad958fb2046@linux.intel.com>
-Date: Wed, 20 Nov 2024 18:48:10 +0800
+   d="scan'208";a="265717816"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Nov 2024 03:52:07 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 20 Nov 2024 03:52:05 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 20 Nov 2024 03:52:02 -0700
+Date: Wed, 20 Nov 2024 10:52:02 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Guenter Roeck <linux@roeck-us.net>
+CC: Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <linux-arm-kernel@lists.infradead.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [RESEND PATCH] net: microchip: vcap: Add typegroup table
+ terminators in kunit tests
+Message-ID: <20241120105202.cvmhyfzvaz6bdkfd@DEN-DL-M70577>
+References: <20241119213202.2884639-1-linux@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/2] net: phy: replace phydev->eee_enabled with
- eee_cfg.eee_enabled
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20241115111151.183108-1-yong.liang.choong@linux.intel.com>
- <20241115111151.183108-2-yong.liang.choong@linux.intel.com>
- <ZzdOkE0lqpl6wx2d@shell.armlinux.org.uk>
- <c1bb831c-fd88-4b03-bda6-d8f4ec4a1681@linux.intel.com>
- <ZzxerMEiUYUhdDIy@pengutronix.de>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <ZzxerMEiUYUhdDIy@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241119213202.2884639-1-linux@roeck-us.net>
 
+Hi Guenter,
 
-
-On 19/11/2024 5:47 pm, Oleksij Rempel wrote:
->> Sorry for the late reply; I just got back from my sick leave. I wasn't aware
->> that you had already submitted a patch. I thought I should include it in my
->> patch series. However, I think I messed up the "Signed-off" part. Sorry
->> about that.
->>
->> The testing part actually took quite some time to complete, and I was
->> already sick last Friday. I was only able to complete the patch series and
->> resubmit the patch, and I thought we could discuss the test results from the
->> patch series. The issue was initially found with EEE on GPY PHY working
->> together with ptp4l, and it did not meet the expected results. There are
->> many things that need to be tested, as it is not only Marvell PHY that has
->> the issue.
+> Comments in the code state that "A typegroup table ends with an all-zero
+> terminator". Add the missing terminators.
 > 
-> Hm, the PTP issue with EEE is usually related to PHYs implementing the
-> EEE without MAC/LPI support. This PHYs are buffering frames and changing
-> the transmission time, so if the time stamp is made by MAC it will have
-> different real transmission time. So far i know, Atheros and Realtek
-> implement it, even if it is not always officially documented, it can be
-> tested.
+> Some of the typegroups did have a terminator of ".offset = 0, .width = 0,
+> .value = 0,". Replace those terminators with "{ }" (no trailing ',') for
+> consistency and to excplicitly state "this is a terminator".
 > 
-> Regards,
-> Oleksij
+> Fixes: 67d637516fa9 ("net: microchip: sparx5: Adding KUNIT test for the VCAP API")
+> Cc: Steen Hegelund <steen.hegelund@microchip.com>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+> resend: forgot to copy netdev@.
 
-Thanks, Oleksij, for the suggestion.
-The actual problem we are facing is that the software and hardware 
-configuration is not in sync.
+You are missing the target tree in the subject - in this case it should be
+'net'
 
-With the following patches applied, the issues were fixed:
-- 
-https://patchwork.kernel.org/project/netdevbpf/patch/E1tBXAF-00341F-EQ@rmk-PC.armlinux.org.uk/
-- 
-https://patchwork.kernel.org/project/netdevbpf/patch/a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com/
-- 
-https://patchwork.kernel.org/project/netdevbpf/patch/20241120083818.1079456-1-yong.liang.choong@linux.intel.com/
+Apart from that, I think the fix looks correct. In the drivers utilizing the VCAP
+API, all the typegroups are "{ }" terminated - also with no trailing ','.
+
+Thanks for fixing this!
+
+/Daniel
+
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com> 
 
