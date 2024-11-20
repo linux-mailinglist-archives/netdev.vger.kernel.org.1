@@ -1,116 +1,145 @@
-Return-Path: <netdev+bounces-146438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 408719D3686
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:12:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121459D368B
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1EE1B21EE9
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:12:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6037285DD5
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E74A193402;
-	Wed, 20 Nov 2024 09:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5A9197A87;
+	Wed, 20 Nov 2024 09:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SX6OTBOU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XlQf8K4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E2E149C42;
-	Wed, 20 Nov 2024 09:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00576149C42;
+	Wed, 20 Nov 2024 09:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732093950; cv=none; b=gHkbsk9NCMeZ1KKcQ80/NRupjJUSpGC6QaDLImk5VtmHBeARUoT4xjMOwO5iVthqh7x8zjxA8X97wSFhcc6JEZRja/h+BNPNAaKB0+zxAV2HL6C6Y/PCUR/QvVxeeKMyIE+cnAnnues5rzAiXR9DQVqEP6jLL8V9l1+qv+dFOxw=
+	t=1732093979; cv=none; b=qKMjggffqCyY0F5uMyWpXTeDx4F5lo/G1q3MmduHyoDtYnsM63TcYd6CLEqJB+pW944L0VEzXcjgRr3r4xaHG7LhomKGFWiKO2CbImPlNWsAcEcj5uqeBmBgUDSMFEmRgsIRbMo7DgjGcYDMu5JoOqD7Fcu777aRV6H/MQZLeaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732093950; c=relaxed/simple;
-	bh=+h6qn39iKYBYkjnAfwM2WCW/3rG7h0rqZ0p706MqXQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hm1ytdShERBFcrRONzxE7HrbMLF6BXN+uwym7nj9fvNUUCoB5HCGNuTqK0uN/wYCAD5QY6+XoBX/f9Oz84khwqDKM6+DC1a2TSA7gNEPnce6gf4v6pypWnfzj0hpHXTz773ym+vMl6cFQIvDy1bZ9mYAHIPB+3pbf36AXCN4fVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SX6OTBOU; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=wk2X3+PQpTfNDXktHKx5N1reY89npk+liD3n+j6xvIo=; b=SX6OTBOUcOh239e6zpRF5e6Hjm
-	aaczC8p43ZAau+BKYgPoqAbCP9M5KkaIAj+d6y/X1UKWi4VYa+a1sczzexsjpluoqdbeEx1UteHqZ
-	cJi5wTJExX6f3YSWkdJVE8MzwNXOH1kerEpzyhMvN1aCWYHLt6SlFNSY5k65FnfakSBiP8nV46rfo
-	1iuXpxL+K2dAoLL4R/W8+sGyL1RxaIZty9JUI0I5CyPHB96tTJjhT0RHK0egn83d7WgRabpZTntnP
-	tWvxSadGig7B4I34GoLq1EGGmupmazf6Nvko+pS2UyN9k7NiBF+SKXO+GjXObiJfxVXd0o/lDIbun
-	iOofmCpw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tDgkx-00000000SXp-3ptr;
-	Wed, 20 Nov 2024 09:12:16 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 8CA523006AB; Wed, 20 Nov 2024 10:12:15 +0100 (CET)
-Date: Wed, 20 Nov 2024 10:12:15 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Ran Xiaokai <ranxiaokai627@163.com>
-Cc: juri.lelli@redhat.com, vincent.guittot@linaro.org, mingo@redhat.com,
-	pshelar@ovn.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
-	ran.xiaokai@zte.com.cn, linux-perf-users@vger.kernel.org,
-	netdev@vger.kernel.org, dev@openvswitch.org
-Subject: Re: [PATCH 2/4] perf/core: convert call_rcu(free_ctx) to kfree_rcu()
-Message-ID: <20241120091215.GK39245@noisy.programming.kicks-ass.net>
-References: <20241120064716.3361211-1-ranxiaokai627@163.com>
- <20241120064716.3361211-3-ranxiaokai627@163.com>
+	s=arc-20240116; t=1732093979; c=relaxed/simple;
+	bh=Nm+LTtFvJjr/ZzsiS8eN3+rLZHQExKr888yVJu40mtA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Qde3qL2b7UrXZWoeMVpADyeEhw83DxjRv7+wSSz0E75Ur+KilNZZrDyoLM9cpecYaT5gNcEzpJdiCwNrFUCIVY5Cuktbl33mrojvMZJnoxAkzbHsOdz5DGT3tghqUZN2QdFaPrl2NnCT1CfJHser5bv5dWyGrN+9RBl5aFzQFSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XlQf8K4S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0C4CC4CECD;
+	Wed, 20 Nov 2024 09:12:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732093978;
+	bh=Nm+LTtFvJjr/ZzsiS8eN3+rLZHQExKr888yVJu40mtA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=XlQf8K4SbGPAG13Togr2fzBC9lBuzzuZUHyyrwI0S0VIG6JHSMt+8DwCTcoLh67/S
+	 GVokmAsT9oJt/kUxUQVzGExfdKhCvVvhJeL32gjQ+kxRVgl5D/nHbm0f26vfG85ukW
+	 XNj4523nWVQZIvwl2I9EtUK6E0CY9qeARyew6PtU75ggN+StWJNYQSed+sM6nSWJyU
+	 w8am4Ov0uMuKyWc/9uhFm/K5Is9CuvV6UBSw4a6zqeCQxbjm7XRrrmRu2PdMbxSteS
+	 XQ03pWhPSVlcY+buU3ixN/o5NgV92cCaOwR/vafKxJX274ayJ+XHt4SgRubmAbXgQd
+	 7/feMm9LpW49g==
+Message-ID: <5527f0e2-1986-4eb5-b16a-86276db0cbb5@kernel.org>
+Date: Wed, 20 Nov 2024 10:12:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241120064716.3361211-3-ranxiaokai627@163.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: can: fsl,flexcan: add S32G2/S32G3 SoC
+ support
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ciprian Costea <ciprianmarian.costea@oss.nxp.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev,
+ NXP Linux Team <s32@nxp.com>, Christophe Lizzi <clizzi@redhat.com>,
+ Alberto Ruiz <aruizrui@redhat.com>, Enric Balletbo <eballetb@redhat.com>
+References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
+ <20241119081053.4175940-2-ciprianmarian.costea@oss.nxp.com>
+ <o4uiphg4lcmdmvibiheyvqa4zmp3kijn7u3qo5c5mofemqaii7@fdn3h2hspks7>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <o4uiphg4lcmdmvibiheyvqa4zmp3kijn7u3qo5c5mofemqaii7@fdn3h2hspks7>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 20, 2024 at 06:47:14AM +0000, Ran Xiaokai wrote:
-> From: Ran Xiaokai <ran.xiaokai@zte.com.cn>
+On 20/11/2024 09:45, Krzysztof Kozlowski wrote:
+> On Tue, Nov 19, 2024 at 10:10:51AM +0200, Ciprian Costea wrote:
+>>    reg:
+>>      maxItems: 1
+>> @@ -136,6 +138,23 @@ required:
+>>    - reg
+>>    - interrupts
+>>  
+>> +allOf:
+>> +  - $ref: can-controller.yaml#
+>> +  - if:
+>> +      properties:
+>> +        compatible:
+>> +          contains:
+>> +            const: nxp,s32g2-flexcan
+>> +    then:
+>> +      properties:
+>> +        interrupts:
+>> +          minItems: 4
+>> +          maxItems: 4
 > 
-> The rcu callback free_ctx() simply calls kfree().
-> It's better to directly call kfree_rcu().
+> Top level says max is 1. You need to keep there widest constraints.
+And list items here instead...
 
-Why is it better? 
-
-> Signed-off-by: Ran Xiaokai <ran.xiaokai@zte.com.cn>
-> ---
->  kernel/events/core.c | 10 +---------
->  1 file changed, 1 insertion(+), 9 deletions(-)
-> 
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 065f9188b44a..7f4cc9c41bbe 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -1210,14 +1210,6 @@ static void free_task_ctx_data(struct pmu *pmu, void *task_ctx_data)
->  		kmem_cache_free(pmu->task_ctx_cache, task_ctx_data);
->  }
->  
-> -static void free_ctx(struct rcu_head *head)
-> -{
-> -	struct perf_event_context *ctx;
-> -
-> -	ctx = container_of(head, struct perf_event_context, rcu_head);
-> -	kfree(ctx);
-> -}
-> -
->  static void put_ctx(struct perf_event_context *ctx)
->  {
->  	if (refcount_dec_and_test(&ctx->refcount)) {
-> @@ -1225,7 +1217,7 @@ static void put_ctx(struct perf_event_context *ctx)
->  			put_ctx(ctx->parent_ctx);
->  		if (ctx->task && ctx->task != TASK_TOMBSTONE)
->  			put_task_struct(ctx->task);
-> -		call_rcu(&ctx->rcu_head, free_ctx);
-> +		kfree_rcu(ctx, rcu_head);
->  	}
->  }
->  
-> -- 
-> 2.17.1
-> 
-> 
+Best regards,
+Krzysztof
 
