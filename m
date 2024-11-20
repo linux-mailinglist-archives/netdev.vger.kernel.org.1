@@ -1,132 +1,241 @@
-Return-Path: <netdev+bounces-146494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CD09D3A86
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 13:17:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC7E9D3A90
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 13:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACC98284148
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 12:17:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13F0B281C5C
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 12:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F43F1A0BC4;
-	Wed, 20 Nov 2024 12:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="qY0Bw2k/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HOoQOQtc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4585F1A3BC8;
+	Wed, 20 Nov 2024 12:20:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8DF1A00EC;
-	Wed, 20 Nov 2024 12:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22011A2C3A
+	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 12:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732105026; cv=none; b=jI+gaB3lF5e4m7CC/oNVDUpp9AJD1b1OD0G634/8XtAEvV9bQRM9dmmVXtvjdtH1zYBbrPiRJVqvvyLCgJEKnLP7EgexOfFjvWJ7+SKH/XFxE/znuieZxKkO3vyi5K5x1J0k7g8TMCJEf8StRtPzDjrR6vXHIsHi+skymvQtzDw=
+	t=1732105251; cv=none; b=i8oK+V6iRqs+yLIsRStFRGJyv14yu7ufQbhtnJe7P2XeFlTSmntzHfzB0pSzDYjGuRbVvO3Io4/PRTnBdM6HUrD81geSVQfgbGQChm91GRzsy0i7mtyB/xbxUDOjeuMyOoybJSx26xjgjdcGW+rdv4nndVf1T6SqaRlIkJp+mCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732105026; c=relaxed/simple;
-	bh=xppnjPqrvhoerBzopeX8R1LH7VW4ackbG9x/TnTFAbY=;
+	s=arc-20240116; t=1732105251; c=relaxed/simple;
+	bh=kj3ra5UKlV2cQyYvss4eMDHnBmaGYC2AyxIjO52JTms=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LDC88NaNZLHdc6OWepRWV+FSOnN+w5iT8Ibl5gt9/dmPEQdI9epX0jk3+gJqcn22JgEW8DfUM5+Gi6RXLFkfUQEgpwIv/0ixEKJWb5Oux1O2n8/gfLXvZSlrdGx0yCwM18t5HTGeUksLEIQVtGKSdRKwIH77+QSVsHYdp4VJL/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=qY0Bw2k/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HOoQOQtc; arc=none smtp.client-ip=103.168.172.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailflow.phl.internal (Postfix) with ESMTP id 664AC20062C;
-	Wed, 20 Nov 2024 07:17:02 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Wed, 20 Nov 2024 07:17:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1732105022; x=
-	1732108622; bh=vZVutuXEb1XYsMhVjUw558rkRrLgw9D1s6JcwZMWDvU=; b=q
-	Y0Bw2k/4epLtl0RenkcDDqmdeZ5hkHDuAQSQ8gBFcRgQLRQoeuUu3nzO0jBZoN48
-	rRFtjYjC+CkaBabqua3CjDdj24zNjTOrCs/ziJVGKm1fZhzUm+Boep/A78Iv1BYp
-	xhCmGVPXfLwOxZFiK6iA0ARsY0qxTxQ9iIYftV+oM9OHTKMMsXKhPPeI+ddjp2bU
-	+zVvUTWTdnSm/9R6FtAMU7djuRk6Q+4Li1DD4nb66x70JVsv86AfBNHO0YSsq9pp
-	3Z9DcoMhmlnjhG4rO8QEh6252AwffPxCFNNlOh84d1xPplDqCpeR2jC7aKJnsOMf
-	adkxBPthp12qm24PVVZeg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1732105022; x=1732108622; bh=vZVutuXEb1XYsMhVjUw558rkRrLgw9D1s6J
-	cwZMWDvU=; b=HOoQOQtchL5TiOTbbAmiGuyzjZzV4d0ygOUnKcDG2Cc+OyhcPD5
-	QDrZIuPwgrW16clvUz15HYsBuPMGfVvNlHzvqG78GWo5XvMD8pqKobyxm1+h8XgN
-	wUMIMfDqrpcM23sL5w6PmkWNJ/tDbNkZmtZjrn8yTd56TFCroHhoCYRj2MWqnW4Z
-	JdVMnsTz/Mytvvcsy5hQHe3mEhv220Tp+dhBMpvVHkX4/saXwpjV77aEyisXhoka
-	btDBcMH3/gb0dLIkHRrx9UP/k8BCh3p1yVui/q3MZA+W/Ei53Kp78NeEm9VWWkT/
-	1qEnvhjHYlbXonsIIZxsGlcLcEQF8P/dRlw==
-X-ME-Sender: <xms:PdM9Z2mdKVAv2XIJPMK60uYWcpDf4qm1Y_c2gx5K33i5PUrZ9OerLA>
-    <xme:PdM9Z9135vfv-0UvluHyn1nD3X12NIhOIw9DJhhSvYTGuatQ3rtwLX29OWFyj_sOM
-    zgt6S41daczpz9VeNA>
-X-ME-Received: <xmr:PdM9Z0rv7bnTEP9iyAx3CkhRe8hX5PVZFO36MHncjJbEl3_zUDDgpWH216sg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfeeggdefkecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
-    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:PdM9Z6nKZvjUTRn67IgSe-JJNfk9WtfgrB5roiiDhJf0tOfXqMDd-A>
-    <xmx:PtM9Z03k57tfWNiK_rUPkWPNK3xBgXw9i3T76A_hOgh_R9mtw_HpZA>
-    <xmx:PtM9Zxv_uxZ0ruNKS2Mc7z8vRgic6Rr6Fp0u9zfF2WQXMcBm-xnrfg>
-    <xmx:PtM9ZwVyv57uSvSxUiPBROdVGTXPPv1n1KcKx5pioKgy_A60a2bRKQ>
-    <xmx:PtM9Z1I-f3ZZBgDQ_vH7z-eMWRnm3FY6fDUcBNM0tDolDeJh8mkuJglP>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 20 Nov 2024 07:17:01 -0500 (EST)
-Date: Wed, 20 Nov 2024 13:17:00 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 20/23] ovpn: kill key and notify userspace
- in case of IV exhaustion
-Message-ID: <Zz3TPLlpEwtAYu3V@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-20-de4698c73a25@openvpn.net>
- <Zyn0aYyPVaaQJg3r@hog>
- <816d8b43-8c19-4a4c-9e37-98a3415848b5@openvpn.net>
- <ZzS3jgNQoDH_0TvK@hog>
- <21330449-fab6-4c0b-a155-84c7419adbcb@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kcez89pjdQpi/l3/vEEfGlm0ffJp4/zWodb1ZjQIe1/GgzpY5g6OmvNbKcpWOlzIzxl36qg6pCx/ugCcYhW4TJEXIxzXui/+5/bHwWYTcFYoSPAshS47cdp9pHJNEbvKDJW76cmToc6Zi4XeX0scuf59L/hoGhPiHTWLRrhEprI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tDjh8-0000az-4P; Wed, 20 Nov 2024 13:20:30 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tDjh7-001js0-21;
+	Wed, 20 Nov 2024 13:20:29 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 3C413377D2F;
+	Wed, 20 Nov 2024 12:20:29 +0000 (UTC)
+Date: Wed, 20 Nov 2024 13:20:28 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ciprian Costea <ciprianmarian.costea@oss.nxp.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>, 
+	Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>, 
+	Enric Balletbo <eballetb@redhat.com>
+Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
+ lines
+Message-ID: <20241120-mindful-belligerent-mussel-501d72-mkl@pengutronix.de>
+References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
+ <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="k7cj6qrunaieusmg"
 Content-Disposition: inline
-In-Reply-To: <21330449-fab6-4c0b-a155-84c7419adbcb@openvpn.net>
+In-Reply-To: <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-2024-11-14, 11:38:51 +0100, Antonio Quartulli wrote:
-> On 13/11/2024 15:28, Sabrina Dubroca wrote:
-> > Around that same "which netns" question, ovpn_udp{4,6}_output uses the
-> > socket's, but ovpn_nexthop_from_rt{4,6} uses the netdev's.
-> 
-> I think this is ok, because routing related decision should be taken in the
-> netns where the device is, but the transport layer should make decisions
-> based on where the socket lives.
 
-Right, thanks for checking.
+--k7cj6qrunaieusmg
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
+ lines
+MIME-Version: 1.0
 
--- 
-Sabrina
+On 19.11.2024 10:10:53, Ciprian Costea wrote:
+> From: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+>=20
+> On S32G2/S32G3 SoC, there are separate interrupts
+> for state change, bus errors, MBs 0-7 and MBs 8-127 respectively.
+>=20
+> In order to handle this FlexCAN hardware particularity, reuse
+> the 'FLEXCAN_QUIRK_NR_IRQ_3' quirk provided by mcf5441x's irq
+> handling support.
+>=20
+> Additionally, introduce 'FLEXCAN_QUIRK_SECONDARY_MB_IRQ' quirk,
+> which can be used in case there are two separate mailbox ranges
+> controlled by independent hardware interrupt lines, as it is
+> the case on S32G2/S32G3 SoC.
+
+Please move the quirk and quirk handling to the 2nd patch. The 3rd patch
+should only add the nxp,s32g2-flexcan compatible and the struct
+flexcan_devtype_data nxp_s32g2_devtype_data.
+
+>=20
+> Signed-off-by: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+> ---
+>  drivers/net/can/flexcan/flexcan-core.c | 25 +++++++++++++++++++++++--
+>  drivers/net/can/flexcan/flexcan.h      |  3 +++
+>  2 files changed, 26 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/fle=
+xcan/flexcan-core.c
+> index f0dee04800d3..dc56d4a7d30b 100644
+> --- a/drivers/net/can/flexcan/flexcan-core.c
+> +++ b/drivers/net/can/flexcan/flexcan-core.c
+> @@ -390,9 +390,10 @@ static const struct flexcan_devtype_data nxp_s32g2_d=
+evtype_data =3D {
+>  	.quirks =3D FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS=
+ |
+>  		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_BROKEN_PERR_STATE |
+>  		FLEXCAN_QUIRK_USE_RX_MAILBOX | FLEXCAN_QUIRK_SUPPORT_FD |
+> -		FLEXCAN_QUIRK_SUPPORT_ECC |
+> +		FLEXCAN_QUIRK_SUPPORT_ECC | FLEXCAN_QUIRK_NR_IRQ_3 |
+>  		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
+> -		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
+> +		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR |
+> +		FLEXCAN_QUIRK_SECONDARY_MB_IRQ,
+>  };
+> =20
+>  static const struct can_bittiming_const flexcan_bittiming_const =3D {
+> @@ -1771,12 +1772,21 @@ static int flexcan_open(struct net_device *dev)
+>  			goto out_free_irq_boff;
+>  	}
+> =20
+> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
+> +		err =3D request_irq(priv->irq_secondary_mb,
+> +				  flexcan_irq, IRQF_SHARED, dev->name, dev);
+> +		if (err)
+> +			goto out_free_irq_err;
+> +	}
+> +
+>  	flexcan_chip_interrupts_enable(dev);
+> =20
+>  	netif_start_queue(dev);
+> =20
+>  	return 0;
+> =20
+> + out_free_irq_err:
+> +	free_irq(priv->irq_err, dev);
+>   out_free_irq_boff:
+>  	free_irq(priv->irq_boff, dev);
+>   out_free_irq:
+> @@ -1808,6 +1818,9 @@ static int flexcan_close(struct net_device *dev)
+>  		free_irq(priv->irq_boff, dev);
+>  	}
+> =20
+> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ)
+> +		free_irq(priv->irq_secondary_mb, dev);
+> +
+>  	free_irq(dev->irq, dev);
+>  	can_rx_offload_disable(&priv->offload);
+>  	flexcan_chip_stop_disable_on_error(dev);
+> @@ -2197,6 +2210,14 @@ static int flexcan_probe(struct platform_device *p=
+dev)
+>  		}
+>  	}
+> =20
+> +	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SECONDARY_MB_IRQ) {
+> +		priv->irq_secondary_mb =3D platform_get_irq(pdev, 3);
+> +		if (priv->irq_secondary_mb < 0) {
+> +			err =3D priv->irq_secondary_mb;
+> +			goto failed_platform_get_irq;
+> +		}
+> +	}
+> +
+>  	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SUPPORT_FD) {
+>  		priv->can.ctrlmode_supported |=3D CAN_CTRLMODE_FD |
+>  			CAN_CTRLMODE_FD_NON_ISO;
+> diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/=
+flexcan.h
+> index 4933d8c7439e..d4b1a954c538 100644
+> --- a/drivers/net/can/flexcan/flexcan.h
+> +++ b/drivers/net/can/flexcan/flexcan.h
+> @@ -70,6 +70,8 @@
+>  #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
+>  /* Setup stop mode with ATF SCMI protocol to support wakeup */
+>  #define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
+> +/* Setup secondary mailbox interrupt */
+
+Describe why this quirk is needed. If you have a proper description in
+the commit message, you can copy it here.
+
+> +#define FLEXCAN_QUIRK_SECONDARY_MB_IRQ	BIT(18)
+> =20
+>  struct flexcan_devtype_data {
+>  	u32 quirks;		/* quirks needed for different IP cores */
+> @@ -105,6 +107,7 @@ struct flexcan_priv {
+>  	struct regulator *reg_xceiver;
+>  	struct flexcan_stop_mode stm;
+> =20
+> +	int irq_secondary_mb;
+
+Please place it after the irq_err, this way it's in order with the
+spread sheet.
+
+>  	int irq_boff;
+>  	int irq_err;
+> =20
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--k7cj6qrunaieusmg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc91AkACgkQKDiiPnot
+vG9tvAf+MUCSC/bR1WQfJ6jsMBgAPuB/aRDz77YVLrt1feRFK0AkOLyXUW+PHbLn
+mvlvhVAUnT1vA7lcNOETI/mjKdDV1ISd9eK1ofJiUWzzYLGV5he0gfswT/7mCdHP
+RV708aOhXGyNokZHYfuEEF+Efbf1nqQuVoQUiZu+VHvvWNmG+fznr0kfB78jKehc
+K1OZIr5Pd8XPE5thxVzdnNUBDU87aX2auyyLwgnmI77ImHXjL8Mi1UP2UJYRu3UI
+bRd4+ZrX8QExbNNXiSiVxUUb6dWy271ORQ2KYcSfP0dOpyjH8bmJQyNIebuEEMk1
+gb3twa1WDvOBKuWDIXa5Lz3YH4VPDg==
+=3Q/0
+-----END PGP SIGNATURE-----
+
+--k7cj6qrunaieusmg--
 
