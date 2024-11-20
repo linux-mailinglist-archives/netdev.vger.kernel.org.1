@@ -1,359 +1,328 @@
-Return-Path: <netdev+bounces-146523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95CBB9D3EC5
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:16:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0469D3EED
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5702A2805FF
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:16:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC65281F3C
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E841CBA16;
-	Wed, 20 Nov 2024 15:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197485588F;
+	Wed, 20 Nov 2024 15:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtlB5RdY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m1DGiFzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DB61AA1DC;
-	Wed, 20 Nov 2024 15:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732115410; cv=none; b=V944xBw3t7ASww0kvqDAOqpiyBcypH5WKYLy0BvnA/8CNCFJ5PGeBH3d2OAg7ESR8ck5hWO6RA55HsxyBVcjDW4dXuAUoMDIwVn8jYsntRXBt3jG895MMIPWXeA0vyJhdRHdRKwK8t6R/oOrkWybQkDSJrjcX1/+qS1na71iAM8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732115410; c=relaxed/simple;
-	bh=cee4bpVCHnOQMsJqKoSGXKnmx0DYKK3uELApQYQdZTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ETGfhkl7LxiW8ga5t4QLr+XjzLDHrRsowZZRC0HE0lm1pINLjESvpSC8+Wo8dkt81OR1ChOGdsA3LB5qhuoj4uPdtsvlepGZdSJEUrcFKEMr86g+UpVF8HelIURUsKtXsuR5RZ4U+aRahDZrkFv2pBX0GPIlRxstcUCTXZH4TUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtlB5RdY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E4DAC4CECD;
-	Wed, 20 Nov 2024 15:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732115410;
-	bh=cee4bpVCHnOQMsJqKoSGXKnmx0DYKK3uELApQYQdZTI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gtlB5RdYLkZbaDBqnPNAlIsTsj41sjCI4jtqrjL9fc3svoMh1MeCpjFQJFoysECQs
-	 Ymsbmw+EC4YNeoiSEVsZ8pKfao312FflWzf8y6TBgQv73kByn/UGYuzqR+vzDjK7us
-	 dndpAAZrSX4v6ILr9McFq4TDDpExoUzP3j+KhSfkMLRcvJ7kuG44rUAxAvK2FIZwEO
-	 lsw3F9XCofFWxm4R0EqZYhQJvdAqaP8PAJC/OQ8FwzV3daSfSzE1iCFqA+gnmj2a2u
-	 eo9qRB6HvAGfrqjMATsR3loQ8KgfaQH0OLEdiiA3RVOXZ6hh+R+BS2s0pVb/2/vApa
-	 qpRE7AAYHyTKQ==
-Message-ID: <3366bf89-4544-4b82-83ec-fd89dd009228@kernel.org>
-Date: Wed, 20 Nov 2024 16:10:04 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA2A1F931;
+	Wed, 20 Nov 2024 15:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732116255; cv=fail; b=m4KBB7wO0Bhel6KSbkKNG2e7sIMDcIuvuHXXuZxR9qy+ClYb62PRQZ+HACNEOslATWHhy/jhCXc7W/I6EtuzvnQvGauH7nPpRAnqEN1C2GEM6/SSIM3Ddm1YTXZm/+IPerlRgSOdmO4LRZ/9folNfem08rGkGra7PJd3PInJcDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732116255; c=relaxed/simple;
+	bh=0FnZWD9JUKmmK/hXQzytNFHhDRWqz9w9zGHSG8up97I=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UiCCLZecarI0OJerZwpvJnNNu6Q9TuIG+6cUhT8VvmEvE5zj4/9iaBtZcKdzqfVmf/1VU6AP1cXLZaFfnSRNLMbmgnCqwrFiH/KJIcCDQhywTKLGTuMIMHS5ISUabG8dyKXcScggmOEQLOXWswTbDu9VHSXVWNxxp95Jxy/TzWE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m1DGiFzg; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732116253; x=1763652253;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0FnZWD9JUKmmK/hXQzytNFHhDRWqz9w9zGHSG8up97I=;
+  b=m1DGiFzglOcRPfoA0UJ7QWK6apSH5/aEunCKawHrqOF4r2wHhshE6a5N
+   5B8YgHJdoIqYg4E6H4laW+Su6gac1B5Tvr2n1reqiX2WG7Nc3DSAMJPJ/
+   NKTSZy9d4iNvX8ppd+rWte0Zr1BcN3hzou0GYeoyk2cIHxPAhnJQeOnmk
+   /A+t8+kzeUe83Kbu/b8mxd41NLMLKAA1BXjx8qHMxUmHm9NEZl7lEHoBl
+   tq6oOjIVn8QoVuA4bsIU/T35mz+4qnx8QqXun8JG1+fK6UYzrWRkigGUo
+   woBZscfKnrieCuHEsuJaxdlfEG47pqLap+08yAL3rhDYJC+Zzipi+tLws
+   g==;
+X-CSE-ConnectionGUID: MuO65Kp7R2ip8LF0kEJPqw==
+X-CSE-MsgGUID: CfylpYWxT1CI/IwK4ChYYA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="35967871"
+X-IronPort-AV: E=Sophos;i="6.12,170,1728975600"; 
+   d="scan'208";a="35967871"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 07:24:09 -0800
+X-CSE-ConnectionGUID: nX5EYtm3RbGpN+PNDOj+3A==
+X-CSE-MsgGUID: FDNYakLSROiN/Oz33d84ig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="95017550"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Nov 2024 07:24:09 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 20 Nov 2024 07:24:09 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 20 Nov 2024 07:24:09 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 20 Nov 2024 07:24:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fi19Er4UyLwsG5blvToAHNU3A9z67WjXT9M5qbW6r5wvJ4gEOTDwVC2+c7pz44nf6RAv+FH8hPW8R91djPOvAqdkTz+7XcNrnE6FUA/rWyl9WQfx2Z2/OaNKqjaiAsLy2/5UOWqWAxQdoofU4iF2raMsbAcnM2CiYM5ac4cqdI46GYYrbXA28ycGr2hfRyVdI4h3aDES9YYzoVNsRakZUhttqZwS622nqMJNfOH898YpHSB4ZZQZ6bSk//sBXBVJMZlNmH0b3tYISTmsEAoiKklDh9In0i0StvqtIo162UmqYzVSTe/xCJCcFlUyZtBs6/3Yw/tnV5vElma8+dZZ7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SfSelbFxMhyjv4CFxxvmg4LfE5UsutS0FmnNykauuF4=;
+ b=Aw+4wJtDTHnQbQMKGB9HQlC956MVR1dj3AJ0l+aNLg6fUbJlw+2jGEyNgn2+ygiXTI8heHS4xbRmaw9HC1pLmE8328Yw0jemZUy2IHCA0qmNjO7zJUNj3epGsXSTqv3RL3oaNNyEXXc7U3ZXiRdGK9W3cFxK0ZP7RZoopOLM7maivhtD3W4BrjgjH8I5wpcdnqj/kyn05J6mWy3p5co9oQ216MgzWxGjTmyouydifuqmD/q1c0c5pBFb+oJ0wTWsd4DX/SbOVhvuColDDeAVBcSRy4LkGdamFqlu7N9Jz9RvW/X2w8DHd9XsxJDhpeEuLczSHbfCl2VePJ3nD91StA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by DS0PR11MB8717.namprd11.prod.outlook.com (2603:10b6:8:1ab::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.14; Wed, 20 Nov
+ 2024 15:24:06 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%6]) with mapi id 15.20.8158.021; Wed, 20 Nov 2024
+ 15:24:05 +0000
+Message-ID: <6af7f16f-2ce4-4584-a7dc-47116158d47a@intel.com>
+Date: Wed, 20 Nov 2024 16:23:59 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 00/19] xdp: a fistful of generic changes
+ (+libeth_xdp)
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "John
+ Fastabend" <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
+	<sdf@fomichev.me>, Magnus Karlsson <magnus.karlsson@intel.com>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
+ <20241115184301.16396cfe@kernel.org>
+ <6738babc4165e_747ce29446@willemb.c.googlers.com.notmuch>
+ <52650a34-f9f9-4769-8d16-01f549954ddf@intel.com>
+ <673cab54db1c1_2a097e2948c@willemb.c.googlers.com.notmuch>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <673cab54db1c1_2a097e2948c@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0114.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:20::11) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 2/3] page_pool: fix IOMMU crash when driver has
- already unbound
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com,
- Robin Murphy <robin.murphy@arm.com>,
- Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
- <20241120103456.396577-3-linyunsheng@huawei.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20241120103456.396577-3-linyunsheng@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB8717:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7df4d65a-3dd4-40c5-8699-08dd09775ef2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?T1V1MllTZDFCVEdrOEo0MWFHVXJTZUZ4Z0lDSlVTTFFlNEhDMzE0amNxc3BM?=
+ =?utf-8?B?cVFHQm82S2ZZZXBwK0J0bm5WT1dTVm5zL1h1YnhXb2FQVmpJS0VUUjFueUd3?=
+ =?utf-8?B?Y3ZyWWhNM1Y0WmhuQUVtVm96N2NjQjFpRGg2OHAwUmZQRlczWVZDRnBCa3BJ?=
+ =?utf-8?B?OEdneERFVlRYRm51SkhreVRkOTd4Ny9GZkNJZ2FJaWc0bXNQVlZGeG9KemhG?=
+ =?utf-8?B?azRUQ05MWGhsOFlJL2xiOFhBaWZOWTZpaHdjbWR3RUtNbWh1WUQvME90RGNa?=
+ =?utf-8?B?eEloNnlOOWk2eGdhcVhBTmNkWFZQV1hMWUI5VlR5dHZWVm9HeVNnVUlsbFJw?=
+ =?utf-8?B?RUtiZmllRjIzVDVLWVNRQU9SWjNwWFFQdkNTbXkwaUNvVEFQbE1oaTJlOHVt?=
+ =?utf-8?B?c0hiMzlQbUhEL2ZHMlpmNTA5Y3JqSHFCRjBSZFV6QTdFZTU1NVRuQUpVZ1pm?=
+ =?utf-8?B?OXFQM2hVUHRITkdPRlEwdXZjNW52cEliQXlidFlOdllaSVlZWTRNaHNjRFRm?=
+ =?utf-8?B?M1BZOXRCekJHdWhqMU4vWVZaVjVYVzBXbzhxejkyVTVmeGhocllGOFFFb3RR?=
+ =?utf-8?B?cEFZSEJiOFY1N3o4T3haKzNqRGZteVMrSVo0SWl1Y3F0bTIzczk5UmplNEND?=
+ =?utf-8?B?VUM5Tk0wVENQaGR2STk1M1pXNEpNb2s0ZCtjN1RWUVFldGEwMzFEcXBTWmpT?=
+ =?utf-8?B?NnVzcDlmREdqNVJlSDlFOWdFSGNlUlVYb0I3Q1U3NHFRa05nZExaVnROc2Vt?=
+ =?utf-8?B?WmZxdlozZWEveDZiV1REY0d2YjRsK2FnL1pLcjlHQTZFT0IzMFlMQ2pLdmc5?=
+ =?utf-8?B?djF1bjN0a21tTHd4ZTRFb2J0a0tkV0J5R1IrMllYakNmYkhTMFozZEZxS01y?=
+ =?utf-8?B?M1ZBWVc0dnB2d3FET3A5eHE1S0FzVS9LdUkvQ00zNkZlYUZkRVMrNGlTVk4y?=
+ =?utf-8?B?T1JvdEtmSnFwWDhTZWRBdVlpYUkwUmNaSVo3MkJtc3BtdTBrSXRzVjF3aURj?=
+ =?utf-8?B?R2pTUk1lNTRmU3YwNzdTK0ZodlFDcVhibks0QUg5VGRZTVBLT0VLYkQ3MmxS?=
+ =?utf-8?B?bnpJRmpQZEhrd2xsS3FUUW9pYmY4d0ViUzQ3T2lqQ3hKZC9tWGVVQzBQRnpa?=
+ =?utf-8?B?Nm1MV2tzWlRzcEdDVHBVbUQxSlBTY25peFFUaXV2TEpTZVlXSTl0aE5OL2FF?=
+ =?utf-8?B?YUNyLzdPektHMk1wMHFHTmRSMVFNY2lYbk0xbnZZVXJZcDc5N0tzVHpzSDNY?=
+ =?utf-8?B?eEtDQzVzR0djaWxmUFdqdTArVlg1RHNNb3RFNTlrbWZ1ZVBJQzBkcSs2Rmg1?=
+ =?utf-8?B?emFLMERQYmk0eTRrcWtja01PVGJGMDdWb0N2cmEwS25pZmpsQXczd3pZV0tr?=
+ =?utf-8?B?RGpUR2NZSk1DU2pQZDQrSlBsYjVmOE5VZnNjV2JjYTdjb2lWWG91bDVZcGg0?=
+ =?utf-8?B?SC92OEhKTFp3ZlhOUmJRNjd1Y3Z4dFNvMzBJUWlKbGZQTzZLT0EzQ1QrZDkw?=
+ =?utf-8?B?RjM4K2Q1TVJjYytOOFdDS2lIZ1Nza1JCZ21KRkFBYVFlUGg1NmQvNUdadVhL?=
+ =?utf-8?B?UFVSV3JheXdHSVU2V2VoaG01ZDA3M1R4cUNwTmV3VFhSWFhuT2M1NGVLQ0Jj?=
+ =?utf-8?B?MXhKMVhwamNDaE56ZGFQcE9IVXdZck43QjlIREs3N0xFbDE5bGk4TTk0ckZl?=
+ =?utf-8?B?N2JVcngvT2pjbjEyUjMza1JIM0NVeXIwbGp5LzRXUE5ha3c4UEFGTWIwWkR1?=
+ =?utf-8?Q?Z+2K7AkTMDMHcGH2gLVQ5VYOMXZxpxsaPR485QW?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U3o2ZFB0MEw1R0NyWjl6aHNrMXcwbENCWFhoZlV4WTAzL2QxTnRoaFMwSUVL?=
+ =?utf-8?B?S21paGxRTmEvZnM4MHN5ZERRKzRhQWJGTWJ0cnVpSytQVTRreUxwQ2ZvNmZC?=
+ =?utf-8?B?TlpHeldZZ0JEZDhMclJETGRNbkRDNS9FaXJlaFZrbE50a1pWWHZnWjhkc0V1?=
+ =?utf-8?B?QzNYWC9OZytnUTZMUlhUUFUwRk5oWVJkNXIwSTYyOXBCLzVDYWV3OWRqV0ND?=
+ =?utf-8?B?ZzZhYkJmRW1xaU9DOGlIcVdMWEt3dGgveEFxbjBncUp4S1RmdjBOc3Jib0Vj?=
+ =?utf-8?B?eGVxcDFERUo5N0htQmZES2IyeGp0WWdDVDVBNU1BdUdSZ3VhWnIvcnZPWFc1?=
+ =?utf-8?B?ZFJVRkxKZEZUeVZlK0pmZTlLdnBibHNrcjRDeVhtS1ozdzR5TXlYM2thSzRu?=
+ =?utf-8?B?N0VFeGlsVGNhN2M1RnJBc1Q3eVNUQ2FVa3NxeFNvQjg3bTF0cExEMi9Eczhv?=
+ =?utf-8?B?d3VJNVFVT3RKcEhScnVZY0xtcU9rT0FaWnA1ZlVwT2I1alFZRWIwTjdYOVBM?=
+ =?utf-8?B?TmUvaGFSL0w3bDVQaFlRb2Y5dUMyWVlpbkhkZytBaUN5eGwxMGVwaXdQZDds?=
+ =?utf-8?B?QUdQWTcySWlIdlRlRjBTb3NYR09GQjI2OXZ2ZDBpRk43anoyR05VcndsOVNo?=
+ =?utf-8?B?cFFVOHh6MzlqWGt1OTg4TlJ5L3VtVHBwNTlOSGJiNW5pN1ZTbEthVjFnMHpN?=
+ =?utf-8?B?SFdSOGM4NUJWMXk2bFdIMnV5TFRSUXVsNy96b2NkTjIzTnFZUDE1Zk9pTGVu?=
+ =?utf-8?B?L3VNUTdKd1JBZldWdCt4RVFkR09mNEhqSWZoNUdtRm9jRlpqYlZNZUhMYTEy?=
+ =?utf-8?B?VllxeGJISnBKTTFzSmZ6YWVwVklralR0SFppSTZ1cVlTZ3Fwak5PckV5VHoy?=
+ =?utf-8?B?b0ppN1FpS0JJWU9BbDdZZnNmSVVEK2xHWDZZb0ZhVzJGUGZuM0FJaGQwekxz?=
+ =?utf-8?B?OUVZZ1NIU0NtNTJOSVRJYkxoRlIvVGNxclFCdmtrSnBDK29heW0yR2dpNS9N?=
+ =?utf-8?B?VHExT0lUS253VGo2NHQ4Qk5NNkMvd3ZHTm9kdUdOeXpWaHhlbWxoVzJnV3pI?=
+ =?utf-8?B?dys5eko5Q3BPV3hWVTVqZE9HUnpSTEVjVHQ3U1MrMitUd2Jiek5hV3RoSWpr?=
+ =?utf-8?B?akwvQXZMdzdmOVpnMGJBV3ZGWFF3dzZGOGpIVFYrZzdiUlNCVFlla0NMRWR6?=
+ =?utf-8?B?ajFaUG4yeE96SWdQOHZscC9JbEJxdEFpRHBwM2JuSW1IVEtucWxDdUNwMFB5?=
+ =?utf-8?B?QkJxZnUyUnRnbWJjU0QweXgwWWRybHg3NzI1Y2hFRGJHT3dQT3g4RHg2MFB0?=
+ =?utf-8?B?SFRwbjRHTnlsZEN2NCtZMDM4SytGdTNEdG1Zd2JKTERMTUE5R0xpNmNPVGd2?=
+ =?utf-8?B?M1BySE9aTS9QN0pBSFpPdko1Ry9pREQzMXNLbldzeXcyQzhPU0tnR0xUOGNm?=
+ =?utf-8?B?cVg4QmdjMmxlMk8vbzZLOGVMeHZ2eFpTSnBJS2xzUzJXUXZWKzhrUkJLR1oz?=
+ =?utf-8?B?cHBJbFBUeWpzaTZCRnZSbzBWeDZlZklnMkoyOXMvdUpBU1NMY21HTElZc0hC?=
+ =?utf-8?B?VStML0VKRzdiUkRPYUUyS3NCaDJHbWNSSk1CdlNhald2eFdjL2tlSVhYY3V1?=
+ =?utf-8?B?ZGsxdEtRSTRoN0g2U2dvTHhxUmRwMVdxbEMrTWhSQ211ZlRnUUdDZFd6bTBa?=
+ =?utf-8?B?eEl0T0NpeFlFTGhRaU1JV0JqYTV6S3BlYWRMUzVMSGpvT3N3cmpBaWZRdDlv?=
+ =?utf-8?B?ZkszRnorVjVmNzdvbzlYY3dqNW1BdVJBTjFxU3gyeHVlSEphTmpIWTJoSkkx?=
+ =?utf-8?B?M0Fxd01mK1JqM0pRM21OZnloTCt4c2NhSkxYWEtBaHZUZlV2S0Q3a0JjL0xQ?=
+ =?utf-8?B?UXJBT0pXOUJ4THEydEJtQ0FPUGN5SFIwT3k5V3hRRE5Ydnhyc2h6QXEwNzhM?=
+ =?utf-8?B?MGhJeTRxWS9iYkhHbmlvRCtnSGt2YTJsTVlVUjYxdjNXcmsrTlR4SEhQeWYv?=
+ =?utf-8?B?QmtwdGdzRllaM2JyRndmeWpKQ0hQRldPMk1XSVBRSWpEMVB0UFlkMmNxbEhX?=
+ =?utf-8?B?KzhTWVNIakYvODFhTm5IdFpyVjJpS3JaTjJnaU91YkJSRDk1UW9JTVJ6UFFY?=
+ =?utf-8?B?V1VKTXV5QWcrY0c4TzhQY1h1aHY5NWJUaVR5UFVCSlZQUlY0aGVtOVNQVzNK?=
+ =?utf-8?B?VGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7df4d65a-3dd4-40c5-8699-08dd09775ef2
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2024 15:24:05.8486
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ftRUXqWw2w8l0Xl/lGTr20wqaTJAUxmOkKgIUUZkDiB9KGi+Mdf42iFKnPK2vUQe1DYHCqT5mexN570QQscM8XipGdv7SXE/ejGmpUwkF1I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8717
+X-OriginatorOrg: intel.com
 
+From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Tue, 19 Nov 2024 10:14:28 -0500
 
+> Alexander Lobakin wrote:
+>> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
+>> Date: Sat, 16 Nov 2024 10:31:08 -0500
 
-On 20/11/2024 11.34, Yunsheng Lin wrote:
-> Networking driver with page_pool support may hand over page
-> still with dma mapping to network stack and try to reuse that
-> page after network stack is done with it and passes it back
-> to page_pool to avoid the penalty of dma mapping/unmapping.
-> With all the caching in the network stack, some pages may be
-> held in the network stack without returning to the page_pool
-> soon enough, and with VF disable causing the driver unbound,
-> the page_pool does not stop the driver from doing it's
-> unbounding work, instead page_pool uses workqueue to check
-> if there is some pages coming back from the network stack
-> periodically, if there is any, it will do the dma unmmapping
-> related cleanup work.
+[...]
+
+>> libeth_xdp depends on every patch from the series. I don't know why you
+>> believe this might anyhow move faster. Almost the whole series got
+>> reviewed relatively quickly, except drivers/intel folder which people
+>> often tend to avoid.
 > 
-> As mentioned in [1], attempting DMA unmaps after the driver
-> has already unbound may leak resources or at worst corrupt
-> memory. Fundamentally, the page pool code cannot allow DMA
-> mappings to outlive the driver they belong to.
+> Smaller focused series might have been merged already.
+
+Half of this series merged wouldn't change that the whole set wouldn't
+fit into one window (which is what you want). Half of this series merged
+wouldn't allow sending idpf XDP parts.
+
+>  
+>> I remind you that the initial libeth + iavf series (11 patches) was
+>> baking on LKML for one year. Here 2 Chapters went into the kernel within
+>> 2 windows and only this one (clearly much bigger than the previous ones
+>> and containing only generic changes in contrary to the previous which
+>> had only /intel code) didn't follow this rule, which doesn't
+>> unnecessarily mean it will stuck for too long.
+>>
+>> (+ I clearly mentioned several times that Chapter III will take longer
+>>  than the rest and each time you had no issues with that)
 > 
-> Currently it seems there are at least two cases that the page
-> is not released fast enough causing dma unmmapping done after
-> driver has already unbound:
-> 1. ipv4 packet defragmentation timeout: this seems to cause
->     delay up to 30 secs.
-> 2. skb_defer_free_flush(): this may cause infinite delay if
->     there is no triggering for net_rx_action().
+> This is a misunderstanding. I need a working feature, on a predictable
+> timeline, in distro kernels.
+
+Predictable timeline is not about upstream. At least when it comes to
+series which introduce a lot of generic changes / additions.
+A good example is PFCP offload in ice, the initial support was done and
+sent spring 2022, then it took almost 2 years until it landed into the
+kernel. The first series was of good quality, but there'll always be
+discussions, different opinions etc.
+
+I've no idea what misunderstanding are you talking about, I quoted what
+Oregon told me quoting you. The email I sent with per-patch breakdown
+why none of them can be tossed off to upstream XDP for idpf, you seemed
+to ignore, at least I haven't seen any reply. I've no idea what they
+promise you each kernel release, but I haven't promised anything except
+sending first working RFC by the end of 2023, which was done back then;
+because promising that feature X will definitely land into upstream
+release Y would mean lying. There's always risk even a small series can
+easily miss 1-3 kernel releases.
+Take a look at Amit's comment. It involves additional work which I
+didn't expect. I'm planning to do it while the window is closed as the
+suggestion is perfectly valid and I don't have any arguments against.
+Feel free to go there and argue that the comment is not valid because
+you want the series merged ASAP, if you think that this "argument" works
+upstream.
+
 > 
-> In order not to call DMA APIs to do DMA unmmapping after driver
-> has already unbound and stall the unloading of the networking
-> driver, scan the inflight pages using some MM API to do the DMA
-> unmmapping for those pages when page_pool_destroy() is called.
+>>>
+>>> The first 3 patches are not essential to IDFP XDP + AF_XDP either.
+>>
+>> You don't seem to read the code. libeth_xdp won't even build without them.
 > 
-> The max time of scanning inflight pages is about 1.3 sec for
-> system with over 300GB memory as mentioned in [3], which seems
-> acceptable as the scanning is only done when there are indeed
-> some inflight pages and is done in the slow path.
+> Not as written, no, obviously.
+
+If you want to compare with the OOT implementation for the 10th time,
+let me remind you that it differs from the upstream version of idpf a
+ton. OOT driver still doesn't use Page Pool (without which idpf wouldn't
+have been accepted upstream at all), for example, which automatically
+drops the dependency from several big patches from this series. OOT
+implementation performs X times worse than the upstream ice. It still
+forces header split to be turned off when XDP prog is installed. It
+still uses hardcoded Rx buffer sizes. I can continue enumerating things
+from OOT unacceptable here in upstream forever.
+
 > 
-> Note, the devmem patchset seems to make the bug harder to fix,
-> and may make backporting harder too. As there is no actual user
-> for the devmem and the fixing for devmem is unclear for now,
-> this patch does not consider fixing the case for devmem yet.
+>> I don't believe the model taken by some developers (not spelling names
+>> loud) "let's submit minimal changes and almost draft code, I promise
+>> I'll create a todo list and will be polishing it within next x years"
+>> works at all, not speaking that it may work better than sending polished
+>> mature code (I hope it is).
+>>
+>>> The IDPF feature does not have to not depend on them.
+>>>
+>>> Does not matter for upstream, but for the purpose of backporting this
+>>> to distro kernels, it helps if the driver feature minimizes dependency
+>>> on core kernel API changes. If patch 19 can be made to work without
+>>
+>> OOT style of thinking.
+>> Minimizing core changes == artificial self-limiting optimization and
+>> functionality potential.
+>> New kernels > LTSes and especially custom kernels which receive
+>> non-upstream (== not officially supported by the community) feature
+>> backports. Upstream shouldn't sacrifice anything in favor of those, this
+>> way we end up one day sacrificing stuff for out-of-tree drivers (which I
+>> know some people already try to do).
 > 
-> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-> 2. https://github.com/netoptimizer/prototype-kernel
-> 3. https://lore.kernel.org/all/17a24d69-7bf0-412c-a32a-b25d82bb4159@kernel.org/
-> CC: Robin Murphy <robin.murphy@arm.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: IOMMU <iommu@lists.linux.dev>
-> Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Tested-by: Yonglong Liu <liuyonglong@huawei.com>
-> ---
->   include/net/page_pool/types.h |  6 ++-
->   net/core/page_pool.c          | 95 ++++++++++++++++++++++++++++++-----
->   2 files changed, 87 insertions(+), 14 deletions(-)
+> Opinionated positions. Nice if you have unlimited time.
+
+I clearly remember Kuba's position that he wants good quality of
+networking core and driver code. I'm pretty sure every netdev maintainer
+has the same position. Again, feel free to argue with them, saying they
+must take whatever trash is sent to LKML because customer X wants it
+backported to his custom kernel Y ASAP.
+
 > 
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index c022c410abe3..7393fd45bc47 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -228,7 +228,11 @@ struct page_pool {
->   	 */
->   	refcount_t user_cnt;
->   
-> -	u64 destroy_cnt;
-> +	/* Lock to avoid doing dma unmapping concurrently when
-> +	 * destroy_cnt > 0.
-> +	 */
-> +	spinlock_t destroy_lock;
-> +	unsigned int destroy_cnt;
->   
->   	/* Slow/Control-path information follows */
->   	struct page_pool_params_slow slow;
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index b3dae671eb26..33a314abbba4 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -272,9 +272,6 @@ static int page_pool_init(struct page_pool *pool,
->   	/* Driver calling page_pool_create() also call page_pool_destroy() */
->   	refcount_set(&pool->user_cnt, 1);
->   
-> -	if (pool->dma_map)
-> -		get_device(pool->p.dev);
-> -
->   	if (pool->slow.flags & PP_FLAG_ALLOW_UNREADABLE_NETMEM) {
->   		/* We rely on rtnl_lock()ing to make sure netdev_rx_queue
->   		 * configuration doesn't change while we're initializing
-> @@ -312,9 +309,6 @@ static void page_pool_uninit(struct page_pool *pool)
->   {
->   	ptr_ring_cleanup(&pool->ring, NULL);
->   
-> -	if (pool->dma_map)
-> -		put_device(pool->p.dev);
-> -
->   #ifdef CONFIG_PAGE_POOL_STATS
->   	if (!pool->system)
->   		free_percpu(pool->recycle_stats);
-> @@ -365,7 +359,7 @@ struct page_pool *page_pool_create(const struct page_pool_params *params)
->   }
->   EXPORT_SYMBOL(page_pool_create);
->   
-> -static void page_pool_return_page(struct page_pool *pool, netmem_ref netmem);
-> +static void __page_pool_return_page(struct page_pool *pool, netmem_ref netmem);
->   
->   static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
->   {
-> @@ -403,7 +397,7 @@ static noinline netmem_ref page_pool_refill_alloc_cache(struct page_pool *pool)
->   			 * (2) break out to fallthrough to alloc_pages_node.
->   			 * This limit stress on page buddy alloactor.
->   			 */
-> -			page_pool_return_page(pool, netmem);
-> +			__page_pool_return_page(pool, netmem);
->   			alloc_stat_inc(pool, waive);
->   			netmem = 0;
->   			break;
-> @@ -670,7 +664,7 @@ static __always_inline void __page_pool_release_page_dma(struct page_pool *pool,
->    * a regular page (that will eventually be returned to the normal
->    * page-allocator via put_page).
->    */
-> -void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
-> +void __page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
->   {
->   	int count;
->   	bool put;
-> @@ -697,6 +691,27 @@ void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
->   	 */
->   }
->   
-> +/* Called from page_pool_put_*() path, need to synchronizated with
-> + * page_pool_destory() path.
-> + */
-> +static void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
-> +{
-> +	unsigned int destroy_cnt;
-> +
-> +	rcu_read_lock();
-> +
-> +	destroy_cnt = READ_ONCE(pool->destroy_cnt);
-> +	if (unlikely(destroy_cnt)) {
-> +		spin_lock_bh(&pool->destroy_lock);
-> +		__page_pool_return_page(pool, netmem);
-> +		spin_unlock_bh(&pool->destroy_lock);
-> +	} else {
-> +		__page_pool_return_page(pool, netmem);
-> +	}
-> +
-> +	rcu_read_unlock();
-> +}
-> +
->   static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
->   {
->   	int ret;
-> @@ -924,7 +939,7 @@ static netmem_ref page_pool_drain_frag(struct page_pool *pool,
->   		return netmem;
->   	}
->   
-> -	page_pool_return_page(pool, netmem);
-> +	__page_pool_return_page(pool, netmem);
->   	return 0;
->   }
->   
-> @@ -938,7 +953,7 @@ static void page_pool_free_frag(struct page_pool *pool)
->   	if (!netmem || page_pool_unref_netmem(netmem, drain_count))
->   		return;
->   
-> -	page_pool_return_page(pool, netmem);
-> +	__page_pool_return_page(pool, netmem);
->   }
->   
->   netmem_ref page_pool_alloc_frag_netmem(struct page_pool *pool,
-> @@ -1045,7 +1060,7 @@ static void page_pool_empty_alloc_cache_once(struct page_pool *pool)
->   static void page_pool_scrub(struct page_pool *pool)
->   {
->   	page_pool_empty_alloc_cache_once(pool);
-> -	pool->destroy_cnt++;
-> +	WRITE_ONCE(pool->destroy_cnt, pool->destroy_cnt + 1);
->   
->   	/* No more consumers should exist, but producers could still
->   	 * be in-flight.
-> @@ -1119,6 +1134,58 @@ void page_pool_disable_direct_recycling(struct page_pool *pool)
->   }
->   EXPORT_SYMBOL(page_pool_disable_direct_recycling);
->   
-> +static void page_pool_inflight_unmap(struct page_pool *pool)
-> +{
-> +	unsigned int unmapped = 0;
-> +	struct zone *zone;
-> +	int inflight;
-> +
-> +	if (!pool->dma_map || pool->mp_priv)
-> +		return;
-> +
-> +	get_online_mems();
-> +	spin_lock_bh(&pool->destroy_lock);
-> +
-> +	inflight = page_pool_inflight(pool, false);
-> +	for_each_populated_zone(zone) {
-> +		unsigned long end_pfn = zone_end_pfn(zone);
-> +		unsigned long pfn;
-> +
-> +		for (pfn = zone->zone_start_pfn; pfn < end_pfn; pfn++) {
-> +			struct page *page = pfn_to_online_page(pfn);
-> +
-> +			if (!page || !page_count(page) ||
-> +			    (page->pp_magic & ~0x3UL) != PP_SIGNATURE ||
-> +			    page->pp != pool)
-> +				continue;
-> +
-> +			dma_unmap_page_attrs(pool->p.dev,
-> +					     page_pool_get_dma_addr(page),
-> +					     PAGE_SIZE << pool->p.order,
-> +					     pool->p.dma_dir,
-> +					     DMA_ATTR_SKIP_CPU_SYNC |
-> +					     DMA_ATTR_WEAK_ORDERING);
-> +			page_pool_set_dma_addr(page, 0);
-> +
+>>> some of the changes in 1..18, that makes it more robust from that PoV.
+>>
+>> No it can't, I thought people first read the code and only then comment,
+>> otherwise it's just wasting time.
 
-I feel this belongs in a helper function call.
-
-Previously we had a function called: page_pool_release_page().
-
-This was used to convert the page into a normal page again, releasing
-page_pool dependencies.  It was used when packet transitioned into the
-netstack, but it was removed when we decided it was safe to let netstack
-return pp pages.
-
-Removed in commits:
-  - 535b9c61bdef ("net: page_pool: hide page_pool_release_page()")
-  - 07e0c7d3179d ("net: page_pool: merge page_pool_release_page() with 
-page_pool_return_page()")
-
-
-> +			unmapped++;
-> +
-> +			/* Skip scanning all pages when debug is disabled */
-> +			if (!IS_ENABLED(CONFIG_DEBUG_NET) &&
-> +			    inflight == unmapped)
-> +				goto out;
-> +		}
-> +	}
-> +
-> +out:
-> +	WARN_ONCE(page_pool_inflight(pool, false) != unmapped,
-> +		  "page_pool(%u): unmapped(%u) != inflight pages(%d)\n",
-> +		  pool->user.id, unmapped, inflight);
-> +
-> +	pool->dma_map = false;
-> +	spin_unlock_bh(&pool->destroy_lock);
-> +	put_online_mems();
-> +}
-> +
->   void page_pool_destroy(struct page_pool *pool)
->   {
->   	if (!pool)
-> @@ -1139,6 +1206,8 @@ void page_pool_destroy(struct page_pool *pool)
->   	 */
->   	synchronize_rcu();
->   
-> +	page_pool_inflight_unmap(pool);
-> +
-
-Reaching here means we have detected in-flight packets/pages.
-
-In "page_pool_inflight_unmap" we scan and find those in-flight pages to
-DMA unmap them. Then below we wait for these in-flight pages again.
-Why don't we just "release" (page_pool_release_page) those in-flight
-pages from belonging to the page_pool, when we found them during scanning?
-
-If doing so, we can hopefully remove the periodic checking code below.
-
->   	page_pool_detached(pool);
->   	pool->defer_start = jiffies;
->   	pool->defer_warn  = jiffies + DEFER_WARN_INTERVAL;
-> @@ -1159,7 +1228,7 @@ void page_pool_update_nid(struct page_pool *pool, int new_nid)
->   	/* Flush pool alloc cache, as refill will check NUMA node */
->   	while (pool->alloc.count) {
->   		netmem = pool->alloc.cache[--pool->alloc.count];
-> -		page_pool_return_page(pool, netmem);
-> +		__page_pool_return_page(pool, netmem);
->   	}
->   }
->   EXPORT_SYMBOL(page_pool_update_nid);
-
-Thanks for continuing to work on this :-)
-
---Jesper
+Thanks,
+Olek
 
