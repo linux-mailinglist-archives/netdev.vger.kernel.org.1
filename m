@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-146464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20BD19D38D4
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:56:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C7A9D38DD
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:58:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6261F25816
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:56:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD562838C4
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A72A19D89B;
-	Wed, 20 Nov 2024 10:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F381A2846;
+	Wed, 20 Nov 2024 10:56:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-195.mail.aliyun.com (out28-195.mail.aliyun.com [115.124.28.195])
+Received: from out28-146.mail.aliyun.com (out28-146.mail.aliyun.com [115.124.28.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C747C848C;
-	Wed, 20 Nov 2024 10:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668DD1A0734;
+	Wed, 20 Nov 2024 10:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732100209; cv=none; b=rTXFeu0Uo5UayYup45o2qiWEO1ZesNTXANbNOQk6gLXpt8eRRAg+Ikoe1vbWkNffLu0QDO8YsBtWLJ7kP5Yj2Nze4k8/sxXKXAA/gAjff2wMlB/3yWpjqMiYyQt7oVbn04QumLApRN51SmBzzHQJvCZR1mJf29UKtaclkrrl5hE=
+	t=1732100214; cv=none; b=MqEjNUeBbEb3vPHR5PdSafe5sBuF2IsWjVqOtz6zRZLrFezOU21tDmexg+kznQwMQEH2AKiKh+UyOFWTrlJfzMBTAuIxqc9iZ9Kpw+xcQDY/yBtm69WxmrZrZ9Rg99AndJPzPBmTHV+ARxdQeIBPPord3SObxs6kqs/ET7kWSLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732100209; c=relaxed/simple;
-	bh=C5493pXo1Jxga6RlwvxPNbMOCGdWhnyUfs5Uzx5mvYk=;
+	s=arc-20240116; t=1732100214; c=relaxed/simple;
+	bh=iRjzYxl1/YHWQu1R4zyczirciBSft4OLVHF0hmQ2Dno=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qdjnOqj9i25ubLUnWKZG1Etrd8Per1kVJzOAjPxui9tplyLjiDwUa9szGHToZDWyT6tZ4doXoA+oY7xp++ToQ3n4hyIKxExZt+fIdo38THW/2LzckVZD+fln/sE608MWNkqZbfSKYTTD14IMhbhrtQwEuaFd9RNhvIF1XybgOc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.195
+	 MIME-Version; b=lx+vw3ESTGpNpYdx3N3g57trlzRxViRe0qULn7deq38amFOa+/Nn+V8H7VLSsXgkcg1fcvxFpgkh4WuowbCzCPz97ccvJkXf5c2fjvWpSgMEC/ADNN6p75NFDmUuaNyMCHctL3U+i4A7QyY8cZ69UEmxP4CuAdB9+jbxTEJZsMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aGmppX-_1732100201 cluster:ay29)
+Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aGmppZM_1732100202 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Wed, 20 Nov 2024 18:56:41 +0800
+          Wed, 20 Nov 2024 18:56:43 +0800
 From: Frank Sae <Frank.Sae@motor-comm.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -43,9 +43,9 @@ Cc: netdev@vger.kernel.org,
 	fei.zhang@motor-comm.com,
 	hua.sun@motor-comm.com,
 	Frank.Sae@motor-comm.com
-Subject: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the fxgmac_start function
-Date: Wed, 20 Nov 2024 18:56:09 +0800
-Message-Id: <20241120105625.22508-6-Frank.Sae@motor-comm.com>
+Subject: [PATCH net-next v2 08/21] motorcomm:yt6801: Implement the fxgmac_read_mac_addr function
+Date: Wed, 20 Nov 2024 18:56:12 +0800
+Message-Id: <20241120105625.22508-9-Frank.Sae@motor-comm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
 References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
@@ -57,286 +57,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the fxgmac_start function to connect phy and init phy lib, enable napi
-, phy and msix irq.
+Implement the fxgmac_read_mac_addr function to read mac address form efuse.
 
 Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
 ---
- .../ethernet/motorcomm/yt6801/yt6801_net.c    | 242 ++++++++++++++++++
- 1 file changed, 242 insertions(+)
+ .../ethernet/motorcomm/yt6801/yt6801_net.c    | 147 ++++++++++++++++++
+ 1 file changed, 147 insertions(+)
 
 diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-index 39b91cc26..eedf4dcb0 100644
+index aa51ecdd7..c3baa06b0 100644
 --- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
 +++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-@@ -11,6 +11,8 @@
- #include "yt6801_desc.h"
- #include "yt6801_net.h"
- 
-+static void fxgmac_napi_enable(struct fxgmac_pdata *pdata);
-+
- static int fxgmac_calc_rx_buf_size(struct fxgmac_pdata *pdata, unsigned int mtu)
- {
- 	u32 rx_buf_size, max_mtu;
-@@ -31,6 +33,26 @@ static int fxgmac_calc_rx_buf_size(struct fxgmac_pdata *pdata, unsigned int mtu)
- 	return rx_buf_size;
+@@ -796,6 +796,153 @@ static int fxgmac_open(struct net_device *netdev)
+ 	return ret;
  }
  
-+static void fxgmac_enable_rx_tx_ints(struct fxgmac_pdata *pdata)
++#define EFUSE_FISRT_UPDATE_ADDR				255
++#define EFUSE_SECOND_UPDATE_ADDR			209
++#define EFUSE_MAX_ENTRY					39
++#define EFUSE_PATCH_ADDR_START				0
++#define EFUSE_PATCH_DATA_START				2
++#define EFUSE_PATCH_SIZE				6
++#define EFUSE_REGION_A_B_LENGTH				18
++
++static bool fxgmac_efuse_read_data(struct fxgmac_pdata *pdata, u32 offset,
++				   u8 *value)
 +{
-+	struct fxgmac_channel *channel = pdata->channel_head;
-+	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
-+	enum fxgmac_int int_id;
++	bool ret = false;
++	u32 wait = 1000;
++	u32 val = 0;
 +
-+	for (u32 i = 0; i < pdata->channel_count; i++, channel++) {
-+		if (channel->tx_ring && channel->rx_ring)
-+			int_id = FXGMAC_INT_DMA_CH_SR_TI_RI;
-+		else if (channel->tx_ring)
-+			int_id = FXGMAC_INT_DMA_CH_SR_TI;
-+		else if (channel->rx_ring)
-+			int_id = FXGMAC_INT_DMA_CH_SR_RI;
-+		else
-+			continue;
++	fxgmac_set_bits(&val, EFUSE_OP_ADDR_POS, EFUSE_OP_ADDR_LEN, offset);
++	fxgmac_set_bits(&val, EFUSE_OP_START_POS, EFUSE_OP_START_LEN, 1);
++	fxgmac_set_bits(&val, EFUSE_OP_MODE_POS, EFUSE_OP_MODE_LEN,
++			EFUSE_OP_MODE_ROW_READ);
++	wr32_mem(pdata, val, EFUSE_OP_CTRL_0);
 +
-+		hw_ops->enable_channel_irq(channel, int_id);
-+	}
-+}
-+
- #define FXGMAC_NAPI_ENABLE			0x1
- #define FXGMAC_NAPI_DISABLE			0x0
- static void fxgmac_napi_disable(struct fxgmac_pdata *pdata)
-@@ -180,6 +202,160 @@ void fxgmac_free_rx_data(struct fxgmac_pdata *pdata)
- 	}
- }
- 
-+static  void fxgmac_phylink_handler(struct net_device *ndev)
-+{
-+	struct fxgmac_pdata *pdata = netdev_priv(ndev);
-+	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
-+
-+	pdata->phy_link = pdata->phydev->link;
-+	pdata->phy_speed = pdata->phydev->speed;
-+	pdata->phy_duplex = pdata->phydev->duplex;
-+
-+	yt_dbg(pdata, "EPHY_CTRL:%x, link:%d, speed:%d,  duplex:%x.\n",
-+	       rd32_mem(pdata, EPHY_CTRL), pdata->phy_link, pdata->phy_speed,
-+	       pdata->phy_duplex);
-+
-+	if (pdata->phy_link) {
-+		hw_ops->config_mac_speed(pdata);
-+		hw_ops->enable_rx(pdata);
-+		hw_ops->enable_tx(pdata);
-+		netif_carrier_on(pdata->netdev);
-+		if (netif_running(pdata->netdev)) {
-+			netif_tx_wake_all_queues(pdata->netdev);
-+			yt_dbg(pdata, "%s now is link up, mac_speed=%d.\n",
-+			       netdev_name(pdata->netdev), pdata->phy_speed);
++	while (wait--) {
++		fsleep(20);
++		val = rd32_mem(pdata, EFUSE_OP_CTRL_1);
++		if (FXGMAC_GET_BITS(val, EFUSE_OP_DONE_POS,
++				    EFUSE_OP_DONE_LEN)) {
++			ret = true;
++			break;
 +		}
-+	} else {
-+		netif_carrier_off(pdata->netdev);
-+		netif_tx_stop_all_queues(pdata->netdev);
-+		hw_ops->disable_rx(pdata);
-+		hw_ops->disable_tx(pdata);
-+		yt_dbg(pdata, "%s now is link down\n",
-+		       netdev_name(pdata->netdev));
 +	}
 +
-+	phy_print_status(pdata->phydev);
-+}
-+
-+static int fxgmac_phy_connect(struct fxgmac_pdata *pdata)
-+{
-+	struct phy_device *phydev = pdata->phydev;
-+	int ret;
-+
-+	ret = phy_connect_direct(pdata->netdev, phydev, fxgmac_phylink_handler,
-+				 PHY_INTERFACE_MODE_RGMII);
-+	if (ret)
-+		return ret;
-+
-+	phy_attached_info(phydev);
-+	return 0;
-+}
-+
-+static void fxgmac_enable_msix_irqs(struct fxgmac_pdata *pdata)
-+{
-+	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
-+
-+	for (u32 intid = 0; intid < MSIX_TBL_MAX_NUM; intid++)
-+		hw_ops->enable_msix_one_irq(pdata, intid);
-+}
-+
-+int fxgmac_phy_irq_enable(struct fxgmac_pdata *pdata, bool clear_phy_interrupt)
-+{
-+	struct phy_device *phydev = pdata->phydev;
-+
-+	if (clear_phy_interrupt &&
-+	    phy_read(phydev, PHY_INT_STATUS) < 0)
-+		return -ETIMEDOUT;
-+
-+	return phy_modify(phydev, PHY_INT_MASK,
-+				     PHY_INT_MASK_LINK_UP |
-+					     PHY_INT_MASK_LINK_DOWN,
-+				     PHY_INT_MASK_LINK_UP |
-+					     PHY_INT_MASK_LINK_DOWN);
-+}
-+
-+int fxgmac_start(struct fxgmac_pdata *pdata)
-+{
-+	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
-+	u32 val;
-+	int ret;
-+
-+	if (pdata->dev_state != FXGMAC_DEV_OPEN &&
-+	    pdata->dev_state != FXGMAC_DEV_STOP &&
-+	    pdata->dev_state != FXGMAC_DEV_RESUME) {
-+		yt_dbg(pdata, " dev_state err:%x\n", pdata->dev_state);
-+		return 0;
-+	}
-+
-+	if (pdata->dev_state != FXGMAC_DEV_STOP) {
-+		hw_ops->reset_phy(pdata);
-+		hw_ops->release_phy(pdata);
-+		yt_dbg(pdata, "reset phy.\n");
-+	}
-+
-+	if (pdata->dev_state == FXGMAC_DEV_OPEN) {
-+		ret = fxgmac_phy_connect(pdata);
-+		if (ret < 0)
-+			return ret;
-+
-+		yt_dbg(pdata, "fxgmac_phy_connect.\n");
-+	}
-+
-+	phy_init_hw(pdata->phydev);
-+	phy_resume(pdata->phydev);
-+
-+	hw_ops->pcie_init(pdata);
-+	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate)) {
-+		yt_err(pdata,
-+		       "fxgmac powerstate is %lu when config power up.\n",
-+		       pdata->powerstate);
-+	}
-+
-+	hw_ops->config_power_up(pdata);
-+	hw_ops->dismiss_all_int(pdata);
-+	ret = hw_ops->init(pdata);
-+	if (ret < 0) {
-+		yt_err(pdata, "fxgmac hw init error.\n");
++	if (!ret) {
++		yt_err(pdata, "Fail to reading efuse Byte%d\n", offset);
 +		return ret;
 +	}
 +
-+	fxgmac_napi_enable(pdata);
-+	ret = fxgmac_request_irqs(pdata);
-+	if (ret < 0)
-+		return ret;
++	if (value)
++		*value = FXGMAC_GET_BITS(val, EFUSE_OP_RD_DATA_POS,
++					 EFUSE_OP_RD_DATA_LEN) & 0xff;
 +
-+	/* Config interrupt to level signal */
-+	val = rd32_mac(pdata, DMA_MR);
-+	fxgmac_set_bits(&val, DMA_MR_INTM_POS, DMA_MR_INTM_LEN, 2);
-+	fxgmac_set_bits(&val, DMA_MR_QUREAD_POS, DMA_MR_QUREAD_LEN, 1);
-+	wr32_mac(pdata, val, DMA_MR);
-+
-+	hw_ops->enable_mgm_irq(pdata);
-+	hw_ops->set_interrupt_moderation(pdata);
-+
-+	if (pdata->per_channel_irq) {
-+		fxgmac_enable_msix_irqs(pdata);
-+		ret = fxgmac_phy_irq_enable(pdata, true);
-+		if (ret < 0)
-+			goto dis_napi;
-+	}
-+
-+	fxgmac_enable_rx_tx_ints(pdata);
-+	phy_speed_up(pdata->phydev);
-+	genphy_soft_reset(pdata->phydev);
-+
-+	pdata->dev_state = FXGMAC_DEV_START;
-+	phy_start(pdata->phydev);
-+
-+	return 0;
-+
-+dis_napi:
-+	fxgmac_napi_disable(pdata);
-+	hw_ops->exit(pdata);
-+	yt_err(pdata, "%s irq err.\n", __func__);
 +	return ret;
 +}
 +
- static void fxgmac_disable_msix_irqs(struct fxgmac_pdata *pdata)
- {
- 	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
-@@ -540,4 +716,70 @@ static const struct net_device_ops fxgmac_netdev_ops = {
- const struct net_device_ops *fxgmac_get_netdev_ops(void)
- {
- 	return &fxgmac_netdev_ops;
-+
-+static void fxgmac_napi_enable(struct fxgmac_pdata *pdata)
++static bool fxgmac_efuse_read_index_patch(struct fxgmac_pdata *pdata, u8 index,
++					  u32 *offset, u32 *value)
 +{
-+	u32 i, *flags = &pdata->int_flags;
-+	struct fxgmac_channel *channel;
-+	u32 misc_napi, tx, rx;
++	u8 tmp[EFUSE_PATCH_SIZE - EFUSE_PATCH_DATA_START];
++	u32 addr, i;
++	bool ret;
 +
-+	misc_napi = FIELD_GET(BIT(FXGMAC_FLAG_MISC_NAPI_POS), *flags);
-+	tx = FXGMAC_GET_BITS(*flags, FXGMAC_FLAG_TX_NAPI_POS,
-+			     FXGMAC_FLAG_TX_NAPI_LEN);
-+	rx = FXGMAC_GET_BITS(*flags, FXGMAC_FLAG_RX_NAPI_POS,
-+			     FXGMAC_FLAG_RX_NAPI_LEN);
-+
-+	if (!pdata->per_channel_irq) {
-+		i = FIELD_GET(BIT(FXGMAC_FLAG_LEGACY_NAPI_POS), *flags);
-+		if (i)
-+			return;
-+
-+		netif_napi_add_weight(pdata->netdev, &pdata->napi,
-+				      fxgmac_all_poll,
-+				      NAPI_POLL_WEIGHT);
-+
-+		napi_enable(&pdata->napi);
-+		fxgmac_set_bits(flags, FXGMAC_FLAG_LEGACY_NAPI_POS,
-+				FXGMAC_FLAG_LEGACY_NAPI_LEN,
-+				FXGMAC_NAPI_ENABLE);
-+		return;
++	if (index >= EFUSE_MAX_ENTRY) {
++		yt_err(pdata, "Reading efuse out of range, index %d\n", index);
++		return false;
 +	}
 +
-+	channel = pdata->channel_head;
-+
-+	for (i = 0; i < pdata->channel_count; i++, channel++) {
-+		if (!FXGMAC_GET_BITS(rx, i, FXGMAC_FLAG_PER_RX_NAPI_LEN)) {
-+			netif_napi_add_weight(pdata->netdev,
-+					      &channel->napi_rx,
-+					      fxgmac_one_poll_rx,
-+					      NAPI_POLL_WEIGHT);
-+
-+			napi_enable(&channel->napi_rx);
-+			fxgmac_set_bits(flags, FXGMAC_FLAG_RX_NAPI_POS + i,
-+					FXGMAC_FLAG_PER_RX_NAPI_LEN,
-+					FXGMAC_NAPI_ENABLE);
++	for (i = EFUSE_PATCH_ADDR_START; i < EFUSE_PATCH_DATA_START; i++) {
++		addr = EFUSE_REGION_A_B_LENGTH + index * EFUSE_PATCH_SIZE + i;
++		ret = fxgmac_efuse_read_data(pdata, addr,
++					     tmp + i - EFUSE_PATCH_ADDR_START);
++		if (!ret) {
++			yt_err(pdata, "Fail to reading efuse Byte%d\n", addr);
++			return ret;
 +		}
++	}
++	if (offset) {
++		/* tmp[0] is low 8bit date, tmp[1] is high 8bit date */
++		*offset = tmp[0] | (tmp[1] << 8);
++	}
 +
-+		if (FXGMAC_IS_CHANNEL_WITH_TX_IRQ(i) && !tx) {
-+			netif_napi_add_weight(pdata->netdev, &channel->napi_tx,
-+					      fxgmac_one_poll_tx,
-+					      NAPI_POLL_WEIGHT);
-+			napi_enable(&channel->napi_tx);
-+			fxgmac_set_bits(flags, FXGMAC_FLAG_TX_NAPI_POS,
-+					FXGMAC_FLAG_TX_NAPI_LEN,
-+					FXGMAC_NAPI_ENABLE);
++	for (i = EFUSE_PATCH_DATA_START; i < EFUSE_PATCH_SIZE; i++) {
++		addr = EFUSE_REGION_A_B_LENGTH + index * EFUSE_PATCH_SIZE + i;
++		ret = fxgmac_efuse_read_data(pdata, addr,
++					     tmp + i - EFUSE_PATCH_DATA_START);
++		if (!ret) {
++			yt_err(pdata, "Fail to reading efuse Byte%d\n", addr);
++			return ret;
 +		}
-+		if (netif_msg_drv(pdata))
-+			yt_dbg(pdata, "msix ch%d napi enabled done.\n", i);
++	}
++	if (value) {
++		/* tmp[0] is low 8bit date, tmp[1] is low 8bit date
++		 * ...  tmp[3] is highest 8bit date
++		 */
++		*value = tmp[0] | (tmp[1] << 8) | (tmp[2] << 16) |
++			 (tmp[3] << 24);
 +	}
 +
-+	/* Misc */
-+	if (!misc_napi) {
-+		netif_napi_add_weight(pdata->netdev, &pdata->napi_misc,
-+				      fxgmac_misc_poll, NAPI_POLL_WEIGHT);
++	return ret;
++}
 +
-+		napi_enable(&pdata->napi_misc);
-+		fxgmac_set_bits(flags, FXGMAC_FLAG_MISC_NAPI_POS,
-+				FXGMAC_FLAG_MISC_NAPI_LEN, FXGMAC_NAPI_ENABLE);
++static bool fxgmac_efuse_read_mac_subsys(struct fxgmac_pdata *pdata,
++					 u8 *mac_addr, u32 *subsys, u32 *revid)
++{
++	u32 machr = 0, maclr = 0;
++	u32 offset = 0, val = 0;
++	bool ret = true;
++	u8 index;
++
++	for (index = 0;; index++) {
++		if (!fxgmac_efuse_read_index_patch(pdata, index, &offset, &val))
++			return false;
++
++		if (offset == 0x00)
++			break; /* Reach the blank. */
++
++		if (offset == MACA0LR_FROM_EFUSE)
++			maclr = val;
++
++		if (offset == MACA0HR_FROM_EFUSE)
++			machr = val;
++
++		if (offset == PCI_REVISION_ID && revid)
++			*revid = val;
++
++		if (offset == PCI_SUBSYSTEM_VENDOR_ID && subsys)
++			*subsys = val;
 +	}
- }
++
++	if (mac_addr) {
++		mac_addr[5] = (u8)(maclr & 0xFF);
++		mac_addr[4] = (u8)((maclr >> 8) & 0xFF);
++		mac_addr[3] = (u8)((maclr >> 16) & 0xFF);
++		mac_addr[2] = (u8)((maclr >> 24) & 0xFF);
++		mac_addr[1] = (u8)(machr & 0xFF);
++		mac_addr[0] = (u8)((machr >> 8) & 0xFF);
++	}
++
++	return ret;
++}
++
++static int fxgmac_read_mac_addr(struct fxgmac_pdata *pdata)
++{
++	u8 default_addr[ETH_ALEN] = { 0, 0x55, 0x7b, 0xb5, 0x7d, 0xf7 };
++	struct net_device *netdev = pdata->netdev;
++	int ret;
++
++	/* If efuse have mac addr, use it. if not, use static mac address. */
++	ret = fxgmac_efuse_read_mac_subsys(pdata, pdata->mac_addr, NULL, NULL);
++	if (!ret)
++		return -1;
++
++	if (is_zero_ether_addr(pdata->mac_addr))
++		/* Use a static mac address for test */
++		memcpy(pdata->mac_addr, default_addr, netdev->addr_len);
++
++	return 0;
++}
++
+ #define FXGMAC_SYSCLOCK 125000000 /* System clock is 125 MHz */
+ 
+ static void fxgmac_default_config(struct fxgmac_pdata *pdata)
 -- 
 2.34.1
 
