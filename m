@@ -1,164 +1,192 @@
-Return-Path: <netdev+bounces-146532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39DBD9D40A2
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 17:56:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059809D3FE3
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 17:18:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03160B27B0D
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:14:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9BEE2812D4
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C10513AA31;
-	Wed, 20 Nov 2024 16:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGcZWD5O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28735141987;
+	Wed, 20 Nov 2024 16:18:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C716124B28;
-	Wed, 20 Nov 2024 16:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE085A4D5;
+	Wed, 20 Nov 2024 16:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732119236; cv=none; b=YUIFACCxnqWibqrNzkuyLcku+fuUgG9r3Gg7aJgEexiG+4ujluYJf4dh31hM235pmt0YTBAdu+FpVKnuAQYx3jDTadM/mf+zAYAsWTu/gqbNDnG2Kl2uVUndJj+tPeEAS7UNfrIOtNDMHCoztR7jxH59Za55I5FAzXwpSZYZDAo=
+	t=1732119487; cv=none; b=ScFja+CcaxUIq5O78CJq/MDs7pgTqvciwNGINXRZS2nFvTuCGHMz1dAFM9VMJ48G3qcgY6/+7MS2DCMOTmP4oTgLyiaMDhhUHqdPdiVnXfV23UsPF5UPxmhpE2QD5UGSLbat1yxjHtHBl6403NzvFF+L/bv4N4AsreodtICck8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732119236; c=relaxed/simple;
-	bh=6dquPXmcvzZwZ7UNLGSo/e4SmGcQLkWTt1lEOQ8mB38=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t/s5nuKoaghxdV5flRsYcGuiBga6fPLOOnm0itVtwMetr3lWhanCa9f/x9HmMEhgN3jgFcEO72TxIlh02MvEiNl2Q1mFIO7amBIYnWKO8KVK1Req3hk5BRhPRcKI+wzhykaXwGpAp7g/PlwbNmDmoPT0GG+HzctlpefCNb40P6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FGcZWD5O; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ea39f39666so1746680a91.2;
-        Wed, 20 Nov 2024 08:13:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732119234; x=1732724034; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/HvFtGjqZ7DcsQBtPnZM2lJlY596mswDKkJjhdWmKo=;
-        b=FGcZWD5O3hfsMyXxP0ozMB+yAgAt45yfS1FM0+7QcBcDeDxpQAPIcHK8XQc10L8AhS
-         zSrOcAZRvurmpxk1PFret34fG+aV7uiLmQpSHozcFHSk0Pk74Uy+4wQOXyrHJyMMdX7O
-         cP3BfU1U40Rz8oZsKyuUHvrT6C/KDaiMAELs5kcvh213wA5DHQk1AiSaonPxq0fUT5rG
-         eBU626A/nUSmGTO8BgL/glm/R7MyLMJB0ZLz6ssnSad8QFpV3ROvaTwtVa5BObLYisrF
-         yJlkoz7/khm67qYPCkqZizqeOJtDPFu7H1VWX7UO6hi8INsZFd29O4Mlb5q7GNr5413n
-         spGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732119234; x=1732724034;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e/HvFtGjqZ7DcsQBtPnZM2lJlY596mswDKkJjhdWmKo=;
-        b=pokbJOWb07ySR2yXOa1RG+rWAHEAM3wzHFR5r5OO+6jvkFpcwS1yMsBXMryyPGCTI5
-         UYKceO8UkT4QyXyVFD/cDE2kRe8/xCgsv7ZWol/T1jHLk934R3j3AaVmtepbKownKgN1
-         dsn+vzSCA+9dJ7dqJ648Hd3Tc3Uo/y4NCXBFDF+X5VNAojovFIvP2+R/1M2fgw2uTO/D
-         N/xcyIaLVVQQH0OgkxgtjKVEXV04GydSTbLas4EeXpjUUN3zWH16rDnnwOBSaS1m0sTA
-         z33PSJKlUcDVJvO+sSVci33pnZkm+yqhzjTwUvFY+uCcEcTgKninCZUloLmodOL6Xq6z
-         5gxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzV/kMAfQOJsVLY0Q5yGDNs7In5kzQekbQNMMk86e4+YbbCVUFRIIJLBMvkc7JvyEldamQFY6rZ/sGVrU=@vger.kernel.org, AJvYcCVMWuDNkSiG0Uh4smB95zwsXF55V84Y8zDnM1MKzYXOKr0EGPxc1JXPswsSEckCPQFJJrpLnbuo@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpbcD7fcSZ+IEZZNRZMI6roEcZeQWQUICj6TagCOzJF+63PrRL
-	mMFF1hPtWACw04LkllgjaDVPLwlteH/2bf5r9w348oPCYkB/4iX2PQEz4kWMBVc7I0XyRQ1Cz73
-	KZtLlbGZmuJ0vuoFojNosdUTgagQ=
-X-Gm-Gg: ASbGncvoknzbhPw2SgLlC2rE8XPVJJO5vepEW8khbx0dxavvF+zT4b0qPNNC43lEJbx
-	i6BjJk+91UXHxHx7d/GBiK11V/sdsMDzKLDDXV/ESMIuoJRn2mO78/iun0b0T/Mz/6g==
-X-Google-Smtp-Source: AGHT+IErlhHptHLWUZGmZIkis6XudrtzEe2+Y6fasY0LMn8WKG3iKlKQo1A0945v3nmksbHGL01UbUnKq6YQMAdMEdA=
-X-Received: by 2002:a17:90b:5310:b0:2ea:819e:9126 with SMTP id
- 98e67ed59e1d1-2eaca7cef44mr3317485a91.26.1732119234049; Wed, 20 Nov 2024
- 08:13:54 -0800 (PST)
+	s=arc-20240116; t=1732119487; c=relaxed/simple;
+	bh=steiTH9WgmEuOIfuCUhnix08ztBgjaw+7hd+ArWDPkw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QDAaLgbSBU+zuA1+rtd62QXp3vWL3FqEbjLYky6+juHNENjZ7GXmqAVpbIrXpcjND6Ns/yDdvs2nl+4sYBnkFH9rIgRxoLfxnQCV2I6vYTFRU5HI+HjMDcuWMR4Bvs7vu5Gbdparrcf/W3dhZTH5dLQ2YgoPE4aoTntKsmKMqAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86D201480;
+	Wed, 20 Nov 2024 08:18:32 -0800 (PST)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 97A8A3F66E;
+	Wed, 20 Nov 2024 08:18:00 -0800 (PST)
+Message-ID: <15f937d7-7ac1-4a7f-abcd-abfede191b51@arm.com>
+Date: Wed, 20 Nov 2024 16:17:59 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-tcp-md5-diag-prep-v2-0-00a2a7feb1fa@gmail.com>
- <20241115160816.09df40eb@kernel.org> <7fb38122abcbcf28f7af8b9891d0b0852c01f088.camel@sipsolutions.net>
-In-Reply-To: <7fb38122abcbcf28f7af8b9891d0b0852c01f088.camel@sipsolutions.net>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Wed, 20 Nov 2024 16:13:42 +0000
-Message-ID: <CAJwJo6ZTT28XZ1HFhC77KrPeFmwVWDkFzYsg7YU1MD0PESAWrw@mail.gmail.com>
-Subject: Re: [PATCH net v2 0/5] Make TCP-MD5-diag slightly less broken
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Ivan Delalande <colona@arista.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Davide Caratti <dcaratti@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mptcp@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v4 3/3] page_pool: skip dma sync operation for
+ inflight pages
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>, IOMMU <iommu@lists.linux.dev>,
+ MM <linux-mm@kvack.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241120103456.396577-1-linyunsheng@huawei.com>
+ <20241120103456.396577-4-linyunsheng@huawei.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20241120103456.396577-4-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Nov 2024 at 08:44, Johannes Berg <johannes@sipsolutions.net> wrote:
->
-> (Sorry, late to the party)
+On 20/11/2024 10:34 am, Yunsheng Lin wrote:
+> Skip dma sync operation for inflight pages before the
+> page_pool_destroy() returns to the driver as DMA API
+> expects to be called with a valid device bound to a
+> driver as mentioned in [1].
+> 
+> After page_pool_destroy() is called, the page is not
+> expected to be recycled back to pool->alloc cache and
+> dma sync operation is not needed when the page is not
+> recyclable or pool->ring is full, so only skip the dma
+> sync operation for the infilght pages by clearing the
+> pool->dma_sync under protection of rcu lock when page
+> is recycled to pool->ring to ensure that there is no
+> dma sync operation called after page_pool_destroy() is
+> returned.
 
-Thanks for joining! :-)
+Something feels off here - either this is a micro-optimisation which I 
+wouldn't really expect to be meaningful, or it means patch #2 doesn't 
+actually do what it claims. If it really is possible to attempt to 
+dma_sync a page *after* page_pool_inflight_unmap() has already reclaimed 
+and unmapped it, that represents yet another DMA API lifecycle issue, 
+which as well as being even more obviously incorrect usage-wise, could 
+also still lead to the same crash (if the device is non-coherent).
 
-> On Fri, 2024-11-15 at 16:08 -0800, Jakub Kicinski wrote:
-> > Would it be too ugly if we simply retried with a 32kB skb if the initial
-> > dump failed with EMSGSIZE?
->
-> We have min_dump_alloc, which a number of places are setting much higher
-> than the default, partially at least because there were similar issues,
-> e.g. in nl80211. See e.g. nl80211_dump_wiphy() doing it dynamically.
-
-Yeah, your example seems alike what netlink_dump() does with
-min_dump_alloc and max_recvmsg_len. You have there
-.doit = nl80211_get_wiphy,
-.dumpit = nl80211_dump_wiphy,
-
-So at this initial patch set, I'm trying to fix
-inet_diag_handler::dump_one() callback, which is to my understanding
-same as .doit() for generic netlink [should we just rename struct
-inet_diag_handler callbacks to match the generics?]. See
-inet_diag_handler_cmd() and NLM_F_DUMP in
-Documentation/userspace-api/netlink/intro.rst
-For TCP-MD5-diag even the single message reply may have a variable
-number of keys on a socket's dump. For multi-messages dump, my plan is
-to use netlink_callback::ctx[] and add an iterator type that will
-allow to stop on N-th key between recvmsg() calls.
-
-> Kind of ugly? Sure! And we shouldn't use it now with newer userspace
-> that knows to request a more finely split dump. For older userspace it's
-> the only way though.
-
-Heh, the comment in nl80211_dump_wiphy() on sending an empty message
-and retrying is ouch!
-
->
-> Also, we don't even give all the data to older userspace (it must
-> support split dumps to get information about the more modern features, 6
-> GHz channels, etc.), but I gather that's not an option here.
->
-> > Another option would be to automatically grow the skb. The size
-> > accounting is an endless source of bugs. We'd just need to scan
-> > the codebase to make sure there are no cases where someone does
-> >
-> >       ptr = __nla_reserve();
-> >       nla_put();
-> >       *ptr = 0;
-> >
-> > Which may be too much of a project and source of bugs in itself.
-> >
-> > Or do both, retry as a fix, and auto-grow in net-next.
->
-> For auto-grow you'd also have to have information about the userspace
-> buffer, I think? It still has to fit there, might as well fail anyway if
-> that buffer is too small? I'm not sure we have that link back? But I'm
-> not really sure right now, just remember this as an additional wrinkle
-> from the above-mentioned nl80211 problem.
-
-Yeah, netlink_recvmsg() attempts to track what the userspace is asking:
-
-:        /* Record the max length of recvmsg() calls for future allocations */
-:        max_recvmsg_len = max(READ_ONCE(nlk->max_recvmsg_len), len);
-:        max_recvmsg_len = min_t(size_t, max_recvmsg_len,
-:                                SKB_WITH_OVERHEAD(32768));
-:        WRITE_ONCE(nlk->max_recvmsg_len, max_recvmsg_len);
+Otherwise, I don't imagine it's really worth worrying about optimising 
+out syncs for any pages which happen to get naturally returned after 
+page_pool_destroy() starts but before they're explicitly reclaimed. 
+Realistically, the kinds of big server systems where reclaim takes an 
+appreciable amount of time are going to be coherent and skipping syncs 
+anyway.
 
 Thanks,
-             Dmitry
+Robin.
+
+> 1. https://lore.kernel.org/all/caf31b5e-0e8f-4844-b7ba-ef59ed13b74e@arm.com/
+> CC: Robin Murphy <robin.murphy@arm.com>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> CC: Andrew Morton <akpm@linux-foundation.org>
+> CC: IOMMU <iommu@lists.linux.dev>
+> CC: MM <linux-mm@kvack.org>
+> Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>   net/core/page_pool.c | 25 ++++++++++++++++++-------
+>   1 file changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 33a314abbba4..0bde7c6c781a 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -712,7 +712,8 @@ static void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
+>   	rcu_read_unlock();
+>   }
+>   
+> -static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
+> +static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem,
+> +				      unsigned int dma_sync_size)
+>   {
+>   	int ret;
+>   	/* BH protection not needed if current is softirq */
+> @@ -723,10 +724,13 @@ static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
+>   
+>   	if (!ret) {
+>   		recycle_stat_inc(pool, ring);
+> -		return true;
+> +
+> +		rcu_read_lock();
+> +		page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
+> +		rcu_read_unlock();
+>   	}
+>   
+> -	return false;
+> +	return !ret;
+>   }
+>   
+>   /* Only allow direct recycling in special circumstances, into the
+> @@ -779,10 +783,11 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
+>   	if (likely(__page_pool_page_can_be_recycled(netmem))) {
+>   		/* Read barrier done in page_ref_count / READ_ONCE */
+>   
+> -		page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
+> -
+> -		if (allow_direct && page_pool_recycle_in_cache(netmem, pool))
+> +		if (allow_direct && page_pool_recycle_in_cache(netmem, pool)) {
+> +			page_pool_dma_sync_for_device(pool, netmem,
+> +						      dma_sync_size);
+>   			return 0;
+> +		}
+>   
+>   		/* Page found as candidate for recycling */
+>   		return netmem;
+> @@ -845,7 +850,7 @@ void page_pool_put_unrefed_netmem(struct page_pool *pool, netmem_ref netmem,
+>   
+>   	netmem =
+>   		__page_pool_put_page(pool, netmem, dma_sync_size, allow_direct);
+> -	if (netmem && !page_pool_recycle_in_ring(pool, netmem)) {
+> +	if (netmem && !page_pool_recycle_in_ring(pool, netmem, dma_sync_size)) {
+>   		/* Cache full, fallback to free pages */
+>   		recycle_stat_inc(pool, ring_full);
+>   		page_pool_return_page(pool, netmem);
+> @@ -903,14 +908,18 @@ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
+>   
+>   	/* Bulk producer into ptr_ring page_pool cache */
+>   	in_softirq = page_pool_producer_lock(pool);
+> +	rcu_read_lock();
+>   	for (i = 0; i < bulk_len; i++) {
+>   		if (__ptr_ring_produce(&pool->ring, data[i])) {
+>   			/* ring full */
+>   			recycle_stat_inc(pool, ring_full);
+>   			break;
+>   		}
+> +		page_pool_dma_sync_for_device(pool, (__force netmem_ref)data[i],
+> +					      -1);
+>   	}
+>   	recycle_stat_add(pool, ring, i);
+> +	rcu_read_unlock();
+>   	page_pool_producer_unlock(pool, in_softirq);
+>   
+>   	/* Hopefully all pages was return into ptr_ring */
+> @@ -1200,6 +1209,8 @@ void page_pool_destroy(struct page_pool *pool)
+>   	if (!page_pool_release(pool))
+>   		return;
+>   
+> +	pool->dma_sync = false;
+> +
+>   	/* Paired with rcu lock in page_pool_napi_local() to enable clearing
+>   	 * of pool->p.napi in page_pool_disable_direct_recycling() is seen
+>   	 * before returning to driver to free the napi instance.
 
