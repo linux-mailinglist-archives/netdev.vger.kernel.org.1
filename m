@@ -1,131 +1,183 @@
-Return-Path: <netdev+bounces-146368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2369D3166
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 01:30:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76C859D319C
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 02:07:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 126031F2313F
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 00:30:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 382932837CD
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 01:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C6DF9D9;
-	Wed, 20 Nov 2024 00:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9866AD27;
+	Wed, 20 Nov 2024 01:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mc2JLndg"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="PCzkjtAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D53FF9FE;
-	Wed, 20 Nov 2024 00:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9735182BD
+	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 01:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732062626; cv=none; b=EMl29rcmeCdJl8WcqUo+4mIKTdlH93qMXLZjPl/UadcYKPhwLb/8s08kqI0tCZod5ufv1pJhR3xosPMepntGlZdyK0VGjDUX+ukbB5ILwNFIAhInZAlEssTsG3/0JmlbYd0TP+YRAc5qOUJLxfrMHq5FxH77jQH0Y+yY+aKRLZw=
+	t=1732064864; cv=none; b=AiQ6dH9wV85zhdc5Tst18wGlyVouBxvk/5H8x9+Vhz5jeCV8VVZvtNcPy1MpfsdCLsyPYBXGedVJbAmBHBfgw7bvB3/bbCro+PyHzhIlEJ9HRSPsj7ckrAqSoENU+ZKJgJ9cCdTtfoa46x5GyBwuaB3MTGqSS17L1K723+amRTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732062626; c=relaxed/simple;
-	bh=Tj39gEQRUnuZujqX2/SNkK2rF5SE+IM6h9lUEGWn254=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=lG/8RRa2c7qhNal61PZq0swEVbu+fDQTVrHHrh7my7VjDHft0Y1Jn6A7XxZVWHFRUrF39Lh7HlwH4Kx81C3GBRDkQNDbzo4KTKUjVnPjvwfWcjgXxEOnX4hg4lUPb44PB5kxQ2y6SIdaDB/ib31lUa40kD0IIA+o7jJJmCsfm2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mc2JLndg; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1732062614;
-	bh=xgE8VEddh66b6D5zGoRX/UR/hABPOyWddRiDV3o9Iqc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=mc2JLndgDTR8x68KMC8rykavNvJ3fiwGig9qJ0Mx9UA5PA4C7DQ6dOlU2Cgwykfg1
-	 7pmf3wKU3QJl5Os4iSFtV/DGVXptML1tYstxxm9CI1MKdFREMdHMKR9wFy2mpUqwQX
-	 pJvCOFNg+dqXyQME9QxnPhccO8Njb1BzJ0AnjodP4Y/s05dDTmRWYsFci5/1byFj4R
-	 yVdXFleOrbSOwtMyGrYjePp0y7hDjIAO7/3GE02C6BfBlYduzWZGafwjCF+/zDefdH
-	 eLPx2l2P6EGC5WMU+IUnxbasmQOo06zaU9fJyP3f6Sas1EtrrjRWraKuOxK/SbJUKj
-	 KoB0H+BlAGX8w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XtMhP2JjKz4w2L;
-	Wed, 20 Nov 2024 11:30:13 +1100 (AEDT)
-Date: Wed, 20 Nov 2024 11:30:15 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Jeff Layton <jlayton@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the ceph tree with the net tree
-Message-ID: <20241120113015.294cf1d2@canb.auug.org.au>
+	s=arc-20240116; t=1732064864; c=relaxed/simple;
+	bh=wzAqo4SgxpRekPbyBUSyMAiZvMaOxt4z8SmppBZ8jaQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gV9fDmSjdiesoK3foxKCFjVKoUujoosrGob+RyuboPZzJ6uKz3X8cm15fZmO5CTduYGUENEVwY+RcQ3IukGGCOR11SXgVsM0YDDMr353AJ+sm8xVPkj7/a3P4Nridt0MooOiC2D5e7v00rO2iBo/r5LZeXi1l8vS3YQc6FeTV4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=PCzkjtAh; arc=none smtp.client-ip=67.231.154.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id F089034006A
+	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 01:07:33 +0000 (UTC)
+Received: from ben-dt5.candelatech.com (unknown [50.251.239.81])
+	by mail3.candelatech.com (Postfix) with ESMTP id 43FD313C2B0;
+	Tue, 19 Nov 2024 17:07:33 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 43FD313C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1732064853;
+	bh=wzAqo4SgxpRekPbyBUSyMAiZvMaOxt4z8SmppBZ8jaQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PCzkjtAhlfn6l+21wK68i7Tp1rM/r3E3iRyQy81pp9bP7AXQ0gzExwOgIlJAy3IxG
+	 AblEW14g2wYrpKEPz3MVr/GXhX40JdIyy8gco+AEuoRG5PX/nX8G1rqx7xYZJxRDia
+	 4MaQaYOEiXlFCHGE62i9efP3qY393AFVzCABZYNs=
+From: greearb@candelatech.com
+To: netdev@vger.kernel.org
+Cc: Ben Greear <greearb@candelatech.com>
+Subject: [RFC] net: wireguard:  Allow binding to specific ifindex
+Date: Tue, 19 Nov 2024 17:07:31 -0800
+Message-ID: <20241120010731.3794059-1-greearb@candelatech.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/DaF8sq.aa1GmhT4rubJOvbh";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+X-MDID: 1732064854-uJmfWfR72rWZ
+X-MDID-O:
+ us5;at1;1732064854;uJmfWfR72rWZ;<greearb@candelatech.com>;0590461a9946a11a9d6965a08c2b2857
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
---Sig_/DaF8sq.aa1GmhT4rubJOvbh
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Ben Greear <greearb@candelatech.com>
 
-Hi all,
+Which allows us to bind to VRF.
 
-Today's linux-next merge of the ceph tree got a conflict in:
+Signed-off-by: Ben Greear <greearb@candelatech.com>
+---
 
-  MAINTAINERS
+Not tested yet, hoping for early feedback while we set up
+proper testbed for this.
 
-between commit:
+ drivers/net/wireguard/device.h  |  1 +
+ drivers/net/wireguard/netlink.c | 12 +++++++++++-
+ drivers/net/wireguard/socket.c  |  2 ++
+ include/uapi/linux/wireguard.h  |  3 +++
+ 4 files changed, 17 insertions(+), 1 deletion(-)
 
-  4262bacb748f ("MAINTAINERS: exclude can core, drivers and DT bindings fro=
-m netdev ML")
+diff --git a/drivers/net/wireguard/device.h b/drivers/net/wireguard/device.h
+index 43c7cebbf50b..9698d9203915 100644
+--- a/drivers/net/wireguard/device.h
++++ b/drivers/net/wireguard/device.h
+@@ -53,6 +53,7 @@ struct wg_device {
+ 	atomic_t handshake_queue_len;
+ 	unsigned int num_peers, device_update_gen;
+ 	u32 fwmark;
++	int lowerdev; /* ifindex of lower level device to bind UDP transport */
+ 	u16 incoming_port;
+ };
+ 
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+index f7055180ba4a..5de3d59a17b0 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -27,7 +27,8 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
+ 	[WGDEVICE_A_FLAGS]		= { .type = NLA_U32 },
+ 	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
+ 	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
+-	[WGDEVICE_A_PEERS]		= { .type = NLA_NESTED }
++	[WGDEVICE_A_PEERS]		= { .type = NLA_NESTED },
++	[WGDEVICE_A_LOWERDEV]		= { .type = NLA_U32 },
+ };
+ 
+ static const struct nla_policy peer_policy[WGPEER_A_MAX + 1] = {
+@@ -232,6 +233,7 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 		if (nla_put_u16(skb, WGDEVICE_A_LISTEN_PORT,
+ 				wg->incoming_port) ||
+ 		    nla_put_u32(skb, WGDEVICE_A_FWMARK, wg->fwmark) ||
++		    nla_put_u32(skb, WGDEVICE_A_LOWERDEV, wg->lowerdev) ||
+ 		    nla_put_u32(skb, WGDEVICE_A_IFINDEX, wg->dev->ifindex) ||
+ 		    nla_put_string(skb, WGDEVICE_A_IFNAME, wg->dev->name))
+ 			goto out;
+@@ -530,6 +532,14 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
+ 			wg_socket_clear_peer_endpoint_src(peer);
+ 	}
+ 
++	if (info->attrs[WGDEVICE_A_LOWERDEV]) {
++		struct wg_peer *peer;
++
++		wg->lowerdev = nla_get_u32(info->attrs[WGDEVICE_A_LOWERDEV]);
++		list_for_each_entry(peer, &wg->peer_list, peer_list)
++			wg_socket_clear_peer_endpoint_src(peer);
++	}
++
+ 	if (info->attrs[WGDEVICE_A_LISTEN_PORT]) {
+ 		ret = set_port(wg,
+ 			nla_get_u16(info->attrs[WGDEVICE_A_LISTEN_PORT]));
+diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
+index 0414d7a6ce74..f8d12e841de0 100644
+--- a/drivers/net/wireguard/socket.c
++++ b/drivers/net/wireguard/socket.c
+@@ -360,6 +360,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 		.family = AF_INET,
+ 		.local_ip.s_addr = htonl(INADDR_ANY),
+ 		.local_udp_port = htons(port),
++		.bind_ifindex = wg->lowerdev,
+ 		.use_udp_checksums = true
+ 	};
+ #if IS_ENABLED(CONFIG_IPV6)
+@@ -369,6 +370,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 		.local_ip6 = IN6ADDR_ANY_INIT,
+ 		.use_udp6_tx_checksums = true,
+ 		.use_udp6_rx_checksums = true,
++		.bind_ifindex = wg->lowerdev,
+ 		.ipv6_v6only = true
+ 	};
+ #endif
+diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wireguard.h
+index ae88be14c947..f3784885389a 100644
+--- a/include/uapi/linux/wireguard.h
++++ b/include/uapi/linux/wireguard.h
+@@ -29,6 +29,7 @@
+  *    WGDEVICE_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
+  *    WGDEVICE_A_LISTEN_PORT: NLA_U16
+  *    WGDEVICE_A_FWMARK: NLA_U32
++ *    WGDEVICE_A_LOWERDEV: NLA_U32
+  *    WGDEVICE_A_PEERS: NLA_NESTED
+  *        0: NLA_NESTED
+  *            WGPEER_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
+@@ -83,6 +84,7 @@
+  *    WGDEVICE_A_PRIVATE_KEY: len WG_KEY_LEN, all zeros to remove
+  *    WGDEVICE_A_LISTEN_PORT: NLA_U16, 0 to choose randomly
+  *    WGDEVICE_A_FWMARK: NLA_U32, 0 to disable
++ *    WGDEVICE_A_LOWERDEV: NLA_U32, ifindex to bind lower transport, 0 to disable
+  *    WGDEVICE_A_PEERS: NLA_NESTED
+  *        0: NLA_NESTED
+  *            WGPEER_A_PUBLIC_KEY: len WG_KEY_LEN
+@@ -157,6 +159,7 @@ enum wgdevice_attribute {
+ 	WGDEVICE_A_LISTEN_PORT,
+ 	WGDEVICE_A_FWMARK,
+ 	WGDEVICE_A_PEERS,
++	WGDEVICE_A_LOWERDEV,
+ 	__WGDEVICE_A_LAST
+ };
+ #define WGDEVICE_A_MAX (__WGDEVICE_A_LAST - 1)
+-- 
+2.42.0
 
-from the net tree and commit:
-
-  6779c9d59a07 ("MAINTAINERS: exclude net/ceph from networking")
-
-from the ceph tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc MAINTAINERS
-index 54fc0c1232b8,3771691fa978..000000000000
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@@ -16235,7 -16179,7 +16236,8 @@@ X:	include/net/mac80211.
-  X:	include/net/wext.h
-  X:	net/9p/
-  X:	net/bluetooth/
- +X:	net/can/
-+ X:	net/ceph/
-  X:	net/mac80211/
-  X:	net/rfkill/
-  X:	net/wireless/
-
---Sig_/DaF8sq.aa1GmhT4rubJOvbh
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc9LZcACgkQAVBC80lX
-0GyhAgf/XHLwOcd9hP83RfBiS+nYp/gLhU5fkhsyd8y6YM/RHAhgpEj0+TzFrW+O
-ClwWaVIebEE3x2KOgw6QuPXQmvi+AJ0YJz+ZNTkxGXVb8cAL8Gi6RnP8xwlepxoE
-jAVH93XesiKQIrzTOMxdhP7+3De+Bs42Zz/nO/V2GqGbcSDOm/p7RnLgZE5Hv8ZG
-bn6rpZLS1SFjqcCc/TxnxjT1g0kLIwNUBZ7s/CTugcKQ9LAmQ+nQ/k7zzriNqbPb
-rBbI2tHM8x9JrDhahrItOcS3bedhayknnG48kKBG3mAtR8/ZVQ+eZst37kKMKclJ
-uBhxbupBrVkiFjYWK5LfMolRA2+J2g==
-=Dpml
------END PGP SIGNATURE-----
-
---Sig_/DaF8sq.aa1GmhT4rubJOvbh--
 
