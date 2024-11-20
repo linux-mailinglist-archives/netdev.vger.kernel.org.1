@@ -1,116 +1,96 @@
-Return-Path: <netdev+bounces-146424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FAB9D3569
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:29:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2AEA9D3589
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE7528249C
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:29:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CA3BB2312A
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C657360DCF;
-	Wed, 20 Nov 2024 08:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F9A1714CD;
+	Wed, 20 Nov 2024 08:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="aZmonetf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-26.smtpout.orange.fr [80.12.242.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0BA16F271
-	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 08:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C363C8615A;
+	Wed, 20 Nov 2024 08:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.26
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732091379; cv=none; b=eOFOB2nbvB94SZapIteu+BU8N6b/Kwrsbb4jlzbKk6hAn2t828n22Im+a4w1Ru83i4YWb0oqqX/bmiiBzj4IfOeSO+RO2UUNHsf7UP2bE6ZGBFm5PtzGjMVv+wt/Iqhy4f4M7oDEe3Bpm8io5sEARYf73aLRDwbygBufNBeDREo=
+	t=1732091660; cv=none; b=bu4KvoiCFW9OIXxV5AJdKb20a7rzlgkJ/F+bjInJ3kG4rjqeXgZKxghrUkvlsgyJaL7iszVnemKqhjZCM/VrDqpGKFPCVRwSZB69Hv3rb0flqXmOOFT0yAqm0K/neXlXh8jO0izM5XEdJmjFgtl+Dydl+Y+HByfiG7qRFugatKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732091379; c=relaxed/simple;
-	bh=7Ifr4kwlqQu0C1yFJZS3ajkFCOJ0TzLt5KNV+Hb4vwg=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tQ3TXNKGB/YXnsfsWUIttNzbnBJowtIpIVp1y233oXPgGh80nEvH+gifkFoanS0d+0tdlTW2QSimMzCeh891c00xbrGdwE0HzgXohWYeCpVIW63nL98rx/B7RT3Lv1KWrJ5qVD0IvfPxEKwdH3f0MTT67dM9ENMHbOaJHbq7Mf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.19.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas2t1732091313t745t33693
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.206.160.172])
-X-QQ-SSF:0001000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 12491251422650144601
-To: "'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Russell King'" <linux@armlinux.org.uk>
-Cc: <netdev@vger.kernel.org>
-References: <f769256c-d51c-4983-b7a5-015add42ca35@redhat.com>
-In-Reply-To: <f769256c-d51c-4983-b7a5-015add42ca35@redhat.com>
-Subject: RE: net vs net-next conflicts while cross merging
-Date: Wed, 20 Nov 2024 16:28:32 +0800
-Message-ID: <013a01db3b26$2f719310$8e54b930$@trustnetic.com>
+	s=arc-20240116; t=1732091660; c=relaxed/simple;
+	bh=tAP3yA2f13hGp4ZFJlv2MEDIvrRVb0ghzYb5MaYX2Iw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JSBSDLb1XUa0mxwU08JT1Vz9RiA/a9FB3XMQhpj1Zrtwzg/WyGJXjl7aAYz9lACPcmJCxNqHDkf9u1VaEfqAbcigwod2JJMxtNE9HlsmO2QsuPHVhI1qNnEhwy4vwO1LLlSiAVUUbA2bZm4va3ZAH/n22yLGfz4d2LzuVis4fHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=aZmonetf; arc=none smtp.client-ip=80.12.242.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-ej1-f46.google.com ([209.85.218.46])
+	by smtp.orange.fr with ESMTPSA
+	id DgA5t0hcpdDuoDgA5tTTc9; Wed, 20 Nov 2024 09:34:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1732091649;
+	bh=adOYQK7aPwsLhM4oKvhYzDNey9j7CMddEcH9FCvvTQo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=aZmonetfTwrSQRz9cLp37mKUGxkVgBWLtyJqBYehhxdnoLWUTcAUwdSTZDc/Yadm7
+	 HJ3KloKd5t0MJoy4eW/qBqyVbhgfauA/pjbk2/vjDRDoyL3iLdWR9MvxToRmUwv9wq
+	 q45uKP4z5RyVYOsgN8UgDtDTKlWhblVfDOvkCIEbAa64sC5qGMR6/hU/nyz5eMkGJl
+	 qRlaKwTSbPUd5cGrdQAmVQ4gd9Jfo5//r27Y+pzlh0CwcqPQf6QsbYD1Vu0KfSaqfV
+	 WIikLTZTOoCSZEr5JeoKEcvi3GAPbWOkvA00l8uA1oPWPx8cD0qWO29P+p9TWJtp4Q
+	 cDn8N2niGJMKQ==
+X-ME-Helo: mail-ej1-f46.google.com
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Wed, 20 Nov 2024 09:34:09 +0100
+X-ME-IP: 209.85.218.46
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9ec267b879so872510366b.2;
+        Wed, 20 Nov 2024 00:34:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUNmdM0VypPdB3ERU6IPif/scqfpuuU2MtQKAADEBWI4OiQEyg4pKjiBtgpuPt1EfzKNBkiSljb@vger.kernel.org, AJvYcCUwRF9jxZ6/M5DvGMO6+hv3BESDcy3QqpH99CYnjvWGGXtNanX4W3N0y5d9l1vU4/F85ZjcFgQQIDYo@vger.kernel.org, AJvYcCV32uZt4sX119DMdqsJcw+x4EGOO+Mw99gFzW8fa8Eqya73zGlP1v2PTDya7Bwdcodp8/K7tisYuk7D@vger.kernel.org, AJvYcCXwJda8Azq3+se4+fJyBpoYjLvq+9fy6K4jihUQIofPMrXEG+jfsoxpIWGSyRKAPhintPPDNErPbGCljBmW@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZFvW1hy8BVlG0Qyor5CEBncmqBoFpj32TGO6jRDgJPFMlv/Ub
+	vhEu5FkiRak9u8FtxoJiL78gAG4754GgNHhuBaGYcmb5L8SSifLj3Le5XHXcGfESXDcv/njd9FA
+	X5t793ts3/pXwdj9F1NquoExkc+Y=
+X-Google-Smtp-Source: AGHT+IHq//r1Bhfb10lz2TdZss0bHvnz2xrRldR2txbJnOPf5VJ4xHiRgJrfjwg3eL3UDdKFiypf3HZSDLQGAzTZ8vQ=
+X-Received: by 2002:a17:907:96a1:b0:a9a:3d5b:dc1a with SMTP id
+ a640c23a62f3a-aa4dd55043cmr167204066b.15.1732091649036; Wed, 20 Nov 2024
+ 00:34:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQK2AfNkyr04IUYYpGaScxifmQHGp7EKRjtg
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MZQHZNohqAr1MDRdV/Q2PNLXc496CNtcwJTrNf0EyyGBkijD7BAekmos
-	YDJ3xLewarIgtVwyShmbniDoHRJCl0wR/YivMLMQd0qdhm5xTZNsdcPoxFQEHEchdtv5oMu
-	lASQUPm1T+2JQauianxJLbTTEaFoNtIL/h5xi4BeoWn+y0dofzjaHCCY8+6YhPvmEEtR/fV
-	EXyqoOOQbVkToRQeONIbONoiEmjnvZ/R+Dg5QHHFSYe/TnaSbhWjH8jm7+3KLYvUH1lpzoR
-	EYiiYTcp3a6jzBnG2PVRjPbE/CxWKz0fhZqfFGFE5AuPSc2AycIJT6ro42JVeeIV0ezhRki
-	G3XElk1tRGCpDcHcumVOJPSr0oY6ZVtxcsCBtGAzTu3salmqpvIvEwgQyub7EErfZYMh4RC
-	8b+X05n2j9vGFC4jVl2jAU9d9V4Lu41X3G5f17Z8U6uBldrwukpbnlZp82JPrzbWk1UcE5G
-	5KYlhLGVG5DwgZuEDg5jBy6z0a01SYxrUYvG2ZDJX0FJVdKH671+etK63z7EHhToKOv3Aah
-	GFabIF40LRbYx4LcqB53vBIDind1pbUGyqJaqtKCHcHtnCI56uQoy7xNJWsx5I/CBnUV5yU
-	h5SJf9Z9jq2Vj6LO0bHdR96z1aD1qFUTCMXULMOj+tpUk/FTw5XS8YAjV/WWJ+1NSOLoe4K
-	Is2jrCQytyFmgnHgVHopiVUgK3aUgWxCvBVK4W4np0sTSfCuv66mArZh9wtayfuMjqfWcBq
-	se6ePOY9Cr19R7z1jSyjT7lEYcj0zzFWDeNwynUaEHHSdRtHK9ivWfGzvc9Y6D59mhOlKU9
-	/T2fv3VTraLHmVi7LxGWaG67qk3ao13pZ/3pzXx6S9yDxZKJ2Jmaf0kRGsJRUztOnlTN/CI
-	GPMuPoANcj99wFRpAG00a0TB21WbMeyTvJxP22EGu2hfbvCuuHCxWMuLGTtWklx7J1nQT7P
-	gZWZI7rU7l2Nohn/p4PHel1Rgl4uv721COeGBpBLO2Ul14VZZH6IH42GVeR3DXBHCVImMkp
-	u04D/ic/DdcRWyTHr3/FElacoendE=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+References: <20241120044014.92375-1-RuffaloLavoisier@gmail.com>
+In-Reply-To: <20241120044014.92375-1-RuffaloLavoisier@gmail.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Wed, 20 Nov 2024 17:33:58 +0900
+X-Gmail-Original-Message-ID: <CAMZ6RqKikFgtpYQ-SwV55hCzHHJ=7bbpmcfSPedheUwmFDDqJA@mail.gmail.com>
+Message-ID: <CAMZ6RqKikFgtpYQ-SwV55hCzHHJ=7bbpmcfSPedheUwmFDDqJA@mail.gmail.com>
+Subject: Re: [PATCH] docs: remove duplicate word
+To: Ruffalo Lavoisier <ruffalolavoisier@gmail.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp <thomas.kopp@microchip.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, No 19, 2024 9:15 PM, Paolo Abeni wrote:
-> Hi,
-> 
-> I just cross-merged net into net-next for the 6.13 PR. There was 2
-> conflicts:
-> 
-> include/linux/phy.h
-> 41ffcd95015f net: phy: fix phylib's dual eee_enabled
-> 21aa69e708b net: phy: convert eee_broken_modes to a linkmode bitmap
-> 
-> drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> 2160428bcb20 net: txgbe: fix null pointer to pcs
-> 2160428bcb20 net: txgbe: remove GPIO interrupt controller
+On Wed. 20 Nov. 2024 at 13:40, Ruffalo Lavoisier
+<ruffalolavoisier@gmail.com> wrote:
+>
+> - Remove duplicate word, 'to'.
+  ^^
 
-Hi,
+No need for the "-", this is not a list. I am fine if this is fixed by
+Marc while applying.
 
-I don't find what's the conflict here. Do you mean these two:
+Under the condition that the Sign-off-by: tag issue gets resolved:
 
-2160428bcb20 ("net: txgbe: fix null pointer to pcs")
-155c499ffd1d ("net: wangxun: txgbe: use phylink_pcs internally")
-
-If this is the case, it should be resolved as follow:
-
-static struct phylink_pcs *txgbe_phylink_mac_select(struct phylink_config *config,
-						    phy_interface_t interface)
-{
-	struct wx *wx = phylink_to_wx(config);
-	struct txgbe *txgbe = wx->priv;
-
-	if (wx->media_type != sp_media_copper)
-		return txgbe->pcs;
-
-	return NULL;
-}
-
-Thanks!
- 
-
+Acked-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
