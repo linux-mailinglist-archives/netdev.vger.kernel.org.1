@@ -1,201 +1,156 @@
-Return-Path: <netdev+bounces-146450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F889D37BA
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:58:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DD69D37E3
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3417A1F22FF1
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:58:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B01B1F24AFA
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7648719CC31;
-	Wed, 20 Nov 2024 09:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3RpsbYH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A833419E999;
+	Wed, 20 Nov 2024 10:01:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC54115DBBA
-	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 09:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF20819E971
+	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 10:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732096616; cv=none; b=n987qsbYquofz70t6EyBgDyAT4erbCbUia3rMvRRq9rCHD+efeo1A7M6uw/qtItpzBxEoktxHORKJGM8VwY4z7s9SYkYTaO/yXaumMm44rz2BBLPYEPFD38imRC8Le8uh9FEpG28tXuHOUwduzVsaquNXHDxfY2PMa2JrarWncY=
+	t=1732096900; cv=none; b=GeLLBF4IuZT52b1R7fYFYoEkiheERGqYiSCtwxXDANYDcmoPMlWO+Te9xkocpZ/5SubnWIrZSVeEAvRsdbbybxpdKItolvJglJFE5kyMy7PKTJpQK3kCnYQJCejd8BCQ+LrK+lm7XKtwQ+Ip59IAEUn7niy+tSlD8OYUE4DHKUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732096616; c=relaxed/simple;
-	bh=32YDIHQA8qQP4BBmzI+sqfTHJ25Ff3DCUPnLrJSJaN0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D0OizC9RG2Ufa20CGg0FGKzHwgtBZAIJjL68fRFHXlIdf5w5dB3FAaLF5Xq9h4CCfRy4SEleWUQi1in7kxvwJRLSlRNDPNpm6O7ic74Xc09GUMdBpP0dOhR+frXRGfZFUa//qO0QsfrO0XcLo58fut+FahwL1Sxaqg39CBqunpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b3RpsbYH; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a77562332aso9248065ab.3
-        for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 01:56:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732096614; x=1732701414; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B69pex7HTUI2SrZp5P49JsJXWsva+CVoUziz4Z9MYIE=;
-        b=b3RpsbYHqAClrdqdd0mugTbjDNx9tlMvJVHEojchvFqOjcQYEoG0wyozyRdcrUEo3t
-         s7oCYj/KO9Z2kWUgEF9etc/et162Zfi4GK+4bVc3l10YJNIFXFZCX6+C1CMLQJHtzzjR
-         wJTsJgPlpZRxvDiqEbMYNiOdt9Ft0VFsO4GR70CDP/z5I0gvK8wba43k03PhzNWcnjyN
-         5CRsehKqWYbllS1soQzkAmHDhXsdXRLFrlmaiCTh+Ngsv8tu1EyE3uEtfFpqPev97pME
-         7INvtsA31dAlLvZFGJapw7tq9aSWChg+nO1WVgmO/v3yxsh9bT8gl0aSzIOJNQDiXbTU
-         KTmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732096614; x=1732701414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B69pex7HTUI2SrZp5P49JsJXWsva+CVoUziz4Z9MYIE=;
-        b=Og0CHoJ8ZYXLntZDEewf2qIMWkKhnqlQe2zdzNFh5Qa/iyJrvJQfRz4MQXTgrbubGa
-         WTTDOoFGdR2o8Ti3MaEcBVgntf+j4ypzTdDkRRg9e5Iywy8z1WnLotGzM6nJASKeetoO
-         3/TzhvWlS9h41CKpa0Zla7via4XALG6Mi41ofC25j+ywp7192rdtipNwYWuzJjkvBxh9
-         izKJDMVBDkMA7rXnhi7PuDosiCuZq3h4TRCQV9oydgMiBEqG4xI3mgXHTp6XxzT30WQi
-         zwe/duFHYLcKdrfby52x9vY40rJTRne2p9Kg/gKjshUnyJbd5RCqdeLfOMh1dWgXhmJ0
-         VKVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXAlSJTiNLF3mtZM9pp7PtlHbh+Be1Im7YzGeJNJM0vd4/g0uO4sMgbgaD/bURS15rqk+o0rI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ24AHW0d8WgkBqs42Oh+kmRvaVibpZNdjH4reYMo5D9YfubAe
-	TihAdjZuURCEGDihZD49ccEqo+t/mGiyaV8dAVrkDWJt1co3PceeqLf+hbA+3ggZ+na6Rkb8JBH
-	KqQF9liphq2Mtoky2LtTu7l4Q8Yh6KiV2
-X-Google-Smtp-Source: AGHT+IGqd6UiuK89t6fgU7MpNm28/r/B1egD87u9dvSm9yqfx8INNbPbGGGke3nIFFU1e6FxTyqcjkawhZ88GytUpcU=
-X-Received: by 2002:a05:6e02:1521:b0:3a7:820e:3388 with SMTP id
- e9e14a558f8ab-3a7865a67edmr21286265ab.20.1732096613808; Wed, 20 Nov 2024
- 01:56:53 -0800 (PST)
+	s=arc-20240116; t=1732096900; c=relaxed/simple;
+	bh=chcNovfSeV+DZRaWhommLahi04LyZbnfEGviJ3Q2E80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cIQqDAqtWCh5M8jlQsf2iFbgt/8c2npd7tRn0oUH1SDlH7fl+2DBA++nLopKG680p1ha5WXGRZMML6NPbhYCuHXplUhDQt6RVVX+0LwZR7lkut531RlQXUIcy9WDuogVxII5CNXLbD3pkNoL/PK2K4DxUQfbZ+dTJYYlA+quODk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tDhWM-0008UK-HI; Wed, 20 Nov 2024 11:01:14 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tDhWL-001igc-02;
+	Wed, 20 Nov 2024 11:01:13 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 8D2CF377B9F;
+	Wed, 20 Nov 2024 10:01:12 +0000 (UTC)
+Date: Wed, 20 Nov 2024 11:01:12 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>, 
+	Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>, 
+	Enric Balletbo <eballetb@redhat.com>
+Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
+ lines
+Message-ID: <20241120-venomous-skilled-rottweiler-622b36-mkl@pengutronix.de>
+References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
+ <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
+ <20241120-magnificent-accelerated-robin-70e7ef-mkl@pengutronix.de>
+ <c9d8ff57-730f-40d9-887e-d11aba87c4b5@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com> <2422c3c6-7ea4-4551-839b-7cbbdaadf499@linux.intel.com>
-In-Reply-To: <2422c3c6-7ea4-4551-839b-7cbbdaadf499@linux.intel.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Date: Wed, 20 Nov 2024 10:56:43 +0100
-Message-ID: <CAFSsGVtCPyto3DHD5bL9H6AOiDKQXcxS34nGtyM7gEKBepQFkA@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net: phy: ensure that genphy_c45_an_config_eee_aneg()
- sees new value of phydev->eee_cfg.eee_enabled
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Russell King <rmk+kernel@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3wnxz2cl47oixl33"
+Content-Disposition: inline
+In-Reply-To: <c9d8ff57-730f-40d9-887e-d11aba87c4b5@oss.nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--3wnxz2cl47oixl33
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
+ lines
+MIME-Version: 1.0
 
-On Wed, Nov 20, 2024 at 4:11=E2=80=AFAM Choong Yong Liang
-<yong.liang.choong@linux.intel.com> wrote:
->
->
->
-> On 17/11/2024 4:52 am, Heiner Kallweit wrote:
-> > This is a follow-up to 41ffcd95015f ("net: phy: fix phylib's dual
-> > eee_enabled") and resolves an issue with genphy_c45_an_config_eee_aneg(=
-)
-> > (called from genphy_c45_ethtool_set_eee) not seeing the new value of
-> > phydev->eee_cfg.eee_enabled.
-> >
-> > Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC su=
-pport EEE")
-> > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> > ---
-> > v2:
-> > - change second arg of phy_ethtool_set_eee_noneg to pass the old settin=
-gs
-> > - reflect argument change in kdoc
-> > ---
-> >   drivers/net/phy/phy.c | 24 ++++++++++++++----------
-> >   1 file changed, 14 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-> > index 8876f3673..2ae0e3a67 100644
-> > --- a/drivers/net/phy/phy.c
-> > +++ b/drivers/net/phy/phy.c
-> > @@ -1671,7 +1671,7 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
-> >    * phy_ethtool_set_eee_noneg - Adjusts MAC LPI configuration without =
-PHY
-> >    *                         renegotiation
-> >    * @phydev: pointer to the target PHY device structure
-> > - * @data: pointer to the ethtool_keee structure containing the new EEE=
- settings
-> > + * @old_cfg: pointer to the eee_config structure containing the old EE=
-E settings
-> >    *
-> >    * This function updates the Energy Efficient Ethernet (EEE) configur=
-ation
-> >    * for cases where only the MAC's Low Power Idle (LPI) configuration =
-changes,
-> > @@ -1682,11 +1682,10 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
-> >    * configuration.
-> >    */
-> >   static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
-> > -                                   struct ethtool_keee *data)
-> > +                                   const struct eee_config *old_cfg)
-> >   {
-> > -     if (phydev->eee_cfg.tx_lpi_enabled !=3D data->tx_lpi_enabled ||
-> > -         phydev->eee_cfg.tx_lpi_timer !=3D data->tx_lpi_timer) {
-> > -             eee_to_eeecfg(&phydev->eee_cfg, data);
-> > +     if (phydev->eee_cfg.tx_lpi_enabled !=3D old_cfg->tx_lpi_enabled |=
-|
-> > +         phydev->eee_cfg.tx_lpi_timer !=3D old_cfg->tx_lpi_timer) {
-> >               phydev->enable_tx_lpi =3D eeecfg_mac_can_tx_lpi(&phydev->=
-eee_cfg);
-> >               if (phydev->link) {
-> >                       phydev->link =3D false;
-> > @@ -1706,18 +1705,23 @@ static void phy_ethtool_set_eee_noneg(struct ph=
-y_device *phydev,
-> >    */
-> >   int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_kee=
-e *data)
-> >   {
-> > +     struct eee_config old_cfg;
-> >       int ret;
-> >
-> >       if (!phydev->drv)
-> >               return -EIO;
-> >
-> >       mutex_lock(&phydev->lock);
-> > +
-> > +     old_cfg =3D phydev->eee_cfg;
-> > +     eee_to_eeecfg(&phydev->eee_cfg, data);
-> > +
-> >       ret =3D genphy_c45_ethtool_set_eee(phydev, data);
-> > -     if (ret >=3D 0) {
-> > -             if (ret =3D=3D 0)
-> > -                     phy_ethtool_set_eee_noneg(phydev, data);
-> > -             eee_to_eeecfg(&phydev->eee_cfg, data);
-> > -     }
-> > +     if (ret =3D=3D 0)
-> > +             phy_ethtool_set_eee_noneg(phydev, &old_cfg);
-> > +     else if (ret < 0)
-> > +             phydev->eee_cfg =3D old_cfg;
-> > +
-> >       mutex_unlock(&phydev->lock);
-> >
-> >       return ret < 0 ? ret : 0;
->
-> Hi Heiner,
->
-> I hope this message finds you well.
->
-> I noticed that the recent patch you submitted appears to be based on the
-> previous work I did in this patch series:
-> https://patchwork.kernel.org/project/netdevbpf/cover/20241115111151.18310=
-8-1-yong.liang.choong@linux.intel.com/.
->
-> Would you mind including my name as "Reported-by" in the commit message? =
-I
-> believe this would appropriately acknowledge my role in identifying and
-> reporting the issue.
->
+On 20.11.2024 11:01:25, Ciprian Marian Costea wrote:
+> On 11/20/2024 10:52 AM, Marc Kleine-Budde wrote:
+> > On 19.11.2024 10:10:53, Ciprian Costea wrote:
+> > > From: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
+> > >=20
+> > > On S32G2/S32G3 SoC, there are separate interrupts
+> > > for state change, bus errors, MBs 0-7 and MBs 8-127 respectively.
+> > >=20
+> > > In order to handle this FlexCAN hardware particularity, reuse
+> > > the 'FLEXCAN_QUIRK_NR_IRQ_3' quirk provided by mcf5441x's irq
+> > > handling support.
+> > >=20
+> > > Additionally, introduce 'FLEXCAN_QUIRK_SECONDARY_MB_IRQ' quirk,
+> > > which can be used in case there are two separate mailbox ranges
+> > > controlled by independent hardware interrupt lines, as it is
+> > > the case on S32G2/S32G3 SoC.
+> >=20
+> > Does the mainline driver already handle the 2nd mailbox range? Is there
+> > any downstream code yet?
+> >=20
+> > Marc
+> >=20
+>=20
+> Hello Marc,
+>=20
+> The mainline driver already handles the 2nd mailbox range (same
+> 'flexcan_irq') is used. The only difference is that for the 2nd mailbox
+> range a separate interrupt line is used.
 
-Reported-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+AFAICS the IP core supports up to 128 mailboxes, though the driver only
+supports 64 mailboxes. Which mailboxes do you mean by the "2nd mailbox
+range"? What about mailboxes 64..127, which IRQ will them?
 
-Hope this is enough for patchwork and/or the maintainers to pick up this ta=
-g,
-w/o resubmitting the patch.
+> I do plan to upstream more patches to the flexcan driver but they relate =
+to
+> Power Management (Suspend and Resume routines) and I plan to do this in a
+> separate patchset.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--3wnxz2cl47oixl33
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc9s2UACgkQKDiiPnot
+vG+mXQf+NEq1bSfJ1c4c9BnkrCHdJ8Th83zFhGmdTCdimKVJda+UVE+kZXKkSkvf
+WQKn4pX291kNV4SbBw1YeWk/cbS7WrpHrFO3GzxNXYgftoLV00v21E3sH6hZYLVj
+cot8rw1k3M+bi/bhnrsBxZW+rTC4xJHVmU+AbAXXsUu4fXV0wdTtW7hndoBtnkio
+kTwU2duz2R/x5O6ni9vP7afjGVig43jtzXfLWPT7p3PHbMzB9Y3XCc8Lf4xsGR6o
+IQdi1LKVAr0OjFJiy6WmhJJ2YhByE/jVpEnfyRjAHmnr8jIclAg6q9IAtbChAXH2
+dX5EByDmnF8G0EJG/C0jPBczpI87dA==
+=ZtzX
+-----END PGP SIGNATURE-----
+
+--3wnxz2cl47oixl33--
 
