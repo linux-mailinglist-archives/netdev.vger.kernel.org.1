@@ -1,110 +1,173 @@
-Return-Path: <netdev+bounces-146393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35FC9D343A
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:40:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB809D344E
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 08:43:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 305C9B22F67
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:40:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82AD61F21603
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 07:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AA2158D6A;
-	Wed, 20 Nov 2024 07:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7D516EBEE;
+	Wed, 20 Nov 2024 07:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JYogboIG"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CD6qGQI3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3100815B0E2
-	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 07:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F85515533F;
+	Wed, 20 Nov 2024 07:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732088411; cv=none; b=CJhbb9Eg19QoDlbV3+7ORQFdBvQ7cAf3j45736rcb46KGt1eNDPhTbVyR4KdtM3RNI/Vx5DIF7ZIHDByIUxbro5d8BgcH/vvjVDZOjzJUcnJ/3Kz8G7AOimZ61Xlb+j8imAJTSjtTAV0Ov8KE5NNtcxybtyp2QeH4gyyj2UAHls=
+	t=1732088613; cv=none; b=iKaejunu/kcoOh7fqaIBxMp7d936Ea5ic5E9wa0Grh0iLlfbMhVIfoj9kzsz23dN2+56fZwNFfG3f9GSPxLjd0oMUdelrazuQZmd7EKYNWOu7DrJHdK0UBnnCBVUNaqyBXeJtdzRDMqhY6I5ejAGQ8oKPeR28wSZWaYHGi+6Iz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732088411; c=relaxed/simple;
-	bh=5NBpiOdcl0cunyRLhCfjjuhNqW0BeuIw0Rwggbxtnhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kXS3F7QENP/0zEa0xWYbH1qWJJBbV8I3hVBY5Pnan8dRyAbcQH8tcgOFg6Lbp3Z/g5IOjxI9KWPp5ExRDWbVTacDVMEPhwkXSHb6x+KgtgGYNN6vhhw4L3VeZ1mJ4F0ZLVRLzMQ91AtCn0MTeBbJ6iQ3OXf0YzAoVwG55OWihxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JYogboIG; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 2CB1D2540213;
-	Wed, 20 Nov 2024 02:40:09 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Wed, 20 Nov 2024 02:40:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1732088409; x=1732174809; bh=mRwlURH/zqPPvYHN+vyfwHNmXoIV6iH4CCu
-	WJgZIEfU=; b=JYogboIGJWHm6KDaO6vAbbrbKsoOT2UxZCCTbM3jLnmiNMo9Qpf
-	PFQ1v3pKluvokEJZtKG/hEbVoKcgaJHYz5bW5do/4T6RSul4ALjLkQJuL7wfl6qb
-	WiJQZ3Rsi+5gY/v1lME5TA8vMcsstlWUX8oL2FpfYdsfh4jtBACHMe5kG0+R+tP/
-	82Nti7GhuYlMMyY+ZEtUS1LSVLHN/l6HwdjNuy/HQAkp5jB7pAPnr6hT5awztVmU
-	Gt8IkyIFIzIG10Yn5UrZgoTahktiPEjScdtUtMHJbcthJaQZypBMZNG+hdsbOjIL
-	mksd1XWM7IfaXZ3PBXquz7i2pvtYWNRoMrw==
-X-ME-Sender: <xms:WJI9Z1vOYFPSIa5nz390Q0HeVIO79ajSXh81RRYGz0dP1W8DbLM_-g>
-    <xme:WJI9Z-e6d-fdPxZWNuGt_cAj5KAUDdKwA4intSmoJDT29X3M9eSremmrp2WxVRpTa
-    mrjOMLwRNxUvbg>
-X-ME-Received: <xmr:WJI9Z4x2OraafhIo4gtqMsoWHQot0YNDkojJjMzAt2P6zEfAp7ey-bwn_oyP>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfeefgddutdejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
-    hrgheqnecuggftrfgrthhtvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeugfdu
-    ffdvffdtfeehieejtdfhjeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhes
-    ihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopeefpdhmohguvgepshhmthhpohhuth
-    dprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehg
-    rhgvvggrrhgssegtrghnuggvlhgrthgvtghhrdgtohhmpdhrtghpthhtohepnhgvthguvg
-    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:WJI9Z8OtWRPwJ5zNb-SehpMtH7NxySbbqOzkdDn3ms_Sx9XWHOpe9w>
-    <xmx:WJI9Z1_yU1Vl89T9vAvDNZqbiJNcggrPult4GLd_JlSZFH-OLsZLQw>
-    <xmx:WJI9Z8Uo-hJJsJpriwnsfVfaNQAPIkHbh9YlAIO_MakkFiPGzaSiZw>
-    <xmx:WJI9Z2frXbMVf_2l9iF4UAVK6Qp228yQ0HXaqzs7rFDzMm-7fe5vng>
-    <xmx:WZI9Z3JM4ehxTgv8IpnNqmgD4BuSE0vZF9SJhaxVP7Yh-HzI21SKFR7M>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 20 Nov 2024 02:40:08 -0500 (EST)
-Date: Wed, 20 Nov 2024 09:40:04 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Ben Greear <greearb@candelatech.com>, netdev <netdev@vger.kernel.org>
-Subject: Re: GRE tunnels bound to VRF
-Message-ID: <Zz2SVFfcLnL1Hw56@shredder>
-References: <86264c3a-d3f7-467b-b9d2-bdc43d185220@candelatech.com>
- <ZzsCNUN1vl01uZcX@shredder>
- <aafc4334-61e3-45e0-bdcd-a6dca3aa78ff@candelatech.com>
- <e138257e-68a9-4514-90e8-d7482d04c31f@candelatech.com>
- <b8b88a15-5b62-4991-ab0c-bb30a51e7be6@candelatech.com>
- <4a2f7ad9-6d38-4d9e-b665-80c29ff726d6@kernel.org>
+	s=arc-20240116; t=1732088613; c=relaxed/simple;
+	bh=0CdquCFaES4KDH1W2g2KxERpmc7esmrg9IkJD3SUXD4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eQAEvPw8Pk7GXm+VhMgWGjDVyUtJexX7DHbG2bAIvRsbra7csGOfsj730/EiM/pq2UYstNb9uAdMzEyTxEwoUlzrHGaSMXztF8KhKynGuCc9hPA2uk1D9t/6C4y2299Rqv+Z844cK36HLW7Qc3AUur9d5kxBC3nkvYE6PxmTW9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CD6qGQI3; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E5F38240003;
+	Wed, 20 Nov 2024 07:43:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732088606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KMZdNfbUY+BAlC109d0n5H3KzVea6UjxKkrWS1zAHd8=;
+	b=CD6qGQI3r+u88yac/u7L4e2TEA148/TLyUabiSBOlRDttm6mESPVamNyqqiaFyIKZIONAS
+	YYYKl6eBPFzZ9puZLLpQ8scbm4EHDlM/+GwtdDkfvDSzsnbMQZsN3Kdlk4i7LjhviMMR5b
+	DlPt7MIfjo/2kXlzFnmWtBhMrtSfE3kWbbg6o9xG4+3Y54gcNKTI9ixQr39M4letDsaKh/
+	c2ee8srL00HgHHeyhoLzAX+8xgk1bod6+MfgsYJB7A8K8KWGiUWjcDo30zxlei35AenKxO
+	JiV6Qmx5+2fvczBg2gbA/AZThDmoIDA7YcDbtEUyFlrqs01coSzeX/Wh5ihFTg==
+From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+Subject: [PATCH bpf-next v3 00/14] selftests/bpf: migrate
+ test_flow_dissector.sh to test_progs
+Date: Wed, 20 Nov 2024 08:43:10 +0100
+Message-Id: <20241120-flow_dissector-v3-0-45b46494f937@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a2f7ad9-6d38-4d9e-b665-80c29ff726d6@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAA6TPWcC/2XNywqDMBQE0F+Ru25KXip21f8opZjkpgaskURSi
+ /jvDVn1sRyGObNBxOAwwqnaIGBy0fkpB3GoQA/9dEfiTM7AKZeMso7Y0T9vxsWIevGBCFRU09Z
+ q1gjIozmgdWsBL6BmSyZcF7jmZnAxD17lKbHSF5Qx8YsmRijhrZbG0rrjRp+V98vopqP2j4Il/
+ gnIP4BnAFH2QqEw2NTfwL7vb2w1GNr5AAAA
+X-Change-ID: 20241019-flow_dissector-3eb0c07fc163
+To: Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: ebpf@linuxfoundation.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Bastien Curutchet <bastien.curutchet@bootlin.com>, bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+X-Mailer: b4 0.14.2
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Tue, Nov 19, 2024 at 09:36:13AM -0700, David Ahern wrote:
-> On 11/19/24 7:59 AM, Ben Greear wrote:
-> > 
-> > Ok, I am happy to report that GRE with lower-dev bound to one VRF and
-> > greX in a different
-> > VRF works fine.
-> > 
-> 
-> mind sending a selftest that also documents this use case?
+Hello,
+this is the revision 3 of test_flow_dissector_migration.sh into
+test_progs. This revision addresses comments from Stanislas, especially
+about proper reuse of pseudo-header checksuming in new network helpers.
 
-We already have that. See:
+There are 2 "main" parts in test_flow_dissector.sh:
+- a set of tests checking flow_dissector programs attachment to either
+  root namespace or non-root namespace
+- dissection test
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fed926d4f64ca1ba23c496747fc4209244c13d80
+The first set is integrated in flow_dissector.c, which already contains
+some existing tests for flow_dissector programs. This series uses the
+opportunity to update a bit this file (use new assert, re-split tests,
+etc)
+The second part is migrated into a new file under test_progs,
+flow_dissector_classification.c. It uses the same eBPF programs as
+flow_dissector.c, but the difference is rather about how those program
+are executed:
+- flow_dissector.c manually runs programs with BPF_PROG_RUN
+- flow_dissector_classification.c sends real packets to be dissected, and
+  so it also executes kernel code related to eBPF flow dissector (eg:
+__skb_flow_bpf_to_target)
+
+---
+Changes in v3:
+- Keep new helpers name in sync with kernel ones
+- Document some existing network helpers
+- Properly reuse pseudo-header csum helper in transport layer csum
+  helper
+- Drop duplicate assert
+- Use const for test structure in the migrated test
+- Simplify shutdown callchain for basic test
+- collect Acked-by
+- Link to v2: https://lore.kernel.org/r/20241114-flow_dissector-v2-0-ee4a3be3de65@bootlin.com
+
+Changes in v2:
+- allow tests to run in parallel
+- move some generic helpers to network_helpers.h
+- define proper function for ASSERT_MEMEQ
+- fetch acked-by tags
+- Link to v1: https://lore.kernel.org/r/20241113-flow_dissector-v1-0-27c4df0592dc@bootlin.com
+
+---
+Alexis Lothoré (eBPF Foundation) (14):
+      selftests/bpf: add a macro to compare raw memory
+      selftests/bpf: use ASSERT_MEMEQ to compare bpf flow keys
+      selftests/bpf: replace CHECK calls with ASSERT macros in flow_dissector test
+      selftests/bpf: re-split main function into dedicated tests
+      selftests/bpf: expose all subtests from flow_dissector
+      selftests/bpf: add gre packets testing to flow_dissector
+      selftests/bpf: migrate flow_dissector namespace exclusivity test
+      selftests/bpf: Enable generic tc actions in selftests config
+      selftests/bpf: move ip checksum helper to network helpers
+      selftests/bpf: document pseudo-header checksum helpers
+      selftests/bpf: use the same udp and tcp headers in tests under test_progs
+      selftests/bpf: add network helpers to generate udp checksums
+      selftests/bpf: migrate bpf flow dissectors tests to test_progs
+      selftests/bpf: remove test_flow_dissector.sh
+
+ tools/testing/selftests/bpf/.gitignore             |   1 -
+ tools/testing/selftests/bpf/Makefile               |   3 +-
+ tools/testing/selftests/bpf/config                 |   1 +
+ tools/testing/selftests/bpf/network_helpers.c      |   2 +-
+ tools/testing/selftests/bpf/network_helpers.h      |  96 +++
+ .../selftests/bpf/prog_tests/flow_dissector.c      | 323 +++++++--
+ .../bpf/prog_tests/flow_dissector_classification.c | 792 +++++++++++++++++++++
+ .../testing/selftests/bpf/prog_tests/sockopt_sk.c  |   2 +-
+ .../testing/selftests/bpf/prog_tests/xdp_bonding.c |   2 +-
+ .../selftests/bpf/prog_tests/xdp_do_redirect.c     |   2 +-
+ .../selftests/bpf/prog_tests/xdp_flowtable.c       |   2 +-
+ .../selftests/bpf/prog_tests/xdp_metadata.c        |  21 +-
+ .../selftests/bpf/progs/test_cls_redirect.c        |   2 +-
+ .../selftests/bpf/progs/test_cls_redirect.h        |   2 +-
+ .../selftests/bpf/progs/test_cls_redirect_dynptr.c |   2 +-
+ tools/testing/selftests/bpf/test_flow_dissector.c  | 780 --------------------
+ tools/testing/selftests/bpf/test_flow_dissector.sh | 178 -----
+ tools/testing/selftests/bpf/test_progs.c           |  15 +
+ tools/testing/selftests/bpf/test_progs.h           |  15 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      |   2 +-
+ 20 files changed, 1176 insertions(+), 1067 deletions(-)
+---
+base-commit: 8e403f7465a7c73e3a8ef62bba8cd75ef525e4b1
+change-id: 20241019-flow_dissector-3eb0c07fc163
+
+Best regards,
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
