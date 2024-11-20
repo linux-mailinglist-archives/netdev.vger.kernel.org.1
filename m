@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-146514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C11C9D3D24
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:10:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7FF9D3D47
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:15:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C7C4283A0B
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 14:10:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 613A6B25CC9
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 14:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874AE1C9DF6;
-	Wed, 20 Nov 2024 14:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AD11CB9F6;
+	Wed, 20 Nov 2024 14:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iw2hsF71"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYo3RBOR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557FC1C9DDB;
-	Wed, 20 Nov 2024 14:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CC51AAE31;
+	Wed, 20 Nov 2024 14:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732111632; cv=none; b=uTusBdccSIg96YwUaWCAcLAxO7vWI2+jhggLVvSdxx8PWgpCQoOfn6hWixXdiyWtOcf2r9tZan8J8TTDhL1sUdX2EHjlTv89RuEEb5by0TDuTv1Pm6rcg6gTC9oPoZDqweCYrPNBmzyBETLxdf1yOfxiZv8mY/m0aBOd3ARFhQk=
+	t=1732111667; cv=none; b=K0776YrjxGiHGwoyQfHb+9qQywyW7/rlz9UFMYVw0iz72/ETvpREHlHMMSOLxxbjvOUCm6/MegNCLlYTMvk0CbkGC6SuUF1rbzAP54AArknuj2gDCjOC8Eu+6wost/xcaLnsdxQ0xsfX1cDfgpy772C5lHi5hb0wbH868MwT04Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732111632; c=relaxed/simple;
+	s=arc-20240116; t=1732111667; c=relaxed/simple;
 	bh=Ht1v6VZM0OpLQY36dqQ+vUEe14WDKDbfPqGqSliSrWE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ATn+UEIL/fdnVx5ZKzKetA0vV0ATvKI75niRmH9Mc/o4lSllWbavsC4WzTjUUyR8JZHBKehR9SPIddTk4mCkyjAXIkGNqVSO/PYyO4PUz5727MOncrr/eOkSe54XeFNVjcMzcduO3CaobVCuEdmClAcG2GD1aNeaf7HKz5o3PtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iw2hsF71; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 587F6C4CED6;
-	Wed, 20 Nov 2024 14:07:10 +0000 (UTC)
+	 MIME-Version; b=Wapm7rWQxRC3uyVBfX9VB2HNdw5dm/eGkUNIvw2CgQaVMVSnFn3jtD3Eqy8k8zb3pbCgCPTGmuq2LJrX3dH1wJTaVSlDBSCC6CrFvcB7t+PHEFc31iaZymna9ne3HOd8/gdGtA4rxMApXLtw9Yya1Zoz/QGt3AtJIQ51k0//61k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aYo3RBOR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EED4DC4CECD;
+	Wed, 20 Nov 2024 14:07:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732111632;
+	s=k20201202; t=1732111667;
 	bh=Ht1v6VZM0OpLQY36dqQ+vUEe14WDKDbfPqGqSliSrWE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iw2hsF71IyYUOKVKRLiQwMqAhXjhsiO2x78sTypdXxKJw5qftKvg0mkgZzcKErsXI
-	 fHs/LBvz5EfAWcoXF8Bd3YrB0OMfZ5Zt7CrVTei77S8MVDfTIZ+BLd5zqVijoH+zp+
-	 m6pmWstU6OCOvanM07FZGpAJGvzCdGxO0iDVjtBBKKpHGt0HFA+/OTEOxbC+l5sQhL
-	 RIKGCGohLF5YkL1CDJnw8bvE6OG1fUFPOVt/tt9x3tScLTzi0Y+NHcooB/rut8xF1W
-	 4vl0j7/MFPWwza1Jg5AAQe8IrLKq0xxlKXosnl0QMRiQZamYLciNbHrZUDolk9QX8W
-	 GHaOXzAVzdooA==
+	b=aYo3RBORQALDYu4/4duI4gloUOB4OlcgF/1WSTjKcTBDSZk1EM4vf3BRuiwGozrrA
+	 MWiTAcs1ctEjTHM/sy1FpwmP8ME0Xi8KCcTbZoutK7+jtxnkRLJ/1Tt1xSa710GKJh
+	 R2TiJFcib0G/UW1PgbJJ9vIrz5dqxDO7XhWLG/31IuZgUy9QrYhvsgqV6s4UwM24cT
+	 HMpw2A7mzdss5aQEp1GQOZOUjVc+rgEJ+uYyxoH63oD5Kfr0VLDZMGBEQfruSnqDVt
+	 Gu1DBU6Sodv85VFlkw6UagpdlSoio6aoifXymXy+APqB7KL5YBqAmcld8LDGGs5Cih
+	 Ayal77BtK3RwA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -52,12 +52,12 @@ Cc: Breno Leitao <leitao@debian.org>,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 6/6] ipmr: Fix access to mfc_cache_list without lock held
-Date: Wed, 20 Nov 2024 09:06:36 -0500
-Message-ID: <20241120140647.1768984-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 6/6] ipmr: Fix access to mfc_cache_list without lock held
+Date: Wed, 20 Nov 2024 09:07:12 -0500
+Message-ID: <20241120140722.1769147-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241120140647.1768984-1-sashal@kernel.org>
-References: <20241120140647.1768984-1-sashal@kernel.org>
+In-Reply-To: <20241120140722.1769147-1-sashal@kernel.org>
+References: <20241120140722.1769147-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,7 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.62
+X-stable-base: Linux 6.1.118
 Content-Transfer-Encoding: 8bit
 
 From: Breno Leitao <leitao@debian.org>
