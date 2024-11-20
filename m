@@ -1,115 +1,92 @@
-Return-Path: <netdev+bounces-146444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89C339D3744
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:44:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C2C39D3770
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EE9282875
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:43:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01AFA2826D2
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 09:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18D619CC20;
-	Wed, 20 Nov 2024 09:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5F919CC27;
+	Wed, 20 Nov 2024 09:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="igZMxffb"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="eeDCWYI9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F31A19C561;
-	Wed, 20 Nov 2024 09:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77ED018EFC1;
+	Wed, 20 Nov 2024 09:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732095797; cv=none; b=cWewRz1MyE4l3qhq4av0iSDEzdEEA0tBd+pPnWUW4zbw6JP0eA1Sv9udUaf0rgobWUZ67fi4W+DRdon8vVF8v1QPtQc4uKEcKh2mKP1zZucalIOh/ZDAWJT5fLW20M/jTU6Swbneu1GKTJibFHokTuFqeoxbLvDPq0brMn46B38=
+	t=1732096292; cv=none; b=maDdQhjgBZax+MN7C+vItEbHHgDJeRQrfkcTzW5sguonqfHMJaVENDFvgvrwAgV0mV6KOL5n6Xa3v8L+de3NLd9K9RKHzCUHiFsvrwCVcXAPUxDlvqHJTWSte0pMSxQiv1k2pjWjsUqLzRsywLPx+nHqM0DR7cwrhjfOunc9pzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732095797; c=relaxed/simple;
-	bh=VaKOt6vvu3wOap6Yra2kLT6E5D+cKAsIU7jD3uNxLao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUCdBQZIC8r0dkZSzyuX4LBhrfC30vPiosFsQCSV5TBhp3xXH+vJkD60EVPLlH+vkzRf6WeC6UnbPkQ/5/es/CBEUKbHVSOtrTSR4UzdMx28l5XBthlSbWhax3rlkOQzOz6KTyFTE95rwDjZFrfmYW1mrwXnYIok7+oUyhRlotw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=igZMxffb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kZTawVyREwEbEOOkp3Rqm/v6gSKb/kMRQbLscX9yHuw=; b=igZMxffbTRUyD8L+1EoUfrdzky
-	RSCaES81zeNcd2+z6BGEANUnUTKU4IfjdGt+u85jLekbR7U1rsHoncYLr4zg5cR1nKwjoKFdG6/ZC
-	Qx1umwuHGU1wHui6vx5IHTK9UBcFgRWsI0n1SAEWTnn1X1jXAcTFRL0C5pnH9XXUKpIfyWrRfpzry
-	66FUMXQBG2L1hvu0eYY+ZzUPvAe1h6j3tzVaDsT7lFo+FrDcVo3WgPrkzuiMEfWkTrd001NvRabRJ
-	Ewjn/XKISUqt3m0EGepTbsEloWWyFSGQBTDbYsE57tavrghZxu5A4lu+kEOy8NcKfOSmKvCWETIyW
-	oYTXeekg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41692)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tDhEg-0005D4-0P;
-	Wed, 20 Nov 2024 09:42:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tDhEb-0006zB-1H;
-	Wed, 20 Nov 2024 09:42:53 +0000
-Date: Wed, 20 Nov 2024 09:42:53 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	joel@jms.id.au, andrew@codeconstruct.com.au, f.fainelli@gmail.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: mdio: aspeed: Add dummy read for fire control
-Message-ID: <Zz2vHWLYTRKIG7GK@shell.armlinux.org.uk>
-References: <20241119095141.1236414-1-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1732096292; c=relaxed/simple;
+	bh=hX1ZJF+sGGIC+8ruMcNzuj5ORxT9wSray9WemWCxTyw=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C+X/jP9b1fge2BungO7pkYNyPAuWnXTLs9XfEQegtScy4ouSRIaEoubf/1Br/SxYQ4sFABwAyC5QklRaNNqfw8uZNvJzbfUG/c6otxle3aMgX2UFpOsez/F870Y9XVFZHMSx0MUL25MuyC7KeBddXtCdrHMrQqqpgZ3EQiJI3gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=eeDCWYI9; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1732095977;
+	bh=hX1ZJF+sGGIC+8ruMcNzuj5ORxT9wSray9WemWCxTyw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eeDCWYI9Ys8QDbAwJ+8duDW9BJLaRGtrwOKNrOA4LF6lwv32DkazcmRaSyA7cGXSh
+	 9GlIPqYi2qOyeYIQGY9RxChXdqW36pZeFkv0dEvUUdm+m7ulfCMYdwLx2mbiYEzUV7
+	 Lk4O36lG4wXDuAzWH6cTrnxLVJnnQWsOdmmAUxgY=
+Received: from localhost.localdomain ([111.48.58.13])
+	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
+	id B8F32AAA; Wed, 20 Nov 2024 17:46:15 +0800
+X-QQ-mid: xmsmtpt1732095975tomnem8ce
+Message-ID: <tencent_0F68091620B122436D14BEA497181B17C007@qq.com>
+X-QQ-XMAILINFO: NnYhxYSyuBnLZ5Zmw0+h4a+g4rLsmAD3gPh+J7MA74U5LwZfUeO0GXRNk8i1HB
+	 r00ykJkRGzA1uZWYHYakHlq480PetZjVTFjSLAvrXWFyX6YhHs6BKa4bGEkzD0Ndfy+a8q8FHIdx
+	 ejt5v6Gf/y9IxIbm2r0UU9bVYUbkDRArA5HzCIxu1XnHnmqNmB44HNLrT+B2GSDsrkA0lA7gMfGw
+	 2R86FWhw8011kl7wjnZpLAvRZDzLztNQG8UNKkF7Du9D9zTzG5ac33nSOISWsbIYqywOvkO7fvBh
+	 gAWucWFcoFYJ+xLI/w5lGtq/ZwBeDkanTBOC4VlvLjYmMW47Kwscovl4t6NupgGROGmQadLHXMR3
+	 nsmAOYNxUSV1l33U/i/W94KWsWIN67zlArQrDfjGIl3aF+1gxnKbImIOdiMqj9UMT9gSmSC3nJGU
+	 oZE9Va2iYbKZewHV3royWNOxBBInG87LT23o+unInMkdwf0AYj/xlyjX1Dy4/x4SozeRPqDJgyJX
+	 imzznUkazK7aOvsqE4V4/y4yjnUD7yzVkYFaZ7LXh70X3dIWALj0qSgI851QHidGBb+URUh/5Cc7
+	 +P5NgWlghbtSBC76selZf7LZDIVvHNOowMCMy35xw3Y9kIaIOQuE302d1h0RVSeDgHoV5wQbqlFv
+	 g12wlwgwMtY7KxQNoJI0SDdLF4nJRpOe1pGHn43X0JJ7iQweXLcE7MK8/Y+AX05zgrajfpZTDwdd
+	 1GlrXwS3+PgJZjG3StTXo3IZebBdob7STcf+Ok4bf+zmvByBwp/AuMl78lULAqzGcvnmkgncpcJU
+	 naLorrY48Da2eVaN4j32814uTIkJfPUoCVdLcmwPbIaiDR8FWv6teHcnn1Sr5r3xEY98SKpJ04pF
+	 KX6WC599V7CznzEA/LEaJI7Lf3ZSb+NdqAP8GCoA+rz07gDjO4R0l8g3KxP8dcAOm55VV5Jb6znZ
+	 Ab8A+n2x4Qf+4A3dOt0Sm90gyfsje9jZz/M+Es3bzVq1EmegftWlMh9NA/5cbdOZA1MWw9Ei4=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Cong Yi <yicong.srfy@foxmail.com>
+To: linux@armlinux.org.uk
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	yicong@kylinos.cn
+Subject: Re: [PATCH] net: phylink: Separating two unrelated definitions for improving code readability
+Date: Wed, 20 Nov 2024 17:46:14 +0800
+X-OQ-MSGID: <20241120094614.175215-1-yicong.srfy@foxmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <Zz2id5-T-2-_jj4Q@shell.armlinux.org.uk>
+References: <Zz2id5-T-2-_jj4Q@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241119095141.1236414-1-jacky_chou@aspeedtech.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 19, 2024 at 05:51:41PM +0800, Jacky Chou wrote:
-> When the command bus is sometimes busy, it may cause the command is not
-> arrived to MDIO controller immediately. On software, the driver issues a
-> write command to the command bus does not wait for command complete and
-> it returned back to code immediately. But a read command will wait for
-> the data back, once a read command was back indicates the previous write
-> command had arrived to controller.
-> Add a dummy read to ensure triggering mdio controller before starting
-> polling the status of mdio controller to avoid polling unexpected timeout.
-> 
-> Fixes: a9770eac511a ("net: mdio: Move MDIO drivers into a new subdirectory")
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/mdio/mdio-aspeed.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
-> index c2170650415c..373902d33b96 100644
-> --- a/drivers/net/mdio/mdio-aspeed.c
-> +++ b/drivers/net/mdio/mdio-aspeed.c
-> @@ -62,6 +62,8 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st, u8 op, u8 phyad, u8 regad,
->  		| FIELD_PREP(ASPEED_MDIO_DATA_MIIRDATA, data);
->  
->  	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
-> +	/* Add dummy read to ensure triggering mdio controller */
-> +	(void)ioread32(ctx->base + ASPEED_MDIO_CTRL);
+Hi, Russell King:
 
-I'd change that comment to:
+Thank you for your reply!
+Yes, as you say, there is no problem with the definitions themselves
+being named. When I just read from Linux-5.4 to 6.6, I thought
+that PCS_STATE_ and PHYLINK_DISABLE- were associated in some way.
+After reading the code carefully, I found that there was no correlation。
+In order to avoid similar confusion, I sent this patch.
 
-	/* The above write could be posted, causing the timeout below to
-	 * be inaccurate. Ensure the controller starts before we start the
-	 * timeout.
-	 */
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
