@@ -1,159 +1,131 @@
-Return-Path: <netdev+bounces-146463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45ADF9D38C8
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:54:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388609D38DB
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:57:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2A461F250A5
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:54:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5665B28BD0
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 10:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A8619DFA7;
-	Wed, 20 Nov 2024 10:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FB91A2541;
+	Wed, 20 Nov 2024 10:56:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out198-12.us.a.mail.aliyun.com (out198-12.us.a.mail.aliyun.com [47.90.198.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B0B199FB2
-	for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 10:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE5A1A0715;
+	Wed, 20 Nov 2024 10:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732100067; cv=none; b=RvoHbr/yEmOPEqOWTmn0eJnZq87yiYENlvcVJ3cJgluSp3HRyL0s3nbr6BFlf4CRZeffyn8e9Qye462TWSKitgiNIyMvKSDuM1RlGsf4BhdPUrNhQfbSikL0G7wQvGm6DnHqYEUYZ3Lg/3Q9GnZ0Q6cc/p1k5eiit32fHMxbjps=
+	t=1732100214; cv=none; b=kK6B9/f0EA/MNmsB8fLrmRT8wYhQ4zWaw6zVRWd2rF/e55CP/PXF/y04JFb/Toef/Es2LjgHzqwTAn+Aj72yRTw26VtQR8WMoLUetc/kjirW9lNR/j/avhYlFpjVNoImKAtZEvdRrIzkZzB+VNQMVuoQRQPLTqywK3mOttWm/CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732100067; c=relaxed/simple;
-	bh=hDDa9WNLmClXft6l1f7IWQJ4LEaIlaLSd4OF6qsf6qY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MOYRbALCLWK6DGPsYAiMQWRrz9iTpq/IA/fMMgrSpdGYjXO1OqnHW9swWfafDepXMYmVQ0r//DoJ7/bibZbpZAjNw2B5nvdkBhnrT9NWZ02qVV7vcZaIfpfrNCNKFqqXcqBwRgKBibTaTpdIwQAXObsfvkY5YIEMWnNlvlkh9x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tDiLV-0000qZ-8i; Wed, 20 Nov 2024 11:54:05 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tDiLU-001j71-0x;
-	Wed, 20 Nov 2024 11:54:04 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id D87AF377C4A;
-	Wed, 20 Nov 2024 10:54:03 +0000 (UTC)
-Date: Wed, 20 Nov 2024 11:54:03 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ciprian Marian Costea <ciprianmarian.costea@oss.nxp.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	imx@lists.linux.dev, NXP Linux Team <s32@nxp.com>, 
-	Christophe Lizzi <clizzi@redhat.com>, Alberto Ruiz <aruizrui@redhat.com>, 
-	Enric Balletbo <eballetb@redhat.com>
-Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
- lines
-Message-ID: <20241120-rational-chocolate-marten-70ed52-mkl@pengutronix.de>
-References: <20241119081053.4175940-1-ciprianmarian.costea@oss.nxp.com>
- <20241119081053.4175940-4-ciprianmarian.costea@oss.nxp.com>
- <20241120-magnificent-accelerated-robin-70e7ef-mkl@pengutronix.de>
- <c9d8ff57-730f-40d9-887e-d11aba87c4b5@oss.nxp.com>
- <20241120-venomous-skilled-rottweiler-622b36-mkl@pengutronix.de>
- <aa73f763-44bc-4e59-ad4a-ccaedaeaf1e8@oss.nxp.com>
- <20241120-cheerful-pug-of-efficiency-bc9b22-mkl@pengutronix.de>
- <72d06daa-82ed-4dc6-8396-fb20c63f5456@oss.nxp.com>
+	s=arc-20240116; t=1732100214; c=relaxed/simple;
+	bh=zyLEPwcrNI/SUqSQ8t+WZoAkPWPx0+dHSrV+zOjgPK0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Sw3fxOtjmoMY5gAA5M2bicu1+eV0K6sTDXyPaQCVhaNlrjWo8cL4jIZyBxbtXsBtBb08SsLHTMOvgytdqoE/LQQsyVKwaMYwXVq7rBiUXHJqNqmD0qaLiA8O8DqgeaCYrvq8n9gcGHpLB+GJxKfP/5LyGAUzvh0SBoDAf12CELk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aGmppAb_1732100186 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Wed, 20 Nov 2024 18:56:39 +0800
+From: Frank Sae <Frank.Sae@motor-comm.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	xiaogang.fan@motor-comm.com,
+	fei.zhang@motor-comm.com,
+	hua.sun@motor-comm.com,
+	Frank.Sae@motor-comm.com
+Subject: [PATCH net-next v2 00/21] net:yt6801: Add Motorcomm yt6801 PCIe driver
+Date: Wed, 20 Nov 2024 18:56:04 +0800
+Message-Id: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="utw4dr5kz2nuipyk"
-Content-Disposition: inline
-In-Reply-To: <72d06daa-82ed-4dc6-8396-fb20c63f5456@oss.nxp.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+This series includes adding Motorcomm YT6801 Gigabit ethernet driver
+and adding yt6801 ethernet driver entry in MAINTAINERS file.
 
---utw4dr5kz2nuipyk
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 3/3] can: flexcan: handle S32G2/S32G3 separate interrupt
- lines
-MIME-Version: 1.0
+YT6801 integrates a YT8531S phy.
 
-On 20.11.2024 12:47:02, Ciprian Marian Costea wrote:
-> > > > > The mainline driver already handles the 2nd mailbox range (same
-> > > > > 'flexcan_irq') is used. The only difference is that for the 2nd m=
-ailbox
-> > > > > range a separate interrupt line is used.
-> > > >=20
-> > > > AFAICS the IP core supports up to 128 mailboxes, though the driver =
-only
-> > > > supports 64 mailboxes. Which mailboxes do you mean by the "2nd mail=
-box
-> > > > range"? What about mailboxes 64..127, which IRQ will them?
-> > >=20
-> > > On S32G the following is the mapping between FlexCAN IRQs and mailbox=
-es:
-> > > - IRQ line X -> Mailboxes 0-7
-> > > - IRQ line Y -> Mailboxes 8-127 (Logical OR of Message Buffer Interru=
-pt
-> > > lines 127 to 8)
-> > >=20
-> > > By 2nd range, I was refering to Mailboxes 8-127.
-> >=20
-> > Interesting, do you know why it's not symmetrical (0...63, 64...127)?
-> > Can you point me to the documentation.
->=20
-> Unfortunately I do not know why such hardware integration decisions have
-> been made.
->=20
-> Documentation for S32G3 SoC can be found on the official NXP website,
-> here:
-> https://www.nxp.com/products/processors-and-microcontrollers/s32-automoti=
-ve-platform/s32g-vehicle-network-processors/s32g3-processors-for-vehicle-ne=
-tworking:S32G3
->=20
-> But please note that you need to setup an account beforehand.
+v1 -> v2:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code
+- Remove PHY handling code and use phylib.
+- Remove writing ASPM config
+- Use generic power management instead of pci_driver.suspend()/resume()
+- Add Space before closing "*/"
 
-I have that already, where is the mailbox to IRQ mapping described?
+Frank Sae (21):
+  motorcomm:yt6801: Add support for a pci table in this module
+  motorcomm:yt6801: Implement pci_driver shutdown
+  motorcomm:yt6801: Implement the fxgmac_drv_probe function
+  motorcomm:yt6801: Implement the .ndo_open function
+  motorcomm:yt6801: Implement the fxgmac_start function
+  motorcomm:yt6801: Implement the poll functions
+  motorcomm:yt6801: Implement the fxgmac_init function
+  motorcomm:yt6801: Implement the fxgmac_read_mac_addr function
+  motorcomm:yt6801: Implement some hw_ops function
+  motorcomm:yt6801: Implement .ndo_start_xmit function
+  motorcomm:yt6801: Implement some net_device_ops function
+  motorcomm:yt6801: Implement .ndo_tx_timeout and .ndo_change_mtu
+    functions
+  motorcomm:yt6801: Implement some ethtool_ops function
+  motorcomm:yt6801: Implement the WOL function of ethtool_ops
+  motorcomm:yt6801: Implement pci_driver suspend and resume
+  motorcomm:yt6801: Add a Makefile in the motorcomm folder
+  motorcomm:yt6801: Update the Makefile and Kconfig in the motorcomm
+  motorcomm:yt6801: Update the Makefile and Kconfig in the ethernet
+  ethernet: Update the index.rst in the ethernet documentation folder
+  motorcomm:yt6801: Add a yt6801.rst in the ethernet documentation
+    folder
+  MAINTAINERS：Add the motorcomm ethernet driver entry
 
-regards,
-Marc
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/motorcomm/yt6801.rst             |   20 +
+ MAINTAINERS                                   |    8 +
+ drivers/net/ethernet/Kconfig                  |    1 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/motorcomm/Kconfig        |   27 +
+ drivers/net/ethernet/motorcomm/Makefile       |    6 +
+ .../net/ethernet/motorcomm/yt6801/Makefile    |    9 +
+ .../net/ethernet/motorcomm/yt6801/yt6801.h    |  617 +++
+ .../ethernet/motorcomm/yt6801/yt6801_desc.c   |  638 ++++
+ .../ethernet/motorcomm/yt6801/yt6801_desc.h   |   39 +
+ .../motorcomm/yt6801/yt6801_ethtool.c         |  907 +++++
+ .../net/ethernet/motorcomm/yt6801/yt6801_hw.c | 3383 +++++++++++++++++
+ .../ethernet/motorcomm/yt6801/yt6801_net.c    | 2908 ++++++++++++++
+ .../ethernet/motorcomm/yt6801/yt6801_net.h    |   32 +
+ .../ethernet/motorcomm/yt6801/yt6801_pci.c    |  191 +
+ .../ethernet/motorcomm/yt6801/yt6801_type.h   | 1398 +++++++
+ 17 files changed, 10186 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/motorcomm/yt6801.rst
+ create mode 100644 drivers/net/ethernet/motorcomm/Kconfig
+ create mode 100644 drivers/net/ethernet/motorcomm/Makefile
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/Makefile
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801.h
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.h
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_ethtool.c
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_hw.c
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_net.h
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/yt6801_type.h
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+-- 
+2.34.1
 
---utw4dr5kz2nuipyk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc9v8gACgkQKDiiPnot
-vG+DZgf/YI75+HHjeafE/UmEJS+6suu6FOSK7UxM5pI+GEKnHbVPKtuYihoiXHfL
-EINWDOpfWVfCUCviimHjSbKanxhJtxUnsd7FhLSPi6bPuavJ6E2yG4WfyCLJFxsx
-v2HYiIaOkSOYepHOwvSCXQsvLDayIzDFs4KMbBfZQYVtVsncWYhhCE7N2/Vukl41
-3m5h2pMDXrjp50CrgblivlDpUlz9Bi4NTuMl23mMu54qnsVlBfiTgMGuq0F/nsdp
-2MqW0+mgRsytIZTSH7XeaMyz6fsefl6rItpGgZSBL3CulV7rpNSlbyjQFwOw9aTO
-4iwInFhNu9rj1lOP/7fJ7F998w08aA==
-=F+0U
------END PGP SIGNATURE-----
-
---utw4dr5kz2nuipyk--
 
