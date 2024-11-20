@@ -1,264 +1,298 @@
-Return-Path: <netdev+bounces-146481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36449D3938
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 12:12:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3EFC9D393D
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 12:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 622A0287D85
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:12:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7921A1F26D4C
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 11:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D95719F101;
-	Wed, 20 Nov 2024 11:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Y/rDaiDe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="e5y1mmt8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3570519CCEC;
+	Wed, 20 Nov 2024 11:14:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
+Received: from out28-74.mail.aliyun.com (out28-74.mail.aliyun.com [115.124.28.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064EB18660C;
-	Wed, 20 Nov 2024 11:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6496D19D8A0;
+	Wed, 20 Nov 2024 11:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732101147; cv=none; b=p5KC9Ph+fENcIXA23zMvFHgnI5idE4MCLsaIZ735eYb5V9ZvCO5N9dSK+4Eptbvd+dq93OHFiSL19dNasNZeKUkBaTOycp0yIUyt8QfT/hHnTONc3UqKOkv/aQtWlpq0hsVGOMxMOthprruwH9uiMXCrVw0Erfxsr4395Xz6oCc=
+	t=1732101267; cv=none; b=CqbwHFbtxbRMz4nbMC5CUXaIsSPZeKfrT5L2gkjdyFSPEZVVTCgkZH/yHZDuabttwWuQY48We9D4N4tRQK06TpGvLx01AVlQvn1LOru5lFCBwVw+8/cAi6UfUvZ9N8eEVFfFvsF9Lg1bdsA8oR7V48W9APlVOp1DmU0Q9rr93L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732101147; c=relaxed/simple;
-	bh=3KHS//OY/HIA0qzFt0DX5aKhWCemKs4JD8VNmLjn0dU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KNMczLpIxget6dYHgS/n3X6gDFx4OIaS2oTFGayHSmdi6/jp8SubT2DCXTo8a0WPKIW2aDJX2/7hLeYkNk7hufI6AZzZiZqUYnhhfUvPO1/41p2x3f87QiXMH5cQK2DmnpdkB0hvemNvSJMHdmBXGUseQQtxUBY3NQNur5k75ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Y/rDaiDe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=e5y1mmt8; arc=none smtp.client-ip=202.12.124.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailflow.stl.internal (Postfix) with ESMTP id 80E3D1D40620;
-	Wed, 20 Nov 2024 06:12:21 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 20 Nov 2024 06:12:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1732101141; x=
-	1732104741; bh=DApLaSVM4QKDiwTBCrt3VEL8I5Jx9sguAKIR2PFbkXM=; b=Y
-	/rDaiDeTo2O35FAoBXtaVBVgN3CqBWhJk5nNgdscdvP2wBzK+Zjhxunb9H8M1WqG
-	6H3NAI+LuvSSyFBtwXtDkg28qZA1rEe6mAPnYuFQQviApqOzXKFEMBzrVnGmOakV
-	BJNgIgOG79nzJ+KOJpluAUiEgLYGtzBQ6EwhAFtkItkkpN+g9SWcbIAqI1bGOkGY
-	tEtzoua8F3/ymO4kW/Qt593V72MiTB361aTr1zDzdkjjAFyjo+AVoWlHhGzgK2L0
-	KuWe/5KVaEZxRgNZ4tBcigoFlOnUpX547RBoGoiY7Jz2abcZfee50LMwIPlSYyhA
-	7H8uoSbwXDbc+g+RidUbw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1732101141; x=1732104741; bh=DApLaSVM4QKDiwTBCrt3VEL8I5Jx9sguAKI
-	R2PFbkXM=; b=e5y1mmt8GPoXZDT7wyG7K/THb4GUrfZBRFUUBA0cTjGLqnnkuqD
-	aGzRksZWx2UPjZmke4VlGpB7RQ95ZIRasdJ3JOSv4kXSaOiz7XomSrPyc8qg7n1N
-	Civ4rl4rcBtQiqWb9Vd/VKc7smNurBnzp2ugMKklkKUmcjLZ47Wbf19UGTQq6UWC
-	2MqUoyvdPqCb/vtW9eNDODGz8QMw1k/2YT5ohT2b8Btw+O2A4tji5e99JnN6ZclO
-	IbMXxMow2IziocvSwcaFfRX45ot0jK+VsHxSAJdy2B6up4zTlqrZNP8JLtZtRncd
-	77L3PjSdnypw/0pzgp4olh43EXkmOcvue0A==
-X-ME-Sender: <xms:FMQ9Z7-FHYqPpFYtlwonyv-0bgiAmsa7Yc9jaB_tVNiC3c5FbMbeZA>
-    <xme:FMQ9Z3uoxYp9LYEpclXlUDsWiC7MvPKad__Yqw76NYLRdDdknKSqbofYfeV_D4-TY
-    hq_PGS9BoUZJJj1Epw>
-X-ME-Received: <xmr:FMQ9Z5CWS54YWriSKekgp5s9Z5lWD432JECdi0r9LiJqAtXI6Gi2s5BwucNM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfeeggddvhecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
-    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:FMQ9Z3fnF0GSKWCy84ti6WMJ7SuzmLHa9h_Pgint9-8q9SLKshRLCw>
-    <xmx:FMQ9ZwM8GgFoJ_pXG5bSUfVJpmD4ogWix2tC-ms6LjUrv7ELxaYe0Q>
-    <xmx:FMQ9Z5nbwHc9UMZIt_ojAQxxdPgbKtAz8hOdwLlEGfDVj8MdxGTPBQ>
-    <xmx:FMQ9Z6uHEtSKXCJEP5lghMrDxWALdp59v9FMx88Noj7kHShwU9zmTA>
-    <xmx:FcQ9ZxhDTTlmdZVuhbE0ROmxnI57lViz85ghqBTaQTnGUxqp5Vf5LLRb>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 20 Nov 2024 06:12:20 -0500 (EST)
-Date: Wed, 20 Nov 2024 12:12:18 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 18/23] ovpn: implement peer
- add/get/dump/delete via netlink
-Message-ID: <Zz3EEl0diYofGkIC@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net>
- <Zyjk781vOqV4kXhJ@hog>
- <76191b85-6844-4a85-bb9c-ad19aa5110c5@openvpn.net>
- <ZzTaRNeZjo48ArsR@hog>
- <e11c5f81-cbc8-43a3-b275-7004efdcb358@openvpn.net>
+	s=arc-20240116; t=1732101267; c=relaxed/simple;
+	bh=h2H7/bSt0YhSwbQYiq3jOu0lOrTaaQx9Why/WNJEuaQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Sl6m4HiHnmnoHUQ0GmkMQGfsmJ7KiRagPV1DPROzA6CcG3zj6MkYhhj0405xgIJaxv0RaWKS53P3e0uCrNAoam4kLWMSDaajPTFBD++FtIu/RpafVa7dbM+BBTcicP67Xz4eMVkMeTdpVPvrN3uA7GZPVz1YYKlcSSiD/t896bQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aGmppbE_1732100204 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Wed, 20 Nov 2024 18:56:44 +0800
+From: Frank Sae <Frank.Sae@motor-comm.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	xiaogang.fan@motor-comm.com,
+	fei.zhang@motor-comm.com,
+	hua.sun@motor-comm.com,
+	Frank.Sae@motor-comm.com
+Subject: [PATCH net-next v2 11/21] motorcomm:yt6801: Implement some net_device_ops function
+Date: Wed, 20 Nov 2024 19:14:14 +0800
+Message-Id: <20241120105625.22508-12-Frank.Sae@motor-comm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e11c5f81-cbc8-43a3-b275-7004efdcb358@openvpn.net>
+Content-Transfer-Encoding: 8bit
 
-2024-11-14, 10:21:18 +0100, Antonio Quartulli wrote:
-> On 13/11/2024 17:56, Sabrina Dubroca wrote:
-> > 2024-11-12, 15:19:50 +0100, Antonio Quartulli wrote:
-> > > On 04/11/2024 16:14, Sabrina Dubroca wrote:
-> > > > 2024-10-29, 11:47:31 +0100, Antonio Quartulli wrote:
-> > > > > +static int ovpn_nl_peer_precheck(struct ovpn_struct *ovpn,
-> > > > > +				 struct genl_info *info,
-> > > > > +				 struct nlattr **attrs)
-> > > > > +{
-> > > > > +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
-> > > > > +			      OVPN_A_PEER_ID))
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	if (attrs[OVPN_A_PEER_REMOTE_IPV4] && attrs[OVPN_A_PEER_REMOTE_IPV6]) {
-> > > > > +		NL_SET_ERR_MSG_MOD(info->extack,
-> > > > > +				   "cannot specify both remote IPv4 or IPv6 address");
-> > > > > +		return -EINVAL;
-> > > > > +	}
-> > > > > +
-> > > > > +	if (!attrs[OVPN_A_PEER_REMOTE_IPV4] &&
-> > > > > +	    !attrs[OVPN_A_PEER_REMOTE_IPV6] && attrs[OVPN_A_PEER_REMOTE_PORT]) {
-> > > > > +		NL_SET_ERR_MSG_MOD(info->extack,
-> > > > > +				   "cannot specify remote port without IP address");
-> > > > > +		return -EINVAL;
-> > > > > +	}
-> > > > > +
-> > > > > +	if (!attrs[OVPN_A_PEER_REMOTE_IPV4] &&
-> > > > > +	    attrs[OVPN_A_PEER_LOCAL_IPV4]) {
-> > > > > +		NL_SET_ERR_MSG_MOD(info->extack,
-> > > > > +				   "cannot specify local IPv4 address without remote");
-> > > > > +		return -EINVAL;
-> > > > > +	}
-> > > > > +
-> > > > > +	if (!attrs[OVPN_A_PEER_REMOTE_IPV6] &&
-> > > > > +	    attrs[OVPN_A_PEER_LOCAL_IPV6]) {
-> > > > 
-> > > > I think these consistency checks should account for v4mapped
-> > > > addresses. With remote=v4mapped and local=v6 we'll end up with an
-> > > > incorrect ipv4 "local" address (taken out of the ipv6 address's first
-> > > > 4B by ovpn_peer_reset_sockaddr). With remote=ipv6 and local=v4mapped,
-> > > > we'll pass the last 4B of OVPN_A_PEER_LOCAL_IPV6 to
-> > > > ovpn_peer_reset_sockaddr and try to read 16B (the full ipv6 address)
-> > > > out of that.
-> > > 
-> > > Right, a v4mapped address would fool this check.
-> > > How about checking if both or none addresses are v4mapped? This way we
-> > > should prevent such cases.
-> > 
-> > I don't know when userspace would use v4mapped addresses,
-> 
-> It happens when listening on [::] with a v6 socket that has no "IPV6_V6ONLY"
-> set to true (you can check ipv6(7) for more details).
-> This socket can receive IPv4 connections, which are implemented using
-> v4mapped addresses. In this case both remote and local are going to be
-> v4mapped.
+Implement following callback function
+.ndo_stop
+.ndo_start_xmit
+.ndo_get_stats64
+.ndo_set_mac_address
+.ndo_validate_addr
+.ndo_vlan_rx_add_vid
+.ndo_vlan_rx_kill_vid
+.ndo_poll_controller
+.ndo_set_features
+.ndo_fix_features
+.ndo_set_rx_mode
 
-I'm familiar with v4mapped addresses, but I wasn't sure the userspace
-part would actually passed them as peer. But I guess it would when the
-peer connects over ipv4 on an ipv6 socket.
+Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
+---
+ .../ethernet/motorcomm/yt6801/yt6801_net.c    | 196 ++++++++++++++++++
+ 1 file changed, 196 insertions(+)
 
-So the combination of PEER_IPV4 with LOCAL_IPV6(v4mapped) should never
-happen? In that case I guess we just need to check that we got 2
-attributes of the same type (both _IPV4 or both _IPV6) and if we got
-_IPV6, that they're either both v4mapped or both not. Might be a tiny
-bit simpler than what I was suggesting below.
-
-> However, the sanity check should make sure nobody can inject bogus
-> combinations.
->
-> > but treating
-> > a v4mapped address as a "proper" ipv4 address should work with the
-> > rest of the code, since you already have the conversion in
-> > ovpn_nl_attr_local_ip and ovpn_nl_attr_sockaddr_remote. So maybe you
-> > could do something like (rough idea and completely untested):
-> > 
-> >      static int get_family(attr_v4, attr_v6)
-> >      {
-> >         if (attr_v4)
-> >             return AF_INET;
-> >         if (attr_v6) {
-> >             if (ipv6_addr_v4mapped(attr_v6)
-> >                 return AF_INET;
-> >             return AF_INET6;
-> >         }
-> >         return AF_UNSPEC;
-> >      }
-> > 
-> > 
-> >      // in _precheck:
-> >      // keep the   attrs[OVPN_A_PEER_REMOTE_IPV4] && attrs[OVPN_A_PEER_REMOTE_IPV6]  check
-> >      // maybe add a similar one for   LOCAL_IPV4 && LOCAL_IPV6
-> 
-> the latter is already covered by:
-> 
->  192         if (!attrs[OVPN_A_PEER_REMOTE_IPV4] &&
->  193             attrs[OVPN_A_PEER_LOCAL_IPV4]) {
->  194                 NL_SET_ERR_MSG_MOD(info->extack,
->  195                                    "cannot specify local IPv4 address
-> without remote");
->  196                 return -EINVAL;
->  197         }
->  198
->  199         if (!attrs[OVPN_A_PEER_REMOTE_IPV6] &&
->  200             attrs[OVPN_A_PEER_LOCAL_IPV6]) {
->  201                 NL_SET_ERR_MSG_MOD(info->extack,
->  202                                    "cannot specify local IPV6 address
-> without remote");
->  203                 return -EINVAL;
->  204         }
-
-LOCAL_IPV4 combined with REMOTE_IPV6 should be fine if the remote is
-v4mapped. And conversely, LOCAL_IPV6 combined with REMOTE_IPV6 isn't
-ok if remote is v4mapped. So those checks should go away and be
-replaced with the "get_family" thing, but that requires at most one of
-the _IPV4/_IPV6 attributes to be present to behave consistently.
-
-
-> > 
-> >      remote_family = get_family(attrs[OVPN_A_PEER_REMOTE_IPV4], attrs[OVPN_A_PEER_REMOTE_IPV6]);
-> >      local_family = get_family(attrs[OVPN_A_PEER_LOCAL_IPV4], attrs[OVPN_A_PEER_LOCAL_IPV6]);
-> >      if (remote_family != local_family) {
-> >          extack "incompatible address families";
-> >          return -EINVAL;
-> >      }
-> > 
-> > That would mirror the conversion that
-> > ovpn_nl_attr_local_ip/ovpn_nl_attr_sockaddr_remote do.
-> 
-> Yeah, pretty much what I was suggested, but in a more explicit manner.
-> I like it.
-
-Cool.
-
-BTW, I guess scope_id should only be used when it's not a v4mapped address?
-So the "cannot specify scope id without remote IPv6 address" check
-should probably use:
-
-    if (remote_family != AF_INET6)
-
-(or split it into !attrs[OVPN_A_PEER_REMOTE_IPV6] and remote_family !=
-AF_INET6 to have a fully specific extack message, but maybe that's
-overkill)
-
+diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
+index fa1587e69..ed65c9cc9 100644
+--- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
++++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
+@@ -996,6 +996,25 @@ static int fxgmac_open(struct net_device *netdev)
+ 	return ret;
+ }
+ 
++static int fxgmac_close(struct net_device *netdev)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
++
++	mutex_lock(&pdata->mutex);
++	fxgmac_stop(pdata);		/* Stop the device */
++	pdata->dev_state = FXGMAC_DEV_CLOSE;
++	fxgmac_channels_rings_free(pdata); /* Free the channels and rings */
++	hw_ops->reset_phy(pdata);
++	phy_disconnect(pdata->phydev);
++	mutex_unlock(&pdata->mutex);
++
++	if (netif_msg_drv(pdata))
++		yt_dbg(pdata, "%s ok\n", __func__);
++
++	return 0;
++}
++
+ #define EFUSE_FISRT_UPDATE_ADDR				255
+ #define EFUSE_SECOND_UPDATE_ADDR			209
+ #define EFUSE_MAX_ENTRY					39
+@@ -1981,9 +2000,186 @@ static netdev_tx_t fxgmac_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 
+ 	return NETDEV_TX_OK;
+ }
++
++static void fxgmac_get_stats64(struct net_device *netdev,
++			       struct rtnl_link_stats64 *s)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_stats *pstats = &pdata->stats;
++
++	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate))
++		return;
++
++	pdata->hw_ops.read_mmc_stats(pdata);
++
++	s->rx_packets = pstats->rxframecount_gb;
++	s->rx_bytes = pstats->rxoctetcount_gb;
++	s->rx_errors = pstats->rxframecount_gb - pstats->rxbroadcastframes_g -
++		       pstats->rxmulticastframes_g - pstats->rxunicastframes_g;
++
++	s->rx_length_errors = pstats->rxlengtherror;
++	s->rx_crc_errors = pstats->rxcrcerror;
++	s->rx_fifo_errors = pstats->rxfifooverflow;
++
++	s->tx_packets = pstats->txframecount_gb;
++	s->tx_bytes = pstats->txoctetcount_gb;
++	s->tx_errors = pstats->txframecount_gb - pstats->txframecount_g;
++	s->tx_dropped = netdev->stats.tx_dropped;
++}
++
++static int fxgmac_set_mac_address(struct net_device *netdev, void *addr)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
++	struct sockaddr *saddr = addr;
++
++	if (!is_valid_ether_addr(saddr->sa_data))
++		return -EADDRNOTAVAIL;
++
++	eth_hw_addr_set(netdev, saddr->sa_data);
++	memcpy(pdata->mac_addr, saddr->sa_data, netdev->addr_len);
++	hw_ops->set_mac_address(pdata, saddr->sa_data);
++	hw_ops->set_mac_hash(pdata);
++
++	yt_dbg(pdata, "fxgmac,set mac addr to %pM\n", netdev->dev_addr);
++
++	return 0;
++}
++
++static int fxgmac_vlan_rx_add_vid(struct net_device *netdev, __be16 proto,
++				  u16 vid)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
++
++	set_bit(vid, pdata->active_vlans);
++	hw_ops->update_vlan_hash_table(pdata);
++
++	yt_dbg(pdata, "fxgmac,add rx vlan %d\n", vid);
++
++	return 0;
++}
++
++static int fxgmac_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto,
++				   u16 vid)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
++
++	clear_bit(vid, pdata->active_vlans);
++	hw_ops->update_vlan_hash_table(pdata);
++
++	yt_dbg(pdata, "fxgmac,del rx vlan %d\n", vid);
++
++	return 0;
++}
++
++#ifdef CONFIG_NET_POLL_CONTROLLER
++static void fxgmac_poll_controller(struct net_device *netdev)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_channel *channel;
++
++	if (pdata->per_channel_irq) {
++		channel = pdata->channel_head;
++		for (u32 i = 0; i < pdata->channel_count; i++, channel++)
++			fxgmac_dma_isr(channel->dma_irq_rx, channel);
++	} else {
++		disable_irq(pdata->dev_irq);
++		fxgmac_isr(pdata->dev_irq, pdata);
++		enable_irq(pdata->dev_irq);
++	}
++}
++#endif /* CONFIG_NET_POLL_CONTROLLER */
++
++static netdev_features_t fxgmac_fix_features(struct net_device *netdev,
++					     netdev_features_t features)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	u32 fifo_size;
++
++	fifo_size = pdata->hw_ops.calculate_max_checksum_size(pdata);
++	if (netdev->mtu > fifo_size) {
++		features &= ~NETIF_F_IP_CSUM;
++		features &= ~NETIF_F_IPV6_CSUM;
++	}
++
++	return features;
++}
++
++static int fxgmac_set_features(struct net_device *netdev,
++			       netdev_features_t features)
++{
++	netdev_features_t rxhash, rxcsum, rxvlan, rxvlan_filter, tso;
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_hw_ops *hw_ops;
++
++	hw_ops = &pdata->hw_ops;
++	rxhash = pdata->netdev_features & NETIF_F_RXHASH;
++	rxcsum = pdata->netdev_features & NETIF_F_RXCSUM;
++	rxvlan = pdata->netdev_features & NETIF_F_HW_VLAN_CTAG_RX;
++	rxvlan_filter = pdata->netdev_features & NETIF_F_HW_VLAN_CTAG_FILTER;
++	tso = pdata->netdev_features & (NETIF_F_TSO | NETIF_F_TSO6);
++
++	if ((features & (NETIF_F_TSO | NETIF_F_TSO6)) && !tso) {
++		yt_dbg(pdata, "enable tso.\n");
++		pdata->hw_feat.tso = 1;
++		hw_ops->config_tso(pdata);
++	} else if (!(features & (NETIF_F_TSO | NETIF_F_TSO6)) && tso) {
++		yt_dbg(pdata, "disable tso.\n");
++		pdata->hw_feat.tso = 0;
++		hw_ops->config_tso(pdata);
++	}
++
++	if ((features & NETIF_F_RXHASH) && !rxhash)
++		hw_ops->enable_rss(pdata);
++	else if (!(features & NETIF_F_RXHASH) && rxhash)
++		hw_ops->disable_rss(pdata);
++
++	if ((features & NETIF_F_RXCSUM) && !rxcsum)
++		hw_ops->enable_rx_csum(pdata);
++	else if (!(features & NETIF_F_RXCSUM) && rxcsum)
++		hw_ops->disable_rx_csum(pdata);
++
++	if ((features & NETIF_F_HW_VLAN_CTAG_RX) && !rxvlan)
++		hw_ops->enable_rx_vlan_stripping(pdata);
++	else if (!(features & NETIF_F_HW_VLAN_CTAG_RX) && rxvlan)
++		hw_ops->disable_rx_vlan_stripping(pdata);
++
++	if ((features & NETIF_F_HW_VLAN_CTAG_FILTER) && !rxvlan_filter)
++		hw_ops->enable_rx_vlan_filtering(pdata);
++	else if (!(features & NETIF_F_HW_VLAN_CTAG_FILTER) && rxvlan_filter)
++		hw_ops->disable_rx_vlan_filtering(pdata);
++
++	pdata->netdev_features = features;
++
++	yt_dbg(pdata, "fxgmac,set features done,%llx\n", (u64)features);
++	return 0;
++}
++
++static void fxgmac_set_rx_mode(struct net_device *netdev)
++{
++	struct fxgmac_pdata *pdata = netdev_priv(netdev);
++	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
++
++	hw_ops->config_rx_mode(pdata);
++}
++
+ static const struct net_device_ops fxgmac_netdev_ops = {
+ 	.ndo_open		= fxgmac_open,
++	.ndo_stop		= fxgmac_close,
+ 	.ndo_start_xmit		= fxgmac_xmit,
++	.ndo_get_stats64	= fxgmac_get_stats64,
++	.ndo_set_mac_address	= fxgmac_set_mac_address,
++	.ndo_validate_addr	= eth_validate_addr,
++	.ndo_vlan_rx_add_vid	= fxgmac_vlan_rx_add_vid,
++	.ndo_vlan_rx_kill_vid	= fxgmac_vlan_rx_kill_vid,
++#ifdef CONFIG_NET_POLL_CONTROLLER
++	.ndo_poll_controller	= fxgmac_poll_controller,
++#endif
++	.ndo_set_features	= fxgmac_set_features,
++	.ndo_fix_features	= fxgmac_fix_features,
++	.ndo_set_rx_mode	= fxgmac_set_rx_mode,
+ };
+ 
+ const struct net_device_ops *fxgmac_get_netdev_ops(void)
 -- 
-Sabrina
+2.34.1
+
 
