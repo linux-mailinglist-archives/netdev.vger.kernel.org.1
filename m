@@ -1,123 +1,149 @@
-Return-Path: <netdev+bounces-146530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772709D3F87
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:59:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 854969D3FB8
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 17:07:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2532F1F21D20
-	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 15:59:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 333BA1F21B2D
+	for <lists+netdev@lfdr.de>; Wed, 20 Nov 2024 16:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45900153820;
-	Wed, 20 Nov 2024 15:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71AD013B5B3;
+	Wed, 20 Nov 2024 16:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lFc3kEao"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDlgQbp3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C483C137930;
-	Wed, 20 Nov 2024 15:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB37044C77;
+	Wed, 20 Nov 2024 16:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732118194; cv=none; b=WFXkwV06uRe+ZQmKSIfAH5789EDGiifJ5d/LG2XMwKMp3sR46rKiT3WMseZ/wvDwk9+C3KGf7CQFxqj+GW+78zub7dEhvOSJsFfIOtR2Htyxfy6G2YL/c5K+Q+Fz5rc8PiSIHLY/4CQV1qSC0Aj97rr6FoolbrbJSMSNbfPhdNM=
+	t=1732118865; cv=none; b=lwse4KNaVYg2uBcjy91MjE8ApH2Lk/Zdx6enCvxQCK3SkGRLMqcYf6F202Adw+tyHfln2I0tKFmJgp/UwFX6n9o3sWl6/0pFONyu0fcG1KIKutucdQpwXBiLUMahgUpwRK8r+xSQQZp3s/CI+tdh+VMGWOkLVtxpIE6snjKV1Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732118194; c=relaxed/simple;
-	bh=gHYszuF31pK6zNphWs0LQBhZ1BGw/HxT8NkzzEthVHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lgTRiqxI6Qoh7ZCa3BkbzDGDJnhs6xVXatxy0sS+/VbGjYCsm90PhoHWN2Kb34AaZISXMv8yfOXnKoXtBSQDfLQKjJvoAoA38AGjdCUgJApXKnWJXxD5rFY0yVIaV6wx+6DiIC3TUDOImTAT8mmMq1gGCL22JDfC+/iGC2wH+p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lFc3kEao; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1732118865; c=relaxed/simple;
+	bh=aO9TKFKPXbpzZpQOYdLRcgOnIQRaSyBu7w9NImnsmsE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I3Z9q/xJhIlOwDrxOJ3lK97USTlmjNyOcCae6JmTXv1tlg+kyzJDE6o2/2W04K+rfgosw6rEn3S3c0n89vlNdPVtLRRnCTLdjM5phRIvsrZNKkqbuD1Xa1Dpo3mQ18BFBvik1WYv8VCiqfZtn+FfLyyD0M9SV1WsNR+4y+Up3w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hDlgQbp3; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21262a191a5so16796865ad.0;
-        Wed, 20 Nov 2024 07:56:32 -0800 (PST)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3823f1ed492so614977f8f.1;
+        Wed, 20 Nov 2024 08:07:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732118192; x=1732722992; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=faofSo4oKVxuq+H71CBfM+zOMDUns1O6D6WWNWtO2QI=;
-        b=lFc3kEaoTZ+U0z3BAzTPcNBXZrzwMQZRa8hzROGw1T4zHyB5AXNJwsrTInEgnyG3jY
-         +yWG6ikTchmbrhqLsdesDWzO4mJVg/K5iGKHUSilHFGcqKT0JMMaINKljFnK6vRDQ1DJ
-         SYFrdPD4kbPXQRzSOkN+H9X/QL1Ef+2IQAvtNUUGB3NKuRZ7JcNFL2fDc1XCM4Rhh3SS
-         SHT7JwXdkh4y6Z+mCgtZWRE7cm9F6/6gIGlPl31bQIGH+KHIPNtgfdRD3xAuiAMqcm3B
-         lCC2cVn+EwqHJksIZqNbAwVtbbtVBDT4jrjrozFyL8Ei+zODqzbU5GC8hTkwuyGaKK9o
-         yH8A==
+        d=gmail.com; s=20230601; t=1732118862; x=1732723662; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aO9TKFKPXbpzZpQOYdLRcgOnIQRaSyBu7w9NImnsmsE=;
+        b=hDlgQbp3Q4LHFX2aooP4FsOpdySNws7Q80jZ8Qfez0OIcdHfMxQVNQpB9v1uaU2v/6
+         hduzVDX4ke1t8PCftPhHq1/VOtm+icmzcF0Va3UEMw4SDYO3fTV7SQiuArXKxE9sH+zt
+         HFX5KaNEtEVOgNSfQ86UODh47uXe2U8i8aTdIw5QZLXLcRiSQvsU4uXt681fWa5zVXmj
+         6gyCXEzOALVircbcZqE7t1I4ZlThzOxM/YuA5IxQEm1xgSuz5DyaP3fwBBnMtXMev3Xd
+         X46RZSU09TPiyGK9I4AMMdzq669MX5OZFzMIY7NPQxYRSc+mKWse9KJLDNPy4rrICGS2
+         Ow7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732118192; x=1732722992;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=faofSo4oKVxuq+H71CBfM+zOMDUns1O6D6WWNWtO2QI=;
-        b=m/IuePSuzjVds0uSrtnRPrzBiRiDikmtVYvOyZGBc1HYOOYesLGy8PRzElf/9vTJmN
-         1QuhDG8ru9a+vXVr6V4v6YaDjWs7YptUXe5FYmlBcCigr6P0PabYw5E9zbqakZjC3gQW
-         7El8XezkzDgrC7jL7pJayDdPJ1B2n4p051vii03IFPEEhce8hK/ku8bP2XcuZ+T/VUeA
-         6bGi7ZeuCZsY+GTUi7p1zwAMZP0R3Bj/IPkEP7fIHKe+R1bNw+9tBXm4jqIVzkPboiSG
-         JSGwxQtmT4khq4i05k2u6pgKOHpluOrYKNinRb2bRBxxM4PdtJV6hja+xFMYkls5qLvj
-         DuiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwF3jfhyXRx5fg2mLE0GtJ3lP9StYejqRFJyjSZxleZumA0U139IR4+TnxX9u7EArIz0LcajFrYntCex04@vger.kernel.org, AJvYcCW3Y4+XVjYOHfqcQv5aEjLQUbGMjVqpPFc/nO8le8IUs5g4peMlyoCpUV4C9w4oDU5tnmZxyz+8Gt63REUsAc2e@vger.kernel.org, AJvYcCWmBRed5bJbymI6L3jbBjvq9mltfhxkr0vdcCShQwWJS9RDC3u4wSTIj2Xqex1XkyUVTFA=@vger.kernel.org, AJvYcCX5VvDLhiCJVtUkCRbrPxqRF8iE/h8nZmALbOrEFw28m95Tbx7r8wpIKTyhLE56cx8Q52x5oUSL@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXKyZuEpDUanR9lYv7CKtK0LspN2tOH9SNyTHrsXkr8+Yt8Rrc
-	+t4UAI2ZM40N0qkLV4wOVPNnZYwg4Cn35g2RBkZA7yMpniPuwAY=
-X-Google-Smtp-Source: AGHT+IGo4oI+Fb87+Czb19lD2BAZoMXT0M6InkIab58s9UkvKgbaXbQ08of0yxblvqBw/za9YhG6Vg==
-X-Received: by 2002:a17:902:cf0f:b0:212:b2b:6f03 with SMTP id d9443c01a7336-2126c12c410mr33196935ad.16.1732118192127;
-        Wed, 20 Nov 2024 07:56:32 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2120b2c54d8sm63940025ad.235.2024.11.20.07.56.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2024 07:56:31 -0800 (PST)
-Date: Wed, 20 Nov 2024 07:56:31 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Alexis =?utf-8?Q?Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, ebpf@linuxfoundation.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Bastien Curutchet <bastien.curutchet@bootlin.com>,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3 13/14] selftests/bpf: migrate bpf flow
- dissectors tests to test_progs
-Message-ID: <Zz4Gr4lNt804_dyP@mini-arch>
-References: <20241120-flow_dissector-v3-0-45b46494f937@bootlin.com>
- <20241120-flow_dissector-v3-13-45b46494f937@bootlin.com>
+        d=1e100.net; s=20230601; t=1732118862; x=1732723662;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aO9TKFKPXbpzZpQOYdLRcgOnIQRaSyBu7w9NImnsmsE=;
+        b=xGN8gG6e92aEV3kwudiiJFKn7apBJ9VzrqjeOZkVZpa9SuBmYfXkY/OgZX0P9xcp5e
+         GAeU2/06xLq+z2Ytb7YI2mAPPl449Jiyqixbxz9UxYxhCxZlpt5Oe6Ks5PuIWPMi0ew1
+         yhCLG2/r3t58RCbFrBDbWxP0YKpJ4R4KKXQejXn2hjXggaCEq/xzuPs1czVKJnoHrkTc
+         w6Nhg23jxv1Vf7x1yfHf/099wkhgv2QlY9q2qE2pMcUsOD7h51vs8y14x0Fot/q8lhwn
+         urdo3f9A4QaW4iRXtUDQIHosAyoplWtURkzRXiqATyqIMseYJeJJa/N3vTtlmiigLltT
+         z00w==
+X-Forwarded-Encrypted: i=1; AJvYcCVJIOo91gmJzYGO7/7oNOtoQiY0xUz+GQoJc5r1/Q5hQ60THThpElP135v6+UvJfy+0ai30WuUAem9OhKs=@vger.kernel.org, AJvYcCXChBfuYSlofYIvEjSdeNAacldQ3eGOKq5hvZuj/a2df6I9zR6c+uIZN6IHRg2C0CxOXfuZ63eU@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJM0/hanWgjpeWCKE/urlQUqSHC1zVbXlTcgAVVMomxgKDGqGc
+	TgC16E8ayGBu4QnBjfXDwFagziArMQSdOTtpQenqPivo8VH4TmIqb+iar3qIfl/Weq7PoamlCeN
+	SSoE8G9M8Zr8QZoKefwo1x0wuIRSL1w==
+X-Google-Smtp-Source: AGHT+IER19cs4sf33fj71/KdeC2bmUz2qJiOH/3CwjU2YUbA7W8Lei2R7xOzyjFNQyjpAY+9DrOmVMYouOIU50rMkJ4=
+X-Received: by 2002:a5d:5f48:0:b0:382:498a:9cc4 with SMTP id
+ ffacd0b85a97d-382544c19f7mr2706793f8f.9.1732118861694; Wed, 20 Nov 2024
+ 08:07:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241120-flow_dissector-v3-13-45b46494f937@bootlin.com>
+References: <cover.1692748902.git.dxu@dxuuu.xyz> <eb20fd2c-0fb7-48f7-9fd0-4d654363f4da@app.fastmail.com>
+ <CAADnVQ+T2nSCA8Tcddh8eD27CnvD1E3vPK0zutDt8Boz7MURQA@mail.gmail.com> <7ec1a922-30c5-4899-a23f-11e3ef9d6fef@app.fastmail.com>
+In-Reply-To: <7ec1a922-30c5-4899-a23f-11e3ef9d6fef@app.fastmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 20 Nov 2024 08:07:29 -0800
+Message-ID: <CAADnVQJ5NnDqx_TMbwHOPySUaJRE-N5K7L_whDsfeyMRBNOFkA@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next 0/2] Improve prog array uref semantics
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/20, Alexis Lothoré (eBPF Foundation) wrote:
-> test_flow_dissector.sh loads flow_dissector program and subprograms,
-> creates and configured relevant tunnels and interfaces, and ensure that
-> the bpf dissection is actually performed correctly. Similar tests exist
-> in test_progs (thanks to flow_dissector.c) and run the same programs,
-> but those are only executed with BPF_PROG_RUN: those tests are then
-> missing some coverage (eg: coverage for flow keys manipulated when the
-> configured flower uses a port range, which has a dedicated test in
-> test_flow_dissector.sh)
-> 
-> Convert test_flow_dissector.sh into test_progs so that the corresponding
-> tests are also run in CI.
-> 
-> Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
+On Wed, Nov 20, 2024 at 7:55=E2=80=AFAM Daniel Xu <dxu@dxuuu.xyz> wrote:
+>
+>
+>
+> On Sat, Nov 16, 2024, at 2:17 PM, Alexei Starovoitov wrote:
+> > On Tue, Oct 29, 2024 at 11:36=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrot=
+e:
+> >>
+> >> Hey Daniel,
+> >>
+> >> On Wed, Aug 23, 2023, at 9:08 AM, Daniel Xu wrote:
+> >> > This patchset changes the behavior of TC and XDP hooks during attach=
+ment
+> >> > such that any BPF_MAP_TYPE_PROG_ARRAY that the prog uses has an extr=
+a
+> >> > uref taken.
+> >> >
+> >> > The goal behind this change is to try and prevent confusion for the
+> >> > majority of use cases. The current behavior where when the last uref=
+ is
+> >> > dropped the prog array map is emptied is quite confusing. Confusing
+> >> > enough for there to be multiple references to it in ebpf-go [0][1].
+> >> >
+> >> > Completely solving the problem is difficult. As stated in c9da161c65=
+17
+> >> > ("bpf: fix clearing on persistent program array maps"), it is
+> >> > difficult-to-impossible to walk the full dependency graph b/c it is =
+too
+> >> > dynamic.
+> >> >
+> >> > However in practice, I've found that all progs in a tailcall chain
+> >> > share the same prog array map. Knowing that, if we take a uref on an=
+y
+> >> > used prog array map when the program is attached, we can simplify th=
+e
+> >> > majority use case and make it more ergonomic.
+> >
+> > Are you proposing to inc map uref when prog is attached?
+> >
+> > But that re-adds the circular dependency that uref concept is solving.
+> > When prog is inserted into prog array prog refcnt is incremented.
+> > So if prog also incremented uref. The user space can exit
+> > but prog array and progs will stay there though nothing is using them.
+> > I guess I'm missing the idea.
+>
+> IIRC the old-style tc/xdp attachment is the one incrementing the uref.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+uref is incremented when FD is given to user space and
+file->release() callback decrements uref.
+
+I don't think any of the attach operations mess with uref.
+At least they shouldn't.
+
+> Once
+> whatever program there is detached the uref is dropped. So I don't think
+> any circular refs can happen unless a prog can somehow prevent its own
+> detachment.
+>
+> Could be mis-remembering though.
+>
+> Thanks,
+> Daniel
 
