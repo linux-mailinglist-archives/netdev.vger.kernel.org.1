@@ -1,153 +1,155 @@
-Return-Path: <netdev+bounces-146691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287C89D5053
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 17:02:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6581E9D508C
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 17:16:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D63B4B26272
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:02:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275C3282A18
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0519F19DF8E;
-	Thu, 21 Nov 2024 16:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958D83C47B;
+	Thu, 21 Nov 2024 16:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="TWPDTvVP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JsoRE5mx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g3OdoTvc"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE6B158A33;
-	Thu, 21 Nov 2024 16:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F25819A;
+	Thu, 21 Nov 2024 16:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732204943; cv=none; b=ar9CknIm75CXPGKB5nLmdtryM0gsHZwCv9RODjgYvuoZ2TI816c1RtFzs5wF60NNCo/azM4hBIfXjzKQWeRSfq5l+wDlRiLE5QzpmHwakEVwvL4LQd4PAnCdTgQx/j9mnEmZj2kET9InO9keTCGkGsAfELZ8VA496+Ybk/EDNnA=
+	t=1732205766; cv=none; b=ptDXoPZ2EGRswZ2ZkXN5hICYGjGrzEUgACJhRxA+tENwr/Y/dGlXcV/D4/R2IaMObJzWPN/onDqhkGWn+16qw7TfMkKOvvCO+m1AruhRlEhl70qERZhIxz5pf/OkR6M1FOJXA+/YZtaOxCVexkN5GqJuSe7estjneZ8N3X8Bgz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732204943; c=relaxed/simple;
-	bh=dBHlf6+aZ1hAOrvQPwSccNRc472d+mPq6Pqy8pnvfqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTez54ssCs/Dd/tEl0s04ydXTsWl+D6l74I5yeKaa6eX2qC+vFs5zydd89O7DC8cQyxxzc0VU9yAZbOKofdK+hHhm62hkFL/P97SXrGzkNHaJu3c7FUP0+qq4Oj8m6SRk0pHr9AECkAuoT6tmmuI7bZeIZr9zPuEs/j+YIl0J3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=TWPDTvVP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JsoRE5mx; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailflow.phl.internal (Postfix) with ESMTP id EEB67200637;
-	Thu, 21 Nov 2024 11:02:18 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Thu, 21 Nov 2024 11:02:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1732204938; x=
-	1732208538; bh=pO3PALF2awA+eBkc4VARw2inhjxAJiO5t86BEffGEBw=; b=T
-	WPDTvVPJ6FmJbTIVJ9cjEwSdbk+CQXtbYOIod/ngJcXW4TWzv8qJlZTYYFak6mGn
-	KGTsig9Hs8eAtEMHVLfaTIcH3qdySAKtLCXx1ukd+ikhGODWIlgkebyY5vQnkp2b
-	qPdIRjyy4rtk5lGMgQLTnOcxcIC8MietnDM9xfW6Q5iFjgzuPN4lw/GpeCS5RvFl
-	/zfIgRwIos7ZmN3/WD13n8g3G24l0bk3rxfvk5Efkd85iWkyy1Jrku24hx6A+afQ
-	NA4nMTRAPSneMcclwaU6ZCcIin80Bq8bWFIY3e1S92rizQBHcaXSyFbdBspvdEIE
-	IWXze/N0lWC4d+Mp7nq1w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1732204938; x=1732208538; bh=pO3PALF2awA+eBkc4VARw2inhjxAJiO5t86
-	BEffGEBw=; b=JsoRE5mxhUvnoibuHggM8f9j0HS3wCPZT3oK+JNDED+a5Io456B
-	2P41QTC3Xz3PJQovzdxpoc6bYbT22dWh1BKU9fSIinuMJ+Z1eyTaBmBcyOxSdVvt
-	PWM2JrzWS3mqaPBERNu1j3lORoSLcCI7MIHzXo0DStbrChajPHuhFkG7rh41zIf5
-	BhAfmtA6a7/+zETJB48Vo4KkcDWKyXd2mrXbaCEBVtWQ62AYVuarA7hFE/NKCD4q
-	an68PAZqGQ6BzmyYWfzdIOWlyp+73kPJIqtYP2cEmSvM1MKW6rq0iICIB0XYsgQp
-	KAi0izO2lzizHWr7hauK10svFfeBmZqy6/A==
-X-ME-Sender: <xms:ilk_Zzo0kvxi0-8n6fCkCA24K5CkyUYcMk7atmcZrkPozFaxQ1PxuQ>
-    <xme:ilk_Z9p0mp4zrGaZJT-kz2gf6XsTOJET8TTJ-n63m-De-WQuC-E5SkE-LPh5_WrDJ
-    1h5a4joHZP4Xn7d84U>
-X-ME-Received: <xmr:ilk_ZwP1FwnkqlDMWvWy2roaQHiqTRmSZ2ZxwVOHe-hqE8ALy9_E5eQqj4XS>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfeeigdekvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecu
-    hfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrih
-    hlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeeg
-    teehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghr
-    tghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnih
-    hosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhu
-    nhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhr
-    tghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepnhgvthguvghvse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:ilk_Z25w-yK-e58Q3JfDsVJIFxeV6ELe7jvji-q9k3hnHgEwnTMLUQ>
-    <xmx:ilk_Zy53vRHhMrOHg3FZEcQfMJxA_EVBqx2w2OqKgL01p7XiBkBfHA>
-    <xmx:ilk_Z-iuDQpl-psr7P3DlL8Eqj9AmNeM8NUqs-UuRNwIxN5dpVe6Kg>
-    <xmx:ilk_Z056dXOzePiJl8WqbSw9XDqPJrSJ4mRxQP5aunuXly-DHtXOgg>
-    <xmx:ilk_Z0skCtz4O2b9xjq7tt7lay1y8a72X5c38yerGPvt4f4IhyScrpsS>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 21 Nov 2024 11:02:17 -0500 (EST)
-Date: Thu, 21 Nov 2024 17:02:15 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 18/23] ovpn: implement peer
- add/get/dump/delete via netlink
-Message-ID: <Zz9Zh-5hZrbal5Ww@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net>
+	s=arc-20240116; t=1732205766; c=relaxed/simple;
+	bh=OiIC0qHEaChCniCOc5MXZ/hJqShD3zHdr3zeQ7gIsrs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hHn3/r5vrL9VmgtdXpJCcEVHDx1CcaI8CAYBii5gx3JQs9BXVcnI+YvcbpMAUaLXC6mWloWBaXFvoIfKdPtNO1U0rJ0Pq5fYaxB7/ziCvbQKrDxOBAaqXJ9gfokQD0j2R0w9RMUjrIZCmDBk+nD1xQOoTy0T0LOcO8I7eKfvUc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g3OdoTvc; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732205763; x=1763741763;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OiIC0qHEaChCniCOc5MXZ/hJqShD3zHdr3zeQ7gIsrs=;
+  b=g3OdoTvc0XP1z6qxBTDB3Two3EVO/gFKEfPuv45ccTu5gU8pzLV4iitX
+   Kzg7DOkSrtQbAlQvInZGqBGeu38EJl3/jVwFZD9lu/uH4ZqWMkg7CLsqV
+   uypcDDoSRZHuhbXrJwdj5s/KC0HXoIEWD//ykIwp24F6ihiQDW/ErotrV
+   ai7mIl/DXBjoZExe2aGpUm0SFgn/sZTmisaX605zMGuCSR2w5E469snAN
+   aPwA6M1McE8vh+GrJTIr++RnMmZxm087rSW/MNGujEH6tWO3sMvKXuDqy
+   KSf4XKwci268Mq78pRpkfdnP3XP6JeSacwTgHxbD5lxvGjbFSpfqKyL90
+   w==;
+X-CSE-ConnectionGUID: tqZuMXh2RU2VUL0t1KCU0Q==
+X-CSE-MsgGUID: +xdiz9bOT7uvz2KX4hqfhg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="32446582"
+X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
+   d="scan'208";a="32446582"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 08:16:02 -0800
+X-CSE-ConnectionGUID: dvkAQR2xTuSL8PWEQ0GeOA==
+X-CSE-MsgGUID: BUjM+sRdRNaurjcdrHKfmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
+   d="scan'208";a="90420764"
+Received: from inaky-mobl1.amr.corp.intel.com (HELO [10.125.109.245]) ([10.125.109.245])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 08:16:02 -0800
+Message-ID: <e51f5a71-4c18-41f5-9c6e-1848a985383c@intel.com>
+Date: Thu, 21 Nov 2024 09:16:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net>
-
-[I'm still thinking about the locking problems for ovpn_peer_float,
-but just noticed this while staring at the rehash code]
-
-2024-10-29, 11:47:31 +0100, Antonio Quartulli wrote:
-> +void ovpn_peer_hash_vpn_ip(struct ovpn_peer *peer)
-> +	__must_hold(&peer->ovpn->peers->lock)
-> +{
-> +	struct hlist_nulls_head *nhead;
-> +
-> +	if (peer->vpn_addrs.ipv4.s_addr != htonl(INADDR_ANY)) {
-> +		/* remove potential old hashing */
-> +		hlist_nulls_del_init_rcu(&peer->hash_entry_transp_addr);
-
-s/hash_entry_transp_addr/hash_entry_addr4/ ?
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 19/27] cxl: make region type based on endpoint type
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
+ <20241118164434.7551-20-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20241118164434.7551-20-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-> +		nhead = ovpn_get_hash_head(peer->ovpn->peers->by_vpn_addr,
-> +					   &peer->vpn_addrs.ipv4,
-> +					   sizeof(peer->vpn_addrs.ipv4));
-> +		hlist_nulls_add_head_rcu(&peer->hash_entry_addr4, nhead);
-> +	}
-> +
-> +	if (!ipv6_addr_any(&peer->vpn_addrs.ipv6)) {
-> +		/* remove potential old hashing */
-> +		hlist_nulls_del_init_rcu(&peer->hash_entry_transp_addr);
 
-s/hash_entry_transp_addr/hash_entry_addr6/ ?
+On 11/18/24 9:44 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Current code is expecting Type3 or CXL_DECODER_HOSTONLYMEM devices only.
+> Support for Type2 implies region type needs to be based on the endpoint
+> type instead.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
+Reviewed-by: Dave Jiang <dave.jiang@intel.com>
 
-> +		nhead = ovpn_get_hash_head(peer->ovpn->peers->by_vpn_addr,
-> +					   &peer->vpn_addrs.ipv6,
-> +					   sizeof(peer->vpn_addrs.ipv6));
-> +		hlist_nulls_add_head_rcu(&peer->hash_entry_addr6, nhead);
-> +	}
-> +}
+> ---
+>  drivers/cxl/core/region.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index d107cc1b4350..8e2dbd15cfc0 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -2654,7 +2654,8 @@ static ssize_t create_ram_region_show(struct device *dev,
+>  }
+>  
+>  static struct cxl_region *__create_region(struct cxl_root_decoder *cxlrd,
+> -					  enum cxl_decoder_mode mode, int id)
+> +					  enum cxl_decoder_mode mode, int id,
+> +					  enum cxl_decoder_type target_type)
+>  {
+>  	int rc;
+>  
+> @@ -2676,7 +2677,7 @@ static struct cxl_region *__create_region(struct cxl_root_decoder *cxlrd,
+>  		return ERR_PTR(-EBUSY);
+>  	}
+>  
+> -	return devm_cxl_add_region(cxlrd, id, mode, CXL_DECODER_HOSTONLYMEM);
+> +	return devm_cxl_add_region(cxlrd, id, mode, target_type);
+>  }
+>  
+>  static ssize_t create_pmem_region_store(struct device *dev,
+> @@ -2691,7 +2692,8 @@ static ssize_t create_pmem_region_store(struct device *dev,
+>  	if (rc != 1)
+>  		return -EINVAL;
+>  
+> -	cxlr = __create_region(cxlrd, CXL_DECODER_PMEM, id);
+> +	cxlr = __create_region(cxlrd, CXL_DECODER_PMEM, id,
+> +			       CXL_DECODER_HOSTONLYMEM);
+>  	if (IS_ERR(cxlr))
+>  		return PTR_ERR(cxlr);
+>  
+> @@ -2711,7 +2713,8 @@ static ssize_t create_ram_region_store(struct device *dev,
+>  	if (rc != 1)
+>  		return -EINVAL;
+>  
+> -	cxlr = __create_region(cxlrd, CXL_DECODER_RAM, id);
+> +	cxlr = __create_region(cxlrd, CXL_DECODER_RAM, id,
+> +			       CXL_DECODER_HOSTONLYMEM);
+>  	if (IS_ERR(cxlr))
+>  		return PTR_ERR(cxlr);
+>  
+> @@ -3372,7 +3375,8 @@ static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+>  
+>  	do {
+>  		cxlr = __create_region(cxlrd, cxled->mode,
+> -				       atomic_read(&cxlrd->region_id));
+> +				       atomic_read(&cxlrd->region_id),
+> +				       cxled->cxld.target_type);
+>  	} while (IS_ERR(cxlr) && PTR_ERR(cxlr) == -EBUSY);
+>  
+>  	if (IS_ERR(cxlr)) {
 
--- 
-Sabrina
 
