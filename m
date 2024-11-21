@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-146727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CB69D54D0
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:39:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B87D59D54DC
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:41:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CEEB282A8A
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:39:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744DC280575
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC81B1D47DC;
-	Thu, 21 Nov 2024 21:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7679F1D89FE;
+	Thu, 21 Nov 2024 21:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="b/Y4CJwd"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="MqQQlfeI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790A11C232B
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 21:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657C119DF66
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 21:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732225169; cv=none; b=QohZVb8geKbrJyMiPEWNLZ87Iqp1hgBCmSqafiGO6M9ArGyyiBhapMbKKmajIiAlkYc7FmwEbPUkfcwJS14ViQ4L0L7xF/mkCFEVkH1AZF/rIFCQAXQIg42vQbEJM88qmbGuzhyNO/1EN4cGpYsrIRYiO4Eq7hY1BvAVmO+aGzo=
+	t=1732225270; cv=none; b=AX56/QGdpF7qZ+jLfP2qe+KWGbN1IELxCl7r0ickLtWYZ9jHP4JUhGrktcASj/0DxL99FM8Jzggx8fXLZ1BTPMr8ZHpsDEC9fAPfsNsdtDWDhRELXrfr2S4N/lRU2MxDxUMYwvtCXojnUH10cMsiLHlpqZ744TUPDab4SIK8IUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732225169; c=relaxed/simple;
-	bh=6O4/oSn2BUc82HocclQZjAVjC1XlfqUd6oiVCfxd5P4=;
+	s=arc-20240116; t=1732225270; c=relaxed/simple;
+	bh=a7VIWYsH6966r8qsRHPstqq/wRhz2X9ULMrmkKrJx7g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KZVFBsKbmYd7JcL9sJhI8ho0B58wWslIVCIIyovTDd0bEN760Ffot5PFpkso4Y1zWEeF/pRDrDLuYb36clgS5UTovV9t8Ct020M5YhYvGm7Yzjf6JBZ//vm6xReWhlL839RKhVm50j4K1xfrI9PaMV2rJ3HehQLUaIEMvrPnrk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=b/Y4CJwd; arc=none smtp.client-ip=209.85.218.54
+	 In-Reply-To:Content-Type; b=Oue+OgzQ+/TqznjV+/uMN1FaZcmtgCgJkplY3t0jfYWFPkMzFtsl6Hpi5MTyg24p29NRqnRUTMJCFOCkO9LLZJvY1naiDnsDewTENxALyoDpPbrer/uIkrN3zc41bE+mw1ni2imC+Gk41OHchUhKwA5Ds/QYAlZ8mzgbflBO9k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=MqQQlfeI; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9a6b4ca29bso207155566b.3
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 13:39:27 -0800 (PST)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53da5a27771so1637642e87.2
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 13:41:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1732225166; x=1732829966; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1732225266; x=1732830066; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TTWHyH0/pd4NGuN+mYmXD7mccA5WSLeaf5E+h3Fti+0=;
-        b=b/Y4CJwdOM5YGdnixCQGceICMqf1kKtyT7GN2uJMJGqg4VlgpAMF45Bcr0a6yQWnma
-         dVYgXwXrjSCVo6JxIpiFB6mfj279NTddLPw3FMpdPxeuydm+VLP7gGRG/Ew2mpFCu5rt
-         sSGJt0RYzEUgnigCXK5KCO9/s1rTqs/hx2OjmHXhAo2YDWsWE2gwrWSO29JTJMynI95W
-         4mh1hzxGJhPZ+hYp3/X6zBK6M/haUMV7TaGwtwvmqywgVLwJ/0Y5+V2/oRuQlz+hG8uU
-         Y37OHtGo3a0YBAIwE72sFdN57//uOYkORHYRCm1x2GoENDRbQcC+3x0U5qGojQ0hYSRM
-         aIMA==
+        bh=Xp7BJDK+fpEtWCkgM/D1MY0zmZ7nJzoLAYaUFtGfDwM=;
+        b=MqQQlfeIdLYW4L71cg5XQjQoq6Xc46gjX3fdW2pFTdmVCagAv5i35XQTP9VwJhbh9T
+         q99+28BUa1OaaNyC1fr/we6cMZZAlD5VIWByIC889qXdohYaF1c+k0aK4NPJlT2rp5Ou
+         5RVUIm5YD2nFsRfYXNJpELGxHcIeWwQDNYbQ1YrxzormSsn5+7VBw9P0Sg6J7BV7soq4
+         vBlXqwz57WSWjbMpWkRLtZjqS7Rf+mftYNgY1xKS+kA6wCodaQ3eueAnW37pjzHGiGOx
+         45uTGXqTcS33y0KIPE7AxRBQiJhar+gmFOCIwNDtjRsH81/rEvSlNbgCitMDh7WCyc8x
+         o5Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732225166; x=1732829966;
+        d=1e100.net; s=20230601; t=1732225266; x=1732830066;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TTWHyH0/pd4NGuN+mYmXD7mccA5WSLeaf5E+h3Fti+0=;
-        b=DgskSz4nEe1HvxfEfdB8UEzsejn8ce7ZnC+C09V4/v4Vp7OxAQqHWpZtDoOyyD/jBx
-         GgnjU973C3Bv/MAr/AE0n61bF82b/+heaLeWfMUePLr7YR1UKuQFjeDfyYToPn6cQGpa
-         TcUq0Uuu2lnNZMDNPSpW4berTWFcOEmM4MDCN/4TNX5iJS43lMHbfy2E8reTPqjV28ZD
-         s9WuEaNC5lCtLSzWP4mUB+vGG6bqq7YEu854oTLVSbpspeMjSsk4fspo+bgBHq2JMyf1
-         NfuI8BRdXpRi5NuHZxCn13vPuAHBZUsIExeX1CwktiEyN+fSWJKB/6WrStKIzqcpcNuB
-         rSzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQBC4wNePWJy+qse/7IQErvsHPzyhSTDS/fKYegUMrMcbSCEgsl8pcOZwFau/sfUjXJlRm/6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuavlqFHroscjQGrvbcCwe0Z+E2BkL7TvHhe/TMBrmgYCqMLmk
-	WBbiaJzeXRNUUZfm3qFbNXgDycpJAtrxjZ6IWjGOzfbgBiekHSCQKTjF8yTxnnc=
-X-Gm-Gg: ASbGncsVVtLmeBI+g9bS35uYYbcW+pmIbGypVhiPI+Z9O+RQj4ADdYjxlrYwBhtdoaM
-	+nAyB/XWck9sc7DfJekC76Jc9n2nDNl6wUrVJ6zJqq2eHIoZgAF4lqhpKb0ZpM++O1KuT/HJyHD
-	Mp0MQx+ntLPcgeys+muQkcPmnyJxguSq0SXpELrLd3aT4u3+NRwEws8/OV9einF8KbBu3NbVWAL
-	mEXUWN5iFQVydwWovcSNINRIIKSjgRH6bpjHELUl/Ow0dO3jqfq6cinf5Zd0j3sHZKaiah5OFT+
-	KCBzPv5E8Q==
-X-Google-Smtp-Source: AGHT+IFt5e/WxtJQsJ1nDQuKfsyN25g9aKQVzA/tscnYlEDUeizxR85YU+6sdhgyib1KDjt00pA5UQ==
-X-Received: by 2002:a17:907:7756:b0:aa4:9b6a:bd77 with SMTP id a640c23a62f3a-aa5099a2a8dmr59376166b.17.1732225165811;
-        Thu, 21 Nov 2024 13:39:25 -0800 (PST)
+        bh=Xp7BJDK+fpEtWCkgM/D1MY0zmZ7nJzoLAYaUFtGfDwM=;
+        b=OPvPzHEB6VWxHaV+547grzKm1DlkEmHwXsf6P3bsTVE8zDGvtQw7fi1oR1d4jG0v+c
+         JqN4I9gbfcBqdU1IGNQvaIa2pcRfiqKrHFP5TaIik9tOhjBxweSFv0QJU9BSB5PMY5KT
+         4+KnP2As3BuIKFFJvpK9bjd/8vMGrtsUKf+qdP+Jvc45jaQfFtTecFOcHypsKfLtvuAW
+         IBcsq0m5rlRyF810J0/Ph9j4jLe51g1reBjfnqOZW+Wx/0HrEHbwfKgWKIoACfZFwGtR
+         D24O8ApteWsv+fHc81nRxY7AuTBXulwZQfWkNdBzLcD25HdIgAEu/YYTadjRVvUE86+i
+         Hn1g==
+X-Forwarded-Encrypted: i=1; AJvYcCVUJo8um2W1AaaKQOk9968twxo4ZGtxxZ9KptUKVpO1m8zp9nIWzaL34bls6JqFJzIqcAWyr6I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5odtsEhNPBkxLlVf/0VkYbup30+5NmY7r9U/YvaMzElFbIPd6
+	G29C+6PQd2tGJ8Nl5FCmyyPckyc5J3kaFrE1QDM3qvHK6PIxVIIXuwz/4H2joJg=
+X-Gm-Gg: ASbGncvTLMt/jVB2XqNALF3zfheJguY6x8s/9NasQNTEGj0hsPWXVWSJ47cQ/ZqkFJA
+	u2JZn2KR2lKAvmdv4qj65qu+0BRGOIOpZY6mCa+CT0x2ccjAvSOb1j4xDcUPUoqWZD6U3/aSA5O
+	+4qOVc9exDtsa5SCdikxxMncMZeS/LaOSZUnxl2PqlV1odzVeBoh6lccCvk30/E8ibQqQ47Wls7
+	03DYzSnN81nW7daBEJC2C3YsrGiIaHKEzuB9i+1vLS3r6BGACpOPzlrDXyttPjlXllrdi9SPiKP
+	NGA1jTjm4w==
+X-Google-Smtp-Source: AGHT+IG2aOB0XzO/z8W/uO9KyC6nKxwoNJWl0ncYXB+fcrk+LyC+9cX/Kn26qAZl6H+D2Fu4TzCAJw==
+X-Received: by 2002:a05:6512:1247:b0:53d:a9a4:7567 with SMTP id 2adb3069b0e04-53dd39b4f71mr191025e87.48.1732225266548;
+        Thu, 21 Nov 2024 13:41:06 -0800 (PST)
 Received: from ?IPV6:2001:67c:2fbc:1:f55:fe70:5486:7392? ([2001:67c:2fbc:1:f55:fe70:5486:7392])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa50b2f5fdesm16640266b.72.2024.11.21.13.39.24
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d01d3c0044sm197993a12.48.2024.11.21.13.41.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2024 13:39:25 -0800 (PST)
-Message-ID: <e767dc62-85bc-4e80-aed9-b2957cd37c78@openvpn.net>
-Date: Thu, 21 Nov 2024 22:39:54 +0100
+        Thu, 21 Nov 2024 13:41:04 -0800 (PST)
+Message-ID: <2eaf99e0-49d2-43a5-ac51-6f5a8f873d14@openvpn.net>
+Date: Thu, 21 Nov 2024 22:41:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,17 +83,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net-next v11 08/23] ovpn: implement basic TX path (UDP)
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
 Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+ Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
  Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net>
- <4fe9f0d5-a8ac-4f2e-aee7-00cbeaf2f0aa@gmail.com>
- <387d3fc5-9ff6-4a8e-b766-5e30d0aef4a4@openvpn.net>
- <7d221595-bd57-4b8d-9c2a-007ad1e33ba1@gmail.com>
+ <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net> <Zz3L3lnmcgbdQDqn@hog>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -136,90 +133,55 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
  +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
 Organization: OpenVPN Inc.
-In-Reply-To: <7d221595-bd57-4b8d-9c2a-007ad1e33ba1@gmail.com>
+In-Reply-To: <Zz3L3lnmcgbdQDqn@hog>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 21/11/2024 01:29, Sergey Ryazanov wrote:
-> On 15.11.2024 16:39, Antonio Quartulli wrote:
->> On 11/11/2024 00:54, Sergey Ryazanov wrote:
->>> Another one forgotten question, sorry about this. Please find the 
->>> question inlined.
->>>
->>> On 29.10.2024 12:47, Antonio Quartulli wrote:
->>>>   /* Send user data to the network
->>>>    */
->>>>   netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device 
->>>> *dev)
->>>>   {
->>>> +    struct ovpn_struct *ovpn = netdev_priv(dev);
->>>> +    struct sk_buff *segments, *curr, *next;
->>>> +    struct sk_buff_head skb_list;
->>>> +    __be16 proto;
->>>> +    int ret;
->>>> +
->>>> +    /* reset netfilter state */
->>>> +    nf_reset_ct(skb);
->>>> +
->>>> +    /* verify IP header size in network packet */
->>>> +    proto = ovpn_ip_check_protocol(skb);
->>>> +    if (unlikely(!proto || skb->protocol != proto)) {
->>>> +        net_err_ratelimited("%s: dropping malformed payload packet\n",
->>>> +                    dev->name);
->>>> +        dev_core_stats_tx_dropped_inc(ovpn->dev);
->>>> +        goto drop;
->>>> +    }
->>>
->>> The above check implies that kernel can feed a network device with 
->>> skb-  >protocol value mismatches actual skb content. Can you share 
->>> any example of such case?
->>>
->>> If you just want to be sure that the user packet is either IPv4 or 
->>> IPv6 then it can be done like this and without error messages:
->>>
->>> /* Support only IPv4 or IPv6 traffic transporting */
->>> if (unlikely(skb->protocol == ETH_P_IP || skb->protocol == ETH_P_IPV6))
->>>      goto drop;
->>
->> It look good, but I will still increase the drop counter, because 
->> something entered the interface and we are trashing it.
+On 20/11/2024 12:45, Sabrina Dubroca wrote:
+> 2024-10-29, 11:47:21 +0100, Antonio Quartulli wrote:
+>> +static int ovpn_udp4_output(struct ovpn_struct *ovpn, struct ovpn_bind *bind,
+>> +			    struct dst_cache *cache, struct sock *sk,
+>> +			    struct sk_buff *skb)
+>> +{
+> [...]
+>> +	if (unlikely(!inet_confirm_addr(sock_net(sk), NULL, 0, fl.saddr,
+>> +					RT_SCOPE_HOST))) {
+>> +		/* we may end up here when the cached address is not usable
+>> +		 * anymore. In this case we reset address/cache and perform a
+>> +		 * new look up
+>> +		 */
+>> +		fl.saddr = 0;
+>> +		bind->local.ipv4.s_addr = 0;
 > 
-> Sure. I just shared a minimalistic example and don't mind if the case 
-> will be counted. Just a small hint, the counter can be moved to the 
-> 'drop:' label below.
+> Here we're updating bind->local without holding peer->lock, that's
+> inconsistent with ovpn_peer_update_local_endpoint.
 
-ok, will double check. thanks
+ACK
 
 > 
+>> +static int ovpn_udp6_output(struct ovpn_struct *ovpn, struct ovpn_bind *bind,
+>> +			    struct dst_cache *cache, struct sock *sk,
+>> +			    struct sk_buff *skb)
+>> +{
+> [...]
+>> +	if (unlikely(!ipv6_chk_addr(sock_net(sk), &fl.saddr, NULL, 0))) {
+>> +		/* we may end up here when the cached address is not usable
+>> +		 * anymore. In this case we reset address/cache and perform a
+>> +		 * new look up
+>> +		 */
+>> +		fl.saddr = in6addr_any;
+>> +		bind->local.ipv6 = in6addr_any;
 > 
-> And sorry for misguiding, the '->protocol' field value has network 
-> endians, so constants should be wrapped in htons():
-> 
-> if (unlikely(skb->protocol == htons(ETH_P_IP) ||
->               skb->protocol == htons(ETH_P_IPV6)))
+> And here as well.
 
-yap yap, already considered. thanks for pointing it out though.
+ACK
 
->      goto drop;
-> 
->> Why not printing a message? The interface is not Ethernet based, so I 
->> think we should not expect anything else other than v4 or v6, no?
-> 
-> Non-Ethernet encapsulation doesn't give any guaranty that packets will 
-> be IPv4/IPv6 only. There are 65k possible 'protocols' and this is an 
-> interface function, which technically can be called with any protocol type.
-> 
-> With this given, nobody wants to flood the log with messages for every 
-> MPLS/LLDP/etc packet. Especially with messages saying that the packet is 
-> malformed and giving no clue, why the packet was considered wrong.
-
-Ok, I see. I am dropping the message then.
+Will fix both.
+Thank you.
 
 Regards,
 
 > 
-> -- 
-> Sergey
 
 -- 
 Antonio Quartulli
