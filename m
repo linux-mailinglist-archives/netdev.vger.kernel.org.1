@@ -1,247 +1,266 @@
-Return-Path: <netdev+bounces-146625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66CB29D49D9
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 10:22:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2010C9D49DC
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 10:22:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 281F02811AB
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:22:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1EE3281A31
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EDA1A9B27;
-	Thu, 21 Nov 2024 09:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB751CBEA3;
+	Thu, 21 Nov 2024 09:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZO7vptDF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AwCLovxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2056.outbound.protection.outlook.com [40.107.94.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F028914A62A
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 09:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732180937; cv=none; b=VomSg3N9kbU5Q6Q3FpBTZx6TrbOOB7AtgGbP8wcVNX05vmESqNit5xOcJ06OCKoxTtY+ZDBFn46xpI1b3dc5O4siVYL0kYpl65d8AUffoNzPhCFKqurYSwNpBZ4W9RTFi8wfx71PJJIdjC+1tCegk+JFCuXJjgR3FhdSyxjMG4Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732180937; c=relaxed/simple;
-	bh=Et+MyeUBBwbo+Ho9sHMO1ZkHG8oW6vT7dGJOy8DCj58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N3PxMOrx+kd3B7+IuV0NQrDexkS/4d34MJ5XYE+Cd3+D5dPI49d9HMFVXt5wV7h9cwGFpfN3R6hhhvFS8h1mlZhBiuBvXpXUlirKKx7E1pxuDFLisHNbo3SMCCTfaLYKIW0IVwfvkz3ezyZ7luKDqtAn2W2/nfMREyCg6joo3lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZO7vptDF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732180935;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3UhM3T0zK7wAUQ6aYe/q88lHTgWagB7X71lPl9l7iAQ=;
-	b=ZO7vptDFDmcf9onp7C9JYHLuj/pX7PG0xdaMqzBUwEArQK4TYr7rWWhynXwVuosQ7hKyOX
-	r3EJBV2E+7NwK6kh6t/dSzoT6/spLBvbHzy43ynvIs1nXhVaWZwMNZSva60or5+DNl25+h
-	t7ZtgTzQj15GPwqmmyy0PttWRtTCC9E=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-cjyXzQdMMlCRwTUZjzELgQ-1; Thu, 21 Nov 2024 04:22:11 -0500
-X-MC-Unique: cjyXzQdMMlCRwTUZjzELgQ-1
-X-Mimecast-MFC-AGG-ID: cjyXzQdMMlCRwTUZjzELgQ
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a9a22a62e80so43729166b.1
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 01:22:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732180930; x=1732785730;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3UhM3T0zK7wAUQ6aYe/q88lHTgWagB7X71lPl9l7iAQ=;
-        b=tWPEmQHNpmVD9T3mn2NrVrhxZVTWnXNVdWUTmG5VaHV5jX1VwRlbp1pN+xBXqDuKCr
-         qW/PKbMkzatzW99L0FLXJaXUyH833SzZh13Iu+Pd0Z+7h25CXoSIPvJHM5ffGWGd8Qm4
-         dVB0gVvIKRcsGWW5aqbxK9Wl4tJAlsVafI8pIi5W1cCc+5UmIUvsv+ffgDnssbkieCuk
-         beCdZ9hLB13jTpf0t5eIFC2YILiefNghFI6gsM0g4MZr4n60wm7i3ucuiePHHj5khQBC
-         OxvdcWhFXg0lpyL6qjswrmbxq6U08uRMJhX4JueLtgzzUhM/uFVPAdnZACqrYC3s1fTs
-         GyZg==
-X-Forwarded-Encrypted: i=1; AJvYcCWExWuRMejh9istuxlqG2z/gcFZ1lon3abH9Z/60trjKo8/eDrKz/4fkreNJmsADiPZ9ZlLF+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw3zYst8S74RshDW7CKPd9rNxhjjan9TbC6ocb4NyObf8DQgBG
-	QCUW7z60JkX4XZgRFlr0VhweMvjA9ElqXi149u3lpJVUJdEJ6FY8Xf5DGcwD2n1dLBDRvhcePrM
-	V5nXm7Guy90dd2yXkKE6b5sUMslpqeyWMtlOLFbUra1+Wz7T1wsQR1w==
-X-Gm-Gg: ASbGnctipHCardYCaTK+YKeIxSfz6DE4kqiRPke7rZ/fCNlhw6BAuU9pJs+UM4b/kRM
-	KrYeprGmPdhiztPwCpyXQ8CJsAlJbW2Zb4qdWhn9A+bVqObVhbZ9G/mQ19AgllTuqaqZOrg0dsA
-	EWgUUQtvY+LVho3I1Gui+ABM5fiGIPSH9BVFO0lIwzFmRGkQXE73QI4BnroTsU5rJ3RQat4/X6+
-	0iRO56VTQPBoZsri2xyJwEPi3DMjrB9h1kS2Dk/FDpCzieftd1zPQJE6BxLJ/oKAOMlivoNFbRK
-	DuFj9ZBmp+a+uIGdB117Uh21fg==
-X-Received: by 2002:a17:907:368a:b0:a9e:b287:2813 with SMTP id a640c23a62f3a-aa4dd52ad60mr613895866b.5.1732180930480;
-        Thu, 21 Nov 2024 01:22:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFpYURhAqi2+Iv1yCRlEqtYUTNmT6QPL+4sLpjlgm8nBJLv3Pn2th1eX/kMAyjO5FOXeHGCAQ==
-X-Received: by 2002:a17:907:368a:b0:a9e:b287:2813 with SMTP id a640c23a62f3a-aa4dd52ad60mr613891666b.5.1732180929759;
-        Thu, 21 Nov 2024 01:22:09 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-129.retail.telecomitalia.it. [79.46.200.129])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa4f42d4b5dsm56844866b.112.2024.11.21.01.22.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 01:22:09 -0800 (PST)
-Date: Thu, 21 Nov 2024 10:22:05 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf 3/4] bpf, vsock: Invoke proto::close on close()
-Message-ID: <7wufhaaytdjp3m3xv7jrdadqjg75is5eirv4bzmjzmezc7v7ls@p52fm6y537di>
-References: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
- <20241118-vsock-bpf-poll-close-v1-3-f1b9669cacdc@rbox.co>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDFA1A9B27;
+	Thu, 21 Nov 2024 09:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732180963; cv=fail; b=E+M8n+v7a0u/7zPJZPRMJKwm8vZol6cUGrZs5HFcdlnVbjTyTaZY1kIULaYDvQmklx3/DvPWAl5l4ksTyKvf+b3OL8yWHZ0q2CzEyxkrW7RoTJnFopf8I4q4+HsOO6diyvjfOdCGIOpjEvlR+pr3oVfGHezKNVRAkAECThGXWT0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732180963; c=relaxed/simple;
+	bh=uUdpJKZnnOZmKFRvhOlm7Lv2DRk7D0J47ocP+IwCV6w=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JKpmXNtNIwutkBl0PUKOMNzi6ANiR1dSLoA/RY2duIlXsRhci6+6q9ub6CvyAxQiTgtv55XndNFkvV4AntHaeHNJiNDjXEC/IfoJRbynOODJ4d59kft/xpGbVhln2JyPfz98iuZCtNF/qrY6IJ2jtA6J109Ci6CYzO9TVl0fCdE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AwCLovxi; arc=fail smtp.client-ip=40.107.94.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zs/0msjJwO3YriBwfskNsCuU4EtRCPWAHRGR3bgmmXea/wpOUmRZfquSXFWD8+P2utjvdVtr8GHjUEPFoFy2xEvVE1VBNzX6N+0exIPkAoBCw5navAx6denv/waE+mdFUwGJLIXXV6d4u31ICLUx4htiLuTEOWJprxoVf4w1wZwE29H79+vSohyrSLR+BnSDCWh1ljjI0LNUbkLRIP3FHF0vEYg4raHh42NbQjeQ24aHrnoswtxdKZuW4x4Vr9GdIdc62Q7lsk8fsLyEuqCVW5p7Utop2l3IfTgAWjnhPbyhbaZ2CvXJEVoXbgemYp7DHoI50OoVTh3QZLXF7Si/hA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kZ0i7wD5wuu2CLq/y4SNyVE/qIUkeSVWLfC08A8H/hg=;
+ b=ic8tvJMi2HM4FReHuEeHABvINGUATLwF6Os22ElByX0VlQPUo2q/pz1Z3PvSKqDZVpHrzxSBn4RlKXrgqMI3lIngGrj0lTDrdrOOHsiKxjJx3I7qCiDtOyik3iY0jVqzDf5ApuX1bkbEL+1N/7BWHzV4DiZd+lZdyN3xln1wKRkTXfWeWiRVN83LDGDV8UjvLdCdV0QVFsZC/AJQ7uhViQ66d4UItxSuKhHvO3GEGAiGfktGSgaUDH0ETPzaSreQmzkaxhlqLU5JF8VayAXkbMKmvt9ZXocHwbvwJ6X2AK5dpLJJP2hXZUL3iHBpRZlXqp2Be5ZysqVQYoyBBaa5aA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kZ0i7wD5wuu2CLq/y4SNyVE/qIUkeSVWLfC08A8H/hg=;
+ b=AwCLovxiIkXCC+CQt3f6+/P8PhlolKHcWT+64lRQ0UBI0K7ZZwMIloFKntCcDESsDLwd00FCDEHhvn2XP33CUmnvHqkIoW3r1yDJulwNlJZcAzXK8MhhEfYLu7gABAVPBKFNCSKB62BLI8MEzJbtkZH7EUWa4EuyjK19TU+WTPI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH8PR12MB6818.namprd12.prod.outlook.com (2603:10b6:510:1c9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.24; Thu, 21 Nov
+ 2024 09:22:38 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8158.023; Thu, 21 Nov 2024
+ 09:22:38 +0000
+Message-ID: <67a1ded1-c572-efe0-6ba3-d21f5c667aa8@amd.com>
+Date: Thu, 21 Nov 2024 09:22:33 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v5 10/27] cxl: harden resource_contains checks to handle
+ zero size resources
+Content-Language: en-US
+To: Alison Schofield <alison.schofield@intel.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
+ <20241118164434.7551-11-alejandro.lucero-palau@amd.com>
+ <Zz6fI-EZYdS5Uw0S@aschofie-mobl2.lan>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <Zz6fI-EZYdS5Uw0S@aschofie-mobl2.lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU2PR04CA0035.eurprd04.prod.outlook.com
+ (2603:10a6:10:234::10) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241118-vsock-bpf-poll-close-v1-3-f1b9669cacdc@rbox.co>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH8PR12MB6818:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14b006bc-592a-4b4c-b16a-08dd0a0e0a72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?d1VpRzdWVVc3emNoaGNsQnRQUDEzZVVlaUFMUGZDVkJMQlA0bzBDdjcrZnBW?=
+ =?utf-8?B?R1VLV3F0YkxtZEZFc25zWnp6SXp2a0I3Yi9KZEg4MVRqSUdWVmhoTnhDSklH?=
+ =?utf-8?B?RUhnWVhkRnJoWHlUZUw0eFlINUVGQUFaem41STRIRGJGcGNncXZzYVZKaW5a?=
+ =?utf-8?B?Z2hCZndpay9TdHQwcThycEJMZm9OWWxrOGwyeDgrempXaEc5VExjeTQweTIw?=
+ =?utf-8?B?MEwxWmV5RUtsSjlxUUZkRlZQeHVvWFpDTjBwUmc5aGMyb0xIWDRlVDdqOUFM?=
+ =?utf-8?B?ZUduWHNZNlNrMmlyV09jVjF6OWdoZ09EN3p2TWpmdERkSThMUHp4dlFHK0o5?=
+ =?utf-8?B?M0Q0Y0Q0ZGtrZ0trZVphUGRKOGppVklaN1l5RmtNQXVlT2JhN1NoRFQ2MzY2?=
+ =?utf-8?B?cCtsNVNtNWNlaWhkTUp3N1RzVEowQ0JZMUs5WjdQaTF6RVpnTnI3Z25HR2ho?=
+ =?utf-8?B?U1oySnFBN0xGclpVWHpCOXRIazl1Q2gvRmxMUUo1NHJRNjdnb2JpU3huWXdT?=
+ =?utf-8?B?ZVA0YzZiSEtjbUJHOUFWYmJXbUxQZ2hwMTdhVHZlRTArRTJBWWZrUVlpRUxC?=
+ =?utf-8?B?Uk1hb0pTYzVqaXVRa1pHSEZDS1MxdHVReGc0aE9MQ3Y0eSs1SFQxZFpvYjV4?=
+ =?utf-8?B?aGFZMWdhcThzQmVVVXdDbFAxM0pGNkxsUTBSV29wK1JZOEh2MEVTbHdtSVJ0?=
+ =?utf-8?B?SmhOa1BxWlpHVjZ1UkZmSTd2ZENQbks2K1JkeFRyTVRTWFk3NUc4ODk2QTRR?=
+ =?utf-8?B?QTRZMGZ1eE54MmNiazd4V1BVaFZqZ3FnZVIxblNxRHFHcllMV1JPRlNKcjdk?=
+ =?utf-8?B?MDgrT1g2OG1BT3A4UkFJTURJTUlTZ2lSUXRjWFJPRFI2ajVQT2d3emMrVzh4?=
+ =?utf-8?B?K3IxaEpqTXB0Zmp5ZDljQkZrWkhxYTA1YXkySFJWLzB1UHhRSkFDMVRwM0NH?=
+ =?utf-8?B?V0FPeldMUjFzR2NEelQyOSttb0ZRcFhHbUJ3a21FUiswUjczZ1R0RDBTeGc4?=
+ =?utf-8?B?SUJQMGJNWmt5TlV0Z0RYYVgwSUV6R1NrVU00TXUzNzJVTDZDOGpMNkZLdnFR?=
+ =?utf-8?B?UWpDZy84OGRFRGJJanpvcllYNzQ4ZnJnaUd0MnBRZy9pa2dGTU12KzU4UHRt?=
+ =?utf-8?B?aUFydjBxeWU5WEpnN1V3WFVHMlZ2Y2VkTXNncExwN3lhcVVPd3VYc3B1ZC93?=
+ =?utf-8?B?WFlBWTI4MnBRQ1JNVjNoWlRNN2V1aVdseGd0L2dNYVllS3hCcHBYQ09NZ0Ew?=
+ =?utf-8?B?SmFYNVlmbXZUUHF6cGN2ZnF1elFxZXpyVWlQcUt1ZDRpMW1ML0lpTDl4V0hm?=
+ =?utf-8?B?TzJ4a1dCRlJOSGFnTERkRWJvUzFoMUlrWnIzUFhERU84ZmVaS3JzY1dxQzRJ?=
+ =?utf-8?B?ZGNDRG5ibTVBUzAwQVVoeTE1NzhaY1M2SWQ2OUhVcnJRU3A2Z1l1ZmYzdnNS?=
+ =?utf-8?B?Yk41MkZ2aCsxVjVva2dONDNGNjlOcnB0Yy8yblMxWjJHalRVcTZHMW5Bd0Q4?=
+ =?utf-8?B?NGpVZjFBVmZlQS9FVWJ2TktzQkhTUGsvbkNYS3pYTjIrZDB2T2REVGF2bmZS?=
+ =?utf-8?B?anJRdWQrY1JSWXFuUXAyb1kvdXJFWDVoUFVjMTBCSWJYVUl0Kzh3eHhWdVh5?=
+ =?utf-8?B?d0RYOW5UQi9kSDZjeE0vMmRmSGw2MUFWQjJCdUVmQkJYVWVpZDBnRlhzRGRv?=
+ =?utf-8?B?d0FvNndNczJJaEdiRmdYcFZvVzZWcHVFdVNYbHB3L01jME43bTNjVmlOdzFm?=
+ =?utf-8?Q?VHnCTVevwm+/yriHHmY9k/VngCiOwqpphdkRlGD?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?c3BOR3ZQSU43YzVHb0lHNCtPT1pCaVMvcWhmSkM1OGo0ZDh6VzU4ZExTbHBW?=
+ =?utf-8?B?MTU1QnVnanpzbWtyRGFlZWNuOVdibXJFZ2tuMnJ3S21LYnlWcDdWS09KSGw1?=
+ =?utf-8?B?UTJLQlNrUkVOMUsvR2EzRkcyODczTExwWWs2ZFhQS2l6N0o5UE9NcHJ1RXd5?=
+ =?utf-8?B?anJ5b2p5MVhyTGd0K3BlcmF2N1h5VTlsbUR3K3JJdi9lejhPYUpNYXFtekk3?=
+ =?utf-8?B?ZVYxSXZGdlgydkxQZ1RUUGJuckFmclZvaEExdkdLc01PNm1qRXNnSFRLcVpJ?=
+ =?utf-8?B?OFo4NDFuQ3pKSmJudnA2YW10RHAybzBZWGJ6V1l4a0RzU2xBTitZWXRWMTFz?=
+ =?utf-8?B?bVU2Z00xNlFndlFvYURlYzlqOGFYOWkxYkp0SitTeVNjS09LQzlDSjdTT1ds?=
+ =?utf-8?B?VU1ZQ05YbGNGT2hBdlZmS1RRTVpYa3NxaUQzZkU3YkhUb0dWalUxYzNQNk9o?=
+ =?utf-8?B?QTBQbnEwcEF5ZTlJb0NnZkllRDg4ZHU2UGV5MEpaTHFQb2NYN205REJKKy9u?=
+ =?utf-8?B?aHc5NWJDMS9BdjRUbG52cFA5aGViU0w4a2VqcjZ4TGI1dlVSZFh6TEdLSU1a?=
+ =?utf-8?B?UllEWW5OYWtFaXpyZk9Zd2VZU1NFTUE3WUZMaVNvcUZhVUVIZUUrWVF2L3pv?=
+ =?utf-8?B?NlliVnBGVXpmbTV4c0FuT1RMR3RuK05KeWpFa3ZnS012Mm5BT2U4MHpFd2ZR?=
+ =?utf-8?B?YUorVUhBNVR1YkZXMHFyNEFYN0txd0VRYlU2MlpXVG1YWFIyQi9VZ014U2NW?=
+ =?utf-8?B?alcxWTRkU0liYTZuVWptelJOTHFXZXY0dU5aclhzeFAxTjgzdGtneXJBd1hs?=
+ =?utf-8?B?bklKT2JTVjA1bklTTWNsWXUvUC9OMGYxT3VkdHErUU1mZ1lTYUwyeHBxTWlM?=
+ =?utf-8?B?Ukh4YTVPR3pERFFhR1BtZ3JOdVFDTDh3cE5rRFlXOHR3endRMGhrbXVZbzJr?=
+ =?utf-8?B?WkxIWmd5ZUN2elR0bk1FMVpETjVaVndxWjVSMExQdFN4V1l1L3l6UmVFVmkw?=
+ =?utf-8?B?ZTVqQnpsQ2I1QUIvdWFSUExCUmNwbmZqbUdoY0phTFh0QXd2dExFTGhDM3lu?=
+ =?utf-8?B?dmF0T2FaQ3gyb3dnT2RQMU51SXZrd2Rkc0hla2NkKzFxTjM1UFpVd3VzS1NC?=
+ =?utf-8?B?eG4vNlhZVENOMXVtaEw1UlByZzNRSnVsbW1lenpkb1pHUzV1eGQxWTFWb0dz?=
+ =?utf-8?B?WjdQaTAvS0FGc1gwbWQxU2ZRUWFUMkM0dVhGV2RTVitsL3hBSVNmeG1Dd01N?=
+ =?utf-8?B?SjBwZE1saWFNWkdrc2c2cTFHRFpqc2NiY05HTGJhbzVDQWRxT2lJUXlKVzgr?=
+ =?utf-8?B?b1h1anlFOG9tYmNjbnlHSUt2dlRMY25KSy83TUNtTVlzc1l2NEJCY3VVUEJK?=
+ =?utf-8?B?TW1jdS95dDZrMEx6N0lkcjJlVzJIZmZwTlFMUEYvT043K1dTZGU5Q0N3dm9w?=
+ =?utf-8?B?SUR0cGZKQ21QR2ZpZXBDSVFUdXo1bWhTb3grZkxHRHZVUkVxNDZiYmRNbElI?=
+ =?utf-8?B?WWtrc2FCb29TSHM5YUp5S21GU2VEYVRIRzc3RElFSVVpM3M1SG5BU0RvQmFX?=
+ =?utf-8?B?Z2N0OFFJTytVd2JYN2JkRFJNbmJPYTd2dW9zOW0vZ1huOUlMQnFjam1pdk13?=
+ =?utf-8?B?M3RReUx2QXdKd1VxVldqMXJFQlZEeVVsOWVUQnh6N29QNmJkU1haajlMTDI4?=
+ =?utf-8?B?cHI4bGRNd2s5ZjhFVmNVcG9zS29rbHBzR0FkeDRKZ2ZCaVlZeWNvL2p4Wk5i?=
+ =?utf-8?B?eUFqanFoNkxFN2FyNE14V05PUGJ0M2dYTk5hdnpTcjh5cWNycHVocHRpb2l1?=
+ =?utf-8?B?OFh6YjZGdG14T1NWSlh0VGdmaklpL1c4WXhpZXRRcFpJR0o1ODA1ZDVkd2d6?=
+ =?utf-8?B?TFhnRkEzYmU2U3U2MUI5KzlLSTBkaU9EZEZuM1FZRmpHcGsrd0E2Y2RhY050?=
+ =?utf-8?B?YW1lNW41SkdXM2RhaDNDMTJ0MHR1WE84TzhnRnZhOVdFY0UrUGZTN3d3bmxx?=
+ =?utf-8?B?by91a2twU016S1J6L2Ixb3VFYytQUWdSRTZOdVl1Tk5NMlNaTzg3b05XV0x2?=
+ =?utf-8?B?eE56V3hjbk04d1hlR1Y0eDhwZW1CZGI4NkJlZWRjbVZhRUtIeEZWL0hFaVN4?=
+ =?utf-8?Q?fjJW2Qinydlm7Ug1NmX7iw6iB?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14b006bc-592a-4b4c-b16a-08dd0a0e0a72
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 09:22:37.9699
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YTZgdbU03us3Ac9+a1vfqBBpRdQfNj1S4SA5r0qAbu1Rll/kQ6X/7z7fkbKrMIxIB4ucwQVOkj3JAgP78ax0fw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6818
 
-On Mon, Nov 18, 2024 at 10:03:43PM +0100, Michal Luczaj wrote:
->vsock defines a BPF callback to be invoked when close() is called. However,
->this callback is never actually executed. As a result, a closed vsock
->socket is not automatically removed from the sockmap/sockhash.
->
->Introduce a dummy vsock_close() and make vsock_release() call proto::close.
->
->Note: changes in __vsock_release() look messy, but it's only due to indent
->level reduction and variables xmas tree reorder.
->
->Fixes: 634f1a7110b4 ("vsock: support sockmap")
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/af_vsock.c | 67 +++++++++++++++++++++++++++++-------------------
-> 1 file changed, 40 insertions(+), 27 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 919da8edd03c838cbcdbf1618425da6c5ec2df1a..b52b798aa4c2926c3f233aad6cd31b4056f6fee2 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -117,12 +117,14 @@
-> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> static void vsock_sk_destruct(struct sock *sk);
-> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
->+static void vsock_close(struct sock *sk, long timeout);
->
-> /* Protocol family. */
-> struct proto vsock_proto = {
-> 	.name = "AF_VSOCK",
-> 	.owner = THIS_MODULE,
-> 	.obj_size = sizeof(struct vsock_sock),
->+	.close = vsock_close,
-> #ifdef CONFIG_BPF_SYSCALL
-> 	.psock_update_sk_prot = vsock_bpf_update_proto,
-> #endif
->@@ -797,39 +799,37 @@ static bool sock_type_connectible(u16 type)
->
-> static void __vsock_release(struct sock *sk, int level)
-> {
->-	if (sk) {
->-		struct sock *pending;
->-		struct vsock_sock *vsk;
->-
->-		vsk = vsock_sk(sk);
->-		pending = NULL;	/* Compiler warning. */
->+	struct vsock_sock *vsk;
->+	struct sock *pending;
->
->-		/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->-		 * version to avoid the warning "possible recursive locking
->-		 * detected". When "level" is 0, lock_sock_nested(sk, level)
->-		 * is the same as lock_sock(sk).
->-		 */
->-		lock_sock_nested(sk, level);
->+	vsk = vsock_sk(sk);
->+	pending = NULL;	/* Compiler warning. */
->
->-		if (vsk->transport)
->-			vsk->transport->release(vsk);
->-		else if (sock_type_connectible(sk->sk_type))
->-			vsock_remove_sock(vsk);
->+	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->+	 * version to avoid the warning "possible recursive locking
->+	 * detected". When "level" is 0, lock_sock_nested(sk, level)
->+	 * is the same as lock_sock(sk).
->+	 */
->+	lock_sock_nested(sk, level);
->
->-		sock_orphan(sk);
->-		sk->sk_shutdown = SHUTDOWN_MASK;
->+	if (vsk->transport)
->+		vsk->transport->release(vsk);
->+	else if (sock_type_connectible(sk->sk_type))
->+		vsock_remove_sock(vsk);
->
->-		skb_queue_purge(&sk->sk_receive_queue);
->+	sock_orphan(sk);
->+	sk->sk_shutdown = SHUTDOWN_MASK;
->
->-		/* Clean up any sockets that never were accepted. */
->-		while ((pending = vsock_dequeue_accept(sk)) != NULL) {
->-			__vsock_release(pending, SINGLE_DEPTH_NESTING);
->-			sock_put(pending);
->-		}
->+	skb_queue_purge(&sk->sk_receive_queue);
->
->-		release_sock(sk);
->-		sock_put(sk);
->+	/* Clean up any sockets that never were accepted. */
->+	while ((pending = vsock_dequeue_accept(sk)) != NULL) {
->+		__vsock_release(pending, SINGLE_DEPTH_NESTING);
->+		sock_put(pending);
-> 	}
->+
->+	release_sock(sk);
->+	sock_put(sk);
-> }
->
-> static void vsock_sk_destruct(struct sock *sk)
->@@ -901,9 +901,22 @@ void vsock_data_ready(struct sock *sk)
-> }
-> EXPORT_SYMBOL_GPL(vsock_data_ready);
->
->+/* Dummy callback required by sockmap.
->+ * See unconditional call of saved_close() in sock_map_close().
->+ */
->+static void vsock_close(struct sock *sk, long timeout)
->+{
->+}
->+
-> static int vsock_release(struct socket *sock)
-> {
->-	__vsock_release(sock->sk, 0);
->+	struct sock *sk = sock->sk;
->+
->+	if (!sk)
->+		return 0;
 
-Compared with before, now we return earlier and so we don't set SS_FREE, 
-could it be risky?
+On 11/21/24 02:46, Alison Schofield wrote:
+> On Mon, Nov 18, 2024 at 04:44:17PM +0000, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> For a resource defined with size zero, resource_contains returns
+>> always true.
+>>
+> I'm not following the premise above -
+>
+> Looking at resource_contains() and the changes made below,
+> it seems the concern is with &cxlds->ram_res or &cxlds->pmem_res
+> being zero - because we already checked that the second param
+> 'res' is not zero a few lines above.
+>
+> Looking at what happens when r1 is of size 0, I don't see how
+> resource_contains() returns always true.
+>
+> In resource_contains(r1, r2), if r1 is of size 0, r1->start == r1->end.
+> The func can only return true if r2 is also of size 0 and located at
+> exactly r1->start. But, in this case, we are not going to get there
+> because we never send an r2 of size 0.
+>
+> For any non-zero size r2 the func will always return false because
+> the size 0 r1 cannot encompass any range.
+>
+> I could be misreading it all ;)
 
-I think no, because in theory we have already set it in a previous call, 
-right?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+The key is to know how a resource with size 0 is initialized, what can 
+be understood looking at DEFINE_RES_NAMED macro. The end field is set 
+as  size - 1.
 
->+
->+	sk->sk_prot->close(sk, 0);
->+	__vsock_release(sk, 0);
-> 	sock->sk = NULL;
-> 	sock->state = SS_FREE;
+With unsigned variables, as it is the case here, it means to have a 
+resource as big as possible ... if you do not check first the size is 
+not 0.
+
+The pmem resource is explicitly initialized inside 
+cxl_accel_state_create in the previous patch, so it has:
+
+pmem_res->start = 0, pmem_res.end = 0xffffffffffffffff
+
+the resource checked against is defined with, for example, a 256MB size:
+
+res.start =0, res.end = 0xfffffff
+
+
+if you then use resource_contains(pmem_res, res), that implies always 
+true, whatever the res range defined.
+
+
+All this confused me as well when facing it initially. I hope this 
+explanation makes sense.
+
+
+>
+> --Alison
 >
 >
->-- 
->2.46.2
->
-
+>> Add resource size check before using it.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/hdm.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
+>> index 223c273c0cd1..c58d6b8f9b58 100644
+>> --- a/drivers/cxl/core/hdm.c
+>> +++ b/drivers/cxl/core/hdm.c
+>> @@ -327,10 +327,13 @@ static int __cxl_dpa_reserve(struct cxl_endpoint_decoder *cxled,
+>>   	cxled->dpa_res = res;
+>>   	cxled->skip = skipped;
+>>   
+>> -	if (resource_contains(&cxlds->pmem_res, res))
+>> +	if (resource_size(&cxlds->pmem_res) &&
+>> +	    resource_contains(&cxlds->pmem_res, res)) {
+>>   		cxled->mode = CXL_DECODER_PMEM;
+>> -	else if (resource_contains(&cxlds->ram_res, res))
+>> +	} else if (resource_size(&cxlds->ram_res) &&
+>> +		   resource_contains(&cxlds->ram_res, res)) {
+>>   		cxled->mode = CXL_DECODER_RAM;
+>> +	}
+>>   	else {
+>>   		dev_warn(dev, "decoder%d.%d: %pr mixed mode not supported\n",
+>>   			 port->id, cxled->cxld.id, cxled->dpa_res);
+>> -- 
+>> 2.17.1
+>>
+>>
 
