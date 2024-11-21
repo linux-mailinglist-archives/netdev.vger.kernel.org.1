@@ -1,130 +1,71 @@
-Return-Path: <netdev+bounces-146742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652F99D55FE
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:02:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2619D5605
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:06:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EEB8B21646
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:02:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0D01B21623
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097E31CCB5C;
-	Thu, 21 Nov 2024 23:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37F01DDC16;
+	Thu, 21 Nov 2024 23:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZhyVJImu"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bHVs9f13"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E284500E;
-	Thu, 21 Nov 2024 23:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215001C877E;
+	Thu, 21 Nov 2024 23:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732230168; cv=none; b=iDzQmOeKCWjth20YgffUmbICH91TpakN4VASQunIoPRjB2DtgBlDcq9z/Z22YgFjETAYAzoaRVbz6akejYruxFzG1SD0eeelMzfLMl1W0xNHMBkJgghyqduZMTvUnFotlZQfORLVrasE45Pfa91Ik5ExVWCRWban/vj/fF4PgwY=
+	t=1732230371; cv=none; b=POAL+q6IbPY3pT/iP5rsz1EwHRrAL0CijILemSJ9VEOkq3r1bORdbEc1fMYstQp6vOPap96sSvkANVIOqS1ZDV18eLP+Tk5rBDLyfR8Kj+TmUb2Bl47DYcD0xHpiQdXRFJ9H/0SPT2Yl7TOzk4KSD05fnsVqe6wA1Vuz9JSxIZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732230168; c=relaxed/simple;
-	bh=YUh71k+175ybgsdUyFe+kVdbDgxENLHIAM7Fa7GXBMk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FCWLA3tfKHHAsVf8FHm9FYBK64X3yQ4IgRKqGNmwNUra+pZGrXEeAu+6fqePBPmvRlB1qN75NdpnYBgaa94pL0odXeF1kNigiMecUTIvZMS9NrruPCND7GIJi9gsrs39dLGKXk4rHW04Xlf36eWaoI1vcskU+ZaFmdvd2G9G67c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZhyVJImu; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ALE9i92003121;
-	Thu, 21 Nov 2024 23:02:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	b45mFdUFdlyJiFzBXY4dTXz7trbCYEjnXQHC+zNFiYw=; b=ZhyVJImuEiWu9eGO
-	WAiNM+1R+KMQ2Xv+G9WPgCWsZ7pK0/5A1e2Glu8gUiGUeG7Lv3Bsijs3rjTO42Tn
-	WaWncJpoyWiMzgXdORW93LH/C98cPMEPFizKHqrs6zrjKqJwIkC0ivHgSnP5I4ZD
-	XlyjzGPNRubNBW0h4Ljtd3mYeHYQ+K5wO4155qpJsqoDDFqjRdPTysVq42GSLOZw
-	mRfF5BvAwkRDqQ5oQluTdfifuru5xCKrVZUeZq6gBUdVJopR9gpajka/V2XwF+Uo
-	8pSdth2DFuWqGnD1KpGF+WJ3CIJGLoTz2Zbeif9qNEFxcDHfF5rbKdKJ/IwHT8eM
-	GcEKvA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4326cs98ff-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Nov 2024 23:02:42 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ALN2fwc004853
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Nov 2024 23:02:41 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 21 Nov
- 2024 15:02:41 -0800
-Message-ID: <022f6596-3b4c-6c19-f918-8dc1cce509ba@quicinc.com>
-Date: Thu, 21 Nov 2024 16:02:40 -0700
+	s=arc-20240116; t=1732230371; c=relaxed/simple;
+	bh=KNiNQgLYuoeTM8eAfCjc6X88OzpyblpQref7kiUIufs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qqvT1vwgbtLRzZTiKENdo1XiGkVe6lCs/mNjDi6hiTfiKdqR38RkxRTzH1kA1HekVsQxYXGWBXKhuQ4tE6osw99LNqFpa0DB9puiysLe8edfACL26Qv7NqY5sglzpVMxcda0XGPG+hILfYz5BKNG8hrLqdmQD63AJexP0Hfk+Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bHVs9f13; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=v17qjx5gKva+Rn4aadN3fNFRw7FQmkniVAVT8il0rY0=; b=bHVs9f133jrTPZ+Rmtsim8jv8b
+	u8Vzmjo94QdTapgeQiouapxnFQ5NGo7J8wT3IpHNO9Ujx36rqOc6GHp0HXPxNYdEdJa6s+74g85z1
+	jLmOYkpOlHe5MrsUeeSPBVab3xV6nFLdJf3naFqoVeBMvfSWtEiZg7XANlHZG2J3cXeQeFsPjxyOA
+	fVpp5/3VrrY3xIwy6sno/oU57qbuvEe0lXL6VjNsvF4Z3Xy7h5BdOqCypjWtXLXNPWNIA1z9w/6wm
+	vHxft6jpNonGU+z49Q0Ym3O1gQLPY77sEhuX+9xuCKPVBQGHozojnGh/ESzeOi/8GAQtyD6Ne6p1x
+	OgsHq7qw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tEGFQ-00000006ug8-0nYh;
+	Thu, 21 Nov 2024 23:06:04 +0000
+Date: Thu, 21 Nov 2024 23:06:04 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Vyshnav Ajith <puthen1977@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Slight improvement in readability
+Message-ID: <Zz-83MmhKi1MvXCw@casper.infradead.org>
+References: <20241121224604.12071-1-puthen1977@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH net-next v2] net: wwan: Add WWAN sahara port type
-Content-Language: en-US
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-CC: Jerry Meng <jerry.meng.lk@quectel.com>, <loic.poulain@linaro.org>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>
-References: <20241120093904.8629-1-jerry.meng.lk@quectel.com>
- <863ba24c-eca4-46e2-96ab-f7f995e75ad0@gmail.com>
- <fbb61e9f-ad1f-b56d-3322-b1bac5746c62@quicinc.com>
- <7c263cbf-0a2f-4ce9-ac81-359ab69e6377@gmail.com>
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <7c263cbf-0a2f-4ce9-ac81-359ab69e6377@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: v4sCxqEOq56I5a5KNR36HdvPDL6NYSBK
-X-Proofpoint-ORIG-GUID: v4sCxqEOq56I5a5KNR36HdvPDL6NYSBK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- malwarescore=0 phishscore=0 impostorscore=0 bulkscore=0 mlxlogscore=789
- adultscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411210174
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241121224604.12071-1-puthen1977@gmail.com>
 
-On 11/21/2024 3:53 PM, Sergey Ryazanov wrote:
-> Hi Jeffrey,
-> 
-> On 20.11.2024 23:48, Jeffrey Hugo wrote:
->> On 11/20/2024 1:36 PM, Sergey Ryazanov wrote:
->>> +Manivannan
->>>
->>> Hello Jerry,
->>>
->>> this version looks a way better, still there is one minor thing to 
->>> improve. See below.
->>>
->>> Manivannan, Loic, could you advice is it Ok to export that SAHARA 
->>> port as is?
->>
->> I'm against this.
->>
->> There is an in-kernel Sahara implementation, which is going to be used 
->> by QDU100.  If WWAN is going to own the "SAHARA" MHI channel name, 
->> then no one else can use it which will conflict with QDU100.
->>
->> I expect the in-kernel implementation can be leveraged for this.
-> 
-> Make sense. Can you share a link to this in-kernel implementation? I've 
-> searched through the code and found nothing similar. Is it merged or has 
-> it a different name?
+On Fri, Nov 22, 2024 at 04:16:04AM +0530, Vyshnav Ajith wrote:
+> Removed few extra spaces and changed from "a" to "an ISP"
 
-drivers/accel/qaic/sahara.c
-
--Jeff
-
+Two spaces afer a period is correct.  Please do not "fix" this.
 
