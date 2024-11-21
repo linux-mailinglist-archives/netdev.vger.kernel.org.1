@@ -1,120 +1,131 @@
-Return-Path: <netdev+bounces-146701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8439D5172
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 18:14:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F168A9D51CC
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 18:30:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 023C4B24BDA
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 17:13:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78E428268E
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 17:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6EA19DF66;
-	Thu, 21 Nov 2024 17:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD161A01DD;
+	Thu, 21 Nov 2024 17:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxDUa83R"
 X-Original-To: netdev@vger.kernel.org
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792DB1487C8;
-	Thu, 21 Nov 2024 17:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B6D6CDBA;
+	Thu, 21 Nov 2024 17:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732209187; cv=none; b=hxYWFaT649NiXWVKJMeiUigGt0kibCavhonAwWxffs+Q35LsvH8lOF19K3B3xuk/WyHZsvzE1jG3i3EB75nplp4OsMcNZhUew/G+qYhroMeyMMGeBRaOePBxCc2iEcq4HDxfSQysMiNhVO1xopYKERndXFOgEYen8OQT1HNHa2g=
+	t=1732210194; cv=none; b=Nu4jkNb/C7cCWdOUJFWq+hyMXuM8gr3piqQN6spTlwRB3z+zT1qBEE8UEnsFqauYAX0Q6fvvLzJeBwKD5BR+1+V7eBjeZMBxdI5KXIEvRPAVjnKzrVyTTShgQlewv0fHjDSgKcMrgcjpQdE8RQJRQ+IbuVUwb57PH/rGyKE5QHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732209187; c=relaxed/simple;
-	bh=GcWWyOMvMcHfUlznL29VswDqfZ4aK48pVXyV1KQ6Bw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PdE/FUlsm1lwfr7h8Q0dRwvYVg2mNyGdVfvulYhDdagvSEZ5ma1kUIFQ53UgMfc+XiwRWPpaRGnC+AJHD2PFcKcwjQWKNyYPENIM9EIyoGSzo0kPodM7FSzYjeQ/xc5xtxnuqAV29OKVWD/xymjQXiXaxa55VJ0FMof7oSZ4NO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 4748B1A063E;
-	Thu, 21 Nov 2024 18:12:58 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 4441B1A063A;
-	Thu, 21 Nov 2024 18:12:58 +0100 (CET)
-Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
-	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 7BFFC2026C;
-	Thu, 21 Nov 2024 18:12:57 +0100 (CET)
-Date: Thu, 21 Nov 2024 18:12:58 +0100
-From: Jan Petrous <jan.petrous@oss.nxp.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	s=arc-20240116; t=1732210194; c=relaxed/simple;
+	bh=pwFx0/X8PtHlmudeayYhqBhhT+wJBbl9lv31lLjUFiQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JOQrhozVT2yvef2rE+zmAZSB0PZainjZzYdDCG+vM1xpGzXwazCJI8Lr0mQXQNwUQ+vHrIlyYWDfqsRQTGkKEfFUoX5xEAcxHzOrurJZ5EaAYb8XTnwVqoxUh8KZ9FTbxYORnKNzbblVrh47J1NfE3ex0YESj0ZPzFwEXwrT6C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RxDUa83R; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4315eac969aso6784565e9.1;
+        Thu, 21 Nov 2024 09:29:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732210191; x=1732814991; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=GTbAdxp0GTcyL45H6qzLKqwHog1M83ap9N15e36oQyI=;
+        b=RxDUa83RmrJRkapiKr3VFbzyI7yf+tMVIT9owk8a8F5beMrt0NFirOsrNWJbO6p+TY
+         xrSU0AAfmhhWhYtw3WOewI8320W64bTxEFXwhYJ+MtIiwBcPRHRxsOSGaUGhAkfZsNl4
+         LC2PU7j2IigMTUuZGfs2nV6UUnvqobl/MslV1xpEKLGnT7xrfr0HE0k4p/9rMZQDPMKX
+         xHkItPPwq+wcQQYSzjogi+On7S5YPOn1XETvBaRLMk7bamJwjqiXBW+XWUFNXposNzsu
+         pZ+rVuzHCXyjU6iIJ7sLTk/42wFtedERFFygOzbs1uVR2f1dEuS69/ZxIeoShu+ppBaf
+         e79w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732210191; x=1732814991;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GTbAdxp0GTcyL45H6qzLKqwHog1M83ap9N15e36oQyI=;
+        b=dPEVDUe9ssoINAy+6RijsoTCCWYiS6naaFpXBpwZ/7hGD+gQbBmeT+WczVq+HFTUzy
+         7RRr2flEw4BlAqeVUu/SqPeujtLcrat3lNUnolgkCoITozLE9y5TUkX4LJQ/0gLNitVr
+         r/V2PkDQ5kwudFNStd31O1CKEv/e1ujEbCRxrgf0DAi5lw0dXkSS/ZroeXkJGT0xuN+t
+         TdQYOZI4q2rP4k7za1Dh3QeCYU+e+yMnUgKce3zK1O5lxgTB42du7dIw3k4jpnlJTTvk
+         T1cvh9w65YLXpZj29ZgmYo3J9Ula+qG3/uct1wzjqBfxQWtWlJBgy583rPupjkQAG1d3
+         Cc8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXa2/pBh50Y8ShaG7mv2WrgVVtOwygf3qqf7ZUUGzv07Cxj1kxEovJtr3FbNC3gVyJL6zAghe0fuSsiUAQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK1iUw+EpcRidRBxadNaTwDjOrLlfBDMDKaKk0yIvKFk6qxbka
+	WUSGz2pwGU/15sv0gGdF0fxPm+j4FQxG4/UuNaX/AaRXZXpfozY=
+X-Gm-Gg: ASbGnctT211nORN7veBGwlItCT34oecErMitBOSTX+LEZ8r7HZO/y3orIfvUcWRAHRt
+	I0l5tVHCGHU6WaSkgEyGlrYQ2EHnCFJ4AI926Ia/dIkRQorPObcY7pyfqKAzMCuXYjJHrzAGYLq
+	vlKrtZtB2heDdDb9MrQD4b3EG2Za9BTSyr/U68jByEq7gn7zPmYwSO+47O8nizdBs0ix7TTaivK
+	io5Q6+BOZ28mcw2yLme+n0DO+ehc/Pt5rL/0hmKcaYHh0YABkm3LZH4hcY95dW67U7ouTS4kd4q
+	CTqFWldO
+X-Google-Smtp-Source: AGHT+IE6bYWFl3d5aGKXnTjwGCIMDgTOZ6TkNAXbUC44rGmzgLLKpr3hJ9Ygx1WAw+p2DLbF4FwF/Q==
+X-Received: by 2002:a05:600c:4f09:b0:431:4e25:fe31 with SMTP id 5b1f17b1804b1-433c5cd3921mr35516805e9.12.1732210190924;
+        Thu, 21 Nov 2024 09:29:50 -0800 (PST)
+Received: from LINUX-DQNM303.production.priv ([2a01:cb14:893d:6d40:f84:32a1:fa27:9eea])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b45f6b78sm65206385e9.12.2024.11.21.09.29.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 09:29:50 -0800 (PST)
+Sender: Louis Leseur <louisleseur@gmail.com>
+From: Louis Leseur <louis.leseur@gmail.com>
+To: Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v5 16/16] net: stmmac: platform: Fix PTP clock rate
- reading
-Message-ID: <Zz9qGvb9v9+SXSev@lsv051416.swis.nl-cdc01.nxp.com>
-References: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
- <20241119-upstream_s32cc_gmac-v5-16-7dcc90fcffef@oss.nxp.com>
- <d6794550-07f2-46df-aa4f-c728b06d50bd@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Louis Leseur <louis.leseur@gmail.com>,
+	Florian Forestier <florian@forestier.re>
+Subject: [PATCH] net/qed: allow old cards not supporting "num_images" to work
+Date: Thu, 21 Nov 2024 18:26:22 +0100
+Message-ID: <20241121172821.24003-1-louis.leseur@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d6794550-07f2-46df-aa4f-c728b06d50bd@redhat.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 21, 2024 at 08:45:20AM +0100, Paolo Abeni wrote:
-> On 11/19/24 16:00, Jan Petrous (OSS) wrote:
-> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> > 
-> > The stmmac driver supports many vendors SoCs using Synopsys-licensed
-> > Ethernet controller IP. Most of these vendors reuse the stmmac_platform
-> > codebase, which has a potential PTP clock initialization issue.
-> > The PTP clock rate reading might require ungating what is not provided.
-> > 
-> > Fix the PTP clock initialization by enabling it immediately.
-> > 
-> > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> 
-> Side, process-related note: it would be great if you could trim the
-> patch series below 16 (currently off-by-one):
-> 
-> https://elixir.bootlin.com/linux/v6.11.8/source/Documentation/process/maintainer-netdev.rst#L14
-> 
-> This patch looks like an independent fix, possibly worth the 'net' tree.
-> If so, please submit this patch separately, including a suitable fixes
-> tag and including the 'net' keyword in the patch subj prefix.
-> 
+Commit 43645ce03e0063d7c4a5001215ca815188778881 added support for
+populating flash image attributes, notably "num_images". However, some
+cards were not able to return this information. In such cases, the
+driver would return EINVAL, causing the driver to exit.
 
-Yeh, I also was a bit worried about patchwork fail check on patch series
-size. Thanks for your hint, I will remove this PTP clock rate patch from
-the series and resend it to the 'net' tree with fixes tag.
+We added a check to return EOPNOTSUPP when the card is not able to
+return these information, allowing the driver continue instead of
+returning an error.
 
-BR.
-/Jan
+Co-developed-by: Florian Forestier <florian@forestier.re>
+Signed-off-by: Florian Forestier <florian@forestier.re>
+Signed-off-by: Louis Leseur <louis.leseur@gmail.com>
+---
+ drivers/net/ethernet/qlogic/qed/qed_mcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_mcp.c b/drivers/net/ethernet/qlogic/qed/qed_mcp.c
+index 16e6bd466143..6218d9c26855 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_mcp.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_mcp.c
+@@ -3314,7 +3314,9 @@ int qed_mcp_bist_nvm_get_num_images(struct qed_hwfn *p_hwfn,
+ 	if (rc)
+ 		return rc;
+ 
+-	if (((rsp & FW_MSG_CODE_MASK) != FW_MSG_CODE_OK))
++	if (((rsp & FW_MSG_CODE_MASK) == FW_MSG_CODE_UNSUPPORTED))
++		rc = -EOPNOTSUPP;
++	else if (((rsp & FW_MSG_CODE_MASK) != FW_MSG_CODE_OK))
+ 		rc = -EINVAL;
+ 
+ 	return rc;
+-- 
+2.45.2
+
 
