@@ -1,132 +1,138 @@
-Return-Path: <netdev+bounces-146686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6995A9D4FA6
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:24:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4759D4FA9
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BED7B24A7F
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:24:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ED36B24D9E
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935931DACAA;
-	Thu, 21 Nov 2024 15:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="F/EpqzNP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54DF1DD877;
+	Thu, 21 Nov 2024 15:25:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F256427447;
-	Thu, 21 Nov 2024 15:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763D01DD0FE
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 15:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732202669; cv=none; b=uEwHfaVehNapKqUmQpwstFAMGMcyuN1PLojm5tPKIxF9BuoQBmBFpHil03AINqc6id3bS42FrCRHjMTwgb9OcACbDTYPaGNIr04PMfJxc0CQ7qG4cfYhIIsSh6nix7XXvZTALRam+3F22pC6y0ZKSS3kriPrsL7gsEbYgVXZwrA=
+	t=1732202759; cv=none; b=guOBS2mL5z30mm0zsbciCo5MQCGZxGyS1sAUZlHMOQlq5NEZI+X9yHfKHEFR3w9czxx5AFaEh7tF0FPeT3USSIgVCWGmFhMzLDfXDmgBXuYw9j/mGzYUTiGx+me1weKPkbAEzTQBUC20Z/xKWcd5ITTwZSBUVmGo4ncsomfkhWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732202669; c=relaxed/simple;
-	bh=7Zx2yBPzpQPZys9FtYhLvm+JYV+pYduZxHC4bcYUS3o=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=UCyyZbjsEts3NcYtIUfFwwZ3JAUPAE1mZgPI0zpM60KNmrq9wUnjQBq4LlTfdLMI3Xrrqz9q6EF0SfmYIDZ8H5qkwHQGqsdzgxq6wSL80dy2FewKQsZ7eEN7RvDdrBIYtzjVfiDJxLxUeGEqSNSzQlJuyNNcjMk5SeAaIk8Hhyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=F/EpqzNP; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id 4CD9980CD9;
-	Thu, 21 Nov 2024 17:24:19 +0200 (EET)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Thu, 21 Nov 2024 17:24:18 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 15AC53027E6;
-	Thu, 21 Nov 2024 17:24:09 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1732202650; bh=7Zx2yBPzpQPZys9FtYhLvm+JYV+pYduZxHC4bcYUS3o=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=F/EpqzNPvknBT/zP/P8tPlKwkcFc4obCKi/QHVU+SI1KO7MEFJJyL605Y+UMCxVSU
-	 pKUA3vmyX4jiJPq5gMITmhAI3alvrroyZ/2IBJ5W+nfbMhwg2mgWSXJ+knywvLyLBJ
-	 wJbAUz55kZ2tALxP685UyhBueV5mhMHWPImme+YI=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4ALFNuTQ040696;
-	Thu, 21 Nov 2024 17:23:58 +0200
-Date: Thu, 21 Nov 2024 17:23:56 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Jinghao Jia <jinghao7@illinois.edu>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-        netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>, Ruowen Qin <ruqin@redhat.com>
-Subject: Re: [PATCH] ipvs: fix UB due to uninitialized stack access in
- ip_vs_protocol_init()
-In-Reply-To: <a271e479-2a78-44b5-868d-3edc1f6c102a@illinois.edu>
-Message-ID: <10eddab8-ebc3-083d-f912-d4aebcf9f9e6@ssi.bg>
-References: <20241111065105.82431-1-jinghao7@illinois.edu> <f97ef69b-a15e-03ab-5e24-c1dfd3c4542b@ssi.bg> <a271e479-2a78-44b5-868d-3edc1f6c102a@illinois.edu>
+	s=arc-20240116; t=1732202759; c=relaxed/simple;
+	bh=oK0uQiqKh+/vdcnvCmhyFoYOyRWHiqqATD9Y2HjkXnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B6ELTKSIfbrnHtYj5ee8klSrteujIE7USvjjQuGlmK8iOTDoMQZ8YikCsT5D4TrcCShLbSRvdix4PELgBCMGoKwpEd+UHJFgfCSlSjxO5TXeBmwLtrbrs1Kjf01S6iOIyXsEcG0cyGZo2WhTUvsT5ohncLnNnxq44X9nwdNZFHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tE93x-0008LV-Vh; Thu, 21 Nov 2024 16:25:45 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tE93x-001vS6-1s;
+	Thu, 21 Nov 2024 16:25:45 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 2E84B378B50;
+	Thu, 21 Nov 2024 15:25:45 +0000 (UTC)
+Date: Thu, 21 Nov 2024 16:25:44 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Lino Sanfilippo <l.sanfilippo@kunbus.com>
+Cc: Nicolai Buchwitz <nb@tipi-net.de>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, n.buchwitz@kunbus.com, 
+	p.rosenberger@kunbus.com, stable@vger.kernel.org, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] can: dev: can_set_termination(): Allow gpio sleep
+Message-ID: <20241121-inquisitive-granite-hamster-b12a6f-mkl@pengutronix.de>
+References: <20241121150209.125772-1-nb@tipi-net.de>
+ <20241121-augmented-aquamarine-cuckoo-017f53-mkl@pengutronix.de>
+ <c47b3d06-8763-4f69-b845-c7b58c9e2fd2@kunbus.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ogcxihj3qbcsrofe"
+Content-Disposition: inline
+In-Reply-To: <c47b3d06-8763-4f69-b845-c7b58c9e2fd2@kunbus.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
-	Hello,
+--ogcxihj3qbcsrofe
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] can: dev: can_set_termination(): Allow gpio sleep
+MIME-Version: 1.0
 
-On Tue, 19 Nov 2024, Jinghao Jia wrote:
-
-> On 11/18/24 6:41 AM, Julian Anastasov wrote:
-> > 
-> > On Mon, 11 Nov 2024, Jinghao Jia wrote:
-> > 
-> >> Under certain kernel configurations when building with Clang/LLVM, the
-> >> compiler does not generate a return or jump as the terminator
-> >> instruction for ip_vs_protocol_init(), triggering the following objtool
-> >> warning during build time:
+On 21.11.2024 16:17:53, Lino Sanfilippo wrote:
+> > On 21.11.2024 16:02:09, Nicolai Buchwitz wrote:
+> >> The current implementation of can_set_termination() sets the GPIO in a
+> >> context which cannot sleep. This is an issue if the GPIO controller can
+> >> sleep (e.g. since the concerning GPIO expander is connected via SPI or
+> >> I2C). Thus, if the termination resistor is set (eg. with ip link),
+> >> a warning splat will be issued in the kernel log.
 > >>
-> >>   vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
+> >> Fix this by setting the termination resistor with
+> >> gpiod_set_value_cansleep() which instead of gpiod_set_value() allows i=
+t to
+> >> sleep.
 > >>
-...
-> >> This gives later passes (SCCP, in particular) to more DCE opportunities
-> 
-> One small request: if you could help us remove the extra "to" in the above
-> sentence when committing this patch, it would be great.
-> 
-...
-> > 	Looks good to me, thanks! I assume it is for
-> > net-next/nf-next, right?
-> 
-> I am actually not familiar with the netfilter trees. IMHO this should also be
-> back-ported to the stable kernels -- I wonder if net-next/nf-next is a good
-> tree for this?
+> >> Cc: stable@vger.kernel.org
+> >> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+> >=20
+> > I've send the same patch a few hours ago:
+> >=20
+> > https://lore.kernel.org/all/20241121-dev-fix-can_set_termination-v1-1-4=
+1fa6e29216d@pengutronix.de/
+> >=20
+> Shouldnt this also go to stable?
 
-	Then may be it is better to send [PATCHv2 net] after fixing
-the above "to" and selecting proper commit for a Fixes line (probably
-the initial commit 1da177e4c3f4 ?).
+Until today no-one complained about the problem, but I'll add stable on
+Cc while applying the patch.
 
-> >> -	char protocols[64];
-> >> +	char protocols[64] = { 0 };
-> >>  #define REGISTER_PROTOCOL(p)			\
-> >>  	do {					\
-> >>  		register_ip_vs_protocol(p);	\
-> >> @@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
-> >>  		strcat(protocols, (p)->name);	\
-> >>  	} while (0)
-> >>  
-> >> -	protocols[0] = '\0';
-> >> -	protocols[2] = '\0';
-> >>  #ifdef CONFIG_IP_VS_PROTO_TCP
-> >>  	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
-> >>  #endif
+regards,
+Marc
 
-Regards
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
---
-Julian Anastasov <ja@ssi.bg>
+--ogcxihj3qbcsrofe
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc/UPYACgkQKDiiPnot
+vG9IOwf/Xe9QldZzK3oY8FulDCyFTGhkQ/QLlekheNDEoEshpuKTEM9bNypg820V
+d0BtTboD3LudGIca4aoyFiYpko1B9UA7rNsylK4A85ZdphA6r1Wmw9qibOlpHH1V
+PYJ0ftVJcW2t6MsXjtcPkHSZCCZv70KPh7h2bX4yJ/y9RJ711E67kiN1wscv+5tM
+xSmWqR+ONxt6/kadkeGM4CwwKbBn0Ygm1SV3tYpyTQ07DRYvlJnpXmSShEu3Tuz6
+igUEltviWwMBC3TTGbsXfjBetQOy2gk9+QNHRIQUOg5BvcB+fSjaXC9AuJqMHSeD
+mGKdDReZlR8/jgtYQKtb23hvbQcrcQ==
+=S3ok
+-----END PGP SIGNATURE-----
+
+--ogcxihj3qbcsrofe--
 
