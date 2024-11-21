@@ -1,139 +1,138 @@
-Return-Path: <netdev+bounces-146731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B4B9D5505
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:50:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0607A9D550C
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A381B213E4
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9771128160C
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F611B86CF;
-	Thu, 21 Nov 2024 21:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056AC1BE23C;
+	Thu, 21 Nov 2024 21:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqEskWsc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LVLUpjoq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C51883CDA;
-	Thu, 21 Nov 2024 21:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7D3200A3
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 21:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732225817; cv=none; b=jl4zo+NzE5QRkPpd4xARXITeq1vlwRMSf0L73mbrfQDAqXxqXnD1VWlOhFo/0cwEWMKqlCj/OFb1pkiHhKPoRRjBMi579JonLyAVHoBMnDiHQ+UeW3mYrkkTQFI0xW0ufZAW1zlSUeIKplcCGo19FInD9S4OLTAtehgUONMY9E4=
+	t=1732225958; cv=none; b=IwUJZ9UpidBEFS3UB+r00ksMDX3mlBwhTjY9zp6BI0DTOxmbQS44lfQq4pDfjPMdIPrLgIY5h2eigilzcytrds+OM66nloQxcFXOKguq+K+TkeKtzQq0sCNa5amfr+fWiloebJ3rvvRi+zh/KcD1/wlqVu7Z0SUg3YXtSKcVtsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732225817; c=relaxed/simple;
-	bh=DwdlUxpukKZkwXyn+QCfutFIDPcY/3c2VtfjLZ6kMGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UkuISjKMnM0HN4yEz9F4PHZFBoUvdh4gIsiQN3ME6SVZwPQSEyr9ScsEZR8rlZ2zT070/GalBUE2Lh/X+RZmj23DbZd/JLDnB2/5B3KozI6d+I/Ilq3ttbJ4b+aqKU1JLvFrsb3sRJMb2aJg0raS9xCBe8WFENtnsMf427HJOvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fqEskWsc; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7fbce800ee5so68718a12.2;
-        Thu, 21 Nov 2024 13:50:16 -0800 (PST)
+	s=arc-20240116; t=1732225958; c=relaxed/simple;
+	bh=ebtwIn5+4HeiRKmyu+Uj+j8vWGRiKoETFcq1hg/r8sQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PfkEfhCRc6T/kpbbg9Wt7kLEuv1vfzlMF2vnZJau16TXhGRhNb59/fkfx4s7hXaCzgJfl4Gy5f4klBzZnmj1xUc2JKp1QtVOKuq0wv+o1jvXrX3o18LvhgsPQN/QlDN6S155s6HLLSCj5Z5CpEEessNuq35WInr4GdfHSKVltlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LVLUpjoq; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9ec86a67feso251791266b.1
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 13:52:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732225816; x=1732830616; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tng0iyvmtAeQDH4O6wrIeK+ASsO/thRJgM2H3Zm+p88=;
-        b=fqEskWscDEdYN/aoKA9d5mRZrL4mMiTsEYDEIresXDwyQDPscL0IhwIoElDFfhJTlg
-         elfnBV08pLMly4iQi5mZIaHlxwCtKgrRxIbanREMZvC8QHHhL9eFDCqYx5YMDbFePp8+
-         HxY9ee9ns2fcPKZKck4pd9cZBpfKQT5fRe+OBJGQeRdef1vYZIRi4+1OY71sO9ZCf4CV
-         qP+wP65AcddZ1y4UafTB1c4Bq4x4uEz1l8Yhanff5dVG0k+Utz7qZ1ZOntTlhzr16HuH
-         xhG2MFDH3mAikEAUqKqSftfO6kDc1mFw0zKS/6Iy/cgELVjGkvFI5ECjkIYXrHxb81d5
-         xvJw==
+        d=google.com; s=20230601; t=1732225956; x=1732830756; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=60xrDiN+3e4ZSRUPHqsQG4464T4xOdTRfgXVWcCirfQ=;
+        b=LVLUpjoqyp+y3v/nmBkQRQrUopF1OGkzdPivk0bpGgG/l6pB2N/SdsQCZzm+bV/TQV
+         BjE70UDyeA1evSRyVH2WqEXzxK5yYhztQ4NQ1aVilxLiQFpF3BVJASXUn+90w0h4LFHj
+         2ZKWqH821dKwh3Dfj0Pjact4njKV5Q+F5c2fWYoO1aDCHqgHTzWHMQokb3rOyNFEUVhm
+         Gl23CJwyJhD6GHlHJv6Xk6GX6X1/E1TiovK6EnjI0CX2l4Kdr6Sp49zq6VtZ2Vt3CaLv
+         yr3/oD4y172PTrzaeBJT1XZhMbI65CjmnB7iHIEHK5hUytow2HV39rvWcsVOrHXAbKy/
+         zDeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732225816; x=1732830616;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tng0iyvmtAeQDH4O6wrIeK+ASsO/thRJgM2H3Zm+p88=;
-        b=cSS3nF4ezdBeK8BakgFfx2iw54c0eJLncQm9WLGwFCFN0nXk0H7uVQaT/U0nO7c9kH
-         YC/ktP4GzrBStsBSO/m1o+3HVHSPOV8xeCO4phSACvfNbsTqf5onqS/rwQvPnkI29FFm
-         zAYqT8//JHbpgntKrpQSI6fbdccKdgQHxefdkhkEWEJIa10VX3Uux120V25DbRkO8SrP
-         l7d5/6FIB/gw6AtleW3BxHjg0+u55kl8/31g2Ieo7Y6c0iGPrIu1or8CsgfT44wW9PYj
-         1/9FyA+LHu35UbTwnbR7c4pgCjOLG7ozLTBBJgqdh+0oVZ4JgaTNkMk95CPX2OBb7j31
-         y4Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1+uU7/AdEcvmz8kxIOLxS/nVHgipeXXRSBDNeaOhIw/MhLIonS9vp1tNlkAK8frXzlDSHkgeRb14=@vger.kernel.org, AJvYcCX1CcPb/A4BllIUmq3b3wesL6slLaAq31BB90CjMCm0+HQrhx7LwpXg2yqhyWsXoxhigZvw3TQi@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3cOaW2xVyUfWeVvu5yGlvg3UyjOPJ9QOouoclwSafA0oROTX2
-	v0F62EnpL12KPu9aOS9JZziPFL7ODJAa0454fncXE8XlMjD46K0=
-X-Gm-Gg: ASbGncu0r0ls9kN1AsDivoX7avoxDw9+hzN//E+NGC/KBJ5pXxTs29H8uXz7cL7XAuM
-	1Gxo7QL6CHPVDUwc6sGwRNnV+RUHytvT/lfjYcWc7twJ5a1OLzRYzLQ7cd9paC3RewKzCrN2pAl
-	6c6ByMzTG2HT++1awoMDEj5XPoJZhnXWHI0YQeSeR/SpmgdRg9+mUW5332p6NUeC2Rc95ZyxGEG
-	sHXTpvDhrCLCawy/tICk4sHR8TYLGksDrbTGgpAuGfK1khFfNgyjggFQ7ES2UPK7M8QTF66S9A=
-X-Google-Smtp-Source: AGHT+IFrL3LRjMWyNkTLvHSkG1wjmyQiarccPferfkvjFV92RnjBWU69GI/bxyj1j4a0Zc0Tcgd/7A==
-X-Received: by 2002:a05:6a21:c20b:b0:1dc:77fc:1cdb with SMTP id adf61e73a8af0-1e09e40a5abmr495782637.13.1732225815616;
-        Thu, 21 Nov 2024 13:50:15 -0800 (PST)
-Received: from localhost.localdomain ([117.250.157.213])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcbfc0f7dsm210334a12.12.2024.11.21.13.50.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 13:50:15 -0800 (PST)
-From: Vyshnav Ajith <puthen1977@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Vyshnav Ajith <puthen1977@gmail.com>
-Subject: Fix spelling and grammar mistake - bareudp.rst
-Date: Fri, 22 Nov 2024 03:19:11 +0530
-Message-ID: <20241121214911.9034-1-puthen1977@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1732225956; x=1732830756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=60xrDiN+3e4ZSRUPHqsQG4464T4xOdTRfgXVWcCirfQ=;
+        b=ok/GgiCoS322X7ihxFyqbGJNsyAsyHhVTud4MwNiFEFv8kpGSG2WCaqU20btCFerhx
+         pOH46nbeE/hyzcq0RFQHrSlm9T7DFJLXhveOPE79VwO89oe+plD59yHYmMn4cguz840h
+         OoV13DJMoiHzpjzxEd2gv41OnHhD3xnp3LNiBdqZg3IaxVPjamLzMk604RF+rZYct3P/
+         B+dx9wXBTn6IkzpL84lhqCP7/72K1EMAxah5zcWHBMydeiOBi1N9iCflNpi/4T3lrZo/
+         lvsDIQ06wbNNNPNHnCYCWrNlUeanktEd+GwKQC3O9GpL4hFlmoETm4NYhVDZfBjEjktC
+         85tQ==
+X-Gm-Message-State: AOJu0YwV2804amiCvW2Og+yh2tvdV/4Pk9DJw5yvW8OfTG8vUEKTH+bT
+	q/o5N0LMNcVKgy7oTrvhy0Lv2hpnxukhMJUNq4TdkRSpPrrBOJsJ5wrLHxYHZ6iXtuBSo37uNcX
+	/xgDIz9u0YhaPcYW6DSv6e3uwMuTwsCOqrOYg
+X-Gm-Gg: ASbGncuj2/l6ydhf3wOtDAyAUMPmdk0/f8yHP50ZXxP4yB//y9bbd8TdkrWdQocujVN
+	AZXpGAtPzsx32XghFjN886d928GvY/+sm2nDqHLEg/eZvzZxhtfZ72dQKhRQc
+X-Google-Smtp-Source: AGHT+IG/F7p1kHWNZYc+MGbhc/nrA820D1QLMs8o5n4GPTVNyiZ3CmiFtvl7fbsyzw0xrYKAgOSyvp6++bH5QsLl94k=
+X-Received: by 2002:a17:907:1dd4:b0:a99:ff2c:78fc with SMTP id
+ a640c23a62f3a-aa509d12d98mr48040866b.57.1732225955499; Thu, 21 Nov 2024
+ 13:52:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241119220411.2961121-1-wangfe@google.com> <3d487b58-6850-499c-a131-b8169061759a@redhat.com>
+In-Reply-To: <3d487b58-6850-499c-a131-b8169061759a@redhat.com>
+From: Feng Wang <wangfe@google.com>
+Date: Thu, 21 Nov 2024 13:52:24 -0800
+Message-ID: <CADsK2K8ni4mttES0TPjV8gJAK7ge53Sstmj3Ep6PNLdxf1AOWg@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet when
+ if_id is set
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
+	antony.antony@secunet.com, leonro@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The BareUDP documentation had several grammar and spelling mistakes,
-making it harder to read. This patch fixes those errors to improve
-clarity and readability for developers.
+Hi Paolo,
 
-Signed-off-by: Vyshnav Ajith <puthen1977@gmail.com>
----
- Documentation/networking/bareudp.rst | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Thanks for your comments, I will upload a new patch to address your
+comments soon.
 
-diff --git a/Documentation/networking/bareudp.rst b/Documentation/networking/bareudp.rst
-index b9d04ee6dac1..ce885caf24d3 100644
---- a/Documentation/networking/bareudp.rst
-+++ b/Documentation/networking/bareudp.rst
-@@ -6,16 +6,17 @@ Bare UDP Tunnelling Module Documentation
- 
- There are various L3 encapsulation standards using UDP being discussed to
- leverage the UDP based load balancing capability of different networks.
--MPLSoUDP (__ https://tools.ietf.org/html/rfc7510) is one among them.
-+MPLSoUDP (https://tools.ietf.org/html/rfc7510) is one among them.
- 
- The Bareudp tunnel module provides a generic L3 encapsulation support for
- tunnelling different L3 protocols like MPLS, IP, NSH etc. inside a UDP tunnel.
- 
- Special Handling
- ----------------
-+
- The bareudp device supports special handling for MPLS & IP as they can have
- multiple ethertypes.
--MPLS procotcol can have ethertypes ETH_P_MPLS_UC  (unicast) & ETH_P_MPLS_MC (multicast).
-+The MPLS protocol can have ethertypes ETH_P_MPLS_UC  (unicast) & ETH_P_MPLS_MC (multicast).
- IP protocol can have ethertypes ETH_P_IP (v4) & ETH_P_IPV6 (v6).
- This special handling can be enabled only for ethertypes ETH_P_IP & ETH_P_MPLS_UC
- with a flag called multiproto mode.
-@@ -52,7 +53,7 @@ be enabled explicitly with the "multiproto" flag.
- 3) Device Usage
- 
- The bareudp device could be used along with OVS or flower filter in TC.
--The OVS or TC flower layer must set the tunnel information in SKB dst field before
--sending packet buffer to the bareudp device for transmission. On reception the
--bareudp device extracts and stores the tunnel information in SKB dst field before
-+The OVS or TC flower layer must set the tunnel information in the SKB dst field before
-+sending the packet buffer to the bareudp device for transmission. On reception, the
-+bareUDP device extracts and stores the tunnel information in the SKB dst field before
- passing the packet buffer to the network stack.
--- 
-2.43.0
+Feng
 
+On Thu, Nov 21, 2024 at 12:09=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> Hi,
+>
+> On 11/19/24 23:04, Feng Wang wrote:
+> > From: wangfe <wangfe@google.com>
+>
+> Unneeded, since the author (you) matches the submitter email address
+> (yours).
+>
+> BTW please include a patch revision number into the subj prefix to help
+> reviewers.
+>
+> > @@ -240,6 +256,7 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_=
+buff *skb)
+> >       struct xfrm_state *xs;
+> >       struct nsim_sa *tsa;
+> >       u32 sa_idx;
+> > +     struct xfrm_offload *xo;
+>
+> This is network driver code, please respect the reverse x-mas tree order
+> above.
+>
+> > diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+> > index e5722c95b8bb..59ac45f0c4ac 100644
+> > --- a/net/xfrm/xfrm_output.c
+> > +++ b/net/xfrm/xfrm_output.c
+> > @@ -706,6 +706,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *sk=
+b)
+> >       struct xfrm_state *x =3D skb_dst(skb)->xfrm;
+> >       int family;
+> >       int err;
+> > +     struct xfrm_offload *xo;
+> > +     struct sec_path *sp;
+>
+> I see the xfrm subtree is more relaxed with the reverse x-mas tree
+> order, but for consistency I would respect it even here.
+>
+> Cheers,
+>
+> Paolo
+>
 
