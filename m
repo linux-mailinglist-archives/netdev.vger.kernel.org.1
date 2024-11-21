@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-146666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A2B9D4EFC
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:48:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004789D4EFF
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B33A7281E4F
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:48:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79CEF1F21AAF
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891C91DFE03;
-	Thu, 21 Nov 2024 14:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F671DFE30;
+	Thu, 21 Nov 2024 14:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="egn34iF4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MuOmbRms"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3241DFD82;
-	Thu, 21 Nov 2024 14:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780381DFDBF;
+	Thu, 21 Nov 2024 14:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732200245; cv=none; b=cM2iKEN3G6fOqp4Nv0ol4CPvD0CCeltYx8SG7R3GRlG4EVmTTrqIGRaXedT07PnLCnjyw9hMIOIKVNnn2qerm/mXjPOEjgugWZD39HGPYqxQhVIqB8eRhqMsBYv8EFcoSVRtacfyhS+oqK6chRw88pYBuWhhkqOWnI29GuQwjOk=
+	t=1732200247; cv=none; b=WPUBSPxJfyuXBagjGqKZuEWFZ0j5w+cYnWklxLAnM6wxPgFGCWIDfIo3D3qfsl/kaJHxR3qqV7uA0g9ydPcSimv5uDdS1Y0ntKiY8u8ir4fVoLQU7jGwmvGFbaAq3cSuvKNAbDOP8NSNShvg8jPylwE8I/thYXfbeuzpmcRbLLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732200245; c=relaxed/simple;
-	bh=QfqHP8jQ3HE57WJ53GO2+IxI/8dWMrI4Z5hUUWqWUFA=;
+	s=arc-20240116; t=1732200247; c=relaxed/simple;
+	bh=yCdz15S5n9bwP+eHaxIWj26ftD8GPdXVftvaKhrORvA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LU1019CDIYqZqTLkKTkrUst3n2CD87hJPr2AvRH+A+oUwP61uZVqy+elL7Nx9+go/kMwYqkKz/0H+tBQm6FfgR9CcOv4LSiA8d6Rjav+P2tKnomyr/GBYorLzr18SGnTDXv002q9aNqi2F/dehB70za417D0CtjgtJ26DWcVGv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=egn34iF4; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=EKqAfJSW2UbRN09lSNBRdhOqKRd3oTswFL3+eP2DPFcL/VI7YegcON72acbPaBKZvF1xTygGhImnYBhJzqEkAi6D+2ljUv9xMSu/5ruiahqsJRPOk8kQdZ8wRFl3MRcayE86/frak8bATc0dAJWRD4wtOeytmArfiEqTFweD1Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MuOmbRms; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D8F1740006;
-	Thu, 21 Nov 2024 14:43:59 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A0C340003;
+	Thu, 21 Nov 2024 14:44:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732200241;
+	t=1732200244;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MRiOopLuCYf+dwOYK9bRpViinqwBSZssZX1G6ZdiUGg=;
-	b=egn34iF4U5Ktiu8MZiJJRYipnbX7sbjp7BajncIw7eluYuQkvQjtUNu8OJgpsd+9Hk0EY8
-	gt6UJhGFzBbxboasTsOrwp/Fh6C1B0BbX07Z3ckJllgevFL/maJ2E7zRF1i/71cwOWw9Yb
-	9R+tFqsOoIXONy4cvycFlvomvMLiLQLheRsHPNJyhdYrpZxLQBPmkqfGJL7afgETEqc2+4
-	hdnmJ6oA/oRe2P4KOMsVRHjh2kq/3CPMvmy44Nr9DMFF5qW4vfqhuPACuNHA8y6CRcRxlM
-	gITg94d6gan4DLpCX47UMQMfj3/L3WL9vYLhsdB780jZuLD8XM7gqpVHg8DF2A==
+	bh=u04a+OXero5sCODR6WNJl3zCEzppF8sFRXUhrvCAEFA=;
+	b=MuOmbRmsOjc4Ak4mjQG71ptircy1YwGmFjL+4izltDHAczySCSRRb44DGGapgcBlg1tkWo
+	BlmiGzQK8lQrfiNG64vczgNWpVWK1Qba2x2Dsh4j0QbfU/iF3CdVFcXh1+0t+noPKAsRQJ
+	HfCWA3aKyxfpjqzywprzrGN1ubt/GSxEaz5BCby5cNenkhGPyO/b8sPg7PO8EYYZnXDnlM
+	ujet5rfH9zCFgRi7oOBnbRC07ddZbQ/hTB8daGGjadvhgwcqpkjlvRMQ01yo4NMYGpkhdY
+	9jHcsqztnF6aqp0pqJl2tk21TAc8+DQzsZEqnBnQaLhZ62YAqI1u+lydR3BLew==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 21 Nov 2024 15:42:40 +0100
-Subject: [PATCH RFC net-next v3 14/27] net: pse-pd: tps23881: Add support
- for PSE events and interrupts
+Date: Thu, 21 Nov 2024 15:42:41 +0100
+Subject: [PATCH RFC net-next v3 15/27] regulator: core: Resolve supply
+ using of_node from regulator_config
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241121-feature_poe_port_prio-v3-14-83299fa6967c@bootlin.com>
+Message-Id: <20241121-feature_poe_port_prio-v3-15-83299fa6967c@bootlin.com>
 References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 In-Reply-To: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -79,249 +79,110 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Add support for PSE event reporting through interrupts. Set up the newly
-introduced devm_pse_irq_helper helper to register the interrupt. Events are
-reported for over-current and over-temperature conditions.
+Previously, the regulator core resolved its supply only from the parent
+device or its children, ignoring the of_node specified in the
+regulator_config structure.
+This behavior causes issues in scenarios where multiple regulator devices
+are registered for components described as children of a controller, each
+with their own specific regulator supply.
+
+For instance, in a PSE controller with multiple PIs (Power Interfaces),
+each PI may have a distinct regulator supply. However, the regulator core
+would incorrectly use the PSE controller node or its first child to look up
+the regulator supply, rather than the node specified by the
+regulator_config->of_node for the PI.
+
+This update modifies the behavior to prioritize the of_node in
+regulator_config for resolving the supply. This ensures correct resolution
+of the power supply for each device. If no supply is found in the provided
+of_node, the core falls back to searching within the parent device as
+before.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
+It is weird that it wasn't seen before, maybe there was not any case
+were it can't find the supply_name from the parent device.
 
-Change in v3:
-- Loop over interruption register to be sure the interruption pin is
-  freed before exiting the interrupt handler function.
-- Add exist variable to not report event for undescribed PIs.
-- Used helpers to convert the chan number to the PI port number.
-
-Change in v2:
-- Remove support for OSS pin and TPC23881 specific port priority management
+Changes in v3:
+- New patch
 ---
- drivers/net/pse-pd/tps23881.c | 178 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 177 insertions(+), 1 deletion(-)
+ drivers/regulator/core.c | 42 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 30 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index b25561f95774..6fe8f150231f 100644
---- a/drivers/net/pse-pd/tps23881.c
-+++ b/drivers/net/pse-pd/tps23881.c
-@@ -17,6 +17,13 @@
- 
- #define TPS23881_MAX_CHANS 8
- 
-+#define TPS23881_REG_IT		0x0
-+#define TPS23881_REG_IT_MASK	0x1
-+#define TPS23881_REG_IT_IFAULT	BIT(5)
-+#define TPS23881_REG_IT_SUPF	BIT(7)
-+#define TPS23881_REG_FAULT	0x7
-+#define TPS23881_REG_SUPF_EVENT	0xb
-+#define TPS23881_REG_TSD	BIT(7)
- #define TPS23881_REG_PW_STATUS	0x10
- #define TPS23881_REG_OP_MODE	0x12
- #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
-@@ -24,6 +31,7 @@
- #define TPS23881_REG_DET_CLA_EN	0x14
- #define TPS23881_REG_GEN_MASK	0x17
- #define TPS23881_REG_NBITACC	BIT(5)
-+#define TPS23881_REG_INTEN	BIT(7)
- #define TPS23881_REG_PW_EN	0x19
- #define TPS23881_REG_2PAIR_POL1	0x1e
- #define TPS23881_REG_PORT_MAP	0x26
-@@ -53,6 +61,7 @@ struct tps23881_port_desc {
- 	u8 chan[2];
- 	bool is_4p;
- 	int pw_pol;
-+	bool exist;
- };
- 
- struct tps23881_priv {
-@@ -791,8 +800,10 @@ tps23881_write_port_matrix(struct tps23881_priv *priv,
- 		hw_chan = port_matrix[i].hw_chan[0] % 4;
- 
- 		/* Set software port matrix for existing ports */
--		if (port_matrix[i].exist)
-+		if (port_matrix[i].exist) {
- 			priv->port[pi_id].chan[0] = lgcl_chan;
-+			priv->port[pi_id].exist = true;
-+		}
- 
- 		/* Initialize power policy internal value */
- 		priv->port[pi_id].pw_pol = -1;
-@@ -1098,6 +1109,165 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
- 	return 0;
+diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
+index 2948a7eca734..b49f751893b9 100644
+--- a/drivers/regulator/core.c
++++ b/drivers/regulator/core.c
+@@ -1936,6 +1936,20 @@ static struct regulator_dev *regulator_lookup_by_name(const char *name)
+ 	return dev ? dev_to_rdev(dev) : NULL;
  }
  
-+/* Convert interrupt events to 0xff to be aligned with the chan
-+ * number.
-+ */
-+static u8 tps23881_it_export_chans_helper(u16 reg_val, u8 field_offset)
++static struct regulator_dev *regulator_dt_lookup(struct device *dev,
++						 const char *supply)
 +{
-+	u8 val;
++	struct regulator_dev *r = NULL;
 +
-+	val = (reg_val >> (4 + field_offset) & 0xf0) |
-+	      (reg_val >> field_offset & 0x0f);
-+
-+	return val;
-+}
-+
-+/* Convert chan number to port number */
-+static void tps23881_set_notifs_helper(struct tps23881_priv *priv,
-+				       u8 chans,
-+				       unsigned long *notifs,
-+				       unsigned long *notifs_mask,
-+				       enum ethtool_pse_events event)
-+{
-+	u8 chan;
-+	int i;
-+
-+	if (!chans)
-+		return;
-+
-+	for (i = 0; i < TPS23881_MAX_CHANS; i++) {
-+		if (!priv->port[i].exist)
-+			continue;
-+		/* No need to look at the 2nd channel in case of PoE4 as
-+		 * both registers are set.
-+		 */
-+		chan = priv->port[i].chan[0];
-+
-+		if (BIT(chan) & chans) {
-+			*notifs_mask |= BIT(i);
-+			notifs[i] |= event;
-+		}
-+	}
-+}
-+
-+static void tps23881_irq_event_over_temp(struct tps23881_priv *priv,
-+					 u16 reg_val,
-+					 unsigned long *notifs,
-+					 unsigned long *notifs_mask)
-+{
-+	int i;
-+
-+	if (reg_val & TPS23881_REG_TSD) {
-+		for (i = 0; i < TPS23881_MAX_CHANS; i++) {
-+			if (!priv->port[i].exist)
-+				continue;
-+
-+			*notifs_mask |= BIT(i);
-+			notifs[i] |= ETHTOOL_PSE_EVENT_OVER_TEMP;
-+		}
-+	}
-+}
-+
-+static void tps23881_irq_event_over_current(struct tps23881_priv *priv,
-+					    u16 reg_val,
-+					    unsigned long *notifs,
-+					    unsigned long *notifs_mask)
-+{
-+	u8 chans;
-+
-+	chans = tps23881_it_export_chans_helper(reg_val, 0);
-+	if (chans)
-+		tps23881_set_notifs_helper(priv, chans, notifs, notifs_mask,
-+					   ETHTOOL_PSE_EVENT_OVER_CURRENT);
-+}
-+
-+static int tps23881_irq_event_handler(struct tps23881_priv *priv, u16 reg,
-+				      unsigned long *notifs,
-+				      unsigned long *notifs_mask)
-+{
-+	struct i2c_client *client = priv->client;
-+	int ret;
-+
-+	/* The Supply event bit is repeated twice so we only need to read
-+	 * the one from the first byte.
-+	 */
-+	if (reg & TPS23881_REG_IT_SUPF) {
-+		ret = i2c_smbus_read_word_data(client, TPS23881_REG_SUPF_EVENT);
-+		if (ret < 0)
-+			return ret;
-+		tps23881_irq_event_over_temp(priv, ret, notifs, notifs_mask);
++	if (dev && dev->of_node) {
++		r = of_regulator_dev_lookup(dev, supply);
++		if (PTR_ERR(r) == -ENODEV)
++			r = NULL;
 +	}
 +
-+	if (reg & (TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_IFAULT << 8)) {
-+		ret = i2c_smbus_read_word_data(client, TPS23881_REG_FAULT);
-+		if (ret < 0)
-+			return ret;
-+		tps23881_irq_event_over_current(priv, ret, notifs, notifs_mask);
-+	}
-+
-+	return 0;
++	return r;
 +}
 +
-+static int tps23881_irq_handler(int irq, struct pse_controller_dev *pcdev,
-+				unsigned long *notifs,
-+				unsigned long *notifs_mask)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	struct i2c_client *client = priv->client;
-+	int ret, it_mask;
-+
-+	/* Get interruption mask */
-+	ret = i2c_smbus_read_word_data(client, TPS23881_REG_IT_MASK);
-+	if (ret < 0)
-+		return ret;
-+	it_mask = ret;
-+
-+	/* Read interrupt register until it frees the interruption pin. */
-+	while (true) {
-+		ret = i2c_smbus_read_word_data(client, TPS23881_REG_IT);
-+		if (ret < 0)
-+			return ret;
-+
-+		/* No more relevant interruption */
-+		if (!(ret & it_mask))
-+			return 0;
-+
-+		ret = tps23881_irq_event_handler(priv, (u16)ret, notifs,
-+						 notifs_mask);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
-+static int tps23881_setup_irq(struct tps23881_priv *priv, int irq)
-+{
-+	struct i2c_client *client = priv->client;
-+	struct pse_irq_desc irq_desc = {
-+		.name = "tps23881-irq",
-+		.map_event = tps23881_irq_handler,
-+	};
-+	int ret;
-+	u16 val;
-+
-+	val = TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_SUPF;
-+	val |= val << 8;
-+	ret = i2c_smbus_write_word_data(client, TPS23881_REG_IT_MASK, val);
-+	if (ret)
-+		return ret;
-+
-+	ret = i2c_smbus_read_word_data(client, TPS23881_REG_GEN_MASK);
-+	if (ret < 0)
-+		return ret;
-+
-+	val = (u16)(ret | TPS23881_REG_INTEN | TPS23881_REG_INTEN << 8);
-+	ret = i2c_smbus_write_word_data(client, TPS23881_REG_GEN_MASK, val);
-+	if (ret < 0)
-+		return ret;
-+
-+	return devm_pse_irq_helper(&priv->pcdev, irq, 0, &irq_desc);
-+}
-+
- static int tps23881_i2c_probe(struct i2c_client *client)
+ /**
+  * regulator_dev_lookup - lookup a regulator device.
+  * @dev: device for regulator "consumer".
+@@ -1960,16 +1974,9 @@ static struct regulator_dev *regulator_dev_lookup(struct device *dev,
+ 	regulator_supply_alias(&dev, &supply);
+ 
+ 	/* first do a dt based lookup */
+-	if (dev && dev->of_node) {
+-		r = of_regulator_dev_lookup(dev, supply);
+-		if (!IS_ERR(r))
+-			return r;
+-		if (PTR_ERR(r) == -EPROBE_DEFER)
+-			return r;
+-
+-		if (PTR_ERR(r) == -ENODEV)
+-			r = NULL;
+-	}
++	r = regulator_dt_lookup(dev, supply);
++	if (r)
++		return r;
+ 
+ 	/* if not found, try doing it non-dt way */
+ 	if (dev)
+@@ -2002,8 +2009,8 @@ static struct regulator_dev *regulator_dev_lookup(struct device *dev,
+ 
+ static int regulator_resolve_supply(struct regulator_dev *rdev)
  {
- 	struct device *dev = &client->dev;
-@@ -1178,6 +1348,12 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- 				     "failed to register PSE controller\n");
- 	}
+-	struct regulator_dev *r;
+ 	struct device *dev = rdev->dev.parent;
++	struct regulator_dev *r = NULL;
+ 	struct ww_acquire_ctx ww_ctx;
+ 	int ret = 0;
  
-+	if (client->irq) {
-+		ret = tps23881_setup_irq(priv, client->irq);
-+		if (ret)
-+			return ret;
-+	}
+@@ -2015,7 +2022,18 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
+ 	if (rdev->supply)
+ 		return 0;
+ 
+-	r = regulator_dev_lookup(dev, rdev->supply_name);
++	/* first do a dt based lookup on the node described in the virtual
++	 * device.
++	 */
++	if (rdev->dev.of_node)
++		r = regulator_dt_lookup(&rdev->dev, rdev->supply_name);
 +
- 	return ret;
- }
++	/* If regulator not found use usual search path in the parent
++	 * device.
++	 */
++	if (!r)
++		r = regulator_dev_lookup(dev, rdev->supply_name);
++
+ 	if (IS_ERR(r)) {
+ 		ret = PTR_ERR(r);
  
 
 -- 
