@@ -1,227 +1,135 @@
-Return-Path: <netdev+bounces-146712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F74F9D53A9
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 20:55:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CE5B9D53B8
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EFD9281B2C
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 19:54:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCABB1F22A7E
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 20:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1581C8797;
-	Thu, 21 Nov 2024 19:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA891BC9ED;
+	Thu, 21 Nov 2024 20:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ao8ygTmu"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="FghJhjBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254071C879E;
-	Thu, 21 Nov 2024 19:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1644D1DDA32;
+	Thu, 21 Nov 2024 20:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732218897; cv=none; b=LHe8kD0GMRUkQUTFSV8wf+TqcUWOrwHCy7KtZn4DVLwXkTMwiI8Psy14Z7dD+H4Urf0h/L4TsWtt4BQxal6a0ga/Wa2Y25tH0xRZ0TyOeeHVbUt1SNvDIA558i5yl4y9JyAh8+FFgcVF7z67FJ4hq9QFpuWwhsM8ZIG7JI5wwhc=
+	t=1732219661; cv=none; b=WQpOZz4GVovcdLLPHCprR3jK3W2qPHOpTeJV/qB5m+yNoa7xQ5CTQXafLlWXWN71KY2k7YlaRh/Fh4EZcFAZTwkmR3e1PdHlWm0Y8F/mljjJUx+qKZCv/TcpP2bGa+u5yFXPWGmmsl0OiJTd8f4JPY6qetULZBKTxN9pypYQFYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732218897; c=relaxed/simple;
-	bh=cCkp6T/5ut6jxWfa0q3B3JwltBL8bFyvsA59iU+TBn0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EGuqvoLwOme4v6wvGVDp8h54cpmZyZ6FnXsdnWPP6PlnPKKf91JIw65DnaD4JPixdu07vcU6ZQob1rmCy8T8yvOWJx6q5/A/HLjCtsHDVSmR8RLAl/7FQCb8yB58EJQ5YnLq7FC/e+egY+3p3zb/rZEp3djno97AalcxGdK84GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ao8ygTmu; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tEDG1-009CVy-1G; Thu, 21 Nov 2024 20:54:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=v/OvbCX67fiKfDPsOSvPlJ92i6d6HdXD7QxhiNZ5o1A=; b=ao8ygTmuqcjWbO3II1En1aQBkC
-	2gZyAB+jNnFyLPsepBk4un1gldp7aG6CfL4pxq2OODmYGqMne6gmf7q8ZYbMTaSI27tGUJXjoWj9D
-	aXnyjlmqOZ1CGFb0km8lGUqDVXthOZviHuCjjnwfICdp6N1hghhDMZLmc45R6ocXxQDMoAZcfAKZv
-	A26udFzPYIwx5KWeJCUILYLMag1qqTYdTVdi2XYE1LQvxnWXObyQE7a5gCOgAqGcaS12HrYW7OZ/q
-	K6tz3II2oHo7kIuIqR2ZBbmGLHyfMpp1rlOy01MwhbhTnk8U7b90aLZxI/TxaG8XLZHpc+xjD3Eat
-	C5G3fgbA==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tEDFz-0006kb-KT; Thu, 21 Nov 2024 20:54:27 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tEDFs-00CqIR-VC; Thu, 21 Nov 2024 20:54:21 +0100
-Message-ID: <350e3a3f-7ebd-471e-95fa-05225d786f1c@rbox.co>
-Date: Thu, 21 Nov 2024 20:54:19 +0100
+	s=arc-20240116; t=1732219661; c=relaxed/simple;
+	bh=6WLBZ5oLh4c1F5I8IkxBtObd6DgFvu5p7Pko9ptaCTA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZNmcFuT+RTPyOvXnlWZwgfVMz3lgVVgTijb+DtIZZ8bx7t6RqL9EZzOwPRtD3PGEYaii4kDRdW32yLMRxUKAyZPCO2X21ZRuVcni/9NKu+EKSf6d4lX4J57TJ9j+HNtM/c1dwQyvn2tuwvnAwlVt6R2b/8so9TNMXICbvPYudhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=FghJhjBV; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from ldvnode.intra.ispras.ru (unknown [10.10.2.153])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 936E740777A2;
+	Thu, 21 Nov 2024 20:07:33 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 936E740777A2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1732219653;
+	bh=I42YNcC0Gzw8hiwK4fNvWO8XT241TcT3a5+brZAF+Vk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FghJhjBVgpooEeDAdGwRoC5rEW6QyAQUxPShsBpd90eX89DaHqAsI6B1ZPRM+DA/d
+	 DKtMfeLsvkeXpJgRqM+lTE3ZEKb+AyCfg7qEtbzu2CNXtw4y79IKuu6jjltIUFDKwd
+	 fOvEoCH1PqmUv20ltgxLGiwnk1+yAwiVuexvpQS0=
+From: Vitalii Mordan <mordan@ispras.ru>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Vitalii Mordan <mordan@ispras.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fedor Pchelkin <pchelkin@ispras.ru>,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	Vadim Mutilin <mutilin@ispras.ru>
+Subject: [PATCH net] marvell: pxa168_eth: fix call balance of pep->clk handling routines
+Date: Thu, 21 Nov 2024 23:06:58 +0300
+Message-Id: <20241121200658.2203871-1-mordan@ispras.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf 3/4] bpf, vsock: Invoke proto::close on close()
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
- <20241118-vsock-bpf-poll-close-v1-3-f1b9669cacdc@rbox.co>
- <7wufhaaytdjp3m3xv7jrdadqjg75is5eirv4bzmjzmezc7v7ls@p52fm6y537di>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <7wufhaaytdjp3m3xv7jrdadqjg75is5eirv4bzmjzmezc7v7ls@p52fm6y537di>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/21/24 10:22, Stefano Garzarella wrote:
-> On Mon, Nov 18, 2024 at 10:03:43PM +0100, Michal Luczaj wrote:
->> vsock defines a BPF callback to be invoked when close() is called. However,
->> this callback is never actually executed. As a result, a closed vsock
->> socket is not automatically removed from the sockmap/sockhash.
->>
->> Introduce a dummy vsock_close() and make vsock_release() call proto::close.
->>
->> Note: changes in __vsock_release() look messy, but it's only due to indent
->> level reduction and variables xmas tree reorder.
->>
->> Fixes: 634f1a7110b4 ("vsock: support sockmap")
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> net/vmw_vsock/af_vsock.c | 67 +++++++++++++++++++++++++++++-------------------
->> 1 file changed, 40 insertions(+), 27 deletions(-)
->>
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index 919da8edd03c838cbcdbf1618425da6c5ec2df1a..b52b798aa4c2926c3f233aad6cd31b4056f6fee2 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -117,12 +117,14 @@
->> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
->> static void vsock_sk_destruct(struct sock *sk);
->> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
->> +static void vsock_close(struct sock *sk, long timeout);
->>
->> /* Protocol family. */
->> struct proto vsock_proto = {
->> 	.name = "AF_VSOCK",
->> 	.owner = THIS_MODULE,
->> 	.obj_size = sizeof(struct vsock_sock),
->> +	.close = vsock_close,
->> #ifdef CONFIG_BPF_SYSCALL
->> 	.psock_update_sk_prot = vsock_bpf_update_proto,
->> #endif
->> @@ -797,39 +799,37 @@ static bool sock_type_connectible(u16 type)
->>
->> static void __vsock_release(struct sock *sk, int level)
->> {
->> -	if (sk) {
->> -		struct sock *pending;
->> -		struct vsock_sock *vsk;
->> -
->> -		vsk = vsock_sk(sk);
->> -		pending = NULL;	/* Compiler warning. */
->> +	struct vsock_sock *vsk;
->> +	struct sock *pending;
->>
->> -		/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->> -		 * version to avoid the warning "possible recursive locking
->> -		 * detected". When "level" is 0, lock_sock_nested(sk, level)
->> -		 * is the same as lock_sock(sk).
->> -		 */
->> -		lock_sock_nested(sk, level);
->> +	vsk = vsock_sk(sk);
->> +	pending = NULL;	/* Compiler warning. */
->>
->> -		if (vsk->transport)
->> -			vsk->transport->release(vsk);
->> -		else if (sock_type_connectible(sk->sk_type))
->> -			vsock_remove_sock(vsk);
->> +	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->> +	 * version to avoid the warning "possible recursive locking
->> +	 * detected". When "level" is 0, lock_sock_nested(sk, level)
->> +	 * is the same as lock_sock(sk).
->> +	 */
->> +	lock_sock_nested(sk, level);
->>
->> -		sock_orphan(sk);
->> -		sk->sk_shutdown = SHUTDOWN_MASK;
->> +	if (vsk->transport)
->> +		vsk->transport->release(vsk);
->> +	else if (sock_type_connectible(sk->sk_type))
->> +		vsock_remove_sock(vsk);
->>
->> -		skb_queue_purge(&sk->sk_receive_queue);
->> +	sock_orphan(sk);
->> +	sk->sk_shutdown = SHUTDOWN_MASK;
->>
->> -		/* Clean up any sockets that never were accepted. */
->> -		while ((pending = vsock_dequeue_accept(sk)) != NULL) {
->> -			__vsock_release(pending, SINGLE_DEPTH_NESTING);
->> -			sock_put(pending);
->> -		}
->> +	skb_queue_purge(&sk->sk_receive_queue);
->>
->> -		release_sock(sk);
->> -		sock_put(sk);
->> +	/* Clean up any sockets that never were accepted. */
->> +	while ((pending = vsock_dequeue_accept(sk)) != NULL) {
->> +		__vsock_release(pending, SINGLE_DEPTH_NESTING);
->> +		sock_put(pending);
->> 	}
->> +
->> +	release_sock(sk);
->> +	sock_put(sk);
->> }
->>
->> static void vsock_sk_destruct(struct sock *sk)
->> @@ -901,9 +901,22 @@ void vsock_data_ready(struct sock *sk)
->> }
->> EXPORT_SYMBOL_GPL(vsock_data_ready);
->>
->> +/* Dummy callback required by sockmap.
->> + * See unconditional call of saved_close() in sock_map_close().
->> + */
->> +static void vsock_close(struct sock *sk, long timeout)
->> +{
->> +}
->> +
->> static int vsock_release(struct socket *sock)
->> {
->> -	__vsock_release(sock->sk, 0);
->> +	struct sock *sk = sock->sk;
->> +
->> +	if (!sk)
->> +		return 0;
-> 
-> Compared with before, now we return earlier and so we don't set SS_FREE, 
-> could it be risky?
->
-> I think no, because in theory we have already set it in a previous call, 
-> right?
+If the clock pep->clk was not enabled in pxa168_eth_probe,
+it should not be disabled in any path.
 
-Yeah, and is there actually a way to call vsock_release() for a second
-time? The only caller I see is __sock_release(), which won't allow that.
+Conversely, if it was enabled in pxa168_eth_probe, it must be disabled
+in all error paths to ensure proper cleanup.
 
-As for the sockets that never had ->sk assigned, I assume it doesn't matter.
+Use the devm_clk_get_enabled helper function to ensure proper call balance
+for pep->clk.
 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
->> +
->> +	sk->sk_prot->close(sk, 0);
->> +	__vsock_release(sk, 0);
->> 	sock->sk = NULL;
->> 	sock->state = SS_FREE;
+Found by Linux Verification Center (linuxtesting.org) with Klever.
+
+Fixes: a49f37eed22b ("net: add Fast Ethernet driver for PXA168.")
+Signed-off-by: Vitalii Mordan <mordan@ispras.ru>
+---
+ drivers/net/ethernet/marvell/pxa168_eth.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/pxa168_eth.c b/drivers/net/ethernet/marvell/pxa168_eth.c
+index 1a59c952aa01..45f115e41857 100644
+--- a/drivers/net/ethernet/marvell/pxa168_eth.c
++++ b/drivers/net/ethernet/marvell/pxa168_eth.c
+@@ -1394,18 +1394,15 @@ static int pxa168_eth_probe(struct platform_device *pdev)
+ 
+ 	printk(KERN_NOTICE "PXA168 10/100 Ethernet Driver\n");
+ 
+-	clk = devm_clk_get(&pdev->dev, NULL);
++	clk = devm_clk_get_enabled(&pdev->dev, NULL);
+ 	if (IS_ERR(clk)) {
+-		dev_err(&pdev->dev, "Fast Ethernet failed to get clock\n");
++		dev_err(&pdev->dev, "Fast Ethernet failed to get and enable clock\n");
+ 		return -ENODEV;
+ 	}
+-	clk_prepare_enable(clk);
+ 
+ 	dev = alloc_etherdev(sizeof(struct pxa168_eth_private));
+-	if (!dev) {
+-		err = -ENOMEM;
+-		goto err_clk;
+-	}
++	if (!dev)
++		return -ENOMEM;
+ 
+ 	platform_set_drvdata(pdev, dev);
+ 	pep = netdev_priv(dev);
+@@ -1523,8 +1520,6 @@ static int pxa168_eth_probe(struct platform_device *pdev)
+ 	mdiobus_free(pep->smi_bus);
+ err_netdev:
+ 	free_netdev(dev);
+-err_clk:
+-	clk_disable_unprepare(clk);
+ 	return err;
+ }
+ 
+@@ -1542,7 +1537,6 @@ static void pxa168_eth_remove(struct platform_device *pdev)
+ 	if (dev->phydev)
+ 		phy_disconnect(dev->phydev);
+ 
+-	clk_disable_unprepare(pep->clk);
+ 	mdiobus_unregister(pep->smi_bus);
+ 	mdiobus_free(pep->smi_bus);
+ 	unregister_netdev(dev);
+-- 
+2.25.1
 
 
