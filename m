@@ -1,130 +1,157 @@
-Return-Path: <netdev+bounces-146737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D2879D559F
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:46:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A18F9D55A4
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D6A128519B
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:46:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32401F22AEA
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC841D4323;
-	Thu, 21 Nov 2024 22:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56871DD877;
+	Thu, 21 Nov 2024 22:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hhi5quU/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbHx9+Dr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23C123098E;
-	Thu, 21 Nov 2024 22:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCF55695;
+	Thu, 21 Nov 2024 22:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732229183; cv=none; b=AcJknMn+KPkIOrgt/KkqcS9YCh4+1HJFUTH8f5SRG1V7aZVStuhecSZ0zbKOMmZjutdU7PUw/g2l8u8HYeE8fZAcyRAAdTPDJc2W6xWy/cevYsgz+hRquJthn6eB+L9iM7OsCX2heIKDivmmXog7xgQJ4A0V0gi08equ/xO63i4=
+	t=1732229252; cv=none; b=OO7asPfbRVgMo9MRIoMAOkuTFz/FgZkqDWkrtaN++NBqjjEcrWy3TndImvOj2W0TOT/m+7S61XiM37R2YjSpMleqQ+SA1EaRPekLAoS1qtJenkgH05ZaVUJVsS4S8E6pNTxHkdIbaO0aOMAlV1KUAi1cM52Q43J5yDQwiVoDp5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732229183; c=relaxed/simple;
-	bh=B8qDvfPULVWvMgZkxlUWxZQtkkngTTpNRPkD7iLA/eU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W12tvZuA7VRyd/nv91jTNtCD69LB4PSkwzlsOYGIOP7cvUkX7F7XJs72oEcBX2GAIxaScX8fgKu/lWnCIwTlMlsLrhyixmEquKbYScWRYJrscHRzIko67hul6Ljv9A5Uut8Ru+knOPjsuHgvNykfJ94CqzBpCrBqy8NUhW63ErY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hhi5quU/; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1732229252; c=relaxed/simple;
+	bh=VW7tTRiIAv1QMTyboro/hE7Usujn5p2rlmQqvJdRP2Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WbfOGISmH83tFL68VcO80Vh7NGMz5zsp6BXYEpOlqxy6ruexsvu2I/pbvDOS34B859fkzksa12ytHFa6c68NkjunhDNco+ADTqjLa2RJlY6yRwtkseqFIxpv2JkRskEBSf5KQdCTOaTIeuokiM29tsijrIFV3c5hXzsM17fVkMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hbHx9+Dr; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21288402a26so14344055ad.0;
-        Thu, 21 Nov 2024 14:46:21 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4319399a411so13143305e9.2;
+        Thu, 21 Nov 2024 14:47:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732229181; x=1732833981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dz00sH94+EWwFPuEsmTdejC/s0s5/Fjq48pe4/Lh2Cs=;
-        b=Hhi5quU/1i8U8YNK7WikSRsaqGaMT4xVyQJC43ycztwCAVIlfssABbCIrWMa4n/h/8
-         5JZ+wF/SbBXyVesnd6gBUEqp0Ssk/8wAUTV5BGsNxhNY2Las0dhERNJs0daPz4nalCqL
-         ZiU8g5RlGhBmoj6C+ipaHIQ1nMlZTvdrdLLXbkGuHq632WaIXg1p2y2yJoHljhI2QaSK
-         f9a0NBVtzkGnPKGvxRqBofDw2nHhXeJ9Sd5nW2G+GjeKkN1Q3dBj8/m7MMOoi4KTt9lU
-         0OtsRTRiEiz2G1B8z5wTfcFUx2Ocfe7b0dELnD0tPdgwaiEvn+qX0TqwcjfNtAZlsteN
-         +mBg==
+        d=gmail.com; s=20230601; t=1732229249; x=1732834049; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6Nk9fK4JWlgagJ1kpp8N9NH5gPa4sBDA9mJEW1eUThs=;
+        b=hbHx9+DrZxLkLABSTyJRSrjIhEz/58VvWDNZYj3mdE5w96Ilvuo1IutWHXewg3DcSk
+         QBJPUbi0A6qI3dLiXahi6+50EXYQ5AgkFBCyys4JxCHMhq1s1/+ag5G+phwK1Yan0+o8
+         hqUfqV6030X9J59SHsGZ2cK2pF+xh0TXXtvi8dPBf5apW1Y7veNPPhDTbjPad5dEXuqu
+         smdpD7n1WTVNs8X4cTH7L57ifAFC8shIKD7klcC8HRHmaMNTXB1ujT+sN1JGnlXdI0wh
+         5x8EWw9IuDznz8vt0BHgkqUSiZZgYtYeyQYBY32b3NS23VAGV2WwvKX5bx/J76UKnA9u
+         8zJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732229181; x=1732833981;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dz00sH94+EWwFPuEsmTdejC/s0s5/Fjq48pe4/Lh2Cs=;
-        b=nqIVYqbeZtsThLxPZ+B1K1XZlvtQYauKcWetS8UwvgBXL4QpobFQoaEHMX4Nsollgt
-         t6j3IYp7Kctstk45eKrsf2igbZpxLRE1LsbkH/YXLLf2QcgDY7KhUL2YhTcA+kXSl057
-         jNB+Zpc/eDoE5Z3/Pn1x59pF46oSQYbOyyPzAcg2Yg+jso3Gelk5dvN/wmSXfw4L/xIF
-         dMsmGxGFGRdz+2d+cVPS31vL3MHXoUIL4lF5OUqDVCAwNxp4F/TbbOUm1Wa1MtBFIhcF
-         jBXDrAohQSrYMPQuLM4S1bj69fsL/qJ0oJI5miCkeCQK5036YMVdRT0kbhmYVAXCoQ4I
-         RIxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMepCXB+4Z+Z7o844OULyqi231WNhWY7V/igqDLmVKVCLO2iw3DBCCJXoqgBnyhUcsHLVSUDs6w2o=@vger.kernel.org, AJvYcCVrw/MMLp481zrxq4O6ceUBis5dadKIYq2bTjZwALW7r6R76crubNgAXU3yHAEC/wi+G1wTweMFxNC/qKA9@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuwVH+i/YcDhohK/KgvKoJ8IEBJt9TCNgJcth6bb3xBVBQ0mn9
-	dsmmSsAdoFhoO4j1etfnM8rANRoCTfic+bU8i66i77DccreMSuo=
-X-Gm-Gg: ASbGncuho190bOSafHoXCIqetOaBEMlZHtGOY6Mt0thtJyVFe4CsddmRp5W1JReLEAB
-	iHOlBHPxkJ2hFjd+NkbL+y52OlPMzkqpeTQjI8gg8vPEx6Kt5rMJiy9wrjiJKLOxs2jJfz5DHPR
-	1cE80/1lnxBxUZBJ7xbOhgnqVPSNLVXIQre87HBmWa7u29MPs0dnQfN7vAIGM3/xp3XaFDj0dA9
-	FpZPUlAhbFsGhH6U8la/6xxoJpgbK9H0DmtYGhDaenf6yn/252Ax8X2q1w7ExBm9NXuoHqjE6I=
-X-Google-Smtp-Source: AGHT+IFjRI1i6uSTwsAPegQoHq3JoUEKY1x5RTEXDctgnlWzpbgDhhm9fmHuaQl4nvuurvM3efYaow==
-X-Received: by 2002:a17:902:f711:b0:20c:dbff:b9d8 with SMTP id d9443c01a7336-2129f28a632mr11817765ad.37.1732229180892;
-        Thu, 21 Nov 2024 14:46:20 -0800 (PST)
-Received: from localhost.localdomain ([117.250.157.213])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129db8c760sm3502945ad.30.2024.11.21.14.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 14:46:20 -0800 (PST)
-From: Vyshnav Ajith <puthen1977@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vyshnav Ajith <puthen1977@gmail.com>
-Subject: Slight improvement in readability
-Date: Fri, 22 Nov 2024 04:16:04 +0530
-Message-ID: <20241121224604.12071-1-puthen1977@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1732229249; x=1732834049;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Nk9fK4JWlgagJ1kpp8N9NH5gPa4sBDA9mJEW1eUThs=;
+        b=IRKw2OYRKjA3gvmtrGGWmKfku1q165m4Tf1IpVLs/401ktOKX8pFlPQtvlyScxWo0P
+         ubwoJ8c0V1yGTbpYfP9SZLW4IzDZ21k8sJJ4TK/npBjSuU/TOTXmndIJj35a0THmjbSq
+         56juvvegCH89u5s2v36DEqPRRFb71WXJu/Ry1DEcmY+uab2Q1ilkfeTScgKBzYPYcKgV
+         Ou18gRuTJB/laBLs7+84POCFz9inGiLY2/5Bf9VkGTdyJXPVFMNc0Bxe+6e09Z03MgpM
+         y6ZqLWs5oSn3HshTZ4pOOzOJEUAJYpivtdYML5ADLuSQYnvSlZuH3rl0oWDVQo9Ze5E1
+         NJFw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2M7kh1zT9diHuo4qfvBGboRCQECRL7GUdLTvxzeTSFaMjAXuwr5Cf/uHaC5v4FjDoapASusSzdSa4PYPy@vger.kernel.org, AJvYcCWli6MjfQbUqN7Fcam3SH47WRN8BIzVsq5pdqy0KEK/Di+mJH12MjzqmOP2LOXgVu9YusfsEajh@vger.kernel.org, AJvYcCX/HeKiNqmxTr/F20DAhBr0vOy8in471785TfL/2ug6lHDETxfSZnkJTQL/5i6ocDX9u1TjWc/JM9wZVafZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJNA9Az0PCwpD0O0CN1zoL0NqfSKRlT5XwrFlUk1EDli4Qj4Kk
+	FjEB8t326tDT2GcbghQiU5JCBh9mIjhjUs694hxAzHwgfm7cm7+z
+X-Gm-Gg: ASbGnctbY2xs3qUvQRwl/8zSYstbPsr3ZBIYlEkNDIei8C5vScZSupbaxQeqDB7hPtc
+	X3GUQLpq5y2gmDhXpqHr1+H1g34AVTLRaxLNi2/Z2OWn4ngYx/hePBR91B0cran29DBEj4x1cKg
+	/ZSlgbrjVe95YACgltg44U/x8F3u63eD0iwHS0cShq6hodiIhtWofvkBrIgwHDwhZ2pVHB16UA7
+	9iSSG1vAVF4sDarzjFFhUS5IcKzKGN5IvVWPF4XU3+cKKeMf6I=
+X-Google-Smtp-Source: AGHT+IHhNMpbhtfsR58XBjE2yLhVvJGJGzZJcQFDA08gpNGngBlSgE/v8hVIIhUTbWukcSqs8HgN3A==
+X-Received: by 2002:a05:600c:348b:b0:42c:c003:edd1 with SMTP id 5b1f17b1804b1-433ce41ce4emr4943055e9.10.1732229249204;
+        Thu, 21 Nov 2024 14:47:29 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433cde97c68sm6688705e9.36.2024.11.21.14.47.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2024 14:47:28 -0800 (PST)
+Message-ID: <7c3e2575-24ea-4294-a877-59be65e4af5d@gmail.com>
+Date: Fri, 22 Nov 2024 00:48:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: wwan: Add WWAN sahara port type
+To: Loic Poulain <loic.poulain@linaro.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Jeffrey Hugo <quic_jhugo@quicinc.com>,
+ Jerry Meng <jerry.meng.lk@quectel.com>,
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+References: <20241120093904.8629-1-jerry.meng.lk@quectel.com>
+ <863ba24c-eca4-46e2-96ab-f7f995e75ad0@gmail.com>
+ <fbb61e9f-ad1f-b56d-3322-b1bac5746c62@quicinc.com>
+ <CAMZdPi_FyvS8c2wA2oqLW5iVPXRrBhFtBU8HOqSdNo0O1+-GUQ@mail.gmail.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <CAMZdPi_FyvS8c2wA2oqLW5iVPXRrBhFtBU8HOqSdNo0O1+-GUQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Removed few extra spaces and changed from "a" to "an ISP"
++Jiri
 
-Signed-off-by: Vyshnav Ajith <puthen1977@gmail.com>
----
- Documentation/networking/eql.rst | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Loic,
 
-diff --git a/Documentation/networking/eql.rst b/Documentation/networking/eql.rst
-index a628c4c81166..4f47121323c9 100644
---- a/Documentation/networking/eql.rst
-+++ b/Documentation/networking/eql.rst
-@@ -23,9 +23,9 @@ EQL Driver: Serial IP Load Balancing HOWTO
- 
-   Which is worse? A huge fee for a 56K leased line or two phone lines?
-   It's probably the former.  If you find yourself craving more bandwidth,
--  and have a ISP that is flexible, it is now possible to bind modems
-+  and have an ISP that is flexible, it is now possible to bind modems
-   together to work as one point-to-point link to increase your
--  bandwidth.  All without having to have a special black box on either
-+  bandwidth. All without having to have a special black box on either
-   side.
- 
- 
-@@ -288,7 +288,7 @@ EQL Driver: Serial IP Load Balancing HOWTO
-   the load across two or more Cirrus chips.
- 
-   The good news is that one gets nearly the full advantage of the
--  second, third, and fourth line's bandwidth.  (The bad news is
-+  second, third, and fourth line's bandwidth. (The bad news is
-   that the connection establishment seemed fragile for the higher
-   speeds.  Once established, the connection seemed robust enough.)
- 
--- 
-2.43.0
+On 21.11.2024 11:08, Loic Poulain wrote:
+> On Wed, 20 Nov 2024 at 22:48, Jeffrey Hugo <quic_jhugo@quicinc.com> wrote:
+>> On 11/20/2024 1:36 PM, Sergey Ryazanov wrote:
+>>> +Manivannan
+>>>
+>>> Hello Jerry,
+>>>
+>>> this version looks a way better, still there is one minor thing to
+>>> improve. See below.
+>>>
+>>> Manivannan, Loic, could you advice is it Ok to export that SAHARA port
+>>> as is?
+>>
+>> I'm against this.
+>>
+>> There is an in-kernel Sahara implementation, which is going to be used
+>> by QDU100.  If WWAN is going to own the "SAHARA" MHI channel name, then
+>> no one else can use it which will conflict with QDU100.
+>>
+>> I expect the in-kernel implementation can be leveraged for this.
+> 
+> Fair enough, actually the same change has already been discussed two
+> years ago, and we agreed that it should not be exposed as a WWAN
+> control port:
+> https://lore.kernel.org/netdev/CAMZdPi_7KGx69s5tFumkswVXiQSdxXZjDXT5f9njRnBNz1k-VA@mail.gmail.com/#t
 
+Thank you for reminding us about that conversation. There you have 
+shared a good thought, that the WWAN framework suppose to export mostly 
+management ports. And all other debug/dump/reflash features should be 
+implemented using corresponding kernel APIs.
+
+Last year, more port types were merged. As part of the T7xx driver 
+development. Specifically it were Fastboot, ADB, and MIPC. See:
+- 495e7c8e9601 wwan: core: Add WWAN ADB and MIPC port type
+- e3caf184107a wwan: core: Add WWAN fastboot port type
+
+If ADB somehow could be considered a management interface. MIPC and 
+Fastboot are firmware management interfaces. And I recall a discussion 
+regarding the Fastboot implementation and there was a NACK from someone 
+from devlink subsystem.
+
+Personally, I prefer the firmware management/debugging operations being 
+implemented using a generic kernel API like it was done in IOSM. And we 
+are suggesting contributors to use the existing kernel API instead of 
+exposing RAW interfaces. On another hand, devlink developers are not 
+happy to see this kind of devlink usage.
+
+Loic, do you have any idea how to solve this puzzle? And how do you 
+think, shall we do something regarding the already introduced 
+Fastboot/ADB/MIPC port types?
+
+--
+Sergey
 
