@@ -1,205 +1,289 @@
-Return-Path: <netdev+bounces-146705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CEFB9D52AA
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 19:42:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C594B9D52C6
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 19:49:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8943BB269BB
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 18:42:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5747F1F2146B
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 18:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017E81BC07B;
-	Thu, 21 Nov 2024 18:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6D41B5829;
+	Thu, 21 Nov 2024 18:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCPgxIPG"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pWhZbz89"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A1A139597;
-	Thu, 21 Nov 2024 18:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5968C200A3
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 18:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732214532; cv=none; b=JM9/AW9H6AZJnqYPMQPm02V+nw9AOUmqLhPODyJTFlBdiEBU/49i19dmmdALJVkI84v/c9ZURUmM1SQDxKiAWxdlwDDQzUVTbdy81rTXrx4vUOAaO9ozXI8GLR7HG42wVFg17dS3OcvJ982VpkJ9TOOBZJQvYXiTSuD2hAChY9Q=
+	t=1732214978; cv=none; b=PcRJRbqDoMWj0dyQ1oNwqqffGFiUJ2q6TtfCWJjXh7ODyo7Pw2yiq6kHIyP8AWWcsn5/51Gh/afoYziNZcdzcfOC3Zoocye03w484rLMo6H8GpUyqgTJS4/g9OLxHHIjTEzQU12NP72L1zpcknqpmCpEa7e6Tx0aji644onYWBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732214532; c=relaxed/simple;
-	bh=4ZOZYSGT9MiXACTC9i0gSBIs254zlFZ1yEDhRSCBbzw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=h5FOeDdT9t+Ga4Mxstq5Hspqby5omNwfzU1GoHACJCoMQNXo+g3f+D82tdi3uTBPHHZjeBKh305ffWld9dEDOEHh0Tdb6FCXOYknhjgBTBTilkioy7vDFNznlNAL2/BwHCKB2BAX8xJLO5Miht+Zm95+dtPVTaRugI4GKJRsHpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCPgxIPG; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7b157c9ad12so77528385a.1;
-        Thu, 21 Nov 2024 10:42:11 -0800 (PST)
+	s=arc-20240116; t=1732214978; c=relaxed/simple;
+	bh=Wc0ZKcB3iv9MPXZcE0WjkapIvTRG8IXCHkhb9YPVfQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qX2xMTs+lza14RGQ5PXKHidH3ZXQ6z40Qj59mstfZHxSlzpfTPBeKQL+ard9a48ADvb0kApfe0mGOfcGGhap45/LZXZylcMWmORWTRbP8yfIAmj8yWKC1cckOZRVoTslzkRKZAs3aMZe7o4AWIG2OD20RapG2Mki5KmbZuv3ROE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pWhZbz89; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2128383b86eso12722245ad.2
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 10:49:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732214530; x=1732819330; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jmdOgbqBPUJl7sAppIUwjIKcePWDsMluXPvHfEsrgt8=;
-        b=bCPgxIPGElLhlD7gSotFb/IK9BPHIs8yBHgIfaf3QxOb7ZgT2DNs4MRU3WZi21EshR
-         pJKF9C8h/NuAt0/uE2KcL8JtdR27uV/CSIKEfmuzFoSiA8IgreHg+EsMh8hJhAGSbWZg
-         BPNL5Dcr9dyYk6f4A1JmKaFWD5ltTAIs4bloF6W0uYe/yvphdvsv7mEckH5WyHU7uzr7
-         NIA/79XUW8FP8QldDzvgZpPBeSIFlncrAXAqytFBm+cqPsZZgRd4E3WogvI3jecyILuO
-         EkR7ESc/YG/pVL2SorgjXWu4ChgW7ZzoNLXm5LIJDXVvGPtGSQ8kPMJ8fs+o1NSIRZf5
-         WlOQ==
+        d=fastly.com; s=google; t=1732214975; x=1732819775; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tQMI0hSDvVmdQQ1OGP+fb8BXhpmdoFrOTrzPs1hsETI=;
+        b=pWhZbz893dbf9r0P01WFGLbVEPpwOFVzrPaOy3V7xqNCKk4MKUEbgq2rE2h9sq7ugC
+         Hs9GjU5fZCIZ/LbuCdV0GHkO/r9Gvk3YKTLBFrl7C765T1x0dEZxD36RmpZAlZeFTfsg
+         FqgjlBEdrXt7Qmyl0kxedIzsKZFYNsb2Kp0ag=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732214530; x=1732819330;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jmdOgbqBPUJl7sAppIUwjIKcePWDsMluXPvHfEsrgt8=;
-        b=Z5jkGqpU6iFqbrYLvxDN5IuqL5nhjZ4MlgoRh25p3oar+saOu6WCBhcpBljwpa1czl
-         vAvi9hK7ojDEELT7SAPYt/FNZVAbMu095K3ZgXAXd0OV/t9b0MvpZZEVfRPPydc7rLt8
-         X/ty2Uq8qYhjflSLiEuPweVPGM/HCKSkDBEfe+yJEZe4ngvGi4mTb0J/F0yNfT17TnC8
-         vOibI3wL06G9IhUY+tt1iv65Y+blWXkC1pbvKp1KU/PZljHj1bTPmyP4VlA6/1jT3QDo
-         30vF2KWF6YzAvYIItCpOeVPdZjIXJZJ5PVnfdZcok/kdKMTMtEbkpD8vV/x5BkZGrmyw
-         Kdmg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8mJj75tlV5q1uHZRNIUEHunXV1JT93X5nxtkTccsSJpGeDYa+Rrlx4blxDxauMxcdODfChBZF5bnnv5qB@vger.kernel.org, AJvYcCVwN+8OZ7b4oh+ZPSIBHt5pOtenTFdAKitFuXuA7AOAL3Ap5AzQMcOeMawAD0cl/TuwFMw=@vger.kernel.org, AJvYcCWMlYa2Vdwmw3+Bf66ekuvW1KeX87bqaMZHBOEGDTZ0/qK+i5ERvsgnT/qC65wdJbfrUFTQmPgW@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf7oknn7erqvVMhej0qkB4mXqkta3jbU8KlzMPuj2kyRZQnGur
-	3NC1a4yvvKNPplQzGzxc+rnTMUnmhzAdTJK8CvSVmPnIZn4vQVRT
-X-Gm-Gg: ASbGncuSGqrYRwqMVeD+UFKzoH86tYHtIfEGTbnXWbpOF0WPJhdpYATExny2R+k9Ij7
-	ZYJGImeHvDBX8sjYb4/PqYm7n21e/UtePkw35YYv88hhrx6AHvW0c4tbW0wkz5BWHMQXWKIHAPi
-	jMrkfXd5js3d+OFggQNUbw5vmit04esRl/kneS42gY5oPfkPHr1fZ9svcjtukma++739NuiaZtE
-	rcC8MaZAEYCsEIXZGih6e0TUsXqrKkNMTUJQ28l0eZ8DeDlz23munlUIqm7Bvaryr2K5Hh+C4cu
-	VBp/RPKnAIuW9YqWkmZSGQ==
-X-Google-Smtp-Source: AGHT+IFofUQ3XTph+PXQDeyalPqr8Wf++DjeBHaM1eFHOLZvndMCNCiX5H/I12tKbgyZy4m8Ghrrkw==
-X-Received: by 2002:a05:620a:19a4:b0:7a9:b8dd:eb96 with SMTP id af79cd13be357-7b51455cce1mr9934085a.30.1732214530165;
-        Thu, 21 Nov 2024 10:42:10 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b51416aae7sm6088585a.115.2024.11.21.10.42.09
+        d=1e100.net; s=20230601; t=1732214975; x=1732819775;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQMI0hSDvVmdQQ1OGP+fb8BXhpmdoFrOTrzPs1hsETI=;
+        b=gnvD6z3/FcvkK04bhJ7TVS2LzGAu79je7nxYx8xZb+kCawSggXUC2U+m1RZ7o17ZJZ
+         Bjr68KvSPNXhE/vn1vXPw5Xc1DUyS1W9AtFW3QENSltexDTeEKk8dcWRg3VQtiXYTOJ0
+         694QDurd8ppAWLr1Z8haqTGoa0kiTpAUxnCBpHKsxHGTmkTQ+ScpYCuVBlJ+8Rfm68u/
+         spJ270riLcZdmHBxRX3NPaoR3t+7s/XHtAMw2B8CWVjRBidEnwYa9ye0q77ORAT3osfZ
+         b9gM6KXOyy67FE/f8xjBtMHWSrd/QNQOcEi3EIGfdjjUefNjAFu+cDKspoN6KdxAjQE0
+         dwxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUiqzlTtb9ObCJsrgvWYaX+jEPJ2b0YEHMQ7zXNFS1MtGXqmUvDBeS2WgqzT0Q5636AYoDj1C4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJ6vjx59qujIRbQEevC7wJ5KiDeAYNQRq62EBWnFN60w5l/lb7
+	LQuxNYsLB0BAtNmpweeUZznFCYdpTzY877WlOKOzp1pCDyZv+CeRSESSvg4ngb4=
+X-Gm-Gg: ASbGncvEeQD4VTLZmK0ckNsbw4w3hM4S13uKAXnN1D/srHGn3Gde27NdU1zhEQvT3Gu
+	ZFohWGitCrZu/rX/F1pr6bulii1wpKatEB5coaVtkvkALj8cxCyjwZUxJUddxZRnP+xlQayW4Ys
+	8egzsykMCvhwdZuFbTG36kVX192HVuR2/9xq/SQuwptOH/kiDvgP8iB6QfkeiEc9z4eGVtKYacP
+	eGbaprGJa54uJf7i2XO6aU5K4kmcEiZOjWficqVC4aGB9nli2Ep4ydRSemRbeOy37CTjRBdYmGT
+	9kX7Qk6YdT9De/2A
+X-Google-Smtp-Source: AGHT+IEWdxqb7Z8B6G2oePuz9oXeL7SHrZGIzmst0Bh+eGzwmiufVjtTHE05ckkF2orkBNLRL1Pe8g==
+X-Received: by 2002:a17:902:d4c8:b0:212:26e:cf9 with SMTP id d9443c01a7336-2129f3be7bemr962115ad.16.1732214975505;
+        Thu, 21 Nov 2024 10:49:35 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129db8c9a5sm1643585ad.46.2024.11.21.10.49.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 10:42:09 -0800 (PST)
-Date: Thu, 21 Nov 2024 13:42:09 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <673f7f013a3b0_d495a294be@willemb.c.googlers.com.notmuch>
-In-Reply-To: <55628623-220c-4512-acdc-0b3bd38685e1@intel.com>
-References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
- <20241115184301.16396cfe@kernel.org>
- <6738babc4165e_747ce29446@willemb.c.googlers.com.notmuch>
- <52650a34-f9f9-4769-8d16-01f549954ddf@intel.com>
- <673cab54db1c1_2a097e2948c@willemb.c.googlers.com.notmuch>
- <6af7f16f-2ce4-4584-a7dc-47116158d47a@intel.com>
- <673f55109d49_bb6d229431@willemb.c.googlers.com.notmuch>
- <55628623-220c-4512-acdc-0b3bd38685e1@intel.com>
-Subject: Re: [PATCH net-next v5 00/19] xdp: a fistful of generic changes
- (+libeth_xdp)
+        Thu, 21 Nov 2024 10:49:35 -0800 (PST)
+Date: Thu, 21 Nov 2024 10:49:32 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: admiyo@os.amperecomputing.com
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH v8 2/2] mctp pcc: Implement MCTP over PCC Transport
+Message-ID: <Zz-AvBwUgNzMJb7-@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	admiyo@os.amperecomputing.com,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+References: <20241120190216.425715-1-admiyo@os.amperecomputing.com>
+ <20241120190216.425715-3-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241120190216.425715-3-admiyo@os.amperecomputing.com>
 
-Alexander Lobakin wrote:
-> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
-> Date: Thu, 21 Nov 2024 10:43:12 -0500
-> 
-> > Alexander Lobakin wrote:
-> >> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
-> >> Date: Tue, 19 Nov 2024 10:14:28 -0500
-> >>
-> >>> Alexander Lobakin wrote:
-> >>>> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
-> >>>> Date: Sat, 16 Nov 2024 10:31:08 -0500
-> >>
-> >> [...]
-> >>
-> >>>> libeth_xdp depends on every patch from the series. I don't know why you
-> >>>> believe this might anyhow move faster. Almost the whole series got
-> >>>> reviewed relatively quickly, except drivers/intel folder which people
-> >>>> often tend to avoid.
-> >>>
-> >>> Smaller focused series might have been merged already.
-> >>
-> >> Half of this series merged wouldn't change that the whole set wouldn't
-> >> fit into one window (which is what you want). Half of this series merged
-> >> wouldn't allow sending idpf XDP parts.
-> > 
-> > I meant that smaller series are easier to facilitate feedback and
-> > iterate on quickly. So multiple focused series can make the same
-> > window.
-> 
-> You get reviews on more patches with bigger series. I'm not saying 19 is
-> fine, but I don't see any way how this series split into two could get
-> reviewed and accepted in full if the whole series didn't do that.
-> And please don't say that the delays between different revisions were
-> too long. I don't remember Mina sending devmem every single day. I
-> already hit the top negative review:series ratio score this window while
-> I was reviewing stuff when I had time.
-> Chapter II also got delayed a bit due to that most of the maintainers
-> were on vacations and I was helping with the reviews back then as well.
-> It's not only about code when it comes to upstream, it's not just you
-> and me being here.
-> 
-> [...]
-> 
-> >> I clearly remember Kuba's position that he wants good quality of
-> >> networking core and driver code. I'm pretty sure every netdev maintainer
-> >> has the same position. Again, feel free to argue with them, saying they
-> >> must take whatever trash is sent to LKML because customer X wants it
-> >> backported to his custom kernel Y ASAP.
-> > 
-> > Not asking for massive changes, just suggesting a different patch
-> > order. That does not affect code quality.
-> > 
-> > The core feature set does not depend on loop unrolling, constification,
-> 
-> I need to remind once again that you have mail from me somewhere
-> describing every patch in detail and why it's needed?
-> When we agreed with Kuba to drop stats off the Chapter II, it took me a
-> while to resolve all the dependencies, but you keep saying that wasting
-> time on downgrading code is better and faster than upstreaming what was
-> already done and works good.
-> 
-> > removal of xdp_frame::mem.id, etcetera. These can probably be reviewed
-> 
-> You see already that I even receive additional requests (Amit).
-> Sometimes generic (and not only) changes cause chain reaction and you
-> can't say to people "let me handle this later", because there's once
-> again no "later" here.
-> idpf still has 3 big lists of todos/followups to be done since it was
-> upstreamed and I haven't seen any activity here (not my team
-> responsibility), so I don't believe in "laters".
-> 
-> > and merged more quickly independent from this driver change, even.
-> > 
-> > Within IDPF, same for for per queue(set) link up/down and chunked
-> > virtchannel messages. A deeper analysis can probably carve out
-> > other changes not critical to landing XDP/XSK (sw marker removal).
-> 
-> You also said once that XDP Rx Hints can be implemented in 3 lines,
-> while it took couple hundred and several revisions for Larysa to
-> implement it in ice.
-> 
-> Just BTW, even if Chapter 3 + 4 + 5 is taken literally today, XDP
-> doesn't work on C0 board revisions at all because the FW is broken and I
-> also doesn't have any activity in fixing this for half a year already.
+FWIW, net-next is currently closed so this would have to be resent
+once it has reopened:
 
-I am not aware of this restriction. Definitely have been running
-variants of your github version on various boards. Let's discuss
-offline.
+https://lore.kernel.org/netdev/20241118071654.695bb1a2@kernel.org/
+
+I don't know much about MCTP, so my apologies that my review is
+mostly little nits and a question/comment about stats below.
+
+I don't think any of these are worth holding this back, but since
+net-next is closed this needs to be resent, maybe worth considering?
+
+On Wed, Nov 20, 2024 at 02:02:15PM -0500, admiyo@os.amperecomputing.com wrote:
+> From: Adam Young <admiyo@os.amperecomputing.com>
+> 
+> Implementation of network driver for
+> Management Control Transport Protocol(MCTP) over
+> Platform Communication Channel(PCC)
+> 
+> DMTF DSP:0292
+> https://www.dmtf.org/sites/default/files/standards/documents/DSP0292_1.0.0WIP50.pdf
+> 
+> MCTP devices are specified by entries in DSDT/SDST and
+> reference channels specified in the PCCT.
+> 
+> Communication with other devices use the PCC based
+> doorbell mechanism.
+> 
+> Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
+> ---
+>  drivers/net/mctp/Kconfig    |  13 ++
+>  drivers/net/mctp/Makefile   |   1 +
+>  drivers/net/mctp/mctp-pcc.c | 321 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 335 insertions(+)
+>  create mode 100644 drivers/net/mctp/mctp-pcc.c
+
+[...]
+
+It seems like below there are a few places where unnecessary double
+spaces are included. Not necessarily a reason to hold this back, but
+since net-next is closed and you need to resend anyway...
+
+> --- /dev/null
+> +++ b/drivers/net/mctp/mctp-pcc.c
+> @@ -0,0 +1,321 @@
+
+[...]
+
+> +static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *buffer)
+> +{
+> +	struct mctp_pcc_ndev *mctp_pcc_dev;
+> +	struct mctp_pcc_hdr mctp_pcc_hdr;
+> +	struct mctp_skb_cb *cb;
+> +	struct sk_buff *skb;
+> +	void *skb_buf;
+> +	u32 data_len;
+> +
+> +	mctp_pcc_dev = container_of(c, struct mctp_pcc_ndev, inbox.client);
+> +	memcpy_fromio(&mctp_pcc_hdr, mctp_pcc_dev->inbox.chan->shmem,
+> +		      sizeof(struct mctp_pcc_hdr));
+> +	data_len = mctp_pcc_hdr.length + MCTP_HEADER_LENGTH;
+> +
+> +	if (data_len > mctp_pcc_dev->mdev.dev->mtu) {
+> +		mctp_pcc_dev->mdev.dev->stats.rx_dropped++;
+
+I'm not an expert on rtnl stats, but maybe this should be
+accounted for as rx_length_errors ?
+
+And when rx_dropped is accounted in the stats callback it can add
+rx_length_errors in as well as setting rtnl_link_stats64's
+rx_length_errors?
+
+You've probably read this already, but just in case:
+
+https://docs.kernel.org/networking/statistics.html#struct-rtnl-link-stats64
+
+> +		return;
+> +	}
+> +
+> +	skb = netdev_alloc_skb(mctp_pcc_dev->mdev.dev, data_len);
+> +	if (!skb) {
+> +		mctp_pcc_dev->mdev.dev->stats.rx_dropped++;
+> +		return;
+> +	}
+> +	mctp_pcc_dev->mdev.dev->stats.rx_packets++;
+> +	mctp_pcc_dev->mdev.dev->stats.rx_bytes += data_len;
+> +	skb->protocol = htons(ETH_P_MCTP);
+> +	skb_buf = skb_put(skb, data_len);
+> +	memcpy_fromio(skb_buf, mctp_pcc_dev->inbox.chan->shmem, data_len);
+> +
+> +	skb_reset_mac_header(skb);
+> +	skb_pull(skb, sizeof(struct mctp_pcc_hdr));
+> +	skb_reset_network_header(skb);
+> +	cb = __mctp_cb(skb);
+> +	cb->halen = 0;
+> +	netif_rx(skb);
+> +}
+> +
+> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
+> +{
+> +	struct mctp_pcc_ndev *mpnd = netdev_priv(ndev);
+> +	struct mctp_pcc_hdr  *mctp_pcc_header;
+
+Extra space after mctp_pcc_hdr ?
+
+[...]
+
+> +
+> +static void  mctp_pcc_setup(struct net_device *ndev)
+
+Extra space after void?
+
+[...]
+
+> +
+> +static acpi_status lookup_pcct_indices(struct acpi_resource *ares,
+> +				       void *context)
+> +{
+> +	struct  mctp_pcc_lookup_context *luc = context;
+
+extra space after struct ?
+
+[...]
+
+> +
+> +static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
+> +{
+> +	struct mctp_pcc_lookup_context context = {0, 0, 0};
+> +	struct mctp_pcc_ndev *mctp_pcc_ndev;
+> +	struct device *dev = &acpi_dev->dev;
+> +	struct net_device *ndev;
+> +	acpi_handle dev_handle;
+> +	acpi_status status;
+> +	int mctp_pcc_mtu;
+> +	char name[32];
+> +	int rc;
+> +
+> +	dev_dbg(dev, "Adding mctp_pcc device for HID %s\n",
+> +		acpi_device_hid(acpi_dev));
+> +	dev_handle = acpi_device_handle(acpi_dev);
+> +	status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices,
+> +				     &context);
+> +	if (!ACPI_SUCCESS(status)) {
+> +		dev_err(dev, "FAILURE to lookup PCC indexes from CRS\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	//inbox initialization
+
+I'm not sure but in net/ the general comment style seems to be /*
+*/, I grepped around a bit and didn't notice many comments of this
+style (except SPDX lines).
+
+Maybe this should be a /* */ ?
+
+> +	snprintf(name, sizeof(name), "mctpipcc%d", context.inbox_index);
+> +	ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM,
+> +			    mctp_pcc_setup);
+> +	if (!ndev)
+> +		return -ENOMEM;
+> +
+> +	mctp_pcc_ndev = netdev_priv(ndev);
+> +	rc =  devm_add_action_or_reset(dev, mctp_cleanup_netdev, ndev);
+
+extra space after = ?
+
+> +	if (rc)
+> +		goto cleanup_netdev;
+> +	spin_lock_init(&mctp_pcc_ndev->lock);
+> +
+> +	rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->inbox,
+> +					 context.inbox_index);
+> +	if (rc)
+> +		goto cleanup_netdev;
+> +	mctp_pcc_ndev->inbox.client.rx_callback = mctp_pcc_client_rx_callback;
+> +
+> +	//outbox initialization
+
+Same as above on comment style
 
