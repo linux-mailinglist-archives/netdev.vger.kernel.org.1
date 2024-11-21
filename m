@@ -1,217 +1,248 @@
-Return-Path: <netdev+bounces-146688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55BF49D4FB8
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:31:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE209D4FF1
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 130D0B261FC
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:30:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F02D41F21812
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E72189B9F;
-	Thu, 21 Nov 2024 15:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFF3155CBF;
+	Thu, 21 Nov 2024 15:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kunbus.com header.i=@kunbus.com header.b="sIFnHqrY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwuXH+Qt"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2100.outbound.protection.outlook.com [40.107.20.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7DB16CD29;
-	Thu, 21 Nov 2024 15:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.100
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732203007; cv=fail; b=aQTke/xDQD7+nyNidPmVtGRveiJL3BwJoBbqJDOl6KxwW5eszvjhi/viOFAcsjoj2aRb5osNb/Kga++zzju4439slArvqc5dbp8YvDSJjmq7rcdz7hZCWDRCYY0twq1/XI7SOG8ulyDgAwigLRdKCe7x74flEMHVy3ztI39OdlE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732203007; c=relaxed/simple;
-	bh=KOcHmEcN+UBU+BuM5o/iRR0wqsTll16H+wyp34y6MqU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=f6FTbeTgXd6RTmiHmZONB1zqCFce4mNadXEtix+0vWTF/GQJZyKDtnTVTc7ijsI6Kv+bxCjiaKK1BRzLur9tO3PV79UH4fNeQ6ujDjrBL982nzIUerVAouW5YpGV2A61niI+hIsxWcHrELfc6/ZQo8sY3e//rWziYY9OpZIi2yE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kunbus.com; spf=pass smtp.mailfrom=kunbus.com; dkim=pass (1024-bit key) header.d=kunbus.com header.i=@kunbus.com header.b=sIFnHqrY; arc=fail smtp.client-ip=40.107.20.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kunbus.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kunbus.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FQU4Y5wfh5eBsAvGV8B5QbwYkcKEg8JsW0YRMaPqjq4THh2q4B2/q2nD9gkAEdFCdU9kqXi9oL+kw/oGjO/Eo+zfEFl6rI8a1eM3b42c5JIOFE7z15DbAd4wDL91qQY5/p3hHp8E0L4Mp9UpIsiuATBHSYBkYDAQD5vRFBPe58hpSgwhMolM77+wKqX/A/WarXoKCn8JMGxsULE14UzJuI6nEJjoFDxVW6pa16Kq6G4GRhKA+WLZ/y3+uLG0mAqdEcenwkTX98uLmF6zdtXfb7lUL/ghqgXwHa13QpSeFY+S4zvdI7Q2raDDwoPjUZ6PY7fjjp5y5ZDyiSx7JmqXgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f7C4IREdW/a/Bk69JcQQi7JunJbeUGcu1R47qPX145I=;
- b=hl3ouVHEX//z0IUHOkb4BdOTi6tiYcCXNhrTAAFsEmLER/z258ZyqV+LN01DHrff9gI577QsxwSViWG2h/pVuGYm0icBFRIYeSqU5WsRygFHKObXb+wlqhrLnWdDdtE4VWXPVOFPLze59XpZ/wNtX5H0H4Ceeake1kLlYxp7TeOWHUbSBLfPXFsg9KazEwMmATX/GWvO+598tjmlVYel740/fFkmQ/a6oBWwI3NvcB0hGpRWaFhPUw7PEkNBqDZkMZ6u0/qZW4O8TWV5HnPnWIKINA7sfLgT4oNOyfTLLYUEGBp0Zht3ey/5XnrhLDRBVAKgmZPaWiVh2CRVK6fYTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=kunbus.com; dmarc=pass action=none header.from=kunbus.com;
- dkim=pass header.d=kunbus.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kunbus.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f7C4IREdW/a/Bk69JcQQi7JunJbeUGcu1R47qPX145I=;
- b=sIFnHqrYk2kIKpt2df4OcCPj5kmC1HBO4ZK4LF912qVskkBxsdww/Dn6DnBVhhwqau0RnvgProKc35uIEnzKz4uXYDOz5aOx5OmCKzF+afJfmo2N14Rcf12knMTNYF3PcxQEINixwGixBWW/GhYNkp8t62v971CcpT8O/t2j1QY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=kunbus.com;
-Received: from PR3P193MB0846.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:ab::17)
- by PA1P193MB2523.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:449::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23; Thu, 21 Nov
- 2024 15:30:01 +0000
-Received: from PR3P193MB0846.EURP193.PROD.OUTLOOK.COM
- ([fe80::1ab7:2eff:ab2b:c486]) by PR3P193MB0846.EURP193.PROD.OUTLOOK.COM
- ([fe80::1ab7:2eff:ab2b:c486%4]) with mapi id 15.20.8158.024; Thu, 21 Nov 2024
- 15:30:01 +0000
-Message-ID: <8d67c890-6e9c-46e5-a22e-84d354a93026@kunbus.com>
-Date: Thu, 21 Nov 2024 16:30:00 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: dev: can_set_termination(): Allow gpio sleep
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Nicolai Buchwitz <nb@tipi-net.de>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- n.buchwitz@kunbus.com, p.rosenberger@kunbus.com, stable@vger.kernel.org,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625AB2AD00;
+	Thu, 21 Nov 2024 15:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732203796; cv=none; b=Wm/fgrKTwdet2T8HmWVaAl5XTahMgvqlS2N6Zi0dGmcmaf52rAHyVQUaRt3tDh4H9pqP2u/1qP55doF3b7iHQZtOQ157lETW3N5TomfrZDKwrQbHHquCCy4q30ZNbhqZxVPi+Ob7bbT2Im2Zz2svzuywo8bYkcZzaMmaXruFP7k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732203796; c=relaxed/simple;
+	bh=O6oHHuEIbcIb6IByxG1z9a7cqD2dBudeztiOVftgRJ8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TaMg1p8lntYLzGb9DWu6tcPohAtDNC/pft5qXDtvEWnKm27a4KmJeGYdeH5Jsscz4FO/FRG5W7Y2CH5Rn1x/+F2U6LuhniCzm9rqb56GzJUv+KqWRiv9MVigekgX4/BPi/MHE1Ewl6OQQUE2HKqQu4wp0NMn0Q3S1cpWRiBbS00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FwuXH+Qt; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b152a23e9aso60976685a.0;
+        Thu, 21 Nov 2024 07:43:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732203793; x=1732808593; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rXs5fvPbgQTUo5pXWl788SZLxX0Pftkx5hC6S+lzBco=;
+        b=FwuXH+QtR63OFcwd1+YiKGYGrc4j+6bkEYunn0sWyj48cly14WLwWxX9SsG/WP4uAV
+         G39vwlVJy5KlFYpKE7C2qlyE7ufH8648PCnqL1Y2YR3urHVVdcU6gUwjHkJ5iXMtDzNm
+         Xl/vgvfVETYvHyfifiy+UN+CRDw97s9Z2sKeDq4RH14GcA2I/zdOf05MlKO78ICKOGKQ
+         0LM3qh9mUHNLPlSLxjHkVsPWuih70Quv73E5qx/it6Hbt9hVGZKf7gh2gPJU+a1UPUui
+         hr2rvo+nYbhP6tYG3SxtlVD/3dNEWtOtPYDb+lRgoaJvnCMwm5HwuvafzaFv4nI8qEdd
+         gf/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732203793; x=1732808593;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rXs5fvPbgQTUo5pXWl788SZLxX0Pftkx5hC6S+lzBco=;
+        b=N5P3LFD8mdvY2JMv6jAiA6ZTHbOClUeQ85n5lzEmHvXz35lEJ2GgL0NmZI+M8YSyaa
+         3cA0+2hnc87qHatGwgyjFFeXpo1NCX4oRJJBYpf1DvsMFIKn8gdx+39vXzSYEgtLKz8x
+         6I1I8nJm7W8rV8Z7OP2qHhMXbIJpZ9EngDo2vmyoA5yxkonvwCeRd1pD2XG6tO/FRPtW
+         Rv6wRkM4386WazzXCe6lAFm/V18eLUflkeH299uEmNz3NkJ6jqKMPuV3q9s8GC66oxcL
+         2UFjYbXxOD2Px8WNkpJAIrD8r/Vw4fXExv7Eek3wyC7G2/66k60MER5xRLDWHO5/d4sK
+         Vo/w==
+X-Forwarded-Encrypted: i=1; AJvYcCVlDKIRdNBawTLdhzqEtf1maQ13ToaTuGPKtWudyAKuDdW9IdrPEZPjc9XrGLiPWN0eABjGgYjo/d/0Z7G4@vger.kernel.org, AJvYcCVqjfehp7YRAdQdcs+p4f6ysASzwmdEo9ZZ+2p8bl1fWk+CPwg6PIIU427D0sVkNjRPdhM=@vger.kernel.org, AJvYcCWlQ9U9eXyUqcTQsSIfNh1Tfl6cU1HAwdzy0NfDZSUZHbQdARFPhEVLBGh7q9phd7EmIPYrJYEl@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyzd0wfWjf3u9QEuNd+Fr+ZlKHprk6g2d+OClh6HRv5WGwPkNn9
+	rlAibIdb1P08XcmIXr2QiS4xhHPMZDsoHjFebSOjhiR0VTrXWPS7
+X-Gm-Gg: ASbGncsjJQeYV0EPsVYyVJTOF8IGX1OqWrNSZpxJPMiBKW7hJKBPn6wRqSxpHb5vaVu
+	P1c79jJO0gmcTbh/0pRCCp1FB/nh02n4o0vL+7uN6kfu5Oewpj3NVyUMTHvqYPDkMVg4Cw1mkhE
+	LUxjMz4a2Sp1ajcYbt1nEhpN3uJ3WLeeNW2YfEOWxrvTUWhoWXgykcvEFzVYxwFTBvFSgvjM62j
+	NikSPzc8z2ZVPChkhl1MiTAKIXt4kG2Hfi/IL8mPNMemUPqUtf7yi5zczNL8WyM14BnD8d1Ef1d
+	HLWIOXAs5BluBNv1M6WaBQ==
+X-Google-Smtp-Source: AGHT+IEoLKAzw+CSypvu/7v9DDR+mVYQ1Ps93lRD3TmJQ1SN2pV7s1zmjvjvkvTT1ZKElntCcmpEPw==
+X-Received: by 2002:a05:6214:19ca:b0:6d4:19a0:1fa with SMTP id 6a1803df08f44-6d43781ce87mr106062356d6.29.1732203793172;
+        Thu, 21 Nov 2024 07:43:13 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d4380d7cc2sm24916746d6.40.2024.11.21.07.43.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 07:43:12 -0800 (PST)
+Date: Thu, 21 Nov 2024 10:43:12 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Magnus Karlsson <magnus.karlsson@intel.com>, 
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
  linux-kernel@vger.kernel.org
-References: <20241121150209.125772-1-nb@tipi-net.de>
- <20241121-augmented-aquamarine-cuckoo-017f53-mkl@pengutronix.de>
- <c47b3d06-8763-4f69-b845-c7b58c9e2fd2@kunbus.com>
- <20241121-inquisitive-granite-hamster-b12a6f-mkl@pengutronix.de>
-Content-Language: en-US
-From: Lino Sanfilippo <l.sanfilippo@kunbus.com>
-In-Reply-To: <20241121-inquisitive-granite-hamster-b12a6f-mkl@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0438.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c6::16) To PR3P193MB0846.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:102:ab::17)
+Message-ID: <673f55109d49_bb6d229431@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6af7f16f-2ce4-4584-a7dc-47116158d47a@intel.com>
+References: <20241113152442.4000468-1-aleksander.lobakin@intel.com>
+ <20241115184301.16396cfe@kernel.org>
+ <6738babc4165e_747ce29446@willemb.c.googlers.com.notmuch>
+ <52650a34-f9f9-4769-8d16-01f549954ddf@intel.com>
+ <673cab54db1c1_2a097e2948c@willemb.c.googlers.com.notmuch>
+ <6af7f16f-2ce4-4584-a7dc-47116158d47a@intel.com>
+Subject: Re: [PATCH net-next v5 00/19] xdp: a fistful of generic changes
+ (+libeth_xdp)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PR3P193MB0846:EE_|PA1P193MB2523:EE_
-X-MS-Office365-Filtering-Correlation-Id: 669fc974-4cca-456c-0884-08dd0a415d8f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|10070799003|52116014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?T1o3S2h4T2UyU2pLbnkvZFBrMWd3NnlEUytQMjIyZW0yMDgycmhDeTB0d2hV?=
- =?utf-8?B?Rk5zUEdicTRDZ0V3UFNoMTNocTREUDRvajhNdlEvNmlXOTVRVjk3WGJOQ3FO?=
- =?utf-8?B?KytJdkZBM2ZCSjR4MWVEL2h0ZU4rbTBCN2s1SHVrdHRhNVk1M3JsQUM3Z1k3?=
- =?utf-8?B?ZFFZU0hmZFNhdWlwQTVYTjdKdERjanBpWFNFVDdveVd0WFF0cGV2YUhRK1lN?=
- =?utf-8?B?T1d6SFdTSTU4RWFCNkVJZ01vdDFKbmFsTSsvQi9DMUxxL1lNR1J0T0IzamVG?=
- =?utf-8?B?NitqY0tYckNubGp6b2RqUllEVEVUekhKZFdTazFyN3FyN3RZcStJQm1Jelp1?=
- =?utf-8?B?NXBQQVhsR2tsY1BoQjdSYWVmK3FtUitjYVRzdTdpTE5SV1NSMTQwN2FsdDMx?=
- =?utf-8?B?UlRORUdVczlYamhDUERtcis4dUVpNUxBbHcvSFM3OUswa1RzdTNpZ1NmN25M?=
- =?utf-8?B?bVV6UDRUb2gyd3FnUnd3OTlxdUxhY0ErNGV0Nng4T0hYbEdLWEp5RFNXTFI0?=
- =?utf-8?B?N1cvQXJzRkliZkozQzZvWmovV0VIVFVjbmxrUHBFdlVZWldKeUZyMHF3WUpX?=
- =?utf-8?B?a2l2eTlldmtGQklnQnBIdUN1QmlJL0NnRFZiTlp5QzRuTHQ1OTF3aHhtUHp3?=
- =?utf-8?B?NitJemxHMm16djRVRFlEVEFIRTh0dk1EMmlreWhoc3J1a201VnlyclVka1g4?=
- =?utf-8?B?QXNVVmU3V1Y4elJTQnpHMk5NNGNTUEJLTm1LTUoyclFQT2RkNyt3WS9nYmJD?=
- =?utf-8?B?WTRySzJybnp0MGdwR1I2M3ZCV3A2SDdQTlZsNExGSXV4YWV0MG5ENHExZk5P?=
- =?utf-8?B?aEk5TDZOVUxqTzd1UUN0Yi80QzB5a0RxNGdGeDViWUNJZDczNzFiZk5tWDlZ?=
- =?utf-8?B?YkpMV2FEWUV0UFdtY2JvY3lkZ1hDbyszVHh1MjRKYWpWdXBhWmhkcURJaEtj?=
- =?utf-8?B?RWJGaWJPNHltWDQ5aitMOWJYVVcrS2Vjamh6S0d4dFh1a2VkaEhYK2t2SXk4?=
- =?utf-8?B?THMwNnhUZWE0Qm11aVlzTmNuRWJacG9zUmdCaysvZmJLU1ArUkFCRGZaaVBD?=
- =?utf-8?B?ekppRjNlaW5jWmRJQkFScUt2V0QwSjVjeXErbHdsM2wvZWhERHlnT1lTU3Vp?=
- =?utf-8?B?aVdRMDJ4emlnaGZpOHdWN2dsTldWdzQzSVZHdzJwUkE3eTUxaEVDWCtiRHNl?=
- =?utf-8?B?RHgzNXZqa0ZXV1YzVmxmZ0tuM0JlZ2hhbzI4dUFLV3B5ZkhlbDRxY0ZlTDRU?=
- =?utf-8?B?T09VL2ZabXVRdmFJa040SHhIKy9LTHN1cEhmRGdOT2l5czJZNTZiLzM3NU52?=
- =?utf-8?B?bnNUaXV1WDlRV2ZvNFlvT280NlJ5MVE0ZDBoeE5vZis4bThKcFJwb2VISGxH?=
- =?utf-8?B?UnpJR1pncTYwZkxKK0w1TkFoRDI3UGdiMnF5VzdNVmhJR3Niek1BSjVWUnpG?=
- =?utf-8?B?ekErT0dsYzdoR2tsMjVNQTFuNG1BZE1ZcXoyOXM5cXpCdXJqR1dmOXlsSjVF?=
- =?utf-8?B?Y3RQZk9EV24zUnh2aG1LZjJEQkVtQzdIZlpJZEhXbnFHeGN6S1k5S21tN0RV?=
- =?utf-8?B?SDZHejBXeW5ocEpmNjV3WEEzQ1RseW9yaTlaaUx6RmV3WThNZzh0dy82bE5E?=
- =?utf-8?B?RXFwNlZhR2czZWZQUHFaNFFHNGt0T2U4SElHWTNyWUk4VDMrTGU3Z2FUeDdw?=
- =?utf-8?Q?eDK9q5hLqKfkDYRmvwEM?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR3P193MB0846.EURP193.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(10070799003)(52116014)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?am1Dc1pmOWVZa2FseEZic09xdTkybEdyTERiMW1NbXVhWWJKSTVibFBuN2Yw?=
- =?utf-8?B?QWFKQys5QUphMHNmaWVEZTc5Q0R5WDVIUkF1d005M0xQNnl0S1ZzVEtWdGcv?=
- =?utf-8?B?N1ozTTl3UFl3UDM2RUxURmdkb3RtV1c1dGRTWHBYM0pZVUZwM3lPaDZtS293?=
- =?utf-8?B?TG9GcTN3ckVmOHRaa0lDZEhPYTc2Y3JFamZBTjloRTlkZFRnVnJrM29sMW1o?=
- =?utf-8?B?ekFDc0RNbG1Na2x1MjEyZGlKSWk3OWJTUDVnajVoOXNLbElacS9jTzFWUXBT?=
- =?utf-8?B?dXpSZnJlaWQ1MzJXUGhGQXo1ZHJ4ZStVT2huRmhGam9Fa3REWjZNVzlZTlNH?=
- =?utf-8?B?VlZwbnRTQi9KNGt0UERuMFRYb1JXdmRaRzVUKzNEcUFXVVMrMkttR0lVSjFW?=
- =?utf-8?B?Q3RadXNxaDFWQVV6b3hTUXNDZlJabTQyRDFKSlJjcW56b0xZSEZyeTVkbFkv?=
- =?utf-8?B?WGRORlBjeGdqQStpV2NjUHM4eVAvWUE4N05HTEcrTlZ3MlFIUVAyRUt4LzM5?=
- =?utf-8?B?Rk9pd3hLRlNIWWJDZW12Uk1vM2dyckVScVdaQkVYdjZGdkRpSjJaOWhhenBy?=
- =?utf-8?B?UTluWnJ0dWJqeDJKTFc2ZStZZDJ1ZjA0VWN6UjBCYWVrRHBaK1UwTVBTOExF?=
- =?utf-8?B?cEpWTkpWbC9GekZWUGJ1RC9hV0pCbDUzK0VLYkdOR3BpLzVLVy9JeXdaMjVW?=
- =?utf-8?B?djlwdFBNUkZ2eXpuejBMcTk5bzBsZmt3RWZMK2FDS0o3ZDUwS3FQbkpTaElF?=
- =?utf-8?B?OU5IeFR3VDUybFljeU1UdzUzWFFxaEl0bW9DTVFRN05NWjN4Vk1RNG9aaUtM?=
- =?utf-8?B?K2l3aU9qOS9yMEJDdkdXRGJmNkNCTkpHQnVQWmxSY0VNdVRpSTNFMXhCRDFv?=
- =?utf-8?B?c2p5aXI3dVlqaWJPWnlqakFKMFJUbGVTRitQL1FBMWYzRzJhMzZ0c0pzdFZU?=
- =?utf-8?B?Nmg3WUNweXVlSnZFVXRsbktpcE9BZVVPRVkwdVB1SWtxK1Z4WGxTOVRyeEdY?=
- =?utf-8?B?NnUvUzltMGZ4ZHdTQ0tYQ1dUU0NiSS9hcWJrVDRkbkZLUkpEV3pEc0M5elcx?=
- =?utf-8?B?WmxXb3JRbnpJN0IzQ0VGcHRuTkc0bko3ejBxajlOZW5ucEtMQ2lLdVlGaG96?=
- =?utf-8?B?cWVsL0hjOFdDQ3JNNFVNL2RjTEdNWU1xQWMvck5TcFozaVRnaFJOcEc0ay8y?=
- =?utf-8?B?eVNCdXpWckRpeDVlZFhlQzJkdEpVU1o4RmQ1eUUyMFBCd0dEUThwY2E5M2xr?=
- =?utf-8?B?eDNQTGRKSzlyL29EaGlJYVFyNDZvS0w3M2FLN3BWLzRISGZIV3B2eTRhZ2Er?=
- =?utf-8?B?OVpuV0xhRFd5Y2VteDhYdWRNTktVQzIxK216c3RVaEZuY2J1dys3SHM2QTAz?=
- =?utf-8?B?NG41VGVtRVRzYjRmeDNhaElhUDVjMjR3RU40elROcmlHMU5tSE11RUptRmRL?=
- =?utf-8?B?MldCSUR1eXpOY0JLb1NORGZHSmYxSGVXTEFiWlpSdk9FdmNESGVKUnR6N0pr?=
- =?utf-8?B?Z0c4OTZMVXBBRytONytZM2Q0WmptTjJ4YWJsMDhxQzg5eXBucUx3bVdXTXZG?=
- =?utf-8?B?SUphRTFJbHNQR2Z5SnRDN0RNMG1GTlc2SUFieWNxdVladW40V3VFSWY4b0FU?=
- =?utf-8?B?TEVCc2VJS0NHeElrQVhjU0k2Nkh0NDdialJEM3owUGRVeFp4ZWEyTkVhQU5q?=
- =?utf-8?B?RWovRkJQQ2pnbWVRd0E1d1RncjNreUdkcEtlYUJTQ2wyNlUzWmszdkthR2NH?=
- =?utf-8?B?RHlBU3lHZ1puK2R0N3VKcG8zcStmRVM2LzUzTW5HS2lnN1NOL200RUl0MFJ3?=
- =?utf-8?B?TzV5bEFWVW1HOGZ0U3Awa1FaS2puMS9SYTJQaVhnQnJFSDFnT01MaFdDQnhQ?=
- =?utf-8?B?RmtVVGZ3azAwemN6cmZiOGZ5V2xQMTB5TmppNm4xMHdPdWtVWDE2czR5NW1h?=
- =?utf-8?B?SVZla0JTVkl6ekdndU1OWlh1eXRBUmUxZU1hOTYzZ1hxcmEwY0htOGJrR3Iz?=
- =?utf-8?B?U3BodDc4eFhvT1h1RHVLS0R2UHRoaVRMSjlQelpCYTJsM2ZKeDhNV2VtUkxD?=
- =?utf-8?B?ZTdqMGdheXdRNWFGUzlWbkFNZ3NlVzljcnRwMHlNTnIvMXFPOWMyUDFkSWlT?=
- =?utf-8?B?NEVmTVlodmgvWW80dDFCZHJkVjRVZnpDYWlMUXhXRENDdGlNKzN0VXJpVUZk?=
- =?utf-8?B?QTBqbUZlNmo5SzlDdkdDZ2ltNHBJdUd1eXE2cExMQVhuVCtlM1g0eWkwa24z?=
- =?utf-8?B?SW82K2NaNjhhbmZTV1E1WWp6SnB3PT0=?=
-X-OriginatorOrg: kunbus.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 669fc974-4cca-456c-0884-08dd0a415d8f
-X-MS-Exchange-CrossTenant-AuthSource: PR3P193MB0846.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 15:30:01.7182
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: aaa4d814-e659-4b0a-9698-1c671f11520b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3jHlJ+IiocmbHiksUGm9/YOA1So2Rmx7vkztMAxTe2S5enQMzsYkcB7jjC7+I4ASrRABD++onWzzQ4mjhWDJkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1P193MB2523
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 21.11.24 16:25, Marc Kleine-Budde wrote:
-> On 21.11.2024 16:17:53, Lino Sanfilippo wrote:
->>> On 21.11.2024 16:02:09, Nicolai Buchwitz wrote:
->>>> The current implementation of can_set_termination() sets the GPIO in a
->>>> context which cannot sleep. This is an issue if the GPIO controller can
->>>> sleep (e.g. since the concerning GPIO expander is connected via SPI or
->>>> I2C). Thus, if the termination resistor is set (eg. with ip link),
->>>> a warning splat will be issued in the kernel log.
->>>>
->>>> Fix this by setting the termination resistor with
->>>> gpiod_set_value_cansleep() which instead of gpiod_set_value() allows it to
->>>> sleep.
->>>>
->>>> Cc: stable@vger.kernel.org
->>>> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
->>>
->>> I've send the same patch a few hours ago:
->>>
->>> https://lore.kernel.org/all/20241121-dev-fix-can_set_termination-v1-1-41fa6e29216d@pengutronix.de/
->>>
->> Shouldnt this also go to stable?
+Alexander Lobakin wrote:
+> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
+> Date: Tue, 19 Nov 2024 10:14:28 -0500
 > 
-> Until today no-one complained about the problem, but I'll add stable on
-> Cc while applying the patch.
+> > Alexander Lobakin wrote:
+> >> From: Willem De Bruijn <willemdebruijn.kernel@gmail.com>
+> >> Date: Sat, 16 Nov 2024 10:31:08 -0500
 > 
-> regards,
-> Marc
+> [...]
 > 
+> >> libeth_xdp depends on every patch from the series. I don't know why you
+> >> believe this might anyhow move faster. Almost the whole series got
+> >> reviewed relatively quickly, except drivers/intel folder which people
+> >> often tend to avoid.
+> > 
+> > Smaller focused series might have been merged already.
+> 
+> Half of this series merged wouldn't change that the whole set wouldn't
+> fit into one window (which is what you want). Half of this series merged
+> wouldn't allow sending idpf XDP parts.
 
-Great, thanks!
+I meant that smaller series are easier to facilitate feedback and
+iterate on quickly. So multiple focused series can make the same
+window.
+ 
+> >  
+> >> I remind you that the initial libeth + iavf series (11 patches) was
+> >> baking on LKML for one year. Here 2 Chapters went into the kernel within
+> >> 2 windows and only this one (clearly much bigger than the previous ones
+> >> and containing only generic changes in contrary to the previous which
+> >> had only /intel code) didn't follow this rule, which doesn't
+> >> unnecessarily mean it will stuck for too long.
+> >>
+> >> (+ I clearly mentioned several times that Chapter III will take longer
+> >>  than the rest and each time you had no issues with that)
+> > 
+> > This is a misunderstanding. I need a working feature, on a predictable
+> > timeline, in distro kernels.
+> 
+> Predictable timeline is not about upstream. At least when it comes to
+> series which introduce a lot of generic changes / additions.
+> A good example is PFCP offload in ice, the initial support was done and
+> sent spring 2022, then it took almost 2 years until it landed into the
+> kernel. The first series was of good quality, but there'll always be
+> discussions, different opinions etc.
+> 
+> I've no idea what misunderstanding are you talking about, I quoted what
+> Oregon told me quoting you. The email I sent with per-patch breakdown
+> why none of them can be tossed off to upstream XDP for idpf, you seemed
+> to ignore, at least I haven't seen any reply. I've no idea what they
+> promise you each kernel release, but I haven't promised anything except
+> sending first working RFC by the end of 2023, which was done back then;
+> because promising that feature X will definitely land into upstream
+> release Y would mean lying. There's always risk even a small series can
+> easily miss 1-3 kernel releases.
+> Take a look at Amit's comment. It involves additional work which I
+> didn't expect. I'm planning to do it while the window is closed as the
+> suggestion is perfectly valid and I don't have any arguments against.
+> Feel free to go there and argue that the comment is not valid because
+> you want the series merged ASAP, if you think that this "argument" works
+> upstream.
+> 
+> > 
+> >>>
+> >>> The first 3 patches are not essential to IDFP XDP + AF_XDP either.
+> >>
+> >> You don't seem to read the code. libeth_xdp won't even build without them.
+> > 
+> > Not as written, no, obviously.
+> 
+> If you want to compare with the OOT implementation for the 10th time,
+> let me remind you that it differs from the upstream version of idpf a
+> ton. OOT driver still doesn't use Page Pool (without which idpf wouldn't
+> have been accepted upstream at all), for example, which automatically
+> drops the dependency from several big patches from this series. OOT
+> implementation performs X times worse than the upstream ice. It still
+> forces header split to be turned off when XDP prog is installed. It
+> still uses hardcoded Rx buffer sizes. I can continue enumerating things
+> from OOT unacceptable here in upstream forever.
 
-BR,
-Lino
+I was not referring to the OOT series. See below.
+
+> > 
+> >> I don't believe the model taken by some developers (not spelling names
+> >> loud) "let's submit minimal changes and almost draft code, I promise
+> >> I'll create a todo list and will be polishing it within next x years"
+> >> works at all, not speaking that it may work better than sending polished
+> >> mature code (I hope it is).
+> >>
+> >>> The IDPF feature does not have to not depend on them.
+> >>>
+> >>> Does not matter for upstream, but for the purpose of backporting this
+> >>> to distro kernels, it helps if the driver feature minimizes dependency
+> >>> on core kernel API changes. If patch 19 can be made to work without
+> >>
+> >> OOT style of thinking.
+> >> Minimizing core changes == artificial self-limiting optimization and
+> >> functionality potential.
+> >> New kernels > LTSes and especially custom kernels which receive
+> >> non-upstream (== not officially supported by the community) feature
+> >> backports. Upstream shouldn't sacrifice anything in favor of those, this
+> >> way we end up one day sacrificing stuff for out-of-tree drivers (which I
+> >> know some people already try to do).
+> > 
+> > Opinionated positions. Nice if you have unlimited time.
+> 
+> I clearly remember Kuba's position that he wants good quality of
+> networking core and driver code. I'm pretty sure every netdev maintainer
+> has the same position. Again, feel free to argue with them, saying they
+> must take whatever trash is sent to LKML because customer X wants it
+> backported to his custom kernel Y ASAP.
+
+Not asking for massive changes, just suggesting a different patch
+order. That does not affect code quality.
+
+The core feature set does not depend on loop unrolling, constification,
+removal of xdp_frame::mem.id, etcetera. These can probably be reviewed
+and merged more quickly independent from this driver change, even.
+
+Within IDPF, same for for per queue(set) link up/down and chunked
+virtchannel messages. A deeper analysis can probably carve out
+other changes not critical to landing XDP/XSK (sw marker removal).
+
+> > 
+> >>> some of the changes in 1..18, that makes it more robust from that PoV.
+> >>
+> >> No it can't, I thought people first read the code and only then comment,
+> >> otherwise it's just wasting time.
+> 
+> Thanks,
+> Olek
+
+
 
