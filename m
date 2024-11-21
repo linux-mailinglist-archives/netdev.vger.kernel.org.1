@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-146654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B596F9D4ED3
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:43:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7F869D4EDC
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 629271F21712
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:43:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 904091F21E1F
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A9F1DAC93;
-	Thu, 21 Nov 2024 14:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDDD1DDC38;
+	Thu, 21 Nov 2024 14:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SVaHKaVW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Hn2mOj1w"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1681CD1EF;
-	Thu, 21 Nov 2024 14:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD241D95B3;
+	Thu, 21 Nov 2024 14:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732200222; cv=none; b=pFyc7F5mIHH2IcQCs2gTgZyb+6tP3GUE1VlfgqzAFQIEzY2LCAdaX0PKAqB2l3RuY0WCkpXmKWIDUPRkvH2+F6GA4u5C+mvNUFGI4WjJJE8qIAFaTSL/ozjiUGSMytfOqmWzLAd+X5TnReL22NtjdTS0VTDsXVe1m0nBWUzrYMc=
+	t=1732200224; cv=none; b=reGhiQnSXGgXKDXkzeK5+VmfnRRMbFUzQbdnZmiemeiweZrKHmMCk+/W329FnuMS68cZ0qscH+h1mky2MGuGRJOhGe8ns879ayytL8JaU6+k1y8PIgHYs9lre+qNSNKo3q3VihBsQRFudfijkhpU/AD1lkvkBslGKpbWW+SV724=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732200222; c=relaxed/simple;
-	bh=7J/eh52uJk71WbVQkH2eMFY49Q8W9fou8NIi2HeyyTc=;
+	s=arc-20240116; t=1732200224; c=relaxed/simple;
+	bh=DC/9YkU2BchaabD5ycgLbSoIt4/zucrbbySyiKTAodw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u6Fo7DT2Y8jfAOqMP5vTWtJ9/FssxmBqiCr04TOhX2hBZRBb0XrqHILaGw5pvCNNm1GIhGE3lxNmhSd6iqBjdXp0yp0lINexASglui96x5UIHz6HZonSJPt7bwltygIFCnkxt6IynrE1NWh4OC+yTSiJ3736sojQvz4A+p1r1Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SVaHKaVW; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=GJWMDY79jjXbe53bQau3QgY2MytMDkx/+ZRROryvLjzYKho2s9xPPICZs1j/Op9sMYwxuQxnCg/HzCJxSbN5xnJZzAqASaf+848lmplnEcO8RDhKhJ2n6WcdlkQfTm83p73H2/Hpbik4msVKwhw8Ee+WvnLFQZ4VeKwa7xWQemw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Hn2mOj1w; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 845F440007;
-	Thu, 21 Nov 2024 14:43:31 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B4D774000B;
+	Thu, 21 Nov 2024 14:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732200213;
+	t=1732200215;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z4FptY7neSNIpm8/KU8J5QUzyVqJhV+phM8Nu0jRFeM=;
-	b=SVaHKaVWgVx29UyAi9iDL6JErcoU9cWtXFxK0CZJsonyX3I6McZlPTBpp5Vc9BWBqz5CLW
-	HZmZafyloTDjJHJrf4glvsPsF2wbjnptF98abO6Qxo0HYHkUInnx460szNHpG2ZdqBEbca
-	G8JKyY6vGahEUhOtWl0J9IDb6jkkzxKOYAkNYhpRTuPoV15s57HJVzMtJH6wj6i4aUS83M
-	UtUliBzd3hV5kDIlFxfCAtfAVcRa//6MhfGck1oD6zJjKV3riefqhKuoosZm5BUtKF3h9J
-	tQu6VM+SZBsID4+A8RsKkxGHgvSfEJbDw2sNutlKT6vs8y4WXw/huk3euT7sJg==
+	bh=PB4N4irPSyn5rR+E/NNWqmUZSG81ZYdtH5kOGb0VcXk=;
+	b=Hn2mOj1wPiMHfblYXynxvv9q601z9o/gA4WJNSOy3/TJLNPerLtchzzAx7IBpYdTINhWwc
+	SGJCzhjPy3fNZ/J8NE5Qwo3JfaqmotoZpcwZOt/VDG0I4spU13YLwsGwFvTDDbp6AU6m1c
+	OtTTZKQ8flYbHNQ+yeLFDMsij5KljziJL5NB8o3ucUfIAVGb/xc5t3MeClrLuo1yQK35ev
+	o9yhM0jvMj+L1NRE6WUJkQ4kvVMa5z8OWd8EQD5qnZoYJanQtlzUKZdWlgTG3fM2xQDDiU
+	wh1eHuEyPT5gCxb3Mq+Bz7aqZKTfL9TZb5b0hccvr+ILOGFxi8rGhV2i1+Tt+Q==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 21 Nov 2024 15:42:27 +0100
-Subject: [PATCH RFC net-next v3 01/27] net: pse-pd: Remove unused
- pse_ethtool_get_pw_limit function declaration
+Date: Thu, 21 Nov 2024 15:42:28 +0100
+Subject: [PATCH RFC net-next v3 02/27] regulator: core: Ignore unset max_uA
+ constraints in current limit check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241121-feature_poe_port_prio-v3-1-83299fa6967c@bootlin.com>
+Message-Id: <20241121-feature_poe_port_prio-v3-2-83299fa6967c@bootlin.com>
 References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 In-Reply-To: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -73,52 +73,39 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
  Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
  Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+ Kory Maincent <kory.maincent@bootlin.com>
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Removed the unused pse_ethtool_get_pw_limit() function declaration from
-pse.h. This function was declared but never implemented or used,
-making the declaration unnecessary.
+We should only consider max_uA constraints if they are explicitly defined.
+In cases where it is not set, we should assume the regulator has no current
+limit.
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Kyle Swenson <kyle.swenson@est.tech>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- include/linux/pse-pd/pse.h | 8 --------
- 1 file changed, 8 deletions(-)
 
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 591a53e082e6..85a08c349256 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -184,8 +184,6 @@ int pse_ethtool_set_config(struct pse_control *psec,
- int pse_ethtool_set_pw_limit(struct pse_control *psec,
- 			     struct netlink_ext_ack *extack,
- 			     const unsigned int pw_limit);
--int pse_ethtool_get_pw_limit(struct pse_control *psec,
--			     struct netlink_ext_ack *extack);
+Change in v3:
+- New patch
+---
+ drivers/regulator/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
+index 1179766811f5..2948a7eca734 100644
+--- a/drivers/regulator/core.c
++++ b/drivers/regulator/core.c
+@@ -497,7 +497,8 @@ static int regulator_check_current_limit(struct regulator_dev *rdev,
+ 		return -EPERM;
+ 	}
  
- bool pse_has_podl(struct pse_control *psec);
- bool pse_has_c33(struct pse_control *psec);
-@@ -222,12 +220,6 @@ static inline int pse_ethtool_set_pw_limit(struct pse_control *psec,
- 	return -EOPNOTSUPP;
- }
- 
--static inline int pse_ethtool_get_pw_limit(struct pse_control *psec,
--					   struct netlink_ext_ack *extack)
--{
--	return -EOPNOTSUPP;
--}
--
- static inline bool pse_has_podl(struct pse_control *psec)
- {
- 	return false;
+-	if (*max_uA > rdev->constraints->max_uA)
++	if (*max_uA > rdev->constraints->max_uA &&
++	    rdev->constraints->max_uA)
+ 		*max_uA = rdev->constraints->max_uA;
+ 	if (*min_uA < rdev->constraints->min_uA)
+ 		*min_uA = rdev->constraints->min_uA;
 
 -- 
 2.34.1
