@@ -1,99 +1,130 @@
-Return-Path: <netdev+bounces-146741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C067F9D55DA
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:55:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 652F99D55FE
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:02:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 694F91F22E66
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:55:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EEB8B21646
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C2B1DDA34;
-	Thu, 21 Nov 2024 22:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097E31CCB5C;
+	Thu, 21 Nov 2024 23:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="ghtOvb9R"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZhyVJImu"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3976223098E;
-	Thu, 21 Nov 2024 22:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E284500E;
+	Thu, 21 Nov 2024 23:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732229746; cv=none; b=WjRXcYfJTDtnOCuJQ4lI3424PBrCcTT8nyIyT7c+dz675WhgtdzEVljflaypXMIjzYrtUIJ4bYTFeIgOVvEAgrriFJ3jISfthXQTlwP/AFnFSwhLkAYN18IP5K3CBkpVYbLmUZu/T0DywGVpJiYNcXmCCDBgkCnOBL8lx21tDkw=
+	t=1732230168; cv=none; b=iDzQmOeKCWjth20YgffUmbICH91TpakN4VASQunIoPRjB2DtgBlDcq9z/Z22YgFjETAYAzoaRVbz6akejYruxFzG1SD0eeelMzfLMl1W0xNHMBkJgghyqduZMTvUnFotlZQfORLVrasE45Pfa91Ik5ExVWCRWban/vj/fF4PgwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732229746; c=relaxed/simple;
-	bh=zO1lwbBfnR33OKzfQqRUTBn3qgyTmput2YiGtIxai1Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MTwn079VG+VV/ViGjDjadcuUXC2069uJgUhx7DiuRvbHCaYSntyw0vg4D1EC/os7jGKSSOTMQfnO3zD4m7G7OU9hKSz/R391p0sar4GT+uiZUZi/LeBrVU+ipioDPByUNQUMECy1/oWO3wVDYBIw1vZey/sStgMZXeBCFMABYmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=ghtOvb9R; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 233CE403E7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1732229743; bh=08T7GhtD33Aas5PbmABVE1NeeqKDFayNzkbTOZZ5Qa0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=ghtOvb9Rh8RYFfCBZz7zruyn6z5xWmzC1gUwyYOroCIbib6C+F/xPnlYXKalP5BK3
-	 AOekC07sw926SQKE2ybebizRHTG9b7eDCIhOWHZ9r/QBxpRnHDXH4NCE/VdLwDmGWs
-	 zntkZk+qhMfEWNWViidwlWMLKpmVoZQZy4V4urnzlpyGfTDpwEUCpADPJGmNsrJlDu
-	 WiOe+uaqtBu4hguglxuOyRLC5OPP7DDq8/EvfwqJ8zW8jw1dUVfhjEedFXL0ZiWK8r
-	 XBhyaVZdaI5zaC+36V7r1g9TkelLjCi08ZupVYDnd8XuB9sY3rcWkg+uTJWiVPtk7z
-	 cPBV5cZ+IBiyA==
-Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 233CE403E7;
-	Thu, 21 Nov 2024 22:55:43 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Vyshnav Ajith <puthen1977@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Vyshnav Ajith <puthen1977@gmail.com>
-Subject: Re: Slight improvement in readability
-In-Reply-To: <20241121224604.12071-1-puthen1977@gmail.com>
-References: <20241121224604.12071-1-puthen1977@gmail.com>
-Date: Thu, 21 Nov 2024 15:55:42 -0700
-Message-ID: <87bjy85h8x.fsf@trenco.lwn.net>
+	s=arc-20240116; t=1732230168; c=relaxed/simple;
+	bh=YUh71k+175ybgsdUyFe+kVdbDgxENLHIAM7Fa7GXBMk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FCWLA3tfKHHAsVf8FHm9FYBK64X3yQ4IgRKqGNmwNUra+pZGrXEeAu+6fqePBPmvRlB1qN75NdpnYBgaa94pL0odXeF1kNigiMecUTIvZMS9NrruPCND7GIJi9gsrs39dLGKXk4rHW04Xlf36eWaoI1vcskU+ZaFmdvd2G9G67c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZhyVJImu; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ALE9i92003121;
+	Thu, 21 Nov 2024 23:02:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	b45mFdUFdlyJiFzBXY4dTXz7trbCYEjnXQHC+zNFiYw=; b=ZhyVJImuEiWu9eGO
+	WAiNM+1R+KMQ2Xv+G9WPgCWsZ7pK0/5A1e2Glu8gUiGUeG7Lv3Bsijs3rjTO42Tn
+	WaWncJpoyWiMzgXdORW93LH/C98cPMEPFizKHqrs6zrjKqJwIkC0ivHgSnP5I4ZD
+	XlyjzGPNRubNBW0h4Ljtd3mYeHYQ+K5wO4155qpJsqoDDFqjRdPTysVq42GSLOZw
+	mRfF5BvAwkRDqQ5oQluTdfifuru5xCKrVZUeZq6gBUdVJopR9gpajka/V2XwF+Uo
+	8pSdth2DFuWqGnD1KpGF+WJ3CIJGLoTz2Zbeif9qNEFxcDHfF5rbKdKJ/IwHT8eM
+	GcEKvA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4326cs98ff-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Nov 2024 23:02:42 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ALN2fwc004853
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Nov 2024 23:02:41 GMT
+Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 21 Nov
+ 2024 15:02:41 -0800
+Message-ID: <022f6596-3b4c-6c19-f918-8dc1cce509ba@quicinc.com>
+Date: Thu, 21 Nov 2024 16:02:40 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH net-next v2] net: wwan: Add WWAN sahara port type
+Content-Language: en-US
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+CC: Jerry Meng <jerry.meng.lk@quectel.com>, <loic.poulain@linaro.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>
+References: <20241120093904.8629-1-jerry.meng.lk@quectel.com>
+ <863ba24c-eca4-46e2-96ab-f7f995e75ad0@gmail.com>
+ <fbb61e9f-ad1f-b56d-3322-b1bac5746c62@quicinc.com>
+ <7c263cbf-0a2f-4ce9-ac81-359ab69e6377@gmail.com>
+From: Jeffrey Hugo <quic_jhugo@quicinc.com>
+In-Reply-To: <7c263cbf-0a2f-4ce9-ac81-359ab69e6377@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: v4sCxqEOq56I5a5KNR36HdvPDL6NYSBK
+X-Proofpoint-ORIG-GUID: v4sCxqEOq56I5a5KNR36HdvPDL6NYSBK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 phishscore=0 impostorscore=0 bulkscore=0 mlxlogscore=789
+ adultscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411210174
 
-Vyshnav Ajith <puthen1977@gmail.com> writes:
+On 11/21/2024 3:53 PM, Sergey Ryazanov wrote:
+> Hi Jeffrey,
+> 
+> On 20.11.2024 23:48, Jeffrey Hugo wrote:
+>> On 11/20/2024 1:36 PM, Sergey Ryazanov wrote:
+>>> +Manivannan
+>>>
+>>> Hello Jerry,
+>>>
+>>> this version looks a way better, still there is one minor thing to 
+>>> improve. See below.
+>>>
+>>> Manivannan, Loic, could you advice is it Ok to export that SAHARA 
+>>> port as is?
+>>
+>> I'm against this.
+>>
+>> There is an in-kernel Sahara implementation, which is going to be used 
+>> by QDU100.  If WWAN is going to own the "SAHARA" MHI channel name, 
+>> then no one else can use it which will conflict with QDU100.
+>>
+>> I expect the in-kernel implementation can be leveraged for this.
+> 
+> Make sense. Can you share a link to this in-kernel implementation? I've 
+> searched through the code and found nothing similar. Is it merged or has 
+> it a different name?
 
-> Removed few extra spaces and changed from "a" to "an ISP"
->
-> Signed-off-by: Vyshnav Ajith <puthen1977@gmail.com>
-> ---
->  Documentation/networking/eql.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/Documentation/networking/eql.rst b/Documentation/networking/eql.rst
-> index a628c4c81166..4f47121323c9 100644
-> --- a/Documentation/networking/eql.rst
-> +++ b/Documentation/networking/eql.rst
-> @@ -23,9 +23,9 @@ EQL Driver: Serial IP Load Balancing HOWTO
->  
->    Which is worse? A huge fee for a 56K leased line or two phone lines?
->    It's probably the former.  If you find yourself craving more bandwidth,
-> -  and have a ISP that is flexible, it is now possible to bind modems
-> +  and have an ISP that is flexible, it is now possible to bind modems
->    together to work as one point-to-point link to increase your
-> -  bandwidth.  All without having to have a special black box on either
-> +  bandwidth. All without having to have a special black box on either
+drivers/accel/qaic/sahara.c
 
-Grammar fixes are fine, but we have an explicit policy that certain
-things are *not* typos and do not need fixing.  These include American
-or British spellings and, to the point here, the number of spaces after
-a period.  Please do not submit that kind of change.
+-Jeff
 
-Thanks,
-
-jon
 
