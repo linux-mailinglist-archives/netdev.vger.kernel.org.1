@@ -1,123 +1,140 @@
-Return-Path: <netdev+bounces-146622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B49729D49BF
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 10:16:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 792D79D49CC
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 10:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79599280C0A
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:16:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 268B71F20593
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047C81AA7B1;
-	Thu, 21 Nov 2024 09:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2AE1BD4F8;
+	Thu, 21 Nov 2024 09:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PNNaKEjv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GA3pPajj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E38215B14B
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 09:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D8B158D79
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 09:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732180612; cv=none; b=pTdbBgRK1v5tuo/jlsfXd3alizRkr41L6GnTi1w/LolI2e/V1SL9HSoXACzzZ8lNgkaChRZSfwGTrUboMaipW+omiqo4hw4VvAqV9VPXqNcC8l7h7yKGKVYepAG3BJSzdzSdwvO0UdP3alE0RSDlrAHpj3tjq0hCCLbvWHYcWhc=
+	t=1732180843; cv=none; b=cnb3mxrMuntlDxjxX2RqC0cs8d9xXnPHVAC+h0Q8ZfjKUm/Leke3pwTtf9gfe1HAuxk62P/bOWsdw7RiZUvZpaZjN0sYHg3VKLCFZmYoydDUy+wemBIQnl8yhvShBBYQOlCS/n3u2JdRjz4w1JM4P+W5iNmk0FtiihXkQ/9Zgds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732180612; c=relaxed/simple;
-	bh=sGMHB3SZJK0nL3Fp3gEnDL8A4oGUDP+I19BB2TI4zKY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J7F2ZiGqMgS8ulLO7CDwRKEhjOTyJqJHhpX7CFzJToxfDBdMlwfW7CY24MgTL1BXvqNSwpdk4uBZRxdbtW+nS89iTd/1t2jcx6cHrzW7pTi5aKQURGopZ+PfPpZbrLdHLEooV1Fj+Co2ABCJ2rR3kZ5WWFv3KkpOXviPsKBFYdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PNNaKEjv; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539e044d4f7so6e87.0
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 01:16:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732180609; x=1732785409; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S3s2WQlWvcDc80eC/0fm6XKW1SB71J8+zdjn3yfV+Yk=;
-        b=PNNaKEjvVJDdVcGM1nfl5jhRztPqRo0Z5vrpm99R4ICeGxQPYIigaVuqIE83zOhb8x
-         czVI4FASawfMIzqX38Fch66p+nuH168j1FMWItyA+EwWYRtpldJsVLgYXG7V00tjFE6N
-         a0DR2rCFzbl2hrCicEKqA0WsW8x1/6cmvOaVREM2tTABZttCW9xALgzMGU5W6uOVlDSa
-         xE1wQhp6b41rZw8BK6exV9d3vWcGfmasoHm+Bl4KUIhMcvH3NZb8IghDT1ku4xcfdlh4
-         xih/8A15mYMEaJKOuNDTWgSdk6REFva4Ph00hA/0+LB89LDNRpITGHlTyWv+1yuDSen3
-         u9GQ==
+	s=arc-20240116; t=1732180843; c=relaxed/simple;
+	bh=z3IzFqz6CGkWpS7Db68UfSWXKU8RdvRO9o8tJ0fBkns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VcDqv6LIH524t09qcUieqdHJDYUYbFQcQo+c4YrLAYBy7ieovjqhLVBeleM9hPcWxWa5mAPhagMARAUqIlduzd/cIxJZIO5woch+gDftMymhYcivfpeMTnZEK0vUQuKOpblug/lgNngepG5sQSisXERrGV3UTRz8sjw96EsQdBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GA3pPajj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732180840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Pe+KersGjDEJYz4W2aLOhFHR+iyviK6f7r1oEzw1+cc=;
+	b=GA3pPajjraHX7fGf6YnZT6SIEOQU/yT6NM3l/bNdiPUAfx5A8kOdDMFzkm4xizXL+k89lh
+	k8v/6hzM9DaZHxvxjMHT9xWx3N5RZe1xycZVQxdErkrQb5FGxAV9OLr9TVMcCGqFWuYIOO
+	eijIfCm5p+ujfdmM36/UCS2aMidqjBs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-266-O4IhJyjaMjCzeaeMvz-V_g-1; Thu, 21 Nov 2024 04:20:39 -0500
+X-MC-Unique: O4IhJyjaMjCzeaeMvz-V_g-1
+X-Mimecast-MFC-AGG-ID: O4IhJyjaMjCzeaeMvz-V_g
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a99efe7369dso62571666b.0
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 01:20:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732180609; x=1732785409;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S3s2WQlWvcDc80eC/0fm6XKW1SB71J8+zdjn3yfV+Yk=;
-        b=LuPTDELj+mixHyUK9Sq6Lyp0cE1LuvHADedTCo3cwKTQiZGdkSWHl0TjuzrKDh2Z5R
-         LmheE5s9EW3/xkgHV6Ev6q8xqclp1uaN0/idCz0mvzj/NU3MtoxwlQmexnz+uFzr4u69
-         QTw8QLjraR+76zC1cF8Ie+qLxyhCAKB/sVJiGaP/Y7b5PENGZj1YYDliTqXUkOq2RBKr
-         aeDK6I7qB8wrb6VTdXa1uAe/2pwOMKoWdHh91sZTXe8pybZwtWTszaTuUSw/Ku9BbpLQ
-         6PSIsM3mYj0UtwIw03jlbWGLSsCn+r5CrFbcAcB6dsG12ksdbfi/4FtXgkFJ3BSEHF3D
-         Iqrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVeFA4LsjN+fyJl2DlQHr+nsEBwBVu/C/KcZg9IKpkDcVVWt4dBcZsGVt2JFFzx9NfGPy223Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN1TebmScTIFIpVt2aMAn9kIkHEj8yxjXAHivd7XFJ9hsZAeAl
-	ExkAqbI/Wj2gCqW2xFRC7GAHUEH2vcrELOrgSTYtZmNU4Nt5503fxj12odzqZl5u8kCcnqKdzFI
-	EiRZgtsVUCMvaRq2vlV2an9gEs86guUI5gG7Q
-X-Gm-Gg: ASbGncua6d0G60jWrMKDRDDiXZw95tzReqTjgowlVhvj7l3j2KG3Jgw0hqgAq6JJn1T
-	V9m1L6pPIgd+qyOU7ZlwaZCTdMtWcz4Y0yTNE/AJ8cRXIrs31abI4v6hzh/kmy8mc
-X-Google-Smtp-Source: AGHT+IERdoQmvN5lPzIHrV+Di//dXCzHhM/Zdnd6NCieoDUryF6n4aePZJGGrKhmaedG4aTr/as4UKQMc/ST1LTlnao=
-X-Received: by 2002:ac2:5639:0:b0:53d:c049:8d60 with SMTP id
- 2adb3069b0e04-53dd0a72f32mr25e87.1.1732180608351; Thu, 21 Nov 2024 01:16:48
- -0800 (PST)
+        d=1e100.net; s=20230601; t=1732180838; x=1732785638;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Pe+KersGjDEJYz4W2aLOhFHR+iyviK6f7r1oEzw1+cc=;
+        b=owSqrBAUhuiDV45VbRl6gTTNyCi7VBqo1YUzjOEAwSls7X5U3e2eW2mqiqOpmx/Gw1
+         jgJpfu2+6s6LTjgCzwUga6T/BvwFVs8r1SkdGKBy8olz3cN+Z0WrDzmZKX/xMiGPhs0a
+         MEOYuxQM+YMZtgvTAQukKmxF6m+OzF3UmRgF8b8Rc8vE2S0kofOPByYp9tADkcyEcHkG
+         TuLMOWUZkCXMvFLRqPzwTRJPNmYiEJqtimNHei49RV2AAUcSoCr0CKA8u9kuhlBeTa4K
+         NHC6Usb1V/v94NAjEojz4YL5tZ2i/RGsmZE3sd5GXWe+NqzGl82+V1Ls7M2h7mwuEuIo
+         VOKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkGVcLCTKIe8su7zm6xxLFQPL3lCV2AOvyuVv8PEyHcja+5iTOVTV6EUn9f4mnQSUmsw5BSbc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynUehpBrt0x6H4X8af/sRN2MbGsggd/+h3RQQPj8twoPSu4plQ
+	ZcPmes2HwausPizPMxBPyvm7how6nDuwBupUg72YZR7oP7uYtuzHVFEx1diaYQTwzjn1PHZKYtt
+	6BzDbzko3jHEOxlNhSlQxW+zZ19IMhDpgBrfqYPu/PvP1xBzJ5jGHVw==
+X-Received: by 2002:a17:907:2d91:b0:a9a:b818:521d with SMTP id a640c23a62f3a-aa4efb8cd32mr245016066b.18.1732180838231;
+        Thu, 21 Nov 2024 01:20:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFR9VubEFl+IO+AiFGGZg/eRdEemUzuJZ7gugoLasmFePLIWVWdepkm95op+xuk3Bl3LojEEA==
+X-Received: by 2002:a17:907:2d91:b0:a9a:b818:521d with SMTP id a640c23a62f3a-aa4efb8cd32mr245013366b.18.1732180837663;
+        Thu, 21 Nov 2024 01:20:37 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-129.retail.telecomitalia.it. [79.46.200.129])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa4f4380c16sm56352166b.202.2024.11.21.01.20.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 01:20:37 -0800 (PST)
+Date: Thu, 21 Nov 2024 10:20:34 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf 1/4] bpf, vsock: Fix poll() missing a queue
+Message-ID: <rkuislntcknwmj65mghggj3k7jzzp5s5pbs36zacijjhcoag64@p5srullnpbqu>
+References: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
+ <20241118-vsock-bpf-poll-close-v1-1-f1b9669cacdc@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121054711.818670-1-yuyanghuang@google.com> <322e75ab-8ae8-4dd0-9646-ef41d9ff2fba@redhat.com>
-In-Reply-To: <322e75ab-8ae8-4dd0-9646-ef41d9ff2fba@redhat.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Thu, 21 Nov 2024 18:16:10 +0900
-Message-ID: <CADXeF1Ef6h8bdHDiqAUhyZ8jg+fpgx69YBTiV6k27JYLhP4R4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next, v3] netlink: add IGMP/MLD join/leave notifications
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
-	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
-	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>, Patrick Ruddy <pruddy@vyatta.att-mail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241118-vsock-bpf-poll-close-v1-1-f1b9669cacdc@rbox.co>
 
->The variable 'scope' is not used below.
+On Mon, Nov 18, 2024 at 10:03:41PM +0100, Michal Luczaj wrote:
+>When a verdict program simply passes a packet without redirection, sk_msg
+>is enqueued on sk_psock::ingress_msg. Add a missing check to poll().
+>
+>Fixes: 634f1a7110b4 ("vsock: support sockmap")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
-Thanks! I will fix it in the next version.
+Yep, in vsock_bpf.c we set `prot->sock_is_readable = sk_msg_is_readable`,
+so it LGTM!
 
-Thanks,
-Yuyang
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-On Thu, Nov 21, 2024 at 6:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
 >
-> On 11/21/24 06:47, Yuyang Huang wrote:
-> > @@ -901,6 +904,58 @@ static struct ifmcaddr6 *mca_alloc(struct inet6_de=
-v *idev,
-> >       return mc;
-> >  }
-> >
-> > +static int inet6_fill_ifmcaddr(struct sk_buff *skb, struct net_device =
-*dev,
-> > +                            const struct in6_addr *addr, int event)
-> > +{
-> > +     struct ifaddrmsg *ifm;
-> > +     struct nlmsghdr *nlh;
-> > +     u8 scope;
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index dfd29160fe11c4675f872c1ee123d65b2da0dae6..919da8edd03c838cbcdbf1618425da6c5ec2df1a 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -1054,6 +1054,9 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
+> 		mask |= EPOLLRDHUP;
+> 	}
 >
-> The variable 'scope' is not used below.
+>+	if (sk_is_readable(sk))
+>+		mask |= EPOLLIN | EPOLLRDNORM;
+>+
+> 	if (sock->type == SOCK_DGRAM) {
+> 		/* For datagram sockets we can read if there is something in
+> 		 * the queue and write as long as the socket isn't shutdown for
 >
-> Cheers,
+>-- 
+>2.46.2
 >
-> Paolo
->
+
 
