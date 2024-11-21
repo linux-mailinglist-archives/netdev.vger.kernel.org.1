@@ -1,160 +1,208 @@
-Return-Path: <netdev+bounces-146647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1BA89D4E34
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:00:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78B029D4E54
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68B36280CB0
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:00:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1716B2179E
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8551D90B6;
-	Thu, 21 Nov 2024 14:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204AA1D88D5;
+	Thu, 21 Nov 2024 14:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y2SIF5nX"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Hxm+jn3s";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YGXSeOHa";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="CGeu9KB/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="K6ngicCq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9011D6DB5
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 14:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358F81D79B0;
+	Thu, 21 Nov 2024 14:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732197615; cv=none; b=qg9I9661S2TQbku7++ycNAkSha1PTpbteRT20llYkdzl0f4+UPJMQxBR/VE0I3s6Scf1u6fkZv/uGl2awG+g72dNF2dvpNaEAtMASwzTPu+k4UkPTshXNf7KW+zQvuPoE+C2aeWfLd7R4QPQ4jt2LwvVwrxLPYPwqHCrwq8iaaw=
+	t=1732198283; cv=none; b=RGWMPLYdgH5xXRzutbFjNkF3q+qygseP198Uq3YzgUiRduAMPXyaSprjf+EJ/AppI80qwmyvpzGxGvtdk5Qur0D7d/fvLN9BB6JJqx2o3F6piVbRGhJbb9saxRjpFORQVsV6MO3ZFc5xR6/DGTmcp3zYeJ5SXOa2pyJIrQQ+h9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732197615; c=relaxed/simple;
-	bh=7RgFP6UuxwQYmWQb6rn744Zd3NSDGlxQx4n7n6wtFzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EnnqXlDo9IVlGJw2cpKctCJ4twnZpBQi8HQKaIjnByp+xl1mFP7LbZIlJYrm7aT7i52r0dHdNbz5b9ZPHVtT8l07M8xLbp3qXQeknzUJ9X46Ux75mRvgt3eVg6ozzCw2wGcy8tA+pZ0Y7b9yzC5GFS1PWX/Y0rERIl+J5nxeA0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y2SIF5nX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kIDX6Fkl+Q7yxJZnKo0gK/TnsINUD39cdrx85nEWnFA=; b=Y2SIF5nXfBqPfvAlm3BbWzwLMk
-	7yQm/qEjUMgDibsd8qtj8J9nXodw3hNuRg+ecZTNm/mYTH8vpxtNjQn81lfPduLxglB8zF6kwDgWp
-	M61SUX10ytfrL7JyTxHdKwr7pXzh732/AW2MGIwiAFKSaQODiEW/Jivcwe6LhLfaSKjU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tE7iy-00E3qr-Uh; Thu, 21 Nov 2024 15:00:00 +0100
-Date: Thu, 21 Nov 2024 15:00:00 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net,
-	Russell King <linux@armlinux.org.uk>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: Moving forward with stacked PHYs
-Message-ID: <1646a5bd-24c7-43fb-9d52-25966aafb80f@lunn.ch>
-References: <20241119115136.74297db7@fedora.home>
- <Zz7zqzlDG40IYxC-@pengutronix.de>
+	s=arc-20240116; t=1732198283; c=relaxed/simple;
+	bh=Ey0IAPn0edSlqo7bOQ+Oiyx7q+LGOFPvfHfglTadl48=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=avfNkRCA8Y59w8LCAy76PIfNZF9lbzOzPaJ3zczEUZAsphuTOK1HBKkGYs3pEnT/1fjmDKxnPY/u8gNEufRdJh4fIJ3Jipuk3+dqzEYyNr5JmV2IGS4/xq9hyAAAI1b4gbxAvR97MdXppfjYwR8Yhdwyx6tRsm0gNcvntibjoz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Hxm+jn3s; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YGXSeOHa; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=CGeu9KB/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=K6ngicCq; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1318F21A24;
+	Thu, 21 Nov 2024 14:11:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732198279; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=90qHUuZk+1shGNjirM2QL8Sq/3ge+2iP+PRdngdmwIc=;
+	b=Hxm+jn3syYbS/XV73a7xZR+I3qTeWIKIAL32wjjGghP/Q+pClw2UCrojhSIycO5T+VgQxc
+	4pw9T043OAd3pqQ/USAFQyhj06bSugJCCqCy089T5iCcwE3BGenx5H2sFJzdBT7OGKgUbr
+	90fIrko6yH8/4TThNXoj5T6pw7cPCzQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732198279;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=90qHUuZk+1shGNjirM2QL8Sq/3ge+2iP+PRdngdmwIc=;
+	b=YGXSeOHa5HHOZMGy8Mc9vhsoUcaEWwniGYLfXV1/F12FnMwNZK83oA2hMdDm+1PSMiv2As
+	Fct9jTR6FxM2yfBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="CGeu9KB/";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=K6ngicCq
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732198278; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=90qHUuZk+1shGNjirM2QL8Sq/3ge+2iP+PRdngdmwIc=;
+	b=CGeu9KB/AMGHF+y5efvIZEnWDHTbQKZ8oQCIjmZqD5nwHfeWl/URw0G90EkFlxg30vNNaP
+	qAM4V/jVeQf+sevvwynf3QQ/lsISGmUvkgscFY9I4OM8Mi+8Gcw1JSNWYCdhjBsJdlVijA
+	nWvsyiVEXLBEAp/JVJdcCpOJKqRodzU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732198278;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=90qHUuZk+1shGNjirM2QL8Sq/3ge+2iP+PRdngdmwIc=;
+	b=K6ngicCqcSxUVrJ49BCm0nDvfriyWDmz7K6hkNWM3oB4Q2w4pFLaemKNuU1kMcVsD3lbWw
+	K+BQ5DoUsPdL/7Bg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 51B8513927;
+	Thu, 21 Nov 2024 14:11:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Xb3nEYU/P2doNQAAD6G6ig
+	(envelope-from <jdelvare@suse.de>); Thu, 21 Nov 2024 14:11:17 +0000
+Date: Thu, 21 Nov 2024 15:11:16 +0100
+From: Jean Delvare <jdelvare@suse.de>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Krzysztof =?UTF-8?B?V2lsY3p5xYRz?=
+ =?UTF-8?B?a2k=?= <kw@linux.com>, linux-pci@vger.kernel.org, Ariel Almog
+ <ariela@nvidia.com>, Aditya Prabhune <aprabhune@nvidia.com>, Hannes
+ Reinecke <hare@suse.de>, Heiner Kallweit <hkallweit1@gmail.com>, Arun Easi
+ <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>, Bert Kenward
+ <bkenward@solarflare.com>, Matt Carlson <mcarlson@broadcom.com>, Kai-Heng
+ Feng <kai.heng.feng@canonical.com>, Alex Williamson
+ <alex.williamson@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Thomas
+ =?UTF-8?B?V2Vpw59zY2h1aA==?= <linux@weissschuh.net>, Stephen Hemminger
+ <stephen@networkplumber.org>
+Subject: Re: [PATCH v2] PCI/sysfs: Change read permissions for VPD
+ attributes
+Message-ID: <20241121151116.4213c144@endymion.delvare>
+In-Reply-To: <20241121121301.GA160612@unreal>
+References: <61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org>
+	<20241121130127.5df61661@endymion.delvare>
+	<20241121121301.GA160612@unreal>
+Organization: SUSE Linux
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zz7zqzlDG40IYxC-@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 1318F21A24
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,linux.com,vger.kernel.org,nvidia.com,suse.de,gmail.com,marvell.com,amazon.com,solarflare.com,broadcom.com,canonical.com,redhat.com,weissschuh.net,networkplumber.org];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,endymion.delvare:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-> > On that front, there's more work coming to improve on that :
-> >   - It would be good if the stats reported through ethtool would account
-> >     for all the PHYs on the link, so that we would get a full overview
-> >     of all stats from all components of the link
-> 
-> Ack, i'm working right now on the standardized PHY stats. With some work on
-> kernel side it would be possible to get with something like this:
-> ethtool -S eth1 --all-groups
-
-Naming becomes interesting, when you have multiple PHYs. You need to
-indicate which PHY the stats are from. So it will need nested netlink
-properties. I don't think we have anything like that at the moment for
-ethtool statistics, but it does exist in other places, e.g. cable
-testing results.
-
-> >   - A netlink notification to indicate that a new PHY was found on the
-> >     link is also in the plans.
-> 
-> This will be cool. I was thinking about netlink notification for some
-> health issues, to avoid polling on the user side.
-
-We need to think about when we send the notification. During
-enumeration of the MDIO bus, during probe, or when the PHY is
-connected to its upstream? What are the userspaces user cases for this
-notification?
-
-> > There's a lot more work to do however, as these user-facing commands aren't
-> > the only place where netdev->phydev is used.
+On Thu, 21 Nov 2024 14:13:01 +0200, Leon Romanovsky wrote:
+> On Thu, Nov 21, 2024 at 01:01:27PM +0100, Jean Delvare wrote:
+> > On Wed, 13 Nov 2024 14:59:58 +0200, Leon Romanovsky wrote:  
+> > > --- a/drivers/pci/vpd.c
+> > > +++ b/drivers/pci/vpd.c
+> > > @@ -332,6 +332,14 @@ static umode_t vpd_attr_is_visible(struct kobject *kobj,
+> > >  	if (!pdev->vpd.cap)
+> > >  		return 0;
+> > >  
+> > > +	/*
+> > > +	 * Mellanox devices have implementation that allows VPD read by
+> > > +	 * unprivileged users, so just add needed bits to allow read.
+> > > +	 */
+> > > +	WARN_ON_ONCE(a->attr.mode != 0600);
+> > > +	if (unlikely(pdev->vendor == PCI_VENDOR_ID_MELLANOX))
+> > > +		return a->attr.mode + 0044;  
 > > 
-> > The first place are the MAC drivers. For this, there seems to be 2 options :
-> > 
-> >  - move to phylink. The phylink API is pretty well designed as it makes
-> >    the phydev totally irrelevant for the MAC driver. The MAC driver doesn't
-> >    even need to know if it's connected to a PHY or something else (and SFP
-> >    cage for example). That's nice, but there are still plenty of drivers
-> >    that don't use phylink.
+> > When manipulating bitfields, | is preferred. This would make the
+> > operation safe regardless of the initial value, so you can even get rid
+> > of the WARN_ON_ONCE() above.  
 > 
-> This would be nice, but this is too much work. Last week I was porting lan78xx
-> to PHYlink. Plain porting is some hours of work, the 80% of time is
-> testing and fixing different issues. I do no think there are enough
-> resources to port all of drivers.
+> The WARN_ON_ONCE() is intended to catch future changes in VPD sysfs
+> attributes. My intention is that once that WARN will trigger, the
+> author will be forced to reevaluate the latter if ( ... PCI_VENDOR_ID_MELLANOX)
+> condition and maybe we won't need it anymore. Without WARN_ON_ONCE, it
+> is easy to miss that code.
 
-It is clear that we the Maintainers cannot convert all MAC drivers to
-phylink. But i would be happy to say if you want to support multiple
-PHYs, you need to use phylink. To some extent, it is already that
-way. I don't think there are any systems with SFPs using phylib.  So i
-would not change the phylib API. Keep netdev->phydev meaning the first
-PHY, and maybe encode the assumption that it is the only PHY with a
-netdev_warn() if that assumption gets violated.
+The default permissions are 10 lines above in the same file. Doesn't
+seem that easy to miss to me.
 
-> > There are other parts of the kernel that accesses the netdev->phydev. There
-> > are a few places in DSA where this is done.
+In my opinion, WARN_ON should be limited to cases where something really
+bad has happened. It's not supposed to be a reminder for developers to
+perform some code clean-up. Remember that WARN_ON has a run-time cost
+and it could be evaluated for a possibly large number of PCI devices
+(although admittedly VPD support seems to be present only in a limited
+number of PCI device).
 
-Many of the DSA drivers are now phylink, not phylib. Any using SFPs
-will be phylink. I would leave those using phylib alone, same as other
-MAC drivers.
+Assuming you properly use | instead of +, then nothing bad will happen
+if the default permissions change, the code will simply become a no-op,
+until someone notices and deletes it. No harm done.
 
-> > Finally, there's the whole work of actually configuring the PHY themselves
-> > correctly when they are chained to one another, and getting the logic right
-> > for the link-up/down detection, getting the ksettings values aggregated
-> > correctly, etc.
-> > 
-> > We have some local patches as well for that, to handle the stacked PHY
-> > state-machine synchronisation, link-reporting and negociation but
-> > it's still WIP to cover all the corner-cases and hard-to-test features, for
-> > example how to deal with WoL or EEE in these situations.
-> 
-> I assume, even with stacked PHYs, some kind of power management would
-> be needed. The WoL is probably less interesting, since all attached PHYs are
-> under linux control, so we can suspend or resume them.
-> 
-> The EEE on other hand, may help to reduce run time power consumption.
-> Still, it the user space should know about it, since it may be critical
-> for time critical tasks.
+I'm not maintaining this part of the kernel so I can't speak or decide
+on behalf of the maintainers, but in my opinion, if you really want to
+leave a note for future developers, then a comment in the source code
+is a better way, as it has no run-time cost, and will also be found
+earlier by the developers (no need for run-time testing).
 
-We also need to consider where in the chain EEE, WoL, Pause etc are
-relevant. Both EEE and Pause it about negotiation, and that happen in
-the PHY closet to the media. WoL in theory could happen anywhere, but
-ideally you want it as close to the media as possible, so you can
-power off intermediary PHYs. But can PHYs in SFP actually wake the
-system? I don't think i have ever seen that, there is no interrupt pin
-on the SFP cage.  However WoL is currently a mess and MAC driver
-writers get is wrong. I would say WoL is another area we need a new
-API moving as much code into the core as possible, same as we have
-done for EEE, phylink handling of Pause etc. But that is probably out
-of scope for this work, but should be kept in mind.
-
-	Andrew
+Thanks,
+-- 
+Jean Delvare
+SUSE L3 Support
 
