@@ -1,193 +1,199 @@
-Return-Path: <netdev+bounces-146583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BEF39D479A
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 07:32:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24BF49D47AC
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 07:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113611F2289F
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 06:32:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8F58282555
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 06:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1539615665E;
-	Thu, 21 Nov 2024 06:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51281ABEB4;
+	Thu, 21 Nov 2024 06:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXA6k6Bq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hB6Nkohm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADD270801;
-	Thu, 21 Nov 2024 06:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1309E4207A;
+	Thu, 21 Nov 2024 06:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732170717; cv=none; b=cRmyYtXEPwIXdz0uv6kIAf+wB6M8m4yf2KwY3b7pMLNPygxR36Ly7cDO+hIvacmm83bG4O1q3AVndXXiromrEA5CW45e2jfzyuWcU+gwQkRfciPr85bkAzB5Timsn7XjfdUa3kRzwcdzyI4kObG5Ig/es9LvmgFWPrvL3dhpAck=
+	t=1732171264; cv=none; b=fHvW3oORcs3rCzLFH7DCUpTHnZu8l3gYZmDvRX3lJOdwZ6FBwbaNpn2GK6xhyJVilLA5SLXB/2E6Jx/2+guFgIUrUqFsb/NUYTNNyAoXtS1M6yFonotCvT/vRU8iBf6hety5OZ2FmO7eBqaFG1fk1DF0BnJmBeoDIDPeKtWlCrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732170717; c=relaxed/simple;
-	bh=7kkeGJoEGJO54se1DJTeClNJ3Ue76J84pIkqrraKadE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=kS2jQDYIktXA+mBpBa9g02cbcmvb2gsLia4rjrDafjQWsC3vxi1PteWrWBeXaPNpkVIEYRerKxoSjivvLYe9rXCA4iR48bQ8CLHdERA2yhVnhGtUQhGKrxb3huOXeUQUv9NUWMTmEybHsclA2pCDghGp+2bngd95HNG17kFH9rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kXA6k6Bq; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1732171264; c=relaxed/simple;
+	bh=FINqjynRckCPdREA15LQd+d/wJ58MH+XzrwNRb4sGD0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oVEnNIBYf9DopeF5r++heH0A+5PgtMBFjcH6yQNY2Fi6qmD2Is379xuq1YFkR+tPdP/wnaWM3JuYLu94z2WXj+VYtJC/iDR11Sl4AoN5nLszcy36Uc4wyCcobG2YfW2OetzN6ayoVI4+7ZUN+ZawEo8f0rHMJJQEOuQOgSFZdu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hB6Nkohm; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ea1c455d0eso481223a91.2;
-        Wed, 20 Nov 2024 22:31:55 -0800 (PST)
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7f46d5d1ad5so482264a12.3;
+        Wed, 20 Nov 2024 22:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732170715; x=1732775515; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w/clsaX5ZjM/ZI0eFz6PXem6IdlBhs+vKBh9/WBzPJ4=;
-        b=kXA6k6BqdNXLMz3phvtwlFAJ00sZbRzWL4FboLxIHpxQC1oUmUsGjvrGOSFaM4apPy
-         WgtFOAjKwyTGJbBJS5U34F3s7We32iXJbKFYw6VG2K7LM4f6dgiJ6YSS4LBsO5byvhc8
-         oFepS9N83DinUlZYGfoG9jFgrnA7jXzT1WOlMjicXV7ASzcvKhnAJ/T0AYmsiBXBEPGn
-         pfnXvTluwS2BVgpM9X5TH2GH1sUQ02V6n9Oc/9tY5X3FTkbQyMEtSCswyWv/lrQi8LjB
-         Bsg5mN55GttAd1y1z2Py62bdXWoRNQ7xfJHtQ9w5pY7gDbneQFANZZLG4R3ONPqQhuY7
-         1tOQ==
+        d=gmail.com; s=20230601; t=1732171262; x=1732776062; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VGWHthOdkm6Gt06IJVjO799GK6ZHCX/yfS2o21G73Jg=;
+        b=hB6Nkohmkd8c9Ym/lYDp4ljAAy4GrYhRGj4/7F1HvCBYQV0Bpz6jNixqiUPkxoEqdX
+         Bhnbu/7CrM/bmlSNauOmyefR1o+aXWJ3Kbcd+kegjQSka7ISTfWyp0CpNOFcQr2xQqBU
+         zX12RK0fXWKZFbeZ7xYpfB6NZaESFn0N11CCoOa9h38WM9k+qRZgjNyHABjUVsGbgk4L
+         7+ElDjAXoBFXWonpr6GRq/F9mqXRY1DmT/Vicxeq5HGgluat+EUS3YuGIjorL3ojHefT
+         msyvs1ONBSomsZ0cC+LSESMuczV5b4rzftUl/dLcHSYjbSWB1tGJkYY/LOn1xg4VuUOO
+         g7dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732170715; x=1732775515;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=w/clsaX5ZjM/ZI0eFz6PXem6IdlBhs+vKBh9/WBzPJ4=;
-        b=LTrYW6Tm3gXLycLB3aBwqSVMmhgV+nPz0BPzFU/r8I/6bSFR8vKWgmRaIjW/lpe5g2
-         bdingJ7HJenqcPzws5yLSxFMR6wIX5ZHMZX4de90dKIVpRQpAoJjq9U0dMb5qAh2oswH
-         QCN1ERfDLc+g0If33wACwY8dj6FFWq++qyc7nijLjJSUtzXP1Qc+grBbXbmX95h+eofC
-         sbqFGNaV944XEv41buHfzBHDqvcalDjLYyjVT8S1I4d/D2XHIUmNDeUklrpUwKxWSdRV
-         ZOhv+FbSvJ6irbD7DPIth07XaJeXqOH9HtC/6sX+ysYm1F/eOZz6Pm63b3xe5Hjd+Rl6
-         9LSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDYQxQYrE+5sHnzINkmy6j+lLN4SX+WMnuxvGqCQUwxA35MKf0Fi6Pr0IYTcdW7SPfggM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQwR/37yHpO3NOf9AeQ9WTmfudtOZDMO3B03QN0qtEBgIgQmGl
-	KS8FXSjuPjGtGkWCheTmeyw30c8KgdRT67oSGzcBpo6paEFZ6MUQ
-X-Google-Smtp-Source: AGHT+IFCfh9qS8dIY5fM6QsCR/BwPVQbNr7zxFeVVthkW7hVKfZ01VwDTCODxtqdRhKkMhZcFaaQjA==
-X-Received: by 2002:a17:90b:1651:b0:2ea:853b:276d with SMTP id 98e67ed59e1d1-2eaca737dfdmr7397338a91.17.1732170714625;
-        Wed, 20 Nov 2024 22:31:54 -0800 (PST)
-Received: from localhost ([98.97.39.253])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2128788fc41sm6093475ad.5.2024.11.20.22.31.53
+        d=1e100.net; s=20230601; t=1732171262; x=1732776062;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VGWHthOdkm6Gt06IJVjO799GK6ZHCX/yfS2o21G73Jg=;
+        b=shqyhC61a2e6DdnKmse/hpVdefC3e5RGWg/6bJ0xDUNTaah1vygFrh0EKXEigGA5eE
+         zrnysRzAW3nTeIq7neoZ1CvS7Vj1D3sRfjmuTDahG5Vf/dt/OmwS09f+JPYD0MzCArGu
+         9lmb7BnAcZpA+aUCcHdEKeP+pKjtptgO51AE31CnfLsNq123ilnHdA5VvPdTcY0WPiCI
+         52jGYpnOR/aLwSkP0JOwi6+i+u354O3jlKlLtdLC22xLaonlKoOVTb5pQwKVuVbNQDHd
+         E+3LBxXaNHXHWIB43kVo+9xJNIj7iqaeY/7furTcVXhopRAOHTdyBxe/u4W8lwyK/bcL
+         sllg==
+X-Forwarded-Encrypted: i=1; AJvYcCUA2RJLmFqv33S6EBA6ViLdBXcGpCxJMuE1+w2AXR15+/inxZ3NexWsHO1ag2Mqcgz33yhxlEVhSAwR@vger.kernel.org, AJvYcCUnAGXjPyW20LWWmuTdEK9xXQG8MrwmdjMsWfwiIVmEIdbuYPtg2VzPtzIEui0OpN+7Pj7MqCD2w/iV@vger.kernel.org, AJvYcCUwuMUUS5u4HshgbqZ3feX1h0orR5NNVIp6z7QKK1Ikaomcr1N6+eWgMheYR9M/t78yO5w+n6fHjD6OA7lRCCY=@vger.kernel.org, AJvYcCWLFFmgNje1S7unLKhaEzIldYLhmzeGCGa3YHnofYo8XB/PhP4bO3EayMfvpj8HzVPP+sMoDaSP@vger.kernel.org, AJvYcCWgGQR0XGaIHPgSOtwxDM7K9DpTbCKuJ90E9VllrFQimUbUNzfMWEkMMklvz5ruoSKd/cPdwrFTclI=@vger.kernel.org, AJvYcCWp1hktI2mzRcbwskIAshN35nUyCvncfdRq2QBWp8Df6wLUr2ZmUWaijmo/GGmGEcFzyePrKSVy45ibBA==@vger.kernel.org, AJvYcCXLaVG6qi7i2L96sokAMIWPMdyi6WPTpIns2a8L6Pd81QqaljxJeEu6Tw11AB5F7DtdhK4mAol5T83ajGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxHouaq78TKjK3ouNli1wXadKUO0Za0k4pMsbay4w8xDmiTnz6
+	3Qvq/zzE4meb3YnKt2GdRALeeYQjbagqT9u7gd34H60Bal1XwLCh
+X-Gm-Gg: ASbGnctFLZvWDvaPv31S46m14Lb0MetQz54+QiwzbEpUf68jYDc53IHOwI4rOMDI5gi
+	Zr689dZzGZXEjol3Ysan0Ae6kZDDwro/gW6/3er7hgKYY4L1oavLHX/XohtEM7qj/AAhURWSj2C
+	t6LMEaoGKCIAsDGdeh/2j1csDonwCEpX6fqm8rx2KProZRSSyL801qj8o4PYSifN7DzR1FNDLYI
+	fwbsOUYk4yp7UPVB1H+Vio8LZ4jjI51ugY2cNYJhuGrkn9FzMOcdhl4xeTL1yj3L1ZIA5RlHyTA
+	KFUZFfHQMoCG
+X-Google-Smtp-Source: AGHT+IGpnymgSDU5esqrFpiME6WfRsGDqK+fak4YLAOVub093rVM6M8RmgJK2D1J5DliCzpHz7ksUQ==
+X-Received: by 2002:a05:6a20:a110:b0:1db:f02d:dd49 with SMTP id adf61e73a8af0-1ddb10dfb56mr8061282637.40.1732171262113;
+        Wed, 20 Nov 2024 22:41:02 -0800 (PST)
+Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724beeb83d4sm2812530b3a.40.2024.11.20.22.40.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2024 22:31:54 -0800 (PST)
-Date: Wed, 20 Nov 2024 22:31:52 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- bpf@vger.kernel.org, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org
-Cc: netdev@vger.kernel.org, 
- magnus.karlsson@intel.com, 
- bjorn@kernel.org, 
- maciej.fijalkowski@intel.com, 
- jordyzomer@google.com, 
- security@kernel.org
-Message-ID: <673ed3d8c25bb_157a20824@john.notmuch>
-In-Reply-To: <87wmh4pmm7.fsf@toke.dk>
-References: <20241115125348.654145-1-maciej.fijalkowski@intel.com>
- <20241115125348.654145-3-maciej.fijalkowski@intel.com>
- <87wmh4pmm7.fsf@toke.dk>
-Subject: Re: [PATCH bpf 2/2] bpf: fix OOB devmap writes when deleting elements
+        Wed, 20 Nov 2024 22:41:01 -0800 (PST)
+From: Ming Yu <a0282524688@gmail.com>
+X-Google-Original-From: Ming Yu <tmyu0@nuvoton.com>
+To: tmyu0@nuvoton.com,
+	lee@kernel.org,
+	linus.walleij@linaro.org,
+	brgl@bgdev.pl,
+	andi.shyti@kernel.org,
+	mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	wim@linux-watchdog.org,
+	linux@roeck-us.net,
+	jdelvare@suse.com,
+	alexandre.belloni@bootlin.com
+Cc: linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org
+Subject: [PATCH v2 0/7] Add Nuvoton NCT6694 MFD drivers
+Date: Thu, 21 Nov 2024 14:40:39 +0800
+Message-Id: <20241121064046.3724726-1-tmyu0@nuvoton.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
-> =
+This patch series introduces support for Nuvoton NCT6694, a peripheral
+expander based on USB interface. It models the chip as an MFD driver
+(1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
+WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
 
-> > Jordy reported issue against XSKMAP which also applies to DEVMAP - th=
-e
-> > index used for accessing map entry, due to being a signed integer,
-> > causes the OOB writes. Fix is simple as changing the type from int to=
+The MFD driver implements USB device functionality to issue
+custom-define USB bulk pipe packets for NCT6694. Each child device can
+use the USB functions nct6694_read_msg() and nct6694_write_msg() to issue
+a command. They can also request interrupt that will be called when the
+USB device receives its interrupt pipe.
 
-> > u32, however, when compared to XSKMAP case, one more thing needs to b=
-e
-> > addressed.
-> >
-> > When map is released from system via dev_map_free(), we iterate throu=
-gh
-> > all of the entries and an iterator variable is also an int, which
-> > implies OOB accesses. Again, change it to be u32.
-> >
-> > Example splat below:
-> >
-> > [  160.724676] BUG: unable to handle page fault for address: ffffc8fc=
-2c001000
-> > [  160.731662] #PF: supervisor read access in kernel mode
-> > [  160.736876] #PF: error_code(0x0000) - not-present page
-> > [  160.742095] PGD 0 P4D 0
-> > [  160.744678] Oops: Oops: 0000 [#1] PREEMPT SMP
-> > [  160.749106] CPU: 1 UID: 0 PID: 520 Comm: kworker/u145:12 Not taint=
-ed 6.12.0-rc1+ #487
-> > [  160.757050] Hardware name: Intel Corporation S2600WFT/S2600WFT, BI=
-OS SE5C620.86B.02.01.0008.031920191559 03/19/2019
-> > [  160.767642] Workqueue: events_unbound bpf_map_free_deferred
-> > [  160.773308] RIP: 0010:dev_map_free+0x77/0x170
-> > [  160.777735] Code: 00 e8 fd 91 ed ff e8 b8 73 ed ff 41 83 7d 18 19 =
-74 6e 41 8b 45 24 49 8b bd f8 00 00 00 31 db 85 c0 74 48 48 63 c3 48 8d 0=
-4 c7 <48> 8b 28 48 85 ed 74 30 48 8b 7d 18 48 85 ff 74 05 e8 b3 52 fa ff
-> > [  160.796777] RSP: 0018:ffffc9000ee1fe38 EFLAGS: 00010202
-> > [  160.802086] RAX: ffffc8fc2c001000 RBX: 0000000080000000 RCX: 00000=
-00000000024
-> > [  160.809331] RDX: 0000000000000000 RSI: 0000000000000024 RDI: ffffc=
-9002c001000
-> > [  160.816576] RBP: 0000000000000000 R08: 0000000000000023 R09: 00000=
-00000000001
-> > [  160.823823] R10: 0000000000000001 R11: 00000000000ee6b2 R12: dead0=
-00000000122
-> > [  160.831066] R13: ffff88810c928e00 R14: ffff8881002df405 R15: 00000=
-00000000000
-> > [  160.838310] FS:  0000000000000000(0000) GS:ffff8897e0c40000(0000) =
-knlGS:0000000000000000
-> > [  160.846528] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [  160.852357] CR2: ffffc8fc2c001000 CR3: 0000000005c32006 CR4: 00000=
-000007726f0
-> > [  160.859604] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000=
-00000000000
-> > [  160.866847] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000=
-00000000400
-> > [  160.874092] PKRU: 55555554
-> > [  160.876847] Call Trace:
-> > [  160.879338]  <TASK>
-> > [  160.881477]  ? __die+0x20/0x60
-> > [  160.884586]  ? page_fault_oops+0x15a/0x450
-> > [  160.888746]  ? search_extable+0x22/0x30
-> > [  160.892647]  ? search_bpf_extables+0x5f/0x80
-> > [  160.896988]  ? exc_page_fault+0xa9/0x140
-> > [  160.900973]  ? asm_exc_page_fault+0x22/0x30
-> > [  160.905232]  ? dev_map_free+0x77/0x170
-> > [  160.909043]  ? dev_map_free+0x58/0x170
-> > [  160.912857]  bpf_map_free_deferred+0x51/0x90
-> > [  160.917196]  process_one_work+0x142/0x370
-> > [  160.921272]  worker_thread+0x29e/0x3b0
-> > [  160.925082]  ? rescuer_thread+0x4b0/0x4b0
-> > [  160.929157]  kthread+0xd4/0x110
-> > [  160.932355]  ? kthread_park+0x80/0x80
-> > [  160.936079]  ret_from_fork+0x2d/0x50
-> > [  160.943396]  ? kthread_park+0x80/0x80
-> > [  160.950803]  ret_from_fork_asm+0x11/0x20
-> > [  160.958482]  </TASK>
-> >
-> > Fixes: 546ac1ffb70d ("bpf: add devmap, a map for storing net device r=
-eferences")
-> > Reported-by: Jordy Zomer <jordyzomer@google.com>
-> > Suggested-by: Jordy Zomer <jordyzomer@google.com>
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+The following introduces the custom-define USB transactions:
+	nct6694_read_msg - Send bulk-out pipe to write request packet
+			   Receive bulk-in pipe to read response packet
+			   Receive bulk-in pipe to read data packet
 
-Also think its worth sending this with cc stable.
+	nct6694_write_msg - Send bulk-out pipe to write request packet
+			    Send bulk-out pipe to write data packet
+			    Receive bulk-in pipe to read response packet
+			    Receive bulk-in pipe to read data packet
 
-Acked-by: John Fastabend <john.fastabend@gmail.com>
-> =
+Changes since version 1:
+- Implement IRQ domain to handle IRQ demux in nct6694.c
+- Modify USB_DEVICE to USB_DEVICE_AND_INTERFACE_INFO API in nct6694.c
+- Add each driver's command structure
+- Fix USB functions in nct6694.c
+- Fix platform driver registration in each child driver
+- Sort each driver's header files alphabetically
+- Drop unnecessary header in gpio-nct6694.c
+- Add gpio line names in gpio-nct6694.c
+- Fix errors and warnings in nct6694_canfd.c
+- Fix TX-flow control in nct6694_canfd.c
+- Fix warnings in nct6694_wdt.c
+- Drop unnecessary logs in nct6694_wdt.c
+- Modify start() function to setup device in nct6694_wdt.c
+- Add voltage sensors functionality in nct6694-hwmon.c
+- Add temperature sensors functionality in nct6694-hwmon.c
+- Fix overwrite error return values in nct6694-hwmon.c
+- Add write value limitation for each write() function in nct6694-hwmon.c
+- Drop unnecessary logs in rtc-nct6694.c
+- Fix overwrite error return values in rtc-nct6694.c
+- Modify to use dev_err_probe API in rtc-nct6694.c
 
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> =
+Ming Yu (7):
+  mfd: Add core driver for Nuvoton NCT6694
+  gpio: Add Nuvoton NCT6694 GPIO support
+  i2c: Add Nuvoton NCT6694 I2C support
+  can: Add Nuvoton NCT6694 CAN support
+  watchdog: Add Nuvoton NCT6694 WDT support
+  hwmon: Add Nuvoton NCT6694 HWMON support
+  rtc: Add Nuvoton NCT6694 RTC support
 
+ MAINTAINERS                      |  13 +
+ drivers/gpio/Kconfig             |  12 +
+ drivers/gpio/Makefile            |   1 +
+ drivers/gpio/gpio-nct6694.c      | 441 +++++++++++++++
+ drivers/hwmon/Kconfig            |  10 +
+ drivers/hwmon/Makefile           |   1 +
+ drivers/hwmon/nct6694-hwmon.c    | 771 +++++++++++++++++++++++++
+ drivers/i2c/busses/Kconfig       |  10 +
+ drivers/i2c/busses/Makefile      |   1 +
+ drivers/i2c/busses/i2c-nct6694.c | 152 +++++
+ drivers/mfd/Kconfig              |  10 +
+ drivers/mfd/Makefile             |   2 +
+ drivers/mfd/nct6694.c            | 382 +++++++++++++
+ drivers/net/can/Kconfig          |  10 +
+ drivers/net/can/Makefile         |   1 +
+ drivers/net/can/nct6694_canfd.c  | 926 +++++++++++++++++++++++++++++++
+ drivers/rtc/Kconfig              |  10 +
+ drivers/rtc/Makefile             |   1 +
+ drivers/rtc/rtc-nct6694.c        | 263 +++++++++
+ drivers/watchdog/Kconfig         |  11 +
+ drivers/watchdog/Makefile        |   1 +
+ drivers/watchdog/nct6694_wdt.c   | 277 +++++++++
+ include/linux/mfd/nct6694.h      | 139 +++++
+ 23 files changed, 3445 insertions(+)
+ create mode 100644 drivers/gpio/gpio-nct6694.c
+ create mode 100644 drivers/hwmon/nct6694-hwmon.c
+ create mode 100644 drivers/i2c/busses/i2c-nct6694.c
+ create mode 100644 drivers/mfd/nct6694.c
+ create mode 100644 drivers/net/can/nct6694_canfd.c
+ create mode 100644 drivers/rtc/rtc-nct6694.c
+ create mode 100644 drivers/watchdog/nct6694_wdt.c
+ create mode 100644 include/linux/mfd/nct6694.h
 
+-- 
+2.34.1
 
 
