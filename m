@@ -1,151 +1,226 @@
-Return-Path: <netdev+bounces-146651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65A39D4EA6
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:25:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3155E9D4ED1
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC50EB26987
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A50281213
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD0D1D8A08;
-	Thu, 21 Nov 2024 14:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA81F1DA10A;
+	Thu, 21 Nov 2024 14:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="npEi2vOd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bR8dNz7D"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4530C20330;
-	Thu, 21 Nov 2024 14:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67B11D363F;
+	Thu, 21 Nov 2024 14:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732199140; cv=none; b=f86lYBJVOfu0XS1MCxToJOrTFqOKLxmXIsyzty8JufmU835c996TziwbjiuLMKYorv1utD0b8Qzrk2PerPAhGIvFuuyoPVkpudlfRCFqkJJjL1nonjUWNVJLSsFlpuUibU+Oyi5xZ9csAmXc+mtKPAmgwm+9f6eryGEPs8SPcvQ=
+	t=1732200222; cv=none; b=HYpl77So2EhzNtf97OYLbivG6JRy8TzGwbp+oioIVRS6xERl7cy0Nkeht4WHDd8O/qL4OJHh95eP/9/FDk+5P7EhytkUKoYtIrxW66f85ny0DrROakIWHgdX2sezIXigeuUi2cGWhGXe72ar81xeU4AXXt436o0wrG7B7CYZcRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732199140; c=relaxed/simple;
-	bh=/xoURug9mFlPXUzDX/hahpXmfY+g2zn4YGL+kl59M5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e2GI00hRjZEWzRWLJeSJdrE1Q4OjW6UWdpTZiEzJjGfXDe8KvpfjPdUfRz4lY4Yqhl0oyuhv9kx19VHZNglQ7WH31QyeVeDNAVlQ/pLS2tezFuxb26SlbRqTQ9m3bh+f3sWkUbwZwC/8enI+taA+Rgxk/BSABNfI+QHyOCUfGNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=npEi2vOd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=eKS76cxQEKPIR4MEzycu9OJBS5rxGLqkxBAvZUIpwVY=; b=np
-	Ei2vOdB6W7Zu4BhKLa323a/lO6SQZ8TcrZ6ky4luNxD9+wHZKN+Z/mn9zLt0LPN1U6G31mm6W2qqc
-	cnStju9YD4aum2igneGTkuOlV4kWSLux0KTLZyCwgEyygQ2xpO9aNVJI4+1fNT7dZnqMaXpQ7hkJR
-	/JyeuCitN9EV9EI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tE87g-00E3vg-8B; Thu, 21 Nov 2024 15:25:32 +0100
-Date: Thu, 21 Nov 2024 15:25:32 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Krzysztof =?utf-8?Q?Ha=C5=82asa?= <khalasa@piap.pl>
-Cc: netdev <netdev@vger.kernel.org>, Oliver Neukum <oneukum@suse.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH] usbnet_link_change() fails to call netif_carrier_on()
-Message-ID: <b1888530-1bf8-4ced-948d-d3989f9896b6@lunn.ch>
-References: <m34j43gwto.fsf@t19.piap.pl>
- <9baf4f17-bae6-4f5c-b9a1-92dc48fd7a8d@lunn.ch>
- <m3plmpf5ar.fsf@t19.piap.pl>
+	s=arc-20240116; t=1732200222; c=relaxed/simple;
+	bh=wQ3Os+03CcRx0xVepGaQMA8S/8BrHZGa6BmF0yYWR08=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=rebjWdgVHkTzbDRCYGUeTWp02ymlm0pd1lNjQhPdhBIbgKAc1Yb2jm5dwibB+Jr67h5oPu1Fdy1TKnKDXlWwHH2qjWLgF1QEh4bkO8YRMCRftDEV3TH3eMHkmHdypO3Yzytg0aX8kJyRU+Zmyhz9mrloUSZnMNGT7hc0qnr4lRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bR8dNz7D; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 63DFD40008;
+	Thu, 21 Nov 2024 14:43:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732200211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=x4b6/euJDp2S7lOWJckp9gGqdxtH6KO6DXDuQOcA8m0=;
+	b=bR8dNz7DJkfbTVqrn9WGnrkunKJAYHrxoKdYuFN1j1YZhi4W+ukel4Bm7/P+yfRst6XEbF
+	8jHYLV2C21Tiy9dTmQp35sQ4kBinXg3mMAPUFEbO6spYIy15k1huhUGVBBnwa1Ii7MHRF7
+	+N9EFxdiN0h/3Dwz9y4Ynk7R8tHpjWU2Xe9/rhebUM6znGaTt3/a8h1jJ2oeUc0vR2QbDf
+	toDI2Hr5oKaXhn69e+Ov6qFvT+TQiy9NZNHqD1bkt39hlvyVCryRJpL9cJxkEnvpB87/18
+	LO0uVyjGCFE6eI5AtNeSaywXGuUJStULayuVa4vUwMEci/g2GjrY0w2wrfP+lQ==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH RFC net-next v3 00/27] Add support for PSE port priority
+Date: Thu, 21 Nov 2024 15:42:26 +0100
+Message-Id: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <m3plmpf5ar.fsf@t19.piap.pl>
+X-B4-Tracking: v=1; b=H4sIANNGP2cC/3XNTQrCMBAF4KuUrI3kpzHWlSB4ALciJbZTG9CkJ
+ DFUSu9umpUuupjFY958MyEPToNHh2JCDqL22poU+KZATa/MA7BuU0aMsJJUlOMOVHg7qAe7jAv
+ 14LTFSlAFreScQYPS7eCg02N2r+hyPhUGAjYwBnRL2177YN0nP400dxafEsJW/EgxwXIviSg7W
+ UIrjndrw1ObbWNf2Yzsx+FkzWHJqYSodowBlFL9O/M8fwGGENpdEgEAAA==
+To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>, 
+ Mark Brown <broonie@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>, 
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+X-Mailer: b4 0.15-dev-8cb71
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Nov 21, 2024 at 07:51:24AM +0100, Krzysztof Hałasa wrote:
-> Hi Andrew,
-> thanks for a looking at this.
-> 
-> Andrew Lunn <andrew@lunn.ch> writes:
-> 
-> >> void usbnet_link_change(struct usbnet *dev, bool link, bool need_reset)
-> >> {
-> >>       /* update link after link is reseted */
-> >>       if (link && !need_reset)
-> >>               netif_carrier_on(dev->net);
-> >>       else
-> >>               netif_carrier_off(dev->net);
-> >>
-> >>       if (need_reset && link)
-> >>               usbnet_defer_kevent(dev, EVENT_LINK_RESET);
-> >>       else
-> >>               usbnet_defer_kevent(dev, EVENT_LINK_CHANGE);
-> >> }
-> >
-> > This device is using phylink to manage the PHY. phylink will than
-> > manage the carrier. It assumes it is solely responsible for the
-> > carrier. So i think your fix is wrong. You probably should be removing
-> > all code in this driver which touches the carrier.
-> 
-> Ok, I wasn't aware that phylink manages netdev's carrier state.
-> 
-> Then, is the patch wrong just because the asix driver shouldn't use the
-> function, or is it wrong because the function should work differently
-> (i.e., the semantics are different)?
-> 
-> Surely the function is broken, isn't it? Calling netif_carrier_off()
-> on link up event can't be right?
-> 
-> 
-> Now the ASIX driver, I'm looking at it for some time now. It consists
-> of two parts linked together. The ax88172a.c part doesn't use phylink,
-> while the main asix_devices.c does. So I'm leaving ax88172a.c alone for
-> now (while it could probably be better ported to the same framework,
-> i.e., phylink).
-> 
-> The main part uses usbnet.c, which does netif_carrier_{on,off}() in the
-> above usbnet_link_change(). I guess I can make it use directly
-> usbnet_defer_kevent() only so it won't be a problem.
-> 
-> Also, usbnet.c calls usbnet_defer_kevent() and thus netif_carrier_off()
-> in usbnet_probe, removing FLAG_LINK_INTR from asix_devices.c will stop
-> that.
-> 
-> The last place interacting with carrier status is asix_status(), called
-> about 8 times a second by usbnet.c intr_complete(). This is independent
-> of any MDIO traffic. Should I now remove this as well? I guess removing
-> asix_status would suffice.
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-I've not looked at this driver in detail, nor usbnet. So i can only
-make general comments. I do see there are a number of drivers which
-re-invent the wheel and do their own PHY handling, when they should
-allow Linux to do it via phylib/phylink.
+This series brings support for port priority in the PSE subsystem.
+PSE controllers can set priorities to decide which ports should be
+turned off in case of special events like over-current.
 
-When the MAC driver is using phylink, or phylib, it should not touch
-the carrier, nor access the PHY directly. The exception can be during
-probe, when it can turn the carrier off. What the MAC driver should be
-doing is exposing its MDIO bus as a Linux MDIO bus. phylib will then
-enumerate the bus and find the PHYs on it. The MAC driver which does
-not have access to device tree then typically uses phy_find_first() to
-find a PHY on the bus, and uses phy_connect() to bind the PHY to the
-MAC. The MAC driver then uses phy_start() when the interface is
-opened. phylib will poll the PHY for changing in link status, and call
-the callback function registered via phy_connect() to let the MAC know
-about what the PHY has negotiated. Other than that, the MAC driver
-does nothing with the PHY.
+I have added regulator maintainers to have their opinion on adding power
+budget regulator constraint see patches 16 and 17.
+There are also a few core regulator change along the way, patch 3 and 15.
+Not sure if they have to be sent with the Fixes tag.
+Also, I suppose I will need to merge them through the regulator tree.
+Will it be possible to create an immutable tag to have this PSE series
+based on them?
 
-It could well be there are historical discrepancies in usbnet, in that
-having Linux drive the PHY is somewhat new for usbnet, historically
-the wheel was reinvented, and maybe part of that is in the usbnet
-core.
+This patch series adds support for two mode port priority modes.
+1. Static Method:
 
-	Andrew
+   This method involves distributing power based on PD classification.
+   It’s straightforward and stable, the PSE core keeping track of the
+   budget and subtracting the power requested by each PD’s class.
+
+   Advantages: Every PD gets its promised power at any time, which
+   guarantees reliability.
+
+   Disadvantages: PD classification steps are large, meaning devices
+   request much more power than they actually need. As a result, the power
+   supply may only operate at, say, 50% capacity, which is inefficient and
+   wastes money.
+
+2. Dynamic Method:
+
+   To address the inefficiencies of the static method, vendors like
+   Microchip have introduced dynamic power budgeting, as seen in the
+   PD692x0 firmware. This method monitors the current consumption per port
+   and subtracts it from the available power budget. When the budget is
+   exceeded, lower-priority ports are shut down.
+
+   Advantages: This method optimizes resource utilization, saving costs.
+
+   Disadvantages: Low-priority devices may experience instability.
+
+The UAPI allows adding support for software port priority mode managed from
+userspace later if needed.
+
+This patch series is currently not fully tested. I would appreciate your
+feedback on the current implementation of port priority in the PSE core.
+
+Several Reviewed-by have been removed due to the changes.
+
+Thanks Oleksij for your pointers.
+
+Patches 1-7: Cosmetics.
+Patch 8: Adds support for last supported features in the TPS23881 drivers.
+Patches 9,10: Add support for PSE index in PSE core and ethtool.
+Patches 11-13: Add support for interrupt event report in PSE core, ethtool
+	     and ethtool specs.
+Patch 14: Adds support for interrupt and event report in TPS23881 driver.
+Patch 15: Fix regulator resolve supply
+Patches 16,17: Add support for power budget in regulator framework.
+Patch 18: Cosmetic.
+Patches 19,20: Add support for PSE power domain in PSE core and ethtool.
+Patches 21-23: Add support for port priority in PSE core, ethtool and
+	       ethtool specs.
+Patches 24,25: Add support for port priority in PD692x0 drivers.
+Patches 26,27: Add support for port priority in TPS23881 drivers.
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Changes in v3:
+- Move power budget to regulator core.
+- Add disconnection policies with PIs using the same priority.
+- Several fixes on the TPS23881 drivers.
+- Several new cosmetic patches.
+- Link to v2: https://lore.kernel.org/r/20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com
+
+Changes in v2:
+- Rethink the port priority management.
+- Add PSE id.
+- Add support for PSE power domains.
+- Add get power budget regulator constraint.
+- Link to v1: https://lore.kernel.org/r/20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com
+
+---
+Kory Maincent (26):
+      net: pse-pd: Remove unused pse_ethtool_get_pw_limit function declaration
+      regulator: core: Ignore unset max_uA constraints in current limit check
+      net: pse-pd: Avoid setting max_uA in regulator constraints
+      net: pse-pd: Add power limit check
+      net: pse-pd: tps23881: Simplify function returns by removing redundant checks
+      net: pse-pd: tps23881: Add missing configuration register after disable
+      net: pse-pd: tps23881: Add support for power limit and measurement features
+      net: pse-pd: Add support for PSE device index
+      net: ethtool: Add support for new PSE device index description
+      net: ethtool: Add support for ethnl_info_init_ntf helper function
+      net: pse-pd: Add support for reporting events
+      netlink: specs: Add support for PSE netlink notifications
+      net: pse-pd: tps23881: Add support for PSE events and interrupts
+      regulator: core: Resolve supply using of_node from regulator_config
+      regulator: Add support for power budget description
+      regulator: dt-bindings: Add regulator-power-budget property
+      net: pse-pd: Fix missing PI of_node description
+      net: pse-pd: Add support for PSE power domains
+      net: ethtool: Add support for new power domains index description
+      net: pse-pd: Add support for getting and setting port priority
+      net: ethtool: Add PSE new port priority support feature
+      netlink: specs: Expand the PSE netlink command with newly supported features
+      net: pse-pd: pd692x0: Add support for PSE PI priority feature
+      dt-bindings: net: pse-pd: microchip,pd692x0: Add manager regulator supply
+      net: pse-pd: tps23881: Add support for static port priority feature
+      dt-bindings: net: pse-pd: ti,tps23881: Add interrupt description
+
+Kory Maincent (Dent Project) (1):
+      net: pse-pd: tps23881: Use helpers to calculate bit offset for a channel
+
+ .../bindings/net/pse-pd/microchip,pd692x0.yaml     |  12 +-
+ .../bindings/net/pse-pd/ti,tps23881.yaml           |   6 +
+ .../devicetree/bindings/regulator/regulator.yaml   |   3 +
+ Documentation/netlink/specs/ethtool.yaml           |  59 ++
+ Documentation/networking/ethtool-netlink.rst       |  85 +++
+ drivers/net/mdio/fwnode_mdio.c                     |  26 +-
+ drivers/net/pse-pd/pd692x0.c                       | 183 +++++
+ drivers/net/pse-pd/pse_core.c                      | 798 +++++++++++++++++++-
+ drivers/net/pse-pd/tps23881.c                      | 833 +++++++++++++++++++--
+ drivers/regulator/core.c                           | 134 +++-
+ drivers/regulator/of_regulator.c                   |   3 +
+ include/linux/ethtool_netlink.h                    |   9 +
+ include/linux/pse-pd/pse.h                         |  91 ++-
+ include/linux/regulator/consumer.h                 |  21 +
+ include/linux/regulator/driver.h                   |   2 +
+ include/linux/regulator/machine.h                  |   2 +
+ include/uapi/linux/ethtool.h                       |  84 +++
+ include/uapi/linux/ethtool_netlink.h               |  18 +
+ net/ethtool/netlink.c                              |   5 +
+ net/ethtool/netlink.h                              |   2 +
+ net/ethtool/pse-pd.c                               | 123 +++
+ 21 files changed, 2391 insertions(+), 108 deletions(-)
+---
+base-commit: 057623b3f6568e5f5c23ae26f6bf3eb367597e03
+change-id: 20240913-feature_poe_port_prio-a51aed7332ec
+
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
+
 
