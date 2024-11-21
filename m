@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-146569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0836B9D45D9
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 03:47:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6D59D45FD
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 03:56:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2EE4283B45
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 02:47:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40DA7280CF3
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 02:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940B5136358;
-	Thu, 21 Nov 2024 02:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF3013AA38;
+	Thu, 21 Nov 2024 02:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QYdK2R1H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NkGUVf43"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E1D63A9;
-	Thu, 21 Nov 2024 02:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB54E136358;
+	Thu, 21 Nov 2024 02:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732157224; cv=none; b=cLBMGQ17mxZRuTcs42c0MO6PRd2rxjzmyo483J/eUOx2SH+ok3iaUBIe5uKJb7gWz8si2iwoAeA9UM2fgwZDdvwKcrQYwdFlpJ/xsc4cYwF1/eIdOCiRPcfCsNOmhez5LcnCf8KqfJCXwQUUZISWONA7q1zMXpnnLWfxaJ8r/5U=
+	t=1732157806; cv=none; b=XvQgDxwdM6k12esFGf3+JJ5rWNuZAcB0Ct5Mb7rhSHqODTidOFzs2OgkiIBAgdYso6LNPi/9t5KReWMBKY35swkmAoFQ13js9wmFLzDw2Yv9SGrfY7u7w7/tnLFoXfyOgYS/XajVsMXVhVxn+gyAH0tLIiDKeepUC71OaNIW1KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732157224; c=relaxed/simple;
-	bh=A62i+PCQPi9/pVfEwl8iAEDDlZJmY9G4trmTblRlT1g=;
+	s=arc-20240116; t=1732157806; c=relaxed/simple;
+	bh=hmxlPQoYSjMhXa+NWDm9aF7Et+9HBZ+buV/9WSg6RuM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FEyZ90rA5WFGsDEv7ecmQ/6TVCxU/HNG0crd/g22yZvC6cwBCojV8kh2F1kLPGQTEQuid1HnNOgmc9cTf1E6j2KvfuPak+ZWr96fi2iGfC48iO6BQqnqszCEx6xScTkeN8ydvZzGTC61OKJ4gmwNF6OpHIanMrKGLmRlTCs00CQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QYdK2R1H; arc=none smtp.client-ip=192.198.163.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=uPlBKHQXnNPJiTlLYLwOFsCUWZgf08zE4SNotfqBgsl0xm4hv0SAXdwzpocm3v1lj6knNOF8o5C4TROakjLRHxO9eN80OZ45xQosq4c9AN1PWIo3X01d4FJ16fIcNVWTV/gZJDB9MtOj2bJUp3camdBIDOgaAVtOl9JF4HgnpLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NkGUVf43; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732157223; x=1763693223;
+  t=1732157804; x=1763693804;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=A62i+PCQPi9/pVfEwl8iAEDDlZJmY9G4trmTblRlT1g=;
-  b=QYdK2R1HFeA7vajtQiwaN3RAWGMvxUcSXQyj9R6qRXGKqYMVm+xE/WRW
-   9KZ+ViLQ6z42/3J8mweM6Rj2RKFsYkljv7KIm6tYD45y66BX9bE3PKA8k
-   JiKP9nthBor6IKJ4K2DrMxMCmT5jpt+dCiVVA4rIl/8Oz2PjmPK7Kvn5L
-   jwqM3CxMTfkjPzEcMx37IOvaXUuyEZI+w903JrKUmSp4HUJ6cKbeCNlyx
-   78+SCLtGY8UyFO3L6wwVAg/26U8MvqIt6FhaX160jvAGY/blYpPPVBXLh
-   5lbRPbzJPDdgK5xei8/kSer7ZKhDjYJHUz0BtXdSkO8kUYNowSC5Ifzg5
-   w==;
-X-CSE-ConnectionGUID: 5lMjc7H3RfKw943eNKkkRw==
-X-CSE-MsgGUID: w+MVOO2uTTubPJzaHoxbdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="35108362"
+  bh=hmxlPQoYSjMhXa+NWDm9aF7Et+9HBZ+buV/9WSg6RuM=;
+  b=NkGUVf43lZ/FSuVuxAKYPQJF4moSQcqUGfc/t9S8ZKnOuOpwprDgXg4F
+   42THnn05NXVMfhvoEfwWIIJhz0Di+nBEeYr0LH7xckPMTPYW6Fvup6P8u
+   Htd/ws7iIAHr6WgpBecLDu4mjIsNdmNYGHJpBEQF9hu2E5KzsWne6YN+z
+   BHvZv0pY5hwHni5Bz3VF87x9mAtvx1gp3Ceu68Ivs1lMIwF2fuOplqaHT
+   Q0Gkmcayt8r7NvZZmohK8I+NpiBh/TZFqjD3ZfCk/RPXS9KiHAhqjsIYj
+   ODYTvLL8OqaDDX7RM8e4GIJvndBstockefOPnAE5gAeE2moJI/+DfJiY+
+   Q==;
+X-CSE-ConnectionGUID: S0bpkZo2Q7CIxymxfKw8Fg==
+X-CSE-MsgGUID: P6c/VepgT+akbAvX7kIb3Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11262"; a="42888679"
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="35108362"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 18:47:02 -0800
-X-CSE-ConnectionGUID: O1RbCacGTiy8VIx3JqGauQ==
-X-CSE-MsgGUID: yuWeEvpKTJSjgi27k++SVw==
+   d="scan'208";a="42888679"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 18:56:44 -0800
+X-CSE-ConnectionGUID: aYIwWo/+RZ6Qcli/64qtDg==
+X-CSE-MsgGUID: m80GOGW4Rxep1V0UfG4Ikg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,171,1728975600"; 
-   d="scan'208";a="94566387"
+   d="scan'208";a="90231880"
 Received: from aschofie-mobl2.amr.corp.intel.com (HELO aschofie-mobl2.lan) ([10.125.109.177])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 18:47:01 -0800
-Date: Wed, 20 Nov 2024 18:46:59 -0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2024 18:56:44 -0800
+Date: Wed, 20 Nov 2024 18:56:41 -0800
 From: Alison Schofield <alison.schofield@intel.com>
 To: alejandro.lucero-palau@amd.com
 Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
@@ -66,11 +66,11 @@ Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
 	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
 	pabeni@redhat.com, edumazet@google.com,
 	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v5 10/27] cxl: harden resource_contains checks to handle
- zero size resources
-Message-ID: <Zz6fI-EZYdS5Uw0S@aschofie-mobl2.lan>
+Subject: Re: [PATCH v5 26/27] cxl: add function for obtaining params from a
+ region
+Message-ID: <Zz6haeBDWRHL2IPR@aschofie-mobl2.lan>
 References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
- <20241118164434.7551-11-alejandro.lucero-palau@amd.com>
+ <20241118164434.7551-27-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,64 +79,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241118164434.7551-11-alejandro.lucero-palau@amd.com>
+In-Reply-To: <20241118164434.7551-27-alejandro.lucero-palau@amd.com>
 
-On Mon, Nov 18, 2024 at 04:44:17PM +0000, alejandro.lucero-palau@amd.com wrote:
+On Mon, Nov 18, 2024 at 04:44:33PM +0000, alejandro.lucero-palau@amd.com wrote:
 > From: Alejandro Lucero <alucerop@amd.com>
 > 
-> For a resource defined with size zero, resource_contains returns
-> always true.
+> A CXL region struct contains the physical address to work with.
 > 
-I'm not following the premise above -
+> Add a function for given a opaque cxl region struct returns the params
+> to be used for mapping such memory range.
 
-Looking at resource_contains() and the changes made below,
-it seems the concern is with &cxlds->ram_res or &cxlds->pmem_res
-being zero - because we already checked that the second param
-'res' is not zero a few lines above.
+I may not be understanding what needs to be opaque here.
 
-Looking at what happens when r1 is of size 0, I don't see how
-resource_contains() returns always true.
+Why not just 'add function to get a region resource'
+and then add 'cxl_get_region_resource().
 
-In resource_contains(r1, r2), if r1 is of size 0, r1->start == r1->end.
-The func can only return true if r2 is also of size 0 and located at 
-exactly r1->start. But, in this case, we are not going to get there
-because we never send an r2 of size 0.
-
-For any non-zero size r2 the func will always return false because
-the size 0 r1 cannot encompass any range.
-
-I could be misreading it all ;)
+Region params usually refers to the member of struct cxl_region
+that is called 'params' and that includes more than the resource.
 
 --Alison
 
-
-> Add resource size check before using it.
 > 
 > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 > ---
->  drivers/cxl/core/hdm.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  drivers/cxl/core/region.c | 16 ++++++++++++++++
+>  drivers/cxl/cxl.h         |  2 ++
+>  include/cxl/cxl.h         |  2 ++
+>  3 files changed, 20 insertions(+)
 > 
-> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
-> index 223c273c0cd1..c58d6b8f9b58 100644
-> --- a/drivers/cxl/core/hdm.c
-> +++ b/drivers/cxl/core/hdm.c
-> @@ -327,10 +327,13 @@ static int __cxl_dpa_reserve(struct cxl_endpoint_decoder *cxled,
->  	cxled->dpa_res = res;
->  	cxled->skip = skipped;
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index eff3ad788077..fa44a60549f7 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -2663,6 +2663,22 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
+>  	return ERR_PTR(rc);
+>  }
 >  
-> -	if (resource_contains(&cxlds->pmem_res, res))
-> +	if (resource_size(&cxlds->pmem_res) &&
-> +	    resource_contains(&cxlds->pmem_res, res)) {
->  		cxled->mode = CXL_DECODER_PMEM;
-> -	else if (resource_contains(&cxlds->ram_res, res))
-> +	} else if (resource_size(&cxlds->ram_res) &&
-> +		   resource_contains(&cxlds->ram_res, res)) {
->  		cxled->mode = CXL_DECODER_RAM;
-> +	}
->  	else {
->  		dev_warn(dev, "decoder%d.%d: %pr mixed mode not supported\n",
->  			 port->id, cxled->cxld.id, cxled->dpa_res);
+> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
+> +			  resource_size_t *end)
+> +{
+> +	if (!region)
+> +		return -ENODEV;
+> +
+> +	if (!region->params.res)
+> +		return -ENOSPC;
+> +
+> +	*start = region->params.res->start;
+> +	*end = region->params.res->end;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_get_region_params, CXL);
+> +
+>  static ssize_t __create_region_show(struct cxl_root_decoder *cxlrd, char *buf)
+>  {
+>  	return sysfs_emit(buf, "region%u\n", atomic_read(&cxlrd->region_id));
+> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+> index ee3385db5663..7b46d313e581 100644
+> --- a/drivers/cxl/cxl.h
+> +++ b/drivers/cxl/cxl.h
+> @@ -913,6 +913,8 @@ void cxl_coordinates_combine(struct access_coordinate *out,
+>  
+>  bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port);
+>  
+> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
+> +			  resource_size_t *end);
+>  /*
+>   * Unit test builds overrides this to __weak, find the 'strong' version
+>   * of these symbols in tools/testing/cxl/.
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 2a8ebabfc1dd..f14a3f292ad8 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -77,4 +77,6 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+>  				     bool avoid_dax);
+>  
+>  int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
+> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
+> +			  resource_size_t *end);
+>  #endif
 > -- 
 > 2.17.1
 > 
