@@ -1,134 +1,138 @@
-Return-Path: <netdev+bounces-146747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08FC49D564F
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:43:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA0359D567C
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:58:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8FCC1F23D85
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:43:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EE781F2478D
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412F71CB9EC;
-	Thu, 21 Nov 2024 23:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A411D042A;
+	Thu, 21 Nov 2024 23:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iO3TPWM/"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="hGia7MHt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653B21DE4D3;
-	Thu, 21 Nov 2024 23:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA7019F410;
+	Thu, 21 Nov 2024 23:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732232553; cv=none; b=NWYotoQhyP26kWAqRbh6m8kVD5PbLK9nRI9gFG+bIIL3oE/nDXHnz1k76d9VheeWL8BP+K5UyG/3uSqrn56eyDXxWQYR3ZWVPjD1pZRujfYfokprhLgFhzr+MDP/ZAZiP1atkKqzPe5gZoowufyt6UTEgBNeNzGQukuHoXJ83R4=
+	t=1732233520; cv=none; b=SoouUYNCsyRvCO0zlzXvU9cGFdtmELoVgwkuhDxgXktpsHCDV4ioBavfbD/cW6HwgCarFIK0zgVdKIrNzWOv9/ln7WVsoXXg/FkGtWLzBx7VsCIcvoWnC1ohAhljLILE6M1cOKEegsFyna4aQDqgfXP5bqjjKou7yCabhEWPHtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732232553; c=relaxed/simple;
-	bh=8y9YLZfA/j4D+Wc81B7+9U0hAhDA8nNRAzL1uJgTbX0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NkLjaCVQpcw2DsReSvqFnqAWFM5myMEYmaBdVcUJ4YD1RHzJlMbQyvA8cy+Hnh3TvKb7h5EP9Dml/sVoz0WrPi81egGdfmXUJObwfS97ifIVoHpteyUcAp/Ux4+V+W218lQRguSm5npt48CsVg4+PwbCbwCyPZTrHpOJh4tI9JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iO3TPWM/; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-382325b0508so1054273f8f.3;
-        Thu, 21 Nov 2024 15:42:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732232550; x=1732837350; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ccV/yshE7H2smC4scGTK8g83YpYG6AVCznLkmoOvLTY=;
-        b=iO3TPWM/OxZHrjSAEWVMxEoSlbFQ+9hjOGf7BbEZtqB5jMNY2f3BYLSwuBhGz9WXyJ
-         ubby+/r/h7ISoI2EszopCGsmgnEoXF+k2W8fhrJoAzN0fXZUN8eNg/upCNsYz7zITZDO
-         J7eQWOnokeVR5u2BQJ/vcvQmB5Smji1/2S+SKa2mKs2yGsgPXHRK2BNbSPc07/nUPZOb
-         SG19Z2njS64ypEs2uUDPQ4l9rbFVmHIbOk957WaK4uZ3LwuF7O3eNty+4gnjKGIt8Aut
-         eLhu+MAuprFIdgcruiFx1s7UEuUP69ktB4eUpmO69z9O/dZt/gI2u1My1PCzmZSzJkK9
-         PaFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732232550; x=1732837350;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccV/yshE7H2smC4scGTK8g83YpYG6AVCznLkmoOvLTY=;
-        b=XRs+GJCqgh+ktZE8H9ZoY2jERujQ956gUlLwhncMjWJOCLGgflSTIl7yyNcN6NKost
-         aR+AwdLvp8vyJNQq5T6/dTxjFozRW8DGxvllMhvl+bZJgpfhlpXP8FxXvZqaSwB4T0lP
-         CrF0F5UnCiNngWxzdyuXuUG0H0slIEn4MZXkhtGhrxVx4RnD566pwGSHjxxyDbd5ogUH
-         uwToJIKOLhf768K0nOdnbkFCuHNfybETcP7SJWkTXL1RRo5TkKalLgTSnWAZC8102P8M
-         tUAWXwsmgOmMqSH7i8oSW5hCt/rdqtqHQFDzAsZwg1RhAfa6Gjmrj+sw/oPfynjy8w2S
-         lJTg==
-X-Forwarded-Encrypted: i=1; AJvYcCU0EL/MFhU4KUyCJWLrC8mCksgIDwZKBGX7SoHbPt+wsls7uJRYRMD1gqx+gc2Sayu1s2UyDzjWPk2v6rLd@vger.kernel.org, AJvYcCV0bGUIdgzzvlGnlUe0l/rEa3kwidNzj0kqyR6OBX/eQJWUorWLWcVjlmNqNGeBwsyj0SkXGe+Q@vger.kernel.org, AJvYcCXQ7hKbAQRCog02FrOtHqmIcfXp8giEOvqrNY9ofxRv6seYeeqfL2GJRBKX0aRD7EvLOSey5tOyNz7k6TVV@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo3KwPJgWnj27Gb6/hsHMYp1hipgwH6/ALE3Eozh9gqQqaAWZp
-	P+n7u3TfKAts/o6Udikx3MTx5UlI/O+e+OlFHgL2g9FcjpFuWu84
-X-Gm-Gg: ASbGncsqTMoV4SUIafJiukk1ECRSpCLgrJWERchHGhbkcxaYSwmqi7RPOtIHaUVbg5R
-	CmybGloQ1ilClmdD3UboEtfDr6ZbR7LiychiY0g0TZG+7kBroM87yB36JsmZ1io1IvQUmW6GciJ
-	z3ZjyekEv5d71fCSHHVfU0oTNPGgMleM3mBL77dt9AV1P3sRDw2dTLuoxA9gd2zRXmLx7vMovqM
-	V1MJKF/+7SpVyJfrv/+I8vNB/obUw5wXDEzAgguHIxFTTPoT7Q=
-X-Google-Smtp-Source: AGHT+IFl26rdc0Msco1PLwttztV/3s0UQWBR7NApcuiOreI25Qfwe01ytYEWSRSuWB1714GsnV01Nw==
-X-Received: by 2002:a05:6000:1543:b0:382:4b9a:f500 with SMTP id ffacd0b85a97d-38260b5bb7amr650832f8f.18.1732232549591;
-        Thu, 21 Nov 2024 15:42:29 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b463abb4sm75592645e9.31.2024.11.21.15.42.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2024 15:42:29 -0800 (PST)
-Message-ID: <33d70ece-15db-4c83-90a4-3daa2f4032fd@gmail.com>
-Date: Fri, 22 Nov 2024 01:43:06 +0200
+	s=arc-20240116; t=1732233520; c=relaxed/simple;
+	bh=Uvl3wsFegsjMfK6muO6ob7tn6o5EzVH/IOzUyaAbTk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bPV21TFF59+jrUfGef7h+gb2K0Pve/H6NeyGs8nrxwwv0n07qLQ1cRp/vgcpUTFZ+2hfiQN/K2yJXDteeRxnWvW90ST8IP2VPvmNFDrIJulON9+ELeR1vd+RJafjWnAyRpoS+ezJyvymM1d9ESYcPvn79YgUTZHkddTQis3fCJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=hGia7MHt; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1732233513;
+	bh=X1IjupogZMkiWNSZk3JFoLN4U2FqYuIYTt2Pu/GfsE8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hGia7MHtBcQU2yw0Co9WJJ6eVcmsrPnicykB4pYjaq7KouNNxlDo5EecduXLMWViA
+	 /rUfwyytG1lNO8wEB9CzeinxYC0P47XpOLvj1rYXAEoJSzjX/Cafk1YZycJgE65V82
+	 uimMYT3+UImEPdJw0V78VRF5jAweInGuSMD1LVEA3P4BXivmFYuGF0QmV1j5F2G79q
+	 hA5i6LgJ197RPqKoKpVpwYhf+/LRa5w1GhFh4u90rKM1RuyZZO9C4uWZosUIc1BOqc
+	 3FgvuTlaUB4MPAmbqu2kV5YC/hnB/+3aIFZuCOV/0WZU5aNuGor0DQo7NPFgc1GJIF
+	 EiUlTnDutYc9A==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XvZtw3Xn7z4wcy;
+	Fri, 22 Nov 2024 10:58:32 +1100 (AEDT)
+Date: Fri, 22 Nov 2024 10:58:35 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Jeff Layton <jlayton@kernel.org>, Ilya Dryomov <idryomov@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the ceph tree with the net tree
+Message-ID: <20241122105835.022e99fe@canb.auug.org.au>
+In-Reply-To: <20241120113015.294cf1d2@canb.auug.org.au>
+References: <20241120113015.294cf1d2@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: wwan: Add WWAN sahara port type
-To: Jeffrey Hugo <quic_jhugo@quicinc.com>
-Cc: Jerry Meng <jerry.meng.lk@quectel.com>, loic.poulain@linaro.org,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org
-References: <20241120093904.8629-1-jerry.meng.lk@quectel.com>
- <863ba24c-eca4-46e2-96ab-f7f995e75ad0@gmail.com>
- <fbb61e9f-ad1f-b56d-3322-b1bac5746c62@quicinc.com>
- <7c263cbf-0a2f-4ce9-ac81-359ab69e6377@gmail.com>
- <022f6596-3b4c-6c19-f918-8dc1cce509ba@quicinc.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <022f6596-3b4c-6c19-f918-8dc1cce509ba@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/WNHmlPmIf2uQLOjs1_iNquO";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 22.11.2024 01:02, Jeffrey Hugo wrote:
-> On 11/21/2024 3:53 PM, Sergey Ryazanov wrote:
->> On 20.11.2024 23:48, Jeffrey Hugo wrote:
->>> On 11/20/2024 1:36 PM, Sergey Ryazanov wrote:
->>>> +Manivannan
->>>>
->>>> Hello Jerry,
->>>>
->>>> this version looks a way better, still there is one minor thing to 
->>>> improve. See below.
->>>>
->>>> Manivannan, Loic, could you advice is it Ok to export that SAHARA 
->>>> port as is?
->>>
->>> I'm against this.
->>>
->>> There is an in-kernel Sahara implementation, which is going to be 
->>> used by QDU100.  If WWAN is going to own the "SAHARA" MHI channel 
->>> name, then no one else can use it which will conflict with QDU100.
->>>
->>> I expect the in-kernel implementation can be leveraged for this.
->>
->> Make sense. Can you share a link to this in-kernel implementation? 
->> I've searched through the code and found nothing similar. Is it merged 
->> or has it a different name?
-> 
-> drivers/accel/qaic/sahara.c
+--Sig_/WNHmlPmIf2uQLOjs1_iNquO
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I was searching for SAHARA and for sahara in the log, however it was 
-introduced as Sahara. Next time will use case insensitive search :) 
-Thank you for the clue.
+Hi all,
 
---
-Sergey
+On Wed, 20 Nov 2024 11:30:15 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> Today's linux-next merge of the ceph tree got a conflict in:
+>=20
+>   MAINTAINERS
+>=20
+> between commit:
+>=20
+>   4262bacb748f ("MAINTAINERS: exclude can core, drivers and DT bindings f=
+rom netdev ML")
+>=20
+> from the net tree and commit:
+>=20
+>   6779c9d59a07 ("MAINTAINERS: exclude net/ceph from networking")
+>=20
+> from the ceph tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> diff --cc MAINTAINERS
+> index 54fc0c1232b8,3771691fa978..000000000000
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@@ -16235,7 -16179,7 +16236,8 @@@ X:	include/net/mac80211.
+>   X:	include/net/wext.h
+>   X:	net/9p/
+>   X:	net/bluetooth/
+>  +X:	net/can/
+> + X:	net/ceph/
+>   X:	net/mac80211/
+>   X:	net/rfkill/
+>   X:	net/wireless/
+
+This is now a conflict between the ceph tree and Linus' tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/WNHmlPmIf2uQLOjs1_iNquO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc/ySsACgkQAVBC80lX
+0Gxv2wf/cNuZPWEQiC28p04NjgbfgoFtJeDQYEzwlf2qnqxZX2Pu6pGZtbZGXBbb
+JHgojUi+gvWC52E27KMl+chudGTNbRbkywDSgCGY+nmMUN4UrcWKeY8aTPwVd3yQ
+dOcEqlvOYnKuYzamUfCiYIzp48/w1Ncl/m3T9EOcNJ+FLITB44zEIi+/mixaKSFG
+wDrZGwvSODHMp8LID9W8kFFH7F+/Tdqyi4rtc28w6cq/BBquh4YzBqgS+GfNu416
+mpM8NtnHVjNvl50SR94X6Bpa8i3si59sVSiP3Rff+RObytxVkBhy5z2keEZyYLJl
+31KVHsyR8VtRV/qJFOOpUx8Jg8qjBA==
+=iaWa
+-----END PGP SIGNATURE-----
+
+--Sig_/WNHmlPmIf2uQLOjs1_iNquO--
 
