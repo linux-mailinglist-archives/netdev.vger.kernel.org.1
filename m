@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-146656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7F869D4EDC
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:44:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1279D4ECF
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 904091F21E1F
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:44:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7BE75B23D80
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 14:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDDD1DDC38;
-	Thu, 21 Nov 2024 14:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B23E1D934B;
+	Thu, 21 Nov 2024 14:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Hn2mOj1w"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="e8jJdSO5"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD241D95B3;
-	Thu, 21 Nov 2024 14:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705101386D7;
+	Thu, 21 Nov 2024 14:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732200224; cv=none; b=reGhiQnSXGgXKDXkzeK5+VmfnRRMbFUzQbdnZmiemeiweZrKHmMCk+/W329FnuMS68cZ0qscH+h1mky2MGuGRJOhGe8ns879ayytL8JaU6+k1y8PIgHYs9lre+qNSNKo3q3VihBsQRFudfijkhpU/AD1lkvkBslGKpbWW+SV724=
+	t=1732200222; cv=none; b=H/nmJec87jlOTMiTow0b8nYrGigjTVItK1qHV46UlwtSziTjUDKGPzM0BvlIGh0WVCbCNpUaufpVlmo/v7425BWcj/1dfJGJ+ha34joaGk5ytxDCycP0dikcY6YaAHDGMyY4SVuZT0gu861zhyfwMq9e6T5QwdFS5N3X2i6DE/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732200224; c=relaxed/simple;
-	bh=DC/9YkU2BchaabD5ycgLbSoIt4/zucrbbySyiKTAodw=;
+	s=arc-20240116; t=1732200222; c=relaxed/simple;
+	bh=Z9ZNL3rh1rUDWm5Q3HrHpjTA0Zx0JXMguecu4dqyCSQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GJWMDY79jjXbe53bQau3QgY2MytMDkx/+ZRROryvLjzYKho2s9xPPICZs1j/Op9sMYwxuQxnCg/HzCJxSbN5xnJZzAqASaf+848lmplnEcO8RDhKhJ2n6WcdlkQfTm83p73H2/Hpbik4msVKwhw8Ee+WvnLFQZ4VeKwa7xWQemw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Hn2mOj1w; arc=none smtp.client-ip=217.70.183.194
+	 In-Reply-To:To:Cc; b=iCpYkGsqV4tVDUUPjMdfhWBCLs3KsP9+G7vTJnhOwb83qFaGsQzSaCfHs2SGI5ik8iRtOraWxJ+okAwY8hp2StXIa0V/U5LD6l6DX6gWoofodQ8XJ9pXiORc9DN7Pl7rHuDueTDfC5ErqgKZsaiM5F1TIogBU52OIEtyLRJciWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=e8jJdSO5; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B4D774000B;
-	Thu, 21 Nov 2024 14:43:33 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CB7ED4000C;
+	Thu, 21 Nov 2024 14:43:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732200215;
+	t=1732200217;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PB4N4irPSyn5rR+E/NNWqmUZSG81ZYdtH5kOGb0VcXk=;
-	b=Hn2mOj1wPiMHfblYXynxvv9q601z9o/gA4WJNSOy3/TJLNPerLtchzzAx7IBpYdTINhWwc
-	SGJCzhjPy3fNZ/J8NE5Qwo3JfaqmotoZpcwZOt/VDG0I4spU13YLwsGwFvTDDbp6AU6m1c
-	OtTTZKQ8flYbHNQ+yeLFDMsij5KljziJL5NB8o3ucUfIAVGb/xc5t3MeClrLuo1yQK35ev
-	o9yhM0jvMj+L1NRE6WUJkQ4kvVMa5z8OWd8EQD5qnZoYJanQtlzUKZdWlgTG3fM2xQDDiU
-	wh1eHuEyPT5gCxb3Mq+Bz7aqZKTfL9TZb5b0hccvr+ILOGFxi8rGhV2i1+Tt+Q==
+	bh=EmHAa5lzTlUKP9x1tLfYUr5FJHSMHYYBy7nd5w51Avs=;
+	b=e8jJdSO5ViEhXGf3Ny2QOlNBN0n5eeXTbNv5GuHUTacuHbdaUyQ0Jl7p7A4bYxQKIvtxHo
+	IEOeMbWgmMA3IlJmMUwFA+dY2LaMQQcJh4pNk05ICaoWJueV/B4uni6UHYxWuqLRP0d1X0
+	K2Dlc2+A7UoEs5NTNN7T6wIWJoFB6zhw940tiX4+tj2LEop+fFA1jTQYiSekrNIrZoEa7B
+	eF6UxLzbsTeDv+pANeS2GJFAT+MGp2uy74dRICOF6G5hk6UV/uukMdgoKykGyGpZSVU3tn
+	4OFMKpB2tqoybQSK7nDB+XWS9cXcBHskFM09JbtpjNTp8YzUClUnDr/OPyg4jw==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 21 Nov 2024 15:42:28 +0100
-Subject: [PATCH RFC net-next v3 02/27] regulator: core: Ignore unset max_uA
- constraints in current limit check
+Date: Thu, 21 Nov 2024 15:42:29 +0100
+Subject: [PATCH RFC net-next v3 03/27] net: pse-pd: Avoid setting max_uA in
+ regulator constraints
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241121-feature_poe_port_prio-v3-2-83299fa6967c@bootlin.com>
+Message-Id: <20241121-feature_poe_port_prio-v3-3-83299fa6967c@bootlin.com>
 References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 In-Reply-To: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -79,33 +79,50 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-We should only consider max_uA constraints if they are explicitly defined.
-In cases where it is not set, we should assume the regulator has no current
-limit.
+Setting the max_uA constraint in the regulator API imposes a current
+limit during the regulator registration process. This behavior conflicts
+with preserving the maximum PI power budget configuration across reboots.
+
+Instead, compare the desired current limit to MAX_PI_CURRENT in the
+pse_pi_set_current_limit() function to ensure proper handling of the
+power budget.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
-Change in v3:
+Change ni v3:
 - New patch
 ---
- drivers/regulator/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/pse-pd/pse_core.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
-index 1179766811f5..2948a7eca734 100644
---- a/drivers/regulator/core.c
-+++ b/drivers/regulator/core.c
-@@ -497,7 +497,8 @@ static int regulator_check_current_limit(struct regulator_dev *rdev,
- 		return -EPERM;
- 	}
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 2906ce173f66..9fee4dd53515 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -357,6 +357,9 @@ static int pse_pi_set_current_limit(struct regulator_dev *rdev, int min_uA,
+ 	if (!ops->pi_set_current_limit)
+ 		return -EOPNOTSUPP;
  
--	if (*max_uA > rdev->constraints->max_uA)
-+	if (*max_uA > rdev->constraints->max_uA &&
-+	    rdev->constraints->max_uA)
- 		*max_uA = rdev->constraints->max_uA;
- 	if (*min_uA < rdev->constraints->min_uA)
- 		*min_uA = rdev->constraints->min_uA;
++	if (max_uA > MAX_PI_CURRENT)
++		return -ERANGE;
++
+ 	id = rdev_get_id(rdev);
+ 	mutex_lock(&pcdev->lock);
+ 	ret = ops->pi_set_current_limit(pcdev, id, max_uA);
+@@ -403,11 +406,9 @@ devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
+ 
+ 	rinit_data->constraints.valid_ops_mask = REGULATOR_CHANGE_STATUS;
+ 
+-	if (pcdev->ops->pi_set_current_limit) {
++	if (pcdev->ops->pi_set_current_limit)
+ 		rinit_data->constraints.valid_ops_mask |=
+ 			REGULATOR_CHANGE_CURRENT;
+-		rinit_data->constraints.max_uA = MAX_PI_CURRENT;
+-	}
+ 
+ 	rinit_data->supply_regulator = "vpwr";
+ 
 
 -- 
 2.34.1
