@@ -1,137 +1,126 @@
-Return-Path: <netdev+bounces-146739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C8D9D55D1
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:49:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0829D55D5
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 23:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6345EB20CEA
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:49:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B93E31F21DDE
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7F31DE2B6;
-	Thu, 21 Nov 2024 22:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011F01DAC89;
+	Thu, 21 Nov 2024 22:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SXd/FNxM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R7M3K5WA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391B31DDC26;
-	Thu, 21 Nov 2024 22:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA121D47A3;
+	Thu, 21 Nov 2024 22:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732229324; cv=none; b=J33iYlyRy2pnfGSiSzw/RAKZO2Xjn+GsT/zq0jHAOYbN5m6u22LttAk2LUjH0N+g5p0BpCNw5YnRPCH9GMNPgP3/qBItEm9p4CHr0UAoMq4THY/wGed5lDrUl7NBkzNiwDHjvMaQZ53+Pxz9uO+AarxJdTAGV7WuUjAC8xpgHP0=
+	t=1732229589; cv=none; b=i30gXzt7Ej4m0gbkcTeirB1kwme0lNFypUIickxU4QnrA1brsJuNdCpRe754uOtFikOxvXgZsrc3/iDErKtf6UvyiTMIyVYj/0UDFlL97jLTqF2Vz07KSf4rNfGRe6X2KicbH5HqASQxwzQMjSmk4syo0irfEP9qz95Bxi7wC8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732229324; c=relaxed/simple;
-	bh=DwdlUxpukKZkwXyn+QCfutFIDPcY/3c2VtfjLZ6kMGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jwGcxjyLk8DWVkbMlLu7Z1qODodycU9pR0rut4wPQvT3vuHs0nJHr+GJ6A6q2MYsm9Njj/fetHLum1r88+FayTlTs9WyhNOqcxRWPUcYzxPMLh1RFMII5LJnc1s1o+LAGUNMrOevnSqVKRyUlrkCpevgN66xQ13cBp944vGe650=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SXd/FNxM; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1732229589; c=relaxed/simple;
+	bh=uIK/PTf4YdNVAmm4jEqvx8eLPG0wqWfoLwVs85Te3ps=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bseVCBaKJBt393tGBzxa0tLl7T039JaRnW+aZmBAO8AMAzXk77hD12/qO6LRhmQ23AYNLhijmSbrwzpACiWY7dOvEPhw8TnpDiGglre68hvG9oNzD0qNa+lKLchCPj+BTyD32lZboPZvAIm95IShYfI0a37I3pON9aOb+qS6Y/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R7M3K5WA; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-720d01caa66so1449135b3a.2;
-        Thu, 21 Nov 2024 14:48:42 -0800 (PST)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3823f1ed492so1432242f8f.1;
+        Thu, 21 Nov 2024 14:53:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732229322; x=1732834122; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tng0iyvmtAeQDH4O6wrIeK+ASsO/thRJgM2H3Zm+p88=;
-        b=SXd/FNxMicay09aPMFUnVUp4jJrXftlgMPYOK3VdGt5174NqFDMACARm4P6Q5iaom6
-         HQE+cxtnL6v4fYEO5Hh3r3gVG6ZUtLvrGKR57x61E8e4SFzHGqgLU61Fg7SMcstoaSUK
-         Ua5eSAEMUR7S7olgK/iPFi2SHGb1O/P5ZWg7Crm+bK6LnG70koa8MCGhFXjqy1XapsUH
-         qA6rWJhleW8sBhDGY+i+0jzPxwbYydqaY8zBXdbPsAPG4FceAa+efcVwAaVhlm2XUJjc
-         e/+NqqwFqwSK9GMPnR6ARReStW0xx4hIsxDiI/LjShbH6BmzPv/On6ACvzlFSVUOVmcK
-         yQ5A==
+        d=gmail.com; s=20230601; t=1732229586; x=1732834386; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Sy8Cvw23mQ6QDS6EoeKT1hV8E5eJnXnzttW4UOQSIhc=;
+        b=R7M3K5WAmNYynUWKsBSb+idrG7QKxDFz/9RWyjnlWqQLoRrKflHoQgotr252KZ3jS0
+         KTLZigCORJ1UJzklSTBwPYT5KDN5rXgD6TNC+mAp6R7q/W2vnzbKswm1IQpGb4ZwAWCN
+         5TlegViVXqTi5uEQYfQpN826E3NKYugNCktW1Tkdwu1HIVTv53NQmAjPE3Uchq2K7MyD
+         7iLTzwBlQC3CY7U/cM0q4rjxPkI/zyK+Uc5xr+Qj/L/78hQaEfD66o+nefu0bJViN7FR
+         zg5oyVYDDS9XXY5aP/8QTp+SdAWFgpa+toZ9RqldrsF/X1UEFFr2qNBtjdqVhaOS9MO6
+         CI1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732229322; x=1732834122;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tng0iyvmtAeQDH4O6wrIeK+ASsO/thRJgM2H3Zm+p88=;
-        b=uv4Uc5KzW6kebdCbhZE6FG9E7nZJUHuR7FQeAAjRwEPK0EoUqRvqQaOs2LWwIgZznn
-         b7ncLmFBHQ2mZlHqN5pqnXth57tootRe0iEgoe22sxhW2P7zA+91Xg7fp5a5gT3bsqPA
-         5bjlDz8jpgMeo/nzZaebO9NNYmPJM+WBufKOkNL6faKGmgP27IdGwJUzY2yU518vt0B6
-         9QfqLoOHg3zzGW2XiapbC5yn19p3xu6O0VeegDf2gR0b6mHOVk63n1J8X8Be4yQ4gfK3
-         Z+ieas7dvwcm9tcoorazQ2OeCVf4QnXwAhskEchZXYXphH4ILZhsnQPJseFjmzxWMTV4
-         R12A==
-X-Forwarded-Encrypted: i=1; AJvYcCW9MsQqoqEESNyO0EUCFw9qFYF0vfK+DD4ufzjKRBWLOtpjMHKd+Uq48EyjWmTgQiYpmshrlkApdUo=@vger.kernel.org, AJvYcCWch3uE3HIN0h+4K2+kZAX4aMecj/v/LpnRPLEUo9jwZ7M5AKNBB29zGjEHW7HE3GXsDRRphuOf@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrMcaGZZfcqlLWDgq1ZoRUaHoczXWBMkOoBVpqsUS+jOuDdxGW
-	pmZswjluGeLPtFDnXak2vnl4f0sloXDRZWiCUfo8F+X5Q5R46f4=
-X-Gm-Gg: ASbGncvK2NSMXVtmrIpsDuPvNSg6sRc9Syj/j74PNXr0k6gArDrIAg92alWxJssFlHc
-	VPaZcYVV6dSRNw7M5YJzdk8EIcoSQtiMYdIA9uOs9BSFTjw7rl27Ew5ZOtLK6PUV+tm0ADfmdoS
-	mB38QAFeH3Qrm6W8vY84lEEM7pA2CKfDasAvlU7pZ/fZLrGmSOqGKhq52zfT+vGcpTNxqaLgxfO
-	ClduIFeSfuBYtW2fLmrSEodiHwkPcQ0xmMaRwE5Q9r0xVixWEYP1bPnn1hKPLRGO/WnP6jP9Fs=
-X-Google-Smtp-Source: AGHT+IFQ0B/JiKGabPfJYNbf/Q86LIo1DT+f0On/aEakqwc0UWc3jxR7+ecwcL6C7VQK7xXfgLtVAQ==
-X-Received: by 2002:a17:90b:1dc3:b0:2ea:696d:7330 with SMTP id 98e67ed59e1d1-2eb0e234d1bmr713339a91.14.1732229322356;
-        Thu, 21 Nov 2024 14:48:42 -0800 (PST)
-Received: from localhost.localdomain ([117.250.157.213])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eb0d048654sm248188a91.39.2024.11.21.14.48.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 14:48:41 -0800 (PST)
-From: Vyshnav Ajith <puthen1977@gmail.com>
-To: corbet@lwn.net
-Cc: linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Vyshnav Ajith <puthen1977@gmail.com>
-Subject: Fix spelling and grammar mistake - bareudp.rst
-Date: Fri, 22 Nov 2024 04:18:27 +0530
-Message-ID: <20241121224827.12293-1-puthen1977@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1732229586; x=1732834386;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sy8Cvw23mQ6QDS6EoeKT1hV8E5eJnXnzttW4UOQSIhc=;
+        b=cHXmjFj+Sb89ces10WqvRjnOBTlMrLmhJyFNjngqpDhuVsrcliFIOkOgNOVCpzWhpS
+         547MbsnzkS87TxQtfvawNJLXlPspxtFtZ/5g5wMKGni0WgFoxGSfdn2dEhGVqf+CBLGI
+         TSaILawO6Wv9qsJh03Xgygr6fQg+eAPyHMJP0g5RKBwFeqD30+GErp51kcPVHFA7oPx9
+         DoJtFG3BERKHKjIMuA3EJVlfyvogsZTRJcOTqmV4btwLkFb7Mrn/HkAtboqEtpwqVOuy
+         lfj5iOxlAEHszZa4c0z/Fn/C+PVEB03pGQ2L79Q5DC3/eltEXyVcvVa+PHZEkAkMgaR+
+         K31w==
+X-Forwarded-Encrypted: i=1; AJvYcCVnVvueJVlOjNqaMWqgN+ojBRY0dj2lM/AmGPP6X9FkZwdMsjuIq3/yKx18fWIC+YpKsQA0cHFt@vger.kernel.org, AJvYcCXlgKEp4ILUb2sBFdOr+83bBTav05yjlTcpjl19oeHjg8UMkBgQhPk6+c23RgdExe3OtSx7O//dKyVkhXmV@vger.kernel.org, AJvYcCXvas3Ju4O735IpeWBSx0v303Syupz4+NUEUO4Y0Gmlan3S57AHH4QZR8OdlaNAGtH/do1Ym+m/AU1O8PKp@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzlfMN62gU9DPoCdJ43cUlyO8xpiMOG7lzu/RwzaR5zw5P8VYM
+	U4fVxFvW9staI/h5XDZq0xLAqilcocaV6pmC3mE+/zL7lyYpZo8W
+X-Gm-Gg: ASbGncsjWSTFYJ8hPltUg3SZTVXoYaq4qTzLI89kDfUNnSHb203vxPqkEE6iOFewqxi
+	QS+WbkGu7Q8N6m73UF/OySup7ryBWTmoKHFAiKtsDLy6j2dCcNmhkmt9HfDaMf7SYR/JVyLYxRS
+	WZm6Do6SWcSXgLNLzfoGJIapGKNktPC0Ob5vOtiKTGgjtRu8HQU5bZEOWEedqT0YUW16/Atl6OU
+	pBxU+Tnlv/4QhbAKXabCNfejkXFLtQPaxV85PepVO3NV5XgZEI=
+X-Google-Smtp-Source: AGHT+IHkG+U0+oDFtDlZAwwzq2TdFMKDYnwddF1dsNGhH0SxOu849/djbN7vKv8OvZm0mxEXJgLfuA==
+X-Received: by 2002:a05:6000:1fa5:b0:37d:3b31:7a9d with SMTP id ffacd0b85a97d-38259d2c161mr4352419f8f.23.1732229586334;
+        Thu, 21 Nov 2024 14:53:06 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b46430f1sm70137405e9.43.2024.11.21.14.53.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2024 14:53:04 -0800 (PST)
+Message-ID: <7c263cbf-0a2f-4ce9-ac81-359ab69e6377@gmail.com>
+Date: Fri, 22 Nov 2024 00:53:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: wwan: Add WWAN sahara port type
+To: Jeffrey Hugo <quic_jhugo@quicinc.com>
+Cc: Jerry Meng <jerry.meng.lk@quectel.com>, loic.poulain@linaro.org,
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+References: <20241120093904.8629-1-jerry.meng.lk@quectel.com>
+ <863ba24c-eca4-46e2-96ab-f7f995e75ad0@gmail.com>
+ <fbb61e9f-ad1f-b56d-3322-b1bac5746c62@quicinc.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <fbb61e9f-ad1f-b56d-3322-b1bac5746c62@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The BareUDP documentation had several grammar and spelling mistakes,
-making it harder to read. This patch fixes those errors to improve
-clarity and readability for developers.
+Hi Jeffrey,
 
-Signed-off-by: Vyshnav Ajith <puthen1977@gmail.com>
----
- Documentation/networking/bareudp.rst | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+On 20.11.2024 23:48, Jeffrey Hugo wrote:
+> On 11/20/2024 1:36 PM, Sergey Ryazanov wrote:
+>> +Manivannan
+>>
+>> Hello Jerry,
+>>
+>> this version looks a way better, still there is one minor thing to 
+>> improve. See below.
+>>
+>> Manivannan, Loic, could you advice is it Ok to export that SAHARA port 
+>> as is?
+> 
+> I'm against this.
+> 
+> There is an in-kernel Sahara implementation, which is going to be used 
+> by QDU100.  If WWAN is going to own the "SAHARA" MHI channel name, then 
+> no one else can use it which will conflict with QDU100.
+> 
+> I expect the in-kernel implementation can be leveraged for this.
 
-diff --git a/Documentation/networking/bareudp.rst b/Documentation/networking/bareudp.rst
-index b9d04ee6dac1..ce885caf24d3 100644
---- a/Documentation/networking/bareudp.rst
-+++ b/Documentation/networking/bareudp.rst
-@@ -6,16 +6,17 @@ Bare UDP Tunnelling Module Documentation
- 
- There are various L3 encapsulation standards using UDP being discussed to
- leverage the UDP based load balancing capability of different networks.
--MPLSoUDP (__ https://tools.ietf.org/html/rfc7510) is one among them.
-+MPLSoUDP (https://tools.ietf.org/html/rfc7510) is one among them.
- 
- The Bareudp tunnel module provides a generic L3 encapsulation support for
- tunnelling different L3 protocols like MPLS, IP, NSH etc. inside a UDP tunnel.
- 
- Special Handling
- ----------------
-+
- The bareudp device supports special handling for MPLS & IP as they can have
- multiple ethertypes.
--MPLS procotcol can have ethertypes ETH_P_MPLS_UC  (unicast) & ETH_P_MPLS_MC (multicast).
-+The MPLS protocol can have ethertypes ETH_P_MPLS_UC  (unicast) & ETH_P_MPLS_MC (multicast).
- IP protocol can have ethertypes ETH_P_IP (v4) & ETH_P_IPV6 (v6).
- This special handling can be enabled only for ethertypes ETH_P_IP & ETH_P_MPLS_UC
- with a flag called multiproto mode.
-@@ -52,7 +53,7 @@ be enabled explicitly with the "multiproto" flag.
- 3) Device Usage
- 
- The bareudp device could be used along with OVS or flower filter in TC.
--The OVS or TC flower layer must set the tunnel information in SKB dst field before
--sending packet buffer to the bareudp device for transmission. On reception the
--bareudp device extracts and stores the tunnel information in SKB dst field before
-+The OVS or TC flower layer must set the tunnel information in the SKB dst field before
-+sending the packet buffer to the bareudp device for transmission. On reception, the
-+bareUDP device extracts and stores the tunnel information in the SKB dst field before
- passing the packet buffer to the network stack.
--- 
-2.43.0
+Make sense. Can you share a link to this in-kernel implementation? I've 
+searched through the code and found nothing similar. Is it merged or has 
+it a different name?
 
+--
+Sergey
 
