@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-146606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD989D489A
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:15:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB049D48C6
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:24:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E600B238C6
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:15:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C1C2281BCE
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB561BC9E2;
-	Thu, 21 Nov 2024 08:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE0A1CB32D;
+	Thu, 21 Nov 2024 08:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbnhOXkb"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="HzbnfOO7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E641B85CF
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7DE1CB303
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732176935; cv=none; b=BzthDJ2jayWW+Xjs53JatBIybxictClWpIfHOcXmUVvtGoAGB7dY5Fl/F/pOksXUuLXwxnf2fFWr//FPUD7Sqv493oAskhAyBWVPYj1a8DDVCVaAZyuVK6iwGmofb+UmklvrK4utQSVd+1cOw9C3cisAdbAB+/aaGDA+qgQX7o0=
+	t=1732177450; cv=none; b=P/UODUSnfV4CSGV/5A2uACy0jF1h6pmPMDD0bm7dJEAF88LnBCLpa5qVkiVB3NOIq+RGGzOEGmBEvuL33PiWKQ9FzXYCIxQdmAoiz8/oWC5+eifq8nO5APO+Sv05P2Y/dfz5v+usXuuGH/00Lr2X/XyvlrotedMISHIHLCQWKug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732176935; c=relaxed/simple;
-	bh=vx1+AwLU4UsvAMyNOFMRQ4EEtvnDkA2FBnIl/UudUDU=;
+	s=arc-20240116; t=1732177450; c=relaxed/simple;
+	bh=SjnNjj6eEjhkdS65B5/uDkp8jKyB8727x/5ZGdDTNM8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzXxfIYsoW+POojJz4YA9+Pb1S4jITTKc95Ak+E05ZLlcHqbIqafSHWNPlzqWdxmIwIp+8ne2bpw5ChYKCf7C6puzF9n0Wp+78JDLOLeohwyrhKCkY7HqZXekgoOq64nMCyye2sKyBSMwyKQFTXyzx9XktSiTTQbR1owo64W7mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbnhOXkb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732176932;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dAru0Q7sNpk/HHsEEZWynnmCBFQAz2UJFJPWzmB99Ic=;
-	b=DbnhOXkbT3bkxbJ+7lZIsHB2UY52yEd7bHq4HtwMabR9mySvuL1Fv/8X9tWgQnqLfPYy/B
-	w0Xacr2tKxQw2VGwNoY2wSLvw8EOMg89bwSStwGkkMLfz/VLsMYlJx3mGgOEbNSbyu0+1y
-	PqcIU9ivZA3ud3vVQBcdLKLcSipg7Ak=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-78-xPtNxMYeM4eWtZjW7h-NpA-1; Thu, 21 Nov 2024 03:15:31 -0500
-X-MC-Unique: xPtNxMYeM4eWtZjW7h-NpA-1
-X-Mimecast-MFC-AGG-ID: xPtNxMYeM4eWtZjW7h-NpA
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315eaa3189so5282115e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 00:15:30 -0800 (PST)
+	 In-Reply-To:Content-Type; b=RLbAqjgKjLcdHwLtVfxZyucS+YaXvBws+XUvas6xptTk9bq6YN9W+cTkX1hsoYsebPb9HLREooMj1jUr83GHxgbMdI0NESyYv09/B28qRpSCba/8PrBzqDbiI6VhCFB8sAVNezYvqkvDEi4iIeZhrYy83nSpzIJwgi50WDHwHOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=HzbnfOO7; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43160c5bad8so161535e9.3
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 00:24:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1732177447; x=1732782247; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=M1sJfTwn7Gyd084YXpAF+iK6+RJm+FhconOKLhhofXs=;
+        b=HzbnfOO7LiLFbWTuOYlKEk23imEZtRgLPz3z1PkF8oWyMOm8R7QM0sLqB8HY90RzYF
+         Wi6y/o7adTgTgS5k12cjKOW9u4xPGjM2xfn4PvqYdqOrdN9HNIJCjSR3zn0wOUPajmFT
+         S/GEQhTv2a4+g7QBvBs1ItPwGODWEwEiDdLj7MCR5Sjy++T1QT4FQ7wfXjNcw9d5/Zmn
+         zvav38pxyjS5adHiNbY2HXrKX0H3OWCj/JIWR1crL99YFJKGtvgZZ9aa+FGOw05YSDX2
+         edzId9XuZqPtfxWtejkwr43rObwH0TnsTB8bnOTNPnh7oAkF0x6V4QsHhCpqEiW3R+Yg
+         4mDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732176930; x=1732781730;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dAru0Q7sNpk/HHsEEZWynnmCBFQAz2UJFJPWzmB99Ic=;
-        b=mVvtC243erHzt5jogAMxtt3HGzT1w5itvLF/+jYZ1wtPipWGEMJknuYpzS4Ofd3qnm
-         o/lS/wxTXIig0MY/pFTRgtTUDa52AOo06+avfWgWAOqeD/iF5Gjv6Di8HfmlzLc2yCr7
-         JY9diNUqgY6yBJ3OgxLx0m/bm9lGSGxJvyHNG81Q2kpWbcVoYYDGIw6UC9TrB/BfzLME
-         T2SEswddTHW6xxNothp6dmTBOtLHBiJZbFdZlGxgGaePw35INKTCJQD4Smrv/erCDB40
-         GwuNiqNzBHD8iJBFqpZvBuDpd0Zo/5YexXCRX1ald2feIyRTG6QLSv4i8uwtLm/40SxX
-         Bosg==
-X-Gm-Message-State: AOJu0YzlDDzgQHJ7iC9F8eitZ6eHmBGkDXEm4fI8cenICkpPJnsC7fQE
-	CCHY9y4G8p+su6VfnNIOhthv06iGuqMd4GJ5PH4YEjEGrZRmsRgJTXUA3OaOvneJV54AXGzEzL7
-	19aEEZf2TgLkwNwj6w/KYydCCpCyjNPGJzQvttPdQ9E6TKnxf8aMMeg==
-X-Received: by 2002:a05:600c:502a:b0:42c:b508:750e with SMTP id 5b1f17b1804b1-433489a06ebmr58058195e9.11.1732176929993;
-        Thu, 21 Nov 2024 00:15:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEAAKP652fy4bHoCxWpHv86UZV5kyYHY85sFR0FghbNa9ObZXs7vQd2NPg/YLhM7rRCI5jfFg==
-X-Received: by 2002:a05:600c:502a:b0:42c:b508:750e with SMTP id 5b1f17b1804b1-433489a06ebmr58057935e9.11.1732176929686;
-        Thu, 21 Nov 2024 00:15:29 -0800 (PST)
-Received: from [192.168.88.24] (146-241-6-75.dyn.eolo.it. [146.241.6.75])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b46343e7sm44946215e9.33.2024.11.21.00.15.28
+        d=1e100.net; s=20230601; t=1732177447; x=1732782247;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M1sJfTwn7Gyd084YXpAF+iK6+RJm+FhconOKLhhofXs=;
+        b=Xj9iyWxXVDgtHOi5fhVdmmvt7sIBG3It3WVXWNJWV0XMMonAmC7cUfMltPC+jnaKzU
+         b8SdTQQUh0n4Pge6ysjSv8vvlj+LtxGImdib7Ewvfo+HdQiWgiMGLmKlB5Jz3Zw103CS
+         J6hOqzTQgsQIVlXHZNyfm7SRie7WvczEjOeW6A4Y/pVqyXEbfi+strJ6VIK0/r13+eu9
+         deuvFZ3I7W7TruDAqetx1+0bvinS478Q2c0++a097oac3YNRc9Mfbjoz31b6wzVu9VQN
+         uKAHqCbGIacAsKzb++XCFaKE2e5zXJAYY3+70s+po2TWi4s8YWaREgHw7aj4CPspltG3
+         5fZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULvvtsEJrYN5EwfhAEQ1okVQk5I0BTKvIM3ZpEvkxplmxceRVonNSNCJuayqR8eLsy6GfVl1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytowAZl8UrA6D4JP3zpJGJwFclyGIV4vQvP2bXtqOtsSXJpHU2
+	KyvpcX0cK56DAeTAsjafYcSHoxCRpFBRFyuZpMxeVMQqDJ2KCuXU77zJ88kR/o4=
+X-Gm-Gg: ASbGnctMsqAHWOOHTPorRuV9H0/sN2NU7FjSSen19MuYHKm27sQOwRYuGwE1gsdDA+d
+	Qcvfl6Hn08Bt3BJ16WAFGlPahqUQ9I5NdVqZ7WQmY0RzovS6dax9pgCG5dPw2kZ3jlvazES17y+
+	+ll1sBm7cj2soCkdsTIAENxaCYrcNJys77PHQ8BDV+SvaPOpoGlONeZzQSChKeSRmotPfTKf1yV
+	2KkkCcXGbW+xfMXBxpmQCgQn+pz5FK7jzGad+AuKykPZipAZ54cIVVS5YnEhk5hF5QiOPe3isNo
+	cUjAl1Ive88cr5maDM1C4OlJVuE=
+X-Google-Smtp-Source: AGHT+IEs5rFa7LQSDMqAm+y4pd4HRXOgjMCNgppccy/tI5bWIghbZ3mlTctuJQq56mR6HnS9FLIOyw==
+X-Received: by 2002:a05:600c:1c9b:b0:42c:b9c8:2b95 with SMTP id 5b1f17b1804b1-4334f025af6mr21527315e9.6.1732177447009;
+        Thu, 21 Nov 2024 00:24:07 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:cbfa:348f:b057:1762? ([2a01:e0a:b41:c160:cbfa:348f:b057:1762])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b46359b9sm45019925e9.36.2024.11.21.00.24.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2024 00:15:29 -0800 (PST)
-Message-ID: <59c96191-3203-4338-9754-ac7c5ee35e78@redhat.com>
-Date: Thu, 21 Nov 2024 09:15:27 +0100
+        Thu, 21 Nov 2024 00:24:06 -0800 (PST)
+Message-ID: <a68fb3e3-e461-4192-9c5c-d3b0864dbeb3@6wind.com>
+Date: Thu, 21 Nov 2024 09:24:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,51 +82,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mlx5/core: remove mlx5_core_cq.tasklet_ctx.priv field
-To: Caleb Sander Mateos <csander@purestorage.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next, v3] netlink: add IGMP/MLD join/leave
+ notifications
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>
-References: <20241119042448.2473694-1-csander@purestorage.com>
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com,
+ jiri@resnulli.us, stephen@networkplumber.org, jimictw@google.com,
+ prohr@google.com, liuhangbin@gmail.com, andrew@lunn.ch,
+ netdev@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?=
+ <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>,
+ Patrick Ruddy <pruddy@vyatta.att-mail.com>
+References: <20241121054711.818670-1-yuyanghuang@google.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241119042448.2473694-1-csander@purestorage.com>
+Organization: 6WIND
+In-Reply-To: <20241121054711.818670-1-yuyanghuang@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/19/24 05:24, Caleb Sander Mateos wrote:
-> The priv field in mlx5_core_cq's tasklet_ctx struct points to the
-> mlx5_eq_tasklet tasklet_ctx field of the CQ's mlx5_eq_comp. mlx5_core_cq
-> already stores a pointer to the EQ. Use this eq pointer to get a pointer
-> to the tasklet_ctx with no additional pointer dereferences and no void *
-> casts. Remove the now unused priv field.
+Le 21/11/2024 à 06:47, Yuyang Huang a écrit :
+> This change introduces netlink notifications for multicast address
+> changes. The following features are included:
+> * Addition and deletion of multicast addresses are reported using
+>   RTM_NEWMULTICAST and RTM_DELMULTICAST messages with AF_INET and
+>   AF_INET6.
+> * Two new notification groups: RTNLGRP_IPV4_MCADDR and
+>   RTNLGRP_IPV6_MCADDR are introduced for receiving these events.
 > 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> This change allows user space applications (e.g., ip monitor) to
+> efficiently track multicast group memberships by listening for netlink
+> events. Previously, applications relied on inefficient polling of
+> procfs, introducing delays. With netlink notifications, applications
+> receive realtime updates on multicast group membership changes,
+> enabling more precise metrics collection and system monitoring. 
+> 
+> This change also unlocks the potential for implementing a wide range
+> of sophisticated multicast related features in user space by allowing
+> applications to combine kernel provided multicast address information
+> with user space data and communicate decisions back to the kernel for
+> more fine grained control. This mechanism can be used for various
+> purposes, including multicast filtering, IGMP/MLD offload, and
+> IGMP/MLD snooping.
+> 
+> Cc: Maciej Żenczykowski <maze@google.com>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Co-developed-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
+> Signed-off-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
+> Link: https://lore.kernel.org/r/20180906091056.21109-1-pruddy@vyatta.att-mail.com
+> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
 
-[Under the assumption Tariq is still handling the mlx5 tree, and patches
-from 3rd party contributors are supposed to land directly into the
-net/net-next tree]
+net-next is currently closed, you will have to resubmit after the v6.13-rc1 is
+out: https://patchwork.hopto.org/net-next.html
 
-@Caleb: please include the target tree ('net-next') into the subj
-prefix. More importantly:
+One comment below.
 
-## Form letter - net-next-closed
+> ---
+> 
+> Changelog since v2:
+> - Use RT_SCOPE_UNIVERSE for both IGMP and MLD notification messages for
+>   consistency.
+> 
+> Changelog since v1:
+> - Implement MLD join/leave notifications.
+> - Revise the comment message to make it generic.
+> - Fix netdev/source_inline error.
+> - Reorder local variables according to "reverse xmas tree” style.
+> 
+>  include/uapi/linux/rtnetlink.h |  8 +++++
+>  net/ipv4/igmp.c                | 53 +++++++++++++++++++++++++++++++
+>  net/ipv6/mcast.c               | 58 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 119 insertions(+)
+> 
+> diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
+> index db7254d52d93..92964a9d2388 100644
+> --- a/include/uapi/linux/rtnetlink.h
+> +++ b/include/uapi/linux/rtnetlink.h
+> @@ -93,6 +93,10 @@ enum {
+>  	RTM_NEWPREFIX	= 52,
+>  #define RTM_NEWPREFIX	RTM_NEWPREFIX
+>  
+> +	RTM_NEWMULTICAST,
+RTM_NEWMULTICAST = 56
 
-The merge window for v6.13 has begun and net-next is closed for new
-drivers, features, code refactoring and optimizations. We are currently
-accepting bug fixes only.
-
-Please repost when net-next reopens after Dec 2nd.
-
-RFC patches sent for review only are welcome at any time.
-
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+> +#define RTM_NEWMULTICAST RTM_NEWMULTICAST
+> +	RTM_DELMULTICAST,
+> +#define RTM_DELMULTICAST RTM_DELMULTICAST
+>  	RTM_GETMULTICAST = 58,
+And you can probably remove this '= 58' to align to other families.
 
 
-
-
+Regards,
+Nicolas
 
