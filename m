@@ -1,81 +1,84 @@
-Return-Path: <netdev+bounces-146616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA55E9D4955
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:56:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A05EF9D4966
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 10:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77AA31F22087
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:56:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F3BDB222E5
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B5A1C1AD9;
-	Thu, 21 Nov 2024 08:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE141CB9F0;
+	Thu, 21 Nov 2024 09:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BtkEgbv1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6iC9y8D"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C6C1C9DC9
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC071CB33D
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 09:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732179356; cv=none; b=IigBBuNhzfC/NVmlRSERwUyBloGEHFDdW9alq+GAmdhzJzGI1REsv9Gge2LBS/+WZz8p5RELEslIGq0XZi64lic/VTOiwxHwSwEh+84juHQLkoxT5ASKqFt0IB6KMlltdCfJS10g+Fv98OX72nJXTqnGo9hUgP+Qx/0TKGkEPrE=
+	t=1732179647; cv=none; b=A0brR4yKht3bIdh7o5CYbCrlhuaizrZ2SMfJS7oIZ9C1s7aCSYtggIPYjEibrQqyICP+AChasGfrkKBqy/DD1xKCSZ78qH3TBcgBxc/D/a2KPNQVOkLv6bjAudmmWkGWp4KGf6NaZh2v1X93+oLPlxyXWyR+uHgSPoXmrJYoi9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732179356; c=relaxed/simple;
-	bh=K7AkL0tto6CDdGlimdcgf6Xn1JT1cRBDjbJ0bR7LQ/M=;
+	s=arc-20240116; t=1732179647; c=relaxed/simple;
+	bh=ZnCk/5g2TfMnFVnDiNYU9hF72gFeq8DTzd2S/HP3jYs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tcmr6V2MgJhVAvaY3JMmhyhvWLUCz1FbWJ7oIDRvxa3Fm1eZKZt3hqpqBFWEfBp4soAj/RpmwY7S8f6o6zaC0M7dBW7okkPQqLX2SHC1Y2bfv4Z94Nbn2RzI3vnd12RvmZGpQz6uIGWULwzAxgzm2EMq54Lk2uYotYMeRz/4nO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BtkEgbv1; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=oyll1MzRVOCzPch08yQyUul2G7vySw5Qx0iZgYKVZ11NeP0hCKe1/cgqFlLu9r7EIj2G4tGZS5ZlHaQ1cGbq/IVXyff1t1GCT9U/WqLs2toqh2N4UQmCXDLJrKBP564430+e6ijStloLY+70Je1lB5yfOdDGUfDSap5P0pTjGcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6iC9y8D; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732179353;
+	s=mimecast20190719; t=1732179644;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JlA/Dao4HWIor+ViY9VXGE+zRi2NDg4RCE9H6BNgMBg=;
-	b=BtkEgbv1pkpgWk9l3nU5Rqnnkzu5Tww5JZjq/6v+qANqrZozbbZLHGfiB1AJs6G9b6W8MJ
-	c8z1FzVGSEBEN8tFgQoKzxlU6lQWpk9Epfv4FwHgd3SMFmQA5JIggAnyyJ5dulg7wRK4hu
-	6cKrwUQw6/h/HaZLIHolcK7JcSJ7wuo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VGDVNO6KuLT2CaTKYJTuRwWCpafnUpHauXNIMBPMRRY=;
+	b=N6iC9y8DL9vLmI41pVLq3IPRQfEok+2PPNQgjKqhcVu+kvNcbs7o0VJqDeR+7joDH25TH0
+	Ou4imSCohI1uHm+urTUHGcdkUMGKn5FIUTK+j4PKQqf5cUyiRH8H83kAsCQfy1KDvflky7
+	NNGbE38rnc7Y37x/X1DJZnP8VmRpRTc=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-46-538zJZp7PaWfSWk2k1dwOQ-1; Thu, 21 Nov 2024 03:55:51 -0500
-X-MC-Unique: 538zJZp7PaWfSWk2k1dwOQ-1
-X-Mimecast-MFC-AGG-ID: 538zJZp7PaWfSWk2k1dwOQ
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38236ca50d5so324127f8f.0
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 00:55:51 -0800 (PST)
+ us-mta-599-NI4OjzOUMy6haUHCKzNOaw-1; Thu, 21 Nov 2024 04:00:42 -0500
+X-MC-Unique: NI4OjzOUMy6haUHCKzNOaw-1
+X-Mimecast-MFC-AGG-ID: NI4OjzOUMy6haUHCKzNOaw
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6d41cbccd23so11075426d6.3
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 01:00:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732179350; x=1732784150;
+        d=1e100.net; s=20230601; t=1732179641; x=1732784441;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JlA/Dao4HWIor+ViY9VXGE+zRi2NDg4RCE9H6BNgMBg=;
-        b=rC0IUcoDw4LxP1NSsGDabiglAAVrJ/o7UlaUGh9FFq+iA0GifCKiHgg59C+qCVRFEw
-         8p7O38LV0NyFlLXQG/D4TuTxuHEhm0TMCUNKxuBiktTAwgWqPTLzCdCgjvGL+dFU+gav
-         7y6YxUVeOg/BquAAb/G6zep42bCvkqNtAImViXjugFs7NBWsWZDPDdz3jozxlUYk4NyM
-         L5aAfUgBJTKOj2BsyOuqUifBh+BlZdoStH6kvjdV45r1MtijVKlG27dqKOxhNyFW7M4k
-         aFpYm+51s3JPEJ0NuJjah3DUQHzv2Svvm3Od+D3/Yj8pgaptBlK6DAPtpafhJvurO8mz
-         voZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbGFq+qfMEJkHHh1rvZoKxYpmu5RTUBO2pmMMeKIZPjGJsBPXmubF0zEJ9YSSWJDuU8oTSwqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3VKR4F6xMZVX4LOeurGLPIJ+Rg7rdNEjk2mDl3ILfpyEammjW
-	+g41UOOxAkrWVXd3wYsothGJTtQG8qMTlRSLe7xFAm+APWwZaoiovd/cw1tsALD2adOPTCyJa63
-	SBgy6qTe6rBfiXJyRNVhKLHBubBTT5ZrQtmt9fFCgCQD0vMQzHDDxVg==
-X-Received: by 2002:a05:6000:18a2:b0:382:3cc2:537c with SMTP id ffacd0b85a97d-38254afacf3mr5058438f8f.26.1732179350511;
-        Thu, 21 Nov 2024 00:55:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGS5uZ0+VI315ZPetn9/2pNfe8s+g3uPtxT0kC/eI2N51ikDPk7/rCHoqVcvf29z/wcQT0Z1A==
-X-Received: by 2002:a05:6000:18a2:b0:382:3cc2:537c with SMTP id ffacd0b85a97d-38254afacf3mr5058426f8f.26.1732179350210;
-        Thu, 21 Nov 2024 00:55:50 -0800 (PST)
+        bh=VGDVNO6KuLT2CaTKYJTuRwWCpafnUpHauXNIMBPMRRY=;
+        b=fioOC7KSQU8EY4Fae/LZ7vivzMkjESE+gOYlUZoQIjoNzFAplV8JwT8sbBzS0Yc/rz
+         rYA4Cs/CVBurfcAKva8ZIjaxJIXGWG1Uu2pve1FGhz5tVHcRT6fAR+xYimq+J9gUXq8l
+         W5m1nbf1D4ea3KlVooEapmxX1fUvK+2dGFPV02RPdOHYYJdo//pqioOlAUsnsHBvP41e
+         pusO0o4i8aY3jqDLeWa2BLrZX4XYZsRGB9yK/ivp5vLTkCfMaBjryGK1slx0fYR6we+C
+         DJZ7Nbx766HQMMwijexxcRIQOjjz7QKTMhC02T3ctOpelRz3axSdOVXFe4Oo9aNrm2eh
+         RFhw==
+X-Gm-Message-State: AOJu0YwJlYqoeYTd/x5kjVQ87dhUTjWWXFdawxBTYey/mXCIt7mh17Ts
+	fasW1pwW8ssAtX2wTJCrSbAW2mVjY16DqLaiHu3NZaP4tWB+TQhzP8sA6LujZj2jIJgMdikiPfV
+	NyFJiRIcBieM9j9EJpgZKFdhgQS1UY45FurQGrXQ0xAS9guQ2aHbWZ1gY6tQCRw==
+X-Gm-Gg: ASbGncsXa6FanRzDmG+FA5Txzdj0JnAksD68UvTkTa2jv/laAJq6V4/HxcS1Xz3BipD
+	H7R8+sKi/Vjo3U8BWEDYqxR6siFf3sMRi7Wi4y2PtvVUNfynbjyLRSlXLL1Uhz0Fxm7TasaDZQJ
+	fvjk6A8Z2cK42R5+YRuFIRTiz9Iv9G6eORhl4v4db6jLGcGMy3t/jKdUeK6fj4JSiajWmMGl1pT
+	JOzuo/jYmONPZ4WahW252Qfm2y4ZqPcqkFXQf3ILwJSBE6UdU37twd6xKZuzzoiR0sKATHiww==
+X-Received: by 2002:a05:6214:b65:b0:6d1:74d4:4ba2 with SMTP id 6a1803df08f44-6d43778e4a0mr103045326d6.9.1732179641627;
+        Thu, 21 Nov 2024 01:00:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHdmy2H9pW5POPHqGGAxMcBpXXjXeyFHS9b0AAyNbf4MGFLMnDsHCORTEYORJXQ6zeWUALLNg==
+X-Received: by 2002:a05:6214:b65:b0:6d1:74d4:4ba2 with SMTP id 6a1803df08f44-6d43778e4a0mr103044906d6.9.1732179641249;
+        Thu, 21 Nov 2024 01:00:41 -0800 (PST)
 Received: from [192.168.88.24] (146-241-6-75.dyn.eolo.it. [146.241.6.75])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38254933d1asm4348786f8f.71.2024.11.21.00.55.48
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d43812c8ffsm20484906d6.91.2024.11.21.01.00.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2024 00:55:49 -0800 (PST)
-Message-ID: <a292cdfe-e319-4bbd-bcc0-a74c16db9053@redhat.com>
-Date: Thu, 21 Nov 2024 09:55:47 +0100
+        Thu, 21 Nov 2024 01:00:40 -0800 (PST)
+Message-ID: <22595a95-e4e9-4aeb-905c-ad928c5fad58@redhat.com>
+Date: Thu, 21 Nov 2024 10:00:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,44 +86,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] PCI/MSI: Add MSIX option to write to ENTRY_DATA
- before any reads
-To: dullfire@yahoo.com, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Mostafa Saleh <smostafa@google.com>,
- Marc Zyngier <maz@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
-Cc: stable@vger.kernel.org
-References: <20241117234843.19236-1-dullfire@yahoo.com>
- <20241117234843.19236-2-dullfire@yahoo.com>
+Subject: Re: [PATCH net-next v2 00/21] net:yt6801: Add Motorcomm yt6801 PCIe
+ driver
+To: Frank Sae <Frank.Sae@motor-comm.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241117234843.19236-2-dullfire@yahoo.com>
+In-Reply-To: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 11/18/24 00:48, dullfire@yahoo.com wrote:
-> From: Jonathan Currier <dullfire@yahoo.com>
+On 11/20/24 11:56, Frank Sae wrote:
+> This series includes adding Motorcomm YT6801 Gigabit ethernet driver
+> and adding yt6801 ethernet driver entry in MAINTAINERS file.
 > 
-> Commit 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X entries")
-> introduces a readl() from ENTRY_VECTOR_CTRL before the writel() to
-> ENTRY_DATA. This is correct, however some hardware, like the Sun Neptune
-> chips, the niu module, will cause an error and/or fatal trap if any MSIX
-> table entry is read before the corresponding ENTRY_DATA field is written
-> to. This patch adds an optional early writel() in msix_prepare_msi_desc().
+> YT6801 integrates a YT8531S phy.
 
-Why the issue can't be addressed into the relevant device driver? It
-looks like an H/W bug, a driver specific fix looks IMHO more fitting.
+Please have a better read to the process documentation and specifically at:
 
-A cross subsystem series, like this one, gives some extra complication
-to maintainers.
+https://elixir.bootlin.com/linux/v6.11.8/source/Documentation/process/maintainer-netdev.rst#L14
 
-Thanks,
+before your next submission.
 
-Paolo
+Additionally:
+
+## Form letter - net-next-closed
+
+The merge window for v6.13 has begun and net-next is closed for new
+drivers, features, code refactoring and optimizations. We are currently
+accepting bug fixes only.
+
+Please repost when net-next reopens after Dec 2nd.
+
+RFC patches sent for review only are welcome at any time.
+
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+
+
+
 
 
