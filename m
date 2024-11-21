@@ -1,163 +1,139 @@
-Return-Path: <netdev+bounces-146730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F3C9D54F0
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:45:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05B4B9D5505
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 22:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B14D1F217A7
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:45:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A381B213E4
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 21:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9811DD0E7;
-	Thu, 21 Nov 2024 21:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F611B86CF;
+	Thu, 21 Nov 2024 21:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BNFcApkC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqEskWsc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2C71DBB19;
-	Thu, 21 Nov 2024 21:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C51883CDA;
+	Thu, 21 Nov 2024 21:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732225505; cv=none; b=R33sdyZoXyCKDyPFYavTW9tUrhzKtcIj3NC7HACs1Jdae7o7+WQYbYfIkJC0AjlP+hDcwgm7VUjwNMkOe1gwHKa6m0L4VkANTYEtITtImU0UT3zgOXd90rISlyKgh5YNQ2DQgqtWySgAYoAdIfzmAZXfLTFElKUr4J0/+rONMe4=
+	t=1732225817; cv=none; b=jl4zo+NzE5QRkPpd4xARXITeq1vlwRMSf0L73mbrfQDAqXxqXnD1VWlOhFo/0cwEWMKqlCj/OFb1pkiHhKPoRRjBMi579JonLyAVHoBMnDiHQ+UeW3mYrkkTQFI0xW0ufZAW1zlSUeIKplcCGo19FInD9S4OLTAtehgUONMY9E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732225505; c=relaxed/simple;
-	bh=NIUcN6+T+wki60rCRnwepyQ8KRF0PBbMkb47VLXLqKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dVjNpgzoCzoV3P1SY4M70VTAZDlaKb1VAwsEM1ItD1jSqnZ8oEk4WbA4Yunuk6z/XrGBwY98cbCOG6yyN8Y5LUwzUJUxn2ke5vVrTyBL2hpXx5sUPfyED/Yex9E+kuvhjlDku0JhfrIeEnH7gxMJTIFYcRdTDLF3XzpUc0yYB/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BNFcApkC; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732225504; x=1763761504;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NIUcN6+T+wki60rCRnwepyQ8KRF0PBbMkb47VLXLqKM=;
-  b=BNFcApkCceVM9sS7dM7XHFFI8lIuy0mmm3XqLpRVhM+3qy5qt7P8kU4T
-   f/8rIOxMJXlnwqnAi+F/DijxT8xYFwtyGKOLXSj+8Tb23nEbIwvBWQewe
-   cFUuZd92N6PDupXXYMyNHL+GuBAQExGC+OITiX7sY8pwYweFr45jgh2p1
-   6ArBuuiGy1vRY6YcTCdIeuNsjVizmxfhe0ZtF/V4MN5DveTlaWvScF5Rt
-   7m/pbMhsNuxyC8wQ256oABy1O6lp+x9sVy6QFMHLOSQ6sVLGvcLzF0T5B
-   nDnRm8CHu7/JpKQSCWQzAva8/7hLpyH4mPx+Efl2AhMNXL47O4aZBD7+8
-   w==;
-X-CSE-ConnectionGUID: UGYcYd7LRrqR+VMlrOAW0g==
-X-CSE-MsgGUID: oCnwJEQ7Rc6PzIy/7uIaPA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="32514204"
-X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="32514204"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 13:45:01 -0800
-X-CSE-ConnectionGUID: xdpPO1RmQrC72kpFCsgzmg==
-X-CSE-MsgGUID: zhZedUIBSeupQFYJAgkZ8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="90753178"
-Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 21 Nov 2024 13:44:56 -0800
-Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tEEyr-0003O1-1A;
-	Thu, 21 Nov 2024 21:44:53 +0000
-Date: Fri, 22 Nov 2024 05:43:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xiao Liang <shaw.leon@gmail.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
-	linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
-	osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
-	linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-	linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
-	bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 3/5] rtnetlink: Decouple net namespaces in
- rtnl_newlink_create()
-Message-ID: <202411220516.rokej98E-lkp@intel.com>
-References: <20241118143244.1773-4-shaw.leon@gmail.com>
+	s=arc-20240116; t=1732225817; c=relaxed/simple;
+	bh=DwdlUxpukKZkwXyn+QCfutFIDPcY/3c2VtfjLZ6kMGI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UkuISjKMnM0HN4yEz9F4PHZFBoUvdh4gIsiQN3ME6SVZwPQSEyr9ScsEZR8rlZ2zT070/GalBUE2Lh/X+RZmj23DbZd/JLDnB2/5B3KozI6d+I/Ilq3ttbJ4b+aqKU1JLvFrsb3sRJMb2aJg0raS9xCBe8WFENtnsMf427HJOvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fqEskWsc; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7fbce800ee5so68718a12.2;
+        Thu, 21 Nov 2024 13:50:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732225816; x=1732830616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tng0iyvmtAeQDH4O6wrIeK+ASsO/thRJgM2H3Zm+p88=;
+        b=fqEskWscDEdYN/aoKA9d5mRZrL4mMiTsEYDEIresXDwyQDPscL0IhwIoElDFfhJTlg
+         elfnBV08pLMly4iQi5mZIaHlxwCtKgrRxIbanREMZvC8QHHhL9eFDCqYx5YMDbFePp8+
+         HxY9ee9ns2fcPKZKck4pd9cZBpfKQT5fRe+OBJGQeRdef1vYZIRi4+1OY71sO9ZCf4CV
+         qP+wP65AcddZ1y4UafTB1c4Bq4x4uEz1l8Yhanff5dVG0k+Utz7qZ1ZOntTlhzr16HuH
+         xhG2MFDH3mAikEAUqKqSftfO6kDc1mFw0zKS/6Iy/cgELVjGkvFI5ECjkIYXrHxb81d5
+         xvJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732225816; x=1732830616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tng0iyvmtAeQDH4O6wrIeK+ASsO/thRJgM2H3Zm+p88=;
+        b=cSS3nF4ezdBeK8BakgFfx2iw54c0eJLncQm9WLGwFCFN0nXk0H7uVQaT/U0nO7c9kH
+         YC/ktP4GzrBStsBSO/m1o+3HVHSPOV8xeCO4phSACvfNbsTqf5onqS/rwQvPnkI29FFm
+         zAYqT8//JHbpgntKrpQSI6fbdccKdgQHxefdkhkEWEJIa10VX3Uux120V25DbRkO8SrP
+         l7d5/6FIB/gw6AtleW3BxHjg0+u55kl8/31g2Ieo7Y6c0iGPrIu1or8CsgfT44wW9PYj
+         1/9FyA+LHu35UbTwnbR7c4pgCjOLG7ozLTBBJgqdh+0oVZ4JgaTNkMk95CPX2OBb7j31
+         y4Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1+uU7/AdEcvmz8kxIOLxS/nVHgipeXXRSBDNeaOhIw/MhLIonS9vp1tNlkAK8frXzlDSHkgeRb14=@vger.kernel.org, AJvYcCX1CcPb/A4BllIUmq3b3wesL6slLaAq31BB90CjMCm0+HQrhx7LwpXg2yqhyWsXoxhigZvw3TQi@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3cOaW2xVyUfWeVvu5yGlvg3UyjOPJ9QOouoclwSafA0oROTX2
+	v0F62EnpL12KPu9aOS9JZziPFL7ODJAa0454fncXE8XlMjD46K0=
+X-Gm-Gg: ASbGncu0r0ls9kN1AsDivoX7avoxDw9+hzN//E+NGC/KBJ5pXxTs29H8uXz7cL7XAuM
+	1Gxo7QL6CHPVDUwc6sGwRNnV+RUHytvT/lfjYcWc7twJ5a1OLzRYzLQ7cd9paC3RewKzCrN2pAl
+	6c6ByMzTG2HT++1awoMDEj5XPoJZhnXWHI0YQeSeR/SpmgdRg9+mUW5332p6NUeC2Rc95ZyxGEG
+	sHXTpvDhrCLCawy/tICk4sHR8TYLGksDrbTGgpAuGfK1khFfNgyjggFQ7ES2UPK7M8QTF66S9A=
+X-Google-Smtp-Source: AGHT+IFrL3LRjMWyNkTLvHSkG1wjmyQiarccPferfkvjFV92RnjBWU69GI/bxyj1j4a0Zc0Tcgd/7A==
+X-Received: by 2002:a05:6a21:c20b:b0:1dc:77fc:1cdb with SMTP id adf61e73a8af0-1e09e40a5abmr495782637.13.1732225815616;
+        Thu, 21 Nov 2024 13:50:15 -0800 (PST)
+Received: from localhost.localdomain ([117.250.157.213])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcbfc0f7dsm210334a12.12.2024.11.21.13.50.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 13:50:15 -0800 (PST)
+From: Vyshnav Ajith <puthen1977@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Vyshnav Ajith <puthen1977@gmail.com>
+Subject: Fix spelling and grammar mistake - bareudp.rst
+Date: Fri, 22 Nov 2024 03:19:11 +0530
+Message-ID: <20241121214911.9034-1-puthen1977@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241118143244.1773-4-shaw.leon@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Xiao,
+The BareUDP documentation had several grammar and spelling mistakes,
+making it harder to read. This patch fixes those errors to improve
+clarity and readability for developers.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Vyshnav Ajith <puthen1977@gmail.com>
+---
+ Documentation/networking/bareudp.rst | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Xiao-Liang/net-ip_tunnel-Build-flow-in-underlay-net-namespace/20241121-112705
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241118143244.1773-4-shaw.leon%40gmail.com
-patch subject: [PATCH net-next v4 3/5] rtnetlink: Decouple net namespaces in rtnl_newlink_create()
-config: arc-randconfig-002-20241122 (https://download.01.org/0day-ci/archive/20241122/202411220516.rokej98E-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241122/202411220516.rokej98E-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411220516.rokej98E-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/batman-adv/soft-interface.c:1075: warning: Function parameter or struct member 'params' not described in 'batadv_softif_newlink'
->> net/batman-adv/soft-interface.c:1075: warning: Excess function parameter 'nets' description in 'batadv_softif_newlink'
->> net/batman-adv/soft-interface.c:1075: warning: Excess function parameter 'dev' description in 'batadv_softif_newlink'
->> net/batman-adv/soft-interface.c:1075: warning: Excess function parameter 'tb' description in 'batadv_softif_newlink'
->> net/batman-adv/soft-interface.c:1075: warning: Excess function parameter 'data' description in 'batadv_softif_newlink'
->> net/batman-adv/soft-interface.c:1075: warning: Excess function parameter 'extack' description in 'batadv_softif_newlink'
-
-
-vim +1075 net/batman-adv/soft-interface.c
-
-128254ceea6ffe Sven Eckelmann 2020-10-11  1063  
-128254ceea6ffe Sven Eckelmann 2020-10-11  1064  /**
-128254ceea6ffe Sven Eckelmann 2020-10-11  1065   * batadv_softif_newlink() - pre-initialize and register new batadv link
-c19808cb1d05d1 Xiao Liang     2024-11-18  1066   * @nets: the applicable net namespaces
-128254ceea6ffe Sven Eckelmann 2020-10-11  1067   * @dev: network device to register
-128254ceea6ffe Sven Eckelmann 2020-10-11  1068   * @tb: IFLA_INFO_DATA netlink attributes
-128254ceea6ffe Sven Eckelmann 2020-10-11  1069   * @data: enum batadv_ifla_attrs attributes
-128254ceea6ffe Sven Eckelmann 2020-10-11  1070   * @extack: extended ACK report struct
-128254ceea6ffe Sven Eckelmann 2020-10-11  1071   *
-128254ceea6ffe Sven Eckelmann 2020-10-11  1072   * Return: 0 if successful or error otherwise.
-128254ceea6ffe Sven Eckelmann 2020-10-11  1073   */
-c19808cb1d05d1 Xiao Liang     2024-11-18  1074  static int batadv_softif_newlink(struct rtnl_newlink_params *params)
-128254ceea6ffe Sven Eckelmann 2020-10-11 @1075  {
-c19808cb1d05d1 Xiao Liang     2024-11-18  1076  	struct net_device *dev = params->dev;
-c19808cb1d05d1 Xiao Liang     2024-11-18  1077  	struct nlattr **data = params->data;
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1078  	struct batadv_priv *bat_priv = netdev_priv(dev);
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1079  	const char *algo_name;
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1080  	int err;
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1081  
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1082  	if (data && data[IFLA_BATADV_ALGO_NAME]) {
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1083  		algo_name = nla_data(data[IFLA_BATADV_ALGO_NAME]);
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1084  		err = batadv_algo_select(bat_priv, algo_name);
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1085  		if (err)
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1086  			return -EINVAL;
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1087  	}
-a5ad457eea41ef Sven Eckelmann 2020-10-11  1088  
-128254ceea6ffe Sven Eckelmann 2020-10-11  1089  	return register_netdevice(dev);
-128254ceea6ffe Sven Eckelmann 2020-10-11  1090  }
-128254ceea6ffe Sven Eckelmann 2020-10-11  1091  
-
+diff --git a/Documentation/networking/bareudp.rst b/Documentation/networking/bareudp.rst
+index b9d04ee6dac1..ce885caf24d3 100644
+--- a/Documentation/networking/bareudp.rst
++++ b/Documentation/networking/bareudp.rst
+@@ -6,16 +6,17 @@ Bare UDP Tunnelling Module Documentation
+ 
+ There are various L3 encapsulation standards using UDP being discussed to
+ leverage the UDP based load balancing capability of different networks.
+-MPLSoUDP (__ https://tools.ietf.org/html/rfc7510) is one among them.
++MPLSoUDP (https://tools.ietf.org/html/rfc7510) is one among them.
+ 
+ The Bareudp tunnel module provides a generic L3 encapsulation support for
+ tunnelling different L3 protocols like MPLS, IP, NSH etc. inside a UDP tunnel.
+ 
+ Special Handling
+ ----------------
++
+ The bareudp device supports special handling for MPLS & IP as they can have
+ multiple ethertypes.
+-MPLS procotcol can have ethertypes ETH_P_MPLS_UC  (unicast) & ETH_P_MPLS_MC (multicast).
++The MPLS protocol can have ethertypes ETH_P_MPLS_UC  (unicast) & ETH_P_MPLS_MC (multicast).
+ IP protocol can have ethertypes ETH_P_IP (v4) & ETH_P_IPV6 (v6).
+ This special handling can be enabled only for ethertypes ETH_P_IP & ETH_P_MPLS_UC
+ with a flag called multiproto mode.
+@@ -52,7 +53,7 @@ be enabled explicitly with the "multiproto" flag.
+ 3) Device Usage
+ 
+ The bareudp device could be used along with OVS or flower filter in TC.
+-The OVS or TC flower layer must set the tunnel information in SKB dst field before
+-sending packet buffer to the bareudp device for transmission. On reception the
+-bareudp device extracts and stores the tunnel information in SKB dst field before
++The OVS or TC flower layer must set the tunnel information in the SKB dst field before
++sending the packet buffer to the bareudp device for transmission. On reception, the
++bareUDP device extracts and stores the tunnel information in the SKB dst field before
+ passing the packet buffer to the network stack.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
