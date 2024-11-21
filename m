@@ -1,185 +1,642 @@
-Return-Path: <netdev+bounces-146608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E969D48CA
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:27:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE33A9D48D2
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:28:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DA7E1F22527
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:27:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EDEF282B14
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CEC1CB511;
-	Thu, 21 Nov 2024 08:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4402D1CB53F;
+	Thu, 21 Nov 2024 08:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hoe7pcd/"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="RYZfdrQK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E311AB512
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36BA1CB528
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732177665; cv=none; b=iserD7cCofcASxJcXJKLCF1HQxYAofSIH53hUSZwAxo15GHaFx7GkTu/1Z66OUlPevEWv6siP/okMGWA3JjkeUyOXmGeumQKyMbXqMZoNJT85gppyKPSbKQDukcEPwl165eM35t4cABnQiiTGyur39LUvOlCFBKOgV0ctHL+C7w=
+	t=1732177711; cv=none; b=dfkRD2cxzUATJfHAsimzFmDcov9x0H0YulcgZCrGUT67m4S/lpthXTnLrz+5WpvzGrzXwiu34JokzVzIlXTEE2lBac4StbPKrLkCzDmwIPnhkNFQw3EMEQgVaU8u/UM8be1s3goqlGDSP/De04k5eiB8Z5qdL/JLrOO2UIqg/io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732177665; c=relaxed/simple;
-	bh=lKTpgMrHK1vk98LRyvQDELMUJG3A74b80MRDxC8T4Oo=;
+	s=arc-20240116; t=1732177711; c=relaxed/simple;
+	bh=r9jnD63KXmSpKG0NjkpLb6DKG5AgBM/Vnuxcl7VuN+c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dT7QaMLzaTKKDvA0EUDDGIfyf79NYHlLPPpiLaQGm1wUcuovlt1TKnTuakst1OAY9auI7MpAql9w+rzTOuArvG+A8JvNrRIK86b0b2fTLDOa/ONkruSoyzpITdjqiDdA7TuhUDL8ob2sENpYAWfqAe0aXO8Jxr82MiWkXQsAagU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hoe7pcd/; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539e64ed090so2e87.1
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 00:27:43 -0800 (PST)
+	 To:Cc:Content-Type; b=TpsfAqrQmxFs2x8sVmCTb80q3feVM1lCZBGhUn2a/9t8qoPCW3uYQRSVxHH/nfa6eELuypjYscoIpMsrIFLbafrCK6wdyyXENFytDHXxcnuzcGAejNU6L7i1EZla6IQAa47yKOE/Y/tjmJxRm9nT47dtSiAnCCLFsphNeLnAKMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=RYZfdrQK; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-53a007743e7so625342e87.1
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 00:28:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732177661; x=1732782461; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1732177707; x=1732782507; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aRg7xTjQ2nlsBAVH9bgeyIfgoJqhIRxj12tN752RQqQ=;
-        b=Hoe7pcd/wLWkwujo6vPeagQ6QwrI8ef1l/5sgmXEBkvotf6McYJfX4ZMfwB8XsKFSw
-         qQ7Jl+hdm95OtDiaEOUbe7GU19GTz5KAo9DJUW5B2Jh97phf344egMA08wxGjqPxW9Pe
-         bLBk+wkimWE8m4awWsz0IrHFZgyAeA6tgmCoHLzm8tnV9tnELS76rfdsUaqgvBa5FwZf
-         Nhz2HEL1L6GLcaj7vFhO4Pw939c0iJ+0P6OKGa3yY+d+nDZnyhxnL4TXPN1eFKzdqUUP
-         Uf1L7BTZpW/rb/a/WlqkCKT5EGLU8VnsfW6ldx3LzwvcrPqbTQHkVQZshBk1KjCWmh/+
-         9qfQ==
+        bh=LSW1C/qBVxULrCXviH7+9hgZoHfp6/Mcea/z7iEbOPs=;
+        b=RYZfdrQK+SO72pxQgvzsyHK0PhPTxUYsTdb4kk15BV38woqhUl+q7uIr9DOhsRJZRU
+         PGhmKZ5Fp4fLQMODJSwEz0rsrrMs0nqMouRMkLx5XHlIZ8VT8aiOsHofYJ4E2FeIYHLd
+         gDf+m8NsAZ3XmgapaH83ab+4wVwk9kr1O5l20CfAuPM+ACdbrHBiNBlD4S2Hdh+2Gi23
+         Om53ImouYl/x13NG1VleMFroABTlRh9El0ThdHQtCd+pQxYs12Sf1MnEZZ3ThLL240me
+         ZM6dJmW5XBXrmjuhZ/hHzZu1m+AMVCLqxu8Cz6Bn1Yj4aqcxfq08ZcO7mnVpQ76mexXg
+         PNIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732177661; x=1732782461;
+        d=1e100.net; s=20230601; t=1732177707; x=1732782507;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aRg7xTjQ2nlsBAVH9bgeyIfgoJqhIRxj12tN752RQqQ=;
-        b=Y8lEA000UAKr+XadqFncfwROw3wFOBoE6yEdIHh57DdmwHHptdz0uc1kApCLK3ffeu
-         59g8rRjCVOgHnQ+dwJ8nbXrWqxlQRQ9nJblY+WGFJLD2VzS/aD+eUnUG9zdwP74KCOQ8
-         39XkevvM7p7932GJsyDHNeb0tOjrj2k/QlqoP/1IokLYGBznpCWAWaZLAPtUoy9daYHQ
-         Bea2sNcb4LQUwqc/7efKBckTVwgmpemQ6wWomVXSVxvgOTNpARJzg9trnO+mm0BAgelm
-         pkI88oorcGSMYzoPsALFhSzDliVto0U+lj+FRuMGo/3cR1wfOyTuXmZ0iVDzeSVHmc9H
-         BTbw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4VmqrcZs5+KLRDcoFxyf44FizVXIOqKBSapppCazhzW5EXmzD8oIxSoPRtm+vjbReKGPKyAQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoX0W4czNwKXPMtmweivI12qbJDFLcCZSTjgvwm4MLTXS8FQ9j
-	hZgKVXb1lY/itQ4RVxzspptW1MB8t6orA0Qcu4O2ZNqXOMcrwZBrN6iNvOQWT+dbDNDb23RRJhe
-	53oVyMDkFqedgfGmEMbtFjS31HISGtgNgsnOt
-X-Gm-Gg: ASbGncunGxDuS2ld//xkmLqE87Xylf2yUQ13f9WGV/hNqfwQ2QqEKByyEXXRmMMB3mF
-	kAtwa6kzUDrX4u6yPSRXWfklmDLf02AavlrwFt0GzMXEyxi5ommVjcZFGAXy305/2
-X-Google-Smtp-Source: AGHT+IHoLR86M9WJHBN1aE8HIks1cdEVP05lDMDIAQsdwXJ4btmhzaYKhYDDRCgwSggPerYF2RUIz692njPARYmRNV0=
-X-Received: by 2002:a19:f006:0:b0:539:e116:26a0 with SMTP id
- 2adb3069b0e04-53dcef77a09mr131e87.0.1732177660081; Thu, 21 Nov 2024 00:27:40
- -0800 (PST)
+        bh=LSW1C/qBVxULrCXviH7+9hgZoHfp6/Mcea/z7iEbOPs=;
+        b=bmUZ4P8dWVK1Z+B96vE23ji9jPZP0k2zoc0vll7Gnje+0An8FCzuuyVgmGmdXLQrLC
+         G5n14fM29vvxGTn5f/iOsYWp4DJ6B2Ygp1wUh2/WVsVSXjVdbQPL+FKzSmZDXExaxgdK
+         A5EC/B/6rZ0C8/wwXPxYazbGR2CyByqzk48ttGnyDK9YuDZxIkycRLFxS8qNwaSV6UUL
+         8YdG2tCA/z/ZYs4syRsfrLWBmPCAgsT1kP5zyfJUWVjriAO/KNeiSoL8XWO8Cuy6JmI/
+         Ryo+WtdkTQB3DR4+LM76Q2npv8ZktuwOoeGzI5ywQMg/q7Hv+psNYzIEWeZNq31tXyJb
+         M2Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTOtwbrO2Ask6YbLg5TVDSdvTVAc2EwqQCObq/PAhsB4bKsQxbmOrYSbWACNPBRp4+SQUTKsY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yza7gor/PjjFC06Ua6ss4gvJbONGY5dfjELHsM341h8Sc5qF6q4
+	CCnGY5viJ9ydK3lGVAmw9YawLyYgcbHEjpWMkvIgIj143eh4hyX93O8HYn5xMXOweqi0metESK9
+	CURTb6Ioc0kcoKvUjk8mj55nbv++lVam27yy8VQ==
+X-Google-Smtp-Source: AGHT+IFVYVQ0/sAkjXa7aOoA5r+icUc6cST11JB7IqopuyurxquNm8L4vHNp6dLIhDGQwBvMN2yjlooU+X0I2GXNkzw=
+X-Received: by 2002:a05:6512:b26:b0:539:8fcd:524 with SMTP id
+ 2adb3069b0e04-53dc1342915mr2878029e87.30.1732177706732; Thu, 21 Nov 2024
+ 00:28:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121054711.818670-1-yuyanghuang@google.com> <a68fb3e3-e461-4192-9c5c-d3b0864dbeb3@6wind.com>
-In-Reply-To: <a68fb3e3-e461-4192-9c5c-d3b0864dbeb3@6wind.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Thu, 21 Nov 2024 17:27:02 +0900
-Message-ID: <CADXeF1Gv1GPyXsvuq6fKZiCOAfWnO5Cqbg5xppwPsgz050W3yQ@mail.gmail.com>
-Subject: Re: [PATCH net-next, v3] netlink: add IGMP/MLD join/leave notifications
-To: nicolas.dichtel@6wind.com
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, andrew@lunn.ch, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>, Patrick Ruddy <pruddy@vyatta.att-mail.com>
+References: <20241121064046.3724726-1-tmyu0@nuvoton.com> <20241121064046.3724726-3-tmyu0@nuvoton.com>
+In-Reply-To: <20241121064046.3724726-3-tmyu0@nuvoton.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 21 Nov 2024 09:28:15 +0100
+Message-ID: <CAMRc=MdT_iXoRJeGFEhuCvjVXVPpJVNeddPc6pi5agTaTm+QpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] gpio: Add Nuvoton NCT6694 GPIO support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Nicolas
+On Thu, Nov 21, 2024 at 7:41=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wro=
+te:
+>
+> This driver supports GPIO and IRQ functionality for NCT6694 MFD
+> device based on USB interface.
+>
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+> ---
+>  MAINTAINERS                 |   1 +
+>  drivers/gpio/Kconfig        |  12 +
+>  drivers/gpio/Makefile       |   1 +
+>  drivers/gpio/gpio-nct6694.c | 441 ++++++++++++++++++++++++++++++++++++
+>  4 files changed, 455 insertions(+)
+>  create mode 100644 drivers/gpio/gpio-nct6694.c
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9c9a94ff8f98..6688c5c470b7 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16545,6 +16545,7 @@ NUVOTON NCT6694 MFD DRIVER
+>  M:     Ming Yu <tmyu0@nuvoton.com>
+>  L:     linux-kernel@vger.kernel.org
+>  S:     Supported
+> +F:     drivers/gpio/gpio-nct6694.c
+>  F:     drivers/mfd/nct6694.c
+>  F:     include/linux/mfd/nct6694.h
+>
+> diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+> index 56fee58e281e..7773b5326e60 100644
+> --- a/drivers/gpio/Kconfig
+> +++ b/drivers/gpio/Kconfig
+> @@ -1460,6 +1460,18 @@ config GPIO_MAX77650
+>           GPIO driver for MAX77650/77651 PMIC from Maxim Semiconductor.
+>           These chips have a single pin that can be configured as GPIO.
+>
+> +config GPIO_NCT6694
+> +       tristate "Nuvoton NCT6694 GPIO controller support"
+> +       depends on MFD_NCT6694
+> +       select GENERIC_IRQ_CHIP
+> +       select GPIOLIB_IRQCHIP
+> +       help
+> +         This driver supports 8 GPIO pins per bank that can all be inter=
+rupt
+> +         sources.
+> +
+> +         This driver can also be built as a module. If so, the module wi=
+ll be
+> +         called gpio-nct6694.
+> +
+>  config GPIO_PALMAS
+>         bool "TI PALMAS series PMICs GPIO"
+>         depends on MFD_PALMAS
+> diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
+> index af3ba4d81b58..ad80a078b27b 100644
+> --- a/drivers/gpio/Makefile
+> +++ b/drivers/gpio/Makefile
+> @@ -123,6 +123,7 @@ obj-$(CONFIG_GPIO_MXC)                      +=3D gpio=
+-mxc.o
+>  obj-$(CONFIG_GPIO_MXS)                 +=3D gpio-mxs.o
+>  obj-$(CONFIG_GPIO_NOMADIK)             +=3D gpio-nomadik.o
+>  obj-$(CONFIG_GPIO_NPCM_SGPIO)          +=3D gpio-npcm-sgpio.o
+> +obj-$(CONFIG_GPIO_NCT6694)             +=3D gpio-nct6694.o
+>  obj-$(CONFIG_GPIO_OCTEON)              +=3D gpio-octeon.o
+>  obj-$(CONFIG_GPIO_OMAP)                        +=3D gpio-omap.o
+>  obj-$(CONFIG_GPIO_PALMAS)              +=3D gpio-palmas.o
+> diff --git a/drivers/gpio/gpio-nct6694.c b/drivers/gpio/gpio-nct6694.c
+> new file mode 100644
+> index 000000000000..1776200b3a04
+> --- /dev/null
+> +++ b/drivers/gpio/gpio-nct6694.c
+> @@ -0,0 +1,441 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Nuvoton NCT6694 GPIO controller driver based on USB interface.
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + */
+> +
+> +#include <linux/gpio/driver.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +
+> +/* Host interface */
+> +#define NCT6694_GPIO_MOD       0xFF
+> +#define NCT6694_GPIO_LEN       0x01
+> +
+> +/* Report Channel */
+> +#define NCT6694_GPIO_VER       0x90
+> +#define NCT6694_GPIO_VALID     0x110
+> +#define NCT6694_GPI_DATA       0x120
+> +#define NCT6694_GPO_DIR                0x170
+> +#define NCT6694_GPO_TYPE       0x180
+> +#define NCT6694_GPO_DATA       0x190
+> +
+> +#define NCT6694_GPI_STS                0x130
+> +#define NCT6694_GPI_CLR                0x140
+> +#define NCT6694_GPI_FALLING    0x150
+> +#define NCT6694_GPI_RISING     0x160
+> +
+> +#define NCT6694_NR_GPIO                8
+> +
+> +struct nct6694_gpio_data {
+> +       struct nct6694 *nct6694;
+> +       struct gpio_chip gpio;
+> +       struct mutex lock;
+> +       /* Protect irq operation */
+> +       struct mutex irq_lock;
+> +
+> +       unsigned char xmit_buf;
+> +       unsigned char irq_trig_falling;
+> +       unsigned char irq_trig_rising;
+> +
+> +       /* Current gpio group */
+> +       unsigned char group;
+> +
+> +       /* GPIO line names */
+> +       char **names;
 
-Thanks for the review feedback, I will modify the patch and submit it
-after v6.13-rc1 is out.
+You only use this in probe() and after assigning it to gc->names, you
+never reference it again. You don't need this field here, it can be a
+local variable in probe().
 
-Thanks,
-Yuyang
+> +};
+> +
+> +static int nct6694_get_direction(struct gpio_chip *gpio, unsigned int of=
+fset)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DIR + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       return !(BIT(offset) & data->xmit_buf);
+> +}
+> +
+> +static int nct6694_direction_input(struct gpio_chip *gpio, unsigned int =
+offset)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DIR + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       data->xmit_buf &=3D ~(1 << offset);
+> +
+> +       return nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                NCT6694_GPO_DIR + data->group,
+> +                                NCT6694_GPIO_LEN, &data->xmit_buf);
+> +}
+> +
+> +static int nct6694_direction_output(struct gpio_chip *gpio,
+> +                                   unsigned int offset, int val)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       /* Set direction to output */
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DIR + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       data->xmit_buf |=3D (1 << offset);
+> +       ret =3D nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                               NCT6694_GPO_DIR + data->group,
+> +                               NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       /* Then set output level */
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DATA + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       if (val)
+> +               data->xmit_buf |=3D (1 << offset);
+> +       else
+> +               data->xmit_buf &=3D ~(1 << offset);
+> +
+> +       return nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                NCT6694_GPO_DATA + data->group,
+> +                                NCT6694_GPIO_LEN, &data->xmit_buf);
+> +}
+> +
+> +static int nct6694_get_value(struct gpio_chip *gpio, unsigned int offset=
+)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_DIR + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       if (BIT(offset) & data->xmit_buf) {
+> +               ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                      NCT6694_GPO_DATA + data->group,
+> +                                      NCT6694_GPIO_LEN, &data->xmit_buf)=
+;
+> +               if (ret < 0)
+> +                       return ret;
+> +
+> +               return !!(BIT(offset) & data->xmit_buf);
+> +       }
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPI_DATA + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       return !!(BIT(offset) & data->xmit_buf);
+> +}
+> +
+> +static void nct6694_set_value(struct gpio_chip *gpio, unsigned int offse=
+t,
+> +                             int val)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                        NCT6694_GPO_DATA + data->group,
+> +                        NCT6694_GPIO_LEN, &data->xmit_buf);
+> +
+> +       if (val)
+> +               data->xmit_buf |=3D (1 << offset);
+> +       else
+> +               data->xmit_buf &=3D ~(1 << offset);
+> +
+> +       nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                         NCT6694_GPO_DATA + data->group,
+> +                         NCT6694_GPIO_LEN, &data->xmit_buf);
+> +}
+> +
+> +static int nct6694_set_config(struct gpio_chip *gpio, unsigned int offse=
+t,
+> +                             unsigned long config)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPO_TYPE + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       switch (pinconf_to_config_param(config)) {
+> +       case PIN_CONFIG_DRIVE_OPEN_DRAIN:
+> +               data->xmit_buf |=3D (1 << offset);
+> +               break;
+> +       case PIN_CONFIG_DRIVE_PUSH_PULL:
+> +               data->xmit_buf &=3D ~(1 << offset);
+> +               break;
+> +       default:
+> +               return -ENOTSUPP;
+> +       }
+> +
+> +       return nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                NCT6694_GPO_TYPE + data->group,
+> +                                NCT6694_GPIO_LEN, &data->xmit_buf);
+> +}
+> +
+> +static int nct6694_init_valid_mask(struct gpio_chip *gpio,
+> +                                  unsigned long *valid_mask,
+> +                                  unsigned int ngpios)
+> +{
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPIO_VALID + data->group,
+> +                              NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       *valid_mask =3D data->xmit_buf;
+> +
+> +       return ret;
+> +}
+> +
+> +static irqreturn_t nct6694_irq_handler(int irq, void *priv)
+> +{
+> +       struct nct6694_gpio_data *data =3D priv;
+> +       unsigned char status;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                        NCT6694_GPI_STS + data->group,
+> +                        NCT6694_GPIO_LEN, &data->xmit_buf);
+> +
+> +       status =3D data->xmit_buf;
+> +
+> +       while (status) {
+> +               int bit =3D __ffs(status);
+> +
+> +               data->xmit_buf =3D BIT(bit);
+> +               handle_nested_irq(irq_find_mapping(data->gpio.irq.domain,=
+ bit));
+> +               status &=3D ~(1 << bit);
+> +               nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                 NCT6694_GPI_CLR + data->group,
+> +                                 NCT6694_GPIO_LEN, &data->xmit_buf);
+> +       }
+> +
+> +       return IRQ_HANDLED;
+> +}
+> +
+> +static int nct6694_get_irq_trig(struct nct6694_gpio_data *data)
+> +{
+> +       int ret;
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       ret =3D nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                              NCT6694_GPI_FALLING + data->group,
+> +                              NCT6694_GPIO_LEN, &data->irq_trig_falling)=
+;
+> +       if (ret)
+> +               return ret;
+> +
+> +       return nct6694_read_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                               NCT6694_GPI_RISING + data->group,
+> +                               NCT6694_GPIO_LEN, &data->irq_trig_rising)=
+;
+> +}
+> +
+> +static void nct6694_irq_mask(struct irq_data *d)
+> +{
+> +       struct gpio_chip *gpio =3D irq_data_get_irq_chip_data(d);
+> +       irq_hw_number_t hwirq =3D irqd_to_hwirq(d);
+> +
+> +       gpiochip_disable_irq(gpio, hwirq);
+> +}
+> +
+> +static void nct6694_irq_unmask(struct irq_data *d)
+> +{
+> +       struct gpio_chip *gpio =3D irq_data_get_irq_chip_data(d);
+> +       irq_hw_number_t hwirq =3D irqd_to_hwirq(d);
+> +
+> +       gpiochip_enable_irq(gpio, hwirq);
+> +}
+> +
+> +static int nct6694_irq_set_type(struct irq_data *d, unsigned int type)
+> +{
+> +       struct gpio_chip *gpio =3D irq_data_get_irq_chip_data(d);
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +       irq_hw_number_t hwirq =3D irqd_to_hwirq(d);
+> +
+> +       guard(mutex)(&data->lock);
+> +
+> +       switch (type) {
+> +       case IRQ_TYPE_EDGE_RISING:
+> +               data->irq_trig_rising |=3D BIT(hwirq);
+> +               break;
+> +
+> +       case IRQ_TYPE_EDGE_FALLING:
+> +               data->irq_trig_falling |=3D BIT(hwirq);
+> +               break;
+> +
+> +       case IRQ_TYPE_EDGE_BOTH:
+> +               data->irq_trig_rising |=3D BIT(hwirq);
+> +               data->irq_trig_falling |=3D BIT(hwirq);
+> +               break;
+> +
+> +       default:
+> +               return -ENOTSUPP;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void nct6694_irq_bus_lock(struct irq_data *d)
+> +{
+> +       struct gpio_chip *gpio =3D irq_data_get_irq_chip_data(d);
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +
+> +       mutex_lock(&data->irq_lock);
+> +}
+> +
+> +static void nct6694_irq_bus_sync_unlock(struct irq_data *d)
+> +{
+> +       struct gpio_chip *gpio =3D irq_data_get_irq_chip_data(d);
+> +       struct nct6694_gpio_data *data =3D gpiochip_get_data(gpio);
+> +
+> +       scoped_guard(mutex, &data->lock) {
+> +               nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                 NCT6694_GPI_FALLING + data->group,
+> +                                 NCT6694_GPIO_LEN, &data->irq_trig_falli=
+ng);
+> +
+> +               nct6694_write_msg(data->nct6694, NCT6694_GPIO_MOD,
+> +                                 NCT6694_GPI_RISING + data->group,
+> +                                 NCT6694_GPIO_LEN, &data->irq_trig_risin=
+g);
+> +       }
+> +
+> +       mutex_unlock(&data->irq_lock);
+> +}
+> +
+> +static const struct irq_chip nct6694_irq_chip =3D {
+> +       .name                   =3D "nct6694-gpio",
+> +       .irq_mask               =3D nct6694_irq_mask,
+> +       .irq_unmask             =3D nct6694_irq_unmask,
+> +       .irq_set_type           =3D nct6694_irq_set_type,
+> +       .irq_bus_lock           =3D nct6694_irq_bus_lock,
+> +       .irq_bus_sync_unlock    =3D nct6694_irq_bus_sync_unlock,
+> +       .flags                  =3D IRQCHIP_IMMUTABLE,
+> +       GPIOCHIP_IRQ_RESOURCE_HELPERS,
+> +};
+> +
+> +static int nct6694_gpio_probe(struct platform_device *pdev)
+> +{
+> +       const struct mfd_cell *cell =3D mfd_get_cell(pdev);
+> +       struct device *dev =3D &pdev->dev;
+> +       struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
+> +       struct nct6694_gpio_data *data;
+> +       struct gpio_irq_chip *girq;
+> +       int ret, irq, i;
+> +
+> +       irq =3D irq_create_mapping(nct6694->domain,
+> +                                NCT6694_IRQ_GPIO0 + cell->id);
+> +       if (!irq)
+> +               return -EINVAL;
+> +
+> +       data =3D devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+> +       if (!data)
+> +               return -ENOMEM;
+> +
+> +       data->names =3D devm_kzalloc(dev, sizeof(char *) * NCT6694_NR_GPI=
+O,
 
-Thanks,
-Yuyang
+devm_kcalloc()?
 
+> +                                  GFP_KERNEL);
+> +       if (!data->names)
+> +               return -ENOMEM;
+> +
+> +       for (i =3D 0; i < NCT6694_NR_GPIO; i++) {
+> +               data->names[i] =3D devm_kasprintf(dev, GFP_KERNEL, "GPIO%=
+X%d",
+> +                                               cell->id, i);
+> +               if (!data->names[i])
+> +                       return -ENOMEM;
+> +       }
+> +
+> +       data->nct6694 =3D nct6694;
+> +       data->group =3D cell->id;
+> +
+> +       data->gpio.names                =3D (const char * const*)data->na=
+mes;
+> +       data->gpio.label                =3D pdev->name;
+> +       data->gpio.direction_input      =3D nct6694_direction_input;
+> +       data->gpio.get                  =3D nct6694_get_value;
+> +       data->gpio.direction_output     =3D nct6694_direction_output;
+> +       data->gpio.set                  =3D nct6694_set_value;
+> +       data->gpio.get_direction        =3D nct6694_get_direction;
+> +       data->gpio.set_config           =3D nct6694_set_config;
+> +       data->gpio.init_valid_mask      =3D nct6694_init_valid_mask;
+> +       data->gpio.base                 =3D -1;
+> +       data->gpio.can_sleep            =3D false;
+> +       data->gpio.owner                =3D THIS_MODULE;
+> +       data->gpio.ngpio                =3D NCT6694_NR_GPIO;
+> +
+> +       mutex_init(&data->irq_lock);
+> +
+> +       platform_set_drvdata(pdev, data);
 
-On Thu, Nov 21, 2024 at 5:24=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
+There is no corresponding platform_get_drvdata() so you don't need this.
+
+> +
+> +       ret =3D nct6694_get_irq_trig(data);
+> +       if (ret)
+> +               return dev_err_probe(dev, ret, "Failed to get irq trigger=
+ type\n");
+> +
+> +       /* Register gpio chip to GPIO framework */
+> +       girq =3D &data->gpio.irq;
+> +       gpio_irq_chip_set_chip(girq, &nct6694_irq_chip);
+> +       girq->parent_handler =3D NULL;
+> +       girq->num_parents =3D 0;
+> +       girq->parents =3D NULL;
+> +       girq->default_type =3D IRQ_TYPE_NONE;
+> +       girq->handler =3D handle_level_irq;
+> +       girq->threaded =3D true;
+> +
+> +       ret =3D devm_request_threaded_irq(dev, irq, NULL, nct6694_irq_han=
+dler,
+> +                                       IRQF_ONESHOT | IRQF_SHARED,
+> +                                       "nct6694-gpio", data);
+> +       if (ret)
+> +               return dev_err_probe(dev, ret, "Failed to request irq\n")=
+;
+> +
+> +       return devm_gpiochip_add_data(dev, &data->gpio, data);
+> +}
+> +
+> +static struct platform_driver nct6694_gpio_driver =3D {
+> +       .driver =3D {
+> +               .name   =3D "nct6694-gpio",
+> +       },
+> +       .probe          =3D nct6694_gpio_probe,
+> +};
+> +
+> +module_platform_driver(nct6694_gpio_driver);
+> +
+> +MODULE_DESCRIPTION("USB-GPIO controller driver for NCT6694");
+> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> +MODULE_LICENSE("GPL");
+
+It's an MFD device, don't you need a MODULE_ALIAS() for this module to load=
+?
+
+Bart
+
+> --
+> 2.34.1
 >
-> Le 21/11/2024 =C3=A0 06:47, Yuyang Huang a =C3=A9crit :
-> > This change introduces netlink notifications for multicast address
-> > changes. The following features are included:
-> > * Addition and deletion of multicast addresses are reported using
-> >   RTM_NEWMULTICAST and RTM_DELMULTICAST messages with AF_INET and
-> >   AF_INET6.
-> > * Two new notification groups: RTNLGRP_IPV4_MCADDR and
-> >   RTNLGRP_IPV6_MCADDR are introduced for receiving these events.
-> >
-> > This change allows user space applications (e.g., ip monitor) to
-> > efficiently track multicast group memberships by listening for netlink
-> > events. Previously, applications relied on inefficient polling of
-> > procfs, introducing delays. With netlink notifications, applications
-> > receive realtime updates on multicast group membership changes,
-> > enabling more precise metrics collection and system monitoring.
-> >
-> > This change also unlocks the potential for implementing a wide range
-> > of sophisticated multicast related features in user space by allowing
-> > applications to combine kernel provided multicast address information
-> > with user space data and communicate decisions back to the kernel for
-> > more fine grained control. This mechanism can be used for various
-> > purposes, including multicast filtering, IGMP/MLD offload, and
-> > IGMP/MLD snooping.
-> >
-> > Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> > Cc: Lorenzo Colitti <lorenzo@google.com>
-> > Co-developed-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
-> > Signed-off-by: Patrick Ruddy <pruddy@vyatta.att-mail.com>
-> > Link: https://lore.kernel.org/r/20180906091056.21109-1-pruddy@vyatta.at=
-t-mail.com
-> > Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
->
-> net-next is currently closed, you will have to resubmit after the v6.13-r=
-c1 is
-> out: https://patchwork.hopto.org/net-next.html
->
-> One comment below.
->
-> > ---
-> >
-> > Changelog since v2:
-> > - Use RT_SCOPE_UNIVERSE for both IGMP and MLD notification messages for
-> >   consistency.
-> >
-> > Changelog since v1:
-> > - Implement MLD join/leave notifications.
-> > - Revise the comment message to make it generic.
-> > - Fix netdev/source_inline error.
-> > - Reorder local variables according to "reverse xmas tree=E2=80=9D styl=
-e.
-> >
-> >  include/uapi/linux/rtnetlink.h |  8 +++++
-> >  net/ipv4/igmp.c                | 53 +++++++++++++++++++++++++++++++
-> >  net/ipv6/mcast.c               | 58 ++++++++++++++++++++++++++++++++++
-> >  3 files changed, 119 insertions(+)
-> >
-> > diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetl=
-ink.h
-> > index db7254d52d93..92964a9d2388 100644
-> > --- a/include/uapi/linux/rtnetlink.h
-> > +++ b/include/uapi/linux/rtnetlink.h
-> > @@ -93,6 +93,10 @@ enum {
-> >       RTM_NEWPREFIX   =3D 52,
-> >  #define RTM_NEWPREFIX        RTM_NEWPREFIX
-> >
-> > +     RTM_NEWMULTICAST,
-> RTM_NEWMULTICAST =3D 56
->
-> > +#define RTM_NEWMULTICAST RTM_NEWMULTICAST
-> > +     RTM_DELMULTICAST,
-> > +#define RTM_DELMULTICAST RTM_DELMULTICAST
-> >       RTM_GETMULTICAST =3D 58,
-> And you can probably remove this '=3D 58' to align to other families.
->
->
-> Regards,
-> Nicolas
 
