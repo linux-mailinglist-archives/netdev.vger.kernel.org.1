@@ -1,138 +1,104 @@
-Return-Path: <netdev+bounces-146687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E4759D4FA9
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:26:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 364F09D5023
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:52:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ED36B24D9E
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:26:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24261B26BF5
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 15:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54DF1DD877;
-	Thu, 21 Nov 2024 15:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043D3183CA2;
+	Thu, 21 Nov 2024 15:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IkQk+h08"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763D01DD0FE
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 15:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8AB15D5C3;
+	Thu, 21 Nov 2024 15:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732202759; cv=none; b=guOBS2mL5z30mm0zsbciCo5MQCGZxGyS1sAUZlHMOQlq5NEZI+X9yHfKHEFR3w9czxx5AFaEh7tF0FPeT3USSIgVCWGmFhMzLDfXDmgBXuYw9j/mGzYUTiGx+me1weKPkbAEzTQBUC20Z/xKWcd5ITTwZSBUVmGo4ncsomfkhWU=
+	t=1732204311; cv=none; b=jZvuC5lLozLzvYEEqu14yHRoGx7O1TFCV2ofdNcVykV3Czy5qxSuGEtM10URQGiXJtWuQDRNElla+p/Ccf7gc5FtuFgemH2+EIyROmPcn7o4eC8wbw7yw1CUhhwFRy4Tus0vBbFjxhD6F/Ep3KlZmJO4+PpMUfERVxJgdsU6Ioc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732202759; c=relaxed/simple;
-	bh=oK0uQiqKh+/vdcnvCmhyFoYOyRWHiqqATD9Y2HjkXnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6ELTKSIfbrnHtYj5ee8klSrteujIE7USvjjQuGlmK8iOTDoMQZ8YikCsT5D4TrcCShLbSRvdix4PELgBCMGoKwpEd+UHJFgfCSlSjxO5TXeBmwLtrbrs1Kjf01S6iOIyXsEcG0cyGZo2WhTUvsT5ohncLnNnxq44X9nwdNZFHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tE93x-0008LV-Vh; Thu, 21 Nov 2024 16:25:45 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tE93x-001vS6-1s;
-	Thu, 21 Nov 2024 16:25:45 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 2E84B378B50;
-	Thu, 21 Nov 2024 15:25:45 +0000 (UTC)
-Date: Thu, 21 Nov 2024 16:25:44 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Lino Sanfilippo <l.sanfilippo@kunbus.com>
-Cc: Nicolai Buchwitz <nb@tipi-net.de>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, n.buchwitz@kunbus.com, 
-	p.rosenberger@kunbus.com, stable@vger.kernel.org, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] can: dev: can_set_termination(): Allow gpio sleep
-Message-ID: <20241121-inquisitive-granite-hamster-b12a6f-mkl@pengutronix.de>
-References: <20241121150209.125772-1-nb@tipi-net.de>
- <20241121-augmented-aquamarine-cuckoo-017f53-mkl@pengutronix.de>
- <c47b3d06-8763-4f69-b845-c7b58c9e2fd2@kunbus.com>
+	s=arc-20240116; t=1732204311; c=relaxed/simple;
+	bh=X7hwPZmjY8q8t6ar3X/nRv/1vY7FPM9xlv+jJsMT4L8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IyXKrZ+1ZP94I4JZn2AlOEm+jq/BdJBPYlK3VdmOSIxFWKionM3QhFusOzyELTxa1eeVb+W25ki2UuFNih34vM55o1kRfA9ontjoOlUK9DdFRiNuTv83otu7l8mOE70JFCNdKSLhuZhLyD6DOvky3WMrRJvMT6AVfev4FArmiik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IkQk+h08; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay4-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::224])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 16AE2C351D;
+	Thu, 21 Nov 2024 15:27:52 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4498CE0015;
+	Thu, 21 Nov 2024 15:27:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732202864;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7vNUEM2nqa5ru8I3224DdW8toFKm1983QOZjCOpdhak=;
+	b=IkQk+h08kyzyl0ixQitvGKYANR/xMCGTYLxz+REOBqQ2sHLSvUez5TvQC8OF9DmBr2MHXp
+	liDAmVLJzuMzHMGk7B/aD8IhuMo2Qy859j28+aN0UyuBZepcKG7X65GSToOn8Hksg/NHy8
+	3TCmAmr76JWvf0ym9NkKxgatvqCq4CnYLKiCjCf14pIKyE0GketAiOH3CHCtt1m3PsKoE5
+	K7OkzjtQMjXPVtYthRtTdDifYI/PvOfzQRYULXMQMNGC8/4sls67l/2oNREMiTckwx1lwa
+	4py66em/riyMwXy4OOo7+eEygZZGNzaRVzYOC6llfdg7B+2eWTOTgVrmF9coAg==
+Date: Thu, 21 Nov 2024 16:27:39 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Liam Girdwood
+ <lgirdwood@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v3 17/27] regulator: dt-bindings: Add
+ regulator-power-budget property
+Message-ID: <20241121162739.6c566d85@kmaincent-XPS-13-7390>
+In-Reply-To: <9b5c62aa-fc01-4391-9fab-219889fa0cf6@sirena.org.uk>
+References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
+	<20241121-feature_poe_port_prio-v3-17-83299fa6967c@bootlin.com>
+	<9b5c62aa-fc01-4391-9fab-219889fa0cf6@sirena.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ogcxihj3qbcsrofe"
-Content-Disposition: inline
-In-Reply-To: <c47b3d06-8763-4f69-b845-c7b58c9e2fd2@kunbus.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---ogcxihj3qbcsrofe
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] can: dev: can_set_termination(): Allow gpio sleep
-MIME-Version: 1.0
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 21.11.2024 16:17:53, Lino Sanfilippo wrote:
-> > On 21.11.2024 16:02:09, Nicolai Buchwitz wrote:
-> >> The current implementation of can_set_termination() sets the GPIO in a
-> >> context which cannot sleep. This is an issue if the GPIO controller can
-> >> sleep (e.g. since the concerning GPIO expander is connected via SPI or
-> >> I2C). Thus, if the termination resistor is set (eg. with ip link),
-> >> a warning splat will be issued in the kernel log.
-> >>
-> >> Fix this by setting the termination resistor with
-> >> gpiod_set_value_cansleep() which instead of gpiod_set_value() allows i=
-t to
-> >> sleep.
-> >>
-> >> Cc: stable@vger.kernel.org
-> >> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
-> >=20
-> > I've send the same patch a few hours ago:
-> >=20
-> > https://lore.kernel.org/all/20241121-dev-fix-can_set_termination-v1-1-4=
-1fa6e29216d@pengutronix.de/
-> >=20
-> Shouldnt this also go to stable?
+On Thu, 21 Nov 2024 14:58:06 +0000
+Mark Brown <broonie@kernel.org> wrote:
 
-Until today no-one complained about the problem, but I'll add stable on
-Cc while applying the patch.
+> On Thu, Nov 21, 2024 at 03:42:43PM +0100, Kory Maincent wrote:
+> >    regulator-input-current-limit-microamp:
+> >      description: maximum input current regulator allows
+> > =20
+> > +  regulator-power-budget:
+> > +    description: power budget of the regulator in mW
+> > + =20
+>=20
+> Properties are supposed to include the unit in the name.
 
-regards,
-Marc
+Oh ok, thanks!
 
 --=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ogcxihj3qbcsrofe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmc/UPYACgkQKDiiPnot
-vG9IOwf/Xe9QldZzK3oY8FulDCyFTGhkQ/QLlekheNDEoEshpuKTEM9bNypg820V
-d0BtTboD3LudGIca4aoyFiYpko1B9UA7rNsylK4A85ZdphA6r1Wmw9qibOlpHH1V
-PYJ0ftVJcW2t6MsXjtcPkHSZCCZv70KPh7h2bX4yJ/y9RJ711E67kiN1wscv+5tM
-xSmWqR+ONxt6/kadkeGM4CwwKbBn0Ygm1SV3tYpyTQ07DRYvlJnpXmSShEu3Tuz6
-igUEltviWwMBC3TTGbsXfjBetQOy2gk9+QNHRIQUOg5BvcB+fSjaXC9AuJqMHSeD
-mGKdDReZlR8/jgtYQKtb23hvbQcrcQ==
-=S3ok
------END PGP SIGNATURE-----
-
---ogcxihj3qbcsrofe--
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
