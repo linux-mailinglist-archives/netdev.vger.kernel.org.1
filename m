@@ -1,146 +1,223 @@
-Return-Path: <netdev+bounces-146614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC489D490B
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:42:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FCA69D492E
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 09:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7452B238E1
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:42:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 662B0B2399F
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 08:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5431D1CBA17;
-	Thu, 21 Nov 2024 08:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbZ5lUn8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3F51CEAA7;
+	Thu, 21 Nov 2024 08:47:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76131CB9F4
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8891CD20B
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 08:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732178508; cv=none; b=USZo3nIyj/UZp24t55Kci1WZHFBFVfjNYRE/TzxjZJJG1+y/eqzOAty559YhKpPCzwia8ynF7YHDDo32HMdtyxlekaRSs/E4Toi+e7Bs7IxEFE/ZbZb00bG3FUOy4Pva+bEU5EsJwcQi4tD7BrEBumKaPtM9YqqPpRZOjk/Ulg0=
+	t=1732178864; cv=none; b=e8WtSnZ512kSg4/GEoZ3sEHcIuDhuTWocJRxeE2kgKLH+M8X+sQx5q2oPHObJgR4K23MfI+zUwFWplnSCayN8MjHvQw1/vlZoXNhI32h/9kuT55sJef+sBiIPIIIqZudmH3joifJKeDHGD1p7ZoJZrUHlru81cuRIDJGVBYCeOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732178508; c=relaxed/simple;
-	bh=OakpjTtQorQ2BeUpm+/i89nPTw9w4eLYabvPpcRfSGw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=J/FP5UKk/AyJeeBB9riTpiUQMiC+T3t9GvlxVl3FZCNpICIbRU/0SyJWzBQ5c8AcufToz0hewoBSKQ8j39aN2dEbgRiXSVz8z0NKl/Tm4L1kVtllR9hebwKFpyx+fQ7Y1B1E4oaZNs8wBNzY1RBKva1BpZnVsWDVgMQNMULp2ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gbZ5lUn8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732178505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3EfxJ3fmdocd7gaMUfcoBEkyZJYyM0opLmf/LIX4Ouc=;
-	b=gbZ5lUn8rzSAEGehFuasML3og/FMlirDDovCkblhdlytrUmrsN1OHUZDgpPbSgV5nztEY+
-	LIuW6twPsW8xLbfioHf58JWuai7vL34DsB415C7upOVSQef8seYCIW821oVNcdCJaJ083j
-	SDFdLrtuVND/uw615WeA077IONHbAQQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-692-6rg1c241M2WNJTupPZjetQ-1; Thu, 21 Nov 2024 03:41:43 -0500
-X-MC-Unique: 6rg1c241M2WNJTupPZjetQ-1
-X-Mimecast-MFC-AGG-ID: 6rg1c241M2WNJTupPZjetQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3822f550027so330425f8f.1
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 00:41:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732178502; x=1732783302;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3EfxJ3fmdocd7gaMUfcoBEkyZJYyM0opLmf/LIX4Ouc=;
-        b=h5UBtAcl8fE0PfL4SSQXQGsWcXtCByFlZBw/GCm9/9v0g2KRI8Q2ai+TZWy8LzS6Nm
-         8udm3e12w2pp1u4otdxUylQFAV15RB9wCnJYybveRbCeM1VYPJj2J72CVXPDj8Qvd+nD
-         XMNqXDndV05RKM+vYXHwX7FIY94C7aInFU1XJGVe/lxpl9iwOgrcb8zyunFoVXsAgtnL
-         zIujdXEVneOfSnkT/btEScyL2HuSwo6dPi9Yqt41sWgQVEZRAMTnPMHBKNvzq8t0wnhO
-         eDpW1z8cyH36XPW22008iLcGcJwVrSOccn7bh2kYXA1XS+542cKt/HhoWaGdWDIbgkUZ
-         zaHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQ7CpWMnFePBr6SbpTtrP5e5yAkXejTKjkeWexT6SzeQ5fEpJfLlpVlCz0l5pzYdlsuOkd/to=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlC/lswNzo9XOB+a4ibZLOE6Mqtn/MbRg8WH3oP/XG9kXnB2ZM
-	g0uVg41EiujCqpy2A77Cu0SV2gQsjPP4AvQCRNzCegT3l+IoG3dNARnpKF/Ukb4x/F8r778hRmP
-	LYwznkLWaJ6eimYz2FegbF7MZ5DaI1gkyUQLSg+H2E5SUUd3OXd5fWA==
-X-Gm-Gg: ASbGncuUZXxotxcMeCQcZ4w1m0zP+yc6PhLutWw6WzFc40b0IubA8767CtJfowyMp4I
-	zgnkskuxquVgZkSMUYC5qe9XXe9hunfYvi75Z498k0KdJ/Olz19W5nzG1PnSzSELpzIGHTqcite
-	8hijJcXc1Q3+GwmmDdtmC+wMznPqD1ftr7DufGxKj+9S6I3PeZtU4MoaK0GbMkXP0Fn0+rgoFg1
-	S9MLmw+//LTcP2/gAtTwvJ1RJIwRp6PT3d8UBWe61TNLqcmlcY4aFqqb46euCtHSRKr2sqCNQ==
-X-Received: by 2002:a5d:5f54:0:b0:382:383e:84d9 with SMTP id ffacd0b85a97d-38254b2905fmr5006766f8f.48.1732178502000;
-        Thu, 21 Nov 2024 00:41:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFWXza0JZ2QIRJ4eZp5svlyv9eMdR/9gHUUjPVmepznkQmbAhjCmDV1VegOdet0I40IWemEKw==
-X-Received: by 2002:a5d:5f54:0:b0:382:383e:84d9 with SMTP id ffacd0b85a97d-38254b2905fmr5006743f8f.48.1732178501624;
-        Thu, 21 Nov 2024 00:41:41 -0800 (PST)
-Received: from [192.168.88.24] (146-241-6-75.dyn.eolo.it. [146.241.6.75])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825493ea2bsm4297621f8f.87.2024.11.21.00.41.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2024 00:41:41 -0800 (PST)
-Message-ID: <13a81556-d28c-46d0-85d6-d2fb1620d24e@redhat.com>
-Date: Thu, 21 Nov 2024 09:41:39 +0100
+	s=arc-20240116; t=1732178864; c=relaxed/simple;
+	bh=pKEsHqJJ7aaw2tPZIhiHso+cyco0KW5Z1F1FUBWFoC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XtarG7gUardah5udIT/uRHe0554ha0r+zVWI8AWD78FAj1UKwe7+g2r6OoaJgvDF/+MrHTOjaxujI5B/CDtxN4yFuDrjlZ/N4rpDZ4bTb8C+B2FbRfJ8faB9N3PizlvleMbc3Sp1tz2ukC8ap3C2SHeVAR7qYNOOiGcMdA45/IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tE2qi-00026n-RD; Thu, 21 Nov 2024 09:47:40 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tE2qh-001sKs-0v;
+	Thu, 21 Nov 2024 09:47:39 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tE2qh-00734Z-0a;
+	Thu, 21 Nov 2024 09:47:39 +0100
+Date: Thu, 21 Nov 2024 09:47:39 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: Moving forward with stacked PHYs
+Message-ID: <Zz7zqzlDG40IYxC-@pengutronix.de>
+References: <20241119115136.74297db7@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/7] Add Aspeed G7 FTGMAC100 support
-To: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, p.zabel@pengutronix.de,
- ratbert@faraday-tech.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241120075017.2590228-1-jacky_chou@aspeedtech.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241120075017.2590228-1-jacky_chou@aspeedtech.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241119115136.74297db7@fedora.home>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 11/20/24 08:50, Jacky Chou wrote:
-> The Aspeed 7th generation SoC features three FTGMAC100.
-> The main difference from the previous generation is that the
-> FTGMAC100 adds support for 64-bit DMA capability. Another change
-> is that the RMII/RGMII pin strap configuration is changed to be set
-> in the bit 20 fo register 0x50.
+Hi Maxime,
+
+On Tue, Nov 19, 2024 at 11:51:36AM +0100, Maxime Chevallier wrote:
+> Hi Netdev,
 > 
-> Jacky Chou (7):
->   dt-bindings: net: ftgmac100: support for AST2700
->   net: faraday: Add ARM64 in FTGMAC100 for AST2700
->   net: ftgmac100: Add reset toggling for Aspeed SOCs
->   net: ftgmac100: Add support for AST2700
->   net: ftgmac100: add pin strap configuration for AST2700
->   net: ftgmac100: Add 64-bit DMA support for AST2700
->   net: ftgmac100: remove extra newline symbols
+> With Romain, we're currently trying to work on the stacked PHY problem,
+> where we'd like to get a proper support for Copper SFPs that are driven
+> by a media converter :
 > 
->  .../bindings/net/faraday,ftgmac100.yaml       |  3 +-
->  drivers/net/ethernet/faraday/Kconfig          |  5 +-
->  drivers/net/ethernet/faraday/ftgmac100.c      | 77 +++++++++++++++----
->  drivers/net/ethernet/faraday/ftgmac100.h      | 10 +++
->  4 files changed, 75 insertions(+), 20 deletions(-)
+>      RGMII       SGMII  +sfp----+
+> MAC ------- PHY ------- | PHY   |
+>                         +-------+
+> 
+> This is one of the cases where we have multiple PHYs on the link, on my
+> side I've been working on PHY muxes with parallel PHYs on the link :
+> 
+> 
+>        +-- PHY
+> MAC ---|
+>        +-- PHY
+>        
+> Both of these use-cases share one common issue, which is that some parts
+> of the kernel will try to directly access netdev->phydev, assuming there's
+> one and only PHY device that sits behind a MAC.
+> 
+> In the past months, I've worked on introducing the phy_link_topology, that
+> keeps track of all the PHYs that are sitting behind a netdev, and I've
+> used that infrastructure for some netlink commands that would access
+> the netdev->phydev field and replace that with :
+>   - A way to list the PHYs behind a netdev
+>   - Allowing netlink commands to target a specific PHY, and not "just"
+>     the netdev->phydev PHY.
+>     
+> On that front, there's more work coming to improve on that :
+>   - It would be good if the stats reported through ethtool would account
+>     for all the PHYs on the link, so that we would get a full overview
+>     of all stats from all components of the link
 
-## Form letter - net-next-closed
+Ack, i'm working right now on the standardized PHY stats. With some work on
+kernel side it would be possible to get with something like this:
+ethtool -S eth1 --all-groups
 
-The merge window for v6.13 has begun and net-next is closed for new
-drivers, features, code refactoring and optimizations. We are currently
-accepting bug fixes only.
+>   - A netlink notification to indicate that a new PHY was found on the
+>     link is also in the plans.
 
-Please repost when net-next reopens after Dec 2nd.
+This will be cool. I was thinking about netlink notification for some
+health issues, to avoid polling on the user side.
 
-RFC patches sent for review only are welcome at any time.
+> There's a lot more work to do however, as these user-facing commands aren't
+> the only place where netdev->phydev is used.
+> 
+> The first place are the MAC drivers. For this, there seems to be 2 options :
+> 
+>  - move to phylink. The phylink API is pretty well designed as it makes
+>    the phydev totally irrelevant for the MAC driver. The MAC driver doesn't
+>    even need to know if it's connected to a PHY or something else (and SFP
+>    cage for example). That's nice, but there are still plenty of drivers
+>    that don't use phylink.
 
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+This would be nice, but this is too much work. Last week I was porting lan78xx
+to PHYlink. Plain porting is some hours of work, the 80% of time is
+testing and fixing different issues. I do no think there are enough
+resources to port all of drivers.
 
+>  - Introduce a new set of helpers that would abstact away the phydev from
+>    the netdev, but in a more straightforward way. MAC drivers that directly
+>    access netdev->phydev to configure the PHY's internal state or get some
+>    PHY info would instead be converted to using a set of helpers that will
+>    take the netdev as a parameter :
+>    
+>  static void ftgmac100_adjust_link(struct net_device *netdev)
+>  {
 
+> +	int phy_link, phy_speed, phy_duplex;
+>  	struct ftgmac100 *priv = netdev_priv(netdev);
+>  	struct phy_device *phydev = netdev->phydev;
+>  	bool tx_pause, rx_pause;
+>  	int new_speed;
+>  
+> +	netdev_phy_link_settings(netdev, &phy_link, &phy_speed, &phy_duplex);
+> +
+>  	/* We store "no link" as speed 0 */
+> -	if (!phydev->link)
+> +	if (!phy_link)
+>  		new_speed = 0;
+>  	else
+> -		new_speed = phydev->speed;
+> +		new_speed = phy_speed;
+> [...]
+> 
+>    The above is just an example of such helpers, Romain is currently
+>    investigating this and going over all the MAC drivers out there to
+>    assess to what extent they are directly accessing the netdev->phydev,
+>    and wrapping that with phydev-independent helpers.
+> 
+>    The idea here is to avoid accessing phydev directly from the MAC
+>    driver, and have a helper query the parameters for us. This helper
+>    could make use of netdev->phydev, but also use phy_link_topology
+>    to get an aggregated version of these parameters, if there are chained
+>    PHYs for example.
 
+Sounds good, introduce the helper and rename net->phydev to something
+different. This should explode everything what is using net->phydev
+directly.
 
+> There are other parts of the kernel that accesses the netdev->phydev. There
+> are a few places in DSA where this is done, but the same helpers as the ones
+> introduced for MAC drivers could be used. The other remaining part would
+> be the Timestamping code, but Köry Maincent is currently working on an
+> series to help deal with the various timestamping sources, that will also
+> help on removing this strong netdev->phydev dependency.
+>    
+> Finally, there's the whole work of actually configuring the PHY themselves
+> correctly when they are chained to one another, and getting the logic right
+> for the link-up/down detection, getting the ksettings values aggregated
+> correctly, etc.
+> 
+> We have some local patches as well for that, to handle the stacked PHY
+> state-machine synchronisation, link-reporting and negociation but
+> it's still WIP to cover all the corner-cases and hard-to-test features, for
+> example how to deal with WoL or EEE in these situations.
 
+I assume, even with stacked PHYs, some kind of power management would
+be needed. The WoL is probably less interesting, since all attached PHYs are
+under linux control, so we can suspend or resume them.
 
+The EEE on other hand, may help to reduce run time power consumption.
+Still, it the user space should know about it, since it may be critical
+for time critical tasks.
 
+I guess, we would need some kind of PHY related metadata. For example,
+MAC triggered EEE, would add some latency, but should work fine with
+PTP. PHY backed EEE (like SmartEEE, etc) would add latency and affect
+PTP if time stamps are made by the MAC and not by the PHY. All of this
+information is HW specific. But, I assume, it is not withing the scope
+of your current work.
 
-
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
