@@ -1,65 +1,51 @@
-Return-Path: <netdev+bounces-146696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E4B79D50BF
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 17:31:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE8E19D5176
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 18:15:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00B2D28395E
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 16:31:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93E48280DB6
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 17:15:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F3B14A4FB;
-	Thu, 21 Nov 2024 16:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AF71A7045;
+	Thu, 21 Nov 2024 17:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lru/rGMw"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=seoss.co.uk header.i=@seoss.co.uk header.b="D05j2VDv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from relay0.allsecuredomains.com (relay0.allsecuredomains.com [51.68.204.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D53310A3E;
-	Thu, 21 Nov 2024 16:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2332B17333A
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 17:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.68.204.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732206705; cv=none; b=JGxHD5Zy1elOU/VU0rmEtlDbS/1UqnE3XqOCdUkboT/zXIl/rzUf9OGJ60aCacmNNiQmyX+2CBvBRSoSc5buEDzo7jdOiyohLBtMipj8idFBwHN2p/rb5O9wO9EjkVbj+j64gUCIxZ5LeyplHE5GcCZckBJUdkv0DepMn2Q5Rsk=
+	t=1732209312; cv=none; b=tFFeCqXmygh/X/qaIEUCzojsxYLtO5K1i1PjOXEi+oKP18F1Kd0dSbJEYPMDUOiHZ7sImXac8zZDF8Ge2wD0O6pYixE5/dLNqLTRJrvZTgUeNeViba77VEbpliGf5pZWhIAQ8LT148CV4tNc+FyTYojrtQROxVHXRHp5owfzsOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732206705; c=relaxed/simple;
-	bh=KAF9bEyre5NHjdh2UhRFrv5pzpjkr/MHSDumIfunvfg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HR7ZB43spZbdy/eiM50ebOro964QAcjMQK87XZ9jB4EWbt4dX1ZNPetkmvZj1SerPCmfNQ1tUYGol+H96ubMRTdP4WUXzLi3+bZVYpqxGQdcXjqbCf2vtsEXX5bOP39AutB6qCCYVS1Sj682TS7CcAF/DiPXy6/0s7mLD2/uJ9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lru/rGMw; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732206704; x=1763742704;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KAF9bEyre5NHjdh2UhRFrv5pzpjkr/MHSDumIfunvfg=;
-  b=Lru/rGMw1d/mB+JjJi/2Rm80LIW7lHi/jU2SQu+/sxOt2j14y6sDSkeJ
-   /IZH6hTVai3csQtyOG5WOtq+lLnZ+kct2t/TLlqTnYm1dPunsbleT0zFJ
-   8EKL6vWR40I0ECXi65VyXMbetXfEFdB4bTpuq/ZyzJa35HpexZO1rGNTd
-   8vxG3p6kMBU+xcXkwnCNOyI0AQYAmFo4dyUw+flkxDMhDR0ib9IYCAna8
-   3sXAU0EkFcUymyuzdvZVdpzUYTB3Vv+Q76kxrpZlEFWi7pyADjdF8vuni
-   E5sd5u26ibGeuMbkD3JPKPcGfvZiMkk0MSPxwR8HQsI6aXDh3e23XPxYC
-   g==;
-X-CSE-ConnectionGUID: a0CQwT3eQXitzRo8MTcQ3w==
-X-CSE-MsgGUID: dmjmnVBuTcSASRBPf4teGQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="42843606"
-X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="42843606"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 08:31:43 -0800
-X-CSE-ConnectionGUID: 7nUNTIgVT6KvW78+0svK+w==
-X-CSE-MsgGUID: lPkF5iIOQf2t9TsgPwZB5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,173,1728975600"; 
-   d="scan'208";a="90285224"
-Received: from inaky-mobl1.amr.corp.intel.com (HELO [10.125.109.245]) ([10.125.109.245])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 08:31:43 -0800
-Message-ID: <57c05646-0d69-45d6-a20b-9447accc9c85@intel.com>
-Date: Thu, 21 Nov 2024 09:31:41 -0700
+	s=arc-20240116; t=1732209312; c=relaxed/simple;
+	bh=Zp07nk2hYaqBxL0vv6nuaTmHsHX/1Y+Ic5vLGxqAUR8=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Cc:Content-Type; b=F301kRtQfv6sdma6RJsKCEgHl3YQwkmCFIPe/BfwyHTjscr/4ogGS7+3vuT7SxZGHg1p0egsVDYoEXTX4SBD2celXif/Ueh/cLYxoiLyjS2wHevraGB3DRAwJ1P6zxCjSVUxsSK58l4DXlE2SdbpEl+HUTsXTcZ0ZEUuM2JmndQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=seoss.co.uk; spf=pass smtp.mailfrom=seoss.co.uk; dkim=pass (1024-bit key) header.d=seoss.co.uk header.i=@seoss.co.uk header.b=D05j2VDv; arc=none smtp.client-ip=51.68.204.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=seoss.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seoss.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=seoss.co.uk
+	; s=asd201810; h=Content-Transfer-Encoding:Content-Type:Cc:Subject:To:From:
+	MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=d2XGZoWR3NXO2nBInIhWT+oQvb36n+z1Dg8CJYFuhUs=; b=D05j2VDvt9qOYmClV5pkkxo5nd
+	UVcTuN3bMD0yX46Di8OYQDfaa4/zA+VlQqg6x/kGrFMqOpsJI/QKgXHFJtEK7RUMpvkGPQo21BRwI
+	tQ2HXIisbTf3WpspLrfODP3nMI+9Mlt4p54qRt65b/UHy01cXHDrR1os1BegaeTLti+g=;
+Received: from [81.174.144.187] (helo=[172.19.198.146])
+	by relay0.allsecuredomains.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	(Exim 4.92)
+	(envelope-from <tim@seoss.co.uk>)
+	id 1tEA7D-00023l-JA; Thu, 21 Nov 2024 16:33:11 +0000
+Message-ID: <ea3dcffe-d7a9-48d2-975c-75b7b20ee3d4@seoss.co.uk>
+Date: Thu, 21 Nov 2024 16:33:11 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,93 +53,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 26/27] cxl: add function for obtaining params from a
- region
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
- <20241118164434.7551-27-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20241118164434.7551-27-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
+From: Tim Small <tim@seoss.co.uk>
+Content-Language: en-GB
+To: Andrew Lunn <andrew@lunn.ch>
+Subject: Marvell 88E1512 cable test tdr timeout
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+Hi Andrew,
 
+Thanks for contributing your work on cable test to the kernel.
 
-On 11/18/24 9:44 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> A CXL region struct contains the physical address to work with.
-> 
-> Add a function for given a opaque cxl region struct returns the params
-> to be used for mapping such memory range.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> ---
->  drivers/cxl/core/region.c | 16 ++++++++++++++++
->  drivers/cxl/cxl.h         |  2 ++
->  include/cxl/cxl.h         |  2 ++
->  3 files changed, 20 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index eff3ad788077..fa44a60549f7 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -2663,6 +2663,22 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
->  	return ERR_PTR(rc);
->  }
->  
-> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
-> +			  resource_size_t *end)
+I'm trying to use the TDR cable test functionality using the Marvell 
+88E1512 PHY which is included in a wifi access point.
 
-Maybe just pass in a 'struct range' ptr and call it cxl_get_region_range()?
+When I run:
 
-DJ
+ethtool --cable-test-tdr eth1
 
-> +{
-> +	if (!region)
-> +		return -ENODEV;
-> +
-> +	if (!region->params.res)
-> +		return -ENOSPC;
-> +
-> +	*start = region->params.res->start;
-> +	*end = region->params.res->end;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_get_region_params, CXL);
-> +
->  static ssize_t __create_region_show(struct cxl_root_decoder *cxlrd, char *buf)
->  {
->  	return sysfs_emit(buf, "region%u\n", atomic_read(&cxlrd->region_id));
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index ee3385db5663..7b46d313e581 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -913,6 +913,8 @@ void cxl_coordinates_combine(struct access_coordinate *out,
->  
->  bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port);
->  
-> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
-> +			  resource_size_t *end);
->  /*
->   * Unit test builds overrides this to __weak, find the 'strong' version
->   * of these symbols in tools/testing/cxl/.
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> index 2a8ebabfc1dd..f14a3f292ad8 100644
-> --- a/include/cxl/cxl.h
-> +++ b/include/cxl/cxl.h
-> @@ -77,4 +77,6 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
->  				     bool avoid_dax);
->  
->  int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
-> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
-> +			  resource_size_t *end);
->  #endif
+I get no results, and the kernel log includes:
 
+Marvell 88E1510 mdio.1:01: Timeout while waiting for cable test to finish
+
+The wifi access point is running OpenWrt snapshot v6.6.61
+  (Huawei AP5030DN) and has a MIPS 74Kc V5.0 based SoC.
+
+Since support for this device is not in the mainline kernel, I cannot 
+easily run mainline, but I've diffed the OpenWrt tree against 
+net-next/main and can't see any changes to drivers/net/phy/marvell.c 
+which which look like they would have changed the tdr test path, and 
+could attempt to run mainline if that would be useful.
+
+The markings on the physical chip are:
+
+88E1512-NNP2
+NNR3880.5JW
+1442 A0P
+TW
+
+I can't find the programming manual online (I assume it's NDAed?) so I 
+can't check to see if there are any differences between the 88E1512 and 
+the 88E1510, or errata etc.
+
+I tried increasing the hard-coded poll number in 
+marvell_vct5_wait_complete(), but I just get a watchdog reset in that case.
+
+Any hints or tips gratefully received.
+
+Cheers,
+
+Tim.
 
