@@ -1,155 +1,279 @@
-Return-Path: <netdev+bounces-146642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 497369D4D39
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 13:55:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E7B9D4D47
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 13:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D02441F21B0D
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 12:55:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82CB52810C7
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 12:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0911E1D3585;
-	Thu, 21 Nov 2024 12:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B6E1D5CD4;
+	Thu, 21 Nov 2024 12:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vp/XsfoX"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="LDJUu0N6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C08F1D14E0;
-	Thu, 21 Nov 2024 12:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3116F1D319B
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 12:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732193704; cv=none; b=BleCrYjwDDhgN6IZCYcqdV2XN41U5NYPqQQW+378y+Xn2yPXJxMQXsmB2CwRqYuI49Drn5CafADpOia07FM6eg6g0LLA57f7ilspL7OqGfNKr1g5FZpm733/7hDJyX2IaGTl6o4+YaBvcwENAirfFdo52NFt6zilgMtGoS9b4xQ=
+	t=1732193892; cv=none; b=TeWRxHYOORpYss/jSXDY3x7sQYhYJUW9aK+YExbffcMgm5sTtiQjdmvAtzXRl51UqU3tk9hQyPEoptg1JqoxdR76gSQG756wt3uU//EnWnlQ5A1I2mDXZrSMqq+aCEZvG4j6c7oqgi8m3O7HmgpCJX+05UVk02Czpid0fUYN7MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732193704; c=relaxed/simple;
-	bh=TyRK0v6JWrIoG6N1dVoWdnKtThdHjDpGnXnLbjIA28w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AH2no3Btz/TfLkmN3BRWWkY94wS9KJAMUU2lCltv6xSGHnEGWI5tZD7KuaLPSRD4RPLxtvX/jQ83pzg5SPKHdFmCbKAMSDJMLHMvOfOe2Ay00UTmEbbWbk+BeSN1MDIjKAQWVpItbuqYM0j4pTdP53rysvVR9cIldNrWpzm/gtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vp/XsfoX; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38231f84d8fso109097f8f.3;
-        Thu, 21 Nov 2024 04:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732193701; x=1732798501; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/mk/t5JsGWeIH/DpSPDEQ6FuPdTH3isfQI/VwO/903c=;
-        b=Vp/XsfoXvdMGp+Gv51WYgJ4ht4sAmEuqdWZOqowJXQmMoVDpPOmi7WEP3rOy3QEVNC
-         AQRI2HAlZKKFiSsoVC25pI3Ur+lP2etEwwHMHklBqannAW8AgNZiOEo75yO8Y9QpqrZi
-         7DtoN8EG7uemJxCm9WlEUs37bIHw8Jsmp2LAIDA0PzeEXdkdSZvx2TUucmPr4jC06an4
-         Oz5ScBACh5s9nHsH58mQe+3cQeXDSuQI2n5WDOMJ6AtmMhl7FNARYx6smf8zaLoqejzR
-         MFn/WsJAlPDzleM2uOW01IpHuBYI3q4W3SQDIfIwq3uxcKBuS8bAZSwiBC2isbBBMFFb
-         KHxg==
+	s=arc-20240116; t=1732193892; c=relaxed/simple;
+	bh=NGrZcFdcWSOdG64B42aeCuurKwAqveVQiGFal6pomAI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hm20HBNhhkGIXtH6m6qAtE6TBIzWltaDY11V0OlkdS+7TuOdCotUMV33vpdsYAUdVNwo3R621+ElUX1cGGy6jg6ZOaSBxtysQV3sg3G2Vx7vPtk/rqavgRyliNUIal8zAyCx13Fu6Uu9XkJSOotbGMnQJX5zmGcIJ6xE8LN2xps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=LDJUu0N6; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C3087402F0
+	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 12:58:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1732193881;
+	bh=NkMGboeB4JllcdtLoKopzE3i3ZmHlvAh51JdixnLmTg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=LDJUu0N65U98bOEpPAIpZ+CAKie5LBKZkcRoOLSfDvccrjjmFyCOGZigxUubltkfM
+	 JI06qxv8EMxzR099kGZX19lsCpJ6LTVGuNVb/ctnpfBWxWL+KaGWlkwuHu8iLPUqPA
+	 xE6RJuyOG/p1NPVfATqWIQhKJUq3k75yQnHqkvcaW0st0MaV/+oYMR/BNHGt7vgIoP
+	 kscArUcoEemFxOCpuQJ0Xw29ae5Y45SaY7MzbmetyHbHQsjMEMo7XxJ2M0KwyeAth8
+	 4d2LYWjEZyKfavLbT1WCEv2ChrhpCYqnHycnOQj3cLJD8888bheacbcx9qbfCTW0CQ
+	 andGz7nbGdNdg==
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a9a2a81ab82so73670666b.1
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 04:58:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732193701; x=1732798501;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/mk/t5JsGWeIH/DpSPDEQ6FuPdTH3isfQI/VwO/903c=;
-        b=ayVM+oVLpbmQRO9ITG/idbB34V4TVlCuVA3q1pTbB1W9dnkclKqQl+MraM2iNxov7s
-         gImLV08+HJNXoQAtLOPtktfsGPDZbGEa3atDvqxa9I/We8aFX/K19bdYlwNdgY+3hXD5
-         +BhncrNsGX/9U0/uXyeeYL8r3bcziVjlaBMVxzsvN0sIc6ACgU+nDEj70Mkv2mODs9T+
-         TpI5vxx6IVDYj2ofgq0gKgqFbin7osWhuiy7bR6l21Mp2uv9BaVvVT7LZNGtFfpQHmlM
-         nPj6azegofO5LmNRvlTtGqjxJt5yRjLG9Tb6D5/sfrHASkHSned7Gb6MDux8uTNf82ss
-         sX1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUYb/NI7w9i2eqMhl6lyVWgOrd65hIZYt6Jc/9aC++n7olhjMPyi0e9Ihw89RBhtUTcY/HaE0o6@vger.kernel.org, AJvYcCWjm7wvkV9L84Kg37qCh4SE6flGmLxLvWF3U2KSiRh4GWBInM425mIHlwanCgZkjYylL9s0bgS0o8eDqCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIymg4o2+MyYFuURr6xut5m5sf5Q1Fv4f0DgQevF4yD7qYtp7H
-	NPdbThG5u6h1Td1TUXwrZ7SRSm7iLZ2L1SAHJ9soHHTaWOakuLZl
-X-Gm-Gg: ASbGncuQ7bidCgSPfrmyX8/hXnZ9+3L+A+V2z7sN0IKdYUcpQisKNq29ISjhMP35Ajb
-	C6wd3MOguAIGnev46KFKQGbe3d6Kd4PBruh9M3tukbIe7Dt5UtnlEWntf3H0ofDkuDX34sY2Ehg
-	3v+vbdtBAr2wZcGiLTSD8zy6CCYqnC53+Uxp6j//h08E77XbS95piPwNrwHWXhzlWX1pFIm5omI
-	8M/O2DvDa1zBFB4yT0qySsq6QqWbZaXEpK0YHs=
-X-Google-Smtp-Source: AGHT+IFDTPLCdhZ3osSznMNoSPBMhCR1wAYH99OVovJbtBHn7pTWd7vID7NNkDjgBlDJ7dm0CyRsYg==
-X-Received: by 2002:a05:6000:1f83:b0:382:4378:4637 with SMTP id ffacd0b85a97d-38254b21195mr2013739f8f.12.1732193701049;
-        Thu, 21 Nov 2024 04:55:01 -0800 (PST)
-Received: from skbuf ([188.25.135.117])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825494ca3fsm4982014f8f.111.2024.11.21.04.54.59
+        d=1e100.net; s=20230601; t=1732193881; x=1732798681;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NkMGboeB4JllcdtLoKopzE3i3ZmHlvAh51JdixnLmTg=;
+        b=mN3b6Pkuex1rEFnA7Hq6Hw6yZDcLCtOW8AC2scCyhCk038AYES+5gOApgcWvqoxUFS
+         ZuietkSgeO48QkustD+H4Zjel6MAvKntC8KtwurseHF94Pwos8NhZwI4qUQYL1ANYm7q
+         SQFhYKNqjc/krcPfGah+l+ZRcO0vcEzBa4ZuO52HYT9k+cRQF4KwAyMo1rAXknC+2zVW
+         wp3MZexRJjiHKXMIaXw/0F8nXNNoMxelLypG/FhZaqIpMxrcIre5UENueptd5IUeOGc8
+         M/Jfh0YcA0gYqWJtqkgHng8GByJana0PQhEBA0UHmAJjZ0FyDZ/JIoa/bAe0YxMulwQA
+         z2AQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWT645qVfPBdbFpYYbMMjsrMDLOz2d5DEWAY9EfplpvXbHsPaBlNLjdomYyMiFsD/1RY8gwkqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvWcpZQoEpIt7x1MNshFz1MIqU2uT3qB42TscPCVpZCt7XY81J
+	Swf5WaOIycOv/ONWmGfCttuXmS+n34vKHK9plHXTHdJPgcghXuQNcxMj0y8zSZTw/Q92AdFJ3h7
+	lmW1tefkgYBkc25jSKLYPl2jIB9TgP668BWuQWf1II0efvJ9byEyF0xUM1JxzgvOOw91TOg==
+X-Gm-Gg: ASbGncsxR1XXAs9vaJvfkt0Ch+JXdD5yJmZXd/GwTWS7lX2IqBH6/uT9dSbpVTDzaRF
+	Y52hHRcizZyiGwZP4gFhuEWoYxQqicvP09Zgk+13++zFYqe9aw0f0zz07Deoo2DNkFxspHyMK9a
+	CLa5jgAwAdRdRw2Pz8nATyH8b+SAw1loDT5D67u2NcP2u45Uo/60SJTEdIz1+9+D66U3sgOawOB
+	ORmoEx1+Gg9aQjIPt/a06BJCFBPYQYNDm28xhosWvYrIChB7PDuDkhlsPU9SLpdzJdtjSEihG8G
+	tg==
+X-Received: by 2002:a17:907:9720:b0:a9a:55dd:bc23 with SMTP id a640c23a62f3a-aa4dd50a642mr542207466b.8.1732193880872;
+        Thu, 21 Nov 2024 04:58:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFG6g7C3BDAlHohQX+vhiU+W2yyBeHXfdlriO8FaVjmCQHY0iBTKt6Ed0Pjpw0u8D6j+3lBRA==
+X-Received: by 2002:a17:907:9720:b0:a9a:55dd:bc23 with SMTP id a640c23a62f3a-aa4dd50a642mr542204066b.8.1732193880498;
+        Thu, 21 Nov 2024 04:58:00 -0800 (PST)
+Received: from amikhalitsyn.lan ([188.192.113.77])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa4f42d3109sm78221766b.132.2024.11.21.04.57.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 04:55:00 -0800 (PST)
-Date: Thu, 21 Nov 2024 14:54:58 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Cong Yi <yicong.srfy@foxmail.com>, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: Re: [PATCH] net: phylink: Separating two unrelated definitions for
- improving code readability
-Message-ID: <20241121125458.j237l34kw3uxhskz@skbuf>
-References: <Zz2id5-T-2-_jj4Q@shell.armlinux.org.uk>
- <tencent_0F68091620B122436D14BEA497181B17C007@qq.com>
- <20241121105044.rbjp2deo5orce3me@skbuf>
- <Zz8Xve4kmHgPx-od@shell.armlinux.org.uk>
- <20241121115230.u6s3frtwg25afdbg@skbuf>
- <Zz8jVmO82CHQe5jR@shell.armlinux.org.uk>
- <20241121121548.gcbkhw2aead5hae3@skbuf>
- <Zz8nBN6Z8s7OZ7Fe@shell.armlinux.org.uk>
- <20241121124718.7behooc2khmgyfvm@skbuf>
- <Zz8sZ8WTocbX1x3r@shell.armlinux.org.uk>
+        Thu, 21 Nov 2024 04:57:59 -0800 (PST)
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To: stsp2@yandex.ru
+Cc: almasrymina@google.com,
+	asml.silence@gmail.com,
+	axboe@kernel.dk,
+	brauner@kernel.org,
+	cyphar@cyphar.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	gouhao@uniontech.com,
+	horms@kernel.org,
+	kees@kernel.org,
+	krisman@suse.de,
+	kuba@kernel.org,
+	kuniyu@amazon.com,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	mhal@rbox.co,
+	netdev@vger.kernel.org,
+	oleg@redhat.com,
+	pabeni@redhat.com,
+	quic_abchauha@quicinc.com,
+	shuah@kernel.org,
+	tandersen@netflix.com,
+	viro@zeniv.linux.org.uk,
+	willemb@google.com,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Subject: Re: [PATCH net-next v3] af_unix: pass pidfd flags via SCM_PIDFD cmsg
+Date: Thu, 21 Nov 2024 13:57:32 +0100
+Message-ID: <20241121125732.88044-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241116101120.323174-1-stsp2@yandex.ru>
+References: <20241116101120.323174-1-stsp2@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zz8sZ8WTocbX1x3r@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 21, 2024 at 12:49:43PM +0000, Russell King (Oracle) wrote:
-> On Thu, Nov 21, 2024 at 02:47:18PM +0200, Vladimir Oltean wrote:
-> > On Thu, Nov 21, 2024 at 12:26:44PM +0000, Russell King (Oracle) wrote:
-> > > On Thu, Nov 21, 2024 at 02:15:48PM +0200, Vladimir Oltean wrote:
-> > > > On Thu, Nov 21, 2024 at 12:11:02PM +0000, Russell King (Oracle) wrote:
-> > > > > On Thu, Nov 21, 2024 at 01:52:30PM +0200, Vladimir Oltean wrote:
-> > > > > > I don't understand what's to defend about this, really.
-> > > > > 
-> > > > > It's not something I want to entertain right now. I have enough on my
-> > > > > plate without having patches like this to deal with. Maybe next year
-> > > > > I'll look at it, but not right now.
-> > > > 
-> > > > I can definitely understand the lack of time to deal with trivial
-> > > > matters, but I mean, it isn't as if ./scripts/get_maintainer.pl
-> > > > drivers/net/phy/phylink.c lists a single person...
-> > > 
-> > > Trivial patches have an impact beyond just reviewing the patch. They
-> > > can cause conflicts, causing work that's in progress to need extra
-> > > re-work.
-> > > 
-> > > I have the problems of in-band that I've been trying to address since
-> > > April. I have phylink EEE support that I've also been trying to move
-> > > forward. However, with everything that has happened this year (first,
-> > > a high priority work item, followed by holiday, followed by my eye
-> > > operations) I've only _just_ been able to get back to looking at these
-> > > issues... meanwhile I see that I'm now being asked for stuff about
-> > > stacked PHYs which is also going to impact phylink. Oh, and to top it
-> > > off, I've discovered that mainline is broken on my test platform
-> > > (IRQ crap) which I'm currently trying to debug what has been broken.
-> > > Meaning I'm not working on any phylink stuff right now because of
-> > > other people's breakage.
-> > > 
-> > > It's just been bit of crap after another after another.
-> > > 
-> > > Give me a sodding break.
-> > 
-> > I just believe that any patch submitter has the right for their proposal
-> > to be evaluated based solely on its own merits (even if time has to be
-> > stretched in order for that to happen), not based on unrelated context.
-> 
-> Right, and my coding preference is as I've written the code. If my
-> coding preference, as author and maintainer of this file, were
-> different then I would've written it differently.
-> 
-> Am I not entitled to make my own choices for code I maintain?
+>Currently SCM_PIDFD cmsg cannot be sent via unix socket
+>(returns -EINVAL) and SO_PASSPIDFD doesn't support flags.
+>The created pidfd always has flags set to 0.
+>
+>This patch implements SCM_PIDFD cmsg in AF_UNIX socket, which
+>can be used to send flags to SO_PASSPIDFD-enabled recipient.
+>
+>Self-test is added for the propagation of PIDFD_NONBLOCK flag.
 
-Well, yes, I do believe that's the essence of our disagreement. I would
-very much like phylink to not be the personal island of Russell King the
-individual, but open to common patterns adopted across the entire
-networking subsystem, and especially to other individuals. You've quoted
-ata headers as an example of a similar pattern, but "git blame" says
-that comes from pre-history, so I'm not sure it's exactly the best example
-of what to do today.
+>This is mainly needed for the future extensions, like eg this one:
+>https://lore.kernel.org/lkml/8288a08e-448b-43c2-82dc-59f87d0d9072@yandex.ru/T/#me1237e46deba8574b77834b7704e63559ffef9cb
+>where it was suggested to try solving the supplementary groups
+>problem with pidfd.
+>
+>Changes in v3: specify target tree in patch subject
+>Changes in v2: remove flags validation in scm_pidfd_recv(), as
+>  suggested by Kuniyuki Iwashima <kuniyu@amazon.com>
+>
+>Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+
+...
+
+>diff --git a/include/linux/pidfs.h b/include/linux/pidfs.h
+>index 75bdf9807802..c4c5c1a0c2ad 100644
+>--- a/include/linux/pidfs.h
+>+++ b/include/linux/pidfs.h
+>@@ -2,7 +2,16 @@
+> #ifndef _LINUX_PID_FS_H
+> #define _LINUX_PID_FS_H
+> 
+>+#include <uapi/linux/pidfd.h>
+>+
+> struct file *pidfs_alloc_file(struct pid *pid, unsigned int flags);
+> void __init pidfs_init(void);
+> 
+>+static inline int pidfd_validate_flags(unsigned int flags)
+>+{
+>+	if (flags & ~(PIDFD_NONBLOCK | PIDFD_THREAD))
+>+		return -EINVAL;
+>+	return 0;
+>+}
+>+
+> #endif /* _LINUX_PID_FS_H */
+>diff --git a/include/linux/socket.h b/include/linux/socket.h
+>index d18cc47e89bd..ee27d391e5aa 100644
+>--- a/include/linux/socket.h
+>+++ b/include/linux/socket.h
+>@@ -178,7 +178,7 @@ static inline size_t msg_data_left(struct msghdr *msg)
+> #define	SCM_RIGHTS	0x01		/* rw: access rights (array of int) */
+> #define SCM_CREDENTIALS 0x02		/* rw: struct ucred		*/
+> #define SCM_SECURITY	0x03		/* rw: security label		*/
+>-#define SCM_PIDFD	0x04		/* ro: pidfd (int)		*/
+>+#define SCM_PIDFD	0x04		/* r: pidfd, w: pidfd_flags (int) */
+> 
+> struct ucred {
+> 	__u32	pid;
+>diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+>index 63129c79b8cb..4bc197548c2f 100644
+>--- a/include/net/af_unix.h
+>+++ b/include/net/af_unix.h
+>@@ -62,6 +62,7 @@ struct unix_skb_parms {
+> #ifdef CONFIG_SECURITY_NETWORK
+> 	u32			secid;		/* Security ID		*/
+> #endif
+>+	u32			pidfd_flags;
+> 	u32			consumed;
+> } __randomize_layout;
+> 
+>diff --git a/include/net/scm.h b/include/net/scm.h
+>index 0d35c7c77a74..1326edcacacb 100644
+>--- a/include/net/scm.h
+>+++ b/include/net/scm.h
+>@@ -48,6 +48,7 @@ struct scm_cookie {
+> #ifdef CONFIG_SECURITY_NETWORK
+> 	u32			secid;		/* Passed security ID 	*/
+> #endif
+>+	u32			pidfd_flags;
+> };
+> 
+> void scm_detach_fds(struct msghdr *msg, struct scm_cookie *scm);
+>@@ -154,7 +155,7 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
+> 	if (!scm->pid)
+> 		return;
+> 
+>-	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
+>+	pidfd = pidfd_prepare(scm->pid, scm->pidfd_flags, &pidfd_file);
+> 
+> 	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
+> 		if (pidfd_file) {
+>diff --git a/kernel/pid.c b/kernel/pid.c
+>index 2715afb77eab..b1100ae8ea63 100644
+>--- a/kernel/pid.c
+>+++ b/kernel/pid.c
+>@@ -629,10 +629,12 @@ static int pidfd_create(struct pid *pid, unsigned int flags)
+> SYSCALL_DEFINE2(pidfd_open, pid_t, pid, unsigned int, flags)
+> {
+> 	int fd;
+>+	int err;
+> 	struct pid *p;
+> 
+>-	if (flags & ~(PIDFD_NONBLOCK | PIDFD_THREAD))
+>-		return -EINVAL;
+>+	err = pidfd_validate_flags(flags);
+>+	if (err)
+>+		return err;
+> 
+> 	if (pid <= 0)
+> 		return -EINVAL;
+>diff --git a/net/core/scm.c b/net/core/scm.c
+>index 4f6a14babe5a..3bcdecdacd7e 100644
+>--- a/net/core/scm.c
+>+++ b/net/core/scm.c
+>@@ -23,6 +23,7 @@
+> #include <linux/security.h>
+> #include <linux/pid_namespace.h>
+> #include <linux/pid.h>
+>+#include <linux/pidfs.h>
+> #include <linux/nsproxy.h>
+> #include <linux/slab.h>
+> #include <linux/errqueue.h>
+>@@ -210,6 +211,19 @@ int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
+> 			p->creds.gid = gid;
+> 			break;
+> 		}
+>+		case SCM_PIDFD:
+>+		{
+>+			unsigned int flags;
+>+
+>+			if (cmsg->cmsg_len != CMSG_LEN(sizeof(flags)))
+>
+
+Hi Stas!
+
+Hmm, it is a bit unusual that SCM_PIDFD message format is different in case
+when you send it and when you read it.
+
+I mean that when you read it (on the receiver side) you get pidfd file descriptor number,
+while when you write it (on the sender side) you are only allowed to send one integer and this time it's
+a pidfd file descriptor flags. I personally have nothing strictly against that but just found this
+a bit unusual and probably confusing for userspace programmers.
+
+Compare it with SCM_CREDENTIALS, for instance, where we read/write the same structure struct ucred.
+
+>+				goto error;
+>+			memcpy(&flags, CMSG_DATA(cmsg), sizeof(flags));
+>+			err = pidfd_validate_flags(flags);
+
+pidfd_validate_flags allows PIDFD_THREAD, but what's the idea behind this if
+scm->pid is always a thread-group leader? (see maybe_add_creds() function).
+
+Sorry if I misunderstand something just want to ensure that we are on the same page.
+
+Kind regards,
+Alex
+
 
