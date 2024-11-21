@@ -1,237 +1,204 @@
-Return-Path: <netdev+bounces-146579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A449D475F
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 06:56:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26CBC9D476C
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 07:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13146282029
-	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 05:56:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB3F3282E52
+	for <lists+netdev@lfdr.de>; Thu, 21 Nov 2024 06:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 090B11AA1FB;
-	Thu, 21 Nov 2024 05:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AE91A3BC8;
+	Thu, 21 Nov 2024 06:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LvboM6Dr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G+TFzSjn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4FE2309B6
-	for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 05:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFA019CCFC;
+	Thu, 21 Nov 2024 06:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732168587; cv=none; b=S8gvTk5YpWNekSPrAsO9ey4pxrSXiBVChJt5WuUFxHukTY5Q7xIJemMGc11o9gAI6z0SNhWxQ/5fBWtadV/DLUHsXNWm3O28uunjDxXrNtTzqcz7cS29+tq2vj2bwRYTmnRS4m6g4xKKmud+L2feNK1TtOdnrozW9W1MaQcBIs8=
+	t=1732169243; cv=none; b=Jknl483q0nwf1La/fxCyu8rrGAl1xN1lra6bllP81CpkYOSR9rVZsvDwG5OVL1qe9pOvsgY9UQEpiTLZL1bBG/vQW20z53FJ5TTIXKMLa3JOiM7CO9EP8GHghNcZniDQOMLXQR4zjbw+vgr692B4kLmxkglDeAQNs3+JfK5+RgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732168587; c=relaxed/simple;
-	bh=VNx8I/juCIHP0kztyYJX441I+5TTY8l1myOYu29viAQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RMp24fv1jhwoigqydbQtCSetMjv6l4iCkS9E8Utu3iOQH7BXIBY3QG3cXQS0N4oAxmKBQaMhri3RBTl2P6j4DvnG/GBSPCiMPlmv45ExigcYrsS/hkAUPssqylktfg9V7BX0NclCMs9rXIGWX4HWMXJOiQOZPjVj3kkYeThfD+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LvboM6Dr; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e2971589916so873292276.3
-        for <netdev@vger.kernel.org>; Wed, 20 Nov 2024 21:56:26 -0800 (PST)
+	s=arc-20240116; t=1732169243; c=relaxed/simple;
+	bh=HNcWevmyjvD6PUWYzF/nuFfQrIXVqRFWbTp/qbXXJy4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=VUVxF00Ah9MwqmJ05NSHp1hILsWmkCdOnBoetWk0NrjRzV8cIvB5xRyTSfwlrEgW990a2g8+C+AMtYIrkKPucwRqYmdoRBG27mUdBmO1Di63fOXh4cz97UZdS7afpOb42M7aFfKvztMUUAi2yBhder84ly0H3ws8i3AtsX7w5SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G+TFzSjn; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7f8095a200eso1308188a12.1;
+        Wed, 20 Nov 2024 22:07:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732168585; x=1732773385; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6gpQHyvdz3/cQZhC+wn7EctdgPhoza9EHtNYdRv78gg=;
-        b=LvboM6Drrcy4KZz1qnYqKN3c3C7pWv6orZlhZ4gz1/ueBkR9/tRNq+GTeP14zZnxyf
-         4hTBw8Bv/SbAm1btZbbhU28RPpJu9yghK5UF6w7xPzyipDLS1nc8BQRkdwx0ozkQooAj
-         wuoanBPlc+qrLKyIqN1dbtn93e5LLGYua9P13XfeJ2AWXMXxsv9DmMGIf+UB/P0CfQBZ
-         npqFhzBFwFtzbgBjzEfHZsaY6hd+wV4J4rTypvHbO8zx+elZGoiEGY+rLpndWE06WLPu
-         KqCdrO5JBSNxYa1xfX0lrv0AqbTPDJ0aDdyhMFa6R7eDzmwrglXuE9HjdzAKJw8M8ho9
-         Inqg==
+        d=gmail.com; s=20230601; t=1732169241; x=1732774041; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3+d8yjjDtwsbo5Fny4q4OpwEW4wZnjIwS92lZ/6zcjg=;
+        b=G+TFzSjnAjbjON8ZmyBQOOh9ZlNpodU3XxIg7mkq/cBnqoXL1oZEgIMq8BMwg9jhDN
+         yhRYM9iyB2Is6ZaVMwS5VJu80y1vpoLMjiMf99Dkm8PgZL3V9yjapU18yVEtth1bhA0I
+         yS6LyYKEGjjrvMIuHLx//DP5t0KIt9jjXIpzG21etr1U9eAZLIOhstoDzpYwJCdQVb0W
+         7hEnYrTsCFkc8oB+X2o6w8nPSRhm4wLEsu06QDUCx2jHa6zTQpsbTltLF2u0Kc2cfQAc
+         chy67q6UZMnXTBWfA3E83kO2V9RCEPt+b6cCId35upfekRIvnBeoVeVApYbE03pYTxok
+         VrIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732168585; x=1732773385;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6gpQHyvdz3/cQZhC+wn7EctdgPhoza9EHtNYdRv78gg=;
-        b=p1lWyXg1SGjT4f6wavMP1bdGyt3wLHLiSETcAcwCz+d6oGoq/Rg9/b/yMu74Faml9o
-         KEjknQgTij6vbfliOjK5WZI+rcPgYF17I+QlZI394wMxpm/bP9UXvFhkbSMI0QCkN/Qu
-         NX3mUc22nX1/jMSwSPUImDKoacM85YtzYu9SNdlmnIk8gqs0E+Xnj4kHSwwusdJEVIQL
-         XazYXnOxH6jMjFwl8jk3CO6MhbRkq8kG0u6AAIMYLQ3fZJTZt6/UbIorGnq3RKOa59Fp
-         W7l483S8q1ncgHZelTiplIAIvTytb2iwLkyPCnLvT6qSTXAvdp6s5Kb8bVn0lGwVdyMe
-         MyQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKw65//4NMLU1rKktzT+Ng7/51ZIRU9GkIu0dHKxwjWTyF+Wv4jTUErVpvYT+oSVTvMFgZC6I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVTqGLI3ryCgRtDGR/5/u4gJY63JAQXnsm1kdS8GcgLF3r00a7
-	EHN+mYmwH4Y4VF0jAIS8go7DdDzLPyhQrofasq4d/5GyO+uqx438uUtlbYLxee3XouDWPQ+jZZv
-	2ygLwxFdxV8u1OyQ5vMs+qA==
-X-Google-Smtp-Source: AGHT+IHLlWE5euc6o4hH0upicx6wBJNeZKmVtgPxJBJDrlJ8T0GuAJjERbIWp3nedsgnJdu4L+ACCyIbsWiocXI62g==
-X-Received: from yuyanghuang.tok.corp.google.com ([2401:fa00:8f:203:b514:d526:a415:3fd7])
- (user=yuyanghuang job=sendgmr) by 2002:a25:d60f:0:b0:e38:bd8b:df20 with SMTP
- id 3f1490d57ef6-e38cb797158mr2205276.9.1732168585198; Wed, 20 Nov 2024
- 21:56:25 -0800 (PST)
-Date: Thu, 21 Nov 2024 14:56:15 +0900
-In-Reply-To: <20241121055615.826882-1-yuyanghuang@google.com>
+        d=1e100.net; s=20230601; t=1732169241; x=1732774041;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3+d8yjjDtwsbo5Fny4q4OpwEW4wZnjIwS92lZ/6zcjg=;
+        b=trQ3i2mSC87zIsLZ0s8CabmHZx4ykjINJSsBWuyhH38m6/ajjaQjff62GnuJAOZJp3
+         lAF524ketSUPtElC6MUM2zk1QW4kxcQdgsB+4I9p8SUU33xoSfEYCNuPxBFC1cdOSnEH
+         W7Vib2N4gBIxkCcWFvDQNd8TxwbWhB9Ehstwlk0H8mfQG2fYmJd3MVgOrY/YJm+6cvl9
+         sqq/4cYQN8dMRkcpAEwUGX37rReFZ7JyGE9n/0D4h/eGQV1CX68mdMM+27ctB2RZQVfU
+         94EYu7Xo99M8xkqLx3xVE/wqd6Gou6wIR5EUlRCOpz6pHWpNUA/Aq8qwLDSUEANPLn6s
+         yH5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6lLvR4X6GNBGIXlxXS4FuHO9seWiQ3WlGIaj5LpffafhYMKOJJbV04bLheBgRCxhKK0Rnh1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykLI84ydP3BLz1WKtqhYphDhC/ipIbPT6XeXdaqTA6TEV210gq
+	xI1R6qkX2tAzKlXT7uNzyRZyIX9+yIOWqvRoVEqoAIp54++1AzSG
+X-Google-Smtp-Source: AGHT+IGc2l0NbyejoOL0VG3q9BRM3lv5Rr4EZDlw52WZAzOoy5S4jZjjTzlxGoX8E/MK27qFuVysJg==
+X-Received: by 2002:a05:6a20:728d:b0:1cf:2d22:564e with SMTP id adf61e73a8af0-1df9c805ba5mr3307989637.6.1732169241407;
+        Wed, 20 Nov 2024 22:07:21 -0800 (PST)
+Received: from localhost ([98.97.39.253])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbb65a2380sm544007a12.74.2024.11.20.22.07.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2024 22:07:20 -0800 (PST)
+Date: Wed, 20 Nov 2024 22:07:19 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Zijian Zhang <zijianzhang@bytedance.com>, 
+ Cong Wang <xiyou.wangcong@gmail.com>
+Cc: bpf@vger.kernel.org, 
+ john.fastabend@gmail.com, 
+ jakub@cloudflare.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ netdev@vger.kernel.org, 
+ cong.wang@bytedance.com
+Message-ID: <673ece17df5d6_157a20815@john.notmuch>
+In-Reply-To: <1016b317-d521-4787-80dc-3b92320f2d19@bytedance.com>
+References: <20241017005742.3374075-1-zijianzhang@bytedance.com>
+ <20241017005742.3374075-3-zijianzhang@bytedance.com>
+ <Zy2N48atzfYYTY6X@pop-os.localdomain>
+ <1016b317-d521-4787-80dc-3b92320f2d19@bytedance.com>
+Subject: Re: [External] Re: [PATCH bpf 2/2] tcp_bpf: add sk_rmem_alloc related
+ logic for ingress redirection
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241121055615.826882-1-yuyanghuang@google.com>
-X-Mailer: git-send-email 2.47.0.371.ga323438b13-goog
-Message-ID: <20241121055615.826882-2-yuyanghuang@google.com>
-Subject: [PATCH iproute2-next, v2 2/2] iproute2: add 'ip monitor mcaddr' support
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, roopa@cumulusnetworks.com, jiri@resnulli.us, 
-	stephen@networkplumber.org, jimictw@google.com, prohr@google.com, 
-	liuhangbin@gmail.com, nicolas.dichtel@6wind.com, andrew@lunn.ch, 
-	netdev@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Enhanced the 'ip monitor' command to track changes in IPv4 and IPv6
-multicast addresses. This update allows the command to listen for
-events related to multicast address additions and deletions by
-registering to the newly introduced RTNLGRP_IPV4_MCADDR and
-RTNLGRP_IPV6_MCADDR netlink groups.
+Zijian Zhang wrote:
+> 
+> On 11/7/24 8:04 PM, Cong Wang wrote:
+> > On Thu, Oct 17, 2024 at 12:57:42AM +0000, zijianzhang@bytedance.com wrote:
+> >> From: Zijian Zhang <zijianzhang@bytedance.com>
+> >>
+> >> Although we sk_rmem_schedule and add sk_msg to the ingress_msg of sk_redir
+> >> in bpf_tcp_ingress, we do not update sk_rmem_alloc. As a result, except
+> >> for the global memory limit, the rmem of sk_redir is nearly unlimited.
+> >>
+> >> Thus, add sk_rmem_alloc related logic to limit the recv buffer.
+> >>
+> >> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> >> ---
+> >>   include/linux/skmsg.h | 11 ++++++++---
+> >>   net/core/skmsg.c      |  6 +++++-
+> >>   net/ipv4/tcp_bpf.c    |  4 +++-
+> >>   3 files changed, 16 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> >> index d9b03e0746e7..2cbe0c22a32f 100644
+> >> --- a/include/linux/skmsg.h
+> >> +++ b/include/linux/skmsg.h
+> >> @@ -317,17 +317,22 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
+> >>   	kfree_skb(skb);
+> >>   }
+> >>   
+> >> -static inline void sk_psock_queue_msg(struct sk_psock *psock,
+> >> +static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+> >>   				      struct sk_msg *msg)
+> >>   {
+> >> +	bool ret;
+> >> +
+> >>   	spin_lock_bh(&psock->ingress_lock);
+> >> -	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
+> >> +	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
+> >>   		list_add_tail(&msg->list, &psock->ingress_msg);
+> >> -	else {
+> >> +		ret = true;
+> >> +	} else {
+> >>   		sk_msg_free(psock->sk, msg);
+> >>   		kfree(msg);
+> >> +		ret = false;
+> >>   	}
+> >>   	spin_unlock_bh(&psock->ingress_lock);
+> >> +	return ret;
+> >>   }
+> >>   
+> >>   static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
+> >> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> >> index b1dcbd3be89e..110ee0abcfe0 100644
+> >> --- a/net/core/skmsg.c
+> >> +++ b/net/core/skmsg.c
+> >> @@ -445,8 +445,10 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+> >>   			if (likely(!peek)) {
+> >>   				sge->offset += copy;
+> >>   				sge->length -= copy;
+> >> -				if (!msg_rx->skb)
+> >> +				if (!msg_rx->skb) {
+> >>   					sk_mem_uncharge(sk, copy);
+> >> +					atomic_sub(copy, &sk->sk_rmem_alloc);
+> >> +				}
+> >>   				msg_rx->sg.size -= copy;
+> >>   
+> >>   				if (!sge->length) {
+> >> @@ -772,6 +774,8 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
+> >>   
+> >>   	list_for_each_entry_safe(msg, tmp, &psock->ingress_msg, list) {
+> >>   		list_del(&msg->list);
+> >> +		if (!msg->skb)
+> >> +			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
+> >>   		sk_msg_free(psock->sk, msg);
+> > 
+> > Why not calling this atomic_sub() in sk_msg_free_elem()?
+> > 
+> > Thanks.
+> 
+> sk_msg_free_elem called by sk_msg_free or sk_msg_free_no_charge will
+> be invoked in multiple locations including TX/RX/Error and etc.
+> 
+> We should call atomic_sub(&sk->sk_rmem_alloc) for sk_msgs that have
+> been atomic_add before. In other words, we need to call atomic_sub
+> only for sk_msgs in ingress_msg.
+> 
+> As for "!msg->skb" check here, I want to make sure the sk_msg is not
+> from function sk_psock_skb_ingress_enqueue, because these sk_msgs'
+> rmem accounting has already handled by skb_set_owner_r in function
+> sk_psock_skb_ingress.
+> 
 
-This patch depends on the kernel patch that adds RTNLGRP_IPV4_MCADDR
-and RTNLGRP_IPV6_MCADDR being merged first.
+Assuming I read above correct this is only an issue when doing a
+redirect to ingress of a socket? The other path where we do a
+SK_PASS directly from the verdict to hit the ingress of the
+current socket is OK because all account is done already through
+skb. Basically that is what the above explanation for !msg->skb
+is describing?
 
-Here is an example usage:
+Can we add this to the description so we don't forget it and/or
+have to look up the mailing list in the future.
 
-root@uml-x86-64:/# ip monitor mcaddr
-8: nettest123    inet6 mcast ff01::1 scope global
-8: nettest123    inet6 mcast ff02::1 scope global
-8: nettest123    inet mcast 224.0.0.1 scope global
-8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-Deleted 8: nettest123    inet mcast 224.0.0.1 scope global
-Deleted 8: nettest123    inet6 mcast ff02::1:ff00:7b01 scope global
-Deleted 8: nettest123    inet6 mcast ff02::1 scope global
-
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
-
-Changelog since v1:
-- Move the UAPI constants to a separate patch.
-- Update the commit message.
-- Fix the indentation format.
-
- ip/ipaddress.c | 17 +++++++++++++++--
- ip/ipmonitor.c | 25 ++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 3 deletions(-)
-
-diff --git a/ip/ipaddress.c b/ip/ipaddress.c
-index d90ba94d..373f613f 100644
---- a/ip/ipaddress.c
-+++ b/ip/ipaddress.c
-@@ -1504,7 +1504,10 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
-=20
- 	SPRINT_BUF(b1);
-=20
--	if (n->nlmsg_type !=3D RTM_NEWADDR && n->nlmsg_type !=3D RTM_DELADDR)
-+	if (n->nlmsg_type !=3D RTM_NEWADDR
-+	    && n->nlmsg_type !=3D RTM_DELADDR
-+	    && n->nlmsg_type !=3D RTM_NEWMULTICAST
-+	    && n->nlmsg_type !=3D RTM_DELMULTICAST)
- 		return 0;
- 	len -=3D NLMSG_LENGTH(sizeof(*ifa));
- 	if (len < 0) {
-@@ -1564,7 +1567,7 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
-=20
- 	print_headers(fp, "[ADDR]");
-=20
--	if (n->nlmsg_type =3D=3D RTM_DELADDR)
-+	if (n->nlmsg_type =3D=3D RTM_DELADDR || n->nlmsg_type =3D=3D RTM_DELMULTI=
-CAST)
- 		print_bool(PRINT_ANY, "deleted", "Deleted ", true);
-=20
- 	if (!brief) {
-@@ -1639,6 +1642,16 @@ int print_addrinfo(struct nlmsghdr *n, void *arg)
- 						   rta_tb[IFA_ANYCAST]));
- 	}
-=20
-+	if (rta_tb[IFA_MULTICAST]) {
-+		print_string(PRINT_FP, NULL, "%s ", "mcast");
-+		print_color_string(PRINT_ANY,
-+				   ifa_family_color(ifa->ifa_family),
-+				   "multicast",
-+				   "%s ",
-+				   format_host_rta(ifa->ifa_family,
-+						   rta_tb[IFA_MULTICAST]));
-+	}
-+
- 	print_string(PRINT_ANY,
- 		     "scope",
- 		     "scope %s ",
-diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
-index de67f2c9..4743b3e1 100644
---- a/ip/ipmonitor.c
-+++ b/ip/ipmonitor.c
-@@ -30,7 +30,7 @@ static void usage(void)
- 	fprintf(stderr,
- 		"Usage: ip monitor [ all | OBJECTS ] [ FILE ] [ label ] [ all-nsid ]\n"
- 		"                  [ dev DEVICE ]\n"
--		"OBJECTS :=3D  address | link | mroute | neigh | netconf |\n"
-+		"OBJECTS :=3D  address | link | mroute | mcaddr | neigh | netconf |\n"
- 		"            nexthop | nsid | prefix | route | rule | stats\n"
- 		"FILE :=3D file FILENAME\n");
- 	exit(-1);
-@@ -152,6 +152,11 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
- 		ipstats_print(n, arg);
- 		return 0;
-=20
-+	case RTM_DELMULTICAST:
-+	case RTM_NEWMULTICAST:
-+		print_addrinfo(n, arg);
-+		return 0;
-+
- 	case NLMSG_ERROR:
- 	case NLMSG_NOOP:
- 	case NLMSG_DONE:
-@@ -178,6 +183,7 @@ static int accept_msg(struct rtnl_ctrl_data *ctrl,
- #define IPMON_LRULE		BIT(8)
- #define IPMON_LNSID		BIT(9)
- #define IPMON_LNEXTHOP		BIT(10)
-+#define IPMON_LMCADDR		BIT(11)
-=20
- #define IPMON_L_ALL		(~0)
-=20
-@@ -220,6 +226,8 @@ int do_ipmonitor(int argc, char **argv)
- 			lmask |=3D IPMON_LNEXTHOP;
- 		} else if (strcmp(*argv, "stats") =3D=3D 0) {
- 			lmask |=3D IPMON_LSTATS;
-+		} else if (strcmp(*argv, "mcaddr") =3D=3D 0) {
-+			lmask |=3D IPMON_LMCADDR;
- 		} else if (strcmp(*argv, "all") =3D=3D 0) {
- 			prefix_banner =3D 1;
- 		} else if (matches(*argv, "all-nsid") =3D=3D 0) {
-@@ -326,6 +334,21 @@ int do_ipmonitor(int argc, char **argv)
- 		exit(1);
- 	}
-=20
-+	if (lmask & IPMON_LMCADDR) {
-+		if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
-+		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
-+			fprintf(stderr,
-+				"Failed to add ipv4 mcaddr group to list\n");
-+			exit(1);
-+		}
-+		if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
-+		    rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
-+			fprintf(stderr,
-+				"Failed to add ipv6 mcaddr group to list\n");
-+			exit(1);
-+		}
-+	}
-+
- 	if (listen_all_nsid && rtnl_listen_all_nsid(&rth) < 0)
- 		exit(1);
-=20
---=20
-2.47.0.371.ga323438b13-goog
-
+Thanks,
+John
 
