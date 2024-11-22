@@ -1,166 +1,303 @@
-Return-Path: <netdev+bounces-146775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37FE09D5AE3
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D659D5AEF
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:18:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71591F22C9D
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:17:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 445D51F230B5
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5193F184101;
-	Fri, 22 Nov 2024 08:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E82818BBA0;
+	Fri, 22 Nov 2024 08:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkAUmVtG"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="PCcJjQLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-15.smtpout.orange.fr [80.12.242.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D18C15B554
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 08:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8349618308A;
+	Fri, 22 Nov 2024 08:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732263423; cv=none; b=mF7/4XBSfKi246fr4cTz7Oy52Enu7Kv4lSFiirAoPUM84Sux9JSvNdVZwMf79i3fz7Jc0VqSoZApbzHfoJZ35Ha2lPMPmlzau3+euMZPlJ/xWFTFYl54mpD/+tMcf+DCQA/bit3wmoG7E466aQZmsh6RUa33cWf4IKqjKUZsjpg=
+	t=1732263513; cv=none; b=rKGI++CgooA5SFgVYlIr6h81la+t4DWGw205W+QDGJTug0ekaxQHEvExaWkxBc0dlyVDHo0Jh6bnrRQ0eh09CPoWA2XPnjC7aVm8Es/9ViQKZOHxQDqFG7+z2Y8JlEaG+G99Yq9Kc4wmIJP2R8fGLXBuY/5PGzRB27YekCUTbsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732263423; c=relaxed/simple;
-	bh=xk0Fp0+bN6FKayBAYjalWJTCWsFsWEGxzuF72NhSP38=;
+	s=arc-20240116; t=1732263513; c=relaxed/simple;
+	bh=0QjR7exsqEfryrKCGOHz0ypMg6tYTPC5iGlX0JssUpg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=phYG4FkZzkxvfWNwdzs7TqXrI4HvEYOCanCuR+ourQ2u8DADMnG2Uf8bd/PzhsIIMI9EgJe+Gb32sYkasvGOn+Sjrc+Gzbg1yI8WfycB1Wzmk3vKvb0aJDWEHocfRh8vpjxXauE9yuvkSmeuY/fll8fB84Gk7zCqRJxkcSh1d7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TkAUmVtG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732263420;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SL5pNnDPsbVA1xe0hrEJ7KV9XmpKuGUUP9MjKyVDU+E=;
-	b=TkAUmVtGsZL51J5aJkBO+iZ+3OPChq8pUxne2FTsQijPdbF5nYQ5/3DYThBTOkWU3Cl7dg
-	Br7OcZ2CGWFXSnfpgwGewnaOZRe/07YKxrSCl3v833e1BzvUmKfdFAKOcZictXrAFWGZ21
-	/Nmk4WskvlRmWsAXV8yp+3Y6IDEzdIo=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-381-bnPD4oHwPtSsYwWT1vGEDQ-1; Fri, 22 Nov 2024 03:16:56 -0500
-X-MC-Unique: bnPD4oHwPtSsYwWT1vGEDQ-1
-X-Mimecast-MFC-AGG-ID: bnPD4oHwPtSsYwWT1vGEDQ
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-e30cf48435fso2979395276.0
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 00:16:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732263415; x=1732868215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SL5pNnDPsbVA1xe0hrEJ7KV9XmpKuGUUP9MjKyVDU+E=;
-        b=CD4ZL+TJSEe50Snmw0dlAFJ4TB6vSOOIO+5TvwzwBL8HaYQh+KqiZgqAKkiKpMeg5e
-         6y03zHhujmSzX2GSJf+SbfNrMo2qldaZv6exXJvksUhvlLFBGihsmKwyNc6AYNyXiWhF
-         wfXXlaJIxUUdxmQVDvOUHVoOpdGBdf0biZB+MBv/pKfBNW+I00QtgTPTqcC/dfPSaWiA
-         xtaZKUd4fICRPoapcS73Hwrkjynq5RvLB52P+1oThXMlwcX5gxeh1IPZdguQ4XJUes+G
-         M7aZfMZ1ZJShaollrDsfpUZ6NIgxE0lgwH4bTzK0h5xEYLoy00kHFcOt1/LS95UAOKtV
-         HQPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUFIOw8EpPizEHoWA3h75ij7Tk2dsfsK0jsamUM4WOzWTh6jaw01EnTYIR1aP6N2WoIBhxEtJY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSgzGtfa/B2jqKTv9Zd+QiZFaAuUPNyUZbJo+9xmHW169j3DUW
-	OahpbphY42NPXyq83JA4XLwJ5t6J/7QrPOaefMT26WkrFbFLGnmaETOrm+s4jr1ZAOvEhyI1trY
-	YzGlYxrRUVVSugRXMRAOEURuO1s5uxdeOPul6qbmrmCPFnUgYL7+EG1KL24q8zGQhJpFmaymnq6
-	dLyFb9Eb/0sjEzqSI1ZI7NU89CABwB
-X-Gm-Gg: ASbGnctEjjS7eUqEZN2PStl586xo3XfCthyaQNgveXJFk4DvDkB0A6oOKZtXmhDwYvO
-	/9tn6wVzMrDfJLpKKC4PhtKYxQ0ELrEc=
-X-Received: by 2002:a05:6902:2891:b0:e38:bbea:5f99 with SMTP id 3f1490d57ef6-e38f8c0827dmr1776424276.44.1732263415784;
-        Fri, 22 Nov 2024 00:16:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEj5vouXz0BRQwa2iQNMlHQsy/q/aCh6IzhfMrbtN83KbXl29vM/kWrF8c5EzwxZD81oxJ4cvZZonMj3R9bA/k=
-X-Received: by 2002:a05:6902:2891:b0:e38:bbea:5f99 with SMTP id
- 3f1490d57ef6-e38f8c0827dmr1776401276.44.1732263415431; Fri, 22 Nov 2024
- 00:16:55 -0800 (PST)
+	 To:Cc:Content-Type; b=ueIAFpwqw+DlXcWav3+gXiWdanmqx6wVL0Sk/CjIYR7++Lz39EpmAQbVoFCmn4dhuI8CGOv6lffERn26sBjf628FGJMJu6DD5ly9oJKCXo+5pUtyuzCWoA6jJhazDexAQjdkuvl+MOnQ+c6It6eRxX0V7IR4bWvVC+tO32jYOfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=PCcJjQLh; arc=none smtp.client-ip=80.12.242.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from mail-ej1-f44.google.com ([209.85.218.44])
+	by smtp.orange.fr with ESMTPSA
+	id EOrttRWAg51TuEOrutgU8W; Fri, 22 Nov 2024 09:18:22 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1732263502;
+	bh=bkksmYHd3DOLy+GhB0etWEn8hsqAz4V+x3nuZS3Vdn4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=PCcJjQLhU01KdNSZl2OVQGRQDrZ1U7m8y4Q/zL+B23lRln0e6jyTcV2F4HFe7oBQj
+	 WEo61DYgw8q01ZPbvXJQck+HXlqKUVQTK0nxsi1/oYs+CjJEr4Ppmrkwj+AvpZissV
+	 ZwAtBE2/g7pAAr28WDMYDfoCI4l+Pm5jko9d6PkY83CntCDkjzdCxlEYCgZz9Fuq1X
+	 Q8U/6VpowxuU4kW/IXJtGrjjkm9OY9AurB+vhw7MN2sy7kyKgl1RYkO4rBdWIB4uXu
+	 qaovh4wDcqLILKayEo90FSwhBiu7t5M6i4otjJt7y0Q4gxkQ9HjHFfouujvISXS6lV
+	 ivCJwndNBzK3Q==
+X-ME-Helo: mail-ej1-f44.google.com
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 22 Nov 2024 09:18:22 +0100
+X-ME-IP: 209.85.218.44
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aa3a79d4d59so275643166b.3;
+        Fri, 22 Nov 2024 00:18:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUARR9dq3tZmaZpEIm+bFZJ1SNQe04OGCxGYIYX2rMNgDFd8Qmt6MHdDGaWfqJuoGCYwN5nlXY7X6SIQw==@vger.kernel.org, AJvYcCV0VcQap653sfkdDzUAyRBWAx/6t2IFvSzOCR3bQDbigyW3rlhokueYgiqQ6XSIpN2JZC+sr4hTQbseBaGD@vger.kernel.org, AJvYcCVPq82jKDkWqGIBdNshG27Ma0fbfg5D8FQKWn1cYe2LDqZ13gQJAEaOUQ5lJDRyIrIZg5XrxtqmC3VTxzVcNcY=@vger.kernel.org, AJvYcCVX9vElPgrKGC6hkwjH3Sm/HPafh50I8IdTtxzQB5VdTlv1YINom4weLEswgAnNk82WL4xW9IFcgGvOHvA=@vger.kernel.org, AJvYcCVtlCcKZ6M2cZNdDBEseeQBI+W4Gr9LWfElMUaqdh3idOK8f2G0dpO8U7ZVU2fegWCP25oWqA4N@vger.kernel.org, AJvYcCWcGYmS7ak2WQQQSXDs9aafAuQtS1w0dmAY1YOC1Cddt3wvwVgrSc78k1Ffvm1OCAK611jiz4sjyQRo@vger.kernel.org, AJvYcCWdqc8WhYzPCSPMQJ9kib3NOdDlqUl5/N28nWdTiLBwvQmFQDaA4nd1MyRwjDldrh9/c1XLep/c1MCI@vger.kernel.org, AJvYcCXY12hv5zOWAu2ERHZz8SCXX07gB+uWkae7FlQet2qbYEcGRuXFIh50y+PtYDNCEhBop2P37wEsJlw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzYa2aVawYyKKY0vPZFaX0tVSFjif8FJusKW7qjJz9kDWv+V0W
+	tuQWOXxsD7AXq+qBWam1HA4FmvbX0nXSLmDFp4UIiCppwVi+2PXMKgMtMtXIFdZA2IVm3fIpgw6
+	UUMZEK7muG2NUtC9e307mTRI4VX4=
+X-Google-Smtp-Source: AGHT+IGjU0Ifb4iseWJWvWQesHEv6Ktx1cnDwwP3WxvPpn1YSLbPy8AcJJePd1GJu60EJ+MGHbckXIVPwFDtaFz2354=
+X-Received: by 2002:a17:906:31c5:b0:aa5:21f7:4304 with SMTP id
+ a640c23a62f3a-aa521f7433dmr5945266b.30.1732263501649; Fri, 22 Nov 2024
+ 00:18:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
- <673ed7b929dbe_157a2089e@john.notmuch> <dpt2h73fnzgzufuvilmaw5lbs2nydc3572xqn4yoicateys6cb@reuefsarvhka>
- <673fc371c9de1_11182089c@john.notmuch>
-In-Reply-To: <673fc371c9de1_11182089c@john.notmuch>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 22 Nov 2024 09:16:44 +0100
-Message-ID: <CAGxU2F7G-s9pwYBD6ateceJJTq_ac5=Yi=AKC6GNX+d6Ly9PUA@mail.gmail.com>
-Subject: Re: [PATCH bpf 0/4] bpf, vsock: Fix poll() and close()
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Michal Luczaj <mhal@rbox.co>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241121064046.3724726-1-tmyu0@nuvoton.com> <20241121064046.3724726-5-tmyu0@nuvoton.com>
+ <08a91d47-ad78-4f7d-896f-b75d7418be1e@wanadoo.fr> <CAOoeyxVjBsmOr=-14iq7pQamJ90j_PBMhQK0Lo=xmvPyqqseGQ@mail.gmail.com>
+In-Reply-To: <CAOoeyxVjBsmOr=-14iq7pQamJ90j_PBMhQK0Lo=xmvPyqqseGQ@mail.gmail.com>
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Date: Fri, 22 Nov 2024 17:18:09 +0900
+X-Gmail-Original-Message-ID: <CAMZ6Rq+WePVM2aSk2HzXoa-t+ZE97yeqS6bndpGXUh+NuiM8sg@mail.gmail.com>
+Message-ID: <CAMZ6Rq+WePVM2aSk2HzXoa-t+ZE97yeqS6bndpGXUh+NuiM8sg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/7] can: Add Nuvoton NCT6694 CAN support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 22, 2024 at 12:34=E2=80=AFAM John Fastabend
-<john.fastabend@gmail.com> wrote:
+On Fri. 22 Nov. 2024 at 17:05, Ming Yu <a0282524688@gmail.com> wrote:
+> Dear Vincent,
 >
-> Stefano Garzarella wrote:
-> > On Wed, Nov 20, 2024 at 10:48:25PM -0800, John Fastabend wrote:
-> > >Michal Luczaj wrote:
-> > >> Two small fixes for vsock: poll() missing a queue check, and close()=
- not
-> > >> invoking sockmap cleanup.
-> > >>
-> > >> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> > >> ---
-> > >> Michal Luczaj (4):
-> > >>       bpf, vsock: Fix poll() missing a queue
-> > >>       selftest/bpf: Add test for af_vsock poll()
-> > >>       bpf, vsock: Invoke proto::close on close()
-> > >>       selftest/bpf: Add test for vsock removal from sockmap on close=
-()
-> > >>
-> > >>  net/vmw_vsock/af_vsock.c                           | 70 +++++++++++=
-+--------
-> > >>  .../selftests/bpf/prog_tests/sockmap_basic.c       | 77 +++++++++++=
-+++++++++++
-> > >>  2 files changed, 120 insertions(+), 27 deletions(-)
-> > >> ---
-> > >> base-commit: 6c4139b0f19b7397286897caee379f8321e78272
-> > >> change-id: 20241118-vsock-bpf-poll-close-64f432e682ec
-> > >>
-> > >> Best regards,
-> > >> --
-> > >> Michal Luczaj <mhal@rbox.co>
-> > >>
-> > >
-> > >LGTM, would be nice to get an ack from someone on the vsock side
-> > >though.
-> >
-> > Sorry, is at the top of my list but other urgent things have come up.
-> >
-> > I will review it by today.
+> Thank you for your comments,
 >
-> Thanks a lot Stefano much appreciated! I was also slow to review as I
-> was travelling and on PTO.
->
-
-You're welcome :-) Thanks for reviewing the bpf part!
-
-Hope you enjoyed your PTO!
-
-Ciao,
-Stefano
-
+> Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2024=E5=B9=B411=E6=
+=9C=8821=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=883:47=E5=AF=AB=E9=81=
+=93=EF=BC=9A
+> > > +
+> > > +struct __packed nct6694_can_cmd0 {
 > >
-> > Stefano
+> > Give more meaningfull names to your structures. For example:
 > >
-> > >
-> > >Acked-by: John Fastabend <john.fastabend@gmail.com>
-> > >
+> >   /* cmd1 */
+> >   struct __packed nct6694_can_bittiming
 > >
 >
+> Understood. I will make the modifications in v3.
 >
+> > > +     u32 nbr;
+> > > +     u32 dbr;
+> > > +     u32 active:8;
+> > > +     u32 reserved:24;
+> > > +     u16 ctrl1;
+> > > +     u16 ctrl2;
+> > > +     u32 nbtp;
+> > > +     u32 dbtp;
+> > > +};
+> > Always use the specific endianess types in the structures that you are
+> > sending to the device. e.g. replace u32 by __le32 (assuming little endi=
+an).
+> >
+>
+> Okay, I'll fix it in v3.
+>
+> > > +struct __packed nct6694_can_cmd1 {
+> ...
+> > > +
+> > > +struct nct6694_canfd_priv {
+> >
+> > Be consistent in your name space. Sometime you prefix your names with
+> > nct6694_can and sometimes with nct6694_canfd for no apparent reasons.
+> >
+>
+> Understood. I will make the modifications in v3.
+>
+> > > +     struct can_priv can;    /* must be the first member */
+> ...
+> > > +     } else {
+> > > +             if (buf->flag & NCT6694_CAN_FLAG_BRS)
+> > > +                     cf->flags |=3D CANFD_BRS;
+> > > +
+> > > +             for (i =3D 0; i < cf->len; i++)
+> > > +                     cf->data[i] =3D buf->data[i];
+> >
+> > Use memcpy().
+> >
+>
+> Okay, I'll fix it in v3.
+>
+> > > +     }
+> > > +
+> > > +     /* Remove the packet from FIFO */
+> > > +     stats->rx_packets++;
+> > > +     stats->rx_bytes +=3D cf->len;
+> >
+> > Do not increment the rx_bytes if the frame is RTR.
+> >
+>
+> Okay, I'll fix it in v3.
+>
+> > > +     netif_receive_skb(skb);
+> ...
+> > > +
+> > > +     switch (new_state) {
+> > > +     case CAN_STATE_ERROR_WARNING:
+> > > +             /* error warning state */
+> >
+> > Such comment can be removed. Here you are just paraphrasing the macro. =
+I
+> > can already see that CAN_STATE_ERROR_WARNING means the "error warning
+> > state". The comments should add information.
+> >
+>
+> Okay, I will drop them in v3.
+>
+> > > +             cf->can_id |=3D CAN_ERR_CRTL;
+> > > +             cf->data[1] =3D (bec.txerr > bec.rxerr) ? CAN_ERR_CRTL_=
+TX_WARNING :
+> > > +                                                     CAN_ERR_CRTL_RX=
+_WARNING;
+> ...
+> > > +static int nct6694_canfd_start(struct net_device *ndev)
+> > > +{
+> > > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > > +     struct nct6694_can_cmd0 *buf =3D (struct nct6694_can_cmd0 *)pri=
+v->tx_buf;
+> >
+> > Give a more memorable name to buf, for example: bittiming_cmd.
+> >
+>
+> Got it. So, every buf that uses a command must be renamed similarly, righ=
+t?
 
+Yes. Note that you can use different names if you have a better idea.
+It is just that generic names like "buf" or "cmd1" do not tell me what
+this variable actually is. On the contrary, bittiming_cmd tells me
+that this variable holds the payload for the command to set the device
+bittiming. This way, suddenly, the code becomes easier to read and
+understand. As long as your naming conveys this kind of information,
+then I am fine with whatever you choose, just avoid the "buf" or
+"cmd1" names.
+
+> > > +     const struct can_bittiming *n_bt =3D &priv->can.bittiming;
+> > > +     const struct can_bittiming *d_bt =3D &priv->can.data_bittiming;
+> > > +     int ret;
+> > > +
+> > > +     guard(mutex)(&priv->lock);
+> > > +
+> > > +     memset(priv->tx_buf, 0, NCT6694_CAN_CMD0_LEN);
+> >
+> > Remove those CMD*_LEN macros, instead, use sizeof() of your structures.
+> >
+> >   memset(buf, 0, sizeof(*buf));
+> >
+>
+> Understood. I will make the modifications in v3.
+>
+> > > +     buf->nbr =3D n_bt->bitrate;
+> > > +     buf->dbr =3D d_bt->bitrate;
+> ...
+> > > +static netdev_tx_t nct6694_canfd_start_xmit(struct sk_buff *skb,
+> > > +                                         struct net_device *ndev)
+> > > +{
+> > > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > > +
+> > > +     if (priv->tx_skb || priv->tx_busy) {
+> > > +             netdev_err(ndev, "hard_xmit called while tx busy\n");
+> > > +             return NETDEV_TX_BUSY;
+> > > +     }
+> > > +
+> > > +     if (can_dev_dropped_skb(ndev, skb))
+> > > +             return NETDEV_TX_OK;
+> > > +
+> > > +     netif_stop_queue(ndev);
+> >
+> > Here, you are inconditionally stopping the queue. Does it mean that you=
+r
+> > device is only able to manage one CAN frame at the time?
+> >
+>
+> Yes, we designed it to manage a single CAN frame, so we stop the queue
+> here until a TX event is received to wake queue.
+
+Do you mean that the device is designed to manage only one single CAN
+frame or is the driver designed to only manage one single CAN frame?
+If the device is capable of handling several CAN frames, your driver
+should take advantage of this. Else the driver will slow down the
+communication a lot whenever packets start to accumulate in the TX
+queue.
+
+> But It seems I lost the error handling code for the tx command in
+> nct6694_canfd_tx(), I will fix it in the next patch.
+>
+> > > +     priv->tx_skb =3D skb;
+> > > +     queue_work(priv->wq, &priv->tx_work);
+> > > +
+> > > +     return NETDEV_TX_OK;
+> > > +}
+> > > +
+> > > +static void nct6694_canfd_tx(struct net_device *ndev, struct canfd_f=
+rame *cf)
+> > > +{
+> > > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > > +     struct nct6694_can_cmd10_11 *buf =3D (struct nct6694_can_cmd10_=
+11 *)priv->tx_buf;
+> > > +     u32 txid =3D 0;
+> > > +     int i;
+> ...
+> > > +
+> > > +     /* set data to buf */
+> > > +     for (i =3D 0; i < cf->len; i++)
+> > > +             buf->data[i] =3D cf->data[i];
+> > > +
+> > > +     nct6694_write_msg(priv->nct6694, NCT6694_CAN_MOD,
+> > > +                       NCT6694_CAN_CMD10_OFFSET(1),
+> > > +                       NCT6694_CAN_CMD10_LEN,
+> > > +                       buf);
+>
+> I will add the error handling to wake the queue in the next patch.
+>
+> > > +}
+> > > +
+> ...
+> > > +static const struct net_device_ops nct6694_canfd_netdev_ops =3D {
+> > > +     .ndo_open =3D nct6694_canfd_open,
+> > > +     .ndo_stop =3D nct6694_canfd_stop,
+> > > +     .ndo_start_xmit =3D nct6694_canfd_start_xmit,
+> > > +     .ndo_change_mtu =3D can_change_mtu,
+> > > +};
+> >
+> > Also add a struct ethtool_ops for the default timestamps:
+> >
+> >   static const struct ethtool_ops nct6694_ethtool_ops =3D {
+> >           .get_ts_info =3D ethtool_op_get_ts_info,
+> >   };
+> >
+> > This assumes that your device does not support hardware timestamps. If
+> > you do have hardware timestamping support, please adjust accordingly.
+> >
+>
+> Understood. I will make the modifications in v3.
+>
+> Best regards,
+> Ming
 
