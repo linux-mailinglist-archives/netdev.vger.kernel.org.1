@@ -1,206 +1,160 @@
-Return-Path: <netdev+bounces-146825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D916B9D61F5
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 17:18:45 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8807D161636
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 16:17:57 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15541DF730;
-	Fri, 22 Nov 2024 16:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VhfdFFnx"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 994669D61F2
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 17:18:25 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5201DF99F;
-	Fri, 22 Nov 2024 16:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 472E0B2371A
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 16:18:22 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A264A1DEFFC;
+	Fri, 22 Nov 2024 16:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="pW+7vYAx";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="h6nOjx4T"
+X-Original-To: netdev@vger.kernel.org
+Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABFC13B58C;
+	Fri, 22 Nov 2024 16:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732292236; cv=none; b=EHIotQaoV2nkRH1BTEWkvOCCPLro6j/5g+cLAs6jSv983uak/+9guQJ0sGJHh0RVGJ6vZW28iwVHd6vq3NvBFMtDfZQuxNisamX14Gq0re075lYv+WDRetcGADzxIQ/lfbuPGdZRb3PGG3R4cL1X8AH86+LV5v4PAgwk7UkdiB0=
+	t=1732292293; cv=none; b=MQbrxvyKZWH3x1pGXutORjSKHwXHJpFiE8OdwVq3vUnn0MJMvhINvR7ANC1nmgLh3OGZrLvmr5slsehHiSTKJa+n0OphyM8kDeKuyFe7v8TYa7/YSpb3cAnQ1E1pb+pSund5Nm1lgkdKbd8KJDanA+UuFgD4Mc84C07w88iFUV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732292236; c=relaxed/simple;
-	bh=YzT+Es9/r0Nk8ji75is2LAqMUQbHockjpf5WvhsLNeE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P8urXbDY6WN+W/F0CklLlIIquH/srjsCpPe4hrjclJ2cOHQwTWtVSjY7vrxSGajhvfcjimQ1NaN/2fs944TmM64mZ+yjyQwPWXui8NxIEyF7QI9czekGz/c/1VQgEi5hzlhQ/CyTTN5+ooTeuh6FrT2x1p7CHGacnUjq6xTAFxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VhfdFFnx; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMBpVe6029097;
-	Fri, 22 Nov 2024 16:17:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=vdaEE2
-	rniiMaP5IeAGFH9iciTB4UVN8gNK9Mw/1GLAU=; b=VhfdFFnxp9LPZNd31/u/7C
-	JzQo9bJNgPwGK0KtQkwblrx5Bmz+M8nI0LB5jTW86JL0h7KVucR/WHFpgcZ7Lu/q
-	4xX5XefOGO6l28JMWJaQl6W0GQTrqqp/QuK7HGgkSVwGGjTV+eAfT8lHGyU4i3AV
-	zVrgyid6Vw74LNCtWmoBoNV0mF2C3rkZZBxcwnGX+YYtXX08v4uXzALejvIdbK4H
-	tiXRTFdcreWDFs4tOS6AGpoNKZ6rugqheYjWd68IAtI9QUMDs++FojRbGAGa2qru
-	zyuIq79ekHzeiO7+klnrS+hDuJ9wd/MNe0/ykFSqlj8Qw2uDKjf5vc0eLOQvcapg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xhtk9yyk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Nov 2024 16:17:06 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AMG70J6014298;
-	Fri, 22 Nov 2024 16:17:06 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xhtk9yye-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Nov 2024 16:17:05 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMCGBrl024589;
-	Fri, 22 Nov 2024 16:17:05 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 42y8e1k9eh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Nov 2024 16:17:05 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AMGH1K341025962
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Nov 2024 16:17:01 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CA8AF2004F;
-	Fri, 22 Nov 2024 16:17:01 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 274372004E;
-	Fri, 22 Nov 2024 16:17:01 +0000 (GMT)
-Received: from [9.171.57.248] (unknown [9.171.57.248])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 22 Nov 2024 16:17:01 +0000 (GMT)
-Message-ID: <05586fa4-308b-4a13-a5f7-0c93ec3760a5@linux.ibm.com>
-Date: Fri, 22 Nov 2024 17:17:00 +0100
+	s=arc-20240116; t=1732292293; c=relaxed/simple;
+	bh=no21xQCcRKk7Kdw5IG63yislTkKktUX5bASibhmwctM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b+gbnn5NzXlUOIJjuEezsBeMvaeC2bKhEy4nq4s4LAI4TDRP8+HsLpt8c6hzAn1FFGVVqqFEz2yex5Hk7QLLbOmb3ubYvhN9yNTLgCX6lyDuq1yjhF5iVwOQWJTy5nBaJPnrFyUQPkCKByOqtRlNfiHkOUwb3UNpM1wY7A06C4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=pW+7vYAx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=h6nOjx4T; arc=none smtp.client-ip=103.168.172.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailflow.phl.internal (Postfix) with ESMTP id 4297D200629;
+	Fri, 22 Nov 2024 11:18:08 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Fri, 22 Nov 2024 11:18:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1732292288; x=1732295888; bh=7MiFj9DQfkB0qD8w4IFwQBW5mbSAECz1
+	magA6LgRv3Y=; b=pW+7vYAxDEVrg8ZGCam7IHEA/Pdj6g703iK4WFDWrNT0e0CZ
+	LgKtBGb3j8S+1NGMnXWxKGtUCkxJUg3Rj4q/+O4D645sB0vinkArfZmT8kg4mM+l
+	qq8APzCUMb7XpU5LIweIq+aZNQX3Wcu5kMt4/Ae+4kwql6Wj9pXJWzip0KPcjIhy
+	Cre+AQYpV2kSEzPKGOM1iv74W7Y+tzMrYuRuRzBG+pgSwJhUE35IYzYP8JbbofnL
+	V1rR+CLu9zpJJvsHxXTkR2rY6rhdzIvgQ0LylZXWuxSPy2d0gFC86jbYep42IUih
+	lpDC9+oB9sX3fLp2oeWIb0KMeCOL1M8z/p5qZg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1732292288; x=
+	1732295888; bh=7MiFj9DQfkB0qD8w4IFwQBW5mbSAECz1magA6LgRv3Y=; b=h
+	6nOjx4Teqc4jkdxqjROVQEfbgZonEbsr3jiDm2SNBNkKbQ0U8muG05l6ziYAz3GP
+	DOHqlP5G3oo73cclUfmu6OLv49d+emgF1yKKSdKJz83QCI76ATqEbS6FCJ+Lzrhl
+	zBH8xjOSOUt7A1eZeJRVR8TtF3ylN8QjtCshDfvnI0h13H0Kuo3MTWBqu3VJYIH8
+	QHGc+ANz4AYros8U1JOe4z1tMyAcO5PLDi3VLpEwKifY9hGdlR1Iu4G7d94Tm2NY
+	tnWxl1EDF/lloQnZ6PETiNQxz8L6pUPlMXwgpfMqsNWMUeOruuyOWkjBRtIyV27G
+	+sw1z9faC9Ihi6NF8ApaA==
+X-ME-Sender: <xms:v65AZ1BbhHvZc-idTCQPgKoGHOgoLcs7qrCZ9_CLg3nFjEY3CxIb2Q>
+    <xme:v65AZzjdGlfhgStRjbG6CgrtZF8H6s2H8z4md8EyI70a_9jQp07GMe9XXqXKll-sk
+    ww9P5LRIM_r2LM95uI>
+X-ME-Received: <xmr:v65AZwnZMLCJofYhxLl26pYYsOL40PycM_ZH0clMGNcC8EKdN3CKxkdF_nd->
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrfeelgdeivdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepgfdvgeeitefffedvgfdutdelgeeihfeg
+    ueehteevveegveejudelfeffieehledvnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
+    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
+    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
+    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:v65AZ_zq-Q45cwsX2RTau0_TKAv559Fjnfxshhpgr5ZZuw2eDKM_IA>
+    <xmx:v65AZ6Q5G07WKCKpcHW-UuQLrOjgiQSrYsODfkQZFyZ4mJlETWu4-g>
+    <xmx:v65AZyZ_d5PFogG-t4BAjS2DMuFAmlqlS2r2pbHFIGhyWl8VEGcGvw>
+    <xmx:v65AZ7TYwsO0QizIX4GnWUvf2ETVLYizmoa60IQ8pVVki65Qrv9nPg>
+    <xmx:wK5AZ9EV3A2-rrahA0z-nxuoyoxiF6E86ePyeAIiJRY4KwNofeTNKo1X>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 22 Nov 2024 11:18:07 -0500 (EST)
+Date: Fri, 22 Nov 2024 17:18:05 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 15/23] ovpn: implement keepalive mechanism
+Message-ID: <Z0CuvYH_ZZMYtDcW@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-15-de4698c73a25@openvpn.net>
+ <ZypfnyfToF1b6YAZ@hog>
+ <189dbeea-127a-47e8-84f8-c8cf1cc03536@openvpn.net>
+ <5eaf74fb-ad13-4371-95b8-7a5f1f3a9cda@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net/smc: initialize close_work early to avoid
- warning
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, horms@kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241122071630.63707-1-guwen@linux.alibaba.com>
- <20241122071630.63707-2-guwen@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20241122071630.63707-2-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: k_01IezWKk5IHnvxTtGUEt0HUCF5J5Zv
-X-Proofpoint-GUID: 2rlw1_ADSm6LApR0iENBbbsFbgrmrOU-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- clxscore=1015 malwarescore=0 spamscore=0 bulkscore=0 priorityscore=1501
- impostorscore=0 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411220135
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5eaf74fb-ad13-4371-95b8-7a5f1f3a9cda@openvpn.net>
 
+2024-11-22, 10:41:26 +0100, Antonio Quartulli wrote:
+> On 12/11/2024 14:20, Antonio Quartulli wrote:
+> [...]
+> > > > +static int ovpn_peer_del_nolock(struct ovpn_peer *peer,
+> > > > +                enum ovpn_del_peer_reason reason)
+> > > > +{
+> > > > +    switch (peer->ovpn->mode) {
+> > > > +    case OVPN_MODE_MP:
+> > > 
+> > > I think it would be nice to add
+> > > 
+> > >      lockdep_assert_held(&peer->ovpn->peers->lock);
+> 
+> Sabrina, in other places I have used the sparse notation __must_hold()
+> instead.
+> Is there any preference in regards to lockdep vs sparse?
+> 
+> I could switch them all to lockdep_assert_held if needed.
 
+__must_hold has the advantage of being checked at compile time (though
+I'm not sure it's that reliable [1]), so you don't need to run a test
+that actually hits that particular code path.
 
-On 22.11.24 08:16, Wen Gu wrote:
-> We encountered a warning that close_work was canceled before
-> initialization.
-> 
->   WARNING: CPU: 7 PID: 111103 at kernel/workqueue.c:3047 __flush_work+0x19e/0x1b0
->   Workqueue: events smc_lgr_terminate_work [smc]
->   RIP: 0010:__flush_work+0x19e/0x1b0
->   Call Trace:
->    ? __wake_up_common+0x7a/0x190
->    ? work_busy+0x80/0x80
->    __cancel_work_timer+0xe3/0x160
->    smc_close_cancel_work+0x1a/0x70 [smc]
->    smc_close_active_abort+0x207/0x360 [smc]
->    __smc_lgr_terminate.part.38+0xc8/0x180 [smc]
->    process_one_work+0x19e/0x340
->    worker_thread+0x30/0x370
->    ? process_one_work+0x340/0x340
->    kthread+0x117/0x130
->    ? __kthread_cancel_work+0x50/0x50
->    ret_from_fork+0x22/0x30
-> 
-> This is because when smc_close_cancel_work is triggered, e.g. the RDMA
-> driver is rmmod and the LGR is terminated, the conn->close_work is
-> flushed before initialization, resulting in WARN_ON(!work->func).
-> 
-> __smc_lgr_terminate             | smc_connect_{rdma|ism}
-> -------------------------------------------------------------
->                                 | smc_conn_create
-> 				| \- smc_lgr_register_conn
-> for conn in lgr->conns_all      |
-> \- smc_conn_kill                |
->    \- smc_close_active_abort    |
->       \- smc_close_cancel_work  |
->          \- cancel_work_sync    |
->             \- __flush_work     |
-> 	         (close_work)   |
-> 	                        | smc_close_init
-> 	                        | \- INIT_WORK(&close_work)
-> 
-> So fix this by initializing close_work before establishing the
-> connection.
-> 
-> Fixes: 46c28dbd4c23 ("net/smc: no socket state changes in tasklet context")
-> Fixes: 413498440e30 ("net/smc: add SMC-D support in af_smc")
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---
->  net/smc/af_smc.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 9d76e902fd77..ed6d4d520bc7 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -383,6 +383,7 @@ void smc_sk_init(struct net *net, struct sock *sk, int protocol)
->  	smc->limit_smc_hs = net->smc.limit_smc_hs;
->  	smc->use_fallback = false; /* assume rdma capability first */
->  	smc->fallback_rsn = 0;
-> +	smc_close_init(smc);
->  }
->  
->  static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
-> @@ -1299,7 +1300,6 @@ static int smc_connect_rdma(struct smc_sock *smc,
->  		goto connect_abort;
->  	}
->  
-> -	smc_close_init(smc);
->  	smc_rx_init(smc);
->  
->  	if (ini->first_contact_local) {
-> @@ -1435,7 +1435,6 @@ static int smc_connect_ism(struct smc_sock *smc,
->  			goto connect_abort;
->  		}
->  	}
-> -	smc_close_init(smc);
->  	smc_rx_init(smc);
->  	smc_tx_init(smc);
->  
-> @@ -2479,7 +2478,6 @@ static void smc_listen_work(struct work_struct *work)
->  		goto out_decl;
->  
->  	mutex_lock(&smc_server_lgr_pending);
-> -	smc_close_init(new_smc);
->  	smc_rx_init(new_smc);
->  	smc_tx_init(new_smc);
->  
+In this case I see lockdep_assert_held as mainly documenting that the
+locking that makes ovpn_peer_del_nolock safe (as safe as
+ovpn_peer_del) is provided by its caller. The splat for incorrect use
+on debug kernels is a bonus. Sprinkling lockdep_assert_held all over
+ovpn might be bloating the code too much, but I'm not opposed to
+adding them if it helps.
 
+[1] I ran sparse on drivers/net/ovpn/peer.c before/after removing the
+locking from ovpn_peer_del and didn't get any warnings. sparse is good
+to detect imbalances (function that locks without unlocking), but
+maybe don't trust __must_hold for more than documenting expectations.
 
-Thank you for the very good commit message. Makes sense to me.
+[note: if you end up merging ovpn->peers->lock with ovpn->lock as
+we've discussed somewhere else, the locking around keepalive and
+ovpn_peer_del becomes a bit less hairy]
 
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+-- 
+Sabrina
 
