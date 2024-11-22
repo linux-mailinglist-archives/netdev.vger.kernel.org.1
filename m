@@ -1,266 +1,226 @@
-Return-Path: <netdev+bounces-146773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 111E29D5AD1
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:13:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2107C9D5AD8
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67D5283099
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:13:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D52E228443D
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7847018BB9B;
-	Fri, 22 Nov 2024 08:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8587D18A6BF;
+	Fri, 22 Nov 2024 08:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhnIWboP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kkCHLhtO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE9B18B46D
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 08:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9819184101;
+	Fri, 22 Nov 2024 08:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732263215; cv=none; b=If5xXrdzkIZlz0yZcNdPAi0CljdJNoYK9mnJXZfJYXpn3Mp3J7Ws3X3uAgi3b5+kE33i8TwnLOlD8uW4vSFx+YXuGdKoH6BX32KKDUf20hrrvVXDtb2AhcVhkljA1s5iF77vTJS5q3enNs3bkUKA/2U1vg6uyrrv1gmIzCSpD8o=
+	t=1732263339; cv=none; b=Qb/Kb3UcUgLNGM8nwSrI62lGpVDWeZCz3NIONC8F4QX4/Wwalt/hPtTuT4LjEvAzSVR78CLRAuceCRMdJjJDC3S+BbBL46h9ZBtG+uXCG8nKJvuQEaY2+SeDqo0q+ONB0tOZ9EZOVM4DnONnECVqD/gtb4grfEJoELAyR297S0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732263215; c=relaxed/simple;
-	bh=JCxji8+zZEwg3Qp6iHQDZxtQInqv5sJnQ+PuEwTDVrg=;
+	s=arc-20240116; t=1732263339; c=relaxed/simple;
+	bh=UXngmQ22E5Ln7cPommdezSyEwswMdAZSYYQteIcmhII=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hVGeNIW/8yiquTOTuLeTftyKi/yked+fAx+Mt3mQmGh4E6cxGEt0xRPRe3pC02BsVo5y9v++8yFAyR/BEc7naTZan9B6teNAU3E+HOYrRWo53my+HrqapPdvVksyHdcsstzTMSnLir+LFJRishB9tV2f1jGa16bL1s6R/V40ybg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YhnIWboP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732263212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jyif/vwioQZSx22jeV7A3meclVkznYeYdCGV00kxmmo=;
-	b=YhnIWboPv3NUjNWkToaBrDAtiTqQg0cDdTXZLhFtYJqv3czBsJ1MEMddrYahp0h8xZWWFC
-	AIzjnuCRBtf+QWsPWeiIZZv+4qa293tlTUz+SniVuFd/rnG7IM/dS8ydv77UlOgIsHMEdM
-	Q0cLWj+71X5N2IArQfWl6l9wFmOV8EE=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-QHRIHJEnNI2eFPgHF7oHGg-1; Fri, 22 Nov 2024 03:13:30 -0500
-X-MC-Unique: QHRIHJEnNI2eFPgHF7oHGg-1
-X-Mimecast-MFC-AGG-ID: QHRIHJEnNI2eFPgHF7oHGg
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-6ee6122ea3fso30897757b3.1
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 00:13:30 -0800 (PST)
+	 To:Cc:Content-Type; b=exuS48kkVj14hHTLF9YAnBkUuwixSeej/iniLkzH5yxWffTwu3j3r3JuDR8s2ulvc2G8HavRgU1uWCnd5lrVKh0xA9nAB73z+WIwD/DR7CzOLswlMMb4M3J2nIZFgD4BzRrrf+9OrdvjkeccspRI7g8uSAZXz865ujAmydwpdC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kkCHLhtO; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ee745e3b2bso22145297b3.0;
+        Fri, 22 Nov 2024 00:15:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732263336; x=1732868136; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vyr8qLSn43QIrBhIICQVkh1BFCJxDyjXHmi9R1Z0AAg=;
+        b=kkCHLhtOIpqe5H4w8qBboIFBWVw4FTRDjBxljfEADKu9itukrYBboh4r6NcJtki2HH
+         n7UVvMuXYsvuB0Ht23e+OK9Q/Ju2q2csHcGCB6oLdQLZGXoGbs0b4emPV4+H9hF1pwK9
+         nqayGZdLQkrRjH6Tx9M92MZzk7nehZ8BcZ7OYhnTI/V2FX7Vqjz3LP9nucTNqhq2ncnt
+         enOHxiPDLkTEG/hrPN1aeP7V6sBYqHAkXBt3hGv+8BOukgO47Gio0Mfdxo73jH3n5xcc
+         Jh5zNPCCIajNKrIZH2ygrWNjb6jRUfH3aTNr1NzaHuDabqcwz6R9DOZh7fZEt5cUwkO+
+         o4PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732263210; x=1732868010;
+        d=1e100.net; s=20230601; t=1732263336; x=1732868136;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Jyif/vwioQZSx22jeV7A3meclVkznYeYdCGV00kxmmo=;
-        b=YWD7Dd5ps+6v4biwfknYQUO0DsT1bDMyftT9+U/7tNKRSVC3oSQzoQVUCkay+XnvoQ
-         Xzu6YCbiltWlJwW4FGfgzjhj4BJVQe5eEdHNV4FJByKXuucGBUHWltatngaxbIosQtyC
-         qvROn1dIhYF0surk7M24W8UvryIMMw8Ee/j3KaaX1WjBNkUngTNgalbJpuTiGQa1BgG2
-         IYbp7536oCU1Sc5Pvk8/qrAPXlsWkzRaV2+WEIqRnr7YyqIKrogIVW2ykRVXWZmutYOc
-         84HN8EpRcgz36/oYyFIQ+3YHkI0p99eVDH9fnGqaFH+SAdFVDc8PZ21Era7XSujVfbpf
-         6B1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUtAdDIp42MTBJ6k/NDZcplluMDgbKQBQm58iEPodkgS+g6otUlNHj98fjWsG5TBccMQJMxzHg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO4K1LZZsMJOEaozyEi3X3gG4K1Y2Phi/2b9kqzqADhN05INZA
-	k4oYqi+lnYrF/OpKWcLsXPeTN43GW6fpsO0tp9OTZSUKJokkvMsCVM25qdWjNyxBsTi7aZFSEVC
-	crKcHSqIGILgJGpSBHPPzxIw+AzDD9bgBzW1pT1IXJW3cQ6z+s12/zNpi85xzblexUf9VHErwQL
-	A6rvfD4I+AJ+FxJk69AfWGOOUtycQU
-X-Gm-Gg: ASbGncuJX1IMmntRCQ6zJHTSIexSwTbTp1na6DCcIJvLYkaYVF/EiNU1Ng9pvMhk4gu
-	IXCNDbisbs37VSZq3Hz1Eecqetrq/1mk=
-X-Received: by 2002:a05:6902:1a47:b0:e38:c0ed:8110 with SMTP id 3f1490d57ef6-e38f8af84afmr1719572276.8.1732263209931;
-        Fri, 22 Nov 2024 00:13:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGKRhMEchEwv851aJVBwXS4rpjG90mS+TEvahOSXsiWvE5DyfFNG4Z+Ig23pjG3EVB8nsNtJzWE+ExjTpdJI/I=
-X-Received: by 2002:a05:6902:1a47:b0:e38:c0ed:8110 with SMTP id
- 3f1490d57ef6-e38f8af84afmr1719537276.8.1732263209529; Fri, 22 Nov 2024
- 00:13:29 -0800 (PST)
+        bh=vyr8qLSn43QIrBhIICQVkh1BFCJxDyjXHmi9R1Z0AAg=;
+        b=R8H7aHETg0f/4bXjlhFI+WUY/bPnh6W5quOebcUqD7bUuULpdBXWvp73Tmw10aOONX
+         iIywGd/TqDESY+bps/s4g1yeyATaS+o9E2TbHQYwWKZpy5Fa342kBL+RbFtZKIwjnCPr
+         NPYs1jZG+cXlXzaaTE6e7Jf4jNRtyIvTi3pycF48oBDjUOUtOmnakyP3oANCw8+ERKlH
+         bGS7qL4KBc7N1LYkn9/1qG0gthRXc+CFBmLYLqpAQ2g7msLI9CbWo01LxEmoyf3IUmmA
+         IfomB+/wzraNLPQ3qICBtOipvsw7P2AYfIe9FDaXHqtLZuMkivF+IscLGskwefgWcrQD
+         9WoA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2WyExLH9owD3emx6WA+7WJV5azLkAAMuCqsCuIGhbqPGUKFWht3RiFFj2SYtiTEdjjbrj+1TRlB9K7A==@vger.kernel.org, AJvYcCU5gQTVBn7FmChr8Is0w0jbfBfv875zdNIioOKlHWqzVswzTw6KGlWp6NAq13O3BVzPHFvauHtXYGmV@vger.kernel.org, AJvYcCVAfaEv7sqoUu8Hv+sEHhKkHLmQG0gGITjNxZOnXuyYyZ0rAxSVK15A/TP2TBPrpR/91IJUyxfZ@vger.kernel.org, AJvYcCVJSKRDkluUedrxjweUXFi0RQpuUHggHFePBJx9sHPVDqasRmR/qjR351iw7YjXJLkZnc3mtABOPfE=@vger.kernel.org, AJvYcCVlFjY4Egt39ACx0b5EjfBib8TVwMzVvadGkSdGLOPh/UahIwPyqqpjy2zDzX2jyKFP2E8q4JTKf32zb5Q=@vger.kernel.org, AJvYcCVm+qKMmCsi02hwmTkk9kTbNkcqSUzatzIA1HkB6uoFE2TF7LLxcYBA8z/aYlpMlfihYv6tJk03euCVxPkU@vger.kernel.org, AJvYcCW30Rgm3bvxaLSlyi2nZ8Cr/PvUxiBWNQBMVaYnAkNJ4mO6uwlNo5+y8wREeO7EhEAVQ+FKDWIUNUvi@vger.kernel.org, AJvYcCWknUIrxd5IQKbpUEY4efq4BBVK6Qabha/LqF+NQ3OJC+VJ1aRDMzWfNRX4xkgXcG19vyG4W7qFRlLfH43JFis=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXEI81tUhnMYpj82d/mH092FQY5GdpuW7c6ZhTlDYSqfXo3hwA
+	6mCfjDGWvKIZWuiGlJMJpRzD2N2GhBqoFG4FX/JF1zLawDK189Zh+5IEdxpVXVIMlu/TQz+gGuB
+	DUWCRFClOi7W8bqD+fMvmy4ngA9M=
+X-Gm-Gg: ASbGnctvS1Cl5cxFsCrhd2DWfx2XHH0QxtOn5ZQ7rUd5PPgYwSfrd/8jsrBwnyFumd9
+	UU7yShf1gUBk5hg7jfdhG9GIUbi46XZA=
+X-Google-Smtp-Source: AGHT+IH4e/mVYiQ32e25TRZ177Vd5CDQUc1yz6a5vA71sHZkd/Q1Rlk/9prOUk+6rMXUHws0NFGThryLzmxccLQtL+w=
+X-Received: by 2002:a05:6902:c07:b0:e2b:dc72:3bdf with SMTP id
+ 3f1490d57ef6-e38f7047ea6mr2183988276.10.1732263336640; Fri, 22 Nov 2024
+ 00:15:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
- <20241118-vsock-bpf-poll-close-v1-3-f1b9669cacdc@rbox.co> <7wufhaaytdjp3m3xv7jrdadqjg75is5eirv4bzmjzmezc7v7ls@p52fm6y537di>
- <350e3a3f-7ebd-471e-95fa-05225d786f1c@rbox.co>
-In-Reply-To: <350e3a3f-7ebd-471e-95fa-05225d786f1c@rbox.co>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Fri, 22 Nov 2024 09:13:18 +0100
-Message-ID: <CAGxU2F5M9Mzpef4ef7NXCR2YP=k_SC93GC_k9CMj1DgVSkpQSw@mail.gmail.com>
-Subject: Re: [PATCH bpf 3/4] bpf, vsock: Invoke proto::close on close()
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241121064046.3724726-1-tmyu0@nuvoton.com> <20241121064046.3724726-7-tmyu0@nuvoton.com>
+ <c1ff92a6-8ad9-43fa-97af-12b1471b5bef@roeck-us.net>
+In-Reply-To: <c1ff92a6-8ad9-43fa-97af-12b1471b5bef@roeck-us.net>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Fri, 22 Nov 2024 16:15:25 +0800
+Message-ID: <CAOoeyxW5PrvhO_cunYwAjXynLH9jZ4OQsdnju-ZONBKsrXgakg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 21, 2024 at 8:54=E2=80=AFPM Michal Luczaj <mhal@rbox.co> wrote:
+Dear Guenter,
+
+Thank you for your comments,
+
+Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B411=E6=9C=8821=E6=
+=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8810:22=E5=AF=AB=E9=81=93=EF=BC=
+=9A
 >
-> On 11/21/24 10:22, Stefano Garzarella wrote:
-> > On Mon, Nov 18, 2024 at 10:03:43PM +0100, Michal Luczaj wrote:
-> >> vsock defines a BPF callback to be invoked when close() is called. How=
-ever,
-> >> this callback is never actually executed. As a result, a closed vsock
-> >> socket is not automatically removed from the sockmap/sockhash.
-> >>
-> >> Introduce a dummy vsock_close() and make vsock_release() call proto::c=
-lose.
-> >>
-> >> Note: changes in __vsock_release() look messy, but it's only due to in=
-dent
-> >> level reduction and variables xmas tree reorder.
-> >>
-> >> Fixes: 634f1a7110b4 ("vsock: support sockmap")
-> >> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> >> ---
-> >> net/vmw_vsock/af_vsock.c | 67 +++++++++++++++++++++++++++++-----------=
---------
-> >> 1 file changed, 40 insertions(+), 27 deletions(-)
-> >>
-> >> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> >> index 919da8edd03c838cbcdbf1618425da6c5ec2df1a..b52b798aa4c2926c3f233a=
-ad6cd31b4056f6fee2 100644
-> >> --- a/net/vmw_vsock/af_vsock.c
-> >> +++ b/net/vmw_vsock/af_vsock.c
-> >> @@ -117,12 +117,14 @@
-> >> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> >> static void vsock_sk_destruct(struct sock *sk);
-> >> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
-> >> +static void vsock_close(struct sock *sk, long timeout);
-> >>
-> >> /* Protocol family. */
-> >> struct proto vsock_proto =3D {
-> >>      .name =3D "AF_VSOCK",
-> >>      .owner =3D THIS_MODULE,
-> >>      .obj_size =3D sizeof(struct vsock_sock),
-> >> +    .close =3D vsock_close,
-> >> #ifdef CONFIG_BPF_SYSCALL
-> >>      .psock_update_sk_prot =3D vsock_bpf_update_proto,
-> >> #endif
-> >> @@ -797,39 +799,37 @@ static bool sock_type_connectible(u16 type)
-> >>
-> >> static void __vsock_release(struct sock *sk, int level)
-> >> {
-> >> -    if (sk) {
-> >> -            struct sock *pending;
-> >> -            struct vsock_sock *vsk;
-> >> -
-> >> -            vsk =3D vsock_sk(sk);
-> >> -            pending =3D NULL; /* Compiler warning. */
-> >> +    struct vsock_sock *vsk;
-> >> +    struct sock *pending;
-> >>
-> >> -            /* When "level" is SINGLE_DEPTH_NESTING, use the nested
-> >> -             * version to avoid the warning "possible recursive locki=
-ng
-> >> -             * detected". When "level" is 0, lock_sock_nested(sk, lev=
-el)
-> >> -             * is the same as lock_sock(sk).
-> >> -             */
-> >> -            lock_sock_nested(sk, level);
-> >> +    vsk =3D vsock_sk(sk);
-> >> +    pending =3D NULL; /* Compiler warning. */
-> >>
-> >> -            if (vsk->transport)
-> >> -                    vsk->transport->release(vsk);
-> >> -            else if (sock_type_connectible(sk->sk_type))
-> >> -                    vsock_remove_sock(vsk);
-> >> +    /* When "level" is SINGLE_DEPTH_NESTING, use the nested
-> >> +     * version to avoid the warning "possible recursive locking
-> >> +     * detected". When "level" is 0, lock_sock_nested(sk, level)
-> >> +     * is the same as lock_sock(sk).
-> >> +     */
-> >> +    lock_sock_nested(sk, level);
-> >>
-> >> -            sock_orphan(sk);
-> >> -            sk->sk_shutdown =3D SHUTDOWN_MASK;
-> >> +    if (vsk->transport)
-> >> +            vsk->transport->release(vsk);
-> >> +    else if (sock_type_connectible(sk->sk_type))
-> >> +            vsock_remove_sock(vsk);
-> >>
-> >> -            skb_queue_purge(&sk->sk_receive_queue);
-> >> +    sock_orphan(sk);
-> >> +    sk->sk_shutdown =3D SHUTDOWN_MASK;
-> >>
-> >> -            /* Clean up any sockets that never were accepted. */
-> >> -            while ((pending =3D vsock_dequeue_accept(sk)) !=3D NULL) =
-{
-> >> -                    __vsock_release(pending, SINGLE_DEPTH_NESTING);
-> >> -                    sock_put(pending);
-> >> -            }
-> >> +    skb_queue_purge(&sk->sk_receive_queue);
-> >>
-> >> -            release_sock(sk);
-> >> -            sock_put(sk);
-> >> +    /* Clean up any sockets that never were accepted. */
-> >> +    while ((pending =3D vsock_dequeue_accept(sk)) !=3D NULL) {
-> >> +            __vsock_release(pending, SINGLE_DEPTH_NESTING);
-> >> +            sock_put(pending);
-> >>      }
-> >> +
-> >> +    release_sock(sk);
-> >> +    sock_put(sk);
-> >> }
-> >>
-> >> static void vsock_sk_destruct(struct sock *sk)
-> >> @@ -901,9 +901,22 @@ void vsock_data_ready(struct sock *sk)
-> >> }
-> >> EXPORT_SYMBOL_GPL(vsock_data_ready);
-> >>
-> >> +/* Dummy callback required by sockmap.
-> >> + * See unconditional call of saved_close() in sock_map_close().
-> >> + */
-> >> +static void vsock_close(struct sock *sk, long timeout)
-> >> +{
-> >> +}
-> >> +
-> >> static int vsock_release(struct socket *sock)
-> >> {
-> >> -    __vsock_release(sock->sk, 0);
-> >> +    struct sock *sk =3D sock->sk;
-> >> +
-> >> +    if (!sk)
-> >> +            return 0;
-> >
-> > Compared with before, now we return earlier and so we don't set SS_FREE=
+...
+> > +static int nct6694_in_read(struct device *dev, u32 attr, int channel,
+> > +                        long *val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     unsigned char vin_en;
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_in_enable:
+> > +             vin_en =3D data->hwmon_en[NCT6694_VIN_EN(channel / 8)];
+> > +             *val =3D vin_en & BIT(channel % 8) ? 1 : 0;
+>
+> Nit: !!(vin_en & BIT(channel % 8))
+>
+> Not even worth mentioning, but !! is used below, so it would make sense
+> to use it here as well for consistency.
+>
+
+Understood. I will make the modifications in v3.
+
+> > +
+> > +             return 0;
+...
+> > +static int nct6694_temp_write(struct device *dev, u32 attr, int channe=
+l,
+> > +                           long val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     signed char temp_max, temp_hyst;
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_temp_enable:
+> > +             return nct6694_enable_channel(dev, NCT6694_TIN_EN(channel=
+ / 8),
+> > +                                           channel, val);
+> > +     case hwmon_temp_max:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
 ,
-> > could it be risky?
-> >
-> > I think no, because in theory we have already set it in a previous call=
+> > +                                    NCT6694_HWMON_CMD2_OFFSET,
+> > +                                    NCT6694_HWMON_CMD2_LEN,
+> > +                                    data->xmit_buf);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             val =3D clamp_val(val, -127000, 127000);
+> > +             data->xmit_buf[NCT6694_TIN_HL(channel)] =3D temp_to_reg(v=
+al);
+> > +
+> > +             return nct6694_write_msg(data->nct6694, NCT6694_HWMON_MOD=
 ,
-> > right?
+> > +                                      NCT6694_HWMON_CMD2_OFFSET,
+> > +                                      NCT6694_HWMON_CMD2_LEN,
+> > +                                      data->xmit_buf);
+> > +     case hwmon_temp_max_hyst:
+> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
+,
+> > +                                    NCT6694_HWMON_CMD2_OFFSET,
+> > +                                    NCT6694_HWMON_CMD2_LEN,
+> > +                                    data->xmit_buf);
+> > +
+> > +             val =3D clamp_val(val, -127000, 127000);
+> > +             temp_max =3D (signed char)data->xmit_buf[NCT6694_TIN_HL(c=
+hannel)];
+> > +             temp_hyst =3D (temp_max < 0) ? (temp_max + val / 1000) :
+> > +                                          (temp_max - val / 1000);
+> > +             if (temp_hyst < 0 || temp_hyst > 7)
+> > +                     return -EINVAL;
+> > +
 >
-> Yeah, and is there actually a way to call vsock_release() for a second
-> time? The only caller I see is __sock_release(), which won't allow that.
-
-Maybe no, but the `sock->sk` check made me think so.
-
->
-> As for the sockets that never had ->sk assigned, I assume it doesn't matt=
-er.
-
-Yep, so my R-b stays here ;-)
-
-Thanks for these great fixes,
-Stefano
-
->
-> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> >
-> >> +
-> >> +    sk->sk_prot->close(sk, 0);
-> >> +    __vsock_release(sk, 0);
-> >>      sock->sk =3D NULL;
-> >>      sock->state =3D SS_FREE;
+> Just use clamp_val() again. Otherwise it is difficult for the user to det=
+ermine
+> valid ranges.
 >
 
+Understood. I will make the modifications in v3.
+
+> > +             data->xmit_buf[NCT6694_TIN_HYST(channel)] =3D
+> > +                    (data->xmit_buf[NCT6694_TIN_HYST(channel)] & ~NCT6=
+694_TIN_HYST_MASK) |
+> > +                    FIELD_PREP(NCT6694_TIN_HYST_MASK, temp_hyst);
+> > +
+> > +             return nct6694_write_msg(data->nct6694, NCT6694_HWMON_MOD=
+,
+> > +                                      NCT6694_HWMON_CMD2_OFFSET,
+> > +                                      NCT6694_HWMON_CMD2_LEN,
+> > +                                      data->xmit_buf);
+> > +     default:
+> > +             return -EOPNOTSUPP;
+> > +     }
+> > +}
+> > +
+> > +static int nct6694_fan_write(struct device *dev, u32 attr, int channel=
+,
+> > +                          long val)
+> > +{
+> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&data->lock);
+> > +
+> > +     switch (attr) {
+> > +     case hwmon_fan_enable:
+> > +             return nct6694_enable_channel(dev, NCT6694_FIN_EN(channel=
+ / 8),
+> > +                                           channel, val);
+> > +     case hwmon_fan_min:
+> > +             if (val <=3D 0)
+> > +                     return -EINVAL;
+> > +
+> I'd suggest to just use clamp_val() and drop this check.
+>
+
+Understood. I will make the modifications in v3.
+
+Best regards,
+Ming
 
