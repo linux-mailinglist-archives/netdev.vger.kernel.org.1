@@ -1,95 +1,113 @@
-Return-Path: <netdev+bounces-146813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 285989D5FFD
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:51:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF8C9D602F
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:13:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D386F1F231B3
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 13:51:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 721371F21C8B
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13066F099;
-	Fri, 22 Nov 2024 13:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFEE2BB04;
+	Fri, 22 Nov 2024 14:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EPxDcobP"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AEF12E7F;
-	Fri, 22 Nov 2024 13:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECAE79C0;
+	Fri, 22 Nov 2024 14:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732283503; cv=none; b=QQPcidlWcGxRZKhu+O3bQy3GPhOvGan9Qah27OyVhJe/QxUSYH5UbYMzpuCRmJYynVC4XO37KL+NxHv23tt5As0TZmNowmp1w/YovGCc57ZLfC2Ug3c7d6jrgnnaksjXVhZDFcvlIIeN/mO+08vCgd3JLXXXwvGosapjklORw0k=
+	t=1732284791; cv=none; b=VhvDGb6Lx8y3sB0P8rxOuOLRQfAJWu32WXMeg9yNPH1/oP6rI8Q8hl3vMpuK751tgfaw3wywuk0pWbA7f7hYdm1IfED626y08AE1kKBKc7zdT44pMISP3sxnmE2gALHj8r7OJ0yO7OhnaFs/R59DkvpB11E7WY9VBYWutorPqns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732283503; c=relaxed/simple;
-	bh=4qVeJak5xPiALIaYDPf7rB81y+1EOLDU6utWS0UkEno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VUuScUwDLHy1vF67x0rCva5gn/fXfB8/IJY8pLc9rEYla7wC98ESn+IfG4kQqvv4SxnfA/cnI1Ipmj3usYyz5xCtQuflLbP1qIGHC3y2oWGnhF8Lw6YYuDoYkhl2wGTiivAwKrHd8ZjTNK8WKpCpzE0UMZTwPP6ZLNDu1iJjuco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.39.247] (port=47062 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1tEU4M-000qBh-6R; Fri, 22 Nov 2024 14:51:36 +0100
-Date: Fri, 22 Nov 2024 14:51:33 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Pei Xiao <xiaopei01@kylinos.cn>, kadlec@netfilter.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] netfilter: nf_tables: Use get_cpu_ptr in nft_inner_eval
-Message-ID: <Z0CMZcpRfYFuXojU@calendula>
-References: <673fca0e.050a0220.363a1b.012a.GAE@google.com>
- <804e05fe4615cfd51f0cc72307f578ea34a701b4.1732281838.git.xiaopei01@kylinos.cn>
- <20241122134529.GB17061@breakpoint.cc>
+	s=arc-20240116; t=1732284791; c=relaxed/simple;
+	bh=7bXRyUg528fYaEeKIULUUicaZ3evTJltL2qw2YdaAq0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qTEoKjaqk/9h/ythhlKM8CkYBupxN7kkmpsSGQPaEDuP3rw0PrShQOMPBEefSS5P6/JN1/BORXG3XkmeZd1Sx3pgyx8BNWBn3Bjus7Sy6blPUQuCvBJ/ldHsu7eMjcLztO3dBkXanBwP3DEOkVlOf2FaM6AfljD2yiQ6hUshfYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EPxDcobP; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D9B381BF204;
+	Fri, 22 Nov 2024 14:12:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1732284781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+01xzJeV3qRX2WUWGKaOOxbz2v9CPnb9VQR2tAoftiY=;
+	b=EPxDcobPHDeJCBnjLXZtIBQaHN3OS6jpELxflv23dxJ/V44WfAMfNEUKav0FLPtpF0C2s7
+	rKbYlya+ZEhOac2lw0RWwCdf6/Y9b6/LMgXWyvz7STEx7lCwbMzmMZPDUysI6HB/FbPM+1
+	NMb5euWe1AY54iZoHTnqm4LACVr3Xohdk+Cl/1izvYTxbS2c07+4Je7B+4Utd/3yR33wm8
+	paLh3eWkk4sBJtvGIQbQ4uXUdIzjZ8Qyy+gqCDtLPjYCR2YS2AlzmIHxvAChQ6Bvl2G1ek
+	Tfycg8ero7EGeQFugWRS4PRZ9YgL0mA1QyUrjUcdkQNWQQaM6R52V9uuyK2xMA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: stmmac: dwmac-socfpga: Set RX watchdog interrupt as broken
+Date: Fri, 22 Nov 2024 15:12:55 +0100
+Message-ID: <20241122141256.764578-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241122134529.GB17061@breakpoint.cc>
-X-Spam-Score: -1.8 (-)
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, Nov 22, 2024 at 02:45:29PM +0100, Florian Westphal wrote:
-> Pei Xiao <xiaopei01@kylinos.cn> wrote:
-> > syzbot complain about using smp_processor_id in preemptible.
-> > use get_cpu_ptr to preempt_disable.
-> 
-> > Reported-by: syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=84d0441b9860f0d63285
-> > Fixes: 0e795b37ba04 ("netfilter: nft_inner: add percpu inner context")
-> > Signed-off-by: Pei Xiao <xiaopei01@kylinos.cn>
-> > ---
-> >  net/netfilter/nft_inner.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/netfilter/nft_inner.c b/net/netfilter/nft_inner.c
-> > index 928312d01eb1..ae85851bab77 100644
-> > --- a/net/netfilter/nft_inner.c
-> > +++ b/net/netfilter/nft_inner.c
-> > @@ -248,7 +248,7 @@ static bool nft_inner_parse_needed(const struct nft_inner *priv,
-> >  static void nft_inner_eval(const struct nft_expr *expr, struct nft_regs *regs,
-> >  			   const struct nft_pktinfo *pkt)
-> >  {
-> > -	struct nft_inner_tun_ctx *tun_ctx = this_cpu_ptr(&nft_pcpu_tun_ctx);
-> > +	struct nft_inner_tun_ctx *tun_ctx = get_cpu_ptr(&nft_pcpu_tun_ctx);
-> >  	const struct nft_inner *priv = nft_expr_priv(expr);
-> 
-> This can't be right, where is it re-enabled?
-> 
-> Not related to your patch:
-> Why is this percpu?  How is this softirq safe?
+On DWMAC3 and later, there's a RX Watchdog interrupt that's used for
+interrupt coalescing. It's known to be buggy on some platforms, and
+dwmac-socfpga appears to be one of them. Changing the interrupt
+coalescing from ethtool doesn't appear to have any effect here.
 
-I can add an owner skbuff to nft_inner_tun_ctx area, so this
-information can be canceled in case of softirq interference, then
-trigger a reparsing of the header.
+Without disabling RIWT (Received Interrupt Watchdog Timer, I
+believe...), we observe latencies while receiving traffic that amount to
+around ~0.4ms. This was discovered with NTP but can be easily reproduced
+with a simple ping. Without this patch :
+
+64 bytes from 192.168.5.2: icmp_seq=1 ttl=64 time=0.657 ms
+
+With this patch :
+
+64 bytes from 192.168.5.2: icmp_seq=1 ttl=64 time=0.254 ms
+
+Fixes: 801d233b7302 ("net: stmmac: Add SOCFPGA glue driver")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 248b30d7b864..16020b72dec8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -487,6 +487,8 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
+ 	plat_dat->has_gmac = true;
+ 
++	plat_dat->riwt_off = 1;
++
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+ 	if (ret)
+ 		return ret;
+-- 
+2.47.0
+
 
