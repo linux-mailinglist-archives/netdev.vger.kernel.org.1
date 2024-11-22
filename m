@@ -1,174 +1,290 @@
-Return-Path: <netdev+bounces-146769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE069D5A82
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:59:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 386829D5A92
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60DD02829F6
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:59:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98AC6282A78
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C608E17B4E1;
-	Fri, 22 Nov 2024 07:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B3217DFEF;
+	Fri, 22 Nov 2024 08:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MY/KT9Ju"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC64166F26
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 07:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A335154454;
+	Fri, 22 Nov 2024 08:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732262369; cv=none; b=PaB6gtQN/xEGib+VtcgcgKcNdhp7yHo7ZA3O2dOQyM6DQ06NLMuAKaxC0rsv7axicuvCSlgs6Sw3njsmvrko26pl+4dt6HGM2vbs9QMNVQwOjwLcJbvWLJjjoRqmqA2Y41LMOnbFbJSzZj7+76j9dj6QdMKUOfh8Sv0GbPo64I0=
+	t=1732262606; cv=none; b=a+GdzrqAWllz8mREuR2mjNfMDv64sdUpTlWrfdxwBOzQj0g3lHCOGzxIv5iuctYuBZKI6Tr7We6l7dl4mfJLmEvpi/E6rfcydJlBxHtzffiw6R25Rq/JtkAcaSAsQGV5QUs4FGnkWyAiaHmFMzL3jJ3AV2Hei2fllNQ+EKkA8MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732262369; c=relaxed/simple;
-	bh=ua4WWXrbFmKwDf0c9+PM4R4TLQFOmCnKY7Grbp6lZt8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sMZO114k465kxvHunqTEAEbhY2+yGlZR9zeRL7ZOJNybYvdRtYXIpkI0WUd2H+C16IwfYMhnNITJl89e/UPzYMGtLOxsMfbIpTFCh4bAx7Bl6ufv+WUHnXHKz7d7a0X7uIREKClEBskIUil6ZkqnaQFIXZidFv6IEJ3JkoYWTow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a97ef06ea8a711efa216b1d71e6e1362-20241122
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:e4b70828-f217-4a76-a0bb-d5081ef3d62e,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:82c5f88,CLOUDID:9d575819d1210145532e6e92a005ebd7,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0,EDM:-3,
-	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
-	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: a97ef06ea8a711efa216b1d71e6e1362-20241122
-Received: from node2.com.cn [(10.44.16.197)] by mailgw.kylinos.cn
-	(envelope-from <luoxuanqiang@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 7202630; Fri, 22 Nov 2024 15:59:12 +0800
-Received: from node2.com.cn (localhost [127.0.0.1])
-	by node2.com.cn (NSMail) with SMTP id 9ECEFB80758A;
-	Fri, 22 Nov 2024 15:59:12 +0800 (CST)
-X-ns-mid: postfix-674039D0-5586047365
-Received: from [10.42.20.255] (unknown [10.42.20.255])
-	by node2.com.cn (NSMail) with ESMTPA id BAF74B80758A;
-	Fri, 22 Nov 2024 07:59:08 +0000 (UTC)
-Message-ID: <833ea8e7-f15b-ff66-84bf-2bcd77710fd8@kylinos.cn>
-Date: Fri, 22 Nov 2024 15:59:08 +0800
+	s=arc-20240116; t=1732262606; c=relaxed/simple;
+	bh=Y+YUR2Fae+PwIeeUgv2c2m7+q5l/+vpmOpmbgPj/7R0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SYHU2H7xD9KF1NZLcGdHmmUeuT79RQLwtJwSqZKIP6sLXIraHIx8sa9TdjtiePzjjW78xY0REKjjNE5RYPwxbbMWqvYogaQdekYaQ+Vq4lxB9oCy1DjxrYU8x/HpJdMSj+3blYHLrGQgqXdOmw2L6Zcrb4uPViKObpDR7QqKx90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MY/KT9Ju; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e3839177651so1528357276.3;
+        Fri, 22 Nov 2024 00:03:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732262603; x=1732867403; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XRPajfXYamrE2oaZvDzqAyzECG0pqfiS5EVqNFRx9FY=;
+        b=MY/KT9JuYQS4Lsf7GcL4CSHsyhiEF72ybKV6d0d8xkCgUg/eO5/hM13hwFNyLnKBkG
+         ba4en7RhtGKkwIFvWger7hd83A4D8FiAf8gmrI5ehO5PGce7LKXGTuR+mhDdfWCdFm44
+         ih65BYf2YusVYPSaJd8IJ+AWRDQAdnQ5DcaxN7pdXPMSpB4qvGlkDAPaBSCxpPNvIwwJ
+         CEGPmzhLf+U4K7MMa/zyDgcPxWxg/FonH4Dy7iGO2+KKXFGlr5q+xhpDMXZi0yq4gPPF
+         9rhhDTYCe+EZFmOkp5e57LyT9Ml73wnHZsXS6Ldefe8rCueDUdEGJzDLTPG0OUZP81BB
+         FNDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732262603; x=1732867403;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XRPajfXYamrE2oaZvDzqAyzECG0pqfiS5EVqNFRx9FY=;
+        b=QnSh0BZoYdTRefgY3WduUU/9eJAeKzgzbszqXiA7o6lkbSRQavRhLUV9RlyufEOYSq
+         u/5UqsMMZ/M10pL05IYoC+eaztctxs6oFfRPpqQrXRm12pbjdF311Ki3lPLoW2jlEhI7
+         NNMHgNHkRLCERGa9iSnMWXEpHYVoJNcrJB/6KrCofSgBoJb3NT4kaZBMwLPZa0+yzQn7
+         I9f++g2VAGWMan+dYOFsVuQpzwQexxt6VGfps+8WmJJaaA0tC4QklJk2mNgmwpeHgaV2
+         olYuNaypOTQRaqmRCJKEe0IVFgV2ZQIbFMak/yF6ABXLS44T2oxT5mI54EVEpN05Z7I3
+         C5RA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/sNugRBSCUR3Y4PvIdaUyg0WBdfzHVc53NT4qLc5kA5TbK1dqLI1BO7l1NyYK75Pf5yU8L/59leYE@vger.kernel.org, AJvYcCWJXv0AyI4cqj3oWB0M84o1WeQTfTZPS/KeMdgdtf54ivKmVIgPgH1vI1VIX3sAV8m7ZRMIUhcU@vger.kernel.org, AJvYcCWkOL9eIJB+LXWEX98qWlxdBnKdVDd5Xetu4YYefl01X+wGBpoNZB+fB7jcW/b3i6VaTj6vB1vo4xJFTA==@vger.kernel.org, AJvYcCWlox2L6RJX58qj9L3GDhOhRDVp1XOXYCeDRwEgpafKJn6KcoUcBGvbsvartAknbioL1syb5YaquxY=@vger.kernel.org, AJvYcCXJTWYp4rWhwcS4PaycJhMyAsUuJw5vLHA/XpE2U8GkKsaWPoWhq9w6nefqXOawzANMbi7z8vNeqa+z@vger.kernel.org, AJvYcCXRAJnbDwQkK1mZqWsza/AroHulJvq8UiqAtwWIDosdAFo4BtBh+UhBbjlTf4HYFkxAbv3LMso0oU4aKkkS@vger.kernel.org, AJvYcCXSjrXjCiPSsPvBDv0CJ8ym4hvW0Yf1OTy97ry35ODhvoh/3gtRA/uM3o5aptH41nYulqRuoBTQpCmuWX33R/g=@vger.kernel.org, AJvYcCXgCuEVxB/oCK8F4vaLohmISS/gnfOw5SZbI9nEw1rWdqpCbHwbsWHsUIa5euvZGPbaqoOiB3gFft95IFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQhfW0cXYEusrs63hdUm7xoQ45rTvuYJiNXA1BKsSvgrbSFvWt
+	uU5QP8ApEfrt1ozL7yi0sFKNkNa76eZa/sCBbiEf0yHiY7IzxpL6ELvkT42R/oBntg876ukXY0M
+	L0f2HtUqA8A/xxwNqPTsyv0n6ssE=
+X-Gm-Gg: ASbGncsk7q2drA0/DlBJi2X9TWOZmSeLmgCas0ib8d8crmuy1RgUz6IxKWwPrLMPiMu
+	c1BVB24g8YGjvZPkxCDAZ908c4yHsx3g=
+X-Google-Smtp-Source: AGHT+IFpxcWhp36ECFmdpGFa2DRQqPb5Q4aHwvEoDsWfHiMZDbVRDfnJZ32bdLPj9o2rmEZW07vf8an9iFpvdZIYOgI=
+X-Received: by 2002:a05:6902:20c3:b0:e38:cdff:830b with SMTP id
+ 3f1490d57ef6-e38f8bdf359mr1613926276.38.1732262603464; Fri, 22 Nov 2024
+ 00:03:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2] net: mdio: fix unbalanced fwnode reference count in
- mdio_device_release()
-Content-Language: en-US
-To: Zeng Heng <zengheng4@huawei.com>, hkallweit1@gmail.com,
- edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
- davem@davemloft.net, andrew@lunn.ch, f.fainelli@gmail.com,
- linux@armlinux.org.uk
-Cc: liwei391@huawei.com, netdev@vger.kernel.org
-References: <20221203073441.3885317-1-zengheng4@huawei.com>
-From: luoxuanqiang <luoxuanqiang@kylinos.cn>
-In-Reply-To: <20221203073441.3885317-1-zengheng4@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20241121064046.3724726-1-tmyu0@nuvoton.com> <20241121064046.3724726-5-tmyu0@nuvoton.com>
+ <08a91d47-ad78-4f7d-896f-b75d7418be1e@wanadoo.fr>
+In-Reply-To: <08a91d47-ad78-4f7d-896f-b75d7418be1e@wanadoo.fr>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Fri, 22 Nov 2024 16:03:12 +0800
+Message-ID: <CAOoeyxVjBsmOr=-14iq7pQamJ90j_PBMhQK0Lo=xmvPyqqseGQ@mail.gmail.com>
+Subject: Re: [PATCH v2 4/7] can: Add Nuvoton NCT6694 CAN support
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Heng,
+Dear Vincent,
 
-=E5=9C=A8 2022/12/3 15:34, Zeng Heng =E5=86=99=E9=81=93:
-> There is warning report about of_node refcount leak
-> while probing mdio device:
->
-> OF: ERROR: memory leak, expected refcount 1 instead of 2,
-> of_node_get()/of_node_put() unbalanced - destroy cset entry:
-> attach overlay node /spi/soc@0/mdio@710700c0/ethernet@4
->
-> In of_mdiobus_register_device(), we increase fwnode refcount
-> by fwnode_handle_get() before associating the of_node with
-> mdio device, but it has never been decreased in normal path.
-> Since that, in mdio_device_release(), it needs to call
-> fwnode_handle_put() in addition instead of calling kfree()
-> directly.
->
-> After above, just calling mdio_device_free() in the error handle
-> path of of_mdiobus_register_device() is enough to keep the
-> refcount balanced.
->
-> Fixes: a9049e0c513c ("mdio: Add support for mdio drivers.")
-> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
-> Reviewed-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->   changes in v2:
->    - Add operation about setting device node as NULL-pointer.
->      There is no practical changes.
->    - Add reviewed-by tag.
-> ---
->   drivers/net/mdio/of_mdio.c    | 3 ++-
->   drivers/net/phy/mdio_device.c | 2 ++
->   2 files changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
-> index 796e9c7857d0..510822d6d0d9 100644
-> --- a/drivers/net/mdio/of_mdio.c
-> +++ b/drivers/net/mdio/of_mdio.c
-> @@ -68,8 +68,9 @@ static int of_mdiobus_register_device(struct mii_bus =
-*mdio,
->   	/* All data is now stored in the mdiodev struct; register it. */
->   	rc =3D mdio_device_register(mdiodev);
->   	if (rc) {
-> +		device_set_node(&mdiodev->dev, NULL);
-> +		fwnode_handle_put(fwnode);
-According to my understanding, the process flow of mdio_device_free() is
-as follows:
-mdio_device_free()
- =C2=A0=C2=A0=C2=A0 -> put_device()
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->kobject_put()
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->kob=
-ject_release()
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 ->device_release()
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->mdio_device_release()
- =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
-=A0 =C2=A0=C2=A0=C2=A0 //Here, it will be called once fwnode_handle_put()=
-;
+Thank you for your comments,
 
-Why is it necessary to add fwnode_handle_put(fwnode) again here? In the
-body of your email, you described that mdio_device_free() is sufficient
-to keep refcount balanced, and it was not added in the v1.
-Could you please explain the reason for this?
-I am looking forward to your response :)
+Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2024=E5=B9=B411=E6=
+=9C=8821=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=883:47=E5=AF=AB=E9=81=
+=93=EF=BC=9A
+> > +
+> > +struct __packed nct6694_can_cmd0 {
+>
+> Give more meaningfull names to your structures. For example:
+>
+>   /* cmd1 */
+>   struct __packed nct6694_can_bittiming
+>
 
-Thanks
-Xuanqiang
->   		mdio_device_free(mdiodev);
-> -		of_node_put(child);
->   		return rc;
->   	}
->  =20
-> diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_devic=
-e.c
-> index 250742ffdfd9..044828d081d2 100644
-> --- a/drivers/net/phy/mdio_device.c
-> +++ b/drivers/net/phy/mdio_device.c
-> @@ -21,6 +21,7 @@
->   #include <linux/slab.h>
->   #include <linux/string.h>
->   #include <linux/unistd.h>
-> +#include <linux/property.h>
->  =20
->   void mdio_device_free(struct mdio_device *mdiodev)
->   {
-> @@ -30,6 +31,7 @@ EXPORT_SYMBOL(mdio_device_free);
->  =20
->   static void mdio_device_release(struct device *dev)
->   {
-> +	fwnode_handle_put(dev->fwnode);
->   	kfree(to_mdio_device(dev));
->   }
->  =20
+Understood. I will make the modifications in v3.
+
+> > +     u32 nbr;
+> > +     u32 dbr;
+> > +     u32 active:8;
+> > +     u32 reserved:24;
+> > +     u16 ctrl1;
+> > +     u16 ctrl2;
+> > +     u32 nbtp;
+> > +     u32 dbtp;
+> > +};
+> Always use the specific endianess types in the structures that you are
+> sending to the device. e.g. replace u32 by __le32 (assuming little endian=
+).
+>
+
+Okay, I'll fix it in v3.
+
+> > +struct __packed nct6694_can_cmd1 {
+...
+> > +
+> > +struct nct6694_canfd_priv {
+>
+> Be consistent in your name space. Sometime you prefix your names with
+> nct6694_can and sometimes with nct6694_canfd for no apparent reasons.
+>
+
+Understood. I will make the modifications in v3.
+
+> > +     struct can_priv can;    /* must be the first member */
+...
+> > +     } else {
+> > +             if (buf->flag & NCT6694_CAN_FLAG_BRS)
+> > +                     cf->flags |=3D CANFD_BRS;
+> > +
+> > +             for (i =3D 0; i < cf->len; i++)
+> > +                     cf->data[i] =3D buf->data[i];
+>
+> Use memcpy().
+>
+
+Okay, I'll fix it in v3.
+
+> > +     }
+> > +
+> > +     /* Remove the packet from FIFO */
+> > +     stats->rx_packets++;
+> > +     stats->rx_bytes +=3D cf->len;
+>
+> Do not increment the rx_bytes if the frame is RTR.
+>
+
+Okay, I'll fix it in v3.
+
+> > +     netif_receive_skb(skb);
+...
+> > +
+> > +     switch (new_state) {
+> > +     case CAN_STATE_ERROR_WARNING:
+> > +             /* error warning state */
+>
+> Such comment can be removed. Here you are just paraphrasing the macro. I
+> can already see that CAN_STATE_ERROR_WARNING means the "error warning
+> state". The comments should add information.
+>
+
+Okay, I will drop them in v3.
+
+> > +             cf->can_id |=3D CAN_ERR_CRTL;
+> > +             cf->data[1] =3D (bec.txerr > bec.rxerr) ? CAN_ERR_CRTL_TX=
+_WARNING :
+> > +                                                     CAN_ERR_CRTL_RX_W=
+ARNING;
+...
+> > +static int nct6694_canfd_start(struct net_device *ndev)
+> > +{
+> > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > +     struct nct6694_can_cmd0 *buf =3D (struct nct6694_can_cmd0 *)priv-=
+>tx_buf;
+>
+> Give a more memorable name to buf, for example: bittiming_cmd.
+>
+
+Got it. So, every buf that uses a command must be renamed similarly, right?
+
+> > +     const struct can_bittiming *n_bt =3D &priv->can.bittiming;
+> > +     const struct can_bittiming *d_bt =3D &priv->can.data_bittiming;
+> > +     int ret;
+> > +
+> > +     guard(mutex)(&priv->lock);
+> > +
+> > +     memset(priv->tx_buf, 0, NCT6694_CAN_CMD0_LEN);
+>
+> Remove those CMD*_LEN macros, instead, use sizeof() of your structures.
+>
+>   memset(buf, 0, sizeof(*buf));
+>
+
+Understood. I will make the modifications in v3.
+
+> > +     buf->nbr =3D n_bt->bitrate;
+> > +     buf->dbr =3D d_bt->bitrate;
+...
+> > +static netdev_tx_t nct6694_canfd_start_xmit(struct sk_buff *skb,
+> > +                                         struct net_device *ndev)
+> > +{
+> > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > +
+> > +     if (priv->tx_skb || priv->tx_busy) {
+> > +             netdev_err(ndev, "hard_xmit called while tx busy\n");
+> > +             return NETDEV_TX_BUSY;
+> > +     }
+> > +
+> > +     if (can_dev_dropped_skb(ndev, skb))
+> > +             return NETDEV_TX_OK;
+> > +
+> > +     netif_stop_queue(ndev);
+>
+> Here, you are inconditionally stopping the queue. Does it mean that your
+> device is only able to manage one CAN frame at the time?
+>
+
+Yes, we designed it to manage a single CAN frame, so we stop the queue
+here until a TX event is received to wake queue.
+But It seems I lost the error handling code for the tx command in
+nct6694_canfd_tx(), I will fix it in the next patch.
+
+> > +     priv->tx_skb =3D skb;
+> > +     queue_work(priv->wq, &priv->tx_work);
+> > +
+> > +     return NETDEV_TX_OK;
+> > +}
+> > +
+> > +static void nct6694_canfd_tx(struct net_device *ndev, struct canfd_fra=
+me *cf)
+> > +{
+> > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > +     struct nct6694_can_cmd10_11 *buf =3D (struct nct6694_can_cmd10_11=
+ *)priv->tx_buf;
+> > +     u32 txid =3D 0;
+> > +     int i;
+...
+> > +
+> > +     /* set data to buf */
+> > +     for (i =3D 0; i < cf->len; i++)
+> > +             buf->data[i] =3D cf->data[i];
+> > +
+> > +     nct6694_write_msg(priv->nct6694, NCT6694_CAN_MOD,
+> > +                       NCT6694_CAN_CMD10_OFFSET(1),
+> > +                       NCT6694_CAN_CMD10_LEN,
+> > +                       buf);
+
+I will add the error handling to wake the queue in the next patch.
+
+> > +}
+> > +
+...
+> > +static const struct net_device_ops nct6694_canfd_netdev_ops =3D {
+> > +     .ndo_open =3D nct6694_canfd_open,
+> > +     .ndo_stop =3D nct6694_canfd_stop,
+> > +     .ndo_start_xmit =3D nct6694_canfd_start_xmit,
+> > +     .ndo_change_mtu =3D can_change_mtu,
+> > +};
+>
+> Also add a struct ethtool_ops for the default timestamps:
+>
+>   static const struct ethtool_ops nct6694_ethtool_ops =3D {
+>           .get_ts_info =3D ethtool_op_get_ts_info,
+>   };
+>
+> This assumes that your device does not support hardware timestamps. If
+> you do have hardware timestamping support, please adjust accordingly.
+>
+
+Understood. I will make the modifications in v3.
+
+Best regards,
+Ming
 
