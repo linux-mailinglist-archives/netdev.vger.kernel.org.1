@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-146872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 914919D65E4
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:47:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E1BE9D65F8
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F7A6B220D9
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:47:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B9728724C
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FBC1A4F22;
-	Fri, 22 Nov 2024 22:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97821C9B97;
+	Fri, 22 Nov 2024 22:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hMuQo6Wy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ttDhO/l3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807971C82E2
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 22:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732315607; cv=none; b=vGu3qXYCA1ptUhjAEj5s6DhuY71FzsbukmCovKDp2cUtha3Y4t5y0u+Pdi0MJU22a9S+8cZx4eto7hUhn3PthOcdy4x/kdyCUGDgThVyJVtuLSiuIBujLlbqQ7CALsF12PTbuj6WqsAnhcyn2V1tF1yKabGIaDKQb8PeX4x2nOA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732315607; c=relaxed/simple;
-	bh=1q5zLrnZJW56EyQTUXvvpBXyQYjs2OSOzVe5FaV/f2M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G83I3+CbXchEmp8Q9PNuLgSV3ISrR5fhwXC2o798ihRm+e2arYgaGxZUyEoA9LhpaqtMf9QEhs7P2zPRN6VORh/0A/XVLxWp/9ZeheBB5joUzrqu6T4a4QWNxa5JTzge6doWmspJW+W2FQKgv9RHPNuRNmfwBkgOjEQyx3PDl5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hMuQo6Wy; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b15eadee87so161194385a.2
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:46:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1732315604; x=1732920404; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qiui2rhF5hwfw95QrNuMUjSYZHJH7nfqV7xul9WK8TE=;
-        b=hMuQo6Wyzlm5doscM4SUb/Xd8OTWDbZbZdHFxQ34cmBuaqBcAaw4yUiSWvwm7snIA6
-         8DObx26WFn7hygO7hz3rQP5afexpAcsos6y7WVa9Bexq3VvoUG+WWJ9CbeEPp8o4/gtL
-         3gcYJgl4Bq+q3uwFURfKobl8fhfd9+jz6HQxE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732315604; x=1732920404;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qiui2rhF5hwfw95QrNuMUjSYZHJH7nfqV7xul9WK8TE=;
-        b=q23NdFP+oypvBkeYkM1we5T4lkGULwOm2zhT9Rs1cfoQmTZaANd/hAkI9zWtP16udy
-         yMEYnCy8Rf+BBD8WO7+G0zot3An3CSamL805hqFfLrkLZgtrR4Yu40XTULbagmk8gEU7
-         nxwHjBE3Y9FlI2NCManGjUDItLjVDk85Ceo3nz/WFVntcndu9j4SlCoxdnUj73JNw+JX
-         /le89/Lsl8jem+eebsRL9js7uAsC4mwmubEnDK/E6OhrIBpOmxPjG76E36so//HisZ6y
-         yHvtj4QDTla3H6JkxtmN/nhxdhOyWUSHM4VLTHEi7lNbk9iFuX1HCGFGe/awGMeep69G
-         txjg==
-X-Gm-Message-State: AOJu0YxngOWZl4s0nUWXHknAJtA4I/9wdRCA9rDppzThb0Vmb46XNcsk
-	WDr0ns5a0uuwWGJIFEK8vAc0rVKYfLgtkCPl1NiELV3gJKMlV5yMxZ6B3RmF1g==
-X-Gm-Gg: ASbGnctiJZ4DazujYMi8Gdnt8dFB+D39jWEaAhHvXsekMXoTZtyyvpGif+kgXp8zhI1
-	SS7XFXIqW0ygg4uiPyYtHK7L/4TNvKDt2h1InidmdtMcNcUgoOvZ5KwemFVCo9Lcq7u9Px7O11Q
-	bdT3yYA42lIb/W0PSDgBlsMEu8hs6SWG5dFcmzslKrC9nkl10ior33xqmRW3BoUwJJ4uU2PvFTd
-	JxRl9F79oPufSdFfzgQxdzZ+1nxu3YILhkhtsUIeW6RLPLVQGCBbrniQTXcWpHGDq8m5xRTx+rf
-	3KrHlL9m72y15y/d9xKOIE/FpQ==
-X-Google-Smtp-Source: AGHT+IHhaGFFLD32oZ7w3xXSJEIU1ksA4ISgD6HIjDnEB6L2mqYvtJBQue7UdF6fGy/M+2G/rEd8Fg==
-X-Received: by 2002:a05:620a:2416:b0:7b1:11ac:627a with SMTP id af79cd13be357-7b514513d9dmr728992885a.25.1732315604211;
-        Fri, 22 Nov 2024 14:46:44 -0800 (PST)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b51415286esm131270485a.101.2024.11.22.14.46.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 14:46:43 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Richard Cochran <richardcochran@gmail.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net 6/6] bnxt_en: Unregister PTP during PCI shutdown and suspend
-Date: Fri, 22 Nov 2024 14:45:46 -0800
-Message-ID: <20241122224547.984808-7-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20241122224547.984808-1-michael.chan@broadcom.com>
-References: <20241122224547.984808-1-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E26B1C5799;
+	Fri, 22 Nov 2024 22:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732315728; cv=fail; b=raGoAVPRtJf/fYgVkV3RqMwoh/C8rDQmjwvJOfXQiZtYea8EPEEOitleP7Hoe5GvnW2nu1fghMUxEPP6taozaKonXMoREjc9dSYUNkAYS3XKT/X0YQtlNW/auBpB1Oyz9cX2WRA3He5tlBK+09XX014MP9WE+5GJjsaGRIektOo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732315728; c=relaxed/simple;
+	bh=HoIXbpe7e4nO0TcvtXW2IJwsZQK+68hrLtLxiuTWbXs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l0f+v7Q/29bdUgtel5j6+WcSQAYy/4j66TcpAewlDWAwIimzAJByLgdqmKka/dpwHH8ERpIo+wQXLYyh2Jvyig9vmOX5k5d5A0++7iG9MlvsJEayc+Ys3DU5FGun7mqaDavEPi7bmDq/zCVyMquHKUhpN5wZefoDeoOmMmxeM7Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ttDhO/l3; arc=fail smtp.client-ip=40.107.244.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oweETcfgS/xCQIQzqma3GLc2TMe1O5S5q+wDzJ6O+xYffcLuo43REL7A1/jlUwy9jzcwWN5Pt0z0PGxUEPiMlTAUd61lRTUbw9UcKGH601xpRB6rERZ6yjRaGh/TJ/Qpuv5jpq7rxUZxHVygaOwhBH2vkJXyir1T9cMAX0L/LrBy1hY7MNF6ZfG9QEJln75UwXzaD7g6YzCAeZbTPBkkvPtF68/bR1p3Qzy+ty4icT3yIG24mCiB8ZoU8m9I3RYG8kEkK1y4iydLVKsB1wuo++YrXwf533Kd34MF6h6GRnm32u0i/TevBjX+YqJOY01K2iXVr2w6FQ81VvCTwxJ27A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LtASgMeRQUdCifxgl0zOeGMZ/GNMN5RUEROpIuYC1SI=;
+ b=h1/AdxiSpGYQZUKAMhsjS8UUHTN3sHAxTwDEZdOwrkTwgrP50uNEAR4uUJhAq4f3V/7zKJXhXitHOnm7rWxhBO4reBR3YEbJyviZPJkdQZoX42z/+SEem/CzXcGOveEt2uHqaG1MNT1s5wlnhEl+bQ2WXKHvWrfdfMAdF3bDd5Dbx3karcKxF3dxajAHQeu/eG/QHf8LYPMyu0izmnuCLHs2uhL6cdjIWAD1vDEQkwoBTSOl9lGHfiU3Al6olqaySgnWW8EQHq8H2JxTswiBYLWZc/9nbDKbmiu/CBUV0uRaaLqe6M7HSAIMaQ8xDobUOTWvW27/lEHoDOl5NbWrzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LtASgMeRQUdCifxgl0zOeGMZ/GNMN5RUEROpIuYC1SI=;
+ b=ttDhO/l3ChbTzsYcPGqCLjpP1Stj7cfeRWDw7NT8ITMjOONJmK6JCcXNKSmnYZJQg63cJ4vT4Losnx09qkXBuiZBlO9crYCTOGEaViRChMmvASQM9HWzWkp41RrLy0oKHoBklr/pMUEmvkeVvqGZ5Zibu4oOjjl88z71q6NIqG37PnYjiUM6Hasi6VhxCqPHmx5hjhaF/7YGuzwERDs6/MpxIPNy3P8p5wUlK00pAFZr3+yQyOZxzdORYCVVYDJ/5Wg86tQNSGEQ4dgsp6Df8EvWgULZduQrkZ/N6Hv+VFrnBr/mYK3GqHQM5BU2hn/Kn6SSKuoxse/k9t9/jpOfNQ==
+Received: from CH0PR03CA0423.namprd03.prod.outlook.com (2603:10b6:610:10e::6)
+ by CH2PR12MB4263.namprd12.prod.outlook.com (2603:10b6:610:a6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.18; Fri, 22 Nov
+ 2024 22:48:42 +0000
+Received: from CH1PEPF0000AD79.namprd04.prod.outlook.com
+ (2603:10b6:610:10e:cafe::a4) by CH0PR03CA0423.outlook.office365.com
+ (2603:10b6:610:10e::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.16 via Frontend
+ Transport; Fri, 22 Nov 2024 22:48:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH1PEPF0000AD79.mail.protection.outlook.com (10.167.244.57) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8182.16 via Frontend Transport; Fri, 22 Nov 2024 22:48:42 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 22 Nov
+ 2024 14:48:31 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 22 Nov
+ 2024 14:48:30 -0800
+Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Fri, 22 Nov
+ 2024 14:48:30 -0800
+From: Asmaa Mnebhi <asmaa@nvidia.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: Asmaa Mnebhi <asmaa@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, David Thompson <davthompson@nvidia.com>
+Subject: [PATCH net v1] mlxbf-gige: Support workaround for MDIO GPIO degradation bug
+Date: Fri, 22 Nov 2024 22:48:27 +0000
+Message-ID: <20241122224829.457786-1-asmaa@nvidia.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,60 +93,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD79:EE_|CH2PR12MB4263:EE_
+X-MS-Office365-Filtering-Correlation-Id: 27253810-e986-4df3-b85b-08dd0b47d06d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?TlVczYtPijN6PqENmtCmA6pTRLYdEzV2azuPe0iQvHJLnsFdZt3ZFnAgwLE7?=
+ =?us-ascii?Q?eX8giqr759WsjCWJKL3spM16ALMkcA/ghEy1WSumdsC+P9vmIFS/l+b2u/Wf?=
+ =?us-ascii?Q?4oSpQAL5a0BI5WFw11TrNa1wOrQVwhgZpdY0ZGcYgJ+vAtMBVNjs4w4qP3e/?=
+ =?us-ascii?Q?K02Zk9Iw4T7byhOFO9s76Bz8U3czotcsbyHsuaQ8U4u2s5R3+U9yUke16RxM?=
+ =?us-ascii?Q?ykiNEbnnvEZQ/7LQrGPs2Wm5arKPncSXn/1KYKJj1uort9xWc7I7lpEWgcaH?=
+ =?us-ascii?Q?APLEL6HE7xJYpL0FxHKS+jyUI/WGpBV6Ki8RblJ/ghUoD/8P1c7rMdsELn3F?=
+ =?us-ascii?Q?ca8HGiQnVPRwcmyjLVlusv9MG9t2XCjK87i/adtukDMiUmFM9KTCHeGvZjOE?=
+ =?us-ascii?Q?9l4hiTxMiy/o2r8mmwTxKXRPSGOCKp1dRfQnJrM5UEuXArgu9cCfig7MEfX/?=
+ =?us-ascii?Q?d86yb48IeQ5UBoCKFrk4mpLZrUeZXckU9mFyXAL5A20OqBw+WHZy297KtOmI?=
+ =?us-ascii?Q?Yg5fIPxJOa2uOv6p5HmhiTphv5zRU5vkqMWFeTwKOoZRsEAkGfIyLeZCqpIv?=
+ =?us-ascii?Q?VwWSSSfiFHJVauxJGJ2+9qqvdVTqHD4bUBER70pIxoX/fm/ltY1Z2+KICrxH?=
+ =?us-ascii?Q?lvukksfXnDm+CsPlGaoNq0CEu4m2FOVwHdPOpsqC8vqYtJrbYHKtaYOFn8TP?=
+ =?us-ascii?Q?h6hTJQNIYBuL0vfIHCLQCJiyTfOTdka6rtauRfZGHo+IMfCaSfp8nk3qd10U?=
+ =?us-ascii?Q?hpoII7XQQ08j8lF3XMhMtmiSr5Vuan3NQNLFuRtDoLPHymXQueSTa0KGUxaR?=
+ =?us-ascii?Q?A8GJaOWshuEYVoMuHtblqqIs8x8qWR8oSJW4G1egArwTZfY1YOeOFZPLsoA9?=
+ =?us-ascii?Q?Zq1BSc2vfQnA8OTSCcfXdGxqlDvoa7DBjeYtGW8C7QRM8dhI//7Scul85dfM?=
+ =?us-ascii?Q?/52Ak+Sx6vdnI/StOndrF/EKKeH8svh10Tw58xj7KsdbPYq5JJSgqP6dRtBb?=
+ =?us-ascii?Q?lHTMMc8zs07x0R40jNqaKcZpkkW+BR4ZHL8lAaqw/T4ckP7eO58yE//sJAAj?=
+ =?us-ascii?Q?GXAshTUE925GzD3tDqqV1kTN8ewefdFSTa/R4MsctJRs1SJ1mFNGS7k8ziK5?=
+ =?us-ascii?Q?cbyj7jZT30TiVXm8FvEsi2yERNR4CLrqfgIqFbkvVNwsiREbyeAdMupH1HY8?=
+ =?us-ascii?Q?DD/InnvF1Q0MnZC53VS4H7cUF+Jvw8NWGiskWXurSxn0kwG/S3+ioNeTlYOJ?=
+ =?us-ascii?Q?Ok4EN+wN3DP2vQbbm+wFlF269oOOnWup4m6c8ZgpuFpuIcztgv8VVtgRrmbt?=
+ =?us-ascii?Q?NpXzhuW4d4hECOf6Q7UzFeGNa7Q7eh/FvXa6UTJZEcxhZe11F+UcS4KN36rh?=
+ =?us-ascii?Q?3x7ROjhtnq/DtDBTOg3Kw3g7hOukSLqD2MF8fWyjLk0b8n6p3/hb6qcsqDY8?=
+ =?us-ascii?Q?9n2Qu2ofCj7aQ6P2bVkjp8LM+GcQd8VQ?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2024 22:48:42.2194
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27253810-e986-4df3-b85b-08dd0b47d06d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD79.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4263
 
-If we go through the PCI shutdown or suspend path, we shutdown the
-NIC but PTP remains registered.  If the kernel continues to run for
-a little bit, the periodic PTP .do_aux_work() function may be called
-and it will read the PHC from the BAR register.  Since the device
-has already been disabled, it will cause a PCIe completion timeout.
-Fix it by calling bnxt_ptp_clear() in the PCI shutdown/suspend
-handlers.  bnxt_ptp_clear() will unregister from PTP and
-.do_aux_work() will be canceled.
+From: asmaa <asmaa@nvidia.com>
 
-In bnxt_resume(), we need to re-initialize PTP.
+Once the BlueField-3 MDIO clock is enabled by software, it is expected
+and intended for it to keep toggling. BlueField-3 has a hardware GPIO bug
+where constant toggling at "high frequencies" will lead to GPIO
+degradation.
 
-Fixes: a521c8a01d26 ("bnxt_en: Move bnxt_ptp_init() from bnxt_open() back to bnxt_init_one()")
-Cc: Richard Cochran <richardcochran@gmail.com>
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+The workaround suggested by the hardware team is to lower down the clock
+frequency. That will increase the "life expectation" of the GPIO.
+The lowest possible frequency we can achieve is 1.09Mhz by setting
+mdio_period = 0xFF.
+
+Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
+Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 9c4b8ea22bf9..57e69c0552ab 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -16245,6 +16245,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
- 	if (netif_running(dev))
- 		dev_close(dev);
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c
+index 654190263535..d6dd36ab599e 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c
+@@ -96,6 +96,7 @@ static struct mlxbf_gige_mdio_gw mlxbf_gige_mdio_gw_t[] = {
+ #define MLXBF_GIGE_MDIO_FREQ_REFERENCE 156250000ULL
+ #define MLXBF_GIGE_MDIO_COREPLL_CONST  16384ULL
+ #define MLXBF_GIGE_MDC_CLK_NS          400
++#define MLXBF_GIGE_BF3_MDIO_PERIOD     0xFF
+ #define MLXBF_GIGE_MDIO_PLL_I1CLK_REG1 0x4
+ #define MLXBF_GIGE_MDIO_PLL_I1CLK_REG2 0x8
+ #define MLXBF_GIGE_MDIO_CORE_F_SHIFT   0
+@@ -178,9 +179,16 @@ static u8 mdio_period_map(struct mlxbf_gige *priv)
+ 	u8 mdio_period;
+ 	u64 i1clk;
  
-+	bnxt_ptp_clear(bp);
- 	bnxt_clear_int_mode(bp);
- 	pci_disable_device(pdev);
- 
-@@ -16272,6 +16273,7 @@ static int bnxt_suspend(struct device *device)
- 		rc = bnxt_close(dev);
- 	}
- 	bnxt_hwrm_func_drv_unrgtr(bp);
-+	bnxt_ptp_clear(bp);
- 	pci_disable_device(bp->pdev);
- 	bnxt_free_ctx_mem(bp, false);
- 	rtnl_unlock();
-@@ -16315,6 +16317,10 @@ static int bnxt_resume(struct device *device)
- 	if (bp->fw_crash_mem)
- 		bnxt_hwrm_crash_dump_mem_cfg(bp);
- 
-+	if (bnxt_ptp_init(bp)) {
-+		kfree(bp->ptp_cfg);
-+		bp->ptp_cfg = NULL;
+-	i1clk = calculate_i1clk(priv);
+-
+-	mdio_period = div_u64((MLXBF_GIGE_MDC_CLK_NS >> 1) * i1clk, 1000000000) - 1;
++	/* The MDIO clock frequency need to be set as low as possible to avoid
++	 * a BF3 hardware GPIO degradation. The lowest frequency can be achieved
++	 * by setting MdioPeriod = 0xFF.
++	 */
++	if (priv->hw_version == MLXBF_GIGE_VERSION_BF3) {
++		mdio_period = MLXBF_GIGE_BF3_MDIO_PERIOD;
++	} else {
++		i1clk = calculate_i1clk(priv);
++		mdio_period = div_u64((MLXBF_GIGE_MDC_CLK_NS >> 1) * i1clk, 1000000000) - 1;
 +	}
- 	bnxt_get_wol_settings(bp);
- 	if (netif_running(dev)) {
- 		rc = bnxt_open(dev);
+ 
+ 	return mdio_period;
+ }
 -- 
-2.30.1
+2.47.0
 
 
