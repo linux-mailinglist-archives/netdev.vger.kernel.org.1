@@ -1,211 +1,136 @@
-Return-Path: <netdev+bounces-146795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB749D5E52
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:43:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F8F99D5E60
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92BF2825EA
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 11:43:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C0491F22682
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 11:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242331DE8B3;
-	Fri, 22 Nov 2024 11:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2FDC1CB329;
+	Fri, 22 Nov 2024 11:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="PP3qrNcO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cvVZKeYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325371AB535;
-	Fri, 22 Nov 2024 11:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A3E1ABEB0;
+	Fri, 22 Nov 2024 11:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732275806; cv=none; b=Dxoca8psruYuQmLTu8gZ1q7WQz0HLu7Pig0IJVnD3mn0P4JMoxpZ/ccwntdVBHcSzHIjyJUqqw/GDSdxIY1UlPDQwGJiYDVmCfQ3fNBV188I+zPixoM3bRrGaUZ0DYMHlPuH7QkTiBrO8TI8XB6/u4HeuFwWjFph0oUmbXKxG3k=
+	t=1732276247; cv=none; b=aapCJ/f8kaAMzVKaEldvUvpadzBx5xaPwnvz1Im+01o/bowE6S0dy8jLMC/wWfCgrS755+JavDJZniz54VqsQ4zWgqGi2IdsKKPa2ohv2J0OK/CYa19bQezFWWVpi6U6pi2zdyMuqHhOVHWG1OsMKboA6hYkvKWwK0B0H2FHDxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732275806; c=relaxed/simple;
-	bh=vLEMZZRV6Tb/GSrZfvxdj8fXkAKkDZRU/uiNN4sVXnw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=nhc95oLQcFu769hZUxah7KpmDPaEsOWyG0FhHmCo1bYwB3Wh4L708owiC+xrPiGSa8RIzc3nNVQ5IWJ0Q0m2/AiaRu6z4eP7q+d6NZ4MRN1cGlcwmViz0RBwQVm0uSVMnnv7bQC2eCnnWIMelh2lZZEHH8gSSRvupOPYFGPoOCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=PP3qrNcO; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id 0F9E28106A;
-	Fri, 22 Nov 2024 13:43:21 +0200 (EET)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Fri, 22 Nov 2024 13:43:20 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 29C52302A21;
-	Fri, 22 Nov 2024 13:43:08 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1732275790; bh=vLEMZZRV6Tb/GSrZfvxdj8fXkAKkDZRU/uiNN4sVXnw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=PP3qrNcOkyDUcGvZn+zKDbEho8Gtjcv16SQIk2tpMRqH1FEMVi78J/uU/OJnfxRIf
-	 4atHzQYHf8CA6Tr2qPV0U5W3dWvRvcZzFvj0a81kb+Rrr7VOD2FaKt/wu7UwUfFrVN
-	 5MbQBOSv4xwK7ZKalc9/3QHQjDhsBrHxYWPGWQW4=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4AMBh5tV027561;
-	Fri, 22 Nov 2024 13:43:05 +0200
-Date: Fri, 22 Nov 2024 13:43:05 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Jinghao Jia <jinghao7@illinois.edu>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-        netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>, Ruowen Qin <ruqin@redhat.com>
-Subject: Re: [PATCH v2 net] ipvs: fix UB due to uninitialized stack access
- in ip_vs_protocol_init()
-In-Reply-To: <20241122045257.27452-1-jinghao7@illinois.edu>
-Message-ID: <c65f0110-f5bf-c841-710e-2932cceec25a@ssi.bg>
-References: <20241122045257.27452-1-jinghao7@illinois.edu>
+	s=arc-20240116; t=1732276247; c=relaxed/simple;
+	bh=FeraCYzH8lC4L4m2qc0ZBAPWUcPF7/P8lzNtAcBkKkw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=UCe6dVqwXM5Ey1lhMb+XnB1KCbnJf0u6jkL8RXhzKZ6p5GEb6XvHx2gWWUco4JtMeTfbnCwC3z7HeHfpFlqmtxrZMTb1m/bwQ/VyKXt9qQrhTxDkgum5FnqtnAHM7TkJREPnOe7YjqjzlRZWIq7eQggC9xAqWOIpHvdg/OtscPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cvVZKeYt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1594AC4CECE;
+	Fri, 22 Nov 2024 11:50:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732276247;
+	bh=FeraCYzH8lC4L4m2qc0ZBAPWUcPF7/P8lzNtAcBkKkw=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=cvVZKeYtqowKKuc9HKirpk0KrdFKpfKQ4jl7xmWDjoOrsGdCm9uQUNwLftzEsIqbp
+	 UFmI2cikiopJeR8doLplR779jR8k1XqR/7tNIKItKfMgh0f0tfYPb8cQLvcACPSluA
+	 fGF/jVBgdp4QAC1n1zX2mJS2EUvwtG8Mh1JSj7CZuoq53UST0QmByKIRdlYpw9FjVa
+	 /vCoYIe86Xl0sYTXHHxOl/cjc4Xn61v8j3BuVGs6aw3UkoN/RSj1weqJNsYNsxFw//
+	 2sIlNW+Uokp9+mZQusDhwkwk6dJp2jq86ncuExRerDUh0CNs+hjSynojpnxumqbHBD
+	 Bd8h6EWTmd1fA==
+Message-ID: <27e36417-9c22-476b-a9be-f22deeb0d774@kernel.org>
+Date: Fri, 22 Nov 2024 12:50:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: Data race in net/mptcp/pm_netlink.c
+Content-Language: en-GB
+To: clingfei <clf700383@gmail.com>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <CADPKJ-7==Bo=Wu6cHQ_y2qQVsPoJGeP3x0GztMXYcDaKCfmrkQ@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CADPKJ-7==Bo=Wu6cHQ_y2qQVsPoJGeP3x0GztMXYcDaKCfmrkQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hello,
 
-	Hello,
+On 22/11/2024 08:34, clingfei wrote:
+> linux-next weekly scan reports that there might be data race in
+> net/mptcp/pm_netlink.c, when mptcp_pm_nl_flush_addrs_doit
+> bitmap_zeroing pernet->id_bit_map at line 1748, there might be a
+> concurrent read at line 1864.
+> Should we add a lock to protect pernet->id_bit_map?
 
-On Thu, 21 Nov 2024, Jinghao Jia wrote:
+I don't think there is an issue here: if the flush is being done in
+parallel to an in progress dump (max 255 addresses), I don't know what
+the userspace can really expect. What's important is not to access freed
+data, which should be prevented by the 'rcu_read_lock()'.
 
-> Under certain kernel configurations when building with Clang/LLVM, the
-> compiler does not generate a return or jump as the terminator
-> instruction for ip_vs_protocol_init(), triggering the following objtool
-> warning during build time:
-> 
->   vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
-> 
-> At runtime, this either causes an oops when trying to load the ipvs
-> module or a boot-time panic if ipvs is built-in. This same issue has
-> been reported by the Intel kernel test robot previously.
-> 
-> Digging deeper into both LLVM and the kernel code reveals this to be a
-> undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
-> of 64 chars to store the registered protocol names and leaves it
-> uninitialized after definition. The function calls strnlen() when
-> concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
-> strnlen() performs an extra step to check whether the last byte of the
-> input char buffer is a null character (commit 3009f891bb9f ("fortify:
-> Allow strlen() and strnlen() to pass compile-time known lengths")).
-> This, together with possibly other configurations, cause the following
-> IR to be generated:
-> 
->   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
->     %1 = alloca [64 x i8], align 16
->     ...
-> 
->   14:                                               ; preds = %11
->     %15 = getelementptr inbounds i8, ptr %1, i64 63
->     %16 = load i8, ptr %15, align 1
->     %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
->     %18 = icmp eq i8 %16, 0
->     %19 = select i1 %17, i1 %18, i1 false
->     br i1 %19, label %20, label %23
-> 
->   20:                                               ; preds = %14
->     %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
->     ...
-> 
->   23:                                               ; preds = %14, %11, %20
->     %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
->     ...
->   }
-> 
-> The above code calculates the address of the last char in the buffer
-> (value %15) and then loads from it (value %16). Because the buffer is
-> never initialized, the LLVM GVN pass marks value %16 as undefined:
-> 
->   %13 = getelementptr inbounds i8, ptr %1, i64 63
->   br i1 undef, label %14, label %17
-> 
-> This gives later passes (SCCP, in particular) more DCE opportunities by
-> propagating the undef value further, and eventually removes everything
-> after the load on the uninitialized stack location:
-> 
->   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
->     %1 = alloca [64 x i8], align 16
->     ...
-> 
->   12:                                               ; preds = %11
->     %13 = getelementptr inbounds i8, ptr %1, i64 63
->     unreachable
->   }
-> 
-> In this way, the generated native code will just fall through to the
-> next function, as LLVM does not generate any code for the unreachable IR
-> instruction and leaves the function without a terminator.
-> 
-> Zero the on-stack buffer to avoid this possible UB.
-> 
-> Changelog:
-> ---
+So it looks like no lock or id_bitmap duplication is needed here. Even
+if there was a need for a certain consistency there, these 2 operations
+should not happen in parallel, because the MPTCP generic NL family
+doesn't have ".parallel_ops = true".
 
-	You can not add --- before the following headers.
-'git am file.patch' can show the result of applying the patch.
+So I think this report is a false positive, no?
 
-> v1 -> v2:
-> v1: https://lore.kernel.org/lkml/20241111065105.82431-1-jinghao7@illinois.edu/
-> * Fix small error in commit message
-> * Address Julian's feedback:
->   * Make this patch target the net tree rather than net-next
->   * Add a "Fixes" tag for the initial git commit
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
-> Co-developed-by: Ruowen Qin <ruqin@redhat.com>
-> Signed-off-by: Ruowen Qin <ruqin@redhat.com>
-> Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
-> ---
-
-	Please send v3, you can move your changelog here,
-after the above ---
-
->  net/netfilter/ipvs/ip_vs_proto.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
-> index f100da4ba3bc..a9fd1d3fc2cb 100644
-> --- a/net/netfilter/ipvs/ip_vs_proto.c
-> +++ b/net/netfilter/ipvs/ip_vs_proto.c
-> @@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
->  
->  int __init ip_vs_protocol_init(void)
->  {
-> -	char protocols[64];
-> +	char protocols[64] = { 0 };
->  #define REGISTER_PROTOCOL(p)			\
->  	do {					\
->  		register_ip_vs_protocol(p);	\
-> @@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
->  		strcat(protocols, (p)->name);	\
->  	} while (0)
->  
-> -	protocols[0] = '\0';
-> -	protocols[2] = '\0';
->  #ifdef CONFIG_IP_VS_PROTO_TCP
->  	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
->  #endif
-> -- 
-> 2.47.0
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
