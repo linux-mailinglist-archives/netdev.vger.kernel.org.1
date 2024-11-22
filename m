@@ -1,122 +1,137 @@
-Return-Path: <netdev+bounces-146861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530F49D656F
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:43:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8C59D658D
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:10:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B282BB22093
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 21:42:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 715392821C8
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455B818733B;
-	Fri, 22 Nov 2024 21:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0142A18C01B;
+	Fri, 22 Nov 2024 22:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i34aEf0i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OCf6HTb3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C32249E5;
-	Fri, 22 Nov 2024 21:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE99176ADB
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 22:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732311773; cv=none; b=LFWj2t8tZfaJwI84YnQO71hpj0rLqLShUhAWCbKi/OJEpMkqjzaiSMVovR36HaqVrqbx1bEkF/OI/gghJOWSqYUrE6w0ipkjrM37wDCqah6Ytr31ISQznifK/kZNAQYj9anJjoXXuXyO/rgNq1G1I6/ZI1OJ6RBX55eYcCpeGgw=
+	t=1732313443; cv=none; b=bFOLKL19b3M7sGlou3DtaVi3YKm33jb0QA+IzSNCOXGmvhROaUbCfrQxd7Ps6NfGdAtNMzFs7Vze3r0iFvwNsq9eP9ruXRVSSL5/WjtGNNSoL+9AgMdL5tLa5vvP9OariP/XGKPg3KDGh791EF/8J9YF4yBjG8+P+XSMsLcS2Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732311773; c=relaxed/simple;
-	bh=VaLYmEpXCswJ+tfNQNgAdXhQYI5DC7J682/Jc0Tbya8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5ykQ7ACYIYy8e0j+zE+l4EEttjh3cmy1zglpT+oJRq8g4mpXsk6DQ9eEr2LYvUJEzJjxa4knCwqjGDGndb8lxIGHbZxH/XHPZTUr0AHb2UgfWkYGvz/9ol4iiMX3PICZvv2/AydFrZkrHjV5XIj1mR6Ez58OOi7zbtDoOurfMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i34aEf0i; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ee7e87f6e4so2249336a12.2;
-        Fri, 22 Nov 2024 13:42:51 -0800 (PST)
+	s=arc-20240116; t=1732313443; c=relaxed/simple;
+	bh=JZZeaLOPwWolDY9YeQvGEW4vFzp1CUFGGaoHcATQS+s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FqDf0aJUEnP3UxFPPCRssjgXs36sR84DyrI7ScqhUpa7IHiOkOkov7ya3mJQPg5/CfusGcBMmrPmIiUzfPOFwG5Xpy9jMopPB9fgXHuqs2Up50D+J/Nq+J2DKvctthwbNFOaKOWxMWkupqytQNH+2x9pDsvPcyqJDWxWSf7BKnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OCf6HTb3; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4315a8cff85so5455e9.0
+        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:10:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732311771; x=1732916571; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dVXpF38JqcLyXbRWoQHlti7bjH/SZY1G/SV6qnKaZtA=;
-        b=i34aEf0i0WF0FaJvy6Fa8BAYVbCajZnyQNGTkJWbRbWsZ9xeUc4M2wAWALQeDQ74mZ
-         cbgSiuFmiqcvJnW5NSVo4kBzH49m/mx2Fe7zOHLpE1XEhjsRpxAArjv0rXByql348ju8
-         iooLp9vcvQt+1Svw9fRH5pjyZOyyhQWr67LKahB9EWdGHtLLh+Zt191WxCA45SStFHK9
-         G7i4y7p+0SYwo00tY5cipizlPzKoCDsiZJxq/Sgj7+A4jeV/YnNB3Rm4/e/ku8KvBxrX
-         nH04t4gnE2CE68qMzUNXOhpV0M0RtTS6YnZA9lD9xU3cMjA9ezxPbQU5f8xBMCwYEKVc
-         UG/g==
+        d=google.com; s=20230601; t=1732313439; x=1732918239; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JZZeaLOPwWolDY9YeQvGEW4vFzp1CUFGGaoHcATQS+s=;
+        b=OCf6HTb3BlfUZchsEjgfCt3k9KyLwDX2+0yD6JyNh7B/LGOkIGiSiKRf1vsemgxz5Q
+         ei/h3sIj7oDb5fxj5j9X4jmTPJDUwnjUtCOii6eIZl1YZWOCjrqJ7xqqehcEwlYFJ5Qj
+         4mCfcY/PbAeXJhELvz940ycZLqq0OZ851hY5QBua8ABy/5tmds2uUyPnMuRsAv9Ickhx
+         Bd72xZodUOgk1Fp+Hu1x/XIFGusqxYXqBznCSDGg7yU2NkOxde5bQrTSCJzAsRsUDbPL
+         GPubEQIQhu3OkrkrQ52FpUTqfTsiQFdMm0U7IHxJLOYps1cUUizCCD/xehkDIj2iY+k8
+         PjvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732311771; x=1732916571;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dVXpF38JqcLyXbRWoQHlti7bjH/SZY1G/SV6qnKaZtA=;
-        b=mwtfJiAjRobs4OTjx/21G5EEcYWCbfGi6WmU+htf2mqnKENRmbr0TrAQ00lOtIo2B3
-         ge6722cELZK/Br8y0I6xiJG2vNt9VQJmJqnISaU6bVLopuPGOcJ8hVtm9/zYK81J6QA3
-         Ksfp4IZRuzpUUhTkiFGJKw8TdO992LFEPtAL84ONwq+foIA1EcSsL6kDHay4wIBgWDe3
-         yY1QL7fANWx96+FxK8AO+KoLYGCSSh1Hfim6ASmkt53sphuO1T9MKLy61+mA6BdQflyv
-         Pmxtt4gAQinplLZ+ENSUB/9iJ+H2JRdmjkcApUWW3AkwTBVOo5oLAXqywCvEEbwLW+mi
-         e7ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2Ol1lsEuSxQ8y7FPPJIPG1AdswwBEXltCLACNqOtwe6LlGg0ClfAGXC6l8eRqVszNuF0a9ltHVPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy5mKTSBBt1w7WV6ogWMAlAktztWYrJWxIfudrFiKRN4MH88+3
-	boiiN48zBS2M8AyLV+LEOZLJuqBLG+18M7bO8LQ2KrqgVhyMeALsNAYZ8Q==
-X-Gm-Gg: ASbGncsSWg4hTXNWrjhrl3wlnRVQ40op4KbN2HY2K0eWTKAc8P1ClWsqFZVMKBUWZu0
-	gBKtF6kH01nFtChtBzgj+I9H3qj29B8Rd5i1/EQ8z+VKbMJMfQ9EEybfcOcOnGwIuSiKzs6Sg59
-	r7Q5Eg1CHM9cFLq3voryMRW13IOFI+R0gjnn/5gygI82ClmuNMLxf+TJMergqeKN9BkT4PaEaYx
-	9jnU3fficJDZ7XMNOXuMmW9VW4zAavBS74jKngP2VyUeJaChv7BnsIr
-X-Google-Smtp-Source: AGHT+IHkNDho4rEQiyLyhahL7QPmYF8xplygAcqlvjAumGRvqCza/cbWnLN4h3DaSDZYnoqzIClbaQ==
-X-Received: by 2002:a05:6a21:790:b0:1db:f0e0:cfd with SMTP id adf61e73a8af0-1e09e5fecd0mr5015368637.44.1732311770947;
-        Fri, 22 Nov 2024 13:42:50 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:5940:b3b4:d5bc:a0b7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcc1e5ceesm1843342a12.33.2024.11.22.13.42.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 13:42:50 -0800 (PST)
-Date: Fri, 22 Nov 2024 13:42:49 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: [PATCH net-next v2 00/12] Begin upstreaming Homa transport
- protocol
-Message-ID: <Z0D62cS7DgkHYEDr@pop-os.localdomain>
-References: <20241111234006.5942-1-ouster@cs.stanford.edu>
- <ZzTcx8nmEKIJpaCR@pop-os.localdomain>
- <CAGXJAmyGTwjFo6fGoROY=hQFXbR5RdpmpkEc9Zm6DOoD2nbwNA@mail.gmail.com>
- <CAGXJAmwr5u7Don-nKivvTuj6C9pGT2A5cAXvhKo6sAm_hHy72A@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1732313439; x=1732918239;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JZZeaLOPwWolDY9YeQvGEW4vFzp1CUFGGaoHcATQS+s=;
+        b=G/GNK9w5uEHxpD5Mbtue6ggfeV7Lhv4V3XMYd2K91uyt4yyR3zd2DyJ87CchYEj6gH
+         VLjK/H8p7XzQ00A1j43uRE9DsMrifFT4KVbKvwa5M+Ak76yt1FvOfLDsYGDhTFIknbkF
+         Q/5wXAj1MiAclB8Y1aoYU4OcXLXa7ZiJazGRXmR43oiCl2VfyU3lj27hLQwzNjelxQAV
+         JCV1EtkDHcG1xfoBWcp3wfYHcYml8XJdBLvuR3xguqhaIkm1b9SQ6PoynPapOH005gFV
+         UBdmZtQdt3mDiaXHbcQ7SX311VDb1Hy9PqdLE3jgleXuol4wKrk0DHbq1nHwfjzbILgm
+         rIew==
+X-Forwarded-Encrypted: i=1; AJvYcCV9+R+UQtfoj7nysChgcLqZUgV1FxBi2OnqeNFM1H8AOwep4Preex+pKn3Ic1TXqnXxkS1As5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHV23btJgsP4JbYnGKnoebToiRzfrhbxo0G+9p9KOHLkmylkdZ
+	Otzo81FKOScvoXB22ZK+DCXHKeTcvZZpUGWd8zgQntWqYRqV9Oedh5K/mllD+srpTvpfhbxIiOb
+	nF1kI11bcazU2iXVdV/y5VJY2I+by8C9QRr5m
+X-Gm-Gg: ASbGnctx4rCMx1IjblCKrqc1Wio7QbiTCoM1kxE2ttRNKrf2u6wCB0fi4cCJ8XlLxj/
+	z6yjF4kQw98C1yaSnbR2uY8ofnZe+LSpBqtGFaTEsqjcymkPLbMeTxN5P3GvRYVz7
+X-Google-Smtp-Source: AGHT+IHn2hbKjIPF1ezTNxBktlxUIPal4HpKW8bNKzDZRuGjbsJ5nlIo3O6z2oBBfRs1YAwI2NOCc3Pjz55YD+M7Nrw=
+X-Received: by 2002:a05:600c:3550:b0:431:416b:9ecf with SMTP id
+ 5b1f17b1804b1-4348be050b3mr350525e9.6.1732313439462; Fri, 22 Nov 2024
+ 14:10:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGXJAmwr5u7Don-nKivvTuj6C9pGT2A5cAXvhKo6sAm_hHy72A@mail.gmail.com>
+References: <20241107212309.3097362-1-almasrymina@google.com>
+ <20241107212309.3097362-5-almasrymina@google.com> <20241108141812.GL35848@ziepe.ca>
+ <CAHS8izOVs+Tz2nFHMfiQ7=+hk6jKg46epO2f6Whfn07fNFOSRw@mail.gmail.com> <20241115015912.GA559636@ziepe.ca>
+In-Reply-To: <20241115015912.GA559636@ziepe.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Fri, 22 Nov 2024 14:10:28 -0800
+Message-ID: <CAAywjhRb0Lb9fJocWBU1r01521sy71hLOaH=92gqceXqUOGHJg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
+ dmabuf memory provider
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 19, 2024 at 01:13:36PM -0800, John Ousterhout wrote:
-> On Thu, Nov 14, 2024 at 8:59 AM John Ousterhout <ouster@cs.stanford.edu> wrote:
-> >
-> > On Wed, Nov 13, 2024 at 9:08 AM Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> >
-> > > 2. Please consider adding socket diagnostics, see net/ipv4/inet_diag.c.
-> >
-> > I wasn't familiar with them before your email; I'll take a look.
-> 
-> I have taken a look at socket diagnostics, and I agree that Homa
-> should support them. However, this looks like a nontrivial task: there
-> appears to be a fair amount of complexity there, not much
-> documentation, and the current diagnostics appear pretty TCP-specific
-> so it may take some work (and advice) to figure out how to map them
-> onto Homa. Thus it feels like it will take a fair amount of
-> back-and-forth to get this right. I would prefer to defer this until
-> after the main body of Homa has been upstreamed, then have a patch
-> series that is dedicated to socket diagnostics support, rather than
-> lumping socket diagnostics into the current patch series. Is that OK
-> with you?
-> 
+On Thu, Nov 14, 2024 at 5:59=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrot=
+e:
+>
+> On Fri, Nov 08, 2024 at 11:01:21AM -0800, Mina Almasry wrote:
+>
+> > > If you do this you may want to block accepting dmabufs that have CPU
+> > > pages inside them.
 
-Sure, I don't think it is a blocker here, it is just a nice feature to
-promote Homa.
+I believe we should be following the dmabuf API for this purpose, if
+we really want to sync for CPU in. page_pool, and should not assume
+the behaviour of the backing memory.
 
-Thanks.
+The dmabuf exporters are supposed to implement the begin_cpu_access
+(optional) and the sync for cpu is done based on the exporter
+implementation.
+
+For example udmabuf implementation calls `dma_sync_sg_for_cpu` on the
+underlying pages.
+
+I think following dmabuf APIs can be used to ensure the backing memory
+is synced:
+
+Before cpu access to sync for cpu
+`dma_buf_begin_cpu_access`
+
+After cpu access to be synced for device
+`dma_buf_end_cpu_access`
+
+Sami
+> > >
+> >
+> > How do I check if the dmabuf has CPU pages inside of it? The only way
+> > I can think to do that is to sg_page a scatterlist entry, then
+> > !is_zone_device_page() the page. Or something like that, but I thought
+> > calling sg_page() on the dmabuf scatterlist was banned now.
+>
+> I don't know. Many dmabuf scenarios abuse scatter list and the CPU
+> list is invalid, so you can't reference sg_page().
+>
+> I think you'd need to discuss with the dmabuf maintainers.
+>
+> Jason
 
