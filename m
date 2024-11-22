@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-146875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E759D6639
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 00:10:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1A09D6644
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 00:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D1D5281425
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:10:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ED34B21ECB
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4994F18BC15;
-	Fri, 22 Nov 2024 23:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B79218870D;
+	Fri, 22 Nov 2024 23:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u9S0ygg/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="McinA9/2"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A08C189BBA;
-	Fri, 22 Nov 2024 23:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306AE175A5;
+	Fri, 22 Nov 2024 23:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732317019; cv=none; b=a1uls37+tTJxAtLDOACQ9bF15BphH90xZZIYH4dFS0QSh9ZwQQhNrUnXHjHp2BABl14hH0O8V5e+PURGmYrmz9swncz1y8nBwjZ3rAu2D5H/9D0tRsgsbtYI+il07zXU4DSM+1WTXm8MdU8NWuAfecQu+S71jhuqsHH/CdQDteI=
+	t=1732317429; cv=none; b=Dv9MbXAy19kHsOWQF7NAVse//na9fJCulyjmaMsZAU0jOLu8o70qubWx6P27t3O/Uvn8w8DER3kxIpRp3Hxj1W3WlNDOaazPhl/tHYb83FZnrUzASEQgsWKXTtY82VoTfOMODiyQtqpi1KL8dA88SS4mUjvn1t/bNvFeKgPB3E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732317019; c=relaxed/simple;
-	bh=KtRj3iNPDh03ln2nGA49Y6qq97KDf9A+3sK2WgArvrM=;
+	s=arc-20240116; t=1732317429; c=relaxed/simple;
+	bh=BSDXvpM0OViZ45YebW7utZOtdqX/Jzc7J1aMkgoCg/k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0GA03K8ndlXySsaMT8lBv9CLzLWokhoTyhMHG9NwNp1/yAkZH0QjwQ4/uIDel35Z4DuyOdsNdhQ5o8/oeRVcSqEXEAbp1AncLUTIpTr49NSMKtK+Km2FJATQALISBFWTiqs+bmwhJf11SWV9FWi4Y6kdBSGeOtongHMZe9U01Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u9S0ygg/; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=X+ObIst+5yVQ2mbgvqYQUzvQiU47ypoUDWpUEiSvXWV6cf78iEejwyWAOgfKQIbyFdRzyLBZ237IxgVCXfEQ/ETwcRz37qsndyzyz19/GAQajpUvhoOwkXMyeBYggRF5oYkjFLuph5VWGT5e80LYnBU2sHj6c1uyM1GGefg85JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=McinA9/2; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Uaxnd6v9igUqbrx4Ej/11lAA/asleA0Szqf9DF1phjw=; b=u9S0ygg/rW248vMf2n/wb6588/
-	wwTcQPkKmZYUvQPBNQMsZn8wiyv5K97gDfjSwKTVfQ/wWwwoCANghk6U9rcM/4jjINQX3gpKuzIXz
-	KU6pK2lvyMOZSFwsO0Ukc6jxCdralL3qrvSLunz4Y21+R3SM/YXZw3U8VmwmZehhzzbI=;
+	bh=nVftyJRl9ThyaLfNbVhV+F9OcRw1IwA/3BuCbESWyuw=; b=McinA9/2SWzu9g32K35EX2PS80
+	sSgG5iJZP1SIJf3e38V1KIdlxxvZlMWjSn7bNX5A5qZnIdc7M8FZN/+HFwhPvyxYu1E04uDhtnziG
+	J8IRCKXyRCL2W9buAj9jkeGXcxM+2cyS/dGw9vCel37kKSvUziy5UZTTPbneEeaefgRw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tEcmw-00EAtm-Lu; Sat, 23 Nov 2024 00:10:10 +0100
-Date: Sat, 23 Nov 2024 00:10:10 +0100
+	id 1tEctW-00EAwA-CT; Sat, 23 Nov 2024 00:16:58 +0100
+Date: Sat, 23 Nov 2024 00:16:58 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Frank Sae <Frank.Sae@motor-comm.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, xiaogang.fan@motor-comm.com,
 	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-Subject: Re: [PATCH net-next v2 15/21] motorcomm:yt6801: Implement pci_driver
- suspend and resume
-Message-ID: <05af1645-9355-4d1d-9aa2-fd5e42e8fad4@lunn.ch>
+Subject: Re: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the
+ fxgmac_start function
+Message-ID: <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
 References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
- <20241120105625.22508-16-Frank.Sae@motor-comm.com>
+ <20241120105625.22508-6-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,45 +62,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241120105625.22508-16-Frank.Sae@motor-comm.com>
+In-Reply-To: <20241120105625.22508-6-Frank.Sae@motor-comm.com>
 
-> +static int fxgmac_pre_powerdown(struct fxgmac_pdata *pdata)
+> +static  void fxgmac_phylink_handler(struct net_device *ndev)
 > +{
-> +	u32 val = 0;
+> +	struct fxgmac_pdata *pdata = netdev_priv(ndev);
+> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
+> +
+> +	pdata->phy_link = pdata->phydev->link;
+> +	pdata->phy_speed = pdata->phydev->speed;
+> +	pdata->phy_duplex = pdata->phydev->duplex;
+> +
+> +	yt_dbg(pdata, "EPHY_CTRL:%x, link:%d, speed:%d,  duplex:%x.\n",
+> +	       rd32_mem(pdata, EPHY_CTRL), pdata->phy_link, pdata->phy_speed,
+> +	       pdata->phy_duplex);
+> +
+> +	if (pdata->phy_link) {
+> +		hw_ops->config_mac_speed(pdata);
+> +		hw_ops->enable_rx(pdata);
+> +		hw_ops->enable_tx(pdata);
+> +		netif_carrier_on(pdata->netdev);
+
+phylib controls the carrier, not the MAC driver.
+
+> +static int fxgmac_phy_connect(struct fxgmac_pdata *pdata)
+> +{
+> +	struct phy_device *phydev = pdata->phydev;
 > +	int ret;
 > +
-> +	fxgmac_disable_rx(pdata);
-> +
-> +	yt_dbg(pdata, "%s, phy and mac status update\n", __func__);
-> +
-> +	if (device_may_wakeup(pdata->dev)) {
-> +		val = rd32_mem(pdata, EPHY_CTRL);
-> +		if (val & EPHY_CTRL_STA_LINKUP) {
-> +			ret = phy_speed_down(pdata->phydev, true);
-> +			if (ret < 0) {
-> +				yt_err(pdata, "%s, phy_speed_down err:%d\n", __func__, ret);
-> +				return ret;
-> +			}
-> +
-> +			ret = phy_read_status(pdata->phydev);
-> +			if (ret < 0) {
-> +				yt_err(pdata, "%s, phy_read_status err:%d\n",
-> +				       __func__, ret);
-> +				return ret;
-> +			}
-> +
-> +			pdata->phy_speed = pdata->phydev->speed;
-> +			pdata->phy_duplex = pdata->phydev->duplex;
-> +			yt_dbg(pdata, "%s, speed :%d, duplex :%d\n", __func__,
-> +			       pdata->phy_speed, pdata->phy_duplex);
-> +
-> +			fxgmac_config_mac_speed(pdata);
+> +	ret = phy_connect_direct(pdata->netdev, phydev, fxgmac_phylink_handler,
+> +				 PHY_INTERFACE_MODE_RGMII);
 
-phy_speed_down() will trigger an autoneg cycle. Once the link has
-established the adjust_link callback will be called telling you the
-new speed and duplex. The only time you can safely access
-phydev->speed and phydev->duplex is during that callback. At other
-times the values can be inconsistent.
+RGMII is unusual, you normally want RGMII_ID. Where are the 2ns delays
+added?
+
+> +int fxgmac_phy_irq_enable(struct fxgmac_pdata *pdata, bool clear_phy_interrupt)
+> +{
+> +	struct phy_device *phydev = pdata->phydev;
+> +
+> +	if (clear_phy_interrupt &&
+> +	    phy_read(phydev, PHY_INT_STATUS) < 0)
+> +		return -ETIMEDOUT;
+> +
+> +	return phy_modify(phydev, PHY_INT_MASK,
+> +				     PHY_INT_MASK_LINK_UP |
+> +					     PHY_INT_MASK_LINK_DOWN,
+> +				     PHY_INT_MASK_LINK_UP |
+> +					     PHY_INT_MASK_LINK_DOWN);
+
+The PHY driver is in charge of PHY interrupts.
+
+> +int fxgmac_start(struct fxgmac_pdata *pdata)
+> +{
+> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
+> +	u32 val;
+> +	int ret;
+> +
+> +	if (pdata->dev_state != FXGMAC_DEV_OPEN &&
+> +	    pdata->dev_state != FXGMAC_DEV_STOP &&
+> +	    pdata->dev_state != FXGMAC_DEV_RESUME) {
+> +		yt_dbg(pdata, " dev_state err:%x\n", pdata->dev_state);
+> +		return 0;
+> +	}
+> +
+> +	if (pdata->dev_state != FXGMAC_DEV_STOP) {
+> +		hw_ops->reset_phy(pdata);
+> +		hw_ops->release_phy(pdata);
+> +		yt_dbg(pdata, "reset phy.\n");
+> +	}
+> +
+> +	if (pdata->dev_state == FXGMAC_DEV_OPEN) {
+> +		ret = fxgmac_phy_connect(pdata);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		yt_dbg(pdata, "fxgmac_phy_connect.\n");
+> +	}
+> +
+> +	phy_init_hw(pdata->phydev);
+> +	phy_resume(pdata->phydev);
+
+The MAC should not be doing this.
+
+> +
+> +	hw_ops->pcie_init(pdata);
+> +	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate)) {
+> +		yt_err(pdata,
+> +		       "fxgmac powerstate is %lu when config power up.\n",
+> +		       pdata->powerstate);
+> +	}
+> +
+> +	hw_ops->config_power_up(pdata);
+> +	hw_ops->dismiss_all_int(pdata);
+> +	ret = hw_ops->init(pdata);
+> +	if (ret < 0) {
+> +		yt_err(pdata, "fxgmac hw init error.\n");
+> +		return ret;
+> +	}
+> +
+> +	fxgmac_napi_enable(pdata);
+> +	ret = fxgmac_request_irqs(pdata);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Config interrupt to level signal */
+> +	val = rd32_mac(pdata, DMA_MR);
+> +	fxgmac_set_bits(&val, DMA_MR_INTM_POS, DMA_MR_INTM_LEN, 2);
+> +	fxgmac_set_bits(&val, DMA_MR_QUREAD_POS, DMA_MR_QUREAD_LEN, 1);
+> +	wr32_mac(pdata, val, DMA_MR);
+> +
+> +	hw_ops->enable_mgm_irq(pdata);
+> +	hw_ops->set_interrupt_moderation(pdata);
+> +
+> +	if (pdata->per_channel_irq) {
+> +		fxgmac_enable_msix_irqs(pdata);
+> +		ret = fxgmac_phy_irq_enable(pdata, true);
+> +		if (ret < 0)
+> +			goto dis_napi;
+> +	}
+> +
+> +	fxgmac_enable_rx_tx_ints(pdata);
+> +	phy_speed_up(pdata->phydev);
+> +	genphy_soft_reset(pdata->phydev);
+
+More things the MAC driver should not be doing.
 
 	Andrew
 
