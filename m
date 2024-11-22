@@ -1,76 +1,86 @@
-Return-Path: <netdev+bounces-146759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91BD39D58F9
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 05:54:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 123D59D5990
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:49:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 220931F23AA1
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 04:54:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77FB9B2172B
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 06:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB2A1527A7;
-	Fri, 22 Nov 2024 04:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB04D1632E1;
+	Fri, 22 Nov 2024 06:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b="a3v2yKpV"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="mw0DN9Yn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00007101.pphosted.com (mx0b-00007101.pphosted.com [148.163.139.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9552309A3;
-	Fri, 22 Nov 2024 04:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB3013A268
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 06:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732251243; cv=none; b=mpAwPVqavjmXrN+Vw7vg/62ZNixvq47GN2HiJzuIk9eSG6TCADVXAVvYe929u6+eWqYq17DFHSkAKmGqs4UP/qh39fK/f27faEH8HewBOMB0iWfbU02iKPbEN0SGLAlKU8mW6rauMg9+2D3eQsTE+Qir/W2QUr1pB55C4qpa+9I=
+	t=1732258181; cv=none; b=ozQsVO+9u22X5TmUoHrazH3H5HSS6KJEaQEpSUxNEHsih6NPPM8Z691GOkjhZM15hEuqk80FR2YOfYaq6g9DWcCDuLBMff5YHI7ijNOEednVfVmRjYhOtyWlaCoJu9y0djgMIP89bimDPOqgPufDQSTpcEW6nTojQxp8eROJz4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732251243; c=relaxed/simple;
-	bh=GMaHCGleSOQxiJxTHlVL9PaaVm7nxmdgWbSaE90XeM4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FJq7Bt8kX9fXrv40uuE76Rg3yfa1+2xrgUN66bQ/gEto4YbN7qBjPWp5cHVSrgKU2DiNtu14zHixlv3JnWjg419YArly5QT/3AUs2EyuLEB1uzBqLK/q9VzZL7hhmldtxCkgDWNwAr8ViuEc3/CN19wxbCbYHWPxs0qXTvnqxe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu; spf=pass smtp.mailfrom=illinois.edu; dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b=a3v2yKpV; arc=none smtp.client-ip=148.163.139.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=illinois.edu
-Received: from pps.filterd (m0166260.ppops.net [127.0.0.1])
-	by mx0b-00007101.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AM3wiai015054;
-	Fri, 22 Nov 2024 04:53:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=illinois.edu; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=campusrelays; bh=M6/FufPVvCmmC25b8oENqCCuZgyvk0Xk
-	1/pLeLp70m8=; b=a3v2yKpVbfJRf9QirliCD5jV0Ge0Gf71BLjhmrUohzCGzI8k
-	1fI/vqo5NHCzIfR0YdSBN6RrHg9nhIuiOAwiCzX28qUIlQDSd5QiQefhi219AXea
-	fZsEltVzOX4Btck+3g0pRmWJWZuaecJ98T2X9Fh7EPV2/EGdL0U7bHzefAWT6MO3
-	65a4LlG8xqj2tp1yhYJy+wq4GWRGb8x8Yt3f0y2empQWUoOU5gDchto/kDYgUNp/
-	5L/Db29XyEnKBSYH/KxOKlDWiX1QjGAZ5EDwglZQrxBXWXL1hfVzhrU+s740W9vB
-	+Ho2Q8kCoOaFbT07mjpGMvHqV4mgytf3lZ6+RQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0b-00007101.pphosted.com (PPS) with ESMTPS id 431yuy8mq8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Nov 2024 04:53:10 +0000 (GMT)
-Received: from m0166260.ppops.net (m0166260.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AM4mFUk019718;
-	Fri, 22 Nov 2024 04:53:10 GMT
-Received: from localhost.localdomain (oasis.cs.illinois.edu [130.126.137.13])
-	by mx0b-00007101.pphosted.com (PPS) with ESMTP id 431yuy8mq5-1;
-	Fri, 22 Nov 2024 04:53:10 +0000 (GMT)
-From: Jinghao Jia <jinghao7@illinois.edu>
-To: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>
-Cc: netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        Jinghao Jia <jinghao7@illinois.edu>, kernel test robot <lkp@intel.com>,
-        Ruowen Qin <ruqin@redhat.com>
-Subject: [PATCH v2 net] ipvs: fix UB due to uninitialized stack access in ip_vs_protocol_init()
-Date: Thu, 21 Nov 2024 22:52:57 -0600
-Message-ID: <20241122045257.27452-1-jinghao7@illinois.edu>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1732258181; c=relaxed/simple;
+	bh=cj8FxFYpnx2gePGZBk5MLl9r//X2HfwX0QSLg+uZxus=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F6qLmXrURTUfcy8MfqST8UQNd9o8TrJNa4O5jsggEX6hNwk8xVURF7v4ql37+3e4OSkAMb7+eHc4jXD2qeEhzxfUUVg67T4EOyc0bSx7A2QFbr41k4AHkPeN6kxKRDGLqTCUniVTHkgBUAtKeR43Qa1wkOC84uIcEl6UdccyCNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=mw0DN9Yn; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3e6005781c0so1085272b6e.3
+        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 22:49:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732258179; x=1732862979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Emi3zUI2rwJq2d7I1jD4qpcNMtg6QfnfoegZT//vDEw=;
+        b=mw0DN9YnJT7gB87gYc6tKpMUnHbtN1rWITEfCTGCiB1Te7yWTiZCjmXF6bpEDBVqtR
+         sxGCXZcaUAFE+9hX0Rgrc9rNcB34kvmHjQxS9icbRMi0eE1VeCeBj2VoIrJ5wMP+YGXn
+         +kFYmZlIrUD3q4Wp15OxL3Va0+Yol76MttCyBPA1MUmL7KSk2r1+Pv5AWxvzDeQwUUNm
+         PCbxLwgd7WXi0dlHcVwMcHTYeu0KUR/NH65WZlDIm9Jr7gCPtvPCbwYRfIS8bOCv+XPj
+         QTAZa3VOAUd9MiQWRzlwT9ilegZXyrCs7ksT+FLQ4mkt7uShGsl7Ezf7jlUY7j0PlceR
+         ARjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732258179; x=1732862979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Emi3zUI2rwJq2d7I1jD4qpcNMtg6QfnfoegZT//vDEw=;
+        b=mnaNwVFv+oabKT5FYz4OdEadT7QVgWaQDeD0MjgDBSxEwA6IIA2mjisYXbb4Vg9Odg
+         x/FFpbwXwDaST32HzpXF5dCgQKmlyC9rlsSQtqdq0pFpaTCUUFC0Pf00wsFtOncstyLU
+         /Rd2LBDOM0ln0SOOLzOAtEiBo2Nq+QrK6NfCC4z9lcoNwQUg4wtxkl0MYxbpRIwj3jeh
+         6YsQ9AfB9IOh8Uo72mUwZhjwQZu3AjHm9ySbLmid+IZ+vY0kkSTGMs6S+4TyLy6kRaBh
+         X8KUjL/VgxD/XpC0yMqdeYcoAFC1YLMW6TtTSUPnBZ2FnfwlpVR7hLZASUQnPG3L5pF0
+         91/Q==
+X-Gm-Message-State: AOJu0YzdqKXhBBsyefNPPJw9/j6QHiZwPXQ6IW2rdDP2XQm52agWjSmn
+	osxwhJehanFeHLQuNqI2kZJmVatQklQgglFQeixrc53yjcODTuPHEzBfgGSvfMFr9zOI9PqP4cc
+	f
+X-Gm-Gg: ASbGnctXm/XSuAPOCwkos4rZGntoRmmnxodfMB0pnNW2oD/CEEATH7SvR2TBqZJ72st
+	cDSmCxNF0soXHCdceKEKRQBzDfjBSTMNkvDNd9c+6LdyCmm8U0flBl8/pC12srl1Lewi4wRENdC
+	fIJqOC7cMeI5n/WIexpeJfoUn5HS7tspQNZrMHce2plny9o75Ez3PF/jmUOJdafhzCTkJKe7jYE
+	UGYA9lGGeRJiUsoZDao4MQGOOEDX3VrEzc=
+X-Google-Smtp-Source: AGHT+IFzHVL9HHw1ZCHOGDXKN5ZD4NNLoyWiLGa86h+QJ/tH5Qq+a22B3czoBeWlo3Uq4MwGR07Jww==
+X-Received: by 2002:a05:6808:3510:b0:3e6:18b6:4bc3 with SMTP id 5614622812f47-3e91587829dmr2356252b6e.24.1732258179237;
+        Thu, 21 Nov 2024 22:49:39 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:73::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724e4c4d7besm499053b3a.103.2024.11.21.22.49.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 22:49:38 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org,
+	Mohan Prasad J <mohan.prasad@microchip.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Wei <dw@davidwei.uk>
+Subject: [PATCH net v1] selftests: fix nested double quotes in f-string
+Date: Thu, 21 Nov 2024 22:48:21 -0800
+Message-ID: <20241122064821.2821199-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,131 +88,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: dEH4go68XiYNgMywoM7tnrJZfxVJfS1U
-X-Proofpoint-GUID: eGPE2fUII21SyMbkJ8sFtdJoeo6eqYU_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
-X-Spam-Details: rule=cautious_plus_nq_notspam policy=cautious_plus_nq score=0 bulkscore=0
- phishscore=0 lowpriorityscore=0 mlxlogscore=999 malwarescore=0
- impostorscore=0 suspectscore=0 spamscore=0 priorityscore=1501 mlxscore=0
- clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411220039
-X-Spam-Score: 0
-X-Spam-OrigSender: jinghao7@illinois.edu
-X-Spam-Bar: 
 
-Under certain kernel configurations when building with Clang/LLVM, the
-compiler does not generate a return or jump as the terminator
-instruction for ip_vs_protocol_init(), triggering the following objtool
-warning during build time:
+Replace nested double quotes in f-string with outer single quotes.
 
-  vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
-
-At runtime, this either causes an oops when trying to load the ipvs
-module or a boot-time panic if ipvs is built-in. This same issue has
-been reported by the Intel kernel test robot previously.
-
-Digging deeper into both LLVM and the kernel code reveals this to be a
-undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
-of 64 chars to store the registered protocol names and leaves it
-uninitialized after definition. The function calls strnlen() when
-concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
-strnlen() performs an extra step to check whether the last byte of the
-input char buffer is a null character (commit 3009f891bb9f ("fortify:
-Allow strlen() and strnlen() to pass compile-time known lengths")).
-This, together with possibly other configurations, cause the following
-IR to be generated:
-
-  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
-    %1 = alloca [64 x i8], align 16
-    ...
-
-  14:                                               ; preds = %11
-    %15 = getelementptr inbounds i8, ptr %1, i64 63
-    %16 = load i8, ptr %15, align 1
-    %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
-    %18 = icmp eq i8 %16, 0
-    %19 = select i1 %17, i1 %18, i1 false
-    br i1 %19, label %20, label %23
-
-  20:                                               ; preds = %14
-    %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
-    ...
-
-  23:                                               ; preds = %14, %11, %20
-    %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
-    ...
-  }
-
-The above code calculates the address of the last char in the buffer
-(value %15) and then loads from it (value %16). Because the buffer is
-never initialized, the LLVM GVN pass marks value %16 as undefined:
-
-  %13 = getelementptr inbounds i8, ptr %1, i64 63
-  br i1 undef, label %14, label %17
-
-This gives later passes (SCCP, in particular) more DCE opportunities by
-propagating the undef value further, and eventually removes everything
-after the load on the uninitialized stack location:
-
-  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
-    %1 = alloca [64 x i8], align 16
-    ...
-
-  12:                                               ; preds = %11
-    %13 = getelementptr inbounds i8, ptr %1, i64 63
-    unreachable
-  }
-
-In this way, the generated native code will just fall through to the
-next function, as LLVM does not generate any code for the unreachable IR
-instruction and leaves the function without a terminator.
-
-Zero the on-stack buffer to avoid this possible UB.
-
-Changelog:
+Fixes: 6116075e18f7 ("selftests: nic_link_layer: Add link layer selftest for NIC driver")
+Signed-off-by: David Wei <dw@davidwei.uk>
 ---
-v1 -> v2:
-v1: https://lore.kernel.org/lkml/20241111065105.82431-1-jinghao7@illinois.edu/
-* Fix small error in commit message
-* Address Julian's feedback:
-  * Make this patch target the net tree rather than net-next
-  * Add a "Fixes" tag for the initial git commit
+ tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
-Co-developed-by: Ruowen Qin <ruqin@redhat.com>
-Signed-off-by: Ruowen Qin <ruqin@redhat.com>
-Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
----
- net/netfilter/ipvs/ip_vs_proto.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
-index f100da4ba3bc..a9fd1d3fc2cb 100644
---- a/net/netfilter/ipvs/ip_vs_proto.c
-+++ b/net/netfilter/ipvs/ip_vs_proto.c
-@@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
- 
- int __init ip_vs_protocol_init(void)
- {
--	char protocols[64];
-+	char protocols[64] = { 0 };
- #define REGISTER_PROTOCOL(p)			\
- 	do {					\
- 		register_ip_vs_protocol(p);	\
-@@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
- 		strcat(protocols, (p)->name);	\
- 	} while (0)
- 
--	protocols[0] = '\0';
--	protocols[2] = '\0';
- #ifdef CONFIG_IP_VS_PROTO_TCP
- 	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
- #endif
+diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py b/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
+index db84000fc75b..79fde603cbbc 100644
+--- a/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
++++ b/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
+@@ -218,5 +218,5 @@ class LinkConfig:
+         json_data = process[0]
+         """Check if the field exist in the json data"""
+         if field not in json_data:
+-            raise KsftSkipEx(f"Field {field} does not exist in the output of interface {json_data["ifname"]}")
++            raise KsftSkipEx(f'Field {field} does not exist in the output of interface {json_data["ifname"]}')
+         return json_data[field]
 -- 
-2.47.0
+2.43.5
 
 
