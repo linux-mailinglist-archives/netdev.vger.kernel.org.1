@@ -1,198 +1,149 @@
-Return-Path: <netdev+bounces-146817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 894A59D60E6
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:54:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C410E9D6115
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 16:04:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49E6C28112C
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:54:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD9AFB26F82
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF04135A4B;
-	Fri, 22 Nov 2024 14:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A191DE8B8;
+	Fri, 22 Nov 2024 15:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="h1JWM7+T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF1413AA4E
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AAC13A3E4;
+	Fri, 22 Nov 2024 15:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732287206; cv=none; b=Lw1+Xxm3FU7/SiCyvcSfh1RIYheWqsaJ97BtiMHmPB4Nc2wzi5QP1s2bfXRmHuiHCJQQ5I4JwwVTdajwQRtD7ruUXOX0/tdOFUktNHGtVqBABmAaSADzev6619iVmnkzKuSf+EGLBQaD/zM+YEb6FALLOebvSPLspUZh5JNud6c=
+	t=1732287703; cv=none; b=kio79y0h/GfCZkdysogz8xh9KxTQ+9mBIQRmtq38w+FKkU19e4k2mDG/uVwcJP0Z3yj/fsYUPg8FzC5AlGQ5g+WnMigmlgPz+f17/ARni+wlTZJ3f6DZQrBa2Nz39kamba5qCm0qrX+6q2lw8IXGj/+ZkCvB2sJBjDref5conMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732287206; c=relaxed/simple;
-	bh=lZQekX2emKcuj2NJAxg/sQkuKYZ6re4Fnr/AHGyvKRo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=X5+S0Pde9N32q1O89OMB/VUqhUXh8zTwP1Qncfzv75VtCa63YDeA7Ct2r3ydflp4NEqerebdQXlDhoG9BoVmPSoRAOIEab+c1AFeOmdpe1RlTiyOcMN1KHymNGqs/5gARbn+h3kCJD6p5viHQ/z97XV4krmTcfJ4zBHsrSVibRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a77085a3d7so20015145ab.1
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 06:53:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732287204; x=1732892004;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7o7pgGKQ4wM8xkrHo10PDRpAbGA2NNo58w/WumnI7BA=;
-        b=s4up7KnosXkhyp2tIVyNxzLkuLgIfg/1Tf8t9ZdlCKR+m1craUDRb4qZbcBWliXbvg
-         x7YXkNABqAfojrQoLf9/FeU7oap/dUjde5J7pgn+FuXNxCVPSrxHLxSiOItLdac3Mbrp
-         u+DnTQjy0QRYJx/R9MtDJlvRaURS6uuqDYiqD90/v3BN5uPT1OFrUdIdbjUxpuIdLm01
-         kEclwoRHQw/Iwr6uSoQY7Jd38WKDnLiNtvf+dPPzb0hSzv32yyD9RS3PDAT2UjktWg9U
-         hNFfjcC2soAuXdbCroPgwb/Ved5S2fAqD1PAAFmkeUvWfK8btR6bEDPd10jx6Jow1A4S
-         +DOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtHarNPyOhENLufYiEJ9w7Xygj8HaDKdKGVByOPjMftqWk/TeHKfLtIgvkopWDImVzDNsEqUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVEEbY2GpCxWCvRqTr6g/a7hAh1t0lTInDrRQvy8QeqZBE4oCK
-	+WggrMGGg73Y8JrshjAR2HNYNwiczifOQ2prUkKaxcKZFfu1mTU7gEhATO5DAHEW3xYLKLh17oA
-	HtLo7/8URdF0/pOOHA+sKU7EtWFerukUUuB34Pmn4EqsS5HXh2bES9x0=
-X-Google-Smtp-Source: AGHT+IFpChMF+zsGAxQ24GSFAkvrHfKB02in/7a9q3UjGkNd70I0TQZdAIdsr6uiZF3c1/+TokDsUp7KuIwntlqS2GdzaWD3gfL2
+	s=arc-20240116; t=1732287703; c=relaxed/simple;
+	bh=q5clxXL+rrB2Qa/SClfsFnrpas8q0UVgr5ltbgUhIWg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yd5Mu1jMmZbs+Rs7Uj8sXXjYLztEWh7f/SZbKLci1fe3l0pym4k+bU3AR+8jxiJEhEgle/C+16tC7jsNIG5nHZDeKm3dIupru2KhcC/bnLvOl7iOMd/nu/AvUpysppaqH3KwVo6XWhHzMIAayR/MTcAJWOJjZvGay1tCvdNJA+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b=h1JWM7+T; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1732287701; x=1763823701;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XhEkPlJOEC4ipBCKHrvl3bqgRsZel/0/VfceNqNLM5U=;
+  b=h1JWM7+TOxSMTH4iI1gwdyDKduDyJAOV3Ae3mGZ//zx9kXlbgoPhEJkM
+   2JYJk6wt0EtdupZFOHPUUqBQ24NobHvoVI2tZUB+y2NYcHULNDjT0EBv+
+   2DWMbXwKA4x4AVyAj6aIGIzTxm/SossHhWc883Eo4+dz1S9X4rN5cLl/E
+   c=;
+X-IronPort-AV: E=Sophos;i="6.12,176,1728950400"; 
+   d="scan'208";a="675868813"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.124.125.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 15:01:34 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:63119]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.62:2525] with esmtp (Farcaster)
+ id d7fa063a-9d11-47ba-bfb7-1ba007f2778f; Fri, 22 Nov 2024 15:01:34 +0000 (UTC)
+X-Farcaster-Flow-ID: d7fa063a-9d11-47ba-bfb7-1ba007f2778f
+Received: from EX19D008EUC001.ant.amazon.com (10.252.51.165) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 22 Nov 2024 15:01:31 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (10.250.64.231) by
+ EX19D008EUC001.ant.amazon.com (10.252.51.165) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 22 Nov 2024 15:01:30 +0000
+Received: from email-imr-corp-prod-iad-all-1a-f1af3bd3.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.228) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.34 via Frontend Transport; Fri, 22 Nov 2024 15:01:30 +0000
+Received: from dev-dsk-mheyne-1b-55676e6a.eu-west-1.amazon.com (dev-dsk-mheyne-1b-55676e6a.eu-west-1.amazon.com [10.253.68.42])
+	by email-imr-corp-prod-iad-all-1a-f1af3bd3.us-east-1.amazon.com (Postfix) with ESMTP id D954340529;
+	Fri, 22 Nov 2024 15:01:29 +0000 (UTC)
+Received: by dev-dsk-mheyne-1b-55676e6a.eu-west-1.amazon.com (Postfix, from userid 5466572)
+	id 98B25B449; Fri, 22 Nov 2024 15:01:29 +0000 (UTC)
+Date: Fri, 22 Nov 2024 15:01:29 +0000
+From: Maximilian Heyne <mheyne@amazon.de>
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: <netdev@vger.kernel.org>, Allison Henderson
+	<allison.henderson@oracle.com>, "David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Vegard Nossum
+	<vegard.nossum@oracle.com>, Chuck Lever <chuck.lever@oracle.com>,
+	<linux-rdma@vger.kernel.org>, <rds-devel@oss.oracle.com>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] selftests: rds: move include.sh to TEST_FILES
+Message-ID: <20241122150129.GB18887@dev-dsk-mheyne-1b-55676e6a.eu-west-1.amazon.com>
+References: <20240927041349.81216-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca4f:0:b0:3a7:9fff:1353 with SMTP id
- e9e14a558f8ab-3a79fff1550mr20296925ab.0.1732287204249; Fri, 22 Nov 2024
- 06:53:24 -0800 (PST)
-Date: Fri, 22 Nov 2024 06:53:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67409ae4.050a0220.363a1b.0140.GAE@google.com>
-Subject: [syzbot] [net?] BUG: unable to handle kernel paging request in __skb_frag_unref
-From: syzbot <syzbot+3bd2949d1470dea6df73@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240927041349.81216-1-liuhangbin@gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello,
+Hi Hangbin,
 
-syzbot found the following issue on:
+On Fri, Sep 27, 2024 at 12:13:49PM +0800, Hangbin Liu wrote:
+> The include.sh file is generated for inclusion and should not be executable.
+> Otherwise, it will be added to kselftest-list.txt. Additionally, add the
+> executable bit for test.py at the same time to ensure proper functionality.
+> 
+> Fixes: 3ade6ce1255e ("selftests: rds: add testing infrastructure")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  tools/testing/selftests/net/rds/Makefile | 3 ++-
+>  tools/testing/selftests/net/rds/test.py  | 0
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>  mode change 100644 => 100755 tools/testing/selftests/net/rds/test.py
+> 
+> diff --git a/tools/testing/selftests/net/rds/Makefile b/tools/testing/selftests/net/rds/Makefile
+> index da9714bc7aad..cf30307a829b 100644
+> --- a/tools/testing/selftests/net/rds/Makefile
+> +++ b/tools/testing/selftests/net/rds/Makefile
+> @@ -4,9 +4,10 @@ all:
+>  	@echo mk_build_dir="$(shell pwd)" > include.sh
+>  
+>  TEST_PROGS := run.sh \
+> -	include.sh \
+>  	test.py
 
-HEAD commit:    86cada34bc3a arm64: preserve pt_regs::stackframe during ex..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b50287980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c154e2d4db830898
-dashboard link: https://syzkaller.appspot.com/bug?extid=3bd2949d1470dea6df73
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160050a7980000
+Should test.py also move down to TEST_FILES? I think run.sh is executing
+test.py anyway but does a couple of sanity checks before, so I think
+this it's not necessary to let the runner execute test.py standalone.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2cba29975cae/disk-86cada34.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a1e63bf4e894/vmlinux-86cada34.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6770ff6b33c6/Image-86cada34.gz.xz
+>  
+> +TEST_FILES := include.sh
+> +
+>  EXTRA_CLEAN := /tmp/rds_logs
+>  
+>  include ../../lib.mk
+> diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
+> old mode 100644
+> new mode 100755
+> -- 
+> 2.39.3 (Apple Git-146)
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3bd2949d1470dea6df73@syzkaller.appspotmail.com
-
-Unable to handle kernel paging request at virtual address dfff800000000001
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[dfff800000000001] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
-Modules linked in:
-CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.12.0-rc3-syzkaller-g86cada34bc3a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : _compound_head include/linux/page-flags.h:242 [inline]
-pc : put_page include/linux/mm.h:1554 [inline]
-pc : skb_page_unref include/linux/skbuff_ref.h:43 [inline]
-pc : __skb_frag_unref+0x80/0x214 include/linux/skbuff_ref.h:56
-lr : netmem_to_page include/net/netmem.h:83 [inline]
-lr : skb_page_unref include/linux/skbuff_ref.h:43 [inline]
-lr : __skb_frag_unref+0x78/0x214 include/linux/skbuff_ref.h:56
-sp : ffff8000978f6aa0
-x29: ffff8000978f6aa0 x28: dfff800000000000 x27: 0000000000000007
-x26: ffff0000d3573d40 x25: ffff0000d3573d70 x24: 0000000000000000
-x23: ffff0000d3573d42 x22: 1fffe0001a6ae7a8 x21: dfff800000000000
-x20: 0000000000000008 x19: 0000000000000000 x18: ffff0000d1eba80c
-x17: 0000000000013a0a x16: ffff800080588a40 x15: 0000000000000001
-x14: 1fffe0001a6ae7ac x13: 0000000000000000 x12: 0000000000000000
-x11: ffff60001a6ae7ad x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : 0000000000000001 x7 : 0000000000000000 x6 : 0000000000000000
-x5 : 0000000000000001 x4 : 0000000000000008 x3 : ffff8000895974dc
-x2 : 0000000000000000 x1 : 0000000000000000 x0 : 0000000000000000
-Call trace:
- _compound_head include/linux/page-flags.h:242 [inline] (P)
- put_page include/linux/mm.h:1554 [inline] (P)
- skb_page_unref include/linux/skbuff_ref.h:43 [inline] (P)
- __skb_frag_unref+0x80/0x214 include/linux/skbuff_ref.h:56 (P)
- netmem_to_page include/net/netmem.h:83 [inline] (L)
- skb_page_unref include/linux/skbuff_ref.h:43 [inline] (L)
- __skb_frag_unref+0x78/0x214 include/linux/skbuff_ref.h:56 (L)
- skb_release_data+0x3c4/0x618 net/core/skbuff.c:1119
- skb_release_all net/core/skbuff.c:1190 [inline]
- __kfree_skb+0x58/0x78 net/core/skbuff.c:1204
- tcp_wmem_free_skb include/net/tcp.h:306 [inline]
- tcp_rtx_queue_unlink_and_free+0x2e8/0x4a8 include/net/tcp.h:2091
- tcp_clean_rtx_queue net/ipv4/tcp_input.c:3436 [inline]
- tcp_ack+0x1c84/0x55ac net/ipv4/tcp_input.c:4032
- tcp_rcv_state_process+0x528/0x3e30 net/ipv4/tcp_input.c:6805
- tcp_v4_do_rcv+0x71c/0xc44 net/ipv4/tcp_ipv4.c:1938
- tcp_v4_rcv+0x2498/0x2dbc net/ipv4/tcp_ipv4.c:2350
- ip_protocol_deliver_rcu+0x1f8/0x484 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x284/0x4f0 net/ipv4/ip_input.c:233
- NF_HOOK+0x328/0x3d4 include/linux/netfilter.h:314
- ip_local_deliver+0x120/0x194 net/ipv4/ip_input.c:254
- dst_input include/net/dst.h:460 [inline]
- ip_rcv_finish+0x220/0x24c net/ipv4/ip_input.c:449
- NF_HOOK+0x328/0x3d4 include/linux/netfilter.h:314
- ip_rcv+0x7c/0x9c net/ipv4/ip_input.c:569
- __netif_receive_skb_one_core net/core/dev.c:5666 [inline]
- __netif_receive_skb+0x18c/0x3c8 net/core/dev.c:5779
- process_backlog+0x640/0x123c net/core/dev.c:6111
- __napi_poll+0xb4/0x3fc net/core/dev.c:6775
- napi_poll net/core/dev.c:6844 [inline]
- net_rx_action+0x6a8/0xf4c net/core/dev.c:6966
- handle_softirqs+0x2e0/0xbf8 kernel/softirq.c:554
- run_ksoftirqd+0x70/0x158 kernel/softirq.c:927
- smpboot_thread_fn+0x4b0/0x90c kernel/smpboot.c:164
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:862
-Code: 37000653 97a5f838 91002274 d343fe88 (38756908) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	37000653 	tbnz	w19, #0, 0xc8
-   4:	97a5f838 	bl	0xfffffffffe97e0e4
-   8:	91002274 	add	x20, x19, #0x8
-   c:	d343fe88 	lsr	x8, x20, #3
-* 10:	38756908 	ldrb	w8, [x8, x21] <-- trapping instruction
+Thanks,
+Max
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Amazon Web Services Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
