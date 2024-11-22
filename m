@@ -1,133 +1,116 @@
-Return-Path: <netdev+bounces-146777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F869D5B33
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:44:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 831299D5BB7
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 10:18:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46A9BB22448
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:44:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2FFCB24D9C
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A83B18C336;
-	Fri, 22 Nov 2024 08:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213841DEFD9;
+	Fri, 22 Nov 2024 09:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="l/6sXL+h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aDTpZYWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C7718C03C;
-	Fri, 22 Nov 2024 08:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BF21DEFC6
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 09:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732264943; cv=none; b=HwsvWH8TgoT94DrlMfOASiF7RmzFtK7GQmhbYG1kolzC5NRqwUUZKevQ5QfxMedgncrIWwlQjfHj0IkXQLZVQKLGuzxWGdjhghS2F1hqKALC2NW0SUAuCC13kFhcd6U7QOJhg2AxV9py8dnWGFT4WjPBeZDlQmkwqSmU6H+9OAg=
+	t=1732266916; cv=none; b=BdELFlOTL43Ra25ytmzEscNAMfEPVozNNizg0XCJYqtPkrLeEfibhbzbqL+aIerDfZIYWt9iRcz44JUEMML132GjkenWFD1KBMIUxZpyjlzqQuLwFFXPG4kZH9O5RnSUuc+59Ogu3VWqAewwcyBc161JRLZe5xz6v7OMwd/HZ5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732264943; c=relaxed/simple;
-	bh=c1Ts82AiyusAlYWb8emaHpqALdupvrkvlzytzMzD5Ok=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TvWKXEfvaoI0NZGasREMbMcQnNnowzeF11xH0VsRFYnj60Fum6dFq+EtjQr6iphpV17zW3AAI9Jgd25PbegOJVgYqHoVBLKVZuCalacxHySNvBVDdoiEPpr0FymemtEL+0QHC3fXdiXQHWeABrYNPrE1U619PYHH5krrIZEX3a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=l/6sXL+h; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 94C4820009;
-	Fri, 22 Nov 2024 08:42:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732264936;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0eBNAIQube8A2Bu+Kj23Enb+yOdyC1OAUgr86oyx5kY=;
-	b=l/6sXL+h2vPwryDFM4PjAURn7ho/eOFEQOR/ch1FCknNwiyLugAlL6ogwsSvFT1mKxWaln
-	hmcG3Gi00vdBLIneggouZsxZ4pLOZ/sPT4m8bdVvIlVWGSR5+8gVB135eb1mXtXq9Pafvp
-	XlzxeUgHW/8ztHwoip08hYvf+qRegQkQCZjR4iRGU96h4TpmH8DpmkMJ1OzF8LMVDyXmfJ
-	CkOgXfi9KG8HDjPi53Eq/THEf+iu9SR+LgJU0TNsgS4XtSuVQ1saNC0hyHqYeS6KfiU3h7
-	BIWRBYYE5iPLSeZbLTwAswHYOtIX98uOH9+bn0tWJevxHd6cIC6YEBfzVkk07Q==
-Date: Fri, 22 Nov 2024 09:42:10 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 25/27] dt-bindings: net: pse-pd:
- microchip,pd692x0: Add manager regulator supply
-Message-ID: <20241122094210.5e643c1d@kmaincent-XPS-13-7390>
-In-Reply-To: <32695cf7-01d4-4180-b7f0-230ad8a0e1a4@kernel.org>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
-	<20241121-feature_poe_port_prio-v3-25-83299fa6967c@bootlin.com>
-	<32695cf7-01d4-4180-b7f0-230ad8a0e1a4@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1732266916; c=relaxed/simple;
+	bh=uruwwJ50mXSVVEsekJ9ZUXKpUw2xOzm+RfNCYzA98Gw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fVQ0hvBgp2ytt0/dwYq3GkY1Wdeqk6YVCL9BHY1F5D4kWNLv6dGndL3Gtno7N6FPwACNME+JexaLN/A/Fo9HFuDWkq10fYejfZvR+Eo6pXhWVRlnO+CA4ypAqdZcS4oZcGusmFqraHaHpnCss9rRiNb+aksazPSnN18rYkR5TIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aDTpZYWG; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa51b8c5f4dso32731566b.2
+        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 01:15:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732266912; x=1732871712; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uruwwJ50mXSVVEsekJ9ZUXKpUw2xOzm+RfNCYzA98Gw=;
+        b=aDTpZYWGd0ZaC7naXXOYeFDP/+UPM/Gm40M8KaOjl33KUUq87hin8Xy33oaT6Gn1oN
+         Dx30Ujyf+n2o1LH1qlUgKqy62c/yXBTGDk7csTctyVrp5uXm6Pc0WmuBPRdd+lvyWxln
+         rV91srbZ2czWwoO1C3vMidcC3k6KIbPO9jA+SmMSXirDDeRoqe8nE3yiFn/eLKfrDMpU
+         q3UqWaHB8VVao33RgZwX/jzJz0BWFeXOwyYLIf23NkztloHEWFUvAYCYLH5nFuQg+2H+
+         ejNHgRh5nHpQOkHPQTMf2II4OJDH83gVvaTKIduUQd+Id77e8t7aLc/Fk2FEegv0X0IW
+         hMJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732266912; x=1732871712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uruwwJ50mXSVVEsekJ9ZUXKpUw2xOzm+RfNCYzA98Gw=;
+        b=sYIfc8YpBsd5rjwkZQMIyj8fRCyrp5I41IAgErPbfOwQwYBR5DyIjlr/uwRs78j6BT
+         8fFNrLxhfvIe6uizE0KFJ9tn0kowzBTiqg11hI9NgyHLsTGq98Naj5T3lSbzgMErK6Qh
+         t2nvhYJC9Um/dHy9RQ5hme/SqNogkm/ujM6BmZ4f5tbPWo9lPzvWbRvqtkojmlC0jXGl
+         WX3Wc0yQY9t+U3Tf94ufGXVebw+AgX1dUpJ4xoa3OA17jLxJFivCYCxstSDw/D4NVNWW
+         J1H9GwmVDcuYnMjb7RG5T7VR7Q5BPTecJWAUd7jsZsfiOeZAtrjfgimrlAtx+gKx72eH
+         GRCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVdQ36WZuxhQWqyZTLF3rRWnQcRvoSf5TK06HDDP9cDospz12/8ni7O6nswDsuaoWqlDaETbAo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+cOl6fYlFlq8A75Qp7YelQmqaNVF5o2y+CUF+iCa+3pOhaNMQ
+	gzhyWgIpz25oS1gZ5jZBN3EINFyvk3FPxawaLMffkZrFx6LLPruiu9BFp2s0greONH4sp6M7cgA
+	X2aFnviHv+FteoQvPOuBzgruBPokxzvLlek+5
+X-Gm-Gg: ASbGncuK++LLZeDr4PGNolYH7rz9w0t4DgqmQdCOOago5RFhlse873n0WeZ49nUThTZ
+	oUTlD973NnkvZdrokP5sthc2QOEsdKp0=
+X-Google-Smtp-Source: AGHT+IGTmF0Vb6HMZgp/sWggxOFXHOzHWtjb30jsvecLQAoOP//xdTjLFIAyhWQ16zUCCabgxDURLJTgCe1037OWug4=
+X-Received: by 2002:a17:906:3293:b0:a96:cca9:5f5 with SMTP id
+ a640c23a62f3a-aa509c06cf7mr125479066b.37.1732266912197; Fri, 22 Nov 2024
+ 01:15:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20241121-netpoll_rcu_herbet_fix-v1-1-457c5fee9dfd@debian.org>
+ <CANn89iJeaaVhXU0VHZ0QF5-juS+xXRjk2rXfY2W+_GsJL_yXbA@mail.gmail.com> <20241121195616.2cd8ba59@kernel.org>
+In-Reply-To: <20241121195616.2cd8ba59@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 22 Nov 2024 10:15:01 +0100
+Message-ID: <CANn89iJZnpeus8neFYBO85iOP2vTT6QwxRKFgk07QnLwVGN+Zg@mail.gmail.com>
+Subject: Re: [PATCH net] netpoll: Use rtnl_dereference() for npinfo pointer access
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Michal Kubiak <michal.kubiak@intel.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello Krzysztof,
+On Fri, Nov 22, 2024 at 4:56=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri, 22 Nov 2024 00:41:14 +0100 Eric Dumazet wrote:
+> > > Fixes: c75964e40e69 ("netpoll: Use rtnl_dereference() for npinfo poin=
+ter access")
+> >
+> > This seems wrong. This sha1 does not exist, and the title is this patch=
+.
+> >
+> > We do not send a patch saying it is fixing itself.
+> >
+> > I would suggest instead :
+> >
+> > Fixes: c69c5e10adb9 ("netpoll: Use rcu_access_pointer() in __netpoll_se=
+tup")
+>
+> Or no Fixes tag and net-next...
+>
+> I'm missing what can go wrong here, seems like a cleanup.
 
-On Fri, 22 Nov 2024 07:58:26 +0100
-Krzysztof Kozlowski <krzk@kernel.org> wrote:
+Nothing wrong, perhaps add a Link: next time to avoid confusion
 
-> On 21/11/2024 15:42, Kory Maincent wrote:
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> >=20
-> > This patch adds the regulator supply parameter of the managers.
-> > It updates also the example as the regulator supply of the PSE PIs
-> > should be the managers itself and not an external regulator.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > ---
-> >  =20
->=20
->=20
-> <form letter>
-> Please use scripts/get_maintainers.pl to get a list of necessary people
-> and lists to CC. It might happen, that command when run on an older
-> kernel, gives you outdated entries. Therefore please be sure you base
-> your patches on recent Linux kernel.
->=20
-> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-> people, so fix your workflow. Tools might also fail if you work on some
-> ancient tree (don't, instead use mainline) or work on fork of kernel
-> (don't, instead use mainline). Just use b4 and everything should be
-> fine, although remember about `b4 prep --auto-to-cc` if you added new
-> patches to the patchset.
->=20
-> You missed at least devicetree list (maybe more), so this won't be
-> tested by automated tooling. Performing review on untested code might be
-> a waste of time.
->=20
-> Please kindly resend and include all necessary To/Cc entries.
-> </form letter>
->=20
-> ... unless you do not expect review.
-
-Indeed I didn't expected binding reviews on this series that's why I did no=
-t add
-you and devicetree mailing list to the CC. I would like to confirm the core=
- PSE
-design choices before that.
-Maybe I should have notify it somewhere to avoid you these emails, sorry.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+https://lore.kernel.org/lkml/Zz1cKZYt1e7elibV@gondor.apana.org.au/
 
