@@ -1,114 +1,140 @@
-Return-Path: <netdev+bounces-146760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 123D59D5990
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:49:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC4A9D59A8
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:58:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77FB9B2172B
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 06:49:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BDAA282FBA
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 06:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB04D1632E1;
-	Fri, 22 Nov 2024 06:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CB41632EE;
+	Fri, 22 Nov 2024 06:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="mw0DN9Yn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOtaUj4V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB3013A268
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 06:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BB31509B6;
+	Fri, 22 Nov 2024 06:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732258181; cv=none; b=ozQsVO+9u22X5TmUoHrazH3H5HSS6KJEaQEpSUxNEHsih6NPPM8Z691GOkjhZM15hEuqk80FR2YOfYaq6g9DWcCDuLBMff5YHI7ijNOEednVfVmRjYhOtyWlaCoJu9y0djgMIP89bimDPOqgPufDQSTpcEW6nTojQxp8eROJz4I=
+	t=1732258678; cv=none; b=YgTE/Vv65s9NU1gvKbbL+1BH9pF2ACliJGlBqfSNTo73CeWLzCwcKeomjkB6+WG6G/Yk2TU5wLg/rbvCbCnqH461UBQMoYkALJhYOBo6i/0SBRnRc2kjEytKgXi++Q8IdcC7CW/7TTKwp/ZJFprhdOXMd/Y/c8NLnqAn68dmln8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732258181; c=relaxed/simple;
-	bh=cj8FxFYpnx2gePGZBk5MLl9r//X2HfwX0QSLg+uZxus=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F6qLmXrURTUfcy8MfqST8UQNd9o8TrJNa4O5jsggEX6hNwk8xVURF7v4ql37+3e4OSkAMb7+eHc4jXD2qeEhzxfUUVg67T4EOyc0bSx7A2QFbr41k4AHkPeN6kxKRDGLqTCUniVTHkgBUAtKeR43Qa1wkOC84uIcEl6UdccyCNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=mw0DN9Yn; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3e6005781c0so1085272b6e.3
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 22:49:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732258179; x=1732862979; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Emi3zUI2rwJq2d7I1jD4qpcNMtg6QfnfoegZT//vDEw=;
-        b=mw0DN9YnJT7gB87gYc6tKpMUnHbtN1rWITEfCTGCiB1Te7yWTiZCjmXF6bpEDBVqtR
-         sxGCXZcaUAFE+9hX0Rgrc9rNcB34kvmHjQxS9icbRMi0eE1VeCeBj2VoIrJ5wMP+YGXn
-         +kFYmZlIrUD3q4Wp15OxL3Va0+Yol76MttCyBPA1MUmL7KSk2r1+Pv5AWxvzDeQwUUNm
-         PCbxLwgd7WXi0dlHcVwMcHTYeu0KUR/NH65WZlDIm9Jr7gCPtvPCbwYRfIS8bOCv+XPj
-         QTAZa3VOAUd9MiQWRzlwT9ilegZXyrCs7ksT+FLQ4mkt7uShGsl7Ezf7jlUY7j0PlceR
-         ARjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732258179; x=1732862979;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Emi3zUI2rwJq2d7I1jD4qpcNMtg6QfnfoegZT//vDEw=;
-        b=mnaNwVFv+oabKT5FYz4OdEadT7QVgWaQDeD0MjgDBSxEwA6IIA2mjisYXbb4Vg9Odg
-         x/FFpbwXwDaST32HzpXF5dCgQKmlyC9rlsSQtqdq0pFpaTCUUFC0Pf00wsFtOncstyLU
-         /Rd2LBDOM0ln0SOOLzOAtEiBo2Nq+QrK6NfCC4z9lcoNwQUg4wtxkl0MYxbpRIwj3jeh
-         6YsQ9AfB9IOh8Uo72mUwZhjwQZu3AjHm9ySbLmid+IZ+vY0kkSTGMs6S+4TyLy6kRaBh
-         X8KUjL/VgxD/XpC0yMqdeYcoAFC1YLMW6TtTSUPnBZ2FnfwlpVR7hLZASUQnPG3L5pF0
-         91/Q==
-X-Gm-Message-State: AOJu0YzdqKXhBBsyefNPPJw9/j6QHiZwPXQ6IW2rdDP2XQm52agWjSmn
-	osxwhJehanFeHLQuNqI2kZJmVatQklQgglFQeixrc53yjcODTuPHEzBfgGSvfMFr9zOI9PqP4cc
-	f
-X-Gm-Gg: ASbGnctXm/XSuAPOCwkos4rZGntoRmmnxodfMB0pnNW2oD/CEEATH7SvR2TBqZJ72st
-	cDSmCxNF0soXHCdceKEKRQBzDfjBSTMNkvDNd9c+6LdyCmm8U0flBl8/pC12srl1Lewi4wRENdC
-	fIJqOC7cMeI5n/WIexpeJfoUn5HS7tspQNZrMHce2plny9o75Ez3PF/jmUOJdafhzCTkJKe7jYE
-	UGYA9lGGeRJiUsoZDao4MQGOOEDX3VrEzc=
-X-Google-Smtp-Source: AGHT+IFzHVL9HHw1ZCHOGDXKN5ZD4NNLoyWiLGa86h+QJ/tH5Qq+a22B3czoBeWlo3Uq4MwGR07Jww==
-X-Received: by 2002:a05:6808:3510:b0:3e6:18b6:4bc3 with SMTP id 5614622812f47-3e91587829dmr2356252b6e.24.1732258179237;
-        Thu, 21 Nov 2024 22:49:39 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:73::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724e4c4d7besm499053b3a.103.2024.11.21.22.49.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2024 22:49:38 -0800 (PST)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org,
-	Mohan Prasad J <mohan.prasad@microchip.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Wei <dw@davidwei.uk>
-Subject: [PATCH net v1] selftests: fix nested double quotes in f-string
-Date: Thu, 21 Nov 2024 22:48:21 -0800
-Message-ID: <20241122064821.2821199-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1732258678; c=relaxed/simple;
+	bh=2bQidcpYViv2UqdnhNfZ825gVGDYKCWzRf/rTc3Yl/c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WlAL+Ez1eeMgpqB5P1QUfUAqq+Y2CCc+iAc18KZMahzG+QRFNJ8M+3eRuYLWXNFjY3ZAeswuBMEq14OZRi3/+WgRQk5AoSOx5nDHJ2Gsk/2Q6Q/YtrxayTfoz4w/IqXVpc8j9mNa2eW88cZcd9hsJ2srOWyQlSuEA+7H0jUd7Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOtaUj4V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 677C7C4CECE;
+	Fri, 22 Nov 2024 06:57:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732258678;
+	bh=2bQidcpYViv2UqdnhNfZ825gVGDYKCWzRf/rTc3Yl/c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WOtaUj4VawlJwZPJWwWTrJhSvmRCkGwZromimL76PxZt9Em5wsSaOu+y93YyW9Qhr
+	 obt9neqrntz6Jr+UrJp80T6UcdZJNungPdtZ0TPMxH+R05SdzASWBgeWSjFtzhrJLt
+	 VpNYLT6qEeVJXkT2IVuJ4HEq/JSxysjHq+ZMVRwGo3PJXQQ4DQ6aZxHc1xszhL6i42
+	 pRwFQZIk1CjXxkTv1tZ44u7F9t0s7JqG/cKt8UQFjR+XYGj86a0iWHGwyU1YQWRYQT
+	 SfX1HNJm1Oyx0DpyKalLhCZNHVhFJUm9npgR1TwG9UwXaHtN7aZCTXesJWQMl1Xah6
+	 /prSuBIMhM2wA==
+Message-ID: <6a965d93-c3f9-4c0b-8c8d-5ea4da49f49f@kernel.org>
+Date: Fri, 22 Nov 2024 07:57:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v3 17/27] regulator: dt-bindings: Add
+ regulator-power-budget property
+To: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
+ Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
+ <20241121-feature_poe_port_prio-v3-17-83299fa6967c@bootlin.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20241121-feature_poe_port_prio-v3-17-83299fa6967c@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Replace nested double quotes in f-string with outer single quotes.
+On 21/11/2024 15:42, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> Introduce a new property to describe the power budget of the regulator.
+> This property will allow power management support for regulator consumers
+> like PSE controllers, enabling them to make decisions based on the
+> available power capacity.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+Considering:
+1. This was not tested,
+2. You did not Cc DT folks
+so I assume you do not expect review as indicated by RFC. It is fine,
+but if that was not the intention, please kindly first test the patch
+and then use get_maintainers.pl or b4.
 
-Fixes: 6116075e18f7 ("selftests: nic_link_layer: Add link layer selftest for NIC driver")
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py b/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
-index db84000fc75b..79fde603cbbc 100644
---- a/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
-+++ b/tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
-@@ -218,5 +218,5 @@ class LinkConfig:
-         json_data = process[0]
-         """Check if the field exist in the json data"""
-         if field not in json_data:
--            raise KsftSkipEx(f"Field {field} does not exist in the output of interface {json_data["ifname"]}")
-+            raise KsftSkipEx(f'Field {field} does not exist in the output of interface {json_data["ifname"]}')
-         return json_data[field]
--- 
-2.43.5
-
+Best regards,
+Krzysztof
 
