@@ -1,219 +1,114 @@
-Return-Path: <netdev+bounces-146815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090309D60A7
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:42:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26999D60BA
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:46:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B8871F23C1F
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:42:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 881821F215E1
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B11613AD33;
-	Fri, 22 Nov 2024 14:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF4884D13;
+	Fri, 22 Nov 2024 14:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DAYea4vJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66386088F
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED1876036
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732286551; cv=none; b=FUncJBHaURBJkBUDbvvWIYDBSkCuoZ/Vt23qNuBTkx0M6x5w/7Lw1CSWreNFLbYpYtwvLb8+ObanX+YJ9vI/eBYE/qsBFams22CZvzRthML/icLKRlct5AhGtvsrmGiXeTQy1bOqUvexHiaKumBjRxXlPIJKe/HGMw/QD+nIzv8=
+	t=1732286792; cv=none; b=ePPYBpqmm/cjXlKR5EM69n4vwt8m5H4KX3Q4T0veVjVtCqnFZXCOH+iTQeVTJckAOzLtpl1WSPXlDv7kM50VDlYfgRHuiz8LBayqwbMakhNBA1VwR54rGP+W6uVatHoSOelzUlcsxj3fpBxZcu3Z1lWnTZ4w+1GWUy23wBJ8UB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732286551; c=relaxed/simple;
-	bh=BIEsS5LsD4by/EhQhvRWIE3r/czFlXo23B/i/vdCbG0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FDDuE4xUBRSgQnWRCqHAWA1gZb50k481m8pjRPA7cHa+txPEtdr63/LpBzwmwF1LgypZenbUZpDGVavGhP2slsmly0cgZYafSreIreNdVgusiB6b0AX5eBcJrMk3jkhA1ZjGOKYZgE76oIHdpzlHaQmHyg5h5U0+laWCqesz/6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a79039ae30so22397435ab.2
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 06:42:29 -0800 (PST)
+	s=arc-20240116; t=1732286792; c=relaxed/simple;
+	bh=YuCDyXzpAPEp7yzMQsq89fFqbxrywM3WLDg46780FWU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m32XneI6WvYhxY2WFvbYUYucIDu3BbNS7KKsa49XUJ7IMPpR1aCeJhZCddFn0xEVY3D2DMGklbROprulXyxs5LiSb3xCTIlu9uYnbY4MY8eFi/aQ5+y8EhVuVl9HNfJ7Hhrc6zOpwR/K+7gyhvTZlK9YEXhTbhgmLkaOw1tfEgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DAYea4vJ; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53dd0cb9ce3so1742896e87.3
+        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 06:46:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732286789; x=1732891589; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YuCDyXzpAPEp7yzMQsq89fFqbxrywM3WLDg46780FWU=;
+        b=DAYea4vJaqkKrZqK3Q0YE2LV/P2qx8pLec7qBLcV/WkUN8sSKyKt9K8eokpTXhiQId
+         XYXlKIsFArZESQGX97zkGLQXbuutL3+vw+28nH1n9h7He2tYe6OEtjPM92kR6tsX5r/6
+         BjQjmbnCTofZO0vYlKPElN5Aj21cyakOe7VEMfXTItXPUAaF40OMKdRXPJnaeDjbe4pR
+         H4c58/jKm4Sa53MujbVHiSgPxjLkv7r97KQ+l8iUHCFjvzjGs5sgAJ3wzZsIfzUxNieR
+         83fr4w3UVpbWcA4ffHeyf7dp4VMjeP/RW/K8sFpKim9gDLyK3RT2wSUQFDgarPWApKWd
+         dPtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732286548; x=1732891348;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HREFpr2frQJtKc/0gF+LMIRtVsh+wEdJTnHfyu0RbuM=;
-        b=vMoHs5m3+jPPSVRuEQFaeb9LCchJwMof2wxQoLbSQbI2dELcdx42hrTKJbmkyQkJ5N
-         1Nqs1ZeBCn8d5zmx01ml/E3jyO/kBXdC5pRyitTbSoIE/UYx/COOprp+caDpZL7xJFB/
-         dJ2F2Y0JKbTM4lm3zwAFSebcNzGg7GXp4P8VQmTLkYAkBrT1qgYwI+WIF015phNIhFd+
-         KC0NIQG8b/srfsU/WQ8mJY33huYXSxzJGWdxwnxt+TRxb6eECkhArpnbYaItHHSC+zom
-         BLTTqDWq4lkeOwq5jlcyeIC5nxyeqC/yv5qqbD1A7G0TJvRy14GO/fKw2ler7OGw6/nn
-         W2eA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyIK4FNRKOBlxoFGiooKHHYueI+gMmcTzf0Hc0PQVDQUVhjcM06lQ+sylRkmhREIpu5/cLjLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQxMYPr2SZFOEA23SeHeCXE5WSRpGJmVcgsu8Y7u9WAyo2MeFc
-	NPuS8XTdvp9aGRZ1FU5rnB1TO6b/WTKURBv/3+7W/QykRyaojZs/CdpEuAcDqAawaB0AIXwRA9O
-	SXOHyb4j8b2Rnal37NIahO8jqL2qInXzgvAzdVehkN6XsaP3HHWbDgoE=
-X-Google-Smtp-Source: AGHT+IGbXUYw3Kwjx0hw4KKuy2WKwNuZ+/BKDPjA2T2Hn3hL4ksW0iLcQ8/sjUrHRK/GuSqEy7KOeguwLdSbBxZe+35sIIIee0Es
+        d=1e100.net; s=20230601; t=1732286789; x=1732891589;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YuCDyXzpAPEp7yzMQsq89fFqbxrywM3WLDg46780FWU=;
+        b=QstOM1REdjaZQuAkiQ5Bzk/8l6oJH0UKKgQ+6Yr3fzrYOa+NhGny8to8/xyfzlJUc/
+         C+vnMBFmDTSmElsEDOkE1UX5TsKGCBFbIGhGkO2u6wPEyIk5Cwxyxk6n7aQkfCoArrfj
+         Me0MbimXQcUzcRcrOtLA2vb3LmLqlTElXygdHJipFk/Q/T+lp4o2uW9PR3x2CnSsxxbG
+         DXJLtxzbFKsG11dLGY3L6+CDjwJlF7QxiPxmiftRhBEVyINjG6OauJXdEpoQjcz911CK
+         taFBFKI/PUQfoKRegCXwfSUSg5uCUG1z24JtU1KaHdw/60qGf6AUaP4/Sjq1Xz5TEw3y
+         EXqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnqklA8hoIsR+dR29E/hVpYvqLasO4u76wrUF/FHmQCFIKe5i4xzgPwJ0gytsOg2kzvlfgdLU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmPtVYvFJBcN3G3gh2CImNnW7wQPWbWMs686Sv26GXTN8yaTTQ
+	VNR7lDh7Z1+SAPeJJlCnHwwXbp4EQmlGYHPO+k62WtSAppYIsD+auvkJd0HfpUHphHQFSdLSMLf
+	KHafABU0htOE7lZd+oDB2PEam8LAplr+4kGrC
+X-Gm-Gg: ASbGncvKR2baM3ov2Mk/EiHrffAkAEc+xQwwD5PpAtr4NOy0i+DcCq3YwXShFrJnvg3
+	cI0FWMNhRzJfzlnohErppigZxsCxzOg==
+X-Google-Smtp-Source: AGHT+IEO0g02B7hMsc6G7E1jh2onw8QqpwRT1leD0anvYgIAvIwpEwDCFZIzyZF/av/qeAHbuQ0CCwLwxb2LPehfcBo=
+X-Received: by 2002:ac2:4d8b:0:b0:53d:d3bc:cc11 with SMTP id
+ 2adb3069b0e04-53dd3bccc70mr1525350e87.48.1732286788623; Fri, 22 Nov 2024
+ 06:46:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:16c5:b0:3a7:87f2:b010 with SMTP id
- e9e14a558f8ab-3a79acf9b88mr40033755ab.5.1732286548639; Fri, 22 Nov 2024
- 06:42:28 -0800 (PST)
-Date: Fri, 22 Nov 2024 06:42:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67409854.050a0220.363a1b.013f.GAE@google.com>
-Subject: [syzbot] [netfilter?] KMSAN: uninit-value in ip6table_mangle_hook (3)
-From: syzbot <syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20241122-netpoll_rcu_herbet_fix-v2-1-93a41fdbb19a@debian.org>
+In-Reply-To: <20241122-netpoll_rcu_herbet_fix-v2-1-93a41fdbb19a@debian.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 22 Nov 2024 15:46:17 +0100
+Message-ID: <CANn89i+iQJ70z2P-ZVYq9vbas16wDnBPQdp8fZT6X8qONeovGw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] netpoll: Use rtnl_dereference() for npinfo
+ pointer access
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Michal Kubiak <michal.kubiak@intel.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Jacob Keller <jacob.e.keller@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, Nov 22, 2024 at 2:18=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
+ote:
+>
+> In the __netpoll_setup() function, when accessing the device's npinfo
+> pointer, replace rcu_access_pointer() with rtnl_dereference(). This
+> change is more appropriate, as suggested by Herbert Xu[1].
+>
+> The function is called with the RTNL mutex held, and the pointer is
+> being dereferenced later, so, dereference earlier and just reuse the
+> pointer for the if/else.
+>
+> The replacement ensures correct pointer access while maintaining
+> the existing locking and RCU semantics of the netpoll subsystem.
+>
+> Link: https://lore.kernel.org/lkml/Zz1cKZYt1e7elibV@gondor.apana.org.au/ =
+[1]
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-syzbot found the following issue on:
-
-HEAD commit:    2e1b3cc9d7f7 Merge tag 'arm-fixes-6.12-2' of git://git.ker..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=105e0d87980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fdf74cce377223b
-dashboard link: https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165d5d5f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=145e0d87980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/08456e37db58/disk-2e1b3cc9.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cc957f7ba80b/vmlinux-2e1b3cc9.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7579fe72ed89/bzImage-2e1b3cc9.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
-BUG: KMSAN: uninit-value in ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
- ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
- ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
- nf_hook include/linux/netfilter.h:269 [inline]
- __ip6_local_out+0x5ac/0x640 net/ipv6/output_core.c:143
- ip6_local_out+0x4c/0x210 net/ipv6/output_core.c:153
- ip6tunnel_xmit+0x129/0x460 include/net/ip6_tunnel.h:161
- ip6_tnl_xmit+0x341a/0x3860 net/ipv6/ip6_tunnel.c:1281
- __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
- ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
- ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
- __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
- netdev_start_xmit include/linux/netdevice.h:4937 [inline]
- xmit_one net/core/dev.c:3588 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
- sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:3825 [inline]
- __dev_queue_xmit+0x2fcf/0x56d0 net/core/dev.c:4398
- dev_queue_xmit include/linux/netdevice.h:3094 [inline]
- packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3145 [inline]
- packet_sendmsg+0x908b/0xa370 net/packet/af_packet.c:3177
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:744
- __sys_sendto+0x645/0x7f0 net/socket.c:2214
- __do_sys_sendto net/socket.c:2226 [inline]
- __se_sys_sendto net/socket.c:2222 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2222
- x64_sys_call+0x3373/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was stored to memory at:
- ip6_tnl_xmit+0x34f7/0x3860 net/ipv6/ip6_tunnel.c:1277
- __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
- ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
- ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
- __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
- netdev_start_xmit include/linux/netdevice.h:4937 [inline]
- xmit_one net/core/dev.c:3588 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
- sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:3825 [inline]
- __dev_queue_xmit+0x2fcf/0x56d0 net/core/dev.c:4398
- dev_queue_xmit include/linux/netdevice.h:3094 [inline]
- packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3145 [inline]
- packet_sendmsg+0x908b/0xa370 net/packet/af_packet.c:3177
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:744
- __sys_sendto+0x645/0x7f0 net/socket.c:2214
- __do_sys_sendto net/socket.c:2226 [inline]
- __se_sys_sendto net/socket.c:2222 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2222
- x64_sys_call+0x3373/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4091 [inline]
- slab_alloc_node mm/slub.c:4134 [inline]
- __do_kmalloc_node mm/slub.c:4263 [inline]
- __kmalloc_node_track_caller_noprof+0x6c7/0xf90 mm/slub.c:4283
- kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
- pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
- skb_realloc_headroom+0x140/0x2b0 net/core/skbuff.c:2355
- ip6_tnl_xmit+0x2106/0x3860 net/ipv6/ip6_tunnel.c:1227
- __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
- ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
- ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
- __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
- netdev_start_xmit include/linux/netdevice.h:4937 [inline]
- xmit_one net/core/dev.c:3588 [inline]
- dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
- sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:3825 [inline]
- __dev_queue_xmit+0x2fcf/0x56d0 net/core/dev.c:4398
- dev_queue_xmit include/linux/netdevice.h:3094 [inline]
- packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3145 [inline]
- packet_sendmsg+0x908b/0xa370 net/packet/af_packet.c:3177
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:744
- __sys_sendto+0x645/0x7f0 net/socket.c:2214
- __do_sys_sendto net/socket.c:2226 [inline]
- __se_sys_sendto net/socket.c:2222 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2222
- x64_sys_call+0x3373/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 5819 Comm: syz-executor359 Not tainted 6.12.0-rc6-syzkaller-00077-g2e1b3cc9d7f7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Okay, but net-next is currently closed.
 
