@@ -1,189 +1,170 @@
-Return-Path: <netdev+bounces-146763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590839D59CA
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:16:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6060F9D59DE
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 004DC1F23048
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:16:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5C1BB22A3D
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AB3170A3E;
-	Fri, 22 Nov 2024 07:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48BB16F0EB;
+	Fri, 22 Nov 2024 07:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KbmIKtKr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZHyrcmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3343616BE01;
-	Fri, 22 Nov 2024 07:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A5C15B987;
+	Fri, 22 Nov 2024 07:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732259807; cv=none; b=gIKPNhyD1PinyPRc52QTGPobIanvfIzZjt6685ewBnJkh/kfaNufDxXjvKJccRswALR9SaPUWNRLwST4ecoooYwxc3dnWNxmDgCgb9OtS+HdcxW2nhbb2gsWinWd470vGnCGq5U0ytFP2gpTEFuo3TtTp9RHtOTvhkdb2Trcguw=
+	t=1732260019; cv=none; b=S1Ow8DcubwEnhbBAfED2VhnOAJNUxzQoZIwcyWescPYnYsmwigpNv5WJ/Av1P4ixqGbJR1/rsuYiekNHI3YDGf7lkGIHERrQtQ9vvLdBSWHNgCiqGnUtnfv4C5J+HPOOMY9mOPZWCTWDkuhnYLBrCKxG9ABCqdCFfCHqslNXljU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732259807; c=relaxed/simple;
-	bh=2cSQxrteySvr13xOvnwTvI9SQX8fC71lvBVAvXlndMM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LW2J8syc8VxN7ITpdFUg2Mtukbgx1ZKmxVrzYw+MC3FrD0T1wZmBvvppyITo2j/04E2AgzY7z83FYbFHUMKdrhG3k4qhlHNJ64Yl560HFke9aorrdbZduEopu2T+VUnbssqAK4cwQX0nZjonDdzbRhIurenpyM51w6EyBKux6f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KbmIKtKr; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1732259796; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=ijdPFqMJEXQyY7cj+GbQC+Q1McJItiVYA1uEbryR+DM=;
-	b=KbmIKtKrUjbelgN1+PZrVTI5HbgPeId/UAeBaJo998/EmwUhWxFUGOaxqL5SPSBrcucoU5iystuQgQ88dOTZGghWAqFhFq6mc0l8lvGfjacBtZ17XxYjKjYEm3963E5jXskt8zttdv0jrmUMsRRBeN4HTf6MGJSnyI+xQUWGreI=
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WJzhgeP_1732259794 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Nov 2024 15:16:35 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] net/smc: fix LGR and link use-after-free issue
-Date: Fri, 22 Nov 2024 15:16:30 +0800
-Message-Id: <20241122071630.63707-3-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20241122071630.63707-1-guwen@linux.alibaba.com>
-References: <20241122071630.63707-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1732260019; c=relaxed/simple;
+	bh=sBFVC7C9RINBCv8fmIUVR8aRbHxatozvHOs/XUgRHwk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LcqXhhUM21pVJijXJcpHkxIGfk04a0cAQE4avFL+1K7RqiYu50MUOY94fl2Z1hBydBaG6Mdbw3vzed7g76N3HW08fpWyTmM1Z7qKOMMj3iezuAjHuH9rUpTzwgB4KTHk4C/ZioLWNs6/pFhMeN9VdczG8dIWjfXG72E8POYRS4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dZHyrcmh; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e388c3b0b76so1529394276.0;
+        Thu, 21 Nov 2024 23:20:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732260017; x=1732864817; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=815PRNAXGixKSoavwJ5I7tnTzuqoesWmtEB/fULSXqw=;
+        b=dZHyrcmhAVuMbbK8SA4sxXyh2C9Qa9DP7/0Ibjp4RWUPHNXSzLwCrLIc9ZE6L5CACE
+         wThQYCteTbEPAoo5DxC/s0mIxiYMPqpf5nWeU2k5dxlyH9mhQVD++llrORBTXq+1xW5J
+         2hZZJ0EQPMJNmrTFyqvWHR9hq8AMNU/wddf24LJ5fnez49uL2zpAY7PLFNHWTIn0MUWA
+         OjQYg57lcx+q7uKFJ82oPPJBULaUp9qHIwP7+hB1+V/AenKQHJSJQAFmqNU5h9NjVnCS
+         JAk/6LbnX1+MyM5hL6E5PrlCjfVGI7be88Gb8+R8FpQnagrQKwMrOREY+5bE4jqvSzTI
+         gIBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732260017; x=1732864817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=815PRNAXGixKSoavwJ5I7tnTzuqoesWmtEB/fULSXqw=;
+        b=WeGZHeJc5m6d4uYc3qS2F2AGUchkyr2x7iILG/ohGoeVrZOtEYhFjfjVNc71z948VX
+         u+IhzlPyx8lzSxz1aJCwm17ZDmHjWJwCV6z6l192cHuoy2D/mBHcrU0xdsO3R2NMjVtx
+         k/rmwCw2q9HkHflVbAUD07+r5Hvi5znjEayZ7txXvSbyIm8fkQE3nnAXvXLOakAOwlxp
+         uHoJkAMXUB6akSHLkEZH8iHRHWFCmgwoc/DksyVjjwiIKPUO7GMTOOFMwkmXgWt+DvhV
+         Fq3q0WK2LN4n46ktECySUr87/jHeZP/bYlF+cX26VD4/b5BucxJMWZaiHJlOmIxSu8w3
+         X9VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUF4XUvY4poZ3dNFFKGjVWjuCM54CxWitCGyfRaAzc8ioggQvaodNvhgBd+aCRGqTzqPM1S55WYI2OOqTFX@vger.kernel.org, AJvYcCVILqoG4reSE/HhktxRv9V+xuX9B6KP51o58ZFNX7aKbuo/86W2mua9IEi1V0XVRgF+WbBaK9bOx6f/I22Lvsk=@vger.kernel.org, AJvYcCViAtX8Qu/zwr9cUgewfQUgGI0pDEKV87KeH0JldFPK0ma3+OsQZgcEEAS7CN/Squ93rLIdUSrDL/sRpA==@vger.kernel.org, AJvYcCVj0yDbwFpVlo6w54EWmQ+RtX5xg8ALnCiEOOE7txifhsYfcdO437l1mNB9hy60ozI3eEoufJeD4utrB7I=@vger.kernel.org, AJvYcCW7mWRC4dA0e7wn56as4yX0iUOjErqjTaMhsFaFaRt4tQq2V+F1349z7bGS1UL+5l7oSjGzuhnP1Fg=@vger.kernel.org, AJvYcCWBMy2CSp6WnyLhH6lFb2nkA9R67+kcnHB68tTyv+5WpOjnv6+KVL5nxhHiwRhfDOTTo575OCA2pLnb@vger.kernel.org, AJvYcCWGG0yPKLiL2biTMr6C04ScIubQWj3woIQsoo46VnH4B2Iqa12YC/emg1lScNMVQYSKOq/21IS/EkwT@vger.kernel.org, AJvYcCXa+joCqNVSA0edxD2f4HDiCzQ6IOYt2Am1UNcom7jc3l+RLgeVSL1l75ZCQD727tqQUIeQTTTd@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx2Wk7fXhHFsHFA0Wj9xo4xqnJGAgKAnRho3/ZtYJZMulenrgA
+	5s5j6pMu8vnB7cXWn9J9hykpXmVQU4tXBNIJx3dzwR8Nqp4xLNgZPDUjNs3YLkNepKHGhpPU9n+
+	oxdxwI7eSTnLP5Q1uZoiR+8A9o34=
+X-Gm-Gg: ASbGncsbK27821sCgQ0yBn1GI9r4Wo9BJm0U2NV9ArM078W9y9Of42txhz8dB0o5r1r
+	0lamvdjAd8BPiZ00K/hFdbby0wf/QuLk=
+X-Google-Smtp-Source: AGHT+IEo9z3KG+qp+L7Dv7o9KTWLJa02iuVvebytFW0OHFU307Dg/AvnlIih0s/Axe8p+7QfLYX633cDQcq1B3yoR4c=
+X-Received: by 2002:a05:6902:114d:b0:e38:b48b:5fc2 with SMTP id
+ 3f1490d57ef6-e38f8bda124mr1654950276.36.1732260017069; Thu, 21 Nov 2024
+ 23:20:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241121064046.3724726-1-tmyu0@nuvoton.com> <20241121064046.3724726-3-tmyu0@nuvoton.com>
+ <CAMRc=MdT_iXoRJeGFEhuCvjVXVPpJVNeddPc6pi5agTaTm+QpQ@mail.gmail.com>
+In-Reply-To: <CAMRc=MdT_iXoRJeGFEhuCvjVXVPpJVNeddPc6pi5agTaTm+QpQ@mail.gmail.com>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Fri, 22 Nov 2024 15:20:06 +0800
+Message-ID: <CAOoeyxVzVF0Jiiv1MeY6b=2XR5HFuGx+4q8Kvw3kFrgC+_LnBw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] gpio: Add Nuvoton NCT6694 GPIO support
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We encountered a LGR/link use-after-free issue, which manifested as
-the LGR/link refcnt reaching 0 early and entering the clear process,
-making resource access unsafe.
+Dear Bartosz,
 
- refcount_t: addition on 0; use-after-free.
- WARNING: CPU: 14 PID: 107447 at lib/refcount.c:25 refcount_warn_saturate+0x9c/0x140
- Workqueue: events smc_lgr_terminate_work [smc]
- Call trace:
-  refcount_warn_saturate+0x9c/0x140
-  __smc_lgr_terminate.part.45+0x2a8/0x370 [smc]
-  smc_lgr_terminate_work+0x28/0x30 [smc]
-  process_one_work+0x1b8/0x420
-  worker_thread+0x158/0x510
-  kthread+0x114/0x118
+Thank you for your comments,
 
-or
+Bartosz Golaszewski <brgl@bgdev.pl> =E6=96=BC 2024=E5=B9=B411=E6=9C=8821=E6=
+=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=884:28=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> > +struct nct6694_gpio_data {
+> > +       struct nct6694 *nct6694;
+> > +       struct gpio_chip gpio;
+> > +       struct mutex lock;
+> > +       /* Protect irq operation */
+> > +       struct mutex irq_lock;
+> > +
+> > +       unsigned char xmit_buf;
+> > +       unsigned char irq_trig_falling;
+> > +       unsigned char irq_trig_rising;
+> > +
+> > +       /* Current gpio group */
+> > +       unsigned char group;
+> > +
+> > +       /* GPIO line names */
+> > +       char **names;
+>
+> You only use this in probe() and after assigning it to gc->names, you
+> never reference it again. You don't need this field here, it can be a
+> local variable in probe().
+>
 
- refcount_t: underflow; use-after-free.
- WARNING: CPU: 6 PID: 93140 at lib/refcount.c:28 refcount_warn_saturate+0xf0/0x140
- Workqueue: smc_hs_wq smc_listen_work [smc]
- Call trace:
-  refcount_warn_saturate+0xf0/0x140
-  smcr_link_put+0x1cc/0x1d8 [smc]
-  smc_conn_free+0x110/0x1b0 [smc]
-  smc_conn_abort+0x50/0x60 [smc]
-  smc_listen_find_device+0x75c/0x790 [smc]
-  smc_listen_work+0x368/0x8a0 [smc]
-  process_one_work+0x1b8/0x420
-  worker_thread+0x158/0x510
-  kthread+0x114/0x118
+Understood. I will modify it in the next patch.
 
-It is caused by repeated release of LGR/link refcnt. One suspect is that
-smc_conn_free() is called repeatedly because some smc_conn_free() are not
-protected by sock lock.
+> > +};
+...
+> > +
+> > +       data =3D devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+> > +       if (!data)
+> > +               return -ENOMEM;
+> > +
+> > +       data->names =3D devm_kzalloc(dev, sizeof(char *) * NCT6694_NR_G=
+PIO,
+>
+> devm_kcalloc()?
+>
 
-Calls under socklock        | Calls not under socklock
--------------------------------------------------------
-lock_sock(sk)               | smc_conn_abort
-smc_conn_free               | \- smc_conn_free
-\- smcr_link_put            |    \- smcr_link_put (duplicated)
-release_sock(sk)
+Okay, fix it in v3.
 
-So make sure smc_conn_free() is called under the sock lock.
+> > +                                  GFP_KERNEL);
+...
+> > +       mutex_init(&data->irq_lock);
+> > +
+> > +       platform_set_drvdata(pdev, data);
+>
+> There is no corresponding platform_get_drvdata() so you don't need this.
+>
 
-Fixes: 8cf3f3e42374 ("net/smc: use helper smc_conn_abort() in listen processing")
-Co-developed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Co-developed-by: Kai <KaiShen@linux.alibaba.com>
-Signed-off-by: Kai <KaiShen@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/af_smc.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+Okay, I'll drop it.
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index ed6d4d520bc7..e0a7a0151b11 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -973,7 +973,8 @@ static int smc_connect_decline_fallback(struct smc_sock *smc, int reason_code,
- 	return smc_connect_fallback(smc, reason_code);
- }
- 
--static void smc_conn_abort(struct smc_sock *smc, int local_first)
-+static void __smc_conn_abort(struct smc_sock *smc, int local_first,
-+			     bool locked)
- {
- 	struct smc_connection *conn = &smc->conn;
- 	struct smc_link_group *lgr = conn->lgr;
-@@ -982,11 +983,27 @@ static void smc_conn_abort(struct smc_sock *smc, int local_first)
- 	if (smc_conn_lgr_valid(conn))
- 		lgr_valid = true;
- 
--	smc_conn_free(conn);
-+	if (!locked) {
-+		lock_sock(&smc->sk);
-+		smc_conn_free(conn);
-+		release_sock(&smc->sk);
-+	} else {
-+		smc_conn_free(conn);
-+	}
- 	if (local_first && lgr_valid)
- 		smc_lgr_cleanup_early(lgr);
- }
- 
-+static void smc_conn_abort(struct smc_sock *smc, int local_first)
-+{
-+	__smc_conn_abort(smc, local_first, false);
-+}
-+
-+static void smc_conn_abort_locked(struct smc_sock *smc, int local_first)
-+{
-+	__smc_conn_abort(smc, local_first, true);
-+}
-+
- /* check if there is a rdma device available for this connection. */
- /* called for connect and listen */
- static int smc_find_rdma_device(struct smc_sock *smc, struct smc_init_info *ini)
-@@ -1352,7 +1369,7 @@ static int smc_connect_rdma(struct smc_sock *smc,
- 
- 	return 0;
- connect_abort:
--	smc_conn_abort(smc, ini->first_contact_local);
-+	smc_conn_abort_locked(smc, ini->first_contact_local);
- 	mutex_unlock(&smc_client_lgr_pending);
- 	smc->connect_nonblock = 0;
- 
-@@ -1454,7 +1471,7 @@ static int smc_connect_ism(struct smc_sock *smc,
- 
- 	return 0;
- connect_abort:
--	smc_conn_abort(smc, ini->first_contact_local);
-+	smc_conn_abort_locked(smc, ini->first_contact_local);
- 	mutex_unlock(&smc_server_lgr_pending);
- 	smc->connect_nonblock = 0;
- 
--- 
-2.32.0.3.g01195cf9f
+> > +
+...
+> > +module_platform_driver(nct6694_gpio_driver);
+> > +
+> > +MODULE_DESCRIPTION("USB-GPIO controller driver for NCT6694");
+> > +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> > +MODULE_LICENSE("GPL");
+>
+> It's an MFD device, don't you need a MODULE_ALIAS() for this module to lo=
+ad?
+>
 
+I will add MODULE_ALIAS() for each child driver.
+
+
+Best regards,
+Ming
 
