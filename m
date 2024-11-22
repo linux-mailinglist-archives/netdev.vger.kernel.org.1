@@ -1,113 +1,219 @@
-Return-Path: <netdev+bounces-146814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF8C9D602F
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:13:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 090309D60A7
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:42:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 721371F21C8B
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:13:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B8871F23C1F
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 14:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFEE2BB04;
-	Fri, 22 Nov 2024 14:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EPxDcobP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B11613AD33;
+	Fri, 22 Nov 2024 14:42:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECAE79C0;
-	Fri, 22 Nov 2024 14:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66386088F
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732284791; cv=none; b=VhvDGb6Lx8y3sB0P8rxOuOLRQfAJWu32WXMeg9yNPH1/oP6rI8Q8hl3vMpuK751tgfaw3wywuk0pWbA7f7hYdm1IfED626y08AE1kKBKc7zdT44pMISP3sxnmE2gALHj8r7OJ0yO7OhnaFs/R59DkvpB11E7WY9VBYWutorPqns=
+	t=1732286551; cv=none; b=FUncJBHaURBJkBUDbvvWIYDBSkCuoZ/Vt23qNuBTkx0M6x5w/7Lw1CSWreNFLbYpYtwvLb8+ObanX+YJ9vI/eBYE/qsBFams22CZvzRthML/icLKRlct5AhGtvsrmGiXeTQy1bOqUvexHiaKumBjRxXlPIJKe/HGMw/QD+nIzv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732284791; c=relaxed/simple;
-	bh=7bXRyUg528fYaEeKIULUUicaZ3evTJltL2qw2YdaAq0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qTEoKjaqk/9h/ythhlKM8CkYBupxN7kkmpsSGQPaEDuP3rw0PrShQOMPBEefSS5P6/JN1/BORXG3XkmeZd1Sx3pgyx8BNWBn3Bjus7Sy6blPUQuCvBJ/ldHsu7eMjcLztO3dBkXanBwP3DEOkVlOf2FaM6AfljD2yiQ6hUshfYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EPxDcobP; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D9B381BF204;
-	Fri, 22 Nov 2024 14:12:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732284781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+01xzJeV3qRX2WUWGKaOOxbz2v9CPnb9VQR2tAoftiY=;
-	b=EPxDcobPHDeJCBnjLXZtIBQaHN3OS6jpELxflv23dxJ/V44WfAMfNEUKav0FLPtpF0C2s7
-	rKbYlya+ZEhOac2lw0RWwCdf6/Y9b6/LMgXWyvz7STEx7lCwbMzmMZPDUysI6HB/FbPM+1
-	NMb5euWe1AY54iZoHTnqm4LACVr3Xohdk+Cl/1izvYTxbS2c07+4Je7B+4Utd/3yR33wm8
-	paLh3eWkk4sBJtvGIQbQ4uXUdIzjZ8Qyy+gqCDtLPjYCR2YS2AlzmIHxvAChQ6Bvl2G1ek
-	Tfycg8ero7EGeQFugWRS4PRZ9YgL0mA1QyUrjUcdkQNWQQaM6R52V9uuyK2xMA==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: stmmac: dwmac-socfpga: Set RX watchdog interrupt as broken
-Date: Fri, 22 Nov 2024 15:12:55 +0100
-Message-ID: <20241122141256.764578-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1732286551; c=relaxed/simple;
+	bh=BIEsS5LsD4by/EhQhvRWIE3r/czFlXo23B/i/vdCbG0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FDDuE4xUBRSgQnWRCqHAWA1gZb50k481m8pjRPA7cHa+txPEtdr63/LpBzwmwF1LgypZenbUZpDGVavGhP2slsmly0cgZYafSreIreNdVgusiB6b0AX5eBcJrMk3jkhA1ZjGOKYZgE76oIHdpzlHaQmHyg5h5U0+laWCqesz/6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a79039ae30so22397435ab.2
+        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 06:42:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732286548; x=1732891348;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HREFpr2frQJtKc/0gF+LMIRtVsh+wEdJTnHfyu0RbuM=;
+        b=vMoHs5m3+jPPSVRuEQFaeb9LCchJwMof2wxQoLbSQbI2dELcdx42hrTKJbmkyQkJ5N
+         1Nqs1ZeBCn8d5zmx01ml/E3jyO/kBXdC5pRyitTbSoIE/UYx/COOprp+caDpZL7xJFB/
+         dJ2F2Y0JKbTM4lm3zwAFSebcNzGg7GXp4P8VQmTLkYAkBrT1qgYwI+WIF015phNIhFd+
+         KC0NIQG8b/srfsU/WQ8mJY33huYXSxzJGWdxwnxt+TRxb6eECkhArpnbYaItHHSC+zom
+         BLTTqDWq4lkeOwq5jlcyeIC5nxyeqC/yv5qqbD1A7G0TJvRy14GO/fKw2ler7OGw6/nn
+         W2eA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyIK4FNRKOBlxoFGiooKHHYueI+gMmcTzf0Hc0PQVDQUVhjcM06lQ+sylRkmhREIpu5/cLjLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQxMYPr2SZFOEA23SeHeCXE5WSRpGJmVcgsu8Y7u9WAyo2MeFc
+	NPuS8XTdvp9aGRZ1FU5rnB1TO6b/WTKURBv/3+7W/QykRyaojZs/CdpEuAcDqAawaB0AIXwRA9O
+	SXOHyb4j8b2Rnal37NIahO8jqL2qInXzgvAzdVehkN6XsaP3HHWbDgoE=
+X-Google-Smtp-Source: AGHT+IGbXUYw3Kwjx0hw4KKuy2WKwNuZ+/BKDPjA2T2Hn3hL4ksW0iLcQ8/sjUrHRK/GuSqEy7KOeguwLdSbBxZe+35sIIIee0Es
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-Received: by 2002:a05:6e02:16c5:b0:3a7:87f2:b010 with SMTP id
+ e9e14a558f8ab-3a79acf9b88mr40033755ab.5.1732286548639; Fri, 22 Nov 2024
+ 06:42:28 -0800 (PST)
+Date: Fri, 22 Nov 2024 06:42:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67409854.050a0220.363a1b.013f.GAE@google.com>
+Subject: [syzbot] [netfilter?] KMSAN: uninit-value in ip6table_mangle_hook (3)
+From: syzbot <syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On DWMAC3 and later, there's a RX Watchdog interrupt that's used for
-interrupt coalescing. It's known to be buggy on some platforms, and
-dwmac-socfpga appears to be one of them. Changing the interrupt
-coalescing from ethtool doesn't appear to have any effect here.
+Hello,
 
-Without disabling RIWT (Received Interrupt Watchdog Timer, I
-believe...), we observe latencies while receiving traffic that amount to
-around ~0.4ms. This was discovered with NTP but can be easily reproduced
-with a simple ping. Without this patch :
+syzbot found the following issue on:
 
-64 bytes from 192.168.5.2: icmp_seq=1 ttl=64 time=0.657 ms
+HEAD commit:    2e1b3cc9d7f7 Merge tag 'arm-fixes-6.12-2' of git://git.ker..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=105e0d87980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fdf74cce377223b
+dashboard link: https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165d5d5f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=145e0d87980000
 
-With this patch :
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/08456e37db58/disk-2e1b3cc9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cc957f7ba80b/vmlinux-2e1b3cc9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7579fe72ed89/bzImage-2e1b3cc9.xz
 
-64 bytes from 192.168.5.2: icmp_seq=1 ttl=64 time=0.254 ms
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com
 
-Fixes: 801d233b7302 ("net: stmmac: Add SOCFPGA glue driver")
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+=====================================================
+BUG: KMSAN: uninit-value in ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
+BUG: KMSAN: uninit-value in ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
+ ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
+ ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
+ nf_hook include/linux/netfilter.h:269 [inline]
+ __ip6_local_out+0x5ac/0x640 net/ipv6/output_core.c:143
+ ip6_local_out+0x4c/0x210 net/ipv6/output_core.c:153
+ ip6tunnel_xmit+0x129/0x460 include/net/ip6_tunnel.h:161
+ ip6_tnl_xmit+0x341a/0x3860 net/ipv6/ip6_tunnel.c:1281
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
+ __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4937 [inline]
+ xmit_one net/core/dev.c:3588 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
+ sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
+ __dev_xmit_skb net/core/dev.c:3825 [inline]
+ __dev_queue_xmit+0x2fcf/0x56d0 net/core/dev.c:4398
+ dev_queue_xmit include/linux/netdevice.h:3094 [inline]
+ packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3145 [inline]
+ packet_sendmsg+0x908b/0xa370 net/packet/af_packet.c:3177
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:744
+ __sys_sendto+0x645/0x7f0 net/socket.c:2214
+ __do_sys_sendto net/socket.c:2226 [inline]
+ __se_sys_sendto net/socket.c:2222 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2222
+ x64_sys_call+0x3373/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ ip6_tnl_xmit+0x34f7/0x3860 net/ipv6/ip6_tunnel.c:1277
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
+ __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4937 [inline]
+ xmit_one net/core/dev.c:3588 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
+ sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
+ __dev_xmit_skb net/core/dev.c:3825 [inline]
+ __dev_queue_xmit+0x2fcf/0x56d0 net/core/dev.c:4398
+ dev_queue_xmit include/linux/netdevice.h:3094 [inline]
+ packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3145 [inline]
+ packet_sendmsg+0x908b/0xa370 net/packet/af_packet.c:3177
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:744
+ __sys_sendto+0x645/0x7f0 net/socket.c:2214
+ __do_sys_sendto net/socket.c:2226 [inline]
+ __se_sys_sendto net/socket.c:2222 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2222
+ x64_sys_call+0x3373/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4091 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ __do_kmalloc_node mm/slub.c:4263 [inline]
+ __kmalloc_node_track_caller_noprof+0x6c7/0xf90 mm/slub.c:4283
+ kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
+ pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+ skb_realloc_headroom+0x140/0x2b0 net/core/skbuff.c:2355
+ ip6_tnl_xmit+0x2106/0x3860 net/ipv6/ip6_tunnel.c:1227
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
+ __netdev_start_xmit include/linux/netdevice.h:4928 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4937 [inline]
+ xmit_one net/core/dev.c:3588 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3604
+ sch_direct_xmit+0x399/0xd40 net/sched/sch_generic.c:343
+ __dev_xmit_skb net/core/dev.c:3825 [inline]
+ __dev_queue_xmit+0x2fcf/0x56d0 net/core/dev.c:4398
+ dev_queue_xmit include/linux/netdevice.h:3094 [inline]
+ packet_xmit+0x9c/0x6c0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3145 [inline]
+ packet_sendmsg+0x908b/0xa370 net/packet/af_packet.c:3177
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:744
+ __sys_sendto+0x645/0x7f0 net/socket.c:2214
+ __do_sys_sendto net/socket.c:2226 [inline]
+ __se_sys_sendto net/socket.c:2222 [inline]
+ __x64_sys_sendto+0x125/0x1d0 net/socket.c:2222
+ x64_sys_call+0x3373/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:45
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 UID: 0 PID: 5819 Comm: syz-executor359 Not tainted 6.12.0-rc6-syzkaller-00077-g2e1b3cc9d7f7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+=====================================================
+
+
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 2 ++
- 1 file changed, 2 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 248b30d7b864..16020b72dec8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -487,6 +487,8 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
- 	plat_dat->has_gmac = true;
- 
-+	plat_dat->riwt_off = 1;
-+
- 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
- 	if (ret)
- 		return ret;
--- 
-2.47.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
