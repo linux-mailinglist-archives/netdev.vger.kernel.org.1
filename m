@@ -1,109 +1,195 @@
-Return-Path: <netdev+bounces-146803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449419D5F34
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 13:48:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416249D5EBA
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 13:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BBE7282DD7
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:48:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6505CB21921
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B329B1DF969;
-	Fri, 22 Nov 2024 12:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846301D63FD;
+	Fri, 22 Nov 2024 12:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="La76uv8t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fSaO6vdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10731DF989
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 12:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88621D5164
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 12:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732279616; cv=none; b=C7S/DEYazCVrZ8onWl19ieT2GcKcf47rYG8bvmGYGZ5G2hoZc59mJI45YJ3A6xIEESFQvZwvMnitwfbdWlfb4xgi4dA6oVy5GCYP4GS2Bq7S3Lnc5me9+d/uKv3VHrETDDMwqVarZmndY8HgkwCVWg+0xuPoRpmPfgg3MHc5Bzk=
+	t=1732278147; cv=none; b=n6m9SyRnNIJ2wIkhAo0yWA/Lc0roWQzXUlz/6eTrQk4X3CwKoyKqHMwaOAY/HJHwcpJaP8znmFYOQqQbmRvmhTmwZxb5IGEMIa8jLsxXccZIdL4BWJRyeKZVAodEtk1w8h1xheaOXSPlMMWjxmnXko+tn6Z2FrGaqioLFh3Cavs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732279616; c=relaxed/simple;
-	bh=yvSMM6KMScxa/lLEsxxshorzTDmjaupIGau2oY4cgn0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d6PS+YUgVYPYefL2VKs2+4v+wnhve9ILCjt05T4nAEMoIN72m0diJk88N2Zjl+3hTeTSIIrDKkxsgsPw32EM8lb4JQ1Pns37819Hvl374y7gY/fCdPQBz2we92SA/5GvSiovZPF4fEl28kVieIhsUfhqFELPRJv+wBkNQzGwuC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=La76uv8t; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732279615; x=1763815615;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yvSMM6KMScxa/lLEsxxshorzTDmjaupIGau2oY4cgn0=;
-  b=La76uv8tlXUyAg6mzMhrqgilJXFzP0u/Y5BZF7nzWVXAB9DAUJqBMs1n
-   QiG7dtHRFJEnXtZ+46ikyC0J+NglcOzsH4La20Oh848i0qyqE9BnkTRSI
-   KaQa2TIBedBOUtJxlMgCQdYU9So+M4FsTs2sayi0B/+i9jTYQ6xEv8S9L
-   BTJcoDkYJX0F1TZfmPmtVArvgutP+8nnuDZhQVGFdesDGtzaLZ5pHze6b
-   vDaOxvBDm+l4xjbgG5eAmu60P4NJXJoeTkxcp7QF9SZjTTGVuQ/ehSbC4
-   3oFRfhL2KuaKg6CYyWPFPxQkeiXcjWh4J9rfSmVLojJOsdEq8wPzY8OOX
-   g==;
-X-CSE-ConnectionGUID: v1xiOzoKQCqGIhk+mjhSeA==
-X-CSE-MsgGUID: V62UDumzSISbgD/G1lYrEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="32585219"
-X-IronPort-AV: E=Sophos;i="6.12,175,1728975600"; 
-   d="scan'208";a="32585219"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 04:46:54 -0800
-X-CSE-ConnectionGUID: 2f6oPqMeR4y23dnEGaEBXg==
-X-CSE-MsgGUID: y7FSIJ20R8aQc8Z9vlwBUQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,175,1728975600"; 
-   d="scan'208";a="90371100"
-Received: from enterprise.igk.intel.com ([10.102.20.175])
-  by fmviesa007.fm.intel.com with ESMTP; 22 Nov 2024 04:46:53 -0800
-From: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next] ixgbe: Enable XDP support when SRIOV is enabled
-Date: Fri, 22 Nov 2024 13:13:18 +0100
-Message-Id: <20241122121317.2117826-1-martyna.szapar-mudlaw@linux.intel.com>
-X-Mailer: git-send-email 2.36.1
+	s=arc-20240116; t=1732278147; c=relaxed/simple;
+	bh=6P9vbsDQcOn2TrVTB/64KzffWt/q15shx9IOFx8viOQ=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=AlAdvME3OXgCm7Hk9pwk6iYKUjLlE99M0b1iBCupVEZEwQATb+lEEOUUdh6ecZL9s/4xAwYKcFhKPY8CKD4flFsFtToafjJMqP4DGPytLZL3kU07+QB3L4/qI4oNJrsNu0BLajcSG9SIy0ayKrt/Zcc4S2tNEGzZ3OUXuzB+6wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fSaO6vdT; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xlfNOBhQj4PaLhDXJw+TWDqraZPwaHPnZ3fn7raguOs=; b=fSaO6vdTT5e5lSn9ri9qjM70OK
+	8kkRnsH41xoUBqDO3JmLqIwlTNwdB6c8jnHqPU4d2yT5nTDaGJcf2lZ7JHpfl4vpreGaqVCNOMcKl
+	fJC0tXFv+mgVFpyLdxClb4mi5JRvWkL0XS57jdApYjhR5WWW6lZNRBWLoVr9Jaj5RLSUx+thO711K
+	aiCsKhqCjK6+/LIfLqYHXZJzGbE9GY+lBDpma9fOKHlYcKrCihL8oVufh1GWkqayMPUg5ZNUt1GzW
+	/VTQ7TWQNWEngkYc8pimQ8YvKoHFTJLZGPmUhtybw6DqS7ZJY82YxdY3s5y8DgucYa1iaMbRL8N0I
+	OkTYSF7w==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33028 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tESfy-0000Ux-1E;
+	Fri, 22 Nov 2024 12:22:18 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tESfx-004evI-NH; Fri, 22 Nov 2024 12:22:17 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net v2] net: phy: fix phy_ethtool_set_eee() incorrectly
+ enabling LPI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tESfx-004evI-NH@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 22 Nov 2024 12:22:17 +0000
 
-Remove the check that prevents XDP support when SRIOV is enabled.
-There is no reason to completely forbid the user from using XDP
-with SRIOV.
+When phy_ethtool_set_eee_noneg() detects a change in the LPI
+parameters, it attempts to update phylib state and trigger the link
+to cycle so the MAC sees the updated parameters.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+However, in doing so, it sets phydev->enable_tx_lpi depending on
+whether the EEE configuration allows the MAC to generate LPI without
+taking into account the result of negotiation.
 
+This can be demonstrated with a 1000base-T FD interface by:
+
+ # ethtool --set-eee eno0 advertise 8	# cause EEE to be not negotiated
+ # ethtool --set-eee eno0 tx-lpi off
+ # ethtool --set-eee eno0 tx-lpi on
+
+This results in being true, despite EEE not having been negotiated and:
+ # ethtool --show-eee eno0
+	EEE status: enabled - inactive
+	Tx LPI: 250 (us)
+	Supported EEE link modes:  100baseT/Full
+	                           1000baseT/Full
+	Advertised EEE link modes:  100baseT/Full
+	Link partner advertised EEE link modes:  100baseT/Full
+	                                         1000baseT/Full
+
+Fix this by keeping track of whether EEE was negotiated via a new
+eee_active member in struct phy_device, and include this state in
+the decision whether phydev->enable_tx_lpi should be set.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
+ drivers/net/phy/phy-c45.c |  2 +-
+ drivers/net/phy/phy.c     | 32 ++++++++++++++++++--------------
+ include/linux/phy.h       |  1 +
+ 3 files changed, 20 insertions(+), 15 deletions(-)
 
-Added CC netdev
-
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 459a539cf8db..a07e28107a42 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -10637,9 +10637,6 @@ static int ixgbe_xdp_setup(struct net_device *dev, struct bpf_prog *prog)
- 	bool need_reset;
- 	int num_queues;
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 96d0b3a5a9d3..944ae98ad110 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -1530,7 +1530,7 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
+ 		return ret;
  
--	if (adapter->flags & IXGBE_FLAG_SRIOV_ENABLED)
--		return -EINVAL;
--
- 	if (adapter->flags & IXGBE_FLAG_DCB_ENABLED)
- 		return -EINVAL;
+ 	data->eee_enabled = is_enabled;
+-	data->eee_active = ret;
++	data->eee_active = phydev->eee_active;
+ 	linkmode_copy(data->supported, phydev->supported_eee);
  
+ 	return 0;
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 4f3e742907cb..e174107b96e2 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -990,14 +990,14 @@ static int phy_check_link_status(struct phy_device *phydev)
+ 		phydev->state = PHY_RUNNING;
+ 		err = genphy_c45_eee_is_active(phydev,
+ 					       NULL, NULL, NULL);
+-		if (err <= 0)
+-			phydev->enable_tx_lpi = false;
+-		else
+-			phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled;
++		phydev->eee_active = err > 0;
++		phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled &&
++					phydev->eee_active;
+ 
+ 		phy_link_up(phydev);
+ 	} else if (!phydev->link && phydev->state != PHY_NOLINK) {
+ 		phydev->state = PHY_NOLINK;
++		phydev->eee_active = false;
+ 		phydev->enable_tx_lpi = false;
+ 		phy_link_down(phydev);
+ 	}
+@@ -1685,16 +1685,20 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
+ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+ 				      struct ethtool_keee *data)
+ {
+-	if (phydev->eee_cfg.tx_lpi_enabled != data->tx_lpi_enabled ||
+-	    phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) {
+-		eee_to_eeecfg(&phydev->eee_cfg, data);
+-		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+-		if (phydev->link) {
+-			phydev->link = false;
+-			phy_link_down(phydev);
+-			phydev->link = true;
+-			phy_link_up(phydev);
+-		}
++	bool enable_tx_lpi = data->tx_lpi_enabled &&
++			     phydev->eee_active;
++
++	eee_to_eeecfg(&phydev->eee_cfg, data);
++
++	if ((phydev->enable_tx_lpi != enable_tx_lpi ||
++	     phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) &&
++	    phydev->link) {
++		phydev->enable_tx_lpi = false;
++		phydev->link = false;
++		phy_link_down(phydev);
++		phydev->enable_tx_lpi = enable_tx_lpi;
++		phydev->link = true;
++		phy_link_up(phydev);
+ 	}
+ }
+ 
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 77c6d6451638..6a17cc05f876 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -723,6 +723,7 @@ struct phy_device {
+ 	/* Energy efficient ethernet modes which should be prohibited */
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_broken_modes);
+ 	bool enable_tx_lpi;
++	bool eee_active;
+ 	struct eee_config eee_cfg;
+ 
+ 	/* Host supported PHY interface types. Should be ignored if empty. */
 -- 
-2.36.1
+2.30.2
 
 
