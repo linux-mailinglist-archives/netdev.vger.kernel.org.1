@@ -1,116 +1,140 @@
-Return-Path: <netdev+bounces-146778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 831299D5BB7
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 10:18:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 754429D5BD0
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 10:21:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2FFCB24D9C
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:18:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D1DC1F21A11
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213841DEFD9;
-	Fri, 22 Nov 2024 09:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE27D1D5164;
+	Fri, 22 Nov 2024 09:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aDTpZYWG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFizMOgE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BF21DEFC6
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 09:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9651D3576;
+	Fri, 22 Nov 2024 09:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732266916; cv=none; b=BdELFlOTL43Ra25ytmzEscNAMfEPVozNNizg0XCJYqtPkrLeEfibhbzbqL+aIerDfZIYWt9iRcz44JUEMML132GjkenWFD1KBMIUxZpyjlzqQuLwFFXPG4kZH9O5RnSUuc+59Ogu3VWqAewwcyBc161JRLZe5xz6v7OMwd/HZ5c=
+	t=1732267249; cv=none; b=AG6XcNOoJXkjmPCerprowgvuZWIPFb3g7TtPn4dnIjjqBd2v30ebGDUpF7mFVs6JjmQ1GRb50WcCzWBOxvON5B20mQ6CQEHE2zAgBe0AXP1hUpdrBRWpctfM+qv/pGhIaauWjzGpUgZP+30uvhbIYVHFwKDFmdVYsrdj5URjLys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732266916; c=relaxed/simple;
-	bh=uruwwJ50mXSVVEsekJ9ZUXKpUw2xOzm+RfNCYzA98Gw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fVQ0hvBgp2ytt0/dwYq3GkY1Wdeqk6YVCL9BHY1F5D4kWNLv6dGndL3Gtno7N6FPwACNME+JexaLN/A/Fo9HFuDWkq10fYejfZvR+Eo6pXhWVRlnO+CA4ypAqdZcS4oZcGusmFqraHaHpnCss9rRiNb+aksazPSnN18rYkR5TIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aDTpZYWG; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa51b8c5f4dso32731566b.2
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 01:15:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732266912; x=1732871712; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uruwwJ50mXSVVEsekJ9ZUXKpUw2xOzm+RfNCYzA98Gw=;
-        b=aDTpZYWGd0ZaC7naXXOYeFDP/+UPM/Gm40M8KaOjl33KUUq87hin8Xy33oaT6Gn1oN
-         Dx30Ujyf+n2o1LH1qlUgKqy62c/yXBTGDk7csTctyVrp5uXm6Pc0WmuBPRdd+lvyWxln
-         rV91srbZ2czWwoO1C3vMidcC3k6KIbPO9jA+SmMSXirDDeRoqe8nE3yiFn/eLKfrDMpU
-         q3UqWaHB8VVao33RgZwX/jzJz0BWFeXOwyYLIf23NkztloHEWFUvAYCYLH5nFuQg+2H+
-         ejNHgRh5nHpQOkHPQTMf2II4OJDH83gVvaTKIduUQd+Id77e8t7aLc/Fk2FEegv0X0IW
-         hMJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732266912; x=1732871712;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uruwwJ50mXSVVEsekJ9ZUXKpUw2xOzm+RfNCYzA98Gw=;
-        b=sYIfc8YpBsd5rjwkZQMIyj8fRCyrp5I41IAgErPbfOwQwYBR5DyIjlr/uwRs78j6BT
-         8fFNrLxhfvIe6uizE0KFJ9tn0kowzBTiqg11hI9NgyHLsTGq98Naj5T3lSbzgMErK6Qh
-         t2nvhYJC9Um/dHy9RQ5hme/SqNogkm/ujM6BmZ4f5tbPWo9lPzvWbRvqtkojmlC0jXGl
-         WX3Wc0yQY9t+U3Tf94ufGXVebw+AgX1dUpJ4xoa3OA17jLxJFivCYCxstSDw/D4NVNWW
-         J1H9GwmVDcuYnMjb7RG5T7VR7Q5BPTecJWAUd7jsZsfiOeZAtrjfgimrlAtx+gKx72eH
-         GRCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdQ36WZuxhQWqyZTLF3rRWnQcRvoSf5TK06HDDP9cDospz12/8ni7O6nswDsuaoWqlDaETbAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+cOl6fYlFlq8A75Qp7YelQmqaNVF5o2y+CUF+iCa+3pOhaNMQ
-	gzhyWgIpz25oS1gZ5jZBN3EINFyvk3FPxawaLMffkZrFx6LLPruiu9BFp2s0greONH4sp6M7cgA
-	X2aFnviHv+FteoQvPOuBzgruBPokxzvLlek+5
-X-Gm-Gg: ASbGncuK++LLZeDr4PGNolYH7rz9w0t4DgqmQdCOOago5RFhlse873n0WeZ49nUThTZ
-	oUTlD973NnkvZdrokP5sthc2QOEsdKp0=
-X-Google-Smtp-Source: AGHT+IGTmF0Vb6HMZgp/sWggxOFXHOzHWtjb30jsvecLQAoOP//xdTjLFIAyhWQ16zUCCabgxDURLJTgCe1037OWug4=
-X-Received: by 2002:a17:906:3293:b0:a96:cca9:5f5 with SMTP id
- a640c23a62f3a-aa509c06cf7mr125479066b.37.1732266912197; Fri, 22 Nov 2024
- 01:15:12 -0800 (PST)
+	s=arc-20240116; t=1732267249; c=relaxed/simple;
+	bh=RzWob2uuA2L/sau1p2E3rPDSaYEypLpnLchHthWg6KU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ODZppedQ6GoSW3NfBJasvpLn3+VaWOoIrGPsvHhjNxAIa57MlIo5IABuqffQY70iSzB86HHJokCAE6sWkW6qMWu1ldwXEaVSQMTtYJxZnJWD7dtrFdXvavwCYiJkKB0+w4RodhquLCTGZjJkUlbqVUTkAOqjqnSnlLcJmbWo5LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFizMOgE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA2E0C4CED0;
+	Fri, 22 Nov 2024 09:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732267249;
+	bh=RzWob2uuA2L/sau1p2E3rPDSaYEypLpnLchHthWg6KU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jFizMOgEgyhi6JmVvnPRNTrdtTNtQUf0NPSPVeqL0QHSTs2jT1/C6lftgZbVtlQeq
+	 MLjaAzeEWhf94gPJNLqcDZReZ6FJqoDueAxV2jbC42ENLmCG3/hjNdGKSRsJtu0yFp
+	 gCgvLrw2cKi3/Md5+MU/UeP1byfHJwDekEEVVts96tEUbsImL55gtaQEw208FT0XgD
+	 9RO4ffaiIhI9K8SHHJQ9AqgySsG+LCxxxIqt7ZlK3C6Kdqh//+Z+li+pYCfLHGdnOq
+	 JbdiywBy+KaVO7d6Zq9Yw6Cz3O/Na3WwZdwK90uQ+Y6N1slsZvaO48XhWfANWfYN+o
+	 HYLh2gcPoCPNg==
+Message-ID: <1c895758-02e0-4a84-a023-7317a7608c6a@kernel.org>
+Date: Fri, 22 Nov 2024 10:20:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121-netpoll_rcu_herbet_fix-v1-1-457c5fee9dfd@debian.org>
- <CANn89iJeaaVhXU0VHZ0QF5-juS+xXRjk2rXfY2W+_GsJL_yXbA@mail.gmail.com> <20241121195616.2cd8ba59@kernel.org>
-In-Reply-To: <20241121195616.2cd8ba59@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 22 Nov 2024 10:15:01 +0100
-Message-ID: <CANn89iJZnpeus8neFYBO85iOP2vTT6QwxRKFgk07QnLwVGN+Zg@mail.gmail.com>
-Subject: Re: [PATCH net] netpoll: Use rtnl_dereference() for npinfo pointer access
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Michal Kubiak <michal.kubiak@intel.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team@meta.com, 
-	Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v3 25/27] dt-bindings: net: pse-pd:
+ microchip,pd692x0: Add manager regulator supply
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
+ Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
+ <20241121-feature_poe_port_prio-v3-25-83299fa6967c@bootlin.com>
+ <32695cf7-01d4-4180-b7f0-230ad8a0e1a4@kernel.org>
+ <20241122094210.5e643c1d@kmaincent-XPS-13-7390>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20241122094210.5e643c1d@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 22, 2024 at 4:56=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 22 Nov 2024 00:41:14 +0100 Eric Dumazet wrote:
-> > > Fixes: c75964e40e69 ("netpoll: Use rtnl_dereference() for npinfo poin=
-ter access")
-> >
-> > This seems wrong. This sha1 does not exist, and the title is this patch=
-.
-> >
-> > We do not send a patch saying it is fixing itself.
-> >
-> > I would suggest instead :
-> >
-> > Fixes: c69c5e10adb9 ("netpoll: Use rcu_access_pointer() in __netpoll_se=
-tup")
->
-> Or no Fixes tag and net-next...
->
-> I'm missing what can go wrong here, seems like a cleanup.
+On 22/11/2024 09:42, Kory Maincent wrote:
+>> You missed at least devicetree list (maybe more), so this won't be
+>> tested by automated tooling. Performing review on untested code might be
+>> a waste of time.
+>>
+>> Please kindly resend and include all necessary To/Cc entries.
+>> </form letter>
+>>
+>> ... unless you do not expect review.
+> 
+> Indeed I didn't expected binding reviews on this series that's why I did not add
+> you and devicetree mailing list to the CC. I would like to confirm the core PSE
+> design choices before that.
+> Maybe I should have notify it somewhere to avoid you these emails, sorry.
+No worries, I just never know whether this is intentional.
 
-Nothing wrong, perhaps add a Link: next time to avoid confusion
-
-https://lore.kernel.org/lkml/Zz1cKZYt1e7elibV@gondor.apana.org.au/
+Best regards,
+Krzysztof
 
