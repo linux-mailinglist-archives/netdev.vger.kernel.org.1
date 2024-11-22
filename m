@@ -1,224 +1,195 @@
-Return-Path: <netdev+bounces-146790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D55C59D5DB3
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:04:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E11B9D5DF8
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9614D283F49
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 11:04:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCF98B273C3
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 11:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4399E1DE2B2;
-	Fri, 22 Nov 2024 11:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D961DE3DF;
+	Fri, 22 Nov 2024 11:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e8G2HjGX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="p5b+mwyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749A81DE89E
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 11:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12E917E00E
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 11:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732273378; cv=none; b=m2LtGUCQUOnxc9hsZiSuKHpQ7JYRiZB6x+zuTqmgjV4uA5GpC4ozERawwuzOCxQfZ1x9FmVTDrGVzSHK65fLA7AwB12+eYQko80tNIDHiDEnDGJxs9mAP2nzI7V1fYTWesSti5s6ujnzkua/nHxzk/8bNwPnRA0sAp7JI+31EzI=
+	t=1732274519; cv=none; b=G4d9ZgJxAkve+s2h5Z23QijulPOhBeNkzajEaf21Qr4bRnHedHuWBaMlFmOAYMrVH2KIYNaKHM12uPvAgGEG0bU2qzfInzP4iOnCKNpNklhsIvi82gOJJTbpqFK8UDh2mc5F1EzE4MLGox6HanX4xaZ3jVZLuBVSiJlmSszCDbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732273378; c=relaxed/simple;
-	bh=q21V6gxjY+V7Bt1e1B5IARj+JvCSlzaKJGtphO/6VVw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xvd3teLjr4ZyzeKr+yEE/E1a39B7pNj8wHQR/cihvxQ2oKmyVWPAtWMhaxiTweUjg6AQSLD7FnNvTd+sgk0fvWTNT+DprYjPQkxQfcbigyah7IhNwrDQstawYeS0zjIBcgSnOgclWGgLf6k5yptYMvv23vWFebr2uwSXzeGVMNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e8G2HjGX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732273375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RIYb19GgEyMrL+OCiRrGI8zst9KbjSl6iyCxG1meKT0=;
-	b=e8G2HjGX2+l5XUQJ0LB4hKnX+f8DKsFAYwvDIUanbcvuum29E9ePqPHqRVKpVBx1VunRXq
-	COGjR/mQ9nVewXXs4ergzcoIHcbwZPVWuvhMFdlEr5w/bOWJ5QfejvgB1iv0bI1OodQdQ3
-	SxzdVwxZ/lWylChLa4XkPB8NmITJBaA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-402-hCvm8VQhOBm8wPLCk7TakQ-1; Fri,
- 22 Nov 2024 06:02:50 -0500
-X-MC-Unique: hCvm8VQhOBm8wPLCk7TakQ-1
-X-Mimecast-MFC-AGG-ID: hCvm8VQhOBm8wPLCk7TakQ
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D28861955F68;
-	Fri, 22 Nov 2024 11:02:48 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.39.192.31])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C661C19560A3;
-	Fri, 22 Nov 2024 11:02:46 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1732274519; c=relaxed/simple;
+	bh=AXB6qb6RDIsTzCWl0EUW0nkGztJDvOo9mGeQKJz63QE=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=fMQh+sHQ0h0dP0twmAQsmUibA9qGq8biHvWzF3nchU1v9G7HmH0ukLca6LkuwFH/A/lHp9OhNY11lKTYlmS5F/3BgRxdRoiOdHDHNf6FaB+FpnxqkkL5L1Ka5zK46z7h4BcWDnMOlUmoUh3F3/68ZO6p9StO8ihtauCVlCftyHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=p5b+mwyk; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uy1ysEXSuRIKOUxF2LGxCn//LIyrJqNRdWvSAf8MRg0=; b=p5b+mwyk5QeVvoUTLtnAjBasHe
+	EnR5Is2m3ofsJy52w8SyPXr+K/03ygkLm903MWvTZFTVgT6igkjVgU/Sen3n3HrR2hF14ymeYUy0K
+	hUxQBi0yHGlIlvREufjzFdnGXF8BcLU1CUzGjL8GoQ5ZksGqj8fQMhB0MhrjiTKYOQjQpMGMKudMs
+	Vog2/NCKDT1YNQyqsD4MKWWyOB8/jQ01ATu1Yg3sBr1tz15U5PdDEwDnL378wYR4ZIPcPw5rwTzJu
+	C7nNRC5P3tOBUo759hvxI7/SuWT75PdReY31PkkoPWSrOfAfg2Qapz2Zw61p4+RqFTwbrNflSTsuP
+	aP/04Mnw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37668 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tERjM-0000Pb-0K;
+	Fri, 22 Nov 2024 11:21:44 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tERjL-004Wax-En; Fri, 22 Nov 2024 11:21:43 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	stefan.wiehler@nokia.com
-Subject: [PATCH net 3/3] ipmr: fix tables suspicious RCU usage
-Date: Fri, 22 Nov 2024 12:02:16 +0100
-Message-ID: <1c14b37b3c8803a4ebda59447561dec78cc87b5d.1732270911.git.pabeni@redhat.com>
-In-Reply-To: <cover.1732270911.git.pabeni@redhat.com>
-References: <cover.1732270911.git.pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] net: phy: fix phy_ethtool_set_eee() incorrectly enabling
+ LPI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tERjL-004Wax-En@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 22 Nov 2024 11:21:43 +0000
 
-Similar to the previous patch, plumb the RCU lock inside
-the ipmr_get_table(), provided a lockless variant and apply
-the latter in the few spots were the lock is already held.
+When phy_ethtool_set_eee_noneg() detects a change in the LPI
+parameters, it attempts to update phylib state and trigger the link
+to cycle so the MAC sees the updated parameters.
 
-Fixes: 709b46e8d90b ("net: Add compat ioctl support for the ipv4 multicast ioctl SIOCGETSGCNT")
-Fixes: f0ad0860d01e ("ipv4: ipmr: support multiple tables")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+However, in doing so, it sets phydev->enable_tx_lpi depending on
+whether the EEE configuration allows the MAC to generate LPI without
+taking into account the result of negotiation.
+
+This can be demonstrated with a 1000base-T FD interface by:
+
+ # ethtool --set-eee eno0 advertise 8	# cause EEE to be not negotiated
+ # ethtool --set-eee eno0 tx-lpi off
+ # ethtool --set-eee eno0 tx-lpi on
+
+This results in being true, despite EEE not having been negotiated and:
+ # ethtool --show-eee eno0
+	EEE status: enabled - inactive
+	Tx LPI: 250 (us)
+	Supported EEE link modes:  100baseT/Full
+	                           1000baseT/Full
+	Advertised EEE link modes:  100baseT/Full
+	Link partner advertised EEE link modes:  100baseT/Full
+	                                         1000baseT/Full
+
+Fix this by keeping track of whether EEE was negotiated via a new
+eee_active member in struct phy_device, and include this state in
+the decision whether phydev->enable_tx_lpi should be set.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- net/ipv4/ipmr.c | 42 +++++++++++++++++++++++++++++-------------
- 1 file changed, 29 insertions(+), 13 deletions(-)
+ drivers/net/phy/phy-c45.c |  2 +-
+ drivers/net/phy/phy.c     | 32 ++++++++++++++++++--------------
+ include/linux/phy.h       |  1 +
+ 3 files changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index c6ad01dc8310..7fa31a604723 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -137,7 +137,7 @@ static struct mr_table *ipmr_mr_table_iter(struct net *net,
- 	return ret;
- }
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 96d0b3a5a9d3..944ae98ad110 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -1530,7 +1530,7 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
+ 		return ret;
  
--static struct mr_table *ipmr_get_table(struct net *net, u32 id)
-+static struct mr_table *__ipmr_get_table(struct net *net, u32 id)
- {
- 	struct mr_table *mrt;
+ 	data->eee_enabled = is_enabled;
+-	data->eee_active = ret;
++	data->eee_active = phydev->eee_active;
+ 	linkmode_copy(data->supported, phydev->supported_eee);
  
-@@ -148,6 +148,16 @@ static struct mr_table *ipmr_get_table(struct net *net, u32 id)
- 	return NULL;
- }
+ 	return 0;
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 4f3e742907cb..d03fe59cf1f3 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -990,14 +990,14 @@ static int phy_check_link_status(struct phy_device *phydev)
+ 		phydev->state = PHY_RUNNING;
+ 		err = genphy_c45_eee_is_active(phydev,
+ 					       NULL, NULL, NULL);
+-		if (err <= 0)
+-			phydev->enable_tx_lpi = false;
+-		else
+-			phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled;
++		phydev->eee_active = err <= 0;
++		phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled &&
++					phydev->eee_active;
  
-+static struct mr_table *ipmr_get_table(struct net *net, u32 id)
-+{
-+	struct mr_table *mrt;
-+
-+	rcu_read_lock();
-+	mrt = __ipmr_get_table(net, id);
-+	rcu_read_unlock();
-+	return mrt;
-+}
-+
- static int ipmr_fib_lookup(struct net *net, struct flowi4 *flp4,
- 			   struct mr_table **mrt)
- {
-@@ -189,7 +199,7 @@ static int ipmr_rule_action(struct fib_rule *rule, struct flowi *flp,
- 
- 	arg->table = fib_rule_get_table(rule, arg);
- 
--	mrt = ipmr_get_table(rule->fr_net, arg->table);
-+	mrt = __ipmr_get_table(rule->fr_net, arg->table);
- 	if (!mrt)
- 		return -EAGAIN;
- 	res->mrt = mrt;
-@@ -315,6 +325,8 @@ static struct mr_table *ipmr_get_table(struct net *net, u32 id)
- 	return net->ipv4.mrt;
- }
- 
-+#define __ipmr_get_table ipmr_get_table
-+
- static int ipmr_fib_lookup(struct net *net, struct flowi4 *flp4,
- 			   struct mr_table **mrt)
- {
-@@ -408,7 +420,7 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
- 	if (id != RT_TABLE_DEFAULT && id >= 1000000000)
- 		return ERR_PTR(-EINVAL);
- 
--	mrt = ipmr_get_table(net, id);
-+	mrt = __ipmr_get_table(net, id);
- 	if (mrt)
- 		return mrt;
- 
-@@ -1383,7 +1395,7 @@ int ip_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
- 		goto out_unlock;
+ 		phy_link_up(phydev);
+ 	} else if (!phydev->link && phydev->state != PHY_NOLINK) {
+ 		phydev->state = PHY_NOLINK;
++		phydev->eee_active = false;
+ 		phydev->enable_tx_lpi = false;
+ 		phy_link_down(phydev);
  	}
- 
--	mrt = ipmr_get_table(net, raw_sk(sk)->ipmr_table ? : RT_TABLE_DEFAULT);
-+	mrt = __ipmr_get_table(net, raw_sk(sk)->ipmr_table ? : RT_TABLE_DEFAULT);
- 	if (!mrt) {
- 		ret = -ENOENT;
- 		goto out_unlock;
-@@ -2271,11 +2283,13 @@ int ipmr_get_route(struct net *net, struct sk_buff *skb,
- 	struct mr_table *mrt;
- 	int err;
- 
--	mrt = ipmr_get_table(net, RT_TABLE_DEFAULT);
--	if (!mrt)
-+	rcu_read_lock();
-+	mrt = __ipmr_get_table(net, RT_TABLE_DEFAULT);
-+	if (!mrt) {
-+		rcu_read_unlock();
- 		return -ENOENT;
-+	}
- 
--	rcu_read_lock();
- 	cache = ipmr_cache_find(mrt, saddr, daddr);
- 	if (!cache && skb->dev) {
- 		int vif = ipmr_find_vif(mrt, skb->dev);
-@@ -2559,7 +2573,7 @@ static int ipmr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
- 	grp = nla_get_in_addr_default(tb[RTA_DST], 0);
- 	tableid = nla_get_u32_default(tb[RTA_TABLE], 0);
- 
--	mrt = ipmr_get_table(net, tableid ? tableid : RT_TABLE_DEFAULT);
-+	mrt = __ipmr_get_table(net, tableid ? tableid : RT_TABLE_DEFAULT);
- 	if (!mrt) {
- 		err = -ENOENT;
- 		goto errout_free;
-@@ -2613,7 +2627,7 @@ static int ipmr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (filter.table_id) {
- 		struct mr_table *mrt;
- 
--		mrt = ipmr_get_table(sock_net(skb->sk), filter.table_id);
-+		mrt = __ipmr_get_table(sock_net(skb->sk), filter.table_id);
- 		if (!mrt) {
- 			if (rtnl_msg_family(cb->nlh) != RTNL_FAMILY_IPMR)
- 				return skb->len;
-@@ -2721,7 +2735,7 @@ static int rtm_to_ipmr_mfcc(struct net *net, struct nlmsghdr *nlh,
- 			break;
- 		}
+@@ -1685,16 +1685,20 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
+ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+ 				      struct ethtool_keee *data)
+ {
+-	if (phydev->eee_cfg.tx_lpi_enabled != data->tx_lpi_enabled ||
+-	    phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) {
+-		eee_to_eeecfg(&phydev->eee_cfg, data);
+-		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+-		if (phydev->link) {
+-			phydev->link = false;
+-			phy_link_down(phydev);
+-			phydev->link = true;
+-			phy_link_up(phydev);
+-		}
++	bool enable_tx_lpi = data->tx_lpi_enabled &&
++			     phydev->eee_active;
++
++	eee_to_eeecfg(&phydev->eee_cfg, data);
++
++	if ((phydev->enable_tx_lpi != enable_tx_lpi ||
++	     phydev->eee_cfg.tx_lpi_timer != data->tx_lpi_timer) &&
++	    phydev->link) {
++		phydev->enable_tx_lpi = false;
++		phydev->link = false;
++		phy_link_down(phydev);
++		phydev->enable_tx_lpi = enable_tx_lpi;
++		phydev->link = true;
++		phy_link_up(phydev);
  	}
--	mrt = ipmr_get_table(net, tblid);
-+	mrt = __ipmr_get_table(net, tblid);
- 	if (!mrt) {
- 		ret = -ENOENT;
- 		goto out;
-@@ -2929,13 +2943,15 @@ static void *ipmr_vif_seq_start(struct seq_file *seq, loff_t *pos)
- 	struct net *net = seq_file_net(seq);
- 	struct mr_table *mrt;
- 
--	mrt = ipmr_get_table(net, RT_TABLE_DEFAULT);
--	if (!mrt)
-+	rcu_read_lock();
-+	mrt = __ipmr_get_table(net, RT_TABLE_DEFAULT);
-+	if (!mrt) {
-+		rcu_read_unlock();
- 		return ERR_PTR(-ENOENT);
-+	}
- 
- 	iter->mrt = mrt;
- 
--	rcu_read_lock();
- 	return mr_vif_seq_start(seq, pos);
  }
  
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 77c6d6451638..6a17cc05f876 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -723,6 +723,7 @@ struct phy_device {
+ 	/* Energy efficient ethernet modes which should be prohibited */
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_broken_modes);
+ 	bool enable_tx_lpi;
++	bool eee_active;
+ 	struct eee_config eee_cfg;
+ 
+ 	/* Host supported PHY interface types. Should be ignored if empty. */
 -- 
-2.45.2
+2.30.2
 
 
