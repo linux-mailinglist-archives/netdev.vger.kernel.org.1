@@ -1,75 +1,82 @@
-Return-Path: <netdev+bounces-146819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C2599D612A
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 16:15:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C49919D619E
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 16:56:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40D2D160449
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:56:40 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACF61BC07D;
+	Fri, 22 Nov 2024 15:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bF1UAQtM"
+X-Original-To: netdev@vger.kernel.org
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EE512825C4
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 15:15:12 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB2C1DE3A2;
-	Fri, 22 Nov 2024 15:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="d0sl82Qh"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F6113CA93
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 15:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8903237171;
+	Fri, 22 Nov 2024 15:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732288504; cv=none; b=D7ae/+N4X/a4okeFlNiX9iZf8NCb1KFH5+kExCZUWAe0XuMygdDcO5QKPMM90rnEuj02KnfwrbQTmk0Jxg054oLqhODarhDCu2A2ImLHCFNSOsrV0DqKwrrqKKrLg1alfd5XJ5tZNiJ4Sp47HONnaUbhuu64OkhAp7HEXh0FbkI=
+	t=1732290999; cv=none; b=QDXLLuCaw55ZZNoXEpR68BLtTpg69yKYIA8W7+kWMFmYTqZnHqPWQHanY8hGWRcw2OGEhoZoML73asQ2unfYbE3M/BVbXgtBXCrmpAI+V2UCqYYum588G8s7/QsHFLI5e++Ba6Q/mHDEOmWl/cjscG1BezoXUIpyiL2TOIHxmwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732288504; c=relaxed/simple;
-	bh=G4ZWYFmDGGCQIedY71/8GZGdAfKcnsuVFa5JVn99a40=;
+	s=arc-20240116; t=1732290999; c=relaxed/simple;
+	bh=+OMbc/XwftdxUR4oD4irFa2VWszcWmfXwbsURr/2m6M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cPtX2lXV9NoL7dd5Y6TV9pTbfsrLKOZlG0u4OlqvnLcUj2XOO4SDzxcovac3cz0FCH55RIwNSrBdsdqqD0ih4Ksw5nhX2Gjo6EgY5qeSGHhA6aRc77bL3IpwGtiTDPNnUtlQhybwipNdi7t/w+sHleg8K2fVQ2csYqxYDbakW4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=d0sl82Qh; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a76156af6bso7678555ab.2
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 07:15:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1732288500; x=1732893300; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rmBxC4X0qWTi2jB3Mdi9nSIUH+PS6n9GSNvglpxej84=;
-        b=d0sl82QhPnq84etKN05j5uIcVQ0fDAtllmUo3ENl6LHqc/FE29FuxkudCbEzHXaOLM
-         SqfYgvVMwCmhCihB1tE4trzsr/522vvpr77e+qPZ7YYl4Eob17aV7Ea/Pa0+BFB126J3
-         ZEan1Yo/R3EMd1RW3CYQAHlHwdDD8oCmh8aJY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732288500; x=1732893300;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rmBxC4X0qWTi2jB3Mdi9nSIUH+PS6n9GSNvglpxej84=;
-        b=mT5m2zKUXdF4EGNMfhlbNjE/Dn6AshTMm7ciLxB1VTt0rhe4b9kW+SpgpksaYAS8UD
-         c5oQlM2v55DbzutGhXsPBw8Bbog/CnMEpX8kbcE90xFOnncAzVzPJUwGEKUMnJYAj5va
-         xlYfw8dRwGlR/qizA3stJZSGo3Pb2fDqRP0dMUh07zVrsAwA3PnIEZuhBtqDr6iAlgEj
-         yVB8dj6p2l0uIrE3aQ3rgjfcxrkBmRPP/sLMTJAH3wXDOsABhdxhG5BIzn9McYht1wYR
-         r6zJaaP8qP1eL/0QNb0K5+ZXQGdNdEH30CeuNV+y90HiZap82m0sWASE2/h/tjatwl3C
-         W2OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9Kj2z3oxqXAHeKwZLvrccfK2KXuxPM6eAK0fdnh94RUinOIuGgrcXJHbSmZSt6Y7nakoMdu4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDF5VGQ2GyrndAww9JGFTEAswFAGKUrN4ZeYAZlQeGYoK9SzF6
-	eITg/FUKOd9H4eB3/faJeWAKjv8PrFIRR75JV/eEsp9jhMcVKVxRE/4PsCIu2a4=
-X-Gm-Gg: ASbGncvMKOxrMUltDGuTBeBNC6dgQvG317ciBSfka/VKaamH3LCR2hZDGEG9AtEbIvp
-	6dj+backq58TZFK0rScd9cufMWAFXDNaey3YxU3jN0O2YmK+m+h8m45pk86sjDFItvfzEOyoFdE
-	YGTVwolpvu0E1r1UpMghesG3NA3VlIITllsINRbr4Di8SHcaEidFEgPOiFy9G7fpYTWlUdWxuAg
-	DARowXcqADa/8AsTxCEao5C5lbKPJHiTSnQFBL6Zi5tZ0oTFJ1rPauDua3OsQ==
-X-Google-Smtp-Source: AGHT+IHy5Cwa3AA3W2fNjldnU0Ki3uW2K71uWzdXCbgAWsASPCmhOBROw7+r3q6xtya9E03fAwzWCw==
-X-Received: by 2002:a05:6602:3c6:b0:83b:47:8d5 with SMTP id ca18e2360f4ac-83ecdc538d9mr370017639f.3.1732288500377;
-        Fri, 22 Nov 2024 07:15:00 -0800 (PST)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4e1cfe1a0e2sm640295173.7.2024.11.22.07.14.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Nov 2024 07:14:59 -0800 (PST)
-Message-ID: <93d96c99-4712-4054-a36f-3c65c80ab3f8@linuxfoundation.org>
-Date: Fri, 22 Nov 2024 08:14:58 -0700
+	 In-Reply-To:Content-Type; b=eF+4XA7XbFDdp0OrYvBQMZsNSXJbL1dpc+Td2PloX1L2eZ32KXKxTHfNSW01cCx9eTc97N8RQ4G1XtgOR9eH+pbH/qyzxt1+bYwoxITp7GsxZXpSG7peFFSTUva42Pj7iBYzmOSE91zwM3saXvnvp/dkEEiVeRAsoBqm75RggnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bF1UAQtM; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMAgM3l006909;
+	Fri, 22 Nov 2024 15:56:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=BtS4Qc
+	/esBxeTVYq7ccMMMG1Zp+siGlrneQgiDLoZyo=; b=bF1UAQtMZ6pOG+EF2Oh8Nj
+	054IPB0d1FQ85AA5UQ8QXU5x7ccFbTabRJWw18Ko7f2mgCClhOFauCxn5pp7yIhc
+	rr+HrP8BM36TTwEzX9HYPdWpcyI9UmHvqRoyKrR4STLPqDMAu4Ap8f0p+sIj0C0i
+	bkUV2DjDx+mN3Y5Ubj5LCZuyxqVjGSz0gxvhppwMjcPba86CvanRSKsG59Oru3hU
+	Rtj3UezM09tCsQZ3FwBlTbQW7AKJ9NxRBpezdFCD99ZOkGdSDSA2U3K8pfddf/5a
+	fX18Y8i9otuozad80J7HiMpHNAx75WgVKSy7KKMdy6GZj795/twzwD3On7gCK2zQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xyu291s4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 15:56:31 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AMFQtZt028286;
+	Fri, 22 Nov 2024 15:56:30 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xyu291s0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 15:56:30 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMCGgrL013699;
+	Fri, 22 Nov 2024 15:56:29 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42y7xju9w5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 15:56:29 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AMFuTbD51773780
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Nov 2024 15:56:29 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 31ECC5805F;
+	Fri, 22 Nov 2024 15:56:29 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF9B858059;
+	Fri, 22 Nov 2024 15:56:26 +0000 (GMT)
+Received: from [9.171.76.132] (unknown [9.171.76.132])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 22 Nov 2024 15:56:26 +0000 (GMT)
+Message-ID: <faba3530-c5f9-48af-be80-3847aa4921b7@linux.ibm.com>
+Date: Fri, 22 Nov 2024 16:56:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,125 +84,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kselftest] fix single bpf test
-To: Jiayuan Chen <mrpre@163.com>, linux-kselftest@vger.kernel.org,
- Mark Brown <broonie@kernel.org>
-Cc: song@kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, martin.lau@linux.dev, andrii@kernel.org,
- ast@kernel.org, kpsingh@kernel.org, jolsa@kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20241118140608.53524-1-mrpre@163.com>
+Subject: Re: [PATCH net 1/2] net/smc: initialize close_work early to avoid
+ warning
+To: Wen Gu <guwen@linux.alibaba.com>, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, horms@kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241122071630.63707-1-guwen@linux.alibaba.com>
+ <20241122071630.63707-2-guwen@linux.alibaba.com>
 Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20241118140608.53524-1-mrpre@163.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20241122071630.63707-2-guwen@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TRAArkc36m_aQ__PuSUVa1CYc2fwBGFH
+X-Proofpoint-ORIG-GUID: 6x9L0fJA9uJrH3xu2WtvYOciLTenCXuM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411220130
 
-On 11/18/24 07:06, Jiayuan Chen wrote:
-> Currently, when testing a certain target in selftests, executing the
-> command 'make TARGETS=XX -C tools/testing/selftests' succeeds for non-BPF,
-> but a similar command fails for BPF:
-> '''
-> make TARGETS=bpf -C tools/testing/selftests
+
+
+On 22.11.24 08:16, Wen Gu wrote:
+> We encountered a warning that close_work was canceled before
+> initialization.
 > 
-> make: Entering directory '/linux-kselftest/tools/testing/selftests'
-> make: *** [Makefile:197: all] Error 1
-> make: Leaving directory '/linux-kselftest/tools/testing/selftests'
-> '''
+>    WARNING: CPU: 7 PID: 111103 at kernel/workqueue.c:3047 __flush_work+0x19e/0x1b0
+>    Workqueue: events smc_lgr_terminate_work [smc]
+>    RIP: 0010:__flush_work+0x19e/0x1b0
+>    Call Trace:
+>     ? __wake_up_common+0x7a/0x190
+>     ? work_busy+0x80/0x80
+>     __cancel_work_timer+0xe3/0x160
+>     smc_close_cancel_work+0x1a/0x70 [smc]
+>     smc_close_active_abort+0x207/0x360 [smc]
+>     __smc_lgr_terminate.part.38+0xc8/0x180 [smc]
+>     process_one_work+0x19e/0x340
+>     worker_thread+0x30/0x370
+>     ? process_one_work+0x340/0x340
+>     kthread+0x117/0x130
+>     ? __kthread_cancel_work+0x50/0x50
+>     ret_from_fork+0x22/0x30
 > 
-> The reason is that the previous commit:
-> commit 7a6eb7c34a78 ("selftests: Skip BPF seftests by default")
-> led to the default filtering of bpf in TARGETS which make TARGETS empty.
-> That commit also mentioned that building BPF tests requires external
-> commands to run. This caused target like 'bpf' or 'sched_ext' defined
-> in SKIP_TARGETS to need an additional specification of SKIP_TARGETS as
-> empty to avoid skipping it, for example:
-> '''
-> make TARGETS=bpf SKIP_TARGETS="" -C tools/testing/selftests
-> '''
+> This is because when smc_close_cancel_work is triggered, e.g. the RDMA
+> driver is rmmod and the LGR is terminated, the conn->close_work is
+> flushed before initialization, resulting in WARN_ON(!work->func).
 > 
-> If special steps are required to execute certain test, it is extremely
-> unfair. We need a fairer way to treat different test targets.
+> __smc_lgr_terminate             | smc_connect_{rdma|ism}
+> -------------------------------------------------------------
+>                                  | smc_conn_create
+> 				| \- smc_lgr_register_conn
+> for conn in lgr->conns_all      |
+> \- smc_conn_kill                |
+>     \- smc_close_active_abort    |
+>        \- smc_close_cancel_work  |
+>           \- cancel_work_sync    |
+>              \- __flush_work     |
+> 	         (close_work)   |
+> 	                        | smc_close_init
+> 	                        | \- INIT_WORK(&close_work)
 > 
-
-Note: Adding Mark, author for commit 7a6eb7c34a78 to the thread
-
-The reason we did this was bpf test depends on newer versions
-of LLVM tool chain.
-
-A better solution would be to check for compile time dependencies in
-bpf Makefile and check run-time dependencies from bpf test or a wrapper
-script invoked from run_tests to the skip the test if test can't run.
-
-I would like to see us go that route over addressing this problem
-with SKIP_TARGETS solution.
-
-The commit 7a6eb7c34a78 went in 4 years ago? DO we have a better
-story for the LLVM tool chain to get rid of skipping bpf and sched_ext?
-
-Running make -C tools/testing/selftests/bpf/ gave me the following error.
-Does this mean we still can't include bpf in default run?
-
-make -C tools/testing/selftests/bpf/
-make: Entering directory '/linux/linux_6.12/tools/testing/selftests/bpf'
-
-Auto-detecting system features:
-...                                    llvm: [ OFF ]
-
-
-   GEN     /linux/linux_6.12/tools/testing/selftests/bpf/tools/build/bpftool/vmlinux.h
-libbpf: failed to find '.BTF' ELF section in /linux/linux_6.12/vmlinux
-Error: failed to load BTF from /linux/linux_6.12/vmlinux: No data available
-make[1]: *** [Makefile:209: /linux/linux_6.12/tools/testing/selftests/bpf/tools/build/bpftool/vmlinux.h] Error 195
-make[1]: *** Deleting file '/linux/linux_6.12/tools/testing/selftests/bpf/tools/build/bpftool/vmlinux.h'
-make: *** [Makefile:369: /linux/linux_6.12/tools/testing/selftests/bpf/tools/sbin/bpftool] Error 2
-make: Leaving directory '/linux/linux_6.12/tools/testing/selftests/bpf'
-
-> This commit provider a way: If a user has specified a single TARGETS,
-> it indicates an expectation to run the specified target, and thus the
-> object should not be skipped.
+> So fix this by initializing close_work before establishing the
+> connection.
 > 
-> Another way is to change TARGETS to DEFAULT_TARGETS in the Makefile and
-> then check if the user specified TARGETS and decide whether filter or not,
-> though this approach requires too many modifications.
-> Signed-off-by: Jiayuan Chen <mrpre@163.com>
+> Fixes: 46c28dbd4c23 ("net/smc: no socket state changes in tasklet context")
+> Fixes: 413498440e30 ("net/smc: add SMC-D support in af_smc")
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 > ---
->   tools/testing/selftests/Makefile | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-> index 363d031a16f7..d76c1781ec09 100644
-> --- a/tools/testing/selftests/Makefile
-> +++ b/tools/testing/selftests/Makefile
-> @@ -116,7 +116,7 @@ TARGETS += vDSO
->   TARGETS += mm
->   TARGETS += x86
->   TARGETS += zram
-> -#Please keep the TARGETS list alphabetically sorted
-> +# Please keep the TARGETS list alphabetically sorted
->   # Run "make quicktest=1 run_tests" or
->   # "make quicktest=1 kselftest" from top level Makefile
->   
-> @@ -132,12 +132,15 @@ endif
->   
->   # User can optionally provide a TARGETS skiplist. By default we skip
->   # targets using BPF since it has cutting edge build time dependencies
-> -# which require more effort to install.
-> +# If user provide custom TARGETS, we just ignore SKIP_TARGETS so that
-> +# user can easy to test single target which defined in SKIP_TARGETS
->   SKIP_TARGETS ?= bpf sched_ext
->   ifneq ($(SKIP_TARGETS),)
-> +ifneq ($(words $(TARGETS)), 1)
->   	TMP := $(filter-out $(SKIP_TARGETS), $(TARGETS))
->   	override TARGETS := $(TMP)
->   endif
-> +endif
->   
->   # User can set FORCE_TARGETS to 1 to require all targets to be successfully
->   # built; make will fail if any of the targets cannot be built. If
-> 
-> base-commit: 67b6d342fb6d5abfbeb71e0f23141b9b96cf7bb1
 
-thanks,
--- Shuah
+It looks plausible to me. Thank you for fixing it!
+
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+
+Thanks,
+Wenjia
 
