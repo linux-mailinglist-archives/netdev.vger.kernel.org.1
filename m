@@ -1,146 +1,151 @@
-Return-Path: <netdev+bounces-146792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECB819D5E00
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:23:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3208B9D5E49
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 12:40:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D00FB23FA1
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 11:23:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C81121F22921
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 11:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE4C1DED76;
-	Fri, 22 Nov 2024 11:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877381DE4FC;
+	Fri, 22 Nov 2024 11:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eZ69rsf8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fBhS4Exb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A3A1DE8B2
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 11:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9BB17E00E;
+	Fri, 22 Nov 2024 11:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732274602; cv=none; b=RzAvG7VEXhT1qSNkpoX6e44iq/gAQ9cP8cgbWNNnNXeBAGp3W5X1iM4Q9FEpFjegUmMLFBlGdRhDlga5YY3MS7QJURjS5AeYTqncOmhlboym1CV5xWjJJpAmpVpffI67hl0YHzeGOXDLfwGlRFKGi80SFcSy4SYdiryXxFbWBqU=
+	t=1732275636; cv=none; b=QJXbFs6Opt/d4cV/KMbUVLc2//RrF2eyVznJN4u4V+2hli/2Esta6t1cuWxYQsWgNIQM1P35g9CaVcH9z+6x3YlIwDZZVLFaa9W1JS/rZagL7h7FQMQiZgLaQyazi+/s+tI0OL3gAu697hoU1Z/JZIlsaEBTCfSh38lQjU/P/Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732274602; c=relaxed/simple;
-	bh=A3DBD5piyy1qV3Wai+gifKhvtHbb/eZsZywUEKlMjLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AWWwOB8gmfCzrv+/xJx90XKvnJ9yk2voIOQ4Cxvgg4USTuIF4nvcHye74+p/M7ypXAK1JbavEXnP7k7tSCNuyQqvuOb0Rz7cMO7YzmHrNoF036B7L5ZeExYTn1PWBzVjEYzsiDJYbHrBD8mKo0bG2rONF+XAke34pxHEsaIPJZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eZ69rsf8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rjdi9+qjaOFYefiQqH3JO1E6if83YhddPLQXbliTMGA=; b=eZ69rsf8xYbIFtkbK5uichDi4S
-	homMAlDY++RWY6NhPlZwsT19kQH4wH0diiLn3SjVQAKVTf5G/r0LnptJEN/DQFDyC+G6n3XdRUg4u
-	eNVP7/gqTO6VN5Xgl1MxszlzBkIbchQr8nDn23L6p2jL7iMSsFMmaiTzARIZCPtXyO+kUBMd980gw
-	ftVZBqi14AWJmjgw40vETK82416jRUSBqg+REt2slMKD9Y7VRE1vTPpRXnTHAbpjLcU6RY3l5ho0p
-	hZxPYslEUPlD7rbxk3JSPrYgronAMKY2A1KWChLRch/Rcm1KWwIk6/xLFmZrj4QyHXzbnSBD+FwyN
-	++yypUgg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41850)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tERkp-0000Py-03;
-	Fri, 22 Nov 2024 11:23:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tERkm-0000ZU-34;
-	Fri, 22 Nov 2024 11:23:12 +0000
-Date: Fri, 22 Nov 2024 11:23:12 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1732275636; c=relaxed/simple;
+	bh=i6CLV1FXRfEQmnP0bc/FJIlv39wNpE+G83O2FsKArr0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HK9ECLexx0krmJdZPxCjfajjVouWbK1QgriHcK2cK8Vi9r7DYM8So86mB4RnshTsj2fymxJ/U8lKLLHefIciAyV8Z7BRluQjHRizBlV4UgtwEL5ffjl6awO8hPMbOch8VR82rGdwuWppg1G4GL8hDWOxzMnzqulR0atIaIfh5yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fBhS4Exb; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732275631; x=1763811631;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=i6CLV1FXRfEQmnP0bc/FJIlv39wNpE+G83O2FsKArr0=;
+  b=fBhS4Exb5g2Vc+2vZ7VOgeNuDThW9YvyBkhOAoxtRkEHCUypbVWzWUsJ
+   jlrIHE32ksSfP6KyFiWsnmq4WGlCw9CR8kmXL4Nv2WtH7iqgIhe105osP
+   7Xez3W7hDqE0Q5jCos2xAZPx3hoAPKv3UKZ0Vpd6poi4VV7CJA+Zx1PQ5
+   B/uEn98dORLLyrWYpSoVxFkzPDrY6hFjOmcLPIdaKzDeOaeRAU5xzLXRM
+   7zQtNDpWD3CDOGpYKQm1krBlVInCL6CjedtbuTZn12LXnmgZOlF2RrLMt
+   dB+9WUCC7dVoeCs58pViItWQK3HjgP6iLNRUezSeDLG4+NY4+dvLZE9JL
+   Q==;
+X-CSE-ConnectionGUID: XQo6tbalTW6xvIyI8skeTQ==
+X-CSE-MsgGUID: bShtfSmfTwWoUvI/Izb+UQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="31783571"
+X-IronPort-AV: E=Sophos;i="6.12,175,1728975600"; 
+   d="scan'208";a="31783571"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 03:40:30 -0800
+X-CSE-ConnectionGUID: +DIRouKGQyG4razPmurnuw==
+X-CSE-MsgGUID: RVWYirEYQtKOFB+YzOf+PQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,175,1728975600"; 
+   d="scan'208";a="121511166"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa001.fm.intel.com with ESMTP; 22 Nov 2024 03:40:27 -0800
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id DA89228778;
+	Fri, 22 Nov 2024 11:40:24 +0000 (GMT)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: fix phy_ethtool_set_eee() incorrectly
- enabling LPI
-Message-ID: <Z0BpoCMcCQxTpbEb@shell.armlinux.org.uk>
-References: <E1tERjL-004Wax-En@rmk-PC.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alasdair McWilliam <alasdair.mcwilliam@outlook.com>
+Subject: [PATCH bpf] xsk: always clear DMA mapping information when unmapping the pool
+Date: Fri, 22 Nov 2024 12:29:09 +0100
+Message-ID: <20241122112912.89881-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tERjL-004Wax-En@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 22, 2024 at 11:21:43AM +0000, Russell King (Oracle) wrote:
-> When phy_ethtool_set_eee_noneg() detects a change in the LPI
-> parameters, it attempts to update phylib state and trigger the link
-> to cycle so the MAC sees the updated parameters.
-> 
-> However, in doing so, it sets phydev->enable_tx_lpi depending on
-> whether the EEE configuration allows the MAC to generate LPI without
-> taking into account the result of negotiation.
-> 
-> This can be demonstrated with a 1000base-T FD interface by:
-> 
->  # ethtool --set-eee eno0 advertise 8	# cause EEE to be not negotiated
->  # ethtool --set-eee eno0 tx-lpi off
->  # ethtool --set-eee eno0 tx-lpi on
-> 
-> This results in being true, despite EEE not having been negotiated and:
->  # ethtool --show-eee eno0
-> 	EEE status: enabled - inactive
-> 	Tx LPI: 250 (us)
-> 	Supported EEE link modes:  100baseT/Full
-> 	                           1000baseT/Full
-> 	Advertised EEE link modes:  100baseT/Full
-> 	Link partner advertised EEE link modes:  100baseT/Full
-> 	                                         1000baseT/Full
-> 
-> Fix this by keeping track of whether EEE was negotiated via a new
-> eee_active member in struct phy_device, and include this state in
-> the decision whether phydev->enable_tx_lpi should be set.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/phy/phy-c45.c |  2 +-
->  drivers/net/phy/phy.c     | 32 ++++++++++++++++++--------------
->  include/linux/phy.h       |  1 +
->  3 files changed, 20 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-> index 96d0b3a5a9d3..944ae98ad110 100644
-> --- a/drivers/net/phy/phy-c45.c
-> +++ b/drivers/net/phy/phy-c45.c
-> @@ -1530,7 +1530,7 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
->  		return ret;
->  
->  	data->eee_enabled = is_enabled;
-> -	data->eee_active = ret;
-> +	data->eee_active = phydev->eee_active;
->  	linkmode_copy(data->supported, phydev->supported_eee);
->  
->  	return 0;
-> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-> index 4f3e742907cb..d03fe59cf1f3 100644
-> --- a/drivers/net/phy/phy.c
-> +++ b/drivers/net/phy/phy.c
-> @@ -990,14 +990,14 @@ static int phy_check_link_status(struct phy_device *phydev)
->  		phydev->state = PHY_RUNNING;
->  		err = genphy_c45_eee_is_active(phydev,
->  					       NULL, NULL, NULL);
-> -		if (err <= 0)
-> -			phydev->enable_tx_lpi = false;
-> -		else
-> -			phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled;
-> +		phydev->eee_active = err <= 0;
+When the umem is shared, the DMA mapping is also shared between the xsk
+pools, therefore it should stay valid as long as at least 1 user remains.
+However, the pool also keeps the copies of DMA-related information that are
+initialized in the same way in xp_init_dma_info(), but cleared by
+xp_dma_unmap() only for the last remaining pool, this causes the problems
+below.
 
-Scrub that... this is inverted!
+The first one is that the commit adbf5a42341f ("ice: remove af_xdp_zc_qps
+bitmap") relies on pool->dev to determine the presence of a ZC pool on a
+given queue, avoiding internal bookkeeping. This works perfectly fine if
+the UMEM is not shared, but reliably fails otherwise as stated in the
+linked report.
 
+The second one is pool->dma_pages which is dynamically allocated and
+only freed in xp_dma_unmap(), this leads to a small memory leak. kmemleak
+does not catch it, but by printing the allocation results after terminating
+the userspace program it is possible to see that all addresses except the
+one belonging to the last detached pool are still accessible through the
+kmemleak dump functionality.
+
+Always clear the DMA mapping information from the pool and free
+pool->dma_pages when unmapping the pool, so that the only difference
+between results of the last remaining user's call and the ones before would
+be the destruction of the DMA mapping.
+
+Fixes: adbf5a42341f ("ice: remove af_xdp_zc_qps bitmap")
+Fixes: 921b68692abb ("xsk: Enable sharing of dma mappings")
+Reported-by: Alasdair McWilliam <alasdair.mcwilliam@outlook.com>
+Closes: https://lore.kernel.org/PA4P194MB10056F208AF221D043F57A3D86512@PA4P194MB1005.EURP194.PROD.OUTLOOK.COM
+Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+---
+ net/xdp/xsk_buff_pool.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 521a2938e50a..0662d34b09ee 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -387,10 +387,9 @@ void xp_dma_unmap(struct xsk_buff_pool *pool, unsigned long attrs)
+ 		return;
+ 	}
+ 
+-	if (!refcount_dec_and_test(&dma_map->users))
+-		return;
++	if (refcount_dec_and_test(&dma_map->users))
++		__xp_dma_unmap(dma_map, attrs);
+ 
+-	__xp_dma_unmap(dma_map, attrs);
+ 	kvfree(pool->dma_pages);
+ 	pool->dma_pages = NULL;
+ 	pool->dma_pages_cnt = 0;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
