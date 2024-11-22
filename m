@@ -1,199 +1,244 @@
-Return-Path: <netdev+bounces-146873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1BE9D65F8
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:51:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37ACB9D6633
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 00:05:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B9728724C
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:50:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9FFA16141C
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97821C9B97;
-	Fri, 22 Nov 2024 22:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53304189B86;
+	Fri, 22 Nov 2024 23:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ttDhO/l3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fw5+t5nd"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E26B1C5799;
-	Fri, 22 Nov 2024 22:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732315728; cv=fail; b=raGoAVPRtJf/fYgVkV3RqMwoh/C8rDQmjwvJOfXQiZtYea8EPEEOitleP7Hoe5GvnW2nu1fghMUxEPP6taozaKonXMoREjc9dSYUNkAYS3XKT/X0YQtlNW/auBpB1Oyz9cX2WRA3He5tlBK+09XX014MP9WE+5GJjsaGRIektOo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732315728; c=relaxed/simple;
-	bh=HoIXbpe7e4nO0TcvtXW2IJwsZQK+68hrLtLxiuTWbXs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l0f+v7Q/29bdUgtel5j6+WcSQAYy/4j66TcpAewlDWAwIimzAJByLgdqmKka/dpwHH8ERpIo+wQXLYyh2Jvyig9vmOX5k5d5A0++7iG9MlvsJEayc+Ys3DU5FGun7mqaDavEPi7bmDq/zCVyMquHKUhpN5wZefoDeoOmMmxeM7Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ttDhO/l3; arc=fail smtp.client-ip=40.107.244.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oweETcfgS/xCQIQzqma3GLc2TMe1O5S5q+wDzJ6O+xYffcLuo43REL7A1/jlUwy9jzcwWN5Pt0z0PGxUEPiMlTAUd61lRTUbw9UcKGH601xpRB6rERZ6yjRaGh/TJ/Qpuv5jpq7rxUZxHVygaOwhBH2vkJXyir1T9cMAX0L/LrBy1hY7MNF6ZfG9QEJln75UwXzaD7g6YzCAeZbTPBkkvPtF68/bR1p3Qzy+ty4icT3yIG24mCiB8ZoU8m9I3RYG8kEkK1y4iydLVKsB1wuo++YrXwf533Kd34MF6h6GRnm32u0i/TevBjX+YqJOY01K2iXVr2w6FQ81VvCTwxJ27A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LtASgMeRQUdCifxgl0zOeGMZ/GNMN5RUEROpIuYC1SI=;
- b=h1/AdxiSpGYQZUKAMhsjS8UUHTN3sHAxTwDEZdOwrkTwgrP50uNEAR4uUJhAq4f3V/7zKJXhXitHOnm7rWxhBO4reBR3YEbJyviZPJkdQZoX42z/+SEem/CzXcGOveEt2uHqaG1MNT1s5wlnhEl+bQ2WXKHvWrfdfMAdF3bDd5Dbx3karcKxF3dxajAHQeu/eG/QHf8LYPMyu0izmnuCLHs2uhL6cdjIWAD1vDEQkwoBTSOl9lGHfiU3Al6olqaySgnWW8EQHq8H2JxTswiBYLWZc/9nbDKbmiu/CBUV0uRaaLqe6M7HSAIMaQ8xDobUOTWvW27/lEHoDOl5NbWrzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LtASgMeRQUdCifxgl0zOeGMZ/GNMN5RUEROpIuYC1SI=;
- b=ttDhO/l3ChbTzsYcPGqCLjpP1Stj7cfeRWDw7NT8ITMjOONJmK6JCcXNKSmnYZJQg63cJ4vT4Losnx09qkXBuiZBlO9crYCTOGEaViRChMmvASQM9HWzWkp41RrLy0oKHoBklr/pMUEmvkeVvqGZ5Zibu4oOjjl88z71q6NIqG37PnYjiUM6Hasi6VhxCqPHmx5hjhaF/7YGuzwERDs6/MpxIPNy3P8p5wUlK00pAFZr3+yQyOZxzdORYCVVYDJ/5Wg86tQNSGEQ4dgsp6Df8EvWgULZduQrkZ/N6Hv+VFrnBr/mYK3GqHQM5BU2hn/Kn6SSKuoxse/k9t9/jpOfNQ==
-Received: from CH0PR03CA0423.namprd03.prod.outlook.com (2603:10b6:610:10e::6)
- by CH2PR12MB4263.namprd12.prod.outlook.com (2603:10b6:610:a6::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.18; Fri, 22 Nov
- 2024 22:48:42 +0000
-Received: from CH1PEPF0000AD79.namprd04.prod.outlook.com
- (2603:10b6:610:10e:cafe::a4) by CH0PR03CA0423.outlook.office365.com
- (2603:10b6:610:10e::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.16 via Frontend
- Transport; Fri, 22 Nov 2024 22:48:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH1PEPF0000AD79.mail.protection.outlook.com (10.167.244.57) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8182.16 via Frontend Transport; Fri, 22 Nov 2024 22:48:42 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 22 Nov
- 2024 14:48:31 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 22 Nov
- 2024 14:48:30 -0800
-Received: from vdi.nvidia.com (10.127.8.9) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Fri, 22 Nov
- 2024 14:48:30 -0800
-From: Asmaa Mnebhi <asmaa@nvidia.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: Asmaa Mnebhi <asmaa@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, David Thompson <davthompson@nvidia.com>
-Subject: [PATCH net v1] mlxbf-gige: Support workaround for MDIO GPIO degradation bug
-Date: Fri, 22 Nov 2024 22:48:27 +0000
-Message-ID: <20241122224829.457786-1-asmaa@nvidia.com>
-X-Mailer: git-send-email 2.47.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3338C176ADB;
+	Fri, 22 Nov 2024 23:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732316699; cv=none; b=j5QxKFJg8VzfX+1WFG40hupXj8u7pBa4fYy2DBFAl7hPRlYPiL7s+dR+f6iH0tl2AQhHDf/LxTTiw729wcWi4cAi2hgsfCZtfy+vxdjaeuDeCOol5X01cPmncQNnYfh+mChfvMRK+T8mhXT8WMQ8BwJlI0Ui0XxgI1C8DNCpr5g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732316699; c=relaxed/simple;
+	bh=4wIWfXpF5G8HG9/Pq+zqdSb7DFqwGwuXPQRVw4+p5FE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AXfB1BPStLiTEhAi0BO/WFzPm6kxcwNp3OEkPjqhV1boe3ArUHPF7UAPRoXgTDc1/CxpN/5kzbOiSW5lx+ax8uqj2WYFGpjeNcyBxelAyDxj94vFYR5DseN4jL6MGiwS+dWU3dE3RifyHSJ93/h5ulNHXnaIs8ug//LIFZmylSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fw5+t5nd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IEf/4Dtt1gordcffcgfDzPQ5Kwj0hKh+nasI0mtcRXU=; b=fw5+t5ndLTUbfV+GOCK33u7kKP
+	0NIDL66Qye4jbiAL54256OFAhoWjOExVCRm58kK4jLY8By4WNhj6nNsamBy4UmE7RdKO1znD3qZLH
+	z0Rl9T3KzFWdEPfNu5wpSx1F4vIX0/13CaW5W01HO6hD4izaNYr8C/iS95nicBIBcdkk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tEchk-00EAsH-3b; Sat, 23 Nov 2024 00:04:48 +0100
+Date: Sat, 23 Nov 2024 00:04:48 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Frank Sae <Frank.Sae@motor-comm.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xiaogang.fan@motor-comm.com,
+	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+Subject: Re: [PATCH net-next v2 14/21] motorcomm:yt6801: Implement the WOL
+ function of ethtool_ops
+Message-ID: <55cac132-578f-4f07-95b0-d4ddb06b6b7f@lunn.ch>
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+ <20241120105625.22508-15-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD79:EE_|CH2PR12MB4263:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27253810-e986-4df3-b85b-08dd0b47d06d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TlVczYtPijN6PqENmtCmA6pTRLYdEzV2azuPe0iQvHJLnsFdZt3ZFnAgwLE7?=
- =?us-ascii?Q?eX8giqr759WsjCWJKL3spM16ALMkcA/ghEy1WSumdsC+P9vmIFS/l+b2u/Wf?=
- =?us-ascii?Q?4oSpQAL5a0BI5WFw11TrNa1wOrQVwhgZpdY0ZGcYgJ+vAtMBVNjs4w4qP3e/?=
- =?us-ascii?Q?K02Zk9Iw4T7byhOFO9s76Bz8U3czotcsbyHsuaQ8U4u2s5R3+U9yUke16RxM?=
- =?us-ascii?Q?ykiNEbnnvEZQ/7LQrGPs2Wm5arKPncSXn/1KYKJj1uort9xWc7I7lpEWgcaH?=
- =?us-ascii?Q?APLEL6HE7xJYpL0FxHKS+jyUI/WGpBV6Ki8RblJ/ghUoD/8P1c7rMdsELn3F?=
- =?us-ascii?Q?ca8HGiQnVPRwcmyjLVlusv9MG9t2XCjK87i/adtukDMiUmFM9KTCHeGvZjOE?=
- =?us-ascii?Q?9l4hiTxMiy/o2r8mmwTxKXRPSGOCKp1dRfQnJrM5UEuXArgu9cCfig7MEfX/?=
- =?us-ascii?Q?d86yb48IeQ5UBoCKFrk4mpLZrUeZXckU9mFyXAL5A20OqBw+WHZy297KtOmI?=
- =?us-ascii?Q?Yg5fIPxJOa2uOv6p5HmhiTphv5zRU5vkqMWFeTwKOoZRsEAkGfIyLeZCqpIv?=
- =?us-ascii?Q?VwWSSSfiFHJVauxJGJ2+9qqvdVTqHD4bUBER70pIxoX/fm/ltY1Z2+KICrxH?=
- =?us-ascii?Q?lvukksfXnDm+CsPlGaoNq0CEu4m2FOVwHdPOpsqC8vqYtJrbYHKtaYOFn8TP?=
- =?us-ascii?Q?h6hTJQNIYBuL0vfIHCLQCJiyTfOTdka6rtauRfZGHo+IMfCaSfp8nk3qd10U?=
- =?us-ascii?Q?hpoII7XQQ08j8lF3XMhMtmiSr5Vuan3NQNLFuRtDoLPHymXQueSTa0KGUxaR?=
- =?us-ascii?Q?A8GJaOWshuEYVoMuHtblqqIs8x8qWR8oSJW4G1egArwTZfY1YOeOFZPLsoA9?=
- =?us-ascii?Q?Zq1BSc2vfQnA8OTSCcfXdGxqlDvoa7DBjeYtGW8C7QRM8dhI//7Scul85dfM?=
- =?us-ascii?Q?/52Ak+Sx6vdnI/StOndrF/EKKeH8svh10Tw58xj7KsdbPYq5JJSgqP6dRtBb?=
- =?us-ascii?Q?lHTMMc8zs07x0R40jNqaKcZpkkW+BR4ZHL8lAaqw/T4ckP7eO58yE//sJAAj?=
- =?us-ascii?Q?GXAshTUE925GzD3tDqqV1kTN8ewefdFSTa/R4MsctJRs1SJ1mFNGS7k8ziK5?=
- =?us-ascii?Q?cbyj7jZT30TiVXm8FvEsi2yERNR4CLrqfgIqFbkvVNwsiREbyeAdMupH1HY8?=
- =?us-ascii?Q?DD/InnvF1Q0MnZC53VS4H7cUF+Jvw8NWGiskWXurSxn0kwG/S3+ioNeTlYOJ?=
- =?us-ascii?Q?Ok4EN+wN3DP2vQbbm+wFlF269oOOnWup4m6c8ZgpuFpuIcztgv8VVtgRrmbt?=
- =?us-ascii?Q?NpXzhuW4d4hECOf6Q7UzFeGNa7Q7eh/FvXa6UTJZEcxhZe11F+UcS4KN36rh?=
- =?us-ascii?Q?3x7ROjhtnq/DtDBTOg3Kw3g7hOukSLqD2MF8fWyjLk0b8n6p3/hb6qcsqDY8?=
- =?us-ascii?Q?9n2Qu2ofCj7aQ6P2bVkjp8LM+GcQd8VQ?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2024 22:48:42.2194
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27253810-e986-4df3-b85b-08dd0b47d06d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD79.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4263
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241120105625.22508-15-Frank.Sae@motor-comm.com>
 
-From: asmaa <asmaa@nvidia.com>
+On Wed, Nov 20, 2024 at 06:56:18PM +0800, Frank Sae wrote:
+> Implement the .get_wol and .set_wol callback function.
+> 
+> Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
+> ---
+>  .../motorcomm/yt6801/yt6801_ethtool.c         | 169 +++++
+>  .../net/ethernet/motorcomm/yt6801/yt6801_hw.c | 576 ++++++++++++++++++
+>  .../ethernet/motorcomm/yt6801/yt6801_net.c    | 118 ++++
+>  3 files changed, 863 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_ethtool.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_ethtool.c
+> index 7989ccbc3..af643a16a 100644
+> --- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_ethtool.c
+> +++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_ethtool.c
+> @@ -565,6 +565,173 @@ static int fxgmac_set_ringparam(struct net_device *netdev,
+>  	return ret;
+>  }
+>  
+> +static void fxgmac_get_wol(struct net_device *netdev,
+> +			   struct ethtool_wolinfo *wol)
+> +{
+> +	struct fxgmac_pdata *pdata = netdev_priv(netdev);
+> +
+> +	wol->supported = WAKE_UCAST | WAKE_MCAST | WAKE_BCAST | WAKE_MAGIC |
+> +			 WAKE_ARP | WAKE_PHY;
 
-Once the BlueField-3 MDIO clock is enabled by software, it is expected
-and intended for it to keep toggling. BlueField-3 has a hardware GPIO bug
-where constant toggling at "high frequencies" will lead to GPIO
-degradation.
+You are not asking the PHY what it can do. Ideally you want the PHY to
+do WoL so you can power off the MAC. You should only use MAC WoL when
+asked to do something the PHY does not support.
 
-The workaround suggested by the hardware team is to lower down the clock
-frequency. That will increase the "life expectation" of the GPIO.
-The lowest possible frequency we can achieve is 1.09Mhz by setting
-mdio_period = 0xFF.
+> +	wol->wolopts = 0;
+> +	if (!(pdata->hw_feat.rwk) || !device_can_wakeup(pdata->dev)) {
+> +		yt_err(pdata, "%s, pci does not support wakeup.\n", __func__);
+> +		return;
+> +	}
+> +
+> +	wol->wolopts = pdata->wol;
+> +}
+> +
+> +#pragma pack(1)
+> +/* it's better to make this struct's size to 128byte. */
+> +struct pattern_packet {
+> +	u8 ether_daddr[ETH_ALEN];
+> +	u8 ether_saddr[ETH_ALEN];
+> +	u16 ether_type;
+> +
+> +	__be16 ar_hrd;		/* format of hardware address  */
+> +	__be16 ar_pro;		/* format of protocol          */
+> +	u8 ar_hln;		/* length of hardware address  */
+> +	u8 ar_pln;		/* length of protocol address  */
+> +	__be16 ar_op;		/* ARP opcode (command)        */
+> +	u8 ar_sha[ETH_ALEN];	/* sender hardware address     */
+> +	u8 ar_sip[4];		/* sender IP address           */
+> +	u8 ar_tha[ETH_ALEN];	/* target hardware address     */
+> +	u8 ar_tip[4];		/* target IP address           */
+> +
+> +	u8 reverse[86];
+> +};
+> +
+> +#pragma pack()
+> +
+> +static int fxgmac_set_pattern_data(struct fxgmac_pdata *pdata)
+> +{
+> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
+> +	u8 type_offset, tip_offset, op_offset;
+> +	struct wol_bitmap_pattern pattern[4];
+> +	struct pattern_packet packet;
+> +	u32 ip_addr, i = 0;
+> +
+> +	memset(pattern, 0, sizeof(struct wol_bitmap_pattern) * 4);
 
-Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
-Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
----
- .../ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+This is somewhat error prone. It is better to use
 
-diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c
-index 654190263535..d6dd36ab599e 100644
---- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c
-+++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_mdio.c
-@@ -96,6 +96,7 @@ static struct mlxbf_gige_mdio_gw mlxbf_gige_mdio_gw_t[] = {
- #define MLXBF_GIGE_MDIO_FREQ_REFERENCE 156250000ULL
- #define MLXBF_GIGE_MDIO_COREPLL_CONST  16384ULL
- #define MLXBF_GIGE_MDC_CLK_NS          400
-+#define MLXBF_GIGE_BF3_MDIO_PERIOD     0xFF
- #define MLXBF_GIGE_MDIO_PLL_I1CLK_REG1 0x4
- #define MLXBF_GIGE_MDIO_PLL_I1CLK_REG2 0x8
- #define MLXBF_GIGE_MDIO_CORE_F_SHIFT   0
-@@ -178,9 +179,16 @@ static u8 mdio_period_map(struct mlxbf_gige *priv)
- 	u8 mdio_period;
- 	u64 i1clk;
- 
--	i1clk = calculate_i1clk(priv);
--
--	mdio_period = div_u64((MLXBF_GIGE_MDC_CLK_NS >> 1) * i1clk, 1000000000) - 1;
-+	/* The MDIO clock frequency need to be set as low as possible to avoid
-+	 * a BF3 hardware GPIO degradation. The lowest frequency can be achieved
-+	 * by setting MdioPeriod = 0xFF.
-+	 */
-+	if (priv->hw_version == MLXBF_GIGE_VERSION_BF3) {
-+		mdio_period = MLXBF_GIGE_BF3_MDIO_PERIOD;
-+	} else {
-+		i1clk = calculate_i1clk(priv);
-+		mdio_period = div_u64((MLXBF_GIGE_MDC_CLK_NS >> 1) * i1clk, 1000000000) - 1;
-+	}
- 
- 	return mdio_period;
- }
--- 
-2.47.0
+       memset(pattern, 0, sizeof(pattern));
 
+> +
+> +	/* Config ucast */
+> +	if (pdata->wol & WAKE_UCAST) {
+> +		pattern[i].mask_info[0] = 0x3F;
+
+What does 0x3F mean? Can you replace the magic number with a #define
+which explains it?
+
+> +		pattern[i].mask_size = sizeof(pattern[0].mask_info);
+> +		memcpy(pattern[i].pattern_info, pdata->mac_addr, ETH_ALEN);
+> +		pattern[i].pattern_offset = 0;
+> +		i++;
+> +	}
+> +
+> +	/* Config bcast */
+> +	if (pdata->wol & WAKE_BCAST) {
+> +		pattern[i].mask_info[0] = 0x3F;
+> +		pattern[i].mask_size = sizeof(pattern[0].mask_info);
+> +		memset(pattern[i].pattern_info, 0xFF, ETH_ALEN);
+> +		pattern[i].pattern_offset = 0;
+> +		i++;
+> +	}
+> +
+> +	/* Config mcast */
+> +	if (pdata->wol & WAKE_MCAST) {
+> +		pattern[i].mask_info[0] = 0x7;
+> +		pattern[i].mask_size = sizeof(pattern[0].mask_info);
+> +		pattern[i].pattern_info[0] = 0x1;
+> +		pattern[i].pattern_info[1] = 0x0;
+> +		pattern[i].pattern_info[2] = 0x5E;
+
+I don't think that is the correct definition of multicast.
+
+https://elixir.bootlin.com/linux/v6.12/source/include/linux/etherdevice.h#L122
+
+You are just interested in one bit to indicate it is an Ethernet
+multicast frame.
+
+> +	/* Config arp */
+> +	if (pdata->wol & WAKE_ARP) {
+> +		memset(pattern[i].mask_info, 0, sizeof(pattern[0].mask_info));
+> +		type_offset = offsetof(struct pattern_packet, ar_pro);
+> +		pattern[i].mask_info[type_offset / 8] |= 1 << type_offset % 8;
+> +		type_offset++;
+> +		pattern[i].mask_info[type_offset / 8] |= 1 << type_offset % 8;
+> +		op_offset = offsetof(struct pattern_packet, ar_op);
+> +		pattern[i].mask_info[op_offset / 8] |= 1 << op_offset % 8;
+> +		op_offset++;
+> +		pattern[i].mask_info[op_offset / 8] |= 1 << op_offset % 8;
+> +		tip_offset = offsetof(struct pattern_packet, ar_tip);
+> +		pattern[i].mask_info[tip_offset / 8] |= 1 << tip_offset % 8;
+> +		tip_offset++;
+> +		pattern[i].mask_info[tip_offset / 8] |= 1 << type_offset % 8;
+> +		tip_offset++;
+> +		pattern[i].mask_info[tip_offset / 8] |= 1 << type_offset % 8;
+> +		tip_offset++;
+> +		pattern[i].mask_info[tip_offset / 8] |= 1 << type_offset % 8;
+> +
+> +		packet.ar_pro = 0x0 << 8 | 0x08;
+> +		/* ARP type is 0x0800, notice that ar_pro and ar_op is
+> +		 * big endian
+> +		 */
+> +		packet.ar_op = 0x1 << 8;
+> +		/* 1 is arp request,2 is arp replay, 3 is rarp request,
+> +		 * 4 is rarp replay
+> +		 */
+> +		ip_addr = fxgmac_get_netdev_ip4addr(pdata);
+
+What happens when there is no IPv4 address on the interface? You
+probably want to return -EINVAL.
+
+> +static int fxgmac_set_wol(struct net_device *netdev,
+> +			  struct ethtool_wolinfo *wol)
+> +{
+> +	struct fxgmac_pdata *pdata = netdev_priv(netdev);
+> +	int ret;
+> +
+> +	if (wol->wolopts & (WAKE_MAGICSECURE | WAKE_FILTER)) {
+> +		yt_err(pdata, "%s, not supported wol options, 0x%x\n", __func__,
+> +		       wol->wolopts);
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (!(pdata->hw_feat.rwk)) {
+> +		yt_err(pdata, "%s, hw wol feature is n/a\n", __func__);
+> +		return wol->wolopts ? -EOPNOTSUPP : 0;
+> +	}
+
+You should be reporting that in get_wol().
+
+> +	pdata->wol = 0;
+> +	if (wol->wolopts & WAKE_UCAST)
+> +		pdata->wol |= WAKE_UCAST;
+> +
+> +	if (wol->wolopts & WAKE_MCAST)
+> +		pdata->wol |= WAKE_MCAST;
+
+It is not 100% clear, but i think set_wol should be additive. You can
+use ethtool to keep adding more WoL options. The clear them you use
+wol d.
+
+	Andrew
 
