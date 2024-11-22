@@ -1,536 +1,173 @@
-Return-Path: <netdev+bounces-146749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3093F9D5683
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 01:02:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 160299D56B8
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 01:29:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72284B22395
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:02:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BBB21F229E4
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 00:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EF7230988;
-	Fri, 22 Nov 2024 00:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA492309AC;
+	Fri, 22 Nov 2024 00:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QKnYPWfn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D958B23A0
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 00:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2311853;
+	Fri, 22 Nov 2024 00:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732233745; cv=none; b=DQalG1vTDu6RyWqPURUz9eNgt6jsZvyKXsQBFVnfXwFHkG1twX1BZY/R0PmYUAGbWCGBnRfQmvb8PvBbOx/8VtFIjC28lKWUeYYfVzVlpALhwNPAmYj+fhtdlEGf1X8UsD0DqROhRpnRNiJayk+iW24G+dE/2TjYvAvgdxi6zqo=
+	t=1732235361; cv=none; b=hyyeFg8sKZvPV8DWPWkzPmPQKxA+3E1c0Hk//5/eypqa8QZKBxbjlkj/+Vi7qWCOqg1MS6VSNU5L7svRGuJ6/HFXOXCAm/gjJ4U/i/qYDFrw9Pm0DCkncPqzyCR3pZ/pJdGhmePoGCZ/ZQ1D+CzOUHF+n/wIXN8/261WKy7/p+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732233745; c=relaxed/simple;
-	bh=zPNsngUrW8SuQCUC+d9uvaCWxxOh0Robx3W3qXyId9Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dvz6s6bOMwRwbwv6suT5CPdEMMhTKAtlY5pzpBf+GvrLgG3rFUDw27tNANx4hDKyYDdnqeoAw1K9C8ew90UyCiaM3rRMho0NzhInZFQAKHp2bksNEdSHTzDp21L/q/2Kwuojs1TD5e47pcX4BhmUmQEAZNBEy36hDmEMjef6CgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a79afe7a0bso4506745ab.3
-        for <netdev@vger.kernel.org>; Thu, 21 Nov 2024 16:02:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732233742; x=1732838542;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ELCqlXYQXHWugF/K5LLj7RS+1lCa8OMBZmX+A9KMV0Q=;
-        b=quyf7naZplmYKJto6QHz8+fcxS15i/fLNWK/ft4fZaTXSgJ8smAtP/SwvJI6WGmV21
-         Z2+aPzkIyVtFlH+TH8Rcjn81Q/eF/n+i9i0n8xRXkQuwn4+C7Va3TEPh6dWl5VjalG4k
-         vM3nCIxB5JaxmlKPNNFUfbCoOaS7ptZ0czffjGYiNkbLtsBky4BxPeadag3LwGFlaNiQ
-         RZVfHNV+6dLflLj8isXR/YGf3+RoxLRHEnwIn7C0AIYud41bMKXpGWi7gHyWBcspfCgO
-         swAuiQ46qi3RwDuqkoHXLQ51Y/ihiYn20A0CozmJXkC/Eos/pGRaFYWEngAwd19ggfDZ
-         0LFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVl04eWN3qdUX1KHkXNXEuWHvwEkGinBaFxp9pNQTJe5RvgDPVx1tCV98mOCAWJ9Ervva778hU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRvE09t5vatiYoogDUE2KhmCSpgYG+XoFgmAdnMKXk7Q/d87Yb
-	FO/181HSfvfN284tZcMfwCutAEcSrqN89wnh32Ll1UDCgZDe0B35QLpc8cyj5BwQh7JVRbAKByK
-	ded++A5gRIxxIFYT/v1FnWO0ORVyIhXr/ODYtXNhCec6pjyG71wvKHNU=
-X-Google-Smtp-Source: AGHT+IFrhkvwA9BDIyJ3ZtLI5uSkjICy1EnXOW6/o/asoQTVP8NlKGJL/8tASg0d4q4IrL5YW74eVVxtObX1THmvLRrZxr8angNo
+	s=arc-20240116; t=1732235361; c=relaxed/simple;
+	bh=uk+pH/rz2AQ9v7cxqSTdM222f4jWZAPRrTaqZZuR2d0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LC31YyMXeqRqz366zLEA8JmJxpK4WAR4QdfdyAhCwZeAP0pKGNC72k3X3ouJk6/xQqzGIUltx2nNrJpxcdKI3ZwQD/NFj8cYnpXyBUGPlH0whNplDuGZSdaFI7lEFUSftd1bkhfs4Ev+2mx3gJdKHYMalndKS+l4vF8sq/EoL6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QKnYPWfn; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ALIw43C019536;
+	Fri, 22 Nov 2024 00:28:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	W04J+mMnkofmPEjfpvH8rTRYkq6LkLstGJFNeRVvoUs=; b=QKnYPWfnIQsu04/f
+	nUrB8AoWmZ2dB20jfM6BoYm+8vHk1R6jnN+kQgLfkoJMK1qljSPNLEH+gxA0o/sd
+	NRIWpo11VydTUPHFgGRQpEbLMk2YLj55AZwL//XMq4lk9NmU72DSGit0FBhl18qr
+	gjaOMhB4OzgxXZLqqff3jvgnX83YxjaFYNTDL1Lv+/ASdnEP551/qm9+d6TO/1Be
+	88Fe2M/D4dFh8Sm691Fb0uKeFEBaJYx4G+eR7w7eqbV47a+kCYKwIwNIDc5Drp+d
+	+83k1qlGtqTKGU9MHVjiDoDXuD9Xn1EIa6YaXU/TBiwNZNLXn8QXzGF/ezMgx6GB
+	LtK5ng==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 431c7hnrw4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 00:28:43 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AM0SgwI009655
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 00:28:42 GMT
+Received: from [10.71.115.177] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 21 Nov
+ 2024 16:28:42 -0800
+Message-ID: <b1e22673-2768-445c-8c67-eae93206cca5@quicinc.com>
+Date: Thu, 21 Nov 2024 16:28:41 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c56a:0:b0:3a7:6825:409d with SMTP id
- e9e14a558f8ab-3a79ab8d47dmr10712425ab.0.1732233742100; Thu, 21 Nov 2024
- 16:02:22 -0800 (PST)
-Date: Thu, 21 Nov 2024 16:02:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <673fca0e.050a0220.363a1b.012a.GAE@google.com>
-Subject: [syzbot] [netfilter?] BUG: using smp_processor_id() in preemptible
- code in nft_inner_eval
-From: syzbot <syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    43fb83c17ba2 Merge tag 'soc-arm-6.13' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17da1b78580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e796b1bf154f93a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=84d0441b9860f0d63285
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cdcbc016316b/disk-43fb83c1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f82505daa7c2/vmlinux-43fb83c1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/74b0b41d70c6/bzImage-43fb83c1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+84d0441b9860f0d63285@syzkaller.appspotmail.com
-
-check_preemption_disabled: 3425 callbacks suppressed
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 1 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 0 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
-BUG: using smp_processor_id() in preemptible [00000000] code: syz.3.1627/12102
-caller is nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
-CPU: 1 UID: 0 PID: 12102 Comm: syz.3.1627 Not tainted 6.12.0-syzkaller-03657-g43fb83c17ba2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
- nft_inner_eval+0xda/0x18e0 net/netfilter/nft_inner.c:251
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
- nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
- NF_HOOK_COND include/linux/netfilter.h:302 [inline]
- ip_output+0x185/0x230 net/ipv4/ip_output.c:434
- ip_local_out net/ipv4/ip_output.c:130 [inline]
- ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1496
- udp_send_skb+0xab6/0x1630 net/ipv4/udp.c:984
- udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1272
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2581
- ___sys_sendmsg net/socket.c:2635 [inline]
- __sys_sendmmsg+0x36a/0x720 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2751 [inline]
- __se_sys_sendmmsg net/socket.c:2748 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2748
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c1ff7e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c20db5038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f1c20135fa0 RCX: 00007f1c1ff7e819
-RDX: 000000000000002d RSI: 0000000020007fc0 RDI: 0000000000000007
-RBP: 00007f1c1fff175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f1c20135fa0 R15: 00007ffef663cd18
- </TASK>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
+To: Johan Hovold <johan@kernel.org>
+CC: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman
+	<horms@kernel.org>,
+        Hemant Kumar <quic_hemantk@quicinc.com>,
+        Loic Poulain
+	<loic.poulain@linaro.org>,
+        Maxim Kochetkov <fido_max@inbox.ru>,
+        "Manivannan
+ Sadhasivam" <mani@kernel.org>,
+        Bjorn Andersson
+	<bjorn.andersson@oss.qualcomm.com>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Bhaumik Bhatt
+	<bbhatt@codeaurora.org>
+References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
+ <Zy3oyGLdsnDY9C0p@hovoldconsulting.com>
+Content-Language: en-US
+From: Chris Lew <quic_clew@quicinc.com>
+In-Reply-To: <Zy3oyGLdsnDY9C0p@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: VpfRLjXQYTbh7pNEPPqQNJK-Ojdpkn3j
+X-Proofpoint-GUID: VpfRLjXQYTbh7pNEPPqQNJK-Ojdpkn3j
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ phishscore=0 priorityscore=1501 malwarescore=0 bulkscore=0 spamscore=0
+ mlxscore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0
+ mlxlogscore=734 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411220002
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 11/8/2024 2:32 AM, Johan Hovold wrote:
+> On Mon, Nov 04, 2024 at 05:29:37PM -0800, Chris Lew wrote:
+>> From: Bhaumik Bhatt <bbhatt@codeaurora.org>
+>>
+>> The call to qrtr_endpoint_register() was moved before
+>> mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
+>> callback can occur before the qrtr endpoint is registered.
+>>
+>> Now the reverse can happen where qrtr will try to send a packet
+>> before the channels are prepared. Add a wait in the sending path to
+>> ensure the channels are prepared before trying to do a ul transfer.
+>>
+>> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+>> Reported-by: Johan Hovold <johan@kernel.org>
+>> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
+>> Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
+>> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+> 
+>> @@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
+>>   	if (skb->sk)
+>>   		sock_hold(skb->sk);
+>>   
+>> +	rc = wait_for_completion_interruptible(&qdev->prepared);
+>> +	if (rc)
+>> +		goto free_skb;
+>> +
+>>   	rc = skb_linearize(skb);
+>>   	if (rc)
+>>   		goto free_skb;
+>> @@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+>>   	qdev->mhi_dev = mhi_dev;
+>>   	qdev->dev = &mhi_dev->dev;
+>>   	qdev->ep.xmit = qcom_mhi_qrtr_send;
+>> +	init_completion(&qdev->prepared);
+>>   
+>>   	dev_set_drvdata(&mhi_dev->dev, qdev);
+>>   	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
+>> @@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+>>   		qrtr_endpoint_unregister(&qdev->ep);
+>>   		return rc;
+>>   	}
+>> +	complete_all(&qdev->prepared);
+>>   
+>>   	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
+> 
+> While this probably works, it still looks like a bit of a hack.
+> 
+> Why can't you restructure the code so that the channels are fully
+> initialised before you register or enable them instead?
+> 
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Ok, I think we will have to stop using the autoqueue feature of MHI and 
+change the flow to be mhi_prepare_for_transfer() --> 
+qrtr_endpoint_register() --> mhi_queue_buf(DMA_FROM_DEVICE). This would 
+make it so ul_transfers only happen after mhi_prepare_for_transfer() and 
+dl_transfers happen after qrtr_endpoint_register().
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+I'll take a stab at implementing this.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> Johan
 
