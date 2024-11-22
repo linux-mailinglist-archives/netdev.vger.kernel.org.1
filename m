@@ -1,112 +1,174 @@
-Return-Path: <netdev+bounces-146768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95B329D5A0B
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:34:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AE069D5A82
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DB161F234BD
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:34:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60DD02829F6
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 07:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8DA1632F5;
-	Fri, 22 Nov 2024 07:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TYars8gA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C608E17B4E1;
+	Fri, 22 Nov 2024 07:59:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746E422075;
-	Fri, 22 Nov 2024 07:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC64166F26
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 07:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732260862; cv=none; b=TAJmUb5EQCxz92yVZx15192YpiHLF/Sq5Idc8FwWvekgQVY7E3KuPLO1Dwbn4/14+1kK/njVpZSMJtiu1DSMU3tMtdB7EyCBg47ycVkX6smwWe4h9PVotEVEXZVMF4D8CN67x7uRIDGuw6eU17pnLp+Zm1ZyzRxWLfae8za69U4=
+	t=1732262369; cv=none; b=PaB6gtQN/xEGib+VtcgcgKcNdhp7yHo7ZA3O2dOQyM6DQ06NLMuAKaxC0rsv7axicuvCSlgs6Sw3njsmvrko26pl+4dt6HGM2vbs9QMNVQwOjwLcJbvWLJjjoRqmqA2Y41LMOnbFbJSzZj7+76j9dj6QdMKUOfh8Sv0GbPo64I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732260862; c=relaxed/simple;
-	bh=aKHi2s7g0Yh57xPmgKbyOF+bAC1mWROyHR/WAGtBZsQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=MIUwQdfkHKetmJualcz4eiGXXSsHhloJu70pRkzMMIVBbZR/AJw83I3YUnpAhHRsbxejTJFmRPNel6m4k9Fr5jX7sJ21M2wF3uZk9A40tntaN2JToHmWT54mxwMYMKdwir+53dN3pV7DrUPZ5G6l+VbgReFvq49jA7pZP0S86Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TYars8gA; arc=none smtp.client-ip=209.85.208.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-5cfe48b3427so256680a12.1;
-        Thu, 21 Nov 2024 23:34:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732260859; x=1732865659; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WP7Qyyn9P8aoIGhU2FYV6anw46pGQsyVROPp57hHtvU=;
-        b=TYars8gAAhB09Pj7MpQQScSyesXwhqVL4B9bTWn9OxCDC9VLLFfTBR7As1hjGhq4wT
-         LBIVDgQbuONeP4pAp6BKco34zk+/Nig3it4wDzqpCLeFHh+5OYYEVFZHwUDpsGs1jMeF
-         4pjiqEStV50Bj05JqwkkfoM48r6J2kowU4djR5G4EXJ8cpI2W0Jj+8DQ/ZvPR3X6kFZc
-         0uHLwRpn9BtbSU0iT2+8PAW4OdgdjmslBU0mVjsK04r0LNUAQtJAjsvze9xC45gxlyWg
-         w6H9AA2GRX3TiFzPyJaEQ4U7V4B9c5l7VRwdSnAFniYqtsaiW7x5gGj0oK+GCh2pKg+J
-         flHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732260859; x=1732865659;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WP7Qyyn9P8aoIGhU2FYV6anw46pGQsyVROPp57hHtvU=;
-        b=FYPeFTt9PbhYmQRWJDybhx8JpRYABSHAmwZm4Okj2jzdlnN+CjaTt2yW9lo7A7Hb0A
-         HvjrJfdw9LPxi6d5S+XxhrXZToGeTRK/eKL/R9fD8CYVaWmVBiRUjsjF9a7Hn377eTmR
-         r/4WLOEJbVhM4eOe60jQLp36QSx6cwTvJiq0B9VxoytDhcJZkIbUKd5BBiBoQrox/U17
-         kiQ6OWSwA1wwitorDrhyDSz9K6ElyCc9bvEA2akydvq5AB6ACj08UtJkps/6Nn7goalc
-         e/gDk+xDOrCJRhAmAxzamzoHa0dui7+urCGOAUvHnDLHk6YwQFIavItxxRh5RaPRyDD4
-         6MuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWP9ab1HBtRNhqwzHoHL6zceYU486MyNuqfNno/hsNjvKKxyTRSpitY2BADjRJNJZWoFUfLBe6IIS2+H3g=@vger.kernel.org, AJvYcCX0fe5efGVlkAYIt033ambYytSGgoJKcdBNsuVPz3KvfFrg4zv7Uu910g9hHtzAZYz1BL9c/X+a@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwWfUFUzgdWQTxTiFPfjsF9AbvUP7Bz6tBaKqZ1EdeDbrxahqU
-	aICa+TgWl2xL9Wlx5c2Zj7R6Xq5bQIo/BzhDEjQhoTiOzmr4+nf/yR/t5Mzihpwi+hwWwqA5Wim
-	pSfNH1fg5Mg5PK7i5wE7WsUcIF2qR6GJaithIng==
-X-Gm-Gg: ASbGncsuSFKyvh9X+WK2O0VxFRmX4Vv+Ida+qYfE8vs5yaTJBkj+ezrADRPimpmFgtA
-	0IH//86w5LjuuClgc45WvTfnMY0Lmg0tz
-X-Google-Smtp-Source: AGHT+IGCtSvS2ymC3RmhAtG5dG3THBE+Z+tmCCHfo43Bgd+3ZuSnl0VmmL4EiEP5whUNpJGSziobzESuHMl33j7bQXA=
-X-Received: by 2002:a05:6402:350e:b0:5cf:d24c:e7cc with SMTP id
- 4fb4d7f45d1cf-5d0207cab69mr485385a12.8.1732260858540; Thu, 21 Nov 2024
- 23:34:18 -0800 (PST)
+	s=arc-20240116; t=1732262369; c=relaxed/simple;
+	bh=ua4WWXrbFmKwDf0c9+PM4R4TLQFOmCnKY7Grbp6lZt8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sMZO114k465kxvHunqTEAEbhY2+yGlZR9zeRL7ZOJNybYvdRtYXIpkI0WUd2H+C16IwfYMhnNITJl89e/UPzYMGtLOxsMfbIpTFCh4bAx7Bl6ufv+WUHnXHKz7d7a0X7uIREKClEBskIUil6ZkqnaQFIXZidFv6IEJ3JkoYWTow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: a97ef06ea8a711efa216b1d71e6e1362-20241122
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:e4b70828-f217-4a76-a0bb-d5081ef3d62e,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:9d575819d1210145532e6e92a005ebd7,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0,EDM:-3,
+	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
+	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: a97ef06ea8a711efa216b1d71e6e1362-20241122
+Received: from node2.com.cn [(10.44.16.197)] by mailgw.kylinos.cn
+	(envelope-from <luoxuanqiang@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 7202630; Fri, 22 Nov 2024 15:59:12 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id 9ECEFB80758A;
+	Fri, 22 Nov 2024 15:59:12 +0800 (CST)
+X-ns-mid: postfix-674039D0-5586047365
+Received: from [10.42.20.255] (unknown [10.42.20.255])
+	by node2.com.cn (NSMail) with ESMTPA id BAF74B80758A;
+	Fri, 22 Nov 2024 07:59:08 +0000 (UTC)
+Message-ID: <833ea8e7-f15b-ff66-84bf-2bcd77710fd8@kylinos.cn>
+Date: Fri, 22 Nov 2024 15:59:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: clingfei <clf700383@gmail.com>
-Date: Fri, 22 Nov 2024 15:34:06 +0800
-Message-ID: <CADPKJ-7==Bo=Wu6cHQ_y2qQVsPoJGeP3x0GztMXYcDaKCfmrkQ@mail.gmail.com>
-Subject: Data race in net/mptcp/pm_netlink.c
-To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2] net: mdio: fix unbalanced fwnode reference count in
+ mdio_device_release()
+Content-Language: en-US
+To: Zeng Heng <zengheng4@huawei.com>, hkallweit1@gmail.com,
+ edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, andrew@lunn.ch, f.fainelli@gmail.com,
+ linux@armlinux.org.uk
+Cc: liwei391@huawei.com, netdev@vger.kernel.org
+References: <20221203073441.3885317-1-zengheng4@huawei.com>
+From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+In-Reply-To: <20221203073441.3885317-1-zengheng4@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-linux-next weekly scan reports that there might be data race in
-net/mptcp/pm_netlink.c, when mptcp_pm_nl_flush_addrs_doit
-bitmap_zeroing pernet->id_bit_map at line 1748, there might be a
-concurrent read at line 1864.
-Should we add a lock to protect pernet->id_bit_map?
+Hi Heng,
 
-The report is listed below.
-** CID 1601938:  Concurrent data access violations  (MISSING_LOCK)
-/net/mptcp/pm_netlink.c: 1864 in mptcp_pm_nl_dump_addr()
+=E5=9C=A8 2022/12/3 15:34, Zeng Heng =E5=86=99=E9=81=93:
+> There is warning report about of_node refcount leak
+> while probing mdio device:
+>
+> OF: ERROR: memory leak, expected refcount 1 instead of 2,
+> of_node_get()/of_node_put() unbalanced - destroy cset entry:
+> attach overlay node /spi/soc@0/mdio@710700c0/ethernet@4
+>
+> In of_mdiobus_register_device(), we increase fwnode refcount
+> by fwnode_handle_get() before associating the of_node with
+> mdio device, but it has never been decreased in normal path.
+> Since that, in mdio_device_release(), it needs to call
+> fwnode_handle_put() in addition instead of calling kfree()
+> directly.
+>
+> After above, just calling mdio_device_free() in the error handle
+> path of of_mdiobus_register_device() is enough to keep the
+> refcount balanced.
+>
+> Fixes: a9049e0c513c ("mdio: Add support for mdio drivers.")
+> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
+> Reviewed-by: Yang Yingliang <yangyingliang@huawei.com>
+> ---
+>   changes in v2:
+>    - Add operation about setting device node as NULL-pointer.
+>      There is no practical changes.
+>    - Add reviewed-by tag.
+> ---
+>   drivers/net/mdio/of_mdio.c    | 3 ++-
+>   drivers/net/phy/mdio_device.c | 2 ++
+>   2 files changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+> index 796e9c7857d0..510822d6d0d9 100644
+> --- a/drivers/net/mdio/of_mdio.c
+> +++ b/drivers/net/mdio/of_mdio.c
+> @@ -68,8 +68,9 @@ static int of_mdiobus_register_device(struct mii_bus =
+*mdio,
+>   	/* All data is now stored in the mdiodev struct; register it. */
+>   	rc =3D mdio_device_register(mdiodev);
+>   	if (rc) {
+> +		device_set_node(&mdiodev->dev, NULL);
+> +		fwnode_handle_put(fwnode);
+According to my understanding, the process flow of mdio_device_free() is
+as follows:
+mdio_device_free()
+ =C2=A0=C2=A0=C2=A0 -> put_device()
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->kobject_put()
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->kob=
+ject_release()
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ->device_release()
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->mdio_device_release()
+ =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
+=A0 =C2=A0=C2=A0=C2=A0 //Here, it will be called once fwnode_handle_put()=
+;
 
+Why is it necessary to add fwnode_handle_put(fwnode) again here? In the
+body of your email, you described that mdio_device_free() is sufficient
+to keep refcount balanced, and it was not added in the v1.
+Could you please explain the reason for this?
+I am looking forward to your response :)
 
-________________________________________________________________________________________________________
-*** CID 1601938:  Concurrent data access violations  (MISSING_LOCK)
-/net/mptcp/pm_netlink.c: 1864 in mptcp_pm_nl_dump_addr()
-1858     int i;
-1859
-1860     pernet = pm_nl_get_pernet(net);
-1861
-1862     rcu_read_lock();
-1863     for (i = id; i < MPTCP_PM_MAX_ADDR_ID + 1; i++) {
->>>     CID 1601938:  Concurrent data access violations  (MISSING_LOCK)
->>>     Accessing "pernet->id_bitmap" without holding lock "pm_nl_pernet.lock". Elsewhere, "pm_nl_pernet.id_bitmap" is written to with "pm_nl_pernet.lock" held 1 out of 1 times.
-1864     if (test_bit(i, pernet->id_bitmap)) {
-1865     entry = __lookup_addr_by_id(pernet, i);
-1866     if (!entry)
-1867     break;
-1868
-1869     if (entry->addr.id <= id)
+Thanks
+Xuanqiang
+>   		mdio_device_free(mdiodev);
+> -		of_node_put(child);
+>   		return rc;
+>   	}
+>  =20
+> diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_devic=
+e.c
+> index 250742ffdfd9..044828d081d2 100644
+> --- a/drivers/net/phy/mdio_device.c
+> +++ b/drivers/net/phy/mdio_device.c
+> @@ -21,6 +21,7 @@
+>   #include <linux/slab.h>
+>   #include <linux/string.h>
+>   #include <linux/unistd.h>
+> +#include <linux/property.h>
+>  =20
+>   void mdio_device_free(struct mdio_device *mdiodev)
+>   {
+> @@ -30,6 +31,7 @@ EXPORT_SYMBOL(mdio_device_free);
+>  =20
+>   static void mdio_device_release(struct device *dev)
+>   {
+> +	fwnode_handle_put(dev->fwnode);
+>   	kfree(to_mdio_device(dev));
+>   }
+>  =20
 
