@@ -1,240 +1,266 @@
-Return-Path: <netdev+bounces-146772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1129D5AC4
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:12:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 111E29D5AD1
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 09:13:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C34D281787
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67D5283099
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 08:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95DF218A6D8;
-	Fri, 22 Nov 2024 08:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7847018BB9B;
+	Fri, 22 Nov 2024 08:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bw21WrI0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhnIWboP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E623822075;
-	Fri, 22 Nov 2024 08:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE9B18B46D
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 08:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732263124; cv=none; b=fwxost7CFCkk2ePBszawGvNdc+J5U0M+dBy3WPhlmmM30uosqr2yKnAvzIYBIRsIO9GH1nMjPngeJN1X19GXYFcDjEQNmoxoRF32qHm8bt3pbv8KoNJLiPeMcXuEr3gLp+/35Ae5t7FsaztEB54n0UkgtSXJdSmT8NZcz9AIYvg=
+	t=1732263215; cv=none; b=If5xXrdzkIZlz0yZcNdPAi0CljdJNoYK9mnJXZfJYXpn3Mp3J7Ws3X3uAgi3b5+kE33i8TwnLOlD8uW4vSFx+YXuGdKoH6BX32KKDUf20hrrvVXDtb2AhcVhkljA1s5iF77vTJS5q3enNs3bkUKA/2U1vg6uyrrv1gmIzCSpD8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732263124; c=relaxed/simple;
-	bh=vfa73H59aXhR7J0Cv4I/H0vg//RnzL84g9+gABL6x10=;
+	s=arc-20240116; t=1732263215; c=relaxed/simple;
+	bh=JCxji8+zZEwg3Qp6iHQDZxtQInqv5sJnQ+PuEwTDVrg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VjO+/gde0yRgk5J0aUaiKsWwlH44rsw5b9nRL21NK/p33c9an/xSRDCBE/Mu1ZPSN91hmg2h5/SlkLOGmF4j/KPstg2tTzCUb0HmbEczELwhnXGvKMMNwz+xDzzKs7M6NTLGUpOYb7eIgVnS8WKC4wBzxuQ+/I4f4JIasWFCva8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bw21WrI0; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6ee7b886b5fso18413347b3.3;
-        Fri, 22 Nov 2024 00:12:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732263122; x=1732867922; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xBVVfxBZW2KFqRVvhdXWhW+v4WR7l4QlIwMPMmDHj5U=;
-        b=Bw21WrI0i24iZi/fSUe98oPj7BCAbL0gup0uqRjTO907lmxf0HPTv7a6r+i2kL0rDG
-         qD00C4U1svCzsPWKHL4/BBF8+mzssy/rNYhg5J9nb5YqpkAYl868mhGUyWJjve9bxwoC
-         83QG701GoBdLKEv0FSBSV8gmdGxheX1sl9fKeKMhlvLlXE/VdFA5+UU/gVYwdOMPKda4
-         1NicrZvTgMNhUhwC3p3uim+rijYVrl3s46ZqnFXdiDonEYB/TiH/w3nwLzwZdB0Tag0w
-         MwhkXW61rlp1jW6/cRUpVLdU3YCvps7dm2Ftm8rH0hOesKu+bBp8QgT6Pv2uGspLR8CI
-         IgNg==
+	 To:Cc:Content-Type; b=hVGeNIW/8yiquTOTuLeTftyKi/yked+fAx+Mt3mQmGh4E6cxGEt0xRPRe3pC02BsVo5y9v++8yFAyR/BEc7naTZan9B6teNAU3E+HOYrRWo53my+HrqapPdvVksyHdcsstzTMSnLir+LFJRishB9tV2f1jGa16bL1s6R/V40ybg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YhnIWboP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732263212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jyif/vwioQZSx22jeV7A3meclVkznYeYdCGV00kxmmo=;
+	b=YhnIWboPv3NUjNWkToaBrDAtiTqQg0cDdTXZLhFtYJqv3czBsJ1MEMddrYahp0h8xZWWFC
+	AIzjnuCRBtf+QWsPWeiIZZv+4qa293tlTUz+SniVuFd/rnG7IM/dS8ydv77UlOgIsHMEdM
+	Q0cLWj+71X5N2IArQfWl6l9wFmOV8EE=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-583-QHRIHJEnNI2eFPgHF7oHGg-1; Fri, 22 Nov 2024 03:13:30 -0500
+X-MC-Unique: QHRIHJEnNI2eFPgHF7oHGg-1
+X-Mimecast-MFC-AGG-ID: QHRIHJEnNI2eFPgHF7oHGg
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-6ee6122ea3fso30897757b3.1
+        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 00:13:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732263122; x=1732867922;
+        d=1e100.net; s=20230601; t=1732263210; x=1732868010;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xBVVfxBZW2KFqRVvhdXWhW+v4WR7l4QlIwMPMmDHj5U=;
-        b=T3ew7zzvp4eKWU1uwfEgPkti2Btxn6ZExK8LnpN4nmDII4p6WqOQQm1LWBd+ph4F+R
-         p5/T7qJ6PVWpn9eYTB6cUmcNO8MEpFbQI0vJgEADW9pCZJKWL8UmVbMzliv/VyjscYgN
-         d6tdEqRxVlaB0eS76pTZuJfsIPI01x8I6Ks+Nnhr9G+uu0vTUrc/Sq3OfMTXjToI0GbJ
-         Q02X4YRyPc59ujdTwzoF/9Rra4kZPj3dHzwk8k5MyUv4yb1744biGnRkNlIK9/CTEZAL
-         Xp8d5emakCpEuDM7wL+HVYppQUIKCV3XMnCD/IzyxoPP0vXo9pWUU9JgahWY6K4M8KXZ
-         ucHA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1/nZrJjzneiQp8j+EwLzsxiq3lebEYfys7Jmk7MDz9vC/5+t/H9E7kpZ5dJIxo8uo91A5C2l3VerU@vger.kernel.org, AJvYcCU9fXGfTTGwtP+nL9GNjo1xX/FGrWf4RHrg8cg0DSHkpZed7jmsFa2zHNK5AU7KO2SKU1pUYFOkr3nVq1Bo@vger.kernel.org, AJvYcCUbGF3AeF4hNw6QwIa7Oa1PBKWwBo4n6ehIXQo7cOtZQU8V202ObXaOQ7s3B74JsJ2GUVnMwWiD@vger.kernel.org, AJvYcCUxI1CzXuxD//Gc7BMKN9oNPBXD72IABeRbf7n0MFTQ0JMSr8ZaFwh3NjMf/+vDlSKhDO/r4bJewQ4siw==@vger.kernel.org, AJvYcCVxYRO77xrX9fjFgP9tyJrV/kk811YXdhyn3AeAi2q6aXFuIE9iLHMMTUGWN+QE2amVjFALiLXElEZU@vger.kernel.org, AJvYcCW5eU4dwLo74n1lDGdxkJooS99q4Jo4elT25nC2hJ3hT9+TQMp1iz0RViP3Aw4pQ1r5VAN7GL4Tu2HxlqM=@vger.kernel.org, AJvYcCXdDsT5T4lekrQ18yTB7oq+ftCI7ZvQ/t3FfIaXTCdrCNLZg8Tu/pl47MXjRSKz4MTQ0fCa8GZbgUo=@vger.kernel.org, AJvYcCXokhqSfl446yC5RMoZa28aAR2OPoSKNb9vJR7tk60Q3CnVYVj1Efs/QRBP5J7mWuHPfxQDxMpsjGwv+fg1cC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ6XZ1bQdCxM5/smmLR+ZaJmEn9yA/o9ToOOQtTF+7hu5XF599
-	OPfz/7MnNxiYZJGwlwuOPJaayMUNrM2vYtKZ42p1YPSXsxv74ft2u/wqORUPihMxS9Ka3r4gvC+
-	opvhSMqs61qkHLEJXfAOOFTb4wrU=
-X-Gm-Gg: ASbGncuV3jmeFHdQmoQtUNcuStc0253+HDsWJwKBOOFYtWmXXCSOVuKinUiWCV6mJ3m
-	EUfs0vCbpxkOZ2ZiqfR684qfj9rrGsmQ=
-X-Google-Smtp-Source: AGHT+IGmgdSbiik8QuTUl0/67zUkXwlQddlW2hCReHsnX53P5ohf/5TneLt36igaRho14/sg+tTkQNogVtwDsPUozas=
-X-Received: by 2002:a05:6902:1245:b0:e38:f293:5b63 with SMTP id
- 3f1490d57ef6-e38f8bd97d6mr2235315276.33.1732263121799; Fri, 22 Nov 2024
- 00:12:01 -0800 (PST)
+        bh=Jyif/vwioQZSx22jeV7A3meclVkznYeYdCGV00kxmmo=;
+        b=YWD7Dd5ps+6v4biwfknYQUO0DsT1bDMyftT9+U/7tNKRSVC3oSQzoQVUCkay+XnvoQ
+         Xzu6YCbiltWlJwW4FGfgzjhj4BJVQe5eEdHNV4FJByKXuucGBUHWltatngaxbIosQtyC
+         qvROn1dIhYF0surk7M24W8UvryIMMw8Ee/j3KaaX1WjBNkUngTNgalbJpuTiGQa1BgG2
+         IYbp7536oCU1Sc5Pvk8/qrAPXlsWkzRaV2+WEIqRnr7YyqIKrogIVW2ykRVXWZmutYOc
+         84HN8EpRcgz36/oYyFIQ+3YHkI0p99eVDH9fnGqaFH+SAdFVDc8PZ21Era7XSujVfbpf
+         6B1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUtAdDIp42MTBJ6k/NDZcplluMDgbKQBQm58iEPodkgS+g6otUlNHj98fjWsG5TBccMQJMxzHg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwO4K1LZZsMJOEaozyEi3X3gG4K1Y2Phi/2b9kqzqADhN05INZA
+	k4oYqi+lnYrF/OpKWcLsXPeTN43GW6fpsO0tp9OTZSUKJokkvMsCVM25qdWjNyxBsTi7aZFSEVC
+	crKcHSqIGILgJGpSBHPPzxIw+AzDD9bgBzW1pT1IXJW3cQ6z+s12/zNpi85xzblexUf9VHErwQL
+	A6rvfD4I+AJ+FxJk69AfWGOOUtycQU
+X-Gm-Gg: ASbGncuJX1IMmntRCQ6zJHTSIexSwTbTp1na6DCcIJvLYkaYVF/EiNU1Ng9pvMhk4gu
+	IXCNDbisbs37VSZq3Hz1Eecqetrq/1mk=
+X-Received: by 2002:a05:6902:1a47:b0:e38:c0ed:8110 with SMTP id 3f1490d57ef6-e38f8af84afmr1719572276.8.1732263209931;
+        Fri, 22 Nov 2024 00:13:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGKRhMEchEwv851aJVBwXS4rpjG90mS+TEvahOSXsiWvE5DyfFNG4Z+Ig23pjG3EVB8nsNtJzWE+ExjTpdJI/I=
+X-Received: by 2002:a05:6902:1a47:b0:e38:c0ed:8110 with SMTP id
+ 3f1490d57ef6-e38f8af84afmr1719537276.8.1732263209529; Fri, 22 Nov 2024
+ 00:13:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121064046.3724726-1-tmyu0@nuvoton.com> <20241121064046.3724726-6-tmyu0@nuvoton.com>
- <2d21093f-7efd-4356-a1f5-2ae3af4a0da3@roeck-us.net>
-In-Reply-To: <2d21093f-7efd-4356-a1f5-2ae3af4a0da3@roeck-us.net>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 22 Nov 2024 16:11:50 +0800
-Message-ID: <CAOoeyxUMGhvNukqc0ufT1UrCi4WK60cNaOpyx1ngqOxm5OsT4Q@mail.gmail.com>
-Subject: Re: [PATCH v2 5/7] watchdog: Add Nuvoton NCT6694 WDT support
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
+References: <20241118-vsock-bpf-poll-close-v1-0-f1b9669cacdc@rbox.co>
+ <20241118-vsock-bpf-poll-close-v1-3-f1b9669cacdc@rbox.co> <7wufhaaytdjp3m3xv7jrdadqjg75is5eirv4bzmjzmezc7v7ls@p52fm6y537di>
+ <350e3a3f-7ebd-471e-95fa-05225d786f1c@rbox.co>
+In-Reply-To: <350e3a3f-7ebd-471e-95fa-05225d786f1c@rbox.co>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 22 Nov 2024 09:13:18 +0100
+Message-ID: <CAGxU2F5M9Mzpef4ef7NXCR2YP=k_SC93GC_k9CMj1DgVSkpQSw@mail.gmail.com>
+Subject: Re: [PATCH bpf 3/4] bpf, vsock: Invoke proto::close on close()
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Dear Guenter,
-
-Thank you for your comments,
-
-Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B411=E6=9C=8821=E6=
-=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8810:15=E5=AF=AB=E9=81=93=EF=BC=
-=9A
-> > +config NCT6694_WATCHDOG
-> > +     tristate "Nuvoton NCT6694 watchdog support"
-> > +     depends on MFD_NCT6694
-> > +     select WATCHDOG_CORE
-> > +     help
-> > +       If you say yes to this option, support will be included for Nuv=
-oton
-> > +       NCT6694, a USB device to watchdog timer.
-> > +
+On Thu, Nov 21, 2024 at 8:54=E2=80=AFPM Michal Luczaj <mhal@rbox.co> wrote:
 >
-> It is a peripheral expander, not a "USB device to watchdog timer". Watchd=
-og is only
-> a small part of its functionality.
+> On 11/21/24 10:22, Stefano Garzarella wrote:
+> > On Mon, Nov 18, 2024 at 10:03:43PM +0100, Michal Luczaj wrote:
+> >> vsock defines a BPF callback to be invoked when close() is called. How=
+ever,
+> >> this callback is never actually executed. As a result, a closed vsock
+> >> socket is not automatically removed from the sockmap/sockhash.
+> >>
+> >> Introduce a dummy vsock_close() and make vsock_release() call proto::c=
+lose.
+> >>
+> >> Note: changes in __vsock_release() look messy, but it's only due to in=
+dent
+> >> level reduction and variables xmas tree reorder.
+> >>
+> >> Fixes: 634f1a7110b4 ("vsock: support sockmap")
+> >> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> >> ---
+> >> net/vmw_vsock/af_vsock.c | 67 +++++++++++++++++++++++++++++-----------=
+--------
+> >> 1 file changed, 40 insertions(+), 27 deletions(-)
+> >>
+> >> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> >> index 919da8edd03c838cbcdbf1618425da6c5ec2df1a..b52b798aa4c2926c3f233a=
+ad6cd31b4056f6fee2 100644
+> >> --- a/net/vmw_vsock/af_vsock.c
+> >> +++ b/net/vmw_vsock/af_vsock.c
+> >> @@ -117,12 +117,14 @@
+> >> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+> >> static void vsock_sk_destruct(struct sock *sk);
+> >> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
+> >> +static void vsock_close(struct sock *sk, long timeout);
+> >>
+> >> /* Protocol family. */
+> >> struct proto vsock_proto =3D {
+> >>      .name =3D "AF_VSOCK",
+> >>      .owner =3D THIS_MODULE,
+> >>      .obj_size =3D sizeof(struct vsock_sock),
+> >> +    .close =3D vsock_close,
+> >> #ifdef CONFIG_BPF_SYSCALL
+> >>      .psock_update_sk_prot =3D vsock_bpf_update_proto,
+> >> #endif
+> >> @@ -797,39 +799,37 @@ static bool sock_type_connectible(u16 type)
+> >>
+> >> static void __vsock_release(struct sock *sk, int level)
+> >> {
+> >> -    if (sk) {
+> >> -            struct sock *pending;
+> >> -            struct vsock_sock *vsk;
+> >> -
+> >> -            vsk =3D vsock_sk(sk);
+> >> -            pending =3D NULL; /* Compiler warning. */
+> >> +    struct vsock_sock *vsk;
+> >> +    struct sock *pending;
+> >>
+> >> -            /* When "level" is SINGLE_DEPTH_NESTING, use the nested
+> >> -             * version to avoid the warning "possible recursive locki=
+ng
+> >> -             * detected". When "level" is 0, lock_sock_nested(sk, lev=
+el)
+> >> -             * is the same as lock_sock(sk).
+> >> -             */
+> >> -            lock_sock_nested(sk, level);
+> >> +    vsk =3D vsock_sk(sk);
+> >> +    pending =3D NULL; /* Compiler warning. */
+> >>
+> >> -            if (vsk->transport)
+> >> -                    vsk->transport->release(vsk);
+> >> -            else if (sock_type_connectible(sk->sk_type))
+> >> -                    vsock_remove_sock(vsk);
+> >> +    /* When "level" is SINGLE_DEPTH_NESTING, use the nested
+> >> +     * version to avoid the warning "possible recursive locking
+> >> +     * detected". When "level" is 0, lock_sock_nested(sk, level)
+> >> +     * is the same as lock_sock(sk).
+> >> +     */
+> >> +    lock_sock_nested(sk, level);
+> >>
+> >> -            sock_orphan(sk);
+> >> -            sk->sk_shutdown =3D SHUTDOWN_MASK;
+> >> +    if (vsk->transport)
+> >> +            vsk->transport->release(vsk);
+> >> +    else if (sock_type_connectible(sk->sk_type))
+> >> +            vsock_remove_sock(vsk);
+> >>
+> >> -            skb_queue_purge(&sk->sk_receive_queue);
+> >> +    sock_orphan(sk);
+> >> +    sk->sk_shutdown =3D SHUTDOWN_MASK;
+> >>
+> >> -            /* Clean up any sockets that never were accepted. */
+> >> -            while ((pending =3D vsock_dequeue_accept(sk)) !=3D NULL) =
+{
+> >> -                    __vsock_release(pending, SINGLE_DEPTH_NESTING);
+> >> -                    sock_put(pending);
+> >> -            }
+> >> +    skb_queue_purge(&sk->sk_receive_queue);
+> >>
+> >> -            release_sock(sk);
+> >> -            sock_put(sk);
+> >> +    /* Clean up any sockets that never were accepted. */
+> >> +    while ((pending =3D vsock_dequeue_accept(sk)) !=3D NULL) {
+> >> +            __vsock_release(pending, SINGLE_DEPTH_NESTING);
+> >> +            sock_put(pending);
+> >>      }
+> >> +
+> >> +    release_sock(sk);
+> >> +    sock_put(sk);
+> >> }
+> >>
+> >> static void vsock_sk_destruct(struct sock *sk)
+> >> @@ -901,9 +901,22 @@ void vsock_data_ready(struct sock *sk)
+> >> }
+> >> EXPORT_SYMBOL_GPL(vsock_data_ready);
+> >>
+> >> +/* Dummy callback required by sockmap.
+> >> + * See unconditional call of saved_close() in sock_map_close().
+> >> + */
+> >> +static void vsock_close(struct sock *sk, long timeout)
+> >> +{
+> >> +}
+> >> +
+> >> static int vsock_release(struct socket *sock)
+> >> {
+> >> -    __vsock_release(sock->sk, 0);
+> >> +    struct sock *sk =3D sock->sk;
+> >> +
+> >> +    if (!sk)
+> >> +            return 0;
+> >
+> > Compared with before, now we return earlier and so we don't set SS_FREE=
+,
+> > could it be risky?
+> >
+> > I think no, because in theory we have already set it in a previous call=
+,
+> > right?
+>
+> Yeah, and is there actually a way to call vsock_release() for a second
+> time? The only caller I see is __sock_release(), which won't allow that.
+
+Maybe no, but the `sock->sk` check made me think so.
+
+>
+> As for the sockets that never had ->sk assigned, I assume it doesn't matt=
+er.
+
+Yep, so my R-b stays here ;-)
+
+Thanks for these great fixes,
+Stefano
+
+>
+> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> >
+> >> +
+> >> +    sk->sk_prot->close(sk, 0);
+> >> +    __vsock_release(sk, 0);
+> >>      sock->sk =3D NULL;
+> >>      sock->state =3D SS_FREE;
 >
 
-Understood. I will make the modifications in v3.
-
-> > +       This driver can also be built as a module. If so, the module wi=
-ll
-> > +       be called nct6694_wdt.
-...
-> > +     ret =3D nct6694_wdt_setting(wdev, wdev->timeout, NCT6694_ACTION_G=
-PO,
-> > +                               wdev->pretimeout, NCT6694_ACTION_GPO);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     dev_info(data->dev, "Setting WDT(%d): timeout =3D %d, pretimeout =
-=3D %d\n",
-> > +              data->wdev_idx, wdev->timeout, wdev->pretimeout);
-> > +
->
-> This is logging noise. Drop or set as debug message.
->
-
-Okay, I'll drop it in v3.
-
-> > +     return ret;
-> > +}
-...
-> > +static int nct6694_wdt_set_timeout(struct watchdog_device *wdev,
-> > +                                unsigned int timeout)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     int ret;
-> > +
-> > +     if (timeout < wdev->pretimeout) {
-> > +             dev_warn(data->dev, "pretimeout < timeout. Setting to zer=
-o\n");
-> > +             wdev->pretimeout =3D 0;
-> > +     }
-> > +
-> This is only necessary if the pretimeout was not validated during probe
-> since otherwise the watchdog core does the check. Please validate it ther=
-e.
->
-
-Understood. I will make the modifications in v3.
-
-> > +     ret =3D nct6694_wdt_setting(wdev, timeout, NCT6694_ACTION_GPO,
-> > +                               wdev->pretimeout, NCT6694_ACTION_GPO);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     wdev->timeout =3D timeout;
-> > +
-> > +     return ret;
->
-> ret =3D=3D 0 here, so return 0.
->
-
-Okay, fix it in v3.
-
-> > +}
-> > +
-> > +static int nct6694_wdt_set_pretimeout(struct watchdog_device *wdev,
-> > +                                   unsigned int pretimeout)
-> > +{
-> > +     int ret;
-> > +
-> > +     ret =3D nct6694_wdt_setting(wdev, wdev->timeout, NCT6694_ACTION_G=
-PO,
-> > +                               pretimeout, NCT6694_ACTION_GPO);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     wdev->pretimeout =3D pretimeout;
-> > +
-> > +     return ret;
->
-> ret =3D=3D 0 here, so return 0.
->
-
-Okay, fix it in v3.
-
-> > +}
-> > +
-> > +static unsigned int nct6694_wdt_get_time(struct watchdog_device *wdev)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694_wdt_cmd0 *buf =3D (struct nct6694_wdt_cmd0 *)data-=
->xmit_buf;
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned int timeleft_ms;
-> > +     int ret;
-> > +
-> > +     guard(mutex)(&data->lock);
-> > +
-> > +     ret =3D nct6694_read_msg(nct6694, NCT6694_WDT_MOD,
-> > +                            NCT6694_WDT_CMD0_OFFSET(data->wdev_idx),
-> > +                            NCT6694_WDT_CMD0_LEN, buf);
-> > +     if (ret)
-> > +             return ret;
->
-> The function does not return an error code. Return 0 instead.
-
-Okay, fix it in v3.
-
-> > +
-> > +     timeleft_ms =3D le32_to_cpu(buf->countdown);
-> > +
-> > +     return timeleft_ms / 1000;
-> > +}
-...
-> > +     wdev =3D &data->wdev;
-> > +     wdev->info =3D &nct6694_wdt_info;
-> > +     wdev->ops =3D &nct6694_wdt_ops;
-> > +     wdev->timeout =3D timeout;
-> > +     wdev->pretimeout =3D pretimeout;
->
-> pretimeout should be validated here.
->
-
-Understood. I will make the modifications in v3.
-
-Best regards,
-Ming
 
