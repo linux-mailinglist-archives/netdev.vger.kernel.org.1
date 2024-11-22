@@ -1,143 +1,208 @@
-Return-Path: <netdev+bounces-146758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A479D58E7
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 05:42:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91BD39D58F9
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 05:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B4B2283BEE
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 04:42:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 220931F23AA1
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 04:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621951632E2;
-	Fri, 22 Nov 2024 04:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB2A1527A7;
+	Fri, 22 Nov 2024 04:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KX5CCQNZ"
+	dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b="a3v2yKpV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mx0b-00007101.pphosted.com (mx0b-00007101.pphosted.com [148.163.139.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B64F145A03
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 04:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9552309A3;
+	Fri, 22 Nov 2024 04:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732250487; cv=none; b=Vsh8G16I0whwg/AXj2f0HTdTbODEgPCQjERl8DpYiQkNVewe3DLoJwHlMB9pbsAotm8sag+DWfm+h1oKD2iY6smpRrDEfjjEf/lFMP9JyuYyiM6ae8HYk9/wie2IsjKeYB0EdQs2z+OtFMNu0/8q5AETTVFqpzCVxMWS461ok8k=
+	t=1732251243; cv=none; b=mpAwPVqavjmXrN+Vw7vg/62ZNixvq47GN2HiJzuIk9eSG6TCADVXAVvYe929u6+eWqYq17DFHSkAKmGqs4UP/qh39fK/f27faEH8HewBOMB0iWfbU02iKPbEN0SGLAlKU8mW6rauMg9+2D3eQsTE+Qir/W2QUr1pB55C4qpa+9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732250487; c=relaxed/simple;
-	bh=L091Ee2oV55tdzPagKshwB9ShTETaAJtaakuZ26vPUQ=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=to/sFAgJNMX2x4B1dRlXA3RnRf1XpsIWLPhsBOFcS3KwV8eKaJ3E600eE179Hwe3+mhX0Z5waqaAcGXz2yNFPN1majc+Bx+1Ob9MRQcOjeyveRjgTszrdUNUaMZ6XiVsgZxsX6pLkpgr4k0VlZmPqm2tUNQjNh01xtkJ4uDq7ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KX5CCQNZ; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732250485; x=1763786485;
-  h=from:to:cc:subject:date:message-id;
-  bh=L091Ee2oV55tdzPagKshwB9ShTETaAJtaakuZ26vPUQ=;
-  b=KX5CCQNZ9bbVRURbeflte2+rOFltw3qDEXvEvW6tK61NcMAbeUpgDCSE
-   jDfZaMYR7J7UoLjUEibwI4N7YspUymDiFm0WZLZgyC7/7kvLm1bbKvD2h
-   qBNyxIHdW0q2Lcdcg8nN4M6mg+wXThZ8vlpMpX5XpRNPJtWGvS+Kwnmoz
-   ncFDKjifXG99RMLVjMRWdybtAI119zMVHJTWzqUUwrB5J5YZU3oJd7Pqy
-   djUu16TYgEkdv8eHpWWBAOTBMyyjtVcEP/9DezUxsaIf1vTqfBl3dBpQ2
-   p3ZXz2Qioe7UarE1sJ+St1knnJQN3MyrXi/Xkb2O+EgKn7HTRNZPfB7Wo
-   g==;
-X-CSE-ConnectionGUID: RP+yfT77SqmAX2uKu8RRGg==
-X-CSE-MsgGUID: ZgwDktUjT1mz9P2oC3/mcA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11263"; a="32251402"
-X-IronPort-AV: E=Sophos;i="6.12,174,1728975600"; 
-   d="scan'208";a="32251402"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2024 20:41:25 -0800
-X-CSE-ConnectionGUID: eZ02IdRWQoyH2f70A6/fZw==
-X-CSE-MsgGUID: lkW0hzLUQpue7IcilY78Ug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,174,1728975600"; 
-   d="scan'208";a="90265730"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by fmviesa007.fm.intel.com with ESMTP; 21 Nov 2024 20:41:24 -0800
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	sridhar.samudrala@intel.com,
-	rlance@google.com,
-	decot@google.com,
-	willemb@google.com,
-	joshua.a.hay@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	aleksander.lobakin@intel.com
-Subject: [PATCH iwl-net v2] idpf: add read memory barrier when checking descriptor done bit
-Date: Thu, 21 Nov 2024 20:40:59 -0800
-Message-Id: <20241122044059.20019-1-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
+	s=arc-20240116; t=1732251243; c=relaxed/simple;
+	bh=GMaHCGleSOQxiJxTHlVL9PaaVm7nxmdgWbSaE90XeM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FJq7Bt8kX9fXrv40uuE76Rg3yfa1+2xrgUN66bQ/gEto4YbN7qBjPWp5cHVSrgKU2DiNtu14zHixlv3JnWjg419YArly5QT/3AUs2EyuLEB1uzBqLK/q9VzZL7hhmldtxCkgDWNwAr8ViuEc3/CN19wxbCbYHWPxs0qXTvnqxe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu; spf=pass smtp.mailfrom=illinois.edu; dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b=a3v2yKpV; arc=none smtp.client-ip=148.163.139.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=illinois.edu
+Received: from pps.filterd (m0166260.ppops.net [127.0.0.1])
+	by mx0b-00007101.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AM3wiai015054;
+	Fri, 22 Nov 2024 04:53:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=illinois.edu; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=campusrelays; bh=M6/FufPVvCmmC25b8oENqCCuZgyvk0Xk
+	1/pLeLp70m8=; b=a3v2yKpVbfJRf9QirliCD5jV0Ge0Gf71BLjhmrUohzCGzI8k
+	1fI/vqo5NHCzIfR0YdSBN6RrHg9nhIuiOAwiCzX28qUIlQDSd5QiQefhi219AXea
+	fZsEltVzOX4Btck+3g0pRmWJWZuaecJ98T2X9Fh7EPV2/EGdL0U7bHzefAWT6MO3
+	65a4LlG8xqj2tp1yhYJy+wq4GWRGb8x8Yt3f0y2empQWUoOU5gDchto/kDYgUNp/
+	5L/Db29XyEnKBSYH/KxOKlDWiX1QjGAZ5EDwglZQrxBXWXL1hfVzhrU+s740W9vB
+	+Ho2Q8kCoOaFbT07mjpGMvHqV4mgytf3lZ6+RQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0b-00007101.pphosted.com (PPS) with ESMTPS id 431yuy8mq8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Nov 2024 04:53:10 +0000 (GMT)
+Received: from m0166260.ppops.net (m0166260.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AM4mFUk019718;
+	Fri, 22 Nov 2024 04:53:10 GMT
+Received: from localhost.localdomain (oasis.cs.illinois.edu [130.126.137.13])
+	by mx0b-00007101.pphosted.com (PPS) with ESMTP id 431yuy8mq5-1;
+	Fri, 22 Nov 2024 04:53:10 +0000 (GMT)
+From: Jinghao Jia <jinghao7@illinois.edu>
+To: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>
+Cc: netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        Jinghao Jia <jinghao7@illinois.edu>, kernel test robot <lkp@intel.com>,
+        Ruowen Qin <ruqin@redhat.com>
+Subject: [PATCH v2 net] ipvs: fix UB due to uninitialized stack access in ip_vs_protocol_init()
+Date: Thu, 21 Nov 2024 22:52:57 -0600
+Message-ID: <20241122045257.27452-1-jinghao7@illinois.edu>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: dEH4go68XiYNgMywoM7tnrJZfxVJfS1U
+X-Proofpoint-GUID: eGPE2fUII21SyMbkJ8sFtdJoeo6eqYU_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+X-Spam-Details: rule=cautious_plus_nq_notspam policy=cautious_plus_nq score=0 bulkscore=0
+ phishscore=0 lowpriorityscore=0 mlxlogscore=999 malwarescore=0
+ impostorscore=0 suspectscore=0 spamscore=0 priorityscore=1501 mlxscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411220039
+X-Spam-Score: 0
+X-Spam-OrigSender: jinghao7@illinois.edu
+X-Spam-Bar: 
 
-Add read memory barrier to ensure the order of operations when accessing
-control queue descriptors. Specifically, we want to avoid cases where loads
-can be reordered:
+Under certain kernel configurations when building with Clang/LLVM, the
+compiler does not generate a return or jump as the terminator
+instruction for ip_vs_protocol_init(), triggering the following objtool
+warning during build time:
 
-1. Load #1 is dispatched to read descriptor flags.
-2. Load #2 is dispatched to read some other field from the descriptor.
-3. Load #2 completes, accessing memory/cache at a point in time when the DD
-   flag is zero.
-4. NIC DMA overwrites the descriptor, now the DD flag is one.
-5. Any fields loaded before step 4 are now inconsistent with the actual
-   descriptor state.
+  vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
 
-Add read memory barrier between steps 1 and 2, so that load #2 is not
-executed until load #1 has completed.
+At runtime, this either causes an oops when trying to load the ipvs
+module or a boot-time panic if ipvs is built-in. This same issue has
+been reported by the Intel kernel test robot previously.
 
-Fixes: 8077c727561a ("idpf: add controlq init and reset checks")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Suggested-by: Lance Richardson <rlance@google.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+Digging deeper into both LLVM and the kernel code reveals this to be a
+undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
+of 64 chars to store the registered protocol names and leaves it
+uninitialized after definition. The function calls strnlen() when
+concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
+strnlen() performs an extra step to check whether the last byte of the
+input char buffer is a null character (commit 3009f891bb9f ("fortify:
+Allow strlen() and strnlen() to pass compile-time known lengths")).
+This, together with possibly other configurations, cause the following
+IR to be generated:
+
+  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
+    %1 = alloca [64 x i8], align 16
+    ...
+
+  14:                                               ; preds = %11
+    %15 = getelementptr inbounds i8, ptr %1, i64 63
+    %16 = load i8, ptr %15, align 1
+    %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
+    %18 = icmp eq i8 %16, 0
+    %19 = select i1 %17, i1 %18, i1 false
+    br i1 %19, label %20, label %23
+
+  20:                                               ; preds = %14
+    %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
+    ...
+
+  23:                                               ; preds = %14, %11, %20
+    %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
+    ...
+  }
+
+The above code calculates the address of the last char in the buffer
+(value %15) and then loads from it (value %16). Because the buffer is
+never initialized, the LLVM GVN pass marks value %16 as undefined:
+
+  %13 = getelementptr inbounds i8, ptr %1, i64 63
+  br i1 undef, label %14, label %17
+
+This gives later passes (SCCP, in particular) more DCE opportunities by
+propagating the undef value further, and eventually removes everything
+after the load on the uninitialized stack location:
+
+  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
+    %1 = alloca [64 x i8], align 16
+    ...
+
+  12:                                               ; preds = %11
+    %13 = getelementptr inbounds i8, ptr %1, i64 63
+    unreachable
+  }
+
+In this way, the generated native code will just fall through to the
+next function, as LLVM does not generate any code for the unreachable IR
+instruction and leaves the function without a terminator.
+
+Zero the on-stack buffer to avoid this possible UB.
+
+Changelog:
 ---
-Changelog
-v2:
-- Rewrote comment to fit on a single line
-- Added new line as separator
-- Updated last sentence in commit message to include load #
-v1:
-https://lore.kernel.org/intel-wired-lan/20241115021618.20565-1-emil.s.tantilov@intel.com/
----
- drivers/net/ethernet/intel/idpf/idpf_controlq.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+v1 -> v2:
+v1: https://lore.kernel.org/lkml/20241111065105.82431-1-jinghao7@illinois.edu/
+* Fix small error in commit message
+* Address Julian's feedback:
+  * Make this patch target the net tree rather than net-next
+  * Add a "Fixes" tag for the initial git commit
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq.c b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
-index 4849590a5591..b28991dd1870 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_controlq.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
-@@ -376,6 +376,9 @@ int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
- 		if (!(le16_to_cpu(desc->flags) & IDPF_CTLQ_FLAG_DD))
- 			break;
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
+Co-developed-by: Ruowen Qin <ruqin@redhat.com>
+Signed-off-by: Ruowen Qin <ruqin@redhat.com>
+Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
+---
+ net/netfilter/ipvs/ip_vs_proto.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
+index f100da4ba3bc..a9fd1d3fc2cb 100644
+--- a/net/netfilter/ipvs/ip_vs_proto.c
++++ b/net/netfilter/ipvs/ip_vs_proto.c
+@@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
  
-+		/* Ensure no other fields are read until DD flag is checked */
-+		dma_rmb();
-+
- 		/* strip off FW internal code */
- 		desc_err = le16_to_cpu(desc->ret_val) & 0xff;
+ int __init ip_vs_protocol_init(void)
+ {
+-	char protocols[64];
++	char protocols[64] = { 0 };
+ #define REGISTER_PROTOCOL(p)			\
+ 	do {					\
+ 		register_ip_vs_protocol(p);	\
+@@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
+ 		strcat(protocols, (p)->name);	\
+ 	} while (0)
  
-@@ -563,6 +566,9 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
- 		if (!(flags & IDPF_CTLQ_FLAG_DD))
- 			break;
- 
-+		/* Ensure no other fields are read until DD flag is checked */
-+		dma_rmb();
-+
- 		q_msg[i].vmvf_type = (flags &
- 				      (IDPF_CTLQ_FLAG_FTYPE_VM |
- 				       IDPF_CTLQ_FLAG_FTYPE_PF)) >>
+-	protocols[0] = '\0';
+-	protocols[2] = '\0';
+ #ifdef CONFIG_IP_VS_PROTO_TCP
+ 	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
+ #endif
 -- 
-2.17.2
+2.47.0
 
 
