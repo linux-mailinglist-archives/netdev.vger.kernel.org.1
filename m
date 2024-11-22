@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-146870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CAD99D65E3
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:46:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 914919D65E4
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 23:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9820B212B5
-	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:46:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F7A6B220D9
+	for <lists+netdev@lfdr.de>; Fri, 22 Nov 2024 22:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225D1198E7B;
-	Fri, 22 Nov 2024 22:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FBC1A4F22;
+	Fri, 22 Nov 2024 22:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FEhjdTjv"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hMuQo6Wy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C89218CC01
-	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 22:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807971C82E2
+	for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 22:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732315604; cv=none; b=nxyX8Ua+N2jy4r2LbjXauNOic1EvGuI9UFy8MkV1CV6K1GZ0JUxXP06pt0SuP1vDWiIb6nQaacCD9zlapeQMgkGjY6IGdnwh1vV4kuAaO2e+ulBja87nORAsm/Bec+iIc1OLVwxmNvHM7/iFHBdqQIhCaAsgW9ej8BqRxet1NLg=
+	t=1732315607; cv=none; b=vGu3qXYCA1ptUhjAEj5s6DhuY71FzsbukmCovKDp2cUtha3Y4t5y0u+Pdi0MJU22a9S+8cZx4eto7hUhn3PthOcdy4x/kdyCUGDgThVyJVtuLSiuIBujLlbqQ7CALsF12PTbuj6WqsAnhcyn2V1tF1yKabGIaDKQb8PeX4x2nOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732315604; c=relaxed/simple;
-	bh=tpDB/KjwXA76ztECG35BWNye1OarOFtto7jb4FKHLZo=;
+	s=arc-20240116; t=1732315607; c=relaxed/simple;
+	bh=1q5zLrnZJW56EyQTUXvvpBXyQYjs2OSOzVe5FaV/f2M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AWpdt7Ufa8vgglrtikP9tUvprpUavzBXNPXTjVcD6VYon4+n5mu3T8A3Wo8MDNd8cvZyQYpXPuonnokHuJhNcUwdSnJi9iEZkQ+/hggudx9DT0zOWY2+HcL/RGNYu43oMRSYMCwmqmkmO9BTEmnb2LsXXkUaMlujZ6jTl5WKgII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FEhjdTjv; arc=none smtp.client-ip=209.85.222.176
+	 MIME-Version; b=G83I3+CbXchEmp8Q9PNuLgSV3ISrR5fhwXC2o798ihRm+e2arYgaGxZUyEoA9LhpaqtMf9QEhs7P2zPRN6VORh/0A/XVLxWp/9ZeheBB5joUzrqu6T4a4QWNxa5JTzge6doWmspJW+W2FQKgv9RHPNuRNmfwBkgOjEQyx3PDl5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hMuQo6Wy; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b1488fde46so168496285a.2
-        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:46:42 -0800 (PST)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b15eadee87so161194385a.2
+        for <netdev@vger.kernel.org>; Fri, 22 Nov 2024 14:46:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1732315601; x=1732920401; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1732315604; x=1732920404; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mgwBv+z+X5JHvhiLz4pnaKO3DgsfjRU+fNdFaB0544g=;
-        b=FEhjdTjvg5xi5jttHKjim/0b1yOK8GzSDh6QdRah758+OM8nvtpkJne8uKjy9/gxTj
-         2Sd2P4HLRgLDTEH32h0NdhexqAJs3qCYXfztLP+Y6P5RkkYniEzeoBnURqxAR5d3fnuX
-         /uHRiKTbFgtwbtRxHK7BBjSaQi147v2Yysc9k=
+        bh=qiui2rhF5hwfw95QrNuMUjSYZHJH7nfqV7xul9WK8TE=;
+        b=hMuQo6Wyzlm5doscM4SUb/Xd8OTWDbZbZdHFxQ34cmBuaqBcAaw4yUiSWvwm7snIA6
+         8DObx26WFn7hygO7hz3rQP5afexpAcsos6y7WVa9Bexq3VvoUG+WWJ9CbeEPp8o4/gtL
+         3gcYJgl4Bq+q3uwFURfKobl8fhfd9+jz6HQxE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732315601; x=1732920401;
+        d=1e100.net; s=20230601; t=1732315604; x=1732920404;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mgwBv+z+X5JHvhiLz4pnaKO3DgsfjRU+fNdFaB0544g=;
-        b=ikCCUH8uks6IzSILqcfRTIXVtIWtHeeuJawhzFzT3jE+iLCDnsxke+psLZb7nXlfEK
-         0PbbnZstvB/S4fUA8ZyxDr5AEuGX7bcyBA3TS+zbdd9n8igQj7cSZN5RRnHED1lu/QF1
-         BcD1el7+T3N81LrYy0dgaw+pi9Cf0JYFeFKPWcFfys8moyMQ1oXC2AzqSc0tuzwQ88f7
-         JJOp0R77W+wmPphw/9qZAl+Zm8Q8OyPVPr8ghe3DnOQNuKvBDNpddPlqGWsWvLPVGaAX
-         JP76GkJ9DgI6i15AHy3H84VyOo51w12KMtxjkEWRrEcUI38Gc3sTSJ+8H/hym0GWlZJE
-         UiVQ==
-X-Gm-Message-State: AOJu0YwlvkV/ZlRMOs598+lzQTEbJBvHgeJ+OC/RZDXEN6pgSzk/lMbk
-	05bm6+9YgiWWiz3zMtZ2Snc8ANEh63Mx05IhrwjRXnY2zWrPKHzMf10P7OSlzQ==
-X-Gm-Gg: ASbGnctMztMhvXPbvXo4RpHHWxFF+Wd1sizvw+742bfo2lKxgG8+lXsg51h20cuebqr
-	kBfQjVa8qqJI2gzhUFpyxgTb+iZSqZFQCeACtFlndvpieNPxm7TYdPvbK4Z4Ihr22OV51RjlBMp
-	cT914rYEycaK9D8X5wbNkvMTvMYpubrrTB4wPy9upA24djYeRbgaWFx9gl/JlC2QUXrnF3VbnTP
-	hKUufP8w+CdEChmD3S+OdGKizHtWvel9WcxgolNj/nqUQJA99fzO3NYTJ4Wtr6+y/jl7h+HCQ+W
-	8jg1NRM1ArNBXJ38RYSbl7bkuw==
-X-Google-Smtp-Source: AGHT+IHaxk0crG0vc0RCYHbNvUcnG8kFVlWMyKR8uUN6MouTs53sNGNEl2P/AbIafHwLo0GTr5De9g==
-X-Received: by 2002:a05:620a:24d6:b0:7ac:b197:3004 with SMTP id af79cd13be357-7b514516442mr566788785a.29.1732315601219;
-        Fri, 22 Nov 2024 14:46:41 -0800 (PST)
+        bh=qiui2rhF5hwfw95QrNuMUjSYZHJH7nfqV7xul9WK8TE=;
+        b=q23NdFP+oypvBkeYkM1we5T4lkGULwOm2zhT9Rs1cfoQmTZaANd/hAkI9zWtP16udy
+         yMEYnCy8Rf+BBD8WO7+G0zot3An3CSamL805hqFfLrkLZgtrR4Yu40XTULbagmk8gEU7
+         nxwHjBE3Y9FlI2NCManGjUDItLjVDk85Ceo3nz/WFVntcndu9j4SlCoxdnUj73JNw+JX
+         /le89/Lsl8jem+eebsRL9js7uAsC4mwmubEnDK/E6OhrIBpOmxPjG76E36so//HisZ6y
+         yHvtj4QDTla3H6JkxtmN/nhxdhOyWUSHM4VLTHEi7lNbk9iFuX1HCGFGe/awGMeep69G
+         txjg==
+X-Gm-Message-State: AOJu0YxngOWZl4s0nUWXHknAJtA4I/9wdRCA9rDppzThb0Vmb46XNcsk
+	WDr0ns5a0uuwWGJIFEK8vAc0rVKYfLgtkCPl1NiELV3gJKMlV5yMxZ6B3RmF1g==
+X-Gm-Gg: ASbGnctiJZ4DazujYMi8Gdnt8dFB+D39jWEaAhHvXsekMXoTZtyyvpGif+kgXp8zhI1
+	SS7XFXIqW0ygg4uiPyYtHK7L/4TNvKDt2h1InidmdtMcNcUgoOvZ5KwemFVCo9Lcq7u9Px7O11Q
+	bdT3yYA42lIb/W0PSDgBlsMEu8hs6SWG5dFcmzslKrC9nkl10ior33xqmRW3BoUwJJ4uU2PvFTd
+	JxRl9F79oPufSdFfzgQxdzZ+1nxu3YILhkhtsUIeW6RLPLVQGCBbrniQTXcWpHGDq8m5xRTx+rf
+	3KrHlL9m72y15y/d9xKOIE/FpQ==
+X-Google-Smtp-Source: AGHT+IHhaGFFLD32oZ7w3xXSJEIU1ksA4ISgD6HIjDnEB6L2mqYvtJBQue7UdF6fGy/M+2G/rEd8Fg==
+X-Received: by 2002:a05:620a:2416:b0:7b1:11ac:627a with SMTP id af79cd13be357-7b514513d9dmr728992885a.25.1732315604211;
+        Fri, 22 Nov 2024 14:46:44 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b51415286esm131270485a.101.2024.11.22.14.46.39
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b51415286esm131270485a.101.2024.11.22.14.46.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2024 14:46:40 -0800 (PST)
+        Fri, 22 Nov 2024 14:46:43 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -77,11 +77,12 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
+	Richard Cochran <richardcochran@gmail.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net 5/6] bnxt_en: Refactor bnxt_ptp_init()
-Date: Fri, 22 Nov 2024 14:45:45 -0800
-Message-ID: <20241122224547.984808-6-michael.chan@broadcom.com>
+Subject: [PATCH net 6/6] bnxt_en: Unregister PTP during PCI shutdown and suspend
+Date: Fri, 22 Nov 2024 14:45:46 -0800
+Message-ID: <20241122224547.984808-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20241122224547.984808-1-michael.chan@broadcom.com>
 References: <20241122224547.984808-1-michael.chan@broadcom.com>
@@ -93,90 +94,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of passing the 2nd parameter phc_cfg to bnxt_ptp_init().
-Store it in bp->ptp_cfg so that the caller doesn't need to know what
-the value should be.
+If we go through the PCI shutdown or suspend path, we shutdown the
+NIC but PTP remains registered.  If the kernel continues to run for
+a little bit, the periodic PTP .do_aux_work() function may be called
+and it will read the PHC from the BAR register.  Since the device
+has already been disabled, it will cause a PCIe completion timeout.
+Fix it by calling bnxt_ptp_clear() in the PCI shutdown/suspend
+handlers.  bnxt_ptp_clear() will unregister from PTP and
+.do_aux_work() will be canceled.
 
-In the next patch, we'll need to call bnxt_ptp_init() in bnxt_resume()
-and this will make it easier.
+In bnxt_resume(), we need to re-initialize PTP.
 
+Fixes: a521c8a01d26 ("bnxt_en: Move bnxt_ptp_init() from bnxt_open() back to bnxt_init_one()")
+Cc: Richard Cochran <richardcochran@gmail.com>
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 6 +++---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h | 3 ++-
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index b7541156fe46..9c4b8ea22bf9 100644
+index 9c4b8ea22bf9..57e69c0552ab 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -9296,7 +9296,6 @@ static int __bnxt_hwrm_ptp_qcfg(struct bnxt *bp)
- 	struct hwrm_port_mac_ptp_qcfg_output *resp;
- 	struct hwrm_port_mac_ptp_qcfg_input *req;
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
--	bool phc_cfg;
- 	u8 flags;
- 	int rc;
+@@ -16245,6 +16245,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
+ 	if (netif_running(dev))
+ 		dev_close(dev);
  
-@@ -9343,8 +9342,9 @@ static int __bnxt_hwrm_ptp_qcfg(struct bnxt *bp)
- 		rc = -ENODEV;
- 		goto exit;
++	bnxt_ptp_clear(bp);
+ 	bnxt_clear_int_mode(bp);
+ 	pci_disable_device(pdev);
+ 
+@@ -16272,6 +16273,7 @@ static int bnxt_suspend(struct device *device)
+ 		rc = bnxt_close(dev);
  	}
--	phc_cfg = (flags & PORT_MAC_PTP_QCFG_RESP_FLAGS_RTC_CONFIGURED) != 0;
--	rc = bnxt_ptp_init(bp, phc_cfg);
-+	ptp->rtc_configured =
-+		(flags & PORT_MAC_PTP_QCFG_RESP_FLAGS_RTC_CONFIGURED) != 0;
-+	rc = bnxt_ptp_init(bp);
- 	if (rc)
- 		netdev_warn(bp->dev, "PTP initialization failed.\n");
- exit:
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index 075ccd589845..2d4e19b96ee7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -1038,7 +1038,7 @@ static void bnxt_ptp_free(struct bnxt *bp)
- 	}
- }
+ 	bnxt_hwrm_func_drv_unrgtr(bp);
++	bnxt_ptp_clear(bp);
+ 	pci_disable_device(bp->pdev);
+ 	bnxt_free_ctx_mem(bp, false);
+ 	rtnl_unlock();
+@@ -16315,6 +16317,10 @@ static int bnxt_resume(struct device *device)
+ 	if (bp->fw_crash_mem)
+ 		bnxt_hwrm_crash_dump_mem_cfg(bp);
  
--int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
-+int bnxt_ptp_init(struct bnxt *bp)
- {
- 	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 	int rc;
-@@ -1061,7 +1061,7 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
- 
- 	if (BNXT_PTP_USE_RTC(bp)) {
- 		bnxt_ptp_timecounter_init(bp, false);
--		rc = bnxt_ptp_init_rtc(bp, phc_cfg);
-+		rc = bnxt_ptp_init_rtc(bp, ptp->rtc_configured);
- 		if (rc)
- 			goto out;
- 	} else {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index c7851f8c971c..a95f05e9c579 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -135,6 +135,7 @@ struct bnxt_ptp_cfg {
- 					 BNXT_PTP_MSG_PDELAY_REQ |	\
- 					 BNXT_PTP_MSG_PDELAY_RESP)
- 	u8			tx_tstamp_en:1;
-+	u8			rtc_configured:1;
- 	int			rx_filter;
- 	u32			tstamp_filters;
- 
-@@ -168,7 +169,7 @@ void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *bnapi,
- 		    struct tx_ts_cmp *tscmp);
- void bnxt_ptp_rtc_timecounter_init(struct bnxt_ptp_cfg *ptp, u64 ns);
- int bnxt_ptp_init_rtc(struct bnxt *bp, bool phc_cfg);
--int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg);
-+int bnxt_ptp_init(struct bnxt *bp);
- void bnxt_ptp_clear(struct bnxt *bp);
- static inline u64 bnxt_timecounter_cyc2time(struct bnxt_ptp_cfg *ptp, u64 ts)
- {
++	if (bnxt_ptp_init(bp)) {
++		kfree(bp->ptp_cfg);
++		bp->ptp_cfg = NULL;
++	}
+ 	bnxt_get_wol_settings(bp);
+ 	if (netif_running(dev)) {
+ 		rc = bnxt_open(dev);
 -- 
 2.30.1
 
