@@ -1,107 +1,141 @@
-Return-Path: <netdev+bounces-146889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F1A9D6811
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 08:34:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32B79D6837
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 09:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05D26282B94
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 07:34:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66B25281DD3
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 08:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B704A15CD78;
-	Sat, 23 Nov 2024 07:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D69178CC8;
+	Sat, 23 Nov 2024 08:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NnryBAPE"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7EF37171
-	for <netdev@vger.kernel.org>; Sat, 23 Nov 2024 07:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D91F4FA;
+	Sat, 23 Nov 2024 08:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732347278; cv=none; b=WuaLcP9X5bOL6krBCXnhTgny+M1U+YHnXH2n06zTSdGKMnaylgzhrpriOlna2UVY9pwlFI5oSceaZfjsvhjE3HGiRGZsNy8FlcKIjEyNUjBXLA8qSok8pgC5EUuZLwuLNHNOSJsCvYsq9/rc7XdazZOV5sPkTztEjhughmEmrbc=
+	t=1732351965; cv=none; b=bZTWzPtAal9VEtGfZXyopiOv7+J1JJ2CmJCKnnGqQCheAr8LO4ev7/sK+FQTRR/Dgi18jKg+PHJtX0gesYP5NNdbsAbeJt0SAQzu42w2DOP/HppX4qRxQsmrDaITlX+fJ4FWKXsJwwHjClSNawJ6tpFPZ16Cgb/XUeYWrHIHLU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732347278; c=relaxed/simple;
-	bh=XB5JFlrmaKLrXBmPcGaGxLlDP2XGXK2ViGydq/EYJss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C2iK6Le7OdxnoogxHvOcpQ792cp/jADxTdmEfft0UoEJ8s9By+WcRr/HwrYSJ4A5LmdmqLoFqSGNfhgN/OTV6HTL0VAM3siM8fNZ1Mzf0ahrT/QoIhjienYTAQnzLcNacAQrVgnFiyGeP7AmYmme4Umo2YxheJ6wiot/yo4XJLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tEkeu-0000tF-L1; Sat, 23 Nov 2024 08:34:24 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tEkeu-002CVj-0q;
-	Sat, 23 Nov 2024 08:34:24 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tEkeu-00ApRp-0R;
-	Sat, 23 Nov 2024 08:34:24 +0100
-Date: Sat, 23 Nov 2024 08:34:24 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 09/27] net: pse-pd: Add support for PSE
- device index
-Message-ID: <Z0GFgAgvbiLTpZqD@pengutronix.de>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
- <20241121-feature_poe_port_prio-v3-9-83299fa6967c@bootlin.com>
+	s=arc-20240116; t=1732351965; c=relaxed/simple;
+	bh=MZxWfinBeB7iFkEeMpRVfcLMYXQwVcnWOwQQV02ZS4U=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=ZdpbfmQgR1WKT7jLUuy43zfOFvswP1bELwTfrnXoAc6nW7snh0es/vdkMtdE7JOiGKNUMykrXKUAzY6sgVM/8Y7G9yuRdnkY/JVmbtvIXy6Q6i4UfEU5SKoP/4XRcDutwSvifl+3L4x4UjnTkD3CwoZ5sftNEl32UTMf6S01oTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NnryBAPE; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AN7jwHP005461;
+	Sat, 23 Nov 2024 08:52:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=hpqiryFom2ZEzj/TTyf1Xe
+	AJH9WUqZKY2OH43LqeZR4=; b=NnryBAPE8PSbQlVjb0OtGpBbibANxRCj8X/xdc
+	fBBAedVW2kq3lDwgz6NMqczB+8wvzLoh6HLyR1qlmtOqogdjXYKcIch5h9A3ssQC
+	flW2J71KRVY8CY4vsgHNexhuB3+l0S5Oar3kZJWV1RnyxSgmiv+Uyzv9nqfYR66n
+	vy8GrfRxtXUlcrMwS5khxR5/JWfou7GgvyFNKvWJyK0kdZWJ+owBYPC1pU7ZRplP
+	vR5lD/KkWu9ZRGqeyOocCE/x4offoH5onTPT++jEkK7qEplXRRwFcMZp3nRSeqnJ
+	gkL7H0MtvXmz+1WdSMSwE0GGuM4JjQZ0W+Vv2XAsjiv+4aOg==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4337928fn3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 23 Nov 2024 08:52:32 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AN8qVmL031627
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 23 Nov 2024 08:52:31 GMT
+Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sat, 23 Nov 2024 00:52:28 -0800
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+Subject: [PATCH v4 0/2] Enable ethernet for qcs8300
+Date: Sat, 23 Nov 2024 16:51:52 +0800
+Message-ID: <20241123-dts_qcs8300-v4-0-b10b8ac634a9@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241121-feature_poe_port_prio-v3-9-83299fa6967c@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKmXQWcC/yWOQQ7CIBBFr9KwFgMUU3TlPYxpKg52jAUL2LQx3
+ t2hZfeY/P/flyWICImdqi+LMGHC4An0rmK27/wDON6JmRJKS3r8nlM72mRqIbgztanBCXcAxyj
+ xjuBwXtsuV+Jbl4DfYudtXzpe6D8z9zBnPgTf2VAyPaYc4rIKTLIkty0hGylUo8xeGa1Vo7nk4
+ wdtu+ATFzI7F0Jv9zYM7Prb5iPQb8K8OWwCdB8wn6p1uHSLo9KU+P0B3xoFnf0AAAA=
+X-Change-ID: 20241111-dts_qcs8300-f8383ef0f5ef
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>
+CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Yijie Yang
+	<quic_yijiyang@quicinc.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1732351947; l=1249;
+ i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
+ bh=MZxWfinBeB7iFkEeMpRVfcLMYXQwVcnWOwQQV02ZS4U=;
+ b=1hS7okFdim/yaQIyujAudQPyUEidFewdaL3vkENokjlz+VRHCLNISyr7FxdBIZYedS0dk5MJg
+ b2dSHgKdCTqCCv6cNebSOWKYx7TGxRtLHsOyrFZjtN/Plo651NuDNUu
+X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
+ pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: P0P5LJDYYwGEDBLjig8EBhgTFVqEoVx0
+X-Proofpoint-GUID: P0P5LJDYYwGEDBLjig8EBhgTFVqEoVx0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=522 clxscore=1015 impostorscore=0 mlxscore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 suspectscore=0
+ adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411230073
 
-On Thu, Nov 21, 2024 at 03:42:35PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> Add support for a PSE device index to report the PSE controller index to
-> the user through ethtool. This will be useful for future support of power
-> domains and port priority management.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Add dts nodes to enable ethernet interface on qcs8300-ride.
+The EMAC, SerDes and EPHY version are the same as those in sa8775p.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+---
+This patch series depends on below patch series:
+https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/ - Reviewed
+https://lore.kernel.org/all/20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com/ - Applied
 
-Thank you!
+Changes in v4:
+- Remove the dts split and revision 2 changes, as the 1G PHY version is now obsolete.
+- Enable 2.5G PHY in qcs8300-ride.dts.
+- Replace spaces with indents as possible.
+- Update the subject of the first change.
+- Link to v3: https://lore.kernel.org/all/20241118071846.2964333-1-quic_yijiyang@quicinc.com/
+
+---
+Yijie Yang (2):
+      arm64: dts: qcom: qcs8300: add the first 2.5G ethernet
+      arm64: dts: qcom: qcs8300-ride: enable ethernet0
+
+ arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++++++++++++
+ arch/arm64/boot/dts/qcom/qcs8300.dtsi     |  43 ++++++++++++
+ 2 files changed, 155 insertions(+)
+---
+base-commit: c83f0b825741bcb9d8a7be67c63f6b9045d30f5a
+change-id: 20241111-dts_qcs8300-f8383ef0f5ef
+
+Best regards,
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Yijie Yang <quic_yijiyang@quicinc.com>
+
 
