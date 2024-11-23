@@ -1,107 +1,125 @@
-Return-Path: <netdev+bounces-146886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4889D67D7
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 07:35:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7DBB9D67E2
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 07:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DC2C2818A2
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 06:35:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69EED281B1C
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 06:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBF815CD74;
-	Sat, 23 Nov 2024 06:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B911662E7;
+	Sat, 23 Nov 2024 06:54:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E008D70800
-	for <netdev@vger.kernel.org>; Sat, 23 Nov 2024 06:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A9D13BC2F;
+	Sat, 23 Nov 2024 06:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732343722; cv=none; b=kNsW4kGFE1wSFblT6TEr/lV3JJsEDfr8qwVVjZEyXPcGmUyZGWYOdIHwH/YNlWHm6jAZ4Ew9CYvSqQWiW6jbFgBVbicqBeH4KkTDJW33xq7yK1CAQt18x7tjAszT8UYioWbtKDOwg4mXd2PIHxYW1ZBP1FlO1a97Az9EfLNFwFY=
+	t=1732344865; cv=none; b=EZ6aMvaZ+zmvCzrTDokx9kjHOm7qHr1w9L2+oDaIKwVP3ODdVqEPEROJj/yUlK8+h2YU/JpzqSzWuhFTXuU5boblGRjes4HCJ4w2SjGC7hLWrC3ROFY/JDUlFss1bMGnZn0uh4FdbI1fFG8IqlaYCmzYm+Yl/1dcDwseUUvjnNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732343722; c=relaxed/simple;
-	bh=w3UMSjVrYnK0UWydnU9k25F2ZkeRqFkcuJcAMsKr2Xg=;
+	s=arc-20240116; t=1732344865; c=relaxed/simple;
+	bh=hG1Lmguo6Ylsxt9Mwo1Nm5xmwIWSme4uTQPZmWOWCIw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PoH+B5NojGd2yFvEiF+CZKL95v+WU6XjqJrSvC0rLdYR8uS/1yH/e7f1pQmqQ8Aecol79EuddssTF3zkGrX367Vzc9PUY1Dy0P4M16ovyQpkXk5X5kmp3Vd8kkIRRu4AfX6cW4P0UX4xn4kh/BsVDLGs1NLh6r060R3l75P8fdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tEjjX-0007K2-OR; Sat, 23 Nov 2024 07:35:07 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tEjjX-002C7T-0S;
-	Sat, 23 Nov 2024 07:35:07 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tEjjX-00AoqQ-04;
-	Sat, 23 Nov 2024 07:35:07 +0100
-Date: Sat, 23 Nov 2024 07:35:07 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=sn3qD0vt9zz1jykrORLeIoULWpPlxqD97ohpCOZ9s8nYiznCwWIyYtjbvSzR1220FILWNqNIQnfL5KEci+D199u1IdAnuazYGCYWQHWRAXwFmxNYYoTRNDvSE55cEKSm+ibz7GbK45aAG+jzumasWk5koAVy54dzkCjgVmQ/61w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 8F6B11A137C;
+	Sat, 23 Nov 2024 07:54:16 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 8194C1A0273;
+	Sat, 23 Nov 2024 07:54:16 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 0D251202AF;
+	Sat, 23 Nov 2024 07:54:16 +0100 (CET)
+Date: Sat, 23 Nov 2024 07:54:16 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 07/27] net: pse-pd: tps23881: Add missing
- configuration register after disable
-Message-ID: <Z0F3m-LLrBFLf1rJ@pengutronix.de>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
- <20241121-feature_poe_port_prio-v3-7-83299fa6967c@bootlin.com>
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>
+Subject: Re: [PATCH v5 07/16] net: dwmac-intel-plat: Use helper rgmii_clock
+Message-ID: <Z0F8GL2NnYmUuE/S@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
+ <20241119-upstream_s32cc_gmac-v5-7-7dcc90fcffef@oss.nxp.com>
+ <ZzzAe8s2UgPYHnkv@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241121-feature_poe_port_prio-v3-7-83299fa6967c@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <ZzzAe8s2UgPYHnkv@shell.armlinux.org.uk>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On Thu, Nov 21, 2024 at 03:42:33PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On Tue, Nov 19, 2024 at 04:44:43PM +0000, Russell King (Oracle) wrote:
+> On Tue, Nov 19, 2024 at 04:00:13PM +0100, Jan Petrous via B4 Relay wrote:
+> > @@ -31,27 +31,15 @@ struct intel_dwmac_data {
+> >  static void kmb_eth_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
+> >  {
+> >  	struct intel_dwmac *dwmac = priv;
+> > -	unsigned long rate;
+> > +	long rate;
+> >  	int ret;
 > 
-> When setting the PWOFF register, the controller resets multiple
-> configuration registers. This patch ensures these registers are
-> reconfigured as needed following a disable operation.
+> So the following becomes:
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> >  
+> >  	rate = clk_get_rate(dwmac->tx_clk);
+> >  
+> > +	rate = rgmii_clock(speed);
+> > +	if (rate < 0) {
+> >  		dev_err(dwmac->dev, "Invalid speed\n");
+> > +		return;
+> >  	}
+> 
+> Now that I've removed the deleted lines, we can see that the
+> clk_get_rate() call there is now redundant. Please remove in
+> this change.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Funny I didn't notice that, thanks. I will remove it in v6.
 
-Thank you!
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Interesting the redundant clk_get_rate() is there from v5.10.0.
+I hope that there was no reason for the clock call, like any platform
+discrepancy requiring reading the clock before setting.
+
+BTW, I also removed Reviewed-by: Andrew as the patch was changed.
+
+BR.
+/Jan
 
