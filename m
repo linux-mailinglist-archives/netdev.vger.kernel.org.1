@@ -1,59 +1,92 @@
-Return-Path: <netdev+bounces-146881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7C49D66ED
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 02:03:26 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 234E79D671F
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 02:54:35 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77633B21364
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 01:03:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A588E16160A
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 01:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7764C97;
-	Sat, 23 Nov 2024 01:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C2316DC28;
+	Sat, 23 Nov 2024 01:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tyIYsuMK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mouQgEsd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A223A23BE;
-	Sat, 23 Nov 2024 01:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA7B165F01;
+	Sat, 23 Nov 2024 01:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732323800; cv=none; b=W3tCM1tObxmWbiSf3hNpjs56l7xVGqIGzigDqOcY33SwA/tVwgzLC1RvCkYLKPZjVs3WokWkW0thzNEyzBVuRMSRAf/i4JiJLiRknkurYLdiLP4IL5aczpg/QWwc31msGlGEYocEC9iNRYcPlNVoPu2ac81krzIqCyC0hF/bjJ4=
+	t=1732326860; cv=none; b=h7ePpjDT3usfLfFC9gqqFrRh4Q97c4a0wYXnUBrk1Z2sOt+51MmI+dBQzuTPUe0q7SSiLJQZcItgWd3yzBtZN+TEN741gkd5BHjW20HmJxkymx+JFOBlP2s+uzdbM/mqYxRgGTlcGLCi5k+c1kFoCi4w1F+mREcwemQOROp+h9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732323800; c=relaxed/simple;
-	bh=8Qd/2RIKKlsOCErrjdY4EU2AkhvuqRMK8OWdf1rWTX8=;
+	s=arc-20240116; t=1732326860; c=relaxed/simple;
+	bh=QujWJg/j/KlrXu16O9JlD+ghYNILn4x0FiRi2LhEivM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhOiaKqw7seSd+TmhxdfBlRtP6oblZmxgOPVy+4rPczecjxW+bdnXXGor/YkbDVPZK+7uQ4lpqOGJL6y2RLqcp0n9MAh+3u/OG7iW6NxJuACTI9PHHeHgeaNGM/gh0pfk+UCfPtaPjBH6J0OU1wHwgQwkwXFAWUB91/K0yeeqyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tyIYsuMK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DKWouLdo+R/jNUeXYvuMi6LNx1L+DRk29BvI3BCGaDk=; b=tyIYsuMKCR3VAtniecPkhu+/Ys
-	b5aRXe9RtiecBXCg20dyIvWSdOUD19oHv8auXBu/fSISxRu6Oo1R50WgUB1VuxLmCGmm1odVJ6HsE
-	TIZuGnQisXYIWBXV7cqK+SZt91FY86jizpUi6ESc19Uy6S9aoHgOvjssbU6BO3t5BPjA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tEeYG-00EBCF-JS; Sat, 23 Nov 2024 02:03:08 +0100
-Date: Sat, 23 Nov 2024 02:03:08 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Frank Sae <Frank.Sae@motor-comm.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xiaogang.fan@motor-comm.com,
-	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-Subject: Re: [PATCH net-next v2 09/21] motorcomm:yt6801: Implement some
- hw_ops function
-Message-ID: <46206a81-e230-411c-8a78-d461d238b171@lunn.ch>
-References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
- <20241120105625.22508-10-Frank.Sae@motor-comm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WbamgUW/9PBIxeH+0x/5OUXrfLYg9gLur3j2nbLUt+4v2D7UW9jAmECGl1NRLCLKKvnwFC64KpQ+FOOmn3V+33BdZU4QZHwGJVjuMl2EDHbmYmJjmMxxIA+W7L7MJJbwU2Nsc4DG2UkNc3hAgYC2YC1SijO7Z6BdC+Q8zJwhv7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mouQgEsd; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ea568d8216so2304740a91.1;
+        Fri, 22 Nov 2024 17:54:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732326858; x=1732931658; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qlpv7zYDhEzSJeSt/GR+Zk814jy10VXiLign7bJf1Gc=;
+        b=mouQgEsdLOEbPieFDpx4NOfYUmWSaVbYEzFXtqm4a/przhq8+ugUJE8IyVKfie4Z4S
+         8oVVev8GFpZkJe7HYJ800PHjXVtRC8DMMmpxFFcBuEjYpByAZNQ8lFI86MD/YXiAR+qk
+         rEJtJ85ehhM0NTnXZHfctSWqlvEVZVjBO991HWrtbyg01HfsEv76JSPUGSr7HaRyzT3M
+         7h8dPaf93uxJ2Lml0G2j96gvRsuMlwWPTon3vfyaZyqZ1d702LmVdTUR806fLKbm8T4A
+         x6wAIARMNnlGgpG1607blrt2vMfQ/kdNXUf7lsQCtlsr42yOKv2jeHd4Gaw+h4YTc6TA
+         6vrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732326858; x=1732931658;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qlpv7zYDhEzSJeSt/GR+Zk814jy10VXiLign7bJf1Gc=;
+        b=imLvySdVxso7rcVpJdZZbqtVso9MKcvDAD0rgDyXi4SziQj+OVqBiAR5jw+wErkEU4
+         K51mPpXxTDKqLCNe15RDY3nzlzOGpJKswZWtTY8vBmQ7SMk7L7njpt9aR/FohlvY+MEu
+         cY811kekx8jQp+6J3jq0rwKFTkNgCh++BlgX9RhASIJpJ1UFZq2Y0QtgdnpUlKyGmiGh
+         aVaAwRsbF3M0LW3TLWe+7jPCxpNv/M1+wVDrKLtMHg5J+ZUR89oDt3VNWjPRqqbDQKZj
+         SkQwdXlvl8ZoyT7uwPsgxeam0GOdTCjSf3j6exq6kRwEG9Cx13dl963MU+XuCPK8UZ3u
+         /6Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCVEw5r0bvSNEtsfJ/hqEA3DhsgBQilmIwUk7R2I/+zxD1XXzBT0cB2ek8OvZS42lDOR41MA92F0k1sGEjAhZZY7@vger.kernel.org, AJvYcCWAs6bOY9XeCRHE+1JfWcAlsVpQFJjLF2KrmaV2z5I5bVic3dNZfnpCT/YTfUDneY/acdGlpLy+CBUmTQ==@vger.kernel.org, AJvYcCWh02LysYKTeyf2wkntgQ/kUJ7b3aqHyBgMXNLLy0yodoW7qwp7HreOYk/YVS48cawLvt5Hqp3apBr1zpc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/KqGnQKyB9VL968kKOmKPZCHaWxxXHUGRIQo+61BHeW9woYVB
+	T9jcKLCtQNxR2q+q9xP385bwMZq/VkoUHWgJOTkOIQwa3bGd3OEP
+X-Gm-Gg: ASbGncsjUgXmEKuDsZx5xnN/J4CgoDumFLHWsovRt4XUCGRKDOwiOwHLzoJTZZvqmA9
+	05bRZnY4gAzfFZ74+fOPb5rbq5+E1PC8BkmVw0pPXtKXEku08NIBcwytRG+sGQtWwHe2r8O54Tz
+	fUMQ6MHzWs7sGktl5CcWOfCcp5LfhVTLaQUZ85SVkIqpzOmxXKXRdARHsWUY/GqdjeZpdVqPKM1
+	hELnduSrKf23KOrtQEb60HJzfCWDOE4TPUgCwF7Q3VwUfFi1y9TIXI=
+X-Google-Smtp-Source: AGHT+IEPeMcQjD3hd3aJX0sQ1H72vTVDcJsqpdChjiw1hKxmKK4kX0f8mxvqFpH7A7HvxqaAsVhcbw==
+X-Received: by 2002:a17:90b:17c9:b0:2ea:a9ac:eee1 with SMTP id 98e67ed59e1d1-2eb0e234c02mr5833180a91.10.1732326858371;
+        Fri, 22 Nov 2024 17:54:18 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eb0d06003csm2298548a91.43.2024.11.22.17.54.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2024 17:54:17 -0800 (PST)
+Date: Sat, 23 Nov 2024 01:54:09 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Maximilian Heyne <mheyne@amazon.de>
+Cc: netdev@vger.kernel.org,
+	Allison Henderson <allison.henderson@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Vegard Nossum <vegard.nossum@oracle.com>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] selftests: rds: move include.sh to TEST_FILES
+Message-ID: <Z0E1wZ75xGCLvNC7@fedora>
+References: <20240927041349.81216-1-liuhangbin@gmail.com>
+ <20241122150129.GB18887@dev-dsk-mheyne-1b-55676e6a.eu-west-1.amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,132 +95,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241120105625.22508-10-Frank.Sae@motor-comm.com>
+In-Reply-To: <20241122150129.GB18887@dev-dsk-mheyne-1b-55676e6a.eu-west-1.amazon.com>
 
-It took a lot of effort to find your MDIO code. And MDIO bus driver
-makes a good patch on its own.
+On Fri, Nov 22, 2024 at 03:01:29PM +0000, Maximilian Heyne wrote:
+> Hi Hangbin,
+> 
+> On Fri, Sep 27, 2024 at 12:13:49PM +0800, Hangbin Liu wrote:
+> > The include.sh file is generated for inclusion and should not be executable.
+> > Otherwise, it will be added to kselftest-list.txt. Additionally, add the
+> > executable bit for test.py at the same time to ensure proper functionality.
+> > 
+> > Fixes: 3ade6ce1255e ("selftests: rds: add testing infrastructure")
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > ---
+> >  tools/testing/selftests/net/rds/Makefile | 3 ++-
+> >  tools/testing/selftests/net/rds/test.py  | 0
+> >  2 files changed, 2 insertions(+), 1 deletion(-)
+> >  mode change 100644 => 100755 tools/testing/selftests/net/rds/test.py
+> > 
+> > diff --git a/tools/testing/selftests/net/rds/Makefile b/tools/testing/selftests/net/rds/Makefile
+> > index da9714bc7aad..cf30307a829b 100644
+> > --- a/tools/testing/selftests/net/rds/Makefile
+> > +++ b/tools/testing/selftests/net/rds/Makefile
+> > @@ -4,9 +4,10 @@ all:
+> >  	@echo mk_build_dir="$(shell pwd)" > include.sh
+> >  
+> >  TEST_PROGS := run.sh \
+> > -	include.sh \
+> >  	test.py
+> 
+> Should test.py also move down to TEST_FILES? I think run.sh is executing
+> test.py anyway but does a couple of sanity checks before, so I think
+> this it's not necessary to let the runner execute test.py standalone.
 
-> +static int mdio_loop_wait(struct fxgmac_pdata *pdata, u32 max_cnt)
-> +{
-> +	u32 val, i;
-> +
-> +	for (i = 0; i < max_cnt; i++) {
-> +		val = rd32_mac(pdata, MAC_MDIO_ADDRESS);
-> +		if ((val & MAC_MDIO_ADDR_BUSY) == 0)
-> +			break;
-> +
-> +		fsleep(10);
-> +	}
-> +
-> +	if (i >= max_cnt) {
-> +		WARN_ON(1);
-> +		yt_err(pdata, "%s timeout. used cnt:%d, reg_val=%x.\n",
-> +		       __func__, i + 1, val);
-> +
-> +		return -ETIMEDOUT;
-> +	}
+I was not aware of this. Thanks for the report. I will post a fix for this.
 
-Please replace this using one of the helpers in
-include/linux/iopoll.h.
-
-> +#define PHY_WR_CONFIG(reg_offset)		(0x8000205 + ((reg_offset) * 0x10000))
-> +static int fxgmac_phy_write_reg(struct fxgmac_pdata *pdata, u32 reg_id, u32 data)
-> +{
-> +	int ret;
-> +
-> +	wr32_mac(pdata, data, MAC_MDIO_DATA);
-> +	wr32_mac(pdata, PHY_WR_CONFIG(reg_id), MAC_MDIO_ADDRESS);
-> +	ret = mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	yt_dbg(pdata, "%s, id:%x %s, ctrl:0x%08x, data:0x%08x\n", __func__,
-> +	       reg_id, (ret == 0) ? "ok" : "err", PHY_WR_CONFIG(reg_id), data);
-> +
-> +	return ret;
-> +}
-> +
-> +#define PHY_RD_CONFIG(reg_offset)		(0x800020d + ((reg_offset) * 0x10000))
-> +static int fxgmac_phy_read_reg(struct fxgmac_pdata *pdata, u32 reg_id)
-> +{
-> +	u32 val;
-> +	int ret;
-> +
-> +	wr32_mac(pdata, PHY_RD_CONFIG(reg_id), MAC_MDIO_ADDRESS);
-> +	ret =  mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	val = rd32_mac(pdata, MAC_MDIO_DATA);  /* Read data */
-> +	yt_dbg(pdata, "%s, id:%x ok, ctrl:0x%08x, val:0x%08x.\n", __func__,
-> +	       reg_id, PHY_RD_CONFIG(reg_id), val);
-> +
-> +	return val;
-> +}
-
-And where is the rest of the MDIO bus driver?
-
-> +static int fxgmac_config_flow_control(struct fxgmac_pdata *pdata)
-> +{
-> +	u32 val = 0;
-> +	int ret;
-> +
-> +	fxgmac_config_tx_flow_control(pdata);
-> +	fxgmac_config_rx_flow_control(pdata);
-> +
-> +	/* Set auto negotiation advertisement pause ability */
-> +	if (pdata->tx_pause || pdata->rx_pause)
-> +		val |= ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM;
-> +
-> +	ret = phy_modify(pdata->phydev, MII_ADVERTISE,
-> +			 ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM, val);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return phy_modify(pdata->phydev, MII_BMCR, BMCR_RESET, BMCR_RESET);
-> +}
-
-
-Yet more code messing with the PHY. This all needs to go.
-
-> +static int fxgmac_phy_clear_interrupt(struct fxgmac_pdata *pdata)
-> +{
-> +	u32 stats_pre, stats;
-> +
-> +	if (mutex_trylock(&pdata->phydev->mdio.bus->mdio_lock) == 0) {
-> +		yt_dbg(pdata, "lock not ready!\n");
-> +		return 0;
-> +	}
-> +
-> +	stats_pre = fxgmac_phy_read_reg(pdata, PHY_INT_STATUS);
-> +	if (stats_pre < 0)
-> +		goto unlock;
-> +
-> +	stats = fxgmac_phy_read_reg(pdata, PHY_INT_STATUS);
-> +	if (stats < 0)
-> +		goto unlock;
-> +
-> +	phy_unlock_mdio_bus(pdata->phydev);
-> +
-> +#define LINK_DOWN	0x800
-> +#define LINK_UP		0x400
-> +#define LINK_CHANGE	(LINK_DOWN | LINK_UP)
-> +	if ((stats_pre & LINK_CHANGE) != (stats & LINK_CHANGE)) {
-> +		yt_dbg(pdata, "phy link change\n");
-> +		return 1;
-> +	}
-> +
-> +	return 0;
-> +unlock:
-> +	phy_unlock_mdio_bus(pdata->phydev);
-> +	yt_err(pdata, "fxgmac_phy_read_reg err!\n");
-> +	return  -ETIMEDOUT;
-> +}
-
-You need to rework your PHY interrupt handling. The PHY driver is
-responsible for handing the interrupt registers in the PHY. Ideally
-you just want to export an interrupt to phylib, so it can do all the
-work.
-
-	Andrew
+Thanks
+Hangbin
 
