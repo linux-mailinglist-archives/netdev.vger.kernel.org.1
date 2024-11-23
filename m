@@ -1,116 +1,211 @@
-Return-Path: <netdev+bounces-146893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D829D6841
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 09:56:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C6A9D687A
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 10:44:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8279B281D34
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 08:55:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D2C8B20F7E
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 09:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49D615C14B;
-	Sat, 23 Nov 2024 08:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875EC17D358;
+	Sat, 23 Nov 2024 09:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b="rC3I8S1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mx0b-00007101.pphosted.com (mx0b-00007101.pphosted.com [148.163.139.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB750F4FA;
-	Sat, 23 Nov 2024 08:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8DA1514EE;
+	Sat, 23 Nov 2024 09:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732352156; cv=none; b=XZ8FvWs38bj1YMuyoHsWFXMJi9cKNtfM/lU52M63tMwbOUFVOHjMD1yeSzkXaNgV781aDmgKG5D5uecrd5yiY80sglCppvLo8YCsBxEwczD5J3XFAD7EtNDTTlZaeVjkO8GPnfLJKTI0ZGb5bH9H99GQb+W0GwzW618Hev2IsXU=
+	t=1732355063; cv=none; b=hsLE8qZyw4fQKz4pLM4a+oyemQ0nUO0F2k9N2SrhLNM3AL75VyDDOmQFdGsvqr0nEo/WjRhno1b/bGoFQEiYE/0lghG/oyaTk7CHS8NOcSGHwm2qGlvq5AmmfRJ/vvJ4vqEyYXSAVzqgTGFe4LH4WJR21RHk7aJ/HpKzxrGjpKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732352156; c=relaxed/simple;
-	bh=W7QKvzogt7TfP3ZUil8GC+BNwtUzslI54WZF0+W46Ek=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aFLAI3lxc4DSney6OSwX+hts6TTLHU9ckpAyC/qiw5YmmG3vJ8Emtp3WK1WToaiZEejoKbga3Xqxny931/iCvIRt38dn2OMXFzWVdkqriT1juG758XUn2UQzkEHLbber6P0zTj37FWA3Bb8KqE8mUBLY2rUS6Uw656qcDsGOWOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: ba03b1faa97811efa216b1d71e6e1362-20241123
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:25583f0c-cb30-4cd9-82db-18d84178b732,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:20
-X-CID-META: VersionHash:82c5f88,CLOUDID:7287d30bde16fa5513094300cd5a2bbf,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:5,IP:nil,URL:0,
-	File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:N
-	O,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: ba03b1faa97811efa216b1d71e6e1362-20241123
-Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
-	(envelope-from <zhangheng@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 919889968; Sat, 23 Nov 2024 16:55:45 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 2EA74E0080FF;
-	Sat, 23 Nov 2024 16:55:45 +0800 (CST)
-X-ns-mid: postfix-67419890-93410110
-Received: from kylin-pc.. (unknown [172.25.130.133])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 413F9E0080FF;
-	Sat, 23 Nov 2024 16:55:42 +0800 (CST)
-From: zhangheng <zhangheng@kylinos.cn>
-To: khc@pm.waw.pl,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhangheng <zhangheng@kylinos.cn>
-Subject: [PATCH] net: wan: replace dma_set_mask()+dma_set_coherent_mask() with new helper
-Date: Sat, 23 Nov 2024 16:55:40 +0800
-Message-ID: <20241123085540.1470530-1-zhangheng@kylinos.cn>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1732355063; c=relaxed/simple;
+	bh=RB/wVdH0A5HO1rOsPwKJVyYz186feknowQ1S27C5oi0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E7DRBWiNmc0Iem4mnLsqFVpifYRcQjD1iDRI3ny0dmgMiP/l+8JGdTyfMG1AWXQOPN/o70FqVIQL85DrnhwvBQOk+ewAiK5MxChoGGwEyPh66N4CVLdxQPpept8qUtZKJatWURM3IuYOUPSKZTVy3liTbqutXdzBIKvzD4Krbro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu; spf=pass smtp.mailfrom=illinois.edu; dkim=pass (2048-bit key) header.d=illinois.edu header.i=@illinois.edu header.b=rC3I8S1o; arc=none smtp.client-ip=148.163.139.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=illinois.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=illinois.edu
+Received: from pps.filterd (m0272703.ppops.net [127.0.0.1])
+	by mx0b-00007101.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AN9aZG0017862;
+	Sat, 23 Nov 2024 09:43:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=illinois.edu; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=campusrelays; bh=oL+PRjo2JKV4WqCO3w0QPZTzXUUvuXwd
+	1UgHTC1NMcM=; b=rC3I8S1oAOG0DBzgHqkM3Y2xs4glRRFa9Gaw0FmUCRKHI2/p
+	JYdvL/nFfnB8MCBYxo3soem+4iRqrhRkWa47rd+9yYgq1ocPlR+iY83W/2DIS5IH
+	BXu0kgeSqP5UuByb1fbwX8peRoNPHuMbJwYc5yC6p3Gxg/3Xw50gkl4LJ3PxiGJJ
+	3xsvglsA02543ROhEMpyVVbxFQy3rV/9lQwUUsOCHOxxOxZGKwNKreQRIjKer5zs
+	23s76YC8zt5c5+mQGwt8fNVyJF1YkiwSZi3pXNmYrptYUwSI9f12m87tTZsQten9
+	n/+NgUe7ZJHRL//65iqS1HJE41OLB2weMBKEQg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0b-00007101.pphosted.com (PPS) with ESMTPS id 43382n0y4a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 23 Nov 2024 09:43:34 +0000 (GMT)
+Received: from m0272703.ppops.net (m0272703.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4AN9hY2H031684;
+	Sat, 23 Nov 2024 09:43:34 GMT
+Received: from localhost.localdomain (oasis.cs.illinois.edu [130.126.137.13])
+	by mx0b-00007101.pphosted.com (PPS) with ESMTP id 43382n0y2x-1;
+	Sat, 23 Nov 2024 09:43:34 +0000 (GMT)
+From: Jinghao Jia <jinghao7@illinois.edu>
+To: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>
+Cc: netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        Jinghao Jia <jinghao7@illinois.edu>, kernel test robot <lkp@intel.com>,
+        Ruowen Qin <ruqin@redhat.com>
+Subject: [PATCH v3 net] ipvs: fix UB due to uninitialized stack access in ip_vs_protocol_init()
+Date: Sat, 23 Nov 2024 03:42:56 -0600
+Message-ID: <20241123094256.28887-1-jinghao7@illinois.edu>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: asx8e01n9hRQlIb2y9Vm7UXV7wqwW2F7
+X-Proofpoint-ORIG-GUID: d_JrjJKs9g1oNL8oG2RL9eSfW7K1zTGo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+X-Spam-Details: rule=cautious_plus_nq_notspam policy=cautious_plus_nq score=0 mlxscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 adultscore=0 clxscore=1015
+ bulkscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411230081
+X-Spam-Score: 0
+X-Spam-OrigSender: jinghao7@illinois.edu
+X-Spam-Bar: 
 
-Replace the following sequence:
+Under certain kernel configurations when building with Clang/LLVM, the
+compiler does not generate a return or jump as the terminator
+instruction for ip_vs_protocol_init(), triggering the following objtool
+warning during build time:
 
-	dma_set_mask(dev, mask);
-	dma_set_coherent_mask(dev, mask);
+  vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
 
-with a call to the new helper dma_set_mask_and_coherent().
+At runtime, this either causes an oops when trying to load the ipvs
+module or a boot-time panic if ipvs is built-in. This same issue has
+been reported by the Intel kernel test robot previously.
 
-Signed-off-by: zhangheng <zhangheng@kylinos.cn>
+Digging deeper into both LLVM and the kernel code reveals this to be a
+undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
+of 64 chars to store the registered protocol names and leaves it
+uninitialized after definition. The function calls strnlen() when
+concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
+strnlen() performs an extra step to check whether the last byte of the
+input char buffer is a null character (commit 3009f891bb9f ("fortify:
+Allow strlen() and strnlen() to pass compile-time known lengths")).
+This, together with possibly other configurations, cause the following
+IR to be generated:
+
+  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
+    %1 = alloca [64 x i8], align 16
+    ...
+
+  14:                                               ; preds = %11
+    %15 = getelementptr inbounds i8, ptr %1, i64 63
+    %16 = load i8, ptr %15, align 1
+    %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
+    %18 = icmp eq i8 %16, 0
+    %19 = select i1 %17, i1 %18, i1 false
+    br i1 %19, label %20, label %23
+
+  20:                                               ; preds = %14
+    %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
+    ...
+
+  23:                                               ; preds = %14, %11, %20
+    %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
+    ...
+  }
+
+The above code calculates the address of the last char in the buffer
+(value %15) and then loads from it (value %16). Because the buffer is
+never initialized, the LLVM GVN pass marks value %16 as undefined:
+
+  %13 = getelementptr inbounds i8, ptr %1, i64 63
+  br i1 undef, label %14, label %17
+
+This gives later passes (SCCP, in particular) more DCE opportunities by
+propagating the undef value further, and eventually removes everything
+after the load on the uninitialized stack location:
+
+  define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
+    %1 = alloca [64 x i8], align 16
+    ...
+
+  12:                                               ; preds = %11
+    %13 = getelementptr inbounds i8, ptr %1, i64 63
+    unreachable
+  }
+
+In this way, the generated native code will just fall through to the
+next function, as LLVM does not generate any code for the unreachable IR
+instruction and leaves the function without a terminator.
+
+Zero the on-stack buffer to avoid this possible UB.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
+Co-developed-by: Ruowen Qin <ruqin@redhat.com>
+Signed-off-by: Ruowen Qin <ruqin@redhat.com>
+Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
 ---
- drivers/net/wan/wanxl.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Changelog:
+v2 -> v3:
+v2: https://lore.kernel.org/lkml/20241122045257.27452-1-jinghao7@illinois.edu/
+* Fix changelog format based on Julian's feedback
 
-diff --git a/drivers/net/wan/wanxl.c b/drivers/net/wan/wanxl.c
-index 5a9e262188ef..c2d5fbf887ee 100644
---- a/drivers/net/wan/wanxl.c
-+++ b/drivers/net/wan/wanxl.c
-@@ -574,8 +574,7 @@ static int wanxl_pci_init_one(struct pci_dev *pdev,
- 	 * and pray pci_alloc_consistent() will use this info. It should
- 	 * work on most platforms
- 	 */
--	if (dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(28)) ||
--	    dma_set_mask(&pdev->dev, DMA_BIT_MASK(28))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(28))) {
- 		pr_err("No usable DMA configuration\n");
- 		pci_disable_device(pdev);
- 		return -EIO;
-@@ -626,8 +625,7 @@ static int wanxl_pci_init_one(struct pci_dev *pdev,
- 	 * We set both dma_mask and consistent_dma_mask back to 32 bits
- 	 * to indicate the card can do 32-bit DMA addressing
- 	 */
--	if (dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32)) ||
--	    dma_set_mask(&pdev->dev, DMA_BIT_MASK(32))) {
-+	if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32))) {
- 		pr_err("No usable DMA configuration\n");
- 		wanxl_pci_remove_one(pdev);
- 		return -EIO;
---=20
-2.45.2
+v1 -> v2:
+v1: https://lore.kernel.org/lkml/20241111065105.82431-1-jinghao7@illinois.edu/
+* Fix small error in commit message
+* Address Julian's feedback:
+  * Make this patch target the net tree rather than net-next
+  * Add a "Fixes" tag for the initial git commit
+
+ net/netfilter/ipvs/ip_vs_proto.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
+index f100da4ba3bc..a9fd1d3fc2cb 100644
+--- a/net/netfilter/ipvs/ip_vs_proto.c
++++ b/net/netfilter/ipvs/ip_vs_proto.c
+@@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
+ 
+ int __init ip_vs_protocol_init(void)
+ {
+-	char protocols[64];
++	char protocols[64] = { 0 };
+ #define REGISTER_PROTOCOL(p)			\
+ 	do {					\
+ 		register_ip_vs_protocol(p);	\
+@@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
+ 		strcat(protocols, (p)->name);	\
+ 	} while (0)
+ 
+-	protocols[0] = '\0';
+-	protocols[2] = '\0';
+ #ifdef CONFIG_IP_VS_PROTO_TCP
+ 	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
+ #endif
+-- 
+2.47.0
 
 
