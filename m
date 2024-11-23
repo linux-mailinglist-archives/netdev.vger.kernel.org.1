@@ -1,210 +1,181 @@
-Return-Path: <netdev+bounces-146899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F6B29D697D
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 15:50:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 209399D6A4F
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 17:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D1CE1615A8
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 14:50:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A570161643
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 16:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDC21CFA9;
-	Sat, 23 Nov 2024 14:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FEF2FE33;
+	Sat, 23 Nov 2024 16:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oWV/bS4y"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="feUlVgxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D95B195
-	for <netdev@vger.kernel.org>; Sat, 23 Nov 2024 14:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4301862A
+	for <netdev@vger.kernel.org>; Sat, 23 Nov 2024 16:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732373423; cv=none; b=Evd5Au9+8XPZWM54AimawdWAQh4YoONHHLCw79nqbi8FLpjPzI31mb/cpiMlE+14jfd2IIiJsRGolb++tEq1yJqBwPzp0iXbrJNmiGjbMPhmikeUg/KWAKFhZEqR7VDiFJEDEWBSnX+WTbO0Z8ihuifrfgVA0MrbFd6KoVmgE/A=
+	t=1732380527; cv=none; b=dXP/HiWUB8B3Vup1K3lNLPpeg38LmczWupiQhW3Pt588xjC+dtHIfrxYX2Mfkiw1GyBOa4LLbvdddke2ju1hBvnBRop4TkqZzykWCuOKKWpLEEe6HFUSa3a6hJhG8QVqTz2anuzJNVnmIbHAYIU0VZ9BpxNvIqFvFa80YsROSmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732373423; c=relaxed/simple;
-	bh=Ok0DKi1lkXLGzG940gcAXtGWOQ8LJhAR2nhD7x7cYhI=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=a6Pz+skUb0zC+hyQUeZB+jOIYqlPurc4ikc2nzpg6mxEGdIgoIff1veMxtMUH99lq9DhSYaMZVjWVyEB5xPv4pc0KNPQs0u7FiqP57FWtJjb+iVA4KUDa/dCUuZO17EhLprvG0/EsBgznTWI2HqBeJ8nwr3jPLV+yPdlu2ZQTmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oWV/bS4y; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i8zo9/PJXZzyB1YqBCkhbvnXDwMzXivW1R2LSmEE0JM=; b=oWV/bS4ysAv1T2i1uZusM4p+K6
-	NTCJoi9JgEh+4qx6Oyrls5NRlSo3KpGg91RD6yJ/96kswiaWWDjUyMsLak0jx+emi6PlchQtbMzD9
-	ZOGXsfyqGaVUSrV7FidobHrpO1H6rTX5IieakQKYpLzRoGdsGtVA+GYRU1BlXWzhNR23JT4tM2POc
-	eU0rxmVL8DUXmwsXzUnbicpGDT+YAeFXhaLkgRkfxkGj5/y8jHi5Vp5EiIX5A/ecFXwUCG8A0Aqwi
-	VoFhd1ZPFFZWIpNmUHbizOMe7WqpQJgWPOUXLMf2LiwFbE9mXSr58qzzHKf/1bk3ILuec+mUxvGf7
-	rqLKQLsA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57886 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tErSe-00028Z-2i;
-	Sat, 23 Nov 2024 14:50:13 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tErSe-005RhB-2R; Sat, 23 Nov 2024 14:50:12 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net v3] net: phy: fix phy_ethtool_set_eee() incorrectly
- enabling LPI
+	s=arc-20240116; t=1732380527; c=relaxed/simple;
+	bh=bPB9eaSNCqsVmCoU8496Fg3t0VKNkqB0lpvtKPdzsL8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=WW5YoYC9MsdBZ3OLNl/oc1V012uTmyI2rEIfbXCHXVk4870gWD3O+6S9sSbvq7kHsrOQoQJfDRzDN5WKzhNdm1f36PnlKlrLdjGcE7aXQDwzl2z/1iG+mGHBnytCp98bgab/hADoym25VMIcDVYVqpLAvaEV4ZpzDPN3Dq0seEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=feUlVgxR; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aa520699becso214782966b.1
+        for <netdev@vger.kernel.org>; Sat, 23 Nov 2024 08:48:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1732380524; x=1732985324; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k/ndLfFTb5zT9K/yGcAbC6fybuoZmORzsbyGlmdLoKg=;
+        b=feUlVgxRNt+E4F4agQRQKzlusEWVkxlZn755AhZb9ivD2i4qlXaPvt7XL6cMPrHVN1
+         8QUNe+whqRZTYhMo1So0G26/FCB4LMAsxBweh1T45o6VyAvbjMqzv88I5NC/Us/zhF8N
+         ACvEFwfPBXTjMcaRjvSDwTDVUIv0WgYTgE3/AAx86G0lwTHeaE1LbSYAdjJrDHyrF8zA
+         WuRdWSvhF4e6x4w6tTTNBUXhd09syVUhqwyZsoWVmUSuBl+A8hVwxe1f+hKj6g4gNeyQ
+         wSTxKNz0I5xrGr5307FLOSHyrvzUAe6e0qwVIni/8CRTUgAvJwM8HSLT077FlM9JbyCd
+         oGAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732380524; x=1732985324;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k/ndLfFTb5zT9K/yGcAbC6fybuoZmORzsbyGlmdLoKg=;
+        b=bMXEz7YhmqvOTCJS/aRwPaaatG8UNh3Rt2LFRt4lUW2LxqyKwGUkB0cvpRDhgtuuxI
+         vojHUE+SrvUGcxc4lagCmq65jv+Yw+7TrXxcmrs4M/s3N6xlN+l1t52nzWPD5RSwkDlj
+         0FPDEgOLKvvrJlW71V19a7BZuFykfPvbsDpLhOwxa75ef9IUgh+GETzLJ+YzaAvwn/UA
+         1/ovzDGM5xvFO4i12g9dGjDUKM/lgNkDOIEH8FzebIRqq2CzgPGu0cMitdQndMwgd5sU
+         WLgElNvwJfRXUIG5DzRPHxTXRKcgKkXmtoK+Lgiz85rsRgxkw+WWSMYsTBBzDtKaLvgi
+         Lqmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNu2fX2EmgidyWJ/HtFjF0/QPAe3TZzYx7MtRswqIYrvqoM66dVNdvlbW5M+YmT+eG+VFvBVg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAwSycyBD6tuCgVxZrJkE++3lqkmjWsfBZ1CerVO3Rpc9jDCHa
+	LTau+SESoUVPTXbqkcfmu1ZACZ9pYBoxe+JoBsXNyX8qWUZ8uQ07ZIovVb7JtW4=
+X-Gm-Gg: ASbGncvW5N2a0CUe255/SSGvHtPjFOMz5OlLxBCW1LlB5A42u/N4SFmMP1GO4T9Jfts
+	rN+sBM1sh4WC9nbARkO/ALM+uzB/fQxepIgvkQjt6OCDmdUcQQKuZDBUAKmwE93v80lem73jmgt
+	m6qZV6mdMjPAKRffA//glfHgYZBFAGdT8A4O4hhM2RUMxlDhW2PiA7oI+F+w7E6BCo7LajcPBS/
+	VYkPtwi6ckg0owOfM+v4pz1OHaAoQPM6Ms2w6FZVw==
+X-Google-Smtp-Source: AGHT+IE0WxFzdJ3aRVO6sc51DU+Q3HyYpOYu9hEWkX9XdWHUI/131Nu2Ndnr2qsURTGOYhh4lIW+zA==
+X-Received: by 2002:a17:906:1da9:b0:aa5:3950:10ea with SMTP id a640c23a62f3a-aa5395015ddmr157637166b.36.1732380524096;
+        Sat, 23 Nov 2024 08:48:44 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:506b:2dc::49:18c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa50b28f8d7sm249430666b.22.2024.11.23.08.48.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Nov 2024 08:48:43 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  David Ahern
+ <dsahern@kernel.org>,  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
+ <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  netdev@vger.kernel.org,  kernel-team@cloudflare.com,  Ivan Babrou
+ <ivan@cloudflare.com>,  stable@vger.kernel.org
+Subject: USO tests with packetdrill? (was [PATCH net v2] udp: Compute L4
+ checksum as usual when not segmenting the skb)
+In-Reply-To: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+	(Jakub Sitnicki's message of "Fri, 11 Oct 2024 14:17:30 +0200")
+References: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+Date: Sat, 23 Nov 2024 17:48:42 +0100
+Message-ID: <87h67xsxp1.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tErSe-005RhB-2R@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 23 Nov 2024 14:50:12 +0000
+Content-Type: text/plain
 
-When phy_ethtool_set_eee_noneg() detects a change in the LPI
-parameters, it attempts to update phylib state and trigger the link
-to cycle so the MAC sees the updated parameters.
+Hi Willem,
 
-However, in doing so, it sets phydev->enable_tx_lpi depending on
-whether the EEE configuration allows the MAC to generate LPI without
-taking into account the result of negotiation.
+On Fri, Oct 11, 2024 at 02:17 PM +02, Jakub Sitnicki wrote:
+> If:
+>
+>   1) the user requested USO, but
+>   2) there is not enough payload for GSO to kick in, and
+>   3) the egress device doesn't offer checksum offload, then
+>
+> we want to compute the L4 checksum in software early on.
+>
+> In the case when we are not taking the GSO path, but it has been requested,
+> the software checksum fallback in skb_segment doesn't get a chance to
+> compute the full checksum, if the egress device can't do it. As a result we
+> end up sending UDP datagrams with only a partial checksum filled in, which
+> the peer will discard.
+>
+> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+> Reported-by: Ivan Babrou <ivan@cloudflare.com>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Acked-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Cc: stable@vger.kernel.org
+> ---
 
-This can be demonstrated with a 1000base-T FD interface by:
+I'm finally circling back to add a regression test for the above fix.
 
- # ethtool --set-eee eno0 advertise 8   # cause EEE to be not negotiated
- # ethtool --set-eee eno0 tx-lpi off
- # ethtool --set-eee eno0 tx-lpi on
+Instead of extending the selftest/net/udpgso.sh test case, I want to
+propose a different approach. I would like to check if the UDP packets
+packets are handed over to the netdevice with the expected checksum
+(complete or partial, depending on the device features), instead of
+testing for side-effects (packet dropped due to bad checksum).
 
-This results in being true, despite EEE not having been negotiated and:
- # ethtool --show-eee eno0
-	EEE status: enabled - inactive
-	Tx LPI: 250 (us)
-	Supported EEE link modes:  100baseT/Full
-	                           1000baseT/Full
-	Advertised EEE link modes:  100baseT/Full
-	                                         1000baseT/Full
+For that we could use packetdrill. We would need to extend it a bit to
+allow specifying a UDP checksum in the script, but otherwise it would
+make writing such tests rather easy. For instance, the regression test
+for this fix could be as simple as:
 
-Fix this by keeping track of whether EEE was negotiated via a new
-eee_active member in struct phy_device, and include this state in
-the decision whether phydev->enable_tx_lpi should be set.
+---8<---
+// Check if sent datagrams with length below GSO size get checksummed correctly
 
-Fixes: 3e43b903da04 ("net: phy: Immediately call adjust_link if only tx_lpi_enabled changes")
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-v3:
-- fixed kernel-doc
-- added fixes tag
-- rebased on Heiner's patch: https://patchwork.kernel.org/project/netdevbpf/patch/a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com/
-As such, not added Andrew's r-b.
+--ip_version=ipv4
+--local_ip=192.168.0.1
 
- drivers/net/phy/phy-c45.c |  2 +-
- drivers/net/phy/phy.c     | 30 ++++++++++++++++++------------
- include/linux/phy.h       |  2 ++
- 3 files changed, 21 insertions(+), 13 deletions(-)
+`
+ethtool -K tun0 tx-checksumming off >/dev/null
+`
 
-diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 96d0b3a5a9d3..944ae98ad110 100644
---- a/drivers/net/phy/phy-c45.c
-+++ b/drivers/net/phy/phy-c45.c
-@@ -1530,7 +1530,7 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
- 		return ret;
- 
- 	data->eee_enabled = is_enabled;
--	data->eee_active = ret;
-+	data->eee_active = phydev->eee_active;
- 	linkmode_copy(data->supported, phydev->supported_eee);
- 
- 	return 0;
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index a660a80f34b7..0d20b534122b 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -990,14 +990,14 @@ static int phy_check_link_status(struct phy_device *phydev)
- 		phydev->state = PHY_RUNNING;
- 		err = genphy_c45_eee_is_active(phydev,
- 					       NULL, NULL, NULL);
--		if (err <= 0)
--			phydev->enable_tx_lpi = false;
--		else
--			phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled;
-+		phydev->eee_active = err > 0;
-+		phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled &&
-+					phydev->eee_active;
- 
- 		phy_link_up(phydev);
- 	} else if (!phydev->link && phydev->state != PHY_NOLINK) {
- 		phydev->state = PHY_NOLINK;
-+		phydev->eee_active = false;
- 		phydev->enable_tx_lpi = false;
- 		phy_link_down(phydev);
- 	}
-@@ -1685,15 +1685,21 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
- static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
- 				      const struct eee_config *old_cfg)
- {
--	if (phydev->eee_cfg.tx_lpi_enabled != old_cfg->tx_lpi_enabled ||
-+	bool enable_tx_lpi;
-+
-+	if (!phydev->link)
-+		return;
-+
-+	enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled && phydev->eee_active;
-+
-+	if (phydev->enable_tx_lpi != enable_tx_lpi ||
- 	    phydev->eee_cfg.tx_lpi_timer != old_cfg->tx_lpi_timer) {
--		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
--		if (phydev->link) {
--			phydev->link = false;
--			phy_link_down(phydev);
--			phydev->link = true;
--			phy_link_up(phydev);
--		}
-+		phydev->enable_tx_lpi = false;
-+		phydev->link = false;
-+		phy_link_down(phydev);
-+		phydev->enable_tx_lpi = enable_tx_lpi;
-+		phydev->link = true;
-+		phy_link_up(phydev);
- 	}
- }
- 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 77c6d6451638..563c46205685 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -602,6 +602,7 @@ struct macsec_ops;
-  * @supported_eee: supported PHY EEE linkmodes
-  * @advertising_eee: Currently advertised EEE linkmodes
-  * @enable_tx_lpi: When True, MAC should transmit LPI to PHY
-+ * @eee_active: phylib private state, indicating that EEE has been negotiated
-  * @eee_cfg: User configuration of EEE
-  * @lp_advertising: Current link partner advertised linkmodes
-  * @host_interfaces: PHY interface modes supported by host
-@@ -723,6 +724,7 @@ struct phy_device {
- 	/* Energy efficient ethernet modes which should be prohibited */
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_broken_modes);
- 	bool enable_tx_lpi;
-+	bool eee_active;
- 	struct eee_config eee_cfg;
- 
- 	/* Host supported PHY interface types. Should be ignored if empty. */
--- 
-2.30.2
+0   socket(..., SOCK_DGRAM, IPPROTO_UDP) = 3
++0  bind(3, ..., ...) = 0
++0  connect(3, ..., ...) = 0
 
++0  write(3, ..., 1000) = 1000
++0  > udp sum 0x3643 (1000) // expect complete checksum
+
++0  setsockopt(3, IPPROTO_UDP, UDP_SEGMENT, [1280], 4) = 0
++0  write(3, ..., 1000) = 1000
++0  > udp sum 0x3643 (1000) // expect complete checksum
+--->8---
+
+(I'd actually like to have a bit mode of syntax sugar there, so we can
+simply specify "sum complete" and have packetdrill figure out the
+expected checksum value. Then IP address pinning wouldn't be needed.)
+
+If we ever regress, the failure will be straightforward to understand.
+Here's what I got when running the above test with the fix reverted:
+
+~ # packetdrill dgram_below_gso_size.pkt
+dgram_below_gso_size.pkt:19: error handling packet: live packet field l4_csum: expected: 13891 (0x3643) vs actual: 34476 (0x86ac)
+script packet:  0.000168 udp sum 0x3643 (1000)
+actual packet:  0.000166 udp sum 0x86ac (1000)
+~ #
+
+My patched packetdrill PoC is at:
+
+https://github.com/jsitnicki/packetdrill/commits/udp-segment/rfc1/
+
+If we want to go with the packetdrill-based test, that raises the
+question where do keep it? In the packetdrill repo? Or with the rest of
+the selftests/net?
+
+Using the packetdrill repo would make it easier to synchronize the
+development of packetdrill features with the tests that use them. But we
+would also have to hook it up to netdev CI.
+
+WDYT?
+
+-jkbs
 
