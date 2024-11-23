@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-146906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C32A9D6B26
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 20:37:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4021A9D6B30
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 20:41:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E9CB282066
-	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 19:37:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1DA8282291
+	for <lists+netdev@lfdr.de>; Sat, 23 Nov 2024 19:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E913C15ADA6;
-	Sat, 23 Nov 2024 19:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BBE189B86;
+	Sat, 23 Nov 2024 19:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f7VKHQcX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="z+3Exu21"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFA734545;
-	Sat, 23 Nov 2024 19:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD3F158DB1;
+	Sat, 23 Nov 2024 19:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732390628; cv=none; b=R4xq0g6gDl0AxxQLDWY0v2H/hJKhFEJco4mpxwJSbSBo5RA9oX45kHQtzMOUHP1OpFecOnvEvSdnqkZaIKrrX/yHPJWLAlt0rPmR0HfUvZJTy48PdS+exy5YE/97Ujad7FG91tM1JINWdDYrhl0d+DtnM3+36HYkh6zmdi9Y9x0=
+	t=1732390913; cv=none; b=iqW7Q8JrYDV7ZKa8fVsMbgnzvoCzZBTysH7JiC5XGbvLte2I9u6I1iDbs5N/ew8ZqODRyjjRTW8/LG3I8bLYXPc1Lq12u0fBTc+oYck16XdzoHweclVcnUtihl2D9gFJD620rrp2+bQjP/w+jzq0Y8x8Al/vxSL8h0N3bd11muI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732390628; c=relaxed/simple;
-	bh=rngSxhuCFJ+uzlzf5CfSOCccr1oI1Ht4c7AbItbbOL4=;
+	s=arc-20240116; t=1732390913; c=relaxed/simple;
+	bh=Vb5QHAayI057QZIb4ZxIjRg4f0RYlXzQxPSvBg/yZrw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TIXxc99Mu98q7ZkyQ+GR6x0v1wF5cZ7Vj1+0I6ZF9TNXyjNYj3NE6o7l/t1I80GYNiSEYV1Lv2/sVZURg00j/PQmglgIg+oFnS3pGPJQVhvt62p1B83kvsEHVqxlnp7aLFf5e13F4TmuDEvZENNggpF4K1LKaUDBdiAW/Ux0N2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f7VKHQcX; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=fpJfgQbV3KXUE2lMacddDy4JXiEBVIbTdUaKOlE8lbZxabqTjF9odfpyQ1MWL7OBZlho5im042MkyfrxHQnVWrdMb/4hulBi6QGGIcVrgRBBKMPqlKMGs6G64MNN3Aay4dfFyRFnKLyF/ctAHCQ+bcD3SWy4LP9ypOQUEe79kIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=z+3Exu21; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=T451uf3FJRW3SLEQhbuE9Lw3J5awZznXo86Z6PYTMZ8=; b=f7VKHQcXjoUjQG0B/8SLl2ywAa
-	FlyQ9YDgnVCPJRO3m+pQ/vUCU8nlx5I9jo0zrrvrguTwow0/SeMCvtzvZ0UbSVKw/CY3MBT9lpuQz
-	tyR+1dQ5jtOuiDZvNiF8Vl/8buk9nDoI2jRStRnv8ZkyU28m/gKNqAdg2AjjhgCxBCQ8=;
+	bh=bXSGeVcp+cWnCmHmUCmJMk2BmeyVeWCVr/9EKOca6eM=; b=z+3Exu21gVLNau8G2CdKo5qliZ
+	/s2vHZgv8mJNtWwnXpTu86AGHEXb9ubyFgGpdnmKvHgHR4FD3sgXqi/0XaQupZ+SwKBq3o+wQQ/WU
+	tJv7hRT9AACJR4ofXGutRL/j3bwd0XEd4V+WIvhP6zgNuvn7PNVRuCc6dCBNA8aKYcIA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tEvwA-00EEA4-B4; Sat, 23 Nov 2024 20:36:58 +0100
-Date: Sat, 23 Nov 2024 20:36:58 +0100
+	id 1tEw0m-00EEC4-Os; Sat, 23 Nov 2024 20:41:44 +0100
+Date: Sat, 23 Nov 2024 20:41:44 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Yijie Yang <quic_yijiyang@quicinc.com>
 Cc: Bjorn Andersson <andersson@kernel.org>,
@@ -53,11 +53,10 @@ Cc: Bjorn Andersson <andersson@kernel.org>,
 	Richard Cochran <richardcochran@gmail.com>,
 	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] arm64: dts: qcom: qcs8300: add the first 2.5G
- ethernet
-Message-ID: <355ff08c-d0a8-49e7-8afc-2e4adddf2c9e@lunn.ch>
+Subject: Re: [PATCH v4 2/2] arm64: dts: qcom: qcs8300-ride: enable ethernet0
+Message-ID: <cbd696c0-3b25-438b-a279-a4263308323a@lunn.ch>
 References: <20241123-dts_qcs8300-v4-0-b10b8ac634a9@quicinc.com>
- <20241123-dts_qcs8300-v4-1-b10b8ac634a9@quicinc.com>
+ <20241123-dts_qcs8300-v4-2-b10b8ac634a9@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,18 +65,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241123-dts_qcs8300-v4-1-b10b8ac634a9@quicinc.com>
+In-Reply-To: <20241123-dts_qcs8300-v4-2-b10b8ac634a9@quicinc.com>
 
-> +		ethernet0: ethernet@23040000 {
-> +			compatible = "qcom,qcs8300-ethqos", "qcom,sa8775p-ethqos";
-> +			reg = <0x0 0x23040000 0x0 0x10000>,
-> +			      <0x0 0x23056000 0x0 0x100>;
-> +			reg-names = "stmmaceth", "rgmii";
+On Sat, Nov 23, 2024 at 04:51:54PM +0800, Yijie Yang wrote:
+> Enable the SerDes PHY on qcs8300-ride. Add the MDC and MDIO pin functions
+> for ethernet0 on qcs8300-ride. Enable the ethernet port on qcs8300-ride.
+> 
+> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+> ---
+>  arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++++++++++++
+>  1 file changed, 112 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/qcs8300-ride.dts b/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
+> index 7eed19a694c39dbe791afb6a991db65acb37e597..af7be26828524cc28299e219c1f0ad459e1c543d 100644
+> --- a/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
+> +++ b/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
+> @@ -210,6 +210,95 @@ vreg_l9c: ldo9 {
+>  	};
+>  };
+>  
+> +&ethernet0 {
+> +	phy-mode = "2500base-x";
+> +	phy-handle = <&sgmii_phy0>;
 
-Dumb question which should not stop this getting merged.
-
-Since this is now a MAC using a SERDES, do you still need the rmgii
-registers? Can the silicon actually do RGMII?
+Nit picking, but your PHY clearly is not an SGMII PHY if it is using
+2500base-x. I would call it just phy0, so avoiding using SGMII
+wrongly, which most vendors do use the name SGMII wrongly.
 
 	Andrew
 
