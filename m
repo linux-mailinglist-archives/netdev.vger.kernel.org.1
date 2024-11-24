@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-147066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF8899D7501
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:25:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E8D9D762B
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 17:53:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13A31164756
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:25:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 876F2C04E0D
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB9A24BFD8;
-	Sun, 24 Nov 2024 13:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B3424B772;
+	Sun, 24 Nov 2024 13:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbKMXSLm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zq94EPkA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B262724BFD6;
-	Sun, 24 Nov 2024 13:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D6E24A951;
+	Sun, 24 Nov 2024 13:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456614; cv=none; b=cMXL3qxdLahDbvWgGc0NnMsaCCGRrCfP+uD5qDQ4KWJS9WBM7srlyqrgTjJruafe1AHO3HOnokQy4tLcZKOxpb45pt4FjznE8bRKstUtwGJCn2Xa6P7EbZ4pFkWsPXPYDiX8Qff8QqtFIbjr9C0ei3HWnkz5sHHSDt9PzoSdFaY=
+	t=1732456637; cv=none; b=D/DnxfCB/+w9JdYIln0k3KRpClRQvKx6hLn9bUp5Rkzo5hR1iJrnEN7gsVCUxpoYmQrZHwOH9VbT65R2nvW8tmLzacCiXgNS4T9lLROOZSi2KW2BQ/otJHx3VzS7MA8IN25zMUvfNjcDmnYsUpbh2jG0qZRLYzTBxYec9TKJ8WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456614; c=relaxed/simple;
-	bh=+SavanS+peFDtun9ThuhSkPysREvObdvfpHagGM5VXQ=;
+	s=arc-20240116; t=1732456637; c=relaxed/simple;
+	bh=CGETTyCWoXPdn1YRwd2zWw1iVkn0FqNHobWiAX6+d5c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NIb0sB/UhDQMkmQpGgyxzGmlqKq+l/vDX0BBakAuymlasOGWAy0coiQ0Eak+eihX4c9poAlzGOUsYCXCMJxv6CNcPyyM0DDcarjLUZ2I0EM/M+DZNNImKGjJb6KVtV6dlxaLF6pqEwFUOsFhJt7dbEOg/xs8vkb6mAmou3e/RBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbKMXSLm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 930D2C4CED6;
-	Sun, 24 Nov 2024 13:56:52 +0000 (UTC)
+	 MIME-Version; b=EMz9iA/RIcD9x5UMfW1kl+pTDoPkn8j1MbbAbdYVr1gLRmMu9dX7WFAnVLzEVrLfeb9ujx3uEhXEZ3JlXfoMaT4tAH9eitSe5xCMh/zOeobJ7PnvvyK3otSxfPhRNVX/LFAZvNTtuFuUB3F9iu3MCZAeZgseH7wiNHLM/d4AipE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zq94EPkA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08AC7C4CEDA;
+	Sun, 24 Nov 2024 13:57:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456614;
-	bh=+SavanS+peFDtun9ThuhSkPysREvObdvfpHagGM5VXQ=;
+	s=k20201202; t=1732456637;
+	bh=CGETTyCWoXPdn1YRwd2zWw1iVkn0FqNHobWiAX6+d5c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tbKMXSLmixiC/kRtAGgIpDpSMOLAs/Hn1wNIXD3h9ln/FzLIO3FPoKtix55p1J+Em
-	 AwjZZjOm1EKDhY+496Fbmfg0XwiemOio3E7QOh0gmO9I2+hA8cf/UCWk4cHMuXt9Zj
-	 v42A09yzo9zOjHY7j2eRlgdg2Fo+SX0ViL+6vX5PK7+P+Zcv9EgUUhWLjVUStJICRi
-	 RFKDgOf9vuwBgLyaGGVQVsfJ1OlEt8oqGo8GXPp9UWNBspbRKcR6ejXkoU+kp/rY9W
-	 Y+qFkV8ku7dAfFK3LQWYSKN9BDlk4vYXGAepA1jr7PBZ7MEzAPSjJRRGt6jJFQ0uK4
-	 Cgoj2Ff4HiJmg==
+	b=Zq94EPkAXwmW0wh911Z3OjnQ9/m8LN70WrUCfChpPIOfRLfl+PJeesAv+3lAinJi7
+	 LceSUgkTbnmanc5w0McDVxAEg4bdrfCco3kNOXKOjUEP65kj0qgDAjeVKUwcBVjAjS
+	 asE5FTaOuOrmV6KQAmngC/JnBmzNNLSiTGlfGkCHaf/sCVBfgzT2fFB8RozaxE+Yy8
+	 xjW+BKZMOOcVzjftqYbyAiCx/oSUzBX/FWpgAkz5Td/8zP3q/Ts+UMdskv+LtkdXNB
+	 r9FCv6U2rAMyn/8rs9yeW9rZ6zEB3HkZLFCKI22QfAkbzfkQZnRLbgRPhMfw+IBX5Z
+	 X8aYv5+RJNZXA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Breno Leitao <leitao@debian.org>,
-	Michal Kubiak <michal.kubiak@intel.com>,
+Cc: Simon Horman <horms@kernel.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Daniel Machon <daniel.machon@microchip.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	viro@zeniv.linux.org.uk,
+	u.kleine-koenig@baylibre.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 28/28] netpoll: Use rcu_access_pointer() in __netpoll_setup
-Date: Sun, 24 Nov 2024 08:55:28 -0500
-Message-ID: <20241124135549.3350700-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/21] net: fec_mpc52xx_phy: Use %pa to format resource_size_t
+Date: Sun, 24 Nov 2024 08:56:36 -0500
+Message-ID: <20241124135709.3351371-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124135549.3350700-1-sashal@kernel.org>
-References: <20241124135549.3350700-1-sashal@kernel.org>
+In-Reply-To: <20241124135709.3351371-1-sashal@kernel.org>
+References: <20241124135709.3351371-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,45 +69,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.286
+X-stable-base: Linux 4.19.324
 Content-Transfer-Encoding: 8bit
 
-From: Breno Leitao <leitao@debian.org>
+From: Simon Horman <horms@kernel.org>
 
-[ Upstream commit c69c5e10adb903ae2438d4f9c16eccf43d1fcbc1 ]
+[ Upstream commit 020bfdc4ed94be472138c891bde4d14241cf00fd ]
 
-The ndev->npinfo pointer in __netpoll_setup() is RCU-protected but is being
-accessed directly for a NULL check. While no RCU read lock is held in this
-context, we should still use proper RCU primitives for consistency and
-correctness.
+The correct format string for resource_size_t is %pa which
+acts on the address of the variable to be formatted [1].
 
-Replace the direct NULL check with rcu_access_pointer(), which is the
-appropriate primitive when only checking for NULL without dereferencing
-the pointer. This function provides the necessary ordering guarantees
-without requiring RCU read-side protection.
+[1] https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/core-api/printk-formats.rst#L229
 
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Link: https://patch.msgid.link/20241118-netpoll_rcu-v1-1-a1888dcb4a02@debian.org
+Introduced by commit 9d9326d3bc0e ("phy: Change mii_bus id field to a string")
+
+Flagged by gcc-14 as:
+
+drivers/net/ethernet/freescale/fec_mpc52xx_phy.c: In function 'mpc52xx_fec_mdio_probe':
+drivers/net/ethernet/freescale/fec_mpc52xx_phy.c:97:46: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t' {aka 'long long unsigned int'} [-Wformat=]
+   97 |         snprintf(bus->id, MII_BUS_ID_SIZE, "%x", res.start);
+      |                                             ~^   ~~~~~~~~~
+      |                                              |      |
+      |                                              |      resource_size_t {aka long long unsigned int}
+      |                                              unsigned int
+      |                                             %llx
+
+No functional change intended.
+Compile tested only.
+
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Closes: https://lore.kernel.org/netdev/711d7f6d-b785-7560-f4dc-c6aad2cce99@linux-m68k.org/
+Signed-off-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+Link: https://patch.msgid.link/20241014-net-pa-fmt-v1-1-dcc9afb8858b@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/netpoll.c | 2 +-
+ drivers/net/ethernet/freescale/fec_mpc52xx_phy.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 9b263a5c0f36f..9a67aa989d606 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -615,7 +615,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
- 		goto out;
+diff --git a/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c b/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c
+index b5497e3083020..7e631e2f710fb 100644
+--- a/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c
++++ b/drivers/net/ethernet/freescale/fec_mpc52xx_phy.c
+@@ -92,7 +92,7 @@ static int mpc52xx_fec_mdio_probe(struct platform_device *of)
+ 		goto out_free;
  	}
  
--	if (!ndev->npinfo) {
-+	if (!rcu_access_pointer(ndev->npinfo)) {
- 		npinfo = kmalloc(sizeof(*npinfo), GFP_KERNEL);
- 		if (!npinfo) {
- 			err = -ENOMEM;
+-	snprintf(bus->id, MII_BUS_ID_SIZE, "%x", res.start);
++	snprintf(bus->id, MII_BUS_ID_SIZE, "%pa", &res.start);
+ 	bus->priv = priv;
+ 
+ 	bus->parent = dev;
 -- 
 2.43.0
 
