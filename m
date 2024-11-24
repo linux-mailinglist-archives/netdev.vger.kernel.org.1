@@ -1,138 +1,217 @@
-Return-Path: <netdev+bounces-147083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD8D9D76DF
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 18:48:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 097519D7813
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 21:28:40 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5664E162F9C
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 17:48:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB332821A8
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 20:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFD3136341;
-	Sun, 24 Nov 2024 17:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C1E13D8A0;
+	Sun, 24 Nov 2024 20:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F/YNqgmp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UIRt6Y7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F057283A18
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 17:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDC5163;
+	Sun, 24 Nov 2024 20:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732470513; cv=none; b=bB+mFe0M6NiB/Y3uK4Nxm8rv8iTp4sgQ9Ws066I6QTwtFVFeWsIi2RRFIHnswa1X/AkKEkARbxAWi2L/7kd9aFb77x/01UoT0LdlizpM5JMITvBWONWIRUfZvB4hcFPKaZWUF3zVyf1UvWbXY1jrEs55JePwLEILedpsZ3NNR9Q=
+	t=1732480116; cv=none; b=IM5AWSf5YOjJxmnP3SrsQs5E88CK7wZjq/vCbpDhXY8MklaMSOX1awnlNpf3xbaHioQzWVBYGNeLoVm/0x8hAn8YtEm3fsdGpR17u2hlqu4TJ8WXW2KBGjzqv9yCUvey3peZ5x82kwAqdVDItZxo/AeHJq47UFzWxK8SShBX1Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732470513; c=relaxed/simple;
-	bh=KAc+dxrgpbfHlVdExuNbNzAS8bmSU5jj7rjkS12Fa48=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CA5LfXZilMgjTEJ4UBWg3U32KAzijuwhst8pX+LjZBM1EonKLkTVttCH3gGkXi/NLkcS5KRMFlKjBkLhq//KrhW4fp/0n+skxEO2v3WvfFL5sr2N6v2RHazdK2uIxlsbwhEzRxgl4Y6CWSYzjfqjSHD55mIMO13hYsu5mwHlozI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F/YNqgmp; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aa5366d3b47so149866866b.0
-        for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 09:48:31 -0800 (PST)
+	s=arc-20240116; t=1732480116; c=relaxed/simple;
+	bh=0Je9YPam0AieU+g/MAjzikhB6nBC0viQCKBhZr7Q3YU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Td0kCEqP5mCKz6+R3qLUBV2V0aRjOjfTmUyLii12KolelUJP1BgUmUvk2pzedwAziRJhJfp59GlhdQxR7jQd1FtT0v+b3qRCeU0VLSUrcXfrRbOJFdSc7W5Ri0oTz5QGR9gVgwnsX2/WJNXg8YpHUJoLQu/G8eETjbLDEQhUYRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UIRt6Y7e; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6d40bdbb59dso29684576d6.3;
+        Sun, 24 Nov 2024 12:28:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732470510; x=1733075310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1732480114; x=1733084914; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vGO/u8jkL1cPeJfFI/uj7V1Q/Nu6nCu/n1Un400nmR4=;
-        b=F/YNqgmp7+DNPp11b2tiDm7D8Mn9hCMEonDz1RR9IDB3RiYcre1Ehh/2C51d6DVwpe
-         3LKort7VMiynZ8ILSAMuWr2otwcAmn+X1GKSb0dOqnVgO/9c4xDiZML4iSNnSigRuiO+
-         EEFNoorruDGZYGDQ/wmmyFAv3iGMkH8VZ5xNYTftjxKT6Mxyc0TzMA7pGj54DbnWGHPo
-         fyX+v0QG8vBi1OMXxLTwo6BMAc11MhupzV+688t/rN93zIaWgNfsTjhMOd9kfbn7XMNV
-         y+8TX2MnHWwnDIZ9ofS/fUOcQvRofpJGhJNpdGGBWLgQaEhii88BtpcUssArOdekrJ+H
-         AsoQ==
+        bh=Az3U59pd8rnLpI+8mN2vKBtnG79d4T1IBg4APDcgsBA=;
+        b=UIRt6Y7e3qmVgu3dWSFD/TjjSbXLJlg9TkQ9bQzZCg1TFksjGkO0tcCxjhMEE0S0tN
+         d2/JxNq48VJndmfTVUo1cIefcZtT4OJVV1PeiGd/OTjwnrgDNxJh3iVKKckDEB949r6V
+         AMEj9n/AW9qB2dMKZ9Tps2ZTrO05OY67RC9p+W3RTvhHIHsQL9ZNsbgDdKLHgvZKSs/L
+         +p78jB1VW7AaZ0hB+UQ7xQBb96ejP6o87D3DDenhbYKUFJ6cn4brjYe6hoBkujWjRtkP
+         bheo7cdzII6ncggFsC5SXc6nBJZj6ZWjE2dYSM7DRxcL9sKhDnnW0a0VjSQFiItyZhFi
+         dJyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732470510; x=1733075310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vGO/u8jkL1cPeJfFI/uj7V1Q/Nu6nCu/n1Un400nmR4=;
-        b=EgJVT9cu3DN3L+ChsH87x+G494RfkxqC9ro5w9CIipc39Y7Lwxw/uQ7V20vTMw41vc
-         Y9yZ8L78OhmBymlzlt3jayp/mJWiA+ksSQsTuNvc2+0EKEP/iQYWlLEnQd7VG8KevZtx
-         xScn7Mb1BF9M2s+ZNO5NDkw8eJd9L0j0wwEJRIw6kJGtlZvD85P6eEYKG5sTqhGqR/ym
-         1PPDnGCHqfgqSTZR/aZpLZbLcvmf/ZASo8v2DlcWeWErOh0LXd6a6CclwknKX9OeKH0v
-         ksP1Q/k5181GAJ2CtPSYSgysMghMp2ThPkvFG9ZKVFHmTUY7VxK3GEDqcI5nlqkDseIX
-         P9bA==
-X-Gm-Message-State: AOJu0YzvR14F/7M/wohzYKYgbsDFrSkvdtfrGjT6z6E+sJ5Oq9HNO9G7
-	iPLl30T+JfXrGpmVR9c7djNoKCm8XfPem4jD9iyNdVp8nGgkXSrU0eHDgCE1a4L4yH+yePcJl5u
-	VDAOlwHtzrhQmZJKcFlcEIcwW1NXHejgnk1Be
-X-Gm-Gg: ASbGnctMztlnh41osYl8qC/DsNY65akqRmgvQKU/F4pFB5XoXdXEfoNtXefsGakiSeQ
-	7j4GeHrTtFquIU1ozPmdp8GD0beKctg==
-X-Google-Smtp-Source: AGHT+IGR78Yp3E74KyUdMeZXImBCNnCQHFfKf3xLMrONhL4PNULfNvPd5JfgYvuW5T+rOTZfTB9T/fjwf64Ysz6MR8M=
-X-Received: by 2002:a17:906:3101:b0:a9a:dc3:c86e with SMTP id
- a640c23a62f3a-aa50990b1aamr890279866b.11.1732470510131; Sun, 24 Nov 2024
- 09:48:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732480114; x=1733084914;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Az3U59pd8rnLpI+8mN2vKBtnG79d4T1IBg4APDcgsBA=;
+        b=EQakIxLh29oiSt/EwVVIECvDHfUHKONCkaJFDrP4xOIgDK83lLfJ55SCwsYnyHlH/c
+         OYpzWrHFAWvOQdwLxkKU/EzKKuCwpEZiHEY/Hu7NePko1xYCzmnJ4twHHNHBx8a/OV+c
+         S2vw/3i2DKTJXZezgYKeY47i276LfIKsW0/j2Y20A+LLWVT8qrYZfYSOsRdjrzBvH2ye
+         P0/AWec6iMzqJZWalDg5Ka5kb+pngcBbS4tR1KJrhej8FwgQ+7+jilZq3rsrBJfLBcUP
+         qcPo8RJsiWS4Hv9ktqrdNCuPVf/LAAG6xYBCgP0Hmg+SsTnOjzmTewXSdlVfp+Dxd/Hb
+         rcrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWO8oN0nwe9imMVL5U12BEDOSkA93u0xyGUIlGsMjCNbnFECXsLhwSzT6RsfpK6SSQ3rpPt6vs=@vger.kernel.org, AJvYcCXtTxFA2Ty2PDyqCzGU7czJqTfl5MEgOFjRaV8wg1knbulocgXHldc/ZivygkDglAbUq01k2yL4@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTYNHdamFVcLF2MQXHyXePECKTQL3lSUE5ez0P2BVsgnS/2Fi8
+	kJRRMASNFz41c7XqsatJVMD72asacyHMAn20Bi1RarXjZ8VLtzVH
+X-Gm-Gg: ASbGncsjBXojZKYf+lgvdS4o2wVyTmJLiQza18zihgYftbgpKUZYpG49tWSNSYHNi1W
+	fzL9eOCq9QjlFgKokjO4SZSQlSDKqMU/ZPoZhHBcr9h8fQePRwv1k/z/1cQboo8mMshCejHtCT1
+	hiJh5RYJLYJWP7rQjlYi/QRX8/U657vz5TCQrCE1Mgo80EptCtrB3n6ZLaQNexnZ6XJ+0lqKEjJ
+	KwkZ6wx38nXarLW/Gzr6fSA1H5eCUSYJO0TYYP44o+u7uLFoQRQG4IKVxhWJMmpvVQvBzSjBOlV
+	7l6CG6evJ5jxHjEh3w/pkQ==
+X-Google-Smtp-Source: AGHT+IGpt1b+FnQ2WR52hOg1PAbzA8Qfe9WcYSEkfRqTfRRnoVtfrqsNqaJIyYC1piiapvi0lbWqdg==
+X-Received: by 2002:a05:6214:252a:b0:6d4:246a:7362 with SMTP id 6a1803df08f44-6d4514b4545mr185037816d6.42.1732480113637;
+        Sun, 24 Nov 2024 12:28:33 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451b23b1esm35098756d6.85.2024.11.24.12.28.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Nov 2024 12:28:32 -0800 (PST)
+Date: Sun, 24 Nov 2024 15:28:31 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ kernel-team@cloudflare.com, 
+ Ivan Babrou <ivan@cloudflare.com>, 
+ stable@vger.kernel.org, 
+ ncardwell@google.com
+Message-ID: <67438c6fe292b_2f7566294d0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <87h67xsxp1.fsf@cloudflare.com>
+References: <20241011-uso-swcsum-fixup-v2-1-6e1ddc199af9@cloudflare.com>
+ <87h67xsxp1.fsf@cloudflare.com>
+Subject: Re: USO tests with packetdrill? (was [PATCH net v2] udp: Compute L4
+ checksum as usual when not segmenting the skb)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241124022148.3126719-1-kuba@kernel.org>
-In-Reply-To: <20241124022148.3126719-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 24 Nov 2024 18:48:18 +0100
-Message-ID: <CANn89iKCzrZgW1jKLDmkRKpMnK3upw0whRAcqdtF5f07D2i7HQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] net_sched: sch_fq: don't follow the fast path if
- Tx is behind now
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com, 
-	stable@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 24, 2024 at 3:21=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Recent kernels cause a lot of TCP retransmissions
->
-> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> [  5]   0.00-1.00   sec  2.24 GBytes  19.2 Gbits/sec  2767    442 KBytes
-> [  5]   1.00-2.00   sec  2.23 GBytes  19.1 Gbits/sec  2312    350 KBytes
->                                                       ^^^^
->
-> Replacing the qdisc with pfifo makes retransmissions go away.
->
-> It appears that a flow may have a delayed packet with a very near
-> Tx time. Later, we may get busy processing Rx and the target Tx time
-> will pass, but we won't service Tx since the CPU is busy with Rx.
-> If Rx sees an ACK and we try to push more data for the delayed flow
-> we may fastpath the skb, not realizing that there are already "ready
-> to send" packets for this flow sitting in the qdisc.
->
-> Don't trust the fastpath if we are "behind" according to the projected
-> Tx time for next flow waiting in the Qdisc. Because we consider anything
-> within the offload window to be okay for fastpath we must consider
-> the entire offload window as "now".
->
-> Qdisc config:
->
-> qdisc fq 8001: dev eth0 parent 1234:1 limit 10000p flow_limit 100p \
->   buckets 32768 orphan_mask 1023 bands 3 \
->   priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 \
->   weights 589824 196608 65536 quantum 3028b initial_quantum 15140b \
->   low_rate_threshold 550Kbit \
->   refill_delay 40ms timer_slack 10us horizon 10s horizon_drop
->
-> For iperf this change seems to do fine, the reordering is gone.
-> The fastpath still gets used most of the time:
->
->   gc 0 highprio 0 fastpath 142614 throttled 418309 latency 19.1us
->    xx_behind 2731
->
-> where "xx_behind" counts how many times we hit the new "return false".
->
-> CC: stable@vger.kernel.org
-> Fixes: 076433bd78d7 ("net_sched: sch_fq: add fast path for mostly idle qd=
-isc")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Jakub Sitnicki wrote:
+> Hi Willem,
+> 
+> On Fri, Oct 11, 2024 at 02:17 PM +02, Jakub Sitnicki wrote:
+> > If:
+> >
+> >   1) the user requested USO, but
+> >   2) there is not enough payload for GSO to kick in, and
+> >   3) the egress device doesn't offer checksum offload, then
+> >
+> > we want to compute the L4 checksum in software early on.
+> >
+> > In the case when we are not taking the GSO path, but it has been requested,
+> > the software checksum fallback in skb_segment doesn't get a chance to
+> > compute the full checksum, if the egress device can't do it. As a result we
+> > end up sending UDP datagrams with only a partial checksum filled in, which
+> > the peer will discard.
+> >
+> > Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
+> > Reported-by: Ivan Babrou <ivan@cloudflare.com>
+> > Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> > Acked-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> > Cc: stable@vger.kernel.org
+> > ---
+> 
+> I'm finally circling back to add a regression test for the above fix.
+> 
+> Instead of extending the selftest/net/udpgso.sh test case, I want to
+> propose a different approach. I would like to check if the UDP packets
+> packets are handed over to the netdevice with the expected checksum
+> (complete or partial, depending on the device features), instead of
+> testing for side-effects (packet dropped due to bad checksum).
+> 
+> For that we could use packetdrill. We would need to extend it a bit to
+> allow specifying a UDP checksum in the script, but otherwise it would
+> make writing such tests rather easy. For instance, the regression test
+> for this fix could be as simple as:
+> 
+> ---8<---
+> // Check if sent datagrams with length below GSO size get checksummed correctly
+> 
+> --ip_version=ipv4
+> --local_ip=192.168.0.1
+> 
+> `
+> ethtool -K tun0 tx-checksumming off >/dev/null
+> `
+> 
+> 0   socket(..., SOCK_DGRAM, IPPROTO_UDP) = 3
+> +0  bind(3, ..., ...) = 0
+> +0  connect(3, ..., ...) = 0
+> 
+> +0  write(3, ..., 1000) = 1000
+> +0  > udp sum 0x3643 (1000) // expect complete checksum
+> 
+> +0  setsockopt(3, IPPROTO_UDP, UDP_SEGMENT, [1280], 4) = 0
+> +0  write(3, ..., 1000) = 1000
+> +0  > udp sum 0x3643 (1000) // expect complete checksum
+> --->8---
+> 
+> (I'd actually like to have a bit mode of syntax sugar there, so we can
+> simply specify "sum complete" and have packetdrill figure out the
+> expected checksum value. Then IP address pinning wouldn't be needed.)
+> 
+> If we ever regress, the failure will be straightforward to understand.
+> Here's what I got when running the above test with the fix reverted:
+> 
+> ~ # packetdrill dgram_below_gso_size.pkt
+> dgram_below_gso_size.pkt:19: error handling packet: live packet field l4_csum: expected: 13891 (0x3643) vs actual: 34476 (0x86ac)
+> script packet:  0.000168 udp sum 0x3643 (1000)
+> actual packet:  0.000166 udp sum 0x86ac (1000)
+> ~ #
+> 
+> My patched packetdrill PoC is at:
+> 
+> https://github.com/jsitnicki/packetdrill/commits/udp-segment/rfc1/
+> 
+> If we want to go with the packetdrill-based test, that raises the
+> question where do keep it? In the packetdrill repo? Or with the rest of
+> the selftests/net?
+> 
+> Using the packetdrill repo would make it easier to synchronize the
+> development of packetdrill features with the tests that use them. But we
+> would also have to hook it up to netdev CI.
+> 
+> WDYT?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
++1. Packetdrill is great environment for such tests. Packetdrill tests
+are also concise and easy to read.
 
-Thanks !
+I recently imported an initial batch of packetdrill tests to ksft and
+with that the netdev CI. We have a patch series with the remaining
+.pkt files on github ready for when the merge window opens.
+
+Any changes to packetdrill itself need to go to github, as that does
+not ship with the kernel.
+
+I encourage .pkt files to go there too. But I suspect that that won't
+be enforceable, and we do want the review on netdev@ first.
+
+One issue with testing optional features may be that packetdrill runs
+by default on a tun device (though it can also run across two NICs as
+a two machine test).
+
+Tun supports NETIF_F_GSO_UDP_L4, so that should be no concern in this
+case.
+
+One small request: to avoid confusion with CHECKSUM_COMPLETE, please
+use something else to mean fully computed checksums on the egress
+path (which, somewhat non-obviously, would be CHECKSUM_NONE). Perhaps
+SUM_PSEUDO and SUM_FULL?
+
 
