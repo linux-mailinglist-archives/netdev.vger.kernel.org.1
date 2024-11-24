@@ -1,94 +1,130 @@
-Return-Path: <netdev+bounces-147075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F32E9D754F
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:34:56 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31D939D7754
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 19:29:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0538B168A07
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:34:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46AA2B35677
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD4418991E;
-	Sun, 24 Nov 2024 15:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Toz7iTH5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26091B85CC;
+	Sun, 24 Nov 2024 15:04:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47195187553
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 15:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989261B3923;
+	Sun, 24 Nov 2024 15:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732460418; cv=none; b=R3xYB0y6JL9JKrE3FUi266w4ShxNNcvXNG8DZRnlfVUqtFkz6HjZzQFia7cGWaQhedD/T6FcMeEVbwP7Y4MK6Mb82NqWVizopQ3UMCXyBerRykBs+thcL8N3q1ZDeJU8TZNyJSGKgcDTUCTLTXDkJfsa5xyMfrCV6M1rt5ecylY=
+	t=1732460672; cv=none; b=Xn8Ua7mYejtnj8fRTKha0XWAt8HOOdWrVS0LKUANei05B1wQwX2dk7DrsjS8dHgD7x/QJlkSxwFkHyXN9hoJBiqcJg7pMHZfcL2otYyIpLC8/k2//plB2+ctoqh553IaJkUB5jORf4nTLxR3VR4fdDT4DVhPs687WceQONNhYNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732460418; c=relaxed/simple;
-	bh=VWf+ug2eFn87cfg7gAxArVEC7TPM409NJRx0u2nzkF8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Az/xsLlL8TvVxb7FJ7DXO6xdOLe4IL6VX5bnPm6K0ON48ui+OaWAXqjGBCdBBegukKYRdpJR0k2zTYIPb7Na64q6GC0u3mMbzXRJh3el361mCpwXY+NJRFlgbgSgnzcLP5bMuDyPhHQylpt2dMH8b9OTisnW6GV8gY9yYde1x4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Toz7iTH5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFFCC4CECC;
-	Sun, 24 Nov 2024 15:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732460417;
-	bh=VWf+ug2eFn87cfg7gAxArVEC7TPM409NJRx0u2nzkF8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Toz7iTH5I1KuGTpxnDItpftaHyJGbdKSwSCJuMaX3wQWzwGHSY/qR1Ss7n6xm0Zve
-	 kctak9QjssZ/9juUfbrGeWRWbGv/zZdusmgL0TiWblrmY1dfgXl5DMyp3vhItkETB6
-	 Q4Si2rvlhNrMDYJQjjhmzsT7YjN4BiSkfio6cCg8rWhnGQF/kr5iqlJSNshl9Ci2G3
-	 ir/SOV05LYgoFeHp4Vw9pkvUKKorkjVYHvbzp3W+B2HlXXTNpebustlUdnNidFXdte
-	 ritgB1pSOrcCNl5dXvoAKF/u3WVVwSV+UY92TU3YagKM7E148F48JkK2VyEwEr8k1j
-	 eJLbNLgG7q3hg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713AF3809A00;
-	Sun, 24 Nov 2024 15:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1732460672; c=relaxed/simple;
+	bh=NzAhNdIviC4mcJCGvuq35Fppehjrbw/+lTWbWZ/mAFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hp7LtcLjf+xReX5WeC31r11hR+DkRcOR5mw+Uuw88XirkAnO0J8IMmZKTxRZAyF00kdJq8lo+N/lC+bG767WvvJD9X4y1i6mooPwPx9yxzEncUjC8/4LKXxrBqX5sthmn2i9wdjI+IvY5BlG599XsTDDsnJsOxBFiI4FOAiuk5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20911C4CECC;
+	Sun, 24 Nov 2024 15:04:27 +0000 (UTC)
+Date: Sun, 24 Nov 2024 20:34:22 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Chris Lew <quic_clew@quicinc.com>
+Cc: Johan Hovold <johan@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hemant Kumar <quic_hemantk@quicinc.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Maxim Kochetkov <fido_max@inbox.ru>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Bhaumik Bhatt <bbhatt@codeaurora.org>
+Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
+Message-ID: <20241124150422.nt67aonfknfhz3sc@thinkpad>
+References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
+ <Zy3oyGLdsnDY9C0p@hovoldconsulting.com>
+ <b1e22673-2768-445c-8c67-eae93206cca5@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] net: phy: ensure that genphy_c45_an_config_eee_aneg()
- sees new value of phydev->eee_cfg.eee_enabled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173246043026.3277616.8812166825455562327.git-patchwork-notify@kernel.org>
-Date: Sun, 24 Nov 2024 15:00:30 +0000
-References: <a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com>
-In-Reply-To: <a5efc274-ce58-49f3-ac8a-5384d9b41695@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, pabeni@redhat.com,
- kuba@kernel.org, rmk+kernel@armlinux.org.uk, andrew@lunn.ch,
- andrew+netdev@lunn.ch, o.rempel@pengutronix.de, netdev@vger.kernel.org
+In-Reply-To: <b1e22673-2768-445c-8c67-eae93206cca5@quicinc.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Sat, 16 Nov 2024 21:52:15 +0100 you wrote:
-> This is a follow-up to 41ffcd95015f ("net: phy: fix phylib's dual
-> eee_enabled") and resolves an issue with genphy_c45_an_config_eee_aneg()
-> (called from genphy_c45_ethtool_set_eee) not seeing the new value of
-> phydev->eee_cfg.eee_enabled.
+On Thu, Nov 21, 2024 at 04:28:41PM -0800, Chris Lew wrote:
 > 
-> Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
-> [...]
+> On 11/8/2024 2:32 AM, Johan Hovold wrote:
+> > On Mon, Nov 04, 2024 at 05:29:37PM -0800, Chris Lew wrote:
+> > > From: Bhaumik Bhatt <bbhatt@codeaurora.org>
+> > > 
+> > > The call to qrtr_endpoint_register() was moved before
+> > > mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
+> > > callback can occur before the qrtr endpoint is registered.
+> > > 
+> > > Now the reverse can happen where qrtr will try to send a packet
+> > > before the channels are prepared. Add a wait in the sending path to
+> > > ensure the channels are prepared before trying to do a ul transfer.
+> > > 
+> > > Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+> > > Reported-by: Johan Hovold <johan@kernel.org>
+> > > Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
+> > > Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
+> > > Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+> > 
+> > > @@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
+> > >   	if (skb->sk)
+> > >   		sock_hold(skb->sk);
+> > > +	rc = wait_for_completion_interruptible(&qdev->prepared);
+> > > +	if (rc)
+> > > +		goto free_skb;
+> > > +
+> > >   	rc = skb_linearize(skb);
+> > >   	if (rc)
+> > >   		goto free_skb;
+> > > @@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+> > >   	qdev->mhi_dev = mhi_dev;
+> > >   	qdev->dev = &mhi_dev->dev;
+> > >   	qdev->ep.xmit = qcom_mhi_qrtr_send;
+> > > +	init_completion(&qdev->prepared);
+> > >   	dev_set_drvdata(&mhi_dev->dev, qdev);
+> > >   	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
+> > > @@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+> > >   		qrtr_endpoint_unregister(&qdev->ep);
+> > >   		return rc;
+> > >   	}
+> > > +	complete_all(&qdev->prepared);
+> > >   	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
+> > 
+> > While this probably works, it still looks like a bit of a hack.
+> > 
+> > Why can't you restructure the code so that the channels are fully
+> > initialised before you register or enable them instead?
+> > 
+> 
+> Ok, I think we will have to stop using the autoqueue feature of MHI and
+> change the flow to be mhi_prepare_for_transfer() -->
+> qrtr_endpoint_register() --> mhi_queue_buf(DMA_FROM_DEVICE). This would make
+> it so ul_transfers only happen after mhi_prepare_for_transfer() and
+> dl_transfers happen after qrtr_endpoint_register().
+> 
+> I'll take a stab at implementing this.
+> 
 
-Here is the summary with links:
-  - [v2,net] net: phy: ensure that genphy_c45_an_config_eee_aneg() sees new value of phydev->eee_cfg.eee_enabled
-    https://git.kernel.org/netdev/net/c/f26a29a038ee
+Hmm, I thought 'autoqueue' was used for a specific reason. So it is not valid
+now?
 
-You are awesome, thank you!
+- Mani
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+மணிவண்ணன் சதாசிவம்
 
