@@ -1,231 +1,156 @@
-Return-Path: <netdev+bounces-146941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2519D6D40
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 10:34:43 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681B01619D1
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 09:34:40 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2015F3BB22;
-	Sun, 24 Nov 2024 09:34:33 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71549D6D42
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 10:35:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C98318859F
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 09:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FC46B20EC9
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 09:35:41 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202BB158DC4;
+	Sun, 24 Nov 2024 09:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTd+4zPT"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6FD8837;
+	Sun, 24 Nov 2024 09:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732440873; cv=none; b=hXaRZbAdTsKfym3eVx5hbb94HvekwxYXje7ZvpDlEXth4ySpcY/TJjResB3ok49f5IaIqmSn3Rb0D4eezUqobjHyf3LyNEl0CWi4jWV0LTe5x5la6+6wHml1iqLXiy7IJdDGs+cdy2G6aF7mYfHH4f8q0ddn6dKepyXHOu6bbeM=
+	t=1732440937; cv=none; b=QQjX3VsKISCVG2D7i7Hp8CgR3rJQzFvShCypKLmV5YOCP7QKoDTXvMdL8eYxRRipQlIhMNTozjAB3GGnpT+FaHnmeB7TXUvmVHGdNJB2Xf7bRnk4DAEgCeqPErHhtPBe0SUw+3SsTuwqINIGYk7GmwKmFZra0a2p9lY19U6COUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732440873; c=relaxed/simple;
-	bh=X2pMooo7r+GCce9iDPOHSV5vPTDrgJUmpK/bvcaIzD0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VmjrjY6K7VeDBioWZFzrLOwXTUs+S5+DUzmYkB6z+5aEgj200Cy3VcMyhx+fawz0qx6azOWrqy7KHbszrYIbZauFJx3W8QEXA+AZBjVZOg0V1zmJ1SeA7FKfQDJq+8aXDwONzWf1hQazu8fk+JwwD3bz8QhFMG+lnJbMPYRlEvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tF90H-0005R7-IQ; Sun, 24 Nov 2024 10:34:05 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tF90G-002N7y-2d;
-	Sun, 24 Nov 2024 10:34:04 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tF90G-00CgO2-2F;
-	Sun, 24 Nov 2024 10:34:04 +0100
-Date: Sun, 24 Nov 2024 10:34:04 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 14/27] net: pse-pd: tps23881: Add support
- for PSE events and interrupts
-Message-ID: <Z0LzDE8cYdbvx79o@pengutronix.de>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
- <20241121-feature_poe_port_prio-v3-14-83299fa6967c@bootlin.com>
+	s=arc-20240116; t=1732440937; c=relaxed/simple;
+	bh=7tOwtFj93SqxzO6xWzYe/3dY+c6msOPIIaqb9P2q0Mk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SVMOm6OQMADfwbgSb0eBK532sNHiYs3M/wtdFA76jTdTdgG1zoBi7wTgseeZmkaSq1lAHYlJhGwp4UkMO57VqW5HTy5FhgmIgik4Pe+tF0om5ORpkUAbJlEGPgxtYSCEd3FY0lLqkX9krev4jF5DMXJn61EjEf4EdhwZyJjfmLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTd+4zPT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1499C4CECC;
+	Sun, 24 Nov 2024 09:35:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732440936;
+	bh=7tOwtFj93SqxzO6xWzYe/3dY+c6msOPIIaqb9P2q0Mk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LTd+4zPTP1GuWN5MNQMw7Y88wWnTWq4F005yO5FzQkZN+zHZiTOk+2Jp+KrBxwGoC
+	 kwwSuINWPUYdSq85pORIE1KjGlRY1Kn47+0TAyIcERF5S8CEpPICL3CkXPohT8gJnp
+	 jN47KvWcisu/ybJ2N7i1r9uMo+iFHOZiUugtTAtDEMMZVYkq2fp6L9rLiEgaborVAO
+	 rQtaFNbVTp9k2ZAwWI0mHBPHBnqRu7YA5QXuDrSXkJdzX6tIwesziD86ZSPRKe0Mgw
+	 VnR+EIgTllLVUqtNIEMJtuql/Xck8RMoUjI5k7NP74wTg7oE9n0bI5eX4fCAgvvJYt
+	 TBxbHd1U17FDQ==
+From: Ilia Lin <ilia.lin@kernel.org>
+To: steffen.klassert@secunet.com,
+	leonro@nvidia.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
+Date: Sun, 24 Nov 2024 11:35:31 +0200
+Message-Id: <20241124093531.3783434-1-ilia.lin@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241121-feature_poe_port_prio-v3-14-83299fa6967c@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 21, 2024 at 03:42:40PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> Add support for PSE event reporting through interrupts. Set up the newly
-> introduced devm_pse_irq_helper helper to register the interrupt. Events are
-> reported for over-current and over-temperature conditions.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-> 
-> Change in v3:
-> - Loop over interruption register to be sure the interruption pin is
->   freed before exiting the interrupt handler function.
-> - Add exist variable to not report event for undescribed PIs.
-> - Used helpers to convert the chan number to the PI port number.
-> 
-> Change in v2:
-> - Remove support for OSS pin and TPC23881 specific port priority management
-> ---
->  drivers/net/pse-pd/tps23881.c | 178 +++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 177 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-> index b25561f95774..6fe8f150231f 100644
-> --- a/drivers/net/pse-pd/tps23881.c
-> +++ b/drivers/net/pse-pd/tps23881.c
-> @@ -17,6 +17,13 @@
->  
->  #define TPS23881_MAX_CHANS 8
->  
-> +#define TPS23881_REG_IT		0x0
-> +#define TPS23881_REG_IT_MASK	0x1
-> +#define TPS23881_REG_IT_IFAULT	BIT(5)
-> +#define TPS23881_REG_IT_SUPF	BIT(7)
-> +#define TPS23881_REG_FAULT	0x7
-> +#define TPS23881_REG_SUPF_EVENT	0xb
-> +#define TPS23881_REG_TSD	BIT(7)
->  #define TPS23881_REG_PW_STATUS	0x10
->  #define TPS23881_REG_OP_MODE	0x12
->  #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
-> @@ -24,6 +31,7 @@
->  #define TPS23881_REG_DET_CLA_EN	0x14
->  #define TPS23881_REG_GEN_MASK	0x17
->  #define TPS23881_REG_NBITACC	BIT(5)
-> +#define TPS23881_REG_INTEN	BIT(7)
->  #define TPS23881_REG_PW_EN	0x19
->  #define TPS23881_REG_2PAIR_POL1	0x1e
->  #define TPS23881_REG_PORT_MAP	0x26
-> @@ -53,6 +61,7 @@ struct tps23881_port_desc {
->  	u8 chan[2];
->  	bool is_4p;
->  	int pw_pol;
-> +	bool exist;
->  };
->  
->  struct tps23881_priv {
-> @@ -791,8 +800,10 @@ tps23881_write_port_matrix(struct tps23881_priv *priv,
->  		hw_chan = port_matrix[i].hw_chan[0] % 4;
->  
->  		/* Set software port matrix for existing ports */
-> -		if (port_matrix[i].exist)
-> +		if (port_matrix[i].exist) {
->  			priv->port[pi_id].chan[0] = lgcl_chan;
-> +			priv->port[pi_id].exist = true;
-> +		}
->  
->  		/* Initialize power policy internal value */
->  		priv->port[pi_id].pw_pol = -1;
-> @@ -1098,6 +1109,165 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
->  	return 0;
->  }
->  
-> +/* Convert interrupt events to 0xff to be aligned with the chan
-> + * number.
-> + */
-> +static u8 tps23881_it_export_chans_helper(u16 reg_val, u8 field_offset)
+In packet offload mode the raw packets will be sent to the NiC,
+and will not return to the Network Stack. In event of crossing
+the MTU size after the encapsulation, the NiC HW may not be
+able to fragment the final packet.
+Adding mandatory pre-encapsulation fragmentation for both
+IPv4 and IPv6, if tunnel mode with packet offload is configured
+on the state.
 
-What is the meaning of _it_?
+Signed-off-by: Ilia Lin <ilia.lin@kernel.org>
+---
+ net/ipv4/xfrm4_output.c | 31 +++++++++++++++++++++++++++++--
+ net/ipv6/xfrm6_output.c |  8 ++++++--
+ 2 files changed, 35 insertions(+), 4 deletions(-)
 
-> +{
-> +	u8 val;
-> +
-> +	val = (reg_val >> (4 + field_offset) & 0xf0) |
-> +	      (reg_val >> field_offset & 0x0f);
-> +
-> +	return val;
-> +}
-> +
-> +/* Convert chan number to port number */
-> +static void tps23881_set_notifs_helper(struct tps23881_priv *priv,
-> +				       u8 chans,
-> +				       unsigned long *notifs,
-> +				       unsigned long *notifs_mask,
-> +				       enum ethtool_pse_events event)
-> +{
-> +	u8 chan;
-> +	int i;
-> +
-> +	if (!chans)
-> +		return;
-> +
-> +	for (i = 0; i < TPS23881_MAX_CHANS; i++) {
-> +		if (!priv->port[i].exist)
-> +			continue;
-> +		/* No need to look at the 2nd channel in case of PoE4 as
-> +		 * both registers are set.
-> +		 */
-> +		chan = priv->port[i].chan[0];
-> +
-> +		if (BIT(chan) & chans) {
-> +			*notifs_mask |= BIT(i);
-> +			notifs[i] |= event;
-> +		}
-> +	}
-> +}
-> +
-> +static void tps23881_irq_event_over_temp(struct tps23881_priv *priv,
-> +					 u16 reg_val,
-> +					 unsigned long *notifs,
-> +					 unsigned long *notifs_mask)
-> +{
-> +	int i;
-> +
-> +	if (reg_val & TPS23881_REG_TSD) {
-> +		for (i = 0; i < TPS23881_MAX_CHANS; i++) {
-> +			if (!priv->port[i].exist)
-> +				continue;
-> +
-> +			*notifs_mask |= BIT(i);
-> +			notifs[i] |= ETHTOOL_PSE_EVENT_OVER_TEMP;
-
-Hm, should it be bound to bound to therman zone frame work and start
-cooling or something? I guess this can be done in a separate step..
-
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
+diff --git a/net/ipv4/xfrm4_output.c b/net/ipv4/xfrm4_output.c
+index 3cff51ba72bb0..a4271e0dd51bb 100644
+--- a/net/ipv4/xfrm4_output.c
++++ b/net/ipv4/xfrm4_output.c
+@@ -14,17 +14,44 @@
+ #include <net/xfrm.h>
+ #include <net/icmp.h>
+ 
++static int __xfrm4_output_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
++{
++	return xfrm_output(sk, skb);
++}
++
+ static int __xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+-#ifdef CONFIG_NETFILTER
+-	struct xfrm_state *x = skb_dst(skb)->xfrm;
++	struct dst_entry *dst = skb_dst(skb);
++	struct xfrm_state *x = dst->xfrm;
++	unsigned int mtu;
++	bool toobig;
+ 
++#ifdef CONFIG_NETFILTER
+ 	if (!x) {
+ 		IPCB(skb)->flags |= IPSKB_REROUTED;
+ 		return dst_output(net, sk, skb);
+ 	}
+ #endif
+ 
++	if (x->props.mode != XFRM_MODE_TUNNEL || x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
++		goto skip_frag;
++
++	mtu = xfrm_state_mtu(x, dst_mtu(skb_dst(skb)));
++
++	toobig = skb->len > mtu && !skb_is_gso(skb);
++
++	if (!skb->ignore_df && toobig && skb->sk) {
++		xfrm_local_error(skb, mtu);
++		kfree_skb(skb);
++		return -EMSGSIZE;
++	}
++
++	if (toobig) {
++		IPCB(skb)->frag_max_size = mtu;
++		return ip_do_fragment(net, sk, skb, __xfrm4_output_finish);
++	}
++
++skip_frag:
+ 	return xfrm_output(sk, skb);
+ }
+ 
+diff --git a/net/ipv6/xfrm6_output.c b/net/ipv6/xfrm6_output.c
+index 5f7b1fdbffe62..fdd2f2f5adc71 100644
+--- a/net/ipv6/xfrm6_output.c
++++ b/net/ipv6/xfrm6_output.c
+@@ -75,10 +75,14 @@ static int __xfrm6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (x->props.mode != XFRM_MODE_TUNNEL)
+ 		goto skip_frag;
+ 
+-	if (skb->protocol == htons(ETH_P_IPV6))
++	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
++		mtu = xfrm_state_mtu(x, dst_mtu(skb_dst(skb)));
++		IP6CB(skb)->frag_max_size = mtu;
++	} else if (skb->protocol == htons(ETH_P_IPV6)) {
+ 		mtu = ip6_skb_dst_mtu(skb);
+-	else
++	} else {
+ 		mtu = dst_mtu(skb_dst(skb));
++	}
+ 
+ 	toobig = skb->len > mtu && !skb_is_gso(skb);
+ 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.25.1
+
 
