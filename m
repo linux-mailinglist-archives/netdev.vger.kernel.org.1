@@ -1,64 +1,66 @@
-Return-Path: <netdev+bounces-147027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D892E9D76E6
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 18:52:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0135C9D741B
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:59:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46B3EC07631
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:56:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47600BE2DE5
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D817F1F8AE2;
-	Sun, 24 Nov 2024 13:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE202389CA;
+	Sun, 24 Nov 2024 13:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ryl7l7HA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tm7nwWgy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEF31F8ADD;
-	Sun, 24 Nov 2024 13:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34742389C4;
+	Sun, 24 Nov 2024 13:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456271; cv=none; b=h9hIMXsjiwlSRhKphWqTovOFXhziftduLdkH8LNpal7JPmLiSNuY4pcmFr+BFEokrHUKDs2YclplYKn9PlcuvGW2ViLAMoq+bAB+Qs1HVCl/FGH8c9smFo+BTiTZmO0sNN8VcstMck8LkTzip1+cg0PTGWGbzD6+rf/Qas/YsNA=
+	t=1732456295; cv=none; b=Kj2m1p6xpkiAaZ1VUI/hFjYuXhRP8cMPZ5YchYLmUsa/CSG7oKRhklPb4MFx8m1qZZQqWqlk+wvg0O19uavhDeiVpWLKi5EAXBszxlm0OKNSfhhxo9EM6dFkhTLXHWvc+qfX6RUrqXGxZMEhEzp3XSmNN+rhlK8bJf5iwm6J1OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456271; c=relaxed/simple;
-	bh=FkRKYXbv1J6A5rOf+ehPciT3xY+A5vy1P8nttvZ6PnI=;
+	s=arc-20240116; t=1732456295; c=relaxed/simple;
+	bh=0k/HJW7lIikqX2d/so+Q+d9e7++AuEc20ExWdQlwupU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mdh7NY9c+i6PQQLAiF6bNQSnh/mZF3alLjIxMnxza5MqYQ/lVbnRhUO0DNTQ2z5jqNJviEb7o9DsBgCF5K7yB/VGGAxCWiBpiOTdml7wrFfj3p8xLQNH20EZArzVBO567R6eWLpqb+x/ldnydxsJlPZludu/BYI5+rjxyeARkkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ryl7l7HA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0A76C4CED1;
-	Sun, 24 Nov 2024 13:51:09 +0000 (UTC)
+	 MIME-Version; b=HfcFTZ27jn78Ick6izLsPWrhzSPNDSYiVi8PEs4UB80I1G6zRy6b3TniyT2g6bDXOQ5+yNsHV0MV5GwCo8hsUMPConJLaz5sIJgfUeOokZFvyuWOu6FVpdENbrqUS20xMzPqlQRYLfxwuj34DoKiqvcEdz7Qd0lRJg13JkhHUN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tm7nwWgy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35230C4CECC;
+	Sun, 24 Nov 2024 13:51:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456271;
-	bh=FkRKYXbv1J6A5rOf+ehPciT3xY+A5vy1P8nttvZ6PnI=;
+	s=k20201202; t=1732456294;
+	bh=0k/HJW7lIikqX2d/so+Q+d9e7++AuEc20ExWdQlwupU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ryl7l7HAJ0rEtjT2YFWLqf0ZKKqwe56NNBhZhYq5U5pvjRqiHkiOQF7SEWJ/IFCBe
-	 PaKpECdK+Fh7zYQTqE5oMD1tFubr6N5xlpZ0MR2FeudzI4Q6MJu6A4rpm6RJH0gHLH
-	 1lVUj3hn6Gdl/GO5rHU3V3atM0XEaYb58pOnilnTByYMEVD4bYlarTeqaDnizRO0En
-	 VmIqgGlvqHJD1XmIldIZ5PIeKgYyFwotSPiEwrn/v/3nh7b2wLHC/WBdoPx4UWQ488
-	 QjuLyvJ6HCyoCVrU1CxGSf/DReTCx8fWK6Bl6Dhu02uJSNAblqIHMo1tIf1WHScPrl
-	 3vGL2uJMv39IA==
+	b=tm7nwWgywH84uOl29sUueovAWN4VMQV8YYmeEu4XCNCMtHyRwBriJX+8xzD7qgJAO
+	 oCGMOiAyOOu+1KFF/zcRSDi6omw7QQ2y8GemuVF4jO5gV/PIl5JaLAJFv3dJgMxxtn
+	 Cp57O1V+dGZqxLgMs4rPD12JR4McoTJaMKVKLgss/cqyBOwCwVa2mnjC92QMIhU2qk
+	 V7Qd7fBK7LJ3ykGm2T44CliQbRCK2UQPZBjzor2Lu+/41g9LmHeIjJ7vkKquiXpLD/
+	 icbZJfIrKXAPUm5QIrRqRxLFYcKUCreuBIS6ZDS/pIGEaNZnplzuw/+oC72IBG6BZy
+	 VDW15Ep1hWXWA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Wei Fang <wei.fang@nxp.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	imx@lists.linux.dev,
+	florian.fainelli@broadcom.com,
+	alsi@bang-olufsen.dk,
+	ansuelsmth@gmail.com,
+	michal.vokac@ysoft.com,
+	javier.carrasco.cruz@gmail.com,
+	rmk+kernel@armlinux.org.uk,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 36/48] net: enetc: add i.MX95 EMDIO support
-Date: Sun, 24 Nov 2024 08:48:59 -0500
-Message-ID: <20241124134950.3348099-36-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 42/48] dsa: qca8k: Use nested lock to avoid splat
+Date: Sun, 24 Nov 2024 08:49:05 -0500
+Message-ID: <20241124134950.3348099-42-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124134950.3348099-1-sashal@kernel.org>
 References: <20241124134950.3348099-1-sashal@kernel.org>
@@ -73,42 +75,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.119
 Content-Transfer-Encoding: 8bit
 
-From: Wei Fang <wei.fang@nxp.com>
+From: Andrew Lunn <andrew@lunn.ch>
 
-[ Upstream commit a52201fb9caa9b33b4d881725d1ec733438b07f2 ]
+[ Upstream commit 078e0d596f7b5952dad8662ace8f20ed2165e2ce ]
 
-The verdor ID and device ID of i.MX95 EMDIO are different from LS1028A
-EMDIO, so add new vendor ID and device ID to pci_device_id table to
-support i.MX95 EMDIO.
+qca8k_phy_eth_command() is used to probe the child MDIO bus while the
+parent MDIO is locked. This causes lockdep splat, reporting a possible
+deadlock. It is not an actually deadlock, because different locks are
+used. By making use of mutex_lock_nested() we can avoid this false
+positive.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/20241110175955.3053664-1-andrew@lunn.ch
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/dsa/qca/qca8k-8xxx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-index d3248881a9b7e..626faae064a95 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-@@ -4,6 +4,8 @@
- #include <linux/of_mdio.h>
- #include "enetc_pf.h"
+diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+index 641692f716f86..47e9b2c303831 100644
+--- a/drivers/net/dsa/qca/qca8k-8xxx.c
++++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+@@ -551,7 +551,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
+ 	 * We therefore need to lock the MDIO bus onto which the switch is
+ 	 * connected.
+ 	 */
+-	mutex_lock(&priv->bus->mdio_lock);
++	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
  
-+#define NETC_EMDIO_VEN_ID	0x1131
-+#define NETC_EMDIO_DEV_ID	0xee00
- #define ENETC_MDIO_DEV_ID	0xee01
- #define ENETC_MDIO_DEV_NAME	"FSL PCIe IE Central MDIO"
- #define ENETC_MDIO_BUS_NAME	ENETC_MDIO_DEV_NAME " Bus"
-@@ -122,6 +124,7 @@ static void enetc_pci_mdio_remove(struct pci_dev *pdev)
- 
- static const struct pci_device_id enetc_pci_mdio_id_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_FREESCALE, ENETC_MDIO_DEV_ID) },
-+	{ PCI_DEVICE(NETC_EMDIO_VEN_ID, NETC_EMDIO_DEV_ID) },
- 	{ 0, } /* End of table. */
- };
- MODULE_DEVICE_TABLE(pci, enetc_pci_mdio_id_table);
+ 	/* Actually start the request:
+ 	 * 1. Send mdio master packet
 -- 
 2.43.0
 
