@@ -1,156 +1,186 @@
-Return-Path: <netdev+bounces-146942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71549D6D42
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 10:35:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02AD9D6D45
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 10:39:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FC46B20EC9
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 09:35:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65F04B211EB
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 09:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202BB158DC4;
-	Sun, 24 Nov 2024 09:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTd+4zPT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583C918871D;
+	Sun, 24 Nov 2024 09:39:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6FD8837;
-	Sun, 24 Nov 2024 09:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EF71632C7
+	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 09:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732440937; cv=none; b=QQjX3VsKISCVG2D7i7Hp8CgR3rJQzFvShCypKLmV5YOCP7QKoDTXvMdL8eYxRRipQlIhMNTozjAB3GGnpT+FaHnmeB7TXUvmVHGdNJB2Xf7bRnk4DAEgCeqPErHhtPBe0SUw+3SsTuwqINIGYk7GmwKmFZra0a2p9lY19U6COUQ=
+	t=1732441179; cv=none; b=FyiUfTVtgQvFUwBGJMWzW68m8i8aIsRyXM6BHWUUL/VGorz05u+/7YCNVG3O7DGtA6AJyWDNIb91SH0+YWQB5lMEmuUfSz4rQ428J29cwHRNWoLeuW4013xYgAcaHmsUnaJNvLJXGso9PwyQ0JFdT+Ej7f1OVxSq5s2LVvZVjxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732440937; c=relaxed/simple;
-	bh=7tOwtFj93SqxzO6xWzYe/3dY+c6msOPIIaqb9P2q0Mk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SVMOm6OQMADfwbgSb0eBK532sNHiYs3M/wtdFA76jTdTdgG1zoBi7wTgseeZmkaSq1lAHYlJhGwp4UkMO57VqW5HTy5FhgmIgik4Pe+tF0om5ORpkUAbJlEGPgxtYSCEd3FY0lLqkX9krev4jF5DMXJn61EjEf4EdhwZyJjfmLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTd+4zPT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1499C4CECC;
-	Sun, 24 Nov 2024 09:35:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732440936;
-	bh=7tOwtFj93SqxzO6xWzYe/3dY+c6msOPIIaqb9P2q0Mk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=LTd+4zPTP1GuWN5MNQMw7Y88wWnTWq4F005yO5FzQkZN+zHZiTOk+2Jp+KrBxwGoC
-	 kwwSuINWPUYdSq85pORIE1KjGlRY1Kn47+0TAyIcERF5S8CEpPICL3CkXPohT8gJnp
-	 jN47KvWcisu/ybJ2N7i1r9uMo+iFHOZiUugtTAtDEMMZVYkq2fp6L9rLiEgaborVAO
-	 rQtaFNbVTp9k2ZAwWI0mHBPHBnqRu7YA5QXuDrSXkJdzX6tIwesziD86ZSPRKe0Mgw
-	 VnR+EIgTllLVUqtNIEMJtuql/Xck8RMoUjI5k7NP74wTg7oE9n0bI5eX4fCAgvvJYt
-	 TBxbHd1U17FDQ==
-From: Ilia Lin <ilia.lin@kernel.org>
-To: steffen.klassert@secunet.com,
-	leonro@nvidia.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
-Date: Sun, 24 Nov 2024 11:35:31 +0200
-Message-Id: <20241124093531.3783434-1-ilia.lin@kernel.org>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1732441179; c=relaxed/simple;
+	bh=8kxRd7XhCltL01GOni+S70qJmZTEC+JyuGErQY6dkYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PdkM5f0gXDKJpcfWBQTZg28+bMt+B8qmIfYQvfjLHEKoDp1dM6iof1smYBf6bZ3hMETiVgVzflf7gy22RoznV6zfEWPTaJwDOavsF+a5G7n7BGoTgHdTEityY9WPhYzF9msf1HMqvfvma2i5QILYw9WgPw+aK0JsUrUHtmold5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tF95P-0005dS-Jh; Sun, 24 Nov 2024 10:39:23 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tF95O-002NBz-2H;
+	Sun, 24 Nov 2024 10:39:22 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tF95O-00CgPK-1q;
+	Sun, 24 Nov 2024 10:39:22 +0100
+Date: Sun, 24 Nov 2024 10:39:22 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v3 15/27] regulator: core: Resolve supply
+ using of_node from regulator_config
+Message-ID: <Z0L0SuaRysRxbtNM@pengutronix.de>
+References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
+ <20241121-feature_poe_port_prio-v3-15-83299fa6967c@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241121-feature_poe_port_prio-v3-15-83299fa6967c@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-In packet offload mode the raw packets will be sent to the NiC,
-and will not return to the Network Stack. In event of crossing
-the MTU size after the encapsulation, the NiC HW may not be
-able to fragment the final packet.
-Adding mandatory pre-encapsulation fragmentation for both
-IPv4 and IPv6, if tunnel mode with packet offload is configured
-on the state.
+On Thu, Nov 21, 2024 at 03:42:41PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> Previously, the regulator core resolved its supply only from the parent
+> device or its children, ignoring the of_node specified in the
+> regulator_config structure.
+> This behavior causes issues in scenarios where multiple regulator devices
+> are registered for components described as children of a controller, each
+> with their own specific regulator supply.
+> 
+> For instance, in a PSE controller with multiple PIs (Power Interfaces),
+> each PI may have a distinct regulator supply. However, the regulator core
+> would incorrectly use the PSE controller node or its first child to look up
+> the regulator supply, rather than the node specified by the
+> regulator_config->of_node for the PI.
+> 
+> This update modifies the behavior to prioritize the of_node in
+> regulator_config for resolving the supply. This ensures correct resolution
+> of the power supply for each device. If no supply is found in the provided
+> of_node, the core falls back to searching within the parent device as
+> before.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> It is weird that it wasn't seen before, maybe there was not any case
+> were it can't find the supply_name from the parent device.
+> 
+> Changes in v3:
+> - New patch
+> ---
+>  drivers/regulator/core.c | 42 ++++++++++++++++++++++++++++++------------
+>  1 file changed, 30 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
+> index 2948a7eca734..b49f751893b9 100644
+> --- a/drivers/regulator/core.c
+> +++ b/drivers/regulator/core.c
+> @@ -1936,6 +1936,20 @@ static struct regulator_dev *regulator_lookup_by_name(const char *name)
+>  	return dev ? dev_to_rdev(dev) : NULL;
+>  }
+>  
+> +static struct regulator_dev *regulator_dt_lookup(struct device *dev,
+> +						 const char *supply)
+> +{
+> +	struct regulator_dev *r = NULL;
+> +
+> +	if (dev && dev->of_node) {
+> +		r = of_regulator_dev_lookup(dev, supply);
+> +		if (PTR_ERR(r) == -ENODEV)
+> +			r = NULL;
+> +	}
+> +
+> +	return r;
+> +}
+...
+>  static int regulator_resolve_supply(struct regulator_dev *rdev)
+>  {
+> -	struct regulator_dev *r;
+>  	struct device *dev = rdev->dev.parent;
+> +	struct regulator_dev *r = NULL;
+>  	struct ww_acquire_ctx ww_ctx;
+>  	int ret = 0;
+>  
+> @@ -2015,7 +2022,18 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
+>  	if (rdev->supply)
+>  		return 0;
+>  
+> -	r = regulator_dev_lookup(dev, rdev->supply_name);
+> +	/* first do a dt based lookup on the node described in the virtual
+> +	 * device.
+> +	 */
+> +	if (rdev->dev.of_node)
 
-Signed-off-by: Ilia Lin <ilia.lin@kernel.org>
----
- net/ipv4/xfrm4_output.c | 31 +++++++++++++++++++++++++++++--
- net/ipv6/xfrm6_output.c |  8 ++++++--
- 2 files changed, 35 insertions(+), 4 deletions(-)
+regulator_dt_lookup() is already doing dev.of_node check, this one can
+be removed.
 
-diff --git a/net/ipv4/xfrm4_output.c b/net/ipv4/xfrm4_output.c
-index 3cff51ba72bb0..a4271e0dd51bb 100644
---- a/net/ipv4/xfrm4_output.c
-+++ b/net/ipv4/xfrm4_output.c
-@@ -14,17 +14,44 @@
- #include <net/xfrm.h>
- #include <net/icmp.h>
- 
-+static int __xfrm4_output_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
-+{
-+	return xfrm_output(sk, skb);
-+}
-+
- static int __xfrm4_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
--#ifdef CONFIG_NETFILTER
--	struct xfrm_state *x = skb_dst(skb)->xfrm;
-+	struct dst_entry *dst = skb_dst(skb);
-+	struct xfrm_state *x = dst->xfrm;
-+	unsigned int mtu;
-+	bool toobig;
- 
-+#ifdef CONFIG_NETFILTER
- 	if (!x) {
- 		IPCB(skb)->flags |= IPSKB_REROUTED;
- 		return dst_output(net, sk, skb);
- 	}
- #endif
- 
-+	if (x->props.mode != XFRM_MODE_TUNNEL || x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-+		goto skip_frag;
-+
-+	mtu = xfrm_state_mtu(x, dst_mtu(skb_dst(skb)));
-+
-+	toobig = skb->len > mtu && !skb_is_gso(skb);
-+
-+	if (!skb->ignore_df && toobig && skb->sk) {
-+		xfrm_local_error(skb, mtu);
-+		kfree_skb(skb);
-+		return -EMSGSIZE;
-+	}
-+
-+	if (toobig) {
-+		IPCB(skb)->frag_max_size = mtu;
-+		return ip_do_fragment(net, sk, skb, __xfrm4_output_finish);
-+	}
-+
-+skip_frag:
- 	return xfrm_output(sk, skb);
- }
- 
-diff --git a/net/ipv6/xfrm6_output.c b/net/ipv6/xfrm6_output.c
-index 5f7b1fdbffe62..fdd2f2f5adc71 100644
---- a/net/ipv6/xfrm6_output.c
-+++ b/net/ipv6/xfrm6_output.c
-@@ -75,10 +75,14 @@ static int __xfrm6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 	if (x->props.mode != XFRM_MODE_TUNNEL)
- 		goto skip_frag;
- 
--	if (skb->protocol == htons(ETH_P_IPV6))
-+	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET) {
-+		mtu = xfrm_state_mtu(x, dst_mtu(skb_dst(skb)));
-+		IP6CB(skb)->frag_max_size = mtu;
-+	} else if (skb->protocol == htons(ETH_P_IPV6)) {
- 		mtu = ip6_skb_dst_mtu(skb);
--	else
-+	} else {
- 		mtu = dst_mtu(skb_dst(skb));
-+	}
- 
- 	toobig = skb->len > mtu && !skb_is_gso(skb);
- 
+> +		r = regulator_dt_lookup(&rdev->dev, rdev->supply_name);
+> +
+> +	/* If regulator not found use usual search path in the parent
+> +	 * device.
+> +	 */
+> +	if (!r)
+> +		r = regulator_dev_lookup(dev, rdev->supply_name);
+> +
+>  	if (IS_ERR(r)) {
+>  		ret = PTR_ERR(r);
+>  
+
+With remove dev.of_node check:
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+
 -- 
-2.25.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
