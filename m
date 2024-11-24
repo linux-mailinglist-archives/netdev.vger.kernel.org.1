@@ -1,98 +1,158 @@
-Return-Path: <netdev+bounces-147115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1759D791E
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 00:21:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB669D7929
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 00:43:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FC52281FB7
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 23:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C95AC2826F3
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 23:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3755A183CC2;
-	Sun, 24 Nov 2024 23:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC74156F5D;
+	Sun, 24 Nov 2024 23:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OdBrT1K8"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JdIAXh5N";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0v86LT+E";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JdIAXh5N";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0v86LT+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201611632F1
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 23:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADFF17E017
+	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 23:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732490471; cv=none; b=Idu/i4343aPcBeIZdORM/JYx23kkiIFovTaMyz4xlxuSCMSzU6nWcfVEFRVrLWN6EcdSyse9f5FigKyj2yF9zNbU/gyUXuJmc/306PVLUJLN07Tc68C+gLeANEVLej7PRyqVUkZTi8QdaJvBQOOCwiDSEIT4hrmomPQi3ZodOZc=
+	t=1732491806; cv=none; b=ToRVYTLkf3ThehIUrUo9OqZqOQ67SC3z1Mq5vTa5vnvoTP4ALY6f7oNnSPItFAJ7DR9bWPHtV/CRj8OWZzvPSBQtdREP044rtu4mINyWcwQJ3yLFnkI/fAmYjFxzICJhiyThIljPJ8SfxPkgcEZFM01CABX5IBkN9jENXHQJUTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732490471; c=relaxed/simple;
-	bh=g8Gg7KoC1668g0Cc44xWKwYM/GErM+FSvWy4zaSlyXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ubpcmqrq8+nV5ABawRFzDocihxD4KeABkWGx+4MTuZzKf9fLvoLKegleJHxGntywWJBrC5yea+v6EgPGcgAQdyYF1djzsHj+Ps6Q0ASz+w51xFWR2A9W9q6YdwQvG2jCMtW6gXZVrlfQPmMKRnVczwLQjGstS7G2Won2+QEIcwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OdBrT1K8; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=7b3zEdAzBT9slW1FPib2Z5UTZBOCkOV5sUgpgXgSgRg=; b=OdBrT1K8LHsJhtLVZoKAStoglT
-	YVr88yTPKuYqspoeC0AF99xNVycKXyBJQgSkmRRnHLN+x3dEmvSUSBJredpAXjG9jmGA+Kohp2Oxj
-	vA3U9AYAH09mych9q6M+8mg5DB8ZvpKRhN4/cHLCaXbbxE3bP/IF3G/RMvXFTVV7Gxw8rW6o9dGkn
-	s1TiDkaYV6z8yPwbgkegel2ys7RN/NHF+gkDDn+x0pas+trc2wDq8P/20eNSVoA4yHNOqIjyURqVl
-	HH0/znO+6ujtWBBUPo25f2IRDrbKYLlY0FeTUkZCGoy5BBHN5NKPNl5slNfoV5Kj2mRUysWCF8DPe
-	vrJcc2fA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tFLuS-001QUM-1E;
-	Mon, 25 Nov 2024 07:20:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Nov 2024 07:20:56 +0800
-Date: Mon, 25 Nov 2024 07:20:56 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: NeilBrown <neilb@suse.de>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
-	Thomas Graf <tgraf@suug.ch>, netdev@vger.kernel.org
-Subject: Re: rhashtable issue - -EBUSY
-Message-ID: <Z0O02AvPs664hJAa@gondor.apana.org.au>
-References: <>
- <Z0L8LQeZwtvhJ2Ft@gondor.apana.org.au>
- <173248978347.1734440.11538643613787576556@noble.neil.brown.name>
+	s=arc-20240116; t=1732491806; c=relaxed/simple;
+	bh=NT8YzLSzORufnUUwG1oBmgWrLkbxPn52zh8Ip36Q0i0=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=ZW4KXalAKGe0t5THR982ldLkPNv3PTiOGi6xbXyGM6yBeE3ouJlmwTpSV+yb5mH+n1tXuoYd/1FytkPcW79taJduO77/qyIJF1s3XgpUJwRGobeZzx62FpCoSHfhL9H72blLSt8sFb81SuZ5REQatyx4/Q8GqTjKP1w0h0Yi4e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JdIAXh5N; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0v86LT+E; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JdIAXh5N; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0v86LT+E; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C7C6521189;
+	Sun, 24 Nov 2024 23:43:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732491802; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hSDjACpvENEkB1yzni7clI4Ewzc/zs26B+UliJw5U64=;
+	b=JdIAXh5N5DtqHzqtm9eOger/WQ3CCVJHRA+GrAqinzs5FEPb5stn8O00ZastDdbLG7Vdk/
+	DrRQZ2mShAPZZvd5g/j1Aow7sB16fOj/Oz9zvMvLdRT3onji2cX5VUN5UUP+ct4FMsfPL1
+	6iNnBhCjsBuj7dKD5OlE9r7rZSH4l6c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732491802;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hSDjACpvENEkB1yzni7clI4Ewzc/zs26B+UliJw5U64=;
+	b=0v86LT+E42JTHolydA8j/7Vm5D/L8WARS0JmsKTMjRHanOIabhQXGVY09oAX7XbGICpXAr
+	0AW3LlaXhSKm+yBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732491802; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hSDjACpvENEkB1yzni7clI4Ewzc/zs26B+UliJw5U64=;
+	b=JdIAXh5N5DtqHzqtm9eOger/WQ3CCVJHRA+GrAqinzs5FEPb5stn8O00ZastDdbLG7Vdk/
+	DrRQZ2mShAPZZvd5g/j1Aow7sB16fOj/Oz9zvMvLdRT3onji2cX5VUN5UUP+ct4FMsfPL1
+	6iNnBhCjsBuj7dKD5OlE9r7rZSH4l6c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732491802;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hSDjACpvENEkB1yzni7clI4Ewzc/zs26B+UliJw5U64=;
+	b=0v86LT+E42JTHolydA8j/7Vm5D/L8WARS0JmsKTMjRHanOIabhQXGVY09oAX7XbGICpXAr
+	0AW3LlaXhSKm+yBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E8C5413676;
+	Sun, 24 Nov 2024 23:43:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id OL56Ihi6Q2dGRgAAD6G6ig
+	(envelope-from <neilb@suse.de>); Sun, 24 Nov 2024 23:43:20 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <173248978347.1734440.11538643613787576556@noble.neil.brown.name>
+From: "NeilBrown" <neilb@suse.de>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: "Kent Overstreet" <kent.overstreet@linux.dev>,
+ "Thomas Graf" <tgraf@suug.ch>, netdev@vger.kernel.org
+Subject: Re: rhashtable issue - -EBUSY
+In-reply-to: <Z0O02AvPs664hJAa@gondor.apana.org.au>
+References: <>, <Z0O02AvPs664hJAa@gondor.apana.org.au>
+Date: Mon, 25 Nov 2024 10:43:16 +1100
+Message-id: <173249179605.1734440.169960974865430595@noble.neil.brown.name>
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.994];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_THREE(0.00)[4]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Mon, Nov 25, 2024 at 10:09:43AM +1100, NeilBrown wrote:
->
-> When writing code I don't only want to guard against problems that I can
-> reproduce.  I want to guard against any problem that is theoretically
-> possible.   Unless you can explain why -EBUSY is not possible, I have to
-> write code to handle it.
+On Mon, 25 Nov 2024, Herbert Xu wrote:
+> On Mon, Nov 25, 2024 at 10:09:43AM +1100, NeilBrown wrote:
+> >
+> > When writing code I don't only want to guard against problems that I can
+> > reproduce.  I want to guard against any problem that is theoretically
+> > possible.   Unless you can explain why -EBUSY is not possible, I have to
+> > write code to handle it.
+> 
+> I just explained to you that it's extremely unlikely (e.g., less
+> than the chance of a cosmic ray flipping your DRAM) for you to get
+> EBUSY.
+> 
+> Not only do you have to have an extremely long hash chain (> 16)
+> to get EBUSY, you also need to have a hash table that is less than
+> 75% full, and that there is an outstanding rehash on the table.
+> 
+> Admittedly the last condition is a bit loose right now because it
+> also includes routine rehashes such as growing/shrinking and I will
+> fix that up.
+> 
+> So there is no reason why you should handle EBUSY, it chould be
+> turned into a WARN_ON_ONCE.
+> 
 
-I just explained to you that it's extremely unlikely (e.g., less
-than the chance of a cosmic ray flipping your DRAM) for you to get
-EBUSY.
+So please turn it into a WARN_ON_ONCE and don't allow the code to return
+it.
 
-Not only do you have to have an extremely long hash chain (> 16)
-to get EBUSY, you also need to have a hash table that is less than
-75% full, and that there is an outstanding rehash on the table.
-
-Admittedly the last condition is a bit loose right now because it
-also includes routine rehashes such as growing/shrinking and I will
-fix that up.
-
-So there is no reason why you should handle EBUSY, it chould be
-turned into a WARN_ON_ONCE.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+NeilBrown
 
