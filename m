@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-147078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885199D756E
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:41:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6DD99D756F
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B10C281A9B
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:41:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0ACA285DD4
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9AA2500BA;
-	Sun, 24 Nov 2024 15:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCE32500C7;
+	Sun, 24 Nov 2024 15:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TvgJAodM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtvHZoJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5182500A8
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 15:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF022500C1
+	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 15:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732462879; cv=none; b=Ldf4H+QFjmi629hBBTwYdbdlQgGINPeCdTnkKnLCBM113+h4VaE9rOq2aoe1Ot7W88GfqnavplRcByxZR/kg+0rQgve276UVmp/Nz60jPHFATtPMUHrI590UP4smvZKcpNEemEx/ZEWXdLzhjKIMPglwfXovEmd3mGNXdgRDMxc=
+	t=1732462882; cv=none; b=seAw8qaHhWHF56/aoPH70x07jdnmqDP7uF9RwwARrO9bVh73wsjHMweZGAxupICeFN7aOcRKHsG2lFy67lQdnJDEOW0IgkmRC7hG4jD+ctydhOv4+9NU+2NW6ltVyIn38pvEBwGm5NTSXVq1a4eMjc13CDNOaeWUdA4Lawi5GxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732462879; c=relaxed/simple;
-	bh=9kge41ycykT/5K/+bFAw+VkAwuhjcKqRCT7jd8uL1sA=;
+	s=arc-20240116; t=1732462882; c=relaxed/simple;
+	bh=EkMcyg62yhQl5MZ2gYa4HCwLzqoNntgE4+dVBT+ZtiY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FrO1xbi5TPPOVBQKKwSQ+FisuYgQMyC0QcJkZhny/qQ46ieo0a+SG6COBfgckj2RJpi/Yy9NYS2XHoNpEQvC5whVHpZaRgyghivw8z8VbAUs8cpDcDIbaeeSVjHbuRfMfEW5fOsgO3Y9S/OTZdSSats1Ij8rlPb/6tw9j4XoC5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TvgJAodM; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=e5pkamwKMzLH5BlIuUNFY5Dfg796V7LUDa6IBnXd1RkUiJW8nGv8q8EBclas/9oS4uCKHBjigyIgfGjNmBdV9dUJKiojNDmmTkVnt1yxlcrr9ScVr9denqnFBWRrqL4dMime7FIoRRUxdpha9r13mnsXbHYaXDdE/uIXVIYJmf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OtvHZoJU; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732462876;
+	s=mimecast20190719; t=1732462879;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V0uS4d19/YPP/e1WqoOKVFItq0uiFJ3bpCHZxiI9/+k=;
-	b=TvgJAodMuFdfS0UwgL8qOeHfGcETygXu0d646Jjy2oylk3NtFbwcK0Vah6uD26os7yR/MD
-	uXMMoLbP4YlRuuN94HhrqkyGhg1DHL90ehxp/1BZrcTZP4c+jG+JMELi+CimIXhkQqxWp/
-	JsHZxomFnrzr3Rj5j2CezlWm5XqAoE8=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=lkq6MMKBa3zNmJ5dD7xQGHTGWqMV4KQJ8Ft8c5Wmucw=;
+	b=OtvHZoJUtNFf+A57DpR4OBvFRbhwxym2FzSvMdVdc4M4/77HGtPOs/7gW451MBhuQnpNwb
+	qPgJ3tw7L9WMTsk6oPZnwDR2/WXO3/bN7zGUY5wi4i+eW8McKXdOXYejX2HdLzKnyEI4Mx
+	WwwpB9GOZq9X0TIGN7PgYZqGtHlBBKk=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-530-Ae-VR1sPOqG6ve4rbNsowA-1; Sun,
- 24 Nov 2024 10:41:12 -0500
-X-MC-Unique: Ae-VR1sPOqG6ve4rbNsowA-1
-X-Mimecast-MFC-AGG-ID: Ae-VR1sPOqG6ve4rbNsowA
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-341-6MqzUNu-MAOdCJU_LsnX5g-1; Sun,
+ 24 Nov 2024 10:41:15 -0500
+X-MC-Unique: 6MqzUNu-MAOdCJU_LsnX5g-1
+X-Mimecast-MFC-AGG-ID: 6MqzUNu-MAOdCJU_LsnX5g
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D2101955F43;
-	Sun, 24 Nov 2024 15:41:11 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBAAF19560AE;
+	Sun, 24 Nov 2024 15:41:13 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.39.192.28])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 69B891955F43;
-	Sun, 24 Nov 2024 15:41:08 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6B3711955F43;
+	Sun, 24 Nov 2024 15:41:11 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Eric Dumazet <edumazet@google.com>,
@@ -65,9 +65,9 @@ Cc: Eric Dumazet <edumazet@google.com>,
 	Simon Horman <horms@kernel.org>,
 	stefan.wiehler@nokia.com,
 	David Ahern <dsahern@kernel.org>
-Subject: [PATCH v2 net 1/3] ipmr: add debug check for mr table cleanup
-Date: Sun, 24 Nov 2024 16:40:56 +0100
-Message-ID: <64f267b5c0dd74f5bc8795b4ff868b5b103741da.1732289799.git.pabeni@redhat.com>
+Subject: [PATCH v2 net 2/3] ip6mr: fix tables suspicious RCU usage
+Date: Sun, 24 Nov 2024 16:40:57 +0100
+Message-ID: <3a8b03f560f0b4b447a227950e6e5283231d138b.1732289799.git.pabeni@redhat.com>
 In-Reply-To: <cover.1732289799.git.pabeni@redhat.com>
 References: <cover.1732289799.git.pabeni@redhat.com>
 Precedence: bulk
@@ -79,108 +79,132 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-The multicast route tables lifecycle, for both ipv4 and ipv6, is
-protected by RCU using the RTNL lock for write access. In many
-places a table pointer escapes the RCU (or RTNL) protected critical
-section, but such scenarios are actually safe because tables are
-deleted only at namespace cleanup time or just after allocation, in
-case of default rule creation failure.
+Several places call ip6mr_get_table() with no RCU nor RTNL lock.
+Add RCU protection inside such helper and provide a lockless variant
+for the few callers that already acquired the relevant lock.
 
-Tables freed at namespace cleanup time are assured to be alive for the
-whole netns lifetime; tables freed just after creation time are never
-exposed to other possible users.
+Note that some users additionally reference the table outside the RCU
+lock. That is actually safe as the table deletion can happen only
+after all table accesses are completed.
 
-Ensure that the free conditions are respected in ip{,6}mr_free_table, to
-document the locking schema and to prevent future possible introduction
-of 'table del' operation from breaking it.
-
+Fixes: e2d57766e674 ("net: Provide compat support for SIOCGETMIFCNT_IN6 and SIOCGETSGCNT_IN6.")
+Fixes: d7c31cbde4bc ("net: ip6mr: add RTM_GETROUTE netlink op")
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v1 -> v2:
- - fix build errors with CONFIG_IP{,V6}_MROUTE_MULTIPLE_TABLES=n
----
- net/ipv4/ipmr.c  | 14 ++++++++++++++
- net/ipv6/ip6mr.c | 14 ++++++++++++++
- 2 files changed, 28 insertions(+)
+ net/ipv6/ip6mr.c | 38 +++++++++++++++++++++++++++-----------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index c58dd78509a2..bac0776648e0 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -120,6 +120,11 @@ static void ipmr_expire_process(struct timer_list *t);
- 				lockdep_rtnl_is_held() ||		\
- 				list_empty(&net->ipv4.mr_tables))
- 
-+static bool ipmr_can_free_table(struct net *net)
-+{
-+	return !check_net(net) || !net->ipv4.mr_rules_ops;
-+}
-+
- static struct mr_table *ipmr_mr_table_iter(struct net *net,
- 					   struct mr_table *mrt)
- {
-@@ -302,6 +307,11 @@ EXPORT_SYMBOL(ipmr_rule_default);
- #define ipmr_for_each_table(mrt, net) \
- 	for (mrt = net->ipv4.mrt; mrt; mrt = NULL)
- 
-+static bool ipmr_can_free_table(struct net *net)
-+{
-+	return !check_net(net);
-+}
-+
- static struct mr_table *ipmr_mr_table_iter(struct net *net,
- 					   struct mr_table *mrt)
- {
-@@ -413,6 +423,10 @@ static struct mr_table *ipmr_new_table(struct net *net, u32 id)
- 
- static void ipmr_free_table(struct mr_table *mrt)
- {
-+	struct net *net = read_pnet(&mrt->net);
-+
-+	DEBUG_NET_WARN_ON_ONCE(!ipmr_can_free_table(net));
-+
- 	timer_shutdown_sync(&mrt->ipmr_expire_timer);
- 	mroute_clean_tables(mrt, MRT_FLUSH_VIFS | MRT_FLUSH_VIFS_STATIC |
- 				 MRT_FLUSH_MFC | MRT_FLUSH_MFC_STATIC);
 diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index d66f58932a79..b80fca894916 100644
+index b80fca894916..4147890fe98f 100644
 --- a/net/ipv6/ip6mr.c
 +++ b/net/ipv6/ip6mr.c
-@@ -108,6 +108,11 @@ static void ipmr_expire_process(struct timer_list *t);
- 				lockdep_rtnl_is_held() || \
- 				list_empty(&net->ipv6.mr6_tables))
+@@ -130,7 +130,7 @@ static struct mr_table *ip6mr_mr_table_iter(struct net *net,
+ 	return ret;
+ }
  
-+static bool ip6mr_can_free_table(struct net *net)
+-static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
++static struct mr_table *__ip6mr_get_table(struct net *net, u32 id)
+ {
+ 	struct mr_table *mrt;
+ 
+@@ -141,6 +141,16 @@ static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
+ 	return NULL;
+ }
+ 
++static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
 +{
-+	return !check_net(net) || !net->ipv6.mr6_rules_ops;
++	struct mr_table *mrt;
++
++	rcu_read_lock();
++	mrt = __ip6mr_get_table(net, id);
++	rcu_read_unlock();
++	return mrt;
 +}
 +
- static struct mr_table *ip6mr_mr_table_iter(struct net *net,
- 					    struct mr_table *mrt)
+ static int ip6mr_fib_lookup(struct net *net, struct flowi6 *flp6,
+ 			    struct mr_table **mrt)
  {
-@@ -291,6 +296,11 @@ EXPORT_SYMBOL(ip6mr_rule_default);
- #define ip6mr_for_each_table(mrt, net) \
- 	for (mrt = net->ipv6.mrt6; mrt; mrt = NULL)
+@@ -182,7 +192,7 @@ static int ip6mr_rule_action(struct fib_rule *rule, struct flowi *flp,
  
-+static bool ip6mr_can_free_table(struct net *net)
-+{
-+	return !check_net(net);
-+}
-+
- static struct mr_table *ip6mr_mr_table_iter(struct net *net,
- 					    struct mr_table *mrt)
- {
-@@ -392,6 +402,10 @@ static struct mr_table *ip6mr_new_table(struct net *net, u32 id)
+ 	arg->table = fib_rule_get_table(rule, arg);
  
- static void ip6mr_free_table(struct mr_table *mrt)
+-	mrt = ip6mr_get_table(rule->fr_net, arg->table);
++	mrt = __ip6mr_get_table(rule->fr_net, arg->table);
+ 	if (!mrt)
+ 		return -EAGAIN;
+ 	res->mrt = mrt;
+@@ -314,6 +324,8 @@ static struct mr_table *ip6mr_get_table(struct net *net, u32 id)
+ 	return net->ipv6.mrt6;
+ }
+ 
++#define __ip6mr_get_table ip6mr_get_table
++
+ static int ip6mr_fib_lookup(struct net *net, struct flowi6 *flp6,
+ 			    struct mr_table **mrt)
  {
-+	struct net *net = read_pnet(&mrt->net);
-+
-+	DEBUG_NET_WARN_ON_ONCE(!ip6mr_can_free_table(net));
-+
- 	timer_shutdown_sync(&mrt->ipmr_expire_timer);
- 	mroute_clean_tables(mrt, MRT6_FLUSH_MIFS | MRT6_FLUSH_MIFS_STATIC |
- 				 MRT6_FLUSH_MFC | MRT6_FLUSH_MFC_STATIC);
+@@ -392,7 +404,7 @@ static struct mr_table *ip6mr_new_table(struct net *net, u32 id)
+ {
+ 	struct mr_table *mrt;
+ 
+-	mrt = ip6mr_get_table(net, id);
++	mrt = __ip6mr_get_table(net, id);
+ 	if (mrt)
+ 		return mrt;
+ 
+@@ -425,13 +437,15 @@ static void *ip6mr_vif_seq_start(struct seq_file *seq, loff_t *pos)
+ 	struct net *net = seq_file_net(seq);
+ 	struct mr_table *mrt;
+ 
+-	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
+-	if (!mrt)
++	rcu_read_lock();
++	mrt = __ip6mr_get_table(net, RT6_TABLE_DFLT);
++	if (!mrt) {
++		rcu_read_unlock();
+ 		return ERR_PTR(-ENOENT);
++	}
+ 
+ 	iter->mrt = mrt;
+ 
+-	rcu_read_lock();
+ 	return mr_vif_seq_start(seq, pos);
+ }
+ 
+@@ -2292,11 +2306,13 @@ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
+ 	struct mfc6_cache *cache;
+ 	struct rt6_info *rt = dst_rt6_info(skb_dst(skb));
+ 
+-	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
+-	if (!mrt)
++	rcu_read_lock();
++	mrt = __ip6mr_get_table(net, RT6_TABLE_DFLT);
++	if (!mrt) {
++		rcu_read_unlock();
+ 		return -ENOENT;
++	}
+ 
+-	rcu_read_lock();
+ 	cache = ip6mr_cache_find(mrt, &rt->rt6i_src.addr, &rt->rt6i_dst.addr);
+ 	if (!cache && skb->dev) {
+ 		int vif = ip6mr_find_vif(mrt, skb->dev);
+@@ -2576,7 +2592,7 @@ static int ip6mr_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 		grp = nla_get_in6_addr(tb[RTA_DST]);
+ 	tableid = nla_get_u32_default(tb[RTA_TABLE], 0);
+ 
+-	mrt = ip6mr_get_table(net, tableid ?: RT_TABLE_DEFAULT);
++	mrt = __ip6mr_get_table(net, tableid ?: RT_TABLE_DEFAULT);
+ 	if (!mrt) {
+ 		NL_SET_ERR_MSG_MOD(extack, "MR table does not exist");
+ 		return -ENOENT;
+@@ -2623,7 +2639,7 @@ static int ip6mr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb)
+ 	if (filter.table_id) {
+ 		struct mr_table *mrt;
+ 
+-		mrt = ip6mr_get_table(sock_net(skb->sk), filter.table_id);
++		mrt = __ip6mr_get_table(sock_net(skb->sk), filter.table_id);
+ 		if (!mrt) {
+ 			if (rtnl_msg_family(cb->nlh) != RTNL_FAMILY_IP6MR)
+ 				return skb->len;
 -- 
 2.45.2
 
