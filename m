@@ -1,130 +1,101 @@
-Return-Path: <netdev+bounces-147076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D939D7754
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 19:29:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9706B9D7714
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 19:02:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46AA2B35677
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:35:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A333B221EB
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26091B85CC;
-	Sun, 24 Nov 2024 15:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488952500AB;
+	Sun, 24 Nov 2024 15:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiRmmF3k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989261B3923;
-	Sun, 24 Nov 2024 15:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EAF163
+	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 15:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732460672; cv=none; b=Xn8Ua7mYejtnj8fRTKha0XWAt8HOOdWrVS0LKUANei05B1wQwX2dk7DrsjS8dHgD7x/QJlkSxwFkHyXN9hoJBiqcJg7pMHZfcL2otYyIpLC8/k2//plB2+ctoqh553IaJkUB5jORf4nTLxR3VR4fdDT4DVhPs687WceQONNhYNc=
+	t=1732462878; cv=none; b=KVG8f0tgfgekpXdWvQxfXEEP0ZAs3nc01LzZInuI+S5PJZJHIspEmUjjS9Of/Vr6+t4y9tLh1ig69y5bL4oRMfIHvoDTJsnfD3z1d3Lji0bwEytO1OzOQ5ITmJzQEBnCuCftBmM8bdQ4/Al3sZtpFCaZglbxs08z4sKO/bX2Ahs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732460672; c=relaxed/simple;
-	bh=NzAhNdIviC4mcJCGvuq35Fppehjrbw/+lTWbWZ/mAFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hp7LtcLjf+xReX5WeC31r11hR+DkRcOR5mw+Uuw88XirkAnO0J8IMmZKTxRZAyF00kdJq8lo+N/lC+bG767WvvJD9X4y1i6mooPwPx9yxzEncUjC8/4LKXxrBqX5sthmn2i9wdjI+IvY5BlG599XsTDDsnJsOxBFiI4FOAiuk5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20911C4CECC;
-	Sun, 24 Nov 2024 15:04:27 +0000 (UTC)
-Date: Sun, 24 Nov 2024 20:34:22 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Chris Lew <quic_clew@quicinc.com>
-Cc: Johan Hovold <johan@kernel.org>,
+	s=arc-20240116; t=1732462878; c=relaxed/simple;
+	bh=EnqMQK8V+ibB/xD90DCg4FpSaGbMF/gH2c4hflIoTBA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d4XsE0mtQB3aHoyVHt+MiOHP4gJhHaezlnyj/xWRe1TX3po9SpxLabiE/mA52J7X+3kRcO7L+/4jPNw+W7GKii2HESKwhEPbPKHZZWPsjWtAjwXAKRz4Q8GVpp9W8EumlVgwYpwu8VvjUJMGKff6dm0GRVsIxeGV52U6FyQ33sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UiRmmF3k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732462874;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CVEm09tc+N9ZNnxoz1I43B8hzOsoZcsHpyevI/PhxN4=;
+	b=UiRmmF3k86Dh8B5m3Jj7fDg2ZZS0h1U+nZg0tfB+buHtZyWcjocO/yH8VqiqFIPsXi7fyg
+	EJDVJSR6rfoNqKSheGi62nOxx3uVWd7Y6FGxZZvK1d8l0xO52EPL6Lcb/GGMPaFOS9cNCs
+	Ijdask46mvD3EAsnZxR38ACbMOpNRKw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-MXVp3urRP8GKUHvzIEZu8A-1; Sun,
+ 24 Nov 2024 10:41:09 -0500
+X-MC-Unique: MXVp3urRP8GKUHvzIEZu8A-1
+X-Mimecast-MFC-AGG-ID: MXVp3urRP8GKUHvzIEZu8A
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E17AA19560AF;
+	Sun, 24 Nov 2024 15:41:07 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.39.192.28])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5CCA41955F43;
+	Sun, 24 Nov 2024 15:41:05 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Simon Horman <horms@kernel.org>,
-	Hemant Kumar <quic_hemantk@quicinc.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Maxim Kochetkov <fido_max@inbox.ru>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Bhaumik Bhatt <bbhatt@codeaurora.org>
-Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
-Message-ID: <20241124150422.nt67aonfknfhz3sc@thinkpad>
-References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
- <Zy3oyGLdsnDY9C0p@hovoldconsulting.com>
- <b1e22673-2768-445c-8c67-eae93206cca5@quicinc.com>
+	stefan.wiehler@nokia.com,
+	David Ahern <dsahern@kernel.org>
+Subject: [PATCH v2 net 0/3] net: fix mcast RCU splats
+Date: Sun, 24 Nov 2024 16:40:55 +0100
+Message-ID: <cover.1732289799.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b1e22673-2768-445c-8c67-eae93206cca5@quicinc.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Nov 21, 2024 at 04:28:41PM -0800, Chris Lew wrote:
-> 
-> 
-> On 11/8/2024 2:32 AM, Johan Hovold wrote:
-> > On Mon, Nov 04, 2024 at 05:29:37PM -0800, Chris Lew wrote:
-> > > From: Bhaumik Bhatt <bbhatt@codeaurora.org>
-> > > 
-> > > The call to qrtr_endpoint_register() was moved before
-> > > mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
-> > > callback can occur before the qrtr endpoint is registered.
-> > > 
-> > > Now the reverse can happen where qrtr will try to send a packet
-> > > before the channels are prepared. Add a wait in the sending path to
-> > > ensure the channels are prepared before trying to do a ul transfer.
-> > > 
-> > > Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
-> > > Reported-by: Johan Hovold <johan@kernel.org>
-> > > Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
-> > > Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
-> > > Signed-off-by: Chris Lew <quic_clew@quicinc.com>
-> > 
-> > > @@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
-> > >   	if (skb->sk)
-> > >   		sock_hold(skb->sk);
-> > > +	rc = wait_for_completion_interruptible(&qdev->prepared);
-> > > +	if (rc)
-> > > +		goto free_skb;
-> > > +
-> > >   	rc = skb_linearize(skb);
-> > >   	if (rc)
-> > >   		goto free_skb;
-> > > @@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
-> > >   	qdev->mhi_dev = mhi_dev;
-> > >   	qdev->dev = &mhi_dev->dev;
-> > >   	qdev->ep.xmit = qcom_mhi_qrtr_send;
-> > > +	init_completion(&qdev->prepared);
-> > >   	dev_set_drvdata(&mhi_dev->dev, qdev);
-> > >   	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
-> > > @@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
-> > >   		qrtr_endpoint_unregister(&qdev->ep);
-> > >   		return rc;
-> > >   	}
-> > > +	complete_all(&qdev->prepared);
-> > >   	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
-> > 
-> > While this probably works, it still looks like a bit of a hack.
-> > 
-> > Why can't you restructure the code so that the channels are fully
-> > initialised before you register or enable them instead?
-> > 
-> 
-> Ok, I think we will have to stop using the autoqueue feature of MHI and
-> change the flow to be mhi_prepare_for_transfer() -->
-> qrtr_endpoint_register() --> mhi_queue_buf(DMA_FROM_DEVICE). This would make
-> it so ul_transfers only happen after mhi_prepare_for_transfer() and
-> dl_transfers happen after qrtr_endpoint_register().
-> 
-> I'll take a stab at implementing this.
-> 
+This series addresses the RCU splat triggered by the forwarding
+mroute tests.
 
-Hmm, I thought 'autoqueue' was used for a specific reason. So it is not valid
-now?
+The first patch does not address any specific issue, but makes the
+following ones more clear. Patch 2 and 3 address the issue for ipv6 and
+ipv4 respectively.
 
-- Mani
+---
+v1 -> v2:
+ - fix build issues in patch 1/3
+
+Paolo Abeni (3):
+  ipmr: add debug check for mr table cleanup
+  ip6mr: fix tables suspicious RCU usage
+  ipmr: fix tables suspicious RCU usage
+
+ net/ipv4/ipmr.c  | 56 +++++++++++++++++++++++++++++++++++++-----------
+ net/ipv6/ip6mr.c | 52 ++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 84 insertions(+), 24 deletions(-)
 
 -- 
-மணிவண்ணன் சதாசிவம்
+2.45.2
+
 
