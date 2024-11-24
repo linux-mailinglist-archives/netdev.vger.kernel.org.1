@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-146959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4A49D71C5
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:54:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D369D72D7
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1690B42E7A
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 13:44:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58175B4496B
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 13:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CED01D63DE;
-	Sun, 24 Nov 2024 13:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7B61DFE3B;
+	Sun, 24 Nov 2024 13:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4tG9t8R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxGk/V9U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B491D618C;
-	Sun, 24 Nov 2024 13:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D4F1DFE33;
+	Sun, 24 Nov 2024 13:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455328; cv=none; b=Q9KBq9X+yVOlJfFos66Ixr3tcd+S2n5/SmvGer8bqsqaW4jBXyV4hwiVEtFrHVUzwaHSPvkse+UUzMNvMYLxcug9UN/undifbd+8umjFIDuDMfBfcqC2/I+7VlBm8BuJOcRS8MfvTiOiKc0j6Gcdk3/QnXlWyDNgf6P3tObmgm8=
+	t=1732455365; cv=none; b=ex2cIogcoeNDRkKzLrPD9rFKNH+xg7eZdh/KT6X230GcHrM76wejIx4w/KaA6ksrrBz0yLU+EWgkBAJWl3/fVxeBxw8b1V942Yx7ukaaMT+vdjDWIgGxJ7CGpBOC5JDxn7XBEQOvM0fD9QopOUtbPsitrlkF+o3AmcTh9UCiWKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455328; c=relaxed/simple;
-	bh=6AvXKilkxx9NwKtZt7nK5GeD+9xzUl/SgqY4EVdyi14=;
+	s=arc-20240116; t=1732455365; c=relaxed/simple;
+	bh=zFPlCJFfDBebf0bG6Mx9689tRjtn3qTTTMtEGdNV8GU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JpDV1lkYzhhqP782xBS/4GPPuPhVkjG/lIHhEiyK4QQT7VhOENlTZWIk0RKjXjOKTJBiYjJnsGLHUeaAas+dKeLNXFj9kVBmie9TT97Di0zZMQYlR2JUaFml5IX10P/eGFCuUBWbHcnV5BZbxEDADYQUaXofSGaAC8g+KWlXLYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4tG9t8R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C879C4CECC;
-	Sun, 24 Nov 2024 13:35:26 +0000 (UTC)
+	 MIME-Version; b=peBhMKDgKPAf2aWo/vKmn6N8eJFbYuiGFN4Yow5+4WVeYp2yxDw7Lv4YyzEecFq9gQAoePk6jtGeG6nldVwlChH7MQSwSGc1fJrkL4901hjhcW7oFxAqiEISTvg18kRdcnuAaPek9OysbbIdDGu6GB6EFwPNdcOQ3T6EB/A096Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxGk/V9U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48B45C4CED3;
+	Sun, 24 Nov 2024 13:36:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455327;
-	bh=6AvXKilkxx9NwKtZt7nK5GeD+9xzUl/SgqY4EVdyi14=;
+	s=k20201202; t=1732455364;
+	bh=zFPlCJFfDBebf0bG6Mx9689tRjtn3qTTTMtEGdNV8GU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X4tG9t8RmEp6TW6fMo5Qq93RZdP2mJFvYbTCYsxLfBtsVp8v5x6kpCt72QrB5ScCv
-	 R2SUXUWvve5jrU7FkKkvfIwJGvwjVzXXzxly0FMr2PKroCFRWB7NL9u3O36Udf83dK
-	 2Mci316A9rLGOXAI9Ue90eHGW8IFUfAjUQP+8Ys+dG6AUOggLdEH6zR1YezaTpsthg
-	 PdiWEBdvQk/K1O/kLN1frev94S7QFeMowSE3gXCe+MRM2WAWmuwWdd2gQ6cL5qgnsR
-	 uN3yykIiGCJvf3DllzFY3sxwUVqJYG25UsVk3o/0O6mrs7GKeKQieFlZHujVw1+R0L
-	 GEqAy4b4bncaQ==
+	b=nxGk/V9ULEKyBNygaSwckpgymXPzyA6rwHvuoksCsJgff386xXACtImfUKhbjYxqE
+	 brQWj6htuVKSanBAQr5Wt4vei5WXL3wke42Yh+1Nw0aLY/CHhxol/tZyfKDe7EvTEM
+	 DNpQatRV89cF+VFsGMf7sEsIwFHOE+C2fLJ2dvnZhUh8Z6ZeKRC6WGPlUDMY6Yzyq2
+	 fClh3VqDf5pse9Eka8DWhZyKqbguN4q0W+4LMjHyjf1AO79MTZ8vqeJ/VOrUpyis+9
+	 DfeKN3VdDit5L9GSC071Z8htVos8RXxsqZIYB7+q+tqYLpx12Fy83bGkjnn/JfVS4N
+	 n0kog02krWgiQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ignat Korchagin <ignat@cloudflare.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Shengyu Qu <wiagn233@outlook.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	linux@armlinux.org.uk,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
 	davem@davemloft.net,
-	dsahern@kernel.org,
-	pabeni@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 044/107] net: inet6: do not leave a dangling sk pointer in inet6_create()
-Date: Sun, 24 Nov 2024 08:29:04 -0500
-Message-ID: <20241124133301.3341829-44-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 056/107] net: sfp: change quirks for Alcatel Lucent G-010S-P
+Date: Sun, 24 Nov 2024 08:29:16 -0500
+Message-ID: <20241124133301.3341829-56-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124133301.3341829-1-sashal@kernel.org>
 References: <20241124133301.3341829-1-sashal@kernel.org>
@@ -70,73 +71,35 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.1
 Content-Transfer-Encoding: 8bit
 
-From: Ignat Korchagin <ignat@cloudflare.com>
+From: Shengyu Qu <wiagn233@outlook.com>
 
-[ Upstream commit 9df99c395d0f55fb444ef39f4d6f194ca437d884 ]
+[ Upstream commit 90cb5f1776ba371478e2b08fbf7018c7bd781a8d ]
 
-sock_init_data() attaches the allocated sk pointer to the provided sock
-object. If inet6_create() fails later, the sk object is released, but the
-sock object retains the dangling sk pointer, which may cause use-after-free
-later.
+Seems Alcatel Lucent G-010S-P also have the same problem that it uses
+TX_FAULT pin for SOC uart. So apply sfp_fixup_ignore_tx_fault to it.
 
-Clear the sock sk pointer on error.
-
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20241014153808.51894-8-ignat@cloudflare.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Shengyu Qu <wiagn233@outlook.com>
+Link: https://patch.msgid.link/TYCPR01MB84373677E45A7BFA5A28232C98792@TYCPR01MB8437.jpnprd01.prod.outlook.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv6/af_inet6.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ drivers/net/phy/sfp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index ba69b86f1c7d5..f60ec8b0f8ea4 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -252,31 +252,29 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
- 		 */
- 		inet->inet_sport = htons(inet->inet_num);
- 		err = sk->sk_prot->hash(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
- 	if (sk->sk_prot->init) {
- 		err = sk->sk_prot->init(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index a5684ef5884bd..dcec92625cf65 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -466,7 +466,8 @@ static void sfp_quirk_ubnt_uf_instant(const struct sfp_eeprom_id *id,
+ static const struct sfp_quirk sfp_quirks[] = {
+ 	// Alcatel Lucent G-010S-P can operate at 2500base-X, but incorrectly
+ 	// report 2500MBd NRZ in their EEPROM
+-	SFP_QUIRK_M("ALCATELLUCENT", "G010SP", sfp_quirk_2500basex),
++	SFP_QUIRK("ALCATELLUCENT", "G010SP", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
  
- 	if (!kern) {
- 		err = BPF_CGROUP_RUN_PROG_INET_SOCK(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
- out:
- 	return err;
- out_rcu_unlock:
- 	rcu_read_unlock();
- 	goto out;
-+out_sk_release:
-+	sk_common_release(sk);
-+	sock->sk = NULL;
-+	goto out;
- }
- 
- static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
+ 	// Alcatel Lucent G-010S-A can operate at 2500base-X, but report 3.2GBd
+ 	// NRZ in their EEPROM
 -- 
 2.43.0
 
