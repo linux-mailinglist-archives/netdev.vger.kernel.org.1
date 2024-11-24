@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-147043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099CE9D7750
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 19:29:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29F5B9D7485
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2624AC04E87
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:08:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04587B3DFA7
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F03240FEA;
-	Sun, 24 Nov 2024 13:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D70E1FBEA6;
+	Sun, 24 Nov 2024 13:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/tEkjCC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxVY6UT3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E510240FE5;
-	Sun, 24 Nov 2024 13:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521521FBEA2;
+	Sun, 24 Nov 2024 13:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456425; cv=none; b=X985C7ctovcpB96UK/QrslQsUA4OZOnsJBDn5j4aSU4bJOeg21udsLuY/qdvwiE7qRUTpCDDC0Y0kCqZONQOd6Ogn/XxaSqn3biHSFVy3M4f2QHOkhQbgipwnvY6Edm1TJwXif0zH9jGv09g0MSN2yYWUdWyodOy6+bqRQChITM=
+	t=1732456460; cv=none; b=cXd6fNV5T62nqfo+RIp1AdH+lp0hWVLJQ2LX8yIHnPBBfVJUKvDRDVkXI2f/6EhhiDVxzmGgP1qgIYgoK/CjqGaHRxWpd6luM8aRu2XHRzTmHRp8JY2I8D1scCstuu5WL/HzznfiJjp68wVgy72FudfYxMj/yiR0ICfzydQXhQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456425; c=relaxed/simple;
-	bh=pXZyNcESKO1/12y1rcyEuI8zYSSFEPtGF4s6DVtZrf4=;
+	s=arc-20240116; t=1732456460; c=relaxed/simple;
+	bh=u0snkxDIwv2nxbiqT7h6JLTyhIu6adGY5Qj7vAFbXKU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I02u4Kb2b/YCkFZt+ofTzjyhwnqL4LmiNgpc+GIUfyTH3p8/RPDiLE1t+Xut2MlQiC1OHNcVtkM2qm9EpP8UAe84fVn/RRT91bCe5o37TdjiVqMhmyTsK/drGcipvD7nWbO8afnjdx4xpjmq5NgM1Y9hy2PDuDhHiG+0BCR664w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/tEkjCC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B534EC4CED1;
-	Sun, 24 Nov 2024 13:53:43 +0000 (UTC)
+	 MIME-Version; b=VD7t+2a2H6cNloiUh8caK/Ginhn9QvPlk1wl38kOzAnoaEIIipmdoZBMqsVtTewIsMNJArJRJw0bPoIEEZKxBsE0ROw/4WK95ORZeyikDjFEkVdljYZI6kfLrCFdBSFdVB1nalZdCb4YMRwf7a4Xah0ieE9yM5WIFGd3/S6BYMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxVY6UT3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89549C4CED1;
+	Sun, 24 Nov 2024 13:54:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456425;
-	bh=pXZyNcESKO1/12y1rcyEuI8zYSSFEPtGF4s6DVtZrf4=;
+	s=k20201202; t=1732456459;
+	bh=u0snkxDIwv2nxbiqT7h6JLTyhIu6adGY5Qj7vAFbXKU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P/tEkjCCgqoNAKQ/YQ2YM9GjHFPyh8bSc8JNdAhIU3MibCOJ4TgLPGo8t9tkSpl97
-	 Yg7XDiMhpHv2dfzWVnI0Cxj+7rFJOfid3fIzI5bCmqI8yuTqBl5GOA7J9EL1aj7L8U
-	 I+xzWNtjKtkYpqmG6yMDSq6EM4qll2/skKoGSzBaYu1PsYwhucB9e01xkHikga02Xu
-	 u/B3hHtDs9ehMTWf8hHK7SN9Y3+5igKWI5zSTqfTNH+WscE3NvrqjI6qWNAynhSNu5
-	 3dKQShgIDaUaF6jEDWNOQ8GImGm8Z6ADbZaeUEuGJ6pkoKIjbdW+v/ocwh3OXw2OOk
-	 OAApMui/ELW3w==
+	b=oxVY6UT35FQKIw3kWx6UHhOGSwnwRtmJ7+0J7HcKUr3wn/+ZRkR63I1uLzEZLc2cE
+	 0MtqVLZc/pHP4AjTYdXCFD41XRE3voR/ljCyR9Wl63yCDZPwUmxISedqG/q86BFt9j
+	 6bKQA3Mv+ceCH8paiRHGftirfHiqj7YHtB11Q0YUSoU19o7mPtN44io/dhRczV4gAt
+	 ky73ugWIwOLJwG1Vfx1jjgjSYeFqk0kSL73wxpowdm2G2iIQi9d/oZbBFJIsG+i5/c
+	 PA8NOBmwBzNlHkEqxxYAPpN4/V+J2wb00snaraCfPxAt/9M5RRSof0xO8d0+i8agrc
+	 rG57Xn1e+SKRQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Breno Leitao <leitao@debian.org>,
-	Michal Kubiak <michal.kubiak@intel.com>,
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	nic_swsd@realtek.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	viro@zeniv.linux.org.uk,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 36/36] netpoll: Use rcu_access_pointer() in __netpoll_setup
-Date: Sun, 24 Nov 2024 08:51:50 -0500
-Message-ID: <20241124135219.3349183-36-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 05/33] r8169: don't apply UDP padding quirk on RTL8126A
+Date: Sun, 24 Nov 2024 08:53:17 -0500
+Message-ID: <20241124135410.3349976-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124135219.3349183-1-sashal@kernel.org>
-References: <20241124135219.3349183-1-sashal@kernel.org>
+In-Reply-To: <20241124135410.3349976-1-sashal@kernel.org>
+References: <20241124135410.3349976-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,45 +68,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.173
+X-stable-base: Linux 5.10.230
 Content-Transfer-Encoding: 8bit
 
-From: Breno Leitao <leitao@debian.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
 
-[ Upstream commit c69c5e10adb903ae2438d4f9c16eccf43d1fcbc1 ]
+[ Upstream commit 87e26448dbda4523b73a894d96f0f788506d3795 ]
 
-The ndev->npinfo pointer in __netpoll_setup() is RCU-protected but is being
-accessed directly for a NULL check. While no RCU read lock is held in this
-context, we should still use proper RCU primitives for consistency and
-correctness.
+Vendor drivers r8125/r8126 indicate that this quirk isn't needed
+any longer for RTL8126A. Mimic this in r8169.
 
-Replace the direct NULL check with rcu_access_pointer(), which is the
-appropriate primitive when only checking for NULL without dereferencing
-the pointer. This function provides the necessary ordering guarantees
-without requiring RCU read-side protection.
-
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Link: https://patch.msgid.link/20241118-netpoll_rcu-v1-1-a1888dcb4a02@debian.org
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/d1317187-aa81-4a69-b831-678436e4de62@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/netpoll.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 2a9d95368d5a2..597e83e2bce86 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -636,7 +636,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
- 		goto out;
- 	}
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 3aa1dda3406cd..b60add52f4497 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4155,8 +4155,8 @@ static unsigned int rtl8125_quirk_udp_padto(struct rtl8169_private *tp,
+ {
+ 	unsigned int padto = 0, len = skb->len;
  
--	if (!ndev->npinfo) {
-+	if (!rcu_access_pointer(ndev->npinfo)) {
- 		npinfo = kmalloc(sizeof(*npinfo), GFP_KERNEL);
- 		if (!npinfo) {
- 			err = -ENOMEM;
+-	if (rtl_is_8125(tp) && len < 128 + RTL_MIN_PATCH_LEN &&
+-	    rtl_skb_is_udp(skb) && skb_transport_header_was_set(skb)) {
++	if (len < 128 + RTL_MIN_PATCH_LEN && rtl_skb_is_udp(skb) &&
++	    skb_transport_header_was_set(skb)) {
+ 		unsigned int trans_data_len = skb_tail_pointer(skb) -
+ 					      skb_transport_header(skb);
+ 
+@@ -4180,9 +4180,15 @@ static unsigned int rtl8125_quirk_udp_padto(struct rtl8169_private *tp,
+ static unsigned int rtl_quirk_packet_padto(struct rtl8169_private *tp,
+ 					   struct sk_buff *skb)
+ {
+-	unsigned int padto;
++	unsigned int padto = 0;
+ 
+-	padto = rtl8125_quirk_udp_padto(tp, skb);
++	switch (tp->mac_version) {
++	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
++		padto = rtl8125_quirk_udp_padto(tp, skb);
++		break;
++	default:
++		break;
++	}
+ 
+ 	switch (tp->mac_version) {
+ 	case RTL_GIGA_MAC_VER_34:
 -- 
 2.43.0
 
