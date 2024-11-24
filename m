@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-147062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5FB9D74D9
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:21:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B746B9D74EB
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44C8F286BAD
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:21:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D009286DCF
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C67248F02;
-	Sun, 24 Nov 2024 13:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5014A1FE454;
+	Sun, 24 Nov 2024 13:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjxWWmjH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tCAz8iX+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD53D248362;
-	Sun, 24 Nov 2024 13:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F651FE44D;
+	Sun, 24 Nov 2024 13:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456575; cv=none; b=cLPJgEb3jmQgaC3q554Jsckp42O8Xg+X/fvRIOYFlKBuLkv5tGxLAyW5/5RDHj2HkNAJNOiy+qEILnUSxCd57YezmnSxPTURnMgWh855b9pYnSq033rI1c2Aamm1MdAmbOcWPyVr4sDd+evJCqIvsXuxoozFu2ue02KmVEjdOJM=
+	t=1732456592; cv=none; b=bPDfoMyUPD4ivwODanmxnwuUQ7q29tBKbAei4QdD1zXqsgiwuag7PtKeHk6xETYVrNfRWFcI8zkPm2oHOd1Zxcl0g1i26WU/nzKCz25GQg+/GXk5RHx/YoAfAcenA2G7P4BvzR++ZvbyEq9tDYcXsCOciFKi0gQzd0dKA89sL2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456575; c=relaxed/simple;
-	bh=vb6nFAQRKxt/olsyS36qmWgyo11KDXaPGNXwy1cxJag=;
+	s=arc-20240116; t=1732456592; c=relaxed/simple;
+	bh=ttcfOWb4cgTr6uMTNT+d9shflIzpo9/f8EQx30jS0AM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qtlg3UZVL+0l3HKjfTwS4bFmXepZ9NywroFgBCvs80SGw+wWBUw2TdK8rGImifUHbgOcoecn2r4ekf0GHT82/h9LlT1tO3itwReRHaTPpX0H18+jarnvP9QhMQyGyPLMAaFStxXe/40C8ou985PuIbOY6b6Cc34Uv1SvH+ZJdFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjxWWmjH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95FF7C4CED1;
-	Sun, 24 Nov 2024 13:56:13 +0000 (UTC)
+	 MIME-Version; b=WWtv0upUJKzKZY+W7tMBy6EVrFPDUoldfSxWrsvUYEWbC+NnYO5nSZnP5eDEXMp3lPuzOV95A6WxI0nZL3+HH1vjKXhivayokmbGt+ddDQp9eI++UmK2ukYY/HYE6mkb2fbN4cAAnT59riNbkd9UCJOfODrViE/DXS3r4AkygUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tCAz8iX+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DE09C4CECC;
+	Sun, 24 Nov 2024 13:56:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456574;
-	bh=vb6nFAQRKxt/olsyS36qmWgyo11KDXaPGNXwy1cxJag=;
+	s=k20201202; t=1732456592;
+	bh=ttcfOWb4cgTr6uMTNT+d9shflIzpo9/f8EQx30jS0AM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kjxWWmjHNfLHBrOrs8JTUqbCuQwr1ubcuqglfX1NHeDHJOnyHiNaUBu0MNmZBDdaU
-	 CrBk9PaL13zL00hzMF6vvAu2RedNBXElOFFN09DVwaxtW7gLRk8zEFpjQmIKresSOJ
-	 gZQbEG50q7gC04TSALyW7/gUYrn+4/MjdojDIqOrspBVwNC7oYAKTx5Q4cw5wlya1D
-	 RMp823GnCELjtJ3kWA99hyWtKBrkRPKwigvm36l/Jc4YytJLgXqR1lizTZrADeElop
-	 Ni9Y2A/r2bYGO9EzUVNEQwws1GS2PXKQvxnSTOoeL2aWaIFiQAm67PNpdg3QuQxv0h
-	 kwYkzXUkLeTmQ==
+	b=tCAz8iX+3uqTH0jauiEe97PYlAFnaNRldEK1ru+gmxeF3Oo4amZz3KSplHlgOO4Dx
+	 Q2WaxIEEqi8FD5b94dUZc7rybcnoj9QHFNg2bAwzDpXAwgYjbEqTeqUUL1b71UYdEl
+	 +tPBaiTvFe5Tetd+91HfjwTbNvsEHzMzYYKs2bIXGC1ugv6jsx1KO7wZLw0m5+G3qp
+	 IgHex1d7zoF+cFov1EGbMO8XGxI6Ixs0Q9JcjllaHEmk1MSWKiNKT2+f5TosZ2uw+M
+	 3ei1d1opxeFaLzgmrI+aDMZAMK+z0a+ZUwA5xdaSLLawUCfJNpdH+kJXKk6KwUA44G
+	 ij4HPShuH+Crw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ignat Korchagin <ignat@cloudflare.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Wei Fang <wei.fang@nxp.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	dsahern@kernel.org,
+	claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	imx@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 13/28] net: inet6: do not leave a dangling sk pointer in inet6_create()
-Date: Sun, 24 Nov 2024 08:55:13 -0500
-Message-ID: <20241124135549.3350700-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 20/28] net: enetc: add i.MX95 EMDIO support
+Date: Sun, 24 Nov 2024 08:55:20 -0500
+Message-ID: <20241124135549.3350700-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124135549.3350700-1-sashal@kernel.org>
 References: <20241124135549.3350700-1-sashal@kernel.org>
@@ -70,73 +73,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.286
 Content-Transfer-Encoding: 8bit
 
-From: Ignat Korchagin <ignat@cloudflare.com>
+From: Wei Fang <wei.fang@nxp.com>
 
-[ Upstream commit 9df99c395d0f55fb444ef39f4d6f194ca437d884 ]
+[ Upstream commit a52201fb9caa9b33b4d881725d1ec733438b07f2 ]
 
-sock_init_data() attaches the allocated sk pointer to the provided sock
-object. If inet6_create() fails later, the sk object is released, but the
-sock object retains the dangling sk pointer, which may cause use-after-free
-later.
+The verdor ID and device ID of i.MX95 EMDIO are different from LS1028A
+EMDIO, so add new vendor ID and device ID to pci_device_id table to
+support i.MX95 EMDIO.
 
-Clear the sock sk pointer on error.
-
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20241014153808.51894-8-ignat@cloudflare.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv6/af_inet6.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 7ee0bfea9de1d..845d77b0a7f03 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -251,31 +251,29 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
- 		 */
- 		inet->inet_sport = htons(inet->inet_num);
- 		err = sk->sk_prot->hash(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
- 	if (sk->sk_prot->init) {
- 		err = sk->sk_prot->init(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
+index fbd41ce01f068..aeffc3bd00afe 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
+@@ -3,6 +3,8 @@
+ #include <linux/of_mdio.h>
+ #include "enetc_mdio.h"
  
- 	if (!kern) {
- 		err = BPF_CGROUP_RUN_PROG_INET_SOCK(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
- out:
- 	return err;
- out_rcu_unlock:
- 	rcu_read_unlock();
- 	goto out;
-+out_sk_release:
-+	sk_common_release(sk);
-+	sock->sk = NULL;
-+	goto out;
- }
++#define NETC_EMDIO_VEN_ID	0x1131
++#define NETC_EMDIO_DEV_ID	0xee00
+ #define ENETC_MDIO_DEV_ID	0xee01
+ #define ENETC_MDIO_DEV_NAME	"FSL PCIe IE Central MDIO"
+ #define ENETC_MDIO_BUS_NAME	ENETC_MDIO_DEV_NAME " Bus"
+@@ -85,6 +87,7 @@ static void enetc_pci_mdio_remove(struct pci_dev *pdev)
  
- static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
+ static const struct pci_device_id enetc_pci_mdio_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_FREESCALE, ENETC_MDIO_DEV_ID) },
++	{ PCI_DEVICE(NETC_EMDIO_VEN_ID, NETC_EMDIO_DEV_ID) },
+ 	{ 0, } /* End of table. */
+ };
+ MODULE_DEVICE_TABLE(pci, enetc_pci_mdio_id_table);
 -- 
 2.43.0
 
