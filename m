@@ -1,141 +1,90 @@
-Return-Path: <netdev+bounces-146929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36ED19D6C7A
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 03:21:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 386BB9D6C80
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 03:33:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA00B16154A
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 02:21:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACD41161740
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 02:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D4836C;
-	Sun, 24 Nov 2024 02:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889371BF37;
+	Sun, 24 Nov 2024 02:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VN7gSIXB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZf8ax+y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B01D646;
-	Sun, 24 Nov 2024 02:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F05F1FC8;
+	Sun, 24 Nov 2024 02:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732414912; cv=none; b=jWNOUSq/0lDko/HwZC9aODz7gl/m/tjuEIGDmoYOm+rb/CYTaxjVd3M9+de2V1dTWEv7ov+MrseUOT8TV5Xr4Wp7jB0HzjEGNrX/OSRQPzl/JOJsyMJmN5nFoHkjTkZz9Xpc4PJ3aOOCnrK0BdlM2jap1M2lk1O1ihWIHQw9y10=
+	t=1732415633; cv=none; b=TpaWIk05CqfCI9dVA2bx6zpnk4uc44syVURarMOAXHStSnnCnmVQ05izNXvg7kZkoHbctUj7If7tJxgxiCw9tWKwTUvZrDCyxSpVBpaFDXzGFwi/cvRr1YAaWdPI3hMAcc6VbNH3QtDNKhwt+Da3B/wu+8KoLoM68i9NkCi0ZxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732414912; c=relaxed/simple;
-	bh=SKZUE0cCNrR3sYXzvMSRSV03xJOyooSZpAcGkiFGBYg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPNLYROzzKtO8ntW+60k3pvOmHKQH0GP8ep64JSYS5E5XSCvwKLjp9gzYrBb98APOaKbSrbWYsTRBkmMhCd7ZAPbd9rDN+kKUWv82LKCp1E2yhN5+/r/tOfCDCM0ylmep7jWu92+l5613cZakMWpc4NP79OM4OAJJ+Z8YBRBP4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VN7gSIXB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A8E8C4CECD;
-	Sun, 24 Nov 2024 02:21:51 +0000 (UTC)
+	s=arc-20240116; t=1732415633; c=relaxed/simple;
+	bh=MHgkf4950Dv/pXJOwCEapYXWpGGemZnM6ozWk9gJHL8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CFLu2s7tJvpGtyKLr3Y55BNpOs7kLK9sVIUTQSjD5ZHo0dITyrJoRnP8t+nyXo1TCCRdknxjkpRwKFZDJm4Zuu0mYxnejFZKhOKSydwWyfMxyZHpQnoNFhuj8VUpNIkZ7JVIvUthxC+6uV1/IkBY+Lg/2esREmlUu1oKvvdPHZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NZf8ax+y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E48C4CECD;
+	Sun, 24 Nov 2024 02:33:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732414911;
-	bh=SKZUE0cCNrR3sYXzvMSRSV03xJOyooSZpAcGkiFGBYg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VN7gSIXB+lCrG8d4GZbg9W3rl3ZLh3WBHvthw3gm+kbSwtK/6C9CPKcUja4vDjD2u
-	 mGl7sTAwi6rb71KPNyspkJel1SUj15kO/EZTwJ+NztkYSTX3F2gmQ9CHSCxzDpBAUw
-	 oClQXxyLSDv4W9WMuPoWrYfrWWCUgx+cgBHV/g04K79Pmgp/frMWlCudtCbslHGEgB
-	 wo8yORBy48MWjuYC/0UAULF3PJduDECLr44rQ7Xj2DkTLHnMBzmXiw98Qv4hKLpkOV
-	 1hXK49JvSM6ZSbwsNOJKqxyXycOO+rWdvPJvYxCnl2vDnKsSfKs6y4GADC+HDxNBUt
-	 KzUVNBgwqfDqw==
+	s=k20201202; t=1732415633;
+	bh=MHgkf4950Dv/pXJOwCEapYXWpGGemZnM6ozWk9gJHL8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NZf8ax+yKFnT5V6LPnNTtCVX5TJTuDlsIM52OkE2T5C/OFcyA1dR20z41kREc+n0p
+	 Q8XRZjyuEazlHNiVleRDwbfhiMBULQ3b3rRqbQAF36u0tc/NLapyOqteUjWXmuFGMk
+	 wyJQ/eQC7L2UYMZePrfu5lJyPSNr0CrYB098+TQmDfUciV02Wo2momHpn9OSDeD+vb
+	 JSTWH7RzyawDkT6ZUtyK/+XvzHy6wNvHpWE3PquzAQubI+kUlsEFVtEoLkJ82E3280
+	 TmmfZLj6ltV6dYaGpqnQdLZ6+1bmQNmkCBgn0OgfC3a+GT2q+TL50vVOvVRPu0Djdn
+	 XnIx5Vokkf8WQ==
+Date: Sat, 23 Nov 2024 18:33:51 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: edumazet@google.com
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	stable@vger.kernel.org,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Subject: [PATCH net v2] net_sched: sch_fq: don't follow the fast path if Tx is behind now
-Date: Sat, 23 Nov 2024 18:21:48 -0800
-Message-ID: <20241124022148.3126719-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.0
+To: Samiullah Khawaja <skhawaja@google.com>, Mina Almasry
+ <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, Willem
+ de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>,
+ linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
+ dmabuf memory provider
+Message-ID: <20241123183351.582aa8ac@kernel.org>
+In-Reply-To: <CAAywjhRb0Lb9fJocWBU1r01521sy71hLOaH=92gqceXqUOGHJg@mail.gmail.com>
+References: <20241107212309.3097362-1-almasrymina@google.com>
+	<20241107212309.3097362-5-almasrymina@google.com>
+	<20241108141812.GL35848@ziepe.ca>
+	<CAHS8izOVs+Tz2nFHMfiQ7=+hk6jKg46epO2f6Whfn07fNFOSRw@mail.gmail.com>
+	<20241115015912.GA559636@ziepe.ca>
+	<CAAywjhRb0Lb9fJocWBU1r01521sy71hLOaH=92gqceXqUOGHJg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Recent kernels cause a lot of TCP retransmissions
+On Fri, 22 Nov 2024 14:10:28 -0800 Samiullah Khawaja wrote:
+> > > > If you do this you may want to block accepting dmabufs that have CPU
+> > > > pages inside them.  
+> 
+> I believe we should be following the dmabuf API for this purpose, if
+> we really want to sync for CPU in. page_pool, and should not assume
+> the behaviour of the backing memory.
+> 
+> The dmabuf exporters are supposed to implement the begin_cpu_access
+> (optional) and the sync for cpu is done based on the exporter
+> implementation.
 
-[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-[  5]   0.00-1.00   sec  2.24 GBytes  19.2 Gbits/sec  2767    442 KBytes
-[  5]   1.00-2.00   sec  2.23 GBytes  19.1 Gbits/sec  2312    350 KBytes
-                                                      ^^^^
+DMABUF is a bit of a distraction here.
 
-Replacing the qdisc with pfifo makes retransmissions go away.
-
-It appears that a flow may have a delayed packet with a very near
-Tx time. Later, we may get busy processing Rx and the target Tx time
-will pass, but we won't service Tx since the CPU is busy with Rx.
-If Rx sees an ACK and we try to push more data for the delayed flow
-we may fastpath the skb, not realizing that there are already "ready
-to send" packets for this flow sitting in the qdisc.
-
-Don't trust the fastpath if we are "behind" according to the projected
-Tx time for next flow waiting in the Qdisc. Because we consider anything
-within the offload window to be okay for fastpath we must consider
-the entire offload window as "now".
-
-Qdisc config:
-
-qdisc fq 8001: dev eth0 parent 1234:1 limit 10000p flow_limit 100p \
-  buckets 32768 orphan_mask 1023 bands 3 \
-  priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 \
-  weights 589824 196608 65536 quantum 3028b initial_quantum 15140b \
-  low_rate_threshold 550Kbit \
-  refill_delay 40ms timer_slack 10us horizon 10s horizon_drop
-
-For iperf this change seems to do fine, the reordering is gone.
-The fastpath still gets used most of the time:
-
-  gc 0 highprio 0 fastpath 142614 throttled 418309 latency 19.1us
-   xx_behind 2731
-
-where "xx_behind" counts how many times we hit the new "return false".
-
-CC: stable@vger.kernel.org
-Fixes: 076433bd78d7 ("net_sched: sch_fq: add fast path for mostly idle qdisc")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - use Eric's condition (fix offload, don't care about throttled)
- - throttled -> delayed
- - explicitly CC stable, it won't build on 6.12 because of the offload
-   horizon, so make sure they don't just drop this
-v1: https://lore.kernel.org/20241122162108.2697803-1-kuba@kernel.org
-
-CC: jhs@mojatatu.com
-CC: xiyou.wangcong@gmail.com
-CC: jiri@resnulli.us
----
- net/sched/sch_fq.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index a97638bef6da..a5e87f9ea986 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -332,6 +332,12 @@ static bool fq_fastpath_check(const struct Qdisc *sch, struct sk_buff *skb,
- 		 */
- 		if (q->internal.qlen >= 8)
- 			return false;
-+
-+		/* Ordering invariants fall apart if some delayed flows
-+		 * are ready but we haven't serviced them, yet.
-+		 */
-+		if (q->time_next_delayed_flow <= now + q->offload_horizon)
-+			return false;
- 	}
- 
- 	sk = skb->sk;
--- 
-2.47.0
-
+What's key is that we need to fill in the gap in the driver facing
+page_pool API, because DMABUF will not be the only provider we can
+plug in.
 
