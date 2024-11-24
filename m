@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-146993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02E669D7317
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:28:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2B19D7329
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:30:04 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4613283EA4
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDBB4161D9D
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CA32144D0;
-	Sun, 24 Nov 2024 13:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD98217F5B;
+	Sun, 24 Nov 2024 13:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DfSfw6Q9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWw9mhSI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C1A21315D;
-	Sun, 24 Nov 2024 13:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CBF217F56;
+	Sun, 24 Nov 2024 13:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455919; cv=none; b=N+cm0stx2QcJOuHM5wk4U+/g35XuY9WTy9EPFG/Daa4swIVzW//jlJPTKn9fD/OXbpkAqSy1I8tS2wMD7im/JtE6sWHGvxQmrDeUsbof5KSptehTmsdjXuFtPI0oaai5mKcIqb3VAJuZ0oa1WI4kgt9UL0H5U1PBQbKPwgxCvVk=
+	t=1732455928; cv=none; b=aQuYFVLF9Kc1FUhbfs92WL5M1l0XB4F0T6EvXWMxjIZ1ITLisU+NqG9gZiY/Y0mYr9RG7ayG56cyI9zxdC072o2BR2vnr8I1NbmyZroSBVhyTEbCTf+HuGZzga52yQJdlE960n85oxmqBlPToFWqBBsUFxfvpoRV5AIjigR8t3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455919; c=relaxed/simple;
-	bh=2KnqPmJU9zRqPXj6Smoes6eWbShF/DU5+MUP6CJnSUA=;
+	s=arc-20240116; t=1732455928; c=relaxed/simple;
+	bh=EBXQHHhl/OS3VoyjoXIvuoikIpqqeSOh4dmng018dZk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TzbrxyApDdhTWFrLH2mhO+yWjeyd2Xsi3OatDAAszSaWb/ruA6Uk8gUK5Z282kHZf5kqq1JfTDfb/rsJYTRUuonDOHqRSfPNDvQlCbJgplcpkOWsoeW02i3dsPror7H9RldZZR7cRHKi7nnFgqMeJLraP/yyZW+XeK6byAgTxbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DfSfw6Q9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8638C4CED1;
-	Sun, 24 Nov 2024 13:45:17 +0000 (UTC)
+	 MIME-Version; b=UrygfTE5G5mpM8ZLDDcnm4vA/hd4kkGMv3L2XsdzqzQtHV8+NJ70sbfp6rctIA2IlOTnTR8Q90g15iAoh8r/m1dkkiJN38z+9BRHDEBtw1gsn3QF6vTqEHcR7dkAvw2bmTqWsRi76U6ANwwRUqH2lLwd8FpcwLx0Qbs0gSjb37Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWw9mhSI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760E8C4CED6;
+	Sun, 24 Nov 2024 13:45:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455919;
-	bh=2KnqPmJU9zRqPXj6Smoes6eWbShF/DU5+MUP6CJnSUA=;
+	s=k20201202; t=1732455928;
+	bh=EBXQHHhl/OS3VoyjoXIvuoikIpqqeSOh4dmng018dZk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DfSfw6Q92bcZEdPgwTJFqn0aNzq4VNI2VpZs084kjmjya5fcxo7eUwAQZW9i4HCsV
-	 U/Qgnv8Ji1sPk5ZIfgA4g2nG5q3NOT/riqltG7uaq2U8hWnEuNhjfPtkjRbikqJ0jE
-	 o0HZVHS95tJ6clyl1iDkGgjeZFXcerlbDVjVJoAbjiL8+cEGFFCcu7ebzlSE04FBxj
-	 uf/fqdSB1NHP2P7x5J4RufhXqW4hsEQ+fpbTVRge+1ykxx7GPHTwttJcikwBPlmkzK
-	 dG7xaDyHZVj13pTLZ99ggW0Y89y6Wr7g02d2rYISssvp18/o5++yJv4kUVSyzIfFN2
-	 95ydpES1VmIsA==
+	b=SWw9mhSIb//JKV7D6Bn2fPZsbhhvpxz1cGPfBHPVdL5O6m7oVeTouf5l4RJ1hZ4CA
+	 3qImCV4zLcnrC2HgCWH9sdJY8gvaB3aE9Is+eFuZ3XsGnaoqXbaADKSbaxbd+xmKup
+	 0Rg2oe15FKe2WkSYI6iO6m2N4hfVtf5bRrCDBeQj1r0nRx0a859oMv1upmb/V9y1zo
+	 gEcEe75B1Ty/Y7dW6rlVUK7rme/L6rg87XMMPFxDjCrozyHKNgVxAgsriokuffrJvz
+	 w/iDM724baf4bCtj9vzNacQVQUFSYpFx1o2+fez+LqHBEdVLQfCwYKESWWRlfm5BGX
+	 g8WUnv/pbJocA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Danil Pylaev <danstiv404@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
+	jiri@resnulli.us,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 80/87] Bluetooth: Add new quirks for ATS2851
-Date: Sun, 24 Nov 2024 08:38:58 -0500
-Message-ID: <20241124134102.3344326-80-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 85/87] rocker: fix link status detection in rocker_carrier_init()
+Date: Sun, 24 Nov 2024 08:39:03 -0500
+Message-ID: <20241124134102.3344326-85-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124134102.3344326-1-sashal@kernel.org>
 References: <20241124134102.3344326-1-sashal@kernel.org>
@@ -73,74 +70,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
-From: Danil Pylaev <danstiv404@gmail.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit 94464a7b71634037b13d54021e0dfd0fb0d8c1f0 ]
+[ Upstream commit e64285ff41bb7a934bd815bd38f31119be62ac37 ]
 
-This adds quirks for broken extended create connection,
-and write auth payload timeout.
+Since '1 << rocker_port->pport' may be undefined for port >= 32,
+cast the left operand to 'unsigned long long' like it's done in
+'rocker_port_set_enable()' above. Compile tested only.
 
-Signed-off-by: Danil Pylaev <danstiv404@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://patch.msgid.link/20241114151946.519047-1-dmantipov@yandex.ru
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci.h      | 14 ++++++++++++++
- include/net/bluetooth/hci_core.h | 10 ++++++----
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/rocker/rocker_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index d1d073089f384..33936134c29e0 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -300,6 +300,20 @@ enum {
- 	 */
- 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
+diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
+index e097ce3e69ea3..0d4d1627bd283 100644
+--- a/drivers/net/ethernet/rocker/rocker_main.c
++++ b/drivers/net/ethernet/rocker/rocker_main.c
+@@ -2502,7 +2502,7 @@ static void rocker_carrier_init(const struct rocker_port *rocker_port)
+ 	u64 link_status = rocker_read64(rocker, PORT_PHYS_LINK_STATUS);
+ 	bool link_up;
  
-+	/*
-+	 * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command is
-+	 * disabled. This is required for the Actions Semiconductor ATS2851
-+	 * based controllers, which erroneously claims to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
-+
-+	/*
-+	 * When this quirk is set, the command WRITE_AUTH_PAYLOAD_TIMEOUT is
-+	 * skipped. This is required for the Actions Semiconductor ATS2851
-+	 * based controllers, due to a race condition in pairing process.
-+	 */
-+	HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT,
-+
- 	/* When this quirk is set, MSFT extension monitor tracking by
- 	 * address filter is supported. Since tracking quantity of each
- 	 * pattern is limited, this feature supports tracking multiple
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 88265d37aa72e..94ddc86849733 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1871,8 +1871,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- 			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
- 
- /* Use ext create connection if command is supported */
--#define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
--
-+#define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
-+	!test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &(dev)->quirks))
- /* Extended advertising support */
- #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
- 
-@@ -1885,8 +1885,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-  * C24: Mandatory if the LE Controller supports Connection State and either
-  * LE Feature (LL Privacy) or LE Feature (Extended Advertising) is supported
-  */
--#define use_enhanced_conn_complete(dev) (ll_privacy_capable(dev) || \
--					 ext_adv_capable(dev))
-+#define use_enhanced_conn_complete(dev) ((ll_privacy_capable(dev) || \
-+					 ext_adv_capable(dev)) && \
-+					 !test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, \
-+						 &(dev)->quirks))
- 
- /* Periodic advertising support */
- #define per_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_PERIODIC_ADV))
+-	link_up = link_status & (1 << rocker_port->pport);
++	link_up = link_status & (1ULL << rocker_port->pport);
+ 	if (link_up)
+ 		netif_carrier_on(rocker_port->dev);
+ 	else
 -- 
 2.43.0
 
