@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-146989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC0A9D75C4
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 17:19:27 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1319D72DF
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:22:04 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21E37BC33EA
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:17:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFA9916431E
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78062205E16;
-	Sun, 24 Nov 2024 13:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034F320B215;
+	Sun, 24 Nov 2024 13:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJK1cL45"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oww4n/PC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B383205E0C;
-	Sun, 24 Nov 2024 13:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C823920ADF6;
+	Sun, 24 Nov 2024 13:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455863; cv=none; b=b7UFxPDnHSPFc0Tvnqjfy/fIP8npRtwSehDkujxHHeEZpVfZOmWi2XsMnIVrjBfWuR+tOJQX3lg0rC8r9PSaufyj2FMD/QG477o/OqKmlMNQyDUv/JeuIClvLTx46UQ2TqIXfNPZVWnlj3fKsy8HA25unUn3Yf8VG+Tw6DGWAOQ=
+	t=1732455887; cv=none; b=fgMOp+EOoi2IXNcQWxbThWQJ8iXePwaI7l4Lj5I0gAfM8chGzxW+SCbhCaj7eWgLaXE5sIPfCIf9j3391y8s8k6ObCvOtdIQnF3hdKM7omYO+F3UFJbbgC3xsxZ0LtcLoz95E74/Ova92Cgf5kfIfXgYRI77KVNJp7RMUIa12jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455863; c=relaxed/simple;
-	bh=IrncszXAlY37bheEyzX1W0R8+6aW7EZqwIL8KR6xRCk=;
+	s=arc-20240116; t=1732455887; c=relaxed/simple;
+	bh=uVOIo4cIj+9dGmsfKgijLyCuIznJYHDWuOrwvOYj2OE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YQ0agiBDZQJUkzIkgQmPq/cg5/ATeTv9bvCn+eLD33VGrq8SEvNxzUaiD27QkEn6//ROCclb9saVf8ViXDRIx3IuxMXYT7phmbDp0E2ct1yvrj37ID2aP/aIXahNbnkAlXLVus9OsoXCYwyVIhC7PRXnxeKY4SfbrCdsOc+SljA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jJK1cL45; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1833C4CECC;
-	Sun, 24 Nov 2024 13:44:21 +0000 (UTC)
+	 MIME-Version; b=EJIsbGBXrufwsHMXGC04Q6aL+1QXvDxoQBYA2N/QoWOg5iocvSbknMLpdU704Iw+jDTqVvquIbvl506ph7x2uSvEq3mO4FD2zHjhFri4isdsWzAGCwExlSHR34KMYxxSGo14W1HnL1KAtXdm3hRN2a/CS0xR8yiGOx1Jt9woQu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oww4n/PC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3259C4CED1;
+	Sun, 24 Nov 2024 13:44:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455863;
-	bh=IrncszXAlY37bheEyzX1W0R8+6aW7EZqwIL8KR6xRCk=;
+	s=k20201202; t=1732455887;
+	bh=uVOIo4cIj+9dGmsfKgijLyCuIznJYHDWuOrwvOYj2OE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jJK1cL45myoT4Pbl72PEScMPvxm0sja8FbR2Ps6CKqzp5mE+OGEcG0CUKNdFgsHCZ
-	 LSmWJ/SX8O+NVg4cb5Xzcru7xZ/4HPTzBmx44N9BF1tV5W646+dqUev0CrTdPxqbHm
-	 9NWIE70i+OWv9mNtcuutIlHEuN9+Xp0HbcBIpFTBnroELHrTKN/4XjQ8ZoKGUK/dTb
-	 DrYL8S1figl3K8Ik06jGZY9K5pXsFdG4e+v9oz0N4zPmFeN2xxZXzDpaWtKLvy4qLb
-	 oOTQWNi/qfpvHkM/yNKngaaXf7qNR7jUBG4nLs8yU4Ma9HEHdvXrWQq8hku9aLolmH
-	 posZLtv1x0khA==
+	b=Oww4n/PCt1Y5QOxS/zUZbYXNaOoq1FO4d/iK/+hoWK4tI7mh7MtLmIONccACOg7qz
+	 9fYFxkyWMh74J+zUPEFLLQWHESJ+525wD/BYdV9/+EpcNBV3O9hIbIbFVloPrLPnvj
+	 yuKGjCfxXCv8g8sL14LL14TO4EY2RHmxwVfks9q1fWoaQymDSykYojop9cFeGfVg/N
+	 WD2hhTRlA02lj/UVh0mL9VFyDpTTIC4Wf8oPT6If3RqJAIgvhA6NmCDJdELWfylrAD
+	 5E0V5Av2zJCqNvIRmZy2BVrKj6bfaeWYT8g6Uv9nQuoZnuBnHUB1nazZgoh+H+0FJ5
+	 0/o3b3EvfixjQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Wei Fang <wei.fang@nxp.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"Si-Wei Liu" <si-wei.liu@oracle.com>,
+	Darren Kenny <darren.kenny@oracle.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
+	mst@redhat.com,
 	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	imx@lists.linux.dev,
+	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 62/87] net: enetc: add i.MX95 EMDIO support
-Date: Sun, 24 Nov 2024 08:38:40 -0500
-Message-ID: <20241124134102.3344326-62-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 67/87] virtio-net: fix overflow inside virtnet_rq_alloc
+Date: Sun, 24 Nov 2024 08:38:45 -0500
+Message-ID: <20241124134102.3344326-67-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124134102.3344326-1-sashal@kernel.org>
 References: <20241124134102.3344326-1-sashal@kernel.org>
@@ -73,42 +74,78 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
-From: Wei Fang <wei.fang@nxp.com>
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-[ Upstream commit a52201fb9caa9b33b4d881725d1ec733438b07f2 ]
+[ Upstream commit 6aacd1484468361d1d04badfe75f264fa5314864 ]
 
-The verdor ID and device ID of i.MX95 EMDIO are different from LS1028A
-EMDIO, so add new vendor ID and device ID to pci_device_id table to
-support i.MX95 EMDIO.
+When the frag just got a page, then may lead to regression on VM.
+Specially if the sysctl net.core.high_order_alloc_disable value is 1,
+then the frag always get a page when do refill.
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Which could see reliable crashes or scp failure (scp a file 100M in size
+to VM).
+
+The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+of a new frag. When the frag size is larger than PAGE_SIZE,
+everything is fine. However, if the frag is only one page and the
+total size of the buffer and virtnet_rq_dma is larger than one page, an
+overflow may occur.
+
+The commit f9dac92ba908 ("virtio_ring: enable premapped mode whatever
+use_dma_api") introduced this problem. And we reverted some commits to
+fix this in last linux version. Now we try to enable it and fix this
+bug directly.
+
+Here, when the frag size is not enough, we reduce the buffer len to fix
+this problem.
+
+Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+Tested-by: Darren Kenny <darren.kenny@oracle.com>
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/virtio_net.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-index e178cd9375a13..e108cac8288d3 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-@@ -4,6 +4,8 @@
- #include <linux/of_mdio.h>
- #include "enetc_pf.h"
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 53a038fcbe991..c897afef0b414 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -946,9 +946,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+ 	void *buf, *head;
+ 	dma_addr_t addr;
  
-+#define NETC_EMDIO_VEN_ID	0x1131
-+#define NETC_EMDIO_DEV_ID	0xee00
- #define ENETC_MDIO_DEV_ID	0xee01
- #define ENETC_MDIO_DEV_NAME	"FSL PCIe IE Central MDIO"
- #define ENETC_MDIO_BUS_NAME	ENETC_MDIO_DEV_NAME " Bus"
-@@ -124,6 +126,7 @@ static void enetc_pci_mdio_remove(struct pci_dev *pdev)
+-	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+-		return NULL;
+-
+ 	head = page_address(alloc_frag->page);
  
- static const struct pci_device_id enetc_pci_mdio_id_table[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_FREESCALE, ENETC_MDIO_DEV_ID) },
-+	{ PCI_DEVICE(NETC_EMDIO_VEN_ID, NETC_EMDIO_DEV_ID) },
- 	{ 0, } /* End of table. */
- };
- MODULE_DEVICE_TABLE(pci, enetc_pci_mdio_id_table);
+ 	if (rq->do_dma) {
+@@ -2443,6 +2440,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+ 	len = SKB_DATA_ALIGN(len) +
+ 	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+ 
++	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
++		return -ENOMEM;
++
+ 	buf = virtnet_rq_alloc(rq, len, gfp);
+ 	if (unlikely(!buf))
+ 		return -ENOMEM;
+@@ -2545,6 +2545,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+ 	 */
+ 	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+ 
++	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
++		return -ENOMEM;
++
++	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
++		len -= sizeof(struct virtnet_rq_dma);
++
+ 	buf = virtnet_rq_alloc(rq, len + room, gfp);
+ 	if (unlikely(!buf))
+ 		return -ENOMEM;
 -- 
 2.43.0
 
