@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-147072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6406B9D751C
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:28:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB97A9D7530
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 16:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28E93284E5A
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:28:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 909D728810E
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531A824D91D;
-	Sun, 24 Nov 2024 13:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD6124F880;
+	Sun, 24 Nov 2024 13:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuizFY7P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E/BPhpIv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2948224D918;
-	Sun, 24 Nov 2024 13:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DCF24F87B;
+	Sun, 24 Nov 2024 13:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456650; cv=none; b=YdcTdiLw9H7lpsCmy0zRROwVkUABXVoe+0WtlnOrRU4KLcMlwRT0o0eKOTSfBCPh0jtQt5GCubBsYEVUvkKWXXZoEKJBRrAgC7n13lvF8xg8wY6w1+68o9Z8l30t2WijiL7Pr24x4ZL0MMbc6D7q137b7ZP47EFijpY3xdO3C4g=
+	t=1732456674; cv=none; b=OLDrtrjuHvA33pGtMcfsj+mOeXL0mOH6HhAQmjkE3ERy6xVkquRRY2p30/u1hDbQs92qqSWduEYZA6bSAaVbjxL9oQ6v/DWFACRV3lldhNlXOkENIHIKvyhN+FE955p2EH5hB2HbW421evw3YPNZIbbgwAo2C+VVfz8ekfEEvs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456650; c=relaxed/simple;
-	bh=E380sr4Hy676F8Xv/FDoioZLqP7w0J7HImFkZP80t4I=;
+	s=arc-20240116; t=1732456674; c=relaxed/simple;
+	bh=eMmAEwOzJ8pHIRIblxWdgDRhwBgDYr7wuDKZ33L19Cc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tat5iaxKJjbzu6AdCygy0vZ36ROms9+8KeSs+bU1R2Q2yMmTqrpERZ/hq2+Xs4hfG46PJFTHP2zmaZD8BwvB4lGKbjQUnmZvX3aQCbIDTLzQdM8OTnVmbP/c0l44MXbsJ7QUjan0pZD01kHm+8txgndqd2wTZCWjqywQVIAAN5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuizFY7P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C7E8C4CED3;
-	Sun, 24 Nov 2024 13:57:28 +0000 (UTC)
+	 MIME-Version; b=kbVsJoS8OU9ehFIfUslpGiLSGdOmSdmVlJsiauBJ0QZyxPh2jtoIJrlQoDPszTt+G+LlMMs/ujZXgq3aDaWe39nBzM9ymnDVZp3RvHkhboczkSlxdKzg0wwB6WvtT0MO1165Le55ipU7yv2RkOBzuspstQLgXzsxFmRGLaC+3KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E/BPhpIv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2987DC4CED1;
+	Sun, 24 Nov 2024 13:57:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456649;
-	bh=E380sr4Hy676F8Xv/FDoioZLqP7w0J7HImFkZP80t4I=;
+	s=k20201202; t=1732456674;
+	bh=eMmAEwOzJ8pHIRIblxWdgDRhwBgDYr7wuDKZ33L19Cc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UuizFY7P9MMOFM2+HhgB4kT2mBWLGrymg3a6I9fO2cVYiie/f/YTMH9bNPeOVUF87
-	 ILhLTuqB3gIMJMg5uxJ1UR0itgeZx9qgp4teLpwaPtDiCj2wabbxiuhmjN0hoXokC4
-	 XFDumcXsZFcxH54TXZ7Jowate6XvcjAUTgXaaW3syEmQ+X+RnBl4vSPo34EBUX9N6y
-	 HJobwIqyuLmeLlegZgLNUATLDo+sROl+OSYs+s9mYcvipaj0+0V4WSLprIrSFc9XAE
-	 jbRRdx7gu08OwQ3ZBvk1FXbpkc2ldGtT7vMKEqDutHfRuvUESmyRDtDq7KmfxDJGWt
-	 G9umSgtQtExzg==
+	b=E/BPhpIvgNUv+9OQ+mCwnzUEcrW0v2YPa7yLbQHf3qwroaeYwkAdekuzXeKKyASiW
+	 RsWsyiAEqNGICZNY9SMe1UPSIeD/gqgZjOeoL/SBxoBiVP5J/zdhEvfDUvm8ebQqPY
+	 ln1hRsYFcqsb/5PjWsLc+KSC5ggolXVrw3AbAV/jHrBtM/Zq581k7BSI5UWf3oFH/b
+	 R1NgJ2LxEAjHlbkVNne8t1Y5PM5DeRTNu58W7He5l2ULX2SGsXz5imrEaeWJXjbzIh
+	 rnvJRN73JZesViSh5uR5seuCg6aS8MOEvmH9rzzyNI7UMrsfoe+SC1PKOrFJb+lPN/
+	 ANsJSX97vxZQA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ignat Korchagin <ignat@cloudflare.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	jiri@resnulli.us,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	dsahern@kernel.org,
+	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 10/21] net: inet6: do not leave a dangling sk pointer in inet6_create()
-Date: Sun, 24 Nov 2024 08:56:43 -0500
-Message-ID: <20241124135709.3351371-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 20/21] rocker: fix link status detection in rocker_carrier_init()
+Date: Sun, 24 Nov 2024 08:56:53 -0500
+Message-ID: <20241124135709.3351371-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124135709.3351371-1-sashal@kernel.org>
 References: <20241124135709.3351371-1-sashal@kernel.org>
@@ -70,73 +70,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 4.19.324
 Content-Transfer-Encoding: 8bit
 
-From: Ignat Korchagin <ignat@cloudflare.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit 9df99c395d0f55fb444ef39f4d6f194ca437d884 ]
+[ Upstream commit e64285ff41bb7a934bd815bd38f31119be62ac37 ]
 
-sock_init_data() attaches the allocated sk pointer to the provided sock
-object. If inet6_create() fails later, the sk object is released, but the
-sock object retains the dangling sk pointer, which may cause use-after-free
-later.
+Since '1 << rocker_port->pport' may be undefined for port >= 32,
+cast the left operand to 'unsigned long long' like it's done in
+'rocker_port_set_enable()' above. Compile tested only.
 
-Clear the sock sk pointer on error.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20241014153808.51894-8-ignat@cloudflare.com
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://patch.msgid.link/20241114151946.519047-1-dmantipov@yandex.ru
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv6/af_inet6.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/rocker/rocker_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index f480436b84339..2de90056bdf22 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -253,31 +253,29 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
- 		 */
- 		inet->inet_sport = htons(inet->inet_num);
- 		err = sk->sk_prot->hash(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
- 	if (sk->sk_prot->init) {
- 		err = sk->sk_prot->init(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
+diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
+index 7d81de57b6f4c..184aceaf34e73 100644
+--- a/drivers/net/ethernet/rocker/rocker_main.c
++++ b/drivers/net/ethernet/rocker/rocker_main.c
+@@ -2535,7 +2535,7 @@ static void rocker_carrier_init(const struct rocker_port *rocker_port)
+ 	u64 link_status = rocker_read64(rocker, PORT_PHYS_LINK_STATUS);
+ 	bool link_up;
  
- 	if (!kern) {
- 		err = BPF_CGROUP_RUN_PROG_INET_SOCK(sk);
--		if (err) {
--			sk_common_release(sk);
--			goto out;
--		}
-+		if (err)
-+			goto out_sk_release;
- 	}
- out:
- 	return err;
- out_rcu_unlock:
- 	rcu_read_unlock();
- 	goto out;
-+out_sk_release:
-+	sk_common_release(sk);
-+	sock->sk = NULL;
-+	goto out;
- }
- 
- static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
+-	link_up = link_status & (1 << rocker_port->pport);
++	link_up = link_status & (1ULL << rocker_port->pport);
+ 	if (link_up)
+ 		netif_carrier_on(rocker_port->dev);
+ 	else
 -- 
 2.43.0
 
