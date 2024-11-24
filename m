@@ -1,265 +1,231 @@
-Return-Path: <netdev+bounces-146937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFA959D6D17
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 09:15:58 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6017616172F
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 08:15:55 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6DB13BADF;
-	Sun, 24 Nov 2024 08:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZPB0rp+"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 895AD9D6D3E
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 10:34:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5E31F95A
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 08:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 443DB281298
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 09:34:04 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317F5152196;
+	Sun, 24 Nov 2024 09:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YbZ1OtrN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5in47z97";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YbZ1OtrN";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5in47z97"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B5F136E
+	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 09:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732436154; cv=none; b=Cpodauyn+Uy3dDs2DW8dMw2PNW0TPcdR2P+5F8OAss+r71S9oLFUcCBvgRN7JR6zKoQVBfcT0JeX6GKFuM2Kg4rSjY9JSrQj3OpwHU0SZo7Xvm1PPa1jfjcjDAmBE9gZ4JVjrXh65Xx4Iq1Tc1XPSkD6THYx298xrzNrLLKP/xw=
+	t=1732440842; cv=none; b=AcGDBgHqGZj7o3BClbsm9uNPKRRD4O7Rn2cCKRNGwHLlxYeuIIbO7w5nxNAo4dxyevp8UJLF7bg0Wc7IBpTUTLPsu4jmm9yqZHU8kSJq/86iEnlA7OTp4JdudzFSMwnTOhuko+z7pxFu1txHuQ7rcMsgKuagXvSPcTUHhYbwHEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732436154; c=relaxed/simple;
-	bh=yiKuvWs6Sk8moKhXA4kLgU7rr/Lz1gPeWMnu7OXhVGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LzEFdfNNhSVrHORRvEkrMbQTzlbOh/mePF+HPpCIm/jX+wAb/KfxkSTg43lDQlKzkRbnQrIMKVp39YHkA0gI5ucpN+eASZetJw+ge+qVsXxNE7GNOyYEBLX0fe7qbWZT/LsA/StseCP2c46+QQSOA1GiYBrVvwBu21CIYePNXtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZPB0rp+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA27FC4CECF;
-	Sun, 24 Nov 2024 08:15:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732436154;
-	bh=yiKuvWs6Sk8moKhXA4kLgU7rr/Lz1gPeWMnu7OXhVGA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AZPB0rp+YZYA0yHVArZe24iTiJ2f7+d7M9I8RfXE3KlgeNz4QFX+kT8lzYRcfsJU+
-	 sEyS9uX684NBx1XgOOSaBOQ5N0DMehRnAq5rOKs63QbQN7uekflK0QyD2NprOayXh5
-	 +m6oK2q/t8FQ7YrCiTsosFFlQ7yqupA0c3vdlnOUVp7W1+2Mg8mhbZ5J0aFfwBuO32
-	 WS5wU+bP/Fi+tzxUOvWmH6dypioj2nKUX5ZDexPQBFgnjQZyFZYsQ2/xbVQgb4bgP3
-	 214rQdyZOHuCDuHJOXFDhLTUX3eToZ8pX7lNGtrIwJQx8kCuXNsguWmOHfQ6hAc8LM
-	 wEYIXUGYsL1Zg==
-Date: Sun, 24 Nov 2024 10:15:49 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Feng Wang <wangfe@google.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	antony.antony@secunet.com, pabeni@redhat.com
-Subject: Re: [PATCH v6] xfrm: add SA information to the offloaded packet when
- if_id is set
-Message-ID: <20241124081549.GD160612@unreal>
-References: <20241121215257.3879343-2-wangfe@google.com>
+	s=arc-20240116; t=1732440842; c=relaxed/simple;
+	bh=4oPmaEoaDr9k3VN0tSTwO/BYdWcdPrTalP4pgnrsiAw=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=DHJCTV1PDt658XSS4yL5kmr3dwVEDEcCQFBWQWCOgeDuatSeD64Qv45cDNbqd9tLvzKB/JnzfDTLHDO5kL+k60mWYSFtWyP8v8siS0ONSPa6vO8tCCpSX7BloxroiyTHLciOb5kkxnv+Ty6WcFe1P3z2pSI2PP5gAAUthWAVO6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YbZ1OtrN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5in47z97; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YbZ1OtrN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=5in47z97; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0DCB91F381;
+	Sun, 24 Nov 2024 09:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732440349; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0gDbEG/cskwlc2UpH2cr8qe1dmmSkUIOGeIH5R29caQ=;
+	b=YbZ1OtrN8Vp/t3c9vYjbebuAoANExhRvpL1h03aU+4bWYG/uwQ9kz9hPwBbBrCR1KQKrr8
+	KWzqIFjkNA1y7/6aap0o+syqo1Ll7S4nYJ5uxEoVxlWnxuqqaeTMaI1X4j+zDLsGHXyz3/
+	Hm251QLp4HxRMO4J3vqSIpHJpQmbtKY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732440349;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0gDbEG/cskwlc2UpH2cr8qe1dmmSkUIOGeIH5R29caQ=;
+	b=5in47z97EibjhJ4Bam+LmQd0uxj9jUdBufJLZOlROQsWfiEzZLUPWOUK8jpZ684Q/5whAt
+	poHK8quiQuHc30DQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=YbZ1OtrN;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=5in47z97
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1732440349; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0gDbEG/cskwlc2UpH2cr8qe1dmmSkUIOGeIH5R29caQ=;
+	b=YbZ1OtrN8Vp/t3c9vYjbebuAoANExhRvpL1h03aU+4bWYG/uwQ9kz9hPwBbBrCR1KQKrr8
+	KWzqIFjkNA1y7/6aap0o+syqo1Ll7S4nYJ5uxEoVxlWnxuqqaeTMaI1X4j+zDLsGHXyz3/
+	Hm251QLp4HxRMO4J3vqSIpHJpQmbtKY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1732440349;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0gDbEG/cskwlc2UpH2cr8qe1dmmSkUIOGeIH5R29caQ=;
+	b=5in47z97EibjhJ4Bam+LmQd0uxj9jUdBufJLZOlROQsWfiEzZLUPWOUK8jpZ684Q/5whAt
+	poHK8quiQuHc30DQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2B1A513676;
+	Sun, 24 Nov 2024 09:25:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id b+SRLxrxQmesdAAAD6G6ig
+	(envelope-from <neilb@suse.de>); Sun, 24 Nov 2024 09:25:46 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241121215257.3879343-2-wangfe@google.com>
+From: "NeilBrown" <neilb@suse.de>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: "Kent Overstreet" <kent.overstreet@linux.dev>,
+ "Thomas Graf" <tgraf@suug.ch>, netdev@vger.kernel.org
+Subject: Re: rhashtable issue - -EBUSY
+In-reply-to: <Z0KaexOJM1phuJKS@gondor.apana.org.au>
+References: <i3vf5e63aqbfvoywuftt7h3qd4abdzomdeuvp3ygmzgza4xjdt@qx36kyyxxkfi>,
+ <Z0KaexOJM1phuJKS@gondor.apana.org.au>
+Date: Sun, 24 Nov 2024 20:25:38 +1100
+Message-id: <173244033805.1734440.12627345429438896757@noble.neil.brown.name>
+X-Rspamd-Queue-Id: 0DCB91F381
+X-Spam-Score: -4.51
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Thu, Nov 21, 2024 at 09:52:58PM +0000, Feng Wang wrote:
-> In packet offload mode, append Security Association (SA) information
-> to each packet, replicating the crypto offload implementation.
+On Sun, 24 Nov 2024, Herbert Xu wrote:
+> On Sat, Nov 23, 2024 at 12:21:21PM -0500, Kent Overstreet wrote:
+> > I'm seeing an issue where rhashtable inserts sporadically return -EBUSY,
+> > thrown from rhashtable_insert_rehash() when there's already a rehash in
+> > progress, i.e. rehashes aren't keeping up.
+>=20
+> EBUSY should never happen *if* you're using the hash table correctly.
+> It is expected to happen if you insert multiple identical entries
+> into the same hash table (the correct thing to do in that case is
+> to use rhltable which is designed to accomodate multiple entries
+> with the same key).
 
-Please write explicitly WHY "replicating ..." is right thing to do and
-why current code is not enough.
+"*if* you're using the hash table correctly" seems to mean that you have
+chosen a hash function which is a sufficiently good fit for your
+incoming data stream.  With the best effort in the world you cannot
+provide a perfect guarantee of that - and most of us don't have the
+expertise to do better than use the default or something easily
+available in the library (and while we can mostly trust the libraries
+... https://lwn.net/Articles/687494/ ).
 
-The best thing will be to see how packet traversal in the netdev stack
-till it gets to the wire.
 
-> 
-> The XFRM_XMIT flag is set to enable packet to be returned immediately
-> from the validate_xmit_xfrm function, thus aligning with the existing
-> code path for packet offload mode.
+>=20
+> Now assuming that is not the case and you are using rhashtable
+> correctly, this is when an EBUSY will occur during an insert:
+>=20
+> 1) The hash table elasticity has been violated, meaning that
+> more than 16 entries are in a single chain.
+>=20
+> 2) The hash table is below 50% capacity (meaning that statistically
+> we do not expect 1) to be true).
+>=20
+> 3) An existing rehash is already taking place.
+>=20
+> The reason we have the EBUSY mechanism in place is to prevent
+> the case where we are being actively attacked by a hostile
+> actor, who has somehow compromised our hash function.
 
-This chunk was dropped mysteriously. It doesn't exist in the current patch.
-What type of testing did you perform? Can you please add it to the
-commit message?
+I think that in many cases this "cure" (i.e.  returning -EBUSY) is worse
+than the disease.
 
-According to the strongswan documentation https://docs.strongswan.org/docs/5.9/features/routeBasedVpn.html,
-"Traffic that’s routed to an XFRM interface, while no policies and SAs with matching interface ID exist,
-will be dropped by the kernel."
+I believe that inserting into a hash table should *always* succeed with
+zero possibility of failure.  Nil. None. Nought.  (or at least it should
+be possible to request this behaviour)
 
-It looks like the current code doesn't handle this case, does it?
+This is why I posted
 
-> 
-> This SA info helps HW offload match packets to their correct security
-> policies. The XFRM interface ID is included, which is used in setups
-> with multiple XFRM interfaces where source/destination addresses alone
-> can't pinpoint the right policy.
+  https://lore.kernel.org/all/152210718434.11435.6551477417902631683.stgit@no=
+ble/
 
-Please add an examples of iproute2 commands on how it is achieved,
-together with tcprdump examples of before and after.
+six years ago, but you wouldn't accept it.
 
-> 
-> Enable packet offload mode on netdevsim and add code to check the XFRM
-> interface ID.
+I understand that there might be situations where failure is tolerable
+and avoiding pathological hash patterns is preferred.  I imagine that in
+parts of the network layer were retry-on-failure is common, that might be
+a perfect fit.  But in other situations such as in filesystem internals,
+I think failure in intolerable.
+Failure should not just be extremely unlikely.  It should be
+mathematically impossible.=20
 
-You still need to add checks in existing drivers to make sure that SAs
-with if_id won't be offloaded.
+thanks,
+NeilBrown
 
-IMHO, netdevsim implementation is not a replacement to support
-out-of-tree code, but a way to help testing features without need to
-have complex HW, but still for the code which is in-tree.
+>=20
+> The first line of defence is to change our hash function and
+> conduct a rehash.  This is what would have occured if 3) is
+> false.
+>=20
+> Once a rehash is in place, if we hit 1) + 2) again, then it
+> means that our defence was futile and the hostile actor is
+> still able to create arbitrarily long hash chains (possibly
+> by compromising our RNG since we use that for the rehash),
+> and as we do not have any defence mechanism for that, it is
+> better to just fail.
+>=20
+> Of course this is meant to be impossible to hit in practice.
+> Whenever it has occurred in the past, it's always been because
+> people were tring to insert identical keyed entries into the
+> same table (Use rhltable instead).
+>=20
+> Theoretically it is also possible to hit this if your hash
+> table was immense (expected worst-case hash chain length is
+> log N / log log N), but it has never been hit in the past
+> with our default elasticity of 16.
+>=20
+> Cheers,
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>=20
 
-Thanks
-
-> 
-> Signed-off-by: wangfe <wangfe@google.com>
-> ---
-> v6: https://lore.kernel.org/all/20241119220411.2961121-1-wangfe@google.com/
->   - Fix code style to follow reverse x-mas tree order declaration.
-> v5: https://lore.kernel.org/all/20241112192249.341515-1-wangfe@google.com/
->   - Add SA information only when XFRM interface ID is non-zero.
-> v4: https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@google.com/
->   - Add offload flag check and only doing check when XFRM interface
->     ID is non-zero.
-> v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@google.com/
->   - Add XFRM interface ID checking on netdevsim in the packet offload
->     mode.
-> v2:
->   - Add why HW offload requires the SA info to the commit message
-> v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@google.com/
-> ---
-> ---
->  drivers/net/netdevsim/ipsec.c     | 32 ++++++++++++++++++++++++++++++-
->  drivers/net/netdevsim/netdevsim.h |  1 +
->  net/xfrm/xfrm_output.c            | 22 +++++++++++++++++++++
->  3 files changed, 54 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
-> index 88187dd4eb2d..5677b2acf9c0 100644
-> --- a/drivers/net/netdevsim/ipsec.c
-> +++ b/drivers/net/netdevsim/ipsec.c
-> @@ -153,7 +153,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
->  		return -EINVAL;
->  	}
->  
-> -	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO) {
-> +	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO &&
-> +	    xs->xso.type != XFRM_DEV_OFFLOAD_PACKET) {
->  		NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload type");
->  		return -EINVAL;
->  	}
-> @@ -169,6 +170,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
->  	memset(&sa, 0, sizeof(sa));
->  	sa.used = true;
->  	sa.xs = xs;
-> +	sa.if_id = xs->if_id;
->  
->  	if (sa.xs->id.proto & IPPROTO_ESP)
->  		sa.crypt = xs->ealg || xs->aead;
-> @@ -227,16 +229,31 @@ static bool nsim_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
->  	return true;
->  }
->  
-> +static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	return 0;
-> +}
-> +
-> +static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
-> +{
-> +}
-> +
->  static const struct xfrmdev_ops nsim_xfrmdev_ops = {
->  	.xdo_dev_state_add	= nsim_ipsec_add_sa,
->  	.xdo_dev_state_delete	= nsim_ipsec_del_sa,
->  	.xdo_dev_offload_ok	= nsim_ipsec_offload_ok,
-> +
-> +	.xdo_dev_policy_add     = nsim_ipsec_add_policy,
-> +	.xdo_dev_policy_delete  = nsim_ipsec_del_policy,
-> +
->  };
->  
->  bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
->  {
->  	struct sec_path *sp = skb_sec_path(skb);
->  	struct nsim_ipsec *ipsec = &ns->ipsec;
-> +	struct xfrm_offload *xo;
->  	struct xfrm_state *xs;
->  	struct nsim_sa *tsa;
->  	u32 sa_idx;
-> @@ -275,6 +292,19 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
->  		return false;
->  	}
->  
-> +	if (xs->if_id) {
-> +		if (xs->if_id != tsa->if_id) {
-> +			netdev_err(ns->netdev, "unmatched if_id %d %d\n",
-> +				   xs->if_id, tsa->if_id);
-> +			return false;
-> +		}
-> +		xo = xfrm_offload(skb);
-> +		if (!xo || !(xo->flags & XFRM_XMIT)) {
-> +			netdev_err(ns->netdev, "offload flag missing or wrong\n");
-> +			return false;
-> +		}
-> +	}
-> +
->  	ipsec->tx++;
->  
->  	return true;
-> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-> index bf02efa10956..4941b6e46d0a 100644
-> --- a/drivers/net/netdevsim/netdevsim.h
-> +++ b/drivers/net/netdevsim/netdevsim.h
-> @@ -41,6 +41,7 @@ struct nsim_sa {
->  	__be32 ipaddr[4];
->  	u32 key[4];
->  	u32 salt;
-> +	u32 if_id;
->  	bool used;
->  	bool crypt;
->  	bool rx;
-> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-> index e5722c95b8bb..3e9a1b17f37e 100644
-> --- a/net/xfrm/xfrm_output.c
-> +++ b/net/xfrm/xfrm_output.c
-> @@ -704,6 +704,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
->  {
->  	struct net *net = dev_net(skb_dst(skb)->dev);
->  	struct xfrm_state *x = skb_dst(skb)->xfrm;
-> +	struct xfrm_offload *xo;
-> +	struct sec_path *sp;
->  	int family;
->  	int err;
->  
-> @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
->  			kfree_skb(skb);
->  			return -EHOSTUNREACH;
->  		}
-> +		if (x->if_id) {
-> +			sp = secpath_set(skb);
-> +			if (!sp) {
-> +				XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-> +				kfree_skb(skb);
-> +				return -ENOMEM;
-> +			}
-> +
-> +			sp->olen++;
-> +			sp->xvec[sp->len++] = x;
-> +			xfrm_state_hold(x);
->  
-> +			xo = xfrm_offload(skb);
-> +			if (!xo) {
-> +				secpath_reset(skb);
-> +				XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-> +				kfree_skb(skb);
-> +				return -EINVAL;
-> +			}
-> +			xo->flags |= XFRM_XMIT;
-> +		}
->  		return xfrm_output_resume(sk, skb, 0);
->  	}
->  
-> -- 
-> 2.47.0.371.ga323438b13-goog
-> 
-> 
 
