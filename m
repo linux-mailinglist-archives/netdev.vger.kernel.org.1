@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-146968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF28E9D7416
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:58:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18EE9D71EF
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:56:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F31AB337D2
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 13:54:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B81212840CF
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 13:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C3B1B4F3D;
-	Sun, 24 Nov 2024 13:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBB41E8847;
+	Sun, 24 Nov 2024 13:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiso16q9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YbYtD7UM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D681E47D6;
-	Sun, 24 Nov 2024 13:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56A51E883E;
+	Sun, 24 Nov 2024 13:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455490; cv=none; b=EaP/fRlIGQGIjAPmwsDuRkytf21o/amu1nj3sY5FBwcQ5++xryZAKZsHB4A3RBcPfzzOV1gsHw/MunYUroy6V6YpsT5luRD76KzV5QJdfHTP00meAyAqVXdo2/LUQtyquZRpg4N2UcbxxAipIZ/YfpWAAlnrsIrAOFxhR7Vlm8c=
+	t=1732455508; cv=none; b=uufYeT10s8cEZ7VLCGtFNJH1sCi8R65M+R3MkX7e7dhUflTiRcE7kJ4wUzYpK3j0dSlPv7KmoCyuCRP+RMx+IpN/N92U75QmkT6tfTlEvSek5bk56FSStrUWcCsc8oJ52tf9y1GpKA0dNgyTSGEf+DJZzowf5Vyv2FVBSOvZGTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455490; c=relaxed/simple;
-	bh=uVOIo4cIj+9dGmsfKgijLyCuIznJYHDWuOrwvOYj2OE=;
+	s=arc-20240116; t=1732455508; c=relaxed/simple;
+	bh=iSb+7DbzMIYQt/U5PSNHLMhXdEZt6hKvzRV2z5eiQw8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p6AtzL06ph2tmXnuw0Bi05MJzUZ5vOzznMTup4B/vTzqrrJf6vbKuGXVSYXmoJR9TgZ9ew/dxNfFGFDkKKP8lzif8HVD++p3JS+Y3JpUyG7W5kYskrDwAkibuYzd73gGW5g4ZtFp2Cbow4cm8Oas+JPO5AWlltzuU/6CdvYpaRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiso16q9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42FDBC4CED1;
-	Sun, 24 Nov 2024 13:38:08 +0000 (UTC)
+	 MIME-Version; b=hxsPtyzNwiB/CFXsPkyXg1Xunc6kG2yAwDUBAtujjRo1OOHiTNxMtd34TFc7/RFAHMJkmPVosIHbNPm1fV4aes5Qz5JiRoJL5PUBid2SkQEM3Bs15QCyNxs6nc1odGjdU9063zCiR6w1NonjwriAm7bc+aGMrzM+NMrJKcYvfcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YbYtD7UM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C0FFC4CECC;
+	Sun, 24 Nov 2024 13:38:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455489;
-	bh=uVOIo4cIj+9dGmsfKgijLyCuIznJYHDWuOrwvOYj2OE=;
+	s=k20201202; t=1732455508;
+	bh=iSb+7DbzMIYQt/U5PSNHLMhXdEZt6hKvzRV2z5eiQw8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aiso16q9uRG2Pc3TYXpZxXJ+2g8JiYhApDJKoAqFfswD4pQ1M5KieQjAZnuo+DVMi
-	 8oFRtMh7iiGXM3bTXhMP+mvWj5MXFWUeYXfWIaGlMFZfC0Oh7JzooPzAQe6w5x9DMx
-	 gxnlqLSdKBweukWcFCD8hQOS6qu7kYoR30PlSkNbCNdGUgLo/1rOaxzxQ6x0pdRLby
-	 REw/vD7BxN9tYITssuboSBD0FgytExdtvgunmme12CIbDUcAgexaLt9OtZ4yGXXkjn
-	 FpgKdJwu/Go6Ca+WD59uhOWd/HyTdWoeMG4Iaf36hoHq6d2bc0gk+oGpnBxYleCLhi
-	 Ct+S6JV+A1vTA==
+	b=YbYtD7UM38kpoIhN85REbqki55tH6WaFLI3zpEP+Q4zS65NoljTYPYwsaCgUMkien
+	 Cm5Uh78gVCoJCyv26rdYKdIir1zf0DgaUXmUIWqvlldAImOoBnvJ4/zCLJ5Y8JUKE/
+	 YyQpPu4RPzAjhMseGibXy3F9QyowOFPDRmazJbJMB+eX3D8D2N8aCLBK7SlbTX1x+3
+	 Q2WrPX9a4EdFIqeA+mYyHJjoqtHebLDRDBQADwcj9HUZz130FgoG6KBYFo9qMMf+WU
+	 LZlyEa1oUs/ouND2bL36oDf3oBYDFHH0bEXagwh8/23WDAdE4qiVhvurBf8nPrXcQk
+	 Y0GpZnItcbKsw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"Si-Wei Liu" <si-wei.liu@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Dmitry Kandybka <d.kandybka@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mst@redhat.com,
-	andrew+netdev@lunn.ch,
+	matttbe@kernel.org,
+	martineau@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 084/107] virtio-net: fix overflow inside virtnet_rq_alloc
-Date: Sun, 24 Nov 2024 08:29:44 -0500
-Message-ID: <20241124133301.3341829-84-sashal@kernel.org>
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.12 090/107] mptcp: fix possible integer overflow in mptcp_reset_tout_timer
+Date: Sun, 24 Nov 2024 08:29:50 -0500
+Message-ID: <20241124133301.3341829-90-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124133301.3341829-1-sashal@kernel.org>
 References: <20241124133301.3341829-1-sashal@kernel.org>
@@ -74,78 +71,38 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.1
 Content-Transfer-Encoding: 8bit
 
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+From: Dmitry Kandybka <d.kandybka@gmail.com>
 
-[ Upstream commit 6aacd1484468361d1d04badfe75f264fa5314864 ]
+[ Upstream commit b169e76ebad22cbd055101ee5aa1a7bed0e66606 ]
 
-When the frag just got a page, then may lead to regression on VM.
-Specially if the sysctl net.core.high_order_alloc_disable value is 1,
-then the frag always get a page when do refill.
+In 'mptcp_reset_tout_timer', promote 'probe_timestamp' to unsigned long
+to avoid possible integer overflow. Compile tested only.
 
-Which could see reliable crashes or scp failure (scp a file 100M in size
-to VM).
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-of a new frag. When the frag size is larger than PAGE_SIZE,
-everything is fine. However, if the frag is only one page and the
-total size of the buffer and virtnet_rq_dma is larger than one page, an
-overflow may occur.
-
-The commit f9dac92ba908 ("virtio_ring: enable premapped mode whatever
-use_dma_api") introduced this problem. And we reverted some commits to
-fix this in last linux version. Now we try to enable it and fix this
-bug directly.
-
-Here, when the frag size is not enough, we reduce the buffer len to fix
-this problem.
-
-Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-Tested-by: Darren Kenny <darren.kenny@oracle.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
+Link: https://patch.msgid.link/20241107103657.1560536-1-d.kandybka@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/virtio_net.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ net/mptcp/protocol.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 53a038fcbe991..c897afef0b414 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -946,9 +946,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
- 	void *buf, *head;
- 	dma_addr_t addr;
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 47ee616f69c2d..8a8e8fee337f5 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2728,8 +2728,8 @@ void mptcp_reset_tout_timer(struct mptcp_sock *msk, unsigned long fail_tout)
+ 	if (!fail_tout && !inet_csk(sk)->icsk_mtup.probe_timestamp)
+ 		return;
  
--	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
--		return NULL;
--
- 	head = page_address(alloc_frag->page);
+-	close_timeout = inet_csk(sk)->icsk_mtup.probe_timestamp - tcp_jiffies32 + jiffies +
+-			mptcp_close_timeout(sk);
++	close_timeout = (unsigned long)inet_csk(sk)->icsk_mtup.probe_timestamp -
++			tcp_jiffies32 + jiffies + mptcp_close_timeout(sk);
  
- 	if (rq->do_dma) {
-@@ -2443,6 +2440,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
- 	len = SKB_DATA_ALIGN(len) +
- 	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 
-+	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-+		return -ENOMEM;
-+
- 	buf = virtnet_rq_alloc(rq, len, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
-@@ -2545,6 +2545,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
- 	 */
- 	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
- 
-+	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-+		return -ENOMEM;
-+
-+	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-+		len -= sizeof(struct virtnet_rq_dma);
-+
- 	buf = virtnet_rq_alloc(rq, len + room, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
+ 	/* the close timeout takes precedence on the fail one, and here at least one of
+ 	 * them is active
 -- 
 2.43.0
 
