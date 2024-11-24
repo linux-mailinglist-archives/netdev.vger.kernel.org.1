@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-146990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1319D72DF
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:22:04 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3EC39D72FE
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:25:48 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFA9916431E
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:21:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67A75286D7D
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034F320B215;
-	Sun, 24 Nov 2024 13:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4BE20E33D;
+	Sun, 24 Nov 2024 13:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oww4n/PC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g1QIA39p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C823920ADF6;
-	Sun, 24 Nov 2024 13:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A898B20E336;
+	Sun, 24 Nov 2024 13:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455887; cv=none; b=fgMOp+EOoi2IXNcQWxbThWQJ8iXePwaI7l4Lj5I0gAfM8chGzxW+SCbhCaj7eWgLaXE5sIPfCIf9j3391y8s8k6ObCvOtdIQnF3hdKM7omYO+F3UFJbbgC3xsxZ0LtcLoz95E74/Ova92Cgf5kfIfXgYRI77KVNJp7RMUIa12jo=
+	t=1732455906; cv=none; b=OjmKwCEHe2WVju9bBMg+7xjs/teCrrALWNJwCUETcRjw0QSxiPY4r6SnqeTbAXtnLmX/yraAedvmt9HdVA7L0MwAHUezkjBjq+uZUvv4NzE9vyPUBBcEQifw28P/rwB/1TS01gbUhQl96YNLyTZL3sXO4C2G0NzCyVSZ0XKVHL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455887; c=relaxed/simple;
-	bh=uVOIo4cIj+9dGmsfKgijLyCuIznJYHDWuOrwvOYj2OE=;
+	s=arc-20240116; t=1732455906; c=relaxed/simple;
+	bh=hdqRIr8JPrP6KkBfW641DB4VEjMrTEqRrJovrjFcl6M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EJIsbGBXrufwsHMXGC04Q6aL+1QXvDxoQBYA2N/QoWOg5iocvSbknMLpdU704Iw+jDTqVvquIbvl506ph7x2uSvEq3mO4FD2zHjhFri4isdsWzAGCwExlSHR34KMYxxSGo14W1HnL1KAtXdm3hRN2a/CS0xR8yiGOx1Jt9woQu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oww4n/PC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3259C4CED1;
-	Sun, 24 Nov 2024 13:44:45 +0000 (UTC)
+	 MIME-Version; b=dewr2mEDOcWgFkX9te7QYAQPS0G4m3D0nbB4hLldpi6K+EIqXImK4n8SLm3jlNxpBckV70U5Ia3ilHtfd+MS+5uVOqLgbmp3efCCFzEuWhciXVGQulD5qwlSA0ZvVftsNOebQ0yKrLODb/4y5JwXvPkRrOYzNbDunxfravKbczQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g1QIA39p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04A86C4CED7;
+	Sun, 24 Nov 2024 13:45:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455887;
-	bh=uVOIo4cIj+9dGmsfKgijLyCuIznJYHDWuOrwvOYj2OE=;
+	s=k20201202; t=1732455906;
+	bh=hdqRIr8JPrP6KkBfW641DB4VEjMrTEqRrJovrjFcl6M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Oww4n/PCt1Y5QOxS/zUZbYXNaOoq1FO4d/iK/+hoWK4tI7mh7MtLmIONccACOg7qz
-	 9fYFxkyWMh74J+zUPEFLLQWHESJ+525wD/BYdV9/+EpcNBV3O9hIbIbFVloPrLPnvj
-	 yuKGjCfxXCv8g8sL14LL14TO4EY2RHmxwVfks9q1fWoaQymDSykYojop9cFeGfVg/N
-	 WD2hhTRlA02lj/UVh0mL9VFyDpTTIC4Wf8oPT6If3RqJAIgvhA6NmCDJdELWfylrAD
-	 5E0V5Av2zJCqNvIRmZy2BVrKj6bfaeWYT8g6Uv9nQuoZnuBnHUB1nazZgoh+H+0FJ5
-	 0/o3b3EvfixjQ==
+	b=g1QIA39pKDF7oRsatCZpe58glhqxm1CQ/cIMrUBgSqbmg6uhHSGowRgIORtxplWvd
+	 5k/v7J7THxxoKYbxMpwq0Ol1JZ/mxtGTrfPHKjD09ExKPJkYpOKY/3AyejjuQckt0g
+	 TPSfSzREqjAzQwSYSrYsoZmWdymBmzejklKYGfcve3zF7u7Ka9Z0+sMb8QWKLskIFG
+	 /BT/1QwiI7tQG/4VQmPIVmrBLSQ5c/DvHI8Se7vMAq5o5fEbAZ4yXBcis5XlHZAznS
+	 SQwsr+aI0NPHchoLkdGFOrA8EMtVxUGQQXsgEx2L++VFP37Cmujuod1ftqA1AoQDw6
+	 J2UYdBSPcr5Gg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"Si-Wei Liu" <si-wei.liu@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Dmitry Kandybka <d.kandybka@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mst@redhat.com,
-	andrew+netdev@lunn.ch,
+	matttbe@kernel.org,
+	martineau@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 67/87] virtio-net: fix overflow inside virtnet_rq_alloc
-Date: Sun, 24 Nov 2024 08:38:45 -0500
-Message-ID: <20241124134102.3344326-67-sashal@kernel.org>
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.11 73/87] mptcp: fix possible integer overflow in mptcp_reset_tout_timer
+Date: Sun, 24 Nov 2024 08:38:51 -0500
+Message-ID: <20241124134102.3344326-73-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124134102.3344326-1-sashal@kernel.org>
 References: <20241124134102.3344326-1-sashal@kernel.org>
@@ -74,78 +71,38 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+From: Dmitry Kandybka <d.kandybka@gmail.com>
 
-[ Upstream commit 6aacd1484468361d1d04badfe75f264fa5314864 ]
+[ Upstream commit b169e76ebad22cbd055101ee5aa1a7bed0e66606 ]
 
-When the frag just got a page, then may lead to regression on VM.
-Specially if the sysctl net.core.high_order_alloc_disable value is 1,
-then the frag always get a page when do refill.
+In 'mptcp_reset_tout_timer', promote 'probe_timestamp' to unsigned long
+to avoid possible integer overflow. Compile tested only.
 
-Which could see reliable crashes or scp failure (scp a file 100M in size
-to VM).
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-of a new frag. When the frag size is larger than PAGE_SIZE,
-everything is fine. However, if the frag is only one page and the
-total size of the buffer and virtnet_rq_dma is larger than one page, an
-overflow may occur.
-
-The commit f9dac92ba908 ("virtio_ring: enable premapped mode whatever
-use_dma_api") introduced this problem. And we reverted some commits to
-fix this in last linux version. Now we try to enable it and fix this
-bug directly.
-
-Here, when the frag size is not enough, we reduce the buffer len to fix
-this problem.
-
-Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-Tested-by: Darren Kenny <darren.kenny@oracle.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
+Link: https://patch.msgid.link/20241107103657.1560536-1-d.kandybka@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/virtio_net.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ net/mptcp/protocol.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 53a038fcbe991..c897afef0b414 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -946,9 +946,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
- 	void *buf, *head;
- 	dma_addr_t addr;
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 7913ba6b5daa3..31a7302c02a68 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2728,8 +2728,8 @@ void mptcp_reset_tout_timer(struct mptcp_sock *msk, unsigned long fail_tout)
+ 	if (!fail_tout && !inet_csk(sk)->icsk_mtup.probe_timestamp)
+ 		return;
  
--	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
--		return NULL;
--
- 	head = page_address(alloc_frag->page);
+-	close_timeout = inet_csk(sk)->icsk_mtup.probe_timestamp - tcp_jiffies32 + jiffies +
+-			mptcp_close_timeout(sk);
++	close_timeout = (unsigned long)inet_csk(sk)->icsk_mtup.probe_timestamp -
++			tcp_jiffies32 + jiffies + mptcp_close_timeout(sk);
  
- 	if (rq->do_dma) {
-@@ -2443,6 +2440,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
- 	len = SKB_DATA_ALIGN(len) +
- 	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 
-+	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-+		return -ENOMEM;
-+
- 	buf = virtnet_rq_alloc(rq, len, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
-@@ -2545,6 +2545,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
- 	 */
- 	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
- 
-+	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-+		return -ENOMEM;
-+
-+	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-+		len -= sizeof(struct virtnet_rq_dma);
-+
- 	buf = virtnet_rq_alloc(rq, len + room, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
+ 	/* the close timeout takes precedence on the fail one, and here at least one of
+ 	 * them is active
 -- 
 2.43.0
 
