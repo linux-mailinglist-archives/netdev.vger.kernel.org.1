@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-147013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A02E9D7618
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 17:46:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A993B9D73B3
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96D1AC01932
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E19C28398D
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9781B87D6;
-	Sun, 24 Nov 2024 13:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E1322FBFA;
+	Sun, 24 Nov 2024 13:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AALT3wf2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ev5aMOHK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00751B87D0;
-	Sun, 24 Nov 2024 13:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E97B22FBF8;
+	Sun, 24 Nov 2024 13:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456136; cv=none; b=hjZj64cqm82A5ogRlpPhYUGSxQFCphbK0ufqqIWmDB4E8qW4vMGYBJzahkaYKIOxa8F7vzSkprsWllSVX6xz9aSKy7qqrsPqR2WCSR/69XqoATHD8LRI7VpZ45RnnWhRy229GcolhTfbDu8nsezuOCgVjpwBkJfsuLCnXYpEjAg=
+	t=1732456144; cv=none; b=KNBJplbjT2P6SyNbhgsY3ooDWZDi/90TU1kONIR3RDYKxKSCjNspvnG7bshxTzv5Gbzi6eVjM71ICj/dQxvSBsjZERrGcKMDImhC/HSNMUkLHKsIIbjfdWrvPd3vVMXWhHVzIJl1TtvZyBKg6cREQNsDv1FwgiSsjx4X67g7zz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456136; c=relaxed/simple;
-	bh=hosWer0wZknNWSVpixY2RwGXm8piDaeKDh4woSPxqhc=;
+	s=arc-20240116; t=1732456144; c=relaxed/simple;
+	bh=fKFqPoYIBX7KqlaFGH/qVI1sKDFUgPkpK1kwpJXs4ds=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N1bB48RLbMJaAD3PJNcdmcwr6YtiwnSz+8qdBy/YEEJ8cFQpBz1+OvXesX8eXbtvfQWi9gPtyrPB7v7FewF/T60b8kC+eI/gJuZZe/55I4m7PfyNuaKG5oay0AYKDkIOwgag/cI3MXHnC6e3Htm33rBnFZ5bGq8uqrXZEcIg468=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AALT3wf2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7BFEC4CED3;
-	Sun, 24 Nov 2024 13:48:54 +0000 (UTC)
+	 MIME-Version; b=atRl7A74xNOyjfq9aX9C1w0BJqAe/LtYo2mf7WlBDQuNUYIsd9107JTilHdvtU2HWQ/zs8KpaQ5myGHuFdXTWOkA/SEGIKGd9JSzUrYSWlHJfsjdTbzW1mMxwu4em5pFSKu4CigBss/NFpk05WpHV4p7tpqBUWh7a5qMcpU37uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ev5aMOHK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBE9EC4CED3;
+	Sun, 24 Nov 2024 13:49:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456136;
-	bh=hosWer0wZknNWSVpixY2RwGXm8piDaeKDh4woSPxqhc=;
+	s=k20201202; t=1732456143;
+	bh=fKFqPoYIBX7KqlaFGH/qVI1sKDFUgPkpK1kwpJXs4ds=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AALT3wf2cpbk96FXmh5I6Xm0ZrdHziNOdPQloOUpgbCMFh/0f5tGgpY2UpkucHWDb
-	 X+8hlqZysZfUKtz7NVj116uSzYQl2ostDrO8kkr69oJH5ltMvB9MW4eRs07EQB5OpG
-	 p87dBB8AUfaRtVUmEDcJaenHFfRSKCt00EcOhw7u7fm83jktO2kdeTLbM5PpDPtAw7
-	 oRXVZvFTOekcA84v/ZkTt3napMuHXUQHKjhB1gDuh0aOYtGn3acVGeuc2YnI92zzeA
-	 O1fXRX8QIJJYGPh82//cvIOTKlVGmwu6la17MZoNkH2eUdcbQiRMxP6tE7f8VpXkec
-	 BzsVUwKF6RHHA==
+	b=Ev5aMOHK5vXuBTB/62rElTINccJnl2JT5r/GV6c1jnyaGvHqtlYVwFgC9W+WQnPvY
+	 pVsVlQ4ZeVQDGllnUv/UUtuB+0swa7s+NR69+VDl6OLdxqEIP4+dOONF/d7JE4lEq9
+	 SWY7N3op4j6q9iXx6Wfu3cGoZCeEAIIb9qg1GccExb5AMCUo8hthWwgscIqrZ63Axx
+	 MV/I7yicUYZe5WTo+orys+xPiYWT60Kr7OM1woXANX2ecm0hYr4POXjeWqFI3qyVUz
+	 pKcNx9QakbFeUqvrIwfG+AeGT7nGaKEy+0Up3H3FhdeQP77Hk/yEK/ca1uEwlzUeVn
+	 JVTOWF0nyWguw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Danil Pylaev <danstiv404@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
+	jiri@resnulli.us,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 55/61] Bluetooth: Add new quirks for ATS2851
-Date: Sun, 24 Nov 2024 08:45:30 -0500
-Message-ID: <20241124134637.3346391-55-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 59/61] rocker: fix link status detection in rocker_carrier_init()
+Date: Sun, 24 Nov 2024 08:45:34 -0500
+Message-ID: <20241124134637.3346391-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124134637.3346391-1-sashal@kernel.org>
 References: <20241124134637.3346391-1-sashal@kernel.org>
@@ -73,74 +70,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.63
 Content-Transfer-Encoding: 8bit
 
-From: Danil Pylaev <danstiv404@gmail.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit 94464a7b71634037b13d54021e0dfd0fb0d8c1f0 ]
+[ Upstream commit e64285ff41bb7a934bd815bd38f31119be62ac37 ]
 
-This adds quirks for broken extended create connection,
-and write auth payload timeout.
+Since '1 << rocker_port->pport' may be undefined for port >= 32,
+cast the left operand to 'unsigned long long' like it's done in
+'rocker_port_set_enable()' above. Compile tested only.
 
-Signed-off-by: Danil Pylaev <danstiv404@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://patch.msgid.link/20241114151946.519047-1-dmantipov@yandex.ru
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci.h      | 14 ++++++++++++++
- include/net/bluetooth/hci_core.h | 10 ++++++----
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/rocker/rocker_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2129d071c3725..77a3040a3f29d 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -297,6 +297,20 @@ enum {
- 	 */
- 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
+diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
+index 9e59669a93dd3..2e2826c901fcc 100644
+--- a/drivers/net/ethernet/rocker/rocker_main.c
++++ b/drivers/net/ethernet/rocker/rocker_main.c
+@@ -2504,7 +2504,7 @@ static void rocker_carrier_init(const struct rocker_port *rocker_port)
+ 	u64 link_status = rocker_read64(rocker, PORT_PHYS_LINK_STATUS);
+ 	bool link_up;
  
-+	/*
-+	 * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command is
-+	 * disabled. This is required for the Actions Semiconductor ATS2851
-+	 * based controllers, which erroneously claims to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
-+
-+	/*
-+	 * When this quirk is set, the command WRITE_AUTH_PAYLOAD_TIMEOUT is
-+	 * skipped. This is required for the Actions Semiconductor ATS2851
-+	 * based controllers, due to a race condition in pairing process.
-+	 */
-+	HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT,
-+
- 	/* When this quirk is set, MSFT extension monitor tracking by
- 	 * address filter is supported. Since tracking quantity of each
- 	 * pattern is limited, this feature supports tracking multiple
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0f50c0cefcb7d..4185eb679180d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1852,8 +1852,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- 			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
- 
- /* Use ext create connection if command is supported */
--#define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
--
-+#define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
-+	!test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &(dev)->quirks))
- /* Extended advertising support */
- #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
- 
-@@ -1866,8 +1866,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-  * C24: Mandatory if the LE Controller supports Connection State and either
-  * LE Feature (LL Privacy) or LE Feature (Extended Advertising) is supported
-  */
--#define use_enhanced_conn_complete(dev) (ll_privacy_capable(dev) || \
--					 ext_adv_capable(dev))
-+#define use_enhanced_conn_complete(dev) ((ll_privacy_capable(dev) || \
-+					 ext_adv_capable(dev)) && \
-+					 !test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, \
-+						 &(dev)->quirks))
- 
- /* Periodic advertising support */
- #define per_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_PERIODIC_ADV))
+-	link_up = link_status & (1 << rocker_port->pport);
++	link_up = link_status & (1ULL << rocker_port->pport);
+ 	if (link_up)
+ 		netif_carrier_on(rocker_port->dev);
+ 	else
 -- 
 2.43.0
 
