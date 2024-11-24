@@ -1,66 +1,69 @@
-Return-Path: <netdev+bounces-146930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 386BB9D6C80
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 03:33:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49F0E9D6C83
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 03:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACD41161740
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 02:33:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB40F161777
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 02:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889371BF37;
-	Sun, 24 Nov 2024 02:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2874ABA2E;
+	Sun, 24 Nov 2024 02:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZf8ax+y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGrwmVgc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F05F1FC8;
-	Sun, 24 Nov 2024 02:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B03CA5B;
+	Sun, 24 Nov 2024 02:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732415633; cv=none; b=TpaWIk05CqfCI9dVA2bx6zpnk4uc44syVURarMOAXHStSnnCnmVQ05izNXvg7kZkoHbctUj7If7tJxgxiCw9tWKwTUvZrDCyxSpVBpaFDXzGFwi/cvRr1YAaWdPI3hMAcc6VbNH3QtDNKhwt+Da3B/wu+8KoLoM68i9NkCi0ZxI=
+	t=1732416626; cv=none; b=Xz7hxbCiKdnZZdYZv6E8RtffCKoD95iYO4CVVMpVrP2KhojPNKXuD2FNDCD1gRQd0Fo1qMMmu3fwV2KSkrjJXo4SPgl5YT0+yRkrDeLbKsGUikMToHVeVsC6PCTqsQVPYd04Ypf2pp7QRhSLeKvylT9xOPjX1Cihu8M8ECgfmuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732415633; c=relaxed/simple;
-	bh=MHgkf4950Dv/pXJOwCEapYXWpGGemZnM6ozWk9gJHL8=;
+	s=arc-20240116; t=1732416626; c=relaxed/simple;
+	bh=4DAbBpdVZZkEgYhQTabwG+d43KbKpV7Qgo3qiACmb/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CFLu2s7tJvpGtyKLr3Y55BNpOs7kLK9sVIUTQSjD5ZHo0dITyrJoRnP8t+nyXo1TCCRdknxjkpRwKFZDJm4Zuu0mYxnejFZKhOKSydwWyfMxyZHpQnoNFhuj8VUpNIkZ7JVIvUthxC+6uV1/IkBY+Lg/2esREmlUu1oKvvdPHZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NZf8ax+y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98E48C4CECD;
-	Sun, 24 Nov 2024 02:33:52 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Qymtfc4FOFVX94SGPobM5d+rOCN+LTh7T4jnkt0hItEDWRcw/gWVtXHsKdyQODAcPwcYPJe4i8skpqGKQDxLeCMIPHLR6mXuVjmU4KIR/RXzhv9Cxj6Dy1GdMZpReqJEBfsheey2qA7vmqrVHkQ4L6kjMUO6hSJ1Bj3r926hH2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGrwmVgc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F3BC4CECD;
+	Sun, 24 Nov 2024 02:50:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732415633;
-	bh=MHgkf4950Dv/pXJOwCEapYXWpGGemZnM6ozWk9gJHL8=;
+	s=k20201202; t=1732416625;
+	bh=4DAbBpdVZZkEgYhQTabwG+d43KbKpV7Qgo3qiACmb/E=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NZf8ax+yKFnT5V6LPnNTtCVX5TJTuDlsIM52OkE2T5C/OFcyA1dR20z41kREc+n0p
-	 Q8XRZjyuEazlHNiVleRDwbfhiMBULQ3b3rRqbQAF36u0tc/NLapyOqteUjWXmuFGMk
-	 wyJQ/eQC7L2UYMZePrfu5lJyPSNr0CrYB098+TQmDfUciV02Wo2momHpn9OSDeD+vb
-	 JSTWH7RzyawDkT6ZUtyK/+XvzHy6wNvHpWE3PquzAQubI+kUlsEFVtEoLkJ82E3280
-	 TmmfZLj6ltV6dYaGpqnQdLZ6+1bmQNmkCBgn0OgfC3a+GT2q+TL50vVOvVRPu0Djdn
-	 XnIx5Vokkf8WQ==
-Date: Sat, 23 Nov 2024 18:33:51 -0800
+	b=jGrwmVgcyHHsUAw0W7wH/E0NiYPVUHIvX7ssRRu5X4Qk7jsakCZDhLy4M6OkrNBdo
+	 Wy/CXWqhnXnaQgB3qUicfci31zWWbt+cT6BgyUEGZ59foxbb3dWt46WAuTasjlO7gT
+	 BPX2aGKnH1nPlrZvc3NdPCwadYlPufbVnL/jCTiZbQIBIxEIaKzfr8BbPlCBGc8Sje
+	 KMTyhB5V0uFq9RHKW1E5HucA3cKb1WRUNPA6JBHpGLCm3lGLYXI3dbx0p+MJxamfP/
+	 3HXqfFfFwoj7uxq+RJtzmB2/SMmzSpe7yQ5Y91DC3ologXzO//LkfVpBxk0VVPjErV
+	 jTM8stzATOjQg==
+Date: Sat, 23 Nov 2024 18:50:24 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Samiullah Khawaja <skhawaja@google.com>, Mina Almasry
- <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>, Willem
- de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
- dmabuf memory provider
-Message-ID: <20241123183351.582aa8ac@kernel.org>
-In-Reply-To: <CAAywjhRb0Lb9fJocWBU1r01521sy71hLOaH=92gqceXqUOGHJg@mail.gmail.com>
-References: <20241107212309.3097362-1-almasrymina@google.com>
-	<20241107212309.3097362-5-almasrymina@google.com>
-	<20241108141812.GL35848@ziepe.ca>
-	<CAHS8izOVs+Tz2nFHMfiQ7=+hk6jKg46epO2f6Whfn07fNFOSRw@mail.gmail.com>
-	<20241115015912.GA559636@ziepe.ca>
-	<CAAywjhRb0Lb9fJocWBU1r01521sy71hLOaH=92gqceXqUOGHJg@mail.gmail.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+ Yafang Shao <laoar.shao@gmail.com>, ttoukan.linux@gmail.com,
+ tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] net/mlx5e: Report rx_discards_phy via
+ rx_fifo_errors
+Message-ID: <20241123185024.21315d99@kernel.org>
+In-Reply-To: <1060ac7d-ad76-4383-906f-9f20a7b8174a@nvidia.com>
+References: <20241114021711.5691-1-laoar.shao@gmail.com>
+	<20241114182750.0678f9ed@kernel.org>
+	<CALOAHbCQeoPfQnXK-Zt6+Fc-UuNAn12UwgT_y11gzrmtnWWpUQ@mail.gmail.com>
+	<20241114203256.3f0f2de2@kernel.org>
+	<CALOAHbBJ2xWKZ5frzR5wKq1D7-mzS62QkWpxB5Q-A7dR-Djhnw@mail.gmail.com>
+	<Zzb_7hXRPgYMACb9@x130>
+	<20241115112443.197c6c4e@kernel.org>
+	<Zzem_raXbyAuSyZO@x130>
+	<20241115132519.03f7396c@kernel.org>
+	<ZzfGfji0V2Xy4LAQ@x130>
+	<20241115144214.03f17c16@kernel.org>
+	<1060ac7d-ad76-4383-906f-9f20a7b8174a@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,21 +73,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Nov 2024 14:10:28 -0800 Samiullah Khawaja wrote:
-> > > > If you do this you may want to block accepting dmabufs that have CPU
-> > > > pages inside them.  
+On Wed, 20 Nov 2024 08:04:35 +0200 Gal Pressman wrote:
+> > The comment just says not to add what's already counted in missed,
+> > because profcs adds the two and we'd end up double counting.  
 > 
-> I believe we should be following the dmabuf API for this purpose, if
-> we really want to sync for CPU in. page_pool, and should not assume
-> the behaviour of the backing memory.
-> 
-> The dmabuf exporters are supposed to implement the begin_cpu_access
-> (optional) and the sync for cpu is done based on the exporter
-> implementation.
+> So this is a procfs thing only?
+> Does that mean that netlink's rx_dropped might be different than procfs'
+> rx_dropped?
 
-DMABUF is a bit of a distraction here.
+Yes, procfs and rtnl show "different" stats.
+For more context on why I put the comment there -- some stats 
+the drivers are supposed to fold (error stats from memory).
 
-What's key is that we need to fill in the gap in the driver facing
-page_pool API, because DMABUF will not be the only provider we can
-plug in.
+Legacy stats are tricky, it'd be a major review time investment 
+to try to improve them..
 
