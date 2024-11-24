@@ -1,123 +1,231 @@
-Return-Path: <netdev+bounces-147091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F479D7870
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 23:01:19 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920119D7880
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 23:18:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6316162EA0
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 22:18:51 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B4F16F0E8;
+	Sun, 24 Nov 2024 22:18:51 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62D1F282768
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 22:01:18 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAAE15E5A6;
-	Sun, 24 Nov 2024 22:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="hX5bDHYg"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF0E5103F
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 22:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9243B15FD13;
+	Sun, 24 Nov 2024 22:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732485676; cv=none; b=u66svk+9CKeNR/C36HeORhl+WYdtibJaW/Y/0gTkgecIhEzhRwvoPXcrbCExWaf9ueuQfW0hBxrM+DSfi+8jRrKwR+aB5PD0aEhXjE4gNmmzxnRey6ZDRsFwMCltv4MMK8zXWaUIgQrc3vGhB7S9KeLB4TQsfH1LcD6ww27d+gc=
+	t=1732486731; cv=none; b=E7GQaHQ8MIoxokHf+SsbTW7RyOApNSXFy4zFuqlLPqGztx+2QoflCZETXg8HCwqGzfluX/f+oJFsywMgD7n+Pk/MzkZskO0V6dgcEsyGRcUjpXD3tf9ZXQaW6yzHnZyF2BToHX6YBfsXN0wJzWYOjE7LyPRx2MdVimxq8JDtWTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732485676; c=relaxed/simple;
-	bh=B6ZExtlrWDpdVkh4NrErlj5TWXl10njXAk3D3IVXvjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DFu8mUtoMYSqmD7EpvvlzQW0zBdyq5LnlA6cBLnRiM0xHNKla9QzUhTHFM4pCXjbC2vBW+rEUMXH67f0GDnajTJu9kRdJahyAUix5EkAocJFirf5cnOvKnPJV7X3bS6V1r7aNjmFVUmUhImLq44Gfp0d6jbv+RldZd7fIrBCihM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=hX5bDHYg; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-382376fcc4fso2178408f8f.2
-        for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 14:01:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1732485673; x=1733090473; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WO0cvhOCCYEcMHo4t/kUcC7+MddOiWfvg8yPqnsazn4=;
-        b=hX5bDHYg6+UsRUluRjpXQcWAhAehhv496WFfAjp3OK+Sl9S/xEdfrXuusNwYYzKx/O
-         Aks3lm+k7/hd4suDwLvlTot5iiw0eoFVBdc1CGVwx8K1k//INL2ELAXfFcr9gwtzuJi1
-         vrxR4pBcp8CbRsJGTN4HS3m9nrmuX6JFUKIjRTLz9ocViQdFeIUZgD7J+kgZ5lMoLAg6
-         qM7O3UfmwgN+aJfb5xvZX48o+Lqz2mnWbiVk0SJd8HSMDm3qamafOkgmk9lUsZOHNxu6
-         jC3kcLmwL0qK1JfpYlFws5y58VZ5AgsjjJ+aT/lkpiWUE/JX5SiFFiyXDkVlNBMGB9yH
-         4DmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732485673; x=1733090473;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WO0cvhOCCYEcMHo4t/kUcC7+MddOiWfvg8yPqnsazn4=;
-        b=vy4PqDbCqRxPkKwUkjzeXYHcK5yS3RM60R3zBsQiwn1LHclNRC8GZyjB3uzniRww0V
-         Zm//Wh3CFNZdaZAhrSKGRqBO4M/SvEAYDH4Tz10S5t0OQa+qcOJSxsGIrQPShFWSZrm7
-         ITifPu0CX2MRGW7c7j+O84C0ierfIzeNdGmyq6xX6CPrnnV5gqcJlLWgw5i7iDqvxFyI
-         FShYm4LiXzWS95rfie4mXohY9EA9JgvYTHd2lvjR5uV5O87jJkGLKQEVVVScjhgqIqOJ
-         5V2y4PAlkxwUSsUOXQzLM59OxQxZf+8tGkAXhp09jhH5AKaKPZCwA2yuHUza7+36JKCz
-         4n2Q==
-X-Gm-Message-State: AOJu0Yyx7V/c6Npi4KU8+iDrf3BAaRZy8qQAqmmJFwZnlsORtfqZ1jrN
-	BW4s8iSFST6kkovR8FawKhZDWMBk+RNdb3ZFH2xFHJorTteSwQtETftJN+8Ajig=
-X-Gm-Gg: ASbGncsxSM9r6hJvvaYbcsgaQilEBBpNZrgedxqaFwufdYGfLqFHUTRGMNWwClROZpp
-	Cwh0krNGFxgu6A9PdmNWM3MULo50ACgldV3uZrhjls7tZTckO17AUhdbolsH/WXLJ5HvP8U3zGb
-	BGo37vNYA5dlpDQP3uNP4/S/dR2fHLDV8FZFTqvoip6R62UGFgDWxOOqbDMdtVISV8A2HTFQnD7
-	KgwspuzZck3DHVaGWaAcVN/hiQjYZMnuRsx0GPlHNqIZVbhGPR2
-X-Google-Smtp-Source: AGHT+IEUmJWNVT/yCHIU4DpWfoBtu4D/gDbWjN7B8ekkI1xXmQ3BxXPpdtKlYrC7+KrVS7KrV9+AEw==
-X-Received: by 2002:a5d:64a1:0:b0:382:5aae:87c7 with SMTP id ffacd0b85a97d-38260b89369mr8791101f8f.31.1732485673204;
-        Sun, 24 Nov 2024 14:01:13 -0800 (PST)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433cde0db3csm105665385e9.10.2024.11.24.14.01.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Nov 2024 14:01:12 -0800 (PST)
-Message-ID: <87d8a49c-41e3-4b18-9ada-cb64fa66fe9b@blackwall.org>
-Date: Mon, 25 Nov 2024 00:01:11 +0200
+	s=arc-20240116; t=1732486731; c=relaxed/simple;
+	bh=u7kQYVP2q/NUDySFecDk5xUiUxBqNf/gjfU1dgYlhRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZ9L3Aweve03gcBS76NI0z5At+kcKeAS56v29pnvIQ/7ib/Z1fvIo5aCx5rtqxrxhZMhP2+dkJeLhDXlNYLsJecNTFcSgMwO0I/ei78Kr9Y6yzyheAaaMLTssCJzmnZSgQjj1AGurMxmjkn2JJZVBuj/zmZBnjfCnYRGdvTeXXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D40F01A07D4;
+	Sun, 24 Nov 2024 23:18:40 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id C192A1A07F5;
+	Sun, 24 Nov 2024 23:18:40 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 722BA203B1;
+	Sun, 24 Nov 2024 23:18:39 +0100 (CET)
+Date: Sun, 24 Nov 2024 23:18:40 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>
+Subject: Re: [PATCH v5 14/16] net: stmmac: dwmac-s32: add basic NXP S32G/S32R
+ glue driver
+Message-ID: <Z0OmQI+4sEbA0lFs@lsv051416.swis.nl-cdc01.nxp.com>
+References: <20241119-upstream_s32cc_gmac-v5-0-7dcc90fcffef@oss.nxp.com>
+ <20241119-upstream_s32cc_gmac-v5-14-7dcc90fcffef@oss.nxp.com>
+ <ZzzDu0tcyixAZ8l1@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next (resend) 1/4] net: bridge: respect sticky flag on
- external learn
-To: Elliot Ayrey <Elliot.Ayrey@alliedtelesis.co.nz>,
- "andrew@lunn.ch" <andrew@lunn.ch>, "olteanv@gmail.com" <olteanv@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "roopa@nvidia.com"
- <roopa@nvidia.com>, "edumazet@google.com" <edumazet@google.com>,
- "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
- "horms@kernel.org" <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "bridge@lists.linux.dev" <bridge@lists.linux.dev>
-References: <20241108035546.2055996-1-elliot.ayrey@alliedtelesis.co.nz>
- <20241108035546.2055996-2-elliot.ayrey@alliedtelesis.co.nz>
- <f2ac33e7b8ec0fefa48fe7cd3b1004abab67dcb1.camel@alliedtelesis.co.nz>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <f2ac33e7b8ec0fefa48fe7cd3b1004abab67dcb1.camel@alliedtelesis.co.nz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZzzDu0tcyixAZ8l1@shell.armlinux.org.uk>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On 24/11/2024 23:01, Elliot Ayrey wrote:
-> On Sat, 2024-11-09 at 15:32 +0200, Nikolay Aleksandrov wrote:
->> So you have a sticky fdb entry added, but it is still allowed to roam
->> in HW?
+On Tue, Nov 19, 2024 at 04:58:35PM +0000, Russell King (Oracle) wrote:
+> On Tue, Nov 19, 2024 at 04:00:20PM +0100, Jan Petrous via B4 Relay wrote:
+> > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> > 
+> > NXP S32G2xx/S32G3xx and S32R45 are automotive grade SoCs
+> > that integrate one or two Synopsys DWMAC 5.10/5.20 IPs.
+> > 
+> > The basic driver supports only RGMII interface.
+> > 
+> > Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 > 
-> No the hardware has informed us a host has _tried_ to roam.
+> One thing that stands out to me in this is the duplication of the PHY
+> interface mode. I would much prefer if we didn't end up with multiple
+> copies, but instead made use of the one already in plat_stmmacenet_data
+> maybe by storing a its pointer in struct s32_priv_data?
+
+I missed the struct plat_stmmacenet_data's phy_interface member. I
+switch the duplicate member intf_mode in struct s32_priv_data to
+pointer.
+
 > 
-> As I think about this more, using the sticky bit alone probably isn't
-> the best idea and it might be better if this mechanism were related to
-> a port being locked? After all the port being locked in hardware is
-> what generates this event.
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/Kconfig     |  12 ++
+> >  drivers/net/ethernet/stmicro/stmmac/Makefile    |   1 +
+> >  drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 204 ++++++++++++++++++++++++
+> >  3 files changed, 217 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> > index 05cc07b8f48c..a6579377bedb 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> > @@ -154,6 +154,18 @@ config DWMAC_RZN1
+> >  	  the stmmac device driver. This support can make use of a custom MII
+> >  	  converter PCS device.
+> >  
+> > +config DWMAC_S32
+> > +	tristate "NXP S32G/S32R GMAC support"
+> > +	default ARCH_S32
+> > +	depends on OF && (ARCH_S32 || COMPILE_TEST)
+> > +	help
+> > +	  Support for ethernet controller on NXP S32CC SOCs.
+> > +
+> > +	  This selects NXP SoC glue layer support for the stmmac
+> > +	  device driver. This driver is used for the S32CC series
+> > +	  SOCs GMAC ethernet controller, ie. S32G2xx, S32G3xx and
+> > +	  S32R45.
+> > +
+> >  config DWMAC_SOCFPGA
+> >  	tristate "SOCFPGA dwmac support"
+> >  	default ARCH_INTEL_SOCFPGA
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> > index c2f0e91f6bf8..1e87e2652c82 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> > @@ -22,6 +22,7 @@ obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
+> >  obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
+> >  obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
+> >  obj-$(CONFIG_DWMAC_RZN1)	+= dwmac-rzn1.o
+> > +obj-$(CONFIG_DWMAC_S32)		+= dwmac-s32.o
+> >  obj-$(CONFIG_DWMAC_SOCFPGA)	+= dwmac-altr-socfpga.o
+> >  obj-$(CONFIG_DWMAC_STARFIVE)	+= dwmac-starfive.o
+> >  obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> > new file mode 100644
+> > index 000000000000..9af7cd093100
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> > @@ -0,0 +1,204 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * NXP S32G/R GMAC glue layer
+> > + *
+> > + * Copyright 2019-2024 NXP
+> > + *
+> > + */
+> > +
+> > +#include <linux/clk.h>
+> > +#include <linux/clk-provider.h>
+> > +#include <linux/device.h>
+> > +#include <linux/ethtool.h>
+> > +#include <linux/io.h>
+> > +#include <linux/module.h>
+> > +#include <linux/of_mdio.h>
+> > +#include <linux/of_address.h>
+> > +#include <linux/phy.h>
+> > +#include <linux/phylink.h>
+> > +#include <linux/platform_device.h>
+> > +#include <linux/stmmac.h>
+> > +
+> > +#include "stmmac_platform.h"
+> > +
+> > +#define GMAC_TX_RATE_125M	125000000	/* 125MHz */
+> > +
+> > +/* SoC PHY interface control register */
+> > +#define PHY_INTF_SEL_MII	0x00
+> > +#define PHY_INTF_SEL_SGMII	0x01
+> > +#define PHY_INTF_SEL_RGMII	0x02
+> > +#define PHY_INTF_SEL_RMII	0x08
+> > +
+> > +struct s32_priv_data {
+> > +	void __iomem *ioaddr;
+> > +	void __iomem *ctrl_sts;
+> > +	struct device *dev;
+> > +	phy_interface_t intf_mode;
+> > +	struct clk *tx_clk;
+> > +	struct clk *rx_clk;
+> > +};
+> > +
+> > +static int s32_gmac_write_phy_intf_select(struct s32_priv_data *gmac)
+> > +{
+> > +	u32 intf_sel;
+> > +
+> > +	switch (gmac->intf_mode) {
+> > +	case PHY_INTERFACE_MODE_RGMII:
+> > +	case PHY_INTERFACE_MODE_RGMII_ID:
+> > +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> > +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> > +		intf_sel = PHY_INTF_SEL_RGMII;
+> > +		break;
+> > +	default:
+> > +		dev_err(gmac->dev, "Unsupported PHY interface: %s\n",
+> > +			phy_modes(gmac->intf_mode));
+> > +		return -EINVAL;
+> > +	}
+> 
+> This can be simplfied to:
+> 
+> 	if (!phy_interface_mode_is_rgmii(...)) {
+> 		dev_err(gmac->dev, "Unsupported PHY interface: %s\n",
+> 			phy_modes(...));
+> 		return -EINVAL;
+> 	}
+> 
+> Also, would it not be better to validate this in s32_dwmac_probe()?
+> 
 
-That does sound better, but we should have the same functionality
-in software as well. Perhaps optional to avoid potential flood of
-current users with unexpected notifications, see my response to
-the other mail for more info.
+Thanks, I move the interface mode to s32_dwmac_probe() in v6.
 
-Cheers,
- Nik
-
+BR.
+/Jan
 
