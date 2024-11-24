@@ -1,103 +1,141 @@
-Return-Path: <netdev+bounces-146928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF599D6C65
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 02:30:22 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36ED19D6C7A
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 03:21:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5B7281395
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 01:30:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA00B16154A
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 02:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A36C14A82;
-	Sun, 24 Nov 2024 01:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D4836C;
+	Sun, 24 Nov 2024 02:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XaYtgmq+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VN7gSIXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1703529A9
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 01:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B01D646;
+	Sun, 24 Nov 2024 02:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732411819; cv=none; b=iU9woE2Egpl6e/4QQwBNWk1BgwqZ+gfJUgOzKb/3irV564UtRljLolhAaJecEfoCflh0cosXabcG6pKKXP08+BtzY/2ol6Odq6ZsChBp1nLW7bCUL+LMIFN6BoOfXwdFJHYuyseA5kRaEaDXh52cYgfe7zZKuzdyhoU7XFel5Ek=
+	t=1732414912; cv=none; b=jWNOUSq/0lDko/HwZC9aODz7gl/m/tjuEIGDmoYOm+rb/CYTaxjVd3M9+de2V1dTWEv7ov+MrseUOT8TV5Xr4Wp7jB0HzjEGNrX/OSRQPzl/JOJsyMJmN5nFoHkjTkZz9Xpc4PJ3aOOCnrK0BdlM2jap1M2lk1O1ihWIHQw9y10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732411819; c=relaxed/simple;
-	bh=iE8bC0iYoUv3KN66wBvVm3CpHEtNZAq6gL6hU7plVWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UApLkD82OpeyGzHi5jHyhVWsYq+2Dps3qQ1lV2m7ZI8tcj64ZpIx8rZUnUe8UJOI8jMyy+S4PbdLFAysdGOlRncgBhoWnIriGn/g5N2T+r0pwH68ufcTMBVejR+Ht/vlO0lpjDKp05i06ha8sp4hG1tdn2k1ykI5oLQuyhEcvVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XaYtgmq+; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <66ebd7b1-8798-4d1c-925e-0822c9b466d1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732411813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GBqCvmkIK9awW/W/XAMHoyazY0FAb6jfi4/qNnRLVF8=;
-	b=XaYtgmq+XKIvSs4Qk2ye5eBIb4ZR4BUgk9zPOmcKz68r79e/DHhItRXhC6yrSqnoBjhNIB
-	0TUTWCc9lh2J6zBit5q1k8UhF5lKkfYHY+m1n2b5oMvcOnbpRmBGlmyVfRl7OAOjbBG9Q+
-	yq5hf0Xg7rjz8xnoJGhjspo05rF45Z4=
-Date: Sat, 23 Nov 2024 17:30:07 -0800
+	s=arc-20240116; t=1732414912; c=relaxed/simple;
+	bh=SKZUE0cCNrR3sYXzvMSRSV03xJOyooSZpAcGkiFGBYg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PPNLYROzzKtO8ntW+60k3pvOmHKQH0GP8ep64JSYS5E5XSCvwKLjp9gzYrBb98APOaKbSrbWYsTRBkmMhCd7ZAPbd9rDN+kKUWv82LKCp1E2yhN5+/r/tOfCDCM0ylmep7jWu92+l5613cZakMWpc4NP79OM4OAJJ+Z8YBRBP4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VN7gSIXB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A8E8C4CECD;
+	Sun, 24 Nov 2024 02:21:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732414911;
+	bh=SKZUE0cCNrR3sYXzvMSRSV03xJOyooSZpAcGkiFGBYg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VN7gSIXB+lCrG8d4GZbg9W3rl3ZLh3WBHvthw3gm+kbSwtK/6C9CPKcUja4vDjD2u
+	 mGl7sTAwi6rb71KPNyspkJel1SUj15kO/EZTwJ+NztkYSTX3F2gmQ9CHSCxzDpBAUw
+	 oClQXxyLSDv4W9WMuPoWrYfrWWCUgx+cgBHV/g04K79Pmgp/frMWlCudtCbslHGEgB
+	 wo8yORBy48MWjuYC/0UAULF3PJduDECLr44rQ7Xj2DkTLHnMBzmXiw98Qv4hKLpkOV
+	 1hXK49JvSM6ZSbwsNOJKqxyXycOO+rWdvPJvYxCnl2vDnKsSfKs6y4GADC+HDxNBUt
+	 KzUVNBgwqfDqw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	stable@vger.kernel.org,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us
+Subject: [PATCH net v2] net_sched: sch_fq: don't follow the fast path if Tx is behind now
+Date: Sat, 23 Nov 2024 18:21:48 -0800
+Message-ID: <20241124022148.3126719-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 net] tcp: Fix use-after-free of nreq in
- reqsk_timer_handler().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- Liu Jian <liujian56@huawei.com>
-References: <20241123174236.62438-1-kuniyu@amazon.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241123174236.62438-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 23/11/2024 09:42, Kuniyuki Iwashima wrote:
-> The cited commit replaced inet_csk_reqsk_queue_drop_and_put() with
-> __inet_csk_reqsk_queue_drop() and reqsk_put() in reqsk_timer_handler().
-> 
-> Then, oreq should be passed to reqsk_put() instead of req; otherwise
-> use-after-free of nreq could happen when reqsk is migrated but the
-> retry attempt failed (e.g. due to timeout).
-> 
-> Let's pass oreq to reqsk_put().
-> 
-> Fixes: e8c526f2bdf1 ("tcp/dccp: Don't use timer_pending() in reqsk_queue_unlink().")
-> Reported-by: Liu Jian <liujian56@huawei.com>
-> Closes: https://lore.kernel.org/netdev/1284490f-9525-42ee-b7b8-ccadf6606f6d@huawei.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->   net/ipv4/inet_connection_sock.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-> index 491c2c6b683e..6872b5aff73e 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -1191,7 +1191,7 @@ static void reqsk_timer_handler(struct timer_list *t)
->   
->   drop:
->   	__inet_csk_reqsk_queue_drop(sk_listener, oreq, true);
-> -	reqsk_put(req);
-> +	reqsk_put(oreq);
->   }
->   
->   static bool reqsk_queue_hash_req(struct request_sock *req,
+Recent kernels cause a lot of TCP retransmissions
 
-That indeed fixes the fix :)
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec  2.24 GBytes  19.2 Gbits/sec  2767    442 KBytes
+[  5]   1.00-2.00   sec  2.23 GBytes  19.1 Gbits/sec  2312    350 KBytes
+                                                      ^^^^
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Replacing the qdisc with pfifo makes retransmissions go away.
+
+It appears that a flow may have a delayed packet with a very near
+Tx time. Later, we may get busy processing Rx and the target Tx time
+will pass, but we won't service Tx since the CPU is busy with Rx.
+If Rx sees an ACK and we try to push more data for the delayed flow
+we may fastpath the skb, not realizing that there are already "ready
+to send" packets for this flow sitting in the qdisc.
+
+Don't trust the fastpath if we are "behind" according to the projected
+Tx time for next flow waiting in the Qdisc. Because we consider anything
+within the offload window to be okay for fastpath we must consider
+the entire offload window as "now".
+
+Qdisc config:
+
+qdisc fq 8001: dev eth0 parent 1234:1 limit 10000p flow_limit 100p \
+  buckets 32768 orphan_mask 1023 bands 3 \
+  priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 \
+  weights 589824 196608 65536 quantum 3028b initial_quantum 15140b \
+  low_rate_threshold 550Kbit \
+  refill_delay 40ms timer_slack 10us horizon 10s horizon_drop
+
+For iperf this change seems to do fine, the reordering is gone.
+The fastpath still gets used most of the time:
+
+  gc 0 highprio 0 fastpath 142614 throttled 418309 latency 19.1us
+   xx_behind 2731
+
+where "xx_behind" counts how many times we hit the new "return false".
+
+CC: stable@vger.kernel.org
+Fixes: 076433bd78d7 ("net_sched: sch_fq: add fast path for mostly idle qdisc")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - use Eric's condition (fix offload, don't care about throttled)
+ - throttled -> delayed
+ - explicitly CC stable, it won't build on 6.12 because of the offload
+   horizon, so make sure they don't just drop this
+v1: https://lore.kernel.org/20241122162108.2697803-1-kuba@kernel.org
+
+CC: jhs@mojatatu.com
+CC: xiyou.wangcong@gmail.com
+CC: jiri@resnulli.us
+---
+ net/sched/sch_fq.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+index a97638bef6da..a5e87f9ea986 100644
+--- a/net/sched/sch_fq.c
++++ b/net/sched/sch_fq.c
+@@ -332,6 +332,12 @@ static bool fq_fastpath_check(const struct Qdisc *sch, struct sk_buff *skb,
+ 		 */
+ 		if (q->internal.qlen >= 8)
+ 			return false;
++
++		/* Ordering invariants fall apart if some delayed flows
++		 * are ready but we haven't serviced them, yet.
++		 */
++		if (q->time_next_delayed_flow <= now + q->offload_horizon)
++			return false;
+ 	}
+ 
+ 	sk = skb->sk;
+-- 
+2.47.0
+
 
