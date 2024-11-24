@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-146992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-146993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1224E9D7306
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:26:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02E669D7317
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 15:28:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBB30284612
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4613283EA4
+	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 14:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683612101A8;
-	Sun, 24 Nov 2024 13:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CA32144D0;
+	Sun, 24 Nov 2024 13:45:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azzdcQzv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DfSfw6Q9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D9A2101A1;
-	Sun, 24 Nov 2024 13:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C1A21315D;
+	Sun, 24 Nov 2024 13:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455910; cv=none; b=aDOXHl7UkvLSvd/u74JwpLP0DNw8SuyVgNHN/mmn6nRXrn2j+2sfLYqEEIWqtiIeD6Mn80fzczKsk+Y+8P7nSXOOwSYLgucQSPTniN8KF/yFZUvVuj62ys0mH9p7v14A4yMHTthoqdfMblWF9biqyKACpkqC77HyGt+W2pYoMJk=
+	t=1732455919; cv=none; b=N+cm0stx2QcJOuHM5wk4U+/g35XuY9WTy9EPFG/Daa4swIVzW//jlJPTKn9fD/OXbpkAqSy1I8tS2wMD7im/JtE6sWHGvxQmrDeUsbof5KSptehTmsdjXuFtPI0oaai5mKcIqb3VAJuZ0oa1WI4kgt9UL0H5U1PBQbKPwgxCvVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455910; c=relaxed/simple;
-	bh=frMsR8PTOxaQrnnDp39CBVkRcossL8PMqqCmGH4P73Y=;
+	s=arc-20240116; t=1732455919; c=relaxed/simple;
+	bh=2KnqPmJU9zRqPXj6Smoes6eWbShF/DU5+MUP6CJnSUA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MGovDmU2LSoHdmkNradwbvJRLXO/VtOAe/0zeksNrHLnr/2S1WxUOixiIGtoY7a/mbkJlJHsjMQQ2xHA6J6SbqjDFQtHeXVLMWY+u93Es/YEEcNXd1fX/a6klqJTAWwrNXWb7/utc3Oig48ayeXV4fu4qFuYONrjjW+s13pXykA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azzdcQzv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 729E8C4CED6;
-	Sun, 24 Nov 2024 13:45:08 +0000 (UTC)
+	 MIME-Version; b=TzbrxyApDdhTWFrLH2mhO+yWjeyd2Xsi3OatDAAszSaWb/ruA6Uk8gUK5Z282kHZf5kqq1JfTDfb/rsJYTRUuonDOHqRSfPNDvQlCbJgplcpkOWsoeW02i3dsPror7H9RldZZR7cRHKi7nnFgqMeJLraP/yyZW+XeK6byAgTxbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DfSfw6Q9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8638C4CED1;
+	Sun, 24 Nov 2024 13:45:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455910;
-	bh=frMsR8PTOxaQrnnDp39CBVkRcossL8PMqqCmGH4P73Y=;
+	s=k20201202; t=1732455919;
+	bh=2KnqPmJU9zRqPXj6Smoes6eWbShF/DU5+MUP6CJnSUA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=azzdcQzvwhFP7RBiTXLFutrUUVEUVYrF5JH/mTBCmeUNfv/vxKyqxKzpVZTYQ9LJF
-	 ib43Y6tmm7HTi+jw8QhJmekK/2JkEol17lWflIGyjCFUEgcqEiJpfc4+mcsIwyluD3
-	 0+rUvbh4CEsYnXMQ8yobnjuLTJFDuBLLMpqjBnEucdpxA7PVxw4Mp/ISd0duBwrK0L
-	 gHcW29oO9zaU0zfMI/qCHVCXc33zP7DQyDQrEK/18M9rbQPiW3x+Kg4d4/ijvvnhA2
-	 AdPUSTyaOeES4SbYggZGv2f+0riQkngrjp/TmnJioayTGQwgAbuwFt+v0K1GHmgHRb
-	 LIZ6sQ4jJRbBw==
+	b=DfSfw6Q92bcZEdPgwTJFqn0aNzq4VNI2VpZs084kjmjya5fcxo7eUwAQZW9i4HCsV
+	 U/Qgnv8Ji1sPk5ZIfgA4g2nG5q3NOT/riqltG7uaq2U8hWnEuNhjfPtkjRbikqJ0jE
+	 o0HZVHS95tJ6clyl1iDkGgjeZFXcerlbDVjVJoAbjiL8+cEGFFCcu7ebzlSE04FBxj
+	 uf/fqdSB1NHP2P7x5J4RufhXqW4hsEQ+fpbTVRge+1ykxx7GPHTwttJcikwBPlmkzK
+	 dG7xaDyHZVj13pTLZ99ggW0Y89y6Wr7g02d2rYISssvp18/o5++yJv4kUVSyzIfFN2
+	 95ydpES1VmIsA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Danil Pylaev <danstiv404@gmail.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	olteanv@gmail.com,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	florian.fainelli@broadcom.com,
-	alsi@bang-olufsen.dk,
-	rmk+kernel@armlinux.org.uk,
-	michal.vokac@ysoft.com,
-	javier.carrasco.cruz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 74/87] dsa: qca8k: Use nested lock to avoid splat
-Date: Sun, 24 Nov 2024 08:38:52 -0500
-Message-ID: <20241124134102.3344326-74-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 80/87] Bluetooth: Add new quirks for ATS2851
+Date: Sun, 24 Nov 2024 08:38:58 -0500
+Message-ID: <20241124134102.3344326-80-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241124134102.3344326-1-sashal@kernel.org>
 References: <20241124134102.3344326-1-sashal@kernel.org>
@@ -74,37 +73,74 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
-From: Andrew Lunn <andrew@lunn.ch>
+From: Danil Pylaev <danstiv404@gmail.com>
 
-[ Upstream commit 078e0d596f7b5952dad8662ace8f20ed2165e2ce ]
+[ Upstream commit 94464a7b71634037b13d54021e0dfd0fb0d8c1f0 ]
 
-qca8k_phy_eth_command() is used to probe the child MDIO bus while the
-parent MDIO is locked. This causes lockdep splat, reporting a possible
-deadlock. It is not an actually deadlock, because different locks are
-used. By making use of mutex_lock_nested() we can avoid this false
-positive.
+This adds quirks for broken extended create connection,
+and write auth payload timeout.
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://patch.msgid.link/20241110175955.3053664-1-andrew@lunn.ch
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Danil Pylaev <danstiv404@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/dsa/qca/qca8k-8xxx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/bluetooth/hci.h      | 14 ++++++++++++++
+ include/net/bluetooth/hci_core.h | 10 ++++++----
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index f8d8c70642c4f..59b4a7240b583 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -673,7 +673,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
- 	 * We therefore need to lock the MDIO bus onto which the switch is
- 	 * connected.
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index d1d073089f384..33936134c29e0 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -300,6 +300,20 @@ enum {
  	 */
--	mutex_lock(&priv->bus->mdio_lock);
-+	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
+ 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
  
- 	/* Actually start the request:
- 	 * 1. Send mdio master packet
++	/*
++	 * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command is
++	 * disabled. This is required for the Actions Semiconductor ATS2851
++	 * based controllers, which erroneously claims to support it.
++	 */
++	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
++
++	/*
++	 * When this quirk is set, the command WRITE_AUTH_PAYLOAD_TIMEOUT is
++	 * skipped. This is required for the Actions Semiconductor ATS2851
++	 * based controllers, due to a race condition in pairing process.
++	 */
++	HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT,
++
+ 	/* When this quirk is set, MSFT extension monitor tracking by
+ 	 * address filter is supported. Since tracking quantity of each
+ 	 * pattern is limited, this feature supports tracking multiple
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 88265d37aa72e..94ddc86849733 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1871,8 +1871,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ 			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
+ 
+ /* Use ext create connection if command is supported */
+-#define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
+-
++#define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
++	!test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &(dev)->quirks))
+ /* Extended advertising support */
+ #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
+ 
+@@ -1885,8 +1885,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+  * C24: Mandatory if the LE Controller supports Connection State and either
+  * LE Feature (LL Privacy) or LE Feature (Extended Advertising) is supported
+  */
+-#define use_enhanced_conn_complete(dev) (ll_privacy_capable(dev) || \
+-					 ext_adv_capable(dev))
++#define use_enhanced_conn_complete(dev) ((ll_privacy_capable(dev) || \
++					 ext_adv_capable(dev)) && \
++					 !test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, \
++						 &(dev)->quirks))
+ 
+ /* Periodic advertising support */
+ #define per_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_PERIODIC_ADV))
 -- 
 2.43.0
 
