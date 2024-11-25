@@ -1,122 +1,228 @@
-Return-Path: <netdev+bounces-147218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075669D83F4
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 12:00:20 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EA239D8402
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 12:04:31 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B59A168D04
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:00:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32FE284417
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16F21922D3;
-	Mon, 25 Nov 2024 11:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dqZUGAlR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AEDC194A6C;
+	Mon, 25 Nov 2024 11:04:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4DA15383D
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 11:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FA01922D3;
+	Mon, 25 Nov 2024 11:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732532416; cv=none; b=S/nPkfkTKR5AC91Ed8Iqp2mhgl2LhSWAay+lc8K9n4mDnZaMp0wsYGDstEDplXbAhu+YIwz9pBTuIQqmyAH+EFhHgTWWGfVXZUN3Ejw6dAXH4POt4vnFgn8BJwg3doj/wm0y/SLaJJur5RRVNIAB3tOV7Ml4NpA4SbbqVfPy+i4=
+	t=1732532667; cv=none; b=HrGfbt1WQPExDZ1qZCzGutWOQv+M4T7HaibdB20126RsEM3oCWWseakAxmoQ0Ze8NDV28nZaVI8//9vc3MaKnNXmpozarHUeEwvaQCLbVED7cZfXYpvKWkxvVz3qO48CrUGBVYZ7AZYZtHHoKxjZt2jvCN8QJCZgsWu+qH60WT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732532416; c=relaxed/simple;
-	bh=3d6UyV6U+9wQgJBtBnwExDF3o1uhmm9VscgFbOGYwg8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MihMiVYaz95f+9o6aH2pRTjkR8rPwriiXaBpyD3VN8IkQz8QB6WlVns6vPGVXhgi9eCrm1e4DmZldgtMXo89Ttd320LudGukI/QvTYc66NEG4lB/3t5r80IvB+ABNWwwiBqRDGWeQF0E8TFNQcRxMzw5JPUYPfWX+dl2BaFOqmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dqZUGAlR; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ea1c453f0eso3381001a91.1
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 03:00:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1732532414; x=1733137214; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=96MYJ9KaXB4pjcRmFCY5IfRMfIhiUGPcMDlrjury5qo=;
-        b=dqZUGAlRbYKvTi695nIRKxRxhCH/LhL+AG6JjwQAWm3rRgB0s8KBZ2Qk57/XODM+Zd
-         N7PVw+59jfEV/dKchD2A9BOQF9O1XypM9kEfEtNGikA63C0iU6R0GUroifO89i6/3jzm
-         7xSA8mhyLQMZMsYwqLSLfPgcTncqNlnXF7KY0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732532414; x=1733137214;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=96MYJ9KaXB4pjcRmFCY5IfRMfIhiUGPcMDlrjury5qo=;
-        b=nMq536bll4r4Jh4UufleCz6pOnJBb50iHcRCBjbBvGH38Div6zEPpi5pZoBs76/OL5
-         b6MrgTfAHky9t4pRez/ytmrbZzDCZyg4Ot5uI1gtU2lg43sgGbIMfARKsO2gBlpajh+7
-         VhnAWdvxQNPIrjAD3OwfOUXYq1mfKoe6AhiLBlVALtMgmVF1V98AJxnlq+BP/mQDhkzV
-         0QOgu9EqvYc2+h4CwtefZ4aZrI2XhTjmMB3zup2UCgZVzVRDI6AfY7lLzdU9piFsqW8t
-         V30LY8i+4H12lSAwVcEgOphWujlt7LqkOmWxPqNp6TKj6uVF4IFK63PjqB7UEkyE3jc2
-         EKLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXuHflna5rntSx6oiRlaVBasS6Mxh9XlEV8bOMw5rJ4UgsS4YT9URJ7/gtKOIzuDkx4tB3oQag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJSKJ+67IE1cJqfhg0v9p6SsoC516UwoVAXA4Xjbt/tJtBPrVY
-	3Oi3goiee5N+AbeiH3TzSz8qw8/hmUMkl22PNhMJ2V5kqhmWKvQLpyJGOiIfe6bribbHjRg1lRs
-	=
-X-Gm-Gg: ASbGncvGmUrsQ4D4ny0j36b1PpT+uejQj5H2pTGOpgYpA/Y06x6U6MV46/7tes80+om
-	ebypetU9vSUwk5CXxi29x+n8wN4Dz0mQAdfAoWTb1EqtRrY8K02FvI/6ZEGzn3PNHCuCmVrNHnR
-	C3uvqgz0NvZQ/VnJjJen2DADLquZSYjppA/I09yAq3b8WRHeHFoPYagUA2jw8UftV6N/NljhDjM
-	YJPd406jTREV8UeBZx0rfO2p/bRnT+kOUXODCuiX9qTPhBuuiEk2v4+u6V9MoUStwP+JkNEZz5x
-	aqo=
-X-Google-Smtp-Source: AGHT+IGOFYLZpRNxLdZHD1TVQKl4mUNs8aee25A9C8cycK7Rs+PtYbJTRnxLEvS3pDQwf57usVWQww==
-X-Received: by 2002:a17:90b:180f:b0:2ea:696d:7341 with SMTP id 98e67ed59e1d1-2eb0e527de1mr13709469a91.22.1732532414441;
-        Mon, 25 Nov 2024 03:00:14 -0800 (PST)
-Received: from photon-dev.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ead04fbcd7sm9972779a91.53.2024.11.25.03.00.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 03:00:13 -0800 (PST)
-From: Ajay Kaher <ajay.kaher@broadcom.com>
-To: richardcochran@gmail.com,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	nick.shi@broadcom.com,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	florian.fainelli@broadcom.com
-Subject: [PATCH]  ptp: Add error handling for adjfine callback in ptp_clock_adjtime
-Date: Mon, 25 Nov 2024 10:59:54 +0000
-Message-Id: <20241125105954.1509971-1-ajay.kaher@broadcom.com>
-X-Mailer: git-send-email 2.39.4
+	s=arc-20240116; t=1732532667; c=relaxed/simple;
+	bh=NFhBhP3/TVWro0ElJi6vj5V8/PmXfpxK+X0fLDMV7GA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=I0nDCM8PeOVurUpvxOh6g8jQH8aX2R9PeDc0kDdBW8C2cIdvUUg5/907DJz85DF4vuDcFv04/aUejcbqyciJb4fHudhUD+MH+wRFPgXjIFGRVycyFhWpFseLrk3wv8Hi1HaN/dABS77H1qra1F1zQn8WqachtAstph8r+2frNrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XxjW32Jvwz6L76x;
+	Mon, 25 Nov 2024 19:03:43 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5BF34140367;
+	Mon, 25 Nov 2024 19:04:13 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 25 Nov 2024 14:04:11 +0300
+Message-ID: <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
+Date: Mon, 25 Nov 2024 14:04:09 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
+ <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
+ <Z0DDQKACIRRDRZRE@google.com>
+Content-Language: ru
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <Z0DDQKACIRRDRZRE@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-ptp_clock_adjtime sets ptp->dialed_frequency even when adjfine
-callback returns an error. This causes subsequent reads to return
-an incorrect value.
+On 11/22/2024 8:45 PM, Günther Noack wrote:
+> Hello Mikhail,
+> 
+> sorry for the delayed response;
+> I am very happy to see activity on this patch set! :)
 
-Fix this by adding error check before ptp->dialed_frequency is set.
+Hello Günther,
+No problem, thanks a lot for your feedback!
 
-Fixes: 39a8cbd9ca05 ("ptp: remember the adjusted frequency")
-Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
----
- drivers/ptp/ptp_clock.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> On Mon, Nov 11, 2024 at 07:29:49PM +0300, Mikhail Ivanov wrote:
+>> On 9/4/2024 1:48 PM, Mikhail Ivanov wrote:
+>>> Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
+>>> fine-grained control of actions for a specific protocol. Any action or
+>>> protocol that is not supported by this rule can not be controlled. As a
+>>> result, protocols for which fine-grained control is not supported can be
+>>> used in a sandboxed system and lead to vulnerabilities or unexpected
+>>> behavior.
+>>>
+>>> Controlling the protocols used will allow to use only those that are
+>>> necessary for the system and/or which have fine-grained Landlock control
+>>> through others types of rules (e.g. TCP bind/connect control with
+>>> `LANDLOCK_RULE_NET_PORT`, UNIX bind control with
+>>> `LANDLOCK_RULE_PATH_BENEATH`). Consider following examples:
+>>>
+>>> * Server may want to use only TCP sockets for which there is fine-grained
+>>>     control of bind(2) and connect(2) actions [1].
+>>> * System that does not need a network or that may want to disable network
+>>>     for security reasons (e.g. [2]) can achieve this by restricting the use
+>>>     of all possible protocols.
+>>>
+>>> This patch implements such control by restricting socket creation in a
+>>> sandboxed process.
+>>>
+>>> Add `LANDLOCK_RULE_SOCKET` rule type that restricts actions on sockets.
+>>> This rule uses values of address family and socket type (Cf. socket(2))
+>>> to determine sockets that should be restricted. This is represented in a
+>>> landlock_socket_attr struct:
+>>>
+>>>     struct landlock_socket_attr {
+>>>       __u64 allowed_access;
+>>>       int family; /* same as domain in socket(2) */
+>>>       int type; /* see socket(2) */
+>>>     };
+>>
+>> Hello! I'd like to consider another approach to define this structure
+>> before sending the next version of this patchset.
+>>
+>> Currently, it has following possible issues:
+>>
+>> First of all, there is a lack of protocol granularity. It's impossible
+>> to (for example) deny creation of ICMP and SCTP sockets and allow TCP
+>> and UDP. Since the values of address family and socket type do not
+>> completely define the protocol for the restriction, we may gain
+>> incomplete control of the network actions. AFAICS, this is limited to
+>> only a couple of IP protocol cases (e.g. it's impossible to deny SCTP
+>> and SMC sockets to only allow TCP, deny ICMP and allow UDP).
+>>
+>> But one of the main advantages of socket access rights is the ability to
+>> allow only those protocols for which there is a fine-grained control
+>> over their actions (TCP bind/connect). It can be inconvenient
+>> (and unsafe) for SCTP to be unrestricted, while sandboxed process only
+>> needs TCP sockets.
+> 
+> That is a good observation which I had missed.
+> 
+> I agree with your analysis, I also see the main use case of socket()
+> restrictions in:
+> 
+>   (a) restricting socket creating altogether
+>   (b) only permitting socket types for which there is fine grained control
+> 
+> and I also agree that it would be very surprising when the same socket types
+> that provide fine grained control would also open the door for unrestricted
+> access to SMC, SCTP or other protocols.  We should instead strive for a
+> socket() access control with which these additional protocols weren't
+> accessible.
+> 
+> 
+>> Adding protocol (Cf. socket(2)) field was considered a bit during the
+>> initial discussion:
+>> https://lore.kernel.org/all/CABi2SkVWU=Wxb2y3fP702twyHBD3kVoySPGSz2X22VckvcHeXw@mail.gmail.com/
+> 
+> So adding "protocol" to the rule attributes would suffice to restrict the use of
+> SMC and SCTP then?  (Sorry, I lost context on these protocols a bit in the
+> meantime, I was so far under the impression that these were using different
+> values for family and type than TCP and UDP do.)
 
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index c56cd0f..77a36e7 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -150,7 +150,8 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
- 		if (ppb > ops->max_adj || ppb < -ops->max_adj)
- 			return -ERANGE;
- 		err = ops->adjfine(ops, tx->freq);
--		ptp->dialed_frequency = tx->freq;
-+		if (!err)
-+			ptp->dialed_frequency = tx->freq;
- 	} else if (tx->modes & ADJ_OFFSET) {
- 		if (ops->adjphase) {
- 			s32 max_phase_adj = ops->getmaxphase(ops);
--- 
-2.39.4
+Yeap. Following rule will be enough to allow TCP sockets only:
 
+const struct landlock_socket_attr create_socket_attr = {
+	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+	.family = AF_INET{,6},
+	.type = SOCK_STREAM,
+	.protocol = 0
+};
+
+Btw, creation of SMC sockets via IP stack was added quite recently.
+So far, creation has been possible only with AF_SMC family.
+
+https://lore.kernel.org/all/1718301630-63692-1-git-send-email-alibuda@linux.alibaba.com/
+
+> 
+> 
+>> Secondly, I'm not really sure if socket type granularity is required
+>> for most of the protocols. It may be more convenient for the end user
+>> to be able to completely restrict the address family without specifying
+>> whether restriction is dedicated to stream or dgram sockets (e.g. for
+>> BLUETOOTH, VSOCK sockets). However, this is not a big issue for the
+>> current design, since address family can be restricted by specifying
+>> type = SOCK_TYPE_MASK.
+> 
+> Whether the user is adding one rule to permit AF_INET+*, or whether the user is
+> adding two rules to permit (1) AF_INET+SOCK_STREAM and (2) AF_INET+SOCK_DGRAM,
+> that does not seem like a big deal to me as long as the list of such
+> combinations is so low?
+
+Agreed
+
+> 
+> 
+>> I suggest implementing something close to selinux socket classes for the
+>> struct landlock_socket_attr (Cf. socket_type_to_security_class()). This
+>> will provide protocol granularity and may be simpler and more convenient
+>> in the terms of determining access rights. WDYT?
+> 
+> I see that this is a longer switch statement that maps to this enum, it would be
+> an additional data table that would have to be documented separately for users.
+
+This table is the general drawback, since it makes API a bit more
+complex.
+
+> 
+> Do you have an example for how such a "security class enum" would map to the
+> combinations of family, type and socket for the protocols discussed above?
+
+I think the socket_type_to_security_class() has a pretty good mapping
+for UNIX and IP families.
+
+> 
+> If this is just a matter of actually mapping (family, type, protocol)
+> combinations in a more flexible way, could we get away by allowing a special
+> "wildcard" value for the "protocol" field, when it is used within a ruleset?
+> Then the LSM would have to look up whether there is a rule for (family, type,
+> protocol) and the only change would be that it now needs to also check whether
+> there is a rule for (family, type, *)?
+
+Something like this?
+
+const struct landlock_socket_attr create_socket_attr = {
+	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+	.family = AF_INET6,
+	.type = SOCK_DGRAM,
+	.protocol = LANDLOCK_SOCKET_PROTO_ALL
+};
+
+> 
+> —Günther
 
