@@ -1,133 +1,240 @@
-Return-Path: <netdev+bounces-147215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1218D9D83D4
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:52:21 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFECB1676D5
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:52:04 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E6C192B90;
-	Mon, 25 Nov 2024 10:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4tuBI4f"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5696C9D83DC
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:53:26 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABCF17DFF2;
-	Mon, 25 Nov 2024 10:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17BAA28A614
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:53:25 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A81193407;
+	Mon, 25 Nov 2024 10:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AG/iqdDk"
+X-Original-To: netdev@vger.kernel.org
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3F7192D87
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 10:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732531897; cv=none; b=VUxXEAgTQ8kVvZQBstodBqkqwsBY3XHxYcZ3UbrrlaGYtO+La5gWykdbxnjVURAl1JVoFVem5jiSfrz7JhG+z7hJkrg9Ke4SdD/i5G7gi+I7dAUV7ucg6NuCwUb5dsqj9o3QO0l7wHwfekjb68W/SBohGStywJNncmMvVDp8YM4=
+	t=1732531975; cv=none; b=kZ4WDZK8+MPUO8TwIufpEYjipSQLh9bf7/wfpPknp9MwsK+YRUJ29E14ZNWaRwTdG5KbJOT2JglNMSL0PMxKsQLKzR4uWzimjGxXqVLykxj5vxoY2RwG4rxkemAFd+DgpxGTtei8rUaCeo1h8ECUJVYoUZbyPvNHwGz6N1+zVJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732531897; c=relaxed/simple;
-	bh=KskUYDOafEEpUyFS31TIrHEYG3ez8mPbthzKMzQhMwI=;
+	s=arc-20240116; t=1732531975; c=relaxed/simple;
+	bh=N5OJASuUNrxir7OkItusUNt/HE0H2KgHqM5QwkfAxB4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CrqJKyXSkFbzv+YFCZyFmJ6/dqCKIDC/Dsj7XZiOzEUjDBDsOl0LvJmCh9H680odDJAx+ycwA/W+stkPrxY0SRuiCKzc2FXDIjk+gRLt/+s5tenKUUqVQAoo57pLz/UPNPRA5khfcedc9dOG6Vg3YZZIEonDGm0xt1Qo+4pwXKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4tuBI4f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8B7DC4CECE;
-	Mon, 25 Nov 2024 10:51:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732531896;
-	bh=KskUYDOafEEpUyFS31TIrHEYG3ez8mPbthzKMzQhMwI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=V4tuBI4fG0F4rZBd7otOSEQPP6MZn/49rKgMOhYw5SU195j4YAE2EbrRmgjCTH5+o
-	 ZXxT0ul5wTvdRKEeLNaFLjFPQnNIM2Gpoj63/L/Mvj8QDgRmNwoY6pm9O86+QmvuyQ
-	 XN2SQNpg9gJcILOqeBCStLERSTVoleQe20dHU8SpOxmJAGKq2uw/QFK5CdIjrqS/aC
-	 Dl6vk5qBNHqsf4QLK8OTt0oiaIJ99VZS4x5+aI2VbvYescw3ND/FLaXZCJkzxTLgzT
-	 x+EW9BoDuWlY3J2vDM/bhbJVAl0IeMKXL5pkBIZswADmG9VbMvZawktnNp6haUQv4m
-	 +bAk6pPGq8gHA==
-Message-ID: <017ae0c6-b221-4486-a2b9-d29b5a82e7de@kernel.org>
-Date: Mon, 25 Nov 2024 11:51:30 +0100
+	 In-Reply-To:Content-Type; b=Oz1IC0gEbrjkEqXrY9QZdoQlBCWBiRVGFCYDGXVEwYAB5UpjeUU6emz/ZLJ0JkKO2pbYeLrfX7oHWouqVjBd9RrPxLUtONT/1d28+p5LZfnJlWH/Z9Ynwm90gC3bcwgMk0Kl/rsxcFWmxvYs+t6Tgi9HxC/5msWgPjkkhWVMAAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AG/iqdDk; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0a8c2285-29c2-4a79-b704-c2baeac90b70@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732531965;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A1KpdPwnSbk5EQncnXyppapMggQ4L+h6E0nxjLIioNE=;
+	b=AG/iqdDkm5jIIRtnb7xBAxMVoJGAo2sn3tvY6bD4JkeXlKoVRse76XaLuAX4yie46AGQGF
+	JsH5Y15Jp4wqxOt8rbkiipPmGxsWxcOWOR6skMT7Feqmh3/hVHvqJzBAUC+swQLa3P6Xbn
+	hxogJnIFHTnn1HgEfqI7udwg0HC99jw=
+Date: Mon, 25 Nov 2024 11:52:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/4] arm64: dts: agilex5: initial support for Arrow
- AXE5-Eagle
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de
-References: <20241125-v6-12-topic-socfpga-agilex5-v2-0-864256ecc7b2@pengutronix.de>
- <20241125-v6-12-topic-socfpga-agilex5-v2-4-864256ecc7b2@pengutronix.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH bpf-next 4/4] bpf/selftests: add simple selftest for
+ bpf_smc_ops
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
+ yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, jolsa@kernel.org, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ dtcccc@linux.alibaba.com
+References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+ <1729737768-124596-5-git-send-email-alibuda@linux.alibaba.com>
+ <8c06240b-540b-472f-974f-d2db80d90c22@linux.dev>
+ <e8ba7dc0-96b5-4119-b2f6-b07432f65fdb@linux.alibaba.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20241125-v6-12-topic-socfpga-agilex5-v2-4-864256ecc7b2@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <e8ba7dc0-96b5-4119-b2f6-b07432f65fdb@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 25/11/2024 11:33, Steffen Trumtrar wrote:
-> The Arrow AXE5-Eagle is an Intel Agilex5 SoCFPGA based board with:
-> 
->    - 1x PCIe Gen4.0 edge connector
->    - 4-port USB HUB
->    - 2x 1Gb Ethernet
->    - microSD
->    - HDMI output
->    - 2x 10Gb SFP+ cages
-> 
-> As most devices aren't supported mainline yet, this is only the initial
-> support for the board.
-> 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> ---
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+On 21.11.24 03:00, D. Wythe wrote:
+>
+>
+> On 11/3/24 9:01 PM, Zhu Yanjun wrote:
+>> 在 2024/10/24 4:42, D. Wythe 写道:
+>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>
+>>> This PATCH adds a tiny selftest for bpf_smc_ops, to verify the ability
+>>> to attach and write access.
+>>>
+>>> Follow the steps below to run this test.
+>>>
+>>> make -C tools/testing/selftests/bpf
+>>> cd tools/testing/selftests/bpf
+>>> sudo ./test_progs -t smc
+>>
+>> Thanks a lot.
+>>
+>> # ./test_progs -t smc
+>> #27/1    bpf_smc/load:OK
+>> #27      bpf_smc:OK
+>> Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+>>
+>> The above command is based on several kernel modules. After these 
+>> dependent kernel modules are loaded, then can run the above command 
+>> successfully.
+>>
+>> Zhu Yanjun
+>>
+>
+> Hi, Yanjun
+>
+> This is indeed a problem, a better way may be to create a separate 
+> testing directory for SMC, and we are trying to do this.
 
-Best regards,
-Krzysztof
+Got it. In the latest patch series, if a test program in sample/bpf can 
+verify this bpf feature, it is better than a selftest program in the 
+directory tools/testing/selftests/bpf.
+
+I delved into this selftest tool. It seems that this selftest tool only 
+makes the basic checks. A test program in sample/bpf can do more.
+
+I mean, it is very nice that a selftest tool can make selftest on smc 
+bpf. But it is better that a test program in sample/bpf can make some 
+parameter changes in smc.
+
+These parameter changes are mentioned in the previous commits.
+
+"
+
+     As a subsequent enhancement, this patch introduces a new hook for eBPF
+     programs that allows decisions on whether to use SMC or not at runtime,
+     including but not limited to local/remote IP address or ports. In
+     simpler words, this feature allows modifications to syn_smc through 
+eBPF
+     programs before the TCP three-way handshake got established.
+
+"
+
+Zhu Yanjun
+
+>
+> Best wishes,
+> D. Wythe
+>
+>>>
+>>> Results shows:
+>>> Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+>>>
+>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>> ---
+>>>   .../selftests/bpf/prog_tests/test_bpf_smc.c        | 21 +++++++++++
+>>>   tools/testing/selftests/bpf/progs/bpf_smc.c        | 44 
+>>> ++++++++++++++++++++++
+>>>   2 files changed, 65 insertions(+)
+>>>   create mode 100644 
+>>> tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+>>>   create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+>>>
+>>> diff --git a/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c 
+>>> b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+>>> new file mode 100644
+>>> index 00000000..2299853
+>>> --- /dev/null
+>>> +++ b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+>>> @@ -0,0 +1,21 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +#include <test_progs.h>
+>>> +
+>>> +#include "bpf_smc.skel.h"
+>>> +
+>>> +static void load(void)
+>>> +{
+>>> +    struct bpf_smc *skel;
+>>> +
+>>> +    skel = bpf_smc__open_and_load();
+>>> +    if (!ASSERT_OK_PTR(skel, "bpf_smc__open_and_load"))
+>>> +        return;
+>>> +
+>>> +    bpf_smc__destroy(skel);
+>>> +}
+>>> +
+>>> +void test_bpf_smc(void)
+>>> +{
+>>> +    if (test__start_subtest("load"))
+>>> +        load();
+>>> +}
+>>> diff --git a/tools/testing/selftests/bpf/progs/bpf_smc.c 
+>>> b/tools/testing/selftests/bpf/progs/bpf_smc.c
+>>> new file mode 100644
+>>> index 00000000..ebff477
+>>> --- /dev/null
+>>> +++ b/tools/testing/selftests/bpf/progs/bpf_smc.c
+>>> @@ -0,0 +1,44 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +
+>>> +#include "vmlinux.h"
+>>> +
+>>> +#include <bpf/bpf_helpers.h>
+>>> +#include <bpf/bpf_tracing.h>
+>>> +
+>>> +char _license[] SEC("license") = "GPL";
+>>> +
+>>> +struct smc_bpf_ops_ctx {
+>>> +    struct {
+>>> +        struct tcp_sock *tp;
+>>> +    } set_option;
+>>> +    struct {
+>>> +        const struct tcp_sock *tp;
+>>> +        struct inet_request_sock *ireq;
+>>> +        int smc_ok;
+>>> +    } set_option_cond;
+>>> +};
+>>> +
+>>> +struct smc_bpf_ops {
+>>> +    void (*set_option)(struct smc_bpf_ops_ctx *ctx);
+>>> +    void (*set_option_cond)(struct smc_bpf_ops_ctx *ctx);
+>>> +};
+>>> +
+>>> +SEC("struct_ops/bpf_smc_set_tcp_option_cond")
+>>> +void BPF_PROG(bpf_smc_set_tcp_option_cond, struct smc_bpf_ops_ctx 
+>>> *arg)
+>>> +{
+>>> +    arg->set_option_cond.smc_ok = 1;
+>>> +}
+>>> +
+>>> +SEC("struct_ops/bpf_smc_set_tcp_option")
+>>> +void BPF_PROG(bpf_smc_set_tcp_option, struct smc_bpf_ops_ctx *arg)
+>>> +{
+>>> +    struct tcp_sock *tp = arg->set_option.tp;
+>>> +
+>>> +    tp->syn_smc = 1;
+>>> +}
+>>> +
+>>> +SEC(".struct_ops.link")
+>>> +struct smc_bpf_ops sample_smc_bpf_ops = {
+>>> +    .set_option         = (void *) bpf_smc_set_tcp_option,
+>>> +    .set_option_cond    = (void *) bpf_smc_set_tcp_option_cond,
+>>> +};
+
+-- 
+Best Regards,
+Yanjun.Zhu
+
 
