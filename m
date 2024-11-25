@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-147295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4758C9D8F51
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 00:52:04 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 680DF9D8F52
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 00:52:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62A27B21D68
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 23:52:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1860A16ACFE
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 23:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B701CC89D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F55D1CD1E1;
 	Mon, 25 Nov 2024 23:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Isbem7Zm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hht2hV30"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD95918FDA5
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 23:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94641195FEF
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 23:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732578715; cv=none; b=TPol8MHUalGr/jvuRbI+LWJZH0KY1AXzUzNZO/pHaM/175hUjYcZAGTSmroc21PlfHp4kKBDvyke9VHiT2Vq4BQjb28KwfQGxoS55JJIGYQjFymfEY18nKZP894P8hHaF2wpvFXBzo10fNTGrm26JsictD+aAbsTfLKPMSWcdNw=
+	t=1732578715; cv=none; b=fPsOVOsYl6SZMOXJnNDX5WhY8SM9J+SU5MapdTNVGPM9KbORI+97G93ZRaSj/0MM/1TDfai7cd4OeMQsMsT9nXoHJT2aYHywiZ3OIkKfeyKldGfiJf1Sb4duD0jIXsPQ7aKQOoCc58LDk3kJl8fhHpeZrNAlcD546iirXWveEzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1732578715; c=relaxed/simple;
-	bh=uGdnYzxKg5GKHi0/ysL3ebuO6MTfJE1bncXU0G0FT9I=;
+	bh=oKmrbFBW91xqVYvbebB/vpZoCPgp9Bu1WvEqBD4XIfA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dzQ8bsNKckBT/+vk21PO7ob9MbdiEZN9xeVE7j/bwvGg9ssrCe56/SZJxlkbIjqdGpDXP6R+e3XAVnBCqA8tS8GIXi7zzkxwc3zrFzx+m0P9lyVhYCN2Dq2D8s9oeFJXjjp+c7Ja34CYQPeroTSD/lfTFbUOhJRTxFID4Kofb+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Isbem7Zm; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=abHBPtqInBlCzMMntevo4oT4GTvcLiiO3KNkGYsk1Vwn2qIn6sEnjwEj2mC5c3DB4IsO+728f9JUHtX+oIDYZ/dtf7BpogcowWhJqocFicM57C6eod9/eUL3WuFNNsnFqn0IOrgnw5RlyWPSe01vpW45iUNiFhbbXJJ5TdSVl8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hht2hV30; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732578713; x=1764114713;
+  t=1732578714; x=1764114714;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uGdnYzxKg5GKHi0/ysL3ebuO6MTfJE1bncXU0G0FT9I=;
-  b=Isbem7ZmBOav8YDEGy2jiGmgOWAH2X5WYI4cVYtTdrNbg9JPUjDtHbz5
-   o8/aS3ETi93q2HmdplF9+ITvn0OJGA4X08hGn0jfsiSlfy6fdGi+OHa6B
-   msaJ3jE2Xjz8R5TqijWMoywMNCr0pONCKM/bbZ5lGGkwtHiqWv6wM6j9V
-   D3fzzHgzpFW8vdp3zjRhWziHLH7YJ//GxZGE6JLjsNx13GDpO1fdswJww
-   Mf9cC3qI687c1Jl7NASHd+s6lV/AQ3uAPjmE7q6pptc3NGU4PuRqM7dhe
-   SBgtp5mPZzQaNHdo/mLNlmWNQJQ6mkc/9mrtrqu4DoZ8ViOaunlcU+CtO
-   Q==;
-X-CSE-ConnectionGUID: WexLtyzSSK6givZ7a22K2A==
-X-CSE-MsgGUID: iTxNhJR+QBGePbHac8A7zQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="44108296"
+  bh=oKmrbFBW91xqVYvbebB/vpZoCPgp9Bu1WvEqBD4XIfA=;
+  b=hht2hV30sHHLJT39mlYFwWIkYNZnwvQACI5wdk+bfJgoopMhVBVFCsA6
+   eE6rnrgIPtAfJx5a8F+TbVb2fKc7q5DnUELZp7GAoRUttdPR9G5JjFI/0
+   ShY5eQdiy/70IdzmA9dXZE80EqJogy5Yp/JaU7vbsCAV5rZlhrJl0rzvg
+   GpvymuNAOlxuSnHCiYeOkyjFoUHahjUcyPvGqRpjpuyqlFPGJ18CSxFN6
+   64KTILz2IJ+ICmTQqi49YOD7OsBlFZmTzLWu1q456slvd7oc25r2pySIp
+   u5aEtrHHFH4giB2WYE4NU7/GbtoDZ3SsDhT/OS6sJBuZCBGXbHUfzwsjn
+   g==;
+X-CSE-ConnectionGUID: L+3lT3KBQ5WD3p/c+QuVgQ==
+X-CSE-MsgGUID: 5aP4BbcNReW5J3c0xoTa9A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="44108299"
 X-IronPort-AV: E=Sophos;i="6.12,184,1728975600"; 
-   d="scan'208";a="44108296"
+   d="scan'208";a="44108299"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 15:51:52 -0800
-X-CSE-ConnectionGUID: K3V+x2kcTLqnZ+ndJcgMzQ==
-X-CSE-MsgGUID: +kokG/I9QIiHRRh0FCO27g==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 15:51:53 -0800
+X-CSE-ConnectionGUID: Mm8ohnSfRKKePUGUyfe13g==
+X-CSE-MsgGUID: gOhpcJkcQhiHzuofj0uFbw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,184,1728975600"; 
-   d="scan'208";a="92239627"
+   d="scan'208";a="92239631"
 Received: from dcskidmo-m40.jf.intel.com ([10.166.241.13])
-  by orviesa008.jf.intel.com with ESMTP; 25 Nov 2024 15:51:52 -0800
+  by orviesa008.jf.intel.com with ESMTP; 25 Nov 2024 15:51:53 -0800
 From: Joshua Hay <joshua.a.hay@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: przemyslaw.kitszel@intel.com,
@@ -66,9 +66,9 @@ Cc: przemyslaw.kitszel@intel.com,
 	madhu.chittim@intel.com,
 	netdev@vger.kernel.org,
 	Joshua Hay <joshua.a.hay@intel.com>
-Subject: [Intel-wired-lan][PATCH iwl-net 1/2] idpf: add support for SW triggered interrupts
-Date: Mon, 25 Nov 2024 15:58:54 -0800
-Message-Id: <20241125235855.64850-2-joshua.a.hay@intel.com>
+Subject: [Intel-wired-lan][PATCH iwl-net 2/2] idpf: trigger SW interrupt when exiting wb_on_itr mode
+Date: Mon, 25 Nov 2024 15:58:55 -0800
+Message-Id: <20241125235855.64850-3-joshua.a.hay@intel.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241125235855.64850-1-joshua.a.hay@intel.com>
 References: <20241125235855.64850-1-joshua.a.hay@intel.com>
@@ -80,90 +80,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SW triggered interrupts are guaranteed to fire after their timer
-expires, unlike Tx and Rx interrupts which will only fire after the
-timer expires _and_ a descriptor write back is available to be processed
-by the driver.
+There is a race condition between exiting wb_on_itr and completion write
+backs. For example, we are in wb_on_itr mode and a Tx completion is
+generated by HW, ready to be written back, as we are re-enabling
+interrupts:
 
-Add the necessary fields, defines, and initializations to enable a SW
-triggered interrupt in the vector's dyn_ctl register.
+	HW                      SW
+	|                       |
+	|			| idpf_tx_splitq_clean_all
+	|                       | napi_complete_done
+	|			|
+	| tx_completion_wb 	| idpf_vport_intr_update_itr_ena_irq
 
+That tx_completion_wb happens before the vector is fully re-enabled.
+Continuing with this example, it is a UDP stream and the
+tx_completion_wb is the last one in the flow (there are no rx packets).
+Because the HW generated the completion before the interrupt is fully
+enabled, the HW will not fire the interrupt once the timer expires and
+the write back will not happen. NAPI poll won't be called.  We have
+indicated we're back in interrupt mode but nothing else will trigger the
+interrupt. Therefore, the completion goes unprocessed, triggering a Tx
+timeout.
+
+To mitigate this, fire a SW triggered interrupt upon exiting wb_on_itr.
+This interrupt will catch the rogue completion and avoid the timeout.
+Add logic to set the appropriate bits in the vector's dyn_ctl register.
+
+Fixes: 9c4a27da0ecc ("idpf: enable WB_ON_ITR")
 Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
 Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_dev.c    | 3 +++
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 8 +++++++-
- drivers/net/ethernet/intel/idpf/idpf_vf_dev.c | 3 +++
- 3 files changed, 13 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 30 ++++++++++++++-------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_dev.c
-index 6c913a703df6..41e4bd49402a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_dev.c
-@@ -101,6 +101,9 @@ static int idpf_intr_reg_init(struct idpf_vport *vport)
- 		intr->dyn_ctl_itridx_s = PF_GLINT_DYN_CTL_ITR_INDX_S;
- 		intr->dyn_ctl_intrvl_s = PF_GLINT_DYN_CTL_INTERVAL_S;
- 		intr->dyn_ctl_wb_on_itr_m = PF_GLINT_DYN_CTL_WB_ON_ITR_M;
-+		intr->dyn_ctl_swint_trig_m = PF_GLINT_DYN_CTL_SWINT_TRIG_M;
-+		intr->dyn_ctl_sw_itridx_ena_m =
-+			PF_GLINT_DYN_CTL_SW_ITR_INDX_ENA_M;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index a8989dd98272..9558b90469c8 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3604,21 +3604,32 @@ static void idpf_vport_intr_dis_irq_all(struct idpf_vport *vport)
+ /**
+  * idpf_vport_intr_buildreg_itr - Enable default interrupt generation settings
+  * @q_vector: pointer to q_vector
+- * @type: itr index
+- * @itr: itr value
+  */
+-static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector,
+-					const int type, u16 itr)
++static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector)
+ {
+-	u32 itr_val;
++	u32 itr_val = q_vector->intr_reg.dyn_ctl_intena_m;
++	int type = IDPF_NO_ITR_UPDATE_IDX;
++	u16 itr = 0;
++
++	if (q_vector->wb_on_itr) {
++		/*
++		 * Trigger a software interrupt when exiting wb_on_itr, to make
++		 * sure we catch any pending write backs that might have been
++		 * missed due to interrupt state transition.
++		 */
++
++		itr_val |= q_vector->intr_reg.dyn_ctl_swint_trig_m |
++			   q_vector->intr_reg.dyn_ctl_sw_itridx_ena_m;
++		type = IDPF_SW_ITR_UPDATE_IDX;
++		itr = IDPF_ITR_20K;
++	}
  
- 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
- 					       IDPF_PF_ITR_IDX_SPACING);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index b59aa7d8de2c..cd9a20c9cc7f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -335,6 +335,8 @@ struct idpf_vec_regs {
-  * @dyn_ctl_itridx_m: Mask for ITR index
-  * @dyn_ctl_intrvl_s: Register bit offset for ITR interval
-  * @dyn_ctl_wb_on_itr_m: Mask for WB on ITR feature
-+ * @dyn_ctl_sw_itridx_ena_m: Mask for SW ITR index
-+ * @dyn_ctl_swint_trig_m: Mask for dyn_ctl SW triggered interrupt enable
-  * @rx_itr: RX ITR register
-  * @tx_itr: TX ITR register
-  * @icr_ena: Interrupt cause register offset
-@@ -348,6 +350,8 @@ struct idpf_intr_reg {
- 	u32 dyn_ctl_itridx_m;
- 	u32 dyn_ctl_intrvl_s;
- 	u32 dyn_ctl_wb_on_itr_m;
-+	u32 dyn_ctl_sw_itridx_ena_m;
-+	u32 dyn_ctl_swint_trig_m;
- 	void __iomem *rx_itr;
- 	void __iomem *tx_itr;
- 	void __iomem *icr_ena;
-@@ -418,7 +422,7 @@ struct idpf_q_vector {
- 	cpumask_var_t affinity_mask;
- 	__cacheline_group_end_aligned(cold);
- };
--libeth_cacheline_set_assert(struct idpf_q_vector, 112,
-+libeth_cacheline_set_assert(struct idpf_q_vector, 120,
- 			    24 + sizeof(struct napi_struct) +
- 			    2 * sizeof(struct dim),
- 			    8 + sizeof(cpumask_var_t));
-@@ -452,6 +456,8 @@ struct idpf_tx_queue_stats {
- #define IDPF_ITR_IS_DYNAMIC(itr_mode) (itr_mode)
- #define IDPF_ITR_TX_DEF		IDPF_ITR_20K
- #define IDPF_ITR_RX_DEF		IDPF_ITR_20K
-+/* Index used for 'SW ITR' update in DYN_CTL register */
-+#define IDPF_SW_ITR_UPDATE_IDX	2
- /* Index used for 'No ITR' update in DYN_CTL register */
- #define IDPF_NO_ITR_UPDATE_IDX	3
- #define IDPF_ITR_IDX_SPACING(spacing, dflt)	(spacing ? spacing : dflt)
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-index aad62e270ae4..aba828abcb17 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
-@@ -101,6 +101,9 @@ static int idpf_vf_intr_reg_init(struct idpf_vport *vport)
- 		intr->dyn_ctl_itridx_s = VF_INT_DYN_CTLN_ITR_INDX_S;
- 		intr->dyn_ctl_intrvl_s = VF_INT_DYN_CTLN_INTERVAL_S;
- 		intr->dyn_ctl_wb_on_itr_m = VF_INT_DYN_CTLN_WB_ON_ITR_M;
-+		intr->dyn_ctl_swint_trig_m = VF_INT_DYN_CTLN_SWINT_TRIG_M;
-+		intr->dyn_ctl_sw_itridx_ena_m =
-+			VF_INT_DYN_CTLN_SW_ITR_INDX_ENA_M;
+ 	itr &= IDPF_ITR_MASK;
+ 	/* Don't clear PBA because that can cause lost interrupts that
+ 	 * came in while we were cleaning/polling
+ 	 */
+-	itr_val = q_vector->intr_reg.dyn_ctl_intena_m |
+-		  (type << q_vector->intr_reg.dyn_ctl_itridx_s) |
+-		  (itr << (q_vector->intr_reg.dyn_ctl_intrvl_s - 1));
++	itr_val |= (type << q_vector->intr_reg.dyn_ctl_itridx_s) |
++		   (itr << (q_vector->intr_reg.dyn_ctl_intrvl_s - 1));
  
- 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
- 					       IDPF_VF_ITR_IDX_SPACING);
+ 	return itr_val;
+ }
+@@ -3716,9 +3727,8 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
+ 	/* net_dim() updates ITR out-of-band using a work item */
+ 	idpf_net_dim(q_vector);
+ 
++	intval = idpf_vport_intr_buildreg_itr(q_vector);
+ 	q_vector->wb_on_itr = false;
+-	intval = idpf_vport_intr_buildreg_itr(q_vector,
+-					      IDPF_NO_ITR_UPDATE_IDX, 0);
+ 
+ 	writel(intval, q_vector->intr_reg.dyn_ctl);
+ }
 -- 
 2.39.2
 
