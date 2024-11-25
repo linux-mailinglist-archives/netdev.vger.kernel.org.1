@@ -1,198 +1,116 @@
-Return-Path: <netdev+bounces-147193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631B89D8244
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:31:25 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E92B816342F
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:31:21 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BF019007F;
-	Mon, 25 Nov 2024 09:31:21 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from out198-20.us.a.mail.aliyun.com (out198-20.us.a.mail.aliyun.com [47.90.198.20])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F219D824E
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:33:07 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2109915098F;
-	Mon, 25 Nov 2024 09:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.20
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AB49281CB4
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:33:06 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A1D190079;
+	Mon, 25 Nov 2024 09:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xpPWtEfN"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921FD186E26
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 09:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732527081; cv=none; b=OO6QnAzcqiAa3gZ2fDpx7X/FbeYjBWEhqeOQrsB62e4DzZ7GFr9sDFaenZ4YZ9+WNI8hs7wHLU5O/pLF3YPcjKvbPKkHB633CcnTDlrvQQMoJc/ftAFePMZcSHCXyzqYUCbK8TI1GNPBr/qDKyOyWA46IO3GdGTVsm1QwpOJu5M=
+	t=1732527184; cv=none; b=BZtb8xG4ld+JUVeM8KbopsgZtW1lrumpO7LxF68TnCqF54dcg6FY+Ijst8M3SR6RawVQzF+/YGPpjj1C1WiK85K0fZDJ/y9vcdvBB/xKd/uLVaIiRtq9WXk0Tr+ALr0zEmUiFqGZQnQm4DVivRH53v+H4mx5QgvBPAS8SciXgLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732527081; c=relaxed/simple;
-	bh=l3qVLm9ZddLvs9+B9vDgR3UiVviQdJaPmWBDf72fr3M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G8E2k/x+APvYfp8WMsk3vcnsXVQSc105VnffTzrGnFrpXeJYXvknnx9fmHq5fxsygoWfVmnoL/l02WuE0cuAY/DzQzSRLsvCxm6RCyeh8sky5mFheEuWtQe7Z3Z5v0c47pZk0T9Y3E4tTooP5oKI/9teU7Antc9lPBGphp5Z/6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aLnmoO6_1732527063 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Nov 2024 17:31:04 +0800
-Message-ID: <ba24293a-77b1-4106-84d2-81ff343fc90f@motor-comm.com>
-Date: Mon, 25 Nov 2024 17:31:02 +0800
+	s=arc-20240116; t=1732527184; c=relaxed/simple;
+	bh=iJhCiDk4FV6a8jhD1x9FdWaVImExu0N+arblA6KpRYw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HJ8DKy/ITnPed46+7lJ8LQ044W5gxBRtn8swKCcBCpSBiBxk3mQPBa+8sy9jVZJmOWlHW9DDfulQKG0/d8CUwYExy/W3VWg/CqqWYHS827x0W7r8yAriw0iwESoRs4yGvI84V138lUPcu1SSRX8cx5dB0jBT4P7yD7HJUZjcGL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xpPWtEfN; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-38248b810ffso3188120f8f.0
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 01:33:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732527181; x=1733131981; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iJhCiDk4FV6a8jhD1x9FdWaVImExu0N+arblA6KpRYw=;
+        b=xpPWtEfNNIMIc/BxU2o/JUCYznhRLaFtwbHSuXHN15ZjDjF5YmwazW6QrzFJ+qNNWm
+         LNm0wpPGZdWkaf2Qm49D6sJppByb2ErHouhJDGn/RDsN0VJZ+Wtfz8a0EL5EXr+4W9cI
+         dfjsvTGTN+o/9KGfIE4pB1I+hAFA76HFDQB/tNcQUb14EN3sZGzyuxL2fiEEmmiNsQ8/
+         RNZuYCMcU+jNYmWPiWHZJHxOWTWLMf8bSP/AqcpsMWdW8Zo1I8ooU5TGPjdoRuJfAdz6
+         NbdmQa+2ywHl6hMXS8IgckChGjljc2GMO+Ln6w5F4BUgKA7h+bmr5oatBt4VwLA8Z+mZ
+         pEkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732527181; x=1733131981;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iJhCiDk4FV6a8jhD1x9FdWaVImExu0N+arblA6KpRYw=;
+        b=h/22rNxQFmenxucBOzaMEDugraslQJZ3G8DYo3JniO8XP5PS/CcMjDktiAKE+JCnYa
+         6dlSuCROPtZeTEJpB+OY1wOZXKDgpWQLxzVtJd7NVeT/Mwa0XgMwgGFYGvqL08CshvXV
+         A6ZE5CTAWkI3jP3dVwrMVMzn3mpowF/HHfwpveRFIcRpnoL69G86+cpdcdcbsBtFh865
+         myGVquTp2EDWVXHGxr7IMriFc+Cc6zyUjcQwOW9jDKBNfFF5IYEtR/Y7cmiYlsWkCpqs
+         KsppgHTGZFrarVqhSTQGGLgprmwi4l9+4CmtAIvrGpXE1qe+6oqtuMZWcJ+TrrTefkmE
+         beuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyvH33mrryp8N4liU3eBSGK5Xr5pZBA6jqJB1Of1Q9hKjgKQUDmz0W6v3U5mL3kWTIYwUNd5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfZcNNvBrSGPiHURQjAD1ojFLoMQ3Q8cxschT0kj4v+1at2KK7
+	tx2ufiKLRFIAzbKgDNWreKrmSXrRDVNbnyP4//aI3eXUgoLX4jtN8VmD4dbsYVjP4+//gzdhBxT
+	6XWiajlrHHPJHIkCyYNBRwVW2QBXBBLJbOZhW
+X-Gm-Gg: ASbGncvoDkJYg7U3kZyALDS2fgUi630w4itHZqf3zzWNmAjxU//dvoTW2og/36yJghH
+	6OIggkkY6yerKv1R1wtI6rf73WINZVm2N45A88jdVq/QdQcxoCcv8b76CVuWoNQ==
+X-Google-Smtp-Source: AGHT+IHk2ePzXk7rFVIBNN5xp9LHxdFZTmA+UEnsClr0r4H+EBABd5CJ17K9erfSX4yaztpTHbj05WlX4/9ds8MqiC4=
+X-Received: by 2002:a5d:6484:0:b0:382:4ab4:b428 with SMTP id
+ ffacd0b85a97d-38260b452famr8130184f8f.8.1732527179739; Mon, 25 Nov 2024
+ 01:32:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the
- fxgmac_start function
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
- <20241120105625.22508-6-Frank.Sae@motor-comm.com>
- <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
-Content-Language: en-US
-From: Frank Sae <Frank.Sae@motor-comm.com>
-In-Reply-To: <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241123222849.350287-1-ojeda@kernel.org> <20241123222849.350287-2-ojeda@kernel.org>
+ <CAH5fLggK_uL0izyDogqdxqp+UEiDbMW555zgS6jk=gw3n07f6A@mail.gmail.com> <CANiq72nKgj0n84Q76FSsPSeaupwgEKBT0GQbO8m-KHKZb103gg@mail.gmail.com>
+In-Reply-To: <CANiq72nKgj0n84Q76FSsPSeaupwgEKBT0GQbO8m-KHKZb103gg@mail.gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Mon, 25 Nov 2024 10:32:47 +0100
+Message-ID: <CAH5fLgiUwnNE9fP8SFOBY1OeKDhb8NGPSRjSxQaL5fAYb7nAWQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] rust: kernel: move `build_error` hidden function to
+ prevent mistakes
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Trevor Gross <tmgross@umich.edu>, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Mon, Nov 25, 2024 at 10:23=E2=80=AFAM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
+>
+> On Mon, Nov 25, 2024 at 10:14=E2=80=AFAM Alice Ryhl <aliceryhl@google.com=
+> wrote:
+> >
+> > You could also put #![doc(hidden)] at the top of build_assert.rs to
+> > simplify the lib.rs list. Not sure what is best.
+>
+> Yeah, not sure. We used outer attributes for the rest of
+> `doc(hidden)`s, including in the same file, so it is probably best to
+> keep it consistent, unless we decide to move all to inner ones.
 
-On 2024/11/23 07:16, Andrew Lunn wrote:
->> +static  void fxgmac_phylink_handler(struct net_device *ndev)
->> +{
->> +	struct fxgmac_pdata *pdata = netdev_priv(ndev);
->> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
->> +
->> +	pdata->phy_link = pdata->phydev->link;
->> +	pdata->phy_speed = pdata->phydev->speed;
->> +	pdata->phy_duplex = pdata->phydev->duplex;
->> +
->> +	yt_dbg(pdata, "EPHY_CTRL:%x, link:%d, speed:%d,  duplex:%x.\n",
->> +	       rd32_mem(pdata, EPHY_CTRL), pdata->phy_link, pdata->phy_speed,
->> +	       pdata->phy_duplex);
->> +
->> +	if (pdata->phy_link) {
->> +		hw_ops->config_mac_speed(pdata);
->> +		hw_ops->enable_rx(pdata);
->> +		hw_ops->enable_tx(pdata);
->> +		netif_carrier_on(pdata->netdev);
-> 
-> phylib controls the carrier, not the MAC driver.
-> 
->> +static int fxgmac_phy_connect(struct fxgmac_pdata *pdata)
->> +{
->> +	struct phy_device *phydev = pdata->phydev;
->> +	int ret;
->> +
->> +	ret = phy_connect_direct(pdata->netdev, phydev, fxgmac_phylink_handler,
->> +				 PHY_INTERFACE_MODE_RGMII);
-> 
-> RGMII is unusual, you normally want RGMII_ID. Where are the 2ns delays
-> added?
-> 
+It might actually make sense to move all of them, I think. I find that
+they make the list difficult to edit.
 
-Yes, you are right. PHY_INTERFACE_MODE_RGMII should be PHY_INTERFACE_MODE_RGMII_ID.
-YT6801 NIC integrated with YT8531S phy, and the 2ns delays added in the phy driver.
-https://elixir.bootlin.com/linux/v6.12/source/drivers/net/phy/motorcomm.c#L895
+But feel free to pick whichever one you prefer for this change. My RB
+applies with or without it :)
 
-
->> +int fxgmac_phy_irq_enable(struct fxgmac_pdata *pdata, bool clear_phy_interrupt)
->> +{
->> +	struct phy_device *phydev = pdata->phydev;
->> +
->> +	if (clear_phy_interrupt &&
->> +	    phy_read(phydev, PHY_INT_STATUS) < 0)
->> +		return -ETIMEDOUT;
->> +
->> +	return phy_modify(phydev, PHY_INT_MASK,
->> +				     PHY_INT_MASK_LINK_UP |
->> +					     PHY_INT_MASK_LINK_DOWN,
->> +				     PHY_INT_MASK_LINK_UP |
->> +					     PHY_INT_MASK_LINK_DOWN);
-> 
-> The PHY driver is in charge of PHY interrupts.
-> 
->> +int fxgmac_start(struct fxgmac_pdata *pdata)
->> +{
->> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
->> +	u32 val;
->> +	int ret;
->> +
->> +	if (pdata->dev_state != FXGMAC_DEV_OPEN &&
->> +	    pdata->dev_state != FXGMAC_DEV_STOP &&
->> +	    pdata->dev_state != FXGMAC_DEV_RESUME) {
->> +		yt_dbg(pdata, " dev_state err:%x\n", pdata->dev_state);
->> +		return 0;
->> +	}
->> +
->> +	if (pdata->dev_state != FXGMAC_DEV_STOP) {
->> +		hw_ops->reset_phy(pdata);
->> +		hw_ops->release_phy(pdata);
->> +		yt_dbg(pdata, "reset phy.\n");
->> +	}
->> +
->> +	if (pdata->dev_state == FXGMAC_DEV_OPEN) {
->> +		ret = fxgmac_phy_connect(pdata);
->> +		if (ret < 0)
->> +			return ret;
->> +
->> +		yt_dbg(pdata, "fxgmac_phy_connect.\n");
->> +	}
->> +
->> +	phy_init_hw(pdata->phydev);
->> +	phy_resume(pdata->phydev);
-> 
-> The MAC should not be doing this.
-
-Does this mean deleting 'phy_resume(pdata->phydev)'?
-
-> 
->> +
->> +	hw_ops->pcie_init(pdata);
->> +	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate)) {
->> +		yt_err(pdata,
->> +		       "fxgmac powerstate is %lu when config power up.\n",
->> +		       pdata->powerstate);
->> +	}
->> +
->> +	hw_ops->config_power_up(pdata);
->> +	hw_ops->dismiss_all_int(pdata);
->> +	ret = hw_ops->init(pdata);
->> +	if (ret < 0) {
->> +		yt_err(pdata, "fxgmac hw init error.\n");
->> +		return ret;
->> +	}
->> +
->> +	fxgmac_napi_enable(pdata);
->> +	ret = fxgmac_request_irqs(pdata);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	/* Config interrupt to level signal */
->> +	val = rd32_mac(pdata, DMA_MR);
->> +	fxgmac_set_bits(&val, DMA_MR_INTM_POS, DMA_MR_INTM_LEN, 2);
->> +	fxgmac_set_bits(&val, DMA_MR_QUREAD_POS, DMA_MR_QUREAD_LEN, 1);
->> +	wr32_mac(pdata, val, DMA_MR);
->> +
->> +	hw_ops->enable_mgm_irq(pdata);
->> +	hw_ops->set_interrupt_moderation(pdata);
->> +
->> +	if (pdata->per_channel_irq) {
->> +		fxgmac_enable_msix_irqs(pdata);
->> +		ret = fxgmac_phy_irq_enable(pdata, true);
->> +		if (ret < 0)
->> +			goto dis_napi;
->> +	}
->> +
->> +	fxgmac_enable_rx_tx_ints(pdata);
->> +	phy_speed_up(pdata->phydev);
->> +	genphy_soft_reset(pdata->phydev);
-> 
-> More things the MAC driver should not be doing.
-
-Does this mean deleting 'phy_speed_up(pdata->phydev);' and 'genphy_soft_reset(pdata->phydev);' ?
-
-> 
-> 	Andrew
+Alice
 
