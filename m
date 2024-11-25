@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-147214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63FA79D83D1
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:51:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1218D9D83D4
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:52:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3442167128
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:51:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFECB1676D5
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:52:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0481990D3;
-	Mon, 25 Nov 2024 10:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E6C192B90;
+	Mon, 25 Nov 2024 10:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cm0Tl8Jv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4tuBI4f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F962500B5;
-	Mon, 25 Nov 2024 10:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABCF17DFF2;
+	Mon, 25 Nov 2024 10:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732531870; cv=none; b=i9ca+dmP6eOty5hfum0/jS7JpV2bO902wuTfv44i4TE/nY/kGZ+deRgXR87EdlBEAUr7RXqa5iI9w8svICn3y8AYMGt8lffeEqtaRKkUsPf5UBC8z4aQ1sAP0HJRQhEmxRhRsEFjuVL71WlB2FB0lMYc2KQ9/YD2yVAU3a8bm6w=
+	t=1732531897; cv=none; b=VUxXEAgTQ8kVvZQBstodBqkqwsBY3XHxYcZ3UbrrlaGYtO+La5gWykdbxnjVURAl1JVoFVem5jiSfrz7JhG+z7hJkrg9Ke4SdD/i5G7gi+I7dAUV7ucg6NuCwUb5dsqj9o3QO0l7wHwfekjb68W/SBohGStywJNncmMvVDp8YM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732531870; c=relaxed/simple;
-	bh=QDA4su++mMVwrM0wfQhlVkImR4PRtky1DFc/fV5/ay4=;
+	s=arc-20240116; t=1732531897; c=relaxed/simple;
+	bh=KskUYDOafEEpUyFS31TIrHEYG3ez8mPbthzKMzQhMwI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g5Jjk1pWpWy8qNZlP41YxllMX+xsI0vK+5T5bVd7VMdR4qEnIuFOUNrX8loB+KrJZt/7TGYg7UzOKEd0crjK1ihMgj3dAbbFf0oDQVW2fpWuJ9MGVQX0UgrB8tbquyk2aCEs2BR2uc2iDUS80lkKN+uUTmSZR6D4BFK944hhsrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cm0Tl8Jv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D68C4CED2;
-	Mon, 25 Nov 2024 10:51:06 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=CrqJKyXSkFbzv+YFCZyFmJ6/dqCKIDC/Dsj7XZiOzEUjDBDsOl0LvJmCh9H680odDJAx+ycwA/W+stkPrxY0SRuiCKzc2FXDIjk+gRLt/+s5tenKUUqVQAoo57pLz/UPNPRA5khfcedc9dOG6Vg3YZZIEonDGm0xt1Qo+4pwXKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4tuBI4f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8B7DC4CECE;
+	Mon, 25 Nov 2024 10:51:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732531870;
-	bh=QDA4su++mMVwrM0wfQhlVkImR4PRtky1DFc/fV5/ay4=;
+	s=k20201202; t=1732531896;
+	bh=KskUYDOafEEpUyFS31TIrHEYG3ez8mPbthzKMzQhMwI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Cm0Tl8JvCmtgOO1gLFNdx1FEwL5ZjOzwyJzTkp5KkUbi3mYgKmOpBqTXEEa/t+nuQ
-	 xWqnff8yLK3wzd/ILHFJSbOncOlQB4QUtz+TLxmN7zDsm0I3smB7Um5Yr2+lJq3t2G
-	 K4IlbsF25j8bs06WRr8Mlc1fnkBCTtjpoBDWxrjHUMKqb5fA8jo08SpML8RHXCSeZ3
-	 ea+hmyoXjSAkNOLv21jguXXfPyTWH8uiB/WDp1EkS2o749hzCx3D2dFwMX5cIo7qhJ
-	 iAhyAN2WEPEO25JmDCOrZjSzzIH7RhowzffGPMkLEzqQJLNVtZj+TZN/xsJp2Wg0Eq
-	 jG1tRk0NLGLEA==
-Message-ID: <14110c3d-4aee-49a9-8cc2-fbeac298f1ff@kernel.org>
-Date: Mon, 25 Nov 2024 11:51:04 +0100
+	b=V4tuBI4fG0F4rZBd7otOSEQPP6MZn/49rKgMOhYw5SU195j4YAE2EbrRmgjCTH5+o
+	 ZXxT0ul5wTvdRKEeLNaFLjFPQnNIM2Gpoj63/L/Mvj8QDgRmNwoY6pm9O86+QmvuyQ
+	 XN2SQNpg9gJcILOqeBCStLERSTVoleQe20dHU8SpOxmJAGKq2uw/QFK5CdIjrqS/aC
+	 Dl6vk5qBNHqsf4QLK8OTt0oiaIJ99VZS4x5+aI2VbvYescw3ND/FLaXZCJkzxTLgzT
+	 x+EW9BoDuWlY3J2vDM/bhbJVAl0IeMKXL5pkBIZswADmG9VbMvZawktnNp6haUQv4m
+	 +bAk6pPGq8gHA==
+Message-ID: <017ae0c6-b221-4486-a2b9-d29b5a82e7de@kernel.org>
+Date: Mon, 25 Nov 2024 11:51:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/4] arm64: dts: agilex5: add gmac nodes
+Subject: Re: [PATCH v2 4/4] arm64: dts: agilex5: initial support for Arrow
+ AXE5-Eagle
 To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
  Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -59,7 +60,7 @@ To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
 Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de
 References: <20241125-v6-12-topic-socfpga-agilex5-v2-0-864256ecc7b2@pengutronix.de>
- <20241125-v6-12-topic-socfpga-agilex5-v2-2-864256ecc7b2@pengutronix.de>
+ <20241125-v6-12-topic-socfpga-agilex5-v2-4-864256ecc7b2@pengutronix.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -105,34 +106,27 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241125-v6-12-topic-socfpga-agilex5-v2-2-864256ecc7b2@pengutronix.de>
+In-Reply-To: <20241125-v6-12-topic-socfpga-agilex5-v2-4-864256ecc7b2@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 25/11/2024 11:33, Steffen Trumtrar wrote:
-> The Agilex5 provides three Synopsys XGMAC ethernet cores, that can be
-> used to transmit and receive data at 10M/100M/1G/2.5G over ethernet
-> connections and enables support for Time Sensitive Networking (TSN)
-> applications.
+> The Arrow AXE5-Eagle is an Intel Agilex5 SoCFPGA based board with:
+> 
+>    - 1x PCIe Gen4.0 edge connector
+>    - 4-port USB HUB
+>    - 2x 1Gb Ethernet
+>    - microSD
+>    - HDMI output
+>    - 2x 10Gb SFP+ cages
+> 
+> As most devices aren't supported mainline yet, this is only the initial
+> support for the board.
 > 
 > Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 > ---
->  arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi | 87 ++++++++++++++++++++++++++
->  1 file changed, 87 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-> index b1debf0317d0576f7b00200e9593481671183faa..647ccd0b5a66b68fab745d443b975c12d6ce63df 100644
-> --- a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-> +++ b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-> @@ -141,6 +141,93 @@ soc: soc@0 {
->  		device_type = "soc";
->  		interrupt-parent = <&intc>;
->  
-> +		gmac0: ethernet@10810000 {
-> +			compatible = "altr,socfpga-stmmac-a10-s10",
 
-
-That's odd compatible, this is not Arria10 SoC, neither Stratix 10.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
