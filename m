@@ -1,211 +1,127 @@
-Return-Path: <netdev+bounces-147253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F089D8BE2
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:04:10 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 193F09D8BF6
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:08:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E300B2E7A6
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 18:01:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B00A4162909
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 18:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F5B1BD01D;
-	Mon, 25 Nov 2024 17:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E245D1B6CEB;
+	Mon, 25 Nov 2024 18:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="Vz/y+APZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fdwy0Rt/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A857E1BBBF7;
-	Mon, 25 Nov 2024 17:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211F31AAE0B
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 18:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732557597; cv=none; b=eGVacKJrGty82n6Wk6+9kr8a2O4gJOnOlWoq2YpAGPsPmNw4OW0BIVwGp43gnr7GnvKDsTUrUYTYSCY2zX3qvvvsTRu8X29e+6ag0yIpOGDmWzxtxz3zhnIiY4I7q+sE7hf8D1Nrm8hgNSDBehn0R/IR8Ff86Q84r83uXxwOblE=
+	t=1732558115; cv=none; b=EVvfeJD1yYu1l5RVpe7gj/xLbGZxIJVrVWUHQPpj8sZILSzlnGwoczCW1evGh4LDaYinNh6jLvBBPACOlfAIfQyz9OGmU0VzXD6qU6n7mUDpa2GFWidQUaJduntUPtd66GvE+LATKLWPWfkM/g3xEWo8nb8SPD3oiWJsQkMbmLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732557597; c=relaxed/simple;
-	bh=V5N4wSUZrBPuCZ/XKy+HU1S/9iyK0UN1290lQKfMNms=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=F3sQMqekQTwAlla21t4X6hOCBL3vuCSbO5il3ia/4l4Cvt3J4FiBMcdHU859mJYIIBW+6MkBHrcopxRsDMi38190Ct1CWcxoFG5luIZi1mNyuDarRhJOp4Fjxtn7gVfaoZgY5DDfNjq5ZxmL2iGve8Xjeofcy60nlbDgdQXnXpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=Vz/y+APZ; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id 8E5A980CAF;
-	Mon, 25 Nov 2024 19:59:44 +0200 (EET)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Mon, 25 Nov 2024 19:59:43 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 37359303248;
-	Mon, 25 Nov 2024 19:59:32 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1732557574; bh=V5N4wSUZrBPuCZ/XKy+HU1S/9iyK0UN1290lQKfMNms=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=Vz/y+APZW/fp7aSEDdYfl2HL12Ly4g47GuG9/uZ/SjF4n62iUW75Tjpzj8PC0DwwR
-	 KcjpelfK5wYlaKZaIbK2BecBEjiMSKOgG00anIJR5J3r+prqsxqiDA1iasgVg+kfJw
-	 aBCV8gKnx5cEDFNNupYNs/xwB5yEWAPT3ilabObE=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 4APHxJKD053777;
-	Mon, 25 Nov 2024 19:59:21 +0200
-Date: Mon, 25 Nov 2024 19:59:19 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Jinghao Jia <jinghao7@illinois.edu>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-        netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>, Ruowen Qin <ruqin@redhat.com>
-Subject: Re: [PATCH v3 net] ipvs: fix UB due to uninitialized stack access
- in ip_vs_protocol_init()
-In-Reply-To: <20241123094256.28887-1-jinghao7@illinois.edu>
-Message-ID: <8b210ce9-19d8-eefd-fc86-febdc33394f6@ssi.bg>
-References: <20241123094256.28887-1-jinghao7@illinois.edu>
+	s=arc-20240116; t=1732558115; c=relaxed/simple;
+	bh=f/8NwLKDNGwA4BBNxjludT6JeLJQpYXupFh0WKIWdEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m7ElFk/MAPRzBKy8/e4ao+ETNNQGrHFLCX3zRuW9ChL+U8VKLrpClp6CUfcfQvGNRfvaUCSXt1BKkySl7SPE8xrqtgWnGDzn9/cL4CvaviGf4FpkSfCmqOWvweQhySDng77uXg6d3aabQNLXjAs1D0DWfTPKQ7EJ0LuzqRvZRi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fdwy0Rt/; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d043043d46so2587747a12.3
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 10:08:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732558112; x=1733162912; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f/8NwLKDNGwA4BBNxjludT6JeLJQpYXupFh0WKIWdEA=;
+        b=Fdwy0Rt/VHlqgQ0xl07X/D3HQqb15N43TZn9J8LhVyQwlhspRXvcAqme9SzgiKgX/j
+         Msyflet/kAp/RTl1Y0r4MZ/Xf8ZnBhb5EVQ7Gg4IHHm2hP41wl8RA2rzfolCGfIY0/WC
+         NaCw1YL4Kpam7q4fCrValZM5YTM0eRy5dvEM72dFRkFjaXyCYxin1jS/saNht61Gb1TR
+         syAi/+GhoGIi18aeYFr8soAoXKfmjhJwnziXmoHIR5m/YLx50TPC9aR4Ecq4D7dpe2Ib
+         4YqEpXlk/0ZeY7di5Ddx8PSAokd+3dR5/bVJUG+jIzKeI0Zvo6e/sOrOp2PCVxnA3Nsa
+         8ShQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732558112; x=1733162912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f/8NwLKDNGwA4BBNxjludT6JeLJQpYXupFh0WKIWdEA=;
+        b=acOqb8FTFS5E974rbvXPmK5GkpzsElTrhqVbPeLkpbHkMS2ZWFbU/UbaC1DFNVRjU2
+         fKve6Y0VdHtAo4yRHCrt6QqRz30bJ08Ak/9vSGUpUn6f/L/jsULqjgZ7KNlHz2lUnk5Y
+         PdN7q2qqOIu6bwu2FyM9mYHQph6wnyQ81fRMzuFLvCTkbTR8uBXJsEUH923AqoyFz132
+         LAVcYjB3wQZ2V2R38eHZdQXQD4O5Z6em/GypgUjAzxCs9Mpc5uBqwt2OkOH0O/LpWZ7K
+         teeyZzIfiQyZ/LJHjScr2T+x9229LhNBtwRFBTirrBsuGb9vni8amH1Coft4toNnjJ4J
+         mJ1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVAWG232W6goc0qgXKggchEsaxWue7WUj9X7QTsiSxRjKh8U7BOFZHFFTghqsMNE5SrXRzO8OI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX42mS184ildWiUsbeeBhqsh9Ltbowvx0NmHlPuouFtBnpI/ig
+	OHARP0r9b7Kq61pnJz9ZnlIKZAKSjGRR6cEf3IEwt6XkyiAC5rcqgTb+MA/9hatGdrDoQSlg50K
+	v39hpHykjIISZpp2zwcl7y2etCnF++PG513g+
+X-Gm-Gg: ASbGncuosRvwRFYUkHS+fffmRSCPBtxPlZe5qMbPrFD5kvlH3foI1Z6H1mk/EZYA5/R
+	a3BToKUrMLbeQUu88J2B/NXskkiIKFk4=
+X-Google-Smtp-Source: AGHT+IHKMdoCdYVLYstvTLbkIH5an+q5VLUZCM0/VpgrdnIYU/0qaxzK96Z5d9X4Yfsfb2kU+0cF1c0TftMw/R/GZ4w=
+X-Received: by 2002:a05:6402:1e93:b0:5cf:de89:9364 with SMTP id
+ 4fb4d7f45d1cf-5d0205f4b61mr11330079a12.10.1732558112236; Mon, 25 Nov 2024
+ 10:08:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <CANn89iJ7uOuDCzErfeymGuyaP9ECqjFK5ZF9o3cuvR3+VLWfFg@mail.gmail.com>
+ <20241125174608.1484356-1-martin.ottens@fau.de>
+In-Reply-To: <20241125174608.1484356-1-martin.ottens@fau.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 25 Nov 2024 19:08:21 +0100
+Message-ID: <CANn89iLeSEVDZv-Nx6RGghSJdpozBAdoU==VQLgH5v+Puc=i0w@mail.gmail.com>
+Subject: Re: [PATCH v2] net/sched: tbf: correct backlog statistic for GSO packets
+To: Martin Ottens <martin.ottens@fau.de>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"open list:TC subsystem" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Nov 25, 2024 at 6:46=E2=80=AFPM Martin Ottens <martin.ottens@fau.de=
+> wrote:
+>
+> When the length of a GSO packet in the tbf qdisc is larger than the burst
+> size configured the packet will be segmented by the tbf_segment function.
+> Whenever this function is used to enqueue SKBs, the backlog statistic of
+> the tbf is not increased correctly. This can lead to underflows of the
+> 'backlog' byte-statistic value when these packets are dequeued from tbf.
+>
+> Reproduce the bug:
+> Ensure that the sender machine has GSO enabled. Configured the tbf on
+> the outgoing interface of the machine as follows (burstsize =3D 1 MTU):
+> $ tc qdisc add dev <oif> root handle 1: tbf rate 50Mbit burst 1514 latenc=
+y 50ms
+>
+> Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
+> client on this machine. Check the qdisc statistics:
+> $ tc -s qdisc show dev <oif>
+>
+> The 'backlog' byte-statistic has incorrect values while traffic is
+> transferred, e.g., high values due to u32 underflows. When the transfer
+> is stopped, the value is !=3D 0, which should never happen.
+>
+> This patch fixes this bug by updating the statistics correctly, even if
+> single SKBs of a GSO SKB cannot be enqueued.
+>
+> Fixes: e43ac79a4bc6 ("sch_tbf: segment too big GSO packets")
+> Signed-off-by: Martin Ottens <martin.ottens@fau.de>
 
-	Hello,
+This seems fine, please note we ask for a 24 hours delay between each
+version, to let other reviewers chime in.
 
-On Sat, 23 Nov 2024, Jinghao Jia wrote:
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-> Under certain kernel configurations when building with Clang/LLVM, the
-> compiler does not generate a return or jump as the terminator
-> instruction for ip_vs_protocol_init(), triggering the following objtool
-> warning during build time:
-> 
->   vmlinux.o: warning: objtool: ip_vs_protocol_init() falls through to next function __initstub__kmod_ip_vs_rr__935_123_ip_vs_rr_init6()
-> 
-> At runtime, this either causes an oops when trying to load the ipvs
-> module or a boot-time panic if ipvs is built-in. This same issue has
-> been reported by the Intel kernel test robot previously.
-> 
-> Digging deeper into both LLVM and the kernel code reveals this to be a
-> undefined behavior problem. ip_vs_protocol_init() uses a on-stack buffer
-> of 64 chars to store the registered protocol names and leaves it
-> uninitialized after definition. The function calls strnlen() when
-> concatenating protocol names into the buffer. With CONFIG_FORTIFY_SOURCE
-> strnlen() performs an extra step to check whether the last byte of the
-> input char buffer is a null character (commit 3009f891bb9f ("fortify:
-> Allow strlen() and strnlen() to pass compile-time known lengths")).
-> This, together with possibly other configurations, cause the following
-> IR to be generated:
-> 
->   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #5 section ".init.text" align 16 !kcfi_type !29 {
->     %1 = alloca [64 x i8], align 16
->     ...
-> 
->   14:                                               ; preds = %11
->     %15 = getelementptr inbounds i8, ptr %1, i64 63
->     %16 = load i8, ptr %15, align 1
->     %17 = tail call i1 @llvm.is.constant.i8(i8 %16)
->     %18 = icmp eq i8 %16, 0
->     %19 = select i1 %17, i1 %18, i1 false
->     br i1 %19, label %20, label %23
-> 
->   20:                                               ; preds = %14
->     %21 = call i64 @strlen(ptr noundef nonnull dereferenceable(1) %1) #23
->     ...
-> 
->   23:                                               ; preds = %14, %11, %20
->     %24 = call i64 @strnlen(ptr noundef nonnull dereferenceable(1) %1, i64 noundef 64) #24
->     ...
->   }
-> 
-> The above code calculates the address of the last char in the buffer
-> (value %15) and then loads from it (value %16). Because the buffer is
-> never initialized, the LLVM GVN pass marks value %16 as undefined:
-> 
->   %13 = getelementptr inbounds i8, ptr %1, i64 63
->   br i1 undef, label %14, label %17
-> 
-> This gives later passes (SCCP, in particular) more DCE opportunities by
-> propagating the undef value further, and eventually removes everything
-> after the load on the uninitialized stack location:
-> 
->   define hidden i32 @ip_vs_protocol_init() local_unnamed_addr #0 section ".init.text" align 16 !kcfi_type !11 {
->     %1 = alloca [64 x i8], align 16
->     ...
-> 
->   12:                                               ; preds = %11
->     %13 = getelementptr inbounds i8, ptr %1, i64 63
->     unreachable
->   }
-> 
-> In this way, the generated native code will just fall through to the
-> next function, as LLVM does not generate any code for the unreachable IR
-> instruction and leaves the function without a terminator.
-> 
-> Zero the on-stack buffer to avoid this possible UB.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202402100205.PWXIz1ZK-lkp@intel.com/
-> Co-developed-by: Ruowen Qin <ruqin@redhat.com>
-> Signed-off-by: Ruowen Qin <ruqin@redhat.com>
-> Signed-off-by: Jinghao Jia <jinghao7@illinois.edu>
-
-	Looks good to me, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
-> ---
-> Changelog:
-> v2 -> v3:
-> v2: https://lore.kernel.org/lkml/20241122045257.27452-1-jinghao7@illinois.edu/
-> * Fix changelog format based on Julian's feedback
-> 
-> v1 -> v2:
-> v1: https://lore.kernel.org/lkml/20241111065105.82431-1-jinghao7@illinois.edu/
-> * Fix small error in commit message
-> * Address Julian's feedback:
->   * Make this patch target the net tree rather than net-next
->   * Add a "Fixes" tag for the initial git commit
-> 
->  net/netfilter/ipvs/ip_vs_proto.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_proto.c b/net/netfilter/ipvs/ip_vs_proto.c
-> index f100da4ba3bc..a9fd1d3fc2cb 100644
-> --- a/net/netfilter/ipvs/ip_vs_proto.c
-> +++ b/net/netfilter/ipvs/ip_vs_proto.c
-> @@ -340,7 +340,7 @@ void __net_exit ip_vs_protocol_net_cleanup(struct netns_ipvs *ipvs)
->  
->  int __init ip_vs_protocol_init(void)
->  {
-> -	char protocols[64];
-> +	char protocols[64] = { 0 };
->  #define REGISTER_PROTOCOL(p)			\
->  	do {					\
->  		register_ip_vs_protocol(p);	\
-> @@ -348,8 +348,6 @@ int __init ip_vs_protocol_init(void)
->  		strcat(protocols, (p)->name);	\
->  	} while (0)
->  
-> -	protocols[0] = '\0';
-> -	protocols[2] = '\0';
->  #ifdef CONFIG_IP_VS_PROTO_TCP
->  	REGISTER_PROTOCOL(&ip_vs_protocol_tcp);
->  #endif
-> -- 
-> 2.47.0
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+Can you also take a look at net/sched/sch_taprio.c, it seems the bug
+has been copy/pasted there as well.
 
