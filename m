@@ -1,211 +1,95 @@
-Return-Path: <netdev+bounces-147262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006299D8C94
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 20:03:49 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C105A9D8C8D
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 20:00:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D4C2826C7
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:03:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D897166AAD
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F00017BB0F;
-	Mon, 25 Nov 2024 19:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931AF157A6C;
+	Mon, 25 Nov 2024 19:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b="LTeTFaSj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVX1xvOM"
 X-Original-To: netdev@vger.kernel.org
-Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6219016CD35;
-	Mon, 25 Nov 2024 19:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E06E1CD2C
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 19:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732561425; cv=none; b=Dgfy663aBfznzFPHNifBksay/QSz+1bi+nMGPOopQpFh+3sH+IEtUEkcFH6ZEhOJ1jrhSSqUK/69CK+URT3pHeNmriK2yoUPQJrBIy3D8VICTlW4czxbhTgjWteUEuL3RwkcZb2BP5tzt49weYnMRyo89gfTzhg6LyJ/N5ZGcPk=
+	t=1732561220; cv=none; b=I8FFSjJTH1yLsqh6L0Cge5tvjIKLssBERypuv9Rm8WGBlZR+LZwC+MWUe+tuG6nq7qVdbeCy5irt0wx0QQ6aYimoLHlVU6gtojhDuU9APrf62Xk7JungHK7/cl0i7E/rAAHvYyFq9eF2GHTrcd0f2CzvcXxLPUjnbb9Pj2MKPXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732561425; c=relaxed/simple;
-	bh=9ku+h65M6+VPZXQ6WcZ4YG41rpM8CqLhibh84fYnn+8=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=l76bcPMfZN7UeJ+YfMwsIFYPd7vWM3K7TxhmNJ+sn1PbgueUM8b0ZQlRrMK9mHfaISwfqEpte49lJPai/sXBo7jujlSM3GKUr3cEIG09ACXIa7FeCzE7Xr4X035aj4f29rZzKvVNI3hGnT/x6aVwMUasGPOKRyk++dWTgGddaxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org; spf=pass smtp.mailfrom=paranoici.org; dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b=LTeTFaSj; arc=none smtp.client-ip=198.167.222.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paranoici.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paranoici.org;
-	s=stigmate; t=1732560903;
-	bh=M6fz4P98w3VjpGDNzAgndwqt7Oc1F7x0EIDpJAYrNRg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LTeTFaSjsi+/BQUPSsqAdLI8AEtwfQGMxUZ8eEcuPkk6wvHaTKv0ndgKYdkKI/JAU
-	 XX4ISyAc+ixYINTWzTWBkicP+2ScOjirWRKrLqY7FPLns6m8K7dRk1XERDZu8rxIQX
-	 E789k+ePHLEn7PmlVJIcBWYsMWfPHwXktXi/KCFg=
-Received: from mx2.investici.org (unknown [127.0.0.1])
-	by devianza.investici.org (Postfix) with ESMTP id 4Xxvyv0mqfz72WY;
-	Mon, 25 Nov 2024 18:55:03 +0000 (UTC)
-Received: from [198.167.222.108] (mx2.investici.org [198.167.222.108]) (Authenticated sender: invernomuto@paranoici.org) by localhost (Postfix) with ESMTPSA id 4Xxvyv0VjMz70Pd;
-	Mon, 25 Nov 2024 18:55:03 +0000 (UTC)
-Received: from frx by crunch with local (Exim 4.98)
-	(envelope-from <invernomuto@paranoici.org>)
-	id 1tFeEf-000000003J6-2q3L;
-	Mon, 25 Nov 2024 19:55:01 +0100
-Date: Mon, 25 Nov 2024 19:54:43 +0100
-From: Francesco Poli <invernomuto@paranoici.org>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <ukleinek@debian.org>
-Cc: 1086520@bugs.debian.org, Mark Zhang <markzhang@nvidia.com>, Leon
- Romanovsky <leonro@nvidia.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to
- start
-Message-Id: <20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
-In-Reply-To: <nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
-References: <173040083268.16618.7451145398661885923.reportbug@crunch>
-	<jaw7557rpn2eln3dtb2xbv2gvzkzde6mfful7d2mf5mgc3wql7@wikm2a7a3kcv>
-	<173040083268.16618.7451145398661885923.reportbug@crunch>
-	<20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
-	<3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
-	<173040083268.16618.7451145398661885923.reportbug@crunch>
-	<20241118200616.865cb4c869e693b19529df36@paranoici.org>
-	<nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1732561220; c=relaxed/simple;
+	bh=V+nI29JBH/YaUXCWXgsHl9TfasPvB+cBwwng/71yIFk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pDFNQzuz30lqy+0CXohpn53t1Bh4KH4FoP2IM3OmmSiduxIIt7pY4XdzYGEMz4YLoDJZshzEfxQ69S/TuEZ3sq6vTIBtUUVQeEwy5VNuTRdc2zoaf9L7Y88YafdoxLaavEIssLoHHwhNnn8A3poMUjXI1cA3FFCa/+ugOyCM04g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVX1xvOM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF043C4CECE;
+	Mon, 25 Nov 2024 19:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732561219;
+	bh=V+nI29JBH/YaUXCWXgsHl9TfasPvB+cBwwng/71yIFk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mVX1xvOMbIk7KctOZNbx7+CraGed1uY3TXM+NmgxF5ganwguRWRZHP0yy6GeCdCog
+	 q+mxS3lcRiljV1djBw7H0qflEcxumHKZM3LWwfOFVLXESPzObW+cNwiC1o39tvryxK
+	 Ck7KzVgQbF6TvUr9Z5cpu505hFkMILwdq6Ta27co+UBrq9PWTYmFaHLh6GJVrQQ3sL
+	 Kxtkhm7AX+x9kfIgNqvFyw00Brvjr+toCgypLMuSn8q1EnrZjZon6WeawpIbW+c1w/
+	 89azJ2OPpyfLqDZBnCMQswWgoAvnwv0+RTmY2LXRarJsYhfAWEMH68v6JFKD8AgPj6
+	 2/zD1Ojw/IXJA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4AC3809A00;
+	Mon, 25 Nov 2024 19:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA512";
- boundary="Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH ethtool-next v4] rxclass: Make output for RSS context action
+ explicit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173256123251.4006343.6336661823202115514.git-patchwork-notify@kernel.org>
+Date: Mon, 25 Nov 2024 19:00:32 +0000
+References: <6f294267b30c93707509d742c34461668a0efc68.1731636671.git.dxu@dxuuu.xyz>
+In-Reply-To: <6f294267b30c93707509d742c34461668a0efc68.1731636671.git.dxu@dxuuu.xyz>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: ecree.xilinx@gmail.com, jdamato@fastly.com, davem@davemloft.net,
+ mkubecek@suse.cz, kuba@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, kernel-team@meta.com
 
---Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-On Thu, 21 Nov 2024 11:04:13 +0100 Uwe Kleine-K=C3=B6nig wrote:
+This patch was applied to ethtool/ethtool.git (master)
+by Michal Kubecek <mkubecek@suse.cz>:
 
-[...]
-> It looks like the commit that is biting you is
->=20
-> https://git.kernel.org/linus/50660c5197f52b8137e223dc3ba8d43661179a1d
->=20
-> So if you bisect, try 50660c5197f52b8137e223dc3ba8d43661179a1d and its
-> parent 24943dcdc156cf294d97a36bf5c51168bf574c22 first.
+On Thu, 14 Nov 2024 19:12:08 -0700 you wrote:
+> Currently `ethtool -n` prints out misleading output if the action for an
+> ntuple rule is to redirect to an RSS context. For example:
+> 
+>     # ethtool -X eth0 hfunc toeplitz context new start 24 equal 8
+>     New RSS context is 1
+> 
+>     # ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
+>     Added rule with ID 0
+> 
+> [...]
 
-I started to bisect.
+Here is the summary with links:
+  - [ethtool-next,v4] rxclass: Make output for RSS context action explicit
+    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=54eba3e91248
 
-The first surprise is that 50660c5197f52b8137e223dc3ba8d43661179a1d is
-good...   :-o
-
-  $ git checkout 50660c5197f52b8137e223dc3ba8d43661179a1d
-  $ make -j 12 my_defconfig bindeb-pkg
-
-  [install and reboot with this kernel version]
-
-  # ls /sys/class/infiniband_mad/ -altrF
-  total 0
-  drwxr-xr-x 70 root root    0 Nov 25 12:05 ../
-  -r--r--r--  1 root root 4096 Nov 25 12:05 abi_version
-  lrwxrwxrwx  1 root root    0 Nov 25 12:05 umad0 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.0/infiniband_mad/umad0/
-  lrwxrwxrwx  1 root root    0 Nov 25 12:05 umad1 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.1/infiniband_mad/umad1/
-  lrwxrwxrwx  1 root root    0 Nov 25 12:08 issm1 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.1/infiniband_mad/issm1/
-  lrwxrwxrwx  1 root root    0 Nov 25 12:08 issm0 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.0/infiniband_mad/issm0/
-  drwxr-xr-x  2 root root    0 Nov 25 12:08 ./
-
-  [InfiniBand works]
-
-  $ git bisect start
-  $ git bisect good
-  $ git checkout v6.11
-  $ make -j 12 my_defconfig bindeb-pkg
-
-  [install and reboot with this kernel version]
-
-  # ls /sys/class/infiniband_mad/ -altrF
-  total 0
-  drwxr-xr-x 70 root root    0 Nov 25 12:29 ../
-  -r--r--r--  1 root root 4096 Nov 25 12:29 abi_version
-  lrwxrwxrwx  1 root root    0 Nov 25 12:29 umad0 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.0/infiniband_mad/umad0/
-  lrwxrwxrwx  1 root root    0 Nov 25 12:29 umad1 -> ../../devices/pci0000:=
-80/0000:80:01.1/0000:81:00.1/infiniband_mad/umad1/
-  drwxr-xr-x  2 root root    0 Nov 25 12:30 ./
-
-  [InfiniBand fails, because OpenSM fails to start]
-
-  $ git bisect bad
-  Bisecting: 7036 revisions left to test after this (roughly 13 steps)
-  [b3ce7a30847a54a7f96a35e609303d8afecd460b] Merge tag 'drm-next-2024-07-18=
-' of https://gitlab.freedesktop.org/drm/kernel
-  $ make -j 12 my_defconfig bindeb-pkg
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Woooha, 13 steps are a lot...
-
-I went on until 10 steps are left:
-
-  [test b3ce7a30847a54a7f96a35e609303d8afecd460b]
-  $ git bisect good
-  Bisecting: 3385 revisions left to test after this (roughly 12 steps)
-  [fbc90c042cd1dc7258ebfebe6d226017e5b5ac8c] Merge tag 'mm-stable-2024-07-2=
-1-14-50' of git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
- =20
-  [test fbc90c042cd1dc7258ebfebe6d226017e5b5ac8c]
-  $ git bisect bad
-  Bisecting: 1763 revisions left to test after this (roughly 11 steps)
-  [09ea8089abb5d851ce08a9b1a43706e42ef39db2] Merge tag 'staging-6.11-rc1' o=
-f git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging
-
-  [test 09ea8089abb5d851ce08a9b1a43706e42ef39db2]
-  $ git bisect bad
-  Bisecting: 910 revisions left to test after this (roughly 10 steps)
-  [4305ca0087dd99c3c3e0e2ac8a228b7e53a21c78] Merge tag 'scsi-misc' of git:/=
-/git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi
-
-
-Since I could not afford to keep the cluster out of service any longer
-(each step takes at least 20 or 25 minutes: build + install + reboot +
-check InfiniBand), I decided to return the cluster to service.
-
-I will try to continue to bisect by testing the resulting kernels on a
-compute node: there's no OpenSM there and it cannot run anyway, if
-there's another OpenSM on the same InfiniBand network.
-However, I can check whether those issm* symlinks are created in
-/sys/class/infiniband_mad/=20
-I really hope that this is enough to pinpoint the first bad
-commit...
-
-Any better ideas?
-
-
---=20
- http://www.inventati.org/frx/
- There's not a second to spare! To the laboratory!
-..................................................... Francesco Poli .
- GnuPG key fpr =3D=3D CA01 1147 9CD2 EFDF FB82  3925 3E1C 27E1 1F69 BFFE
-
---Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEygERR5zS79/7gjklPhwn4R9pv/4FAmdEx/QACgkQPhwn4R9p
-v/4ZXw/6Ap8I5PS6e6wKSo47UVJ0iB8+NqbtxpYGg8aB8f4tyE8An6TzsblP8Wtg
-QRnJqBE594/mHipy3Ys/mtUHBRirqR179opRVPYFnY/qg/XHfQ6Yp3SD/Iopnckn
-r/thVv5KcwQWhP4DhWynsopTV7I2rw5oob3LTEXGweVN4alXORBxp36J0e/kckgQ
-J+tYyqV15vswbo60T1TyHsxaeYVh3YgZ9JPqhpqn5qiGTNyyaxP6nWJEt/f04K4P
-4oX3qoHONyJd7eYeLbdyq11EPNECP6Fq+1UEpDvc10iTFiROSK69MW6l1ZmmEUyX
-Ig4KGQH/7wXa6+09Xad9D7DHyCdKioyAYvBdDCW29ZglsgbNVO8LSvRg2FWRDJY+
-Lkwfz4mLr+Kc4tS6HdSs1LiKeF5boNb/QuUt/3cjWBJlwF8b+dJ8usGd/VlsxmpA
-zSQFdxfTph0V5rQ3DHtSMv9CKPx+D1oEfjY+k3Tl0u6rcJavaxn52kAjR2KrpVP7
-sx0cDXmygpntn9+rk8PHJDwo6aMJH03vB2Uy6yPUVJuTlbK2xpQ6LfJEcbARsu08
-r2HJlTK7JQkcWGsNMoIvKcmhX9eQXNX2+BuOUrS+UnLAIeoVEK3Wq6pFjrSoBqrb
-47p3MEunzo5L8Zf/gYdBPqXYa3evIBAlRyMGXw9xhfbO3hzZJ8U=
-=1imU
------END PGP SIGNATURE-----
-
---Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE--
 
