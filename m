@@ -1,130 +1,112 @@
-Return-Path: <netdev+bounces-147139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EAE9D7A4F
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 04:22:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F1E9D7A55
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 04:25:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8735A281AEB
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:22:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34CA6281CB3
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D9218027;
-	Mon, 25 Nov 2024 03:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MCJ/ZkuG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C41917BCA;
+	Mon, 25 Nov 2024 03:25:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43ECB2500CE;
-	Mon, 25 Nov 2024 03:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E8815E97
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 03:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732504938; cv=none; b=liZZVuENJuGSO0O6hMtXfgX1meEcWpfkEBXEipD2i3deSgF2NrUvn4e7IuO5q0HgLim5159eUi/72yFwwTyOIrSveXi0ItQ9jZhy/OklU6FdiepaD8/d3NwvCc59Gq7J1A8ctJ5nsOgAajoHasPNfFNiht3y0KX6ep2C6mSSvaM=
+	t=1732505146; cv=none; b=CoRLL8ORlg8BSw9TayPWbFbWusd753yrbpM3AuJWfH5CnwBoWxJV3Uc+Uv5/uSApWlVwQL2RVu5RYiwwjs8Ez0BjanqskZQFkh7vi/AmNWwPRRVldcNgqwK8yuN5k2Fiv9z11gMvFHw6miqmwuYXMtMvPxx9+KhPwf+1H/AopgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732504938; c=relaxed/simple;
-	bh=Mp9AjKn2HYbZnlIY8RW/zJoovSYeQ+NF+kMs5TwLers=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RlrZduhky5Yk2yOW6Ipuo3YGCqV4mHo4sp3mUy2lp9QqZD5v+Vd6IVvtNbjwWRg2wQuWaeAAWrHv/G2eLVd22Z5zoKNVQ+Z2s7Cpwpw9yUOtqbzEFAOXnggSRM5nFCccsf2wW0w6VCoI2k1gLBxzfZInJCq0vgXwnmP7ikGWMi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MCJ/ZkuG; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AOMrWfX012575;
-	Mon, 25 Nov 2024 03:22:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	PNBWXEC7+0ri8hN3xVC6JJZbLxPsSBF1ILLFblF3CvA=; b=MCJ/ZkuGaiC1QLDY
-	W59yJni2pnNmDVwTWZ6seyLyUUCxX33krYernExCmFSMSjsMIqEVo7nsDDLagn6g
-	oFzfUTLwAaFQBjr824+P4+8H5qLogJjwZ6Qi/mB0mQbT2MlosCJsVLq68poQvEdD
-	ibM72qO05FPEkF/PjuN76Weo1nnIqbRy7+ca9yYRuRyg5jVkMdnG4dqPEis5wP9I
-	WA8UTSXxn8LpK6Z+SUuOhR0UUz555vvUHGlssqrSeMFHhTp5GQheLGEnk5EEHLR+
-	rYqnN5JQ9Ewcp82k60mPgAwtj4K01vA/LZycAL1pSCZR3bbupQiXu+YL69uQSBTt
-	MWvkeQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4334dmufph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 03:22:11 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AP3MAuf001389
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 03:22:10 GMT
-Received: from [10.253.38.8] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 24 Nov
- 2024 19:22:06 -0800
-Message-ID: <34ff9c8a-f288-4f76-be22-a1c784c24d2f@quicinc.com>
-Date: Mon, 25 Nov 2024 11:22:02 +0800
+	s=arc-20240116; t=1732505146; c=relaxed/simple;
+	bh=OnVmQUC90eIvuNGVkARZIwyty0P8fX/4vKc6xW+AIRk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lKnLj44r/zX4ujtOeMkutvwZMfXNpu1Zcp3EXnryLtvwS6XAWbsXqi/rpCKopdlPKkg6P17hRJB0JJRB/ty5zY95sAkhOESCzjnw07byTmJYMSQc9aWrVKiGmU2AzXw9JoiNsUbB8XzwpOmoYy0HHZwQbBng+8r1baxR/pIb8z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: ed1ff9bcaadc11efa216b1d71e6e1362-20241125
+X-CTIC-Tags:
+	HR_CC_AS_FROM, HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED, SA_LOWREP
+	SA_EXISTED, SN_UNTRUSTED, SN_LOWREP, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_T1, AMN_GOOD, AMN_C_TI
+	AMN_C_BU, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:db6d120e-68d6-441a-b812-7af1ab08a097,IP:10,
+	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:-1,FILE:0,BULK:0,RULE:Release_Ham,ACT
+	ION:release,TS:29
+X-CID-INFO: VERSION:1.1.38,REQID:db6d120e-68d6-441a-b812-7af1ab08a097,IP:10,UR
+	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:-1,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:29
+X-CID-META: VersionHash:82c5f88,CLOUDID:3e2d04f7cb7225ccc4f7daf228f118e2,BulkI
+	D:241125112534WIRJ8LKI,BulkQuantity:0,Recheck:0,SF:19|25|38|44|66|72|102,T
+	C:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,
+	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
+X-UUID: ed1ff9bcaadc11efa216b1d71e6e1362-20241125
+X-User: heminhong@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <heminhong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 902229649; Mon, 25 Nov 2024 11:25:31 +0800
+From: Minhong He <heminhong@kylinos.cn>
+To: stephen@networkplumber.org,
+	netdev@vger.kernel.org
+Cc: Minhong He <heminhong@kylinos.cn>
+Subject: [PATCH] devlink: fix memory leak in ifname_map_rtnl_init()
+Date: Mon, 25 Nov 2024 11:24:54 +0800
+Message-Id: <20241125032454.35392-1-heminhong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] arm64: dts: qcom: qcs8300: add the first 2.5G
- ethernet
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241123-dts_qcs8300-v4-0-b10b8ac634a9@quicinc.com>
- <20241123-dts_qcs8300-v4-1-b10b8ac634a9@quicinc.com>
- <355ff08c-d0a8-49e7-8afc-2e4adddf2c9e@lunn.ch>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <355ff08c-d0a8-49e7-8afc-2e4adddf2c9e@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: TTcvx6yjmz1Zg6OGHlL2EH7Xvn4wwEiD
-X-Proofpoint-ORIG-GUID: TTcvx6yjmz1Zg6OGHlL2EH7Xvn4wwEiD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 mlxlogscore=804 phishscore=0 mlxscore=0
- lowpriorityscore=0 suspectscore=0 malwarescore=0 adultscore=0 spamscore=0
- impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2411250027
+Content-Transfer-Encoding: 8bit
 
+When the return value of rtnl_talk() is greater than
+or equal to 0, 'answer' will be allocated.
+The 'answer' should be free after using,
+otherwise it will cause memory leak.
 
+Signed-off-by: Minhong He <heminhong@kylinos.cn>
+---
+ devlink/devlink.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On 2024-11-24 03:36, Andrew Lunn wrote:
->> +		ethernet0: ethernet@23040000 {
->> +			compatible = "qcom,qcs8300-ethqos", "qcom,sa8775p-ethqos";
->> +			reg = <0x0 0x23040000 0x0 0x10000>,
->> +			      <0x0 0x23056000 0x0 0x100>;
->> +			reg-names = "stmmaceth", "rgmii";
-> 
-> Dumb question which should not stop this getting merged.
-> 
-> Since this is now a MAC using a SERDES, do you still need the rmgii
-> registers? Can the silicon actually do RGMII?
-
-Indeed, the RGMII configuration area is necessary for managing clock 
-settings, even when SERDES is utilized. For instance, the 
-RGMII_CONFIG2_RGMII_CLK_SEL_CFG bit within RGMII_IO_MACRO_CONFIG2 is set 
-in ethqos_configure_sgmii.
-
-> 
-> 	Andrew
-
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index 9907712e..abe96f34 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -846,7 +846,7 @@ static int ifname_map_rtnl_init(struct dl *dl, const char *ifname)
+ 	struct rtattr *tb[IFLA_MAX + 1];
+ 	struct rtnl_handle rth;
+ 	struct ifinfomsg *ifi;
+-	struct nlmsghdr *n;
++	struct nlmsghdr *n = NULL;
+ 	int len;
+ 	int err;
+ 
+@@ -887,6 +887,7 @@ static int ifname_map_rtnl_init(struct dl *dl, const char *ifname)
+ 	err = ifname_map_rtnl_port_parse(dl, ifname, tb[IFLA_DEVLINK_PORT]);
+ 
+ out:
++	free(n);
+ 	rtnl_close(&rth);
+ 	return err;
+ }
 -- 
-Best Regards,
-Yijie
+2.25.1
 
 
