@@ -1,348 +1,405 @@
-Return-Path: <netdev+bounces-147137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57E8F9D7A10
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:25:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4549D7A2A
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:45:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEF76162ADE
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 02:45:17 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DDC38385;
+	Mon, 25 Nov 2024 02:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="GcJrykKN"
+X-Original-To: netdev@vger.kernel.org
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2045.outbound.protection.outlook.com [40.107.103.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16FBF2818D4
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 02:25:50 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE86D268;
-	Mon, 25 Nov 2024 02:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKxxcY09"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D60802;
-	Mon, 25 Nov 2024 02:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732501546; cv=none; b=mb2Dgyssf2zAMksGBVkyMk8vCl4//BF+AxWVmyRocf06oAy7D4xo9zixpb+waxufiFwc/tSAYTouoOetDndGJsz7XKuUAXLs+cg2NI/WM7LILpTq9uR9lhd1hJ+ydFKaU0tu5eb0n0K6dquPBB2iOXkDgmiPFfxGdOccqiKL8y8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732501546; c=relaxed/simple;
-	bh=6sYrPQCBHtjIKyk64Sq0rmiSsPY2Tj4VdGT5r46u5cc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F1zgZlwe+NMFSR+d16YuaXsdWxtubkaOh55MGsGa5DfBb8R43NPqefUHatrpUJQgOV7FCmXwxAm2SPv3SRDaucBDnsE3EB7/18XwbzE6zJmpAZRE2ORcN6w4zGPGxdfmYJt7b+RTLvrjO7MLtnNMoxUVrc/ALF0KAAn2jVeIIg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKxxcY09; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43158625112so36324025e9.3;
-        Sun, 24 Nov 2024 18:25:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732501543; x=1733106343; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Etx9kPDcxnxzaIyCeOw4OFDodyl+Y6sd6gBOibDxl44=;
-        b=EKxxcY09ahjFkaAeCZEs2dycGHQ1BhyA0KgHrt2lBDy83xSlzKZM5Pq2hiRXCABjI7
-         BlvMgQmXug95VOEtkBE5F21lbx448jD4UFukBM06/v9m/FJFNq3BQcBj/P8hxW06d9SO
-         5lLxQ8eJQLTkDsGd1pTyF6yyCoqqI/8MfJAudh4g/Vt106Z2TdT9Rirr0cPGNDQVm0ra
-         xG2EzsuQNT7ovaFg9ezaMPu7GctYkxukOCM5nIOJrxGfSxBrjjwPy9PY8+cxUonrOdHI
-         DV91ZW1mBZiQE9zYuoyT4h8fAxhKlbsMHvWISWcYUZsuY2+WoHGOFOfgRf9cBPoqby9q
-         oAWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732501543; x=1733106343;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Etx9kPDcxnxzaIyCeOw4OFDodyl+Y6sd6gBOibDxl44=;
-        b=ACewdOyQgPiQXfNHSFLIodw62bcvTScIzgXpVXYuTx9oSbx77PKeA/3vycXZOsiAx3
-         dGUXNT1hoBQnDltumysQlqKRxQ68Hp/7rQR5kDqeJ10Q13oBrkblr/FCtAXYcaOrwMK6
-         WJxMHyQNuviwu5egAF83v3OKqIVo89rlw2TubOmaoOHgZri6GSm9kiFUvgPFwYJcENW7
-         5btyN4EW/d4IWbBuG2xYfbNApdPDYq0dL3NQBb2CqJt+E7w+ikWymibgmm7H9Yqudgwf
-         kMtkPXCe3eL3trbRxLRVHkG5F+L/lhNDyDeTpuNNXHYq8dsP58+mgMKQTCxdknmJOoeP
-         mrKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVyXEQ8VRrpDdA6MalqCszhT/eJk+HsLTVMxustF4rCW3c0fcTGVJxyvH/pRwE2QSBEYzDt0LFD3A5RCIfoAWP+@vger.kernel.org, AJvYcCWBLIaiXuH3AdhEARPPkWClTSAE+MGqZEFyLY6PhdbEBLU7oJAi4byM/TJQbnzWbD0L5OELTuNvbqWou/Q=@vger.kernel.org, AJvYcCWfP6NNpQAul2y39pkFov9fSMCDJIqMtfmZVj0prJV6XlY7tli+z2uSxM/ZkVg++DLb6k4V8UyI@vger.kernel.org
-X-Gm-Message-State: AOJu0YztXL5gQQQJR9VvLx54KjOWQbJjwL/ul7XtP2NDwlGfdSXoJ6xf
-	Jyda7B/MytyJ6j/C6VTVRovDleYgayGs+1/3wlqe6WLiuVRIpW78
-X-Gm-Gg: ASbGncviZImmNJkI77ODCpPrxTLgRQZ611dZwTAwHMraRZolz5JpS6tN2iXJD4AM4pi
-	PbpwdpjDDUTUhzDmcKlihfG6Nx4fbJQ2RhjafFny2HfbEb0tNcciNyxAO6CLxR8b4zy/fux+3Xp
-	85XLMo0ViPDdjvonoTAnfNbDxeKuUY6iDUeDEmAc+hHk0L3OAGOxyA04vgMfzlvdcl2qZJy+YBe
-	WPT4U30OfazDCc+pLTAaG6lNCY6KMQuu9R/uz0QVDP3LzUpFls=
-X-Google-Smtp-Source: AGHT+IEnZCFyecwPyqmtA9pr8Xv+WYKVz22FNPMhmKXxOTMqCwPMp5lixHMvlamoaZoPR9urnpgERA==
-X-Received: by 2002:a05:600c:511c:b0:431:47d4:19c7 with SMTP id 5b1f17b1804b1-433ce417b36mr106855995e9.3.1732501542797;
-        Sun, 24 Nov 2024 18:25:42 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a10208c2sm3284225e9.12.2024.11.24.18.25.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Nov 2024 18:25:41 -0800 (PST)
-Message-ID: <c62208a4-5396-4116-add1-4ffbc254a09d@gmail.com>
-Date: Mon, 25 Nov 2024 04:26:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24B111713;
+	Mon, 25 Nov 2024 02:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732502711; cv=fail; b=ryTzWY1KBezBtMlIpJfndL5BqyGR5CMNlFT5M+B3zGUb42UkiSLW092Mc+ptFlzj4S+1/DqKH0vvMO/3kzUp/gWXXu3lZ2ecvVtFSNnVcvSl83/SC4lcX+DXHvrPR14XLlFTV8Xpn++k4ircFKRbiI2uPy68HBxTvdr5wCwIfgI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732502711; c=relaxed/simple;
+	bh=oJzRzeDg+v3K3CjIL+TN7HuYA+6iJWwGJV6e/VDWQHQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=scht5Q2s2k7EZsF7/fUlLA+H9JHKgxTKc+op4FHJxealHlvFOjIavbi+FHa5wrJ9hpYO4i5rcQ8dDk4gSgzGWop1T4EYf6Czmdp/MyIjpLJoCbv+vWB8/2YxNpeVAfWYarrbxQd2SE10q6h76/yPCb1UdyjH4/AcKoRWv6Nfh5o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=GcJrykKN; arc=fail smtp.client-ip=40.107.103.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QHar4JuMiZZ1ydajp0DnVkUxslLRyO19DYfg/1OIw9B9V0+BqVWO5HHcZTLJgmmXNv7OwgabLQtICcIjgD92dc/yGmU285GXQ5iFk0mcCxbRYNod4j5SgkdaFUdBYBVujZeP2m1g/UyBbfyasJUQkTK9/W07tJs6Q5mSMGDi9Hhu9TDh5RK6MShnkeDxZcetVdoOk7vcX1nnkY/M+xZFf6tzVtrSFwXVjpO6Jqq9K0el3EFH2qDxEqT5L/Z/A6jedj8rwu730GruBAXgGq+ekfUELi4nQCfY/RuTdwH56Q6AZJaTvtDswK+F+I6SNxR6n3WG1xVArIG+Y7pR2IJJpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sbfrLrRO5iNjfojsiXpqsVRUkGjrCouFwFMYCr+0x5k=;
+ b=iKNYvVY+jwCqHpuR+eVOGXInaPp5Ez6BVMfbi4ulAnwUlyMP/gj6LaSdx2tmYIpuAtt5ceWalR8vkA/21WZFCJ9CgEB2ESYk5FN7d2sfrVLK1G19i5b3ncBDc/aqV+FSxKQXl8rZFRJ+ijmasNYkHIex4ZTy8KnPgxJKAu09N3EjyRD3diMQWvC4nGSZsRYxF2HLh2iPjg0YgpcL2dONB9JHmyokNVZPDOZXyceTTO/Ik+HYE2dy/I0blx5A9UVzdoe9eJyrW4YtCIR7LhzFWwKYjH1a4o5xWMy5avR5eoMxlFFmaCjJXQ2W2JbN2Nf5AxBEyHygKPLtero1+A2NhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sbfrLrRO5iNjfojsiXpqsVRUkGjrCouFwFMYCr+0x5k=;
+ b=GcJrykKNDEKOHczjmhVzwPgKGdZIbuzhHmM2A0A4nuHj1fFPdwG6REyioPq0zZbEiDB/kmxOWdXFlLjbAiPQVme1Apgn/gw58x+qXy64Cf4uIrj9mbrWcnphcOV7YnI8/ZUFv5WRBukHwnHeNrj2Dss9cuLqRWlTX7EThY6j/73Ykq0S9CfMFT/xc7ibPNR27QGh5qD9ZqLVW63DIN0JmWc/HTb5X04r3TsejV83W6f1jW5gYkUF/y8oIkn4RWZ0u+DOL/CC5afez/IExsdlA9hMuzkEhXFr+/a4Xqo7qLk/8s8UDSdYjL1QIN+mnMSi2tENJmCUAFizalXEqwzIEA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by VI0PR04MB10496.eurprd04.prod.outlook.com (2603:10a6:800:21a::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Mon, 25 Nov
+ 2024 02:45:05 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8182.019; Mon, 25 Nov 2024
+ 02:45:05 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	florian.fainelli@broadcom.com,
+	heiko.stuebner@cherry.de
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: [PATCH net] net: phy: micrel: Dynamically control external clock of KSZ PHY
+Date: Mon, 25 Nov 2024 10:29:05 +0800
+Message-Id: <20241125022906.2140428-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR02CA0046.apcprd02.prod.outlook.com
+ (2603:1096:4:196::15) To PAXPR04MB8510.eurprd04.prod.outlook.com
+ (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 05/23] ovpn: keep carrier always on
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- sd@queasysnail.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net>
- <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
- <89ae26a2-0a09-4758-989e-8f45a707a41b@openvpn.net>
- <e2caab8a-343e-4728-b5a7-b167f05c9bb9@gmail.com>
- <c933e2bf-b19c-4f8b-b2c0-44de50eb4141@openvpn.net>
- <1cf97615-a38d-48c3-9e23-4ba82012b32d@gmail.com>
- <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|VI0PR04MB10496:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7f20e28-1f75-4f68-72c6-08dd0cfb2a9e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|52116014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?s3u/gOeWd2hTyv3y+F/hL2Kl7xfz9RX0j+strBqk1k3Y3LwTo+dFhFvltJ/4?=
+ =?us-ascii?Q?VWU9KZRT0IO5YM2LV4zQVhnbmBg68hXS6C3uuhzL5zbd/mNRZWWx2ze1ijxA?=
+ =?us-ascii?Q?1e8I5mmxqGFdV3kACphhsyMVhXyrc8qFcP+/ACbQLTo37f/rwb72COGZxv5Y?=
+ =?us-ascii?Q?J9A5d7uY2o/itT7Qfx5yLTDrRX2NYaPXyEVQwVQMNZDZJH9z2v4to+RjcHm6?=
+ =?us-ascii?Q?k0RpZrcE34x4k0zE5YpdRbDj1Z87+RMeFUNTnc3l0Qm9je6sbuHbvr0J/sXX?=
+ =?us-ascii?Q?/dlmFGNUTrF/dLk22c8K+JZ07ziGPvOKTxQb0Fd19blXsY34wJQ50DEKUBb6?=
+ =?us-ascii?Q?SJvz2Dw9lLa+TzwYYAFfYFPIZ5qj9o/rb83S+/BNJnyaNGGRg6EcAZNN35Xa?=
+ =?us-ascii?Q?oR6TlrqPJFyx+EPUSncggu5XUoUXg1cw+tRNqo2ZqJkY/bdvOn93PKY1vVou?=
+ =?us-ascii?Q?NdrqPKtQTTeqX2VOVHUo48rwpGkZZTNvJXJ+0CTcNlX0ePyQuZI87772AfLW?=
+ =?us-ascii?Q?EBYUvucF+NR++R5lruZBmnqz14gDH6ywfCL4pWUWqTdG5IP8QXTBJXn1x+07?=
+ =?us-ascii?Q?XW1+z2YzXGmUG0EzLckxuXMux0M8UCvbuMtIXjrna03TV7D7smJAQaYbS9XU?=
+ =?us-ascii?Q?t3odl5oentsQ+lrGjq2C63IwKVy4gSfrwmyQWHOcdKxjiUiL696ajDyI8GLO?=
+ =?us-ascii?Q?L5BEGY3FpGjhn/zvvJV9fvVQgXU8Sg6WiYlUqnYsQm5DrU3zuJ4Pa0GvH653?=
+ =?us-ascii?Q?FRpHpaRjgKHbUEkicNbnsgjEtbCO0G6abPtIG6ksK/Q7liuwvTky6a1aSsHJ?=
+ =?us-ascii?Q?mz1ONm/VZH1Fe8wir1IJbU8mNcNdl3n7m6WMERXUtxeNB09eDvLNaauwkWh7?=
+ =?us-ascii?Q?cGVO4MR6KZ9mgcuYvb5GNQR7R2EXCd/Ufvad559nG7M6xsVntUQbS0Q/teLn?=
+ =?us-ascii?Q?bfCHQLqzyMIBxm7ngZ/ZOquMAkWLUE6ct1DRXS6TH7vk32BztprzlNryiHKa?=
+ =?us-ascii?Q?ccTKzX49UgN9s8fgfELg35w+qEe4NRoa289UPE8ZRwT00/TyzDB8jX8vBDT+?=
+ =?us-ascii?Q?lsUC4Eo95jxU4Y3QhTYKvnFCMui4wzUPT3Zx9Gia4bQc8nSigoHDFIHfiMKN?=
+ =?us-ascii?Q?1gu+B5E1gxx5NnraKEdR8XnK1PGNv1eWGXaHs//oo6I6p8JDSJDHCKpvO0YK?=
+ =?us-ascii?Q?be/tVxHzv4rXLYZK3wQsrqMGr6Nsk5esWt3c6fDN453xU6iFhXn63YBc3mNM?=
+ =?us-ascii?Q?Oyz9SGC32iSpPsLIECRAq9uBcUJFqdgArOTmnpdKehKGjlP8Qp353jTg515h?=
+ =?us-ascii?Q?rr0ij77qiQQpjnuMjzGOAdJ7iwipTuxeyu9nMy8h44i8uw3mugOUygleW+Gt?=
+ =?us-ascii?Q?Mdum1YWhfvraaNlJefJ4xURWqDenBlrtDXxYDzc/Iu4kf0KAPA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(52116014)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WBmTVFNsKzXdcmIJTD3OGTa3GeMrAPn8z0eiaIYzN02E5Zl7IvQOH/TF1QCI?=
+ =?us-ascii?Q?qFYCg9VKoJRt0YdA34VQ5IEd+D4t81NNcpa7mvWbskL2iRSxDXOsEPXzOkDv?=
+ =?us-ascii?Q?I9kbGuS7ZSRlR3wEr2jiDBdj1izdI7Qspwu5X/6wzPe30nFtenW8MieDSEH9?=
+ =?us-ascii?Q?LiUEKrp6uodxRuNja6KC4vmSOacqMHU4DH2Orzopuoe+q7pWPU8fRrp5UtQy?=
+ =?us-ascii?Q?VH6EFjYCAFHm5Eu1MzekcDVgt5iNSdnoXnTvjasez+SqWvkfwZUzEglwkCpI?=
+ =?us-ascii?Q?Q6bzVfRud10eA1nhYmziM8dRnm7SeoBoTV2yfBICisHh3xLVgizPV0o3NY6z?=
+ =?us-ascii?Q?CEAgmTzl8KB4zQZ5TE5XetdG9ehKf64dNy9LgYtih1RtCOYws7LCYXAAITkr?=
+ =?us-ascii?Q?9UFkiApq6p6UcAqgIfLzPilHWRPhDnWcZMa4aXTl4C8HX1v0sLQwt3TcYrYz?=
+ =?us-ascii?Q?ROFhuUtThc6W+JRwByiMVMTDF2jMRoXGdCkF2O6zr/tkfdG3vz6Zv7bnjQDR?=
+ =?us-ascii?Q?CSl03xUZiZmIeeIzmh09sNrNu4fSlb42h6s23qUNkia1/36e1k7DY7yhF3gS?=
+ =?us-ascii?Q?bwYtL54UVOuVTSL35wL//KnC3jLpB3fbXcIXWM1u8qpBXaX1714+4ksTWuyt?=
+ =?us-ascii?Q?20YLQFlEnOpl8hLjSjtqPAkdwHhWm1Ro/kQmInvOG+6x/CZGGvEPxlqtWWbL?=
+ =?us-ascii?Q?9MahsQX/kxARy8HvuaM36oUJa/4uglYe9UzbNeJfDx32IxfCyVmHZWgKL4QS?=
+ =?us-ascii?Q?59uBqyYtEeMwgjYT12m6Iw/z2OAW71dHp9oWvdqCR+h/TBJU5ZXl6SbD8ttk?=
+ =?us-ascii?Q?B2/CY6HtccDwNgygCHD4HNxmE+I2qi+KvV0hpRpkkujWOSrxxJrL/eCBHkyU?=
+ =?us-ascii?Q?EiUahrOS6WG0g5GIjCjBTX82GRey1R0w6LopJtjlwH8gfyjgCQE96LEfCShh?=
+ =?us-ascii?Q?wqQ0r5tuotShFELGrQUcKYaRl6lpLh5sCErmEWbnmoJ2PrIK5oDR+kvOzxJF?=
+ =?us-ascii?Q?tz8ya7xhuq6mzy/lIMqsuCQhOHXNC9fUoxZsQ5ZcLY7nGWFRZEJxYkzvAWsF?=
+ =?us-ascii?Q?HM1qeCIJ3DZO5lxD7DPdOiATd5VPeQ/tZ3vNoPjBNdKwFAAhaIJJ3jUhF4Ik?=
+ =?us-ascii?Q?VfNKGnUzR0WSXes3RDWk3E3vUrCD8Y2/ObK4QMN+sFo6QIA+CkkCuFLYJB/s?=
+ =?us-ascii?Q?2IXVSA6MLhOqLqfgl4RkIh3Zu/yYVqjdc4bUORoDIjsVWJ9xU9BgxzywW4gN?=
+ =?us-ascii?Q?8Jf1EvXY9/M8O6HkhaKtgVtRH2XNqU3YyXONTSb/dqHbrUl9XtYUc1iDLoi1?=
+ =?us-ascii?Q?YtOQIzM04M5HNSckkphZAIw6MAHmZFE2sBOvzuZARzXq+Momorz0ALb5VVtA?=
+ =?us-ascii?Q?NU7q1B+lB5cTPGCWRGvBer7+iBWU2KAkjhD8rIwG4zQHUf5VwERIGwMyDSS/?=
+ =?us-ascii?Q?K31crt17s9VX9PyI93hZDDTplSRfx/bAboRRIkFqbkv5QBmgO4JrGUJVPYF0?=
+ =?us-ascii?Q?m/cKRDr7FudRohqUp43ks/CSudJ6bTRfz1TwhRmwrylwEACbKk88B7SZTKBL?=
+ =?us-ascii?Q?XHyBRAELNpLQLAjCbf6OBnUSx3+losV3y1uSO1do?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7f20e28-1f75-4f68-72c6-08dd0cfb2a9e
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2024 02:45:04.9928
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tIg5Jska5iODeyH5NUJWdUECnFdj1c1cOtmVLzLkFzQ5ox0keb64DZLsVoJNefNC/4SAxI/oExKSJVUPrbpN2Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10496
 
-On 24.11.2024 00:52, Antonio Quartulli wrote:
-> On 23/11/2024 23:25, Sergey Ryazanov wrote:
->> On 21.11.2024 23:17, Antonio Quartulli wrote:
->>> On 20/11/2024 23:56, Sergey Ryazanov wrote:
->>>> On 15.11.2024 16:13, Antonio Quartulli wrote:
->>>>> On 09/11/2024 02:11, Sergey Ryazanov wrote:
->>>>>> On 29.10.2024 12:47, Antonio Quartulli wrote:
->>>>>>> An ovpn interface will keep carrier always on and let the user
->>>>>>> decide when an interface should be considered disconnected.
->>>>>>>
->>>>>>> This way, even if an ovpn interface is not connected to any peer,
->>>>>>> it can still retain all IPs and routes and thus prevent any data
->>>>>>> leak.
->>>>>>>
->>>>>>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
->>>>>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->>>>>>> ---
->>>>>>>   drivers/net/ovpn/main.c | 7 +++++++
->>>>>>>   1 file changed, 7 insertions(+)
->>>>>>>
->>>>>>> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
->>>>>>> index 
->>>>>>> eead7677b8239eb3c48bb26ca95492d88512b8d4..eaa83a8662e4ac2c758201008268f9633643c0b6 100644
->>>>>>> --- a/drivers/net/ovpn/main.c
->>>>>>> +++ b/drivers/net/ovpn/main.c
->>>>>>> @@ -31,6 +31,13 @@ static void ovpn_struct_free(struct net_device 
->>>>>>> *net)
->>>>>>>   static int ovpn_net_open(struct net_device *dev)
->>>>>>>   {
->>>>>>> +    /* ovpn keeps the carrier always on to avoid losing IP or route
->>>>>>> +     * configuration upon disconnection. This way it can prevent 
->>>>>>> leaks
->>>>>>> +     * of traffic outside of the VPN tunnel.
->>>>>>> +     * The user may override this behaviour by tearing down the 
->>>>>>> interface
->>>>>>> +     * manually.
->>>>>>> +     */
->>>>>>> +    netif_carrier_on(dev);
->>>>>>
->>>>>> If a user cares about the traffic leaking, then he can create a 
->>>>>> blackhole route with huge metric:
->>>>>>
->>>>>> # ip route add blackhole default metric 10000
->>>>>>
->>>>>> Why the network interface should implicitly provide this 
->>>>>> functionality? And on another hand, how a routing daemon can learn 
->>>>>> a topology change without indication from the interface?
->>>>>
->>>>> This was discussed loooong ago with Andrew. Here my last response:
->>>>>
->>>>> https://lore.kernel.org/all/d896bbd8-2709-4834-a637- 
->>>>> f982fc51fc57@openvpn.net/
->>>>
->>>> Thank you for sharing the link to the beginning of the conversation. 
->>>> Till the moment we have 3 topics regarding the operational state 
->>>> indication:
->>>> 1. possible absence of a conception of running state,
->>>> 2. influence on routing protocol implementations,
->>>> 3. traffic leaking.
->>>>
->>>> As for conception of the running state, it should exists for 
->>>> tunneling protocols with a state tracking. In this specific case, we 
->>>> can assume interface running when it has configured peer with keys. 
->>>> The protocol even has nice feature for the connection monitoring - 
->>>> keepalive.
->>>
->>> What about a device in MP mode? It doesn't make sense to turn the 
->>> carrier off when the MP node has no peers connected.
->>> At the same time I don't like having P2P and MP devices behaving 
->>> differently in this regard.
->>
->> MP with a single network interface is an endless headache. Indeed. On 
->> the other hand, penalizing P2P users just because protocol support MP 
->> doesn't look like a solution either.
-> 
-> On the upper side, with "iroutes" implemented using the system routing 
-> table, routing protocols will be able to detect new routes only when the 
-> related client has connected. (The same for the disconnection)
-> 
-> But this is a bit orthogonal compared to the oper state.
+On the i.MX6ULL-14x14-EVK board, when using the 6.12 kernel, it is found
+that after disabling the two network ports, the clk_enable_count of the
+enet1_ref and enet2_ref clocks is not 0 (these two clocks are used as the
+clock source of the RMII reference clock of the two KSZ8081 PHYs), but
+there is no such problem in the 6.6 kernel.
 
-The patch has nothing common with the routes configuration. The main 
-concern is forcing of the running state indication. And more 
-specifically, the concern is the given justification for this activity.
+After analysis, we found that since the commit 985329462723 ("net: phy:
+micrel: use devm_clk_get_optional_enabled for the rmii-ref clock"), the
+external clock of KSZ PHY has been enabled when the PHY driver probes,
+and it can only be disabled when the PHY driver is removed. This causes
+the clock to continue working when the system is suspended or the network
+port is down.
 
->>> Therefore keeping the carrier on seemed the most logical way forward 
->>> (at least for now - we can still come back to this once we have 
->>> something smarter to implement).
->>
->> It was shown above how to distinguish between running and non-running 
->> cases.
->>
->> If an author doesn't want to implement operational state indication 
->> now, then I'm Ok with it. Not a big deal now. I just don't like the 
->> idea to promote the abuse of the running state indicator. Please see 
->> below.
->>
->>>> Routing protocols on one hand could benefit from the operational 
->>>> state indication. On another hand, hello/hold timer values mentioned 
->>>> in the documentation are comparable with default routing protocols 
->>>> timers. So, actual improvement is debatable.
->>>>
->>>> Regarding the traffic leading, as I mentioned before, the blackhole 
->>>> route or a firewall rule works better then implicit blackholing with 
->>>> a non-running interface.
->>>>
->>>> Long story short, I agree that we might not need a real operational 
->>>> state indication now. Still protecting from a traffic leaking is not 
->>>> good enough justification.
->>>
->>> Well, it's the so called "persistent interface" concept in VPNs: 
->>> leave everything as is, even if the connection is lost.
->>
->> It's called routing framework abuse. The IP router will choose the 
->> route and the egress interface not because this route is a good option 
->> to deliver a packet, but because someone trick it.
-> 
-> This is what the user wants.
+To solve this problem, the clock is enabled when resume() of the PHY
+driver is called, and the clock is disabled when suspend() is called.
+Since the PHY driver's resume() and suspend() interfaces are not called
+in pairs, an additional clk_enable flag is added. When suspend() is
+called, the clock is disabled only if clk_enable is true. Conversely,
+when resume() is called, the clock is enabled if clk_enable is false.
 
-Will be happy to see a study on user's preferences.
+Fixes: 985329462723 ("net: phy: micrel: use devm_clk_get_optional_enabled for the rmii-ref clock")
+Fixes: 99ac4cbcc2a5 ("net: phy: micrel: allow usage of generic ethernet-phy clock")
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+---
+ drivers/net/phy/micrel.c | 103 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 95 insertions(+), 8 deletions(-)
 
-> OpenVPN (userspace) will tear down the P2P interface upon disconnection, 
-> assuming the --persist-tun option was not specified by the user.
-> 
-> So the interface is gone in any case.
-> 
-> By keeping the netcarrier on we are just ensuring that, if the user 
-> wanted persist-tun, the iface is not actually making decisions on its own.
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 3ef508840674..44577b5d48d5 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -432,10 +432,12 @@ struct kszphy_ptp_priv {
+ struct kszphy_priv {
+ 	struct kszphy_ptp_priv ptp_priv;
+ 	const struct kszphy_type *type;
++	struct clk *clk;
+ 	int led_mode;
+ 	u16 vct_ctrl1000;
+ 	bool rmii_ref_clk_sel;
+ 	bool rmii_ref_clk_sel_val;
++	bool clk_enable;
+ 	u64 stats[ARRAY_SIZE(kszphy_hw_stats)];
+ };
+ 
+@@ -2050,8 +2052,27 @@ static void kszphy_get_stats(struct phy_device *phydev,
+ 		data[i] = kszphy_get_stat(phydev, i);
+ }
+ 
++static void kszphy_enable_clk(struct kszphy_priv *priv)
++{
++	if (!priv->clk_enable && priv->clk) {
++		clk_prepare_enable(priv->clk);
++		priv->clk_enable = true;
++	}
++}
++
++static void kszphy_disable_clk(struct kszphy_priv *priv)
++{
++	if (priv->clk_enable && priv->clk) {
++		clk_disable_unprepare(priv->clk);
++		priv->clk_enable = false;
++	}
++}
++
+ static int kszphy_suspend(struct phy_device *phydev)
+ {
++	struct kszphy_priv *priv = phydev->priv;
++	int ret;
++
+ 	/* Disable PHY Interrupts */
+ 	if (phy_interrupt_is_valid(phydev)) {
+ 		phydev->interrupts = PHY_INTERRUPT_DISABLED;
+@@ -2059,7 +2080,13 @@ static int kszphy_suspend(struct phy_device *phydev)
+ 			phydev->drv->config_intr(phydev);
+ 	}
+ 
+-	return genphy_suspend(phydev);
++	ret = genphy_suspend(phydev);
++	if (ret)
++		return ret;
++
++	kszphy_disable_clk(priv);
++
++	return 0;
+ }
+ 
+ static void kszphy_parse_led_mode(struct phy_device *phydev)
+@@ -2088,8 +2115,11 @@ static void kszphy_parse_led_mode(struct phy_device *phydev)
+ 
+ static int kszphy_resume(struct phy_device *phydev)
+ {
++	struct kszphy_priv *priv = phydev->priv;
+ 	int ret;
+ 
++	kszphy_enable_clk(priv);
++
+ 	genphy_resume(phydev);
+ 
+ 	/* After switching from power-down to normal mode, an internal global
+@@ -2112,6 +2142,24 @@ static int kszphy_resume(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int ksz8041_resume(struct phy_device *phydev)
++{
++	struct kszphy_priv *priv = phydev->priv;
++
++	kszphy_enable_clk(priv);
++
++	return 0;
++}
++
++static int ksz8041_suspend(struct phy_device *phydev)
++{
++	struct kszphy_priv *priv = phydev->priv;
++
++	kszphy_disable_clk(priv);
++
++	return 0;
++}
++
+ static int ksz9477_resume(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -2150,8 +2198,11 @@ static int ksz9477_resume(struct phy_device *phydev)
+ 
+ static int ksz8061_resume(struct phy_device *phydev)
+ {
++	struct kszphy_priv *priv = phydev->priv;
+ 	int ret;
+ 
++	kszphy_enable_clk(priv);
++
+ 	/* This function can be called twice when the Ethernet device is on. */
+ 	ret = phy_read(phydev, MII_BMCR);
+ 	if (ret < 0)
+@@ -2194,7 +2245,7 @@ static int kszphy_probe(struct phy_device *phydev)
+ 
+ 	kszphy_parse_led_mode(phydev);
+ 
+-	clk = devm_clk_get_optional_enabled(&phydev->mdio.dev, "rmii-ref");
++	clk = devm_clk_get_optional(&phydev->mdio.dev, "rmii-ref");
+ 	/* NOTE: clk may be NULL if building without CONFIG_HAVE_CLK */
+ 	if (!IS_ERR_OR_NULL(clk)) {
+ 		unsigned long rate = clk_get_rate(clk);
+@@ -2216,11 +2267,14 @@ static int kszphy_probe(struct phy_device *phydev)
+ 		}
+ 	} else if (!clk) {
+ 		/* unnamed clock from the generic ethernet-phy binding */
+-		clk = devm_clk_get_optional_enabled(&phydev->mdio.dev, NULL);
++		clk = devm_clk_get_optional(&phydev->mdio.dev, NULL);
+ 		if (IS_ERR(clk))
+ 			return PTR_ERR(clk);
+ 	}
+ 
++	if (!IS_ERR_OR_NULL(clk))
++		priv->clk = clk;
++
+ 	if (ksz8041_fiber_mode(phydev))
+ 		phydev->port = PORT_FIBRE;
+ 
+@@ -5290,15 +5344,45 @@ static int lan8841_probe(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int lan8804_suspend(struct phy_device *phydev)
++{
++	struct kszphy_priv *priv = phydev->priv;
++	int ret;
++
++	ret = genphy_suspend(phydev);
++	if (ret)
++		return ret;
++
++	kszphy_disable_clk(priv);
++
++	return 0;
++}
++
++static int lan8841_resume(struct phy_device *phydev)
++{
++	struct kszphy_priv *priv = phydev->priv;
++
++	kszphy_enable_clk(priv);
++
++	return genphy_resume(phydev);
++}
++
+ static int lan8841_suspend(struct phy_device *phydev)
+ {
+ 	struct kszphy_priv *priv = phydev->priv;
+ 	struct kszphy_ptp_priv *ptp_priv = &priv->ptp_priv;
++	int ret;
+ 
+ 	if (ptp_priv->ptp_clock)
+ 		ptp_cancel_worker_sync(ptp_priv->ptp_clock);
+ 
+-	return genphy_suspend(phydev);
++	ret = genphy_suspend(phydev);
++	if (ret)
++		return ret;
++
++	kszphy_disable_clk(priv);
++
++	return 0;
+ }
+ 
+ static struct phy_driver ksphy_driver[] = {
+@@ -5358,9 +5442,12 @@ static struct phy_driver ksphy_driver[] = {
+ 	.get_sset_count = kszphy_get_sset_count,
+ 	.get_strings	= kszphy_get_strings,
+ 	.get_stats	= kszphy_get_stats,
+-	/* No suspend/resume callbacks because of errata DS80000700A,
+-	 * receiver error following software power down.
++	/* Because of errata DS80000700A, receiver error following software
++	 * power down. Suspend and resume callbacks only disable and enable
++	 * external rmii reference clock.
+ 	 */
++	.suspend	= ksz8041_suspend,
++	.resume		= ksz8041_resume,
+ }, {
+ 	.phy_id		= PHY_ID_KSZ8041RNLI,
+ 	.phy_id_mask	= MICREL_PHY_ID_MASK,
+@@ -5507,7 +5594,7 @@ static struct phy_driver ksphy_driver[] = {
+ 	.get_sset_count	= kszphy_get_sset_count,
+ 	.get_strings	= kszphy_get_strings,
+ 	.get_stats	= kszphy_get_stats,
+-	.suspend	= genphy_suspend,
++	.suspend	= lan8804_suspend,
+ 	.resume		= kszphy_resume,
+ 	.config_intr	= lan8804_config_intr,
+ 	.handle_interrupt = lan8804_handle_interrupt,
+@@ -5526,7 +5613,7 @@ static struct phy_driver ksphy_driver[] = {
+ 	.get_strings	= kszphy_get_strings,
+ 	.get_stats	= kszphy_get_stats,
+ 	.suspend	= lan8841_suspend,
+-	.resume		= genphy_resume,
++	.resume		= lan8841_resume,
+ 	.cable_test_start	= lan8814_cable_test_start,
+ 	.cable_test_get_status	= ksz886x_cable_test_get_status,
+ }, {
+-- 
+2.34.1
 
-Regarding a decision on its own. Ethernet interface going to the 
-not-running state upon lost of carrier from a switch. It's hardly could 
-be considered a decision of the interface. It's an indication of the fact.
-
-Similarly, beeping of UPS is not its decision to make user's life 
-miserable, it's the indication of the power line failure. I hope, at 
-least we are both agree on that a UPS should indicate the line failure.
-
-Back to the 'persist-tun' option. I checked the openvpn(8) man page. It 
-gives a reasonable hints to use this option to avoid negative outcomes 
-on internal openvpn process restart. E.g. in case of privilege dropping. 
-It servers the same purpose as 'persist-key'. And there is no word 
-regarding traffic leaking.
-
-If somebody have decided that this option gives the funny side-effect 
-and allows to cut the corners, then I cannot say anything but sorry.
-
-> With a tun interface this can be done, now you want to basically drop 
-> this feature that existed for long time and break existing setups.
-
-Amicus Plato, sed magis amica veritas
-
-Yes, I don't want to see this interface misbehaviour advertised as a 
-security feature. I hope the previous email gives a detailed explanation 
-why.
-
-If it's going to break existing setup, then end-users can be supported 
-with a changelog notice explaining how to properly address the risk of 
-the traffic leaking.
-
->> At some circumstance, e.g. Android app, it could be the only way to 
->> prevent traffic leaking. But these special circumstances do not make 
->> solution generic and eligible for inclusion into the mainline code.
-> 
-> Why not? We are not changing the general rule, but just defining a 
-> specific behaviour for a specific driver.
-
-Yeah. This patch is not changing the general rule. The patch breaks it 
-and the comment in the code makes proud of it. Looks like an old joke 
-that documented bug become a feature.
-
- From a system administrator or a firmware developer perspective, the 
-proposed behaviour will look like inconsistency comparing to other 
-interface types. And this inconsistency requires to be addressed with 
-special configuration or a dedicated script in a worst case. And I 
-cannot see justified reason to make their life harder.
-
-> For example, I don't think a tun interface goes down when there is no 
-> socket attached to it, still packets are just going to be blackhole'd in 
-> that case. No?
-
-Nope. Tun interface indeed will go into the non-running state on the 
-detach event. Moreover, the tun module supports running/non-running 
-indication change upon a command from userspace. But not every userspace 
-application feel a desire to implement it.
-
->>> I know it can be implemented in many other different ways..but I 
->>> don't see a real problem with keeping this way.
->>
->> At least routing protocols and network monitoring software will not be 
->> happy to see a dead interface pretending that it's still running. 
-> 
-> They won't know that the interface is disconnected, they will possibly 
-> just see traffic being dropped.
-
-Packet loss detection is quite complex operation. So yes, they are 
-indeed monitoring the interface operational state to warn operator as 
-soon as possible and take some automatic actions if we are talking about 
-routing protocols. Some sophisticated monitoring systems even capable to 
-generate events like 'link unstable' with higher severity if they see 
-interface operational state flapping in a short period of time.
-
-So yeah, for these kinds of systems, proper operational state indication 
-is essential.
-
->> Generally speaking, saying that interface is running, when module 
->> knows for sure that a packet can not be delivered is a user misguiding.
-> 
-> Or a feature, wanted by the user.
-> 
->>> A blackhole/firewall can still be added if the user prefers (and not 
->>> use the persistent interface).
->>
->> The solution with false-indication is not so reliable as it might 
->> look. Interface shutdown, inability of a user-space application to 
->> start, user-space application crash, user-space application restart, 
->> each of them will void the trick. Ergo, blackhole/firewall must be 
->> employed by a security concerned user. What makes the proposed feature 
->> odd.
-> 
-> Yeah, this is what other VPN clients call "kill switch".
-> Persist-tun is just one piece of the puzzle, yet important.
-> 
->>
->> To summaries, I'm Ok if this change will be merged with a comment like 
->> "For future study" or "To be done" or "To be implemented". But a 
->> comment like "to prevent traffic leaking" or any other comment 
->> implying a "breakthrough security feature" will have a big NACK from 
->> my side.
-> 
-> What if the comment redirects the user to --persist-tun option in order 
-> to clarify the context and the wanted behaviour?
-> 
-> Would that help?
-
-Nope. As it was mentioned above, the are no indication that 
-'persist-tun' is a 'security' feature even in the current openvpn 
-documentation.
-
-If the openvpn developers want to keep implementation bug-to-bug 
-compatible, then feel free to configure the blackhole route on behalf of 
-end-user by means of the userspace daemon. Nobody will mind.
-
---
-Sergey
 
