@@ -1,132 +1,138 @@
-Return-Path: <netdev+bounces-147226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B7459D8605
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 14:11:59 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BC99D8633
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 14:21:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61E00284C09
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 13:11:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3F9B167935
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 13:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E071A9B5D;
-	Mon, 25 Nov 2024 13:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E421ADFF8;
+	Mon, 25 Nov 2024 13:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TZ0q2qoJ"
+	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="NBNYps3J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx-rz-1.rrze.uni-erlangen.de (mx-rz-1.rrze.uni-erlangen.de [131.188.11.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA72618D625;
-	Mon, 25 Nov 2024 13:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864D21AAE39;
+	Mon, 25 Nov 2024 13:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732540312; cv=none; b=ZNQgJrfEEjoUmyhnZGVpk8doDfNy6Pr2QfCnneNtTr7AeBEMT/nlmSR5NH+HSDwmbPiDEiwvczvqiKnUx0LKkv14EDAne+d4aRECBUjsr+wzLHkixLjkKrWUj6u//8N00plJ/sMy+lRPmPxmj2f9wSUDamvzLeiTCfFuq+DSfyc=
+	t=1732540856; cv=none; b=MsgwQyykAb3bdDa1Vfw4tAPDQlwpQoiCup89+VkZTOhIvS5E4lzR9i15u26EB7mOs1urfqyqRJFJp6NkY9ekLFWesVNvk9JpnsGiLN3qbuo0nVkgXEJCBKRB4lYZs+5x0vDxYK9ZnPnRcf9s2oSkO7fk7JLkCU4Q/Y9qv6DxsPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732540312; c=relaxed/simple;
-	bh=77n7xr3tbx600Y8k4lOBNTIIJ0RxEAQqaxW7kBUCqsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n23zlh4f4rIWJJsla2HnBAZXDUjkYX/GAxDZ58L+pYJK1JJRFK82uSGh2A9m2G0CSfBs9O/lYjjWBWP5BAC8hlUYHU4XChq1c8NX7gYl03cfgrNyWIs7zBxTAnJ7LNHRFO2Kzl6WJiyEXCqCbhZbJWgS+Y8YXdZMT2wve+BJBWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TZ0q2qoJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03B5C4CECE;
-	Mon, 25 Nov 2024 13:11:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732540312;
-	bh=77n7xr3tbx600Y8k4lOBNTIIJ0RxEAQqaxW7kBUCqsc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TZ0q2qoJo9jRKJO+I3SfmVlTttF0p1AgwxhCf1SlgooF56vf8YeaxCg2ghEyOMMmT
-	 +U7xBi9FzIrrBUfze98Jj55U6IzZq5w8e0Rnl2uA0d/Wem1MTj8AcPUloaJ9clj+Vm
-	 LkqPO7I/TGGaYwsvne1Oijp1UcPVl35UdTSrURNNG+tpvzgHU0DQhErnywaP7OeCAM
-	 ijMXtrvbSAEWck9so/iL0W+VlDZ9L9b3Dxc06pZE5Tsv3w/UvxXhsfzeSUirmtUCrj
-	 YcviGFpRiI0GDFOLRG984vhhUZ0xBKkBlJ19QWTqkx49xrsM7aIUNyDxdstM2LuKk+
-	 GPo61Tm+Wo5yw==
-Date: Mon, 25 Nov 2024 13:11:46 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: Jiayuan Chen <mrpre@163.com>, linux-kselftest@vger.kernel.org,
-	song@kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, martin.lau@linux.dev, andrii@kernel.org,
-	ast@kernel.org, kpsingh@kernel.org, jolsa@kernel.org
-Subject: Re: [PATCH kselftest] fix single bpf test
-Message-ID: <c685c171-0d2d-4ef1-82ca-386c3a2e3df6@sirena.org.uk>
-References: <20241118140608.53524-1-mrpre@163.com>
- <93d96c99-4712-4054-a36f-3c65c80ab3f8@linuxfoundation.org>
+	s=arc-20240116; t=1732540856; c=relaxed/simple;
+	bh=nEVLGdrVZPb6enKB7EY1THDhzmHqOu2kfzHjyYRrzkc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z8IG6CtVhaLcoiyAztFZxicbH6a53bjwVDoHHMGb4yfZ2RPdd/CoBxGQpVemTFjwGA+ovO5b0KeSrDggtart5JHoGTJk1kw8SyznvQJYELGeYElQaPKSI2Dkj/WggSSeUVtDP77u/VnAOBvfUUwYbQaktdteHM/DwIsx2dhEFoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=NBNYps3J; arc=none smtp.client-ip=131.188.11.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
+Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-rz-1.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4XxmQ33NzRz8sgN;
+	Mon, 25 Nov 2024 14:14:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
+	t=1732540475; bh=s7L96CAwEKK5QfK2TjaVOwN2FZlsfrSEHf8b4H+HNBw=;
+	h=From:To:Cc:Subject:Date:From:To:CC:Subject;
+	b=NBNYps3J6duIbL9N74MP7us9Tt+5PZZ7xnoiByEkX5+Ytx9KcVhPqgRrGkWnqhRLO
+	 SbqWb8nX29JzxmEIAUzgj4T31iC8f+IdOLf4Me8nYBy86tF49Od4MAPW1FMXMJ+u0o
+	 zOh4+YAijBJcGrlWRkQWJy9w2BZ9TUUgjdJejLEYbFzkhbOggpB2MZi/niRic0EOqw
+	 GHxmuNlgWuCtYww5HJ5Kwc7Ch2J50FK3gXAyMtLbVbToEw9Zeaad/kIc8aKPJTsupq
+	 GKgixmVprWU/c2+AKBibUPHE4ffxnQID7xWDyLaRFgryBEFtEypIEjZHajA9mhzaLo
+	 leTnyyVXOnnkQ==
+X-Virus-Scanned: amavisd-new at boeck4.rrze.uni-erlangen.de (RRZE)
+X-RRZE-Flag: Not-Spam
+X-RRZE-Submit-IP: 131.188.47.107
+Received: from faui76b (faui76b.informatik.uni-erlangen.de [131.188.47.107])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: U2FsdGVkX1+XNSxb4JLlG+hslXpIVCWhXOsiQT88hzM=)
+	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4XxmQ10rlfz8slJ;
+	Mon, 25 Nov 2024 14:14:33 +0100 (CET)
+From: Martin Ottens <martin.ottens@fau.de>
+To: 
+Cc: Martin Ottens <martin.ottens@fau.de>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net/sched: tbf: correct backlog statistic for GSO packets
+Date: Mon, 25 Nov 2024 14:13:55 +0100
+Message-Id: <20241125131356.932264-1-martin.ottens@fau.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6obR2W6oqGidcei7"
-Content-Disposition: inline
-In-Reply-To: <93d96c99-4712-4054-a36f-3c65c80ab3f8@linuxfoundation.org>
-X-Cookie: This bag is recyclable.
+Content-Transfer-Encoding: 8bit
 
+When the length of a GSO packet in the tbf qdisc is larger than the burst
+size configured the packet will be segmented by the tbf_segment function.
+Whenever this function is used to enqueue SKBs, the backlog statistic of
+the tbf is not increased correctly. This can lead to underflows of the
+'backlog' byte-statistic value when these packets are dequeued from tbf.
 
---6obR2W6oqGidcei7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reproduce the bug:
+Ensure that the sender machine has GSO enabled. Configured the tbf on
+the outgoing interface of the machine as follows (burstsize = 1 MTU):
+$ tc qdisc add dev <oif> root handle 1: tbf rate 50Mbit burst 1514 latency 50ms
 
-On Fri, Nov 22, 2024 at 08:14:58AM -0700, Shuah Khan wrote:
+Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
+client on this machine. Check the qdisc statistics:
+$ tc -s qdisc show dev <oif>
 
-> The commit 7a6eb7c34a78 went in 4 years ago? DO we have a better
-> story for the LLVM tool chain to get rid of skipping bpf and sched_ext?
+The 'backlog' byte-statistic has incorrect values while traffic is
+transferred, e.g., high values due to u32 underflows. When the transfer
+is stopped, the value is != 0, which should never happen.
 
-> Running make -C tools/testing/selftests/bpf/ gave me the following error.
-> Does this mean we still can't include bpf in default run?
+This patch fixes this bug by updating the statistics correctly, even if
+single SKBs of a GSO SKB cannot be enqueued.
 
-> make -C tools/testing/selftests/bpf/
-> make: Entering directory '/linux/linux_6.12/tools/testing/selftests/bpf'
->=20
-> Auto-detecting system features:
-> ...                                    llvm: [ OFF ]
+Signed-off-by: Martin Ottens <martin.ottens@fau.de>
+---
+ net/sched/sch_tbf.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-The toolchain is in a better place now and we can run with released LLVM
-versions.  The detection above is still needed since the LLVM version
-needed is a bit newer than the version needed for the kernel itself,
-it's LLVM 18 for BPF, and not everyone has LLVM.
+diff --git a/net/sched/sch_tbf.c b/net/sched/sch_tbf.c
+index f1d09183ae63..ef7752f9d0d9 100644
+--- a/net/sched/sch_tbf.c
++++ b/net/sched/sch_tbf.c
+@@ -220,17 +220,18 @@ static int tbf_segment(struct sk_buff *skb, struct Qdisc *sch,
+ 	skb_list_walk_safe(segs, segs, nskb) {
+ 		skb_mark_not_on_list(segs);
+ 		qdisc_skb_cb(segs)->pkt_len = segs->len;
+-		len += segs->len;
+ 		ret = qdisc_enqueue(segs, q->qdisc, to_free);
+ 		if (ret != NET_XMIT_SUCCESS) {
+ 			if (net_xmit_drop_count(ret))
+ 				qdisc_qstats_drop(sch);
+ 		} else {
+ 			nb++;
++			len += segs->len;
+ 		}
+ 	}
+ 	sch->q.qlen += nb;
+-	if (nb > 1)
++	sch->qstats.backlog += len;
++	if (nb > 0)
+ 		qdisc_tree_reduce_backlog(sch, 1 - nb, prev_len - len);
+ 	consume_skb(skb);
+ 	return nb > 0 ? NET_XMIT_SUCCESS : NET_XMIT_DROP;
+-- 
+2.39.5
 
->   GEN     /linux/linux_6.12/tools/testing/selftests/bpf/tools/build/bpfto=
-ol/vmlinux.h
-> libbpf: failed to find '.BTF' ELF section in /linux/linux_6.12/vmlinux
-> Error: failed to load BTF from /linux/linux_6.12/vmlinux: No data availab=
-le
-> make[1]: *** [Makefile:209: /linux/linux_6.12/tools/testing/selftests/bpf=
-/tools/build/bpftool/vmlinux.h] Error 195
-> make[1]: *** Deleting file '/linux/linux_6.12/tools/testing/selftests/bpf=
-/tools/build/bpftool/vmlinux.h'
-> make: *** [Makefile:369: /linux/linux_6.12/tools/testing/selftests/bpf/to=
-ols/sbin/bpftool] Error 2
-> make: Leaving directory '/linux/linux_6.12/tools/testing/selftests/bpf'
-
-This bit still needs some attention - the build needs a kernel binary
-with BTF information built in via CONFIG_DEBUG_INFO_BTF.  That is
-enabled by the config fragment for BTF tests but it's not compatible
-with the arm64 defconfig since that sets CONFIG_DEBUG_INFO_REDUCED which
-isn't compatible with _BTF, and in general having it missing should be
-handled a bit more gracefully.  I believe some of the tests would run
-happily without the BTF information. =20
-
-TBH I'm a bit surprised we even tried to do this bit with LLVM not
-available...
-
---6obR2W6oqGidcei7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmdEd5IACgkQJNaLcl1U
-h9BZMQf9F1MFajh28PQz3CmjPPNAkdxl8CF86T29XnOhxrfCPKuLpZNkem5jspwO
-Dg7Eu5rM36gAZyAsh+vUj+w6rsNf0XQ8cEVnXouJ98mCjjzuFZp1GKVfl3VdNEJ2
-aOGpQMtck3w1ZY/pZUU++kDcXSV9p/TnOCAjOt8HBc7V2FuQtJqvyfz2H++92CVA
-4HD3wrqqVtRDCd3APgApyRYm14eh37O8LUyMM4zcYDByC/orxJzq2dmuAxMdhqiM
-r3bwx6MIsC2GnqsrhZ+21SFN2vMUmXdt7MRZASBq7xmE3RALj2aIe0NzCG/53nV5
-6GaD8ns0JcFmbAn3gzPmJnJFd2Oj9w==
-=Afir
------END PGP SIGNATURE-----
-
---6obR2W6oqGidcei7--
 
