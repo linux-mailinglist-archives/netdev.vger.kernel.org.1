@@ -1,221 +1,206 @@
-Return-Path: <netdev+bounces-147285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCBF9D8EF0
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 00:19:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF919D8F09
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 00:25:20 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAB1EB229B3
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 23:19:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59944169B55
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 23:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F201925AD;
-	Mon, 25 Nov 2024 23:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8701CEE8A;
+	Mon, 25 Nov 2024 23:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="fpym/GOr"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="I/c1RYN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-rz-2.rrze.uni-erlangen.de (mx-rz-2.rrze.uni-erlangen.de [131.188.11.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75F41CD2C;
-	Mon, 25 Nov 2024 23:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.21
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655831CD2C;
+	Mon, 25 Nov 2024 23:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732576767; cv=none; b=ZdPjMV0l1cxtLu4ezT/ytpoalp3b1gb30eKHT5IZJvP4fuDVMJzUYuMZHp6+xrDzoOFcAUufAAYNTQ/bbc2DxEPwOll86kcvCeaV7yaIvF2K0QeRe67IgOvT4QtwHbPV4vbf31np03tOHLK7eRc6W2/y4kNqDnklyHKn8i2Wfd8=
+	t=1732577091; cv=none; b=gdR+LuluhPQvBdlCHbjN/tX2KumMybZKWz4mEzAenXXStSX1a7usufCqkuLqFrj1J905kuc4E0qvf2tlfVXccrQBObzR3kwrH1hWeYaC7LfsBDmqrcKrM/TQkiZN1wLN9+N+FNGbPxXl9bM0t0UPCQS0BkL29za6UfiqAITrW7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732576767; c=relaxed/simple;
-	bh=AAKcvTazsTtzaizb2P/Gv3cineczqMLFnAjAu81+gg4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ViD+sTg6A9x1jeVsctgfx13C0aIs6e752sH4yHd0vC+IT02jv3btc4e0EGjEBSD2ClYuctW3L+52sIsvVd74Fv8ZuyUyuSri+HvqKnQ8NTcyP51lpv7D4YXhQKZLEnAOYPL029v/TjFf3a/kS8hKLj3a0qVzJmOouXhabPTuLtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=fpym/GOr; arc=none smtp.client-ip=131.188.11.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
-Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-rz-2.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4Xy1qt0Q6tzPkVp;
-	Tue, 26 Nov 2024 00:19:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
-	t=1732576762; bh=hXNXvB1YkXWQBhSaqVTMLp4cvaSRmlShkxqkHuC1Xm4=;
-	h=From:To:Cc:Subject:Date:From:To:CC:Subject;
-	b=fpym/GOrf1hBVVsUSuK0o0QamH8DvxqdRwggB6CYT+jMw7+QtilvyHzJIu6n3f1YB
-	 wI6vxNGsFCC/vWNyBZw2ubyUn/xAr6nOBKcoHQcb0ruSNVvR2ixy9KRkdQ3UuEOhgB
-	 XYpyVeRPJxpjBLDNKTMBe7zH+AACANWgH2397IuCG4vYa8fL82rCm5uwXzgUoi/Dw/
-	 AiXziqhmDs7VFqechs3XZX64Vv4oNSV/6O33YFNwsXJdz+JFgY6KJsiZ9l6yyI0UWt
-	 qAUSUZENOeMycCWAc4fZBOZMUKof0+B5VVc1daQek7+JHT99ByrpbeV9zh1vtpGzH5
-	 R0YD1mczS3RcA==
-X-Virus-Scanned: amavisd-new at boeck4.rrze.uni-erlangen.de (RRZE)
-X-RRZE-Flag: Not-Spam
-X-RRZE-Submit-IP: 131.188.47.107
-Received: from faui76b (faui76b.informatik.uni-erlangen.de [131.188.47.107])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: U2FsdGVkX18MIWNQaQuiS8veO/+fA1bRqTG18I/Xv6w=)
-	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4Xy1qq3Q0QzPjml;
-	Tue, 26 Nov 2024 00:19:19 +0100 (CET)
-From: Martin Ottens <martin.ottens@fau.de>
-To: 
-Cc: Martin Ottens <martin.ottens@fau.de>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
+	s=arc-20240116; t=1732577091; c=relaxed/simple;
+	bh=8ET40aUJBPF8KJ8l/GdaeBQwZGILcXnZdbZXTC2/+wo=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=WyM6z7TbGSGmhOAr1EJTNjJ95tejQxMuAGaGTQH0t1tG5ZeEPxEqgkSfARqXXb1n3UmQR8GiYt/97gnqZJV8oeVxMvdBbGAMm5rHFnW75ONgCgno4KgWU0P+Hqv1FQcdVHz2+eEXXrxX2i4xkicDQDKYhsZRPtQsYuzVEWfIdq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=I/c1RYN4; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id BC82A2054597;
+	Mon, 25 Nov 2024 15:24:47 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BC82A2054597
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1732577087;
+	bh=KKxzMh07QCmMgY5ntlRx+0kcO0k3u6+fBgf1JWSRuQE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=I/c1RYN4dA+qUthGeQv6gh+TFPvdHoVYWtoz34qRQbODr8muisW07fzsKSq76FBqv
+	 1BCkJQS3BlZ9hGDfV01s1HkGv7AmIwADtJFS/+xlNHCCr8+Wp4Mlu9ORXlWtyOGYtw
+	 mTe9Uqf7okrDn8wYD+oN2pLQubME821KC1+zxfm8=
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	iommu@lists.linux.dev,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net/sched: netem: account for backlog updates from child qdisc
-Date: Tue, 26 Nov 2024 00:18:25 +0100
-Message-Id: <20241125231825.2586179-1-martin.ottens@fau.de>
-X-Mailer: git-send-email 2.39.5
+	linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	mhklinux@outlook.com,
+	decui@microsoft.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	luto@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	daniel.lezcano@linaro.org,
+	joro@8bytes.org,
+	robin.murphy@arm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lpieralisi@kernel.org,
+	kw@linux.com,
+	robh@kernel.org,
+	bhelgaas@google.com,
+	arnd@arndb.de,
+	sgarzare@redhat.com,
+	jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com,
+	skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com,
+	vkuznets@redhat.com,
+	ssengar@linux.microsoft.com,
+	apais@linux.microsoft.com,
+	eahariha@linux.microsoft.com,
+	horms@kernel.org
+Subject: [PATCH v3 0/5] Introduce new headers for Hyper-V
+Date: Mon, 25 Nov 2024 15:24:39 -0800
+Message-Id: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-When netem is used with a child qdisc, the child qdisc can use
-'qdisc_tree_reduce_backlog' to inform its parent, netem, about created or
-dropped SKBs. This function updates 'qlen' and the backlog statistics of
-netem, but netem does not account for changes made by a child qdisc. If a
-child qdisc creates new SKBs during enqueue and informs its parent about
-this, netem's 'qlen' value is increased. When netem dequeues the newly
-created SKBs from the child, the 'qlen' in netem is not updated. If 'qlen'
-reaches the configured limit, the enqueue function stops working, even
-though the tfifo is not full.
+To support Linux as root partition[1] on Hyper-V many new definitions
+are required.
 
-Reproduce the bug:
-Ensure that the sender machine has GSO enabled. Configure netem as root
-qdisc and tbf as its child on the outgoing interface of the machine
-as follows:
-$ tc qdisc add dev <oif> root handle 1: netem delay 100ms limit 100
-$ tc qdisc add dev <oif> parent 1:0 tbf rate 50Mbit burst 1542 latency 50ms
+The plan going forward is to directly import definitions from
+Hyper-V code without waiting for them to land in the TLFS document.
+This is a quicker and more maintainable way to import definitions,
+and is a step toward the eventual goal of exporting the headers
+directly from Hyper-V for use in Linux.
 
-Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
-client on the machine. Check the qdisc statistics:
-$ tc -s qdisc show dev <oif>
+This patch series introduces new headers (hvhdk.h, hvgdk.h, etc,
+see patch #3) derived directly from Hyper-V code. hyperv-tlfs.h is
+replaced with hvhdk.h (which includes the other new headers)
+everywhere.
 
-tbf segments the GSO SKBs (tbf_segment) and updates the netem's 'qlen'.
-The interface fully stops transferring packets and "locks". In this case,
-the child qdisc and tfifo are empty, but 'qlen' indicates the tfifo is at
-its limit and no more packets are accepted.
+No functional change is expected.
 
-This patch adds a counter for the entries in the tfifo. Netem's 'qlen' is
-only decreased when a packet is returned by its dequeue function, and not
-during enqueuing into the child qdisc. External updates to 'qlen' are thus
-accounted for and only the behavior of the backlog statistics changes.
-This statistics now show the total number/length of SKBs held in the tfifo
-and in the child qdisc. (Note: the 'backlog' byte-statistic of netem is
-incorrect in the example above even after the patch is applied due to a
-bug in tbf. See my previous patch ([PATCH] net/sched: tbf: correct backlog
-statistic for GSO packets)).
+Summary:
+Patch 1-2: Minor cleanup patches
+Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+Patch 4: Switch to the new headers
+Patch 5: Delete hyperv-tlfs.h files
 
-Signed-off-by: Martin Ottens <martin.ottens@fau.de>
+Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
 ---
- net/sched/sch_netem.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+Changelog:
+v3:
+- Add patch (#5) to delete the hyperv-tlfs.h files, suggested by
+  Michael Kelley and Easwar Hariharan
+- Reword commit message on patch #3 to improve clarity, suggested
+  by Michael Kelley
+- Clarify "Dom0" terminology, suggested by Michael Kelley
+v2:
+- Rework the series to simply use the new headers everywhere,
+  instead of fiddling around to keep hyperv-tlfs.h in some areas,
+  suggested by Michael Kelley and Easwar Hariharan
+- Fix compilation issues with some configs by adding missing
+  definitions and changing some names, thanks to Simon Horman for
+  catching those
+- Add additional definitions to the new headers due to them now being
+  used everywhere
+- Don't remove indirect includes in patch #2, only remove those which
+  truly aren't used, suggested by Michael Kelley
 
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fe6fed291a7b..71ec9986ed37 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -79,6 +79,8 @@ struct netem_sched_data {
- 	struct sk_buff	*t_head;
- 	struct sk_buff	*t_tail;
- 
-+	u32 t_len;
-+
- 	/* optional qdisc for classful handling (NULL at netem init) */
- 	struct Qdisc	*qdisc;
- 
-@@ -383,6 +385,7 @@ static void tfifo_reset(struct Qdisc *sch)
- 	rtnl_kfree_skbs(q->t_head, q->t_tail);
- 	q->t_head = NULL;
- 	q->t_tail = NULL;
-+	q->t_len = 0;
- }
- 
- static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
-@@ -412,6 +415,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
- 		rb_link_node(&nskb->rbnode, parent, p);
- 		rb_insert_color(&nskb->rbnode, &q->t_root);
- 	}
-+	q->t_len++;
- 	sch->q.qlen++;
- }
- 
-@@ -518,7 +522,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			1<<get_random_u32_below(8);
- 	}
- 
--	if (unlikely(sch->q.qlen >= sch->limit)) {
-+	if (unlikely(q->t_len >= sch->limit)) {
- 		/* re-link segs, so that qdisc_drop_all() frees them all */
- 		skb->next = segs;
- 		qdisc_drop_all(skb, sch, to_free);
-@@ -702,8 +706,8 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- tfifo_dequeue:
- 	skb = __qdisc_dequeue_head(&sch->q);
- 	if (skb) {
--		qdisc_qstats_backlog_dec(sch, skb);
- deliver:
-+		qdisc_qstats_backlog_dec(sch, skb);
- 		qdisc_bstats_update(sch, skb);
- 		return skb;
- 	}
-@@ -719,8 +723,7 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 
- 		if (time_to_send <= now && q->slot.slot_next <= now) {
- 			netem_erase_head(q, skb);
--			sch->q.qlen--;
--			qdisc_qstats_backlog_dec(sch, skb);
-+			q->t_len--;
- 			skb->next = NULL;
- 			skb->prev = NULL;
- 			/* skb->dev shares skb->rbnode area,
-@@ -747,16 +750,21 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 					if (net_xmit_drop_count(err))
- 						qdisc_qstats_drop(sch);
- 					qdisc_tree_reduce_backlog(sch, 1, pkt_len);
-+					sch->qstats.backlog -= pkt_len;
-+					sch->q.qlen--;
- 				}
- 				goto tfifo_dequeue;
- 			}
-+			sch->q.qlen--;
- 			goto deliver;
- 		}
- 
- 		if (q->qdisc) {
- 			skb = q->qdisc->ops->dequeue(q->qdisc);
--			if (skb)
-+			if (skb) {
-+				sch->q.qlen--;
- 				goto deliver;
-+			}
- 		}
- 
- 		qdisc_watchdog_schedule_ns(&q->watchdog,
-@@ -766,8 +774,10 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
- 
- 	if (q->qdisc) {
- 		skb = q->qdisc->ops->dequeue(q->qdisc);
--		if (skb)
-+		if (skb) {
-+			sch->q.qlen--;
- 			goto deliver;
-+		}
- 	}
- 	return NULL;
- }
+---
+Footnotes:
+[1] Linux as root partition on Hyper-V is sometimes referred to as
+    "Dom0", borrowing the terminology from Xen. Although they are
+    conceptually similar, note that "Hyper-V Dom0" has nothing to do
+    with Xen.
+
+Nuno Das Neves (5):
+  hyperv: Move hv_connection_id to hyperv-tlfs.h
+  hyperv: Clean up unnecessary #includes
+  hyperv: Add new Hyper-V headers in include/hyperv
+  hyperv: Switch from hyperv-tlfs.h to hyperv/hvhdk.h
+  hyperv: Remove the now unused hyperv-tlfs.h files
+
+ MAINTAINERS                          |    8 +-
+ arch/arm64/hyperv/hv_core.c          |    3 +-
+ arch/arm64/hyperv/mshyperv.c         |    4 +-
+ arch/arm64/include/asm/hyperv-tlfs.h |   71 --
+ arch/arm64/include/asm/mshyperv.h    |    7 +-
+ arch/x86/hyperv/hv_apic.c            |    1 -
+ arch/x86/hyperv/hv_init.c            |   21 +-
+ arch/x86/hyperv/hv_proc.c            |    3 +-
+ arch/x86/hyperv/ivm.c                |    1 -
+ arch/x86/hyperv/mmu.c                |    1 -
+ arch/x86/hyperv/nested.c             |    2 +-
+ arch/x86/include/asm/hyperv-tlfs.h   |  811 ----------------
+ arch/x86/include/asm/kvm_host.h      |    3 +-
+ arch/x86/include/asm/mshyperv.h      |    3 +-
+ arch/x86/include/asm/svm.h           |    2 +-
+ arch/x86/kernel/cpu/mshyperv.c       |    2 +-
+ arch/x86/kvm/vmx/hyperv_evmcs.h      |    2 +-
+ arch/x86/kvm/vmx/vmx_onhyperv.h      |    2 +-
+ arch/x86/mm/pat/set_memory.c         |    2 -
+ drivers/clocksource/hyperv_timer.c   |    2 +-
+ drivers/hv/hv_balloon.c              |    4 +-
+ drivers/hv/hv_common.c               |    2 +-
+ drivers/hv/hv_kvp.c                  |    2 +-
+ drivers/hv/hv_snapshot.c             |    2 +-
+ drivers/hv/hyperv_vmbus.h            |    2 +-
+ include/asm-generic/hyperv-tlfs.h    |  874 -----------------
+ include/asm-generic/mshyperv.h       |    7 +-
+ include/clocksource/hyperv_timer.h   |    2 +-
+ include/hyperv/hvgdk.h               |  308 ++++++
+ include/hyperv/hvgdk_ext.h           |   46 +
+ include/hyperv/hvgdk_mini.h          | 1306 ++++++++++++++++++++++++++
+ include/hyperv/hvhdk.h               |  733 +++++++++++++++
+ include/hyperv/hvhdk_mini.h          |  311 ++++++
+ include/linux/hyperv.h               |   11 +-
+ net/vmw_vsock/hyperv_transport.c     |    6 +-
+ 35 files changed, 2748 insertions(+), 1819 deletions(-)
+ delete mode 100644 arch/arm64/include/asm/hyperv-tlfs.h
+ delete mode 100644 arch/x86/include/asm/hyperv-tlfs.h
+ delete mode 100644 include/asm-generic/hyperv-tlfs.h
+ create mode 100644 include/hyperv/hvgdk.h
+ create mode 100644 include/hyperv/hvgdk_ext.h
+ create mode 100644 include/hyperv/hvgdk_mini.h
+ create mode 100644 include/hyperv/hvhdk.h
+ create mode 100644 include/hyperv/hvhdk_mini.h
+
 -- 
-2.39.5
+2.34.1
 
 
