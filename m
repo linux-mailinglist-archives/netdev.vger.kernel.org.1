@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-147159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B17D29D7AC7
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 05:24:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FC789D7AC8
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 05:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 713782818DF
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 04:24:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4C86B213EB
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 04:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5651E517;
-	Mon, 25 Nov 2024 04:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2040777102;
+	Mon, 25 Nov 2024 04:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="MmPYp8mQ"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Oz7ta+Ww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576BD383
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 04:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7110F4C76
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 04:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732508679; cv=none; b=Fa/V8ikE2b6vtNN34jaTmWYShSlQtPhQ2PRM7vtFNkBn4gEZESmoRscpLYVevfCHA+emCRjXIfLrjt1UT7tnq7OUxwId0rTNFISNhiIPPhjJS6ghOp3kpPx1cGCUUOx1JC3e9Qm6MU+hUkcfOD+PIzAm4MrFm7tvRKBDXxDCjzg=
+	t=1732508681; cv=none; b=D8Dce+ASdzQIRIDY15nzIRE1Lo/zKVJJu+02Regta26IEjLfvieQ+30/forbPGV5FJrRoQMc6gbRGJZSFwuhTZhW1V9Z29zSB48Ch8ZLg0MKygmX19paXdw1quxsnepsZo8IvYNLJjWalAFrhokIkSLJPgTJQDkfr6tKTnWBbKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732508679; c=relaxed/simple;
-	bh=KRm+rx6Jsfts1/yyfDNCgszEkP4208KKmBjRG1Tab4I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HZdbfUtxv5yFYp5cWfRSeBU8LLfBKI5WL0+YRT/yaH9YNR+DFy2NV/mEGtmOu7R9vJ0UUc/KSpP0SO09KlBCxZYiJJs21ZXKkxnxs0ZhXRUnOep9xg7DciQpa/BWWCjjMqiIEH7DF99m0INwfrSACteJYuhCxcEJDUGVGYCuPLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=MmPYp8mQ; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1732508681; c=relaxed/simple;
+	bh=49maGMWiy3Nbi8tm+3sP+LhlVcyM86OY4LiijQN7eNM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=p1SYL4dPONF2WS1/j+E+SWS8GADTU4v3NcigL4n0rNu8ILxcfBlnRgUzEHtabnWow2Fn8FzLlV8XyNWbYwZxstsGnjDveLTFx7yDSrfZGAfiuXVumK4iDudFBAAZVnsfqL8RRitwIvGj8KL4Ecm9JPT8o0EDpK/yJOtRj+iw5E0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Oz7ta+Ww; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-724f383c5bfso1148665b3a.1
-        for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 20:24:38 -0800 (PST)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-724e113c821so2152163b3a.3
+        for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 20:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732508677; x=1733113477; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=N6GuZARBi7xM4YeYsmfFn0mKFjL1VBD1bxtjDGmzYzA=;
-        b=MmPYp8mQuS55z8oh5sYERjhZITjRUOmw9buy+Tm0J4/eco8QmGi5iv+16MmQKizWog
-         niE4zmZ9lveQ+KRVq/D+1zjuzjVzW/FwSIzyNfoV9jSpqKBkz+J6R7DIwgPxB2+CYQFv
-         t4O31ZiegfHs7VVAqkC+hJSHy8H8JiweyRgyhTl+0ZXRaj1ZtlNz/C2Mi0b76hXdK4wj
-         LBZh9nRew0Vpd1Ac5bRWt+Hdg4m/Vc72gMfPB94LqNOjtVqlCf8i+cTV3SEQQvdscHVo
-         cf2u7ULGbKNvT18PQPvngeudFdSck2KYP7YX9OU98n7GpMH3rhWDlUcb9YK6zg+arcuy
-         DvJw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732508679; x=1733113479; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mX+7FJNwY1ZGYJBKL/Ylmjs/CQwIsMbj1Ti1EMLN6tw=;
+        b=Oz7ta+WwB0uL41bN1Bm0Ua/JKG6laz21BddULDH2Y4x8qJR5JrnlPn+NClJ5cycun1
+         Rnw3mfBNCF04HmDmo1RdZLJaARkwJA3QkjF18vLvLCXHtp7lFwa+YP6DyrMPQN+i+2OT
+         S+i+P9MRxfnJa1vbs1J7C6Spb9LBkHSynobo+go5H5Kd0HlQ17kOpYbFGghVEE3eLIqK
+         IgOqGbrJqKPz61Z6ODy/BrqmuCq1YngFhDatDIuM0K9DgsugQhmia34VIasT7v+RFh/S
+         E7DgV/aGJ028jTny9+dNmAVCP/6P9o0uCI12kq13bA8CwruU8m7gNbKV8bFI1YjLkS3e
+         mugw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732508677; x=1733113477;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N6GuZARBi7xM4YeYsmfFn0mKFjL1VBD1bxtjDGmzYzA=;
-        b=LBM6YU94I850IzO9vh4IemGHB/kp/dBM2fmcVtvRfmVF9KrCNLci5bTLSCgpTC549J
-         mY1dqk/+rXfiPOcqZ21y2drOBtnyjfdvAP+MhTzbtLCfvSr8ZU5kM9gRBBLqJCHMkkHk
-         gdFJBOEyhcqX5DU3K6vq1ngc18XwLfYXLJFX28yZGom2Pmcc15tDyGRmWUYRuTibZrp0
-         7phpwEk5EQYxAYwxYRqBjayRg7sfC0aROFiHfdLqNFAhROWbI3ZJGrwZZ7+Q4OJ2cQnN
-         NR1xwDE8Nf1ngQJUYWlWVCMskg1Jo9Sfr6AWijH3AEdNlkjoFo5WTUVjeOPtBaGR7AKE
-         3adw==
-X-Gm-Message-State: AOJu0YwiaLlT/kwnQB8dCSuCpTSpGEtLZoCl33+85+GkCoDv00fByi29
-	yzOpFXKgMdxWt6hKd8fUc0VckFo6vDK/sj3V3FQlSdpYccRTd8fw5/2gPyCeNBaSGIUO3wh8e+9
-	4
-X-Gm-Gg: ASbGncv7aEg8mi2Os1+m18ZiTOGrvdFhBuYrkZn1ZaRKFNbu66kDAAp2LLUfYRiyirZ
-	t79lyIkZT7hnCSdQL/o1F1UAZKCEIAXNwWB5qFw2nqdX2kb/woklZ5BlU0IKucr+UucWIqKVNOc
-	W6cBOi+MU56+EfesfSJr23/8N5URLUvsKpmhjBUFJ69APHD3ekNKLvPWm4Tq1C1xU5A+lIR/9Tg
-	U9iq7og7Oe2nWH8EHHPn5XBUFATSU9Igg==
-X-Google-Smtp-Source: AGHT+IHs9DKgmFWZy8RxtDAhkzRuZt8mZNSVNHRZ3xVdQ4edtWmqGei+luPkNWB/Y64lv11F5L1qQQ==
-X-Received: by 2002:a05:6a00:21c9:b0:724:60bd:e861 with SMTP id d2e1a72fcca58-724df66ba7amr15587720b3a.18.1732508677522;
-        Sun, 24 Nov 2024 20:24:37 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:7::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcc1e1c44sm4739879a12.27.2024.11.24.20.24.36
+        d=1e100.net; s=20230601; t=1732508679; x=1733113479;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mX+7FJNwY1ZGYJBKL/Ylmjs/CQwIsMbj1Ti1EMLN6tw=;
+        b=b9dT1uaiUQ9f+dGFBNxQtBKQCPPpoXq2+cxXDmxdTI0QuVUtx1yHWRgaSDy+Q37rrt
+         Us0qvtQzEZ0xwHvY6Isb8b34NZyuFPXLkm7XmmYvIO77ul4EijdmB250uVVqwT8+buhi
+         dijdEhiffso8zZsENk6PqOdaieVanXhnAbdc42e2U9q6H/SN+2c2MFnXHSO+3qZyOX0C
+         toi/nC+m1KTGqpdjIdJICFUow/uZINd4hSyD/H8RqdjHTEzpspVfYYtyUhNvkh2bJjEm
+         I7u2qmXUTNkN/KtPs12NHpyOyJ/xk7QuavbDMYDTfUrOSyPyJjOGnBbPmUGqe4dNAQdT
+         E2Cw==
+X-Gm-Message-State: AOJu0Yy5q0c6tadUNFoCfguxxU/DjRQKPa630uo6UUZcZ538HJSQFeKD
+	O1y+jC9SRX5P3PQ0vlrGk/xRDz1U6mqyOsHKTgAkGbrTe6FegEfanRz6kM03KyLdlEZ+4DhHSnl
+	D
+X-Gm-Gg: ASbGncuwi2Wtb8ieeLpXF0BRoX059sNkjTL91rf6sHGPu5t42Dm/dyIoZbXptRy3Vy2
+	grLam+sRnypfjWPJ4KgoKulzeWWZpboFrDbJuieaepCanX4rrat6gyi1I1xiDTMCkg3+iFuMOOu
+	7LNqARgzSZCi7FJhvV7dJWRw6AfPsJS/cpTlMogPjVNOTnPB2SvLcgl8c257a/WMuUM/N3xRJ4/
+	UUMtEMnSFSVgnjxcpu3H0ClLHHHfCYfgg==
+X-Google-Smtp-Source: AGHT+IGlml5yCVInrC04HuLf7asLGGHkLFE9bqNOkY6NzmldhHqe1mmaonvulUM9isBw5zQjGzapHA==
+X-Received: by 2002:a17:90b:1dcf:b0:2ea:6f19:180b with SMTP id 98e67ed59e1d1-2eb0e885a10mr13377191a91.36.1732508678677;
+        Sun, 24 Nov 2024 20:24:38 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:5::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eb0d06299dsm5679189a91.53.2024.11.24.20.24.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Nov 2024 20:24:36 -0800 (PST)
+        Sun, 24 Nov 2024 20:24:38 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org,
 	Michael Chan <michael.chan@broadcom.com>,
@@ -79,10 +81,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	David Wei <dw@davidwei.uk>
-Subject: [PATCH net v1 0/3] bnxt_en: support header page pool in queue API
-Date: Sun, 24 Nov 2024 20:24:09 -0800
-Message-ID: <20241125042412.2865764-1-dw@davidwei.uk>
+Subject: [PATCH net v1 1/3] bnxt_en: refactor tpa_info alloc/free into helpers
+Date: Sun, 24 Nov 2024 20:24:10 -0800
+Message-ID: <20241125042412.2865764-2-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20241125042412.2865764-1-dw@davidwei.uk>
+References: <20241125042412.2865764-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,35 +95,257 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 7ed816be35ab ("eth: bnxt: use page pool for head frags") added a
-separate page pool for header frags. Now, frags are allocated from this
-header page pool e.g. rxr->tpa_info.data.
+Refactor bnxt_rx_ring_info->tpa_info operations into helpers that work
+on a single tpa_info in prep for queue API using them.
 
-The queue API did not properly handle rxr->tpa_info and so using the
-queue API to i.e. reset any queues will result in pages being returned
-to the incorrect page pool, causing inflight != 0 warnings.
+There are 2 pairs of operations:
 
-Fix this bug by properly allocating/freeing tpa_info and copying/freeing
-head_pool in the queue API implementation.
+* bnxt_alloc_one_tpa_info()
+* bnxt_free_one_tpa_info()
 
-The 1st patch is a prep patch that refactors helpers out to be used by
-the implementation patch later.
+These alloc/free the tpa_info array itself.
 
-The 2nd patch is a drive-by refactor. Happy to take it out and re-send
-to net-next if there are any objections.
+* bnxt_alloc_one_tpa_info_data()
+* bnxt_free_one_tpa_info_data()
 
-The 3rd patch is the implementation patch that will properly alloc/free
-rxr->tpa_info.
+These alloc/free the frags stored in tpa_info array.
 
-David Wei (3):
-  bnxt_en: refactor tpa_info alloc/free into helpers
-  bnxt_en: refactor bnxt_alloc_rx_rings() to call
-    bnxt_alloc_rx_agg_bmap()
-  bnxt_en: handle tpa_info in queue API implementation
+Signed-off-by: David Wei <dw@davidwei.uk>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 148 ++++++++++++++--------
+ 1 file changed, 95 insertions(+), 53 deletions(-)
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 208 ++++++++++++++--------
- 1 file changed, 131 insertions(+), 77 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 5f7bdafcf05d..b2cc8df22241 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -3421,15 +3421,11 @@ static void bnxt_free_one_rx_agg_ring(struct bnxt *bp, struct bnxt_rx_ring_info
+ 	}
+ }
+ 
+-static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
++static void bnxt_free_one_tpa_info_data(struct bnxt *bp,
++					struct bnxt_rx_ring_info *rxr)
+ {
+-	struct bnxt_rx_ring_info *rxr = &bp->rx_ring[ring_nr];
+-	struct bnxt_tpa_idx_map *map;
+ 	int i;
+ 
+-	if (!rxr->rx_tpa)
+-		goto skip_rx_tpa_free;
+-
+ 	for (i = 0; i < bp->max_tpa; i++) {
+ 		struct bnxt_tpa_info *tpa_info = &rxr->rx_tpa[i];
+ 		u8 *data = tpa_info->data;
+@@ -3440,6 +3436,17 @@ static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
+ 		tpa_info->data = NULL;
+ 		page_pool_free_va(rxr->head_pool, data, false);
+ 	}
++}
++
++static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp,
++				       struct bnxt_rx_ring_info *rxr)
++{
++	struct bnxt_tpa_idx_map *map;
++
++	if (!rxr->rx_tpa)
++		goto skip_rx_tpa_free;
++
++	bnxt_free_one_tpa_info_data(bp, rxr);
+ 
+ skip_rx_tpa_free:
+ 	if (!rxr->rx_buf_ring)
+@@ -3461,13 +3468,17 @@ static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
+ 
+ static void bnxt_free_rx_skbs(struct bnxt *bp)
+ {
++	struct bnxt_rx_ring_info *rxr;
+ 	int i;
+ 
+ 	if (!bp->rx_ring)
+ 		return;
+ 
+-	for (i = 0; i < bp->rx_nr_rings; i++)
+-		bnxt_free_one_rx_ring_skbs(bp, i);
++	for (i = 0; i < bp->rx_nr_rings; i++) {
++		rxr = &bp->rx_ring[i];
++
++		bnxt_free_one_rx_ring_skbs(bp, rxr);
++	}
+ }
+ 
+ static void bnxt_free_skbs(struct bnxt *bp)
+@@ -3608,29 +3619,64 @@ static int bnxt_alloc_ring(struct bnxt *bp, struct bnxt_ring_mem_info *rmem)
+ 	return 0;
+ }
+ 
++static void bnxt_free_one_tpa_info(struct bnxt *bp,
++				   struct bnxt_rx_ring_info *rxr)
++{
++	int i;
++
++	kfree(rxr->rx_tpa_idx_map);
++	rxr->rx_tpa_idx_map = NULL;
++	if (rxr->rx_tpa) {
++		for (i = 0; i < bp->max_tpa; i++) {
++			kfree(rxr->rx_tpa[i].agg_arr);
++			rxr->rx_tpa[i].agg_arr = NULL;
++		}
++	}
++	kfree(rxr->rx_tpa);
++	rxr->rx_tpa = NULL;
++}
++
+ static void bnxt_free_tpa_info(struct bnxt *bp)
+ {
+-	int i, j;
++	int i;
+ 
+ 	for (i = 0; i < bp->rx_nr_rings; i++) {
+ 		struct bnxt_rx_ring_info *rxr = &bp->rx_ring[i];
+ 
+-		kfree(rxr->rx_tpa_idx_map);
+-		rxr->rx_tpa_idx_map = NULL;
+-		if (rxr->rx_tpa) {
+-			for (j = 0; j < bp->max_tpa; j++) {
+-				kfree(rxr->rx_tpa[j].agg_arr);
+-				rxr->rx_tpa[j].agg_arr = NULL;
+-			}
+-		}
+-		kfree(rxr->rx_tpa);
+-		rxr->rx_tpa = NULL;
++		bnxt_free_one_tpa_info(bp, rxr);
++	}
++}
++
++static int bnxt_alloc_one_tpa_info(struct bnxt *bp,
++				   struct bnxt_rx_ring_info *rxr)
++{
++	struct rx_agg_cmp *agg;
++	int i;
++
++	rxr->rx_tpa = kcalloc(bp->max_tpa, sizeof(struct bnxt_tpa_info),
++			      GFP_KERNEL);
++	if (!rxr->rx_tpa)
++		return -ENOMEM;
++
++	if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
++		return 0;
++	for (i = 0; i < bp->max_tpa; i++) {
++		agg = kcalloc(MAX_SKB_FRAGS, sizeof(*agg), GFP_KERNEL);
++		if (!agg)
++			return -ENOMEM;
++		rxr->rx_tpa[i].agg_arr = agg;
+ 	}
++	rxr->rx_tpa_idx_map = kzalloc(sizeof(*rxr->rx_tpa_idx_map),
++				      GFP_KERNEL);
++	if (!rxr->rx_tpa_idx_map)
++		return -ENOMEM;
++
++	return 0;
+ }
+ 
+ static int bnxt_alloc_tpa_info(struct bnxt *bp)
+ {
+-	int i, j;
++	int i, rc;
+ 
+ 	bp->max_tpa = MAX_TPA;
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+@@ -3641,25 +3687,10 @@ static int bnxt_alloc_tpa_info(struct bnxt *bp)
+ 
+ 	for (i = 0; i < bp->rx_nr_rings; i++) {
+ 		struct bnxt_rx_ring_info *rxr = &bp->rx_ring[i];
+-		struct rx_agg_cmp *agg;
+ 
+-		rxr->rx_tpa = kcalloc(bp->max_tpa, sizeof(struct bnxt_tpa_info),
+-				      GFP_KERNEL);
+-		if (!rxr->rx_tpa)
+-			return -ENOMEM;
+-
+-		if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
+-			continue;
+-		for (j = 0; j < bp->max_tpa; j++) {
+-			agg = kcalloc(MAX_SKB_FRAGS, sizeof(*agg), GFP_KERNEL);
+-			if (!agg)
+-				return -ENOMEM;
+-			rxr->rx_tpa[j].agg_arr = agg;
+-		}
+-		rxr->rx_tpa_idx_map = kzalloc(sizeof(*rxr->rx_tpa_idx_map),
+-					      GFP_KERNEL);
+-		if (!rxr->rx_tpa_idx_map)
+-			return -ENOMEM;
++		rc = bnxt_alloc_one_tpa_info(bp, rxr);
++		if (rc)
++			return rc;
+ 	}
+ 	return 0;
+ }
+@@ -4268,10 +4299,31 @@ static void bnxt_alloc_one_rx_ring_page(struct bnxt *bp,
+ 	rxr->rx_agg_prod = prod;
+ }
+ 
++static int bnxt_alloc_one_tpa_info_data(struct bnxt *bp,
++					struct bnxt_rx_ring_info *rxr)
++{
++	dma_addr_t mapping;
++	u8 *data;
++	int i;
++
++	for (i = 0; i < bp->max_tpa; i++) {
++		data = __bnxt_alloc_rx_frag(bp, &mapping, rxr,
++					    GFP_KERNEL);
++		if (!data)
++			return -ENOMEM;
++
++		rxr->rx_tpa[i].data = data;
++		rxr->rx_tpa[i].data_ptr = data + bp->rx_offset;
++		rxr->rx_tpa[i].mapping = mapping;
++	}
++
++	return 0;
++}
++
+ static int bnxt_alloc_one_rx_ring(struct bnxt *bp, int ring_nr)
+ {
+ 	struct bnxt_rx_ring_info *rxr = &bp->rx_ring[ring_nr];
+-	int i;
++	int rc;
+ 
+ 	bnxt_alloc_one_rx_ring_skb(bp, rxr, ring_nr);
+ 
+@@ -4281,19 +4333,9 @@ static int bnxt_alloc_one_rx_ring(struct bnxt *bp, int ring_nr)
+ 	bnxt_alloc_one_rx_ring_page(bp, rxr, ring_nr);
+ 
+ 	if (rxr->rx_tpa) {
+-		dma_addr_t mapping;
+-		u8 *data;
+-
+-		for (i = 0; i < bp->max_tpa; i++) {
+-			data = __bnxt_alloc_rx_frag(bp, &mapping, rxr,
+-						    GFP_KERNEL);
+-			if (!data)
+-				return -ENOMEM;
+-
+-			rxr->rx_tpa[i].data = data;
+-			rxr->rx_tpa[i].data_ptr = data + bp->rx_offset;
+-			rxr->rx_tpa[i].mapping = mapping;
+-		}
++		rc = bnxt_alloc_one_tpa_info_data(bp, rxr);
++		if (rc)
++			return rc;
+ 	}
+ 	return 0;
+ }
+@@ -13657,7 +13699,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
+ 			bnxt_reset_task(bp, true);
+ 			break;
+ 		}
+-		bnxt_free_one_rx_ring_skbs(bp, i);
++		bnxt_free_one_rx_ring_skbs(bp, rxr);
+ 		rxr->rx_prod = 0;
+ 		rxr->rx_agg_prod = 0;
+ 		rxr->rx_sw_agg_prod = 0;
 -- 
 2.43.5
 
