@@ -1,342 +1,306 @@
-Return-Path: <netdev+bounces-147275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E4BE9D8E39
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 22:54:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650D69D8E37
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 22:53:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D135B166FDA
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 21:53:45 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEC01C4A2D;
+	Mon, 25 Nov 2024 21:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="YloAeGJk";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="1CZkeMGg"
+X-Original-To: netdev@vger.kernel.org
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 912DFB2E8D9
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 21:31:58 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EB519066E;
-	Mon, 25 Nov 2024 21:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZ2pstJC"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDFE188010;
-	Mon, 25 Nov 2024 21:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D258514F9CF;
+	Mon, 25 Nov 2024 21:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732570315; cv=none; b=orX4L6I0nYRpho7HlidaWem6L/tYrw2P2jFGWWRB4WTYF6J0d11y2YFIm9cAVDSuFT/1G0ZBWyAxihdKPwJKkNxRme0DVCrdIohQnq4MuPRhnuhoqoEZDE6fFSncHWcMqRbx1cIkSve/bWRG6jfsq92vvKju50JGJZ08W7vyyAc=
+	t=1732571625; cv=none; b=WeaXiU89NGR/cTGeH3IH1Tc3ju+Vf4soyEg+4lYQqN9GlE/fOZhlFfcwHouOh/heewsxV5Jo/ECXMKZCerPls+xtpBkO8XtJPpVkVehWOHt6boUZS64s8eierYgJNXew+QxqKVtmeNg+BtzghMxSVaMtAV0DIV+IH+KD1Dr2YXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732570315; c=relaxed/simple;
-	bh=im0QVT5ebvZOgOgFSGqUaGkJZeIzbfRlXAkN6QuHGxk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O45sv3t5DFGZE4yFYcUyQBc/j2dIPuflz8bUDszZDhpOP7PVay9z5bTTKoN5I3n8cejy+SJpAfmqzsewUwsAFkbeDDPXeehrYC97tPRxUHn+098Fmy5hvLP6zJXNkO3wxsyYw0D3tRzwMAhOChT7hi6YGm/sffFnGSXwa4hYKJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NZ2pstJC; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-434a14d6bf4so9391685e9.1;
-        Mon, 25 Nov 2024 13:31:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732570308; x=1733175108; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gRmlTWuB/Al0wVwcWOcHFHSlcDl4F/Z5c99lepHjy/s=;
-        b=NZ2pstJCYVxjD8S43pnIrmy5rnIUoHEGfTWVtIaAwIK5Fs5uHBDFjXlz86AOaOAiG2
-         Uabi2RmCVacMeVp52oya8Eav9SwhYbdHeVxNU8S/oTdz+s7SqCNVA7Y9L9mpY0S3QxKI
-         Jkgg/g76AaMxZ9sHc/WlHXfqb4x+e2QVIACrs/4pL+5jWAqzWrvmB03jrmCBXk5EnPoJ
-         ULsHUpP1uXYdkZfKXgC3GwEtBh0wytS7a2Ik20jg8/lqZSc3cug+f0weyH4Ym7j2UXsO
-         6+vRsa7DZflyHKH2QHcajMTwQkXiO0hrjIBLI8usRRrlquj+SwzjMAeQGfOXwd3k9XdK
-         xy7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732570308; x=1733175108;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gRmlTWuB/Al0wVwcWOcHFHSlcDl4F/Z5c99lepHjy/s=;
-        b=qpWvr2bFG6EcYLFSJid2x/aByXh3XNTyvQNUilpTlHYcX+dteB0sdhyeaoz+3u70Th
-         qfVYGvJI/8RliKZydCeASZZ4RZILlNmFyM/EhlRUAWKOsFOM9qZUfDl8KdoB8z9UUXFn
-         0Ldh26ePpC+ZCUXOBAWyDmELeEGBzHd0cfjJQHSkqhmg+PvEDqVpBQFNqgzX+rty/JHs
-         /8YEMrM25u9qzxy2ZF/1BsAwdfr3Ov6ueATdK+9sbH5wCoNitvi6Aool5paAo8+cE8nS
-         mUJyr0XCvfAbro8+OsW978OV1iWFIv1yxXJBMbp0uSAvORPfx2f4ybqiKHQ/RSLRJkpL
-         +oPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTegyn6ywKpQlOrUBFqNA4DrlbBtLcwJE+G2n8Y1+WKKd1fyanszIHGqRK5UGrt800zulQGBCO@vger.kernel.org, AJvYcCUbvQqn/D7P7q9NvCDzT3RztREqq36Kk1geh8KJMtugRVrjmWpfwSC5bkliTHligafjzoLoqxovnKknFM0=@vger.kernel.org, AJvYcCUusOA1nEQ+DT7d4BV11215RimKCTYHNEZDlIuhJKEJh/Uq4hYwo15nG7zr9syQphc3SYEhqwdfQq4owKJiHUEk@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlagOkrkasZjrjNkHRNNFKjtCmM7qezjONtz538FBRmS7DWoaX
-	XSfmR5aDR6Kms2GAxCtFf8n4FjmwiEVyxUfUVoZaqV3wgZMMRsxn
-X-Gm-Gg: ASbGncsuM+Zzz1E36LT1k8g0kdYUXBa+Ibaavqs6hvz14/iwMZ+n7iIabx3f7Unjef/
-	tpU2g2qcmzisW/q6Yyh+qE2rozwJ6T5KU/3DMVhWRaEkmh+wzxD4y3Qbyij0i3dg5GzNqkE2uk7
-	Ny2DbbPPIdD6ozyaH4N0+aXcuZqCKjguaWu85VecNn8z2Wb89bM6Cx7BRdShGgbVjoRF5RbtLQM
-	AX+G2lvujJ61iec/vzKcVVtttosZHMLodO39/jHDUsdixR67RI=
-X-Google-Smtp-Source: AGHT+IHIiT9/SGX/p32Re3pjTKXS16tvO7Vh4Jouuynpdb/7loXil7Frj9p3eb9BZ+YUz6OBqDDFxg==
-X-Received: by 2002:a05:600c:5254:b0:434:a169:6ff7 with SMTP id 5b1f17b1804b1-434a16972f7mr32204765e9.9.1732570307370;
-        Mon, 25 Nov 2024 13:31:47 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fb2685csm11745568f8f.46.2024.11.25.13.31.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Nov 2024 13:31:46 -0800 (PST)
-Message-ID: <debdfbda-36f8-4c83-bb54-3b48af77e7bd@gmail.com>
-Date: Mon, 25 Nov 2024 23:32:24 +0200
+	s=arc-20240116; t=1732571625; c=relaxed/simple;
+	bh=9x6VMRSVJ50P1RsKBnG3BY3PF9r70a190ET17O/dxQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fKL5JJOddeGp0vxHUr93DF4aex2qU2zj5NVsomEr/JzsyBicT9EiIxOMWTCRp8k24GW8KjsDcgLc0yeksSNq3FxM9gZq5feMSgJKoR1jg2+Q4mGuejybz8QMnTa4ANAmrNmJKsvBZwY53277qSPQp7N89OO0Nluzd3pdF/jZh7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=YloAeGJk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=1CZkeMGg; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 6764C2540194;
+	Mon, 25 Nov 2024 16:53:41 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Mon, 25 Nov 2024 16:53:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1732571621; x=1732658021; bh=JL/cMK59FQ
+	CyoR4ZcakYyeoNMFfW0LAs9lWKxt/ya/8=; b=YloAeGJkhbRs+JXYd4OjxjwDCa
+	P5IV5P3dmAb+GqUeNehKFCeImjjh1mI7EAbULPqt8EhdpeDW2qCFgACxAg1fxjOX
+	VmloQ5W3wvoSNd/SzBxoqP0gP9fI/cHiBxaH6YJ+SlCNgpbQpFD3xex8RefXWYHB
+	ajVHWFo50N8SSsrwxo77d40y0xfnO+hEJvtbma2D19Tp6v7AYh/I+J2/0KpeyJIO
+	M2EeAASK+XXgXxAyKStxonDxLhxBUbDm6ZFHBMRW9QOlUgkx3U+Py8rH0B3znaR5
+	9A9hCf/+uvqZ/oFFLslF3X+poJYuXegOf6i62fmTDjYO7KD4At3rzMizy2Ng==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1732571621; x=1732658021; bh=JL/cMK59FQCyoR4ZcakYyeoNMFfW0LAs9lW
+	Kxt/ya/8=; b=1CZkeMGgmfHr6Z7UuI+CVBIsvxYc/rdn3OIFYg0Ten04ScTt5rF
+	B6xUW4BXaEI27TsoPQxeDdsyC6I4htSiZIzbWUpqtT6pNYVR/fnMhiB9edwQMfsA
+	iq13gRTpakVyYVwhUzT+VnfftsunaQTpLaZZ5bPXXKatjeA8FkNdv1PD6xo4CDIA
+	lT+vbv7jHmqdbCZxnHZaVXITGqr8KgubTtzXpMtJlIkV9obaBDKPAfWFXUofOXdB
+	1q7LCKB3ujcVyWIC1Ww+GM7cNDvVHnhGWpR+kiSRjPouLfLWIVAuJBbhjLdv2YgR
+	+6r1nN2RgVbrKHyqDpnkTd+ODrAMP7koFdg==
+X-ME-Sender: <xms:5PFEZzv61CUcwCo2jIuliHki_EeqirtfzG37rncFvwjwOQxOG0Soug>
+    <xme:5PFEZ0ep2ZSDJjFkuxtIdA58OGERI9Yd36OWgPA7HHyKIYU17CW-riHoubYs0UGMm
+    jS6xqM5GmettubvjA>
+X-ME-Received: <xmr:5PFEZ2w1l4WmGPD2fTfn8jyejUvd3uxKlUwgCYJz1LAXFYPdsuP8Qax9gXq4l_gRLX0poWTKT_h3kvKyNTAg4O1pJy7GmLUtM6o5kRMZkrp2Uw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrgeehgdduhedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnegfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvvefukfhf
+    gggtuggjsehttdfstddttddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesug
+    iguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepvdefkeetuddufeeigedtheefffek
+    uedukeehudffudfffffggeeitdetgfdvhfdvnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghp
+    thhtohepudejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhrgifkheskhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkihhnsehi
+    nhhtvghlrdgtohhmpdhrtghpthhtoheplhhorhgvnhiioheskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehk
+    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthht
+    oheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjohhhnhdrfhgrsh
+    htrggsvghnugesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:5PFEZyMz1OcgPfkGvfThJfF_vVMk7pLJxAN5aU3mrFN7gsM-eJHbIA>
+    <xmx:5PFEZz_80hWzv-aUWrryztvf802f7n5B-RzCrbABIrHdoUxTr4_FGA>
+    <xmx:5PFEZyWdcIbs5NOS6AR9lkhfVK_LlpOhhSN9dGWpTVjDkvFIitgU3Q>
+    <xmx:5PFEZ0e429HyKjGX0Janwf-juoAN33c448aZ7eicRvOhMy5H_amI_w>
+    <xmx:5fFEZwgtmjL1B498EKYPVzdm9MkoDkvizaiqK8Ey6hhNbueqza6ogSg2>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 25 Nov 2024 16:53:39 -0500 (EST)
+Date: Mon, 25 Nov 2024 14:53:37 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, kernel-team <kernel-team@cloudflare.com>, 
+	mfleming@cloudflare.com
+Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
+Message-ID: <25ujrqfgfkyek2mxh2c2kuuvyt5dyx2e6uysujgv3q43ezab4s@aedwgrlhnvft>
+References: <ZwZe6Bg5ZrXLkDGW@lore-desk>
+ <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
+ <ZwZ7fr_STZStsnln@lore-desk>
+ <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
+ <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
+ <01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
+ <b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
+ <rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
+ <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
+ <fcaae4c8-4083-4eef-8cfe-3d1f7e340079@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 05/23] ovpn: keep carrier always on
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- sd@queasysnail.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net>
- <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
- <89ae26a2-0a09-4758-989e-8f45a707a41b@openvpn.net>
- <e2caab8a-343e-4728-b5a7-b167f05c9bb9@gmail.com>
- <c933e2bf-b19c-4f8b-b2c0-44de50eb4141@openvpn.net>
- <1cf97615-a38d-48c3-9e23-4ba82012b32d@gmail.com>
- <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
- <c62208a4-5396-4116-add1-4ffbc254a09d@gmail.com>
- <cdbeecb8-e468-4925-9ab4-c77accf806b9@openvpn.net>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <cdbeecb8-e468-4925-9ab4-c77accf806b9@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcaae4c8-4083-4eef-8cfe-3d1f7e340079@kernel.org>
 
-On 25.11.2024 15:07, Antonio Quartulli wrote:
-> On 25/11/2024 03:26, Sergey Ryazanov wrote:
->>> OpenVPN (userspace) will tear down the P2P interface upon 
->>> disconnection, assuming the --persist-tun option was not specified by 
->>> the user.
->>>
->>> So the interface is gone in any case.
->>>
->>> By keeping the netcarrier on we are just ensuring that, if the user 
->>> wanted persist-tun, the iface is not actually making decisions on its 
->>> own.
->>
->> Regarding a decision on its own. Ethernet interface going to the not- 
->> running state upon lost of carrier from a switch. It's hardly could be 
->> considered a decision of the interface. It's an indication of the fact.
->>
->> Similarly, beeping of UPS is not its decision to make user's life 
->> miserable, it's the indication of the power line failure. I hope, at 
->> least we are both agree on that a UPS should indicate the line failure.
-> 
-> The answer is always "it depends".
-> 
->> Back to the 'persist-tun' option. I checked the openvpn(8) man page. 
->> It gives a reasonable hints to use this option to avoid negative 
->> outcomes on internal openvpn process restart. E.g. in case of 
->> privilege dropping. It servers the same purpose as 'persist-key'. And 
->> there is no word regarding traffic leaking.
-> 
-> FTR, here is the text in the manpage:
-> 
->         --persist-tun
->                Don't close and reopen TUN/TAP device or run up/down 
-> scripts across SIGUSR1 or --ping-restart restarts.
-> 
->                SIGUSR1 is a restart signal similar to SIGHUP, but which 
-> offers finer-grained control over reset options.
-> 
-> 
-> SIGUSR1 is a session reconnection, not a process restart.
-> The manpage just indicates what happens at the low level when this 
-> option is provided.
+Hi Jesper,
 
-Still no mentions of the traffic leaking prevention. Is it?
+On Mon, Nov 25, 2024 at 07:50:41PM GMT, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 25/11/2024 16.12, Alexander Lobakin wrote:
+> > From: Daniel Xu <dxu@dxuuu.xyz>
+> > Date: Fri, 22 Nov 2024 17:10:06 -0700
+> > 
+> > > Hi Olek,
+> > > 
+> > > Here are the results.
+> > > 
+> > > On Wed, Nov 13, 2024 at 03:39:13PM GMT, Daniel Xu wrote:
+> > > > 
+> > > > 
+> > > > On Tue, Nov 12, 2024, at 9:43 AM, Alexander Lobakin wrote:
+> > 
+> > [...]
+> > 
+> > > Baseline (again)
+> > > 
+> > > 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+> > > Run 1	3169917	        0.00007295	0.00007871	0.00009343		Run 1	21749.43
+> > > Run 2	3228290	        0.00007103	0.00007679	0.00009215		Run 2	21897.17
+> > > Run 3	3226746	        0.00007231	0.00007871	0.00009087		Run 3	21906.82
+> > > Run 4	3191258	        0.00007231	0.00007743	0.00009087		Run 4	21155.15
+> > > Run 5	3235653	        0.00007231	0.00007743	0.00008703		Run 5	21397.06
+> > > Average	3210372.8	0.000072182	0.000077814	0.00009087		Average	21621.126
+> > > 
+> 
+> We need to talk about what we are measuring, and how to control the
+> experiment setup to get reproducible results.
+> Especially controlling on what CPU cores our code paths are executing.
+> 
+> In above "baseline" case, we have two processes/tasks executing:
+>  (1) RX-napi softirq/thread (until napi_gro_receive deliver to socket)
+>  (2) Userspace netserver process TCP receiving data from socket.
 
-> The next question is: what is this useful for? Many things, among those 
-> there is the fact the interface will retain its configuration (i.e. IPs, 
-> routes, etc).
+"baseline" in this case is still cpumap, just without these GRO patches.
 
-This is unrelated to the correct operational state indication. Addresses 
-and routes are not reset in case of interface going to non-running state.
+> 
+> My experience is that you will see two noticeable different
+> throughput performance results depending on whether (1) and (2) is
+> executing on the *same* CPU (multi-tasking context-switching),
+> or executing in parallel (e.g. pinned) on two different CPU cores.
+> 
+> The netperf command have an option
+> 
+>  -T lcpu,remcpu
+>       Request that netperf be bound to local CPU lcpu and/or netserver be
+> bound to remote CPU rcpu.
+> 
+> Verify setting by listing pinning like this:
+>   for PID in $(pidof netserver); do taskset -pc $PID ; done
+> 
+> You can also set pinning runtime like this:
+>  export CPU=2; for PID in $(pidof netserver); do sudo taskset -pc $CPU $PID;
+> done
+> 
+> For troubleshooting, I like to use the periodic 1 sec (netperf -D1)
+> output and adjust pinning runtime to observe the effect quickly.
+> 
+> My experience is unfortunately that TCP results have a lot of variation
+> (thanks for incliding 5 runs in your benchmarks), as it depends on tasks
+> timing, that can get affected by CPU sleep states. The systems CPU
+> latency setting can be seen in /dev/cpu_dma_latency, which can be read
+> like this:
+> 
+>  sudo hexdump --format '"%d\n"' /dev/cpu_dma_latency
+> 
+> For playing with changing /dev/cpu_dma_latency I choose to use tuned-adm
+> as it requires holding the file open. E.g I play with these profiles:
+> 
+>  sudo tuned-adm profile throughput-performance
+>  sudo tuned-adm profile latency-performance
+>  sudo tuned-adm profile network-latency
 
->> If somebody have decided that this option gives the funny side-effect 
->> and allows to cut the corners, then I cannot say anything but sorry.
-> 
-> Well, OpenVPN is more than 20 years old.
+Appreciate the tips - I should keep this saved somewhere.
 
-More than 20 years of misguiding users has been duly noted :)
+> 
+> 
+> > > cpumap v2 Olek
+> > > 
+> > > 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+> > > Run 1	3253651	        0.00007167	0.00007807	0.00009343		Run 1	13497.57
+> > > Run 2	3221492	        0.00007231	0.00007743	0.00009087		Run 2	12115.53
+> > > Run 3	3296453	        0.00007039	0.00007807	0.00009087		Run 3	12323.38
+> > > Run 4	3254460	        0.00007167	0.00007807	0.00009087		Run 4	12901.88
+> > > Run 5	3173327	        0.00007295	0.00007871	0.00009215		Run 5	12593.22
+> > > Average	3239876.6	0.000071798	0.00007807	0.000091638		Average	12686.316
+> > > Delta	0.92%	        -0.53%	        0.33%	        0.85%			        -41.32%
+> > > 
+> > > 
+> 
+> 
+> We now three processes/tasks executing:
+>  (1) RX-napi softirq/thread (doing XDP_REDIRECT into cpumap)
+>  (2) CPUmap kthread (until gro_receive_skb/gro_flush deliver to socket)
+>  (3) Userspace netserver process TCP receiving data from socket.
+> 
+> Again, now the performance is going to depend on depending on which CPU
+> cores the processes/tasks are running and whether some are sharing the
+> same CPU. (There are both wakeup timing and cache-line effects).
+> 
+> There are now more combinations to test...
+> 
+> CPUmap is a CPU scaling facility, and you will likely also see different
+> CPU utilization on the difference cores one you start to pin these to
+> control the scenarios.
+> 
+> > > It's very interesting that we see -40% tput w/ the patches. I went back
+> > 
+> 
+> Sad that we see -40% throughput...  but do we know what CPU cores the
+> now three different tasks/processes run on(?)
+> 
 
-Should I mention that RFC 1066 containing ifOperStatus definition was 
-issues 12 years before OpenVPN? And than it was updated with multiple 
-clarifications.
+Roughly, yes. For context, my primary use case for cpumap is to provide
+some degree of isolation between colocated containers on a single host.
+In particular, colocation occurs on AMD Bergamo. And containers are
+CPU pinned to their own CCX (roughly). My RX steering program ensures
+RX packets destined to a specific container are cpumap redirected to any
+of the container's pinned CPUs. It not only provides a good measure of
+isolation but ensures resources are properly accounted.
 
-> If a given API allows a specific user behaviour and had done so for 
-> those many years, changing it is still a user breakage. Not much we can do.
-> 
->>> With a tun interface this can be done, now you want to basically drop 
->>> this feature that existed for long time and break existing setups.
->>
->> Amicus Plato, sed magis amica veritas
->>
->> Yes, I don't want to see this interface misbehaviour advertised as a 
->> security feature. I hope the previous email gives a detailed 
->> explanation why.
-> 
-> Let's forget about the traffic leak mention and the "security feature". 
-> That comment was probably written in the middle of the night and I agree 
-> it gives a false sense or what is happening.
-> 
->> If it's going to break existing setup, then end-users can be supported 
->> with a changelog notice explaining how to properly address the risk of 
->> the traffic leaking.
-> 
-> Nope, we can't just break existing user setups.
-> 
->>>> At some circumstance, e.g. Android app, it could be the only way to 
->>>> prevent traffic leaking. But these special circumstances do not make 
->>>> solution generic and eligible for inclusion into the mainline code.
->>>
->>> Why not? We are not changing the general rule, but just defining a 
->>> specific behaviour for a specific driver.
->>
->> Yeah. This patch is not changing the general rule. The patch breaks it 
->> and the comment in the code makes proud of it. Looks like an old joke 
->> that documented bug become a feature.
-> 
-> Like I said above, let's make the comment meaningful for the expected 
-> goal: implement persist-tun while leaving userspace the chance to decide 
-> what to do.
-> 
->>
->>  From a system administrator or a firmware developer perspective, the 
->> proposed behaviour will look like inconsistency comparing to other 
->> interface types. And this inconsistency requires to be addressed with 
->> special configuration or a dedicated script in a worst case. And I 
->> cannot see justified reason to make their life harder.
-> 
-> You can configure openvpn to bring the interface down when the 
-> connection is lost. Why do you say it requires extra scripting and such?
+So to answer your question of which CPUs the 3 things run on: cpumap
+kthread and application run on the same set of cores. More than that,
+they share the same L3 cache by design. irq/softirq is effectively
+random given default RSS config and IRQ affinities.
 
-Being administratively down and being operationally down are different 
-states.
 
->>> For example, I don't think a tun interface goes down when there is no 
->>> socket attached to it, still packets are just going to be blackhole'd 
->>> in that case. No?
->>
->> Nope. Tun interface indeed will go into the non-running state on the 
->> detach event. Moreover, the tun module supports running/non-running 
->> indication change upon a command from userspace. But not every 
->> userspace application feel a desire to implement it.
 > 
-> With 'ovpn' we basically want a similar effect: let userspace decide 
-> what to do depending on the configuration.
+> > Oh no, I messed up something =\
+> >  > Could you please also test not the whole series, but patches 1-3 (up to
+> > "bpf:cpumap: switch to GRO...") and 1-4 (up to "bpf: cpumap: reuse skb
+> > array...")? Would be great to see whether this implementation works
+> > worse right from the start or I just broke something later on.
+> > 
+> > > and double checked and it seems the numbers are right. Here's the
+> > > some output from some profiles I took with:
+> > > 
+> > >      perf record -e cycles:k -a -- sleep 10
+> > >      perf --no-pager diff perf.data.baseline perf.data.withpatches > ...
+> > > 
+> > >      # Event 'cycles:k'
+> > >      # Baseline  Delta Abs  Shared Object                                                    Symbol
+> > >           6.13%     -3.60%  [kernel.kallsyms]                                                [k] _copy_to_iter
+> > 
 > 
->>
->>>>> I know it can be implemented in many other different ways..but I 
->>>>> don't see a real problem with keeping this way.
->>>>
->>>> At least routing protocols and network monitoring software will not 
->>>> be happy to see a dead interface pretending that it's still running. 
->>>
->>> They won't know that the interface is disconnected, they will 
->>> possibly just see traffic being dropped.
->>
->> Packet loss detection is quite complex operation. So yes, they are 
->> indeed monitoring the interface operational state to warn operator as 
->> soon as possible and take some automatic actions if we are talking 
->> about routing protocols. Some sophisticated monitoring systems even 
->> capable to generate events like 'link unstable' with higher severity 
->> if they see interface operational state flapping in a short period of 
->> time.
->>
->> So yeah, for these kinds of systems, proper operational state 
->> indication is essential.
+> I really appreciate that you provide perf data and perf diff, but as
+> described above, we need data and information on what CPU cores are
+> running which workload.
 > 
-> Again, if the user has not explicitly allowed the persistent behaviour, 
-> the interface will be brought down when a disconnection happens.
-> But if the user/administrator *wants* to avoid that, he has needs a 
-> chance to do that.
+> Fortunately perf diff (and perf report) support doing like this:
+>  perf diff --sort=cpu,symbol
 > 
-> Otherwise people that needs this behaviour will just have to stick to 
-> using tun and the full userspace implementation.
+> But then you also need to control the CPUs used in experiment for the
+> diff to work.
 > 
->>
->>>> Generally speaking, saying that interface is running, when module 
->>>> knows for sure that a packet can not be delivered is a user misguiding.
->>>
->>> Or a feature, wanted by the user.
->>>
->>>>> A blackhole/firewall can still be added if the user prefers (and 
->>>>> not use the persistent interface).
->>>>
->>>> The solution with false-indication is not so reliable as it might 
->>>> look. Interface shutdown, inability of a user-space application to 
->>>> start, user-space application crash, user-space application restart, 
->>>> each of them will void the trick. Ergo, blackhole/firewall must be 
->>>> employed by a security concerned user. What makes the proposed 
->>>> feature odd.
->>>
->>> Yeah, this is what other VPN clients call "kill switch".
->>> Persist-tun is just one piece of the puzzle, yet important.
->>>
->>>>
->>>> To summaries, I'm Ok if this change will be merged with a comment 
->>>> like "For future study" or "To be done" or "To be implemented". But 
->>>> a comment like "to prevent traffic leaking" or any other comment 
->>>> implying a "breakthrough security feature" will have a big NACK from 
->>>> my side.
->>>
->>> What if the comment redirects the user to --persist-tun option in 
->>> order to clarify the context and the wanted behaviour?
->>>
->>> Would that help?
->>
->> Nope. As it was mentioned above, the are no indication that 'persist- 
->> tun' is a 'security' feature even in the current openvpn documentation.
->>
-> 
-> Like I mentioned above, I agree we should get rid of that sentence.
-> The security feature must be implemented by means of extra tools, just 
-> the interface staying up is not enough.
-> 
->> If the openvpn developers want to keep implementation bug-to-bug 
->> compatible, then feel free to configure the blackhole route on behalf 
->> of end-user by means of the userspace daemon. Nobody will mind.
-> 
-> bug-to-bug compatible? What do you mean?
+> I hope I made sense as these kind of CPU scaling benchmarks are tricky,
 
-http://www.jargon.net/jargonfile/b/bug-compatible.html
+Indeed, sounds quite tricky.
 
-With that difference, the local operational state indication does not 
-break compatibility between hosts.
+My understanding with GRO is that it's a powerful general purpose
+optimization. Enough that it should rise above the usual noise on a
+reasonably configured system (which mine is).
 
-> Having userspace configure a blackhole route is something that can be 
-> considered by whoeever decides to implement the "kill switch" feature.
-> 
-> OpenVPN does not. It just implements --persist-tun.
-> 
-> So all in all, the conclusion is that in this case it's usersapce to 
-> decide when the interface should go up and down, depending on the 
-> configuration. I'd like to keep it as it is to avoid the ovpn interface 
-> to make decisions on its own.
-> 
-> I can spell this out in the comment (I think it definitely makes sense), 
-> to clarify that the netcarrier is expected to be driven by userspace 
-> (where the control plane is) rather than having the device make 
-> decisions without having the full picture.
-> 
-> What do you think?
+Maybe we can consider decoupling the cpumap GRO enablement with the
+later optimizations?
 
-It wasn't suggested to destroy the interface in case of interface 
-becoming non-operational. I apologize if something I wrote earlier 
-sounded like that. The interface existence stays unquestionable. It's 
-going to be solid persistent.
+So in Olek's above series, patches 1-3 seem like they would still
+benefit from an simpler testbed. But the more targetted optimizations in
+patch 4+ would probably justify a de-noised setup.  Possibly single host
+with xdp-trafficgen or something.
 
-Back to the proposed rephrasing. If the 'full picture' means forcing the 
-running state indication even when the netdev is not capable to deliver 
-packets, then it looks like an attempt to hide the control knob of the 
-misguiding feature somewhere else.
+Procedurally speaking, maybe it would save some wasted effort if
+everyone agreed on the general approach before investing more time into
+finer optimizations built on top of the basic GRO support?
 
-And since the concept of on-purpose false indication is still here, many 
-words regarding the control plane and a full picture do not sound good 
-either.
-
---
-Sergey
+Thanks,
+Daniel
 
