@@ -1,106 +1,96 @@
-Return-Path: <netdev+bounces-147180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1625C9D8205
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:16:07 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525879D820A
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:17:00 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5E5A161194
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:16:56 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299471607A4;
+	Mon, 25 Nov 2024 09:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="D77n2q8I"
+X-Original-To: netdev@vger.kernel.org
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF64F281A63
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:16:05 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABAF19049A;
-	Mon, 25 Nov 2024 09:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y8xcS+tT"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEBD1531E8
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 09:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A37185935;
+	Mon, 25 Nov 2024 09:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732526156; cv=none; b=gebKNrR5sek+Sl14jT1bb3xHzZLjlaXb+rlvEVUYwheqBuMOZD2b3J1BDLpHe6r5txw+pW3xp54wltO+sVxGotuYD/Gvm8hmRFGrkrFxXPxGf5Er7roGJTBYVYFglzxp7CltXTxIGhJ7NH3FCEfqESFzfmNqpi+GvhaHJ4LmS0Y=
+	t=1732526217; cv=none; b=JNrs2qnrjfbVAeC6q3DiKMbOXB94bOVVn/2of7qFJOBTgPR6Vplo/KYIvjYUOhi2cmj5YNJyX+HB4DTD5Ru/uaGtYw3snKZhPWtanmqvJ+OqvhqUw+eRfIx57KpIMWa2r8l/4pMZVFoCOFnRfBZIz7KUDQv7Dd87p6KIgGHG0U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732526156; c=relaxed/simple;
-	bh=0ha3COx0DHOj8uxVj0+IXNOyCOzZMIKeCo7cSFiOZo0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tzTHPfn37Jjq7M0rRVNH2XgNjA07A9KQXrxRatV4ZMXDzFYk6WV9BEeJR5y10wN5Cg1VMIfLh8O6R+cFngBou9oEhUVaEzgPJyd/tqqqyCYTY40U6B5NIOJ3QHJRyiuYIrTIuXdvIxr+06vhXL0ueodJTw8u3L1Yz602cSAEqz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y8xcS+tT; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3822ec43fb0so3270311f8f.3
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 01:15:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732526152; x=1733130952; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0ha3COx0DHOj8uxVj0+IXNOyCOzZMIKeCo7cSFiOZo0=;
-        b=Y8xcS+tTTWlf9/6R6RcIHXDyFyLx0NYP3v7Qp6LDlZunXveUB+nNcRMOOfqG46QacO
-         ZJ1W6+WVTekrxD/lQNa11Zbi/JXVsDCXDKCK6yoyavqdXqXdsAUDl2VnEIzLD37Wj8Pt
-         GEm22mlGlq8ivVDu0ituahMFRO063vyyqE0QWCo/RavTB3ELTaLIRAXvignghtCUiNh3
-         3QSgcbiYVtmOQIyxm4zFXtCaX6H4BF5z12TbaxeLaeT0xeLV9u3ZJm8O/FXnNqBVqNwA
-         Z3S7E6HBzLA9MD0Y18ePo5gKdixPMhbCQTqhQPAjYpdwFHyKaTRqQQj4uN5MmMiPYDGJ
-         OszA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732526152; x=1733130952;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0ha3COx0DHOj8uxVj0+IXNOyCOzZMIKeCo7cSFiOZo0=;
-        b=m2uaCj0uaRa1e7kq9IuDdglgnZzz653/DNtpC8+n78mxAtvl6Z7GclNdY/rshswFUQ
-         kCq5z0s1gXWCEtAJUEpHt0bL77vML099nIyXRXqdDahAM+dORM/JH3UJX4k4/WvS8zu7
-         0fBesRZpAR9lwClY10k1PdUrxDqORY+s3lnFjRiktA8YDUPNX7nKRw7VP84DqLrr5mx4
-         uoynooYY3LFKhWfYBWSPV7l9uokWSvUdX8YRD6GHWGCuAOVF9a7VtYrarRkmMNd+qAuO
-         MfAV2C4uRgXzx5NixaL7PC5K7g53YYa0iUS4JzcywKg6XJ+UHg1wWsfBJfxODdfnYMOq
-         4QXA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3HXwAiu4wkCZLiTP3T70lmbpDlNB/BVB8sDGnY8w0YjGe2EB0hCNqZeoGMtHY7b1FnJiK49U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc8PPyFTQaaSOlrXnKlRMZLsRtsysbii8HhCOaT5OsL4of939M
-	ZSFYBDcdWAkOzDbngyVoOBg1+dAyrV+foAyLsr9y3SikB2trYGdDgRDMfDdxq6w9zI7Xrx+cG0M
-	AuWFGrob6enq0JMKVpJeQwk4cm0tW6pVZkwvy
-X-Gm-Gg: ASbGnctmQSQIaDq2GDUCV8MzUwYuub/QmGfQIfD/m93aLZK/Jq/2TesBjiN3qWwoxCP
-	+Ws93oWNIU3AEK7aP0TTOw6b+ck3EQ++KRruRKYjjFF5PdsHxpMklJuMqHM726Q==
-X-Google-Smtp-Source: AGHT+IH8NglVha/cRO2EUsWas5pT6+KPbdrlOa1Qfc0/+y2Ov2H+tjMFSpQ12N28tn+7P/9GBO4emIZVFBM59ocV130=
-X-Received: by 2002:a05:6000:1fab:b0:382:4a15:6928 with SMTP id
- ffacd0b85a97d-38260b5715fmr10344321f8f.14.1732526152020; Mon, 25 Nov 2024
- 01:15:52 -0800 (PST)
+	s=arc-20240116; t=1732526217; c=relaxed/simple;
+	bh=lbIWNYMvSjyfLtOw1mvuOqw21VstXoAYqxbOHR064L0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fZkGl+0LcI4CxNbjl2IatVLxxGJtbypLoUtWMimXCJlY16KEulIehUw7qvMv+x0hzKlYn6TnfDabJ+U4z5BAIx52i8CN3P1CUe2E3GiJGJElANTElA4ZePgT+NfOV5v4Xc5nTx4x/MYbdnJa4XZedzGP0Ifg9RPkHCxHcBDTRA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=D77n2q8I; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 04FB9A06EA;
+	Mon, 25 Nov 2024 10:16:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=Q6wYDtIQjR5+T/DQDg0D6iro4kbT0EVZiPNUQPiaEF8=; b=
+	D77n2q8I+1axsoSfEUHf0oXpCp8HYOhEeOmuJ5cmgXsKxK+W21I9qsJt/BQo70K1
+	7cW42scuXJZ4oGJkrTmPLGnHyVZcxpxPkiV8JbTrUB3dTXi+lHh/8BcmJsF+72O7
+	T0435DSBWWStm4ONl0+rT2Oiqjeq3IdTMeEwD2ZQd7jilgRDQb8/8LzTYawYW4vW
+	0bbRTbOOkzc9k8ysTm3kkUB6JKyB19ZRhqyrzEP8G2IdmN3hUtNpGHCFJB+hQ2FP
+	C1s52uOMOunvpDJrsQncQQY8X5qFF8vM5IuEej6KQ/Ke8t6g7lDIueXlI90/NO5L
+	fCHGkf7IWgDCWsNVAxFNvvrmWOZ3hkVCHr0LC/0dT3lyS+ty7hPTjaKPOGKBmoTD
+	mGlxsM8S20rGVCu+0ki/AnszcQjbHIRC2ShyGbDx1tAhLdm9ZMgrzoOP6UofmFUa
+	5gwPBEBJfmEvqrXXrhfS1LOjO5mASxGnQoovG4VN9itan6zcXsnRGW8p1LPkHEuc
+	S9oj8INYBQThsJ/xBh4gfzkxEB0xXBs92O+gHN6w5IEYEtfc22peuzu6HA5w3fLL
+	6FX9o7nalAJTUG9IkUsH3e14QTNQsD2FDtUDZ6EhOPOBtnQxecBuFKq6oFxn+Ddg
+	2eW2tTcWnfO8BBsTCG8BAZR7dhwBBx5Jc81BiuuAOfs=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: <stable@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Sasha
+ Levin" <sashal@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH 6.6 0/3] Fix PPS channel routing
+Date: Mon, 25 Nov 2024 10:16:36 +0100
+Message-ID: <20241125091639.2729916-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241123222849.350287-1-ojeda@kernel.org> <20241123222849.350287-3-ojeda@kernel.org>
-In-Reply-To: <20241123222849.350287-3-ojeda@kernel.org>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 25 Nov 2024 10:15:39 +0100
-Message-ID: <CAH5fLgjoC7=gBBnohf4GPLPrk+wpR7P5KMm25EAmTspdTjg=4g@mail.gmail.com>
-Subject: Re: [PATCH 3/3] rust: add `build_error!` to the prelude
-To: Miguel Ojeda <ojeda@kernel.org>
-Cc: Alex Gaynor <alex.gaynor@gmail.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Trevor Gross <tmgross@umich.edu>, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	patches@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1732526205;VERSION=7980;MC=2019651544;ID=94027;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29ACD94855607C67
 
-On Sat, Nov 23, 2024 at 11:29=E2=80=AFPM Miguel Ojeda <ojeda@kernel.org> wr=
-ote:
->
-> The sibling `build_assert!` is already in the prelude, it makes sense
-> that a "core"/"language" facility like this is part of the prelude and
-> users should not be defining their own one (thus there should be no risk
-> of future name collisions and we would want to be aware of them anyway).
->
-> Thus add `build_error!` into the prelude.
->
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+On certain i.MX8 series parts [1], the PPS channel 0
+is routed internally to eDMA, and the external PPS
+pin is available on channel 1. In addition, on
+certain boards, the PPS may be wired on the PCB to
+an EVENTOUTn pin other than 0. On these systems
+it is necessary that the PPS channel be able
+to be configured from the Device Tree.
 
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+[1] https://lore.kernel.org/all/ZrPYOWA3FESx197L@lizhi-Precision-Tower-5810/
+
+Francesco Dolcini (3):
+  dt-bindings: net: fec: add pps channel property
+  net: fec: refactor PPS channel configuration
+  net: fec: make PPS channel configurable
+
+ Documentation/devicetree/bindings/net/fsl,fec.yaml |  7 +++++++
+ drivers/net/ethernet/freescale/fec_ptp.c           | 11 ++++++-----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+-- 
+2.34.1
+
+
 
