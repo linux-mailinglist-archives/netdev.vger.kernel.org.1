@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-147213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC4FC9D83CB
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:50:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FA79D83D1
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D7D3165501
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3442167128
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E991946BC;
-	Mon, 25 Nov 2024 10:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0481990D3;
+	Mon, 25 Nov 2024 10:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dPnppZGe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cm0Tl8Jv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF48B193425;
-	Mon, 25 Nov 2024 10:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F962500B5;
+	Mon, 25 Nov 2024 10:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732531816; cv=none; b=BeFQk4ThjT+dQze4ey2DtHEbdJWF21a/reqmzC1YBNnOhgVOCXo0bI/6YgzgCNFDlhai9YzvjwNsUTwdPNBc9mcHXXkQuMkKwdHPqaIoh4QhGvqLfoqZCTNeOqK2/yvuSERDccgnQv/djuc4rfdGb2MdUq4jxZyDI8bnqzZITeg=
+	t=1732531870; cv=none; b=i9ca+dmP6eOty5hfum0/jS7JpV2bO902wuTfv44i4TE/nY/kGZ+deRgXR87EdlBEAUr7RXqa5iI9w8svICn3y8AYMGt8lffeEqtaRKkUsPf5UBC8z4aQ1sAP0HJRQhEmxRhRsEFjuVL71WlB2FB0lMYc2KQ9/YD2yVAU3a8bm6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732531816; c=relaxed/simple;
-	bh=NUQ4XOYHs4NZ9y8cLWgnqIpcWzpQbsAZkILpYVOpZGA=;
+	s=arc-20240116; t=1732531870; c=relaxed/simple;
+	bh=QDA4su++mMVwrM0wfQhlVkImR4PRtky1DFc/fV5/ay4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OUTxAFl5qhSV9qDu70Sr7V4HmEjhe7ilL0Q/ejptlnFD1dVs9gdu50nEpPPUZKScP2Z8HgUfBTNr1KXbZZbFlD0FKmqKQ+m9wt8ecGDb1AflFAQHjvh+mHd1vN3DQ8lKr5yeQZ+73MI7kXyIqrKLcaP25Ce0LBsa8xVQYS0Pqyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dPnppZGe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 825D5C4CECF;
-	Mon, 25 Nov 2024 10:50:11 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=g5Jjk1pWpWy8qNZlP41YxllMX+xsI0vK+5T5bVd7VMdR4qEnIuFOUNrX8loB+KrJZt/7TGYg7UzOKEd0crjK1ihMgj3dAbbFf0oDQVW2fpWuJ9MGVQX0UgrB8tbquyk2aCEs2BR2uc2iDUS80lkKN+uUTmSZR6D4BFK944hhsrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cm0Tl8Jv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D68C4CED2;
+	Mon, 25 Nov 2024 10:51:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732531815;
-	bh=NUQ4XOYHs4NZ9y8cLWgnqIpcWzpQbsAZkILpYVOpZGA=;
+	s=k20201202; t=1732531870;
+	bh=QDA4su++mMVwrM0wfQhlVkImR4PRtky1DFc/fV5/ay4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dPnppZGejzVEvApv3dkvbWgXulIR7HXqRUdd4zE7c9zIfcGaeXoByG5T3U806zbpM
-	 EHvZgSR1sUb/ePIyT4KuocHjFlekUW84VpRytwCdes1HTCu5Z02zcft45/K33fvjZL
-	 70/lPEWqbblCvTx+cwhr2dkUHrgX76Pg38RNO7NovVCD2hWQPjeicMzsgOTO/j3dI1
-	 RdmF6I8YnDaKBHpKEkXsERrHmcBqsMj8b71E6QhLMQvxLjiobNoiVeeTCBQWXgUhXa
-	 X1jFrzBa/j7fRlveSqng8EgPlrR7fiIsAR4QsN9a1+g38NI+aMxQbcISOFmbJhSin7
-	 xs/e8taOJ39Qg==
-Message-ID: <09f0d1ae-db23-487f-8ba0-4fdefe5ee185@kernel.org>
-Date: Mon, 25 Nov 2024 11:50:09 +0100
+	b=Cm0Tl8JvCmtgOO1gLFNdx1FEwL5ZjOzwyJzTkp5KkUbi3mYgKmOpBqTXEEa/t+nuQ
+	 xWqnff8yLK3wzd/ILHFJSbOncOlQB4QUtz+TLxmN7zDsm0I3smB7Um5Yr2+lJq3t2G
+	 K4IlbsF25j8bs06WRr8Mlc1fnkBCTtjpoBDWxrjHUMKqb5fA8jo08SpML8RHXCSeZ3
+	 ea+hmyoXjSAkNOLv21jguXXfPyTWH8uiB/WDp1EkS2o749hzCx3D2dFwMX5cIo7qhJ
+	 iAhyAN2WEPEO25JmDCOrZjSzzIH7RhowzffGPMkLEzqQJLNVtZj+TZN/xsJp2Wg0Eq
+	 jG1tRk0NLGLEA==
+Message-ID: <14110c3d-4aee-49a9-8cc2-fbeac298f1ff@kernel.org>
+Date: Mon, 25 Nov 2024 11:51:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] arm64: dts: agilex5: add gpio0
+Subject: Re: [PATCH v2 2/4] arm64: dts: agilex5: add gmac nodes
 To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
  Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -59,9 +59,9 @@ To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
 Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de
 References: <20241125-v6-12-topic-socfpga-agilex5-v2-0-864256ecc7b2@pengutronix.de>
- <20241125-v6-12-topic-socfpga-agilex5-v2-1-864256ecc7b2@pengutronix.de>
-Content-Language: en-US
+ <20241125-v6-12-topic-socfpga-agilex5-v2-2-864256ecc7b2@pengutronix.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -105,17 +105,34 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241125-v6-12-topic-socfpga-agilex5-v2-1-864256ecc7b2@pengutronix.de>
+In-Reply-To: <20241125-v6-12-topic-socfpga-agilex5-v2-2-864256ecc7b2@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 25/11/2024 11:33, Steffen Trumtrar wrote:
-> gpio0 is the same as gpio1 with a different base address.
+> The Agilex5 provides three Synopsys XGMAC ethernet cores, that can be
+> used to transmit and receive data at 10M/100M/1G/2.5G over ethernet
+> connections and enables support for Time Sensitive Networking (TSN)
+> applications.
 > 
 > Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 > ---
+>  arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi | 87 ++++++++++++++++++++++++++
+>  1 file changed, 87 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> index b1debf0317d0576f7b00200e9593481671183faa..647ccd0b5a66b68fab745d443b975c12d6ce63df 100644
+> --- a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> +++ b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
+> @@ -141,6 +141,93 @@ soc: soc@0 {
+>  		device_type = "soc";
+>  		interrupt-parent = <&intc>;
+>  
+> +		gmac0: ethernet@10810000 {
+> +			compatible = "altr,socfpga-stmmac-a10-s10",
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+That's odd compatible, this is not Arria10 SoC, neither Stratix 10.
 
 Best regards,
 Krzysztof
