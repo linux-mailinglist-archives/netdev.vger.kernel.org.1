@@ -1,111 +1,85 @@
-Return-Path: <netdev+bounces-147118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7A2C9D794B
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 00:58:28 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7A14162FBA
-	for <lists+netdev@lfdr.de>; Sun, 24 Nov 2024 23:58:23 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A1013A1B5;
-	Sun, 24 Nov 2024 23:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FyCQSkaw"
-X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD089D794F
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 01:21:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221936F06D
-	for <netdev@vger.kernel.org>; Sun, 24 Nov 2024 23:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90980B20FDE
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 00:21:53 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF42C17D2;
+	Mon, 25 Nov 2024 00:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDUKvZHe"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A35B1372;
+	Mon, 25 Nov 2024 00:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732492705; cv=none; b=mhs5rejWLvT3GEtQcx8aH/9d7g4GHioq3nwnQ5j147qG+wSX/p4/u9uZsWxBrHm4iSLFSll79Vw960tWh+UwZvQDhKn+MRooO1lR4H92RsJOtbCA1WBvM73NOK5e23NBJTPkBQDwxrEuVI8bix8W3KzbJxdPm3k7ihJRqz+SXRc=
+	t=1732494109; cv=none; b=iR52DF1113fvA4ZxEqBIlwaIY8jY8uzno1E+kaDVbKGjDpspdSi3WzokzGVIfv0JV5NUh6iQjzxtdZb8r2PM4x1QWUVhfoBp4wfDmgZcnfza+I3+w4ph3X6kkGbfmxa8qrVNzvTb/gKoBL2hHOZ8FSx97RIhALeB/kErsvmKw3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732492705; c=relaxed/simple;
-	bh=1+EoHm5WvPxbK47qV2OprXG5Je0bUj++7PmmwbhuyKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p0SvUpx/iN1lHCLNSktiejB44KFbm2L/TD+Z6tK/N53OOrfpsbKGK2bbTukFP9jid8QF3fF1+JsZT97arUMISkYqJ07iPuArcw5MHo/rI9xTnMzoYjzFAl3KZjKA968wlrszTbpxi7oBOvfaXwmZ7hqZOMK3ZcWHNPZFZjwauU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FyCQSkaw; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sun, 24 Nov 2024 18:58:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732492699;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZN8h3plEKrcOpOBZv6ANPkL/ziEb9w8b8bIQl6/vP0M=;
-	b=FyCQSkawjh3R3Fj+QKNgT/tRoTe2e2cJ0qj8kBzBviTFz4k/11japaX9jGeS1xt/uGNtew
-	4Jgyyy7uvZXynnTspyytQ50DwOddDpEfzxpIdfcwDhYaKMAI+bo5EWRRlRXdZYSMvNQZcv
-	t4wX8wmvuULMmsFeaUVjcD1Iil+rdKI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>, 
-	netdev@vger.kernel.org
-Subject: Re: rhashtable issue - -EBUSY
-Message-ID: <pq73vur4sgec4hxjugk5abgpqiftpkkdyvmtcq246jv2vuseok@qn2x6xzfqii7>
-References: <>
- <Z0LxtPp1b-jy2Klg@gondor.apana.org.au>
- <173244248654.1734440.17446111766467452028@noble.neil.brown.name>
- <Z0L8LQeZwtvhJ2Ft@gondor.apana.org.au>
- <qderkhvtvsoje5ro5evohboirlysp7oqtczbix2eoklb4mrbvn@inrf23xnuujv>
- <Z0O0BV6v4x3mq-Uw@gondor.apana.org.au>
+	s=arc-20240116; t=1732494109; c=relaxed/simple;
+	bh=ySb5iph48rF33sNgYjYhTOU5DnfrzG1oaqong6mJyKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WUDXA3oBT/MJtmLZZy/N4LNswYa7/woGyL1oFvDNtuUS9LdYhpqR23J5D3qN4EGdY5Z3kFoVawVxBpynLWqo0Km995vB1N+n+oAjybTKXyfBxij1yDtRhxRMian9Px3uU+4MaCE7AKaNFsmKzzBBngoqnBvV9/o3zEi03ZLLNTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDUKvZHe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6450CC4CED1;
+	Mon, 25 Nov 2024 00:21:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732494109;
+	bh=ySb5iph48rF33sNgYjYhTOU5DnfrzG1oaqong6mJyKA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QDUKvZHep1+LpC71s216IRnlHvpNl9AEcAk1DBy4oQxp44p3I8Wlzq4oqhEfnRg0R
+	 rIwOYh+Tj+32xsKofFzLy5YUR8mxUo5oKtAiQn2iHPQL+JAoMOpiEe8ioX8xzZoGGT
+	 LIuQuhESCPVp/yVDDQnRUlCtdp6YqKhYP1x02e52nOQVQHeRbERHps8XLg9KahLXL/
+	 RUaSvoc800186wUjv28h7ltdMoNNcPw211hGdYpmFoL38KWHtvfft0I5x0bOMphPl8
+	 TuPMyeZm7eiYv3DKa9nk0M0PTpTdNnzoe7BbDLzPP0BbaZgnvQ3Rm7zxGM+kZ0xj17
+	 AGessry1ZQxrw==
+Date: Sun, 24 Nov 2024 16:21:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Catdeo Zhang <catdeo.zhang@unisoc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Orson Zhai <orsonzhai@gmail.com>, Baolin Wang
+ <baolin.wang@linux.alibaba.com>, Chunyan Zhang <zhang.lyra@gmail.com>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <cixi.geng@linux.dev>, <wade.shu@unisoc.com>, <jiawang.yu@unisoc.com>,
+ <hehe.li@unisoc.com>
+Subject: Re: [PATCH] net/sipa: Spreadtrum IPA driver code
+Message-ID: <20241124162147.4508d22c@kernel.org>
+In-Reply-To: <20241122014541.1234644-1-catdeo.zhang@unisoc.com>
+References: <20241122014541.1234644-1-catdeo.zhang@unisoc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z0O0BV6v4x3mq-Uw@gondor.apana.org.au>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 25, 2024 at 07:17:25AM +0800, Herbert Xu wrote:
-> On Sun, Nov 24, 2024 at 05:35:56PM -0500, Kent Overstreet wrote:
-> >
-> > That's what I've been describing, but you keep insisting that this must
-> > be misuse, even though I'm telling you I've got the error code that
-> > shows what is going on.
-> 
-> Well, please do as I suggested and dump the chain with over 16
-> entries when this happens.  If you can prove to me that you've
-> got 16 entries with non-identical keys that hashed to the same
-> bucket then I will fix this.  Please also dump the table size
-> and the total number of entries currently hashed.
-> 
-> As I said, every single report in the past has turned out to be
-> because people were adding multiple entries with identical keys
-> to the same hash table, which will obviously breach the limit of
-> 16.
-> 
-> But I think there is one thing that I will do, the rehash check
-> is a bit too loose.  It should only fail if the outstanding rehash
-> was caused by insertion failure, and not if it was a growth or
-> shrink operation.
+On Fri, 22 Nov 2024 09:45:41 +0800 Catdeo Zhang wrote:
+> This is a first patch which upload the ipa driver code. IPA is an IP Packet Accelerator developed
+> by Spreadtrum included in some Socs, which can provide packet filtering, forwarding etc.
 
-Hang on, I see what's going on :) It's not duplicate keys, we're doing
-something exceptionally weird here.
+## Form letter - net-next-closed
 
-We're not hashing the full key, because we require that inodes in
-different subvolumes hash to the same bucket - we need to be able to
-iterate over cached inodes with the same inode number in all subvolumes
-so that fsck can check if deleted inodes are still open, and that
-requires iterating over all the subvolumes to look for descendents.
+The merge window for v6.13 has begun and net-next is closed for new drivers,
+features, code refactoring and optimizations. We are currently accepting
+bug fixes only.
 
-(Yes, it's a bit gross, but I've been trying to avoid a two-level lookup
-structure.)
+Please repost when net-next reopens after Dec 2nd.
 
-But - your rhltable gives me an idea for a better solution, which would
-be to use two different hash tables for this (one indexed by
-subvol:inum, for primary lookups, and an rhltable for indexing by inum
-for fsck).
+RFC patches sent for review only are welcome at any time.
 
-Sorry for claiming this was your bug - I do agree with Neal that the
-rhastable code could handle this situation better though, so as to avoid
-crazy bughunts.
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
+
 
