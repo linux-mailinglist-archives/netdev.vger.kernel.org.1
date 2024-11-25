@@ -1,140 +1,106 @@
-Return-Path: <netdev+bounces-147143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873089D7A66
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 04:39:35 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 254E81624D8
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:39:32 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C17C38DD8;
-	Mon, 25 Nov 2024 03:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ewQCK+I5"
-X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72BFE9D7A6A
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 04:44:55 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9AAB2500AC;
-	Mon, 25 Nov 2024 03:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA71EB20EA6
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:44:52 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E4939FD9;
+	Mon, 25 Nov 2024 03:44:48 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F2810F9;
+	Mon, 25 Nov 2024 03:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732505970; cv=none; b=USbBXkV9vdaRZ+geshADWpfj4U7zrmFuvXtyhOaUPnML85NXBV2Uc4NtEGVSrkpOCB4M9UXKo0tXz/KckBKjffsw4DmU+vD2uqG9IGGRVspvw1MLNSjSDf/FLZRvgiCvOcZEoPaNqIh+mfSEO1+Xw1xov+KWJWi+OsAmDdjqsZA=
+	t=1732506288; cv=none; b=QJJNGHQ6rJHMk7bBJEXafPaJMui9GwS7FvwWh/pNWJvlNPQp7y6hwmmYgfvX6XjS2cFq/8rrJMd8ObuXNsD+hpnzhaXfIEAfp3HTtflQOW08YLRY3MNImHc1dzgGALY7bmSWgfjpLjP21aGYDHHSeQSWQJBZFuJWwgu4/LYyDRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732505970; c=relaxed/simple;
-	bh=o6AyubdLIxQFozXKJeWNwpcy8swQeM0jUZLQcwZJbyk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RKagT+WSgaaRDUoYwRc3gk4OPoavcwQrja8Qa4aURCvK+m5oq04u+ntH/QTIWzYHNX5m9b8iQ/ip4wxPWDm07B5vEkXWifH9L8ZCNgvV4/Jq4in1nh7G+H7+wEz/RAMFWCMgP7NNSL489frniUxAVRZ+cH0M/xFTlx4l5BnXY18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ewQCK+I5; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AONDdaD019777;
-	Mon, 25 Nov 2024 03:39:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	W5KC879pXDmQjk3e/MYMpCbKJ6xkp7D507cwCO4aQRQ=; b=ewQCK+I5RP0HAPhx
-	pgRfxTQx3x0S45UIAwT2Dx7Gl0pjpjqKDU76sEvmDWdB8dEAqkvG53P/rnR8C7Pb
-	fipQTmI7rmOgqoPsBH2nmS8/3G/Qz+GjQX0Zb90v601oga+manX8VbcWZTB4398a
-	tzBxrfrYKU4cOMyRkDHjJxpUxv79fX9vYTPblbtGwYMDDdD7R+VSYvGRFBwIAkmY
-	ExIYwJ/3tHOH6m9QD3Oyb0j9/d7WcAiqH0gcc/bfKWJuZgFfc+sdAqHVHKWWaJ0q
-	WUObrTOfKSBQ1C4dCeSc9muLYbfoPYeLul1YDi0+32Nv4uZRkb2A7ye23r9CAST5
-	D87y6Q==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4336mxb9mu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 03:39:21 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AP3dKMx006338
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 03:39:20 GMT
-Received: from [10.253.38.8] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 24 Nov
- 2024 19:39:16 -0800
-Message-ID: <21ee5ff4-9355-44aa-b6f7-afbc044f9ec8@quicinc.com>
-Date: Mon, 25 Nov 2024 11:39:14 +0800
+	s=arc-20240116; t=1732506288; c=relaxed/simple;
+	bh=ZRnoajD1QdXZX6krqeoKi10PkO2r+xrRVPlVkYB7UZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QxTtAnrCdN+O36RryvTM64Y0UHlk5An2BJ1W9Mg9y5pQs5F0oLrIuVXL6RYvwul/BNiThq7B4wfd1f/stMjNcTOl+0vuAJtP/DqQ/cw/KG5Un2czE+DWkZ90bm9g1cnUhS5HIkroJz+bKVgKzPzHAS0tBU5C8MhVznYqMjW7GUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A050C4CECE;
+	Mon, 25 Nov 2024 03:44:43 +0000 (UTC)
+Date: Sun, 24 Nov 2024 22:44:41 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ruan Bonan
+ <bonan.ruan@u.nus.edu>, "mingo@redhat.com" <mingo@redhat.com>,
+ "will@kernel.org" <will@kernel.org>, "longman@redhat.com"
+ <longman@redhat.com>, "boqun.feng@gmail.com" <boqun.feng@gmail.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kpsingh@kernel.org" <kpsingh@kernel.org>, "mattbobrowski@google.com"
+ <mattbobrowski@google.com>, "ast@kernel.org" <ast@kernel.org>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
+ <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
+ "eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org"
+ <song@kernel.org>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me"
+ <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+ "jolsa@kernel.org" <jolsa@kernel.org>, "mhiramat@kernel.org"
+ <mhiramat@kernel.org>, "mathieu.desnoyers@efficios.com"
+ <mathieu.desnoyers@efficios.com>, "bpf@vger.kernel.org"
+ <bpf@vger.kernel.org>, "linux-trace-kernel@vger.kernel.org"
+ <linux-trace-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Fu Yeqi <e1374359@u.nus.edu>
+Subject: Re: [BUG] possible deadlock in __schedule (with reproducer
+ available)
+Message-ID: <20241124224441.5614c15a@rorschach.local.home>
+In-Reply-To: <20241124223045.4e47e8b7@rorschach.local.home>
+References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
+	<20241123202744.GB20633@noisy.programming.kicks-ass.net>
+	<20241123180000.5e219f2e@gandalf.local.home>
+	<CAADnVQLBhV_sSuH+BKu66ZsxTcsvw7RSLnjRGLwQX3TFSjs-Gg@mail.gmail.com>
+	<20241124223045.4e47e8b7@rorschach.local.home>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] arm64: dts: qcom: qcs8300-ride: enable ethernet0
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241123-dts_qcs8300-v4-0-b10b8ac634a9@quicinc.com>
- <20241123-dts_qcs8300-v4-2-b10b8ac634a9@quicinc.com>
- <cbd696c0-3b25-438b-a279-a4263308323a@lunn.ch>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <cbd696c0-3b25-438b-a279-a4263308323a@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: uEmU1Dku6UaT0b39yLYCJAjX4uLQQA29
-X-Proofpoint-GUID: uEmU1Dku6UaT0b39yLYCJAjX4uLQQA29
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- adultscore=0 impostorscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- clxscore=1015 suspectscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=804 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411250029
 
+On Sun, 24 Nov 2024 22:30:45 -0500
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-
-On 2024-11-24 03:41, Andrew Lunn wrote:
-> On Sat, Nov 23, 2024 at 04:51:54PM +0800, Yijie Yang wrote:
->> Enable the SerDes PHY on qcs8300-ride. Add the MDC and MDIO pin functions
->> for ethernet0 on qcs8300-ride. Enable the ethernet port on qcs8300-ride.
->>
->> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->> ---
->>   arch/arm64/boot/dts/qcom/qcs8300-ride.dts | 112 ++++++++++++++++++++++++++++++
->>   1 file changed, 112 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/qcs8300-ride.dts b/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
->> index 7eed19a694c39dbe791afb6a991db65acb37e597..af7be26828524cc28299e219c1f0ad459e1c543d 100644
->> --- a/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
->> +++ b/arch/arm64/boot/dts/qcom/qcs8300-ride.dts
->> @@ -210,6 +210,95 @@ vreg_l9c: ldo9 {
->>   	};
->>   };
->>   
->> +&ethernet0 {
->> +	phy-mode = "2500base-x";
->> +	phy-handle = <&sgmii_phy0>;
+> > > Ack. BPF should not be causing deadlocks by doing code called from
+> > > tracepoints.    
+> > 
+> > I sense so much BPF love here that it diminishes the ability to read
+> > stack traces :)  
 > 
-> Nit picking, but your PHY clearly is not an SGMII PHY if it is using
-> 2500base-x. I would call it just phy0, so avoiding using SGMII
-> wrongly, which most vendors do use the name SGMII wrongly.
+> You know I love BPF ;-)  I do recommend it when I feel it's the right
+> tool for the job.
 
-You're right, that's really confusing here. I'll fix it.
+BTW, I want to apologize if my email sounded like an attack on BPF.
+That wasn't my intention. It was more about Peter's response being
+so short, where the submitter may not understand his response. It's not
+up to Peter to explain himself. As I said, this isn't his problem.
 
-> 
-> 	Andrew
+I figured I would fill in the gap. As I fear with more people using BPF,
+when some bug happens when they attach a BPF program somewhere, they
+then blame the code that they attached to. If this was titled "Possible
+deadlock when attaching BPF program to scheduler" and was sent to the
+BPF folks, I would not have any issue with it. But it was sent to the
+scheduler maintainers.
 
--- 
-Best Regards,
-Yijie
+We need to teach people that if a bug happens because they attach a BPF
+program somewhere, they first notify the BPF folks. Then if it really
+ends up being a bug where the BPF program was attached, it should be
+the BPF folks that inform that subsystem maintainers. Not the original
+submitter.
 
+Cheers,
+
+-- Steve
 
