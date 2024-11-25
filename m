@@ -1,96 +1,99 @@
-Return-Path: <netdev+bounces-147130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7451E9D79A0
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 02:01:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AAEC9D79BE
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 02:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38DEB281DA1
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 01:00:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A16A1B22697
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 01:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E44B81732;
-	Mon, 25 Nov 2024 01:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMG9Gbwg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C54EEC5;
+	Mon, 25 Nov 2024 01:19:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7EA762E0;
-	Mon, 25 Nov 2024 01:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8E53D64
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 01:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732496422; cv=none; b=i2Jpo6USND5B43hnOnlO/HvcAHKI4+Hr/MiUwGZteQYjuA8EM9RJmyHJkmdEwztMqZe5+d4DUqnJGxCGFNZhU7WFHZjv+Eff3w0acjH1ZNHyZjZANLa9vXEFOlK1QRkDEMZEB6LyoRJuLLLeTE/l1KZTD8Q9KErO0DyfUg5a62g=
+	t=1732497566; cv=none; b=TC4AoWR5wfxa3bCvlgOVo/0sjeCE2p9QZdtJVf6fcS0py8verFgT2I938cVqrT8Cm949Sn0ExUd09aEQ7MV+Ow14IX2IrneDK5WqPhhIw41QvhsbUjxOT3ATYHNNLumXNye+tVEig7bS5SfluDsAxLb1WMp/dWFZ317ZaUY92/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732496422; c=relaxed/simple;
-	bh=xJtyI+DnX8Inf25/pfeNNPqn4+XYVC765q5L3z9rMxs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aMtqYfqEnibgHK7fu8pAF/Pmb/SxlJ0gQrXwIrc6K35x/X2abvwcO7RbFDWvo+HTxuJEcWRi0BxVhS4gkFv4cJg7uJlWHJNODNxYWTezDVjNI64M6VaFJZxv+JB8RRdDqRUl7JuZKD8FiuqofDl3SaSZ6cSK1HD7jd3Abd26rVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fMG9Gbwg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C234C4CED8;
-	Mon, 25 Nov 2024 01:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732496420;
-	bh=xJtyI+DnX8Inf25/pfeNNPqn4+XYVC765q5L3z9rMxs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fMG9GbwghN5LOxCrxZg4qLund6+0NFnJID+yAW1bwLixJ+NfeoNuyDJ+m7CbflV15
-	 LOa6lGpOw3d2dDqLAJ0K7LnF0d74ivdqxhPB7S6xyRgmNyVaIVkxqsVF7/53EyatF8
-	 ab/VsTNlw/j8BpMp6GgLDmNKYDoEVb5V/kz0djHvdEOfONVChFjDkrh3KNz8C19V40
-	 JNyFQWQynXyRl+CQkceHYi0x3jsSgFeslZWhdSKd8I0XulENIZyLGvaevn/SDmSzrL
-	 PCW3fZ/DTy4oCKg4Pre9jj/LzboSi60uMa1NxLqv7+dTvZGMjz7/c5MNV40cguvljw
-	 7HcSPjL1Wa5og==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD973809A00;
-	Mon, 25 Nov 2024 01:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1732497566; c=relaxed/simple;
+	bh=Gk1VdypdBLttUVNW3c2fmyLCEHdmB5dFaJS3wdAqxRc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Vi5QRFkwJxWmmaUjEpCKy//MRzEoguq+mq2vUhc3u1EEgtMF1+2NoAePhz6rYyKPjAMHejZKW2nfPwqOt1ATu/a4kA2BkS2DfsC9i4fY/vXEm6+lZnUlL24KqrR0oFUje3cNHoV4AVBoqXml6zS2od5i1SxxhS0c/4OMXP1UvWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XxSTT1vdGzPnZq;
+	Mon, 25 Nov 2024 09:16:29 +0800 (CST)
+Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
+	by mail.maildlp.com (Postfix) with ESMTPS id C157E180102;
+	Mon, 25 Nov 2024 09:19:14 +0800 (CST)
+Received: from [10.174.176.93] (10.174.176.93) by
+ kwepemg200003.china.huawei.com (7.202.181.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 25 Nov 2024 09:19:13 +0800
+Message-ID: <0c958770-2797-4a5c-997a-4df9ed068de8@huawei.com>
+Date: Mon, 25 Nov 2024 09:19:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net] tcp: Fix use-after-free of nreq in
+ reqsk_timer_handler().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+References: <20241123174236.62438-1-kuniyu@amazon.com>
+From: "liujian (CE)" <liujian56@huawei.com>
+In-Reply-To: <20241123174236.62438-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1 1/1] net: usb: lan78xx: Fix refcounting and autosuspend
- on invalid WoL configuration
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173249643252.3410476.17299621375719038969.git-patchwork-notify@kernel.org>
-Date: Mon, 25 Nov 2024 01:00:32 +0000
-References: <20241118140351.2398166-1-o.rempel@pengutronix.de>
-In-Reply-To: <20241118140351.2398166-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, woojung.huh@microchip.com, andrew+netdev@lunn.ch,
- f.fainelli@gmail.com, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com, phil@raspberrypi.org
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemg200003.china.huawei.com (7.202.181.30)
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 18 Nov 2024 15:03:51 +0100 you wrote:
-> Validate Wake-on-LAN (WoL) options in `lan78xx_set_wol` before calling
-> `usb_autopm_get_interface`. This prevents USB autopm refcounting issues
-> and ensures the adapter can properly enter autosuspend when invalid WoL
-> options are provided.
+在 2024/11/24 1:42, Kuniyuki Iwashima 写道:
+> The cited commit replaced inet_csk_reqsk_queue_drop_and_put() with
+> __inet_csk_reqsk_queue_drop() and reqsk_put() in reqsk_timer_handler().
 > 
-> Fixes: eb9ad088f966 ("lan78xx: Check for supported Wake-on-LAN modes")
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Then, oreq should be passed to reqsk_put() instead of req; otherwise
+> use-after-free of nreq could happen when reqsk is migrated but the
+> retry attempt failed (e.g. due to timeout).
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,v1,1/1] net: usb: lan78xx: Fix refcounting and autosuspend on invalid WoL configuration
-    https://git.kernel.org/netdev/net/c/e863ff806f72
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Let's pass oreq to reqsk_put().
+> 
+> Fixes: e8c526f2bdf1 ("tcp/dccp: Don't use timer_pending() in reqsk_queue_unlink().")
+> Reported-by: Liu Jian <liujian56@huawei.com>
+> Closes: https://lore.kernel.org/netdev/1284490f-9525-42ee-b7b8-ccadf6606f6d@huawei.com/
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>   net/ipv4/inet_connection_sock.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+> index 491c2c6b683e..6872b5aff73e 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -1191,7 +1191,7 @@ static void reqsk_timer_handler(struct timer_list *t)
+>   
+>   drop:
+>   	__inet_csk_reqsk_queue_drop(sk_listener, oreq, true);
+> -	reqsk_put(req);
+> +	reqsk_put(oreq);
+>   }
+Reviewed-by: Liu Jian <liujian56@huawei.com>
+>   
+>   static bool reqsk_queue_hash_req(struct request_sock *req,
 
