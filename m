@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-147244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 643179D8A06
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 17:12:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FDB39D8A4E
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 17:29:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A1FC285089
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 16:12:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C815B2BF8B
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 16:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5D11B4142;
-	Mon, 25 Nov 2024 16:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458471B4144;
+	Mon, 25 Nov 2024 16:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVM+oP8R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QheBHp9R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109122500D2;
-	Mon, 25 Nov 2024 16:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DA0188591;
+	Mon, 25 Nov 2024 16:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732551174; cv=none; b=QR68tnBYLZKLxk4CaRvbIPPI3p5kV68JUMtfYzFVv3yflp6Crq9fy7MMfdrnuQvjlH6rm2ibvPgP/CXdEcvJwkT28mf2Hxqb2LWM/BFPjrM57Q1spVus6zNsDkVMEEXZboTkyyHYVvIDbYFuHuELq89Sm3QyLaoMUO5ZcKCU64k=
+	t=1732551223; cv=none; b=GnsB1awbSFMwCxGKga/sO/kChm5MgGDCoLyC0RTT8v1EGSEA5URDdM6DuFxxyyN9D8lREEQlTnjnhX78mOPxWiPWfmh1FOpA5DD0cL8Ki/2wcZdzYVGevAeZOpdqaOLNDk1IXa6ZsjWZgmwybMlpVkgzft7lq+dODjSEl1IaGf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732551174; c=relaxed/simple;
-	bh=RrpXGVUKPW/jA4lEYfdxaIJmcREW+7tUpqjSPmfLOl4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hMdY9jP4UpDAQCDtTNV6jaBweMnAsX1Kg8ykweMdsmRbKmSdPxLMLamxf+TL9qZQ6a121+sq293FD+AWm/5OsrStuqA75RihNRcacjdevgky2qgIasbwsGypWVwIEAg/35ooKI6PWq98gijc3zQug0c2zT6GjZJIaM8T9ZekS3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVM+oP8R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D5BC4CECE;
-	Mon, 25 Nov 2024 16:12:49 +0000 (UTC)
+	s=arc-20240116; t=1732551223; c=relaxed/simple;
+	bh=Nq8mhHryxrL8NVtVRklL2bRQ0+Bp93LDZv80QB0rONQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GhtpAtoa7N5r8hpEwclgiTPjvgkX1oFwclVV6W9AMgMjuvIXoT8NS915yskk4LS2vSzNI6d/D4CjNsxG1v2OuNArmigdpoVwnaPxaCyATV3VQ0M9c4xPxb+wXMcYqVWp8fQvui+DTwQY6WpV6rdpIpPjSlNz4zy3kc+6ZqElzSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QheBHp9R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7F3AC4CED2;
+	Mon, 25 Nov 2024 16:13:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732551173;
-	bh=RrpXGVUKPW/jA4lEYfdxaIJmcREW+7tUpqjSPmfLOl4=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=cVM+oP8R7JWk6NAVVYIjMFPatbUpgrHTT/Rdqnl0hPzkoWHf5sulZhTNpylBSYKc8
-	 IER26vcOOUNobGncGlDU1aeoyZPemVBkfGzSxn3ZPYcDx6pRAmW0ELRGX0h+v5/jzm
-	 h60xgyhFEepN0SK9l5OGnVjjH7g7XLtnr2T9ftfvdiTv6nVpcP3jpKMywar4X7BV+D
-	 +2lnBewcBArkwDA+i7sfbZokozB8BHrvGE0dHNqc82zLZlLz+RaFeCWGT9Rt1QERZ4
-	 PrTtUgLyJDnjo+RryYn4jOBsY3fWcwk59EX/i7ppM+Dkuir8O7VqziO5n6N4d7fPKt
-	 Prn0+PHscrJEQ==
-Message-ID: <846e2d7e-33bf-4aa5-8e33-e2c4fffb4f7a@kernel.org>
-Date: Mon, 25 Nov 2024 17:12:47 +0100
+	s=k20201202; t=1732551222;
+	bh=Nq8mhHryxrL8NVtVRklL2bRQ0+Bp93LDZv80QB0rONQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QheBHp9R7poBvybMCFH68dJh9Ft6CucO+a1ET9amrThxqE0SaEUWoYdH8YjPSdqhv
+	 xC803FqeYVkk7awFupa/A1rR3tbWbGU5SuJzXOP15fcGOLBRWzpFD25A7uSM9Ft+4d
+	 u5zPwNRDue+UyBKBpNOHsyf8jjtozW+Zf/PvXTydPFNKnVqszOU1i8GPqrg/u35DHM
+	 i/q35N2f94C75EHNZfcXELHeYTw4q3e9E+UJjuK44NtQGcXDJ1Crtd/ob+MmTSHBUg
+	 HJ75SMb1OHrIkecyMh6ax1xiSGP7Ovnfnvs+PTK03a/uQGPgsFPb0dJfm/YjXfTCgj
+	 G7yxIbJnSP8Ew==
+Message-ID: <de34a628-a74c-4558-817e-345a3de46e2e@kernel.org>
+Date: Mon, 25 Nov 2024 17:13:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,15 +50,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/7] net: faraday: Add ARM64 in FTGMAC100 for
+Subject: Re: [PATCH net-next v3 1/7] dt-bindings: net: ftgmac100: support for
  AST2700
-To: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
+To: Philipp Zabel <p.zabel@pengutronix.de>,
+ Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- p.zabel@pengutronix.de, ratbert@faraday-tech.com, netdev@vger.kernel.org,
+ ratbert@faraday-tech.com, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Conor Dooley <conor.dooley@microchip.com>
 References: <20241120075017.2590228-1-jacky_chou@aspeedtech.com>
- <20241120075017.2590228-3-jacky_chou@aspeedtech.com>
+ <20241120075017.2590228-2-jacky_chou@aspeedtech.com>
+ <cc93cc7332e97e31f90edc13496951dc0df12744.camel@pengutronix.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -104,40 +107,52 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241120075017.2590228-3-jacky_chou@aspeedtech.com>
+In-Reply-To: <cc93cc7332e97e31f90edc13496951dc0df12744.camel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 20/11/2024 08:50, Jacky Chou wrote:
-> AST2700 is a ARM 64-bit SoC and ftgmac100 adds support 64-bit
-> DMA capability in AST2700.
+On 25/11/2024 11:24, Philipp Zabel wrote:
+> On Mi, 2024-11-20 at 15:50 +0800, Jacky Chou wrote:
+>> The AST2700 is the 7th generation SoC from Aspeed.
+>> Add compatible support for AST2700 in yaml.
+>>
+>> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+>> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+>> ---
+>>  Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+>> index 9bcbacb6640d..fffe5c51daa9 100644
+>> --- a/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+>> +++ b/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml
+>> @@ -21,6 +21,7 @@ properties:
+>>                - aspeed,ast2400-mac
+>>                - aspeed,ast2500-mac
+>>                - aspeed,ast2600-mac
+>> +              - aspeed,ast2700-mac
+>>            - const: faraday,ftgmac100
+>>  
+>>    reg:
+>> @@ -33,7 +34,7 @@ properties:
+>>      minItems: 1
+>>      items:
+>>        - description: MAC IP clock
+>> -      - description: RMII RCLK gate for AST2500/2600
+>> +      - description: RMII RCLK gate for AST2500/2600/2700
+>>  
+>>    clock-names:
+>>      minItems: 1
 > 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/ethernet/faraday/Kconfig | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/faraday/Kconfig b/drivers/net/ethernet/faraday/Kconfig
-> index c699bd6bcbb9..d5a088d88c3d 100644
-> --- a/drivers/net/ethernet/faraday/Kconfig
-> +++ b/drivers/net/ethernet/faraday/Kconfig
-> @@ -6,7 +6,7 @@
->  config NET_VENDOR_FARADAY
->  	bool "Faraday devices"
->  	default y
-> -	depends on ARM || COMPILE_TEST
-> +	depends on ARM || ARM64 || COMPILE_TEST
->  	help
->  	  If you have a network (Ethernet) card belonging to this class, say Y.
->  
-> @@ -28,8 +28,7 @@ config FTMAC100
->  
->  config FTGMAC100
->  	tristate "Faraday FTGMAC100 Gigabit Ethernet support"
-> -	depends on ARM || COMPILE_TEST
-> -	depends on !64BIT || BROKEN
-Explain in commit msg how did you unbreak it. Better, combine it with
-commit which actually fixes broken 64bit.
+> Given patch 3, I would expect a resets property to be defined and
+> possibly added to the list of required properties for aspeed,ast2700-
+> mac.
+
+
+Yeah, DTS was not tested at all.
+
+Jacky, where is the DTS, so we can validate it? Please provide link in
+cover letter.
 
 Best regards,
 Krzysztof
