@@ -1,181 +1,104 @@
-Return-Path: <netdev+bounces-147202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504EC9D835C
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:30:43 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7616162C63
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:30:39 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E248C1922ED;
-	Mon, 25 Nov 2024 10:30:39 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277709D8418
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 12:10:51 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790B9185935;
-	Mon, 25 Nov 2024 10:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E56CB30680
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:34:20 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0152194C7D;
+	Mon, 25 Nov 2024 10:33:40 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E7219258E
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 10:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732530639; cv=none; b=h0yRTh2Lg8XjEOcYDQUhY6CuerBRb1P3s+gxzm3FpXvBfHrKol1luTFlSLDJCn1EBGuhxSdCn8B60OF8SQzFDIkvZdcZiQIrz04gwO0zYz7EZlXYledIUiXO9NG1e+f95GNDG0F7H2GRzB3X7yei6zUI2g9pWl0OIaku9L5ssIM=
+	t=1732530820; cv=none; b=Z1VyUUUCGac1/FlTfsDHWnms1sa3GlfGQbTe+JwA/DGHn0Tif+PolfqOZqpBIwjDkVM0zJLPOdp3Xa0AtASE54cwyFnJGEoZnnL3KnndWmQYFi9TEtxImwklocRJuHaWshaTpSmwUn3M8pNpgSCnu30GN4A94qdxZtNiEjgSjXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732530639; c=relaxed/simple;
-	bh=MYRRw8F6lcMAra7mTnNKMG4JQKyAPo8Yz4Vd7ymQeXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oE+oBmqT/+mU7SGO4jhwNEUwZdOTpZVdwHF0fM/chbjatuA5cqT0f+PSEaVS8RTeagOUTRHH8g01WIfKwN4c7apkE2v0MbHCnBsAnQ39FUiVFQ7gCmaiVVTOwPUHxlhAKO9GHq1O/pPbjvM5ZsDwZIYqQpvNxX/siaTvFgUKEl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.39.247] (port=48218 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1tFWMF-007spC-UT; Mon, 25 Nov 2024 11:30:22 +0100
-Date: Mon, 25 Nov 2024 11:30:18 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: syzbot <syzbot+57bac0866ddd99fe47c0@syzkaller.appspotmail.com>
-Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [netfilter?] WARNING in nft_socket_init
-Message-ID: <Z0RRutRfeaWVs63d@calendula>
-References: <67443b01.050a0220.1cc393.006f.GAE@google.com>
+	s=arc-20240116; t=1732530820; c=relaxed/simple;
+	bh=gCRzn4LNOBE5nMygWBX5OlLmC+fRJ/rT8vbWN7CMr/4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=E30u0zIXv3Q83Bi1q0MPS4S9STonhUPgsBldauj4c2OHmRFBCUMGcC8GbISNYqdazxri7ZDkueaau9N2EijnwBFH0w6JothTzdiL9zo3B0w83OHAuhcLEYMyzbswcN9XwVptwaaGPGtYCWZ+RleRj9/ELTJYiS91CwTx1/kGJNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.trumtrar.info)
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <s.trumtrar@pengutronix.de>)
+	id 1tFWPO-0001Fo-Oi; Mon, 25 Nov 2024 11:33:34 +0100
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [PATCH v2 0/4] ARM64: dts: intel: agilex5: add nodes and new board
+Date: Mon, 25 Nov 2024 11:33:19 +0100
+Message-Id: <20241125-v6-12-topic-socfpga-agilex5-v2-0-864256ecc7b2@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <67443b01.050a0220.1cc393.006f.GAE@google.com>
-X-Spam-Score: 0.8 (/)
-X-Spam-Report: SpamASsassin versoin 3.4.6 on ganesha.gnumonks.org summary:
- Content analysis details:   (0.8 points, 5.0 required)
- 
-  pts rule name              description
- ---- ---------------------- --------------------------------------------------
- -1.0 ALL_TRUSTED            Passed through trusted hosts only via SMTP
- -1.9 BAYES_00               BODY: Bayes spam probability is 0 to 1%
-                             [score: 0.0000]
-  1.0 HEADER_FROM_DIFFERENT_DOMAINS From and EnvelopeFrom 2nd level
-                             mail domains are different
-  2.5 SORTED_RECIPS          Recipient list is sorted by address
-  0.1 TW_BF                  BODY: Odd Letter Triples with BF
-  0.1 TW_YZ                  BODY: Odd Letter Triples with YZ
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAG9SRGcC/43NTQ7CIBCG4asY1o4ZqPbHlfcwXbQw0ElMIVBJT
+ dO7iz2By+dbvN8mEkWmJO6nTUTKnNjPBep8EnoaZkfAplgoVFeJFUKuQSpYfGANyWsb3ACD4xe
+ tN+jQmsq0tmtRi1IIkSyvR/3ZF0+cFh8/x1mWv/W/bpaAMKqxbpoWqUZ6BJrde4l+5vViSPT7v
+ n8BNcoDkcsAAAA=
+X-Change-ID: 20241030-v6-12-topic-socfpga-agilex5-90fd3d8f980c
+To: Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de, 
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-At quick glance, cgroup maximum depth seems INT_MAX.
+This series adds the gpio0 and gmac nodes to the socfpga_agilex5.dtsi.
 
-On Mon, Nov 25, 2024 at 12:53:21AM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    06afb0f36106 Merge tag 'trace-v6.13' of git://git.kernel.o..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=111a7b78580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=95b76860fd16c857
-> dashboard link: https://syzkaller.appspot.com/bug?extid=57bac0866ddd99fe47c0
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=131a7b78580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=158e81c0580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/49111529582a/disk-06afb0f3.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/f04577ad9add/vmlinux-06afb0f3.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/b352b4fae995/bzImage-06afb0f3.xz
-> 
-> The issue was bisected to:
-> 
-> commit 7f3287db654395f9c5ddd246325ff7889f550286
-> Author: Florian Westphal <fw@strlen.de>
-> Date:   Sat Sep 7 14:07:49 2024 +0000
-> 
->     netfilter: nft_socket: make cgroupsv2 matching work with namespaces
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=105d8778580000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=125d8778580000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=145d8778580000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+57bac0866ddd99fe47c0@syzkaller.appspotmail.com
-> Fixes: 7f3287db6543 ("netfilter: nft_socket: make cgroupsv2 matching work with namespaces")
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 5849 at net/netfilter/nft_socket.c:220 nft_socket_init+0x2db/0x3a0 net/netfilter/nft_socket.c:220
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 5849 Comm: syz-executor186 Not tainted 6.12.0-syzkaller-07834-g06afb0f36106 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> RIP: 0010:nft_socket_init+0x2db/0x3a0 net/netfilter/nft_socket.c:220
-> Code: 42 0f b6 04 30 84 c0 0f 85 c8 00 00 00 88 5d 00 bb 08 00 00 00 e9 aa fe ff ff e8 30 4a 9e f7 e9 5d ff ff ff e8 26 4a 9e f7 90 <0f> 0b 90 e9 4a ff ff ff 89 e9 80 e1 07 38 c1 0f 8c 9a fd ff ff 48
-> RSP: 0018:ffffc90003eb71d8 EFLAGS: 00010293
-> RAX: ffffffff89f7030a RBX: 0000000000000100 RCX: ffff888034de0000
-> RDX: 0000000000000000 RSI: 0000000000000100 RDI: 00000000000000ff
-> RBP: 00000000000000ff R08: ffffffff89f702c5 R09: 1ffffffff203a5b6
-> R10: dffffc0000000000 R11: fffffbfff203a5b7 R12: 1ffff110061c5004
-> R13: ffff8880347742a2 R14: dffffc0000000000 R15: ffff888030e28020
-> FS:  00005555769d4380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020000200 CR3: 0000000029582000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  nf_tables_newexpr net/netfilter/nf_tables_api.c:3444 [inline]
->  nf_tables_newrule+0x185e/0x2980 net/netfilter/nf_tables_api.c:4272
->  nfnetlink_rcv_batch net/netfilter/nfnetlink.c:524 [inline]
->  nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:647 [inline]
->  nfnetlink_rcv+0x14e3/0x2ab0 net/netfilter/nfnetlink.c:665
->  netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
->  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1347
->  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1891
->  sock_sendmsg_nosec net/socket.c:711 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:726
->  ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2583
->  ___sys_sendmsg net/socket.c:2637 [inline]
->  __sys_sendmsg+0x269/0x350 net/socket.c:2669
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fcc94659e69
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 61 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffe0bc7a0d8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fcc94659e69
-> RDX: 0000000000000000 RSI: 00000000200002c0 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 00007fcc946a3036
-> R13: 00007ffe0bc7a110 R14: 00007ffe0bc7a150 R15: 0000000000000000
->  </TASK>
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
+An initial devicetree for a new board (Arrow AXE5-Eagle) is also added.
+Currently only QSPI and network are functional as all other hardware
+currently lacks mainline support.
+
+Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+---
+Changes in v2:
+- fix node names according to dtb_check
+- remove gpio 'status = disabled'
+- mdio0: remove setting of adi,[rt]x-internal-delay-ps. 2000 is the
+  default value
+- add Acked-by to dt-binding
+- Link to v1: https://lore.kernel.org/r/20241030-v6-12-topic-socfpga-agilex5-v1-0-b2b67780e60e@pengutronix.de
+
+---
+Steffen Trumtrar (4):
+      arm64: dts: agilex5: add gpio0
+      arm64: dts: agilex5: add gmac nodes
+      dt-bindings: intel: add agilex5-based Arrow AXE5-Eagle
+      arm64: dts: agilex5: initial support for Arrow AXE5-Eagle
+
+ .../devicetree/bindings/arm/intel,socfpga.yaml     |   1 +
+ arch/arm64/boot/dts/intel/Makefile                 |   1 +
+ arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi     | 106 ++++++++++++++++
+ .../boot/dts/intel/socfpga_agilex5_axe5_eagle.dts  | 140 +++++++++++++++++++++
+ 4 files changed, 248 insertions(+)
+---
+base-commit: adc218676eef25575469234709c2d87185ca223a
+change-id: 20241030-v6-12-topic-socfpga-agilex5-90fd3d8f980c
+
+Best regards,
+-- 
+Steffen Trumtrar <s.trumtrar@pengutronix.de>
+
 
