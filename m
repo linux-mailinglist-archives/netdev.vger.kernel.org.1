@@ -1,255 +1,167 @@
-Return-Path: <netdev+bounces-147175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D2619D7D87
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:53:33 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8310E9D7F50
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:59:36 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E361619A1
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 08:53:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBFF9B222C7
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 08:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867A318E028;
-	Mon, 25 Nov 2024 08:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C8118E047;
+	Mon, 25 Nov 2024 08:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ni7VOp8i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B425018C92F
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 08:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5CD7082C
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 08:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732524804; cv=none; b=fJP5BmBfh1rndqk2tzJFjcidztORrNvwvko7X+9aTMJyDslf86qHGjHM0wimTNS2ha/yTbgGBV7hu0pdmrYiobgIJkQVYKx+D4SY7wOpS82DThACnET4KmCi7J38j9HN8j3IDSvdaywMn2jnbpc8oAtI/jp2DxUV9IzvsFEBvFs=
+	t=1732525170; cv=none; b=RjG6KzrfPLvggeD+Nmu1br5z+BWtna+egqI+PSKMdd5sZFFfIFkPA+T29lFKbu3eCoBJ8irxK2GhpBdmPPipVIaM2aFRGLHZoq+xYiIEfDRbiFLKK3IThQhLq5LHvq84lQX0aaRlMjkqIk9HXpqEonxUiyqQh0m2reJIybxlYDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732524804; c=relaxed/simple;
-	bh=Ro4JgtyhvTpx3uc0cLSi4EkbGILhQmAYsf3Iz4h1ix4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IEqBBF9ALEP2WUbRqnUIeS/cKtrUbu99xdIq2haFlz2JqnqWHbbJtUR45KxV/5CRSoc4jpTrzt85JPfACD/SQrWiBMfXFkHFdouljVKdJhgZjjaM1YHjXdLCRhckY4uZL3el8Y1+/n0rZeARog8vMLalgI1EWaN505VVRQ0QA4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a777d47a8eso45919295ab.3
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 00:53:22 -0800 (PST)
+	s=arc-20240116; t=1732525170; c=relaxed/simple;
+	bh=7yeqh8mSpcpqY013Nd8GMY529z54HpOWd7EOpKC2kSA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mqsiB4gb3A66ypSfxw3BaVGrNBoU85d2ecctdQPINWF89duhNlm2otxLqs8/y6StqZ1vHfh2ZX01pewSibQD/mmuva0PwgV3pijDWOzVrvmAgQ1NZrEDb5y++KuUX6dTVmbxoWJDPOcPp6b2ne7+AlajVH4na70Ea3HdSzrb9mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ni7VOp8i; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4316cce103dso53219635e9.3
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 00:59:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732525166; x=1733129966; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1p2MlDzA7dqrElrwy+KJ7tN4JmHOF22/NGKBLlAmx+Q=;
+        b=Ni7VOp8iPgMDHcK56OnuH7JNTtc+HI6jxAp5F6B3r6xK3TF/4PkFiJ8CPG66q49rO/
+         bBYQabi/A1J/8bmAMepYxagda8BtMRhQlpKz/FiblFcyAr3NSBW3cuktUnuiDDtUCJZd
+         sxKZ6WOd53r1onZbv+9byUmdAIg7+zaF0qARlMEk0z+jCkJKkAqNv3mAVdJODHbWgG5k
+         ElU37Vo1pawtJU6bGyQ9Y0YPCtrz7BhGRRo/hm5IGvY3d3aVSoMP1rAqU9SmwU7J0Iex
+         CZoiFCrAzFQ5YE89l/2sLsxPMAVqwvlL3RujlK/g5lMXC1IAOe3JRR0BRUO05bEDthZd
+         nsZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732524802; x=1733129602;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lm0BRJLap8IYokZmCzi5Af1DkjsKA++CY39Qvl+Gr20=;
-        b=vcoy77BJ7Wxd9vtpF2jO2UsD51FdDQ/j7XHDRDpmU8g4Igk7fFKfO2I8BYH6lgkK5E
-         +OJ34MGYo3490y85UOZvYi/qe7EGH31VWs+i1ckfVU5rmPHfjnLgkD3Ab42+PVGkSNUb
-         kHq82oO42VOnT1+ElSVdMVLjj9Df9gQr+MD5e1Cwkkkd36V+ALFz1bOPX9Sa0szhX1Ve
-         HrvRNtKb+1OF6II0ezb03dAFN8R9WgnxxIEGGKlrPXZJKmuEtu5NZ8eydbet39/vHXX7
-         QRfODuofPOMVqQOoBrA9vVLYmw6Gh5s74YiUKDO2OyPXmBMt1mkWL13cdpcBha0C9jWn
-         PLog==
-X-Forwarded-Encrypted: i=1; AJvYcCUnlTjtGBWnnuODYSQHgPFNNmYVRh/E3qra6j5cxBjr7FhSnYAGi7f+JZDknhlA12czKH4SVBo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEIkPRnaeF8q/0XVutbygJVNQRP6X5AaaftGbnw+nnFhmbhgqu
-	BXObXo6s6wCHeck3AB2/ujOzpFVpHpfZyFSigl4qEDV48pDrFj4XG00AgK70ZfXn+Jse0KehFw2
-	QPE7oA9FLrnQ1+2v9NFUuxMImcUnXDDNmHoDLZlQrbrCE858DcCgQWQo=
-X-Google-Smtp-Source: AGHT+IGoR23tV9ownqtFbzVTrlYx84FtpfaFT4+sjnob9QTBV/YLecx14ozgy0zfgA5kXY9XJJ8pDyzg4QCW3G+hIPgzUE+KrhHJ
+        d=1e100.net; s=20230601; t=1732525166; x=1733129966;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1p2MlDzA7dqrElrwy+KJ7tN4JmHOF22/NGKBLlAmx+Q=;
+        b=L13dz3F+Owyfl1RqnMc4sK4lfxUPi0DK1cQt0c1e54C4PI9BE/gyyAWl9F30TSj51C
+         dOTmNIvdTVwuAB1YMEx7c3M8gE0FPt6QclA8fHnK3GG4NpoH2Vnnen1pyxY1ZPAKBq4x
+         HB2zjdgB8pYMnWhWE+ejeAkCQa/OzJWB/5ZYtxo3oolCM+sntPohSfCO7miS6JZM+nW/
+         bV0A43FDIxjXfLRAw6JZsVHcFuuktTrf2Q5duQdnpjbcUEqZqWazuJKo64+k366oUiLL
+         2mQd99UE+lQkYiS5x0l3W0/Sm5RZ0UWQTl45HS9gpkP0desNPJo9Gk9Me+bkfiVUtkFA
+         HQVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzFNrRXLsAeu3WxDIo8LJuS5DpywMUuy3Um8GmpiJ1r+vogKdjdoHMINKvjDP4Yy1H2slmqsA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAOwWsDqGg4ohsv153MTrDH3D2XSWNwWFIoiJkqa1a6sXs09qi
+	7m3v+SNOB/vNlgZwrt3ftKuCiW1JGc5Eb80pClob5pL1DwPP3BIIaOsNMnDYH3AC3vYqpZrcWIX
+	sMeF3/Yd+zsuZbue721gt/y3gAXlBrk7aLe3p
+X-Gm-Gg: ASbGnctue49rbfubzeEWClj4zustjDPDmusa0ZTT6NJT0XVNS3aoR60L1B2SYNc+uD3
+	s/6vAiR3SKKYlnvR7qUS9nR49MvjGtjHwozYQuPpzOJgRdtrkPA5c0CrxSTjO7A==
+X-Google-Smtp-Source: AGHT+IFYOF/TAUWVLBDEfvxfi8/wxmxgjijqnjz3cOLzclsiUIjHCZdK96AUcPZYb9goN+8u8cSs7q0J/CqX3J6/090=
+X-Received: by 2002:a05:600c:4f83:b0:42f:8229:a09e with SMTP id
+ 5b1f17b1804b1-433ce4ad08fmr116754985e9.29.1732525166556; Mon, 25 Nov 2024
+ 00:59:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:190b:b0:3a7:7d26:4ce4 with SMTP id
- e9e14a558f8ab-3a79ad0fb5dmr123833565ab.9.1732524801977; Mon, 25 Nov 2024
- 00:53:21 -0800 (PST)
-Date: Mon, 25 Nov 2024 00:53:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67443b01.050a0220.1cc393.0070.GAE@google.com>
-Subject: [syzbot] [mm?] INFO: rcu detected stall in sys_setsockopt (4)
-From: syzbot <syzbot+6e61d59e9d2150c8492b@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, bigeasy@linutronix.de, davem@davemloft.net, 
-	edumazet@google.com, kerneljasonxing@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
+References: <20241113174438.327414-3-sergeantsagara@protonmail.com> <20241124162700.4ec4b6ce@kernel.org>
+In-Reply-To: <20241124162700.4ec4b6ce@kernel.org>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Mon, 25 Nov 2024 09:59:13 +0100
+Message-ID: <CAH5fLgiFFhrDd+=+0gsnaWdV=EeiExo3SQxg2=2c3m-5Z5Tgqg@mail.gmail.com>
+Subject: Re: [PATCH net] rust: net::phy scope ThisModule usage in the
+ module_phy_driver macro
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Rahul Rameshbabu <sergeantsagara@protonmail.com>, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Nov 25, 2024 at 1:27=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 13 Nov 2024 17:45:22 +0000 Rahul Rameshbabu wrote:
+> > Similar to the use of $crate::Module, ThisModule should be referred to =
+as
+> > $crate::ThisModule in the macro evaluation. The reason the macro previo=
+usly
+> > did not cause any errors is because all the users of the macro would us=
+e
+> > kernel::prelude::*, bringing ThisModule into scope.
+>
+> You say "previously", does it mean there are no in-tree users where
+> this could cause bugs? If so no Fixes tag necessary..
+>
+> > Fixes: 2fe11d5ab35d ("rust: net::phy add module_phy_driver macro")
+> > Signed-off-by: Rahul Rameshbabu <sergeantsagara@protonmail.com>
+> > ---
+> >
+> > Notes:
+> >     How I came up with this change:
+> >
+> >     I was working on my own rust bindings and rust driver when I compar=
+ed my
+> >     macro_rule to the one used for module_phy_driver. I noticed, if I m=
+ade a
+> >     driver that does not use kernel::prelude::*, that the ThisModule ty=
+pe
+> >     identifier used in the macro would cause an error without being sco=
+ped in
+> >     the macro_rule. I believe the correct implementation for the macro =
+is one
+> >     where the types used are correctly expanded with needed scopes.
+>
+> Rust experts, does the patch itself make sense?
 
-syzbot found the following issue on:
+Yes, the macro should not rely on the user having random things in
+scope when calling the macro. This change is good.
 
-HEAD commit:    cfba9f07a1d6 Add linux-next specific files for 20241122
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1701175f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=45719eec4c74e6ba
-dashboard link: https://syzkaller.appspot.com/bug?extid=6e61d59e9d2150c8492b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13353b78580000
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/be35516c7ba5/disk-cfba9f07.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/70295210dc7d/vmlinux-cfba9f07.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8b5d044072ee/bzImage-cfba9f07.xz
-
-The issue was bisected to:
-
-commit d15121be7485655129101f3960ae6add40204463
-Author: Paolo Abeni <pabeni@redhat.com>
-Date:   Mon May 8 06:17:44 2023 +0000
-
-    Revert "softirq: Let ksoftirqd do its job"
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=121d5ee8580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=111d5ee8580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=161d5ee8580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6e61d59e9d2150c8492b@syzkaller.appspotmail.com
-Fixes: d15121be7485 ("Revert "softirq: Let ksoftirqd do its job"")
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P6057/1:b..l
-rcu: 	(detected by 1, t=10503 jiffies, g=12753, q=1720979 ncpus=2)
-task:syz-executor    state:R  running task     stack:20544 pid:6057  tgid:6057  ppid:1      flags:0x00000006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5369 [inline]
- __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
- preempt_schedule_irq+0xfb/0x1c0 kernel/sched/core.c:7078
- irqentry_exit+0x5e/0x90 kernel/entry/common.c:354
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lock_acquire+0x264/0x550 kernel/locking/lockdep.c:5853
-Code: 2b 00 74 08 4c 89 f7 e8 ba be 8f 00 f6 44 24 61 02 0f 85 85 01 00 00 41 f7 c7 00 02 00 00 74 01 fb 48 c7 44 24 40 0e 36 e0 45 <4b> c7 44 25 00 00 00 00 00 43 c7 44 25 09 00 00 00 00 43 c7 44 25
-RSP: 0018:ffffc9000322f2a0 EFLAGS: 00000206
-RAX: 0000000000000001 RBX: 1ffff92000645e60 RCX: ffff88802d22c6d8
-RDX: dffffc0000000000 RSI: ffffffff8c0aa840 RDI: ffffffff8c5e88a0
-RBP: ffffc9000322f3f8 R08: ffffffff9428a887 R09: 1ffffffff2851510
-R10: dffffc0000000000 R11: fffffbfff2851511 R12: 1ffff92000645e5c
-R13: dffffc0000000000 R14: ffffc9000322f300 R15: 0000000000000246
- rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- rcu_read_lock include/linux/rcupdate.h:849 [inline]
- page_ext_get+0x3d/0x2a0 mm/page_ext.c:525
- __page_table_check_zero+0xb1/0x350 mm/page_table_check.c:148
- page_table_check_free include/linux/page_table_check.h:41 [inline]
- free_pages_prepare mm/page_alloc.c:1128 [inline]
- free_unref_page+0xe0e/0x1140 mm/page_alloc.c:2693
- discard_slab mm/slub.c:2673 [inline]
- __put_partials+0xeb/0x130 mm/slub.c:3142
- put_cpu_partial+0x17c/0x250 mm/slub.c:3217
- __slab_free+0x2ea/0x3d0 mm/slub.c:4468
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
- __kasan_kmalloc+0x23/0xb0 mm/kasan/common.c:385
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __kmalloc_cache_node_noprof+0x25d/0x3a0 mm/slub.c:4326
- kmalloc_node_noprof include/linux/slab.h:924 [inline]
- __get_vm_area_node+0x132/0x2d0 mm/vmalloc.c:3127
- __vmalloc_node_range_noprof+0x344/0x1380 mm/vmalloc.c:3804
- __vmalloc_node_noprof mm/vmalloc.c:3909 [inline]
- vzalloc_noprof+0x79/0x90 mm/vmalloc.c:3982
- __do_replace+0xc8/0xa40 net/ipv4/netfilter/ip_tables.c:1046
- do_replace net/ipv4/netfilter/ip_tables.c:1141 [inline]
- do_ipt_set_ctl+0xf02/0x1250 net/ipv4/netfilter/ip_tables.c:1635
- nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
- do_sock_setsockopt+0x3af/0x720 net/socket.c:2313
- __sys_setsockopt net/socket.c:2338 [inline]
- __do_sys_setsockopt net/socket.c:2344 [inline]
- __se_sys_setsockopt net/socket.c:2341 [inline]
- __x64_sys_setsockopt+0x1ee/0x280 net/socket.c:2341
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1f1638070a
-RSP: 002b:00007ffec3066f38 EFLAGS: 00000202 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 00007ffec3066fc0 RCX: 00007f1f1638070a
-RDX: 0000000000000040 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 00000000000002d8 R09: 00007ffec3067377
-R10: 00007f1f16509ea0 R11: 0000000000000202 R12: 00007f1f16509e40
-R13: 00007ffec3066f5c R14: 0000000000000000 R15: 00007f1f1650c000
- </TASK>
-rcu: rcu_preempt kthread starved for 9031 jiffies! g12753 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:25720 pid:17    tgid:17    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5369 [inline]
- __schedule+0x1850/0x4c30 kernel/sched/core.c:6756
- __schedule_loop kernel/sched/core.c:6833 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6848
- schedule_timeout+0x15a/0x290 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x2df/0x1330 kernel/rcu/tree.c:2045
- rcu_gp_kthread+0xa7/0x3b0 kernel/rcu/tree.c:2247
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 8 Comm: kworker/0:0 Not tainted 6.12.0-next-20241122-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Workqueue: wg-crypt-wg2 wg_packet_tx_worker
-RIP: 0010:__trace_hardirqs_on_caller kernel/locking/lockdep.c:4346 [inline]
-RIP: 0010:lockdep_hardirqs_on_prepare+0x317/0x780 kernel/locking/lockdep.c:4406
-Code: 00 00 fc ff df eb ac 48 c7 c7 20 48 80 8e 4c 89 ee e8 fd 56 80 03 48 ba 00 00 00 00 00 fc ff df e9 3d ff ff ff 48 8b 44 24 10 <48> 8d 98 c0 0a 00 00 48 89 d8 48 c1 e8 03 0f b6 04 10 84 c0 0f 85
-RSP: 0018:ffffc90000007a00 EFLAGS: 00000046
-RAX: ffff88801d2bda00 RBX: ffff88801d2be530 RCX: ffffffff817b230a
-RDX: dffffc0000000000 RSI: 0000000000000008 RDI: ffffffff9428a988
-RBP: ffffc90000007ab8 R08: ffffffff9428a98f R09: 1ffffffff2851531
-R10: dffffc0000000000 R11: fffffbfff2851532 R12: ffff88801d2be550
-R13: 0000000000000002 R14: ffff88801d2be4d8 R15: 1ffff11003a57c9b
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055b1b8f2b008 CR3: 000000000e736000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <IRQ>
- trace_hardirqs_on+0x28/0x40 kernel/trace/trace_preemptirq.c:47
- __raw_spin_unlock_irq include/linux/spinlock_api_smp.h:159 [inline]
- _raw_spin_unlock_irq+0x23/0x50 kernel/locking/spinlock.c:202
- spin_unlock_irq include/linux/spinlock.h:401 [inline]
- backlog_unlock_irq_enable net/core/dev.c:258 [inline]
- process_backlog+0x101e/0x15b0 net/core/dev.c:6146
- __napi_poll+0xcb/0x490 net/core/dev.c:6877
- napi_poll net/core/dev.c:6946 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:7068
- handle_softirqs+0x2c5/0x980 kernel/softirq.c:554
- do_softirq+0x11b/0x1e0 kernel/softirq.c:455
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
- wg_packet_create_data_done drivers/net/wireguard/send.c:247 [inline]
- wg_packet_tx_worker+0x160/0x810 drivers/net/wireguard/send.c:276
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> > diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+> > index 910ce867480a..80f9f571b88c 100644
+> > --- a/rust/kernel/net/phy.rs
+> > +++ b/rust/kernel/net/phy.rs
+> > @@ -837,7 +837,7 @@ const fn as_int(&self) -> u32 {
+> >  ///         [::kernel::net::phy::create_phy_driver::<PhySample>()];
+> >  ///
+> >  ///     impl ::kernel::Module for Module {
+> > -///         fn init(module: &'static ThisModule) -> Result<Self> {
+> > +///         fn init(module: &'static ::kernel::ThisModule) -> Result<S=
+elf> {
+> >  ///             let drivers =3D unsafe { &mut DRIVERS };
+> >  ///             let mut reg =3D ::kernel::net::phy::Registration::regi=
+ster(
+> >  ///                 module,
+> > @@ -899,7 +899,7 @@ struct Module {
+> >                  [$($crate::net::phy::create_phy_driver::<$driver>()),+=
+];
+> >
+> >              impl $crate::Module for Module {
+> > -                fn init(module: &'static ThisModule) -> Result<Self> {
+> > +                fn init(module: &'static $crate::ThisModule) -> Result=
+<Self> {
+> >                      // SAFETY: The anonymous constant guarantees that =
+nobody else can access
+> >                      // the `DRIVERS` static. The array is used only in=
+ the C side.
+> >                      let drivers =3D unsafe { &mut DRIVERS };
+> >
+> > base-commit: 73af53d82076bbe184d9ece9e14b0dc8599e6055
+>
 
