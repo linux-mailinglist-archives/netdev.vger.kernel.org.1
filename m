@@ -1,65 +1,115 @@
-Return-Path: <netdev+bounces-147246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06CB9D8A75
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 17:34:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025F79D8AFD
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 18:07:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D80285FF5
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 16:34:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B38C2B2C749
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 17:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485951B4F14;
-	Mon, 25 Nov 2024 16:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8B11B4F02;
+	Mon, 25 Nov 2024 17:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZyQ4GA2p"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="iPiSsJIC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PVN4m1nM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D431ADFFE
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 16:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758FE1E48A;
+	Mon, 25 Nov 2024 17:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732552469; cv=none; b=MQzJaALRlrxAoTD94Q/zoJNL8/2YBV1ELF++V7G+WsldK0bbJEwEn4KA5Ddet9WPz7wmLbEp7F2RVmPnAF6PRoxCvbH93Gx6z2ta9UzyQuotBG5LNxZqirCtpnrcl+OoiDs5iTlRnPY900CIKvtZ2aP6eYgA89mRrMRSRod7tkA=
+	t=1732554220; cv=none; b=LD4bP7jTtP0Gom4gRuRuQ35NxeAgfFdGOknpy9/y4o4PcHg1JIZxzAZpvwvRgoqS6DzEHL5YtZVSH6d4W8+VVXB8/g0lY8V/MMhjQDn2ZHeUA0HgbnvvL/zsM+lZCZGwd9UtKmALmLLfA2B1B091tsKxZwIy74i8ErqkB2gAW2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732552469; c=relaxed/simple;
-	bh=ZHmCgfg++r55a4SQ/VaFBEl7sVlsjjkgBdelBnA+9O0=;
+	s=arc-20240116; t=1732554220; c=relaxed/simple;
+	bh=tvx2+dddCua1RIHYiN/bk4phpUGsIfMLdciy141RWgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lKC3uIHj6bOvMzgCKsOyRN51z3S0OdidNL8rx7sl0Dppu/h7F7r7dKBr4F7i/UxtDZbn8DlSdKG7PfCBQ5OpISX0fbCN+t6YaPA1i56p5OrZ1e1bT9fCqZzLKSl48fFgjcUkC1ESBqaFG+TIRl1AOG67ql7otQIPVc67DKErBQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZyQ4GA2p; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3qQ4evFuvQLIwOYQPLLoWVobf5IVO4M2mgqfCtW7AH4=; b=ZyQ4GA2p0QEeBS4lhuio6vo8Aa
-	zAmgLG0Y5jfe7ye+5+jZcCs224hlhNcYStkT7uVNPoRP3MZENJHscEd5Ufgne2mXwi8P7E4MXPj+R
-	+trXKyqz5NRBlCd23Wpphrf/bAlDlQuHF7cvOvc4L4ezVQjuYVXhSF7qsC2PYcoiotqs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tFc2Z-00EPKP-6L; Mon, 25 Nov 2024 17:34:23 +0100
-Date: Mon, 25 Nov 2024 17:34:23 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, Russell King <linux@armlinux.org.uk>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: Moving forward with stacked PHYs
-Message-ID: <320e6ab6-3299-4b6c-af66-191dc9c5052d@lunn.ch>
-References: <20241119115136.74297db7@fedora.home>
- <Zz7zqzlDG40IYxC-@pengutronix.de>
- <1646a5bd-24c7-43fb-9d52-25966aafb80f@lunn.ch>
- <20241125094622.65f0bb97@fedora.home>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bWwSnpStR3xAL91MLyJ4cVdtydmGoqGfuIsU4aaWuYIw1YMQYnaazKAjMCh5+j0y9RuG9A20DdWvkK2+rpNt58ZODwCj/tGEPA9v5Zj0jUnTFApiHvMWbcdR307fM941gSe2yilra0tdjTEbOEQSFdCQnDcFem35nEA5OemIOa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=iPiSsJIC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PVN4m1nM; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.stl.internal (Postfix) with ESMTP id 4EE801140194;
+	Mon, 25 Nov 2024 12:03:36 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Mon, 25 Nov 2024 12:03:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1732554216; x=1732640616; bh=3opjGAU9QR
+	QBmipUhTbClawhanaHRmChf076z90vHYU=; b=iPiSsJIC6qob8vajiMHx3xDkDz
+	XyTHQkPxgcmzMof4NZbtjDVvtrW2vWgDNfjQb4vzxSBqZd3lTZHJmTHdlOC9/wH4
+	akhzv79bQLA9tHcAmexpWz4CeJ/p/jDSte8RDtRqBtUR2yA+Cpc2zcuKla9IfLKy
+	1I4InWNRgsZO9qrK7qWbaNJbDh2woEbqe6LVWburV32p04fmb+jptrDGg5Z3/XYd
+	CSvZqmr0Wh+Wtm7Vv+8gugRaFit5vNFQ1FyP9r+QsbN+aalqKEw2xQ5djz98z4/M
+	Wk/rtCKBeIyCjtpJdx4HTk+dK8mRDKnW3VNf+MZw16MI0b0Z+E8v16Tw9YPQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1732554216; x=1732640616; bh=3opjGAU9QRQBmipUhTbClawhanaHRmChf07
+	6z90vHYU=; b=PVN4m1nMT6jnhVBOi0erdw6Zo+sEvs2f8arg1IwMhgPWnieks36
+	SQaFMlnvjiPoRVb5LVk//O/r/t5ysGqgXLwFKVg3NpOIEK2WuVeleB9JWBEIfidc
+	W6TQ1TX3/BKHkNQXswD04wOoIDazDltvjNz33W6fX6FYChOtquKzkybDLvlSH7VA
+	f0h5ru39+qYofRKRLSxbqtHOOiO8B5iObya+HOGp1bDZnSGhjEE1uMZUo43xfIDa
+	PGiad6SLutAohEQ4So68LGUSxPwK0k0ObRimROhhCvk93mjHJRtDeVjLxwtsNvFx
+	4CZ1rq/vRjo6boWfg3N2Bo+RyofkND20+aw==
+X-ME-Sender: <xms:561EZ_Fl9Otahpa_PCWs5XVYzTJqkkluCwou2gbnSiUQstVBuQWMkg>
+    <xme:561EZ8UJyEonkKtpnEdiW2nxBsdPOR_3BMggYDzbxQelmEewB9R_4JLuOlHiygMJN
+    t7FU_myiDOOAdziCg>
+X-ME-Received: <xmr:561EZxJ_717LbZvJsHPoETXgwvfpQRQjUVqpXxA7x9HaWLHcWh5Z2ZVotlHAJedsO4iHowzoLi_7lLxV-Lfl9MlK_jMoMRxj-vlqWG3Pf9dzjg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrgeehgdelhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhgg
+    tggujgesthdtsfdttddtvdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugi
+    huuhhurdighiiiqeenucggtffrrghtthgvrhhnpedvfeekteduudefieegtdehfeffkeeu
+    udekheduffduffffgfegiedttefgvdfhvdenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggprhgtphht
+    thhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghlvghkshgrnhguvg
+    hrrdhlohgsrghkihhnsehinhhtvghlrdgtohhmpdhrtghpthhtoheplhhorhgvnhiiohes
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghs
+    theskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsoh
+    igrdhnvghtpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhope
+    hhrgifkheskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:561EZ9Gynp2h_cINdeQKccecTVBlG7GGE4N_ta2cfdhWWB9DWfyuhw>
+    <xmx:561EZ1WtKQTXT-N7XK2Ls6q12nem5aaeMA4NkVZgRVz5qgP5yxLGlQ>
+    <xmx:561EZ4PHuzi1s8psExljuVZwEWaa0cSzjBSSdWO9RJOoyYAHeuKv_w>
+    <xmx:561EZ002ldYIlHwFH4aRgTbGReL4a6SeRzw708NEKgdCHt2zRMvxqg>
+    <xmx:6K1EZ2XiOSfpBcc7rzGmicqEUkLbiV1R640Dva6YV5ZhX9LtXr7pt5S8>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 25 Nov 2024 12:03:33 -0500 (EST)
+Date: Mon, 25 Nov 2024 10:03:31 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
+Message-ID: <22h2giilfzjsof2ncuzaogzrgj4kzieqyhnufmyctwealrueum@fiytwllolnja>
+References: <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
+ <ZwZe6Bg5ZrXLkDGW@lore-desk>
+ <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
+ <ZwZ7fr_STZStsnln@lore-desk>
+ <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
+ <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
+ <01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
+ <b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
+ <rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
+ <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,46 +118,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241125094622.65f0bb97@fedora.home>
+In-Reply-To: <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
 
-> The way I see this is based on the phy_link_topology. What is done
-> currently is that the SFP PHY is added to the topology when :
+On Mon, Nov 25, 2024 at 04:12:24PM GMT, Alexander Lobakin wrote:
+> From: Daniel Xu <dxu@dxuuu.xyz>
+> Date: Fri, 22 Nov 2024 17:10:06 -0700
 > 
->  - The .connect_phy() SFP upstream op is called, but ONLY if the
-> upstream PHY is attached to its netdev (otherwise, the upstream PHY
-> isn't in the topology)
+> > Hi Olek,
+> > 
+> > Here are the results.
+> > 
+> > On Wed, Nov 13, 2024 at 03:39:13PM GMT, Daniel Xu wrote:
+> >>
+> >>
+> >> On Tue, Nov 12, 2024, at 9:43 AM, Alexander Lobakin wrote:
 > 
->  - Alternatively if the SFP phy is already attached to its upstream,
-> both the upstream PHY and the SFP PHY will be added to the tpopology
-> when the upstream PHY gets attached to its netdev.
+> [...]
 > 
-> The notification would be sent at that time. We can't really send it
-> before the PHYs are part of the topology because at that point we don't
-> know to which netdev it belongs.
-
-I agree we cannot notify until we know where it goes in the chain. But
-i was wondering if this is too early? Is it guaranteed that
-phy_init_hw() is complete? We don't want userspace trying to
-reconfigure the PHY of it then to be overwritten.
-
-It would be good if the commit message adding the notification
-explains what has already happened when the notification is sent, what
-state the PHY is in.
-
-> The way I see that, based on the appereance of PHYs, userspace may want
-> to re-ajust configuration, especially if :
->  - The PHY is attached in .ndo_open() and
->  - The PHY provides some kind of offloading capability (Timestamping,
-> maybe more such as macsec)
+> > Baseline (again)
+> > 
+> > 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+> > Run 1	3169917	        0.00007295	0.00007871	0.00009343		Run 1	21749.43
+> > Run 2	3228290	        0.00007103	0.00007679	0.00009215		Run 2	21897.17
+> > Run 3	3226746	        0.00007231	0.00007871	0.00009087		Run 3	21906.82
+> > Run 4	3191258	        0.00007231	0.00007743	0.00009087		Run 4	21155.15
+> > Run 5	3235653	        0.00007231	0.00007743	0.00008703		Run 5	21397.06
+> > Average	3210372.8	0.000072182	0.000077814	0.00009087		Average	21621.126
+> > 
+> > cpumap v2 Olek
+> > 
+> > 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+> > Run 1	3253651	        0.00007167	0.00007807	0.00009343		Run 1	13497.57
+> > Run 2	3221492	        0.00007231	0.00007743	0.00009087		Run 2	12115.53
+> > Run 3	3296453	        0.00007039	0.00007807	0.00009087		Run 3	12323.38
+> > Run 4	3254460	        0.00007167	0.00007807	0.00009087		Run 4	12901.88
+> > Run 5	3173327	        0.00007295	0.00007871	0.00009215		Run 5	12593.22
+> > Average	3239876.6	0.000071798	0.00007807	0.000091638		Average	12686.316
+> > Delta	0.92%	        -0.53%	        0.33%	        0.85%			        -41.32%
+> > 
+> > 
+> > It's very interesting that we see -40% tput w/ the patches. I went back
 > 
-> In that case, it's possible that userspace is interested in knowing
-> that a new PHY is here to re-adjust the offloads to the PHY.
+> Oh no, I messed up something =\
+> 
+> Could you please also test not the whole series, but patches 1-3 (up to
+> "bpf:cpumap: switch to GRO...") and 1-4 (up to "bpf: cpumap: reuse skb
+> array...")? Would be great to see whether this implementation works
+> worse right from the start or I just broke something later on.
 
-So do we need to be at the point that we know its EEE capabilities? It
-has registers its MACSec capabilities and timestamper? Again, this
-should be part of the commit message. What can a user of the
-notification expect to have happened, and what has not yet happened,
-or is ongoing and might race with.
+Will do.
 
-	Andrew
+> 
+> > and double checked and it seems the numbers are right. Here's the
+> > some output from some profiles I took with:
+> > 
+> >     perf record -e cycles:k -a -- sleep 10
+> >     perf --no-pager diff perf.data.baseline perf.data.withpatches > ...
+> > 
+> >     # Event 'cycles:k'
+> >     # Baseline  Delta Abs  Shared Object                                                    Symbol
+> >          6.13%     -3.60%  [kernel.kallsyms]                                                [k] _copy_to_iter
+> 
+> BTW, what CONFIG_HZ do you have on the kernel you're testing with?
+
+# zgrep CONFIG_HZ /proc/config.gz
+# CONFIG_HZ_PERIODIC is not set
+# CONFIG_HZ_100 is not set
+# CONFIG_HZ_250 is not set
+# CONFIG_HZ_300 is not set
+CONFIG_HZ_1000=y
+CONFIG_HZ=1000
+
+Just curious - why do you ask?
+
+Thanks,
+Daniel
 
