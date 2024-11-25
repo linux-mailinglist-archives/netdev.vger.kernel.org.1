@@ -1,183 +1,221 @@
-Return-Path: <netdev+bounces-147284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A6369D8EC0
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 23:57:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BCBF9D8EF0
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 00:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B5C0B238C1
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 22:57:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAB1EB229B3
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 23:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3C61BDAAE;
-	Mon, 25 Nov 2024 22:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F201925AD;
+	Mon, 25 Nov 2024 23:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="FStYZvZx";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="0vMhBEb8"
+	dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b="fpym/GOr"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from mx-rz-2.rrze.uni-erlangen.de (mx-rz-2.rrze.uni-erlangen.de [131.188.11.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AA21B78F3;
-	Mon, 25 Nov 2024 22:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75F41CD2C;
+	Mon, 25 Nov 2024 23:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.188.11.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732575433; cv=none; b=TJGXKCAPHbJOF+8frcAfjB+QuwkIBGk5cJbS2a1j/bZ76Yn/4yZjmBD3pBWGae8T+Pey1dBX0ltTtz74U/dvFYmRy8N1H9pGd9lrz3EaxBhH2HAsvR8qUNc7OPqnVK+UgXqH7NabiMVnBDvK+6Wi1HgQaOO760IbiCjb/zci+8I=
+	t=1732576767; cv=none; b=ZdPjMV0l1cxtLu4ezT/ytpoalp3b1gb30eKHT5IZJvP4fuDVMJzUYuMZHp6+xrDzoOFcAUufAAYNTQ/bbc2DxEPwOll86kcvCeaV7yaIvF2K0QeRe67IgOvT4QtwHbPV4vbf31np03tOHLK7eRc6W2/y4kNqDnklyHKn8i2Wfd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732575433; c=relaxed/simple;
-	bh=YogG0G1TBcHC3lyh02F8CIMiD0AwC3KztSfRE9Rcqgw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=lSWLNiD2oH4zTea7yCC1CnCj9B1czLn9iwbBhw3CcTa1lPy36MF/HN88F/Uu8IZ2ZmVGj3Wd3i2MWu9LGMMH4ehk1dFpeZCJSSq0E1eB/CI3hU42BQWJB3oBzrsVrFfTa44LUFKrrxfa0fX7gRNJFLUFHOuX6121lXZHSCxH9L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=FStYZvZx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=0vMhBEb8; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id 9618511401D3;
-	Mon, 25 Nov 2024 17:57:10 -0500 (EST)
-Received: from phl-imap-08 ([10.202.2.84])
-  by phl-compute-03.internal (MEProxy); Mon, 25 Nov 2024 17:57:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1732575430;
-	 x=1732661830; bh=ijzTN/SpjyhtGVgqirePfpk41e8BZ9geMcPGTqORSM4=; b=
-	FStYZvZxPfm63pvMOwjdrX7o8Sg1p2MdZPgKx2yLH1H0fgf7Zhargnr/VRGQ2r0w
-	I+fsBfiCsVnQ9tICL7eAColYXRLOdPWP6OJE8551AGsb8Nq7x7wnK/o8ZZSCUzXr
-	JoyuZdFvGMz1bcHlITPMEWZ3vFYtIkU9s9EAcORCxyoaAqlua9Imdq4SvRPt4N7k
-	iz7HVQ1+eglpVPXob1NPOWhv5BmPbdEvSXsYzxc6X8MMhIQLddZOldW9HzVco3K9
-	ckLMGew8iGCtYaxeTKzofKydfKurcRQnagsOu0fd4OtrpLNS/b/cg9ocm6hKl/Mw
-	jtkOBfQHO94e4fLQMEJQoA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1732575430; x=
-	1732661830; bh=ijzTN/SpjyhtGVgqirePfpk41e8BZ9geMcPGTqORSM4=; b=0
-	vMhBEb8bsPrafu1pKRRSa+7Rf+HO6KdnbsnU5dBWdMXSKrvo/gDx9aqmL6siUoFW
-	NFkyNcFy8iG/2uuowRvT9GE4nMWD/1cDBD6P284vJqchnSp3rqpwuxRDtff720Xl
-	FQPlFGQ49DYkkjy1gGXUmbA+RqS6qqNxXQE+oe73SezG/1/sDjV/pK7BHYCJtPka
-	YKQyDeWqRpA2EIty8HWvRWMWBJLPCW0XDi3SFt9Gqj1O5ogVel+bapjRSvcWBuEk
-	qUFfd/lhMQTI53LQxamUQ8GKBJYpC5YYMVfuPW5XbdJKI/DD/H9RxPu4bb9JBpqh
-	DD1FGbsIVu1daD5Xg/ZQQ==
-X-ME-Sender: <xms:xQBFZ8bCXDHe0YGi9gdPnGvmcegQwXTiManJ5MSkPtg-79tUGBaVBw>
-    <xme:xQBFZ3bu-uXjoJngP2Hl5kTpmxvyUG5ALwnrbPqlZ_Z7Q02X-H21nyNSskfCKH-ei
-    VaDdso9H28FdRYfTw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrgeeigddtfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenfghrlhcuvffnffculdefhedmnecujfgurhepofggfffhvfevkfgj
-    fhfutgfgsehtjeertdertddtnecuhfhrohhmpedfffgrnhhivghlucgiuhdfuceougiguh
-    esugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgeelieffhfduudeukefhieef
-    gfffgeduleevjeefffeukefgtdelvddvfeefiedunecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghr
-    tghpthhtohepudehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmse
-    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepjhhohhhnrdhfrghsthgrsggvnhgu
-    sehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopegrlhgvkhhsrghnuggvrhdrlhhosggrkhhinhesihhnthgvlhdr
-    tghomhdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtph
-    htthhopegrnhgurhhiiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghstheskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohephhgrfihksehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:xQBFZ2_kPX4C-R6TvriavGWSkr-IssesBKp-JLBd_XvEVXfYt99lJg>
-    <xmx:xQBFZ2ppzXg2OPXZ7xCaqYrxvIJqR7Pz_MfyoKEUkANWZa9mgkSpRw>
-    <xmx:xQBFZ3riJlLYEzwmCa_sTPxqxst_ujqx2KwN8O5vhfsuddiSxERDtA>
-    <xmx:xQBFZ0SmZv-Q0uoOO52-oy8MoW5pFgBv1vHHDEwD1MYdiEV-zelcjA>
-    <xmx:xgBFZyDXyRAuqBMjU_WOpuM0U82kiuqneodx4QWc8fKHo2lGsiWc6I_U>
-Feedback-ID: i6a694271:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id A6C0E18A006E; Mon, 25 Nov 2024 17:57:09 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1732576767; c=relaxed/simple;
+	bh=AAKcvTazsTtzaizb2P/Gv3cineczqMLFnAjAu81+gg4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ViD+sTg6A9x1jeVsctgfx13C0aIs6e752sH4yHd0vC+IT02jv3btc4e0EGjEBSD2ClYuctW3L+52sIsvVd74Fv8ZuyUyuSri+HvqKnQ8NTcyP51lpv7D4YXhQKZLEnAOYPL029v/TjFf3a/kS8hKLj3a0qVzJmOouXhabPTuLtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de; spf=pass smtp.mailfrom=fau.de; dkim=pass (2048-bit key) header.d=fau.de header.i=@fau.de header.b=fpym/GOr; arc=none smtp.client-ip=131.188.11.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fau.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fau.de
+Received: from mx-rz-smart.rrze.uni-erlangen.de (mx-rz-smart.rrze.uni-erlangen.de [IPv6:2001:638:a000:1025::1e])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-rz-2.rrze.uni-erlangen.de (Postfix) with ESMTPS id 4Xy1qt0Q6tzPkVp;
+	Tue, 26 Nov 2024 00:19:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fau.de; s=fau-2021;
+	t=1732576762; bh=hXNXvB1YkXWQBhSaqVTMLp4cvaSRmlShkxqkHuC1Xm4=;
+	h=From:To:Cc:Subject:Date:From:To:CC:Subject;
+	b=fpym/GOrf1hBVVsUSuK0o0QamH8DvxqdRwggB6CYT+jMw7+QtilvyHzJIu6n3f1YB
+	 wI6vxNGsFCC/vWNyBZw2ubyUn/xAr6nOBKcoHQcb0ruSNVvR2ixy9KRkdQ3UuEOhgB
+	 XYpyVeRPJxpjBLDNKTMBe7zH+AACANWgH2397IuCG4vYa8fL82rCm5uwXzgUoi/Dw/
+	 AiXziqhmDs7VFqechs3XZX64Vv4oNSV/6O33YFNwsXJdz+JFgY6KJsiZ9l6yyI0UWt
+	 qAUSUZENOeMycCWAc4fZBOZMUKof0+B5VVc1daQek7+JHT99ByrpbeV9zh1vtpGzH5
+	 R0YD1mczS3RcA==
+X-Virus-Scanned: amavisd-new at boeck4.rrze.uni-erlangen.de (RRZE)
+X-RRZE-Flag: Not-Spam
+X-RRZE-Submit-IP: 131.188.47.107
+Received: from faui76b (faui76b.informatik.uni-erlangen.de [131.188.47.107])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: U2FsdGVkX18MIWNQaQuiS8veO/+fA1bRqTG18I/Xv6w=)
+	by smtp-auth.uni-erlangen.de (Postfix) with ESMTPSA id 4Xy1qq3Q0QzPjml;
+	Tue, 26 Nov 2024 00:19:19 +0100 (CET)
+From: Martin Ottens <martin.ottens@fau.de>
+To: 
+Cc: Martin Ottens <martin.ottens@fau.de>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net/sched: netem: account for backlog updates from child qdisc
+Date: Tue, 26 Nov 2024 00:18:25 +0100
+Message-Id: <20241125231825.2586179-1-martin.ottens@fau.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 25 Nov 2024 16:56:49 -0600
-From: "Daniel Xu" <dxu@dxuuu.xyz>
-To: "Alexander Lobakin" <aleksander.lobakin@intel.com>
-Cc: "Lorenzo Bianconi" <lorenzo@kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "Jakub Kicinski" <kuba@kernel.org>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>,
- "David Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
- "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>
-Message-Id: <a2ebba59-bf19-4bb9-9952-c2f63123b7cd@app.fastmail.com>
-In-Reply-To: <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
-References: <cover.1726480607.git.lorenzo@kernel.org>
- <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
- <ZwZe6Bg5ZrXLkDGW@lore-desk> <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
- <ZwZ7fr_STZStsnln@lore-desk> <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
- <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
- <01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
- <b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
- <rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
- <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+When netem is used with a child qdisc, the child qdisc can use
+'qdisc_tree_reduce_backlog' to inform its parent, netem, about created or
+dropped SKBs. This function updates 'qlen' and the backlog statistics of
+netem, but netem does not account for changes made by a child qdisc. If a
+child qdisc creates new SKBs during enqueue and informs its parent about
+this, netem's 'qlen' value is increased. When netem dequeues the newly
+created SKBs from the child, the 'qlen' in netem is not updated. If 'qlen'
+reaches the configured limit, the enqueue function stops working, even
+though the tfifo is not full.
 
+Reproduce the bug:
+Ensure that the sender machine has GSO enabled. Configure netem as root
+qdisc and tbf as its child on the outgoing interface of the machine
+as follows:
+$ tc qdisc add dev <oif> root handle 1: netem delay 100ms limit 100
+$ tc qdisc add dev <oif> parent 1:0 tbf rate 50Mbit burst 1542 latency 50ms
 
-On Mon, Nov 25, 2024, at 9:12 AM, Alexander Lobakin wrote:
-> From: Daniel Xu <dxu@dxuuu.xyz>
-> Date: Fri, 22 Nov 2024 17:10:06 -0700
->
->> Hi Olek,
->> 
->> Here are the results.
->> 
->> On Wed, Nov 13, 2024 at 03:39:13PM GMT, Daniel Xu wrote:
->>>
->>>
->>> On Tue, Nov 12, 2024, at 9:43 AM, Alexander Lobakin wrote:
->
-> [...]
->
->> Baseline (again)
->> 
->> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
->> Run 1	3169917	        0.00007295	0.00007871	0.00009343		Run 1	21749.43
->> Run 2	3228290	        0.00007103	0.00007679	0.00009215		Run 2	21897.17
->> Run 3	3226746	        0.00007231	0.00007871	0.00009087		Run 3	21906.82
->> Run 4	3191258	        0.00007231	0.00007743	0.00009087		Run 4	21155.15
->> Run 5	3235653	        0.00007231	0.00007743	0.00008703		Run 5	21397.06
->> Average	3210372.8	0.000072182	0.000077814	0.00009087		Average	21621.126
->> 
->> cpumap v2 Olek
->> 
->> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
->> Run 1	3253651	        0.00007167	0.00007807	0.00009343		Run 1	13497.57
->> Run 2	3221492	        0.00007231	0.00007743	0.00009087		Run 2	12115.53
->> Run 3	3296453	        0.00007039	0.00007807	0.00009087		Run 3	12323.38
->> Run 4	3254460	        0.00007167	0.00007807	0.00009087		Run 4	12901.88
->> Run 5	3173327	        0.00007295	0.00007871	0.00009215		Run 5	12593.22
->> Average	3239876.6	0.000071798	0.00007807	0.000091638		Average	12686.316
->> Delta	0.92%	        -0.53%	        0.33%	        0.85%			        -41.32%
->> 
->> 
->> It's very interesting that we see -40% tput w/ the patches. I went back
->
-> Oh no, I messed up something =\
->
-> Could you please also test not the whole series, but patches 1-3 (up to
-> "bpf:cpumap: switch to GRO...") and 1-4 (up to "bpf: cpumap: reuse skb
-> array...")? Would be great to see whether this implementation works
-> worse right from the start or I just broke something later on.
+Send bulk TCP traffic out via this interface, e.g., by running an iPerf3
+client on the machine. Check the qdisc statistics:
+$ tc -s qdisc show dev <oif>
 
-Patches 1-3 reproduces the -40% tput numbers. 
+tbf segments the GSO SKBs (tbf_segment) and updates the netem's 'qlen'.
+The interface fully stops transferring packets and "locks". In this case,
+the child qdisc and tfifo are empty, but 'qlen' indicates the tfifo is at
+its limit and no more packets are accepted.
 
-With patches 1-4 the numbers get slightly worse (~1gbps lower) but it was noisy.
+This patch adds a counter for the entries in the tfifo. Netem's 'qlen' is
+only decreased when a packet is returned by its dequeue function, and not
+during enqueuing into the child qdisc. External updates to 'qlen' are thus
+accounted for and only the behavior of the backlog statistics changes.
+This statistics now show the total number/length of SKBs held in the tfifo
+and in the child qdisc. (Note: the 'backlog' byte-statistic of netem is
+incorrect in the example above even after the patch is applied due to a
+bug in tbf. See my previous patch ([PATCH] net/sched: tbf: correct backlog
+statistic for GSO packets)).
 
-tcp_rr results were unaffected.
+Signed-off-by: Martin Ottens <martin.ottens@fau.de>
+---
+ net/sched/sch_netem.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-Thanks,
-Daniel
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index fe6fed291a7b..71ec9986ed37 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -79,6 +79,8 @@ struct netem_sched_data {
+ 	struct sk_buff	*t_head;
+ 	struct sk_buff	*t_tail;
+ 
++	u32 t_len;
++
+ 	/* optional qdisc for classful handling (NULL at netem init) */
+ 	struct Qdisc	*qdisc;
+ 
+@@ -383,6 +385,7 @@ static void tfifo_reset(struct Qdisc *sch)
+ 	rtnl_kfree_skbs(q->t_head, q->t_tail);
+ 	q->t_head = NULL;
+ 	q->t_tail = NULL;
++	q->t_len = 0;
+ }
+ 
+ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
+@@ -412,6 +415,7 @@ static void tfifo_enqueue(struct sk_buff *nskb, struct Qdisc *sch)
+ 		rb_link_node(&nskb->rbnode, parent, p);
+ 		rb_insert_color(&nskb->rbnode, &q->t_root);
+ 	}
++	q->t_len++;
+ 	sch->q.qlen++;
+ }
+ 
+@@ -518,7 +522,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 			1<<get_random_u32_below(8);
+ 	}
+ 
+-	if (unlikely(sch->q.qlen >= sch->limit)) {
++	if (unlikely(q->t_len >= sch->limit)) {
+ 		/* re-link segs, so that qdisc_drop_all() frees them all */
+ 		skb->next = segs;
+ 		qdisc_drop_all(skb, sch, to_free);
+@@ -702,8 +706,8 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
+ tfifo_dequeue:
+ 	skb = __qdisc_dequeue_head(&sch->q);
+ 	if (skb) {
+-		qdisc_qstats_backlog_dec(sch, skb);
+ deliver:
++		qdisc_qstats_backlog_dec(sch, skb);
+ 		qdisc_bstats_update(sch, skb);
+ 		return skb;
+ 	}
+@@ -719,8 +723,7 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
+ 
+ 		if (time_to_send <= now && q->slot.slot_next <= now) {
+ 			netem_erase_head(q, skb);
+-			sch->q.qlen--;
+-			qdisc_qstats_backlog_dec(sch, skb);
++			q->t_len--;
+ 			skb->next = NULL;
+ 			skb->prev = NULL;
+ 			/* skb->dev shares skb->rbnode area,
+@@ -747,16 +750,21 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
+ 					if (net_xmit_drop_count(err))
+ 						qdisc_qstats_drop(sch);
+ 					qdisc_tree_reduce_backlog(sch, 1, pkt_len);
++					sch->qstats.backlog -= pkt_len;
++					sch->q.qlen--;
+ 				}
+ 				goto tfifo_dequeue;
+ 			}
++			sch->q.qlen--;
+ 			goto deliver;
+ 		}
+ 
+ 		if (q->qdisc) {
+ 			skb = q->qdisc->ops->dequeue(q->qdisc);
+-			if (skb)
++			if (skb) {
++				sch->q.qlen--;
+ 				goto deliver;
++			}
+ 		}
+ 
+ 		qdisc_watchdog_schedule_ns(&q->watchdog,
+@@ -766,8 +774,10 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
+ 
+ 	if (q->qdisc) {
+ 		skb = q->qdisc->ops->dequeue(q->qdisc);
+-		if (skb)
++		if (skb) {
++			sch->q.qlen--;
+ 			goto deliver;
++		}
+ 	}
+ 	return NULL;
+ }
+-- 
+2.39.5
+
 
