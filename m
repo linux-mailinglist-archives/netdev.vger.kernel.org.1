@@ -1,254 +1,276 @@
-Return-Path: <netdev+bounces-147192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CBF9D8243
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:31:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C47E9D82AB
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:40:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0919D1635C5
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E13FA2824AA
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D7E19007F;
-	Mon, 25 Nov 2024 09:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2494E1917D7;
+	Mon, 25 Nov 2024 09:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2wiZF0Tn"
+	dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b="tQga0QCl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.183.29.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51CB1632DF
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 09:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732527054; cv=none; b=DoLUKIFLxP2Dh6Em5TCbz/WMoyZJC/QMUszxfYXsqHC37m9bXZJMsOpMwnuGUIWX8ZX+/Ide2JbLjlHM4G1rnAVm8+6922Qh9jO6TR3AbkxQwoxy6E5nzGeFw3vYWPzG2Vhnmt5pZT9xS3FaI/TjAK22vLrnnfI3rr58QMs7f20=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732527054; c=relaxed/simple;
-	bh=ZtPt/UBZ3b3Nbp++xWu2QVjOgBChbNfguNY55juEKU0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uATKOdg4oGGRa218qKxloKiS7NDDOLz806QfXbO3rhtRelv0jeiXV8Rg64qk0+zY1YPtLDuK33DVOHyKuhawyCCRaaJ8XGGvggT+4s24Eb3DGAV9C78MwOB2t7JhBoa58mdYHxyoAdzolWsmVaEHb9R8nN+bSmPgC+fmk6+eOuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2wiZF0Tn; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e38f6630bbbso4542421276.3
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 01:30:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81A618C92F
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 09:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=185.183.29.34
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732527562; cv=fail; b=VLjSuPelPE2FusE4Ks3eFHmT5ad4JprKE5Wrrs20vqVOUxWAXvUk/4l6W4PPNesaddBbhpgDDOQ+OutNME7aZQIh/6QeThHrkQIC8is5etQ2lLcP2yR2AQLjDcWB/wK7nfiMRs01AoabWBK9Xi8qbqk486mQdyXxO38V9YjbZ+E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732527562; c=relaxed/simple;
+	bh=ZV0208b5mC5WJf5eMQhrTqm+FYhc+bIClLLL2D5jIvo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GOzw5vPgHP/Viz6ApWDCrrkuN1x0EWpErWIOwBuPAR8shyoA4uW41o0IRZ0my0aCDyfxCnjfq/L22Zbn+GOOGxzT5UNLHj3Nh/s/9nm1SLvu9kdKUJayYGuOCp0kxaRzJPpaCjS1v88cUh0QJPN2O2WUM+tTDd2vD0r5xyU7Uz0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com; spf=pass smtp.mailfrom=drivenets.com; dkim=pass (1024-bit key) header.d=drivenets.onmicrosoft.com header.i=@drivenets.onmicrosoft.com header.b=tQga0QCl; arc=fail smtp.client-ip=185.183.29.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=drivenets.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=drivenets.com
+Received: from dispatch1-eu1.ppe-hosted.com (ip6-localhost [127.0.0.1])
+	by dispatch1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 6267081ED0
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 09:31:23 +0000 (UTC)
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02lp2235.outbound.protection.outlook.com [104.47.11.235])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 6183C1C005D;
+	Mon, 25 Nov 2024 09:31:15 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xZdgJuYPukr0qarHa8HvFWuow1Q6mSX2pE3gDTTH7R7XGSMHBx9wBjHvRoQ6FyVJdfEvWR76PmdGs4k54NX+b6UvFsVOt32EXbAYhjpmQPsb5hsrPk/GfyA0ESFSyqXpL/AoasSbCy0H1K7w5dw5PH99TUN69i1C/wna6/KeVBMrSs7a61zSENrmv3OWVKYZ0E2koUnjqbsJSqt2fwy8sbKZOT2N0myFXoU7m1oTSv6adaKyXs4HGpRYREJ/8UHCM+AddtZbff6IypYiim3id0qH8/4L6Ao2yT+y4LrUEvZ0j/NdKNEvAmVAyv2fZoLthXscyyfBqrvihRHl2awaKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WMLxCGHZ4JQ2BMjZTZNVM3+bzUd7NN1aLj29DsF1oMs=;
+ b=kD3jqx3nQyQfMpYwObYAmFaL8JN43EIF06R2cz60WV38jh6Z4q0DELpk3ps4tmfEqIYMON3Ah17yP7a3aAeKMpcrREtE3LbjaBdLSA0EcoVSmR+VdzQWyTqZkXGslmaLjvoJia9j8u8eXsmuCOjI559PFagjm3h8Coye3bGKSiqqm1hst0k81awedk/IaVhAkk92n62afOeVJFsvXYsYJHtUkutC7Jk3JW6PPVpWopd64G9FZqFRsjJz75+6XU4/mrKt54DSdFU0waX2AKuBcW9DzNfbZVqdWlzWJqxCVh8yMIatyK5+MUtVOc17jefYZNjfGcurTHrRHgxOO6jecw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=drivenets.com; dmarc=pass action=none
+ header.from=drivenets.com; dkim=pass header.d=drivenets.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732527051; x=1733131851; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ApPaAaGFSQyE0Se/uKc7zLiWZe8QY3BPqqAd3tdeyUA=;
-        b=2wiZF0TncU40P3kTYWnTkamLxz72/FcBoiK6YgzUUi/cAIwRmIFyvM3lQ7nWkV51/5
-         sNXFtI7fo6DOKWQzS7mIs4F28qDg7CYciEG+IawZNJYQCYifROOB/QnISDXG2hH0U1DS
-         7H17nVBB2MlpzXPT44Cyxr6cO+hIaNxONfDVJ0OiD3c1bXr4lXv4WWEeKfapuFG7nKTb
-         jDI39A7gGMB8UrvB8FacC7BBTQC57S8D6LaoNcZhDQNpHRSpRR+thPgVBJPioAZmxd53
-         C+bFRTrmME5E9/M2GTZu58BXuEIKRo5Mh7hAk+BEBvL6qB72+9knt+oy9vrsNJTugqdM
-         sOZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732527051; x=1733131851;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ApPaAaGFSQyE0Se/uKc7zLiWZe8QY3BPqqAd3tdeyUA=;
-        b=qeMxUC9WKCc9SaXu6tDe1qwDs4cBd8jSV68vDq9o5FDtFgEAeV4Pccy8wBeDeScGaf
-         wBJkZcpe9miS2m5o8q0yQksUIhlCqdvPkPs3kH5wimjNkw8Ayvy0BBRseHjqoLyHH1kB
-         LurNWhmzi1cqQ/5a6DXw60SZTgnyEtpMZ6Hyv7DRo7BRbIP9b7ErdWtluOVRRtH3B6EK
-         0PC1C8JCZqUT++u/RC/P77nbhRjwVyApN+wAQmu2u+vI9Cj34hx54hevDM7Wnm3JA//b
-         ZTDSD7bi4zYa5ZSZKWYuqaGTLDEexYfz43ckXiTrHMVKUXjVbAKRet9JRX1ibLWtasxW
-         W+kw==
-X-Gm-Message-State: AOJu0YyRX6tb51SgNvSANto/s8Lg2FKjwVi2c3m8xgrl20JTbL2gnqza
-	AhsykcHzFBvsi8c/nrKM1mawY+QuR83Vng+TnCYukfJQsHSjnaf8ymY6Vgyl/RULhOX5gaS/d4w
-	htuJKR7SlFA==
-X-Google-Smtp-Source: AGHT+IGa5VwBBQWVDfwFs33uNLqJ5lb9ZFyttFeOFxykfPOCNn3t6rJS64KruF5MQDrFHDbv3PdwqKg8AnKdcA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:adc6:0:b0:e38:c40b:a0a9 with SMTP id
- 3f1490d57ef6-e38f8bde03bmr5467276.5.1732527051420; Mon, 25 Nov 2024 01:30:51
- -0800 (PST)
-Date: Mon, 25 Nov 2024 09:30:39 +0000
+ d=drivenets.onmicrosoft.com; s=selector2-drivenets-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WMLxCGHZ4JQ2BMjZTZNVM3+bzUd7NN1aLj29DsF1oMs=;
+ b=tQga0QCl2r3rfs4Q6iBGiIC07Wb3dGRCLSx6mTYXCGOuFzHA7CPy0VFzezoY/cVecd7mU4l0QxKz+hld18h/DRcWy6B8AUmFlM3KMkoY9ISBFZB6w2CUVBP/UU6T1qOj4+cTMVDIm3FTLuBGsdDsAgdHCrm1dVR0iASVAlvroBQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=drivenets.com;
+Received: from DB8PR08MB5388.eurprd08.prod.outlook.com (2603:10a6:10:11c::7)
+ by VI1PR08MB10148.eurprd08.prod.outlook.com (2603:10a6:800:1bc::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.20; Mon, 25 Nov
+ 2024 09:31:11 +0000
+Received: from DB8PR08MB5388.eurprd08.prod.outlook.com
+ ([fe80::29dd:6773:4977:dc4e]) by DB8PR08MB5388.eurprd08.prod.outlook.com
+ ([fe80::29dd:6773:4977:dc4e%6]) with mapi id 15.20.8182.019; Mon, 25 Nov 2024
+ 09:31:11 +0000
+From: Gilad Naaman <gnaaman@drivenets.com>
+To: kuba@kernel.org
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] ipv6: Avoid invoking addrconf_verify_rtnl unnecessarily
+Date: Mon, 25 Nov 2024 09:30:54 +0000
+Message-Id: <20241125093054.3014390-1-gnaaman@drivenets.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241118182004.5d38fac2@kernel.org>
+References: <20241118182004.5d38fac2@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO0P265CA0008.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:355::11) To DB8PR08MB5388.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.371.ga323438b13-goog
-Message-ID: <20241125093039.3095790-1-edumazet@google.com>
-Subject: [PATCH net] tcp: populate XPS related fields of timewait sockets
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+8b0959fc16551d55896b@syzkaller.appspotmail.com, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Brian Vazquez <brianvv@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB8PR08MB5388:EE_|VI1PR08MB10148:EE_
+X-MS-Office365-Filtering-Correlation-Id: b8d0148d-27a8-4559-a9ca-08dd0d33e5eb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?VdeHkcvJAyFHPBUs38Yy0zhkgmowXPZqkllrSTdndKXwvVUShP+NApUmJfsp?=
+ =?us-ascii?Q?7Sxa7fqCXeyGSuMNqE43wxiiMxUDG3yvJmk0CQHvCud0Conz0GDAqEAPZkAl?=
+ =?us-ascii?Q?V/TB/VMXOfS281WtCiIUrWFzd52f3LJ/wkpzsCb9nrORhsqz4+HF5xfRAJWm?=
+ =?us-ascii?Q?In9F2o5m8fKOvrIU/g5xAousIo8+vbuMKuw4dyYCGDheVUi3SS0XmUhLPgLM?=
+ =?us-ascii?Q?YIOsg8YRhnqbmDLh6MKjxt+oIxaOujMce6Bpln1XRXPRm1XI5pM7PfNHamfZ?=
+ =?us-ascii?Q?L5NbFWGApqtgwQ0/BSSKxs0P8M5a2jaAVtZmQDLouWsRgeohcr2R8/qzIhwA?=
+ =?us-ascii?Q?s/Pn/QY6YPmAyneutUY/kNCVKDNMW+Z8ZKhvyaRXEO+3heDCCrE4TxqTRDxm?=
+ =?us-ascii?Q?QlbTbfr1bseKkjrrjgmAexVWumeSr2jotzFBHIkesRkDF40ffFYKlfpMw6MN?=
+ =?us-ascii?Q?Q32irNaoJ7A7xJPchx6uZmvQQJKYkCixPP71Bi8+FHNJcKZBWQPSSC9QRKcS?=
+ =?us-ascii?Q?9oz3eUO3YmNx6sNApU3mnkKSAAa5hGHnQoUTrnyNH+HQ7KzRw8IcM2YxmOec?=
+ =?us-ascii?Q?6ZX96n0myDjlAOKwiXxK3ow4n0UVJe7nRWK3vV1+Pm1PWn7bpo3qC6lYMWMO?=
+ =?us-ascii?Q?+kcZC7t7wgbhFFm3YhtGLjVEDMzxxnGTXDPRUfBeCI7kO/6CJpepfBket+oB?=
+ =?us-ascii?Q?FmBjRxcdTZYXsuBhy6I1L17EfkUiPgL0X8XwWLs9RisdoqssOgtlfUvn+ySI?=
+ =?us-ascii?Q?oSssp/EAW1DBXF0NaeOYMsVFSbnqKdJLJSI4evvqXvGJfE6C+b+TTWf8yAH5?=
+ =?us-ascii?Q?XLjC6tE5tvNgKaUWtLsz/PET8ODiVMHx2ZVkjFHc8e8GvbQY7vHIzX9Mwnpf?=
+ =?us-ascii?Q?n2IZRZYaQPxe1lEldw7pG9ro/tfqseaMIKqECxOhSanVpFEwszgAcPNV+ZyA?=
+ =?us-ascii?Q?aeCQJSTs7Dql/K3F5VciOivK7JL8+csl3/KvFw+tUszq44k9SDxRCYTARz2g?=
+ =?us-ascii?Q?uPDhPNhbC0tuFrMJTgiQOUiLvN8WSy7ulwzx7Fz0UP2Mr2FvsbgpA7WcMSSe?=
+ =?us-ascii?Q?uC5f+JATOZNyUiDDiXc14uXhFq+fsQBSZcKZLyHrI/DDXHgz2a6pEhlZ1O6L?=
+ =?us-ascii?Q?sliAJVT32JwKiAVwNf2tDm+NoU1rHYzCFg+eStLr7TzUj83tynwXEmcE+hDy?=
+ =?us-ascii?Q?V42SuevIH9KJRhv1OZSigZrPPIiIaVlKpP5xCnDf4GwVCiF8GDTsYKqt6ixS?=
+ =?us-ascii?Q?MAZH26dZiJc/1IALr7MoOisjUFQytwHbguyUzu1qeB4DfgM9jo5Y5jW7vFoA?=
+ =?us-ascii?Q?tJG7TBOLNaNuUi3HGxiOXlPsPxwJI/8UXmeozGA0EYleiJucxYzHbmniLgZO?=
+ =?us-ascii?Q?XLZB6J4gVlVc5EMNpWvoA+j1wiMvfuFIRZxsViPNphADJrKAHA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR08MB5388.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?r+JxyIyiQHLi008zCChJ+4G0YYWozq4w0oPca+5fiCMsTNj4nmlT9WCg28GW?=
+ =?us-ascii?Q?sB/uV/tJZHbmUP/b7xGfG0zybbxqGbWA+yz7psc9ES71JEEAJmiDSDXb6KpJ?=
+ =?us-ascii?Q?BdrFa+WpLbd9StsTT+I/2sxwTDsRyMGch10AUEE19xjNrAoyq1vNHH8uKLN4?=
+ =?us-ascii?Q?a+gWY2GKYpFAmpXf5uEc52HSpkSr9sMvaYlAIpx764aJ7inHVGnBwCYLVGGg?=
+ =?us-ascii?Q?Y6nuWhDaW9b3e2kLQ2aZzpEFhpejuiL4ki5XjjL7rUJ5L07lFxbE7HrrAKz1?=
+ =?us-ascii?Q?dCF7JEi2eruimdvpBTYbWXETFX/mR2V0h7rzWAGutcn+GiNo8A9yWzTBxJ+b?=
+ =?us-ascii?Q?BDFn2zNp9kTxYaGAQBfX2aoLslfQY2f0uOKASm688n+kxmlezP8zQM6JbmV/?=
+ =?us-ascii?Q?6xNsjEc/TnowDEpAe0zfAmyhvJGtNv+GWHCvF2qh7TMGZfVSHJjN8343n0j3?=
+ =?us-ascii?Q?r1nKv7TF2mI5eL5ZA+44S8C0dF+R3fA2qlyLa5ZEx1dgw+jgEyxTabPMBcnh?=
+ =?us-ascii?Q?3kFyn8R5WzahIu/w9x+9/3XbsyPLfVUbXANK2Bf4SiLk2rGgSK+cluErj1Hw?=
+ =?us-ascii?Q?6UvlV1OZqpc3mBaJW8w2cE/nLG0EJVTe00MmBE/yLTEK5eFBauUpFWIfKfBR?=
+ =?us-ascii?Q?3ZSyAk30FvQWQwx9jySg3TTFkt0V5EKxhLO+ENTiK42AVSVAqQLDMd71ZYHT?=
+ =?us-ascii?Q?FFds/iBesoHo4acokRQ9ELJMuWJiHgsqNW4nlkdbyKpIPrPosjlfcH36jg/3?=
+ =?us-ascii?Q?r5zxrhSw7tOjccbAVbgoiaIox0zuUnvh3DKDKlL2SN3hlW/G0DPE436PqNfz?=
+ =?us-ascii?Q?c9lbyUk23ZsgOCPA4PfcRjSzfw2w6F7nP1Dr1YrUjEny+RPa74Ve6mnXRloV?=
+ =?us-ascii?Q?V+4oQnbBtZUxm4cp3DbvL45zcMW25ExX2wgBLF6LJAZLukihAe1aF21e0VaN?=
+ =?us-ascii?Q?qhJJ4qGK7vN6XaEcgOU0wOGHIEXbbF25VD/YtC6Moa88Y323TXoE94s/yB/c?=
+ =?us-ascii?Q?tAeiR2CaKKgTIja9BeeFEam0g5BOHlG8sJp/Gq82rcvaoVxDjKIxFZkPQhDC?=
+ =?us-ascii?Q?ljk+yuV4NCSyFKaBbOY+kviXEqPe7Oj233sVNQ+DksWhKa3BhYrXPwmf/U70?=
+ =?us-ascii?Q?XTuccfDJMjLaH/ttKQC6P1hoa28wA1F4fUHPHSP7l6Eqfvcr92O4Hqm7IwLr?=
+ =?us-ascii?Q?LzQsG/6RWrJsXEA+6EXGH6Jvuru2IKjiBvW6VZ8hc533BOt0NhhKWIE8gRb0?=
+ =?us-ascii?Q?qyfNIZAtDtz4icyEy5pDp6e8I7IqoLuAq8lK0KcPESB2MeQReE6paJS0MauV?=
+ =?us-ascii?Q?Wf6LPCMX2GP1+sLprUW5HKTeMLUXC4POgaew7HJlIM0Wdf8ytkMbPflMrCuL?=
+ =?us-ascii?Q?55ZAydKnBj6Lq2UutPpJUBMSPgsgz94C7+Lsg4zA17RSUyJaBj5RP6IC0bXA?=
+ =?us-ascii?Q?qH+3Aewj/p6HhNgGR2ab50dY/lLQOQGaLi+j74/egEfZvL0wRlIxBbMYT2TA?=
+ =?us-ascii?Q?IcDWks4ZI7P2+K4JDlvo8fysTp/rpRHxekjZ2U7yHzeN2CvivUxG2KdQtvc3?=
+ =?us-ascii?Q?qZpNhx51nMipGxXPaj0K6RSc8mT+vJB0ZHUu50/jkBK0Jcl7IhnOwv2l7PFh?=
+ =?us-ascii?Q?Tw=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	cI9Bnk30eaoOIEj4JkXf0ZsanVDcNWismUbWfQKd/lZihmTYRIE94nbOa4RZ939wyEYqErq9ncFT78X386AthPC5ec64u6WzQz8wWeaDOLYWJxkAghbezYCINH3BhOM2HO/f0jDaqf34aOHzAY+U+EfIcBgZl3GylxKrw3Sl0LcC8+TWJrr/T8ZWT3wPjbQ9tnc/PGRa6dcBSIJOwZabpPPwCBySF+mIwBu5dBihxK/hFNN4YP5UPCB32r7mbMbtQd43J5HlS4dH1vO1JIFGB3wNznzVLC45QDt3qe3wOkonLw8hyQG5J6y94QRBAi9al0A7hLXwp0+YThxEy78X3GkFW/45WM+YnjvOse5rRdyfWHw/GfNZZkaJ8PNS0lpCh2M85wJDXSt5KBJhJM9jhYbg9bF7soL7A/Mjp5DUjYk9h4XSPl0NCJeflo/fHef58Y+fqR/yt869iEo2RKY4ZgbCeslrxdhUJvqTvhHm2JmFVJVpHaXG0EsZ88JEGEQ5q9a9eQYCV6rcyrtK6rgmUwX0+Prtt2RyOYOEjvnEYDBm1yKFmEXAtfQZQiu6X/vtunUBvtGb63Dnwv8EYTDuZ8ZzdyeIsmOrMmfTQecsT5rEnwyRMMl+AL6WI7kzGiwL
+X-OriginatorOrg: drivenets.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8d0148d-27a8-4559-a9ca-08dd0d33e5eb
+X-MS-Exchange-CrossTenant-AuthSource: DB8PR08MB5388.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2024 09:31:11.0150
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 662f82da-cf45-4bdf-b295-33b083f5d229
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H3KJiCGOMlLJxLRteJC49RjqOYTnbJUavfJzpEAHeg/w9O2kjcEfJimTMtoyOtegY5syGVgXA8vNxQ9zNt8Myw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB10148
+X-MDID: 1732527076-ap0yRC0XAHzZ
+X-MDID-O:
+ eu1;ams;1732527076;ap0yRC0XAHzZ;<gnaaman@drivenets.com>;734049c21285abfbb55dd56ad4f9dd58
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
-syzbot reported that netdev_core_pick_tx() was reading an unitialized
-field [1].
+> On Mon, 11 Nov 2024 17:16:07 +0000 Gilad Naaman wrote:
+> > Do not invoke costly `addrconf_verify_rtnl` if the added address
+> > wouldn't need it, or affect the delayed_work timer.
+> > 
+> > Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
+> > ---
+> > addrconf_verify_rtnl() deals with either management/temporary (Security)
+> > addresses, or with addresses that have some kind of lifetime.
+> > 
+> > This patches makes it so that ops on addresses that are permanent would
+> > not trigger this function.
+> > 
+> > This does wonders in our use-case of modifying a lot of (~24K) static
+> > addresses, since it turns the addition or deletion of addresses to an
+> > amortized O(1), instead of O(N).
+> > 
+> > Modification of management addresses or "non-permanent" (not sure what
+> > is the correct jargon) addresses are still slow.
+> > 
+> > We can improve those in the future, depending on the case:
+> > 
+> > If the function is called only to handle cases where the scheduled work should
+> > be called earlier, I think this would be better served by saving the next
+> > expiration and equating to it, since it would save iteration of the
+> > table.
+> > 
+> > If some upkeep *is* needed (e.g. creating a temporary address)
+> > I Think it is possible in theory make these modifications faster as
+> > well, if we only iterate `idev->if_addrs` as a response for a
+> > modification, since it doesn't seem to me like there are any
+> > cross-device effects.
+> > 
+> > I opted to keep this patch simple and not solve this, on the assumption
+> > that there aren't many users that need this scale.
+> 
+> I'd rather you put too much in the commit message than too little.
+> Move more (all?) of this above the --- please.
 
-This is indeed hapening for timewait sockets after recent commits.
+No problem, will do :)
+I thought that most of the text is a bit speculative and describes
+changes I didn't end up making, but I see the value in including it.
 
-We can copy the original established socket sk_tx_queue_mapping
-and sk_rx_queue_mapping fields, instead of adding more checks
-in fast paths.
+> 
+> > diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> > index d0a99710d65d..12fdabb1deba 100644
+> > --- a/net/ipv6/addrconf.c
+> > +++ b/net/ipv6/addrconf.c
+> > @@ -3072,8 +3072,7 @@ static int inet6_addr_add(struct net *net, int ifindex,
+> >  		 */
+> >  		if (!(ifp->flags & (IFA_F_OPTIMISTIC | IFA_F_NODAD)))
+> >  			ipv6_ifa_notify(0, ifp);
+> > -		/*
+> > -		 * Note that section 3.1 of RFC 4429 indicates
+> > +		/* Note that section 3.1 of RFC 4429 indicates
+> >  		 * that the Optimistic flag should not be set for
+> >  		 * manually configured addresses
+> >  		 */
+> > @@ -3082,7 +3081,15 @@ static int inet6_addr_add(struct net *net, int ifindex,
+> >  			manage_tempaddrs(idev, ifp, cfg->valid_lft,
+> >  					 cfg->preferred_lft, true, jiffies);
+> >  		in6_ifa_put(ifp);
+> > -		addrconf_verify_rtnl(net);
+> > +
+> > +		/* Verify only if this address is perishable or has temporary
+> > +		 * offshoots, as this function is too expansive.
+> > +		 */
+> > +		if ((cfg->ifa_flags & IFA_F_MANAGETEMPADDR) ||
+> > +		    !(cfg->ifa_flags & IFA_F_PERMANENT) ||
+> > +		    cfg->preferred_lft != INFINITY_LIFE_TIME)
+> 
+> Would be very useful for readability to extract the condition into 
+> some helper. If addrconf_verify_rtnl() also used that same helper
+> reviewing this patch would be trivial..
 
-As a bonus, packets will use the same transmit queue than
-prior ones, this potentially can avoid reordering.
+Good idea.
 
-[1]
-BUG: KMSAN: uninit-value in netdev_pick_tx+0x5c7/0x1550
- netdev_pick_tx+0x5c7/0x1550
-  netdev_core_pick_tx+0x1d2/0x4a0 net/core/dev.c:4312
-  __dev_queue_xmit+0x128a/0x57d0 net/core/dev.c:4394
-  dev_queue_xmit include/linux/netdevice.h:3168 [inline]
-  neigh_hh_output include/net/neighbour.h:523 [inline]
-  neigh_output include/net/neighbour.h:537 [inline]
-  ip_finish_output2+0x187c/0x1b70 net/ipv4/ip_output.c:236
- __ip_finish_output+0x287/0x810
-  ip_finish_output+0x4b/0x600 net/ipv4/ip_output.c:324
-  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-  ip_output+0x15f/0x3f0 net/ipv4/ip_output.c:434
-  dst_output include/net/dst.h:450 [inline]
-  ip_local_out net/ipv4/ip_output.c:130 [inline]
-  ip_send_skb net/ipv4/ip_output.c:1505 [inline]
-  ip_push_pending_frames+0x444/0x570 net/ipv4/ip_output.c:1525
-  ip_send_unicast_reply+0x18c1/0x1b30 net/ipv4/ip_output.c:1672
-  tcp_v4_send_reset+0x238d/0x2a40 net/ipv4/tcp_ipv4.c:910
-  tcp_v4_rcv+0x48f8/0x5750 net/ipv4/tcp_ipv4.c:2431
-  ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
-  ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
-  dst_input include/net/dst.h:460 [inline]
-  ip_sublist_rcv_finish net/ipv4/ip_input.c:578 [inline]
-  ip_list_rcv_finish net/ipv4/ip_input.c:628 [inline]
-  ip_sublist_rcv+0x15f3/0x17f0 net/ipv4/ip_input.c:636
-  ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:670
-  __netif_receive_skb_list_ptype net/core/dev.c:5715 [inline]
-  __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5762
-  __netif_receive_skb_list net/core/dev.c:5814 [inline]
-  netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:5905
-  gro_normal_list include/net/gro.h:515 [inline]
-  napi_complete_done+0x3d4/0x810 net/core/dev.c:6256
-  virtqueue_napi_complete drivers/net/virtio_net.c:758 [inline]
-  virtnet_poll+0x5d80/0x6bf0 drivers/net/virtio_net.c:3013
-  __napi_poll+0xe7/0x980 net/core/dev.c:6877
-  napi_poll net/core/dev.c:6946 [inline]
-  net_rx_action+0xa5a/0x19b0 net/core/dev.c:7068
-  handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:554
-  __do_softirq kernel/softirq.c:588 [inline]
-  invoke_softirq kernel/softirq.c:428 [inline]
-  __irq_exit_rcu+0x68/0x180 kernel/softirq.c:655
-  irq_exit_rcu+0x12/0x20 kernel/softirq.c:671
-  common_interrupt+0x97/0xb0 arch/x86/kernel/irq.c:278
-  asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:693
-  __preempt_count_sub arch/x86/include/asm/preempt.h:84 [inline]
-  kmsan_virt_addr_valid arch/x86/include/asm/kmsan.h:95 [inline]
-  virt_to_page_or_null+0xfb/0x150 mm/kmsan/shadow.c:75
-  kmsan_get_metadata+0x13e/0x1c0 mm/kmsan/shadow.c:141
-  kmsan_get_shadow_origin_ptr+0x4d/0xb0 mm/kmsan/shadow.c:102
-  get_shadow_origin_ptr mm/kmsan/instrumentation.c:38 [inline]
-  __msan_metadata_ptr_for_store_4+0x27/0x40 mm/kmsan/instrumentation.c:93
-  rcu_preempt_read_enter kernel/rcu/tree_plugin.h:390 [inline]
-  __rcu_read_lock+0x46/0x70 kernel/rcu/tree_plugin.h:413
-  rcu_read_lock include/linux/rcupdate.h:847 [inline]
-  batadv_nc_purge_orig_hash net/batman-adv/network-coding.c:408 [inline]
-  batadv_nc_worker+0x114/0x19e0 net/batman-adv/network-coding.c:719
-  process_one_work kernel/workqueue.c:3229 [inline]
-  process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3310
-  worker_thread+0xea7/0x14f0 kernel/workqueue.c:3391
-  kthread+0x3e2/0x540 kernel/kthread.c:389
-  ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> > +			addrconf_verify_rtnl(net);
+> > +
+> >  		return 0;
+> >  	} else if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+> >  		ipv6_mc_config(net->ipv6.mc_autojoin_sk, false,
+> > @@ -3099,6 +3106,7 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
+> >  	struct inet6_ifaddr *ifp;
+> >  	struct inet6_dev *idev;
+> >  	struct net_device *dev;
+> > +	int is_mgmt_tmp;
+> 
+> The flag naming isn't super clear, but it's manageD, not manageMENT,
+> as in "managed by the kernel".
 
-Uninit was created at:
-  __alloc_pages_noprof+0x9a7/0xe00 mm/page_alloc.c:4774
-  alloc_pages_mpol_noprof+0x299/0x990 mm/mempolicy.c:2265
-  alloc_pages_noprof+0x1bf/0x1e0 mm/mempolicy.c:2344
-  alloc_slab_page mm/slub.c:2412 [inline]
-  allocate_slab+0x320/0x12e0 mm/slub.c:2578
-  new_slab mm/slub.c:2631 [inline]
-  ___slab_alloc+0x12ef/0x35e0 mm/slub.c:3818
-  __slab_alloc mm/slub.c:3908 [inline]
-  __slab_alloc_node mm/slub.c:3961 [inline]
-  slab_alloc_node mm/slub.c:4122 [inline]
-  kmem_cache_alloc_noprof+0x57a/0xb20 mm/slub.c:4141
-  inet_twsk_alloc+0x11f/0x9d0 net/ipv4/inet_timewait_sock.c:188
-  tcp_time_wait+0x83/0xf50 net/ipv4/tcp_minisocks.c:309
- tcp_rcv_state_process+0x145a/0x49d0
-  tcp_v4_do_rcv+0xbf9/0x11a0 net/ipv4/tcp_ipv4.c:1939
-  tcp_v4_rcv+0x51df/0x5750 net/ipv4/tcp_ipv4.c:2351
-  ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
-  ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
-  dst_input include/net/dst.h:460 [inline]
-  ip_sublist_rcv_finish net/ipv4/ip_input.c:578 [inline]
-  ip_list_rcv_finish net/ipv4/ip_input.c:628 [inline]
-  ip_sublist_rcv+0x15f3/0x17f0 net/ipv4/ip_input.c:636
-  ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:670
-  __netif_receive_skb_list_ptype net/core/dev.c:5715 [inline]
-  __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5762
-  __netif_receive_skb_list net/core/dev.c:5814 [inline]
-  netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:5905
-  gro_normal_list include/net/gro.h:515 [inline]
-  napi_complete_done+0x3d4/0x810 net/core/dev.c:6256
-  virtqueue_napi_complete drivers/net/virtio_net.c:758 [inline]
-  virtnet_poll+0x5d80/0x6bf0 drivers/net/virtio_net.c:3013
-  __napi_poll+0xe7/0x980 net/core/dev.c:6877
-  napi_poll net/core/dev.c:6946 [inline]
-  net_rx_action+0xa5a/0x19b0 net/core/dev.c:7068
-  handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:554
-  __do_softirq kernel/softirq.c:588 [inline]
-  invoke_softirq kernel/softirq.c:428 [inline]
-  __irq_exit_rcu+0x68/0x180 kernel/softirq.c:655
-  irq_exit_rcu+0x12/0x20 kernel/softirq.c:671
-  common_interrupt+0x97/0xb0 arch/x86/kernel/irq.c:278
-  asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:693
+Oh, whoopse, MANAGEDTEMP tricked me.
+Thank you.
 
-CPU: 0 UID: 0 PID: 3962 Comm: kworker/u8:18 Not tainted 6.12.0-syzkaller-09073-g9f16d5e6f220 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: bat_events batadv_nc_worker
+> >  
+> >  	if (plen > 128) {
+> >  		NL_SET_ERR_MSG_MOD(extack, "Invalid prefix length");
+> 
+> I think this change will need to wait until after the merge window
+> (Dec 2nd), sorry nobody reviewed it in time for 6.13 :(
 
-Fixes: 79636038d37e ("ipv4: tcp: give socket pointer to control skbs")
-Fixes: 507a96737d99 ("ipv6: tcp: give socket pointer to control skbs")
-Reported-by: syzbot+8b0959fc16551d55896b@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/netdev/674442bd.050a0220.1cc393.0072.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Brian Vazquez <brianvv@google.com>
----
- include/net/inet_timewait_sock.h | 2 ++
- net/ipv4/tcp_minisocks.c         | 4 ++++
- 2 files changed, 6 insertions(+)
-
-diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
-index beb533a0e88098a95a1365b51bdc2d9e9dfd1d07..62c0a7e65d6bdf4c71a8ea90586b985f9fd30229 100644
---- a/include/net/inet_timewait_sock.h
-+++ b/include/net/inet_timewait_sock.h
-@@ -45,6 +45,8 @@ struct inet_timewait_sock {
- #define tw_node			__tw_common.skc_nulls_node
- #define tw_bind_node		__tw_common.skc_bind_node
- #define tw_refcnt		__tw_common.skc_refcnt
-+#define tw_tx_queue_mapping	__tw_common.skc_tx_queue_mapping
-+#define tw_rx_queue_mapping	__tw_common.skc_rx_queue_mapping
- #define tw_hash			__tw_common.skc_hash
- #define tw_prot			__tw_common.skc_prot
- #define tw_net			__tw_common.skc_net
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index bb1fe1ba867ac3ed8610ceb9fef7e74cd465b3ea..7121d8573928cbf6840b3361b62f4812d365a30b 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -326,6 +326,10 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- 		tcptw->tw_last_oow_ack_time = 0;
- 		tcptw->tw_tx_delay	= tp->tcp_tx_delay;
- 		tw->tw_txhash		= sk->sk_txhash;
-+		tw->tw_tx_queue_mapping = sk->sk_tx_queue_mapping;
-+#ifdef CONFIG_SOCK_RX_QUEUE_MAPPING
-+		tw->tw_rx_queue_mapping = sk->sk_rx_queue_mapping;
-+#endif
- #if IS_ENABLED(CONFIG_IPV6)
- 		if (tw->tw_family == PF_INET6) {
- 			struct ipv6_pinfo *np = inet6_sk(sk);
--- 
-2.47.0.371.ga323438b13-goog
+No problem, thank you for time!
+I'll resend a polished patch next week.
 
 
