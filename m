@@ -1,182 +1,174 @@
-Return-Path: <netdev+bounces-147263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F8649D8C96
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 20:05:52 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F06D9D8CD4
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 20:29:38 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33024285FCE
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:05:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D11BE168E02
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFD21AB500;
-	Mon, 25 Nov 2024 19:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9903A1B87E1;
+	Mon, 25 Nov 2024 19:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="agnqXj8/"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v8Phw636";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8hPoSL7K";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v8Phw636";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="8hPoSL7K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D2140C03;
-	Mon, 25 Nov 2024 19:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583C51AF0CE
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 19:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732561548; cv=none; b=gNYXEo1DHS5DYj60mabgbaZlb3c1s4s9KWK/DzVjS2ykOHbluRNXullUU4503UeVdfr8YFg3acDkVDJOoNv+Inn2TyUW8bMwQKyQLIX690gMW99bZNqUYvq2S8PXf9TwLVkql5dRKPfYRni5QdDcsi7fbwTQzoKaqwNjHfduJ9U=
+	t=1732562974; cv=none; b=g9iuKIaVJNMCVq0G41wo6+2rWii368o8VLvhIYMbPQW9na3c+uDyKE1+mTOMRt2rygGJDPQWXVAFlejNuAslOWxRuKx+SAkezC/bnmQymCvv74qjvCNxv5S8MH4jVlbT2ztNeApCquCS8YuKop4iXSMgrHKYTfU8P9nmO/K+x2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732561548; c=relaxed/simple;
-	bh=1QotW/D5kZ6RmMyScVquWXbHGf7CejY2ly9OXOESfYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=M+NFIYNYGqbW7xCvHAmhcdD1u2GKMnHrdIly4FnJrF20w/C2NSBF9ozhmckPuhVRSTqEHZjBudHbxlnK2hk+ML1axJwYfjUl+6btT2Z9PRYHdvdtsIBsZ3o62PACK/eaSyilxn4A1LWRRSlLBtGRVm1HV7lsy+4hmb0izX9tZ1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=agnqXj8/; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4APBI4lO006014;
-	Mon, 25 Nov 2024 19:05:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	G/Y4PPIbRV/797ioNzyA/Ue8IasVTf7fgTftYMfyKMk=; b=agnqXj8/JsmXTyWM
-	b+IKMD1rL8DF7F4OMd+DgCeeAX7S4W+Ccfb3668U8yNRUnOyG4Pqw718NnzOrA8k
-	+NwlASu+WhE1Ax6sbtDkklcTekEXahRuUaz0i/5Ua+9zyXHWRsZMJup2i/d+/UDz
-	KVclM+irW5Ew6/W3RoNHmVwvrPChMKy+Iyq4aDAVNSPdcetdv0lfH5icY/d0QYRT
-	PO+Jask7TzPaCojn8tYGxPMBXRG9w/iAvi+YY3O0r1Enpcg7ak/tgXqmE61Glp8n
-	0zi+O+um5PrLdxElg/ymVcSLRzcrIMvBwRNCuRInsdHxyZ7p1JYyClB224Ka72lw
-	wsWyVg==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4336cfnuqb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 19:05:08 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4APJ577n017585
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 19:05:07 GMT
-Received: from [10.110.76.191] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 25 Nov
- 2024 11:05:07 -0800
-Message-ID: <c6567708-00d3-4d06-8e90-4e7b858a9030@quicinc.com>
-Date: Mon, 25 Nov 2024 11:05:06 -0800
+	s=arc-20240116; t=1732562974; c=relaxed/simple;
+	bh=ZQYUWyU8CxxO1V2LrrcSrvzYIhtRDVhiIyTAAiaqE7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ksEtVYMRSR09fjQmLmlhJ7ixVeiMcIIflgB5QYI3C7HXnzG9wPL8fMFfxqKzBxbW299AYhLiwrlwPyAzMEip9+7VT5dePdkrSANqr/+syiKhyuj9xv9PrnGH/1ijsQLdbvk0RG61m+8ypQYVR8ekFvIxqX+4GJLLJAEPpwAgMk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v8Phw636; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8hPoSL7K; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v8Phw636; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=8hPoSL7K; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 627A921114;
+	Mon, 25 Nov 2024 19:29:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1732562970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gi002pgisGg4G7GukPWmJSsL3tqpos9pFqchM5DJVEg=;
+	b=v8Phw636fMcsom8C4KH/LysCyz5IKjwsI+x1C5p8l9kp1h0GAEG65lq2ShXvxrKMYY+zUe
+	9eITE5kSUq0/xFTIy7QNRSiIMFvBkzvsukMWXHKfnEgaU2qzs7ncbtLeixPYHov+NxTZ+p
+	ZhG7V7ek1Hrl2boAl7olC2RH3pDdxQ0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1732562970;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gi002pgisGg4G7GukPWmJSsL3tqpos9pFqchM5DJVEg=;
+	b=8hPoSL7K4Zv7DBEU/+XCHVJAP8bskAiKqjWvfG3BOojPhVhmAQ4K9Ob1wHRJXmonexuah3
+	Newfeyxhc8zNU5Aw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1732562970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gi002pgisGg4G7GukPWmJSsL3tqpos9pFqchM5DJVEg=;
+	b=v8Phw636fMcsom8C4KH/LysCyz5IKjwsI+x1C5p8l9kp1h0GAEG65lq2ShXvxrKMYY+zUe
+	9eITE5kSUq0/xFTIy7QNRSiIMFvBkzvsukMWXHKfnEgaU2qzs7ncbtLeixPYHov+NxTZ+p
+	ZhG7V7ek1Hrl2boAl7olC2RH3pDdxQ0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1732562970;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gi002pgisGg4G7GukPWmJSsL3tqpos9pFqchM5DJVEg=;
+	b=8hPoSL7K4Zv7DBEU/+XCHVJAP8bskAiKqjWvfG3BOojPhVhmAQ4K9Ob1wHRJXmonexuah3
+	Newfeyxhc8zNU5Aw==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 4D8422012C; Mon, 25 Nov 2024 20:29:30 +0100 (CET)
+Date: Mon, 25 Nov 2024 20:29:30 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: kernel@pengutronix.de, netdev@vger.kernel.org
+Subject: Re: [PATCH ethtool-next v1 1/1] ethtool: add support for
+ ETHTOOL_A_CABLE_FAULT_LENGTH_SRC and ETHTOOL_A_CABLE_RESULT_SRC
+Message-ID: <dkfesntoylodx2xm65frikdhm6gslddp6xj2mcidxwbpjtklsv@cwfxiuywrysg>
+References: <20241119131054.3317432-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-CC: Johan Hovold <johan@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Hemant Kumar
-	<quic_hemantk@quicinc.com>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        "Maxim
- Kochetkov" <fido_max@inbox.ru>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        "Bjorn Andersson" <bjorn.andersson@oss.qualcomm.com>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Bhaumik Bhatt <bbhatt@codeaurora.org>
-References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
- <Zy3oyGLdsnDY9C0p@hovoldconsulting.com>
- <b1e22673-2768-445c-8c67-eae93206cca5@quicinc.com>
- <20241124150422.nt67aonfknfhz3sc@thinkpad>
-Content-Language: en-US
-From: Chris Lew <quic_clew@quicinc.com>
-In-Reply-To: <20241124150422.nt67aonfknfhz3sc@thinkpad>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: sIeqTHs9bRc-q9GURkIZdyXRkY57ovrm
-X-Proofpoint-ORIG-GUID: sIeqTHs9bRc-q9GURkIZdyXRkY57ovrm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 malwarescore=0
- mlxscore=0 suspectscore=0 mlxlogscore=748 clxscore=1015 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411250158
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6icaa3dgrtwyuwmk"
+Content-Disposition: inline
+In-Reply-To: <20241119131054.3317432-1-o.rempel@pengutronix.de>
+X-Spam-Score: -5.90
+X-Spamd-Result: default: False [-5.90 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-0.995];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_ONE(0.00)[1];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
 
+--6icaa3dgrtwyuwmk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 11/24/2024 7:04 AM, Manivannan Sadhasivam wrote:
-> On Thu, Nov 21, 2024 at 04:28:41PM -0800, Chris Lew wrote:
->>
->>
->> On 11/8/2024 2:32 AM, Johan Hovold wrote:
->>> On Mon, Nov 04, 2024 at 05:29:37PM -0800, Chris Lew wrote:
->>>> From: Bhaumik Bhatt <bbhatt@codeaurora.org>
->>>>
->>>> The call to qrtr_endpoint_register() was moved before
->>>> mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
->>>> callback can occur before the qrtr endpoint is registered.
->>>>
->>>> Now the reverse can happen where qrtr will try to send a packet
->>>> before the channels are prepared. Add a wait in the sending path to
->>>> ensure the channels are prepared before trying to do a ul transfer.
->>>>
->>>> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
->>>> Reported-by: Johan Hovold <johan@kernel.org>
->>>> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
->>>> Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
->>>> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
->>>
->>>> @@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
->>>>    	if (skb->sk)
->>>>    		sock_hold(skb->sk);
->>>> +	rc = wait_for_completion_interruptible(&qdev->prepared);
->>>> +	if (rc)
->>>> +		goto free_skb;
->>>> +
->>>>    	rc = skb_linearize(skb);
->>>>    	if (rc)
->>>>    		goto free_skb;
->>>> @@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
->>>>    	qdev->mhi_dev = mhi_dev;
->>>>    	qdev->dev = &mhi_dev->dev;
->>>>    	qdev->ep.xmit = qcom_mhi_qrtr_send;
->>>> +	init_completion(&qdev->prepared);
->>>>    	dev_set_drvdata(&mhi_dev->dev, qdev);
->>>>    	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
->>>> @@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
->>>>    		qrtr_endpoint_unregister(&qdev->ep);
->>>>    		return rc;
->>>>    	}
->>>> +	complete_all(&qdev->prepared);
->>>>    	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
->>>
->>> While this probably works, it still looks like a bit of a hack.
->>>
->>> Why can't you restructure the code so that the channels are fully
->>> initialised before you register or enable them instead?
->>>
->>
->> Ok, I think we will have to stop using the autoqueue feature of MHI and
->> change the flow to be mhi_prepare_for_transfer() -->
->> qrtr_endpoint_register() --> mhi_queue_buf(DMA_FROM_DEVICE). This would make
->> it so ul_transfers only happen after mhi_prepare_for_transfer() and
->> dl_transfers happen after qrtr_endpoint_register().
->>
->> I'll take a stab at implementing this.
->>
-> 
-> Hmm, I thought 'autoqueue' was used for a specific reason. So it is not valid
-> now?
-> 
+On Tue, Nov 19, 2024 at 02:10:54PM +0100, Oleksij Rempel wrote:
+> diff --git a/netlink/desc-ethtool.c b/netlink/desc-ethtool.c
+> index 5c0e1c6f433d..97a994961c8e 100644
+> --- a/netlink/desc-ethtool.c
+> +++ b/netlink/desc-ethtool.c
+> @@ -252,12 +252,14 @@ static const struct pretty_nla_desc __cable_test_re=
+sult_desc[] =3D {
+>  	NLATTR_DESC_INVALID(ETHTOOL_A_CABLE_RESULT_UNSPEC),
+>  	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_PAIR),
+>  	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_CODE),
+> +	NLATTR_DESC_U8(ETHTOOL_A_CABLE_RESULT_SRC),
+>  };
+> =20
+>  static const struct pretty_nla_desc __cable_test_flength_desc[] =3D {
+>  	NLATTR_DESC_INVALID(ETHTOOL_A_CABLE_FAULT_LENGTH_UNSPEC),
+>  	NLATTR_DESC_U8(ETHTOOL_A_CABLE_FAULT_LENGTH_PAIR),
+>  	NLATTR_DESC_U32(ETHTOOL_A_CABLE_FAULT_LENGTH_CM),
+> +	NLATTR_DESC_U8(ETHTOOL_A_CABLE_FAULT_LENGTH_SRC),
+>  };
+> =20
+>  static const struct pretty_nla_desc __cable_nest_desc[] =3D {
 
-I think when MHI was being developed, I asked for an interface similar 
-to rpmsg. The team came up with the autoqueue feature which made the 
-qrtr mhi transport simpler and closer to the smd transport. I can't 
-think of a specific reason that QRTR needs autoqueue, but maybe ill find 
-it when I start poking at it.
+AFAICS both new attributes are U32 so that NLATTR_DESC_U32() should be
+used here. Looks good to me otherwise.
 
-> - Mani
-> 
+One question: the kernel counterpart seems to be present in 6.12 final,
+is there something that would prevent including this in ethtool 6.12
+(planned to be wrapped up at the end of this week)?
+
+Michal
+
+
+--6icaa3dgrtwyuwmk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmdE0BUACgkQ538sG/LR
+dpUCwgf/S+Zs26v1SHmCa62NritpO5RZpOmB/SOROV16itI4ToRE5XZsELeQK/VX
+VeD7vkVpj3cePnZzSIht99ZD4W0ulkjLwcaLQEkf4X0SWwmE443UfJWhreBnGxMP
+Iyv9cG5M2iLFKMWy+Zelu5yvJDkOD/5rXWK4gs3phexeF2WkcLvBedVeFAAA3ojk
+rCcPYiWfsqBFGxe8T7Fs3iJv5b2m2ZKvbhMDKgZ3T/rfaxkK4qIVsM2fWvMU6rC+
+keaE/WDnTa4bh8629kD6HMJIuTaY1CfTyGAcnxqCjjWtNhPQDuvN+Flv6PBYH+OX
+/eU/xFjR8kE35amq+uWoD5mlUkSziw==
+=db31
+-----END PGP SIGNATURE-----
+
+--6icaa3dgrtwyuwmk--
 
