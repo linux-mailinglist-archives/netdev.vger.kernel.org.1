@@ -1,146 +1,143 @@
-Return-Path: <netdev+bounces-147227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D3A9D8622
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 14:16:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3F59D87FC
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 15:29:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F01EB35F36
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 13:16:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6824B42205
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 13:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2221AA789;
-	Mon, 25 Nov 2024 13:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60161ADFEC;
+	Mon, 25 Nov 2024 13:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OwUW4cRI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7141A7275
-	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 13:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210601AB6D4;
+	Mon, 25 Nov 2024 13:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732540583; cv=none; b=Czido+VL0DvfsBEdErKlg8jAuYpQF3jKBFgLXIUQkO9DBt2ArYNTzPbEfM3kQMwt2ZYElwXiXOvOZUhDDBk61AqZQQ2Thk4e8r30Fvxuiy3rF1BT9q7rLeuu27La+rYEi7RRC6q0pMJFeG9B0y8sVrmbRXn0UPScLvav5OXgLSI=
+	t=1732540895; cv=none; b=rM8Ue9hljSugoitgmsy4Zew0c0sLEPf07K9Lo+xwMvpMixKZmP1uzCDd6bjTLHJ/Kw+0lInAVQOt9tjbHep7m+ZN9i5osEIKeoIczNcbhS4HM9dCYWeuZIzjImqP3T8JbxqGP5MDsjqhMTJTseRc/5L+qUhTi1JY1hfG0QvU+8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732540583; c=relaxed/simple;
-	bh=roIkGxppyk36vBN5Aa6eHc1RlxwoOMeS01gUbDbG0fQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UXBqut0t5+PLVu9HatK3iL4fbN+WOgHS0fy95r6J3u01ZE1hMP4u9HWObBvmVeVs319dRJ8iUNL5lHpIfXrxL/+wDIliN2HoB1en5FNseNcy/6dqwyNt6wh8jsn928t8kJb2G/J/MZZnDMFrAe8KEmSPSkjZni5ldfZKo9xE6qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-8419aa46a87so97734639f.2
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 05:16:21 -0800 (PST)
+	s=arc-20240116; t=1732540895; c=relaxed/simple;
+	bh=0SOZQeyrNKlS9tHFmzi8ORnOWl29Sf5sPDo1Ych8PFk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VQJelUiJAXUFGDkxf3LHxH0lKhPphusJVOu8MQLZAdUlrPictOgV4s/OJpAxJuFM4uGK9FgQswsMBS9O6tJ+HnZzIWpxDmSf7dlxairduxwp+NWBvmVmS7p0WfK7dBO9ZpMOqqpH8R+/1CChdIFwZFkd6F6CJcrUg/+Ymc5iLLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OwUW4cRI; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43163667f0eso39735805e9.0;
+        Mon, 25 Nov 2024 05:21:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732540892; x=1733145692; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Oa0cn0wwc4zMYLeRwlkxFR8F0f3kJ7kjZT+G9vlnpOU=;
+        b=OwUW4cRIjk9AIYYRL1S4mmjMm7KOyJop4V27XGRo2naaE/4dd7tanabU/IPrGOqj3B
+         NlXnb/PdFm7wLDY8IOUyTs1GAKPoCj7m3VKw5fgELY/L+wksdhL58eMDVME5jQcCwTxI
+         frBWWH8eZtJ2HVy1fjAcdQ3VU3lyFgNUGGNK620/Nwf1ve7Xi+IDSgjBJPITA66HcSYW
+         Qs1NmRACdocQrP6ihhf0+PvBHVexfnJIWU+9BXMBtGovjYqpVfYtAAqsp1Y8Bs6l9ThR
+         dpQuh1zneMZXgfZXFSqleXt5jZ0i6YFDBijcmBx1N0px/4pm08FhmLV5hmvlfSA81+7z
+         eKTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732540581; x=1733145381;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tUeEscvPl0THsXTCcyvV67cLrpataPHdN4bYi/SNHVE=;
-        b=h8gCYSCuAQBeoWCg/Z4HmWjmpWB1YGFb+mdqbm1+oiDKYTHnKe4VdXa7w9PsMpJg1O
-         QujWVxIJYAn8DaAF1iEh3ejjEHPH1o3U7vIDwroNFGzm3z1enhhsxgJv+3mNKp+LBPDk
-         nIcp5b0MYl/w12ICReNC/lpM9OsMeZpYeQXA03vqJMV/tZcjSb7wBMs/vlStDv2SK7JM
-         AdSuygzDcL5HCxTE4X4iZvCHOqiASF66QnrcpwamacI2HFp7rPWWTCYvWwSCeaqdEN4x
-         nWkV313GZe7dm+6/WWSUwSn99rXsMpPrzGZjOkAmDEdmtIYOJjR5MF1gJtDFf0ioTnZ9
-         cA0g==
-X-Forwarded-Encrypted: i=1; AJvYcCWsgND7nBx/Aoeyn3OkHyqxx9nt0ZNJ8f+Iza8g9d/c6lo4COzvJBTxRcZGEJJPdjkm2BNyi6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb55fpJAnaq41rPJ+WAMxqSR44TtaI8ebhIiOZx1I3u1Rgu6xe
-	38L0Cr08B+TSQR4L4ohFVCLxauRHsNUujiyzEycst+JUPTHMW1jt8diLfhO0hPg2f1N1mhnBpq6
-	1LCcgyt+ZODZIQ6OuNTrusA0bHAVy8QS6VRMP1W1KGudCYgW9llZy0Mk=
-X-Google-Smtp-Source: AGHT+IFZP3MFmJFXYawZzjM1WHJDr4FPegED77nU69hwDq7WZ9qe3AIs018Ze5kDsiDe4gsMBEXzftjOoB3DZW6FcP1ToXBaj05U
+        d=1e100.net; s=20230601; t=1732540892; x=1733145692;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oa0cn0wwc4zMYLeRwlkxFR8F0f3kJ7kjZT+G9vlnpOU=;
+        b=LFP3I5YpcCgjJT8gqdJGYKqss+VqufrDYckGLqzoMPYrJA4NTTyoJP5usNNmxtJ4Jk
+         DIErOozLrhR2jHKgoY2jyoVIZSdxsezOhk0hud1l56TAd7IYu5EfLAAAhFD2L8PrGGXs
+         1T24kZjtPnHxeZPNcWUd2VyUIXrvPJZRH7wlXcBLtRM6AAQVWkLV17Lk8TjrMFhvbhmC
+         71ocZcYNhe7f3rb9AE1GMGDarmeNBaVUAymn1trbxeWzmEGwcGXNr32N8qXtCB3a80Oi
+         9tevccMU9Bzalp4ichyQOTGMdI1PR0vqCd6wAXGRHPA9hts1lD3vq05bOhbRxrUC2uET
+         WNQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIKJmRtemAiChherKYwo/dwFEC4zp2asmYf1D6rAUuP5xy4TCqNv5HoFhdEEEk1XK/gfuFGhxJ7DvmK/8zrZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzjq62V9koS0Ueq5yirL0F7y2YsMJ8tOV1H8lvZQrdSaGssLSbQ
+	KDxUR7B8mCC7HwRV4Enm39voHRJqQA5QIktikpzKLRTHF5EcXA7l9G3Dqg==
+X-Gm-Gg: ASbGncvOyhlAYIaZDuJRe9k1DUImnuil77qFMgoZTQQnyEe565kYxVLKY2mykorfweY
+	HBxrbF+WSLY/93RVSpD5eW4G/MpINuskZT7bHxuDGHC0NFRFALoLXR/jY2Fzw8u0dPVAwavFiDV
+	WdodXgmUcVY2f80/Cxivh6HTwXHuCYlwdrPznrjtprOKJmDK+P8e6Fxv3ErmJOA+3Hqg7gT7ZKL
+	yyqtPHmaXdCcKRCDzLOjIlSZj8ax9jTT5tXd4KSamMvL+N8QK2r8XFK5KxZ/P2oz3ATYQYDVC5u
+	VOEbKypi+hLPWfgTkA6P1VLBYmZuOIhEKMVXgA==
+X-Google-Smtp-Source: AGHT+IGNH4hQ3aM3rD6cvvYYRgYauN4jMf9b0IL6JeWRXy+7Fq2BjtXzWPiFdK1A1L3Bf6RZcrenxQ==
+X-Received: by 2002:a5d:47c6:0:b0:382:4485:2d96 with SMTP id ffacd0b85a97d-38260be5323mr7197223f8f.50.1732540892164;
+        Mon, 25 Nov 2024 05:21:32 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fad6255sm10678389f8f.5.2024.11.25.05.21.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Nov 2024 05:21:31 -0800 (PST)
+Subject: Re: [PATCH net-next 1/5] net: ethtool: only allow set_rxnfc with rss
+ + ring_cookie if driver opts in
+To: Gal Pressman <gal@nvidia.com>, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
+ linux-net-drivers@amd.com, horms@kernel.org, andrew+netdev@lunn.ch,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org
+References: <cover.1731499021.git.ecree.xilinx@gmail.com>
+ <cc3da0844083b0e301a33092a6299e4042b65221.1731499022.git.ecree.xilinx@gmail.com>
+ <871a9ecf-1e14-40dd-bbd7-e90c92f89d47@nvidia.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <b0f84914-c4bf-9071-b72d-cc2cc4a517f9@gmail.com>
+Date: Mon, 25 Nov 2024 13:21:30 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1547:b0:3a7:629a:8be8 with SMTP id
- e9e14a558f8ab-3a79acfca70mr162786835ab.3.1732540581438; Mon, 25 Nov 2024
- 05:16:21 -0800 (PST)
-Date: Mon, 25 Nov 2024 05:16:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <674478a5.050a0220.1cc393.0081.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in call_netdevice_notifiers_info (2)
-From: syzbot <syzbot+9b66539a997baee14f5d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <871a9ecf-1e14-40dd-bbd7-e90c92f89d47@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 25/11/2024 07:11, Gal Pressman wrote:
+> On 13/11/2024 14:13, edward.cree@amd.com wrote:
+>> Ethtool ntuple filters with FLOW_RSS were originally defined as adding
+>>  the base queue ID (ring_cookie) to the value from the indirection table,
+>>  so that the same table could distribute over more than one set of queues
+>>  when used by different filters.
+> 
+> TBH, I'm not sure I understand the difference? Perhaps you can share an
+> example?
 
-syzbot found the following issue on:
+Something like this:
 
-HEAD commit:    fcc79e1714e8 Merge tag 'net-next-6.13' of git://git.kernel..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=14ffd75f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=275de99a754927af
-dashboard link: https://syzkaller.appspot.com/bug?extid=9b66539a997baee14f5d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+ethtool -X $intf context new equal 2
+# creates context ID 1, table filled with 0s and 1s
+ethtool -N $intf <match fields...> context 1
+# filter distributes traffic to queues 0 and 1
+ethtool -N $intf <match fields...> context 1 action 2
+# filter distributes traffic to queues 2 and 3
 
-Unfortunately, I don't have any reproducer for this issue yet.
+See the selftest in patch 4 for a concrete example of this.
+Some NICs were apparently sending the traffic from both filters to
+ queues 0 and 1, and ignoring the 'action 2' on the second filter.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1539da626e54/disk-fcc79e17.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d44dbcc68df2/vmlinux-fcc79e17.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/76fdad1309ae/bzImage-fcc79e17.xz
+>> @@ -992,6 +992,11 @@ static noinline_for_stack int ethtool_set_rxnfc(struct net_device *dev,
+>>  	if (rc)
+>>  		return rc;
+>>  
+>> +	/* Nonzero ring with RSS only makes sense if NIC adds them together */
+>> +	if (info.flow_type & FLOW_RSS && !ops->cap_rss_rxnfc_adds &&
+>> +	    ethtool_get_flow_spec_ring(info.fs.ring_cookie))
+>> +		return -EINVAL;
+> 
+> I believe this check shouldn't happen when we do ETHTOOL_SRXCLSRLDEL as
+> flow_type is garbage, WDYT?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9b66539a997baee14f5d@syzkaller.appspotmail.com
+Agreed; this check should only apply to ETHTOOL_SRXCLSRLINS.  Do you want
+ to send the fix or shall I?
 
-RTNL: assertion failed at net/core/dev.c (1987)
-WARNING: CPU: 0 PID: 12 at net/core/dev.c:1987 call_netdevice_notifiers_info+0x106/0x110 net/core/dev.c:1987
-Modules linked in:
-CPU: 0 UID: 0 PID: 12 Comm: kworker/u8:1 Not tainted 6.12.0-syzkaller-05480-gfcc79e1714e8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: bond0 bond_mii_monitor
-RIP: 0010:call_netdevice_notifiers_info+0x106/0x110 net/core/dev.c:1987
-Code: cc cc cc cc e8 2b 74 fd f7 c6 05 ec 80 70 06 01 90 48 c7 c7 20 5e 0e 8d 48 c7 c6 00 5e 0e 8d ba c3 07 00 00 e8 db 6c be f7 90 <0f> 0b 90 90 e9 73 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffc900001176d8 EFLAGS: 00010246
-RAX: a4b68b757b823100 RBX: ffff88805a365ac0 RCX: ffff88801befda00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff8155fe42 R09: 1ffffffff203c906
-R10: dffffc0000000000 R11: fffffbfff203c907 R12: dffffc0000000000
-R13: 1ffff92000022ee0 R14: 0000000000000004 R15: ffffc90000117720
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffeb14c9ff8 CR3: 000000000e738000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- netdev_state_change+0x11f/0x1a0 net/core/dev.c:1378
- linkwatch_do_dev+0x112/0x170 net/core/link_watch.c:177
- ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:62
- bond_check_dev_link+0x1f1/0x3f0 drivers/net/bonding/bond_main.c:873
- bond_miimon_inspect drivers/net/bonding/bond_main.c:2740 [inline]
- bond_mii_monitor+0x49a/0x3170 drivers/net/bonding/bond_main.c:2962
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Also, the check below it, dealing with sym-xor, looks like it's only
+ relevant to ETHTOOL_SRXFH, since info.data is garbage for other commands.
+ Ahmed, is my understanding correct there?
 
