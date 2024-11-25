@@ -1,305 +1,356 @@
-Return-Path: <netdev+bounces-147224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EDE39D85F2
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 14:08:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C56F19D85F6
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 14:08:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17311169D42
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 13:07:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221C516A099
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 13:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2772B1AB52D;
-	Mon, 25 Nov 2024 13:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1851ABEC7;
+	Mon, 25 Nov 2024 13:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CO0wVyLw"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="aqeSdegn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEF51AB507;
-	Mon, 25 Nov 2024 13:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133741AF0DC
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 13:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732540026; cv=none; b=MZcX6Ba8UZNRBDJg0mPGk3ZTxwFm7/Il6ikwxU9ozA6EBxV7ju5DZDHOK+q2c57ZUJjspiJEKkHB0u7Tc6K6XoEJfi1+ZxgLL0Dq4tWuEGujMFLqzzPIbVdLOdaErFtPiV0XjEyoN66G6V7P4LyJb035BfjSnJCq8takgqFK5u8=
+	t=1732540030; cv=none; b=EpPWoP9k60DdmVWbp0V5fEgrhEgBYfs7quRRNtbud7KoZJVUZaar06EFgDuiDVstK6c6dLQWhvJ0wVedScGKrHHD0wCS2NxUapm0OL2fpmPWWcfdlGUqHgj9tnpHxyqYz6xT9EMWBudNvEjgzt3nhK1FYubQs0N9V7gDVNDe8a8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732540026; c=relaxed/simple;
-	bh=NYAR6zx9csg70XZRm5JpbFd7GI76A8LuONb3G1EzATg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ml0DZLfvzPYa2XptZM4v2meFXiI6UJO+2X2/9zdvj7WwbVNwZ7jsbc0a1K15pbIHNm6YK1zQhgNCXsJUXruKZEsMj6SgH2/Pd6w0zPDu37YoBGc8ka6zTzuVTm4dFhCR4fH8mljYduv1+IrGm4D6KrEQZZGikm8humQs3u8d8fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CO0wVyLw; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732540024; x=1764076024;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NYAR6zx9csg70XZRm5JpbFd7GI76A8LuONb3G1EzATg=;
-  b=CO0wVyLwimVZGmXfaCBwDh3QetCeYsNUvBcN2hwIGpTTiHVOdDdkxtNN
-   jOgr0tCb4OSK4WPrIkhiuK41mcFHfvY0RHxLPgRcy1dCMPSzlorkiMgNR
-   QQMezoyhVW5vat7ByjwXbkWKaSihqBBLlItRSzvqTadrhb/356h8+ImNZ
-   8uFLSx5GaX9yVTggTGbRpDS6eMCPBIHSascF9yHNZDw49u5J8+KAIFikw
-   uTJVOBvTYWCfMrrlhBY7tNqB/AIfjMJsGxWlTwqtxhhX3oVL0CwIbhg8y
-   xM+iGbW2wYTtSsSAyoCmB2Og5t1uduM4fYk72LCVkNoKMRRZnBn3OJVpn
-   A==;
-X-CSE-ConnectionGUID: boliNkj7SGGq2CIzeeviag==
-X-CSE-MsgGUID: fmFoQ79HQ1SdKc7ISmK/Aw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="32016928"
-X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
-   d="scan'208";a="32016928"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 05:07:03 -0800
-X-CSE-ConnectionGUID: WuTFLlVwQfulv7lZjSsbhg==
-X-CSE-MsgGUID: UXvWF2SVR4ybBFbmaR/pkw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
-   d="scan'208";a="96324026"
-Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 25 Nov 2024 05:07:00 -0800
-Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tFYnp-0006PZ-0X;
-	Mon, 25 Nov 2024 13:06:57 +0000
-Date: Mon, 25 Nov 2024 21:06:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Catdeo Zhang <catdeo.zhang@unisoc.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, catdeo.zhang@unisoc.com,
-	cixi.geng@linux.dev, wade.shu@unisoc.com, jiawang.yu@unisoc.com,
-	hehe.li@unisoc.com
-Subject: Re: [PATCH] net/sipa: Spreadtrum IPA driver code
-Message-ID: <202411252057.ShDClRfV-lkp@intel.com>
-References: <20241122014541.1234644-1-catdeo.zhang@unisoc.com>
+	s=arc-20240116; t=1732540030; c=relaxed/simple;
+	bh=LP+LCZEptwt2vsfmd8TBhiodAfBAR0oL4JUc5hRyUY0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OvqjNAoCumEJ44YgtCOaOI3YV/iCAMvXx2kGBkZlYQ6oZQvOfWf3OfB/SjmKzh8ofb4ZXkuYmNyINkSxhTk43TNyp4JWLoISWDBT/g05SDTUvpHgYTpLFpXQQWdo4Fy386lHelUAHP/6Cxe8dY/k84VJSn6vGsHeSYDS8aUD+p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=aqeSdegn; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9f1d76dab1so717064266b.0
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 05:07:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1732540026; x=1733144826; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=icQX7YFORRwUe1N9AfP7akp2MHxYaHRXrCCY8rvB32U=;
+        b=aqeSdegnVO33IZCBQbLI9NuVeqxtjpwR1mF1rCiX3l3x1RlwNdG3k835U/QT0eEkmH
+         m2QoM/8neB3oRto5/BvBU1rSHbkE/KW9mfjHsJpcAJ7OXsxjKuDPT8Y+jpEZnWjjNrzJ
+         4zGob7fmtGug+deum/sFPYDZrFSIFumxxBRYRp51uPRisYYbwujpcWvUNFcQ+21uR+WN
+         gCtwr4tFd07lnnPBDYgpjhB5kaoQ2httAzNUlevk/xls5v4dNewSgpix+fydBbRKlXEl
+         eNfw6td4/fKqraXQHdbo2FP5Lj51e53O1Wx8yHa3GQZmEZh1rww3kYVfX7v/+TfA8O23
+         rrmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732540026; x=1733144826;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=icQX7YFORRwUe1N9AfP7akp2MHxYaHRXrCCY8rvB32U=;
+        b=Vm1UNNeYRDp1vMmPCX5sdh4y/iL9EYMVy0t6WQil2n2YEZwS0qQTZHaLQbEtWZYdJS
+         PMKxO88EX1ByybNzolV4S0SiiYIxlZ/cfR5nmp6+tV5oBSnjxCXdrS1WIB+cMVVPUENP
+         Mp19mkSzfejzJSQu105Dnz7JU9LUd4Ey+3GMPOEl85jmpj3GLJgu568numg8KrT8nZO2
+         S3Hb+YVFVL5KJM0gzvStE9hUsW1mpdZpboISQNdQA31CruLHnvmr3cNYAMnic4/RsmL+
+         I0fTloNOf2xPTfWuCYD/WumWz2YZ0dr6ftq4XYj5uZ6OZXhjWGv7GkqFp7Xc50QUT1Z5
+         jpdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcc6qSX2w/DzIW2xLiMK7Qjh5O5FlSR2LVgO4wyiJ4P4TXONRu//CMxmb0UOb4qUlaFD3u8mw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBEthSXepIiJzM7moW5MbJurAyuRoI0c5ITQoUZzbdijJgLGvA
+	u555of0VBDrW/zpQppBQTB3XghsnCaNNG52Epp9XljlWtOE7GdX0RzeUrIr2YAU=
+X-Gm-Gg: ASbGncs0Ru54iPcqzve6q7XFbnEPZe23IZN3Zb+xje6cTFem1v7te2rwuN5pnYFDdbu
+	e1eKQ7eL9EASNS0K4/1vow9VB9Ff4KOWdVYmZV7exPrnV03KJDzagjX+xSIm0JXc1fVkpKkkVR8
+	N0kehNoWf0wXwrX9DZ2LXQSCkzjtRBu4Hr7/WsJGwIh7KKs8S/rNvNIeRpCRegh/zhZGJKk5HW2
+	Om0qjBQrSy7y/y9jv3wmRZM6xVv6YRQZlZjGhpkBOUa8NXVBqI1luR8J4M6qvwPSQP2ff8ysAUY
+	mnlF7NfqGFx2
+X-Google-Smtp-Source: AGHT+IFLsOGTQMIR4hOc9IjqMVSoAPihG9DXBR41HZEMsJZ7ArtggrhMFbll0APoS/TEdjsxYMIw5A==
+X-Received: by 2002:a17:907:7758:b0:aa5:3591:420f with SMTP id a640c23a62f3a-aa5359144f5mr696439466b.16.1732540026359;
+        Mon, 25 Nov 2024 05:07:06 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:250d:e03d:dfbb:424b? ([2001:67c:2fbc:1:250d:e03d:dfbb:424b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa5449d3c10sm218994466b.28.2024.11.25.05.07.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Nov 2024 05:07:05 -0800 (PST)
+Message-ID: <cdbeecb8-e468-4925-9ab4-c77accf806b9@openvpn.net>
+Date: Mon, 25 Nov 2024 14:07:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241122014541.1234644-1-catdeo.zhang@unisoc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 05/23] ovpn: keep carrier always on
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ sd@queasysnail.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net>
+ <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
+ <89ae26a2-0a09-4758-989e-8f45a707a41b@openvpn.net>
+ <e2caab8a-343e-4728-b5a7-b167f05c9bb9@gmail.com>
+ <c933e2bf-b19c-4f8b-b2c0-44de50eb4141@openvpn.net>
+ <1cf97615-a38d-48c3-9e23-4ba82012b32d@gmail.com>
+ <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
+ <c62208a4-5396-4116-add1-4ffbc254a09d@gmail.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <c62208a4-5396-4116-add1-4ffbc254a09d@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Catdeo,
+On 25/11/2024 03:26, Sergey Ryazanov wrote:
+>> OpenVPN (userspace) will tear down the P2P interface upon 
+>> disconnection, assuming the --persist-tun option was not specified by 
+>> the user.
+>>
+>> So the interface is gone in any case.
+>>
+>> By keeping the netcarrier on we are just ensuring that, if the user 
+>> wanted persist-tun, the iface is not actually making decisions on its 
+>> own.
+> 
+> Regarding a decision on its own. Ethernet interface going to the not- 
+> running state upon lost of carrier from a switch. It's hardly could be 
+> considered a decision of the interface. It's an indication of the fact.
+> 
+> Similarly, beeping of UPS is not its decision to make user's life 
+> miserable, it's the indication of the power line failure. I hope, at 
+> least we are both agree on that a UPS should indicate the line failure.
 
-kernel test robot noticed the following build warnings:
+The answer is always "it depends".
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master horms-ipvs/master v6.12 next-20241125]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> Back to the 'persist-tun' option. I checked the openvpn(8) man page. It 
+> gives a reasonable hints to use this option to avoid negative outcomes 
+> on internal openvpn process restart. E.g. in case of privilege dropping. 
+> It servers the same purpose as 'persist-key'. And there is no word 
+> regarding traffic leaking.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Catdeo-Zhang/net-sipa-Spreadtrum-IPA-driver-code/20241125-094101
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241122014541.1234644-1-catdeo.zhang%40unisoc.com
-patch subject: [PATCH] net/sipa: Spreadtrum IPA driver code
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20241125/202411252057.ShDClRfV-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241125/202411252057.ShDClRfV-lkp@intel.com/reproduce)
+FTR, here is the text in the manpage:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411252057.ShDClRfV-lkp@intel.com/
+        --persist-tun
+               Don't close and reopen TUN/TAP device or run up/down 
+scripts across SIGUSR1 or --ping-restart restarts.
 
-All warnings (new ones prefixed by >>):
-
->> drivers/net/sipa/sipa_core.c:31: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-    * SPRD IPA contains a number of common fifo
+               SIGUSR1 is a restart signal similar to SIGHUP, but which 
+offers finer-grained control over reset options.
 
 
-vim +31 drivers/net/sipa/sipa_core.c
+SIGUSR1 is a session reconnection, not a process restart.
+The manpage just indicates what happens at the low level when this 
+option is provided.
 
-    29	
-    30	/**
-  > 31	 * SPRD IPA contains a number of common fifo
-    32	 * in the current Unisoc, mainly includes USB, WIFI, PCIE, AP etc.
-    33	 */
-    34	static struct sipa_cmn_fifo_info sipa_cmn_fifo_statics[SIPA_CFIFO_MAX] = {
-    35		{
-    36			.cfifo_name = "sprd,usb-ul",
-    37			.tx_fifo = "sprd,usb-ul-tx",
-    38			.rx_fifo = "sprd,usb-ul-rx",
-    39			.relate_ep = SIPA_EP_USB,
-    40			.src_id = SIPA_TERM_USB,
-    41			.dst_id = SIPA_TERM_AP,
-    42			.is_to_ipa = 1,
-    43			.is_pam = 1,
-    44		},
-    45		{
-    46			.cfifo_name = "sprd,wifi-ul",
-    47			.tx_fifo = "sprd,wifi-ul-tx",
-    48			.rx_fifo = "sprd,wifi-ul-rx",
-    49			.relate_ep = SIPA_EP_WIFI,
-    50			.src_id = SIPA_TERM_WIFI1,
-    51			.dst_id = SIPA_TERM_AP,
-    52			.is_to_ipa = 1,
-    53			.is_pam = 1,
-    54		},
-    55		{
-    56			.cfifo_name = "sprd,pcie-ul",
-    57			.tx_fifo = "sprd,pcie-ul-tx",
-    58			.rx_fifo = "sprd,pcie-ul-rx",
-    59			.relate_ep = SIPA_EP_PCIE,
-    60			.src_id = SIPA_TERM_PCIE0,
-    61			.dst_id = SIPA_TERM_AP,
-    62			.is_to_ipa = 1,
-    63			.is_pam = 1,
-    64		},
-    65		{
-    66			.cfifo_name = "sprd,wiap-dl",
-    67			.tx_fifo = "sprd,wiap-dl-tx",
-    68			.rx_fifo = "sprd,wiap-dl-rx",
-    69			.relate_ep = SIPA_EP_WIAP,
-    70			.src_id = SIPA_TERM_VAP0,
-    71			.dst_id = SIPA_TERM_AP,
-    72			.is_to_ipa = 1,
-    73			.is_pam = 1,
-    74		},
-    75		{
-    76			.cfifo_name = "sprd,map-in",
-    77			.tx_fifo = "sprd,map-in-tx",
-    78			.rx_fifo = "sprd,map-in-rx",
-    79			.relate_ep = SIPA_EP_AP,
-    80			.src_id = SIPA_TERM_AP,
-    81			.dst_id = SIPA_TERM_VCP,
-    82			.is_to_ipa = 1,
-    83			.is_pam = 0,
-    84		},
-    85		{
-    86			.cfifo_name = "sprd,usb-dl",
-    87			.tx_fifo = "sprd,usb-dl-tx",
-    88			.rx_fifo = "sprd,usb-dl-rx",
-    89			.relate_ep = SIPA_EP_USB,
-    90			.src_id = SIPA_TERM_USB,
-    91			.dst_id = SIPA_TERM_AP,
-    92			.is_to_ipa = 0,
-    93			.is_pam = 1,
-    94		},
-    95		{
-    96			.cfifo_name = "sprd,wifi-dl",
-    97			.tx_fifo = "sprd,wifi-dl-tx",
-    98			.rx_fifo = "sprd,wifi-dl-rx",
-    99			.relate_ep = SIPA_EP_WIFI,
-   100			.src_id = SIPA_TERM_WIFI1,
-   101			.dst_id = SIPA_TERM_AP,
-   102			.is_to_ipa = 0,
-   103			.is_pam = 1,
-   104		},
-   105		{
-   106			.cfifo_name = "sprd,pcie-dl",
-   107			.tx_fifo = "sprd,pcie-dl-tx",
-   108			.rx_fifo = "sprd,pcie-dl-rx",
-   109			.relate_ep = SIPA_EP_PCIE,
-   110			.src_id = SIPA_TERM_PCIE0,
-   111			.dst_id = SIPA_TERM_AP,
-   112			.is_to_ipa = 0,
-   113			.is_pam = 1,
-   114		},
-   115		{
-   116			.cfifo_name = "sprd,wiap-ul",
-   117			.tx_fifo = "sprd,wiap-ul-tx",
-   118			.rx_fifo = "sprd,wiap-ul-rx",
-   119			.relate_ep = SIPA_EP_WIAP,
-   120			.src_id = SIPA_TERM_VAP0,
-   121			.dst_id = SIPA_TERM_AP,
-   122			.is_to_ipa = 0,
-   123			.is_pam = 1,
-   124		},
-   125		{
-   126			.cfifo_name = "sprd,map0-out",
-   127			.tx_fifo = "sprd,map0-out-tx",
-   128			.rx_fifo = "sprd,map0-out-rx",
-   129			.relate_ep = SIPA_EP_AP,
-   130			.src_id = SIPA_TERM_AP,
-   131			.dst_id = SIPA_TERM_USB,
-   132			.is_to_ipa = 0,
-   133			.is_pam = 0,
-   134		},
-   135		{
-   136			.cfifo_name = "sprd,map1-out",
-   137			.tx_fifo = "sprd,map1-out-tx",
-   138			.rx_fifo = "sprd,map1-out-rx",
-   139			.relate_ep = SIPA_EP_AP,
-   140			.src_id = SIPA_TERM_AP,
-   141			.dst_id = SIPA_TERM_USB,
-   142			.is_to_ipa = 0,
-   143			.is_pam = 0,
-   144		},
-   145		{
-   146			.cfifo_name = "sprd,map2-out",
-   147			.tx_fifo = "sprd,map2-out-tx",
-   148			.rx_fifo = "sprd,map2-out-rx",
-   149			.relate_ep = SIPA_EP_AP,
-   150			.src_id = SIPA_TERM_AP,
-   151			.dst_id = SIPA_TERM_USB,
-   152			.is_to_ipa = 0,
-   153			.is_pam = 0,
-   154		},
-   155		{
-   156			.cfifo_name = "sprd,map3-out",
-   157			.tx_fifo = "sprd,map3-out-tx",
-   158			.rx_fifo = "sprd,map3-out-rx",
-   159			.relate_ep = SIPA_EP_AP,
-   160			.src_id = SIPA_TERM_AP,
-   161			.dst_id = SIPA_TERM_USB,
-   162			.is_to_ipa = 0,
-   163			.is_pam = 0,
-   164		},
-   165		{
-   166			.cfifo_name = "sprd,map4-out",
-   167			.tx_fifo = "sprd,map4-out-tx",
-   168			.rx_fifo = "sprd,map4-out-rx",
-   169			.relate_ep = SIPA_EP_AP,
-   170			.src_id = SIPA_TERM_AP,
-   171			.dst_id = SIPA_TERM_USB,
-   172			.is_to_ipa = 0,
-   173			.is_pam = 0,
-   174		},
-   175		{
-   176			.cfifo_name = "sprd,map5-out",
-   177			.tx_fifo = "sprd,map5-out-tx",
-   178			.rx_fifo = "sprd,map5-out-rx",
-   179			.relate_ep = SIPA_EP_AP,
-   180			.src_id = SIPA_TERM_AP,
-   181			.dst_id = SIPA_TERM_USB,
-   182			.is_to_ipa = 0,
-   183			.is_pam = 0,
-   184		},
-   185		{
-   186			.cfifo_name = "sprd,map6-out",
-   187			.tx_fifo = "sprd,map6-out-tx",
-   188			.rx_fifo = "sprd,map6-out-rx",
-   189			.relate_ep = SIPA_EP_AP,
-   190			.src_id = SIPA_TERM_AP,
-   191			.dst_id = SIPA_TERM_USB,
-   192			.is_to_ipa = 0,
-   193			.is_pam = 0,
-   194		},
-   195		{
-   196			.cfifo_name = "sprd,map7-out",
-   197			.tx_fifo = "sprd,map7-out-tx",
-   198			.rx_fifo = "sprd,map7-out-rx",
-   199			.relate_ep = SIPA_EP_AP,
-   200			.src_id = SIPA_TERM_AP,
-   201			.dst_id = SIPA_TERM_USB,
-   202			.is_to_ipa = 0,
-   203			.is_pam = 0,
-   204		},
-   205	};
-   206	
+The next question is: what is this useful for? Many things, among those 
+there is the fact the interface will retain its configuration (i.e. IPs, 
+routes, etc).
+
+> 
+> If somebody have decided that this option gives the funny side-effect 
+> and allows to cut the corners, then I cannot say anything but sorry.
+> 
+
+Well, OpenVPN is more than 20 years old.
+If a given API allows a specific user behaviour and had done so for 
+those many years, changing it is still a user breakage. Not much we can do.
+
+>> With a tun interface this can be done, now you want to basically drop 
+>> this feature that existed for long time and break existing setups.
+> 
+> Amicus Plato, sed magis amica veritas
+> 
+> Yes, I don't want to see this interface misbehaviour advertised as a 
+> security feature. I hope the previous email gives a detailed explanation 
+> why.
+
+Let's forget about the traffic leak mention and the "security feature". 
+That comment was probably written in the middle of the night and I agree 
+it gives a false sense or what is happening.
+
+> 
+> If it's going to break existing setup, then end-users can be supported 
+> with a changelog notice explaining how to properly address the risk of 
+> the traffic leaking.
+
+Nope, we can't just break existing user setups.
+
+> 
+>>> At some circumstance, e.g. Android app, it could be the only way to 
+>>> prevent traffic leaking. But these special circumstances do not make 
+>>> solution generic and eligible for inclusion into the mainline code.
+>>
+>> Why not? We are not changing the general rule, but just defining a 
+>> specific behaviour for a specific driver.
+> 
+> Yeah. This patch is not changing the general rule. The patch breaks it 
+> and the comment in the code makes proud of it. Looks like an old joke 
+> that documented bug become a feature.
+
+Like I said above, let's make the comment meaningful for the expected 
+goal: implement persist-tun while leaving userspace the chance to decide 
+what to do.
+
+> 
+>  From a system administrator or a firmware developer perspective, the 
+> proposed behaviour will look like inconsistency comparing to other 
+> interface types. And this inconsistency requires to be addressed with 
+> special configuration or a dedicated script in a worst case. And I 
+> cannot see justified reason to make their life harder.
+
+You can configure openvpn to bring the interface down when the 
+connection is lost. Why do you say it requires extra scripting and such?
+
+> 
+>> For example, I don't think a tun interface goes down when there is no 
+>> socket attached to it, still packets are just going to be blackhole'd 
+>> in that case. No?
+> 
+> Nope. Tun interface indeed will go into the non-running state on the 
+> detach event. Moreover, the tun module supports running/non-running 
+> indication change upon a command from userspace. But not every userspace 
+> application feel a desire to implement it.
+
+With 'ovpn' we basically want a similar effect: let userspace decide 
+what to do depending on the configuration.
+
+> 
+>>>> I know it can be implemented in many other different ways..but I 
+>>>> don't see a real problem with keeping this way.
+>>>
+>>> At least routing protocols and network monitoring software will not 
+>>> be happy to see a dead interface pretending that it's still running. 
+>>
+>> They won't know that the interface is disconnected, they will possibly 
+>> just see traffic being dropped.
+> 
+> Packet loss detection is quite complex operation. So yes, they are 
+> indeed monitoring the interface operational state to warn operator as 
+> soon as possible and take some automatic actions if we are talking about 
+> routing protocols. Some sophisticated monitoring systems even capable to 
+> generate events like 'link unstable' with higher severity if they see 
+> interface operational state flapping in a short period of time.
+> 
+> So yeah, for these kinds of systems, proper operational state indication 
+> is essential.
+
+Again, if the user has not explicitly allowed the persistent behaviour, 
+the interface will be brought down when a disconnection happens.
+But if the user/administrator *wants* to avoid that, he has needs a 
+chance to do that.
+
+Otherwise people that needs this behaviour will just have to stick to 
+using tun and the full userspace implementation.
+
+> 
+>>> Generally speaking, saying that interface is running, when module 
+>>> knows for sure that a packet can not be delivered is a user misguiding.
+>>
+>> Or a feature, wanted by the user.
+>>
+>>>> A blackhole/firewall can still be added if the user prefers (and not 
+>>>> use the persistent interface).
+>>>
+>>> The solution with false-indication is not so reliable as it might 
+>>> look. Interface shutdown, inability of a user-space application to 
+>>> start, user-space application crash, user-space application restart, 
+>>> each of them will void the trick. Ergo, blackhole/firewall must be 
+>>> employed by a security concerned user. What makes the proposed 
+>>> feature odd.
+>>
+>> Yeah, this is what other VPN clients call "kill switch".
+>> Persist-tun is just one piece of the puzzle, yet important.
+>>
+>>>
+>>> To summaries, I'm Ok if this change will be merged with a comment 
+>>> like "For future study" or "To be done" or "To be implemented". But a 
+>>> comment like "to prevent traffic leaking" or any other comment 
+>>> implying a "breakthrough security feature" will have a big NACK from 
+>>> my side.
+>>
+>> What if the comment redirects the user to --persist-tun option in 
+>> order to clarify the context and the wanted behaviour?
+>>
+>> Would that help?
+> 
+> Nope. As it was mentioned above, the are no indication that 'persist- 
+> tun' is a 'security' feature even in the current openvpn documentation.
+> 
+
+Like I mentioned above, I agree we should get rid of that sentence.
+The security feature must be implemented by means of extra tools, just 
+the interface staying up is not enough.
+
+> If the openvpn developers want to keep implementation bug-to-bug 
+> compatible, then feel free to configure the blackhole route on behalf of 
+> end-user by means of the userspace daemon. Nobody will mind.
+
+bug-to-bug compatible? What do you mean?
+Having userspace configure a blackhole route is something that can be 
+considered by whoeever decides to implement the "kill switch" feature.
+
+OpenVPN does not. It just implements --persist-tun.
+
+So all in all, the conclusion is that in this case it's usersapce to 
+decide when the interface should go up and down, depending on the 
+configuration. I'd like to keep it as it is to avoid the ovpn interface 
+to make decisions on its own.
+
+I can spell this out in the comment (I think it definitely makes sense), 
+to clarify that the netcarrier is expected to be driven by userspace 
+(where the control plane is) rather than having the device make 
+decisions without having the full picture.
+
+What do you think?
+
+Regards,
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Antonio Quartulli
+OpenVPN Inc.
+
 
