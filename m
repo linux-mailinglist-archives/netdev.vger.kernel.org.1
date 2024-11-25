@@ -1,200 +1,124 @@
-Return-Path: <netdev+bounces-147197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0DB9D82DA
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:50:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 832479D831B
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 11:10:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C7A9286A27
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:50:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40F82B26383
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0504B19149E;
-	Mon, 25 Nov 2024 09:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AF0191499;
+	Mon, 25 Nov 2024 09:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YOZYhNoF"
 X-Original-To: netdev@vger.kernel.org
-Received: from out198-20.us.a.mail.aliyun.com (out198-20.us.a.mail.aliyun.com [47.90.198.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D8912B17C;
-	Mon, 25 Nov 2024 09:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63381426C
+	for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 09:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732528176; cv=none; b=rkJ+cpchJ3ASPzC1C9hhdg/m8JNHB+mhP4mHhg21JYym76oaTKw/HpLNvDLvVAwIfxfRu0bI+dW/2/kTZRnqa1uZy5U3mImDFF1p+a+pzFF0CrOCNtRKmtvlxzapzsiMeWhEGwBAoTuYd7iRA73p+crYrokuxW0clvd7aqVROHc=
+	t=1732528480; cv=none; b=DV2I9xJ3Y5tRoEmusNuniFqDYjC+nauXLbv21x/WXGNm+R40GYdAYvQNwBmJ2XxZYpN1gTc1FEtkRnPD4gg72KBFR8bncQ/KCpQRQo9BH6LZzt2gLLXkEstv3pLVxiCzNY6DwfnQLhIgBRbJZQNlu+nU6DltPTy3GAvFehDOCq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732528176; c=relaxed/simple;
-	bh=oVpkyRX5ML3zfya5CuT278HfRoLX4XGPkPbPJqJcckE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B2swinK+eFQRgYvbe4wLOcTaNBIX2y4vsbQtrPnyV1gOHRm4Ik1Uc/xbVwqZOEz38jFumyVSzPi5b/15706EKnIcb1bxRU8NhMKiH1s4goaVNH1c6TRIeqZV12fafChD50XU4ecjTP1pgcZ+GUBAzu540CqjQCQI9Y4PmRUlcPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aLoTznl_1732528160 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Nov 2024 17:49:20 +0800
-Message-ID: <11e26658-670f-49fa-8001-0654670b541e@motor-comm.com>
-Date: Mon, 25 Nov 2024 17:49:19 +0800
+	s=arc-20240116; t=1732528480; c=relaxed/simple;
+	bh=8LWejlKEaYxvvegcxS3dkgnlT0u99V8hub9WNJnMKRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PDfb7OeLE36ogZp/XMbRu4s/vazvRgjjko0/gfuxOTeRD2PxZK9is/Tac2alIs+8fimJegx1R5ot8BSfnHs0mPFgTXPF3rNWS6OthrUSCmxXTJ5b2Uuvf1O4/wMGre8v0ySL7L+CoCDFFcV9wzuoCBBRMxejsC2hfKIzAXzr5Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YOZYhNoF; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732528478; x=1764064478;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8LWejlKEaYxvvegcxS3dkgnlT0u99V8hub9WNJnMKRY=;
+  b=YOZYhNoFWycQaTA0daYdQwcGO84VNyjLVx1gsbizrzTRpaNP0H1QmNVK
+   SHKuCWiElfOGPg1jVkX+Ka/5cnOqxcDI6pyspGMr50fiXzeXXJxDdzfu9
+   xn62ZL4GK3CrRNp85t6zJE3vY/U61vY7IpSUlpCDXUpjhUSwPDqQ/QuOx
+   Z+IF8QDNhXZqP4wW2ImBIhKzizLd75FAoy2rA7LJir9SBNkurWlidLZfs
+   svxIKB8VcCgmulPDJoQqN+CtSCLnzS5ukEScXLrDz52KuAQVOOtRtx4AA
+   DfK15DPgm6OWDVevYjJpNwrqGq3XMFaKZIhmlxPC4uleNYpeYVaQCqKyL
+   A==;
+X-CSE-ConnectionGUID: Bi3f1fZxRAK4hfw3+cLnOw==
+X-CSE-MsgGUID: wX7+XaK6RVCrb66hvPwaVw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11266"; a="36405901"
+X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
+   d="scan'208";a="36405901"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 01:54:38 -0800
+X-CSE-ConnectionGUID: SXKfI93MRjqFv844HnjH+A==
+X-CSE-MsgGUID: xZnl602YSIuoKCaqEwjMOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
+   d="scan'208";a="122059625"
+Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 25 Nov 2024 01:54:36 -0800
+Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tFVnc-000681-2t;
+	Mon, 25 Nov 2024 09:54:32 +0000
+Date: Mon, 25 Nov 2024 17:53:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	stefan.wiehler@nokia.com
+Subject: Re: [PATCH net 1/3] ipmr: add debug check for mr table cleanup
+Message-ID: <202411251722.Mg6UtrLH-lkp@intel.com>
+References: <23bd87600f046ce1f1c93513b6ac8f8152b22bf4.1732270911.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 09/21] motorcomm:yt6801: Implement some hw_ops
- function
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
- <20241120105625.22508-10-Frank.Sae@motor-comm.com>
- <46206a81-e230-411c-8a78-d461d238b171@lunn.ch>
-Content-Language: en-US
-From: Frank Sae <Frank.Sae@motor-comm.com>
-In-Reply-To: <46206a81-e230-411c-8a78-d461d238b171@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <23bd87600f046ce1f1c93513b6ac8f8152b22bf4.1732270911.git.pabeni@redhat.com>
 
-Hi Andrew,
+Hi Paolo,
 
-On 2024/11/23 09:03, Andrew Lunn wrote:
-> It took a lot of effort to find your MDIO code. And MDIO bus driver
-> makes a good patch on its own.
-> 
+kernel test robot noticed the following build errors:
 
-Sorry about that.
-There is too many codes in yt6801_hw.c file. If I put the MDIO bus driver
-in one patch, it's would be very difficult to limit to 15 patches. 
+[auto build test ERROR on net/main]
 
->> +static int mdio_loop_wait(struct fxgmac_pdata *pdata, u32 max_cnt)
->> +{
->> +	u32 val, i;
->> +
->> +	for (i = 0; i < max_cnt; i++) {
->> +		val = rd32_mac(pdata, MAC_MDIO_ADDRESS);
->> +		if ((val & MAC_MDIO_ADDR_BUSY) == 0)
->> +			break;
->> +
->> +		fsleep(10);
->> +	}
->> +
->> +	if (i >= max_cnt) {
->> +		WARN_ON(1);
->> +		yt_err(pdata, "%s timeout. used cnt:%d, reg_val=%x.\n",
->> +		       __func__, i + 1, val);
->> +
->> +		return -ETIMEDOUT;
->> +	}
-> 
-> Please replace this using one of the helpers in
-> include/linux/iopoll.h.
-> 
->> +#define PHY_WR_CONFIG(reg_offset)		(0x8000205 + ((reg_offset) * 0x10000))
->> +static int fxgmac_phy_write_reg(struct fxgmac_pdata *pdata, u32 reg_id, u32 data)
->> +{
->> +	int ret;
->> +
->> +	wr32_mac(pdata, data, MAC_MDIO_DATA);
->> +	wr32_mac(pdata, PHY_WR_CONFIG(reg_id), MAC_MDIO_ADDRESS);
->> +	ret = mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	yt_dbg(pdata, "%s, id:%x %s, ctrl:0x%08x, data:0x%08x\n", __func__,
->> +	       reg_id, (ret == 0) ? "ok" : "err", PHY_WR_CONFIG(reg_id), data);
->> +
->> +	return ret;
->> +}
->> +
->> +#define PHY_RD_CONFIG(reg_offset)		(0x800020d + ((reg_offset) * 0x10000))
->> +static int fxgmac_phy_read_reg(struct fxgmac_pdata *pdata, u32 reg_id)
->> +{
->> +	u32 val;
->> +	int ret;
->> +
->> +	wr32_mac(pdata, PHY_RD_CONFIG(reg_id), MAC_MDIO_ADDRESS);
->> +	ret =  mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	val = rd32_mac(pdata, MAC_MDIO_DATA);  /* Read data */
->> +	yt_dbg(pdata, "%s, id:%x ok, ctrl:0x%08x, val:0x%08x.\n", __func__,
->> +	       reg_id, PHY_RD_CONFIG(reg_id), val);
->> +
->> +	return val;
->> +}
-> 
-> And where is the rest of the MDIO bus driver?
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/ipmr-add-debug-check-for-mr-table-cleanup/20241125-104108
+base:   net/main
+patch link:    https://lore.kernel.org/r/23bd87600f046ce1f1c93513b6ac8f8152b22bf4.1732270911.git.pabeni%40redhat.com
+patch subject: [PATCH net 1/3] ipmr: add debug check for mr table cleanup
+config: mips-ip22_defconfig (https://download.01.org/0day-ci/archive/20241125/202411251722.Mg6UtrLH-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241125/202411251722.Mg6UtrLH-lkp@intel.com/reproduce)
 
-There is no separate reset of MDIO bus driver.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411251722.Mg6UtrLH-lkp@intel.com/
 
-> 
->> +static int fxgmac_config_flow_control(struct fxgmac_pdata *pdata)
->> +{
->> +	u32 val = 0;
->> +	int ret;
->> +
->> +	fxgmac_config_tx_flow_control(pdata);
->> +	fxgmac_config_rx_flow_control(pdata);
->> +
->> +	/* Set auto negotiation advertisement pause ability */
->> +	if (pdata->tx_pause || pdata->rx_pause)
->> +		val |= ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM;
->> +
->> +	ret = phy_modify(pdata->phydev, MII_ADVERTISE,
->> +			 ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM, val);
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	return phy_modify(pdata->phydev, MII_BMCR, BMCR_RESET, BMCR_RESET);
->> +}
-> 
-> 
-> Yet more code messing with the PHY. This all needs to go.
-> 
->> +static int fxgmac_phy_clear_interrupt(struct fxgmac_pdata *pdata)
->> +{
->> +	u32 stats_pre, stats;
->> +
->> +	if (mutex_trylock(&pdata->phydev->mdio.bus->mdio_lock) == 0) {
->> +		yt_dbg(pdata, "lock not ready!\n");
->> +		return 0;
->> +	}
->> +
->> +	stats_pre = fxgmac_phy_read_reg(pdata, PHY_INT_STATUS);
->> +	if (stats_pre < 0)
->> +		goto unlock;
->> +
->> +	stats = fxgmac_phy_read_reg(pdata, PHY_INT_STATUS);
->> +	if (stats < 0)
->> +		goto unlock;
->> +
->> +	phy_unlock_mdio_bus(pdata->phydev);
->> +
->> +#define LINK_DOWN	0x800
->> +#define LINK_UP		0x400
->> +#define LINK_CHANGE	(LINK_DOWN | LINK_UP)
->> +	if ((stats_pre & LINK_CHANGE) != (stats & LINK_CHANGE)) {
->> +		yt_dbg(pdata, "phy link change\n");
->> +		return 1;
->> +	}
->> +
->> +	return 0;
->> +unlock:
->> +	phy_unlock_mdio_bus(pdata->phydev);
->> +	yt_err(pdata, "fxgmac_phy_read_reg err!\n");
->> +	return  -ETIMEDOUT;
->> +}
-> 
-> You need to rework your PHY interrupt handling. The PHY driver is
-> responsible for handing the interrupt registers in the PHY. Ideally
-> you just want to export an interrupt to phylib, so it can do all the
-> work.
+All errors (new ones prefixed by >>):
 
-I'm sorry. Could you please give me more information about export
- an interrupt to phylib?
+   net/ipv6/ip6mr.c: In function 'ip6mr_can_free_table':
+>> net/ipv6/ip6mr.c:346:46: error: 'struct netns_ipv6' has no member named 'mr6_rules_ops'; did you mean 'fib6_rules_ops'?
+     346 |         return !check_net(net) || !net->ipv6.mr6_rules_ops;
+         |                                              ^~~~~~~~~~~~~
+         |                                              fib6_rules_ops
 
-> 
-> 	Andrew
+
+vim +346 net/ipv6/ip6mr.c
+
+   343	
+   344	static bool ip6mr_can_free_table(struct net *net)
+   345	{
+ > 346		return !check_net(net) || !net->ipv6.mr6_rules_ops;
+   347	}
+   348	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
