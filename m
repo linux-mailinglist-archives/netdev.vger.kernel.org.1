@@ -1,175 +1,348 @@
-Return-Path: <netdev+bounces-147136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0089D79EB
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:02:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57E8F9D7A10
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 03:25:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62F2FB21A4E
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 02:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16FBF2818D4
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 02:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6F1B64A;
-	Mon, 25 Nov 2024 02:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE86D268;
+	Mon, 25 Nov 2024 02:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QOWwi7VA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKxxcY09"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B782F2D;
-	Mon, 25 Nov 2024 02:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D60802;
+	Mon, 25 Nov 2024 02:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732500170; cv=none; b=GfUT2K0C2kVIZ8cco4xn8h41zzibrbPNYeUu9Kh3mwdsRxRkLIIuspIlKkZSpNxqXrOlMYa50Hl1kE2yD1kDaeNUcHFD52VqL/8GPiKGDeIO8oL78cc16NOEdO879q9kTSdBDYpsx/rXAvL1A3e8UEMajDym2XyFx2ImPdLFsV8=
+	t=1732501546; cv=none; b=mb2Dgyssf2zAMksGBVkyMk8vCl4//BF+AxWVmyRocf06oAy7D4xo9zixpb+waxufiFwc/tSAYTouoOetDndGJsz7XKuUAXLs+cg2NI/WM7LILpTq9uR9lhd1hJ+ydFKaU0tu5eb0n0K6dquPBB2iOXkDgmiPFfxGdOccqiKL8y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732500170; c=relaxed/simple;
-	bh=+g6AKYlq4/3r92iGWdjR4OKqfnss8ffR1uZCeCYj7n8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mzBX36gvuC9aDErAxTVIYwZ5Tzw7G9KpFULNkVXbELuZDIpKbpYowoY9B7ePqWHWbjVDpT9b2CtcTtKpsuUMhg3Rsreb6DBXgDSm6OARQRFlIcOADmXcgz0tee5fo336nqQLkYmHgE5zq0/1gBa9pEUB2RaHr7w+8jvqph/h1Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QOWwi7VA; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1732501546; c=relaxed/simple;
+	bh=6sYrPQCBHtjIKyk64Sq0rmiSsPY2Tj4VdGT5r46u5cc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F1zgZlwe+NMFSR+d16YuaXsdWxtubkaOh55MGsGa5DfBb8R43NPqefUHatrpUJQgOV7FCmXwxAm2SPv3SRDaucBDnsE3EB7/18XwbzE6zJmpAZRE2ORcN6w4zGPGxdfmYJt7b+RTLvrjO7MLtnNMoxUVrc/ALF0KAAn2jVeIIg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKxxcY09; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3823eb7ba72so2688425f8f.0;
-        Sun, 24 Nov 2024 18:02:48 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43158625112so36324025e9.3;
+        Sun, 24 Nov 2024 18:25:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732500167; x=1733104967; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bb+IdiitV8/KAvhELpNdl6E0qRpMtW+ZNTipCC40/ao=;
-        b=QOWwi7VAzwPRxWwXpzy+mzRgqNh0ObAzBx++LQNl+kv7lJwmi7hkRszedWSDPZhLxc
-         TAwWt5fpusvIHVzZuZ4q8JgEi3eJzkZd7cbzP97cy9Pg/PB01iN1vRMIKZ6/6jNilFYP
-         gTLjfp8UA1wya3k92g3DsuqHFTw8GC8uxkrmYs31bOZ3rVaTN3Y6XBnyGcRaR1grQX4d
-         7c9afH826sv3kkPfp4FMIJP9eJhSHBmMNKHBIS9YHBYq4P/4DuxrUkBeBTOqBcmxGibU
-         bzLDHOq/vf2W70gniDVpBN6iq1eA2rGGWjt1rKLyBnD+N3lbuvZIxHMJqt6KF9bRHMAM
-         Hknw==
+        d=gmail.com; s=20230601; t=1732501543; x=1733106343; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Etx9kPDcxnxzaIyCeOw4OFDodyl+Y6sd6gBOibDxl44=;
+        b=EKxxcY09ahjFkaAeCZEs2dycGHQ1BhyA0KgHrt2lBDy83xSlzKZM5Pq2hiRXCABjI7
+         BlvMgQmXug95VOEtkBE5F21lbx448jD4UFukBM06/v9m/FJFNq3BQcBj/P8hxW06d9SO
+         5lLxQ8eJQLTkDsGd1pTyF6yyCoqqI/8MfJAudh4g/Vt106Z2TdT9Rirr0cPGNDQVm0ra
+         xG2EzsuQNT7ovaFg9ezaMPu7GctYkxukOCM5nIOJrxGfSxBrjjwPy9PY8+cxUonrOdHI
+         DV91ZW1mBZiQE9zYuoyT4h8fAxhKlbsMHvWISWcYUZsuY2+WoHGOFOfgRf9cBPoqby9q
+         oAWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732500167; x=1733104967;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bb+IdiitV8/KAvhELpNdl6E0qRpMtW+ZNTipCC40/ao=;
-        b=M3i013Luzk7/hM7EPGKbnXfywKPtdNmDC/k+ti5jz/ZBV9Jrdzrzk9FwpeEmkJ9bqx
-         nm3eNuak/1FxbBcIDlxr1zYlC6raQcunUClWbT9P6cRdhUnaJVn1ypkuacLrSufwzJPg
-         wnBDVoXZhW7hMU02h5+UT0jfHkPnyXA5EA3trQuZhz2C3LzUr7OSE4BhnZnbeGPIrmU7
-         Ws1W9qqY6l2zfwx1rUUWWzPQsOmi3gSBcp1dPDXTZGNwVH1UjohNGGuuKQYmJX4YDFmy
-         sAITQ3JKPGyVr0eL6BpyZHnN/p1N06na1/HHmZyz+/65JEEQzl/qMntSCPyxGvEyHkr9
-         kWSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwcKdB9uv3tGQ8ovedg4kqpyHpnLhmYse4bbYg4T905SSe+lPZeIUf5di2rGXm2euOjFQ=@vger.kernel.org, AJvYcCVUCCRTZM4X6CGrd/a8fkw57OlefVbb+wj5w3df9+1Jp6CuokRPQvop9qgpPdgBSVerHC7sd9qV@vger.kernel.org, AJvYcCWUxLBh0r7luaUV1JNnJ7ptVM/Iepxrr1Bszgb0YGjXG3f/8KkR30XAUhf9RLj9x+F+bnDJq4ghf/vJouc6@vger.kernel.org, AJvYcCXv9gijeEuWvFnWphZADqZG2I0M3XOVbRLOIm1DkPWDxXu7hdbiut+BfG1zIjg4d34cb0ZuobimVaQuoMrnfYWuDWsM@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWr0ZCh0JeZ7AvF0pAB9G3xZaucNaGih29vQ0JbqQhKPTBY/PS
-	48TYczewBxVLUajbkz1I3kD3IF60WclVKUl11+t/ur1KiR+Iwp906LjYHr+/9vrvX6sivXPVCIM
-	9rpzTn3plGedPw1mcMJ1Eg30Ysac=
-X-Gm-Gg: ASbGncsPAVZ+n+zanCjAsFigIx8Me1MyUc2pSjIk+KAHxM1rrGqX0Ro5NJmp5mBeJoB
-	/HhZF3KWcsVge625WIM+fgyY/kEacvd38tDCctq572Gi2bS0=
-X-Google-Smtp-Source: AGHT+IFdkN6cqlq6Cu+x0UV122VQlCTSEn68BAxP3I21x7Xme8bcvsGJmXnGmOFS/47AJhGbRh9d28C3wL3WT/mfpbc=
-X-Received: by 2002:a05:6000:2d08:b0:382:50d9:bc7c with SMTP id
- ffacd0b85a97d-38260be6bfamr5453968f8f.58.1732500166830; Sun, 24 Nov 2024
- 18:02:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732501543; x=1733106343;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Etx9kPDcxnxzaIyCeOw4OFDodyl+Y6sd6gBOibDxl44=;
+        b=ACewdOyQgPiQXfNHSFLIodw62bcvTScIzgXpVXYuTx9oSbx77PKeA/3vycXZOsiAx3
+         dGUXNT1hoBQnDltumysQlqKRxQ68Hp/7rQR5kDqeJ10Q13oBrkblr/FCtAXYcaOrwMK6
+         WJxMHyQNuviwu5egAF83v3OKqIVo89rlw2TubOmaoOHgZri6GSm9kiFUvgPFwYJcENW7
+         5btyN4EW/d4IWbBuG2xYfbNApdPDYq0dL3NQBb2CqJt+E7w+ikWymibgmm7H9Yqudgwf
+         kMtkPXCe3eL3trbRxLRVHkG5F+L/lhNDyDeTpuNNXHYq8dsP58+mgMKQTCxdknmJOoeP
+         mrKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVyXEQ8VRrpDdA6MalqCszhT/eJk+HsLTVMxustF4rCW3c0fcTGVJxyvH/pRwE2QSBEYzDt0LFD3A5RCIfoAWP+@vger.kernel.org, AJvYcCWBLIaiXuH3AdhEARPPkWClTSAE+MGqZEFyLY6PhdbEBLU7oJAi4byM/TJQbnzWbD0L5OELTuNvbqWou/Q=@vger.kernel.org, AJvYcCWfP6NNpQAul2y39pkFov9fSMCDJIqMtfmZVj0prJV6XlY7tli+z2uSxM/ZkVg++DLb6k4V8UyI@vger.kernel.org
+X-Gm-Message-State: AOJu0YztXL5gQQQJR9VvLx54KjOWQbJjwL/ul7XtP2NDwlGfdSXoJ6xf
+	Jyda7B/MytyJ6j/C6VTVRovDleYgayGs+1/3wlqe6WLiuVRIpW78
+X-Gm-Gg: ASbGncviZImmNJkI77ODCpPrxTLgRQZ611dZwTAwHMraRZolz5JpS6tN2iXJD4AM4pi
+	PbpwdpjDDUTUhzDmcKlihfG6Nx4fbJQ2RhjafFny2HfbEb0tNcciNyxAO6CLxR8b4zy/fux+3Xp
+	85XLMo0ViPDdjvonoTAnfNbDxeKuUY6iDUeDEmAc+hHk0L3OAGOxyA04vgMfzlvdcl2qZJy+YBe
+	WPT4U30OfazDCc+pLTAaG6lNCY6KMQuu9R/uz0QVDP3LzUpFls=
+X-Google-Smtp-Source: AGHT+IEnZCFyecwPyqmtA9pr8Xv+WYKVz22FNPMhmKXxOTMqCwPMp5lixHMvlamoaZoPR9urnpgERA==
+X-Received: by 2002:a05:600c:511c:b0:431:47d4:19c7 with SMTP id 5b1f17b1804b1-433ce417b36mr106855995e9.3.1732501542797;
+        Sun, 24 Nov 2024 18:25:42 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a10208c2sm3284225e9.12.2024.11.24.18.25.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Nov 2024 18:25:41 -0800 (PST)
+Message-ID: <c62208a4-5396-4116-add1-4ffbc254a09d@gmail.com>
+Date: Mon, 25 Nov 2024 04:26:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <24481522-69BF-4CE7-A05D-1E7398400D80@u.nus.edu>
- <20241123202744.GB20633@noisy.programming.kicks-ass.net> <20241123180000.5e219f2e@gandalf.local.home>
-In-Reply-To: <20241123180000.5e219f2e@gandalf.local.home>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 24 Nov 2024 18:02:35 -0800
-Message-ID: <CAADnVQLBhV_sSuH+BKu66ZsxTcsvw7RSLnjRGLwQX3TFSjs-Gg@mail.gmail.com>
-Subject: Re: [BUG] possible deadlock in __schedule (with reproducer available)
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ruan Bonan <bonan.ruan@u.nus.edu>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "will@kernel.org" <will@kernel.org>, 
-	"longman@redhat.com" <longman@redhat.com>, "boqun.feng@gmail.com" <boqun.feng@gmail.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"mattbobrowski@google.com" <mattbobrowski@google.com>, "ast@kernel.org" <ast@kernel.org>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
-	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me" <sdf@fomichev.me>, 
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, 
-	"mhiramat@kernel.org" <mhiramat@kernel.org>, 
-	"mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Fu Yeqi <e1374359@u.nus.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 05/23] ovpn: keep carrier always on
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ sd@queasysnail.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net>
+ <6a171cc9-a052-452e-8b3d-273e5b46dae5@gmail.com>
+ <89ae26a2-0a09-4758-989e-8f45a707a41b@openvpn.net>
+ <e2caab8a-343e-4728-b5a7-b167f05c9bb9@gmail.com>
+ <c933e2bf-b19c-4f8b-b2c0-44de50eb4141@openvpn.net>
+ <1cf97615-a38d-48c3-9e23-4ba82012b32d@gmail.com>
+ <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <c9185b5b-942d-4927-8171-f3460619aed1@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 23, 2024 at 2:59=E2=80=AFPM Steven Rostedt <rostedt@goodmis.org=
-> wrote:
->
-> On Sat, 23 Nov 2024 21:27:44 +0100
-> Peter Zijlstra <peterz@infradead.org> wrote:
->
-> > On Sat, Nov 23, 2024 at 03:39:45AM +0000, Ruan Bonan wrote:
-> >
-> > >  </TASK>
-> > > FAULT_INJECTION: forcing a failure.
-> > > name fail_usercopy, interval 1, probability 0, space 0, times 0
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> > > WARNING: possible circular locking dependency detected
-> > > 6.12.0-rc7-00144-g66418447d27b #8 Not tainted
-> > > ------------------------------------------------------
-> > > syz-executor144/330 is trying to acquire lock:
-> > > ffffffffbcd2da38 ((console_sem).lock){....}-{2:2}, at: down_trylock+0=
-x20/0xa0 kernel/locking/semaphore.c:139
-> > >
-> > > but task is already holding lock:
-> > > ffff888065cbd718 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nest=
-ed kernel/sched/core.c:598 [inline]
-> > > ffff888065cbd718 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock kern=
-el/sched/sched.h:1506 [inline]
-> > > ffff888065cbd718 (&rq->__lock){-.-.}-{2:2}, at: rq_lock kernel/sched/=
-sched.h:1805 [inline]
-> > > ffff888065cbd718 (&rq->__lock){-.-.}-{2:2}, at: __schedule+0x140/0x1e=
-70 kernel/sched/core.c:6592
-> > >
-> > > which lock already depends on the new lock.
-> > >
-> > >        _printk+0x7a/0xa0 kernel/printk/printk.c:2432
-> > >        fail_dump lib/fault-inject.c:46 [inline]
-> > >        should_fail_ex+0x3be/0x570 lib/fault-inject.c:154
-> > >        strncpy_from_user+0x36/0x230 lib/strncpy_from_user.c:118
-> > >        strncpy_from_user_nofault+0x71/0x140 mm/maccess.c:186
-> > >        bpf_probe_read_user_str_common kernel/trace/bpf_trace.c:215 [i=
-nline]
-> > >        ____bpf_probe_read_user_str kernel/trace/bpf_trace.c:224 [inli=
-ne]
-> > >        bpf_probe_read_user_str+0x2a/0x70 kernel/trace/bpf_trace.c:221
-> > >        bpf_prog_bc7c5c6b9645592f+0x3e/0x40
-> > >        bpf_dispatcher_nop_func include/linux/bpf.h:1265 [inline]
-> > >        __bpf_prog_run include/linux/filter.h:701 [inline]
-> > >        bpf_prog_run include/linux/filter.h:708 [inline]
-> > >        __bpf_trace_run kernel/trace/bpf_trace.c:2316 [inline]
-> > >        bpf_trace_run4+0x30b/0x4d0 kernel/trace/bpf_trace.c:2359
-> > >        __bpf_trace_sched_switch+0x1c6/0x2c0 include/trace/events/sche=
-d.h:222
-> > >        trace_sched_switch+0x12a/0x190 include/trace/events/sched.h:22=
-2
-> >
-> > -EWONTFIX. Don't do stupid.
->
-> Ack. BPF should not be causing deadlocks by doing code called from
-> tracepoints.
+On 24.11.2024 00:52, Antonio Quartulli wrote:
+> On 23/11/2024 23:25, Sergey Ryazanov wrote:
+>> On 21.11.2024 23:17, Antonio Quartulli wrote:
+>>> On 20/11/2024 23:56, Sergey Ryazanov wrote:
+>>>> On 15.11.2024 16:13, Antonio Quartulli wrote:
+>>>>> On 09/11/2024 02:11, Sergey Ryazanov wrote:
+>>>>>> On 29.10.2024 12:47, Antonio Quartulli wrote:
+>>>>>>> An ovpn interface will keep carrier always on and let the user
+>>>>>>> decide when an interface should be considered disconnected.
+>>>>>>>
+>>>>>>> This way, even if an ovpn interface is not connected to any peer,
+>>>>>>> it can still retain all IPs and routes and thus prevent any data
+>>>>>>> leak.
+>>>>>>>
+>>>>>>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>>>>>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>>>>>>> ---
+>>>>>>>   drivers/net/ovpn/main.c | 7 +++++++
+>>>>>>>   1 file changed, 7 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+>>>>>>> index 
+>>>>>>> eead7677b8239eb3c48bb26ca95492d88512b8d4..eaa83a8662e4ac2c758201008268f9633643c0b6 100644
+>>>>>>> --- a/drivers/net/ovpn/main.c
+>>>>>>> +++ b/drivers/net/ovpn/main.c
+>>>>>>> @@ -31,6 +31,13 @@ static void ovpn_struct_free(struct net_device 
+>>>>>>> *net)
+>>>>>>>   static int ovpn_net_open(struct net_device *dev)
+>>>>>>>   {
+>>>>>>> +    /* ovpn keeps the carrier always on to avoid losing IP or route
+>>>>>>> +     * configuration upon disconnection. This way it can prevent 
+>>>>>>> leaks
+>>>>>>> +     * of traffic outside of the VPN tunnel.
+>>>>>>> +     * The user may override this behaviour by tearing down the 
+>>>>>>> interface
+>>>>>>> +     * manually.
+>>>>>>> +     */
+>>>>>>> +    netif_carrier_on(dev);
+>>>>>>
+>>>>>> If a user cares about the traffic leaking, then he can create a 
+>>>>>> blackhole route with huge metric:
+>>>>>>
+>>>>>> # ip route add blackhole default metric 10000
+>>>>>>
+>>>>>> Why the network interface should implicitly provide this 
+>>>>>> functionality? And on another hand, how a routing daemon can learn 
+>>>>>> a topology change without indication from the interface?
+>>>>>
+>>>>> This was discussed loooong ago with Andrew. Here my last response:
+>>>>>
+>>>>> https://lore.kernel.org/all/d896bbd8-2709-4834-a637- 
+>>>>> f982fc51fc57@openvpn.net/
+>>>>
+>>>> Thank you for sharing the link to the beginning of the conversation. 
+>>>> Till the moment we have 3 topics regarding the operational state 
+>>>> indication:
+>>>> 1. possible absence of a conception of running state,
+>>>> 2. influence on routing protocol implementations,
+>>>> 3. traffic leaking.
+>>>>
+>>>> As for conception of the running state, it should exists for 
+>>>> tunneling protocols with a state tracking. In this specific case, we 
+>>>> can assume interface running when it has configured peer with keys. 
+>>>> The protocol even has nice feature for the connection monitoring - 
+>>>> keepalive.
+>>>
+>>> What about a device in MP mode? It doesn't make sense to turn the 
+>>> carrier off when the MP node has no peers connected.
+>>> At the same time I don't like having P2P and MP devices behaving 
+>>> differently in this regard.
+>>
+>> MP with a single network interface is an endless headache. Indeed. On 
+>> the other hand, penalizing P2P users just because protocol support MP 
+>> doesn't look like a solution either.
+> 
+> On the upper side, with "iroutes" implemented using the system routing 
+> table, routing protocols will be able to detect new routes only when the 
+> related client has connected. (The same for the disconnection)
+> 
+> But this is a bit orthogonal compared to the oper state.
 
-I sense so much BPF love here that it diminishes the ability to read
-stack traces :)
-Above is one of many printk related splats that syzbot keeps finding.
-This is not a new issue and it has nothing to do with bpf.
+The patch has nothing common with the routes configuration. The main 
+concern is forcing of the running state indication. And more 
+specifically, the concern is the given justification for this activity.
 
-> Tracepoints have a special context similar to NMIs. If you add
-> a hook into an NMI handler that causes a deadlock, it's a bug in the hook=
-,
-> not the NMI code. If you add code that causes a deadlock when attaching t=
-o a
-> tracepoint, it's a bug in the hook, not the tracepoint.
+>>> Therefore keeping the carrier on seemed the most logical way forward 
+>>> (at least for now - we can still come back to this once we have 
+>>> something smarter to implement).
+>>
+>> It was shown above how to distinguish between running and non-running 
+>> cases.
+>>
+>> If an author doesn't want to implement operational state indication 
+>> now, then I'm Ok with it. Not a big deal now. I just don't like the 
+>> idea to promote the abuse of the running state indicator. Please see 
+>> below.
+>>
+>>>> Routing protocols on one hand could benefit from the operational 
+>>>> state indication. On another hand, hello/hold timer values mentioned 
+>>>> in the documentation are comparable with default routing protocols 
+>>>> timers. So, actual improvement is debatable.
+>>>>
+>>>> Regarding the traffic leading, as I mentioned before, the blackhole 
+>>>> route or a firewall rule works better then implicit blackholing with 
+>>>> a non-running interface.
+>>>>
+>>>> Long story short, I agree that we might not need a real operational 
+>>>> state indication now. Still protecting from a traffic leaking is not 
+>>>> good enough justification.
+>>>
+>>> Well, it's the so called "persistent interface" concept in VPNs: 
+>>> leave everything as is, even if the connection is lost.
+>>
+>> It's called routing framework abuse. The IP router will choose the 
+>> route and the egress interface not because this route is a good option 
+>> to deliver a packet, but because someone trick it.
+> 
+> This is what the user wants.
 
-trace events call strncpy_from_user_nofault() just as well.
-kernel/trace/trace_events_filter.c:830
+Will be happy to see a study on user's preferences.
+
+> OpenVPN (userspace) will tear down the P2P interface upon disconnection, 
+> assuming the --persist-tun option was not specified by the user.
+> 
+> So the interface is gone in any case.
+> 
+> By keeping the netcarrier on we are just ensuring that, if the user 
+> wanted persist-tun, the iface is not actually making decisions on its own.
+
+Regarding a decision on its own. Ethernet interface going to the 
+not-running state upon lost of carrier from a switch. It's hardly could 
+be considered a decision of the interface. It's an indication of the fact.
+
+Similarly, beeping of UPS is not its decision to make user's life 
+miserable, it's the indication of the power line failure. I hope, at 
+least we are both agree on that a UPS should indicate the line failure.
+
+Back to the 'persist-tun' option. I checked the openvpn(8) man page. It 
+gives a reasonable hints to use this option to avoid negative outcomes 
+on internal openvpn process restart. E.g. in case of privilege dropping. 
+It servers the same purpose as 'persist-key'. And there is no word 
+regarding traffic leaking.
+
+If somebody have decided that this option gives the funny side-effect 
+and allows to cut the corners, then I cannot say anything but sorry.
+
+> With a tun interface this can be done, now you want to basically drop 
+> this feature that existed for long time and break existing setups.
+
+Amicus Plato, sed magis amica veritas
+
+Yes, I don't want to see this interface misbehaviour advertised as a 
+security feature. I hope the previous email gives a detailed explanation 
+why.
+
+If it's going to break existing setup, then end-users can be supported 
+with a changelog notice explaining how to properly address the risk of 
+the traffic leaking.
+
+>> At some circumstance, e.g. Android app, it could be the only way to 
+>> prevent traffic leaking. But these special circumstances do not make 
+>> solution generic and eligible for inclusion into the mainline code.
+> 
+> Why not? We are not changing the general rule, but just defining a 
+> specific behaviour for a specific driver.
+
+Yeah. This patch is not changing the general rule. The patch breaks it 
+and the comment in the code makes proud of it. Looks like an old joke 
+that documented bug become a feature.
+
+ From a system administrator or a firmware developer perspective, the 
+proposed behaviour will look like inconsistency comparing to other 
+interface types. And this inconsistency requires to be addressed with 
+special configuration or a dedicated script in a worst case. And I 
+cannot see justified reason to make their life harder.
+
+> For example, I don't think a tun interface goes down when there is no 
+> socket attached to it, still packets are just going to be blackhole'd in 
+> that case. No?
+
+Nope. Tun interface indeed will go into the non-running state on the 
+detach event. Moreover, the tun module supports running/non-running 
+indication change upon a command from userspace. But not every userspace 
+application feel a desire to implement it.
+
+>>> I know it can be implemented in many other different ways..but I 
+>>> don't see a real problem with keeping this way.
+>>
+>> At least routing protocols and network monitoring software will not be 
+>> happy to see a dead interface pretending that it's still running. 
+> 
+> They won't know that the interface is disconnected, they will possibly 
+> just see traffic being dropped.
+
+Packet loss detection is quite complex operation. So yes, they are 
+indeed monitoring the interface operational state to warn operator as 
+soon as possible and take some automatic actions if we are talking about 
+routing protocols. Some sophisticated monitoring systems even capable to 
+generate events like 'link unstable' with higher severity if they see 
+interface operational state flapping in a short period of time.
+
+So yeah, for these kinds of systems, proper operational state indication 
+is essential.
+
+>> Generally speaking, saying that interface is running, when module 
+>> knows for sure that a packet can not be delivered is a user misguiding.
+> 
+> Or a feature, wanted by the user.
+> 
+>>> A blackhole/firewall can still be added if the user prefers (and not 
+>>> use the persistent interface).
+>>
+>> The solution with false-indication is not so reliable as it might 
+>> look. Interface shutdown, inability of a user-space application to 
+>> start, user-space application crash, user-space application restart, 
+>> each of them will void the trick. Ergo, blackhole/firewall must be 
+>> employed by a security concerned user. What makes the proposed feature 
+>> odd.
+> 
+> Yeah, this is what other VPN clients call "kill switch".
+> Persist-tun is just one piece of the puzzle, yet important.
+> 
+>>
+>> To summaries, I'm Ok if this change will be merged with a comment like 
+>> "For future study" or "To be done" or "To be implemented". But a 
+>> comment like "to prevent traffic leaking" or any other comment 
+>> implying a "breakthrough security feature" will have a big NACK from 
+>> my side.
+> 
+> What if the comment redirects the user to --persist-tun option in order 
+> to clarify the context and the wanted behaviour?
+> 
+> Would that help?
+
+Nope. As it was mentioned above, the are no indication that 
+'persist-tun' is a 'security' feature even in the current openvpn 
+documentation.
+
+If the openvpn developers want to keep implementation bug-to-bug 
+compatible, then feel free to configure the blackhole route on behalf of 
+end-user by means of the userspace daemon. Nobody will mind.
+
+--
+Sergey
 
