@@ -1,110 +1,99 @@
-Return-Path: <netdev+bounces-147189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA499D8227
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:24:23 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 335BD9D8230
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 10:26:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965031633F9
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:24:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C24D4281F79
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 09:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130441917CE;
-	Mon, 25 Nov 2024 09:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AAF191F67;
+	Mon, 25 Nov 2024 09:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DT7XsLXZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6cX47Im"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914F6188907;
-	Mon, 25 Nov 2024 09:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7311917FF;
+	Mon, 25 Nov 2024 09:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732526633; cv=none; b=R48m8K3XUPbkEbK3WtUKmggqZG9LM9iRvNsWykYk04Druw5tHqUNdCllzaH7sZ0+7/CCthMqu2YDUD4YHA6HYFwcVZ6vTA9BX+U323ZOxr1OgQoxqQ3symSBojW1gBsFoQqGj7Klx7b1Hhg065CxhYj7jiYxcW/hxurah2hgpcg=
+	t=1732526787; cv=none; b=MO5FuKKHgPF0Ft6sQmcL3Q+3pjux5qhFqCTn+yjEa5CjGoG8cjIK0baTf8Ttc+CQP6qo9hwS+BMkO7SReTZGoKTzPCmiBiZjPy2pkt5efAuupYKFtUb6MafL+eV4bsA0aaKI47aXnt0/x9ZszZZ6UZmStzEwojcmbPkv913vUSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732526633; c=relaxed/simple;
-	bh=qcemhaF6dxBYnXBRHVDjb/MTiKC/YiHKVVAIRb06Rdk=;
+	s=arc-20240116; t=1732526787; c=relaxed/simple;
+	bh=QHhDkNUF779zgJCNE3MNftukR3ZM6l0jDZiflD7kPOQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b0fh5QyWLeCsmnYN7x0dww+lIUznJwxjzrY8UajsL3v8AkHvs52EfqImIZI/6lE9ijaenhiJbMQHBOvWMJ+mT6s7RgyxillSNcFFh0fqT2w9brp/byQcimT/qcbpt09XuLpxQ1XFCOGQ3VChRdkdbfH6Mk9hGM+PGdA9LEGjQtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DT7XsLXZ; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ea704b1c2bso714573a91.1;
-        Mon, 25 Nov 2024 01:23:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732526631; x=1733131431; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qcemhaF6dxBYnXBRHVDjb/MTiKC/YiHKVVAIRb06Rdk=;
-        b=DT7XsLXZJXxsI0qn5/G4zIhJeUB+AtKDS/acX9/moX23GaCb0BnMI5lAXT5u9wt2e4
-         QC1k+thNz6UiB7kawhQk7joue8ZkXbbIUUtAIZWOxc//znIz5R/FiYoXM/nV7qCoCfR8
-         7kt7mor4lB8FVwHpAlxF/2DSQ+eNn11UxPzgZ+PcVVI33N4VpdjbDI0O/nm/hpkFynrN
-         JHy0s96DQeD2xtJDEehO46Nj+jvXS9gfKwiaY54DIFqz4DWzd1Anne0rTa3cExElrKg2
-         C5Z8D9VSCBY5gqbMUWoJ1/a+ABAUtBzuVMpkxsfF0SMgXTxFnEaYOsVgvRtsz0i3s4SL
-         StIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732526631; x=1733131431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qcemhaF6dxBYnXBRHVDjb/MTiKC/YiHKVVAIRb06Rdk=;
-        b=l6OC2MHmjLjTQsKF5bZt96y5FubfigPJGQ+MawH9hMdT2irm6pS9bPgNs5UZ1cJSb1
-         STrqM256WhhsBTmIQ2E/fXEFGMYAzjjAuWOYaXnEmoJ65R0qaMoYcQ+H7OsBOun72My3
-         xnnfYtP4kjfh8VM9xtH4fQI5w06oXsUKTat52tOdOM9E7IW8qqNO+MOrrCqgHRPJX6Qn
-         e3KG2bPBBtZq+JPSENkLq8FCg81jD5s8fsf5mDzV2psU8UeLAOZW40As/oD/9rNrJLNx
-         TVH6VA9QprCeQw8B9rmmHSBIxAcBeOnjtbK2QMAwJO1LlDJeIHCsVaXIM+mA4plUlxMu
-         /IGA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5xPVlH81THMUiP6xfYKnJ4Gez2U/KAxrqlnjmLyKVJWmGdrQlotX9CLd1OnPVlQgvXIOn13cAK40O9GG0kuw=@vger.kernel.org, AJvYcCVCMDUkKr+nIkkOYc0WD3+eGoa63xUXKcO7SV0qCgXvPBpWuTA3Agrhtbv/z30z7X86hI5tRfJMAbxeHg==@vger.kernel.org, AJvYcCVK4cQ5LYIwy5n5eFT8NyKFh+eEWkmm6QyWA6Es8AplxqJq1J52XIzhwhwYBO82WhG5NEYAgbWKbeswHsFm@vger.kernel.org, AJvYcCVzyMzuTlhgZoHLJrwbhC526Ud4MhobXwntllHiGwBiH70EK51SF55u+TRu6lNfnz0bGnSMld53@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtMhApN359VtqZj7cZaG8ivL+qSCZvKZtqk0DzfOsjpeH85hg1
-	uhd8l359c1pJu/zX/u3XJdiWadWN3/+tH075ITx+FxVGAJWsZf7psC5L9uUSGJTpFNFcORMxhn0
-	bqWG7yLiUgmiJJz+yL83s4Wb4wUQ=
-X-Gm-Gg: ASbGncslEjmmue9y+Yll1O5EuspSC8G6VU8GJlw3iPsfVcROCruDoYqZUCjADa+CtE/
-	cz5D9OvrvI6XDWTS+WLriTtmBiT2v7KI=
-X-Google-Smtp-Source: AGHT+IGOTgELQN8uyP5ueJTT51+ZqKtyOCk3LQ405zrt1L/Z+emvAyfINoiT8DvRuIQBC07HGWjHnB5guv16ACCxbfc=
-X-Received: by 2002:a17:90b:1b51:b0:2ea:580f:6c0c with SMTP id
- 98e67ed59e1d1-2eb0e024be7mr6689199a91.1.1732526630792; Mon, 25 Nov 2024
- 01:23:50 -0800 (PST)
+	 To:Cc:Content-Type; b=p6sahJi04JgwtqaxCHqnRkHlJq/p3N8zZmts04oL28xfh/BIaFcZLs1MEwguYDBVUYnskMdQ+n74fm6t+pomEqKjZowm5FUWKYu8L/vjXryxbKwnXjw22tWTgLqLCyEVXH7Fx5gmh7IfQivswyjruz2Q4PnGm8Lkg7VGKhkzW0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6cX47Im; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE8D5C4CED7;
+	Mon, 25 Nov 2024 09:26:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732526786;
+	bh=QHhDkNUF779zgJCNE3MNftukR3ZM6l0jDZiflD7kPOQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=O6cX47ImDkLiaXISx2JHvSlVuRTXkrWdeRTsce76ge4uKgsYSVva0ljk79MetuuY5
+	 AgGBZer7Vgb77fw1Vf6TIQ1jZdgHANnom0xI4ROaCjKfgWokPtKLw+rxDC0Vw8GzJ7
+	 kFqCLBhjFqWM/TInEV5JHk7uXjZUavaSJXOHhHiroeYyZ+fRR0HhNCzal8IEpe2GJQ
+	 n71onnVgeYPdEnA2KbgO6UYzAAAVHdVoGK9u0O2r6LAnmsx75gPxz4wUxHvyBkvDoy
+	 hsf57elYhoKM8s4QkzGd8TjwVFru0HxKvGdDS7H+VQwo9YCZaSzBNkYof0sHtmKmfp
+	 5Dx4J36IW+lKw==
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-85b09db4824so382861241.2;
+        Mon, 25 Nov 2024 01:26:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUzYp7Bbml0/Ra5JetIZwv4e//FtkqFF9O7M78O9BqdrBk8yDHCqY0gkr9AOrdn7nKONVIAk4iqDTnBZg4=@vger.kernel.org, AJvYcCXPUAng5/VzE4lr43OwrsFjDthwLYMLExQZCtJz+ZxESYPzGouJnscdzZEBXOkT8r0QSjXazO22@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywysj+dw2IiHRyDcfSMBtX2VL84UJLUMfBz0qaIwLYU1Ii+hfM0
+	TuJdFXku0odwKhk6LhR8RHrMl6o+DUhOM/TEeV5wjIy5spPmgEgpZkM1b0IDTegUTaYk/TuNb9/
+	OphJ1tt/DhjHoi2D6omQ3yDPmjIg=
+X-Google-Smtp-Source: AGHT+IEb9fqfE71doZvP388OfePmr3GzqVRkWAsyxsJb7vFM5lL4XOgLM606xR4c+u6Z5i8n4cJth8LPMjyygGpkElQ=
+X-Received: by 2002:a05:6102:292b:b0:4af:7bf:86c9 with SMTP id
+ ada2fe7eead31-4af07bf885bmr4770096137.4.1732526785748; Mon, 25 Nov 2024
+ 01:26:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241123222849.350287-1-ojeda@kernel.org> <20241123222849.350287-2-ojeda@kernel.org>
- <CAH5fLggK_uL0izyDogqdxqp+UEiDbMW555zgS6jk=gw3n07f6A@mail.gmail.com>
-In-Reply-To: <CAH5fLggK_uL0izyDogqdxqp+UEiDbMW555zgS6jk=gw3n07f6A@mail.gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 25 Nov 2024 10:23:38 +0100
-Message-ID: <CANiq72nKgj0n84Q76FSsPSeaupwgEKBT0GQbO8m-KHKZb103gg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] rust: kernel: move `build_error` hidden function to
- prevent mistakes
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Trevor Gross <tmgross@umich.edu>, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	patches@lists.linux.dev
+References: <20241124093531.3783434-1-ilia.lin@kernel.org> <20241124120424.GE160612@unreal>
+In-Reply-To: <20241124120424.GE160612@unreal>
+From: Ilia Lin <ilia.lin@kernel.org>
+Date: Mon, 25 Nov 2024 11:26:14 +0200
+X-Gmail-Original-Message-ID: <CA+5LGR2n-jCyGbLy9X5wQoUT5OXPkAc3nOr9bURO6=9ObEZVnA@mail.gmail.com>
+Message-ID: <CA+5LGR2n-jCyGbLy9X5wQoUT5OXPkAc3nOr9bURO6=9ObEZVnA@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Ilia Lin <ilia.lin@kernel.org>, steffen.klassert@secunet.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 25, 2024 at 10:14=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> =
-wrote:
+On Sun, Nov 24, 2024 at 2:04=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
+rote:
 >
-> You could also put #![doc(hidden)] at the top of build_assert.rs to
-> simplify the lib.rs list. Not sure what is best.
+> On Sun, Nov 24, 2024 at 11:35:31AM +0200, Ilia Lin wrote:
+> > In packet offload mode the raw packets will be sent to the NiC,
+> > and will not return to the Network Stack. In event of crossing
+> > the MTU size after the encapsulation, the NiC HW may not be
+> > able to fragment the final packet.
+>
+> Yes, HW doesn't know how to handle these packets.
+>
+> > Adding mandatory pre-encapsulation fragmentation for both
+> > IPv4 and IPv6, if tunnel mode with packet offload is configured
+> > on the state.
+>
+> I was under impression is that xfrm_dev_offload_ok() is responsible to
+> prevent fragmentation.
+> https://elixir.bootlin.com/linux/v6.12/source/net/xfrm/xfrm_device.c#L410
 
-Yeah, not sure. We used outer attributes for the rest of
-`doc(hidden)`s, including in the same file, so it is probably best to
-keep it consistent, unless we decide to move all to inner ones.
+With my change we can both support inner fragmentation or prevent it,
+depending on the network device driver implementation.
 
-Thanks!
-
-Cheers,
-Miguel
+>
+> Thanks
 
