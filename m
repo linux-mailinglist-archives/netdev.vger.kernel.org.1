@@ -1,218 +1,211 @@
-Return-Path: <netdev+bounces-147259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB039D8C80
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:52:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006299D8C94
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 20:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53773B226FA
-	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 18:50:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D4C2826C7
+	for <lists+netdev@lfdr.de>; Mon, 25 Nov 2024 19:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F9A1B87F9;
-	Mon, 25 Nov 2024 18:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F00017BB0F;
+	Mon, 25 Nov 2024 19:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMaRpC00"
+	dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b="LTeTFaSj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D108F1AF0CB;
-	Mon, 25 Nov 2024 18:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6219016CD35;
+	Mon, 25 Nov 2024 19:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732560647; cv=none; b=RGS3VIl1/WL3yO0DwjlZKnlZAjG94PKjY6JlLbjL5SFyDU6y5c9gi+PBTGCZjaL6SeqrWZkj8nDaicu6gKSs5NDtI6V1A/CSED6cr6oiibuajUaeOsKedVG3ylCQuo0K2Hzr+xTU2GfNes4Vpvtg2VCJoRYjcFD0kkimqz+mo00=
+	t=1732561425; cv=none; b=Dgfy663aBfznzFPHNifBksay/QSz+1bi+nMGPOopQpFh+3sH+IEtUEkcFH6ZEhOJ1jrhSSqUK/69CK+URT3pHeNmriK2yoUPQJrBIy3D8VICTlW4czxbhTgjWteUEuL3RwkcZb2BP5tzt49weYnMRyo89gfTzhg6LyJ/N5ZGcPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732560647; c=relaxed/simple;
-	bh=T3BifNSxIQLht5pOam5kqaF6/zJkRYG7joZ7EyNthPw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TTwXTpSqOmgsz4JpvHuGgYdT3MoEIw0yj7OGAdUiMpkLmsSFfbK5I8GknSCyZj+0/A0B+5FQi69Yj6eF/EvyElI4ljs1ihsNhOoLcCKWisci4ed9mURvOtq0tc1QATcxmtCHcxGmeXFsJWApxB6klYaiNsPPJGg/yC4ofkOmiSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMaRpC00; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8707FC4CECE;
-	Mon, 25 Nov 2024 18:50:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732560647;
-	bh=T3BifNSxIQLht5pOam5kqaF6/zJkRYG7joZ7EyNthPw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YMaRpC00WJIZyiZ3KJV0MVBO/FwuNOzagC4Y/A+szWcfgYvsQcuU2cPwkVblUpoLh
-	 dFrGvMszAlc2yYhdxl04gR0lQg9rHKmcnpzREkLoY5lTGElZE/REVIkjZ/9elbx+5O
-	 dT18EK4MwK8h3lT0chQ3o42Of0Pm3pJvR/E6iuEF90Q25pris8BJeqaNOGTYG/5QX6
-	 x9GyMWtQjB1nt+1pgZ+O7R2NvIPgmhX/8h/XuQ07q0NCRp4lKUe2z4QP83l4B+M4yK
-	 rG6Y6/fKq1ilP7Z9JIMpt0dtiDdVnznV5/W6sGkfpVSHw55n5NyLiHoHzfcul6/pRQ
-	 hwWlFKeVfHD1A==
-Message-ID: <fcaae4c8-4083-4eef-8cfe-3d1f7e340079@kernel.org>
-Date: Mon, 25 Nov 2024 19:50:41 +0100
+	s=arc-20240116; t=1732561425; c=relaxed/simple;
+	bh=9ku+h65M6+VPZXQ6WcZ4YG41rpM8CqLhibh84fYnn+8=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=l76bcPMfZN7UeJ+YfMwsIFYPd7vWM3K7TxhmNJ+sn1PbgueUM8b0ZQlRrMK9mHfaISwfqEpte49lJPai/sXBo7jujlSM3GKUr3cEIG09ACXIa7FeCzE7Xr4X035aj4f29rZzKvVNI3hGnT/x6aVwMUasGPOKRyk++dWTgGddaxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org; spf=pass smtp.mailfrom=paranoici.org; dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b=LTeTFaSj; arc=none smtp.client-ip=198.167.222.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paranoici.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paranoici.org;
+	s=stigmate; t=1732560903;
+	bh=M6fz4P98w3VjpGDNzAgndwqt7Oc1F7x0EIDpJAYrNRg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LTeTFaSjsi+/BQUPSsqAdLI8AEtwfQGMxUZ8eEcuPkk6wvHaTKv0ndgKYdkKI/JAU
+	 XX4ISyAc+ixYINTWzTWBkicP+2ScOjirWRKrLqY7FPLns6m8K7dRk1XERDZu8rxIQX
+	 E789k+ePHLEn7PmlVJIcBWYsMWfPHwXktXi/KCFg=
+Received: from mx2.investici.org (unknown [127.0.0.1])
+	by devianza.investici.org (Postfix) with ESMTP id 4Xxvyv0mqfz72WY;
+	Mon, 25 Nov 2024 18:55:03 +0000 (UTC)
+Received: from [198.167.222.108] (mx2.investici.org [198.167.222.108]) (Authenticated sender: invernomuto@paranoici.org) by localhost (Postfix) with ESMTPSA id 4Xxvyv0VjMz70Pd;
+	Mon, 25 Nov 2024 18:55:03 +0000 (UTC)
+Received: from frx by crunch with local (Exim 4.98)
+	(envelope-from <invernomuto@paranoici.org>)
+	id 1tFeEf-000000003J6-2q3L;
+	Mon, 25 Nov 2024 19:55:01 +0100
+Date: Mon, 25 Nov 2024 19:54:43 +0100
+From: Francesco Poli <invernomuto@paranoici.org>
+To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <ukleinek@debian.org>
+Cc: 1086520@bugs.debian.org, Mark Zhang <markzhang@nvidia.com>, Leon
+ Romanovsky <leonro@nvidia.com>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to
+ start
+Message-Id: <20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
+In-Reply-To: <nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
+References: <173040083268.16618.7451145398661885923.reportbug@crunch>
+	<jaw7557rpn2eln3dtb2xbv2gvzkzde6mfful7d2mf5mgc3wql7@wikm2a7a3kcv>
+	<173040083268.16618.7451145398661885923.reportbug@crunch>
+	<20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
+	<3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
+	<173040083268.16618.7451145398661885923.reportbug@crunch>
+	<20241118200616.865cb4c869e693b19529df36@paranoici.org>
+	<nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Daniel Xu <dxu@dxuuu.xyz>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, Jakub Kicinski
- <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
- kernel-team <kernel-team@cloudflare.com>, mfleming@cloudflare.com
-References: <cover.1726480607.git.lorenzo@kernel.org>
- <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
- <ZwZe6Bg5ZrXLkDGW@lore-desk> <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
- <ZwZ7fr_STZStsnln@lore-desk> <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
- <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
- <01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
- <b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
- <rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
- <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA512";
+ boundary="Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE"
+
+--Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 21 Nov 2024 11:04:13 +0100 Uwe Kleine-K=C3=B6nig wrote:
+
+[...]
+> It looks like the commit that is biting you is
+>=20
+> https://git.kernel.org/linus/50660c5197f52b8137e223dc3ba8d43661179a1d
+>=20
+> So if you bisect, try 50660c5197f52b8137e223dc3ba8d43661179a1d and its
+> parent 24943dcdc156cf294d97a36bf5c51168bf574c22 first.
+
+I started to bisect.
+
+The first surprise is that 50660c5197f52b8137e223dc3ba8d43661179a1d is
+good...   :-o
+
+  $ git checkout 50660c5197f52b8137e223dc3ba8d43661179a1d
+  $ make -j 12 my_defconfig bindeb-pkg
+
+  [install and reboot with this kernel version]
+
+  # ls /sys/class/infiniband_mad/ -altrF
+  total 0
+  drwxr-xr-x 70 root root    0 Nov 25 12:05 ../
+  -r--r--r--  1 root root 4096 Nov 25 12:05 abi_version
+  lrwxrwxrwx  1 root root    0 Nov 25 12:05 umad0 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.0/infiniband_mad/umad0/
+  lrwxrwxrwx  1 root root    0 Nov 25 12:05 umad1 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.1/infiniband_mad/umad1/
+  lrwxrwxrwx  1 root root    0 Nov 25 12:08 issm1 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.1/infiniband_mad/issm1/
+  lrwxrwxrwx  1 root root    0 Nov 25 12:08 issm0 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.0/infiniband_mad/issm0/
+  drwxr-xr-x  2 root root    0 Nov 25 12:08 ./
+
+  [InfiniBand works]
+
+  $ git bisect start
+  $ git bisect good
+  $ git checkout v6.11
+  $ make -j 12 my_defconfig bindeb-pkg
+
+  [install and reboot with this kernel version]
+
+  # ls /sys/class/infiniband_mad/ -altrF
+  total 0
+  drwxr-xr-x 70 root root    0 Nov 25 12:29 ../
+  -r--r--r--  1 root root 4096 Nov 25 12:29 abi_version
+  lrwxrwxrwx  1 root root    0 Nov 25 12:29 umad0 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.0/infiniband_mad/umad0/
+  lrwxrwxrwx  1 root root    0 Nov 25 12:29 umad1 -> ../../devices/pci0000:=
+80/0000:80:01.1/0000:81:00.1/infiniband_mad/umad1/
+  drwxr-xr-x  2 root root    0 Nov 25 12:30 ./
+
+  [InfiniBand fails, because OpenSM fails to start]
+
+  $ git bisect bad
+  Bisecting: 7036 revisions left to test after this (roughly 13 steps)
+  [b3ce7a30847a54a7f96a35e609303d8afecd460b] Merge tag 'drm-next-2024-07-18=
+' of https://gitlab.freedesktop.org/drm/kernel
+  $ make -j 12 my_defconfig bindeb-pkg
 
 
+Woooha, 13 steps are a lot...
 
-On 25/11/2024 16.12, Alexander Lobakin wrote:
-> From: Daniel Xu <dxu@dxuuu.xyz>
-> Date: Fri, 22 Nov 2024 17:10:06 -0700
-> 
->> Hi Olek,
->>
->> Here are the results.
->>
->> On Wed, Nov 13, 2024 at 03:39:13PM GMT, Daniel Xu wrote:
->>>
->>>
->>> On Tue, Nov 12, 2024, at 9:43 AM, Alexander Lobakin wrote:
-> 
-> [...]
-> 
->> Baseline (again)
->>
->> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
->> Run 1	3169917	        0.00007295	0.00007871	0.00009343		Run 1	21749.43
->> Run 2	3228290	        0.00007103	0.00007679	0.00009215		Run 2	21897.17
->> Run 3	3226746	        0.00007231	0.00007871	0.00009087		Run 3	21906.82
->> Run 4	3191258	        0.00007231	0.00007743	0.00009087		Run 4	21155.15
->> Run 5	3235653	        0.00007231	0.00007743	0.00008703		Run 5	21397.06
->> Average	3210372.8	0.000072182	0.000077814	0.00009087		Average	21621.126
->>
+I went on until 10 steps are left:
 
-We need to talk about what we are measuring, and how to control the
-experiment setup to get reproducible results.
-Especially controlling on what CPU cores our code paths are executing.
+  [test b3ce7a30847a54a7f96a35e609303d8afecd460b]
+  $ git bisect good
+  Bisecting: 3385 revisions left to test after this (roughly 12 steps)
+  [fbc90c042cd1dc7258ebfebe6d226017e5b5ac8c] Merge tag 'mm-stable-2024-07-2=
+1-14-50' of git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
+ =20
+  [test fbc90c042cd1dc7258ebfebe6d226017e5b5ac8c]
+  $ git bisect bad
+  Bisecting: 1763 revisions left to test after this (roughly 11 steps)
+  [09ea8089abb5d851ce08a9b1a43706e42ef39db2] Merge tag 'staging-6.11-rc1' o=
+f git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging
 
-In above "baseline" case, we have two processes/tasks executing:
-  (1) RX-napi softirq/thread (until napi_gro_receive deliver to socket)
-  (2) Userspace netserver process TCP receiving data from socket.
-
-My experience is that you will see two noticeable different
-throughput performance results depending on whether (1) and (2) is
-executing on the *same* CPU (multi-tasking context-switching),
-or executing in parallel (e.g. pinned) on two different CPU cores.
-
-The netperf command have an option
-
-  -T lcpu,remcpu
-       Request that netperf be bound to local CPU lcpu and/or netserver 
-be bound to remote CPU rcpu.
-
-Verify setting by listing pinning like this:
-   for PID in $(pidof netserver); do taskset -pc $PID ; done
-
-You can also set pinning runtime like this:
-  export CPU=2; for PID in $(pidof netserver); do sudo taskset -pc $CPU 
-$PID; done
-
-For troubleshooting, I like to use the periodic 1 sec (netperf -D1)
-output and adjust pinning runtime to observe the effect quickly.
-
-My experience is unfortunately that TCP results have a lot of variation
-(thanks for incliding 5 runs in your benchmarks), as it depends on tasks
-timing, that can get affected by CPU sleep states. The systems CPU
-latency setting can be seen in /dev/cpu_dma_latency, which can be read
-like this:
-
-  sudo hexdump --format '"%d\n"' /dev/cpu_dma_latency
-
-For playing with changing /dev/cpu_dma_latency I choose to use tuned-adm
-as it requires holding the file open. E.g I play with these profiles:
-
-  sudo tuned-adm profile throughput-performance
-  sudo tuned-adm profile latency-performance
-  sudo tuned-adm profile network-latency
+  [test 09ea8089abb5d851ce08a9b1a43706e42ef39db2]
+  $ git bisect bad
+  Bisecting: 910 revisions left to test after this (roughly 10 steps)
+  [4305ca0087dd99c3c3e0e2ac8a228b7e53a21c78] Merge tag 'scsi-misc' of git:/=
+/git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi
 
 
->> cpumap v2 Olek
->>
->> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
->> Run 1	3253651	        0.00007167	0.00007807	0.00009343		Run 1	13497.57
->> Run 2	3221492	        0.00007231	0.00007743	0.00009087		Run 2	12115.53
->> Run 3	3296453	        0.00007039	0.00007807	0.00009087		Run 3	12323.38
->> Run 4	3254460	        0.00007167	0.00007807	0.00009087		Run 4	12901.88
->> Run 5	3173327	        0.00007295	0.00007871	0.00009215		Run 5	12593.22
->> Average	3239876.6	0.000071798	0.00007807	0.000091638		Average	12686.316
->> Delta	0.92%	        -0.53%	        0.33%	        0.85%			        -41.32%
->>
->>
+Since I could not afford to keep the cluster out of service any longer
+(each step takes at least 20 or 25 minutes: build + install + reboot +
+check InfiniBand), I decided to return the cluster to service.
+
+I will try to continue to bisect by testing the resulting kernels on a
+compute node: there's no OpenSM there and it cannot run anyway, if
+there's another OpenSM on the same InfiniBand network.
+However, I can check whether those issm* symlinks are created in
+/sys/class/infiniband_mad/=20
+I really hope that this is enough to pinpoint the first bad
+commit...
+
+Any better ideas?
 
 
-We now three processes/tasks executing:
-  (1) RX-napi softirq/thread (doing XDP_REDIRECT into cpumap)
-  (2) CPUmap kthread (until gro_receive_skb/gro_flush deliver to socket)
-  (3) Userspace netserver process TCP receiving data from socket.
+--=20
+ http://www.inventati.org/frx/
+ There's not a second to spare! To the laboratory!
+..................................................... Francesco Poli .
+ GnuPG key fpr =3D=3D CA01 1147 9CD2 EFDF FB82  3925 3E1C 27E1 1F69 BFFE
 
-Again, now the performance is going to depend on depending on which CPU
-cores the processes/tasks are running and whether some are sharing the
-same CPU. (There are both wakeup timing and cache-line effects).
+--Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE
+Content-Type: application/pgp-signature
 
-There are now more combinations to test...
+-----BEGIN PGP SIGNATURE-----
 
-CPUmap is a CPU scaling facility, and you will likely also see different
-CPU utilization on the difference cores one you start to pin these to
-control the scenarios.
+iQIzBAEBCgAdFiEEygERR5zS79/7gjklPhwn4R9pv/4FAmdEx/QACgkQPhwn4R9p
+v/4ZXw/6Ap8I5PS6e6wKSo47UVJ0iB8+NqbtxpYGg8aB8f4tyE8An6TzsblP8Wtg
+QRnJqBE594/mHipy3Ys/mtUHBRirqR179opRVPYFnY/qg/XHfQ6Yp3SD/Iopnckn
+r/thVv5KcwQWhP4DhWynsopTV7I2rw5oob3LTEXGweVN4alXORBxp36J0e/kckgQ
+J+tYyqV15vswbo60T1TyHsxaeYVh3YgZ9JPqhpqn5qiGTNyyaxP6nWJEt/f04K4P
+4oX3qoHONyJd7eYeLbdyq11EPNECP6Fq+1UEpDvc10iTFiROSK69MW6l1ZmmEUyX
+Ig4KGQH/7wXa6+09Xad9D7DHyCdKioyAYvBdDCW29ZglsgbNVO8LSvRg2FWRDJY+
+Lkwfz4mLr+Kc4tS6HdSs1LiKeF5boNb/QuUt/3cjWBJlwF8b+dJ8usGd/VlsxmpA
+zSQFdxfTph0V5rQ3DHtSMv9CKPx+D1oEfjY+k3Tl0u6rcJavaxn52kAjR2KrpVP7
+sx0cDXmygpntn9+rk8PHJDwo6aMJH03vB2Uy6yPUVJuTlbK2xpQ6LfJEcbARsu08
+r2HJlTK7JQkcWGsNMoIvKcmhX9eQXNX2+BuOUrS+UnLAIeoVEK3Wq6pFjrSoBqrb
+47p3MEunzo5L8Zf/gYdBPqXYa3evIBAlRyMGXw9xhfbO3hzZJ8U=
+=1imU
+-----END PGP SIGNATURE-----
 
->> It's very interesting that we see -40% tput w/ the patches. I went back
-> 
-
-Sad that we see -40% throughput...  but do we know what CPU cores the
-now three different tasks/processes run on(?)
-
-
-> Oh no, I messed up something =\
->  > Could you please also test not the whole series, but patches 1-3 (up to
-> "bpf:cpumap: switch to GRO...") and 1-4 (up to "bpf: cpumap: reuse skb
-> array...")? Would be great to see whether this implementation works
-> worse right from the start or I just broke something later on.
-> 
->> and double checked and it seems the numbers are right. Here's the
->> some output from some profiles I took with:
->>
->>      perf record -e cycles:k -a -- sleep 10
->>      perf --no-pager diff perf.data.baseline perf.data.withpatches > ...
->>
->>      # Event 'cycles:k'
->>      # Baseline  Delta Abs  Shared Object                                                    Symbol
->>           6.13%     -3.60%  [kernel.kallsyms]                                                [k] _copy_to_iter
->
-
-I really appreciate that you provide perf data and perf diff, but as
-described above, we need data and information on what CPU cores are
-running which workload.
-
-Fortunately perf diff (and perf report) support doing like this:
-  perf diff --sort=cpu,symbol
-
-But then you also need to control the CPUs used in experiment for the
-diff to work.
-
-I hope I made sense as these kind of CPU scaling benchmarks are tricky,
---Jesper
+--Signature=_Mon__25_Nov_2024_19_54_43_+0100_ms7K9=h3DEstPnbE--
 
