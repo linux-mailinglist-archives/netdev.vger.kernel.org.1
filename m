@@ -1,140 +1,110 @@
-Return-Path: <netdev+bounces-147335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F379D924F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 08:18:55 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842FA9D92C0
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 08:48:47 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F32C8283880
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 07:18:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25AA216468E
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 07:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80D4192B77;
-	Tue, 26 Nov 2024 07:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF241940B0;
+	Tue, 26 Nov 2024 07:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b="s9PJacUo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VDYXR+/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from devianza.investici.org (devianza.investici.org [198.167.222.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12B11898FC;
-	Tue, 26 Nov 2024 07:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.167.222.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6271713BAE3;
+	Tue, 26 Nov 2024 07:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732605522; cv=none; b=M8kecIsLuaigTr+u7CXfFfVY3+J2PvjzQ4PArMlXr/2YRR9kyn/V4PRzVUqhi6SAWmLECZ8NSHZ2mUI2tRGUQ+sg6GERQxfUepA7PPK9B0OASgttSRinUeIHirMGfQtXPBx9at92zp0mY/PNsE76UStY73L+Z1Sf1pH2IPSgHOE=
+	t=1732607324; cv=none; b=quZBzLjEypKD3ZDudr4Yeuf9BeGCudsQmiyi4r2IA1YxZVhxx7rwh4cZe1nvfHBF3UEHqZve1fNt4aI9aFPix1VUojLKgLtfxXuY3Ha9lVKRfVmojfGSjAlq/h8HlrA0cGLOmBF5q0MZQan/7WgKGm1qSCmHkCdyVmhT7QiXMp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732605522; c=relaxed/simple;
-	bh=3WG+rsDl8ssfKYzOttBsssvHgdqZSvcUE4T0kx9jmG8=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=hNLSGkyA/NMIEsriHqRM/61SO90TEuZ8Ehb6UmaJVPzbjOAMJCDb/3ZP08UbNR9NFpEVBhu2zIz7PbzyadOqY40FKNHIBOLGTDS+7XCcTGn7gF18wJDqhpcmF4jALiOqfKtPa366ODiNqfip7Uue4uJ3aJ4cG5F7iNIwxBctsl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org; spf=pass smtp.mailfrom=paranoici.org; dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b=s9PJacUo; arc=none smtp.client-ip=198.167.222.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paranoici.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paranoici.org;
-	s=stigmate; t=1732605514;
-	bh=C5ms5roH9t6g5LU0Y7op/suniBU+rWLbq1V6yV3ku2k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s9PJacUoPpikDhzNuIv5tVm15U0dfq9TCjUELSzG8f91NPGfQTK17u0QuWojqzv8p
-	 wUy0jCazqgNirKkYbJtfgxjZA9Cj452a+2VzY6c11MpezlvmoTmnURq8YI0FPC0Ksm
-	 vpKI+fj/DEAP69zTQHiavVhA873Pus1DBDw/y9+8=
-Received: from mx2.investici.org (unknown [127.0.0.1])
-	by devianza.investici.org (Postfix) with ESMTP id 4XyDSp35mzz6vVZ;
-	Tue, 26 Nov 2024 07:18:34 +0000 (UTC)
-Received: from [198.167.222.108] (mx2.investici.org [198.167.222.108]) (Authenticated sender: invernomuto@paranoici.org) by localhost (Postfix) with ESMTPSA id 4XyDSp2nwKz6vTY;
-	Tue, 26 Nov 2024 07:18:34 +0000 (UTC)
-Received: from frx by crunch with local (Exim 4.98)
-	(envelope-from <invernomuto@paranoici.org>)
-	id 1tFpqC-000000001vc-48NX;
-	Tue, 26 Nov 2024 08:18:32 +0100
-Date: Tue, 26 Nov 2024 08:18:24 +0100
-From: Francesco Poli <invernomuto@paranoici.org>
-To: Mark Zhang <markzhang@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>, Uwe =?UTF-8?B?S2xlaW5lLUvDtm5p?=
- =?UTF-8?B?Zw==?= <ukleinek@debian.org>, 1086520@bugs.debian.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to
- start
-Message-Id: <20241126081824.afd7197d3a54c5242c4bb4b5@paranoici.org>
-In-Reply-To: <cd4ea02f-bcb8-4494-a26e-81cdf6c684bf@nvidia.com>
-References: <173040083268.16618.7451145398661885923.reportbug@crunch>
-	<jaw7557rpn2eln3dtb2xbv2gvzkzde6mfful7d2mf5mgc3wql7@wikm2a7a3kcv>
-	<173040083268.16618.7451145398661885923.reportbug@crunch>
-	<20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
-	<3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
-	<173040083268.16618.7451145398661885923.reportbug@crunch>
-	<20241118200616.865cb4c869e693b19529df36@paranoici.org>
-	<nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
-	<20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
-	<20241125193837.GH160612@unreal>
-	<cd4ea02f-bcb8-4494-a26e-81cdf6c684bf@nvidia.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1732607324; c=relaxed/simple;
+	bh=skmMUS91D2aQ8NSi9NHlSuX2wfVxjq3SHr5gsfheWmY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ClY6UN9LHqytyB/N+HUfWK6/3igXWkhbBQIdpDJj/QadglBGViGHzCmi7uG7gMbyZ73uIpPo0wLpY1laXBn8URgifufnLGwLjkc7mKeNRiFL4aRymrLyLwKgMXqeClWuiWNabahrBj+pS95qmifitlZ05hIUSFT+5rZ65Pxgn0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VDYXR+/F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFB44C4CECF;
+	Tue, 26 Nov 2024 07:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732607323;
+	bh=skmMUS91D2aQ8NSi9NHlSuX2wfVxjq3SHr5gsfheWmY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=VDYXR+/FosSwh8ACaruvyOGjFiJTZPSqtoQ4jGtgUzfh13D/1OeO20rDIspBuPKye
+	 RAZVv1piGmYbhSyr+7fL8asnb/PEcmHCORRufcXSkw+g7G3GN3Rf6gXgGxcQMlVro9
+	 6BJjVs+1slaBPCkX8CLN7qVQa+s2Q1Xl0JzPuaEZd6h6vq9eIGH0b7+/madblpTp7f
+	 oh7aVy270/oSl1UnhbVcxdrjEIeoXpiejPj1a6u8rSCfUsrTBo1HP2gwQzc9szVT9L
+	 dmd/t8ohBnRDcslkr+3lH2qOZsQkJSbXS85Spwco56r/bi+20zS1ZCa36UpWKmr4px
+	 sJwqOxzIv9a1Q==
+From: Ilia Lin <ilia.lin@kernel.org>
+To: leon@kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	herbert@gondor.apana.org.au,
+	horms@kernel.org,
+	ilia.lin@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	steffen.klassert@secunet.com
+Subject: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
+Date: Tue, 26 Nov 2024 09:48:37 +0200
+Message-Id: <20241126074837.631786-1-ilia.lin@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20241125194340.GI160612@unreal>
+References: <20241125194340.GI160612@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA512";
- boundary="Signature=_Tue__26_Nov_2024_08_18_24_+0100_milZIYpp=r8ZwzMM"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---Signature=_Tue__26_Nov_2024_08_18_24_+0100_milZIYpp=r8ZwzMM
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Nov 25, 2024 at 9:43 PM Leon Romanovsky <leon@kernel.org> wrote:
+>
+> On Mon, Nov 25, 2024 at 11:26:14AM +0200, Ilia Lin wrote:
+> > On Sun, Nov 24, 2024 at 2:04 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > >
+> > > On Sun, Nov 24, 2024 at 11:35:31AM +0200, Ilia Lin wrote:
+> > > > In packet offload mode the raw packets will be sent to the NiC,
+> > > > and will not return to the Network Stack. In event of crossing
+> > > > the MTU size after the encapsulation, the NiC HW may not be
+> > > > able to fragment the final packet.
+> > >
+> > > Yes, HW doesn't know how to handle these packets.
+> > >
+> > > > Adding mandatory pre-encapsulation fragmentation for both
+> > > > IPv4 and IPv6, if tunnel mode with packet offload is configured
+> > > > on the state.
+> > >
+> > > I was under impression is that xfrm_dev_offload_ok() is responsible to
+> > > prevent fragmentation.
+> > > https://elixir.bootlin.com/linux/v6.12/source/net/xfrm/xfrm_device.c#L410
+> >
+> > With my change we can both support inner fragmentation or prevent it,
+> > depending on the network device driver implementation.
+>
+> The thing is that fragmentation isn't desirable thing. Why didn't PMTU
+> take into account headers so we can rely on existing code and do not add
+> extra logic for packet offload?
 
-On Tue, 26 Nov 2024 09:21:37 +0800 Mark Zhang wrote:
+I agree that PMTU is a preferred option, but the packets may be routed from
+a host behind the VPN, which is unaware that it transmits into an IPsec tunnel,
+and therefore will not count on the extra headers.
 
-[...]
-> Yes looks like FW reports vport.num_plane > 0. What is your hw type and=20
-> FW version ("ethtool -i <netdev_of_the_ibdev>")? I don't think it=20
-> supports multiplane.
-
-  $ /sbin/ethtool -i ibp129s0f0
-  driver: mlx5_core[ib_ipoib]
-  version: 6.10.11-amd64
-  firmware-version: 20.40.1000 (MT_0000000224)
-  expansion-rom-version:=20
-  bus-info: 0000:81:00.0
-  supports-statistics: yes
-  supports-test: yes
-  supports-eeprom-access: no
-  supports-register-dump: no
-  supports-priv-flags: yes
-
-Please note that I determined <netdev_of_the_ibdev> by looking at
-the output of 'ibv_devices': I hope this is a correct way to answer
-your question.
-
-
-
-
---=20
- http://www.inventati.org/frx/
- There's not a second to spare! To the laboratory!
-..................................................... Francesco Poli .
- GnuPG key fpr =3D=3D CA01 1147 9CD2 EFDF FB82  3925 3E1C 27E1 1F69 BFFE
-
---Signature=_Tue__26_Nov_2024_08_18_24_+0100_milZIYpp=r8ZwzMM
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEygERR5zS79/7gjklPhwn4R9pv/4FAmdFdkEACgkQPhwn4R9p
-v/42txAAlpTMgd77CdbAemqg2q22E7oNHCa9AUjWDzcHFN9yMNVbyGf1hntpyjYp
-e6iMRLNGywypVygonJZQXa/oCQBiCf6QQpZ39F061LhhzamcbVL/zlsEnV7h6c1H
-U36i9O18ws8pFUrN3E/2fAAWfDlujHS1iQkECLW24yzYTfNLRriLKApRvZjzyVrR
-PaiDbbVKDFMZ9LuaOkWr+fQg51l22ds+mUGvtBEBAKxz/aFFhM6b5BOAu6Gj4qEn
-qnKhl1I/lTB9843JqR5DVwz/kWnG5KoAK2DICXgz/QpyygEGxQ3aGyvn/yyiK/G7
-tbWE7rW+rGvg9L8q1e5n6ncmvSQW41nZLYEuBcZZ1SBa0wP7d1jPuedwFVkNhOkk
-SI4VriRig04i/zk0O3YamwPpw992eIeZyinsvw2xOwoc5B2KNPCnHRaeTO4F7EJl
-fDE5VkelZVCuMr8/hBzLw4XfzlnNoHY3BmMbNJslmCvFBX0k+adqF6No5e3JPllO
-cJyFNjjC9WD/y4Y8pV5KymvWS3gQiw36y3iq9q0tR80dzah/PShbiHZUHCpPElBW
-TGiSuPAx8t7lp4ci+HnZ0DfHdWEg1qo/apaWkTV3KlYMVZmNxyYTW3R8R98lhe+u
-ILofzAsyTWJS0CKjPiIHzOcUPesS+vc1k7vtFkyclhPNoNs40gk=
-=PMEd
------END PGP SIGNATURE-----
-
---Signature=_Tue__26_Nov_2024_08_18_24_+0100_milZIYpp=r8ZwzMM--
+>
+> Thanks
+>
+> >
+> > >
+> > > Thanks
 
