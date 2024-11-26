@@ -1,87 +1,50 @@
-Return-Path: <netdev+bounces-147352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D7E9D93D1
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:08:54 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0929D93D8
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:10:21 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61DAA167FD9
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:10:18 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F931ADFEB;
+	Tue, 26 Nov 2024 09:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SHju/Ee8"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBBC2B21856
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:08:51 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079BB1B0F26;
-	Tue, 26 Nov 2024 09:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bczEdLco"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEF81B415C
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394B718F2DA;
+	Tue, 26 Nov 2024 09:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732612127; cv=none; b=Ym9LjAkJZpkBjpqgA9uOY197DOMBy6AFO9/pQCUuCTVL5QebUaCS/e4CAdEYSAxYuK7J6gN1Oy/zFNZGWbvvKsGXkh/1CRl+vSVgSNdAg9hQs0zRe3ioR6gm07fLjAzl57xouTuSUym3ykq4q+lrWHQst5PYM0dgaX0LefqHBRs=
+	t=1732612218; cv=none; b=QVUusKxOldZmf8TKaYa1ADJX3nDqsLxL9VRICEPmjwisb0pZrnkKxUkEiK90DutADKO8M5gCaEnBcYTlbefs8yuKVL11020J7q1eUh5l395JqYjJ+9Vm27GVxpiywbcfVOFX9KQyykNyeQ30GyekI5fqVHWLc5gY0K7GKvwlEaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732612127; c=relaxed/simple;
-	bh=sc+2ipuBlnI0+rAVlSLBGAGaPcNXDV7AgqigyNVrb8M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YDHuhNwvjpamElJ+ju2JEQ3X3kz8l/wvUwM4XeJLBDDRjTmGAG58/aK5yaBxRgvVslSjIBVrrWZXgVJcK9FRworgNpVj0mWifLCiFvfikNViO73IDkFaXhsEOKmChSZH/D5hf4yXI3VK/xODSDAKCXMv4kVHR4xy4FJjIIzTzUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bczEdLco; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4349fd77b33so15476195e9.2
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 01:08:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1732612125; x=1733216925; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PFd1ebhZpjAtZnnNiukccHu4xLx7w3A+9Qv4klrtJrs=;
-        b=bczEdLcoeLy/Jt7b8phBCxwOdM+vaq7IwmlJSt2CU9q+8AaZI+ob3vXXqebSjK3Wu3
-         ScDq49SsiFQPAZxKaCGajSq4XbVpmD9kLwHIICnE93MbaJ/+r8cxbjbaFKlLHDX13Ad6
-         ykt2bCHOt/QXOjb3Br0DrMySVSKHH76ypwS92TaWic7wiey2PG130zrUIADHyeWf1oLZ
-         jPMOsUNKfHEtLCHXjanZnPlZ7ltT6yCbhQN3+5mH/gS0sV/ayLzW5t2gvJgBMWnAkbr4
-         qPMZm7/rPqpTJ6gP3uPvsF33Qk61BfGbxtok96gbnHViMvpU3dyzqeoe/x5R6E570rrb
-         efaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732612125; x=1733216925;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PFd1ebhZpjAtZnnNiukccHu4xLx7w3A+9Qv4klrtJrs=;
-        b=t3VwuRX8uiEP6mV+gjPga5oXG4Bh0V/XBjeriubk183XtKzJwKqdaBoiVAQbsr8RpY
-         g/yMPVLpG4Aj6SeUr1Ch38xeHQwr6LDdFPBj1gC7FcImbeBArU7yjt9LDmwHmLI22Etj
-         B5wr2Tk92+pNYodJfu5rqBM8OcgOFZ6kYXQ4vl2/fj30RshPcIusUOcTo9U6HaKEOYu5
-         kZg4sY+vERCJ0bcTWgGheh+1WUjtlpdU1OC5waqSqjvXFTYgZoFhNtZ+ZKmwOw4RA9by
-         NbixYX7esFPaagJzRvibm7tfbcHKWMSrYq+yHqQiP3sx5sc6tNjsgegdeOLh1uRd2XIX
-         4DkA==
-X-Gm-Message-State: AOJu0Yzsphu2fMy6NEQIa+5lyyHTYhRbok6PiPrKxIHe1SitECcAy9oi
-	/OXM72L3Vd05bzejJL00SYxd6HDDVSdyqR4GJ8GKjZxT5Xq87zpzrDdEfHZbpOaNh+xYG3hRY3v
-	I
-X-Gm-Gg: ASbGncvfK85ptB/GEDgaJFbw3ranA9JusHqs2jpnGxcxvmboudKoovnAVl3zCGXVfK+
-	hzOvIEBVzp9fprv0QfUD3xgNXrrIMavrliYy3XovI/JN64pTkS1t3Pa81+BrEpVg6u3COWuw/j3
-	/vn0/8mDg9vv0qYe4HmY/biVet6cg5yg79KV4Ux+fMANgAPa7UN6uTv99vZiNeylxLiRC1/2sBF
-	cdL81OQZmhMAwDWFJw+6gUOx3rbJAkOVlIyJfYHx5A=
-X-Google-Smtp-Source: AGHT+IGseQ1ow5XF1iaXqYGyFaoKW09qOoxSQ1fJL0wFafyQG80Dr/OFZ1KD4rfu5+4vBQ5VZYZ8ew==
-X-Received: by 2002:a05:600c:548d:b0:433:c463:62dd with SMTP id 5b1f17b1804b1-433ce4e73camr137249625e9.27.1732612124756;
-        Tue, 26 Nov 2024 01:08:44 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a4d41fb4sm23577815e9.14.2024.11.26.01.08.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 01:08:44 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	dsahern@gmail.com,
-	saeedm@nvidia.com
-Subject: [PATCH iproute2 2/2] devlink: use the correct handle flag for port param show
-Date: Tue, 26 Nov 2024 10:08:28 +0100
-Message-ID: <20241126090828.3185365-3-jiri@resnulli.us>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241126090828.3185365-1-jiri@resnulli.us>
-References: <20241126090828.3185365-1-jiri@resnulli.us>
+	s=arc-20240116; t=1732612218; c=relaxed/simple;
+	bh=RKTl4ZHFTCDBw3opPPqPySWer7MgDg24OXtqlCf6FCI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fSNUzrPlqTlX5MEOd7XFqpAldjUjnYm3xVMwAcrtdM0VIpRYr3KtCDMsYZmrgcWaxOYlQl1Oop97TxnzerP9+pPiYphYpb5gAqQRNCRM1XVkrZAirl0ngTx4AU8/1zJxs4iw2USuyjMCFFzZYHj6/qea++iWGXGwfjuJ7I6uAOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SHju/Ee8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9621C4CECF;
+	Tue, 26 Nov 2024 09:10:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732612217;
+	bh=RKTl4ZHFTCDBw3opPPqPySWer7MgDg24OXtqlCf6FCI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SHju/Ee8NC8GX4VgkopikGbogKtOK4d/8yp6X13USAS/K0SX8KV14nyI5OtIW45Gs
+	 Yimzhxwa3t84W236WKKEH4AoOoj8reVD7YgOWxtqwjySH/cdmapAnfyySpUaKounKP
+	 w1UU0b2r1U6/hBtPKqgOV9HiR7/tKSPTVb9ZugAfT9cQU6YFcWB2X22HJSFb+Ez3V7
+	 tgk0evyx/nlDycViEHlwtXeTGdMuJQi+s6NZ/wXvdvkvVptlgTx/dCOs6Xrxklxs0U
+	 CusJnUeujTXkgelnZcqeFDOaL0M/9lxcgI9BqXsLVjs/au6E3OH4O6oKHuT/VnecmQ
+	 A9LO/qISZbzSg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE3CE3809A00;
+	Tue, 26 Nov 2024 09:10:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,40 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] s390/iucv: MSG_PEEK causes memory leak in
+ iucv_sock_destruct()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173261223051.316212.8347433268494188785.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Nov 2024 09:10:30 +0000
+References: <20241119152219.3712168-1-wintera@linux.ibm.com>
+In-Reply-To: <20241119152219.3712168-1-wintera@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ borntraeger@linux.ibm.com, svens@linux.ibm.com, twinkler@linux.ibm.com,
+ horms@kernel.org, sidraya@linux.ibm.com
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+Hello:
 
-Port param show command arg parser used the devlink dev flag
-instead of the port, which caused to not identify the port device
-argument, causing the following error:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-$ devlink port param show eth0 name link_type
-Wrong identification string format.
-Devlink identification ("bus_name/dev_name") expected
+On Tue, 19 Nov 2024 16:22:19 +0100 you wrote:
+> From: Sidraya Jayagond <sidraya@linux.ibm.com>
+> 
+> Passing MSG_PEEK flag to skb_recv_datagram() increments skb refcount
+> (skb->users) and iucv_sock_recvmsg() does not decrement skb refcount
+> at exit.
+> This results in skb memory leak in skb_queue_purge() and WARN_ON in
+> iucv_sock_destruct() during socket close. To fix this decrease
+> skb refcount by one if MSG_PEEK is set in order to prevent memory
+> leak and WARN_ON.
+> 
+> [...]
 
-Use the correct the devlink handle flag.
+Here is the summary with links:
+  - [net] s390/iucv: MSG_PEEK causes memory leak in iucv_sock_destruct()
+    https://git.kernel.org/netdev/net/c/ebaf81317e42
 
-Fixes: 70faecdca8f5 ("devlink: implement dump selector for devlink objects show commands")
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- devlink/devlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index f4e90b804fb6..5711974f2cb0 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -5088,7 +5088,7 @@ static int cmd_port_param_show(struct dl *dl)
- 
- 	err = dl_argv_parse_with_selector(dl, &flags,
- 					  DEVLINK_CMD_PORT_PARAM_GET,
--					  DL_OPT_HANDLE | DL_OPT_PARAM_NAME, 0,
-+					  DL_OPT_HANDLEP | DL_OPT_PARAM_NAME, 0,
- 					  DL_OPT_HANDLE | DL_OPT_HANDLEP, 0);
- 	if (err)
- 		return err;
+You are awesome, thank you!
 -- 
-2.47.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
