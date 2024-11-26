@@ -1,119 +1,101 @@
-Return-Path: <netdev+bounces-147484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE849D9C8D
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 18:29:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A6D9D9C9A
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 18:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A127F1637D1
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 17:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 419C816773A
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 17:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95471DB55C;
-	Tue, 26 Nov 2024 17:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8370F1DAC92;
+	Tue, 26 Nov 2024 17:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="sXLbEnkQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lX2HTkd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E071DACB4;
-	Tue, 26 Nov 2024 17:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FF11D63C4;
+	Tue, 26 Nov 2024 17:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732642135; cv=none; b=FlHlGmpLTsYImI7Hr59xNPpa/UreAzZx3MrPw4Pz0bSzrrOg4THZx0ZbyUVp3etJ6EDRWBYUbwCvBcsg3nm3KIjvX846xxk54Ruga/QOt7BYmgojNj8l0oUnf5VW6/oLnPJuETh0MiiIWmHHEsvQBTuU4JobJd2utJsUr8Tfchw=
+	t=1732642369; cv=none; b=fdnfPyY4XfK6YdP+xs2+7R2ED0DwsWabGvKzLPTm05LkNPw5VQ/+m6a/E5cfshcxOMvKwfNqMyTI82kjTEO3N/plGGfmgBz+GfJt6v2VS8JxzFBhXlabGs4w9keTsFc/8Lgem4SdntsbyAZ78t7u0O8RofDK/iyyzSWVp7HXigs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732642135; c=relaxed/simple;
-	bh=PlMMIc4AQSbkLcvBzrHB9wgiuJrm21ESzo2se5IDeG8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XVm/4ofvj/shJs2rtXNiU2EmrJUcZjRcZyhZYHqH/ddT/qq6Wh459sxxVwXkEpBK+T7u6CeXc9W1bi+Kbc/R3ly4OB3r3GVGxzomUuK/KjDb1eh4SWEb6XlNeYcQ9WIEGODqcoQ1Va7PqBOzVtKuSGYeUj1FtewHMDdz3SCxTp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=sXLbEnkQ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.115] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 1A72420545AE;
-	Tue, 26 Nov 2024 09:28:53 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1A72420545AE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1732642133;
-	bh=H94+kE6a6Z3TCvsv5IQfa8koOq42a44wDuStW4E/6+8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sXLbEnkQ61nv6hbtZZ2ZQwagIwQ3s57qp+UTpK189JiX/cAYSvAH5zo9QDJA5ey8k
-	 Dwt4CCS4FMIH15sSObKql/pyGsegy+eu+jPnazasSvIj/u/dhKQ5vboJ68gY5vxkaU
-	 Ik00OhGi1r1Ksyj94O5yXx79fuqOSlgwKrm8eO6s=
-Message-ID: <074bacbe-2823-4653-a6fb-a50b7785a027@linux.microsoft.com>
-Date: Tue, 26 Nov 2024 09:28:52 -0800
+	s=arc-20240116; t=1732642369; c=relaxed/simple;
+	bh=H17MHCfd24VPEldcnn5wdiGocPT+zmtDZfyEF8Mym3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UinkD7PjTc4Ua81Cx52zJsbAwpIngDLB5d54dVHh1tpg8gLkXsWntbPPfPR/VnhdzocCXzUymc7QnZRU783hoKSI4e2YlSbK02a6i9nH+DAzCl90Q5UY74XBzX2NMNb4P2llQAjYIZK4pfbf6Y3th+/5kHYJxZbU51UPs6sijCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lX2HTkd0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Us51DEsfUuxfpmv7rXsN3ADrJLcG5L8FQbD+ZR2E+ps=; b=lX2HTkd0Yss2rlJmqzV8ZArRTS
+	CjjM3ticImcRzuIvMQz1oGCx0etV4a/4bpO1dotmha6JihdZfu85408KAJR1nh7J3hmq6DCGD2tlE
+	Nu2HQ5t3s6Rv2raZUnNy4ofdolBcBB29iwDE+s2h8yQz3mHSHMUQqAxwiJfvVkIkGX9k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tFzQV-00EXlC-LI; Tue, 26 Nov 2024 18:32:39 +0100
+Date: Tue, 26 Nov 2024 18:32:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Asmaa Mnebhi <asmaa@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	David Thompson <davthompson@nvidia.com>
+Subject: Re: [PATCH net v1] mlxbf-gige: Support workaround for MDIO GPIO
+ degradation bug
+Message-ID: <7c7e94dc-a87f-425b-b833-32e618497cf8@lunn.ch>
+References: <20241122224829.457786-1-asmaa@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/5] hyperv: Remove the now unused hyperv-tlfs.h files
-To: Michael Kelley <mhklinux@outlook.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
- "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>
-Cc: "kys@microsoft.com" <kys@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "luto@kernel.org" <luto@kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
- "kw@linux.com" <kw@linux.com>, "robh@kernel.org" <robh@kernel.org>,
- "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de"
- <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
- "jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
- "muminulrussell@gmail.com" <muminulrussell@gmail.com>,
- "skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
- "mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>,
- "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
- "apais@linux.microsoft.com" <apais@linux.microsoft.com>,
- "eahariha@linux.microsoft.com" <eahariha@linux.microsoft.com>,
- "horms@kernel.org" <horms@kernel.org>
-References: <1732577084-2122-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1732577084-2122-6-git-send-email-nunodasneves@linux.microsoft.com>
- <SN6PR02MB41570E0108D4E3B45571EE9FD42F2@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <SN6PR02MB41570E0108D4E3B45571EE9FD42F2@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241122224829.457786-1-asmaa@nvidia.com>
 
-On 11/25/2024 9:59 PM, Michael Kelley wrote:
-> From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Monday, November 25, 2024 3:25 PM
->>
->> Remove all hyperv-tlfs.h files. These are no longer included
->> anywhere. hyperv/hvhdk.h serves the same role, but with an easier
->> path for adding new definitions.
->>
->> Remove the relevant lines in MAINTAINERS.
->>
->> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+On Fri, Nov 22, 2024 at 10:48:27PM +0000, Asmaa Mnebhi wrote:
+> From: asmaa <asmaa@nvidia.com>
 > 
-> Reviewed-by: Michael Kelley <mhklinux@outlook.com>
+> Once the BlueField-3 MDIO clock is enabled by software, it is expected
+> and intended for it to keep toggling. BlueField-3 has a hardware GPIO bug
+> where constant toggling at "high frequencies" will lead to GPIO
+> degradation.
+> 
+> The workaround suggested by the hardware team is to lower down the clock
+> frequency. That will increase the "life expectation" of the GPIO.
+> The lowest possible frequency we can achieve is 1.09Mhz by setting
+> mdio_period = 0xFF.
 
-Thanks for the reviews on this series Michael!
+802.3 says:
+
+  22.2.2.13 MDC (management data clock)
+
+  MDC is sourced by the station management entity to the PHY as the
+  timing reference for transfer of information on the MDIO signal. MDC
+  is an aperiodic signal that has no maximum high or low times. The
+  minimum high and low times for MDC shall be 160 ns each, and the
+  minimum period for MDC shall be 400 ns, regardless of the nominal
+  period of TX_CLK and RX_CLK.
+
+My reading of this is that you can stop the clock when it is not
+needed. Maybe tie into the Linux runtime power management
+framework. It can keep track of how long a device has been idle, and
+if a timer is exceeded, make a callback to power it down.
+
+If you have an MDIO bus with one PHY on it, the access pattern is
+likely to be a small bunch of reads followed by about one second of
+idle time. I would of thought that stopping the clock increases the
+life expectancy of you hardware more than just slowing it down.
+
+	Andrew
 
