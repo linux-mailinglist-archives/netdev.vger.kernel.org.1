@@ -1,333 +1,204 @@
-Return-Path: <netdev+bounces-147528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 886719D9F0C
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 22:54:39 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D82E9D9FD9
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 00:54:37 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24A48165520
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:54:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E236728320E
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 23:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6181DEFE1;
-	Tue, 26 Nov 2024 21:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E151DFE09;
+	Tue, 26 Nov 2024 23:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AjKBS43O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q3rviiPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334B3160884
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 21:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E19D299;
+	Tue, 26 Nov 2024 23:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732658076; cv=none; b=sYWidOzE9anBeBQHMh2t12jaSYE9sUdx94aebHxV6VAYswpTYJpTBvNRsl8ziMCtuYqVivl+Dh6fStOv45zQpPou+hiFgxApnfbdaJy7MAXzK/1B2inuvPCx0IRnnNi//EQ7yshvW4MJCafpubDTiSPzj6YEXxY43frsvMVPWBU=
+	t=1732665273; cv=none; b=fKWfFxRPsOrHTqUzgEkP7dHyOsC9FyhQlKD9boXJY2loNxu92/+7Tvi4FIlytSVWJlOCIvqvuuBxuBxYcCdUZN1smpwukF9jNE8T6VMwSV1EDrTWU/Sh/pYwF1qmXHgFnR1oGgVuGGBdOmVy2ynCArNJ315O8KX2gQkxgm+N6B4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732658076; c=relaxed/simple;
-	bh=AFrpQREeKJUVEInX3v0hu0yPGLZCzbOkvDsefsWIZRg=;
+	s=arc-20240116; t=1732665273; c=relaxed/simple;
+	bh=x63pMP4OLfWRH+KuRzokRHFrfyWUaoWvW8veNR5AVMg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LmJv94xMG7pM8BT3z7m+tMXGU/rGJLLu+GJvlonY0f0COfj4XN9VR4ho3HRf4RDbHfa4wlwLx9p3EhN3K3pAp4XPj9U7mKwrtK9zSOsTEZUNBWw3bMiBX9P0Ok5VsvRl3HVHYYd4OhKu1STQbMCA13pk9cBdEByHybvbOrs5HGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AjKBS43O; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-53de880c77eso1824650e87.1
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 13:54:33 -0800 (PST)
+	 To:Cc:Content-Type; b=tNnzX+Iysp1AAW/tocqBIfWzlFBaTwZBUyrPmSGdchVNq7TBXfntbMhRYjg1By1IKkRv+SQ4RQOIp7v/PjM7lEyKi+Ig/1NqEHh0NLMJIM9Cgi41fYL6XbC0aY8oFitxQnNrkNqm2OfXbGqGVgpg9WsOJF8XIo7AfZ2EsLMndKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q3rviiPK; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3823f1ed492so134414f8f.1;
+        Tue, 26 Nov 2024 15:54:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732658072; x=1733262872; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732665270; x=1733270070; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7JjJ3dt95EA7mVzRH47zkdO0ubeMUr3AwSruH0KqrE0=;
-        b=AjKBS43ONDAlXunyVnyVD/LyW0NnIPCOO5Q5wkvIZksrQaGZVhHWMsPkgh/SazFxWp
-         s3Bsvwm/kLVOJrXFVUdlcnwU1PzVFZ1T4PJL/Eep4RzHee7/E7bgTtbGckmTEa8KvInO
-         L3icSkHlebFx0tMwmCj4Obf6Il16nSZR7R+XRXopj+Ge/byDvZgra5t5M8CGb7GtzTh1
-         7acADZAQvd6CdivfJKHkVWWu4dmdfVHecZJBK40Q/NpudliSUkFq6CB8TyJVk9uFpLqI
-         pvNUgudmGViYKNnihzSbXvVAvpnm6gd8x48pOp1su/sR7svQ5BmRyNrllw0ZJgASciOz
-         NUfQ==
+        bh=u2u5ocyAxhRtJ7w+0LT+WI0tq8J0AZWlWuu8DjpM/jI=;
+        b=Q3rviiPK4r2pec4yNpvG/pR7HXBabNgNtjhJjoNG2wTlRZwt61kpUQsPDBAYtszXNK
+         yyfiZBE0eWszwJYN/bBzOg+AHeB7mpPEZZ6M4Gm9RMq4IBeZAZJdA0GB3eZC0tyKuVcL
+         6lNpEoUK4NGqUe2VzJR4M81WPKJBIB3uyXLsSusBcZSoN6OX2YQCBGtyQ+ew2m+suCH5
+         14gGOOzqAQHYiMFtimCxfqps0L4CfnM5PjzKt9M3AVwC2VP1Fmy4hJDilFLP1DWTQKGz
+         eWEMXmoehvKGVCse1Fb8fdikNSIWgm5xFuLT61qQFa1briNj1jiC8bQkUJgM1L0ksIKR
+         kvtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732658072; x=1733262872;
+        d=1e100.net; s=20230601; t=1732665270; x=1733270070;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7JjJ3dt95EA7mVzRH47zkdO0ubeMUr3AwSruH0KqrE0=;
-        b=aNjnTiShs3POXPgrX14nYF5vaiefDWBK3x1zC+KS//ByTy+LLQ3kLkhBtNw1g1nlXK
-         +PsVVHUG/6Hl84QMfCJloez6j8vhI5/9QY+kXcULPIvU40CCWwtVNKTaWVgxRSUzGZVX
-         3dOoxdcfcaaxadXVWEgYtw3/PXoUIkdIelpRnh38BSoc0fIpfXNM0dv7Pi6xG61fjhkG
-         DLnXHVeWJsNDogMu/RN3O2VYncEEqVzlXiP9iCkD3b9xjECOkMexh07yKNX6QXCrBItN
-         2RlT4SFs9NhDyVXuu051ghSSzbOPzdUOTmrQscEFwlVHbg++ilyFfxLNkNL6QvpBO38n
-         yg2g==
-X-Gm-Message-State: AOJu0YyvLs/LN/m+tDXhl4vC9oWPxjtfoaaWbgsNYc0beq8Lbyvoo+/y
-	ED2JAiDI1Nu3IbSFd75TxlXW6varDX0D3bl0HVbFwkbua3VgG2wCGAHnYlDyFY8/lgXvbU+jlLM
-	wqZ7qMRSzLBcqOWhw0iYMjt81Ows2AJipsBlL
-X-Gm-Gg: ASbGnctkI5rGPA/XezoAtZ+WQM7HeFF78I/23JWblFHSN+O/sCv74WhQdUCT4tebpOs
-	Xo/dpC3PnMkoHoaav74mkQkf6FV2IioQQ6UoZUv/bOk6W6K8foz5PvHPhEKuD
-X-Google-Smtp-Source: AGHT+IHCbjVaptbAWeeDThZP7HQmyjN3jASLy5b8Aa61s+xL4PlW7WDJGvuhUh76wWfvqd468h6WQ9rfT8Xjwyr0LcE=
-X-Received: by 2002:a05:6512:104f:b0:53d:a024:ddb2 with SMTP id
- 2adb3069b0e04-53df00d3c06mr359694e87.24.1732658071850; Tue, 26 Nov 2024
- 13:54:31 -0800 (PST)
+        bh=u2u5ocyAxhRtJ7w+0LT+WI0tq8J0AZWlWuu8DjpM/jI=;
+        b=raGLI9uE+JAFqRpQ2gqjkD7F1oJkQQu3I4tFcQNg1ASzMmwzX8YPaWH5DUqESZ/D31
+         XQyiws6FFBX2YK+rn2ntldA+aw0xxU5s+8yuHknGyI64krJGOa9GPhK9+InuJ2mwtIFN
+         NvDIDW8Eb4syak3dil0T+WYGVxIP0HQSTznIBDKQD1wSzudOvS5fO1H1kxVjj6vqIOu3
+         rYkuRGBoKMIBOcaU9Nr3mi99t4kielifSC4PG9+hTBevns/9dI9pwD0sNl8UQ5UySP8k
+         Feg5o0IHycvelYsEgsBKXWCAY5wNzxpKq/0HNv3k1NYLdzDlXezFXf5Fs1sPyUCyh4s5
+         W9MA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5EGm5bRWceBsu5EbXcJblNF6Hobw7+5KsqVb+1ThUYlptccd+teNz5f9HNInv8dTyqjq+zG8Y@vger.kernel.org, AJvYcCWwYfsiIHX91lqH8M+WHglrieLhwzlD+nDCiKX9SUfx1pALrTY967HV1X05dHAL2YhyhUbUUI4TeWAHPmE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1NbinP6sQlKMtsNVoFhiKUj226qFcDJIB2OnYvNJ62MBRRapi
+	HDhXsVq9ARlgaHlXjivGLXefE0smR1KzlVPDwVgZSaJMnLBnIBg+5sAdinkq+B/hhM3y9eCszZA
+	UkUAhaFPtpuEDLXFJYOiy4jdlgSk=
+X-Gm-Gg: ASbGncuf/K4DJ08dSivdPBEGC+DnIxxE6mjix2j94nVgiM3liwk0vwohc37YsgQoUU1
+	cbvGgGZocIVF1bfDSw+W2b2bFJR8WZUiulBDrBx0OjNB569sIAtfsYj07ApFqpS5c
+X-Google-Smtp-Source: AGHT+IFtH1P3ItFz7u/rM/m1aucdE4ilOQvI4yoohlQC7SXR7UEilmGjmt5k6+4jadT8AZZ+mnnALhcPNWhrUveUGRI=
+X-Received: by 2002:a5d:5986:0:b0:382:2e9e:d695 with SMTP id
+ ffacd0b85a97d-385c6841615mr711578f8f.24.1732665269562; Tue, 26 Nov 2024
+ 15:54:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241121215257.3879343-2-wangfe@google.com> <20241124081549.GD160612@unreal>
-In-Reply-To: <20241124081549.GD160612@unreal>
-From: Feng Wang <wangfe@google.com>
-Date: Tue, 26 Nov 2024 13:54:20 -0800
-Message-ID: <CADsK2K_na0Ugwv2PPT_s4oHSAx2rtZvtYY58C4MQkjE6G5y4Ew@mail.gmail.com>
-Subject: Re: [PATCH v6] xfrm: add SA information to the offloaded packet when
- if_id is set
-To: Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	antony.antony@secunet.com, pabeni@redhat.com
+References: <20241120103456.396577-1-linyunsheng@huawei.com>
+ <20241120103456.396577-3-linyunsheng@huawei.com> <3366bf89-4544-4b82-83ec-fd89dd009228@kernel.org>
+ <27475b57-eda1-4d67-93f2-5ca443632f6b@huawei.com> <CAHS8izM+sK=48gfa3gRNffu=T6t6-2vaS60QvH79zFA3gSDv9g@mail.gmail.com>
+In-Reply-To: <CAHS8izM+sK=48gfa3gRNffu=T6t6-2vaS60QvH79zFA3gSDv9g@mail.gmail.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 26 Nov 2024 15:53:53 -0800
+Message-ID: <CAKgT0Uc-SDHsGkgmLeAuo5GLE0H43i3h7mmzG88BQojfCoQGGA@mail.gmail.com>
+Subject: Re: [PATCH RFC v4 2/3] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Mina Almasry <almasrymina@google.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, liuyonglong@huawei.com, 
+	fanghaiqing@huawei.com, zhangkun09@huawei.com, 
+	Robin Murphy <robin.murphy@arm.com>, IOMMU <iommu@lists.linux.dev>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Please see embedded answers below. Thanks.
+On Tue, Nov 26, 2024 at 1:51=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> On Thu, Nov 21, 2024 at 12:03=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei=
+.com> wrote:
+> >
+> > On 2024/11/20 23:10, Jesper Dangaard Brouer wrote:
+> > >
+> > >>       page_pool_detached(pool);
+> > >>       pool->defer_start =3D jiffies;
+> > >>       pool->defer_warn  =3D jiffies + DEFER_WARN_INTERVAL;
+> > >> @@ -1159,7 +1228,7 @@ void page_pool_update_nid(struct page_pool *po=
+ol, int new_nid)
+> > >>       /* Flush pool alloc cache, as refill will check NUMA node */
+> > >>       while (pool->alloc.count) {
+> > >>           netmem =3D pool->alloc.cache[--pool->alloc.count];
+> > >> -        page_pool_return_page(pool, netmem);
+> > >> +        __page_pool_return_page(pool, netmem);
+> > >>       }
+> > >>   }
+> > >>   EXPORT_SYMBOL(page_pool_update_nid);
+> > >
+> > > Thanks for continuing to work on this :-)
+> >
+> > I am not sure how scalable the scanning is going to be if the memory si=
+ze became
+> > bigger, which is one of the reason I was posting it as RFC for this ver=
+sion.
+> >
+> > For some quick searching here, it seems there might be server with max =
+ram capacity
+> > of 12.3TB, which means the scanning might take up to about 10 secs for =
+those systems.
+> > The spin_lock is used to avoid concurrency as the page_pool_put_page() =
+API might be
+> > called from the softirq context, which might mean there might be spinni=
+ng of 12 secs
+> > in the softirq context.
+> >
+> > And it seems hard to call cond_resched() when the scanning and unmappin=
+g takes a lot
+> > of time as page_pool_put_page() might be called concurrently when pool-=
+>destroy_lock
+> > is released, which might means page_pool_get_dma_addr() need to be chec=
+ked to decide
+> > if the mapping is already done or not for each page.
+> >
+> > Also, I am not sure it is appropriate to stall the driver unbound up to=
+ 10 secs here
+> > for those large memory systems.
+> >
+> > https://www.broadberry.com/12tb-ram-supermicro-servers?srsltid=3DAfmBOo=
+rCPCZQBSv91mOGH3WTg9Cq0MhksnVYL_eXxOHtHJyuYzjyvwgH
+> >
+>
+> FWIW I'm also concerned about the looping of all memory on the system.
+> In addition to the performance, I think (but not sure), that
+> CONFIG_MEMORY_HOTPLUG may mess such a loop as memory may appear or
+> disappear concurrently. Even if not, the CPU cost of this may be
+> significant. I'm imagining the possibility of having many page_pools
+> allocated on the system for many hardware queues, (and maybe multiple
+> pp's per queue for applications like devmem TCP), and each pp looping
+> over the entire xTB memory on page_pool_destroy()...
+>
+> My 2 cents here is that a more reasonable approach is to have the pp
+> track all pages it has dma-mapped, without the problems in the
+> previous iterations of this patch:
+>
+> 1. When we dma-map a page, we add it to some pp->dma_mapped data
+> structure (maybe xarray or rculist).
+> 2. When we dma-unmap a page, we remove it from pp->dma_mapped.
+> 3 When we destroy the pp, we traverse pp->dma_mapped and unmap all the
+> pages there.
 
-On Sun, Nov 24, 2024 at 12:15=E2=80=AFAM Leon Romanovsky <leon@kernel.org> =
-wrote:
->
-> On Thu, Nov 21, 2024 at 09:52:58PM +0000, Feng Wang wrote:
-> > In packet offload mode, append Security Association (SA) information
-> > to each packet, replicating the crypto offload implementation.
->
-> Please write explicitly WHY "replicating ..." is right thing to do and
-> why current code is not enough.
->
-> The best thing will be to see how packet traversal in the netdev stack
-> till it gets to the wire.
->
-I explained why doing this change in the third paragraph based on
-Steffen's suggestion, I can move it here.
+The thing is this should be a very rare event as it should apply only
+when a device is removed and still has pages outstanding shouldn't it?
+The problem is that maintaining a list of in-flight DMA pages will be
+very costly and will make the use of page pool expensive enough that I
+would worry it might be considered less than useful. Once we add too
+much overhead the caching of the DMA address doesn't gain us much on
+most systems in that case.
 
-> >
-> > The XFRM_XMIT flag is set to enable packet to be returned immediately
-> > from the validate_xmit_xfrm function, thus aligning with the existing
-> > code path for packet offload mode.
+> I haven't looked deeply, but with the right data structure we may be
+> able to synchronize 1, 2, and 3 without any additional locks. From a
+> quick skim it seems maybe rculist and xarray can do this without
+> additional locks, maybe.
 >
-> This chunk was dropped mysteriously. It doesn't exist in the current patc=
-h.
-> What type of testing did you perform? Can you please add it to the
-> commit message?
->
-I didn't drop any code in the current patch,  I created a test and the
-patch will be upstreamed after this change is checked in.
-The link is https://lore.kernel.org/all/20241104233315.3387982-1-wangfe@goo=
-gle.com/
-Do I need to add the test details in this commit?
+> Like stated in the previous iterations of this approach, we should not
+> be putting any hard limit on the amount of memory the pp can allocate,
+> and we should not have to mess with the page->pp entry in struct page.
 
-> According to the strongswan documentation https://docs.strongswan.org/doc=
-s/5.9/features/routeBasedVpn.html,
-> "Traffic that=E2=80=99s routed to an XFRM interface, while no policies an=
-d SAs with matching interface ID exist,
-> will be dropped by the kernel."
->
-> It looks like the current code doesn't handle this case, does it?
->
-The current code will drop the packet if the interface ID is not matched.
+I agree with you on the fact that we shouldn't be setting any sort of
+limit. The current approach to doing the unmapping is more-or-less the
+brute force way of doing it working around the DMA api. I wonder if we
+couldn't look at working with it instead and see if there wouldn't be
+some way for us to reduce the overhead instead of having to do the
+full scan of the page table.
 
-> >
-> > This SA info helps HW offload match packets to their correct security
-> > policies. The XFRM interface ID is included, which is used in setups
-> > with multiple XFRM interfaces where source/destination addresses alone
-> > can't pinpoint the right policy.
->
-> Please add an examples of iproute2 commands on how it is achieved,
-> together with tcprdump examples of before and after.
->
-A test patch will be upstreamed.  There is no need for tcpdump because
-this change won't change packet content.
+One thought in that regard though would be to see if there were a way
+to have the DMA API itself provide some of that info. I know the DMA
+API should be storing some of that data for the mapping as we have to
+go through and invalidate it if it is stored.
 
-> >
-> > Enable packet offload mode on netdevsim and add code to check the XFRM
-> > interface ID.
->
-> You still need to add checks in existing drivers to make sure that SAs
-> with if_id won't be offloaded.
->
-There is no existing driver supporting packet offload mode except netdevsim=
-.
-
-> IMHO, netdevsim implementation is not a replacement to support
-> out-of-tree code, but a way to help testing features without need to
-> have complex HW, but still for the code which is in-tree.
->
-We discussed this before, and I followed your and Steffen's comment to
-add netdevsim simulation code to satisfy the requirement.
-
-> Thanks
->
-
-> >
-> > Signed-off-by: wangfe <wangfe@google.com>
-> > ---
-> > v6: https://lore.kernel.org/all/20241119220411.2961121-1-wangfe@google.=
-com/
-> >   - Fix code style to follow reverse x-mas tree order declaration.
-> > v5: https://lore.kernel.org/all/20241112192249.341515-1-wangfe@google.c=
-om/
-> >   - Add SA information only when XFRM interface ID is non-zero.
-> > v4: https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@google.=
-com/
-> >   - Add offload flag check and only doing check when XFRM interface
-> >     ID is non-zero.
-> > v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@google.c=
-om/
-> >   - Add XFRM interface ID checking on netdevsim in the packet offload
-> >     mode.
-> > v2:
-> >   - Add why HW offload requires the SA info to the commit message
-> > v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@google.=
-com/
-> > ---
-> > ---
-> >  drivers/net/netdevsim/ipsec.c     | 32 ++++++++++++++++++++++++++++++-
-> >  drivers/net/netdevsim/netdevsim.h |  1 +
-> >  net/xfrm/xfrm_output.c            | 22 +++++++++++++++++++++
-> >  3 files changed, 54 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipse=
-c.c
-> > index 88187dd4eb2d..5677b2acf9c0 100644
-> > --- a/drivers/net/netdevsim/ipsec.c
-> > +++ b/drivers/net/netdevsim/ipsec.c
-> > @@ -153,7 +153,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
-> >               return -EINVAL;
-> >       }
-> >
-> > -     if (xs->xso.type !=3D XFRM_DEV_OFFLOAD_CRYPTO) {
-> > +     if (xs->xso.type !=3D XFRM_DEV_OFFLOAD_CRYPTO &&
-> > +         xs->xso.type !=3D XFRM_DEV_OFFLOAD_PACKET) {
-> >               NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload typ=
-e");
-> >               return -EINVAL;
-> >       }
-> > @@ -169,6 +170,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
-> >       memset(&sa, 0, sizeof(sa));
-> >       sa.used =3D true;
-> >       sa.xs =3D xs;
-> > +     sa.if_id =3D xs->if_id;
-> >
-> >       if (sa.xs->id.proto & IPPROTO_ESP)
-> >               sa.crypt =3D xs->ealg || xs->aead;
-> > @@ -227,16 +229,31 @@ static bool nsim_ipsec_offload_ok(struct sk_buff =
-*skb, struct xfrm_state *xs)
-> >       return true;
-> >  }
-> >
-> > +static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
-> > +                              struct netlink_ext_ack *extack)
-> > +{
-> > +     return 0;
-> > +}
-> > +
-> > +static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
-> > +{
-> > +}
-> > +
-> >  static const struct xfrmdev_ops nsim_xfrmdev_ops =3D {
-> >       .xdo_dev_state_add      =3D nsim_ipsec_add_sa,
-> >       .xdo_dev_state_delete   =3D nsim_ipsec_del_sa,
-> >       .xdo_dev_offload_ok     =3D nsim_ipsec_offload_ok,
-> > +
-> > +     .xdo_dev_policy_add     =3D nsim_ipsec_add_policy,
-> > +     .xdo_dev_policy_delete  =3D nsim_ipsec_del_policy,
-> > +
-> >  };
-> >
-> >  bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
-> >  {
-> >       struct sec_path *sp =3D skb_sec_path(skb);
-> >       struct nsim_ipsec *ipsec =3D &ns->ipsec;
-> > +     struct xfrm_offload *xo;
-> >       struct xfrm_state *xs;
-> >       struct nsim_sa *tsa;
-> >       u32 sa_idx;
-> > @@ -275,6 +292,19 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk=
-_buff *skb)
-> >               return false;
-> >       }
-> >
-> > +     if (xs->if_id) {
-> > +             if (xs->if_id !=3D tsa->if_id) {
-> > +                     netdev_err(ns->netdev, "unmatched if_id %d %d\n",
-> > +                                xs->if_id, tsa->if_id);
-> > +                     return false;
-> > +             }
-> > +             xo =3D xfrm_offload(skb);
-> > +             if (!xo || !(xo->flags & XFRM_XMIT)) {
-> > +                     netdev_err(ns->netdev, "offload flag missing or w=
-rong\n");
-> > +                     return false;
-> > +             }
-> > +     }
-> > +
-> >       ipsec->tx++;
-> >
-> >       return true;
-> > diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/=
-netdevsim.h
-> > index bf02efa10956..4941b6e46d0a 100644
-> > --- a/drivers/net/netdevsim/netdevsim.h
-> > +++ b/drivers/net/netdevsim/netdevsim.h
-> > @@ -41,6 +41,7 @@ struct nsim_sa {
-> >       __be32 ipaddr[4];
-> >       u32 key[4];
-> >       u32 salt;
-> > +     u32 if_id;
-> >       bool used;
-> >       bool crypt;
-> >       bool rx;
-> > diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-> > index e5722c95b8bb..3e9a1b17f37e 100644
-> > --- a/net/xfrm/xfrm_output.c
-> > +++ b/net/xfrm/xfrm_output.c
-> > @@ -704,6 +704,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *sk=
-b)
-> >  {
-> >       struct net *net =3D dev_net(skb_dst(skb)->dev);
-> >       struct xfrm_state *x =3D skb_dst(skb)->xfrm;
-> > +     struct xfrm_offload *xo;
-> > +     struct sec_path *sp;
-> >       int family;
-> >       int err;
-> >
-> > @@ -728,7 +730,27 @@ int xfrm_output(struct sock *sk, struct sk_buff *s=
-kb)
-> >                       kfree_skb(skb);
-> >                       return -EHOSTUNREACH;
-> >               }
-> > +             if (x->if_id) {
-> > +                     sp =3D secpath_set(skb);
-> > +                     if (!sp) {
-> > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERRO=
-R);
-> > +                             kfree_skb(skb);
-> > +                             return -ENOMEM;
-> > +                     }
-> > +
-> > +                     sp->olen++;
-> > +                     sp->xvec[sp->len++] =3D x;
-> > +                     xfrm_state_hold(x);
-> >
-> > +                     xo =3D xfrm_offload(skb);
-> > +                     if (!xo) {
-> > +                             secpath_reset(skb);
-> > +                             XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERRO=
-R);
-> > +                             kfree_skb(skb);
-> > +                             return -EINVAL;
-> > +                     }
-> > +                     xo->flags |=3D XFRM_XMIT;
-> > +             }
-> >               return xfrm_output_resume(sk, skb, 0);
-> >       }
-> >
-> > --
-> > 2.47.0.371.ga323438b13-goog
-> >
-> >
+Another alternative would be to see if we have the option to just
+invalidate the DMA side of things entirely for the device. Essentially
+unregister the device from the IOMMU instead of the mappings. If that
+is an option then we could look at leaving the page pool in a state
+where it would essentially claim it no longer has to do the DMA unmap
+operations and is just freeing the remaining lingering pages.
 
