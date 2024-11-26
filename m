@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 583B99D9467
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:27:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B09B9D946A
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 184B4163F1D
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:27:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 896EA165EE9
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8074D1D4352;
-	Tue, 26 Nov 2024 09:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BA61D517A;
+	Tue, 26 Nov 2024 09:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LnPuZ5cM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="R1xRbhVb"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5D41BA86C
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F921D5170
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732613134; cv=none; b=p7MKYnjLxGX/UqHj6dCiLXyU5aB4xTkHS85bdokpvliyaJUzAOoMe2L0vj84KbXldvho6R1/WmeIAJOuiwf36omEb0ckxRCYKKtfNEPOsCu+suSlFzWv/fZrGSOPkhm3dru1W6RB92PAM8iRRsQBI4AKiBX0wYmcEKiZlu7tdUQ=
+	t=1732613139; cv=none; b=jIiqN7xT7iEzBSfGbC4vzjTDmd2kyArAs9HES2XgL5jUg7kQ9affQLdE1kiv7CFfwsvZwR4hwurpqA1S6opZygNHQCK+m9h0Pw6TtWQH3RRuHMORp7LzkZRVaqUOCpaYFKIPjxE9QnO203AwQXJWqNJQf96oChD5JkLO8VfkGCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732613134; c=relaxed/simple;
-	bh=3q2GSUIfMLuYYHPDl+5tah3ircLf3D4P5iLONXakGTo=;
+	s=arc-20240116; t=1732613139; c=relaxed/simple;
+	bh=YOAX/kDYS93CRTAyV9yok+iJG4ddKJPCQWoCW1sl50o=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=izD2RPWl24URJXNnnVuP65AA4gz4FZfA6XYdQoo9uN9GOjd6ph/ZGubMRc81XhSZ2N4ffDVcLCCnX1kQeNZKlAVkFfjL7KfjIWkQrp4SoQ1gP7MvHiZ3Q0ZZ1FhpNWHUuTD543JGBlAPBKvBQTA5wKFJWlIrjfNnP+uoFn/pOEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LnPuZ5cM; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=OBCK1XmxQCuwsXdFjRxq3T1vuNJa4CWF3X2pBSJSox6KXLx+qh3ctQAzjmcdNEX3z5QBSEiFZUjyH6Sq6lsU3xzsY+jXJetYfD494w58DZOFkRIRK1yWfTnS7TO3sQtU7Gu68lOZ1uSYEfNXAYucUhUj+BxxgrlmyvJxwrdk3WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=R1xRbhVb; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CpTJ7ep7WjNgRdD+PpFVRfcu1rVLPyYDfT8jjGhsaVw=; b=LnPuZ5cM/QCEy7/toUkkCR2DJI
-	Kmc7f/FM73ibcxdv6sLAU1AFBh0/aRfTwx99wKGolnP5yH6geh2UAbUIHttlBji/1UOkqbAK06aVv
-	TIfJ/qp0eftWm07O0Kdc68e6y+MvMl/UgFFte7as5W2iQfmE3sZbU7od5JXmipeosu//+E3XeFxro
-	3gwxNoZhxeTF1iohFsbs+9yT5Ryzld0oYvjEdOyAS4f4YrmUtirsT0ccfwmKCaty3mzm3MxjOLafp
-	MDQCjHy9ZkJMUFzjIks9aiPe7jEny+2bUHFJpqCa6t22ss1TpTy/ggYdUzWbQWPaEnJWpBIwU+ZxK
-	sGC3dkcg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35156 helo=rmk-PC.armlinux.org.uk)
+	bh=7vuVuSz1ikyfCg09UlbCqoDgZ9MeD4Xre3c4jOWt9Zo=; b=R1xRbhVbO3X3ElH4ipfqT/sK3y
+	szMeNVq21WHN7qs2wvbMNb9qbnbl+JF0622GZnG45lZ7rCpOo0YHbU7o+85uWT+w2L7CjTC2Rkb1t
+	mHjvzLol0WlhBZqsmSwDg3akFga0vh+UxwtRjBEv+MiFJiAviKNqrr9vPLNZjNZPDcrNhuUa1jNNs
+	OZVkCwdwVeJum3obf8al8s5xLMohBDAzUW6bnh/RXS8ySAWrKWPgFQvaFZ0n+nrVTn5Wd8cfd3kqN
+	+VMC6lrnBch4o//zG6joUVGNaAT4cs3O0BtThbsH+dayQXFhN11VecEBXxGPv+zzxFBN8Y8gVhoN0
+	hqvDMV0g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35162 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFros-0006VM-13;
-	Tue, 26 Nov 2024 09:25:18 +0000
+	id 1tFrox-0006Vi-25;
+	Tue, 26 Nov 2024 09:25:24 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFroq-005xQk-SU; Tue, 26 Nov 2024 09:25:16 +0000
+	id 1tFrov-005xQq-W8; Tue, 26 Nov 2024 09:25:22 +0000
 In-Reply-To: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
 References: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -74,7 +74,7 @@ Cc: Alexander Couzens <lynxis@fe80.eu>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next 12/16] net: pcs: pcs-lynx: implement
+Subject: [PATCH RFC net-next 13/16] net: pcs: pcs-mtk-lynxi: implement
  pcs_inband_caps() method
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,57 +85,51 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFroq-005xQk-SU@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tFrov-005xQq-W8@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 09:25:16 +0000
+Date: Tue, 26 Nov 2024 09:25:21 +0000
 
-Report the PCS in-band capabilities to phylink for the Lynx PCS.
+Report the PCS in-band capabilities to phylink for the LynxI PCS.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/pcs/pcs-lynx.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/net/pcs/pcs-mtk-lynxi.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
-index b79aedad855b..767a8c0714ac 100644
---- a/drivers/net/pcs/pcs-lynx.c
-+++ b/drivers/net/pcs/pcs-lynx.c
-@@ -35,6 +35,27 @@ enum sgmii_speed {
- #define phylink_pcs_to_lynx(pl_pcs) container_of((pl_pcs), struct lynx_pcs, pcs)
- #define lynx_to_phylink_pcs(lynx) (&(lynx)->pcs)
+diff --git a/drivers/net/pcs/pcs-mtk-lynxi.c b/drivers/net/pcs/pcs-mtk-lynxi.c
+index 4f63abe638c4..7de804535229 100644
+--- a/drivers/net/pcs/pcs-mtk-lynxi.c
++++ b/drivers/net/pcs/pcs-mtk-lynxi.c
+@@ -88,6 +88,21 @@ static struct mtk_pcs_lynxi *pcs_to_mtk_pcs_lynxi(struct phylink_pcs *pcs)
+ 	return container_of(pcs, struct mtk_pcs_lynxi, pcs);
+ }
  
-+static unsigned int lynx_pcs_inband_caps(struct phylink_pcs *pcs,
-+					 phy_interface_t interface)
++static unsigned int mtk_pcs_lynxi_inband_caps(struct phylink_pcs *pcs,
++					      phy_interface_t interface)
 +{
 +	switch (interface) {
 +	case PHY_INTERFACE_MODE_1000BASEX:
++	case PHY_INTERFACE_MODE_2500BASEX:
 +	case PHY_INTERFACE_MODE_SGMII:
 +	case PHY_INTERFACE_MODE_QSGMII:
 +		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
-+
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		return LINK_INBAND_DISABLE;
-+
-+	case PHY_INTERFACE_MODE_USXGMII:
-+		return LINK_INBAND_ENABLE;
 +
 +	default:
 +		return 0;
 +	}
 +}
 +
- static void lynx_pcs_get_state_usxgmii(struct mdio_device *pcs,
- 				       struct phylink_link_state *state)
+ static void mtk_pcs_lynxi_get_state(struct phylink_pcs *pcs,
+ 				    struct phylink_link_state *state)
  {
-@@ -306,6 +327,7 @@ static void lynx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
+@@ -241,6 +256,7 @@ static void mtk_pcs_lynxi_disable(struct phylink_pcs *pcs)
  }
  
- static const struct phylink_pcs_ops lynx_pcs_phylink_ops = {
-+	.pcs_inband_caps = lynx_pcs_inband_caps,
- 	.pcs_get_state = lynx_pcs_get_state,
- 	.pcs_config = lynx_pcs_config,
- 	.pcs_an_restart = lynx_pcs_an_restart,
+ static const struct phylink_pcs_ops mtk_pcs_lynxi_ops = {
++	.pcs_inband_caps = mtk_pcs_lynxi_inband_caps,
+ 	.pcs_get_state = mtk_pcs_lynxi_get_state,
+ 	.pcs_config = mtk_pcs_lynxi_config,
+ 	.pcs_an_restart = mtk_pcs_lynxi_restart_an,
 -- 
 2.30.2
 
