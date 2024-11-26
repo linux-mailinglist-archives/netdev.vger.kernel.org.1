@@ -1,184 +1,196 @@
-Return-Path: <netdev+bounces-147331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B269D91CE
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 07:31:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DECB89D91CF
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 07:34:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B340F286044
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 06:31:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 447A9B2152A
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 06:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254B515575F;
-	Tue, 26 Nov 2024 06:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2946335B5;
+	Tue, 26 Nov 2024 06:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T3UlxoIW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XnKphy8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A2C1684A4
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C08653
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732602716; cv=none; b=IK067SGnM3BU1pt5UMGA6xS8WHzBQNkZ7BTbWQnNa8WjExDoMIf8gexPN/sU7I4ZRlVN61Tc6CnGz3GUlzATf/xX/T7rYI8QkPp9RqTu79t3L60jFdj/CHKagma9G7+go3xYEE7O5fBGH35NATyGinIwApLms4Xt+DIWKVKfORs=
+	t=1732602839; cv=none; b=nJw+wOU6giu268KnCk4IY/kScFbCOt5y5bfZI/PSle1aG/+k+Y9HkHKyOwTO3U1EJxvSan3y+nh4d0E73r9owvL78TyccpETQqeyqaAyCVzPa+4riLaRtah5NUDizRlil27bJ6Irx/TlbuCPrfiKuiYnNQmncZDmL+JVAquKc9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732602716; c=relaxed/simple;
-	bh=zYjd1KWhVM4FRGm8C7YtweAcvjV0Jc6aN/HYIfW2VuM=;
+	s=arc-20240116; t=1732602839; c=relaxed/simple;
+	bh=daesccIW0K6lyxBmWOlGBRLy/qPm4O4zYTqmsPN4F5I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nOFSQ//Pe9lCCG5ckwy9Sg4mcx3zQZpC6hMGZgqxFRAfb/rpnvVPb+sS3aVKfR2y8n6j9GzUMo1cVd/pQhP87SB4tAQSvks+rg9v/uD+FqHqzOYb5nj0WNEJ2gxNVnk+9dyepWL6Wg+LFbZrRuszR2XYFa+0kWqXSWBW3ATro+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T3UlxoIW; arc=none smtp.client-ip=209.85.217.54
+	 To:Cc:Content-Type; b=BKtaQOKsQOU99w2Ixwp9s5LKCnpH/V3dGzTSarR7QSMN9WX7LDKMMCQ5O9oCUtVS5lQrl4WKGyzt/Km89jFyZCICsbCjJXZf2GpxEU0SSm35eu/sUCISJ5MvB6Kx722PeCEi67Sh4CTOuZy96utCNKn9OVQ9YvYBdqfAjly2oXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XnKphy8W; arc=none smtp.client-ip=209.85.217.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-4aef56c5cf9so936349137.0
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 22:31:54 -0800 (PST)
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4aad848f2f1so1453724137.2
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 22:33:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1732602713; x=1733207513; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1732602837; x=1733207637; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zscTyqrf7IZG8l5V+1fuf03gKjB0quLyn3srN3XZ254=;
-        b=T3UlxoIWfny/MqFk7in0N+EFE1o/6kcHg7P94m7SIOef/4fHTLhqiawYZItdNGIX+7
-         iPnhb/2lxUcpQX96HicSGB64VY8tAr+eqKaVh0rJ8huYyOcO/dZUXje2W104pvPoQQMP
-         hfhF0eGFE/fuNn2/PsBe2WkBTMp2RMd65l4Jc=
+        bh=h91ksujD3yrmFYjX0tumYSD3cFUUbjXJJ/fiqtiV4N8=;
+        b=XnKphy8WtFpgAxhGhPJFtAzdXU9D2zobmLbygSwFuHQjYLqvFYiv+FPMDfJ5+yjN9Q
+         CdYB43GRtX1O7vEKDm15R399bPTg5vZeYpOxvqLwrCuFb52WCkM1n34cAMKA8rP9fxn1
+         iUTFSS/HEbfLGPg88ZUTv/ShX7wQg5h09Sjns=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732602713; x=1733207513;
+        d=1e100.net; s=20230601; t=1732602837; x=1733207637;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zscTyqrf7IZG8l5V+1fuf03gKjB0quLyn3srN3XZ254=;
-        b=kaReDSMOBFl0nDU94Ie5qFjOa/jkb7YXfH7zzmbsUmavREULnoSNJtw0VzPWNiKwKm
-         orj+krgnvcihrSZB1ufvNXHF9Ly9L87aO4fQuOJGJDBWZ6syO/q7hdmBH3z62/shUlZA
-         lIflK8dKVHb+DIsBlAE0cqSW1fEcfpl66JKRRiH2ONmatjWGqPqZXLyLlEKWavsjXX3k
-         6jm5l9nqujszSgQNqg/HxqkvEH+lqQv/V/yoRk/j0H7qkuQyyTNUkzDibfwGHsA7RGSO
-         spjo8D3iHKfw6iGaKmn8ldHmZQteF6sulNexH5xLhyXlndS55v/Mjf1I1EoD43DpUWPd
-         7D3g==
-X-Gm-Message-State: AOJu0Yw/haN/iEiDX1vmK75Ul+Qzu0OrasXQuL2ITSQy5HlSJ9fgsMBw
-	ExXHuhUjvbc8ZiwTus1tB564eY3eiIfmTSc6y0vtOCa+d++6n8g++woB1IWh69lMIBK3T66mIQz
-	9KeR8mziSRp5JjhOgB7KeL6VYB2Nue0I1l7ozzRbNQzuPIg8=
-X-Gm-Gg: ASbGnctJaI+Rt1iHdNsmIBatOASCJsmPfxT9wh7ajKEstSl78GVJDH+fiioUbuLiwIg
-	t01il1C4t+Jxnzg10F9lqDKd20M2yvSr7
-X-Google-Smtp-Source: AGHT+IGo2IUGy6n4YrQcy08QiD3NnT/2eOdNO3tWjARoACstCiWNIJIevsyMOeq0fq7yy0bQoGkn8GQodS5vSBT11hE=
-X-Received: by 2002:a05:6102:32c9:b0:4ad:4e83:92be with SMTP id
- ada2fe7eead31-4addcbf254fmr14365037137.13.1732602713269; Mon, 25 Nov 2024
- 22:31:53 -0800 (PST)
+        bh=h91ksujD3yrmFYjX0tumYSD3cFUUbjXJJ/fiqtiV4N8=;
+        b=gsYvbZCGgAAikZ3Zjjf8HAVmuQ2au9QghPnI3KAXxdku+Swc6OswrkbhqVSE06j4gw
+         Vrmzjh/8HejhmrR/2nOYCn/1JS79i5YqBic0jp5vBpwyExUFByQSwYlZHEDPN8wBfdkq
+         DSh1y0MkSOxOJiUEmgc2OVMIbTY4M2qJtDgyO4BEaeccnb0EHbvGrGKxF3A1eEyGuQdO
+         Px76ryY7YH1ShPD07eXAX9iMecF4yxtb0FwGQ+1flM9f5ZhMhiJDXHmKIRMHe1OqN3tK
+         8nTKbonZAi+Ctss5smLLlFLx1a30qqRm9Qquj6dGF4aH/m0kX1UivKYJjUfn6xLHJJSj
+         1eTQ==
+X-Gm-Message-State: AOJu0YxQLMBM+QQp0j0IxkxV89N+LkN7KO/VMny4FL9GItFxj/L1pJrS
+	kW8GZS+Nb34VPDF20eVkp/HD7tBtQWLoUDo7Gqx4rdXgPn0JVASwv1kjoDVlAo+eDet30MqDzeb
+	amEzdBst7ohXt3/encgTZKZy42WbrOO6RPvZE
+X-Gm-Gg: ASbGncu7kTBYFbFE+SeEKKt1eQ02LdpUbjTxG/H91vtwG7ljpR/wwXubPLqgy7bNLq3
+	GYCuIyvS+0yGH+01k42UjcZJJjtRQb0NV
+X-Google-Smtp-Source: AGHT+IFhc+v+bQcvtHknktWd6FAmpZ6jq8W3cSRwGu4l0cRUDXAMCn3Fes/juzYLFlFF3uzwaGu5LoFm/z8zehRbevc=
+X-Received: by 2002:a05:6102:5088:b0:4af:3e23:2183 with SMTP id
+ ada2fe7eead31-4af3e232393mr226426137.5.1732602836841; Mon, 25 Nov 2024
+ 22:33:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241125042412.2865764-1-dw@davidwei.uk> <20241125042412.2865764-3-dw@davidwei.uk>
-In-Reply-To: <20241125042412.2865764-3-dw@davidwei.uk>
+References: <20241125042412.2865764-1-dw@davidwei.uk> <20241125042412.2865764-4-dw@davidwei.uk>
+In-Reply-To: <20241125042412.2865764-4-dw@davidwei.uk>
 From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Tue, 26 Nov 2024 12:01:42 +0530
-Message-ID: <CAOBf=muRZ2SDeadY8Sjass8tZ3xM5iCYeJjEMDLgCZXnCoLOcg@mail.gmail.com>
-Subject: Re: [PATCH net v1 2/3] bnxt_en: refactor bnxt_alloc_rx_rings() to
- call bnxt_alloc_rx_agg_bmap()
+Date: Tue, 26 Nov 2024 12:03:45 +0530
+Message-ID: <CAOBf=muDXtrsMMszA+Y8raaT7cGYrotU88s2YMN9B2r80gcm_Q@mail.gmail.com>
+Subject: Re: [PATCH net v1 3/3] bnxt_en: handle tpa_info in queue API implementation
 To: David Wei <dw@davidwei.uk>
 Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, 
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000467db80627cb0199"
+	boundary="000000000000a4d8f70627cb08d1"
 
---000000000000467db80627cb0199
+--000000000000a4d8f70627cb08d1
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, Nov 25, 2024 at 9:54=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
 >
-> Refactor bnxt_alloc_rx_rings() to call bnxt_alloc_rx_agg_bmap() for
-> allocating rx_agg_bmap.
+> Commit 7ed816be35ab ("eth: bnxt: use page pool for head frags") added a
+> page pool for header frags, which may be distinct from the existing pool
+> for the aggregation ring. Add support for this head_pool in the queue
+> API.
 >
 > Signed-off-by: David Wei <dw@davidwei.uk>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++-------------
->  1 file changed, 16 insertions(+), 20 deletions(-)
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 24 +++++++++++++++++++----
+>  1 file changed, 20 insertions(+), 4 deletions(-)
 >
 > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
 rnet/broadcom/bnxt/bnxt.c
-> index b2cc8df22241..294d21cdaeb7 100644
+> index 294d21cdaeb7..e4b7ff9f6dfa 100644
 > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -3768,6 +3768,19 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp=
-,
->         return PTR_ERR(pool);
+> @@ -15378,15 +15378,25 @@ static int bnxt_queue_mem_alloc(struct net_devi=
+ce *dev, void *qmem, int idx)
+>                         goto err_free_rx_agg_ring;
+>         }
+>
+> +       if (bp->flags & BNXT_FLAG_TPA) {
+> +               rc =3D bnxt_alloc_one_tpa_info(bp, clone);
+> +               if (rc)
+> +                       goto err_free_tpa_info;
+> +       }
+> +
+>         bnxt_init_one_rx_ring_rxbd(bp, clone);
+>         bnxt_init_one_rx_agg_ring_rxbd(bp, clone);
+>
+>         bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
+>         if (bp->flags & BNXT_FLAG_AGG_RINGS)
+>                 bnxt_alloc_one_rx_ring_page(bp, clone, idx);
+> +       if (bp->flags & BNXT_FLAG_TPA)
+> +               bnxt_alloc_one_tpa_info_data(bp, clone);
+>
+>         return 0;
+>
+> +err_free_tpa_info:
+> +       bnxt_free_one_tpa_info(bp, clone);
+>  err_free_rx_agg_ring:
+>         bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
+>  err_free_rx_ring:
+> @@ -15394,9 +15404,11 @@ static int bnxt_queue_mem_alloc(struct net_devic=
+e *dev, void *qmem, int idx)
+>  err_rxq_info_unreg:
+>         xdp_rxq_info_unreg(&clone->xdp_rxq);
+>  err_page_pool_destroy:
+> -       clone->page_pool->p.napi =3D NULL;
+>         page_pool_destroy(clone->page_pool);
+> +       if (clone->page_pool !=3D clone->head_pool)
+> +               page_pool_destroy(clone->head_pool);
+>         clone->page_pool =3D NULL;
+> +       clone->head_pool =3D NULL;
+>         return rc;
 >  }
 >
-> +static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_i=
-nfo *rxr)
-> +{
-> +       u16 mem_size;
-> +
-> +       rxr->rx_agg_bmap_size =3D bp->rx_agg_ring_mask + 1;
-> +       mem_size =3D rxr->rx_agg_bmap_size / 8;
-> +       rxr->rx_agg_bmap =3D kzalloc(mem_size, GFP_KERNEL);
-> +       if (!rxr->rx_agg_bmap)
-> +               return -ENOMEM;
-> +
-> +       return 0;
-> +}
-> +
->  static int bnxt_alloc_rx_rings(struct bnxt *bp)
->  {
->         int numa_node =3D dev_to_node(&bp->pdev->dev);
-> @@ -3812,19 +3825,15 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+> @@ -15406,13 +15418,15 @@ static void bnxt_queue_mem_free(struct net_devi=
+ce *dev, void *qmem)
+>         struct bnxt *bp =3D netdev_priv(dev);
+>         struct bnxt_ring_struct *ring;
 >
->                 ring->grp_idx =3D i;
->                 if (agg_rings) {
-> -                       u16 mem_size;
-> -
->                         ring =3D &rxr->rx_agg_ring_struct;
->                         rc =3D bnxt_alloc_ring(bp, &ring->ring_mem);
->                         if (rc)
->                                 return rc;
+> -       bnxt_free_one_rx_ring(bp, rxr);
+> -       bnxt_free_one_rx_agg_ring(bp, rxr);
+> +       bnxt_free_one_rx_ring_skbs(bp, rxr);
 >
->                         ring->grp_idx =3D i;
-> -                       rxr->rx_agg_bmap_size =3D bp->rx_agg_ring_mask + =
-1;
-> -                       mem_size =3D rxr->rx_agg_bmap_size / 8;
-> -                       rxr->rx_agg_bmap =3D kzalloc(mem_size, GFP_KERNEL=
-);
-> -                       if (!rxr->rx_agg_bmap)
-> -                               return -ENOMEM;
-> +                       rc =3D bnxt_alloc_rx_agg_bmap(bp, rxr);
-> +                       if (rc)
-> +                               return rc;
->                 }
->         }
->         if (bp->flags & BNXT_FLAG_TPA)
-> @@ -15321,19 +15330,6 @@ static const struct netdev_stat_ops bnxt_stat_op=
-s =3D {
->         .get_base_stats         =3D bnxt_get_base_stats,
->  };
+>         xdp_rxq_info_unreg(&rxr->xdp_rxq);
 >
-> -static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_i=
-nfo *rxr)
-> -{
-> -       u16 mem_size;
-> -
-> -       rxr->rx_agg_bmap_size =3D bp->rx_agg_ring_mask + 1;
-> -       mem_size =3D rxr->rx_agg_bmap_size / 8;
-> -       rxr->rx_agg_bmap =3D kzalloc(mem_size, GFP_KERNEL);
-> -       if (!rxr->rx_agg_bmap)
-> -               return -ENOMEM;
-> -
-> -       return 0;
-> -}
-> -
->  static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int =
-idx)
->  {
->         struct bnxt_rx_ring_info *rxr, *clone;
+>         page_pool_destroy(rxr->page_pool);
+> +       if (rxr->page_pool !=3D rxr->head_pool)
+> +               page_pool_destroy(rxr->head_pool);
+>         rxr->page_pool =3D NULL;
+> +       rxr->head_pool =3D NULL;
+>
+>         ring =3D &rxr->rx_ring_struct;
+>         bnxt_free_ring(bp, &ring->ring_mem);
+> @@ -15494,7 +15508,10 @@ static int bnxt_queue_start(struct net_device *d=
+ev, void *qmem, int idx)
+>         rxr->rx_agg_prod =3D clone->rx_agg_prod;
+>         rxr->rx_sw_agg_prod =3D clone->rx_sw_agg_prod;
+>         rxr->rx_next_cons =3D clone->rx_next_cons;
+> +       rxr->rx_tpa =3D clone->rx_tpa;
+> +       rxr->rx_tpa_idx_map =3D clone->rx_tpa_idx_map;
+>         rxr->page_pool =3D clone->page_pool;
+> +       rxr->head_pool =3D clone->head_pool;
+>         rxr->xdp_rxq =3D clone->xdp_rxq;
+>
+>         bnxt_copy_rx_ring(bp, rxr, clone);
+> @@ -15545,7 +15562,6 @@ static int bnxt_queue_stop(struct net_device *dev=
+, void *qmem, int idx)
+>         bnxt_hwrm_rx_ring_free(bp, rxr, false);
+>         bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+>         rxr->rx_next_cons =3D 0;
+> -       page_pool_disable_direct_recycling(rxr->page_pool);
+Intended? Not sure I understood this one, while I got the rest of the patch
+>
+>         memcpy(qmem, rxr, sizeof(*rxr));
+>         bnxt_init_rx_ring_struct(bp, qmem);
 > --
 > 2.43.5
 >
 >
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 
---000000000000467db80627cb0199
+--000000000000a4d8f70627cb08d1
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -249,14 +261,14 @@ R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
 r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJt
 MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
 VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGkD1Lta9dPtaVS29vi6TJU6DSCj
-tOOEoX7sPLdK3F3FMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0
-MTEyNjA2MzE1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJcn2uKJ6UZ63UFBmIpkL4pwR8sX
+F0D2ZezOSyyNovoxMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0
+MTEyNjA2MzM1N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
 CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
-AwQCATANBgkqhkiG9w0BAQEFAASCAQBKB3JSZrq4uZ1VRFkd+F77afwNCTtv8STSENorAaF/9xdV
-jEyLGu3XaHyyfWdm0tBSY+2Q0VBLX6DGhFGTEfcd0/hdK5KOCg623vc213EzJ+FnKqy/IxUg4U0d
-ANJ59Qz0rH43vpdAEZ9+gqSBsaW6KbBbVI7ggUcyg3JdyLCskJuWxHK+WSpIpCODZ7jN3VfR54sh
-R/hFOGBZGjczpre22mPsnZmpJZmu8qY893z0F08j5IvuJiLw8wsIgNXINQJk79GyM/E4QG5Oh+zC
-nALZymJW7hQ3HdqFL1TJvYd4nrXByhUBnOTevbLwKI45yO8GN3sTh94lW5myqGj/YnUy
---000000000000467db80627cb0199--
+AwQCATANBgkqhkiG9w0BAQEFAASCAQCjIY2dtyDHuiOec1opUzmb9n1i5NTp2FTWLmd6B3bJLGOw
+0N36qjXBCNBdO2KltlbflKoteM31u7ZvbbZTdVc3nIoJva3kzkk8JMua09c39qAC+XbPOqXqcvu8
+45xbQa0BQQvDZz+gvwDY9JhH7lK9ap3gCGTgAF2/ofKta/TzpqF/XW97faGoyPdcHi6SjPIrkK5b
+IgLxdSYwgnGcXIG+LF2n+e7SVoAojxMqB4ybgZgdeDd0M82nDO3eQZ5hPpPi4x4TU5hPmyWZa0ry
+ZINgR0e6bIl7NyJk/94lqwsd5g6RdmFbKhiLkl63pi9vNIj98JMfkBdjhIFg2YNez965
+--000000000000a4d8f70627cb08d1--
 
