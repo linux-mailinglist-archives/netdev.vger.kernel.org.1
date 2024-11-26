@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-147359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A262B9D9491
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:33:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3AF49D945A
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:26:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43006B2C9F2
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:26:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48F2283153
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7091B87DC;
-	Tue, 26 Nov 2024 09:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0451BC069;
+	Tue, 26 Nov 2024 09:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zzT4dMuT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vw5DRYJ9"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B7E18E057
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886F118E057
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732613064; cv=none; b=kpvdX3QU/IAkF89AxXC7hc4hZ1mLtXcj3jF30wfRuApwm80ru0C9A60nwLYIDWO1kNnzLnEjWpuGZvmesEZXh8B5VypOdWxjPyGi1Zy+jJhlQmVz0lKHfosQFmZNeGTHrWY9M7MMdJoAUoKRJRuwlVs9HLHu7n4RkQ4iCwRsaIo=
+	t=1732613076; cv=none; b=SsG+z8aqmbnLS7Ey5J510fziIGHpShpU6eM/pwpXlTYus+IYFsIWPWFxrtbDXMaOsiWKoZKzxCrCUV8xGtfjmyq8Vv+BXAEJnc2u6LUZpuHGiCsPKp+RAoznaY+80vAvDMMEsal/JcOL8ya8cHxLzPwlVGy/Vq7U0ykkHLPFJ3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732613064; c=relaxed/simple;
-	bh=GMJieUXvxk3A4qUk9RdHTxj5k5tmVomz1Plx9yKmExc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=VB2KEcGNr9Koc0p+G6+AeF8LGIEIygt0H8A5GGV+p12/UFdgq5fGvgPs5Q0dDDo2ReCHPpwgMLWa8PevlgEo/TfFhYCjw2QgslQdXGphT7zUPp6yKUarkpiD5nnxa3wFCtrhbOTvuPRVeIPvHKBCqaeaHm4tXD5IXp2aKvDmlRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zzT4dMuT; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1732613076; c=relaxed/simple;
+	bh=Pfu7vZEj6fSubOfqWR5vDzcGfo6ZOx2dIjRoBvUNlcg=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=or5yi6ElSBWfDI/Nh1+s6uRufndJZhOlVQ4aHFcniECF83xhak2EZ7tnHohWRkWnhQNiIdQy8CVYbMPXnaexX1TuroA0scstd7ZcpYdVSvjOF+5Ob6s04SBfnkTL7NAInYhgUEcfHHSzSJBHHgmmTPDv9Ls8lqBX5JMzRxrNkJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vw5DRYJ9; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qVPL0RdD4hnmz4XYDjVggcqfPiFjhTjUbOauD820jSM=; b=zzT4dMuTJkpC3NnKY2hawXduOh
-	PbEAYhOg6UWAai71+bXosnUAQX6y1wUPJD6QRmHaqz866weG4pV6klHL8w7ALIQ/HBlrMKx7UhAhy
-	QPa4DCqlnTpChq6us+nNiYlPuJtn46kTGpzihoHcKAsXRQwXH+W278+thEykecLaAYtBJtnn+6hAZ
-	u74FUonF6dKYIIHMC4bSZYHatmGFDC2w30VH8lPuJHAq9LNKPHlBeJZBtfgwYM/lEshBf2EYKEudY
-	onFeRs7HfsXC+4n2tNKhOJ39JB4uzciZColpghXrw5eaLUPDxA3lt0KBokpBRX/lNXPhSI3ClukbC
-	KLmGMU3w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39506)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PEFP7moTXhDwLu8mliziU9KVQdVyXflN9X2ifDX1sAk=; b=vw5DRYJ9kwjc12cJzmTAXwTz4E
+	2QY87lZlQovEZnnVjNEvQ/bxy45yBs3keUZMGvPTuIJlaTe68IzhfLQB3onNojqmNBp1VfK3H171y
+	lzfKpZZ6ls4AAjAg44nQ3RI6ZHicU7bUImdWhyRHGE5LjIFR/qANhb0+5UmnJT+RxIQXG9pJbvK8W
+	2sXesbbwx9Rbd+xa5c0NLviFjvLi/bde5i3ULA3DCICH/0g5y+0MMof9NdBVaTF0B6btRnwbt3Q08
+	S3Q5F3D4iO7QN4FJjU2ubtPtBUhr7ytRfer78F5e3A26cd3cKWhq5CXyRIqP/bfGA3EmFfMzXJIIo
+	mQKtWdAA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35820 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tFrnX-0006RQ-2S;
-	Tue, 26 Nov 2024 09:23:56 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tFrnQ-0004Ra-2v;
-	Tue, 26 Nov 2024 09:23:48 +0000
-Date: Tue, 26 Nov 2024 09:23:48 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexander Couzens <lynxis@fe80.eu>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tFrnx-0006Rq-1v;
+	Tue, 26 Nov 2024 09:24:22 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tFrnw-005xPe-KN; Tue, 26 Nov 2024 09:24:20 +0000
+In-Reply-To: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
+References: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexander Couzens <lynxis@fe80.eu>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	Daniel Golle <daniel@makrotopia.org>,
@@ -69,86 +71,113 @@ Cc: Alexander Couzens <lynxis@fe80.eu>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next 00/16] net: add negotiation of in-band
- capabilities
-Message-ID: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
+Subject: [PATCH RFC net-next 01/16] net: phylink: pass phylink and pcs into
+ phylink_pcs_neg_mode()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tFrnw-005xPe-KN@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 26 Nov 2024 09:24:20 +0000
 
-Hi,
+Move the call to phylink_pcs_neg_mode() in phylink_major_config() after
+we have selected the appropriate PCS to allow the PCS to be passed in.
 
-Yes, this is one patch over the limit of 15 for netdev - but I think it's
-important to include the last patch to head off review comments like "why
-don't you remove phylink_phy_no_inband() in this series?"
+Add struct phylink and struct phylink_pcs pointers to
+phylink_pcs_neg_mode() and pass in the appropriate structures. Set
+pl->pcs_neg_mode before returning, and remove the return value.
 
-Phylink's handling of in-band has been deficient for a long time, and
-people keep hitting problems with it. Notably, situations with the way-
-to-late standardized 2500Base-X and whether that should or should not
-have in-band enabled. We have also been carrying a hack in the form of
-phylink_phy_no_inband() for a PHY that has been used on a SFP module,
-but has no in-band capabilities, not even for SGMII.
+This will allow the capabilities of the PCS and any PHY to be used when
+deciding which pcs_neg_mode should be used.
 
-When phylink is trying to operate in in-band mode, this series will look
-at the capabilities of the MAC-side PCS and PHY, and work out whether
-in-band can or should be used, programming the PHY as appropriate. This
-includes in-band bypass mode at the PHY.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-We don't... yet... support that on the MAC side PCS, because that
-requires yet more complexity.
-
-Patch 1 passes struct phylink and struct phylink_pcs into
-phylink_pcs_neg_mode() so we can look at more state in this function in
-a future patch.
-
-Patch 2 splits "cur_link_an_mode" (the MLO_AN_* mode) into two separate
-purposes - a requested and an active mode. The active mode is the one
-we will be using for the MAC, which becomes dependent on the result of
-in-band negotiation.
-
-Patch 3 adds debug to phylink_major_config() so we can see what is going
-on with the requested and active AN modes.
-
-Patch 4 adds to phylib a method to get the in-band capabilities of the
-PHY from phylib. Patches 5 and 6 add implementations for BCM84881 and
-some Marvell PHYs found on SFPs.
-
-Patch 7 adds to phylib a method to configure the PHY in-band signalling,
-and patch 8 implements it for those Marvell PHYs that support the method
-in patch 4.
-
-Patch 9 does the same as patch 4 but for the MAC-side PCS, with patches
-10 through 14 adding support to several PCS.
-
-Patch 15 adds the code to phylink_pcs_neg_mode() which looks at the
-capabilities, and works out whether to use in-band or out-band mode for
-driving the link between the MAC PCS and PHY.
-
-Patch 16 removes the phylink_phy_no_inband() hack now that we are
-publishing the in-band capabilities from the BCM84881 PHY driver.
-
- drivers/net/ethernet/marvell/mvneta.c           |  27 +-
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c |  25 +-
- drivers/net/pcs/pcs-lynx.c                      |  22 ++
- drivers/net/pcs/pcs-mtk-lynxi.c                 |  16 ++
- drivers/net/pcs/pcs-xpcs.c                      |  28 ++
- drivers/net/phy/bcm84881.c                      |  10 +
- drivers/net/phy/marvell.c                       |  48 ++++
- drivers/net/phy/phy.c                           |  52 ++++
- drivers/net/phy/phylink.c                       | 352 +++++++++++++++++++-----
- include/linux/phy.h                             |  34 +++
- include/linux/phylink.h                         |  17 ++
- 11 files changed, 539 insertions(+), 92 deletions(-)
-
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 3b5ceca2637c..8a43b81d5846 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1085,7 +1085,8 @@ static void phylink_pcs_an_restart(struct phylink *pl)
+ 
+ /**
+  * phylink_pcs_neg_mode() - helper to determine PCS inband mode
+- * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
++ * @pl: a pointer to a &struct phylink returned from phylink_create()
++ * @pcs: a pointer to &struct phylink_pcs
+  * @interface: interface mode to be used
+  * @advertising: adertisement ethtool link mode mask
+  *
+@@ -1102,11 +1103,13 @@ static void phylink_pcs_an_restart(struct phylink *pl)
+  * Note: this is for cases where the PCS itself is involved in negotiation
+  * (e.g. Clause 37, SGMII and similar) not Clause 73.
+  */
+-static unsigned int phylink_pcs_neg_mode(unsigned int mode,
+-					 phy_interface_t interface,
+-					 const unsigned long *advertising)
++static void phylink_pcs_neg_mode(struct phylink *pl, struct phylink_pcs *pcs,
++				 phy_interface_t interface,
++				 const unsigned long *advertising)
+ {
+-	unsigned int neg_mode;
++	unsigned int neg_mode, mode;
++
++	mode = pl->cur_link_an_mode;
+ 
+ 	switch (interface) {
+ 	case PHY_INTERFACE_MODE_SGMII:
+@@ -1147,7 +1150,7 @@ static unsigned int phylink_pcs_neg_mode(unsigned int mode,
+ 		break;
+ 	}
+ 
+-	return neg_mode;
++	pl->pcs_neg_mode = neg_mode;
+ }
+ 
+ static void phylink_major_config(struct phylink *pl, bool restart,
+@@ -1161,10 +1164,6 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 
+ 	phylink_dbg(pl, "major config %s\n", phy_modes(state->interface));
+ 
+-	pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
+-						state->interface,
+-						state->advertising);
+-
+ 	if (pl->mac_ops->mac_select_pcs) {
+ 		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+ 		if (IS_ERR(pcs)) {
+@@ -1177,6 +1176,8 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 		pcs_changed = pl->pcs != pcs;
+ 	}
+ 
++	phylink_pcs_neg_mode(pl, pcs, state->interface, state->advertising);
++
+ 	phylink_pcs_poll_stop(pl);
+ 
+ 	if (pl->mac_ops->mac_prepare) {
+@@ -1267,9 +1268,8 @@ static int phylink_change_inband_advert(struct phylink *pl)
+ 		    pl->link_config.pause);
+ 
+ 	/* Recompute the PCS neg mode */
+-	pl->pcs_neg_mode = phylink_pcs_neg_mode(pl->cur_link_an_mode,
+-					pl->link_config.interface,
+-					pl->link_config.advertising);
++	phylink_pcs_neg_mode(pl, pl->pcs, pl->link_config.interface,
++			     pl->link_config.advertising);
+ 
+ 	neg_mode = pl->cur_link_an_mode;
+ 	if (pl->pcs->neg_mode)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
