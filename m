@@ -1,148 +1,220 @@
-Return-Path: <netdev+bounces-147457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79F89D9A08
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:58:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1CC9D9A0B
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:59:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594D8165DFA
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7428A1660E7
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5BE1D5ADA;
-	Tue, 26 Nov 2024 14:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1A61D5CEE;
+	Tue, 26 Nov 2024 14:59:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FE6ybjcb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yFPGJaYs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4991C22334;
-	Tue, 26 Nov 2024 14:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3991CEAD0
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 14:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732633077; cv=none; b=E9417yqWcLQj98KEuo1KEAz140z2hc0DK9fbNW3yO5ftXLXzKVKqqCLEqR4HgiQ3cQWIVZTqU20Y8vcUTXx2+YcJMzZKbgrVUp3cU5FVc1ad6Ysw9exryfn7wMuLosdLzOh5OQNRuSvK4KXTWIs2YO6e+yYCEe1HirsYXLyJaHQ=
+	t=1732633156; cv=none; b=tmLT9uozW9RxE4EW3+3bPGyQf4F50O6vCsL90HHXrUtQo1sbJgI5rGmhW65YWV6LluOFJD+SWPyu/a8wRIiyLQ+ii0K/tIDzzzdGR1nsvyznMWsFPzU3UwhxrmTnHAevk5YkUtffh2ovx29Da7RdMGcZFweVWv0lw7q0PTgQtJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732633077; c=relaxed/simple;
-	bh=zUBGXZjHem0gkf6lSs5y6g3Uszs4mufd4BEtZVD8khg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V1Wyxqip3M1o+JrHMxH3cYrLQz9fPJn8yDh1iZ1EpNbznjLryb4fhVCbXyJeFuN0bexxU0bPO6RlzJ1hswGfzdQp2+W5athBH+4XjSJuXgm8i8Vtr2IwdTdHV7W4IPPKzpuucj02CD4yarWMUnS0T1CahPPuY8+nNrPqj/hk3Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FE6ybjcb; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ff99b5ede4so56736991fa.1;
-        Tue, 26 Nov 2024 06:57:54 -0800 (PST)
+	s=arc-20240116; t=1732633156; c=relaxed/simple;
+	bh=c9s5j5HugC+AoiPGvJnCt/UjnzlFA4eO7ktqoh7lg2A=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nmt/7u+myWV3SBdvJdutbw8GPwA/Gi970UWJZ3NiGp8gZngPvRA5n8KDIMe2ODoY9Nop9hYWfzDUnPvlBzpNy+hn5dTXBlCPVnTxPytIXzcCQE4zBiKv5jxjWzyFy7o9JibV624i46DJw2SPhJ9pVAJ5enboqxMLAk7FHW1scSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yFPGJaYs; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b66773ac24so330492385a.3
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:59:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732633073; x=1733237873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ckvJIjZdkpd2N85ffKYpm4KEmJwjPaIR1j8uP61d0Ho=;
-        b=FE6ybjcb7TJBjGapAvZtCQswC+RnaSvp4uohOQ1PbcJpHDUUY+DsPGhKAgVP7zZ495
-         cXBxj+2Zo5P83leaffeEOb2iVvqRnBkb3jXToNXimvzurAhb9+ZkasQ4wO1TYkHzqat9
-         wCdfUsYBzzWADCxIDyoit2h9zYSMPfUH+NTGKMiLwZQgpNNffTzUR67a5E5K8cOiF1y4
-         HwcHFxa5UL5u8QcX7Ma9RExw1wKMnJL1FRWkkM2WkgwEK4/ryyejHorQcuc6k6PlX2qE
-         rTZZynGJHLdRH8WwVOhMukNysXjmvIiaO8Q5coKTBrEa3Rg1WECQ4/EC5jhvaU5Erz2r
-         BP9A==
+        d=google.com; s=20230601; t=1732633152; x=1733237952; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sQudZCjaVdDzHtL5sibZ1sXlI3S8veThfHaA+fYC2yo=;
+        b=yFPGJaYsl3jQkRNG6IyO9eZ+n8zhLFzI0uxWOJpJX/ij4RR556WqKV970drTLJNo3p
+         qX4S2P6IORXVWKraELZvVGY6kegFKTGfTgqJA15XRkryLs3kI2spgPD1HsorvcXYY7x1
+         jAp3Rso1QMngvB9GBZoYrKA8aeO9rJwAZ6TImbt4IbapVaJJFf5s/8TXX3tawWKhys2e
+         xLxXa29Lkt2mZ+HsCogGiSuMlVHiUu1z82rB3HbfoEXaRyqNzuSLe7GLO7FjZb9P2hDU
+         37S/jWLyXVsXorDF/qePBLZMfhS5LgN2eWPk9KwoEMKvRVlPhhIXdvAIVFPkohgUE8nn
+         QgTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732633073; x=1733237873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ckvJIjZdkpd2N85ffKYpm4KEmJwjPaIR1j8uP61d0Ho=;
-        b=oGLX/1qxh4XZf5lD9KXj9XIUALdBSOmEPmUmFBZS8T0LSjFJT7i1SYgrX5ceAamky0
-         wGqqstfUUzOZWtHdxBrjHLsIFkhJ96rh/TthNTyB1Hj6SxsNGv00opssmYNMDK0+V3dS
-         6zYhay/wza9wU/KE2qHrkKrAbg2dYcXl1UBYO6qDDrObWGka0uKuVO+JeEvOIwgNLuuR
-         3pC/HikRke94sZVQ9w0mV5G4YAmn4r+6lxtoqyBcsBf6ZOuTZBdoS2gSO2rKEeYOC3Dv
-         U5v+aj6CM/j3EOyVzvdIKdS9P9kzKN1Zv21V5nXP2n350npRAmid/EQA5JiVLDuxHDBy
-         AK3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV18laiTR7YSXE6aJZPmmQI/MBziciggGzaCBgsjZzVzU+xfIHpSHWss7nop1GX61KT5FtI4c8VvV6Ehq92ju8=@vger.kernel.org, AJvYcCVqdYFGQk5eAfYoeiahdRp1prgEy0NgbdUUHBvJUwaDPrlLJtOsdHDxbkqSL+fi4RB8JkghrgY2@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVp2WHVruIArq6qtAmpX8ntCRrnaMcfsD8iQmMSR2UkhWA0ZB3
-	3hmt9BY3UtdSSEG+QHrRs1K0nxhCYS4HTS4h1l+/5eybnwkEoy1nB7LJJ0/yH/Wqo5qo/e0WCnf
-	pNR7Byi6RDUej7lVPt/pFI07dxkg=
-X-Gm-Gg: ASbGncuKk049aLvqJSiGfMz+/70hoocTW/Kz6NUaMnW59pSAAklFBsQwvAx6uEFsyN2
-	j+9W5VsIxuidDqACzJu+ckIDEXTzokMSe
-X-Google-Smtp-Source: AGHT+IFfyN4039Knpq36PH+TpFo2xoFGOUn7tSeGfnipAHlLG9ZUzE/zrc6AsiUIeNUF8OV+ByB0gAUfzI8SoMdBfG4=
-X-Received: by 2002:a05:651c:150e:b0:2ff:8f67:bc6a with SMTP id
- 38308e7fff4ca-2ffa6d1e153mr88033001fa.0.1732633073056; Tue, 26 Nov 2024
- 06:57:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732633152; x=1733237952;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sQudZCjaVdDzHtL5sibZ1sXlI3S8veThfHaA+fYC2yo=;
+        b=oITrLbTrKkWglprnO9I26TaQbQ03D1tR4ZBlGG+n4+EVUciiCkHV84sK+w7RezaD0A
+         zOKg79dwwF7CUPmCk08JKB4tKvypqTk3vcQvPItPKsGSXQSfSjJsM8/Lp4yXUYfJpu5i
+         x0qXHJBLCvC3CIAc041eEYWaK4Bti8OepZznMD51A0M4YP2KHGCEVen4XYsih3NR4uXm
+         AjIlwthlTitnGCsDLKWFpuRpqATCTFwtQKSAjPWtPz1P2hFr4oSXZsYJ14qzXijBfQGd
+         ArVhMxpCfPghdK6RaOgf5cHa9R9fBSUjgVrtyXwPlLeiQr1p49MTsqD0OTI07iTK+IMf
+         ysXg==
+X-Gm-Message-State: AOJu0Yy4PrFag2m/hCisoufGAfB68r6pm14wxE2ptaseyVrtJWKUS3cE
+	ceWG7zJsHK6wUzXmqPANESmA+CmYmgj2Zgp5MLbeH1qeI2r4Z1W3KsASHW5uZLG6+Ve2ASqOVrg
+	AMm1ywB2oRA==
+X-Google-Smtp-Source: AGHT+IFap7RI7JlsbX1Nt2DLHCJpTn2gAcYVYCUN7zxPhNnAcwRihB52mLuN/xkJEtcJQQqSBuZn98H+v2UQEw==
+X-Received: from qkee14.prod.google.com ([2002:a05:620a:4e4e:b0:7b3:5814:20ee])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:84ca:b0:7b6:62f9:109b with SMTP id af79cd13be357-7b662f9121bmr1518238085a.42.1732633152623;
+ Tue, 26 Nov 2024 06:59:12 -0800 (PST)
+Date: Tue, 26 Nov 2024 14:59:11 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co> <7f968fde-8a41-4152-8b39-72d5b21a19a2@redhat.com>
-In-Reply-To: <7f968fde-8a41-4152-8b39-72d5b21a19a2@redhat.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 26 Nov 2024 09:57:40 -0500
-Message-ID: <CABBYNZKyfD5xNrPpfaDpGqwtOf+-ePfAa3njK1w2nrEKtpuavw@mail.gmail.com>
-Subject: Re: [PATCH net v3 0/4] net: Fix some callers of copy_from_sockptr()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>, David Howells <dhowells@redhat.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
-	Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Marc Dionne <marc.dionne@auristor.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241126145911.4187198-1-edumazet@google.com>
+Subject: [PATCH net] selinux: use sk_to_full_sk() in selinux_ip_output()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+2d9f5f948c31dcb7745e@syzkaller.appspotmail.com, 
+	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, selinux@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Brian Vazquez <brianvv@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+In blamed commit, TCP started to attach timewait sockets to
+some skbs.
 
-On Tue, Nov 26, 2024 at 4:00=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 11/19/24 14:31, Michal Luczaj wrote:
-> > Some callers misinterpret copy_from_sockptr()'s return value. The funct=
-ion
-> > follows copy_from_user(), i.e. returns 0 for success, or the number of
-> > bytes not copied on error. Simply returning the result in a non-zero ca=
-se
-> > isn't usually what was intended.
-> >
-> > Compile tested with CONFIG_LLC, CONFIG_AF_RXRPC, CONFIG_BT enabled.
-> >
-> > Last patch probably belongs more to net-next, if any. Here as an RFC.
-> >
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> > ---
-> > Changes in v3:
-> > - rxrpc/llc: Drop the non-essential changes
-> > - rxrpc/llc: Replace the deprecated copy_from_sockptr() with
-> >   copy_safe_from_sockptr() [David Wei]
-> > - Collect Reviewed-by [David Wei]
-> > - Link to v2: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v2-=
-0-9b1254c18b7a@rbox.co
-> >
-> > Changes in v2:
-> > - Fix the fix of llc_ui_setsockopt()
-> > - Switch "bluetooth:" to "Bluetooth:" [bluez.test.bot]
-> > - Collect Reviewed-by [Luiz Augusto von Dentz]
-> > - Link to v1: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v1-=
-0-d183c87fcbd5@rbox.co
-> >
-> > ---
-> > Michal Luczaj (4):
-> >       Bluetooth: Improve setsockopt() handling of malformed user input
-> >       llc: Improve setsockopt() handling of malformed user input
-> >       rxrpc: Improve setsockopt() handling of malformed user input
-> >       net: Comment copy_from_sockptr() explaining its behaviour
->
-> I guess we can apply directly patch 2-4, but patch 1 should go via the
-> BT tree. @Luiz, @David, are you ok with that?
+syzbot reported that selinux_ip_output() was not expecting them yet.
 
-Sure, I can apply that one if there is no dependency on the others.
+Note that using sk_to_full_sk() is still allowing the
+following sk_listener() check to work as before.
 
-> Thanks,
->
-> Paolo
->
+BUG: KASAN: slab-out-of-bounds in selinux_sock security/selinux/include/objsec.h:207 [inline]
+BUG: KASAN: slab-out-of-bounds in selinux_ip_output+0x1e0/0x1f0 security/selinux/hooks.c:5761
+Read of size 8 at addr ffff88804e86e758 by task syz-executor347/5894
 
+CPU: 0 UID: 0 PID: 5894 Comm: syz-executor347 Not tainted 6.12.0-syzkaller-05480-gfcc79e1714e8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+Call Trace:
+ <IRQ>
+  __dump_stack lib/dump_stack.c:94 [inline]
+  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+  print_address_description mm/kasan/report.c:377 [inline]
+  print_report+0xc3/0x620 mm/kasan/report.c:488
+  kasan_report+0xd9/0x110 mm/kasan/report.c:601
+  selinux_sock security/selinux/include/objsec.h:207 [inline]
+  selinux_ip_output+0x1e0/0x1f0 security/selinux/hooks.c:5761
+  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+  nf_hook_slow+0xbb/0x200 net/netfilter/core.c:626
+  nf_hook+0x386/0x6d0 include/linux/netfilter.h:269
+  __ip_local_out+0x339/0x640 net/ipv4/ip_output.c:119
+  ip_local_out net/ipv4/ip_output.c:128 [inline]
+  ip_send_skb net/ipv4/ip_output.c:1505 [inline]
+  ip_push_pending_frames+0xa0/0x5b0 net/ipv4/ip_output.c:1525
+  ip_send_unicast_reply+0xd0e/0x1650 net/ipv4/ip_output.c:1672
+  tcp_v4_send_ack+0x976/0x13f0 net/ipv4/tcp_ipv4.c:1024
+  tcp_v4_timewait_ack net/ipv4/tcp_ipv4.c:1077 [inline]
+  tcp_v4_rcv+0x2f96/0x4390 net/ipv4/tcp_ipv4.c:2428
+  ip_protocol_deliver_rcu+0xba/0x4c0 net/ipv4/ip_input.c:205
+  ip_local_deliver_finish+0x316/0x570 net/ipv4/ip_input.c:233
+  NF_HOOK include/linux/netfilter.h:314 [inline]
+  NF_HOOK include/linux/netfilter.h:308 [inline]
+  ip_local_deliver+0x18e/0x1f0 net/ipv4/ip_input.c:254
+  dst_input include/net/dst.h:460 [inline]
+  ip_rcv_finish net/ipv4/ip_input.c:447 [inline]
+  NF_HOOK include/linux/netfilter.h:314 [inline]
+  NF_HOOK include/linux/netfilter.h:308 [inline]
+  ip_rcv+0x2c3/0x5d0 net/ipv4/ip_input.c:567
+  __netif_receive_skb_one_core+0x199/0x1e0 net/core/dev.c:5672
+  __netif_receive_skb+0x1d/0x160 net/core/dev.c:5785
+  process_backlog+0x443/0x15f0 net/core/dev.c:6117
+  __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6877
+  napi_poll net/core/dev.c:6946 [inline]
+  net_rx_action+0xa94/0x1010 net/core/dev.c:7068
+  handle_softirqs+0x213/0x8f0 kernel/softirq.c:554
+  do_softirq kernel/softirq.c:455 [inline]
+  do_softirq+0xb2/0xf0 kernel/softirq.c:442
+ </IRQ>
+ <TASK>
+  __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
+  local_bh_enable include/linux/bottom_half.h:33 [inline]
+  rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
+  __dev_queue_xmit+0x8af/0x43e0 net/core/dev.c:4461
+  dev_queue_xmit include/linux/netdevice.h:3168 [inline]
+  neigh_hh_output include/net/neighbour.h:523 [inline]
+  neigh_output include/net/neighbour.h:537 [inline]
+  ip_finish_output2+0xc6c/0x2150 net/ipv4/ip_output.c:236
+  __ip_finish_output net/ipv4/ip_output.c:314 [inline]
+  __ip_finish_output+0x49e/0x950 net/ipv4/ip_output.c:296
+  ip_finish_output+0x35/0x380 net/ipv4/ip_output.c:324
+  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+  ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:434
+  dst_output include/net/dst.h:450 [inline]
+  ip_local_out+0x33e/0x4a0 net/ipv4/ip_output.c:130
+  __ip_queue_xmit+0x777/0x1970 net/ipv4/ip_output.c:536
+  __tcp_transmit_skb+0x2b39/0x3df0 net/ipv4/tcp_output.c:1466
+  tcp_transmit_skb net/ipv4/tcp_output.c:1484 [inline]
+  tcp_write_xmit+0x12b1/0x8560 net/ipv4/tcp_output.c:2827
+  __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3010
+  tcp_send_fin+0x154/0xc70 net/ipv4/tcp_output.c:3616
+  __tcp_close+0x96b/0xff0 net/ipv4/tcp.c:3130
+  tcp_close+0x28/0x120 net/ipv4/tcp.c:3221
+  inet_release+0x13c/0x280 net/ipv4/af_inet.c:435
+  __sock_release net/socket.c:640 [inline]
+  sock_release+0x8e/0x1d0 net/socket.c:668
+  smc_clcsock_release+0xb7/0xe0 net/smc/smc_close.c:34
+  __smc_release+0x5c2/0x880 net/smc/af_smc.c:301
+  smc_release+0x1fc/0x5f0 net/smc/af_smc.c:344
+  __sock_release+0xb0/0x270 net/socket.c:640
+  sock_close+0x1c/0x30 net/socket.c:1408
+  __fput+0x3f8/0xb60 fs/file_table.c:450
+  __fput_sync+0xa1/0xc0 fs/file_table.c:535
+  __do_sys_close fs/open.c:1550 [inline]
+  __se_sys_close fs/open.c:1535 [inline]
+  __x64_sys_close+0x86/0x100 fs/open.c:1535
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6814c9ae10
+Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d b1 e2 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+RSP: 002b:00007fffb2389758 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007f6814c9ae10
+RDX: 0000000000000010 RSI: 0000000020000000 RDI: 0000000000000003
+RBP: 00000000000f4240 R08: 0000000000000001 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000202 R12: 00007fffb23897b0
+R13: 00000000000141c3 R14: 00007fffb238977c R15: 00007fffb2389790
+ </TASK>
 
---=20
-Luiz Augusto von Dentz
+Fixes: 79636038d37e ("ipv4: tcp: give socket pointer to control skbs")
+Reported-by: syzbot+2d9f5f948c31dcb7745e@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/6745e1a2.050a0220.1286eb.001c.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+Cc: Paul Moore <paul@paul-moore.com>
+Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
+Cc: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: selinux@vger.kernel.org
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Brian Vazquez <brianvv@google.com>
+---
+ security/selinux/hooks.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index f5a08f94e09402b6b0b1538fae1a7a3f5af19fe6..366c87a40bd15707f6da4f25e8de4ddce3d281fc 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -5738,7 +5738,7 @@ static unsigned int selinux_ip_output(void *priv, struct sk_buff *skb,
+ 	/* we do this in the LOCAL_OUT path and not the POST_ROUTING path
+ 	 * because we want to make sure we apply the necessary labeling
+ 	 * before IPsec is applied so we can leverage AH protection */
+-	sk = skb->sk;
++	sk = sk_to_full_sk(skb->sk);
+ 	if (sk) {
+ 		struct sk_security_struct *sksec;
+ 
+-- 
+2.47.0.338.g60cca15819-goog
+
 
