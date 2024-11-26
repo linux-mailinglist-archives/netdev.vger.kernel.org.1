@@ -1,135 +1,119 @@
-Return-Path: <netdev+bounces-147444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EABBA9D98D2
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:48:09 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93A2A1621E8
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:48:06 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA3F1CEAC7;
-	Tue, 26 Nov 2024 13:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b="bzI+GCY3"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp052.goneo.de (smtp052.goneo.de [85.220.129.60])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B2E9D98D4
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:48:44 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E646193408
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 13:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.220.129.60
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA152283D83
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:48:42 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63BB1D0E26;
+	Tue, 26 Nov 2024 13:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IvPnTxHO"
+X-Original-To: netdev@vger.kernel.org
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE631CEE96;
+	Tue, 26 Nov 2024 13:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732628886; cv=none; b=ZYJI0PzqNyVGrDAV6LBDuB5DRDWVI0K+juw21aUF0SmNSpLkxj00PvLnIZpOnmCCf02W0nDRzlzBmIkGdeE2wjEENuXmeSQe+VS6/wzPr2IPQWswRMdTkjz4QGmmEiT1wvxMRveE1GeiqWD6EFj1o0p40guPUTV7w8Jb1BVBy3s=
+	t=1732628918; cv=none; b=XOV1kw7if2D4dM+mBBm3z+zqAOgP4sZmhqJv2GA25DuMCWjjt2UeyXDG3GOW2r6q0i+ZEoFjlKTRjn+7ST4KQ4VN+Qo+73DjW9KQffwZt7svTxAjp8NWFsqxkh1HNCSfjBu2Fs4qFp0jMK5FIxuf7kb5FZhgrdqGc9iK9Z4KGNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732628886; c=relaxed/simple;
-	bh=U2gEeF/Eef1wijrrVMYlOOEm1KVO7MFELCQ5jF2AZ0g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b62+JrQNAo1Peg0LY2TbnMsyZsiT4Aq9I59lu0nyfMnUbK/kHCNjwIjkktIrcMHrcZa75FLC67WaAE99np5vAUuhXBwP2HBrwvFn3e0YDCr4plM7LaToaV5lVonJURoihEl5TNdfHG5DXb59ddUj/gxgjWkyjsR9wKR+cTBJfX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=bzI+GCY3; arc=none smtp.client-ip=85.220.129.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tk154.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tk154.de
-Received: from hub2.goneo.de (hub2.goneo.de [IPv6:2001:1640:5::8:53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by smtp5.goneo.de (Postfix) with ESMTPS id B116D240E80;
-	Tue, 26 Nov 2024 14:47:59 +0100 (CET)
-Received: from hub2.goneo.de (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by hub2.goneo.de (Postfix) with ESMTPS id 1AFAD240726;
-	Tue, 26 Nov 2024 14:47:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=DKIM001;
-	t=1732628878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ae4Ixg/X5mnmSF5slWB6IWMBf8Qx6HK9tQoWDogvzuI=;
-	b=bzI+GCY39H5swAYFixeysj/fq6cJwlp0lW8klbC4s9CkLzqAod/riHWBN3fJcd84HapDrn
-	5rHQhaTm6fOY9j360fa1UX8Jz/PkilnI8SY7tEQQhn5njsd26ON+v2KGxrEH8u3YVHJ5Y7
-	pltbFFfXPv3z34NVf1ek6CM28mkFNUinmzfflJBr1XBttf7bT3a/YLhHiLIq3bEplyJABj
-	nCY1GveGzY1qQtnKIvaazBRi1AyHPh0pUaSuVj9nlU73TWjO9A1CgqZd2+9+hF0sxkPaH2
-	SIZK9IT+T8SlCAg903HyUHMjiWulP76hwxqrdBHQK6elo5kzNideo+JUtneMZw==
-Received: from Til-Notebook.hs-nordhausen.de (unknown [195.37.89.195])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by hub2.goneo.de (Postfix) with ESMTPSA id 5352B24062D;
-	Tue, 26 Nov 2024 14:47:57 +0100 (CET)
-From: Til Kaiser <mail@tk154.de>
-To: nbd@nbd.name,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	lorenzo@kernel.org
-Cc: netdev@vger.kernel.org,
-	Til Kaiser <mail@tk154.de>
-Subject: [PATCH net] mediathek: mtk_eth_soc: fix netdev inside xdp_rxq_info
-Date: Tue, 26 Nov 2024 14:41:54 +0100
-Message-ID: <20241126134707.253572-2-mail@tk154.de>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241126134707.253572-1-mail@tk154.de>
-References: <20241126134707.253572-1-mail@tk154.de>
+	s=arc-20240116; t=1732628918; c=relaxed/simple;
+	bh=ZKAvOwXr3qv93aa+cn8GDQk5NMxPHbHgo7mMdqPthRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KmEDgayj0wVBGl3LQjOK+/c4GaO+wvRRIQp/YTadeLzzbXVXRRy8p9P9wG2YwdKuskAmeACydtbH7Tk2AXgAsxhUG+l6LMs6YlysgaRMfbI/Bj+5JWfKgiawPUCGWe792rltH0nqdDp3OwzgvQ/gRQynGiyoJtq4ibz630Riil0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IvPnTxHO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=amZclqVZR4wTjHpzUyfdqRGzrVfZK9pbXNx6aTcQ9OY=; b=IvPnTxHOFuDkabpNSUxQ2IoWcs
+	9jLgd0ZMP4nYd1iWsIF5xNNdsgATmuiYiOUNKuUmmd+AiS1MwL1wSWWBcdxCqL8GteUjng7Bla0lv
+	nZoKOVyJgsHO1V8kgzPzMMT6zOSKaUdemh79NFcHk4xVYjV3zqY5H5gs0EDjMCcp7Ek8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tFvvP-00EWFb-Qx; Tue, 26 Nov 2024 14:48:19 +0100
+Date: Tue, 26 Nov 2024 14:48:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Frank Sae <Frank.Sae@motor-comm.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xiaogang.fan@motor-comm.com,
+	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+Subject: Re: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the
+ fxgmac_start function
+Message-ID: <fde04f06-df39-41a8-8f74-036e315e9a8b@lunn.ch>
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+ <20241120105625.22508-6-Frank.Sae@motor-comm.com>
+ <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
+ <ba24293a-77b1-4106-84d2-81ff343fc90f@motor-comm.com>
+ <82e1860b-cbbf-4c82-9f1b-bf4a283e3585@lunn.ch>
+ <43341290-15e3-4784-9b69-7f3f13f34e01@motor-comm.com>
+ <a48d76ac-db08-46d5-9528-f046a7b541dc@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-UID: 3a60f5
-X-Rspamd-UID: b386e7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a48d76ac-db08-46d5-9528-f046a7b541dc@motor-comm.com>
 
-Currently, the network device isn't set inside the xdp_rxq_info
-of the mtk_rx_ring, which means that an XDP program attached to
-the Mediathek ethernet driver cannot retrieve the index of the
-interface that received the package since it's always 0 inside
-the xdp_md struct.
+On Tue, Nov 26, 2024 at 05:28:08PM +0800, Frank Sae wrote:
+> 
+> 
+> On 2024/11/26 11:15, Frank Sae wrote:
+> > Hi Andrew,
+> > 
+> > On 2024/11/25 22:18, Andrew Lunn wrote:
+> >>>> RGMII is unusual, you normally want RGMII_ID. Where are the 2ns delays
+> >>>> added?
+> >>>>
+> >>>
+> >>> Yes, you are right. PHY_INTERFACE_MODE_RGMII should be PHY_INTERFACE_MODE_RGMII_ID.
+> >>> YT6801 NIC integrated with YT8531S phy, and the 2ns delays added in the phy driver.
+> >>> https://elixir.bootlin.com/linux/v6.12/source/drivers/net/phy/motorcomm.c#L895
+> >>
+> >> But if you pass PHY_INTERFACE_MODE_RGMII to the PHY it is not adding
+> >> the 2ns delay. So how does this work now?
+> > 
+> > I'm sorry. Maybe PHY_INTERFACE_MODE_RGMII is enough.
+> > YT6801 is a pcie NIC chip that integrates one yt8531s phy.
+> > Therefore, a delay of 2ns is unnecessary, as the hardware has
+> >  already ensured this.
+> 
+> YT6801 looks like that:
+> 
+>                       ||                      
+>   ********************++**********************
+>   *            | PCIE Endpoint |             *
+>   *            +---------------+             *
+>   *                | GMAC |                  *
+>   *                +--++--+      YT6801      *
+>   *                  |**|                    *
+>   *         GMII --> |**| <-- MDIO           *
+>   *                 +-++--+                  *
+>   *                 | PHY |                  *
+>   *                 +--++-+                  *
+>   *********************||*********************
+> 
+> yt8531s phy driver not support GMII.
 
-This patch sets the network device pointer inside the
-xdp_rxq_info struct, which is later used to initialize
-the xdp_buff struct via xdp_init_buff.
+Is it really GMII? If so, add GMII to the yt8531 driver.
 
-This was tested using the following eBPF/XDP program attached
-to a network interface of the mtk_eth_soc driver. As said before,
-ingress_ifindex always had a value of zero. After applying the
-patch, ingress_ifindex holds the correct interface index.
+Often this is described as PHY_INTERFACE_MODE_INTERNAL, meaning it
+does not matter what is being used between the MAC and the PHY, it is
+internal to the SoC. You might want to add that to the PHY driver.
 
-	#include <linux/bpf.h>
-	#include <bpf/bpf_helpers.h>
-
-	SEC("pass")
-	int pass_func(struct xdp_md *xdp) {
-    		bpf_printk("ingress_ifindex: %u",
-			xdp->ingress_ifindex);
-
-		return XDP_PASS;
-	}
-
-	char _license[] SEC("license") = "GPL";
-
-Signed-off-by: Til Kaiser <mail@tk154.de>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 53485142938c..9c6d4477e536 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2069,6 +2069,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 
- 		netdev = eth->netdev[mac];
- 		ppe_idx = eth->mac[mac]->ppe_idx;
-+		ring->xdp_q.dev = netdev;
- 
- 		if (unlikely(test_bit(MTK_RESETTING, &eth->state)))
- 			goto release_desc;
--- 
-2.47.1
-
+	Andrew
 
