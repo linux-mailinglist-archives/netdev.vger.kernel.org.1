@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887619D9793
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:53:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583259D979D
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:53:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0878BB265F4
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:53:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F141285C7A
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FE81D1E74;
-	Tue, 26 Nov 2024 12:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC331D318F;
+	Tue, 26 Nov 2024 12:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uORnPyRX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Rjwn3XIL"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F87192D65
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6490E1D2F54
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732625593; cv=none; b=qyZJjAO2bH8swQaiBylg4WmDBNSiTIK8VAdJqvkq+3ZSXU3suANJ9GJjzy9xBdTZmyc2/kh9iAfUsG6UfpxqdJIIpO15lNqvQ8HMKKmo6lYgT5kejLUSl+Hd+XJvGzSujbNKwV241ipDEMKCZeqEVnwHMveZz1sKMp61X/93GPU=
+	t=1732625597; cv=none; b=Nm8kiefxnu6KPRlO8Nzsu2cxOa02YeTei3xpayS7GCmL8DAdtzRoJHzro+ZbA+PYwXAQdvSKx6t7iHCAnT6UZLdxvalVZ7+oypqybVOCg7Cwq2aVjlZghCjpeTyGBgPTEzruiKKi9L1EgOAo5xnA2SxmGkCjRobKa0mk7gqBZ5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732625593; c=relaxed/simple;
-	bh=zB5sGOPUKzn0B2Vt61My4DYZUJVvHJ9gMoER0ddmZjk=;
+	s=arc-20240116; t=1732625597; c=relaxed/simple;
+	bh=FXtqTwTRu+TzZldDZB4+VwSJYaeSIAw8r1aOm9yArdU=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=WlFNvQyMw/jAzoohAauux6m9X+cajRJqkn0IUoIv8ll+qC8YCX8sF11htXtzgZq5hK9vHMRJzbGPt7G99sab+3vz5aR/ROLNNclGsRrZyAgyehGwFt7CWC/qWjP2yPUEACobU7wMd+tINnvpgoRJ7Q2jvN8yPj8uA8MID9MqCtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uORnPyRX; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=qHLf0v4VLgF9fn+8bYX6M094BWLHEbO9WEXwUPTWL7h6E0aRneLYL2mB52vJTTbLdqjcggd8HqHXZxr+/0+Qqva5Xvhh6mjZal+TrG9FsI/mo6tDcRI68/W6i19yG2mYodPImI4wY4+P+QKKIA/HZz8f+XChOAinEuHDXHC2djQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Rjwn3XIL; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YrRBFjzD2crSgRpPTXiskXFXmSEIx5eNanvtUfjPMXI=; b=uORnPyRXtwosRyXd/hSpFC+IHq
-	a9Hg35iqjeSRwrAp5YbVtwfITI+BNuDvbprXzp9tyZCbWyhP15OlQAkf8T+Y3Jgc/BW+StHe4g2VQ
-	26caF9ly+mkxF9JuPiIDtm1EzTPzWRBWU3w2h5ZiypPenKtlnNSLyuD40CqK5QN4sc/XCNQrdG0g8
-	2kDSAlnzyre1GLEgahk2BUmIU35EdmzzQHF2AGS6IdXENgXqYDG7yP9TuJ3q4Lp63hUv5arnztHOZ
-	5lZXyJ0NBtzDPKB3orLCfVGRnm/C/+3LaT9sAmrX2oE9QFm2wKmpP0vY+zkCjRNIcO2N/GpytZBnD
-	KjUFsSIw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39442 helo=rmk-PC.armlinux.org.uk)
+	bh=wc3sVUvSf0qUFVLW+MD3C2Ls9fTd5d+/oumz9FXoC4A=; b=Rjwn3XILVDPJ0eirjgFSYPimec
+	F4nd33yRg4/1N8ULTyd6TYmvclbMLfFCl7aYr/57Ya6A6kYcQ6AhhjT/aeRPDJ5j21SAwVN+tC6T9
+	cI0froY5Q0UgqXWzSKyxUCLnISyhavJxEYk4ctGTsGL/yldCVq6hF3mFpZgBP5h2oiyrn65YqMUMr
+	yl/nuZYf8YXtLKHh0e0ebaU9HM29SiIhmfG5I8dqlp9kxpwkOaV8o4sMQZBMaqGV01PaLjHHQ3qhG
+	o2U/lN9rFTPuyPToId0p+Wo4v7Fzq8HCzHikPrMk8ECVBzwW+jxQQ+Z9RCOApDmeuyuAmZwFCIr3l
+	+Ia2TmqA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39456 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFv3q-0006tu-2u;
-	Tue, 26 Nov 2024 12:52:59 +0000
+	id 1tFv3w-0006uM-0F;
+	Tue, 26 Nov 2024 12:53:04 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFv3p-005yi9-3F; Tue, 26 Nov 2024 12:52:57 +0000
+	id 1tFv3u-005yiF-76; Tue, 26 Nov 2024 12:53:02 +0000
 In-Reply-To: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -73,8 +73,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com
-Subject: [PATCH RFC net-next 09/23] net: phy: add configuration of rx clock
- stop mode
+Subject: [PATCH RFC net-next 10/23] net: phylink: add phylink_link_is_up()
+ helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,75 +84,50 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFv3p-005yi9-3F@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tFv3u-005yiF-76@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 12:52:57 +0000
+Date: Tue, 26 Nov 2024 12:53:02 +0000
 
-Add a function to allow configuration of the PCS's clock stop enable
-bit, used to configure whether the xMII receive clock can be stopped
-during LPI mode.
+Add a helper to determine whether the link is up or down. Currently
+this is only used in one location, but becomes necessary to test
+when reconfiguring EEE.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phy.c | 25 ++++++++++++++++++++-----
- include/linux/phy.h   |  1 +
- 2 files changed, 21 insertions(+), 5 deletions(-)
+ drivers/net/phy/phylink.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 21e0fc9a6f09..d0a9d807d48f 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1607,6 +1607,25 @@ int phy_eee_tx_clock_stop_capable(struct phy_device *phydev)
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 30a654e98352..1d68809403de 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1442,20 +1442,21 @@ static void phylink_link_down(struct phylink *pl)
+ 	phylink_info(pl, "Link is Down\n");
  }
- EXPORT_SYMBOL_GPL(phy_eee_tx_clock_stop_capable);
  
-+/**
-+ * phy_eee_rx_clock_stop() - configure PHY receive clock in LPI
-+ * phydev: target phy_device struct
-+ *
-+ * Configure whether the PHY may disable its receive clock during LPI mode,
-+ * See IEEE 802.3 sections 22.2.2.2, 35.2.2.10, and 45.2.3.1.4. Returns 0 or
-+ * negative error.
-+ */
-+int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable)
++static bool phylink_link_is_up(struct phylink *pl)
 +{
-+	/* Configure the PHY to stop receiving xMII
-+	 * clock while it is signaling LPI.
-+	 */
-+	return phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
-+			      MDIO_PCS_CTRL1_CLKSTOP_EN,
-+			      clk_stop_enable ? MDIO_PCS_CTRL1_CLKSTOP_EN : 0);
++	return pl->netdev ? netif_carrier_ok(pl->netdev) : pl->old_link_state;
 +}
-+EXPORT_SYMBOL_GPL(phy_eee_rx_clock_stop);
 +
- /**
-  * phy_init_eee - init and check the EEE feature
-  * @phydev: target phy_device struct
-@@ -1631,11 +1650,7 @@ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable)
- 		return -EPROTONOSUPPORT;
+ static void phylink_resolve(struct work_struct *w)
+ {
+ 	struct phylink *pl = container_of(w, struct phylink, resolve);
+ 	struct phylink_link_state link_state;
+-	struct net_device *ndev = pl->netdev;
+ 	bool mac_config = false;
+ 	bool retrigger = false;
+ 	bool cur_link_state;
  
- 	if (clk_stop_enable)
--		/* Configure the PHY to stop receiving xMII
--		 * clock while it is signaling LPI.
--		 */
--		ret = phy_set_bits_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
--				       MDIO_PCS_CTRL1_CLKSTOP_EN);
-+		ret = phy_eee_rx_clock_stop(phydev, true);
+ 	mutex_lock(&pl->state_mutex);
+-	if (pl->netdev)
+-		cur_link_state = netif_carrier_ok(ndev);
+-	else
+-		cur_link_state = pl->old_link_state;
++	cur_link_state = phylink_link_is_up(pl);
  
- 	return ret < 0 ? ret : 0;
- }
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index d0491cdf54b6..467149b44a8e 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2039,6 +2039,7 @@ int phy_unregister_fixup_for_id(const char *bus_id);
- int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
- 
- int phy_eee_tx_clock_stop_capable(struct phy_device *phydev);
-+int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
- int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable);
- int phy_get_eee_err(struct phy_device *phydev);
- int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data);
+ 	if (pl->phylink_disable_state) {
+ 		pl->link_failed = false;
 -- 
 2.30.2
 
