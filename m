@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07DE9D9E8F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:57:14 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF389D9E90
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:57:56 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58D4B283A1D
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:57:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8801116563F
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB65C1DF73C;
-	Tue, 26 Nov 2024 20:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34051DDC16;
+	Tue, 26 Nov 2024 20:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wx9R1gAj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CdiZhN05"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D424B1DF253
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 20:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AF51DA631
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 20:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732654628; cv=none; b=OV9D6kxHAVR3YShelpiDjLX8HD81ROFlxzdLL/iO3aTyGfptSBANdapBDlQCju/qaXWiEBsQESVijU6dYsxi0yuGAYYibxcpAx7E03Aeqmg0h9ar+VxTwxRvQPaxt1J5Sc3bv/nXbIdsJIOuAKsPKAfmjYzgACoUOJc7gdsQMI8=
+	t=1732654673; cv=none; b=Bp2VE7z3ivM81OKf+oNHuWHb1A5Ase1EbKxHwg60nxBIBdLKn3CuZ29ReQcDGCcSMmanYyk9h3elWg6YeQeEIlHUxRkUB7dtuzlXNg+nKZ9yMWonp3UaoBji1Bs1UnvR1bWjpkZggV6qNSm+v+4CHLrM4QOxAnFR0oY0hmkJfzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732654628; c=relaxed/simple;
-	bh=FeFCgNv/6Fni+1yuNE92SHdaQM7DSwpMtzt8vE/zKWU=;
+	s=arc-20240116; t=1732654673; c=relaxed/simple;
+	bh=QXNe6ZgVb7HZvNUvE70B7eaVrZniTnXDfT5aII6LN+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RLS9Yvg2T2w4VtYt/2bxYxMH1uXRw85x4gGp00JfcsDl0t4IFZNKrO9IQvsiGyZfVe4nVey3Tt0BVrWU63RmI0+DLbmsNtlDeCTVkpuYRDnj8vc7eZx82gBmGaxNcfmeAuLGscf3cu96iXvwtPn3r4HC4o+ZitvmNPZpS4J9HRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wx9R1gAj; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=bRaAiqiYLqhuy0EMA7kQnkscT5rB2QlhV8+mMh7NH/GKyoOIxoBj4YS3RbJNF86qR94YcdevF4eJdSF+lwfjZSvckZVaAXc2OV/j+j/I2jlJvHhh2xhPihD7DigP9FX7bPg8O5feaMGs78wtX880mhArTI9ap+sCNDyA5a30vKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CdiZhN05; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8bk0eDi4lhzSA0jEmiEZSOhunHrYMNImxYTUhwQ+4mo=; b=wx9R1gAjXtyw7VRv8VzC+CBjfB
-	zy/UdOGExHBw7LZgdoAqOacDJ2KHU5JO87lWgMemogbZc/H9BkbfZWnQ369rnwIvWxCtZ9v4nuQe0
-	LbF2L6auyTVFpgoi+sZ3RZ6x2Th2KbJns+PJof+n/evLF8fAS9PhFJ4qIEDCc8urY9U0=;
+	bh=qwOuK+RU+Vr3FPd0NUqSDUOTFabmPgce9CBmDTXSQQg=; b=CdiZhN05S248jze/q9tRiG9oXZ
+	0UZQi+r/YpuHF8kQIPcQ01H66r2B2rJD994yzQ8OXv6ojyNA+MhT0YHj/8sPATG8aF0BZZQuPgsNW
+	zeljd6ZXPcEqc6KlTN35zF88QoGdarRdk+pTXl0YIHVC2IjALT4C57ryAj0I10DBp9Do=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tG2c3-00EZ5A-Tj; Tue, 26 Nov 2024 21:56:47 +0100
-Date: Tue, 26 Nov 2024 21:56:47 +0100
+	id 1tG2cs-00EZ6I-DL; Tue, 26 Nov 2024 21:57:38 +0100
+Date: Tue, 26 Nov 2024 21:57:38 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -62,10 +62,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
 	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 04/16] net: phy: add phy_inband_caps()
-Message-ID: <4484cd63-87f7-4b3b-8251-b99b35b4d3a8@lunn.ch>
+Subject: Re: [PATCH RFC net-next 05/16] net: phy: bcm84881: implement
+ phy_inband_caps() method
+Message-ID: <4f344457-47f8-4a7e-809e-a2ad82b66cd8@lunn.ch>
 References: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
- <E1tFroB-005xPw-Vd@rmk-PC.armlinux.org.uk>
+ <E1tFroH-005xQ2-2v@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,31 +75,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1tFroB-005xPw-Vd@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tFroH-005xQ2-2v@rmk-PC.armlinux.org.uk>
 
-On Tue, Nov 26, 2024 at 09:24:35AM +0000, Russell King (Oracle) wrote:
-> Add a method to query the PHY's in-band capabilities for a PHY
-> interface mode.
-> 
-> Where the interface mode does not have in-band capability, or the PHY
-> driver has not been updated to return this information, then
-> phy_inband_caps() should return zero. Otherwise, PHY drivers will
-> return a value consisting of the following flags:
-> 
-> LINK_INBAND_DISABLE indicates that the hardware does not support
-> in-band signalling, or can have in-band signalling configured via
-> software to be disabled.
-> 
-> LINK_INBAND_ENABLE indicates that the hardware will use in-band
-> signalling, or can have in-band signalling configured via software
-> to be enabled.
-> 
-> LINK_INBAND_BYPASS indicates that the hardware has the ability to
-> bypass in-band signalling when enabled after a timeout if the link
-> partner does not respond to its in-band signalling.
-> 
-> This reports the PHY capabilities for the particular interface mode,
-> not the current configuration.
+On Tue, Nov 26, 2024 at 09:24:41AM +0000, Russell King (Oracle) wrote:
+> BCM84881 has no support for inband signalling, so this is a trivial
+> implementation that returns no support for inband.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
