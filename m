@@ -1,158 +1,95 @@
-Return-Path: <netdev+bounces-147461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE569D9A71
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 16:32:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFC99D9A79
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 16:34:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FEBCB22326
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:32:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7095B23DEA
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842AF1D63CB;
-	Tue, 26 Nov 2024 15:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B241D63C3;
+	Tue, 26 Nov 2024 15:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PFMT6Skn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNSKr/1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4741917E6;
-	Tue, 26 Nov 2024 15:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFB21D5ADA
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 15:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732635123; cv=none; b=my2bmOI8fYa4mOv3k9Fp0dOkze402s0t6OQgMAbiSp/OFvScJvxW7uSlPpCPGA7OFIpYrAGACtKeUj768xiKAi2GJ+0LZyIvCHvHEivZXhE3y+EXzMckBwVgZtezWQ8EbTWlBc0Zw5lnSTEs23WK5HXE0/BnJUY9kOTToww+zp0=
+	t=1732635276; cv=none; b=ctxAytrmhcBEnvXQba11464J5/uLuOHo4pFNZiOz2SPkdTYIuZUL5J43N+wsiLGHaW8mzbkKyJgZZOAM/pQ2TiZPWUCR+6GutaHHvdHUrgk3Nt98zpdB2prdX8BwfbdL+vf97h5CgNVobkBKjiOH4gzHL2RSRrZ4b0vjAe2Zj0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732635123; c=relaxed/simple;
-	bh=bWWIwNB3omMtAB0EEKWIcFPkL0+jNsIwsilo00ia6nM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aDu0eUeAJfUR0vRKc9BTC6pXhlM8u+NVToBImSSTTng0gyumUoBbGbDDDgoWs1C7qBIW5zpC+9H+R+DhQG8opd64WlXJ7ZY1/F4EXZY7DNlsoAc/3JkXDbxbxJXT+EcenKFBTs2UDZsE0ZG4s0nB01r0wOxKgWW4rO/oZwksb5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PFMT6Skn; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A5D4F240009;
-	Tue, 26 Nov 2024 15:31:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1732635118;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=efUBgvOu+GXnqy4wXRdjHPkVmMen40IYrQW2Xg/1YGA=;
-	b=PFMT6SkntixfHotv4sVyEgY0TF9FJs6Sm21h+nPD7gFktloqhRSasX8peNrqFsd6+tIEzQ
-	Z2i6u1HKqj2PCzRvCrZYcHICmiraS/eYCRjTAYJYvJdgGmsbdoO+M+H7d7nnyd7Kf08nCm
-	9N8X1Oh4R1eqwikQaQ5e+losVph0GHRYm/yJyYnR+dGsO+fb+HOSZSe9Ykph0X9JVlM27x
-	Ih8sYWvCNw3ynA06Rnji0LysQ/EGl9RlR0OyLUP1bwpiSr/7CF+aj8b68PJWnI3QZaKhlp
-	pwvREdHQbJ5LE0Q2ioSkvP6tElrAUn6m2NZLcPMkuIZ8XSFb7KUJ09K2gbcgHA==
-Date: Tue, 26 Nov 2024 16:31:55 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v3 21/27] net: pse-pd: Add support for
- getting and setting port priority
-Message-ID: <20241126163155.4b7a444f@kmaincent-XPS-13-7390>
-In-Reply-To: <Z0WJAzkgq4Qr-xLU@pengutronix.de>
-References: <20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com>
-	<20241121-feature_poe_port_prio-v3-21-83299fa6967c@bootlin.com>
-	<Z0WJAzkgq4Qr-xLU@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1732635276; c=relaxed/simple;
+	bh=kSlnmGcWpn3wVgV1/VZZD9dyaWFc4+6Tp2fuEEvavVQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=et8E+mw8fl9g6ocWFozntwBJ1qzeVuNeTxYQwU+CWDQH2N/2H75cFEIOjWT18eXFzkWdaIu1STRewKLZmoDf4F0ve08e47lXKPQ6ChHdmRWg3cGS11BDkEqBUHSJ1gJum2TywR8xBCx6OCw0qjD1BbqrpSu6zFa6GJLf94SbaBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNSKr/1R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D232C4CECF;
+	Tue, 26 Nov 2024 15:34:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732635275;
+	bh=kSlnmGcWpn3wVgV1/VZZD9dyaWFc4+6Tp2fuEEvavVQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SNSKr/1RB1ybXH/4Xip4fvPnw4lApqCQZwfYzjRVFiTHThNUXIhPF4njGNiCKTsFk
+	 qYkqStMeDWkLfZPNtwiD//ysvYPvr1rg5Hn/O4P9T2floOdEytkcKV56IeDZARLikG
+	 7p0fPbYTIYHa3XAcgk3MAGbSxWYzaxFj7TjhupMmloFccs4zPE6OrQ4/DLKvhcoLY3
+	 WLTAl9xLeXfsaxkLn7eB6M/G0SaZrm+BFR264Aso4X4oIfWOP36xJ9FVF5IltsiNHR
+	 8Ya1hgdV5qasDA7NgxMwJDaYPZGg/LkcDf0Ju6xkcl3iLrJwkV/spt4gm/JZcoX9al
+	 V2wrLV/kqBgVg==
+Message-ID: <ecc5c683-0331-42a8-9061-3a4eef96e5bb@kernel.org>
+Date: Tue, 26 Nov 2024 08:34:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 1/3] ipmr: add debug check for mr table cleanup
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, stefan.wiehler@nokia.com
+References: <cover.1732289799.git.pabeni@redhat.com>
+ <64f267b5c0dd74f5bc8795b4ff868b5b103741da.1732289799.git.pabeni@redhat.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <64f267b5c0dd74f5bc8795b4ff868b5b103741da.1732289799.git.pabeni@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hello Oleksij,
+On 11/24/24 8:40 AM, Paolo Abeni wrote:
+> The multicast route tables lifecycle, for both ipv4 and ipv6, is
+> protected by RCU using the RTNL lock for write access. In many
+> places a table pointer escapes the RCU (or RTNL) protected critical
+> section, but such scenarios are actually safe because tables are
+> deleted only at namespace cleanup time or just after allocation, in
+> case of default rule creation failure.
+> 
+> Tables freed at namespace cleanup time are assured to be alive for the
+> whole netns lifetime; tables freed just after creation time are never
+> exposed to other possible users.
+> 
+> Ensure that the free conditions are respected in ip{,6}mr_free_table, to
+> document the locking schema and to prevent future possible introduction
+> of 'table del' operation from breaking it.
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v1 -> v2:
+>  - fix build errors with CONFIG_IP{,V6}_MROUTE_MULTIPLE_TABLES=n
+> ---
+>  net/ipv4/ipmr.c  | 14 ++++++++++++++
+>  net/ipv6/ip6mr.c | 14 ++++++++++++++
+>  2 files changed, 28 insertions(+)
+> 
 
-Thanks for your quick reviews!
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-On Tue, 26 Nov 2024 09:38:27 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-> > +int pse_ethtool_set_prio_mode(struct pse_control *psec,
-> > +			      struct netlink_ext_ack *extack,
-> > +			      u32 prio_mode)
-> > +{
-> > +	struct pse_controller_dev *pcdev =3D psec->pcdev;
-> > +	const struct pse_controller_ops *ops;
-> > +	int ret =3D 0, i;
-> > +
-> > +	if (!(prio_mode & pcdev->port_prio_supp_modes)) {
-> > +		NL_SET_ERR_MSG(extack, "priority mode not supported");
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	if (!pcdev->pi[psec->id].pw_d) {
-> > +		NL_SET_ERR_MSG(extack, "no power domain attached");
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	/* ETHTOOL_PSE_PORT_PRIO_DISABLED can't be ORed with another mode
-> > */
-> > +	if (prio_mode & ETHTOOL_PSE_PORT_PRIO_DISABLED &&
-> > +	    prio_mode & ~ETHTOOL_PSE_PORT_PRIO_DISABLED) {
-> > +		NL_SET_ERR_MSG(extack,
-> > +			       "port priority can't be enabled and
-> > disabled simultaneously");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	ops =3D psec->pcdev->ops;
-> > +
-> > +	/* We don't want priority mode change in the middle of an
-> > +	 * enable/disable call
-> > +	 */
-> > +	mutex_lock(&pcdev->lock);
-> > +	pcdev->pi[psec->id].pw_d->port_prio_mode =3D prio_mode; =20
->=20
-> In proposed implementation we have can set policies per port, but it
-> will affect complete domain. This is not good. It feels like a separate
-> challenge with extra discussion and work. I would recommend not to
-> implement policy setting right now.
->=20
-> If you will decide to implement setting of policies anyway, then we need
-> to discuss the interface.
-> - If the policy should be done per domain, then we will need a separate
->   interface to interact with domains.
->   Pro: seems to be easier to implement.
-> - If we will go with policy per port, wich would make sense too, then
->   some rework of this patch is needed.
->   Pro: can combine best of both strategies: set ports with wide load
->   range to static strategy and use dynamic strategy on other ports.
->=20
-> Right now we do not have software implementation for dynamic mode,
-> implementing configuration of the policies from user space can be
-> implemented later. It is enough to provide information about what
-> hard coded policy is currently used.
-
-There is no PSE that support static and dynamic mode indeed but the aim was=
- to
-be able to disable the budget evaluation strategy.
-
-In fact we could have static strategy with a disconnection policy that do n=
-ot
-power a newly connected PD if we become over budget. This behavior would be
-something similar to no budget evaluation strategy.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
