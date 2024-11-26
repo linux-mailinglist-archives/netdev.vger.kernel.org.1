@@ -1,112 +1,110 @@
-Return-Path: <netdev+bounces-147492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8909D9DEE
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:18:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A95E9D9DF2
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:20:13 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EF4BB21DB9
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 19:18:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24574163774
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 19:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3188C1DD9AD;
-	Tue, 26 Nov 2024 19:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="O+YO0ron"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8551DE3A3;
+	Tue, 26 Nov 2024 19:20:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E60D18858E
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 19:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.252.153.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D08C1DE2AA
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 19:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732648689; cv=none; b=olWdjs7Y0DdnC5xDFDuLH4zKXZVbguycZ232u+wJ36IMk8gbFE+iDNDAj9AU8gP6rE4SbhDQF2qaSM2FhqJ11yQSPcJRZN/OZh9mXQJ19gdNJ+NfFr++FK62UMfQRvk+kNglfrASLuNSNjyCnq2TmGQulnLnAiiZVsENLItQcZM=
+	t=1732648810; cv=none; b=K0WwXFLS9nsFOAZUzVGw0ZTAMgy0wcGntolC6xKMCpWfh6Lgg6NNoF1vOgN7fFny1ygGFi7k6MbIZax+U5J1RUkpmSrsWe6tm7S6Mv/vpDCmqCDoeAnQ/H4/BtcuvXrbiTCjyVava/V34uqhH06u640PuKKirGSkG9kf1/reako=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732648689; c=relaxed/simple;
-	bh=WFoLq4dOdTq9BLMfwmAxU+Drm0aYVT7O3PvyFSVqfA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HxvKBAy1vmC42GVc255zlAa+F1gk7+FmX/Gknaz1mUeAg9r571kMmnKsf2E9mpiltyjzGfrd9JVUaBvKdVmetv1maZvZ6CVMzfQJ77GFDsSfSXcPII2Dm8ybzOtZX0KGHpYO4zLAwREwOt7nT5nS47ugpYXYQak8BjA5SrnPS3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=O+YO0ron; arc=none smtp.client-ip=198.252.153.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riseup.net
-Received: from fews01-sea.riseup.net (fews01-sea-pn.riseup.net [10.0.1.109])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx1.riseup.net (Postfix) with ESMTPS id 4XyXQx0YvJzDqXL;
-	Tue, 26 Nov 2024 19:18:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
-	t=1732648681; bh=WFoLq4dOdTq9BLMfwmAxU+Drm0aYVT7O3PvyFSVqfA8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O+YO0ronYPRVJyKE1K6NEbknLOrnFb69T36yVJ/CdLUKn+ZIXkRnwe+PqQiUh28qg
-	 rSzBL1rRkntydP8E1sT7Hc7NhpaXm/7RuXdTYeI4S2kb37w0C8nR/ho8N5AA3f33Mh
-	 zSxFlF/GswaW4tKkpiDdOOId2n0kelGpsu8wVVQI=
-X-Riseup-User-ID: 1745837A2BE95B5CEEC469201207054E8F0DB9F1AD8D494BA31067AD83E1F8DC
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	 by fews01-sea.riseup.net (Postfix) with ESMTPSA id 4XyXQw0Sp1zJrqq;
-	Tue, 26 Nov 2024 19:17:59 +0000 (UTC)
-Message-ID: <85bce8fc-6034-43fb-9f4e-45d955568aaa@riseup.net>
-Date: Tue, 26 Nov 2024 20:17:48 +0100
+	s=arc-20240116; t=1732648810; c=relaxed/simple;
+	bh=1rfO/dDcUsk9L0huJ8tsODJN4eDkJ6Y9cI/jyNngJ+M=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=KC2hEoXDk5Jwoc4kuvtHBfWZsfJeDOSQ5BWFulL01Bl2sBZxfnvw4dhBAYmgsMNrZ8QIjn84uM2arU5huQ8QdYIFCahS5sIx3tZsVT0yuMEJ12IJQPXA9eu/NIdFSY6IUgKs79ykKjaicMbN1sHCI+b4CLuE8HmUIS5v+swP/AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-192-kfp3vaQpMlqaEBSAx8cs1A-1; Tue, 26 Nov 2024 19:20:00 +0000
+X-MC-Unique: kfp3vaQpMlqaEBSAx8cs1A-1
+X-Mimecast-MFC-AGG-ID: kfp3vaQpMlqaEBSAx8cs1A
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 26 Nov
+ 2024 19:19:54 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 26 Nov 2024 19:19:54 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>, Kent Overstreet
+	<kent.overstreet@linux.dev>
+CC: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: rhashtable issue - -EBUSY
+Thread-Topic: rhashtable issue - -EBUSY
+Thread-Index: AQHbP7e2Pj7ceWvry0iKsQ15fk0dc7LJ78Pw
+Date: Tue, 26 Nov 2024 19:19:54 +0000
+Message-ID: <bddd44410602480fb57c82b8face23bb@AcuMS.aculab.com>
+References: <> <Z0QQnLNJn1jhMErP@gondor.apana.org.au>
+ <173257789029.1734440.16216135574521669815@noble.neil.brown.name>
+ <yaxjp5k4o37vh2bl2ecuj3qoyz6x3lwau2kf7zevq5v3krcmtu@idoh3wd4zyqu>
+ <Z0U4bfbBoooHIZVB@gondor.apana.org.au>
+ <t3a3ggvcvnle6dnnmzf3ehlgcxhgpnn2mbpyukjv3g67iqxlah@spqeyovloafo>
+ <Z0U9IW12JklBfuBv@gondor.apana.org.au>
+ <dhgvxsvugfqrowuypzwizy5psdfm4fy5xveq2fuepqfmhdlv5e@pj5kt4pmansq>
+ <Z0VHwWe8x9RrhKGp@gondor.apana.org.au>
+In-Reply-To: <Z0VHwWe8x9RrhKGp@gondor.apana.org.au>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] udp: call sock_def_readable() if socket is not
- SOCK_FASYNC
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, willemb@google.com
-References: <20241126175402.1506-1-ffmancera@riseup.net>
- <CANn89iJ7NLR4vSqjSb9gpKxfZ2jPJS+jv_H1Qqs1Qz0DZZC=ug@mail.gmail.com>
- <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: ZhWtf03Nw6fF0fe-XnWNvJ1oIf-h6HTNjTcndNrqpQA_1732648799
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-From: "Fernando F. Mancera" <ffmancera@riseup.net>
-In-Reply-To: <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+From: Herbert Xu
+> Sent: 26 November 2024 04:00
+>=20
+> On Mon, Nov 25, 2024 at 10:51:04PM -0500, Kent Overstreet wrote:
+> >
+> > I just meant having a knob that's called "insecure". Why not a knob
+> > that selects nonblocking vs. reliable?
+>=20
+> Because it is *insecure*.  If a hostile actor gains the ability
+> to insert into your hash table, then by disabling this defence
+> you're giving them the ability to turn your hash table into a
+> linked list.
+>=20
+> So as long as you acknowledge and are willing to undertake this
+> risk, I'm happy for you to do that.  But I'm not going to hide
+> this under the rug.
 
-On 26/11/2024 19:41, Eric Dumazet wrote:
-> On Tue, Nov 26, 2024 at 7:32 PM Eric Dumazet <edumazet@google.com> wrote:
->>
->> On Tue, Nov 26, 2024 at 6:56 PM Fernando Fernandez Mancera
->> <ffmancera@riseup.net> wrote:
->>>
->>> If a socket is not SOCK_FASYNC, sock_def_readable() needs to be called
->>> even if receive queue was not empty. Otherwise, if several threads are
->>> listening on the same socket with blocking recvfrom() calls they might
->>> hang waiting for data to be received.
->>>
->>
->> SOCK_FASYNC seems completely orthogonal to the issue.
->>
->> First sock_def_readable() should wakeup all threads, I wonder what is happening.
-> 
+There is always the option of some kind of status flag (etc)
+so that the user can find out that the hash table is 'sub optimal'
+outsize of the insert path.
+Not sure how you'd clear it - except by a rehash.
 
-Well, it might be. But I noticed that if SOCK_FASYNC is set then 
-sk_wake_async_rcu() do its work and everything is fine. This is why I 
-thought checking on the flag was a good idea.
+That does pass the buck a bit though.
 
-> Oh well, __skb_wait_for_more_packets() is using
-> prepare_to_wait_exclusive(), so in this case sock_def_readable() is
-> waking only one thread.
-> 
+=09David
 
-Yes, this is what I was expecting. What would be the solution? Should I 
-change it to "prepare_to_wait()" instead? Although, I don't know the 
-implication that change might have.
-
-Thank you for the comments, first time working on UDP socket 
-implementation so they are very helpful :)
-
->>
->> UDP can store incoming packets into sk->sk_receive_queue and
->> udp_sk(sk)->reader_queue
->>
->> Paolo, should __skb_wait_for_more_packets() for UDP socket look at both queues ?
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
