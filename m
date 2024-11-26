@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 429889D978F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:53:03 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67F59D9792
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:53:17 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6F70B2632B
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:53:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CBF3167FA6
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16181D3564;
-	Tue, 26 Nov 2024 12:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED321CCEDB;
+	Tue, 26 Nov 2024 12:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wX1MOib1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1mIxpqoA"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C9D194A66
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F2D1CEE8A
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732625574; cv=none; b=MGZcGCE27UT9owE4I4pcGkuQ1a5xR5YmhfrcSCwsgVcZPVXYAjKrwGhnJ4ZTx3fiI3Z9mrwvmaOZRTaKQgPjoXJosaUrqGD0NPr+QMIlfHTAC2/BV/j+dT3cwyf1CghNzaiBiWVum6yh797CCayC+jgspnrXg5vG+p+mZFxyaJg=
+	t=1732625581; cv=none; b=EZGv0CPH/vqqVCB1ogXtngN6RdZW1mqMP92x0N2AGpPOq0LkIChdBFWaTTZFRt766wU2g6W3alCVS9A2cbcEpzcX3K3MESHwhOelDRCNa58aqRSgFiJH5W9/vWgT1vevB5I6HHnwu4aBDA2ASnCeZDK1+vBnK3IgsWUMRasbWcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732625574; c=relaxed/simple;
-	bh=VS1Jn0MKxK896HY0QyRsfm/vGGkWNaU0l71PD3kt0Vk=;
+	s=arc-20240116; t=1732625581; c=relaxed/simple;
+	bh=evL1OQos5EuPDX/rUaBZj5SIFXLeAgYT/3PPMQsNIIQ=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=epmkLtfpt8l9Js38GOBuL4DId/JNBWME/610gbakAStQqXahT9cRdxjyTcy8jyonVM5WENbL5VqNoMOozV9lcdxlkU7QShu0pNSrnXETXM/LgcuzEqxlk1OGJnIUnNymL3BI2YiUkrR/I48qbPrGZcJ7LLNnBFKZ/yCUXvP3DzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wX1MOib1; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=eXWXYvCMkwfsMMmKaAcDI5OnzyEJMG6Zr7Pqw9nq0K7HFq8DD2FF3Gd8gTk7K2v/C9StinJKImulD/ZpbecCnmBEBzEEY5I2p6U+yWytO6DCbC3k90P2XPVgW57HKokcogMWzk8gaHUY8O0abzU/TbRKv/Fi4rZhSJaooxRP2SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1mIxpqoA; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hM2Me0R442AO8DdVkavZVZg2yJn2icgsmunMOQ2V1M8=; b=wX1MOib1+DBlN4WWej5Q/tAJhg
-	REEjg+iOgD99ePnruIdxN3PHit10xMAL0SCEtX+1ivn5+3Uig2LSQ7jWOTTLZZ3tP7mvEOYaDx3MI
-	w7RqcHlIQ0DpabuMDYzrm40JdYp6B1sMSVu+94MOTjjVIRaqDMWZd1oT6Ii3Y4GKske7T09MbDKMl
-	Xr/pZblsQCeWm6dQay6GbIVcjKMa3Bgo/2ppNP4ePpIoQbvn31CTVkFIoG/pIQhwqtNEua1/fpAAW
-	p6ClYCvzdA9pA4C9QW4ymb6YPqSh0JcfGk3XfCTw03tcaHi7LQxY3PNpnYgaKnryQcbdHxuv4O6O+
-	fGhRk24Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:34386 helo=rmk-PC.armlinux.org.uk)
+	bh=4+/h+G+UZmcLpKhAAeUc1gCUmuIP7h4zUAThZbIDIwU=; b=1mIxpqoAoFisMNMn11GMy+5cnR
+	ohJgIwSgsqReB+QUQ35N7RT4b7vvZ9RnOeGjjLwcPz/1LzQ62REBrnlaYYSU+ug85kq2y7fdTkm4V
+	vBpYThK63VxRMi/ISMhi/VBoOZ46nPDgx/Vdvy8pc72Fc5uYf+PyPEYmLhDA6NwHBvQ+S9EdQX7pY
+	tf5Inb/igj2paGv6ldTMjDl/l5mBFcyV1DfDhzbb7GEZLS0BxNg8AXsg6WLctEmmZ7/Bcs5CVLBVC
+	Pg+WDIw5Pb+K+a+zZ3/0eQOSdkq7Sb43f1nVOHNmGsJwixWfycqKbCZHaRYD490RzHZKpjI0MVBGP
+	zPEjnZJg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58798 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFv3a-0006sx-2x;
-	Tue, 26 Nov 2024 12:52:43 +0000
+	id 1tFv3g-0006tH-0B;
+	Tue, 26 Nov 2024 12:52:48 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFv3Z-005yhr-Os; Tue, 26 Nov 2024 12:52:41 +0000
+	id 1tFv3e-005yhx-SV; Tue, 26 Nov 2024 12:52:46 +0000
 In-Reply-To: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -73,8 +73,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com
-Subject: [PATCH RFC net-next 06/23] net: phy: update phy_ethtool_get_eee()
- documentation
+Subject: [PATCH RFC net-next 07/23] net: mdio: add definition for clock stop
+ capable bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,39 +84,31 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFv3Z-005yhr-Os@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tFv3e-005yhx-SV@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 12:52:41 +0000
+Date: Tue, 26 Nov 2024 12:52:46 +0000
 
-Update the phy_ethtool_get_eee() documentation to make it clear that
-all members of struct ethtool_keee are written by this function.
-
-keee.supported, keee.advertised, keee.lp_advertised and keee.eee_active
-are all written by genphy_c45_ethtool_get_eee().
-
-keee.tx_lpi_timer, keee.tx_lpi_enabled and keee.eee_enabled are all
-written by eeecfg_to_eee().
+Add a definition for the clock stop capable bit in the PCS MMD. This
+bit indicates whether the MAC is able to stop the transmit xMII clock
+while it is signalling LPI.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phy.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/uapi/linux/mdio.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 18109f843e39..8caef54a60e0 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1648,8 +1648,8 @@ EXPORT_SYMBOL(phy_get_eee_err);
-  * @phydev: target phy_device struct
-  * @data: ethtool_keee data
-  *
-- * Description: reports the Supported/Advertisement/LP Advertisement
-- * capabilities, etc.
-+ * Description: get the current EEE settings, filling in all members of
-+ * @data.
-  */
- int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_keee *data)
- {
+diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
+index f0d3f268240d..6975f182b22c 100644
+--- a/include/uapi/linux/mdio.h
++++ b/include/uapi/linux/mdio.h
+@@ -125,6 +125,7 @@
+ #define MDIO_STAT1_LPOWERABLE		0x0002	/* Low-power ability */
+ #define MDIO_STAT1_LSTATUS		BMSR_LSTATUS
+ #define MDIO_STAT1_FAULT		0x0080	/* Fault */
++#define MDIO_PCS_STAT1_CLKSTOP_CAP	0x0040
+ #define MDIO_AN_STAT1_LPABLE		0x0001	/* Link partner AN ability */
+ #define MDIO_AN_STAT1_ABLE		BMSR_ANEGCAPABLE
+ #define MDIO_AN_STAT1_RFAULT		BMSR_RFAULT
 -- 
 2.30.2
 
