@@ -1,109 +1,149 @@
-Return-Path: <netdev+bounces-147448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E3319D998F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:25:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 965DC9D999C
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:29:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 283C8B2625D
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:20:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDF44B21619
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C016B2EAE6;
-	Tue, 26 Nov 2024 14:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RcZZ0mKG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D783398E;
+	Tue, 26 Nov 2024 14:21:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8A21D5CC2
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 14:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4081CB32A
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 14:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732630841; cv=none; b=Urj/Is9UQvVNKS3d7Rf6Z46wQZmZspijQ2Ylnk3pAhZZxPt/2BJkbcKmDiehcX64+hxY1ss8qZYxzupBFKWtTiy3ujQIfkRck2DB9YUaDmAeActSB3IA7j5YCa9m85oCK91BPYMqQiBkR/qA+P2hqb8KovyAW+pKSY5iS0qXghY=
+	t=1732630909; cv=none; b=X3aFGkz91VnRcpOHycShoGLVuilTR04cs1pGrWfyw9ncLKa0rv714ELw5QKusdrFfLmLNsK8GWFYDteeDBi6g7CF204/h5dDDewi3y49V7nKSRsG5Io6CMVR+yJCvemNkHoeNYPxXbqatRO0qn9/zGDwCrU9zT07/CMp195WBvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732630841; c=relaxed/simple;
-	bh=Nt2N9AicdWJ/nKrqZ7uRqb8xhfY5yw882EqZyhO3gWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uLWbi+2PuImAN5+ZNP1mD/DYqB03K/YOgAMkmaPqfrlVkcmbooLBOf9KY2X7OHx8aWOIoqorW1+vmR0OVIesUh0JpUHy84tfVmqaRUoxC0Wk9/HiocgOtH/6HHvgkRoYFsczbRnnGdiJpLdrvELyaRmouaOVx3WyZhVl5rb709c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RcZZ0mKG; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-434a1833367so10752325e9.1
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:20:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732630838; x=1733235638; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Nt2N9AicdWJ/nKrqZ7uRqb8xhfY5yw882EqZyhO3gWA=;
-        b=RcZZ0mKGdAgUUWK/ZB+Rm/U74zxoAd8+IPED8WtVAqEUCUFEoaDPRgHT0gz1Dz8XLa
-         s+TdnqF6+xdhX+BZXphvltmN7s2HmXUMo/Nua/Tz4b9P3ahxSurhjQv5J3XYFyvJa6mw
-         DJo35WYE5TfLHqDSi0nhhyD21yHREjLU0kz+2LsJqIEyhS2GkN4oE9lRg7yzxNPgGzOC
-         xLjgIfOETibrHwI/l8T67lXDko/VU+CjLzkIKd6NIwbuyp6OITnC4zZostm0r27FK5uE
-         OIRwys5I6suEgsbMKYWT8mouJzLYoj/9gJRM6MdSAH/KExkqsPk860FLyQQxW3GHzit4
-         tYYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732630838; x=1733235638;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nt2N9AicdWJ/nKrqZ7uRqb8xhfY5yw882EqZyhO3gWA=;
-        b=H4529eIyyDUzuaw6wgW+Py4w2J/uIs2F4j6+sZ5J2O9v/3Gd8Y2rI1pR1/iCCL+opy
-         tqcZ7/GgDL0yAqy2NzyC85416qMBbyIYZOnCx0SFsYaRKnn2Y7BeoddgN9yKssbOHWSv
-         G//zkGHt4YmhwydMI1ADnpGQc+el6qWBCPPlB5E/wCK2rR84omhRSlOFhZqOml1IIZcr
-         AdX0u60jLBtmUneStDaVzOb5wf7LGeM0roW6V0GSrskGVyw2fLKz4HqYmzu3klK9mXpt
-         2ccLpGwGOZkoZU/ym4GpmzgCj/nteWNQFgYweHhyycv/Ga2dC1+ODSS/jG8bv6djebnT
-         R4Og==
-X-Gm-Message-State: AOJu0Yy61qCn8YQTZu3oxNWabpl7nlWKyKgDvuSHx1SDpOndBkH4QYSX
-	+wglZkeS1gi54oeQOa5pW39AsbLtCbDXYE/6Miases78kviKd/dOMc9mUQ==
-X-Gm-Gg: ASbGnct2fHNrqz0ny77/POhGTO8aonuaQduIm7nJr9+c6C+iQItTYPQQciso3DWkOLk
-	lxN9Qv2vf2qFERE9VabKlm+AjvxLi6V1VeZXpYwkKrtnILL1+r1WlWz3LXyeafK8R8lJczncTZX
-	5yW0AwOi6/FOv8JgGCpYee8/lYYZHebALvKUA62uWEf/k9cB6c3Jsk7UO1Xm5F4MJ3tlWevrTWI
-	dBHOSdf1USQ/ZdqW7U6dAbGfGULRpJNK41uNoVGqJM1ZSJQI6bU
-X-Google-Smtp-Source: AGHT+IEc4q9l5Ov+Mzz/8Uhjn/bsTfxXaE8rdH9ye3ZnjWPhVCXVuVIqOXZHkGIdHMHZv1byJER5HQ==
-X-Received: by 2002:a05:600c:4985:b0:434:9e73:51a1 with SMTP id 5b1f17b1804b1-434a4ea3f2fmr31210855e9.14.1732630837962;
-        Tue, 26 Nov 2024 06:20:37 -0800 (PST)
-Received: from [10.0.0.4] ([78.244.195.188])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-433b4642b8dsm231487205e9.41.2024.11.26.06.20.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2024 06:20:37 -0800 (PST)
-Message-ID: <1e418442-722d-488c-858d-8789736b1b5b@gmail.com>
-Date: Tue, 26 Nov 2024 15:20:32 +0100
+	s=arc-20240116; t=1732630909; c=relaxed/simple;
+	bh=dS9yVchjTv0/oJ9s3FhzGaMWyMMfzEkXHhtOmGGcwdc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oRZed+syeDUPP9jIoJR6sqBD+vNXcQUyLqvoKf8INMjEdZnrrlKdiU67azLmK8lF/9RVlmDXnv4CYzeEuhrjrLVwVTUD7GK8YfwUEG+OLmOf+hKJXjnpcH5dzR88pRbuzPLzgJ98KVNfI+rYzz+DRm1IuYCzLlLNzNo2MyQIGVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tFwRV-0001t6-Mp; Tue, 26 Nov 2024 15:21:29 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tFwRR-000GRf-2M;
+	Tue, 26 Nov 2024 15:21:26 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tFwRS-00GeR7-1E;
+	Tue, 26 Nov 2024 15:21:26 +0100
+Date: Tue, 26 Nov 2024 15:21:26 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH RFC net-next 00/23] net: phylink managed EEE support
+Message-ID: <Z0XZZszZFVbVl_kN@pengutronix.de>
+References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
+ <Z0XGl0caztvVarmZ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] ipv4: remove useless arg
-To: tianyu2 <tianyu2@kernelsoft.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org
-References: <20241126131912.601391-1-tianyu2@kernelsoft.com>
-Content-Language: en-US
-From: Eric Dumazet <eric.dumazet@gmail.com>
-In-Reply-To: <20241126131912.601391-1-tianyu2@kernelsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z0XGl0caztvVarmZ@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hi Russell,
 
-On 11/26/24 2:19 PM, tianyu2 wrote:
-> When I wanted to kprobe the ip_rcv_finish_core, I found that using x1 to
-> pass "struct sk_buff *skb"."struct sock *sk" was not used in the
-> function, causing the compiler to optimize away. This resulted in a
-> hard to use kprobe. Why not delete him?
->
-> Signed-off-by: tianyu2 <tianyu2@kernelsoft.com>
-> ---
+On Tue, Nov 26, 2024 at 01:01:11PM +0000, Russell King (Oracle) wrote:
+> On Tue, Nov 26, 2024 at 12:51:36PM +0000, Russell King (Oracle) wrote:
+> > Patch 11 adds phylink managed EEE support. Two new MAC APIs are added,
+> > to enable and disable LPI. The enable method is passed the LPI timer
+> > setting which it is expected to program into the hardware, and also a
+> > flag ehther the transmit clock should be stopped.
+> > 
+> >  *** There are open questions here. Eagle eyed reviewers will notice
+> >    pl->config->lpi_interfaces. There are MACs out there which only
+> >    support LPI signalling on a subset of their interface types. Phylib
+> >    doesn't understand this. I'm handling this at the moment by simply
+> >    not activating LPI at the MAC, but that leads to ethtool --show-eee
+> >    suggesting that EEE is active when it isn't.
+> >  *** Should we pass the phy_interface_t to these functions?
+> >  *** Should mac_enable_tx_lpi() be allowed to fail if the MAC doesn't
+> >    support the interface mode?
+> 
+> There is another point to raise here - should we have a "validate_eee"
+> method in struct phylink_mac_ops so that MAC drivers can validate
+> settings such as the tx_lpi_timer value can be programmed into the
+> hardware?
+> 
+> We do have the situation on Marvell platforms where the programmed
+> value depends on the MAC speed, and is only 8 bit, which makes
+> validating its value rather difficult - at 1G speeds, it's a
+> resolution of 1us so we can support up to 255us. At 100M speeds,
+> it's 10us, supporting up to 2.55ms. This makes it awkward to be able
+> to validate the set_eee() settings are sane for the hardware. Should
+> Marvell platforms instead implement a hrtimer above this? That sounds
+> a bit problematical to manage sanely.
 
-This is great seeing compilers being smart.
+I agree that tx_lpi_timer can be a problem, and this is not just a
+Marvell issue.  For example, I think the FEC MAC on i.MX8MP might also
+be affected.  But I can't confirm this because I don't have an i.MX8MP
+board with a PHY that supports MAC-controlled EEE mode. The Realtek PHY
+I have uses PHY-controlled EEE (SmartEEE).
 
-SGTM, please send this next week when net-next is open again.
+Except for this, I think there should be sane default values for
+tx_lpi_timer.  The IEEE 802.3-2022 standard (Section 78.2) describes EEE
+timing, but it doesn’t give a clear recommendation for tx_lpi_timer.
+IMO, the best value for tx_lpi_timer should be the sum of the time
+needed to put the full chain (MAC -> PHY -> remote PHY) into sleep mode
+and the time needed to wake the chain. These times are link-speed
+specific, so defaults should consider PHY timings for each link speed.
 
-Also do the same for ip_list_rcv_finish()
+Except for tx_lpi_timer, some MACs also allow configuration of the Twake
+timer.  For example, the FEC driver uses the lpi_timer value to
+configure the Twake timer, and the LAN78xx driver also provides a
+configurable Twake timer register.
 
+If the Twake timer is not configured properly, or if the system has
+quirks causing the actual Twake time to be longer than expected, it can
+result in frame corruption. 
 
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
