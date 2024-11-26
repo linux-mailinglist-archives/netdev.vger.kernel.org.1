@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-147397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2ED49D966C
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:46:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 901EE9D9685
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:51:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E006CB22866
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 11:46:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 567B928A505
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 11:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C44A193064;
-	Tue, 26 Nov 2024 11:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D76F1CFEDB;
+	Tue, 26 Nov 2024 11:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qsj4b6lT"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D034811185;
-	Tue, 26 Nov 2024 11:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551421CF7A1;
+	Tue, 26 Nov 2024 11:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732621599; cv=none; b=FxZxeHDcUPxxq+NjtclWYLJJJneEv91GqHMAKDFAqZ/qaj3WpOSBtk/DT70F6m2UlPOqbFxcDOgZDzk1ZmE+QYvE86AIMNHimu/NaB3XeuTGk3LmW/AI061BXtufeSL/jWiUQMk/dZix1jrEg3+RfnQjcSvywGwwD4qDz3VubJo=
+	t=1732621818; cv=none; b=PXJClBMcpfvkrQnR+yChh95Fr10plKjWr3S6y/mLK6HwB3dvErcbQFkibJ6TlXNAWt2LLbvKSPl9U4yRkGHDz+ZNN4PU0SG0W4IMYd+R2ciiM/cbtMChOxe9J9A5SfU5Sd8fkfLsz0P7whCovhSHDje4YbV+WZ51+Na3drtcP/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732621599; c=relaxed/simple;
-	bh=PZlwZxdHF7frqU3MGDyp+2mGn8PBWwE2iXqb6SNufIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=s8JEIzUNvzLlujtfrdb1vj+4UqfYrngkUALOXnkimL4GSPd4n4X/1JlnHSwyYqrQ06hjavWZPtbG3OVKuSaADqR3V5ekgXdjQt2XG6KOI6QTMxLF4d2fo//IxSKM1bNFgLlJ6LCynDivYmCa/TZEx/FJzL6fNbGUrS6noFp24Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XyLLq74MwzxVZX;
-	Tue, 26 Nov 2024 19:43:47 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6CABD180105;
-	Tue, 26 Nov 2024 19:46:34 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Nov 2024 19:46:34 +0800
-Message-ID: <caabd226-e80b-4cd7-acdf-0f1355e04b4f@huawei.com>
-Date: Tue, 26 Nov 2024 19:46:33 +0800
+	s=arc-20240116; t=1732621818; c=relaxed/simple;
+	bh=oKh7sp0Ecwnh2RNXEO0aVQBi0j1F4BGPQFwGp6eo3lU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PhvLYOkx3iirha6oG6cLdmFOCa1kuTL5IvzLzC2VxA+xtEdOFy2DdT8l2U1Ls1TI46g2uqnXg5b98wFx0chMYDDBZBVLa+4rrtUpSTKKlQEwOi1jIfix6rwsmlVEZ90r23h1w9srn6zvG7a3mffSg5zlQYC5jkNKXjqTOqLO6kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qsj4b6lT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5919C4CECF;
+	Tue, 26 Nov 2024 11:50:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732621818;
+	bh=oKh7sp0Ecwnh2RNXEO0aVQBi0j1F4BGPQFwGp6eo3lU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Qsj4b6lTnsVQv5dupK/3h4xssYEbx65lCg+X2mIwj/h1ZzgjA8YSbvV1xNkAj9Bck
+	 OLPeMDJGLNk+CjQ1Gjr8QTiZfoetfF8bCIOe7xLSFzZSkm8Z0xA94pba44xSL2cwZc
+	 dqSIjpiVtYmVbmhCiIweO1gmvOfl4VPCXtjoh2y1ykTtRP37AW/uovQi6h2215aaAw
+	 yoCMctJeuP0oAa4z/CcyHTXwdm1w3yyJvDz0DEBD+2CwttAUKYx4KOVTuIeb6X33EC
+	 x3NI+0woCZrgafDt7tTvO9XKbwsaDYTUeNhiE7tSPuMCLUB1lwih3q95deXjMPtFWf
+	 K/P/HZCkE/LxQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4A33809A00;
+	Tue, 26 Nov 2024 11:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 2/3] page_pool: fix IOMMU crash when driver has
- already unbound
-To: Jesper Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <liuyonglong@huawei.com>, <fanghaiqing@huawei.com>,
-	<zhangkun09@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
-	<alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
- <20241120103456.396577-3-linyunsheng@huawei.com>
- <3366bf89-4544-4b82-83ec-fd89dd009228@kernel.org>
- <27475b57-eda1-4d67-93f2-5ca443632f6b@huawei.com>
- <ac728cc1-2ccb-4207-ae11-527a3ed8fbb6@kernel.org>
- <6233e2c3-3fea-4ed0-bdcc-9a625270da37@huawei.com>
- <554e768b-e990-49ff-bad4-805ee931597f@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <554e768b-e990-49ff-bad4-805ee931597f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Subject: Re: [net 0/5] octeontx2-af: misc RPM fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173262183075.361852.14254743220816168481.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Nov 2024 11:50:30 +0000
+References: <20241122162035.5842-1-hkelam@marvell.com>
+In-Reply-To: <20241122162035.5842-1-hkelam@marvell.com>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
+ jerinj@marvell.com, lcherian@marvell.com, sbhatta@marvell.com,
+ naveenm@marvell.com, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch
 
-On 2024/11/26 18:22, Jesper Dangaard Brouer wrote:
+Hello:
 
-...
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
->>>
->>> Once the a page is release from a page pool it becomes a normal page,
->>> that adhere to normal page refcnt'ing. That is how it worked before with
->>> page_pool_release_page().
->>> The later extensions with page fragment support and devmem might have
->>> complicated this code path.
->>
->> As page_pool_return_page() and page_pool_destroy() both try to "release"
->> the page concurrently for a specific page, I am not sure how using some
->> simple *atomic* can avoid this kind of concurrency even before page
->> fragment and devmem are supported, it would be good to be more specific
->> about that by using some pseudocode.
->>
+On Fri, 22 Nov 2024 21:50:30 +0530 you wrote:
+> There are few issues with the RPM driver, such as FIFO overflow
+> and network performance problems due to wrong FIFO values. This
+> patchset adds fixes for the same.
 > 
-> Okay, some my simple atomic idea will not work.
 > 
-> NEW IDEA:
+> Patch1: Fixes the mismatch between the lmac type reported by the driver
+>         and the actual hardware configuration.
 > 
-> So, the my concern in this patchset is that BH-disabling spin_lock pool->destroy_lock is held in the outer loop of page_pool_inflight_unmap() that scans all pages.  Disabling BH for this long have nasty side-effects.
-> 
-> Will it be enough to grab the pool->destroy_lock only when we detect a page that belongs to our page pool?  Of-cause after obtaining the lock. the code need to recheck if the page still belongs to the pool.
-> 
+> [...]
 
-That means there will be page_pool_return_page() called between the scanning,
-it seems like a lot like the idea of 'page_pool_get_dma_addr() need to be
-checked to decide if the mapping is already done or not for each page.' as
-there are two cases when page_pool_return_page() is called during scanning:
-1. page_pool_get_dma_addr() returns non-zero dma address, which means the dma
-   unmapping is not done by scanning yet, page_pool_return_page() need to do
-   the dma unmapping before calling put_page()
-2. page_pool_get_dma_addr() returns zero dma address, which means the dma
-   unmapping is done by scanning, page_pool_return_page() just skip the dma
-   unmapping and only call put_page().
+Here is the summary with links:
+  - [net,1/5] octeontx2-af: RPM: Fix mismatch in lmac type
+    https://git.kernel.org/netdev/net/c/7ebbbb23ea5b
+  - [net,2/5] octeontx2-af: RPM: Fix low network performance
+    https://git.kernel.org/netdev/net/c/d1e8884e050c
+  - [net,3/5] octeontx2-af: RPM: fix stale RSFEC counters
+    https://git.kernel.org/netdev/net/c/07cd1eb166a3
+  - [net,4/5] octeontx2-af: RPM: fix stale FCFEC counters
+    https://git.kernel.org/netdev/net/c/6fc216410846
+  - [net,5/5] octeontx2-af: Quiesce traffic before NIX block reset
+    https://git.kernel.org/netdev/net/c/762ca6eed026
 
-It seems there is only one case for scanning:
-1. page_pool_get_dma_addr() for a page_pool owned page returns non-zero dma
-   address, which means page_pool_return_page() is not called for that page yet,
-   scanning will the do the mapping for page_pool_return_page() and reset the
-   dma address of the page to indicate the dma unmapping is done for that page.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-It seems there is no case of page_pool owned page having zero dma address during
-scanning, as both page->pp_magic is cleared and dma unmapping is already done in
-page_pool_return_page().
+
 
