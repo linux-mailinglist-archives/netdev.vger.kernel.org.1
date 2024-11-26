@@ -1,204 +1,110 @@
-Return-Path: <netdev+bounces-147309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6113C9D909F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:05:00 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223829D90A8
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:13:00 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 272CB2894CE
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:04:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8B9169B85
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9504038F91;
-	Tue, 26 Nov 2024 03:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26BE840C03;
+	Tue, 26 Nov 2024 03:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wbtkh9DC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-5.mail.aliyun.com (out28-5.mail.aliyun.com [115.124.28.5])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645DB27735;
-	Tue, 26 Nov 2024 03:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90782F85C
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 03:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732590296; cv=none; b=POJZHzjXJMws2wCWB5ClIkTNK7ruh16boJ1MhaWK8ORk45KgEOO9/6EHOnSnT/zWeqwlaDjsZPSLxdzELU3kZEInv/v4Ht3VPZ+WGtEqOHDQBMzWfGQOaltjGEh8lBy8sIGWHQ0FNW07fhTBCdwayhFhvrW5XOOO5zXzbDavZUI=
+	t=1732590777; cv=none; b=b0uWDf/A85hfZoNeNZbEhMXviXr82p64XNYOTaelcZ7P6idj8bOr5FGqIwJR4a4/IPoz7olAj3AgHtCVaqAMDzKKVI7blv/6UvFy9y1rHkA2JhaSyvq1Ym8EDN9aNkGdqtNUcU//kgQgADvpWhFHrv+rWPoLIH+lNHnq6JukFpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732590296; c=relaxed/simple;
-	bh=594+teM29iEIoF9KRvIvZWYIrAA5cVKCDrmj6HJmYEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FuQYMZlE1oG0n+B+JEH6qy2LxAkqXO6VqNJlkhD2QtfH0CME4wPJD4TNLRCPSwx9OfEu0NJNUgkxoj/eogfFTLhnZWiCJ2/YepbOq9K83u14c903UISam5uFjsIMjl8wAdbr6sTvX7mQGgazwm5unixyguzW1lAAU/MlnpYIZhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aMScSzK_1732590281 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Nov 2024 11:04:42 +0800
-Message-ID: <708dd5d9-5e06-4446-9b1d-f6f9561eb9c3@motor-comm.com>
-Date: Tue, 26 Nov 2024 11:04:40 +0800
+	s=arc-20240116; t=1732590777; c=relaxed/simple;
+	bh=hwzXCIdTjGVp4vBY4mT50Yf9dobIx/6YLm9M3LTcjds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMnom/QNYc8tjbCg2f8NoW7plKV1arWHrDm21kCko/7ZpgwC5d/ICwUj45zZNWhJm8OXC0rETR5r4nJNyGsiXcFOS71ywgvYYR+sDiBIbnon7zs0TSPbq/ldAyzaj3+/0IwW7SJxG07rtG6P+JeShKxro2XwHg6p+gquy6MGF6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wbtkh9DC; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 25 Nov 2024 22:12:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732590771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7ZFCvigxc+f+OmEHcbTlilY3nILuy+938VPUfRa7aRw=;
+	b=wbtkh9DCqRmiK2a6LPcnLAWLqDwFtbBTpyxG9r30PTnOqczyMWRCQR8rFN54IOM+HfmiKj
+	9AqO/86hC3R0LfKcBJtUpBE4dTRi7vWCliiOLhvbSY7wqjtxxGzlzxA1kAnkHJCtV3AvUD
+	yb99i5iTCQBlebQUdi9l78M60+4cj6A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>, 
+	netdev@vger.kernel.org
+Subject: Re: rhashtable issue - -EBUSY
+Message-ID: <t3a3ggvcvnle6dnnmzf3ehlgcxhgpnn2mbpyukjv3g67iqxlah@spqeyovloafo>
+References: <>
+ <Z0QQnLNJn1jhMErP@gondor.apana.org.au>
+ <173257789029.1734440.16216135574521669815@noble.neil.brown.name>
+ <yaxjp5k4o37vh2bl2ecuj3qoyz6x3lwau2kf7zevq5v3krcmtu@idoh3wd4zyqu>
+ <Z0U4bfbBoooHIZVB@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 09/21] motorcomm:yt6801: Implement some hw_ops
- function
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
- <20241120105625.22508-10-Frank.Sae@motor-comm.com>
- <46206a81-e230-411c-8a78-d461d238b171@lunn.ch>
- <11e26658-670f-49fa-8001-0654670b541e@motor-comm.com>
- <cd57707a-2d7e-4549-aab1-d0bd6c24ad35@lunn.ch>
-Content-Language: en-US
-From: Frank Sae <Frank.Sae@motor-comm.com>
-In-Reply-To: <cd57707a-2d7e-4549-aab1-d0bd6c24ad35@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z0U4bfbBoooHIZVB@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Andrew,
-  Thanks for your suggestions.
-  I will follow your advice, thanks again!
+On Tue, Nov 26, 2024 at 10:54:37AM +0800, Herbert Xu wrote:
+> On Mon, Nov 25, 2024 at 07:38:57PM -0500, Kent Overstreet wrote:
+> >
+> > Networking and storage people seem to have quite different perspectives
+> > on these issues; in filesystem and storage land in general, randomly
+> > failing is flatly unacceptable.
+> > 
+> > We do need these issues fixed.
+> > 
+> > I don't think the -EBUSY is being taken seriously enough either,
+> > especially given that the default hash is jhash. I've seen jhash produce
+> > bad statistical behaviour before, and while rehashing with a different seen
+> > may make jhash acceptable, I'm not an all confident that we won't ever
+> > see -EBUSY show up in production.
+> > 
+> > That's the sort of issue that won't ever show up in testing, but it will
+> > show up in production as users start coming up with all sorts of weird
+> > workloads - and good luck debugging those...
+> 
+> I actually added a knob to disable EBUSY but it was removed
+> without my review:
+> 
+> commit ccd57b1bd32460d27bbb9c599e795628a3c66983
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Tue Mar 24 00:50:28 2015 +1100
+> 
+>     rhashtable: Add immediate rehash during insertion
+> 
+> commit 5f8ddeab10ce45d3d3de8ae7ea8811512845c497
+> Author: Florian Westphal <fw@strlen.de>
+> Date:   Sun Apr 16 02:55:09 2017 +0200
+> 
+>     rhashtable: remove insecure_elasticity
+> 
+> I could reintroduce this knob.  It should obviously also disable
+> the last-ditch hash table resize that should make ENOMEM impossible
+> to hit.
 
+How odd...
 
-On 2024/11/25 22:39, Andrew Lunn wrote:
-> On Mon, Nov 25, 2024 at 05:49:19PM +0800, Frank Sae wrote:
->> Hi Andrew,
->>
->> On 2024/11/23 09:03, Andrew Lunn wrote:
->>> It took a lot of effort to find your MDIO code. And MDIO bus driver
->>> makes a good patch on its own.
->>>
->>
->> Sorry about that.
->> There is too many codes in yt6801_hw.c file. If I put the MDIO bus driver
->> in one patch, it's would be very difficult to limit to 15 patches. 
-> 
-> You can easily limit this to 15 patches. Throw away 75% of the driver
-> for the moment. Do enough to get link and then send/receive
-> frames. Forget the rest. You don't need statistics, ethtool, WoL, and
-> everything else in the first submission. They can all be added later.
-> 
-> You need reviewers in order to get your driver merged. If you give
-> them a huge driver which is hard to find what they are interested in,
-> they won't review it, and it will not get merged. So break it up into
-> a number of patchsets. A minimum driver to just send/receive should be
-> nice and small, and can be split into 15 patches making it nice and
-> easy to find bits reviewers are interested in. That should get
-> reviewed and merged. Then add more and more features in nice small
-> chunks which are easy to review> 
->>>> +static int mdio_loop_wait(struct fxgmac_pdata *pdata, u32 max_cnt)
->>>> +{
->>>> +	u32 val, i;
->>>> +
->>>> +	for (i = 0; i < max_cnt; i++) {
->>>> +		val = rd32_mac(pdata, MAC_MDIO_ADDRESS);
->>>> +		if ((val & MAC_MDIO_ADDR_BUSY) == 0)
->>>> +			break;
->>>> +
->>>> +		fsleep(10);
->>>> +	}
->>>> +
->>>> +	if (i >= max_cnt) {
->>>> +		WARN_ON(1);
->>>> +		yt_err(pdata, "%s timeout. used cnt:%d, reg_val=%x.\n",
->>>> +		       __func__, i + 1, val);
->>>> +
->>>> +		return -ETIMEDOUT;
->>>> +	}
->>>
->>> Please replace this using one of the helpers in
->>> include/linux/iopoll.h.
->>>
->>>> +#define PHY_WR_CONFIG(reg_offset)		(0x8000205 + ((reg_offset) * 0x10000))
->>>> +static int fxgmac_phy_write_reg(struct fxgmac_pdata *pdata, u32 reg_id, u32 data)
->>>> +{
->>>> +	int ret;
->>>> +
->>>> +	wr32_mac(pdata, data, MAC_MDIO_DATA);
->>>> +	wr32_mac(pdata, PHY_WR_CONFIG(reg_id), MAC_MDIO_ADDRESS);
->>>> +	ret = mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
->>>> +	if (ret < 0)
->>>> +		return ret;
->>>> +
->>>> +	yt_dbg(pdata, "%s, id:%x %s, ctrl:0x%08x, data:0x%08x\n", __func__,
->>>> +	       reg_id, (ret == 0) ? "ok" : "err", PHY_WR_CONFIG(reg_id), data);
->>>> +
->>>> +	return ret;
->>>> +}
->>>> +
->>>> +#define PHY_RD_CONFIG(reg_offset)		(0x800020d + ((reg_offset) * 0x10000))
->>>> +static int fxgmac_phy_read_reg(struct fxgmac_pdata *pdata, u32 reg_id)
->>>> +{
->>>> +	u32 val;
->>>> +	int ret;
->>>> +
->>>> +	wr32_mac(pdata, PHY_RD_CONFIG(reg_id), MAC_MDIO_ADDRESS);
->>>> +	ret =  mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
->>>> +	if (ret < 0)
->>>> +		return ret;
->>>> +
->>>> +	val = rd32_mac(pdata, MAC_MDIO_DATA);  /* Read data */
->>>> +	yt_dbg(pdata, "%s, id:%x ok, ctrl:0x%08x, val:0x%08x.\n", __func__,
->>>> +	       reg_id, PHY_RD_CONFIG(reg_id), val);
->>>> +
->>>> +	return val;
->>>> +}
->>>
->>> And where is the rest of the MDIO bus driver?
->>
->> There is no separate reset of MDIO bus driver.
-> 
-> rest, not reset.
-> 
-> An MDIO driver is generally two to five functions to do bus
-> transactions, and then one or two functions to allocate the bus
-> structure, fill in the members and register the bus, and maybe a
-> function to undo that. I would expect these all to be in one
-> patch. They are not.
-> 
-> At some point, you need to justify your hw_ops structure. Why do you
-> have this? At the moment it just obfuscate the code. Maybe there is a
-> good reason for it, but given the size of the driver i've not been
-> able to find it.
-> 
->>>> +#define LINK_DOWN	0x800
->>>> +#define LINK_UP		0x400
->>>> +#define LINK_CHANGE	(LINK_DOWN | LINK_UP)
->>>> +	if ((stats_pre & LINK_CHANGE) != (stats & LINK_CHANGE)) {
->>>> +		yt_dbg(pdata, "phy link change\n");
->>>> +		return 1;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +unlock:
->>>> +	phy_unlock_mdio_bus(pdata->phydev);
->>>> +	yt_err(pdata, "fxgmac_phy_read_reg err!\n");
->>>> +	return  -ETIMEDOUT;
->>>> +}
->>>
->>> You need to rework your PHY interrupt handling. The PHY driver is
->>> responsible for handing the interrupt registers in the PHY. Ideally
->>> you just want to export an interrupt to phylib, so it can do all the
->>> work.
->>
->> I'm sorry. Could you please give me more information about export
->>  an interrupt to phylib?
-> 
-> I would actually suggest you first just let phylib poll the PHY. That
-> gets you something working. You can add interrupt support in a later
-> patchset. For ideas, look at ksz_common.c:
-> 
-> ds->user_mii_bus->irq[phy] = irq;
-> 
-> You have a whole tree of source code you can look at, there are other
-> examples of MAC drivers exporting an interrupt controller. And you
-> might find other ways to do this, look at other MAC drivers. There is
-> nothing special here, so don't invent something new, copy what other
-> MAC drivers do.
-> 
-> 
-> 	Andrew
+Does the knob have to be insecure_elasticity? Neal's idea of just
+blocking instead of returning -EBUSY seems perfectly viable to me, most
+uses I'm aware of don't need insertions to be strictly nonblocking.
 
