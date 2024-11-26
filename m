@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-147388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E0C9D95BA
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 11:41:57 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F00C1639C8
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:41:53 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198D91C5799;
-	Tue, 26 Nov 2024 10:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CbEw++6G"
-X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05ECD9D95C7
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 11:44:49 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4311B21AD
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 10:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C104628316C
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:44:47 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B989C1B6CE6;
+	Tue, 26 Nov 2024 10:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XJLIfR7j"
+X-Original-To: netdev@vger.kernel.org
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002B81C4A13
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 10:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732617708; cv=none; b=I6VJhbkUe7PYaaUlFYbsTYIvGgU14+RPHhxxEaAxqtBHOFzCbqibgUrlUMAJ/lNh5r9GGOHyUuxs3ywPblgHPZsmW9HE0Osvmcq4KDxRQQIsTc1GJ9eC7rasGyJ1wn66P7aJUN6LrlkQ9NfdipSRY03QfLit8CSB5YK0Bmx43pY=
+	t=1732617885; cv=none; b=fr4kv/lHaH4q9ooscXvlq5pyxJPzB4QvC+/eEyYhdg+E9iIiM+ESzsrvg7+5HY7N5UM9EbB6N7AQuRDpK21KWEZx9m110xz/JvUMlzvRq/VR3kFKL7rlJWJqAgXODF8UM4P7hmkSG7OklpJMkyeMxcu8lpQ5uDNtZ+gVctwFKow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732617708; c=relaxed/simple;
-	bh=SB9RVzpPrIASoDg3bpjPyfTi6AefWnYI0OM14bBB/fw=;
+	s=arc-20240116; t=1732617885; c=relaxed/simple;
+	bh=KdBWadV999/hFI+4SLYSFHFp8GJDXFgDWBOoMHkFijI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RvsFLhPMjlsxrYFBrmeo6JsBG8VIdMfTHf8sb4tcxHX72W5uXiBD50x2Tn7abPHdyElOharHsHPYwVnhqJLlwzyQWHiPxd8ik84xz4hPt2kX2v6ubRIbYAw6d0luB+pQVj8ZYAUJtkUZyJaxhQb1Lk65krhD++tbg6iUEF1TMfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CbEw++6G; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=BBIxXeGiJ1/1guLF8m7d3FxCXKwoMVd2fmo87ba29fY6MMfom6eg6gZB94sisnCdYJLIULbRJCb1vkOJQTnKdKb2fVP8/YRylRIEcXkyjYG8OJsZGn8BJDvgLNNvu6eM9CAi4qp8aRDzDXgmzC49xmRYI6quDbEkNaoNnelxsGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XJLIfR7j; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732617704;
+	s=mimecast20190719; t=1732617883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=c10oVoNw574UgZa8BPhDkAjnTCWOGhdZy0d+349O0RI=;
-	b=CbEw++6GfCNUNg0hBsfhibcJ1UFW09b/ND7GeAtrPsgZS/RQgtNBCdV84oKScIraKjmcVY
-	hfw8YAtEEnucaxrE74VN0b2466404HV3ONkmvY2udGGfUMUjzVdYctWvsMt9AmGADy4atw
-	nKtnqcv6XAAu8Hq/os4xz7ottzxaUqs=
+	bh=TkVy/t0jQWf/59aVVZ4W3SiOPE2oemtlXug1Llmq1Y8=;
+	b=XJLIfR7jSpWFdOseEezuEO4F+b86rqW1E5cAS3LbsuZkaJZqVjZ6965FZOouGIzKidMOZi
+	4IvAHkhWjTuSdrlG/SKtIL2v9wGSWlISB9ajkr4dncYH0DnmWpU4FOHvIWW+X+nL0AOP0T
+	Cdudym60UaAR31L81VZlZvGRTwO0ARc=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-620-4tG6uJShOtaibMNHC8PkBQ-1; Tue, 26 Nov 2024 05:41:42 -0500
-X-MC-Unique: 4tG6uJShOtaibMNHC8PkBQ-1
-X-Mimecast-MFC-AGG-ID: 4tG6uJShOtaibMNHC8PkBQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-382299520fdso3442249f8f.3
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 02:41:42 -0800 (PST)
+ us-mta-619-ywvZ3n32N7ihUhgMh8teNA-1; Tue, 26 Nov 2024 05:44:42 -0500
+X-MC-Unique: ywvZ3n32N7ihUhgMh8teNA-1
+X-Mimecast-MFC-AGG-ID: ywvZ3n32N7ihUhgMh8teNA
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3822ebe9321so3426935f8f.2
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 02:44:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732617701; x=1733222501;
+        d=1e100.net; s=20230601; t=1732617881; x=1733222681;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c10oVoNw574UgZa8BPhDkAjnTCWOGhdZy0d+349O0RI=;
-        b=no+4hrWsZuz2TNTK8jAEUtQWAxiM6TJJWNGiUzW81XGkP3Lg5JbmavqJVglC0uDSO2
-         Qc6A7ZZh60Bu5TxQZ+l0ncER1GL8AxtdZz+yk69z4JvEi8DW7ZRS1Tdhx9KtQiHN+BXS
-         lo2r3YyGJgXzsgXkz9XAkcWjQdH3xId5XwF9jXYtzadLIk+0E5R67u9NtX269Hy8QGwb
-         UW9TwKr4l684EYg5uFmlLVCopU4XzyciC5V+2VorqdzcRg8WsFFk+/0O/0jytQAZf8QP
-         F5+mrtgEGLBvegUo+oxvkfEYaPuYWIZNlZkevIa65TPrbKrElDkJjus361GyGOh3/vLK
-         qZvw==
-X-Gm-Message-State: AOJu0YwfkSmd5igGlNjS/2L1CXqFLzPBz8GkhQPITowbP8XRLcIV2Ghk
-	CD31rX8HHrPsFo6MS61ooHih+GdWcqPjgPZIQCs03GwA43VtRBIH879dh2cQ3NQnSkkJfGAwlUb
-	ICoO1AkHvOU3b70+iaQL6eDl9Z3rqrUbfsemy3QCbxFkON3gU4OJaCg==
-X-Gm-Gg: ASbGncttq9rWiokf1BQe57zUbMZ+rxxVVV0zqifeJvkzLjshkLq2qqQtoQU9CU8YWOc
-	tE04jaXsbaqaXsM14q08U5lUXiSY3uZ1izFE701plet3q8UhEewlRi4wgVRRSyZMfWYLndkXj1+
-	8S4nrr8ri81c08Qxm6W9P4DCz8hH3LB7QVojlY8xd0eA1FgEMPoDU1ppi1k6peHL+tdhFwh4IrV
-	lSSlyT7yTendLB9LLfbgTypHCMz0GZIxp81zVC6cOImIf2jEmGB3Zmmm2eui17JnVmRoS2Rx/Xe
-X-Received: by 2002:a5d:5f4b:0:b0:382:4a1b:16de with SMTP id ffacd0b85a97d-38260b6b627mr14762629f8f.21.1732617701354;
-        Tue, 26 Nov 2024 02:41:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFb5Dbp1esF0ba97VSbOBzEQDfodzxC6H9YqoKX1VC2tWE64+bs74QfkZMoN9Is771saUdIEg==
-X-Received: by 2002:a5d:5f4b:0:b0:382:4a1b:16de with SMTP id ffacd0b85a97d-38260b6b627mr14762614f8f.21.1732617701055;
-        Tue, 26 Nov 2024 02:41:41 -0800 (PST)
+        bh=TkVy/t0jQWf/59aVVZ4W3SiOPE2oemtlXug1Llmq1Y8=;
+        b=OQzn5zBVR+gwSCLMmpjZCiSBEyfQRtrxTG4jac3WWynbcoo3hiGA03qEVrW4WlxFBY
+         yFGSTXpmgp5bmioiL6+FT60fYWUFStkuI8huP09bzEHx8cOhjkMdIDKHejdEBJeKjRYW
+         JdzXwsukRObbsDLiWNXLz+BmzP+QDvbKlhXAVmiZR+UDKI+gEOrgu/BBwdj1xjdvS25x
+         uQTBl/uVXVUzrenhsfGMfF/ijBHm6QV4Mmtb0kEoxTXoNFd74XmoBIbMQnP/+1WqZa9S
+         24+eHlH6iQKF0J5HUBDHDTmMQfrkDtqRhQjy7rbcYSRTT3HDFTbpSjAEnCdSvxzoQ37p
+         eguA==
+X-Gm-Message-State: AOJu0YxOsDwPExlsliJJUqs5msIfn8TudQn4aQiIpmLGrX4v/d5qolwe
+	I6oht6couIVTn9pPf1jjpwyjgvUff288T7G+S4x+DUSE2KQzKZRglspxC2705xXOXPFeX2H6OAE
+	3PCMjDp/RabjaKsYOtep0a5e19RhkFrtE+q3R0B2Nd/rpjjVRrwZU6Q==
+X-Gm-Gg: ASbGncubjgk/Plba6lbES/UvV49mPf9QurC+FP2Bwx/lX6JaVqvLEtKo+LDUWsy90yN
+	QcoGDtckGlWW23EvNCe49tPaMBiUaqK2P/zEPraM1NYA7HcgGQ0aRroA+EOvFfGk/FEENHXL1o7
+	1pJBex4YsyHl4C/Nh++hPBzHZj74l4W724Z3f678htzCvye1e6lEvJ3FkBqk+t6FPIvned5XmVN
+	Us0bKesVpKrfnfMe838w+G/UP6ymNuwo+qO+wLl1UjCQRkSR686T5TqjHbSR+i+0T7wNz27Qsg8
+X-Received: by 2002:a05:6000:491a:b0:382:518d:5890 with SMTP id ffacd0b85a97d-38260b58769mr13451070f8f.17.1732617880785;
+        Tue, 26 Nov 2024 02:44:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGTI0+cN9ItH+mhgzw+NIRlvg7G2hbcc86+PnXjz1UHiB6HDILm1hH27tvO3nOKO+UuuqptQQ==
+X-Received: by 2002:a05:6000:491a:b0:382:518d:5890 with SMTP id ffacd0b85a97d-38260b58769mr13451056f8f.17.1732617880439;
+        Tue, 26 Nov 2024 02:44:40 -0800 (PST)
 Received: from [192.168.88.24] (146-241-94-87.dyn.eolo.it. [146.241.94.87])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a0c889c5sm54013395e9.2.2024.11.26.02.41.40
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fad61b0sm13181801f8f.7.2024.11.26.02.44.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2024 02:41:40 -0800 (PST)
-Message-ID: <1d7f6fbc-bc3c-4a21-b55e-80fcd575e618@redhat.com>
-Date: Tue, 26 Nov 2024 11:41:39 +0100
+        Tue, 26 Nov 2024 02:44:40 -0800 (PST)
+Message-ID: <b48da380-3071-4a94-911d-8d742d9120c2@redhat.com>
+Date: Tue, 26 Nov 2024 11:44:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,63 +86,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] net: ethernet: oa_tc6: fix tx skb race
- condition between reference pointers
+Subject: Re: [PATCH net v2 1/2] net: ethernet: oa_tc6: fix infinite loop error
+ when tx credits becomes 0
 To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
  andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
  kuba@kernel.org
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  UNGLinuxDriver@microchip.com, jacob.e.keller@intel.com
 References: <20241122102135.428272-1-parthiban.veerasooran@microchip.com>
- <20241122102135.428272-3-parthiban.veerasooran@microchip.com>
+ <20241122102135.428272-2-parthiban.veerasooran@microchip.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241122102135.428272-3-parthiban.veerasooran@microchip.com>
+In-Reply-To: <20241122102135.428272-2-parthiban.veerasooran@microchip.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
 On 11/22/24 11:21, Parthiban Veerasooran wrote:
-> There are two skb pointers to manage tx skb's enqueued from n/w stack.
-> waiting_tx_skb pointer points to the tx skb which needs to be processed
-> and ongoing_tx_skb pointer points to the tx skb which is being processed.
+> SPI thread wakes up to perform SPI transfer whenever there is an TX skb
+> from n/w stack or interrupt from MAC-PHY. Ethernet frame from TX skb is
+> transferred based on the availability tx credits in the MAC-PHY which is
+> reported from the previous SPI transfer. Sometimes there is a possibility
+> that TX skb is available to transmit but there is no tx credits from
+> MAC-PHY. In this case, there will not be any SPI transfer but the thread
+> will be running in an endless loop until tx credits available again.
 > 
-> SPI thread prepares the tx data chunks from the tx skb pointed by the
-> ongoing_tx_skb pointer. When the tx skb pointed by the ongoing_tx_skb is
-> processed, the tx skb pointed by the waiting_tx_skb is assigned to
-> ongoing_tx_skb and the waiting_tx_skb pointer is assigned with NULL.
-> Whenever there is a new tx skb from n/w stack, it will be assigned to
-> waiting_tx_skb pointer if it is NULL. Enqueuing and processing of a tx skb
-> handled in two different threads.
+> So checking the availability of tx credits along with TX skb will prevent
+> the above infinite loop. When the tx credits available again that will be
+> notified through interrupt which will trigger the SPI transfer to get the
+> available tx credits.
 > 
-> Consider a scenario where the SPI thread processed an ongoing_tx_skb and
-> it moves next tx skb from waiting_tx_skb pointer to ongoing_tx_skb pointer
-> without doing any NULL check. At this time, if the waiting_tx_skb pointer
-> is NULL then ongoing_tx_skb pointer is also assigned with NULL. After
-> that, if a new tx skb is assigned to waiting_tx_skb pointer by the n/w
-> stack and there is a chance to overwrite the tx skb pointer with NULL in
-> the SPI thread. Finally one of the tx skb will be left as unhandled,
-> resulting packet missing and memory leak.
-> To overcome the above issue, protect the moving of tx skb reference from
-> waiting_tx_skb pointer to ongoing_tx_skb pointer so that the other thread
-> can't access the waiting_tx_skb pointer until the current thread completes
-> moving the tx skb reference safely.
+> Fixes: 53fbde8ab21e ("net: ethernet: oa_tc6: implement transmit path to transfer tx ethernet frames")
+> 
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
 
-A mutex looks overkill. Why don't you use a spinlock? why locking only
-one side (the writer) would be enough?
-
-Could you please report the exact sequence of events in a time diagram
-leading to the bug, something alike the following?
-
-CPU0					CPU1
-oa_tc6_start_xmit
- ...
-					oa_tc6_spi_thread_handler
-					 ...
+Please, avoid empty lines between the Fixes tag and the SoB
 
 Thanks,
 
 Paolo
+
 
 
