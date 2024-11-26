@@ -1,91 +1,194 @@
-Return-Path: <netdev+bounces-147311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 436E09D90AE
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:15:01 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F1C59D90AF
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:16:01 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B71AFB2654A
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:14:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13613169BBE
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3712C433AD;
-	Tue, 26 Nov 2024 03:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ihUj+ZDF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050FF481DD;
+	Tue, 26 Nov 2024 03:15:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out28-221.mail.aliyun.com (out28-221.mail.aliyun.com [115.124.28.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F107E42AA2
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 03:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AE613FFC;
+	Tue, 26 Nov 2024 03:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732590895; cv=none; b=XOPLvhXMNUEFRiCsV4lh1jAmScWtQmhS2++Eo3vnMnhM2onDAuWQpjTNS1J/vcX0/jiHHW0em0lx5TAFZg4i/+YDWr8eVL9f+nE4rqRtQCBIV3mhzD/iZIlhTOuEmq+Y3K5oyMFluqoA8ZIjC7SnQlGFNg2JlaKEE4cG6Sd2nY0=
+	t=1732590956; cv=none; b=fy+BkqA2ifVH/nIVgasgiTPV3ONuRj43AksgemcCTVeKrU0pYFhmEej7PELgoiSfZ6EkHqP5pEJ6VvmHnzDdcTI2oyXQH6Zq7YvHTtE3w2Ud+qHf/T3QMI4x870e4MQNv8K6ftBsncJPxraz+T1/gXaukXKC08C+SnWBI58N/AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732590895; c=relaxed/simple;
-	bh=vaGeh27o0jtZeHmi4gfu2+YVTcR4eo0DKTVQyV/jmH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCDtRdlXMwtawOn8qjq6F4ikNDFyI44vzorecLft9HrPPCTfWXH455bTdGBBvMHbWQld9avxJBfN/eG7QnGuGUnH60P38kx+wXZYsC/eU3TewbSIW8iQYXaPq28SXD4T5qKqsY3I6Z2i3shwvpuoSPGfsGCFD6b3YS38cDKCRz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ihUj+ZDF; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Reo+zWQ8AG/ykcKyCZUCx0SIkINBsg74weDdRCMTPGE=; b=ihUj+ZDFN+EFa2/oW0V77JujUX
-	vdC2F3nVuiRpzZuImX+4IcsNEHacHMnywQMowjkuIBfOlIOruhluxzGdmOve64MUIZ+NMy9nZNIBR
-	o9j5UQicbZF8GH1iGhTKLqb3nOrz/JDNua32SPkuUarngQlnBIlxuip7z+ZxdTHqz+tceoQ820P65
-	YbZXgS13eKaxBxnz+UEIKQqLLh+lGngUgm2CBf49S8AWgsP4O4n82nUfToa7jbFarGYPPS7uwyy5l
-	EIHvRXbpQtohwHmrClZRMV2OPaKU1k3ok+ruFhyuPTU7jmC36w9l5B9urFReCYsVSqpZgcaUL4XvU
-	Ow2ujUPQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tFm2D-001gZH-0H;
-	Tue, 26 Nov 2024 11:14:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 26 Nov 2024 11:14:41 +0800
-Date: Tue, 26 Nov 2024 11:14:41 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>,
-	netdev@vger.kernel.org
-Subject: Re: rhashtable issue - -EBUSY
-Message-ID: <Z0U9IW12JklBfuBv@gondor.apana.org.au>
-References: <>
- <Z0QQnLNJn1jhMErP@gondor.apana.org.au>
- <173257789029.1734440.16216135574521669815@noble.neil.brown.name>
- <yaxjp5k4o37vh2bl2ecuj3qoyz6x3lwau2kf7zevq5v3krcmtu@idoh3wd4zyqu>
- <Z0U4bfbBoooHIZVB@gondor.apana.org.au>
- <t3a3ggvcvnle6dnnmzf3ehlgcxhgpnn2mbpyukjv3g67iqxlah@spqeyovloafo>
+	s=arc-20240116; t=1732590956; c=relaxed/simple;
+	bh=cSfp93QI3T8iQ8KLjNyaYF65vPVLOGKUcgQ2HC7Pqg4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SKvh2Wj0/HKKMFCt0iKGvkqjd84rMh4wSK8KXUT25KbteV52L8EORHfWiONWSD9ntx8KwdppY+JJ3OeiyrNdWjrquu0aHcNVBtjFD3Aimg5Q0ZXMHIf9sVjdWKh1bVzY2ktirpnzUPqjVtPTZpxGkNggzt+VtXNJqv6AH5KYS+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aMT7QzV_1732590947 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Nov 2024 11:15:48 +0800
+Message-ID: <43341290-15e3-4784-9b69-7f3f13f34e01@motor-comm.com>
+Date: Tue, 26 Nov 2024 11:15:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <t3a3ggvcvnle6dnnmzf3ehlgcxhgpnn2mbpyukjv3g67iqxlah@spqeyovloafo>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the
+ fxgmac_start function
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+ <20241120105625.22508-6-Frank.Sae@motor-comm.com>
+ <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
+ <ba24293a-77b1-4106-84d2-81ff343fc90f@motor-comm.com>
+ <82e1860b-cbbf-4c82-9f1b-bf4a283e3585@lunn.ch>
+Content-Language: en-US
+From: Frank Sae <Frank.Sae@motor-comm.com>
+In-Reply-To: <82e1860b-cbbf-4c82-9f1b-bf4a283e3585@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 25, 2024 at 10:12:44PM -0500, Kent Overstreet wrote:
->
-> Does the knob have to be insecure_elasticity? Neal's idea of just
-> blocking instead of returning -EBUSY seems perfectly viable to me, most
-> uses I'm aware of don't need insertions to be strictly nonblocking.
+Hi Andrew,
 
-Well having a knob is not negotiable because we must have this
-defence for networking users where hostile actors are a fact of
-life.
+On 2024/11/25 22:18, Andrew Lunn wrote:
+>>> RGMII is unusual, you normally want RGMII_ID. Where are the 2ns delays
+>>> added?
+>>>
+>>
+>> Yes, you are right. PHY_INTERFACE_MODE_RGMII should be PHY_INTERFACE_MODE_RGMII_ID.
+>> YT6801 NIC integrated with YT8531S phy, and the 2ns delays added in the phy driver.
+>> https://elixir.bootlin.com/linux/v6.12/source/drivers/net/phy/motorcomm.c#L895
+> 
+> But if you pass PHY_INTERFACE_MODE_RGMII to the PHY it is not adding
+> the 2ns delay. So how does this work now?
 
-And no you cannot block in networking.
+I'm sorry. Maybe PHY_INTERFACE_MODE_RGMII is enough.
+YT6801 is a pcie NIC chip that integrates one yt8531s phy.
+Therefore, a delay of 2ns is unnecessary, as the hardware has
+ already ensured this.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
+>>>> +int fxgmac_start(struct fxgmac_pdata *pdata)
+>>>> +{
+>>>> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
+>>>> +	u32 val;
+>>>> +	int ret;
+>>>> +
+>>>> +	if (pdata->dev_state != FXGMAC_DEV_OPEN &&
+>>>> +	    pdata->dev_state != FXGMAC_DEV_STOP &&
+>>>> +	    pdata->dev_state != FXGMAC_DEV_RESUME) {
+>>>> +		yt_dbg(pdata, " dev_state err:%x\n", pdata->dev_state);
+>>>> +		return 0;
+>>>> +	}
+>>>> +
+>>>> +	if (pdata->dev_state != FXGMAC_DEV_STOP) {
+>>>> +		hw_ops->reset_phy(pdata);
+>>>> +		hw_ops->release_phy(pdata);
+>>>> +		yt_dbg(pdata, "reset phy.\n");
+>>>> +	}
+>>>> +
+>>>> +	if (pdata->dev_state == FXGMAC_DEV_OPEN) {
+>>>> +		ret = fxgmac_phy_connect(pdata);
+>>>> +		if (ret < 0)
+>>>> +			return ret;
+>>>> +
+>>>> +		yt_dbg(pdata, "fxgmac_phy_connect.\n");
+>>>> +	}
+>>>> +
+>>>> +	phy_init_hw(pdata->phydev);
+>>>> +	phy_resume(pdata->phydev);
+>>>
+>>> The MAC should not be doing this.
+>>
+>> Does this mean deleting 'phy_resume(pdata->phydev)'?
+> 
+> There are only a few phylib API calls you should be using
+> 
+> phy_connect() or one of its variants.
+> phy_start()
+> phy_stop()
+> phy_disconnect()
+> 
+> Those four are the core. Those should be all you need to minimum
+> support.
+> 
+> phy_support_asym_pause()
+> phy_support_eee()
+> phy_speed_up()
+> phy_speed_down()
+> 
+> and these are just nice to have to let phylib know about things the
+> MAC supports, so phylib can manage the PHY to make them available to
+> the MAC. This is the API between the MAC driver and phylib. phylib
+> will then manage the PHY. Any time you want to use a phy_* function,
+> look to see if other MAC drivers do. If they don't you should not
+> either.
+
+Tanks for your clear explanation.
+
+> 
+>>>> +	hw_ops->pcie_init(pdata);
+>>>> +	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate)) {
+>>>> +		yt_err(pdata,
+>>>> +		       "fxgmac powerstate is %lu when config power up.\n",
+>>>> +		       pdata->powerstate);
+>>>> +	}
+>>>> +
+>>>> +	hw_ops->config_power_up(pdata);
+>>>> +	hw_ops->dismiss_all_int(pdata);
+>>>> +	ret = hw_ops->init(pdata);
+>>>> +	if (ret < 0) {
+>>>> +		yt_err(pdata, "fxgmac hw init error.\n");
+>>>> +		return ret;
+>>>> +	}
+>>>> +
+>>>> +	fxgmac_napi_enable(pdata);
+>>>> +	ret = fxgmac_request_irqs(pdata);
+>>>> +	if (ret < 0)
+>>>> +		return ret;
+>>>> +
+>>>> +	/* Config interrupt to level signal */
+>>>> +	val = rd32_mac(pdata, DMA_MR);
+>>>> +	fxgmac_set_bits(&val, DMA_MR_INTM_POS, DMA_MR_INTM_LEN, 2);
+>>>> +	fxgmac_set_bits(&val, DMA_MR_QUREAD_POS, DMA_MR_QUREAD_LEN, 1);
+>>>> +	wr32_mac(pdata, val, DMA_MR);
+>>>> +
+>>>> +	hw_ops->enable_mgm_irq(pdata);
+>>>> +	hw_ops->set_interrupt_moderation(pdata);
+>>>> +
+>>>> +	if (pdata->per_channel_irq) {
+>>>> +		fxgmac_enable_msix_irqs(pdata);
+>>>> +		ret = fxgmac_phy_irq_enable(pdata, true);
+>>>> +		if (ret < 0)
+>>>> +			goto dis_napi;
+>>>> +	}
+>>>> +
+>>>> +	fxgmac_enable_rx_tx_ints(pdata);
+>>>> +	phy_speed_up(pdata->phydev);
+>>>> +	genphy_soft_reset(pdata->phydev);
+>>>
+>>> More things the MAC driver should not be doing.
+>>
+>> Does this mean deleting 'phy_speed_up(pdata->phydev);' and 'genphy_soft_reset(pdata->phydev);' ?
+> 
+> Two things here:
+> 
+> phy_speed_up()/phy_speed_down() is part of suspend/resume when using
+> WoL. This code has nothing to do with that. So why is it here?
+> 
+> There should not be any need to call genphy_soft_reset(). You should
+> figure out why you need it, because it could be a PHY driver bug, or a
+> MAC driver bug.
+> 
+> 	Andrew
 
