@@ -1,130 +1,204 @@
-Return-Path: <netdev+bounces-147308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D729D908F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:58:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6113C9D909F
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25548B26E58
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 02:58:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 272CB2894CE
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0743D96A;
-	Tue, 26 Nov 2024 02:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9504038F91;
+	Tue, 26 Nov 2024 03:04:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from out28-5.mail.aliyun.com (out28-5.mail.aliyun.com [115.124.28.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9823EA69
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 02:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645DB27735;
+	Tue, 26 Nov 2024 03:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732589917; cv=none; b=ALp3MGq/7/wcKiTIqd3LF88VyxXNM4asnHCXE20q0cNxB54fiCZ03y1mdztzkyjaNW6YyDCoFw6NTIcw3AVg8DGcWpIzRwe5G+QJcM18w4kHDZlD4pqqbLz0XELrsSEOrY1wgkJGHALHfgBL0Xbgpf//LwQLKgslAwGqpS/dLZ8=
+	t=1732590296; cv=none; b=POJZHzjXJMws2wCWB5ClIkTNK7ruh16boJ1MhaWK8ORk45KgEOO9/6EHOnSnT/zWeqwlaDjsZPSLxdzELU3kZEInv/v4Ht3VPZ+WGtEqOHDQBMzWfGQOaltjGEh8lBy8sIGWHQ0FNW07fhTBCdwayhFhvrW5XOOO5zXzbDavZUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732589917; c=relaxed/simple;
-	bh=GKqA2oNgjXpavWVTcpyAmDPiGN024i9162ozzInY++s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=P5YS6P6VGBsgO9rRSwnbLQjcsmeRcGdDGKs4towZS4C16pKlCfTo+Vg/0LMlm5Z5RN/OO2mkwB1goypCPTFCb89i6TW8vkQMPrOcRx7GhhxjWU+VwasjswkXZIwvHnAi5mRJ5BraC9u6LrxYy2fVvv9jzlg430xDUjuwNmsKqaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Xy6j16qHWz1yr3M;
-	Tue, 26 Nov 2024 10:58:45 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id E53C91402DA;
-	Tue, 26 Nov 2024 10:58:31 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Nov 2024 10:58:30 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <herbert@gondor.apana.org.au>,
-	<steffen.klassert@secunet.com>
-CC: <netdev@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: [PATCH net v2] net: Fix icmp host relookup triggering ip_rt_bug
-Date: Tue, 26 Nov 2024 10:59:43 +0800
-Message-ID: <20241126025943.1223254-1-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1732590296; c=relaxed/simple;
+	bh=594+teM29iEIoF9KRvIvZWYIrAA5cVKCDrmj6HJmYEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FuQYMZlE1oG0n+B+JEH6qy2LxAkqXO6VqNJlkhD2QtfH0CME4wPJD4TNLRCPSwx9OfEu0NJNUgkxoj/eogfFTLhnZWiCJ2/YepbOq9K83u14c903UISam5uFjsIMjl8wAdbr6sTvX7mQGgazwm5unixyguzW1lAAU/MlnpYIZhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aMScSzK_1732590281 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Nov 2024 11:04:42 +0800
+Message-ID: <708dd5d9-5e06-4446-9b1d-f6f9561eb9c3@motor-comm.com>
+Date: Tue, 26 Nov 2024 11:04:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 09/21] motorcomm:yt6801: Implement some hw_ops
+ function
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+ <20241120105625.22508-10-Frank.Sae@motor-comm.com>
+ <46206a81-e230-411c-8a78-d461d238b171@lunn.ch>
+ <11e26658-670f-49fa-8001-0654670b541e@motor-comm.com>
+ <cd57707a-2d7e-4549-aab1-d0bd6c24ad35@lunn.ch>
+Content-Language: en-US
+From: Frank Sae <Frank.Sae@motor-comm.com>
+In-Reply-To: <cd57707a-2d7e-4549-aab1-d0bd6c24ad35@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-arp link failure may trigger ip_rt_bug while xfrm enabled, call trace is:
+Hi Andrew,
+  Thanks for your suggestions.
+  I will follow your advice, thanks again!
 
-WARNING: CPU: 0 PID: 0 at net/ipv4/route.c:1241 ip_rt_bug+0x14/0x20
-Modules linked in:
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc6-00077-g2e1b3cc9d7f7
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-RIP: 0010:ip_rt_bug+0x14/0x20
-Call Trace:
- <IRQ>
- ip_send_skb+0x14/0x40
- __icmp_send+0x42d/0x6a0
- ipv4_link_failure+0xe2/0x1d0
- arp_error_report+0x3c/0x50
- neigh_invalidate+0x8d/0x100
- neigh_timer_handler+0x2e1/0x330
- call_timer_fn+0x21/0x120
- __run_timer_base.part.0+0x1c9/0x270
- run_timer_softirq+0x4c/0x80
- handle_softirqs+0xac/0x280
- irq_exit_rcu+0x62/0x80
- sysvec_apic_timer_interrupt+0x77/0x90
 
-The script below reproduces this scenario:
-ip xfrm policy add src 0.0.0.0/0 dst 0.0.0.0/0 \
-	dir out priority 0 ptype main flag localok icmp
-ip l a veth1 type veth
-ip a a 192.168.141.111/24 dev veth0
-ip l s veth0 up
-ping 192.168.141.155 -c 1
-
-icmp_route_lookup() create input routes for locally generated packets
-while xfrm relookup ICMP traffic.Then it will set input route
-(dst->out = ip_rt_bug) to skb for DESTUNREACH.
-
-For ICMP err triggered by locally generated packets, dst->dev of output
-route is loopback. Generally, xfrm relookup verification is not required
-on loopback interfaces (net.ipv4.conf.lo.disable_xfrm = 1).
-
-Skip icmp relookup for locally generated packets to fix it.
-
-Fixes: 8b7817f3a959 ("[IPSEC]: Add ICMP host relookup support")
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
----
-v2: Skip icmp relookup to fix bug
----
- net/ipv4/icmp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 4f088fa1c2f2..0d51f8434187 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -515,7 +515,10 @@ static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
- 			  flowi4_to_flowi(fl4), NULL, 0);
- 	rt = dst_rtable(dst);
- 	if (!IS_ERR(dst)) {
--		if (rt != rt2)
-+		unsigned int addr_type = inet_addr_type_dev_table(net,
-+							route_lookup_dev, fl4->daddr);
-+
-+		if (rt != rt2 || addr_type == RTN_LOCAL)
- 			return rt;
- 	} else if (PTR_ERR(dst) == -EPERM) {
- 		rt = NULL;
--- 
-2.25.1
-
+On 2024/11/25 22:39, Andrew Lunn wrote:
+> On Mon, Nov 25, 2024 at 05:49:19PM +0800, Frank Sae wrote:
+>> Hi Andrew,
+>>
+>> On 2024/11/23 09:03, Andrew Lunn wrote:
+>>> It took a lot of effort to find your MDIO code. And MDIO bus driver
+>>> makes a good patch on its own.
+>>>
+>>
+>> Sorry about that.
+>> There is too many codes in yt6801_hw.c file. If I put the MDIO bus driver
+>> in one patch, it's would be very difficult to limit to 15 patches. 
+> 
+> You can easily limit this to 15 patches. Throw away 75% of the driver
+> for the moment. Do enough to get link and then send/receive
+> frames. Forget the rest. You don't need statistics, ethtool, WoL, and
+> everything else in the first submission. They can all be added later.
+> 
+> You need reviewers in order to get your driver merged. If you give
+> them a huge driver which is hard to find what they are interested in,
+> they won't review it, and it will not get merged. So break it up into
+> a number of patchsets. A minimum driver to just send/receive should be
+> nice and small, and can be split into 15 patches making it nice and
+> easy to find bits reviewers are interested in. That should get
+> reviewed and merged. Then add more and more features in nice small
+> chunks which are easy to review> 
+>>>> +static int mdio_loop_wait(struct fxgmac_pdata *pdata, u32 max_cnt)
+>>>> +{
+>>>> +	u32 val, i;
+>>>> +
+>>>> +	for (i = 0; i < max_cnt; i++) {
+>>>> +		val = rd32_mac(pdata, MAC_MDIO_ADDRESS);
+>>>> +		if ((val & MAC_MDIO_ADDR_BUSY) == 0)
+>>>> +			break;
+>>>> +
+>>>> +		fsleep(10);
+>>>> +	}
+>>>> +
+>>>> +	if (i >= max_cnt) {
+>>>> +		WARN_ON(1);
+>>>> +		yt_err(pdata, "%s timeout. used cnt:%d, reg_val=%x.\n",
+>>>> +		       __func__, i + 1, val);
+>>>> +
+>>>> +		return -ETIMEDOUT;
+>>>> +	}
+>>>
+>>> Please replace this using one of the helpers in
+>>> include/linux/iopoll.h.
+>>>
+>>>> +#define PHY_WR_CONFIG(reg_offset)		(0x8000205 + ((reg_offset) * 0x10000))
+>>>> +static int fxgmac_phy_write_reg(struct fxgmac_pdata *pdata, u32 reg_id, u32 data)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	wr32_mac(pdata, data, MAC_MDIO_DATA);
+>>>> +	wr32_mac(pdata, PHY_WR_CONFIG(reg_id), MAC_MDIO_ADDRESS);
+>>>> +	ret = mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
+>>>> +	if (ret < 0)
+>>>> +		return ret;
+>>>> +
+>>>> +	yt_dbg(pdata, "%s, id:%x %s, ctrl:0x%08x, data:0x%08x\n", __func__,
+>>>> +	       reg_id, (ret == 0) ? "ok" : "err", PHY_WR_CONFIG(reg_id), data);
+>>>> +
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>>> +#define PHY_RD_CONFIG(reg_offset)		(0x800020d + ((reg_offset) * 0x10000))
+>>>> +static int fxgmac_phy_read_reg(struct fxgmac_pdata *pdata, u32 reg_id)
+>>>> +{
+>>>> +	u32 val;
+>>>> +	int ret;
+>>>> +
+>>>> +	wr32_mac(pdata, PHY_RD_CONFIG(reg_id), MAC_MDIO_ADDRESS);
+>>>> +	ret =  mdio_loop_wait(pdata, PHY_MDIO_MAX_TRY);
+>>>> +	if (ret < 0)
+>>>> +		return ret;
+>>>> +
+>>>> +	val = rd32_mac(pdata, MAC_MDIO_DATA);  /* Read data */
+>>>> +	yt_dbg(pdata, "%s, id:%x ok, ctrl:0x%08x, val:0x%08x.\n", __func__,
+>>>> +	       reg_id, PHY_RD_CONFIG(reg_id), val);
+>>>> +
+>>>> +	return val;
+>>>> +}
+>>>
+>>> And where is the rest of the MDIO bus driver?
+>>
+>> There is no separate reset of MDIO bus driver.
+> 
+> rest, not reset.
+> 
+> An MDIO driver is generally two to five functions to do bus
+> transactions, and then one or two functions to allocate the bus
+> structure, fill in the members and register the bus, and maybe a
+> function to undo that. I would expect these all to be in one
+> patch. They are not.
+> 
+> At some point, you need to justify your hw_ops structure. Why do you
+> have this? At the moment it just obfuscate the code. Maybe there is a
+> good reason for it, but given the size of the driver i've not been
+> able to find it.
+> 
+>>>> +#define LINK_DOWN	0x800
+>>>> +#define LINK_UP		0x400
+>>>> +#define LINK_CHANGE	(LINK_DOWN | LINK_UP)
+>>>> +	if ((stats_pre & LINK_CHANGE) != (stats & LINK_CHANGE)) {
+>>>> +		yt_dbg(pdata, "phy link change\n");
+>>>> +		return 1;
+>>>> +	}
+>>>> +
+>>>> +	return 0;
+>>>> +unlock:
+>>>> +	phy_unlock_mdio_bus(pdata->phydev);
+>>>> +	yt_err(pdata, "fxgmac_phy_read_reg err!\n");
+>>>> +	return  -ETIMEDOUT;
+>>>> +}
+>>>
+>>> You need to rework your PHY interrupt handling. The PHY driver is
+>>> responsible for handing the interrupt registers in the PHY. Ideally
+>>> you just want to export an interrupt to phylib, so it can do all the
+>>> work.
+>>
+>> I'm sorry. Could you please give me more information about export
+>>  an interrupt to phylib?
+> 
+> I would actually suggest you first just let phylib poll the PHY. That
+> gets you something working. You can add interrupt support in a later
+> patchset. For ideas, look at ksz_common.c:
+> 
+> ds->user_mii_bus->irq[phy] = irq;
+> 
+> You have a whole tree of source code you can look at, there are other
+> examples of MAC drivers exporting an interrupt controller. And you
+> might find other ways to do this, look at other MAC drivers. There is
+> nothing special here, so don't invent something new, copy what other
+> MAC drivers do.
+> 
+> 
+> 	Andrew
 
