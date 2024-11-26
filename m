@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-147351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF9369D93D0
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:08:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D7E9D93D1
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:08:54 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324241670D1
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:08:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBBC2B21856
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F7819A2B0;
-	Tue, 26 Nov 2024 09:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079BB1B0F26;
+	Tue, 26 Nov 2024 09:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="n8Pv7bj4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="bczEdLco"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3AC28FF
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CEF81B415C
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732612124; cv=none; b=PXWcCTa7mr/KeEbyVsna8ffNkZc/ctXPo/5GeOsWmPBPPbvsnDayx/QGANuXyXSBtqTqdY6RWkcRKYvBh79CRYx7+jnpumt07Fe+xkg+u0tT1bKS5gdenA2zzcbVaA/lSWyDK6/IatEV500audaUR6sDdEwvtlUNhlPJZ9ZarIY=
+	t=1732612127; cv=none; b=Ym9LjAkJZpkBjpqgA9uOY197DOMBy6AFO9/pQCUuCTVL5QebUaCS/e4CAdEYSAxYuK7J6gN1Oy/zFNZGWbvvKsGXkh/1CRl+vSVgSNdAg9hQs0zRe3ioR6gm07fLjAzl57xouTuSUym3ykq4q+lrWHQst5PYM0dgaX0LefqHBRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732612124; c=relaxed/simple;
-	bh=7t70YZBffsmmFkwGyusN0/IbLQvWxW15+60fzIgRXS0=;
+	s=arc-20240116; t=1732612127; c=relaxed/simple;
+	bh=sc+2ipuBlnI0+rAVlSLBGAGaPcNXDV7AgqigyNVrb8M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GKUyarO52C6ZUHpXm0+qS4dACXcad+aHItw24xkNfpgq1wIkRUlhKovHiRWSw1IhvyQCuQBlE4YYZ5MkgU9yGMhmaPwhdvVOHAzN1nkpl40cUE7FKYqHG/iQ8S89EdBXX69U35rHAzmEFpYFPmx+llcneQPXPUiNgAdbmTHquxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=n8Pv7bj4; arc=none smtp.client-ip=209.85.208.169
+	 MIME-Version; b=YDHuhNwvjpamElJ+ju2JEQ3X3kz8l/wvUwM4XeJLBDDRjTmGAG58/aK5yaBxRgvVslSjIBVrrWZXgVJcK9FRworgNpVj0mWifLCiFvfikNViO73IDkFaXhsEOKmChSZH/D5hf4yXI3VK/xODSDAKCXMv4kVHR4xy4FJjIIzTzUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=bczEdLco; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ffc80318c9so16266251fa.2
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 01:08:41 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4349fd77b33so15476195e9.2
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 01:08:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1732612120; x=1733216920; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1732612125; x=1733216925; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m16aVCnRbfkgBu1RaVfuGkGho6ym/9PLLiGj/PJIyUI=;
-        b=n8Pv7bj4LQfRQZfPuQjoknIRno8HzI2TKegA6VupTCrT1vxPw+09w+aCZ8XMkknyqM
-         KCnqePwPlhWCEHnnW7mAzA+u7r3wNqyevbcXqjPp/ZQ5+asjxcjUQkZ7JkGjh7vg8wDM
-         7wBOzOL330rdBkpLajaZx22mxsZhkmnD0BM405Pz/Fr5MO3DaeYbFbi1/lH74jMU8yMx
-         UKOswwoyowsDTkl0J2mF75zGaeYDzWvIVQGJSAIRpJP5X+QX/R1WagE5cW2060xhb/zO
-         J8v2Bu9qG1KTVYCfu5zw7pJBVVyEQsjcWSIbO7/kZy587jdA19AfsLcL7pP/vD3Qlfci
-         id1g==
+        bh=PFd1ebhZpjAtZnnNiukccHu4xLx7w3A+9Qv4klrtJrs=;
+        b=bczEdLcoeLy/Jt7b8phBCxwOdM+vaq7IwmlJSt2CU9q+8AaZI+ob3vXXqebSjK3Wu3
+         ScDq49SsiFQPAZxKaCGajSq4XbVpmD9kLwHIICnE93MbaJ/+r8cxbjbaFKlLHDX13Ad6
+         ykt2bCHOt/QXOjb3Br0DrMySVSKHH76ypwS92TaWic7wiey2PG130zrUIADHyeWf1oLZ
+         jPMOsUNKfHEtLCHXjanZnPlZ7ltT6yCbhQN3+5mH/gS0sV/ayLzW5t2gvJgBMWnAkbr4
+         qPMZm7/rPqpTJ6gP3uPvsF33Qk61BfGbxtok96gbnHViMvpU3dyzqeoe/x5R6E570rrb
+         efaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732612120; x=1733216920;
+        d=1e100.net; s=20230601; t=1732612125; x=1733216925;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m16aVCnRbfkgBu1RaVfuGkGho6ym/9PLLiGj/PJIyUI=;
-        b=qtLI6p8/4HWp0Qg9J0M4XumxA+ONarxIZyEyStRiAmOlOSjxltcsgxj669syJVy6JW
-         SdRMdZpud0VIlb6eqjDXxOFgKBFrRdhI++duM+toE04i+pnsQyFDrM0ZuQEFt55LnS1M
-         jtkaXoxnvBzZBK/pEUXsiUJf0EeukwrXp0Y4XwLMWCWoIrHFmovIZYwSdmYck8kbIIFO
-         buQm6gyda/QJqNMxfHokFcHYz4rGQD86Zm8SiPvk+Jp3FdA8Lave/dgmACnqyPbC26tq
-         eSHBVd1pJYGphNpB14SkEl3bnyAON/hVqkhuIDDvzSgNKbjQdDUJAZGwNQbH7VoFtSlF
-         5Yyw==
-X-Gm-Message-State: AOJu0Yxv8UAdQ5+8keRQdG0sgzs1wm6GYly7Eq2rGvwZ6OvEFLMREL29
-	zEooTXR3r7wHlqnaAtE0cc44/Pl9Mew6h52eD4XJyAhXfW4oFfdpB4WrP5KUiVHgGgNrUdyKyLZ
-	o
-X-Gm-Gg: ASbGnctMlWYXrPUzX08BNBFASKSXc0YUEHJUzaCrldm3y81HYKIk59MuzPoBXarb9ew
-	NqSqw0L1sSapbibT0sl4J6P/MxcalP/lDwlahhPgDVpCv9ZOMo+/04WVOt3RHmcWfW4aZ8f7rZI
-	vopDwX7IeepR//FBhCsa6eGdO4MhHZYjPpF8lH/Bo3GeyNWpO5HhfY/2iGV57EWCBhZ71OrBPVL
-	18pi8B8AkITeWu92ashpt7FdsOE0iURR7z1aZcBVug=
-X-Google-Smtp-Source: AGHT+IHP8VPB/t+f1RACPk8IodcTXk/irDkmZfpkYJJivwZHo8p4egGoFarCWo+YaMLNyM902AmNAQ==
-X-Received: by 2002:a05:651c:a0b:b0:2ff:cb88:f132 with SMTP id 38308e7fff4ca-2ffcb88f152mr13935701fa.3.1732612119583;
-        Tue, 26 Nov 2024 01:08:39 -0800 (PST)
+        bh=PFd1ebhZpjAtZnnNiukccHu4xLx7w3A+9Qv4klrtJrs=;
+        b=t3VwuRX8uiEP6mV+gjPga5oXG4Bh0V/XBjeriubk183XtKzJwKqdaBoiVAQbsr8RpY
+         g/yMPVLpG4Aj6SeUr1Ch38xeHQwr6LDdFPBj1gC7FcImbeBArU7yjt9LDmwHmLI22Etj
+         B5wr2Tk92+pNYodJfu5rqBM8OcgOFZ6kYXQ4vl2/fj30RshPcIusUOcTo9U6HaKEOYu5
+         kZg4sY+vERCJ0bcTWgGheh+1WUjtlpdU1OC5waqSqjvXFTYgZoFhNtZ+ZKmwOw4RA9by
+         NbixYX7esFPaagJzRvibm7tfbcHKWMSrYq+yHqQiP3sx5sc6tNjsgegdeOLh1uRd2XIX
+         4DkA==
+X-Gm-Message-State: AOJu0Yzsphu2fMy6NEQIa+5lyyHTYhRbok6PiPrKxIHe1SitECcAy9oi
+	/OXM72L3Vd05bzejJL00SYxd6HDDVSdyqR4GJ8GKjZxT5Xq87zpzrDdEfHZbpOaNh+xYG3hRY3v
+	I
+X-Gm-Gg: ASbGncvfK85ptB/GEDgaJFbw3ranA9JusHqs2jpnGxcxvmboudKoovnAVl3zCGXVfK+
+	hzOvIEBVzp9fprv0QfUD3xgNXrrIMavrliYy3XovI/JN64pTkS1t3Pa81+BrEpVg6u3COWuw/j3
+	/vn0/8mDg9vv0qYe4HmY/biVet6cg5yg79KV4Ux+fMANgAPa7UN6uTv99vZiNeylxLiRC1/2sBF
+	cdL81OQZmhMAwDWFJw+6gUOx3rbJAkOVlIyJfYHx5A=
+X-Google-Smtp-Source: AGHT+IGseQ1ow5XF1iaXqYGyFaoKW09qOoxSQ1fJL0wFafyQG80Dr/OFZ1KD4rfu5+4vBQ5VZYZ8ew==
+X-Received: by 2002:a05:600c:548d:b0:433:c463:62dd with SMTP id 5b1f17b1804b1-433ce4e73camr137249625e9.27.1732612124756;
+        Tue, 26 Nov 2024 01:08:44 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a5f96236sm16789625e9.35.2024.11.26.01.08.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a4d41fb4sm23577815e9.14.2024.11.26.01.08.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 01:08:39 -0800 (PST)
+        Tue, 26 Nov 2024 01:08:44 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com,
 	saeedm@nvidia.com
-Subject: [PATCH iproute2 1/2] devlink: do dry parse for extended handle with selector
-Date: Tue, 26 Nov 2024 10:08:27 +0100
-Message-ID: <20241126090828.3185365-2-jiri@resnulli.us>
+Subject: [PATCH iproute2 2/2] devlink: use the correct handle flag for port param show
+Date: Tue, 26 Nov 2024 10:08:28 +0100
+Message-ID: <20241126090828.3185365-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241126090828.3185365-1-jiri@resnulli.us>
 References: <20241126090828.3185365-1-jiri@resnulli.us>
@@ -90,36 +90,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-When parsing with selector, there's a list of extended handles
-(devname/busname/x) which require special treatment.
-DL_OPT_HANDLEP is one of them. The code tries to parse devname/busname
-handle and in case it is successful, it goes the "dump" way. However if
-it's not, parsing is directly done. That is wrong, as the options may
-still be incomplete. Do break in that case instead allowing to do dry
-parse and possibly go the "dump" way in case the option list is not
-complete.
+Port param show command arg parser used the devlink dev flag
+instead of the port, which caused to not identify the port device
+argument, causing the following error:
+
+$ devlink port param show eth0 name link_type
+Wrong identification string format.
+Devlink identification ("bus_name/dev_name") expected
+
+Use the correct the devlink handle flag.
 
 Fixes: 70faecdca8f5 ("devlink: implement dump selector for devlink objects show commands")
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
  devlink/devlink.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 9907712e3ad0..f4e90b804fb6 100644
+index f4e90b804fb6..5711974f2cb0 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -2409,7 +2409,7 @@ static int dl_argv_parse_with_selector(struct dl *dl, uint16_t *flags,
- 						o_optional);
- 			if (err == -ENOENT || !err)
- 				goto dump_parse;
--			goto do_parse;
-+			break;
- 		}
- 	}
+@@ -5088,7 +5088,7 @@ static int cmd_port_param_show(struct dl *dl)
  
+ 	err = dl_argv_parse_with_selector(dl, &flags,
+ 					  DEVLINK_CMD_PORT_PARAM_GET,
+-					  DL_OPT_HANDLE | DL_OPT_PARAM_NAME, 0,
++					  DL_OPT_HANDLEP | DL_OPT_PARAM_NAME, 0,
+ 					  DL_OPT_HANDLE | DL_OPT_HANDLEP, 0);
+ 	if (err)
+ 		return err;
 -- 
 2.47.0
 
