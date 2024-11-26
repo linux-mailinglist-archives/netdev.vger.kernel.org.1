@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF5849D97B1
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3905C9D97B0
 	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:54:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E19ECB26A04
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:54:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E85DB27368
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A471CB528;
-	Tue, 26 Nov 2024 12:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13631D432C;
+	Tue, 26 Nov 2024 12:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H70N8FCR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="m/9BqHVU"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B311D1E74
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EDA1D1E74
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732625645; cv=none; b=EFEfY+5Ggl76xlK7XNKbj6+LRaeN6QXeaaJ5NzLGlu30l9rppJaWJJtW4t0eZUewdc9dTxUKX+XikXu3NRNskKChGgbzBEmO0p2F30VMxty5vKu06gBoHzvzUt5/OCt+8UJtQYidOjdeJKEhY9Slwy9dqsp5WBJCbppE+YSMF/c=
+	t=1732625652; cv=none; b=EDKvGb/eItwNBCdYleshdkF0AsBeV4CqU1J/D8GxvM0AafIg4Dn0398fpII0sqziZztcHemseoqFf3X3x43PKsyX8OgNbm2ZbdEFVSAbVR9pKC8anQ3o0bk/St0ulflhXiLPkUWw5cU8fDZIWgsR0oQu3zpdmKyoXV3MFsi0W40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732625645; c=relaxed/simple;
-	bh=8CsnwNdQfK+jTj7IxvKKoapdKEaBBVTU6vJTIkuUbOQ=;
+	s=arc-20240116; t=1732625652; c=relaxed/simple;
+	bh=8XUikeSPHyRF78tvVAphJ3KB2SJKnn5hykiXi77HfwI=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Zm1YiqhpRpu3ZRsUEPMPv1Z8Qd1OnVAxb/Qs+RRaWSQ93kPX8R9cfZdrz8RRn+dBnKBuF9mg9dARBPZphvBcehFgn7svBWIaONF8+1dngRvmQTQYNt2jmNDKlvx9rTmgC76jWEWCAltGTUleFuiCn18agLpZVxJAy/UrwzXSg6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H70N8FCR; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=hkT4UcqB4D+nukY6LIASnY18PnM4eFwby2TpY087qLnRN0pDqwc0ES6g29nole+yGbyq0CwXj7Nh90iLUjvT+SjOMcicGFIh5EniGwKCAFIqYpCVFP7ooLafvIugo4YGhCvecZJ7e87BI/JLb5lG3u0d0jLNZxyQ9mBbXpR4CHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=m/9BqHVU; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PEkk5Q5jvaBXDuI8wGcpUVE1aRBTW0jxP9vUWLuWdh8=; b=H70N8FCROgcZxkBg4eilMMlSWp
-	yClptKpRLMxal5RGwYAXF9sIjD4WfJkz9Jg0fNt1CkLgkwq+Ry5X/SOB9EzzCXgSEotImvYG192W5
-	qF0v+aoibG6xwraUJ0m173AXuKjIcShHjLqWRColocPGPdXw87eix2v0DZhUoJMNI2mV22h5E0e7B
-	6/Z2LEzI8ZdmsCj5S5jlIAXVq+hjHXU1TibobFtwNsEB2AtdYY6q4bjnWztvqLzLM5lpPoHcbrhPq
-	zCLM1gZFYSVq5L8k6odBe4cs58RgYEjeSFQ/yS6//F8qDd/MAXkkKWdpxb4wpd9WDVj5qWE+htgGd
-	NjSxu8GA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42628 helo=rmk-PC.armlinux.org.uk)
+	bh=0rC1mufdNytwrMf+jdU56xanVZH+tbl22qe8k+O92jM=; b=m/9BqHVUfqQ+CSfR9cRWYjOgIm
+	Y0yXluFcwfTR7Jg45Zr721q1hlXZRUh8n6pwwOoeTD5TpmpBr1DRwl9KhTte9cgAKiBDlF9K4+WbO
+	LHJ1qt1fW4laEoEJ4oyJbP5CeO9GM6cwzdP1E2cTUAr6QAJRob0o6dDNPVLPYuu/qQw18nEYVC23v
+	hWhCxAXLFnCkfpFz8PtB2AQHsGy61Xwn7G3t67lWimHtCjq06UoiXNOfXxJIY4ONHX+qKH2+n22A6
+	Y1fWi+CEN68o8IE3KJLwAirXCfZOiM0pM4T3uRFDA/kmEbbIq+KCZMgnjZ1CtiGg+y61qkDxtdRaK
+	PrIQ6AQQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:50154 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFv4k-0006xu-1h;
-	Tue, 26 Nov 2024 12:53:54 +0000
+	id 1tFv4p-0006yH-2E;
+	Tue, 26 Nov 2024 12:54:00 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFv4j-005yjK-BJ; Tue, 26 Nov 2024 12:53:53 +0000
+	id 1tFv4o-005yjQ-F1; Tue, 26 Nov 2024 12:53:58 +0000
 In-Reply-To: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -73,7 +73,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com
-Subject: [PATCH RFC net-next 20/23] net: stmmac: remove priv->tx_lpi_enabled
+Subject: [PATCH RFC net-next 21/23] net: stmmac: report EEE errors if EEE is
+ supported
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,51 +84,32 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFv4j-005yjK-BJ@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tFv4o-005yjQ-F1@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 12:53:53 +0000
+Date: Tue, 26 Nov 2024 12:53:58 +0000
 
-Through using phylib's EEE state, priv->tx_lpi_enabled has become a
-write-only variable. Remove it.
+Report the number of EEE errors in the xstats even when EEE is not
+enabled in hardware, but is supported. The PHY maintains this counter
+even when EEE is not enabled.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac.h      | 1 -
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 --
- 2 files changed, 3 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 1d86439b8a14..77a7a098ebd1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -310,7 +310,6 @@ struct stmmac_priv {
- 	int eee_enabled;
- 	int eee_active;
- 	int tx_lpi_timer;
--	int tx_lpi_enabled;
- 	int eee_tw_timer;
- 	bool eee_sw_timer_en;
- 	unsigned int mode;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 8bdf8bc9a728..7924808fec08 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -974,7 +974,6 @@ static void stmmac_mac_link_down(struct phylink_config *config,
- 
- 	stmmac_mac_set(priv, priv->ioaddr, false);
- 	priv->eee_active = false;
--	priv->tx_lpi_enabled = false;
- 	priv->eee_enabled = stmmac_eee_init(priv);
- 	stmmac_set_eee_pls(priv, priv->hw, false);
- 
-@@ -1089,7 +1088,6 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
- 		priv->eee_enabled = stmmac_eee_init(priv);
- 		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
--		priv->tx_lpi_enabled = priv->eee_enabled;
- 		stmmac_set_eee_pls(priv, priv->hw, true);
- 	}
- 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index 3a10788bb210..a33d7db810f0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -654,7 +654,7 @@ static void stmmac_get_ethtool_stats(struct net_device *dev,
+ 					     (*(u32 *)p);
+ 			}
+ 		}
+-		if (priv->eee_enabled) {
++		if (priv->dma_cap.eee) {
+ 			int val = phylink_get_eee_err(priv->phylink);
+ 			if (val)
+ 				priv->xstats.phy_eee_wakeup_error_n = val;
 -- 
 2.30.2
 
