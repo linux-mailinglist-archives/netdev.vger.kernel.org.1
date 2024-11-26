@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE7F69D9465
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:27:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ABD79D94A5
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:37:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F79AB2BA2C
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:27:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2266EB2CE5E
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CE21D049D;
-	Tue, 26 Nov 2024 09:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C001D27BB;
+	Tue, 26 Nov 2024 09:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GQJ/ulSk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="c2PLDRGD"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D480D1BD030
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF081BD038
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732613092; cv=none; b=ay0vUJnKzIAJDJKLL8DCCcxjYOBIfze9Jcre2sNkLIEN3MbIlqD7plCzKR+PUZbVJyh5JObf6mI98fHG7M4BjcvMw+helbgn75VtyFNZ6wHJE7IXX15GzvqVkzzPd37FO9XFuCH08skFx4ZPqMY2gus1DplVeH+gqd4gNQZw6f4=
+	t=1732613097; cv=none; b=CgNyRL/6Oja06vdbbSpBGXznn6WPC2K1iipGCX2q+oauBkz2rr2HqRtGCwhiJDuuUNnOKyjNTLCcRikYQOq/ka3FouVMwMF+ES6gCSFu/w5a1C53+nwhOOnEUJJjgwlLVC5IvLCZmJz5g9Xn2G0tgG9HqyBByTGVQAHoWcFKuOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732613092; c=relaxed/simple;
-	bh=2dVszNd6s+ix2mgPssHrpHIpQk2Bmkyl84cSALIup5A=;
+	s=arc-20240116; t=1732613097; c=relaxed/simple;
+	bh=ctSrFoQbuRzkkWlPctBqOWCh6o7txINd0G4TiKlYcqw=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=jncRt5EV6MWm8B/xPfcRo+Lci4ejrtuQujKD+boX7rt00czqMfbitlCPxGxZgbo7rKuRnxaNfh6MqldGZRcjKDPVdmmptuzPjzerEOx7WSMAqXKUcDoV2u7c6IN2ALkik74MkB0iU5DXpUyCWkfP+Y+sdVYmbEfOJhDVpIO1q+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GQJ/ulSk; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=ooOp8bvycll760e4XqJSbxYYmkgVVv+uUTyaGl6+faA5wVbMbZYcNkm24w6NrvblMuBXPfN0RVhTK6GHcLjcxiX6tQGOFrcui+MNfuWCwAnar9SjONqIc0LbLlQjmGzMD0x8I4bXwyc8rw+2L947nnJ+Pcd+B/9iwFH3zInGsQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=c2PLDRGD; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ViyBqZDRf9mxt/gnHL7aRAYMh2xDyHVj2nyl3rce0Ks=; b=GQJ/ulSkVWJHiIVfXGxvaQiiIj
-	e9muwTR/cxOXIAFlBTPI4Mc+6RS6qIF/zLCfzvGFzIRL3d6A/AWYJWxxusgjvoHox/4N/6500KRJk
-	A899l13IltA4KYkS4p7SrDRQ/mnlfSw4VT2+Hh86WSDYqAdLaY1S/76RyspCXQ5xAfh9kQsIY85vd
-	5H+ZZaSkceXtpPZqSKRpyUBvZlcUlS8th9g8iLZL9IZXYRMwLxktXznf63ZEs5z9isRChZgZULFQH
-	naHe6YPZiWwMMcopiwoVmwzH7cLtEcmFDo76q3OZYUBaqZayQQva4+7mCbdZerjWAbSU3n4rDx9vR
-	c4v4HYKw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37314 helo=rmk-PC.armlinux.org.uk)
+	bh=el0rVY+c9CrkRzaGqbcKkhlZC6FhAlwE6EzSElpENZM=; b=c2PLDRGD9Ssf7ZkhiapQYuPPQS
+	1ZD+o4FDtCpKZMI0SUXyUFVJKP5Ogvjyi22GEnxGLvO0sDt9H/xOKqq0sXVUWQJ4uftakUuC0MzOc
+	zth8l3K944nGdgSpHcrGLg4lsgoBMqE8+gYwjh5g9/siPz6crxx+xPoYS960XDIGeEJvgwMTZHvCE
+	5J2/vCaS7XRZo7/g95CpNu173tEzl04U14HmM4MM4R9FJBrFcibMNF+4/9JfUeiZEJbcfTQAZd3He
+	eDTmvQmiFq26nr7vG8a9cRabNsjHwe0LwL93jUbHTX70bMlROERn58bIaNK3/TP97ZdZWg9hK3rml
+	ejlf7Qyw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46098 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFroD-0006Sd-0l;
-	Tue, 26 Nov 2024 09:24:37 +0000
+	id 1tFroI-0006Sz-1A;
+	Tue, 26 Nov 2024 09:24:43 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFroB-005xPw-Vd; Tue, 26 Nov 2024 09:24:36 +0000
+	id 1tFroH-005xQ2-2v; Tue, 26 Nov 2024 09:24:41 +0000
 In-Reply-To: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
 References: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -74,7 +74,8 @@ Cc: Alexander Couzens <lynxis@fe80.eu>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next 04/16] net: phy: add phy_inband_caps()
+Subject: [PATCH RFC net-next 05/16] net: phy: bcm84881: implement
+ phy_inband_caps() method
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,124 +85,44 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFroB-005xPw-Vd@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tFroH-005xQ2-2v@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 09:24:35 +0000
+Date: Tue, 26 Nov 2024 09:24:41 +0000
 
-Add a method to query the PHY's in-band capabilities for a PHY
-interface mode.
-
-Where the interface mode does not have in-band capability, or the PHY
-driver has not been updated to return this information, then
-phy_inband_caps() should return zero. Otherwise, PHY drivers will
-return a value consisting of the following flags:
-
-LINK_INBAND_DISABLE indicates that the hardware does not support
-in-band signalling, or can have in-band signalling configured via
-software to be disabled.
-
-LINK_INBAND_ENABLE indicates that the hardware will use in-band
-signalling, or can have in-band signalling configured via software
-to be enabled.
-
-LINK_INBAND_BYPASS indicates that the hardware has the ability to
-bypass in-band signalling when enabled after a timeout if the link
-partner does not respond to its in-band signalling.
-
-This reports the PHY capabilities for the particular interface mode,
-not the current configuration.
+BCM84881 has no support for inband signalling, so this is a trivial
+implementation that returns no support for inband.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phy.c | 21 +++++++++++++++++++++
- include/linux/phy.h   | 28 ++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+)
+ drivers/net/phy/bcm84881.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 4f3e742907cb..d7b34f8ae415 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1005,6 +1005,27 @@ static int phy_check_link_status(struct phy_device *phydev)
- 	return 0;
+diff --git a/drivers/net/phy/bcm84881.c b/drivers/net/phy/bcm84881.c
+index 97da3aee4942..47405bded677 100644
+--- a/drivers/net/phy/bcm84881.c
++++ b/drivers/net/phy/bcm84881.c
+@@ -235,11 +235,21 @@ static int bcm84881_read_status(struct phy_device *phydev)
+ 	return genphy_c45_read_mdix(phydev);
  }
  
-+/**
-+ * phy_inband_caps - query which in-band signalling modes are supported
-+ * @phydev: a pointer to a &struct phy_device
-+ * @interface: the interface mode for the PHY
-+ *
-+ * Returns zero if it is unknown what in-band signalling is supported by the
-+ * PHY (e.g. because the PHY driver doesn't implement the method.) Otherwise,
-+ * returns a bit mask of the LINK_INBAND_* values from
-+ * &enum link_inband_signalling to describe which inband modes are supported
-+ * by the PHY for this interface mode.
++/* The Broadcom BCM84881 in the Methode DM7052 is unable to provide a SGMII
++ * or 802.3z control word, so inband will not work.
 + */
-+unsigned int phy_inband_caps(struct phy_device *phydev,
-+			     phy_interface_t interface)
++static unsigned int bcm84881_inband_caps(struct phy_device *phydev,
++					 phy_interface_t interface)
 +{
-+	if (phydev->drv && phydev->drv->inband_caps)
-+		return phydev->drv->inband_caps(phydev, interface);
-+
-+	return 0;
++	return LINK_INBAND_DISABLE;
 +}
-+EXPORT_SYMBOL_GPL(phy_inband_caps);
 +
- /**
-  * _phy_start_aneg - start auto-negotiation for this PHY device
-  * @phydev: the phy_device struct
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 77c6d6451638..ff60c4785e11 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -815,6 +815,24 @@ struct phy_tdr_config {
- };
- #define PHY_PAIR_ALL -1
- 
-+/**
-+ * enum link_inband_signalling - in-band signalling modes that are supported
-+ *
-+ * @LINK_INBAND_DISABLE: in-band signalling can be disabled
-+ * @LINK_INBAND_ENABLE: in-band signalling can be enabled without bypass
-+ * @LINK_INBAND_BYPASS: in-band signalling can be enabled with bypass
-+ *
-+ * The possible and required bits can only be used if the valid bit is set.
-+ * If possible is clear, that means inband signalling can not be used.
-+ * Required is only valid when possible is set, and means that inband
-+ * signalling must be used.
-+ */
-+enum link_inband_signalling {
-+	LINK_INBAND_DISABLE		= BIT(0),
-+	LINK_INBAND_ENABLE		= BIT(1),
-+	LINK_INBAND_BYPASS		= BIT(2),
-+};
-+
- /**
-  * struct phy_plca_cfg - Configuration of the PLCA (Physical Layer Collision
-  * Avoidance) Reconciliation Sublayer.
-@@ -954,6 +972,14 @@ struct phy_driver {
- 	 */
- 	int (*get_features)(struct phy_device *phydev);
- 
-+	/**
-+	 * @inband_caps: query whether in-band is supported for the given PHY
-+	 * interface mode. Returns a bitmask of bits defined by enum
-+	 * link_inband_signalling.
-+	 */
-+	unsigned int (*inband_caps)(struct phy_device *phydev,
-+				    phy_interface_t interface);
-+
- 	/**
- 	 * @get_rate_matching: Get the supported type of rate matching for a
- 	 * particular phy interface. This is used by phy consumers to determine
-@@ -1816,6 +1842,8 @@ int phy_config_aneg(struct phy_device *phydev);
- int _phy_start_aneg(struct phy_device *phydev);
- int phy_start_aneg(struct phy_device *phydev);
- int phy_aneg_done(struct phy_device *phydev);
-+unsigned int phy_inband_caps(struct phy_device *phydev,
-+			     phy_interface_t interface);
- int phy_speed_down(struct phy_device *phydev, bool sync);
- int phy_speed_up(struct phy_device *phydev);
- bool phy_check_valid(int speed, int duplex, unsigned long *features);
+ static struct phy_driver bcm84881_drivers[] = {
+ 	{
+ 		.phy_id		= 0xae025150,
+ 		.phy_id_mask	= 0xfffffff0,
+ 		.name		= "Broadcom BCM84881",
++		.inband_caps	= bcm84881_inband_caps,
+ 		.config_init	= bcm84881_config_init,
+ 		.probe		= bcm84881_probe,
+ 		.get_features	= bcm84881_get_features,
 -- 
 2.30.2
 
