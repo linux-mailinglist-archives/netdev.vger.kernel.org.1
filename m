@@ -1,220 +1,307 @@
-Return-Path: <netdev+bounces-147458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB1CC9D9A0B
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:59:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDDD9D9A21
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 16:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7428A1660E7
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:59:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE83C168D1F
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1A61D5CEE;
-	Tue, 26 Nov 2024 14:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC511D5CFF;
+	Tue, 26 Nov 2024 15:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yFPGJaYs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xq7Bx/Yf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3991CEAD0
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 14:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732633156; cv=none; b=tmLT9uozW9RxE4EW3+3bPGyQf4F50O6vCsL90HHXrUtQo1sbJgI5rGmhW65YWV6LluOFJD+SWPyu/a8wRIiyLQ+ii0K/tIDzzzdGR1nsvyznMWsFPzU3UwhxrmTnHAevk5YkUtffh2ovx29Da7RdMGcZFweVWv0lw7q0PTgQtJ0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732633156; c=relaxed/simple;
-	bh=c9s5j5HugC+AoiPGvJnCt/UjnzlFA4eO7ktqoh7lg2A=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nmt/7u+myWV3SBdvJdutbw8GPwA/Gi970UWJZ3NiGp8gZngPvRA5n8KDIMe2ODoY9Nop9hYWfzDUnPvlBzpNy+hn5dTXBlCPVnTxPytIXzcCQE4zBiKv5jxjWzyFy7o9JibV624i46DJw2SPhJ9pVAJ5enboqxMLAk7FHW1scSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yFPGJaYs; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b66773ac24so330492385a.3
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:59:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732633152; x=1733237952; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sQudZCjaVdDzHtL5sibZ1sXlI3S8veThfHaA+fYC2yo=;
-        b=yFPGJaYsl3jQkRNG6IyO9eZ+n8zhLFzI0uxWOJpJX/ij4RR556WqKV970drTLJNo3p
-         qX4S2P6IORXVWKraELZvVGY6kegFKTGfTgqJA15XRkryLs3kI2spgPD1HsorvcXYY7x1
-         jAp3Rso1QMngvB9GBZoYrKA8aeO9rJwAZ6TImbt4IbapVaJJFf5s/8TXX3tawWKhys2e
-         xLxXa29Lkt2mZ+HsCogGiSuMlVHiUu1z82rB3HbfoEXaRyqNzuSLe7GLO7FjZb9P2hDU
-         37S/jWLyXVsXorDF/qePBLZMfhS5LgN2eWPk9KwoEMKvRVlPhhIXdvAIVFPkohgUE8nn
-         QgTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732633152; x=1733237952;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sQudZCjaVdDzHtL5sibZ1sXlI3S8veThfHaA+fYC2yo=;
-        b=oITrLbTrKkWglprnO9I26TaQbQ03D1tR4ZBlGG+n4+EVUciiCkHV84sK+w7RezaD0A
-         zOKg79dwwF7CUPmCk08JKB4tKvypqTk3vcQvPItPKsGSXQSfSjJsM8/Lp4yXUYfJpu5i
-         x0qXHJBLCvC3CIAc041eEYWaK4Bti8OepZznMD51A0M4YP2KHGCEVen4XYsih3NR4uXm
-         AjIlwthlTitnGCsDLKWFpuRpqATCTFwtQKSAjPWtPz1P2hFr4oSXZsYJ14qzXijBfQGd
-         ArVhMxpCfPghdK6RaOgf5cHa9R9fBSUjgVrtyXwPlLeiQr1p49MTsqD0OTI07iTK+IMf
-         ysXg==
-X-Gm-Message-State: AOJu0Yy4PrFag2m/hCisoufGAfB68r6pm14wxE2ptaseyVrtJWKUS3cE
-	ceWG7zJsHK6wUzXmqPANESmA+CmYmgj2Zgp5MLbeH1qeI2r4Z1W3KsASHW5uZLG6+Ve2ASqOVrg
-	AMm1ywB2oRA==
-X-Google-Smtp-Source: AGHT+IFap7RI7JlsbX1Nt2DLHCJpTn2gAcYVYCUN7zxPhNnAcwRihB52mLuN/xkJEtcJQQqSBuZn98H+v2UQEw==
-X-Received: from qkee14.prod.google.com ([2002:a05:620a:4e4e:b0:7b3:5814:20ee])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:84ca:b0:7b6:62f9:109b with SMTP id af79cd13be357-7b662f9121bmr1518238085a.42.1732633152623;
- Tue, 26 Nov 2024 06:59:12 -0800 (PST)
-Date: Tue, 26 Nov 2024 14:59:11 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC110194080
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 15:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732633380; cv=fail; b=iYaSPykkbPDAojXT+IRZwW/U5uYvdTJnxqbT9etk9b5aL5BZsuPQcwdvBAC9JG5kbS2F5Z76ScqMgSc7Rjet3uAFmcSvIN3mSjkdQZ7mrlimEErjUF89MUGJh8RraogGcAEgZe2Lf985Ev2TENjKIOKmWv9glm37mULTNQT+f7U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732633380; c=relaxed/simple;
+	bh=cRJfB1Foe8iJCGUBC6mLj9tMh3bmi1wI6RgLI7F992A=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=c2SGs4WDyvmAHdbARDEOpnxctFHBOk7b3H2nQBfuuWdwUpH4DTX7k21ao8vvHSZuiTLx9K9HvlSl+MURlYglv/8xFTEesJdDV8LqJ9iXiHk8i/UOAeYEjFqj7dmlc7HObnjZwnnmAVzn4QLmR6f7Cly/xGu/Vq4JHehIZPRpPf8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xq7Bx/Yf; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732633379; x=1764169379;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cRJfB1Foe8iJCGUBC6mLj9tMh3bmi1wI6RgLI7F992A=;
+  b=Xq7Bx/YfiB4gW6wBaqHxrTEIYz32erGSXA3zYYPJuqaIZQjQCyR/8nO3
+   KJwVq64eDYNUk5kJMO7Ru8DAOcbOUKdbiL3PnSu82/itqUk9X7TsmNAyD
+   QnsHNyNZjQGBg3irXaZq9XrcK8/jYCbSwK+EUajpxL1uq4JW/lK+ry657
+   PQUAkQuwzVKDRZJ50mTEF4vfd/ziFas6Uyxqr9i6sIOVn1U17dtYCz5uO
+   A09lTBbBo/VDkMJVqVYfokpRmDt8ru9Sb429q2s534uQ0UluDqjzQEFIl
+   mmRXB+JDkltGeUgLGR54JyqYxyotqxg5FqST//kWC6pidzyDaJ6c2ewAZ
+   A==;
+X-CSE-ConnectionGUID: tiu2OOTBSoGPiwB4HeV77Q==
+X-CSE-MsgGUID: Z9k1s8ByRBOUa30ukdCbqQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11268"; a="32928261"
+X-IronPort-AV: E=Sophos;i="6.12,186,1728975600"; 
+   d="scan'208";a="32928261"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2024 07:02:58 -0800
+X-CSE-ConnectionGUID: nF6gF1HPSkmZnEL7S/QMcg==
+X-CSE-MsgGUID: +UBHAA6WTHCM1ysX55LwUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,186,1728975600"; 
+   d="scan'208";a="122490453"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Nov 2024 07:02:58 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 26 Nov 2024 07:02:57 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 26 Nov 2024 07:02:57 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.43) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 26 Nov 2024 07:02:56 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=D6Y2FVv0NcWi4JELGWDMi+uSeV3SbgtkVuYAYcs6BPXXYekT7YI2wXrPgP/nK3WUohz2qc5VsLiAY1jLPsl/Uo+9+H4I+MRC1xM9nwl60mtc/uWqFy94GG6e6TbgMH18Ymc0Nvhn/ZiISopYSctsGle1b5PgEl3dDf3HhEzt7YnGYTypC0frL38IRvhdD+bI3qi2W73ZKJGsvSSCRSh/gSD1R6c7uuWhE1UdC79Ld89iY07CI59dJ6/xiHI1nh4bzrfFdW/+8Z6IbhB1vTvy8jknCN0eh0LtJChVEXGoaJYLaLP3q/qzkdu3Tir1S75n5g7vY1Cp9oJvwB4JJsRx/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XqEe35iObQRMP5T2Q0owbHigAXSIB3feO5lN/8OTKEc=;
+ b=TCINKx4XphNMXm1V2jCYrbKMK/cuS88LzdODSlgtaaX/a0u2TQ0eiNDGsb+xVH2//zNQv6jfthSwL/SADB/6snIUAt/qPtssW3sKveMmSLKxJdnDutEQkJT+MSVOJHuAyhpRivnMQexgr4j+CPj5rT/H9L7A8+kR/KYszmLh6+eO6Vnh0Oiv5RCEOxDC2bZC9SZBQGOXCJ2VswKC8IQ6ccr3XlV29mM+vt0uOMAO2/+oCUL3j6hYcul5j4wIZZ3FPzRWuk0gP5kAv3Pv6BMatXoJ9sF8riqaQU9ncyeG+yJwCaDqZeqkdtk9osVGUytytuY1zXVz/WZwfEcpyT9cEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by DS0PR11MB6424.namprd11.prod.outlook.com (2603:10b6:8:c4::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8182.18; Tue, 26 Nov 2024 15:02:51 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%7]) with mapi id 15.20.8182.019; Tue, 26 Nov 2024
+ 15:02:51 +0000
+Message-ID: <e95977e0-d080-45a1-a82e-e11ee85ce794@intel.com>
+Date: Tue, 26 Nov 2024 16:02:32 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan][PATCH iwl-net 2/2] idpf: trigger SW interrupt
+ when exiting wb_on_itr mode
+To: Joshua Hay <joshua.a.hay@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <przemyslaw.kitszel@intel.com>,
+	<michal.kubiak@intel.com>, <madhu.chittim@intel.com>,
+	<netdev@vger.kernel.org>
+References: <20241125235855.64850-1-joshua.a.hay@intel.com>
+ <20241125235855.64850-3-joshua.a.hay@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20241125235855.64850-3-joshua.a.hay@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA1P291CA0006.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::14) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
-Message-ID: <20241126145911.4187198-1-edumazet@google.com>
-Subject: [PATCH net] selinux: use sk_to_full_sk() in selinux_ip_output()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+2d9f5f948c31dcb7745e@syzkaller.appspotmail.com, 
-	Paul Moore <paul@paul-moore.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, selinux@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Brian Vazquez <brianvv@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB6424:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca5007a4-778d-43ce-04b3-08dd0e2b65f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?a2ZBUldLOW1VRE9iU2haZUJHWTNEOVJabUh3bElzV3BDc3hMcmoreDI3S05i?=
+ =?utf-8?B?Z1R3bVpUVkUxOTF3NlRHRG9IclE3OURsU1lZNXdOWWIrUmhJREx3Qkhya21s?=
+ =?utf-8?B?Qnh5SXhUMDJOM0ppSkFZTGJId2RzaGhUQ1BYbVh1WVgwSlNhSnBpQnkvU3Aw?=
+ =?utf-8?B?eTJEc0djM3gvMkhmUVRHcXVBaVQ5SGJKdXJQT096N3F5Skg2dUYwSVY5Wnd5?=
+ =?utf-8?B?c3ZXY3NTQ0FOcUpqUlpjcDNvaXYwZnlOa0pmRHRiTm5FZjgvNjlLZDRCUUE4?=
+ =?utf-8?B?NUpsTVFEZkh2RzRGeGwwZTh1eStDSkVrRVFpRnFCYVRCaFVaYUgxRmRkZDJp?=
+ =?utf-8?B?MEpOd1dVaElQelpXdGwzNnRYY2RnOVc0YlVEODNlYXk2NUljbUZScmkyYUJr?=
+ =?utf-8?B?VklpeTNtYXNNb3c3clBUREdiMVY3YUd6a1M3NTA3WmYwTjgvdUNJdnl0QURR?=
+ =?utf-8?B?MUtiL2wxSmF4MmRTTnYxd0VldXFkMC8yYVhUT21HTE1JZDN4Q1dGR24xNGZo?=
+ =?utf-8?B?S3RQaDVLRkNsUjVlaHY1UEdKeUpvR0NWMVRLQUZteWQ0TXErT3M3Ym5MbjFG?=
+ =?utf-8?B?TERzM0hqNkdKMDlHMGoxSkI4U2FxRWV4cEpzVFNzTmJwMEsrSm5CSHNqbXhR?=
+ =?utf-8?B?WUFWc0I5WXlKa24wMUtyRHRFQTVGdUhuNVVlV3JRT2M2MDlKUHJ2WlBxSXg2?=
+ =?utf-8?B?UUVvdjFJaDJrNFJzaU56UWdoR2tBYklmK2ZlTWYwSWFXR0lLQ09JNC9sU2lP?=
+ =?utf-8?B?TGRqK1BwZHVYSlhBaDdCbHpwd0RNQnk4TmJZalljTFRyT0xPREM5Sy83SDlB?=
+ =?utf-8?B?d1VMUnlLVHJDZjhud0FGSTVFM1F3RmtES1NOaWlsUlNUdDkrd0p0aFFNaGh1?=
+ =?utf-8?B?TkhCTmI2VUJpNTNCcDRsQytESlpkNlRMQTE2MXh2YS8ydGJLQ0RIdW9Md2xi?=
+ =?utf-8?B?b2JuRVVPY1JRRE1oQkJDTkRUR1dJMVRRREQrSHFjaVJENStuWU1OMmhpaU1h?=
+ =?utf-8?B?NFQ1Uks4YjVJRnZRdFlRc2g3bkpKdGNiemJnMk1JWDJza0FwM0FlbmwrWXVn?=
+ =?utf-8?B?OXVDNUJMQkg3NW1GRGJxaEx2S3N2NGRtWkl4Z2locnBZRVhPLzFqNHhPSjgx?=
+ =?utf-8?B?ektub0NkalFRNFMzWExqdisyTGJ0ODBudFRHZEZQenBkMVlKRzBrWTBmSW1U?=
+ =?utf-8?B?TkRjOVhzWmprUmgrTkd0TkhObElJL0dXY3lha1N4bmNudnMxZ2RPM1ROM0FS?=
+ =?utf-8?B?dkF5ekZUWTdBSEZqMlhyNE5PMStZK1E3cGUvWVAyRXBmQkdjcnVCU3NnUVpa?=
+ =?utf-8?B?UzJCY0JxVnQ3K1k5UkRmcEpqUTR1OENxbUVzVkwzV1hwQnRBeXprak4yUFVB?=
+ =?utf-8?B?eGN3d3huNkxNb1BVTWFSV00rczYrR21KcWVtWmpUQW1sWms0Y0xZalZBeWNx?=
+ =?utf-8?B?cllQTmlIUlFjL1Jnd1VkVEFSQmltNHJNNHVoYUxWeTJhZTZIbkx3eXRPQ0Zz?=
+ =?utf-8?B?b2tpK29qV0xPSG0wc1Q4K3daRi9XNXNlZUorK0FJcXdSTGVQSFFkZTZJejNZ?=
+ =?utf-8?B?T0NBRlRIQnZkMzRYQTZYSklpK1RabVBoZ1ZuR1VzcTNoL2ZsMGR6Y214WUNE?=
+ =?utf-8?B?NnY0OVhOcEJqTEpZVmo4S0ZjQzBUMmFyNjJXTnVZOHFkL2ltVXlvbitzMDQ1?=
+ =?utf-8?B?Q3VvWS9GNU1nQUhJQytiYkRWcXE5M2xmeVptK1pFdGtma1VXZUhXY0p1YWRP?=
+ =?utf-8?B?QWtIcmk2RHBkQTNCWWRqdUd0QitDbkova0VpcU9BcnJtR3VXVkkydUNoOWJw?=
+ =?utf-8?B?RDREc3lDbldTZGkzWUs5QT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sk9YR0V6Q3FPU3ZiOWk0dm5mYmpCSlc4QkNPMkcwM0MvclNxbnpUMTlEZ2g0?=
+ =?utf-8?B?Z2d3NmJUdVlJNnI4YnJmVVlLZVorcDd4VUJEYWJoU3VrZXBIY1VCclEwaURs?=
+ =?utf-8?B?WUNoZlNCd3F3VDIxaFRIY2V4eHB2OTllclhFZEluMHhCM2x0UkVCdjRLSHo0?=
+ =?utf-8?B?YmdMN2p4UkpJTmxmWEZVOTZ2bThaSkp3a2lVTWVST0JpNFlrd3E0VEt1RGpQ?=
+ =?utf-8?B?eW5HQ0Z4TnY5ckRsZGNRcUdsKzZiaFhGUW95OHVyamZGT2RhY0loWUtOckRv?=
+ =?utf-8?B?Q3dXNStTV2FmOG9ZWldmbGJiOTFOckFKNjEyMU9LYi9jQVplbE5RSUNmUDhn?=
+ =?utf-8?B?T3haZjhoTzRocmkxQy9hN0grcFFoWU01ek53Ymc0Ky9nMDFDbXB3cjFnVHFq?=
+ =?utf-8?B?eUUyaFNkSWZySnNuNnl6MVdNRVZ4ZmF3T2xsQk9MTmNnRnQ5Rm9OSkoreCtu?=
+ =?utf-8?B?OHFaV3BQMVcyNUdoNW43cVBnU1pTM0pRb0pHRlFQdFhldGVhQnNsRGpkNDR3?=
+ =?utf-8?B?d1FidU9lNHprN21MeHhuVXhOekhTRzBMaUVmSzgxZ3NON1FJaXhwc2dPdmpl?=
+ =?utf-8?B?QklYSDJFY0R3VFU0VzdCVzJyWGhscDFkVGh0aXNnWGVSSmRwamF6d1dKSTVT?=
+ =?utf-8?B?MWpmQTBYcENhSlFqVXFGYUJIRDZ0VXRrVDVVZWVaNFFxODlwNlRqVEtFMU84?=
+ =?utf-8?B?eHpWNG5rRTZpTVVEc2VkbEduV3dBU2JoelRFdkppblVxTkIxdk1sOVBYNlFv?=
+ =?utf-8?B?bm1XMTNsVnl6bWs3L2VpR0ZQaUx6ZjhCWDV3RkJUc2tvbFNYRHQ1djR6N3Nn?=
+ =?utf-8?B?SXVmWldsOGVFRkVKdXp2R1NmMXoxNWlhZ3VTZXlmVVNiQVZ4eEd5L1FDSEQr?=
+ =?utf-8?B?a1ZKaS9IdnNPVDlESTNZblE5RVVGeUNkRGRkZFNDaFpYam0vWEttZERvbzRE?=
+ =?utf-8?B?K1JLNjBsSFE1N0NsMmsxREhJcWM4eDl2dWJxcTNESmR2VlVJVEhhQ0diQWl5?=
+ =?utf-8?B?Y1ZWZ3JWRXN6UDhPd3FKV1JtbDhWUFdmdklFa2d4eGNVdEZWUkJkNHZ1TVNK?=
+ =?utf-8?B?bHc5bVBqZTBaTjIvb1FMdk1zc3FlanEzOVVLZWplbDhzeU9GalRNRUVTSU1Y?=
+ =?utf-8?B?MStYbENsUlRxNHpwWDN2VUxGWUtPWXpQd1BPR21TVW1zT2VZTXN1Z0R4cE52?=
+ =?utf-8?B?U1JiRmxJMnZQdXFZcUpnOWFPdmpkVkpLbVoyUmFaNjN2SElmS1J3SDlkeHRq?=
+ =?utf-8?B?dzJKcGc3WHArcTZwY2dCUWVsRDhwbTR0WndjblhsRTN6WUZMZHgxN3hZME5X?=
+ =?utf-8?B?bFFtK3VkSXRuUVI2b1p4cndscld6RWJ0d0h6NHVWR2YyQ3MyZW45MTFaQVE5?=
+ =?utf-8?B?R2dPRys1bTNPb2Rtc0luSUswOFd5ejQzUCtwd25GWmsrNjFUSTZna1pDWHFk?=
+ =?utf-8?B?SmZ3NzY5YjBjenV4NlphMDJTWmovNWs4V1ZpRmZlOW43QzlNZ2JlK0lSVXRk?=
+ =?utf-8?B?RUFxK0hTQ3FVY2kzOWU2TWM2b2o3K0FwYW5VOFA1WEF2ckFCTTV5bXJ1bDgy?=
+ =?utf-8?B?a0c2UVRnTnowc1NEeE5XZ2xXV0YrSXBTdFcyUElDc0dVeWtQMDdscGM4enFO?=
+ =?utf-8?B?SGllajJDZXBkOVM1L2FGRlEreWNWT2hQYi9RRUJzcTFrR2dSSStBR3ZVNjln?=
+ =?utf-8?B?ZmphOVhPRkpLUWRJUGV5cWVyVytZMmd6WFQveTNMYmpSVG83cEY5UElMVDEr?=
+ =?utf-8?B?QU9sWDJMTDFETlMwTno3MU5Cakl2YmdBQzlGWXB6cnNBNmM1RUJmRWN3ZVNl?=
+ =?utf-8?B?SUNZYys5dmJEeC9zNENkRTJlcmVtblVZclVCYzFRcTBzUFNCS3AwU1l2Z0E4?=
+ =?utf-8?B?Sm1QUlZLUmhEcTd3SUMvbWgzT0VBeTdjd2laYy9wQS8zdXBkcEk0ZTJzQXVB?=
+ =?utf-8?B?cXN3NDlCNDFQT1E0dkVaUzRqa2JMRDBOcnFWVUlWMHhZNXlKWWpGUUxrakJ1?=
+ =?utf-8?B?d00wZm1xWG9vNytYNUFUZkVxRTJpR3dJNitKR2VVKy9kRHFlM2k2cFlYTGlW?=
+ =?utf-8?B?NWJwZHFyYW8vZ3Q1eVVrMUZWc0FWSmE0VGtYekh5Y3c4RlJGTDBtbC9Xb0dS?=
+ =?utf-8?B?WCtzNnV0TG1WUUVHWDNFRVF2eDZIcUpoUzgzdWgwRVE0NC9Bak93bDFoempU?=
+ =?utf-8?B?Mmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca5007a4-778d-43ce-04b3-08dd0e2b65f5
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 15:02:51.6286
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G5OaiiyND3+IIorYpLrbcEnzWJNC4Ff6RX1UbFopCuUWr0lijOIb3rvFUMgCiko8aIFGMq94p6EWFF3soGTrXpJGuswHvViHuivO/8U0iNY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6424
+X-OriginatorOrg: intel.com
 
-In blamed commit, TCP started to attach timewait sockets to
-some skbs.
+From: Joshua Hay <joshua.a.hay@intel.com>
+Date: Mon, 25 Nov 2024 15:58:55 -0800
 
-syzbot reported that selinux_ip_output() was not expecting them yet.
+> There is a race condition between exiting wb_on_itr and completion write
+> backs. For example, we are in wb_on_itr mode and a Tx completion is
+> generated by HW, ready to be written back, as we are re-enabling
+> interrupts:
+> 
+> 	HW                      SW
+> 	|                       |
+> 	|			| idpf_tx_splitq_clean_all
+> 	|                       | napi_complete_done
+> 	|			|
+> 	| tx_completion_wb 	| idpf_vport_intr_update_itr_ena_irq
+> 
+> That tx_completion_wb happens before the vector is fully re-enabled.
+> Continuing with this example, it is a UDP stream and the
+> tx_completion_wb is the last one in the flow (there are no rx packets).
+> Because the HW generated the completion before the interrupt is fully
+> enabled, the HW will not fire the interrupt once the timer expires and
+> the write back will not happen. NAPI poll won't be called.  We have
+> indicated we're back in interrupt mode but nothing else will trigger the
+> interrupt. Therefore, the completion goes unprocessed, triggering a Tx
+> timeout.
+> 
+> To mitigate this, fire a SW triggered interrupt upon exiting wb_on_itr.
+> This interrupt will catch the rogue completion and avoid the timeout.
+> Add logic to set the appropriate bits in the vector's dyn_ctl register.
+> 
+> Fixes: 9c4a27da0ecc ("idpf: enable WB_ON_ITR")
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 30 ++++++++++++++-------
+>  1 file changed, 20 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index a8989dd98272..9558b90469c8 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -3604,21 +3604,32 @@ static void idpf_vport_intr_dis_irq_all(struct idpf_vport *vport)
+>  /**
+>   * idpf_vport_intr_buildreg_itr - Enable default interrupt generation settings
+>   * @q_vector: pointer to q_vector
+> - * @type: itr index
+> - * @itr: itr value
+>   */
+> -static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector,
+> -					const int type, u16 itr)
+> +static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector)
+>  {
+> -	u32 itr_val;
+> +	u32 itr_val = q_vector->intr_reg.dyn_ctl_intena_m;
+> +	int type = IDPF_NO_ITR_UPDATE_IDX;
+> +	u16 itr = 0;
+> +
+> +	if (q_vector->wb_on_itr) {
+> +		/*
+> +		 * Trigger a software interrupt when exiting wb_on_itr, to make
+> +		 * sure we catch any pending write backs that might have been
+> +		 * missed due to interrupt state transition.
+> +		 */
+> +
 
-Note that using sk_to_full_sk() is still allowing the
-following sk_listener() check to work as before.
+This empty newline is not needed I'd say.
 
-BUG: KASAN: slab-out-of-bounds in selinux_sock security/selinux/include/objsec.h:207 [inline]
-BUG: KASAN: slab-out-of-bounds in selinux_ip_output+0x1e0/0x1f0 security/selinux/hooks.c:5761
-Read of size 8 at addr ffff88804e86e758 by task syz-executor347/5894
+> +		itr_val |= q_vector->intr_reg.dyn_ctl_swint_trig_m |
+> +			   q_vector->intr_reg.dyn_ctl_sw_itridx_ena_m;
+> +		type = IDPF_SW_ITR_UPDATE_IDX;
+> +		itr = IDPF_ITR_20K;
+> +	}
+>  
+>  	itr &= IDPF_ITR_MASK;
+>  	/* Don't clear PBA because that can cause lost interrupts that
+>  	 * came in while we were cleaning/polling
+>  	 */
+> -	itr_val = q_vector->intr_reg.dyn_ctl_intena_m |
+> -		  (type << q_vector->intr_reg.dyn_ctl_itridx_s) |
+> -		  (itr << (q_vector->intr_reg.dyn_ctl_intrvl_s - 1));
+> +	itr_val |= (type << q_vector->intr_reg.dyn_ctl_itridx_s) |
+> +		   (itr << (q_vector->intr_reg.dyn_ctl_intrvl_s - 1));
+>  
+>  	return itr_val;
+>  }
+> @@ -3716,9 +3727,8 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
+>  	/* net_dim() updates ITR out-of-band using a work item */
+>  	idpf_net_dim(q_vector);
+>  
+> +	intval = idpf_vport_intr_buildreg_itr(q_vector);
+>  	q_vector->wb_on_itr = false;
+> -	intval = idpf_vport_intr_buildreg_itr(q_vector,
+> -					      IDPF_NO_ITR_UPDATE_IDX, 0);
 
-CPU: 0 UID: 0 PID: 5894 Comm: syz-executor347 Not tainted 6.12.0-syzkaller-05480-gfcc79e1714e8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Call Trace:
- <IRQ>
-  __dump_stack lib/dump_stack.c:94 [inline]
-  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
-  print_address_description mm/kasan/report.c:377 [inline]
-  print_report+0xc3/0x620 mm/kasan/report.c:488
-  kasan_report+0xd9/0x110 mm/kasan/report.c:601
-  selinux_sock security/selinux/include/objsec.h:207 [inline]
-  selinux_ip_output+0x1e0/0x1f0 security/selinux/hooks.c:5761
-  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
-  nf_hook_slow+0xbb/0x200 net/netfilter/core.c:626
-  nf_hook+0x386/0x6d0 include/linux/netfilter.h:269
-  __ip_local_out+0x339/0x640 net/ipv4/ip_output.c:119
-  ip_local_out net/ipv4/ip_output.c:128 [inline]
-  ip_send_skb net/ipv4/ip_output.c:1505 [inline]
-  ip_push_pending_frames+0xa0/0x5b0 net/ipv4/ip_output.c:1525
-  ip_send_unicast_reply+0xd0e/0x1650 net/ipv4/ip_output.c:1672
-  tcp_v4_send_ack+0x976/0x13f0 net/ipv4/tcp_ipv4.c:1024
-  tcp_v4_timewait_ack net/ipv4/tcp_ipv4.c:1077 [inline]
-  tcp_v4_rcv+0x2f96/0x4390 net/ipv4/tcp_ipv4.c:2428
-  ip_protocol_deliver_rcu+0xba/0x4c0 net/ipv4/ip_input.c:205
-  ip_local_deliver_finish+0x316/0x570 net/ipv4/ip_input.c:233
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  NF_HOOK include/linux/netfilter.h:308 [inline]
-  ip_local_deliver+0x18e/0x1f0 net/ipv4/ip_input.c:254
-  dst_input include/net/dst.h:460 [inline]
-  ip_rcv_finish net/ipv4/ip_input.c:447 [inline]
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  NF_HOOK include/linux/netfilter.h:308 [inline]
-  ip_rcv+0x2c3/0x5d0 net/ipv4/ip_input.c:567
-  __netif_receive_skb_one_core+0x199/0x1e0 net/core/dev.c:5672
-  __netif_receive_skb+0x1d/0x160 net/core/dev.c:5785
-  process_backlog+0x443/0x15f0 net/core/dev.c:6117
-  __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6877
-  napi_poll net/core/dev.c:6946 [inline]
-  net_rx_action+0xa94/0x1010 net/core/dev.c:7068
-  handle_softirqs+0x213/0x8f0 kernel/softirq.c:554
-  do_softirq kernel/softirq.c:455 [inline]
-  do_softirq+0xb2/0xf0 kernel/softirq.c:442
- </IRQ>
- <TASK>
-  __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
-  local_bh_enable include/linux/bottom_half.h:33 [inline]
-  rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
-  __dev_queue_xmit+0x8af/0x43e0 net/core/dev.c:4461
-  dev_queue_xmit include/linux/netdevice.h:3168 [inline]
-  neigh_hh_output include/net/neighbour.h:523 [inline]
-  neigh_output include/net/neighbour.h:537 [inline]
-  ip_finish_output2+0xc6c/0x2150 net/ipv4/ip_output.c:236
-  __ip_finish_output net/ipv4/ip_output.c:314 [inline]
-  __ip_finish_output+0x49e/0x950 net/ipv4/ip_output.c:296
-  ip_finish_output+0x35/0x380 net/ipv4/ip_output.c:324
-  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-  ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:434
-  dst_output include/net/dst.h:450 [inline]
-  ip_local_out+0x33e/0x4a0 net/ipv4/ip_output.c:130
-  __ip_queue_xmit+0x777/0x1970 net/ipv4/ip_output.c:536
-  __tcp_transmit_skb+0x2b39/0x3df0 net/ipv4/tcp_output.c:1466
-  tcp_transmit_skb net/ipv4/tcp_output.c:1484 [inline]
-  tcp_write_xmit+0x12b1/0x8560 net/ipv4/tcp_output.c:2827
-  __tcp_push_pending_frames+0xaf/0x390 net/ipv4/tcp_output.c:3010
-  tcp_send_fin+0x154/0xc70 net/ipv4/tcp_output.c:3616
-  __tcp_close+0x96b/0xff0 net/ipv4/tcp.c:3130
-  tcp_close+0x28/0x120 net/ipv4/tcp.c:3221
-  inet_release+0x13c/0x280 net/ipv4/af_inet.c:435
-  __sock_release net/socket.c:640 [inline]
-  sock_release+0x8e/0x1d0 net/socket.c:668
-  smc_clcsock_release+0xb7/0xe0 net/smc/smc_close.c:34
-  __smc_release+0x5c2/0x880 net/smc/af_smc.c:301
-  smc_release+0x1fc/0x5f0 net/smc/af_smc.c:344
-  __sock_release+0xb0/0x270 net/socket.c:640
-  sock_close+0x1c/0x30 net/socket.c:1408
-  __fput+0x3f8/0xb60 fs/file_table.c:450
-  __fput_sync+0xa1/0xc0 fs/file_table.c:535
-  __do_sys_close fs/open.c:1550 [inline]
-  __se_sys_close fs/open.c:1535 [inline]
-  __x64_sys_close+0x86/0x100 fs/open.c:1535
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f6814c9ae10
-Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d b1 e2 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-RSP: 002b:00007fffb2389758 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007f6814c9ae10
-RDX: 0000000000000010 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00000000000f4240 R08: 0000000000000001 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000000202 R12: 00007fffb23897b0
-R13: 00000000000141c3 R14: 00007fffb238977c R15: 00007fffb2389790
- </TASK>
+Is there a reason for changing the order of these two?
 
-Fixes: 79636038d37e ("ipv4: tcp: give socket pointer to control skbs")
-Reported-by: syzbot+2d9f5f948c31dcb7745e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/lkml/6745e1a2.050a0220.1286eb.001c.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
-Cc: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: selinux@vger.kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Brian Vazquez <brianvv@google.com>
----
- security/selinux/hooks.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>  
+>  	writel(intval, q_vector->intr_reg.dyn_ctl);
+>  }
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index f5a08f94e09402b6b0b1538fae1a7a3f5af19fe6..366c87a40bd15707f6da4f25e8de4ddce3d281fc 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -5738,7 +5738,7 @@ static unsigned int selinux_ip_output(void *priv, struct sk_buff *skb,
- 	/* we do this in the LOCAL_OUT path and not the POST_ROUTING path
- 	 * because we want to make sure we apply the necessary labeling
- 	 * before IPsec is applied so we can leverage AH protection */
--	sk = skb->sk;
-+	sk = sk_to_full_sk(skb->sk);
- 	if (sk) {
- 		struct sk_security_struct *sksec;
- 
--- 
-2.47.0.338.g60cca15819-goog
-
+Thanks,
+Olek
 
