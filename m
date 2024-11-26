@@ -1,194 +1,363 @@
-Return-Path: <netdev+bounces-147312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F1C59D90AF
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:16:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F13BC9D90CC
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:50:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13613169BBE
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:15:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 863E1163CEC
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050FF481DD;
-	Tue, 26 Nov 2024 03:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D463C61FFE;
+	Tue, 26 Nov 2024 03:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c2cBxD7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-221.mail.aliyun.com (out28-221.mail.aliyun.com [115.124.28.221])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AE613FFC;
-	Tue, 26 Nov 2024 03:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7E61A28D
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 03:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732590956; cv=none; b=fy+BkqA2ifVH/nIVgasgiTPV3ONuRj43AksgemcCTVeKrU0pYFhmEej7PELgoiSfZ6EkHqP5pEJ6VvmHnzDdcTI2oyXQH6Zq7YvHTtE3w2Ud+qHf/T3QMI4x870e4MQNv8K6ftBsncJPxraz+T1/gXaukXKC08C+SnWBI58N/AE=
+	t=1732593035; cv=none; b=RajzE0JOcRjVuTfJUjjNj/1kffxAp1Jnd2YyevNCSZT7pqoUZ9M7vVpT7lEfGKFT5gBrf/Rc/u/WWWNTXSbjlBHom8PJM+2Qj8XfwRu8kPwY5E06zXic5vNQIa4vSPKiSefvGPIAR+NSocnZIENpqwCaU9pnmKxLZyHFacu493U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732590956; c=relaxed/simple;
-	bh=cSfp93QI3T8iQ8KLjNyaYF65vPVLOGKUcgQ2HC7Pqg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SKvh2Wj0/HKKMFCt0iKGvkqjd84rMh4wSK8KXUT25KbteV52L8EORHfWiONWSD9ntx8KwdppY+JJ3OeiyrNdWjrquu0aHcNVBtjFD3Aimg5Q0ZXMHIf9sVjdWKh1bVzY2ktirpnzUPqjVtPTZpxGkNggzt+VtXNJqv6AH5KYS+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aMT7QzV_1732590947 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Nov 2024 11:15:48 +0800
-Message-ID: <43341290-15e3-4784-9b69-7f3f13f34e01@motor-comm.com>
-Date: Tue, 26 Nov 2024 11:15:46 +0800
+	s=arc-20240116; t=1732593035; c=relaxed/simple;
+	bh=KRl+ClJrn4uF55e790EBXA+RHYsf2trftkq4P+O1nwc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NXgLgsmWkgsIRiNvvyTUhJHZQ8beTw2y4dnLw5DtVWUgJl3L/GvurWeoqJtibFQXLjxntyckbDAuld3ya1r3Dinb/kdyPmmtdRpG7SF1K8bNjMe1MznqDcoTlCyMisblfYJCmBX6TfBD9M8Zstu2jRDH452mFwt+hEZfh1ZuI/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c2cBxD7j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732593032;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8yfBsDl/Z9cNtb1IhfxjbFBIApGKYMpr7atKR/rohe0=;
+	b=c2cBxD7jsbyfb1gkHyrV3h2dVIg6IcmtAfecTCq7gCyryD2XvHzhtRjUXmbC4Yka29dTeK
+	rb7SZRRwBgqUYT5Fv1jCXIzXkgS+Jj78QOThYxY3qMeZYdGU/tO42fiy1WGv6t1bk62TUy
+	gAtTHXMmX4z8bXYkQEcVbmLmc5a9WZo=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-IB_lHXXWPCidYWFghwcN9A-1; Mon, 25 Nov 2024 22:50:30 -0500
+X-MC-Unique: IB_lHXXWPCidYWFghwcN9A-1
+X-Mimecast-MFC-AGG-ID: IB_lHXXWPCidYWFghwcN9A
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ea65508e51so6551281a91.0
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 19:50:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732593030; x=1733197830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8yfBsDl/Z9cNtb1IhfxjbFBIApGKYMpr7atKR/rohe0=;
+        b=bCWj2Rmn075jLvpKDmbS1F67veS3o4jQjJyTYOut19AdoK+z5jQZxQs8M+uv/GIOgg
+         Iq/WTzXL6/aR4vHcGZunajU6qNlciYM9nLx/SAr4RqrjyFJ9gS2VeBPUefZ9zHAj9tWN
+         sSOSR7TEWBgLfSEH/SjgbaQcTE/Bn5dt8pId/ccjwrmU9d/zr7DlSzhTm1BDsxgtQ39E
+         WnnyXCA9R1yrcPxqD9uRxpGd09Tm+nE2WrKBJPsRxBmHC3TwV078aTZ0cjSlLKJORb9+
+         ks1RPUKb2w2Fn5IoB+hvJTIpSKOW0tjNfpdz0LYq1CmVrlnyMmoyH21PE247At2S1N8M
+         oeHA==
+X-Forwarded-Encrypted: i=1; AJvYcCViTkBSKNpTp4ckqSiA4/Ks9mDT9ifPgWRE3E8Zj9AHUDSa9fIVF8E0Q8GqRRToxtMz452Pvp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXZxF/jbptHOUR7yKMLCXeY9ctOZmDK52YSHe/m076BrJaSrax
+	HYO6qJf61v4k9iYZ6yKMHtHV6WaILHt675XILw+GpNY/W6GOEGDSAqc9nDH3rWEuj7AKK276ybr
+	/EZ4yt4E8gpvreCpzdH4cllFG8D1c1lAJL03ib0wUcPR00lNeJkg0lkIEV97tTTnj8UVnKQUkq2
+	xTWMWyejNLhJ9yMyWNNs7e2n8ZTEcI
+X-Gm-Gg: ASbGncvXVV+JGp5nfpXKhkP5udCYZBVIpc+AKe8fy1Mw3A0S9RojzVY8y1rn3D01ESU
+	Vugd25ihZP2Ep9uTrNMrshn5xn2wkZg==
+X-Received: by 2002:a17:90b:4a86:b0:2ea:6551:da5d with SMTP id 98e67ed59e1d1-2eb0e22c2bbmr18718663a91.13.1732593029624;
+        Mon, 25 Nov 2024 19:50:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEcgWk+Gf8iKHoeXTy758YuxrRS5MtoBpxsIX8rdEuQBVmkGae9tx4Ekw3PY8pxUCiEN1ZM9vsT7cC5UiKDMBk=
+X-Received: by 2002:a17:90b:4a86:b0:2ea:6551:da5d with SMTP id
+ 98e67ed59e1d1-2eb0e22c2bbmr18718636a91.13.1732593029108; Mon, 25 Nov 2024
+ 19:50:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the
- fxgmac_start function
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
- <20241120105625.22508-6-Frank.Sae@motor-comm.com>
- <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
- <ba24293a-77b1-4106-84d2-81ff343fc90f@motor-comm.com>
- <82e1860b-cbbf-4c82-9f1b-bf4a283e3585@lunn.ch>
-Content-Language: en-US
-From: Frank Sae <Frank.Sae@motor-comm.com>
-In-Reply-To: <82e1860b-cbbf-4c82-9f1b-bf4a283e3585@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241126024200.2371546-1-koichiro.den@canonical.com>
+In-Reply-To: <20241126024200.2371546-1-koichiro.den@canonical.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 26 Nov 2024 11:50:17 +0800
+Message-ID: <CACGkMEsJ1X-u=djO2=kJzZdpZH5SX560V9osdpDuySXtfBMpuw@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: drain unconsumed tx completions if any before dql_reset
+To: Koichiro Den <koichiro.den@canonical.com>
+Cc: virtualization@lists.linux.dev, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Tue, Nov 26, 2024 at 10:42=E2=80=AFAM Koichiro Den
+<koichiro.den@canonical.com> wrote:
+>
+> When virtnet_close is followed by virtnet_open, there is a slight chance
+> that some TX completions remain unconsumed. Those are handled during the
+> first NAPI poll, but since dql_reset occurs just beforehand, it can lead
+> to a crash [1].
+>
+> This issue can be reproduced by running: `while :; do ip l set DEV down;
+> ip l set DEV up; done` under heavy network TX load from inside of the
+> machine.
+>
+> To fix this, drain unconsumed TX completions if any before dql_reset,
+> allowing BQL to start cleanly.
+>
+> ------------[ cut here ]------------
+> kernel BUG at lib/dynamic_queue_limits.c:99!
+> Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> CPU: 7 UID: 0 PID: 1598 Comm: ip Tainted: G    N 6.12.0net-next_main+ #2
+> Tainted: [N]=3DTEST
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), \
+> BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> RIP: 0010:dql_completed+0x26b/0x290
+> Code: b7 c2 49 89 e9 44 89 da 89 c6 4c 89 d7 e8 ed 17 47 00 58 65 ff 0d
+> 4d 27 90 7e 0f 85 fd fe ff ff e8 ea 53 8d ff e9 f3 fe ff ff <0f> 0b 01
+> d2 44 89 d1 29 d1 ba 00 00 00 00 0f 48 ca e9 28 ff ff ff
+> RSP: 0018:ffffc900002b0d08 EFLAGS: 00010297
+> RAX: 0000000000000000 RBX: ffff888102398c80 RCX: 0000000080190009
+> RDX: 0000000000000000 RSI: 000000000000006a RDI: 0000000000000000
+> RBP: ffff888102398c00 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00000000000000ca R11: 0000000000015681 R12: 0000000000000001
+> R13: ffffc900002b0d68 R14: ffff88811115e000 R15: ffff8881107aca40
+> FS:  00007f41ded69500(0000) GS:ffff888667dc0000(0000)
+> knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000556ccc2dc1a0 CR3: 0000000104fd8003 CR4: 0000000000772ef0
+> PKRU: 55555554
+> Call Trace:
+>  <IRQ>
+>  ? die+0x32/0x80
+>  ? do_trap+0xd9/0x100
+>  ? dql_completed+0x26b/0x290
+>  ? dql_completed+0x26b/0x290
+>  ? do_error_trap+0x6d/0xb0
+>  ? dql_completed+0x26b/0x290
+>  ? exc_invalid_op+0x4c/0x60
+>  ? dql_completed+0x26b/0x290
+>  ? asm_exc_invalid_op+0x16/0x20
+>  ? dql_completed+0x26b/0x290
+>  __free_old_xmit+0xff/0x170 [virtio_net]
+>  free_old_xmit+0x54/0xc0 [virtio_net]
+>  virtnet_poll+0xf4/0xe30 [virtio_net]
+>  ? __update_load_avg_cfs_rq+0x264/0x2d0
+>  ? update_curr+0x35/0x260
+>  ? reweight_entity+0x1be/0x260
+>  __napi_poll.constprop.0+0x28/0x1c0
+>  net_rx_action+0x329/0x420
+>  ? enqueue_hrtimer+0x35/0x90
+>  ? trace_hardirqs_on+0x1d/0x80
+>  ? kvm_sched_clock_read+0xd/0x20
+>  ? sched_clock+0xc/0x30
+>  ? kvm_sched_clock_read+0xd/0x20
+>  ? sched_clock+0xc/0x30
+>  ? sched_clock_cpu+0xd/0x1a0
+>  handle_softirqs+0x138/0x3e0
+>  do_softirq.part.0+0x89/0xc0
+>  </IRQ>
+>  <TASK>
+>  __local_bh_enable_ip+0xa7/0xb0
+>  virtnet_open+0xc8/0x310 [virtio_net]
+>  __dev_open+0xfa/0x1b0
+>  __dev_change_flags+0x1de/0x250
+>  dev_change_flags+0x22/0x60
+>  do_setlink.isra.0+0x2df/0x10b0
+>  ? rtnetlink_rcv_msg+0x34f/0x3f0
+>  ? netlink_rcv_skb+0x54/0x100
+>  ? netlink_unicast+0x23e/0x390
+>  ? netlink_sendmsg+0x21e/0x490
+>  ? ____sys_sendmsg+0x31b/0x350
+>  ? avc_has_perm_noaudit+0x67/0xf0
+>  ? cred_has_capability.isra.0+0x75/0x110
+>  ? __nla_validate_parse+0x5f/0xee0
+>  ? __pfx___probestub_irq_enable+0x3/0x10
+>  ? __create_object+0x5e/0x90
+>  ? security_capable+0x3b/0x70
+>  rtnl_newlink+0x784/0xaf0
+>  ? avc_has_perm_noaudit+0x67/0xf0
+>  ? cred_has_capability.isra.0+0x75/0x110
+>  ? stack_depot_save_flags+0x24/0x6d0
+>  ? __pfx_rtnl_newlink+0x10/0x10
+>  rtnetlink_rcv_msg+0x34f/0x3f0
+>  ? do_syscall_64+0x6c/0x180
+>  ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+>  netlink_rcv_skb+0x54/0x100
+>  netlink_unicast+0x23e/0x390
+>  netlink_sendmsg+0x21e/0x490
+>  ____sys_sendmsg+0x31b/0x350
+>  ? copy_msghdr_from_user+0x6d/0xa0
+>  ___sys_sendmsg+0x86/0xd0
+>  ? __pte_offset_map+0x17/0x160
+>  ? preempt_count_add+0x69/0xa0
+>  ? __call_rcu_common.constprop.0+0x147/0x610
+>  ? preempt_count_add+0x69/0xa0
+>  ? preempt_count_add+0x69/0xa0
+>  ? _raw_spin_trylock+0x13/0x60
+>  ? trace_hardirqs_on+0x1d/0x80
+>  __sys_sendmsg+0x66/0xc0
+>  do_syscall_64+0x6c/0x180
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7f41defe5b34
+> Code: 15 e1 12 0f 00 f7 d8 64 89 02 b8 ff ff ff ff eb bf 0f 1f 44 00 00
+> f3 0f 1e fa 80 3d 35 95 0f 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d 00
+> f0 ff ff 77 4c c3 0f 1f 00 55 48 89 e5 48 83 ec 20 89 55
+> RSP: 002b:00007ffe5336ecc8 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f41defe5b34
+> RDX: 0000000000000000 RSI: 00007ffe5336ed30 RDI: 0000000000000003
+> RBP: 00007ffe5336eda0 R08: 0000000000000010 R09: 0000000000000001
+> R10: 00007ffe5336f6f9 R11: 0000000000000202 R12: 0000000000000003
+> R13: 0000000067452259 R14: 0000556ccc28b040 R15: 0000000000000000
+>  </TASK>
+> [...]
+> ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+>
+> Fixes: c8bd1f7f3e61 ("virtio_net: add support for Byte Queue Limits")
+> Cc: <stable@vger.kernel.org> # v6.11+
+> Signed-off-by: Koichiro Den <koichiro.den@canonical.com>
+> ---
+>  drivers/net/virtio_net.c | 37 +++++++++++++++++++++++++++++--------
+>  1 file changed, 29 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 64c87bb48a41..3e36c0470600 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -513,7 +513,7 @@ static struct sk_buff *virtnet_skb_append_frag(struct=
+ sk_buff *head_skb,
+>                                                struct sk_buff *curr_skb,
+>                                                struct page *page, void *b=
+uf,
+>                                                int len, int truesize);
+> -static void virtnet_xsk_completed(struct send_queue *sq, int num);
+> +static void virtnet_xsk_completed(struct send_queue *sq, int num, bool d=
+rain);
+>
+>  enum virtnet_xmit_type {
+>         VIRTNET_XMIT_TYPE_SKB,
+> @@ -580,7 +580,8 @@ static void sg_fill_dma(struct scatterlist *sg, dma_a=
+ddr_t addr, u32 len)
+>  }
+>
+>  static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *=
+txq,
+> -                           bool in_napi, struct virtnet_sq_free_stats *s=
+tats)
+> +                           bool in_napi, struct virtnet_sq_free_stats *s=
+tats,
+> +                           bool drain)
+>  {
+>         struct xdp_frame *frame;
+>         struct sk_buff *skb;
+> @@ -620,7 +621,8 @@ static void __free_old_xmit(struct send_queue *sq, st=
+ruct netdev_queue *txq,
+>                         break;
+>                 }
+>         }
+> -       netdev_tx_completed_queue(txq, stats->napi_packets, stats->napi_b=
+ytes);
+> +       if (!drain)
+> +               netdev_tx_completed_queue(txq, stats->napi_packets, stats=
+->napi_bytes);
+>  }
+>
+>  static void virtnet_free_old_xmit(struct send_queue *sq,
+> @@ -628,10 +630,21 @@ static void virtnet_free_old_xmit(struct send_queue=
+ *sq,
+>                                   bool in_napi,
+>                                   struct virtnet_sq_free_stats *stats)
+>  {
+> -       __free_old_xmit(sq, txq, in_napi, stats);
+> +       __free_old_xmit(sq, txq, in_napi, stats, false);
+>
+>         if (stats->xsk)
+> -               virtnet_xsk_completed(sq, stats->xsk);
+> +               virtnet_xsk_completed(sq, stats->xsk, false);
+> +}
+> +
+> +static void virtnet_drain_old_xmit(struct send_queue *sq,
+> +                                  struct netdev_queue *txq)
+> +{
+> +       struct virtnet_sq_free_stats stats =3D {0};
+> +
+> +       __free_old_xmit(sq, txq, false, &stats, true);
+> +
+> +       if (stats.xsk)
+> +               virtnet_xsk_completed(sq, stats.xsk, true);
+>  }
 
-On 2024/11/25 22:18, Andrew Lunn wrote:
->>> RGMII is unusual, you normally want RGMII_ID. Where are the 2ns delays
->>> added?
->>>
->>
->> Yes, you are right. PHY_INTERFACE_MODE_RGMII should be PHY_INTERFACE_MODE_RGMII_ID.
->> YT6801 NIC integrated with YT8531S phy, and the 2ns delays added in the phy driver.
->> https://elixir.bootlin.com/linux/v6.12/source/drivers/net/phy/motorcomm.c#L895
-> 
-> But if you pass PHY_INTERFACE_MODE_RGMII to the PHY it is not adding
-> the 2ns delay. So how does this work now?
+Are we sure this can drain the queue? Note that the device is not stopped.
 
-I'm sorry. Maybe PHY_INTERFACE_MODE_RGMII is enough.
-YT6801 is a pcie NIC chip that integrates one yt8531s phy.
-Therefore, a delay of 2ns is unnecessary, as the hardware has
- already ensured this.
+>
+>  /* Converting between virtqueue no. and kernel tx/rx queue no.
+> @@ -1499,7 +1512,8 @@ static bool virtnet_xsk_xmit(struct send_queue *sq,=
+ struct xsk_buff_pool *pool,
+>         /* Avoid to wakeup napi meanless, so call __free_old_xmit instead=
+ of
+>          * free_old_xmit().
+>          */
+> -       __free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq), true, =
+&stats);
+> +       __free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq), true,
+> +                       &stats, false);
+>
+>         if (stats.xsk)
+>                 xsk_tx_completed(sq->xsk_pool, stats.xsk);
+> @@ -1556,10 +1570,13 @@ static int virtnet_xsk_wakeup(struct net_device *=
+dev, u32 qid, u32 flag)
+>         return 0;
+>  }
+>
+> -static void virtnet_xsk_completed(struct send_queue *sq, int num)
+> +static void virtnet_xsk_completed(struct send_queue *sq, int num, bool d=
+rain)
+>  {
+>         xsk_tx_completed(sq->xsk_pool, num);
+>
+> +       if (drain)
+> +               return;
+> +
+>         /* If this is called by rx poll, start_xmit and xdp xmit we shoul=
+d
+>          * wakeup the tx napi to consume the xsk tx queue, because the tx
+>          * interrupt may not be triggered.
+> @@ -3041,6 +3058,7 @@ static void virtnet_disable_queue_pair(struct virtn=
+et_info *vi, int qp_index)
+>
+>  static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_ind=
+ex)
+>  {
+> +       struct netdev_queue *txq =3D netdev_get_tx_queue(vi->dev, qp_inde=
+x);
+>         struct net_device *dev =3D vi->dev;
+>         int err;
+>
+> @@ -3054,7 +3072,10 @@ static int virtnet_enable_queue_pair(struct virtne=
+t_info *vi, int qp_index)
+>         if (err < 0)
+>                 goto err_xdp_reg_mem_model;
+>
+> -       netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
+> +       /* Drain any unconsumed TX skbs transmitted before the last virtn=
+et_close */
+> +       virtnet_drain_old_xmit(&vi->sq[qp_index], txq);
+> +
+> +       netdev_tx_reset_queue(txq);
+>         virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
+>         virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index]=
+.napi);
+>
+> --
+> 2.43.0
+>
+>
 
-> 
->>>> +int fxgmac_start(struct fxgmac_pdata *pdata)
->>>> +{
->>>> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
->>>> +	u32 val;
->>>> +	int ret;
->>>> +
->>>> +	if (pdata->dev_state != FXGMAC_DEV_OPEN &&
->>>> +	    pdata->dev_state != FXGMAC_DEV_STOP &&
->>>> +	    pdata->dev_state != FXGMAC_DEV_RESUME) {
->>>> +		yt_dbg(pdata, " dev_state err:%x\n", pdata->dev_state);
->>>> +		return 0;
->>>> +	}
->>>> +
->>>> +	if (pdata->dev_state != FXGMAC_DEV_STOP) {
->>>> +		hw_ops->reset_phy(pdata);
->>>> +		hw_ops->release_phy(pdata);
->>>> +		yt_dbg(pdata, "reset phy.\n");
->>>> +	}
->>>> +
->>>> +	if (pdata->dev_state == FXGMAC_DEV_OPEN) {
->>>> +		ret = fxgmac_phy_connect(pdata);
->>>> +		if (ret < 0)
->>>> +			return ret;
->>>> +
->>>> +		yt_dbg(pdata, "fxgmac_phy_connect.\n");
->>>> +	}
->>>> +
->>>> +	phy_init_hw(pdata->phydev);
->>>> +	phy_resume(pdata->phydev);
->>>
->>> The MAC should not be doing this.
->>
->> Does this mean deleting 'phy_resume(pdata->phydev)'?
-> 
-> There are only a few phylib API calls you should be using
-> 
-> phy_connect() or one of its variants.
-> phy_start()
-> phy_stop()
-> phy_disconnect()
-> 
-> Those four are the core. Those should be all you need to minimum
-> support.
-> 
-> phy_support_asym_pause()
-> phy_support_eee()
-> phy_speed_up()
-> phy_speed_down()
-> 
-> and these are just nice to have to let phylib know about things the
-> MAC supports, so phylib can manage the PHY to make them available to
-> the MAC. This is the API between the MAC driver and phylib. phylib
-> will then manage the PHY. Any time you want to use a phy_* function,
-> look to see if other MAC drivers do. If they don't you should not
-> either.
+Thanks
 
-Tanks for your clear explanation.
-
-> 
->>>> +	hw_ops->pcie_init(pdata);
->>>> +	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate)) {
->>>> +		yt_err(pdata,
->>>> +		       "fxgmac powerstate is %lu when config power up.\n",
->>>> +		       pdata->powerstate);
->>>> +	}
->>>> +
->>>> +	hw_ops->config_power_up(pdata);
->>>> +	hw_ops->dismiss_all_int(pdata);
->>>> +	ret = hw_ops->init(pdata);
->>>> +	if (ret < 0) {
->>>> +		yt_err(pdata, "fxgmac hw init error.\n");
->>>> +		return ret;
->>>> +	}
->>>> +
->>>> +	fxgmac_napi_enable(pdata);
->>>> +	ret = fxgmac_request_irqs(pdata);
->>>> +	if (ret < 0)
->>>> +		return ret;
->>>> +
->>>> +	/* Config interrupt to level signal */
->>>> +	val = rd32_mac(pdata, DMA_MR);
->>>> +	fxgmac_set_bits(&val, DMA_MR_INTM_POS, DMA_MR_INTM_LEN, 2);
->>>> +	fxgmac_set_bits(&val, DMA_MR_QUREAD_POS, DMA_MR_QUREAD_LEN, 1);
->>>> +	wr32_mac(pdata, val, DMA_MR);
->>>> +
->>>> +	hw_ops->enable_mgm_irq(pdata);
->>>> +	hw_ops->set_interrupt_moderation(pdata);
->>>> +
->>>> +	if (pdata->per_channel_irq) {
->>>> +		fxgmac_enable_msix_irqs(pdata);
->>>> +		ret = fxgmac_phy_irq_enable(pdata, true);
->>>> +		if (ret < 0)
->>>> +			goto dis_napi;
->>>> +	}
->>>> +
->>>> +	fxgmac_enable_rx_tx_ints(pdata);
->>>> +	phy_speed_up(pdata->phydev);
->>>> +	genphy_soft_reset(pdata->phydev);
->>>
->>> More things the MAC driver should not be doing.
->>
->> Does this mean deleting 'phy_speed_up(pdata->phydev);' and 'genphy_soft_reset(pdata->phydev);' ?
-> 
-> Two things here:
-> 
-> phy_speed_up()/phy_speed_down() is part of suspend/resume when using
-> WoL. This code has nothing to do with that. So why is it here?
-> 
-> There should not be any need to call genphy_soft_reset(). You should
-> figure out why you need it, because it could be a PHY driver bug, or a
-> MAC driver bug.
-> 
-> 	Andrew
 
