@@ -1,307 +1,169 @@
-Return-Path: <netdev+bounces-147459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDDDD9D9A21
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 16:03:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91F4B9D9A65
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 16:26:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE83C168D1F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:03:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CEFB1653BF
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 15:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC511D5CFF;
-	Tue, 26 Nov 2024 15:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640201D619E;
+	Tue, 26 Nov 2024 15:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xq7Bx/Yf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmpqcV/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC110194080
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 15:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732633380; cv=fail; b=iYaSPykkbPDAojXT+IRZwW/U5uYvdTJnxqbT9etk9b5aL5BZsuPQcwdvBAC9JG5kbS2F5Z76ScqMgSc7Rjet3uAFmcSvIN3mSjkdQZ7mrlimEErjUF89MUGJh8RraogGcAEgZe2Lf985Ev2TENjKIOKmWv9glm37mULTNQT+f7U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732633380; c=relaxed/simple;
-	bh=cRJfB1Foe8iJCGUBC6mLj9tMh3bmi1wI6RgLI7F992A=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=c2SGs4WDyvmAHdbARDEOpnxctFHBOk7b3H2nQBfuuWdwUpH4DTX7k21ao8vvHSZuiTLx9K9HvlSl+MURlYglv/8xFTEesJdDV8LqJ9iXiHk8i/UOAeYEjFqj7dmlc7HObnjZwnnmAVzn4QLmR6f7Cly/xGu/Vq4JHehIZPRpPf8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xq7Bx/Yf; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732633379; x=1764169379;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cRJfB1Foe8iJCGUBC6mLj9tMh3bmi1wI6RgLI7F992A=;
-  b=Xq7Bx/YfiB4gW6wBaqHxrTEIYz32erGSXA3zYYPJuqaIZQjQCyR/8nO3
-   KJwVq64eDYNUk5kJMO7Ru8DAOcbOUKdbiL3PnSu82/itqUk9X7TsmNAyD
-   QnsHNyNZjQGBg3irXaZq9XrcK8/jYCbSwK+EUajpxL1uq4JW/lK+ry657
-   PQUAkQuwzVKDRZJ50mTEF4vfd/ziFas6Uyxqr9i6sIOVn1U17dtYCz5uO
-   A09lTBbBo/VDkMJVqVYfokpRmDt8ru9Sb429q2s534uQ0UluDqjzQEFIl
-   mmRXB+JDkltGeUgLGR54JyqYxyotqxg5FqST//kWC6pidzyDaJ6c2ewAZ
-   A==;
-X-CSE-ConnectionGUID: tiu2OOTBSoGPiwB4HeV77Q==
-X-CSE-MsgGUID: Z9k1s8ByRBOUa30ukdCbqQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11268"; a="32928261"
-X-IronPort-AV: E=Sophos;i="6.12,186,1728975600"; 
-   d="scan'208";a="32928261"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2024 07:02:58 -0800
-X-CSE-ConnectionGUID: nF6gF1HPSkmZnEL7S/QMcg==
-X-CSE-MsgGUID: +UBHAA6WTHCM1ysX55LwUQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,186,1728975600"; 
-   d="scan'208";a="122490453"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Nov 2024 07:02:58 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 26 Nov 2024 07:02:57 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 26 Nov 2024 07:02:57 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.43) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 26 Nov 2024 07:02:56 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D6Y2FVv0NcWi4JELGWDMi+uSeV3SbgtkVuYAYcs6BPXXYekT7YI2wXrPgP/nK3WUohz2qc5VsLiAY1jLPsl/Uo+9+H4I+MRC1xM9nwl60mtc/uWqFy94GG6e6TbgMH18Ymc0Nvhn/ZiISopYSctsGle1b5PgEl3dDf3HhEzt7YnGYTypC0frL38IRvhdD+bI3qi2W73ZKJGsvSSCRSh/gSD1R6c7uuWhE1UdC79Ld89iY07CI59dJ6/xiHI1nh4bzrfFdW/+8Z6IbhB1vTvy8jknCN0eh0LtJChVEXGoaJYLaLP3q/qzkdu3Tir1S75n5g7vY1Cp9oJvwB4JJsRx/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XqEe35iObQRMP5T2Q0owbHigAXSIB3feO5lN/8OTKEc=;
- b=TCINKx4XphNMXm1V2jCYrbKMK/cuS88LzdODSlgtaaX/a0u2TQ0eiNDGsb+xVH2//zNQv6jfthSwL/SADB/6snIUAt/qPtssW3sKveMmSLKxJdnDutEQkJT+MSVOJHuAyhpRivnMQexgr4j+CPj5rT/H9L7A8+kR/KYszmLh6+eO6Vnh0Oiv5RCEOxDC2bZC9SZBQGOXCJ2VswKC8IQ6ccr3XlV29mM+vt0uOMAO2/+oCUL3j6hYcul5j4wIZZ3FPzRWuk0gP5kAv3Pv6BMatXoJ9sF8riqaQU9ncyeG+yJwCaDqZeqkdtk9osVGUytytuY1zXVz/WZwfEcpyT9cEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by DS0PR11MB6424.namprd11.prod.outlook.com (2603:10b6:8:c4::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8182.18; Tue, 26 Nov 2024 15:02:51 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%7]) with mapi id 15.20.8182.019; Tue, 26 Nov 2024
- 15:02:51 +0000
-Message-ID: <e95977e0-d080-45a1-a82e-e11ee85ce794@intel.com>
-Date: Tue, 26 Nov 2024 16:02:32 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan][PATCH iwl-net 2/2] idpf: trigger SW interrupt
- when exiting wb_on_itr mode
-To: Joshua Hay <joshua.a.hay@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <przemyslaw.kitszel@intel.com>,
-	<michal.kubiak@intel.com>, <madhu.chittim@intel.com>,
-	<netdev@vger.kernel.org>
-References: <20241125235855.64850-1-joshua.a.hay@intel.com>
- <20241125235855.64850-3-joshua.a.hay@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20241125235855.64850-3-joshua.a.hay@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA1P291CA0006.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:19::14) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4A71D47DC;
+	Tue, 26 Nov 2024 15:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732634762; cv=none; b=VGsxSq9+rmRTQSVRZnSLac8jrS1cpa6JVvUtwGVCc5yhvYh9i2WYNX2sMuhW2YwDiit4KdQUnp4xHk3J71p4SLAdgcMwurhM6MFgMyjbXa1wuTtdjZnzp23BiTbVqI6Tnezrhw6QeHXk9wdSLd3u/pModj+OysVcRTHS7CTm4Eo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732634762; c=relaxed/simple;
+	bh=75qY2RlPICpYt+qpGsSQ2PTwM6sFL9hl/+SmNj1wTXA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cyHB5xmBx9HIhxu+qdspxWN6EOoZawRlKtElqG8OM6sUq7BhFjwjrnidkn4F08fi+ESJTIFGi2VgdYNuyYviODhgsWfXkPk+3uHL8olKs+XnU/ztlasyCeigdkLcNLTAMCrlLh76zt8ZcGVpWrHyTsIhOx39IkcqDqGvqbDA4Bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RmpqcV/9; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9a0ef5179dso818130766b.1;
+        Tue, 26 Nov 2024 07:26:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732634759; x=1733239559; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j7p42/YIlccA+0/0TWeEQofMRxicEop0Giua8rEzfi4=;
+        b=RmpqcV/9lFJvp681DjbMolTNaJdErryLr2uAHZfRma0yzAnnk7wAwIF+Y0OYhkYPMK
+         QS/fGNhkT++av5l5KRaaE435gX7QVDX8Aji7fxsL1lNhREbs27Xo8VjUld0cuacUFPgP
+         2WAsUZlwyy44baDu9b6fcFjmMPlvhs7E5LsMhZBax9jDoyNHkUbH/LFLu1w83VU72JCz
+         Y9KOBi5FPYpa+89w79VrMk1XYuntlj3/ybtGDJH05Hzw0VuccTi77AqaFjtZrKISlrRT
+         Ue3xEWJu0Z2SDNP4cuVd2+sdoCadYmW2PpXDulESPtGemQp1Xq/67PAqurEtm6LkHSx0
+         D4Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732634759; x=1733239559;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j7p42/YIlccA+0/0TWeEQofMRxicEop0Giua8rEzfi4=;
+        b=etPi3spd0ZKdzV0HSXYlYv8mCFPpODBvXBb+L1eq+itOOL4JhP78sa7axwuoRRvscz
+         O4630cnYAXXuEKHwU0sQe24H+CGhlDLoLs5NizDAbBPZElpoLnc9HZKPGKXVbfMi4/pA
+         Hwb5l3UjlMY1fTotJgqmOKNjeSifKJhT7Ni6ImK+j+2aD5O35E/WNXubNRmeluRaFRab
+         NGoGFPpGIktUVcOkYyPA55pTqjY8+SsZv/bGB7LN1GFyTuJ/tTm4dntRE7rnMAlJn69W
+         GAewX7sPboqgT3AiBoi5mDIZHBblxL8uvbuBx2BwhzXoy4EJR6GakH6P5Yhyx7Yssnq8
+         5HLw==
+X-Forwarded-Encrypted: i=1; AJvYcCVs0uvjOfyg5/Z8CwGy99EtGRePo/ZxzqNoblZf++yK6VR+2A2CSrf8FNm04sTQ5hEgvDZ2Rngoag==@vger.kernel.org, AJvYcCW6TkVxzNGavErdrnBtqOvrPek7gfyVKS+I0a48AbxF3fqMbCP2WwFgCYzxH1DxPwcRRmroJwgY@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOcLoHyKoPv76YsHo72NPjz5pDLyCtBkCW9oM3icetGvoWw/lT
+	vrwaA6eTj4ASuZkRSVrN14MRz9Th1At3iBM7LP4FximFv83wHQH8
+X-Gm-Gg: ASbGncv9Jyfd6o7DLvvpQVCqRrNpf1S4ZlBryYFPUA3uy3d+LJO6XWBsYCyJBJIvvvL
+	L7EA0evbM8Wpv4jrd7UXhV9g+d9ooWy5YBSlhfcOO0u58+HvOZim+qkWLa0bQbbZwVNfc8ypsbc
+	9rF0INWiDbD6k5X7Foks/Uz5UU8Dop4VQbp52r79Fti1VymNnw3gHtV1d2bn+8g4ET+79Ek7rMn
+	Q0Dass5yEBBpbxBFc4a0joeMz7vivDEJyboPNYV9q3UW+t4Th2yH3oxiS6C
+X-Google-Smtp-Source: AGHT+IF1hl9Vor9A8CgFjDoq9ZySNHePMq79OdoiLBgMI4XJFtnGmiMTDzc52jbC9izaXAejYb6yTA==
+X-Received: by 2002:a17:906:3155:b0:a9a:230b:fb5e with SMTP id a640c23a62f3a-aa509966471mr1418230366b.4.1732634758942;
+        Tue, 26 Nov 2024 07:25:58 -0800 (PST)
+Received: from [192.168.42.58] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa50b2efbf1sm604120066b.44.2024.11.26.07.25.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Nov 2024 07:25:58 -0800 (PST)
+Message-ID: <6e687570-c7b7-4c22-a601-d7ea6d620afe@gmail.com>
+Date: Tue, 26 Nov 2024 15:26:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB6424:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca5007a4-778d-43ce-04b3-08dd0e2b65f5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?a2ZBUldLOW1VRE9iU2haZUJHWTNEOVJabUh3bElzV3BDc3hMcmoreDI3S05i?=
- =?utf-8?B?Z1R3bVpUVkUxOTF3NlRHRG9IclE3OURsU1lZNXdOWWIrUmhJREx3Qkhya21s?=
- =?utf-8?B?Qnh5SXhUMDJOM0ppSkFZTGJId2RzaGhUQ1BYbVh1WVgwSlNhSnBpQnkvU3Aw?=
- =?utf-8?B?eTJEc0djM3gvMkhmUVRHcXVBaVQ5SGJKdXJQT096N3F5Skg2dUYwSVY5Wnd5?=
- =?utf-8?B?c3ZXY3NTQ0FOcUpqUlpjcDNvaXYwZnlOa0pmRHRiTm5FZjgvNjlLZDRCUUE4?=
- =?utf-8?B?NUpsTVFEZkh2RzRGeGwwZTh1eStDSkVrRVFpRnFCYVRCaFVaYUgxRmRkZDJp?=
- =?utf-8?B?MEpOd1dVaElQelpXdGwzNnRYY2RnOVc0YlVEODNlYXk2NUljbUZScmkyYUJr?=
- =?utf-8?B?VklpeTNtYXNNb3c3clBUREdiMVY3YUd6a1M3NTA3WmYwTjgvdUNJdnl0QURR?=
- =?utf-8?B?MUtiL2wxSmF4MmRTTnYxd0VldXFkMC8yYVhUT21HTE1JZDN4Q1dGR24xNGZo?=
- =?utf-8?B?S3RQaDVLRkNsUjVlaHY1UEdKeUpvR0NWMVRLQUZteWQ0TXErT3M3Ym5MbjFG?=
- =?utf-8?B?TERzM0hqNkdKMDlHMGoxSkI4U2FxRWV4cEpzVFNzTmJwMEsrSm5CSHNqbXhR?=
- =?utf-8?B?WUFWc0I5WXlKa24wMUtyRHRFQTVGdUhuNVVlV3JRT2M2MDlKUHJ2WlBxSXg2?=
- =?utf-8?B?UUVvdjFJaDJrNFJzaU56UWdoR2tBYklmK2ZlTWYwSWFXR0lLQ09JNC9sU2lP?=
- =?utf-8?B?TGRqK1BwZHVYSlhBaDdCbHpwd0RNQnk4TmJZalljTFRyT0xPREM5Sy83SDlB?=
- =?utf-8?B?d1VMUnlLVHJDZjhud0FGSTVFM1F3RmtES1NOaWlsUlNUdDkrd0p0aFFNaGh1?=
- =?utf-8?B?TkhCTmI2VUJpNTNCcDRsQytESlpkNlRMQTE2MXh2YS8ydGJLQ0RIdW9Md2xi?=
- =?utf-8?B?b2JuRVVPY1JRRE1oQkJDTkRUR1dJMVRRREQrSHFjaVJENStuWU1OMmhpaU1h?=
- =?utf-8?B?NFQ1Uks4YjVJRnZRdFlRc2g3bkpKdGNiemJnMk1JWDJza0FwM0FlbmwrWXVn?=
- =?utf-8?B?OXVDNUJMQkg3NW1GRGJxaEx2S3N2NGRtWkl4Z2locnBZRVhPLzFqNHhPSjgx?=
- =?utf-8?B?ektub0NkalFRNFMzWExqdisyTGJ0ODBudFRHZEZQenBkMVlKRzBrWTBmSW1U?=
- =?utf-8?B?TkRjOVhzWmprUmgrTkd0TkhObElJL0dXY3lha1N4bmNudnMxZ2RPM1ROM0FS?=
- =?utf-8?B?dkF5ekZUWTdBSEZqMlhyNE5PMStZK1E3cGUvWVAyRXBmQkdjcnVCU3NnUVpa?=
- =?utf-8?B?UzJCY0JxVnQ3K1k5UkRmcEpqUTR1OENxbUVzVkwzV1hwQnRBeXprak4yUFVB?=
- =?utf-8?B?eGN3d3huNkxNb1BVTWFSV00rczYrR21KcWVtWmpUQW1sWms0Y0xZalZBeWNx?=
- =?utf-8?B?cllQTmlIUlFjL1Jnd1VkVEFSQmltNHJNNHVoYUxWeTJhZTZIbkx3eXRPQ0Zz?=
- =?utf-8?B?b2tpK29qV0xPSG0wc1Q4K3daRi9XNXNlZUorK0FJcXdSTGVQSFFkZTZJejNZ?=
- =?utf-8?B?T0NBRlRIQnZkMzRYQTZYSklpK1RabVBoZ1ZuR1VzcTNoL2ZsMGR6Y214WUNE?=
- =?utf-8?B?NnY0OVhOcEJqTEpZVmo4S0ZjQzBUMmFyNjJXTnVZOHFkL2ltVXlvbitzMDQ1?=
- =?utf-8?B?Q3VvWS9GNU1nQUhJQytiYkRWcXE5M2xmeVptK1pFdGtma1VXZUhXY0p1YWRP?=
- =?utf-8?B?QWtIcmk2RHBkQTNCWWRqdUd0QitDbkova0VpcU9BcnJtR3VXVkkydUNoOWJw?=
- =?utf-8?B?RDREc3lDbldTZGkzWUs5QT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sk9YR0V6Q3FPU3ZiOWk0dm5mYmpCSlc4QkNPMkcwM0MvclNxbnpUMTlEZ2g0?=
- =?utf-8?B?Z2d3NmJUdVlJNnI4YnJmVVlLZVorcDd4VUJEYWJoU3VrZXBIY1VCclEwaURs?=
- =?utf-8?B?WUNoZlNCd3F3VDIxaFRIY2V4eHB2OTllclhFZEluMHhCM2x0UkVCdjRLSHo0?=
- =?utf-8?B?YmdMN2p4UkpJTmxmWEZVOTZ2bThaSkp3a2lVTWVST0JpNFlrd3E0VEt1RGpQ?=
- =?utf-8?B?eW5HQ0Z4TnY5ckRsZGNRcUdsKzZiaFhGUW95OHVyamZGT2RhY0loWUtOckRv?=
- =?utf-8?B?Q3dXNStTV2FmOG9ZWldmbGJiOTFOckFKNjEyMU9LYi9jQVplbE5RSUNmUDhn?=
- =?utf-8?B?T3haZjhoTzRocmkxQy9hN0grcFFoWU01ek53Ymc0Ky9nMDFDbXB3cjFnVHFq?=
- =?utf-8?B?eUUyaFNkSWZySnNuNnl6MVdNRVZ4ZmF3T2xsQk9MTmNnRnQ5Rm9OSkoreCtu?=
- =?utf-8?B?OHFaV3BQMVcyNUdoNW43cVBnU1pTM0pRb0pHRlFQdFhldGVhQnNsRGpkNDR3?=
- =?utf-8?B?d1FidU9lNHprN21MeHhuVXhOekhTRzBMaUVmSzgxZ3NON1FJaXhwc2dPdmpl?=
- =?utf-8?B?QklYSDJFY0R3VFU0VzdCVzJyWGhscDFkVGh0aXNnWGVSSmRwamF6d1dKSTVT?=
- =?utf-8?B?MWpmQTBYcENhSlFqVXFGYUJIRDZ0VXRrVDVVZWVaNFFxODlwNlRqVEtFMU84?=
- =?utf-8?B?eHpWNG5rRTZpTVVEc2VkbEduV3dBU2JoelRFdkppblVxTkIxdk1sOVBYNlFv?=
- =?utf-8?B?bm1XMTNsVnl6bWs3L2VpR0ZQaUx6ZjhCWDV3RkJUc2tvbFNYRHQ1djR6N3Nn?=
- =?utf-8?B?SXVmWldsOGVFRkVKdXp2R1NmMXoxNWlhZ3VTZXlmVVNiQVZ4eEd5L1FDSEQr?=
- =?utf-8?B?a1ZKaS9IdnNPVDlESTNZblE5RVVGeUNkRGRkZFNDaFpYam0vWEttZERvbzRE?=
- =?utf-8?B?K1JLNjBsSFE1N0NsMmsxREhJcWM4eDl2dWJxcTNESmR2VlVJVEhhQ0diQWl5?=
- =?utf-8?B?Y1ZWZ3JWRXN6UDhPd3FKV1JtbDhWUFdmdklFa2d4eGNVdEZWUkJkNHZ1TVNK?=
- =?utf-8?B?bHc5bVBqZTBaTjIvb1FMdk1zc3FlanEzOVVLZWplbDhzeU9GalRNRUVTSU1Y?=
- =?utf-8?B?MStYbENsUlRxNHpwWDN2VUxGWUtPWXpQd1BPR21TVW1zT2VZTXN1Z0R4cE52?=
- =?utf-8?B?U1JiRmxJMnZQdXFZcUpnOWFPdmpkVkpLbVoyUmFaNjN2SElmS1J3SDlkeHRq?=
- =?utf-8?B?dzJKcGc3WHArcTZwY2dCUWVsRDhwbTR0WndjblhsRTN6WUZMZHgxN3hZME5X?=
- =?utf-8?B?bFFtK3VkSXRuUVI2b1p4cndscld6RWJ0d0h6NHVWR2YyQ3MyZW45MTFaQVE5?=
- =?utf-8?B?R2dPRys1bTNPb2Rtc0luSUswOFd5ejQzUCtwd25GWmsrNjFUSTZna1pDWHFk?=
- =?utf-8?B?SmZ3NzY5YjBjenV4NlphMDJTWmovNWs4V1ZpRmZlOW43QzlNZ2JlK0lSVXRk?=
- =?utf-8?B?RUFxK0hTQ3FVY2kzOWU2TWM2b2o3K0FwYW5VOFA1WEF2ckFCTTV5bXJ1bDgy?=
- =?utf-8?B?a0c2UVRnTnowc1NEeE5XZ2xXV0YrSXBTdFcyUElDc0dVeWtQMDdscGM4enFO?=
- =?utf-8?B?SGllajJDZXBkOVM1L2FGRlEreWNWT2hQYi9RRUJzcTFrR2dSSStBR3ZVNjln?=
- =?utf-8?B?ZmphOVhPRkpLUWRJUGV5cWVyVytZMmd6WFQveTNMYmpSVG83cEY5UElMVDEr?=
- =?utf-8?B?QU9sWDJMTDFETlMwTno3MU5Cakl2YmdBQzlGWXB6cnNBNmM1RUJmRWN3ZVNl?=
- =?utf-8?B?SUNZYys5dmJEeC9zNENkRTJlcmVtblVZclVCYzFRcTBzUFNCS3AwU1l2Z0E4?=
- =?utf-8?B?Sm1QUlZLUmhEcTd3SUMvbWgzT0VBeTdjd2laYy9wQS8zdXBkcEk0ZTJzQXVB?=
- =?utf-8?B?cXN3NDlCNDFQT1E0dkVaUzRqa2JMRDBOcnFWVUlWMHhZNXlKWWpGUUxrakJ1?=
- =?utf-8?B?d00wZm1xWG9vNytYNUFUZkVxRTJpR3dJNitKR2VVKy9kRHFlM2k2cFlYTGlW?=
- =?utf-8?B?NWJwZHFyYW8vZ3Q1eVVrMUZWc0FWSmE0VGtYekh5Y3c4RlJGTDBtbC9Xb0dS?=
- =?utf-8?B?WCtzNnV0TG1WUUVHWDNFRVF2eDZIcUpoUzgzdWgwRVE0NC9Bak93bDFoempU?=
- =?utf-8?B?Mmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca5007a4-778d-43ce-04b3-08dd0e2b65f5
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 15:02:51.6286
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G5OaiiyND3+IIorYpLrbcEnzWJNC4Ff6RX1UbFopCuUWr0lijOIb3rvFUMgCiko8aIFGMq94p6EWFF3soGTrXpJGuswHvViHuivO/8U0iNY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6424
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 11/15] io_uring/zcrx: implement zerocopy receive pp
+ memory provider
+To: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241029230521.2385749-1-dw@davidwei.uk>
+ <20241029230521.2385749-12-dw@davidwei.uk>
+ <CAHS8izNbNCAmecRDCL_rRjMU0Spnqo_BY5pyG1EhF2rZFx+y0A@mail.gmail.com>
+ <af9a249a-1577-40fd-b1ba-be3737e86b18@gmail.com>
+ <CAHS8izPEmbepTYsjjsxX_Dt-0Lz1HviuCyPM857-0q4GPdn4Rg@mail.gmail.com>
+ <9ed60db4-234c-4565-93d6-4dac6b4e4e15@davidwei.uk>
+ <CAHS8izND0V4LbTYrk2bZNkSuDDvm2gejAB07f=JYtCBKvSXROQ@mail.gmail.com>
+ <20241115151428.6f1e1aba@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20241115151428.6f1e1aba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Joshua Hay <joshua.a.hay@intel.com>
-Date: Mon, 25 Nov 2024 15:58:55 -0800
-
-> There is a race condition between exiting wb_on_itr and completion write
-> backs. For example, we are in wb_on_itr mode and a Tx completion is
-> generated by HW, ready to be written back, as we are re-enabling
-> interrupts:
+On 11/15/24 23:14, Jakub Kicinski wrote:
+> On Thu, 14 Nov 2024 12:56:14 -0800 Mina Almasry wrote:
+>> But I've been bringing this up a lot in the past (and offering
+>> alternatives that don't introduce this overloading) and I think this
+>> conversation has run its course. I'm unsure about this approach and
+>> this could use another pair of eyes. Jakub, sorry to bother you but
+>> you probably are the one that reviewed the whole net_iov stuff most
+>> closely. Any chance you would take a look and provide direction here?
+>> Maybe my concern is overblown...
 > 
-> 	HW                      SW
-> 	|                       |
-> 	|			| idpf_tx_splitq_clean_all
-> 	|                       | napi_complete_done
-> 	|			|
-> 	| tx_completion_wb 	| idpf_vport_intr_update_itr_ena_irq
+> Sorry I haven't read this code very closely (still!?) really hoping
+> for next version to come during the merge window when time is more
+> abundant :S
 > 
-> That tx_completion_wb happens before the vector is fully re-enabled.
-> Continuing with this example, it is a UDP stream and the
-> tx_completion_wb is the last one in the flow (there are no rx packets).
-> Because the HW generated the completion before the interrupt is fully
-> enabled, the HW will not fire the interrupt once the timer expires and
-> the write back will not happen. NAPI poll won't be called.  We have
-> indicated we're back in interrupt mode but nothing else will trigger the
-> interrupt. Therefore, the completion goes unprocessed, triggering a Tx
-> timeout.
-> 
-> To mitigate this, fire a SW triggered interrupt upon exiting wb_on_itr.
-> This interrupt will catch the rogue completion and avoid the timeout.
-> Add logic to set the appropriate bits in the vector's dyn_ctl register.
-> 
-> Fixes: 9c4a27da0ecc ("idpf: enable WB_ON_ITR")
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 30 ++++++++++++++-------
->  1 file changed, 20 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> index a8989dd98272..9558b90469c8 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> @@ -3604,21 +3604,32 @@ static void idpf_vport_intr_dis_irq_all(struct idpf_vport *vport)
->  /**
->   * idpf_vport_intr_buildreg_itr - Enable default interrupt generation settings
->   * @q_vector: pointer to q_vector
-> - * @type: itr index
-> - * @itr: itr value
->   */
-> -static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector,
-> -					const int type, u16 itr)
-> +static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector)
->  {
-> -	u32 itr_val;
-> +	u32 itr_val = q_vector->intr_reg.dyn_ctl_intena_m;
-> +	int type = IDPF_NO_ITR_UPDATE_IDX;
-> +	u16 itr = 0;
-> +
-> +	if (q_vector->wb_on_itr) {
-> +		/*
-> +		 * Trigger a software interrupt when exiting wb_on_itr, to make
-> +		 * sure we catch any pending write backs that might have been
-> +		 * missed due to interrupt state transition.
-> +		 */
-> +
+>  From scanning the quoted context I gather you're asking about using
+> the elevated ->pp_ref_count for user-owned pages? If yes - I also
+> find that part.. borderline incorrect. The page pool stats will show
+> these pages as allocated which normally means held by the driver or
+> the stack. Pages given to the user should effectively leave the pool.
 
-This empty newline is not needed I'd say.
+It can't just drop all net_iov refs here, otherwise the buffer might
+be returned back to page pool and reused while the user still reading
+the data. We can't even be smart in the release callback as it might
+never get there and be reallocated purely via alloc.cache. And either
+way, tunneling all buffers into ->release_netmem would be horrible
+for performance, and it'd probably even need a check in
+page_pool_recycle_in_cache().
 
-> +		itr_val |= q_vector->intr_reg.dyn_ctl_swint_trig_m |
-> +			   q_vector->intr_reg.dyn_ctl_sw_itridx_ena_m;
-> +		type = IDPF_SW_ITR_UPDATE_IDX;
-> +		itr = IDPF_ITR_20K;
-> +	}
->  
->  	itr &= IDPF_ITR_MASK;
->  	/* Don't clear PBA because that can cause lost interrupts that
->  	 * came in while we were cleaning/polling
->  	 */
-> -	itr_val = q_vector->intr_reg.dyn_ctl_intena_m |
-> -		  (type << q_vector->intr_reg.dyn_ctl_itridx_s) |
-> -		  (itr << (q_vector->intr_reg.dyn_ctl_intrvl_s - 1));
-> +	itr_val |= (type << q_vector->intr_reg.dyn_ctl_itridx_s) |
-> +		   (itr << (q_vector->intr_reg.dyn_ctl_intrvl_s - 1));
->  
->  	return itr_val;
->  }
-> @@ -3716,9 +3727,8 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
->  	/* net_dim() updates ITR out-of-band using a work item */
->  	idpf_net_dim(q_vector);
->  
-> +	intval = idpf_vport_intr_buildreg_itr(q_vector);
->  	q_vector->wb_on_itr = false;
-> -	intval = idpf_vport_intr_buildreg_itr(q_vector,
-> -					      IDPF_NO_ITR_UPDATE_IDX, 0);
+Fixing it for devmem TCP (which also holds a net_iov ref while it's
+given to user, so we're not unique here) sounds even harder as
+they're stashed in a socket xarray page pool knows nothing about,
+so it might need some extra counting on top?
 
-Is there a reason for changing the order of these two?
+This set has a problem with page_pool_alloc_frag*() helpers, so
+we'd either need to explicitly chip away some bits from ->pp_ref_count
+or move user counting out of net_iov and double the cost of one
+of the main sources of overhead, and then being very inventive
+optimising it in the future, but that won't solve the "should
+leave the pool" problem.
 
->  
->  	writel(intval, q_vector->intr_reg.dyn_ctl);
->  }
+If it's just stats printing, it should be quite easy to fix
+for the current set, ala some kind of "mask out bits responsible
+for user refs". And I don't immediately have an idea of how to
+address it for devmem TCP.
 
-Thanks,
-Olek
+Also note, that if sth happens with io_uring or such, those
+"user" refs are going to be dropped by the kernel off a page
+pool callback, so it's not about leaking buffers.
+
+> So I'm guessing this is some optimization.
+> Same for patch 8.
+
+This one will need some more explanation, otherwise it'd be a guess
+game. What is incorrect? The overall approach or some implementation
+aspect? It's also worth to note that it's a private queue, stopping
+the napi attached to it shouldn't interfere with other queues and
+users in the system, that's it assuming steering configured right.
+
+> But let me not get sucked into this before we wrap up the net-next PR..
+
+-- 
+Pavel Begunkov
 
