@@ -1,109 +1,127 @@
-Return-Path: <netdev+bounces-147441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D85A49D9840
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:20:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CF79D986F
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:22:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B44164796
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:20:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7303D1658A5
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EE51D4354;
-	Tue, 26 Nov 2024 13:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA5E1D515E;
+	Tue, 26 Nov 2024 13:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLdIGSG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECC41D2B22
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 13:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656F51D5151;
+	Tue, 26 Nov 2024 13:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732627200; cv=none; b=mdcV1H4y1xjYTTtd4n8bjF9t1P2Iy3yZxJPE6Y+iZwF9vWxuZyuixVuX96+hTrlTLwuh4EAX5hj92Do86f5CksrxW2JrQ34atCg4XZhnztvL6uuyx/8WY276wC4+7G+UqAf+beAaDHteRW2a0Er5AJIxQXFnOK2ZOXKEe0vc0t0=
+	t=1732627311; cv=none; b=PSCca/NNu/nlJJhE4bPxvIUzkDnT9T/667Ua/5OaCxObcfY1wooZfqqo6zJfZe6K7yMzFcXxTJxv5qwUbv9dMlO32/appI/fFTjiBA3gJd8Ln1OZ6JrmbujWmNpx0OoJ/tEZT/5POjM//NtBiD3dHN+Wv/ijOsBuXS21Kl8YU9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732627200; c=relaxed/simple;
-	bh=Bf+F3wkPUvI4YlFpmLDMpedy/e8itnPqS8SvRRUdhTw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NWkuvS1miVO28uLTOR/fFwO0s36PPOIbBxiMjUIiNskgDROZcD4nCpGckJ6h365cTwN/ABOpY6LMLHjKNa/q7MDwBYBW71qFVUr4N6Anu+m6mM3qfUxrZy3TDRmVoTigpfNsUqlc6XHw+xg9G1NcbxsoeQF0CjEY9dXNJ8l7juU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com; spf=pass smtp.mailfrom=kernelsoft.com; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernelsoft.com
-Received: from localhost.localdomain (unknown [183.69.133.42])
-	by mail (Coremail) with SMTP id AQAAfwAno91NykVnw842Ag--.64100S2;
-	Tue, 26 Nov 2024 21:17:02 +0800 (CST)
-From: tianyu2 <tianyu2@kernelsoft.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org
-Subject: [RFC] ipv4: remove useless arg
-Date: Tue, 26 Nov 2024 21:19:12 +0800
-Message-Id: <20241126131912.601391-1-tianyu2@kernelsoft.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1732627311; c=relaxed/simple;
+	bh=r7WixRalsMhPOVvhc77DI2Yr24fjHE72bC6gsIMtJyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L+09PEXdjjcuCthZVCzJ3CEcg+dVZyfUDEZSF3NG6Tp3iWl36BoOSRkW6lneJpfIH8dJeN7c0ulTbo2/rk3jhKytw89CU1rDPsUOC0uyBwYJLJjYTsUjfbd3y37DA+f71czUHJQoGos+wNxNDHwzcaocSsSh4j7ffcSnht7dd7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLdIGSG5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49B3FC4AF09;
+	Tue, 26 Nov 2024 13:21:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732627311;
+	bh=r7WixRalsMhPOVvhc77DI2Yr24fjHE72bC6gsIMtJyY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MLdIGSG5gufIjX6wy+iMi+jmUtoBFw6sFScNNNMe+IKmP0B75VZbJDsDkfvkwZROC
+	 iN5CedH370QQwomB5bvVsKGqiX6kXXx5b0DkbUfkv47Mqm0yeaoiiyn9q5GBu1kSLg
+	 INHAIZlt9uxB4EoD/kiM8h+C2i104eJCHcuxgD7aU/+whYP7r5ltYuFjVIg98H64yP
+	 D+LcNELTpebOUJ7NKvljwcK2hAAZoxS92GkeGDboazb+dXkWPWIMdt9I/zMchJjcKD
+	 FUlW3Tg0FuHANpD6EIe/yxRNdSy+6N+45w5Cwl9ZjG/+zsPgAushp9YhMPEI9/UhqU
+	 jDaxCWMPEuxYg==
+Date: Tue, 26 Nov 2024 15:21:45 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Ilia Lin <ilia.lin@kernel.org>, herbert@gondor.apana.org.au,
+	David Miller <davem@davemloft.net>, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
+Message-ID: <20241126132145.GA1245331@unreal>
+References: <20241124093531.3783434-1-ilia.lin@kernel.org>
+ <20241124120424.GE160612@unreal>
+ <CA+5LGR2n-jCyGbLy9X5wQoUT5OXPkAc3nOr9bURO6=9ObEZVnA@mail.gmail.com>
+ <20241125194340.GI160612@unreal>
+ <CA+5LGR0e677wm5zEx9yYZDtsCUL6etMoRB2yF9o5msqdVOWU8w@mail.gmail.com>
+ <20241126083513.GL160612@unreal>
+ <Z0XGMxSou3AZrB2f@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAfwAno91NykVnw842Ag--.64100S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF4ktw1kKw13Cr1fJF1rtFb_yoW8Xw4xpF
-	45Kan8ArykWr4UW34kKF97W34ayw1rG34ak3y8Aw13G34DJF4FgF1DKF4YyF1YkrWxKa13
-	XFyagw13Gw1kCFJanT9S1TB71UUUUUJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9vb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
-	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY
-	62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7V
-	CY1x0262k0Y48FwI0_Jr0_Gr1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY
-	6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkIecxEwVAFwVW5GwCF04k20xvY0x0EwIxGrwCFx2
-	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
-	6r106r1rMI8E67AF67kF1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
-	AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IY
-	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr
-	0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IUYeT5PUUUUU==
-X-CM-SenderInfo: xwld05zxs6yvxuqhz2xriwhudrp/
+In-Reply-To: <Z0XGMxSou3AZrB2f@gauss3.secunet.de>
 
-When I wanted to kprobe the ip_rcv_finish_core, I found that using x1 to
-pass "struct sk_buff *skb"."struct sock *sk" was not used in the
-function, causing the compiler to optimize away. This resulted in a
-hard to use kprobe. Why not delete him?
+On Tue, Nov 26, 2024 at 01:59:31PM +0100, Steffen Klassert wrote:
+> On Tue, Nov 26, 2024 at 10:35:13AM +0200, Leon Romanovsky wrote:
+> > On Tue, Nov 26, 2024 at 09:09:03AM +0200, Ilia Lin wrote:
+> > > On Mon, Nov 25, 2024 at 9:43 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > >
+> > > > On Mon, Nov 25, 2024 at 11:26:14AM +0200, Ilia Lin wrote:
+> > > > > On Sun, Nov 24, 2024 at 2:04 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > > > >
+> > > > > > On Sun, Nov 24, 2024 at 11:35:31AM +0200, Ilia Lin wrote:
+> > > > > > > In packet offload mode the raw packets will be sent to the NiC,
+> > > > > > > and will not return to the Network Stack. In event of crossing
+> > > > > > > the MTU size after the encapsulation, the NiC HW may not be
+> > > > > > > able to fragment the final packet.
+> > > > > >
+> > > > > > Yes, HW doesn't know how to handle these packets.
+> > > > > >
+> > > > > > > Adding mandatory pre-encapsulation fragmentation for both
+> > > > > > > IPv4 and IPv6, if tunnel mode with packet offload is configured
+> > > > > > > on the state.
+> > > > > >
+> > > > > > I was under impression is that xfrm_dev_offload_ok() is responsible to
+> > > > > > prevent fragmentation.
+> > > > > >
+> > > https://elixir.bootlin.com/linux/v6.12/source/net/xfrm/xfrm_device.c#L410
+> > > > >
+> > > > > With my change we can both support inner fragmentation or prevent it,
+> > > > > depending on the network device driver implementation.
+> > > >
+> > > > The thing is that fragmentation isn't desirable thing. Why didn't PMTU
+> > > > take into account headers so we can rely on existing code and do not add
+> > > > extra logic for packet offload?
+> > > 
+> > > I agree that PMTU is preferred option, but the packets may be routed from
+> > > a host behind the VPN, which is unaware that it transmits into an IPsec
+> > > tunnel,
+> > > and therefore will not count on the extra headers.
+> > 
+> > My basic web search shows that PMTU works correctly for IPsec tunnels too.
+> 
+> Yes, at least SW and crypto offload IPsec PMTU works correctly.
+> 
+> > 
+> > Steffen, do we need special case for packet offload here? My preference is
+> > to make sure that we will have as less possible special cases for packet
+> > offload.
+> 
+> Looks like the problem on packet offload is that packets
+> bigger than MTU size are dropped before the PMTU signaling
+> is handled.
 
-Signed-off-by: tianyu2 <tianyu2@kernelsoft.com>
----
- net/ipv4/ip_input.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+But PMTU should be less or equal to MTU, even before first packet was
+sent. Otherwise already first packet will be fragmented.
 
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index e7196ecffafc..2ff88c598988 100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -314,7 +314,7 @@ static bool ip_can_use_hint(const struct sk_buff *skb, const struct iphdr *iph,
- 
- int tcp_v4_early_demux(struct sk_buff *skb);
- int udp_v4_early_demux(struct sk_buff *skb);
--static int ip_rcv_finish_core(struct net *net, struct sock *sk,
-+static int ip_rcv_finish_core(struct net *net,
- 			      struct sk_buff *skb, struct net_device *dev,
- 			      const struct sk_buff *hint)
- {
-@@ -444,7 +444,7 @@ static int ip_rcv_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
- 	if (!skb)
- 		return NET_RX_SUCCESS;
- 
--	ret = ip_rcv_finish_core(net, sk, skb, dev, NULL);
-+	ret = ip_rcv_finish_core(net, skb, dev, NULL);
- 	if (ret != NET_RX_DROP)
- 		ret = dst_input(skb);
- 	return ret;
-@@ -610,7 +610,7 @@ static void ip_list_rcv_finish(struct net *net, struct sock *sk,
- 		skb = l3mdev_ip_rcv(skb);
- 		if (!skb)
- 			continue;
--		if (ip_rcv_finish_core(net, sk, skb, dev, hint) == NET_RX_DROP)
-+		if (ip_rcv_finish_core(net, skb, dev, hint) == NET_RX_DROP)
- 			continue;
- 
- 		dst = skb_dst(skb);
--- 
-2.27.0
+Thanks
 
 
