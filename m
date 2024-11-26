@@ -1,53 +1,60 @@
-Return-Path: <netdev+bounces-147319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFFB79D910C
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 05:36:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9D69D9111
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 05:37:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8698B220CA
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:35:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 411FB2887F4
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92C242AA2;
-	Tue, 26 Nov 2024 04:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C421869D31;
+	Tue, 26 Nov 2024 04:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jHJn18Vo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Llr9zKVW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513162260C
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 04:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF4D146D40
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 04:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732595756; cv=none; b=DvV9hTR4gBkhZCt3oanky9yp0y0FvD/AWTPtnB9eV1zgzi47ZvyySV04tQskLqYGAt46lyN9CcYwZ7wMRBEy1lkKAF6SMlWmKdUM/+q60OfcxFM4AJpxqcfcbkn5El0aB6KYYFsSmiSrtpzmULPWzE4UvwXElzo75xG6ahv4JZE=
+	t=1732595825; cv=none; b=RACiFd4fvGxz8uLfKzZgDklZ3ccOE0j6BT23zYR4/PDCoO4DkG8V1QMr32cjJAaRD8FyasmcM/ORjsvKSobXmxe6q3givrfpID9CyvcjZ8p3ru1evdhXc5E/2KRtCGv5Sm6ay+gmOrYg7KELFuikQFvzY98SvKWL2HZJF29+QJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732595756; c=relaxed/simple;
-	bh=w0a7laltbCAyWrZakTD+qFIXTZu9L6aTl3+FmyrA1bk=;
+	s=arc-20240116; t=1732595825; c=relaxed/simple;
+	bh=MHaXTcL6laKFSgSuGmmknXkQOI1R/5X3O/8X74W9TVE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sIKP/e9RkyQdyU1ThaqNgtkUDpEh7Xk/hBaqdUr1nH2tOKpu6wwdldyJiiG6FzN5TGlhGJYADHG+zqiYwUsOOzCQw2Y34eRzMfnHbPS92bYzV21bkfVneFRyGbvraPfF4hrJ1hG4HOAWhZvb/zY6i+M3y4qSa93GHKmBHDmaiSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jHJn18Vo; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 25 Nov 2024 23:35:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1732595751;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ms3SNLuCPwKxinj7AVS6hyjHOWnJA/mWxFozSkndvrM=;
-	b=jHJn18VoRHbL9w7mYtEEAdXUSzrjNQgRl3Yk1xdKTzxdA5p655W8e/zglWsmVv4CKrnmCW
-	pyhtw3lqAbo+FmbcgrocnyDPsK2ypJRfF6D4xeQTMUhssz7JntHDggfqUb9rvcM5vPLZAM
-	VCXrIzrNxDCPgqkvpKItseVNjYxYYTE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>, 
+	 Content-Type:Content-Disposition:In-Reply-To; b=RuH2LHwrENvrGpV74Ru08AfwlkAYgDjZEqFIuyvpAOHpppY5xEpQ/is6RBkQFKVP2aIKL14dswZMSyyhk6MZ1emYmEy9SQ7CMu9MLihCn1tFuwVYkewA4s4WQfZO582ZJmMbgsJi3kdQdBkIq6vsR7iujOKtMQeufOV3flSqSis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Llr9zKVW; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=3piqzS6+rOpwRYRTFm2skaWPpuxkLCSDxSbZ+I0U9i0=; b=Llr9zKVWv9VCFjHpO8P1WMJebW
+	5Gzw118HuC2lEZ1c4vtHeRcPlV4SHkOPXswQODNdZgeyUNsJst6gCbcRzSnkJbKg6cnaH9lZt/qMG
+	SbuFPIq4Bfks5nCVB5V+pqkowo/OqdWBw6cCnu1uA1c1Sj6wfbhEZciTG37lxellqizhc+ph+UD5x
+	+AVDhhkiBeyEE8/w7PdosffStrY3eFFnPAApqExK0Ij957kHPjJ2P9z1T8tt9sOTjWBNHy5u6YUwP
+	Eg4x1/2/OAumy6N2rw3NU8pCSJDDy/NTCHVZ60Ajt9xE69oE62EH/xHK3BSTAbMOcpugbAuVEBFTr
+	6h1EnNTg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tFnJm-001h4G-1v;
+	Tue, 26 Nov 2024 12:36:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 26 Nov 2024 12:36:54 +0800
+Date: Tue, 26 Nov 2024 12:36:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>,
 	netdev@vger.kernel.org
 Subject: Re: rhashtable issue - -EBUSY
-Message-ID: <bdnyshk47krppnfczkn3tgdfslylof3pxhxu7nt2xq4oawyio4@ktfab5bu7lis>
+Message-ID: <Z0VQZnLaYpjziend@gondor.apana.org.au>
 References: <>
  <Z0QQnLNJn1jhMErP@gondor.apana.org.au>
  <173257789029.1734440.16216135574521669815@noble.neil.brown.name>
@@ -57,6 +64,7 @@ References: <>
  <Z0U9IW12JklBfuBv@gondor.apana.org.au>
  <dhgvxsvugfqrowuypzwizy5psdfm4fy5xveq2fuepqfmhdlv5e@pj5kt4pmansq>
  <Z0VHwWe8x9RrhKGp@gondor.apana.org.au>
+ <bdnyshk47krppnfczkn3tgdfslylof3pxhxu7nt2xq4oawyio4@ktfab5bu7lis>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,24 +73,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z0VHwWe8x9RrhKGp@gondor.apana.org.au>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <bdnyshk47krppnfczkn3tgdfslylof3pxhxu7nt2xq4oawyio4@ktfab5bu7lis>
 
-On Tue, Nov 26, 2024 at 12:00:01PM +0800, Herbert Xu wrote:
-> On Mon, Nov 25, 2024 at 10:51:04PM -0500, Kent Overstreet wrote:
-> >
-> > I just meant having a knob that's called "insecure". Why not a knob
-> > that selects nonblocking vs. reliable?
-> 
-> Because it is *insecure*.  If a hostile actor gains the ability
-> to insert into your hash table, then by disabling this defence
-> you're giving them the ability to turn your hash table into a
-> linked list.
-> 
-> So as long as you acknowledge and are willing to undertake this
-> risk, I'm happy for you to do that.  But I'm not going to hide
-> this under the rug.
+On Mon, Nov 25, 2024 at 11:35:48PM -0500, Kent Overstreet wrote:
+>
+> That knob was. That's not what I'm suggesting. Can you go back and
+> re-read my, and Neal's, suggestion?
 
-That knob was. That's not what I'm suggesting. Can you go back and
-re-read my, and Neal's, suggestion?
+That's exactly what the knob used to do.  Let you add entries
+without any limit.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
