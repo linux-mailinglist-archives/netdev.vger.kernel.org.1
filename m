@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-147523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7119D9EE6
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 22:34:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC52D9D9EE8
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 22:34:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA31128156F
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:34:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C795281C04
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237C61DF25D;
-	Tue, 26 Nov 2024 21:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF58E1DFD9B;
+	Tue, 26 Nov 2024 21:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WrO6OLNC"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SR5uVoPx"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2065.outbound.protection.outlook.com [40.107.93.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C532500D5
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 21:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311021DF267
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 21:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732656850; cv=fail; b=aQEK88QY+aAmF+zqab7BNx7Fk1hxv7PycRzdxf14u7cZdRM2xaxe5gUNNZY/fKYXIKdu9MNWxxpBn2fsaOjb/Kfec7w7Cuyh2k5pAMTrJK7doIE2JfBV4a0MeV98853v+KBzcf7YwQAKNpAArNhQX6noGQcEULyo3ox2XfI1udk=
+	t=1732656851; cv=fail; b=PKoMQtKWMQRETAVIvzY8Pm++3CQEF+uBEPJCVxHHfqIeXxhv6CmQocwjJwgO2OC8ynpYOndh/4MCwixz/zpsSI5EM1Rgq2PipSpICtSxMdmQvuA5puTaZHay2F/lGsq6EabSNp2cgdwgpuxvO6ligz/hk6zRMdW2hDd2goOm+tM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732656850; c=relaxed/simple;
-	bh=rMkb8A92YwIcjx74OGBXnONIg6eOMUMdxgj7a7dV8FA=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=WnBgZKiCByBynq42QsyMs3NB0V47IWfmfCoIplLH4vLGMPNdYJ8iezP0F78jx9fEmfPD5XlyZJ53mONVUHeUAiSMTrxieFyItk5A10Zd/pVaYGW0mJ5/uXke+PRVsv1iGj7TRzeHc5FgbjzIZFQMDFv/18fq7AG8clXq7wBaBjo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WrO6OLNC; arc=fail smtp.client-ip=40.107.93.65
+	s=arc-20240116; t=1732656851; c=relaxed/simple;
+	bh=AydVqt31YL+3WF7wTRqq2Q5Yx1EL0avl1G3sdO4PFnU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SW4ShrfbkcyYB1az9I7QteYE1dL6slrxkHMKeo9WocrCcCPTZaD8NcCPN2Uhgw+OP1BjfocVi6SGtB9x89KHmXjU0q5DHnWtDrJ8cvJjj0u2TN5PJKacR5VWpMEIJlhO2nt7NyEfg2h6fZt3+0lHceBg6k/heURgKV/E9qHqR44=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SR5uVoPx; arc=fail smtp.client-ip=40.107.93.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZreJS8MJ3O6jLX299CGPTcL1WY1iE54YFET0IwubMl1WRMKHerNHxzfHSBdK1b7dZ2RiKRoEzQDt3tZp4F6j5WUWTlots7vsUefr0fAmJOMve2td9VJ82MzFLgkofAUoWovqVjMX5PQA7qOiOEUYlZsWq9ic/xpvDOzgcGbgHLg/v+mTT+akAts3laBWPxUsgNoLsRCcnOG+WYfvXyIFfS28YC7nD5MrcqNyFVP6eqDkRm6A0OD2n+jN2IWuImjbzAvky/qk31vw/VU6eFbbFDmjwx55LqucHP5I0aNxE1NAyMqwtwiXP3MHYsW8clZOGHFtYqHV3vSCPgkhUjxe9g==
+ b=Z7NmpogbZAj9YgXrUlR9GPvc61JgGnoQ15vLKdjJww4ds35LYxrbQD8IPJ5WVZ9oONWyl9oNnecAaxxpqHq86SLckmgB8UV1kiXF+E+cVUHxEgDsoBKl08opB6bKdj9pDicZXA1fZE7cewteMqTgyjahHgYyVxhAaP70ox9NR3Hb1WQYd95mGwLYLVLxXlKDCjO/V2KIdCSHQ3oOmyg9TQD4yP766FTcRH4NllonqazB6KKRD4XewOf8TSN88z/fjTx1koKVIytEo07QWCFBIeHTenIzV5FOba5cpg+ltdSW6TWDnb2IfK1fdiwfJ3UkqaddCQLH19Q2xanTWahPxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=86zlaxWsjJ3Hyj9RxwZIck7GO30S0cbt1N2ZnLRKPSw=;
- b=Rhq3R9yv56Ai0gh5y7kzNM1te5PtdcGv3MnSbuQmNEDrAUWFTxmOnVmxV0hd7KroQmagi8THcS+NzqaPQ9CChfNvM3Ry9mzA4GW/+u5z/CwRcerfjDmvr42wJw6emMH5NZBw1o1Hlw96B8bEWslhbjS9kyI4LsiAnTFAcGELA7GJOsRqp8UZ7VbqAwRcZA2SiC8tPJlGPX8OnPoUFtd90z9k5JpfcTB6GXgVSF9bq6ZsM7Jn7SbPly+zP8WmtbR5W78bhuGM0KdfCO0xlVtYG1jBie1vRQvh1Chnj2nCUnovAxvpVK6mQhzOh6OrFfl5LfuO0W3BRAFslkpbDvmJ6Q==
+ bh=tzOdvIkGpy0khqZE3gI2ud5rFjUNbRKpyZ33LUy3yuY=;
+ b=b8k85kSj5cvcjjXnRekQ9oLcKOdzzbOhj6ZiSj02mNHwzKjIDCEXuGb+L13vNn7GxfLxkDRDOaOapqLQJjp50wyMW2dOWPjpGAAp4u+h/2M0ecQj/x/G3w3FvnIzrX08V0q0xY4ov2lit8oJbgTVv7W+p/sliYMDdNjm7F2/c3BMAGkHiUDnVNnUBCqo6Y4jn5p7o+j7WRnxmKwrvswpw1u7DYigqcQFaocE01AVASh0+IrJMWZd5R8qU2/YfHljCEK+eum7TwQqmLmGyQmk6FIDALitZlNuuBkA+w8idYn/e9JPIYxdC5Bui1T6p75daDmFwC397jzsaBPCCACN5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=86zlaxWsjJ3Hyj9RxwZIck7GO30S0cbt1N2ZnLRKPSw=;
- b=WrO6OLNCqzUFIMsPZOnlpAPHTVewU6Zf53DMUNkPXqIdEZm9xZGQf7FrxPxSlpDafeatcz5QqHSuBktI4GhhijRLzItoFQ8TaTQQEH2o3wKCEzhguALMu7uMl86NwZ2HlXBhllEpq6AFTrVqBkAddNBvx7QZ8UmHPbDxMsT55b3lXMRbpCL/7yxsN1s8LurKPleNduX6yrIBnavnnRFfJFoEndiz3PGP0Sp9cOD/sDOSyiLrOtIYLnGhoztuy2s9vW3KOglt7xJnE1KctQXn3JdmM9LcCwfqsNHF50WPUpDhJWDwf8lPrrzwDuX5KB5XqP6PBUucCQkW2PSksIuwFA==
+ bh=tzOdvIkGpy0khqZE3gI2ud5rFjUNbRKpyZ33LUy3yuY=;
+ b=SR5uVoPxjcjm7YTBpYmpcT9RkX5bL5uSUII8RAp1nIoGLeLA/+j9ik6uI0hwCYbFT7QeOH7asSAV/+KQXXvn3UXwY41x3KMB4UMkoaJZ7Euk1WOAP/dTYvtd+W89kdYqDPL9n+hs/n/SaytUoHh++oJZKfHVX+3RPs7gdG1G0NE4Rif7X+VFswb2WR0kr7I2Hl/625ybrFr46gLS1TvSsgnMQqjthJRJCMbfUrM1TGzgzImWWeeIMP8B5F/bBx+pViRW1w5Y67hiO6JvNGE8Hcfs4cv1dt1r343Mk5dwuTLE5m1Rr4ZawYL6paUbm9w60VG4WOoIxzEA47cdlf5yZg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from CH2PR12MB4858.namprd12.prod.outlook.com (2603:10b6:610:67::7)
  by PH8PR12MB7447.namprd12.prod.outlook.com (2603:10b6:510:215::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.20; Tue, 26 Nov
- 2024 21:34:04 +0000
+ 2024 21:34:05 +0000
 Received: from CH2PR12MB4858.namprd12.prod.outlook.com
  ([fe80::615:9477:2990:face]) by CH2PR12MB4858.namprd12.prod.outlook.com
  ([fe80::615:9477:2990:face%6]) with mapi id 15.20.8182.019; Tue, 26 Nov 2024
- 21:34:03 +0000
+ 21:34:05 +0000
 From: Yong Wang <yongwang@nvidia.com>
 To: razor@blackwall.org,
 	roopa@nvidia.com,
@@ -64,14 +65,17 @@ To: razor@blackwall.org,
 Cc: aroulin@nvidia.com,
 	idosch@nvidia.com,
 	ndhar@nvidia.com
-Subject: [RFC net-next 0/2] bridge: multicast: per vlan query improvement when port or vlan state changes
-Date: Tue, 26 Nov 2024 13:33:59 -0800
-Message-Id: <20241126213401.3211801-1-yongwang@nvidia.com>
+Subject: [RFC net-next 1/2] net: bridge: multicast: re-implement port multicast enable/disable functions
+Date: Tue, 26 Nov 2024 13:34:00 -0800
+Message-Id: <20241126213401.3211801-2-yongwang@nvidia.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241126213401.3211801-1-yongwang@nvidia.com>
+References: <20241126213401.3211801-1-yongwang@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BYAPR01CA0038.prod.exchangelabs.com (2603:10b6:a03:94::15)
- To CH2PR12MB4858.namprd12.prod.outlook.com (2603:10b6:610:67::7)
+X-ClientProxiedBy: SJ0PR03CA0390.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::35) To CH2PR12MB4858.namprd12.prod.outlook.com
+ (2603:10b6:610:67::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,117 +84,198 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH2PR12MB4858:EE_|PH8PR12MB7447:EE_
-X-MS-Office365-Filtering-Correlation-Id: 33191158-1129-42f2-0c83-08dd0e620c5d
+X-MS-Office365-Filtering-Correlation-Id: cb9f534e-5cee-4d94-046c-08dd0e620d2f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?NAJyVW9IP095IhCMUQ5BgaxN9FUYXNJr1qsknbBc9QWb8Bu8SUOWGrrKgE+T?=
- =?us-ascii?Q?NsW102XTl4W6QGCZCSZDIqesTIpISQpVEXwF3usdfCYS0P1GVwmrojs0yZUV?=
- =?us-ascii?Q?+TJWII0HrbmP3Bb65ZrPV+CMYcQ3667mrWFHT2bqrCZsCKCmr/cg69RMU/nc?=
- =?us-ascii?Q?qvoG6uqqHg6xtvnXnOrIGSlSmCg7CMlgTS+HnLz2BcfkJFPGE87sHnUNCS0n?=
- =?us-ascii?Q?sjl1aUSGoWEhJR5+G1y1EatqB9+Qe6CvC6lqfUXf5bSXmntZaM9DVhSIsz3r?=
- =?us-ascii?Q?zwL3am55F33LpuUO5HVCLTuXAlq6gKpSVlsk8+z9QJ+lfERwZNTV4gDCwGuK?=
- =?us-ascii?Q?iOV/oKdcDdc1eurS62J4MtohybpqPgRhh8E30kOkz4EesId2myt4yLraspY6?=
- =?us-ascii?Q?TAf5sdK79DYQJzw9aJ8iw6wwbqVADVGmpB36tNNODLaGnS/YYa5gE/E+SURm?=
- =?us-ascii?Q?mnAlZ++hGQS0VCAD6GACC0MMV8muON6XdzsVrJcQcRo1J25nsGzlf/jVgEV0?=
- =?us-ascii?Q?Cu3XIeWtfMwJG1zZg9BOgYs2wfO+4nM6svVM6D+vxC7bdX2wEXbaq9HRjhOV?=
- =?us-ascii?Q?sr0e1uYgJwC7Df4TqGa01NrWH+LsmioQia0vqK6uOmWf8zQgJa+sQA3YR2M5?=
- =?us-ascii?Q?mAxHZkmzgQWwl8L5SMPHF/r45hPR/qpGczK644RMNyAYM0uYT2fxwoWU/VtB?=
- =?us-ascii?Q?ezIzv0+Mw3nf0mQnmWggv8Eo8Ey0xuRIjjMk9uE26lUgeEIfGmxqD73lLWQh?=
- =?us-ascii?Q?TBBfNh4rcQHx9qXVjzFC1QoPyjrMr0nQ9MFiAzw0QhuOz2dlBfzdsAKL8YzM?=
- =?us-ascii?Q?Zp5CktLk7Oh3+XytNsOfHWs40ojTAv6WQjFUsNFF8AwO1wQHwQZIE84Oq2WV?=
- =?us-ascii?Q?PDHCZd16hMXwgzei6ZxwfjIvfbLGB9FbrXY9JaKTH1QEydlP/PoBD8narLS4?=
- =?us-ascii?Q?dPyTXqog4iq0oFmuC+3wxoyOvF/9AUjrr3LmbEVm0WCqbsZSVUgApA5Kl8S3?=
- =?us-ascii?Q?TmBnjifXZ+ZdeykJgR5FD6ERle5uz/2Z/CTvRn1Pk9W6L5hRbvqnU8X/U9fD?=
- =?us-ascii?Q?RrUrmxKPx53ONEZEh8pOIB77VY7YhYSqgt9ugah3VmZY1FmNCrJ541hPAGor?=
- =?us-ascii?Q?hnXmGHMXm6pG/HJOpBdGluaK0uGkQz4JJs/8tssT8IFPsMRTTzDWfq1XXDLU?=
- =?us-ascii?Q?HF2XceLpreKCw/2sjXeTlKofLNBLVvyuo0qkrz2SpqBOfu3gCTDwm1TW5BpV?=
- =?us-ascii?Q?TzrM34t4nvzBTMU4O9RSjkwb9VfTjHUqMcdm4VTL8mw3LHhP/C8GfqG1R6Tt?=
- =?us-ascii?Q?8ZKFRCTkLEiIbqTsfKD57Zw91JaXDGu3VX7mW0WQJ6RYMw=3D=3D?=
+	=?us-ascii?Q?CDqvr5iUaB77xb2OH1vQk+8TDE7HHSKKpPg2f+5zPXQz71lfBndt9gXOcS9v?=
+ =?us-ascii?Q?8sfo3hqrTJsTyKLbleuzpw+4S4eImw24pKQhmFr2dKDqV0EMKKjJZI2pi/7K?=
+ =?us-ascii?Q?zGB9LHRQ1z2hzyFJO7XJgwYWOn/O/x2NV+89FNE3L7qdbFZ+cqgKnMdeTYhU?=
+ =?us-ascii?Q?k/g+ERe+Ll3/BgpU4rJGpJshwb4VrIXiLzz8FutdPLHDLTkFj/Le1gkFcgnV?=
+ =?us-ascii?Q?7ZZrHdRG/RO/I66bO1haoJruf0noO3V7HrY1YJWHhEzaEyq+xbuUuPQEzyuC?=
+ =?us-ascii?Q?tMOgxdSlEqrzWPDkThTGrl9TcwmYJu5V0nhYSnIQCJZa6RfX9q8EbkVibP3G?=
+ =?us-ascii?Q?o/IdlIWI8EmArE1rWp+cDM9NRxY28mJc9oAXzEZjwDmlJeOvDpsp1ACsxedI?=
+ =?us-ascii?Q?R3+gYx3OHL4oEJq7HsuICI3/SGzscT9ZnF+fandg6/tC6cOuBTSDIgP+wqrl?=
+ =?us-ascii?Q?GfKu6mS1BBePx7fLR6xg3CQPaDMMIZb7d8tKChhk8CCBwuu2TuQnEIGyeNhG?=
+ =?us-ascii?Q?A5YD2xl7ewIsLHcQDI7oktBcPahHdCjq2odExTNsoiF9c/mkE+Vudx5B8Mr9?=
+ =?us-ascii?Q?A3Uvb/v1IWH/hA0U1CIRMPqThFdd2kEJ9QPgd1uoj+4G59MZsXxgZEEGM4hb?=
+ =?us-ascii?Q?XlrPSWb8Mxlu9aewsFpXA3CkAy9GbDVF/dAM/CE6paCpOcBpZyFDhDB64g3u?=
+ =?us-ascii?Q?kjsi5h00azeNep/Bye6ccJzyBBUYEW3yySWD1TV4XD2UkUArvj5GTm7xaODP?=
+ =?us-ascii?Q?N+AOY8wC5zS45IAXZYjkqied09uQatCxfBEl/W5xT26A0zkyc8HpZsdytK0r?=
+ =?us-ascii?Q?O1HSMw2+zxe5Fb6zfUZnmQSKAiNSIHf4v4GN+5MRK58kwkr2JDVxaypMxxB6?=
+ =?us-ascii?Q?XCP2wjjKuqvyKJUTSM5AO18ocIbHi7/yHE7GyDxReMOzDYlmRzvFZRG2/gb6?=
+ =?us-ascii?Q?PglKMnB0Fdjk4dcNU7ce7GW1ARe2ZEKzEAI+d8ReG6rMF9kFVS/SWmWXSFTh?=
+ =?us-ascii?Q?4PG3UfDlVoR7evUA87do6qhAa73e7fwRPPra3gYiDk7VWnY27R3NCsMPZGIb?=
+ =?us-ascii?Q?+ha6irK4Un+d7MBxxjgpU5PagQ7VL15Hymqnaeo1Fg1WZV0FEsms59VTn4M7?=
+ =?us-ascii?Q?sVhWZFeLp2pi0TeDX8bukdvXvINc13pQSfR+DLIfeoyNEWOliSUw9uregsdK?=
+ =?us-ascii?Q?Dbnd5ppmOJcNSJOJdSJvxWkaOeO7l71Dd7ItLVP2YvSNlXCFPYhsr9D1Y8CG?=
+ =?us-ascii?Q?WrYoLCTNMoOWHyWXG3etOeqENfd8f3r7+l9w06pSvDQLDLnZBhGK+nYRrkFY?=
+ =?us-ascii?Q?14ZSA/ENZGV0x28CR4K6ANAgeIuLoRpLnoqYu9CBXoSS7g=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4858.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EYg4DUj6Fw1QZWUE5fDZuFiGgneXe/38L6IGjMwGDhA+ekOcsVEYOQqGiLn0?=
- =?us-ascii?Q?E006NTejzrKpJH1l6vDPulan/aN5Fg6jf+bY7JpugDH/u0RZC/IDXRI5/9mu?=
- =?us-ascii?Q?hxMNj++Nibcz3WNQcqHrOFubT+YySXLbBQehv5vBhInQ70numFY5mNoZe3jw?=
- =?us-ascii?Q?o3PSrVnd0XWiq3zRUPmkZaggAPleMbdDc7Cq2GULCuVa4c9ZYLIlSMju2rJG?=
- =?us-ascii?Q?OjkMAMwucjDjuaJb1jDGHpS9iAIvIbVDqhTMNVj6r0xdI1I8I1R2kn9jOLx+?=
- =?us-ascii?Q?rV2bYUwlDy+ExjMwQr338ASG6F0hIDSnrX0180nBk7BB056lWe/XCCj+A1lQ?=
- =?us-ascii?Q?TlUw43CjOIpQ7BO+t51VG70CuiEPEWycalcJ13w3s/OwWAcR4ZgSchLFeiW+?=
- =?us-ascii?Q?MxlM+x3zJ0WIU0lYPrrSZqIbpkP5PhIbYC7748uAMebcnr0RKeBK0DEQ/KBa?=
- =?us-ascii?Q?ynjh68N0Yw57QFnXLbNp1Pne/B2z53TnMnf0ntWr6yJ/zDaj3LEw6tIu0kNQ?=
- =?us-ascii?Q?bcivczw/DrmJASiRUevIAFBhqEv56dbl+7l1+2rG1fHonFoeBBjnobfYtw/G?=
- =?us-ascii?Q?q7qj+8dqd5uYODE2QcwLukfcO/DbP3ICT64mFL0PG1KkKnSss0h38EAOOpS1?=
- =?us-ascii?Q?LaibeoKlFMH29D25dSw0OAnYRzbYfr8dCCEtRexsHej4Xux2dHPHwo0R2fls?=
- =?us-ascii?Q?xbX5ItZL0GZQZ1IyHPMy6K2p4YxYtVVi7tPPw1fQ489GZtInOX5PiXQbgYBy?=
- =?us-ascii?Q?HYz+ZZCma4Xdt5UhmeQMSwccr2ArT33BNfKI4F39SBNn6phkKKiaCmZl/nLK?=
- =?us-ascii?Q?s3ibfm7nkoAprwxrMxE/JwmukZXGCF/BIM9buPPEu8gXcVOLD5dZG7zOhtms?=
- =?us-ascii?Q?WdcVd3tYB1Bm3ptws+hn3TVZnnMmt657oFywFyYtmOLr/RL/BnHkEvujLY8u?=
- =?us-ascii?Q?ZzJy/DbDzRRXzcaF1RQwCIdVWUPtBIqM02HAUN+6iFvv2mTOhj/k84Sr6Oao?=
- =?us-ascii?Q?09J76vUsBgglZ7/vKUM2C+8XmNXttO7pwqOas0c9fENLPqU8fE3C29LAUolF?=
- =?us-ascii?Q?zEzBOJKji+89J86ukP3b4wkjaFxo6VtWsJksxEP1OZ4kE91ZYziRrBL7PveT?=
- =?us-ascii?Q?PYFkqTKZuVMkKCTMIw4MfpoFGFdH0ICfungxD5gfbhM6nYBjTMJ5XSb12Mcf?=
- =?us-ascii?Q?9CAINRRML7BX4VP0z7+yAr2fiJR0bQ2aWlUlAtO8thXy+zczTAuLl0AGl5Iz?=
- =?us-ascii?Q?FwK0L4UgT0SHPCSQLxzFLFb4aNDMUG5zh313UaFfRo/9ywYsesXeP+b13hiF?=
- =?us-ascii?Q?a7oc4iDOZDSPXbuXIGlHrFYYnW0g2Jd8TGEfacunt3/TY8l1anrgMpIbxz1v?=
- =?us-ascii?Q?2A1uJFQpLnKnYZVEqmK7oEEOJbZT0AEJd+ud7v/nvz9vbHXSZH6pdVJHSMbn?=
- =?us-ascii?Q?dZGDQq50yrJK6vQ7OqivnEs6/EyKGi+Utqm3yZAiY4eKxuZKj6OAlNY7GwnS?=
- =?us-ascii?Q?lhlDGqKwfZakE6vRE8zCuKlB+MreBy24UfXojRDA63bNk3WeY6fdU2UgNEBv?=
- =?us-ascii?Q?JDOzUNzSfbeR7jyH1yjsGKmA/mz3uMvd2jJdnY9N?=
+	=?us-ascii?Q?EF/sDiBFXtGnoKd88lyRmoDb3u16PFQ+NaMaPQmHZrMZP2S06JrGiDz3cym7?=
+ =?us-ascii?Q?7XTzzbd4zdVMMjyqbV4XQ3KfS4gPpw3Q6xD4Kx18gQCwJXOA10EdVplJzipD?=
+ =?us-ascii?Q?cSO+cI4+us+xAtBIrV+NASlsdQUV/+4KNx7ohKopgqNf6NR+g6z5i0hwBgE+?=
+ =?us-ascii?Q?4L7ecxtPCTorZP43FBChiSv8aTa2IjRJhCCJSvgoj3jYrGV5HRW6UtGLZkLn?=
+ =?us-ascii?Q?Ct7EQMzOJreQPzaIzKdp2PzzK/eTuyXlrsGozvW1MH//lIRt+lcX5Pto8Vdn?=
+ =?us-ascii?Q?zLtBVAHMchA3R4dMVlqHGKpiA9v6qXPg7b+SP0Pt7ql8meify8hFQ+mYTTIy?=
+ =?us-ascii?Q?PKQJzIiPwBVI5s0E2PjaowFkyui2aIj9k5GaiFZKJyPoNrXGkiCSX1aQqxkz?=
+ =?us-ascii?Q?BfSbykFoFTMwG2SNLLQmwqkD00etneaHFiHwZFEQtnh8ZDnPDsrSa1q0r7Gk?=
+ =?us-ascii?Q?DR63M3NfaEPzGWz50J8pzluYqwNmCSXBX+SogTvpSOEaKWR5KrYrzEJgnUeu?=
+ =?us-ascii?Q?iqA+/3lyrtPcwZYddWDg2i9uoC/GBgqKDQPMU5MXNSQlLD758dJwnkgSLYSh?=
+ =?us-ascii?Q?4kAoeq9yFRtVGb0KSOPQHND+BjKsHtA1gTH+mhQNy6VKncS5LlMOGlw+eSLL?=
+ =?us-ascii?Q?JvQKLr881Eb5T2VLvGdOcfzXcQU544uz4R8h4jgj1fnuj8kjwClK4vrzZopP?=
+ =?us-ascii?Q?hBV5bH9zj174aAAUnFv74qfqe1GFFOd4WzBz8UKskbbu8w2VxgZ47nlpOoxj?=
+ =?us-ascii?Q?UFU1Zlmm+H3GjtlpRHKSjTsPc7YXMXhTTwzY8/IGnvsd56sNn92Z+8XfEc1v?=
+ =?us-ascii?Q?n/0DfPDdNTAhVDJFU5NJzlpeNvllivVd+F6tklxHL/dyVfMmZusKsOL4Jqh8?=
+ =?us-ascii?Q?Gp4Qu2jw+1q83hVzfJkQEDnhRvubElq5vBycW09x/eAnZ9a41lcmo/vJFxw3?=
+ =?us-ascii?Q?i1fpp0yso5sFJetQWJ5KA7mQhsCGbi/ZkHZa4f5ylfXbNDIY7hY9ONolo4cS?=
+ =?us-ascii?Q?uSesAKah6sqTCwD1HfaeRyVTi/ARHnRJjHZd7RNItWSFe0po9CDkgWSAACsE?=
+ =?us-ascii?Q?blOVurdQfkcEvEdOuvD11g1LCQEZRM53WHeoRSvYn31y+aXHISQW5tJ63kfY?=
+ =?us-ascii?Q?+kKOaBFDcTd6UgKMA5lX7qfXyu1H/iQPthwqyuOYG/Mikg+mYZvmk244gTWV?=
+ =?us-ascii?Q?FiHTTVJ+fcvsZh0XZvAHK+vdjvQuFy/51AKKo2ujeoN5UNNDxlD2vmjRgy4/?=
+ =?us-ascii?Q?S5L1ed2rQkaJQNXc76gd/4sZQ0idpT73PcNYHw3sD8cFNJYI0e4P5wgikIUQ?=
+ =?us-ascii?Q?S2CZAJd+QdVZAmacGVQYEZra76Ymevc3v37AFXLeZudUqSw2rzkzqzOHJYrw?=
+ =?us-ascii?Q?nTlOYN4Wa71V8UqpUVhXBuTfoSLyXBg0rPyLu+bpbTZKG+s5IzcvKIKWfj91?=
+ =?us-ascii?Q?4D/PW+nHHVsE6PmtZQ61a4ki6+Tr87DrGlnSnYZOJeZVjrUfJp4ovE4abRYy?=
+ =?us-ascii?Q?Xgoa1cd1Gpeg5WnL3myAm9hGDJHme/zNtN7sKvEk+5JMU+6sZur4dgHTo6Bf?=
+ =?us-ascii?Q?hiU2SqhhPOWm87hYJHdnzv9Ry9DNPpQVeyrfavzq?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33191158-1129-42f2-0c83-08dd0e620c5d
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb9f534e-5cee-4d94-046c-08dd0e620d2f
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4858.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 21:34:03.5226
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 21:34:04.9132
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Yb+Vr3qWM/LHKvDYd5JlOHw9QSJFqIWbDtYQM9tnovf0Utel0ZkmZ9It1d1YlD+FE/dwLzu+a/lNZYDY5PVIg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: xaBy7CyX3mrl64c8t3fp1ULl9GSX3ubex5mwEEKYySRJ5MHX1jyXLOB3TK2ahouL6tKS8pgqKmR24IqPiFSaeg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7447
 
-The current implementation of br_multicast_enable_port() only operates on
-port's multicast context, which doesn't take into account in case of vlan
-snooping, one downside is the port's igmp query timer will NOT resume when
-port state gets changed from BR_STATE_BLOCKING to BR_STATE_FORWARDING etc.
+Re-implement br_multicast_enable_port() / br_multicast_disable_port() to
+support per vlan multicast context enabling/disabling for bridge ports.
+The port state could be changed by STP, that impacts multicast behaviors
+like igmp query. The corresponding context should be used for per port
+context or per vlan context accordingly.
 
-Such code flow will briefly look like:
-1.vlan snooping 
-  --> br_multicast_port_query_expired with per vlan port_mcast_ctx
-  --> port in BR_STATE_BLOCKING state --> then one-shot timer discontinued
+Signed-off-by: Yong Wang <yongwang@nvidia.com>
+Reviewed-by: Andy Roulin <aroulin@nvidia.com>
+---
+ net/bridge/br_multicast.c | 75 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 67 insertions(+), 8 deletions(-)
 
-The port state could be changed by STP daemon or kernel STP, taking mstpd
-as example:
-
-2.mstpd --> netlink_sendmsg --> br_setlink --> br_set_port_state with non 
-  blocking states, i.e. BR_STATE_LEARNING or BR_STATE_FORWARDING
-  --> br_port_state_selection --> br_multicast_enable_port
-  --> enable multicast with port's multicast_ctx
-
-Here for per vlan query, the port_mcast_ctx of each vlan should be used
-instead of port's multicast_ctx. The first patch corrects such behavior.
-
-Similarly, vlan state could also impacts multicast behavior, the 2nd patch
-adds function to update the corresponding multicast context when vlan state
-changes.
-
-
-Yong Wang (2):
-  net: bridge: multicast: re-implement port multicast enable/disable
-    functions
-  net: bridge: multicast: update multicast contex when vlan state gets
-    changed
-
- net/bridge/br_mst.c          |  5 +-
- net/bridge/br_multicast.c    | 93 ++++++++++++++++++++++++++++++++----
- net/bridge/br_private.h      | 11 +++++
- net/bridge/br_vlan_options.c |  2 +
- 4 files changed, 101 insertions(+), 10 deletions(-)
-
-
-base-commit: d7ef9eeef0723cc47601923c508ecbebd864f0c0
+diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+index b2ae0d2434d2..8b23b0dc6129 100644
+--- a/net/bridge/br_multicast.c
++++ b/net/bridge/br_multicast.c
+@@ -2105,15 +2105,45 @@ static void __br_multicast_enable_port_ctx(struct net_bridge_mcast_port *pmctx)
+ 	}
+ }
+ 
+-void br_multicast_enable_port(struct net_bridge_port *port)
++static void br_multicast_enable_port_ctx(struct net_bridge_mcast_port *pmctx)
+ {
+-	struct net_bridge *br = port->br;
++	struct net_bridge *br = pmctx->port->br;
+ 
+ 	spin_lock_bh(&br->multicast_lock);
+-	__br_multicast_enable_port_ctx(&port->multicast_ctx);
++	__br_multicast_enable_port_ctx(pmctx);
+ 	spin_unlock_bh(&br->multicast_lock);
+ }
+ 
++void br_multicast_enable_port(struct net_bridge_port *port)
++{
++	struct net_bridge *br = port->br;
++
++	if (br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED)) {
++		struct net_bridge_vlan_group *vg;
++		struct net_bridge_vlan *vlan;
++
++		rcu_read_lock();
++		vg = nbp_vlan_group_rcu(port);
++		if (!vg) {
++			rcu_read_unlock();
++			return;
++		}
++
++		/* iterate each vlan of the port, enable port_mcast_ctx per vlan
++		 * when vlan is in allowed states.
++		 */
++		list_for_each_entry_rcu(vlan, &vg->vlan_list, vlist) {
++			if ((vlan->priv_flags & BR_VLFLAG_MCAST_ENABLED) &&
++			    br_vlan_state_allowed(br_vlan_get_state(vlan), true))
++				br_multicast_enable_port_ctx(&vlan->port_mcast_ctx);
++		}
++		rcu_read_unlock();
++	} else {
++		/* use the port's multicast context when vlan snooping is disabled */
++		br_multicast_enable_port_ctx(&port->multicast_ctx);
++	}
++}
++
+ static void __br_multicast_disable_port_ctx(struct net_bridge_mcast_port *pmctx)
+ {
+ 	struct net_bridge_port_group *pg;
+@@ -2137,11 +2167,40 @@ static void __br_multicast_disable_port_ctx(struct net_bridge_mcast_port *pmctx)
+ 	br_multicast_rport_del_notify(pmctx, del);
+ }
+ 
++static void br_multicast_disable_port_ctx(struct net_bridge_mcast_port *pmctx)
++{
++	struct net_bridge *br = pmctx->port->br;
++
++	spin_lock_bh(&br->multicast_lock);
++	__br_multicast_disable_port_ctx(pmctx);
++	spin_unlock_bh(&br->multicast_lock);
++}
++
+ void br_multicast_disable_port(struct net_bridge_port *port)
+ {
+-	spin_lock_bh(&port->br->multicast_lock);
+-	__br_multicast_disable_port_ctx(&port->multicast_ctx);
+-	spin_unlock_bh(&port->br->multicast_lock);
++	struct net_bridge *br = port->br;
++
++	if (br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED)) {
++		struct net_bridge_vlan_group *vg;
++		struct net_bridge_vlan *vlan;
++
++		rcu_read_lock();
++		vg = nbp_vlan_group_rcu(port);
++		if (!vg) {
++			rcu_read_unlock();
++			return;
++		}
++
++		/* iterate each vlan of the port, disable port_mcast_ctx per vlan */
++		list_for_each_entry(vlan, &vg->vlan_list, vlist) {
++			if (vlan->priv_flags & BR_VLFLAG_MCAST_ENABLED)
++				br_multicast_disable_port_ctx(&vlan->port_mcast_ctx);
++		}
++		rcu_read_unlock();
++	} else {
++		/* use the port's multicast context when vlan snooping is disabled */
++		br_multicast_disable_port_ctx(&port->multicast_ctx);
++	}
+ }
+ 
+ static int __grp_src_delete_marked(struct net_bridge_port_group *pg)
+@@ -4304,9 +4363,9 @@ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
+ 		__br_multicast_open(&br->multicast_ctx);
+ 	list_for_each_entry(p, &br->port_list, list) {
+ 		if (on)
+-			br_multicast_disable_port(p);
++			br_multicast_disable_port_ctx(&p->multicast_ctx);
+ 		else
+-			br_multicast_enable_port(p);
++			br_multicast_enable_port_ctx(&p->multicast_ctx);
+ 	}
+ 
+ 	list_for_each_entry(vlan, &vg->vlan_list, vlist)
 -- 
 2.39.5
 
