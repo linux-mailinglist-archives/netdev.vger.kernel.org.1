@@ -1,148 +1,100 @@
-Return-Path: <netdev+bounces-147349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0059D93BF
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7329D93BC
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F628B274F5
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:00:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC9A8B275BE
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34771B6CFB;
-	Tue, 26 Nov 2024 09:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66A41B4142;
+	Tue, 26 Nov 2024 09:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B33Spuq5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgKz1SKV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208D916F27E
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEE51AD9F9;
+	Tue, 26 Nov 2024 09:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732611629; cv=none; b=RGOMGv6pE16U89++FDTHlgMhMq/YNnr4LA2VLfk50BbzsjcUPitYXFdarm9J3VVhlTfXkTTNaXyYmimSqdcZFfUoBOfBgKAeAUo3zYCfQdFzPF18Ize6H1XgjKdBW9CypXITCeT420o2BtuVIr2dXyDETFcDvCPOdddO5W0eiQ8=
+	t=1732611618; cv=none; b=MwVoE50NETXE2I9uStSUUbGhF5nT6w8gLUwTwWpoUnKNl3Q3eOKEfpystkosWeE4aam+FtVll3cRoRGE21xm+Fila2ZCvC45ykuGKKDVAGIhElfhAfjXIVk4y2BCMWfv1WoXmkVRxE/xXcHiZWg5APrgpy4A38AAYA6E5X8Vxrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732611629; c=relaxed/simple;
-	bh=+7SpuMcrjwJ/YiLx54TrDaZKnKyyL7xaMQsuKK66MEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p77lVpDbaRgMhdBDHK9awh6vQNxwzGrKWtHdweRMH/eiG/Xs1NYSaJ92KyiXcifALDGH7yEZ4gydOenQxqLTQOVKdczE73bPpYhdTBAACju0UfrvJrdy0SaaotIOfKz27/GZZqb/rs2+NtFw+rZNLQ0gl+YP8jWnVMSTyIAAi3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B33Spuq5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732611627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QAEZZmA0v1k80nlOysurYutIwKXMOWMnay0WZ+kcQrU=;
-	b=B33Spuq5Rk8LCDh3ujhY07lP8oBfouL7UrW6Ob15hV33aZQPirCZBefuANn9zh58opDthU
-	8wKPxs7uJz0mk53NjAQH0vV10US6IyXADbNOTjwPnRgLgDuueO0Tvup9ss4B5kq6tOoiOe
-	xKoKvxA53UGfUMrqdTAZp/aTN81uUPY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-461-cPZzRBDaPdOXeZJ5L7H3iQ-1; Tue, 26 Nov 2024 04:00:22 -0500
-X-MC-Unique: cPZzRBDaPdOXeZJ5L7H3iQ-1
-X-Mimecast-MFC-AGG-ID: cPZzRBDaPdOXeZJ5L7H3iQ
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38240c98b68so2724719f8f.2
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 01:00:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732611621; x=1733216421;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QAEZZmA0v1k80nlOysurYutIwKXMOWMnay0WZ+kcQrU=;
-        b=gLs5dPAbu7REkNZlg+V43XxZ2AFvBxs+M7/4fWqjPynzX5u40uJXIIAIOAJyoLAVFa
-         +J3yNLwSW1zzyI7fAy/pi6+5onrLg8YMKE5OTexNXzc/evJYph2hj0vv+9TDdxEAC9S4
-         TxkLQA+7bRI+0bno/1ahMB1QdmgmmzFpHz0250MH0put3m8Pd7PSq/nSud/k+NoDYhDQ
-         DNakeucHiX1GwDq5sEF9+8wTIQdpouIAKQBukLSc88wwUrVXC7u8jttPHGOVTRgYI01A
-         8EfBsVlyGgRfTB8uQozrLOTLm3vctRK6YwxfkUm1LzP/eT8/pWwL2fvTioeyIf+I+MHf
-         yTkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUtysSacTEQgIo5KmqiU/+aAdu98eDLGfcS/boQrZAwV2ED8XLNm3fRENCFPNX19jOqBdn/Rqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2sTmmOJh1B5pbgF85m44FNRt19X81SJ/xzU/nNhXmALIzlloN
-	p2msLXRRdkjQbNS0fE+R2nVBu+yFJVOcgl2DonIAXwO2S6zLqtn0LI8dLnYOHmeNw8u4sT1rJeC
-	fCn8dm4k1tL2BuCUO4ZcydXZO0kjkSvm89xDiwBZ3kfkardOckVbhDg==
-X-Gm-Gg: ASbGncvSpnWPiSeuxScP8qlaKz39e3/dAkFk5udAYH3Lh4WE/iuADXKcPbqMzwCANbI
-	sFySzsZh9N/WE96j50+gzB/C+LoOkCs8KjZ2vQdHO0q8xwGOxtxoM7/VP0udSTHbe8b5CnWV44K
-	z/gkmrxQbDaLEEFli4Wbw6tyvSm5dqjL0ZHI+mo8GwkwVLmHIn8XsSkwd6GwJPp1+tR55wbmdYH
-	uKmMqzW2/MMTwn2PF01/GMCI//NqhjHiXNsYrdWArFn2bRV1+9gfebadFl/zKxypysQM3hwm5Uw
-X-Received: by 2002:a05:6000:4802:b0:37d:4fab:c198 with SMTP id ffacd0b85a97d-38260b69dffmr14125799f8f.26.1732611621649;
-        Tue, 26 Nov 2024 01:00:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH8jYA0GTdG9hgUI38n8Ov8NGoouv5zqqCEPjjl2QpgvmIaQFxgpgIbKOkHE4UlowpkKNfIEg==
-X-Received: by 2002:a05:6000:4802:b0:37d:4fab:c198 with SMTP id ffacd0b85a97d-38260b69dffmr14125762f8f.26.1732611621303;
-        Tue, 26 Nov 2024 01:00:21 -0800 (PST)
-Received: from [192.168.88.24] (146-241-94-87.dyn.eolo.it. [146.241.94.87])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fb36612sm12643663f8f.59.2024.11.26.01.00.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2024 01:00:20 -0800 (PST)
-Message-ID: <7f968fde-8a41-4152-8b39-72d5b21a19a2@redhat.com>
-Date: Tue, 26 Nov 2024 10:00:19 +0100
+	s=arc-20240116; t=1732611618; c=relaxed/simple;
+	bh=MtrrpWa+DLu+oO3ptkLS0bspbdjI0fJGpUEg/PFl3mU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RV97f+se+HwFPi9Lz87BKosABVnl0wVN2ASZrJ/1Z4jYnXdLN5rUyLx+pyMEtxTc1IhpSB24npS7u6C6XWEwrt73/lINtO8kp65Gk6fK20M+ayK65HpsE3FaQGcYqS1mtVoGjU1OIsPe8GnsG0GF9E4K30sme5pGYky1XfdB7UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgKz1SKV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B43EC4CED0;
+	Tue, 26 Nov 2024 09:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732611617;
+	bh=MtrrpWa+DLu+oO3ptkLS0bspbdjI0fJGpUEg/PFl3mU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VgKz1SKVfyxKerTmvXhVbT1Tjsze8wfRPR8MJVL0ElGwhq/RsDZGWH7Ba6fTG365s
+	 8+0Pv+DiUI5vUGORYfBn58gSQBcUdW39vrGBZOLGC+WZBMxR4OYXWE4LUIpSvkG9hB
+	 W8n0sY9JcrGpke1Ha9KheAXWboJp7RXVR1+XEesPCh0erc8I9Z/bE+CGyMrLnbGpEx
+	 K7wJjfTckMoMG28InP+mWM/5HVrFoLCIHtddAjG6KrD59vn5t5mMtj3VbH+5xjtLPD
+	 MDS1Gy3Pz3wO30giRsce7WHBfQSH3VSLytDrA4wDKPXUQqNYD7SU+mILKUeanuRdtp
+	 asFb+WfsmrV8g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 355243809A00;
+	Tue, 26 Nov 2024 09:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 0/4] net: Fix some callers of copy_from_sockptr()
-To: Michal Luczaj <mhal@rbox.co>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- David Howells <dhowells@redhat.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
- David Wei <dw@davidwei.uk>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Marc Dionne <marc.dionne@auristor.com>
-References: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/l2tp: fix warning in l2tp_exit_net found by syzbot
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173261162982.313261.16721245294644686761.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Nov 2024 09:00:29 +0000
+References: <20241118140411.1582555-1-jchapman@katalix.com>
+In-Reply-To: <20241118140411.1582555-1-jchapman@katalix.com>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ guohui.study@gmail.com, horms@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com,
+ syzbot+332fe1e67018625f63c9@syzkaller.appspotmail.com, tparkin@katalix.com
 
-On 11/19/24 14:31, Michal Luczaj wrote:
-> Some callers misinterpret copy_from_sockptr()'s return value. The function
-> follows copy_from_user(), i.e. returns 0 for success, or the number of
-> bytes not copied on error. Simply returning the result in a non-zero case
-> isn't usually what was intended.
-> 
-> Compile tested with CONFIG_LLC, CONFIG_AF_RXRPC, CONFIG_BT enabled.
-> 
-> Last patch probably belongs more to net-next, if any. Here as an RFC.
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
-> Changes in v3:
-> - rxrpc/llc: Drop the non-essential changes
-> - rxrpc/llc: Replace the deprecated copy_from_sockptr() with
->   copy_safe_from_sockptr() [David Wei]
-> - Collect Reviewed-by [David Wei]
-> - Link to v2: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co
-> 
-> Changes in v2:
-> - Fix the fix of llc_ui_setsockopt()
-> - Switch "bluetooth:" to "Bluetooth:" [bluez.test.bot]
-> - Collect Reviewed-by [Luiz Augusto von Dentz]
-> - Link to v1: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co
-> 
-> ---
-> Michal Luczaj (4):
->       Bluetooth: Improve setsockopt() handling of malformed user input
->       llc: Improve setsockopt() handling of malformed user input
->       rxrpc: Improve setsockopt() handling of malformed user input
->       net: Comment copy_from_sockptr() explaining its behaviour
+Hello:
 
-I guess we can apply directly patch 2-4, but patch 1 should go via the
-BT tree. @Luiz, @David, are you ok with that?
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thanks,
+On Mon, 18 Nov 2024 14:04:11 +0000 you wrote:
+> In l2tp's net exit handler, we check that an IDR is empty before
+> destroying it:
+> 
+> 	WARN_ON_ONCE(!idr_is_empty(&pn->l2tp_tunnel_idr));
+> 	idr_destroy(&pn->l2tp_tunnel_idr);
+> 
+> By forcing memory allocation failures in idr_alloc_32, syzbot is able
+> to provoke a condition where idr_is_empty returns false despite there
+> being no items in the IDR. This turns out to be because the radix tree
+> of the IDR contains only internal radix-tree nodes and it is this that
+> causes idr_is_empty to return false. The internal nodes are cleaned by
+> idr_destroy.
+> 
+> [...]
 
-Paolo
+Here is the summary with links:
+  - [net] net/l2tp: fix warning in l2tp_exit_net found by syzbot
+    https://git.kernel.org/netdev/net/c/5d066766c5f1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
