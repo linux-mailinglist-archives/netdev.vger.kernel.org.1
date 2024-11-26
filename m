@@ -1,179 +1,88 @@
-Return-Path: <netdev+bounces-147318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC81F9D9107
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 05:27:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFFB79D910C
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 05:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6624C282A39
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:27:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8698B220CA
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 04:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3865F42AA2;
-	Tue, 26 Nov 2024 04:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92C242AA2;
+	Tue, 26 Nov 2024 04:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cqMvCkiF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jHJn18Vo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA1E10E6;
-	Tue, 26 Nov 2024 04:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513162260C
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 04:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732595253; cv=none; b=gluL4aecHF8Bvfcf03bpVg7PETsME/W7JRn/7a75eMWq8GPFUaV0Ozm/neBMR1koO3kT4/MhtUKDysBhCPy4VwK0H/fypXEBrWoKl0J+8NZpPJDoOihJvnixzHHydXJEo/EcmygPmSkrQNeojQPUnEJabg026LdsT2rbAiHsaiY=
+	t=1732595756; cv=none; b=DvV9hTR4gBkhZCt3oanky9yp0y0FvD/AWTPtnB9eV1zgzi47ZvyySV04tQskLqYGAt46lyN9CcYwZ7wMRBEy1lkKAF6SMlWmKdUM/+q60OfcxFM4AJpxqcfcbkn5El0aB6KYYFsSmiSrtpzmULPWzE4UvwXElzo75xG6ahv4JZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732595253; c=relaxed/simple;
-	bh=aX/b+UTO81Nt07pDPl00uRiI3vW9Yf4VER1ahKxy0Yw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=R6gw4PwnP7Yxq7equba8ieX6TmhdXh9ur2HhagmqCOSl4e6WEMA3RMTH96Yx6Tz/2VTVcQ8K22L613/xWwulhOivZAhGqQwt8t/qHYLmDgaPrHUd414wu79CtZru6PCaMtaPVMbhAWhinvlpbEGffBQWdHjzwkTpEH7Ft5AcuuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cqMvCkiF; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1732595247; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=9fdQvl9sFAN5+qJlrKwyEI1XXekh060PCb6cxd/vT7Q=;
-	b=cqMvCkiF2rFbmVDTrXgr3e+GUHu4ZzO4v0Vpg6iLQoB7qWoS0jSRJp526USiDFhGpdobnnIESWk+T97FS+mQF8Ml6oHbpYfwBgCIhaKm1U++g2C8c7VIoX8HuscOTJtNat/In7Bp+kR1NMseiffSb7I9pdxN5VzuE95Yq0/hx0I=
-Received: from 30.221.146.228(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WKGnheK_1732595245 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Nov 2024 12:27:26 +0800
-Message-ID: <f81a78ac-b32a-44bf-9375-8ac380bbce74@linux.alibaba.com>
-Date: Tue, 26 Nov 2024 12:27:25 +0800
+	s=arc-20240116; t=1732595756; c=relaxed/simple;
+	bh=w0a7laltbCAyWrZakTD+qFIXTZu9L6aTl3+FmyrA1bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sIKP/e9RkyQdyU1ThaqNgtkUDpEh7Xk/hBaqdUr1nH2tOKpu6wwdldyJiiG6FzN5TGlhGJYADHG+zqiYwUsOOzCQw2Y34eRzMfnHbPS92bYzV21bkfVneFRyGbvraPfF4hrJ1hG4HOAWhZvb/zY6i+M3y4qSa93GHKmBHDmaiSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jHJn18Vo; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 25 Nov 2024 23:35:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732595751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ms3SNLuCPwKxinj7AVS6hyjHOWnJA/mWxFozSkndvrM=;
+	b=jHJn18VoRHbL9w7mYtEEAdXUSzrjNQgRl3Yk1xdKTzxdA5p655W8e/zglWsmVv4CKrnmCW
+	pyhtw3lqAbo+FmbcgrocnyDPsK2ypJRfF6D4xeQTMUhssz7JntHDggfqUb9rvcM5vPLZAM
+	VCXrIzrNxDCPgqkvpKItseVNjYxYYTE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: NeilBrown <neilb@suse.de>, Thomas Graf <tgraf@suug.ch>, 
+	netdev@vger.kernel.org
+Subject: Re: rhashtable issue - -EBUSY
+Message-ID: <bdnyshk47krppnfczkn3tgdfslylof3pxhxu7nt2xq4oawyio4@ktfab5bu7lis>
+References: <>
+ <Z0QQnLNJn1jhMErP@gondor.apana.org.au>
+ <173257789029.1734440.16216135574521669815@noble.neil.brown.name>
+ <yaxjp5k4o37vh2bl2ecuj3qoyz6x3lwau2kf7zevq5v3krcmtu@idoh3wd4zyqu>
+ <Z0U4bfbBoooHIZVB@gondor.apana.org.au>
+ <t3a3ggvcvnle6dnnmzf3ehlgcxhgpnn2mbpyukjv3g67iqxlah@spqeyovloafo>
+ <Z0U9IW12JklBfuBv@gondor.apana.org.au>
+ <dhgvxsvugfqrowuypzwizy5psdfm4fy5xveq2fuepqfmhdlv5e@pj5kt4pmansq>
+ <Z0VHwWe8x9RrhKGp@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 12/12] net: homa: create Makefile and Kconfig
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org,
- linux-api@vger.kernel.org
-References: <20241111234006.5942-1-ouster@cs.stanford.edu>
- <20241111234006.5942-13-ouster@cs.stanford.edu>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20241111234006.5942-13-ouster@cs.stanford.edu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z0VHwWe8x9RrhKGp@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 11/12/24 7:40 AM, John Ousterhout wrote:
-> Before this commit the Homa code is "inert": it won't be compiled
-> in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-> also links Homa into net/Makefile and net/Kconfig, so that Homa
-> will be built during kernel builds if enabled (it is disabled by
-> default).
+On Tue, Nov 26, 2024 at 12:00:01PM +0800, Herbert Xu wrote:
+> On Mon, Nov 25, 2024 at 10:51:04PM -0500, Kent Overstreet wrote:
+> >
+> > I just meant having a knob that's called "insecure". Why not a knob
+> > that selects nonblocking vs. reliable?
 > 
-> Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-> ---
->   MAINTAINERS       |  7 +++++++
->   net/Kconfig       |  1 +
->   net/Makefile      |  1 +
->   net/homa/Kconfig  | 19 +++++++++++++++++++
->   net/homa/Makefile | 14 ++++++++++++++
->   5 files changed, 42 insertions(+)
->   create mode 100644 net/homa/Kconfig
->   create mode 100644 net/homa/Makefile
+> Because it is *insecure*.  If a hostile actor gains the ability
+> to insert into your hash table, then by disabling this defence
+> you're giving them the ability to turn your hash table into a
+> linked list.
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1389704c7d8d..935d1e995018 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -10391,6 +10391,13 @@ F:	lib/test_hmm*
->   F:	mm/hmm*
->   F:	tools/testing/selftests/mm/*hmm*
->   
-> +HOMA TRANSPORT PROTOCOL
-> +M:	John Ousterhout <ouster@cs.stanford.edu>
-> +S:	Maintained
-> +W:	https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
-> +F:	include/uapi/linux/homa.h
-> +F:	net/homa/
-> +
->   HONEYWELL HSC030PA PRESSURE SENSOR SERIES IIO DRIVER
->   M:	Petre Rodan <petre.rodan@subdimension.ro>
->   L:	linux-iio@vger.kernel.org
-> diff --git a/net/Kconfig b/net/Kconfig
-> index a629f92dc86b..ca8551c1a226 100644
-> --- a/net/Kconfig
-> +++ b/net/Kconfig
-> @@ -244,6 +244,7 @@ endif
->   
->   source "net/dccp/Kconfig"
->   source "net/sctp/Kconfig"
-> +source "net/homa/Kconfig"
->   source "net/rds/Kconfig"
->   source "net/tipc/Kconfig"
->   source "net/atm/Kconfig"
-> diff --git a/net/Makefile b/net/Makefile
-> index 65bb8c72a35e..18fa3c323187 100644
-> --- a/net/Makefile
-> +++ b/net/Makefile
-> @@ -44,6 +44,7 @@ obj-y				+= 8021q/
->   endif
->   obj-$(CONFIG_IP_DCCP)		+= dccp/
->   obj-$(CONFIG_IP_SCTP)		+= sctp/
-> +obj-$(CONFIG_HOMA)              += homa/
+> So as long as you acknowledge and are willing to undertake this
+> risk, I'm happy for you to do that.  But I'm not going to hide
+> this under the rug.
 
-A small formatting issue, perhaps you're using spaces?
-
-
->   obj-$(CONFIG_RDS)		+= rds/
->   obj-$(CONFIG_WIRELESS)		+= wireless/
->   obj-$(CONFIG_MAC80211)		+= mac80211/
-> diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-> new file mode 100644
-> index 000000000000..8ba81b00d35f
-> --- /dev/null
-> +++ b/net/homa/Kconfig
-> @@ -0,0 +1,19 @@
-> +# SPDX-License-Identifier: BSD-2-Clause
-> +#
-> +# Homa transport protocol
-> +#
-> +
-> +menuconfig HOMA
-> +	tristate "The Homa transport protocol"
-> +	depends on INET
-> +	depends on IPV6
-
-Can HOMA run in an environment without IPv6（IPv4 only)? If so, depends is not suitable here. Perhaps 
-what you need is to implement different branches in the code using
-
-#if IS_ENABLED(CONFIG_IPV6)
-
-> +
-> +	help
-> +	Homa is a network transport protocol for communication within
-> +	a datacenter. It provides significantly lower latency than TCP,
-> +	particularly for workloads containing a mixture of large and small
-> +	messages operating at high network utilization. For more information
-> +	see the homa(7) man page or checkout the Homa Wiki at
-> +	https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-> +
-> +	If unsure, say N.
-> diff --git a/net/homa/Makefile b/net/homa/Makefile
-> new file mode 100644
-> index 000000000000..3eb192a6ffa6
-> --- /dev/null
-> +++ b/net/homa/Makefile
-> @@ -0,0 +1,14 @@
-> +# SPDX-License-Identifier: BSD-2-Clause
-> +#
-> +# Makefile for the Linux implementation of the Homa transport protocol.
-> +
-> +obj-$(CONFIG_HOMA) := homa.o
-> +homa-y:=        homa_incoming.o \
-> +		homa_outgoing.o \
-> +		homa_peer.o \
-> +		homa_pool.o \
-> +		homa_plumbing.o \
-> +		homa_rpc.o \
-> +		homa_sock.o \
-> +		homa_timer.o \
-> +		homa_utils.o
+That knob was. That's not what I'm suggesting. Can you go back and
+re-read my, and Neal's, suggestion?
 
