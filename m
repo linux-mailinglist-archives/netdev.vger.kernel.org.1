@@ -1,119 +1,109 @@
-Return-Path: <netdev+bounces-147440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B8B9D97ED
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:05:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85A49D9840
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 14:20:03 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5D3EB2A263
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:01:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B44164796
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A928E1D5145;
-	Tue, 26 Nov 2024 13:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sA/wh2Qd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EE51D4354;
+	Tue, 26 Nov 2024 13:20:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1DC1D47AD
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 13:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECC41D2B22
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 13:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732626089; cv=none; b=RMJ9/EbuCpy4SHUom3ygwc4ZnJP1tCTriL0RaSJTqOIMZy63itVapC3WGxkGtevKilyKRC/a6HQMvFXooyyuJ8PxQt48xtrAydp5UvRv87to+W3iOBIoVRD2WAz31ZHK2tP0JzA1IaBK6dPNCvYgP1gFJJyp4ZseRGZPOILaJVM=
+	t=1732627200; cv=none; b=mdcV1H4y1xjYTTtd4n8bjF9t1P2Iy3yZxJPE6Y+iZwF9vWxuZyuixVuX96+hTrlTLwuh4EAX5hj92Do86f5CksrxW2JrQ34atCg4XZhnztvL6uuyx/8WY276wC4+7G+UqAf+beAaDHteRW2a0Er5AJIxQXFnOK2ZOXKEe0vc0t0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732626089; c=relaxed/simple;
-	bh=gSCzkAL+GY4gELKymzPajvu0deHxQMrCYAO7s3LsnZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XHQJfWp3kLRu7Yu4IFjjgRUYa4sB02aQQExYIXXB7xaFjEw+3rTCyeCyCUJLY0B6FjGnLiVsUT/ZIIDEzsIiY+Cc3u7ooKpr8PBgaDuxmZmOQVwaMH/ScU1Ew5O4CSoqzGBeO2P+5/Xx6y7jBHq4vkpcVuWh/mW7+B309Exjw34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sA/wh2Qd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ky6HbS31SSAdMYxozY6xIMAs0Cpmlvp4GWo+IUxC3Gc=; b=sA/wh2QdMDG6PLLquxIEEkTzeN
-	r8oRRbixq8aAWGNui9FskfeZ+s+CruyDf1QNYcJu1YTw1B59tqTMhKJR5jcBCUo9aYxQfbbZSAbcy
-	UpRmoq+0oztPAtiTZR6Jf3kg5fvS/1q+fWAJT5LrwrQ3ap6KoivSQLAQ9JoXquDPGhH60kjpyU37Z
-	ch0Ypjw60dLf9Z4KZrdjMH+PaZkow2p6pzin2z+wpe5l+BuIFlWrY+PUbynf8x03RargY5D9GF0m1
-	X4wNGVCYilk3TcsMtkI4sJ0U6Rpug2xNX4sO5o4186DptWdSkvOXoUIFEfbvq1X8w7oRZhuxM13zB
-	aQRGky1w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54564)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tFvBq-00070g-17;
-	Tue, 26 Nov 2024 13:01:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tFvBn-0004ZI-1q;
-	Tue, 26 Nov 2024 13:01:11 +0000
-Date: Tue, 26 Nov 2024 13:01:11 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH RFC net-next 00/23] net: phylink managed EEE support
-Message-ID: <Z0XGl0caztvVarmZ@shell.armlinux.org.uk>
-References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
+	s=arc-20240116; t=1732627200; c=relaxed/simple;
+	bh=Bf+F3wkPUvI4YlFpmLDMpedy/e8itnPqS8SvRRUdhTw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NWkuvS1miVO28uLTOR/fFwO0s36PPOIbBxiMjUIiNskgDROZcD4nCpGckJ6h365cTwN/ABOpY6LMLHjKNa/q7MDwBYBW71qFVUr4N6Anu+m6mM3qfUxrZy3TDRmVoTigpfNsUqlc6XHw+xg9G1NcbxsoeQF0CjEY9dXNJ8l7juU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com; spf=pass smtp.mailfrom=kernelsoft.com; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernelsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernelsoft.com
+Received: from localhost.localdomain (unknown [183.69.133.42])
+	by mail (Coremail) with SMTP id AQAAfwAno91NykVnw842Ag--.64100S2;
+	Tue, 26 Nov 2024 21:17:02 +0800 (CST)
+From: tianyu2 <tianyu2@kernelsoft.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org
+Subject: [RFC] ipv4: remove useless arg
+Date: Tue, 26 Nov 2024 21:19:12 +0800
+Message-Id: <20241126131912.601391-1-tianyu2@kernelsoft.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAfwAno91NykVnw842Ag--.64100S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF4ktw1kKw13Cr1fJF1rtFb_yoW8Xw4xpF
+	45Kan8ArykWr4UW34kKF97W34ayw1rG34ak3y8Aw13G34DJF4FgF1DKF4YyF1YkrWxKa13
+	XFyagw13Gw1kCFJanT9S1TB71UUUUUJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9vb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY
+	62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7V
+	CY1x0262k0Y48FwI0_Jr0_Gr1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY
+	6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkIecxEwVAFwVW5GwCF04k20xvY0x0EwIxGrwCFx2
+	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
+	6r106r1rMI8E67AF67kF1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
+	AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IY
+	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr
+	0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IUYeT5PUUUUU==
+X-CM-SenderInfo: xwld05zxs6yvxuqhz2xriwhudrp/
 
-On Tue, Nov 26, 2024 at 12:51:36PM +0000, Russell King (Oracle) wrote:
-> Patch 11 adds phylink managed EEE support. Two new MAC APIs are added,
-> to enable and disable LPI. The enable method is passed the LPI timer
-> setting which it is expected to program into the hardware, and also a
-> flag ehther the transmit clock should be stopped.
-> 
->  *** There are open questions here. Eagle eyed reviewers will notice
->    pl->config->lpi_interfaces. There are MACs out there which only
->    support LPI signalling on a subset of their interface types. Phylib
->    doesn't understand this. I'm handling this at the moment by simply
->    not activating LPI at the MAC, but that leads to ethtool --show-eee
->    suggesting that EEE is active when it isn't.
->  *** Should we pass the phy_interface_t to these functions?
->  *** Should mac_enable_tx_lpi() be allowed to fail if the MAC doesn't
->    support the interface mode?
+When I wanted to kprobe the ip_rcv_finish_core, I found that using x1 to
+pass "struct sk_buff *skb"."struct sock *sk" was not used in the
+function, causing the compiler to optimize away. This resulted in a
+hard to use kprobe. Why not delete him?
 
-There is another point to raise here - should we have a "validate_eee"
-method in struct phylink_mac_ops so that MAC drivers can validate
-settings such as the tx_lpi_timer value can be programmed into the
-hardware?
+Signed-off-by: tianyu2 <tianyu2@kernelsoft.com>
+---
+ net/ipv4/ip_input.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-We do have the situation on Marvell platforms where the programmed
-value depends on the MAC speed, and is only 8 bit, which makes
-validating its value rather difficult - at 1G speeds, it's a
-resolution of 1us so we can support up to 255us. At 100M speeds,
-it's 10us, supporting up to 2.55ms. This makes it awkward to be able
-to validate the set_eee() settings are sane for the hardware. Should
-Marvell platforms instead implement a hrtimer above this? That sounds
-a bit problematical to manage sanely.
-
+diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+index e7196ecffafc..2ff88c598988 100644
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -314,7 +314,7 @@ static bool ip_can_use_hint(const struct sk_buff *skb, const struct iphdr *iph,
+ 
+ int tcp_v4_early_demux(struct sk_buff *skb);
+ int udp_v4_early_demux(struct sk_buff *skb);
+-static int ip_rcv_finish_core(struct net *net, struct sock *sk,
++static int ip_rcv_finish_core(struct net *net,
+ 			      struct sk_buff *skb, struct net_device *dev,
+ 			      const struct sk_buff *hint)
+ {
+@@ -444,7 +444,7 @@ static int ip_rcv_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (!skb)
+ 		return NET_RX_SUCCESS;
+ 
+-	ret = ip_rcv_finish_core(net, sk, skb, dev, NULL);
++	ret = ip_rcv_finish_core(net, skb, dev, NULL);
+ 	if (ret != NET_RX_DROP)
+ 		ret = dst_input(skb);
+ 	return ret;
+@@ -610,7 +610,7 @@ static void ip_list_rcv_finish(struct net *net, struct sock *sk,
+ 		skb = l3mdev_ip_rcv(skb);
+ 		if (!skb)
+ 			continue;
+-		if (ip_rcv_finish_core(net, sk, skb, dev, hint) == NET_RX_DROP)
++		if (ip_rcv_finish_core(net, skb, dev, hint) == NET_RX_DROP)
+ 			continue;
+ 
+ 		dst = skb_dst(skb);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.27.0
+
 
