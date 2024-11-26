@@ -1,276 +1,296 @@
-Return-Path: <netdev+bounces-147386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5F69D9589
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 11:27:15 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BF6D9D95B5
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 11:40:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 118B716632C
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:26:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5115B24D62
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDCD1D434F;
-	Tue, 26 Nov 2024 10:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA2D1C8FD7;
+	Tue, 26 Nov 2024 10:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YRQopeXi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E0QdKTXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11BF1C8FBA
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 10:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732616744; cv=none; b=Tc3YXKFEKzTz4yWq4JUQrGEzGqwZPqh/PMKt14LOGG2stYcP1XgA7XBOwkpK6Qrotr6oKUm3Bh7o6sGDDUwsgnHY4Ed7fnF76Srhio6KYpRmkLygKCF92zuH0JiD3zL90xCoB5miQnjCBP9PavsLaTjZIyzw4nRvUesfIRm4lgQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732616744; c=relaxed/simple;
-	bh=0AHxS5c7xOA4JS8KOWeY79CxbK1ojaOG3GboAWxgUwU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nTLDDjGjsyUUxjZ+nacZFrdHolceGR08J60t9XIGFbrBhucQ8LgKozEDqL9XY3n4M67DQ3CWNYlyQA/kz+ADZzYnLTVHkgIFPAtdyRdJtivcsdLJqi9Rc3lqTDCN9iLPiIdPwnkID5K2vtnpcqdhJOn2KM6hwf+jEce6CtwFMts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YRQopeXi; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3822ec43fb0so4213217f8f.3
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 02:25:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732616741; x=1733221541; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9F4qrATdzkaEZl/5xMy8QoIfZV7gFQvOGJFoii7AVqY=;
-        b=YRQopeXiACvke5oTBYEtdpTVLoGSzg19aBdDGBtfVvmknOpkSQuzmV0xTahU033BqF
-         5+VfVwMzTw+PftUrDNelcEOFXPix3FibnBTVmqQuJu9fR5RhFrC7OBmBv/IG7mfiB/hi
-         u+z6l3JikUHXXAvbXUBSkbl3Ks6QvSSQGuQvO2XYc2b6NGcPVnLeGe60aCjK0EtzDddn
-         sxSpXGUPJAx2ItSfGDLgSl3EcGCdzVUvnEo7H9GU4dDlUsGlB8o/u693ob4G/2SDpGxL
-         Uw25S+JpppM04blbhwQx8anm6hDIWisWG/0e58hA8xjP4Senw8EY/JENle1z/LL1xU4p
-         rXag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732616741; x=1733221541;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9F4qrATdzkaEZl/5xMy8QoIfZV7gFQvOGJFoii7AVqY=;
-        b=Wc1m8jprxTWroON+cGq8ecVdaHVeM1bDt1eAoZla82qVfrK2z3obzOaX0euFbQ6z86
-         P+r7RYm37djQ/IP0tthOocOfMOH0hlW+esWqsBp8Pr2V2HrCrdN7REB5/bNIzRiHL43g
-         fxY0zwhcxyukLEceORpbvEHcLnBY0ZbznlXg3N9mlO2c4Aqilb0iZ2/CjJdn/3wYiTkR
-         L22gTL57aqOc5X16/calchXd9msytEigdVMTUejhSDuyTRuJ+WDo6aWDeo4Xn6PhR8JI
-         HtWOLtoe47TaUmsBXF5uelBp/Do4e+8gXbLsbtkFjia6T0k6lOh0YSNeIAQG/a508aHt
-         k3ag==
-X-Forwarded-Encrypted: i=1; AJvYcCVFDuNi6CpHR7TKQkbcOHevuXR3Rlh+VFBqZgOVWQYHPscC1HDzbtENXBoQzGUKpKxOOhgKye4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqjncEevDfyjygeu8oEieI9DQpzjTY3JewoFABeLHpDLC6glSt
-	LLbzBRLyPXyRTRqyTfAQ9G4P16drkaSQXdm/BCaFY2pBNsmFeDOmyZpe9dCrN5R1Fwcq3iVsIiu
-	utW/3/j8P7HDpCAJ2QPgb3lJMxDunuvBH6ust
-X-Gm-Gg: ASbGncuz4gRLLbUO8u1/o9uonjkxO46nLzqfc952SPI6eF2ijkAWpv5OmkxOcMKlH+E
-	wA2cQ/UvYY0sosZJ4p2kKyK0knowwuJNO
-X-Google-Smtp-Source: AGHT+IFgx5Zhg+Yo4VHeiTQGt4LZSOTizSa+ww9NNd0z5Lip+apITCeA+ldEI9n1GHlzvOMC1RHkYCRMdA4JNifqpN0=
-X-Received: by 2002:a05:6000:154c:b0:382:5471:655b with SMTP id
- ffacd0b85a97d-38260bc8649mr13997624f8f.47.1732616740911; Tue, 26 Nov 2024
- 02:25:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872821C8FCE;
+	Tue, 26 Nov 2024 10:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732617438; cv=fail; b=Pl/jhChUimZ3OzU8gAbJc7KwRdCzfQvGwbsc0CQYLskFK+ve1hxoLQ0cfVBrTusmHPptMLbndNQR2k2RZyPmTAOv27IIhX7CWVzXbhvjrC3U5XaokXmicq0E+K8yUTQBr3mSPVJ9qeI5SSR5zwWWMsJghb/dK+gK8rJwpfdrV6Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732617438; c=relaxed/simple;
+	bh=i937ILl2rfhxxwsCbcTRMbR03xaG4mjTkZoHwS075aU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bW5ielASC20PYboESlQZACbH8G+6UtPq+0uczCRwWcRUsNF7HcbNrlR7XwZd09RpYyJDKomqpABbHJepWLUNrGvmIwi0VK84a6NJnCU+Cede0J0ov0pvweF6oJii504itx6o4c3xmxaUrcFt+cw4KMzg1D9ywtv6pgXCkoBXUvU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E0QdKTXk; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732617437; x=1764153437;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=i937ILl2rfhxxwsCbcTRMbR03xaG4mjTkZoHwS075aU=;
+  b=E0QdKTXkuYlIbxMmtVYEAJIQk2QvhBqlhBG6MD2mP3Nc88TBX1NmMwEe
+   bPTV0R9YLgISbt1KB2ThClW0q8dxmw1gQn7O8sakwpj0RsWtYfQ14b88A
+   olS4mwn9KmJxy37uNg7s0HvGpPrz+MmFKTYIncsoZ1flrlNr9xefEsmhu
+   kXsmoqMluwflumjv/x3nDD6IQkoG4hrYangpbGX63GS26FxJtcQxB3xt/
+   gIPxh3jEMVmr6bP5eeuXPzJ1b9R86lPf3pnq/AqLdI48bAgjrKpcUV6cF
+   ESCO0lab/1/fk8RCIrWcMd2HHKZncwKvfjbMV8gZ7INnuVq+wnUmDtXTt
+   g==;
+X-CSE-ConnectionGUID: hjdnOzNmS1OrucIAV8MsDQ==
+X-CSE-MsgGUID: 2hVbAl61TzGavYHy4dRhYQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="43431752"
+X-IronPort-AV: E=Sophos;i="6.12,185,1728975600"; 
+   d="scan'208";a="43431752"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2024 02:37:16 -0800
+X-CSE-ConnectionGUID: vtwDng2UR4G9BFsFEXxmlA==
+X-CSE-MsgGUID: RzKllsNGRMWIl3wQ49d07w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,185,1728975600"; 
+   d="scan'208";a="92038887"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Nov 2024 02:37:15 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 26 Nov 2024 02:37:15 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 26 Nov 2024 02:37:15 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 26 Nov 2024 02:37:15 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fLtWItj1HlntJMnF6Gy3LNkMEPyqtsrrJ4d4RnCvmmyO9acHz8w9md/u7iRJwL48t2ktAq98bFQtmKfsmxOotqo4vmpz7cONFqHUNE8rdy/53S6FWVm5cfw/Conr+atD0ThFL9W5QaXs3Ccq5WRlmJPXS+mp5h8xFBEFMu3Q3tQnj9bjkQPbvspM0Tk0pjBsAwunf57uAzbE1q6dc9cfs4LAPEFn2ExA3/qp+DxjXlpu8X1h27QKQwasJsN2gINb2HA2RJYm5AetoWr8lYkyU4er8E030PlGQFEWAoT4+a3XpbiI+v7IZftYUrkNHbk6kIqL58ZCc+7oOtgLRMfD4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6rGq4QnZxe7QuZF2nC2Q+n4d20413BMlRVcfZ/T5oWM=;
+ b=qmTjTZycSW32+3vxFalaufBXGB8I94XOPXyWCcqbzgSjfSlCp99opbSW/RZcaQiaR+jOhzimLGEGfB9pOs5RKh8UEdslOM1XlxSHFKPyL9aAIz4eqRu8ZvqG2CStUQf0fBMGcypSBKsArjwXHPyChSUNK+KJ1/MWPAbvHODO3MDHjUqbvoPNIBmC9+HkYPOsz2hGM5kiQnj/Z7x4NJyC3SboSsXYduQMHT28nMIES+1zeFCy5cJmXDFqx17tLsRO3dBdZ6bm+rCaUiILFvkXrWBNsuxcjDYnXQBBC4VHEwF13x83pku96aE/8ZA5XpJsBJNBZeOV4m1wdqmVyj4iqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by LV1PR11MB8817.namprd11.prod.outlook.com (2603:10b6:408:2b4::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.19; Tue, 26 Nov
+ 2024 10:37:12 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%7]) with mapi id 15.20.8182.019; Tue, 26 Nov 2024
+ 10:37:12 +0000
+Message-ID: <6db67537-6b7b-4700-9801-72b6640fc609@intel.com>
+Date: Tue, 26 Nov 2024 11:36:53 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
+To: Daniel Xu <dxu@dxuuu.xyz>, Jakub Kicinski <kuba@kernel.org>, "Lorenzo
+ Bianconi" <lorenzo.bianconi@redhat.com>
+CC: Lorenzo Bianconi <lorenzo@kernel.org>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Martin
+ KaFai Lau" <martin.lau@linux.dev>, David Miller <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>
+References: <cover.1726480607.git.lorenzo@kernel.org>
+ <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
+ <ZwZe6Bg5ZrXLkDGW@lore-desk> <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
+ <ZwZ7fr_STZStsnln@lore-desk> <c3e20036-2bb3-4bca-932c-33fd3801f138@intel.com>
+ <c21dc62c-f03e-4b26-b097-562d45407618@intel.com>
+ <01dcfecc-ab8e-43b8-b20c-96cc476a826d@intel.com>
+ <b319014e-519c-4c2d-8b6d-1632357e66cd@app.fastmail.com>
+ <rntmnecd6w7ntnazqloxo44dub2snqf73zn2jqwuur6io2xdv7@4iqbg5odgmfq>
+ <05991551-415c-49d0-8f14-f99cb84fc5cb@intel.com>
+ <a2ebba59-bf19-4bb9-9952-c2f63123b7cd@app.fastmail.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <a2ebba59-bf19-4bb9-9952-c2f63123b7cd@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0268.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:194::21) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241125093039.3095790-1-edumazet@google.com>
-In-Reply-To: <20241125093039.3095790-1-edumazet@google.com>
-From: Brian Vazquez <brianvv@google.com>
-Date: Tue, 26 Nov 2024 05:25:28 -0500
-Message-ID: <CAMzD94Q+O3TTgwDUDJhHtg-reEGHZjaoPtGM-4V8k8bwR89NKA@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: populate XPS related fields of timewait sockets
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+8b0959fc16551d55896b@syzkaller.appspotmail.com, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|LV1PR11MB8817:EE_
+X-MS-Office365-Filtering-Correlation-Id: 79176979-b594-432e-aef4-08dd0e06494c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dER3S1JDczR1bnVWMGU1amhHRkdiQnFUUzBBQ01IS0NYWENEVXhLbHBCZEln?=
+ =?utf-8?B?dkJUQ3RESVFlcEI1RGx2dkNYVG5WcTJJUjB4NEs0N0gvM2F2MUIrUnNndE5T?=
+ =?utf-8?B?b2VDZWZGeFg1NFhGQVBPSUQ0c01wV3ExZjNPZVMrT2xXcFAvME1YdUZLTG11?=
+ =?utf-8?B?bEMwdkZYVk5pVjZka2lvMjBpWnFNaXZuOFoxc3BRYzByRTk0cVA4MkdNSFE1?=
+ =?utf-8?B?aU5QdVo0djN0dEdSTGRsZjgyeWppTGdOeEdnRHhibGRESlp1VGVIRWM4c2xY?=
+ =?utf-8?B?d1crWThZODY5a0VISjdFUmNESXNVR3JudThhL2tXbGNYcUlSSllnNDFvK205?=
+ =?utf-8?B?bDRndUE0elNuVk15M3ltbk5zbmo0OWVENzZTbTF6dEptazRmV1haT21rUkN6?=
+ =?utf-8?B?SmNBT09jTDZOdWJTb2ZxbjkwdjdoM2VHMlY3OVZnNEVCTjBId3NUOU91Z0ov?=
+ =?utf-8?B?d0dyY2pUMVRKb1kxREVhTXFHUHNmdk5IcklndTUvbitIVjFzVVZ3R20vU2pn?=
+ =?utf-8?B?cXBIRmNBM1B3dE03dVQ1YUFUbWxxbVI1dm5FUjY0WUxCVThsZ1FlOXptVERl?=
+ =?utf-8?B?WmV4TlVibnVOanFqZ3FTbENqL3VVenVaV3lPZFA1Z1ZaZFp2M0IyazFLaDAw?=
+ =?utf-8?B?VUNjenl5WHkrTzVuN2VzdmRLOEhXRm8vZitrakljNzl3eFQ5V0JLb1I5d0dX?=
+ =?utf-8?B?aGU4NWdOVHNXL01JcU5xTGlzZDA4UWZuMUdSTjR1bmRSdU44anFSU0QwRGlY?=
+ =?utf-8?B?K0c4Z05meUVrcW11TkVOWWJnUVRtZEVIOHoxRUpEWDVXd0JZWmV0NytpQXAr?=
+ =?utf-8?B?cmczLzdtd1lSRnJ4WWJERE4rRUYyZ3NMZjZEUW8ycjlmQ3RoL29tU0dibXo4?=
+ =?utf-8?B?NWtpMmVHYUZXMHc5U1hITUtKSlRHb3RaUS85SHpFUHN4eW9LZFBvTFRoblFX?=
+ =?utf-8?B?UE9wSzVLSGdQa05EdmpGcUloTkxoc2NYTVEyVy95TkZMdm0rUXhFREUvUTcr?=
+ =?utf-8?B?bXA3c3lqL2wrMW0rNkhoSkM3bWlzZUh1RHpEaWZrYnJpZU5KWjVpLzNkMjJj?=
+ =?utf-8?B?Q2N6VWN6UytDbUJPVjF6T3VtRHpyOWFOTFVwRlFwNUl3NjdlN0VQM3cvSHgz?=
+ =?utf-8?B?d05xNkZwTFpSV2VsaXY2Q09XYkJWUEl6ZVJheHVHMW8wYUs1bHNLVGJuSndX?=
+ =?utf-8?B?ZzNaZVI0NEE4Y2J5R1ViWGRIZVNKSWVETC9GWkZ4RGlTR2tvcTdoajBWYkVn?=
+ =?utf-8?B?aWhmdlpqWitwRUdhUzFPSlYrMmVMcmhTYTF5djIrcE4yZ1JZSGFUME41TVhR?=
+ =?utf-8?B?QUhRSm9WVy9ERU1GdjlPazg3eWVnK3ZTeFB5enFDVWJBS2JSd3pXbFlWQmFF?=
+ =?utf-8?B?a3Q2aDFabkt4dFY2VU5tVm10QkIxV2s5cERDRytMVkR4c05zZzc1YXJWcmxS?=
+ =?utf-8?B?Y3BHalFXTi9PZ1k4QnA5TmptOU9tdE1NeUhxYkJsa0Y3eTdnRnh2UUV2cHU3?=
+ =?utf-8?B?ZkIwcS9pOEtPaUxSd1BpR1FPUDBCTkJQeEJZeVBta29uRlMzWVBTVkh6ZHVp?=
+ =?utf-8?B?TjA3ckM2N2Vtd1JBNGFYYUVBb2lMbWRGK1dUVmJzcXZrKzI1QUtoWVBwY1lO?=
+ =?utf-8?B?U1VManJwcmNpby9ZTXBXbUR5Mll4K0o0dkRhT09hQXdnemxKTWpGVFpvVW1R?=
+ =?utf-8?B?dWFsL0p2amQ4VFJZSGoyNEM5aW1qUlhMbE9KTmMxMzEwVkpXOWVHRFBJSk94?=
+ =?utf-8?B?bEE4a2lBQzhNS1NCNVZWMVNpTlI0Y05pc1dIS0JJT3laazBLSVZVOHlZRWk5?=
+ =?utf-8?B?OVRuZEJBQjZVS1o4YThqQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXZmOWhsdnozbjQyWVcrbFJvS2JXL3Z2YjNKWGRPREQ0ZUZPTFl5a3hMV1VG?=
+ =?utf-8?B?RlU1ZGtJZUdtMXhFVExQYnBSY1pJUWhTZ01LbkZERElzNmVEK210MHUzMitk?=
+ =?utf-8?B?VVZpVk5Nd2xENjFSTnI2aGVldzRXVkg4QnlWc0JoVFppZVlKUUJlOHZ0bEpV?=
+ =?utf-8?B?VXRwdVloTXVTVmt3ZlBYcWdHS1BWOU1XRXR0YU92K21sNDNKUlVNc2NYSElN?=
+ =?utf-8?B?VGVza25aVy9JVE1ZNytIQ1JheDFIQmZhZURHYWNEMkV4Q0xDN2lWNHdkU0cy?=
+ =?utf-8?B?RUMrRERSdllSS2xqZmkvNW5YMlQxa0Q5YVVkVVU3a2p3cU5PRlNOK1ZvWDcx?=
+ =?utf-8?B?K0RFaHpKeUt3ZlhUeG9tcHZ0WURXU3F6RHR5UFk2RVFEaE5mKzFzeG9xTmFt?=
+ =?utf-8?B?Q0I3RWNRUkVva1JXSXlCV1hlSXdMQi80bkt5MlJxYnN2UDdzR3Y4UDAvMFY5?=
+ =?utf-8?B?aVJQL2Z0L29SaGxxeTcwUFNYcjlGbWluNmN2czQ2Mnc3QURyQ0c2ZFdpMUtG?=
+ =?utf-8?B?TkI4bkh5M2o3ajdhZHlHUkdpRUV5YTBXS2ZLNTZCT1pNbisra2d3OEU4TFph?=
+ =?utf-8?B?OWROSUN4emRxTGZGU3MrVjhFZTI1MUY1TXFLZFczNGcxZG9XbkVlZGZPMTRt?=
+ =?utf-8?B?YmVJR2JFVjhUempiS2VSWUYvM0VSVEYxZ0prbVlQZDZSOWFOeWlSZVVNN05a?=
+ =?utf-8?B?dE5lUkNOZjJGVzlZNHVsYU41cExZUGZ5YkJ0MU1kcFpSRWttWXkrNmVXbXN4?=
+ =?utf-8?B?WnBXWkVST25CY0t2U1hlNjBkYVVsc3lLalp4TTVhL0NDcWhlZnNYTWFkdmU1?=
+ =?utf-8?B?VGN5QlJwTmw5bDU0RWhRTGwrTzFTTHR4U2pEcVIwdjJVRFY0YTg2Q2RNalln?=
+ =?utf-8?B?cTlnbmZwUVExQWlCclhtdEE1Z2RtQUQxekNvYUliaDlEYnZSUjJJQUxJZVNX?=
+ =?utf-8?B?dDdvQ3cxNnRudWZKUkdQN1J2WlBRajFsVHJUdTFvelRwKy9wNmROcjZDbDgx?=
+ =?utf-8?B?bGVvVTFrRk9VbHFHa1VnWFJDaG9UUmk0M29RdkxNajJQZmI2ZkM3RW1lYU9i?=
+ =?utf-8?B?UzR3L2F6a0w5bEtzdnQrdGFKd2MxVHRSMXdYcVRMUjlQSTdLYTBVRlErQ2xk?=
+ =?utf-8?B?MzF1OGw4OFViZXlEVklCS0phQ0IzSXRmOHdwbi8raS85OEtYNTVuaEZNREhM?=
+ =?utf-8?B?a0dmeW1vcWRVNTJMU24veUVRVWJZRmpMdytLTU00L28yVEZJQk5nb0dpcGlp?=
+ =?utf-8?B?Zy8vSDN6NWoyS05YTUVTVEwyeEpmK0pPN2ZyYkxxUElmOVdEUWJkOEozbWRM?=
+ =?utf-8?B?aWJLZUxFSnI4dU1qZGlNVzdjT1ZKYytzN3hWMlVvYlN3Z2Rnakx3Qk1UV1Ex?=
+ =?utf-8?B?QlpjNWpNcXVWYXl0SU9md2craktPYVNhdDFDTFhrRHpZVWNRV1ZoKzlrbWF0?=
+ =?utf-8?B?TVJLRTRIM0N6YkZaRmJFQmY3Ni94K1FDSGRTc2U5a3lDSDFmd3VqcFg2VjBT?=
+ =?utf-8?B?WE52eW84N1Y5cFpFNkhPaFB6VGc0MXk2dHd5WTBldFJBTFFXb1ZGcmVvQW1T?=
+ =?utf-8?B?QUFyRHZ3Mm10TnJsMElkSWQxeHVBemt1VmFxZG5IUmJsWmpZNER3WTlobHNu?=
+ =?utf-8?B?TXd3YWJ0eXl1WUVoaTdGd29NaFZSMW1ISWZVSHZlMTdlbm9xOVkxemI2ZzJY?=
+ =?utf-8?B?WCtrRGVHUXRORzdVR3pSL2tmRis0dG5qTTFhT0xrU2NNZ1NzMldvSlNkdlVa?=
+ =?utf-8?B?T0FDTWViUGY0N0ZGS1FsOCtQb1hKTjB1Vk1QckZYVFlxU1FueXFZbDB6RVlQ?=
+ =?utf-8?B?NTBnTklHSG1OMjJNR0dmd0lZenVxa2wwbFlvZDlySzRHYk5WRTVCSHBEa0Jy?=
+ =?utf-8?B?RU5NNTZCYUZoUHZOamRlNjZaK0wxeG8yZEJnQmVSYlRtNU52UGFIZkovWit0?=
+ =?utf-8?B?OXhYcjhMOWFVN2FGb1JtdU1FZjBSdStZR3ZQQzRnT2lVaXJlV25jOXBreVdI?=
+ =?utf-8?B?T01BM2Jtdko1ZktCYjM1alVscmF1RXNkREJGUWtEQnRvRWZYSUV0ZmF3S3lK?=
+ =?utf-8?B?WVEyUEZxSEtHRmgvZmszU1BJbDExbDlkWHBwaERyMWtRN2R1SXo5R0Zzdytr?=
+ =?utf-8?B?Y1ZYVXJKbnIrbUp4cDZXNjZ6aXZ0UjFvc051ei9HSFpkV1ZrUzd3SHJQakVj?=
+ =?utf-8?B?M3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79176979-b594-432e-aef4-08dd0e06494c
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2024 10:37:12.1321
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H23OTSzqGRd1LGgIfqRJ1zPwwJr7t6ZKyh6eYywzns0Z6H4e5oq/Lc6zGlU7C7ITqMpMzFmQeUs//HkBW010G3XctXhZevImcnVCsDRD6o4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV1PR11MB8817
+X-OriginatorOrg: intel.com
 
-Thanks for the patch!
+From: Daniel Xu <dxu@dxuuu.xyz>
+Date: Mon, 25 Nov 2024 16:56:49 -0600
 
-On Mon, Nov 25, 2024 at 4:30=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> syzbot reported that netdev_core_pick_tx() was reading an unitialized
-> field [1].
->
-> This is indeed hapening for timewait sockets after recent commits.
->
-> We can copy the original established socket sk_tx_queue_mapping
-> and sk_rx_queue_mapping fields, instead of adding more checks
-> in fast paths.
->
-> As a bonus, packets will use the same transmit queue than
-> prior ones, this potentially can avoid reordering.
->
-> [1]
-> BUG: KMSAN: uninit-value in netdev_pick_tx+0x5c7/0x1550
->  netdev_pick_tx+0x5c7/0x1550
->   netdev_core_pick_tx+0x1d2/0x4a0 net/core/dev.c:4312
->   __dev_queue_xmit+0x128a/0x57d0 net/core/dev.c:4394
->   dev_queue_xmit include/linux/netdevice.h:3168 [inline]
->   neigh_hh_output include/net/neighbour.h:523 [inline]
->   neigh_output include/net/neighbour.h:537 [inline]
->   ip_finish_output2+0x187c/0x1b70 net/ipv4/ip_output.c:236
->  __ip_finish_output+0x287/0x810
->   ip_finish_output+0x4b/0x600 net/ipv4/ip_output.c:324
->   NF_HOOK_COND include/linux/netfilter.h:303 [inline]
->   ip_output+0x15f/0x3f0 net/ipv4/ip_output.c:434
->   dst_output include/net/dst.h:450 [inline]
->   ip_local_out net/ipv4/ip_output.c:130 [inline]
->   ip_send_skb net/ipv4/ip_output.c:1505 [inline]
->   ip_push_pending_frames+0x444/0x570 net/ipv4/ip_output.c:1525
->   ip_send_unicast_reply+0x18c1/0x1b30 net/ipv4/ip_output.c:1672
->   tcp_v4_send_reset+0x238d/0x2a40 net/ipv4/tcp_ipv4.c:910
->   tcp_v4_rcv+0x48f8/0x5750 net/ipv4/tcp_ipv4.c:2431
->   ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
->   ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
->   NF_HOOK include/linux/netfilter.h:314 [inline]
->   ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
->   dst_input include/net/dst.h:460 [inline]
->   ip_sublist_rcv_finish net/ipv4/ip_input.c:578 [inline]
->   ip_list_rcv_finish net/ipv4/ip_input.c:628 [inline]
->   ip_sublist_rcv+0x15f3/0x17f0 net/ipv4/ip_input.c:636
->   ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:670
->   __netif_receive_skb_list_ptype net/core/dev.c:5715 [inline]
->   __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5762
->   __netif_receive_skb_list net/core/dev.c:5814 [inline]
->   netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:5905
->   gro_normal_list include/net/gro.h:515 [inline]
->   napi_complete_done+0x3d4/0x810 net/core/dev.c:6256
->   virtqueue_napi_complete drivers/net/virtio_net.c:758 [inline]
->   virtnet_poll+0x5d80/0x6bf0 drivers/net/virtio_net.c:3013
->   __napi_poll+0xe7/0x980 net/core/dev.c:6877
->   napi_poll net/core/dev.c:6946 [inline]
->   net_rx_action+0xa5a/0x19b0 net/core/dev.c:7068
->   handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:554
->   __do_softirq kernel/softirq.c:588 [inline]
->   invoke_softirq kernel/softirq.c:428 [inline]
->   __irq_exit_rcu+0x68/0x180 kernel/softirq.c:655
->   irq_exit_rcu+0x12/0x20 kernel/softirq.c:671
->   common_interrupt+0x97/0xb0 arch/x86/kernel/irq.c:278
->   asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:693
->   __preempt_count_sub arch/x86/include/asm/preempt.h:84 [inline]
->   kmsan_virt_addr_valid arch/x86/include/asm/kmsan.h:95 [inline]
->   virt_to_page_or_null+0xfb/0x150 mm/kmsan/shadow.c:75
->   kmsan_get_metadata+0x13e/0x1c0 mm/kmsan/shadow.c:141
->   kmsan_get_shadow_origin_ptr+0x4d/0xb0 mm/kmsan/shadow.c:102
->   get_shadow_origin_ptr mm/kmsan/instrumentation.c:38 [inline]
->   __msan_metadata_ptr_for_store_4+0x27/0x40 mm/kmsan/instrumentation.c:93
->   rcu_preempt_read_enter kernel/rcu/tree_plugin.h:390 [inline]
->   __rcu_read_lock+0x46/0x70 kernel/rcu/tree_plugin.h:413
->   rcu_read_lock include/linux/rcupdate.h:847 [inline]
->   batadv_nc_purge_orig_hash net/batman-adv/network-coding.c:408 [inline]
->   batadv_nc_worker+0x114/0x19e0 net/batman-adv/network-coding.c:719
->   process_one_work kernel/workqueue.c:3229 [inline]
->   process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3310
->   worker_thread+0xea7/0x14f0 kernel/workqueue.c:3391
->   kthread+0x3e2/0x540 kernel/kthread.c:389
->   ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->
-> Uninit was created at:
->   __alloc_pages_noprof+0x9a7/0xe00 mm/page_alloc.c:4774
->   alloc_pages_mpol_noprof+0x299/0x990 mm/mempolicy.c:2265
->   alloc_pages_noprof+0x1bf/0x1e0 mm/mempolicy.c:2344
->   alloc_slab_page mm/slub.c:2412 [inline]
->   allocate_slab+0x320/0x12e0 mm/slub.c:2578
->   new_slab mm/slub.c:2631 [inline]
->   ___slab_alloc+0x12ef/0x35e0 mm/slub.c:3818
->   __slab_alloc mm/slub.c:3908 [inline]
->   __slab_alloc_node mm/slub.c:3961 [inline]
->   slab_alloc_node mm/slub.c:4122 [inline]
->   kmem_cache_alloc_noprof+0x57a/0xb20 mm/slub.c:4141
->   inet_twsk_alloc+0x11f/0x9d0 net/ipv4/inet_timewait_sock.c:188
->   tcp_time_wait+0x83/0xf50 net/ipv4/tcp_minisocks.c:309
->  tcp_rcv_state_process+0x145a/0x49d0
->   tcp_v4_do_rcv+0xbf9/0x11a0 net/ipv4/tcp_ipv4.c:1939
->   tcp_v4_rcv+0x51df/0x5750 net/ipv4/tcp_ipv4.c:2351
->   ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
->   ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
->   NF_HOOK include/linux/netfilter.h:314 [inline]
->   ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
->   dst_input include/net/dst.h:460 [inline]
->   ip_sublist_rcv_finish net/ipv4/ip_input.c:578 [inline]
->   ip_list_rcv_finish net/ipv4/ip_input.c:628 [inline]
->   ip_sublist_rcv+0x15f3/0x17f0 net/ipv4/ip_input.c:636
->   ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:670
->   __netif_receive_skb_list_ptype net/core/dev.c:5715 [inline]
->   __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5762
->   __netif_receive_skb_list net/core/dev.c:5814 [inline]
->   netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:5905
->   gro_normal_list include/net/gro.h:515 [inline]
->   napi_complete_done+0x3d4/0x810 net/core/dev.c:6256
->   virtqueue_napi_complete drivers/net/virtio_net.c:758 [inline]
->   virtnet_poll+0x5d80/0x6bf0 drivers/net/virtio_net.c:3013
->   __napi_poll+0xe7/0x980 net/core/dev.c:6877
->   napi_poll net/core/dev.c:6946 [inline]
->   net_rx_action+0xa5a/0x19b0 net/core/dev.c:7068
->   handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:554
->   __do_softirq kernel/softirq.c:588 [inline]
->   invoke_softirq kernel/softirq.c:428 [inline]
->   __irq_exit_rcu+0x68/0x180 kernel/softirq.c:655
->   irq_exit_rcu+0x12/0x20 kernel/softirq.c:671
->   common_interrupt+0x97/0xb0 arch/x86/kernel/irq.c:278
->   asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:693
->
-> CPU: 0 UID: 0 PID: 3962 Comm: kworker/u8:18 Not tainted 6.12.0-syzkaller-=
-09073-g9f16d5e6f220 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 09/13/2024
-> Workqueue: bat_events batadv_nc_worker
->
-> Fixes: 79636038d37e ("ipv4: tcp: give socket pointer to control skbs")
-> Fixes: 507a96737d99 ("ipv6: tcp: give socket pointer to control skbs")
-> Reported-by: syzbot+8b0959fc16551d55896b@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/netdev/674442bd.050a0220.1cc393.0072.GAE@go=
-ogle.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> 
+> 
+> On Mon, Nov 25, 2024, at 9:12 AM, Alexander Lobakin wrote:
+>> From: Daniel Xu <dxu@dxuuu.xyz>
+>> Date: Fri, 22 Nov 2024 17:10:06 -0700
+>>
+>>> Hi Olek,
+>>>
+>>> Here are the results.
+>>>
+>>> On Wed, Nov 13, 2024 at 03:39:13PM GMT, Daniel Xu wrote:
+>>>>
+>>>>
+>>>> On Tue, Nov 12, 2024, at 9:43 AM, Alexander Lobakin wrote:
+>>
+>> [...]
+>>
+>>> Baseline (again)
+>>>
+>>> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+>>> Run 1	3169917	        0.00007295	0.00007871	0.00009343		Run 1	21749.43
+>>> Run 2	3228290	        0.00007103	0.00007679	0.00009215		Run 2	21897.17
+>>> Run 3	3226746	        0.00007231	0.00007871	0.00009087		Run 3	21906.82
+>>> Run 4	3191258	        0.00007231	0.00007743	0.00009087		Run 4	21155.15
+>>> Run 5	3235653	        0.00007231	0.00007743	0.00008703		Run 5	21397.06
+>>> Average	3210372.8	0.000072182	0.000077814	0.00009087		Average	21621.126
+>>>
+>>> cpumap v2 Olek
+>>>
+>>> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughput (Mbit/s)
+>>> Run 1	3253651	        0.00007167	0.00007807	0.00009343		Run 1	13497.57
+>>> Run 2	3221492	        0.00007231	0.00007743	0.00009087		Run 2	12115.53
+>>> Run 3	3296453	        0.00007039	0.00007807	0.00009087		Run 3	12323.38
+>>> Run 4	3254460	        0.00007167	0.00007807	0.00009087		Run 4	12901.88
+>>> Run 5	3173327	        0.00007295	0.00007871	0.00009215		Run 5	12593.22
+>>> Average	3239876.6	0.000071798	0.00007807	0.000091638		Average	12686.316
+>>> Delta	0.92%	        -0.53%	        0.33%	        0.85%			        -41.32%
+>>>
+>>>
+>>> It's very interesting that we see -40% tput w/ the patches. I went back
+>>
+>> Oh no, I messed up something =\
+>>
+>> Could you please also test not the whole series, but patches 1-3 (up to
+>> "bpf:cpumap: switch to GRO...") and 1-4 (up to "bpf: cpumap: reuse skb
+>> array...")? Would be great to see whether this implementation works
+>> worse right from the start or I just broke something later on.
+> 
+> Patches 1-3 reproduces the -40% tput numbers. 
 
-Reviewed-by: Brian Vazquez <brianvv@google.com>
+Ok, thanks! Seems like using the hybrid approach (GRO, but on top of
+cpumap's kthreads instead of NAPI) really performs worse than switching
+cpumap to NAPI.
 
-> ---
-> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Cc: Brian Vazquez <brianvv@google.com>
-> ---
->  include/net/inet_timewait_sock.h | 2 ++
->  net/ipv4/tcp_minisocks.c         | 4 ++++
->  2 files changed, 6 insertions(+)
->
-> diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait=
-_sock.h
-> index beb533a0e88098a95a1365b51bdc2d9e9dfd1d07..62c0a7e65d6bdf4c71a8ea905=
-86b985f9fd30229 100644
-> --- a/include/net/inet_timewait_sock.h
-> +++ b/include/net/inet_timewait_sock.h
-> @@ -45,6 +45,8 @@ struct inet_timewait_sock {
->  #define tw_node                        __tw_common.skc_nulls_node
->  #define tw_bind_node           __tw_common.skc_bind_node
->  #define tw_refcnt              __tw_common.skc_refcnt
-> +#define tw_tx_queue_mapping    __tw_common.skc_tx_queue_mapping
-> +#define tw_rx_queue_mapping    __tw_common.skc_rx_queue_mapping
->  #define tw_hash                        __tw_common.skc_hash
->  #define tw_prot                        __tw_common.skc_prot
->  #define tw_net                 __tw_common.skc_net
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> index bb1fe1ba867ac3ed8610ceb9fef7e74cd465b3ea..7121d8573928cbf6840b3361b=
-62f4812d365a30b 100644
-> --- a/net/ipv4/tcp_minisocks.c
-> +++ b/net/ipv4/tcp_minisocks.c
-> @@ -326,6 +326,10 @@ void tcp_time_wait(struct sock *sk, int state, int t=
-imeo)
->                 tcptw->tw_last_oow_ack_time =3D 0;
->                 tcptw->tw_tx_delay      =3D tp->tcp_tx_delay;
->                 tw->tw_txhash           =3D sk->sk_txhash;
-> +               tw->tw_tx_queue_mapping =3D sk->sk_tx_queue_mapping;
-> +#ifdef CONFIG_SOCK_RX_QUEUE_MAPPING
-> +               tw->tw_rx_queue_mapping =3D sk->sk_rx_queue_mapping;
-> +#endif
->  #if IS_ENABLED(CONFIG_IPV6)
->                 if (tw->tw_family =3D=3D PF_INET6) {
->                         struct ipv6_pinfo *np =3D inet6_sk(sk);
-> --
-> 2.47.0.371.ga323438b13-goog
->
+> 
+> With patches 1-4 the numbers get slightly worse (~1gbps lower) but it was noisy.
+
+Interesting, I was sure patch 4 optimizes stuff... Maybe I'll give up on it.
+
+> 
+> tcp_rr results were unaffected.
+
+@ Jakub,
+
+Looks like I can't just use GRO without Lorenzo's conversion to NAPI, at
+least for now =\ I took a look on the backlog NAPI and it could be used,
+although we'd need a pointer in the backlog to the corresponding cpumap
++ also some synchronization point to make sure backlog NAPI won't access
+already destroyed cpumap.
+
+Maybe Lorenzo could take a look...
+
+Thanks,
+Olek
 
