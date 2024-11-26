@@ -1,366 +1,184 @@
-Return-Path: <netdev+bounces-147330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4DC9D91CA
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 07:31:13 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B269D91CE
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 07:31:59 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77C9164DCF
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 06:31:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B340F286044
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 06:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC9969D31;
-	Tue, 26 Nov 2024 06:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254B515575F;
+	Tue, 26 Nov 2024 06:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NueduGRu"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T3UlxoIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE8510940
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A2C1684A4
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 06:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732602669; cv=none; b=Rh3giWP8LvCh1qqeQlpUGIpv9LTaUPg0KdTS6GrBPignaF0fKiVYrf5Ep9E6mh1GDWO2Z2xdpdzgoFCm+PelagICEbzRvAaSR0r6OCor9g4W2HKsWecaVaTXfpFOEc6/ord8CRJDJoI23jSSTLsmrnb6Ykah/AsP746eqHyW478=
+	t=1732602716; cv=none; b=IK067SGnM3BU1pt5UMGA6xS8WHzBQNkZ7BTbWQnNa8WjExDoMIf8gexPN/sU7I4ZRlVN61Tc6CnGz3GUlzATf/xX/T7rYI8QkPp9RqTu79t3L60jFdj/CHKagma9G7+go3xYEE7O5fBGH35NATyGinIwApLms4Xt+DIWKVKfORs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732602669; c=relaxed/simple;
-	bh=ifyKNTHyzlftTzQIIUF/nSQrtM5pnGEGArNh948fmKU=;
+	s=arc-20240116; t=1732602716; c=relaxed/simple;
+	bh=zYjd1KWhVM4FRGm8C7YtweAcvjV0Jc6aN/HYIfW2VuM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=msoDaa87NBH4fSj10gwwzw13zDdKtakkt2+9A7x250mVCPqSiNxw4EcEt6BWsoyalltEluJP+B8jrBTDsvXT1iAT6OiiLhFpWYS9aXkRgekOVLUSZRdf22xIMfzQBSkG3kFnOi3+UmWYz5nvw/orL348o9EksCWW44vVHs0kRMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NueduGRu; arc=none smtp.client-ip=209.85.217.47
+	 To:Cc:Content-Type; b=nOFSQ//Pe9lCCG5ckwy9Sg4mcx3zQZpC6hMGZgqxFRAfb/rpnvVPb+sS3aVKfR2y8n6j9GzUMo1cVd/pQhP87SB4tAQSvks+rg9v/uD+FqHqzOYb5nj0WNEJ2gxNVnk+9dyepWL6Wg+LFbZrRuszR2XYFa+0kWqXSWBW3ATro+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T3UlxoIW; arc=none smtp.client-ip=209.85.217.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4ad564437edso2179451137.1
-        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 22:31:06 -0800 (PST)
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-4aef56c5cf9so936349137.0
+        for <netdev@vger.kernel.org>; Mon, 25 Nov 2024 22:31:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1732602666; x=1733207466; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1732602713; x=1733207513; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VeYr50zAyav3xAlvso4ygPe7Qgtaus6L9v5H8dj22wE=;
-        b=NueduGRuQScSwdbyg15FsJkKCliR3Ih68rF7MlaTmCQ7HtLJAVw1NuS04RZpZUv4y1
-         YlExotNJP7xMWL+PJ7k5lmHmFWBoa6ivw1RZMBB/jR9pYkc6Mu5D7izEQndPLp5ktq82
-         AXWrYNLrbOwmTwo4dDCV8zUCFtCh9ZC1sx3EU=
+        bh=zscTyqrf7IZG8l5V+1fuf03gKjB0quLyn3srN3XZ254=;
+        b=T3UlxoIWfny/MqFk7in0N+EFE1o/6kcHg7P94m7SIOef/4fHTLhqiawYZItdNGIX+7
+         iPnhb/2lxUcpQX96HicSGB64VY8tAr+eqKaVh0rJ8huYyOcO/dZUXje2W104pvPoQQMP
+         hfhF0eGFE/fuNn2/PsBe2WkBTMp2RMd65l4Jc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732602666; x=1733207466;
+        d=1e100.net; s=20230601; t=1732602713; x=1733207513;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VeYr50zAyav3xAlvso4ygPe7Qgtaus6L9v5H8dj22wE=;
-        b=jV5oX401KY4sxEEcTx+J82t/LLpdY399m2d7XNe4U0DJweOCthoYqfoyRMDE8fGjwV
-         V0j6ZdOz3vEYDu7Yk8fcYwatgurdJ4O9e2cjNzBsnrUBjarAHBVzd+in7Qk+JCxPkI9T
-         Iv5OW01YLbNNuj6j5L7RqdNYerINv7qVZa/OvO8HUFIIXyo45B/4KIkh8sUA6dI5YhEk
-         yM9DlWq7Zo/Oy8gkGWKIDtikvuIf3On1y4G3xOAG3J+OFaID5IaHYTayvvgr2B0r/Bpi
-         Oor4NzDJ/625OqqZoEvt/Vy8Bywp7FnUMMBayEkpvoHgStOxsQU34bKpauWtROd6AfZk
-         LL3A==
-X-Gm-Message-State: AOJu0YxzXxJFKL9+OuImYTGaHk19JnzEUWY5AGx+F9I1JS7UVimir++r
-	uQhyROVRKe1VeL76h/C282eDKtJS1V9rh2CSFpSLU5vYwkyyadmdhrg6SJ+2cVg09BBPdGbeu3D
-	buK20Ekv+fd1Gzdk7u8M/uBwwMZFYlGTqqjN0
-X-Gm-Gg: ASbGncu6M6L4zPohgvNQKNIrD73/a/MmslBf17k6KOhIVSKIWcUwKRdvIYbFM1z1KON
-	YShKn6e79NNQ5Amh9XC3v564tOiT3A39b
-X-Google-Smtp-Source: AGHT+IGIaA7lTwVkw0SP1sqGvXO5QRR5Ja46Kngi61GDIdqqJXjzyc6I8cuCatm7vu9bNt1hgNrcxWgyEV/1qZ1Xq1I=
-X-Received: by 2002:a05:6102:3e23:b0:4af:f45:d360 with SMTP id
- ada2fe7eead31-4af35ea8901mr2661401137.5.1732602665808; Mon, 25 Nov 2024
- 22:31:05 -0800 (PST)
+        bh=zscTyqrf7IZG8l5V+1fuf03gKjB0quLyn3srN3XZ254=;
+        b=kaReDSMOBFl0nDU94Ie5qFjOa/jkb7YXfH7zzmbsUmavREULnoSNJtw0VzPWNiKwKm
+         orj+krgnvcihrSZB1ufvNXHF9Ly9L87aO4fQuOJGJDBWZ6syO/q7hdmBH3z62/shUlZA
+         lIflK8dKVHb+DIsBlAE0cqSW1fEcfpl66JKRRiH2ONmatjWGqPqZXLyLlEKWavsjXX3k
+         6jm5l9nqujszSgQNqg/HxqkvEH+lqQv/V/yoRk/j0H7qkuQyyTNUkzDibfwGHsA7RGSO
+         spjo8D3iHKfw6iGaKmn8ldHmZQteF6sulNexH5xLhyXlndS55v/Mjf1I1EoD43DpUWPd
+         7D3g==
+X-Gm-Message-State: AOJu0Yw/haN/iEiDX1vmK75Ul+Qzu0OrasXQuL2ITSQy5HlSJ9fgsMBw
+	ExXHuhUjvbc8ZiwTus1tB564eY3eiIfmTSc6y0vtOCa+d++6n8g++woB1IWh69lMIBK3T66mIQz
+	9KeR8mziSRp5JjhOgB7KeL6VYB2Nue0I1l7ozzRbNQzuPIg8=
+X-Gm-Gg: ASbGnctJaI+Rt1iHdNsmIBatOASCJsmPfxT9wh7ajKEstSl78GVJDH+fiioUbuLiwIg
+	t01il1C4t+Jxnzg10F9lqDKd20M2yvSr7
+X-Google-Smtp-Source: AGHT+IGo2IUGy6n4YrQcy08QiD3NnT/2eOdNO3tWjARoACstCiWNIJIevsyMOeq0fq7yy0bQoGkn8GQodS5vSBT11hE=
+X-Received: by 2002:a05:6102:32c9:b0:4ad:4e83:92be with SMTP id
+ ada2fe7eead31-4addcbf254fmr14365037137.13.1732602713269; Mon, 25 Nov 2024
+ 22:31:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241125042412.2865764-1-dw@davidwei.uk> <20241125042412.2865764-2-dw@davidwei.uk>
-In-Reply-To: <20241125042412.2865764-2-dw@davidwei.uk>
+References: <20241125042412.2865764-1-dw@davidwei.uk> <20241125042412.2865764-3-dw@davidwei.uk>
+In-Reply-To: <20241125042412.2865764-3-dw@davidwei.uk>
 From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Tue, 26 Nov 2024 12:00:54 +0530
-Message-ID: <CAOBf=mvEEHeLP4CF76b7ip2VHz82V+c23trCkVeArjP9iJ0sfg@mail.gmail.com>
-Subject: Re: [PATCH net v1 1/3] bnxt_en: refactor tpa_info alloc/free into helpers
+Date: Tue, 26 Nov 2024 12:01:42 +0530
+Message-ID: <CAOBf=muRZ2SDeadY8Sjass8tZ3xM5iCYeJjEMDLgCZXnCoLOcg@mail.gmail.com>
+Subject: Re: [PATCH net v1 2/3] bnxt_en: refactor bnxt_alloc_rx_rings() to
+ call bnxt_alloc_rx_agg_bmap()
 To: David Wei <dw@davidwei.uk>
 Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, 
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000731a3e0627cafe8d"
+	boundary="000000000000467db80627cb0199"
 
---000000000000731a3e0627cafe8d
+--000000000000467db80627cb0199
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, Nov 25, 2024 at 9:54=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
 >
-> Refactor bnxt_rx_ring_info->tpa_info operations into helpers that work
-> on a single tpa_info in prep for queue API using them.
->
-> There are 2 pairs of operations:
->
-> * bnxt_alloc_one_tpa_info()
-> * bnxt_free_one_tpa_info()
->
-> These alloc/free the tpa_info array itself.
->
-> * bnxt_alloc_one_tpa_info_data()
-> * bnxt_free_one_tpa_info_data()
->
-> These alloc/free the frags stored in tpa_info array.
+> Refactor bnxt_alloc_rx_rings() to call bnxt_alloc_rx_agg_bmap() for
+> allocating rx_agg_bmap.
 >
 > Signed-off-by: David Wei <dw@davidwei.uk>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 148 ++++++++++++++--------
->  1 file changed, 95 insertions(+), 53 deletions(-)
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++-------------
+>  1 file changed, 16 insertions(+), 20 deletions(-)
 >
 > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
 rnet/broadcom/bnxt/bnxt.c
-> index 5f7bdafcf05d..b2cc8df22241 100644
+> index b2cc8df22241..294d21cdaeb7 100644
 > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -3421,15 +3421,11 @@ static void bnxt_free_one_rx_agg_ring(struct bnxt=
- *bp, struct bnxt_rx_ring_info
->         }
->  }
->
-> -static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
-> +static void bnxt_free_one_tpa_info_data(struct bnxt *bp,
-> +                                       struct bnxt_rx_ring_info *rxr)
->  {
-> -       struct bnxt_rx_ring_info *rxr =3D &bp->rx_ring[ring_nr];
-> -       struct bnxt_tpa_idx_map *map;
->         int i;
->
-> -       if (!rxr->rx_tpa)
-> -               goto skip_rx_tpa_free;
-> -
->         for (i =3D 0; i < bp->max_tpa; i++) {
->                 struct bnxt_tpa_info *tpa_info =3D &rxr->rx_tpa[i];
->                 u8 *data =3D tpa_info->data;
-> @@ -3440,6 +3436,17 @@ static void bnxt_free_one_rx_ring_skbs(struct bnxt=
- *bp, int ring_nr)
->                 tpa_info->data =3D NULL;
->                 page_pool_free_va(rxr->head_pool, data, false);
->         }
-> +}
-> +
-> +static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp,
-> +                                      struct bnxt_rx_ring_info *rxr)
-> +{
-> +       struct bnxt_tpa_idx_map *map;
-> +
-> +       if (!rxr->rx_tpa)
-> +               goto skip_rx_tpa_free;
-> +
-> +       bnxt_free_one_tpa_info_data(bp, rxr);
->
->  skip_rx_tpa_free:
->         if (!rxr->rx_buf_ring)
-> @@ -3461,13 +3468,17 @@ static void bnxt_free_one_rx_ring_skbs(struct bnx=
-t *bp, int ring_nr)
->
->  static void bnxt_free_rx_skbs(struct bnxt *bp)
->  {
-> +       struct bnxt_rx_ring_info *rxr;
->         int i;
->
->         if (!bp->rx_ring)
->                 return;
->
-> -       for (i =3D 0; i < bp->rx_nr_rings; i++)
-> -               bnxt_free_one_rx_ring_skbs(bp, i);
-> +       for (i =3D 0; i < bp->rx_nr_rings; i++) {
-> +               rxr =3D &bp->rx_ring[i];
-> +
-> +               bnxt_free_one_rx_ring_skbs(bp, rxr);
-Minor nit; Could avoid a declaration and an assignment here by
-directly calling this API with the 2nd param set to &bp->rx_ring[i] ?
-> +       }
->  }
->
->  static void bnxt_free_skbs(struct bnxt *bp)
-> @@ -3608,29 +3619,64 @@ static int bnxt_alloc_ring(struct bnxt *bp, struc=
-t bnxt_ring_mem_info *rmem)
->         return 0;
->  }
->
-> +static void bnxt_free_one_tpa_info(struct bnxt *bp,
-> +                                  struct bnxt_rx_ring_info *rxr)
-> +{
-> +       int i;
-> +
-> +       kfree(rxr->rx_tpa_idx_map);
-> +       rxr->rx_tpa_idx_map =3D NULL;
-> +       if (rxr->rx_tpa) {
-> +               for (i =3D 0; i < bp->max_tpa; i++) {
-> +                       kfree(rxr->rx_tpa[i].agg_arr);
-> +                       rxr->rx_tpa[i].agg_arr =3D NULL;
-> +               }
-> +       }
-> +       kfree(rxr->rx_tpa);
-> +       rxr->rx_tpa =3D NULL;
-> +}
-> +
->  static void bnxt_free_tpa_info(struct bnxt *bp)
->  {
-> -       int i, j;
-> +       int i;
->
->         for (i =3D 0; i < bp->rx_nr_rings; i++) {
->                 struct bnxt_rx_ring_info *rxr =3D &bp->rx_ring[i];
->
-> -               kfree(rxr->rx_tpa_idx_map);
-> -               rxr->rx_tpa_idx_map =3D NULL;
-> -               if (rxr->rx_tpa) {
-> -                       for (j =3D 0; j < bp->max_tpa; j++) {
-> -                               kfree(rxr->rx_tpa[j].agg_arr);
-> -                               rxr->rx_tpa[j].agg_arr =3D NULL;
-> -                       }
-> -               }
-> -               kfree(rxr->rx_tpa);
-> -               rxr->rx_tpa =3D NULL;
-> +               bnxt_free_one_tpa_info(bp, rxr);
-> +       }
-> +}
-> +
-> +static int bnxt_alloc_one_tpa_info(struct bnxt *bp,
-> +                                  struct bnxt_rx_ring_info *rxr)
-> +{
-> +       struct rx_agg_cmp *agg;
-> +       int i;
-> +
-> +       rxr->rx_tpa =3D kcalloc(bp->max_tpa, sizeof(struct bnxt_tpa_info)=
+> @@ -3768,6 +3768,19 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp=
 ,
-> +                             GFP_KERNEL);
-> +       if (!rxr->rx_tpa)
-> +               return -ENOMEM;
-> +
-> +       if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
-> +               return 0;
-> +       for (i =3D 0; i < bp->max_tpa; i++) {
-> +               agg =3D kcalloc(MAX_SKB_FRAGS, sizeof(*agg), GFP_KERNEL);
-> +               if (!agg)
-> +                       return -ENOMEM;
-> +               rxr->rx_tpa[i].agg_arr =3D agg;
->         }
-> +       rxr->rx_tpa_idx_map =3D kzalloc(sizeof(*rxr->rx_tpa_idx_map),
-> +                                     GFP_KERNEL);
-> +       if (!rxr->rx_tpa_idx_map)
-> +               return -ENOMEM;
-> +
-> +       return 0;
+>         return PTR_ERR(pool);
 >  }
 >
->  static int bnxt_alloc_tpa_info(struct bnxt *bp)
->  {
-> -       int i, j;
-> +       int i, rc;
->
->         bp->max_tpa =3D MAX_TPA;
->         if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
-> @@ -3641,25 +3687,10 @@ static int bnxt_alloc_tpa_info(struct bnxt *bp)
->
->         for (i =3D 0; i < bp->rx_nr_rings; i++) {
->                 struct bnxt_rx_ring_info *rxr =3D &bp->rx_ring[i];
-> -               struct rx_agg_cmp *agg;
->
-> -               rxr->rx_tpa =3D kcalloc(bp->max_tpa, sizeof(struct bnxt_t=
-pa_info),
-> -                                     GFP_KERNEL);
-> -               if (!rxr->rx_tpa)
-> -                       return -ENOMEM;
-> -
-> -               if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
-> -                       continue;
-> -               for (j =3D 0; j < bp->max_tpa; j++) {
-> -                       agg =3D kcalloc(MAX_SKB_FRAGS, sizeof(*agg), GFP_=
-KERNEL);
-> -                       if (!agg)
-> -                               return -ENOMEM;
-> -                       rxr->rx_tpa[j].agg_arr =3D agg;
-> -               }
-> -               rxr->rx_tpa_idx_map =3D kzalloc(sizeof(*rxr->rx_tpa_idx_m=
-ap),
-> -                                             GFP_KERNEL);
-> -               if (!rxr->rx_tpa_idx_map)
-> -                       return -ENOMEM;
-> +               rc =3D bnxt_alloc_one_tpa_info(bp, rxr);
-> +               if (rc)
-> +                       return rc;
->         }
->         return 0;
->  }
-> @@ -4268,10 +4299,31 @@ static void bnxt_alloc_one_rx_ring_page(struct bn=
-xt *bp,
->         rxr->rx_agg_prod =3D prod;
->  }
->
-> +static int bnxt_alloc_one_tpa_info_data(struct bnxt *bp,
-> +                                       struct bnxt_rx_ring_info *rxr)
+> +static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_i=
+nfo *rxr)
 > +{
-> +       dma_addr_t mapping;
-> +       u8 *data;
-> +       int i;
+> +       u16 mem_size;
 > +
-> +       for (i =3D 0; i < bp->max_tpa; i++) {
-> +               data =3D __bnxt_alloc_rx_frag(bp, &mapping, rxr,
-> +                                           GFP_KERNEL);
-> +               if (!data)
-> +                       return -ENOMEM;
-> +
-> +               rxr->rx_tpa[i].data =3D data;
-> +               rxr->rx_tpa[i].data_ptr =3D data + bp->rx_offset;
-> +               rxr->rx_tpa[i].mapping =3D mapping;
-> +       }
+> +       rxr->rx_agg_bmap_size =3D bp->rx_agg_ring_mask + 1;
+> +       mem_size =3D rxr->rx_agg_bmap_size / 8;
+> +       rxr->rx_agg_bmap =3D kzalloc(mem_size, GFP_KERNEL);
+> +       if (!rxr->rx_agg_bmap)
+> +               return -ENOMEM;
 > +
 > +       return 0;
 > +}
 > +
->  static int bnxt_alloc_one_rx_ring(struct bnxt *bp, int ring_nr)
+>  static int bnxt_alloc_rx_rings(struct bnxt *bp)
 >  {
->         struct bnxt_rx_ring_info *rxr =3D &bp->rx_ring[ring_nr];
-> -       int i;
-> +       int rc;
+>         int numa_node =3D dev_to_node(&bp->pdev->dev);
+> @@ -3812,19 +3825,15 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
 >
->         bnxt_alloc_one_rx_ring_skb(bp, rxr, ring_nr);
->
-> @@ -4281,19 +4333,9 @@ static int bnxt_alloc_one_rx_ring(struct bnxt *bp,=
- int ring_nr)
->         bnxt_alloc_one_rx_ring_page(bp, rxr, ring_nr);
->
->         if (rxr->rx_tpa) {
-> -               dma_addr_t mapping;
-> -               u8 *data;
+>                 ring->grp_idx =3D i;
+>                 if (agg_rings) {
+> -                       u16 mem_size;
 > -
-> -               for (i =3D 0; i < bp->max_tpa; i++) {
-> -                       data =3D __bnxt_alloc_rx_frag(bp, &mapping, rxr,
-> -                                                   GFP_KERNEL);
-> -                       if (!data)
+>                         ring =3D &rxr->rx_agg_ring_struct;
+>                         rc =3D bnxt_alloc_ring(bp, &ring->ring_mem);
+>                         if (rc)
+>                                 return rc;
+>
+>                         ring->grp_idx =3D i;
+> -                       rxr->rx_agg_bmap_size =3D bp->rx_agg_ring_mask + =
+1;
+> -                       mem_size =3D rxr->rx_agg_bmap_size / 8;
+> -                       rxr->rx_agg_bmap =3D kzalloc(mem_size, GFP_KERNEL=
+);
+> -                       if (!rxr->rx_agg_bmap)
 > -                               return -ENOMEM;
-> -
-> -                       rxr->rx_tpa[i].data =3D data;
-> -                       rxr->rx_tpa[i].data_ptr =3D data + bp->rx_offset;
-> -                       rxr->rx_tpa[i].mapping =3D mapping;
-> -               }
-> +               rc =3D bnxt_alloc_one_tpa_info_data(bp, rxr);
-> +               if (rc)
-> +                       return rc;
->         }
->         return 0;
->  }
-> @@ -13657,7 +13699,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
->                         bnxt_reset_task(bp, true);
->                         break;
+> +                       rc =3D bnxt_alloc_rx_agg_bmap(bp, rxr);
+> +                       if (rc)
+> +                               return rc;
 >                 }
-> -               bnxt_free_one_rx_ring_skbs(bp, i);
-> +               bnxt_free_one_rx_ring_skbs(bp, rxr);
->                 rxr->rx_prod =3D 0;
->                 rxr->rx_agg_prod =3D 0;
->                 rxr->rx_sw_agg_prod =3D 0;
+>         }
+>         if (bp->flags & BNXT_FLAG_TPA)
+> @@ -15321,19 +15330,6 @@ static const struct netdev_stat_ops bnxt_stat_op=
+s =3D {
+>         .get_base_stats         =3D bnxt_get_base_stats,
+>  };
+>
+> -static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_i=
+nfo *rxr)
+> -{
+> -       u16 mem_size;
+> -
+> -       rxr->rx_agg_bmap_size =3D bp->rx_agg_ring_mask + 1;
+> -       mem_size =3D rxr->rx_agg_bmap_size / 8;
+> -       rxr->rx_agg_bmap =3D kzalloc(mem_size, GFP_KERNEL);
+> -       if (!rxr->rx_agg_bmap)
+> -               return -ENOMEM;
+> -
+> -       return 0;
+> -}
+> -
+>  static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int =
+idx)
+>  {
+>         struct bnxt_rx_ring_info *rxr, *clone;
 > --
 > 2.43.5
 >
 >
-Other than the one minor suggestion, LGTM otherwise
-
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 
---000000000000731a3e0627cafe8d
+--000000000000467db80627cb0199
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -431,14 +249,14 @@ R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
 r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJt
 MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
 VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE+WrYMD8XwRqemINwIqy+UmUmUF
-90DTwGgZBbr69I7WMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0
-MTEyNjA2MzEwNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGkD1Lta9dPtaVS29vi6TJU6DSCj
+tOOEoX7sPLdK3F3FMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0
+MTEyNjA2MzE1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
 CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
-AwQCATANBgkqhkiG9w0BAQEFAASCAQAIt4Bs0FOLlM4Z/sIRgpPInxQ3+0HDebn3qlSuCI4OxSTr
-KShEqnyRRpFFdOvDrA5z42mvQjWSyHACiJBgH34ZXV0Rlp8Dr3NhyBkv6EOpOwrCE8cao7QuRqSP
-1ym7WnpVgRuGSuFJcXh3jXgRZ4MErYksdl86qbzs+CdJqOUpHqFtlJ3lDmCqUP5LQ9lfwVizDnOC
-mwqKOQVQKE9MTO2y1pZ9rMs3gtkOCs1KVE3oYGwdlDJ5XY8SG+zCvttPUCOSG7SK74AG90xkoShP
-tpAXR71BVBRp5BINTi/i9DByxIcyPiQapHioOxStWivU2n3bFGBF1Fwo+9HkOq0pBmhS
---000000000000731a3e0627cafe8d--
+AwQCATANBgkqhkiG9w0BAQEFAASCAQBKB3JSZrq4uZ1VRFkd+F77afwNCTtv8STSENorAaF/9xdV
+jEyLGu3XaHyyfWdm0tBSY+2Q0VBLX6DGhFGTEfcd0/hdK5KOCg623vc213EzJ+FnKqy/IxUg4U0d
+ANJ59Qz0rH43vpdAEZ9+gqSBsaW6KbBbVI7ggUcyg3JdyLCskJuWxHK+WSpIpCODZ7jN3VfR54sh
+R/hFOGBZGjczpre22mPsnZmpJZmu8qY893z0F08j5IvuJiLw8wsIgNXINQJk79GyM/E4QG5Oh+zC
+nALZymJW7hQ3HdqFL1TJvYd4nrXByhUBnOTevbLwKI45yO8GN3sTh94lW5myqGj/YnUy
+--000000000000467db80627cb0199--
 
