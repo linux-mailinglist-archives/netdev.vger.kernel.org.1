@@ -1,125 +1,94 @@
-Return-Path: <netdev+bounces-147499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048199D9E0B
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:30:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 322E09D9E0C
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:31:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D61928405B
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 19:30:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECA96286CED
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 19:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EA41D7E35;
-	Tue, 26 Nov 2024 19:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="Dr+MAdxj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3DA1DD525;
+	Tue, 26 Nov 2024 19:31:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.riseup.net (mx0.riseup.net [198.252.153.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C9F1AAD7
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 19:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.252.153.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14281191F8F
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 19:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732649438; cv=none; b=MGru31J9lHEJaKw20SWzM2WouXejfhLS1nuHbQ9qWFuaqvQvletvGxaCR1nAKHa3AWcnYAm+2CRCSyGFa8Q1CZesTYDd1mXA5ZrdBC9exMzGKgMgP82wE7j6SMXRD/zTsv7iXsEZ8Rd2CB1GUEWo/Fll38zBu90IA/5vjItTHmw=
+	t=1732649469; cv=none; b=e4mfemRtmfKLW/zba1srfEpSWdlIesUCo8zDMjuHcKDhyeKFBk5GluzUnmucvEvMqinHO6jH8hg0NihO6w5WCKpVYTRApn67Mg3uIXr5Kz3IS39C5ZOBdUXclp5Ff/4wYFcUBjPeQL723yqkYA9gtcBYrNI05VxkNtQB6tqK/T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732649438; c=relaxed/simple;
-	bh=JxEi1NzfjLMLWVcyld2ufbmMA0wr6PtI07pJBc7cpLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EklC/goYYu8+dKUTEZj9xZD0S9Gi6Zzfm9mdb7QPiIMLIP62KD2VlPB1+tlHAU4KtE/VPQhjRGT93niwN0Dh6enodSSKo8nbLADL4ZdAM/uZaTc3txFIxRkoZk4CObfk5cOjaTRw8FItlqLujm2UJU8QsDKB/wxlvwm+D4ZCM2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=Dr+MAdxj; arc=none smtp.client-ip=198.252.153.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riseup.net
-Received: from fews02-sea.riseup.net (fews02-sea-pn.riseup.net [10.0.1.112])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx0.riseup.net (Postfix) with ESMTPS id 4XyXjL3lfsz9wnw;
-	Tue, 26 Nov 2024 19:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
-	t=1732649430; bh=JxEi1NzfjLMLWVcyld2ufbmMA0wr6PtI07pJBc7cpLo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Dr+MAdxj6BugDN65hlxBhP/Q7No+l+g223cS3NXWSKikYNgQO4qLYnNuYPzQQQRCS
-	 n2OqqNOUldJjoNKBJwtzAbhOIIY5Ingfa96eR1aBCgA1d1sl1+/rQtrEAseT8yw9Xj
-	 5NNMW5Ieq+HvFA+YZAn9YCmTGy0ymORZON1aG6C0=
-X-Riseup-User-ID: 9289D9DC948FAB085E2DCFBA9194C4F85110AEA0518B8F026BE77FC0B2D0AD56
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	 by fews02-sea.riseup.net (Postfix) with ESMTPSA id 4XyXjK2sp0zFtBV;
-	Tue, 26 Nov 2024 19:30:29 +0000 (UTC)
-Message-ID: <8506e3ba-c2fc-4981-9a51-041565a9337b@riseup.net>
-Date: Tue, 26 Nov 2024 20:30:17 +0100
+	s=arc-20240116; t=1732649469; c=relaxed/simple;
+	bh=Z3Yh2qOY8Xtf+fmgZGJLC+IYmCMIWKkdvMJGsLFHuZw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=ERpVOs/3fpqN4mj+C7AEEHYalLtu0xnLfuglHl9qzbJWAEwVBRevjnSn9SDFi7h0xKmjsZAZVS+B3bMlWOt4tkr/ET5TvtPML5jbvtLrhxY0NQgsQqnomd8snLbsoAAuIZJpcqMgDb0GpfSY7A2cp6WZDzl+ZlQeLf1zttZHCcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a794990ef3so903025ab.1
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 11:31:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732649467; x=1733254267;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h3CcMyqh6Vw2D6UimFBh1G8vqaTzPY//H9G8tue85iE=;
+        b=Vs6afMmjKSt7X6SeAykSa6nUpnnvEaYOpaEtxEjtN/Sbr+qQWClop5M2TFapK1KYmJ
+         O/mASouuxw11ZTZpWAcxz1iLxgm8fpVvhIrnq2gFqmy5rswXvPbuKAkYXhaxi7OTmRmN
+         2MhzcUuiO9PStsqXim3WWuXpB+nIjENGdXXncxP5TL8HzxVaRJZ0VY6MVziG1v4leZld
+         ng+XC3dnREHfwowwdcGfbQViJJnr4hzKF4N4HVuZU5NNWcgwW3R5iybEiJzSnGMBpqEu
+         2vlMcOkWtZV6t4V23B2xmTgcU+PXHYtopEMZ6Vymiwn5c0h8CAMOmfeyfPZszIZpHXaY
+         T0vA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2LJyb94GR2ACFXrCFUgGMtgRyyJDatvVdjnpuZW4XrI7EwzcREV80sd5j+HieIxUNsC5AbvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzXfQi8JRINo97WLXvyW7ZyP3VUkSLkm082d3kpc5acBK82bb4
+	HWrAd6jjBaqeFxdaXACXIJoBZXbdnAzCV9RV31RJafKl62+iBEMfb9lgCHzga4aEm5X4A1FvF76
+	OCQBbQjbosdJsetCzQh1N2Cbgrgq9kI8P3Q4VY/4dM50nwdr/KDZV+jw=
+X-Google-Smtp-Source: AGHT+IHhUJgZRn8cEIpq2ohKQAHuqvVvyaYASR0ayovJ4dSWmFjQUCv+4k3ANt4iU+F9hFQMh2aJBjwzb0csbO/dDix8+GQ6iwJg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] udp: call sock_def_readable() if socket is not
- SOCK_FASYNC
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, willemb@google.com
-References: <20241126175402.1506-1-ffmancera@riseup.net>
- <CANn89iJ7NLR4vSqjSb9gpKxfZ2jPJS+jv_H1Qqs1Qz0DZZC=ug@mail.gmail.com>
- <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
- <85bce8fc-6034-43fb-9f4e-45d955568aaa@riseup.net>
- <CANn89iLF_0__Ewy9TXpCs7NP4FB-18iGfnn=cXgXu4qMbxyhwQ@mail.gmail.com>
-Content-Language: en-US
-From: "Fernando F. Mancera" <ffmancera@riseup.net>
-In-Reply-To: <CANn89iLF_0__Ewy9TXpCs7NP4FB-18iGfnn=cXgXu4qMbxyhwQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1745:b0:3a7:bcc5:9de3 with SMTP id
+ e9e14a558f8ab-3a7c51ea413mr5332075ab.2.1732649467304; Tue, 26 Nov 2024
+ 11:31:07 -0800 (PST)
+Date: Tue, 26 Nov 2024 11:31:07 -0800
+In-Reply-To: <67461f7f.050a0220.1286eb.0021.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <674621fb.050a0220.21d33d.001e.GAE@google.com>
+Subject: Re: [syzbot] [net?] general protection fault in modify_prefix_route
+From: syzbot <syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	eric.dumazet@gmail.com, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, thinker.li@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot has bisected this issue to:
 
+commit 5eb902b8e7193cdcb33242af0a56502e6b5206e9
+Author: Kui-Feng Lee <thinker.li@gmail.com>
+Date:   Thu Feb 8 22:06:51 2024 +0000
 
-On 26/11/2024 20:26, Eric Dumazet wrote:
-> On Tue, Nov 26, 2024 at 8:18 PM Fernando F. Mancera
-> <ffmancera@riseup.net> wrote:
->>
->> Hi,
->>
->> On 26/11/2024 19:41, Eric Dumazet wrote:
->>> On Tue, Nov 26, 2024 at 7:32 PM Eric Dumazet <edumazet@google.com> wrote:
->>>>
->>>> On Tue, Nov 26, 2024 at 6:56 PM Fernando Fernandez Mancera
->>>> <ffmancera@riseup.net> wrote:
->>>>>
->>>>> If a socket is not SOCK_FASYNC, sock_def_readable() needs to be called
->>>>> even if receive queue was not empty. Otherwise, if several threads are
->>>>> listening on the same socket with blocking recvfrom() calls they might
->>>>> hang waiting for data to be received.
->>>>>
->>>>
->>>> SOCK_FASYNC seems completely orthogonal to the issue.
->>>>
->>>> First sock_def_readable() should wakeup all threads, I wonder what is happening.
->>>
->>
->> Well, it might be. But I noticed that if SOCK_FASYNC is set then
->> sk_wake_async_rcu() do its work and everything is fine. This is why I
->> thought checking on the flag was a good idea.
->>
-> 
-> How have you tested SOCK_FASYNC ?
-> 
-> SOCK_FASYNC is sending signals. If SIGIO is blocked, I am pretty sure
-> the bug is back.
-> 
+    net/ipv6: Remove expired routes with a separated list of routes.
 
-Ah, I didn't know SIGIO was going to be blocked.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17a90dc0580000
+start commit:   7eef7e306d3c Merge tag 'for-6.13/dm-changes' of git://git...
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14690dc0580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10690dc0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3c44a32edb32752c
+dashboard link: https://syzkaller.appspot.com/bug?extid=1de74b0794c40c8eb300
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=142375c0580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=146f1530580000
 
-> 
->>> Oh well, __skb_wait_for_more_packets() is using
->>> prepare_to_wait_exclusive(), so in this case sock_def_readable() is
->>> waking only one thread.
->>>
->>
->> Yes, this is what I was expecting. What would be the solution? Should I
->> change it to "prepare_to_wait()" instead? Although, I don't know the
->> implication that change might have.
-> 
-> Sadly, we will have to revert, this exclusive wake is subtle.
+Reported-by: syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com
+Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
 
-If that is the case, let me send a revert patch. Thanks for the fast 
-replies :)
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
