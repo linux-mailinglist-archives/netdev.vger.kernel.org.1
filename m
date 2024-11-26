@@ -1,197 +1,144 @@
-Return-Path: <netdev+bounces-147438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC619D97B5
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:55:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5FB39D97CF
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:59:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 913B7B273BE
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:54:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BED4285F46
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7401D4354;
-	Tue, 26 Nov 2024 12:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F861D45F0;
+	Tue, 26 Nov 2024 12:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YwtySm9u"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="YTA8Di+B"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6E21D4324
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12061D4340;
+	Tue, 26 Nov 2024 12:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732625661; cv=none; b=nPRV+aMt/9znKDg9EpTZEADG30JcmFH+oq+W0JD6y51mO8rqcQEyc7bpEWbRwozQKpj9Ia+uS5IXb4lokumlOv0+Av9eGIizZCflAP4hrpvHY81qKFrDvyCL9kzJSv4Yte50EuS8FbP5b4zL+0JmKT4KB9SuxpJzGCWUsXT3hKU=
+	t=1732625977; cv=none; b=tAwir90hsoqmPmYzysrthIWyWn0Rt6nImXOykPciVn4ikHI/7GYnP+5jtXhWuLf4oFUPkqsmthWBv2Pgb0aMn7DDRgUugbGkVvSBg8IbnC1fqbEWVu7XkFDPLVTX+tiZYY7HNKRcqQ2ZhHJBdirwNDhpf6sIBLDYnkLqeT/Rbds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732625661; c=relaxed/simple;
-	bh=3AtldjBJQAk8xIR6jbDNwhIHcUoO7VJjz4GSZunka+Q=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=MMeX3/q0jifWGmXvv2ib8GMP1jQpDyhCf1/VgXN0uSMxloINGXIGAShbJS1Iv3YcbIVK+dR19SPX/sCoNrXulMj53pK1b0lYfhDJ6YE1l4n9EGNNINsQFvQ9bvBQrZJxzRIXp24+1mWY0OPfYm7tES3HQcm+Tx5I1Yws9wymTDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YwtySm9u; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=p5iam8LcLfiWFg9yqlxfwUNcEh+T0vPbo6e8JFWKInY=; b=YwtySm9ulAC86bOSqPk+qRTfeF
-	zs4q/6kYpd4y/tKnAJNZDJgaKNkRPnEi/Rdfd8DTPAR2uPGblFfwOHEzI2bdzyqhCUa30K0L9qAJN
-	5X4kJ5KXOJehIxLrLfhR/mZ0A9dbAizF9NFItuC6FLlxl34Xg5x+0L0Ai7wsvBRMokAeG0pJWpt3C
-	DCMfsMykovDdEDXmtz4QDZGiHZ+tFEy0gSihPa+nsYToh1hjEd+ZNnjvqpGWGD3fjxv4sn1yoFM3G
-	Axhx/tQ3qnIgbIYJCOkuMn61MnZGBKtyVYoVKGj33n6IWzwfM9yGs8GeUK/GQVi8abEx5U2H2sxto
-	ujXbBYvA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:56802 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFv4z-0006yx-2y;
-	Tue, 26 Nov 2024 12:54:10 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFv4y-005yjc-MG; Tue, 26 Nov 2024 12:54:08 +0000
-In-Reply-To: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
-References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH RFC net-next 23/23] net: stmmac: convert to phylink managed
- EEE support
+	s=arc-20240116; t=1732625977; c=relaxed/simple;
+	bh=cnvnj0VfxIvQRO2vsdi0eRPwYK1wWOUyT57uL5dMTLQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Atu/KbiWU0tI4e7FVnIZ8wmUkLtnA4QnxPoACd5mvkgomX8DirJSqnr7o7NCTa6+RmM0E+KrMgPOYWBfGV6yxlF1XrAZMql+cVxVq6JG0s4Bq87+OM2d/36965tEnEGVhIaonyDzlC+C5CJ36EADQAIK3gmfHQb5gIaaFCXwk9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=YTA8Di+B; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id E24C5207CA;
+	Tue, 26 Nov 2024 13:59:32 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id L1OXqsNFQURN; Tue, 26 Nov 2024 13:59:32 +0100 (CET)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 06E99207BB;
+	Tue, 26 Nov 2024 13:59:32 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 06E99207BB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1732625972;
+	bh=MZSNHrkoFWQwpMSZYUXRA/Mg+7OUMb1wtcBhBpfF0m0=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=YTA8Di+B1fnLRKo6JFQ9iUjCSJwKEvH7enJVv3F4Q5DZ3IITOBdrKOV44m0P4rayn
+	 B9mcEXJUCaaFrbH1WAtKYkHCviUMjtcxEsCNgdON8glUFKv9ilUSz0mPfzTNrWCi2Q
+	 tvbx92q0BAgdjq5SacNCER8C0O+D8079TUluG32B5ea92KP6IDcPVFGuey1oImHjGT
+	 fCwSM/0vJ0HbMyE0vhh8vNSd9yPi7GNQIbrOplJtJj0tY0T+6N5uLSUzxDAsAC2axd
+	 RPQbs5FDvbFcg7ZMs/ekvHCSfSmPN/2+PNyvdhMjFXC6MRZ+FD4x5ABCCw3Pq0vsKk
+	 Xo0fEy2zAgr+A==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 26 Nov 2024 13:59:31 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 26 Nov
+ 2024 13:59:31 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 393393184178; Tue, 26 Nov 2024 13:59:31 +0100 (CET)
+Date: Tue, 26 Nov 2024 13:59:31 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Ilia Lin <ilia.lin@kernel.org>, <herbert@gondor.apana.org.au>, "David
+ Miller" <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] xfrm: Add pre-encap fragmentation for packet offload
+Message-ID: <Z0XGMxSou3AZrB2f@gauss3.secunet.de>
+References: <20241124093531.3783434-1-ilia.lin@kernel.org>
+ <20241124120424.GE160612@unreal>
+ <CA+5LGR2n-jCyGbLy9X5wQoUT5OXPkAc3nOr9bURO6=9ObEZVnA@mail.gmail.com>
+ <20241125194340.GI160612@unreal>
+ <CA+5LGR0e677wm5zEx9yYZDtsCUL6etMoRB2yF9o5msqdVOWU8w@mail.gmail.com>
+ <20241126083513.GL160612@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFv4y-005yjc-MG@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 12:54:08 +0000
+In-Reply-To: <20241126083513.GL160612@unreal>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Convert stmmac to use phylink managed EEE support rather than delving
-into phylib.
+On Tue, Nov 26, 2024 at 10:35:13AM +0200, Leon Romanovsky wrote:
+> On Tue, Nov 26, 2024 at 09:09:03AM +0200, Ilia Lin wrote:
+> > On Mon, Nov 25, 2024 at 9:43 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > >
+> > > On Mon, Nov 25, 2024 at 11:26:14AM +0200, Ilia Lin wrote:
+> > > > On Sun, Nov 24, 2024 at 2:04 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > > >
+> > > > > On Sun, Nov 24, 2024 at 11:35:31AM +0200, Ilia Lin wrote:
+> > > > > > In packet offload mode the raw packets will be sent to the NiC,
+> > > > > > and will not return to the Network Stack. In event of crossing
+> > > > > > the MTU size after the encapsulation, the NiC HW may not be
+> > > > > > able to fragment the final packet.
+> > > > >
+> > > > > Yes, HW doesn't know how to handle these packets.
+> > > > >
+> > > > > > Adding mandatory pre-encapsulation fragmentation for both
+> > > > > > IPv4 and IPv6, if tunnel mode with packet offload is configured
+> > > > > > on the state.
+> > > > >
+> > > > > I was under impression is that xfrm_dev_offload_ok() is responsible to
+> > > > > prevent fragmentation.
+> > > > >
+> > https://elixir.bootlin.com/linux/v6.12/source/net/xfrm/xfrm_device.c#L410
+> > > >
+> > > > With my change we can both support inner fragmentation or prevent it,
+> > > > depending on the network device driver implementation.
+> > >
+> > > The thing is that fragmentation isn't desirable thing. Why didn't PMTU
+> > > take into account headers so we can rely on existing code and do not add
+> > > extra logic for packet offload?
+> > 
+> > I agree that PMTU is preferred option, but the packets may be routed from
+> > a host behind the VPN, which is unaware that it transmits into an IPsec
+> > tunnel,
+> > and therefore will not count on the extra headers.
+> 
+> My basic web search shows that PMTU works correctly for IPsec tunnels too.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 50 +++++++++++++++----
- 1 file changed, 39 insertions(+), 11 deletions(-)
+Yes, at least SW and crypto offload IPsec PMTU works correctly.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 66a43a9aa469..39a4f0da82e5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -973,9 +973,6 @@ static void stmmac_mac_link_down(struct phylink_config *config,
- 	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
- 
- 	stmmac_mac_set(priv, priv->ioaddr, false);
--	priv->eee_active = false;
--	priv->eee_enabled = stmmac_eee_init(priv);
--	stmmac_set_eee_pls(priv, priv->hw, false);
- 
- 	if (stmmac_fpe_supported(priv))
- 		stmmac_fpe_link_state_handle(priv, false);
-@@ -1082,14 +1079,6 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
- 
- 	stmmac_mac_set(priv, priv->ioaddr, true);
--	if (phy && priv->dma_cap.eee) {
--		phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
--					     STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
--		priv->eee_active = phy->enable_tx_lpi;
--		priv->eee_enabled = stmmac_eee_init(priv);
--		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
--		stmmac_set_eee_pls(priv, priv->hw, true);
--	}
- 
- 	if (stmmac_fpe_supported(priv))
- 		stmmac_fpe_link_state_handle(priv, true);
-@@ -1098,12 +1087,34 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 		stmmac_hwtstamp_correct_latency(priv, priv);
- }
- 
-+static void stmmac_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-+
-+	priv->eee_active = false;
-+	priv->eee_enabled = stmmac_eee_init(priv);
-+	stmmac_set_eee_pls(priv, priv->hw, false);
-+}
-+
-+static void stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+				     bool tx_clk_stop)
-+{
-+	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-+
-+	priv->eee_active = true;
-+	priv->eee_enabled = stmmac_eee_init(priv);
-+	priv->tx_lpi_timer = timer;
-+	stmmac_set_eee_pls(priv, priv->hw, true);
-+}
-+
- static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
- 	.mac_get_caps = stmmac_mac_get_caps,
- 	.mac_select_pcs = stmmac_mac_select_pcs,
- 	.mac_config = stmmac_mac_config,
- 	.mac_link_down = stmmac_mac_link_down,
- 	.mac_link_up = stmmac_mac_link_up,
-+	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
-+	.mac_mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
- };
- 
- /**
-@@ -1216,6 +1227,18 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 	/* Stmmac always requires an RX clock for hardware initialization */
- 	priv->phylink_config.mac_requires_rxc = true;
- 
-+	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
-+		priv->phylink_config.eee_rx_clk_stop_enable = true;
-+
-+	if (priv->dma_cap.eee) {
-+		/* All full duplex speeds above 100Mbps are supported */
-+		priv->phylink_config.lpi_capabilities = ~(MAC_1000FD - 1) |
-+							MAC_100FD;
-+		priv->phylink_config.lpi_timer_limit_us = U32_MAX;
-+		priv->phylink_config.lpi_timer_default = eee_timer * 1000;
-+		priv->phylink_config.eee_enabled_default = false;
-+	}
-+
- 	mdio_bus_data = priv->plat->mdio_bus_data;
- 	if (mdio_bus_data)
- 		priv->phylink_config.default_an_inband =
-@@ -1231,6 +1254,11 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 		xpcs_get_interfaces(priv->hw->xpcs,
- 				    priv->phylink_config.supported_interfaces);
- 
-+	/* Assume all supported interfaces also support LPI */
-+	memcpy(priv->phylink_config.lpi_interfaces,
-+	       priv->phylink_config.supported_interfaces,
-+	       sizeof(priv->phylink_config.lpi_interfaces));
-+
- 	fwnode = priv->plat->port_node;
- 	if (!fwnode)
- 		fwnode = dev_fwnode(priv->device);
--- 
-2.30.2
+> 
+> Steffen, do we need special case for packet offload here? My preference is
+> to make sure that we will have as less possible special cases for packet
+> offload.
 
+Looks like the problem on packet offload is that packets
+bigger than MTU size are dropped before the PMTU signaling
+is handled.
 
