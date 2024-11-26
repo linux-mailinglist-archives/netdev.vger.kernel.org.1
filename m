@@ -1,148 +1,119 @@
-Return-Path: <netdev+bounces-147340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537C49D9336
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:22:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE884161FC4
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 08:22:49 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EA5199924;
-	Tue, 26 Nov 2024 08:22:50 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03959D9350
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:30:05 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837F61A00F4;
-	Tue, 26 Nov 2024 08:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 604B6B21029
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 08:30:03 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9167119CC32;
+	Tue, 26 Nov 2024 08:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JaSzBd2B"
+X-Original-To: netdev@vger.kernel.org
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C751917FB
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 08:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732609370; cv=none; b=fdIyKvu8A5l4r14PYMqCBEIChRFs0EEk89spZX+OGnaA1COpD4R9MuKrE3BnGHtVvqqStkcb79f0kVChLdzLh8eflIk1Xvn6xGlFGz6odpZS6zWVRYVhMld4NUmci3o9QUHEjyZrEz6yqHBeGtDSSnHrkgzBBzIVkYLxjo8m6mU=
+	t=1732609799; cv=none; b=GROg9xHoERgdccaYwMO10VpN6QLATtVQSwNa3rNqDnO2ySwnf1c5V9Pf1zZkdFGXesga96lWcbmcK/LyjFUs3foQsPWDyExVd5zVZbqj6v3KlW1VaTF8VqFWy/tWVpraP+ScHKLySHLbvrUViX40cgg5vRq7du00BOeXY/J+/hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732609370; c=relaxed/simple;
-	bh=NZzFxGiqYDUqL29nURG2k2e9QAvCV2Jo0ezb0nUvxqA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=nCZ24PuaSpoMF+NkD0MEW1KOVypAHbGNPgShg6Q6XvZ8S2uDCp6/lNPHrDTTqBo8mx70yJLOdWxMenLsliEnvvavRcPRRfGJQEuu2DUrLvIu0AosXbBnsMsbuJzDRQ6EwWZvRpndUsYvE5Q9SxEBfocOtg4QypgsJovoKNUD0Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XyFrH24FZz10WNr;
-	Tue, 26 Nov 2024 16:20:31 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 94B9718009B;
-	Tue, 26 Nov 2024 16:22:39 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 26 Nov 2024 16:22:39 +0800
-Message-ID: <6233e2c3-3fea-4ed0-bdcc-9a625270da37@huawei.com>
-Date: Tue, 26 Nov 2024 16:22:30 +0800
+	s=arc-20240116; t=1732609799; c=relaxed/simple;
+	bh=+PHgQAc1B4ytje4hZjbwIj43XIYJaG2UExnCW3e7OSc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TQQb+v7IggVqWlb8EquryNIKkFv74YDdPAUEXydpvKFRj9Qca2ZNBLdUaj+5DqUnPdSmZIhb5A5nbmX1fzP6TsmWXK1XYNOz2UcwYHehXEToohOIwTvGZ/9kvBsLQuK9kfagLDSltnDK+EDMW72H9lk7QzkOZtApKOETGjW9EDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JaSzBd2B; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <bf535357-74ad-4eaa-96d7-5e527789d10d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1732609794;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9gbq5TzS0a4IseLhp6Tc7c8shxkxLBAvltDhxn81LO0=;
+	b=JaSzBd2BrWOg6ShpnvSIn3jvyObCFgbc4poOgfmDA3ZL1r2HAODai5v/JMM3yApimSjtmk
+	8BiU3pmMegXppbjtIFWVz+LnbO2Po8x3VnruvmSeZLiJnTMEv++QeKjWSiwJonGJhzlhJq
+	I5HMEFnkGtmDNYmMtclXJY6j/iMiMBk=
+Date: Tue, 26 Nov 2024 09:29:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 2/3] page_pool: fix IOMMU crash when driver has
- already unbound
-To: Jesper Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <liuyonglong@huawei.com>, <fanghaiqing@huawei.com>,
-	<zhangkun09@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
-	<alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20241120103456.396577-1-linyunsheng@huawei.com>
- <20241120103456.396577-3-linyunsheng@huawei.com>
- <3366bf89-4544-4b82-83ec-fd89dd009228@kernel.org>
- <27475b57-eda1-4d67-93f2-5ca443632f6b@huawei.com>
- <ac728cc1-2ccb-4207-ae11-527a3ed8fbb6@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <ac728cc1-2ccb-4207-ae11-527a3ed8fbb6@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH bpf-next 4/4] bpf/selftests: add simple selftest for
+ bpf_smc_ops
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+ "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+ song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+ edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, dtcccc@linux.alibaba.com
+References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+ <1729737768-124596-5-git-send-email-alibuda@linux.alibaba.com>
+ <8c06240b-540b-472f-974f-d2db80d90c22@linux.dev>
+ <e8ba7dc0-96b5-4119-b2f6-b07432f65fdb@linux.alibaba.com>
+ <0a8c2285-29c2-4a79-b704-c2baeac90b70@linux.dev>
+ <c96fe7a8-8512-48e8-b253-d5ff8a0f4755@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <c96fe7a8-8512-48e8-b253-d5ff8a0f4755@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+X-Migadu-Flow: FLOW_OUT
 
-On 2024/11/25 23:25, Jesper Dangaard Brouer wrote:
-
-...
-
->>>> +
->>>>    void page_pool_destroy(struct page_pool *pool)
->>>>    {
->>>>        if (!pool)
->>>> @@ -1139,6 +1206,8 @@ void page_pool_destroy(struct page_pool *pool)
->>>>         */
->>>>        synchronize_rcu();
->>>>    +    page_pool_inflight_unmap(pool);
->>>> +
+在 2024/11/26 0:32, Martin KaFai Lau 写道:
+> On 11/25/24 2:52 AM, Zhu Yanjun wrote:
+>>>> # ./test_progs -t smc
+>>>> #27/1    bpf_smc/load:OK
+>>>> #27      bpf_smc:OK
+>>>> Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+>>>>
+>>>> The above command is based on several kernel modules. After these 
+>>>> dependent kernel modules are loaded, then can run the above command 
+>>>> successfully.
+> 
 >>>
->>> Reaching here means we have detected in-flight packets/pages.
->>>
->>> In "page_pool_inflight_unmap" we scan and find those in-flight pages to
->>> DMA unmap them. Then below we wait for these in-flight pages again.
->>> Why don't we just "release" (page_pool_release_page) those in-flight
->>> pages from belonging to the page_pool, when we found them during scanning?
->>>
->>> If doing so, we can hopefully remove the periodic checking code below.
+>>> This is indeed a problem, a better way may be to create a separate 
+>>> testing directory for SMC, and we are trying to do this.
 >>
->> I thought about that too, but it means more complicated work than just
->> calling the page_pool_release_page() as page->pp_ref_count need to be
->> converted into page->_refcount for the above to work, it seems hard to
->> do that with least performance degradation as the racing against
->> page_pool_put_page() being called concurrently.
+>> Got it. In the latest patch series, if a test program in sample/bpf 
+>> can verify this bpf feature, it is better than a selftest program in 
+>> the directory tools/ testing/selftests/bpf.
 >>
+>> I delved into this selftest tool. It seems that this selftest tool 
+>> only makes the basic checks. A test program in sample/bpf can do more.
 > 
-> Maybe we can have a design that avoid/reduce concurrency.  Can we
-> convert the suggested pool->destroy_lock into an atomic?
-> (Doing an *atomic* READ in page_pool_return_page, should be fast if we
-> keep this cache in in (cache coherence) Shared state).
-> 
-> In your new/proposed page_pool_return_page() when we see the
-> "destroy_cnt" (now atomic READ) bigger than zero, then we can do nothing
-> (or maybe we need decrement page-refcnt?), as we know the destroy code
+> sample(s)/bpf? No new test should be added to samples/bpf which is 
+> obsolete. The bpf CI only runs tests under selftests/bpf.
 
-Is it valid to have a page->_refcount of zero when page_pool still own
-the page if we only decrement page->_refcount and not clear page->pp_magic?
-What happens if put_page() is called from other subsystem for a page_pool
-owned page, isn't that mean the page might be returned to buddy page
-allocator, causing use-after-free problem?
+Thanks for letting me know this, Martin.
 
-> will be taking care of "releasing" the pages from the page pool.
+In the past, with samples/bpf, we can know a lot of details of bpf 
+samples. But in the selftests/bpf, it seems that only load method can be 
+found. For example, in this smc bpf selftests commit, we can not find 
+how to change parameters in smc. In the past, this method about how to 
+change parameters can be found in samples/bpf.
 
-If page->_refcount is not decremented in page_pool_return_page(), how
-does page_pool_destroy() know if a specific page have been called with
-page_pool_return_page()? Does an extra state is needed to indicate that?
+I am not sure whether this selftests/bpf is designed for this simple 
+tests or the detailed information can be found in other places.
 
-And there might still be concurrency between checking/handling of the extra
-state in page_pool_destroy() and the setting of extra state in
-page_pool_return_page(), something like lock might still be needed to avoid
-the above concurrency.
+Zhu Yanjun
 
 > 
-> Once the a page is release from a page pool it becomes a normal page,
-> that adhere to normal page refcnt'ing. That is how it worked before with
-> page_pool_release_page().
-> The later extensions with page fragment support and devmem might have
-> complicated this code path.
+> There is selftests/bpf/config to tell the bpf CI about what kconfig 
+> needs to turn on.
+> 
 
-As page_pool_return_page() and page_pool_destroy() both try to "release"
-the page concurrently for a specific page, I am not sure how using some
-simple *atomic* can avoid this kind of concurrency even before page
-fragment and devmem are supported, it would be good to be more specific
-about that by using some pseudocode.
-
-I looked at it more closely, previously page_pool_put_page() seemed to
-not be allowed to be called after page_pool_release_page() had been
-called for a specific page mainly because of concurrently checking/handlig
-and clearing of page->pp_magic if I understand it correctly:
-https://elixir.bootlin.com/linux/v5.16.20/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L5316
 
