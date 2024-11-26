@@ -1,73 +1,77 @@
-Return-Path: <netdev+bounces-147304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2429D9047
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:09:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 675ED9D9057
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 03:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5175B244E0
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 02:09:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB9DCB22CFF
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 02:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCDA16415;
-	Tue, 26 Nov 2024 02:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uN6rGID8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D2517996;
+	Tue, 26 Nov 2024 02:19:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6E814A85
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 02:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BF738C
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 02:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732586945; cv=none; b=SHbtW4hz4X6juRolmPolk6yiI21UaTeIYRzl8oBCOwGf5J3tTBz4NFavJ6vMewPsuS/JC7huyWsKluemvygUyJv/NgzFF1RFDOMcIK+7SinP+SOX6KrkrKgHlzrhDz1h977EQ0TnVf5SWaaHXRuO9wdw5WNcD49eMc6aFYELyDI=
+	t=1732587549; cv=none; b=BQeEvUsOSe0Tw/q4zfPwCtRoLnq5iQgn6W9AgefFcob7VrpvC/xzqm5vAYUci+IDf/ykZE2AeEOxSnTBvlioVHc93uoveKVWY5nRrlZZ8Z3LCowBoFn33/gQemtodBv0CbCfN+Np/x/1mPm4Bh0oqxnBFVAO218xln/aoohNAQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732586945; c=relaxed/simple;
-	bh=O6i0P9JiTBq5EqyvftH6NnRX9k9tCh9RVUSl2CsA5oA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CtS5omkPIZKra+QYhLqxNiIfX4WgWuItDnLjZF077ZSTRUWBT5uRbhwKok7zgTWJSJDqmVDI12uHxTTSOYO7TufhaPx2GFjIlfHF+/8ZERYNxjY7d5EbPnoZbRSe56oZu/aYY2pytUh8MisQABhMPrcFk2O7SJjrFpxKFKfKP4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=uN6rGID8; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1732586938; x=1764122938;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=biUROtdtar+Sf9Ol7mM56F7n+rXeAnn3smyPvOLI4W0=;
-  b=uN6rGID8EkhRZgrpAIagjCtHiRSx1dOpuuKc77XKgSqaHEMCg6ui8fom
-   +sDFYT3mHOoixBOXWeDz3kiNox2XPIhbwMmA1PpR4u6PZ+1LZOHxpZ4u1
-   VZozBUFbcS35zvrzWZ4lWH1tRLvu+2lSSkVhhKK6hXAhNhHdmCf3KxPcf
-   A=;
-X-IronPort-AV: E=Sophos;i="6.12,184,1728950400"; 
-   d="scan'208";a="451304793"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2024 02:08:54 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:7038]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.190:2525] with esmtp (Farcaster)
- id 90ac187e-8678-4f34-af48-c538adfa4817; Tue, 26 Nov 2024 02:08:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 90ac187e-8678-4f34-af48-c538adfa4817
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 26 Nov 2024 02:08:53 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.244.66) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 26 Nov 2024 02:08:49 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <brianvv@google.com>, <davem@davemloft.net>, <eric.dumazet@gmail.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzbot+8b0959fc16551d55896b@syzkaller.appspotmail.com>
-Subject: Re: [PATCH net] tcp: populate XPS related fields of timewait sockets
-Date: Tue, 26 Nov 2024 11:08:45 +0900
-Message-ID: <20241126020845.35087-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241125093039.3095790-1-edumazet@google.com>
-References: <20241125093039.3095790-1-edumazet@google.com>
+	s=arc-20240116; t=1732587549; c=relaxed/simple;
+	bh=dqn+22mLMBFKN19NER36d/kkeWRSefiSGaWLiUbesh8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=TvPdtPfe1mIMXPsBv8Fgu9Gko8EdFeVmPGZNLtjD5LlG6kVXb5IE3Dhe78JUaHA1W/zsHRduoOWND+oRJgtDwcr5Hp2gmKwPxCjqpxkGMhiFgntlGzZQFsc+uN+cJ0IaCECFeb0dZf1u/DvGj8Dn59Rps0q9QnMyK7KOXkLu0Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: c808083eab9c11efa216b1d71e6e1362-20241126
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_UNTRUSTED, SA_LOWREP
+	SA_EXISTED, SN_UNTRUSTED, SN_LOWREP, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:d5ae44ce-c823-48a7-af27-e769f57a09f7,IP:10,
+	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:3,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:33
+X-CID-INFO: VERSION:1.1.38,REQID:d5ae44ce-c823-48a7-af27-e769f57a09f7,IP:10,UR
+	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:3,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:33
+X-CID-META: VersionHash:82c5f88,CLOUDID:d4c66fa315b9db6f1c8ddd0e86fb86ed,BulkI
+	D:2411261018554LEOE9NK,BulkQuantity:0,Recheck:0,SF:19|25|43|66|72|74|81|82
+	|100|101|102,TC:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,Q
+	S:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: c808083eab9c11efa216b1d71e6e1362-20241126
+X-User: heminhong@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <heminhong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1881880197; Tue, 26 Nov 2024 10:18:53 +0800
+From: Minhong He <heminhong@kylinos.cn>
+To: razor@blackwall.org
+Cc: heminhong@kylinos.cn,
+	netdev@vger.kernel.org,
+	stephen@networkplumber.org,
+	roopa@nvidia.com,
+	bridge@lists.linux-foundation.org
+Subject: [PATCH iproute2 v2] bridge: fix memory leak in error path
+Date: Tue, 26 Nov 2024 10:18:19 +0800
+Message-Id: <20241126021819.18663-1-heminhong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <385b4ead-8d43-4845-ac66-4218b285be32@blackwall.org>
+References: <385b4ead-8d43-4845-ac66-4218b285be32@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,31 +79,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 Nov 2024 09:30:39 +0000
-> syzbot reported that netdev_core_pick_tx() was reading an unitialized
-> field [1].
-> 
-> This is indeed hapening for timewait sockets after recent commits.
-> 
-> We can copy the original established socket sk_tx_queue_mapping
-> and sk_rx_queue_mapping fields, instead of adding more checks
-> in fast paths.
-> 
-> As a bonus, packets will use the same transmit queue than
-> prior ones, this potentially can avoid reordering.
-[...]
-> Fixes: 79636038d37e ("ipv4: tcp: give socket pointer to control skbs")
-> Fixes: 507a96737d99 ("ipv6: tcp: give socket pointer to control skbs")
-> Reported-by: syzbot+8b0959fc16551d55896b@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/netdev/674442bd.050a0220.1cc393.0072.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+The 'json' object doesn't free when 'rtnl_dump_filter()' fails to process,
+fix it.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Signed-off-by: Minhong He <heminhong@kylinos.cn>
+---
+ bridge/mst.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks!
+diff --git a/bridge/mst.c b/bridge/mst.c
+index 32f64aba..37362c45 100644
+--- a/bridge/mst.c
++++ b/bridge/mst.c
+@@ -153,6 +153,7 @@ static int mst_show(int argc, char **argv)
+ 
+ 	if (rtnl_dump_filter(&rth, print_msts, stdout) < 0) {
+ 		fprintf(stderr, "Dump terminated\n");
++		delete_json_obj();
+ 		return -1;
+ 	}
+ 
+-- 
+2.25.1
+
 
