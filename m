@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-147426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9B29D97A0
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:53:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A4E9D97A2
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 13:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DCBD162A82
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:53:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44CF71629E1
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 12:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8E51D2F54;
-	Tue, 26 Nov 2024 12:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6171D319B;
+	Tue, 26 Nov 2024 12:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YfglRCn4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gnu0No/j"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9721CEE8A
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E571D47B5
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732625604; cv=none; b=Xe+1j3VvrqWnsdr8lGWwmd0yPYnE+pAYRVivWLP7eK1bZlx0E2xO0e5nlL/hbnzPlA9NF+HNy3xGlYt5jio7EwlK6BDR7A6QuYBCe5yiIAeB0/xA78dxRAX4t21ZMInHOkQBkYzaYz7L3CghLJAir7J4wyOPOqgNMBQnwDxPK5M=
+	t=1732625607; cv=none; b=AR2AZeRrb12oHWEIpmfHDpv1SkSKKSXECZ30IR4xW1FmnpMRQf1l3lRKXTMHRNviDQjbFR42iGzo15PJsHn1PnDwdPi5XyWYm/9vfleknjhGuCmyzsVrWC4Jj0PslbECoq6cz9FnCDr3zDHds08TGwuTgOD0+xNy/HZ+tVkyw9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732625604; c=relaxed/simple;
-	bh=VhvNRwYuIIbn1m9nUyZrYCG3CAtSIGcwGDLh4fIZA44=;
+	s=arc-20240116; t=1732625607; c=relaxed/simple;
+	bh=k1Ue3R0HrgihX0mpbhnKSaEEsVNo4DDoozlvnlALX3o=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=QIyuHr7zrSDF8SknFKpfit0d2zUAlt+yRWPymJ1jI8qpbuXgRwnwmhVmS0ok2zbMUwH4EzcLLVx4uUEq4nzacWWSIZ8Q1LgOEZycCK0fheEBuyJ9Ai1EU0ygbcGyNDfjiN2/+UJxGrnzCU6ijxoc/khLTZewipVDGfqmxuJDohc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YfglRCn4; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=uUfLcsimdv1U/6I7TP2WGRUuxl1XwN3Opb58GadAR4JXVquxtbPXxlQbTsUsvlleXGaAMh8jXPFY8rhk01+WW5N5mbUp9Tv2pHP0WcuYod54UvVimo+gbYyAZQfLTRcao4DwlH9l+znmcSfN9JhCH9ejp/C2fbgDTnJfulv/Xgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gnu0No/j; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=om8YKPOfUOqLgRGMKjayCyghU8YpyfqYf7cp1coSSXI=; b=YfglRCn4JdJDe8nSXaCwGaj4ij
-	DQxl5RtB0LgU6Q6vzul1xyAm8cxbKsLDYtdTVZH0RE4K3WXBTxzkGmoq9zeRPswe1H0LlRge9G6tD
-	38p74162xWdUjZsaJ9t/Canzv9FF1u82/UKDSLBxXOMZ3pm3aMX2XBrQ4hIsrTU67XI4tV6lFoRg/
-	/fioVRzQv/9SQGHoNJt7wDKJLONio6ffBlo93iyWmKZuwC49zoGNTVjqyj9foly4roCvUHNr6jvyS
-	wpPWRDjO3O6J7y8xk816uMepyZtOBrwHulgJ09YKtmKwacS8k1GkFpofJlqXd4YoQhspxgBIQxQnD
-	FKUlmd7Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51130 helo=rmk-PC.armlinux.org.uk)
+	bh=sMsj1itYD0QurpAqOjGf9BKpxvaNuiNfv6EPWoNRACk=; b=gnu0No/jFm+63Kw1vh4sqJEcVb
+	CP3tCSBiaWpQZewHdIb/V2MhjxvIJk+9WhRGihmcgnycbELoQwxFTHINXw1BKNX8kEx67cOteEItU
+	PYLMEctP9ij8LuJCT+z5Q66UlM3k8inm22HmraaNhAwgNlGHxpX9W494z0nOSCjwkaC3I95YLHwhx
+	n45ij+Q/MCu5r6JiGkoddZpc8X/1Fsnjv4bJ2UXfrZ46p7WPks/5vvs7K7bhwYqeNxqBcf4kkZ+pO
+	eWy3i1FG4Bdg1tVGY50N/OstxW2kGYWUdY8jMKP5BskkQ/8YhkaYXBaUmyRmKC8iIFu8pLsWme06m
+	Nog3mhjg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51146 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFv40-0006ub-1W;
-	Tue, 26 Nov 2024 12:53:09 +0000
+	id 1tFv45-0006uw-1L;
+	Tue, 26 Nov 2024 12:53:14 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFv3z-005yiL-Ab; Tue, 26 Nov 2024 12:53:07 +0000
+	id 1tFv44-005yiR-E2; Tue, 26 Nov 2024 12:53:12 +0000
 In-Reply-To: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -73,7 +73,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com
-Subject: [PATCH RFC net-next 11/23] net: phylink: add EEE management
+Subject: [PATCH RFC net-next 12/23] net: mvneta: convert to phylink EEE
+ implementation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,347 +84,223 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFv3z-005yiL-Ab@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tFv44-005yiR-E2@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 12:53:07 +0000
+Date: Tue, 26 Nov 2024 12:53:12 +0000
 
-Add EEE management to phylink, making use of the phylib implementation.
-This will only be used where a MAC driver populates the methods and
-capabilities bitfield, otherwise we keep our old behaviour.
+Convert mvneta to use phylink's EEE implementation, which means we just
+need to implement the two methods for LPI control, and adding the
+initial configuration.
 
-Phylink will keep track of the EEE configuration, including the clock
-stop abilities at each end of the MAC to PHY link, programming the PHY
-appropriately and preserving the EEE configuration should the PHY go
-away.
-
-It will also call into the MAC driver when LPI needs to be enabled or
-disabled, with the expectation that the MAC have LPI disabled during
-probe.
-
-Support for phylink managed EEE is enabled by populating both tx_lpi
-MAC operations method pointers.
+Disabling LPI requires clearing a single bit. Enabling LPI needs a full
+configuration of several values, as the timer values are dependent on
+the MAC operating speed.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phylink.c | 123 ++++++++++++++++++++++++++++++++++++--
- include/linux/phylink.h   |  44 ++++++++++++++
- 2 files changed, 163 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/marvell/mvneta.c | 116 +++++++++++++++-----------
+ 1 file changed, 68 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 1d68809403de..d8d288b121a8 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -79,12 +79,19 @@ struct phylink {
- 	unsigned int pcs_state;
+diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
+index 1fb285fa0bdb..976ce8d6dabf 100644
+--- a/drivers/net/ethernet/marvell/mvneta.c
++++ b/drivers/net/ethernet/marvell/mvneta.c
+@@ -284,8 +284,12 @@
+ 					  MVNETA_TXQ_BUCKET_REFILL_PERIOD))
  
- 	bool link_failed;
-+	bool mac_supports_eee;
-+	bool phy_enable_tx_lpi;
-+	bool mac_enable_tx_lpi;
-+	bool mac_tx_clk_stop;
-+	u32 mac_tx_lpi_timer;
+ #define MVNETA_LPI_CTRL_0                        0x2cc0
++#define      MVNETA_LPI_CTRL_0_TS                (0xff << 8)
+ #define MVNETA_LPI_CTRL_1                        0x2cc4
+-#define      MVNETA_LPI_REQUEST_ENABLE           BIT(0)
++#define      MVNETA_LPI_CTRL_1_REQUEST_ENABLE    BIT(0)
++#define      MVNETA_LPI_CTRL_1_REQUEST_FORCE     BIT(1)
++#define      MVNETA_LPI_CTRL_1_MANUAL_MODE       BIT(2)
++#define      MVNETA_LPI_CTRL_1_TW                (0xfff << 4)
+ #define MVNETA_LPI_CTRL_2                        0x2cc8
+ #define MVNETA_LPI_STATUS                        0x2ccc
  
- 	struct sfp_bus *sfp_bus;
- 	bool sfp_may_have_phy;
- 	DECLARE_PHY_INTERFACE_MASK(sfp_interfaces);
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
- 	u8 sfp_port;
+@@ -541,10 +545,6 @@ struct mvneta_port {
+ 	struct mvneta_bm_pool *pool_short;
+ 	int bm_win_id;
+ 
+-	bool eee_enabled;
+-	bool eee_active;
+-	bool tx_lpi_enabled;
+-
+ 	u64 ethtool_stats[ARRAY_SIZE(mvneta_statistics)];
+ 
+ 	u32 indir[MVNETA_RSS_LU_TABLE_SIZE];
+@@ -1354,6 +1354,13 @@ static void mvneta_port_enable(struct mvneta_port *pp)
+ 	val = mvreg_read(pp, MVNETA_GMAC_CTRL_0);
+ 	val |= MVNETA_GMAC0_PORT_ENABLE;
+ 	mvreg_write(pp, MVNETA_GMAC_CTRL_0, val);
 +
-+	struct eee_config eee_cfg;
- };
- 
- #define phylink_printk(level, pl, fmt, ...) \
-@@ -1375,6 +1382,47 @@ static const char *phylink_pause_to_str(int pause)
- 	}
++	/* Ensure LPI is disabled */
++	val = mvreg_read(pp, MVNETA_LPI_CTRL_1);
++	val &= ~(MVNETA_LPI_CTRL_1_REQUEST_ENABLE |
++		 MVNETA_LPI_CTRL_1_REQUEST_FORCE |
++		 MVNETA_LPI_CTRL_1_MANUAL_MODE);
++	mvreg_write(pp, MVNETA_LPI_CTRL_1, val);
  }
  
-+static void phylink_deactivate_lpi(struct phylink *pl)
-+{
-+	if (pl->mac_enable_tx_lpi) {
-+		pl->mac_enable_tx_lpi = false;
-+
-+		phylink_dbg(pl, "disabling LPI\n");
-+
-+		pl->mac_ops->mac_disable_tx_lpi(pl->config);
-+	}
-+}
-+
-+static void phylink_activate_lpi(struct phylink *pl)
-+{
-+	if (!test_bit(pl->cur_interface, pl->config->lpi_interfaces)) {
-+		phylink_dbg(pl, "MAC does not support LPI with %s\n",
-+			    phy_modes(pl->cur_interface));
-+		return;
-+	}
-+
-+	phylink_dbg(pl, "LPI timer %uus, tx clock stop %u\n",
-+		    pl->mac_tx_lpi_timer, pl->mac_tx_clk_stop);
-+
-+	pl->mac_ops->mac_enable_tx_lpi(pl->config, pl->mac_tx_lpi_timer,
-+				       pl->mac_tx_clk_stop);
-+
-+	pl->mac_enable_tx_lpi = true;
-+}
-+
-+static void phylink_phy_restrict_eee(struct phylink *pl, struct phy_device *phy)
-+{
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_supported);
-+
-+	/* Convert the MAC's LPI capabilities to linkmodes */
-+	linkmode_zero(eee_supported);
-+	phylink_caps_to_linkmodes(eee_supported, pl->config->lpi_capabilities);
-+
-+	/* Mask out EEE modes that are not supported */
-+	linkmode_and(phy->supported_eee, phy->supported_eee, eee_supported);
-+	linkmode_and(phy->advertising_eee, phy->advertising_eee, eee_supported);
-+}
-+
- static void phylink_link_up(struct phylink *pl,
- 			    struct phylink_link_state link_state)
+ /* Disable the port and wait for about 200 usec before retuning */
+@@ -4206,18 +4213,6 @@ static int mvneta_mac_finish(struct phylink_config *config, unsigned int mode,
+ 	return 0;
+ }
+ 
+-static void mvneta_set_eee(struct mvneta_port *pp, bool enable)
+-{
+-	u32 lpi_ctl1;
+-
+-	lpi_ctl1 = mvreg_read(pp, MVNETA_LPI_CTRL_1);
+-	if (enable)
+-		lpi_ctl1 |= MVNETA_LPI_REQUEST_ENABLE;
+-	else
+-		lpi_ctl1 &= ~MVNETA_LPI_REQUEST_ENABLE;
+-	mvreg_write(pp, MVNETA_LPI_CTRL_1, lpi_ctl1);
+-}
+-
+ static void mvneta_mac_link_down(struct phylink_config *config,
+ 				 unsigned int mode, phy_interface_t interface)
  {
-@@ -1421,6 +1469,9 @@ static void phylink_link_up(struct phylink *pl,
- 				 pl->cur_interface, speed, duplex,
- 				 !!(link_state.pause & MLO_PAUSE_TX), rx_pause);
+@@ -4233,9 +4228,6 @@ static void mvneta_mac_link_down(struct phylink_config *config,
+ 		val |= MVNETA_GMAC_FORCE_LINK_DOWN;
+ 		mvreg_write(pp, MVNETA_GMAC_AUTONEG_CONFIG, val);
+ 	}
+-
+-	pp->eee_active = false;
+-	mvneta_set_eee(pp, false);
+ }
  
-+	if (pl->mac_supports_eee && pl->phy_enable_tx_lpi)
-+		phylink_activate_lpi(pl);
-+
- 	if (ndev)
- 		netif_carrier_on(ndev);
- 
-@@ -1437,6 +1488,9 @@ static void phylink_link_down(struct phylink *pl)
- 
- 	if (ndev)
- 		netif_carrier_off(ndev);
-+
-+	phylink_deactivate_lpi(pl);
-+
- 	pl->mac_ops->mac_link_down(pl->config, pl->cur_link_an_mode,
- 				   pl->cur_interface);
- 	phylink_info(pl, "Link is Down\n");
-@@ -1700,6 +1754,14 @@ struct phylink *phylink_create(struct phylink_config *config,
- 		return ERR_PTR(-EINVAL);
+ static void mvneta_mac_link_up(struct phylink_config *config,
+@@ -4284,11 +4276,53 @@ static void mvneta_mac_link_up(struct phylink_config *config,
  	}
  
-+	pl->mac_supports_eee = mac_ops->mac_disable_tx_lpi &&
-+			       mac_ops->mac_enable_tx_lpi;
+ 	mvneta_port_up(pp);
++}
 +
-+	/* Set the default EEE configuration */
-+	pl->eee_cfg.eee_enabled = pl->config->eee_enabled_default;
-+	pl->eee_cfg.tx_lpi_enabled = pl->eee_cfg.eee_enabled;
-+	pl->eee_cfg.tx_lpi_timer = pl->config->lpi_timer_default;
++static void mvneta_mac_disable_tx_lpi(struct phylink_config *config)
++{
++	struct mvneta_port *pp = netdev_priv(to_net_dev(config->dev));
++	u32 lpi1;
 +
- 	pl->phy_state.interface = iface;
- 	pl->link_interface = iface;
- 	if (iface == PHY_INTERFACE_MODE_MOCA)
-@@ -1804,16 +1866,22 @@ static void phylink_phy_change(struct phy_device *phydev, bool up)
- 	pl->phy_state.link = up;
- 	if (!up)
- 		pl->link_failed = true;
++	lpi1 = mvreg_read(pp, MVNETA_LPI_CTRL_1);
++	lpi1 &= ~MVNETA_LPI_CTRL_1_REQUEST_ENABLE;
++	mvreg_write(pp, MVNETA_LPI_CTRL_1, lpi1);
++}
 +
-+	/* Get the LPI state from phylib */
-+	pl->phy_enable_tx_lpi = phydev->enable_tx_lpi;
-+	pl->mac_tx_lpi_timer = phydev->eee_cfg.tx_lpi_timer;
- 	mutex_unlock(&pl->state_mutex);
++static void mvneta_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
++				     bool tx_clk_stop)
++{
++	struct mvneta_port *pp = netdev_priv(to_net_dev(config->dev));
++	u32 ts, tw, lpi0, lpi1, status;
  
- 	phylink_run_resolve(pl);
- 
--	phylink_dbg(pl, "phy link %s %s/%s/%s/%s/%s\n", up ? "up" : "down",
-+	phylink_dbg(pl, "phy link %s %s/%s/%s/%s/%s/%slpi\n",
-+		    up ? "up" : "down",
- 		    phy_modes(phydev->interface),
- 		    phy_speed_to_str(phydev->speed),
- 		    phy_duplex_to_str(phydev->duplex),
- 		    phy_rate_matching_to_str(phydev->rate_matching),
--		    phylink_pause_to_str(pl->phy_state.pause));
-+		    phylink_pause_to_str(pl->phy_state.pause),
-+		    phydev->enable_tx_lpi ? "" : "no");
+-	if (phy && pp->eee_enabled) {
+-		pp->eee_active = phy_init_eee(phy, false) >= 0;
+-		mvneta_set_eee(pp, pp->eee_active && pp->tx_lpi_enabled);
++	status = mvreg_read(pp, MVNETA_GMAC_STATUS);
++	if (status & MVNETA_GMAC_SPEED_1000) {
++		/* At 1G speeds, the timer resolution are 1us, and
++		 * 802.3 says tw is 16.5us. Round up to 17us.
++		 */
++		tw = 17;
++		ts = timer;
++	} else {
++		/* At 100M speeds, the timer resolutions are 10us, and
++		 * 802.3 says tw is 30us.
++		 */
++		tw = 3;
++		ts = DIV_ROUND_UP(timer, 10);
+ 	}
++
++	if (ts > 255)
++		ts = 255;
++
++
++	/* Configure ts */
++	lpi0 = mvreg_read(pp, MVNETA_LPI_CTRL_0);
++	lpi0 = u32_replace_bits(lpi0, MVNETA_LPI_CTRL_0_TS, ts);
++	mvreg_write(pp, MVNETA_LPI_CTRL_0, lpi0);
++
++	/* Configure tw and enable LPI generation */
++	lpi1 = mvreg_read(pp, MVNETA_LPI_CTRL_1);
++	lpi1 = u32_replace_bits(lpi1, MVNETA_LPI_CTRL_1_TW, tw);
++	lpi1 |= MVNETA_LPI_CTRL_1_REQUEST_ENABLE;
++	mvreg_write(pp, MVNETA_LPI_CTRL_1, lpi1);
  }
  
- static int phylink_validate_phy(struct phylink *pl, struct phy_device *phy,
-@@ -1943,6 +2011,28 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
+ static const struct phylink_mac_ops mvneta_phylink_ops = {
+@@ -4298,6 +4332,8 @@ static const struct phylink_mac_ops mvneta_phylink_ops = {
+ 	.mac_finish = mvneta_mac_finish,
+ 	.mac_link_down = mvneta_mac_link_down,
+ 	.mac_link_up = mvneta_mac_link_up,
++	.mac_disable_tx_lpi = mvneta_mac_disable_tx_lpi,
++	.mac_enable_tx_lpi = mvneta_mac_enable_tx_lpi,
+ };
  
- 	/* Restrict the phy advertisement according to the MAC support. */
- 	linkmode_copy(phy->advertising, config.advertising);
-+
-+	/* If the MAC supports phylink managed EEE, restrict the EEE
-+	 * advertisement according to the MAC's LPI capabilities.
-+	 */
-+	if (pl->mac_supports_eee) {
-+		phy->eee_cfg.eee_enabled = pl->eee_cfg.eee_enabled;
-+
-+		/* If EEE is enabled, then we need to call phy_support_eee()
-+		 * to ensure that the advertising mask is appropriately set.
-+		 */
-+		if (pl->eee_cfg.eee_enabled)
-+			phy_support_eee(phy);
-+
-+		phy->eee_cfg.tx_lpi_enabled = pl->eee_cfg.tx_lpi_enabled;
-+		phy->eee_cfg.tx_lpi_timer = pl->eee_cfg.tx_lpi_timer;
-+
-+		/* Restrict the PHYs EEE support/advertisement to the modes
-+		 * that the MAC supports.
-+		 */
-+		phylink_phy_restrict_eee(pl, phy);
-+	}
-+
- 	mutex_unlock(&pl->state_mutex);
- 	mutex_unlock(&phy->lock);
- 
-@@ -1958,7 +2048,13 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
- 	if (pl->config->mac_managed_pm)
- 		phy->mac_managed_pm = true;
- 
--	return 0;
-+	/* Allow the MAC to stop its clock if the PHY has the capability */
-+	pl->mac_tx_clk_stop = phy_eee_tx_clock_stop_capable(phy) > 0;
-+
-+	/* Explicitly configure whether the PHY is allowed to stop it's
-+	 * receive clock.
-+	 */
-+	return phy_eee_rx_clock_stop(phy, pl->config->eee_rx_clk_stop_enable);
- }
- 
- static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
-@@ -2115,6 +2211,8 @@ void phylink_disconnect_phy(struct phylink *pl)
- 		mutex_lock(&phy->lock);
- 		mutex_lock(&pl->state_mutex);
- 		pl->phydev = NULL;
-+		pl->phy_enable_tx_lpi = false;
-+		pl->mac_tx_clk_stop = false;
- 		mutex_unlock(&pl->state_mutex);
- 		mutex_unlock(&phy->lock);
- 		flush_work(&pl->resolve);
-@@ -2856,12 +2954,29 @@ EXPORT_SYMBOL_GPL(phylink_ethtool_get_eee);
-  */
- int phylink_ethtool_set_eee(struct phylink *pl, struct ethtool_keee *eee)
+ static int mvneta_mdio_probe(struct mvneta_port *pp)
+@@ -5099,14 +5135,6 @@ static int mvneta_ethtool_get_eee(struct net_device *dev,
+ 				  struct ethtool_keee *eee)
  {
-+	bool mac_eee = pl->mac_supports_eee;
- 	int ret = -EOPNOTSUPP;
+ 	struct mvneta_port *pp = netdev_priv(dev);
+-	u32 lpi_ctl0;
+-
+-	lpi_ctl0 = mvreg_read(pp, MVNETA_LPI_CTRL_0);
+-
+-	eee->eee_enabled = pp->eee_enabled;
+-	eee->eee_active = pp->eee_active;
+-	eee->tx_lpi_enabled = pp->tx_lpi_enabled;
+-	eee->tx_lpi_timer = (lpi_ctl0) >> 8; // * scale;
  
- 	ASSERT_RTNL();
- 
--	if (pl->phydev)
-+	phylink_dbg(pl, "mac %s phylink EEE%s, adv %*pbl, LPI%s timer %uus\n",
-+		    mac_eee ? "supports" : "does not support",
-+		    eee->eee_enabled ? ", enabled" : "",
-+		    __ETHTOOL_LINK_MODE_MASK_NBITS, eee->advertised,
-+		    eee->tx_lpi_enabled ? " enabled" : "", eee->tx_lpi_timer);
-+
-+	/* Clamp the LPI timer maximum value */
-+	if (mac_eee && eee->tx_lpi_timer > pl->config->lpi_timer_limit_us) {
-+		eee->tx_lpi_timer = pl->config->lpi_timer_limit_us;
-+		phylink_dbg(pl, "LPI timer limited to %uus\n",
-+			    eee->tx_lpi_timer);
-+	}
-+
-+	if (pl->phydev) {
- 		ret = phy_ethtool_set_eee(pl->phydev, eee);
-+		if (ret == 0)
-+			eee_to_eeecfg(&pl->eee_cfg, eee);
-+	}
- 
- 	return ret;
+ 	return phylink_ethtool_get_eee(pp->phylink, eee);
  }
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 5c01048860c4..df469fdda040 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -5,6 +5,8 @@
- #include <linux/spinlock.h>
- #include <linux/workqueue.h>
+@@ -5115,23 +5143,6 @@ static int mvneta_ethtool_set_eee(struct net_device *dev,
+ 				  struct ethtool_keee *eee)
+ {
+ 	struct mvneta_port *pp = netdev_priv(dev);
+-	u32 lpi_ctl0;
+-
+-	/* The Armada 37x documents do not give limits for this other than
+-	 * it being an 8-bit register.
+-	 */
+-	if (eee->tx_lpi_enabled && eee->tx_lpi_timer > 255)
+-		return -EINVAL;
+-
+-	lpi_ctl0 = mvreg_read(pp, MVNETA_LPI_CTRL_0);
+-	lpi_ctl0 &= ~(0xff << 8);
+-	lpi_ctl0 |= eee->tx_lpi_timer << 8;
+-	mvreg_write(pp, MVNETA_LPI_CTRL_0, lpi_ctl0);
+-
+-	pp->eee_enabled = eee->eee_enabled;
+-	pp->tx_lpi_enabled = eee->tx_lpi_enabled;
+-
+-	mvneta_set_eee(pp, eee->tx_lpi_enabled && eee->eee_enabled);
  
-+#include <net/eee.h>
+ 	return phylink_ethtool_set_eee(pp->phylink, eee);
+ }
+@@ -5446,6 +5457,9 @@ static int mvneta_port_power_up(struct mvneta_port *pp, int phy_mode)
+ 	    !phy_interface_mode_is_rgmii(phy_mode))
+ 		return -EINVAL;
+ 
++	/* Ensure LPI is disabled */
++	mvneta_mac_disable_tx_lpi(&pp->phylink_config);
 +
- struct device_node;
- struct ethtool_cmd;
- struct fwnode_handle;
-@@ -143,11 +145,17 @@ enum phylink_op_type {
-  *                    possible and avoid stopping it during suspend events.
-  * @default_an_inband: if true, defaults to MLO_AN_INBAND rather than
-  *		       MLO_AN_PHY. A fixed-link specification will override.
-+ * @eee_rx_clk_stop_enable: if true, PHY can stop the receive clock during LPI
-  * @get_fixed_state: callback to execute to determine the fixed link state,
-  *		     if MAC link is at %MLO_AN_FIXED mode.
-  * @supported_interfaces: bitmap describing which PHY_INTERFACE_MODE_xxx
-  *                        are supported by the MAC/PCS.
-+ * @lpi_interfaces: bitmap describing which PHY interface modes can support
-+ *		    LPI signalling.
-  * @mac_capabilities: MAC pause/speed/duplex capabilities.
-+ * @lpi_capabilities: MAC speeds which can support LPI signalling
-+ * @eee: default EEE configuration.
-+ * @lpi_timer_limit_us: Maximum (inclusive) value of the EEE LPI timer.
-  */
- struct phylink_config {
- 	struct device *dev;
-@@ -156,10 +164,16 @@ struct phylink_config {
- 	bool mac_managed_pm;
- 	bool mac_requires_rxc;
- 	bool default_an_inband;
-+	bool eee_rx_clk_stop_enable;
- 	void (*get_fixed_state)(struct phylink_config *config,
- 				struct phylink_link_state *state);
- 	DECLARE_PHY_INTERFACE_MASK(supported_interfaces);
-+	DECLARE_PHY_INTERFACE_MASK(lpi_interfaces);
- 	unsigned long mac_capabilities;
-+	unsigned long lpi_capabilities;
-+	u32 lpi_timer_limit_us;
-+	u32 lpi_timer_default;
-+	bool eee_enabled_default;
- };
+ 	return 0;
+ }
  
- void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed);
-@@ -173,6 +187,8 @@ void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed);
-  * @mac_finish: finish a major reconfiguration of the interface.
-  * @mac_link_down: take the link down.
-  * @mac_link_up: allow the link to come up.
-+ * @mac_disable_tx_lpi: disable LPI.
-+ * @mac_enable_tx_lpi: enable and configure LPI.
-  *
-  * The individual methods are described more fully below.
-  */
-@@ -193,6 +209,9 @@ struct phylink_mac_ops {
- 			    struct phy_device *phy, unsigned int mode,
- 			    phy_interface_t interface, int speed, int duplex,
- 			    bool tx_pause, bool rx_pause);
-+	void (*mac_disable_tx_lpi)(struct phylink_config *config);
-+	void (*mac_enable_tx_lpi)(struct phylink_config *config, u32 timer,
-+				  bool tx_clk_stop);
- };
+@@ -5537,6 +5551,12 @@ static int mvneta_probe(struct platform_device *pdev)
+ 	pp->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_10 |
+ 		MAC_100 | MAC_1000FD | MAC_2500FD;
  
- #if 0 /* For kernel-doc purposes only. */
-@@ -387,6 +406,31 @@ void mac_link_down(struct phylink_config *config, unsigned int mode,
- void mac_link_up(struct phylink_config *config, struct phy_device *phy,
- 		 unsigned int mode, phy_interface_t interface,
- 		 int speed, int duplex, bool tx_pause, bool rx_pause);
++	/* Setup EEE.  Choose 250us idle. */
++	pp->phylink_config.lpi_capabilities = MAC_100FD | MAC_1000FD;
++	pp->phylink_config.lpi_timer_limit_us = 255;
++	pp->phylink_config.lpi_timer_default = 250;
++	pp->phylink_config.eee_enabled_default = true;
 +
-+/**
-+ * mac_disable_tx_lpi() - disable LPI generation at the MAC
-+ * @config: a pointer to a &struct phylink_config.
-+ *
-+ * Disable generation of LPI at the MAC, effectively preventing the MAC
-+ * from indicating that it is idle.
-+ */
-+void mac_disable_tx_lpi(struct phylink_config *config);
-+
-+/**
-+ * mac_enable_tx_lpi() - configure and enable LPI generation at the MAC
-+ * @config: a pointer to a &struct phylink_config.
-+ * @timer: LPI timeout in microseconds.
-+ * @tx_clk_stop: allow xMII transmit clock to be stopped during LPI
-+ *
-+ * Configure the LPI timeout accordingly. This will only be called when
-+ * the link is already up, to cater for situations where the hardware
-+ * needs to be programmed according to the link speed.
-+ *
-+ * Enable LPI generation at the MAC, and configure whether the xMII transmit
-+ * clock may be stopped.
-+ */
-+void mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+		       bool tx_clk_stop);
- #endif
- 
- struct phylink_pcs_ops;
+ 	phy_interface_set_rgmii(pp->phylink_config.supported_interfaces);
+ 	__set_bit(PHY_INTERFACE_MODE_QSGMII,
+ 		  pp->phylink_config.supported_interfaces);
 -- 
 2.30.2
 
