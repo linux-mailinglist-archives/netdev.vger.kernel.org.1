@@ -1,189 +1,217 @@
-Return-Path: <netdev+bounces-147375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D444A9D946E
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:28:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3412D9D9474
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0901656C7
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2157D168300
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00F31D54E3;
-	Tue, 26 Nov 2024 09:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gy5uCAYX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5911BA86C;
+	Tue, 26 Nov 2024 09:28:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out28-171.mail.aliyun.com (out28-171.mail.aliyun.com [115.124.28.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8001B412A
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 09:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61811B4122;
+	Tue, 26 Nov 2024 09:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732613153; cv=none; b=Jx7jyzOEpC2ccDYOntfZwduBOVI5pL0pVvkl2S5k8Hapu2LqjSxnONQUzt122bo/hi3si42DXJpFnhlLGjiDLfEc+ZiISJCAao6q8XzLOLio8u5gSn8ivHz2zLFgC01Vg4lzdmB1+M9Yo+vEL1jJnw1oYdULDItiquyL5QqYj2w=
+	t=1732613299; cv=none; b=nGHiUV0QGNFkQXNff5WTj2CA7AnChqU0xaJpCBFzNoF9/TW/TLNOQtYxMnS/0QD0pKGjgTTvflvGdfw+jjXtPddIDdzW76OkSF7GlyH5Ep32Orpm05SEJbna+9wY7mT0nw3LSIctC8u/Z2V7kIgUHeQwUnCr7UqQfCgPfHMNtJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732613153; c=relaxed/simple;
-	bh=Sd5ZsZih8uvyUoVBoN/JGaE7S4LaaQ97QiAmX/f/+Eo=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=IwsR0Ib81AMk+h+MKFqb5DLiYvQPfxDn8dTVN3IuIUI6mosSID+Yx8HBAzfYRQ0RiY3yJNmg6JznjdiBmh9d1VuRHYY2lvRfKJbVEN/ouMj7DWZyt9hasVxHH5qGkRA5I5hZvmMyPX1FMt8JTSyvYdQMOQQAOao0PyjcdJqR2mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gy5uCAYX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=TzNYooxEH+SbwVbXNQKm879Cde8BezevC9ulnl0zP60=; b=gy5uCAYXp1PkvtBzZ/9KoojWnf
-	18TM0iASJcB6kGzCjXK11a3QzpLnkLSMjGFE9q8tGD4eMefmvFOi0C5+rJl5dzHAzT5+FGxEnlY2C
-	U1HNoeM4LO7BV89TZj+G8PAPEgcFov2J2faSepsiDL/U+Fjclxazg3zWqqYr1vnXCFTgOA4YHflox
-	nwSQO43pTr+e2vg959A4Yefk0daTGPfwJtKL0ez6u2G5n6RKqFIWutzHXmioKdm3JpbCOls7mZBqb
-	7QmM3ttbYiUosMbOmJ3BC84nLmLx0j8s7zbQdHnEnR2Iz3Rh+CsGOO50ya/oUhhs47NI5TuGlXMC/
-	PUQkllwg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42244 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tFrpD-0006Wk-06;
-	Tue, 26 Nov 2024 09:25:39 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tFrpB-005xR8-A6; Tue, 26 Nov 2024 09:25:37 +0000
-In-Reply-To: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
-References: <Z0WTpE8wkpjMiv_J@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexander Couzens <lynxis@fe80.eu>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next 16/16] net: phylink: remove
- phylink_phy_no_inband()
+	s=arc-20240116; t=1732613299; c=relaxed/simple;
+	bh=SZuyiSGsWlPw7HX0P6RnRL4kdpkTcv0tnCESV6ZJV4A=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=lLNrkQskFZQ7Ft1HB8UL5JRI1mo1oMRmQf9bA+ZzXnccX2KrCEhXp4p4jzRJ4PBS1iGA6r8UNqn6pQQKNZh7IJR3UG3VFGssklIn+HoSMMlkX2+XZJn+1oYkVKNxB021rNZEfbxSZvfepy+zzAWg3zant0rbzJPfTfHuvnDTP/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
+Received: from 10.0.2.15(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.aNBBMub_1732613289 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Nov 2024 17:28:10 +0800
+Message-ID: <a48d76ac-db08-46d5-9528-f046a7b541dc@motor-comm.com>
+Date: Tue, 26 Nov 2024 17:28:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tFrpB-005xR8-A6@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 26 Nov 2024 09:25:37 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 05/21] motorcomm:yt6801: Implement the
+ fxgmac_start function
+From: Frank Sae <Frank.Sae@motor-comm.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+References: <20241120105625.22508-1-Frank.Sae@motor-comm.com>
+ <20241120105625.22508-6-Frank.Sae@motor-comm.com>
+ <95675880-1b93-4916-beee-e5feb6531009@lunn.ch>
+ <ba24293a-77b1-4106-84d2-81ff343fc90f@motor-comm.com>
+ <82e1860b-cbbf-4c82-9f1b-bf4a283e3585@lunn.ch>
+ <43341290-15e3-4784-9b69-7f3f13f34e01@motor-comm.com>
+Content-Language: en-US
+In-Reply-To: <43341290-15e3-4784-9b69-7f3f13f34e01@motor-comm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Remove phylink_phy_no_inband() now that we are handling the lack of
-inband negotiation by querying the capabilities of the PHY and PCS,
-and the BCM84881 PHY driver provides us the information necessary to
-make the decision.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phylink.c | 27 ++++++---------------------
- 1 file changed, 6 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index fd2855fc0fc8..7d5ebab0afb1 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3400,10 +3400,11 @@ static phy_interface_t phylink_choose_sfp_interface(struct phylink *pl,
- 	return interface;
- }
- 
--static void phylink_sfp_set_config(struct phylink *pl, u8 mode,
-+static void phylink_sfp_set_config(struct phylink *pl,
- 				   unsigned long *supported,
- 				   struct phylink_link_state *state)
- {
-+	u8 mode = MLO_AN_INBAND;
- 	bool changed = false;
- 
- 	phylink_dbg(pl, "requesting link mode %s/%s with support %*pb\n",
-@@ -3437,8 +3438,7 @@ static void phylink_sfp_set_config(struct phylink *pl, u8 mode,
- 		phylink_mac_initial_config(pl, false);
- }
- 
--static int phylink_sfp_config_phy(struct phylink *pl, u8 mode,
--				  struct phy_device *phy)
-+static int phylink_sfp_config_phy(struct phylink *pl, struct phy_device *phy)
- {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(support);
- 	struct phylink_link_state config;
-@@ -3482,7 +3482,7 @@ static int phylink_sfp_config_phy(struct phylink *pl, u8 mode,
- 
- 	pl->link_port = pl->sfp_port;
- 
--	phylink_sfp_set_config(pl, mode, support, &config);
-+	phylink_sfp_set_config(pl, support, &config);
- 
- 	return 0;
- }
-@@ -3557,7 +3557,7 @@ static int phylink_sfp_config_optical(struct phylink *pl)
- 
- 	pl->link_port = pl->sfp_port;
- 
--	phylink_sfp_set_config(pl, MLO_AN_INBAND, pl->sfp_support, &config);
-+	phylink_sfp_set_config(pl, pl->sfp_support, &config);
- 
- 	return 0;
- }
-@@ -3628,19 +3628,9 @@ static void phylink_sfp_link_up(void *upstream)
- 	phylink_enable_and_run_resolve(pl, PHYLINK_DISABLE_LINK);
- }
- 
--/* The Broadcom BCM84881 in the Methode DM7052 is unable to provide a SGMII
-- * or 802.3z control word, so inband will not work.
-- */
--static bool phylink_phy_no_inband(struct phy_device *phy)
--{
--	return phy->is_c45 && phy_id_compare(phy->c45_ids.device_ids[1],
--					     0xae025150, 0xfffffff0);
--}
--
- static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
- {
- 	struct phylink *pl = upstream;
--	u8 mode;
- 
- 	/*
- 	 * This is the new way of dealing with flow control for PHYs,
-@@ -3651,17 +3641,12 @@ static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
- 	 */
- 	phy_support_asym_pause(phy);
- 
--	if (phylink_phy_no_inband(phy))
--		mode = MLO_AN_PHY;
--	else
--		mode = MLO_AN_INBAND;
--
- 	/* Set the PHY's host supported interfaces */
- 	phy_interface_and(phy->host_interfaces, phylink_sfp_interfaces,
- 			  pl->config->supported_interfaces);
- 
- 	/* Do the initial configuration */
--	return phylink_sfp_config_phy(pl, mode, phy);
-+	return phylink_sfp_config_phy(pl, phy);
- }
- 
- static void phylink_sfp_disconnect_phy(void *upstream,
--- 
-2.30.2
+On 2024/11/26 11:15, Frank Sae wrote:
+> Hi Andrew,
+> 
+> On 2024/11/25 22:18, Andrew Lunn wrote:
+>>>> RGMII is unusual, you normally want RGMII_ID. Where are the 2ns delays
+>>>> added?
+>>>>
+>>>
+>>> Yes, you are right. PHY_INTERFACE_MODE_RGMII should be PHY_INTERFACE_MODE_RGMII_ID.
+>>> YT6801 NIC integrated with YT8531S phy, and the 2ns delays added in the phy driver.
+>>> https://elixir.bootlin.com/linux/v6.12/source/drivers/net/phy/motorcomm.c#L895
+>>
+>> But if you pass PHY_INTERFACE_MODE_RGMII to the PHY it is not adding
+>> the 2ns delay. So how does this work now?
+> 
+> I'm sorry. Maybe PHY_INTERFACE_MODE_RGMII is enough.
+> YT6801 is a pcie NIC chip that integrates one yt8531s phy.
+> Therefore, a delay of 2ns is unnecessary, as the hardware has
+>  already ensured this.
 
+YT6801 looks like that:
+
+                      ||                      
+  ********************++**********************
+  *            | PCIE Endpoint |             *
+  *            +---------------+             *
+  *                | GMAC |                  *
+  *                +--++--+      YT6801      *
+  *                  |**|                    *
+  *         GMII --> |**| <-- MDIO           *
+  *                 +-++--+                  *
+  *                 | PHY |                  *
+  *                 +--++-+                  *
+  *********************||*********************
+
+yt8531s phy driver not support GMII.
+
+
+> 
+>>
+>>>>> +int fxgmac_start(struct fxgmac_pdata *pdata)
+>>>>> +{
+>>>>> +	struct fxgmac_hw_ops *hw_ops = &pdata->hw_ops;
+>>>>> +	u32 val;
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	if (pdata->dev_state != FXGMAC_DEV_OPEN &&
+>>>>> +	    pdata->dev_state != FXGMAC_DEV_STOP &&
+>>>>> +	    pdata->dev_state != FXGMAC_DEV_RESUME) {
+>>>>> +		yt_dbg(pdata, " dev_state err:%x\n", pdata->dev_state);
+>>>>> +		return 0;
+>>>>> +	}
+>>>>> +
+>>>>> +	if (pdata->dev_state != FXGMAC_DEV_STOP) {
+>>>>> +		hw_ops->reset_phy(pdata);
+>>>>> +		hw_ops->release_phy(pdata);
+>>>>> +		yt_dbg(pdata, "reset phy.\n");
+>>>>> +	}
+>>>>> +
+>>>>> +	if (pdata->dev_state == FXGMAC_DEV_OPEN) {
+>>>>> +		ret = fxgmac_phy_connect(pdata);
+>>>>> +		if (ret < 0)
+>>>>> +			return ret;
+>>>>> +
+>>>>> +		yt_dbg(pdata, "fxgmac_phy_connect.\n");
+>>>>> +	}
+>>>>> +
+>>>>> +	phy_init_hw(pdata->phydev);
+>>>>> +	phy_resume(pdata->phydev);
+>>>>
+>>>> The MAC should not be doing this.
+>>>
+>>> Does this mean deleting 'phy_resume(pdata->phydev)'?
+>>
+>> There are only a few phylib API calls you should be using
+>>
+>> phy_connect() or one of its variants.
+>> phy_start()
+>> phy_stop()
+>> phy_disconnect()
+>>
+>> Those four are the core. Those should be all you need to minimum
+>> support.
+>>
+>> phy_support_asym_pause()
+>> phy_support_eee()
+>> phy_speed_up()
+>> phy_speed_down()
+>>
+>> and these are just nice to have to let phylib know about things the
+>> MAC supports, so phylib can manage the PHY to make them available to
+>> the MAC. This is the API between the MAC driver and phylib. phylib
+>> will then manage the PHY. Any time you want to use a phy_* function,
+>> look to see if other MAC drivers do. If they don't you should not
+>> either.
+> 
+> Tanks for your clear explanation.
+> 
+>>
+>>>>> +	hw_ops->pcie_init(pdata);
+>>>>> +	if (test_bit(FXGMAC_POWER_STATE_DOWN, &pdata->powerstate)) {
+>>>>> +		yt_err(pdata,
+>>>>> +		       "fxgmac powerstate is %lu when config power up.\n",
+>>>>> +		       pdata->powerstate);
+>>>>> +	}
+>>>>> +
+>>>>> +	hw_ops->config_power_up(pdata);
+>>>>> +	hw_ops->dismiss_all_int(pdata);
+>>>>> +	ret = hw_ops->init(pdata);
+>>>>> +	if (ret < 0) {
+>>>>> +		yt_err(pdata, "fxgmac hw init error.\n");
+>>>>> +		return ret;
+>>>>> +	}
+>>>>> +
+>>>>> +	fxgmac_napi_enable(pdata);
+>>>>> +	ret = fxgmac_request_irqs(pdata);
+>>>>> +	if (ret < 0)
+>>>>> +		return ret;
+>>>>> +
+>>>>> +	/* Config interrupt to level signal */
+>>>>> +	val = rd32_mac(pdata, DMA_MR);
+>>>>> +	fxgmac_set_bits(&val, DMA_MR_INTM_POS, DMA_MR_INTM_LEN, 2);
+>>>>> +	fxgmac_set_bits(&val, DMA_MR_QUREAD_POS, DMA_MR_QUREAD_LEN, 1);
+>>>>> +	wr32_mac(pdata, val, DMA_MR);
+>>>>> +
+>>>>> +	hw_ops->enable_mgm_irq(pdata);
+>>>>> +	hw_ops->set_interrupt_moderation(pdata);
+>>>>> +
+>>>>> +	if (pdata->per_channel_irq) {
+>>>>> +		fxgmac_enable_msix_irqs(pdata);
+>>>>> +		ret = fxgmac_phy_irq_enable(pdata, true);
+>>>>> +		if (ret < 0)
+>>>>> +			goto dis_napi;
+>>>>> +	}
+>>>>> +
+>>>>> +	fxgmac_enable_rx_tx_ints(pdata);
+>>>>> +	phy_speed_up(pdata->phydev);
+>>>>> +	genphy_soft_reset(pdata->phydev);
+>>>>
+>>>> More things the MAC driver should not be doing.
+>>>
+>>> Does this mean deleting 'phy_speed_up(pdata->phydev);' and 'genphy_soft_reset(pdata->phydev);' ?
+>>
+>> Two things here:
+>>
+>> phy_speed_up()/phy_speed_down() is part of suspend/resume when using
+>> WoL. This code has nothing to do with that. So why is it here?
+>>
+>> There should not be any need to call genphy_soft_reset(). You should
+>> figure out why you need it, because it could be a PHY driver bug, or a
+>> MAC driver bug.
+>>
+>> 	Andrew
 
