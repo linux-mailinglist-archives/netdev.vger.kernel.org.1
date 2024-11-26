@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-147356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF3A9D940C
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:20:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A76379D940F
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 10:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8097168376
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:20:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B75BB168377
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 09:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81C018E35D;
-	Tue, 26 Nov 2024 09:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127651B78F3;
+	Tue, 26 Nov 2024 09:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eq1Ul6ln"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMoVL8rg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3211369B6;
-	Tue, 26 Nov 2024 09:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07D01B652C;
+	Tue, 26 Nov 2024 09:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732612820; cv=none; b=MP+6vPjJTuJT0cDcnej0BSrLk9pjXNBiPYEPlo05RrXmB/S42qIXTtfDGWSmXsqXyxO15e6DoOK4X3RxprupUv4GLH0wY6GTbinjneIPVB0uy/FG2oZkek28C6BijvstF+Kn8jbuMu+vC+pDf9OYjEqCle8JTzCOQBE3kHAfzFY=
+	t=1732612822; cv=none; b=WOsM6h8fhzBTa31s8CRjZgujPC1AAF3dO0R0DDaJq6xBhFh+P8zOopVBY3Aa68W6s5S8m1xG4hKX5peHI+TbuonvxDd41h7jTUo7nhTbD+FKeM2UV9h7SERul13XMFzZcwgq6+ENyIgob3kNyJcIx2jTL8sweMSA/1UCkSrRta8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732612820; c=relaxed/simple;
-	bh=U7n/SI5fUPd2Az9BoDV51BCYY+KeSeeSp7nFWQ/q+aI=;
+	s=arc-20240116; t=1732612822; c=relaxed/simple;
+	bh=Ctg6MXostCZ1aJoI4FFc/g312bq9jtegH+oNd3mbPbM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F3nYNCiFwHr/ShFKsP6ZQAR+YUOU6liqPKqGJywucFwymy0kNNdjcEzHKAn5+sLSZzCuoLaq/VJkrqqIRiROgmJm4d9SpF3cMm0xhD5LkZIBetK2I2jMt3PhVeLyYukJqC0IFywP4dy3pwqdkIPhszXxw+QcX0aqNt88PAvfHmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eq1Ul6ln; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32E07C4CECF;
-	Tue, 26 Nov 2024 09:20:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ijbbeS8PcnEUv7um2MDt1P34CwFZ+ZPCZtRE9zrfrSnsw84voIRRiyOkwVz2dcdh1knnr1M8rfqFUhT6X6HztAEUwQc5kgq5LLQWGH9GOIvFnyt2FBS7GWk9TfrHuERsJC6KQWCEh0uWdVCEmGP2e9/jeHvraH9mTRoABK4VGHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMoVL8rg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFAE4C4CED0;
+	Tue, 26 Nov 2024 09:20:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732612820;
-	bh=U7n/SI5fUPd2Az9BoDV51BCYY+KeSeeSp7nFWQ/q+aI=;
+	s=k20201202; t=1732612821;
+	bh=Ctg6MXostCZ1aJoI4FFc/g312bq9jtegH+oNd3mbPbM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Eq1Ul6lnKBWRiRGsp0bobP+YIsFPdqPImMLsPamoHc3qARhLqo3ur81Ad23gvsS1x
-	 evU8IxMttCAmtIXyNHZwZm0ms12DZHn9gOR/NzdUFVoCB1hWtzXU2gYL5zSrchlX3t
-	 W935l8e10ub+nwMSmTDVAz0mGTuw0v1q/NIrgY6FyWp2squbWhFkiD437zmWLCz2jk
-	 uh7w2sisvcwwxYeUwJSaobjwKfvvpeF3LbS5mAkaOp8kgfz4j1EKgpMXnM1r9qqdO+
-	 /jSmMZWIQYnr3lrpb/bRftzDUeIq3pU84SPFusaK50P285TmpUcRlq7Vh26SmDlUWS
-	 RErLUZOksnF3A==
+	b=hMoVL8rgbDSJZsho/GqGrLQfqMe65YqL/OcfkOgVu/5jtxIXo8eRmaxd5wQMHI7Nw
+	 NOpZRQVuhvE4/31lTFsVwpoOXbRIjh8MmLZlhrpC8eIOoSvx1X0a5myta69XiHNnyh
+	 WbGIGB6h6kr7sxp3NIu2OXa4/KGahf4K56dR1iU5okxS2CJ+uTHGVlypIj7r5/mfuD
+	 3zpFVLmxKFDzPZB1ZIgdNYca9r8eZ0h9j2Hlf75mjRDYzvGWLEgkZg8EL+YJibtO9G
+	 w6Drte+7iDFIi6DA5fcAK/wscZBGCqtrcTo55HOA0ug0sHRJ8vpIzIYNYlFzcCoNWR
+	 veNEsxTuP20/w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CFA3809A00;
-	Tue, 26 Nov 2024 09:20:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEB873809A00;
+	Tue, 26 Nov 2024 09:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 0/3] Correcting switch hardware versions and reported
- speeds
+Subject: Re: [PATCH net 1/1] net: stmmac: set initial EEE policy configuration
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173261283301.319179.8241614994129494508.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Nov 2024 09:20:33 +0000
-References: <20241120075624.499464-1-justinlai0215@realtek.com>
-In-Reply-To: <20241120075624.499464-1-justinlai0215@realtek.com>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, horms@kernel.org, michal.kubiak@intel.com,
- pkshih@realtek.com, larry.chiu@realtek.com
+ <173261283425.319179.1006458233398022415.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Nov 2024 09:20:34 +0000
+References: <20241120083818.1079456-1-yong.liang.choong@linux.intel.com>
+In-Reply-To: <20241120083818.1079456-1-yong.liang.choong@linux.intel.com>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: andrew+netdev@lunn.ch, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, o.rempel@pengutronix.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Wed, 20 Nov 2024 15:56:21 +0800 you wrote:
-> This patch set mainly involves correcting switch hardware versions and
-> reported speeds.
-> Details are as follows:
-> 1. Refactor the rtase_check_mac_version_valid() function.
-> 2. Correct the speed for RTL907XD-V1
-> 3. Corrects error handling of the rtase_check_mac_version_valid()
+On Wed, 20 Nov 2024 16:38:18 +0800 you wrote:
+> Set the initial eee_cfg values to have 'ethtool --show-eee ' display
+> the initial EEE configuration.
+> 
+> Fixes: 49168d1980e2 ("net: phy: Add phy_support_eee() indicating MAC support EEE")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v5,1/3] rtase: Refactor the rtase_check_mac_version_valid() function
-    https://git.kernel.org/netdev/net/c/a1f8609ff1f6
-  - [net,v5,2/3] rtase: Correct the speed for RTL907XD-V1
-    https://git.kernel.org/netdev/net/c/c1fc14c4df80
-  - [net,v5,3/3] rtase: Corrects error handling of the rtase_check_mac_version_valid()
-    https://git.kernel.org/netdev/net/c/a01cfcfda5cc
+  - [net,1/1] net: stmmac: set initial EEE policy configuration
+    https://git.kernel.org/netdev/net/c/59c5e1411a0a
 
 You are awesome, thank you!
 -- 
