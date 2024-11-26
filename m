@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-147506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA6DD9D9E5E
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:19:53 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEE4A9D9E60
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 21:20:39 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 577141644F8
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:19:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42A22B24E75
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 20:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20CF1DE880;
-	Tue, 26 Nov 2024 20:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5E21DE880;
+	Tue, 26 Nov 2024 20:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kIDWEWDX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZXYOEPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D884A1DE2D3
-	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 20:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5650A1DDC2E
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 20:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732652385; cv=none; b=b0cGaSAoc2t+ltjjeMwh67adzTtvNIuLi0QGTq+9U8t2mmR7R+XK9jTJOl1scPaWFLx7p5cVMdvYVBxqckj4rl8uFtNvd1PoLKcgTVzyFhGvTd9UpiKrJDcU68lNTrYPQSNwIo1r5M5agOhH7kZldeBMScvcsA/vHwjm40eAKa0=
+	t=1732652433; cv=none; b=T+aYATPeelk7G6+gefRKf6Cv5TVuwX74mIYTzGeqrozw5rzR5pl/CPU4UKMT/SYKmDFcZFkvqOD7X1WzD4PeYnuffGhhvqlMkqjRcrmAMZwN62mEj6e/ZdNB+4iebcfV9FJLSJNaLvkUXYFPIliZXWpIt1dRnQbMg/qVU+yzVYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732652385; c=relaxed/simple;
-	bh=z74amAUWB1PrCjxQ9NA1lFyHx/fno7XJH0a2IcsTCEg=;
+	s=arc-20240116; t=1732652433; c=relaxed/simple;
+	bh=hE36GHZAn9bcZ2gX4F+8xhFEnFhrZcCdir62CFrw1Is=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QWlxEKnXm9wNh4ABP2jIrUUtHhQkGdy7D+vNCJpGBkSTqy8dxanHe8j2zxSOqyjVqRRdn6K7fRBKdFIfZ0d157BlElzBi10QWN9zH4Zyy4MnAoVzWEkkIinmDY/OyFpkqPMzADnX26rGX+eLgxkEPhB7rV5kCz1bnCk7V0BL954=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kIDWEWDX; arc=none smtp.client-ip=209.85.218.46
+	 In-Reply-To:Content-Type; b=FABucqvvm8KCTgcUhLhALoNPaK6I2rwJJU4I579inXIPZdQQmNrIAdOlGkXdmsU5oPFM8zWFGSw5mrmBg/QNlvII1k+S6/eWFrWyOmv/Cx/KfBPKX79rXxFo9RM+7dPrPvu2aG31lIPz3H68owbexYQ74H0wHeytu+oa03Jud4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZXYOEPP; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa5366d3b47so461702366b.0
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:19:43 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa530a94c0eso561601866b.2
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 12:20:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732652382; x=1733257182; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732652430; x=1733257230; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bIdOM98L3EBQwsq5FQMMGgLWqa/7d6Lq3LNh7wTZfHQ=;
-        b=kIDWEWDX4wiTxxWqGT8+HoGUmF9YepQliAuPV8yw6aHsebR+tA6YuUnokthtPILbge
-         S7Mim0BLyhci4tCH5wA0DJ7ta+c0kK6qk/vtBnFgfbBbNhZyUheYZ7KpovpqU8JoDop2
-         nGm8cC5OTWkbsqcO0vZLBPL1ly1JjoVKKRqkN95EEIPLqDdAAliKtskUj10OcwIRpHNC
-         FweyFaLrE6/QkH/nxTOH3kQWfEDxt+prXFvdIN2aI+3EO3qg5/8TjzlnnM1TNMKKf+yD
-         LtqXGwW4izwfZ+3wRD0BzxD/uFEFYUaTl2A5YAQEiI0Z6C+4LXE0QpZJCU9zLosySvvW
-         oiVw==
+        bh=EDIpeb3JMBwFv1oZ+7PJFJMHR0Hd5nE3HVJPYq0ihls=;
+        b=FZXYOEPP5C+M6xkG65lF8+AIDiYC+frPwFI30VvI36U/jZFY65fLP6ffLHZ8JQR32u
+         YoSSoJsdSW+ll62gih+iNk8daUmJDDfZpDXvjRrYIUFrTgFSbK27iBA3Gi7NKZpO8/qn
+         HJWcpzPcfncqkb6W2reM3phqunAdbFl5xKk432+1wz+VqekJdHo8odTLuPlit6wOnsgy
+         D8sbsiDq2wimVj2ZCad8pThc/OqRpessdPjwKkWtoiEUZfpRV0REykX323tjLBclyj2Q
+         51iOdxP80gJqsDTiI3QelJ5elKuH0k1Ram9F+2ktT/xfanp8ZQgy6cb6ke9vVdBIvr1S
+         hAow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732652382; x=1733257182;
+        d=1e100.net; s=20230601; t=1732652430; x=1733257230;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bIdOM98L3EBQwsq5FQMMGgLWqa/7d6Lq3LNh7wTZfHQ=;
-        b=dblGnAOioAr0YUQsPJtU9ZEiErx996f1bWDpp+xKk/RPeM17XSVpEkbQ32xBHZMhGt
-         nLvwUhi3BTsLwoSvf/50PkbmcHt3X0cEJrP+0Boz+x3yN4hHroRXtpgFJxXSQb13Tddz
-         lLyUsuSOB+1qmYcAIW6YDd5F0WCNk7e67ylGuGQJPWNWqI4LrFlJkFYZJYb+ZP6UEraq
-         tFH/0umImeQsiJ/oq5c9IzDvFfQJR+vD7I4/EBj3CvAgGscQjz3J1MW5QetV3wK1quEe
-         5nA90cr+Rrrp6NDstgKLhIUHlJHGP1aGGDGG+Ez3kXs8BqfcKEvo3cfM6pPswePrOeaH
-         EouQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6HLShY/4n0H5ozXJzaAMhTHL3U7eXN6dQ+8HdKv+8t/tvRDH7N/mv39hGrf4+xcU5lnUWcbc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrkA2lnc9Ht/cWKncQIG7iQ32nuCXPtIaoyJf0o3sjevwXwsfC
-	aKfRjHZwTOrAYPsV7QUjvMzI2KaIqndkLSmvMjb0EhpL4Zvd1lAT
-X-Gm-Gg: ASbGnctdNfz3NpZMLcdIXKwTKJwEvczmjT5uN4GT+/zGpNIheFlxsimZ5izbIdlYtZY
-	mXnY9MRb33sdjI3P2OFoBPPlrqB5rD6Dz8N5/gFSWzzLHzzMpzJpdSnPuThVOBeyL0yyrsjv0Xk
-	p0fT4E0n2v7atrbmAtsFyyI1iZ+KgY//kq6SlM0b0Pr868lTZq4EhrNuhfZfz6EE4Xuzc0HCHyP
-	blxD3MMqNqYkJYM7Lr5VuMmaqxk+Ivetowx9wrLbYKDcINCSc95Qo6VyguMpx/on6z1GIVfwEcj
-	vsbyJ7/O6SOH4R9s2zRTXzFYZNUq3NzmFr1E3sNpd5qWAB128DZO1odfbCPSvsG/0jELLTCL0qx
-	yfh3dHVemKMdmEpHRffCz+PFInKfnWKLzrrUn1a5R4g==
-X-Google-Smtp-Source: AGHT+IFJzXI+QGnug04VkzBBZH3/3gOfiit7iwiUpCdN3K1kV7d0P626vyqQmw6ZO1DajOX9UOmxZw==
-X-Received: by 2002:a17:907:6ea6:b0:aa5:4c3a:3b55 with SMTP id a640c23a62f3a-aa580f5814amr26638366b.36.1732652381959;
-        Tue, 26 Nov 2024 12:19:41 -0800 (PST)
+        bh=EDIpeb3JMBwFv1oZ+7PJFJMHR0Hd5nE3HVJPYq0ihls=;
+        b=r6/T1HZvQYSQTC3p6sDOl+RxYG9WCXjXOJKwW6XS71aqb9QHE+iXnBk6gxMKIa1u3u
+         1vGz7+00xfuLPBLKr4d1jdXacUTpOka+XuIdRrxwIfxv9oApmT3ox20NuSbTn8jNdsaC
+         yJi9h/cuep2HpH3YxnNGoCueK0kIaLG4q/zX+ZSkCsrJGAaxG0On0vGYdXvRTWXP8NXp
+         IksFTZKQn6rkAvg3Cie5OQOEVIZ7/utlAJS0Dks+8WcXJbPa8qF1HJKzTKi5/2zMfnuE
+         lo4DcZI5Gb8So0bUYvEZdCwkvhLZcy4ya24VjvtZe6xcUHJ1m767b+ljKBXFiT5PQQv6
+         TaSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqb62FBZs5gyRRUBvvAWJj8mV/fu80No7R/hv11wm2WmMkabHGZHf6T1LzU3i822O9MBE/k2c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB8MKfOAnEXYq6bCe6moPUdaS4qrlEWMpnToh9uDUO5LWz4PyO
+	Km5sXoUr8K+ilLfm4XCKrWR/haUgh/UeAGbxMhXDK5Obl8kKENtu
+X-Gm-Gg: ASbGnctsi1kiPKxIwYLp/4ux62PkxL0StUukaBibfUgwRU8k1EdSnBrAWk0+wb01l5M
+	zmm9nL3kXBK8oYoOM15Uodtp8HAvQbx5WE9U2kMmTMHFTwqw4EalwWcaeT94yTd1PHBdgNDk5oK
+	Etwig6LGamQPo8Fdde9kVyoJJxhQHH38+bxVYWeTDwcdzJYRTWNzVV0/Xz8WsSGLE2g+qkTRiuD
+	GkscNKtUcWid5K3d8114hvE7jTVyTEF/J5pZi06IgdoNqucA3Rz/xa0hwycY7ZK+4NtJF6RSltL
+	tOUtVDbIeu/eBzodqH4obl2ry5uScYIjmTDRB/tU4WrRBv3idoq+5cPCev+oDUM9jMikL3x4D9Y
+	sH2wzeAEyprg/dQvx7vjxojmt//+KSEaIVFkXDlpjZQ==
+X-Google-Smtp-Source: AGHT+IEQ+GUY00gDNSfoYzGgyx8asHOxAIhNjERgZcKduGGgVFJK+5xW0EhYGKlEcMvQnyyoY63gFg==
+X-Received: by 2002:a17:906:328f:b0:aa5:4b7f:e705 with SMTP id a640c23a62f3a-aa580eee492mr24716366b.1.1732652430538;
+        Tue, 26 Nov 2024 12:20:30 -0800 (PST)
 Received: from ?IPV6:2a02:3100:b1b1:7000:f43f:954d:8ddd:f91b? (dynamic-2a02-3100-b1b1-7000-f43f-954d-8ddd-f91b.310.pool.telefonica.de. [2a02:3100:b1b1:7000:f43f:954d:8ddd:f91b])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa50b3000e6sm628933066b.80.2024.11.26.12.19.39
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-aa51a449c24sm590832966b.178.2024.11.26.12.20.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2024 12:19:40 -0800 (PST)
-Message-ID: <fd994907-0d37-41a6-87fe-1064543bf9fc@gmail.com>
-Date: Tue, 26 Nov 2024 21:19:39 +0100
+        Tue, 26 Nov 2024 12:20:29 -0800 (PST)
+Message-ID: <14b3a67f-416a-479c-bd28-887ea06cd435@gmail.com>
+Date: Tue, 26 Nov 2024 21:20:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 03/23] net: phy: marvell: use
- phydev->eee_cfg.eee_enabled
+Subject: Re: [PATCH RFC net-next 04/23] net: phy: avoid
+ genphy_c45_ethtool_get_eee() setting eee_enabled
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -100,7 +100,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Oleksij Rempel <o.rempel@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
  UNGLinuxDriver@microchip.com
 References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
- <E1tFv3K-005yhZ-E8@rmk-PC.armlinux.org.uk>
+ <E1tFv3P-005yhf-Ho@rmk-PC.armlinux.org.uk>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -146,45 +146,18 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <E1tFv3K-005yhZ-E8@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tFv3P-005yhf-Ho@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 26.11.2024 13:52, Russell King (Oracle) wrote:
-> Rather than calling genphy_c45_ethtool_get_eee() to retrieve whether
-> EEE is enabled, use the value stored in the phy_device eee_cfg
-> structure.
+> genphy_c45_ethtool_get_eee() is only called from phy_ethtool_get_eee(),
+> which then calls eeecfg_to_eee(). eeecfg_to_eee() will overwrite
+> keee.eee_enabled, so there's no point setting keee.eee_enabled in
+> genphy_c45_ethtool_get_eee(). Remove this assignment.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->  drivers/net/phy/marvell.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-> index cd50cd6a7f75..1d117fa8c564 100644
-> --- a/drivers/net/phy/marvell.c
-> +++ b/drivers/net/phy/marvell.c
-> @@ -1508,7 +1508,6 @@ static int m88e1540_get_fld(struct phy_device *phydev, u8 *msecs)
->  
->  static int m88e1540_set_fld(struct phy_device *phydev, const u8 *msecs)
->  {
-> -	struct ethtool_keee eee;
->  	int val, ret;
->  
->  	if (*msecs == ETHTOOL_PHY_FAST_LINK_DOWN_OFF)
-> @@ -1518,8 +1517,7 @@ static int m88e1540_set_fld(struct phy_device *phydev, const u8 *msecs)
->  	/* According to the Marvell data sheet EEE must be disabled for
->  	 * Fast Link Down detection to work properly
->  	 */
-> -	ret = genphy_c45_ethtool_get_eee(phydev, &eee);
-> -	if (!ret && eee.eee_enabled) {
-> +	if (phydev->eee_cfg.eee_enabled) {
->  		phydev_warn(phydev, "Fast Link Down detection requires EEE to be disabled!\n");
->  		return -EBUSY;
->  	}
-
-This one I had on my list too. Old and new check aren't waterproof as the user can still
-enable EEE later, silently disabling FLD. But the check is better than nothing.
 
 Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
 
