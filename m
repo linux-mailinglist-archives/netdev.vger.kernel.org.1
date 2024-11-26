@@ -1,214 +1,180 @@
-Return-Path: <netdev+bounces-147488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675049D9D1D
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 19:08:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1104F9D9D3B
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 19:16:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 014D6161CB7
-	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 18:08:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEA381641B8
+	for <lists+netdev@lfdr.de>; Tue, 26 Nov 2024 18:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB171DC05F;
-	Tue, 26 Nov 2024 18:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DB61DB55C;
+	Tue, 26 Nov 2024 18:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUO7QwRp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLAH41PZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941FF11187;
-	Tue, 26 Nov 2024 18:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0D0BA3F
+	for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 18:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732644500; cv=none; b=aK5TD93yIJIQS/RisP0UX43Xm6U5gp2CX/22w+cPcsb6MRik5bsEpgvN0+3jP2+iBu4opPSWodElYo/EznMl7S5JbXFufVfR6s6v5pasaztqnly1rOLDFcLQKgoYcKAxPtqgaPgzKftT5fyYwtW+FW/huzCR61vRLy26GrSIf1c=
+	t=1732644971; cv=none; b=aMTyFPn+aQp95W9TUyV4HN5IoQSuYnqHX67JbdWsmvmoUFETn7G7YBVT+Ln6ladNzYsiMyxeTlpXvzjdbq676qe54w6ec+h02iIOxwhjp2snyZyUIDmVMMX7OQ0hZI1bgN8tbhoDm5PlOxt45zFCQFn0dzj7HXXg5Qf4JEERRF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732644500; c=relaxed/simple;
-	bh=uTpMIG27nq9/n0AhWOmqsVR8DfXN0z+SeDYIP/jNcQ0=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NSJnVdufnERa6361kx49Os3QRXuDqCW15WcO3kP8IaVz9Ld4swE9dwQPiOeL+AzusYnyr9I3onPxp9Z2OMjZBZAXJuMaNnSkhwytPk6Og3a/5n/FM2S3Onuaf3KmeFGPVBTHe+cLz5qM+ZydN9UaoBLSMKtdNulqK1SKKK6wLOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hUO7QwRp; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2124a86f4cbso53028825ad.3;
-        Tue, 26 Nov 2024 10:08:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732644498; x=1733249298; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=t0FWcA0PLr8/Ei0bdAEOBOvGFwy/TKJtGRmS0UhbD/g=;
-        b=hUO7QwRpSApzqMAFhdzQBVCk+oaSQqZW6ZHjuMcdgYNqWnxI9Gmmg8HUBL+gDYmrKV
-         NgHuUK2v/eqf3E1/aCUfafrQxNPosvt2xvs6MBbuuIZd3gfut/CtlKJ8lqWSJ/ajUEbW
-         Ug9jNWgfbTxK4Ev9ZDUoKCe1BNHlchP9kuSRmPhF0uNMPwQQhWH7h26lgFIklPZFKrXB
-         mn45nEWiSLPXbrth7bqRP0th6icVJYS1EdEQUINwKM8ThwrF6IxPyO7qPKXDHVUOZX9F
-         rkkI/xV3n6+fCcjZbjnliS/vyCGWVJW0fuqb27O2sv/FeTN139kg4ApAlZs571uWwZCu
-         0QEw==
+	s=arc-20240116; t=1732644971; c=relaxed/simple;
+	bh=kZVQM9xBrwh6IK4X4iq+YiO//9mc5zYtX5MPMs2B5Mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TGvumqGOUuhWgoTpTCwLReF+6g3pm8ldGH3jIgpIGlJDUKdd9s/rYZF0kYhHbppmSUgiPjM1BlkR/xCIJSHLlexsxSJuO5Ia6PHETXz4hT7o4vCCNbHVPz1F6W/yDgkbZHCGmojRwgvcusuO/X3XDhWLFTgOUXT5vSAzXC88XJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DLAH41PZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732644968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f8G9ISwVZXa5JJ9k1DSJBqn0E7TUnWgpcZYyV9NgZ8E=;
+	b=DLAH41PZecr9CmHisw+nlwEPApbaJs6tpfx6EE98lGRr+W1Up2AUCT4h99DwtydJOWv3dN
+	D6JBSDoX+Zogrc6ACShfSncVh0hiOFj7TdFOH/dw7CZLQdxPndZodSE4vsLG6VipxXlf7T
+	J7KKqOrpJz6js4C+J7MRexzG/ON78B8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-QmcVJxOcPv2XrxipVy2H-Q-1; Tue, 26 Nov 2024 13:16:03 -0500
+X-MC-Unique: QmcVJxOcPv2XrxipVy2H-Q-1
+X-Mimecast-MFC-AGG-ID: QmcVJxOcPv2XrxipVy2H-Q
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38233ea8c1bso19987f8f.0
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 10:16:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732644498; x=1733249298;
+        d=1e100.net; s=20230601; t=1732644962; x=1733249762;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t0FWcA0PLr8/Ei0bdAEOBOvGFwy/TKJtGRmS0UhbD/g=;
-        b=n7yXp3oSSK0zmFgkPXeD2uTDWapg325PAUx35/FCfZ5vNQH+tp6mfjJdEvGnI/NBkG
-         V+kG6vzSzhDIuTbUjQC5uAyUsi1uFar73C3yNJGvlzDr6lfLsys867ZIoOH0K2QTZEXD
-         HjiMzd1UiHaPQOpEM0hp9qvPgE5mXRpvv5C6PdKELBcob9RdPKMWdyzOejg1TN9EKTLZ
-         42dVHeDITvRBc85aY65nW6I7Cl/SJJ1CWVUEEtxE+JTatSbeIfzd8Kq4EeQyO7MI+NAl
-         cff365urVSM0peggMxXeNY7Uf/a3aNaHem7QDEsqsgjePcy9nkBockBJ7aTeNMxKM+Xw
-         1Rsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYLQidSn2mVdRGNv/s1UqQtTbsL7wn7tYCpn6IuOH7SmtaIii+u/I4nKkPAWv00Bkr5IVWHjA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVtUgtF6gw57XYGmKSC5mWh3tmYVcLsTXbVdiHqDyFBeRTNHys
-	zwgfkipiiu0pQUWFKKAW7UuxxdBF576Pho+Tj8JTyYpfZlu0/xf4
-X-Gm-Gg: ASbGnctuJUgWA/wVYovRlwTzYlqQ2LHDRSqScFWSNHt9wQtJjBTUceWbByDrZXkp7c9
-	GAQYjZnTboPHaQ2TIF5mFZE1Ei0ZNV+hc74E7XQMAgGW3lQ8gz8Gfk2ESNgcq54pmMM1KF/duAv
-	Ngzz/xxI9v7cjqRJIheRnGK8+R1ExvBy2oI7cceepnLq1VKaR/ISTmBZKOwXj22X42yKRE6n3Wq
-	2ohCE+orIxG+GUbHC4oG4p+UHWqdWla9175FPzEw2HS89Kulfv5kA==
-X-Google-Smtp-Source: AGHT+IFHCCb0CwjOQeLSqtQ6Dg2s1ly9mGQTKmORcEGHvb+6F+KOYQLWA2rByQ3x0T4aPdtxp5MzgA==
-X-Received: by 2002:a17:902:e5cd:b0:211:eb15:9b6c with SMTP id d9443c01a7336-21501e6ce57mr1166025ad.57.1732644497682;
-        Tue, 26 Nov 2024 10:08:17 -0800 (PST)
-Received: from smc-140338-bm01 ([149.97.161.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724de456436sm8715042b3a.38.2024.11.26.10.08.16
+        bh=f8G9ISwVZXa5JJ9k1DSJBqn0E7TUnWgpcZYyV9NgZ8E=;
+        b=jqo6hIkcjec24h+eHnbXiSBRD11x8+uRu9VI+aKV60cSRrsqKX3e4SCfC+qo6HYRNL
+         vjLsJ1uPjRjD1y2+8p+IHu9LcveLstwVUNi75qBcwwfi/amKAyB/5TXQnvSQuT6tJxlT
+         5kaW9TqrTIpp2zqiRY9lR5TA8I5cl8FOLIOZu0kRtIpK3XASrjgBqs0ddKRD9DA0zogK
+         aZmHmzIjL0lBx+doUOduAffAl9w4+wFouldUN5zQPd2e4qHhvPTvYwCIvEAb3qEDqOx7
+         mcL2OBjeIYmnJ0/YPW6ld9dfJnNbpvNRBTJYsLZl5SPl26yGCcI8M5Y9ySQ13U+JWY9W
+         FGxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXDweoQANOXmyT9cjOWY/X+tVHkSY2kEToxqejjgUYsviuVdXtILxsImJRD5lm7pIFIc1/mj9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA17B68m4JFulnZGHy9UbLmnKkT6esMo+x6EDtOupHfV0FmheQ
+	cxlyy1QZPEyeiBPQ4MzhEC7wPOMjWLwo47n7Mh9AspZTXo55q98mIKx9htnaUqDoi1FMgbdhZBQ
+	3hvRngiP6nGRKccQcpvrkCaAk27c9Ouo2iBVNhV2zRmyLSfPzzu4Cnw==
+X-Gm-Gg: ASbGnctgr45o2yKHwyNRSYoMu8MNJU+yP9SU8DJ/S331Z0ORk0yvckDPVgggEzhG3SN
+	Va4gpdUAf4qjnhr0i6muV/HiSOThyh0nywKzLXjgTKYph1WK7Tr22OCGWNhksp8Wn2r3o27kb5T
+	wKZ7ehAM/qfpgwhICCARAuBm5Vnmci2i+MrIpCBu5CuVApxWuQINOlLnywpXxR+CI+f8TGYV+xr
+	wy47rcmyQiq3//QI9wlTqQQtoCnzjDfC533qVCJuemiopsJU5gP4iASbwlAEUJK8KpmmCBGEAmW
+	c9v6ruopWHmqV/YAJDvm7g==
+X-Received: by 2002:a5d:6484:0:b0:382:5a29:199 with SMTP id ffacd0b85a97d-385bfae8583mr3933272f8f.11.1732644962504;
+        Tue, 26 Nov 2024 10:16:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1yhFPUkHGrcDD2n2g/govLWYhFZ1U+H7BCWuWoeOCQMP3qng9A9eE4WHuBMOc/cwhow55ww==
+X-Received: by 2002:a5d:6484:0:b0:382:5a29:199 with SMTP id ffacd0b85a97d-385bfae8583mr3933234f8f.11.1732644962089;
+        Tue, 26 Nov 2024 10:16:02 -0800 (PST)
+Received: from localhost (net-93-146-37-148.cust.vodafonedsl.it. [93.146.37.148])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434a02f2ea1sm74630915e9.34.2024.11.26.10.16.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 10:08:17 -0800 (PST)
-From: Fan Ni <nifan.cxl@gmail.com>
-X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
-Date: Tue, 26 Nov 2024 18:08:14 +0000
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v5 02/27] sfc: add cxl support using new CXL API
-Message-ID: <Z0YOju3FaSSCJRRr@smc-140338-bm01>
-References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
- <20241118164434.7551-3-alejandro.lucero-palau@amd.com>
+        Tue, 26 Nov 2024 10:16:01 -0800 (PST)
+Date: Tue, 26 Nov 2024 19:16:00 +0100
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Til Kaiser <mail@tk154.de>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] mediathek: mtk_eth_soc: fix netdev inside
+ xdp_rxq_info
+Message-ID: <Z0YQYKgUyLt8w4va@lore-desk>
+References: <20241126134707.253572-1-mail@tk154.de>
+ <20241126134707.253572-2-mail@tk154.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="uvb7q/nk1Bce8w0/"
+Content-Disposition: inline
+In-Reply-To: <20241126134707.253572-2-mail@tk154.de>
+
+
+--uvb7q/nk1Bce8w0/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241118164434.7551-3-alejandro.lucero-palau@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 18, 2024 at 04:44:09PM +0000, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Add CXL initialization based on new CXL API for accel drivers and make
-> it dependable on kernel CXL configuration.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Currently, the network device isn't set inside the xdp_rxq_info
+> of the mtk_rx_ring, which means that an XDP program attached to
+> the Mediathek ethernet driver cannot retrieve the index of the
+> interface that received the package since it's always 0 inside
+> the xdp_md struct.
+>=20
+> This patch sets the network device pointer inside the
+> xdp_rxq_info struct, which is later used to initialize
+> the xdp_buff struct via xdp_init_buff.
+>=20
+> This was tested using the following eBPF/XDP program attached
+> to a network interface of the mtk_eth_soc driver. As said before,
+> ingress_ifindex always had a value of zero. After applying the
+> patch, ingress_ifindex holds the correct interface index.
+>=20
+> 	#include <linux/bpf.h>
+> 	#include <bpf/bpf_helpers.h>
+>=20
+> 	SEC("pass")
+> 	int pass_func(struct xdp_md *xdp) {
+>     		bpf_printk("ingress_ifindex: %u",
+> 			xdp->ingress_ifindex);
+>=20
+> 		return XDP_PASS;
+> 	}
+>=20
+> 	char _license[] SEC("license") =3D "GPL";
+>=20
+> Signed-off-by: Til Kaiser <mail@tk154.de>
 > ---
->  drivers/net/ethernet/sfc/Kconfig      |  7 +++
->  drivers/net/ethernet/sfc/Makefile     |  1 +
->  drivers/net/ethernet/sfc/efx.c        | 24 +++++++-
->  drivers/net/ethernet/sfc/efx_cxl.c    | 88 +++++++++++++++++++++++++++
->  drivers/net/ethernet/sfc/efx_cxl.h    | 28 +++++++++
->  drivers/net/ethernet/sfc/net_driver.h | 10 +++
->  6 files changed, 157 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
->  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
-...
-> +	res = DEFINE_RES_MEM_NAMED(0, EFX_CTPIO_BUFFER_SIZE, "ram");
-> +	if (cxl_set_resource(cxl->cxlds, res, CXL_RES_RAM)) {
-> +		pci_err(pci_dev, "cxl_set_resource RAM failed\n");
-> +		rc = -EINVAL;
-> +		goto err2;
-> +	}
-> +
-> +	probe_data->cxl = cxl;
-> +
-> +	return 0;
-> +
-> +err2:
-> +	kfree(cxl->cxlds);
-> +err1:
-> +	kfree(cxl);
-> +	return rc;
-> +
-Unwanted blank line here.
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/et=
+hernet/mediatek/mtk_eth_soc.c
+> index 53485142938c..9c6d4477e536 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -2069,6 +2069,7 @@ static int mtk_poll_rx(struct napi_struct *napi, in=
+t budget,
+> =20
+>  		netdev =3D eth->netdev[mac];
+>  		ppe_idx =3D eth->mac[mac]->ppe_idx;
+> +		ring->xdp_q.dev =3D netdev;
 
-Fan
-> +}
-> +
-> +void efx_cxl_exit(struct efx_probe_data *probe_data)
-> +{
-> +	if (probe_data->cxl) {
-> +		kfree(probe_data->cxl->cxlds);
-> +		kfree(probe_data->cxl);
-> +	}
-> +}
-> +
-> +MODULE_IMPORT_NS(CXL);
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
-> new file mode 100644
-> index 000000000000..90fa46bc94db
-> --- /dev/null
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.h
-> @@ -0,0 +1,28 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/****************************************************************************
-> + * Driver for AMD network controllers and boards
-> + * Copyright (C) 2024, Advanced Micro Devices, Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2 as published
-> + * by the Free Software Foundation, incorporated herein by reference.
-> + */
-> +
-> +#ifndef EFX_CXL_H
-> +#define EFX_CXL_H
-> +
-> +struct efx_nic;
-> +
-> +struct efx_cxl {
-> +	struct cxl_dev_state *cxlds;
-> +	struct cxl_memdev *cxlmd;
-> +	struct cxl_root_decoder *cxlrd;
-> +	struct cxl_port *endpoint;
-> +	struct cxl_endpoint_decoder *cxled;
-> +	struct cxl_region *efx_region;
-> +	void __iomem *ctpio_cxl;
-> +};
-> +
-> +int efx_cxl_init(struct efx_probe_data *probe_data);
-> +void efx_cxl_exit(struct efx_probe_data *probe_data);
-> +#endif
-> diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-> index b85c51cbe7f9..efc6d90380b9 100644
-> --- a/drivers/net/ethernet/sfc/net_driver.h
-> +++ b/drivers/net/ethernet/sfc/net_driver.h
-> @@ -1160,14 +1160,24 @@ struct efx_nic {
->  	atomic_t n_rx_noskb_drops;
->  };
->  
-> +#ifdef CONFIG_SFC_CXL
-> +struct efx_cxl;
-> +#endif
-> +
->  /**
->   * struct efx_probe_data - State after hardware probe
->   * @pci_dev: The PCI device
->   * @efx: Efx NIC details
-> + * @cxl: details of related cxl objects
-> + * @cxl_pio_initialised: cxl initialization outcome.
->   */
->  struct efx_probe_data {
->  	struct pci_dev *pci_dev;
->  	struct efx_nic efx;
-> +#ifdef CONFIG_SFC_CXL
-> +	struct efx_cxl *cxl;
-> +	bool cxl_pio_initialised;
-> +#endif
->  };
->  
->  static inline struct efx_nic *efx_netdev_priv(struct net_device *dev)
-> -- 
-> 2.17.1
-> 
+I guess you can set it just before running xdp_init_buff(), but the change =
+is fine.
 
--- 
-Fan Ni (From gmail)
+Regards,
+Lorenzo
+
+> =20
+>  		if (unlikely(test_bit(MTK_RESETTING, &eth->state)))
+>  			goto release_desc;
+> --=20
+> 2.47.1
+>=20
+>=20
+
+--uvb7q/nk1Bce8w0/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ0YQYAAKCRA6cBh0uS2t
+rE83AP9aWzKM/1L4n1BoEJE/YnvJ0ZgCt/qRO9Ic6wvncBspJgD/f2wyeQqB4c3c
+RCA/I9kBkH0M1sI3s/WtbGbWzaU/0Ak=
+=Et90
+-----END PGP SIGNATURE-----
+
+--uvb7q/nk1Bce8w0/--
+
 
