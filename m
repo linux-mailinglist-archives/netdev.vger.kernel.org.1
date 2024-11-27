@@ -1,117 +1,87 @@
-Return-Path: <netdev+bounces-147615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CE99DAAE1
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 16:34:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EEA89DAAE4
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 16:38:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0669B20B2F
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 15:34:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEA9E281C08
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 15:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E43E1FCFD7;
-	Wed, 27 Nov 2024 15:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5454C1FF7C4;
+	Wed, 27 Nov 2024 15:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gmwn6BEE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hWC9ckQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F13618FDD0
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 15:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2206328B6;
+	Wed, 27 Nov 2024 15:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732721650; cv=none; b=hwdLjiL7Nb3PwlgAl2xFKsiC3UwZ5OLmnw1N+vLje+a4TjDZBvh3Ej40Qzy7132NsOpMk9Nck5v+TrSiRHduCpA5PCXIy30aVymM7bp47sRvD+ye3qqXNZxSDjnpYjlfIomy82e3rYyOGEc77zHFPqmn7fyfLPcnuq5CFy8ZGSo=
+	t=1732721890; cv=none; b=DP00qBj3E3QuadVa7qWaVR3bzJlJreLYUur73kKJjLHDDI2P5QnHAVrCBonTcwCgtlTglb5DO8qz9dOQE017QjW5Gl0rnfQoS975i3qly06pSUsq4nBPhPKx0eTqA+LNa/RfsCgMCrW3K1vYrFE9DhrKkWiL9JdutHjzK1CZvh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732721650; c=relaxed/simple;
-	bh=4Q+79t4Ehjz4uhTJ2PTguamvLBPg3IWGClJcxn8TUrA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UnI7bp3VwaQslXm6LVL9TZYjCLqhwoSTBkIc18fekTKrGlxtjY0Mod2DpFsi0wVXgc65ufuLq6aQArfvYM/LCzjxCRmgbvwBtsv/0r4cHVMnqqDflHsWCPMfMkERFdp8LrQxVsrRruIU3WsOZFNrAZZPzDAnvajpJVbxBrra8E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gmwn6BEE; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6d41dbf6cfbso52598476d6.3
-        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 07:34:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732721648; x=1733326448; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ehLBCZMvqNM9RzwEXeNAalHuQSt29OG4XkC9vSde//s=;
-        b=Gmwn6BEEGLcI24JQRLjvskzJSzUfwgpTGMKySV7zjbSte3BxIm1xdcufNvykli1l5X
-         F11AK8VhqUdmpE/TYeuSJYEnLiMl0+5P692Vd6ZkOP+9OVKqVJZrE8uBHE7CkAY1xDNT
-         g9TahUfVevkH8oarSWPrNvoNkyx3H7hXq1k1/eECgzpUk0UnaUChQdL8xA0Nr1rwlndw
-         Yfeirusjuk4Ny6GQsrOz9F5CSAr7b/xpbz8iwNv96B7JtXFVsWHUmXvTwdf1ZEs5rWhD
-         WL5S2JYS6zxYS+bsxD/NHe9Cu5wWLVfQ9W6MOzHOS+isMKT9tjZbL02UPKt0eW/JCPnP
-         VQ6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732721648; x=1733326448;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ehLBCZMvqNM9RzwEXeNAalHuQSt29OG4XkC9vSde//s=;
-        b=neOt0yzYyNMJ5dl/k6D5S0BLUWj1dAM8oS3qXNrDvYGR5CZIum5O+Y9WCynARXvgms
-         RnSWzrsIYF5wHwIVk7WVQsgvC2BEZeKqsH7MUyM+Qsh/+rAGSID1+rzXrUMa9FeRooYx
-         AHN5+0nV3Cakj48vN/90Y0kLokU3UJbxuyQjE3JbPRD+CefS3dOd+6N/ECsDKQdPMs8f
-         CiaMSFJhQ5fOrd4IacI5xQjliKxXgwBfTYyfa446gPEeTD94hIc2Jmu1kYuaQDVKAiLW
-         yN7iQq3+pEjoYPtYfMw08zRws6uEnAwvyFPClDkzTqIZa9gND5loJCZV1ZRjB9TBaB2L
-         +Krg==
-X-Gm-Message-State: AOJu0YwolI0r6803p+Xk5+WFG8dBYgbr9jELhfjfiRAOzzzcMs8ZDcVR
-	XeMraaZNZEpumlS/YVDRIzTeb07Fq75SAGXUPixsO+zScgatoGuD
-X-Gm-Gg: ASbGnctGQGj/mqPfT+8Z4fNPcZaS5CBXGtxjEebL9Nsjfep64ahp+ftmEDbzbvEYMUa
-	UP0W4XuITkSY+PByt3/hA1eBH5wJkzVnwmkWmiNVU2XEMwfIgoA7DF/JCSbwJcZCQ8tXF5a3KJ4
-	l0z7JPU5Ig99P3XLBv25kuM1FEx19ag5r+fijVKyYIOIWEY9M0U8L7ueQuu9mlThKGwBK2G5X8P
-	42ygxDEONTj3I7VFmUy3AG4BbN/OWxJ/1I03yLqDWf7J3GViueNjkZH539O4zz3EyPtkpe8cZzN
-	wTv8oTrZKLG+OTP7meWPiA==
-X-Google-Smtp-Source: AGHT+IEEzlTT2avstp8W9weA2W6Cs8uymkdP10+Ia6GaqZlwbET2wqgTzBzk7LE2on4otsU0hU9wgA==
-X-Received: by 2002:a05:6214:2529:b0:6d4:1ea3:9829 with SMTP id 6a1803df08f44-6d864d8e653mr49258146d6.30.1732721648123;
-        Wed, 27 Nov 2024 07:34:08 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d451b49c3csm67001366d6.99.2024.11.27.07.34.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 07:34:07 -0800 (PST)
-Date: Wed, 27 Nov 2024 10:34:06 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Milena Olech <milena.olech@intel.com>, 
- intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, 
- anthony.l.nguyen@intel.com, 
- przemyslaw.kitszel@intel.com, 
- Milena Olech <milena.olech@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <67473beedaa9a_38483294f5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241126035849.6441-5-milena.olech@intel.com>
-References: <20241126035849.6441-1-milena.olech@intel.com>
- <20241126035849.6441-5-milena.olech@intel.com>
-Subject: Re: [PATCH v2 iwl-next 04/10] idpf: negotiate PTP capabilities and
- get PTP clock
+	s=arc-20240116; t=1732721890; c=relaxed/simple;
+	bh=Qsh7lyv6B7rh6QnAyT1L/qq/xUEJEtQwxby5Odi2Skw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SvKYpgwNnaeuOnmic37fQM9xiPkkXG4wJhzjg9smBlPlTvwmw46wFS3l1nb2SwcA1PrK91i6krzyd1csQrG45L1gGIO+nesZ4D5Clf5RGtpf9Fy4eWNFtULteaDKPwI+NHn4wRYlrsumxHiveMYLLvg/08kOdj750fRSU7QzhwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hWC9ckQ2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1zGoFEOXxGRwMEfyJ/IQx4PP6NpvQSzerDrWNbMAxxA=; b=hWC9ckQ23kE6G6lxaDgBUYp6Z2
+	Hyd7ItU9S2dETCiSSMjK87+1wHLos//nWJi/L5fmJZZCd32vRwaQUixz/5+YBuPj6Nmne6HsZwDS3
+	ne0SFB/wjaGQI7aVkort8P1Nm7p6aE+H9xwCz8zqTX5sEa0Ojt4BAU7L+gXYB2i2xU+8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tGK6v-00Ed4c-W1; Wed, 27 Nov 2024 16:37:49 +0100
+Date: Wed, 27 Nov 2024 16:37:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [RFC net-next v1 2/2] net. phy: dp83tg720: Add randomized
+ polling intervals for unstable link detection
+Message-ID: <43cceaf2-6540-4a45-95fa-4382ab2953ef@lunn.ch>
+References: <20241127131011.92800-1-o.rempel@pengutronix.de>
+ <20241127131011.92800-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241127131011.92800-2-o.rempel@pengutronix.de>
 
-Milena Olech wrote:
-> PTP capabilities are negotiated using virtchnl command. Add get
-> capabilities function, direct access to read the PTP clock time and
-> direct access to read the cross timestamp - system time and PTP clock
-> time. Set initial PTP capabilities exposed to the stack.
+On Wed, Nov 27, 2024 at 02:10:11PM +0100, Oleksij Rempel wrote:
+> Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
+> report a stable link state. To handle this, the PHY must be periodically reset
+> when the link is down. However, synchronized reset intervals between the PHY
+> and its link partner can result in a deadlock, preventing the link from
+> re-establishing.
 > 
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Tested-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> This change introduces a randomized polling interval when the link is down to
+> desynchronize resets between link partners.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Hi Oleksij
 
-> ---
-> v1 -> v2: change the size of access fields in ptp struct
+What other solutions did you try? I'm wondering if this is more
+complex than it needs to be. Could you add a random delay in
+dp83tg720_read_status() when it decides to do a reset?
 
-also removes dependency on CONFIG_PCIE_PTM
-
+	Andrew
 
