@@ -1,183 +1,126 @@
-Return-Path: <netdev+bounces-147588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F929DA684
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 12:06:40 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023939DA69C
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 12:12:52 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E314DB2A664
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 11:04:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A508E1623A8
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 11:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7732A1EBFF3;
-	Wed, 27 Nov 2024 11:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD261EE00C;
+	Wed, 27 Nov 2024 11:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FcE8UKPS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nUjmzZSp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59C81EBA0D;
-	Wed, 27 Nov 2024 11:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D11198E6E
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 11:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732705344; cv=none; b=tpql2jTcC4FijB1YzbRLPJmBkv/Jsn9H7IEOmNHT+sJgmmqfRyUNcDampRGCn63rvYucmLD+w3xxZn+GBo3HvniQfbf9ZT8i0zpqnHx2s3CMWPcYwqK672lbVAG2yMlXYCz0X6Q/73ltYm0VkBikVxRfP9La7o/3iGL7SDGBYM0=
+	t=1732705968; cv=none; b=jfxRiN+rzBH2p/SKGreGIZGG7oBidTF0sCSjH3Cv480pdGjvfblWzamB6cwEjiDEFjhvrUlsnx+nWYePE3dyPPQMNyouuW9pcsJ3tAMPma+Qd3diEvHrw5WFdtfZmrEee7paB/1ePfosMohfKzkipje7Agw8FdKlFt/mq9xkhrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732705344; c=relaxed/simple;
-	bh=SR0ePwHp0GA795M/9GcPHbpC2ijsjfg2DaxIWwZJC8c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eZMeLFkREoW5p65suVeQf9M6TvKJZSAKlUg7Bj/Lgnhg2Ad8eQu6zD/si5gQNv46nILCaEOJv1aUBPobDojeddMX+FZIwCnb9udE2uYBWiz94USGGyxKwg24gGbtOz0JrYSxAPk5wGj9vj25ThPSYFLTP6+Hd1m2v6WdlFV0we0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FcE8UKPS; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1732705333; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=SoaB6C5PEyN7YaAPt3mcEv/MO65XKYDAh7oA1Qdc11A=;
-	b=FcE8UKPSDVIzc0wRFiYTOjdKU1lviOP3doMjFMN3SqBGcb0ktD1FcEOPpvtegohU9/WG8x0mIWOMfCgoFykaFnUv0s3xbRU3zKPVmV8je3pipN6D09TPkRPZtSKgTaZGnz7VGARGtssTwtwpnR/QQbkRVpVpeob+y0+pqdYqwbw=
-Received: from 30.221.101.175(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WKMQX7n_1732705331 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 27 Nov 2024 19:02:12 +0800
-Message-ID: <3d005186-1e63-4d57-b73f-230d1ded72f2@linux.alibaba.com>
-Date: Wed, 27 Nov 2024 19:02:10 +0800
+	s=arc-20240116; t=1732705968; c=relaxed/simple;
+	bh=vdZH3/2aZfr6fG/Im9L3M1CFgUDwLeyFoFp+clCBCgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G4YkaVEHwTtO5ydvkFkouHJdnSzuOF5FMQ4CrS+Vn279L9bLqUAG3hlcJ/32L/Yl56qaoW9VByTiyL29KYl9cZSD/ctQhlLIiz4ljzlcdahxxhzSPjjeID3l0NQeHVsLVhT04Q7MDHnE/lLyEH2/hq8OrWnk8689EhfD/9rDnaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nUjmzZSp; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YV7Ng+UILJGgeX2OpLHjyU7yknzjQ5R3jvrdw+xvoG8=; b=nUjmzZSp0723C2w0rHv8ZaBBLX
+	XrkG0T8d+DtE6S1tVqA9igzcoRFqbPXKGKBIZ4RCgzvAxBiu8zSDZRkP20hWC2zi8ejzAABOEMym7
+	kYc3vo4iaWZF96oJya2fXWPR/2ADrBQ2Zc0LVayYCZsQVkNbns4K+a83WfHjjVGA5cDWoE8WNokM1
+	BTj6Cw6Y2MGA2Jun7EV5DrGKSxIzwuJwfIzhGN8NocCwFQ8KLj+3vKYKXnyWG1EIJTTSRYRTqE4Ok
+	SFB0hKL53Udq4ZcTt7L3qRABwslS07W0/G/N7Vg31EgBkjZdFOHliWC/4WxGFkZcvzPgVJTyDpfDt
+	SsxAZIxQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39324)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tGFyC-0000E0-0T;
+	Wed, 27 Nov 2024 11:12:32 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tGFy8-00076l-1e;
+	Wed, 27 Nov 2024 11:12:28 +0000
+Date: Wed, 27 Nov 2024 11:12:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH RFC net-next 02/23] net: phy: fix phy_ethtool_set_eee()
+ incorrectly enabling LPI
+Message-ID: <Z0b-nJ7bt8IlBMpz@shell.armlinux.org.uk>
+References: <Z0XEWGqLJ8okNSIr@shell.armlinux.org.uk>
+ <E1tFv3F-005yhT-AA@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: introduce autosplit for smc
-To: Wenjia Zhang <wenjia@linux.ibm.com>, jaka@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240709160551.40595-1-guangguan.wang@linux.alibaba.com>
- <cf07ec76-9d48-4bff-99f6-0842b5127c81@linux.ibm.com>
- <63862dcc-33fd-4757-8daf-e0a018a1c7a3@linux.alibaba.com>
- <faad0886-9ece-4a1c-a659-461b060ba70b@linux.alibaba.com>
- <0afaeec5-f80a-4d8d-806b-d39c0eb5570e@linux.ibm.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <0afaeec5-f80a-4d8d-806b-d39c0eb5570e@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tFv3F-005yhT-AA@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Tue, Nov 26, 2024 at 12:52:21PM +0000, Russell King (Oracle) wrote:
+> @@ -1685,15 +1685,21 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
+>  static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+>  				      const struct eee_config *old_cfg)
+>  {
+> -	if (phydev->eee_cfg.tx_lpi_enabled != old_cfg->tx_lpi_enabled ||
+> +	bool enable_tx_lpi;
+> +
+> +	if (!phydev->link)
+> +		return;
+> +
+> +	enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled && phydev->eee_active;
+> +
+> +	if (phydev->enable_tx_lpi != enable_tx_lpi ||
+>  	    phydev->eee_cfg.tx_lpi_timer != old_cfg->tx_lpi_timer) {
 
+I'm wondering whether this should be:
 
-On 2024/8/10 05:07, Wenjia Zhang wrote:
-> 
-> 
-> On 08.08.24 08:26, Guangguan Wang wrote:
->> On 2024/7/15 10:53, Guangguan Wang wrote:
->>>
->>>
->>> On 2024/7/11 23:57, Wenjia Zhang wrote:
->>>>
->>>>
->>>> On 09.07.24 18:05, Guangguan Wang wrote:
->>>>> When sending large size data in TCP, the data will be split into
->>>>> several segments(packets) to transfer due to MTU config. And in
->>>>> the receive side, application can be woken up to recv data every
->>>>> packet arrived, the data transmission and data recv copy are
->>>>> pipelined.
->>>>>
->>>>> But for SMC-R, it will transmit as many data as possible in one
->>>>> RDMA WRITE and a CDC msg follows the RDMA WRITE, in the receive
->>>>> size, the application only be woken up to recv data when all RDMA
->>>>> WRITE data and the followed CDC msg arrived. The data transmission
->>>>> and data recv copy are sequential.
->>>>>
->>>>> This patch introduce autosplit for SMC, which can automatic split
->>>>> data into several segments and every segment transmitted by one RDMA
->>>>> WRITE when sending large size data in SMC. Because of the split, the
->>>>> data transmission and data send copy can be pipelined in the send side,
->>>>> and the data transmission and data recv copy can be pipelined in the
->>>>> receive side. Thus autosplit helps improving latency performance when
->>>>> sending large size data. The autosplit also works for SMC-D.
->>>>>
->>>>> This patch also introduce a sysctl names autosplit_size for configure
->>>>> the max size of the split segment, whose default value is 128KiB
->>>>> (128KiB perform best in my environment).
->>>>>
->>>>> The sockperf benchmark shows 17%-28% latency improvement when msgsize
->>>>>> = 256KB for SMC-R, 15%-32% latency improvement when msgsize >= 256KB
->>>>> for SMC-D with smc-loopback.
->>>>>
->>>>> Test command:
->>>>> sockperf sr --tcp -m 1048575
->>>>> sockperf pp --tcp -i <server ip> -m <msgsize> -t 20
->>>>>
->>>>> Test config:
->>>>> sysctl -w net.smc.wmem=524288
->>>>> sysctl -w net.smc.rmem=524288
->>>>>
->>>>> Test results:
->>>>> SMC-R
->>>>> msgsize   noautosplit    autosplit
->>>>> 128KB       55.546 us     55.763 us
->>>>> 256KB       83.537 us     69.743 us (17% improve)
->>>>> 512KB      138.306 us    100.313 us (28% improve)
->>>>> 1MB        273.702 us    197.222 us (28% improve)
->>>>>
->>>>> SMC-D with smc-loopback
->>>>> msgsize   noautosplit    autosplit
->>>>> 128KB       14.672 us     14.690 us
->>>>> 256KB       28.277 us     23.958 us (15% improve)
->>>>> 512KB       63.047 us     45.339 us (28% improve)
->>>>> 1MB        129.306 us     87.278 us (32% improve)
->>>>>
->>>>> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->>>>> ---
->>>>>    Documentation/networking/smc-sysctl.rst | 11 +++++++++++
->>>>>    include/net/netns/smc.h                 |  1 +
->>>>>    net/smc/smc_sysctl.c                    | 12 ++++++++++++
->>>>>    net/smc/smc_tx.c                        | 19 ++++++++++++++++++-
->>>>>    4 files changed, 42 insertions(+), 1 deletion(-)
->>>>>
->>>>
->>>> Hi Guangguan,
->>>>
->>>> If I remember correctly, the intention to use one RDMA-write for a possible large data is to reduce possible many partial stores. Since many year has gone, I'm not that sure if it would still be an issue. I need some time to check on it.
->>>>
->>>
->>> Did you mean too many partial stores will result in some issue? What's the issue?
->>>
-> Forget it, I did verify that the partial stores should not be problem now.
->>>
->>>> BTW, I don't really like the idea to use sysctl to set the autosplit_size in any value at will. That makes no sense to improve the performance.
->>>
->>> Although 128KB autosplit_size have a good performance in most scenario, I still found some better autosplit_size for some specific network configurations.
->>> For example, 128KB autosplit_size have a good performance whether the MTU is 1500 or 8500, but for 8500 MTU, 64KB autosplit_size performs better.
->>>
->>> Maybe the sysctl is not the best way, but I think it should have a way to set the value of autosplit_size for possible performance tuning.
->>>
-> mhhh, that could be a good reason to use sysctl.
->>> Thanks,
->>> Guangguan Wang
->>>
->>
->> Hi Wenjia,
->>
->> Is there any update comment or information about this patch?
-> 
-> Hi Guangguan,
-> 
-> sorry for the delayed answer. In the last time it is really difficult for me to find time to look into it and test it. With more thinking, I'm kind of convinced with this idea. But test is still needed. I'll be in vacation next 3 weeks. I hope it is okay for you that I'll test it as soon as possible when I'm back. If everything is ok, I think we can let it go upstream.
-> 
-> Thanks,
-> Wenjia
+	if (phydev->enable_tx_lpi != enable_tx_lpi ||
+	    (phydev->enable_tx_lpi &&
+	     phydev->eee_cfg.tx_lpi_timer != old_cfg->tx_lpi_timer)) {
 
-Hi Wenjia,
+The argument for this change would be to avoid cycling the link when the
+LPI timer changes but we're not using LPI.
 
-Is there any update comment or information about this patch?
+The argument against this change would be that then we don't program the
+hardware, and if the driver reads the initial value from hardware and
+is unbound/rebound, we'll lose that update whereas before the phylib
+changes, it would have been preserved.
 
-> 
-> 
->>
->>>>
->>>> Thanks,
->>>> Wenjia
+The problem, however, are drivers where the LPI timer is dependent on
+the speed.
+
+Any thoughts?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
