@@ -1,173 +1,207 @@
-Return-Path: <netdev+bounces-147605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321D99DA88C
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 14:31:51 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8029161B2F
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 13:31:47 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7EC1F76A5;
-	Wed, 27 Nov 2024 13:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AwJKcbvV"
-X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B37C9DA96B
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 14:55:43 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D2D6A8D2
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 13:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66254B211EB
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 13:55:40 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872461FCF57;
+	Wed, 27 Nov 2024 13:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UgpQY6qV"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4361FA165
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 13:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732714307; cv=none; b=Sesm3EC7pg9cDTlH8WBd2oHHH5E2ypDL/uFscH/rFonql1LMmaVRuY1xfKNR1XoxGARXHk10oj56uSo2CL+nii2FTUxdIGJHzpXvRtoF2Gl5DX2X8Zs6ZYJk4XZx404cq0QudLn0lRhxiw4JIYx8ds3zEl+gqSHcCEHr+ovA1mI=
+	t=1732715737; cv=none; b=FpmVqEi7iofVMfbstd/cfD80DcxFhkBm0CMR/RPZjaVEFPm41PXWUekp5Wwk5NgvyN7dUyrBILkx17HsyMHMEAsXXEwWFIToZrbLaUVNbUGBCwqrMhB9jYM+ICVVYPZo7bwHHw/5GAsnU2u5+pbn3FQCM5M7xrG27cYCdHwmjFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732714307; c=relaxed/simple;
-	bh=cldKOGvGEDCVtpyFEnvKqgLQdUBtqnf8swX67yPUtWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YIRyOd1WPU6hij86aWknh2bCdKCPCacjgH07Y+1PGfMTkgcxEdJ8G6W029n9z2Q1anxESlAp1tfZtGdv4BTJiLbzpWZW3jjfD2aRKZHWmRnC9n/HRuxlf/U7CE1SNSySU3bQSkkAbMWMNXGN2g8akFHmB8MfwlvNetNzWvjDmtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AwJKcbvV; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfout.stl.internal (Postfix) with ESMTP id 43D0E1140108;
-	Wed, 27 Nov 2024 08:31:44 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 27 Nov 2024 08:31:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1732714304; x=1732800704; bh=kD4GGRRXaJo5coUVseQ9cL4WW5EIeSMVT52
-	/M/YXrqo=; b=AwJKcbvVk4bZADXM0lQ75mLzLoElEG7hc+c9BuWIsNbyzCMdnL5
-	kno3T++TVEwRCKf0PMegKvZgdXwcmuHz6MsoQ7UCwG77X5ojgXakERDC1Qf5HbLO
-	nrg3DszrAfMtocoj/1eGMqAIvxXlLVrE5755JXNNlUJzC5gsmWajXigZY/HDKvP+
-	jqfJHNY7fPrEAWBTmJjDNRnlKZbhkyumR35rbQ54gueX/GYCJVXNz8uKwt3sx4F7
-	wOhvUoqPlaSdJ4ohaMVw32x7epDZEyj8xOmrS1GpKX86pkO8BeWteoihLzksTzAj
-	gKDHXaeAjtONJKXQF9AAAj+QfG+diyVw24w==
-X-ME-Sender: <xms:Ph9HZ_D9cAvcx7BRdtg_NxroEY9qbomzQ-iZMydPWLfXnGSZpgd1bw>
-    <xme:Ph9HZ1jbd-QB9tbOaVgRtIDFTeLGr8soT8xUwktkANplfSPv6uy4tYts7wvpUi57L
-    w3knU9fyiBWQ8s>
-X-ME-Received: <xmr:Ph9HZ6nMmXLhcXGacQGI-hUTdWDfHYdTGtEkHaGIW0AaPNprerRguB4BBJM90bCgP7SdY7ykx3vXPtppIxL4I69yLPE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrgeelgdeglecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
-    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
-    hgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefgudff
-    vdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehi
-    ughoshgthhdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpd
-    hrtghpthhtoheplhhorhgvnhiiohdrsghirghntghonhhisehrvgguhhgrthdrtghomhdp
-    rhgtphhtthhopehmrghilhesthhkudehgedruggvpdhrtghpthhtohepnhgsugesnhgsug
-    drnhgrmhgvpdhrtghpthhtohepshgvrghnrdifrghnghesmhgvughirghtvghkrdgtohhm
-    pdhrtghpthhtohepmhgrrhhkqdhmtgdrlhgvvgesmhgvughirghtvghkrdgtohhmpdhrtg
-    hpthhtoheplhhorhgvnhiioheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthgu
-    vghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghmtghohhgvnhesnh
-    hvihguihgrrdgtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkihhn
-    sehinhhtvghlrdgtohhm
-X-ME-Proxy: <xmx:Ph9HZxxmC3iu7jjQT6jEOfhqON8G0HY1LLNJDQSZ8OvW5Ask2wtXiw>
-    <xmx:Ph9HZ0RmqwAAe4YJu_iLtG4siluM5JMOuPaLT-DLCglSg3nHopv21w>
-    <xmx:Ph9HZ0Y_cgaxonZc3g2QKMg55FpMgxDQwFIBWhN5fM8b8EDJYUf4eg>
-    <xmx:Ph9HZ1Rmo974fapYeKDrIkjkS1ZcpUKfFxMRoov-jakQh1SS9FmAZQ>
-    <xmx:QB9HZ3Ex6aB9bsAbLeVpOpgerrbD8h8THsOs-XtxAa1w-YNULKBI3I2V>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 Nov 2024 08:31:41 -0500 (EST)
-Date: Wed, 27 Nov 2024 15:31:39 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-Cc: Til Kaiser <mail@tk154.de>, nbd@nbd.name, sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
-	netdev@vger.kernel.org, amcohen@nvidia.com,
-	aleksander.lobakin@intel.com
-Subject: Re: [PATCH net] mediathek: mtk_eth_soc: fix netdev inside
- xdp_rxq_info
-Message-ID: <Z0cfOzsujtoxO422@shredder>
-References: <20241126134707.253572-1-mail@tk154.de>
- <20241126134707.253572-2-mail@tk154.de>
- <Z0YQYKgUyLt8w4va@lore-desk>
+	s=arc-20240116; t=1732715737; c=relaxed/simple;
+	bh=4XjHRBUfd9IDatyBHdKZqpWJUDX3CV3U4KyxPjZrbDI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CekGIDV7TBoKmp8qOqxIFsVgUe9P3L7j3Yf8yQfZketosHNkuDuOGYKlnOlVMZJZeRrYGnoV51snBi50jXwdXyxfIL/qensfVSqUbaHcWkulbtt2ezh1aM2n5rh0ffnLb6mOdJ5ZwHldAz8Rbko4nqsuFTSh/AA6oQb1KF8kQwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UgpQY6qV; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4668e48963eso25683481cf.1
+        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 05:55:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732715735; x=1733320535; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=phDKT4Qmzsc6KoBiJvw2JobVokShbNGEtfRViw+X9Z0=;
+        b=UgpQY6qV1+6YhlIQA/I1Vcq/cmdkte+vfUNTY+shaL2aA3y4lBadoFKbiurMztynyC
+         5MWlckfNKKvSTrnh/q80Dkn4NkPHnh0pFaL4BRfMMyrZWaI2RNy2+JKGxe73zblNuIo6
+         w/HswVVsXtSP9oqJF6o1yLGO1VYCfqr+gw7BTcWb/wPMwJdE2inKAwgDH7pWhXgiizzE
+         U8OT9Ab6WPNh4BJ6CNx9EPbbRAARsgO7zUf4okZiMtUTGT+yo4uuJrVdcd9IYa/VIaD8
+         lDXwjdqSITzDnUVgjiRD0f/xj6qKIsLjJcagDThRbBQYyxlZ+0lgIoXbK0PWTGobP6gm
+         57iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732715735; x=1733320535;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=phDKT4Qmzsc6KoBiJvw2JobVokShbNGEtfRViw+X9Z0=;
+        b=qBb1ePX43Co129K8Ru2JRWyT7PZ9CwptCv4UkWDUiaxs8rbZohH9xcfBJ71M8hEl7Q
+         WjZXdTtKfY2rnXI4uJizAPyc8OF3VOisk0oim0IwfgzByuB1Nmp5HsiTz8avltiBbaiu
+         HLaPW3IMMCBi2KtiOMYQyCXUgaUOgRDd8EGUMqNbQmzjF+wMj5SiHE3U2jSslmNiJNtQ
+         cMtEhtAD1S85AlHM7Uu2n8VHAsQXmKe8lDudLHAD7RI/cYsRO2RyHF2srFuoBj9Nllfw
+         p0+WU4Lg5/oXDZzmeD1bHT3KtVvAS6AQRPrwfNUAym8MfWVsNGCTJE4f0ugdtJ3GFham
+         ur+w==
+X-Gm-Message-State: AOJu0YwkS7703A5nNbt4jeOTnQByqwpnMFdZKBFyIKdxTV5m20s8/Rlp
+	X+0ukXDv/8iOi+Si212ObBJMMzMmAJOggv/r496Jyd8/Dk6ozIqb
+X-Gm-Gg: ASbGncv7tTIfYIJw1E6fYbeU6Zk5VPCWCp7zfJXQolUmbDn6V/yq5ku/O+SkkgSZoM1
+	0U8waMapYgRlxCEftksv+UrMGU6ysbFtG87eAz82KqrjQLYPTtItJifaGX2gk3l9cYgM94qb4Mw
+	4EHZxIAXkgxaETh7sqDG7BH6ikXiY9uYtmHoBlhbdum2Hcf9aOXMqXtVj2JzQwVd7380kc5chzz
+	wb5nHxhFOdxHJSkaxwA1uYivkW3mYo030HdNrVKttoRJCC4tppmPIX0nO3Ri9Dj
+X-Google-Smtp-Source: AGHT+IHLGLVoULEWdbvaTTKKhrzAUFbUHOqSMb+ofCb/uMqta77juq2H2LHizCZBXlFjpUrfTKT9VQ==
+X-Received: by 2002:a05:6214:c2c:b0:6d4:1530:a0a6 with SMTP id 6a1803df08f44-6d864d0375fmr37907496d6.9.1732715734768;
+        Wed, 27 Nov 2024 05:55:34 -0800 (PST)
+Received: from ?IPV6:2620:10d:c0a8:11c1::107a? ([2620:10d:c091:400::5:2c1c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b67ae4322bsm93834985a.111.2024.11.27.05.55.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Nov 2024 05:55:34 -0800 (PST)
+Message-ID: <f3272bbe-3b3d-496e-95c6-9a35d469b6e7@gmail.com>
+Date: Wed, 27 Nov 2024 08:55:33 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z0YQYKgUyLt8w4va@lore-desk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC ethtool] ethtool: mock JSON output for --module-info
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+ "mkubecek@suse.cz" <mkubecek@suse.cz>
+References: <7d3b3d56-b3cf-49aa-9690-60d230903474@gmail.com>
+ <DM6PR12MB451628E919440310BC5726E5D8422@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <f0d2811d-e69f-4ef4-bf0f-21ab9c5a8b36@gmail.com>
+ <DM6PR12MB4516A5E32EB6C663F907C24BD8492@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <cd258b2f-d43f-4ae6-bd7c-ca22777d35e3@gmail.com>
+ <MN2PR12MB45179CC5F6CC57611E5024E2D8282@MN2PR12MB4517.namprd12.prod.outlook.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <MN2PR12MB45179CC5F6CC57611E5024E2D8282@MN2PR12MB4517.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 26, 2024 at 07:16:00PM +0100, Lorenzo Bianconi wrote:
-> > Currently, the network device isn't set inside the xdp_rxq_info
-> > of the mtk_rx_ring, which means that an XDP program attached to
-> > the Mediathek ethernet driver cannot retrieve the index of the
-> > interface that received the package since it's always 0 inside
-> > the xdp_md struct.
-> > 
-> > This patch sets the network device pointer inside the
-> > xdp_rxq_info struct, which is later used to initialize
-> > the xdp_buff struct via xdp_init_buff.
-> > 
-> > This was tested using the following eBPF/XDP program attached
-> > to a network interface of the mtk_eth_soc driver. As said before,
-> > ingress_ifindex always had a value of zero. After applying the
-> > patch, ingress_ifindex holds the correct interface index.
-> > 
-> > 	#include <linux/bpf.h>
-> > 	#include <bpf/bpf_helpers.h>
-> > 
-> > 	SEC("pass")
-> > 	int pass_func(struct xdp_md *xdp) {
-> >     		bpf_printk("ingress_ifindex: %u",
-> > 			xdp->ingress_ifindex);
-> > 
-> > 		return XDP_PASS;
-> > 	}
-> > 
-> > 	char _license[] SEC("license") = "GPL";
-> > 
-> > Signed-off-by: Til Kaiser <mail@tk154.de>
-> > ---
-> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > index 53485142938c..9c6d4477e536 100644
-> > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > @@ -2069,6 +2069,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
-> >  
-> >  		netdev = eth->netdev[mac];
-> >  		ppe_idx = eth->mac[mac]->ppe_idx;
-> > +		ring->xdp_q.dev = netdev;
-> 
-> I guess you can set it just before running xdp_init_buff(), but the change is fine.
 
-Lorenzo, is it legitimate to change rxq->dev post registration like
-that?
+On 11/27/24 3:11 AM, Danielle Ratson wrote:
+> Hi,
+>
+> I am attaching the dump I already have implemented for both CMIS and SFF modules:
+>
+> $ sudo ethtool --json -m swp23
+> [ {
+>          "identifier": 24,
+>          "identifier_description": "QSFP-DD Double Density 8X Pluggable Transceiver (INF-8628)",
+>          "power_class": 5,
+>          "max_power": 10.00,
+>          "max_power_units": "W",
+>          "connector": 40,
+>          "connector_description": "MPO 1x16",
+>          "cable_assembly_length": 0.00,
+>          "cable_assembly_length_units": "m",
+>          "tx_cdr_bypass_control": false,
+>          "rx_cdr_bypass_control": false,
+>          "tx_cdr": true,
+>          "rx_cdr": true,
+>          "transmitter_technology": 0,
+>          "transmitter_technology_description": "850 nm VCSEL",
+>          "length_(smf)": 0.00,
+>          "length_(smf)_units": "km",
+>          "length_(om5)": 0,
+>          "length_(om5)_units": "m",
+>          "length_(om4)": 100,
+>          "length_(om4)_units": "m",
+>          "length_(om3_50/125um)": 70,
+>          "length_(om3_50/125um)_units": "m",
+>          "length_(om2_50/125um)": 0,
+>          "length_(om2_50/125um)_units": "m",
+>          "revision_compliance": [
+>              "major": 4,
+>              "minor": 0 ],
+>          "rx_loss_of_signal": [ "Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes" ],
+>          "tx_loss_of_signal": "None",
+>          "rx_loss_of_lock": "None",
+>          "tx_loss_of_lock": "None",
+>          "tx_fault": "None",
+>          "module_state": 3,
+>          "module_state_description": "ModuleReady",
+>          "low_pwr_allow_request_hw": false,
+>          "low_pwr_request_sw": false,
+>          "module_temperature": 36.00,
+>          "module_temperature_units": "degrees C",
+>          "module_voltage": 3.00,
+>          "module_voltage_units": "V",
+>          "module_temperature_high_alarm": false,
+>          "module_temperature_low_alarm": false,
+>          "module_temperature_high_warning": false,
+>          "module_temperature_low_warning": false,
+>          "module_voltage_high_alarm": false,
+>          "module_voltage_low_alarm": false,
+>          "module_voltage_high_warning": false,
+>          "module_voltage_low_warning": false,
+>          "cdb_instances": 1,
+>          "cdb_background_mode": "Supported",
+>          "cdb_epl_pages": 0,
+>          "cdb_maximum_epl_rw_length": 128,
+>          "cdb_maximum_lpl_rw_length": 128,
+>          "cdb_trigger_method": "Single write"
+>      } ]
+>
+> $ sudo ethtool --json -m swp1
+> [ {
+>          "identifier": 24,
+>          "identifier_description": "QSFP-DD Double Density 8X Pluggable Transceiver (INF-8628)",
+>          "power_class": 1,
+>          "max_power": 0.25,
+>          "max_power_units": "W",
+>          "connector": 35,
+>          "connector_description": "No separable connector",
+>          "cable_assembly_length": 0.50,
+>          "cable_assembly_length_units": "m",
+>          "transmitter_technology": 10,
+>          "transmitter_technology_description": "Copper cable, unequalized",
+>          "attenuation_at_5ghz": 3,
+>          "attenuation_at_5ghz_units": "db",
+>          "attenuation_at_7ghz": 4,
+>          "attenuation_at_7ghz_units": "db",
+>          "attenuation_at_12.9ghz": 6,
+>          "attenuation_at_12.9ghz_units": "db",
+>          "attenuation_at_25.8ghz": 16,
+>          "attenuation_at_25.8ghz_units": "db",
+>          "revision_compliance": [
+>              "major": 4,
+>              "minor": 0 ],
+>          "module_state": 3,
+>          "module_state_description": "ModuleReady",
+>          "low_pwr_allow_request_hw": false,
+>          "low_pwr_request_sw": false
+>      } ]
+>
+> Please let me know what do you think.
 
-I am asking because we have a similar problem [1]. In our case we also
-register the rxq structure with a dummy netdev which is why XDP programs
-see an ifindex of 0.
 
-Thanks
+The formatting LGTM. It seems like some of the fields from upper page 
+00h are missing: vendor name, vendor pn, etc. Are those elided because 
+they are null?
 
-[1] https://lore.kernel.org/netdev/ZzYR2ZJ1mGRq12VL@shredder/
+>
+> I believe I will send a version about two weeks from now.
 
-> 
-> Regards,
-> Lorenzo
-> 
-> >  
-> >  		if (unlikely(test_bit(MTK_RESETTING, &eth->state)))
-> >  			goto release_desc;
-> > -- 
-> > 2.47.1
-> > 
-> > 
 
+Sounds good. Thanks for the update.
 
 
