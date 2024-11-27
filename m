@@ -1,171 +1,178 @@
-Return-Path: <netdev+bounces-147666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 605BA9DAF76
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:59:37 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41EAA9DAFCE
+	for <lists+netdev@lfdr.de>; Thu, 28 Nov 2024 00:21:50 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3ABBB21BF5
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:59:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4F48164DBA
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71846204F95;
-	Wed, 27 Nov 2024 22:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE811990CD;
+	Wed, 27 Nov 2024 23:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="nMENH7Z/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JqAZHXEf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GKZ0ZkkV"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D8C204F72;
-	Wed, 27 Nov 2024 22:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D78192D76
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 23:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732748331; cv=none; b=YFSv9/5euaad+qBIlr/vfKvPZm8VYw974XbyLwo99yy7uCE1h9ZqHMYYkj1kdCvY8EjaXSOhjRUjQeYC6yachsX+cvNAkSFiIDNh+Ym57KnXRcD1qdIUSCX0ZK72tJRrcR+ZaWqFacr3C7/RJfLiYARMvMvcTm46A0AU4HJrM+4=
+	t=1732749701; cv=none; b=a7vd7CPpxUfFWlyOJEF/RIv0jD50tgMeATb0Af1QmlQYNuBCmGMqrpc+mblywVeq4k1QHMFLHM+FUK5s/lTyBuunbibd0o49AvWQYDUdBhgme6AIbcj+YskGSD3EC3/xApDPX8rearhWhI1VDAfd+N5am8qvivsIhMR53TfrqIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732748331; c=relaxed/simple;
-	bh=gTut2Bb70dTdxhqs0TnBAg+jX/uvcRTbJJ983vhcCAc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lih6aWlETQgbSvGgmQjS8weFQm3ZVGLg/qCiQw64wd1D1wxZxknUrhnXU0ZT2p1N4gk5a90V83jlRpbgprNKgj+assbxIOxt2d08XpEz5If71ymKYak2vo/5cs0Eqfpl2uFMWgY1eFHjt09WQ1ZTY/f9qZIfOYNTHgldYMAtkRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=nMENH7Z/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JqAZHXEf; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id A14D71140194;
-	Wed, 27 Nov 2024 17:58:48 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Wed, 27 Nov 2024 17:58:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1732748328; x=
-	1732834728; bh=7a9iua5Ya9R/+yjRYkgQYBjKtp939sLnstLb3lP7qNs=; b=n
-	MENH7Z/aeURLcISorl7O733uBq1WLnlotjL6DapvY0Bcr92CCDv2FE5kYza0cFji
-	2IHEQp2EvK3W9Gt7r5SyL89Aafh3OEWadMROMlrBlIxptBH/u+3pNbJVA9n8BDRe
-	mdbGr4OxMau3xY0qg7eB3GcTwR/0N0jQxgKCD9ruEQnHmIX4dpjfOLW51tZdrJCr
-	T5LPvH6JyZEy6pCUocUaBxs92gpn9mZbUAsMDzdRmq/oWBv6/Hg+KwEE+rJBU4Tt
-	9egDnS5NZL557sqDgTPd/minI29cI2EgNkFRMCZgjI8Rdwz7/fkTZlvT2fxnlnxR
-	ZwpGY55w1qTzCyfOvZQTg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1732748328; x=1732834728; bh=7
-	a9iua5Ya9R/+yjRYkgQYBjKtp939sLnstLb3lP7qNs=; b=JqAZHXEfGB8e6xr4r
-	VrFze/1jLgVthZG44SSL6UNyN6fTEbb20TzSL4hOYMZfQX+GQsPB6Ivhkqa7TZLx
-	aD+Dbcdk3A3oN+ALLUadkP3gI4tkse7X6HA+yqb1VRz61Py74Vpq/Dei53fwkeu/
-	npbB4Um8ybiE47WUxpL3VPDqH7BEkBagN9b3dcpO83VOoKKAmSxBOIJxUjRTnj4D
-	vUpPRJ+TTEFBaTpSYRMIt7RFHM665sApvrOLTgfuQOzXgKCnc2yrWddeETBAaf1L
-	H6UjvJKolaNLP8aMHqd/QxzOfXzx84Y/LYbkr0BC2CQ6FZHmtpvr0bMKcR1lDHtt
-	6hftg==
-X-ME-Sender: <xms:KKRHZ93LREqKl3uZtKn5kd2Mtw7FmUz-zHbaZeu2E_9hXAcci57B5A>
-    <xme:KKRHZ0F3JUzBxVfeeduvkMNVZmgSYs2QR0yS3M2QQleyJNaFWQcF287cCPlj4Ku6I
-    JAlAQRx1VoykxKmzw>
-X-ME-Received: <xmr:KKRHZ96EZFry0SPvj60V9S3H6c1QOvTTwnTBhow5jligjA_UlaNmGuEHQhr9kjSYHF5ZAsSUzGAP1VWZNzDfPCgvMI7sRBJUV6wBYE7MUCmw68Ixbqmi>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrhedtgddtgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdejtd
-    dmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgr
-    nhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpe
-    fgfefggeejhfduieekvdeuteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugi
-    huuhhurdighiiipdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhr
-    tghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhope
-    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
-    mhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
-    hmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhu
-    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgrvghlrdgthhgrnhessg
-    hrohgruggtohhmrdgtohhmpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhig
-    rdguvghvpdhrtghpthhtohepphgrvhgrnhdrtghhvggssghisegsrhhorggutghomhdrtg
-    homh
-X-ME-Proxy: <xmx:KKRHZ61ytxHXb-FMBa4MBmlz2XwmIvj1aI5C-zniWhcKnq7UReYv-w>
-    <xmx:KKRHZwEG41UwW6AO8ZxJ2bK1guBHbRhh0kRX8uAvOrZ58Opo7pGu5A>
-    <xmx:KKRHZ78Q4XA5w-3UMun8h_4El68ZlRFwlv770Rri5b5tICKy-WZn9w>
-    <xmx:KKRHZ9lMkcnWn8KwAiyaNmrqmZiMOPmTfncOD18RhAe1sNa_VFwGsw>
-    <xmx:KKRHZ9d33pi135AXOyG99oSkd_Uf1WYS4x9ZrPJeUu-kBz5kr7qwKZOT>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 Nov 2024 17:58:46 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	shuah@kernel.org,
-	kuba@kernel.org,
-	michael.chan@broadcom.com,
-	martin.lau@linux.dev,
-	pavan.chebbi@broadcom.com,
-	ecree.xilinx@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH net v3 2/2] selftests: drv-net: rss_ctx: Add test for ntuple rule
-Date: Wed, 27 Nov 2024 15:58:30 -0700
-Message-ID: <759870e430b7c93ecaae6e448f30a47284c59637.1732748253.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <cover.1732748253.git.dxu@dxuuu.xyz>
-References: <cover.1732748253.git.dxu@dxuuu.xyz>
+	s=arc-20240116; t=1732749701; c=relaxed/simple;
+	bh=Vi/SX3JTjpjmfswC3/FbkGdskaDiBdboG6X7+DY1cbk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ceQ9XGAxh6nJpg9YKyat5xq17/u2REprv5qEChyFEJb6Dgld/yrFaL0E391cWAJ23Ew1h0ekBskInRZIKoe6pYnSYGaKjeeWuefbASFxVbo3Ox2AVSG00wvRyuDcA5D5bvvgrovzd4AfuLydS7HpeRdBBBpi6rufDa7ed/PZScc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GKZ0ZkkV; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-725126e7da0so249592b3a.1
+        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 15:21:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732749699; x=1733354499; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u20pll8VeOEmkG4npMdzaZzjnGDg+tlkbbf8/K18yaA=;
+        b=GKZ0ZkkVxAoj2CUa7myJbwDl33CmYl+D4MJ7bYGNXQtaih9NvSwdm4aCzrNoSksyuN
+         YBqvCBKq8CTrOOVIBq2glISCIiE7lAhGTx9nLZ+oE0aBLRH38pbsf1kPNcVVahgas7Ul
+         jXLzJyxjjx30ni+5gRAUmkicn6H3Wmlwu10W7lu63Kt+pN4sIYRRs/KPIaGzTVS5xKRA
+         5Wvbfi332DkSynfrTXajbxxlQFKUvV6f9gFpKamYGBp7erS94vDZqiiQPyEeS9mLhuNK
+         qqy55QiCCOKpxKFVizHScF5dcbQCpyaVIhZuNlnHmUqKOeduXcurdQxEEB7rhOmRYfaB
+         GP4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732749699; x=1733354499;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u20pll8VeOEmkG4npMdzaZzjnGDg+tlkbbf8/K18yaA=;
+        b=VUF/PvTfOPBifhPZoqso56dXBns163UTY19QncgLj4/7t+fV8KpUjXLYUTsm4/KuCd
+         zqxwSg5xmG+3/IpgMhud295CutarODthsI1Fj8rNhHoRl+xPLcDjIpm2q0uFo8Yd8pIC
+         k8SLQY1JP5s9RVLQx1ZPv3GRadq3e9L/DWawiZBV5pvx6AZ9APGnRA9c4fRJd3l9Pgch
+         q1e6FSpLjjHKMmiTiVrC1bAeICoz/NdSvO5KQCf5zJ+HAOZhd4zF7De9IWVp/eiZZ6E8
+         bAdywedqJcHwAxH/4VI6geuExfLUWA1mTSui9olfEHQNvMH9J9+5D+PPNl9Qyz3/+WPk
+         Jv3A==
+X-Forwarded-Encrypted: i=1; AJvYcCVQtualJgO/kYINGHxumb7ONEIk2t3smQzhfpZU889Hb4kx3S973VnHbYM5ZKmFVJNyKm111IQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywssv/bRDk1GY5fXyKdBnndbDoOaursDfQYFHXasLABjse20Mbb
+	k4R23ewLGKWxa4FZPQeCfvLHqvD/qmMQZwdPnIIMwBYzC7ji3QeExPNzoPGJ+EYpLEGTsa16xA=
+	=
+X-Google-Smtp-Source: AGHT+IGdqHAFyXe8UNth15Wha1d0C9WQ0r4xWcwWi3yujdz0WVs368myT4JyWIp7ZAc2PFuEv/H+Lq7cYA==
+X-Received: from pfbdw21.prod.google.com ([2002:a05:6a00:3695:b0:724:f1f4:cc72])
+ (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b81:b0:724:fac6:35f2
+ with SMTP id d2e1a72fcca58-725300107f4mr5451899b3a.9.1732749698863; Wed, 27
+ Nov 2024 15:21:38 -0800 (PST)
+Date: Wed, 27 Nov 2024 23:21:33 +0000
+In-Reply-To: <CADKFtnTThMBDKCXufNaeci5uCeddOgLvXmqszyJoT6N=6xtWug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <CADKFtnTThMBDKCXufNaeci5uCeddOgLvXmqszyJoT6N=6xtWug@mail.gmail.com>
+X-Mailer: git-send-email 2.47.0.338.g60cca15819-goog
+Message-ID: <20241127232133.3928793-1-jrife@google.com>
+Subject: Re: [PATCH v2 net-next] wireguard: allowedips: Add
+ WGALLOWEDIP_F_REMOVE_ME flag
+From: Jordan Rife <jrife@google.com>
+To: jrife@google.com
+Cc: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	shuah@kernel.org, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-Extend the rss_ctx test suite to test that an ntuple action that
-redirects to an RSS context contains that information in `ethtool -n`.
-Otherwise the output from ethtool is highly deceiving. This test helps
-ensure drivers are compliant with the API.
+> I think the challenge with WGALLOWEDIP_A_FLAGS in particular is that
+> because it didn't exist since the beginning like WGPEER_A_FLAGS, there
+> are kernels out there that have no knowledge of it and wouldn't have
+> this check in place. While I think it's a good idea to replicate this
+> check for WGALLOWEDIP_A_FLAGS as well for future compatibility, we
+> still need some way for clients to probe whether or not this feature
+> is supported in case they're running on an older kernel. If we want to
+> keep the version number as-is, I see a few alternatives:
 
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- tools/testing/selftests/drivers/net/hw/rss_ctx.py | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Forget about all of this actually. I was under the mistaken impression
+that an unrecognized attribute would be silently ignored by an older
+kernel, but it seems that validation is strict.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-index 0b49ce7ae678..ca8a7edff3dd 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-@@ -3,7 +3,8 @@
- 
- import datetime
- import random
--from lib.py import ksft_run, ksft_pr, ksft_exit, ksft_eq, ksft_ne, ksft_ge, ksft_lt
-+import re
-+from lib.py import ksft_run, ksft_pr, ksft_exit, ksft_eq, ksft_ne, ksft_ge, ksft_lt, ksft_true
- from lib.py import NetDrvEpEnv
- from lib.py import EthtoolFamily, NetdevFamily
- from lib.py import KsftSkipEx, KsftFailEx
-@@ -96,6 +97,13 @@ def _send_traffic_check(cfg, port, name, params):
-                 f"traffic on inactive queues ({name}): " + str(cnts))
- 
- 
-+def _ntuple_rule_check(cfg, rule_id, ctx_id):
-+    """Check that ntuple rule references RSS context ID"""
-+    text = ethtool(f"-n {cfg.ifname} rule {rule_id}").stdout
-+    pattern = f"RSS Context (ID: )?{ctx_id}"
-+    ksft_true(re.search(pattern, text), "RSS context not referenced in ntuple rule")
-+
-+
- def test_rss_key_indir(cfg):
-     """Test basics like updating the main RSS key and indirection table."""
- 
-@@ -459,6 +467,8 @@ def test_rss_context(cfg, ctx_cnt=1, create_with_cfg=None):
-         ntuple = ethtool_create(cfg, "-N", flow)
-         defer(ethtool, f"-N {cfg.ifname} delete {ntuple}")
- 
-+        _ntuple_rule_check(cfg, ntuple, ctx_id)
-+
-     for i in range(ctx_cnt):
-         _send_traffic_check(cfg, ports[i], f"context {i}",
-                             { 'target': (2+i*2, 3+i*2),
--- 
-2.46.0
+	if (attrs[WGPEER_A_ALLOWEDIPS]) {
+		struct nlattr *attr, *allowedip[WGALLOWEDIP_A_MAX + 1];
+		int rem;
 
+		nla_for_each_nested(attr, attrs[WGPEER_A_ALLOWEDIPS], rem) {
+			ret = nla_parse_nested(allowedip, WGALLOWEDIP_A_MAX,
+					       attr, allowedip_policy, NULL);
+			if (ret < 0)
+				goto out;
+			ret = set_allowedip(peer, allowedip);
+			if (ret < 0)
+				goto out;
+		}
+	}
+
+nla_parse_nested() uses NL_VALIDATE_STRICT which sets
+NL_VALIDATE_MAXTYPE, causing __nla_validate_parse() in this case to
+check that no attribute types are greater than WGALLOWEDIP_A_MAX.
+
+The WG_CMD_SET_DEVICE operation simply returns EINVAL if you try to use
+WGALLOWEDIP_A_FLAGS on a kernel that doesn't support it. I tested this
+using a patched version of wg that sets the WGALLOWEDIP_F_REMOVE_ME
+attribute when using an argument I added called "allowed-ips-patch".
+
+Kernel With WGALLOWEDIP_A_FLAGS
+==================================
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg set wg0 peer xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4= allowed-ips-patch 192.168.0.3/32
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg
+interface: wg0
+
+peer: xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4=
+  allowed ips: 192.168.0.3/32
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg set wg0 peer xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4= allowed-ips-patch -192.168.0.3/32
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg
+interface: wg0
+
+peer: xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4=
+  allowed ips: (none)
+jordan@t14:~/code/wireguard-tools/src$ 
+
+Kernel Without WGALLOWEDIP_A_FLAGS
+==================================
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg set wg0 peer xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4= allowed-ips-patch 192.168.0.3/32
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg
+interface: wg0
+
+peer: xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4=
+  allowed ips: 192.168.0.3/32
+jordan@t14:~/code/wireguard-tools/src$ sudo ./wg set wg0 peer xK7O/YnTb8W/fgPA4dwAshEV06rMPMqqmy3zZN0NPS4= allowed-ips-patch -192.168.0.3/32
+Unable to modify interface: Invalid argument
+jordan@t14:~/code/wireguard-tools/src$ 
+
+The second command fails with "Invalid argument" (EINVAL) on the
+unpatched kernel. This simplifies things, as there's no need for
+clients to explicitly probe to see if this attribute is supported. I
+will do the following:
+
+1. Revert WG_GENL_VERSION back to 1.
+2. Add a check for new flags similar to the one you mentioned for
+   WGPEER_A_FLAGS.
+
+        if (attrs[WGPEER_A_FLAGS])
+                flags = nla_get_u32(attrs[WGPEER_A_FLAGS]);
+        ret = -EOPNOTSUPP;
+        if (flags & ~__WGPEER_F_ALL)
+                goto out;
+
+This should be sufficient. We might want to consider how best to bubble
+this error up to users. In the case of wg, "Invalid argument" may not be
+very helpful in determining where you went wrong. We could always detect
+when EINVAL is returned in response to an operation that sets
+WGALLOWEDIP_A_FLAGS and print something more helpful like "Operation not
+supported on this kernel". However, these are details that can be worked
+out.
+
+Sorry for the confusion!
+
+-Jordan
 
