@@ -1,85 +1,79 @@
-Return-Path: <netdev+bounces-147561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D0759DA356
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:47:08 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D929DA372
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 09:02:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39001B21671
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:47:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D4B11656B0
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC2E156F54;
-	Wed, 27 Nov 2024 07:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FAA154C12;
+	Wed, 27 Nov 2024 08:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JnYCtp/p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JzRM6WTf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F4518D63C
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 07:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6076E1272A6;
+	Wed, 27 Nov 2024 08:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732693590; cv=none; b=qcxG/Tm8vpmolFAJtMCRLQJNZGvO6owpFrEk0fxqUZ75YpiuLI2XqqoADNYkLt5hWuQDRYst4VcwPOflGc1I8YRk28BIgN5lBKOMnoFCVtNUZGSkDl87PIGxaip0gUc078f3HqTCQBA+QoS49P13k9iu+lbaa8lW0a6qOrqMPrw=
+	t=1732694523; cv=none; b=cdCj8H+lWxyHqLSzmzfALWqVnPNd/eTIUKGbPnEqfWi8XVIXenGzcSkvYWXlU19e3YvwpgLlg12/f/FJ64ODGp3WqGjlaAIHJVY9Cuzm5aHXrFc69P7Yz91obRk5w1t0CmVUo8rhgHo4CdsgvHTcDs/NyVydqzwHpT0/nYDkbdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732693590; c=relaxed/simple;
-	bh=4/yXwKY6nG5+HhZPf7lYUj4gAUD18OtQWnuzyKtJZmE=;
+	s=arc-20240116; t=1732694523; c=relaxed/simple;
+	bh=TA/9WZEbvgB1jmH6kCzUe9r/FiGqTL+90VzfPh1UVzA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FFdH/2AvnzNDGu6u8QP1/Msh44kKEzgNVt971FagVRvvFb5W9UEzuKoFgKxcgClR16PJwBoqXVDz5Go01zSzZv6sZ35I1ZxPrDlLhrTIorqhSe+f+M08MGP9KUSqcYEvFigs1/J264OiDzU0mGKZ+HMmMoNYSVhOoEbDZqr/MfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JnYCtp/p; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732693587;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GK+3G3kO0VycIHGio9DvkBxIF2tO2AzV2JADeZzp4jw=;
-	b=JnYCtp/pZmOmftyV0kB8eqeItPx1kSfhPDphkTGO3R36d9gUIaX9aGvp2YPJt5wgMGmWB3
-	pJ/jT9HWATvcOOWcE90yOREv8b+xLpeQ5ASmgvHIPzJfC4szfXjEfWPyWKjG7cP/Df88I1
-	yR7N93RmHeqNy9Faq/L0RZP2r35MPEU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-630-iQ4iLyDkMI650gwSy6RhCQ-1; Wed, 27 Nov 2024 02:46:25 -0500
-X-MC-Unique: iQ4iLyDkMI650gwSy6RhCQ-1
-X-Mimecast-MFC-AGG-ID: iQ4iLyDkMI650gwSy6RhCQ
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38242a78f3eso3360934f8f.0
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 23:46:25 -0800 (PST)
+	 In-Reply-To:Content-Type; b=cvjuAd+jbXUqFQ8Y12cwPp3MXBe3ZKSFjGMVEgv7S0kuZ7vJs5S8uZ4l7LmuzicSXuKOhJF2k9773RsmfKd1jUcjyVwBQFD96mR+gh4CLPX9QgPQbBy7oZkcQ5aZSyxqXNdtrJbl8TJPXsI9Md72ro2GXoULVZF0EE4lr9kQop8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JzRM6WTf; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2124a86f4cbso58320885ad.3;
+        Wed, 27 Nov 2024 00:02:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732694521; x=1733299321; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bew/I5xXVZXMcMLGcr2bk1V3h79V/rlhudJAubnILnI=;
+        b=JzRM6WTflhvuVNaoLpDjpBRtkSWaGFvch6uCz1KzlfG/5AzIlRqGtW7HywmZCXL4eS
+         KiAFxhExAfVlnttpDVpYVd9cqX+UNy8U7yQP+UYOnG4ww16ZZqjPjb9GLKqPVgZJ70Nq
+         ssWN3W6JgDu1R3zJtCdc4Ms5ktjNm2eqzR9FzSNv3sfpqnkFd30GDU85fKUSN0J+ngrQ
+         8kR5IrWc0002X7kVCJ2RWtGoq6vOX3WcQW1lWCMWi2SOd8r2ZsDYddR5imh7kvKbmBoe
+         HFuNQKWko4ncxtKrhgF+QCERLbFM06R0dNuBzaswYhoyrw4f2EQDgt9W8F5eDDdmxYtf
+         ti/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732693584; x=1733298384;
+        d=1e100.net; s=20230601; t=1732694521; x=1733299321;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GK+3G3kO0VycIHGio9DvkBxIF2tO2AzV2JADeZzp4jw=;
-        b=fIK9kXTGtK4vTm5O55lrjt0RGnDoXOWVD5UgKhj2zsOMFNk9But3iXQScs/57/V6Oj
-         bXa5bcNDowEyQxycHGePQUc45kU2xkO48J+S7PbleDe5Rv8NXGNqKdSxvk2FsXoBYGRE
-         9YxlM7smZts+8kVQTpnju4EXpoi5nFho5PD5/fXUDGqCOc84xxcQ9rSKnzBoGZyd2kbG
-         OwOC0K6aXcGsqPeJN7AaPjkT9tBjSaNj1rz+SBZrOsH1SynEDQTjzyAC38Nd0JofL/jS
-         7CLPA47W1vu0wYkOw8hoSr+KAanW/DhZeDocu5TpFZADScgdDRyHme8ZUuCVZdVNukYe
-         QNtw==
-X-Gm-Message-State: AOJu0YyTiuLlCJzYlaqUDKN11BeSh91oFY+gVXf9W8Njpfty5hcN02fB
-	LsTdDJJT58zuqYyNRUEQlcCZNwWVVHrnAo04UUYxwE6VAov+uKOi4QJIoPnrXIISz17aFEN96x0
-	e33+ShgT51pRFot13ibrEhMt0eFQifsi7E0S/vVI6gxvfAWCYI6lsZw==
-X-Gm-Gg: ASbGncvgLvB5rt2r0fDUfCNkcUdK5OFAgJBkWRg15yUT050C67RACinptpg66cwX6fp
-	BPf9vcAVGLBBzOveHN+afXeRskg2bIfFExUvUj+LOWEkWPIoQE/XNeZM0kw4oBh6Qe5ruEeDrND
-	6y+toB9D8anxst0oizdgya04sbqLkElDUrohCogu1VA7725Mpn5dAZzRImU78SmgR5vcaIcJmU1
-	jhRkg94PDuQqtyEYTUoX8HgkSUE/CTGzaaPFXUj3xzQYvANQ/zW1EOyXpjjO1i9NIIu6Q+yf8Qd
-	hgE=
-X-Received: by 2002:a05:6000:1aca:b0:382:397f:3df5 with SMTP id ffacd0b85a97d-385c6edd4fcmr1334546f8f.38.1732693584520;
-        Tue, 26 Nov 2024 23:46:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHSgs8I9raBPC/ec0+MexPGRBtWsZQCpKG9JWoNGJiKxPWOnS5ouGX5aC+JU9uJwI0cwOtNTw==
-X-Received: by 2002:a05:6000:1aca:b0:382:397f:3df5 with SMTP id ffacd0b85a97d-385c6edd4fcmr1334523f8f.38.1732693583986;
-        Tue, 26 Nov 2024 23:46:23 -0800 (PST)
-Received: from [192.168.88.24] (146-241-49-128.dyn.eolo.it. [146.241.49.128])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fbedce3sm15470212f8f.97.2024.11.26.23.46.23
+        bh=bew/I5xXVZXMcMLGcr2bk1V3h79V/rlhudJAubnILnI=;
+        b=s9pKu6nyB5M9EJBO/bfAcHsL2o/6couBcFOPfkNYk+0ycQWp5VWvA259BL26BnVZFW
+         qvP0VKv693Ey2ao60ZhhVqSCBMR1myz/57RnivkI4lvd3nN6jAyQgbamVJOeiWfmDMJN
+         NSZiCju/pdOGuetstHaAiU4wVaX97jmQADr1Qv+oeURQ/qst7P0BJvm9qycvPmYhbmQq
+         BJ9IUBV+Ss1aYbjoaod2MnPeSmKMSAokrsWDFs/Rx0AmjrDGUCAisp9FzoWIYAkVVPFe
+         UPmWWtx11bCjAR4/5VNLBoQP10rsjSgQqumTb87PtVx6nW0tH+V5QeJXLzbVXdAxciD1
+         ASvA==
+X-Forwarded-Encrypted: i=1; AJvYcCVC4qSpfMjaDE0Gs84JXjehZDn20eGFxko97EUeyHgZuT1VCpgcCePP8depj0d7LG0373F13sZ8@vger.kernel.org, AJvYcCVyhDacbGT5p3FUS/aDO9fG6J0U3J76iH2jvtIDe3EhvYdwbzVoO2fLr0WpJtVJfk4YQXOsT57g5IGZ@vger.kernel.org, AJvYcCWCevaguTFm9qI9/gB89Z3bkPRApiKbXWKknFmI5BR1ht3Wd7TxvnHmCj8nHbG185eqBdrWsZPTi6Hdv7fN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6IXotH4fWY9zdTC8nc9FuaTE4nZyiNBxFbTl19kKnDEZhjKER
+	lTLfi3aK3qTM8GPpF6gTDvI7FYFPCasccSuDVG41gnbvAMwPxuke
+X-Gm-Gg: ASbGncsJFqnaJRgk3xC22wz3913tY1ZbOyhyeFeQV3twFoLZ1oMs9aaXRR5fyIY2Bd0
+	SCsaZhcTLKI75MmsY5srkRRmJXek8eEI6MNU/Tw5WxoHpTTraYzCPGKFqv7Itu8MJUHZNtqgZfi
+	b5lCGWmxowepKFKGezwr0Ws9Ctob/0XzTtRxTk3VwG0zRNOtHutMUFJrgUgLSoqK+gF0nEoz78R
+	ejjBgnPnSH7SkW/U0kR6E/nPD+gathzzEFrs20BcfSM15Tc4RYrLOpH9cQrxnNgHWNBBfIZK1a9
+	b1a1Qsw3ubQaPPurGvSBF6NxEBH7
+X-Google-Smtp-Source: AGHT+IGtUIoISB0+clpN9PkK/2UFXTIykn3qm+m0cLDTT9iuNBtfEZ70ZERWyU6+cs55GUUZXZV4kQ==
+X-Received: by 2002:a17:903:2b08:b0:211:e812:3948 with SMTP id d9443c01a7336-21500fedf8amr32131585ad.0.1732694521468;
+        Wed, 27 Nov 2024 00:02:01 -0800 (PST)
+Received: from [192.168.0.100] (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129db8c783sm96580615ad.25.2024.11.27.00.01.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2024 23:46:23 -0800 (PST)
-Message-ID: <411eb4ba-3226-44f2-aabe-5d68df01f867@redhat.com>
-Date: Wed, 27 Nov 2024 08:46:22 +0100
+        Wed, 27 Nov 2024 00:02:01 -0800 (PST)
+Message-ID: <6efc512e-b153-4f2c-8b38-4443024475ee@gmail.com>
+Date: Wed, 27 Nov 2024 16:01:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,60 +81,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] udp: call sock_def_readable() if socket is not
- SOCK_FASYNC
-To: Eric Dumazet <edumazet@google.com>,
- Fernando Fernandez Mancera <ffmancera@riseup.net>
-Cc: netdev@vger.kernel.org, willemb@google.com
-References: <20241126175402.1506-1-ffmancera@riseup.net>
- <CANn89iJ7NLR4vSqjSb9gpKxfZ2jPJS+jv_H1Qqs1Qz0DZZC=ug@mail.gmail.com>
- <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] arm64: dts: nuvoton: Add Ethernet nodes
+To: Krzysztof Kozlowski <krzk@kernel.org>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ mcoquelin.stm32@gmail.com, richardcochran@gmail.com
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
+ schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
+References: <20241118082707.8504-1-a0987203069@gmail.com>
+ <20241118082707.8504-3-a0987203069@gmail.com>
+ <a220d407-de40-4398-a837-de11e01d2381@kernel.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Joey Lu <a0987203069@gmail.com>
+In-Reply-To: <a220d407-de40-4398-a837-de11e01d2381@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Dear Krzysztof,
 
-I'm sorry for the latency here.
+Thank you for your reply.
 
-On 11/26/24 19:41, Eric Dumazet wrote:
-> On Tue, Nov 26, 2024 at 7:32 PM Eric Dumazet <edumazet@google.com> wrote:
->>
->> On Tue, Nov 26, 2024 at 6:56 PM Fernando Fernandez Mancera
->> <ffmancera@riseup.net> wrote:
->>>
->>> If a socket is not SOCK_FASYNC, sock_def_readable() needs to be called
->>> even if receive queue was not empty. Otherwise, if several threads are
->>> listening on the same socket with blocking recvfrom() calls they might
->>> hang waiting for data to be received.
->>>
->>
->> SOCK_FASYNC seems completely orthogonal to the issue.
->>
->> First sock_def_readable() should wakeup all threads, I wonder what is happening.
-> 
-> Oh well, __skb_wait_for_more_packets() is using
-> prepare_to_wait_exclusive(), so in this case sock_def_readable() is
-> waking only one thread.
+Krzysztof Kozlowski 於 11/26/2024 6:08 PM 寫道:
+> On 18/11/2024 09:27, Joey Lu wrote:
+>> diff --git a/arch/arm64/boot/dts/nuvoton/ma35d1.dtsi b/arch/arm64/boot/dts/nuvoton/ma35d1.dtsi
+>> index e51b98f5bdce..2e0071329309 100644
+>> --- a/arch/arm64/boot/dts/nuvoton/ma35d1.dtsi
+>> +++ b/arch/arm64/boot/dts/nuvoton/ma35d1.dtsi
+>> @@ -379,5 +379,57 @@ uart16: serial@40880000 {
+>>   			clocks = <&clk UART16_GATE>;
+>>   			status = "disabled";
+>>   		};
+>> +
+>> +		gmac0: ethernet@40120000 {
+>> +			compatible = "nuvoton,ma35d1-dwmac";
+>> +			reg = <0x0 0x40120000 0x0 0x10000>;
+>> +			interrupts = <GIC_SPI 23 IRQ_TYPE_LEVEL_HIGH>;
+>> +			interrupt-names = "macirq";
+>> +			clocks = <&clk EMAC0_GATE>, <&clk EPLL_DIV8>;
+>> +			clock-names = "stmmaceth", "ptp_ref";
+>> +
+>> +			nuvoton,sys = <&sys 0>;
+>> +			resets = <&sys MA35D1_RESET_GMAC0>;
+>> +			reset-names = "stmmaceth";
+>> +			status = "disabled";
+> Status is always, always the last property. Please read and follow DTS
+> coding style.
+>
+> Best regards,
+> Krzysztof
 
-Very likely whatever I'll add here will be of little use, still...
+Got it. I will fix these.
 
-AFAICS prepare_to_wait_exclusive() is there since pre git times, so its
-usage not be the cause of behaviors changes.
+Thanks!
 
->> UDP can store incoming packets into sk->sk_receive_queue and
->> udp_sk(sk)->reader_queue
->>
->> Paolo, should __skb_wait_for_more_packets() for UDP socket look at both queues ?
+BR,
 
-That in case multiple threads are woken-up and thread-1 splices
-sk_receive_queue into reader_queue before thread-2 has any chance of
-checking the first, I guess?
-
-With prepare_to_wait_exclusive, checking a single queue should be ok.
-
-/P
+Joey
 
 
