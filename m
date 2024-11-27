@@ -1,63 +1,46 @@
-Return-Path: <netdev+bounces-147555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABEE9DA295
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:01:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBED9DA2A5
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D2C9B23FCA
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:00:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D7A6B22E84
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32525142E67;
-	Wed, 27 Nov 2024 07:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0423D14B976;
+	Wed, 27 Nov 2024 07:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dLmyIKdU"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tQXo87tq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A246417BA2;
-	Wed, 27 Nov 2024 07:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADB0142E67;
+	Wed, 27 Nov 2024 07:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732690854; cv=none; b=JOrYA+gQyxg6x2j1/GXoKVEsgyL2GpnPqWc7jjLrRggVbVA6vTiae/AMPsdeu3lC6zp1VGe0NL6ClG5sgPGyaeo9R5y/Wags8UFPb7eIdg4hW+1y43RGEWQZjwapeF49N5oFSuKGwpKXysPiGU6ooPAsIN3R9IbsGgei50ZtDwQ=
+	t=1732691036; cv=none; b=d+6rwCBlQgsyE8E53F3Rf1e1D/oPfTkagNVTKy3lx/mOAOnYQhUXWuD6yszJGeS5MOB1gFISk9WO2cF7uTLmsC8OQK0U2CbNsgdNSJv1Ue2NM+sLTg64tlV3vnHODVaqfxlyqmFL4Ge6k54n+iN3OQPjy498Oo9RSdUJzqrvEZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732690854; c=relaxed/simple;
-	bh=rYrtuOnGhlmsVE8BBvxk8yY4kUvnUhoSOGfV5MZkSgg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=O4xwHZX7nmlF/IflwkOpJ7wtHv5DUWgD6jL4Xd6AbCr41le+ynzwD6VClsGmULozJLoOeLOSGXBqMsqG/AL+uFN08fGcT92xUnBQO5vR1BFOKcF0vOydYGCeeab4wJ0D7HyMMk12CkVtkhL1BwgYwtYh8jBMCdV75n7tajsKdek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dLmyIKdU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQKLXvc007146;
-	Wed, 27 Nov 2024 07:00:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	XgRtXKp6Ib0r1ecUjQWlmkTsRbpS2b5Cwd/uwfaa+wk=; b=dLmyIKdU8IhBp0lK
-	e37ZIYmWNVrS2ophDrZc+zUDy1X0qmMQUYLjBjP1X47sGxWnkHQU+8lPIKub8NxS
-	lAUejjvg8ssU0BzR5vaNZj0x38AiBjW568LorSqgLTP9SN5xI58by0hVNMUEtnYW
-	Nct6zc0k9Afcfj3b6Z1c5UPYzhlJlHCYFJU1UomRygAK7tAN6N48pZLA+pRQTuE8
-	iJ4sEiEZ5iQuBJZLyVaIqXxku873jT8K29jWEmpeh//fe5+hbuhthWshVvgcqXc2
-	tZmArM94Sfn/srbihWzfNZgtI0DPcsIaO/TdWYpk3ytV/WnLRI2/x284RX07BNxL
-	4BwAuw==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 434sw9ds2j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Nov 2024 07:00:46 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AR70kuY026035
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Nov 2024 07:00:46 GMT
-Received: from [10.253.38.8] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 26 Nov
- 2024 23:00:42 -0800
-Message-ID: <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
-Date: Wed, 27 Nov 2024 15:00:38 +0800
+	s=arc-20240116; t=1732691036; c=relaxed/simple;
+	bh=Vr+OPaKshdfcwKPvFlrq+DwZKQuM5oRL8whyKhkMx60=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iFb1ZGzNqRde19t2BYwt0rmy/lizQCMKvHGdpRPtYno11HkiS8t/DkHuADsQsgmtkYffSutiOcEMLnPnHdPuabvCA0I//MWtcGFYDqQdkVfRPH4BVC55xNAj+n1c4okmVPVkKtt+pjI4zVxVdAdLK8w5oZym9GO0jWjfOMxMu+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tQXo87tq; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1732691028; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=8b4CvN/0uVEaBclN/45Oq1ekXqOJCvnUAqF3eGgR/Ic=;
+	b=tQXo87tq/Wl/0o4FneOch6HX9VTJhJ7muF/2VBSW9MiKz91Arjj2dH8wRXFmf5hdOm49suk2LxO7PNsHJYT6sosiyhF6Orf2wT5BSWufpjKMg7xPigHa79i3hLsMsa1R+o/ceTH7gwMkZPqTfvqwZONiqNoca+/7GtaiuYE983E=
+Received: from 30.221.129.190(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WKLPV-Q_1732691026 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Nov 2024 15:03:48 +0800
+Message-ID: <dfe1ba19-a1fe-4d29-b7f5-40d7b62ce144@linux.alibaba.com>
+Date: Wed, 27 Nov 2024 15:03:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,117 +48,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
- node
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-        Konrad Dybcio
-	<konrad.dybcio@oss.qualcomm.com>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
-References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
- <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
- <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
- <89a4f120-6cfd-416d-ab55-f0bdf069d9ce@quicinc.com>
- <c2800557-225d-4fbd-83ee-d4b72eb587ce@oss.qualcomm.com>
- <3c69423e-ba80-487f-b585-1e4ffb4137b6@lunn.ch>
- <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
-Content-Language: en-US
-In-Reply-To: <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net 2/2] net/smc: fix LGR and link use-after-free issue
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241122071630.63707-1-guwen@linux.alibaba.com>
+ <20241122071630.63707-3-guwen@linux.alibaba.com>
+ <5688fe46-dda0-4050-ba24-eb5ef573f120@linux.ibm.com>
+ <f4eb6ddf-0b44-4fb1-95d3-a8f01be19d8d@linux.alibaba.com>
+ <0d62917a-f64e-4be1-95c9-649f1a24d676@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <0d62917a-f64e-4be1-95c9-649f1a24d676@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _Sw2n69pV_5KQZultUUqlaXlxy3wsuoo
-X-Proofpoint-ORIG-GUID: _Sw2n69pV_5KQZultUUqlaXlxy3wsuoo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 adultscore=0 spamscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 bulkscore=0 malwarescore=0 classifier=spam adjust=0
- reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411270056
 
 
 
-On 2024-11-27 14:17, Yijie Yang wrote:
+On 2024/11/25 21:02, Alexandra Winter wrote:
 > 
 > 
-> On 2024-11-22 21:19, Andrew Lunn wrote:
->>>>>>    +&ethernet {
->>>>>> +    status = "okay";
->>>>>> +
->>>>>> +    pinctrl-0 = <&ethernet_defaults>;
->>>>>> +    pinctrl-names = "default";
->>>>>> +
->>>>>> +    phy-handle = <&rgmii_phy>;
->>>>>> +    phy-mode = "rgmii";
->>>>>
->>>>> That is unusual. Does the board have extra long clock lines?
->>>>
->>>> Do you mean to imply that using RGMII mode is unusual? While the 
->>>> EMAC controller supports various modes, due to hardware design 
->>>> limitations, only RGMII mode can be effectively implemented.
+> On 25.11.24 11:00, Wen Gu wrote:
+>>> I wonder if this can deadlock, when you take lock_sock so far down in the callchain.
+>>> example:
+>>>    smc_connect will first take lock_sock(sk) and then mutex_lock(&smc_server_lgr_pending);  (e.g. in smc_connect_ism())
+>>> wheras
+>>> smc_listen_work() will take mutex_lock(&smc_server_lgr_pending); and then lock_sock(sk) (in your __smc_conn_abort(,,false))
 >>>
->>> Is that a board-specific issue, or something that concerns the SoC 
->>> itself?
->>
->> Lots of developers gets this wrong.... Searching the mainline list for
->> patchs getting it wrong and the explanation i have given in the past
->> might help.
->>
->> The usual setting here is 'rgmmii-id', which means something needs to
->> insert a 2ns delay on the clock lines. This is not always true, a very
->> small number of boards use extra long clock likes on the PCB to add
->> the needed 2ns delay.
->>
->> Now, if 'rgmii' does work, it means something else is broken
->> somewhere. I will let you find out what.
-> 
-> The 'rgmii' does function correctly, but it does not necessarily mean 
-> that a time delay is required at the board level. The EPHY can also 
-> compensate for the time skew.
-
-I was mistaken earlier; it is actually the EMAC that will introduce a 
-time skew by shifting the phase of the clock in 'rgmii' mode.
-
-> 
->>
->>>>>> +    max-speed = <1000>;
->>>>>
->>>>> Why do you have this property? It is normally used to slow the MAC
->>>>> down because of issues at higher speeds.
->>>>
->>>> According to the databoot, the EMAC in RGMII mode can support speeds 
->>>> of up to 1Gbps.
+>>> I am not sure whether this can be called on the same socket, but it looks suspicious to me.
 >>>
->>> I believe the question Andrew is asking is "how is that effectively
->>> different from the default setting (omitting the property)?"
 >>
->> Correct. If there are no issues at higher speeds, you don't need
->> this. phylib will ask the PHY what it is capable of, and limit the
->> negotiated speeds to its capabilities. Occasionally you do see an
->> RGMII PHY connected to a MII MAC, because a RGMII PHY is cheaper...
+>> IMHO this two paths can not occur on the same sk.
 >>
->>     Andrew
+>>>
+>>> All callers of smc_conn_abort() without socklock seem to originate from smc_listen_work().
+>>> That makes me think whether smc_listen_work() should do lock_sock(sk) on a higher level.
+>>>
+>>
+>> Yes, I also think about this question, I guess it is because the new smc sock will be
+>> accepted by userspace only after smc_listen_work() is completed. Before that, no userspace
+>> operation occurs synchronously with it, so it is not protected by sock lock. But I am not
+>> sure if there are other reasons, so I did not aggressively protect the entire smc_listen_work
+>> with sock lock, but chose a conservative approach.
+>>
+>>> Do you have an example which function could collide with smc_listen_work()?
+>>> i.e. have you found a way to reproduce this?
+>>>
+>>
+>> We discovered this during our fault injection testing where the rdma driver was rmmod/insmod
+>> sporadically during the nginx/wrk 1K connections test.
+>>
+>> e.g.
+>>
+>>     __smc_lgr_terminate            | smc_listen_decline
+>>     (caused by rmmod mlx5_ib)      | (caused by e.g. reg mr fail)
+>>     --------------------------------------------------------------
+>>     lock_sock                      |
+>>     smc_conn_kill                  | smc_conn_abort
+>>      \- smc_conn_free              |  \- smc_conn_free
+>>     release_sock                   |
 > 
-> It does unnecessary, I will remove it.
+> 
+> Thank you for the explanations. So the most suspicious scenario is
+> smc_listen_work() colliding with
+>   __smc_lgr_terminate() -> smc_conn_kill() of the conn and smc socket that is just under
+> construction by smc_listen_work() (without socklock).
+> 
+> I am wondering, if other parts of smc_listen_work() are allowed to run in parallel
+> with smc_conn_kill() of this smc socket??
+> 
+Ideally, smc_listen_work should be all covered by new_smc's sock lock, mutually
+exclusive with other conn operations.
+
+But I need to look deeper into the smc_listen_work() implementation to see if
+all-covered by sock lock is feasible. At least some of the places already protected
+by new_smc's sock lock need to be excluded or handled.
+
+e.g.
+
+smc_listen_work()
+  \- smc_listen_out_xxx()
+      \- smc_listen_out()
+          \- smc_close_non_accepted() -> take the new_smc's sock lock.
+
+> My impression would be that the whole smc_listen_work() should be protected against
+> smc_conn_kill(), not only smc_conn_free.
 > 
 
--- 
-Best Regards,
-Yijie
-
+Thanks!
 
