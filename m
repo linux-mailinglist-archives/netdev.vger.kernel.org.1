@@ -1,258 +1,146 @@
-Return-Path: <netdev+bounces-147560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10599DA325
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:34:31 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D0759DA356
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:47:08 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE8916778F
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:34:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39001B21671
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDE51514F6;
-	Wed, 27 Nov 2024 07:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC2E156F54;
+	Wed, 27 Nov 2024 07:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FiHwVcvK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JnYCtp/p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD1E14F102;
-	Wed, 27 Nov 2024 07:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F4518D63C
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 07:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732692869; cv=none; b=EmAQSPkRkYbNGFczTMxE93S14FjK6JYZg9hhwlR7fLfhlPyxDWUA6V/vvE6P33ijoaNxcWGkQ7jpBXAekkne8QYP0NaamKkVxWXApXdK/UabOHOS7ftJ5PaoUTej/aM7kmpkSAsgWEsePhF1tVM7dP388J6yOYpeEloAs657OnQ=
+	t=1732693590; cv=none; b=qcxG/Tm8vpmolFAJtMCRLQJNZGvO6owpFrEk0fxqUZ75YpiuLI2XqqoADNYkLt5hWuQDRYst4VcwPOflGc1I8YRk28BIgN5lBKOMnoFCVtNUZGSkDl87PIGxaip0gUc078f3HqTCQBA+QoS49P13k9iu+lbaa8lW0a6qOrqMPrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732692869; c=relaxed/simple;
-	bh=4WO2JdXA2564p2SZr8+iXkDfVAsxsKAbuhj/98J0eJI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=V+kgBlaWUz3erhan/rnlWFGSBp08eKLbY0TNna1Fu6AP68r1kqbNXjcYKfuxUBVZeCikvVYhaqn1oBJRWJwgf06yHa7un64sIykHDvNs84GDF7kh9CvYYmhe3B0O+edJNh4A3wXqoGLgkPkEBjtvsO7WEphX8R0+hDZZvDcLE1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FiHwVcvK; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ea8b039ddcso5113099a91.0;
-        Tue, 26 Nov 2024 23:34:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732692867; x=1733297667; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uLhtbTcEA7lxOzC9Mcl9ifDLK0DyGtZjy01VuSanglg=;
-        b=FiHwVcvKmqOsW4y1Utvack7oWpd4u26g7v/dCMg2YTwcXpUxRlT06DrPFE3kH3m2Lw
-         SoppJx8JRM53/qq9iNY7HM4G6gbSNi9t3TDJ1kUXIKKlQivVZ0cMdDaoKgCPx21qU6y+
-         Xh/fFrgN65fpGSgc8ZpfZDmKIiaHREVRxLJEPReOtWaJjloTchvh6oT9VuzGeGGIU74C
-         rai4CzVgNzupXGav/XLBwiXDGP+aWiIPfvSUpElywYqQ95bRwB42F3B7QCvwuojW0WJm
-         RvbyE7KSkDexzDQ3COmKaheU7n0AJSd9aKh4foRT6cs6NL66yQouHHo8YghhBufyz/fc
-         sXkQ==
+	s=arc-20240116; t=1732693590; c=relaxed/simple;
+	bh=4/yXwKY6nG5+HhZPf7lYUj4gAUD18OtQWnuzyKtJZmE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FFdH/2AvnzNDGu6u8QP1/Msh44kKEzgNVt971FagVRvvFb5W9UEzuKoFgKxcgClR16PJwBoqXVDz5Go01zSzZv6sZ35I1ZxPrDlLhrTIorqhSe+f+M08MGP9KUSqcYEvFigs1/J264OiDzU0mGKZ+HMmMoNYSVhOoEbDZqr/MfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JnYCtp/p; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732693587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GK+3G3kO0VycIHGio9DvkBxIF2tO2AzV2JADeZzp4jw=;
+	b=JnYCtp/pZmOmftyV0kB8eqeItPx1kSfhPDphkTGO3R36d9gUIaX9aGvp2YPJt5wgMGmWB3
+	pJ/jT9HWATvcOOWcE90yOREv8b+xLpeQ5ASmgvHIPzJfC4szfXjEfWPyWKjG7cP/Df88I1
+	yR7N93RmHeqNy9Faq/L0RZP2r35MPEU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-630-iQ4iLyDkMI650gwSy6RhCQ-1; Wed, 27 Nov 2024 02:46:25 -0500
+X-MC-Unique: iQ4iLyDkMI650gwSy6RhCQ-1
+X-Mimecast-MFC-AGG-ID: iQ4iLyDkMI650gwSy6RhCQ
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38242a78f3eso3360934f8f.0
+        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 23:46:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732692867; x=1733297667;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uLhtbTcEA7lxOzC9Mcl9ifDLK0DyGtZjy01VuSanglg=;
-        b=Be2a0M/ccytFgM0SkmDpGFEm5gf1aqBZtq+NCEUEKhm7eNMtYy3EcG8ZolY98Apfc3
-         KsvH3tu8iaftvc+8SyPaRD+ZwWYUHpp/98yEdnVVeJSgwH0xA4CYgawTNip+J98r72Sh
-         5xg9cLR0nMo9pqeJOraPh5bn/X2QOFIyUO4SUiWTdPhV+PGZwYwW4RuYuf/fSOKsOUKs
-         Sd9R3tvLS+eenWHoDjAKamef51pdYAtOJbRyUDbRV0vcCCJWNJ/B0MWJ/b/BiK3DtIN2
-         0U1NGGYCyqWmcsh+HwBOVRSbNXZTMTzTdDBYGskt5+61/NLQWW8tYBFBECSOwhfZhgSC
-         v7YA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAuX4ah0DDTNBwQ5HijoK7sCZHfKIWDYHoX7iIlLVgBgGV17SjDD36J6fBI3zrClK9CdfQFT8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzqv6HSHTYsIzu+OR4Aj3s3kNHoM4zBgFLkYkwtp6leiVux06wS
-	4Z218QrdrEac8f6L5SkKmYmRh9vNUrgxG4OJX0fQOul44RnoLY4ggcg+9A==
-X-Gm-Gg: ASbGncsA5noJyc05JkwJozo6OB7y4gCO6krtgV7cojiRpaH03zubtKg/GTTSoDeYSY3
-	1ugYAwSt38AfBLdL2nSCDLmoyjVJF9XD1xCuuV3VR2fdsnyiBYjHN4G6vHs216sab/mjZoZa7d8
-	cAVTevIOzDZ5L1+DbCVcj3hClQ+whEh/5VOxrJvFqNuiLOIkmZ4RezeSMRffT/Pdf6JO3Dj90Ns
-	9OivXDBKYDA3uFxJKzJSEJBSTF0kGxpSAgO4335aHPiOJ99A3g=
-X-Google-Smtp-Source: AGHT+IEsnSzmDH4Rd5E/576eqAaqH5g5sLVhF6VkNsoCtYvu9MgO+J2ldear+DY1YxIFrsHiZzWTFg==
-X-Received: by 2002:a17:90b:1a8e:b0:2ea:4290:7274 with SMTP id 98e67ed59e1d1-2ee08e9fe02mr2806521a91.10.1732692867158;
-        Tue, 26 Nov 2024 23:34:27 -0800 (PST)
-Received: from localhost ([98.97.45.174])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee0fa30fcesm806046a91.8.2024.11.26.23.34.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2024 23:34:26 -0800 (PST)
-Date: Tue, 26 Nov 2024 23:34:25 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Zijian Zhang <zijianzhang@bytedance.com>, 
- Cong Wang <xiyou.wangcong@gmail.com>, 
- netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, 
- Cong Wang <cong.wang@bytedance.com>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <6746cb81870d7_f422208e@john.notmuch>
-In-Reply-To: <67a0fb14-f791-4499-8751-01bbbd1cafcb@bytedance.com>
-References: <20241107034141.250815-1-xiyou.wangcong@gmail.com>
- <20241107034141.250815-2-xiyou.wangcong@gmail.com>
- <67a0fb14-f791-4499-8751-01bbbd1cafcb@bytedance.com>
-Subject: Re: [External] [Patch bpf 2/2] selftests/bpf: Add a BPF selftest for
- bpf_skb_change_tail()
+        d=1e100.net; s=20230601; t=1732693584; x=1733298384;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GK+3G3kO0VycIHGio9DvkBxIF2tO2AzV2JADeZzp4jw=;
+        b=fIK9kXTGtK4vTm5O55lrjt0RGnDoXOWVD5UgKhj2zsOMFNk9But3iXQScs/57/V6Oj
+         bXa5bcNDowEyQxycHGePQUc45kU2xkO48J+S7PbleDe5Rv8NXGNqKdSxvk2FsXoBYGRE
+         9YxlM7smZts+8kVQTpnju4EXpoi5nFho5PD5/fXUDGqCOc84xxcQ9rSKnzBoGZyd2kbG
+         OwOC0K6aXcGsqPeJN7AaPjkT9tBjSaNj1rz+SBZrOsH1SynEDQTjzyAC38Nd0JofL/jS
+         7CLPA47W1vu0wYkOw8hoSr+KAanW/DhZeDocu5TpFZADScgdDRyHme8ZUuCVZdVNukYe
+         QNtw==
+X-Gm-Message-State: AOJu0YyTiuLlCJzYlaqUDKN11BeSh91oFY+gVXf9W8Njpfty5hcN02fB
+	LsTdDJJT58zuqYyNRUEQlcCZNwWVVHrnAo04UUYxwE6VAov+uKOi4QJIoPnrXIISz17aFEN96x0
+	e33+ShgT51pRFot13ibrEhMt0eFQifsi7E0S/vVI6gxvfAWCYI6lsZw==
+X-Gm-Gg: ASbGncvgLvB5rt2r0fDUfCNkcUdK5OFAgJBkWRg15yUT050C67RACinptpg66cwX6fp
+	BPf9vcAVGLBBzOveHN+afXeRskg2bIfFExUvUj+LOWEkWPIoQE/XNeZM0kw4oBh6Qe5ruEeDrND
+	6y+toB9D8anxst0oizdgya04sbqLkElDUrohCogu1VA7725Mpn5dAZzRImU78SmgR5vcaIcJmU1
+	jhRkg94PDuQqtyEYTUoX8HgkSUE/CTGzaaPFXUj3xzQYvANQ/zW1EOyXpjjO1i9NIIu6Q+yf8Qd
+	hgE=
+X-Received: by 2002:a05:6000:1aca:b0:382:397f:3df5 with SMTP id ffacd0b85a97d-385c6edd4fcmr1334546f8f.38.1732693584520;
+        Tue, 26 Nov 2024 23:46:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHSgs8I9raBPC/ec0+MexPGRBtWsZQCpKG9JWoNGJiKxPWOnS5ouGX5aC+JU9uJwI0cwOtNTw==
+X-Received: by 2002:a05:6000:1aca:b0:382:397f:3df5 with SMTP id ffacd0b85a97d-385c6edd4fcmr1334523f8f.38.1732693583986;
+        Tue, 26 Nov 2024 23:46:23 -0800 (PST)
+Received: from [192.168.88.24] (146-241-49-128.dyn.eolo.it. [146.241.49.128])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fbedce3sm15470212f8f.97.2024.11.26.23.46.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Nov 2024 23:46:23 -0800 (PST)
+Message-ID: <411eb4ba-3226-44f2-aabe-5d68df01f867@redhat.com>
+Date: Wed, 27 Nov 2024 08:46:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] udp: call sock_def_readable() if socket is not
+ SOCK_FASYNC
+To: Eric Dumazet <edumazet@google.com>,
+ Fernando Fernandez Mancera <ffmancera@riseup.net>
+Cc: netdev@vger.kernel.org, willemb@google.com
+References: <20241126175402.1506-1-ffmancera@riseup.net>
+ <CANn89iJ7NLR4vSqjSb9gpKxfZ2jPJS+jv_H1Qqs1Qz0DZZC=ug@mail.gmail.com>
+ <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89i+651SOZDegASE2XQ7BViBdS=gdGPuNs=69SBS7SuKitg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Zijian Zhang wrote:
-> On 11/6/24 7:41 PM, Cong Wang wrote:
-> > From: Cong Wang <cong.wang@bytedance.com>
-> > 
-> > As requested by Daniel, we need to add a selftest to cover
-> > bpf_skb_change_tail() cases in skb_verdict. Here we test trimming,
-> > growing and error cases, and validate its expected return values.
-> > 
-> > Cc: John Fastabend <john.fastabend@gmail.com>
-> > Cc: Daniel Borkmann <daniel@iogearbox.net>
-> > Cc: Zijian Zhang <zijianzhang@bytedance.com>
-> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-> > ---
-> >   .../selftests/bpf/prog_tests/sockmap_basic.c  | 51 +++++++++++++++++++
-> >   .../bpf/progs/test_sockmap_change_tail.c      | 40 +++++++++++++++
-> >   2 files changed, 91 insertions(+)
-> >   create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_change_tail.c
-> > 
-> > diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-> > index 82bfb266741c..fe735fced836 100644
-> > --- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-> > +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-> > @@ -12,6 +12,7 @@
-> >   #include "test_sockmap_progs_query.skel.h"
-> >   #include "test_sockmap_pass_prog.skel.h"
-> >   #include "test_sockmap_drop_prog.skel.h"
-> > +#include "test_sockmap_change_tail.skel.h"
-> >   #include "bpf_iter_sockmap.skel.h"
-> >   
-> >   #include "sockmap_helpers.h"
-> > @@ -562,6 +563,54 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
-> >   		test_sockmap_drop_prog__destroy(drop);
-> >   }
-> >   
-> > +static void test_sockmap_skb_verdict_change_tail(void)
-> > +{
-> > +	struct test_sockmap_change_tail *skel;
-> > +	int err, map, verdict;
-> > +	int c1, p1, sent, recvd;
-> > +	int zero = 0;
-> > +	char b[3];
-> > +
-> > +	skel = test_sockmap_change_tail__open_and_load();
-> > +	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-> > +		return;
-> > +	verdict = bpf_program__fd(skel->progs.prog_skb_verdict);
-> > +	map = bpf_map__fd(skel->maps.sock_map_rx);
-> > +
-> > +	err = bpf_prog_attach(verdict, map, BPF_SK_SKB_STREAM_VERDICT, 0);
-> > +	if (!ASSERT_OK(err, "bpf_prog_attach"))
-> > +		goto out;
-> > +	err = create_pair(AF_INET, SOCK_STREAM, &c1, &p1);
-> > +	if (!ASSERT_OK(err, "create_pair()"))
-> > +		goto out;
-> > +	err = bpf_map_update_elem(map, &zero, &c1, BPF_NOEXIST);
-> > +	if (!ASSERT_OK(err, "bpf_map_update_elem(c1)"))
-> > +		goto out_close;
-> > +	sent = xsend(p1, "Tr", 2, 0);
-> > +	ASSERT_EQ(sent, 2, "xsend(p1)");
-> > +	recvd = recv(c1, b, 2, 0);
-> > +	ASSERT_EQ(recvd, 1, "recv(c1)");
-> > +	ASSERT_EQ(skel->data->change_tail_ret, 0, "change_tail_ret");
-> > +
-> > +	sent = xsend(p1, "G", 1, 0);
-> > +	ASSERT_EQ(sent, 1, "xsend(p1)");
-> > +	recvd = recv(c1, b, 2, 0);
-> > +	ASSERT_EQ(recvd, 2, "recv(c1)");
-> > +	ASSERT_EQ(skel->data->change_tail_ret, 0, "change_tail_ret");
-> > +
-> > +	sent = xsend(p1, "E", 1, 0);
-> > +	ASSERT_EQ(sent, 1, "xsend(p1)");
-> > +	recvd = recv(c1, b, 1, 0);
-> > +	ASSERT_EQ(recvd, 1, "recv(c1)");
-> > +	ASSERT_EQ(skel->data->change_tail_ret, -EINVAL, "change_tail_ret");
-> > +
-> > +out_close:
-> > +	close(c1);
-> > +	close(p1);
-> > +out:
-> > +	test_sockmap_change_tail__destroy(skel);
-> > +}
-> > +
-> >   static void test_sockmap_skb_verdict_peek_helper(int map)
-> >   {
-> >   	int err, c1, p1, zero = 0, sent, recvd, avail;
-> > @@ -927,6 +976,8 @@ void test_sockmap_basic(void)
-> >   		test_sockmap_skb_verdict_fionread(true);
-> >   	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
-> >   		test_sockmap_skb_verdict_fionread(false);
-> > +	if (test__start_subtest("sockmap skb_verdict change tail"))
-> > +		test_sockmap_skb_verdict_change_tail();
-> >   	if (test__start_subtest("sockmap skb_verdict msg_f_peek"))
-> >   		test_sockmap_skb_verdict_peek();
-> >   	if (test__start_subtest("sockmap skb_verdict msg_f_peek with link"))
-> > diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_change_tail.c b/tools/testing/selftests/bpf/progs/test_sockmap_change_tail.c
-> > new file mode 100644
-> > index 000000000000..2796dd8545eb
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/progs/test_sockmap_change_tail.c
-> > @@ -0,0 +1,40 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/* Copyright (c) 2024 ByteDance */
-> > +#include <linux/bpf.h>
-> > +#include <bpf/bpf_helpers.h>
-> > +
-> > +struct {
-> > +	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-> > +	__uint(max_entries, 1);
-> > +	__type(key, int);
-> > +	__type(value, int);
-> > +} sock_map_rx SEC(".maps");
-> > +
-> > +long change_tail_ret = 1;
-> > +
-> > +SEC("sk_skb")
-> > +int prog_skb_verdict(struct __sk_buff *skb)
-> > +{
-> > +	char *data, *data_end;
-> > +
-> > +	bpf_skb_pull_data(skb, 1);
-> > +	data = (char *)(unsigned long)skb->data;
-> > +	data_end = (char *)(unsigned long)skb->data_end;
-> > +
-> > +	if (data + 1 > data_end)
-> > +		return SK_PASS;
-> > +
-> > +	if (data[0] == 'T') { /* Trim the packet */
-> > +		change_tail_ret = bpf_skb_change_tail(skb, skb->len - 1, 0);
-> > +		return SK_PASS;
-> > +	} else if (data[0] == 'G') { /* Grow the packet */
-> > +		change_tail_ret = bpf_skb_change_tail(skb, skb->len + 1, 0);
-> > +		return SK_PASS;
-> > +	} else if (data[0] == 'E') { /* Error */
-> > +		change_tail_ret = bpf_skb_change_tail(skb, 65535, 0);
-> > +		return SK_PASS;
-> > +	}
-> > +	return SK_PASS;
-> > +}
-> > +
-> > +char _license[] SEC("license") = "GPL";
-> 
-> LGTM!
-> 
-> I think it will be better if the test could also cover the case you
-> indicated in the first patch, where skb_transport_offset is a negative
-> value.
-> 
-> Thanks,
-> Zijian
-> 
+Hi,
 
-Hi Cong,
+I'm sorry for the latency here.
 
-I agree it would be great to see the skb_transport_offset is
-negative pattern. Could we add it?
+On 11/26/24 19:41, Eric Dumazet wrote:
+> On Tue, Nov 26, 2024 at 7:32 PM Eric Dumazet <edumazet@google.com> wrote:
+>>
+>> On Tue, Nov 26, 2024 at 6:56 PM Fernando Fernandez Mancera
+>> <ffmancera@riseup.net> wrote:
+>>>
+>>> If a socket is not SOCK_FASYNC, sock_def_readable() needs to be called
+>>> even if receive queue was not empty. Otherwise, if several threads are
+>>> listening on the same socket with blocking recvfrom() calls they might
+>>> hang waiting for data to be received.
+>>>
+>>
+>> SOCK_FASYNC seems completely orthogonal to the issue.
+>>
+>> First sock_def_readable() should wakeup all threads, I wonder what is happening.
+> 
+> Oh well, __skb_wait_for_more_packets() is using
+> prepare_to_wait_exclusive(), so in this case sock_def_readable() is
+> waking only one thread.
 
-Thanks,
-John
+Very likely whatever I'll add here will be of little use, still...
+
+AFAICS prepare_to_wait_exclusive() is there since pre git times, so its
+usage not be the cause of behaviors changes.
+
+>> UDP can store incoming packets into sk->sk_receive_queue and
+>> udp_sk(sk)->reader_queue
+>>
+>> Paolo, should __skb_wait_for_more_packets() for UDP socket look at both queues ?
+
+That in case multiple threads are woken-up and thread-1 splices
+sk_receive_queue into reader_queue before thread-2 has any chance of
+checking the first, I guess?
+
+With prepare_to_wait_exclusive, checking a single queue should be ok.
+
+/P
+
 
