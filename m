@@ -1,406 +1,230 @@
-Return-Path: <netdev+bounces-147627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601FD9DACAA
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 18:44:04 +0100 (CET)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659FD9DACC4
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 18:57:46 +0100 (CET)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED35D164A58
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 17:44:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D31BBB21CC9
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 17:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F022201022;
-	Wed, 27 Nov 2024 17:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E903E201039;
+	Wed, 27 Nov 2024 17:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgjF/qSJ"
+	dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b="DMH9Nj4x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from confino.investici.org (confino.investici.org [93.190.126.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6BF82D66;
-	Wed, 27 Nov 2024 17:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13591F9EDC;
+	Wed, 27 Nov 2024 17:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.190.126.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732729440; cv=none; b=ZWwkbhltk4rxsuh0J1/xciVjsRlMV4b1yw/97uISOd04bm3fV1vWXfiZjrwNRqGzPwdno0UktT3UDPx83ljXYl7uZUaR7FYr+NnTl4IQBPjWJpF+mDuZw4GvlmNJ+o/YE6nZpEaExs1AdMC5CbSnV2ipw2uNbsyeOshvPkORu9E=
+	t=1732730255; cv=none; b=fzzH3bgfLCAV/rpcu9Mi1ldLF5Hekx6dsrualEjwZkI10Cnes2txWd2eKPEzx2cCSRCF+22ZHYTRa9TddIAZ/bSxx8jfWI1nxXlzYi2E7gAnJOIbOd3qmOGFgVmHREmRGYH+6a/0ajBsFvYamBUl2wYPtqFMivTQUvMwtrEgpmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732729440; c=relaxed/simple;
-	bh=wB0whHn3D1g+lo/zegfVYQ2VjMYarYN9RWMfyShvLfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ESq2DUFk695Rk/yvgYCDn9jVm0PJwG3DsiPIa4amuB2cH16jfEKDXyAswi/CD8po1SHSPH5I5lPUxXHygyDB1qltGZEs0tiVxo5UtNfWEz1TUoEvvanlgMyBWC6T5W6YWwt6mLPIQzTYYcXz3LOsgh3Fuvo5Q8y+RVWa7JJt4Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lgjF/qSJ; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ea499f264fso27686a91.1;
-        Wed, 27 Nov 2024 09:43:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732729437; x=1733334237; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0mGzRd7mwpAf0UVUKW9E40rKesP5FbNQTDyPN+u3Ovk=;
-        b=lgjF/qSJs8XYMuHisJP8l+tgJNLUplLTWlZFUniNue5OcW75YmApHvziOQ99V+G2VW
-         PBTGkbAAGL4ClCuTO28gYe130oFTbxisSqsE8mIUAOnZCzpCfOwTojDdgN9VM2zk1o9A
-         CVYkPtapCfFbP9PfVz7aFmm/sHZlf0fYYM0ihcS0N4r8QvhJEQEu9YBNg+ARXIwz0tp9
-         hi5Hqp/MMqXP7l3p7tRm/uOhPTYUHEs8p3jUTHZablfm6YYWJcbgZFwl3vUuLrsWHtR9
-         LXZCAzYEEkiX9Wjjn/MB9qXkuLUu/QkBMO2FNNpDTYVO2runxJqdZJzs1QZ0n4tj01Tt
-         mBCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732729437; x=1733334237;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0mGzRd7mwpAf0UVUKW9E40rKesP5FbNQTDyPN+u3Ovk=;
-        b=vBru2eBKo/EDwBPIzlCfMbtx2XdSoH6FlWPDEU1/BRq2xNVJ7Ym3L6RcucbIW7eKxr
-         sTNyRII709XvcG96HsntnbMOhFKsC+JibJm2YneHGh4Ce2dVNo5ck3yegZvspWWYK9O7
-         DGQWWW+os8XRbhdePuuEtA/dJy0O51XeimUN53S7pHTgv8FYNQEWBWCVGHxUejcLE/1m
-         BjRizOMxZfBqMitw7mglqkLLyxxPLLb3cExzmRhjphb5TpOWr3T13lWpJRrMXPnX/3Fv
-         d9OAXlb+qcBImAys9pKXC6D8ApifR/p98DR2H/DpkO43QI89o4icguIwux1tliCkLOr8
-         NP5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUS5ZKrEXZpmKPJac4h+dSt9oTBM3W7MX+AsTBzfYFwSLXlRqt8qdnirDrcUPn4Z6YS7u02cvarl3k=@vger.kernel.org, AJvYcCVuKMumfZl+/7kfS3ew2pyM7x3y6N7d9vGE2WM5wgmE24iaM4ZTsUuAodz7xAsAtUw/1d2IOkrUuqQBKW+O@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaqBxtLpKScBnB6tk3/lvGq4MA5EZRXDOutNHHPnzBRLNCR6A4
-	pAZi0JBEmqwWFXTStZzHntu4681tir1WVtxkWjoHH6eEEmfF5Dk5
-X-Gm-Gg: ASbGnct8WlmtNKFnW0W37iirRwotS7JUxQwxBUwHjQtxK/d8YC2huwBJVA0KP//qWSr
-	xa8REU9cCwLo1BFIm5O//hgjZ4mPXaeNK/H1rnARQbK4XLtabqsHpnCHyxPgl6Ff+B98YwzDRlw
-	zca0z87dNjGvDdHJuxTjaASxxC6M8XyTyUF1iuC8t5SFPAiBLclnl/+j5ga3aIYT31Su/C4awqz
-	/rPusseadwmUZDE13QkeDrsOwDQgc5Qgus+LFR0s2pyjMZNLzG+CApILrl2jJQ=
-X-Google-Smtp-Source: AGHT+IHbHuH3VnLr23U01JOZQG2dZwrWXVVhZceYeCoseWnwS3olFWwj+t9oXBwCziOzWbtry6GZYw==
-X-Received: by 2002:a17:90a:c387:b0:2ea:507f:49bd with SMTP id 98e67ed59e1d1-2ee25abe48dmr355511a91.2.1732729436890;
-        Wed, 27 Nov 2024 09:43:56 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee0fad063dsm1834182a91.32.2024.11.27.09.43.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 09:43:56 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Wed, 27 Nov 2024 09:43:54 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	edumazet@google.com, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next v6 5/9] net: napi: Add napi_config
-Message-ID: <85dd4590-ea6b-427d-876a-1d8559c7ad82@roeck-us.net>
-References: <20241011184527.16393-1-jdamato@fastly.com>
- <20241011184527.16393-6-jdamato@fastly.com>
+	s=arc-20240116; t=1732730255; c=relaxed/simple;
+	bh=ssc8+x45uYtdsQermSnlm21imfsLHCA0BpP4c3W5/bI=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=NoAJOtNVJRKFUs1OacBj7bKx37TpBlY3+DrYxLC1xfjPFlI23Z1xuixns3PPGcHV9+AkJGQQFRGCr3B1n83UshY1KVjwh/j28W8SibL29SMa2g0rf3QyamCXUDPfawl/kWji4bQ2ORAUBwefzO49/Qe1Vxw4LvqO+cWTZCCc2qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org; spf=pass smtp.mailfrom=paranoici.org; dkim=pass (1024-bit key) header.d=paranoici.org header.i=@paranoici.org header.b=DMH9Nj4x; arc=none smtp.client-ip=93.190.126.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=paranoici.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paranoici.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paranoici.org;
+	s=stigmate; t=1732729703;
+	bh=TMfGlKmDkUlDGaT8cORJfVr29uuDvXsJrr1YxzKPkG0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DMH9Nj4x+2vNPPYFirP4R/1Qbzs67ztXHICUO/MZnNlJk6a8bEGQfvQ8Sf1kJj/HL
+	 jK5tZFqS1QcRLXWBDemjfJ9Grk03LzaFXzvid03fXzwLiGz2uHwabv6AxJKeLpxUwm
+	 CiwdGD8GQZrqkkqE4aWFPIQCc+/RCvc7LRCv234o=
+Received: from mx1.investici.org (unknown [127.0.0.1])
+	by confino.investici.org (Postfix) with ESMTP id 4Xz6P3273nz11H3;
+	Wed, 27 Nov 2024 17:48:23 +0000 (UTC)
+Received: from [93.190.126.19] (mx1.investici.org [93.190.126.19]) (Authenticated sender: invernomuto@paranoici.org) by localhost (Postfix) with ESMTPSA id 4Xz6P31nF3z1144;
+	Wed, 27 Nov 2024 17:48:23 +0000 (UTC)
+Received: from frx by crunch with local (Exim 4.98)
+	(envelope-from <invernomuto@paranoici.org>)
+	id 1tGM9G-00000000CZc-0bFO;
+	Wed, 27 Nov 2024 18:48:22 +0100
+Date: Wed, 27 Nov 2024 18:48:03 +0100
+From: Francesco Poli <invernomuto@paranoici.org>
+To: Leon Romanovsky <leonro@nvidia.com>
+Cc: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <ukleinek@debian.org>,
+ <1086520@bugs.debian.org>, Mark Zhang <markzhang@nvidia.com>,
+ <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: Bug#1086520: linux-image-6.11.2-amd64: makes opensm fail to
+ start
+Message-Id: <20241127184803.75086499e71c6b1588a4fb5a@paranoici.org>
+In-Reply-To: <20241125193837.GH160612@unreal>
+References: <173040083268.16618.7451145398661885923.reportbug@crunch>
+	<jaw7557rpn2eln3dtb2xbv2gvzkzde6mfful7d2mf5mgc3wql7@wikm2a7a3kcv>
+	<173040083268.16618.7451145398661885923.reportbug@crunch>
+	<20241113231503.54d12ed5b5d0c8fa9b7d9806@paranoici.org>
+	<3wfi2j7jn2f7rajabfcengubgtyt3wkuin6hqepdoe5dlvfhvn@2clhco3z6fuw>
+	<173040083268.16618.7451145398661885923.reportbug@crunch>
+	<20241118200616.865cb4c869e693b19529df36@paranoici.org>
+	<nvs4i2v7o6vn6zhmtq4sgazy2hu5kiulukxcntdelggmznnl7h@so3oul6uwgbl>
+	<20241125195443.0ddf0d0176d7c34bd29942c7@paranoici.org>
+	<20241125193837.GH160612@unreal>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA512";
+ boundary="Signature=_Wed__27_Nov_2024_18_48_03_+0100_yjdnRe8fnuF.YdD8"
+
+--Signature=_Wed__27_Nov_2024_18_48_03_+0100_yjdnRe8fnuF.YdD8
+Content-Type: text/plain; charset=US-ASCII
 Content-Disposition: inline
-In-Reply-To: <20241011184527.16393-6-jdamato@fastly.com>
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, 25 Nov 2024 21:38:37 +0200 Leon Romanovsky wrote:
 
-On Fri, Oct 11, 2024 at 06:45:00PM +0000, Joe Damato wrote:
-> Add a persistent NAPI config area for NAPI configuration to the core.
-> Drivers opt-in to setting the persistent config for a NAPI by passing an
-> index when calling netif_napi_add_config.
-> 
-> napi_config is allocated in alloc_netdev_mqs, freed in free_netdev
-> (after the NAPIs are deleted).
-> 
-> Drivers which call netif_napi_add_config will have persistent per-NAPI
-> settings: NAPI IDs, gro_flush_timeout, and defer_hard_irq settings.
-> 
-> Per-NAPI settings are saved in napi_disable and restored in napi_enable.
-> 
-> Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> On Mon, Nov 25, 2024 at 07:54:43PM +0100, Francesco Poli wrote:
+[...]
+> > I will try to continue to bisect by testing the resulting kernels on a
+> > compute node: there's no OpenSM there and it cannot run anyway, if
+> > there's another OpenSM on the same InfiniBand network.
+> > However, I can check whether those issm* symlinks are created in
+> > /sys/class/infiniband_mad/=20
+> > I really hope that this is enough to pinpoint the first bad
+> > commit...
+>=20
+> Yes, these symlinks should be there. Your test scenario is correct one.
 
-This patch triggers a lock inversion message on pcnet Ethernet adapters.
+OK, I have completed the bisect on a compute node without OpenSM, by
+looking at the issm* symlinks, as I said.
 
-========================================================
-WARNING: possible irq lock inversion dependency detected
-6.12.0-08446-g228a1157fb9f #1 Tainted: G                 N
+See below.
 
-The problem seems obvious - napi_hash_lock and the local driver lock are
-acquired in different order depending on the call sequence. Unfortunately
-I have no idea how to fix the problem or I'd submit a patch.
+>=20
+> >=20
+> > Any better ideas?
+>=20
+> I think that commit: 2a5db20fa532 ("RDMA/mlx5: Add support to multi-plane=
+ device and port")
+> is the one which is causing to troubles, which leads me to suspect FW.
+[...]
 
-Complete backtrace and bisect log attached. Bisect was run with qemu on
-riscv64, but the architecture/platform does not really matter.
+Thanks to your guess about the possibly troublesome commit, the bisect was =
+completed in a few steps:
 
-Please let me know if there is anything I can do to help resolve the
-problem.
+  $ git checkout 2a5db20fa532
+  $ make -j 12 my_defconfig bindeb-pkg
+ =20
+  [install this version on a compute node test image and reboot
+  one compute node with that image: the InfiniBand network was
+  working for that node, that's no surprise, since OpenSM was running
+  on the head node, but no issm* symlink was created; please note
+  that, surprisingly, the Ethernet network was not working, I mean
+  that the Ethernet interfaces were not found by the kernel...]
+ =20
+  root@node # ls -altrF /sys/class/infiniband_mad/
+  total 0
+  drwxr-xr-x 60 root root    0 Nov 26 17:06 ../
+  lrwxrwxrwx  1 root root    0 Nov 26 17:06 umad0 -> ../../devices/pci0000:=
+00/0000:00:01.1/0000:01:00.0/infiniband_mad/umad0/
+  -r--r--r--  1 root root 4096 Nov 26 17:06 abi_version
+  lrwxrwxrwx  1 root root    0 Nov 26 17:06 umad1 -> ../../devices/pci0000:=
+00/0000:00:01.1/0000:01:00.1/infiniband_mad/umad1/
+  drwxr-xr-x  2 root root    0 Nov 26 17:08 ./
+ =20
+  $ git bisect bad
+  Bisecting: 0 revisions left to test after this (roughly 0 steps)
+  [65528cfb21fdb68de8ae6dccae19af180d93e143] net/mlx5: mlx5_ifc update for =
+multi-plane support
+  $ make -j 12 my_defconfig bindeb-pkg
+ =20
+  [install this version on the compute node test image and reboot
+  one compute node with that image: the InfiniBand network again
+  working for that node, issm* symlinks were created;
+  Ethernet network again not working for that node...]
+ =20
+  root@node # ls -altrF /sys/class/infiniband_mad/
+  total 0
+  drwxr-xr-x 60 root root    0 Nov 26 17:31 ../
+  lrwxrwxrwx  1 root root    0 Nov 26 17:31 umad0 -> ../../devices/pci0000:=
+00/0000:00:01.1/0000:01:00.0/infiniband_mad/umad0/
+  -r--r--r--  1 root root 4096 Nov 26 17:31 abi_version
+  lrwxrwxrwx  1 root root    0 Nov 26 17:31 umad1 -> ../../devices/pci0000:=
+00/0000:00:01.1/0000:01:00.1/infiniband_mad/umad1/
+  lrwxrwxrwx  1 root root    0 Nov 26 17:36 issm1 -> ../../devices/pci0000:=
+00/0000:00:01.1/0000:01:00.1/infiniband_mad/issm1/
+  lrwxrwxrwx  1 root root    0 Nov 26 17:36 issm0 -> ../../devices/pci0000:=
+00/0000:00:01.1/0000:01:00.0/infiniband_mad/issm0/
+  drwxr-xr-x  2 root root    0 Nov 26 17:36 ./
+ =20
+  $ git bisect good
+  2a5db20fa532198639671713c6213f96ff285b85 is the first bad commit
+  commit 2a5db20fa532198639671713c6213f96ff285b85
+  Author: Mark Zhang <markzhang@nvidia.com>
+  Date:   Sun Jun 16 19:08:35 2024 +0300
+ =20
+      RDMA/mlx5: Add support to multi-plane device and port
+ =20
+      When multi-plane is supported, a logical port, which is aggregation of
+      multiple physical plane ports, is exposed for data transmission.
+      Compared with a normal mlx5 IB port, this logical port supports all
+      functionalities except Subnet Management.
+ =20
+      Signed-off-by: Mark Zhang <markzhang@nvidia.com>
+      Link: https://lore.kernel.org/r/7e37c06c9cb243be9ac79930cd17053903785=
+b95.1718553901.git.leon@kernel.org
+      Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+ =20
+   drivers/infiniband/hw/mlx5/main.c               | 60 +++++++++++++++++++=
+++----
+   drivers/infiniband/hw/mlx5/mlx5_ib.h            |  2 +
+   drivers/net/ethernet/mellanox/mlx5/core/vport.c |  1 +
+   include/linux/mlx5/driver.h                     |  1 +
+   4 files changed, 55 insertions(+), 9 deletions(-)
 
-Thanks,
-Guenter
 
----
-[   13.251894] ========================================================
-[   13.252024] WARNING: possible irq lock inversion dependency detected
-[   13.252307] 6.12.0-08446-g228a1157fb9f #1 Tainted: G                 N
-[   13.252472] --------------------------------------------------------
-[   13.252569] ip/1816 just changed the state of lock:
-[   13.252678] ffffffff81dec490 (napi_hash_lock){+...}-{3:3}, at: napi_disable+0xf8/0x10c
-[   13.253497] but this lock was taken by another, HARDIRQ-safe lock in the past:
-[   13.253637]  (&lp->lock){-.-.}-{3:3}
-[   13.253682]
-[   13.253682]
-[   13.253682] and interrupts could create inverse lock ordering between them.
-[   13.253682]
-[   13.253923]
-[   13.253923] other info that might help us debug this:
-[   13.254082]  Possible interrupt unsafe locking scenario:
-[   13.254082]
-[   13.254186]        CPU0                    CPU1
-[   13.254264]        ----                    ----
-[   13.254340]   lock(napi_hash_lock);
-[   13.254438]                                local_irq_disable();
-[   13.254532]                                lock(&lp->lock);
-[   13.254649]                                lock(napi_hash_lock);
-[   13.254772]   <Interrupt>
-[   13.254828]     lock(&lp->lock);
-[   13.254921]
-[   13.254921]  *** DEADLOCK ***
-[   13.254921]
-[   13.255049] 1 lock held by ip/1816:
-[   13.255127]  #0: ffffffff81dece50 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x22a/0x74c
-[   13.255398]
-[   13.255398] the shortest dependencies between 2nd lock and 1st lock:
-[   13.255593]  -> (&lp->lock){-.-.}-{3:3} ops: 75 {
-[   13.255802]     IN-HARDIRQ-W at:
-[   13.255910]                       __lock_acquire+0xa3e/0x2158
-[   13.256055]                       lock_acquire.part.0+0xba/0x21e
-[   13.256153]                       lock_acquire+0x44/0x5a
-[   13.256241]                       _raw_spin_lock+0x2c/0x40
-[   13.256343]                       pcnet32_interrupt+0x3c/0x200
-[   13.256442]                       __handle_irq_event_percpu+0xa0/0x2e0
-[   13.256547]                       handle_irq_event+0x3c/0x8a
-[   13.256640]                       handle_fasteoi_irq+0x9c/0x1d2
-[   13.256738]                       generic_handle_domain_irq+0x1c/0x2a
-[   13.256840]                       plic_handle_irq+0x7e/0xfc
-[   13.256937]                       generic_handle_domain_irq+0x1c/0x2a
-[   13.257041]                       riscv_intc_irq+0x26/0x60
-[   13.257133]                       handle_riscv_irq+0x4a/0x74
-[   13.257228]                       call_on_irq_stack+0x32/0x40
-[   13.257349]     IN-SOFTIRQ-W at:
-[   13.257420]                       __lock_acquire+0x40a/0x2158
-[   13.257515]                       lock_acquire.part.0+0xba/0x21e
-[   13.257611]                       lock_acquire+0x44/0x5a
-[   13.257699]                       _raw_spin_lock_irqsave+0x3a/0x64
-[   13.257798]                       pcnet32_poll+0x2ac/0x768
-[   13.257892]                       __napi_poll.constprop.0+0x26/0x128
-[   13.257997]                       net_rx_action+0x186/0x30e
-[   13.258090]                       handle_softirqs+0x110/0x4a2
-[   13.258187]                       __irq_exit_rcu+0xe2/0x10c
-[   13.258279]                       irq_exit_rcu+0xc/0x36
-[   13.258368]                       handle_riscv_irq+0x64/0x74
-[   13.258463]                       call_on_irq_stack+0x32/0x40
-[   13.258558]     INITIAL USE at:
-[   13.258629]                      __lock_acquire+0x46c/0x2158
-[   13.258723]                      lock_acquire.part.0+0xba/0x21e
-[   13.258820]                      lock_acquire+0x44/0x5a
-[   13.258909]                      _raw_spin_lock_irqsave+0x3a/0x64
-[   13.259007]                      pcnet32_get_stats+0x2a/0x62
-[   13.259101]                      dev_get_stats+0xc4/0x2a6
-[   13.259380]                      rtnl_fill_stats+0x32/0xee
-[   13.259480]                      rtnl_fill_ifinfo.isra.0+0x648/0x141c
-[   13.259589]                      rtmsg_ifinfo_build_skb+0x98/0xf0
-[   13.259711]                      rtmsg_ifinfo+0x36/0x78
-[   13.259799]                      register_netdevice+0x758/0x7a8
-[   13.259905]                      register_netdev+0x18/0x2e
-[   13.259999]                      pcnet32_probe1+0xb96/0x103e
-[   13.260099]                      pcnet32_probe_pci+0xcc/0x12e
-[   13.260196]                      pci_device_probe+0x82/0x100
-[   13.260291]                      really_probe+0x86/0x234
-[   13.260383]                      __driver_probe_device+0x5c/0xda
-[   13.260482]                      driver_probe_device+0x2c/0xb2
-[   13.260578]                      __driver_attach+0x70/0x120
-[   13.260671]                      bus_for_each_dev+0x60/0xae
-[   13.260764]                      driver_attach+0x1a/0x22
-[   13.260853]                      bus_add_driver+0xce/0x1d6
-[   13.260951]                      driver_register+0x3e/0xd8
-[   13.261048]                      __pci_register_driver+0x5c/0x66
-[   13.261149]                      pcnet32_init_module+0x58/0x14a
-[   13.261255]                      do_one_initcall+0x7e/0x2b6
-[   13.261352]                      kernel_init_freeable+0x2cc/0x33e
-[   13.261456]                      kernel_init+0x1e/0x11a
-[   13.261550]                      ret_from_fork+0xe/0x18
-[   13.261653]   }
-[   13.261705]   ... key      at: [<ffffffff82a9efb0>] __key.4+0x0/0x10
-[   13.261839]   ... acquired at:
-[   13.261907]    lock_acquire.part.0+0xba/0x21e
-[   13.261987]    lock_acquire+0x44/0x5a
-[   13.262056]    _raw_spin_lock+0x2c/0x40
-[   13.262132]    napi_hash_add+0x26/0xb8
-[   13.262207]    napi_enable+0x10e/0x124
-[   13.262281]    pcnet32_open+0x3c2/0x6b8
-[   13.262357]    __dev_open+0xba/0x158
-[   13.262427]    __dev_change_flags+0x19a/0x214
-[   13.262508]    dev_change_flags+0x1e/0x56
-[   13.262583]    do_setlink.isra.0+0x20c/0xcc2
-[   13.262661]    rtnl_newlink+0x592/0x74c
-[   13.262731]    rtnetlink_rcv_msg+0x3a8/0x582
-[   13.262807]    netlink_rcv_skb+0x44/0xf4
-[   13.262882]    rtnetlink_rcv+0x14/0x1c
-[   13.262956]    netlink_unicast+0x1a0/0x23e
-[   13.263031]    netlink_sendmsg+0x17e/0x38e
-[   13.263109]    __sock_sendmsg+0x40/0x7a
-[   13.263182]    ____sys_sendmsg+0x18e/0x1de
-[   13.263288]    ___sys_sendmsg+0x82/0xc6
-[   13.263360]    __sys_sendmsg+0x8e/0xe0
-[   13.263430]    __riscv_sys_sendmsg+0x16/0x1e
-[   13.263507]    do_trap_ecall_u+0x1b6/0x1e2
-[   13.263583]    _new_vmalloc_restore_context_a0+0xc2/0xce
-[   13.263685]
-[   13.263746] -> (napi_hash_lock){+...}-{3:3} ops: 2 {
-[   13.263891]    HARDIRQ-ON-W at:
-[   13.263963]                     __lock_acquire+0x688/0x2158
-[   13.264057]                     lock_acquire.part.0+0xba/0x21e
-[   13.264153]                     lock_acquire+0x44/0x5a
-[   13.264240]                     _raw_spin_lock+0x2c/0x40
-[   13.264330]                     napi_disable+0xf8/0x10c
-[   13.264419]                     pcnet32_close+0x5c/0x126
-[   13.264511]                     __dev_close_many+0x8a/0xf8
-[   13.264609]                     __dev_change_flags+0x176/0x214
-[   13.264708]                     dev_change_flags+0x1e/0x56
-[   13.264800]                     do_setlink.isra.0+0x20c/0xcc2
-[   13.264900]                     rtnl_newlink+0x592/0x74c
-[   13.264988]                     rtnetlink_rcv_msg+0x3a8/0x582
-[   13.265082]                     netlink_rcv_skb+0x44/0xf4
-[   13.265174]                     rtnetlink_rcv+0x14/0x1c
-[   13.265268]                     netlink_unicast+0x1a0/0x23e
-[   13.265367]                     netlink_sendmsg+0x17e/0x38e
-[   13.265466]                     __sock_sendmsg+0x40/0x7a
-[   13.265557]                     ____sys_sendmsg+0x18e/0x1de
-[   13.265649]                     ___sys_sendmsg+0x82/0xc6
-[   13.265738]                     __sys_sendmsg+0x8e/0xe0
-[   13.265828]                     __riscv_sys_sendmsg+0x16/0x1e
-[   13.265928]                     do_trap_ecall_u+0x1b6/0x1e2
-[   13.266024]                     _new_vmalloc_restore_context_a0+0xc2/0xce
-[   13.266134]    INITIAL USE at:
-[   13.266206]                    __lock_acquire+0x46c/0x2158
-[   13.266298]                    lock_acquire.part.0+0xba/0x21e
-[   13.266394]                    lock_acquire+0x44/0x5a
-[   13.266480]                    _raw_spin_lock+0x2c/0x40
-[   13.266572]                    napi_hash_add+0x26/0xb8
-[   13.266660]                    napi_enable+0x10e/0x124
-[   13.266748]                    pcnet32_open+0x3c2/0x6b8
-[   13.266839]                    __dev_open+0xba/0x158
-[   13.266930]                    __dev_change_flags+0x19a/0x214
-[   13.267026]                    dev_change_flags+0x1e/0x56
-[   13.267116]                    do_setlink.isra.0+0x20c/0xcc2
-[   13.267211]                    rtnl_newlink+0x592/0x74c
-[   13.267299]                    rtnetlink_rcv_msg+0x3a8/0x582
-[   13.267395]                    netlink_rcv_skb+0x44/0xf4
-[   13.267489]                    rtnetlink_rcv+0x14/0x1c
-[   13.267578]                    netlink_unicast+0x1a0/0x23e
-[   13.267670]                    netlink_sendmsg+0x17e/0x38e
-[   13.267763]                    __sock_sendmsg+0x40/0x7a
-[   13.267851]                    ____sys_sendmsg+0x18e/0x1de
-[   13.267946]                    ___sys_sendmsg+0x82/0xc6
-[   13.268034]                    __sys_sendmsg+0x8e/0xe0
-[   13.268121]                    __riscv_sys_sendmsg+0x16/0x1e
-[   13.268215]                    do_trap_ecall_u+0x1b6/0x1e2
-[   13.268309]                    _new_vmalloc_restore_context_a0+0xc2/0xce
-[   13.268419]  }
-[   13.268460]  ... key      at: [<ffffffff81dec490>] napi_hash_lock+0x18/0x40
-[   13.268579]  ... acquired at:
-[   13.268636]    mark_lock+0x5f2/0x88a
-[   13.268705]    __lock_acquire+0x688/0x2158
-[   13.268779]    lock_acquire.part.0+0xba/0x21e
-[   13.268858]    lock_acquire+0x44/0x5a
-[   13.268930]    _raw_spin_lock+0x2c/0x40
-[   13.269002]    napi_disable+0xf8/0x10c
-[   13.269073]    pcnet32_close+0x5c/0x126
-[   13.269145]    __dev_close_many+0x8a/0xf8
-[   13.269220]    __dev_change_flags+0x176/0x214
-[   13.269298]    dev_change_flags+0x1e/0x56
-[   13.269371]    do_setlink.isra.0+0x20c/0xcc2
-[   13.269449]    rtnl_newlink+0x592/0x74c
-[   13.269520]    rtnetlink_rcv_msg+0x3a8/0x582
-[   13.269596]    netlink_rcv_skb+0x44/0xf4
-[   13.269671]    rtnetlink_rcv+0x14/0x1c
-[   13.269742]    netlink_unicast+0x1a0/0x23e
-[   13.269818]    netlink_sendmsg+0x17e/0x38e
-[   13.269894]    __sock_sendmsg+0x40/0x7a
-[   13.269966]    ____sys_sendmsg+0x18e/0x1de
-[   13.270041]    ___sys_sendmsg+0x82/0xc6
-[   13.270114]    __sys_sendmsg+0x8e/0xe0
-[   13.270187]    __riscv_sys_sendmsg+0x16/0x1e
-[   13.270268]    do_trap_ecall_u+0x1b6/0x1e2
-[   13.270346]    _new_vmalloc_restore_context_a0+0xc2/0xce
-[   13.270439]
-[   13.270525]
-[   13.270525] stack backtrace:
-[   13.270729] CPU: 0 UID: 0 PID: 1816 Comm: ip Tainted: G                 N 6.12.0-08446-g228a1157fb9f #1
-[   13.270933] Tainted: [N]=TEST
-[   13.271006] Hardware name: riscv-virtio,qemu (DT)
-[   13.271165] Call Trace:
-[   13.271270] [<ffffffff80006d42>] dump_backtrace+0x1c/0x24
-[   13.271373] [<ffffffff80dc5574>] show_stack+0x2c/0x38
-[   13.271467] [<ffffffff80ddc854>] dump_stack_lvl+0x74/0xac
-[   13.271565] [<ffffffff80ddc8a0>] dump_stack+0x14/0x1c
-[   13.271657] [<ffffffff8008551a>] print_irq_inversion_bug.part.0+0x1aa/0x1fe
-[   13.271775] [<ffffffff800867f8>] mark_lock+0x5f2/0x88a
-[   13.271869] [<ffffffff80087d44>] __lock_acquire+0x688/0x2158
-[   13.271973] [<ffffffff80086e10>] lock_acquire.part.0+0xba/0x21e
-[   13.272078] [<ffffffff80086fb8>] lock_acquire+0x44/0x5a
-[   13.272173] [<ffffffff80de8ea4>] _raw_spin_lock+0x2c/0x40
-[   13.272269] [<ffffffff80b89bf0>] napi_disable+0xf8/0x10c
-[   13.272360] [<ffffffff8099d022>] pcnet32_close+0x5c/0x126
-[   13.272454] [<ffffffff80b8fa52>] __dev_close_many+0x8a/0xf8
-[   13.272549] [<ffffffff80b9790e>] __dev_change_flags+0x176/0x214
-[   13.272647] [<ffffffff80b979ca>] dev_change_flags+0x1e/0x56
-[   13.272740] [<ffffffff80ba93a8>] do_setlink.isra.0+0x20c/0xcc2
-[   13.272838] [<ffffffff80baa3f0>] rtnl_newlink+0x592/0x74c
-[   13.272935] [<ffffffff80babf5a>] rtnetlink_rcv_msg+0x3a8/0x582
-[   13.273032] [<ffffffff80c05bcc>] netlink_rcv_skb+0x44/0xf4
-[   13.273127] [<ffffffff80ba64f6>] rtnetlink_rcv+0x14/0x1c
-[   13.273223] [<ffffffff80c05578>] netlink_unicast+0x1a0/0x23e
-[   13.273326] [<ffffffff80c05794>] netlink_sendmsg+0x17e/0x38e
-[   13.273423] [<ffffffff80b633e2>] __sock_sendmsg+0x40/0x7a
-[   13.273515] [<ffffffff80b63742>] ____sys_sendmsg+0x18e/0x1de
-[   13.273610] [<ffffffff80b65e44>] ___sys_sendmsg+0x82/0xc6
-[   13.273704] [<ffffffff80b662ac>] __sys_sendmsg+0x8e/0xe0
-[   13.273795] [<ffffffff80b66314>] __riscv_sys_sendmsg+0x16/0x1e
-[   13.273894] [<ffffffff80ddd3e4>] do_trap_ecall_u+0x1b6/0x1e2
-[   13.273992] [<ffffffff80de9c7a>] _new_vmalloc_restore_context_a0+0xc2/0xce
+In other words, bingo!, your guess looks correct, the first bad commit
+is the one you mentioned.
 
----
-# bad: [228a1157fb9fec47eb135b51c0202b574e079ebf] Merge tag '6.13-rc-part1-SMB3-client-fixes' of git://git.samba.org/sfrench/cifs-2.6
-# good: [43fb83c17ba2d63dfb798f0be7453ed55ca3f9c2] Merge tag 'soc-arm-6.13' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
-git bisect start '228a1157fb9f' '43fb83c17ba2'
-# bad: [071b34dcf71523a559b6c39f5d21a268a9531b50] Merge tag 'sound-6.13-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound
-git bisect bad 071b34dcf71523a559b6c39f5d21a268a9531b50
-# bad: [31a1f8752f7df7e3d8122054fbef02a9a8bff38f] Merge branch 'phy-mediatek-reorg'
-git bisect bad 31a1f8752f7df7e3d8122054fbef02a9a8bff38f
-# bad: [de51ad08b1177bbbb8b60cb7dd4c3c5dd50d262f] phonet: Pass net and ifindex to rtm_phonet_notify().
-git bisect bad de51ad08b1177bbbb8b60cb7dd4c3c5dd50d262f
-# good: [76d46d766a45e205e59af511efbb24abe22d0b4c] net: emaclite: Adopt clock support
-git bisect good 76d46d766a45e205e59af511efbb24abe22d0b4c
-# bad: [a37b0e4eca0436ebc17d512d70b1409956340688] ipv6: Use rtnl_register_many().
-git bisect bad a37b0e4eca0436ebc17d512d70b1409956340688
-# bad: [de306f0051ae947680a13c13a9fd9373d7460bb1] net: gianfar: Use __be64 * to store pointers to big endian values
-git bisect bad de306f0051ae947680a13c13a9fd9373d7460bb1
-# good: [5c16e118b796e95d6e5c80c5d8af2591262431c9] net: ethernet: ti: am65-cpsw: Use __be64 type for id_temp
-git bisect good 5c16e118b796e95d6e5c80c5d8af2591262431c9
-# bad: [41936522749654e64531121bbd6a95bab5d56d76] bnxt: Add support for persistent NAPI config
-git bisect bad 41936522749654e64531121bbd6a95bab5d56d76
-# good: [79636038d37e7bd4d078238f2a3f002cab4423bc] ipv4: tcp: give socket pointer to control skbs
-git bisect good 79636038d37e7bd4d078238f2a3f002cab4423bc
-# good: [516010460011ae74ac3b7383cf90ed27e2711cd6] netdev-genl: Dump napi_defer_hard_irqs
-git bisect good 516010460011ae74ac3b7383cf90ed27e2711cd6
-# good: [0137891e74576f77a7901718dc0ce08ca074ae74] netdev-genl: Dump gro_flush_timeout
-git bisect good 0137891e74576f77a7901718dc0ce08ca074ae74
-# bad: [1287c1ae0fc227e5acef11a539eb4e75646e31c7] netdev-genl: Support setting per-NAPI config values
-git bisect bad 1287c1ae0fc227e5acef11a539eb4e75646e31c7
-# bad: [86e25f40aa1e9e54e081e55016f65b5c92523989] net: napi: Add napi_config
-git bisect bad 86e25f40aa1e9e54e081e55016f65b5c92523989
-# first bad commit: [86e25f40aa1e9e54e081e55016f65b5c92523989] net: napi: Add napi_config
+
+Now, I will try to upgrade the firmware of the InfiniBand NICs, as you
+suggested, and check whether this solves the issue with the recent
+Linux kernel versions.
+
+Please confirm that the procedure to be followed is the one described in
+<https://docs.nvidia.com/networking/display/ubuntu2204/firmware+burning>
+
+Thanks for your time and patience, and for all the help you are kindly
+providing!   :-)
+
+
+--=20
+ http://www.inventati.org/frx/
+ There's not a second to spare! To the laboratory!
+..................................................... Francesco Poli .
+ GnuPG key fpr =3D=3D CA01 1147 9CD2 EFDF FB82  3925 3E1C 27E1 1F69 BFFE
+
+--Signature=_Wed__27_Nov_2024_18_48_03_+0100_yjdnRe8fnuF.YdD8
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEygERR5zS79/7gjklPhwn4R9pv/4FAmdHW1MACgkQPhwn4R9p
+v/6QJRAAjYjCYH0ksnEdwq2Cj0PkDmAO2M5GpTH7Xg4i7ecErrvYyCGOXpKJ4Qog
+1qv5BtVYVbcK9fcDa8CUhZehbNH+4nVg8qHHT0I2HRrhErJErP7EoudHUfc9WeDc
+mRiXUQV9dg3hWY1PNMwees9RC81BADOO4GOEsme5rwuoL1P6zanR0plY5MmVbhj/
+f9Cia8wZoun19miYeA5JsEHDODjdhqEcnAuubF5JBEem9ZRvSmhlJJHapT+Tsb4k
+tu9iYg5+8AdCWQ0zTYJfR7bFgkbJ/kZNbk3e4KfXRgYXlukl89mS8+B0m2k+vbqt
+x46jm3W4yoBuxoWbA6i/sfHVX7H8gu1C0/TTMQ/CXM/mD8eVnFAmrHF/wN2BI50S
+OLPWrzSuVMzUxuW2qaUBaXaQLTwaOW+NVQb6IM5mknHY/GizskL6nP+aBomjSHo6
+MqYdj/NaWInOn/uNvr8h7yYsBQlK5wyjiwF0wU/f4HnTIUda11ZQZxOvDuQSHv9p
+ZdlwCsobdX97rl94Ty/oku96DAog/j6pKoFFDOcqXzCgEV11WU79KQ+6M0ACBf+/
+PVCCLnf/UjuoogDuaOeQ6QtMelS0SVX6uzh70gWv71q3EF396EpxqS1OCTtVHkxf
+buthBhNT6kDskVixMrBXwv2psypw7tGm7MqfzI4Ichf7IvzHYv0=
+=PxeC
+-----END PGP SIGNATURE-----
+
+--Signature=_Wed__27_Nov_2024_18_48_03_+0100_yjdnRe8fnuF.YdD8--
 
