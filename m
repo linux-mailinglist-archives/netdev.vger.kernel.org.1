@@ -1,208 +1,229 @@
-Return-Path: <netdev+bounces-147599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30489DA843
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 14:10:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9BA49DA860
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 14:19:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B92282557
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 13:10:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7A9DB23D45
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 13:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBA11FCFD5;
-	Wed, 27 Nov 2024 13:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525441F9F7B;
+	Wed, 27 Nov 2024 13:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FEdIPDUJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3661FCD14
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 13:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732713024; cv=none; b=uHy2EtpgWt5j9V9vx7zEmi+ziHzLVasxjWj/vXB8AHUCDL46YNwagN7voyYWDGbCQu2EFRb9PKY6QvwF8GgoJQqtxDlA4iOW+p/K/08eI/nUMq4jCMYbEWFwFVBw1w9c8PEVcXGikNYls9UqjLhwSg5yePptonOB6wsApD180kw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732713024; c=relaxed/simple;
-	bh=rLvBpuoyTfHZljNsekWfKlVu7aHKebHTp2fF7xHczwY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kNe6HVRRytdG8RNDoMpdohUl+GRGbqM2AIJs/bGdC2lC08urS7IQtHjyaBtR6We5/CN+6jORonug69dnrspELfomx5h4YP7NYAKdQMx2pnqZOJ16kfPhaB81dHKs0SMhx2iyNRHIUM+4XTSDqKN8mLlAMC81MygXSLRZbHrm0tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tGHo4-0001wi-VO; Wed, 27 Nov 2024 14:10:12 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tGHo3-000R6c-0w;
-	Wed, 27 Nov 2024 14:10:12 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tGHo4-000O9P-00;
-	Wed, 27 Nov 2024 14:10:12 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [RFC net-next v1 2/2] net. phy: dp83tg720: Add randomized polling intervals for unstable link detection
-Date: Wed, 27 Nov 2024 14:10:11 +0100
-Message-Id: <20241127131011.92800-2-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241127131011.92800-1-o.rempel@pengutronix.de>
-References: <20241127131011.92800-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F061FC0E1
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 13:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732713567; cv=fail; b=aNLvgR/OReITNW2rbcRDi9FhTJWOKTi7xBQYys2Vmru8bB4OgpxlT3h+G3cP6WQQeQULTzp1jfd92sXrDtTt9LruSrsQLLf06Hjs5CHxZ6upvE1pQ5GK83Dhzb6FPefEXpkmgPRhHnyC716JTq4LWHvqqDsDRCanNehFveyCPVE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732713567; c=relaxed/simple;
+	bh=hAnOkIeAug6SlmHGfxK1sYBOFtrCY3qs6Vc6Cv9R2/k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MicIumQ+xe5YymPAeug8rlHbEfKPY955EQzt2vQZ9AIenLkIxdkHMXqDCpW2nopVrTympuyVK+ULx9UKr1K1Xb/QAN6pEU2KV+OEHgvd4eGZdkCGs4oh43hRLsBBvEECjVTSHn0as0XpRSM3KDugiAQiPD8M+djCLgDxPDVfEUQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FEdIPDUJ; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732713565; x=1764249565;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=hAnOkIeAug6SlmHGfxK1sYBOFtrCY3qs6Vc6Cv9R2/k=;
+  b=FEdIPDUJOiak8D7Cj0N7JizXJnF2nm+e1VPmWimpxxMhxToO/G0AGgmO
+   85duepmXLqnKwNSi6x9uzXcre02se7GOlhgOPfM631l+186bDda73QhXC
+   zJU2G/ishWdBEyTgG510MeboSa841/Tqu92td2efNrrx0Oh7nghDfymOv
+   s/avOgIqqYdBxrfMDlBE9QRs51Ha8mIBPVJHvV3BDLTlSUyw7VjOdPnJw
+   I2qsNNrVKwKdEpLRyBRbZfcTWlBYG6cgg7YZlwU2B8wd9xpI3uCbi1EQC
+   dWEo3RXnIB5iHeq9xSFuZVimAOyGiQqudo5q9BFyYtbE+KkgZhtZKIVzs
+   A==;
+X-CSE-ConnectionGUID: spXm6Y11ReSaGHM7kd1ybA==
+X-CSE-MsgGUID: Q6Ocaeq1Tp2h0h1l/lmfJQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11268"; a="50443961"
+X-IronPort-AV: E=Sophos;i="6.12,189,1728975600"; 
+   d="scan'208";a="50443961"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2024 05:19:24 -0800
+X-CSE-ConnectionGUID: 2emgnzOlTcKGvPujODNWtw==
+X-CSE-MsgGUID: dG/u3DeWR0i4yMQ4wCu5Cw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,189,1728975600"; 
+   d="scan'208";a="122905525"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Nov 2024 05:19:22 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 27 Nov 2024 05:19:22 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 27 Nov 2024 05:19:22 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 27 Nov 2024 05:19:22 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=a4CpTmmlbi7kfIdeoGyF926vSGQFOn4MSndWQac9G1aowgGpLK3foJGblLkiVoZ8bRfIX+QYP1BZ0vvYXilUDpnGNH5G7sUNC/eko9WGOAYFkbgx3DKJ6S9He09XQNzILlSq6fSEw1P8FTqQ3IEDvDRHh/NjilbBLL8uv0KqPKixhEmr3rXmOsBP1e1mqlkT/OZqhTAXoktCVGznqmvT4e5i7cTXR5kSyZ/03TJsG/yQF4CVz6Vmx2uXQvDrqKkuomfHTZKfKWlIZd7Z4k/v2BxK/tCe5cbN1vBISzOWyXrlt8H+YTtC5rDpKuWv7tVATOozIKtj2CJ2dj8W8O2F1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r7BZ1hknu+0/PJrZ9arWKPuoV/F6yPiqEmgHcOPhgiw=;
+ b=MvDn2Bv+W+DJDI8tjA0r5q1fczq2PfwdRsH1nhLTwATmkcw50WbeRqYL3FwXqHpMFCRtJgIQTnvFePjugySwU6x8+dhZRZo5YK/rWKqotrdnme/UP58stLQaAL53d8BB5GK8Ll7TAYazuNYlBO3Ho0A3hxEVPlMcTs/esE6KikcB+ThM6N5q14ehYdLlPa9FkKdamQLoxfGe8J6C3Mxf+1waGpWirhbXOjHsjlgFZHlACWkTYwbPQQyUqCXxlo5ZKp79bP3YFiR+Jeldh1Ct0EwrJseOqx6Q5dXGh7JijtB+TKbF70jHKF1+UH6Uq0++yIuIlwV2cpnLDHCJTGaLIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB4904.namprd11.prod.outlook.com (2603:10b6:510:40::10)
+ by DM4PR11MB6334.namprd11.prod.outlook.com (2603:10b6:8:b5::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.14; Wed, 27 Nov
+ 2024 13:19:20 +0000
+Received: from PH0PR11MB4904.namprd11.prod.outlook.com
+ ([fe80::c7ea:ab4f:35f9:9b07]) by PH0PR11MB4904.namprd11.prod.outlook.com
+ ([fe80::c7ea:ab4f:35f9:9b07%7]) with mapi id 15.20.8207.010; Wed, 27 Nov 2024
+ 13:19:20 +0000
+From: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Olech, Milena" <milena.olech@intel.com>
+Subject: RE: [PATCH iwl-net] ice: fix incorrect PHY settings for 100 GB/s
+Thread-Topic: [PATCH iwl-net] ice: fix incorrect PHY settings for 100 GB/s
+Thread-Index: AQHbP+0+/jmF4KnFUU6JzgEAAJ1pD7LJ1TWAgAEci0A=
+Date: Wed, 27 Nov 2024 13:19:20 +0000
+Message-ID: <PH0PR11MB4904824FA658713F78CA404D94282@PH0PR11MB4904.namprd11.prod.outlook.com>
+References: <20241126102311.344972-1-przemyslaw.korba@intel.com>
+ <946b6621-fd35-46b9-84ee-37de14195610@lunn.ch>
+In-Reply-To: <946b6621-fd35-46b9-84ee-37de14195610@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB4904:EE_|DM4PR11MB6334:EE_
+x-ms-office365-filtering-correlation-id: 35374bac-1bee-4efd-38d9-08dd0ee61a2c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?DII5gVea6n5nIi/Ywu/hh7SMZ9DjauaSoRAIOngkij9xIJieUfIi4j+VLqQA?=
+ =?us-ascii?Q?E04NvmuCGErJObQhhatRM0CdlmS93E9xmTtUQHN5HHtTWh/A19CAq/BZ7N7L?=
+ =?us-ascii?Q?Dz9SH6gpgotu9m8uaAklXb+2vNmiaMd0/Lfycjp89ACRJ/+bijLdW5AWd56w?=
+ =?us-ascii?Q?+HTjtlfpbY4roUWUzPpjXV+CB44GeukzswB0KkeSpq6epPu/psQQOD1YlDfH?=
+ =?us-ascii?Q?2bhevLwlkiVbxP/GnF/0aGb4j3NoFM9RFQrO0Ev8nZQbs6vKuuSPzgwlAk41?=
+ =?us-ascii?Q?rbJ1EBG9BBFCtb/Y+CfIqLBWMPdLiEk0/RFaRjejdFb+HCa/NtyHWtLQUK2y?=
+ =?us-ascii?Q?9Ul+kgEoB8sPaU6rq6a3LKeLXyITAj+wDSziP4rUpkYMQDO+fQ/kOISRToff?=
+ =?us-ascii?Q?5J1NBzbUNpzACBe79EXbnP1WgKAxoJxgffuaW+3m+YaVyRc9kmTnpzYWGjWf?=
+ =?us-ascii?Q?0lleIdJzD5F0g5TZVjpA1HN9LzqCrhDA3M98qYmDUukU6lW9wyNAOG+DlK6X?=
+ =?us-ascii?Q?G8wqpX1ppRnENERDPp6ioB+preyt7xRb7KvIlLwXjACx3nHL1ywz2oooZhVy?=
+ =?us-ascii?Q?OTfKbNA3T7v6cHDFCjxHfrdb+jsz2LR1aW6I5u8fv/3/lzZAsIWfL6jqDih+?=
+ =?us-ascii?Q?w40epCI+0KJLMI8t71pBt6ufveIr/2WI7NzA28/398dzQthpbKr1k7+cWTYv?=
+ =?us-ascii?Q?s2wDjvn3dAiGT5lU3Djsm0m5R2V//VRONz3jq2aDAp6JJZSypuFKBiP0BUEo?=
+ =?us-ascii?Q?0ajEb3AzgZ3XhAx8I1qGfmkFwfG1NKORtPPkN7K3QpLL9rdfDv2psR7eTnJH?=
+ =?us-ascii?Q?hSWS7SVOv9F6imlJZ89NXRw/xYMoQuLWfLNAEAQsAUyxidI28kzhfJ3OcL4O?=
+ =?us-ascii?Q?7DjEBF3L0MIvaqD+nK0wc/T538Ywrs6S5WJxHgTNVkKn408pBVRPqhuIStHc?=
+ =?us-ascii?Q?YSjZsGh5AkdKwJxSLHWaycCbGF/8tB2Zv6RX/xHrYtAD+DLgJt+jDRTTMxgH?=
+ =?us-ascii?Q?rD59/NngsKsEi+tkJr3diMmPkocjwd2kS5uT+XY6LDm4gxUr1B9yq7OEeW+Z?=
+ =?us-ascii?Q?iFtuCklqHzIycSPcJ4XuqGdPudA+rZ1amx+u2RgCIGh2F/wZGpHYbAd/tgIo?=
+ =?us-ascii?Q?VpEgMdFlSNIsL2x78upkb/i6DjErBLATWzhWbqxC+MzgQYaqlKmzO3OfzjPw?=
+ =?us-ascii?Q?5Rt6Y4VGrUDFg3e93vLWKiucrOY6g5+uQV0HqwKU4fwDBRC4FEaRcCiejbnR?=
+ =?us-ascii?Q?M1YaHFGgK+cR1Ogrq8fdglExCtLvkvH1262Cs/Wno2iqp3nbFfzBYRlebTcR?=
+ =?us-ascii?Q?fG2C4l8j9rpH6HYvwpzkxBVKMQMsHlz1k3aen7k7T8WNWx8YUPKSPhArBlLR?=
+ =?us-ascii?Q?HbVZPvhHecznL2qqf7gI3o5nlDTa4eJpC+jofNK0h5AponMIVw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4904.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7JC+LPTV/d5h72OvVl8AkuhsFLX1Vojfl4u35E6Ukm1dPdGSQNu617mCjc8c?=
+ =?us-ascii?Q?q+i/WIoz15VRLT1zuJQ9nkJaopkEYS+piAq1u5CwJvjzgDNdDDN7UXVV/Ag3?=
+ =?us-ascii?Q?zqlAFOfPWyHEk+CWYJrvx+ZH9DqcU/TM39mliiftrfIJ3XMRvaOrFA+cu0i1?=
+ =?us-ascii?Q?6SiZjw1DgHfKRYO4DXFkzwjj6cO1SpSPCbtzygbeTxMHiza1AU8R9rIV3bNR?=
+ =?us-ascii?Q?laHK5vebY6eaGBQTaceYdIMsWSjlufoCHI0F7yVnAxVVtrekeUKTy2eSVjcu?=
+ =?us-ascii?Q?Wbis8ykG2soq2/aoVnjvcjDnrlpzMC1DgxVL70dILDaLv4U1NYBRt0PrSUWJ?=
+ =?us-ascii?Q?8QH4jbDdU5gSVsFJBQSimq1AWzAuIdADJdqrAhUSVikHxYp0uwFcmoanaxYc?=
+ =?us-ascii?Q?cBublK9d0gbJb85X8ZQpkGizzCwZFEvU4Svn6H/6LCcymRVqzTridYYg8Y0R?=
+ =?us-ascii?Q?MyDUBxg4M4LmcGP8yO9WGmds+e1AZDe/tcLedRytqDFlrzRSzuU5hjNQXmFW?=
+ =?us-ascii?Q?eFkOzryOy3aN5nTNtKhW2voCMX/yeSgv3NdAZQJCkncTpAzgwe4AQR8895ns?=
+ =?us-ascii?Q?draeS38puJ/iA3hIJVdNRPYHaVM39JO0nPGb4PyGJFBtrw39ia63AlzhAvyC?=
+ =?us-ascii?Q?YMD5EUEKMfGHQ+IyncJNhx4qqiqaGZP6MrFAhx70++MJZPsE0t19qv4p9RfV?=
+ =?us-ascii?Q?ZuFcnR1HM6xnUmE+C1xmaWMT1/SgztfOkJj4f3/zHX46tDMCeEY3xbnpaM3i?=
+ =?us-ascii?Q?q5IF1qbTGduT4Md9RhrVd4N6Vtz8eEqQ/llL9EryTWnLiMeeaGj4EUOx9LL/?=
+ =?us-ascii?Q?fc8eUk3ldMy8QYdlH8KfQmgao3uvbAH+ecHBwvUw0BCHpVjdH2ExD+kXV1Md?=
+ =?us-ascii?Q?5qqFsyAY/cZI1IZ5YP0LMsBDb+qtEW4iVcgBQ5IT1fIkstXvemrA18HGTfnt?=
+ =?us-ascii?Q?yazJjjuvMKZnDjyWpRIyJLcIwvTQ9XS1PtxSJ1kHrpQTNlNzG18Ikhiqikba?=
+ =?us-ascii?Q?FqbUhR+zx40MKFq0qWKOCiKs9z3J+uYK/K3Nj3M5NMn0Fs5sMPa09qByypk1?=
+ =?us-ascii?Q?fxEyfTuOvkISwf+ULT/IA/nuudwEQrti3Y2Piv19zWc8AHApQBBJzuMvHyP9?=
+ =?us-ascii?Q?DQVcWL31CbaaawrcbiEISA8tIaTCih0R+DaKRB5x5oTLAXcledXGbhP+/tO/?=
+ =?us-ascii?Q?cMq6s1SuhCaDMbbBlauH/0pa8N6SMt26z5pQMhwsWV5NN6TOTbprPGwHmr76?=
+ =?us-ascii?Q?0VwZepsaKfCFomFun/YW8xddBQSW/tMxdmJHZgGxJRfzkJOUuT2KpmgrlH5X?=
+ =?us-ascii?Q?vSRGFmgnhdtmoE3SQaUYCsd0J5EpW2cJ70Th4tmjMa80J7f+rDTQLKBPdH/a?=
+ =?us-ascii?Q?XAUqMbWiIsszhJDbmHihZK5NJKuw1QGlnJ/RC6M4+ESbfGustq/XImy3QRyQ?=
+ =?us-ascii?Q?S+PBGNb4/n5H88C+o7RmYmvfgax32WrX5zxpGxEZTPbYTGES0Udw7fTpQDfo?=
+ =?us-ascii?Q?TUv5s8hIgvpCLaFLaEQ2ZemNwsgQQUInnfJm45HAfTr6cxCi/EzF86sWCgzV?=
+ =?us-ascii?Q?t7t4QIcbKmZqAov1uFArtPztCkligO5Sy9UqC62X?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4904.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35374bac-1bee-4efd-38d9-08dd0ee61a2c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Nov 2024 13:19:20.0624
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: r6e3a69bX2W5OG/cVc/rMUtkcQ3DSzKsLIYQxAi3xi9cWTSGTAF4rCdR3Xb2hc+fU0g8Q+QQXEeWEwWpR5EQbiZd6QyOiyzGU6/imDWAbu4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6334
+X-OriginatorOrg: intel.com
 
-Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
-report a stable link state. To handle this, the PHY must be periodically reset
-when the link is down. However, synchronized reset intervals between the PHY
-and its link partner can result in a deadlock, preventing the link from
-re-establishing.
+> On Tue, Nov 26, 2024 at 11:23:11AM +0100, Przemyslaw Korba wrote:
+> > ptp4l application reports too high offset when ran on E823 device with
+> > a 100GB/s link. Those values cannot go under 100ns, like in a PTP
+> > working case when using 100 GB/s cable.
+> > This is due to incorrect frequency settings on the PHY clocks for
+> > 100 GB/s speed. Changes are introduced to align with the internal
+> > hardware documentation, and correctly initialize frequency in PHY
+> > clocks with the frequency values that are in our HW spec.
+> > To reproduce the issue run ptp4l as a Time Receiver on E823 device,
+> > and observe the offset, which will never approach values seen in the
+> > PTP working case.
+>=20
+> You forgot to Cc: the PTP maintainer.
 
-This change introduces a randomized polling interval when the link is down to
-desynchronize resets between link partners.
+Who is the PTP maintainer? Is it necessary? This is only Intel's driver,=20
+I am not sure if PTP maintainer is necessary.=20
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/phy/dp83tg720.c | 76 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+>=20
+> If i spent the time to measure the latency and configured ptp4l correctly=
+ to take
+> into account the latency, would i not see this issue? And will this chang=
+e then
+> cause a regression because it changes the latency invalidating my measure=
+ments?
+>=20
 
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index f56659d41b31..64c65454cf94 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -4,12 +4,31 @@
-  */
- #include <linux/bitfield.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/jiffies.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/phy.h>
-+#include <linux/random.h>
+I don't think ptp4l config, or configured latency has anything to do with t=
+hat, you should
+still see issue with any configured latency. due to incorrect PHY settings =
+there was incorrect=20
+calculation in Vernier algorithm. Not much to do with latency. The Problem =
+was that the offset=20
+was quite far off,  I will attach logs in commit message once the window is=
+ opened. I did not test=20
+with other ptp4l configs other than the standard one. Thanks for reviewing =
+by the way! : )
 
- #include "open_alliance_helpers.h"
-
-+/*
-+ * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
-+ *				 is active.
-+ * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
-+ *				 the link is down.
-+ * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
-+ *				 the link is down.
-+ *
-+ * These values are not documented or officially recommended by the vendor but
-+ * were determined through empirical testing. They achieve a good balance in
-+ * minimizing the number of reset retries while ensuring reliable link recovery
-+ * within a reasonable timeframe.
-+ */
-+#define DP83TG720S_POLL_ACTIVE_LINK		1000
-+#define DP83TG720S_POLL_NO_LINK_MIN		100
-+#define DP83TG720S_POLL_NO_LINK_MAX		1000
-+
- #define DP83TG720S_PHY_ID			0x2000a284
-
- /* MDIO_MMD_VEND2 registers */
-@@ -355,6 +374,11 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 		if (ret)
- 			return ret;
-
-+		/* The sleep value is based on testing with the DP83TG720S-Q1
-+		 * PHY. The PHY needs some time to recover from a link loss.
-+		 */
-+		msleep(600);
-+
- 		/* After HW reset we need to restore master/slave configuration.
- 		 * genphy_c45_pma_baset1_read_master_slave() call will be done
- 		 * by the dp83tg720_config_aneg() function.
-@@ -482,6 +506,57 @@ static int dp83tg720_probe(struct phy_device *phydev)
- 	return 0;
- }
-
-+/**
-+ * dp83tg720_phy_get_next_update_time - Determine the next update time for PHY
-+ *                                      state
-+ * @phydev: Pointer to the phy_device structure
-+ *
-+ * This function addresses a limitation of the DP83TG720 PHY, which cannot
-+ * reliably detect or report a stable link state. To recover from such
-+ * scenarios, the PHY must be periodically reset when the link is down. However,
-+ * if the link partner also runs Linux with the same driver, synchronized reset
-+ * intervals can lead to a deadlock where the link never establishes due to
-+ * simultaneous resets on both sides.
-+ *
-+ * To avoid this, the function implements randomized polling intervals when the
-+ * link is down. It ensures that reset intervals are desynchronized by
-+ * introducing a random delay between a configured minimum and maximum range.
-+ * When the link is up, a fixed polling interval is used to minimize overhead.
-+ *
-+ * This mechanism guarantees that the link will reestablish within 10 seconds
-+ * in the worst-case scenario.
-+ *
-+ * Return: Time (in milliseconds) until the next update event for the PHY state
-+ * machine.
-+ */
-+static unsigned int dp83tg720_phy_get_next_update_time(struct phy_device *phydev)
-+{
-+	unsigned int jiffy_ms = jiffies_to_msecs(1); /* Jiffy granularity in ms */
-+	unsigned int next_time_ms;
-+
-+	if (phydev->link) {
-+		/* When the link is up, use a fixed 1000ms interval */
-+		next_time_ms = DP83TG720S_POLL_ACTIVE_LINK;
-+	} else {
-+		unsigned int min_jiffies, max_jiffies, rand_jiffies;
-+		/* When the link is down, randomize interval between
-+		 * configured min/max
-+		 */
-+
-+		/* Convert min and max to jiffies */
-+		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
-+		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
-+
-+		/* Randomize in the jiffie range and convert back to ms */
-+		rand_jiffies = min_jiffies +
-+			get_random_u32_below(max_jiffies - min_jiffies + 1);
-+		next_time_ms = jiffies_to_msecs(rand_jiffies);
-+	}
-+
-+	/* Ensure the polling time is at least one jiffy */
-+	return max(next_time_ms, jiffy_ms);
-+}
-+
- static struct phy_driver dp83tg720_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
-@@ -500,6 +575,7 @@ static struct phy_driver dp83tg720_driver[] = {
- 	.get_link_stats	= dp83tg720_get_link_stats,
- 	.get_phy_stats	= dp83tg720_get_phy_stats,
- 	.update_stats	= dp83tg720_update_stats,
-+	.get_next_update_time = dp83tg720_phy_get_next_update_time,
-
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
---
-2.39.5
-
+>     Andrew
 
