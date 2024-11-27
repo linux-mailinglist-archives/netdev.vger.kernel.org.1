@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-147661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866069DAF46
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:39:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF179DAF47
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 548CB281FD7
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:39:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B7C28203B
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B82204085;
-	Wed, 27 Nov 2024 22:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C54A204093;
+	Wed, 27 Nov 2024 22:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="cu6AFBcC"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="BqKrdTXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8DC202F98
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 22:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19997204080
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 22:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732747144; cv=none; b=SioZzV/oImzuLJzVPWl8wFEyUBurVIkQRNFdJJG9rYJFYQp/tTmcE4ROUR9K3kwW0XVlBfYC1oQNy322Taf3/Xc/yPeIb/BxI3/EJRP/+J8mmQxCcmc4qD8CUAQB3LJRdJJaL7zvAETW3LDGteaEvQ5bA1VIx5fvFnoePYyuss0=
+	t=1732747145; cv=none; b=K5P+bA3SjWR4bEuZd1sDPhx7fTQwHV5BjBAv7Swa+EGoLamlk4E97nh7pMimEMQTjRx8rqHug/3eXdGx3LFfLMkR692SMxj9CFar+BNbMPkszoPwrfjg3BFF8/Gp0Dj0R078moPr5oapvwJLdru9KqVTroTSbZFgDM5x2+kDXPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732747144; c=relaxed/simple;
-	bh=pjU3PzSQG8nIEwSuwmX+wD/Ujw1NoMm4te2TB9IyQVI=;
+	s=arc-20240116; t=1732747145; c=relaxed/simple;
+	bh=mrnLoACOxAEHLwzGhCohiE1xaF4bYxsstg5UAJYIih4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GxaxbHAGyPq/BuV3z85Rw8emrdbobNWlyGH0rbHI7/Ny6Iqw3x3dZaCTfv4tltzNzl6Sb4LCgYb0jJmVWLZ7Za3OxleGLuHDPCySG8UddiqF8SknYgAqT4CjET0q28KI9hgRRquP5FxAd1ak4CIjBv23D6jRcH0IqWy4pocKp2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=cu6AFBcC; arc=none smtp.client-ip=209.85.216.43
+	 MIME-Version; b=oavXYs3nWssdSqArfXttAP83/JlS3tlREcgQ71AuXHsr1Mx6N9lSvMAYZ23Jdkfc4JlYzmU46risKy2NslgDv0xCC/rLPRFNqneHBfjGakR+mRtjiv4MwNr1/rWVyUJb8GXbmOKG+qLfpf0lC7yeBtTvldE8W2TJ0JklHZtyT/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=BqKrdTXh; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2eb1433958dso184075a91.2
-        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 14:39:02 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20cf3e36a76so1783125ad.0
+        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 14:39:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732747142; x=1733351942; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1732747143; x=1733351943; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ooy7CJvq9SUyTVj3GUhLBN54umo1bJHs8huQT2HeNzE=;
-        b=cu6AFBcCSIzWJQquzvk7VHUh5GSBbTkh7GoEnK7V5SWYXSXNlIMniypx++3CVGovxk
-         0yOikWeYc7ibToBcbT+lFuHjQWjyjla3jaNnBCd5F+I1zaHEYJ1aPMUYttSRx1Tbs4MC
-         1enyeX4PzhHRAutY7gRnvpNX6ubQpORDh0kLYsqMayM0h3j9BilJ+nQSAo1Qjbxc5heR
-         /zVNqQnfNlN1VZYlWyLwRWjwdeJ20+VmcIKwmus7vr28640bTB/o3nrwBbg5Fa1cmgmG
-         XALmgS9tekGa9ZOh7vJfvzso4srGS70Da8zgJ5KzrfN3hYRrO44EC5spsNMX2//mrmiA
-         ryjw==
+        bh=O7f8m1SooXX5YCEkbC6UVe7KeF8jC2NXt6Q2ZooeG/0=;
+        b=BqKrdTXhZgsBjJXSTKnHrRtNcQr5vF/wLqKb07bPRGFmzW84Ibt7bRkk4B/nR8Kq3+
+         gLOSNtrYHnAtm1FJAr7DIPnZJnhxF8RBOkjJRNIQd/nWT442Rq8NAEJHRcO8yV7zPH9x
+         byeGVZZPGZriKe371wqA54gUzHhZaZRcKCwDcZ6TYGu9aFIpPrreXwkhua89AYOx0BzP
+         64UAAxkRR8wOt4MIqgo13XJ69Bq5SF+IDjCwaFv+0F99vbXRVeB/7tE6hsQaM8hLtGqa
+         f6Gmy7CDEAxmi2in3usDpkmDwJStQnxNdOCy03fKcK5x0FS+eWScKKDa0GHUpfDvImcp
+         yvsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732747142; x=1733351942;
+        d=1e100.net; s=20230601; t=1732747143; x=1733351943;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ooy7CJvq9SUyTVj3GUhLBN54umo1bJHs8huQT2HeNzE=;
-        b=HvPi1id74B9m/x+qsGYvTKGu82o9Wbojx3iCksA9jYscL/whCZeeF7P5kUiwy7/7Bb
-         r5pAjrAatQDp+0Iz6V9Zn8RlnoIcsyE2j6/HpZpqr5tydRH8KqPmx6vkPsrZQWCfTosI
-         SUYC1MO0rvuFfuieF8+4gTL56gMjU7yJjkcLF4EYNTP0iJGLRg4T0hcd84jhCQU6Gojt
-         CymZ/jLsbvTlVVaFqYX1LPVXTq23YXNmTUb8mYijWHUAoqpNzG0MrbkVfdFgpPdg2PLJ
-         KNFIPFihkyCrcC5dB3oU69pMtYR4683bKyTsYcBFIptve1QZh+Z74FCIsWyGvseRdmD5
-         r/Nw==
-X-Gm-Message-State: AOJu0YwHXZHMQkDvIF5uhMtnXJpn9cA4mW//IrAOR3cRRPYqC9MLluhZ
-	ZpCwqijThDidBHEVDPs7M4+FE3IDiJT36+hTftNUeMWIFDjbGnpRXaRFRSEbaOTEfwoQf8dwJTm
-	t
-X-Gm-Gg: ASbGnctLRZprskULKQzrrPBHbtNl85zDP1IpQbrOWkLH0tIacPsOWpdRdZtuMGWQgBv
-	Mby6ewCr7nsFBOkJ6UyV61PP245f7q29NpLi/MoqCeX5SM+97OR6V7vF1lG1DIvNUpbpD4Dg/sP
-	9vFmCXZFyrF+9sbJQ3jnhFYTmZ4JEbwe3f0xJ9tuaTo3vL9Ww3bvIB3V8kns8Cje3JIC3LqplkL
-	+ouePTHg/72YN6wGc6+SBVA/QpgEWJcgxY=
-X-Google-Smtp-Source: AGHT+IFouv7JPHxLtFkVEFE1s2C6cXLdVibe09YBXKYyn5ZbX1uaPaTejYgXCKAh8eglhGGGusTdMA==
-X-Received: by 2002:a17:90b:2d0d:b0:2ea:7570:af24 with SMTP id 98e67ed59e1d1-2ee097c46bamr5946614a91.26.1732747142237;
-        Wed, 27 Nov 2024 14:39:02 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:24::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ee2b2a2dd0sm106202a91.33.2024.11.27.14.39.01
+        bh=O7f8m1SooXX5YCEkbC6UVe7KeF8jC2NXt6Q2ZooeG/0=;
+        b=HoeBihl/OC2KmVOzac74NTgCNRjmP8xTLTwm8vh6SMIgv8/YwXjEAc7arCWECmqARR
+         4CpoxSTBjb3gfYa2bXAxOGrWLYWDrtw89XCIJikT2diIfF8HDTG1SsMYRvUwtelv9K2s
+         CzaR3SO6gWb6azxkGV7vBvFFXy8fdKaJCcGhvo4lzZa+ybTIF1MNUrDdvi8j/BJ7wlFE
+         t3D0JzmTM8ExlK6C3rPLRCUzpQ3/XVXhwqrEQnnjXIPjbJiANE4neF0RqFceXzIm3Itm
+         TDoo9rnSvyfZ1WmMd5gg4N5hCbKNuUciHJVb0wfawenDw33/zFQJLK2rdfO20MYUoPMO
+         bW8g==
+X-Gm-Message-State: AOJu0YyQgFVkEFomx2i9TXZ6GxuRW6XvUgwGISF2u+NOZ5QaOQhs0xuR
+	dQhDFQwPbhHj5pgrGcXX/khOg3rCS3XQYMXfi0UVcgjDAe/rijlpmJmwAjAH2Kt1V4rA+sQZukq
+	M
+X-Gm-Gg: ASbGncuSIpDRQ9B+qaBNUaN2POewdSOklIaYjYCuXL0MwNYpYGSc8PZhJDJ46PsnZQA
+	kYrvT0kClo7zWTm9J7nN4HWu8bB5fuCQZczAedwMO053wZPUi3T5y0EmFF4MFTTc1f6AgMWvYiU
+	czdyuVlWhY+arwmUj1Ut2Mhk0JKa4YChsgJ6RISxGjVuQP1Amp4tt6qFFYDxSZQ7Ku4h/Fg3RpA
+	1oKz9U5WzZQuawFvXd3qtRQTST4WHhpI88=
+X-Google-Smtp-Source: AGHT+IFfEmnalpCocnyaXZW/7Mwpz/nOpEfts7zG85BN51p0aA3bBBOJ2vhwHBTQn5UcJ4NYzCf48w==
+X-Received: by 2002:a17:902:f54e:b0:211:6b21:5a88 with SMTP id d9443c01a7336-21501099d5dmr46559845ad.20.1732747143410;
+        Wed, 27 Nov 2024 14:39:03 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:18::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215219c53a7sm604605ad.257.2024.11.27.14.39.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 14:39:01 -0800 (PST)
+        Wed, 27 Nov 2024 14:39:02 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org,
 	Michael Chan <michael.chan@broadcom.com>,
@@ -82,9 +82,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	David Wei <dw@davidwei.uk>
-Subject: [PATCH net v2 2/3] bnxt_en: refactor bnxt_alloc_rx_rings() to call bnxt_alloc_rx_agg_bmap()
-Date: Wed, 27 Nov 2024 14:38:54 -0800
-Message-ID: <20241127223855.3496785-3-dw@davidwei.uk>
+Subject: [PATCH net v2 3/3] bnxt_en: handle tpa_info in queue API implementation
+Date: Wed, 27 Nov 2024 14:38:55 -0800
+Message-ID: <20241127223855.3496785-4-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241127223855.3496785-1-dw@davidwei.uk>
 References: <20241127223855.3496785-1-dw@davidwei.uk>
@@ -96,82 +96,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Refactor bnxt_alloc_rx_rings() to call bnxt_alloc_rx_agg_bmap() for
-allocating rx_agg_bmap.
+Commit 7ed816be35ab ("eth: bnxt: use page pool for head frags") added a
+page pool for header frags, which may be distinct from the existing pool
+for the aggregation ring. Add support for this head_pool in the queue
+API.
 
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++-------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 25 ++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 38783d125d55..9b079bce1423 100644
+index 9b079bce1423..08c7d3049562 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3764,6 +3764,19 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
- 	return PTR_ERR(pool);
+@@ -15382,15 +15382,25 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
+ 			goto err_free_rx_agg_ring;
+ 	}
+ 
++	if (bp->flags & BNXT_FLAG_TPA) {
++		rc = bnxt_alloc_one_tpa_info(bp, clone);
++		if (rc)
++			goto err_free_tpa_info;
++	}
++
+ 	bnxt_init_one_rx_ring_rxbd(bp, clone);
+ 	bnxt_init_one_rx_agg_ring_rxbd(bp, clone);
+ 
+ 	bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
+ 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+ 		bnxt_alloc_one_rx_ring_page(bp, clone, idx);
++	if (bp->flags & BNXT_FLAG_TPA)
++		bnxt_alloc_one_tpa_info_data(bp, clone);
+ 
+ 	return 0;
+ 
++err_free_tpa_info:
++	bnxt_free_one_tpa_info(bp, clone);
+ err_free_rx_agg_ring:
+ 	bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
+ err_free_rx_ring:
+@@ -15398,9 +15408,11 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
+ err_rxq_info_unreg:
+ 	xdp_rxq_info_unreg(&clone->xdp_rxq);
+ err_page_pool_destroy:
+-	clone->page_pool->p.napi = NULL;
+ 	page_pool_destroy(clone->page_pool);
++	if (clone->page_pool != clone->head_pool)
++		page_pool_destroy(clone->head_pool);
+ 	clone->page_pool = NULL;
++	clone->head_pool = NULL;
+ 	return rc;
  }
  
-+static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
-+{
-+	u16 mem_size;
-+
-+	rxr->rx_agg_bmap_size = bp->rx_agg_ring_mask + 1;
-+	mem_size = rxr->rx_agg_bmap_size / 8;
-+	rxr->rx_agg_bmap = kzalloc(mem_size, GFP_KERNEL);
-+	if (!rxr->rx_agg_bmap)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
- static int bnxt_alloc_rx_rings(struct bnxt *bp)
- {
- 	int numa_node = dev_to_node(&bp->pdev->dev);
-@@ -3808,19 +3821,15 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
+@@ -15410,13 +15422,15 @@ static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	struct bnxt_ring_struct *ring;
  
- 		ring->grp_idx = i;
- 		if (agg_rings) {
--			u16 mem_size;
--
- 			ring = &rxr->rx_agg_ring_struct;
- 			rc = bnxt_alloc_ring(bp, &ring->ring_mem);
- 			if (rc)
- 				return rc;
+-	bnxt_free_one_rx_ring(bp, rxr);
+-	bnxt_free_one_rx_agg_ring(bp, rxr);
++	bnxt_free_one_rx_ring_skbs(bp, rxr);
  
- 			ring->grp_idx = i;
--			rxr->rx_agg_bmap_size = bp->rx_agg_ring_mask + 1;
--			mem_size = rxr->rx_agg_bmap_size / 8;
--			rxr->rx_agg_bmap = kzalloc(mem_size, GFP_KERNEL);
--			if (!rxr->rx_agg_bmap)
--				return -ENOMEM;
-+			rc = bnxt_alloc_rx_agg_bmap(bp, rxr);
-+			if (rc)
-+				return rc;
- 		}
- 	}
- 	if (bp->flags & BNXT_FLAG_TPA)
-@@ -15325,19 +15334,6 @@ static const struct netdev_stat_ops bnxt_stat_ops = {
- 	.get_base_stats		= bnxt_get_base_stats,
- };
+ 	xdp_rxq_info_unreg(&rxr->xdp_rxq);
  
--static int bnxt_alloc_rx_agg_bmap(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)
--{
--	u16 mem_size;
--
--	rxr->rx_agg_bmap_size = bp->rx_agg_ring_mask + 1;
--	mem_size = rxr->rx_agg_bmap_size / 8;
--	rxr->rx_agg_bmap = kzalloc(mem_size, GFP_KERNEL);
--	if (!rxr->rx_agg_bmap)
--		return -ENOMEM;
--
--	return 0;
--}
--
- static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
- {
- 	struct bnxt_rx_ring_info *rxr, *clone;
+ 	page_pool_destroy(rxr->page_pool);
++	if (rxr->page_pool != rxr->head_pool)
++		page_pool_destroy(rxr->head_pool);
+ 	rxr->page_pool = NULL;
++	rxr->head_pool = NULL;
+ 
+ 	ring = &rxr->rx_ring_struct;
+ 	bnxt_free_ring(bp, &ring->ring_mem);
+@@ -15498,7 +15512,10 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 	rxr->rx_agg_prod = clone->rx_agg_prod;
+ 	rxr->rx_sw_agg_prod = clone->rx_sw_agg_prod;
+ 	rxr->rx_next_cons = clone->rx_next_cons;
++	rxr->rx_tpa = clone->rx_tpa;
++	rxr->rx_tpa_idx_map = clone->rx_tpa_idx_map;
+ 	rxr->page_pool = clone->page_pool;
++	rxr->head_pool = clone->head_pool;
+ 	rxr->xdp_rxq = clone->xdp_rxq;
+ 
+ 	bnxt_copy_rx_ring(bp, rxr, clone);
+@@ -15557,6 +15574,8 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+ 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+ 	rxr->rx_next_cons = 0;
+ 	page_pool_disable_direct_recycling(rxr->page_pool);
++	if (rxr->page_pool != rxr->head_pool)
++		page_pool_disable_direct_recycling(rxr->head_pool);
+ 
+ 	memcpy(qmem, rxr, sizeof(*rxr));
+ 	bnxt_init_rx_ring_struct(bp, qmem);
 -- 
 2.43.5
 
