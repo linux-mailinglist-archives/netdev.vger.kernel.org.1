@@ -1,132 +1,181 @@
-Return-Path: <netdev+bounces-147554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 962399DA273
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:45:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CABEE9DA295
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 08:01:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B74B2831AE
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 06:45:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D2C9B23FCA
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 07:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3DE13C9A6;
-	Wed, 27 Nov 2024 06:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32525142E67;
+	Wed, 27 Nov 2024 07:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kg20+Lpv"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dLmyIKdU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3211946B
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 06:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A246417BA2;
+	Wed, 27 Nov 2024 07:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732689935; cv=none; b=g0UXRlB8ZrPR1ikudsOME3mGn0UDTWYgqvfvx0ZNKEKSqNyS0M9TWoIy6/Nb8Rwhd04jsT/RdbftzgtdOd8oW/6OKkRGstRF41aa1aoI/MBg+qRB0T7XCvcnwmzdkRZVsbSeca1tgJPSYDXxI5IZC+pK/09yuIGB7kPxvkO2MGw=
+	t=1732690854; cv=none; b=JOrYA+gQyxg6x2j1/GXoKVEsgyL2GpnPqWc7jjLrRggVbVA6vTiae/AMPsdeu3lC6zp1VGe0NL6ClG5sgPGyaeo9R5y/Wags8UFPb7eIdg4hW+1y43RGEWQZjwapeF49N5oFSuKGwpKXysPiGU6ooPAsIN3R9IbsGgei50ZtDwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732689935; c=relaxed/simple;
-	bh=RNmNT70ps+kx7slfSFuJ9G/H2xuAhJkWrfXMq+752EE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QwlENx+Nyz+leKwMB2dgCYDOckhDwVoOe1hYQJmNGKkaBcNYiaBIm1E2nOYortNS3/83HgEIWLe5uxENHTOHsEluc03G1ur1n6ZucfMSnhnzbrOGmaPgRidQpy9PJApsSioIeCbbYDvSaoaUYckNG6cMllF1cTiIyzOks3jr62A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kg20+Lpv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1732689933;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8/rI2EY7Ph6b3KZhYxy9/j/W0i2aqaLJSO/nDcTsMvA=;
-	b=Kg20+LpvVR7ZZ/T2BQ2xaa9/rNRkfcO2ej3XoGvGzsPERVwXv7Mvtk0p9hBrUARt5wx/Bx
-	PpA35R9/pJkVXu8RD9BH4rsBeQVBa3BHu4qmLJKbX4YkzhVwu9ci+3DChdkNEOQaP0pMc2
-	SSc3Ka2SvuhiZiwnRY5cDVAee5B4JTY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-8UaeEvSYP7SSG_61XWviRA-1; Wed, 27 Nov 2024 01:45:31 -0500
-X-MC-Unique: 8UaeEvSYP7SSG_61XWviRA-1
-X-Mimecast-MFC-AGG-ID: 8UaeEvSYP7SSG_61XWviRA
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aa525192412so295123166b.0
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 22:45:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732689930; x=1733294730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8/rI2EY7Ph6b3KZhYxy9/j/W0i2aqaLJSO/nDcTsMvA=;
-        b=hA99bj1Hig15OyMuAi2l/q9l825AY2Z4C797e5jcEp8i3SkJLSJewMVQO/BjEYDXS3
-         2v9BEAsZYRAhNjlgIblYO+aO1K+GzDZA4i18bUR+VbXA0IQ4UvvApZdFoH1guUFuD7zJ
-         QAgTAoa30e0865nIdTYD6gta/0/ipUWQgvuRg+YxTeClF26kWZgqxsEkqFV09VlT72iC
-         YBJELVc9c0G32+a4crKDe2bhtfbgbMZJpCXUX+VVnEc06+LLa9+VAJo4OPuNy7/SwRGz
-         Vcl8jiRgJvgZsGCwA/yidUJMx5as0e7rSEAzd8yhhjDJfBfBY7SBrsuqhnx89kZ0C3c9
-         d3Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdKuUkzsTtyZ01xZw0QBhTt1ncEjBq9JeuD4mwVjlcXrwDtf1qvDHsK/fki+40IitJ3Govg2c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMOycPdA1WyNgf1A5QGQAOtLNhORcwRWnhQSfG/g/1/FOIT020
-	qGugo/WY4Ib7xvbPH4gWFOPjd60cmyDMvpFk0JBJX3q6MdVgv+0Wom/GdfJkjXRNNtILrBCVP5x
-	F/Q0XsFQu5sSRpRHyY0+lklONyyRhVZNbTTa86ppNEAb+6ZyxkfScixEZbnWZm7TGXWn0z+jBcP
-	rZCCgB/8YwVYPn5/wEGbzh1f91MPar
-X-Gm-Gg: ASbGncvSOtQwM5Cjv2+Z13rY38/lHEGLSRaI56ISWB8GIC7C/PXRx+XshqWhOLDZ+yN
-	N2QXgzPleV+4y6VjaOYTtioOUiFf+EsJQ
-X-Received: by 2002:a17:906:1ba2:b0:aa5:2f8a:b952 with SMTP id a640c23a62f3a-aa58106613bmr111618166b.54.1732689930419;
-        Tue, 26 Nov 2024 22:45:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEUP0/KWUbb7Co3AncLRdOmYqmNvbV+nqgWBTGrmbeqC5ZOJ62cFI33uH+j5QLWBacrMzgyNp/kkRsf6zhWK3M=
-X-Received: by 2002:a17:906:1ba2:b0:aa5:2f8a:b952 with SMTP id
- a640c23a62f3a-aa58106613bmr111616966b.54.1732689930058; Tue, 26 Nov 2024
- 22:45:30 -0800 (PST)
+	s=arc-20240116; t=1732690854; c=relaxed/simple;
+	bh=rYrtuOnGhlmsVE8BBvxk8yY4kUvnUhoSOGfV5MZkSgg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=O4xwHZX7nmlF/IflwkOpJ7wtHv5DUWgD6jL4Xd6AbCr41le+ynzwD6VClsGmULozJLoOeLOSGXBqMsqG/AL+uFN08fGcT92xUnBQO5vR1BFOKcF0vOydYGCeeab4wJ0D7HyMMk12CkVtkhL1BwgYwtYh8jBMCdV75n7tajsKdek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dLmyIKdU; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQKLXvc007146;
+	Wed, 27 Nov 2024 07:00:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	XgRtXKp6Ib0r1ecUjQWlmkTsRbpS2b5Cwd/uwfaa+wk=; b=dLmyIKdU8IhBp0lK
+	e37ZIYmWNVrS2ophDrZc+zUDy1X0qmMQUYLjBjP1X47sGxWnkHQU+8lPIKub8NxS
+	lAUejjvg8ssU0BzR5vaNZj0x38AiBjW568LorSqgLTP9SN5xI58by0hVNMUEtnYW
+	Nct6zc0k9Afcfj3b6Z1c5UPYzhlJlHCYFJU1UomRygAK7tAN6N48pZLA+pRQTuE8
+	iJ4sEiEZ5iQuBJZLyVaIqXxku873jT8K29jWEmpeh//fe5+hbuhthWshVvgcqXc2
+	tZmArM94Sfn/srbihWzfNZgtI0DPcsIaO/TdWYpk3ytV/WnLRI2/x284RX07BNxL
+	4BwAuw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 434sw9ds2j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Nov 2024 07:00:46 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AR70kuY026035
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Nov 2024 07:00:46 GMT
+Received: from [10.253.38.8] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 26 Nov
+ 2024 23:00:42 -0800
+Message-ID: <75fb42cc-1cc5-4dd3-924c-e6fda4061f03@quicinc.com>
+Date: Wed, 27 Nov 2024 15:00:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105072642.898710-1-lulu@redhat.com> <20241105072642.898710-4-lulu@redhat.com>
- <c6975912-4205-4c75-976a-f68dd6dcaf1c@oracle.com>
-In-Reply-To: <c6975912-4205-4c75-976a-f68dd6dcaf1c@oracle.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Wed, 27 Nov 2024 14:44:53 +0800
-Message-ID: <CACLfguWGxNX1PgTCgH2NbBZoJhRSNnvVKzUzq2=cYY60+-kReQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/9] vhost: Add the cgroup related function
-To: Mike Christie <michael.christie@oracle.com>
-Cc: jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: qcs615-ride: Enable ethernet
+ node
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+        Konrad Dybcio
+	<konrad.dybcio@oss.qualcomm.com>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20241118-dts_qcs615-v2-0-e62b924a3cbd@quicinc.com>
+ <20241118-dts_qcs615-v2-2-e62b924a3cbd@quicinc.com>
+ <ececbbe1-07b3-4050-b3a4-3de9451ac7d7@lunn.ch>
+ <89a4f120-6cfd-416d-ab55-f0bdf069d9ce@quicinc.com>
+ <c2800557-225d-4fbd-83ee-d4b72eb587ce@oss.qualcomm.com>
+ <3c69423e-ba80-487f-b585-1e4ffb4137b6@lunn.ch>
+ <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <2556b02c-f884-40c2-a0d4-0c87da6e5332@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: _Sw2n69pV_5KQZultUUqlaXlxy3wsuoo
+X-Proofpoint-ORIG-GUID: _Sw2n69pV_5KQZultUUqlaXlxy3wsuoo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 adultscore=0 spamscore=0 impostorscore=0
+ priorityscore=1501 phishscore=0 clxscore=1015 mlxscore=0
+ lowpriorityscore=0 bulkscore=0 malwarescore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411270056
 
-On Mon, Nov 25, 2024 at 11:22=E2=80=AFPM Mike Christie
-<michael.christie@oracle.com> wrote:
->
-> On 11/5/24 1:25 AM, Cindy Lu wrote:
-> > +static int vhost_attach_cgroups(struct vhost_dev *dev)
-> > +{
-> > +     struct vhost_worker *worker;
-> > +     unsigned long i;
-> > +     int ret;
-> > +
-> > +     /*
-> > +      * Free the default worker we created and cleanup workers userspa=
-ce
-> > +      * created but couldn't clean up (it forgot or crashed).
-> > +      */
->
-> I think this comment got added here by accident.
->
-will remove this
-Thanks
-Cindy
-> > +
-> > +     xa_for_each(&dev->worker_xa, i, worker) {
-> > +             ret =3D vhost_worker_cgroups_kthread(worker);
-> > +             if (ret)
-> > +                     return ret;
-> > +     }
-> > +     return ret;
-> > +}
-> > +
-> >  /* Caller should have device mutex */
-> >  bool vhost_dev_has_owner(struct vhost_dev *dev)
-> >  {
->
+
+
+On 2024-11-27 14:17, Yijie Yang wrote:
+> 
+> 
+> On 2024-11-22 21:19, Andrew Lunn wrote:
+>>>>>>    +&ethernet {
+>>>>>> +    status = "okay";
+>>>>>> +
+>>>>>> +    pinctrl-0 = <&ethernet_defaults>;
+>>>>>> +    pinctrl-names = "default";
+>>>>>> +
+>>>>>> +    phy-handle = <&rgmii_phy>;
+>>>>>> +    phy-mode = "rgmii";
+>>>>>
+>>>>> That is unusual. Does the board have extra long clock lines?
+>>>>
+>>>> Do you mean to imply that using RGMII mode is unusual? While the 
+>>>> EMAC controller supports various modes, due to hardware design 
+>>>> limitations, only RGMII mode can be effectively implemented.
+>>>
+>>> Is that a board-specific issue, or something that concerns the SoC 
+>>> itself?
+>>
+>> Lots of developers gets this wrong.... Searching the mainline list for
+>> patchs getting it wrong and the explanation i have given in the past
+>> might help.
+>>
+>> The usual setting here is 'rgmmii-id', which means something needs to
+>> insert a 2ns delay on the clock lines. This is not always true, a very
+>> small number of boards use extra long clock likes on the PCB to add
+>> the needed 2ns delay.
+>>
+>> Now, if 'rgmii' does work, it means something else is broken
+>> somewhere. I will let you find out what.
+> 
+> The 'rgmii' does function correctly, but it does not necessarily mean 
+> that a time delay is required at the board level. The EPHY can also 
+> compensate for the time skew.
+
+I was mistaken earlier; it is actually the EMAC that will introduce a 
+time skew by shifting the phase of the clock in 'rgmii' mode.
+
+> 
+>>
+>>>>>> +    max-speed = <1000>;
+>>>>>
+>>>>> Why do you have this property? It is normally used to slow the MAC
+>>>>> down because of issues at higher speeds.
+>>>>
+>>>> According to the databoot, the EMAC in RGMII mode can support speeds 
+>>>> of up to 1Gbps.
+>>>
+>>> I believe the question Andrew is asking is "how is that effectively
+>>> different from the default setting (omitting the property)?"
+>>
+>> Correct. If there are no issues at higher speeds, you don't need
+>> this. phylib will ask the PHY what it is capable of, and limit the
+>> negotiated speeds to its capabilities. Occasionally you do see an
+>> RGMII PHY connected to a MII MAC, because a RGMII PHY is cheaper...
+>>
+>>     Andrew
+> 
+> It does unnecessary, I will remove it.
+> 
+
+-- 
+Best Regards,
+Yijie
 
 
