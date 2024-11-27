@@ -1,338 +1,297 @@
-Return-Path: <netdev+bounces-147618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 094EE9DAB76
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 17:09:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACAF9DABC3
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 17:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD8BC281F43
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 16:09:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFFC3281F65
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 16:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E30200B91;
-	Wed, 27 Nov 2024 16:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9383200B95;
+	Wed, 27 Nov 2024 16:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EEL041Q7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QjsPMIdE"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2065.outbound.protection.outlook.com [40.107.93.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6462433A0;
-	Wed, 27 Nov 2024 16:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732723767; cv=fail; b=cO74FGJ6zQsE6GK1sVaBFYC5errxzgomzfFTYdwQVghNVx0xcq+nghGyVOsPdtBqCfAQQa6knlmL5a8tZ6t8oYie5MSp681TEOhnlXGobTU/2qaplIXxNNiaitDd7drvHE/ho3razloXdEHUAzy+XDnbBkj5uWrVVMYHKlqlm70=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732723767; c=relaxed/simple;
-	bh=tTZhAQ0cWiQbaGH1c086vwejcnsBn7irGwv6kzyW0Aw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VdKxvHbReyzDDpn33pzDM1Rt0McEH3tExbNodM/ElpVjPtuvxSAMzJ2msYokU8X3yzlGJX8XKHykswnz4m8kWbib3QbgI4VVwNcc/qEjcMnwmzrSix8SZpKe24SECx/S5XFkuuR0Ag6hvyOEQ3j6Mt9HRDPGGh7s8yGhiWuv00A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EEL041Q7; arc=fail smtp.client-ip=40.107.93.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xzFs+iuRSDZF3nOf+ktwPCfRH1daFu+MGjnAFZhkn2EYomdnKaR2m7BNPJCF7e4lgfm2nbC4q74T/zSsP0mvGX5K2w8PlL5Ugoj1n8fuINtseZcyoeJWAfreqw/3ByYs/S54ot26qAOmPtxB5tD9UYZnPFMSDvOudregKMAKoViqM5SHPC7QWtTB/v2lBnpkewGjQJvm7mjL97THA2jEBYBhxd4wnw+toHLbkyWG65C5sqpXwoXMQGDO/BxfnHFwW1ca1CDBP/VN2BbxZvrmDj1g+5BcACTG9bWMCEkbQvGI9tHQapMNC+JxpV+qNdZSPogl6HhzM49K49G4Qk0Bwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ugwP36tzunlGunVodkZAKgRKUH9fzCVT0WtNR8X03Fc=;
- b=yo2myKcM3QEhUSEBI+ebONN/oXFqvrn1xCWBuZTEPv7dBUQwTCm+jvOtjGvmhlqjRwXfrfMAkCnINP6eV8WZHL8136Pp4zmgt8327PaLIOJri0vQOnIIocgu/f5Pl40yxBPHRJWg8gKYHzH97hcxwSav/b5kK+Wz80qjtn+8A+i0uRx4S1CnY3LPjiiMXCY8lOTDtncOq7Q/3/U7OhuNi3yRHiTrItHDjT6Qlry6E85aLjj64ztkZI6QRtEPe1Xky3ADsiJwiDB2u5lZfwdAvUu+po5eJev9QLPchOMpslsjJ77KDbzRHVZHXyd7HA5UbP0GjykqV5fpoMUtxwNnpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ugwP36tzunlGunVodkZAKgRKUH9fzCVT0WtNR8X03Fc=;
- b=EEL041Q7QLO5Q9UTvfaGsU+bFrpABdPKkjOQazG5ETjAHFxK9CIxSgEP7yDIG7+JUHSBKZ/bi+pNjXVQzwv6agrsFFa58xVEt0cVb1FHxwB7bSdYPXf6y1BHYoAhMtMa1xyT6zbOUwrObj7KnjSkgX5iGU8U76LKSG2lw9isQ0M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SJ0PR12MB6902.namprd12.prod.outlook.com (2603:10b6:a03:484::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.23; Wed, 27 Nov
- 2024 16:09:20 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8207.010; Wed, 27 Nov 2024
- 16:09:20 +0000
-Message-ID: <04c2b050-ff42-1957-7426-b3314aaeea45@amd.com>
-Date: Wed, 27 Nov 2024 16:09:14 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v5 13/27] cxl: prepare memdev creation for type2
-Content-Language: en-US
-To: Ben Cheatham <benjamin.cheatham@amd.com>, alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, dan.j.williams@intel.com,
- martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
- pabeni@redhat.com, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, "Cheatham, Benjamin" <bcheatha@amd.com>
-References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
- <20241118164434.7551-14-alejandro.lucero-palau@amd.com>
- <87e61d7d-039d-4899-975b-0797d3bc486c@amd.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <87e61d7d-039d-4899-975b-0797d3bc486c@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PR0P264CA0253.FRAP264.PROD.OUTLOOK.COM (2603:10a6:100::25)
- To DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF66C2581;
+	Wed, 27 Nov 2024 16:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732724860; cv=none; b=txluGMf5itTjRiGPS2lCYKSf+n/oiIATgkgCMO6lJxVtlRriyqUuhrpmfuWIF6HGlOnm67RE4MMraKRyfHn5THGE2ClmXjnJ/jGtO0Lc/93NyXRO+6SFyGb1/mD2E2WDK9GHEpGLPeKk9OxcZHNktYFlZYVfCHNNIYBCmNzRRHU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732724860; c=relaxed/simple;
+	bh=iADUC2p9Xf4qa0czb/Ja4hLEYXyP6low1aLqYk7dSwg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kr95moos4F9bhwodgYf8sOs152QtJd0gNb0GEE7vi7bZLmekcaCMN8tOggY6qaZgfhBeusgyw9W9y8w0jL5ui7GbGp8+L6W+Z9GeCAbfkZeXB0Bh8RURAKyzEOhk7yeR1Mg1dkr4IIF5icerFRNvn8gIM5FYWPTOIAKFXiHUgog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QjsPMIdE; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38248b810ffso5297644f8f.0;
+        Wed, 27 Nov 2024 08:27:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732724857; x=1733329657; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/6I/PKx4AbOtXDrsC/W9UiLLi4+KmiegPWZJSbvoADs=;
+        b=QjsPMIdEhS4Vchdv6cSJppyBJMXw9uXo63RQVCb4eMhq53lzXXC54wJ4YfOE9OmSYQ
+         sPbcOXXT6gf9rCD3NllutP/iV3ZLbEafjdBV48efUkGj25P8AJFs2nhKUL4t4k2s4rmy
+         J9rJfVhuIW70m5fPtAs/NI/8lcAyng4SgVQOvlrk0R8g6Ttyk4yS3Yfe3gy12Yo+Vkoi
+         IFAlwcananmZx+5cVnARSnVsMPbS7mSZM6mWOHF7l18FUb3IC+8exdbIorHqc/oK0yOf
+         7hAsIwg6NwVxtDI8esh4aMGKJgrIb2g1zYEwr8fx1MQAiNgLk6iyLWXkRdS6M2DPPr1R
+         Nwtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732724857; x=1733329657;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/6I/PKx4AbOtXDrsC/W9UiLLi4+KmiegPWZJSbvoADs=;
+        b=ce84LY5kyKV9p7pz8h40qBni+Kh/U7IpKyCj21CwHhik938KlI3HdpvSt6xVy0c4TA
+         1YjfPYhahRWdiF/8gGA1RgQ6Lj1e9OiD+GLQVuCxP1+LM3qkCDsaUuT5HOimTxRI5mb5
+         OcxQG0MT4quQ8Kx4gOourSyHx9PvwT6bB24Z75/bWoXkwZ9lmxvWTrvh4csDh51SuQlB
+         FSAAXjQBAN+DqzZxceTGJiiaWKiKUDmN/IS9gOV4Ju5B63bAJm1zC6lgEVCTle9wBPbE
+         pVzn1EIf4uif5ggT8bg4uonAR6AqeWeJPlqY5QVthf/Mn9fqPC4FntuB1Diojg4E6dN2
+         G1jw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdcQHQmFifncRscPNGQJ4gtsnqs9a+Tt00ZXJ/VP7xk6Bo+Psv5LJFR7wXhetJc0vrGNzJ1gf1@vger.kernel.org, AJvYcCXe394hxsKtixacvjeWalGug2mFRshvhuVi/8P8c05Hy493qYQka0NPstGUZsW9W00cGPRxdhE4a2pznqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysrhrfYW1VT3ToaeXoMHQHKb0tbWefhdzHriYtsKKc6rFPM3zC
+	/5/LfJ7AsqSP/XXUTigYRsT/BEsn/Myzrh47952iR7t4huc4OYZegCnlvnu+7U3ivrslIYnSfGM
+	UhrmN3bjg91abWHoraiepBvyKTNE=
+X-Gm-Gg: ASbGncvJqxgUcXAGE9JHHtOZDG+3qJXacEZW9sCY4PouXx5IZ14WZCJbfwdfXBUXOpY
+	iaDojawhmsaWp0a9ovZgBxLQbMWbPUm6IH121SRnZIy/gc6NXLbyZxaWg+P4anMKW
+X-Google-Smtp-Source: AGHT+IGGWJxqRyKBXVYbw5HA0nIXlk5U7/5i94crLnJMbgsB3lvD8caynw07JTKB6Qy9MHh+Q2GDXXq8klaQqQnE1gM=
+X-Received: by 2002:a5d:64aa:0:b0:382:3efc:c6d8 with SMTP id
+ ffacd0b85a97d-385c6eb5872mr2932834f8f.12.1732724856834; Wed, 27 Nov 2024
+ 08:27:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SJ0PR12MB6902:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf28c2da-8f5e-40b8-b00e-08dd0efdd9a4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K0lLQVNmMnEwZ0pYTXFQcHdsenpFRkY0bzMyM20vVTRFbVV2aXVRNUQ3dUEz?=
- =?utf-8?B?Q0g2ZjFqTVBKTG5yRkVFZk5xWTJhcDRFS29jQmx1eDYwZ3Y0SzQ2Y2pKbm5Z?=
- =?utf-8?B?WEt6YTI0dGFkVmZpVEhVWEd3aGpQWVRtSjlVTXZua29nU2dXTUVMOGUzSjdi?=
- =?utf-8?B?YnRxbmxjbnJSTzkydmRUU3p2KytTWFJDMjJaQnlnU1Fod0xGbGh1NkUzUm1l?=
- =?utf-8?B?VmlMZ1JldENrS1F5RENpZU9EaDYxY1Z4am1JMFdnRWhWUHg0ekV6TUNQejVl?=
- =?utf-8?B?dTRaTDRVcC9YTDhUTEo5NUtrdjUwa0hqMDQxVEhkQXF4UkdkWWdzRE9jSWpK?=
- =?utf-8?B?bXc5YjBzTEEvZVZUT2Z2eG9MYnUrWDdMQnVvVUxnUUtFOWkyVGFFK3A3VnVx?=
- =?utf-8?B?QXdqY0pGVFk4L2FJK3VYMFo5QzJwVjRXNU5FbG44dlRpUURQRnU1K1psNWVX?=
- =?utf-8?B?SW9LR1h2TGxTSTA1RWwvdUhqQjhMUjFLZnIrcVg5Mmo4Y1JHNVNFTzlHd2lV?=
- =?utf-8?B?NHlSdjgxbjZyci92QlhVaEhKcnhaOVQ1d3U4RU5kcWZpVzB0VEYvVUNRWVNM?=
- =?utf-8?B?UEdLMWNaaTVxNkxNWUN3K3E5ZzloZjBGQ1dRTUdQKzNuazBDTVpuOTAvZ05w?=
- =?utf-8?B?allCbjlLSHhGWVNrTVRFK1pHWnVGYWlCQzcvN1V4MHZBalI4enUyYUtXSXA1?=
- =?utf-8?B?Q3lnWmhUbUp1UWVaSW42TmZTYzFaaW92Z29zR0FGOUpmSzJySzZScnhqdTF3?=
- =?utf-8?B?VG9keUhPUjNLaFg0MWVlclp4eVJrem1hbzc4M3VLUm92TmpiNFhRV2NtblEy?=
- =?utf-8?B?Z0c5RzlXSEo2dVBtaDRLMDRZNTNpUzc0VkpBMzdDeEVwcEdNcUE3NjUxaStm?=
- =?utf-8?B?VEJvaTVRQ1NSdEs5d21hb1RnYkJlaUJXRExnK0JwVDRWYktNNzlmeHU5a0tt?=
- =?utf-8?B?ZENBZitRWElONlhDK25HUXVCcmpOWUdqZ2dFZ1V3dnBDdU9NVC9FWlcwWXpF?=
- =?utf-8?B?THhwWEF3bVBGd1lRUkZqSk9obzA2ejNVUm9laUNtcmdjRUlDZGluK1N5aTRx?=
- =?utf-8?B?NThsYzBUOGdNL0Zrc3hSYXZIY0RjZjBBV0loNk9OUjdNU1BYVkM1cCswUDRs?=
- =?utf-8?B?eXpVQUo3WkxsaE90ZjE3OVhVTDNJWk5SYzVnNUxlVHA2dnBWL0xESG1zaE1j?=
- =?utf-8?B?UnZkMHUvbGJ4Z0MxMFpmc2t1ZGhXZmF2RWFUQ2twQVVXVU9Fcmo3KzJlaUda?=
- =?utf-8?B?bW9aZS95ajlrVkxGUXJMaWpBUFhJcFNjNVlUaW1IK3I2bllJQVpidFN1dm9R?=
- =?utf-8?B?RDF2T3gveEhsdnQ4clFabWp2RjRQbVhidFBVa3hvWEpIQ2hHSTdLVlpWOGg5?=
- =?utf-8?B?YVpENC9pdkY3TjNud3NZY21wRGtYTnJScHBsZUd2UkwzZy9kQVV6VGFGZmFF?=
- =?utf-8?B?QzRlWmRIbUFhWTB0K0hsWnA4OWRHdHM0SDRZclVMR1FQbmxldWRvTG9GaXlH?=
- =?utf-8?B?S1JpYW81TE5UclRTNnFjc0IrWm9VOUp0Ykoxek93dFllSlpOeFpSb2dlL0xB?=
- =?utf-8?B?MENMYW9ZZ0hmN01tZS9nR05GZXpnS1pKWldyTzZzWVloWkUyUnFWWWNNUnpr?=
- =?utf-8?B?TFRud296eDh3NGFRNnRGYVRMQStrYk1COWZWQytJYk5oKy9wQy95ZlpMTGVy?=
- =?utf-8?B?YmhScXhUK3BxR3U4WDEzSDRUMkN0S1dPbWZLMEpkajUzS0xpcnJraEJ5UzF3?=
- =?utf-8?B?dktNZng1NjFGU1EyZWZOUzJZL1VQMDdvbVpCZU5PSlUyREF5SmZpMDZ1UUVB?=
- =?utf-8?B?bTV2ZlFzRC9TRXFJK1ZPQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dFo0WEhqSXN3eFcxb0Z1TDd6REV2NXhjNWFWZVZQdEplcURvQXVLclFMalZu?=
- =?utf-8?B?SWlOaGhKYkxBZDc5T0RpemcxYnRtUjc4VE05clJPOXdZVzlsTnBUcEk4ME1J?=
- =?utf-8?B?ZU5EWGszREkwSFJja0oveDNwR1ljemp4VFlwQi8yYWQ5enJYTmJDb1FldGxP?=
- =?utf-8?B?aGppZklMTUFUVWJvcVRPcCs3dWY5UlFhMlQvaGlteGIxN3lMVFozeXJyT01q?=
- =?utf-8?B?L0xTbEZnWUFEUXZuVEhGRlFEOENMcmh4MGtmMmdMM3JtQlpRTHZwUnhZRU9u?=
- =?utf-8?B?U2J1RGpXYWpIRDFZZ0QwWWY1bDBBRHpTZzJmcUY5SFdvYlc1QzB5cnZ5TzBj?=
- =?utf-8?B?M3NJazlUcXBNcC9YZWV1bEJUbFAyUmZnc1VNemhxMFMyOWp0WW5lb1Fzd1pn?=
- =?utf-8?B?MGxvenRpQ2oyYXJHMFZpRVBtRElDSVNuczhKNjVoRExhbWlmS3ZONmZkR00x?=
- =?utf-8?B?aVRYc05uN1hUNnlOZ2FUdWJMMERZWHlycXhZdytxUlI5T3FPbFVXaEJEVE1C?=
- =?utf-8?B?cjc0emREcXJ4Qjc4ZVo3enlRM0JsVC9BRGNqUldzQTFsekxuMFlRK1pXVkQ4?=
- =?utf-8?B?U3FLSE5ZbUs5Q2x5SThQeVBWdWhwbll1a3JJSTZFd3hkRjdqekQ0cGkwSXZE?=
- =?utf-8?B?Uit6NndjSEJLNkl0RjJlVC9FSVc5Vkp4UVZRVkdRbmdlVnU0K21LU0JzRWVy?=
- =?utf-8?B?ZGxpbWhDSGYrejlXSjBSV2NoRm5pTW1YS3ZMSDNRcTFpOEo5KzhPRzdIc0Zs?=
- =?utf-8?B?eExOQ1psbVVEN09JU1o5Witzak41RmpOV0wrNWFUNGJxY1c3c0hNOThWUlJC?=
- =?utf-8?B?c2JqU0Rucm1zcWlWdVhnUnY1VjVuZ2svb25QY24vbEdOZmVVTDAvNTkvTWVK?=
- =?utf-8?B?RjBXTDl2REdQUUJCSktwL0FjbkpjcG50YTJsam9LRGRmWDRsaHBkTktHK3Vk?=
- =?utf-8?B?K2hNcWRJM3NOejhxWVM3QkhoY01zUVR4cHlUT21HT2tWVXpzSFBydmoreDE1?=
- =?utf-8?B?TStkbGJIc0FFc2w2bGh5YzIrUjFVOHBsZW1LNEJmajhSYTBoSXppQStxTWxh?=
- =?utf-8?B?dm1mZ2d1NGJmUUdyVW5uZkt5WnZNQlpERjFYUFlXbmpmaWVVM1NjK3Iybytp?=
- =?utf-8?B?aG1wZm1OSEFHRHRxa245WUNOaGVKTllBdjY4WWpiN2liM3MrWXQycUdXN1Mr?=
- =?utf-8?B?dG9LMmlWckt6U2JNZ0h5dVVzQ0Q3R3U2UDRQRHBsaklzOUp4S280Y3M0SitM?=
- =?utf-8?B?UU1odmlLRDJjMVExaUw5Q2EzTmd3MlFaK29ja0hrY2g2Z1Vza0QwZ296aXZm?=
- =?utf-8?B?RFl4V3RZSDBQTjBta3FaU3hRN28wVGVyaFB2Y0ZKbjhsVnlKa21Da3ZDTGY4?=
- =?utf-8?B?bDlHY1ZYZXpMdHhpZ0tVa3B6aTRLcEdLVzZ1WS84bnZ5R3RuaU5PK0MrNVVK?=
- =?utf-8?B?eGZma00rMmlESUZGcytEQlNOQTV3YWxuVjZBNVZITVdBNlJ6SUNpZk8ybUJi?=
- =?utf-8?B?bEVOd3BjSW8wVVhzRkl6czJlRWQ1VXN4eUVoUVBHUWh0Ymd4TVpHdkJHOFR0?=
- =?utf-8?B?TTB1N0ZOR2ZRUjcxVUo4ZWF1MDViMkpicUljdUVWcG1OSmFwNjBDY2s4MWpw?=
- =?utf-8?B?dTdOR0wrOFUySWtieVIwSVIzMmxSOVord1ZEbmFweDd6a0ZpRVZ0K1h0VVNz?=
- =?utf-8?B?Z2ZMRnhwSzRVc2ZiQjNUNFBkZnU0TWtJYnNSSEU5MHI3UVVNSFR2NmV4Z1Fr?=
- =?utf-8?B?ejlBOTRaYkc4cnhKcGdHcE1YZkF1NG9GdWRxVGZTc3REZlVYNXRwbnRCRjla?=
- =?utf-8?B?U1J3aGVsUWpoZC9KWnFrWExpK3ZGcFhqT2lqY01laEFqN3ZQL2p6Y2dHVUhI?=
- =?utf-8?B?anhHTGJ6Q3d2UXpnVzlDRzIzNWVsQ25jL1dNM2M2Y3VySWQzc0MraC9yUUpX?=
- =?utf-8?B?SHl5TUJ3VUlVbVhsR2hFa0hVVEVvMThSU1YxenZUK01OOWYvWUpCU3FoTklw?=
- =?utf-8?B?UmtSbXdxVVBtMGwrcVBDMTVOd1NDSVNIV3NOYXVqK0xHdWZlVTZyNmdrOVRG?=
- =?utf-8?B?cTAxYjBabEJaclpDYnkyY0k0RllCemw2VDg0OG9TUWdSSmZQQTJUMlo1ZUk2?=
- =?utf-8?Q?VT+uiOnwSVUIcDnnAoIc5+C/c?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf28c2da-8f5e-40b8-b00e-08dd0efdd9a4
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2024 16:09:20.0542
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yB8yCOGHzki3OljxREpafzZd/5Phq6lhyawS2YValISc3ZHmmgDB/dGBNxKLE8WzYHrsUFsk/4nikbUxD57Bhg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6902
+References: <20241120103456.396577-1-linyunsheng@huawei.com>
+ <20241120103456.396577-3-linyunsheng@huawei.com> <3366bf89-4544-4b82-83ec-fd89dd009228@kernel.org>
+ <27475b57-eda1-4d67-93f2-5ca443632f6b@huawei.com> <CAHS8izM+sK=48gfa3gRNffu=T6t6-2vaS60QvH79zFA3gSDv9g@mail.gmail.com>
+ <CAKgT0Uc-SDHsGkgmLeAuo5GLE0H43i3h7mmzG88BQojfCoQGGA@mail.gmail.com>
+ <8f45cc4f-f5fc-4066-9ee1-ba59bf684b07@huawei.com> <41dfc444-1bab-4f9d-af11-4bbd93a9fe4b@arm.com>
+In-Reply-To: <41dfc444-1bab-4f9d-af11-4bbd93a9fe4b@arm.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 27 Nov 2024 08:27:00 -0800
+Message-ID: <CAKgT0UfGmR9B7WBjANvZ9=dxbsWXDRgpaNAMJWGW4Uj4ueiHJg@mail.gmail.com>
+Subject: Re: [PATCH RFC v4 2/3] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, Mina Almasry <almasrymina@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com, 
+	IOMMU <iommu@lists.linux.dev>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Nov 27, 2024 at 7:31=E2=80=AFAM Robin Murphy <robin.murphy@arm.com>=
+ wrote:
+>
+> On 27/11/2024 9:35 am, Yunsheng Lin wrote:
+> > On 2024/11/27 7:53, Alexander Duyck wrote:
+> >> On Tue, Nov 26, 2024 at 1:51=E2=80=AFPM Mina Almasry <almasrymina@goog=
+le.com> wrote:
+> >>>
+> >>> On Thu, Nov 21, 2024 at 12:03=E2=80=AFAM Yunsheng Lin <linyunsheng@hu=
+awei.com> wrote:
+> >>>>
+> >>>> On 2024/11/20 23:10, Jesper Dangaard Brouer wrote:
+> >>>>>
+> >>>>>>        page_pool_detached(pool);
+> >>>>>>        pool->defer_start =3D jiffies;
+> >>>>>>        pool->defer_warn  =3D jiffies + DEFER_WARN_INTERVAL;
+> >>>>>> @@ -1159,7 +1228,7 @@ void page_pool_update_nid(struct page_pool *=
+pool, int new_nid)
+> >>>>>>        /* Flush pool alloc cache, as refill will check NUMA node *=
+/
+> >>>>>>        while (pool->alloc.count) {
+> >>>>>>            netmem =3D pool->alloc.cache[--pool->alloc.count];
+> >>>>>> -        page_pool_return_page(pool, netmem);
+> >>>>>> +        __page_pool_return_page(pool, netmem);
+> >>>>>>        }
+> >>>>>>    }
+> >>>>>>    EXPORT_SYMBOL(page_pool_update_nid);
+> >>>>>
+> >>>>> Thanks for continuing to work on this :-)
+> >>>>
+> >>>> I am not sure how scalable the scanning is going to be if the memory=
+ size became
+> >>>> bigger, which is one of the reason I was posting it as RFC for this =
+version.
+> >>>>
+> >>>> For some quick searching here, it seems there might be server with m=
+ax ram capacity
+> >>>> of 12.3TB, which means the scanning might take up to about 10 secs f=
+or those systems.
+> >>>> The spin_lock is used to avoid concurrency as the page_pool_put_page=
+() API might be
+> >>>> called from the softirq context, which might mean there might be spi=
+nning of 12 secs
+> >>>> in the softirq context.
+> >>>>
+> >>>> And it seems hard to call cond_resched() when the scanning and unmap=
+ping takes a lot
+> >>>> of time as page_pool_put_page() might be called concurrently when po=
+ol->destroy_lock
+> >>>> is released, which might means page_pool_get_dma_addr() need to be c=
+hecked to decide
+> >>>> if the mapping is already done or not for each page.
+> >>>>
+> >>>> Also, I am not sure it is appropriate to stall the driver unbound up=
+ to 10 secs here
+> >>>> for those large memory systems.
+> >>>>
+> >>>> https://www.broadberry.com/12tb-ram-supermicro-servers?srsltid=3DAfm=
+BOorCPCZQBSv91mOGH3WTg9Cq0MhksnVYL_eXxOHtHJyuYzjyvwgH
+> >>>>
+> >>>
+> >>> FWIW I'm also concerned about the looping of all memory on the system=
+.
+> >>> In addition to the performance, I think (but not sure), that
+> >>> CONFIG_MEMORY_HOTPLUG may mess such a loop as memory may appear or
+> >>> disappear concurrently. Even if not, the CPU cost of this may be
+> >>> significant. I'm imagining the possibility of having many page_pools
+> >>> allocated on the system for many hardware queues, (and maybe multiple
+> >>> pp's per queue for applications like devmem TCP), and each pp looping
+> >>> over the entire xTB memory on page_pool_destroy()...
+> >>>
+> >>> My 2 cents here is that a more reasonable approach is to have the pp
+> >>> track all pages it has dma-mapped, without the problems in the
+> >>> previous iterations of this patch:
+> >>>
+> >>> 1. When we dma-map a page, we add it to some pp->dma_mapped data
+> >>> structure (maybe xarray or rculist).
+> >>> 2. When we dma-unmap a page, we remove it from pp->dma_mapped.
+> >>> 3 When we destroy the pp, we traverse pp->dma_mapped and unmap all th=
+e
+> >>> pages there.
+> >>
+> >> The thing is this should be a very rare event as it should apply only
+> >> when a device is removed and still has pages outstanding shouldn't it?
+> >> The problem is that maintaining a list of in-flight DMA pages will be
+> >> very costly and will make the use of page pool expensive enough that I
+> >> would worry it might be considered less than useful. Once we add too
+> >> much overhead the caching of the DMA address doesn't gain us much on
+> >> most systems in that case.
+> >>
+> >>> I haven't looked deeply, but with the right data structure we may be
+> >>> able to synchronize 1, 2, and 3 without any additional locks. From a
+> >>> quick skim it seems maybe rculist and xarray can do this without
+> >>> additional locks, maybe.
+> >
+> > I am not sure how the above right data structure without any additional
+> > locks will work, but my feeling is that the issues mentioned in [1] wil=
+l
+> > likely apply to the above right data structure too.
+> >
+> > 1. https://lore.kernel.org/all/6233e2c3-3fea-4ed0-bdcc-9a625270da37@hua=
+wei.com/
+> >
+> >>>
+> >>> Like stated in the previous iterations of this approach, we should no=
+t
+> >>> be putting any hard limit on the amount of memory the pp can allocate=
+,
+> >>> and we should not have to mess with the page->pp entry in struct page=
+.
+> >
+> > It would be good to be more specific about how it is done without 'mess=
+ing'
+> > with the page->pp entry in struct page using some pseudocode or RFC if =
+you
+> > call the renaming as messing.
+> >
+> >>
+> >> I agree with you on the fact that we shouldn't be setting any sort of
+> >> limit. The current approach to doing the unmapping is more-or-less the
+> >> brute force way of doing it working around the DMA api. I wonder if we
+> >> couldn't look at working with it instead and see if there wouldn't be
+> >> some way for us to reduce the overhead instead of having to do the
+> >> full scan of the page table.
+> >>
+> >> One thought in that regard though would be to see if there were a way
+> >> to have the DMA API itself provide some of that info. I know the DMA
+> >> API should be storing some of that data for the mapping as we have to
+> >> go through and invalidate it if it is stored.
+> >>
+> >> Another alternative would be to see if we have the option to just
+> >> invalidate the DMA side of things entirely for the device. Essentially
+> >> unregister the device from the IOMMU instead of the mappings. If that
+> >> is an option then we could look at leaving the page pool in a state
+> >> where it would essentially claim it no longer has to do the DMA unmap
+> >> operations and is just freeing the remaining lingering pages.
+> >
+> > If we are going to 'invalidate the DMA side of things entirely for the
+> > device', synchronization from page_pool might just go to the DMA core a=
+s
+> > concurrent calling for dma unmapping API and 'invalidating' operation s=
+till
+> > exist. If the invalidating is a common feature, perhaps it makes sense =
+to
+> > do that in the DMA core, otherwise it might just add unnecessary overhe=
+ad
+> > for other callers of DMA API.
+> >
+> > As mentioned by Robin in [2], the DMA core seems to make a great deal o=
+f
+> > effort to catch DMA API misuse in kernel/dma/debug.c, it seems doing th=
+e
+> > above might invalidate some of the dma debug checking.
+>
+> Has nobody paused to consider *why* dma-debug is an optional feature
+> with an explicit performance warning? If you're concerned about the
+> impact of keeping track of DMA mappings within the confines of the
+> page_pool usage model, do you really imagine it could somehow be cheaper
+> to keep track of them at the generic DMA API level without the benefit
+> of any assumptions at all?
 
-On 11/22/24 20:45, Ben Cheatham wrote:
-> On 11/18/24 10:44 AM, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Current cxl core is relying on a CXL_DEVTYPE_CLASSMEM type device when
->> creating a memdev leading to problems when obtaining cxl_memdev_state
->> references from a CXL_DEVTYPE_DEVMEM type. This last device type is
->> managed by a specific vendor driver and does not need same sysfs files
->> since not userspace intervention is expected.
->>
->> Create a new cxl_mem device type with no attributes for Type2.
->>
->> Avoid debugfs files relying on existence of clx_memdev_state.
->>
->> Make devm_cxl_add_memdev accesible from a accel driver.
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> ---
->>   drivers/cxl/core/cdat.c   |  3 +++
->>   drivers/cxl/core/memdev.c | 15 +++++++++++++--
->>   drivers/cxl/core/region.c |  3 ++-
->>   drivers/cxl/mem.c         | 25 +++++++++++++++++++------
->>   include/cxl/cxl.h         |  2 ++
->>   5 files changed, 39 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/cxl/core/cdat.c b/drivers/cxl/core/cdat.c
->> index e9cd7939c407..192cff18ea25 100644
->> --- a/drivers/cxl/core/cdat.c
->> +++ b/drivers/cxl/core/cdat.c
->> @@ -577,6 +577,9 @@ static struct cxl_dpa_perf *cxled_get_dpa_perf(struct cxl_endpoint_decoder *cxle
->>   	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->>   	struct cxl_dpa_perf *perf;
->>   
->> +	if (!mds)
->> +		return ERR_PTR(-EINVAL);
->> +
->>   	switch (mode) {
->>   	case CXL_DECODER_RAM:
->>   		perf = &mds->ram_perf;
->> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
->> index d746c8a1021c..df31eea0c06b 100644
->> --- a/drivers/cxl/core/memdev.c
->> +++ b/drivers/cxl/core/memdev.c
->> @@ -547,9 +547,17 @@ static const struct device_type cxl_memdev_type = {
->>   	.groups = cxl_memdev_attribute_groups,
->>   };
->>   
->> +static const struct device_type cxl_accel_memdev_type = {
->> +	.name = "cxl_memdev",
-> I would like to see a different name than cxl_memdev here, since this is technically
-> a different type and I could see it being confusing sysfs-wise. Maybe "cxl_acceldev"
-> or "cxl_accel_memdev" instead?
+I get what you are saying, but there are things about the internal
+implementations of the individual DMA APIs that might make them much
+easier to destroy mappings and essentially invalidate them. For
+example if the system doesn't have an IOMMU there isn't much that
+actually has to be retained. At most it might be a bitmap for the
+SWIOTLB that would have to be retained per device and that could be
+used to invalidate the mappings assuming the device has been wiped out
+and is somehow actually using the SWIOTLB.
 
+In the case of an IOMMU there are many who run with iommu=3Dpt which
+will identity map the entire system memory and then just hand out
+individual physical addresses from that range. In reality that should
+be almost as easy to handle as the non-iommu case so why shouldn't we
+take advantage of that to clean up this use case?
 
-Yes, it makes sense.
+> Yes, in principle we could add a set of "robust" DMA APIs which make
+> sure racy sync calls are safe and offer a "clean up all my outstanding
+> mappings" op, and they would offer approximately as terrible performance
+> as the current streaming APIs with dma-debug enabled, because it would
+> be little different from what dma-debug already does. The checks
+> themselves aren't complicated; the generally-prohibitive cost lies in
+> keeping track of mappings and allocations so that they *can* be checked
+> internally.
+>
+> Whatever you think is hard to do in the page_pool code to fix that
+> code's own behaviour, it's even harder to do from elsewhere with less
+> information.
 
+My general thought would be to see if there is anything we could
+explore within the DMA API itself to optimize the handling for this
+sort of bulk unmap request. If not we could fall back to an approach
+that requires more overhead and invalidation of individual pages.
 
->> +	.release = cxl_memdev_release,
->> +	.devnode = cxl_memdev_devnode,
->> +};
->> +
->>   bool is_cxl_memdev(const struct device *dev)
->>   {
->> -	return dev->type == &cxl_memdev_type;
->> +	return (dev->type == &cxl_memdev_type ||
->> +		dev->type == &cxl_accel_memdev_type);
->> +
->>   }
->>   EXPORT_SYMBOL_NS_GPL(is_cxl_memdev, CXL);
->>   
->> @@ -660,7 +668,10 @@ static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
->>   	dev->parent = cxlds->dev;
->>   	dev->bus = &cxl_bus_type;
->>   	dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
->> -	dev->type = &cxl_memdev_type;
->> +	if (cxlds->type == CXL_DEVTYPE_DEVMEM)
->> +		dev->type = &cxl_accel_memdev_type;
->> +	else
->> +		dev->type = &cxl_memdev_type;
->>   	device_set_pm_not_required(dev);
->>   	INIT_WORK(&cxlmd->detach_work, detach_memdev);
->>   
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index dff618c708dc..622e3bb2e04b 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
->> @@ -1948,7 +1948,8 @@ static int cxl_region_attach(struct cxl_region *cxlr,
->>   		return -EINVAL;
->>   	}
->>   
->> -	cxl_region_perf_data_calculate(cxlr, cxled);
->> +	if (cxlr->type == CXL_DECODER_HOSTONLYMEM)
->> +		cxl_region_perf_data_calculate(cxlr, cxled);
->>   
->>   	if (test_bit(CXL_REGION_F_AUTO, &cxlr->flags)) {
->>   		int i;
->> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
->> index a9fd5cd5a0d2..cb771bf196cd 100644
->> --- a/drivers/cxl/mem.c
->> +++ b/drivers/cxl/mem.c
->> @@ -130,12 +130,18 @@ static int cxl_mem_probe(struct device *dev)
->>   	dentry = cxl_debugfs_create_dir(dev_name(dev));
->>   	debugfs_create_devm_seqfile(dev, "dpamem", dentry, cxl_mem_dpa_show);
->>   
->> -	if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
->> -		debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
->> -				    &cxl_poison_inject_fops);
->> -	if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
->> -		debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
->> -				    &cxl_poison_clear_fops);
->> +	/*
->> +	 * Avoid poison debugfs files for Type2 devices as they rely on
->> +	 * cxl_memdev_state.
->> +	 */
->> +	if (mds) {
->> +		if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
->> +			debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
->> +					    &cxl_poison_inject_fops);
->> +		if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
->> +			debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
->> +					    &cxl_poison_clear_fops);
->> +	}
->>   
->>   	rc = devm_add_action_or_reset(dev, remove_debugfs, dentry);
->>   	if (rc)
->> @@ -219,6 +225,13 @@ static umode_t cxl_mem_visible(struct kobject *kobj, struct attribute *a, int n)
->>   	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->>   	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->>   
->> +	/*
->> +	 * Avoid poison sysfs files for Type2 devices as they rely on
->> +	 * cxl_memdev_state.
->> +	 */
->> +	if (!mds)
->> +		return 0;
-> cxl_accel_memdev don't use the same attributes, so I imagine this modification isn't needed?
-> I'm probably just missing something here.
-
-
-This function is invoked for a Type2, as the cxl_mem device is created 
-and the attr group attached by default.
-
-So this is needed or the reference will be pointing to unknown data and 
-the kernel, if we are lucky, getting a null pointer or a wrong pointer 
-making things worse.
-
-
->> +
->>   	if (a == &dev_attr_trigger_poison_list.attr)
->>   		if (!test_bit(CXL_POISON_ENABLED_LIST,
->>   			      mds->poison.enabled_cmds))
->> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
->> index 6033ce84b3d3..5608ed0f5f15 100644
->> --- a/include/cxl/cxl.h
->> +++ b/include/cxl/cxl.h
->> @@ -57,4 +57,6 @@ int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
->>   int cxl_request_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
->>   int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
->>   void cxl_set_media_ready(struct cxl_dev_state *cxlds);
->> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
->> +				       struct cxl_dev_state *cxlds);
->>   #endif
+You could think of it like the approach that has been taken with
+DEFINED_DMA_UNMAP_ADDR/LEN. Basically there are cases where this can
+be done much more quickly and it is likely we can clean up large
+swaths in one go. So why not expose a function that might be able to
+take advantage of that for exception cases like this surprise device
+removal.
 
