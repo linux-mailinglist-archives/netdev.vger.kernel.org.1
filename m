@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-147665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D067D9DAF74
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:59:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 605BA9DAF76
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:59:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A6A8B20C60
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:59:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3ABBB21BF5
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:59:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A159C204F71;
-	Wed, 27 Nov 2024 22:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71846204F95;
+	Wed, 27 Nov 2024 22:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="EUyj5+HQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YyLTcLel"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="nMENH7Z/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JqAZHXEf"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F952036ED;
-	Wed, 27 Nov 2024 22:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D8C204F72;
+	Wed, 27 Nov 2024 22:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732748329; cv=none; b=PxZGx7yWIoQw8i66oBY6gQ/5r7706KDDmsHsjhlReCBY3q52b91IJZjp/6VnajD+7k1I2CvMI93PV/9F2ap5QqJ5xQBu42dJhoo/S4o0UZxthsT0W799IrIgeSieHtUu3i8SHZngrpua6N4Ot2D8SQ3bj+Mv9GZ4g0Be6Ns4UiI=
+	t=1732748331; cv=none; b=YFSv9/5euaad+qBIlr/vfKvPZm8VYw974XbyLwo99yy7uCE1h9ZqHMYYkj1kdCvY8EjaXSOhjRUjQeYC6yachsX+cvNAkSFiIDNh+Ym57KnXRcD1qdIUSCX0ZK72tJRrcR+ZaWqFacr3C7/RJfLiYARMvMvcTm46A0AU4HJrM+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732748329; c=relaxed/simple;
-	bh=vj5enPpd/XiXqTwZ4ZKIHjG+vVXbJeGqCFyVQC+B5t0=;
+	s=arc-20240116; t=1732748331; c=relaxed/simple;
+	bh=gTut2Bb70dTdxhqs0TnBAg+jX/uvcRTbJJ983vhcCAc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R/m/Bdn97n3CIWO3oi0e9B0siaG3mGdhLdde0eLjb0+Dqe/6C4EbetYJTe0agLQRTL6HEKUWJKB+6roQjMYIHVsjoZQw45MkbEIaTrT+T3fUaPrDF3CtmycME68NhrNqJ5+//xYandrsr06ERzS4qslhrkYlkMbsfy8/+YEcut8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=EUyj5+HQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YyLTcLel; arc=none smtp.client-ip=103.168.172.147
+	 MIME-Version; b=lih6aWlETQgbSvGgmQjS8weFQm3ZVGLg/qCiQw64wd1D1wxZxknUrhnXU0ZT2p1N4gk5a90V83jlRpbgprNKgj+assbxIOxt2d08XpEz5If71ymKYak2vo/5cs0Eqfpl2uFMWgY1eFHjt09WQ1ZTY/f9qZIfOYNTHgldYMAtkRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=nMENH7Z/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JqAZHXEf; arc=none smtp.client-ip=103.168.172.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id 96C031380439;
-	Wed, 27 Nov 2024 17:58:46 -0500 (EST)
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id A14D71140194;
+	Wed, 27 Nov 2024 17:58:48 -0500 (EST)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 27 Nov 2024 17:58:46 -0500
+  by phl-compute-08.internal (MEProxy); Wed, 27 Nov 2024 17:58:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
 	:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1732748326; x=
-	1732834726; bh=kmaKp+gO5Ni6M6T4MZ2C6qRQyeNlE74ySZwdK112b60=; b=E
-	Uyj5+HQ4thpnpnFlJ8tycfWTctLRr+HhcvW+1uZhXRlruL3kRPbq5uQpgEUIrkB9
-	lvZHyLVD3ZKfRuJjMmZy9fTnN8UWQ9x9929av29Af/OjJtQmNNnB776J9SjHV2oo
-	MI2/fGV1VmfYDgpcVgQkmI1i3m3xBVoiqrW+NJ40kOHfer0O7VLCH6nnHYtEEQyq
-	P+HXZ+W5mWXka2UId1U1j+/43yUn9PkRxa7oBVpFeOmLNsSBPbbgJNcPFLpRmWq6
-	+j3HvhoaaAOPoaQfSSU6URauWyZrqxnuG0qL604IyyK6fJTGc6kRw9YELlb4L6Y+
-	eu5OvlHre2l7nI23F2KsA==
+	:reply-to:subject:subject:to:to; s=fm3; t=1732748328; x=
+	1732834728; bh=7a9iua5Ya9R/+yjRYkgQYBjKtp939sLnstLb3lP7qNs=; b=n
+	MENH7Z/aeURLcISorl7O733uBq1WLnlotjL6DapvY0Bcr92CCDv2FE5kYza0cFji
+	2IHEQp2EvK3W9Gt7r5SyL89Aafh3OEWadMROMlrBlIxptBH/u+3pNbJVA9n8BDRe
+	mdbGr4OxMau3xY0qg7eB3GcTwR/0N0jQxgKCD9ruEQnHmIX4dpjfOLW51tZdrJCr
+	T5LPvH6JyZEy6pCUocUaBxs92gpn9mZbUAsMDzdRmq/oWBv6/Hg+KwEE+rJBU4Tt
+	9egDnS5NZL557sqDgTPd/minI29cI2EgNkFRMCZgjI8Rdwz7/fkTZlvT2fxnlnxR
+	ZwpGY55w1qTzCyfOvZQTg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1732748326; x=1732834726; bh=k
-	maKp+gO5Ni6M6T4MZ2C6qRQyeNlE74ySZwdK112b60=; b=YyLTcLelHuqvMv6EZ
-	EFayjK3T5YXbZNiciJ0Ywg/Gb9SynOqlvc9cvQdWQgF8MZz2jf/xeVx/XxNSqtBE
-	anjfDHLF73aV6wgb9gXpE8BljoKy05dAq/whG9MhU9+8ad0kcsRV4k+ZUqBHZzGl
-	soLcfZ+u9U3xfIvo+I/OCkAZLVvKJNMkbZab+0BrVkBzqinT3/cvYvUOAAYTo9U9
-	g8dvrkAubiojE31PoZgsiG4XrTkzGCfLmOTWEhRh1vR+lEP1sP139imN00qY1icc
-	ZHHoZmCWOIibECJPq+oGXt1SKP5X1T972CeBped/dokLi5FxZxGXefpYYhu0NJ1a
-	wIANA==
-X-ME-Sender: <xms:JaRHZ0PJScmAMk4CKa1E1qThYe8-9I5393gNSLYr5k-1e66CHJ91rQ>
-    <xme:JaRHZ6__9up1zrUbERW5ZDVyPp8XSDrDYncWAwMQRcj2e-xu_YVu3p4ti037Ca8aZ
-    HcJPGIM105SglcZHA>
-X-ME-Received: <xmr:JaRHZ7RvlmPjiJzxIKd6ImvznOVcfZGd804yXaqH-U8WbgTnjy4oSgQI05BNr1tN-HLMrzDDW_S1x3FOyyy9sEITCD1Z9pCDEa77fxil7QBKwX0Cw0cX>
+	:x-me-sender:x-sasl-enc; s=fm1; t=1732748328; x=1732834728; bh=7
+	a9iua5Ya9R/+yjRYkgQYBjKtp939sLnstLb3lP7qNs=; b=JqAZHXEfGB8e6xr4r
+	VrFze/1jLgVthZG44SSL6UNyN6fTEbb20TzSL4hOYMZfQX+GQsPB6Ivhkqa7TZLx
+	aD+Dbcdk3A3oN+ALLUadkP3gI4tkse7X6HA+yqb1VRz61Py74Vpq/Dei53fwkeu/
+	npbB4Um8ybiE47WUxpL3VPDqH7BEkBagN9b3dcpO83VOoKKAmSxBOIJxUjRTnj4D
+	vUpPRJ+TTEFBaTpSYRMIt7RFHM665sApvrOLTgfuQOzXgKCnc2yrWddeETBAaf1L
+	H6UjvJKolaNLP8aMHqd/QxzOfXzx84Y/LYbkr0BC2CQ6FZHmtpvr0bMKcR1lDHtt
+	6hftg==
+X-ME-Sender: <xms:KKRHZ93LREqKl3uZtKn5kd2Mtw7FmUz-zHbaZeu2E_9hXAcci57B5A>
+    <xme:KKRHZ0F3JUzBxVfeeduvkMNVZmgSYs2QR0yS3M2QQleyJNaFWQcF287cCPlj4Ku6I
+    JAlAQRx1VoykxKmzw>
+X-ME-Received: <xmr:KKRHZ96EZFry0SPvj60V9S3H6c1QOvTTwnTBhow5jligjA_UlaNmGuEHQhr9kjSYHF5ZAsSUzGAP1VWZNzDfPCgvMI7sRBJUV6wBYE7MUCmw68Ixbqmi>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrhedtgddtgecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
     tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdejtd
@@ -72,40 +72,41 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrhedtgddtgecutefuodetggdote
     nhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpe
     fgfefggeejhfduieekvdeuteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucev
     lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugi
-    huuhhurdighiiipdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhr
+    huuhhurdighiiipdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhr
     tghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhope
-    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepphgrvhgrnhdrtghhvggs
-    sghisegsrhhorggutghomhdrtghomhdprhgtphhtthhopehkrghlvghshhdqrghnrghkkh
-    hurhdrphhurhgrhihilhessghrohgruggtohhmrdgtohhmpdhrtghpthhtohepuggrvhgv
-    mhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmihgthhgrvghlrdgthhgrnh
-    essghrohgruggtohhmrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghv
-X-ME-Proxy: <xmx:JaRHZ8uzPObqw5Z6V2Usogu8pG_J6RMciTLp99fFn9jdYz36nftxDA>
-    <xmx:JaRHZ8ezyJZgxIkC--ZDqHGoTWrmmpKtSy770y7EgWxGbCtZO0baOg>
-    <xmx:JaRHZw3yU1P-dHcHpdMFfhKqQ9WUrqDOC6KCBeIRhstyeJ4PmsoFcw>
-    <xmx:JaRHZw9Pz8IUMmHGk0S40gpNDC87smNINnSBvmm7XDD56ibOMRU4iQ>
-    <xmx:JqRHZ7_Z5QyWKIzb0KTFtAW_V2qXZG8GP6bvg0ToR_9eEpdX5fLZy__8>
+    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
+    mhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
+    hmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgrvghlrdgthhgrnhessg
+    hrohgruggtohhmrdgtohhmpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhig
+    rdguvghvpdhrtghpthhtohepphgrvhgrnhdrtghhvggssghisegsrhhorggutghomhdrtg
+    homh
+X-ME-Proxy: <xmx:KKRHZ61ytxHXb-FMBa4MBmlz2XwmIvj1aI5C-zniWhcKnq7UReYv-w>
+    <xmx:KKRHZwEG41UwW6AO8ZxJ2bK1guBHbRhh0kRX8uAvOrZ58Opo7pGu5A>
+    <xmx:KKRHZ78Q4XA5w-3UMun8h_4El68ZlRFwlv770Rri5b5tICKy-WZn9w>
+    <xmx:KKRHZ9lMkcnWn8KwAiyaNmrqmZiMOPmTfncOD18RhAe1sNa_VFwGsw>
+    <xmx:KKRHZ9d33pi135AXOyG99oSkd_Uf1WYS4x9ZrPJeUu-kBz5kr7qwKZOT>
 Feedback-ID: i6a694271:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 27 Nov 2024 17:58:44 -0500 (EST)
+ 27 Nov 2024 17:58:46 -0500 (EST)
 From: Daniel Xu <dxu@dxuuu.xyz>
 To: andrew+netdev@lunn.ch,
 	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	kalesh-anakkur.purayil@broadcom.com,
 	davem@davemloft.net,
-	michael.chan@broadcom.com,
 	edumazet@google.com,
+	shuah@kernel.org,
 	kuba@kernel.org,
+	michael.chan@broadcom.com,
 	martin.lau@linux.dev,
+	pavan.chebbi@broadcom.com,
 	ecree.xilinx@gmail.com
 Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	kernel-team@meta.com
-Subject: [PATCH net v3 1/2] bnxt_en: ethtool: Supply ntuple rss context action
-Date: Wed, 27 Nov 2024 15:58:29 -0700
-Message-ID: <2e884ae39e08dc5123be7c170a6089cefe6a78f7.1732748253.git.dxu@dxuuu.xyz>
+Subject: [PATCH net v3 2/2] selftests: drv-net: rss_ctx: Add test for ntuple rule
+Date: Wed, 27 Nov 2024 15:58:30 -0700
+Message-ID: <759870e430b7c93ecaae6e448f30a47284c59637.1732748253.git.dxu@dxuuu.xyz>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <cover.1732748253.git.dxu@dxuuu.xyz>
 References: <cover.1732748253.git.dxu@dxuuu.xyz>
@@ -117,42 +118,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 2f4f9fe5bf5f ("bnxt_en: Support adding ntuple rules on RSS
-contexts") added support for redirecting to an RSS context as an ntuple
-rule action. However, it forgot to update the ETHTOOL_GRXCLSRULE
-codepath. This caused `ethtool -n` to always report the action as
-"Action: Direct to queue 0" which is wrong.
+Extend the rss_ctx test suite to test that an ntuple action that
+redirects to an RSS context contains that information in `ethtool -n`.
+Otherwise the output from ethtool is highly deceiving. This test helps
+ensure drivers are compliant with the API.
 
-Fix by teaching bnxt driver to report the RSS context when applicable.
-
-Fixes: 2f4f9fe5bf5f ("bnxt_en: Support adding ntuple rules on RSS contexts")
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ tools/testing/selftests/drivers/net/hw/rss_ctx.py | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index f1f6bb328a55..d87681d71106 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1187,10 +1187,14 @@ static int bnxt_grxclsrule(struct bnxt *bp, struct ethtool_rxnfc *cmd)
- 		}
- 	}
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+index 0b49ce7ae678..ca8a7edff3dd 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+@@ -3,7 +3,8 @@
  
--	if (fltr->base.flags & BNXT_ACT_DROP)
-+	if (fltr->base.flags & BNXT_ACT_DROP) {
- 		fs->ring_cookie = RX_CLS_FLOW_DISC;
--	else
-+	} else if (fltr->base.flags & BNXT_ACT_RSS_CTX) {
-+		fs->flow_type |= FLOW_RSS;
-+		cmd->rss_context = fltr->base.fw_vnic_id;
-+	} else {
- 		fs->ring_cookie = fltr->base.rxq;
-+	}
- 	rc = 0;
+ import datetime
+ import random
+-from lib.py import ksft_run, ksft_pr, ksft_exit, ksft_eq, ksft_ne, ksft_ge, ksft_lt
++import re
++from lib.py import ksft_run, ksft_pr, ksft_exit, ksft_eq, ksft_ne, ksft_ge, ksft_lt, ksft_true
+ from lib.py import NetDrvEpEnv
+ from lib.py import EthtoolFamily, NetdevFamily
+ from lib.py import KsftSkipEx, KsftFailEx
+@@ -96,6 +97,13 @@ def _send_traffic_check(cfg, port, name, params):
+                 f"traffic on inactive queues ({name}): " + str(cnts))
  
- fltr_err:
+ 
++def _ntuple_rule_check(cfg, rule_id, ctx_id):
++    """Check that ntuple rule references RSS context ID"""
++    text = ethtool(f"-n {cfg.ifname} rule {rule_id}").stdout
++    pattern = f"RSS Context (ID: )?{ctx_id}"
++    ksft_true(re.search(pattern, text), "RSS context not referenced in ntuple rule")
++
++
+ def test_rss_key_indir(cfg):
+     """Test basics like updating the main RSS key and indirection table."""
+ 
+@@ -459,6 +467,8 @@ def test_rss_context(cfg, ctx_cnt=1, create_with_cfg=None):
+         ntuple = ethtool_create(cfg, "-N", flow)
+         defer(ethtool, f"-N {cfg.ifname} delete {ntuple}")
+ 
++        _ntuple_rule_check(cfg, ntuple, ctx_id)
++
+     for i in range(ctx_cnt):
+         _send_traffic_check(cfg, ports[i], f"context {i}",
+                             { 'target': (2+i*2, 3+i*2),
 -- 
 2.46.0
 
