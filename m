@@ -1,153 +1,173 @@
-Return-Path: <netdev+bounces-147603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C3FF9DA880
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 14:30:41 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321D99DA88C
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 14:31:51 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1359A282232
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 13:30:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8029161B2F
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 13:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93E21FCFCA;
-	Wed, 27 Nov 2024 13:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7EC1F76A5;
+	Wed, 27 Nov 2024 13:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RbnPhrHu"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AwJKcbvV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC87C5B1FB;
-	Wed, 27 Nov 2024 13:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D2D6A8D2
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 13:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732714226; cv=none; b=e3D0XFQ4io6cjT5IlfUG+CAUhw9EKfQKZ7MlYMrqjh5IKA2jOFpXiONyUlHtqlpyK4LCIvCaLL9IOtn2ngbHWQ5q8VFqvz0YDWDrmgMu1oweZj5hexHAAkhhvoTKSk/GFHOEQa25lSi++P2snrcGZXAHEyojKAps+Dwuv7vcuJ4=
+	t=1732714307; cv=none; b=Sesm3EC7pg9cDTlH8WBd2oHHH5E2ypDL/uFscH/rFonql1LMmaVRuY1xfKNR1XoxGARXHk10oj56uSo2CL+nii2FTUxdIGJHzpXvRtoF2Gl5DX2X8Zs6ZYJk4XZx404cq0QudLn0lRhxiw4JIYx8ds3zEl+gqSHcCEHr+ovA1mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732714226; c=relaxed/simple;
-	bh=eurh3IoFffcwIYSmtKn6rRPAfOFD/U0NU9PvTvqgvII=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uA+c3Nmn1DLBe+ZCKvdbkoXltPay7jpindojiGWfQXJM3m6MpmalBMkWsigcsa+8xAegxLXOnaAuB4dYIPZZ67Y+c1qmBaNsfhsq1agLIyFh9VpzSwxoepXHLxKU2G20p3kCTSgpDRdh7X0amMXVlvzhSFFRyVmTjDMrUAXV17k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RbnPhrHu; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1732714220; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=VQ5YFXwzAVQWAU6LW3L0vrzXF2bw6K+KRSa11h34H0U=;
-	b=RbnPhrHuZiCcvnFwJUXvOzL+I6TfaX/b+5jaJVpRK5Eda6TVZecnjKGhKDJyw061qnehzJPS74CwtsWHclcZ3G3Ij765Dip4V7vQ8LI2YWPYYjrpEg2fpXY7G7i0K4H/f+9HS7e1sifI4kJocwT88QYBDqRDL7nIVyKuafHRrSA=
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WKMbqSM_1732714218 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 27 Nov 2024 21:30:20 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	horms@kernel.org,
-	kgraul@linux.ibm.com,
-	hwippel@linux.ibm.com,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 2/2] net/smc: fix LGR and link use-after-free issue
-Date: Wed, 27 Nov 2024 21:30:14 +0800
-Message-Id: <20241127133014.100509-3-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20241127133014.100509-1-guwen@linux.alibaba.com>
-References: <20241127133014.100509-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1732714307; c=relaxed/simple;
+	bh=cldKOGvGEDCVtpyFEnvKqgLQdUBtqnf8swX67yPUtWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YIRyOd1WPU6hij86aWknh2bCdKCPCacjgH07Y+1PGfMTkgcxEdJ8G6W029n9z2Q1anxESlAp1tfZtGdv4BTJiLbzpWZW3jjfD2aRKZHWmRnC9n/HRuxlf/U7CE1SNSySU3bQSkkAbMWMNXGN2g8akFHmB8MfwlvNetNzWvjDmtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AwJKcbvV; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.stl.internal (Postfix) with ESMTP id 43D0E1140108;
+	Wed, 27 Nov 2024 08:31:44 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Wed, 27 Nov 2024 08:31:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1732714304; x=1732800704; bh=kD4GGRRXaJo5coUVseQ9cL4WW5EIeSMVT52
+	/M/YXrqo=; b=AwJKcbvVk4bZADXM0lQ75mLzLoElEG7hc+c9BuWIsNbyzCMdnL5
+	kno3T++TVEwRCKf0PMegKvZgdXwcmuHz6MsoQ7UCwG77X5ojgXakERDC1Qf5HbLO
+	nrg3DszrAfMtocoj/1eGMqAIvxXlLVrE5755JXNNlUJzC5gsmWajXigZY/HDKvP+
+	jqfJHNY7fPrEAWBTmJjDNRnlKZbhkyumR35rbQ54gueX/GYCJVXNz8uKwt3sx4F7
+	wOhvUoqPlaSdJ4ohaMVw32x7epDZEyj8xOmrS1GpKX86pkO8BeWteoihLzksTzAj
+	gKDHXaeAjtONJKXQF9AAAj+QfG+diyVw24w==
+X-ME-Sender: <xms:Ph9HZ_D9cAvcx7BRdtg_NxroEY9qbomzQ-iZMydPWLfXnGSZpgd1bw>
+    <xme:Ph9HZ1jbd-QB9tbOaVgRtIDFTeLGr8soT8xUwktkANplfSPv6uy4tYts7wvpUi57L
+    w3knU9fyiBWQ8s>
+X-ME-Received: <xmr:Ph9HZ6nMmXLhcXGacQGI-hUTdWDfHYdTGtEkHaGIW0AaPNprerRguB4BBJM90bCgP7SdY7ykx3vXPtppIxL4I69yLPE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrgeelgdeglecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
+    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
+    hgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefgudff
+    vdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehi
+    ughoshgthhdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpd
+    hrtghpthhtoheplhhorhgvnhiiohdrsghirghntghonhhisehrvgguhhgrthdrtghomhdp
+    rhgtphhtthhopehmrghilhesthhkudehgedruggvpdhrtghpthhtohepnhgsugesnhgsug
+    drnhgrmhgvpdhrtghpthhtohepshgvrghnrdifrghnghesmhgvughirghtvghkrdgtohhm
+    pdhrtghpthhtohepmhgrrhhkqdhmtgdrlhgvvgesmhgvughirghtvghkrdgtohhmpdhrtg
+    hpthhtoheplhhorhgvnhiioheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthgu
+    vghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghmtghohhgvnhesnh
+    hvihguihgrrdgtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkihhn
+    sehinhhtvghlrdgtohhm
+X-ME-Proxy: <xmx:Ph9HZxxmC3iu7jjQT6jEOfhqON8G0HY1LLNJDQSZ8OvW5Ask2wtXiw>
+    <xmx:Ph9HZ0RmqwAAe4YJu_iLtG4siluM5JMOuPaLT-DLCglSg3nHopv21w>
+    <xmx:Ph9HZ0Y_cgaxonZc3g2QKMg55FpMgxDQwFIBWhN5fM8b8EDJYUf4eg>
+    <xmx:Ph9HZ1Rmo974fapYeKDrIkjkS1ZcpUKfFxMRoov-jakQh1SS9FmAZQ>
+    <xmx:QB9HZ3Ex6aB9bsAbLeVpOpgerrbD8h8THsOs-XtxAa1w-YNULKBI3I2V>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 Nov 2024 08:31:41 -0500 (EST)
+Date: Wed, 27 Nov 2024 15:31:39 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Cc: Til Kaiser <mail@tk154.de>, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
+	netdev@vger.kernel.org, amcohen@nvidia.com,
+	aleksander.lobakin@intel.com
+Subject: Re: [PATCH net] mediathek: mtk_eth_soc: fix netdev inside
+ xdp_rxq_info
+Message-ID: <Z0cfOzsujtoxO422@shredder>
+References: <20241126134707.253572-1-mail@tk154.de>
+ <20241126134707.253572-2-mail@tk154.de>
+ <Z0YQYKgUyLt8w4va@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z0YQYKgUyLt8w4va@lore-desk>
 
-We encountered a LGR/link use-after-free issue, which manifested as
-the LGR/link refcnt reaching 0 early and entering the clear process,
-making resource access unsafe.
+On Tue, Nov 26, 2024 at 07:16:00PM +0100, Lorenzo Bianconi wrote:
+> > Currently, the network device isn't set inside the xdp_rxq_info
+> > of the mtk_rx_ring, which means that an XDP program attached to
+> > the Mediathek ethernet driver cannot retrieve the index of the
+> > interface that received the package since it's always 0 inside
+> > the xdp_md struct.
+> > 
+> > This patch sets the network device pointer inside the
+> > xdp_rxq_info struct, which is later used to initialize
+> > the xdp_buff struct via xdp_init_buff.
+> > 
+> > This was tested using the following eBPF/XDP program attached
+> > to a network interface of the mtk_eth_soc driver. As said before,
+> > ingress_ifindex always had a value of zero. After applying the
+> > patch, ingress_ifindex holds the correct interface index.
+> > 
+> > 	#include <linux/bpf.h>
+> > 	#include <bpf/bpf_helpers.h>
+> > 
+> > 	SEC("pass")
+> > 	int pass_func(struct xdp_md *xdp) {
+> >     		bpf_printk("ingress_ifindex: %u",
+> > 			xdp->ingress_ifindex);
+> > 
+> > 		return XDP_PASS;
+> > 	}
+> > 
+> > 	char _license[] SEC("license") = "GPL";
+> > 
+> > Signed-off-by: Til Kaiser <mail@tk154.de>
+> > ---
+> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > index 53485142938c..9c6d4477e536 100644
+> > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > @@ -2069,6 +2069,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
+> >  
+> >  		netdev = eth->netdev[mac];
+> >  		ppe_idx = eth->mac[mac]->ppe_idx;
+> > +		ring->xdp_q.dev = netdev;
+> 
+> I guess you can set it just before running xdp_init_buff(), but the change is fine.
 
- refcount_t: addition on 0; use-after-free.
- WARNING: CPU: 14 PID: 107447 at lib/refcount.c:25 refcount_warn_saturate+0x9c/0x140
- Workqueue: events smc_lgr_terminate_work [smc]
- Call trace:
-  refcount_warn_saturate+0x9c/0x140
-  __smc_lgr_terminate.part.45+0x2a8/0x370 [smc]
-  smc_lgr_terminate_work+0x28/0x30 [smc]
-  process_one_work+0x1b8/0x420
-  worker_thread+0x158/0x510
-  kthread+0x114/0x118
+Lorenzo, is it legitimate to change rxq->dev post registration like
+that?
 
-or
+I am asking because we have a similar problem [1]. In our case we also
+register the rxq structure with a dummy netdev which is why XDP programs
+see an ifindex of 0.
 
- refcount_t: underflow; use-after-free.
- WARNING: CPU: 6 PID: 93140 at lib/refcount.c:28 refcount_warn_saturate+0xf0/0x140
- Workqueue: smc_hs_wq smc_listen_work [smc]
- Call trace:
-  refcount_warn_saturate+0xf0/0x140
-  smcr_link_put+0x1cc/0x1d8 [smc]
-  smc_conn_free+0x110/0x1b0 [smc]
-  smc_conn_abort+0x50/0x60 [smc]
-  smc_listen_find_device+0x75c/0x790 [smc]
-  smc_listen_work+0x368/0x8a0 [smc]
-  process_one_work+0x1b8/0x420
-  worker_thread+0x158/0x510
-  kthread+0x114/0x118
+Thanks
 
-It is caused by repeated release of LGR/link refcnt. One suspect is that
-smc_conn_free() is called repeatedly because some smc_conn_free() from
-server listening path are not protected by sock lock.
+[1] https://lore.kernel.org/netdev/ZzYR2ZJ1mGRq12VL@shredder/
 
-e.g.
+> 
+> Regards,
+> Lorenzo
+> 
+> >  
+> >  		if (unlikely(test_bit(MTK_RESETTING, &eth->state)))
+> >  			goto release_desc;
+> > -- 
+> > 2.47.1
+> > 
+> > 
 
-Calls under socklock        | smc_listen_work
--------------------------------------------------------
-lock_sock(sk)               | smc_conn_abort
-smc_conn_free               | \- smc_conn_free
-\- smcr_link_put            |    \- smcr_link_put (duplicated)
-release_sock(sk)
-
-So here add sock lock protection in smc_listen_work() path, making it
-exclusive with other connection operations.
-
-Fixes: 3b2dec2603d5 ("net/smc: restructure client and server code in af_smc")
-Co-developed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Co-developed-by: Kai <KaiShen@linux.alibaba.com>
-Signed-off-by: Kai <KaiShen@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/af_smc.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index ed6d4d520bc7..9e6c69d18581 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -1900,6 +1900,7 @@ static void smc_listen_out(struct smc_sock *new_smc)
- 	if (tcp_sk(new_smc->clcsock->sk)->syn_smc)
- 		atomic_dec(&lsmc->queued_smc_hs);
- 
-+	release_sock(newsmcsk); /* lock in smc_listen_work() */
- 	if (lsmc->sk.sk_state == SMC_LISTEN) {
- 		lock_sock_nested(&lsmc->sk, SINGLE_DEPTH_NESTING);
- 		smc_accept_enqueue(&lsmc->sk, newsmcsk);
-@@ -2421,6 +2422,7 @@ static void smc_listen_work(struct work_struct *work)
- 	u8 accept_version;
- 	int rc = 0;
- 
-+	lock_sock(&new_smc->sk); /* release in smc_listen_out() */
- 	if (new_smc->listen_smc->sk.sk_state != SMC_LISTEN)
- 		return smc_listen_out_err(new_smc);
- 
--- 
-2.32.0.3.g01195cf9f
 
 
