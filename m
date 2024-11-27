@@ -1,78 +1,40 @@
-Return-Path: <netdev+bounces-147613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 804299DAABA
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 16:26:48 +0100 (CET)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8529DAAD1
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 16:31:23 +0100 (CET)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 395AD2815F3
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 15:26:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DBD1637FA
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 15:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E900B1FF7D0;
-	Wed, 27 Nov 2024 15:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="pfP6uYr5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E70E3C488;
+	Wed, 27 Nov 2024 15:31:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013151E51D
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 15:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E850240BF2;
+	Wed, 27 Nov 2024 15:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732721204; cv=none; b=XpJ20FTUmidcjwm3JmIl5b64QQPR2OVvIoUuqrqHzKgsUSZPLAwesr53KF5go/FTebqopkltuJTm+miNyhQhprJkaPi/MQfZuZwF8PAuFkKjwSi4nfYSpx4Uteh7jnnrM8LV1uwoXSn6niBji3xlBm70BR3pYAZ4odr+zqeLkxg=
+	t=1732721480; cv=none; b=KEXtAsF9b6T6FLiKlXgAs1VN9JqZIjIZvSQnU7i2Ouft0W5SkOKzt3vSzJ8T2RMEz0gzYQlgnes/nBzq/T8Yp+qdVD2uDrWSlrudZpEma6Ob1u33/TARxGTpJboknZJlDJKhvvPkbkpF5VtWTZF2/jNLC/nRojRKWtKT1NKP15I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732721204; c=relaxed/simple;
-	bh=GJf3i/XDIVDhsA/XhOwq8syjtapR6LMIST7/HQ/e8Lo=;
+	s=arc-20240116; t=1732721480; c=relaxed/simple;
+	bh=pubFsu2duy/OPMVsYcsHApVWHA9DZRmxt9oXT1BKVEI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a/D6sMPmvp4+wE4dvKjbBGPvRX6L3cdis8rtT9dbOnIUfpcMqoxyWwIbedtGrGMZ7lCDmaX7RC5Jn/GbSvujVw0sFB6sjUpkNHXKF7WJfb4Abhcm0yz2Tb4bC7ddHNz0L8+/ZKFiRT4D4HhhDg2BmmhIXnd6FxSATondSuC/huQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=pfP6uYr5; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3823cae4be1so4262229f8f.3
-        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 07:26:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1732721201; x=1733326001; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fW/M4oPV0/KPGqG0SIYH3NNGppK50TUAetW8hAYS+Xs=;
-        b=pfP6uYr5uPMyBSQLQRnViEnKIERrlCP5GPIDCtXLDd/FEnLp6z82Mh2uShQZwlvUms
-         qhqKZss11nPjHeqqNC4LbzgPa2GdGEG+xT9yKMzmAn4Lcc4SuGGypohP7q4UITm2zBPV
-         jLQVbraDiz/PElcv4ok2j2qOE7D0xtZc5WOX9l5aFrHtQ5kJOvge5og+GuxljiUIyR79
-         q7KT19Je03/yTPJ3/3q62uqZEHt3tnk4Jsbmipke7U2UALxky6h3PSuBgPbQyC3I5D0Y
-         nKyQIpjlG5d6E5+2jBfN/ZLLiUTXLqw4tX9LtvzOcO6xCOV9UdEvVAaVR+n65k08xbpE
-         7OEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732721201; x=1733326001;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fW/M4oPV0/KPGqG0SIYH3NNGppK50TUAetW8hAYS+Xs=;
-        b=LnvAd9NmVR9HzT0CWtoPy539h53ioKJwf84C+r+XhcXuN89L2xasPEvQIcfJg6hP2k
-         1eAtI9UDUQ7hpGc+2ITeOyNQqG0sWQhJ2OUx/nxQT3LkYaGYyqvoNs/csjRk8+aFZTVJ
-         7fVAdAZuiE0DlAZjRbBPQmVK5cR4o1xaW9nJJrqgBFfbD9+E0WHZx0EkP6yce9yZaFPQ
-         LV6zi9t9k6XraKOKwUtej7UaqcwkOV59SDsBmS14hgm/VSJe3rgRW7bwMUFcd88f6W1n
-         jILMPamBoL9leZ4jMI6KKZt1Jd5x7s/71SZNpBitxT/TVP0tRjnqJ3gNPloIwUgWzEsK
-         6wqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhex53tUWLlOuZVPdyZtd5iEbDY3aR7U2EidKF0QnLwRPnZ1QK1EXsBdmHZyk5OOtGbGNTT+c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKuI7GPlYY8iq7VA63+1nNmc2aLPnpvJBMQJwR4jcr0p9K77HN
-	tqSXZnBuf+lquUSaBdzyt1/0KBFdkZomNh0IWYih/ZlcOjK9PRTGeTo8kp8WMAM=
-X-Gm-Gg: ASbGncthJRxl4MN51c+BtqlMrXSwKqomZXfttjVAF+nJgEW3ojUTcEIizQXHZph853d
-	GxKtCeiQDPs3TG+PTrxSj/Pf/9ZxQDkVkAjSnybJ/N8qaun8uP12Jo7Nvo+xMWUpcSHj88r5gL8
-	TmfjDj17PJ6sQUWgddjRYXZ0zku+BVQ1znXxCPuDPLsrH0pUY7eeIk9ew1nmTyqsjSJjzzezyoF
-	EhRBpraxOjsQj8aGUM9lhYIipCeCO8H0PBTlSk0n+Mr6JJMhVSN
-X-Google-Smtp-Source: AGHT+IFoxy7WV35Ygj3vsbdYcky2hEvBC0FIqeNel/qXKrrNnmPVuy76qDW0Q5E6BNRWF87nahyzcQ==
-X-Received: by 2002:a05:6000:4405:b0:382:503c:da57 with SMTP id ffacd0b85a97d-385c6eba9ecmr2064794f8f.33.1732721201276;
-        Wed, 27 Nov 2024 07:26:41 -0800 (PST)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fafe3cbsm16506610f8f.38.2024.11.27.07.26.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Nov 2024 07:26:40 -0800 (PST)
-Message-ID: <4522c622-3e77-4191-8af6-f0ee8cd9061e@blackwall.org>
-Date: Wed, 27 Nov 2024 17:26:39 +0200
+	 In-Reply-To:Content-Type; b=HjX5M9xd9hpoST/RQOWP/z7n2X25obhfofqZzLq2zdRCL5MWfm7PIWfnUAaeKpz4iyHe0OAJIM254LpEToUpK1ZNmvExu1tP8yqEhQ3qM3eYaH0B1BSfAK3kOll2ai9RYa+aj7XUKjD+jY4k34j/1OoPe11jXZjsOiGaCpOPhYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5813C1477;
+	Wed, 27 Nov 2024 07:31:46 -0800 (PST)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8C7FA3F58B;
+	Wed, 27 Nov 2024 07:31:13 -0800 (PST)
+Message-ID: <41dfc444-1bab-4f9d-af11-4bbd93a9fe4b@arm.com>
+Date: Wed, 27 Nov 2024 15:31:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,152 +42,176 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 2/2] net: bridge: multicast: update multicast
- contex when vlan state gets changed
-To: Yong Wang <yongwang@nvidia.com>, roopa@nvidia.com, davem@davemloft.net,
- netdev@vger.kernel.org
-Cc: aroulin@nvidia.com, idosch@nvidia.com, ndhar@nvidia.com
-References: <20241126213401.3211801-1-yongwang@nvidia.com>
- <20241126213401.3211801-3-yongwang@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241126213401.3211801-3-yongwang@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH RFC v4 2/3] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Mina Almasry <almasrymina@google.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, liuyonglong@huawei.com,
+ fanghaiqing@huawei.com, zhangkun09@huawei.com, IOMMU
+ <iommu@lists.linux.dev>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241120103456.396577-1-linyunsheng@huawei.com>
+ <20241120103456.396577-3-linyunsheng@huawei.com>
+ <3366bf89-4544-4b82-83ec-fd89dd009228@kernel.org>
+ <27475b57-eda1-4d67-93f2-5ca443632f6b@huawei.com>
+ <CAHS8izM+sK=48gfa3gRNffu=T6t6-2vaS60QvH79zFA3gSDv9g@mail.gmail.com>
+ <CAKgT0Uc-SDHsGkgmLeAuo5GLE0H43i3h7mmzG88BQojfCoQGGA@mail.gmail.com>
+ <8f45cc4f-f5fc-4066-9ee1-ba59bf684b07@huawei.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <8f45cc4f-f5fc-4066-9ee1-ba59bf684b07@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 26/11/2024 23:34, Yong Wang wrote:
-> Add br_vlan_set_state_finish() helper function to be executed right after
-> br_vlan_set_state() when vlan state gets changed, similar to port state,
-> vlan state could impact multicast behaviors as well such as igmp query.
-> When bridge is running with userspace STP, vlan state can be manipulated by
-> "bridge vlan" commands. Updating the corresponding multicast context
-> will ensure the port query timer to continue when vlan state gets changed
-> to those "allowed" states like "forwarding" etc.
+On 27/11/2024 9:35 am, Yunsheng Lin wrote:
+> On 2024/11/27 7:53, Alexander Duyck wrote:
+>> On Tue, Nov 26, 2024 at 1:51 PM Mina Almasry <almasrymina@google.com> wrote:
+>>>
+>>> On Thu, Nov 21, 2024 at 12:03 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>>
+>>>> On 2024/11/20 23:10, Jesper Dangaard Brouer wrote:
+>>>>>
+>>>>>>        page_pool_detached(pool);
+>>>>>>        pool->defer_start = jiffies;
+>>>>>>        pool->defer_warn  = jiffies + DEFER_WARN_INTERVAL;
+>>>>>> @@ -1159,7 +1228,7 @@ void page_pool_update_nid(struct page_pool *pool, int new_nid)
+>>>>>>        /* Flush pool alloc cache, as refill will check NUMA node */
+>>>>>>        while (pool->alloc.count) {
+>>>>>>            netmem = pool->alloc.cache[--pool->alloc.count];
+>>>>>> -        page_pool_return_page(pool, netmem);
+>>>>>> +        __page_pool_return_page(pool, netmem);
+>>>>>>        }
+>>>>>>    }
+>>>>>>    EXPORT_SYMBOL(page_pool_update_nid);
+>>>>>
+>>>>> Thanks for continuing to work on this :-)
+>>>>
+>>>> I am not sure how scalable the scanning is going to be if the memory size became
+>>>> bigger, which is one of the reason I was posting it as RFC for this version.
+>>>>
+>>>> For some quick searching here, it seems there might be server with max ram capacity
+>>>> of 12.3TB, which means the scanning might take up to about 10 secs for those systems.
+>>>> The spin_lock is used to avoid concurrency as the page_pool_put_page() API might be
+>>>> called from the softirq context, which might mean there might be spinning of 12 secs
+>>>> in the softirq context.
+>>>>
+>>>> And it seems hard to call cond_resched() when the scanning and unmapping takes a lot
+>>>> of time as page_pool_put_page() might be called concurrently when pool->destroy_lock
+>>>> is released, which might means page_pool_get_dma_addr() need to be checked to decide
+>>>> if the mapping is already done or not for each page.
+>>>>
+>>>> Also, I am not sure it is appropriate to stall the driver unbound up to 10 secs here
+>>>> for those large memory systems.
+>>>>
+>>>> https://www.broadberry.com/12tb-ram-supermicro-servers?srsltid=AfmBOorCPCZQBSv91mOGH3WTg9Cq0MhksnVYL_eXxOHtHJyuYzjyvwgH
+>>>>
+>>>
+>>> FWIW I'm also concerned about the looping of all memory on the system.
+>>> In addition to the performance, I think (but not sure), that
+>>> CONFIG_MEMORY_HOTPLUG may mess such a loop as memory may appear or
+>>> disappear concurrently. Even if not, the CPU cost of this may be
+>>> significant. I'm imagining the possibility of having many page_pools
+>>> allocated on the system for many hardware queues, (and maybe multiple
+>>> pp's per queue for applications like devmem TCP), and each pp looping
+>>> over the entire xTB memory on page_pool_destroy()...
+>>>
+>>> My 2 cents here is that a more reasonable approach is to have the pp
+>>> track all pages it has dma-mapped, without the problems in the
+>>> previous iterations of this patch:
+>>>
+>>> 1. When we dma-map a page, we add it to some pp->dma_mapped data
+>>> structure (maybe xarray or rculist).
+>>> 2. When we dma-unmap a page, we remove it from pp->dma_mapped.
+>>> 3 When we destroy the pp, we traverse pp->dma_mapped and unmap all the
+>>> pages there.
+>>
+>> The thing is this should be a very rare event as it should apply only
+>> when a device is removed and still has pages outstanding shouldn't it?
+>> The problem is that maintaining a list of in-flight DMA pages will be
+>> very costly and will make the use of page pool expensive enough that I
+>> would worry it might be considered less than useful. Once we add too
+>> much overhead the caching of the DMA address doesn't gain us much on
+>> most systems in that case.
+>>
+>>> I haven't looked deeply, but with the right data structure we may be
+>>> able to synchronize 1, 2, and 3 without any additional locks. From a
+>>> quick skim it seems maybe rculist and xarray can do this without
+>>> additional locks, maybe.
 > 
-> Signed-off-by: Yong Wang <yongwang@nvidia.com>
-> Reviewed-by: Andy Roulin <aroulin@nvidia.com>
-> ---
->  net/bridge/br_mst.c          |  5 +++--
->  net/bridge/br_multicast.c    | 18 ++++++++++++++++++
->  net/bridge/br_private.h      | 11 +++++++++++
->  net/bridge/br_vlan_options.c |  2 ++
->  4 files changed, 34 insertions(+), 2 deletions(-)
+> I am not sure how the above right data structure without any additional
+> locks will work, but my feeling is that the issues mentioned in [1] will
+> likely apply to the above right data structure too.
 > 
+> 1. https://lore.kernel.org/all/6233e2c3-3fea-4ed0-bdcc-9a625270da37@huawei.com/
+> 
+>>>
+>>> Like stated in the previous iterations of this approach, we should not
+>>> be putting any hard limit on the amount of memory the pp can allocate,
+>>> and we should not have to mess with the page->pp entry in struct page.
+> 
+> It would be good to be more specific about how it is done without 'messing'
+> with the page->pp entry in struct page using some pseudocode or RFC if you
+> call the renaming as messing.
+> 
+>>
+>> I agree with you on the fact that we shouldn't be setting any sort of
+>> limit. The current approach to doing the unmapping is more-or-less the
+>> brute force way of doing it working around the DMA api. I wonder if we
+>> couldn't look at working with it instead and see if there wouldn't be
+>> some way for us to reduce the overhead instead of having to do the
+>> full scan of the page table.
+>>
+>> One thought in that regard though would be to see if there were a way
+>> to have the DMA API itself provide some of that info. I know the DMA
+>> API should be storing some of that data for the mapping as we have to
+>> go through and invalidate it if it is stored.
+>>
+>> Another alternative would be to see if we have the option to just
+>> invalidate the DMA side of things entirely for the device. Essentially
+>> unregister the device from the IOMMU instead of the mappings. If that
+>> is an option then we could look at leaving the page pool in a state
+>> where it would essentially claim it no longer has to do the DMA unmap
+>> operations and is just freeing the remaining lingering pages.
+> 
+> If we are going to 'invalidate the DMA side of things entirely for the
+> device', synchronization from page_pool might just go to the DMA core as
+> concurrent calling for dma unmapping API and 'invalidating' operation still
+> exist. If the invalidating is a common feature, perhaps it makes sense to
+> do that in the DMA core, otherwise it might just add unnecessary overhead
+> for other callers of DMA API.
+> 
+> As mentioned by Robin in [2], the DMA core seems to make a great deal of
+> effort to catch DMA API misuse in kernel/dma/debug.c, it seems doing the
+> above might invalidate some of the dma debug checking.
 
-A few comments below,
+Has nobody paused to consider *why* dma-debug is an optional feature 
+with an explicit performance warning? If you're concerned about the 
+impact of keeping track of DMA mappings within the confines of the 
+page_pool usage model, do you really imagine it could somehow be cheaper 
+to keep track of them at the generic DMA API level without the benefit 
+of any assumptions at all?
 
-> diff --git a/net/bridge/br_mst.c b/net/bridge/br_mst.c
-> index 1820f09ff59c..b77c31a24257 100644
-> --- a/net/bridge/br_mst.c
-> +++ b/net/bridge/br_mst.c
-> @@ -80,10 +80,11 @@ static void br_mst_vlan_set_state(struct net_bridge_vlan_group *vg,
->  	if (br_vlan_get_state(v) == state)
->  		return;
->  
-> -	br_vlan_set_state(v, state);
-> -
->  	if (v->vid == vg->pvid)
->  		br_vlan_set_pvid_state(vg, state);
-> +
-> +	br_vlan_set_state(v, state);
-> +	br_vlan_set_state_finish(v, state);
+Yes, in principle we could add a set of "robust" DMA APIs which make 
+sure racy sync calls are safe and offer a "clean up all my outstanding 
+mappings" op, and they would offer approximately as terrible performance 
+as the current streaming APIs with dma-debug enabled, because it would 
+be little different from what dma-debug already does. The checks 
+themselves aren't complicated; the generally-prohibitive cost lies in 
+keeping track of mappings and allocations so that they *can* be checked 
+internally.
 
-This state_finish function is called after every instance of br_vlan_set_state(),
-just add that call to br_vlan_set_state.
+Whatever you think is hard to do in the page_pool code to fix that 
+code's own behaviour, it's even harder to do from elsewhere with less 
+information.
 
->  }
->  
->  int br_mst_set_state(struct net_bridge_port *p, u16 msti, u8 state,
-> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-> index 8b23b0dc6129..3a3b63c97c92 100644
-> --- a/net/bridge/br_multicast.c
-> +++ b/net/bridge/br_multicast.c
-> @@ -4270,6 +4270,24 @@ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
->  #endif
->  }
->  
-> +void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
-> +{
-> +	struct net_bridge *br;
-> +
-> +	if (!br_vlan_should_use(v))
-> +		return;
-> +
-> +	if (br_vlan_is_master(v))
-> +		return;
-> +
-> +	br = v->port->br;
-> +
-> +	if (br_vlan_state_allowed(state, true) &&
-> +	    (v->priv_flags & BR_VLFLAG_MCAST_ENABLED) &&
+Thanks,
+Robin.
 
-checking this flag without mcast lock is racy.
-
-> +	    br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
-
-this should be the first check
-
-> +		br_multicast_enable_port_ctx(&v->port_mcast_ctx);
-
-What about disable? What if the state is != LEARNING/FORWARDING ?
-
-> +}
-> +
->  void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
->  {
->  	struct net_bridge *br;
-> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-> index 9853cfbb9d14..9c72070956e3 100644
-> --- a/net/bridge/br_private.h
-> +++ b/net/bridge/br_private.h
-> @@ -1052,6 +1052,7 @@ void br_multicast_port_ctx_init(struct net_bridge_port *port,
->  				struct net_bridge_vlan *vlan,
->  				struct net_bridge_mcast_port *pmctx);
->  void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pmctx);
-> +void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state);
->  void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on);
->  int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
->  				      struct netlink_ext_ack *extack);
-> @@ -1502,6 +1503,10 @@ static inline void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pm
->  {
->  }
->  
-> +static inline void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
-> +{
-> +}
-> +
->  static inline void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan,
->  						bool on)
->  {
-> @@ -1853,6 +1858,12 @@ bool br_vlan_global_opts_can_enter_range(const struct net_bridge_vlan *v_curr,
->  bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
->  			      const struct net_bridge_vlan *v_opts);
->  
-> +/* helper function to be called right after br_vlan_set_state() when vlan state gets changed */
-> +static inline void br_vlan_set_state_finish(struct net_bridge_vlan *v, u8 state)
-> +{
-
-A one line helper that directly calls another function is not helping anything.
-Please just call that function directly and remove the helper.
-
-> +	br_multicast_update_vlan_mcast_ctx(v, state);
-> +}
-> +
->  /* vlan state manipulation helpers using *_ONCE to annotate lock-free access */
->  static inline u8 br_vlan_get_state(const struct net_bridge_vlan *v)
->  {
-> diff --git a/net/bridge/br_vlan_options.c b/net/bridge/br_vlan_options.c
-> index 8fa89b04ee94..bad187c4f16d 100644
-> --- a/net/bridge/br_vlan_options.c
-> +++ b/net/bridge/br_vlan_options.c
-> @@ -123,6 +123,8 @@ static int br_vlan_modify_state(struct net_bridge_vlan_group *vg,
->  		br_vlan_set_pvid_state(vg, state);
->  
->  	br_vlan_set_state(v, state);
-> +	br_vlan_set_state_finish(v, state);
-> +
->  	*changed = true;
->  
->  	return 0;
-
+> 
+> 2. https://lore.kernel.org/all/caf31b5e-0e8f-4844-b7ba-ef59ed13b74e@arm.com/
+> 
+>>
 
