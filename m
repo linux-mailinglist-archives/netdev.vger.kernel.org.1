@@ -1,138 +1,186 @@
-Return-Path: <netdev+bounces-147533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6929DA070
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 02:47:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC159DA114
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 04:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07D78284747
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 01:47:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 256972818E8
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 03:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F8E4431;
-	Wed, 27 Nov 2024 01:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2KIK2Ob"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACBC42A9D;
+	Wed, 27 Nov 2024 03:14:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F99E360
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 01:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A080C139D
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 03:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732672021; cv=none; b=hkHBSGOrdqcevF+vmuxpTA584ZyDaWXsjEZQqD2fnRRY8sgMTRVHdy7s9QDmY0KkQjI2GZ4QP95oabTjp9REF8Q5aPSSIoQZz29tcDiKwf55/AN/go41UiZYL4gaOc84VgSr6lo99iEePMktoYHlylUYBVhcdmN/XD52GYUV2Ak=
+	t=1732677268; cv=none; b=fjBZmBHKYYdt/7HRkr0PvY5+YNCrCjHA6TJ+H5k46GVpZHEQx1BHgth9AWdmiGv6PJicsNnsbHwRyjo+oQrTi/2ptOoYPe5+d6D9qGPmSWFxNLmYqrzjRUY5lQB6rNWiS5T27x9TPALnmqVo9F+hYKNd9V6eHMOYRLr45i+EV2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732672021; c=relaxed/simple;
-	bh=ri6R2F6JhCDDiyidB38SL9I1p6QxnRAAw9SRYbXyPCU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rJ3qXh7+Jg6aEwmtM4emWVsKmdYVXw9dgf16ywfv7dDQiZlo5iVTCk2KCaZBMd9FgHBmWuJJgMwkYqx8b5rY2nPptX5jIyFGG2eZQJWOUDC4X6CliKDd7kh6KJU9L4njLoI1iQDQNJf0F+6IvR+X3uiDF/IPVHQA4WmWxlvuBFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2KIK2Ob; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8065BC4CECF;
-	Wed, 27 Nov 2024 01:46:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732672019;
-	bh=ri6R2F6JhCDDiyidB38SL9I1p6QxnRAAw9SRYbXyPCU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a2KIK2ObhqHzURDXBXaVhlbl7h3e6VZwKj1iHZREEbGuNc8UKhmUFJpg0+ZGVWc6+
-	 kTSLqgvuLPxMWsCKBBKNqdwF1NcVT/ZGlLP1mTep5J1anl18IzgSxxK9kq63VY/GxY
-	 xnD7eZJXg+5fT890PcoZxwynFG2Qqew2w1J0CU3UhNzvexZuYZChtrco8vFDl5I/mM
-	 OtOMklPD/vrlaTU6AYQvTxy7A6n3i0MoBNqJlO2zHoueuKjOCSkmmKuPW+L2JC/UTp
-	 y5Su1RFwm2OoR+HZE1buejbbr3GiFG4UrLYYUfQo7fltNbHXjUxZ7GvlSCjd98skre
-	 bB0GrO6Yyy22Q==
-Message-ID: <43fcfc8e-d833-452e-b20b-33395069a384@kernel.org>
-Date: Tue, 26 Nov 2024 18:46:58 -0700
+	s=arc-20240116; t=1732677268; c=relaxed/simple;
+	bh=D68W2/mFJ5W3E1GKVPHSOoNpy+Ihcx9ZWcYPSO0aPzQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=a3Ar1q+BDXGFgvwawcGOSdunwRgOGHUWKR6ayOCSyJ9Jp+VtOizlgtKUSWmQkE6pKpoKcZEH+4ZjG1ODnRj+hUMnLYpeeeoBiXy6yMQnyQ3ATJwQIiJE7oZrrpDf/Upi38WwXxuHnEtzg+6R1rsN2ivsNFC4vD7Rtfq8gWWeO7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: abc2172eac6d11efa216b1d71e6e1362-20241127
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:48d106e8-f44b-4719-bc6c-3e658d708ee0,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:40e9e96e57f7affb107b3b612ff67756,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102,TC:nil,Content:0,EDM:-3,
+	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
+	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: abc2172eac6d11efa216b1d71e6e1362-20241127
+Received: from node2.com.cn [(10.44.16.197)] by mailgw.kylinos.cn
+	(envelope-from <luoxuanqiang@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1785016247; Wed, 27 Nov 2024 11:14:10 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id 49EC8B807587;
+	Wed, 27 Nov 2024 11:14:10 +0800 (CST)
+X-ns-mid: postfix-67468E82-213949681
+Received: from [10.42.20.255] (unknown [10.42.20.255])
+	by node2.com.cn (NSMail) with ESMTPA id 86ED6B807587;
+	Wed, 27 Nov 2024 03:14:06 +0000 (UTC)
+Message-ID: <71ae37d6-b5cf-d407-be4b-0c8b3c9f01d7@kylinos.cn>
+Date: Wed, 27 Nov 2024 11:14:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: avoid possible NULL deref in
- modify_prefix_route()
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2] net: mdio: fix unbalanced fwnode reference count in
+ mdio_device_release()
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com,
- Kui-Feng Lee <thinker.li@gmail.com>
-References: <20241126192827.797037-1-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20241126192827.797037-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: luoxuanqiang <luoxuanqiang@kylinos.cn>
+To: Zeng Heng <zengheng4@huawei.com>, hkallweit1@gmail.com,
+ edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, andrew@lunn.ch, f.fainelli@gmail.com,
+ linux@armlinux.org.uk
+Cc: liwei391@huawei.com, netdev@vger.kernel.org
+References: <20221203073441.3885317-1-zengheng4@huawei.com>
+ <833ea8e7-f15b-ff66-84bf-2bcd77710fd8@kylinos.cn>
+In-Reply-To: <833ea8e7-f15b-ff66-84bf-2bcd77710fd8@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-On 11/26/24 12:28 PM, Eric Dumazet wrote:
-> syzbot found a NULL deref [1] in modify_prefix_route(), caused by one
-> fib6_info without a fib6_table pointer set.
-> 
-> This can happen for net->ipv6.fib6_null_entry
-> 
-> [1]
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-> CPU: 1 UID: 0 PID: 5837 Comm: syz-executor888 Not tainted 6.12.0-syzkaller-09567-g7eef7e306d3c #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
->  RIP: 0010:__lock_acquire+0xe4/0x3c40 kernel/locking/lockdep.c:5089
-> Code: 08 84 d2 0f 85 15 14 00 00 44 8b 0d ca 98 f5 0e 45 85 c9 0f 84 b4 0e 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 96 2c 00 00 49 8b 04 24 48 3d a0 07 7f 93 0f 84
-> RSP: 0018:ffffc900035d7268 EFLAGS: 00010006
-> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> RDX: 0000000000000006 RSI: 1ffff920006bae5f RDI: 0000000000000030
-> RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
-> R10: ffffffff90608e17 R11: 0000000000000001 R12: 0000000000000030
-> R13: ffff888036334880 R14: 0000000000000000 R15: 0000000000000000
-> FS:  0000555579e90380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ffc59cc4278 CR3: 0000000072b54000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->   lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
->   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
->   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
->   spin_lock_bh include/linux/spinlock.h:356 [inline]
->   modify_prefix_route+0x30b/0x8b0 net/ipv6/addrconf.c:4831
->   inet6_addr_modify net/ipv6/addrconf.c:4923 [inline]
->   inet6_rtm_newaddr+0x12c7/0x1ab0 net/ipv6/addrconf.c:5055
->   rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6920
->   netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2541
->   netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
->   netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1347
->   netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1891
->   sock_sendmsg_nosec net/socket.c:711 [inline]
->   __sock_sendmsg net/socket.c:726 [inline]
->   ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2583
->   ___sys_sendmsg+0x135/0x1e0 net/socket.c:2637
->   __sys_sendmsg+0x16e/0x220 net/socket.c:2669
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fd1dcef8b79
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffc59cc4378 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fd1dcef8b79
-> RDX: 0000000000040040 RSI: 0000000020000140 RDI: 0000000000000004
-> RBP: 00000000000113fd R08: 0000000000000006 R09: 0000000000000006
-> R10: 0000000000000006 R11: 0000000000000246 R12: 00007ffc59cc438c
-> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
->  </TASK>
-> 
-> Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
-> Reported-by: syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/67461f7f.050a0220.1286eb.0021.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> CC: Kui-Feng Lee <thinker.li@gmail.com>
-> Cc: David Ahern <dsahern@kernel.org>
-> ---
->  net/ipv6/addrconf.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
-> 
+Hi Heng,
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+=E5=9C=A8 2024/11/22 15:59, luoxuanqiang =E5=86=99=E9=81=93:
+> Hi Heng,
+>
+> =E5=9C=A8 2022/12/3 15:34, Zeng Heng =E5=86=99=E9=81=93:
+>> There is warning report about of_node refcount leak
+>> while probing mdio device:
+>>
+>> OF: ERROR: memory leak, expected refcount 1 instead of 2,
+>> of_node_get()/of_node_put() unbalanced - destroy cset entry:
+>> attach overlay node /spi/soc@0/mdio@710700c0/ethernet@4
+>>
+>> In of_mdiobus_register_device(), we increase fwnode refcount
+>> by fwnode_handle_get() before associating the of_node with
+>> mdio device, but it has never been decreased in normal path.
+>> Since that, in mdio_device_release(), it needs to call
+>> fwnode_handle_put() in addition instead of calling kfree()
+>> directly.
+>>
+>> After above, just calling mdio_device_free() in the error handle
+>> path of of_mdiobus_register_device() is enough to keep the
+>> refcount balanced.
+>>
+>> Fixes: a9049e0c513c ("mdio: Add support for mdio drivers.")
+>> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
+>> Reviewed-by: Yang Yingliang <yangyingliang@huawei.com>
+>> ---
+>> =C2=A0 changes in v2:
+>> =C2=A0=C2=A0 - Add operation about setting device node as NULL-pointer=
+.
+>> =C2=A0=C2=A0=C2=A0=C2=A0 There is no practical changes.
+>> =C2=A0=C2=A0 - Add reviewed-by tag.
+>> ---
+>> =C2=A0 drivers/net/mdio/of_mdio.c=C2=A0=C2=A0=C2=A0 | 3 ++-
+>> =C2=A0 drivers/net/phy/mdio_device.c | 2 ++
+>> =C2=A0 2 files changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+>> index 796e9c7857d0..510822d6d0d9 100644
+>> --- a/drivers/net/mdio/of_mdio.c
+>> +++ b/drivers/net/mdio/of_mdio.c
+>> @@ -68,8 +68,9 @@ static int of_mdiobus_register_device(struct=20
+>> mii_bus *mdio,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* All data is now stored in the mdiode=
+v struct; register it. */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rc =3D mdio_device_register(mdiodev);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (rc) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 device_set_node(&mdiodev->=
+dev, NULL);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fwnode_handle_put(fwnode);
+> According to my understanding, the process flow of mdio_device_free() i=
+s
+> as follows:
+> mdio_device_free()
+> =C2=A0=C2=A0=C2=A0 -> put_device()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->kobject_put()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->ko=
+bject_release()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ->device_release()
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ->mdio_device_release()
+> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=
+=A0 =C2=A0=C2=A0=C2=A0 //Here, it will be called once fwnode_handle_put()=
+;
+>
+> Why is it necessary to add fwnode_handle_put(fwnode) again here? In the
+> body of your email, you described that mdio_device_free() is sufficient
+> to keep refcount balanced, and it was not added in the v1.
+> Could you please explain the reason for this?
+> I am looking forward to your response :)
+>
+> Thanks
+> Xuanqiang
+I noticed that I had missed the fact that you had already disconnected
+the relationship between dev and node by calling
+device_set_node(&mdiodev->dev, NULL). Even though it would go through
+fwnode_handle_put() again, it would not have any effect.
 
-
+Thanks
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mdio_device_fre=
+e(mdiodev);
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 of_node_put(child);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return rc;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 diff --git a/drivers/net/phy/mdio_device.c=20
+>> b/drivers/net/phy/mdio_device.c
+>> index 250742ffdfd9..044828d081d2 100644
+>> --- a/drivers/net/phy/mdio_device.c
+>> +++ b/drivers/net/phy/mdio_device.c
+>> @@ -21,6 +21,7 @@
+>> =C2=A0 #include <linux/slab.h>
+>> =C2=A0 #include <linux/string.h>
+>> =C2=A0 #include <linux/unistd.h>
+>> +#include <linux/property.h>
+>> =C2=A0 =C2=A0 void mdio_device_free(struct mdio_device *mdiodev)
+>> =C2=A0 {
+>> @@ -30,6 +31,7 @@ EXPORT_SYMBOL(mdio_device_free);
+>> =C2=A0 =C2=A0 static void mdio_device_release(struct device *dev)
+>> =C2=A0 {
+>> +=C2=A0=C2=A0=C2=A0 fwnode_handle_put(dev->fwnode);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree(to_mdio_device(dev));
+>> =C2=A0 }
+>
 
