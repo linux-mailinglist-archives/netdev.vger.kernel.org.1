@@ -1,81 +1,48 @@
-Return-Path: <netdev+bounces-147532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CBB89DA06B
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 02:39:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A6929DA070
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 02:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C727284C3C
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 01:39:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07D78284747
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 01:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70CF1803A;
-	Wed, 27 Nov 2024 01:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F8E4431;
+	Wed, 27 Nov 2024 01:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="epoOx5uq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2KIK2Ob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BD71946B
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 01:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F99E360
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 01:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732671574; cv=none; b=M49kA+aefcMZ4WyMfmuJ+25VwWYUlzmbsccwBv5cQUvtwzN29p7aoxJ7ESI6DH1X8YnuBwpaks8piGBAfXVMvLEp8G5S16tp5L+HiNHPMdADJ3lmXAItWXgoLaiT/7lCRFLFNVqSHrlWYJ6sZ7MjAFIwsdqYLdPABEd6XvqBooQ=
+	t=1732672021; cv=none; b=hkHBSGOrdqcevF+vmuxpTA584ZyDaWXsjEZQqD2fnRRY8sgMTRVHdy7s9QDmY0KkQjI2GZ4QP95oabTjp9REF8Q5aPSSIoQZz29tcDiKwf55/AN/go41UiZYL4gaOc84VgSr6lo99iEePMktoYHlylUYBVhcdmN/XD52GYUV2Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732671574; c=relaxed/simple;
-	bh=KL4zWxXZDEXFjC3sH1lz3oJ6QUVZvpY0E5T/drnan/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=BwGVBMjP6EaZmeWmrhcE8nlpJbv7HbpY9oGZSR0m3V2m0AD89ft24sAROrak3LLQjgCxKyuA4+aut6kA3dAhWNa0mtlYKWL1+m3I2dqgJhXQRWtwTwS5oUo91IHghwcZy2MidZVWHdp83nPO+otI6I7ko6oEiCJIomQYBe+SLuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=epoOx5uq; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa52bb7beceso511872566b.3
-        for <netdev@vger.kernel.org>; Tue, 26 Nov 2024 17:39:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1732671570; x=1733276370; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XXHRTnhBH7f1ASTCrHAWhVSUa0aFbmTXAI7eBbisBbk=;
-        b=epoOx5uq4jJnUgufqRPo6Qyx+FqH5WGDsTGNMEgYnpYyrYuXXcN3gs/dAYrXwRJtgk
-         6jaAarCZ+QQfeqhz18NA1pTIBCYfBDCXdtgLr/PZEKYE8aI0KKY9vLDxgVGRhkdbPKKP
-         Q8GrkASNR5Pj8YoYcToqBidehFlFUcYIGKXCrrOSFqKa66UKsYDOu7ayLe2rUfVEV6gA
-         cxqOjb0/c6nH6TjYh6B3b1GMrje9MeJA12sik4tYE73v1T+PW/rbrw+x4KfDv9YROhnL
-         KYRNiJu7ERzvIxb+6GeNyU3xV4Eejuo7oMc7bFBW3QA2nlxZRmT0+yG/AYSuWMC9Jbm3
-         piFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732671570; x=1733276370;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XXHRTnhBH7f1ASTCrHAWhVSUa0aFbmTXAI7eBbisBbk=;
-        b=O0lzWyQ9myq4yx4Ww4E5Q+oZw4NXKrZHLix+6n+yxRFalQt1W2NEXAV9CPcOa8+tIr
-         Mo/j/MNDG8oa9F0WcjKws86L7ROr0x3jsIZl/Bz/4VHGo9XNZx+5vVtVPm+f8gQuoY2B
-         7tkwefJ3VT90PaXRTbPYJ6pOr1teZRIMj3WarqL2xfdWO/2Tg4/i9LxoZnfZnKnHdxTp
-         uV9JPnDKq8M4aMrIAFhkNVExEoPphp/u3JVcaOJNJx0TcF3LHyJB6P8C/rLTIOaELgek
-         CgnDxOeIQuPWBPuMVFqrleMphG59oPZ0cnkECvAVjaVOpsjfb7pYnWeyCI7B9sNf06hW
-         WurQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWtN0jQIf8jY6YpBPpDCJcSob8057PXHoLlMnkIcUSsGUgJsitb9X5+EUUlow4lLUNYJXAJ7ek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaUO/kqbjuXn6cNZga4f60iYvKfRj5eJDBO8RXaijZMdZJ5BgH
-	60bzssG115zpWWIuUcfcKsit+cKFhZIx0Gu+ZYbt/0XnpNpVrsRxMX4Ze/zgAq0=
-X-Gm-Gg: ASbGnctHdTI78vqrpfaW020SLlc3uCnTqle8biD/7S71L95uDDBsOdAyUtUFGt9YVSj
-	JbpiyJiHkIicXI4hxs3s87LyJS636ph3K0dFkM6UX+nIe0BeowEWHBYt9Cc11ejqG41LWsehLmx
-	9N0fC8/xqxPQJc/eVry6KwYA6Z+5hrCvJSzloTvQaCqy5hJBPAGBfWOL5TXbYKrNRpC2bgmbBc9
-	54413EmCITlfM89QQxvRjlAePQSS2uPFBPZ/fvn4+jp5pngYFSTR4u73Go0UTi4Wo7/NVc5Htmp
-	keH8/FWuMQ==
-X-Google-Smtp-Source: AGHT+IE+ZD3OX1m4rkHq8FBHMwGAiAanB01jl/KaBasyk1+49gvjqbB1yUMCPbsxce6E0Dc+SKpD4A==
-X-Received: by 2002:a17:906:3145:b0:aa5:1d08:dad7 with SMTP id a640c23a62f3a-aa580ed0a63mr61701566b.9.1732671569682;
-        Tue, 26 Nov 2024 17:39:29 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:da11:5b16:7b45:f72? ([2001:67c:2fbc:1:da11:5b16:7b45:f72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa50b57d4d5sm649155866b.163.2024.11.26.17.39.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2024 17:39:29 -0800 (PST)
-Message-ID: <a4a537df-900b-43e6-bcc2-5049036b1ca2@openvpn.net>
-Date: Wed, 27 Nov 2024 02:40:02 +0100
+	s=arc-20240116; t=1732672021; c=relaxed/simple;
+	bh=ri6R2F6JhCDDiyidB38SL9I1p6QxnRAAw9SRYbXyPCU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rJ3qXh7+Jg6aEwmtM4emWVsKmdYVXw9dgf16ywfv7dDQiZlo5iVTCk2KCaZBMd9FgHBmWuJJgMwkYqx8b5rY2nPptX5jIyFGG2eZQJWOUDC4X6CliKDd7kh6KJU9L4njLoI1iQDQNJf0F+6IvR+X3uiDF/IPVHQA4WmWxlvuBFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2KIK2Ob; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8065BC4CECF;
+	Wed, 27 Nov 2024 01:46:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732672019;
+	bh=ri6R2F6JhCDDiyidB38SL9I1p6QxnRAAw9SRYbXyPCU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a2KIK2ObhqHzURDXBXaVhlbl7h3e6VZwKj1iHZREEbGuNc8UKhmUFJpg0+ZGVWc6+
+	 kTSLqgvuLPxMWsCKBBKNqdwF1NcVT/ZGlLP1mTep5J1anl18IzgSxxK9kq63VY/GxY
+	 xnD7eZJXg+5fT890PcoZxwynFG2Qqew2w1J0CU3UhNzvexZuYZChtrco8vFDl5I/mM
+	 OtOMklPD/vrlaTU6AYQvTxy7A6n3i0MoBNqJlO2zHoueuKjOCSkmmKuPW+L2JC/UTp
+	 y5Su1RFwm2OoR+HZE1buejbbr3GiFG4UrLYYUfQo7fltNbHXjUxZ7GvlSCjd98skre
+	 bB0GrO6Yyy22Q==
+Message-ID: <43fcfc8e-d833-452e-b20b-33395069a384@kernel.org>
+Date: Tue, 26 Nov 2024 18:46:58 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,164 +50,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 09/23] ovpn: implement basic RX path (UDP)
-From: Antonio Quartulli <antonio@openvpn.net>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- sd@queasysnail.net, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Shuah Khan <shuah@kernel.org>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-9-de4698c73a25@openvpn.net>
- <eabe28f9-d6a4-4bdc-a988-418e5137f3cb@gmail.com>
- <288f68cd-533a-4253-85c4-951cc4a9c862@openvpn.net>
- <aac209cc-589c-4b8a-9123-e44df9e794e4@gmail.com>
- <4c24d8ba-35d0-4aff-b207-9eca6eeda1fc@openvpn.net>
+Subject: Re: [PATCH net] ipv6: avoid possible NULL deref in
+ modify_prefix_route()
 Content-Language: en-US
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <4c24d8ba-35d0-4aff-b207-9eca6eeda1fc@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com,
+ Kui-Feng Lee <thinker.li@gmail.com>
+References: <20241126192827.797037-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20241126192827.797037-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 26/11/2024 09:49, Antonio Quartulli wrote:
-[...]
->>
->> The potential issue is tricky since we create it patch-by-patch.
->>
->> Up to this patch the socket releasing procedure looks solid and 
->> reliable. E.g. the P2P netdev destroying:
->>
->>    ovpn_netdev_notifier_call(NETDEV_UNREGISTER)
->>      ovpn_peer_release_p2p
->>        ovpn_peer_del_p2p
->>          ovpn_peer_put
->>            ovpn_peer_release_kref
->>              ovpn_peer_release
->>                ovpn_socket_put
->>                  ovpn_socket_release_kref
->>                    ovpn_socket_detach
->>                      ovpn_udp_socket_detach
->>                        setup_udp_tunnel_sock
->>    netdev_run_todo
->>      rcu_barrier  <- no running ovpn_udp_encap_recv after this point
->>      free_netdev
->>
->> After the setup_udp_tunnel_sock() call no new ovpn_udp_encap_recv() 
->> will be spawned. And after the rcu_barrier() all running 
->> ovpn_udp_encap_recv() will be done. All good.
->>
+On 11/26/24 12:28 PM, Eric Dumazet wrote:
+> syzbot found a NULL deref [1] in modify_prefix_route(), caused by one
+> fib6_info without a fib6_table pointer set.
 > 
-> ok
+> This can happen for net->ipv6.fib6_null_entry
 > 
->> Then, the following patch 'ovpn: implement TCP transport' disjoin 
->> ovpn_socket_release_kref() and ovpn_socket_detach() by scheduling the 
->> socket detach function call:
->>
->>    ovpn_socket_release_kref
->>      ovpn_socket_schedule_release
->>        schedule_work(&sock->work)
->>
->> And long time after the socket will be actually detached:
->>
->>    ovpn_socket_release_work
->>      ovpn_socket_detach
->>        ovpn_udp_socket_detach
->>          setup_udp_tunnel_sock
->>
->> And until this detaching will take a place, UDP handler can call 
->> ovpn_udp_encap_recv() whatever number of times.
->>
->> So, we can end up with this scenario:
->>
->>    ovpn_netdev_notifier_call(NETDEV_UNREGISTER)
->>      ovpn_peer_release_p2p
->>        ovpn_peer_del_p2p
->>          ovpn_peer_put
->>            ovpn_peer_release_kref
->>              ovpn_peer_release
->>                ovpn_socket_put
->>                  ovpn_socket_release_kref
->>                    ovpn_socket_schedule_release
->>                      schedule_work(&sock->work)
->>    netdev_run_todo
->>      rcu_barrier
->>      free_netdev
->>
->>    ovpn_udp_encap_recv  <- called for an incoming UDP packet
->>      ovpn_from_udp_sock <- returns pointer to freed memory
->>      // Any access to ovpn pointer is the use-after-free
->>
->>    ovpn_socket_release_work  <- kernel finally ivoke the work
->>      ovpn_socket_detach
->>        ovpn_udp_socket_detach
->>          setup_udp_tunnel_sock
->>
->> To address the issue, I see two possible solutions:
->> 1. flush the workqueue somewhere before the netdev release
+> [1]
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
+> CPU: 1 UID: 0 PID: 5837 Comm: syz-executor888 Not tainted 6.12.0-syzkaller-09567-g7eef7e306d3c #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>  RIP: 0010:__lock_acquire+0xe4/0x3c40 kernel/locking/lockdep.c:5089
+> Code: 08 84 d2 0f 85 15 14 00 00 44 8b 0d ca 98 f5 0e 45 85 c9 0f 84 b4 0e 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 96 2c 00 00 49 8b 04 24 48 3d a0 07 7f 93 0f 84
+> RSP: 0018:ffffc900035d7268 EFLAGS: 00010006
+> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+> RDX: 0000000000000006 RSI: 1ffff920006bae5f RDI: 0000000000000030
+> RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
+> R10: ffffffff90608e17 R11: 0000000000000001 R12: 0000000000000030
+> R13: ffff888036334880 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000555579e90380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffc59cc4278 CR3: 0000000072b54000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>   lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
+>   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+>   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+>   spin_lock_bh include/linux/spinlock.h:356 [inline]
+>   modify_prefix_route+0x30b/0x8b0 net/ipv6/addrconf.c:4831
+>   inet6_addr_modify net/ipv6/addrconf.c:4923 [inline]
+>   inet6_rtm_newaddr+0x12c7/0x1ab0 net/ipv6/addrconf.c:5055
+>   rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6920
+>   netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2541
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+>   netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1347
+>   netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1891
+>   sock_sendmsg_nosec net/socket.c:711 [inline]
+>   __sock_sendmsg net/socket.c:726 [inline]
+>   ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2583
+>   ___sys_sendmsg+0x135/0x1e0 net/socket.c:2637
+>   __sys_sendmsg+0x16e/0x220 net/socket.c:2669
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fd1dcef8b79
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffc59cc4378 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fd1dcef8b79
+> RDX: 0000000000040040 RSI: 0000000020000140 RDI: 0000000000000004
+> RBP: 00000000000113fd R08: 0000000000000006 R09: 0000000000000006
+> R10: 0000000000000006 R11: 0000000000000246 R12: 00007ffc59cc438c
+> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
 > 
-> yes! This is what I was missing. This will also solve the "how can the 
-> module wait for all workers to be done before unloading?"
+> Fixes: 5eb902b8e719 ("net/ipv6: Remove expired routes with a separated list of routes.")
+> Reported-by: syzbot+1de74b0794c40c8eb300@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/67461f7f.050a0220.1286eb.0021.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> CC: Kui-Feng Lee <thinker.li@gmail.com>
+> Cc: David Ahern <dsahern@kernel.org>
+> ---
+>  net/ipv6/addrconf.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
 > 
 
-Actually there might be even a simpler solution: each ovpn_socket will 
-hold a reference to an ovpn_peer (TCP) or to an ovpn_priv (UDP).
-I can simply increase the refcounter those objects while they are 
-referenced by the socket and decrease it when the socket is fully 
-released (in the detach() function called by the worker).
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-This way the netdev cannot be released until all socket (and all peers) 
-are gone.
-
-This approach doesn't require any local workqueue or any other special 
-coordination as we'll just force the whole cleanup to happen in a 
-specific order.
-
-Does it make sense?
-
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
 
 
