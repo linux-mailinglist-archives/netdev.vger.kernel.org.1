@@ -1,275 +1,284 @@
-Return-Path: <netdev+bounces-147624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6409DAC48
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 18:18:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C77A9DAC81
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 18:33:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7188281E04
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 17:18:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEC9EB21863
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 17:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7AB200105;
-	Wed, 27 Nov 2024 17:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913B91E1041;
+	Wed, 27 Nov 2024 17:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="S7SVsIe9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MRLZ7uix"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2082.outbound.protection.outlook.com [40.107.223.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873A6225D6;
-	Wed, 27 Nov 2024 17:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732727901; cv=fail; b=lIqQHYV3hJfBX8wjwOkRZRt0l1Kc2ifTyqA/6BZli0TjQahQcRVKH9h7o7GZ8xAJsmQHQkjRGySp/kV/StUEmuQYLi0bka7FjiW35b45Ee0mAV38NklcywdgapcG9b4NI/ouFqR+q5qwVEfTMAcFx7GvpZV6+m2tSLhdIkIVyew=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732727901; c=relaxed/simple;
-	bh=l7hVnSwMNVfeVddpXo/WvfijnAQ+0Vgam68c52XpZxY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=KYLGdPpiHGqKBKhOeKlVcm4wKMdF+iiwqnMWOtGPvRGU50j+vnxBDeNU16u0gR+29O0ToUF+tP2ViHL46LDLEPk00MASeS9Pi4OgLyhyt/MHtRDVSkkPJN4XA++VTLynom2WraUk34OybXbYfhMphKZa5okzxpfIZWEPsi6qWks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=S7SVsIe9; arc=fail smtp.client-ip=40.107.223.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P9O400FX5j8mVyB6a1ek4sejjUYL3QA3Onm6x8t0hb4HIkIZ3eVp7T6zR33cw8osIIjvCkyQXo7KPimH1YHpAnLJwkOi+A1clxGnc/6sPU0cZWuPBJmIN5dABmn/1C30QJeFb4GXJuRTTsbR020SJa07U8dNTtHO3UrXBcyWXC6hnJFow93eerFWL+YPdsoMzoRpW/XWYgQL37nqjSD5u8yg0svg3X8O500i6DcMRLdG9G1QZ76l61BECJRL6XerWOapI/OmNznpI01qop4ULmv+JJO8iyuFb+rmXDkgQZfKLtMRi6KWq9Ame0W6pw2Gdli8L04/2qV50fuPhPD5ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UcyNMslLrM8fnw2IIxI/yhZXGuBvQCqVn1QoyYTbs30=;
- b=pWWz7LZ0z4sAHIOP5YIR6pNngtjNH97pat1+LysDTnjMvXeasg803UZolVihajWj7t3izn99Y8d0UX2Zxyj+pYBt6YFeo4Zxt65vVQEN/JFwwflxEz3nDsQZLFpCcv2EgzVwOJGt0/2zmQhxVAsZmCyFE5k8J8DgGpcUhHAWkmMRxRkofxRS8fM6Re/zos0yNBNjpLO3x4cUDfObDeyeBPeFSAAZFcvZ8A2mvgv05I9UkFYgkBAOcDPt3uzkyqWAXZajFwPZTFRbWto96SB7uHHdWsFsKnBiaB51n6RnWSsmmF8OgtuxfsazVnyuREd/9einKvsMYaQdau99ad1fYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UcyNMslLrM8fnw2IIxI/yhZXGuBvQCqVn1QoyYTbs30=;
- b=S7SVsIe9BHEN5dcib79peuZUrOvC77RKhI7cZiKJiayGVrXHLOTY0YiqrDODwZ1hq7dOCg/Qe5qsBLI27gpQPO+bA6cdTQjXhWgAGOX3Mee76Ssl4/5GLWFRwxxVlm6VnqxWH9+L6ZgqtfWe2n4lRe2rPj8Ki0T/16eomerIupE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by IA0PR12MB7649.namprd12.prod.outlook.com (2603:10b6:208:437::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.18; Wed, 27 Nov
- 2024 17:18:12 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.8207.010; Wed, 27 Nov 2024
- 17:18:11 +0000
-Message-ID: <63353dd3-6527-6165-533e-90787a1ebea4@amd.com>
-Date: Wed, 27 Nov 2024 17:18:06 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v5 26/27] cxl: add function for obtaining params from a
- region
-Content-Language: en-US
-To: Alison Schofield <alison.schofield@intel.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-References: <20241118164434.7551-1-alejandro.lucero-palau@amd.com>
- <20241118164434.7551-27-alejandro.lucero-palau@amd.com>
- <Zz6haeBDWRHL2IPR@aschofie-mobl2.lan>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <Zz6haeBDWRHL2IPR@aschofie-mobl2.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0634.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:294::9) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A48A41;
+	Wed, 27 Nov 2024 17:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732728787; cv=none; b=Qvyv+xyy9T5bxVfiMAuEtaDelbg20oJHKpAqm7YqjypK5+rpbA8FptuUJVcsOzNViNM//6VPC/3+HfkyczYiP65xmfCx1d5f84FG9VBQdM8KU6xuLdusTww/KUSBOTTHUt/X1lSVMkpfXY1Xraa3MB1XX0OY5tit1vh7YwR2P3E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732728787; c=relaxed/simple;
+	bh=ROCiRi/yYhXsqy0A3hG8CWASE+jjM3H03lGX9OJe7DQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oQR1wuDrGWwesiQliwzOjIYiP9MTjnzKICqGhRhbWU6mdKOw6QWjU0733SkUAv8+yghZua+pLv01CGslOMPRdc+XRjGwj2I972fzOWZQOBIbmeoi/fQDlPOc9TKiVeJ7IH8iUQT9JVu+PAzEGeRUqXq3z0qDEIOQ3rG2InMnPXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MRLZ7uix; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5cf7aa91733so3894956a12.2;
+        Wed, 27 Nov 2024 09:33:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732728784; x=1733333584; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kzYUqODO47hR/WQO2uQfWUqA0kWqjEwrdbtM/DTVfuU=;
+        b=MRLZ7uix585zlTPNXMltB1nT+QCHTB/Ng2nXTHxA4vYqX8/eImV48eWVP8/mDU98G5
+         defPT5t0zwnKHt0MNYsGtE+2AFvo4PaOa6qTX0zPRw6g9+3mEh++i3LVDPRsuaBT1AR7
+         GlHnisXGDqyjL4y/6IqaHBkljWB43GAJT+DJzRJJP4rmKs7FP2xkEku3j0I2IWNuG0Bm
+         4cqsJikFbKuJRgavf+rOKgpuF9iCXVfeuQ4vwyi0U38EsvEXrTGy9b822N+ZFQ05FgqU
+         386OaFmA3whHiOYzyBB0LxH9MKt4y55C1s6FvRA7dt8mBvZM/vIcJQxzYPhH7Fn2TnpK
+         W97Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732728784; x=1733333584;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kzYUqODO47hR/WQO2uQfWUqA0kWqjEwrdbtM/DTVfuU=;
+        b=uMllxvw8l5HTBcMU4GMQycR20EoU7ibM54yOzVaoveiCrSBnjxTBmfA9wABQqo7Km4
+         vBybyG1i41g0XyCSwfIjqedjdb+ewgPyj5CVdbiqXsa9a7uvR/ScXPyOkIbF7do5H0xN
+         VuLU/DxCsSxN1QqMAX7p+ySWkU27QFPNJ40L8u7yAT20doOyhSERI6WTc9YVHmElERqf
+         cGxvE8T5USqSxVu/Vdxnu5vYf8yUx8RzQwwcnZjvXGTvmc62+RV1X2ZfPPx0I6lsz4LP
+         VQlW+h4IXOtDAbTTPurd33l4Of0dj00TfEjwBH/gRVt8ZiaUiqfaiY7G1T+5H2ekPFEf
+         uxxw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2ObpYwzNFKzcwtHIKA1Vch7eljT2JzTfbkBKcLtdxiaktZ31Ze+JU+fRPbKnHQEVXcqKQKoBn@vger.kernel.org, AJvYcCX0jKyJ+1accxJJ385x2c9GdFqSsZNDulrkZfP4cl3Be80AcwrB0HkhE2UV2lVIul85Q5Wxomn1j7Y/5mE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqOROoHC/J3fnjCQm83VMYSEy46oCTF1gJ/bHtsevvL5vSkVnN
+	6f+WX6f8geXLgl+uMhNTBhRmTmnOH1195E24E6biB1EZYTdhRKhr
+X-Gm-Gg: ASbGncu+WBvGcP7CRkzgkundXSqFzL5UAyGqG4guJ31IUQ1/UraOYEUwnDuB65sTGea
+	BLSEOT9omguJ/hKkiUYS2q9TYD0Dt0MbtaoO/nX47igEXp+dnvApdKuQKftetUfifGXZBynN+W2
+	MMwzy+/fmkjIcjNv/JowDJs6xLrpQnmhQZKWOFqBDPWuy9MH6dA/LHcesF9wgQ+vHaNvESpRXqQ
+	iUISmOmxvmLrmCwp8cDXZ1be3SpxGNvhBTN4ZPKecilPQ6l2+9xJ+R+4Om9p3c2SB1Zc7Ejgl21
+	1E7NyCwvwi8bhTWdJ297fHDkliYqfhtVOWu7bQrEaL0RsEypDG2tymneK7h3fI0EuYDwZ7rG8ky
+	bvH402ZjBjSgr+2GAYsi5j8aFUwijGpUzKcpBWwYDfQ==
+X-Google-Smtp-Source: AGHT+IElZ8X7hhb3RjqL7Mk6thv/lcV/e3xD1JUsnyVdd+rC7/1j3EqdIhv1BaEeptNXbzA5nSihFA==
+X-Received: by 2002:a05:6402:26c3:b0:5d0:8f07:eceb with SMTP id 4fb4d7f45d1cf-5d08f07f079mr2572908a12.10.1732728783642;
+        Wed, 27 Nov 2024 09:33:03 -0800 (PST)
+Received: from ?IPV6:2a02:3100:b12f:4200:648f:850f:5e23:bc2f? (dynamic-2a02-3100-b12f-4200-648f-850f-5e23-bc2f.310.pool.telefonica.de. [2a02:3100:b12f:4200:648f:850f:5e23:bc2f])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5d01d8603dfsm6357269a12.26.2024.11.27.09.33.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Nov 2024 09:33:02 -0800 (PST)
+Message-ID: <dabcacd6-6e51-489c-b8f1-bd104ac4186f@gmail.com>
+Date: Wed, 27 Nov 2024 18:33:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|IA0PR12MB7649:EE_
-X-MS-Office365-Filtering-Correlation-Id: d358fae9-e9e2-497b-0666-08dd0f077879
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MUx6OXRxVDd2YVZOdUNmeGJzNU5ERGRvQzFBaWd5MElvU2RFM05EcDhFRkxS?=
- =?utf-8?B?dWpvTUVKK1JXNnRHSGhkSlpkYUU5d2lZMVFLUmlOanFDZEtqQnkvZmpySEZ1?=
- =?utf-8?B?MDljRTJZeTVYUkpxalpRNllxNWVrbjVjdGdlazNKZFdEZWNJTXBwRGNDTk1V?=
- =?utf-8?B?Qkh3d1FsRkpFeVFYenJQM3EzRkpyNzBoTlQvWVZoZXRhVnpla09WY0p4WTRl?=
- =?utf-8?B?WjFPbzE3STRQQ2YxUVZaNzZ0SU4yUFEwQllwVG5EbnF3RzdPQlBLa1VQbEVQ?=
- =?utf-8?B?cUtsajQ1Tkt5N3dITXRGQ1VrbU4xRkxlZXM3ek1MUENxL0dZT3VkYXNzRG9Z?=
- =?utf-8?B?T05BemxKUGNEdHZtdTZZMTJ2TlJaeVVVYldweTZia0M0Qit4RlEzd3pjQkdU?=
- =?utf-8?B?Zjk1b0QxN3EvZ0VHOUM4NmFNMW1wdU1zQlVvYmRmYTdmN2dCUzhCMXd0aDlQ?=
- =?utf-8?B?alM5RXRlT3JRS0I3M2pZb1VYNHcySjNGR053WVJVTjNPd0J1aXhUdSszaEo5?=
- =?utf-8?B?Zlc1TnZPWFNJZDFSYmNxdnJYN2FyMjdySERqV0ZsUjMreGRQY2pnaU9qQzhW?=
- =?utf-8?B?dGxxY3BpblpzOUsxR0hDaWFLVmlOaHBDWVNUVmduRElpZ0ZvVEo1WDYyeXY0?=
- =?utf-8?B?VGs2aXNMTlhlZDNEWUNGREpJNXBuejM2RXA2dUNDeit4OEhick9mQmVUVUM3?=
- =?utf-8?B?d2h0dkhoM0FudjFkV1d4OE9mRjZnNTcwMGlJSVVBQWI1TzllSnZ6aUpUYSty?=
- =?utf-8?B?Q1lRbXhndkZxYm96ZTZHMEJteXdlV0JjY1BwTFFyN1BQanZKRnFHKy9QcURM?=
- =?utf-8?B?eWYwbE5yZ1dMcVRLUjMyQjVCLzFpZm56VTNEdWwzOEdWOG52S3NYaDBTbEtx?=
- =?utf-8?B?UVJoS2dZVEUzTnF0bGh1VnJtQ2VJS3V1UU9yUFZ2ckZoblB0RW5Kc0NocDht?=
- =?utf-8?B?QVo2U3c0RjBYZXdvS3BCbjdXbzRJZW93UkNYTEZidnJabFVFcWc3TzNlMUJw?=
- =?utf-8?B?aXNHbHN4ZEdiUXRKOTQrYWVZTFhhekQxVVhLTjRZR0UydXM1ZHpWQjBIWVRj?=
- =?utf-8?B?TkNGcTROc2poUkRtVVAxRFV1cHljTzJYckxTanlmU1A4L3BCd1VzM2ZBRFNM?=
- =?utf-8?B?c1ZIK1hLUDR1dldJb0U4Z3lLRUJ1UURtU1NUaldPT05vOG9DcGQxeEZzaENK?=
- =?utf-8?B?dVNXc1gwRW5GSVZ1SGlPSjZDOXVsOTQvWlhhOHo4S1JvbzB4eldDMmRYQzI4?=
- =?utf-8?B?U1ZVdVdwS2JXeWgwckpuTi9yL3pOenhYZnVtUkhLdlM5MlRVTmhDelhKK0dz?=
- =?utf-8?B?SytvMXpiVU9MT1pUc01ncnZ1NGxmNXNNYlJHUkNEeVBPdXduaDBnUXpRd3Jk?=
- =?utf-8?B?U0kvM2hWSGFxbzY1N1d3OFI5UFpIYlFXZ3pnNDhPZEM5L1ZuL3cxS2RIN0wr?=
- =?utf-8?B?d1dacFY0bUFzaGJoS1pqNktYRU8xUEVoNjZ1RFFJbEhvbjQ2cG0rQnl1QWRB?=
- =?utf-8?B?WVQyeW1mM0JJOHlVYlJyRGJnSWFDYm5mREEwVitLS014Ny9zK1RFbU9iZVBz?=
- =?utf-8?B?VkxZdUtXQndrVlNDaXlESFd6T011SkhodnI5ZXIxbTN5cVpGcTRxbERsdVAr?=
- =?utf-8?B?KzhUa2E1ZzJ1VVpTT3pYNk5aVG5keW5FeXFxYnVJOVpwYzFNeTJDMkkrUUl2?=
- =?utf-8?B?UUE5Y0Z0S01pZHRBZEJiYlgvNUdoUU0wNEVpSFFNRGVrK01KWk00STFZczBY?=
- =?utf-8?B?Qk8vWFZjOVJnNnhuOFo1d0h0Y1BFTkRaSWN6eHZUdUEwdTJXN2U0SFNGQ0ZB?=
- =?utf-8?B?cU05aElBbGk5cW82VjRTUT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aE14VHpUejQwcllVeUU3TjVPb25TSE55RTM0NUQ5aVBvaWtBbktqbENveVBk?=
- =?utf-8?B?dS9rcXYrcExIMXgxSS9uRlMyYzVFMXlqZTduV1BnU0VIQStxTkl1MC9Hd3Uz?=
- =?utf-8?B?SVZvSEJ4SGQxbVp3OUdmanQ0Y3BRTWdXVnpudk1KZ09qaWtPeE40ci9mVTFs?=
- =?utf-8?B?cm9XbzN6S3FsNGZKRHlQOW96OCttQTZGaEVOb252RjM4eVRKalRDMFBYSUVi?=
- =?utf-8?B?VGRud2tZeE0rNzRsZmwrZDZoelAxU21kaGlQVFoyYXlVakpTV1MzK3hNRzhN?=
- =?utf-8?B?UVpZYU5KdkExVWp6QytjOWRBZ0p3TWlYK2d6d1JjWFBXVDErYVhFanVSakhP?=
- =?utf-8?B?SHJLeExobzQybkV1dUlNdlllc0NCeDRnZkJPSEtwemU5alY5RmNSU0QrQmlZ?=
- =?utf-8?B?M3hoUlJ2K0lhYXBtVTVweTkxYW14U05jV0J5QkI0dElVNUZtTDd3YU9KT0Fj?=
- =?utf-8?B?cUVHVEFFWWZRa2FTaVp5S1dSTTFmMFluamFFdyt1ZU5TaWlvTjlIR1lUSm9m?=
- =?utf-8?B?R2YwR3pia3AvbGRZNEpEblFOeDEyRUQyU29yTHhCUHZ1TXg2akUvWnAzVk1k?=
- =?utf-8?B?NUZrajMzTnFMNU1RN2hOYTRHb0xCWHNWSjhJZXN1aEFINUZuMHpiWklFcWpF?=
- =?utf-8?B?QzdUdGM4U0psbUowQTc3MUZhcWtLOUlKTG1SdlpZc2RsSGNWeTlGdmExOXNk?=
- =?utf-8?B?d1dleVhoWDIzWVhVZ1NsZWVvTk42T1Y4QmZOajNyZUlzV3BYOHIwU3lVQ2hm?=
- =?utf-8?B?UXdVMStxZUJuRms0aXpYY2NxZlBoNnFtYW50Z0lKOFlRNHA2YWJVQVE4YzND?=
- =?utf-8?B?cVU5TXlteGs4cklJWEQ5UnJJVmZxWDdaeGZmdkpweEtjZ1FBazN2dExoYXQv?=
- =?utf-8?B?QjN5Q3h1QkJ5RWxKYzJuTjlLbUJsRUovN2hPWkZEMERCY25Ma2cxZkwyZGo4?=
- =?utf-8?B?Rng5cjVGaExTbVh1WVFIc1NyS0IvT0piRDRtck1BQWJFZEtCZnNtQXpFVnlv?=
- =?utf-8?B?d0ZXdmpGNE1Xc05GVWtrRlBJMnUvZTN3cFo1TGVSNmJGd3pRVXBiWmd0dlhH?=
- =?utf-8?B?dXZrQkluR3BTVmFvTVFJNmJ2QlBYQmpEMmhtcUNmUVBpaC8zSnN6ejVjdGRY?=
- =?utf-8?B?N1A0NUJxcXNhQlRkb2wrUXlSMUtQR0VOOE8xRU9JN2orRU5QcWZ2N2cxZmJ3?=
- =?utf-8?B?bWxpd1o3L0wySVZqSkkzaDhWWng1QnN1a3hGMTRwUm5haCt4SFRRM3lXZ2Jq?=
- =?utf-8?B?cVRhYzFmOFdGSm9vR3VrYmRRcFc1dnY3b2gzRlBJc0YzQWFMWHR6blhic1d5?=
- =?utf-8?B?K2I0MlVNeTUrcjlkZi9mN2NvVDM0MWVqRkpjaEpNZjk5aDFiSmExcWt4MXZB?=
- =?utf-8?B?eXArcllTWjBTckJNUkFhK0dVRlpGdC81WXVRcUdEMmt0N2RHMzFMR20vd25F?=
- =?utf-8?B?ZjdZcXZzbXpqd2tEakVqYjhDZC9rMW8yb1JQOTZZd2xZNEo5TmQvWlRsSVlG?=
- =?utf-8?B?VklFVmIxbFBCK0lQMUN1blk4Mkw2QkZ0aHIxRlRDaE9xdjhNMFdrVkJkNmcx?=
- =?utf-8?B?bGNRWFduU0RxZzY2cVh5b09uamhzYTBJZ2RyUTBQSnkrRWsyQlpSNExLS2R0?=
- =?utf-8?B?aWxhaGUwQ1ZqR1lkMXBNcGRSa2FLbUxSZjU2bE05KzhZRWJtSlhJdVBoOFJz?=
- =?utf-8?B?VWt1Wll5MXBhZjJ4ZmtOSSswZmNQTEtxdExRYnVmWkxBRHZBS3BUdFh5eFNC?=
- =?utf-8?B?VUo0ZVFLSVIrRGFIY2llNU9UNm5WdE9QdWo2SVZMNGp1N2NNRTQwTFQ2aHJK?=
- =?utf-8?B?eGtiemxvbi85cDNMVExYMnhZTUhLVnFPWFNOeVU0dTBiUlp5amRXdWpicjdV?=
- =?utf-8?B?NkZVWk1EQWs0cDJ3K2FmZktOTG9NTEhGZEFEc2NHQS9zUXVyMFZUeU5EeVNr?=
- =?utf-8?B?OXpGbnZNcmY1a3lSaGVHVXRWdXZQUCs4anlFbmxBWmpYWTBOWjhqNDUvL1Zq?=
- =?utf-8?B?SG5FR1lGRlRRWTJqQlY4ZmFkejByV2tzS2NoRzNNYXU4ZEZKaC9CRHFka1Q1?=
- =?utf-8?B?OHMxRy9YbDRVdms2clVWTmdDMTJ2b3N2akF3dmpqTzRDdHZCZjl0Wk1IRUhI?=
- =?utf-8?Q?AErGm0c5ZTD8+FrzuLm+J9yTF?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d358fae9-e9e2-497b-0666-08dd0f077879
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2024 17:18:11.9073
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jy+3vU95a2xcMyhmqxC8N5Gcb0k+HeuWKHFdlPJkF8WxMUeyo7YuhRmCDtBxn+0gZOpfxEd7o0Ob741RpBwqcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7649
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v1 2/2] net. phy: dp83tg720: Add randomized polling
+ intervals for unstable link detection
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241127131011.92800-1-o.rempel@pengutronix.de>
+ <20241127131011.92800-2-o.rempel@pengutronix.de>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20241127131011.92800-2-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 27.11.2024 14:10, Oleksij Rempel wrote:
+> Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
+> report a stable link state. To handle this, the PHY must be periodically reset
+> when the link is down. However, synchronized reset intervals between the PHY
+> and its link partner can result in a deadlock, preventing the link from
+> re-establishing.
+> 
+Out of curiosity: This PHY isn't normally quirky, but completely broken.
+Why would anybody use it?
 
-On 11/21/24 02:56, Alison Schofield wrote:
-> On Mon, Nov 18, 2024 at 04:44:33PM +0000, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> A CXL region struct contains the physical address to work with.
->>
->> Add a function for given a opaque cxl region struct returns the params
->> to be used for mapping such memory range.
-> I may not be understanding what needs to be opaque here.
+> This change introduces a randomized polling interval when the link is down to
+> desynchronize resets between link partners.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/phy/dp83tg720.c | 76 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 76 insertions(+)
+> 
+> diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
+> index f56659d41b31..64c65454cf94 100644
+> --- a/drivers/net/phy/dp83tg720.c
+> +++ b/drivers/net/phy/dp83tg720.c
+> @@ -4,12 +4,31 @@
+>   */
+>  #include <linux/bitfield.h>
+>  #include <linux/ethtool_netlink.h>
+> +#include <linux/jiffies.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/phy.h>
+> +#include <linux/random.h>
+> 
+>  #include "open_alliance_helpers.h"
+> 
+> +/*
+> + * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
+> + *				 is active.
+> + * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
+> + *				 the link is down.
+> + * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
+> + *				 the link is down.
+> + *
+> + * These values are not documented or officially recommended by the vendor but
+> + * were determined through empirical testing. They achieve a good balance in
+> + * minimizing the number of reset retries while ensuring reliable link recovery
+> + * within a reasonable timeframe.
+> + */
+> +#define DP83TG720S_POLL_ACTIVE_LINK		1000
+> +#define DP83TG720S_POLL_NO_LINK_MIN		100
+> +#define DP83TG720S_POLL_NO_LINK_MAX		1000
+> +
+>  #define DP83TG720S_PHY_ID			0x2000a284
+> 
+>  /* MDIO_MMD_VEND2 registers */
+> @@ -355,6 +374,11 @@ static int dp83tg720_read_status(struct phy_device *phydev)
+>  		if (ret)
+>  			return ret;
+> 
+> +		/* The sleep value is based on testing with the DP83TG720S-Q1
+> +		 * PHY. The PHY needs some time to recover from a link loss.
+> +		 */
+What is the issue during this "time to recover"?
+Is errata information available from the vendor?
 
+> +		msleep(600);
+> +
+>  		/* After HW reset we need to restore master/slave configuration.
+>  		 * genphy_c45_pma_baset1_read_master_slave() call will be done
+>  		 * by the dp83tg720_config_aneg() function.
+> @@ -482,6 +506,57 @@ static int dp83tg720_probe(struct phy_device *phydev)
+>  	return 0;
+>  }
+> 
+> +/**
+> + * dp83tg720_phy_get_next_update_time - Determine the next update time for PHY
+> + *                                      state
+> + * @phydev: Pointer to the phy_device structure
+> + *
+> + * This function addresses a limitation of the DP83TG720 PHY, which cannot
+> + * reliably detect or report a stable link state. To recover from such
+> + * scenarios, the PHY must be periodically reset when the link is down. However,
+> + * if the link partner also runs Linux with the same driver, synchronized reset
+> + * intervals can lead to a deadlock where the link never establishes due to
+> + * simultaneous resets on both sides.
+> + *
+> + * To avoid this, the function implements randomized polling intervals when the
+> + * link is down. It ensures that reset intervals are desynchronized by
+> + * introducing a random delay between a configured minimum and maximum range.
+> + * When the link is up, a fixed polling interval is used to minimize overhead.
+> + *
+> + * This mechanism guarantees that the link will reestablish within 10 seconds
+> + * in the worst-case scenario.
+> + *
+> + * Return: Time (in milliseconds) until the next update event for the PHY state
+> + * machine.
+> + */
+> +static unsigned int dp83tg720_phy_get_next_update_time(struct phy_device *phydev)
+> +{
+> +	unsigned int jiffy_ms = jiffies_to_msecs(1); /* Jiffy granularity in ms */
+> +	unsigned int next_time_ms;
+> +
+> +	if (phydev->link) {
+> +		/* When the link is up, use a fixed 1000ms interval */
+> +		next_time_ms = DP83TG720S_POLL_ACTIVE_LINK;
+> +	} else {
+> +		unsigned int min_jiffies, max_jiffies, rand_jiffies;
+> +		/* When the link is down, randomize interval between
+> +		 * configured min/max
+> +		 */
+> +
+> +		/* Convert min and max to jiffies */
+> +		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
+> +		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
+> +
+> +		/* Randomize in the jiffie range and convert back to ms */
+> +		rand_jiffies = min_jiffies +
+> +			get_random_u32_below(max_jiffies - min_jiffies + 1);
+> +		next_time_ms = jiffies_to_msecs(rand_jiffies);
+> +	}
+> +
+> +	/* Ensure the polling time is at least one jiffy */
+> +	return max(next_time_ms, jiffy_ms);
+> +}
+> +
+>  static struct phy_driver dp83tg720_driver[] = {
+>  {
+>  	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
+> @@ -500,6 +575,7 @@ static struct phy_driver dp83tg720_driver[] = {
+>  	.get_link_stats	= dp83tg720_get_link_stats,
+>  	.get_phy_stats	= dp83tg720_get_phy_stats,
+>  	.update_stats	= dp83tg720_update_stats,
+> +	.get_next_update_time = dp83tg720_phy_get_next_update_time,
+> 
+>  	.suspend	= genphy_suspend,
+>  	.resume		= genphy_resume,
+> --
+> 2.39.5
+> 
 
-The driver can not access cxl_region struct just using it in calls, what 
-requires this patch as other in this patchset as an API for accel drivers.
-
-Apologies if mentioning that here creates confusion.
-
-
-> Why not just 'add function to get a region resource'
-> and then add 'cxl_get_region_resource().
->
-> Region params usually refers to the member of struct cxl_region
-> that is called 'params' and that includes more than the resource.
-
-
-I did not realize using params could be problematic, but I agree it is 
-not how we should refer to what we are returning to the caller.
-
-I think using Dave suggestion for using range instead should solve the 
-problem.
-
-Thanks
-
-
-> --Alison
->
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> ---
->>   drivers/cxl/core/region.c | 16 ++++++++++++++++
->>   drivers/cxl/cxl.h         |  2 ++
->>   include/cxl/cxl.h         |  2 ++
->>   3 files changed, 20 insertions(+)
->>
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index eff3ad788077..fa44a60549f7 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
->> @@ -2663,6 +2663,22 @@ static struct cxl_region *devm_cxl_add_region(struct cxl_root_decoder *cxlrd,
->>   	return ERR_PTR(rc);
->>   }
->>   
->> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
->> +			  resource_size_t *end)
->> +{
->> +	if (!region)
->> +		return -ENODEV;
->> +
->> +	if (!region->params.res)
->> +		return -ENOSPC;
->> +
->> +	*start = region->params.res->start;
->> +	*end = region->params.res->end;
->> +
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_get_region_params, CXL);
->> +
->>   static ssize_t __create_region_show(struct cxl_root_decoder *cxlrd, char *buf)
->>   {
->>   	return sysfs_emit(buf, "region%u\n", atomic_read(&cxlrd->region_id));
->> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
->> index ee3385db5663..7b46d313e581 100644
->> --- a/drivers/cxl/cxl.h
->> +++ b/drivers/cxl/cxl.h
->> @@ -913,6 +913,8 @@ void cxl_coordinates_combine(struct access_coordinate *out,
->>   
->>   bool cxl_endpoint_decoder_reset_detected(struct cxl_port *port);
->>   
->> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
->> +			  resource_size_t *end);
->>   /*
->>    * Unit test builds overrides this to __weak, find the 'strong' version
->>    * of these symbols in tools/testing/cxl/.
->> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
->> index 2a8ebabfc1dd..f14a3f292ad8 100644
->> --- a/include/cxl/cxl.h
->> +++ b/include/cxl/cxl.h
->> @@ -77,4 +77,6 @@ struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
->>   				     bool avoid_dax);
->>   
->>   int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
->> +int cxl_get_region_params(struct cxl_region *region, resource_size_t *start,
->> +			  resource_size_t *end);
->>   #endif
->> -- 
->> 2.17.1
->>
->>
 
