@@ -1,180 +1,194 @@
-Return-Path: <netdev+bounces-147656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-147657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ACF59DAF21
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:55:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D947C9DAF35
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 23:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA6A4B20B02
-	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 21:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99A8B281D85
+	for <lists+netdev@lfdr.de>; Wed, 27 Nov 2024 22:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B563E2036E8;
-	Wed, 27 Nov 2024 21:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536322036FC;
+	Wed, 27 Nov 2024 22:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="McL0Ch6W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24D5202F7B
-	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 21:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7318C202F9C
+	for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 22:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732744525; cv=none; b=DGje8Zzw3GJ4y/BCkWGuuz+bWbIdKb/BMivcaiS+YEPztY5aKZnA3+WrJqZL+4Jcs9Zzxeu1BXJyv1/ZvLqFq1KNSC+ZMaCqGaw2AC6RcDKtPDkSZNeZEqCPOBaLSxxJFjhLkRMAC3E/Pi7PrEfZDjp+U9VwKYg7qYQ3y42Hezw=
+	t=1732745504; cv=none; b=ixoqgOpFtTxWgBS+EcHy1sPUAmp2hd0IsdaD2sCoeXTW9ywNyFO2beVdVAxH4fc8/bOUUpLUkX6hfR2IhSLSohfdGpdaEDkcyuxP7aFmIrMh2/rFixn+lrTGJnf8kX3JuwPsdHxgx+PBRrglvQ/2SbfSIMigXgqnmCoJ4w12QCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732744525; c=relaxed/simple;
-	bh=wHM2OrL8e79dKeH2gD8Yp82lDj4yCL0xRcvE5WB7s9s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jCiOPLkYGi63rx46iNGRrVKGMirIUvHZKXOp8u1fKRQjR9xn4U4I19/RIMTevVDUf+QSIG55M/FnyLppwIPowz1HLHE+xLq82N9K6AOGHC18l8zoUAHnLRZ2076O7j8O2IOpm/byGs0aM8heuBBIrVBYEI9yPxh3oUbssd3DhiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-84182041b05so12463539f.1
-        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 13:55:23 -0800 (PST)
+	s=arc-20240116; t=1732745504; c=relaxed/simple;
+	bh=QgHLQ6FcSiVaTG+yqlYqVzXAkIsyC1KAE6Tx8Uz1oSw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mHeb0iI0JG/wRok6SzaVq51c88gDoK3TrwYhG4gF9wiRC/wQgYcnK3FVn9KimuTZyKYn8uo7M+brUinq5konKdvG9xTyX6a/YeOB50Y9yWmvZ8KNwJfuNLqLzSWtZVkX0dCahVaOUrXHUwEF2yo0aAv4kta5PtJ0CM5hExfpIJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=McL0Ch6W; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3824aef833bso146716f8f.0
+        for <netdev@vger.kernel.org>; Wed, 27 Nov 2024 14:11:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732745500; x=1733350300; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=H8xCeSsXB1SGqsvkne3bx5tW5DoZL/BuIVhnmqcxnuk=;
+        b=McL0Ch6WVVdz2rZM9btMaQg4PST1DY8knX2zzWmLhc7zfr7k1USoyHHAHA8X6OHoDM
+         L8P+w2HG6PecZVv25zJm+6DGpgMbwgjiOEWnPNcV7FTh4R4AihA/Ck63voT6/FYHyjsC
+         x9iKjJcTe40pd5dDZzNwxdYkehQaqV3mKEI5nZuVwZfxZzpeeqWI1J0qWZ+WMP8NZhjx
+         YtBJgEDvULA14cicsrGhkmpJlOre0tpkUxgok/gV3n2dQoFmh4Y/vG2aTWhxIihwMS+4
+         hvp6bJDGejnEWh8yygltisfX1TII0+sqJkC4CiP3mY73kGJkmPZHehxiRhz5AVDZWktc
+         Bf2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732744523; x=1733349323;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Epg/2RMhmpPXmBlb4qS8YZsKov8fLNlh2IrMDtv8Kxs=;
-        b=pDtFIFy5Ihcsc+TSy1CBFWacEwR7jcKRSoeOdAkTiRSDO15oSMub/6xp+r1Gh+UeQx
-         Ss2OzdCy4MDnK4ydHfooW86R10MVegm4CDzWqCMSzds5rLOFsY6CoLXpPXx+oMLn1w4m
-         YeWE0zZTPg1NwEDL3veavhdUdxlcujaa512iX7lYVnac2JCCcdRCm2GUf4W1xajZ+g7l
-         pqMJdSvRyE2pHD7O6CbjLJh95JbS1uGI2NM1ykPhPPXb+7GG0t4XgVKY8Ku7ZGZ6hjMl
-         v244uCogk4G2qP/2UAWkNJ2tMGulAP4IN08WFR+ozZCJ2ijmXcWyezHXa//zcLZUikzS
-         lo6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUfjmkHciKqU/TabatXgLRTmWeqrKu9VWreZ537RknhmCf/qDZSVoheDBZBoZxsZVDIdtCoIHk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySmi7x+5IWvH9/86OP0jw6tVxIRVVF37GTqxworvJATuaqGW2j
-	pGjPLjOa6VN1cNs5b+q9sMg4oFqRAAvE68X//AYCeh68iqLeSp9f/NGB/aeujSazlnSWJg8Jp/J
-	PJOhxmgFSpToZEu3+m+XD/Nq2CoQTnJgxiJ02txnF3N/weaygB/1B+xA=
-X-Google-Smtp-Source: AGHT+IF5KfYlQB4ZglRygUfFv4HlReybSxnwAVaXI2cqd9V0GHNEQqdc0dKCshkBV2GNUJoSGcfKFgsp2XiTCNqdtyszvdoerLAW
+        d=1e100.net; s=20230601; t=1732745500; x=1733350300;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H8xCeSsXB1SGqsvkne3bx5tW5DoZL/BuIVhnmqcxnuk=;
+        b=b7SymUoDM5ayKQ6YXI1g1z/0P5OQYiVOz6OzrCT0lJuKBfomPlpNcOrmSAIfAeI2Iu
+         Gtlh5Kb7Q2kUcb0WpEzDdRH5ocYZOuVwWqETPxdvf3bEC6JnRYWHVoQBLFU4uSPUsYqd
+         u7EhvBKMmjKx1fo8OnRbr93ALj1+LA5j2WlnMiTY9sW+HWxc01MZnjuQ5wPh2/N4M3cj
+         0l7FTCgtJ5uefq2bCws/SNJguLgGO8IJSctBm5tV7YOy04YtKJb8feo+Tn1gZ2U37dOm
+         1Dw3sSKZtFHAaHSrG4efgbhyEKgaI7eIK23EMqmhSzcWVC/hVNNCUYqrgHV3encAFFjm
+         WS0Q==
+X-Gm-Message-State: AOJu0Yz+NlCDcWh7344bin55XRxtPeMFXTmdC/ziNJb5qUfRFsbsXUsc
+	06XDOYk12KoE9VZ5TqljvOq5Td2oDWHBqS+pObCYMsvFqbWFyev2vx6nX4yJ
+X-Gm-Gg: ASbGncuLXyh6stnp1/q40/xIXXGR/UPKOMZaC/sQL9FkWqaX1uPBmLOzB0fVOalNCXr
+	F7O54QE8Cl6RU7sxGoJY8mTjWGhXDdnuhVKLNTOy9HJpy9GRQ63zF5vpdmBIAaxgt7A7URQYqm+
+	9TPpNIYWUSuuTbCvzCVvoQ1BK67Mu6ojUGOAkapSsXNDPrLMUJM33HLZEzRBfwTcfPu43YsDdy0
+	t42WYMOz4qPSER+4/g9ljqekeVRZfF6W2JwL1V45irJtFFN6LJL1NW0UHzzmKdbfJF5Y9Z+mQl8
+	NweU67Vt7L8K/jwLq14NFxC0DkW9pdl26XDZi2uyRCckcw==
+X-Google-Smtp-Source: AGHT+IGFpTTV3u8kbqPnbetZaJlhjuK87233drO9WK28dtdpdMW5UoVX+/r5cabr9ZU2DH0xowzJfw==
+X-Received: by 2002:a05:6000:1787:b0:382:4ab4:b43c with SMTP id ffacd0b85a97d-385c6eb736dmr3304555f8f.21.1732745499796;
+        Wed, 27 Nov 2024 14:11:39 -0800 (PST)
+Received: from KJKCLT3928.esterline.net (192.234-180-91.adsl-dyn.isp.belgacom.be. [91.180.234.192])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd36c44sm96f8f.38.2024.11.27.14.11.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2024 14:11:39 -0800 (PST)
+From: Jesse Van Gavere <jesseevg@gmail.com>
+X-Google-Original-From: Jesse Van Gavere <jesse.vangavere@scioteq.com>
+To: netdev@vger.kernel.org,
+	woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com
+Cc: andrew@lunn.ch,
+	olteanv@gmail.com,
+	Jesse Van Gavere <jesse.vangavere@scioteq.com>
+Subject: [PATCH] net: dsa: microchip: KSZ9896 register regmap alignment to 32 bit boundaries
+Date: Wed, 27 Nov 2024 23:11:29 +0100
+Message-Id: <20241127221129.46155-1-jesse.vangavere@scioteq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d05:b0:3a7:8040:595b with SMTP id
- e9e14a558f8ab-3a7c555ec95mr39547485ab.9.1732744523085; Wed, 27 Nov 2024
- 13:55:23 -0800 (PST)
-Date: Wed, 27 Nov 2024 13:55:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6747954b.050a0220.253251.0064.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: global-out-of-bounds Read in __hw_addr_add_ex (2)
-From: syzbot <syzbot+a29a4fe94b1560756f7d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Commit (SHA1: 8d7ae22ae9f8c8a4407f8e993df64440bdbd0cee) fixed this issue
+for the KSZ9477 by adjusting the regmap ranges.
 
-syzbot found the following issue on:
+The same issue presents itself on the KSZ9896 regs and is fixed with 
+the same regmap range modification.
 
-HEAD commit:    5f153a692bac Merge commit 'bf40167d54d5' into fixes
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux.git fixes
-console output: https://syzkaller.appspot.com/x/log.txt?x=17e6d230580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cdbbf8ef410bf2e8
-dashboard link: https://syzkaller.appspot.com/bug?extid=a29a4fe94b1560756f7d
-compiler:       riscv64-linux-gnu-gcc (Debian 12.2.0-13) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: riscv64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1080aca7980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11c3a940580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/a741b348759c/non_bootable_disk-5f153a69.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bf8994051afc/vmlinux-5f153a69.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7603ef590293/Image-5f153a69.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a29a4fe94b1560756f7d@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: global-out-of-bounds in memcmp+0xc0/0xca lib/string.c:676
-Read of size 1 at addr ffffffff895cb520 by task syz-executor156/3200
-
-CPU: 1 UID: 0 PID: 3200 Comm: syz-executor156 Not tainted 6.12.0-rc1-syzkaller-00012-g5f153a692bac #0
-Hardware name: riscv-virtio,qemu (DT)
-Call Trace:
-[<ffffffff80010a14>] dump_backtrace+0x2e/0x3c arch/riscv/kernel/stacktrace.c:130
-[<ffffffff85f7c3cc>] show_stack+0x34/0x40 arch/riscv/kernel/stacktrace.c:136
-[<ffffffff85fd797a>] __dump_stack lib/dump_stack.c:94 [inline]
-[<ffffffff85fd797a>] dump_stack_lvl+0x122/0x196 lib/dump_stack.c:120
-[<ffffffff85f861e4>] print_address_description mm/kasan/report.c:377 [inline]
-[<ffffffff85f861e4>] print_report+0x290/0x5a0 mm/kasan/report.c:488
-[<ffffffff80970318>] kasan_report+0xec/0x118 mm/kasan/report.c:601
-[<ffffffff8097214e>] __asan_report_load1_noabort+0x12/0x1a mm/kasan/report_generic.c:378
-[<ffffffff85f525ae>] memcmp+0xc0/0xca lib/string.c:676
-[<ffffffff84d3805e>] __hw_addr_add_ex+0xee/0x676 net/core/dev_addr_lists.c:88
-[<ffffffff84d3b06a>] __dev_mc_add net/core/dev_addr_lists.c:867 [inline]
-[<ffffffff84d3b06a>] dev_mc_add+0xac/0x108 net/core/dev_addr_lists.c:885
-[<ffffffff84edd5e2>] mrp_init_applicant+0xe8/0x56e net/802/mrp.c:873
-[<ffffffff85ad13e2>] vlan_mvrp_init_applicant+0x26/0x30 net/8021q/vlan_mvrp.c:57
-[<ffffffff85ac7490>] register_vlan_dev+0x1b4/0x922 net/8021q/vlan.c:170
-[<ffffffff85acfab0>] vlan_newlink+0x3d2/0x5fc net/8021q/vlan_netlink.c:193
-[<ffffffff84d83228>] rtnl_newlink_create net/core/rtnetlink.c:3510 [inline]
-[<ffffffff84d83228>] __rtnl_newlink+0xfe2/0x1738 net/core/rtnetlink.c:3730
-[<ffffffff84d839ea>] rtnl_newlink+0x6c/0xa2 net/core/rtnetlink.c:3743
-[<ffffffff84d7259a>] rtnetlink_rcv_msg+0x428/0xdbe net/core/rtnetlink.c:6646
-[<ffffffff850b3e8e>] netlink_rcv_skb+0x216/0x3dc net/netlink/af_netlink.c:2550
-[<ffffffff84d6454c>] rtnetlink_rcv+0x26/0x30 net/core/rtnetlink.c:6664
-[<ffffffff850b2140>] netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
-[<ffffffff850b2140>] netlink_unicast+0x4f0/0x82c net/netlink/af_netlink.c:1357
-[<ffffffff850b2ce0>] netlink_sendmsg+0x864/0xdc6 net/netlink/af_netlink.c:1901
-[<ffffffff84c5e82a>] sock_sendmsg_nosec net/socket.c:729 [inline]
-[<ffffffff84c5e82a>] __sock_sendmsg+0xcc/0x160 net/socket.c:744
-[<ffffffff84c5f436>] ____sys_sendmsg+0x5ce/0x79e net/socket.c:2602
-[<ffffffff84c66b4c>] ___sys_sendmsg+0x144/0x1e6 net/socket.c:2656
-[<ffffffff84c67624>] __sys_sendmsg+0x130/0x1f0 net/socket.c:2685
-[<ffffffff84c67754>] __do_sys_sendmsg net/socket.c:2694 [inline]
-[<ffffffff84c67754>] __se_sys_sendmsg net/socket.c:2692 [inline]
-[<ffffffff84c67754>] __riscv_sys_sendmsg+0x70/0xa2 net/socket.c:2692
-[<ffffffff8000f2d4>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:90
-[<ffffffff85fd9c4a>] do_trap_ecall_u+0x1aa/0x216 arch/riscv/kernel/traps.c:331
-[<ffffffff85ffcac6>] _new_vmalloc_restore_context_a0+0xc2/0xce
-
-The buggy address belongs to the variable:
- vlan_mrp_app+0x60/0x3e80
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x897cb
-flags: 0xffe000000002000(reserved|node=0|zone=0|lastcpupid=0x7ff)
-raw: 0ffe000000002000 ff1c00000025f2c8 ff1c00000025f2c8 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner info is not present (never set?)
-
-Memory state around the buggy address:
- ffffffff895cb400: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
- ffffffff895cb480: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffffffff895cb500: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
-                               ^
- ffffffff895cb580: 00 00 00 00 00 00 00 00 00 00 00 00 f9 f9 f9 f9
- ffffffff895cb600: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
-==================================================================
-
-
+Signed-off-by: Jesse Van Gavere <jesse.vangavere@scioteq.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/dsa/microchip/ksz_common.c | 42 +++++++++++---------------
+ 1 file changed, 18 insertions(+), 24 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 920443ee8ffd..8a03baa6aecc 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -1100,10 +1100,9 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x1030, 0x1030),
+ 	regmap_reg_range(0x1100, 0x1115),
+ 	regmap_reg_range(0x111a, 0x111f),
+-	regmap_reg_range(0x1122, 0x1127),
+-	regmap_reg_range(0x112a, 0x112b),
+-	regmap_reg_range(0x1136, 0x1139),
+-	regmap_reg_range(0x113e, 0x113f),
++	regmap_reg_range(0x1120, 0x112b),
++	regmap_reg_range(0x1134, 0x113b),
++	regmap_reg_range(0x113c, 0x113f),
+ 	regmap_reg_range(0x1400, 0x1401),
+ 	regmap_reg_range(0x1403, 0x1403),
+ 	regmap_reg_range(0x1410, 0x1417),
+@@ -1130,10 +1129,9 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x2030, 0x2030),
+ 	regmap_reg_range(0x2100, 0x2115),
+ 	regmap_reg_range(0x211a, 0x211f),
+-	regmap_reg_range(0x2122, 0x2127),
+-	regmap_reg_range(0x212a, 0x212b),
+-	regmap_reg_range(0x2136, 0x2139),
+-	regmap_reg_range(0x213e, 0x213f),
++	regmap_reg_range(0x2120, 0x212b),
++	regmap_reg_range(0x2134, 0x213b),
++	regmap_reg_range(0x213c, 0x213f),
+ 	regmap_reg_range(0x2400, 0x2401),
+ 	regmap_reg_range(0x2403, 0x2403),
+ 	regmap_reg_range(0x2410, 0x2417),
+@@ -1160,10 +1158,9 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x3030, 0x3030),
+ 	regmap_reg_range(0x3100, 0x3115),
+ 	regmap_reg_range(0x311a, 0x311f),
+-	regmap_reg_range(0x3122, 0x3127),
+-	regmap_reg_range(0x312a, 0x312b),
+-	regmap_reg_range(0x3136, 0x3139),
+-	regmap_reg_range(0x313e, 0x313f),
++	regmap_reg_range(0x3120, 0x312b),
++	regmap_reg_range(0x3134, 0x313b),
++	regmap_reg_range(0x313c, 0x313f),
+ 	regmap_reg_range(0x3400, 0x3401),
+ 	regmap_reg_range(0x3403, 0x3403),
+ 	regmap_reg_range(0x3410, 0x3417),
+@@ -1190,10 +1187,9 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x4030, 0x4030),
+ 	regmap_reg_range(0x4100, 0x4115),
+ 	regmap_reg_range(0x411a, 0x411f),
+-	regmap_reg_range(0x4122, 0x4127),
+-	regmap_reg_range(0x412a, 0x412b),
+-	regmap_reg_range(0x4136, 0x4139),
+-	regmap_reg_range(0x413e, 0x413f),
++	regmap_reg_range(0x4120, 0x412b),
++	regmap_reg_range(0x4134, 0x413b),
++	regmap_reg_range(0x413c, 0x413f),
+ 	regmap_reg_range(0x4400, 0x4401),
+ 	regmap_reg_range(0x4403, 0x4403),
+ 	regmap_reg_range(0x4410, 0x4417),
+@@ -1220,10 +1216,9 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x5030, 0x5030),
+ 	regmap_reg_range(0x5100, 0x5115),
+ 	regmap_reg_range(0x511a, 0x511f),
+-	regmap_reg_range(0x5122, 0x5127),
+-	regmap_reg_range(0x512a, 0x512b),
+-	regmap_reg_range(0x5136, 0x5139),
+-	regmap_reg_range(0x513e, 0x513f),
++	regmap_reg_range(0x5120, 0x512b),
++	regmap_reg_range(0x5134, 0x513b),
++	regmap_reg_range(0x513c, 0x513f),
+ 	regmap_reg_range(0x5400, 0x5401),
+ 	regmap_reg_range(0x5403, 0x5403),
+ 	regmap_reg_range(0x5410, 0x5417),
+@@ -1250,10 +1245,9 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x6030, 0x6030),
+ 	regmap_reg_range(0x6100, 0x6115),
+ 	regmap_reg_range(0x611a, 0x611f),
+-	regmap_reg_range(0x6122, 0x6127),
+-	regmap_reg_range(0x612a, 0x612b),
+-	regmap_reg_range(0x6136, 0x6139),
+-	regmap_reg_range(0x613e, 0x613f),
++	regmap_reg_range(0x6120, 0x612b),
++	regmap_reg_range(0x6134, 0x613b),
++	regmap_reg_range(0x613c, 0x613f),
+ 	regmap_reg_range(0x6300, 0x6301),
+ 	regmap_reg_range(0x6400, 0x6401),
+ 	regmap_reg_range(0x6403, 0x6403),
+-- 
+2.34.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
